@@ -24,7 +24,7 @@ RETURNS
 File pointer or <<NULL>>, as for <<fopen>>.
 */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <sys/types.h>
 #include <sys/fcntl.h>
 

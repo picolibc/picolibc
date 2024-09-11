@@ -38,7 +38,7 @@
         free(tmp);                                                      \
     } while (0)
 
-int test_basename(void)
+static int test_basename(void)
 {
 	char *tmp, *s;
 	int err=0;

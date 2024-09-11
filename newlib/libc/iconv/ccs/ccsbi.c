@@ -2,7 +2,6 @@
  * This file was automatically generated mkdeps.pl script. Don't edit.
  */
 
-#include <_ansi.h>
 #include "ccsbi.h"
 
 /*

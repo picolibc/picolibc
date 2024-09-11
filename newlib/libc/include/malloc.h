@@ -36,12 +36,10 @@ SUCH DAMAGE.
 #ifndef _INCLUDE_MALLOC_H_
 #define _INCLUDE_MALLOC_H_
 
-#include <_ansi.h>
-
+#include <sys/cdefs.h>
 #define __need_size_t
 #include <stddef.h>
 
-#include <sys/cdefs.h>
 /* include any machine-specific extensions */
 #include <machine/malloc.h>
 
@@ -105,10 +103,8 @@ void mstats (char *);
 #define M_MMAP_THRESHOLD    -3 
 #define M_MMAP_MAX          -4
 
-#ifndef __CYGWIN__
 /* Some systems provide this, so do too for compatibility.  */
 void cfree (void *);
-#endif /* __CYGWIN__ */
 
 #ifdef __cplusplus
 }

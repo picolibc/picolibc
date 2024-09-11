@@ -39,17 +39,12 @@ SUCH DAMAGE.
 #ifndef _SETJMP_H_
 #define _SETJMP_H_
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 #include <machine/setjmp.h>
 
 _BEGIN_STD_C
 
-#ifdef __GNUC__
-void	longjmp (jmp_buf __jmpb, int __retval)
-			__attribute__ ((__noreturn__));
-#else
-void	longjmp (jmp_buf __jmpb, int __retval);
-#endif
+_Noreturn void	longjmp (jmp_buf __jmpb, int __retval);
 int	setjmp (jmp_buf __jmpb);
 
 _END_STD_C

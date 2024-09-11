@@ -186,7 +186,7 @@ int __ftoa_engine(float val, struct dtoa *ftoa, int maxDigits, bool fmode, int m
                 /* If limiting decimals... */
                 if(fmode)
                 {
-		    maxDigits = min(maxDigits, max(1, maxDecimals + exp10 + 1));
+		    maxDigits = min(maxDigits, max(maxDecimals<0, maxDecimals + exp10 + 1));
 		    if (maxDigits == 0)
 			break;
                 }
@@ -243,7 +243,6 @@ int __ftoa_engine(float val, struct dtoa *ftoa, int maxDigits, bool fmode, int m
 		exp10++;
 		if (fmode)
 		    maxDigits = min(saveMaxDigits, max(1, maxDecimals + exp10 + 1));
-		flags |= DTOA_CARRY;
 	    }
         }
         ftoa->exp = exp10;

@@ -12,8 +12,8 @@ exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-arc "$@"', 'run-arc'
 
 [host_machine]
 system = 'zephyr'
-cpu_family = 'arc'
-cpu = 'arc'
+cpu_family = 'arc64'
+cpu = 'arc64'
 endian = 'little'
 
 [properties]

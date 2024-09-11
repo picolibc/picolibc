@@ -48,7 +48,7 @@ opal_call(void *r3, void *r4, void *r5, int call_r6, void *base_r7, void *entry_
 int
 opal_console_write(int terminal, size_t len, const char *base);
 
-void _ATTRIBUTE((__noreturn__))
+_Noreturn void
 opal_cec_power_down(uint64_t request);
 
 #define OPAL_TERMINAL_DEFAULT   0

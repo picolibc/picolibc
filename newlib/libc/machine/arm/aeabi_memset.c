@@ -26,9 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #include <stddef.h>
 #include <string.h>
-#include <_ansi.h>
 
 /* Support the alias for the __aeabi_memset which may
    assume memory alignment.  */
@@ -46,6 +47,8 @@ void __aeabi_memset8 (void *dest, size_t n, int c)
  */
 
 #undef memset
+
+void __attribute__((used, weak)) __aeabi_memset (void *dest, size_t n, int c);
 
 void __attribute__((used, weak)) __aeabi_memset (void *dest, size_t n, int c)
 {

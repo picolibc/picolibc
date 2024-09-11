@@ -1,8 +1,14 @@
 /* Copyright (c) 2011 Eric Blake <eblake@redhat.com> */
 /* POSIX variant of strerror_r. */
-#undef __STRICT_ANSI__
+#define _POSIX_C_SOURCE 200809
 #include <errno.h>
 #include <string.h>
+#include "local.h"
+
+int
+__xpg_strerror_r (int errnum,
+	char *buffer,
+        size_t n);
 
 int
 __xpg_strerror_r (int errnum,

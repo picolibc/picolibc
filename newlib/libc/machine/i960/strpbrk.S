@@ -48,6 +48,8 @@
 	This routine stays out of g3 and g4 altogether.  They may be used by 
 	the strtok routine, which calls this routine in an incestuous way.
 */
+#include <picolibc.h>
+
 #ifdef  __PIC
         .pic
 #endif

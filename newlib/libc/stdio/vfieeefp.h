@@ -29,13 +29,9 @@
 /* This header file is a modification of mprec.h that only contains floating
    point union code. */
 
-#include <newlib.h>
-#include <ieeefp.h>
 #include <math.h>
 #include <float.h>
 #include <errno.h>
-#include <sys/config.h>
-#include <sys/cdefs.h>
 
 #ifdef __IEEE_LITTLE_ENDIAN
 #define IEEE_8087

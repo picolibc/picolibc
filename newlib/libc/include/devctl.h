@@ -27,17 +27,15 @@
 #ifndef _POSIX_DEVCTL_h_
 #define _POSIX_DEVCTL_h_
 
+#include <sys/cdefs.h>
+
 /*
  * Nothing in this file should be visible unless _POSIX_26_C_SOURCE is
  * defined.
  */
 #ifdef _POSIX_26_C_SOURCE
 
-#include <sys/cdefs.h>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 #if defined(__rtems__)
 /*
@@ -70,9 +68,7 @@ int posix_devctl(
   int *__restrict  dev_info_ptr
 );
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* _POSIX_26_C_SOURCE */
 #endif /*_POSIX_DEVCTL_h_ */

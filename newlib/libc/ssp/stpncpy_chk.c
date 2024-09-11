@@ -29,8 +29,6 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #define _DEFAULT_SOURCE
-#include <sys/cdefs.h>
-__RCSID("$NetBSD: stpncpy_chk.c,v 1.3 2015/05/09 15:42:21 christos Exp $");
 
 /*LINTLIBRARY*/
 
@@ -39,9 +37,7 @@ __RCSID("$NetBSD: stpncpy_chk.c,v 1.3 2015/05/09 15:42:21 christos Exp $");
 
 #undef stpncpy
 
-#if !__GNUC_PREREQ__(4, 8)
 char *__stpncpy_chk(char * __restrict, const char * __restrict, size_t, size_t);
-#endif
 
 char *
 __stpncpy_chk(char * __restrict dst, const char * __restrict src, size_t len,

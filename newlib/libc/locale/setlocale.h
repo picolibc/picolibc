@@ -29,13 +29,13 @@
 #ifndef _SETLOCALE_H_
 #define	_SETLOCALE_H_
 
-#include <_ansi.h>
-#include <sys/cdefs.h>
+#include <errno.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include <locale.h>
+#include <langinfo.h>
 
 __BEGIN_DECLS
 
@@ -47,15 +47,6 @@ extern struct __locale_t __global_locale;
 #define CATEGORY_LEN 11
 #define _LC_LAST      7
 
-#ifdef __CYGWIN__
-struct lc_collate_T
-{
-  int	       (*mbtowc) (wchar_t *, const char *, size_t,
-			  mbstate_t *);
-  char		 codeset[ENCODING_LEN + 1];
-};
-extern const struct lc_collate_T _C_collate_locale;
-#endif
 
 struct lc_ctype_T
 {
@@ -67,9 +58,6 @@ struct lc_ctype_T
 #endif
 };
 extern const struct lc_ctype_T _C_ctype_locale;
-#ifdef __CYGWIN__
-extern const struct lc_ctype_T _C_utf8_ctype_locale;
-#endif
 
 struct lc_monetary_T
 {
@@ -165,12 +153,14 @@ struct	lc_messages_T
   const char	*noexpr;
   const char	*yesstr;
   const char	*nostr;
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+#ifdef __HAVE_LOCALE_INFO__
   const char	*codeset;	 /* codeset for mbtowc conversion */
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
   const wchar_t	*wyesexpr;
   const wchar_t	*wnoexpr;
   const wchar_t	*wyesstr;
   const wchar_t	*wnostr;
+#endif
 #endif
 };
 extern const struct lc_messages_T _C_messages_locale;
@@ -242,20 +232,6 @@ __get_C_locale (void)
 #endif
 }
 
-#ifdef __CYGWIN__
-_ELIDABLE_INLINE const struct lc_collate_T *
-__get_collate_locale (struct __locale_t *locale)
-{
-  return (const struct lc_collate_T *) locale->lc_cat[LC_COLLATE].ptr;
-}
-
-_ELIDABLE_INLINE const struct lc_collate_T *
-__get_current_collate_locale (void)
-{
-  return (const struct lc_collate_T *)
-	 _locale->lc_cat[LC_COLLATE].ptr;
-}
-#endif
 
 #ifdef __HAVE_LOCALE_INFO__
 _ELIDABLE_INLINE const struct lc_ctype_T *
@@ -325,15 +301,16 @@ __get_current_time_locale (void)
 _ELIDABLE_INLINE const struct lc_messages_T *
 __get_messages_locale (struct __locale_t *locale)
 {
-  return (const struct lc_messages_T *) (locale)->lc_cat[LC_MESSAGES].ptr;
+  return (const struct lc_messages_T *) (locale)->lc_cat[_LC_MESSAGES].ptr;
 }
 
 _ELIDABLE_INLINE const struct lc_messages_T *
 __get_current_messages_locale (void)
 {
   return (const struct lc_messages_T *)
-	 _locale->lc_cat[LC_MESSAGES].ptr;
+	 _locale->lc_cat[_LC_MESSAGES].ptr;
 }
+
 #else /* ! __HAVE_LOCALE_INFO__ */
 _ELIDABLE_INLINE const struct lc_monetary_T *
 __get_monetary_locale (struct __locale_t *locale)
@@ -433,21 +410,8 @@ int __ctype_load_locale (struct __locale_t *, const char *, void *,
 			 const char *, int);
 int __monetary_load_locale (struct __locale_t *, const char *, void *,
 			    const char *);
-#ifdef __CYGWIN__
-int __numeric_load_locale (struct __locale_t *, const char *, void *,
-			   const char *);
-int __time_load_locale (struct __locale_t *, const char *, void *,
-			const char *);
-#endif
 int __messages_load_locale (struct __locale_t *, const char *, void *,
 			    const char *);
-#ifdef __CYGWIN__
-int __collate_load_locale (struct __locale_t *, const char *, void *,
-			   const char *);
-
-extern void __set_charset_from_locale (const char *locale, char *charset);
-extern char *__set_locale_from_locale_alias (const char *, char *);
-#endif
 
 __END_DECLS
 

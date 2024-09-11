@@ -30,6 +30,8 @@
 
 */
 
+#include "stdio_private.h"
+
 #define SCANF_LEVEL SCANF_LLONG
 #ifndef _FORMAT_DEFAULT_LONG_LONG
 #define vfscanf __l_vfscanf

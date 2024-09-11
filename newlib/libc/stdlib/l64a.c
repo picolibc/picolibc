@@ -21,7 +21,7 @@
  * 0 results in an empty string.
  */
 
-#include <_ansi.h>
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 
 static const char R64_ARRAY[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";

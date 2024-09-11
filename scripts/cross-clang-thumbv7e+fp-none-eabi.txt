@@ -4,7 +4,6 @@
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
 c = ['ccache', 'clang', '-m32', '-target', 'thumbv7e-none-eabi', '-mcpu=cortex-m7', '-mfloat-abi=hard', '-nostdlib']
-c_ld = '/usr/bin/arm-none-eabi-ld'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'

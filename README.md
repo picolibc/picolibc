@@ -145,6 +145,126 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc release 1.8.7
+
+ * Support ARM v8.1-m BTI and PAC features
+
+ * Fix stdio buffered backend automatic flushing of stdout when
+   reading stdin.
+
+ * Support _FORTIFY_SOURCE=3
+
+ * Fix several fesetround implementations to return an error when
+   passed an invalid argument. Thanks to Abdallah Abdelhafeez.
+
+ * Document headers which the compiler must provide. Thanks to Alexey
+   Brodkin.
+
+ * Generate mktemp/tmpnam filenames using random() so they don't
+   repeat even if they aren't used before another name is generated.
+
+ * Set error flag when fgetc is called on an file without read
+   mode. Thanks to Mohamed Moawad.
+
+ * Add type casting to CMPLX, CMPLXF and CMPLXL macros (as glibc
+   does). Thanks to Mostafa Salman.
+
+ * Add mips64 support and build the library during CI.
+
+ * Make fgets return any accumulated string on EOF instead of
+   always returning NULL. Thanks to Hana Ashour.
+
+ * Use C99 minimum array size in asctime_r and ctime_r API
+   declarations ('[static 26]'). Bounds check the generated value and
+   return NULL/EOVERFLOW on overflow.
+
+ * Make Zephyr's -Oz cmake option enable
+   PREFER_SIZE_OVER_SPEED. Thanks to Jonathon Penix.
+
+ * Add funopen to tinystdio.
+
+ * Validate all public headers with a C++ compiler to make sure they
+   at least compile successfully. Fix time.h.
+
+ * Stop using -include picolibc.h during library build.
+
+ * Add -Wmissing-declarations and -Wmissing-prototypes to library
+   build flags. Fix a rather large pile of missing prototypes caused
+   by source files failing to add _GNU_SOURCE or _DEFAULT_SOURCE
+   definitions.
+
+ * Add POSIX "unlocked" I/O functions to tinystdio. These don't
+   actually do anything because tinystdio doesn't do any
+   locking. However, flockfile/funlockfile grab the global C library
+   lock so applications synchronizing with that API will "work".
+
+ * Fix wide orientation handling in tinystdio. Thanks to Ahmed Shehab.
+
+ * Add aarch64 soft float support for armv8. Clang allows this with
+   -march=armv8-a+nofp -mabi=aapcs-soft. This required building a
+   custom toolchain that included a compiler-rt library built with the
+   right options.
+
+ * Add fgetpos and fsetpos to tinystdio. Thanks to Hana Ashour.
+
+ * Restore missing members of 'struct sigevent'. Over eager removal of
+   _POSIX_THREADS support caused these to be accidentally deleted some
+   time ago.
+
+ * Test on i386 native target.
+
+ * Fix hex float scanning and printing. Thanks to Hana Ashour and
+   Ahmed Shehab.
+
+ * Fix double rounding in %f printf. Thanks to Ahmed Shehab for
+   constructing a test case that identified the issue.
+
+ * Add mem_align to the "big" malloc version. Thanks to Simon Tatham.
+
+ * Adjust POSIX and C headers to limit symbol exposure to that
+   specified in the standards.
+
+ * Fix rounding in float scanf. This does round twice for input longer
+   than the required number of digits, but that's permitted by the C
+   specification.
+
+ * Support %a/%A in scanf. Support arbitrary precision in %a/%A
+   printf. Fix NaN/INF formatting in %a/%A printf. Thanks to Ahmed
+   Shehab.
+
+ * Provide a build-time option to enable %n in printf. This is
+   disabled by default for security concerns, but supported in case
+   someone needs strict C conformance. Thanks to Ahmed Shehab.
+
+ * Make freopen clear the unget buffer. Thanks to Mostafa Salman.
+
+ * Fix wide and multi-byte character support in printf and scanf. For
+   strict standards conformance, there's now an option that enables
+   %lc/%ls in printf even if multi-byte support is not enabled.
+
+ * Enable MMU in picocrt on A profile ARM and AARCH64 targets when
+   present. This is required by the latest qemu which now more
+   accurately emulates this hardware. Thanks to Alex Richardson.
+
+ * Fix AARCH64 asm code in ILP32 mode.
+
+ * Parse NaN(<string>) in sscanf. This is required by the standard,
+   although picolibc doesn't do anything with <string>. Thanks to
+   Mohamed Moawad.
+
+ * Clean up header files. Picolibc tries to limit symbol definitions
+   to those specified in the C and POSIX specs.
+
+ * Add support for C's Annex K functions. These are bounds-checking
+   versions of various memory and string functions. Thanks to Mostafa
+   Salman.
+
+ * Perform locale string validation in newlocale even when _MB_CAPABLE
+   isn't defined. Thanks to Mostafa Salman.
+
+ * Place compiler-rt library after C library when linking
+   tests. Thanks to Oliver Stannard.
+
 ### Picolibc version 1.8.6
 
  * Fix some FORTITY_SOURCE issues with tinystdio

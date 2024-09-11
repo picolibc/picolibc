@@ -32,7 +32,6 @@
    We do assume _write_r is working.
 */
 
-#include <_ansi.h>
 #include <unistd.h>
 #include <endian.h>
 #include "ctype.h"

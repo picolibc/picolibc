@@ -38,10 +38,5 @@
 int
 sys_semihost_close(int fd)
 {
-	struct {
-		sh_param_t	field1;
-	} arg = {
-		.field1 = fd
-	};
-	return (int) sys_semihost(SYS_CLOSE, (uintptr_t) &arg);
+	return (int) sys_semihost1(SYS_CLOSE, fd);
 }

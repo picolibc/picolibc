@@ -35,11 +35,12 @@
 
 #include "stdio_private.h"
 
-#ifndef FSEEK_TYPE
+#ifndef FSEEK
+#define FSEEK fseek
 #define FSEEK_TYPE long
 #endif
 
-int fseek(FILE *stream, FSEEK_TYPE offset, int whence)
+int FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
         if ((stream->flags & __SEXT) && xf->seek) {

@@ -2,7 +2,7 @@
 #ifndef _WCTYPE_H_
 #define _WCTYPE_H_
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <sys/_types.h>
 
 #define __need_wint_t
@@ -18,18 +18,18 @@
 
 _BEGIN_STD_C
 
-#ifndef _WCTYPE_T
-#define _WCTYPE_T
+#ifndef _WCTYPE_DECLARED
 typedef int wctype_t;
+#define _WCTYPE_DECLARED
 #endif
 
-#ifndef _WCTRANS_T
-#define _WCTRANS_T
+#ifndef _WCTRANS_DECLARED
 typedef int wctrans_t;
+#define _WCTRANS_DECLARED
 #endif
 
-int	iswalpha (wint_t);
 int	iswalnum (wint_t);
+int	iswalpha (wint_t);
 #if __ISO_C_VISIBLE >= 1999
 int	iswblank (wint_t);
 #endif
@@ -50,24 +50,24 @@ wctrans_t wctrans (const char *);
 wctype_t wctype (const char *);
 
 #if __POSIX_VISIBLE >= 200809
-extern int	iswalpha_l (wint_t, locale_t);
-extern int	iswalnum_l (wint_t, locale_t);
-extern int	iswblank_l (wint_t, locale_t);
-extern int	iswcntrl_l (wint_t, locale_t);
-extern int	iswctype_l (wint_t, wctype_t, locale_t);
-extern int	iswdigit_l (wint_t, locale_t);
-extern int	iswgraph_l (wint_t, locale_t);
-extern int	iswlower_l (wint_t, locale_t);
-extern int	iswprint_l (wint_t, locale_t);
-extern int	iswpunct_l (wint_t, locale_t);
-extern int	iswspace_l (wint_t, locale_t);
-extern int	iswupper_l (wint_t, locale_t);
-extern int	iswxdigit_l (wint_t, locale_t);
-extern wint_t	towctrans_l (wint_t, wctrans_t, locale_t);
-extern wint_t	towupper_l (wint_t, locale_t);
-extern wint_t	towlower_l (wint_t, locale_t);
-extern wctrans_t wctrans_l (const char *, locale_t);
-extern wctype_t wctype_l (const char *, locale_t);
+int	iswalnum_l (wint_t, locale_t);
+int	iswalpha_l (wint_t, locale_t);
+int	iswblank_l (wint_t, locale_t);
+int	iswcntrl_l (wint_t, locale_t);
+int	iswctype_l (wint_t, wctype_t, locale_t);
+int	iswdigit_l (wint_t, locale_t);
+int	iswgraph_l (wint_t, locale_t);
+int	iswlower_l (wint_t, locale_t);
+int	iswprint_l (wint_t, locale_t);
+int	iswpunct_l (wint_t, locale_t);
+int	iswspace_l (wint_t, locale_t);
+int	iswupper_l (wint_t, locale_t);
+int	iswxdigit_l (wint_t, locale_t);
+wint_t	towctrans_l (wint_t, wctrans_t, locale_t);
+wint_t	towupper_l (wint_t, locale_t);
+wint_t	towlower_l (wint_t, locale_t);
+wctrans_t wctrans_l (const char *, locale_t);
+wctype_t wctype_l (const char *, locale_t);
 #endif
 
 _END_STD_C

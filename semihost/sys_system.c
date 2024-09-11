@@ -39,12 +39,5 @@
 int
 sys_semihost_system(const char *command)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-	} arg = {
-		.field1 = (uintptr_t) command,
-		.field2 = strlen(command)
-	};
-	return (int) sys_semihost(SYS_SYSTEM, (uintptr_t) &arg);
+    return (int)sys_semihost2(SYS_SYSTEM, (uintptr_t)command, strlen(command));
 }

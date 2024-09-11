@@ -45,7 +45,7 @@
 
 static long double max_error;
 
-bool
+static bool
 within_error(long double expect, long double result, long double error)
 {
     long double difference;
@@ -68,7 +68,7 @@ within_error(long double expect, long double result, long double error)
     return difference <= error;
 }
 
-int
+static int
 check_long_double(const char *name, int i, long double prec, long double expect, long double result)
 {
     if (!within_error(expect, result, prec)) {
@@ -88,7 +88,7 @@ check_long_double(const char *name, int i, long double prec, long double expect,
     return 0;
 }
 
-int
+static int
 check_long_long(const char *name, int i, long long expect, long long result)
 {
     if (expect != result) {

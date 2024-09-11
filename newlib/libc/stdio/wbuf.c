@@ -21,7 +21,6 @@ static char sccsid[] = "%W% (Berkeley) %G%";
 #endif /* LIBC_SCCS and not lint */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
@@ -83,14 +82,4 @@ _swbuf (
     if (fflush ( fp))
       return EOF;
   return c;
-}
-
-/* This function isn't any longer declared in stdio.h, but it's
-   required for backward compatibility with applications built against
-   earlier dynamically built newlib libraries. */
-int
-__swbuf (register int c,
-       register FILE *fp)
-{
-  return _swbuf ( c, fp);
 }

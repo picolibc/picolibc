@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <setjmp.h>
 
-void func(jmp_buf env, int param)
+static void func(jmp_buf env, int param)
 {
 	printf("func param %d\n", param);
 	longjmp(env, param);

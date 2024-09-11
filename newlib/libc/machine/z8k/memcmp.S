@@ -14,6 +14,8 @@
 /* int memcmp(const void *b1, const void *b2, size_t length);
  */
 
+#include <picolibc.h>
+
 	name	"memcmp.S"
 
 	.text

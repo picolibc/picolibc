@@ -44,7 +44,6 @@ PORTABILITY
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <stdio.h>

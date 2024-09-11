@@ -37,7 +37,7 @@ int  errors = 0;
 /* Complain if condition is not true.  */
 #define check(thing) checkit(thing, __LINE__)
 
-void
+static void
 checkit (int ok,
        int l )
 
@@ -57,7 +57,7 @@ checkit (int ok,
 /* Complain if first two args don't strcmp as equal.  */
 #define equal(a, b)  funcqual(a,b,__LINE__);
 
-void
+static void
 funcqual (char *a,
        char *b,
        int l)

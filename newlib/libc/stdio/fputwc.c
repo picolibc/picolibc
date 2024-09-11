@@ -119,7 +119,6 @@ PORTABILITY
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <errno.h>
 #include <limits.h>
 #include <stdio.h>

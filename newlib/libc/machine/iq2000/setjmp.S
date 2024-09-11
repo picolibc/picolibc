@@ -3,6 +3,8 @@
 
 
 /* int setjmp (jmp_buf);  */
+#include <picolibc.h>
+
 	.globl	setjmp
 	.ent	setjmp
 setjmp:

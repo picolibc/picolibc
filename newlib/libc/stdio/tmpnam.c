@@ -91,7 +91,6 @@ The global pointer <<environ>> is also required.
 
 #define _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -185,7 +184,10 @@ tempnam (
     {
       if (! worker (filename, dir, prefix,
 		    getpid (), &_tls_inc))
+      {
+        free(filename);
 	return NULL;
+      }
     }
   return filename;
 }

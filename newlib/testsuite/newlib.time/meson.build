@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['tzset']
+tests = ['tzset', 'asctime']
 
 foreach target : targets
   value = get_variable('target_' + target)
@@ -52,7 +52,8 @@ foreach target : targets
   _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
   _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
 
-  _c_args += ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE']
+  _c_args_extra = ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE']
+  _c_args += _c_args_extra
 
   foreach test : tests
     if target == ''
@@ -73,5 +74,11 @@ foreach target : targets
 		    include_directories: test_inc),
          depends: bios_bin,
 	 env: test_env)
+    if enable_native_tests
+      test(test_name + '-native',
+           executable(test_name + '-native', [src],
+                      c_args: native_c_args + _c_args_extra,
+                      link_args: native_c_args))
+    endif
   endforeach
 endforeach

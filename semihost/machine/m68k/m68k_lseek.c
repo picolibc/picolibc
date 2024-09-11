@@ -33,8 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#undef __LARGE64_FILES
-#define __LARGE64_FILES 1
+#define _GNU_SOURCE
 #include "m68k_semihost.h"
 #include <sys/types.h>
 #include <sys/stat.h>

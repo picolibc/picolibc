@@ -116,8 +116,7 @@ No supporting OS subroutines are required.
  */
 
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
+#define _GNU_SOURCE
 #include <limits.h>
 #include <wctype.h>
 #include <errno.h>
@@ -127,8 +126,6 @@ No supporting OS subroutines are required.
 /*
  * Convert a wide string to a long integer.
  */
-#ifndef _REENT_ONLY
-
 long
 wcstol_l (const wchar_t *nptr, wchar_t **endptr,
 	   int base, locale_t loc)
@@ -218,5 +215,3 @@ wcstol (const wchar_t *__restrict s,
 {
 	return wcstol_l (s, ptr, base, __get_current_locale ());
 }
-
-#endif

@@ -73,6 +73,8 @@
 
 @ This code requires armv6t2 or later.  Uses Thumb2.
 
+#include <picolibc.h>
+
 	.syntax unified
 
 #include "arm_asm.h"
@@ -292,6 +294,7 @@ memchr:
 	.global memchr
 	.type memchr,%function
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 memchr:
 	@ r0 = start of memory to scan

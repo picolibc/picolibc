@@ -116,7 +116,6 @@ No supporting OS subroutines are required.
  */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
 #include <limits.h>
 #include <wctype.h>
 #include <errno.h>

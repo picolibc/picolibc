@@ -1,0 +1,4 @@
+[binaries]
+c = ['cc', '-m32', '-march=core2', '-mfpmath=sse', '-msse2']
+cpp = ['c++', '-m32', '-march=core2', '-mfpmath=sse', '-msse2']
+strip = 'strip'

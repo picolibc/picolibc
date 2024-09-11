@@ -24,6 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_FP & 0x8
 #include <math.h>
 
 double
@@ -33,3 +34,7 @@ fmax (double x, double y)
   __asm__("fmaxnm\t%d0, %d1, %d2" : "=w" (result) : "w" (x), "w" (y));
   return result;
 }
+
+#else
+#include "../../common/s_fmax.c"
+#endif

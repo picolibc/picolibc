@@ -11,6 +11,8 @@
    the new terms are clearly indicated on the first page of each file where
    they apply.  */
 
+#include <picolibc.h>
+
 # setjmp/longjmp for moxie.  The jmpbuf looks like this:
 #
 # Register        jmpbuf offset

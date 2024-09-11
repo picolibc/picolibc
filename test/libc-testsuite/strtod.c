@@ -44,7 +44,7 @@ msg = #f, ((r) = (f)) == (x) || \
 ((r) = (f)) == (x) || \
 (printf(__FILE__ ":%d: %s failed (" m ")\n", __LINE__, msg, r, x), err++, 0) )
 
-int test_strtod(void)
+static int test_strtod(void)
 {
 	int i;
 	double d, d2;

@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#include <picolibc.h>
+
 	#include "i386mach.h"
 
 	.global SYM (strchr)

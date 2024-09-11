@@ -28,7 +28,8 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <_ansi.h>
+#include <picolibc.h>
+
 #include <stdio.h>
 
 #include "c99ppe.h"

@@ -19,6 +19,7 @@ distribute this software is freely granted.
 #if defined(__GNUC__) && !defined(_SOFT_FLOAT)
 
 #include <math.h>
+#include "f_math.h"
 
 /*
  * Fast math version of lrintf(x)

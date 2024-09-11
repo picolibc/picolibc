@@ -1,6 +1,8 @@
 /* clock.c
  * Support file for nvptx in newlib.
  */
+#include <picolibc.h>
+
 #include <time.h>
 
 clock_t

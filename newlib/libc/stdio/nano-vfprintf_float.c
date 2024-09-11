@@ -30,10 +30,8 @@
  * SUCH DAMAGE.
  */
 
-#include <newlib.h>
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

@@ -32,7 +32,6 @@ SUCH DAMAGE.
 #include <machine/ieeefp.h>  /* floating point macros */
 #include <sys/features.h>	/* POSIX defs */
 #include <float.h>
-#include <newlib.h>
 
 #ifdef __aarch64__
 #define MALLOC_ALIGNMENT 16
@@ -261,21 +260,10 @@ SUCH DAMAGE.
 #define __RAND_MAX 0x7fffffff
 #endif
 
-#if defined(__CYGWIN__)
-#include <cygwin/config.h>
-#endif
 
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
 #define __DYNAMIC_REENT__
-#endif
-
-#ifndef __EXPORT
-#define __EXPORT
-#endif
-
-#ifndef __IMPORT
-#define __IMPORT
 #endif
 
 #ifndef __WCHAR_MAX__

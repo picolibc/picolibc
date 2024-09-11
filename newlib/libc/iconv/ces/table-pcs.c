@@ -32,7 +32,6 @@
 #if defined (ICONV_TO_UCS_CES_TABLE_PCS) \
  || defined (ICONV_FROM_UCS_CES_TABLE_PCS)
 
-#include <_ansi.h>
 #include <sys/types.h>
 #include "../lib/local.h"
 #include "../lib/ucsconv.h"

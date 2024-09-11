@@ -18,7 +18,6 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <stdarg.h>
 #include "local.h"

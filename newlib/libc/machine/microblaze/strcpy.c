@@ -55,6 +55,8 @@ QUICKREF
 	strcpy ansi pure
 */
 
+#include <picolibc.h>
+
 #include <string.h>
 #include <limits.h>
 

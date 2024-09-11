@@ -55,11 +55,13 @@ These functions originate from Solaris and are also provided by GNU libc.
 No supporting OS subroutines are required.
 */
 
+#include <picolibc.h>
+
 #ifndef __rtems__
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
+#include <stdio_ext.h>
 
 /* Subroutine versions of the inline or macro functions. */
 

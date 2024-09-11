@@ -9,6 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
+#define _BSD_SOURCE
+#include <picolibc.h>
 #include <ieeefp.h>
 
 #if defined(__riscv_flen) || defined (__riscv_zfinx)

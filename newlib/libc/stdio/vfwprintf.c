@@ -84,7 +84,6 @@ SEEALSO
  * This code is large and complicated...
  */
 #define _DEFAULT_SOURCE
-#include <newlib.h>
 
 #ifdef INTEGER_ONLY
 # ifdef STRING_ONLY
@@ -109,7 +108,6 @@ SEEALSO
 #endif
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -117,6 +115,7 @@ SEEALSO
 #include <stdint.h>
 #include <wchar.h>
 #include <sys/lock.h>
+#include <sys/types.h>
 #include <stdarg.h>
 #include "local.h"
 #include "fvwrite.h"
@@ -155,7 +154,6 @@ int __SPRINT (FILE *, register struct __suio *);
 # else
 #  define __SPRINT __sfputws
 # endif
-int __SPRINT (FILE *, const wchar_t *, size_t);
 #endif
 #ifndef STRING_ONLY
 #ifdef _UNBUF_STREAM_OPT

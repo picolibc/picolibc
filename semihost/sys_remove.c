@@ -39,13 +39,6 @@
 int
 sys_semihost_remove(const char *pathname)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-	} arg = {
-		.field1 = (sh_param_t) (uintptr_t) pathname,
-		.field2 = strlen(pathname)
-	};
-
-	return (int) sys_semihost(SYS_REMOVE, (uintptr_t) &arg);
+    return (int)sys_semihost2(SYS_REMOVE, (sh_param_t)(uintptr_t)pathname,
+                              strlen(pathname));
 }

@@ -12,6 +12,8 @@
    permission of Red Hat, Inc.
 */
 
+#include <picolibc.h>
+
 # setjmp/longjmp for msp430.  The jmpbuf looks like this:
 #
 # Register	Jmpbuf offset

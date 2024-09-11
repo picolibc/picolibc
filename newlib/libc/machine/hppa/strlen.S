@@ -16,6 +16,8 @@
 /* HPUX_ID = "@(#) $Revision$" */
 /* strlen(s): Return length of string s */
 
+#include <picolibc.h>
+
 #define start   arg0
 #define end     ret0
 #define tmp1    arg1

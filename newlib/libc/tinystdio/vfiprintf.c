@@ -30,6 +30,8 @@
 
 */
 
+#include "stdio_private.h"
+
 #define PICOLIBC_INTEGER_PRINTF_SCANF
 #define PRINTF_LEVEL PRINTF_STD
 #ifndef _FORMAT_DEFAULT_INTEGER

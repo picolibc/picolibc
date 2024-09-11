@@ -28,5 +28,7 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #define printf    iprintf
 #include "printf.S"

@@ -28,5 +28,7 @@
   POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #define sprintf    siprintf
 #include "sprintf.S"

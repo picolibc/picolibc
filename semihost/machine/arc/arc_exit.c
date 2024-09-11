@@ -37,7 +37,7 @@
 #include <sys/cdefs.h>
 #include <unistd.h>
 
-void _ATTRIBUTE((__noreturn__))
+_Noreturn void
 _exit(int code)
 {
     arc_semihost1(SYS_SEMIHOST_exit, code);

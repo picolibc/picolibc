@@ -32,6 +32,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <picolibc.h>
+
 #define PPC_BIT(bit)            (0x8000000000000000ULL >> (bit))
 	.text
 	.section	.text.init.enter

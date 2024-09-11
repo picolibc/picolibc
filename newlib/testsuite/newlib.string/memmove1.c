@@ -50,7 +50,7 @@ int errors = 0;
 
 /* A safe target-independent memmove.  */
 
-void
+static void
 mymemmove (unsigned char *dest, unsigned char *src, size_t n)
 {
   if ((src <= dest && src + n <= dest)
@@ -90,7 +90,7 @@ xmemmove (unsigned char *dest, unsigned char *src, size_t n)
 /* Fill the array with something we can associate with a position, but
    not exactly the same as the position index.  */
 
-void
+static void
 fill (unsigned char dest[MAX*3])
 {
   size_t i;

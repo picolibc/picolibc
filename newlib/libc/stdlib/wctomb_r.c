@@ -132,7 +132,6 @@ __utf8_wctomb (
 
 /* Cygwin defines its own doublebyte charset conversion functions 
    because the underlying OS requires wchar_t == UTF-16. */
-#ifndef __CYGWIN__
 int
 __sjis_wctomb (
         char          *s,
@@ -254,7 +253,6 @@ __jis_wctomb (
   *s = (char)char2;
   return cnt + 1;
 }
-#endif /* !__CYGWIN__ */
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 static int

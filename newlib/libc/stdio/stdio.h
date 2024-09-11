@@ -26,23 +26,32 @@
 #ifndef _STDIO_H_
 #define	_STDIO_H_
 
-#include "_ansi.h"
+#include <sys/cdefs.h>
 
 #define	_FSTDIO			/* ``function stdio'' */
 
 #define __need_size_t
-#define __need_ssize_t
 #define __need_NULL
-#include <sys/cdefs.h>
 #include <stddef.h>
 
 #include <stdarg.h>
-#include <_ansi.h>
 #include <sys/_types.h>
 
 #ifndef __machine_flock_t_defined
 #include <sys/lock.h>
 typedef _LOCK_RECURSIVE_T _flock_t;
+#endif
+
+_BEGIN_STD_C
+
+#ifndef ___FILE_DECLARED
+typedef struct __file __FILE;
+# define ___FILE_DECLARED
+#endif
+
+#ifndef _FILE_DECLARED
+typedef __FILE FILE;
+#define _FILE_DECLARED
 #endif
 
 /*
@@ -81,7 +90,14 @@ struct __sbuf {
 
 #define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 
-struct __sFILE {
+#ifdef __CUSTOM_FILE_IO__
+
+/* Get custom _FILE definition.  */
+#include <sys/custom_file.h>
+
+#else /* !__CUSTOM_FILE_IO__ */
+#ifndef __LARGE64_FILES
+struct __file {
   unsigned char *_p;	/* current position in (some) buffer */
   int	_r;		/* read space left for getc() */
   int	_w;		/* write space left for putc() */
@@ -123,15 +139,8 @@ struct __sFILE {
   _mbstate_t _mbstate;	/* for wide char stdio functions. */
   int   _flags2;        /* for future use */
 };
-
-#ifdef __CUSTOM_FILE_IO__
-
-/* Get custom _FILE definition.  */
-#include <sys/custom_file.h>
-
-#else /* !__CUSTOM_FILE_IO__ */
-#ifdef __LARGE64_FILES
-struct __sFILE64 {
+#else
+struct __file {
   unsigned char *_p;	/* current position in (some) buffer */
   int	_r;		/* read space left for getc() */
   int	_w;		/* write space left for putc() */
@@ -175,9 +184,6 @@ struct __sFILE64 {
 #endif
   _mbstate_t _mbstate;	/* for wide char stdio functions. */
 };
-typedef struct __sFILE64 __FILE;
-#else
-typedef struct __sFILE   __FILE;
 #endif /* __LARGE64_FILES */
 #endif /* !__CUSTOM_FILE_IO__ */
 
@@ -203,19 +209,12 @@ extern struct _glue __sglue;
 
 extern int _fwalk_sglue (int (*)(__FILE *), struct _glue *);
 
-#include <sys/_types.h>
-
-_BEGIN_STD_C
-
-#if !defined(__FILE_defined)
-typedef __FILE FILE;
-# define __FILE_defined
-#endif
-
 typedef _fpos_t fpos_t;
 #ifdef __LARGE64_FILES
 typedef _fpos64_t fpos64_t;
 #endif
+
+#if __POSIX_VISIBLE
 
 #ifndef _OFF_T_DECLARED
 typedef __off_t off_t;
@@ -225,6 +224,8 @@ typedef __off_t off_t;
 #ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
 #define	_SSIZE_T_DECLARED
+#endif
+
 #endif
 
 #include <sys/stdio.h>
@@ -244,9 +245,6 @@ typedef _ssize_t ssize_t;
 #define	__SNPT	0x0800		/* do not do fseek() optimisation */
 #define	__SOFF	0x1000		/* set iff _offset is in fact correct */
 #define	__SORD	0x2000		/* true => stream orientation (byte/wide) decided */
-#if defined(__CYGWIN__)
-#  define __SCLE  0x4000        /* convert line endings CR/LF <-> NL */
-#endif
 #define	__SL64	0x8000		/* is 64-bit offset large file */
 
 /* _flags2 flags */
@@ -539,18 +537,17 @@ int	vdprintf (int, const char *__restrict, va_list)
 #endif
 #if __ATFILE_VISIBLE
 int	renameat (int, const char *, int, const char *);
-# ifdef __CYGWIN__
-int	renameat2 (int, const char *, int, const char *, unsigned int);
-# endif
 #endif
 
 /* Other extensions.  */
 
+#if __BSD_VISIBLE
 int	fpurge (FILE *);
-ssize_t __getdelim (char **, size_t *, int, FILE *);
-ssize_t __getline (char **, size_t *, FILE *);
+#endif
 
 #if __MISC_VISIBLE
+_ssize_t __getdelim (char **, size_t *, int, FILE *);
+_ssize_t __getline (char **, size_t *, FILE *);
 void	clearerr_unlocked (FILE *);
 int	feof_unlocked (FILE *);
 int	ferror_unlocked (FILE *);
@@ -568,7 +565,7 @@ int	fputs_unlocked (const char *__restrict, FILE *__restrict);
 #endif
 
 #ifdef __LARGE64_FILES
-#if !defined(__CYGWIN__) || defined(_LIBC)
+#if __LARGEFILE64_VISIBLE
 FILE *	fdopen64 (int, const char *);
 FILE *  fopen64 (const char *, const char *);
 FILE *  freopen64 (const char *, const char *, FILE *);
@@ -578,7 +575,7 @@ int     fgetpos64 (FILE *, _fpos64_t *);
 int     fsetpos64 (FILE *, const _fpos64_t *);
 FILE *  tmpfile64 (void);
 
-#endif /* !__CYGWIN__ */
+#endif /* __LARGEFILE64_VISIBLE */
 #endif /* __LARGE64_FILES */
 
 /*
@@ -796,6 +793,20 @@ _putchar_unlocked(int _c)
 #endif
 
 #endif /* !__CUSTOM_FILE_IO__ */
+
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+#ifndef _ERRNO_T_DEFINED
+typedef __errno_t errno_t;
+#define _ERRNO_T_DEFINED
+#endif
+
+#ifndef _RSIZE_T_DEFINED
+typedef __rsize_t rsize_t;
+#define _RSIZE_T_DEFINED
+#endif
+#endif
 
 _END_STD_C
 

@@ -28,6 +28,8 @@ QUICKREF
 	stpcpy gnu
 */
 
+#define IN_STPCPY
+#define _GNU_SOURCE
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>

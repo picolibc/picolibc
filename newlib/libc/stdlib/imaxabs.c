@@ -24,8 +24,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-__FBSDID("$FreeBSD: head/lib/libc/stdlib/imaxabs.c 86368 2001-11-15 02:05:03Z mike $");
 
 #include <inttypes.h>
 #include <stdint.h>

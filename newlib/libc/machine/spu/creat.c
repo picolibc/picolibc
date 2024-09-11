@@ -5,6 +5,8 @@
 
 /* This is needed by f2c and therefore the SPEC benchmarks.  */
 
+#include <picolibc.h>
+
 #include <fcntl.h>
 
 int

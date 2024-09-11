@@ -1,6 +1,7 @@
 /* Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com> */
 /* sincos -- currently no more efficient than two separate calls to
    sin and cos. */
+#define _GNU_SOURCE
 #include "fdlibm.h"
 #if __OBSOLETE_MATH_FLOAT
 

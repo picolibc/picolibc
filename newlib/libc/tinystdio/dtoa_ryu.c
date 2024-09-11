@@ -223,8 +223,13 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bo
 		 *
 		 * A single expression gives the right answer in both
 		 * cases, which is kinda cool
+                 *
+                 * When called from fcvt, max_decimals may be less
+                 * than zero, indicating that we want to round left of
+                 * the decimal point. In that case, make sure we generate
+                 * at least one digit
 		 */
-		max_digits = min_int(max_digits, max_int(1, max_decimals + exp + 1));
+		max_digits = min_int(max_digits, max_int(max_decimals<0, max_decimals + exp + 1));
 	}
 
 	for (;;) {
@@ -296,7 +301,7 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bo
                         if(fmode) {
 				int exp = e10 + len - 1;
 				/* max_decimals comes in biased by 1 to flag the 'f' case */
-				max_digits = min_int(save_max_digits, max_int(0, max_decimals + exp + 1));
+				max_digits = min_int(save_max_digits, max_int(1, max_decimals + exp + 1));
 			}
 
 			if (len > max_digits) {

@@ -11,7 +11,9 @@
  * MTE compatible.
  */
 
-#if defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)
+#include <picolibc.h>
+
+#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__) || !defined(__ARM_NEON)
 /* See memrchr-stub.c */
 #else
 #include "asmdefs.h"

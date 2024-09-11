@@ -1,7 +1,6 @@
 /*
 Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
  */
-#include <newlib.h>
 #include <wchar.h>
 #include <stdlib.h>
 #include <stdio.h>

@@ -21,19 +21,15 @@
 #ifndef _SYS_SCHED_H_
 #define _SYS_SCHED_H_
 
+#include <sys/cdefs.h>
+#include <sys/_types.h>
 #include <sys/_timespec.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 /* Scheduling Policies */
 /* Open Group Specifications Issue 6 */
-#if defined(__CYGWIN__)
-#define SCHED_OTHER    3
-#else
 #define SCHED_OTHER    0
-#endif
 
 #define SCHED_FIFO     1
 #define SCHED_RR       2
@@ -60,9 +56,7 @@ struct sched_param {
 #endif
 };
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif
 /* end of include file */

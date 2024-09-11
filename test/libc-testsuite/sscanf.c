@@ -24,6 +24,9 @@
 #include <string.h>
 #include <errno.h>
 #include <limits.h>
+#include <locale.h>
+#include <wchar.h>
+#include <math.h>
 
 #define TEST(r, f, x, m) ( \
 ((r) = (f)) == (x) || \
@@ -33,9 +36,17 @@
 !strcmp((s),(x)) || \
 (printf(__FILE__ ":%d: [%s] != [%s] (%s)\n", __LINE__, s, x, m), err++, 0) )
 
+#define TEST_WS(s, x, m) ( \
+!wcscmp((s),(x)) || \
+(printf(__FILE__ ":%d: [%ls] != [%ls] (%ls)\n", __LINE__, s, x, m), err++, 0) )
+
 #define TEST_F(x) ( \
 TEST(i, sscanf(# x, "%lf", &d), 1, "got %d fields, expected %d"), \
-TEST(t, d, (double)x, "%g != %g") )
+TEST(t, d, (double)x, "%a != %a") )
+
+#define TEST_FV(x,v) (\
+TEST(i, sscanf(v, "%lf", &d), 1, "got %d fields, expected %d"), \
+TEST(t, d, (double)x, "%a != %a") )
 
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
@@ -44,15 +55,24 @@ TEST(t, d, (double)x, "%g != %g") )
 #pragma GCC diagnostic ignored "-Wliteral-range"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 
-#if defined(__PICOLIBC__) && !defined(TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
+#if defined(__PICOLIBC__)
+
+#if !defined(TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
 #define NO_FLOATING_POINT
 #endif
 
-int test_sscanf(void)
+#if !defined(_MB_CAPABLE) || !defined(TINY_STDIO)
+#define NO_MULTI_BYTE
+#endif
+
+#endif
+
+static int test_sscanf(void)
 {
 	int i;
 	int err=0;
-	char a[100], b[100];
+	char a[100], b[100], c[100];
+        wchar_t aw[100], bw[100], cw[100];
 	int x, y, z, u, v;
 #ifdef _WANT_IO_PERCENT_B
         int w;
@@ -60,9 +80,29 @@ int test_sscanf(void)
 	double d, t;
 //	long lo[10];
 
+#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+        if (!setlocale(LC_CTYPE, "C.UTF-8")) {
+            printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
+            return 1;
+        }
+#endif
+        (void) aw;
+        (void) bw;
+        (void) cw;
+
+        /* sscanf with char results */
+
 	TEST(i, sscanf("hello, world\n", "%s %s", a, b), 2, "only %d fields, expected %d");
 	TEST_S(a, "hello,", "");
 	TEST_S(b, "world", "");
+
+        memset(a, 0, sizeof(a));
+        memset(b, 0, sizeof(b));
+        memset(c, 0, sizeof(c));
+	TEST(i, sscanf("hello, world\n", "%6c %5c%c", a, b, c), 3, "only %d fields, expected %d");
+	TEST_S(a, "hello,", "");
+	TEST_S(b, "world", "");
+        TEST_S(c, "\n", "");
 
 	TEST(i, sscanf("hello, world\n", "%[hel]%s", a, b), 2, "only %d fields, expected %d");
 	TEST_S(a, "hell", "");
@@ -72,12 +112,153 @@ int test_sscanf(void)
 	TEST_S(a, "hell", "");
 	TEST_S(b, "o,", "");
 
+        TEST(i, sscanf("elloworld", "%1[abcdefg]%s", a, b), 2, "only %d fields, expected %d");
+        TEST_S(a, "e", "");
+        TEST_S(b, "lloworld", "");
+
+        TEST(i, sscanf("elloworld", "%5[a-z]%s", a, b), 2, "only %d fields, expected %d");
+        TEST_S(a, "ellow", "");
+        TEST_S(b, "orld", "");
+
+#ifndef NO_MULTI_BYTE
+        /* sscanf with mb results */
+
+        TEST(i, sscanf("㌰ello, ✕orld\n", "%s %s", a, b), 2, "only %d fields, expected %d");
+        TEST_S(a, "㌰ello,", "");
+        TEST_S(b, "✕orld", "");
+
+        memset(a, 0, sizeof(a));
+        memset(b, 0, sizeof(b));
+        memset(c, 0, sizeof(c));
+	TEST(i, sscanf("㌰ello, ✕orld\n", "%8c %7c%c", a, b, c), 3, "only %d fields, expected %d");
+	TEST_S(a, "㌰ello,", "");
+	TEST_S(b, "✕orld", "");
+        TEST_S(c, "\n", "");
+
+	TEST(i, sscanf("㌰ello, ✕orld\n", "%[㌰el]%s", a, b), 2, "only %d fields, expected %d");
+	TEST_S(a, "㌰ell", "");
+	TEST_S(b, "o,", "");
+
+	TEST(i, sscanf("㌰ello, ✕orld\n", "%[㌰el] %s", a, b), 2, "only %d fields, expected %d");
+	TEST_S(a, "㌰ell", "");
+	TEST_S(b, "o,", "");
+
+        /* sscanf with wchar results */
+
+        TEST(i, sscanf("㌰ello, ✕orld\n", "%ls %ls", aw, bw), 2, "only %d fields, expected %d");
+        TEST_WS(aw, L"㌰ello,", L"");
+        TEST_WS(bw, L"✕orld", L"");
+
+        memset(aw, 0, sizeof(aw));
+        memset(bw, 0, sizeof(bw));
+        memset(cw, 0, sizeof(cw));
+        TEST(i, sscanf("㌰ello, ✕orld\n", "%6lc %5lc%lc", aw, bw, cw), 3, "only %d fields, expected %d");
+        TEST_WS(aw, L"㌰ello,", L"");
+        TEST_WS(bw, L"✕orld", L"");
+        TEST_WS(cw, L"\n", L"");
+
+	TEST(i, sscanf("㌰ello, ✕orld\n", "%l[^o]%ls", aw, bw), 2, "only %d fields, expected %d");
+	TEST_WS(aw, L"㌰ell", L"");
+	TEST_WS(bw, L"o,", L"");
+
+	TEST(i, sscanf("㌰ello, ✕orld\n", "%l[^o] %ls", aw, bw), 2, "only %d fields, expected %d");
+	TEST_S(a, "㌰ell", "");
+	TEST_S(b, "o,", "");
+
+        /* swscanf with mb results */
+
+        TEST(i, swscanf(L"hello, world\n", L"%s %s", a, b), 2, "only %d fields, expected %d");
+        TEST_S(a, "hello,", "");
+        TEST_S(b, "world", "");
+
+        TEST(i, swscanf(L"㌰ello, ✕orld\n", L"%s %s", a, b), 2, "only %d fields, expected %d");
+        TEST_S(a, "㌰ello,", "");
+        TEST_S(b, "✕orld", "");
+
+        memset(a, 0, sizeof(a));
+        memset(b, 0, sizeof(b));
+        memset(c, 0, sizeof(c));
+	TEST(i, swscanf(L"hello, world\n", L"%6c %5c%c", a, b, c), 3, "only %d fields, expected %d");
+	TEST_S(a, "hello,", "");
+	TEST_S(b, "world", "");
+        TEST_S(c, "\n", "");
+
+        memset(a, 0, sizeof(a));
+        memset(b, 0, sizeof(b));
+        memset(c, 0, sizeof(c));
+        TEST(i, swscanf(L"㌰ello, ✕orld\n", L"%6c %5c%c", a, b, c), 3, "only %d fields, expected %d");
+        TEST_S(a, "㌰ello,", "");
+        TEST_S(b, "✕orld", "");
+        TEST_S(c, "\n", "");
+
+        /* swscanf with wchar results */
+
+        TEST(i, swscanf(L"㌰ello, ✕orld\n", L"%ls %ls", aw, bw), 2, "only %d fields, expected %d");
+        TEST_WS(aw, L"㌰ello,", L"");
+        TEST_WS(bw, L"✕orld", L"");
+
+        memset(aw, 0, sizeof(aw));
+        memset(bw, 0, sizeof(bw));
+        memset(cw, 0, sizeof(cw));
+        TEST(i, swscanf(L"㌰ello, ✕orld\n", L"%6lc %5lc%lc", aw, bw, cw), 3, "only %d fields, expected %d");
+        TEST_WS(aw, L"㌰ello,", L"");
+        TEST_WS(bw, L"✕orld", L"");
+        TEST_WS(cw, L"\n", L"");
+#endif
+
 #ifdef TINY_STDIO
 	a[8] = 'X';
 	a[9] = 0;
         /* legacy stdio fails this test */
 	TEST(i, sscanf("hello, world\n", "%8c%8c", a, b), 1, "%d fields, expected %d");
 	TEST_S(a, "hello, wX", "");
+
+    /* testing nan(n-seq-char) in the expected form */
+    a[0] = '#';
+    a[1] = '\0';
+    TEST(i, sscanf(" Nan(98b)", "%lf%c", &d, a), 1, "got %d fields, expected %d");
+    TEST(i, isnan(d), 1, "isnan %d expected %d");
+    TEST_S(a, "#", "");
+
+    /* testing nan(n-seq-char) missing closing paren */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("NaN(abcdefg", "%lf%c", &d, a), -1, "got %d fields, expected %d");
+    TEST(i, d, 1.0, "%d expected %lf");
+    TEST_S(a, "#", "");
+
+    /* testing nan(n-seq-char) invalid character inside parens */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("NaN(12:b)", "%lf%c", &d, a), 0, "got %d fields, expected %d");
+    TEST(i, d, 1.0, "%d expected %lf");
+    TEST_S(a, "#", "");
+    
+    /* testing nan(n-seq-char) overrunning a field width value */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("Nan(12345)", "%9lf%c", &d, a), 0, "got %d fields, expected %d");
+    TEST(i, d, 1.0, "%d expected %lf");
+    TEST_S(a, "#", "");
+    
+    /* testing inf(n-seq-char) should 'inf' should be evaluated sperately */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("inf(12b)", "%lf%c", &d, a), 2, "got %d fields, expected %d");
+    TEST(i, isinf(d), 1, "%d expected %d");
+    TEST_S(a, "(", "");
+
+    /* testing infinity(n-seq-char) should 'infinity' should be evaluated sperately */
+    a[0] = '#';
+    a[1] = '\0';
+    d = 1.0;
+    TEST(i, sscanf("infinity(abcd)", "%lf%c", &d, a), 2, "got %d fields, expected %d");
+    TEST(i, isinf(d), 1, "%d expected %d");
+    TEST_S(a, "(", "");
 #endif
 
 	TEST(i, sscanf("56789 0123 56a72", "%2d%d%*d %[0123456789]\n", &x, &y, a), 3, "only %d fields, expected %d");
@@ -137,6 +318,23 @@ int test_sscanf(void)
 	TEST_F(0.2);
 	TEST_F(0.1e-10);
 	TEST_F(0x1234p56);
+        TEST_F(3752432815e-39);
+        TEST(i, sscanf("nan", "%lg", &d), 1, "got %d fields, expected %d");
+        TEST(i, isnan(d), 1, "isnan %d expected %d");
+        TEST(i, !!signbit(d), 0, "signbit %d expected %d");
+        TEST(i, sscanf("-nan", "%lg", &d), 1, "got %d fields, expected %d");
+        TEST(i, isnan(d), 1, "isnan %d expected %d");
+        TEST(i, !!signbit(d), 1, "signbit %d expected %d");
+        TEST_FV(INFINITY, "inf");
+        TEST_FV(-INFINITY, "-inf");
+
+        d = 1.0;
+        TEST(i, sscanf("-inf", "%3lg", &d), 0, "got %d fields, expected %d");
+        TEST(i, d, 1.0, "%g expected %g");
+
+        TEST(i, sscanf("-inf", "%4lg", &d), 1, "got %d fields, expected %d");
+        TEST(i, isinf(d), 1, "isinf %d expected %d");
+        TEST(i, !!signbit(d), 1, "signbit %d expected %d");
 
 #ifndef __PICOLIBC__
         /* both tinystdio and legacy stdio fail this test */

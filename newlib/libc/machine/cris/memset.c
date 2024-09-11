@@ -39,6 +39,8 @@
    <= 24+24*(n/48-1) so n >= 45.7; n >= 0.9; we win on the first full
    48-byte block to set.  */
 
+#include <picolibc.h>
+
 #define MEMSET_BY_BLOCK_THRESHOLD (1 * 48)
 
 /* No name ambiguities in this file.  */
@@ -131,6 +133,8 @@ void *memset(void *pdst, int c, unsigned int plen)
 	   subq	   12*4,r12						\n\
 0:									\n\
 "
+#include <picolibc.h>
+
 #ifdef __arch_common_v10_v32
 	   /* Cater to branch offset difference between v32 and v10.  We
 	      assume the branch below has an 8-bit offset.  */

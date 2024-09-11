@@ -52,7 +52,6 @@ No supporting OS subroutines are required.
  *	citrus Id: wcspbrk.c,v 1.2 2000/12/21 05:07:25 itojun Exp
  */
 
-#include <_ansi.h>
 #include <stddef.h>
 #include <wchar.h>
 

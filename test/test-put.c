@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-int
+static int
 check(char *label, bool ok, int expect, int got)
 {
     if (!ok) {
@@ -49,7 +49,7 @@ check(char *label, bool ok, int expect, int got)
     return 0;
 }
 
-int
+static int
 check_s(char *label, bool ok, size_t expect, size_t got)
 {
     if (!ok) {

@@ -41,5 +41,4 @@ srcs_machine = [
 
 src_machine = files(srcs_machine)
 
-subdir('sys')
 subdir('machine')

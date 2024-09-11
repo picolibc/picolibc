@@ -41,6 +41,7 @@ QUICKREF
 	strlwr
 */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <ctype.h>
 

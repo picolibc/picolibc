@@ -97,7 +97,7 @@ Exit is just a wrapper around _exit that also calls destructors and
 callbacks registered with atexit. To make it work, you'll need to
 implement the `_exit` function:
 
-	void	_exit (int status) _ATTRIBUTE ((__noreturn__));
+	_Noreturn void _exit (int status);
 
 ### malloc and free
 
@@ -119,6 +119,17 @@ application linking process needs to define two symbols:
 The sample linker script provided with picolibc defines these two
 symbols to enclose all RAM which is not otherwise used by the
 application.
+
+## abort
+
+Posix says that `abort` sends `SIGABRT` to the calling process as if
+the process called `raise(SIGABRT)`. It also says `abort` shall not
+return. The picolibc implementation of `abort` calls `raise`; if that
+returns, it then calls `_exit`. The picolibc version of `raise` also
+calls `_exit` for uncaught and un-ignored signals.
+
+This means that an application needs to provide an implementation of
+`_exit` to support `abort`.
 
 ## Linking with System Library
 
@@ -178,7 +189,7 @@ picolibc configuration parameters:
  * -Dtls-model=global-dynamic makes picolibc use the default TLS model
    for GCC.
 
- * -Dmultilib-false makes picolibc build only a single library for the
+ * -Dmultilib=false makes picolibc build only a single library for the
    default GCC configuration.
 
  * -Dpicolib=false disables building the TLS and sbrk support built-in

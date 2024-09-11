@@ -32,6 +32,10 @@
 #ifndef	_SYS_TREE_H_
 #define	_SYS_TREE_H_
 
+#ifndef __PERMIT_DEPRECATED_SYS_TREE_H
+#warning "sys/tree.h is deprecated and will be removed in the future."
+#endif
+
 #include <sys/cdefs.h>
 
 /*
@@ -90,7 +94,7 @@ struct {								\
 	SPLAY_RIGHT(tmp, field) = (head)->sph_root;			\
 	(head)->sph_root = tmp;						\
 } while (/*CONSTCOND*/ 0)
-	
+
 #define SPLAY_ROTATE_LEFT(head, tmp, field) do {			\
 	SPLAY_RIGHT((head)->sph_root, field) = SPLAY_LEFT(tmp, field);	\
 	SPLAY_LEFT(tmp, field) = (head)->sph_root;			\

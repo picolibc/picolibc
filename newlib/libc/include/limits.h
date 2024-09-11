@@ -2,15 +2,17 @@
 #ifndef _LIBC_LIMITS_H_
 # define _LIBC_LIMITS_H_	1
 
-#include <newlib.h>
 #include <sys/cdefs.h>
 #include <sys/syslimits.h>
 
-# ifdef _MB_LEN_MAX
-#  define MB_LEN_MAX	_MB_LEN_MAX
+#ifndef _MB_LEN_MAX
+# ifdef _MB_CAPABLE
+#  define _MB_LEN_MAX   8
 # else
-#  define MB_LEN_MAX    1
+#  define _MB_LEN_MAX   1
 # endif
+#endif
+#define MB_LEN_MAX	_MB_LEN_MAX
 
 /* Maximum number of positional arguments, if _WANT_IO_POS_ARGS.  */
 # ifndef NL_ARGMAX
@@ -23,8 +25,6 @@
 
 #  ifndef _LIMITS_H
 #   define _LIMITS_H	1
-
-#   include <sys/config.h>
 
 /* Number of bits in a `char'.  */
 #   undef CHAR_BIT
@@ -128,8 +128,13 @@
 
 #endif	 /* !_LIBC_LIMITS_H_ */
 
+/*
+ * Placing this outside of the above condition means that this will
+ * get run even from another picolibc provided limits.h file down the
+ * include chain. This also to see if the compiler limits.h has
+ * already been included as some clang configurations do that.
+ */
 #if defined __GNUC__ && !defined _GCC_LIMITS_H_
-/* `_GCC_LIMITS_H_' is what GCC's file defines.  */
 #ifdef __clang__
 #ifndef __GLIBC_USE
 #define __GLIBC_USE(x) 1
@@ -137,17 +142,3 @@
 #endif
 # include_next <limits.h>
 #endif /* __GNUC__ && !_GCC_LIMITS_H_ */
-
-#ifndef _POSIX2_RE_DUP_MAX
-/* The maximum number of repeated occurrences of a regular expression
- *    permitted when using the interval notation `\{M,N\}'.  */
-#define _POSIX2_RE_DUP_MAX              255
-#endif /* _POSIX2_RE_DUP_MAX  */
-
-#ifndef ARG_MAX
-#define ARG_MAX		4096
-#endif
-
-#ifndef PATH_MAX
-#define PATH_MAX	4096
-#endif

@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     Return value:
       The memcpy function returns the value of s1.
 */
+#include <picolibc.h>
+
 	.text
 	.align	2
 	.globl	memcpy

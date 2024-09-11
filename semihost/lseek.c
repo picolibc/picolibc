@@ -60,15 +60,7 @@ off_t lseek(int fd, off_t offset, int whence)
 		return (off_t) -1;
 	}
 
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-	} arg = {
-		.field1 = fd,
-		.field2 = offset
-	};
-
-	uintptr_t ret = sys_semihost(SYS_SEEK, (uintptr_t) &arg);
+	uintptr_t ret = sys_semihost2(SYS_SEEK, fd, offset);
 	if (ret == 0)
 		return offset;
 	errno = sys_semihost_errno();

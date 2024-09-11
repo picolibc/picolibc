@@ -70,7 +70,6 @@ No supporting OS subroutines are required.
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <wctype.h>
 //#include <errno.h>
 #include "local.h"

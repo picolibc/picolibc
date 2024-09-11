@@ -33,6 +33,8 @@
    Even worse, we base it on memcpy, on the assumption that overlapping
    moves are rare, and we will do no worse than the generic memmove.  */
 
+#include <picolibc.h>
+
 #include <stddef.h>
 
 /* Break even between movem and move16 is really at 38.7 * 2, but

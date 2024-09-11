@@ -8,14 +8,13 @@
 #ifndef	_COMPLEX_H
 #define	_COMPLEX_H
 
+#include <sys/cdefs.h>
+
 #define complex _Complex
 #define _Complex_I 1.0fi
 #define I _Complex_I
 
-#include <sys/cdefs.h>
-#include <ieeefp.h>
-
-__BEGIN_DECLS
+_BEGIN_STD_C
 
 /* 7.3.5 Trigonometric functions */
 /* 7.3.5.1 The cacos functions */
@@ -112,9 +111,9 @@ float crealf(float complex);
 
 #if __ISO_C_VISIBLE >= 2011
 #ifdef _HAVE_BUILTIN_COMPLEX
-#define CMPLX(r,i) __builtin_complex(r,i)
-#define CMPLXF(r,i) __builtin_complex(r,i)
-#define CMPLXL(r,i) __builtin_complex(r,i)
+#define CMPLX(r,i) __builtin_complex((double)(r), (double)(i))
+#define CMPLXF(r,i) __builtin_complex((float)(r), (float)(i))
+#define CMPLXL(r,i) __builtin_complex((long double)(r), (long double)(i))
 #else
 #define CMPLX(r,i) ((double complex) ((double) (r) + (double complex) I * (double) (i)))
 #define CMPLXF(r,i) ((float complex) ((float) (r) + (float complex) I * (float) (i)))
@@ -159,6 +158,6 @@ long double complex clog10l(long double complex);
 
 #endif /* _HAVE_LONG_DOUBLE */
 
-__END_DECLS
+_END_STD_C
 
 #endif	/* ! _COMPLEX_H */

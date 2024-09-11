@@ -3,7 +3,7 @@ Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de>
 Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 /* Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling */
-#include <_ansi.h>
+#define _DEFAULT_SOURCE
 #include <wctype.h>
 #include <stdint.h>
 //#include <errno.h>

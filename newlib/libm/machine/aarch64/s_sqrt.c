@@ -24,6 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_FP & 0x8
 #include "fdlibm.h"
 
 double
@@ -37,3 +38,7 @@ sqrt (double x)
   __asm__("fsqrt\t%d0, %d1" : "=w" (result) : "w" (x));
   return result;
 }
+
+#else
+#include "../../math/s_sqrt.c"
+#endif

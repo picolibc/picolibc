@@ -200,9 +200,12 @@ __declare_fenv_inline(int) fesetround(int rounding_mode)
 {
     fenv_t fpcr;
 
+    if (rounding_mode & ~3)
+        return 1;
+
     __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
 
-    fpcr = (fpcr & ~(3 << 4)) | ((rounding_mode & 3) << 4);
+    fpcr = (fpcr & ~(3 << 4)) | (rounding_mode << 4);
 
     __asm__ volatile("fmove.l %0, %%fpcr" : : "d"(fpcr));
 

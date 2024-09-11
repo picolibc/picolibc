@@ -8,7 +8,6 @@
 #if defined (ICONV_TO_UCS_CCS_JIS_X0212_1990) \
  || defined (ICONV_FROM_UCS_CCS_JIS_X0212_1990)
 
-#include <_ansi.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include "ccs.h"

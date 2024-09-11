@@ -1,3 +1,5 @@
+#include <picolibc.h>
+
 ;;  xstormy16
 ;;   Copyright (C) 2001 by  Red Hat, Incorporated. All rights reserved.
 ;; 

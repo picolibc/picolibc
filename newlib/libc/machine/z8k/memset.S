@@ -14,6 +14,8 @@
 /* void *memset(void *buffer, int value, size_t length);
  */
 
+#include <picolibc.h>
+
 	name	"memset.S"
 
 	.text

@@ -1,3 +1,5 @@
+#include <picolibc.h>
+
 ! Entry: arg0: string start address
 ! Exit:  result: length
 !

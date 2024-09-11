@@ -45,7 +45,7 @@ No supporting OS subroutines are required.
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <sys/types.h>
+#define _GNU_SOURCE
 #include <wchar.h>
 
 /*

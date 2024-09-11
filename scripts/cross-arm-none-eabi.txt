@@ -4,6 +4,7 @@
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
 c = ['ccache', 'arm-none-eabi-gcc', '-nostdlib']
+cpp = ['ccache', 'arm-none-eabi-g++', '-nostdlib']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 nm = 'arm-none-eabi-nm'
@@ -27,6 +28,12 @@ default_ram_size   = '0x00200000'
 custom_mem_config_thumb_v8_1_m_main_mve_hard = 'mps3_an547'
 custom_mem_config_thumb_v8_m_main_dp_hard = 'mps3_an547'
 custom_mem_config_thumb_v8_m_main_dp_softfp = 'mps3_an547'
+custom_mem_config_thumb_v8_1_m_main_pacbti_bp_nofp = 'mps3_an547'
+custom_mem_config_thumb_v8_1_m_main_pacbti_dp_bp_hard = 'mps3_an547'
+custom_mem_config_thumb_v8_1_m_main_pacbti_dp_bp_softfp = 'mps3_an547'
+custom_mem_config_thumb_v8_1_m_main_pacbti_fp_bp_hard = 'mps3_an547'
+custom_mem_config_thumb_v8_1_m_main_pacbti_fp_bp_softfp = 'mps3_an547'
+custom_mem_config_thumb_v8_1_m_main_pacbti_mve_bp_hard = 'mps3_an547'
 
 separate_boot_flash_mps3_an547 = true
 default_boot_flash_addr_mps3_an547 = '0x00000000'

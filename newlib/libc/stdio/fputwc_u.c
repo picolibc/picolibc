@@ -24,8 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <wchar.h>
 #include "local.h"

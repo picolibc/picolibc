@@ -45,9 +45,6 @@ effects vary with the locale.
 <<mbtowc>> requires no supporting OS subroutines.
 */
 
-#ifndef _REENT_ONLY
-
-#include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "local.h"
@@ -79,9 +76,3 @@ mbtowc (wchar_t *__restrict pwc,
   return (*s != '\0');
 #endif /* not _MB_CAPABLE */
 }
-
-#endif /* !_REENT_ONLY */
-
-
-
-

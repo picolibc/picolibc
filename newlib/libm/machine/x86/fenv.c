@@ -9,6 +9,7 @@
 #else
 
 #define _GNU_SOURCE        // for FE_NOMASK_ENV
+#define __STDC_WANT_IEC_60559_BFP_EXT__
 
 #include <fenv.h>
 #include <errno.h>
@@ -421,59 +422,6 @@ fesetround (int round)
   return 0;
 }
 
-#if defined(__CYGWIN__)
-/*  Returns the currently selected precision, represented by one of the
-   values of the defined precision macros.  */
-int
-fegetprec (void)
-{
-  unsigned short cw;
-
-  /* Get control word.  */
-  __asm__ volatile ("fnstcw %0" : "=m" (cw) : );
-
-  return (cw & FE_CW_PREC_MASK) >> FE_CW_PREC_SHIFT;
-}
-
-/* http://www.open-std.org/jtc1/sc22//WG14/www/docs/n752.htm:
-
-   The fesetprec function establishes the precision represented by its
-   argument prec.  If the argument does not match a precision macro, the
-   precision is not changed.
-
-   The fesetprec function returns a nonzero value if and only if the
-   argument matches a precision macro (that is, if and only if the requested
-   precision can be established). */
-int
-fesetprec (int prec)
-{
-  unsigned short cw;
-
-  /* Will succeed for any valid value of the input parameter.  */
-  switch (prec)
-    {
-    case FE_FLTPREC:
-    case FE_DBLPREC:
-    case FE_LDBLPREC:
-      break;
-    default:
-      return 0;
-    }
-
-  /* Get control word.  */
-  __asm__ volatile ("fnstcw %0" : "=m" (cw) : );
-
-  /* Twiddle bits.  */
-  cw &= ~FE_CW_PREC_MASK;
-  cw |= (prec << FE_CW_PREC_SHIFT);
-
-  /* Set back into FPU state.  */
-  __asm__ volatile ("fldcw %0" :: "m" (cw));
-
-  /* Indicate success.  */
-  return 1;
-}
-#endif
 
 /*  Set up the FPU and SSE environment at the start of execution.  */
 static void

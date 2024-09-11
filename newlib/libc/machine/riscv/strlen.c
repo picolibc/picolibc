@@ -9,8 +9,11 @@
    http://www.opensource.org/licenses.
 */
 
+#include <picolibc.h>
+
 #include <string.h>
 #include <stdint.h>
+#include "local.h"
 
 size_t strlen(const char *str)
 {

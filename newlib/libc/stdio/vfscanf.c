@@ -75,8 +75,6 @@ Supporting OS subroutines required:
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
-#include <newlib.h>
 #include <ctype.h>
 #include <wctype.h>
 #include <stdio.h>
@@ -320,7 +318,7 @@ _ssrefill (
 }
 
 size_t
-sfread (
+_sfread (
        void *buf,
        size_t size,
        size_t count,
@@ -409,6 +407,12 @@ _SVFSCANF (
 #define _WANT_IO_POSIX_EXTENSIONS
 #endif
 #ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
+#endif
+
   /* POSIX requires that fscanf frees all allocated strings from 'm'
      conversions in case it returns EOF.  m_ptr is used to keep track.
      It will be allocated on the stack the first time an 'm' conversion

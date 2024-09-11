@@ -97,21 +97,15 @@ fetestexcept(int excepts)
 __declare_fenv_inline(int)
 fegetround(void)
 {
-
-#ifdef FE_TONEAREST
 	return FE_TONEAREST;
-#else
-	return 0;
-#endif
-
 }
 
 __declare_fenv_inline(int)
 fesetround(int rounding_mode)
 {
-        (void) rounding_mode;
-
-	return (0);
+        if (rounding_mode == FE_TONEAREST)
+                return 0;
+	return 1;
 }
 
 __declare_fenv_inline(int)

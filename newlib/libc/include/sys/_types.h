@@ -58,8 +58,6 @@ SUCH DAMAGE.
 typedef __WINT_TYPE__ wint_t;
 #endif
 
-#include <newlib.h>
-#include <sys/config.h>
 #include <machine/_types.h>
 
 #ifndef __machine_blkcnt_t_defined
@@ -146,12 +144,8 @@ typedef __uint32_t __mode_t;
 __extension__ typedef long long _off64_t;
 #endif
 
-#if defined(__CYGWIN__) && !defined(__LP64__)
-typedef _off64_t __off_t;
-#else
 typedef _off_t __off_t;
 typedef __uint64_t __off64_t;
-#endif
 
 typedef _off64_t __loff_t;
 
@@ -168,10 +162,8 @@ typedef long _fpos_t;		/* XXX must match off_t in <sys/types.h> */
 				/* (and must be `long' for now) */
 #endif
 
-#ifdef __LARGE64_FILES
 #ifndef __machine_fpos64_t_defined
 typedef _off64_t _fpos64_t;
-#endif
 #endif
 
 /* Defined by GCC provided <stddef.h> */
@@ -264,5 +256,16 @@ typedef	__int32_t	__nl_item;
 typedef	unsigned short	__nlink_t;
 typedef	long		__suseconds_t;	/* microseconds (signed) */
 typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
+
+#ifdef __STDC_WANT_LIB_EXT1__
+#if (__STDC_WANT_LIB_EXT1__ != 0) && (__STDC_WANT_LIB_EXT1__ != 1)
+#error Please define __STDC_WANT_LIB_EXT__ as 0 or 1
+#endif
+
+#if __STDC_WANT_LIB_EXT1__ == 1
+typedef size_t __rsize_t;
+typedef int __errno_t;
+#endif
+#endif
 
 #endif	/* _SYS__TYPES_H */

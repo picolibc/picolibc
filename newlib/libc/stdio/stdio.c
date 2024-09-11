@@ -17,7 +17,6 @@
 /* No user fns here.  Pesch 15apr92. */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <sys/types.h>
 #include <fcntl.h>
@@ -137,11 +136,6 @@ __sclose (
 int
 __stextmode (int fd)
 {
-#ifdef __CYGWIN__
-  extern int _cygwin_istext_for_stdio (int);
-  return _cygwin_istext_for_stdio (fd);
-#else
   return 0;
-#endif
 }
 #endif

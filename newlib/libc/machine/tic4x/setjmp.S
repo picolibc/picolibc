@@ -13,6 +13,8 @@
  */
 /* setjmp/longjmp routines. */
 
+#include <picolibc.h>
+
 	.sect .text
 	.global setjmp
 	.global longjmp

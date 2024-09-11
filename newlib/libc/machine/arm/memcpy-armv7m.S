@@ -46,6 +46,8 @@
      __OPT_BIG_BLOCK_SIZE: Size of big block in words.  Default to 64.
      __OPT_MID_BLOCK_SIZE: Size of big block in words.  Default to 16.
  */
+#include <picolibc.h>
+
 #include "arm_asm.h"
 
 #ifndef __OPT_BIG_BLOCK_SIZE
@@ -81,16 +83,6 @@
 
 #define END_UNROLL .endr
 
-.macro	ASM_ALIAS new old
-	.global	\new
-	.type	\new, %function
-#if defined (__thumb__)
-	.thumb_set	\new, \old
-#else
-	.set	\new, \old
-#endif
-.endm
-
 	.syntax unified
 	.text
 	.align	2
@@ -98,6 +90,7 @@
 	.thumb
 	.thumb_func
 	.fnstart
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	.type	memcpy, %function
 	ASM_ALIAS __aeabi_memcpy, memcpy

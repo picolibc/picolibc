@@ -40,7 +40,7 @@
 
 #ifndef _RPC_XDR_H
 #define _RPC_XDR_H
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <rpc/types.h>
 
 #ifdef __cplusplus

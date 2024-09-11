@@ -30,6 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Ken Werner <ken.werner@de.ibm.com>
 */
 
+#include <picolibc.h>
+
 #include "ea_internal.h"
 #include <ea.h>
 #include <spu_cache.h>

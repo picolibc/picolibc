@@ -52,7 +52,7 @@
 
 #define MESSAGE "hello, world\n"
 
-void
+static void
 check_contents(int repeats)
 {
     FILE *f;

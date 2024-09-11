@@ -40,7 +40,6 @@ subdir('arpa')
 
 inc_headers = [
   'alloca.h',
-  '_ansi.h',
   'argz.h',
   'ar.h',
   'assert.h',
@@ -82,6 +81,7 @@ inc_headers = [
   'signal.h',
   'spawn.h',
   'stdint.h',
+  'stdnoreturn.h',
   'stdlib.h',
   'string.h',
   'strings.h',
@@ -111,3 +111,19 @@ install_headers(inc_headers,
 # For compatibility with libc++'s __mbstate_t.h:
 install_headers(['bits/types/mbstate_t.h'],
 		install_dir: include_dir / 'bits/types')
+
+if enable_cdefs_tests
+
+  ignore_headers = ['cpio.h', 'paths.h', 'termios.h', 'newlib.h', 'regdef.h', 'tar.h', 'utmp.h']
+  foreach header : inc_headers
+
+    if not (header in ignore_headers) and not (header.startswith('_'))
+      test_name = 'check-cdef-' + header
+
+      test(test_name,
+           validate_cdefs,
+           args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+           suite: 'headers')
+    endif
+  endforeach
+endif

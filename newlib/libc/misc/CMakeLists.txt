@@ -33,7 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_sources(
-  __dprintf.c
   ffs.c
   fini.c
   init.c

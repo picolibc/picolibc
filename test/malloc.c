@@ -44,14 +44,15 @@
 
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
 #endif
 
 int
 main(void)
 {
-	void *r;
+        void *r, *q;
 	int result = 0;
-	int pow;
+	int err, pow;
 
 	errno = 0;
 	r = malloc(0);
@@ -70,13 +71,54 @@ main(void)
 	}
 	free(r);
 
+	r = NULL;
+	err = posix_memalign(&r, 128, 237);
+	printf("posix_memalign(128, 237): %p, err=%d\n", r, err);
+	if ((uintptr_t) r & 127) {
+		printf("posix_memalign(128, 237) unaligned (%p)\n", r);
+		err++;
+	}
+	free(r);
+
+	r = NULL;
+	err = posix_memalign(&r, 0, 237);
+	printf("posix_memalign(0, 237): %p, err=%d\n", r, err);
+	if (err != EINVAL) {
+		printf("posix_memalign(0, 237) should return EINVAL\n");
+		err++;
+	}
+	free(r);
+
+	r = NULL;
+	err = posix_memalign(&r, 129, 237);
+	printf("posix_memalign(129, 237): %p, err=%d\n", r, err);
+	if (err != EINVAL) {
+		printf("posix_memalign(129, 237) should return EINVAL\n");
+		err++;
+	}
+	free(r);
+
+	r = NULL;
+	err = posix_memalign(&r, 128, PTRDIFF_MAX);
+	printf("posix_memalign(128, PTRDIFF_MAX): %p, err=%d\n", r, err);
+	if (err != ENOMEM) {
+		printf("posix_memalign(128, PTRDIFF_MAX) should return ENOMEM\n");
+		err++;
+	}
+	free(r);
+
 	errno = 0;
 	r = malloc(PTRDIFF_MAX);
-        printf("malloc(PTRDIFF_MAX): %p\n", r);
-	if (r || errno != ENOMEM) {
-                printf("malloc(PTRDIFF_MAX) should have failed. got %p error %s\n", r, strerror(errno));
+        q = NULL;
+        if (r)
+                q = malloc(PTRDIFF_MAX);
+        printf("malloc(PTRDIFF_MAX: %p %p\n", r, q);
+	if ((r && q) || errno != ENOMEM) {
+                printf("2*malloc(PTRDIFF_MAX) should have failed. got %p,%p error %s\n", r, q, strerror(errno));
 		result++;
 	}
+        free(r);
+        free(q);
 
 	errno = 0;
 	r = malloc(SIZE_MAX);
@@ -110,24 +152,26 @@ main(void)
 			printf("calloc(SIZE_MAX >> %d, SIZE_MAX >> %d) should have failed. got %p error %s\n", pow, pow, r, strerror(errno));
 			result++;
 		}
+                free(r);
 		r = reallocarray(NULL, SIZE_MAX >> pow, SIZE_MAX >> pow);
                 printf("reallocarray(SIZE_MAX >> %d, SIZE_MAX >> %d): %p\n", pow, pow, r);
 		if (r || errno != ENOMEM) {
 			printf("reallocarray(NULL, SIZE_MAX >> %d, SIZE_MAX >> %d) should have failed. got %p error %s\n", pow, pow, r, strerror(errno));
 			result++;
 		}
+                free(r);
 	}
 
 	/* make sure realloc doesn't read past the source */
 
 	void *big = malloc(1024);
-	memset(big, '1', 1024);
         printf("big %p\n", big);
 	if (big) {
+                memset(big, '1', 1024);
 		void *small = malloc(128);
-		memset(small, '2', 128);
                 printf("small %p\n", small);
 		if (small) {
+                        memset(small, '2', 128);
                         (void) atoi(small);
 			free(big);
 			char *med = realloc(small, 1024);

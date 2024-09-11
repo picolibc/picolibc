@@ -90,11 +90,11 @@ sys_semihost_elapsed(void);
 int
 sys_semihost_errno(void);
 
-void
-sys_semihost_exit(uintptr_t exception, uintptr_t subcode) _ATTRIBUTE((__noreturn__));
+_Noreturn void
+sys_semihost_exit(uintptr_t exception, uintptr_t subcode);
 
-void
-sys_semihost_exit_extended(uintptr_t code) _ATTRIBUTE((__noreturn__));
+_Noreturn void
+sys_semihost_exit_extended(uintptr_t code);
 
 bool
 sys_semihost_feature(uint8_t feature);
@@ -155,7 +155,7 @@ int
 sys_semihost_tmpnam(char *pathname, int identifier, int maxpath);
 
 uintptr_t
-sys_semihost_write(int fd, const void *buf, uintptr_t count);
+sys_semihost_write(int fd, const void *buf, size_t count);
 
 void
 sys_semihost_write0(const char *string);

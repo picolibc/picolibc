@@ -97,7 +97,6 @@ srcs_string = [
     'swab.c',
     'timingsafe_bcmp.c',
     'timingsafe_memcmp.c',
-    'u_strerr.c',
     'wcpcpy.c',
     'wcpncpy.c',
     'wcscasecmp.c',
@@ -135,11 +134,22 @@ srcs_string = [
     'wmempcpy.c',
     'wmemset.c',
     'xpg_strerror_r.c',
+    'memcpy_s.c',
+    'memmove_s.c',
+    'memset_s.c',
+    'strcat_s.c',
+    'strcpy_s.c',
+    'strerror_s.c',
+    'strerrorlen_s.c',
+    'strncat_s.c',
+    'strncpy_s.c',
+    'strnlen_s.c',
 ]
 
 hdrs_string = [
     'local.h',
     'str-two-way.h',
+    'string_private.h',
 ]
 
 srcs_strcmp = [

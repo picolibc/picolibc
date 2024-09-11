@@ -156,18 +156,24 @@ foreach target : targets
 
   value = get_variable('target_' + target)
 
-  libs = [get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
-    libs += [get_variable('lib_semihost' + target)]
-  endif
-  if is_variable('crt0_hosted' + target)
-    objs = [get_variable('crt0_hosted'+ target)]
-  else
-    objs = []
+    _libs += [get_variable('lib_semihost' + target)]
   endif
 
+  if is_variable('crt0_hosted' + target)
+    _objs = [get_variable('crt0_hosted'+ target)]
+  else
+    _objs = []
+  endif
+
+  _lib_files=[]
+  foreach _lib : _libs
+    _lib_files += _lib.full_path()
+  endforeach
+
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
+  _link_args = value[1] + _lib_files + get_variable('test_link_args_' + target, test_link_args)
   _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
 
   _c_args = double_printf_compile_args + _c_args
@@ -187,17 +193,16 @@ foreach target : targets
     test(test_name,
          executable(test_name, math_test_src,
 		    c_args: _c_args +  ['-DTEST_PART=' + test_part],
-		    objects: objs,
-		    link_with: libs,
+		    objects: _objs,
 		    link_args: _link_args,
-		    link_depends: _link_depends,
+		    link_depends: _libs + _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
          env: test_env)
   endforeach
 endforeach
 
-if enable_native_tests
+if enable_native_math_tests
 
   native_lib_m = cc.find_library('m', required: false)
 

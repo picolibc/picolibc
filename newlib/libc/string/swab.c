@@ -16,6 +16,7 @@ PORTABILITY
 <<swab>> requires no supporting OS subroutines.
 */
 
+#define _XOPEN_SOURCE
 #include <unistd.h>
 
 void

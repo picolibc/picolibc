@@ -29,6 +29,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 */
 
+#include <picolibc.h>
+
 #include <string.h>
 #include <stddef.h>
 #include "ea_internal.h"

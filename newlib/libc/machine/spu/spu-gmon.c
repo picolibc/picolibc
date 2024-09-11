@@ -30,6 +30,8 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Ken Werner <ken.werner@de.ibm.com>
 */
 
+#include <picolibc.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

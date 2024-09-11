@@ -27,7 +27,6 @@
 #include <stdlib.h>
 #include <iconv.h>
 #include <errno.h>
-#include <newlib.h>
 #include "check.h"
 
 static const char * const good_names[] = {

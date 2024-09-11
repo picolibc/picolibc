@@ -34,9 +34,15 @@ SUCH DAMAGE.
 #ifndef __ERRNO_H__
 #define __ERRNO_H__
 
-#ifndef __error_t_defined
-typedef int error_t;
-#define __error_t_defined 1
+#include <sys/cdefs.h>
+
+#if __STDC_WANT_LIB_EXT1__ == 1
+#include <sys/_types.h>
+
+#ifndef _ERRNO_T_DEFINED
+typedef __errno_t errno_t;
+#define _ERRNO_T_DEFINED
+#endif
 #endif
 
 #include <sys/errno.h>

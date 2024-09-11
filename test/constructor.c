@@ -43,7 +43,7 @@
 
 #define REGULAR_RET (1 - CONSTRUCTOR_RET)
 
-void __attribute__((constructor(101)))
+static void __attribute__((constructor(101)))
 crt_startup(void)
 {
 	_exit(CONSTRUCTOR_RET);

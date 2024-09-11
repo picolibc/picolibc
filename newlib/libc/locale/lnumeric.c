@@ -24,6 +24,7 @@
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LCNUMERIC_SIZE (sizeof(struct lc_numeric_T) / sizeof(char *))
@@ -42,48 +43,4 @@ const struct lc_numeric_T _C_numeric_locale = {
 };
 
 #ifdef __HAVE_LOCALE_INFO__
-#ifdef __CYGWIN__
-int
-__numeric_load_locale (struct __locale_t *locale, const char *name ,
-		       void *f_wctomb, const char *charset)
-{
-  int ret= -1;
-  struct lc_numeric_T nm;
-  char *bufp = NULL;
-
-  extern int __set_lc_numeric_from_win (const char *,
-					const struct lc_numeric_T *,
-					struct lc_numeric_T *, char **,
-					void *, const char *);
-  ret = __set_lc_numeric_from_win (name, &_C_numeric_locale, &nm, &bufp,
-				   f_wctomb, charset);
-  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-  if (ret >= 0)
-    {
-      struct lc_numeric_T *nmp = NULL;
-
-      if (ret > 0)
-	{
-	  nmp = (struct lc_numeric_T *) calloc (1, sizeof *nmp);
-	  if (!nmp)
-	    {
-	      free (bufp);
-	      return -1;
-	    }
-	  *nmp = nm;
-	}
-      struct __lc_cats tmp = locale->lc_cat[LC_NUMERIC];
-      locale->lc_cat[LC_NUMERIC].ptr = ret == 0 ? &_C_numeric_locale : nmp;
-      locale->lc_cat[LC_NUMERIC].buf = bufp;
-      /* If buf is not NULL, both pointers have been alloc'ed */
-      if (tmp.buf)
-	{
-	  free ((void *) tmp.ptr);
-	  free (tmp.buf);
-	}
-      ret = 0;
-    }
-  return ret;
-}
-#endif
 #endif

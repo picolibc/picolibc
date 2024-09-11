@@ -48,6 +48,7 @@ PORTABILITY
 Supporting OS subroutines required: None
 */
 
+#define _DEFAULT_SOURCE
 #include <stddef.h>
 #include <stdlib.h>
 #include "atexit.h"

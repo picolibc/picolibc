@@ -66,7 +66,7 @@ QUICKREF
  * software is freely granted, provided that this notice is preserved.
  */
 
-#include <sys/cdefs.h>
+#define _GNU_SOURCE
 
 #include <ctype.h>
 #include <string.h>

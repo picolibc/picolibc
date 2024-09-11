@@ -24,6 +24,7 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
+#if __ARM_FP & 0x4
 #include "fdlibm.h"
 
 float
@@ -38,3 +39,6 @@ sqrtf (float x)
   return result;
 }
 
+#else
+#include "../../math/sf_sqrt.c"
+#endif

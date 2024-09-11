@@ -30,6 +30,8 @@
 
 */
 
+#include "stdio_private.h"
+
 #define SCANF_LEVEL SCANF_STD
 #ifndef _FORMAT_DEFAULT_INTEGER
 #define vfscanf __i_vfscanf

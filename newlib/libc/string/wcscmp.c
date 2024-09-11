@@ -60,7 +60,6 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-#include <_ansi.h>
 #include <wchar.h>
 
 /*

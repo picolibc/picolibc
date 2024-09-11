@@ -33,7 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
 #include <stdint.h>
 
 #if __ARM_ARCH_PROFILE == 'M'
@@ -93,7 +92,7 @@ __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 #else
 
-void arm_halt_isr(void);
+void arm_halt_vector(void);
 
 void __attribute__((naked)) __section(".init")
 arm_halt_vector(void)
@@ -102,7 +101,7 @@ arm_halt_vector(void)
 	__asm__("1: b 1b");
 }
 
-void arm_ignore_isr(void);
+void arm_ignore_vector(void);
 
 void __attribute__((naked)) __section(".init")
 arm_ignore_vector(void)
@@ -125,6 +124,9 @@ vector(not_used);
 vector(irq);
 vector(fiq);
 
+void
+__weak_vector_table(void);
+
 void __attribute__((naked)) __section(".text.init.enter")
 __weak_vector_table(void)
 {
@@ -132,29 +134,29 @@ __weak_vector_table(void)
 	 * Exception vector that lives at the
 	 * start of program text (usually 0x0)
 	 */
-#if __thumb2__
+#if __thumb2__ && __ARM_ARCH_PROFILE != 'A'
 	/* Thumb 2 processors start in thumb mode */
-	__asm__(".thumb");
-	__asm__(".syntax unified");
-	__asm__("b.w _start");
-	__asm__("b.w arm_undef_vector");
-	__asm__("b.w arm_svc_vector");
-	__asm__("b.w arm_prefetch_abort_vector");
-	__asm__("b.w arm_data_abort_vector");
-	__asm__("b.w arm_not_used_vector");
-	__asm__("b.w arm_irq_vector");
-	__asm__("b.w arm_fiq_vector");
+	__asm__(".thumb\n"
+                ".syntax unified\n"
+                "b.w _start\n"
+                "b.w arm_undef_vector\n"
+                "b.w arm_svc_vector\n"
+                "b.w arm_prefetch_abort_vector\n"
+                "b.w arm_data_abort_vector\n"
+                "b.w arm_not_used_vector\n"
+                "b.w arm_irq_vector\n"
+                "b.w arm_fiq_vector");
 #else
 	/* Thumb 1 and arm processors start in arm mode */
-	__asm__(".arm");
-	__asm__("b _start");
-	__asm__("b arm_undef_vector");
-	__asm__("b arm_svc_vector");
-	__asm__("b arm_prefetch_abort_vector");
-	__asm__("b arm_data_abort_vector");
-	__asm__("b arm_not_used_vector");
-	__asm__("b arm_irq_vector");
-	__asm__("b arm_fiq_vector");
+        __asm__(".arm\n"
+                "b _start\n"
+                "b arm_undef_vector\n"
+                "b arm_svc_vector\n"
+                "b arm_prefetch_abort_vector\n"
+                "b arm_data_abort_vector\n"
+                "b arm_not_used_vector\n"
+                "b arm_irq_vector\n"
+                "b arm_fiq_vector");
 #endif
 }
 

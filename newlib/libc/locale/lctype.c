@@ -23,6 +23,7 @@
  * SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LCCTYPE_SIZE (sizeof(struct lc_ctype_T) / sizeof(char *))
@@ -41,61 +42,3 @@ const struct lc_ctype_T _C_ctype_locale = {
 #endif
 };
 
-#ifdef __CYGWIN__
-static const char	numsix[] = { '\6', '\0'};
-
-const struct lc_ctype_T _C_utf8_ctype_locale = {
-	"UTF-8",			/* codeset */
-	numsix				/* mb_cur_max */
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	,
-	{ "0", "1", "2", "3", "4",	/* outdigits */
-	  "5", "6", "7", "8", "9" },
-	{ L"0", L"1", L"2", L"3", L"4",	/* woutdigits */
-	  L"5", L"6", L"7", L"8", L"9" }
-#endif
-};
-
-/* NULL locale indicates global locale (called from setlocale) */
-int
-__ctype_load_locale (struct __locale_t *locale, const char *name,
-		     void *f_wctomb, const char *charset, int mb_cur_max)
-{
-  int ret;
-  struct lc_ctype_T ct;
-  char *bufp = NULL;
-
-  extern int __set_lc_ctype_from_win (const char *, const struct lc_ctype_T *,
-				      struct lc_ctype_T *, char **, void *,
-				      const char *, int);
-  ret = __set_lc_ctype_from_win (name, &_C_ctype_locale, &ct, &bufp,
-				 f_wctomb, charset, mb_cur_max);
-  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-  if (ret >= 0)
-    {
-      struct lc_ctype_T *ctp = NULL;
-
-      if (ret > 0)
-	{
-	  ctp = (struct lc_ctype_T *) calloc (1, sizeof *ctp);
-	  if (!ctp)
-	    {
-	      free (bufp);
-	      return -1;
-	    }
-	  *ctp = ct;
-	}
-      struct __lc_cats tmp = locale->lc_cat[LC_CTYPE];
-      locale->lc_cat[LC_CTYPE].ptr = ret == 0 ? &_C_ctype_locale : ctp;
-      locale->lc_cat[LC_CTYPE].buf = bufp;
-      /* If buf is not NULL, both pointers have been alloc'ed */
-      if (tmp.buf)
-	{
-	  free ((void *) tmp.ptr);
-	  free (tmp.buf);
-	}
-      ret = 0;
-    }
-  return ret;
-}
-#endif

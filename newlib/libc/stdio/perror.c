@@ -54,10 +54,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 
 #define _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <string.h>
 #include "local.h"
+#include "../string/local.h"
 #include <errno.h>
 
 #define WRITE_STR(str) \

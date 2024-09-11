@@ -40,7 +40,6 @@ add_subdirectory(arpa)
 
 picolibc_headers(""
   alloca.h
-  _ansi.h
   argz.h
   ar.h
   assert.h
@@ -83,6 +82,7 @@ picolibc_headers(""
   signal.h
   spawn.h
   stdint.h
+  stdnoreturn.h
   stdlib.h
   string.h
   strings.h

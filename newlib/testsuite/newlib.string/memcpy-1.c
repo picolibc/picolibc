@@ -54,7 +54,7 @@
 #define TOO_MANY_ERRORS 11
 int errors = 0;
 
-void
+static void
 print_error (char const* msg, ...)
 {   
   errors++;

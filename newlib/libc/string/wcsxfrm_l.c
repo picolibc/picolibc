@@ -40,7 +40,6 @@ PORTABILITY
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <wchar.h>
 
 size_t

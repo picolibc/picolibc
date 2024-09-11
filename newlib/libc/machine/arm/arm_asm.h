@@ -499,6 +499,16 @@
 	.endif
 .endm
 
+.macro	ASM_ALIAS new old
+	.global	\new
+	.type	\new, %function
+#if defined (__thumb__)
+	.thumb_set	\new, \old
+#else
+	.set	\new, \old
+#endif
+.endm
+
 #endif /* __ASSEMBLER__ */
 
 #endif /* ARM_ASM__H */

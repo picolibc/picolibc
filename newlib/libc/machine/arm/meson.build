@@ -36,7 +36,6 @@ srcs_machine = [
   'setjmp.S',
   'strcmp.S',
   'strcpy.S',
-  'aeabi_memcpy-armv7a.S',
   'aeabi_memset.c',
   'bzero.c',
   'memchr.c',
@@ -50,7 +49,6 @@ srcs_machine = [
   'strlen.S',
 ]
 
-subdir('sys')
 subdir('machine')
 
 foreach target : targets

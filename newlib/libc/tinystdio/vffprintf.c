@@ -30,6 +30,8 @@
 
 */
 
+#include "stdio_private.h"
+
 #define PRINTF_LEVEL PRINTF_FLT
 #define PICOLIBC_FLOAT_PRINTF_SCANF
 #ifndef _FORMAT_DEFAULT_FLOAT

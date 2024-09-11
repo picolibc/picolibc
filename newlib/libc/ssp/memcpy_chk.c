@@ -28,8 +28,6 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-#include <sys/cdefs.h>
-__RCSID("$NetBSD: memcpy_chk.c,v 1.7 2015/05/13 19:57:16 joerg Exp $");
 
 /*LINTLIBRARY*/
 

@@ -39,7 +39,6 @@ POSSIBILITY OF SUCH DAMAGE.
 extern "C" {
 #endif
 
-#include "_ansi.h"
 #include <sys/features.h>
 #include <sys/types.h>
 

@@ -34,9 +34,6 @@
 #define	_DB_H_
 
 #include <sys/types.h>
-#include <sys/cdefs.h>
-#include <sys/config.h>
-
 #include <limits.h>
 
 #define	RET_ERROR	-1		/* Return values. */

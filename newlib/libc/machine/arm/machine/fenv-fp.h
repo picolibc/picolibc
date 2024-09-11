@@ -147,6 +147,9 @@ __declare_fenv_inline(int) fesetround(int round)
 {
 	fenv_t __fpsr;
 
+        /* Check for invalid rounding modes */
+        if (round & ~(_ROUND_MASK))
+                return 1;
 	_vmrs_fpscr(__fpsr);
 	__fpsr &= ~(_ROUND_MASK);
 	__fpsr |= round;

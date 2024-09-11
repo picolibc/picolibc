@@ -5,6 +5,8 @@
  * SPDX-License-Identifier: MIT 
  */
 
+#include <picolibc.h>
+
 #define BUILD_STPCPY 1
 
 #include "strcpy.S"

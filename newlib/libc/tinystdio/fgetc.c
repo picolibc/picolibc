@@ -37,8 +37,10 @@ fgetc(FILE *stream)
 	int rv;
 	__ungetc_t unget;
 
-	if ((stream->flags & __SRD) == 0)
+	if ((stream->flags & __SRD) == 0) {
+		stream->flags |= __SERR;
 		return EOF;
+	}
 
 	if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
                 return (unsigned char) (unget - 1);
@@ -53,8 +55,12 @@ fgetc(FILE *stream)
 	return (unsigned char)rv;
 }
 
+#undef getc
+#undef getc_unlocked
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fgetc, getc);
-#elif !defined(getc)
+__strong_reference(fgetc, getc_unlocked);
+#else
 int getc(FILE *stream) { return fgetc(stream); }
+int getc_unlocked(FILE *stream) { return fgetc(stream); }
 #endif

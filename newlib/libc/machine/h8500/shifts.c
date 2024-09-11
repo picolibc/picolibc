@@ -16,6 +16,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 
+#include <picolibc.h>
+
 int __ashrhi3(int a,int b)
 {
   return a>>b;

@@ -27,8 +27,11 @@
 #ifndef _THREADS_H_
 #define	_THREADS_H_
 
+#include <sys/cdefs.h>
 #include <machine/_threads.h>
 #include <time.h>
+
+_BEGIN_STD_C
 
 typedef void (*tss_dtor_t)(void *);
 typedef int (*thrd_start_t)(void *);
@@ -51,7 +54,6 @@ enum {
 #define	thread_local		NEWLIB_THREAD_LOCAL
 #endif
 
-__BEGIN_DECLS
 void	call_once(once_flag *, void (*)(void));
 int	cnd_broadcast(cnd_t *);
 void	cnd_destroy(cnd_t *);
@@ -88,6 +90,8 @@ int	tss_create(tss_t *, tss_dtor_t);
 void	tss_delete(tss_t);
 void *	tss_get(tss_t);
 int	tss_set(tss_t, void *);
-__END_DECLS
+
+_END_STD_C
+
 
 #endif /* !_THREADS_H_ */

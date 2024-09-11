@@ -44,7 +44,7 @@ msg = #f, ((r) = (f)) == (x) || \
 ((r) = (f)) == (x) || \
 (printf(__FILE__ ":%d: %s failed (" m ")\n", __LINE__, msg, r, x), err++, 0) )
 
-int test_strtol(void)
+static int test_strtol(void)
 {
 	int i;
 	long l;
@@ -160,7 +160,12 @@ int test_strtol(void)
 	errno = 0;
 	c = NULL;
 	TEST(l, strtol(s="123", &c, 37), 0, "%ld != %ld");
-	TEST2(i, c-s, 0, "wrong final position %d != %d");
+
+        /*
+          The value of 'c' is undefined when base is invalid, so this
+          test isn't valid:
+           TEST2(i, c-s, 0, "wrong final position %d != %d");
+        */
 	TEST2(i, errno, EINVAL, "%d != %d");
 
 	TEST(l, strtol(s="  15437", &c, 8), 015437, "%ld != %ld");

@@ -19,7 +19,7 @@
 #include <errno.h>
 
 
-int
+static int
 randi (void)
 {
   static int32_t next;
@@ -31,7 +31,7 @@ randi (void)
 #define __FLOAT_WORD_ORDER__ __BYTE_ORDER__
 #endif
 
-double randx (void)
+static double randx (void)
 {
   double res;
 
@@ -61,7 +61,7 @@ double randx (void)
 }
 
 /* Return a random double, but bias for numbers closer to 0 */
-double randy (void)
+static double randy (void)
 {
   int pow;
   double r= randx();
@@ -69,7 +69,7 @@ double randy (void)
   return ldexp(r, randi() & 0x1f);
 }
 
-void
+static void
 test_frexp (void)
 {
   int i;
@@ -157,7 +157,7 @@ test_frexp (void)
    we test this
 
 */
-void
+static void
 test_mod (void)
 {
   int i;
@@ -202,7 +202,7 @@ test_mod (void)
 /*
 Test pow by multiplying logs
 */
-void
+static void
 test_pow (void)
 {
   unsigned int i;

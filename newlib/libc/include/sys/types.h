@@ -45,7 +45,6 @@ SUCH DAMAGE.
 
 #ifndef _SYS_TYPES_H
 
-#include <_ansi.h>
 #include <sys/cdefs.h>
 #include <machine/_types.h>
 
@@ -130,15 +129,13 @@ typedef	__blksize_t	blksize_t;
 #define	_BLKSIZE_T_DECLARED
 #endif
 
-#if !defined(__clock_t_defined) && !defined(_CLOCK_T_DECLARED)
+#ifndef _CLOCK_T_DECLARED
 typedef	_CLOCK_T_	clock_t;
-#define	__clock_t_defined
 #define	_CLOCK_T_DECLARED
 #endif
 
-#if !defined(__time_t_defined) && !defined(_TIME_T_DECLARED)
+#ifndef _TIME_T_DECLARED
 typedef	_TIME_T_	time_t;
-#define	__time_t_defined
 #define	_TIME_T_DECLARED
 #endif
 
@@ -171,25 +168,26 @@ typedef unsigned long vm_offset_t;
 typedef unsigned long vm_size_t;
 #endif /* __i386__ && (GO32 || __MSDOS__) */
 
-/*
- * All these should be machine specific - right now they are all broken.
- * However, for all of Cygnus' embedded targets, we want them to all be
- * the same.  Otherwise things like sizeof (struct stat) might depend on
- * how the file was compiled (e.g. -mint16 vs -mint32, etc.).
- */
+#ifndef _SSIZE_T_DECLARED
+typedef _ssize_t ssize_t;
+#define	_SSIZE_T_DECLARED
+#endif
 
 #ifndef _OFF_T_DECLARED
 typedef	__off_t		off_t;		/* file offset */
 #define	_OFF_T_DECLARED
 #endif
+
 #ifndef _DEV_T_DECLARED
 typedef	__dev_t		dev_t;		/* device number or struct cdev */
 #define	_DEV_T_DECLARED
 #endif
+
 #ifndef _UID_T_DECLARED
 typedef	__uid_t		uid_t;		/* user id */
 #define	_UID_T_DECLARED
 #endif
+
 #ifndef _GID_T_DECLARED
 typedef	__gid_t		gid_t;		/* group id */
 #define	_GID_T_DECLARED
@@ -205,11 +203,6 @@ typedef	__key_t		key_t;		/* IPC key */
 #define	_KEY_T_DECLARED
 #endif
 
-#ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
-#define	_SSIZE_T_DECLARED
-#endif
-
 #ifndef _MODE_T_DECLARED
 typedef	__mode_t	mode_t;		/* permissions */
 #define	_MODE_T_DECLARED
@@ -220,15 +213,13 @@ typedef	__nlink_t	nlink_t;	/* link count */
 #define	_NLINK_T_DECLARED
 #endif
 
-#if !defined(__clockid_t_defined) && !defined(_CLOCKID_T_DECLARED)
+#ifndef _CLOCKID_T_DECLARED
 typedef	__clockid_t	clockid_t;
-#define	__clockid_t_defined
 #define	_CLOCKID_T_DECLARED
 #endif
 
-#if !defined(__timer_t_defined) && !defined(_TIMER_T_DECLARED)
+#ifndef _TIMER_T_DECLARED
 typedef	__timer_t	timer_t;
-#define	__timer_t_defined
 #define	_TIMER_T_DECLARED
 #endif
 
@@ -242,7 +233,14 @@ typedef	__suseconds_t	suseconds_t;
 #define	_SUSECONDS_T_DECLARED
 #endif
 
+#if __BSD_VISIBLE
+
+#ifndef _SBINTIME_T_DECLARED
 typedef	__int64_t	sbintime_t;
+#define _SBINTIME_T_DECLARED
+#endif
+
+#endif
 
 #include <sys/features.h>
 #include <machine/types.h>

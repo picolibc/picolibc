@@ -25,7 +25,7 @@ SUCH DAMAGE.
 #ifndef __ICONV_ICONVNLS_H__
 #define __ICONV_ICONVNLS_H__
 
-#include <newlib.h>
+#include <stdint.h>
 
 /*
  * Include ucs-2-internal or ucs-4-internal if Newlib is configured as

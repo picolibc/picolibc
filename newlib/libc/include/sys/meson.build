@@ -43,9 +43,9 @@ inc_sys_headers_all = [
   'errno.h',
   'fcntl.h',
   'features.h',
-  'fenv.h',
   'file.h',
   'iconvnls.h',
+  '_initfini.h',
   '_intsup.h',
   '_locale.h',
   'lock.h',
@@ -54,7 +54,7 @@ inc_sys_headers_all = [
   'resource.h',
   'sched.h',
   'select.h',
-  'signal.h',
+  '_select.h',
   '_sigset.h',
   'stat.h',
   '_stdint.h',
@@ -72,7 +72,8 @@ inc_sys_headers_all = [
   '_tz_structs.h',
   'unistd.h',
   'utime.h',
-  'wait.h'
+  'wait.h',
+  '_wait.h'
 ]
 
 inc_sys_headers = []
@@ -86,3 +87,16 @@ endforeach
 
 install_headers(inc_sys_headers,
 		install_dir: include_dir / 'sys')
+
+if enable_cdefs_tests
+  ignore_headers = ['config.h', 'features.h', 'string.h', 'custom_file.h', 'dirent.h']
+  foreach header : inc_sys_headers
+    if not (header in ignore_headers) and not (header.startswith('_'))
+      test_name = 'check-cdef-sys-' + header
+      test(test_name,
+           validate_cdefs,
+           args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+           suite: 'headers')
+    endif
+  endforeach
+endif

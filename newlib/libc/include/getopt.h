@@ -87,7 +87,7 @@ gpietsch@comcast.net
 #ifndef GETOPT_H
 #define GETOPT_H
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 
 /* include files needed by this include file */
 

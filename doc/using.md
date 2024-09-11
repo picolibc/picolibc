@@ -5,6 +5,29 @@ running either no operating system or a small RTOS. It is designed to
 be linked statically along with any operating system and application
 code.
 
+### Prerequisites
+
+It is expected that the toolchain used for compilation of applicatons
+against Picolibc provides the follwoing headers in its default search
+paths:
+
+ * float.h
+ * iso646.h
+ * stdalign.h
+ * stdarg.h
+ * stdbool.h
+ * stddef.h
+ * tgmath.h
+
+Vanilla GCC & Clang/LLVM toolchains take care of that so most of
+the users have everything in place. But some third-party toolchains
+may expect these headers to be provided by the C library. Unfortunately
+it is not possible as these headers have compiler-specific parts and
+so whatever version could be imported in the Picolibc, it won't work
+nicely with certain compilers. Moreover even different versions of the
+same compiler may not work well with the same version of one of the
+headers mentioned above.
+
 ## Compiling with Picolibc
 
 To compile source code to use Picolibc, you can use the GCC .specs

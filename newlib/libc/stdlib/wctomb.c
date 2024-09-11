@@ -42,9 +42,6 @@ effects vary with the locale.
 <<wctomb>> requires no supporting OS subroutines.
 */
 
-#ifndef _REENT_ONLY
-
-#include <newlib.h>
 #include <stdlib.h>
 #include <errno.h>
 #include "local.h"
@@ -71,5 +68,3 @@ wctomb (char *s,
         return 1;
 #endif /* not _MB_CAPABLE */
 }
-
-#endif /* !_REENT_ONLY */

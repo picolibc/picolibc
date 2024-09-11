@@ -1,8 +1,10 @@
-#include <newlib.h>
+
+#include <picolibc.h>
 
 #ifndef _FVWRITE_IN_STREAMIO
 
 #include <stdio.h>
+#include "local.h"
 
 int
 __sfputs (

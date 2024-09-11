@@ -32,6 +32,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+libc_tests_common = [
+  'basename',
+  'dirname',
+  'fnmatch',
+  'qsort',
+  'snprintf',
+  'sscanf',
+  'string',
+  'strtol',
+]
+
+libc_tests_picolibc = libc_tests_common
+
+if (tinystdio and io_float_exact) or newlib_io_float
+  libc_tests_picolibc += ['strtod']
+endif
+
 foreach target : targets
   value = get_variable('target_' + target)
 
@@ -46,26 +63,16 @@ foreach target : targets
     _objs = []
   endif
 
+  _lib_files=[]
+  foreach _lib : _libs
+    _lib_files += _lib.full_path()
+  endforeach
+
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
-  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+  _link_args = value[1] + _lib_files + get_variable('test_link_args_' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends_' + target, test_link_depends) + _libs
 
-  libc_tests = [
-    'basename',
-    'dirname',
-    'fnmatch',
-    'qsort',
-    'snprintf',
-    'sscanf',
-    'string',
-    'strtol',
-  ]
-
-  if (tinystdio and io_float_exact) or newlib_io_float
-    libc_tests += ['strtod']
-  endif
-
-  foreach t1 : libc_tests
+  foreach t1 : libc_tests_picolibc
     t1_src = t1 + '.c'
     if target == ''
       t1_name = t1
@@ -84,7 +91,6 @@ foreach target : targets
 		    c_args: double_printf_compile_args + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
-		    link_with: _libs,
 		    link_depends:  _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
@@ -92,3 +98,27 @@ foreach target : targets
 	 env: test_env)
   endforeach
 endforeach
+
+if enable_native_tests
+
+  libc_tests_native = libc_tests_common
+  libc_tests_native_dependencies = []
+
+  if enable_native_math_tests
+    libc_tests_native += ['strtod']
+    libc_tests_native_dependencies += native_lib_m
+  endif
+
+  foreach t1 : libc_tests_native
+    t1_src = t1 + '.c'
+    t1_name = t1 + '-native'
+
+    test(t1_name,
+	 executable(t1_name, t1_src,
+		    c_args: native_c_args,
+		    link_args: native_c_args,
+                    dependencies: libc_tests_native_dependencies))
+  endforeach
+
+endif
+

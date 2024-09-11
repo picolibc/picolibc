@@ -33,6 +33,7 @@ QUICKREF
 	wcscasecmp 
 */
 
+#define _DEFAULT_SOURCE
 #include <wchar.h>
 #include <wctype.h>
 

@@ -61,6 +61,7 @@ static const char pstr_an[] = "an";
 # endif
 
 #define FLT_STREAM const char
+#define FLT_CONTEXT int
 
 static inline int scanf_getc(const char *s, int *lenp)
 {
@@ -70,11 +71,11 @@ static inline int scanf_getc(const char *s, int *lenp)
     return c;
 }
 
-static inline void scanf_ungetc(int c, const char *s, int *lenp)
+static inline void scanf_ungetc(int c, FLT_STREAM *s, int *lenp)
 {
     (void) c;
     (void) s;
-    *lenp = *lenp - 1;
+    --(*lenp);
 }
 
 #undef EOF
@@ -103,6 +104,10 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     0
 # endif
+
+#define FLT_STREAM      FILE
+#define FLT_CONTEXT     scanf_context_t
+
 #endif
 
 #include "scanf_private.h"
@@ -193,7 +198,7 @@ static inline void scanf_ungetc(int c, const char *s, int *lenp)
 #endif
 
 static unsigned char
-conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t flags)
+conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, uint16_t flags)
 {
     UINTFLOAT uint;
     unsigned int overflow = 0;
@@ -203,14 +208,14 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
     const char *p;
     int exp;
 
-    i = scanf_getc (stream, lenp);		/* after scanf_ungetc()	*/
+    i = scanf_getc (stream, context);		/* after scanf_ungetc()	*/
 
     switch ((unsigned char)i) {
     case '-':
         flags |= FL_MINUS;
 	__PICOLIBC_FALLTHROUGH;
     case '+':
-	if (!CHECK_WIDTH() || (i = scanf_getc (stream, lenp)) < 0)
+	if (!CHECK_WIDTH() || (i = scanf_getc (stream, context)) < 0)
 	    return 0;
     }
 
@@ -229,16 +234,32 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 	    while ((c = *p++) != 0) {
 		if (CHECK_WIDTH()) {
-                    if ((i = scanf_getc (stream, lenp)) >= 0) {
+                    if ((i = scanf_getc (stream, context)) >= 0) {
                         if (TOLOWER(i) == c)
                             continue;
-                        scanf_ungetc (i, stream, lenp);
+                        scanf_ungetc (i, stream, context);
                     }
-		    if (p == pstr_nfinity + 3)
-			break;
-		    return 0;
-		}
+                }
+                if (p == pstr_nfinity + 3)
+                    break;
+                return 0;
 	    }
+            if (flt != flt) {
+                if (CHECK_WIDTH()) {
+                    if ((i = scanf_getc (stream, context)) == '(') {
+                        while (CHECK_WIDTH() && (i = scanf_getc (stream, context)) != ')') {
+                            if (isalnum(i) || i == '_' )
+                                continue;
+                            else
+                                break;
+                        }
+                        if (i != ')')
+                            return 0;
+                    } else {
+                        scanf_ungetc (i, stream, context);
+                    }
+                }
+            }
         }
 	break;
 
@@ -295,6 +316,18 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 	    if (c < base) {
 		flags |= FL_ANY;
+                if (!(flags & FL_OVFL) && uintdigits > uintdigitsmax) {
+                    flags |= FL_OVFL;
+                    if (base == 10) {
+                        /* Check if overflow is >= 0.5 */
+                        if (c >= 5) {
+                            overflow = 2;
+                            /* Check if overflow might be == 0.5 */
+                            if (c == 5)
+                                c = 0;
+                        }
+                    }
+                }
 		if (flags & FL_OVFL) {
                     overflow |= (c != 0);
 		    if (!(flags & FL_DOT))
@@ -303,11 +336,8 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 		    if (flags & FL_DOT)
 			exp -= 1;
                     uint = UF_PLUS_DIGIT(UF_TIMES_BASE(uint, base), c);
-		    if (!UF_IS_ZERO(uint)) {
+		    if (!UF_IS_ZERO(uint))
 			uintdigits++;
-                        if (uintdigits > uintdigitsmax)
-                            flags |= FL_OVFL;
-		    }
 	        }
 
 	    } else if (c == (('.'-'0') & 0xff) && !(flags & FL_DOT)) {
@@ -320,13 +350,17 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    } else {
 		break;
 	    }
-	} while (CHECK_WIDTH() && (i = scanf_getc (stream, lenp)) >= 0);
+	} while (CHECK_WIDTH() && (i = scanf_getc (stream, context)) >= 0);
 
 	if (!(flags & FL_ANY))
 	    return 0;
 
 #ifdef _NEED_IO_C99_FORMATS
-        int exp_match = (flags & FL_FHEX) ? 'p' : 'e';
+        int exp_match = 'e';
+        if (flags & FL_FHEX) {
+            exp_match = 'p';
+            exp *= 4;
+        }
 #else
 #define exp_match 'e'
 #endif
@@ -338,7 +372,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    if (!CHECK_WIDTH())
                 goto no_exp;
 
-            esign = scanf_getc (stream, lenp);
+            esign = scanf_getc (stream, context);
 
 	    switch ((unsigned char)esign) {
             case '-':
@@ -346,10 +380,10 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 		__PICOLIBC_FALLTHROUGH;
             case '+':
                 if (!CHECK_WIDTH()) {
-                    scanf_ungetc(esign, stream, lenp);
+                    scanf_ungetc(esign, stream, context);
                     goto no_exp;
                 }
-		edig = scanf_getc (stream, lenp);		/* test EOF will below	*/
+		edig = scanf_getc (stream, context);		/* test EOF will below	*/
                 break;
             default:
                 edig = esign;
@@ -359,9 +393,9 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 
 	    if (!isdigit (edig))
             {
-                scanf_ungetc(edig, stream, lenp);
+                scanf_ungetc(edig, stream, context);
                 if (esign != EOF)
-                    scanf_ungetc(esign, stream, lenp);
+                    scanf_ungetc(esign, stream, context);
                 goto no_exp;
             }
 
@@ -371,19 +405,15 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	    do {
                 if (expacc < MAX_POSSIBLE_EXP)
                     expacc = expacc * 10 + (i - '0');
-	    } while (CHECK_WIDTH() && isdigit (i = scanf_getc(stream, lenp)));
+	    } while (CHECK_WIDTH() && isdigit (i = scanf_getc(stream, context)));
 	    if (flags & FL_MEXP)
 		expacc = -expacc;
-#ifdef _NEED_IO_C99_FORMATS
-            if (flags & FL_FHEX)
-                exp *= 4;
-#endif
             exp += expacc;
 	}
 
     no_exp:
 	if (width)
-            scanf_ungetc (i, stream, lenp);
+            scanf_ungetc (i, stream, context);
 
 	if (UF_IS_ZERO(uint)) {
 	    flt = (FLOAT) 0;
@@ -492,6 +522,20 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
         else
 #endif
         {
+            /*
+             * Mix in overflow. Overflow has four possible values:
+             *
+             * 0: overflow == 0
+             * 1: overflow < 0.5
+             * 2: overflow == 0.5
+             * 3: overflow > 0.5
+             *
+             * We want to increment in case 2 if uint is odd
+             * and always in case 3.
+             */
+            overflow |= UF_AND_64(uint, 1);
+            uint = UF_PLUS_DIGIT(uint, (overflow + 1) >> 2);
+
 #ifdef _NEED_IO_FLOAT_LARGE
             if (CHECK_LONG_LONG() && __SIZEOF_LONG_DOUBLE__ > 8)
             {
@@ -531,6 +575,30 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
 	break;
     } /* switch */
 
+#if defined(__riscv) || defined(__ARC64__) || defined(__mips)
+    /*
+     * Some processors don't preserve the sign of NAN across
+     * conversions, so we have to negate after the cast
+     */
+    if (addr) {
+	if (CHECK_LONG_LONG()) {
+            long double ld = (long double) flt;
+            if (flags & FL_MINUS)
+                ld = -ld;
+            *((long double *) addr) = ld;
+	} else if (CHECK_LONG()) {
+            double d = (double) flt;
+            if (flags & FL_MINUS)
+                d = -d;
+	    *((double *) addr) = d;
+        } else {
+            float f = (float) flt;
+            if (flags & FL_MINUS)
+                f = -f;
+	    *((float *) addr) = f;
+        }
+    }
+#else
     if (flags & FL_MINUS)
 	flt = -flt;
     if (addr) {
@@ -541,6 +609,7 @@ conv_flt (FLT_STREAM *stream, int *lenp, width_t width, void *addr, uint16_t fla
         else
 	    *((float *) addr) = (float) flt;
     }
+#endif
     return 1;
 }
 

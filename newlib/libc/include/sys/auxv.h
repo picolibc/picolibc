@@ -36,9 +36,15 @@
 #ifndef _SYS_AUXV_H
 #define _SYS_AUXV_H
 
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
+
 unsigned long getauxval(unsigned long type);
 
 #define AT_HWCAP	16
 #define AT_HWCAP2	26
+
+_END_STD_C
 
 #endif /* _SYS_AUXV_H */

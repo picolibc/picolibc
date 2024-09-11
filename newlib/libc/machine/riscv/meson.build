@@ -47,7 +47,6 @@ srcs_machine = [
 
 has_ieeefp_funcs = true
 
-subdir('sys')
 subdir('machine')
 
 foreach target : targets

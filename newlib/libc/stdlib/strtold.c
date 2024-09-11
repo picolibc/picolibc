@@ -45,7 +45,7 @@ static const int map[] = {
         0       /* round to positive infinity */
 };
 
-int
+static int
 __flt_rounds(void)
 {
         int x;

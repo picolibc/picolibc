@@ -95,11 +95,13 @@ if src_semihost != []
     src_semihost += 'iob.c'
   endif
 
-  install_headers('semihost.h',
+  inc_headers = ['semihost.h']
+  install_headers(inc_headers,
 		  install_dir: include_dir
 		 )
 
   inc = [inc, include_directories('.')]
+  inc_args += '-I' + meson.current_source_dir()
 
   has_semihost = true
 
@@ -127,8 +129,25 @@ if src_semihost != []
 				c_args : value[1] + c_args))
     
   endforeach
+
+  if enable_cdefs_tests
+    ignore_headers = []
+    foreach header : inc_headers
+
+      if not (header in ignore_headers) and not (header.startswith('_'))
+        test_name = 'check-cdef-' + header
+
+        test(test_name,
+             validate_cdefs,
+             args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+             suite: 'headers')
+      endif
+    endforeach
+  endif
+
 endif
 
 if not has_semihost and get_option('fake-semihost')
   subdir('fake')
 endif
+

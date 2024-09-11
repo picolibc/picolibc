@@ -97,7 +97,7 @@ if $qemu --version | grep -q 'version [89]'; then
 fi
 
 if $qemu --version | grep -q 'version \(8.[1-9]\|9\)'; then
-    all_options="Zfa $all_options"
+    all_options="zfa $all_options"
 fi
 
 for o in $all_options; do

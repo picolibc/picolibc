@@ -70,7 +70,6 @@ srcs_machine = [
     'strrchr.S',
 ]
 
-subdir('sys')
 subdir('machine')
 
 foreach target : targets

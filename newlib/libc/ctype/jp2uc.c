@@ -30,14 +30,12 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include <newlib.h>
+#include <picolibc.h>
 
 #ifdef _MB_CAPABLE
 /* Under Cygwin, the incoming wide character is already given in UTF due
    to the requirements of the underlying OS. */
-#ifndef __CYGWIN__
 
-#include <_ansi.h>
 #include <string.h>
 #include <wctype.h>
 #include "local.h"
@@ -199,5 +197,4 @@ _uc2jp_l (wint_t c, struct __locale_t * l)
   return c;
 }
 
-#endif /* !__CYGWIN__ */
 #endif /* _MB_CAPABLE */

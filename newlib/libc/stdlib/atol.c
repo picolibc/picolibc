@@ -7,7 +7,6 @@ All rights reserved.
  */
 
 #include <stdlib.h>
-#include <_ansi.h>
 
 #ifndef _REENT_ONLY
 long

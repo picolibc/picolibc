@@ -31,6 +31,8 @@ POSSIBILITY OF SUCH DAMAGE.
 Author: Kazunori Asayama <asayama@sm.sony.co.jp>
 */
 
+#include <picolibc.h>
+
 #include <stdio.h>
 
 #include "c99ppe.h"

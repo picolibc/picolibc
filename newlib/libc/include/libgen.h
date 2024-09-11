@@ -6,7 +6,6 @@
 #ifndef _LIBGEN_H_
 #define _LIBGEN_H_
 
-#include "_ansi.h"
 #include <sys/cdefs.h>
 
 #ifdef __cplusplus

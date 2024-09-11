@@ -122,7 +122,6 @@ PORTABILITY
  */
 
 #define _GNU_SOURCE
-#include <_ansi.h>
 #include <limits.h>
 #include <wchar.h>
 #include <wctype.h>

@@ -28,7 +28,6 @@
 #if defined (ICONV_TO_UCS_CES_UCS_4) \
  || defined (ICONV_FROM_UCS_CES_UCS_4)
 
-#include <_ansi.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>

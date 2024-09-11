@@ -30,6 +30,8 @@
 
 */
 
+#include "stdio_private.h"
+
 #define PICOLIBC_LONG_LONG_PRINTF_SCANF
 #define PRINTF_LEVEL PRINTF_LLONG
 #ifndef _FORMAT_DEFAULT_LONG_LONG

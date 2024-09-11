@@ -39,9 +39,6 @@ effects vary with the locale.
 <<mblen>> requires no supporting OS subroutines.
 */
 
-#ifndef _REENT_ONLY
-
-#include <newlib.h>
 #include <stdlib.h>
 #include <wchar.h>
 #include "local.h"
@@ -71,5 +68,3 @@ mblen (const char *s,
   return 1;
 #endif /* not _MB_CAPABLE */
 }
-
-#endif /* !_REENT_ONLY */

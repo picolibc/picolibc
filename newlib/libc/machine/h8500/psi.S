@@ -19,6 +19,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 Note that `fp' below isn't a segment register.
 It's r6, the frame pointer.  */
 
+#include <picolibc.h>
+
 #if __CODE__==32
 #define RET prts
 #else

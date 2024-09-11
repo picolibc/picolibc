@@ -30,6 +30,8 @@
    result is somewhat depending on gcc generating what we expect rather
    than what we describe.  An assembly file should be used instead.  */
 
+#include <picolibc.h>
+
 #include <stddef.h>
 #include "../../string/local.h"
 

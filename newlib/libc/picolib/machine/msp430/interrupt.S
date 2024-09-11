@@ -1,3 +1,5 @@
+#include <picolibc.h>
+
 	.text
 	.section .rodata.vector
 	.globl	__interrupt_vector

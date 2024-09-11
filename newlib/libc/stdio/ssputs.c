@@ -1,9 +1,9 @@
-#include <newlib.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include "local.h"
 
 int
 __ssputs (

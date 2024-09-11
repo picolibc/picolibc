@@ -24,7 +24,6 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/src/s_tanl.c,v 1.3 2011/05/30 19:41:28 kargl Exp $");
 
 /*
  * Limited testing on pseudorandom numbers drawn within [0:4e8] shows

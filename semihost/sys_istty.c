@@ -38,10 +38,5 @@
 int
 sys_semihost_istty(int fd)
 {
-	struct {
-		sh_param_t	field1;
-	} arg = {
-		.field1 = fd
-	};
-	return (int) sys_semihost(SYS_ISTTY, (uintptr_t) &arg);
+    return (int)sys_semihost1(SYS_ISTTY, fd);
 }

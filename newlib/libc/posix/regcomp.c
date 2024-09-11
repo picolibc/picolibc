@@ -806,21 +806,17 @@ p_b_term(struct parse *p, cset *cs)
 			CHadd(cs, start);
 		else {
 #ifdef __HAVE_LOCALE_INFO__
-			if (__collate_load_error) {
-#endif
-				(void)REQUIRE((uch)start <= (uch)finish, REG_ERANGE);
-				for (i = (uch)start; i <= (uch)finish; i++)
-					CHadd(cs, i);
-#ifdef __HAVE_LOCALE_INFO__
-			} else {
-				(void)REQUIRE(__collate_range_cmp(start, finish) <= 0, REG_ERANGE);
-				for (i = CHAR_MIN; i <= CHAR_MAX; i++) {
-					if (   __collate_range_cmp(start, i) <= 0
-					    && __collate_range_cmp(i, finish) <= 0
-					   )
-						CHadd(cs, i);
-				}
-			}
+                    (void)REQUIRE(__collate_range_cmp(start, finish) <= 0, REG_ERANGE);
+                    for (i = CHAR_MIN; i <= CHAR_MAX; i++) {
+                        if (   __collate_range_cmp(start, i) <= 0
+                               && __collate_range_cmp(i, finish) <= 0
+                            )
+                            CHadd(cs, i);
+                    }
+#else
+                    (void)REQUIRE((uch)start <= (uch)finish, REG_ERANGE);
+                    for (i = (uch)start; i <= (uch)finish; i++)
+                        CHadd(cs, i);
 #endif
 		}
 		break;
@@ -1887,6 +1883,12 @@ computejumps(struct parse *p, struct re_guts *g)
 	for (mindex = 0; mindex < g->mlen; mindex++)
 		g->charjump[(unsigned char) g->must[mindex]] = g->mlen - mindex - 1;
 }
+
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#endif
 
 /*
  - computematchjumps - compute match jumps for BM scan

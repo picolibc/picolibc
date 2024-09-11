@@ -127,8 +127,7 @@ are not standardized.
 Supporting OS subroutines required: <<getpid>>, <<mkdir>>, <<open>>, <<stat>>.
 */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <sys/types.h>
 #include <fcntl.h>

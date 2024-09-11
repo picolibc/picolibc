@@ -17,8 +17,7 @@
 /* This code was copied from sprintf.c */
 /* doc in sprintf.c */
 
-#define _DEFAULT_SOURCE
-#include <_ansi.h>
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdarg.h>
 #include <limits.h>

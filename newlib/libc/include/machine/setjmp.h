@@ -10,6 +10,8 @@ This file is distributed WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <sys/cdefs.h>
+
 _BEGIN_STD_C
 
 #if defined(__or1k__) || defined(__or1knd__)
@@ -106,9 +108,7 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __i386__
-# if defined(__CYGWIN__) && !defined (_JBLEN)
-#  define _JBLEN (13 * 4)
-# elif defined(__unix__) || defined(__rtems__)
+# if   defined(__unix__) || defined(__rtems__)
 #  define _JBLEN	9
 # elif defined(__iamcu__)
 /* Intel MCU jmp_buf only covers callee-saved registers. */
@@ -119,13 +119,8 @@ _BEGIN_STD_C
 #endif
 
 #ifdef __x86_64__
-# ifdef __CYGWIN__
-#  define _JBTYPE long
-#  define _JBLEN  32
-# else
 #  define _JBTYPE long long
 #  define _JBLEN  8
-# endif
 #endif
 
 #ifdef __i960__
@@ -291,10 +286,20 @@ _BEGIN_STD_C
 #define _JBLEN 16
 #endif
 
-#if defined(__arc__) || defined(__ARC64__)
+#ifdef __arc__
 #define _JBLEN 25 /* r13-r30,blink,lp_count,lp_start,lp_end,mlo,mhi,status32 */
 #define _JBTYPE unsigned long
 #endif
+
+#ifdef __ARC64__
+/* r14-r27,sp,ilink,r30,blink  */
+#define _JBLEN 18
+#ifdef __ARC64_ARCH64__
+#define _JBTYPE long long
+#else  /* __ARC64_ARCH32__ */
+#define _JBTYPE long
+#endif
+#endif /* __ARC64__ */
 
 #ifdef __MMIX__
 /* Using a layout compatible with GCC's built-in.  */
@@ -454,9 +459,7 @@ _END_STD_C
 #if (defined(__CYGWIN__) || defined(__rtems__)) && __POSIX_VISIBLE
 #include <signal.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 /* POSIX sigsetjmp/siglongjmp macros */
 #ifdef _JBTYPE
@@ -469,9 +472,6 @@ typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #define _SAVEMASK	_JBLEN
 #define _SIGMASK	(_JBLEN+1)
 
-#ifdef __CYGWIN__
-# define _CYGWIN_WORKING_SIGSETJMP
-#endif
 
 #ifdef _POSIX_THREADS
 #define __SIGMASK_FUNC pthread_sigmask
@@ -479,12 +479,6 @@ typedef int sigjmp_buf[_JBLEN+1+(sizeof (sigset_t)/sizeof (int))];
 #define __SIGMASK_FUNC sigprocmask
 #endif
 
-#ifdef __CYGWIN__
-/* Per POSIX, siglongjmp has to be implemented as function.  Cygwin
-   provides functions for both, siglongjmp and sigsetjmp since 2.2.0. */
-extern void siglongjmp (sigjmp_buf, int) __attribute__ ((__noreturn__));
-extern int sigsetjmp (sigjmp_buf, int);
-#endif
 
 #if defined(__GNUC__)
 
@@ -522,15 +516,9 @@ extern int sigsetjmp (sigjmp_buf, int);
 /* POSIX _setjmp/_longjmp, maintained for XSI compatibility.  These
    are equivalent to sigsetjmp/siglongjmp when not saving the signal mask.
    New applications should use sigsetjmp/siglongjmp instead. */
-#ifdef __CYGWIN__
-extern void _longjmp (jmp_buf, int) __attribute__ ((__noreturn__));
-extern int _setjmp (jmp_buf);
-#else
 #define _setjmp(env)		sigsetjmp ((env), 0)
 #define _longjmp(env, val)	siglongjmp ((env), (val))
-#endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* (__CYGWIN__ or __rtems__) and __POSIX_VISIBLE */

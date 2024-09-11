@@ -36,18 +36,11 @@
 #include "semihost-private.h"
 #include <sys/cdefs.h>
 
-void  _ATTRIBUTE((__noreturn__))
+_Noreturn void
 sys_semihost_exit(uintptr_t exception, uintptr_t subcode)
 {
 	if (sizeof(sh_param_t) == 8) {
-		struct {
-			sh_param_t	field1;
-			sh_param_t	field2;
-		} arg = {
-			.field1 = exception,
-			.field2 = subcode
-		};
-		(void) sys_semihost(SYS_EXIT, (uintptr_t) &arg);
+		(void) sys_semihost2(SYS_EXIT, exception, subcode);
 	}
 	else
 		(void) sys_semihost(SYS_EXIT, exception);

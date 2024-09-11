@@ -82,7 +82,7 @@ inside_tls_region(void *ptr, const void *tls)
 	}
 #endif
 
-int
+static int
 check_tls(char *where, bool check_addr, void *tls_region)
 {
 	int result = 0;
@@ -230,7 +230,8 @@ check_tls(char *where, bool check_addr, void *tls_region)
 	return result;
 }
 
-void
+#ifdef PICOLIBC_TLS
+static void
 hexdump(const void *ptr, int length, const char *hdr)
 {
 	const unsigned char *cp = ptr;
@@ -247,6 +248,7 @@ hexdump(const void *ptr, int length, const char *hdr)
 		printf("\n");
 	}
 }
+#endif
 
 int
 main(void)

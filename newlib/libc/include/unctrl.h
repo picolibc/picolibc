@@ -31,7 +31,7 @@
 #ifndef _UNCTRL_H_
 #define _UNCTRL_H_
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 
 #define unctrl(c)		__unctrl[(c) & 0xff]
 #define unctrllen(ch)		__unctrllen[(ch) & 0xff]

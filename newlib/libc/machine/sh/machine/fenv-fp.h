@@ -148,6 +148,8 @@ __declare_fenv_inline(int) fesetround(int round)
 {
 	fenv_t fpscr;
 
+        if (round & ~_SH_FPU_ROUND_MASK)
+                return (1);
 	_sh_get_fpscr(fpscr);
 	fpscr &= ~(_SH_FPU_ROUND_MASK);
 	fpscr |= round;

@@ -2,6 +2,7 @@
 Copyright (c) 1990 Regents of the University of California.
 All rights reserved.
  */
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 
 /* Pseudo-random generator based on Minimal Standard by

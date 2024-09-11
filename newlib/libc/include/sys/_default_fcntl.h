@@ -1,12 +1,25 @@
 /* Copyright (c) 2007 Jeff Johnston  <jjohnstn@redhat.com> */
 
 #ifndef	_SYS__DEFAULT_FCNTL_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define	_SYS__DEFAULT_FCNTL_H_
-#include <_ansi.h>
 #include <sys/cdefs.h>
+#include <sys/_types.h>
+
+_BEGIN_STD_C
+
+#ifndef _MODE_T_DECLARED
+typedef	__mode_t	mode_t;		/* permissions */
+#define	_MODE_T_DECLARED
+#endif
+#ifndef _OFF_T_DECLARED
+typedef	__off_t		off_t;		/* file offset */
+#define	_OFF_T_DECLARED
+#endif
+#ifndef _PID_T_DECLARED
+typedef	__pid_t		pid_t;		/* process id */
+#define	_PID_T_DECLARED
+#endif
+
 #define	_FOPEN		(-1)	/* from sys/file.h, kernel use only */
 #define	_FREAD		0x0001	/* read enabled */
 #define	_FWRITE		0x0002	/* write enabled */
@@ -24,20 +37,11 @@ extern "C" {
 #define	_FNONBLOCK	0x4000	/* non blocking I/O (POSIX style) */
 #define	_FNDELAY	_FNONBLOCK	/* non blocking I/O (4.2 style) */
 #define	_FNOCTTY	0x8000	/* don't assign a ctty on this open */
-#if defined (__CYGWIN__)
-#define	_FBINARY	0x10000
-#define	_FTEXT		0x20000
-#endif
 #define	_FNOINHERIT	0x40000
 #define	_FDIRECT	0x80000
 #define	_FNOFOLLOW	0x100000
 #define	_FDIRECTORY	0x200000
 #define	_FEXECSRCH	0x400000
-#if defined (__CYGWIN__)
-#define	_FTMPFILE	0x800000
-#define	_FNOATIME	0x1000000
-#define	_FPATH		0x2000000
-#endif
 
 #define	O_ACCMODE	(O_RDONLY|O_WRONLY|O_RDWR)
 
@@ -72,19 +76,8 @@ extern "C" {
 #define	O_DIRECT	_FDIRECT
 #endif
 
-#if defined (__CYGWIN__)
-#define O_BINARY	_FBINARY
-#define O_TEXT		_FTEXT
 #define O_DSYNC         _FSYNC
 #define O_RSYNC         _FSYNC
-
-/* Linux-specific flags */
-#if __GNU_VISIBLE
-#define O_TMPFILE	_FTMPFILE
-#define O_NOATIME	_FNOATIME
-#define O_PATH		_FPATH
-#endif
-#endif
 
 #if __MISC_VISIBLE
 
@@ -181,9 +174,6 @@ extern "C" {
 #define	LOCK_UN		0x08		/* unlock file */
 #endif
 
-/*#include <sys/stdtypes.h>*/
-
-#ifndef __CYGWIN__
 /* file segment locking set data type - information passed to system by user */
 struct flock {
 	short	l_type;		/* F_RDLCK, F_WRLCK, or F_UNLCK */
@@ -193,7 +183,6 @@ struct flock {
 	short	l_pid;		/* returned with F_GETLK */
 	short	l_xxx;		/* reserved for future use */
 };
-#endif /* __CYGWIN__ */
 
 #if __MISC_VISIBLE
 /* extended file segment locking set data type */
@@ -209,9 +198,6 @@ struct eflock {
 };
 #endif	/* __MISC_VISIBLE */
 
-#include <sys/types.h>
-#include <sys/stat.h>		/* sigh. for the mode bits for open/creat */
-
 extern int open (const char *, int, ...);
 #if __ATFILE_VISIBLE
 extern int openat (int, const char *, int, ...);
@@ -220,10 +206,6 @@ extern int creat (const char *, mode_t);
 extern int fcntl (int, int, ...);
 #if __BSD_VISIBLE
 extern int flock (int, int);
-#endif
-#if __GNU_VISIBLE
-#include <sys/time.h>
-extern int futimesat (int, const char *, const struct timeval [2]);
 #endif
 
 /* Provide _<systemcall> prototypes for functions provided by some versions
@@ -236,7 +218,6 @@ extern int open64 (const char *, int, ...);
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif	/* !_SYS__DEFAULT_FCNTL_H_ */

@@ -17,9 +17,7 @@
 /* Test conversions */
 
 #define _GNU_SOURCE
-#define IN_CONVERT
 #include "test.h"
-//#include <_ansi.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
@@ -47,7 +45,7 @@ double_type *pd = doubles;
 #define CONVERT_BITS_FLOAT	28
 #endif
 
-void
+static void
 test_strtod (void)
 {
   char *tail;
@@ -73,7 +71,7 @@ test_strtod (void)
   test_iok(tail - pd->string, pd->endscan & ENDSCAN_MASK);
 }
 
-void
+static void
 test_strtof (void)
 {
   char *tail;
@@ -105,7 +103,7 @@ test_strtof (void)
 #endif
 
 #ifdef HAVE_STRTOLD
-void
+static void
 test_strtold (void)
 {
   char *tail;
@@ -130,14 +128,14 @@ test_strtold (void)
 }
 #endif
 
-void
+static void
 test_atof (void)
 {
   test_mok(atof(pd->string), pd->value, CONVERT_BITS_DOUBLE);
 }
 
 #ifndef NO_NEWLIB
-void
+static void
 test_atoff (void)
 {
   float v = atoff(pd->string);
@@ -187,7 +185,7 @@ int_iterate (void (*func)(),
   }
 }
 
-void
+static void
 test_strtol_base (int base,
        int_scan_type *pi,
        char *string)
@@ -201,7 +199,7 @@ test_strtol_base (int base,
   test_iok(ptr - string, pi->end);
 }
 
-void
+static void
 test_strtol (void)
 {
   test_strtol_base(8,&(p->octal), p->string);
@@ -211,14 +209,14 @@ test_strtol (void)
   test_strtol_base(26, &(p->alphabetical), p->string);
 }
 
-void
+static void
 test_atoi (void)
 {
   if (p->decimal.errno_val == 0)
     test_iok(atoi(p->string), p->decimal.value);
 }
 
-void
+static void
 test_atol (void)
 {
   test_iok(atol(p->string), p->decimal.value);
@@ -243,7 +241,7 @@ check_null(char *s) {
 #endif
 
 /* test ECVT and friends */
-void
+static void
 test_ecvt_r (void)
 {
   int a2,a3;
@@ -266,7 +264,7 @@ test_ecvt_r (void)
 #endif
 }
 
-void
+static void
 test_ecvt (void)
 {
   int a2,a3;
@@ -286,7 +284,7 @@ test_ecvt (void)
 #endif
 }
 
-void
+static void
 test_fcvt_r (void)
 {
   int a2,a3;
@@ -328,7 +326,7 @@ test_fcvt_r (void)
 #endif
 }
 
-void
+static void
 test_gcvt (void)
 {
   char *s = check_null(gcvt(pdd->value, pdd->g1, buffer));
@@ -340,7 +338,7 @@ test_gcvt (void)
 #endif
 }
 
-void
+static void
 test_fcvt (void)
 {
   int a2,a3;
@@ -381,7 +379,6 @@ test_fcvt (void)
 }
 
 static void
-
 diterate (void (*func)(),
        char *name)
 {
@@ -399,8 +396,8 @@ diterate (void (*func)(),
   }
 }
 
-
-void
+#if TEST_PART ==1 || TEST_PART == -1
+static void
 deltest (void)
 {
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
@@ -434,7 +431,7 @@ deltest (void)
 
 /* Most of what sprint does is tested with the tests of
    fcvt/ecvt/gcvt, but here are some more */
-void
+static void
 test_sprint (void)
 {
 #if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
@@ -532,7 +529,7 @@ test_sprint (void)
 }
 
 /* Scanf calls strtod etc tested elsewhere, but also has some pattern matching skills */
-void
+static void
 test_scan (void)
 {
   int i,j;
@@ -592,6 +589,7 @@ test_scan (void)
   sscanf("magicXYZZYfoobar","%[^XYZ]", buffer);
   test_sok("magic", buffer);
 }
+#endif
 
 #ifdef GENERATE_VECTORS
 static void

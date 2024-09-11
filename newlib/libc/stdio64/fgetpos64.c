@@ -56,7 +56,7 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <stdio.h>
 
 #ifdef __LARGE64_FILES

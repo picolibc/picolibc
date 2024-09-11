@@ -11,7 +11,9 @@
  *
  */
 
-#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__)
+#include <picolibc.h>
+
+#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__) || !defined(__ARM_NEON)
 /* See memset-stub.c  */
 #else
 #include "asmdefs.h"

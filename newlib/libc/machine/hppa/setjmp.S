@@ -32,6 +32,8 @@
    library.  Maybe we'll have to have -msoft-float trigger something
    like -DSOFT_FLOAT if this issue ever arises.  */
 
+#include <picolibc.h>
+
 #include "DEFS.h"
 
 #if 0

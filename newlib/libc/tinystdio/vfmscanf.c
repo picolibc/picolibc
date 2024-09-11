@@ -30,6 +30,8 @@
 
 */
 
+#include "stdio_private.h"
+
 #define SCANF_LEVEL SCANF_MIN
 #ifndef _FORMAT_DEFAULT_MINIMAL
 #define vfscanf __m_vfscanf

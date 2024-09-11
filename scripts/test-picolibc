@@ -7,6 +7,10 @@ set -e
 
 #test=echo
 
+options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dnewlib-mb=true"
+minoptions="$options"
+reloptions="$options --buildtype=release -Dbuild-type-subdir=release -Dwerror=true"
+
 for arch in arm riscv; do
 
     DIR=$PICOLIBC_DIR/builds/build-$arch-minsize
@@ -16,10 +20,10 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true
+    echo '####' ../../scripts/do-$arch-configure $options
     echo '###################################'
 
-    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true
+    $test ../../scripts/do-$arch-configure $options
     $test ninja test install
 
     DIR=$PICOLIBC_DIR/builds/build-$arch-release
@@ -29,13 +33,17 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release
+    echo '####' ../../scripts/do-$arch-configure $reloptions
     echo '###################################'
 
-    $test ../../scripts/do-$arch-configure -Dwant-math-errno=true -Dio-long-double=true --buildtype=release -Dbuild-type-subdir=release
+    $test ../../scripts/do-$arch-configure $reloptions
     $test ninja test install
 
 done
+
+options="-Dwerror=true"
+minoptions="$options --buildtype=minsize"
+reloptions="$options --buildtype=release -Dpicolibc-buildtype=release"
 
 for arch in arm riscv; do
 
@@ -46,10 +54,10 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../picolibc/do-$arch-configure --buildtype=minsize
+    echo '####' ../../picolibc/do-$arch-configure $minoptions
     echo '###################################'
 
-    $test ../../picolibc/do-$arch-configure --buildtype=minsize
+    $test ../../picolibc/do-$arch-configure $minoptions
     $test ninja test
 
     DIR=$GLIBC_DIR/builds/build-$arch-release
@@ -59,10 +67,10 @@ for arch in arm riscv; do
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release
+    echo '####' ../../picolibc/do-$arch-configure $reloptions
     echo '###################################'
 
-    $test ../../picolibc/do-$arch-configure --buildtype=release -Dpicolibc-buildtype=release
+    $test ../../picolibc/do-$arch-configure $reloptions
     $test ninja test
 
 done

@@ -29,6 +29,8 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 /* SPU timer start and alloc library services.  */
+#include <picolibc.h>
+
 #include <spu_timer.h>
 #include "spu_timer_internal.h"
 

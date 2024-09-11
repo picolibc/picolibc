@@ -50,7 +50,6 @@ No supporting OS subroutines are required.
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #ifndef __rtems__
 #include <stdio_ext.h>

@@ -96,7 +96,7 @@ int errors = 0;
 
 const char *testname = "strcmp";
 
-void
+static void
 print_error (char const* msg, ...)
 {
   errors++;
@@ -117,7 +117,8 @@ print_error (char const* msg, ...)
     }
 }
 
-void
+#if 0
+static void
 printbuf (char *buf, char *name)
 {
   int i;
@@ -129,6 +130,7 @@ printbuf (char *buf, char *name)
       printf ("(%d,%s)", i, "\\0");
   printf ("\n");
 }
+#endif
 
 int
 main (void)

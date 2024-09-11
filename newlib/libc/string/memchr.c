@@ -45,7 +45,6 @@ QUICKREF
 	memchr ansi pure
 */
 
-#include <_ansi.h>
 #include <string.h>
 #include <limits.h>
 #include <stdint.h>

@@ -25,9 +25,9 @@
 #ifndef __CCS_H__
 #define __CCS_H__
 
-#include <_ansi.h>
 #include <sys/types.h>
 #include <sys/param.h>
+#include <stddef.h>
 
 /*
  * Size-optimized tables will be linked instead of speed-optimized if

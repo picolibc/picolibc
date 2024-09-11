@@ -64,6 +64,7 @@ picolibc_sources(
   filestrputalloc.c
   filestrput.c
   filewstrget.c
+  flockfile.c
   fmemopen.c
   fprintf.c
   fputc.c
@@ -77,6 +78,9 @@ picolibc_sources(
   ftell.c
   ftello.c
   ftox_engine.c
+  ftrylockfile.c
+  funlockfile.c
+  funopen.c
   fwide.c
   fwprintf.c
   fwrite.c
@@ -162,6 +166,7 @@ picolibc_sources(
   vwscanf.c
   wprintf.c
   wscanf.c
+  sprintf_s.c
   )
 
 picolibc_sources(

@@ -31,6 +31,5 @@
 */
 
 #define WIDE_CHARS
-#define my_putc(c, stream) do { ++stream_len; if (putwc(c, stream) == WEOF) goto fail; } while(0)
 
 #include "vfprintf.c"

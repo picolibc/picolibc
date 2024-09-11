@@ -278,9 +278,7 @@ BUGS
 locale, hard-coding the "C" locale settings.
 */
 
-#define _DEFAULT_SOURCE
-#include <newlib.h>
-#include <sys/config.h>
+#define _GNU_SOURCE
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
@@ -289,6 +287,7 @@ locale, hard-coding the "C" locale settings.
 #include <limits.h>
 #include <ctype.h>
 #include <wctype.h>
+#include <wchar.h>
 #include "local.h"
 #include "../locale/setlocale.h"
 
@@ -328,7 +327,7 @@ locale, hard-coding the "C" locale settings.
 #   define _ctloc(x)    (ctloclen = wcslen (ctloc = _CurrentTimeLocale->w##x))
 #  else
 #   define CTLOCBUFLEN   256		/* Arbitrary big buffer size */
-    const wchar_t *
+    static const wchar_t *
     __ctloc (wchar_t *buf, const char *elem, size_t *len_ret)
     {
       buf[CTLOCBUFLEN - 1] = L'\0';
@@ -1145,15 +1144,7 @@ recurse:
 		    tzset_called = 1;
 		  }
 
-#if defined (__CYGWIN__)
-		/* Cygwin must check if the application has been built with or
-		   without the extra tm members for backward compatibility, and
-		   then use either that or the old method fetching from tzinfo.
-		   Rather than pulling in the version check infrastructure, we
-		   just call a Cygwin function. */
-		extern long __cygwin_gettzoffset (const struct tm *tmp);
-		offset = __cygwin_gettzoffset (tim_p);
-#elif defined (__TM_GMTOFF)
+#if   defined (__TM_GMTOFF)
 		offset = tim_p->__TM_GMTOFF;
 #else
 		__tzinfo_type *tz = __gettzinfo ();
@@ -1388,15 +1379,7 @@ recurse:
 		  tzset_called = 1;
 		}
 
-#if defined (__CYGWIN__)
-	      /* Cygwin must check if the application has been built with or
-		 without the extra tm members for backward compatibility, and
-		 then use either that or the old method fetching from tzinfo.
-		 Rather than pulling in the version check infrastructure, we
-		 just call a Cygwin function. */
-	      extern long __cygwin_gettzoffset (const struct tm *tmp);
-	      offset = __cygwin_gettzoffset (tim_p);
-#elif defined (__TM_GMTOFF)
+#if   defined (__TM_GMTOFF)
 	      offset = tim_p->__TM_GMTOFF;
 #else
 	      __tzinfo_type *tz = __gettzinfo ();
@@ -1424,15 +1407,11 @@ recurse:
 		  _tzset_unlocked ();
 		  tzset_called = 1;
 		}
-#if defined (__CYGWIN__)
-	      /* See above. */
-	      extern const char *__cygwin_gettzname (const struct tm *tmp);
-	      tznam = __cygwin_gettzname (tim_p);
-#elif defined (__TM_ZONE)
+#if   defined (__TM_ZONE)
 	      tznam = tim_p->__TM_ZONE;
 #endif
 	      if (!tznam)
-		tznam = _tzname[tim_p->tm_isdst > 0];
+		tznam = tzname[tim_p->tm_isdst > 0];
 	      /* Note that in case of wcsftime this loop only works for
 	         timezone abbreviations using the portable codeset (aka ASCII).
 		 This seems to be the case, but if that ever changes, this

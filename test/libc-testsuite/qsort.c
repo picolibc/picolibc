@@ -87,7 +87,7 @@ static struct three t[] = {
     i3(848405), i3(3434), i3(3434344), i3(3535), i3(93994), i3(2230404), i3(4334)
 };
 
-int test_qsort(void)
+static int test_qsort(void)
 {
 	int i;
 	int err=0;

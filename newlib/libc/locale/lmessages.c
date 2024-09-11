@@ -24,9 +24,7 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
-#include <stddef.h>
+#define _GNU_SOURCE
 #include "setlocale.h"
 
 #define LCMESSAGES_SIZE_FULL (sizeof(struct lc_messages_T) / sizeof(char *))
@@ -47,48 +45,3 @@ const struct lc_messages_T _C_messages_locale = {
 #endif
 };
 
-#ifdef __CYGWIN__
-int
-__messages_load_locale (struct __locale_t *locale, const char *name,
-			void *f_wctomb, const char *charset)
-{
-  int ret;
-  struct lc_messages_T me;
-  char *bufp = NULL;
-
-  extern int __set_lc_messages_from_win (const char *,
-					 const struct lc_messages_T *,
-					 struct lc_messages_T *, char **,
-					 void *, const char *);
-
-  ret = __set_lc_messages_from_win (name, &_C_messages_locale, &me, &bufp,
-				    f_wctomb, charset);
-  /* ret == -1: error, ret == 0: C/POSIX, ret > 0: valid */
-  if (ret >= 0)
-    {
-      struct lc_messages_T *mep = NULL;
-
-      if (ret > 0)
-	{
-	  mep = (struct lc_messages_T *) calloc (1, sizeof *mep);
-	  if (!mep)
-	    {
-	      free (bufp);
-	      return -1;
-	    }
-	  *mep = me;
-	}
-      struct __lc_cats tmp = locale->lc_cat[LC_MESSAGES];
-      locale->lc_cat[LC_MESSAGES].ptr = ret == 0 ? &_C_messages_locale : mep;
-      locale->lc_cat[LC_MESSAGES].buf = bufp;
-      /* If buf is not NULL, both pointers have been alloc'ed */
-      if (tmp.buf)
-	{
-	  free ((void *) tmp.ptr);
-	  free (tmp.buf);
-	}
-      ret = 0;
-    }
-  return ret;
-}
-#endif

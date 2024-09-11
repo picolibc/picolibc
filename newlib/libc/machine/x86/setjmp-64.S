@@ -8,6 +8,8 @@
  * ====================================================
  */
 
+#include <picolibc.h>
+
 #ifndef __x86_64
 #include "../i386/setjmp.S"
 #else

@@ -85,7 +85,6 @@ PORTABILITY
 */
 
 #define _DEFAULT_SOURCE
-#include <_ansi.h>
 #include <stdio.h>
 #include <wchar.h>
 #include "local.h"

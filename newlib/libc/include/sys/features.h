@@ -48,22 +48,25 @@ extern "C" {
  *
  * _POSIX_SOURCE (deprecated by _POSIX_C_SOURCE=1)
  * _POSIX_C_SOURCE >= 1
- * 	POSIX.1-1990
+ *	POSIX.1-1990
  *
  * _POSIX_C_SOURCE >= 2
- * 	POSIX.2-1992
+ *	POSIX.2-1992
  *
  * _POSIX_C_SOURCE >= 199309L
- * 	POSIX.1b-1993 Real-time extensions
+ *	POSIX.1b-1993 Real-time extensions
  *
  * _POSIX_C_SOURCE >= 199506L
- * 	POSIX.1c-1995 Threads extensions
+ *	POSIX.1c-1995 Threads extensions
  *
  * _POSIX_C_SOURCE >= 200112L
- * 	POSIX.1-2001 and C99
+ *	POSIX.1-2001 and C99
  *
  * _POSIX_C_SOURCE >= 200809L
- * 	POSIX.1-2008
+ *	POSIX.1-2008
+ *
+ * _POSIX_C_SOURCE >= 202405L
+ *	POSIX.1-2024
  *
  * _XOPEN_SOURCE
  *	POSIX.1-1990 and XPG4
@@ -81,13 +84,13 @@ extern "C" {
  *	SUSv4 (POSIX.1-2008 plus XSI)
  *
  * _ISOC99_SOURCE or gcc -std=c99 or g++
- * 	ISO C99
+ *	ISO C99
  *
  * _ISOC11_SOURCE or gcc -std=c11 or g++ -std=c++11
- * 	ISO C11
+ *	ISO C11
  *
  * _ISOC2x_SOURCE or gcc -std=c2x or g++ -std=c++20
- * 	ISO C11
+ *	ISO C11
  *
  * _ATFILE_SOURCE (implied by _POSIX_C_SOURCE >= 200809L)
  *	"at" functions
@@ -96,14 +99,14 @@ extern "C" {
  *	fseeko, ftello
  *
  * _GNU_SOURCE
- * 	All of the above plus GNU extensions
+ *	All of the above plus GNU extensions
  *
  * _BSD_SOURCE (deprecated by _DEFAULT_SOURCE)
  * _SVID_SOURCE (deprecated by _DEFAULT_SOURCE)
  * _DEFAULT_SOURCE (or none of the above)
- * 	POSIX-1.2008 with BSD and SVr4 extensions
+ *	POSIX-1.2024 with BSD and SVr4 extensions
  *
- * _FORTIFY_SOURCE = 1 or 2
+ * _FORTIFY_SOURCE = 1, 2 or 3
  * 	Object Size Checking function wrappers
  *
  * _ZEPHYR_SOURCE
@@ -129,6 +132,8 @@ extern "C" {
 #define	_XOPEN_SOURCE		700
 #undef _XOPEN_SOURCE_EXTENDED
 #define	_XOPEN_SOURCE_EXTENDED	1
+#undef _LARGEFILE64_SOURCE
+#define _LARGEFILE64_SOURCE     1
 #endif /* _GNU_SOURCE */
 
 /* When building for Zephyr, set _ZEPHYR_SOURCE unless some other API
@@ -158,7 +163,7 @@ extern "C" {
 #undef _POSIX_SOURCE
 #define	_POSIX_SOURCE		1
 #undef _POSIX_C_SOURCE
-#define	_POSIX_C_SOURCE		200809L
+#define	_POSIX_C_SOURCE		202405L
 #endif
 
 #if !defined(_POSIX_SOURCE) && !defined(_POSIX_C_SOURCE) && \
@@ -197,35 +202,39 @@ extern "C" {
  * of these headers.
  *
  * __POSIX_VISIBLE
- * 	any version of POSIX.1; enabled by default, or with _POSIX_SOURCE,
- * 	any value of _POSIX_C_SOURCE, or _XOPEN_SOURCE >= 500.
+ *	any version of POSIX.1; enabled by default, or with _POSIX_SOURCE,
+ *	any value of _POSIX_C_SOURCE, or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 2
- * 	POSIX.2-1992; enabled by default, with _POSIX_C_SOURCE >= 2,
- * 	or _XOPEN_SOURCE >= 500.
+ *	POSIX.2-1992; enabled by default, with _POSIX_C_SOURCE >= 2,
+ *	or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 199309
- * 	POSIX.1b-1993; enabled by default, with _POSIX_C_SOURCE >= 199309L,
- * 	or _XOPEN_SOURCE >= 500.
+ *	POSIX.1b-1993; enabled by default, with _POSIX_C_SOURCE >= 199309L,
+ *	or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 199506
- * 	POSIX.1c-1995; enabled by default, with _POSIX_C_SOURCE >= 199506L,
- * 	or _XOPEN_SOURCE >= 500.
+ *	POSIX.1c-1995; enabled by default, with _POSIX_C_SOURCE >= 199506L,
+ *	or _XOPEN_SOURCE >= 500.
  *
  * __POSIX_VISIBLE >= 200112
- * 	POSIX.1-2001; enabled by default, with _POSIX_C_SOURCE >= 200112L,
- * 	or _XOPEN_SOURCE >= 600.
+ *	POSIX.1-2001; enabled by default, with _POSIX_C_SOURCE >= 200112L,
+ *	or _XOPEN_SOURCE >= 600.
  *
  * __POSIX_VISIBLE >= 200809
- * 	POSIX.1-2008; enabled by default, with _POSIX_C_SOURCE >= 200809L,
- * 	or _XOPEN_SOURCE >= 700.
+ *	POSIX.1-2008; enabled by default, with _POSIX_C_SOURCE >= 200809L,
+ *	or _XOPEN_SOURCE >= 700.
+ *
+ * __POSIX_VISIBLE >= 202405
+ *	POSIX.1-2024; enabled by default, with _POSIX_C_SOURCE >= 202405L,
+ *	or _XOPEN_SOURCE >= 700.
  *
  * __XSI_VISIBLE
  *	XPG4 XSI extensions; enabled with any version of _XOPEN_SOURCE.
  *
  * __XSI_VISIBLE >= 4
  *	SUSv1 XSI extensions; enabled with both _XOPEN_SOURCE and
- * 	_XOPEN_SOURCE_EXTENDED together.
+ *	_XOPEN_SOURCE_EXTENDED together.
  *
  * __XSI_VISIBLE >= 500
  *	SUSv2 XSI extensions; enabled with _XOPEN_SOURCE >= 500.
@@ -237,43 +246,46 @@ extern "C" {
  *	SUSv4 XSI extensions; enabled with _XOPEN_SOURCE >= 700.
  *
  * __ISO_C_VISIBLE >= 1999
- * 	ISO C99; enabled with gcc -std=c99 or newer (on by default since GCC 5),
- * 	any version of C++, or with _ISOC99_SOURCE, _POSIX_C_SOURCE >= 200112L,
- * 	or _XOPEN_SOURCE >= 600.
+ *	ISO C99; enabled with gcc -std=c99 or newer (on by default since GCC 5),
+ *	any version of C++, or with _ISOC99_SOURCE, _POSIX_C_SOURCE >= 200112L,
+ *	or _XOPEN_SOURCE >= 600.
  *
  * __ISO_C_VISIBLE >= 2011
- * 	ISO C11; enabled with gcc -std=c11 or newer (on by default since GCC 5),
- * 	g++ -std=c++11 or newer (on by default since GCC 6), or with
- * 	_ISOC11_SOURCE.
+ *	ISO C11; enabled with gcc -std=c11 or newer (on by default since GCC 5),
+ *	g++ -std=c++11 or newer (on by default since GCC 6), or with
+ *	_ISOC11_SOURCE.
  *
  * __ISO_C_VISIBLE >= 2020
- * 	ISO C2x; enabled with gcc -std=c2x or newer,
- * 	g++ -std=c++20 or newer, or with
- * 	_ISOC2X_SOURCE.
+ *	ISO C2x; enabled with gcc -std=c2x or newer,
+ *	g++ -std=c++20 or newer, or with
+ *	_ISOC2X_SOURCE.
  *
  * __ATFILE_VISIBLE
  *	"at" functions; enabled by default, with _ATFILE_SOURCE,
- * 	_POSIX_C_SOURCE >= 200809L, or _XOPEN_SOURCE >= 700.
+ *	_POSIX_C_SOURCE >= 200809L, or _XOPEN_SOURCE >= 700.
  *
  * __LARGEFILE_VISIBLE
  *	fseeko, ftello; enabled with _LARGEFILE_SOURCE or _XOPEN_SOURCE >= 500.
  *
+ * __LARGEFILE64_VISIBLE
+ *      additional large file extensions; enabled with _LARGEFILE64_SOURCE.
+ *
  * __BSD_VISIBLE
- * 	BSD extensions; enabled by default, or with _BSD_SOURCE.
+ *	BSD extensions; enabled by default, or with _BSD_SOURCE.
  *
  * __SVID_VISIBLE
- * 	SVr4 extensions; enabled by default, or with _SVID_SOURCE.
+ *	SVr4 extensions; enabled by default, or with _SVID_SOURCE.
  *
  * __MISC_VISIBLE
- * 	Extensions found in both BSD and SVr4 (shorthand for
- * 	(__BSD_VISIBLE || __SVID_VISIBLE)), or newlib-specific
- * 	extensions; enabled by default.
+ *	Extensions found in both BSD and SVr4 (shorthand for
+ *	(__BSD_VISIBLE || __SVID_VISIBLE)), or newlib-specific
+ *	extensions; enabled by default.
  *
  * __GNU_VISIBLE
- * 	GNU extensions; enabled with _GNU_SOURCE.
+ *	GNU extensions; enabled with _GNU_SOURCE.
  *
  * __SSP_FORTIFY_LEVEL
- * 	Object Size Checking; defined to 0 (off), 1, or 2.
+ *	Object Size Checking; defined to 0 (off), 1, 2 or 3.
  *
  * __ZEPHYR_VISIBLE
  *      Zephyr extensions; enabled with _ZEPHYR_SOURCE.
@@ -325,13 +337,21 @@ extern "C" {
 #define	__LARGEFILE_VISIBLE	0
 #endif
 
+#ifdef _LARGEFILE64_SOURCE
+#define __LARGEFILE64_VISIBLE   1
+#else
+#define __LARGEFILE64_VISIBLE   0
+#endif
+
 #ifdef _DEFAULT_SOURCE
 #define	__MISC_VISIBLE		1
 #else
 #define	__MISC_VISIBLE		0
 #endif
 
-#if (_POSIX_C_SOURCE - 0) >= 200809L
+#if (_POSIX_C_SOURCE - 0) >= 202405L
+#define	__POSIX_VISIBLE		202405
+#elif (_POSIX_C_SOURCE - 0) >= 200809L
 #define	__POSIX_VISIBLE		200809
 #elif (_POSIX_C_SOURCE - 0) >= 200112L
 #define	__POSIX_VISIBLE		200112
@@ -370,7 +390,13 @@ extern "C" {
 #if _FORTIFY_SOURCE > 0 && !defined(__cplusplus) && !defined(__lint__) && \
    (__OPTIMIZE__ > 0 || defined(__clang__)) && __GNUC_PREREQ__(4, 1) && \
    !defined(_LIBC)
-#  if _FORTIFY_SOURCE > 1
+#  if _FORTIFY_SOURCE > 2 && defined(__has_builtin)
+#    if __has_builtin(__builtin_dynamic_object_size)
+#      define __SSP_FORTIFY_LEVEL 3
+#    else
+#      define __SSP_FORTIFY_LEVEL 2
+#    endif
+#  elif _FORTIFY_SOURCE > 1
 #    define __SSP_FORTIFY_LEVEL 2
 #  else
 #    define __SSP_FORTIFY_LEVEL 1
@@ -382,8 +408,8 @@ extern "C" {
 /* RTEMS adheres to POSIX -- 1003.1b with some features from annexes.  */
 
 #ifdef __rtems__
-#define _POSIX_JOB_CONTROL     		1
-#define _POSIX_SAVED_IDS       		1
+#define _POSIX_JOB_CONTROL		1
+#define _POSIX_SAVED_IDS		1
 #define _POSIX_VERSION			199309L
 #define _POSIX_ASYNCHRONOUS_IO		1
 #define _POSIX_FSYNC			1
@@ -448,137 +474,6 @@ extern "C" {
 # define _POSIX_SAVED_IDS       1
 # define _POSIX_VERSION 199009L
 #endif
-
-#ifdef __CYGWIN__
-
-#if __POSIX_VISIBLE >= 200809
-#define _POSIX_VERSION				200809L
-#define _POSIX2_VERSION				200809L
-#elif __POSIX_VISIBLE >= 200112
-#define _POSIX_VERSION				200112L
-#define _POSIX2_VERSION				200112L
-#elif __POSIX_VISIBLE >= 199506
-#define _POSIX_VERSION				199506L
-#define _POSIX2_VERSION				199506L
-#elif __POSIX_VISIBLE >= 199309
-#define _POSIX_VERSION				199309L
-#define _POSIX2_VERSION				199209L
-#elif __POSIX_VISIBLE >= 199209
-#define _POSIX_VERSION				199009L
-#define _POSIX2_VERSION				199209L
-#elif __POSIX_VISIBLE
-#define _POSIX_VERSION				199009L
-#endif
-#if __XSI_VISIBLE >= 4
-#define _XOPEN_VERSION				__XSI_VISIBLE
-#endif
-
-#define _POSIX_ADVISORY_INFO			200809L
-#define _POSIX_ASYNCHRONOUS_IO			200809L
-#define _POSIX_BARRIERS				200809L
-#define _POSIX_CHOWN_RESTRICTED			     1
-#define _POSIX_CLOCK_SELECTION			200809L
-#define _POSIX_CPUTIME				200809L
-#define _POSIX_FSYNC				200809L
-#define _POSIX_IPV6				200809L
-#define _POSIX_JOB_CONTROL			     1
-#define _POSIX_MAPPED_FILES			200809L
-/* #define _POSIX_MEMLOCK			    -1 */
-#define _POSIX_MEMLOCK_RANGE			200809L
-#define _POSIX_MEMORY_PROTECTION		200809L
-#define _POSIX_MESSAGE_PASSING			200809L
-#define _POSIX_MONOTONIC_CLOCK			200809L
-#define _POSIX_NO_TRUNC				     1
-/* #define _POSIX_PRIORITIZED_IO		    -1 */
-#define _POSIX_PRIORITY_SCHEDULING		200809L
-#define _POSIX_RAW_SOCKETS			200809L
-#define _POSIX_READER_WRITER_LOCKS		200809L
-#define _POSIX_REALTIME_SIGNALS			200809L
-#define _POSIX_REGEXP				     1
-#define _POSIX_SAVED_IDS			     1
-#define _POSIX_SEMAPHORES			200809L
-#define _POSIX_SHARED_MEMORY_OBJECTS		200809L
-#define _POSIX_SHELL				     1
-#define _POSIX_SPAWN				200809L
-#define _POSIX_SPIN_LOCKS			200809L
-/* #define _POSIX_SPORADIC_SERVER		    -1 */
-#define _POSIX_SYNCHRONIZED_IO			200809L
-#define _POSIX_THREAD_ATTR_STACKADDR		200809L
-#define _POSIX_THREAD_ATTR_STACKSIZE		200809L
-#define _POSIX_THREAD_CPUTIME			200809L
-/* #define _POSIX_THREAD_PRIO_INHERIT		    -1 */
-/* #define _POSIX_THREAD_PRIO_PROTECT		    -1 */
-#define _POSIX_THREAD_PRIORITY_SCHEDULING	200809L
-#define _POSIX_THREAD_PROCESS_SHARED		200809L
-#define _POSIX_THREAD_SAFE_FUNCTIONS		200809L
-/* #define _POSIX_THREAD_SPORADIC_SERVER	    -1 */
-#define _POSIX_THREADS				200809L
-#define _POSIX_TIMEOUTS				200809L
-#define _POSIX_TIMERS				200809L
-/* #define _POSIX_TRACE				    -1 */
-/* #define _POSIX_TRACE_EVENT_FILTER		    -1 */
-/* #define _POSIX_TRACE_INHERIT			    -1 */
-/* #define _POSIX_TRACE_LOG			    -1 */
-/* #define _POSIX_TYPED_MEMORY_OBJECTS		    -1 */
-#define _POSIX_VDISABLE				   '\0'
-
-#if __POSIX_VISIBLE >= 2
-#define _POSIX2_C_VERSION			_POSIX2_VERSION
-#define _POSIX2_C_BIND				_POSIX2_VERSION
-#define _POSIX2_C_DEV				_POSIX2_VERSION
-#define _POSIX2_CHAR_TERM			_POSIX2_VERSION
-/* #define _POSIX2_FORT_DEV			    -1 */
-/* #define _POSIX2_FORT_RUN			    -1 */
-/* #define _POSIX2_LOCALEDEF			    -1 */
-/* #define _POSIX2_PBS				    -1 */
-/* #define _POSIX2_PBS_ACCOUNTING		    -1 */
-/* #define _POSIX2_PBS_CHECKPOINT		    -1 */
-/* #define _POSIX2_PBS_LOCATE			    -1 */
-/* #define _POSIX2_PBS_MESSAGE			    -1 */
-/* #define _POSIX2_PBS_TRACK			    -1 */
-#define _POSIX2_SW_DEV				_POSIX2_VERSION
-#define _POSIX2_UPE				_POSIX2_VERSION
-#endif /* __POSIX_VISIBLE >= 2 */
-
-#define _POSIX_V6_ILP32_OFF32			    -1
-#ifdef __LP64__
-#define _POSIX_V6_ILP32_OFFBIG			    -1
-#define _POSIX_V6_LP64_OFF64			     1
-#define _POSIX_V6_LPBIG_OFFBIG			     1
-#else
-#define _POSIX_V6_ILP32_OFFBIG			     1
-#define _POSIX_V6_LP64_OFF64			    -1
-#define _POSIX_V6_LPBIG_OFFBIG			    -1
-#endif
-#define _POSIX_V7_ILP32_OFF32			_POSIX_V6_ILP32_OFF32
-#define _POSIX_V7_ILP32_OFFBIG			_POSIX_V6_ILP32_OFFBIG
-#define _POSIX_V7_LP64_OFF64			_POSIX_V6_LP64_OFF64
-#define _POSIX_V7_LPBIG_OFFBIG			_POSIX_V6_LPBIG_OFFBIG
-#define _XBS5_ILP32_OFF32			_POSIX_V6_ILP32_OFF32
-#define _XBS5_ILP32_OFFBIG			_POSIX_V6_ILP32_OFFBIG
-#define _XBS5_LP64_OFF64			_POSIX_V6_LP64_OFF64
-#define _XBS5_LPBIG_OFFBIG			_POSIX_V6_LPBIG_OFFBIG
-
-#if __XSI_VISIBLE
-#define _XOPEN_CRYPT				     1
-#define _XOPEN_ENH_I18N				     1
-/* #define _XOPEN_LEGACY			    -1 */
-/* #define _XOPEN_REALTIME			    -1 */
-/* #define _XOPEN_REALTIME_THREADS		    -1 */
-#define _XOPEN_SHM				     1
-/* #define _XOPEN_STREAMS			    -1 */
-/* #define _XOPEN_UNIX				    -1 */
-#endif /* __XSI_VISIBLE */
-
-/*
- * newlib's wide char conversion functions were updated on
- *	2019-01-12
- * to UNICODE version:
- *	11.0.0 released 2018-06-05
- */
-#define __STDC_ISO_10646__ 201806L
-
-#endif /* __CYGWIN__ */
 
 #ifdef __cplusplus
 }

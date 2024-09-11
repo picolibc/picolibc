@@ -3,6 +3,8 @@
    Copyright (c) 1997 Nick Clifton, Cygnus Solutions
  */
 
+#include <picolibc.h>
+
 #include "machine/acle-compat.h"
 
 /* ANSI concatenation macros.  */
@@ -183,6 +185,7 @@ SYM (.arm_start_of.\name):
 	.align 2
 	MODE
 	.globl SYM (\name)
+	.cfi_sections .debug_frame
 	.cfi_startproc
 	TYPE (\name)
 SYM (\name):

@@ -34,6 +34,7 @@
 #
 srcs_tinystdio = [
   'asprintf.c',
+  'atomic_load.c',
   'atold_engine.c',
   'bufio.c',
   'clearerr.c',
@@ -56,6 +57,7 @@ srcs_tinystdio = [
   'ferror.c',
   'fflush.c',
   'fgetc.c',
+  'fgetpos.c',
   'fgets.c',
   'fgetwc.c',
   'fgetws.c',
@@ -64,6 +66,7 @@ srcs_tinystdio = [
   'filestrputalloc.c',
   'filestrput.c',
   'filewstrget.c',
+  'flockfile.c',
   'fmemopen.c',
   'fprintf.c',
   'fputc.c',
@@ -74,9 +77,13 @@ srcs_tinystdio = [
   'fscanf.c',
   'fseek.c',
   'fseeko.c',
+  'fsetpos.c',
   'ftell.c',
   'ftello.c',
   'ftox_engine.c',
+  'ftrylockfile.c',
+  'funlockfile.c',
+  'funopen.c',
   'fwide.c',
   'fwprintf.c',
   'fwrite.c',
@@ -162,6 +169,7 @@ srcs_tinystdio = [
   'vwscanf.c',
   'wprintf.c',
   'wscanf.c',
+  'sprintf_s.c',
 ]
 
 # exact float/string conversion code
@@ -224,7 +232,8 @@ if posix_console
   srcs_tinystdio += srcs_tinystdio_posix_console
 endif
 
-install_headers(['stdio.h', 'stdio-bufio.h'],
+inc_headers = ['stdio.h', 'stdio-bufio.h']
+install_headers(inc_headers,
 		install_dir: include_dir
 	       )
 
@@ -241,3 +250,13 @@ foreach file : srcs_tinystdio
 endforeach
 
 src_tinystdio = files(srcs_tinystdio_use)
+
+if enable_cdefs_tests
+  foreach header : inc_headers
+    test_name = 'check-cdef-' + header
+    test(test_name,
+         validate_cdefs,
+         args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+         suite: 'headers')
+  endforeach
+endif

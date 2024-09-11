@@ -48,5 +48,4 @@ if(${CMAKE_SYSTEM_SUB_PROCESSOR} STREQUAL "i686")
     )
 endif()
 
-add_subdirectory(sys)
 add_subdirectory(machine)

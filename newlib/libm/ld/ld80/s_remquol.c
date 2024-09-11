@@ -22,13 +22,13 @@
  */
 #ifdef LDBL_IMPLICIT_NBIT
 #define	SET_NBIT(hx)	((hx) | (1ULL << LDBL_MANH_SIZE))
-#define	HFRAC_BITS	EXT_FRACHBITS
+#define	HFRAC_BITS	LDBL_MANH_SIZE
 #else
 #define	SET_NBIT(hx)	(hx)
-#define	HFRAC_BITS	(EXT_FRACHBITS - 1)
+#define	HFRAC_BITS	(LDBL_MANH_SIZE - 1)
 #endif
 
-#define	MANL_SHIFT	(EXT_FRACLBITS - 1)
+#define	MANL_SHIFT	(LDBL_MANL_SIZE - 1)
 
 static const long double Zero[] = {0.0L, -0.0L};
 

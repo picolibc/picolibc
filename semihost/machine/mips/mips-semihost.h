@@ -37,6 +37,11 @@
 #define _MIPS_SEMIHOST_H_
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <unistd.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 int
 mips_putc(char c, FILE *file);

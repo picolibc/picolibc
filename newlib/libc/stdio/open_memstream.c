@@ -61,6 +61,12 @@ POSIX.1-2008
 Supporting OS subroutines required: <<sbrk>>.
 */
 
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#endif
+
 #define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <wchar.h>

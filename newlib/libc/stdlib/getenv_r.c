@@ -51,6 +51,7 @@ permit '=' to be in identifiers.
  * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>

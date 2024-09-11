@@ -1,8 +1,8 @@
 /*
 Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com>
  */
-#ifndef _REENT_ONLY
 
+#define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <string.h>
 
@@ -17,5 +17,3 @@ strdup (const char *str)
     }
   return copy;
 }
-
-#endif /* !_REENT_ONLY */

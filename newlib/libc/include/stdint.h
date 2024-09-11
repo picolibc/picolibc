@@ -9,13 +9,12 @@
 #ifndef _STDINT_H
 #define _STDINT_H
 
+#include <sys/cdefs.h>
 #include <machine/_default_types.h>
 #include <sys/_intsup.h>
 #include <sys/_stdint.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 #ifdef ___int_least8_t_defined
 typedef __int_least8_t int_least8_t;
@@ -458,9 +457,14 @@ typedef __uint_least64_t uint_least64_t;
 #endif
 #endif
 
-
-#ifdef __cplusplus
-}
+#if __STDC_WANT_LIB_EXT1__ == 1
+  // could be defined by the user
+#ifndef RSIZE_MAX
+#define RSIZE_MAX SIZE_MAX
+#endif
 #endif
 
+  _END_STD_C
+
 #endif /* _STDINT_H */
+

@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 	.section .text.m68k_semihost
 	.global m68k_semihost
 	.type m68k_semihost, @function

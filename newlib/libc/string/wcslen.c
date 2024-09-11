@@ -51,7 +51,6 @@ No supporting OS subroutines are required.
  *	citrus Id: wcslen.c,v 1.1 1999/12/29 21:47:45 tshiozak Exp
  */
 
-#include <_ansi.h>
 #include <wchar.h>
 
 size_t

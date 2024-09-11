@@ -127,6 +127,7 @@ _picolibc_supported_compile_options(PICOLIBC_FLAG_OPTIONS
   -Werror=unsupported-floating-point-opt
   -Werror=ignored-optimization-argument
   -Werror=attribute-optimize
+  -Werror=implicit-function-declaration
   -Wno-unused-command-line-argument
   )
 

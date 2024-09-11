@@ -33,7 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 subdir('sys')
-install_headers('stdio.h',
+inc_headers = ['stdio.h']
+install_headers(inc_headers,
 		install_dir: include_dir)
 
 general_srcs_stdio = [
@@ -49,6 +50,7 @@ general_srcs_stdio = [
   'fileno.c',
   'findfp.c',
   'flags.c',
+  'flockfile.c',
   'fopen.c',
   'fprintf.c',
   'fputc.c',
@@ -60,6 +62,7 @@ general_srcs_stdio = [
   'fseeko.c',
   'fsetpos.c',
   'ftell.c',
+  'funlockfile.c',
   'fvwrite.c',
   'fwalk.c',
   'fwrite.c',
@@ -298,3 +301,13 @@ foreach file : srcs_stdio
 endforeach
 
 src_stdio = files(srcs_stdio_use)
+
+if enable_cdefs_tests
+  foreach header : inc_headers
+    test_name = 'check-cdef-' + header
+    test(test_name,
+         validate_cdefs,
+         args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
+         suite: 'headers')
+  endforeach
+endif

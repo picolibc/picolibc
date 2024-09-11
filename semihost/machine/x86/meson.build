@@ -78,6 +78,7 @@ if objcopy.found()
   bios_ld = '@0@/@1@'.format(meson.current_source_dir(), 'bios.ld')
   bios = executable('bios', 'bios.S',
 		    c_args: ['-m32'] + c_args,
+                    include_directories: inc,
 		    link_args: ['-nostdlib', '-m32', '-Wl,--build-id=none', '-T', bios_ld])
 
   bios_bin = custom_target('bios.bin',

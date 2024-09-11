@@ -26,17 +26,15 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #include "arm_asm.h"
 
-/* NOTE: This ifdef MUST match the one in aeabi_memcpy.c.  */
-#if !(defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) && \
-	defined (__ARM_ARCH_7A__) && defined (__ARM_FEATURE_UNALIGNED) && \
-	(defined (__ARM_NEON__) || !defined (__SOFTFP__))
-
 	.syntax unified
-	.global __aeabi_memcpy
-	.type   __aeabi_memcpy, %function
-__aeabi_memcpy:
+	.global memcpy
+	.type   memcpy, %function
+	ASM_ALIAS __aeabi_memcpy, memcpy
+memcpy:
 	/* Assumes that n >= 0, and dst, src are valid pointers.
           If there is at least 8 bytes to copy, use LDRD/STRD.
           If src and dst are misaligned with different offsets,
@@ -283,5 +281,3 @@ __aeabi_memcpy8:
 	blt	copy_less_than_64	/* if n + 8 < 64.  */
 
 	bl	two_word_aligned
-
-#endif

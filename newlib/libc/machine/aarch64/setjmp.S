@@ -26,6 +26,8 @@
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
+
 #define GPR_LAYOUT			\
 	REG_PAIR (x19, x20,  0);	\
 	REG_PAIR (x21, x22, 16);	\
@@ -52,7 +54,9 @@ setjmp:
 #define REG_PAIR(REG1, REG2, OFFS)	stp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)		str REG1, [x0, OFFS]
 	GPR_LAYOUT
+#if __ARM_FP
 	FPR_LAYOUT
+#endif
 #undef REG_PAIR
 #undef REG_ONE
 	mov	w0, #0
@@ -70,7 +74,9 @@ longjmp:
 #define REG_PAIR(REG1, REG2, OFFS)	ldp REG1, REG2, [x0, OFFS]
 #define REG_ONE(REG1, OFFS)		ldr REG1, [x0, OFFS]
 	GPR_LAYOUT
+#if __ARM_FP
 	FPR_LAYOUT
+#endif
 #undef REG_PAIR
 #undef REG_ONE
 	mov	sp, x16

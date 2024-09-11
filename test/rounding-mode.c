@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <fenv.h>
+#include "rounding-mode.h"
 
 #ifndef PICOLIBC_DOUBLE_NOROUND
 static double
@@ -109,7 +110,11 @@ mul_f(float a, float b);
 float
 sub_f(float a, float b);
 
-double
+#if defined(FE_UPWARD) && defined(FE_DOWNWARD) && defined(FE_TOWARDZERO)
+
+#ifndef PICOLIBC_DOUBLE_NOROUND
+
+static double
 div_mul_sub(double a, double b, double c, double d)
 {
 	return sub(mul(div(a,b), c), d);
@@ -117,13 +122,21 @@ div_mul_sub(double a, double b, double c, double d)
 
 #define do_fancy(sign) div_mul_sub(sign 1.0, 3.0, 3.0, sign 1.0)
 
-float
+#endif
+
+#ifndef PICOLIBC_FLOAT_NOROUND
+
+static float
 div_f_mul_sub(float a, float b, float c, float d)
 {
 	return sub_f(mul_f(div_f(a,b), c), d);
 }
 
 #define do_fancyf(sign) div_f_mul_sub(sign 1.0f, 3.0f, 3.0f, sign 1.0f)
+
+#endif
+
+#endif
 
 #define n4      nextafter(4.0, 5.0)
 #define nn4     nextafter(nextafter(4.0, 5.0), 5.0)
@@ -150,6 +163,17 @@ check(int mode, char *name, double value)
 		printf("ERROR fesetround %s failed\n", name);
 		ret++;
 	}
+        /* Make sure setting an invalid rounding mode fails and doesn't
+         * change the test results
+         */
+        if (fesetround(FE_ALL_EXCEPT+1) == 0) {
+                printf("ERROR fesetround %d succeeded\n", FE_ALL_EXCEPT+1);
+                ret++;
+        }
+        if (fegetround() != mode) {
+                printf("ERROR fegetround() != %s\n", name);
+                ret++;
+        }
 	got = nearbyint(value);
 	if (want != got) {
 		printf("ERROR double %s: value %g want %g got %g\n", name, value, want, got);
@@ -176,6 +200,17 @@ check(int mode, char *name, double value)
 		printf("ERROR fesetround %s failed\n", name);
 		ret++;
 	}
+        /* Make sure setting an invalid rounding mode fails and doesn't
+         * change the test results
+         */
+        if (fesetround(FE_ALL_EXCEPT+1) == 0) {
+                printf("ERROR fesetround %d succeeded\n", FE_ALL_EXCEPT+1);
+                ret++;
+        }
+        if (fegetround() != mode) {
+                printf("ERROR fegetround() != %s\n", name);
+                ret++;
+        }
 	gotf = nearbyintf(valuef);
 	if (wantf != gotf) {
 		printf("ERROR float %s: value %g want %g got %g\n", name, (double) valuef, (double) wantf, (double) gotf);

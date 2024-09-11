@@ -32,11 +32,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+add_subdirectory(machine)
+
 picolibc_sources_flags("-fno-builtin"
   setjmp.S
   strcmp.S
   strcpy.S
-  aeabi_memcpy-armv7a.S
   aeabi_memset.c
   bzero.c
   memchr.c
@@ -49,6 +51,3 @@ picolibc_sources_flags("-fno-builtin"
   strlen.c
   strlen.S
   )
-
-add_subdirectory(sys)
-add_subdirectory(machine)

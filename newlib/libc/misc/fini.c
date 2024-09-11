@@ -12,14 +12,9 @@
 
 /* Handle ELF .{pre_init,init,fini}_array sections.  */
 #include <sys/types.h>
+#include <sys/_initfini.h>
 
 #ifdef _HAVE_INITFINI_ARRAY
-extern void (*__fini_array_start []) (void) __attribute__((weak));
-extern void (*__fini_array_end []) (void) __attribute__((weak));
-
-#ifdef _HAVE_INIT_FINI
-extern void _fini (void) __attribute__((weak));
-#endif
 
 /* Run all the cleanup routines.  */
 void

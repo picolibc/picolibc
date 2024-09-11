@@ -40,7 +40,7 @@ fileno(FILE *file)
 {
         if (file->flags & __SBUF) {
                 struct __file_bufio *pf = (struct __file_bufio *) file;
-                return pf->fd;
+                return (int)(intptr_t)(pf->ptr);
         }
 	return -1;
 }

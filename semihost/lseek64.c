@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include "semihost-private.h"
 #include <sys/types.h>
 #include <sys/stat.h>

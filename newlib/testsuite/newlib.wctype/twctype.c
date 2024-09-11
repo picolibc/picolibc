@@ -8,7 +8,6 @@ is freely granted, provided that this notice is preserved.
 #include <ctype.h>
 #include <stdio.h>
 #include <string.h>
-#include <newlib.h>
 #include <locale.h>
 #include "check.h"
 

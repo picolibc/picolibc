@@ -30,14 +30,8 @@
 #if defined(__NetBSD__)
 #include <atf-c.h>
 #else
-#if defined(__PICOLIBC__)
-#define _GNU_SOURCE  /* strnlen */
-#elif defined(__linux__)
-#define _GNU_SOURCE
-#include <features.h>
-#endif
+#define _POSIX_C_SOURCE 200809L /* for strnlen */
 #include <assert.h>
-#include <stdio.h>
 #define ATF_TC(arg0)		static void arg0##_head(void)
 #define ATF_TC_HEAD(arg0, arg1)	static void arg0##_head(void)
 #define atf_tc_set_md_var(arg0, arg1, ...) do {	\
@@ -567,9 +561,6 @@ ATF_TC_BODY(test11, tc)
 /*
  * test fmemopen_seek(SEEK_CUR)
  */
-#if defined(__GLIBC__)
-			if (i < (off_t)t->n) {
-#endif
 			/* zero */
 			ATF_CHECK(fseeko(fp, (off_t)0, SEEK_CUR) == 0);
 			ATF_CHECK(ftello(fp) == len);
@@ -594,9 +585,6 @@ ATF_TC_BODY(test11, tc)
 			ATF_CHECK(fseeko(fp, (off_t)-1, SEEK_CUR) == -1);
 			ATF_CHECK(ftello(fp) == (off_t)0);
 
-#if defined(__GLIBC__)
-			}
-#endif
 			ATF_CHECK(fclose(fp) == 0);
 		}
 	}

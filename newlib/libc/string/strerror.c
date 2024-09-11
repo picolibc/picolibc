@@ -400,6 +400,10 @@ QUICKREF
 #define _DEFAULT_SOURCE
 #include <errno.h>
 #include <string.h>
+#include "string_private.h"
+#include "local.h"
+
+extern char *_user_strerror (int, int, int *) _ATTRIBUTE((__weak__));
 
 char *
 _strerror_r (
@@ -408,7 +412,6 @@ _strerror_r (
 	int *errptr)
 {
   char *error;
-  extern char *_user_strerror (int, int, int *);
 
   switch (errnum)
     {
@@ -900,7 +903,7 @@ _strerror_r (
     default:
       if (!errptr)
         errptr = &_REENT_ERRNO(ptr);
-      if ((error = _user_strerror (errnum, internal, errptr)) == 0)
+      if (&_user_strerror == NULL || (error = _user_strerror (errnum, internal, errptr)) == 0)
         error = "";
       break;
     }

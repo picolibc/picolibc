@@ -9,6 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
+#include <picolibc.h>
+
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 .section .text.memmove
 .global memmove

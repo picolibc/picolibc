@@ -12,15 +12,11 @@
 #ifndef _FENV_H
 #define _FENV_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
 
-#include <sys/fenv.h>
+_BEGIN_STD_C
 
-#ifndef FE_TONEAREST
-#define FE_TONEAREST	0
-#endif
+#include <machine/fenv.h>
 
 #ifndef FE_ALL_EXCEPT
 #define FE_ALL_EXCEPT	0
@@ -43,9 +39,11 @@ int feholdexcept(fenv_t *envp);
 int fesetenv(const fenv_t *envp);
 int feupdateenv(const fenv_t *envp);
 
+#if __GNU_VISIBLE
 int feenableexcept(int);
 int fedisableexcept(int);
 int fegetexcept(void);
+#endif
 
 /*
  * Lastly, a FE_DFL_ENV macro must be defined, representing a pointer
@@ -73,8 +71,6 @@ int fesetexcept(int excepts);
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif

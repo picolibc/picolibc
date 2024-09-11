@@ -33,6 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <sys/features.h>
+
 #ifdef __LONG_DOUBLE_IEEE128__
 
 #define TCtype long double __complex
@@ -42,6 +44,9 @@ TCtype
 __mulkc3_hw (TFtype a, TFtype b, TFtype c, TFtype d);
 
 TCtype
+__mulkc3 (TFtype a, TFtype b, TFtype c, TFtype d);
+
+TCtype
 __mulkc3 (TFtype a, TFtype b, TFtype c, TFtype d)
 {
     return __mulkc3_hw(a, b, c, d);
@@ -49,6 +54,9 @@ __mulkc3 (TFtype a, TFtype b, TFtype c, TFtype d)
 
 TCtype
 __divkc3_hw (TFtype a, TFtype b, TFtype c, TFtype d);
+
+TCtype
+__divkc3 (TFtype a, TFtype b, TFtype c, TFtype d);
 
 TCtype
 __divkc3 (TFtype a, TFtype b, TFtype c, TFtype d)

@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include "sparc-semihost.h"
 
-void  _ATTRIBUTE((__noreturn__))
+_Noreturn void
 _exit(int code)
 {
         char buf[15];

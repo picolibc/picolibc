@@ -43,9 +43,9 @@ picolibc_headers(sys
   errno.h
   fcntl.h
   features.h
-  fenv.h
   file.h
   iconvnls.h
+  _initfini.h
   _intsup.h
   _locale.h
   lock.h
@@ -54,7 +54,7 @@ picolibc_headers(sys
   resource.h
   sched.h
   select.h
-  signal.h
+  _select.h
   _sigset.h
   stat.h
   _stdint.h
@@ -73,4 +73,5 @@ picolibc_headers(sys
   unistd.h
   utime.h
   wait.h
+  _wait.h
   )

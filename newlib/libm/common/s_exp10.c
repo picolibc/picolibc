@@ -49,6 +49,7 @@ PORTABILITY
  * wrapper exp10(x)
  */
 
+#define _GNU_SOURCE
 #undef exp10
 #include "fdlibm.h"
 #include <errno.h>

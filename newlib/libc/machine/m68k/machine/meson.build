@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 inc_sys_headers_machine = [
+  'fenv.h',
   'fenv-fp.h'
 ]
 

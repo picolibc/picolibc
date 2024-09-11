@@ -24,7 +24,6 @@
  * SUCH DAMAGE.
  */
 
-//__FBSDID("$FreeBSD: src/lib/msun/src/s_fmal.c,v 1.7 2011/10/21 06:30:43 das Exp $");
 
 /*
  * Denorms usually have an exponent biased by 1 so that they flow

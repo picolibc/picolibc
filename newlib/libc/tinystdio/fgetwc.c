@@ -39,6 +39,8 @@ fgetwc(FILE *stream)
         unsigned i;
         int sc;
         __ungetc_t unget;
+        
+        stream->flags |= __SWIDE;
 
 	if ((stream->flags & __SRD) == 0)
 		return WEOF;

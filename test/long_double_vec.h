@@ -1,6 +1,6 @@
 
 #ifdef FULL_LONG_DOUBLE
-long_double_test_i_f_t finitel_vec[] = {
+static long_double_test_i_f_t finitel_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 1 },
     { .line = __LINE__, .x = -9.9L, .y = 1 },
     { .line = __LINE__, .x = -9.8L, .y = 1 },
@@ -204,7 +204,7 @@ long_double_test_i_f_t finitel_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 1 },
 };
 
-int test_finitel(void) {
+static int test_finitel(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(finitel_vec)/sizeof(finitel_vec[0]); i++) {
@@ -216,7 +216,7 @@ int test_finitel(void) {
 #endif /* FULL_LONG_DOUBLE */
 
 #ifdef FULL_LONG_DOUBLE
-long_double_test_i_f_t ilogb_vec[] = {
+static long_double_test_i_f_t ilogb_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 3 },
     { .line = __LINE__, .x = -9.9L, .y = 3 },
     { .line = __LINE__, .x = -9.8L, .y = 3 },
@@ -420,7 +420,7 @@ long_double_test_i_f_t ilogb_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 3 },
 };
 
-int test_ilogb(void) {
+static int test_ilogb(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(ilogb_vec)/sizeof(ilogb_vec[0]); i++) {
@@ -432,7 +432,7 @@ int test_ilogb(void) {
 #endif /* FULL_LONG_DOUBLE */
 
 #ifdef FULL_LONG_DOUBLE
-long_double_test_i_f_t isinfl_vec[] = {
+static long_double_test_i_f_t isinfl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 0 },
     { .line = __LINE__, .x = -9.9L, .y = 0 },
     { .line = __LINE__, .x = -9.8L, .y = 0 },
@@ -636,7 +636,7 @@ long_double_test_i_f_t isinfl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 0 },
 };
 
-int test_isinfl(void) {
+static int test_isinfl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(isinfl_vec)/sizeof(isinfl_vec[0]); i++) {
@@ -648,7 +648,7 @@ int test_isinfl(void) {
 #endif /* FULL_LONG_DOUBLE */
 
 #ifdef FULL_LONG_DOUBLE
-long_double_test_i_f_t isnanl_vec[] = {
+static long_double_test_i_f_t isnanl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 0 },
     { .line = __LINE__, .x = -9.9L, .y = 0 },
     { .line = __LINE__, .x = -9.8L, .y = 0 },
@@ -852,7 +852,7 @@ long_double_test_i_f_t isnanl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 0 },
 };
 
-int test_isnanl(void) {
+static int test_isnanl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(isnanl_vec)/sizeof(isnanl_vec[0]); i++) {
@@ -863,7 +863,7 @@ int test_isnanl(void) {
 }
 #endif /* FULL_LONG_DOUBLE */
 
-long_double_test_i_f_t lrintl_vec[] = {
+static long_double_test_i_f_t lrintl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10 },
     { .line = __LINE__, .x = -9.9L, .y = -10 },
     { .line = __LINE__, .x = -9.8L, .y = -10 },
@@ -1067,7 +1067,7 @@ long_double_test_i_f_t lrintl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10 },
 };
 
-int test_lrintl(void) {
+static int test_lrintl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(lrintl_vec)/sizeof(lrintl_vec[0]); i++) {
@@ -1077,7 +1077,7 @@ int test_lrintl(void) {
     return result;
 }
 
-long_double_test_i_f_t llrintl_vec[] = {
+static long_double_test_i_f_t llrintl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10 },
     { .line = __LINE__, .x = -9.9L, .y = -10 },
     { .line = __LINE__, .x = -9.8L, .y = -10 },
@@ -1281,7 +1281,7 @@ long_double_test_i_f_t llrintl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10 },
 };
 
-int test_llrintl(void) {
+static int test_llrintl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(llrintl_vec)/sizeof(llrintl_vec[0]); i++) {
@@ -1291,7 +1291,7 @@ int test_llrintl(void) {
     return result;
 }
 
-long_double_test_i_f_t lroundl_vec[] = {
+static long_double_test_i_f_t lroundl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10 },
     { .line = __LINE__, .x = -9.9L, .y = -10 },
     { .line = __LINE__, .x = -9.8L, .y = -10 },
@@ -1495,7 +1495,7 @@ long_double_test_i_f_t lroundl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10 },
 };
 
-int test_lroundl(void) {
+static int test_lroundl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(lroundl_vec)/sizeof(lroundl_vec[0]); i++) {
@@ -1505,7 +1505,7 @@ int test_lroundl(void) {
     return result;
 }
 
-long_double_test_i_f_t llroundl_vec[] = {
+static long_double_test_i_f_t llroundl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10 },
     { .line = __LINE__, .x = -9.9L, .y = -10 },
     { .line = __LINE__, .x = -9.8L, .y = -10 },
@@ -1709,7 +1709,7 @@ long_double_test_i_f_t llroundl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10 },
 };
 
-int test_llroundl(void) {
+static int test_llroundl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(llroundl_vec)/sizeof(llroundl_vec[0]); i++) {
@@ -1722,7 +1722,7 @@ int test_llroundl(void) {
 #ifndef LDEXPL_PREC
 #define LDEXPL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_fi_t ldexpl_vec[] = {
+static long_double_test_f_fi_t ldexpl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -16, .y = -6.103515625e-5L },
     { .line = __LINE__, .x0 = -4L, .x1 = -15, .y = -1.220703125e-4L },
     { .line = __LINE__, .x0 = -4L, .x1 = -14, .y = -2.44140625e-4L },
@@ -2814,7 +2814,7 @@ long_double_test_f_fi_t ldexpl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 16, .y = 2.62144e5L },
 };
 
-int test_ldexpl(void) {
+static int test_ldexpl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(ldexpl_vec)/sizeof(ldexpl_vec[0]); i++) {
@@ -2827,7 +2827,7 @@ int test_ldexpl(void) {
 #ifndef SCALBNL_PREC
 #define SCALBNL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_fi_t scalbnl_vec[] = {
+static long_double_test_f_fi_t scalbnl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -16, .y = -6.103515625e-5L },
     { .line = __LINE__, .x0 = -4L, .x1 = -15, .y = -1.220703125e-4L },
     { .line = __LINE__, .x0 = -4L, .x1 = -14, .y = -2.44140625e-4L },
@@ -3919,7 +3919,7 @@ long_double_test_f_fi_t scalbnl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 16, .y = 2.62144e5L },
 };
 
-int test_scalbnl(void) {
+static int test_scalbnl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(scalbnl_vec)/sizeof(scalbnl_vec[0]); i++) {
@@ -3933,7 +3933,7 @@ int test_scalbnl(void) {
 #ifndef ATAN2L_PREC
 #define ATAN2L_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t atan2l_vec[] = {
+static long_double_test_f_ff_t atan2l_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = -2.3561944901923449288469825374596271631478770495313293657312046247721681311643974228764937606443810176625251869548734446956054675408949722944845347138119462382377378162345848977565765380859375L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = -2.3239476077570910087560610619087803236986786062085050832318357598526982210706928986092485764076556538931499284362564371250433706329832572220537678479856946722748034517280757427215576171875L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = -2.289626326416521124648335843165656096050003819705869996030149820506264873392202170962599183317300919051500385589674547328710765516721156710733083212462590783076166189857758581638336181640625L },
@@ -5024,7 +5024,7 @@ long_double_test_f_ff_t atan2l_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 0.7853981633974483096156608458198757210492923498437764552437348749240560437214658076254979202147936725541750623182911482318684891802983240981615115712706487460792459387448616325855255126953125L },
 };
 
-int test_atan2l(void) {
+static int test_atan2l(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(atan2l_vec)/sizeof(atan2l_vec[0]); i++) {
@@ -5039,7 +5039,7 @@ int test_atan2l(void) {
 #ifndef POWL_PREC
 #define POWL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t powl_vec[] = {
+static long_double_test_f_ff_t powl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = (long double) NAN },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = (long double) NAN },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.25L, .y = (long double) NAN },
@@ -5922,7 +5922,7 @@ long_double_test_f_ff_t powl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 256L },
 };
 
-int test_powl(void) {
+static int test_powl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(powl_vec)/sizeof(powl_vec[0]); i++) {
@@ -5937,7 +5937,7 @@ int test_powl(void) {
 #ifndef FMODL_PREC
 #define FMODL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t fmodl_vec[] = {
+static long_double_test_f_ff_t fmodl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = 0L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = -2.5e-1L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = -5.e-1L },
@@ -7029,7 +7029,7 @@ long_double_test_f_ff_t fmodl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 0L },
 };
 
-int test_fmodl(void) {
+static int test_fmodl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(fmodl_vec)/sizeof(fmodl_vec[0]); i++) {
@@ -7044,7 +7044,7 @@ int test_fmodl(void) {
 #ifndef FDIML_PREC
 #define FDIML_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t fdiml_vec[] = {
+static long_double_test_f_ff_t fdiml_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = 0L },
     { .line = __LINE__, .x0 = -3.75L, .x1 = -4L, .y = 2.5e-1L },
     { .line = __LINE__, .x0 = -3.75L, .x1 = -3.75L, .y = 0L },
@@ -7608,7 +7608,7 @@ long_double_test_f_ff_t fdiml_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 0L },
 };
 
-int test_fdiml(void) {
+static int test_fdiml(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(fdiml_vec)/sizeof(fdiml_vec[0]); i++) {
@@ -7622,7 +7622,7 @@ int test_fdiml(void) {
 #ifndef FMAXL_PREC
 #define FMAXL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t fmaxl_vec[] = {
+static long_double_test_f_ff_t fmaxl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = -4L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = -3.75L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = -3.5L },
@@ -8714,7 +8714,7 @@ long_double_test_f_ff_t fmaxl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 4L },
 };
 
-int test_fmaxl(void) {
+static int test_fmaxl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(fmaxl_vec)/sizeof(fmaxl_vec[0]); i++) {
@@ -8727,7 +8727,7 @@ int test_fmaxl(void) {
 #ifndef FMINL_PREC
 #define FMINL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t fminl_vec[] = {
+static long_double_test_f_ff_t fminl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = -4L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = -4L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = -4L },
@@ -9819,7 +9819,7 @@ long_double_test_f_ff_t fminl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 4L },
 };
 
-int test_fminl(void) {
+static int test_fminl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(fminl_vec)/sizeof(fminl_vec[0]); i++) {
@@ -9832,7 +9832,7 @@ int test_fminl(void) {
 #ifndef HYPOTL_PREC
 #define HYPOTL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t hypotl_vec[] = {
+static long_double_test_f_ff_t hypotl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = 5.656854249492380195206754896838792314278687501507792292706813081410411056069846314346579520874328719111259706673460710850154855831514995745878680356334700096709866556921042501926422119140625L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = 5.482928049865327204137017924031890912542998514563063173070648576944073666265572534150755048238110382780777629390350353773762090864797116052590969276399335274874147216905839741230010986328125L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = 5.315072906367324703999560957464657110983632129291298240398412680015803494363673655237837734590939767105572242379031051711033205464655761699465993529341301115920259690028615295886993408203125L },
@@ -10923,7 +10923,7 @@ long_double_test_f_ff_t hypotl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 5.656854249492380195206754896838792314278687501507792292706813081410411056069846314346579520874328719111259706673460710850154855831514995745878680356334700096709866556921042501926422119140625L },
 };
 
-int test_hypotl(void) {
+static int test_hypotl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(hypotl_vec)/sizeof(hypotl_vec[0]); i++) {
@@ -10937,7 +10937,7 @@ int test_hypotl(void) {
 #ifndef SCALBL_PREC
 #define SCALBL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t scalbl_vec[] = {
+static long_double_test_f_ff_t scalbl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = -2.5e-1L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = (long double) NAN },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = (long double) NAN },
@@ -12029,7 +12029,7 @@ long_double_test_f_ff_t scalbl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 64L },
 };
 
-int test_scalbl(void) {
+static int test_scalbl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(scalbl_vec)/sizeof(scalbl_vec[0]); i++) {
@@ -12044,7 +12044,7 @@ int test_scalbl(void) {
 #ifndef REMAINDERL_PREC
 #define REMAINDERL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t remainderl_vec[] = {
+static long_double_test_f_ff_t remainderl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = 0L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = -2.5e-1L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = -5.e-1L },
@@ -13136,7 +13136,7 @@ long_double_test_f_ff_t remainderl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 0L },
 };
 
-int test_remainderl(void) {
+static int test_remainderl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(remainderl_vec)/sizeof(remainderl_vec[0]); i++) {
@@ -13151,7 +13151,7 @@ int test_remainderl(void) {
 #ifndef DREML_PREC
 #define DREML_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t dreml_vec[] = {
+static long_double_test_f_ff_t dreml_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = 0L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = -2.5e-1L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = -5.e-1L },
@@ -14243,7 +14243,7 @@ long_double_test_f_ff_t dreml_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 0L },
 };
 
-int test_dreml(void) {
+static int test_dreml(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(dreml_vec)/sizeof(dreml_vec[0]); i++) {
@@ -14257,7 +14257,7 @@ int test_dreml(void) {
 #ifndef COPYSIGNL_PREC
 #define COPYSIGNL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_ff_t copysignl_vec[] = {
+static long_double_test_f_ff_t copysignl_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .y = -4L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.75L, .y = -4L },
     { .line = __LINE__, .x0 = -4L, .x1 = -3.5L, .y = -4L },
@@ -15349,7 +15349,7 @@ long_double_test_f_ff_t copysignl_vec[] = {
     { .line = __LINE__, .x0 = 4L, .x1 = 4L, .y = 4L },
 };
 
-int test_copysignl(void) {
+static int test_copysignl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(copysignl_vec)/sizeof(copysignl_vec[0]); i++) {
@@ -15363,7 +15363,7 @@ int test_copysignl(void) {
 #ifndef ACOSHL_PREC
 #define ACOSHL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t acoshl_vec[] = {
+static long_double_test_f_f_t acoshl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = (long double) NAN },
     { .line = __LINE__, .x = -9.9L, .y = (long double) NAN },
     { .line = __LINE__, .x = -9.8L, .y = (long double) NAN },
@@ -15567,7 +15567,7 @@ long_double_test_f_f_t acoshl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.9932228461263808979126677137741829130836604511809806426846e0L },
 };
 
-int test_acoshl(void) {
+static int test_acoshl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(acoshl_vec)/sizeof(acoshl_vec[0]); i++) {
@@ -15582,7 +15582,7 @@ int test_acoshl(void) {
 #ifndef ACOSL_PREC
 #define ACOSL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t acosl_vec[] = {
+static long_double_test_f_f_t acosl_vec[] = {
     { .line = __LINE__, .x = -1L, .y = 3.1415926535897932384626433832795028841971693993751058209749e0L },
     { .line = __LINE__, .x = -0.9L, .y = 2.6905658417935308059179987474851510579937468860908557928631e0L },
     { .line = __LINE__, .x = -0.8L, .y = 2.4980915447965088516598341545621802461556588082597934381092e0L },
@@ -15606,7 +15606,7 @@ long_double_test_f_f_t acosl_vec[] = {
     { .line = __LINE__, .x = 1L, .y = 0e-2L },
 };
 
-int test_acosl(void) {
+static int test_acosl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(acosl_vec)/sizeof(acosl_vec[0]); i++) {
@@ -15621,7 +15621,7 @@ int test_acosl(void) {
 #ifndef ASINHL_PREC
 #define ASINHL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t asinhl_vec[] = {
+static long_double_test_f_f_t asinhl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -2.9982229502979697388465955375964534766070580548773036557343e0L },
     { .line = __LINE__, .x = -9.9L, .y = -2.9882229932141514909156637228438987221019782600471707862289e0L },
     { .line = __LINE__, .x = -9.8L, .y = -2.9781225426278809231001556182686864935105028348715805953441e0L },
@@ -15825,7 +15825,7 @@ long_double_test_f_f_t asinhl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.9982229502979697388465955375964534766070580548773036557343e0L },
 };
 
-int test_asinhl(void) {
+static int test_asinhl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(asinhl_vec)/sizeof(asinhl_vec[0]); i++) {
@@ -15840,7 +15840,7 @@ int test_asinhl(void) {
 #ifndef ASINL_PREC
 #define ASINL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t asinl_vec[] = {
+static long_double_test_f_f_t asinl_vec[] = {
     { .line = __LINE__, .x = -1L, .y = -1.5707963267948966192313216916397514420985846996875529104875e0L },
     { .line = __LINE__, .x = -0.9L, .y = -1.1197695149986341866866770558453996158951621864033028823756e0L },
     { .line = __LINE__, .x = -0.8L, .y = -9.2729521800161223242851246292242880405707410857224052762173e-1L },
@@ -15864,7 +15864,7 @@ long_double_test_f_f_t asinl_vec[] = {
     { .line = __LINE__, .x = 1L, .y = 1.5707963267948966192313216916397514420985846996875529104875e0L },
 };
 
-int test_asinl(void) {
+static int test_asinl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(asinl_vec)/sizeof(asinl_vec[0]); i++) {
@@ -15879,7 +15879,7 @@ int test_asinl(void) {
 #ifndef ATANHL_PREC
 #define ATANHL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t atanhl_vec[] = {
+static long_double_test_f_f_t atanhl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = (long double) NAN },
     { .line = __LINE__, .x = -9.9L, .y = (long double) NAN },
     { .line = __LINE__, .x = -9.8L, .y = (long double) NAN },
@@ -16083,7 +16083,7 @@ long_double_test_f_f_t atanhl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = (long double) NAN },
 };
 
-int test_atanhl(void) {
+static int test_atanhl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(atanhl_vec)/sizeof(atanhl_vec[0]); i++) {
@@ -16098,7 +16098,7 @@ int test_atanhl(void) {
 #ifndef ATANL_PREC
 #define ATANL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t atanl_vec[] = {
+static long_double_test_f_f_t atanl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -1.4711276743037345918528755717617308518553063771832382624718e0L },
     { .line = __LINE__, .x = -9.9L, .y = -1.4701276746370677251863517621268103078436854426289702493803e0L },
     { .line = __LINE__, .x = -9.8L, .y = -1.4691074750318195808508839400211729940707149453676660498433e0L },
@@ -16302,7 +16302,7 @@ long_double_test_f_f_t atanl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 1.4711276743037345918528755717617308518553063771832382624718e0L },
 };
 
-int test_atanl(void) {
+static int test_atanl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(atanl_vec)/sizeof(atanl_vec[0]); i++) {
@@ -16317,7 +16317,7 @@ int test_atanl(void) {
 #ifndef CBRTL_PREC
 #define CBRTL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t cbrtl_vec[] = {
+static long_double_test_f_f_t cbrtl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -2.154434690031883721759293566519350495259344942192108582489e0L },
     { .line = __LINE__, .x = -9.9L, .y = -2.1472291690189411755683915912787666734052916252127894921821e0L },
     { .line = __LINE__, .x = -9.8L, .y = -2.1399749611301590225704020029870483759603754006997117050082e0L },
@@ -16521,7 +16521,7 @@ long_double_test_f_f_t cbrtl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.154434690031883721759293566519350495259344942192108582489e0L },
 };
 
-int test_cbrtl(void) {
+static int test_cbrtl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(cbrtl_vec)/sizeof(cbrtl_vec[0]); i++) {
@@ -16535,7 +16535,7 @@ int test_cbrtl(void) {
 #ifndef CEILL_PREC
 #define CEILL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t ceill_vec[] = {
+static long_double_test_f_f_t ceill_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10e0L },
     { .line = __LINE__, .x = -9.9L, .y = -9e0L },
     { .line = __LINE__, .x = -9.8L, .y = -9e0L },
@@ -16739,7 +16739,7 @@ long_double_test_f_f_t ceill_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10e0L },
 };
 
-int test_ceill(void) {
+static int test_ceill(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(ceill_vec)/sizeof(ceill_vec[0]); i++) {
@@ -16753,7 +16753,7 @@ int test_ceill(void) {
 #ifndef COSHL_PREC
 #define COSHL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t coshl_vec[] = {
+static long_double_test_f_f_t coshl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 1.1013232920103323139721376090437879963452061428237434970398e4L },
     { .line = __LINE__, .x = -9.9L, .y = 9.9651852442024857733678118268106103729196247408377933403114e3L },
     { .line = __LINE__, .x = -9.8L, .y = 9.0168724916400553390861235718428387262228821601875602725671e3L },
@@ -16957,7 +16957,7 @@ long_double_test_f_f_t coshl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 1.1013232920103323139721376090437879963452061428237434970398e4L },
 };
 
-int test_coshl(void) {
+static int test_coshl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(coshl_vec)/sizeof(coshl_vec[0]); i++) {
@@ -16972,7 +16972,7 @@ int test_coshl(void) {
 #ifndef COSL_PREC
 #define COSL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t cosl_vec[] = {
+static long_double_test_f_f_t cosl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -8.3907152907645245225886394782406483451993016513316854683583e-1L },
     { .line = __LINE__, .x = -9.9L, .y = -8.8919115262536105463443869868910677945996388891798987194011e-1L },
     { .line = __LINE__, .x = -9.8L, .y = -9.3042627210475351854937775208922132123520497966837464461598e-1L },
@@ -17176,7 +17176,7 @@ long_double_test_f_f_t cosl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = -8.3907152907645245225886394782406483451993016513316854683583e-1L },
 };
 
-int test_cosl(void) {
+static int test_cosl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(cosl_vec)/sizeof(cosl_vec[0]); i++) {
@@ -17191,7 +17191,7 @@ int test_cosl(void) {
 #ifndef ERFCL_PREC
 #define ERFCL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t erfcl_vec[] = {
+static long_double_test_f_f_t erfcl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 1.9999999999999999999999999999999999999999999979115124162374e0L },
     { .line = __LINE__, .x = -9.9L, .y = 1.9999999999999999999999999999999999999999999845687997859466e0L },
     { .line = __LINE__, .x = -9.8L, .y = 1.9999999999999999999999999999999999999999998882301580942854e0L },
@@ -17394,7 +17394,7 @@ long_double_test_f_f_t erfcl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.0884875837625447570007862949577886115608181193211637270119e-45L },
 };
 
-int test_erfcl(void) {
+static int test_erfcl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(erfcl_vec)/sizeof(erfcl_vec[0]); i++) {
@@ -17409,7 +17409,7 @@ int test_erfcl(void) {
 #ifndef ERFL_PREC
 #define ERFL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t erfl_vec[] = {
+static long_double_test_f_f_t erfl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -9.9999999999999999999999999999999999999999999791151241623736e-1L },
     { .line = __LINE__, .x = -9.9L, .y = -9.9999999999999999999999999999999999999999998456879978594675e-1L },
     { .line = __LINE__, .x = -9.8L, .y = -9.9999999999999999999999999999999999999999988823015809428557e-1L },
@@ -17612,7 +17612,7 @@ long_double_test_f_f_t erfl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 9.9999999999999999999999999999999999999999999791151241623736e-1L },
 };
 
-int test_erfl(void) {
+static int test_erfl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(erfl_vec)/sizeof(erfl_vec[0]); i++) {
@@ -17627,7 +17627,7 @@ int test_erfl(void) {
 #ifndef EXP10L_PREC
 #define EXP10L_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t exp10l_vec[] = {
+static long_double_test_f_f_t exp10l_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 9.9999999999999999999999999999999999999999999999999999999987e-11L },
     { .line = __LINE__, .x = -9.9L, .y = 1.2589254117941672104239541063958006060936174094669310691078e-10L },
     { .line = __LINE__, .x = -9.8L, .y = 1.5848931924611134852021013733915070132694421338250390683162e-10L },
@@ -17831,7 +17831,7 @@ long_double_test_f_f_t exp10l_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 9.9999999999999999999999999999999999999999999999999999999973e9L },
 };
 
-int test_exp10l(void) {
+static int test_exp10l(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(exp10l_vec)/sizeof(exp10l_vec[0]); i++) {
@@ -17846,7 +17846,7 @@ int test_exp10l(void) {
 #ifndef EXP2L_PREC
 #define EXP2L_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t exp2l_vec[] = {
+static long_double_test_f_f_t exp2l_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 9.765625e-4L },
     { .line = __LINE__, .x = -9.9L, .y = 1.0466537720080987931767639892806074442445162157983952963698e-3L },
     { .line = __LINE__, .x = -9.8L, .y = 1.1217757373017919988267841277128199115662606338845678764781e-3L },
@@ -18050,7 +18050,7 @@ long_double_test_f_f_t exp2l_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 1.024e3L },
 };
 
-int test_exp2l(void) {
+static int test_exp2l(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(exp2l_vec)/sizeof(exp2l_vec[0]); i++) {
@@ -18065,7 +18065,7 @@ int test_exp2l(void) {
 #ifndef EXPL_PREC
 #define EXPL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t expl_vec[] = {
+static long_double_test_f_f_t expl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 4.5399929762484851535591515560550610237918088866564969259065e-5L },
     { .line = __LINE__, .x = -9.9L, .y = 5.0174682056175302185833726590041691590389221932660253735418e-5L },
     { .line = __LINE__, .x = -9.8L, .y = 5.5451599432176981808877544465374948948247669441317910374137e-5L },
@@ -18269,7 +18269,7 @@ long_double_test_f_f_t expl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.2026465794806716516957900645284244366353512618556781074231e4L },
 };
 
-int test_expl(void) {
+static int test_expl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(expl_vec)/sizeof(expl_vec[0]); i++) {
@@ -18284,7 +18284,7 @@ int test_expl(void) {
 #ifndef EXPM1L_PREC
 #define EXPM1L_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t expm1l_vec[] = {
+static long_double_test_f_f_t expm1l_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -9.9995460007023751514846440848443944938976208191113343503067e-1L },
     { .line = __LINE__, .x = -9.9L, .y = -9.9994982531794382469781416627340995830840961077806733974623e-1L },
     { .line = __LINE__, .x = -9.8L, .y = -9.9994454840056782301819112245553462505105175233055868208958e-1L },
@@ -18488,7 +18488,7 @@ long_double_test_f_f_t expm1l_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.2025465794806716516957900645284244366353512618556781074231e4L },
 };
 
-int test_expm1l(void) {
+static int test_expm1l(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(expm1l_vec)/sizeof(expm1l_vec[0]); i++) {
@@ -18502,7 +18502,7 @@ int test_expm1l(void) {
 #ifndef FLOORL_PREC
 #define FLOORL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t floorl_vec[] = {
+static long_double_test_f_f_t floorl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10e0L },
     { .line = __LINE__, .x = -9.9L, .y = -10e0L },
     { .line = __LINE__, .x = -9.8L, .y = -10e0L },
@@ -18706,7 +18706,7 @@ long_double_test_f_f_t floorl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10e0L },
 };
 
-int test_floorl(void) {
+static int test_floorl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(floorl_vec)/sizeof(floorl_vec[0]); i++) {
@@ -18720,7 +18720,7 @@ int test_floorl(void) {
 #ifndef LGAMMAL_PREC
 #define LGAMMAL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t lgammal_vec[] = {
+static long_double_test_f_f_t lgammal_vec[] = {
     { .line = __LINE__, .x = -10L, .y = (long double) INFINITY },
     { .line = __LINE__, .x = -9.9L, .y = -1.2550625769891474199753855486670743423975266387163492012077e1L },
     { .line = __LINE__, .x = -9.8L, .y = -1.2959854063575136042320743546608392115305840335692539941565e1L },
@@ -18878,7 +18878,7 @@ long_double_test_f_f_t lgammal_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 1.2801827480081469611207717874566706164281149255663163496154e1L },
 };
 
-int test_lgammal(void) {
+static int test_lgammal(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(lgammal_vec)/sizeof(lgammal_vec[0]); i++) {
@@ -18893,7 +18893,7 @@ int test_lgammal(void) {
 #ifndef LOG10L_PREC
 #define LOG10L_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t log10l_vec[] = {
+static long_double_test_f_f_t log10l_vec[] = {
     { .line = __LINE__, .x = 1.e-1L, .y = -9.9999999999999999999999999999999999999999999999999999999984e-1L },
     { .line = __LINE__, .x = 2.e-1L, .y = -6.9897000433601880478626110527550697323181011853789145868954e-1L },
     { .line = __LINE__, .x = 3.e-1L, .y = -5.2287874528033756270497209674488469079987113580930413517012e-1L },
@@ -18996,7 +18996,7 @@ long_double_test_f_f_t log10l_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 9.9999999999999999999999999999999999999999999999999999999984e-1L },
 };
 
-int test_log10l(void) {
+static int test_log10l(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(log10l_vec)/sizeof(log10l_vec[0]); i++) {
@@ -19011,7 +19011,7 @@ int test_log10l(void) {
 #ifndef LOG1PL_PREC
 #define LOG1PL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t log1pl_vec[] = {
+static long_double_test_f_f_t log1pl_vec[] = {
     { .line = __LINE__, .x = -0.9L, .y = -2.302585092994045684017991454684364207601101488628772976033e0L },
     { .line = __LINE__, .x = -0.8L, .y = -1.6094379124341003746007593332261876395256013542685177219126e0L },
     { .line = __LINE__, .x = -0.7L, .y = -1.2039728043259359926227462177618385029536109308060235242983e0L },
@@ -19124,7 +19124,7 @@ long_double_test_f_f_t log1pl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.3978952727983705440619435779651292998217068539374171752184e0L },
 };
 
-int test_log1pl(void) {
+static int test_log1pl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(log1pl_vec)/sizeof(log1pl_vec[0]); i++) {
@@ -19139,7 +19139,7 @@ int test_log1pl(void) {
 #ifndef LOG2L_PREC
 #define LOG2L_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t log2l_vec[] = {
+static long_double_test_f_f_t log2l_vec[] = {
     { .line = __LINE__, .x = 1.e-1L, .y = -3.3219280948873623478703194294893901758648313930245806120544e0L },
     { .line = __LINE__, .x = 2.e-1L, .y = -2.3219280948873623478703194294893901758648313930245806120544e0L },
     { .line = __LINE__, .x = 3.e-1L, .y = -1.7369655941662061664165804855415736671050169853320995515987e0L },
@@ -19242,7 +19242,7 @@ long_double_test_f_f_t log2l_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 3.3219280948873623478703194294893901758648313930245806120544e0L },
 };
 
-int test_log2l(void) {
+static int test_log2l(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(log2l_vec)/sizeof(log2l_vec[0]); i++) {
@@ -19256,7 +19256,7 @@ int test_log2l(void) {
 #ifndef LOGBL_PREC
 #define LOGBL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t logbl_vec[] = {
+static long_double_test_f_f_t logbl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 3e0L },
     { .line = __LINE__, .x = -9.9L, .y = 3e0L },
     { .line = __LINE__, .x = -9.8L, .y = 3e0L },
@@ -19460,7 +19460,7 @@ long_double_test_f_f_t logbl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 3e0L },
 };
 
-int test_logbl(void) {
+static int test_logbl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(logbl_vec)/sizeof(logbl_vec[0]); i++) {
@@ -19474,7 +19474,7 @@ int test_logbl(void) {
 #ifndef LOGL_PREC
 #define LOGL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t logl_vec[] = {
+static long_double_test_f_f_t logl_vec[] = {
     { .line = __LINE__, .x = 1.e-1L, .y = -2.302585092994045684017991454684364207601101488628772976033e0L },
     { .line = __LINE__, .x = 2.e-1L, .y = -1.6094379124341003746007593332261876395256013542685177219126e0L },
     { .line = __LINE__, .x = 3.e-1L, .y = -1.2039728043259359926227462177618385029536109308060235242983e0L },
@@ -19577,7 +19577,7 @@ long_double_test_f_f_t logl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 2.302585092994045684017991454684364207601101488628772976033e0L },
 };
 
-int test_logl(void) {
+static int test_logl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(logl_vec)/sizeof(logl_vec[0]); i++) {
@@ -19591,7 +19591,7 @@ int test_logl(void) {
 #ifndef NEARBYINTL_PREC
 #define NEARBYINTL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t nearbyintl_vec[] = {
+static long_double_test_f_f_t nearbyintl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10e0L },
     { .line = __LINE__, .x = -9.9L, .y = -10e0L },
     { .line = __LINE__, .x = -9.8L, .y = -10e0L },
@@ -19795,7 +19795,7 @@ long_double_test_f_f_t nearbyintl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10e0L },
 };
 
-int test_nearbyintl(void) {
+static int test_nearbyintl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(nearbyintl_vec)/sizeof(nearbyintl_vec[0]); i++) {
@@ -19808,7 +19808,7 @@ int test_nearbyintl(void) {
 #ifndef RINTL_PREC
 #define RINTL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t rintl_vec[] = {
+static long_double_test_f_f_t rintl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10e0L },
     { .line = __LINE__, .x = -9.9L, .y = -10e0L },
     { .line = __LINE__, .x = -9.8L, .y = -10e0L },
@@ -20012,7 +20012,7 @@ long_double_test_f_f_t rintl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10e0L },
 };
 
-int test_rintl(void) {
+static int test_rintl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(rintl_vec)/sizeof(rintl_vec[0]); i++) {
@@ -20025,7 +20025,7 @@ int test_rintl(void) {
 #ifndef ROUNDL_PREC
 #define ROUNDL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t roundl_vec[] = {
+static long_double_test_f_f_t roundl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10e0L },
     { .line = __LINE__, .x = -9.9L, .y = -10e0L },
     { .line = __LINE__, .x = -9.8L, .y = -10e0L },
@@ -20229,7 +20229,7 @@ long_double_test_f_f_t roundl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10e0L },
 };
 
-int test_roundl(void) {
+static int test_roundl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(roundl_vec)/sizeof(roundl_vec[0]); i++) {
@@ -20243,7 +20243,7 @@ int test_roundl(void) {
 #ifndef SINHL_PREC
 #define SINHL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t sinhl_vec[] = {
+static long_double_test_f_f_t sinhl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -1.1013232874703393377236524554846364402901451190319346103833e4L },
     { .line = __LINE__, .x = -9.9L, .y = -9.9651851940278037171925096409768837828779331504485714076516e3L },
     { .line = __LINE__, .x = -9.8L, .y = -9.0168724361884559069091417629652942608479332119398908312492e3L },
@@ -20447,7 +20447,7 @@ long_double_test_f_f_t sinhl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 1.1013232874703393377236524554846364402901451190319346103833e4L },
 };
 
-int test_sinhl(void) {
+static int test_sinhl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(sinhl_vec)/sizeof(sinhl_vec[0]); i++) {
@@ -20462,7 +20462,7 @@ int test_sinhl(void) {
 #ifndef SINL_PREC
 #define SINL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t sinl_vec[] = {
+static long_double_test_f_f_t sinl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = 5.4402111088936981340474766185137728168364301291622389157411e-1L },
     { .line = __LINE__, .x = -9.9L, .y = 4.5753589377532104441381810750536392603046467184221820312356e-1L },
     { .line = __LINE__, .x = -9.8L, .y = 3.6647912925192774816925294872885630023718088574956288705826e-1L },
@@ -20666,7 +20666,7 @@ long_double_test_f_f_t sinl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = -5.4402111088936981340474766185137728168364301291622389157411e-1L },
 };
 
-int test_sinl(void) {
+static int test_sinl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(sinl_vec)/sizeof(sinl_vec[0]); i++) {
@@ -20680,7 +20680,7 @@ int test_sinl(void) {
 #ifndef SQRTL_PREC
 #define SQRTL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t sqrtl_vec[] = {
+static long_double_test_f_f_t sqrtl_vec[] = {
     { .line = __LINE__, .x = 0L, .y = 0e-2L },
     { .line = __LINE__, .x = 1.e-1L, .y = 3.1622776601683793319988935444327185337195551393252168268575e-1L },
     { .line = __LINE__, .x = 2.e-1L, .y = 4.4721359549995793928183473374625524708812367192230514485417e-1L },
@@ -20784,7 +20784,7 @@ long_double_test_f_f_t sqrtl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 3.162277660168379331998893544432718533719555139325216826857e0L },
 };
 
-int test_sqrtl(void) {
+static int test_sqrtl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(sqrtl_vec)/sizeof(sqrtl_vec[0]); i++) {
@@ -20798,7 +20798,7 @@ int test_sqrtl(void) {
 #ifndef TANHL_PREC
 #define TANHL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t tanhl_vec[] = {
+static long_double_test_f_f_t tanhl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -9.9999999587769276361959283713827574105081461849501996226134e-1L },
     { .line = __LINE__, .x = -9.9L, .y = -9.9999999496500257379903987281217437607041538764370858608536e-1L },
     { .line = __LINE__, .x = -9.8L, .y = -9.9999999385024025973655134688928234356327454810824244198416e-1L },
@@ -21002,7 +21002,7 @@ long_double_test_f_f_t tanhl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 9.9999999587769276361959283713827574105081461849501996226134e-1L },
 };
 
-int test_tanhl(void) {
+static int test_tanhl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(tanhl_vec)/sizeof(tanhl_vec[0]); i++) {
@@ -21017,7 +21017,7 @@ int test_tanhl(void) {
 #ifndef TANL_PREC
 #define TANL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t tanl_vec[] = {
+static long_double_test_f_f_t tanl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -6.4836082745908667125912493300980867681687434298372497563357e-1L },
     { .line = __LINE__, .x = -9.9L, .y = -5.1455290847691621531505744308784898596094490330157028066474e-1L },
     { .line = __LINE__, .x = -9.8L, .y = -3.9388304075174170678789695740797031133210669099356337307926e-1L },
@@ -21221,7 +21221,7 @@ long_double_test_f_f_t tanl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 6.4836082745908667125912493300980867681687434298372497563357e-1L },
 };
 
-int test_tanl(void) {
+static int test_tanl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(tanl_vec)/sizeof(tanl_vec[0]); i++) {
@@ -21236,7 +21236,7 @@ int test_tanl(void) {
 #ifndef TGAMMAL_PREC
 #define TGAMMAL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t tgammal_vec[] = {
+static long_double_test_f_f_t tgammal_vec[] = {
     { .line = __LINE__, .x = -10L, .y = (long double) NAN },
     { .line = __LINE__, .x = -9.9L, .y = 3.5426845530808342626702547702097053513062563719644253973003e-6L },
     { .line = __LINE__, .x = -9.8L, .y = 2.3529185514768193697563065389025643905738532727360082716453e-6L },
@@ -21440,7 +21440,7 @@ long_double_test_f_f_t tgammal_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 3.6287999999999999999999999999999999999999999999999999999992e5L },
 };
 
-int test_tgammal(void) {
+static int test_tgammal(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(tgammal_vec)/sizeof(tgammal_vec[0]); i++) {
@@ -21454,7 +21454,7 @@ int test_tgammal(void) {
 #ifndef TRUNCL_PREC
 #define TRUNCL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_f_t truncl_vec[] = {
+static long_double_test_f_f_t truncl_vec[] = {
     { .line = __LINE__, .x = -10L, .y = -10e0L },
     { .line = __LINE__, .x = -9.9L, .y = -9e0L },
     { .line = __LINE__, .x = -9.8L, .y = -9e0L },
@@ -21658,7 +21658,7 @@ long_double_test_f_f_t truncl_vec[] = {
     { .line = __LINE__, .x = 10L, .y = 10e0L },
 };
 
-int test_truncl(void) {
+static int test_truncl(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(truncl_vec)/sizeof(truncl_vec[0]); i++) {
@@ -21672,7 +21672,7 @@ int test_truncl(void) {
 #ifndef FMAL_PREC
 #define FMAL_PREC DEFAULT_PREC
 #endif
-long_double_test_f_fff_t fmal_vec[] = {
+static long_double_test_f_fff_t fmal_vec[] = {
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .x2 = -4L, .y = 1.2e1L },
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .x2 = -3.4L, .y = 1.2599999999999999999999999999999999999999999999999999999998e1L },
     { .line = __LINE__, .x0 = -4L, .x1 = -4L, .x2 = -2.8L, .y = 1.3199999999999999999999999999999999999999999999999999999999e1L },
@@ -24419,7 +24419,7 @@ long_double_test_f_fff_t fmal_vec[] = {
     { .line = __LINE__, .x0 = 3.8L, .x1 = 3.8L, .x2 = 3.8L, .y = 1.8239999999999999999999999999999999999999999999999999999996e1L },
 };
 
-int test_fmal(void) {
+static int test_fmal(void) {
     unsigned int i;
     int result = 0;
     for (i = 0; i < sizeof(fmal_vec)/sizeof(fmal_vec[0]); i++) {
@@ -24429,7 +24429,7 @@ int test_fmal(void) {
     return result;
 }
 #endif /* FULL_LONG_DOUBLE */
-long_double_test_t long_double_tests[] = {
+static long_double_test_t long_double_tests[] = {
 #ifdef FULL_LONG_DOUBLE
     { .name = "acoshl", .test = test_acoshl },
 #endif /* FULL_LONG_DOUBLE */

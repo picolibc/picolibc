@@ -1,6 +1,7 @@
 #!/bin/sh
 set -e
 HERE=`dirname "$0"`
+"$HERE"/do-zephyr-test aarch64-zephyr "$@"
 "$HERE"/do-zephyr-test arc "$@"
 "$HERE"/do-zephyr-test arc64 "$@"
 "$HERE"/do-zephyr-build microblazeel "$@"

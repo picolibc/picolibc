@@ -15,6 +15,8 @@ IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
+#include <picolibc.h>
+
 #define divnorm(num, den, sign) 		\
 {						\
   if (num < 0) 					\
@@ -127,6 +129,8 @@ __udivsi3 (unsigned long numerator, unsigned long denominator)
 
 
 
+
+#include <picolibc.h>
 
 #ifdef TEST
 

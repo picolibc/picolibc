@@ -32,7 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* wctrans constants */
 
-#include <_ansi.h>
 #include "../locale/setlocale.h"
 
 /* valid values for wctrans_t */
@@ -62,13 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
    * for towupper and towlower, the result must be back-transformed
      into the respective locale encoding; currently NOT IMPLEMENTED
 */
-#ifdef __CYGWIN__
-/* Under Cygwin, wchar_t (or its extension wint_t) is Unicode */
-#define _jp2uc(c) (c)
-#define _jp2uc_l(c, l) (c)
-#define _uc2jp_l(c, l) (c)
-#else
 wint_t _jp2uc (wint_t);
 wint_t _jp2uc_l (wint_t, struct __locale_t *);
 wint_t _uc2jp_l (wint_t, struct __locale_t *);
-#endif

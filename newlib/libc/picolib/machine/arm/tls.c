@@ -2,6 +2,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Stephen Street
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -42,7 +43,7 @@
  * refer to it in an asm statement
  */
 #ifndef ARM_TLS_CP15
-void *__tls;
+extern void *__tls[];
 #endif
 
 /* The size of the thread control block.
@@ -59,9 +60,15 @@ extern char __arm32_tls_tcb_offset;
 void
 _set_tls(void *tls)
 {
+        tls = (uint8_t *) tls - TP_OFFSET;
 #ifdef ARM_TLS_CP15
-	__asm__("mcr p15, 0, %0, cr13, cr0, 3" : : "r" (tls - TP_OFFSET));
+	__asm__("mcr p15, 0, %0, cr13, cr0, 3" : : "r" (tls));
 #else
-	__tls = (uint8_t *) tls - TP_OFFSET;
+#ifdef ARM_RP2040
+        uint32_t cpuid = *(uint32_t *)0xd0000000;
+        __tls[cpuid] = tls;
+#else
+	__tls[0] = tls;
+#endif
 #endif
 }

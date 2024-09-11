@@ -31,7 +31,7 @@
 #ifndef __SYS_ICONVNLS_H__
 #define __SYS_ICONVNLS_H__
 
-#include <_ansi.h>
+#include <sys/cdefs.h>
 #include <wchar.h>
 #include <iconv.h>
 

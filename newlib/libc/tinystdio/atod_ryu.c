@@ -67,10 +67,12 @@ FLOAT64
 __atod_engine(uint64_t m10, int e10)
 {
 #ifdef RYU_DEBUG
-    printf("m10 = %ld\n", m10);
+    printf("m10 = %lu\n", m10);
     printf("e10 = %d\n", e10);
     printf("m10 * 10^e10 = %" PRIu64 " * 10^%d\n", m10, e10);
 #endif
+#define signedM 0
+#define RYU_OPTIMIZE_SIZE
 
     // Convert to binary float m2 * 2^e2, while retaining information about whether the conversion
     // was exact (trailingZeros).
@@ -93,10 +95,14 @@ __atod_engine(uint64_t m10, int e10)
 	// To that end, we use the DOUBLE_POW5_SPLIT table.
 	int j = e2 - e10 - ceil_log2pow5(e10) + DOUBLE_POW5_BITCOUNT;
 	assert(j >= 0);
+#if defined(RYU_OPTIMIZE_SIZE)
 	uint64_t pow5[2];
 	__double_computePow5(e10, pow5);
 	m2 = mulShift64(m10, pow5, j);
-
+#else
+	assert(e10 < DOUBLE_POW5_TABLE_SIZE);
+	m2 = mulShift64(m10, DOUBLE_POW5_SPLIT[e10], j);
+#endif
 	// We also compute if the result is exact, i.e.,
 	//   [m10 * 10^e10 / 2^e2] == m10 * 10^e10 / 2^e2.
 	// This can only be the case if 2^e2 divides m10 * 10^e10, which in turn requires that the
@@ -106,17 +112,19 @@ __atod_engine(uint64_t m10, int e10)
     } else {
 	e2 = floor_log2(m10) + e10 - ceil_log2pow5(-e10) - (DOUBLE_MANTISSA_BITS + 1);
 	int j = e2 - e10 + ceil_log2pow5(-e10) - 1 + DOUBLE_POW5_INV_BITCOUNT;
+#if defined(RYU_OPTIMIZE_SIZE)
 	uint64_t pow5[2];
 	__double_computeInvPow5(-e10, pow5);
 	m2 = mulShift64(m10, pow5, j);
-	trailingZeros = multipleOfPowerOf5(m10, -e10);
-#ifdef RYU_DEBUG
-	printf("pow5 %016lx_%016lx j %d trailingZeros %d\n", pow5[0], pow5[1], j, trailingZeros);
+#else
+	assert(-e10 < DOUBLE_POW5_INV_TABLE_SIZE);
+	m2 = mulShift64(m10, DOUBLE_POW5_INV_SPLIT[-e10], j);
 #endif
+	trailingZeros = multipleOfPowerOf5(m10, -e10);
     }
 
 #ifdef RYU_DEBUG
-    printf("m2 * 2^e2 = %" PRIu64 " * 2^%d\n", m2, e2);
+    printf("m2 * 2^e2 = 0x%" PRIx64 " * 2^%d\n", m2, e2);
 #endif
 
     // Compute the final IEEE exponent.
@@ -124,7 +132,7 @@ __atod_engine(uint64_t m10, int e10)
 
     if (ieee_e2 > 0x7fe) {
 	// Final IEEE exponent is larger than the maximum representable; return +/-Infinity.
-	uint64_t ieee = (0x7ffull << DOUBLE_MANTISSA_BITS);
+	uint64_t ieee = (((uint64_t) signedM) << (DOUBLE_EXPONENT_BITS + DOUBLE_MANTISSA_BITS)) | (0x7ffull << DOUBLE_MANTISSA_BITS);
 	return int64Bits2Double(ieee);
     }
 
@@ -137,7 +145,7 @@ __atod_engine(uint64_t m10, int e10)
     printf("ieee_e2 = %d\n", ieee_e2);
     printf("shift = %d\n", shift);
 #endif
-  
+
     // We need to round up if the exact value is more than 0.5 above the value we computed. That's
     // equivalent to checking if the last removed bit was 1 and either the value was not just
     // trailing zeros or the result would otherwise be odd.
@@ -149,7 +157,7 @@ __atod_engine(uint64_t m10, int e10)
 
 #ifdef RYU_DEBUG
     printf("roundUp = %d\n", roundUp);
-    printf("ieee_m2 = %" PRIu64 "\n", (m2 >> shift) + roundUp);
+    printf("ieee_m2 = 0x%" PRIx64 "\n", (m2 >> shift) + roundUp);
 #endif
     uint64_t ieee_m2 = (m2 >> shift) + roundUp;
     assert(ieee_m2 <= (1ull << (DOUBLE_MANTISSA_BITS + 1)));
@@ -158,7 +166,8 @@ __atod_engine(uint64_t m10, int e10)
 	// Due to how the IEEE represents +/-Infinity, we don't need to check for overflow here.
 	ieee_e2++;
     }
-    uint64_t ieee = (((uint64_t)ieee_e2) << DOUBLE_MANTISSA_BITS) | ieee_m2;
+
+    uint64_t ieee = (((((uint64_t) signedM) << DOUBLE_EXPONENT_BITS) | (uint64_t)ieee_e2) << DOUBLE_MANTISSA_BITS) | ieee_m2;
     return int64Bits2Double(ieee);
 }
 

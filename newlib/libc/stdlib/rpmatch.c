@@ -51,7 +51,7 @@ No supporting OS subroutines are required.
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
+#define _DEFAULT_SOURCE
 #include <sys/types.h>
 
 #include <langinfo.h>
