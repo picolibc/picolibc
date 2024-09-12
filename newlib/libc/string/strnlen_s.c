@@ -34,6 +34,7 @@
  */
 #define __STDC_WANT_LIB_EXT1__ 1
 #include <string.h>
+#include <stddef.h>
 #include "string_private.h"
 
 size_t
@@ -50,8 +51,8 @@ strnlen_s(const char *s, size_t maxsize)
         if (s_end == NULL) {
             rtn = maxsize;
         } else {
-            int s_size;
-            s_size = s_end - (const void *)s;
+            ptrdiff_t s_size;
+            s_size = (const char *) s_end - s;
             rtn = (size_t)s_size;
         }
     }
