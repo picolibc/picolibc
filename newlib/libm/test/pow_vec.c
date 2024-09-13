@@ -154,5 +154,8 @@
 {64, 0,123,__LINE__, 0x792ffffe, 0x0bc9e399, 0x3ff00000, 0x2c5e2e99, 0x41ec9eee, 0x35374af6},
 {64, 0,123,__LINE__, 0x18bfffff, 0xec16bafd, 0x3fefffff, 0xd2e3e669, 0x41f344c9, 0x823eb66c},
 
+/* x -1.1 y 101. float result is -15158.707 */
+{64, 0,123,__LINE__, 0xc0cd9b5a, 0x770b46a4, 0xbff19999, 0xa0000000, 0x40594000, 0x00000000},
+
 {0},};
 void test_pow_vec(int m)   {run_vector_1(m,pow_vec,(char *)(pow),"pow","ddd");   }
