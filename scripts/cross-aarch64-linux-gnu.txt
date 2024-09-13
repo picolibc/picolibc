@@ -20,6 +20,7 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
+need_exe_wrapper = true
 link_spec = '--build-id=none --no-warn-rwx-segments'
 specs_extra = ['*libgcc:', '-lgcc']
 default_flash_addr = '0x40000000'
