@@ -49,7 +49,7 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n ? n - 1 : 0);
 
 	va_start(ap, fmt);
-	i = vfprintf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfprintf)(&f.file, fmt, ap);
 	va_end(ap);
 
 	if (n)

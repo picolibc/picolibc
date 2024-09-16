@@ -43,7 +43,7 @@ asprintf(char **strp, const char *fmt, ...)
 	int i;
 
 	va_start(ap, fmt);
-	i = vfprintf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfprintf)(&f.file, fmt, ap);
 	va_end(ap);
 	if (i >= 0) {
                 char *buf = f.end - f.size;

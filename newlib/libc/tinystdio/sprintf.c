@@ -39,7 +39,7 @@ sprintf(char *s, const char *fmt, ...)
 	int i;
 
 	va_start(ap, fmt);
-	i = vfprintf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfprintf)(&f.file, fmt, ap);
 	va_end(ap);
 	if (i >= 0)
 		s[i] = 0;

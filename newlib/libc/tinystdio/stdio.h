@@ -530,16 +530,14 @@ __printf_float(float f)
 static inline void __flockfile(FILE *f) {
 	(void) f;
 #ifdef _WANT_FLOCKFILE
-	if (f->lock)
-		__lock_acquire_recursive(f->lock);
+	__lock_acquire_recursive(f->lock);
 #endif
 }
 
 static inline void __funlockfile(FILE *f) {
 	(void) f;
 #ifdef _WANT_FLOCKFILE
-	if (f->lock)
-		__lock_release_recursive(f->lock);
+	__lock_release_recursive(f->lock);
 #endif
 }
 

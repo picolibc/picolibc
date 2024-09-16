@@ -29,7 +29,6 @@
 
 #include "stdio_private.h"
 
-FILE_FN_UNLOCKED_SPECIFIER
 wchar_t *
 FILE_FN_UNLOCKED(fgetws)(wchar_t *str, int size, FILE *stream)
 {

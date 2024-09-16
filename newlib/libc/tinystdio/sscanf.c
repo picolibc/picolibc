@@ -38,7 +38,7 @@ sscanf(const char *s, const char *fmt, ...)
 	int i;
 	struct __file_str f = FDEV_SETUP_STRING_READ(s);
 	va_start(ap, fmt);
-	i = vfscanf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfscanf)(&f.file, fmt, ap);
 	va_end(ap);
 
 	return i;

@@ -235,6 +235,22 @@ int FILE_FN_UNLOCKED(fseek)(FILE *stream, long offset, int whence);
 int FILE_FN_UNLOCKED(fseeko)(FILE *stream, off_t offset, int whence);
 void FILE_FN_UNLOCKED(clearerr)(FILE *stream);
 
+int FILE_FN_UNLOCKED(vfwprintf)(FILE * stream, const wchar_t *fmt, va_list ap_orig);
+int	FILE_FN_UNLOCKED(vfprintf)(FILE * stream, const char *fmt, va_list ap_orig)     __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int FILE_FN_UNLOCKED(__d_vfprintf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int FILE_FN_UNLOCKED(__f_vfprintf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int FILE_FN_UNLOCKED(__i_vfprintf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int FILE_FN_UNLOCKED(__l_vfprintf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int FILE_FN_UNLOCKED(__m_vfprintf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+
+int	FILE_FN_UNLOCKED(vfwscanf)(FILE * stream, const wchar_t *fmt, va_list ap_orig);
+int	FILE_FN_UNLOCKED(vfscanf)(FILE * stream, const char *fmt, va_list ap_orig)     __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int FILE_FN_UNLOCKED(__d_vfscanf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int FILE_FN_UNLOCKED(__f_vfscanf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int FILE_FN_UNLOCKED(__i_vfscanf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int FILE_FN_UNLOCKED(__l_vfscanf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int FILE_FN_UNLOCKED(__m_vfscanf)(FILE * stream, const char *fmt, va_list ap_orig) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+
 #else
 #define FILE_FN_UNLOCKED_SPECIFIER
 #define FILE_FN_UNLOCKED(_fn) _fn

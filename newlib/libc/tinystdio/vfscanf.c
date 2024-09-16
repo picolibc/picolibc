@@ -567,7 +567,8 @@ skip_to_arg(my_va_list *ap, int target_argno)
      -Wl,-u,vfscanf -lscanf_min -lm
      \endcode
 */
-int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
+int
+FILE_FN_UNLOCKED(vfscanf) (FILE * stream, const CHAR *fmt, va_list ap_orig)
 {
     unsigned char nconvs;
     UCHAR c;
@@ -852,6 +853,18 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
     return nconvs ? nconvs : EOF;
 }
+
+#ifdef _WANT_FLOCKFILE
+int
+vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(vfscanf)(stream, fmt, ap_orig);
+    __funlockfile(stream);
+    return ret;
+}
+#endif
 
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE

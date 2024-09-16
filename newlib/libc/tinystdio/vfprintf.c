@@ -477,7 +477,6 @@ _wcslen(const char *s, size_t maxlen)
 }
 #endif
 
-FILE_FN_UNLOCKED_SPECIFIER
 int
 FILE_FN_UNLOCKED(vfprintf)(FILE * stream, const CHAR *fmt, va_list ap_orig)
 {

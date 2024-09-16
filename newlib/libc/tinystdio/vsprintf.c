@@ -37,7 +37,7 @@ vsprintf(char *s, const char *fmt, va_list ap)
 	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, INT_MAX);
 	int i;
 
-	i = vfprintf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfprintf)(&f.file, fmt, ap);
 	if (i >= 0)
 		s[i] = 0;
 
