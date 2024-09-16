@@ -31,27 +31,35 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 int
-fputs(const char *str, FILE *stream)
+FILE_FN_UNLOCKED(fputs)(const char *str, FILE *stream)
 {
         int (*put)(char, struct __file *);
 	char c;
-	int ret = EOF;
 
-	__flockfile(stream);
 	if ((stream->flags & __SWR) == 0)
-		goto fail;
+		return EOF;
 
         put = stream->put;
 
 	while ((c = *str++) != '\0')
                 if (put(c, stream) < 0) {
                         stream->flags |= __SERR;
-			goto fail;
+			return EOF;
                 }
 
-	ret = 0;
-fail:
-	__funlockfile(stream);
-	return ret;
+	return 0;
 }
+
+#if defined(_WANT_FLOCKFILE)
+int
+fputs(const char *str, FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fputs)(str, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

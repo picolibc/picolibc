@@ -31,33 +31,39 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 int
-puts(const char *str)
+FILE_FN_UNLOCKED(puts)(const char *str)
 {
         int (*put)(char, struct __file *);
 	char c;
-	int ret = EOF;
         FILE *out = stdout;
 
-	__flockfile(out);
-
 	if ((out->flags & __SWR) == 0)
-		goto exit;
+		return EOF;
 
         put = out->put;
 	while ((c = *str++) != '\0')
 		if (put(c, out) < 0)
-			goto flag_exit;
+			goto fail;
 
 	if (put('\n', out) < 0)
-		goto flag_exit;
+		goto fail;
 
-	ret = 0;
-	goto exit;
-
-flag_exit:
-	out->flags |= __SERR;
-exit:
-	__funlockfile(out);
-	return ret;
+	return 0;
+fail:
+        out->flags |= __SERR;
+        return EOF;
 }
+
+#if defined(_WANT_FLOCKFILE)
+int
+puts(const char *str)
+{
+    int ret;
+    __flockfile(stdout);
+    ret = FILE_FN_UNLOCKED(puts)(str);
+    __funlockfile(stdout);
+    return ret;
+}
+#endif
