@@ -300,6 +300,7 @@ __bufio_close(FILE *f)
                 free(bf->buf);
 
 	__bufio_lock_close(f);
+	__flockfile_close(f);
 
         /*
          * Don't close the fd or free the FILE for things not
