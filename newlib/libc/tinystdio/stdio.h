@@ -527,6 +527,37 @@ __printf_float(float f)
 # endif
 #endif
 
+static inline void __flockfile(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	if (f->lock)
+		__lock_acquire_recursive(f->lock);
+#endif
+}
+
+static inline void __funlockfile(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	if (f->lock)
+		__lock_release_recursive(f->lock);
+#endif
+}
+
+static inline void __flockfile_init(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	__lock_init_recursive(f->lock);
+#endif
+}
+
+static inline void __flockfile_close(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+    __lock_release(f->lock);
+	__lock_close(f->lock);
+#endif
+}
+
 _END_STD_C
 
 #if __SSP_FORTIFY_LEVEL > 0
