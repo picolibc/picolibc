@@ -29,6 +29,7 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 wchar_t *
 FILE_FN_UNLOCKED(fgetws)(wchar_t *str, int size, FILE *stream)
 {
@@ -49,7 +50,7 @@ FILE_FN_UNLOCKED(fgetws)(wchar_t *str, int size, FILE *stream)
 	return str;
 }
 
-#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+#if defined(_WANT_FLOCKFILE)
 wchar_t *
 fgetws(wchar_t *str, int size, FILE *stream)
 {

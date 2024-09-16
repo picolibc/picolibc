@@ -44,7 +44,7 @@ FILE_FN_UNLOCKED(fflush)(FILE *stream)
 	return 0;
 }
 
-#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+#if defined(_WANT_FLOCKFILE)
 int
 fflush(FILE *stream)
 {

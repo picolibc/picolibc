@@ -39,7 +39,7 @@ FILE_FN_UNLOCKED(clearerr)(FILE *stream)
 	stream->flags &= ~(__SERR | __SEOF);
 }
 
-#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+#if defined(_WANT_FLOCKFILE)
 void
 clearerr(FILE *stream)
 {

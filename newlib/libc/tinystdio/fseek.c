@@ -56,7 +56,7 @@ FILE_FN_UNLOCKED(FSEEK)(FILE *stream, FSEEK_TYPE offset, int whence)
 	return -1;
 }
 
-#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+#if defined(_WANT_FLOCKFILE)
 int
 FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
 {

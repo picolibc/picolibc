@@ -51,7 +51,7 @@ FILE_FN_UNLOCKED(ungetc)(int c, FILE *stream)
 	return (unsigned char) c;
 }
 
-#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+#if defined(_WANT_FLOCKFILE)
 int
 ungetc(int c, FILE *stream)
 {

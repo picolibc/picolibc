@@ -55,7 +55,7 @@ FILE_FN_UNLOCKED(FTELL)(FILE *stream)
 	return -1;
 }
 
-#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+#if defined(_WANT_FLOCKFILE)
 FTELL_TYPE
 FTELL(FILE *stream)
 {

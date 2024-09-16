@@ -49,7 +49,7 @@ FILE_FN_UNLOCKED(ungetwc)(wint_t c, FILE *stream)
 	return c;
 }
 
-#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+#if defined(_WANT_FLOCKFILE)
 wint_t
 ungetwc(wint_t c, FILE *stream)
 {
