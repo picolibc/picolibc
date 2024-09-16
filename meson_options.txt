@@ -184,7 +184,7 @@ option('fast-bufio', type: 'boolean', value: false,
 option('io-wchar', type: 'boolean', value: false,
        description: 'enable wide character support in printf/scanf even when newlib-mb is false')
 option('flockfile', type: 'boolean', value: false,
-       description: 'enable thread-safe mode for stream functions')
+       description: 'Use atomic i/o stream functions')
 
 #
 # Options applying to only legacy stdio
