@@ -43,7 +43,13 @@
 #ifdef _FORMAT_DEFAULT_FLOAT
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __f_vfscanf);
+#ifdef _WANT_FLOCKFILE
+__strong_reference(FILE_FN_UNLOCKED(vfscanf), FILE_FN_UNLOCKED(__f_vfscanf));
+#endif
 #else
 int __f_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
+#ifdef _WANT_FLOCKFILE
+int FILE_FN_UNLOCKED(__f_vfscanf) (FILE * stream, const char *fmt, va_list ap) { return FILE_FN_UNLOCKED(vfscanf)(stream, fmt, ap); }
+#endif
 #endif
 #endif

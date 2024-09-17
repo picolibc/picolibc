@@ -869,7 +869,13 @@ vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __d_vfscanf);
+#ifdef _WANT_FLOCKFILE
+__strong_reference(FILE_FN_UNLOCKED(vfscanf), FILE_FN_UNLOCKED(__d_vfscanf));
+#endif
 #else
 int __d_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
+#ifdef _WANT_FLOCKFILE
+int FILE_FN_UNLOCKED(__d_vfscanf) (FILE * stream, const char *fmt, va_list ap) { return FILE_FN_UNLOCKED(vfscanf)(stream, fmt, ap); }
+#endif
 #endif
 #endif
