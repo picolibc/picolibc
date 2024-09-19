@@ -45,7 +45,6 @@ inc_machine_headers_all = [
   'malloc.h',
   'math.h',
   'param.h',
-  'setjmp-dj.h',
   'setjmp.h',
   'stdlib.h',
   'termios.h',
