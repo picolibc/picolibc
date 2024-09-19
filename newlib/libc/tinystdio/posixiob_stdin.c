@@ -46,5 +46,6 @@ __weak_reference(__posix_stdin,stdin);
 __attribute__((constructor))
 static void posix_init(void)
 {
+    __flockfile_init(&__stdin.xfile.cfile.file);
     __bufio_lock_init(&__stdin.xfile.cfile.file);
 }

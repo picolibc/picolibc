@@ -31,8 +31,9 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 int
-puts(const char *str)
+FILE_FN_UNLOCKED(puts)(const char *str)
 {
         int (*put)(char, struct __file *);
 	char c;
@@ -54,3 +55,15 @@ fail:
         out->flags |= __SERR;
         return EOF;
 }
+
+#if defined(_WANT_FLOCKFILE)
+int
+puts(const char *str)
+{
+    int ret;
+    __flockfile(stdout);
+    ret = FILE_FN_UNLOCKED(puts)(str);
+    __funlockfile(stdout);
+    return ret;
+}
+#endif

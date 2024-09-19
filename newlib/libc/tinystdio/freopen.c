@@ -38,22 +38,25 @@
 FILE *
 freopen(const char *pathname, const char *mode, FILE *stream)
 {
+	FILE *ret = NULL;
 	struct __file_bufio *pf = (struct __file_bufio *) stream;
 	int fd;
 	int stdio_flags;
 	int open_flags;
 
-        /* Can't reopen FILEs which aren't buffered */
-        if (!(stream->flags & __SBUF))
-            return NULL;
-
 	stdio_flags = __posix_sflags(mode, &open_flags);
 	if (stdio_flags == 0)
 		return NULL;
 
+	__flockfile(stream);
+
+	/* Can't reopen FILEs which aren't buffered */
+	if (!(stream->flags & __SBUF))
+		goto exit;
+
 	fd = open(pathname, open_flags, 0666);
 	if (fd < 0)
-		return NULL;
+		goto exit;
 
         fflush(stream);
 
@@ -70,7 +73,9 @@ freopen(const char *pathname, const char *mode, FILE *stream)
         pf->lseek_int = lseek;
         pf->close_int = close;
 
-        __bufio_unlock(stream);
+	__bufio_unlock(stream);
 
-        return stream;
+exit:
+	__funlockfile(stream);
+	return ret;
 }

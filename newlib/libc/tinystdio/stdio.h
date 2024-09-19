@@ -45,6 +45,7 @@
 #include <stddef.h>
 #define __need___va_list
 #include <stdarg.h>
+#include <sys/lock.h>
 #include <sys/_types.h>
 
 _BEGIN_STD_C
@@ -93,6 +94,9 @@ struct __file {
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
+#ifdef _WANT_FLOCKFILE
+	_LOCK_RECURSIVE_T lock;
+#endif
 };
 
 /*
@@ -161,13 +165,25 @@ extern FILE *const stderr;
 #define	_IOLBF	1		/* setvbuf should set line buffered */
 #define	_IONBF	2		/* setvbuf should set unbuffered */
 
-#define fdev_setup_stream(stream, p, g, fl, f)	\
+#ifdef _WANT_FLOCKFILE
+# define fdev_setup_stream(stream, p, g, fl, f)	\
+	do { \
+		(stream)->flags = f; \
+		(stream)->put = p; \
+		(stream)->get = g; \
+		(stream)->flush = fl; \
+		__flockfile_init((stream)); \
+	} while(0)
+
+#else
+# define fdev_setup_stream(stream, p, g, fl, f)	\
 	do { \
 		(stream)->flags = f; \
 		(stream)->put = p; \
 		(stream)->get = g; \
 		(stream)->flush = fl; \
 	} while(0)
+#endif
 
 #define _FDEV_SETUP_READ  __SRD	/**< fdev_setup_stream() with read intent */
 #define _FDEV_SETUP_WRITE __SWR	/**< fdev_setup_stream() with write intent */
@@ -369,16 +385,18 @@ FILE	*funopen (const void *cookie,
 
 #if __POSIX_VISIBLE >= 199309L
 int	getc_unlocked (FILE *);
+int	fgetc_unlocked (FILE *);
 int	getchar_unlocked (void);
 void	flockfile (FILE *);
 int	ftrylockfile (FILE *);
 void	funlockfile (FILE *);
 int	putc_unlocked (int, FILE *);
+int	fputc_unlocked (int, FILE *);
 int	putchar_unlocked (int);
-#define getc_unlocked(f) fgetc(f)
-#define getchar_unlocked(f) fgetc(stdin)
-#define putc_unlocked(c, f) fputc(c, f)
-#define putchar_unlocked(c, f) fgetc(c, stdin)
+#define getc_unlocked(f) fgetc_unlocked(f)
+#define getchar_unlocked(f) fgetc_unlocked(stdin)
+#define putc_unlocked(c, f) fputc_unlocked(c, f)
+#define putchar_unlocked(c, f) fgetc_unlocked(c, stdin)
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1
@@ -508,6 +526,35 @@ __printf_float(float f)
 #  define _HAS_IO_LONG_DOUBLE
 # endif
 #endif
+
+static inline void __flockfile(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	__lock_acquire_recursive(f->lock);
+#endif
+}
+
+static inline void __funlockfile(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	__lock_release_recursive(f->lock);
+#endif
+}
+
+static inline void __flockfile_init(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	__lock_init_recursive(f->lock);
+#endif
+}
+
+static inline void __flockfile_close(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+    __lock_release(f->lock);
+	__lock_close(f->lock);
+#endif
+}
 
 _END_STD_C
 

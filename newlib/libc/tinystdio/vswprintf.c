@@ -42,7 +42,7 @@ vswprintf(wchar_t *s, size_t len, const wchar_t *fmt, va_list ap)
 	int i;
 
         f.file.flags |= __SWIDE;
-	i = vfwprintf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfwprintf)(&f.file, fmt, ap);
 	if (i >= 0)
 		s[i] = 0;
 

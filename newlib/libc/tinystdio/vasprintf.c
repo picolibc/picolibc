@@ -41,7 +41,7 @@ vasprintf(char **strp, const char *fmt, va_list ap)
 	struct __file_str f = FDEV_SETUP_STRING_ALLOC();
 	int i;
 
-	i = vfprintf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfprintf)(&f.file, fmt, ap);
 	if (i >= 0) {
                 char *buf = f.end - f.size;
 		char *s = realloc(buf, i+1);

@@ -35,8 +35,9 @@
 #include "../stdlib/mul_overflow.h"
 #endif
 
+FILE_FN_UNLOCKED_SPECIFIER
 size_t
-fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+FILE_FN_UNLOCKED(fwrite)(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
 	size_t i, j;
 	const uint8_t *cp = (const uint8_t *) ptr;
@@ -100,3 +101,15 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 
 	return i;
 }
+
+#ifdef _WANT_FLOCKFILE
+size_t
+fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
+{
+    size_t ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fwrite)(ptr, size, nmemb, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

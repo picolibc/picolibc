@@ -35,8 +35,9 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 int
-fileno(FILE *file)
+FILE_FN_UNLOCKED(fileno)(FILE *file)
 {
         if (file->flags & __SBUF) {
                 struct __file_bufio *pf = (struct __file_bufio *) file;
@@ -44,3 +45,15 @@ fileno(FILE *file)
         }
 	return -1;
 }
+
+#ifdef _WANT_FLOCKFILE
+int
+fileno(FILE *file)
+{
+    int ret;
+    __flockfile(file);
+    ret = FILE_FN_UNLOCKED(fileno)(file);
+    __funlockfile(file);
+    return ret;
+}
+#endif

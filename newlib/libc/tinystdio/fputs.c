@@ -31,8 +31,9 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 int
-fputs(const char *str, FILE *stream)
+FILE_FN_UNLOCKED(fputs)(const char *str, FILE *stream)
 {
         int (*put)(char, struct __file *);
 	char c;
@@ -50,3 +51,15 @@ fputs(const char *str, FILE *stream)
 
 	return 0;
 }
+
+#if defined(_WANT_FLOCKFILE)
+int
+fputs(const char *str, FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fputs)(str, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

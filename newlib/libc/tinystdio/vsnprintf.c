@@ -47,7 +47,7 @@ vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 
 	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n ? n - 1 : 0);
 
-	i = vfprintf(&f.file, fmt, ap);
+	i = FILE_FN_UNLOCKED(vfprintf)(&f.file, fmt, ap);
 
 	if (n)
             *f.pos = '\0';

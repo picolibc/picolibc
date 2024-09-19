@@ -30,7 +30,7 @@
 #include "stdio_private.h"
 
 wint_t
-fgetwc(FILE *stream)
+FILE_FN_UNLOCKED(fgetwc)(FILE *stream)
 {
         union {
                 wchar_t wc;
@@ -39,7 +39,7 @@ fgetwc(FILE *stream)
         unsigned i;
         int sc;
         __ungetc_t unget;
-        
+
         stream->flags |= __SWIDE;
 
 	if ((stream->flags & __SRD) == 0)
@@ -58,8 +58,31 @@ fgetwc(FILE *stream)
 	return (wint_t) u.wc;
 }
 
+#ifdef _WANT_FLOCKFILE
+wint_t
+fgetwc(FILE *stream)
+{
+    wint_t ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fgetwc)(stream);
+    __funlockfile(stream);
+    return ret;
+}
+#else
+#ifdef _HAVE_ALIAS_ATTRIBUTE
+__strong_reference(fgetwc, fgetwc_unlocked);
+#else
+wint_t fgetwc_unlocked(FILE *stream) { return fgetwc(stream); }
+#endif
+#endif
+
+#undef getwc
+#undef getwc_unlocked
+
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fgetwc, getwc);
-#elif !defined(getwc)
+__strong_reference(FILE_FN_UNLOCKED(fgetwc), getwc_unlocked);
+#else
 wint_t getwc(FILE *stream) { return fgetwc(stream); }
+wint_t getwc_unlocked(FILE *stream) { return FILE_FN_UNLOCKED(fgetwc)(stream); }
 #endif

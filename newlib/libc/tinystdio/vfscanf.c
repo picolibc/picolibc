@@ -64,8 +64,8 @@ typedef long int_scanf_t;
 # define MY_EOF          WEOF
 # define CHAR wchar_t
 # define UCHAR wchar_t
-# define GETC(s) getwc(s)
-# define UNGETC(c,s) ungetwc(c,s)
+# define GETC(s) FILE_FN_UNLOCKED(getwc)(s)
+# define UNGETC(c,s) FILE_FN_UNLOCKED(ungetwc)(c,s)
 # define ISSPACE(c) iswspace(c)
 # undef vfscanf
 # define vfscanf vfwscanf
@@ -79,8 +79,8 @@ typedef long int_scanf_t;
 # define IS_EOF(c)       ((c) < 0)
 # define CHAR char
 # define UCHAR unsigned char
-# define GETC(s) getc(s)
-# define UNGETC(c,s) ungetc(c,s)
+# define GETC(s) FILE_FN_UNLOCKED(fgetc)(s)
+# define UNGETC(c,s) FILE_FN_UNLOCKED(ungetc)(c,s)
 # define ISSPACE(c) isspace(c)
 # ifdef _NEED_IO_MBTOWIDE
 #  define WINT            wint_t
@@ -567,7 +567,8 @@ skip_to_arg(my_va_list *ap, int target_argno)
      -Wl,-u,vfscanf -lscanf_min -lm
      \endcode
 */
-int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
+int
+FILE_FN_UNLOCKED(vfscanf) (FILE * stream, const CHAR *fmt, va_list ap_orig)
 {
     unsigned char nconvs;
     UCHAR c;
@@ -853,10 +854,28 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     return nconvs ? nconvs : EOF;
 }
 
+#ifdef _WANT_FLOCKFILE
+int
+vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(vfscanf)(stream, fmt, ap_orig);
+    __funlockfile(stream);
+    return ret;
+}
+#endif
+
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfscanf, __d_vfscanf);
+#ifdef _WANT_FLOCKFILE
+__strong_reference(FILE_FN_UNLOCKED(vfscanf), FILE_FN_UNLOCKED(__d_vfscanf));
+#endif
 #else
 int __d_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
+#ifdef _WANT_FLOCKFILE
+int FILE_FN_UNLOCKED(__d_vfscanf) (FILE * stream, const char *fmt, va_list ap) { return FILE_FN_UNLOCKED(vfscanf)(stream, fmt, ap); }
+#endif
 #endif
 #endif

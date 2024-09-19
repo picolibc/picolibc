@@ -477,7 +477,8 @@ _wcslen(const char *s, size_t maxlen)
 }
 #endif
 
-int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
+int
+FILE_FN_UNLOCKED(vfprintf)(FILE * stream, const CHAR *fmt, va_list ap_orig)
 {
     unsigned c;		/* holds a char from the format string */
     uint16_t flags;
@@ -1321,10 +1322,28 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     goto ret;
 }
 
+#ifdef _WANT_FLOCKFILE
+int
+vfprintf(FILE * stream, const CHAR *fmt, va_list ap_orig)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(vfprintf)(stream, fmt, ap_orig);
+    __funlockfile(stream);
+    return ret;
+}
+#endif
+
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
+#ifdef _WANT_FLOCKFILE
+__strong_reference(FILE_FN_UNLOCKED(vfprintf), FILE_FN_UNLOCKED(__d_vfprintf));
+#endif
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
+#ifdef _WANT_FLOCKFILE
+int FILE_FN_UNLOCKED(__d_vfprintf) (FILE * stream, const char *fmt, va_list ap) { return FILE_FN_UNLOCKED(vfprintf)(stream, fmt, ap); }
+#endif
 #endif
 #endif

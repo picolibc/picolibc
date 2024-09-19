@@ -35,8 +35,20 @@
 
 #include "stdio_private.h"
 
-void rewind(FILE *stream)
+FILE_FN_UNLOCKED_SPECIFIER
+void
+FILE_FN_UNLOCKED(rewind)(FILE *stream)
 {
-    (void) fseek(stream, 0L, SEEK_SET);
-    clearerr(stream);
+    (void) FILE_FN_UNLOCKED(fseek)(stream, 0L, SEEK_SET);
+    FILE_FN_UNLOCKED(clearerr)(stream);
 }
+
+#ifdef _WANT_FLOCKFILE
+void
+rewind(FILE *stream)
+{
+    __flockfile(stream);
+    FILE_FN_UNLOCKED(rewind)(stream);
+    __funlockfile(stream);
+}
+#endif
