@@ -1,6 +1,6 @@
 MEMORY
 {
-	bios (rxai!w) : ORIGIN = 0xffff0000, LENGTH = 0x10000
+	bios (rx!w) : ORIGIN = 0xffff0000, LENGTH = 0x10000
 }
 
 PHDRS
@@ -12,6 +12,10 @@ SECTIONS {
 	.text : {
 		*(.text*)
 	} >bios AT>bios :text
+
+	.shstrtab : {
+		*(.shstrtab)
+	}
 
 	/DISCARD/ : {
 		*(*)
