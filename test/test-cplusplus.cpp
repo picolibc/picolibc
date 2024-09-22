@@ -145,9 +145,13 @@
 #include <wctype.h>
 #include <wordexp.h>
 
-extern "C" { int main(void); }
+extern "C" {
 
-int main() {
+int main(void);
+
+int main(void) {
 	printf("Hello, world!\n");
 	return 0;
+}
+
 }
