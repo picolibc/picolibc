@@ -559,6 +559,7 @@ foreach target : targets
 		  include_directories: inc),
        depends: bios_bin,
        timeout: 120,
+       priority: -1,
        env: test_env)
 
   t1 = 'test-long-long'
@@ -577,6 +578,7 @@ foreach target : targets
 		  include_directories: inc),
        depends: bios_bin,
        timeout: 120,
+       priority: -1,
        env: test_env)
 
   plain_tests = ['rand', 'regex', 'ungetc', 'fenv',
