@@ -1,5 +1,6 @@
 [binaries]
-c = ['ccache', 'm68k-linux-gnu-gcc', '-march=68020', '-static', '-nostdlib']
+c = ['m68k-linux-gnu-gcc', '-march=68020', '-static', '-nostdlib', '-Wl,--build-id=none']
+cpp = ['m68k-linux-gnu-g++', '-march=68020', '-static', '-nostdlib', '-Wl,--build-id=none']
 ar = 'm68k-linux-gnu-ar'
 as = 'm68k-linux-gnu-as'
 ld = 'm68k-linux-gnu-ld'

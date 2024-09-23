@@ -3,7 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'mipsel-linux-gnu-gcc', '-nostdlib']
+c = ['mipsel-linux-gnu-gcc', '-nostdlib']
+cpp = ['mipsel-linux-gnu-g++', '-nostdlib']
 ar = 'mipsel-linux-gnu-ar'
 as = 'mipsel-linux-gnu-as'
 ld = 'mipsel-linux-gnu-ld'

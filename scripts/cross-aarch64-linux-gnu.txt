@@ -3,7 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'aarch64-linux-gnu-gcc', '-nostdlib', '-Wl,--build-id=none', '-Wl,--no-warn-rwx-segments']
+c = ['aarch64-linux-gnu-gcc', '-nostdlib', '-Wl,--build-id=none', '-Wl,--no-warn-rwx-segments']
+cpp = ['aarch64-linux-gnu-g++', '-nostdlib', '-Wl,--build-id=none', '-Wl,--no-warn-rwx-segments']
 ar = 'aarch64-linux-gnu-ar'
 as = 'aarch64-linux-gnu-as'
 ld = 'aarch64-linux-gnu-ld'
