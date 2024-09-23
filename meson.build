@@ -542,7 +542,12 @@ if sysroot_install
     if not get_option('sysroot-install-skip-checks')
       error('sysroot install requested, but compiler has no sysroot')
     endif
+    # The default value of GCC_EXEC_PREFIX is "prefix/lib/gcc/"
+    # Since toolchain may be moved and to another directory, let's get actual path using "gcc -print-search-dirs"
+    # Note that the "install path" obtained with this command points to the "$GCC_EXEC_PREFIX/$ARCH/$GCC-VERSION"
+    # That's why obtained path appended with '../../'
     sysroot = run_command(cc.cmd_array() + ['-print-search-dirs'], check : true).stdout().split('\n')[0].split(' ')[1]
+    sysroot += '../../'
     specs_prefix_format_format = '%:getenv(GCC_EXEC_PREFIX @0@)'
     specs_prefix_format_default = '%:getenv(GCC_EXEC_PREFIX ../../@0@)'
   endif
