@@ -3,7 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'msp430-unknown-elf-gcc', '-nostdlib', '-mlarge', '-mdata-region=none']
+c = ['msp430-unknown-elf-gcc', '-nostdlib', '-mlarge', '-mdata-region=none']
+cpp = ['msp430-unknown-elf-g++', '-nostdlib', '-mlarge', '-mdata-region=none']
 ar = 'msp430-unknown-elf-ar'
 as = 'msp430-unknown-elf-as'
 nm = 'msp430-unknown-elf-nm'

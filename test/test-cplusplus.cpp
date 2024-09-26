@@ -145,9 +145,19 @@
 #include <wctype.h>
 #include <wordexp.h>
 
-extern "C" { int main(void); }
+#ifdef __clang__
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wmain"
+#endif
 
-int main() {
+extern "C" {
+
+int main(void);
+
+int main(void) {
 	printf("Hello, world!\n");
 	return 0;
+}
+
 }

@@ -3,8 +3,10 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc', '-mabi=ilp32d', '-nostdlib']
+c = ['clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc', '-mabi=ilp32d', '-nostdlib']
+cpp = ['clang', '-m32', '-target', 'riscv32-unknown-elf', '-march=rv32imafdc', '-mabi=ilp32d', '-nostdlib']
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
+cpp_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
 nm = 'riscv64-unknown-elf-nm'
@@ -21,6 +23,7 @@ endian = 'little'
 [properties]
 c_args = ['-Werror=double-promotion']
 c_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv32imafdc/ilp32d']
+cpp_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv32imafdc/ilp32d']
 skip_sanity_check = true
 has_link_defsym = true
 default_flash_addr = '0x80000000'

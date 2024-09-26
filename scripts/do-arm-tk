@@ -43,19 +43,19 @@ set -e
 
 
 echo '###################################'
-echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize
+echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize -Dmultilib-exclude=pacbti
 echo '###################################'
 
 cd "$MINSIZE_DIR"
-../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize
+../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize -Dmultilib-exclude=pacbti
 ninja test install
 
 echo '###################################'
-echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
+echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release -Dmultilib-exclude=pacbti
 echo '###################################'
 
 cd "$RELEASE_DIR"
-../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release
+../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release -Dmultilib-exclude=pacbti
 ninja test install
 
 cd "$DESTDIR"/"$ARM_TK"

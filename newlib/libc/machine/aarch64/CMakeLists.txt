@@ -68,5 +68,4 @@ picolibc_sources_flags("-fno-builtin"
   strrchr.S
   )
 
-add_subdirectory(sys)
 add_subdirectory(machine)

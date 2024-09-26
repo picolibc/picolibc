@@ -79,6 +79,7 @@ if objcopy.found()
   bios = executable('bios', 'bios.S',
 		    c_args: ['-m32'] + c_args,
                     include_directories: inc,
+                    link_depends: [bios_ld],
 		    link_args: ['-nostdlib', '-m32', '-Wl,--build-id=none', '-T', bios_ld])
 
   bios_bin = custom_target('bios.bin',
@@ -87,6 +88,6 @@ if objcopy.found()
 		           install: true,
 		           install_dir: instdir,
 		           output: 'bios.bin',
-		           command: [objcopy, '-O', 'binary', '@INPUT@', '@OUTPUT@'])
+		           command: [objcopy, '-O', 'binary', '--only-section=.text', '@INPUT@', '@OUTPUT@'])
 endif
 

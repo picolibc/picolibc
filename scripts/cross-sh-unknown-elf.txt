@@ -3,7 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'sh-unknown-elf-gcc', '-nostdlib']
+c = ['sh-unknown-elf-gcc', '-nostdlib']
+cpp = ['sh-unknown-elf-g++', '-nostdlib']
 ar = 'sh-unknown-elf-ar'
 as = 'sh-unknown-elf-as'
 nm = 'sh-unknown-elf-nm'

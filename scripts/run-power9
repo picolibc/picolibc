@@ -65,6 +65,6 @@ mon=none
 	-serial none \
 	-device isa-serial,chardev=s1 \
 	-chardev stdio,id=s1 \
-	-machine powernv,accel=tcg \
+	-machine powernv9,accel=tcg \
 	-kernel "$one_elf" \
 	-nographic "$@" < /dev/null

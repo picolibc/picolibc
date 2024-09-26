@@ -3,7 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'clang', '-m32', '--target=thumbv6m-none-eabi', '-nostdlib']
+c = ['clang', '-m32', '--target=thumbv6m-none-eabi', '-nostdlib']
+cpp = ['clang', '-m32', '--target=thumbv6m-none-eabi', '-nostdlib']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'
@@ -20,6 +21,7 @@ endian = 'little'
 [properties]
 c_args = ['-Werror=double-promotion', '-Wno-unsupported-floating-point-opt', '-fshort-enums']
 c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/12.2.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp/', '-Wl,-z,noexecstack']
+cpp_link_args = ['-L/usr/lib/gcc/arm-none-eabi/10.3.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/11.3.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/12.2.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v6-m/nofp/', '-L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp/', '-Wl,-z,noexecstack']
 skip_sanity_check = true
 default_flash_addr = '0x00000000'
 default_flash_size = '0x00400000'

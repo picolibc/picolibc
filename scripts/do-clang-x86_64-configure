@@ -1,7 +1,8 @@
+#!/bin/sh
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2024 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,38 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-inc_machine_headers_all = [
-  'ansi.h',
-  '_arc4random.h',
-  '_default_types.h',
-  '_endian.h',
-  'endian.h',
-  'fastmath.h',
-  'fenv.h',
-  'fenv-softfloat.h',
-  'ieeefp.h',
-  'malloc.h',
-  'math.h',
-  'param.h',
-  'setjmp.h',
-  'stdlib.h',
-  'termios.h',
-  '_time.h',
-  'time.h',
-  '_types.h',
-  'types.h',
-]
-
-inc_machine_headers = []
-foreach file : inc_machine_headers_all
-  if not (file in inc_machine_headers_machine)
-    inc_machine_headers += file
-  else
-    message('libc/include/machine/' + file + ': machine overrides generic')
-  endif
-endforeach
-
-install_headers(
-  inc_machine_headers,
-  install_dir: include_dir / 'machine'
-)
+exec "$(dirname "$0")"/do-configure clang-x86_64 -Dtests=true -Dtests-enable-posix-io=false -Dmultilib=false "$@"

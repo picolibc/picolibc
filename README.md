@@ -145,6 +145,14 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc release 1.8.8
+
+ * Fixed 3 bugs in the powf computation. Thanks to Fabian Schriever.
+
+ * Fixed a bunch of build issues found by Zephyr.
+
+ * Improve C++ testing and compatibility.
+
 ### Picolibc release 1.8.7
 
  * Support ARM v8.1-m BTI and PAC features

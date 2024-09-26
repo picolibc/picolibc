@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'clang', '-m64', '-target', 'aarch64-none-elf', '-march=armv8-a+nofp', '-mabi=aapcs-soft', '-nostdlib']
-cpp = ['ccache', 'clang', '-m64', '-target', 'aarch64-none-elf', '-march=armv8-a+nofp', '-mabi=aapcs-soft', '-nostdlib']
+c = ['clang', '-m64', '-target', 'aarch64-none-elf', '-march=armv8-a+nofp', '-mabi=aapcs-soft', '-nostdlib']
+cpp = ['clang', '-m64', '-target', 'aarch64-none-elf', '-march=armv8-a+nofp', '-mabi=aapcs-soft', '-nostdlib']
 ar = 'ar'
 as = 'as'
 nm = 'nm'

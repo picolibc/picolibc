@@ -45,7 +45,6 @@ picolibc_headers(machine
   malloc.h
   math.h
   param.h
-  setjmp-dj.h
   setjmp.h
   stdlib.h
   termios.h
