@@ -1252,6 +1252,8 @@ Files: newlib/libc/include/stdnoreturn.h
  newlib/libc/tinystdio/funlockfile.c
  newlib/libc/tinystdio/funopen.c
  newlib/libm/fenv/fenv.c
+ scripts/do-clang-x86-configure
+ scripts/do-clang-x86_64-configure
  scripts/validate-cdefs
  test/test-cplusplus.cpp
  test/test-ctype.c
@@ -2861,6 +2863,8 @@ Files: .clang-format
  scripts/cross-clang-thumbv7e+dp-none-eabi.txt
  scripts/cross-clang-thumbv7e+fp-none-eabi.txt
  scripts/cross-clang-thumbv7m-none-eabi.txt
+ scripts/cross-clang-x86.txt
+ scripts/cross-clang-x86_64.txt
  scripts/cross-cortex-a9-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt
  scripts/cross-m68k-linux-gnu.txt
@@ -3718,7 +3722,6 @@ License: Other-5
 
 Files: newlib/libc/include/machine/fastmath.h
  newlib/libc/include/machine/ieeefp.h
- newlib/libc/include/machine/setjmp-dj.h
  newlib/libc/include/machine/setjmp.h
  newlib/libc/include/machine/time.h
  newlib/libc/include/machine/types.h

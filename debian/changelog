@@ -1,3 +1,13 @@
+picolibc (1.8.8-1) unstable; urgency=medium
+
+  * New upstream.
+
+  * Build with new gcc-arm-none-eabi version.
+
+  * Incorporate build fixes found during Zephyr integration.
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 26 Sep 2024 08:41:21 -0700
+
 picolibc (1.8.7-1) unstable; urgency=medium
 
   * New upstream.
