@@ -35,6 +35,9 @@
 #include "test.h"
  one_line_type pow_vec[] = {
 
+/* x 1.021918654441833 y 4092.023193359375 result is 3.4027371058175e38 */
+{64, 0,123,__LINE__, 0x47efffca, 0xa6b471f3, 0x3ff059c7, 0x60000000, 0x40aff80b, 0xe0000000},
+
 #ifdef __mcffpu__
 #define SKIP_SNAN_CHECKS
 #endif
