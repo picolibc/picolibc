@@ -34,6 +34,7 @@
 #
 
 src_picocrt = []
+src_picocrt_none = files('crt0-none.c')
 
 machine_dir = 'machine' / host_cpu_family
 picocrt_march_add=''
@@ -64,25 +65,30 @@ foreach target : targets
     crt_hosted_name = 'crt0-hosted.o'
     crt_minimal_name = 'crt0-minimal.o'
     crt_semihost_name = 'crt0-semihost.o'
+    crt_none_name = 'crt0-none.o'
     libcrt_name = 'crt0'
     libcrt_hosted_name = 'crt0-hosted'
     libcrt_minimal_name = 'crt0-minimal'
     libcrt_semihost_name = 'crt0-semihost'
+    libcrt_none_name = 'crt0-none'
   else
     crt_name = join_paths(target, 'crt0.o')
     crt_hosted_name = join_paths(target, 'crt0-hosted.o')
     crt_minimal_name = join_paths(target, 'crt0-minimal.o')
     crt_semihost_name = join_paths(target, 'crt0-semihost.o')
+    crt_none_name = join_paths(target, 'crt0-none.o')
     libcrt_name = join_paths(target, 'libcrt0')
     libcrt_hosted_name = join_paths(target, 'libcrt0-hosted')
     libcrt_minimal_name = join_paths(target, 'libcrt0-minimal')
     libcrt_semihost_name = join_paths(target, 'libcrt0-semihost')
+    libcrt_none_name = join_paths(target, 'libcrt0-none')
   endif
 
   crt0_name = 'crt0' + target
   crt0_hosted_name = 'crt0_hosted' + target
   crt0_minimal_name = 'crt0_minimal' + target
   crt0_semihost_name = 'crt0_semihost' + target
+  crt0_none_name = 'crt0_none' + target
 
   _c_args = value[1] + arg_fnobuiltin + ['-ffreestanding']
   _link_args = value[1] + ['-r', '-ffreestanding']
@@ -185,4 +191,19 @@ foreach target : targets
 		     c_args : value[1] + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'])
     endif
   endif
+
+  # The 'none' variant is completely empty
+  _crt = executable(crt_none_name,
+		    src_picocrt_none,
+		    include_directories : inc,
+		    install : true,
+		    install_dir : instdir,
+		    c_args : _c_args,
+		    link_args : _link_args)
+
+  set_variable(crt0_none_name,
+	       _crt.extract_objects(src_picocrt_none)
+	      )
+
+  
 endforeach
