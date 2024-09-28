@@ -1,3 +1,9 @@
+picolibc (1.8.8-2) unstable; urgency=medium
+
+  * Build with new gcc-riscv64-unknown-elf version.
+
+ -- Keith Packard <keithp@keithp.com>  Sat, 28 Sep 2024 11:57:45 -0700
+
 picolibc (1.8.8-1) unstable; urgency=medium
 
   * New upstream.
