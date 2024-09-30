@@ -1576,7 +1576,7 @@ _SVFSCANF (
 			}
 		      goto fskip;
 		    }
-		  /* Fall through.  */
+                  __PICOLIBC_FALLTHROUGH;
 		case '1':
 		case '2':
 		case '3':

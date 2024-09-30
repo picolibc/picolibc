@@ -252,15 +252,19 @@ __math_lgammaf_r(float x, int *signgamp, int *divzero)
         z = one; /* lgamma(1+s) = log(s) + lgamma(s) */
         switch (i) {
         case 7:
-            z *= (y + (float)6.0); /* FALLTHRU */
+            z *= (y + (float)6.0);
+	  __PICOLIBC_FALLTHROUGH;
         case 6:
-            z *= (y + (float)5.0); /* FALLTHRU */
+            z *= (y + (float)5.0);
+	  __PICOLIBC_FALLTHROUGH;
         case 5:
-            z *= (y + (float)4.0); /* FALLTHRU */
+            z *= (y + (float)4.0);
+	  __PICOLIBC_FALLTHROUGH;
         case 4:
-            z *= (y + (float)3.0); /* FALLTHRU */
+            z *= (y + (float)3.0);
+	  __PICOLIBC_FALLTHROUGH;
         case 3:
-            z *= (y + (float)2.0); /* FALLTHRU */
+            z *= (y + (float)2.0);
             r += logf(z);
             break;
         }

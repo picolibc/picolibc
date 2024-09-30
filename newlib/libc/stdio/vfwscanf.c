@@ -1330,7 +1330,7 @@ _SVFWSCANF (
 			}
 		      goto fskip;
 		    }
-		  /* Fall through.  */
+                  __PICOLIBC_FALLTHROUGH;
 		case L'1':
 		case L'2':
 		case L'3':
