@@ -826,6 +826,8 @@ common_warnings = [
   '-Wno-unused-command-line-argument',
   '-Wmissing-prototypes',
   '-Wmissing-declarations',
+  '-Werror=implicit-fallthrough=5',
+  '-Werror=unreachable-code-fallthrough',
 ]
 if get_option('analyzer')
   common_warnings += [
