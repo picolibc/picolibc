@@ -41,6 +41,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ * fall-through case statement annotations
+ */
+#if __cplusplus >= 201703L || __STDC_VERSION__ > 201710L
+/* Standard C++17/C23 attribute */
+#define __TEST_PICOLIBC_FALLTHROUGH [[fallthrough]]
+#elif __has_attribute(fallthrough)
+/* Non-standard but supported by at least gcc and clang */
+#define __TEST_PICOLIBC_FALLTHROUGH __attribute__((fallthrough))
+#else
+#define __TEST_PICOLIBC_FALLTHROUGH do { } while(0)
+#endif
+
 #ifdef _TEST_LONG_DOUBLE
 
 static long double max_error;
@@ -267,7 +280,6 @@ naive_strtold(const char *buf)
                 }
                 return -(long double)INFINITY;
             }
-            /* FALLTHROUGH */
             if (base == 10.0L) {
                 if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
                     state = LDOUBLE_EXP;
@@ -275,7 +287,7 @@ naive_strtold(const char *buf)
                 }
                 return -(long double)INFINITY;
             }
-            /* FALLTHROUGH */
+            __TEST_PICOLIBC_FALLTHROUGH;
         case 'A': case 'B': case 'C':
         case 'D': case 'F':
             if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
@@ -291,7 +303,7 @@ naive_strtold(const char *buf)
                 }
                 return -(long double)INFINITY;
             }
-            /* FALLTHROUGH */
+            __TEST_PICOLIBC_FALLTHROUGH;
         case 'a': case 'b': case 'c':
         case 'd': case 'f':
             if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
