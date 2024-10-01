@@ -45,7 +45,8 @@
 	.type	start, @function
 _start:
 	.code16
-	cs lgdtl gdt_desc - _start + 0x10
+	cs
+	lgdtl gdt_desc - _start + 0x10
 	mov $1, %eax
 	mov %eax, %cr0
 	ljmpl $0x10,$_start32

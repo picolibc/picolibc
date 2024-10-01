@@ -45,7 +45,8 @@
 	.type	start, @function
 _start:
 	.code16
-	cs lgdtl	gdt_desc - _start + 0x10
+	cs
+	lgdtl	gdt_desc - _start + 0x10
 	
 	# enable sse and pae
 	mov	$0x620, %eax
