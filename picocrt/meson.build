@@ -90,7 +90,7 @@ foreach target : targets
   crt0_semihost_name = 'crt0_semihost' + target
   crt0_none_name = 'crt0_none' + target
 
-  _c_args = value[1] + arg_fnobuiltin + ['-ffreestanding']
+  _c_args = value[1] + arg_fnobuiltin + ['-ffreestanding', '-DMACHINE_' + picocrt_machine]
   _link_args = value[1] + ['-r', '-ffreestanding']
 
   # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
