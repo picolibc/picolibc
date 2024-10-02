@@ -61,16 +61,11 @@ _set_tls(void *tls)
 #include "../../crt0.h"
 
 /*
- * We need 4 1GB mappings to cover the usual Normal memory space,
- * which runs from 0x00000000 to 0x7fffffff along with the usual
- * Device space which runs from 0x80000000 to 0xffffffff. However,
- * it looks like the smallest VA we can construct is 8GB, so we'll
- * pad the space with invalid PTEs
+ * The smallest VA we can construct is 8GB, which needs 8 block page table
+ * entries, each covering 1GiB.
  */
-#define MMU_NORMAL_COUNT        2
-#define MMU_DEVICE_COUNT        2
-#define MMU_INVALID_COUNT       4
-extern uint64_t __identity_page_table[MMU_NORMAL_COUNT + MMU_DEVICE_COUNT + MMU_INVALID_COUNT];
+#define MMU_BLOCK_COUNT       8
+extern uint64_t __identity_page_table[MMU_BLOCK_COUNT];
 
 #define MMU_DESCRIPTOR_VALID    (1 << 0)
 #define MMU_DESCRIPTOR_BLOCK    (0 << 1)
@@ -108,27 +103,56 @@ extern uint64_t __identity_page_table[MMU_NORMAL_COUNT + MMU_DEVICE_COUNT + MMU_
 #define MMU_INVALID_FLAGS       0
 
 __asm__(
+    ".macro start_page_table\n"
     ".section .rodata\n"
     ".global __identity_page_table\n"
     ".balign 65536\n"
     "__identity_page_table:\n"
-    ".set _i, 0\n"
-    ".rept " __XSTRING(MMU_NORMAL_COUNT) "\n"
-    "  .8byte (_i << 30) |" __XSTRING(MMU_NORMAL_FLAGS) "\n"
-    "  .set _i, _i + 1\n"
+    ".set block_num, 0\n"
+    ".endm\n"
+
+    ".macro page_table_entries count, flags\n"
+    ".rept \\count\n"
+    "  .8byte (block_num << 30) | \\flags\n"
+    "  .set block_num, block_num + 1\n"
     ".endr\n"
-    ".set _i, 0\n"
-    ".rept " __XSTRING(MMU_DEVICE_COUNT) "\n"
-    "  .8byte (1 << 31) | (_i << 30) |" __XSTRING(MMU_DEVICE_FLAGS) "\n"
-    "  .set _i, _i + 1\n"
-    ".endr\n"
-    ".set _i, 0\n"
-    ".rept " __XSTRING(MMU_INVALID_COUNT) "\n"
-    "  .8byte " __XSTRING(MMU_INVALID_FLAGS) "\n"
-    "  .set _i, _i + 1\n"
-    ".endr\n"
-    ".size __identity_page_table, " __XSTRING((MMU_NORMAL_COUNT + MMU_DEVICE_COUNT + MMU_INVALID_COUNT) * 8) "\n"
+    ".endm\n"
+
+    ".macro end_page_table\n"
+    ".size __identity_page_table, " __XSTRING(MMU_BLOCK_COUNT * 8) "\n"
+    ".if block_num != " __XSTRING(MMU_BLOCK_COUNT) "\n"
+    ".error \"Wrong number of page table entries\"\n"
+    ".endif\n"
+    ".endm\n"
 );
+
+#if defined(MACHINE_qemu)
+__asm__(
+    "start_page_table\n"
+    // [0x0000_0000,0x8000_0000): 2GiB normal memory
+    "page_table_entries 2, " __XSTRING(MMU_NORMAL_FLAGS) "\n"
+    // [0x8000_0000,0x1_0000_0000): 2GiB device memory
+    "page_table_entries 2, " __XSTRING(MMU_DEVICE_FLAGS) "\n"
+    // [0x1_0000_0000,0x2_0000_0000): 4GiB un-mapped
+    "page_table_entries 4, " __XSTRING(MMU_INVALID_FLAGS) "\n"
+    "end_page_table\n"
+);
+#elif defined(MACHINE_fvp)
+__asm__(
+    "start_page_table\n"
+    // [0x0000_0000,0x8000_0000): 2GiB unmapped. This actually contains a lot
+    // of different memory regions and devices, but we don't need any of them
+    // for testing.
+    "page_table_entries 2, " __XSTRING(MMU_INVALID_FLAGS) "\n"
+    // [0x8000_0000,0x1_0000_0000): 2GiB normal memory
+    "page_table_entries 2, " __XSTRING(MMU_NORMAL_FLAGS) "\n"
+    // [0x1_0000_0000,0x2_0000_0000): 4GiB un-mapped
+    "page_table_entries 4, " __XSTRING(MMU_INVALID_FLAGS) "\n"
+    "end_page_table\n"
+);
+#else
+#error "Unknown machine type"
+#endif
 
 #define SCTLR_MMU       (1 << 0)
 #define SCTLR_A         (1 << 1)
@@ -159,12 +183,22 @@ __asm__(
 #define TCR_IPS_BIT     32
 #define TCR_IPS_4GB     (0LL << TCR_IPS_BIT)
 
+/* QEMU boots into EL1, and FVPs boot into EL3, so we need to use the correct
+ * system registers. */
+#if defined(MACHINE_qemu)
+#define BOOT_EL "EL1"
+#elif defined(MACHINE_fvp)
+#define BOOT_EL "EL3"
+#else
+#error "Unknown machine type"
+#endif
+
 extern const void *__vector_table[];
 
 static void __attribute((used))
 _cstart(void)
 {
-        uint64_t        sctlr_el1;
+        uint64_t        sctlr;
 
         /* Invalidate the cache */
         __asm__("ic iallu");
@@ -174,7 +208,7 @@ _cstart(void)
          * Set up the TCR register to provide a 33bit VA space using
          * 4kB pages over 4GB of PA
          */
-        __asm__("msr    tcr_el1, %x0" ::
+        __asm__("msr    tcr_"BOOT_EL", %x0" ::
                 "r" ((0x1f << TCR_T0SZ_BIT) |
                      TCR_IRGN0_WB_WA |
                      TCR_ORGN0_WB_WA |
@@ -184,7 +218,7 @@ _cstart(void)
                      TCR_IPS_4GB));
 
         /* Load the page table base */
-        __asm__("msr    ttbr0_el1, %x0" :: "r" (__identity_page_table));
+        __asm__("msr    ttbr0_"BOOT_EL", %x0" :: "r" (__identity_page_table));
 
         /*
          * Set the memory attributions in the MAIR register:
@@ -192,28 +226,28 @@ _cstart(void)
          * Region 0 is Normal memory
          * Region 1 is Device memory
          */
-        __asm__("msr    mair_el1, %x0" ::
+        __asm__("msr    mair_"BOOT_EL", %x0" ::
                 "r" ((0xffLL << 0) | (0x00LL << 8)));
 
         /*
          * Enable caches, and the MMU, disable alignment requirements
          * and write-implies-XN
          */
-        __asm__("mrs    %x0, sctlr_el1" : "=r" (sctlr_el1));
-        sctlr_el1 |= SCTLR_ICACHE | SCTLR_C | SCTLR_MMU;
-        sctlr_el1 &= ~(SCTLR_A | SCTLR_WXN);
-        __asm__("msr    sctlr_el1, %x0" :: "r" (sctlr_el1));
+        __asm__("mrs    %x0, sctlr_"BOOT_EL"" : "=r" (sctlr));
+        sctlr |= SCTLR_ICACHE | SCTLR_C | SCTLR_MMU;
+        sctlr &= ~(SCTLR_A | SCTLR_WXN);
+        __asm__("msr    sctlr_"BOOT_EL", %x0" :: "r" (sctlr));
         __asm__("isb\n");
 
         /* Set the vector base address register */
-        __asm__("msr    vbar_el1, %x0" :: "r" (__vector_table));
+        __asm__("msr    vbar_"BOOT_EL", %x0" :: "r" (__vector_table));
 	__start();
 }
 
 void __section(".text.init.enter")
 _start(void)
 {
-        /* Switch to EL1 */
+        /* Use EL-banked stack pointer */
 	__asm__("msr     SPSel, #1");
 
 	/* Initialize stack */
@@ -223,7 +257,7 @@ _start(void)
 #if __ARM_FP
 	/* Enable FPU */
 	__asm__("mov x1, #(0x3 << 20)");
-	__asm__("msr cpacr_el1,x1");
+	__asm__("msr cpacr_"BOOT_EL",x1");
 #endif
 	/* Jump into C code */
 	__asm__("bl _cstart");
