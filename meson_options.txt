@@ -68,6 +68,9 @@ option('picocrt-enable-mmu', type: 'boolean', value: true,
 option('picocrt-lib', type: 'boolean', value: true,
        description: 'Include pico crt bits in lib form')
 
+option('picocrt-machine', type: 'combo', choices: ['qemu', 'fvp'], value: 'qemu',
+       description: 'Machine to build crt0 startup code for')
+
 option('semihost', type: 'boolean', value: true,
        description: 'Include semihost bits')
 
