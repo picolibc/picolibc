@@ -151,7 +151,7 @@ multilib_exclude = get_option('multilib-exclude')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
-picocrt_machine = get_option('picocrt-machine')
+test_machine = get_option('test-machine')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
 if get_option('tests-cdefs') == 'auto'

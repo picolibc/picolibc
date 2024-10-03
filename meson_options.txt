@@ -68,9 +68,6 @@ option('picocrt-enable-mmu', type: 'boolean', value: true,
 option('picocrt-lib', type: 'boolean', value: true,
        description: 'Include pico crt bits in lib form')
 
-option('picocrt-machine', type: 'combo', choices: ['qemu', 'fvp'], value: 'qemu',
-       description: 'Machine to build crt0 startup code for')
-
 option('semihost', type: 'boolean', value: true,
        description: 'Include semihost bits')
 
@@ -135,6 +132,9 @@ option('test-stdin', type: 'boolean', value: false,
        description: 'Enable tests that use stdin. This only works on a few targets')
 option('fortify-source', type: 'combo', choices: ['none', '1', '2', '3'], value: '3',
        description: 'Set _FORTIFY_SOURCE=<value> when building tests')
+option('test-machine', type: 'combo', choices: ['qemu', 'fvp'], value: 'qemu',
+       description: 'Machine-specific startup code to use when running tests')
+
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
