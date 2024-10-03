@@ -55,6 +55,16 @@ else
   src_picocrt = files('shared/crt0.c')
 endif
 
+machine_found = false
+foreach machine : picocrt_machines
+  if machine['name'] == test_machine
+    machine_found = true
+  endif
+endforeach
+if not machine_found
+  error(test_machine + ': requested test machine not found')
+endif
+
 foreach target : targets
   value = get_variable('target_' + target)
 

@@ -132,7 +132,7 @@ option('test-stdin', type: 'boolean', value: false,
        description: 'Enable tests that use stdin. This only works on a few targets')
 option('fortify-source', type: 'combo', choices: ['none', '1', '2', '3'], value: '3',
        description: 'Set _FORTIFY_SOURCE=<value> when building tests')
-option('test-machine', type: 'combo', choices: ['qemu', 'fvp'], value: 'qemu',
+option('test-machine', type: 'string', value: 'qemu',
        description: 'Machine-specific startup code to use when running tests')
 
 
