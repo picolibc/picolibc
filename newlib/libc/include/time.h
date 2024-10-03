@@ -228,7 +228,7 @@ int	   getdate_r (const char *, struct tm *);
 
 struct tm *gmtime (const time_t *_timer);
 
-#if __POSIX_VISIBLE
+#if __POSIX_VISIBLE || __ZEPHYR_VISIBLE
 struct tm *gmtime_r (const time_t *__restrict,
                      struct tm *__restrict);
 #endif
