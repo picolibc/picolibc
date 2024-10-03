@@ -60,99 +60,11 @@ _set_tls(void *tls)
 
 #include "../../crt0.h"
 
-/*
- * The smallest VA we can construct is 8GB, which needs 8 block page table
- * entries, each covering 1GiB.
- */
+/* Defined in crt0.S */
 #define MMU_BLOCK_COUNT       8
 extern uint64_t __identity_page_table[MMU_BLOCK_COUNT];
-
-#define MMU_DESCRIPTOR_VALID    (1 << 0)
-#define MMU_DESCRIPTOR_BLOCK    (0 << 1)
-#define MMU_DESCRIPTOR_TABLE    (1 << 1)
-
-#define MMU_BLOCK_XN            (1LL << 54)
-#define MMU_BLOCK_PXN           (1LL << 53)
-#define MMU_BLOCK_CONTIG        (1LL << 52)
-#define MMU_BLOCK_DBM           (1LL << 51)
-#define MMU_BLOCK_GP            (1LL << 50)
-
-#define MMU_BLOCK_NT            (1 << 16)
-#define MMU_BLOCK_OA_BIT        12
-#define MMU_BLOCK_NG            (1 << 11)
-#define MMU_BLOCK_AF            (1 << 10)
-#define MMU_BLOCK_SH_BIT        8
-#define MMU_BLOCK_SH_NS         (0 << MMU_BLOCK_SH_BIT)
-#define MMU_BLOCK_SH_OS         (2 << MMU_BLOCK_SH_BIT)
-#define MMU_BLOCK_SH_IS         (3 << MMU_BLOCK_SH_BIT)
-#define MMU_BLOCK_AP_BIT        6
-#define MMU_BLOCK_NS            (1 << 5)
-#define MMU_BLOCK_ATTR_BIT      2
-
-#define MMU_NORMAL_FLAGS        (MMU_DESCRIPTOR_VALID |         \
-                                 MMU_DESCRIPTOR_BLOCK |         \
-                                 MMU_BLOCK_AF |                 \
-                                 MMU_BLOCK_SH_IS |              \
-                                 (0 << MMU_BLOCK_ATTR_BIT))
-
-#define MMU_DEVICE_FLAGS        (MMU_DESCRIPTOR_VALID | \
-                                 MMU_DESCRIPTOR_BLOCK | \
-                                 MMU_BLOCK_AF | \
-                                 (1 << MMU_BLOCK_ATTR_BIT))
-
-#define MMU_INVALID_FLAGS       0
-
-__asm__(
-    ".macro start_page_table\n"
-    ".section .rodata\n"
-    ".global __identity_page_table\n"
-    ".balign 65536\n"
-    "__identity_page_table:\n"
-    ".set block_num, 0\n"
-    ".endm\n"
-
-    ".macro page_table_entries count, flags\n"
-    ".rept \\count\n"
-    "  .8byte (block_num << 30) | \\flags\n"
-    "  .set block_num, block_num + 1\n"
-    ".endr\n"
-    ".endm\n"
-
-    ".macro end_page_table\n"
-    ".size __identity_page_table, " __XSTRING(MMU_BLOCK_COUNT * 8) "\n"
-    ".if block_num != " __XSTRING(MMU_BLOCK_COUNT) "\n"
-    ".error \"Wrong number of page table entries\"\n"
-    ".endif\n"
-    ".endm\n"
-);
-
-#if defined(MACHINE_qemu)
-__asm__(
-    "start_page_table\n"
-    // [0x0000_0000,0x8000_0000): 2GiB normal memory
-    "page_table_entries 2, " __XSTRING(MMU_NORMAL_FLAGS) "\n"
-    // [0x8000_0000,0x1_0000_0000): 2GiB device memory
-    "page_table_entries 2, " __XSTRING(MMU_DEVICE_FLAGS) "\n"
-    // [0x1_0000_0000,0x2_0000_0000): 4GiB un-mapped
-    "page_table_entries 4, " __XSTRING(MMU_INVALID_FLAGS) "\n"
-    "end_page_table\n"
-);
-#elif defined(MACHINE_fvp)
-__asm__(
-    "start_page_table\n"
-    // [0x0000_0000,0x8000_0000): 2GiB unmapped. This actually contains a lot
-    // of different memory regions and devices, but we don't need any of them
-    // for testing.
-    "page_table_entries 2, " __XSTRING(MMU_INVALID_FLAGS) "\n"
-    // [0x8000_0000,0x1_0000_0000): 2GiB normal memory
-    "page_table_entries 2, " __XSTRING(MMU_NORMAL_FLAGS) "\n"
-    // [0x1_0000_0000,0x2_0000_0000): 4GiB un-mapped
-    "page_table_entries 4, " __XSTRING(MMU_INVALID_FLAGS) "\n"
-    "end_page_table\n"
-);
-#else
-#error "Unknown machine type"
-#endif
+extern void _start(void);
+extern const void *__vector_table[];
 
 #define SCTLR_MMU       (1 << 0)
 #define SCTLR_A         (1 << 1)
@@ -193,10 +105,7 @@ __asm__(
 #error "Unknown machine type"
 #endif
 
-extern const void *__vector_table[];
-
-static void __attribute((used))
-_cstart(void)
+void _cstart(void)
 {
         uint64_t        sctlr;
 
@@ -244,24 +153,6 @@ _cstart(void)
 	__start();
 }
 
-void __section(".text.init.enter")
-_start(void)
-{
-        /* Use EL-banked stack pointer */
-	__asm__("msr     SPSel, #1");
-
-	/* Initialize stack */
-	__asm__("adrp x1, __stack");
-	__asm__("add  x1, x1, :lo12:__stack");
-	__asm__("mov sp, x1");
-#if __ARM_FP
-	/* Enable FPU */
-	__asm__("mov x1, #(0x3 << 20)");
-	__asm__("msr cpacr_"BOOT_EL",x1");
-#endif
-	/* Jump into C code */
-	__asm__("bl _cstart");
-}
 
 #ifdef CRT0_SEMIHOST
 
@@ -303,13 +194,9 @@ static const char *const reasons[] = {
     "serror\n"
 };
 
-#define REASON_SYNC     0
-#define REASON_IRQ      1
-#define REASON_FIQ      2
-#define REASON_SERROR   3
-
-static void __attribute__((used))
-aarch64_fault(struct fault *f, int reason)
+/* Called from assembly wrappers in crt0.S, which fills *f with the register
+ * values at the point the fault happened. */
+void aarch64_fault(struct fault *f, int reason)
 {
     int r;
     fputs("AARCH64 fault: ", stdout);
@@ -324,71 +211,6 @@ aarch64_fault(struct fault *f, int reason)
     aarch64_fault_write_reg("\tESR:   0x", f->esr);
     aarch64_fault_write_reg("\tFAR:   0x", f->far);
     _exit(1);
-}
-
-#define VECTOR_COMMON \
-    __asm__("sub sp, sp, #256"); \
-    __asm__("str x0, [sp, #0]"); \
-    __asm__("str x1, [sp, #8]"); \
-    __asm__("str x2, [sp, #16]"); \
-    __asm__("str x3, [sp, #24]"); \
-    __asm__("str x4, [sp, #32]"); \
-    __asm__("str x5, [sp, #40]"); \
-    __asm__("str x6, [sp, #48]"); \
-    __asm__("str x7, [sp, #56]"); \
-    __asm__("str x8, [sp, #64]"); \
-    __asm__("str x9, [sp, #72]"); \
-    __asm__("str x10, [sp, #80]"); \
-    __asm__("str x11, [sp, #88]"); \
-    __asm__("str x12, [sp, #96]"); \
-    __asm__("str x13, [sp, #104]"); \
-    __asm__("str x14, [sp, #112]"); \
-    __asm__("str x15, [sp, #120]"); \
-    __asm__("str x16, [sp, #128]"); \
-    __asm__("str x17, [sp, #136]"); \
-    __asm__("str x18, [sp, #144]"); \
-    __asm__("str x19, [sp, #152]"); \
-    __asm__("str x20, [sp, #160]"); \
-    __asm__("str x21, [sp, #168]"); \
-    __asm__("str x22, [sp, #176]"); \
-    __asm__("str x23, [sp, #184]"); \
-    __asm__("str x24, [sp, #192]"); \
-    __asm__("str x25, [sp, #200]"); \
-    __asm__("str x26, [sp, #208]"); \
-    __asm__("str x27, [sp, #216]"); \
-    __asm__("str x28, [sp, #224]"); \
-    __asm__("str x29, [sp, #232]"); \
-    __asm__("str x30, [sp, #240]"); \
-    __asm__("mrs x0, ELR_EL1\n"); \
-    __asm__("str x0, [sp, #248]"); \
-    __asm__("mrs x0, ESR_EL1\n"); \
-    __asm__("str x0, [sp, #256]"); \
-    __asm__("mrs x0, FAR_EL1\n"); \
-    __asm__("str x0, [sp, #264]"); \
-    __asm__("mov x0, sp")
-
-void __section(".init")
-aarch64_sync_vector(void)
-{
-    VECTOR_COMMON;
-    __asm__("mov x1, #" REASON(REASON_SYNC));
-    __asm__("b  aarch64_fault");
-}
-
-void __section(".init")
-aarch64_irq_vector(void)
-{
-    VECTOR_COMMON;
-    __asm__("mov x1, #" REASON(REASON_IRQ));
-    __asm__("b  aarch64_fault");
-}
-
-void __section(".init")
-aarch64_fiq_vector(void)
-{
-    VECTOR_COMMON;
-    __asm__("mov x1, #" REASON(REASON_FIQ));
-    __asm__("b  aarch64_fault");
 }
 
 #endif /* CRT0_SEMIHOST */
