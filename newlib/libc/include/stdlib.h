@@ -427,6 +427,8 @@ typedef void (*constraint_handler_t)(const char *restrict msg,
 constraint_handler_t set_constraint_handler_s(constraint_handler_t handler);
 void abort_handler_s(const char *restrict msg, void *restrict ptr,
                      __errno_t error);
+void ignore_handler_s(const char *restrict msg, void *restrict ptr,
+                     __errno_t error);
 #endif
 
 _END_STD_C
