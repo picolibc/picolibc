@@ -52,7 +52,7 @@
 #include <errno.h>
 #endif
 
-#if (__ARM_FP & 0x8) && !defined(__SOFTFP__)
+#if (__ARM_FP & 0x8)
 
 /*
  * Double precision routines
@@ -151,9 +151,9 @@ fma (double x, double y, double z)
 
 #endif
 
-#endif /* (__ARM_FP & 0x8) && !defined(__SOFTFP__) */
+#endif /* (__ARM_FP & 0x8) */
 
-#if (__ARM_FP & 0x4) && !defined(__SOFTFP__)
+#if (__ARM_FP & 0x4)
 
 /*
  * Single precision functions
@@ -252,7 +252,7 @@ fmaf (float x, float y, float z)
 
 #endif
 
-#endif /* (__ARM_FP & 0x4) && !defined(__SOFTFP__) */
+#endif /* (__ARM_FP & 0x4) */
 
 #endif /* have attributes */
 

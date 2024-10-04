@@ -38,13 +38,13 @@ extern "C" {
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
 
-#if defined(__SOFTFP__) || (__ARM_FP & 0x8) == 0
+#if (__ARM_FP & 0x8) == 0
 #define PICOLIBC_DOUBLE_NOROUND
 #define PICOLIBC_DOUBLE_NOEXCEPT
 #define PICOLIBC_LONG_DOUBLE_NOEXCEPT
 #endif
 
-#if defined(__SOFTFP__) || (__ARM_FP & 0x4) == 0
+#if (__ARM_FP & 0x4) == 0
 #define PICOLIBC_FLOAT_NOROUND
 #define PICOLIBC_FLOAT_NOEXCEPT
 #endif

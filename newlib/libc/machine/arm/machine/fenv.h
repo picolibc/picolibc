@@ -37,18 +37,18 @@ _BEGIN_STD_C
 typedef int fenv_t;
 typedef int fexcept_t;
 
-#if defined(__SOFTFP__) || (__ARM_FP & 0x8) == 0
+#if (__ARM_FP & 0x8) == 0
 #define PICOLIBC_DOUBLE_NOROUND
 #define PICOLIBC_DOUBLE_NOEXCEPT
 #define PICOLIBC_LONG_DOUBLE_NOEXCEPT
 #endif
 
-#if defined(__SOFTFP__) || (__ARM_FP & 0x4) == 0
+#if (__ARM_FP & 0x4) == 0
 #define PICOLIBC_FLOAT_NOROUND
 #define PICOLIBC_FLOAT_NOEXCEPT
 #endif
 
-#ifndef __SOFTFP__
+#if __ARM_FP != 0
 
 /* Exception flags */
 #define	FE_INVALID	0x0001
@@ -77,7 +77,7 @@ typedef int fexcept_t;
 _END_STD_C
 
 #ifdef __declare_fenv_inline
-#ifdef __SOFTFP__
+#if __ARM_FP == 0
 #include <machine/fenv-softfloat.h>
 #else
 #include <machine/fenv-fp.h>

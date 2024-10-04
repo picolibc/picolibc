@@ -114,7 +114,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
    byte ordering was big or little endian depending upon the target.
    Modern floating-point formats are naturally ordered; in this case
    __VFP_FP__ will be defined, even if soft-float.  */
-#if defined(__VFP_FP__) || defined(__SOFTFP__)
+#if defined(__VFP_FP__) || __ARM_FP == 0
 # ifdef __ARMEL__
 #  define __IEEE_LITTLE_ENDIAN
 # else
@@ -126,7 +126,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #  define __IEEE_BYTES_LITTLE_ENDIAN
 # endif
 #endif
-#ifndef __SOFTFP__
+#if __ARM_FP != 0
 # define _SUPPORTS_ERREXCEPT
 #endif
 /* As per ISO/IEC TS 18661 '__FLT_EVAL_METHOD__' will be defined to 16
@@ -144,7 +144,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #else
 #define __IEEE_BIG_ENDIAN
 #endif
-#ifdef __ARM_FP
+#if __ARM_FP != 0
 # define _SUPPORTS_ERREXCEPT
 #else
 #ifdef __clang__
