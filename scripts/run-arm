@@ -94,7 +94,24 @@ case "$cpu_arch"/"$cpu_profile" in
         esac
         ;;
     v7/Microcontroller)
-        cpu=cortex-m3
+        case "$fp_arch" in
+            FPv5/FP-D16)
+                case "$fp_use" in
+                    SP)
+                        cpu=cortex-m4
+                        ;;
+                    *)
+                        cpu=cortex-m7
+                        ;;
+                esac
+                ;;
+            VFPv4-D16)
+                cpu=cortex-m7
+                ;;
+            *)
+                cpu=cortex-m3
+                ;;
+        esac
         ;;
     v7/Realtime)
         cpu=cortex-r5f
