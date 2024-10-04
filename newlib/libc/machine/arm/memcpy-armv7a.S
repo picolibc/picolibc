@@ -59,7 +59,7 @@
 # define USE_VFP
 # define USE_NEON
 
-#elif !defined (__SOFTFP__)
+#elif __ARM_FP != 0
 
 	.arch	armv6
 	.fpu	vfpv2
