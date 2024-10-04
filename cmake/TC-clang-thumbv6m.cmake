@@ -22,6 +22,7 @@ set(_HAVE_PICOLIBC_TLS_API TRUE)
 
 set(PICOLIBC_LINK_FLAGS
   --ld-path=/usr/bin/arm-none-eabi-ld
+  -L/usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/
   -L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp/
   -L/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/
   -L/usr/lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/
