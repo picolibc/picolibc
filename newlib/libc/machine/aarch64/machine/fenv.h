@@ -38,15 +38,41 @@ extern "C" {
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
 
+/*
+ * We can't tell if we're using compiler-rt or libgcc; instead
+ * we assume a connection between the compiler in use and
+ * the runtime library.
+ */
+#if defined(__clang__)
+
+/* compiler-rt has no exceptions in soft-float */
+
+#define PICOLIBC_LONG_DOUBLE_NOROUND
+#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+
 #if (__ARM_FP & 0x8) == 0
 #define PICOLIBC_DOUBLE_NOROUND
 #define PICOLIBC_DOUBLE_NOEXCEPT
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
 #endif
 
 #if (__ARM_FP & 0x4) == 0
 #define PICOLIBC_FLOAT_NOROUND
 #define PICOLIBC_FLOAT_NOEXCEPT
+#endif
+
+#else
+
+/* libgcc has exceptions when there is an FPU */
+
+#if __ARM_FP == 0
+#define PICOLIBC_LONG_DOUBLE_NOROUND
+#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define PICOLIBC_DOUBLE_NOROUND
+#define PICOLIBC_DOUBLE_NOEXCEPT
+#define PICOLIBC_FLOAT_NOROUND
+#define PICOLIBC_FLOAT_NOEXCEPT
+#endif
+
 #endif
 
 #if __ARM_FP
