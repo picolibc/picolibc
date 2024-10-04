@@ -1090,7 +1090,8 @@ _SVFSCANF (
                     *wcp = L'\0';
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
-                      if (!ccltab[__wctob (*wcp)])
+                      int wcb = __wctob(*wcp);
+                      if (wcb == EOF || !ccltab[wcb])
                         {
                           while (s != 0)
                             ungetc ( (unsigned char) buf[--s], fp);
