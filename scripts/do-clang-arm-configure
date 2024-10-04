@@ -33,4 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure clang-arm-none-eabi "$@"
+exec "$(dirname "$0")"/do-configure clang-arm-none-eabi -Dmultilib-exclude=aarch64 -Dtests=true "$@"
