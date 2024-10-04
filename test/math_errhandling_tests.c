@@ -1694,9 +1694,15 @@ makemathname(run_tests)(void) {
 			}
 		} else {
 			if (except) {
-                                PRINT;
-				printf("\texceptions not supported. %s returns %s\n", makemathname(tests)[t].name, e_to_str(except));
-				++result;
+#if defined(__clang__) && MATH_ERREXCEPT && !EXCEPTION_TEST
+                                if (except == FE_INEXACT) {
+                                } else
+#endif
+                                {
+                                        PRINT;
+                                        printf("\texceptions not supported. %s returns %s\n", makemathname(tests)[t].name, e_to_str(except));
+                                        ++result;
+                                }
 			}
 		}
 		if (math_errhandling & MATH_ERRNO) {
