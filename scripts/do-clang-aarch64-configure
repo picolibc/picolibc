@@ -34,4 +34,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 exec "$(dirname "$0")"/do-configure clang-aarch64-none-elf \
-	-Dtests=true "$@"
+	-Dtests=true -Dmultilib-exclude=arm "$@"

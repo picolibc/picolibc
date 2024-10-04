@@ -3,12 +3,12 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '-m64', '-target', 'aarch64-none-elf', '-march=armv8-a+nofp', '-mabi=aapcs-soft', '-nostdlib']
-cpp = ['clang', '-m64', '-target', 'aarch64-none-elf', '-march=armv8-a+nofp', '-mabi=aapcs-soft', '-nostdlib']
-ar = 'ar'
-as = 'as'
-nm = 'nm'
-strip = 'strip'
+c = ['clang', '-target', 'aarch64-none-elf', '-nostdlib']
+cpp = ['clang', '-target', 'aarch64-none-elf', '-nostdlib']
+ar = 'llvm-ar'
+as = 'llvm-as'
+nm = 'llvm-nm'
+strip = 'llvm-strip'
 # only needed to run tests
 exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-aarch64 "$@"', 'run-aarch64']
 
@@ -20,7 +20,7 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
-libgcc='-lclang_rt.builtins-aarch64'
+libgcc='-lclang_rt.builtins'
 default_flash_addr = '0x40000000'
 default_flash_size = '0x00400000'
 default_ram_addr   = '0x40400000'
