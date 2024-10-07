@@ -1037,7 +1037,14 @@ foreach target : ['default-target'] + targets
   
   message('generate linker script target ' + target)
 
-  custom_mem_config = meson.get_cross_property('custom_mem_config_' + target, '')
+  if target != 'default-target'
+    target_head = get_variable('target_' + target)[0].split('_')[0].underscorify()
+    custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_head, '')
+  else
+    custom_mem_config = ''
+  endif
+
+  custom_mem_config = meson.get_cross_property('custom_mem_config_' + target, custom_mem_config)
 
   if target == 'default-target' or custom_mem_config != ''
 
