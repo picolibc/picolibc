@@ -258,6 +258,8 @@ static void aarch64_fault_write_reg(const char *prefix, uint64_t reg)
 struct fault {
     uint64_t    x[31];
     uint64_t    pc;
+    uint64_t    esr;
+    uint64_t    far;
 };
 
 static const char *const reasons[] = {
@@ -285,6 +287,8 @@ aarch64_fault(struct fault *f, int reason)
         aarch64_fault_write_reg(prefix, f->x[r]);
     }
     aarch64_fault_write_reg("\tPC:    0x", f->pc);
+    aarch64_fault_write_reg("\tESR:   0x", f->esr);
+    aarch64_fault_write_reg("\tFAR:   0x", f->far);
     _exit(1);
 }
 
@@ -323,6 +327,10 @@ aarch64_fault(struct fault *f, int reason)
     __asm__("str x30, [sp, #240]"); \
     __asm__("mrs x0, ELR_EL1\n"); \
     __asm__("str x0, [sp, #248]"); \
+    __asm__("mrs x0, ESR_EL1\n"); \
+    __asm__("str x0, [sp, #256]"); \
+    __asm__("mrs x0, FAR_EL1\n"); \
+    __asm__("str x0, [sp, #264]"); \
     __asm__("mov x0, sp")
 
 void __section(".init")
