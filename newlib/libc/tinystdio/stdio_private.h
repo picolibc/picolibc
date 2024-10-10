@@ -216,12 +216,59 @@ __stdio_sflags (const char *mode)
     return __posix_sflags (mode, &omode);
 }
 
-#else
+#else // POSIX_IO
 
 int
 __stdio_sflags (const char *mode);
 
+#endif // POSIX_IO
+
+#ifdef _WANT_FLOCKFILE
+#define FILE_FN_UNLOCKED_SPECIFIER static inline
+#define _FILE_FN_UNLOCKED(_fn) _fn##_unlocked
+#define FILE_FN_UNLOCKED(_fn) _FILE_FN_UNLOCKED(_fn)
+
+wint_t FILE_FN_UNLOCKED(ungetwc)(wint_t c, FILE *stream);
+int FILE_FN_UNLOCKED(ungetc)(int c, FILE *stream);
+int FILE_FN_UNLOCKED(fgetc)(FILE *stream);
+int FILE_FN_UNLOCKED(fseek)(FILE *stream, long offset, int whence);
+int FILE_FN_UNLOCKED(fseeko)(FILE *stream, off_t offset, int whence);
+void FILE_FN_UNLOCKED(clearerr)(FILE *stream);
+
+#else
+#define FILE_FN_UNLOCKED_SPECIFIER
+#define FILE_FN_UNLOCKED(_fn) _fn
 #endif
+
+static inline void __flockfile(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	if (f->lock)
+		__lock_acquire_recursive(f->lock);
+#endif
+}
+
+static inline void __funlockfile(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	if (f->lock)
+		__lock_release_recursive(f->lock);
+#endif
+}
+
+static inline void __flockfile_init(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	__lock_init_recursive(f->lock);
+#endif
+}
+
+static inline void __flockfile_close(FILE *f) {
+	(void) f;
+#ifdef _WANT_FLOCKFILE
+	__lock_close(f->lock);
+#endif
+}
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);

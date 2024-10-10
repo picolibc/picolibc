@@ -199,6 +199,7 @@ fmemopen(void *buf, size_t size, const char *mode)
         .pos = initial_pos,
         .mflags = mflags,
     };
+    __flockfile_init(&(mf->xfile.cfile.file));
 
     return (FILE *)mf;
 }

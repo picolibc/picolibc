@@ -35,9 +35,23 @@
 
 #include "stdio_private.h"
 
-int fflush(FILE *stream)
+FILE_FN_UNLOCKED_SPECIFIER
+int
+FILE_FN_UNLOCKED(fflush)(FILE *stream)
 {
 	if (stream->flush)
 		return (stream->flush)(stream);
 	return 0;
 }
+
+#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+int
+fflush(FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fflush)(stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

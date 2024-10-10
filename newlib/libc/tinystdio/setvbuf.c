@@ -35,11 +35,24 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 int
-setvbuf(FILE *stream, char *buf, int mode, size_t size)
+FILE_FN_UNLOCKED(setvbuf)(FILE *stream, char *buf, int mode, size_t size)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
         if ((stream->flags & __SEXT) && xf->setvbuf)
                 return (xf->setvbuf)(stream, buf, mode, size);
         return 0;
 }
+
+#ifdef _WANT_FLOCKFILE
+int
+setvbuf(FILE *stream, char *buf, int mode, size_t size)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(setvbuf)(stream, buf, mode, size);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

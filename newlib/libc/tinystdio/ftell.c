@@ -40,8 +40,9 @@
 #define FTELL_TYPE long
 #endif
 
+FILE_FN_UNLOCKED_SPECIFIER
 FTELL_TYPE
-FTELL(FILE *stream)
+FILE_FN_UNLOCKED(FTELL)(FILE *stream)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
         if ((stream->flags & __SEXT) && xf->seek) {
@@ -53,3 +54,15 @@ FTELL(FILE *stream)
         errno = ESPIPE;
 	return -1;
 }
+
+#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+FTELL_TYPE
+FTELL(FILE *stream)
+{
+    FTELL_TYPE ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(FTELL)(stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

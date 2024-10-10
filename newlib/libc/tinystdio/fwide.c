@@ -35,10 +35,23 @@
 
 #include "stdio_private.h"
 
+FILE_FN_UNLOCKED_SPECIFIER
 int
-fwide(FILE *stream, int mode)
+FILE_FN_UNLOCKED(fwide)(FILE *stream, int mode)
 {
         if (mode != 0)
                 stream->flags = (stream->flags & ~__SWIDE) | ((mode > 0) ? __SWIDE : 0);
         return (stream->flags & __SWIDE) ? 1 : -1;
 }
+
+#ifdef _WANT_FLOCKFILE
+int
+fwide(FILE *stream, int mode)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fwide)(stream, mode);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

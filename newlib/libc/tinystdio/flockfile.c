@@ -35,14 +35,13 @@
 
 #include "stdio_private.h"
 
-/*
- * This only serializes with other threads also using flockfile,
- * but it's about as good as we can reasonably manage without
- * actually adding per-file locking to every API.
- */
 void
 flockfile (FILE *f)
 {
+#ifdef _WANT_FLOCKFILE
+    __flockfile(f);
+#else
     (void) f;
     __LIBC_LOCK();
+#endif
 }

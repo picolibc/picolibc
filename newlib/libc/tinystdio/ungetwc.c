@@ -30,7 +30,7 @@
 #include "stdio_private.h"
 
 wint_t
-ungetwc(wint_t c, FILE *stream)
+FILE_FN_UNLOCKED(ungetwc)(wint_t c, FILE *stream)
 {
 	/*
 	 * Streams that are not readable, or streams that already had
@@ -48,3 +48,15 @@ ungetwc(wint_t c, FILE *stream)
 
 	return c;
 }
+
+#if defined(_WANT_FLOCKFILE) && !defined(_FILE_INCLUDED)
+wint_t
+ungetwc(wint_t c, FILE *stream)
+{
+    wint_t ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(ungetwc)(c, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

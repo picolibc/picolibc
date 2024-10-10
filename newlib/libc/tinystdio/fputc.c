@@ -32,7 +32,7 @@
 #include "stdio_private.h"
 
 int
-fputc(int c, FILE *stream)
+FILE_FN_UNLOCKED(fputc)(int c, FILE *stream)
 {
 	if ((stream->flags & __SWR) == 0)
 		return EOF;
@@ -45,12 +45,31 @@ fputc(int c, FILE *stream)
 	return (unsigned char) c;
 }
 
+#ifdef _WANT_FLOCKFILE
+int
+fputc(int c, FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = FILE_FN_UNLOCKED(fputc)(c, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#else
+#ifdef _HAVE_ALIAS_ATTRIBUTE
+__strong_reference(fputc, fputc_unlocked);
+#else
+int fputc_unlocked(int c, FILE *stream) { return fputc(c, stream); }
+#endif
+#endif
+
 #undef putc
 #undef putc_unlocked
+
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(fputc, putc);
-__strong_reference(fputc, putc_unlocked);
+__strong_reference(FILE_FN_UNLOCKED(fputc), putc_unlocked);
 #else
 int putc(int c, FILE *stream) { return fputc(c, stream); }
-int putc_unlocked(int c, FILE *stream) { return fputc(c, stream); }
+int putc_unlocked(int c, FILE *stream) { return FILE_FN_UNLOCKED(fputc)(c, stream); }
 #endif
