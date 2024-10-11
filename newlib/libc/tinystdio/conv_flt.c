@@ -35,11 +35,15 @@ static const char pstr_an[] = "an";
 
 #if defined(STRTOD) || defined(STRTOF) || defined(STRTOLD)
 # define CHECK_WIDTH()   1
+#if 0
 # define CHECK_RANGE(flt) do {                                          \
         int __class = fpclassify(flt);                                  \
         if (__class == FP_INFINITE || __class == FP_SUBNORMAL || __class == FP_ZERO) \
             errno = ERANGE;                                             \
     } while (0);
+#else
+# define CHECK_RANGE(flt)
+#endif
 # ifdef _WANT_IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
