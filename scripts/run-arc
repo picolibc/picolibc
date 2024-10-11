@@ -66,6 +66,10 @@ case "$cpu" in
     hs6x|fpud)
         qemu=qemu-system-arc64
         ;;
+    arc700|arc600|nps400)
+        echo "unsupported cpu $cpu"
+        exit 77
+        ;;
     *)
         qemu=qemu-system-arc
         ;;

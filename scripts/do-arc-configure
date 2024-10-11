@@ -34,4 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 multilib_list="arcem,archs,em"
-exec "$(dirname "$0")"/do-configure arc-zephyr-elf -Dposix-console=true -Dtests=true -Dthread-local-storage=false -Dmultilib-list="$multilib_list" "$@"
+multilib_list=".,em,arcem,em4,em4_dmips,em4_fpus,em4_fpuda,quarkse_em,hs,archs,hs34,hs38,hs38_linux,hs4x,hs4xd,hs4x_rel31,arc600,arc600_norm,arc600_mul64,arc600_mul32x16,arc601,arc601_norm,arc601_mul64,arc601_mul32x16,arc700"
+multilib_exclude="em_mini"
+#exec "$(dirname "$0")"/do-configure arc-zephyr-elf -Dposix-console=true -Dtests=true -Dthread-local-storage=false -Dmultilib-list="$multilib_list" "$@"
+exec "$(dirname "$0")"/do-configure arc-zephyr-elf -Dposix-console=true -Dtests=true -Dthread-local-storage=false -Dmultilib-exclude="$multilib_exclude" "$@"
