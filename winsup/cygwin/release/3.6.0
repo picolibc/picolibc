@@ -37,3 +37,6 @@ What changed:
 
 - Redesign pipe handling to minimize toggling blocking mode.
   The query_hdl stuff is no longer needed in new implementation.
+
+- Now using AVX/AVX2/AVX-512 instructions in signal handler does not
+  break their context.

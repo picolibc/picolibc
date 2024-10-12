@@ -185,7 +185,7 @@ sigdelayed:
 	# make sure it is aligned from here on
 	# We could be called from an interrupted thread which doesn't know
 	# about his fate, so save and restore everything and the kitchen sink.
-	andq	\$0xfffffffffffffff0,%rsp
+	andq	\$0xffffffffffffffc0,%rsp
 	.seh_setframe %rbp,0
 	pushq	%r15
 	.seh_pushreg %r15
@@ -213,26 +213,41 @@ sigdelayed:
 	.seh_pushreg %rbx
 	pushq	%rax
 	.seh_pushreg %rax
-	subq	\$0x128,%rsp
-	.seh_stackalloc 0x128
-	stmxcsr	0x124(%rsp)
-	fnstcw	0x120(%rsp)
-	movdqa	%xmm15,0x110(%rsp)
-	movdqa	%xmm14,0x100(%rsp)
-	movdqa	%xmm13,0xf0(%rsp)
-	movdqa	%xmm12,0xe0(%rsp)
-	movdqa	%xmm11,0xd0(%rsp)
-	movdqa	%xmm10,0xc0(%rsp)
-	movdqa	%xmm9,0xb0(%rsp)
-	movdqa	%xmm8,0xa0(%rsp)
-	movdqa	%xmm7,0x90(%rsp)
-	movdqa	%xmm6,0x80(%rsp)
-	movdqa	%xmm5,0x70(%rsp)
-	movdqa	%xmm4,0x60(%rsp)
-	movdqa	%xmm3,0x50(%rsp)
-	movdqa	%xmm2,0x40(%rsp)
-	movdqa	%xmm1,0x30(%rsp)
-	movdqa	%xmm0,0x20(%rsp)
+
+	# +0x20: indicates if xsave is available
+	# +0x24: decrement of the stack to allocate space
+	# +0x28: %eax returnd by cpuid (0x0d, 0x00)
+	# +0x2c: %edx returnd by cpuid (0x0d, 0x00)
+	# +0x30: state save area
+	movl	\$1,%eax
+	cpuid
+	andl	\$0x04000000,%ecx # xsave available?
+	jnz	1f
+	movl	\$0x248,%ebx # 0x18 for alignment, 0x30 for additional space
+	subq	%rbx,%rsp
+	movl	%ecx,0x20(%rsp)
+	movl	%ebx,0x24(%rsp)
+	fxsave64 0x30(%rsp) # x86 CPU with 64-bit mode has fxsave64/fxrstor64
+	jmp	2f
+1:
+	movl	\$0x0d,%eax
+	xorl	%ecx,%ecx
+	cpuid	# get necessary space for xsave
+	movq	%rbx,%rcx
+	addq	\$0x48,%rbx # 0x18 for alignment, 0x30 for additional space
+	subq	%rbx,%rsp
+	movl	%ebx,0x24(%rsp)
+	xorq	%rax,%rax
+	shrq	\$3,%rcx
+	leaq	0x30(%rsp),%rdi
+	rep	stosq
+	xgetbv	# get XCR0 (ecx is 0 after rep)
+	movl	%eax,0x28(%rsp)
+	movl	%edx,0x2c(%rsp)
+	notl	%ecx # set ecx non-zero
+	movl	%ecx,0x20(%rsp)
+	xsave64	0x30(%rsp)
+2:
 	.seh_endprologue
 
 	movq	%gs:8,%r12			# get tls
@@ -259,26 +274,20 @@ sigdelayed:
 	xorl	%r11d,%r11d
 	movl	%r11d,_cygtls.incyg(%r12)
 	movl	%r11d,_cygtls.stacklock(%r12)	# unlock
-	movdqa	0x20(%rsp),%xmm0
-	movdqa	0x30(%rsp),%xmm1
-	movdqa	0x40(%rsp),%xmm2
-	movdqa	0x50(%rsp),%xmm3
-	movdqa	0x60(%rsp),%xmm4
-	movdqa	0x70(%rsp),%xmm5
-	movdqa	0x80(%rsp),%xmm6
-	movdqa	0x90(%rsp),%xmm7
-	movdqa	0xa0(%rsp),%xmm8
-	movdqa	0xb0(%rsp),%xmm9
-	movdqa	0xc0(%rsp),%xmm10
-	movdqa	0xd0(%rsp),%xmm11
-	movdqa	0xe0(%rsp),%xmm12
-	movdqa	0xf0(%rsp),%xmm13
-	movdqa	0x100(%rsp),%xmm14
-	movdqa	0x110(%rsp),%xmm15
-	fninit
-	fldcw	0x120(%rsp)
-	ldmxcsr	0x124(%rsp)
-	addq	\$0x128,%rsp
+
+	movl	0x20(%rsp),%ecx
+	testl	%ecx,%ecx # xsave available?
+	jnz	1f
+	fxrstor64 0x30(%rsp)
+	jmp	2f
+1:
+	movl	0x28(%rsp),%eax
+	movl	0x2c(%rsp),%edx
+	xrstor64 0x30(%rsp)
+2:
+	movl	0x24(%rsp),%ebx
+	addq	%rbx,%rsp
+
 	popq	%rax
 	popq	%rbx
 	popq	%rcx
