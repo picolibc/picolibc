@@ -532,12 +532,28 @@ if thread_local_storage
   tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
 endif
 
+#
+# Construct two format strings to help generate specs file fragments
+#
+# specs_abs_format:  constructs an absolute path to a file
+# specs_rel_format:  constructs a path relative to the GCC lib dir (for sysroot) or
+#                    absolute (for non-sysroot)
+#
+# We need both because places in the spec file which take library file names
+# (like startfile) take filenames and search the library path for them while
+# places that aren't known to the library file names don't do that. In
+# a sysroot install, that matters a lot.
+#
+# In a non-sysroot install, we're constructing the pathname ourselves
+# and so the search code will notice a leading / and not search, so
+# the two formats are the same
+#
 if sysroot_install
   # Get 'sysroot' or 'GCC_EXEC_PREFIX' from GCC output
   sysroot = run_command(cc.cmd_array() + ['-print-sysroot'], check : true).stdout().split('\n')[0]
   if sysroot != ''
-    specs_prefix_format_format = '%R/@0@'
-    specs_prefix_format_default = '%R/@0@'
+    specs_abs_format_format = '%R/@0@'
+    specs_prefix_default = ''
   else
     if not get_option('sysroot-install-skip-checks')
       error('sysroot install requested, but compiler has no sysroot')
@@ -548,17 +564,19 @@ if sysroot_install
     # That's why obtained path appended with '../../'
     sysroot = run_command(cc.cmd_array() + ['-print-search-dirs'], check : true).stdout().split('\n')[0].split(' ')[1]
     sysroot += '../../'
-    specs_prefix_format_format = '%:getenv(GCC_EXEC_PREFIX @0@)'
-    specs_prefix_format_default = '%:getenv(GCC_EXEC_PREFIX ../../@0@)'
+    specs_abs_format_format = '%:getenv(GCC_EXEC_PREFIX @0@)'
+    specs_prefix_default = '../../'
   endif
 
   # Try to calculate relative path from sysroot to prefix
-  specs_prefix_format = ''
+  specs_prefix = ''
+  match = false
   if fs.exists(sysroot)
     sysroot_to_prefix_correction = ''
     foreach _ : sysroot.split('/')
-      if fs.is_samepath(sysroot + '/' + sysroot_to_prefix_correction, prefix)
-        specs_prefix_format = specs_prefix_format_format.format(sysroot_to_prefix_correction + '@0@')
+      if fs.is_samepath(sysroot / sysroot_to_prefix_correction, prefix)
+        specs_prefix = sysroot_to_prefix_correction
+        match = true
         break
       endif
       sysroot_to_prefix_correction += '../'
@@ -566,14 +584,17 @@ if sysroot_install
   endif
 
   # Use default 'specs_prefix_format' if can not have relative sysroot path
-  if specs_prefix_format == ''
+  if not match
     if not get_option('sysroot-install-skip-checks')
       error('sysroot install requires sysroot(' + sysroot + ') to be a subdirectory of --prefix=<PATH>(' + prefix + ')')
     endif
-    specs_prefix_format = specs_prefix_format_default
+    specs_prefix = specs_prefix_default
   endif
+  specs_rel_format = specs_prefix + '@0@'
+  specs_abs_format = specs_abs_format_format.format(specs_rel_format)
 else
-  specs_prefix_format = prefix + '/@0@'
+  specs_rel_format = prefix + '/@0@'
+  specs_abs_format = specs_rel_format
 endif
 
 build_type_subdir = get_option('build-type-subdir')
@@ -669,8 +690,8 @@ else
 # Because 'getenv' appends a space afterwards in GCC spec files, the
 # entire final path elements must be specified inside the parens;
 # e.g. %:getenv(FOO a/b/c) instead of %:getenv(FOO)/a/b/c. That means
-# we use the specs_prefix_format value computed above to build paths
-# instead of simple concatenation
+# we use the specs_abs_format and specs_rel_format values
+# computed above to build paths instead of simple concatenation
 #
 
 #
@@ -693,10 +714,10 @@ specs_option_format = '%{@0@; @1@; :@2@}'
 prefix_include_dir = '%*/@0@/'.format(get_option('includedir'))
 isystem_prefix = picolibc_prefix_format.format(prefix_include_dir)
 
-buildtype_include_dir = specs_prefix_format.format(get_option('includedir') / '%*')
+buildtype_include_dir = specs_abs_format.format(get_option('includedir') / '%*')
 isystem_buildtype = picolibc_buildtype_format.format(buildtype_include_dir)
 
-gen_include_dir = specs_prefix_format.format(get_option('includedir'))
+gen_include_dir = specs_abs_format.format(get_option('includedir'))
 isystem_gen = gen_format.format(gen_include_dir)
 
 specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_gen)
@@ -708,26 +729,13 @@ specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem
 prefix_lib_dir = '%*/@0@'.format(get_option('libdir'))
 lib_prefix = picolibc_prefix_format.format(prefix_lib_dir)
 
-buildtype_lib_dir = specs_prefix_format.format(get_option('libdir') / '%*')
+buildtype_lib_dir = specs_abs_format.format(get_option('libdir') / '%*')
 lib_buildtype = picolibc_buildtype_format.format(buildtype_lib_dir)
 
-gen_lib_dir = specs_prefix_format.format(get_option('libdir'))
+gen_lib_dir = specs_abs_format.format(get_option('libdir'))
 lib_gen = gen_format.format(gen_lib_dir)
 
 specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib_gen)
-
-#
-# Build the non-multilib *startfile options
-#
-
-prefix_crt0_path = '%*/@0@'.format(get_option('libdir')) / crt0_expr
-crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
-
-buildtype_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*' / crt0_expr)
-crt0_buildtype = picolibc_buildtype_format.format(buildtype_crt0_path)
-
-gen_crt0_path = specs_prefix_format.format(get_option('libdir') / crt0_expr)
-crt0_gen = gen_format.format(gen_crt0_path)
 
 #
 # Now build multilib versions of the -L and *startfile values
@@ -740,10 +748,10 @@ if enable_multilib
   prefix_multilib_dir = '%*/@0@'.format(get_option('libdir') / '%M')
   multilib_prefix = picolibc_prefix_format.format(prefix_multilib_dir)
 
-  buildtype_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%*/%M')
+  buildtype_multilib_dir = specs_abs_format.format(get_option('libdir') / '%*/%M')
   multilib_buildtype = picolibc_buildtype_format.format(buildtype_multilib_dir)
 
-  gen_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%M')
+  gen_multilib_dir = specs_abs_format.format(get_option('libdir') / '%M')
   multilib_gen = gen_format.format(gen_multilib_dir)
 
   specs_multilibpath = '-L' + specs_option_format.format(multilib_prefix, multilib_buildtype, multilib_gen)
@@ -759,11 +767,26 @@ if enable_multilib
   prefix_multilib_crt0_path = '%*/@0@'.format(get_option('libdir')) / '%M' / crt0_expr
   crt0_prefix = picolibc_prefix_format.format(prefix_multilib_crt0_path)
 
-  buildtype_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*/%M' / crt0_expr)
+  buildtype_multilib_crt0_path = specs_rel_format.format(get_option('libdir') / '%*/%M' / crt0_expr)
   crt0_buildtype = picolibc_buildtype_format.format(buildtype_multilib_crt0_path)
 
-  gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
+  gen_multilib_crt0_path = specs_rel_format.format(get_option('libdir') / '%M' / crt0_expr)
   crt0_gen = gen_format.format(gen_multilib_crt0_path)
+else
+
+  #
+  # Build the non-multilib *startfile options
+  #
+
+  prefix_crt0_path = '%*/@0@'.format(get_option('libdir')) / crt0_expr
+  crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
+
+  buildtype_crt0_path = specs_rel_format.format(get_option('libdir') / '%*' / crt0_expr)
+  crt0_buildtype = picolibc_buildtype_format.format(buildtype_crt0_path)
+
+  gen_crt0_path = specs_rel_format.format(get_option('libdir') / crt0_expr)
+  crt0_gen = gen_format.format(gen_crt0_path)
+
 endif
   
 #
