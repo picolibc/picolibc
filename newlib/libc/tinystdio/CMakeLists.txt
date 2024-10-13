@@ -167,6 +167,8 @@ picolibc_sources(
   wprintf.c
   wscanf.c
   sprintf_s.c
+  vfprintf_s.c
+  vsnprintf_s.c
   )
 
 picolibc_sources(
