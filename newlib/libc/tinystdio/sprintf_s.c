@@ -122,7 +122,7 @@ sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
         va_end(args);
     }
 
-    if (rc < 0 || rc >= (int)bufsize) {
+    if (rc < 0 || (unsigned int)rc >= bufsize) {
         msg = "sprintf_s: dest buffer overflow";
         goto handle_error;
     } else {

@@ -147,6 +147,14 @@ main(void)
     TEST_RES(strcmp(buf, "") == 0, "Empty format string Contents", handler_res,
              test_id);
 
+    // Test case 6: Large buffer size (bufsize = 0xffffffff)
+    test_id++;
+    res = sprintf_s(buf, (rsize_t)0xffffffff, "Test large buffer size");
+    TEST_RES(res == (int)strlen("Test large buffer size"), "Large buffer size check", handler_res, test_id);
+    handler_res = test_handler_called(0, "", test_id);
+    TEST_RES(strcmp(buf, "Test large buffer size") == 0, "Large buffer size Contents", handler_res,
+             test_id);
+
     printf("All sprintf_s tests passed!\n");
     return 0;
 }
