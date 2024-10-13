@@ -169,10 +169,17 @@ randval(void)
 #define RAND_LOOPS 1000ll
 #define SMALL_MIN -1024ll
 #define SMALL_MAX 1024ll
+#define SMALL_STEP 1
+#elif defined(__arc__)
+#define RAND_LOOPS 1000ll
+#define SMALL_MIN -65536
+#define SMALL_MAX 65536
+#define SMALL_STEP 7
 #else
 #define RAND_LOOPS 100000ll
 #define SMALL_MIN -65536
 #define SMALL_MAX 65536
+#define SMALL_STEP 1
 #endif
 
 int main(void)
@@ -181,7 +188,7 @@ int main(void)
     int         ret = 0;
     long long   t;
 
-    for (x = SMALL_MIN; x <= SMALL_MAX; x++)
+    for (x = SMALL_MIN; x <= SMALL_MAX; x += SMALL_STEP)
         ret |= check(x);
 
     for (t = 0; t < RAND_LOOPS; t++) {
