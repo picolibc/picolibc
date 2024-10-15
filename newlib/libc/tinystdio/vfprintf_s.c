@@ -40,44 +40,29 @@
 #include "../stdlib/local_s.h"
 
 int
-sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
+vfprintf_s(FILE *restrict stream, const char *restrict fmt, va_list arg)
 {
     bool write_null = true;
     const char *msg = "";
-    va_list args;
     int rc;
 
-    if (s == NULL) {
+    if (stream == NULL) {
         write_null = false;
-        msg = "sprintf_s: dest buffer is null";
-        goto handle_error;
-    } else if ((bufsize == 0) || (CHECK_RSIZE(bufsize))) {
-        write_null = false;
-        msg = "sprintf_s: invalid buffer size";
+        msg = "vfprintf_s: output stream is null";
         goto handle_error;
     } else if (fmt == NULL) {
-        msg = "sprintf_s: null format string";
+        msg = "vfprintf_s: null format string";
         goto handle_error;
     } else if (strstr(fmt, " %n") != NULL) {
-        msg = "sprintf_s: format string contains percent-n";
+        msg = "vfprintf_s: format string contains percent-n";
         goto handle_error;
     } else {
-        va_start(args, fmt);
-        rc = vsnprintf_s(s, bufsize, fmt, args);
-        va_end(args);
+        rc = vfprintf(stream, fmt, arg);
     }
 
     if (rc < 0) {
-        msg = "sprintf_s: output error";
+        msg = "vfprintf_s: output error";
         goto handle_error;
-    } else if (rc > INT_MAX) {
-        msg = "sprintf_s: output size exceeds max limit";
-        goto handle_error;
-    } else if ((unsigned int)rc >= bufsize) {
-        msg = "sprintf_s: dest buffer overflow";
-        goto handle_error;
-    } else {
-        s[rc] = '\0';
     }
 
     // Normal return path
@@ -88,10 +73,10 @@ handle_error:
         __cur_handler(msg, NULL, -1);
     }
 
-    rc = 0; /* standard stipulates this */
+    rc = -1;
 
-    if (write_null && s != NULL) {
-        s[0] = '\0'; /* again, standard requires this */
+    if (write_null && stream != NULL) {
+        fflush(stream); /* Ensure the stream is flushed if there's an error */
     }
 
     return rc;

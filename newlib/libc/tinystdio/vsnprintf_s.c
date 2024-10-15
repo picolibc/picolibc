@@ -40,42 +40,47 @@
 #include "../stdlib/local_s.h"
 
 int
-sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
+vsnprintf_s(char *restrict s, rsize_t n, const char *restrict fmt, va_list arg)
 {
     bool write_null = true;
     const char *msg = "";
-    va_list args;
     int rc;
 
     if (s == NULL) {
         write_null = false;
-        msg = "sprintf_s: dest buffer is null";
+        msg = "vsnprintf_s: dest buffer is null";
         goto handle_error;
-    } else if ((bufsize == 0) || (CHECK_RSIZE(bufsize))) {
+    } else if ((n == 0) || (CHECK_RSIZE(n))) {
         write_null = false;
-        msg = "sprintf_s: invalid buffer size";
+        msg = "vsnprintf_s: invalid buffer size";
         goto handle_error;
     } else if (fmt == NULL) {
-        msg = "sprintf_s: null format string";
+        msg = "vsnprintf_s: null format string";
         goto handle_error;
     } else if (strstr(fmt, " %n") != NULL) {
-        msg = "sprintf_s: format string contains percent-n";
+        msg = "vsnprintf_s: format string contains percent-n";
         goto handle_error;
     } else {
-        va_start(args, fmt);
-        rc = vsnprintf_s(s, bufsize, fmt, args);
-        va_end(args);
+        if ((int)n < 0) {
+            n = (unsigned)INT_MAX + 1;
+        }
+        struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n ? n - 1 : 0);
+        rc = vfprintf_s(&f.file, fmt, arg);
+        if (n) {
+            *f.pos = '\0';
+        }
     }
 
     if (rc < 0) {
-        msg = "sprintf_s: output error";
+        msg = "vsnprintf_s: output error";
         goto handle_error;
     } else if (rc > INT_MAX) {
-        msg = "sprintf_s: output size exceeds max limit";
+        msg = "vsnprintf_s: output size exceeds max limit";
         goto handle_error;
-    } else if ((unsigned int)rc >= bufsize) {
-        msg = "sprintf_s: dest buffer overflow";
-        goto handle_error;
+    } else if ((unsigned int)rc >= n) {
+        if (n > 0) {
+            s[n - 1] = '\0';
+        }
     } else {
         s[rc] = '\0';
     }
@@ -88,9 +93,9 @@ handle_error:
         __cur_handler(msg, NULL, -1);
     }
 
-    rc = 0; /* standard stipulates this */
+    rc = -1;
 
-    if (write_null && s != NULL) {
+    if (write_null && s != NULL && n > 0) {
         s[0] = '\0'; /* again, standard requires this */
     }
 
