@@ -72,6 +72,8 @@ set(tests
   test-strncpy_s
   test-strnlen_s
   test-sprintf_s
+  test-vfprintf_s
+  test-vsnprintf_s
   )
 
 set(tests_fail
