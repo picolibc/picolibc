@@ -43,6 +43,7 @@ picolibc_sources(
   hash_page.c
   hcreate.c
   hcreate_r.c
+  ndbm.c
   qsort.c
   qsort_r.c
   tdelete.c
