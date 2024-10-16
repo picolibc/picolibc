@@ -70,6 +70,7 @@ picolibc_headers(""
   malloc.h
   math.h
   memory.h
+  ndbm.h
   newlib.h
   paths.h
   picotls.h
