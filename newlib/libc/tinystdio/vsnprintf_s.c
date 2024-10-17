@@ -48,17 +48,14 @@ vsnprintf_s(char *restrict s, rsize_t n, const char *restrict fmt, va_list arg)
 
     if (s == NULL) {
         write_null = false;
-        msg = "vsnprintf_s: dest buffer is null";
+        msg = "dest buffer is null";
         goto handle_error;
     } else if ((n == 0) || (CHECK_RSIZE(n))) {
         write_null = false;
-        msg = "vsnprintf_s: invalid buffer size";
+        msg = "invalid buffer size";
         goto handle_error;
     } else if (fmt == NULL) {
-        msg = "vsnprintf_s: null format string";
-        goto handle_error;
-    } else if (strstr(fmt, " %n") != NULL) {
-        msg = "vsnprintf_s: format string contains percent-n";
+        msg = "null format string";
         goto handle_error;
     } else {
         if ((int)n < 0) {
@@ -72,15 +69,14 @@ vsnprintf_s(char *restrict s, rsize_t n, const char *restrict fmt, va_list arg)
     }
 
     if (rc < 0) {
-        msg = "vsnprintf_s: output error";
+        msg = "output error";
         goto handle_error;
     } else if (rc > INT_MAX) {
-        msg = "vsnprintf_s: output size exceeds max limit";
+        msg = "output size exceeds max limit";
         goto handle_error;
     } else if ((unsigned int)rc >= n) {
-        if (n > 0) {
-            s[n - 1] = '\0';
-        }
+        msg = "dest buffer overflow";
+        goto handle_error;
     } else {
         s[rc] = '\0';
     }

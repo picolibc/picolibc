@@ -32,6 +32,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #define __STDC_WANT_LIB_EXT1__ 1
 #include "stdio_private.h"
 #include <stdio.h>
@@ -39,45 +40,5 @@
 #include <stdbool.h>
 #include "../stdlib/local_s.h"
 
-int
-vfprintf_s(FILE *restrict stream, const char *restrict fmt, va_list arg)
-{
-    bool write_null = true;
-    const char *msg = "";
-    int rc;
-
-    if (stream == NULL) {
-        write_null = false;
-        msg = "vfprintf_s: output stream is null";
-        goto handle_error;
-    } else if (fmt == NULL) {
-        msg = "vfprintf_s: null format string";
-        goto handle_error;
-    } else if (strstr(fmt, " %n") != NULL) {
-        msg = "vfprintf_s: format string contains percent-n";
-        goto handle_error;
-    } else {
-        rc = vfprintf(stream, fmt, arg);
-    }
-
-    if (rc < 0) {
-        msg = "vfprintf_s: output error";
-        goto handle_error;
-    }
-
-    // Normal return path
-    return rc;
-
-handle_error:
-    if (__cur_handler != NULL) {
-        __cur_handler(msg, NULL, -1);
-    }
-
-    rc = -1;
-
-    if (write_null && stream != NULL) {
-        fflush(stream); /* Ensure the stream is flushed if there's an error */
-    }
-
-    return rc;
-}
+#define VFPRINTF_S
+#include "vfprintf.c"

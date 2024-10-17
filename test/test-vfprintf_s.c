@@ -41,8 +41,10 @@
 #include <stdarg.h>
 
 #define MAX_ERROR_MSG 100
+#define BUFFER_SIZE 256
 
 char handler_msg[MAX_ERROR_MSG] = "";
+char buffer[BUFFER_SIZE] = "";
 
 static void
 custom_constraint_handler(const char *restrict msg, void *restrict ptr,
@@ -118,7 +120,12 @@ main(void)
     int test_id = 0;
     int handler_res = 0;
     errno_t res;
-    FILE *f = tmpfile();
+    FILE *f = fmemopen(buffer, BUFFER_SIZE, "w+");
+
+    if (!f) {
+        perror("Failed to open memory stream");
+        return 1;
+    }
 
     set_constraint_handler_s(custom_constraint_handler);
 
@@ -132,14 +139,13 @@ main(void)
     // Test case 2: Formatting with Null stream
     test_id++;
     res = test_vfprintf_s(NULL, "Hello, %s!", "world");
-    handler_res = test_handler_called(1, "vfprintf_s: stream is null", test_id);
+    handler_res = test_handler_called(1, "output stream is null", test_id);
     TEST_RES(res == -1, "Formatting with Null stream", handler_res, test_id);
 
     // Test case 3: Formatting with Null format string
     test_id++;
     res = test_vfprintf_s(f, NULL, "world");
-    handler_res =
-        test_handler_called(1, "vfprintf_s: null format string", test_id);
+    handler_res = test_handler_called(1, "null format string", test_id);
     TEST_RES(res == -1, "Formatting with Null format string", handler_res,
              test_id);
 
