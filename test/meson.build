@@ -642,7 +642,10 @@ foreach target : targets
                   ]
 
   if tinystdio
-    plain_tests += 'test-sprintf_s'
+    plain_tests += ['test-sprintf_s',
+                    'test-vfprintf_s',
+                    'test-vsnprintf_s',
+                   ]    
   endif
 
 

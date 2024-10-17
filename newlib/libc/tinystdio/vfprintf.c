@@ -414,7 +414,18 @@ skip_to_arg(const CHAR *fmt_orig, my_va_list *ap, int target_argno)
             } else if (c == 'c') {
                 (void) va_arg (ap->ap, int);
             } else if (c == 's') {
+#ifdef VFPRINTF_S
+                const char *str = va_arg(ap->ap, const char *);
+                if (str == NULL) {
+                    const char *msg =
+                        "vfprintf_s: arg corresponding to '%s' is null";
+                    if (__cur_handler != NULL) {
+                        __cur_handler(msg, NULL, -1);
+                    }
+                }
+#else
                 (void) va_arg (ap->ap, char *);
+#endif
             } else if (c == 'd' || c == 'i') {
                 ultoa_signed_t x_s;
                 arg_to_signed(ap->ap, flags, x_s);
@@ -477,7 +488,12 @@ _wcslen(const char *s, size_t maxlen)
 }
 #endif
 
+#ifdef VFPRINTF_S
+int
+vfprintf_s(FILE *restrict stream, const char *restrict fmt, va_list ap_orig)
+#else
 int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
+#endif
 {
     unsigned c;		/* holds a char from the format string */
     uint16_t flags;
@@ -525,6 +541,20 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 #ifdef _NEED_IO_POS_ARGS
     va_copy(ap, ap_orig);
+#endif
+
+#ifdef VFPRINTF_S
+    bool write_null = true;
+    const char *msg = "";
+
+    if (stream == NULL) {
+        write_null = false;
+        msg = "output stream is null";
+        goto handle_error;
+    } else if (fmt == NULL) {
+        msg = "null format string";
+        goto handle_error;
+    }
 #endif
 
     for (;;) {
@@ -1080,8 +1110,13 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                 } else
 #endif
                     pnt = va_arg (ap, char *);
-                if (!pnt)
+                if (!pnt) {
+#ifdef VFPRINTF_S
+                    msg = "arg corresponding to '%s' is null";
+                    goto handle_error;
+#endif
                     pnt = "(null)";
+                }
 #ifdef _NEED_IO_SHRINK
                 char c;
                 while ( (c = *pnt++) )
@@ -1137,8 +1172,12 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
                 }
 #endif
-#ifdef _PRINTF_PERCENT_N
             } else if (c == 'n') {
+#ifdef VFPRINTF_S
+                msg = "format string contains percent-n";
+                goto handle_error;
+#else
+#ifdef _PRINTF_PERCENT_N
                 if (flags & FL_LONG) {
                     if (flags & FL_REPD_TYPE)
                         *va_arg(ap, long long *) = stream_len;
@@ -1152,6 +1191,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                 } else {
                     *va_arg(ap, int *) = stream_len;
                 }
+#endif
 #endif
             } else {
                 if (c == 'd' || c == 'i') {
@@ -1319,12 +1359,25 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     stream->flags |= __SERR;
     stream_len = -1;
     goto ret;
+#ifdef VFPRINTF_S
+  handle_error:
+      if (__cur_handler != NULL) {
+          __cur_handler(msg, NULL, -1);
+      }
+
+      if (write_null && stream != NULL) {
+          fflush(stream); /* Ensure the stream is flushed if there's an error */
+      }
+      goto fail;
+#endif
 }
 
+#ifndef VFPRINTF_S
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
+#endif
 #endif
 #endif
