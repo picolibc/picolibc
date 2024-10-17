@@ -49,17 +49,17 @@ sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
 
     if (s == NULL) {
         write_null = false;
-        msg = "sprintf_s: dest buffer is null";
+        msg = "dest buffer is null";
         goto handle_error;
     } else if ((bufsize == 0) || (CHECK_RSIZE(bufsize))) {
         write_null = false;
-        msg = "sprintf_s: invalid buffer size";
+        msg = "invalid buffer size";
         goto handle_error;
     } else if (fmt == NULL) {
-        msg = "sprintf_s: null format string";
+        msg = "null format string";
         goto handle_error;
     } else if (strstr(fmt, " %n") != NULL) {
-        msg = "sprintf_s: format string contains percent-n";
+        msg = "format string contains percent-n";
         goto handle_error;
     } else {
         va_start(args, fmt);
@@ -68,16 +68,7 @@ sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
     }
 
     if (rc < 0) {
-        msg = "sprintf_s: output error";
-        goto handle_error;
-    } else if (rc > INT_MAX) {
-        msg = "sprintf_s: output size exceeds max limit";
-        goto handle_error;
-    } else if ((unsigned int)rc >= bufsize) {
-        msg = "sprintf_s: dest buffer overflow";
-        goto handle_error;
-    } else {
-        s[rc] = '\0';
+        rc = 0;
     }
 
     // Normal return path

@@ -399,7 +399,8 @@ int sprintf_s(char *__restrict __s, rsize_t __bufsize,
               const char *__restrict __format, ...);
 int vsnprintf_s(char *restrict s, rsize_t n, const char *restrict fmt,
                 va_list arg);
-int vfprintf_s(FILE *restrict stream, const char *restrict fmt, va_list arg);
+int vfprintf_s(FILE *restrict stream, const char *restrict fmt,
+               va_list ap_orig);
 #endif
 
 /*

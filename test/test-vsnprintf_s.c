@@ -135,23 +135,20 @@ main(void)
     // Test case 2: Formatting with buffer overflow
     test_id++;
     res = test_vsnprintf_s(buf, 10, "Hello, %s!", "world");
-    handler_res =
-        test_handler_called(1, "vsnprintf_s: dest buffer overflow", test_id);
+    handler_res = test_handler_called(1, "dest buffer overflow", test_id);
     TEST_RES(res == -1, "Formatting with buffer overflow", handler_res,
              test_id);
 
     // Test case 3: Formatting with Null buffer
     test_id++;
     res = test_vsnprintf_s(NULL, sizeof(buf), "Hello, %s!", "world");
-    handler_res =
-        test_handler_called(1, "vsnprintf_s: dest buffer is null", test_id);
+    handler_res = test_handler_called(1, "dest buffer is null", test_id);
     TEST_RES(res == -1, "Formatting with Null buffer", handler_res, test_id);
 
     // Test case 4: Formatting with Null format string
     test_id++;
     res = test_vsnprintf_s(buf, sizeof(buf), NULL, "world");
-    handler_res =
-        test_handler_called(1, "vsnprintf_s: null format string", test_id);
+    handler_res = test_handler_called(1, "null format string", test_id);
     TEST_RES(res == -1, "Formatting with Null format string", handler_res,
              test_id);
 
