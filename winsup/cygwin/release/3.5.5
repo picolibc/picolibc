@@ -12,3 +12,7 @@ Fixes:
   Addresses: https://sourceware.org/pipermail/cygwin/2024-September/256468.html
 
 - Fix timer_delete() return value which always indicated failure.
+
+- Fix lockf() error which occurs when adding a new lock over multiple
+  locks.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-October/256528.html

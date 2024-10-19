@@ -1454,13 +1454,14 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	  /*
 	   * Add the new lock before overlap.
 	   */
-	  if (needtolink) {
+	  if (needtolink)
+	    {
 	      *prev = lock;
 	      lock->lf_next = overlap;
-	  }
+	      lock->create_lock_obj ();
+	    }
 	  overlap->lf_start = lock->lf_end + 1;
 	  lf_wakelock (overlap, fhdl);
-	  lock->create_lock_obj ();
 	  overlap->create_lock_obj ();
 	  break;
 	}
