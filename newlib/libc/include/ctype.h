@@ -229,6 +229,7 @@ __declare_extern_inline(int) toupper_l (int c, locale_t l) { (void) l; return to
 #define _C	040
 #define _X	0100
 #define	_B	0200
+#define	_T	0400
 
 #ifndef __CHAR_UNSIGNED__
 #define ALLOW_NEGATIVE_CTYPE_INDEX
@@ -238,7 +239,7 @@ __declare_extern_inline(int) toupper_l (int c, locale_t l) { (void) l; return to
 extern const char	_ctype_b[];
 #define _ctype_ (_ctype_b + 127)
 #else
-extern const char	_ctype_[];
+extern const short	_ctype_[];
 #endif
 
 #ifdef __HAVE_LOCALE_INFO__
