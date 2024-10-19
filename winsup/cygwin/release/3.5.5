@@ -16,3 +16,7 @@ Fixes:
 - Fix lockf() error which occurs when adding a new lock over multiple
   locks.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-October/256528.html
+
+- Make lockf() return ENOLCK when the number of locks exceeds
+  MAX_LOCKF_CNT rather than printing a warning message.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-October/256528.html
