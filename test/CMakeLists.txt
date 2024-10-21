@@ -72,6 +72,7 @@ set(tests
   test-strncpy_s
   test-strnlen_s
   test-sprintf_s
+  test-uchar
   )
 
 set(tests_fail
