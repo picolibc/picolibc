@@ -560,6 +560,10 @@ __utf8_mbtowc (
     }
   if (ch >= 0xc0 && ch <= 0xdf)
     {
+      if (ch == 0xc0) {
+        _REENT_ERRNO(r) = EILSEQ;
+        return -1;
+      }
       /* two-byte sequence */
       state->__value.__wchb[0] = ch;
       if (state->__count == 0)
