@@ -59,11 +59,6 @@
 #define __ptr_t void *
 #define __long_double_t  long double
 
-#define __attribute_malloc__
-#define __attribute_pure__
-#define __attribute_format_strfmon__(a,b)
-#define __flexarr      [0]
-
 #ifndef __BOUNDED_POINTERS__
 # define __bounded      /* nothing */
 # define __unbounded    /* nothing */
@@ -88,6 +83,51 @@
 #ifndef	__has_builtin
 #define	__has_builtin(x)	0
 #endif
+
+#if __has_attribute(__pure__)
+# define __attribute_pure__ __attribute__((__pure__))
+#else
+# define __attribute_pure__
+#endif
+
+#if __has_attribute(__format__)
+# define __attribute_format_strfmon__(a,b) \
+    __attribute__((__format__(__strfmon__, a, b)))
+#else
+# define __attribute_format_strfmon__(a,b)
+#endif
+
+#if __has_attribute(__nonnull__)
+# define __attribute_nonnull__(params) __attribute__((__nonnull__ params))
+#else
+# define __attribute_nonnull__(params)
+#endif
+
+#if __has_attribute(__returns_nonnull__)
+# define __returns_nonnull __attribute__((__returns_nonnull__))
+#else
+# define __returns_nonnull
+#endif
+
+#if __has_attribute (__malloc__)
+# define __attribute_malloc__ __attribute__ ((__malloc__))
+#else
+# define __attribute_malloc__
+#endif
+
+#if __has_attribute(__alloc_size__)
+# define __attribute_alloc_size__(params) __attribute__ ((__alloc_size__ params))
+#else
+# define __attribute_alloc_size__(params)
+#endif
+
+#if __has_attribute (__alloc_align__)
+# define __attribute_alloc_align__(param) __attribute__ ((__alloc_align__ param))
+#else
+# define __attribute_alloc_align__(param)
+#endif
+
+#define __flexarr      []
 
 #if defined(__cplusplus)
 #define	__BEGIN_DECLS	extern "C" {
@@ -402,6 +442,7 @@
 #endif
 
 #define	__malloc_like __malloc_like_with_free(free, 1)
+#define __attr_dealloc_free __malloc_like_with_free(__builtin_free, 1)
 
 #ifndef __always_inline
 #if __GNUC_PREREQ__(3, 1)
