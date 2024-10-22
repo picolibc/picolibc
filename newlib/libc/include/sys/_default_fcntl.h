@@ -19,6 +19,10 @@ typedef	__off_t		off_t;		/* file offset */
 typedef	__pid_t		pid_t;		/* process id */
 #define	_PID_T_DECLARED
 #endif
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
 
 #define	_FOPEN		(-1)	/* from sys/file.h, kernel use only */
 #define	_FREAD		0x0001	/* read enabled */

@@ -314,6 +314,11 @@ typedef	__off_t		off_t;		/* file offset */
 #  define _OFF_T_DECLARED
 # endif
 
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
+
 # ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
 #  define _SSIZE_T_DECLARED

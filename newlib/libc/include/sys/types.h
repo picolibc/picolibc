@@ -178,6 +178,11 @@ typedef	__off_t		off_t;		/* file offset */
 #define	_OFF_T_DECLARED
 #endif
 
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
+
 #ifndef _DEV_T_DECLARED
 typedef	__dev_t		dev_t;		/* device number or struct cdev */
 #define	_DEV_T_DECLARED
