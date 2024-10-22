@@ -36,6 +36,8 @@ srcs_posix = [
   'basename.c',
   'dirname.c',
   'fnmatch.c',
+  'fpathconf.c',
+  'pathconf.c',
   'regcomp.c',
   'regerror.c',
   'regexec.c',
