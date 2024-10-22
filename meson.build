@@ -948,7 +948,6 @@ if enable_multilib
   endforeach
 
   foreach target : target_list
-    message('target ' + target)
     tmp = target.split(';')
     matches_exclude = false
     foreach exclude : multilib_exclude
@@ -1035,13 +1034,21 @@ endif
 
 foreach target : ['default-target'] + targets
   
-  message('generate linker script target ' + target)
+  custom_mem_config = ''
 
   if target != 'default-target'
+    target_part = ''
+    foreach part : target.split('_')
+      if target_part == ''
+        target_part = part
+      else
+        target_part += '_' + part
+      endif
+      custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_part, custom_mem_config)
+    endforeach
+
     target_head = get_variable('target_' + target)[0].split('_')[0].underscorify()
-    custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_head, '')
-  else
-    custom_mem_config = ''
+    custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_head, custom_mem_config)
   endif
 
   custom_mem_config = meson.get_cross_property('custom_mem_config_' + target, custom_mem_config)
@@ -1524,7 +1531,6 @@ endif
 # Set config variables for each requested 'from' encoding
 
 foreach from : newlib_iconv_from_encodings
-  message('from ' + from)
   if not available_encodings.contains(from)
     error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
   endif
