@@ -1803,6 +1803,9 @@ fhandler_disk_file::prw_open (bool write, void *aio)
       return -1;
     }
 
+  /* prw_handle is invalid after fork. */
+  need_fork_fixup (true);
+
   /* record prw_handle's asyncness for subsequent pread/pwrite operations */
   prw_handle_isasync = !!aio;
   return 0;

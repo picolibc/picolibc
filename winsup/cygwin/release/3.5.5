@@ -7,3 +7,6 @@ Fixes:
 
 - Fix a regression in 3.5.4 that writing to pipe extremely slows down.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-August/256398.html
+
+- Fix pread() and pwrite() EBADF error after fork().
+  Addresses: https://sourceware.org/pipermail/cygwin/2024-September/256468.html
