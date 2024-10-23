@@ -9,6 +9,7 @@ HERE=`dirname "$0"`
 "$HERE"/do-zephyr-test nios2 "$@"
 "$HERE"/do-zephyr-test sparc-zephyr "$@"
 "$HERE"/do-zephyr-test x86_64-zephyr "$@"
+"$HERE"/do-zephyr-test xtensa-dc233c "$@"
 "$HERE"/do-zephyr-build xtensa-espressif_esp32 "$@"
 "$HERE"/do-zephyr-build xtensa-espressif_esp32s2 "$@"
 "$HERE"/do-zephyr-build xtensa-nxp_imx_adsp "$@"
