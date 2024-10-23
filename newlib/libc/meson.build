@@ -59,13 +59,6 @@ srcs_machine = []
 machine_dir = 'machine' / host_cpu_family
 if fs.is_dir(machine_dir)
 
-  machine_inc_dir = machine_dir / 'include'
-  if fs.is_dir(machine_inc_dir)
-    inc = [include_directories(machine_inc_dir), inc]
-  endif
-
-  inc = [include_directories(machine_dir), inc]
-
   libdirs = [machine_dir] + libdirs
   libnames = ['machine'] + libnames
 

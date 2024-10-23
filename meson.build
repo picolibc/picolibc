@@ -1578,6 +1578,15 @@ endif
 
 inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
 
+machine_dir = 'newlib/libc/machine' / host_cpu_family
+if fs.is_dir(machine_dir)
+  machine_inc_dir = machine_dir / 'include'
+  if fs.is_dir(machine_inc_dir)
+    inc_dirs = [machine_inc_dir] + inc_dirs
+  endif
+  inc_dirs = [machine_dir] + inc_dirs
+endif
+
 inc = include_directories(inc_dirs)
 
 inc_args = []
