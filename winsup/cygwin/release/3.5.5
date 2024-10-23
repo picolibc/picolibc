@@ -10,3 +10,5 @@ Fixes:
 
 - Fix pread() and pwrite() EBADF error after fork().
   Addresses: https://sourceware.org/pipermail/cygwin/2024-September/256468.html
+
+- Fix timer_delete() return value which always indicated failure.

@@ -530,6 +530,7 @@ timer_delete (timer_t timerid)
 	  __leave;
 	}
       delete in_tt;
+      ret = 0;
     }
   __except (EFAULT) {}
   __endtry
