@@ -55,6 +55,12 @@ __utf8_wctomb (
   if (sizeof (wchar_t) == 2 && state->__count == -4
       && (wchar < 0xdc00 || wchar > 0xdfff))
     {
+      /* Unexpected extra high surrogate */
+      if (0xd800 <= wchar && wchar <= 0xdbff)
+        {
+          _REENT_ERRNO(r) = EILSEQ;
+          return -1;
+        }
       /* There's a leftover lone high surrogate.  Write out the CESU-8 value
 	 of the surrogate and proceed to convert the given character.  Note
 	 to return extra 3 bytes. */
@@ -86,6 +92,12 @@ __utf8_wctomb (
 	  uint32_t tmp;
 	  if (wchar <= 0xdbff)
 	    {
+              if (state->__count == -4)
+                {
+                  /* Extra high surrogate */
+                  _REENT_ERRNO(r) = EILSEQ;
+                  return -1;
+                }
 	      /* First half of a surrogate pair.  Store the state and
 	         return ret + 0. */
 	      tmp = ((wchar & 0x3ff) << 10) + 0x10000;
@@ -110,7 +122,9 @@ __utf8_wctomb (
 	      *s   = 0x80 |  (tmp &     0x3f);
 	      return 4;
 	    }
-	  /* Otherwise translate into CESU-8 value. */
+          /* Unexpected second half */
+          _REENT_ERRNO(r) = EILSEQ;
+          return -1;
 	}
       *s++ = 0xe0 | ((wchar & 0xf000) >> 12);
       *s++ = 0x80 | ((wchar &  0xfc0) >> 6);

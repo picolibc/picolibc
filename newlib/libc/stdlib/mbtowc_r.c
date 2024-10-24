@@ -629,6 +629,12 @@ __utf8_mbtowc (
       tmp = (wchar_t)((state->__value.__wchb[0] & 0x0f) << 12)
 	|    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 6)
 	|     (wchar_t)(ch & 0x3f);
+      /* Check for surrogates */
+      if (0xd800 <= tmp && tmp <= 0xdfff)
+        {
+          _REENT_ERRNO(r) = EILSEQ;
+          return -1;
+        }
       *pwc = tmp;
       return i;
     }
