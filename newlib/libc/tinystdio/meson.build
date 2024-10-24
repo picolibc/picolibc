@@ -170,6 +170,8 @@ srcs_tinystdio = [
   'wprintf.c',
   'wscanf.c',
   'sprintf_s.c',
+  'vfprintf_s.c',
+  'vsnprintf_s.c',
 ]
 
 # exact float/string conversion code

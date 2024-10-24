@@ -388,6 +388,7 @@ int	putchar_unlocked (int);
 
 #if __STDC_WANT_LIB_EXT1__ == 1
 #include <sys/_types.h>
+#include <stdarg.h>
 
 #ifndef _ERRNO_T_DEFINED
 typedef __errno_t errno_t;
@@ -401,6 +402,10 @@ typedef __rsize_t rsize_t;
 
 int sprintf_s(char *__restrict __s, rsize_t __bufsize,
               const char *__restrict __format, ...);
+int vsnprintf_s(char *restrict s, rsize_t n, const char *restrict fmt,
+                va_list arg);
+int vfprintf_s(FILE *restrict stream, const char *restrict fmt,
+               va_list ap_orig);
 #endif
 
 /*
