@@ -91,7 +91,7 @@ extern "C" {
  *	ISO C11
  *
  * _ISOC2x_SOURCE or gcc -std=c2x or g++ -std=c++20
- *	ISO C11
+ *	ISO C2x
  *
  * _ATFILE_SOURCE (implied by _POSIX_C_SOURCE >= 200809L)
  *	"at" functions
