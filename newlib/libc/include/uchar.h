@@ -52,8 +52,10 @@ typedef _mbstate_t mbstate_t;
 #endif
 
 typedef unsigned char char8_t;
+#if !defined __cplusplus || __cplusplus < 201103L
 typedef __uint_least16_t char16_t;
 typedef __uint_least32_t char32_t;
+#endif
 
 size_t mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n,
                _mbstate_t * __restrict ps);
