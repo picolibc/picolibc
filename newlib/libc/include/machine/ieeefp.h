@@ -586,6 +586,14 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+#ifdef __TRICORE__
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#endif
+
 /* New math code requires 64-bit doubles */
 #ifdef _DOUBLE_IS_32BITS
 #undef __OBSOLETE_MATH
