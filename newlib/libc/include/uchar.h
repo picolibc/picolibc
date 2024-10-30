@@ -51,7 +51,9 @@ typedef _mbstate_t mbstate_t;
 #define _MBSTATE_DECLARED
 #endif
 
+#ifndef __cpp_char8_t
 typedef unsigned char char8_t;
+#endif
 #if !defined __cplusplus || __cplusplus < 201103L
 typedef __uint_least16_t char16_t;
 typedef __uint_least32_t char32_t;
