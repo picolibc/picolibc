@@ -575,7 +575,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	  else if (avail >= PIPE_BUF)
 	    len1 = avail & ~(PIPE_BUF - 1);
 	  else
-	    len1 = 1 << (31 - __builtin_clzl (avail));
+	    len1 = 1 << (63 - __builtin_clzl (avail));
 	  short_write_once = true;
 	}
       if (isclosed ())  /* A signal handler might have closed the fd. */
