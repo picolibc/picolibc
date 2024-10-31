@@ -827,3 +827,9 @@ fhandler_termios::spawn_worker::close_handle_set ()
   if (cons_need_cleanup)
     fhandler_console::close_handle_set (&cons_handle_set);
 }
+
+void
+fhandler_termios::atexit_func ()
+{
+  fhandler_console::pcon_hand_over_proc ();
+}

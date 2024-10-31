@@ -178,6 +178,7 @@ public:
   friend class fhandler_pty_master;
   friend class fhandler_pty_slave;
   friend class tty_min;
+  friend class fhandler_console;
 };
 
 class tty_list

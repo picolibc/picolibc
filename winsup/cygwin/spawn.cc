@@ -880,6 +880,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	     ctrl_c_handler(). This insures that setting sigExeced
 	     on Ctrl-C key has been completed. */
 	  init_console_handler (false);
+	  fhandler_termios::atexit_func ();
 	  myself.exit (EXITCODE_NOSET);
 	  break;
 	case _P_WAIT:

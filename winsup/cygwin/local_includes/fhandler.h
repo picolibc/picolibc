@@ -2030,6 +2030,7 @@ class fhandler_termios: public fhandler_base
   virtual void setpgid_aux (pid_t pid) {}
   virtual bool need_console_handler () { return false; }
   virtual bool need_send_ctrl_c_event () { return true; }
+  static void atexit_func ();
 
   struct ptys_handle_set_t
   {
@@ -2390,6 +2391,9 @@ private:
     operator int () const { return n; }
     console_unit (int, HANDLE *input_mutex = NULL);
   };
+
+  void setup_pcon_hand_over ();
+  static void pcon_hand_over_proc ();
 
   friend tty_min * tty_list::get_cttyp ();
 };

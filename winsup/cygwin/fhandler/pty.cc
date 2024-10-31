@@ -102,6 +102,8 @@ fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
   for (int i = (int) num - 1; i >= 0; i--)
     if ((match && list[i] == pid) || (!match && list[i] != pid))
       {
+	if (!process_alive (list[i]))
+	  continue;
 	if (!cygwin)
 	  {
 	    res_pri = list[i];
@@ -117,7 +119,7 @@ fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
 		res_pri = stub_only ? p->exec_dwProcessId : list[i];
 		break;
 	      }
-	    if (!p && !res && process_alive (list[i]) && stub_only)
+	    if (!p && !res && stub_only)
 	      res = list[i];
 	    if (!!p && !res && !stub_only)
 	      res = list[i];
@@ -1134,6 +1136,8 @@ process_alive (DWORD pid)
 inline static bool
 nat_pipe_owner_self (DWORD pid)
 {
+  if (pid == GetCurrentProcessId ())
+    return true;
   return (pid == (myself->exec_dwProcessId ?: myself->dwProcessId));
 }
 
@@ -3541,11 +3545,16 @@ fhandler_pty_slave::get_winpid_to_hand_over (tty *ttyp,
     {
       /* Search another native process which attaches to the same console */
       DWORD current_pid = myself->exec_dwProcessId ?: myself->dwProcessId;
+      if (ttyp->nat_pipe_owner_pid == GetCurrentProcessId ())
+	current_pid = GetCurrentProcessId ();
       switch_to = get_console_process_id (current_pid,
 					  false, true, true, true);
       if (!switch_to)
 	switch_to = get_console_process_id (current_pid,
 					    false, true, false, true);
+      if (!switch_to)
+	switch_to = get_console_process_id (current_pid,
+					    false, false, false, false);
     }
   return switch_to;
 }
@@ -3573,13 +3582,13 @@ fhandler_pty_slave::hand_over_only (tty *ttyp, DWORD force_switch_to)
 void
 fhandler_pty_slave::close_pseudoconsole (tty *ttyp, DWORD force_switch_to)
 {
-  DWORD switch_to = get_winpid_to_hand_over (ttyp, force_switch_to);
   acquire_attach_mutex (mutex_timeout);
   ttyp->previous_code_page = GetConsoleCP ();
   ttyp->previous_output_code_page = GetConsoleOutputCP ();
   release_attach_mutex ();
   if (nat_pipe_owner_self (ttyp->nat_pipe_owner_pid))
     { /* I am owner of the nat pipe. */
+      DWORD switch_to = get_winpid_to_hand_over (ttyp, force_switch_to);
       if (switch_to)
 	{
 	  /* Change pseudo console owner to another process (switch_to). */

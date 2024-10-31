@@ -60,6 +60,10 @@ const unsigned fhandler_console::MAX_WRITE_CHARS = 16384;
 fhandler_console::console_state NO_COPY
   *fhandler_console::shared_console_info[MAX_CONS_DEV + 1];
 
+static bool NO_COPY inside_pcon_checked = false;
+static bool NO_COPY inside_pcon = false;
+static int NO_COPY parent_pty;
+
 bool NO_COPY fhandler_console::invisible_console;
 
 /* con_ra is shared in the same process.
@@ -1894,12 +1898,69 @@ fhandler_console::open (int flags, mode_t)
   return 1;
 }
 
+void
+fhandler_console::setup_pcon_hand_over ()
+{
+  /* Prepare for pcon hand over */
+  if (!inside_pcon_checked)
+    for (int i = 0; i < NTTYS; i++)
+      {
+	if (!cygwin_shared->tty[i]->pcon_activated)
+	  continue;
+	DWORD owner = cygwin_shared->tty[i]->nat_pipe_owner_pid;
+	if (fhandler_pty_common::get_console_process_id
+					(owner, true, false, false, false))
+	  {
+	    inside_pcon = true;
+	    atexit (fhandler_console::pcon_hand_over_proc);
+	    parent_pty = i;
+	    break;
+	  }
+      }
+  inside_pcon_checked = true;
+}
+
+void
+fhandler_console::pcon_hand_over_proc (void)
+{
+  if (!inside_pcon)
+    return;
+  tty *ttyp = cygwin_shared->tty[parent_pty];
+  char buf[MAX_PATH];
+  shared_name (buf, PIPE_SW_MUTEX, parent_pty);
+  HANDLE mtx = OpenMutex (MAXIMUM_ALLOWED, FALSE, buf);
+  WaitForSingleObject (mtx, INFINITE);
+  ReleaseMutex (mtx);
+  DWORD res = WaitForSingleObject (mtx, INFINITE);
+  if (res == WAIT_OBJECT_0 || res == WAIT_ABANDONED)
+    {
+      DWORD owner = ttyp->nat_pipe_owner_pid;
+      if (owner == GetCurrentProcessId ()
+	  || owner == (myself->exec_dwProcessId ?: myself->dwProcessId))
+	fhandler_pty_slave::close_pseudoconsole (ttyp, 0);
+    }
+  else
+    system_printf("Acquiring pcon_ho_mutex failed.");
+  /* Do not release the mutex.
+     Hold onto the mutex until this process completes. */
+}
+
 bool
 fhandler_console::open_setup (int flags)
 {
   set_flags ((flags & ~O_TEXT) | O_BINARY);
   if (myself->set_ctty (this, flags) && !myself->cygstarted)
-    init_console_handler (true);
+    {
+      init_console_handler (true);
+      setup_pcon_hand_over ();
+
+      /* Initialize handle_set */
+      handle_set.input_handle = get_handle ();
+      handle_set.output_handle = get_output_handle ();
+      handle_set.input_mutex = input_mutex;
+      handle_set.output_mutex = output_mutex;
+      handle_set.unit = unit;
+    }
   return fhandler_base::open_setup (flags);
 }
 
@@ -4327,6 +4388,7 @@ fhandler_console::fixup_after_fork_exec (bool execing)
       cygheap->ctty = NULL;
       return;
     }
+  setup_pcon_hand_over ();
 
   if (!execing)
     return;
