@@ -90,8 +90,8 @@ extern "C" {
  * _ISOC11_SOURCE or gcc -std=c11 or g++ -std=c++11
  *	ISO C11
  *
- * _ISOC2x_SOURCE or gcc -std=c2x or g++ -std=c++20
- *	ISO C2x
+ * _ISOC23_SOURCE or _ISOC2X_SOURCE or gcc -std=c23 or g++ -std=c++20
+ *	ISO C23
  *
  * _ATFILE_SOURCE (implied by _POSIX_C_SOURCE >= 200809L)
  *	"at" functions
@@ -111,6 +111,13 @@ extern "C" {
  *	Object Size Checking function wrappers
  */
 
+/* Remap the old name _ISOC2X_SOURCE to _ISOC23_SOURCE.  */
+#ifdef _ISOC2X_SOURCE
+# undef _ISOC2X_SOURCE
+# undef _ISOC23_SOURCE
+# define _ISOC23_SOURCE	1
+#endif
+
 #ifdef _GNU_SOURCE
 #undef _ATFILE_SOURCE
 #define	_ATFILE_SOURCE		1
@@ -120,8 +127,8 @@ extern "C" {
 #define	_ISOC99_SOURCE		1
 #undef _ISOC11_SOURCE
 #define	_ISOC11_SOURCE		1
-#undef _ISOC2X_SOURCE
-#define	_ISOC2X_SOURCE		1
+#undef _ISOC23_SOURCE
+#define	_ISOC23_SOURCE		1
 #undef _POSIX_SOURCE
 #define	_POSIX_SOURCE		1
 #undef _POSIX_C_SOURCE
@@ -228,9 +235,9 @@ extern "C" {
  *	_ISOC11_SOURCE.
  *
  * __ISO_C_VISIBLE >= 2020
- *	ISO C2x; enabled with gcc -std=c2x or newer,
+ *	ISO C23; enabled with gcc -std=c23 or newer,
  *	g++ -std=c++20 or newer, or with
- *	_ISOC2X_SOURCE.
+ *	_ISOC23_SOURCE or _ISOC2x_SOURCE.
  *
  * __ATFILE_VISIBLE
  *	"at" functions; enabled by default, with _ATFILE_SOURCE,
@@ -278,7 +285,7 @@ extern "C" {
 #define	__GNU_VISIBLE		0
 #endif
 
-#if defined(_ISOC2X_SOURCE) || \
+#if defined(_ISOC23_SOURCE) || \
   (__STDC_VERSION__ - 0) > 201710L || (__cplusplus - 0) >= 202002L
 #define __ISO_C_VISIBLE		2020
 #elif defined(_ISOC11_SOURCE) || \
