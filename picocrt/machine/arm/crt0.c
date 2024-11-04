@@ -280,6 +280,10 @@ _cstart(void)
                 uint32_t sctlr;
                 __asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
                 sctlr |= SCTLR_ICACHE | SCTLR_BRANCH_PRED | SCTLR_DATA_L2 | SCTLR_MMU;
+                #ifndef __ARM_FEATURE_UNALIGNED
+                    sctlr |= (1 << 1);
+                    sctlr &= ~(1 << 22);
+                #endif
                 sctlr &= ~SCTLR_TRE;
                 __asm__("mcr p15, 0, %0, c1, c0, 0\n" :: "r" (sctlr));
                 __asm__("isb\n");
