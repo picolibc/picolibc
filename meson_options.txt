@@ -263,6 +263,8 @@ option('atomic-signal', type: 'boolean', value: true,
 #
 option('newlib-nano-malloc', type: 'boolean', value: true,
        description: 'use small-footprint nano-malloc implementation')
+option('nano-malloc-clear-freed', type: 'boolean', value: false,
+       description: 'nano version erases memory on free/realloc')
 
 #
 # Locking support
