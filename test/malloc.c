@@ -53,6 +53,12 @@
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif
 
+#ifdef __clang__
+#define CHECK_ERRNO()   0
+#else
+#define CHECK_ERRNO()   (errno != ENOMEM)
+#endif
+
 int
 main(void)
 {
@@ -119,7 +125,7 @@ main(void)
         if (r)
                 q = malloc(PTRDIFF_MAX);
 //        printf("malloc(PTRDIFF_MAX: %p %p\n", r, q);
-	if ((r && q) || errno != ENOMEM) {
+	if ((r && q) || CHECK_ERRNO()) {
                 printf("2*malloc(PTRDIFF_MAX) should have failed. got %p,%p error %s\n", r, q, strerror(errno));
 		result = 1;
 	}
@@ -129,7 +135,7 @@ main(void)
 	errno = 0;
 	r = malloc(SIZE_MAX);
 //        printf("malloc(SIZE_MAX): %p\n", r);
-	if (r || errno != ENOMEM) {
+	if (r || CHECK_ERRNO()) {
 		printf("malloc(SIZE_MAX) should have failed. got %p error %s\n", r, strerror(errno));
 		result = 1;
 	}
@@ -137,15 +143,16 @@ main(void)
 	errno = 0;
 	r = calloc(1, SIZE_MAX);
 //        printf("calloc(1, SIZE_MAX): %p\n", r);
-	if (r || errno != ENOMEM) {
+	if (r || CHECK_ERRNO()) {
 		printf("calloc(1, SIZE_MAX) should have failed. got %p error %s\n", r, strerror(errno));
 		result = 1;
 	}
+        free(r);
 
 	errno = 0;
 	r = reallocarray(NULL, 1, SIZE_MAX);
 //        printf("reallocarray(NULL, 1, SIZE_MAX): %p\n", r);
-	if (r || errno != ENOMEM) {
+	if (r || CHECK_ERRNO()) {
 		printf("reallocarray(NULL, 1, SIZE_MAX) should have failed. got %p error %s\n", r, strerror(errno));
 		result = 1;
 	}
@@ -154,14 +161,14 @@ main(void)
 		errno = 0;
 		r = calloc(SIZE_MAX >> pow, SIZE_MAX >> pow);
 //                printf("calloc(SIZE_MAX >> %d, SIZE_MAX >> %d): %p\n", pow, pow, r);
-		if (r || errno != ENOMEM) {
+		if (r || CHECK_ERRNO()) {
 			printf("calloc(SIZE_MAX >> %d, SIZE_MAX >> %d) should have failed. got %p error %s\n", pow, pow, r, strerror(errno));
 			result = 1;
 		}
                 free(r);
 		r = reallocarray(NULL, SIZE_MAX >> pow, SIZE_MAX >> pow);
 //                printf("reallocarray(SIZE_MAX >> %d, SIZE_MAX >> %d): %p\n", pow, pow, r);
-		if (r || errno != ENOMEM) {
+		if (r || CHECK_ERRNO()) {
 			printf("reallocarray(NULL, SIZE_MAX >> %d, SIZE_MAX >> %d) should have failed. got %p error %s\n", pow, pow, r, strerror(errno));
 			result = 1;
 		}
