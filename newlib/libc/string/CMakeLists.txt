@@ -53,6 +53,7 @@ picolibc_sources(
   mempcpy.c
   memrchr.c
   memset.c
+  memset_explicit.c
   rawmemchr.c
   rindex.c
   stpcpy.c
