@@ -64,11 +64,15 @@ memset_s(void *s, rsize_t smax, int c, rsize_t n)
 
     // Normal return path
     (void)memset(s, c, n);
+    /* Compiler barrier.  */
+    __asm__ __volatile__ ("" ::"r"(s): "memory");
     return 0;
 
 handle_error:
     if (s != NULL) {
         (void)memset(s, c, smax);
+        /* Compiler barrier.  */
+        __asm__ __volatile__ ("" ::"r"(s): "memory");
     }
 
     if (__cur_handler != NULL) {
