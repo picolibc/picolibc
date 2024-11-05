@@ -516,6 +516,18 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
     int stream_len = 0;
 
+#ifdef VFPRINTF_S
+    const char *msg = "";
+
+    if (stream == NULL) {
+        msg = "output stream is null";
+        goto handle_error;
+    } else if (fmt == NULL) {
+        msg = "null format string";
+        goto handle_error;
+    }
+#endif
+
 #ifndef my_putc
 #ifdef WIDE_CHARS
 #define my_putc(c, stream) do { ++stream_len; if (putwc(c, stream) == WEOF) goto fail; } while(0)
@@ -530,18 +542,6 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 #ifdef _NEED_IO_POS_ARGS
     va_copy(ap, ap_orig);
-#endif
-
-#ifdef VFPRINTF_S
-    const char *msg = "";
-
-    if (stream == NULL) {
-        msg = "output stream is null";
-        goto handle_error;
-    } else if (fmt == NULL) {
-        msg = "null format string";
-        goto handle_error;
-    }
 #endif
 
     for (;;) {
@@ -1348,10 +1348,13 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     goto ret;
 #ifdef VFPRINTF_S
   handle_error:
-      if (__cur_handler != NULL) {
-          __cur_handler(msg, NULL, -1);
-      }
-      goto fail;
+    if (__cur_handler != NULL) {
+        __cur_handler(msg, NULL, -1);
+    }
+    if (stream)
+        stream->flags |= __SERR;
+    stream_len = -1;
+    goto ret;
 #endif
 }
 
