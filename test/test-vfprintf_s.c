@@ -112,6 +112,8 @@ test_vfprintf_s(FILE *restrict stream, const char *restrict fmt, ...)
     return ret;
 }
 
+static char buf[512];
+
 int
 main(void)
 {
@@ -119,7 +121,7 @@ main(void)
     int handler_res = 0;
     errno_t res;
     FILE *f;
-    f = fopen("test_vfprintf_s.txt", "w+");
+    f = fmemopen(buf, sizeof(buf), "w");
 
     if (!f) {
         perror("Error opening file");
