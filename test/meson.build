@@ -708,6 +708,31 @@ if enable_native_tests
 		    link_args: native_c_args))
   endforeach
 
+  if newlib_mb
+    diff = find_program('diff', required: false)
+
+    if diff.found()
+      wctype = executable('test-wctype', 'test-wctype.c',
+                          c_args: _c_args,
+                          link_args: _link_args,
+                          objects: _objs,
+                          link_depends: _link_depends + _libs,
+                          include_directories: inc)
+
+      wctype_native = executable('test-wctype-native', 'test-wctype.c',
+                                 c_args: native_c_args,
+                                 link_args: native_c_args)
+
+      wctype_out = custom_target ('wctype-out', output: 'wctype-out',
+                                  command: [wctype, '@OUTPUT@'])
+
+      wctype_native_out = custom_target ('wctype-native-out', output: 'wctype-native-out',
+                                         command: [wctype_native, '@OUTPUT@'])
+
+      test('wctype-compare', diff, args: [wctype_out, wctype_native_out])
+    endif
+  endif
+       
 endif
 
 subdir('libc-testsuite')
