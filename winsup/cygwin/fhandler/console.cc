@@ -85,12 +85,18 @@ fhandler_console::attach_console (pid_t owner, bool *err)
 	fhandler_pty_common::get_console_process_id (p->dwProcessId,
 						     true, false, false);
       if (!attached)
+	attached =
+	  fhandler_pty_common::get_console_process_id (p->exec_dwProcessId,
+						       true, false, false);
+      if (!attached)
 	{
 	  resume_pid =
 	    fhandler_pty_common::get_console_process_id (myself->dwProcessId,
 							 false, false, false);
 	  FreeConsole ();
 	  BOOL r = AttachConsole (p->dwProcessId);
+	  if (!r)
+	    r = AttachConsole (p->exec_dwProcessId);
 	  if (!r)
 	    {
 	      if (resume_pid)
