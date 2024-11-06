@@ -35,6 +35,7 @@
 srcs_ctype = [
     'categories.c',
     'ctype_.c',
+    'ctype_wide.c',
     'isalnum.c',
     'isalnum_l.c',
     'isalpha.c',
