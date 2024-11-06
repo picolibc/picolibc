@@ -85,7 +85,7 @@ fhandler_console::attach_console (DWORD owner, bool *err)
   if (!attached)
     {
       resume_pid =
-	get_console_process_id (myself->dwProcessId, false, false, false);
+	get_console_process_id (GetCurrentProcessId (), false, false, false);
       FreeConsole ();
       BOOL r = AttachConsole (owner);
       if (!r)
@@ -110,7 +110,7 @@ fhandler_console::detach_console (DWORD resume_pid, DWORD owner)
       FreeConsole ();
       AttachConsole (resume_pid);
     }
-  else if (myself->dwProcessId != owner)
+  else if (GetCurrentProcessId () != owner)
     FreeConsole ();
 }
 
@@ -395,7 +395,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       }
   };
   termios &ti = ttyp->ti;
-  while (con.owner == myself->dwProcessId)
+  while (con.owner == GetCurrentProcessId ())
     {
       DWORD total_read, n, i;
 
@@ -709,7 +709,7 @@ fhandler_console::set_unit ()
 		unit = device::minor (cs->tty_min_state.ntty);
 	      shared_console_info[unit] = cs;
 	      if (created)
-		con.owner = myself->dwProcessId;
+		con.owner = GetCurrentProcessId ();
 	    }
 	}
     }
@@ -917,10 +917,10 @@ fhandler_console::cleanup_for_non_cygwin_app (handle_set_t *p)
   /* conmode can be tty::restore when non-cygwin app is
      exec'ed from login shell. */
   tty::cons_mode conmode =
-    (con.owner == myself->dwProcessId) ? tty::restore : tty::cygwin;
+    (con.owner == GetCurrentProcessId ()) ? tty::restore : tty::cygwin;
   set_output_mode (conmode, ti, p);
   set_input_mode (conmode, ti, p);
-  set_disable_master_thread (con.owner == myself->dwProcessId);
+  set_disable_master_thread (con.owner == GetCurrentProcessId ());
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -1774,7 +1774,7 @@ fhandler_console::open (int flags, mode_t)
   acquire_output_mutex (mutex_timeout);
 
   if (!process_alive (con.owner))
-    con.owner = myself->dwProcessId;
+    con.owner = GetCurrentProcessId ();
 
   /* Open the input handle as handle_ */
   bool err = false;
@@ -1838,7 +1838,7 @@ fhandler_console::open (int flags, mode_t)
 
   set_open_status ();
 
-  if (myself->dwProcessId == con.owner && wincap.has_con_24bit_colors ())
+  if (GetCurrentProcessId () == con.owner && wincap.has_con_24bit_colors ())
     {
       bool is_legacy = false;
       DWORD dwMode;
@@ -1869,7 +1869,7 @@ fhandler_console::open (int flags, mode_t)
   debug_printf ("opened conin$ %p, conout$ %p", get_handle (),
 		get_output_handle ());
 
-  if (myself->dwProcessId == con.owner)
+  if (GetCurrentProcessId () == con.owner)
     {
       if (GetModuleHandle ("ConEmuHk64.dll"))
 	hook_conemu_cygwin_connector ();
@@ -1983,9 +1983,9 @@ fhandler_console::close ()
       NTSTATUS status;
       status = NtQueryObject (get_handle (), ObjectBasicInformation,
 			      &obi, sizeof obi, NULL);
-      if ((NT_SUCCESS (status) && obi.HandleCount == 1
-	   && (dev_t) myself->ctty == get_device ())
-	  || myself->dwProcessId == con.owner)
+      if (NT_SUCCESS (status)
+	  && obi.HandleCount <= (myself->cygstarted ? 2 : 3)
+	  && (dev_t) myself->ctty == get_device ())
 	{
 	  /* Cleaning-up console mode for cygwin apps. */
 	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
@@ -1994,7 +1994,7 @@ fhandler_console::close ()
 	}
     }
 
-  if (shared_console_info[unit] && con.owner == myself->dwProcessId)
+  if (shared_console_info[unit] && con.owner == GetCurrentProcessId ())
     {
       if (master_thread_started)
 	{
