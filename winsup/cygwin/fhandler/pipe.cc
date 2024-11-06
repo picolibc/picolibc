@@ -532,10 +532,8 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	}
     }
 
-  if (len <= (size_t) avail || pipe_buf_size == 0)
+  if (len <= (size_t) avail)
     chunk = len;
-  else if (is_nonblocking ())
-    chunk = len = pipe_buf_size;
   else
     chunk = avail;
 
@@ -555,7 +553,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
       ULONG len1;
       DWORD waitret = WAIT_OBJECT_0;
 
-      if (left > chunk)
+      if (left > chunk && !is_nonblocking ())
 	len1 = chunk;
       else
 	len1 = (ULONG) left;
