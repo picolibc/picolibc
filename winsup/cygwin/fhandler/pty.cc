@@ -74,60 +74,6 @@ void release_attach_mutex (void)
   ReleaseMutex (attach_mutex);
 }
 
-inline static bool process_alive (DWORD pid);
-
-/* This functions looks for a process which attached to the same console
-   with current process and is matched to given conditions:
-     match: If true, return given pid if the process pid attaches to the
-	    same console, otherwise, return 0. If false, return pid except
-	    for given pid.
-     cygwin: return only process's pid which has cygwin pid.
-     stub_only: return only stub process's pid of non-cygwin process. */
-DWORD
-fhandler_pty_common::get_console_process_id (DWORD pid, bool match,
-					     bool cygwin, bool stub_only,
-					     bool nat)
-{
-  tmp_pathbuf tp;
-  DWORD *list = (DWORD *) tp.c_get ();
-  const DWORD buf_size = NT_MAX_PATH / sizeof (DWORD);
-
-  DWORD num = GetConsoleProcessList (list, buf_size);
-  if (num == 0 || num > buf_size)
-    return 0;
-
-  DWORD res_pri = 0, res = 0;
-  /* Last one is the oldest. */
-  /* https://github.com/microsoft/terminal/issues/95 */
-  for (int i = (int) num - 1; i >= 0; i--)
-    if ((match && list[i] == pid) || (!match && list[i] != pid))
-      {
-	if (!process_alive (list[i]))
-	  continue;
-	if (!cygwin)
-	  {
-	    res_pri = list[i];
-	    break;
-	  }
-	else
-	  {
-	    pinfo p (cygwin_pid (list[i]));
-	    if (nat && !!p && !ISSTATE(p, PID_NOTCYGWIN))
-	      continue;
-	    if (!!p && p->exec_dwProcessId)
-	      {
-		res_pri = stub_only ? p->exec_dwProcessId : list[i];
-		break;
-	      }
-	    if (!p && !res && stub_only)
-	      res = list[i];
-	    if (!!p && !res && !stub_only)
-	      res = list[i];
-	  }
-      }
-  return res_pri ?: res;
-}
-
 static bool isHybrid; /* Set true if the active pipe is set to nat pipe
 			 owned by myself even though the current process
 			 is a cygwin process. */
@@ -1112,25 +1058,6 @@ fhandler_pty_slave::set_switch_to_nat_pipe (void)
       bool stdin_is_ptys = GetStdHandle (STD_INPUT_HANDLE) == get_handle ();
       setup_for_non_cygwin_app (false, NULL, stdin_is_ptys);
     }
-}
-
-inline static bool
-process_alive (DWORD pid)
-{
-  /* This function is very similar to _pinfo::alive(), however, this
-     can be used for non-cygwin process which is started from non-cygwin
-     shell. In addition, this checks exit code as well. */
-  if (pid == 0)
-    return false;
-  HANDLE h = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
-  if (h == NULL)
-    return false;
-  DWORD exit_code;
-  BOOL r = GetExitCodeProcess (h, &exit_code);
-  CloseHandle (h);
-  if (r && exit_code == STILL_ACTIVE)
-    return true;
-  return false;
 }
 
 inline static bool

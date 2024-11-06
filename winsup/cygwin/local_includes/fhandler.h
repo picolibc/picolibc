@@ -1938,6 +1938,11 @@ class fhandler_termios: public fhandler_base
     done_with_debugger /* The key was processed (CTRL_C_EVENT was sent)
 			  for inferior of GDB. */
   };
+  static bool process_alive (DWORD pid);
+  static DWORD get_console_process_id (DWORD pid, bool match,
+				       bool cygwin = false,
+				       bool stub_only = false,
+				       bool nat = false);
 
  public:
   virtual pid_t tc_getpgid () { return 0; };
@@ -2061,7 +2066,7 @@ enum cltype
 
 class dev_console
 {
-  pid_t owner;
+  DWORD owner;
   bool is_legacy;
   bool orig_virtual_terminal_processing_mode;
 
@@ -2211,7 +2216,7 @@ private:
   void set_cursor_maybe ();
   static bool create_invisible_console_workaround (bool force);
   static console_state *open_shared_console (HWND, HANDLE&, bool&);
-  static void fix_tab_position (HANDLE h, pid_t owner);
+  static void fix_tab_position (HANDLE h, DWORD owner);
 
 /* console mode calls */
   const handle_set_t *get_handle_set (void) {return &handle_set;}
@@ -2336,9 +2341,9 @@ private:
   static void set_console_mode_to_native ();
   bool need_console_handler ();
   static void set_disable_master_thread (bool x, fhandler_console *cons = NULL);
-  static DWORD attach_console (pid_t, bool *err = NULL);
-  static void detach_console (DWORD, pid_t);
-  pid_t get_owner ();
+  static DWORD attach_console (DWORD, bool *err = NULL);
+  static void detach_console (DWORD, DWORD);
+  DWORD get_owner ();
   void wpbuf_put (char c);
   void wpbuf_send ();
   int fstat (struct stat *buf);
@@ -2402,10 +2407,6 @@ class fhandler_pty_common: public fhandler_termios
   }
 
   void resize_pseudo_console (struct winsize *);
-  static DWORD get_console_process_id (DWORD pid, bool match,
-				       bool cygwin = false,
-				       bool stub_only = false,
-				       bool nat = false);
   bool to_be_read_from_nat_pipe (void);
   static DWORD attach_console_temporarily (DWORD target_pid);
   static void resume_from_temporarily_attach (DWORD resume_pid);

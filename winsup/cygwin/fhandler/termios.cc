@@ -20,6 +20,7 @@ details. */
 #include "cygheap.h"
 #include "child_info.h"
 #include "ntdll.h"
+#include "tls_pbuf.h"
 
 /* Wait time for some treminal mutexes. This is set to 0 when the
    process calls CreateProcess() with DEBUG_PROCESS flag, because
@@ -832,4 +833,75 @@ void
 fhandler_termios::atexit_func ()
 {
   fhandler_console::pcon_hand_over_proc ();
+}
+
+bool
+fhandler_termios::process_alive (DWORD pid)
+{
+  /* This function is very similar to _pinfo::alive(), however, this
+     can be used for non-cygwin process which is started from non-cygwin
+     shell. In addition, this checks exit code as well. */
+  if (pid == 0)
+    return false;
+  HANDLE h = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pid);
+  if (h == NULL)
+    return false;
+  DWORD exit_code;
+  BOOL r = GetExitCodeProcess (h, &exit_code);
+  CloseHandle (h);
+  if (r && exit_code == STILL_ACTIVE)
+    return true;
+  return false;
+}
+
+/* This functions looks for a process which attached to the same console
+   with current process and is matched to given conditions:
+     match: If true, return given pid if the process pid attaches to the
+	    same console, otherwise, return 0. If false, return pid except
+	    for given pid.
+     cygwin: return only process's pid which has cygwin pid.
+     stub_only: return only stub process's pid of non-cygwin process. */
+DWORD
+fhandler_termios::get_console_process_id (DWORD pid, bool match,
+					     bool cygwin, bool stub_only,
+					     bool nat)
+{
+  tmp_pathbuf tp;
+  DWORD *list = (DWORD *) tp.c_get ();
+  const DWORD buf_size = NT_MAX_PATH / sizeof (DWORD);
+
+  DWORD num = GetConsoleProcessList (list, buf_size);
+  if (num == 0 || num > buf_size)
+    return 0;
+
+  DWORD res_pri = 0, res = 0;
+  /* Last one is the oldest. */
+  /* https://github.com/microsoft/terminal/issues/95 */
+  for (int i = (int) num - 1; i >= 0; i--)
+    if ((match && list[i] == pid) || (!match && list[i] != pid))
+      {
+	if (!process_alive (list[i]))
+	  continue;
+	if (!cygwin)
+	  {
+	    res_pri = list[i];
+	    break;
+	  }
+	else
+	  {
+	    pinfo p (cygwin_pid (list[i]));
+	    if (nat && !!p && !ISSTATE(p, PID_NOTCYGWIN))
+	      continue;
+	    if (!!p && p->exec_dwProcessId)
+	      {
+		res_pri = stub_only ? p->exec_dwProcessId : list[i];
+		break;
+	      }
+	    if (!p && !res && stub_only)
+	      res = list[i];
+	    if (!!p && !res && !stub_only)
+	      res = list[i];
+	  }
+      }
+  return res_pri ?: res;
 }

@@ -75,43 +75,33 @@ static struct fhandler_base::rabuf_t con_ra;
 static wchar_t last_char;
 
 DWORD
-fhandler_console::attach_console (pid_t owner, bool *err)
+fhandler_console::attach_console (DWORD owner, bool *err)
 {
   DWORD resume_pid = (DWORD) -1;
-  pinfo p (owner);
-  if (p)
+  if (!process_alive (owner))
+    return resume_pid;
+  DWORD attached =
+    get_console_process_id (owner, true, false, false);
+  if (!attached)
     {
-      DWORD attached =
-	fhandler_pty_common::get_console_process_id (p->dwProcessId,
-						     true, false, false);
-      if (!attached)
-	attached =
-	  fhandler_pty_common::get_console_process_id (p->exec_dwProcessId,
-						       true, false, false);
-      if (!attached)
+      resume_pid =
+	get_console_process_id (myself->dwProcessId, false, false, false);
+      FreeConsole ();
+      BOOL r = AttachConsole (owner);
+      if (!r)
 	{
-	  resume_pid =
-	    fhandler_pty_common::get_console_process_id (myself->dwProcessId,
-							 false, false, false);
-	  FreeConsole ();
-	  BOOL r = AttachConsole (p->dwProcessId);
-	  if (!r)
-	    r = AttachConsole (p->exec_dwProcessId);
-	  if (!r)
-	    {
-	      if (resume_pid)
-		AttachConsole (resume_pid);
-	      if (err)
-		*err = true;
-	      return (DWORD) -1;
-	    }
+	  if (resume_pid)
+	    AttachConsole (resume_pid);
+	  if (err)
+	    *err = true;
+	  return (DWORD) -1;
 	}
     }
   return resume_pid;
 }
 
 void
-fhandler_console::detach_console (DWORD resume_pid, pid_t owner)
+fhandler_console::detach_console (DWORD resume_pid, DWORD owner)
 {
   if (resume_pid == (DWORD) -1)
     return;
@@ -120,11 +110,11 @@ fhandler_console::detach_console (DWORD resume_pid, pid_t owner)
       FreeConsole ();
       AttachConsole (resume_pid);
     }
-  else if (myself->pid != owner)
+  else if (myself->dwProcessId != owner)
     FreeConsole ();
 }
 
-pid_t
+DWORD
 fhandler_console::get_owner ()
 {
   return con.owner;
@@ -143,14 +133,14 @@ public:
   {
     empty ();
   }
-  inline void put (HANDLE output_handle, pid_t owner, char x)
+  inline void put (HANDLE output_handle, DWORD owner, char x)
   {
     if (ixput == WPBUF_LEN)
       send (output_handle, owner);
     buf[ixput++] = x;
   }
   inline void empty () { ixput = 0u; }
-  inline void send (HANDLE output_handle, pid_t owner)
+  inline void send (HANDLE output_handle, DWORD owner)
   {
     if (!output_handle)
       {
@@ -405,7 +395,7 @@ fhandler_console::cons_master_thread (handle_set_t *p, tty *ttyp)
       }
   };
   termios &ti = ttyp->ti;
-  while (con.owner == myself->pid)
+  while (con.owner == myself->dwProcessId)
     {
       DWORD total_read, n, i;
 
@@ -719,7 +709,7 @@ fhandler_console::set_unit ()
 		unit = device::minor (cs->tty_min_state.ntty);
 	      shared_console_info[unit] = cs;
 	      if (created)
-		con.owner = myself->pid;
+		con.owner = myself->dwProcessId;
 	    }
 	}
     }
@@ -927,10 +917,10 @@ fhandler_console::cleanup_for_non_cygwin_app (handle_set_t *p)
   /* conmode can be tty::restore when non-cygwin app is
      exec'ed from login shell. */
   tty::cons_mode conmode =
-    (con.owner == myself->pid) ? tty::restore : tty::cygwin;
+    (con.owner == myself->dwProcessId) ? tty::restore : tty::cygwin;
   set_output_mode (conmode, ti, p);
   set_input_mode (conmode, ti, p);
-  set_disable_master_thread (con.owner == myself->pid);
+  set_disable_master_thread (con.owner == myself->dwProcessId);
 }
 
 /* Return the tty structure associated with a given tty number.  If the
@@ -1043,7 +1033,7 @@ fhandler_console::set_cursor_maybe ()
 /* Workaround for a bug of windows xterm compatible mode. */
 /* The horizontal tab positions are broken after resize. */
 void
-fhandler_console::fix_tab_position (HANDLE h, pid_t owner)
+fhandler_console::fix_tab_position (HANDLE h, DWORD owner)
 {
   /* Re-setting ENABLE_VIRTUAL_TERMINAL_PROCESSING
      fixes the tab position. */
@@ -1783,13 +1773,8 @@ fhandler_console::open (int flags, mode_t)
   setup_io_mutex ();
   acquire_output_mutex (mutex_timeout);
 
-  do
-    {
-      pinfo p (con.owner);
-      if (!p)
-	con.owner = myself->pid;
-    }
-  while (false);
+  if (!process_alive (con.owner))
+    con.owner = myself->dwProcessId;
 
   /* Open the input handle as handle_ */
   bool err = false;
@@ -1853,7 +1838,7 @@ fhandler_console::open (int flags, mode_t)
 
   set_open_status ();
 
-  if (myself->pid == con.owner && wincap.has_con_24bit_colors ())
+  if (myself->dwProcessId == con.owner && wincap.has_con_24bit_colors ())
     {
       bool is_legacy = false;
       DWORD dwMode;
@@ -1884,7 +1869,7 @@ fhandler_console::open (int flags, mode_t)
   debug_printf ("opened conin$ %p, conout$ %p", get_handle (),
 		get_output_handle ());
 
-  if (myself->pid == con.owner)
+  if (myself->dwProcessId == con.owner)
     {
       if (GetModuleHandle ("ConEmuHk64.dll"))
 	hook_conemu_cygwin_connector ();
@@ -1914,8 +1899,7 @@ fhandler_console::setup_pcon_hand_over ()
 	if (!cygwin_shared->tty[i]->pcon_activated)
 	  continue;
 	DWORD owner = cygwin_shared->tty[i]->nat_pipe_owner_pid;
-	if (fhandler_pty_common::get_console_process_id
-					(owner, true, false, false, false))
+	if (get_console_process_id (owner, true, false, false, false))
 	  {
 	    inside_pcon = true;
 	    atexit (fhandler_console::pcon_hand_over_proc);
@@ -2001,7 +1985,7 @@ fhandler_console::close ()
 			      &obi, sizeof obi, NULL);
       if ((NT_SUCCESS (status) && obi.HandleCount == 1
 	   && (dev_t) myself->ctty == get_device ())
-	  || myself->pid == con.owner)
+	  || myself->dwProcessId == con.owner)
 	{
 	  /* Cleaning-up console mode for cygwin apps. */
 	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
@@ -2010,7 +1994,7 @@ fhandler_console::close ()
 	}
     }
 
-  if (shared_console_info[unit] && con.owner == myself->pid)
+  if (shared_console_info[unit] && con.owner == myself->dwProcessId)
     {
       if (master_thread_started)
 	{
@@ -2019,7 +2003,7 @@ fhandler_console::close ()
 	  thread_sync_event = OpenEvent (MAXIMUM_ALLOWED, FALSE, name);
 	  if (thread_sync_event)
 	    {
-	      con.owner = MAX_PID + 1;
+	      con.owner = (DWORD) -1;
 	      WaitForSingleObject (thread_sync_event, INFINITE);
 	      CloseHandle (thread_sync_event);
 	    }
@@ -3508,7 +3492,7 @@ enum_proc (const LOGFONTW *lf, const TEXTMETRICW *tm,
 }
 
 static void
-check_font (HANDLE hdl, pid_t owner)
+check_font (HANDLE hdl, DWORD owner)
 {
   CONSOLE_FONT_INFOEX cfi;
   LOGFONTW lf;
