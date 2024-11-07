@@ -279,6 +279,8 @@ conv_int (FILE *stream, scanf_context_t *context, width_t width, void *addr, uin
             base = 16;
             if (!--width || IS_EOF(i = scanf_getc (stream, context)))
 		goto putval;
+            if(!isxdigit(i))
+                goto err;
 #ifdef _NEED_IO_PERCENT_B
         } else if (i == 'b' && base <= 2) {
             base = 2;
