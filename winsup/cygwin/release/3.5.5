@@ -24,3 +24,9 @@ Fixes:
 - Make console inherit hand over of pseudo console ownership from
   parent pty.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-February/255388.html
+
+- Restore pipe blocking mode for non-cygwin apps.
+  Addresses: https://github.com/git-for-windows/git/issues/5115
+
+- Fix a problem that signal handler destroys the FPU context.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-October/256503.html
