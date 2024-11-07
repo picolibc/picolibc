@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 /* wctrans constants */
 
+#include <stdint.h>
 #include "../locale/setlocale.h"
 
 /* valid values for wctrans_t */
@@ -51,6 +52,24 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define WC_SPACE	10
 #define WC_UPPER	11
 #define WC_XDIGIT	12
+
+#define CLASS_none 0
+#define CLASS_alnum     (1 << 0)
+#define CLASS_alpha     (1 << 1)
+#define CLASS_blank     (1 << 2)
+#define CLASS_cntrl     (1 << 3)
+#define CLASS_digit     (1 << 4)
+#define CLASS_graph     (1 << 5)
+#define CLASS_print     (1 << 6)
+#define CLASS_punct     (1 << 7)
+#define CLASS_space     (1 << 8)
+#define CLASS_case      (1 << 9)
+#define CLASS_lower     (1 << 10)
+#define CLASS_upper     (1 << 11)
+#define CLASS_xdigit    (1 << 12)
+
+uint16_t
+__ctype_table_lookup(wint_t ic);
 
 /* internal functions to translate between JP and Unicode */
 /* note this is not applicable to Cygwin, where wchar_t is always Unicode,

@@ -33,8 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_ctype = [
-    'categories.c',
     'ctype_.c',
+    'ctype_table.c',
     'ctype_wide.c',
     'isalnum.c',
     'isalnum_l.c',
