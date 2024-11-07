@@ -1,4 +1,3 @@
-/* This file was generated automatically */
   {0x0041, 25, TOLO, 32},
   {0x0061, 25, TOUP, -32},
   {0x00B5, 0, TOUP, 743},
