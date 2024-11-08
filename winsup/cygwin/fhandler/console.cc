@@ -1976,7 +1976,8 @@ fhandler_console::close ()
 
   acquire_output_mutex (mutex_timeout);
 
-  if (shared_console_info[unit])
+  if (shared_console_info[unit] && !myself->cygstarted
+      && (dev_t) myself->ctty == get_device ())
     {
       /* Restore console mode if this is the last closure. */
       OBJECT_BASIC_INFORMATION obi;
@@ -1984,8 +1985,7 @@ fhandler_console::close ()
       status = NtQueryObject (get_handle (), ObjectBasicInformation,
 			      &obi, sizeof obi, NULL);
       if (NT_SUCCESS (status)
-	  && obi.HandleCount <= (myself->cygstarted ? 2 : 3)
-	  && (dev_t) myself->ctty == get_device ())
+	  && obi.HandleCount == (con.owner == GetCurrentProcessId () ? 2 : 3))
 	{
 	  /* Cleaning-up console mode for cygwin apps. */
 	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
