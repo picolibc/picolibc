@@ -87,7 +87,7 @@ blocks:
 Picolib provides a couple of helper APIs for TLS:
 
 * _set_tls
-```
+```c
 void
 _set_tls(void *tls);
 ```
@@ -95,7 +95,7 @@ This is an architecture-specific function which sets the TLS
 block pointer for the processor to `tls`.
 
 * _init_tls
-```
+```c
 void
 _init_tls(void *tls);
 ```
