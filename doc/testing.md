@@ -10,18 +10,20 @@ library easier.
 
 The do-native-configure script has an example:
 
-    #!/bin/sh
-    DIR=`dirname $0`
-    meson $DIR \
-	    -Dmultilib=false \
-	    -Dnewlib-wide-orient=false\
-	    -Dnewlib-nano-malloc=true\
-	    -Dlite-exit=true\
-	    -Dnewlib-global-atexit=true\
-	    -Dincludedir=lib/newlib-nano/include \
-	    -Dlibdir=lib/newlib-nano/lib \
-	    -Dtests=true \
-	    --buildtype debug
+```sh
+#!/bin/sh
+DIR=`dirname $0`
+meson $DIR \
+    -Dmultilib=false \
+    -Dnewlib-wide-orient=false\
+    -Dnewlib-nano-malloc=true\
+    -Dlite-exit=true\
+    -Dnewlib-global-atexit=true\
+    -Dincludedir=lib/newlib-nano/include \
+    -Dlibdir=lib/newlib-nano/lib \
+    -Dtests=true \
+    --buildtype debug
+```
 
 Again, create a directory and build there:
 
