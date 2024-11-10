@@ -110,10 +110,13 @@ typedef struct _pthread_cleanup_handler
 void _pthread_cleanup_push (__pthread_cleanup_handler *handler);
 void _pthread_cleanup_pop (int execute);
 
-#define pthread_cleanup_push(_fn, _arg) { __pthread_cleanup_handler __cleanup_handler = \
-					 { _fn, _arg, NULL }; \
-					 _pthread_cleanup_push( &__cleanup_handler );
-#define pthread_cleanup_pop(_execute) _pthread_cleanup_pop( _execute ); }
+#define pthread_cleanup_push(_fn, _arg) \
+  do { \
+    __pthread_cleanup_handler __cleanup_handler = { _fn, _arg, NULL }; \
+    _pthread_cleanup_push(&__cleanup_handler)
+#define pthread_cleanup_pop(_execute) \
+    _pthread_cleanup_pop(_execute); \
+  } while (0)
 
 /* Condition variables */
 int pthread_cond_broadcast (pthread_cond_t *);
