@@ -23,41 +23,47 @@ pointers, and linker aliases may be used to make all three pointers be
 stored in the same location. The FILE object contains function
 pointers for putc, getc, which might be defined as follows:
 
-	static int
-	sample_putc(char c, FILE *file)
-	{
-		(void) file;		/* Not used in this function
-		__uart_putc(c);		/* Defined by underlying system */
-		return c;
-	}
+```c
+static int
+sample_putc(char c, FILE *file)
+{
+	(void) file;		/* Not used in this function
+	__uart_putc(c);		/* Defined by underlying system */
+	return c;
+}
 
-	static int
-	sample_getc(FILE *file)
-	{
-		unsigned char c;
-		(void) file;		/* Not used in this function */
-		c = __uart_getc();	/* Defined by underlying system */
-		return c;
-	}
+static int
+sample_getc(FILE *file)
+{
+	unsigned char c;
+	(void) file;		/* Not used in this function */
+	c = __uart_getc();	/* Defined by underlying system */
+	return c;
+}
+```
 
 It also contains a pointer to an optional `flush` function, which, if
 provide, will be called to flush pending output to the file, e.g.,
 when the `fflush()` function is called:
 
-	static int
-	sample_flush(FILE *file)
-	{
-		/* This function doesn't need to do anything */
-		(void) file;		/* Not used in this function */
-		return 0;
-	}
+```c
+static int
+sample_flush(FILE *file)
+{
+	/* This function doesn't need to do anything */
+	(void) file;		/* Not used in this function */
+	return 0;
+}
+```
 
 These functions are used to initialize a FILE structure:
 
-	static FILE __stdio = FDEV_SETUP_STREAM(sample_putc,
-						sample_getc,
-						NULL,
-						_FDEV_SETUP_RW);
+```c
+static FILE __stdio = FDEV_SETUP_STREAM(sample_putc,
+					sample_getc,
+					NULL,
+					_FDEV_SETUP_RW);
+```
 
 This defines a FILE which can read and write characters using the putc
 and getc functions described above, but not using any flush
@@ -73,20 +79,24 @@ supported, can be one of the following:
 Finally, the FILE is used to initialize the `stdin`, `stdout` and
 `stderr` values, the latter two of which are simply aliases to `stdin`:
 
-   FILE *const stdin = &__stdio;
-   __strong_reference(stdin, stdout);
-   __strong_reference(stdin, stderr);
+```c
+FILE *const stdin = &__stdio;
+__strong_reference(stdin, stdout);
+__strong_reference(stdin, stderr);
+```
 
 ### fopen, fdopen
 
 Support for these requires malloc/free along with a handful of
 POSIX-compatible functions:
 
-	int open (const char *, int, ...);
-	int close (int fd);
-	ssize_t read (int fd, void *buf, size_t nbyte);
-	ssize_t write (int fd, const void *buf, size_t nbyte);
-	off_t lseek (int fd, off_t offset, int whence);
+```c
+int open (const char *, int, ...);
+int close (int fd);
+ssize_t read (int fd, void *buf, size_t nbyte);
+ssize_t write (int fd, const void *buf, size_t nbyte);
+off_t lseek (int fd, off_t offset, int whence);
+```
 
 The code needed for this is built into Picolibc by default, but can be
 disabled by specifying `-Dposix-io=false` in the meson command line.
@@ -97,7 +107,9 @@ Exit is just a wrapper around _exit that also calls destructors and
 callbacks registered with atexit. To make it work, you'll need to
 implement the `_exit` function:
 
-	_Noreturn void _exit (int status);
+```c
+_Noreturn void _exit (int status);
+```
 
 ### malloc and free
 
@@ -138,7 +150,9 @@ specified *after* libc on the linker command line. The picolibc.specs
 file provides a way to specify a library after libc using the
 `--oslib=` parameter:
 
-	$ gcc -o program.elf program.o --oslib=myos
+```sh
+$ gcc -o program.elf program.o --oslib=myos
+```
 
 This will include -lmyos after -lc so that the linker can resolve
 functions used by picolibc from libmyos.a. You can, alternatively,
@@ -175,16 +189,18 @@ underlying system C library is used for the POSIX functions described
 above. To build in this mode, you'll need to override a few default
 picolibc configuration parameters:
 
-	$ meson \
-		-Dtls-model=global-dynamic \
-		-Dmultilib=false \
-		-Dpicolib=false \
-		-Dpicocrt=false \
-		-Dposix-console=true \
-		-Dnewlib-global-atexit=true \
-		-Dincludedir=lib/picolibc/include \
-		-Dlibdir=lib/picolibc/lib \
-		-Dspecsdir=none
+```sh
+$ meson \
+	-Dtls-model=global-dynamic \
+	-Dmultilib=false \
+	-Dpicolib=false \
+	-Dpicocrt=false \
+	-Dposix-console=true \
+	-Dnewlib-global-atexit=true \
+	-Dincludedir=lib/picolibc/include \
+	-Dlibdir=lib/picolibc/lib \
+	-Dspecsdir=none
+```
 
  * -Dtls-model=global-dynamic makes picolibc use the default TLS model
    for GCC.
@@ -212,5 +228,7 @@ picolibc configuration parameters:
 
 Once built, you can install and use picolibc on the host:
 
-	$ cc -I/usr/local/lib/picolibc/include hello-world.c \
-		/usr/local/lib/picolibc/lib/libc.a
+```sh
+$ cc -I/usr/local/lib/picolibc/include hello-world.c \
+	/usr/local/lib/picolibc/lib/libc.a
+```
