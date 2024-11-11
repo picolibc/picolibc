@@ -6,7 +6,7 @@
 
 #include <picolibc.h>
 
-#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__) || !defined(__ARM_NEON)
+#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__) || !defined(__ARM_NEON) || !defined(__ARM_FEATURE_UNALIGNED)
 /* See memcmp-stub.c  */
 #else
 

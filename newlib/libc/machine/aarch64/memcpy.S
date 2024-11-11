@@ -13,7 +13,7 @@
 
 #include <picolibc.h>
 
-#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__)
+#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__) || !defined(__ARM_FEATURE_UNALIGNED)
 /* See memcpy-stub.c  */
 #else
 #include "asmdefs.h"
