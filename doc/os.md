@@ -150,7 +150,7 @@ specified *after* libc on the linker command line. The picolibc.specs
 file provides a way to specify a library after libc using the
 `--oslib=` parameter:
 
-```sh
+```console
 $ gcc -o program.elf program.o --oslib=myos
 ```
 
@@ -189,7 +189,7 @@ underlying system C library is used for the POSIX functions described
 above. To build in this mode, you'll need to override a few default
 picolibc configuration parameters:
 
-```sh
+```console
 $ meson \
 	-Dtls-model=global-dynamic \
 	-Dmultilib=false \
@@ -228,7 +228,7 @@ $ meson \
 
 Once built, you can install and use picolibc on the host:
 
-```sh
+```console
 $ cc -I/usr/local/lib/picolibc/include hello-world.c \
 	/usr/local/lib/picolibc/lib/libc.a
 ```
