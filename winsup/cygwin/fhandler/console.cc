@@ -1984,6 +1984,15 @@ fhandler_console::close ()
       NTSTATUS status;
       status = NtQueryObject (get_handle (), ObjectBasicInformation,
 			      &obi, sizeof obi, NULL);
+      /* If the process is not myself->cygstarted and is the console owner,
+	 the process is the last process on this console device. The console
+	 owner has two console handles, i.e. one is io_handle and the other
+	 is the dupplicated handle for cons_master_thread.
+	 If myself->cygstarted is false and the process is not console owner,
+	 the process is supposed to be started by the exec command in the
+	 owner shell. In this case, the owner process is still alive in the
+	 background and waiting for this process. So the handle count is
+	 three (two in the owner process, one is mine). */
       if (NT_SUCCESS (status)
 	  && obi.HandleCount == (con.owner == GetCurrentProcessId () ? 2 : 3))
 	{
