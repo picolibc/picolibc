@@ -3301,13 +3301,13 @@ pthread_sigmask (int operation, const sigset_t *set, sigset_t *old_set)
 }
 
 int
-pthread_sigqueue (pthread_t *thread, int sig, const union sigval value)
+pthread_sigqueue (pthread_t thread, int sig, const union sigval value)
 {
   siginfo_t si = {0};
 
-  if (!pthread::is_good_object (thread))
+  if (!pthread::is_good_object (&thread))
     return EINVAL;
-  if (!(*thread)->valid)
+  if (!thread->valid)
     return ESRCH;
 
   si.si_signo = sig;
@@ -3315,7 +3315,7 @@ pthread_sigqueue (pthread_t *thread, int sig, const union sigval value)
   si.si_value = value;
   si.si_pid = myself->pid;
   si.si_uid = myself->uid;
-  return (int) sig_send (NULL, si, (*thread)->cygtls);
+  return (int) sig_send (NULL, si, thread->cygtls);
 }
 
 /* Cancelability */
