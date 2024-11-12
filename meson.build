@@ -1415,6 +1415,9 @@ if tinystdio
   conf_data.set('_FORMAT_DEFAULT_FLOAT',
                 format_default == 'float',
                 description: 'The default printf functions is the float variant')
+  conf_data.set('_FORMAT_DEFAULT_LONG_LONG',
+                format_default == 'long-long',
+                description: 'The default printf functions is the long-long variant')
   conf_data.set('_FORMAT_DEFAULT_INTEGER',
                 format_default == 'integer',
                 description: 'The default printf functions is the integer variant')
