@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright 2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,8 +33,47 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure clang-aarch64-none-elf \
-	-Dtests=true -Dmultilib-exclude=arm "$@"
 
-exec "$(dirname "$0")"/do-configure clang-aarch64-none-elf-fvp \
-	-Dtests=true -Dmultilib-exclude=arm -Dtest-machine=fvp "$@"
+fvp_exe="FVP_Base_RevC-2xAEMvA"
+
+# select the program
+elf="$1"
+shift
+
+cmdline_param="cluster0.cpu0.semihosting-cmd_line"
+input="program-name"
+done=0
+
+while [ "$done" != "1" ]; do
+    case "$1" in
+        --)
+            shift
+            done=1
+            ;;
+        -s|"")
+            done=1
+            ;;
+        *)
+            case "$input" in
+                "")
+                    input="$1"
+                    ;;
+                *)
+                    input="$input $1"
+                    ;;
+            esac
+            shift
+            ;;
+    esac
+done
+
+$fvp_exe --quiet --application "$elf" --parameter "$cmdline_param=$input" \
+    --parameter "bp.vis.disable_visualisation=1" \
+    --parameter "bp.terminal_0.quiet=1" \
+    --parameter "bp.terminal_1.quiet=1" \
+    --parameter "bp.terminal_2.quiet=1" \
+    --parameter "bp.terminal_3.quiet=1" \
+    --parameter "cluster0.NUM_CORES=1" \
+    --parameter "cluster1.NUM_CORES=0" \
+    --parameter "bp.secure_memory=0" \
+    --parameter "cluster0.cpu0.CONFIG64=1"
