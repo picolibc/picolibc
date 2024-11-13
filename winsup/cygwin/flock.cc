@@ -1524,6 +1524,10 @@ lf_clearlock (lockf_t *unlock, lockf_t **clean, HANDLE fhdl)
   lockf_t *lf = *head;
   lockf_t *overlap, **prev;
   int ovcase;
+
+  if (lf == NOLOCKF)
+    return 0;
+
   inode_t *node = lf->lf_inode;
   tmp_pathbuf tp;
   node->i_all_lf = (lockf_t *) tp.w_get ();
@@ -1531,8 +1535,6 @@ lf_clearlock (lockf_t *unlock, lockf_t **clean, HANDLE fhdl)
   uint32_t lock_cnt = node->get_lock_count ();
   bool first_loop = true;
 
-  if (lf == NOLOCKF)
-    return 0;
   prev = head;
   while ((ovcase = lf_findoverlap (lf, unlock, SELF, &prev, &overlap)))
     {

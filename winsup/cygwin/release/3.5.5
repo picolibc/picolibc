@@ -36,3 +36,6 @@ Fixes:
 
 - Fix potential stack corruption in rmdir() in a border case.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-November/256774.html
+
+- Fix access violation in lf_clearlock() called from flock().
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-November/256750.html
