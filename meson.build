@@ -1443,6 +1443,18 @@ NEWLIB_MAJOR_VERSION=4
 NEWLIB_MINOR_VERSION=3
 NEWLIB_PATCHLEVEL_VERSION=0
 
+conf_data.set('_GNU_SOURCE', '',
+        description: '''Enable GNU functions like strtof_l.
+It's necessary to set this globally because inline functions in
+libc++ headers call the GNU functions.'''
+)
+
+conf_data.set('_PICOLIBC_CTYPE_SMALL', '0',
+        description: '''Disable picolibc's small ctype implementation.
+libc++ expects newlib-style ctype tables, and also expects support for locales
+and extended character sets, so picolibc's small ctype is not compatible with it'''
+)
+
 conf_data.set('__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      cc.has_argument('-fno-tree-loop-distribute-patterns'),
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
