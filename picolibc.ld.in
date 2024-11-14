@@ -68,6 +68,9 @@ SECTIONS
 		*(.literal.unlikely .text.unlikely .literal.unlikely.* .text.unlikely.*)
 		*(.literal.startup .text.startup .literal.startup.* .text.startup.*)
 		*(.literal .text .literal.* .text.* .opd .opd.*)
+		PROVIDE (__start___lcxx_override = .);
+		*(__lcxx_override)
+		PROVIDE (__stop___lcxx_override = .);
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
 		@PREFIX@__text_end = .;
