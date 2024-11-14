@@ -33,3 +33,10 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_picocrt += files('crt0.c')
+
+picocrt_machines += [
+  {
+    'name': 'fvp',
+    'suffix': '-fvp',
+  },
+]
