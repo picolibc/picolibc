@@ -1410,12 +1410,16 @@ lf_setlock (lockf_t *lock, inode_t *node, lockf_t **clean, HANDLE fhdl)
 	   */
 	  if (lock_cnt > MAX_LOCKF_CNT - room_for_clearlock)
 	    return ENOLCK;
+	  /* Do not create a lock here. It should be done after all
+	     overlaps have been removed. */
 	  lf_wakelock (overlap, fhdl);
-	  overlap->lf_type = lock->lf_type;
-	  overlap->create_lock_obj ();
-	  lock->lf_next = *clean;
-	  *clean = lock;
-	  break;
+	  *prev = overlap->lf_next;
+	  overlap->lf_next = *clean;
+	  *clean = overlap;
+	  /* We may have multiple versions (lf_ver) having same lock range.
+	     Therefore, we need to find overlap repeatedly. (originally,
+	     just 'break' here. */
+	  continue;
 
 	case 2: /* overlap contains lock */
 	  /*
@@ -1563,10 +1567,16 @@ lf_clearlock (lockf_t *unlock, lockf_t **clean, HANDLE fhdl)
       switch (ovcase)
 	{
 	case 1: /* overlap == lock */
+	case 3: /* lock contains overlap */
 	  *prev = overlap->lf_next;
+	  lf = overlap->lf_next;
 	  overlap->lf_next = *clean;
 	  *clean = overlap;
-	  break;
+	  first_loop = false;
+	  /* We may have multiple versions (lf_ver) having same lock range.
+	     Therefore, we need to find overlap repeatedly. (originally,
+	     just 'break' here. */
+	  continue;
 
 	case 2: /* overlap contains lock: split it */
 	  if (overlap->lf_start == unlock->lf_start)
@@ -1582,13 +1592,8 @@ lf_clearlock (lockf_t *unlock, lockf_t **clean, HANDLE fhdl)
 	    overlap->lf_next->create_lock_obj ();
 	  break;
 
-	case 3: /* lock contains overlap */
-	  *prev = overlap->lf_next;
-	  lf = overlap->lf_next;
-	  overlap->lf_next = *clean;
-	  *clean = overlap;
-	  first_loop = false;
-	  continue;
+	/* case 3: */ /* lock contains overlap */
+	  /* Merged into case 1 */
 
 	case 4: /* overlap starts before lock */
 	    overlap->lf_end = unlock->lf_start - 1;
