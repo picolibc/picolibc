@@ -617,9 +617,10 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
   IO_STATUS_BLOCK io;
   const ULONG bufsiz = 3 * sizeof (FILE_NAMES_INFORMATION)
 		       + 3 * NAME_MAX * sizeof (WCHAR);
-  PFILE_NAMES_INFORMATION pfni = (PFILE_NAMES_INFORMATION)
-				 alloca (bufsiz);
-  NTSTATUS status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io, pfni,
+  PFILE_NAMES_INFORMATION pfni_buf = (PFILE_NAMES_INFORMATION)
+				     alloca (bufsiz);
+  PFILE_NAMES_INFORMATION pfni;
+  NTSTATUS status = NtQueryDirectoryFile (dir, NULL, NULL, 0, &io, pfni_buf,
 					  bufsiz, FileNamesInformation,
 					  FALSE, NULL, TRUE);
   if (!NT_SUCCESS (status))
@@ -631,6 +632,7 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
   int cnt = 1;
   do
     {
+      pfni = pfni_buf;
       while (pfni->NextEntryOffset)
 	{
 	  if (++cnt > 2)
@@ -677,7 +679,7 @@ check_dir_not_empty (HANDLE dir, path_conv &pc)
 	  pfni = (PFILE_NAMES_INFORMATION) ((caddr_t) pfni + pfni->NextEntryOffset);
 	}
     }
-  while (NT_SUCCESS (NtQueryDirectoryFile (dir, NULL, NULL, 0, &io, pfni,
+  while (NT_SUCCESS (NtQueryDirectoryFile (dir, NULL, NULL, 0, &io, pfni_buf,
 					   bufsiz, FileNamesInformation,
 					   FALSE, NULL, FALSE)));
   return STATUS_SUCCESS;

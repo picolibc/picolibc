@@ -33,3 +33,6 @@ Fixes:
 
 - Fix type of pthread_sigqueue() first parameter to match Linux.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-September/256439.html
+
+- Fix potential stack corruption in rmdir() in a border case.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-November/256774.html
