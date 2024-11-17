@@ -615,6 +615,7 @@ sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
       set_signal_mask (_my_tls.sigwait_mask, *set);
       sig_dispatch_pending (true);
 
+do_wait:
       switch (cygwait (NULL, waittime,
 		       cw_sig_eintr | cw_cancel | cw_cancel_self))
 	{
@@ -640,6 +641,17 @@ sigwait_common (const sigset_t *set, siginfo_t *info, PLARGE_INTEGER waittime)
 	    }
 	  break;
 	case WAIT_TIMEOUT:
+	  _my_tls.lock ();
+	  if (_my_tls.sigwait_mask == 0)
+	    {
+	      /* sigpacket::process() already started.
+	         Will surely be signalled soon. */
+	      waittime = cw_infinite;
+	      _my_tls.unlock ();
+	      goto do_wait;
+	    }
+	  _my_tls.sigwait_mask = 0;
+	  _my_tls.unlock ();
 	  set_errno (EAGAIN);
 	  break;
 	default:

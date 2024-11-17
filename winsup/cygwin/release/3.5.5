@@ -42,3 +42,6 @@ Fixes:
 
 - Fix NtCreateEvent() error in create_lock_ob() called from flock().
   Addresses: https://cygwin.com/pipermail/cygwin/2024-November/256750.html
+
+- Fix segfault in sigtimedwait() when using timeout.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-November/256762.html
