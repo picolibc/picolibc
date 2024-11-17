@@ -1,5 +1,5 @@
 /* Support for cris*-axis-linux-gnu and src/sim/cris simulator.
-   Copyright (C) 2000-2005, 2017, 2023 Axis Communications.
+   Copyright (C) 2000-2005, 2017, 2023, 2024 Axis Communications.
    All rights reserved.
 
    Redistribution and use in source and binary forms, with or without
@@ -102,7 +102,7 @@ extern void __init__start (void) __attribute ((weak));
 extern void __aout__ctors (void) __attribute ((weak));
 extern int main (int argc, char **argv, char **env);
 
-static void start1 () __asm__ ("__start1") __attribute ((__used__));
+static void start1 (int, char **, char **) __asm__ ("__start1") __attribute ((__used__));
 static void
 start1 (int argc, char **argv, char **env)
 {
