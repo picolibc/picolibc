@@ -302,6 +302,20 @@ cygthread::terminate_thread ()
   if (!inuse)
     goto force_notterminated;
 
+  if (_my_tls._ctinfo != this)
+    {
+      CONTEXT context;
+      context.ContextFlags = CONTEXT_CONTROL;
+      /* SuspendThread makes sure a thread is "booted" from emulation before
+	 it is suspended.  As such, the emulator hopefully won't be in a bad
+	 state (aka, holding any locks) when the thread is terminated. */
+      SuspendThread (h);
+      /* We need to call GetThreadContext, even though we don't care about the
+	 context, because SuspendThread is asynchronous and GetThreadContext
+	 will make sure the thread is *really* suspended before returning */
+      GetThreadContext (h, &context);
+    }
+
   TerminateThread (h, 0);
   WaitForSingleObject (h, INFINITE);
   CloseHandle (h);
