@@ -1460,6 +1460,8 @@ dump_sysinfo ()
 		    strcpy (osname, "Server 2019");
 		  else if (osversion.dwBuildNumber <= 20348)
 		    strcpy (osname, "Server 2022");
+		  else if (osversion.dwBuildNumber <= 26100)
+		    strcpy (osname, "Server 2025");
 		  else
 		    strcpy (osname, "Server 20??");
 		}
