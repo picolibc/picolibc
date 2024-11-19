@@ -13,6 +13,9 @@ What's new:
   Windows attributes FILE_ATTRIBUTE_PINNED and FILE_ATTRIBUTE_UNPINNED.
   Add matching 'p' and 'u' mode bits in chattr(1) and lsattr(1).
 
+- New libaio.a provided for projects checking for POSIX aio support
+  by looking for this library at configure time.
+
 
 What changed:
 -------------

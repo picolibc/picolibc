@@ -550,7 +550,8 @@ SUBLIBS = \
 	libresolv.a \
 	librt.a \
 	libacl.a \
-	libssp.a
+	libssp.a \
+	libaio.a
 
 noinst_LIBRARIES = \
 	libdll.a \
@@ -664,6 +665,9 @@ libacl.a: $(LIB_NAME) sec/posixacl.o
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 libssp.a: $(LIB_NAME) $(wildcard $(newlib_build)/libc/ssp/*.o)
+	$(AM_V_GEN)$(speclib) $^ $(@F)
+
+libaio.a: $(LIB_NAME) aio.o
 	$(AM_V_GEN)$(speclib) $^ $(@F)
 
 #
