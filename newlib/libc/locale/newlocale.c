@@ -127,8 +127,12 @@ newlocale (int category_mask, const char *locale,
     return __get_C_locale ();
 
 #ifndef _MB_CAPABLE
-  _REENT_ERRNO(p) = EINVAL;
-  return NULL;
+  if (locale[0] != '\0')
+  {
+	_REENT_ERRNO(p) = EINVAL;
+	return NULL;
+  }
+  return __get_C_locale ();
 #else /* _MB_CAPABLE */
   char new_categories[_LC_LAST][ENCODING_LEN + 1];
   struct __locale_t tmp_locale, *new_locale;
