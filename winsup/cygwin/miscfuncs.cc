@@ -353,7 +353,7 @@ SetThreadName (DWORD dwThreadID, const char* threadName)
       WCHAR buf[bufsize];
       bufsize = MultiByteToWideChar (CP_UTF8, 0, threadName, -1, buf, bufsize);
       HRESULT hr = SetThreadDescription (hThread, buf);
-      if (hr != S_OK)
+      if (IS_ERROR (hr))
 	{
 	  debug_printf ("SetThreadDescription() failed. %08x %08x\n",
 			GetLastError (), hr);
