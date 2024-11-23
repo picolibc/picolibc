@@ -409,11 +409,7 @@ proc_terminate ()
 	     to 1 iff it is a Cygwin process.  */
 	  if (!have_execed || !have_execed_cygwin)
 	    chld_procs[i]->ppid = 1;
-	  /* Attempt to exit the wait_thread cleanly via CancelSynchronousIo
-	     before falling back to the (explicitly dangerous) cross-thread
-	     termination */
-	  if (chld_procs[i].wait_thread
-	      && !CancelSynchronousIo (chld_procs[i].wait_thread->thread_handle ()))
+	  if (chld_procs[i].wait_thread)
 	    chld_procs[i].wait_thread->terminate_thread ();
 	  /* Release memory associated with this process unless it is 'myself'.
 	     'myself' is only in the chld_procs table when we've execed.  We
@@ -1178,11 +1174,7 @@ remove_proc (int ci)
 {
   if (have_execed)
     {
-      /* Attempt to exit the wait_thread cleanly via CancelSynchronousIo
-	 before falling back to the (explicitly dangerous) cross-thread
-	 termination */
-      if (_my_tls._ctinfo != chld_procs[ci].wait_thread
-	  && !CancelSynchronousIo (chld_procs[ci].wait_thread->thread_handle ()))
+      if (_my_tls._ctinfo != chld_procs[ci].wait_thread)
 	chld_procs[ci].wait_thread->terminate_thread ();
     }
   else if (chld_procs[ci] && chld_procs[ci]->exists ())
