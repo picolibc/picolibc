@@ -192,7 +192,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   class cygthread *_ctinfo;
   class san *andreas;
   waitq wq;
-  int sig;
+  int current_sig;
   unsigned incyg;
   unsigned spinning;
   unsigned stacklock;

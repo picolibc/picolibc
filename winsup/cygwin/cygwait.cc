@@ -82,9 +82,9 @@ cygwait (HANDLE object, PLARGE_INTEGER timeout, unsigned mask)
 	/* all set */;
       else
 	{
-	  int sig = _my_tls.sig;
+	  int sig = _my_tls.current_sig;
 	  if (is_cw_sig_cont && sig == SIGCONT)
-	    _my_tls.sig = 0;
+	    _my_tls.current_sig = 0;
 	  if (!sig)
 	    continue;
 	  if (is_cw_sig_eintr || (is_cw_sig_cont && sig == SIGCONT))

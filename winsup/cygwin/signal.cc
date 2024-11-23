@@ -634,7 +634,7 @@ do_wait:
 	      if (info)
 		*info = _my_tls.infodata;
 	      res = _my_tls.infodata.si_signo;
-	      _my_tls.sig = 0;
+	      _my_tls.current_sig = 0;
 	      if (_my_tls.retaddr () == (__tlsstack_t) sigdelayed)
 		_my_tls.pop ();
 	      _my_tls.unlock ();

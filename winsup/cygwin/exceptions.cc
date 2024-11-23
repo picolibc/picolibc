@@ -891,8 +891,9 @@ sig_handle_tty_stop (int sig, siginfo_t *, void *)
       sigproc_printf ("process %d stopped by signal %d", myself->pid, sig);
       /* FIXME! This does nothing to suspend anything other than the main
 	 thread. */
-      /* Use special cygwait parameter to handle SIGCONT.  _main_tls.sig will
-	 be cleared under lock when SIGCONT is detected.  */
+      /* Use special cygwait parameter to handle SIGCONT.
+         _main_tls.current_sig will be cleared under lock when SIGCONT is
+	 detected.  */
       pthread::suspend_all_except_self ();
       DWORD res = cygwait (NULL, cw_infinite, cw_sig_cont);
       pthread::resume_all ();
@@ -952,7 +953,8 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
     }
 
   infodata = si;
-  this->sig = si.si_signo; /* Should always be last thing set to avoid race */
+  /* current_sig should always be last thing set to avoid race */
+  this->current_sig = si.si_signo;
 
   if (incyg)
     set_signal_arrived ();
@@ -976,10 +978,10 @@ sigpacket::setup_handler (void *handler, struct sigaction& siga, _cygtls *tls)
   CONTEXT cx;
   bool interrupted = false;
 
-  if (tls->sig)
+  if (tls->current_sig)
     {
       sigproc_printf ("trying to send signal %d but signal %d already armed",
-		      si.si_signo, tls->sig);
+		      si.si_signo, tls->current_sig);
       goto out;
     }
 
@@ -1432,14 +1434,14 @@ _cygtls::handle_SIGCONT ()
      before exiting the loop.  */
   bool sigsent = false;
   while (1)
-    if (sig)		/* Assume that it's ok to just test sig outside of a
+    if (current_sig)	/* Assume that it's ok to just test sig outside of a
 			   lock since setup_handler does it this way.  */
       yield ();		/* Attempt to schedule another thread.  */
     else if (sigsent)
       break;		/* SIGCONT has been recognized by other thread */
     else
       {
-	sig = SIGCONT;
+	current_sig = SIGCONT;
 	set_signal_arrived (); /* alert sig_handle_tty_stop */
 	sigsent = true;
       }
@@ -1675,7 +1677,7 @@ _cygtls::call_signal_handler ()
   while (1)
     {
       lock ();
-      if (!sig)
+      if (!current_sig)
 	{
 	  unlock ();
 	  break;
@@ -1686,7 +1688,7 @@ _cygtls::call_signal_handler ()
       if (retaddr () == (__tlsstack_t) sigdelayed)
 	pop ();
 
-      debug_only_printf ("dealing with signal %d", sig);
+      debug_only_printf ("dealing with signal %d", current_sig);
       this_sa_flags = sa_flags;
 
       sigset_t this_oldmask = set_process_mask_delta ();
@@ -1699,7 +1701,7 @@ _cygtls::call_signal_handler ()
 	}
 
       /* Save information locally on stack to pass to handler. */
-      int thissig = sig;
+      int thissig = current_sig;
       siginfo_t thissi = infodata;
       void (*thisfunc) (int, siginfo_t *, void *) = func;
 
@@ -1768,7 +1770,7 @@ _cygtls::call_signal_handler ()
       int this_errno = saved_errno;
       reset_signal_arrived ();
       incyg = false;
-      sig = 0;		/* Flag that we can accept another signal */
+      current_sig = 0;	/* Flag that we can accept another signal */
       unlock ();	/* unlock signal stack */
 
       /* Alternate signal stack requested for this signal and alternate signal

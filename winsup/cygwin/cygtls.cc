@@ -76,10 +76,10 @@ _cygtls::init_thread (void *x, DWORD (*func) (void *, void *))
 void
 _cygtls::fixup_after_fork ()
 {
-  if (sig)
+  if (current_sig)
     {
       pop ();
-      sig = 0;
+      current_sig = 0;
     }
   stacklock = spinning = 0;
   signal_arrived = NULL;

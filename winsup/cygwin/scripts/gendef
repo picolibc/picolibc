@@ -374,7 +374,7 @@ stabilize_sig_stack:
 	pause
 	jmp	1b
 2:	incl	_cygtls.incyg(%r12)
-	cmpl	\$0,_cygtls.sig(%r12)
+	cmpl	\$0,_cygtls.current_sig(%r12)
 	jz	3f
 	decl	_cygtls.stacklock(%r12)		# release lock
 	movq	\$_cygtls.start_offset,%rcx	# point to beginning
