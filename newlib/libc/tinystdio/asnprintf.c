@@ -35,29 +35,14 @@
 
 #include "stdio_private.h"
 
-int
-__file_str_put_alloc(char c, FILE *stream)
+char *
+asnprintf(char *str, size_t *lenp, const char *fmt, ...)
 {
-	struct __file_str *sstream = (struct __file_str *) stream;
-	if (sstream->pos == sstream->end) {
-                size_t old_size = sstream->size;
-                char *old = sstream->end - old_size;
-                size_t new_size = old_size + 32;
-                char *new;
-                if (sstream->alloc)
-                        new = realloc(old, new_size);
-                else {
-                        new = malloc(new_size);
-                        if (new)
-                                memcpy(new, old, old_size);
-                }
-		if (!new)
-			return EOF;
-		sstream->size = new_size;
-                sstream->pos = new + old_size;
-                sstream->end = new + new_size;
-                sstream->alloc = true;
-	}
-	*sstream->pos++ = c;
-	return (unsigned char) c;
+        va_list ap;
+        char    *ret;
+
+        va_start(ap, fmt);
+	ret = vasnprintf(str, lenp, fmt, ap);
+        va_end(ap);
+        return ret;
 }

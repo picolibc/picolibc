@@ -35,29 +35,37 @@
 
 #include "stdio_private.h"
 
-int
-__file_str_put_alloc(char c, FILE *stream)
+char *
+vasnprintf(char *str, size_t *lenp, const char *fmt, va_list ap)
 {
-	struct __file_str *sstream = (struct __file_str *) stream;
-	if (sstream->pos == sstream->end) {
-                size_t old_size = sstream->size;
-                char *old = sstream->end - old_size;
-                size_t new_size = old_size + 32;
-                char *new;
-                if (sstream->alloc)
-                        new = realloc(old, new_size);
-                else {
-                        new = malloc(new_size);
-                        if (new)
-                                memcpy(new, old, old_size);
+	struct __file_str f = FDEV_SETUP_STRING_ALLOC_BUF(str, *lenp);
+	int i;
+
+	i = vfprintf(&f.file, fmt, ap);
+
+        /*
+         * Use fputc to append a NULL to handle
+         * buffer overflow cases
+         */
+	if (i >= 0) {
+                if (fputc('\0', &f.file) < 0)
+                        i = EOF;
+        }
+
+        char *ret = f.end - f.size;
+
+        if (i >= 0) {
+                *lenp = (size_t) i;
+                /* Try to shrink the buffer */
+                if (f.alloc) {
+                        char *s = realloc(ret, i + 1);
+                        if (s)
+                                ret = s;
                 }
-		if (!new)
-			return EOF;
-		sstream->size = new_size;
-                sstream->pos = new + old_size;
-                sstream->end = new + new_size;
-                sstream->alloc = true;
-	}
-	*sstream->pos++ = c;
-	return (unsigned char) c;
+        } else {
+                if (f.alloc)
+                        free(ret);
+                ret = NULL;
+        }
+        return ret;
 }

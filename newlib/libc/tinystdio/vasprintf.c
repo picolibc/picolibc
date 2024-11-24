@@ -38,7 +38,7 @@
 int
 vasprintf(char **strp, const char *fmt, va_list ap)
 {
-	struct __file_str f = FDEV_SETUP_STRING_ALLOC();
+        struct __file_str f = FDEV_SETUP_STRING_ALLOC();
 	int i;
 
 	i = vfprintf(&f.file, fmt, ap);
