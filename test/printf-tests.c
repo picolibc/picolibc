@@ -22,9 +22,14 @@ extern int _scanf_float();
 
 int (*_reference_printf_float)() = _printf_float;
 int (*_reference_scanf_float)() = _scanf_float;
+#endif
+#endif
+#endif
+
 #define TEST_ASPRINTF
-#endif
-#endif
+
+#ifdef __PICOLIBC__
+#define TEST_ASNPRINTF
 #endif
 
 #define PRINTF_BUF_SIZE 512
@@ -52,12 +57,20 @@ static void failmsg(int serial, char *fmt, ...) {
 static int test(int serial, char *expect, char *fmt, ...) {
     va_list ap;
     char *abuf = NULL;
+    char *as = NULL;
     va_start(ap, fmt);
     int n;
+    int ret = 0;
 #ifdef TEST_ASPRINTF
     int an;
     va_list aap;
     va_copy(aap, ap);
+#endif
+#ifdef TEST_ASNPRINTF
+    static char as_buf[16];
+    size_t as_len;
+    va_list aanp;
+    va_copy(aanp, ap);
 #endif
 #ifndef NO_FLOATING_POINT
 # ifdef _HAS_IO_FLOAT
@@ -96,6 +109,10 @@ static int test(int serial, char *expect, char *fmt, ...) {
 #ifdef TEST_ASPRINTF
                                     an = asprintf(&abuf, fmt, iv1, iv2, ldv);
 #endif
+#ifdef TEST_ASNPRINTF
+                                    as_len = sizeof(as_buf);
+                                    as = asnprintf(as_buf, &as_len, fmt, iv1, iv2, ldv);
+#endif
                             } else
 #endif
                             {
@@ -103,6 +120,10 @@ static int test(int serial, char *expect, char *fmt, ...) {
                                     n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv1, iv2, dv);
 #ifdef TEST_ASPRINTF
                                     an = asprintf(&abuf, fmt, iv1, iv2, dv);
+#endif
+#ifdef TEST_ASNPRINTF
+                                    as_len = sizeof(as_buf);
+                                    as = asnprintf(as_buf, &as_len, fmt, iv1, iv2, dv);
 #endif
                             }
 		    } else  {
@@ -114,6 +135,10 @@ static int test(int serial, char *expect, char *fmt, ...) {
 #ifdef TEST_ASPRINTF
                                     an = asprintf(&abuf, fmt, iv, ldv);
 #endif
+#ifdef TEST_ASNPRINTF
+                                    as_len = sizeof(as_buf);
+                                    as = asnprintf(as_buf, &as_len, fmt, iv, ldv);
+#endif
                             } else
 #endif
                             {
@@ -121,6 +146,10 @@ static int test(int serial, char *expect, char *fmt, ...) {
                                     n = snprintf(buf, PRINTF_BUF_SIZE, fmt, iv, dv);
 #ifdef TEST_ASPRINTF
                                     an = asprintf(&abuf, fmt, iv, dv);
+#endif
+#ifdef TEST_ASNPRINTF
+                                    as_len = sizeof(as_buf);
+                                    as = asnprintf(as_buf, &as_len, fmt, iv, dv);
 #endif
                             }
 		    }
@@ -132,6 +161,10 @@ static int test(int serial, char *expect, char *fmt, ...) {
 #ifdef TEST_ASPRINTF
                             an = asprintf(&abuf, fmt, ldv);
 #endif
+#ifdef TEST_ASNPRINTF
+                            as_len = sizeof(as_buf);
+                            as = asnprintf(as_buf, &as_len, fmt, ldv);
+#endif
                     } else
 #endif
                     {
@@ -139,6 +172,10 @@ static int test(int serial, char *expect, char *fmt, ...) {
                             n = snprintf(buf, PRINTF_BUF_SIZE, fmt, dv);
 #ifdef TEST_ASPRINTF
                             an = asprintf(&abuf, fmt, dv);
+#endif
+#ifdef TEST_ASNPRINTF
+                            as_len = sizeof(as_buf);
+                            as = asnprintf(as_buf, &as_len, fmt, dv);
 #endif
                     }
 	    }
@@ -149,43 +186,61 @@ static int test(int serial, char *expect, char *fmt, ...) {
 #ifdef TEST_ASPRINTF
 	    an = vasprintf(&abuf, fmt, aap);
 #endif
+#ifdef TEST_ASNPRINTF
+            as_len = sizeof(as_buf);
+            as = vasnprintf(as_buf, &as_len, fmt, aanp);
+#endif
 	    break;
     }
     va_end(ap);
-#ifdef TEST_ASPRINTF
-    va_end(aap);
-#endif
 //    printf("serial %d expect \"%s\" got \"%s\"\n", serial, expect, buf);
     if (n >= PRINTF_BUF_SIZE) {
         failmsg(serial, "buffer overflow");
-	free(abuf);
-        return 1;
+        ret = 1;
     }
     if (n != (int) strlen(expect)) {
         failmsg(serial, "expected \"%s\" (%d), got \"%s\" (%d)",
 		expect, (int) strlen(expect), buf, n);
-	free(abuf);
-        return 1;
+        ret = 1;
     }
     if (strcmp(buf, expect)) {
         failmsg(serial, "expected \"%s\", got \"%s\"", expect, buf);
-	free(abuf);
-        return 1;
+        ret = 1;
     }
 #ifdef TEST_ASPRINTF
+    va_end(aap);
     if (an != n) {
-	failmsg(serial, "asprintf return %d sprintf return %d\n", an, n);
-	free(abuf);
-	return 1;
+	failmsg(serial, "asprintf return %d sprintf return %d", an, n);
+        ret = 1;
     }
     if (strcmp(abuf, buf)) {
-	failmsg(serial, "sprintf return %s asprintf return %s\n", buf, abuf);
-	free(abuf);
-	return 1;
+	failmsg(serial, "sprintf return %s asprintf return %s", buf, abuf);
+        ret = 1;
     }
-    free(abuf);
 #endif
-    return 0;
+#ifdef TEST_ASNPRINTF
+    va_end(aanp);
+    if (as_len != (size_t) n) {
+	failmsg(serial, "asnprintf return %d sprintf return %d", as_len, n);
+        ret = 1;
+    }
+    if (strcmp(as, buf)) {
+	failmsg(serial, "sprintf return %s asnprintf return %s", buf, as);
+        ret = 1;
+    }
+    if (as_len + 1 <= sizeof(as_buf)) {
+        if (as != as_buf)
+            failmsg(serial, "asnprintf shouldn't have allocated at %d\n", n);
+    } else {
+        if (as == as_buf)
+            failmsg(serial, "asnprintf should have allocated at %d\n", n);
+    }
+    if (as == as_buf)
+        as = NULL;
+#endif
+    free(as);
+    free(abuf);
+    return ret;
 }
 
 static void failmsgw(int serial, wchar_t *fmt, ...) {
@@ -205,11 +260,6 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
     wchar_t *abuf = NULL;
     va_start(ap, fmt);
     int n;
-#ifdef TEST_ASPRINTF
-    int an;
-    va_list aap;
-    va_copy(aap, ap);
-#endif
 #ifndef NO_FLOATING_POINT
 # ifdef _HAS_IO_FLOAT
     uint32_t dv;
