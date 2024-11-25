@@ -140,7 +140,10 @@ int
 sched_getscheduler (pid_t pid)
 {
   if (pid < 0)
-    return ESRCH;
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
   else
     return SCHED_FIFO;
 }
