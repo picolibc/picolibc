@@ -110,7 +110,7 @@ class pending_signals
 
 public:
   void add (sigpacket&);
-  bool pending () {retry = true; return !!start.next;}
+  bool pending () {retry = !!start.next; return retry;}
   void clear (int sig) {sigs[sig].si.si_signo = 0;}
   void clear (_cygtls *tls);
   friend void sig_dispatch_pending (bool);
