@@ -201,7 +201,12 @@ _cstart(void)
          */
         __asm__("mrs    %x0, sctlr_el1" : "=r" (sctlr_el1));
         sctlr_el1 |= SCTLR_ICACHE | SCTLR_C | SCTLR_MMU;
-        sctlr_el1 &= ~(SCTLR_A | SCTLR_WXN);
+	#ifdef __ARM_FEATURE_UNALIGNED
+            sctlr_el1 &= ~SCTLR_A;
+        #else
+            sctlr_el1 |= SCTLR_A;
+        #endif
+        sctlr_el1 &= ~SCTLR_WXN;
         __asm__("msr    sctlr_el1, %x0" :: "r" (sctlr_el1));
         __asm__("isb\n");
 
