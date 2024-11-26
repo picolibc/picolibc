@@ -144,7 +144,12 @@ void _cstart(void)
          */
         __asm__("mrs    %x0, sctlr_"BOOT_EL"" : "=r" (sctlr));
         sctlr |= SCTLR_ICACHE | SCTLR_C | SCTLR_MMU;
-        sctlr &= ~(SCTLR_A | SCTLR_WXN);
+        #ifdef __ARM_FEATURE_UNALIGNED
+            sctlr &= ~SCTLR_A;
+        #else
+            sctlr |= SCTLR_A;
+        #endif
+        sctlr &= ~SCTLR_WXN;
         __asm__("msr    sctlr_"BOOT_EL", %x0" :: "r" (sctlr));
         __asm__("isb\n");
 
