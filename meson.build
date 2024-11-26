@@ -185,6 +185,7 @@ newlib_iconv_external_ccs = get_option('newlib-iconv-external-ccs')
 
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 newlib_nano_malloc = get_option('newlib-nano-malloc')
+nano_malloc_clear_freed = get_option('nano-malloc-clear-freed')
 lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
@@ -1365,6 +1366,7 @@ conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
 conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
 conf_data.set('_HAVE_FCNTL', newlib_have_fcntl)
 conf_data.set('_NANO_MALLOC', newlib_nano_malloc)
+conf_data.set('_NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
 conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
 conf_data.set('_LITE_EXIT', lite_exit)
 conf_data.set('_PICO_EXIT', picoexit)
@@ -1413,6 +1415,9 @@ if tinystdio
   conf_data.set('_FORMAT_DEFAULT_FLOAT',
                 format_default == 'float',
                 description: 'The default printf functions is the float variant')
+  conf_data.set('_FORMAT_DEFAULT_LONG_LONG',
+                format_default == 'long-long',
+                description: 'The default printf functions is the long-long variant')
   conf_data.set('_FORMAT_DEFAULT_INTEGER',
                 format_default == 'integer',
                 description: 'The default printf functions is the integer variant')

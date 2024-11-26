@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2024, Synopsys Inc.
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,52 +32,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#define __STDC_WANT_LIB_EXT1__ 1
-#include "stdio_private.h"
+
+#include <wctype.h>
 #include <stdio.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include "../stdlib/local_s.h"
+#include <stdlib.h>
+#include <locale.h>
 
-int
-sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
+static struct {
+    char *n;
+    int (*f)(wint_t);
+} funcs[] = {
+    { .n = "alnum", iswalnum },
+    { .n = "alpha", iswalpha },
+    { .n = "blank", iswblank },
+    { .n = "cntrl", iswcntrl },
+    { .n = "digit", iswdigit },
+    { .n = "graph", iswgraph },
+    { .n = "lower", iswlower },
+    { .n = "print", iswprint },
+    { .n = "punct", iswpunct },
+    { .n = "space", iswspace },
+    { .n = "upper", iswupper },
+    { .n = "xdigit", iswxdigit },
+};
+
+#define NFUNC sizeof(funcs)/sizeof(funcs[0])
+
+int main(int argc, char **argv)
 {
-    bool write_null = true;
-    const char *msg = "";
-    va_list args;
-    int rc;
+    wchar_t     c;
+    unsigned    f;
+    FILE        *out = stdout;
 
-    if (s == NULL) {
-        write_null = false;
-        msg = "dest buffer is null";
-        goto handle_error;
-    } else if ((bufsize == 0) || (CHECK_RSIZE(bufsize))) {
-        write_null = false;
-        msg = "invalid buffer size";
-        goto handle_error;
-    } else {
-        va_start(args, fmt);
-        rc = vsnprintf_s(s, bufsize, fmt, args);
-        va_end(args);
+    if (argc > 1) {
+        out = fopen(argv[1], "w");
+        if (!out) {
+            perror(argv[1]);
+            exit(1);
+        }
     }
 
-    if (rc < 0) {
-        rc = 0;
+    c = 0x0000;
+    setlocale(LC_ALL, "C.UTF-8");
+    for (;;) {
+        fprintf(out, "0x%04x", c);
+        for (f = 0; f < NFUNC; f++)
+            fprintf(out, "%6.6s ", funcs[f].f(c) ? funcs[f].n : "      ");
+
+        fprintf(out, "\n");
+#if __SIZEOF_WCHAR_T__ == 2
+        if (c == 0xffff)
+            break;
+#else
+        if (c == 0xe01ef)
+            break;
+#endif
+        c++;
     }
-
-    // Normal return path
-    return rc;
-
-handle_error:
-    if (__cur_handler != NULL) {
-        __cur_handler(msg, NULL, -1);
-    }
-
-    rc = 0; /* standard stipulates this */
-
-    if (write_null && s != NULL) {
-        s[0] = '\0'; /* again, standard requires this */
-    }
-
-    return rc;
+    fflush(out);
+    return 0;
 }

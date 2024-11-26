@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '-m32', '-target', 'arm-none-eabihf', '-march=armv7-a', '-mfloat-abi=soft', '-nostdlib']
-cpp = ['clang', '-m32', '-target', 'arm-none-eabihf', '-march=armv7-a', '-mfloat-abi=soft', '-nostdlib']
+c = ['clang', '-m32', '-target', 'arm-none-eabihf', '-mno-unaligned-access', '-march=armv7-a', '-mfloat-abi=soft', '-nostdlib']
+cpp = ['clang', '-m32', '-target', 'arm-none-eabihf', '-mno-unaligned-access', '-march=armv7-a', '-mfloat-abi=soft', '-nostdlib']
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'

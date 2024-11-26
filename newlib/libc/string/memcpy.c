@@ -47,9 +47,9 @@ QUICKREF
 #include "local.h"
 #include <stdint.h>
 
-/* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
-  (((uintptr_t)X & (sizeof (long) - 1)) | ((uintptr_t)Y & (sizeof (long) - 1)))
+/* Distance from X to previous aligned boundary. Zero if aligned */
+#define UNALIGNED(X) \
+    (((uintptr_t)X & (sizeof (long) - 1)))
 
 /* How many bytes are copied each iteration of the 4X unrolled loop.  */
 #define BIGBLOCKSIZE    (sizeof (long) << 2)
@@ -68,56 +68,95 @@ memcpy (void *__restrict dst0,
 	const void *__restrict src0,
 	size_t len0)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-  char *dst = (char *) dst0;
-  char *src = (char *) src0;
-
-  void *save = dst0;
-
-  while (len0--)
-    {
-      *dst++ = *src++;
-    }
-
-  return save;
-#else
   char *dst = dst0;
   const char *src = src0;
-  long *aligned_dst;
-  const long *aligned_src;
+#if !(defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__))
+  unsigned long *aligned_dst;
+  const unsigned long *aligned_src;
 
   /* If the size is small, or either SRC or DST is unaligned,
      then punt into the byte copy loop.  This should be rare.  */
-  if (!TOO_SMALL(len0) && !UNALIGNED (src, dst))
-    {
-      aligned_dst = (long*)dst;
-      aligned_src = (long*)src;
+  if (!TOO_SMALL(len0))
+  {
+      /*
+       * Align dst and make sure
+       * we won't fetch anything before src
+       */
+      unsigned start = LITTLEBLOCKSIZE*2 - UNALIGNED(dst);
+      while(start--) {
+          *dst++ = *src++;
+          len0--;
+      }
 
-      /* Copy 4X long words at a time if possible.  */
-      while (len0 >= BIGBLOCKSIZE)
-        {
-          *aligned_dst++ = *aligned_src++;
-          *aligned_dst++ = *aligned_src++;
-          *aligned_dst++ = *aligned_src++;
-          *aligned_dst++ = *aligned_src++;
-          len0 -= BIGBLOCKSIZE;
-        }
+      aligned_dst = (unsigned long*)dst;
+      int byte_shift = UNALIGNED(src);
 
-      /* Copy one long word at a time if possible.  */
-      while (len0 >= LITTLEBLOCKSIZE)
-        {
-          *aligned_dst++ = *aligned_src++;
-          len0 -= LITTLEBLOCKSIZE;
-        }
+      if (!byte_shift)
+      {
+          aligned_src = (unsigned long*)src;
 
-       /* Pick up any residual with a byte copier.  */
-      dst = (char*)aligned_dst;
-      src = (char*)aligned_src;
-    }
+          /* Copy 4X long words at a time if possible.  */
+          while (len0 >= BIGBLOCKSIZE)
+          {
+              *aligned_dst++ = *aligned_src++;
+              *aligned_dst++ = *aligned_src++;
+              *aligned_dst++ = *aligned_src++;
+              *aligned_dst++ = *aligned_src++;
+              len0 -= BIGBLOCKSIZE;
+          }
+
+          /* Copy one long word at a time if possible.  */
+          while (len0 >= LITTLEBLOCKSIZE)
+          {
+              *aligned_dst++ = *aligned_src++;
+              len0 -= LITTLEBLOCKSIZE;
+          }
+
+          src = (char*)aligned_src;
+      }
+      else
+      {
+          /*
+           * Fetch source words and then merge two of them for each
+           * dest word:
+           *
+           * byte_shift      remain
+           * |     |         |
+           * xxxxxxxL RRRRRRRy
+           *        D DDDDDDD
+           *
+           * We don't want to fetch past the source at all, so stop
+           * when we have fewer than 'remain' bytes left
+           */
+
+          /* bytes used from the left word */
+          int remain = LITTLEBLOCKSIZE - byte_shift;
+          /* bit shifts for the left and right words */
+          int left_shift = byte_shift << 3;
+          int right_shift = remain << 3;
+
+          aligned_src = (unsigned long*)(src - byte_shift);
+          unsigned long left = *aligned_src++, right;
+
+          while (len0 >= LITTLEBLOCKSIZE + remain) {
+              right = *aligned_src++;
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+              *aligned_dst++ = (left >> left_shift) | (right << right_shift);
+#else
+              *aligned_dst++ = (left << left_shift) | (right >> right_shift);
+#endif
+              left = right;
+              len0 -= LITTLEBLOCKSIZE;
+          }
+          src = (char *)aligned_src - remain;
+      }
+      /* Pick up any residual with a byte copier.  */
+     dst = (char*)aligned_dst;
+  }
+#endif
 
   while (len0--)
     *dst++ = *src++;
 
   return dst0;
-#endif /* not PREFER_SIZE_OVER_SPEED */
 }

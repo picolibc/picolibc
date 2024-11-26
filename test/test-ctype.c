@@ -35,17 +35,25 @@
 
 #include <stdio.h>
 #include <ctype.h>
+#include <wctype.h>
 #include <stdbool.h>
 
 /* Validate C locale ctype data */
 
 #define boolname(b)     ((b) ? "true" : "false")
 #define iscat(name)     is ## name
+#define iswcat(name)     isw ## name
 #define TEST(name)   do {                                               \
         if (!!iscat(name)(c) != !!name) {                               \
             printf("character %#2x '%c' is%s is %s should be %s\n",     \
                    c, c, #name, boolname(iscat(name)(c)), boolname(name)); \
             error = 1;                                                  \
+        }                                                               \
+        if (!!iscat(name)(c) != !!iswcat(name)((wint_t)(c))) {          \
+                printf("character %#2x '%c' is%s = %s isw%s = %s\n",    \
+                       c, c, #name, boolname(iscat(name)(c)), #name,    \
+                       boolname(iswcat(name)(c)));                      \
+                error = 1;                                              \
         }                                                               \
     } while(0)
 

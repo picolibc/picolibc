@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2024, Synopsys Inc.
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,52 +32,46 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#define __STDC_WANT_LIB_EXT1__ 1
-#include "stdio_private.h"
-#include <stdio.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include "../stdlib/local_s.h"
 
-int
-sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
+#define _DEFAULT_SOURCE
+#include <ctype.h>
+#include <wctype.h>
+#include "local.h"
+
+#define NEED_CTYPE_TABLE
+
+static struct {
+    wchar_t             code;
+    uint16_t            category;
+} ctype_table[] = {
+#include "ctype_table.h"
+};
+
+#define N_CAT_TABLE     (sizeof(ctype_table) / sizeof(ctype_table[0]))
+
+uint16_t
+__ctype_table_lookup(wint_t ic)
 {
-    bool write_null = true;
-    const char *msg = "";
-    va_list args;
-    int rc;
+    size_t      low = 0;
+    size_t      high = N_CAT_TABLE - 1;
+    size_t      mid;
+    wchar_t     c;
 
-    if (s == NULL) {
-        write_null = false;
-        msg = "dest buffer is null";
-        goto handle_error;
-    } else if ((bufsize == 0) || (CHECK_RSIZE(bufsize))) {
-        write_null = false;
-        msg = "invalid buffer size";
-        goto handle_error;
-    } else {
-        va_start(args, fmt);
-        rc = vsnprintf_s(s, bufsize, fmt, args);
-        va_end(args);
+    if (ic == WEOF)
+        return CLASS_none;
+
+    c = (wchar_t) ic;
+
+    while (low < high) {
+        mid = (low + high) >> 1;
+        if (c < ctype_table[mid].code) {
+            high = mid - 1;
+        } else if (mid >= N_CAT_TABLE || c >= ctype_table[mid+1].code) {
+            low = mid + 1;
+        } else {
+            high = mid;
+            break;
+        }
     }
-
-    if (rc < 0) {
-        rc = 0;
-    }
-
-    // Normal return path
-    return rc;
-
-handle_error:
-    if (__cur_handler != NULL) {
-        __cur_handler(msg, NULL, -1);
-    }
-
-    rc = 0; /* standard stipulates this */
-
-    if (write_null && s != NULL) {
-        s[0] = '\0'; /* again, standard requires this */
-    }
-
-    return rc;
+    return ctype_table[high].category;
 }

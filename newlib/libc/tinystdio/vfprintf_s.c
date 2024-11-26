@@ -32,6 +32,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+
 #define __STDC_WANT_LIB_EXT1__ 1
 #include "stdio_private.h"
 #include <stdio.h>
@@ -39,45 +40,5 @@
 #include <stdbool.h>
 #include "../stdlib/local_s.h"
 
-int
-sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
-{
-    bool write_null = true;
-    const char *msg = "";
-    va_list args;
-    int rc;
-
-    if (s == NULL) {
-        write_null = false;
-        msg = "dest buffer is null";
-        goto handle_error;
-    } else if ((bufsize == 0) || (CHECK_RSIZE(bufsize))) {
-        write_null = false;
-        msg = "invalid buffer size";
-        goto handle_error;
-    } else {
-        va_start(args, fmt);
-        rc = vsnprintf_s(s, bufsize, fmt, args);
-        va_end(args);
-    }
-
-    if (rc < 0) {
-        rc = 0;
-    }
-
-    // Normal return path
-    return rc;
-
-handle_error:
-    if (__cur_handler != NULL) {
-        __cur_handler(msg, NULL, -1);
-    }
-
-    rc = 0; /* standard stipulates this */
-
-    if (write_null && s != NULL) {
-        s[0] = '\0'; /* again, standard requires this */
-    }
-
-    return rc;
-}
+#define VFPRINTF_S
+#include "vfprintf.c"

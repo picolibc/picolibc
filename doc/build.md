@@ -366,14 +366,16 @@ the library code size. Here's the
 [do-riscv-configure](../scripts/do-riscv-configure) script from the repository
 that configures the library for small RISC-V systems:
 
-    #!/bin/sh
-    ARCH=riscv64-unknown-elf
-    DIR=`dirname $0`
-    meson "$DIR" \
-	    -Dincludedir=picolibc/$ARCH/include \
-	    -Dlibdir=picolibc/$ARCH/lib \
-	    --cross-file "$DIR"/cross-$ARCH.txt \
-	    "$@"
+```sh
+#!/bin/sh
+ARCH=riscv64-unknown-elf
+DIR=`dirname $0`
+meson "$DIR" \
+    -Dincludedir=picolibc/$ARCH/include \
+    -Dlibdir=picolibc/$ARCH/lib \
+    --cross-file "$DIR"/cross-$ARCH.txt \
+    "$@"
+```
 
 This script is designed to be run from a build directory, so you'd do:
 

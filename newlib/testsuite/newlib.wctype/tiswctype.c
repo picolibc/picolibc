@@ -57,5 +57,9 @@ int main(void)
   x = wctype ("unknown");
   CHECK (x == 0);
 
+  CHECK(!iswprint((wint_t) __WCHAR_MAX__));
+  CHECK(!iswcntrl((wint_t) __WCHAR_MAX__));
+  CHECK(!iswgraph((wint_t) __WCHAR_MAX__));
+
   exit (0);
 }

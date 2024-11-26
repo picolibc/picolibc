@@ -92,6 +92,9 @@ void    *mempcpy (void *, const void *, size_t);
 void    *memrchr (const void *, int, size_t);
 #endif
 void    *memset (void *, int, size_t);
+#if __ISO_C_VISIBLE >= 2023
+void    *memset_explicit(void *, int, size_t);
+#endif
 #if __GNU_VISIBLE
 void    *rawmemchr (const void *, int);
 #endif

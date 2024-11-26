@@ -38,8 +38,6 @@
 /* Defined in memcpy-armv7a.S.  */
 #elif __ARM_ARCH_ISA_THUMB == 2 && !__ARM_ARCH_ISA_ARM
 /* Defined in memcpy-armv7m.S.  */
-#elif defined (__ARM_ARCH_7A__)
-/* Defined in aeabi_memcpy-armv7a.S */
 #else
 #define MEMCPY_FALLBACK
 #endif
