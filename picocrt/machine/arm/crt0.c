@@ -246,6 +246,8 @@ _cstart(void)
 #define SCTLR_BRANCH_PRED (1 << 11)
 #define SCTLR_ICACHE (1 << 12)
 #define SCTLR_TRE       (1 << 28)
+#define SCTLR_ALIGNMEMT_CHECK (1 << 1)
+#define SCTLR_UNALIGNED_ACCESS_ENABLE (1 << 22)
 
         uint32_t        mmfr0;
         __asm__("mrc p15, 0, %0, c0, c1, 4" : "=r" (mmfr0));
@@ -281,8 +283,8 @@ _cstart(void)
                 __asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
                 sctlr |= SCTLR_ICACHE | SCTLR_BRANCH_PRED | SCTLR_DATA_L2 | SCTLR_MMU;
                 #ifndef __ARM_FEATURE_UNALIGNED
-                    sctlr |= (1 << 1);
-                    sctlr &= ~(1 << 22);
+                    sctlr |= SCTLR_ALIGNMEMT_CHECK;
+                    sctlr &= ~SCTLR_UNALIGNED_ACCESS_ENABLE;
                 #endif
                 sctlr &= ~SCTLR_TRE;
                 __asm__("mcr p15, 0, %0, c1, c0, 0\n" :: "r" (sctlr));
