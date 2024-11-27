@@ -235,9 +235,15 @@ static const wincaps wincap_11 = {
 
 wincapc wincap __attribute__((section (".cygwin_dll_common"), shared));
 
+extern IMAGE_DOS_HEADER
+__image_base__;
+
 void
 wincapc::init ()
 {
+  PIMAGE_NT_HEADERS ntheader;
+  USHORT emul_mach;
+
   if (caps)
     return;		// already initialized
 
@@ -282,4 +288,17 @@ wincapc::init ()
 
   __small_sprintf (osnam, "NT-%d.%d", version.dwMajorVersion,
 		   version.dwMinorVersion);
+
+  if (!IsWow64Process2 (GetCurrentProcess (), &emul_mach, &host_mach))
+    {
+      /* If IsWow64Process2 succeeded, it filled in host_mach.  Assume the only
+	 way it fails for the current process is that we're running on an OS
+	 version where it's not implemented yet.  As such, the only realistic
+	 option for host_mach is AMD64 */
+      host_mach = IMAGE_FILE_MACHINE_AMD64;
+    }
+
+  ntheader = (PIMAGE_NT_HEADERS)((LPBYTE) &__image_base__
+				 + __image_base__.e_lfanew);
+  cygwin_mach = ntheader->FileHeader.Machine;
 }

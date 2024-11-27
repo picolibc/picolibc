@@ -42,6 +42,8 @@ class wincapc
   RTL_OSVERSIONINFOEXW	version;
   char			osnam[40];
   const void		*caps;
+  USHORT		host_mach;
+  USHORT		cygwin_mach;
   bool			_is_server;
 
 public:
@@ -61,6 +63,8 @@ public:
 		     { return (size_t) system_info.dwAllocationGranularity; }
   const char *osname () const { return osnam; }
   const DWORD build_number () const { return version.dwBuildNumber; }
+  const USHORT host_machine () const { return host_mach; }
+  const USHORT cygwin_machine () const { return cygwin_mach; }
 
 #define IMPLEMENT(cap) cap() const { return ((wincaps *) this->caps)->cap; }
 

@@ -4617,14 +4617,12 @@ find_fast_cwd_pointer ()
 static fcwd_access_t **
 find_fast_cwd ()
 {
-  USHORT emulated, hosted;
   fcwd_access_t **f_cwd_ptr;
 
-  /* First check if we're running in WOW64 on ARM64 emulating AMD64.  Skip
+  /* First check if we're running on an ARM64 system.  Skip
      fetching FAST_CWD pointer as long as there's no solution for finding
      it on that system. */
-  if (IsWow64Process2 (GetCurrentProcess (), &emulated, &hosted)
-      && hosted == IMAGE_FILE_MACHINE_ARM64)
+  if (wincap.host_machine () == IMAGE_FILE_MACHINE_ARM64)
     return NULL;
 
   /* Fetch the pointer but don't set the global fast_cwd_ptr yet.  First
