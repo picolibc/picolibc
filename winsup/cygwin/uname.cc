@@ -33,11 +33,25 @@ uname_x (struct utsname *name)
   __try
     {
       char buf[NI_MAXHOST + 1] ATTRIBUTE_NONSTRING;
+      int n;
 
       memset (name, 0, sizeof (*name));
       /* sysname */
-      __small_sprintf (name->sysname, "CYGWIN_%s-%u",
-		       wincap.osname (), wincap.build_number ());
+      n = __small_sprintf (name->sysname, "CYGWIN_%s-%u",
+			   wincap.osname (), wincap.build_number ());
+      if (wincap.host_machine () != wincap.cygwin_machine ())
+	{
+	  switch (wincap.host_machine ())
+	    {
+	      case IMAGE_FILE_MACHINE_ARM64:
+		n = stpcpy (name->sysname + n, "-ARM64") - name->sysname;
+		break;
+	      default:
+		n += __small_sprintf (name->sysname + n, "-%04y",
+				      (int) wincap.host_machine ());
+		break;
+	    }
+	}
       /* nodename */
       memset (buf, 0, sizeof buf);
       cygwin_gethostname (buf, sizeof buf - 1);
