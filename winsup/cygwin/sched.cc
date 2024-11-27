@@ -402,8 +402,11 @@ int
 sched_setscheduler (pid_t pid, int policy,
 		    const struct sched_param *param)
 {
+  if (policy == SCHED_FIFO) /* returned by sched_getscheduler. */
+    return sched_setparam (pid, param);
+
   /* on win32, you can't change the scheduler. Doh! */
-  set_errno (ENOSYS);
+  set_errno (EINVAL);
   return -1;
 }
 
