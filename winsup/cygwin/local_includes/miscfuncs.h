@@ -46,6 +46,7 @@ is_alt_numpad_event (PINPUT_RECORD pirec)
 
 int winprio_to_nice (DWORD);
 DWORD nice_to_winprio (int &);
+bool set_and_check_winprio (HANDLE proc, DWORD prio);
 
 bool create_pipe (PHANDLE, PHANDLE, LPSECURITY_ATTRIBUTES, DWORD);
 

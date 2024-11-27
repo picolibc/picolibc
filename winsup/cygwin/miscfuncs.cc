@@ -183,6 +183,35 @@ nice_to_winprio (int &nice)
   return prio;
 }
 
+/* Set Win32 priority or return false on failure.  Also return
+   false and revert to the original priority if a different (lower)
+   priority is set instead. */
+bool
+set_and_check_winprio (HANDLE proc, DWORD prio)
+{
+  DWORD prev_prio = GetPriorityClass (proc);
+  if (prev_prio == prio)
+    return true;
+
+  if (!SetPriorityClass (proc, prio))
+    return false;
+
+  /* Windows silently sets a lower priority (HIGH_PRIORITY_CLASS) if
+     the new priority (REALTIME_PRIORITY_CLASS) requires administrator
+     privileges. */
+  DWORD curr_prio = GetPriorityClass (proc);
+  if (curr_prio != prio)
+    {
+      debug_printf ("Failed to set priority 0x%x, revert from 0x%x to 0x%x",
+	prio, curr_prio, prev_prio);
+      SetPriorityClass (proc, prev_prio);
+      return false;
+    }
+
+  debug_printf ("Changed priority from 0x%x to 0x%x", prev_prio, curr_prio);
+  return true;
+}
+
 /* Minimal overlapped pipe I/O implementation for signal and commune stuff. */
 
 BOOL

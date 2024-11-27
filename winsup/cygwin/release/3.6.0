@@ -43,3 +43,8 @@ What changed:
 
 - Now using AVX/AVX2/AVX-512 instructions in signal handler does not
   break their context.
+
+- nice(2), setpriority(2) and sched_setparam(2) now fail with EACCES
+  or EPERM if Windows would silently set a lower priority
+  (HIGH_PRIORITY_CLASS instead of REALTIME_PRIORITY_CLASS) due to
+  missing administrator privileges.

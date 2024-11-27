@@ -266,7 +266,7 @@ sched_setparam (pid_t pid, const struct sched_param *param)
       set_errno (ESRCH);
       return -1;
     }
-  if (!SetPriorityClass (process, pclass))
+  if (!set_and_check_winprio (process, pclass))
     {
       CloseHandle (process);
       set_errno (EPERM);

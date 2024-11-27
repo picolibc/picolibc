@@ -3826,7 +3826,7 @@ setpriority (int which, id_t who, int value)
 	who = myself->pid;
       if ((pid_t) who == myself->pid)
 	{
-	  if (!SetPriorityClass (GetCurrentProcess (), prio))
+	  if (!set_and_check_winprio (GetCurrentProcess (), prio))
 	    {
 	      set_errno (EACCES);
 	      return -1;
@@ -3875,7 +3875,7 @@ setpriority (int which, id_t who, int value)
 	    error = EPERM;
 	  else
 	    {
-	      if (!SetPriorityClass (proc_h, prio))
+	      if (!set_and_check_winprio (proc_h, prio))
 		error = EACCES;
 	      else
 		p->nice = value;
