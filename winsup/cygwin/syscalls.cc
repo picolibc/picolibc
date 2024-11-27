@@ -3959,7 +3959,16 @@ out:
 extern "C" int
 nice (int incr)
 {
-  return setpriority (PRIO_PROCESS, myself->pid, myself->nice + incr);
+  if (setpriority (PRIO_PROCESS, myself->pid, myself->nice + incr))
+    {
+      /* POSIX: EPERM instead of EACCES. */
+      set_errno (EPERM);
+      return -1;
+    }
+
+  /* POSIX: return the new nice value.  Linux glibc >= 2.2.4 provides
+     conformance with POSIX (FreeBSD returns 0). */
+  return myself->nice;
 }
 
 static void

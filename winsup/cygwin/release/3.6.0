@@ -48,3 +48,7 @@ What changed:
   or EPERM if Windows would silently set a lower priority
   (HIGH_PRIORITY_CLASS instead of REALTIME_PRIORITY_CLASS) due to
   missing administrator privileges.
+
+- nice(2) now returns the new nice value instead of 0 on success
+  and sets errno to EPERM instead of EACCES on failure.  This confirms
+  to POSIX and Linux (glibc >= 2.2.4) behavior.
