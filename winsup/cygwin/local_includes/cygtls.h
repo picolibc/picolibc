@@ -159,6 +159,8 @@ extern "C" int __ljfault (jmp_buf, int);
 
 typedef uintptr_t __tlsstack_t;
 
+struct threadlist_t;
+
 class _cygtls
 {
 public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
@@ -262,7 +264,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   {
     will_wait_for_signal = false;
   }
-  void handle_SIGCONT ();
+  void handle_SIGCONT (threadlist_t * &);
   static void cleanup_early(struct _reent *);
 private:
   void call2 (DWORD (*) (void *, void *), void *, void *);
