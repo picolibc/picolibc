@@ -25,6 +25,7 @@ HERE=`dirname "$0"`
 "$HERE"/do-test-noopt riscv "$@"
 "$HERE"/do-test-noopt rv32imac "$@"
 "$HERE"/do-test clang-aarch64 "$@"
+"$HERE"/do-test clang-aarch64-fvp "$@"
 "$HERE"/do-test clang-arm "$@"
 "$HERE"/do-test-noopt clang-x86_64 "$@"
 "$HERE"/do-test-noopt clang-x86 "$@"
