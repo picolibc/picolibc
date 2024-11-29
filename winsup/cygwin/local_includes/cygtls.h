@@ -197,7 +197,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   int current_sig;
   unsigned incyg;
   unsigned spinning;
-  unsigned stacklock;
+  volatile unsigned stacklock;
   __tlsstack_t *stackptr;
   __tlsstack_t stack[TLS_STACK_SIZE];
   unsigned initialized;
@@ -225,9 +225,20 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   int call_signal_handler ();
   void remove_wq (DWORD);
   void fixup_after_fork ();
-  void lock ();
-  void unlock ();
-  bool locked ();
+  void lock ()
+  {
+    while (InterlockedExchange (&stacklock, 1))
+      {
+#ifdef __x86_64__
+	__asm__ ("pause");
+#else
+#error unimplemented for this target
+#endif
+	Sleep (0);
+      }
+  }
+  void unlock () { stacklock = 0; }
+  bool locked () { return !!stacklock; }
   HANDLE get_signal_arrived (bool wait_for_lock = true)
   {
     if (!signal_arrived)

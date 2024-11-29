@@ -322,42 +322,6 @@ _ZN7_cygtls3popEv:
 	ret
 	.seh_endproc
 
-# _cygtls::lock
-	.global _ZN7_cygtls4lockEv
-	.seh_proc _ZN7_cygtls4lockEv
-_ZN7_cygtls4lockEv:
-	pushq	%r12
-	.seh_pushreg %r12
-	.seh_endprologue
-	movq	%rcx,%r12
-1:	movl	\$1,%r11d
-	xchgl	%r11d,_cygtls.stacklock_p(%r12)	# try to acquire lock
-	testl   %r11d,%r11d
-	jz	2f
-	pause
-	jmp	1b
-2:	popq	%r12
-	ret
-	.seh_endproc
-
-# _cygtls::unlock
-	.global _ZN7_cygtls6unlockEv
-	.seh_proc _ZN7_cygtls6unlockEv
-_ZN7_cygtls6unlockEv:
-	.seh_endprologue
-	decl	_cygtls.stacklock_p(%rcx)	# release lock
-	ret
-	.seh_endproc
-
-# _cygtls::locked
-	.global _ZN7_cygtls6lockedEv
-	.seh_proc _ZN7_cygtls6lockedEv
-_ZN7_cygtls6lockedEv:
-	.seh_endprologue
-	movl	_cygtls.stacklock_p(%rcx),%eax
-	ret
-	.seh_endproc
-
 	.seh_proc stabilize_sig_stack
 stabilize_sig_stack:
 	pushq	%r12
