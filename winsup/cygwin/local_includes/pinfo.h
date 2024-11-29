@@ -92,7 +92,9 @@ public:
   long start_time;
   struct rusage rusage_self;
   struct rusage rusage_children;
-  int nice;
+
+  int nice;          /* nice value for SCHED_OTHER. */
+  int sched_policy;  /* SCHED_OTHER, SCHED_FIFO or SCHED_RR. */
 
   /* Non-zero if process was stopped by a signal. */
   char stopsig;

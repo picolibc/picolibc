@@ -52,3 +52,11 @@ What changed:
 - nice(2) now returns the new nice value instead of 0 on success
   and sets errno to EPERM instead of EACCES on failure.  This confirms
   to POSIX and Linux (glibc >= 2.2.4) behavior.
+
+- sched_setscheduler(2) now emulates changes between SCHED_OTHER,
+  SCHED_FIFO and SCHED_RR.  If SCHED_OTHER is selected, the Windows
+  priority is set according to the nice value.  If SCHED_FIFO or
+  SCHED_RR is selected, the nice value is preserved and the Windows
+  priority is set according to the realtime priority.
+  Note: Windows does not offer alternative scheduling policies so
+  this could only emulate API behavior.

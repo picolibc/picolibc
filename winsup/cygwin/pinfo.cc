@@ -102,6 +102,7 @@ pinfo_init (char **envp, int envc)
       myself->gid = ILLEGAL_GID;
       environ_init (NULL, 0);	/* call after myself has been set up */
       myself->nice = winprio_to_nice (GetPriorityClass (GetCurrentProcess ()));
+      myself->sched_policy = SCHED_OTHER;
       myself->ppid = 1;		/* always set last */
       debug_printf ("Set nice to %d", myself->nice);
     }

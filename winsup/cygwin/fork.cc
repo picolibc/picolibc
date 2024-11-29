@@ -402,6 +402,7 @@ frok::parent (volatile char * volatile stack_here)
     }
 
   child->nice = myself->nice;
+  child->sched_policy = myself->sched_policy;
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */

@@ -33,9 +33,10 @@ sched_get_priority_max (int policy)
 {
   switch (policy)
     {
+    case SCHED_OTHER:
+      return 0;
     case SCHED_FIFO:
     case SCHED_RR:
-    case SCHED_OTHER:
       return 32;
     }
   set_errno (EINVAL);
@@ -48,9 +49,10 @@ sched_get_priority_min (int policy)
 {
   switch (policy)
     {
+    case SCHED_OTHER:
+      return 0;
     case SCHED_FIFO:
     case SCHED_RR:
-    case SCHED_OTHER:
       return 1;
     }
   set_errno (EINVAL);
@@ -90,6 +92,14 @@ sched_getparam (pid_t pid, struct sched_param *param)
       set_errno (ESRCH);
       return -1;
     }
+
+  if (p->sched_policy == SCHED_OTHER)
+    {
+      /* No realtime policy. */
+      param->sched_priority = 0;
+      return 0;
+    }
+
   process = OpenProcess (PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
 			 p->dwProcessId);
   if (!process)
@@ -132,9 +142,6 @@ sched_getparam (pid_t pid, struct sched_param *param)
 }
 
 /* get the scheduler for pid
-
-   All process's on WIN32 run with SCHED_FIFO.  So we just give an answer.
-   (WIN32 uses a multi queue FIFO).
 */
 int
 sched_getscheduler (pid_t pid)
@@ -144,8 +151,13 @@ sched_getscheduler (pid_t pid)
       set_errno (EINVAL);
       return -1;
     }
-  else
-    return SCHED_FIFO;
+  pinfo p (pid ? pid : getpid ());
+  if (!p)
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+  return p->sched_policy;
 }
 
 /* get the time quantum for pid */
@@ -212,31 +224,18 @@ sched_rr_get_interval (pid_t pid, struct timespec *interval)
 }
 
 /* set the scheduling parameters */
-int
-sched_setparam (pid_t pid, const struct sched_param *param)
+static int
+sched_setparam_pinfo (pinfo & p, const struct sched_param *param)
 {
-  pid_t localpid;
-  int pri;
-  DWORD pclass;
-  HANDLE process;
-
-  if (!param || pid < 0)
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  if (!valid_sched_parameters (param))
-    {
-      set_errno (EINVAL);
-      return -1;
-    }
-
-  pri = param->sched_priority;
+  int pri = param->sched_priority;
 
   /* calculate our desired priority class.  We only reserve a small area
      (31/32) for realtime priority. */
-  if (pri <= 6)
+  DWORD pclass;
+  if (p->sched_policy == SCHED_OTHER && pri == 0)
+    /* No realtime policy, reapply the nice value. */
+    pclass = nice_to_winprio (p->nice);
+  else if (1 <= pri && pri <= 6)
     pclass = IDLE_PRIORITY_CLASS;
   else if (pri <= 12)
     pclass = BELOW_NORMAL_PRIORITY_CLASS;
@@ -246,23 +245,16 @@ sched_setparam (pid_t pid, const struct sched_param *param)
     pclass = ABOVE_NORMAL_PRIORITY_CLASS;
   else if (pri <= 30)
     pclass = HIGH_PRIORITY_CLASS;
-  else
+  else if (pri <= 32)
     pclass = REALTIME_PRIORITY_CLASS;
-
-  localpid = pid ? pid : getpid ();
-
-  pinfo p (localpid);
-
-  /* set the class */
-
-  if (!p)
+  else
     {
-      set_errno (ESRCH);
+      set_errno (EINVAL);
       return -1;
     }
-  process = OpenProcess (PROCESS_SET_INFORMATION |
-			 PROCESS_QUERY_LIMITED_INFORMATION,
-			 FALSE, p->dwProcessId);
+  HANDLE process = OpenProcess (PROCESS_SET_INFORMATION |
+				PROCESS_QUERY_LIMITED_INFORMATION,
+				FALSE, p->dwProcessId);
   if (!process)
     {
       set_errno (ESRCH);
@@ -277,6 +269,26 @@ sched_setparam (pid_t pid, const struct sched_param *param)
   CloseHandle (process);
 
   return 0;
+}
+
+int
+sched_setparam (pid_t pid, const struct sched_param *param)
+{
+  if (!(pid >= 0 && param && (param->sched_priority == 0 ||
+      valid_sched_parameters(param))))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+
+  pinfo p (pid ? pid : getpid ());
+  if (!p)
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+
+  return sched_setparam_pinfo (p, param);
 }
 
 /* POSIX thread priorities loosely compare to Windows thread base priorities.
@@ -404,12 +416,30 @@ int
 sched_setscheduler (pid_t pid, int policy,
 		    const struct sched_param *param)
 {
-  if (policy == SCHED_FIFO) /* returned by sched_getscheduler. */
-    return sched_setparam (pid, param);
+  if (!(pid >= 0 && param &&
+      ((policy == SCHED_OTHER && param->sched_priority == 0) ||
+      ((policy == SCHED_FIFO || policy == SCHED_RR) && valid_sched_parameters(param)))))
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
 
-  /* on win32, you can't change the scheduler. Doh! */
-  set_errno (EINVAL);
-  return -1;
+  pinfo p (pid ? pid : getpid ());
+  if (!p)
+    {
+      set_errno (ESRCH);
+      return -1;
+    }
+
+  int prev_policy = p->sched_policy;
+  p->sched_policy = policy;
+  if (sched_setparam_pinfo (p, param))
+    {
+      p->sched_policy = prev_policy;
+      return -1;
+    }
+
+  return 0;
 }
 
 /* yield the cpu */

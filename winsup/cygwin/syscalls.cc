@@ -3826,7 +3826,9 @@ setpriority (int which, id_t who, int value)
 	who = myself->pid;
       if ((pid_t) who == myself->pid)
 	{
-	  if (!set_and_check_winprio (GetCurrentProcess (), prio))
+	  /* If realtime policy is set, keep prio but check its validity. */
+	  if (!set_and_check_winprio (GetCurrentProcess (), prio,
+	      (myself->sched_policy == SCHED_OTHER)))
 	    {
 	      set_errno (EACCES);
 	      return -1;
@@ -3876,7 +3878,9 @@ setpriority (int which, id_t who, int value)
 	    error = EPERM;
 	  else
 	    {
-	      if (!set_and_check_winprio (proc_h, prio))
+	      /* If realtime policy is set, keep prio but check its validity. */
+	      if (!set_and_check_winprio (proc_h, prio,
+		  (p->sched_policy == SCHED_OTHER)))
 		error = EACCES;
 	      else
 		p->nice = value;
@@ -3905,10 +3909,13 @@ getpriority (int which, id_t who)
 	who = myself->pid;
       if ((pid_t) who == myself->pid)
         {
-          DWORD winprio = GetPriorityClass(GetCurrentProcess());
-          if (winprio != nice_to_winprio(myself->nice))
-            myself->nice = winprio_to_nice(winprio);
-          return myself->nice;
+	  if (myself->sched_policy == SCHED_OTHER)
+	    {
+	      DWORD winprio = GetPriorityClass (GetCurrentProcess());
+	      if (winprio != nice_to_winprio (myself->nice))
+		myself->nice = winprio_to_nice (winprio);
+	    }
+	  return myself->nice;
         }
       break;
     case PRIO_PGRP:
