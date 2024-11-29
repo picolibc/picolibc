@@ -111,7 +111,7 @@ class pending_signals
 public:
   void add (sigpacket&);
   bool pending () {retry = !!start.next; return retry;}
-  void clear (int sig) {sigs[sig].si.si_signo = 0;}
+  void clear (int sig);
   void clear (_cygtls *tls);
   friend void sig_dispatch_pending (bool);
   friend void wait_sig (VOID *arg);
@@ -432,21 +432,35 @@ sig_clear (int sig)
   sigq.clear (sig);
 }
 
+/* Clear pending signals of specific si_signo.
+   Called from sigpacket::process(). */
+void
+pending_signals::clear (int sig)
+{
+  sigpacket *q = sigs + sig;
+  if (!sig || !q->si.si_signo)
+    return;
+  q->si.si_signo = 0;
+  q->prev->next = q->next;
+  if (q->next)
+    q->next->prev = q->prev;
+}
+
 /* Clear pending signals of specific thread.  Called under TLS lock from
    _cygtls::remove_pending_sigs. */
 void
 pending_signals::clear (_cygtls *tls)
 {
-  sigpacket *q = &start, *qnext;
+  sigpacket *q = &start;
 
-  while ((qnext = q->next))
-    if (qnext->sigtls == tls)
+  while ((q = q->next))
+    if (q->sigtls == tls)
       {
-	qnext->si.si_signo = 0;
-	q->next = qnext->next;
+	q->si.si_signo = 0;
+	q->prev->next = q->next;
+	if (q->next)
+	  q->next->prev = q->prev;
       }
-    else
-      q = qnext;
 }
 
 /* Clear pending signals of specific thread.  Called from _cygtls::remove */
@@ -1300,7 +1314,10 @@ pending_signals::add (sigpacket& pack)
     return;
   *se = pack;
   se->next = start.next;
-  start.next = se;
+  se->prev = &start;
+  se->prev->next = se;
+  if (se->next)
+    se->next->prev = se;
 }
 
 /* Process signals by waiting for signal data to arrive in a pipe.
@@ -1455,17 +1472,16 @@ wait_sig (VOID *)
 	case __SIGFLUSHFAST:
 	  if (!sig_held)
 	    {
-	      sigpacket *qnext;
 	      /* Check the queue for signals.  There will always be at least one
 		 thing on the queue if this was a valid signal.  */
-	      while ((qnext = q->next))
+	      while ((q = q->next))
 		{
-		  if (qnext->si.si_signo && qnext->process () <= 0)
-		    q = qnext;
-		  else
+		  if (q->si.si_signo && q->process () > 0)
 		    {
-		      q->next = qnext->next;
-		      qnext->si.si_signo = 0;
+		      q->si.si_signo = 0;
+		      q->prev->next = q->next;
+		      if (q->next)
+			q->next->prev = q->prev;
 		    }
 		}
 	      /* At least one signal still queued?  The event is used in select

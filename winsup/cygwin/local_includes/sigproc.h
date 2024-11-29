@@ -50,8 +50,9 @@ struct sigpacket
   {
     HANDLE wakeup;
     HANDLE thread_handle;
-    struct sigpacket *next;
   };
+  struct sigpacket *next;
+  struct sigpacket *prev;
   int process ();
   int setup_handler (void *, struct sigaction&, _cygtls *);
 };
