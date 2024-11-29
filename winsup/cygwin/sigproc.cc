@@ -727,7 +727,8 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       res = WriteFile (sendsig, leader, packsize, &nb, NULL);
       if (!res || packsize == nb)
 	break;
-      Sleep (10);
+      if (cygwait (NULL, 10, cw_sig_eintr) == WAIT_SIGNALED)
+	_my_tls.call_signal_handler ();
       res = 0;
     }
 
