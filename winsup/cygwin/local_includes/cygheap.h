@@ -222,7 +222,6 @@ public:
   void Free (PVOID heap);
   void FillIn (HANDLE dir, PUNICODE_STRING name, ULONG old_dismount_count);
   static void SetDirHandleFromBufferPointer (PWCHAR buf_p, HANDLE dir);
-  static void SetVersionFromPointer (PBYTE buf_p, bool is_buffer);
 };
 
 class cwdstuff
