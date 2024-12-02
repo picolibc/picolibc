@@ -601,7 +601,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     nexttowardf
     nexttowardl
     nftw
-    nice
+    nice			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     nl_langinfo
     nl_langinfo_l
     nrand48
@@ -818,8 +818,8 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     sched_getparam
     sched_getscheduler
     sched_rr_get_interval
-    sched_setparam
-    sched_setscheduler
+    sched_setparam		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    sched_setscheduler		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     sched_yield
     seed48
     seekdir
@@ -854,7 +854,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     setlogmask
     setpgid
     setpgrp
-    setpriority
+    setpriority			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     setprotoent
     setpwent
     setregid
@@ -1768,6 +1768,32 @@ as per the POSIX requirements.  This re-allocation operation isn't
 atomic either.  Over-allocation with FALLOC_FL_KEEP_SIZE is only
 temporary on Windows until the last handle to the file is closed.
 Over-allocation on sparse files is entirely ignored on Windows.</para>
+
+<para><function>sched_setpolicy</function> only emulates API behavior
+because Windows does not offer alternative scheduling policies.
+If <literal>SCHED_OTHER</literal> is selected, the Windows priority is
+set according to the nice value.  If <literal>SCHED_FIFO</literal>
+or <literal>SCHED_RR</literal> is selected, the nice value is preserved
+and the Windows priority is set according to the
+<literal>sched_priority</literal> value.</para>
+
+<para><function>nice</function>, <function>setpriority</function>,
+<function>sched_setparam</function> and <function>sched_setpolicy</function>
+map the nice value (<literal>SCHED_OTHER</literal>) or the
+<literal>sched_priority</literal> (<literal>SCHED_FIFO</literal>,
+<literal>SCHED_RR</literal>) to Windows priority classes as follows:</para>
+<screen>
+    nice value   sched_priority   Windows priority class
+     12...19      1....6          IDLE_PRIORITY_CLASS
+      4...11      7...12          BELOW_NORMAL_PRIORITY_CLASS
+     -4....3     13...18          NORMAL_PRIORITY_CLASS
+    -12...-5     19...24          ABOVE_NORMAL_PRIORITY_CLASS
+    -13..-19     25...30          HIGH_PRIORITY_CLASS
+         -20     31...32          REALTIME_PRIORITY_CLASS
+</screen>
+The use of values which are mapped to the
+<literal>REALTIME_PRIORITY_CLASS</literal> require administrative
+privileges.
 
 </sect1>
 
