@@ -190,6 +190,8 @@ bool
 set_and_check_winprio (HANDLE proc, DWORD prio)
 {
   DWORD prev_prio = GetPriorityClass (proc);
+  if (!prev_prio)
+    return false;
   if (prev_prio == prio)
     return true;
 

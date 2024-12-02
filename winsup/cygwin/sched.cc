@@ -260,7 +260,9 @@ sched_setparam (pid_t pid, const struct sched_param *param)
       set_errno (ESRCH);
       return -1;
     }
-  process = OpenProcess (PROCESS_SET_INFORMATION, FALSE, p->dwProcessId);
+  process = OpenProcess (PROCESS_SET_INFORMATION |
+			 PROCESS_QUERY_LIMITED_INFORMATION,
+			 FALSE, p->dwProcessId);
   if (!process)
     {
       set_errno (ESRCH);

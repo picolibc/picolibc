@@ -3869,8 +3869,9 @@ setpriority (int which, id_t who, int value)
 		continue;
 	      break;
 	    }
-	  HANDLE proc_h = OpenProcess (PROCESS_SET_INFORMATION, FALSE,
-				       p->dwProcessId);
+	  HANDLE proc_h = OpenProcess (PROCESS_SET_INFORMATION |
+				       PROCESS_QUERY_LIMITED_INFORMATION,
+				       FALSE, p->dwProcessId);
 	  if (!proc_h)
 	    error = EPERM;
 	  else
