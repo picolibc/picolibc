@@ -1325,7 +1325,10 @@ wait_sig (VOID *)
 	pack.si.si_signo = __SIGFLUSH;
       else if (sigq.start.next
 	       && PeekNamedPipe (my_readsig, NULL, 0, NULL, &nb, NULL) && !nb)
-	pack.si.si_signo = __SIGFLUSH;
+	{
+	  yield ();
+	  pack.si.si_signo = __SIGFLUSH;
+	}
       else if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
 	Sleep (INFINITE);	/* Assume were exiting.  Never exit this thread */
       else if (nb != sizeof (pack) || !pack.si.si_signo)
