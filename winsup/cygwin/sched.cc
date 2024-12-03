@@ -34,6 +34,7 @@ sched_get_priority_max (int policy)
   switch (policy)
     {
     case SCHED_OTHER:
+    case SCHED_IDLE:
       return 0;
     case SCHED_FIFO:
     case SCHED_RR:
@@ -50,6 +51,7 @@ sched_get_priority_min (int policy)
   switch (policy)
     {
     case SCHED_OTHER:
+    case SCHED_IDLE:
       return 0;
     case SCHED_FIFO:
     case SCHED_RR:
@@ -93,7 +95,7 @@ sched_getparam (pid_t pid, struct sched_param *param)
       return -1;
     }
 
-  if (p->sched_policy == SCHED_OTHER)
+  if (p->sched_policy == SCHED_OTHER || p->sched_policy == SCHED_IDLE)
     {
       /* No realtime policy. */
       param->sched_priority = 0;
@@ -235,6 +237,9 @@ sched_setparam_pinfo (pinfo & p, const struct sched_param *param)
   if (p->sched_policy == SCHED_OTHER && pri == 0)
     /* No realtime policy, reapply the nice value. */
     pclass = nice_to_winprio (p->nice);
+  else if (p->sched_policy == SCHED_IDLE && pri == 0)
+    /* Idle policy, ignore the nice value. */
+    pclass = IDLE_PRIORITY_CLASS;
   else if (1 <= pri && pri <= 6)
     pclass = IDLE_PRIORITY_CLASS;
   else if (pri <= 12)
@@ -417,7 +422,7 @@ sched_setscheduler (pid_t pid, int policy,
 		    const struct sched_param *param)
 {
   if (!(pid >= 0 && param &&
-      ((policy == SCHED_OTHER && param->sched_priority == 0) ||
+      (((policy == SCHED_OTHER || policy == SCHED_IDLE) && param->sched_priority == 0) ||
       ((policy == SCHED_FIFO || policy == SCHED_RR) && valid_sched_parameters(param)))))
     {
       set_errno (EINVAL);

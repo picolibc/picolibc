@@ -42,6 +42,10 @@ extern "C" {
 #define SCHED_SPORADIC 4
 #endif
 
+#if __GNU_VISIBLE
+#define SCHED_IDLE     5
+#endif
+
 /* Scheduling Parameters */
 /* Open Group Specifications Issue 6 */
 
