@@ -77,3 +77,18 @@ $fvp_exe --quiet --application "$elf" --parameter "$cmdline_param=$input" \
     --parameter "cluster1.NUM_CORES=0" \
     --parameter "bp.secure_memory=0" \
     --parameter "cluster0.cpu0.CONFIG64=1"
+
+result=$?
+if [ $result != 0 ]; then
+    case "$elf" in
+        *test-fread-fwrite*|*posix-io*|*semihost-seek*)
+            echo "SYS_SEEK broken in FVP"
+            result=77
+            ;;
+        *semihost-gettimeofday*)
+            echo "SYS_ELAPSED broken in FVP"
+            result=77
+            ;;
+    esac
+fi
+exit $result
