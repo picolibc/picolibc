@@ -167,9 +167,10 @@ hash3(keyarg, len)
 
 /* Hash function from Chris Torek. */
 static __uint32_t
-hash4(keyarg, len)
-	const void *keyarg;
-	size_t len;
+hash4(
+	const void *keyarg,
+	size_t len
+)
 {
 	const u_char *key;
 	size_t loop;

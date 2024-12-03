@@ -163,11 +163,12 @@ fnmatch(pattern, string, flags)
 }
 
 static int
-rangematch(pattern, test, flags, newp)
-	const char *pattern;
-	char test;
-	int flags;
-	char **newp;
+rangematch(
+	const char *pattern,
+	char test,
+	int flags,
+	char **newp
+)
 {
 	int negate, ok;
 	char c, c2;

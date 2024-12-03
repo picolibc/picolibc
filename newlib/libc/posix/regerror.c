@@ -160,9 +160,10 @@ size_t errbuf_size;
  == static char *regatoi(const regex_t *preg, char *localbuf);
  */
 static char *
-regatoi(preg, localbuf)
-const regex_t *preg;
-char *localbuf;
+regatoi(
+	const regex_t *preg,
+	char *localbuf
+)
 {
 	struct rerr *r;
 

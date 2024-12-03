@@ -40,8 +40,9 @@ static char sccsid[] = "@(#)hash_log2.c	8.2 (Berkeley) 5/31/94";
 #include "db_local.h"
 
 __uint32_t
-__log2(num)
-	__uint32_t num;
+__log2(
+	__uint32_t num
+)
 {
 	__uint32_t i, limit;
 
