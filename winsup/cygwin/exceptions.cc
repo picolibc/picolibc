@@ -1450,10 +1450,10 @@ _cygtls::handle_SIGCONT (threadlist_t * &tl_entry)
 	sigsent = true;
       }
   /* Clear pending stop signals */
-  sig_clear (SIGSTOP);
-  sig_clear (SIGTSTP);
-  sig_clear (SIGTTIN);
-  sig_clear (SIGTTOU);
+  sig_clear (SIGSTOP, false);
+  sig_clear (SIGTSTP, false);
+  sig_clear (SIGTTIN, false);
+  sig_clear (SIGTTOU, false);
 }
 
 int
@@ -1554,14 +1554,14 @@ sigpacket::process ()
     goto exit_sig;
   if (si.si_signo == SIGSTOP)
     {
-      sig_clear (SIGCONT);
+      sig_clear (SIGCONT, false);
       goto stop;
     }
 
   /* Clear pending SIGCONT on stop signals */
   if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN
       || si.si_signo == SIGTTOU)
-    sig_clear (SIGCONT);
+    sig_clear (SIGCONT, false);
 
   if (handler == (void *) SIG_DFL)
     {

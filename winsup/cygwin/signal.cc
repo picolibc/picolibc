@@ -451,9 +451,9 @@ sigaction_worker (int sig, const struct sigaction *newact,
 	      if (!(gs.sa_flags & SA_NODEFER))
 		gs.sa_mask |= SIGTOMASK(sig);
 	      if (gs.sa_handler == SIG_IGN)
-		sig_clear (sig);
+		sig_clear (sig, true);
 	      if (gs.sa_handler == SIG_DFL && sig == SIGCHLD)
-		sig_clear (sig);
+		sig_clear (sig, true);
 	      if (sig == SIGCHLD)
 		{
 		  myself->process_state &= ~PID_NOCLDSTOP;

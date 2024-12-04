@@ -62,7 +62,7 @@ void set_signal_mask (sigset_t&, sigset_t);
 int handle_sigprocmask (int sig, const sigset_t *set,
 				  sigset_t *oldset, sigset_t& opmask);
 
-void sig_clear (int);
+void sig_clear (int, bool);
 void sig_set_pending (int);
 int handle_sigsuspend (sigset_t);
 
