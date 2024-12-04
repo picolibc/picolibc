@@ -870,8 +870,18 @@ fhandler_termios::get_console_process_id (DWORD pid, bool match,
   DWORD *list = (DWORD *) tp.c_get ();
   const DWORD buf_size = NT_MAX_PATH / sizeof (DWORD);
 
-  DWORD num = GetConsoleProcessList (list, buf_size);
-  if (num == 0 || num > buf_size)
+  DWORD buf_size1 = 1;
+  DWORD num;
+  /* The buffer of too large size does not seem to be expected by new condrv.
+     https://github.com/microsoft/terminal/issues/18264#issuecomment-2515448548
+     Use the minimum buffer size in the loop. */
+  while ((num = GetConsoleProcessList (list, buf_size1)) > buf_size1)
+    {
+      if (num > buf_size)
+	return 0;
+      buf_size1 = num;
+    }
+  if (num == 0)
     return 0;
 
   DWORD res_pri = 0, res = 0;
