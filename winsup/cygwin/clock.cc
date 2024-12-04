@@ -3,7 +3,6 @@
 #include "pinfo.h"
 #include "clock.h"
 #include "miscfuncs.h"
-#include "spinlock.h"
 
 static inline LONGLONG
 system_qpc_tickspersec ()

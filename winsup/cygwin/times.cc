@@ -24,7 +24,6 @@ details. */
 #include "thread.h"
 #include "cygtls.h"
 #include "ntdll.h"
-#include "spinlock.h"
 
 static inline void __attribute__ ((always_inline))
 get_system_time (PLARGE_INTEGER systime)
