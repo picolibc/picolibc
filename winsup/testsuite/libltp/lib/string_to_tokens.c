@@ -80,7 +80,7 @@ int
 string_to_tokens(char *arg_string, char *arg_array[], int array_size, char *separator)
 {
    int num_toks = 0;  /* number of tokens found */
-   char *strtok();
+   char *strtok(char *, const char *);
 	
    if ( arg_array == NULL || array_size <= 1 || separator == NULL )
 	return -1;

@@ -83,11 +83,12 @@ static char Errmsg[80];
  * Thus, offset 8 is in middle of word 1
  ***********************************************************************/
 int
-datapidgen(pid, buffer, bsize, offset)
-int pid;
-char *buffer;
-int bsize;
-int offset;
+datapidgen(
+    int pid,
+    char *buffer,
+    int bsize,
+    int offset
+)
 {
 #if CRAY
 	
@@ -178,12 +179,13 @@ printf("partial at end\n");
  *
  ***********************************************************************/
 int
-datapidchk(pid, buffer, bsize, offset, errmsg)
-int pid;
-char *buffer;
-int bsize;
-int offset;
-char **errmsg;
+datapidchk(
+    int pid,
+    char *buffer,
+    int bsize,
+    int offset,
+    char **errmsg
+)
 {
 #if CRAY
 	

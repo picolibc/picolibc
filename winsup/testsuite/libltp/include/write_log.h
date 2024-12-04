@@ -154,7 +154,7 @@ extern int	wlog_close(struct wlog_file *wfile);
 extern int	wlog_record_write(struct wlog_file *wfile,
 				  struct wlog_rec *wrec, long offset);
 extern int	wlog_scan_backward(struct wlog_file *wfile, int nrecs,
-				   int (*func)(struct wlog_rec *rec),
+				   int (*func)(struct wlog_rec *rec, long),
 				   long data);
 #else
 int	wlog_open();

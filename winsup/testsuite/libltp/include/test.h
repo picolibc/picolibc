@@ -225,7 +225,7 @@ extern void tt_exit();
 extern int  t_environ();
 extern void t_breakum(char *tcid, int total, int typ, char *msg, void (*fnc)());
 
-extern void tst_sig(int fork_flag, void (*handler)(), void (*cleanup)());
+extern void tst_sig(int fork_flag, void (*handler)(int), void (*cleanup)());
 extern void tst_tmpdir();
 extern void tst_rmdir();
 

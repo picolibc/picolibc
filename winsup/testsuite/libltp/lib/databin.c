@@ -42,11 +42,12 @@
 static char Errmsg[80];
 
 void
-databingen (mode, buffer, bsize, offset)
-int mode;	/* either a, c, r, o, z or C */
-unsigned char *buffer;	/* buffer pointer */
-int bsize;	/* size of buffer */
-int offset;	/* offset into the file where buffer starts */
+databingen (
+    int mode,	/* either a, c, r, o, z or C */
+    unsigned char *buffer,	/* buffer pointer */
+    int bsize,	/* size of buffer */
+    int offset	/* offset into the file where buffer starts */
+)
 {
 int ind;
 
@@ -89,12 +90,13 @@ int ind;
  *      < 0  : no error
  ***********************************************************************/
 int
-databinchk(mode, buffer, bsize, offset, errmsg)
-int mode;	/* either a, c, r, z, o, or C */
-unsigned char *buffer;	/* buffer pointer */
-int bsize;	/* size of buffer */
-int offset;	/* offset into the file where buffer starts */
-char **errmsg;
+databinchk(
+    int mode,	/* either a, c, r, z, o, or C */
+    unsigned char *buffer,	/* buffer pointer */
+    int bsize,	/* size of buffer */
+    int offset,	/* offset into the file where buffer starts */
+    char **errmsg
+)
 {
     int cnt;
     unsigned char *chr;

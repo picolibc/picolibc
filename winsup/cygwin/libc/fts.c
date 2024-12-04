@@ -1111,8 +1111,7 @@ fts_padjust(FTS *sp, FTSENT *head)
 }
 
 static size_t
-fts_maxarglen(argv)
-	char * const *argv;
+fts_maxarglen(char * const *argv)
 {
 	size_t len, max;
 

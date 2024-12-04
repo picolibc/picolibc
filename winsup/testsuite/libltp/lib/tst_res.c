@@ -563,8 +563,6 @@ tst_exit()
 int
 tst_environ()
 {
-   FILE *fdopen();
-
    if ( (T_out = fdopen(dup(fileno(stdout)), "w")) == NULL )
       return(-1);
    else

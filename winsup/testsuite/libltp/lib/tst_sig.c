@@ -81,7 +81,7 @@
 void (*T_cleanup)();		/* pointer to cleanup function */
 
 extern int errno;
-static void def_handler();		/* default signal handler */
+static void def_handler(int);		/* default signal handler */
 
 /****************************************************************************
  * tst_sig() : set-up to catch unexpected signals.  fork_flag is set to NOFORK
@@ -93,7 +93,7 @@ static void def_handler();		/* default signal handler */
  ***************************************************************************/
 
 void
-tst_sig(int fork_flag, void (*handler)(), void (*cleanup)())
+tst_sig(int fork_flag, void (*handler)(int), void (*cleanup)())
 {
 	char mesg[MAXMESG];		/* message buffer for tst_res */
 	int sig;

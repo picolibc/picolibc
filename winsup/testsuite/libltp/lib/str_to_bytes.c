@@ -75,8 +75,7 @@
 #define T_MULT	1099511627776	/* tera or 2^40 */
 
 int
-str_to_bytes(s)
-char    *s;
+str_to_bytes(char *s)
 {
     char    mult, junk;
     int	    nconv;
@@ -110,8 +109,7 @@ char    *s;
 }
 
 long
-str_to_lbytes(s)
-char    *s;
+str_to_lbytes(char *s)
 {
     char    mult, junk;
     long    nconv;
@@ -150,8 +148,7 @@ char    *s;
  */
 
 long long
-str_to_llbytes(s)
-char    *s;
+str_to_llbytes(char *s)
 {
     char    mult, junk;
     long    nconv;

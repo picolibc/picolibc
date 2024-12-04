@@ -43,11 +43,12 @@
 static char Errmsg[80];
 
 int
-dataasciigen(listofchars, buffer, bsize, offset)
-char *listofchars;	/* a null terminated list of characters */
-char *buffer;
-int bsize;
-int offset;
+dataasciigen(
+	char *listofchars,	/* a null terminated list of characters */
+	char *buffer,
+	int bsize,
+	int offset
+)
 {
    int cnt;
    int total;
@@ -78,12 +79,13 @@ int offset;
 }	/* end of dataasciigen */
 
 int
-dataasciichk(listofchars, buffer, bsize, offset, errmsg)
-char *listofchars;	/* a null terminated list of characters */
-char *buffer;
-int bsize;
-int offset;
-char **errmsg;
+dataasciichk(
+	char *listofchars,	/* a null terminated list of characters */
+	char *buffer,
+	int bsize,
+	int offset,
+	char **errmsg
+)
 {
    int cnt;
    int total;

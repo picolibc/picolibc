@@ -198,7 +198,7 @@ struct tblock {
  * in the macros that follow.
  ***********************************************************************/
 extern struct tblock tblock;
-extern void STD_go();
+extern void STD_go(int);
 extern int (*_TMP_FUNC)(void);
 extern void STD_opts_help();
 
