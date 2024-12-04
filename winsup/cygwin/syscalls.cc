@@ -340,14 +340,14 @@ try_to_bin (path_conv &pc, HANDLE &fh, ACCESS_MASK access, ULONG flags)
   else
     {
       /* Create unique filename.  Start with a dot, followed by "cyg"
-	 transposed into the Unicode low surrogate area (U+dc00) on file
-	 systems supporting Unicode (except Samba), followed by the inode
-	 number in hex, followed by a path hash in hex.  The combination
-	 allows to remove multiple hardlinks to the same file. */
+	 transposed to the Unicode private use area in the U+f700 area
+	 on file systems supporting Unicode (except Samba), followed by
+	 the inode number in hex, followed by a path hash in hex.  The
+	 combination allows to remove multiple hardlinks to the same file. */
       RtlAppendUnicodeToString (&recycler,
 				(pc.fs_flags () & FILE_UNICODE_ON_DISK
 				 && !pc.fs_is_samba ())
-				? L".\xdc63\xdc79\xdc67" : L".cyg");
+				? L".\xf763\xf779\xf767" : L".cyg");
       pfii = (PFILE_INTERNAL_INFORMATION) infobuf;
       status = NtQueryInformationFile (fh, &io, pfii, sizeof *pfii,
 				       FileInternalInformation);
