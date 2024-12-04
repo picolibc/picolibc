@@ -344,6 +344,7 @@ stabilize_sig_stack:
 	movq	\$_cygtls.start_offset,%rcx	# point to beginning
 	addq	%r12,%rcx			#  of tls block
 	call	_ZN7_cygtls19call_signal_handlerEv
+	decl	_cygtls.incyg(%r12)
 	jmp	1b
 3:	decl	_cygtls.incyg(%r12)
 	addq	\$0x20,%rsp
