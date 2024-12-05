@@ -332,7 +332,6 @@ stabilize_sig_stack:
 	movq	%gs:8,%r12
 1:	movl	\$1,%r10d
 	xchgl	%r10d,_cygtls.stacklock(%r12)	# try to acquire lock
-	movl	%r10d,_cygtls.spinning(%r12)	# flag if we are waiting for lock
 	testl	%r10d,%r10d
 	jz	2f
 	pause
