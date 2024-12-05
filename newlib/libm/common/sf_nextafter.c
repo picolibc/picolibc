@@ -32,7 +32,7 @@
 	if(FLT_UWORD_IS_NAN(ix) ||
 	   FLT_UWORD_IS_NAN(iy))
 	   return x+y;
-	if(x==y) return x;		/* x=y, return x */
+	if(x==y) return y;		/* x=y, return y */
 	if(FLT_UWORD_IS_ZERO(ix)) {		/* x == 0 */
 	    SET_FLOAT_WORD(x,(hy&0x80000000)|FLT_UWORD_MIN);
 	    y = x*x;
