@@ -196,7 +196,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   waitq wq;
   int current_sig;
   unsigned incyg;
-  unsigned spinning;
+  volatile unsigned spinning;
   volatile unsigned stacklock;
   __tlsstack_t *stackptr;
   __tlsstack_t stack[TLS_STACK_SIZE];
