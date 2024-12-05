@@ -61,10 +61,6 @@ if(NOT DEFINED CONFIG_ISA_ARCV3)
     strcpy-bs.S
     strcpy.S
     strcpy-stub.c
-    strlen-bs-norm.S
-    strlen-bs.S
-    strlen.S
-    strlen-stub.c
     strncpy-bs.S
     strncpy.S
     strncpy-stub.c
