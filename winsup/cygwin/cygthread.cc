@@ -4,6 +4,88 @@ This software is a copyrighted work licensed under the terms of the
 Cygwin license.  Please consult the file "CYGWIN_LICENSE" for
 details. */
 
+/*========================================================================
+
+  LIST OF CYGTHREADs USED IN CYGWIN
+
+  Please try to keep up-to-date
+
+  - pinfo.cc: class pinfo: proc_waiter()
+
+	Read side of the pipe set up to keep the parent process
+	informed about the progress of a child process, and to
+	receive certain signals from the child end.
+
+  - pinfo.cc: via talktome(): commune_process()
+
+	Server side of the "commune" interface to submit /proc process
+	info to a requesting process (`cat /proc/pid/cmdline' etc).
+
+  - sigproc.cc: via sigproc_init(): wait_sig()
+
+	Implement signal queue, receiver side.
+
+  - ldap.cc: class cyg_ldap: ldap_init_thr()
+			     ldap_search_thr()
+			     ldap_next_page_thr()
+
+	Implement interruptible LDAP operations, opening the connection,
+	simple search, and paged search.
+
+  - aio.cc: via aio_init(): aioworker()
+			    aiowaiter()
+
+	Interruptible asynchronous IO.
+
+  - timerfd.cc: class timerfd_tracker: timerfd_thread()
+
+	Handles timer message collected via MsgWaitForMultipleObjectsEx and
+	converts them into matching information for a timerfd.
+
+  - posix_timer.cc: class timer_tracker: timer_thread()
+
+	Analogue for POSIX timer functions.
+
+  - flock.cc: class fhandler_disk_file: blocking_lock_thr()
+
+	Thread implements an interruptible mandatory lock on files.
+
+  - select.cc: various fhandler classes: thread_pipe()
+					 thread_fifo()
+					 thread_console()
+					 thread_pty_slave()
+					 thread_socket()
+					 thread_dsp()
+
+	Interuptible threads to implement select() using badly designed
+	Windows functionality.
+
+  - fhandler/console.cc: class fhandler_console: cons_master_thread()
+
+	Handle Windows console message.
+
+  - fhandler/fifo.cc: fhandler_fifo: fifo_reader_thread()
+
+	Handle interruptible FIFO reads.
+
+  - fhandler/netdrive.cc: class fhandler_netdrive: thread_netdrive_wsd()
+						   thread_netdrive_wnet()
+
+	Threads used to collect network server and share lists via
+	WNet functions.
+
+  - fhandler/pty.cc: class fhandler_pty_master: pty_master_thread()
+						pty_master_fwd_thread()
+
+	Handle the pty master control pipe
+	[FIXME: missing description of pty_master_fwd_thread]
+
+  - window.cc: class wininfo: winthread()
+
+	Implement /dev/windows to interface with Windows message loop.
+
+========================================================================*/
+
 #include "winsup.h"
 #include "miscfuncs.h"
 #include <stdlib.h>
