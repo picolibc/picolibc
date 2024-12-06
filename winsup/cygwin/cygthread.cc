@@ -271,7 +271,10 @@ cygthread::async_create (ULONG_PTR arg)
 {
   cygthread *that = (cygthread *) arg;
   that->create ();
-  ::SetThreadPriority (that->h, THREAD_PRIORITY_HIGHEST);
+  /* We used to set the priority to HIGHEST here, but most cygthreads don't
+     require such a high priority.  Keep the priority at NORMAL here and let
+     the thread function decide by itself if it needs a higher or lower
+     priority, based on the task it performs. */
   that->zap_h ();
 }
 

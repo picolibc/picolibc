@@ -1345,7 +1345,6 @@ wait_sig (VOID *)
 
   hntdll = GetModuleHandle ("ntdll.dll");
 
-  SetThreadPriority (GetCurrentThread (), THREAD_PRIORITY_NORMAL);
   for (;;)
     {
       DWORD nb;
