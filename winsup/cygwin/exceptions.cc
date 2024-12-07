@@ -920,9 +920,8 @@ _cygtls::interrupt_now (CONTEXT *cx, siginfo_t& si, void *handler,
 
   /* Delay the interrupt if we are
      1) somehow inside the DLL
-     2) in _sigfe (spinning is true) and about to enter cygwin DLL
-     3) in a Windows DLL.  */
-  if (incyg || spinning || inside_kernel (cx))
+     2) in a Windows DLL.  */
+  if (incyg || inside_kernel (cx))
     interrupted = false;
   else
     {

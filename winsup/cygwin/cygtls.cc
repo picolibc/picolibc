@@ -81,7 +81,7 @@ _cygtls::fixup_after_fork ()
       pop ();
       current_sig = 0;
     }
-  stacklock = spinning = 0;
+  stacklock = 0;
   signal_arrived = NULL;
   locals.select.sockevt = NULL;
   locals.cw_timer = NULL;
