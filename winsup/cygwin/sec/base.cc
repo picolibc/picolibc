@@ -28,10 +28,6 @@ details. */
 				  | GROUP_SECURITY_INFORMATION \
 				  | OWNER_SECURITY_INFORMATION)
 
-static GENERIC_MAPPING NO_COPY_RO file_mapping = { FILE_GENERIC_READ,
-						   FILE_GENERIC_WRITE,
-						   FILE_GENERIC_EXECUTE,
-						   FILE_ALL_ACCESS };
 LONG
 get_file_sd (HANDLE fh, path_conv &pc, security_descriptor &sd,
 	     bool justcreated)
@@ -605,99 +601,9 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
   return ret;
 }
 
-/* Samba override.  Check security descriptor for Samba UNIX user and group
-   accounts and check if we have an RFC 2307 mapping to a Windows account.
-   Create a new security descriptor with all of the UNIX accounts with
-   valid mapping replaced with their Windows counterpart. */
-static void
-convert_samba_sd (security_descriptor &sd_ret)
-{
-  NTSTATUS status;
-  BOOLEAN dummy;
-  PSID sid;
-  cygsid owner;
-  cygsid group;
-  SECURITY_DESCRIPTOR sd;
-  cyg_ldap cldap;
-  tmp_pathbuf tp;
-  PACL acl, oacl;
-  size_t acl_len;
-  PACCESS_ALLOWED_ACE ace;
-
-  if (!NT_SUCCESS (RtlGetOwnerSecurityDescriptor (sd_ret, &sid, &dummy)))
-    return;
-  owner = sid;
-  if (!NT_SUCCESS (RtlGetGroupSecurityDescriptor (sd_ret, &sid, &dummy)))
-    return;
-  group = sid;
-
-  if (sid_id_auth (owner) == 22)
-    {
-      struct passwd *pwd;
-      uid_t uid = owner.get_uid (&cldap);
-      if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
-	owner.getfrompw (pwd);
-    }
-  if (sid_id_auth (group) == 22)
-    {
-      struct group *grp;
-      gid_t gid = group.get_gid (&cldap);
-      if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
-	group.getfromgr (grp);
-    }
-
-  if (!NT_SUCCESS (RtlGetDaclSecurityDescriptor (sd_ret, &dummy,
-						 &oacl, &dummy)))
-    return;
-  acl = (PACL) tp.w_get ();
-  RtlCreateAcl (acl, ACL_MAXIMUM_SIZE, ACL_REVISION);
-  acl_len = sizeof (ACL);
-
-  for (DWORD i = 0; i < oacl->AceCount; ++i)
-    if (NT_SUCCESS (RtlGetAce (oacl, i, (PVOID *) &ace)))
-      {
-	cygsid ace_sid ((PSID) &ace->SidStart);
-	if (sid_id_auth (ace_sid) == 22)
-	  {
-	    if (sid_sub_auth (ace_sid, 0) == 1) /* user */
-	      {
-		struct passwd *pwd;
-		uid_t uid = ace_sid.get_uid (&cldap);
-		if (uid < UNIX_POSIX_OFFSET && (pwd = internal_getpwuid (uid)))
-		  ace_sid.getfrompw (pwd);
-	      }
-	    else if (sid_sub_auth (ace_sid, 0) == 2) /* group */
-	      {
-		struct group *grp;
-		gid_t gid = ace_sid.get_gid (&cldap);
-		if (gid < UNIX_POSIX_OFFSET && (grp = internal_getgrgid (gid)))
-		  ace_sid.getfromgr (grp);
-	      }
-	  }
-	if (!add_access_allowed_ace (acl, ace->Mask, ace_sid, acl_len,
-				     ace->Header.AceFlags))
-	  return;
-      }
-  acl->AclSize = acl_len;
-
-  RtlCreateSecurityDescriptor (&sd, SECURITY_DESCRIPTOR_REVISION);
-  RtlSetControlSecurityDescriptor (&sd, SE_DACL_PROTECTED, SE_DACL_PROTECTED);
-  RtlSetOwnerSecurityDescriptor (&sd, owner, FALSE);
-  RtlSetGroupSecurityDescriptor (&sd, group, FALSE);
-
-  status = RtlSetDaclSecurityDescriptor (&sd, TRUE, acl, FALSE);
-  if (!NT_SUCCESS (status))
-    return;
-  DWORD sd_size = 0;
-  status = RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
-  if (sd_size > 0 && sd_ret.malloc (sd_size))
-    RtlAbsoluteToSelfRelativeSD (&sd, sd_ret, &sd_size);
-}
-
 int
 check_file_access (path_conv &pc, int flags, bool effective)
 {
-  security_descriptor sd;
   int ret = -1;
   ACCESS_MASK desired = 0;
   if (flags & R_OK)
@@ -706,13 +612,28 @@ check_file_access (path_conv &pc, int flags, bool effective)
     desired |= FILE_WRITE_DATA;
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
-  if (!get_file_sd (pc.handle (), pc, sd, false))
+
+  if (!effective)
+    cygheap->user.deimpersonate ();
+
+  OBJECT_ATTRIBUTES attr;
+  pc.init_reopen_attr (attr, pc.handle ());
+  NTSTATUS status;
+  IO_STATUS_BLOCK io;
+  HANDLE h;
+  status = NtOpenFile (&h, desired, &attr, &io, FILE_SHARE_VALID_FLAGS,
+		       FILE_OPEN_FOR_BACKUP_INTENT);
+  if (NT_SUCCESS (status))
     {
-      /* Tweak Samba security descriptor as necessary. */
-      if (pc.fs_is_samba ())
-	convert_samba_sd (sd);
-      ret = check_access (sd, file_mapping, desired, flags, effective);
+      NtClose (h);
+      ret = 0;
     }
+  else
+    __seterrno_from_nt_status (status);
+
+  if (!effective)
+    cygheap->user.reimpersonate ();
+
   debug_printf ("flags %y, ret %d", flags, ret);
   return ret;
 }
