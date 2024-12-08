@@ -421,13 +421,13 @@ typedef __rsize_t rsize_t;
 #define _RSIZE_T_DEFINED
 #endif
 
-typedef void (*constraint_handler_t)(const char *restrict msg,
-                                     void *restrict ptr, __errno_t error);
+typedef void (*constraint_handler_t)(const char *__restrict msg,
+                                     void *__restrict ptr, __errno_t error);
 
 constraint_handler_t set_constraint_handler_s(constraint_handler_t handler);
-void abort_handler_s(const char *restrict msg, void *restrict ptr,
+void abort_handler_s(const char *__restrict msg, void *__restrict ptr,
                      __errno_t error);
-void ignore_handler_s(const char *restrict msg, void *restrict ptr,
+void ignore_handler_s(const char *__restrict msg, void *__restrict ptr,
                      __errno_t error);
 #endif
 

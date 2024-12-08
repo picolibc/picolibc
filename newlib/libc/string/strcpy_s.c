@@ -38,7 +38,7 @@
 #include "string_private.h"
 
 __errno_t
-strcpy_s(char *restrict s1, rsize_t s1max, const char *restrict s2)
+strcpy_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2)
 {
     const char *msg = "";
     bool write_null = true;
