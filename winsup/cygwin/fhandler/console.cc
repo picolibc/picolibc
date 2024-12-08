@@ -4024,6 +4024,11 @@ fhandler_console::write (const void *vsrc, size_t len)
 	case gotcommand:
 	  if (con.nargs < MAXARGS)
 	    con.nargs++;
+	  if (*src == '%' && con.nargs == 1 && con.args[0] == 0)
+	    { /* Ignore intermediate byte in CSI sequence used by vim. */
+	      src++;
+	      break;
+	    }
 	  char_command (*src++);
 	  con.state = normal;
 	  wpbuf.empty();
