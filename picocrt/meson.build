@@ -89,22 +89,48 @@ foreach target : targets
       crt_minimal_name = 'crt0-minimal' + suffix + '.o'
       crt_semihost_name = 'crt0-semihost' + suffix + '.o'
       crt_none_name = 'crt0-none' + suffix + '.o'
+
+      crt_rename = []
+      crt_hosted_rename = []
+      crt_minimal_rename = []
+      crt_semihost_rename = []
+      crt_none_rename = []
+
       libcrt_name = 'crt0' + suffix
       libcrt_hosted_name = 'crt0-hosted' + suffix
       libcrt_minimal_name = 'crt0-minimal' + suffix
       libcrt_semihost_name = 'crt0-semihost' + suffix
       libcrt_none_name = 'crt0-none' + suffix
+
+      libcrt_rename = []
+      libcrt_hosted_rename = []
+      libcrt_minimal_rename = []
+      libcrt_semihost_rename = []
+      libcrt_none_rename = []
     else
-      crt_name = join_paths(target, 'crt0' + suffix + '.o')
-      crt_hosted_name = join_paths(target, 'crt0-hosted' + suffix + '.o')
-      crt_minimal_name = join_paths(target, 'crt0-minimal' + suffix + '.o')
-      crt_semihost_name = join_paths(target, 'crt0-semihost' + suffix + '.o')
-      crt_none_name = join_paths(target, 'crt0-none' + suffix + '.o')
-      libcrt_name = join_paths(target, 'libcrt0' + suffix)
-      libcrt_hosted_name = join_paths(target, 'libcrt0-hosted' + suffix)
-      libcrt_minimal_name = join_paths(target, 'libcrt0-minimal' + suffix)
-      libcrt_semihost_name = join_paths(target, 'libcrt0-semihost' + suffix)
-      libcrt_none_name = join_paths(target, 'libcrt0-none' + suffix)
+      crt_name = 'crt0-' + target + suffix + '.o'
+      crt_hosted_name = 'crt0-hosted-' + target + suffix + '.o'
+      crt_minimal_name = 'crt0-minimal-' + target + suffix + '.o'
+      crt_semihost_name = 'crt0-semihost-' + target + suffix + '.o'
+      crt_none_name = 'crt0-none-' + target + suffix + '.o'
+
+      crt_rename = 'crt0' + suffix + '.o'
+      crt_hosted_rename = 'crt0-hosted' + suffix + '.o'
+      crt_minimal_rename = 'crt0-minimal' + suffix + '.o'
+      crt_semihost_rename = 'crt0-semihost' + suffix + '.o'
+      crt_none_rename = 'crt0-none' + suffix + '.o'
+
+      libcrt_name = 'crt0-' + target + suffix
+      libcrt_hosted_name = 'crt0-hosted-' + target + suffix
+      libcrt_minimal_name = 'crt0-minimal-' + target + suffix
+      libcrt_semihost_name = 'crt0-semihost-' + target + suffix
+      libcrt_none_name = 'crt0-none-' + target + suffix
+
+      libcrt_rename = 'libcrt0' + suffix + '.a'
+      libcrt_hosted_rename = 'libcrt0-hosted' + suffix + '.a'
+      libcrt_minimal_rename = 'libcrt0-minimal' + suffix + '.a'
+      libcrt_semihost_rename = 'libcrt0-semihost' + suffix + '.a'
+      libcrt_none_rename = 'libcrt0-none' + suffix + '.a'
     endif
 
     crt0_name = 'crt0' + target
@@ -122,6 +148,7 @@ foreach target : targets
                       include_directories : inc,
                       install : true,
                       install_dir : instdir,
+                      rename : crt_rename,
                       c_args : _c_args,
                       link_args : _link_args)
 
@@ -137,6 +164,7 @@ foreach target : targets
                      include_directories : inc,
                      install : true,
                      install_dir : instdir,
+                     rename : libcrt_rename,
                      c_args : _c_args,
                      objects: _crt.extract_objects(src_picocrt),
                      pic: false)
@@ -148,6 +176,7 @@ foreach target : targets
                       include_directories : inc,
                       install : true,
                       install_dir : instdir,
+                      rename : crt_hosted_rename,
                       c_args : _c_args + ['-DCRT0_EXIT'],
                       link_args : _link_args)
 
@@ -163,6 +192,7 @@ foreach target : targets
                      include_directories : inc,
                      install : true,
                      install_dir : instdir,
+                     rename : libcrt_hosted_rename,
                      pic: false,
                      objects: _crt.extract_objects(src_picocrt),
                      c_args : value[1] + ['-DCRT0_EXIT'])
@@ -174,6 +204,7 @@ foreach target : targets
                       include_directories : inc,
                       install : true,
                       install_dir : instdir,
+                      rename : crt_minimal_rename,
                       c_args : _c_args + ['-DCONSTRUCTORS=0'],
                       link_args : _link_args)
 
@@ -189,6 +220,7 @@ foreach target : targets
                      include_directories : inc,
                      install : true,
                      install_dir : instdir,
+                     rename : libcrt_minimal_rename,
                      pic: false,
                      objects: _crt.extract_objects(src_picocrt),
                      c_args : _c_args + ['-DCONSTRUCTORS=0'])
@@ -202,6 +234,7 @@ foreach target : targets
                         include_directories : inc,
                         install : true,
                         install_dir : instdir,
+                        rename : crt_semihost_rename,
                         c_args : _c_args + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
                         link_args : _link_args)
 
@@ -217,6 +250,7 @@ foreach target : targets
                        include_directories : inc,
                        install : true,
                        install_dir : instdir,
+                       rename : libcrt_semihost_rename,
                        pic: false,
                        objects: _crt.extract_objects(src_picocrt),
                        c_args : value[1] + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'])
@@ -229,6 +263,7 @@ foreach target : targets
                       include_directories : inc,
                       install : true,
                       install_dir : instdir,
+                      rename : crt_none_rename,
                       c_args : _c_args,
                       link_args : _link_args)
 

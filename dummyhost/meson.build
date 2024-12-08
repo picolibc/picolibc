@@ -45,8 +45,10 @@ foreach target : targets
 
   if target == ''
     libdummyhost_name = 'dummyhost'
+    libdummyhost_rename = []
   else
-    libdummyhost_name = join_paths(target, 'libdummyhost')
+    libdummyhost_name = 'dummyhost-' + target
+    libdummyhost_rename = 'libdummyhost.a'
   endif
 
   set_variable('lib_dummyhost' + target,
@@ -54,6 +56,7 @@ foreach target : targets
 			      srcs_dummyhost,
 			      install : true,
 			      install_dir : instdir,
+                              rename : libdummyhost_rename,
 			      include_directories : inc,
 			      c_args : value[1] + c_args))
 

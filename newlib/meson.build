@@ -62,17 +62,28 @@ foreach target : targets
     libg_name = 'g'
     libm_name = 'm'
     libnosys_name = 'nosys'
+
+    libc_rename = []
+    libg_rename = []
+    libm_rename = []
+    libnosys_rename = []
   else
-    libc_name = join_paths(target, 'libc')
-    libg_name = join_paths(target, 'libg')
-    libm_name = join_paths(target, 'libm')
-    libnosys_name = join_paths(target, 'libnosys')
+    libc_name = 'c-' + target
+    libg_name = 'g-' + target
+    libm_name = 'm-' + target
+    libnosys_name = 'nosys-' + target
+
+    libc_rename = 'libc.a'
+    libg_rename = 'libg.a'
+    libm_rename = 'libm.a'
+    libnosys_rename = 'libnosys.a'
   endif
 
   local_lib_c_target = static_library(libc_name,
 				      libsrcs_target,
 				      install : true,
 				      install_dir : instdir,
+                                      rename : libc_rename,
 				      pic: false,
 				      objects : libobjs,
 				      include_directories: inc,
@@ -83,20 +94,25 @@ foreach target : targets
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
+                 rename : libm_rename,
 		 pic: false,
                  c_args: value[1] + c_args,
 		 objects : [])
+
   static_library(libg_name,
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
+                 rename : libg_rename,
 		 pic: false,
                  c_args: value[1] + c_args,
 		 objects : [])
+
   static_library(libnosys_name,
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
+                 rename : libnosys_rename,
 		 pic: false,
                  c_args: value[1] + c_args,
 		 objects : [])

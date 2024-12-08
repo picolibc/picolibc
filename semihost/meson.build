@@ -116,8 +116,10 @@ if src_semihost != []
 
     if target == ''
       libsemihost_name = 'semihost'
+      libsemihost_rename = []
     else
-      libsemihost_name = join_paths(target, 'libsemihost')
+      libsemihost_name = 'semihost-' + target
+      libsemihost_rename = 'libsemihost.a'
     endif
 
     set_variable('lib_semihost' + target,
@@ -125,6 +127,7 @@ if src_semihost != []
 				src_semihost,
 				install : true,
 				install_dir : instdir,
+                                rename : libsemihost_rename,
 				include_directories : inc,
 				c_args : value[1] + c_args))
     
