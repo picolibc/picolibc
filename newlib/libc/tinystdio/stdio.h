@@ -404,9 +404,9 @@ typedef __rsize_t rsize_t;
 
 int sprintf_s(char *__restrict __s, rsize_t __bufsize,
               const char *__restrict __format, ...);
-int vsnprintf_s(char *restrict s, rsize_t n, const char *restrict fmt,
+int vsnprintf_s(char *__restrict s, rsize_t n, const char *__restrict fmt,
                 va_list arg);
-int vfprintf_s(FILE *restrict stream, const char *restrict fmt,
+int vfprintf_s(FILE *__restrict stream, const char *__restrict fmt,
                va_list ap_orig);
 #endif
 

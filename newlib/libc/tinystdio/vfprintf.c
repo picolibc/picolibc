@@ -479,7 +479,7 @@ _wcslen(const char *s, size_t maxlen)
 
 #ifdef VFPRINTF_S
 int
-vfprintf_s(FILE *restrict stream, const char *restrict fmt, va_list ap_orig)
+vfprintf_s(FILE *__restrict stream, const char *__restrict fmt, va_list ap_orig)
 #else
 int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif

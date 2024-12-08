@@ -40,7 +40,7 @@
 #include "../stdlib/local_s.h"
 
 int
-sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
+sprintf_s(char *__restrict s, rsize_t bufsize, const char *__restrict fmt, ...)
 {
     bool write_null = true;
     const char *msg = "";

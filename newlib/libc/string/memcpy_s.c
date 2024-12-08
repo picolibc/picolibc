@@ -38,7 +38,7 @@
 #include "string_private.h"
 
 __errno_t
-memcpy_s(void *restrict s1, rsize_t s1max, const void *restrict s2, rsize_t n)
+memcpy_s(void *__restrict s1, rsize_t s1max, const void *__restrict s2, rsize_t n)
 {
     const char *msg = "";
 

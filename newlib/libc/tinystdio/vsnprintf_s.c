@@ -40,7 +40,7 @@
 #include "../stdlib/local_s.h"
 
 int
-vsnprintf_s(char *restrict s, rsize_t n, const char *restrict fmt, va_list arg)
+vsnprintf_s(char *__restrict s, rsize_t n, const char *__restrict fmt, va_list arg)
 {
     bool write_null = true;
     const char *msg = "";
