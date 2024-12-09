@@ -34,6 +34,7 @@ sched_get_priority_max (int policy)
   switch (policy)
     {
     case SCHED_OTHER:
+    case SCHED_BATCH:
     case SCHED_IDLE:
       return 0;
     case SCHED_FIFO:
@@ -51,6 +52,7 @@ sched_get_priority_min (int policy)
   switch (policy)
     {
     case SCHED_OTHER:
+    case SCHED_BATCH:
     case SCHED_IDLE:
       return 0;
     case SCHED_FIFO:
@@ -95,7 +97,8 @@ sched_getparam (pid_t pid, struct sched_param *param)
       return -1;
     }
 
-  if (p->sched_policy == SCHED_OTHER || p->sched_policy == SCHED_IDLE)
+  if (p->sched_policy == SCHED_OTHER || p->sched_policy == SCHED_BATCH
+      || p->sched_policy == SCHED_IDLE)
     {
       /* No realtime policy. */
       param->sched_priority = 0;
@@ -234,9 +237,10 @@ sched_setparam_pinfo (pinfo & p, const struct sched_param *param)
   /* calculate our desired priority class.  We only reserve a small area
      (31/32) for realtime priority. */
   DWORD pclass;
-  if (p->sched_policy == SCHED_OTHER && pri == 0)
+  bool batch = (p->sched_policy == SCHED_BATCH);
+  if ((p->sched_policy == SCHED_OTHER || batch) && pri == 0)
     /* No realtime policy, reapply the nice value. */
-    pclass = nice_to_winprio (p->nice);
+    pclass = nice_to_winprio (p->nice, batch);
   else if (p->sched_policy == SCHED_IDLE && pri == 0)
     /* Idle policy, ignore the nice value. */
     pclass = IDLE_PRIORITY_CLASS;
@@ -422,8 +426,9 @@ sched_setscheduler (pid_t pid, int policy,
 		    const struct sched_param *param)
 {
   if (!(pid >= 0 && param &&
-      (((policy == SCHED_OTHER || policy == SCHED_IDLE) && param->sched_priority == 0) ||
-      ((policy == SCHED_FIFO || policy == SCHED_RR) && valid_sched_parameters(param)))))
+      (((policy == SCHED_OTHER || policy == SCHED_BATCH || policy == SCHED_IDLE)
+      && param->sched_priority == 0) || ((policy == SCHED_FIFO || policy == SCHED_RR)
+      && valid_sched_parameters(param)))))
     {
       set_errno (EINVAL);
       return -1;

@@ -57,11 +57,12 @@ What changed:
   to POSIX and Linux (glibc >= 2.2.4) behavior.
 
 - sched_setscheduler(2) now emulates changes between SCHED_OTHER,
-  SCHED_IDLE, SCHED_FIFO and SCHED_RR.  If SCHED_OTHER is selected, the
-  Windows priority is set according to the nice value. If SCHED_IDLE is
+  SCHED_BATCH, SCHED_IDLE, SCHED_FIFO and SCHED_RR.  If SCHED_OTHER or
+  SCHED_BATCH is selected, the Windows priority is set according to the
+  nice value where SCHED_BATCH sets a one step lower priority.  If
+  SCHED_IDLE is selected, the nice value is preserved and the Windows
+  priority is set to IDLE_PRIORITY_CLASS.  If SCHED_FIFO or SCHED_RR is
   selected, the nice value is preserved and the Windows priority is set
-  to IDLE_PRIORITY_CLASS.  If SCHED_FIFO or SCHED_RR is selected, the
-  nice value is preserved and the Windows priority is set according to
-  the realtime priority.
+  according to the realtime priority.
   Note: Windows does not offer alternative scheduling policies so
   this could only emulate API behavior.

@@ -3816,9 +3816,6 @@ vhangup ()
 extern "C" int
 setpriority (int which, id_t who, int value)
 {
-  DWORD prio = nice_to_winprio (value);
-  int error = 0;
-
   switch (which)
     {
     case PRIO_PROCESS:
@@ -3827,8 +3824,10 @@ setpriority (int which, id_t who, int value)
       if ((pid_t) who == myself->pid)
 	{
 	  /* If realtime policy is set, keep prio but check its validity. */
+	  bool batch = (myself->sched_policy == SCHED_BATCH);
+	  DWORD prio = nice_to_winprio (value, batch);
 	  if (!set_and_check_winprio (GetCurrentProcess (), prio,
-	      (myself->sched_policy == SCHED_OTHER)))
+	      (myself->sched_policy == SCHED_OTHER || batch)))
 	    {
 	      set_errno (EACCES);
 	      return -1;
@@ -3850,6 +3849,8 @@ setpriority (int which, id_t who, int value)
       set_errno (EINVAL);
       return -1;
     }
+
+  int error = 0;
   winpids pids ((DWORD) PID_MAP_RW);
   for (DWORD i = 0; i < pids.npids; ++i)
     {
@@ -3878,9 +3879,11 @@ setpriority (int which, id_t who, int value)
 	    error = EPERM;
 	  else
 	    {
+	      bool batch = (p->sched_policy == SCHED_BATCH);
+	      DWORD prio = nice_to_winprio (value, batch);
 	      /* If realtime policy is set, keep prio but check its validity. */
 	      if (!set_and_check_winprio (proc_h, prio,
-		  (p->sched_policy == SCHED_OTHER)))
+		  (p->sched_policy == SCHED_OTHER || batch)))
 		error = EACCES;
 	      else
 		p->nice = value;
@@ -3909,11 +3912,12 @@ getpriority (int which, id_t who)
 	who = myself->pid;
       if ((pid_t) who == myself->pid)
         {
-	  if (myself->sched_policy == SCHED_OTHER)
+	  bool batch = (myself->sched_policy == SCHED_BATCH);
+	  if (myself->sched_policy == SCHED_OTHER || batch)
 	    {
 	      DWORD winprio = GetPriorityClass (GetCurrentProcess());
-	      if (winprio != nice_to_winprio (myself->nice))
-		myself->nice = winprio_to_nice (winprio);
+	      if (winprio != nice_to_winprio (myself->nice, batch))
+		myself->nice = winprio_to_nice (winprio, batch);
 	    }
 	  return myself->nice;
         }

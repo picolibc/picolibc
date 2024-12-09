@@ -44,6 +44,7 @@ extern "C" {
 
 #if __GNU_VISIBLE
 #define SCHED_IDLE     5
+#define SCHED_BATCH    6
 #endif
 
 /* Scheduling Parameters */

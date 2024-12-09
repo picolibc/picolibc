@@ -103,84 +103,111 @@ yield ()
   Sleep (0L);
 }
 
-/* Get a default value for the nice factor.  When changing these values,
-   have a look into the below function nice_to_winprio.  The values must
-   match the layout of the static "priority" array. */
-int
-winprio_to_nice (DWORD prio)
+/*
+   Mapping of nice value from/to Windows priority
+   ('batch' is used for SCHED_BATCH policy).
+
+    nice_to_winprio()                                       winprio_to_nice()
+  !batch      batch     Level  Windows priority class        !batch   batch
+   12...19      4...19    0    IDLE_PRIORITY_CLASS            16        8
+    4...11     -4....3    1    BELOW_NORMAL_PRIORITY_CLASS     8        0
+   -4....3    -12...-5    2    NORMAL_PRIORITY_CLASS           0       -8
+  -12...-5    -13..-19    3    ABOVE_NORMAL_PRIORITY_CLASS    -8      -16
+  -13..-19         -20    4    HIGH_PRIORITY_CLASS           -16      -20
+       -20           -    5    REALTIME_PRIORITY_CLASS       -20      -20
+*/
+
+/* *_PRIORITY_CLASS -> 0...5 */
+constexpr int
+winprio_to_level (DWORD prio)
 {
   switch (prio)
     {
-      case REALTIME_PRIORITY_CLASS:
-	return -20;
-      case HIGH_PRIORITY_CLASS:
-	return -16;
-      case ABOVE_NORMAL_PRIORITY_CLASS:
-	return -8;
-      case NORMAL_PRIORITY_CLASS:
-	return 0;
-      case BELOW_NORMAL_PRIORITY_CLASS:
-	return 8;
-      case IDLE_PRIORITY_CLASS:
-	return 16;
+      case IDLE_PRIORITY_CLASS:		return 0;
+      case BELOW_NORMAL_PRIORITY_CLASS:	return 1;
+      default:				return 2;
+      case ABOVE_NORMAL_PRIORITY_CLASS:	return 3;
+      case HIGH_PRIORITY_CLASS:		return 4;
+      case REALTIME_PRIORITY_CLASS:	return 5;
     }
-  return 0;
+}
+
+/* 0...5 -> *_PRIORITY_CLASS */
+constexpr DWORD
+level_to_winprio (int level)
+{
+  switch (level)
+    {
+      case 0:  return IDLE_PRIORITY_CLASS;
+      case 1:  return BELOW_NORMAL_PRIORITY_CLASS;
+      default: return NORMAL_PRIORITY_CLASS;
+      case 3:  return ABOVE_NORMAL_PRIORITY_CLASS;
+      case 4:  return HIGH_PRIORITY_CLASS;
+      case 5:  return REALTIME_PRIORITY_CLASS;
+    }
+}
+
+/* *_PRIORITY_CLASS -> nice value */
+constexpr int
+winprio_to_nice_impl (DWORD prio, bool batch = false)
+{
+  int level = winprio_to_level (prio);
+  if (batch && level < 5)
+    level++;
+  return (level < 5 ? NZERO - 1 - 3 - level * 8 : -NZERO);
+}
+
+/* nice value -> *_PRIORITY_CLASS */
+constexpr DWORD
+nice_to_winprio_impl (int nice, bool batch = false)
+{
+  int level = (nice > -NZERO ? (NZERO - 1 - nice) / 8 : 5);
+  if (batch && level > 0)
+    level--;
+  return level_to_winprio (level);
+}
+
+/* Check consistency at compile time. */
+constexpr bool
+check_nice_winprio_mapping ()
+{
+  for (int nice = -NZERO; nice < NZERO; nice++)
+    for (int batch = 0; batch <= 1; batch++) {
+      DWORD prio = nice_to_winprio_impl (nice, !!batch);
+      int nice2 = winprio_to_nice_impl (prio, !!batch);
+      DWORD prio2 = nice_to_winprio_impl (nice2, !!batch);
+      if (prio != prio2)
+	return false;
+    }
+  return true;
+}
+
+static_assert (check_nice_winprio_mapping());
+static_assert (nice_to_winprio_impl(NZERO-1, false) == IDLE_PRIORITY_CLASS);
+static_assert (nice_to_winprio_impl(0, true) == BELOW_NORMAL_PRIORITY_CLASS);
+static_assert (winprio_to_nice_impl(BELOW_NORMAL_PRIORITY_CLASS, true) == 0);
+static_assert (nice_to_winprio_impl(0, false) == NORMAL_PRIORITY_CLASS);
+static_assert (winprio_to_nice_impl(NORMAL_PRIORITY_CLASS, false) == 0);
+static_assert (nice_to_winprio_impl(-NZERO, false) == REALTIME_PRIORITY_CLASS);
+
+/* Get a default value for the nice factor. */
+int
+winprio_to_nice (DWORD prio, bool batch /* = false */)
+{
+  return winprio_to_nice_impl (prio, batch);
 }
 
 /* Get a Win32 priority matching the incoming nice factor.  The incoming
    nice is limited to the interval [-NZERO,NZERO-1]. */
 DWORD
-nice_to_winprio (int &nice)
+nice_to_winprio (int &nice, bool batch /* = false */)
 {
-  static const DWORD priority[] =
-    {
-      REALTIME_PRIORITY_CLASS,		/*  0 */
-      HIGH_PRIORITY_CLASS,		/*  1 */
-      HIGH_PRIORITY_CLASS,
-      HIGH_PRIORITY_CLASS,
-      HIGH_PRIORITY_CLASS,
-      HIGH_PRIORITY_CLASS,
-      HIGH_PRIORITY_CLASS,
-      HIGH_PRIORITY_CLASS,		/*  7 */
-      ABOVE_NORMAL_PRIORITY_CLASS,	/*  8 */
-      ABOVE_NORMAL_PRIORITY_CLASS,
-      ABOVE_NORMAL_PRIORITY_CLASS,
-      ABOVE_NORMAL_PRIORITY_CLASS,
-      ABOVE_NORMAL_PRIORITY_CLASS,
-      ABOVE_NORMAL_PRIORITY_CLASS,
-      ABOVE_NORMAL_PRIORITY_CLASS,
-      ABOVE_NORMAL_PRIORITY_CLASS,	/* 15 */
-      NORMAL_PRIORITY_CLASS,		/* 16 */
-      NORMAL_PRIORITY_CLASS,
-      NORMAL_PRIORITY_CLASS,
-      NORMAL_PRIORITY_CLASS,
-      NORMAL_PRIORITY_CLASS,
-      NORMAL_PRIORITY_CLASS,
-      NORMAL_PRIORITY_CLASS,
-      NORMAL_PRIORITY_CLASS,		/* 23 */
-      BELOW_NORMAL_PRIORITY_CLASS,	/* 24 */
-      BELOW_NORMAL_PRIORITY_CLASS,
-      BELOW_NORMAL_PRIORITY_CLASS,
-      BELOW_NORMAL_PRIORITY_CLASS,
-      BELOW_NORMAL_PRIORITY_CLASS,
-      BELOW_NORMAL_PRIORITY_CLASS,
-      BELOW_NORMAL_PRIORITY_CLASS,
-      BELOW_NORMAL_PRIORITY_CLASS,	/* 31 */
-      IDLE_PRIORITY_CLASS,		/* 32 */
-      IDLE_PRIORITY_CLASS,
-      IDLE_PRIORITY_CLASS,
-      IDLE_PRIORITY_CLASS,
-      IDLE_PRIORITY_CLASS,
-      IDLE_PRIORITY_CLASS,
-      IDLE_PRIORITY_CLASS,
-      IDLE_PRIORITY_CLASS		/* 39 */
-    };
   if (nice < -NZERO)
     nice = -NZERO;
   else if (nice > NZERO - 1)
     nice = NZERO - 1;
-  DWORD prio = priority[nice + NZERO];
-  return prio;
+
+  return nice_to_winprio_impl (nice, batch);
 }
 
 /* Set Win32 priority or return false on failure.  Also return
