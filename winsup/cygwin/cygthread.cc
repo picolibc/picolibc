@@ -77,8 +77,8 @@ details. */
   - fhandler/pty.cc: class fhandler_pty_master: pty_master_thread()
 						pty_master_fwd_thread()
 
-	Handle the pty master control pipe
-	[FIXME: missing description of pty_master_fwd_thread]
+	Handle the pty master control pipe.
+	Handle forwarding pty output from non-cygwin processes.
 
   - window.cc: class wininfo: winthread()
 
