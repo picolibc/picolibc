@@ -16,6 +16,9 @@ What's new:
 - New libaio.a provided for projects checking for POSIX aio support
   by looking for this library at configure time.
 
+- cygpath -r option allows to generate all Windows paths with root-local
+  path prefix \\?\.
+
 
 What changed:
 -------------
