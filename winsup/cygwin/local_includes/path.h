@@ -323,7 +323,7 @@ class path_conv
   }
   inline POBJECT_ATTRIBUTES init_reopen_attr (OBJECT_ATTRIBUTES &attr, HANDLE h)
   {
-    if (has_buggy_reopen ())
+    if (!h || has_buggy_reopen ())
       InitializeObjectAttributes (&attr, get_nt_native_path (),
 				  objcaseinsensitive (), NULL, NULL)
     else
