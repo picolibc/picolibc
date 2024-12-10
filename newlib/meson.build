@@ -61,10 +61,12 @@ foreach target : targets
     libc_name = 'c'
     libg_name = 'g'
     libm_name = 'm'
+    libnosys_name = 'nosys'
   else
     libc_name = join_paths(target, 'libc')
     libg_name = join_paths(target, 'libg')
     libm_name = join_paths(target, 'libm')
+    libnosys_name = join_paths(target, 'libnosys')
   endif
 
   local_lib_c_target = static_library(libc_name,
@@ -85,6 +87,13 @@ foreach target : targets
                  c_args: value[1] + c_args,
 		 objects : [])
   static_library(libg_name,
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+                 c_args: value[1] + c_args,
+		 objects : [])
+  static_library(libnosys_name,
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
