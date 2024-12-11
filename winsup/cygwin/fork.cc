@@ -212,7 +212,37 @@ frok::parent (volatile char * volatile stack_here)
   bool fix_impersonation = false;
   pinfo child;
 
-  int c_flags = GetPriorityClass (GetCurrentProcess ());
+  /* Inherit scheduling parameters by default. */
+  int child_nice = myself->nice;
+  int child_sched_policy = myself->sched_policy;
+  int c_flags = 0;
+
+  /* Handle SCHED_RESET_ON_FORK flag. */
+  if (myself->sched_reset_on_fork)
+    {
+      bool batch = (myself->sched_policy == SCHED_BATCH);
+      bool idle = (myself->sched_policy == SCHED_IDLE);
+      bool set_prio = false;
+      /* Reset negative nice values to zero. */
+      if (myself->nice < 0)
+	{
+	  child_nice = 0;
+	  set_prio = !idle;
+	}
+      /* Reset realtime policies to SCHED_OTHER. */
+      if (!(myself->sched_policy == SCHED_OTHER || batch || idle))
+	{
+	  child_sched_policy = SCHED_OTHER;
+	  set_prio = true;
+	}
+      if (set_prio)
+	c_flags = nice_to_winprio (child_nice, batch);
+    }
+
+  /* Always request a priority because otherwise anything above
+     NORMAL_PRIORITY_CLASS would not be inherited. */
+  if (!c_flags)
+    c_flags = GetPriorityClass (GetCurrentProcess ());
   debug_printf ("priority class %d", c_flags);
   /* Per MSDN, this must be specified even if lpEnvironment is set to NULL,
      otherwise UNICODE characters in the parent environment are not copied
@@ -401,8 +431,9 @@ frok::parent (volatile char * volatile stack_here)
       goto cleanup;
     }
 
-  child->nice = myself->nice;
-  child->sched_policy = myself->sched_policy;
+  child->nice = child_nice;
+  child->sched_policy = child_sched_policy;
+  child->sched_reset_on_fork = false;
 
   /* Initialize things that are done later in dll_crt0_1 that aren't done
      for the forkee.  */

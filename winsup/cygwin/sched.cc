@@ -162,7 +162,7 @@ sched_getscheduler (pid_t pid)
       set_errno (ESRCH);
       return -1;
     }
-  return p->sched_policy;
+  return p->sched_policy | (p->sched_reset_on_fork ? SCHED_RESET_ON_FORK : 0);
 }
 
 /* get the time quantum for pid */
@@ -425,9 +425,11 @@ int
 sched_setscheduler (pid_t pid, int policy,
 		    const struct sched_param *param)
 {
+  int new_policy = policy & ~SCHED_RESET_ON_FORK;
   if (!(pid >= 0 && param &&
-      (((policy == SCHED_OTHER || policy == SCHED_BATCH || policy == SCHED_IDLE)
-      && param->sched_priority == 0) || ((policy == SCHED_FIFO || policy == SCHED_RR)
+      (((new_policy == SCHED_OTHER || new_policy == SCHED_BATCH
+      || new_policy == SCHED_IDLE) && param->sched_priority == 0)
+      || ((new_policy == SCHED_FIFO || new_policy == SCHED_RR)
       && valid_sched_parameters(param)))))
     {
       set_errno (EINVAL);
@@ -442,13 +444,14 @@ sched_setscheduler (pid_t pid, int policy,
     }
 
   int prev_policy = p->sched_policy;
-  p->sched_policy = policy;
+  p->sched_policy = new_policy;
   if (sched_setparam_pinfo (p, param))
     {
       p->sched_policy = prev_policy;
       return -1;
     }
 
+  p->sched_reset_on_fork = !!(policy & SCHED_RESET_ON_FORK);
   return 0;
 }
 

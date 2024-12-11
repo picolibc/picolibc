@@ -93,8 +93,9 @@ public:
   struct rusage rusage_self;
   struct rusage rusage_children;
 
-  int nice;          /* nice value for SCHED_OTHER. */
-  int sched_policy;  /* SCHED_OTHER, SCHED_FIFO or SCHED_RR. */
+  int nice;          /* nice value for SCHED_OTHER and SCHED_BATCH. */
+  int sched_policy;  /* SCHED_OTHER/BATCH/IDLE/FIFO/RR */
+  bool sched_reset_on_fork;  /* true if SCHED_RESET_ON_FORK flag was set. */
 
   /* Non-zero if process was stopped by a signal. */
   char stopsig;

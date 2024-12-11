@@ -800,6 +800,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	  child->start_time = time (NULL); /* Register child's starting time. */
 	  child->nice = myself->nice;
 	  child->sched_policy = myself->sched_policy;
+	  child->sched_reset_on_fork = false;
 	  postfork (child);
 	  if (mode != _P_DETACH
 	      && (!child.remember () || !child.attach ()))

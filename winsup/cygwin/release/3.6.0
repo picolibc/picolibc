@@ -64,5 +64,8 @@ What changed:
   priority is set to IDLE_PRIORITY_CLASS.  If SCHED_FIFO or SCHED_RR is
   selected, the nice value is preserved and the Windows priority is set
   according to the realtime priority.
+  If the SCHED_RESET_ON_FORK flag is set, SCHED_FIFO and SCHED_RR are
+  reset to SCHED_OTHER and negative nice values are reset to zero in
+  each child process created with fork(2).
   Note: Windows does not offer alternative scheduling policies so
   this could only emulate API behavior.
