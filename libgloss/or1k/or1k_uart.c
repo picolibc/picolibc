@@ -90,7 +90,7 @@ void (*_or1k_uart_read_cb)(char c);
  * This is the interrupt handler that is registered for the callback
  * function.
  */
-void _or1k_uart_interrupt_handler(uint32_t data)
+void _or1k_uart_interrupt_handler(void *data)
 {
 	uint8_t iir = REG8(IIR);
 

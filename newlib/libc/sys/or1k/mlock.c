@@ -38,6 +38,9 @@ volatile uint32_t _or1k_malloc_lock_restore;
 
 extern uint32_t or1k_sync_cas(void *address, uint32_t compare, uint32_t swap);
 
+extern uint32_t or1k_critical_begin();
+extern void or1k_critical_end(uint32_t restore);
+
 /**
  * Recursive lock of the malloc
  */

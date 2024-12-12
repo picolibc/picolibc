@@ -35,10 +35,10 @@ void or1k_interrupt_handler_add(uint32_t id,
 {
 #ifdef __OR1K_MULTICORE__
 	_or1k_interrupt_handler_table[or1k_coreid()][id] = handler;
-	_or1k_interrupt_handler_data_ptr_table[or1k_coreid()][id] = (uint32_t) data_ptr;
+	_or1k_interrupt_handler_data_ptr_table[or1k_coreid()][id] = data_ptr;
 #else
 	_or1k_interrupt_handler_table[id] = handler;
-	_or1k_interrupt_handler_data_ptr_table[id] = (uint32_t) data_ptr;
+	_or1k_interrupt_handler_data_ptr_table[id] = data_ptr;
 #endif
 }
 

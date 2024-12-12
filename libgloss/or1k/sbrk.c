@@ -20,7 +20,7 @@
 #include "include/or1k-support.h"
 
 extern uint32_t	end; /* Set by linker.  */
-uint32_t _or1k_heap_start = &end;
+uint32_t _or1k_heap_start = (uint32_t) &end;
 uint32_t _or1k_heap_end;
 
 void *

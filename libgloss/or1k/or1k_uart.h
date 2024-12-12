@@ -30,7 +30,7 @@ extern void (*_or1k_uart_read_cb)(char c);
 /**
  * The UART interrupt handler
  */
-void _or1k_uart_interrupt_handler(uint32_t data);
+void _or1k_uart_interrupt_handler(void *data);
 
 /**
  * Initialize UART
