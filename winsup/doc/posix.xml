@@ -1771,25 +1771,32 @@ Over-allocation on sparse files is entirely ignored on Windows.</para>
 
 <para><function>sched_setpolicy</function> only emulates API behavior
 because Windows does not offer alternative scheduling policies.
-If <literal>SCHED_OTHER</literal> is selected, the Windows priority is
-set according to the nice value.  If <literal>SCHED_FIFO</literal>
-or <literal>SCHED_RR</literal> is selected, the nice value is preserved
-and the Windows priority is set according to the
-<literal>sched_priority</literal> value.</para>
+If <literal>SCHED_OTHER</literal> or <literal>SCHED_BATCH</literal> is
+selected, the Windows priority is set according to the nice value.
+If <literal>SCHED_IDLE</literal> is selected, the Windows priority is
+set to <literal>IDLE_PRIORITY_CLASS</literal>.
+If <literal>SCHED_FIFO</literal> or <literal>SCHED_RR</literal> is
+selected, the nice value is preserved and the Windows priority is set
+according to the <literal>sched_priority</literal> value.
+If the <literal>SCHED_RESET_ON_FORK</literal> flag is set, realtime
+policies and negative nice values are dropped on
+<function>fork</function>.</para>
 
 <para><function>nice</function>, <function>setpriority</function>,
 <function>sched_setparam</function> and <function>sched_setpolicy</function>
-map the nice value (<literal>SCHED_OTHER</literal>) or the
-<literal>sched_priority</literal> (<literal>SCHED_FIFO</literal>,
-<literal>SCHED_RR</literal>) to Windows priority classes as follows:</para>
+map the nice value (<literal>SCHED_OTHER</literal>,
+<literal>SCHED_BATCH</literal>) or the <literal>sched_priority</literal>
+(<literal>SCHED_FIFO</literal>, <literal>SCHED_RR</literal>) to Windows
+priority classes as follows:</para>
 <screen>
-    nice value   sched_priority   Windows priority class
-     12...19      1....6          IDLE_PRIORITY_CLASS
-      4...11      7...12          BELOW_NORMAL_PRIORITY_CLASS
-     -4....3     13...18          NORMAL_PRIORITY_CLASS
-    -12...-5     19...24          ABOVE_NORMAL_PRIORITY_CLASS
-    -13..-19     25...30          HIGH_PRIORITY_CLASS
-         -20     31...32          REALTIME_PRIORITY_CLASS
+    SCHED_OTHER  SCHED_BATCH  SCHED_FIFO/RR
+    nice value   nice value   sched_priority   Windows priority class
+     12...19       4...19      1....6          IDLE_PRIORITY_CLASS
+      4...11      -4....3      7...12          BELOW_NORMAL_PRIORITY_CLASS
+     -4....3     -12...-5     13...18          NORMAL_PRIORITY_CLASS
+    -12...-5     -13..-19     19...24          ABOVE_NORMAL_PRIORITY_CLASS
+    -13..-19          -20     25...30          HIGH_PRIORITY_CLASS
+         -20            -     31...32          REALTIME_PRIORITY_CLASS
 </screen>
 The use of values which are mapped to the
 <literal>REALTIME_PRIORITY_CLASS</literal> require administrative
