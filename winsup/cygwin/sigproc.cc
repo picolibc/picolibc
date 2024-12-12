@@ -1345,6 +1345,12 @@ wait_sig (VOID *)
 
   hntdll = GetModuleHandle ("ntdll.dll");
 
+  /* GetTickCount() here is enough because GetTickCount() - t0 does
+     not overflow until 49 days psss. Even if GetTickCount() overflows,
+     GetTickCount() - t0 returns correct value, since underflow in
+     unsigned wraps correctly. Pending a signal for more thtn 49
+     days would be noncense. */
+  DWORD t0 = GetTickCount ();
   for (;;)
     {
       DWORD nb;
@@ -1354,7 +1360,7 @@ wait_sig (VOID *)
       else if (sigq.start.next
 	       && PeekNamedPipe (my_readsig, NULL, 0, NULL, &nb, NULL) && !nb)
 	{
-	  yield ();
+	  Sleep (GetTickCount () - t0 > 10 ? 1 : 0);
 	  pack.si.si_signo = __SIGFLUSH;
 	}
       else if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
@@ -1364,6 +1370,8 @@ wait_sig (VOID *)
 	  system_printf ("garbled signal pipe data nb %u, sig %d", nb, pack.si.si_signo);
 	  continue;
 	}
+      if (pack.si.si_signo != __SIGFLUSH)
+	t0 = GetTickCount ();
 
       sigq.retry = false;
       /* Don't process signals when we start exiting */
