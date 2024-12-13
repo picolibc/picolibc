@@ -26,6 +26,13 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #define oob(x,a) ((unsigned)(x) >= sizeof(a)/sizeof(a[0]))
 #define valid(x,a)   (oob(x,a) ? "???" : a[x])
 
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wunterminated-string-initialization"
+#endif
+
 char *
 asctime_r (const struct tm *__restrict tim_p,
            char result[__restrict static __ASCTIME_SIZE])
