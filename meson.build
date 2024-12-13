@@ -1683,6 +1683,8 @@ endif
 test_env = environment({'PICOLIBC_TEST' : '1'})
 test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
+test_link_defaults = cc.get_supported_link_arguments(['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments'])
+
 if has_semihost
   foreach target : ['default-target'] + targets
     if target == 'default-target'
@@ -1704,7 +1706,7 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-		 ['-Wl,--gc-sections', '-nostdlib', '-T', picolibc_ld_string]
+		 test_link_defaults + ['-nostdlib', '-T', picolibc_ld_string]
        + additional_libs_list
        + [lib_gcc])
 
@@ -1714,7 +1716,7 @@ if has_semihost
     set_variable(test_link_depends_variable, [picolibc_ld_value])
   endforeach
 else
-  test_link_args = ['-Wl,--gc-sections']
+  test_link_args = test_link_defaults
   test_link_depends = []
 endif
 
