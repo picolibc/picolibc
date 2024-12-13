@@ -1348,8 +1348,8 @@ wait_sig (VOID *)
   /* GetTickCount() here is enough because GetTickCount() - t0 does
      not overflow until 49 days psss. Even if GetTickCount() overflows,
      GetTickCount() - t0 returns correct value, since underflow in
-     unsigned wraps correctly. Pending a signal for more thtn 49
-     days would be noncense. */
+     unsigned wraps correctly. Pending a signal for more than 49
+     days makes no sense. */
   DWORD t0 = GetTickCount ();
   for (;;)
     {
