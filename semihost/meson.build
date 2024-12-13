@@ -113,18 +113,16 @@ if src_semihost != []
     value = get_variable('target_' + target)
 
     instdir = join_paths(lib_dir, value[0])
+    build_subdir = value[0]
 
-    if target == ''
-      libsemihost_name = 'semihost'
-    else
-      libsemihost_name = join_paths(target, 'libsemihost')
-    endif
+    libsemihost_name = 'semihost'
 
     set_variable('lib_semihost' + target,
 		 static_library(libsemihost_name,
 				src_semihost,
 				install : true,
 				install_dir : instdir,
+                                build_subdir : build_subdir,
 				include_directories : inc,
 				c_args : value[1] + c_args))
     

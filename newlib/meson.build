@@ -57,22 +57,18 @@ foreach target : targets
 
   instdir = join_paths(lib_dir, value[0])
 
-  if target == ''
-    libc_name = 'c'
-    libg_name = 'g'
-    libm_name = 'm'
-    libnosys_name = 'nosys'
-  else
-    libc_name = join_paths(target, 'libc')
-    libg_name = join_paths(target, 'libg')
-    libm_name = join_paths(target, 'libm')
-    libnosys_name = join_paths(target, 'libnosys')
-  endif
+  libc_name = 'c'
+  libg_name = 'g'
+  libm_name = 'm'
+  libnosys_name = 'nosys'
+
+  build_subdir = value[0]
 
   local_lib_c_target = static_library(libc_name,
 				      libsrcs_target,
 				      install : true,
 				      install_dir : instdir,
+                                      build_subdir : build_subdir,
 				      pic: false,
 				      objects : libobjs,
 				      include_directories: inc,
@@ -83,6 +79,7 @@ foreach target : targets
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
+                 build_subdir : build_subdir,
 		 pic: false,
                  c_args: value[1] + c_args,
 		 objects : [])
@@ -90,6 +87,7 @@ foreach target : targets
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
+                 build_subdir : build_subdir,
 		 pic: false,
                  c_args: value[1] + c_args,
 		 objects : [])
@@ -97,6 +95,7 @@ foreach target : targets
 		 ['empty.c'],
 		 install : true,
 		 install_dir : instdir,
+                 build_subdir : build_subdir,
 		 pic: false,
                  c_args: value[1] + c_args,
 		 objects : [])
