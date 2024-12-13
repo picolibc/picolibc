@@ -440,6 +440,20 @@ __printf_float(float f)
 	return u.u;
 }
 
+#ifdef _PICOLIBC_PRINTF
+#if _PICOLIBC_PRINTF == 'd'
+#define PICOLIBC_DOUBLE_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'f'
+#define PICOLIBC_FLOAT_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'l'
+#define PICOLIBC_LONG_LONG_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'i'
+#define PICOLIBC_INTEGER_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'm'
+#define PICOLIBC_MINIMAL_PRINTF_SCANF
+#endif
+#endif
+
 #if !defined(PICOLIBC_DOUBLE_PRINTF_SCANF) && \
     !defined(PICOLIBC_FLOAT_PRINTF_SCANF) && \
     !defined(PICOLIBC_LONG_LONG_PRINTF_SCANF) && \
