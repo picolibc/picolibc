@@ -1233,10 +1233,10 @@ foreach target : ['default-target'] + targets
     else
       picolibc_ld_file = 'picolibc_' + custom_mem_config + '.ld'
       picolibc_ld_variable = 'picolibc_' + target + '_ld'
-      picolibc_ld_config_variable = 'picolibc_' + target + 'ld_config'
+      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + 'ld_config'
       picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
       picolibcpp_ld_variable = 'picolibcpp_' + target + '_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_' + target + 'ld_config'
+      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + 'ld_config'
       picolibc_ld_install = false
     endif
 
