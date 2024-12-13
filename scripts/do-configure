@@ -108,21 +108,30 @@ case "$*" in
 	;;
 esac
 
+case "$*" in
+    *system-libc=true*)
+	picolibcdir=""
+	;;
+    *)
+	picolibcdir="picolibc/"
+	;;
+esac
+
 # Run meson
 
 case "$PREFIX" in
     "")
 	meson setup \
-	      -Dincludedir=picolibc/"$ARCH"/include \
-	      -Dlibdir=picolibc/"$ARCH"/lib \
+	      -Dincludedir="$picolibcdir""$ARCH"/include \
+	      -Dlibdir="$picolibcdir""$ARCH"/lib \
 	      --cross-file "$CROSS" \
 	      "$@" \
 	      "$DIR"/..
 	;;
     *)
 	meson setup \
-	      -Dincludedir=picolibc/"$ARCH"/include \
-	      -Dlibdir=picolibc/"$ARCH"/lib \
+	      -Dincludedir="$picolibcdir""$ARCH"/include \
+	      -Dlibdir="$picolibcdir""$ARCH"/lib \
 	      --cross-file "$CROSS" \
 	      "$PREFIX" "$@" \
 	      "$DIR"/..
