@@ -70,7 +70,7 @@ foreach target : targets
 
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
   _link_args = value[1] + _lib_files + get_variable('test_link_args_' + target, test_link_args)
-  _link_depends = get_variable('test_link_depends_' + target, test_link_depends) + _libs
+  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
 
   foreach t1 : libc_tests_picolibc
     t1_src = t1 + '.c'
@@ -92,6 +92,7 @@ foreach target : targets
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
+                    link_with: _libs,
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: timeout,

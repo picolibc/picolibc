@@ -173,7 +173,7 @@ foreach target : targets
   endforeach
 
   _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + _lib_files + get_variable('test_link_args_' + target, test_link_args)
+  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
   _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
 
   _c_args = double_printf_compile_args + _c_args
@@ -195,7 +195,8 @@ foreach target : targets
 		    c_args: _c_args +  ['-DTEST_PART=' + test_part],
 		    objects: _objs,
 		    link_args: _link_args,
-		    link_depends: _libs + _link_depends,
+                    link_with: _libs,
+		    link_depends: _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
          env: test_env)

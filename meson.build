@@ -1716,7 +1716,7 @@ if has_semihost
     set_variable(test_link_depends_variable, [picolibc_ld_value])
   endforeach
 else
-  test_link_args = test_link_defaults
+  test_link_args = test_link_defaults + cc.get_supported_link_arguments(['-lgcc'])
   test_link_depends = []
 endif
 
