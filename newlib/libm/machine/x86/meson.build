@@ -69,11 +69,19 @@ srcs_libm_machine = srcs_libm_machine_common
 
 src_libm_machine = []
 
+x86_64_code = '''#ifndef __x86_64
+#error not x86_64
+#endif
+'''
+
 foreach target : targets
-  if target.startswith('32') or (target == '' and not is_x86_64)
-    src_libm_machine_target = srcs_libm_machine_common + srcs_libm_machine_32
-  else
+  value = get_variable('target_' + target)
+  if cc.compiles(x86_64_code,
+                 name: 'x86_64 check',
+                 args: value[1] + c_args)
     src_libm_machine_target = srcs_libm_machine_common
+  else
+    src_libm_machine_target = srcs_libm_machine_common + srcs_libm_machine_32
   endif
   set_variable('src_libm_machine' + target, files(src_libm_machine_target))
 endforeach

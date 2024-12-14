@@ -33,21 +33,15 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_machine_common = [
+srcs_machine = [
   'memcpy.S',
   'memset.S',
   'setjmp.S',
-]
-
-srcs_machine_64 = [
   'memchr.c',
   'memcmp.c',
   'memmove.c',
   'strchr.c',
-  'strlen.c'
-]
-
-srcs_machine_32 = [
+  'strlen.c',
   'memchr.S',
   'memcmp.S',
   'memmove.S',
@@ -55,27 +49,13 @@ srcs_machine_32 = [
   'strlen.S',
 ]
 
-srcs_machine = srcs_machine_common + srcs_machine_64
-
 subdir('machine')
-
-x86_64_code = '''#ifndef __x86_64
-#error not x86_64
-#endif
-'''
-
-is_x86_64 = cc.compiles(x86_64_code, name : 'x86_64 check')
 
 foreach target : targets
   value = get_variable('target_' + target)
-  if target.startswith('32') or (target == '' and not is_x86_64)
-    srcs_machine_target = srcs_machine_common + srcs_machine_32
-  else
-    srcs_machine_target = srcs_machine_common + srcs_machine_64
-  endif
   set_variable('lib_machine' + target,
 	       static_library('machine' + target,
-			      srcs_machine_target,
+			      srcs_machine,
 			      pic: false,
 			      include_directories: inc,
 			      c_args: value[1] + c_args + arg_fnobuiltin))
