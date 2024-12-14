@@ -65,6 +65,43 @@ if not machine_found
   error(test_machine + ': requested test machine not found')
 endif
 
+# crt0 variants
+picocrt_variants = [
+  {
+    'name': 'default',
+    'suffix': '',
+    'c_args': [],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'hosted',
+    'suffix': '-hosted',
+    'c_args': ['-DCRT0_EXIT'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'minimal',
+    'suffix': '-minimal',
+    'c_args': ['-DCONSTRUCTORS=0'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'none',
+    'suffix': '-none',
+    'c_args': [],
+    'src': src_picocrt_none,
+  },
+]
+
+if has_arm_semihost
+  picocrt_variants += {
+                       'name': 'semihost',
+                       'suffix': '-semihost',
+                       'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+                       'src': src_picocrt,
+                     }
+endif
+
 foreach target : targets
   value = get_variable('target_' + target)
 
@@ -82,149 +119,42 @@ foreach target : targets
   endif
 
   foreach machine : picocrt_machines
-    suffix = machine['suffix']
-    crt_name = 'crt0' + suffix + '.o'
-    crt_hosted_name = 'crt0-hosted' + suffix + '.o'
-    crt_minimal_name = 'crt0-minimal' + suffix + '.o'
-    crt_semihost_name = 'crt0-semihost' + suffix + '.o'
-    crt_none_name = 'crt0-none' + suffix + '.o'
-    libcrt_name = 'crt0' + suffix
-    libcrt_hosted_name = 'crt0-hosted' + suffix
-    libcrt_minimal_name = 'crt0-minimal' + suffix
-    libcrt_semihost_name = 'crt0-semihost' + suffix
-    libcrt_none_name = 'crt0-none' + suffix
+    machine_suffix = machine['suffix']
 
-    crt0_name = 'crt0' + target
-    crt0_hosted_name = 'crt0_hosted' + target
-    crt0_minimal_name = 'crt0_minimal' + target
-    crt0_semihost_name = 'crt0_semihost' + target
-    crt0_none_name = 'crt0_none' + target
+    foreach variant : picocrt_variants
+      variant_suffix = variant['suffix']
+      libcrt_name = 'crt0' + variant_suffix + machine_suffix
+      crt_name = libcrt_name + '.o'
 
-    _c_args = value[1] + arg_fnobuiltin + ['-ffreestanding', '-DMACHINE_' + machine['name']]
-    _link_args = value[1] + ['-r', '-ffreestanding']
-
-    # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
-    _crt = executable(join_paths(value[0], crt_name),
-                      src_picocrt,
-                      include_directories : inc,
-                      install : true,
-                      install_dir : instdir,
-                      c_args : _c_args,
-                      link_args : _link_args)
-
-    if machine['name'] == test_machine
-      set_variable(crt0_name,
-                   _crt.extract_objects(src_picocrt)
-                  )
-    endif
-
-    if enable_picocrt_lib
-      static_library(join_paths(value[0], value[2] + libcrt_name),
-                     [],
-                     include_directories : inc,
-                     install : true,
-                     install_dir : instdir,
-                     c_args : _c_args,
-                     objects: _crt.extract_objects(src_picocrt),
-                     pic: false)
-    endif
-
-    # The 'hosted' variant calls 'exit' after return from main (c lingo: hosted execution environment)
-    _crt = executable(join_paths(value[0], crt_hosted_name),
-                      src_picocrt,
-                      include_directories : inc,
-                      install : true,
-                      install_dir : instdir,
-                      c_args : _c_args + ['-DCRT0_EXIT'],
-                      link_args : _link_args)
-
-    if machine['name'] == test_machine
-      set_variable(crt0_hosted_name,
-                   _crt.extract_objects(src_picocrt)
-                  )
-    endif
-
-    if enable_picocrt_lib
-      static_library(join_paths(value[0], value[2] + libcrt_hosted_name),
-                     [],
-                     include_directories : inc,
-                     install : true,
-                     install_dir : instdir,
-                     pic: false,
-                     objects: _crt.extract_objects(src_picocrt),
-                     c_args : value[1] + ['-DCRT0_EXIT'])
-    endif
-
-    # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
-    _crt = executable(join_paths(value[0], crt_minimal_name),
-                      src_picocrt,
-                      include_directories : inc,
-                      install : true,
-                      install_dir : instdir,
-                      c_args : _c_args + ['-DCONSTRUCTORS=0'],
-                      link_args : _link_args)
-
-    if machine['name'] == test_machine
-      set_variable(crt0_minimal_name,
-                   _crt.extract_objects(src_picocrt)
-                  )
-    endif
-
-    if enable_picocrt_lib
-      static_library(join_paths(value[0], value[2] + libcrt_minimal_name),
-                     [],
-                     include_directories : inc,
-                     install : true,
-                     install_dir : instdir,
-                     pic: false,
-                     objects: _crt.extract_objects(src_picocrt),
-                     c_args : _c_args + ['-DCONSTRUCTORS=0'])
-    endif
-
-    if has_arm_semihost
-      # The 'semihost' variant calls sys_semihost_get_cmdline to build argv
-      # and calls exit when main returns
-      _crt = executable(join_paths(value[0], value[2] + crt_semihost_name),
-                        src_picocrt,
+      _src = variant['src']
+      _c_args = value[1] + arg_fnobuiltin + ['-ffreestanding', '-DMACHINE_' + machine['name']] + variant['c_args']
+      _link_args = value[1] + ['-r', '-ffreestanding']
+      
+      # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
+      _crt = executable(join_paths(value[0], crt_name),
+                        _src,
                         include_directories : inc,
                         install : true,
                         install_dir : instdir,
-                        c_args : _c_args + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+                        c_args : _c_args,
                         link_args : _link_args)
 
       if machine['name'] == test_machine
-        set_variable(crt0_semihost_name,
-                     _crt.extract_objects(src_picocrt)
+        set_variable('crt0' + variant_suffix.underscorify() + target,
+                     _crt.extract_objects(_src)
                     )
       endif
 
       if enable_picocrt_lib
-        static_library(join_paths(value[0], value[2] + libcrt_semihost_name),
+        static_library(join_paths(value[0], value[2] + libcrt_name),
                        [],
                        include_directories : inc,
                        install : true,
                        install_dir : instdir,
-                       pic: false,
-                       objects: _crt.extract_objects(src_picocrt),
-                       c_args : value[1] + ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'])
+                       c_args : _c_args,
+                       objects: _crt.extract_objects(_src),
+                       pic: false)
       endif
-    endif
-
-    # The 'none' variant is completely empty
-    _crt = executable(join_paths(value[0], crt_none_name),
-                      src_picocrt_none,
-                      include_directories : inc,
-                      install : true,
-                      install_dir : instdir,
-                      c_args : _c_args,
-                      link_args : _link_args)
-
-    if machine['name'] == test_machine
-      set_variable(crt0_none_name,
-                   _crt.extract_objects(src_picocrt_none)
-                  )
-    endif
-
+    endforeach
   endforeach
-  
 endforeach
