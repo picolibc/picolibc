@@ -148,13 +148,16 @@ endif
 
 skip_math_test = meson.get_cross_property('skip_math_test', [])
 
-foreach target : targets
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
-  if target in skip_math_test
+  if target.strip('_') in skip_math_test
     continue
   endif
 
-  value = get_variable('target_' + target)
 
   _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
@@ -172,9 +175,9 @@ foreach target : targets
     _lib_files += _lib.full_path()
   endforeach
 
-  _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
-  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
+  _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
   _c_args = double_printf_compile_args + _c_args
   _link_args = double_printf_link_args + _link_args

@@ -45,8 +45,6 @@ project('picolibc', 'c',
 	version: '1.8.8'
        )
 
-targets = []
-
 fs = import('fs')
 
 cc = meson.get_compiler('c')
@@ -934,6 +932,8 @@ void __attribute__((destructor(101))) dtor (void) {}
 '''
 have_attr_ctor_dtor = cc.compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : werror_c_args)
 
+targets = []
+
 if enable_multilib
   used_libs = []
 
@@ -1006,21 +1006,26 @@ if enable_multilib
           lib_prefix = 'lib'
 	endif
       else
+        dir = ''
 	name = ''
+        lib_prefix = ''
       endif
-      targets += name
 
       # rv64 needs to use a non-default mcmodel so that variables can
       # live in a broader range of memory addresses
-      if not has_mcmodel and name.startswith('rv64')
+      if not has_mcmodel and name.strip('_').startswith('rv64')
 	flags += [ '-mcmodel=medany' ]
       endif
 
       # Add any extra flags for this target from the cross file
-      flags += meson.get_cross_property('c_args_' + name, [])
+      flags += meson.get_cross_property('c_args_' + name.strip('_'), [])
 
-      value = [dir, flags, lib_prefix]
-      set_variable('target_' + name, value)
+      targets += {
+                  'name': name,
+                  'dir': dir,
+                  'c_args': flags,
+                  'lib_prefix': lib_prefix,
+                }
     endif
   endforeach
 
@@ -1034,30 +1039,44 @@ if enable_multilib
     endforeach
   endif
 else
-  targets = ['']
-  target_ = ['', [], '']
+  targets += {
+              'name': '',
+              'dir': '',
+              'c_args': [],
+              'lib_prefix': '',
+            }
 endif
 
-foreach target : ['default-target'] + targets
+default_target = {
+              'name': 'default-target',
+              'dir': '',
+              'c_args': [],
+              'lib_prefix': '',
+            }
+
+foreach params : [default_target] + targets
   
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
+
   custom_mem_config = ''
 
   if target != 'default-target'
     target_part = ''
     foreach part : target.split('_')
-      if target_part == ''
-        target_part = part
-      else
+      if part != ''
         target_part += '_' + part
+        custom_mem_config = meson.get_cross_property('custom_mem_config' + target_part, custom_mem_config)
       endif
-      custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_part, custom_mem_config)
     endforeach
 
-    target_head = get_variable('target_' + target)[0].split('_')[0].underscorify()
+    target_head = target_dir.split('_')[0].underscorify()
     custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_head, custom_mem_config)
   endif
 
-  custom_mem_config = meson.get_cross_property('custom_mem_config_' + target, custom_mem_config)
+  custom_mem_config = meson.get_cross_property('custom_mem_config' + target, custom_mem_config)
 
   if target == 'default-target' or custom_mem_config != ''
 
@@ -1690,16 +1709,21 @@ test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 test_link_defaults = cc.get_supported_link_arguments(['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments'])
 
 if has_semihost
-  foreach target : ['default-target'] + targets
+  foreach params : [default_target] + targets
+    
+    target = params['name']
+    target_dir = params['dir']
+    target_c_args = params['c_args']
+    target_lib_prefix = params['lib_prefix']
     if target == 'default-target'
       test_link_args_variable = 'test_link_args'
       test_linker_files_variable = 'test_linker_files'
       test_link_depends_variable = 'test_link_depends'
       picolibc_ld_value = picolibc_ld
     else
-      test_link_args_variable = 'test_link_args_' + target
+      test_link_args_variable = 'test_link_args' + target
       test_linker_files_variable = 'test_linker_files_' + target
-      test_link_depends_variable = 'test_link_depends_' + target
+      test_link_depends_variable = 'test_link_depends' + target
       picolibc_ld_value = get_variable('picolibc_' + target + '_ld', picolibc_ld)
     endif
 

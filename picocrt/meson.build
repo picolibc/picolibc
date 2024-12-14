@@ -102,21 +102,13 @@ if has_arm_semihost
                      }
 endif
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
-  instdir = join_paths(lib_dir, value[0])
-
-  if picocrt_march_add != ''
-    new_cflags = []
-    foreach cflag : value[1]
-      if cflag.startswith('-march') and not cflag.contains(picocrt_march_add)
-	cflag = cflag + picocrt_march_add
-      endif
-      new_cflags += cflag
-    endforeach
-    value = [value[0], new_cflags]
-  endif
+  instdir = join_paths(lib_dir, target_dir)
 
   foreach machine : picocrt_machines
     machine_suffix = machine['suffix']
@@ -127,11 +119,11 @@ foreach target : targets
       crt_name = libcrt_name + '.o'
 
       _src = variant['src']
-      _c_args = value[1] + arg_fnobuiltin + ['-ffreestanding', '-DMACHINE_' + machine['name']] + variant['c_args']
-      _link_args = value[1] + ['-r', '-ffreestanding']
+      _c_args = target_c_args + arg_fnobuiltin + ['-ffreestanding', '-DMACHINE_' + machine['name']] + variant['c_args']
+      _link_args = target_c_args + ['-r', '-ffreestanding']
       
       # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
-      _crt = executable(join_paths(value[0], crt_name),
+      _crt = executable(join_paths(target_dir, crt_name),
                         _src,
                         include_directories : inc,
                         install : true,
@@ -146,7 +138,7 @@ foreach target : targets
       endif
 
       if enable_picocrt_lib
-        static_library(join_paths(value[0], value[2] + libcrt_name),
+        static_library(join_paths(target_dir, target_lib_prefix + libcrt_name),
                        [],
                        include_directories : inc,
                        install : true,

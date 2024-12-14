@@ -259,8 +259,11 @@ endforeach
 
 src_stdlib = files(srcs_stdlib_use)
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
   # Have to build a sub-library to get custom c_args for malloc
   set_variable('lib_stdlib' + target,
@@ -268,6 +271,6 @@ foreach target : targets
 			      srcs_stdlib_malloc_use,
 			      pic: false,
 			      include_directories: inc,
-			      c_args: value[1] + c_args + c_args_malloc))
+			      c_args: target_c_args + c_args + c_args_malloc))
 
 endforeach

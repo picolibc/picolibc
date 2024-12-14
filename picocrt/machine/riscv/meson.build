@@ -36,4 +36,26 @@ src_picocrt += files('crt0.c')
 
 if cc.compiles('int i;', args: core_c_args + ['-march=rv32imac_zicsr', '-mabi=ilp32'])
   picocrt_march_add='_zicsr'
+  new_targets = []
+  foreach params : targets
+    target = params['name']
+    target_dir = params['dir']
+    target_c_args = params['c_args']
+    target_lib_prefix = params['lib_prefix']
+    new_c_args = []
+    foreach c_arg : target_c_args
+      if c_arg.startswith('-march') and not c_arg.contains(picocrt_march_add)
+	c_arg = c_arg + picocrt_march_add
+      endif
+      new_c_args += c_arg
+    endforeach
+    target_c_args = new_c_args
+    new_targets += {
+                  'name': target,
+                  'dir': target_dir,
+                  'c_args': target_c_args,
+                  'lib_prefix': target_lib_prefix,
+                }
+  endforeach
+  targets = new_targets
 endif

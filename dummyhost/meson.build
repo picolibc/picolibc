@@ -38,18 +38,21 @@ srcs_dummyhost = [
   'exit.c',
 ]
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
-  instdir = join_paths(lib_dir, value[0])
+  instdir = join_paths(lib_dir, target_dir)
 
   libdummyhost_name = 'dummyhost'
 
   set_variable('lib_dummyhost' + target,
-	       static_library(join_paths(value[0], value[2] + libdummyhost_name),
+	       static_library(join_paths(target_dir, target_lib_prefix + libdummyhost_name),
 			      srcs_dummyhost,
 			      install : true,
 			      install_dir : instdir,
 			      include_directories : inc,
-			      c_args : value[1] + c_args))
+			      c_args : target_c_args + c_args))
 endforeach

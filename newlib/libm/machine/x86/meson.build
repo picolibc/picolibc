@@ -74,11 +74,14 @@ x86_64_code = '''#ifndef __x86_64
 #endif
 '''
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
   if cc.compiles(x86_64_code,
                  name: 'x86_64 check',
-                 args: value[1] + c_args)
+                 args: target_c_args + c_args)
     src_libm_machine_target = srcs_libm_machine_common
   else
     src_libm_machine_target = srcs_libm_machine_common + srcs_libm_machine_32

@@ -192,14 +192,17 @@ src_string = files(srcs_string_use)
 # Need a sub-library to pass custom cflags to strcmp
 
 if srcs_strcmp_use != []
-  foreach target : targets
-    value = get_variable('target_' + target)
+  foreach params : targets
+    target = params['name']
+    target_dir = params['dir']
+    target_c_args = params['c_args']
+    target_lib_prefix = params['lib_prefix']
 
     set_variable('lib_string' + target,
 		 static_library('strcmp' + target,
 				srcs_strcmp_use,
 				pic: false,
-				c_args: value[1] + c_args + cargs_strcmp,
+				c_args: target_c_args + c_args + cargs_strcmp,
 				include_directories: inc))
   endforeach
 endif

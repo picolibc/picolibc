@@ -76,8 +76,11 @@ endforeach
 
 subdir('include')
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
   libobjs = []
   libsrcs_target = []
 
@@ -94,7 +97,7 @@ foreach target : targets
 				          pic: false,
 				          objects : libobjs,
 					  include_directories: inc,
-					  c_args: value[1] + c_args)
+					  c_args: target_c_args + c_args)
 
   set_variable('lib_cpart' + target, local_lib_cpart_target)
 endforeach
