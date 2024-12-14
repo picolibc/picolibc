@@ -69,11 +69,7 @@ foreach target : targets
   _c_args += ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + iconv_test_c_args
 
   foreach test : tests
-    if target == ''
-      test_name = test
-    else
-      test_name = test + '_' + target
-    endif
+    test_name = test + target
 
     src = test + '.c'
 

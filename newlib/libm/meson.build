@@ -75,14 +75,8 @@ foreach target : targets
 
   set_variable('src_mpart_' + target, libsrcs_target)
 
-  if target == ''
-    libmpart_name = 'mpart'
-  else
-    libmpart_name = 'mpart' + '_' + target
-  endif
-
   if libobjs != []
-    local_lib_mpart_target = static_library(libmpart_name,
+    local_lib_mpart_target = static_library('mpart' + target,
 					    pic: false,
 					    objects : libobjs,
 					    include_directories: inc,

@@ -157,14 +157,9 @@ foreach target : targets
   endif
 
   t1 = 'printf_scanf'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
@@ -175,14 +170,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printff_scanff'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
 		  objects: _objs,
@@ -193,14 +183,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printfl_scanfl'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: llong_printf_compile_args + _c_args,
 		  link_args: llong_printf_link_args + _link_args,
 		  objects: _objs,
@@ -211,14 +196,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printfi_scanfi'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args,
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
@@ -229,14 +209,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printfm_scanfm'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf_scanf.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
 		  c_args: min_printf_compile_args + _c_args,
 		  link_args: min_printf_link_args + _link_args,
 		  objects: _objs,
@@ -247,14 +222,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printf-tests'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
@@ -265,14 +235,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printff-tests'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: float_printf_compile_args + _c_args,
 		  link_args: float_printf_link_args + _link_args,
 		  objects: _objs,
@@ -283,14 +248,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printfi-tests'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args,
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
@@ -301,14 +261,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'printfm-tests'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['printf-tests.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
 		  c_args: min_printf_compile_args + _c_args,
 		  link_args: min_printf_link_args + _link_args,
 		  objects: _objs,
@@ -318,22 +273,10 @@ foreach target : targets
        depends: bios_bin,
        env: test_env)
 
-  t1 = 'try-ilp32'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
-
   t1 = 'time-sprintf'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['time-sprintf.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['time-sprintf.c', 'lock-valid.c'],
 		  c_args: int_printf_compile_args + _c_args + ['-fno-builtin'],
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
@@ -344,14 +287,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'try-ilp32'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args: _link_args,
 		  objects: _objs,
@@ -362,16 +300,10 @@ foreach target : targets
        env: test_env)
 
   t1 = 'hosted-exit'
-  if target == ''
-    t1_name = t1
-    t1_fail_name = t1 + '-fail'
-  else
-    t1_name = t1 + '_' + target
-    t1_fail_name = t1 + '-fail_' + target
-  endif
+  t1_fail = t1 + '-fail'
 
-  test(t1_name,
-       executable(t1_name, ['hosted-exit.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  objects: _objs,
@@ -381,8 +313,8 @@ foreach target : targets
        depends: bios_bin,
        env: test_env)
 
-  test(t1_fail_name,
-       executable(t1_fail_name, ['hosted-exit.c', 'lock-valid.c'],
+  test(t1_fail + target,
+       executable(t1_fail + target, ['hosted-exit.c', 'lock-valid.c'],
 		  c_args: _c_args + ['-DRETVAL=1'],
 		  link_args:  _link_args,
 		  objects: _objs,
@@ -395,14 +327,9 @@ foreach target : targets
       )
 
   t1 = 'abort'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['abort.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['abort.c', 'lock-valid.c'],
 		  c_args: _c_args,
 		  link_args:  _link_args,
 		  objects: _objs,
@@ -421,14 +348,9 @@ foreach target : targets
   if is_variable('crt0_minimal' + target) and not posix_console
     _objs_minimal = [get_variable('crt0_minimal'+ target)]
     t1 = 'constructor-skip'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = t1 + '_' + target
-    endif
 
-    test(t1_name,
-	 executable(t1_name, ['constructor-skip.c', 'lock-valid.c'],
+    test(t1 + target,
+	 executable(t1 + target, ['constructor-skip.c', 'lock-valid.c'],
 		    c_args: _c_args,
 		    link_args:  _link_args,
 		    objects: _objs_minimal,
@@ -440,14 +362,9 @@ foreach target : targets
   endif
 
   t1 = 'math_errhandling'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['math_errhandling.c'],
+  test(t1 + target,
+       executable(t1 + target, ['math_errhandling.c'],
 		  c_args: arg_fnobuiltin + _c_args,
 		  link_args: _link_args,
 		  objects: _objs,
@@ -458,14 +375,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'rounding-mode'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['rounding-mode.c', 'rounding-mode-sub.c'],
+  test(t1 + target,
+       executable(t1 + target, ['rounding-mode.c', 'rounding-mode-sub.c'],
 		  c_args: arg_fnobuiltin + _c_args,
 		  link_args: _link_args,
 		  objects: _objs,
@@ -477,14 +389,9 @@ foreach target : targets
 
   t1 = 'test-except'
   t1_src = t1 + '.c'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, [t1_src, 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, [t1_src, 'lock-valid.c'],
 		  c_args: double_printf_compile_args + arg_fnobuiltin + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
@@ -498,14 +405,9 @@ foreach target : targets
 
   t1 = 'long_double'
   t1_src = t1 + '.c'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, t1_src,
+  test(t1 + target,
+       executable(t1 + target, t1_src,
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
@@ -520,13 +422,8 @@ foreach target : targets
   if get_option('test-stdin')
     t1 = 'test-gets'
     t1_src = 'test-gets.c'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = t1 + '_' + target
-    endif
 
-    test_gets = executable(t1_name, t1_src,
+    test_gets = executable(t1 + target, t1_src,
 		           c_args: _c_args,
 		           link_args: _link_args,
 		           objects: _objs,
@@ -534,7 +431,7 @@ foreach target : targets
 		           link_with: _libs,
 		           include_directories: inc)
 
-    test(t1_name + '-success',
+    test(t1 + target + '-success',
          test_gets,
          depends: bios_bin,
          args: ['hi'],
@@ -543,7 +440,7 @@ foreach target : targets
         )
 
 
-    test(t1_name + '-failure',
+    test(t1 + target + '-failure',
          test_gets,
          depends: bios_bin,
          args: ['this is a long string that should overflow the buffer'],
@@ -556,19 +453,14 @@ foreach target : targets
   if have_ubsan
     t1 = 'test-ubsan'
     t1_src = t1 + '.c'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = t1 + '_' + target
-    endif
 
     test_ubsan_flags = []
     if sanitize_trap_on_error
       test_ubsan_flags = ['-DSANITIZE_TRAP_ON_ERROR']
     endif
 
-    test(t1_name,
-	 executable(t1_name, t1_src,
+    test(t1 + target,
+	 executable(t1 + target, t1_src,
 		    c_args: c_sanitize_bounds_flags + _c_args + test_ubsan_flags,
 		    link_args: _link_args,
 		    objects: _objs,
@@ -582,14 +474,9 @@ foreach target : targets
   endif
 
   t1 = 'test-long-longl'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['test-long-long.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['test-long-long.c', 'lock-valid.c'],
 		  c_args: llong_printf_compile_args + _c_args,
 		  link_args: llong_printf_link_args + _link_args,
 		  objects: _objs,
@@ -602,14 +489,9 @@ foreach target : targets
        env: test_env)
 
   t1 = 'test-long-long'
-  if target == ''
-    t1_name = t1
-  else
-    t1_name = t1 + '_' + target
-  endif
 
-  test(t1_name,
-       executable(t1_name, ['test-long-long.c', 'lock-valid.c'],
+  test(t1 + target,
+       executable(t1 + target, ['test-long-long.c', 'lock-valid.c'],
 		  c_args: double_printf_compile_args + _c_args,
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
@@ -623,15 +505,10 @@ foreach target : targets
 
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = t1 + '_' + target
-    endif
-    test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
-    test(t1_name,
-	 executable(t1_name, [t1_src, 'lock-valid.c'],
+    test(t1 + target,
+	 executable(t1 + target, [t1_src, 'lock-valid.c'],
 		    c_args: double_printf_compile_args + test_file_name_arg + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
@@ -646,13 +523,8 @@ foreach target : targets
   if have_cplusplus
     t1 = 'test-cplusplus'
     t1_src = t1 + '.cpp'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = t1 + '_' + target
-    endif
-    test(t1_name,
-         executable(t1_name, t1_src,
+    test(t1 + target,
+         executable(t1 + target, t1_src,
                     cpp_args: _cpp_args,
 		    link_args: _cpp_args + _link_args,
 		    objects: _objs,
@@ -698,10 +570,9 @@ if enable_native_math_tests
 
     foreach t1 : math_tests_native
       t1_src = t1 + '.c'
-      t1_name = t1 + '-native'
 
-      test(t1_name,
-	   executable(t1_name, t1_src,
+      test(t1 + '-native',
+	   executable(t1 + '-native', t1_src,
 		      c_args: native_c_args,
 		      link_args: native_c_args,
                       dependencies: native_lib_m))
@@ -724,11 +595,10 @@ if enable_native_tests
   
   foreach t1 : plain_tests_native
     t1_src = t1 + '.c'
-    t1_name = t1 + '-native'
-    test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
-    test(t1_name,
-	 executable(t1_name, t1_src,
+    test(t1 + target,
+	 executable(t1 + '-native', t1_src,
 		    c_args: native_c_args,
 		    link_args: native_c_args))
   endforeach

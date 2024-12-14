@@ -68,13 +68,9 @@ if cc.get_define('_CALL_ELF') == '1'
     endforeach
 
     if cc.get_define('__PPC64__', args : test_flags) != ''
-      if target == ''
-	libsemihost_name = 'semihost'
-      else
-	libsemihost_name = join_paths(target, 'libsemihost')
-      endif
+      libsemihost_name = 'semihost'
 
-      local_lib_semihost_target = static_library(libsemihost_name,
+      local_lib_semihost_target = static_library(join_paths(value[0], value[2] + libsemihost_name),
 						 lib_semihost_srcs,
 						 install : true,
 						 install_dir : instdir,

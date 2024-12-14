@@ -83,29 +83,16 @@ foreach target : targets
 
   foreach machine : picocrt_machines
     suffix = machine['suffix']
-    if target == ''
-      crt_name = 'crt0' + suffix + '.o'
-      crt_hosted_name = 'crt0-hosted' + suffix + '.o'
-      crt_minimal_name = 'crt0-minimal' + suffix + '.o'
-      crt_semihost_name = 'crt0-semihost' + suffix + '.o'
-      crt_none_name = 'crt0-none' + suffix + '.o'
-      libcrt_name = 'crt0' + suffix
-      libcrt_hosted_name = 'crt0-hosted' + suffix
-      libcrt_minimal_name = 'crt0-minimal' + suffix
-      libcrt_semihost_name = 'crt0-semihost' + suffix
-      libcrt_none_name = 'crt0-none' + suffix
-    else
-      crt_name = join_paths(target, 'crt0' + suffix + '.o')
-      crt_hosted_name = join_paths(target, 'crt0-hosted' + suffix + '.o')
-      crt_minimal_name = join_paths(target, 'crt0-minimal' + suffix + '.o')
-      crt_semihost_name = join_paths(target, 'crt0-semihost' + suffix + '.o')
-      crt_none_name = join_paths(target, 'crt0-none' + suffix + '.o')
-      libcrt_name = join_paths(target, 'libcrt0' + suffix)
-      libcrt_hosted_name = join_paths(target, 'libcrt0-hosted' + suffix)
-      libcrt_minimal_name = join_paths(target, 'libcrt0-minimal' + suffix)
-      libcrt_semihost_name = join_paths(target, 'libcrt0-semihost' + suffix)
-      libcrt_none_name = join_paths(target, 'libcrt0-none' + suffix)
-    endif
+    crt_name = 'crt0' + suffix + '.o'
+    crt_hosted_name = 'crt0-hosted' + suffix + '.o'
+    crt_minimal_name = 'crt0-minimal' + suffix + '.o'
+    crt_semihost_name = 'crt0-semihost' + suffix + '.o'
+    crt_none_name = 'crt0-none' + suffix + '.o'
+    libcrt_name = 'crt0' + suffix
+    libcrt_hosted_name = 'crt0-hosted' + suffix
+    libcrt_minimal_name = 'crt0-minimal' + suffix
+    libcrt_semihost_name = 'crt0-semihost' + suffix
+    libcrt_none_name = 'crt0-none' + suffix
 
     crt0_name = 'crt0' + target
     crt0_hosted_name = 'crt0_hosted' + target
@@ -117,7 +104,7 @@ foreach target : targets
     _link_args = value[1] + ['-r', '-ffreestanding']
 
     # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
-    _crt = executable(crt_name,
+    _crt = executable(join_paths(value[0], crt_name),
                       src_picocrt,
                       include_directories : inc,
                       install : true,
@@ -132,7 +119,7 @@ foreach target : targets
     endif
 
     if enable_picocrt_lib
-      static_library(libcrt_name,
+      static_library(join_paths(value[0], value[2] + libcrt_name),
                      [],
                      include_directories : inc,
                      install : true,
@@ -143,7 +130,7 @@ foreach target : targets
     endif
 
     # The 'hosted' variant calls 'exit' after return from main (c lingo: hosted execution environment)
-    _crt = executable(crt_hosted_name,
+    _crt = executable(join_paths(value[0], crt_hosted_name),
                       src_picocrt,
                       include_directories : inc,
                       install : true,
@@ -152,13 +139,13 @@ foreach target : targets
                       link_args : _link_args)
 
     if machine['name'] == test_machine
-    set_variable(crt0_hosted_name,
-                 _crt.extract_objects(src_picocrt)
-                )
+      set_variable(crt0_hosted_name,
+                   _crt.extract_objects(src_picocrt)
+                  )
     endif
 
     if enable_picocrt_lib
-      static_library(libcrt_hosted_name,
+      static_library(join_paths(value[0], value[2] + libcrt_hosted_name),
                      [],
                      include_directories : inc,
                      install : true,
@@ -169,7 +156,7 @@ foreach target : targets
     endif
 
     # The 'minimal' variant doesn't call exit, nor does it invoke any constructors
-    _crt = executable(crt_minimal_name,
+    _crt = executable(join_paths(value[0], crt_minimal_name),
                       src_picocrt,
                       include_directories : inc,
                       install : true,
@@ -178,13 +165,13 @@ foreach target : targets
                       link_args : _link_args)
 
     if machine['name'] == test_machine
-    set_variable(crt0_minimal_name,
-                 _crt.extract_objects(src_picocrt)
-                )
+      set_variable(crt0_minimal_name,
+                   _crt.extract_objects(src_picocrt)
+                  )
     endif
 
     if enable_picocrt_lib
-      static_library(libcrt_minimal_name,
+      static_library(join_paths(value[0], value[2] + libcrt_minimal_name),
                      [],
                      include_directories : inc,
                      install : true,
@@ -197,7 +184,7 @@ foreach target : targets
     if has_arm_semihost
       # The 'semihost' variant calls sys_semihost_get_cmdline to build argv
       # and calls exit when main returns
-      _crt = executable(crt_semihost_name,
+      _crt = executable(join_paths(value[0], value[2] + crt_semihost_name),
                         src_picocrt,
                         include_directories : inc,
                         install : true,
@@ -212,7 +199,7 @@ foreach target : targets
       endif
 
       if enable_picocrt_lib
-        static_library(libcrt_semihost_name,
+        static_library(join_paths(value[0], value[2] + libcrt_semihost_name),
                        [],
                        include_directories : inc,
                        install : true,
@@ -224,7 +211,7 @@ foreach target : targets
     endif
 
     # The 'none' variant is completely empty
-    _crt = executable(crt_none_name,
+    _crt = executable(join_paths(value[0], crt_none_name),
                       src_picocrt_none,
                       include_directories : inc,
                       install : true,
@@ -233,9 +220,9 @@ foreach target : targets
                       link_args : _link_args)
 
     if machine['name'] == test_machine
-    set_variable(crt0_none_name,
-                 _crt.extract_objects(src_picocrt_none)
-                )
+      set_variable(crt0_none_name,
+                   _crt.extract_objects(src_picocrt_none)
+                  )
     endif
 
   endforeach

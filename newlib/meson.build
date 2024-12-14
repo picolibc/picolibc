@@ -57,19 +57,12 @@ foreach target : targets
 
   instdir = join_paths(lib_dir, value[0])
 
-  if target == ''
-    libc_name = 'c'
-    libg_name = 'g'
-    libm_name = 'm'
-    libnosys_name = 'nosys'
-  else
-    libc_name = join_paths(target, 'libc')
-    libg_name = join_paths(target, 'libg')
-    libm_name = join_paths(target, 'libm')
-    libnosys_name = join_paths(target, 'libnosys')
-  endif
+  libc_name = 'c'
+  libg_name = 'g'
+  libm_name = 'm'
+  libnosys_name = 'nosys'
 
-  local_lib_c_target = static_library(libc_name,
+  local_lib_c_target = static_library(join_paths(value[0], value[2] + libc_name),
 				      libsrcs_target,
 				      install : true,
 				      install_dir : instdir,
@@ -78,28 +71,29 @@ foreach target : targets
 				      include_directories: inc,
 				      c_args: value[1] + c_args)
 
+  static_library(join_paths(value[0], value[2] + libm_name),
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+                 c_args: value[1] + c_args,
+		 objects : [])
+  static_library(join_paths(value[0], value[2] + libg_name),
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+                 c_args: value[1] + c_args,
+		 objects : [])
+  static_library(join_paths(value[0], value[2] + libnosys_name),
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+                 c_args: value[1] + c_args,
+		 objects : [])
+
   set_variable('lib_c' + target, local_lib_c_target)
-  static_library(libm_name,
-		 ['empty.c'],
-		 install : true,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: value[1] + c_args,
-		 objects : [])
-  static_library(libg_name,
-		 ['empty.c'],
-		 install : true,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: value[1] + c_args,
-		 objects : [])
-  static_library(libnosys_name,
-		 ['empty.c'],
-		 install : true,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: value[1] + c_args,
-		 objects : [])
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,

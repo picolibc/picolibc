@@ -90,13 +90,7 @@ foreach target : targets
 
   set_variable('src_cpart_' + target, libsrcs_target)
 
-  if target == ''
-    libcpart_name = 'cpart'
-  else
-    libcpart_name = 'cpart' + '_' + target
-  endif
-
-  local_lib_cpart_target = static_library(libcpart_name,
+  local_lib_cpart_target = static_library('cpart' + target,
 				          pic: false,
 				          objects : libobjs,
 					  include_directories: inc,

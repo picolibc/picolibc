@@ -74,11 +74,6 @@ foreach target : targets
 
   foreach t1 : libc_tests_picolibc
     t1_src = t1 + '.c'
-    if target == ''
-      t1_name = t1
-    else
-      t1_name = t1 + '_' + target
-    endif
 
     timeout = 30
     if t1 == 'snprintf'
@@ -86,8 +81,8 @@ foreach target : targets
       timeout = 900
     endif
 
-    test(t1_name,
-	 executable(t1_name, [t1_src],
+    test(t1 + target,
+	 executable(t1 + target, [t1_src],
 		    c_args: double_printf_compile_args + _c_args,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
@@ -112,10 +107,9 @@ if enable_native_tests
 
   foreach t1 : libc_tests_native
     t1_src = t1 + '.c'
-    t1_name = t1 + '-native'
 
-    test(t1_name,
-	 executable(t1_name, t1_src,
+    test(t1 + '-native',
+	 executable(t1 + '-native', t1_src,
 		    c_args: native_c_args,
 		    link_args: native_c_args,
                     dependencies: libc_tests_native_dependencies))

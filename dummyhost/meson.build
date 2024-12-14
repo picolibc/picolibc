@@ -43,18 +43,13 @@ foreach target : targets
 
   instdir = join_paths(lib_dir, value[0])
 
-  if target == ''
-    libdummyhost_name = 'dummyhost'
-  else
-    libdummyhost_name = join_paths(target, 'libdummyhost')
-  endif
+  libdummyhost_name = 'dummyhost'
 
   set_variable('lib_dummyhost' + target,
-	       static_library(libdummyhost_name,
+	       static_library(join_paths(value[0], value[2] + libdummyhost_name),
 			      srcs_dummyhost,
 			      install : true,
 			      install_dir : instdir,
 			      include_directories : inc,
 			      c_args : value[1] + c_args))
-
 endforeach

@@ -56,11 +56,7 @@ foreach target : targets
   _c_args += _c_args_extra
 
   foreach test : tests
-    if target == ''
-      test_name = test
-    else
-      test_name = test + '_' + target
-    endif
+    test_name = test + target
 
     src = test + '.c'
 

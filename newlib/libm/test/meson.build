@@ -185,11 +185,8 @@ foreach target : targets
     else
       test_part_name = '_' + test_part
     endif
-    if target == ''
-      test_name = 'math_test' + test_part_name
-    else
-      test_name = 'math_test' + test_part_name + '_' + target
-    endif
+    test_name = 'math_test' + test_part_name + target
+
     test(test_name,
          executable(test_name, math_test_src,
 		    c_args: _c_args +  ['-DTEST_PART=' + test_part],

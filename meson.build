@@ -997,9 +997,13 @@ if enable_multilib
 	  endif
 	endforeach
 	if tmp[0] == '.'
+          dir = ''
 	  name = ''
+          lib_prefix = ''
 	else
-	  name = tmp[0].underscorify()
+          dir = tmp[0]
+	  name = '_' + tmp[0].underscorify()
+          lib_prefix = 'lib'
 	endif
       else
 	name = ''
@@ -1015,7 +1019,7 @@ if enable_multilib
       # Add any extra flags for this target from the cross file
       flags += meson.get_cross_property('c_args_' + name, [])
 
-      value = [tmp[0], flags]
+      value = [dir, flags, lib_prefix]
       set_variable('target_' + name, value)
     endif
   endforeach
@@ -1031,7 +1035,7 @@ if enable_multilib
   endif
 else
   targets = ['']
-  target_ = ['.', []]
+  target_ = ['', [], '']
 endif
 
 foreach target : ['default-target'] + targets

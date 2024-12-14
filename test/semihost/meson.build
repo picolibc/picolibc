@@ -95,16 +95,11 @@ foreach target : targets
 
   foreach semihost_test : semihost_tests
     semihost_test_src = semihost_test + '.c'
-    if target == ''
-      semihost_test_name = semihost_test
-    else
-      semihost_test_name = semihost_test + '_' + target
-    endif
 
     _cmd_arg = ['-DCOMMAND_LINE="' + 'program-name' + ' ' + ' '.join(test_args) + '"']
 
-    test(semihost_test_name,
-	 executable(semihost_test_name, [semihost_test_src],
+    test(semihost_test + target,
+	 executable(semihost_test + target, [semihost_test_src],
 		    c_args: _c_args + _cmd_arg,
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
@@ -119,14 +114,9 @@ foreach target : targets
 
   foreach semihost_fail_test : semihost_fail_tests
     semihost_fail_test_src = semihost_fail_test + '.c'
-    if target == ''
-      semihost_fail_test_name = semihost_fail_test
-    else
-      semihost_fail_test_name = semihost_fail_test + '_' + target
-    endif
 
-    test(semihost_fail_test_name,
-	 executable(semihost_fail_test_name, [semihost_fail_test_src],
+    test(semihost_fail_test + target,
+	 executable(semihost_fail_test + target, [semihost_fail_test_src],
 		    c_args: _c_args + _cmd_arg,
 		    link_args: _link_args,
 		    objects: _objs,
@@ -143,14 +133,9 @@ foreach target : targets
   if has_semihost_args
     foreach semihost_test : semihost_no_args_tests
       semihost_test_src = semihost_test + '.c'
-      if target == ''
-	semihost_test_name = semihost_test
-      else
-	semihost_test_name = semihost_test + '_' + target
-      endif
 
-      test(semihost_test_name,
-	   executable(semihost_test_name, [semihost_test_src],
+      test(semihost_test + target,
+	   executable(semihost_test + target, [semihost_test_src],
 		      c_args: _c_args + _cmd_arg,
 		      link_args: double_printf_link_args + _link_args,
 		      objects: _objs,
