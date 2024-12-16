@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,29 +33,64 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "../../crt0.h"
+#include <stdint.h>
 
-static void __attribute__((used)) __section(".init")
-_cstart(void)
+/* Interrupt functions */
+
+void arc_halt_vector(void);
+
+void arc_halt_vector(void)
 {
-    __start();
+	for(;;);
 }
 
-extern char __stack[];
-extern void (* const __vector_table[]);
+void arc_ignore_vector(void);
 
-void __attribute__((naked)) __section(".init") __attribute__((used))
-_start(void)
+void arc_ignore_vector(void)
 {
-    /* Set up the stack pointer */
-    __asm__("mov_s sp, %0" : : "r" (__stack));
-
-    /* Set up the vector table */
-    __asm__("sr %0, [0x25]" : : "r" (__vector_table));
-
-    /* Branch to C code */
-    __asm__("j _cstart");
-
-    /* Fill in any delay slot */
-    __asm__("nop");
 }
+
+#define isr(name) \
+	void  arc_ ## name ## _vector(void) __attribute__ ((weak, alias("arc_ignore_vector")));
+
+#define isr_halt(name) \
+	void  arc_ ## name ## _vector(void) __attribute__ ((weak, alias("arc_halt_vector")));
+
+isr_halt(memory_error);
+isr_halt(instruction_error);
+isr_halt(machine_check);
+isr(tlb_miss_i);
+isr(tlb_miss_d);
+isr(prot_v);
+isr(privilege_v);
+isr(swi);
+isr(trap);
+isr(extension);
+isr(div_zero);
+/* dc_error is unused in ARCv3 and de-facto unused in ARCv2 as well */
+isr(dc_error);
+isr(maligned);
+
+void _start(void);
+extern uint8_t __stack[];
+
+#define i(addr,name)	[(addr)/4] = (void(*)(void)) arc_ ## name ## _vector
+
+__section(".data.init.enter")
+void (* const __weak_vector_table[])(void) __attribute((aligned(128))) = {
+    [0] = (void *) _start,
+    i(0x04, memory_error),
+    i(0x08, instruction_error),
+    i(0x0c, machine_check),
+    i(0x10, tlb_miss_i),
+    i(0x14, tlb_miss_d),
+    i(0x18, prot_v),
+    i(0x1c, privilege_v),
+    i(0x20, swi),
+    i(0x24, trap),
+    i(0x28, extension),
+    i(0x2c, div_zero),
+    i(0x30, dc_error),
+    i(0x34, maligned),
+};
+__weak_reference(__weak_vector_table, __vector_table);

@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+src_picolib += files('../arc/vector_table.c')
 if thread_local_storage
   src_picolib += files('../arc/tls.c')
 endif
