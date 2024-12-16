@@ -93,7 +93,7 @@ picocrt_variants = [
   },
 ]
 
-if has_arm_semihost
+if has_semihost
   picocrt_variants += {
                        'name': 'semihost',
                        'suffix': '-semihost',
