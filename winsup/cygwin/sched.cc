@@ -120,29 +120,7 @@ sched_getparam (pid_t pid, struct sched_param *param)
       return -1;
     }
   /* calculate the unix priority. */
-  switch (pclass)
-    {
-    case IDLE_PRIORITY_CLASS:
-      param->sched_priority = 3;
-      break;
-    case BELOW_NORMAL_PRIORITY_CLASS:
-      param->sched_priority = 9;
-      break;
-    case NORMAL_PRIORITY_CLASS:
-    default:
-      param->sched_priority = 15;
-      break;
-    case ABOVE_NORMAL_PRIORITY_CLASS:
-      param->sched_priority = 21;
-      break;
-    case HIGH_PRIORITY_CLASS:
-      param->sched_priority = 27;
-      break;
-    case REALTIME_PRIORITY_CLASS:
-      param->sched_priority = 32;
-      break;
-    }
-
+  param->sched_priority = winprio_to_schedprio (pclass);
   return 0;
 }
 
@@ -244,18 +222,10 @@ sched_setparam_pinfo (pinfo & p, const struct sched_param *param)
   else if (p->sched_policy == SCHED_IDLE && pri == 0)
     /* Idle policy, ignore the nice value. */
     pclass = IDLE_PRIORITY_CLASS;
-  else if (1 <= pri && pri <= 6)
-    pclass = IDLE_PRIORITY_CLASS;
-  else if (pri <= 12)
-    pclass = BELOW_NORMAL_PRIORITY_CLASS;
-  else if (pri <= 18)
-    pclass = NORMAL_PRIORITY_CLASS;
-  else if (pri <= 24)
-    pclass = ABOVE_NORMAL_PRIORITY_CLASS;
-  else if (pri <= 30)
-    pclass = HIGH_PRIORITY_CLASS;
-  else if (pri <= 32)
-    pclass = REALTIME_PRIORITY_CLASS;
+  else if ((p->sched_policy == SCHED_FIFO || p->sched_policy == SCHED_RR)
+           && valid_sched_parameters (param))
+    /* Realtime policy, apply requested priority. */
+    pclass = schedprio_to_winprio (param->sched_priority);
   else
     {
       set_errno (EINVAL);

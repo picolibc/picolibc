@@ -69,3 +69,8 @@ What changed:
   each child process created with fork(2).
   Note: Windows does not offer alternative scheduling policies so
   this could only emulate API behavior.
+
+- If SCHED_FIFO or SCHED_RR is selected, the /proc/<PID>/stat field
+  '(18) priority' is now set to the negated sched_policy minus one.
+  If SCHED_IDLE is selected, this field is set to 39.  The '(19) nice'
+  field is now set to the originally requested nice value.

@@ -104,7 +104,7 @@ yield ()
 }
 
 /*
-   Mapping of nice value from/to Windows priority
+   Mapping of nice value or sched_priority from/to Windows priority
    ('batch' is used for SCHED_BATCH policy).
 
     nice_to_winprio()                                       winprio_to_nice()
@@ -115,6 +115,14 @@ yield ()
   -12...-5    -13..-19    3    ABOVE_NORMAL_PRIORITY_CLASS    -8      -16
   -13..-19         -20    4    HIGH_PRIORITY_CLASS           -16      -20
        -20           -    5    REALTIME_PRIORITY_CLASS       -20      -20
+
+   schedprio_to_winprio()                               winprio_to_schedprio()
+    1....6                0    IDLE_PRIORITY_CLASS             3
+    7...12                1    BELOW_NORMAL_PRIORITY_CLASS     9
+   13...18                2    NORMAL_PRIORITY_CLASS          15
+   19...24                3    ABOVE_NORMAL_PRIORITY_CLASS    21
+   25...30                4    HIGH_PRIORITY_CLASS            27
+   31...32                5    REALTIME_PRIORITY_CLASS        32
 */
 
 /* *_PRIORITY_CLASS -> 0...5 */
@@ -167,9 +175,25 @@ nice_to_winprio_impl (int nice, bool batch = false)
   return level_to_winprio (level);
 }
 
+/* *_PRIORITY_CLASS -> sched_priority */
+constexpr int
+winprio_to_schedprio_impl (DWORD prio)
+{
+  int level = winprio_to_level (prio);
+  return (level < 5 ? 3 + level * 6 : 32);
+}
+
+/* sched_priority -> *_PRIORITY_CLASS */
+constexpr DWORD
+schedprio_to_winprio_impl (int schedprio)
+{
+  int level = (schedprio <= 1 ? 0 : (schedprio < 32 ? (schedprio - 1) / 6 : 5));
+  return level_to_winprio (level);
+}
+
 /* Check consistency at compile time. */
 constexpr bool
-check_nice_winprio_mapping ()
+check_nice_schedprio_winprio_mapping ()
 {
   for (int nice = -NZERO; nice < NZERO; nice++)
     for (int batch = 0; batch <= 1; batch++) {
@@ -179,16 +203,28 @@ check_nice_winprio_mapping ()
       if (prio != prio2)
 	return false;
     }
+  for (int schedprio = 1; schedprio <= 32; schedprio++)
+    {
+      DWORD prio = schedprio_to_winprio_impl (schedprio);
+      int schedprio2 = winprio_to_schedprio_impl (prio);
+      DWORD prio2 = schedprio_to_winprio_impl (schedprio2);
+      if (prio != prio2)
+	return false;
+    }
   return true;
 }
 
-static_assert (check_nice_winprio_mapping());
+static_assert (check_nice_schedprio_winprio_mapping());
 static_assert (nice_to_winprio_impl(NZERO-1, false) == IDLE_PRIORITY_CLASS);
 static_assert (nice_to_winprio_impl(0, true) == BELOW_NORMAL_PRIORITY_CLASS);
 static_assert (winprio_to_nice_impl(BELOW_NORMAL_PRIORITY_CLASS, true) == 0);
 static_assert (nice_to_winprio_impl(0, false) == NORMAL_PRIORITY_CLASS);
 static_assert (winprio_to_nice_impl(NORMAL_PRIORITY_CLASS, false) == 0);
 static_assert (nice_to_winprio_impl(-NZERO, false) == REALTIME_PRIORITY_CLASS);
+static_assert (schedprio_to_winprio_impl(1) == IDLE_PRIORITY_CLASS);
+static_assert (schedprio_to_winprio_impl(15) == NORMAL_PRIORITY_CLASS);
+static_assert (winprio_to_schedprio_impl(NORMAL_PRIORITY_CLASS) == 15);
+static_assert (schedprio_to_winprio_impl(32) == REALTIME_PRIORITY_CLASS);
 
 /* Get a default value for the nice factor. */
 int
@@ -208,6 +244,20 @@ nice_to_winprio (int &nice, bool batch /* = false */)
     nice = NZERO - 1;
 
   return nice_to_winprio_impl (nice, batch);
+}
+
+/* Get a default sched_priority from a Win32 priority. */
+int
+winprio_to_schedprio (DWORD prio)
+{
+  return winprio_to_schedprio_impl (prio);
+}
+
+/* Get a Win32 priority matching the sched_priority. */
+DWORD
+schedprio_to_winprio (int schedprio)
+{
+  return schedprio_to_winprio_impl (schedprio);
 }
 
 /* Set Win32 priority or return false on failure.  Also return

@@ -1098,7 +1098,6 @@ format_process_stat (void *data, char *&destbuf)
   unsigned long fault_count = 0UL,
 		vmsize = 0UL, vmrss = 0UL, vmmaxrss = 0UL;
   uint64_t utime = 0ULL, stime = 0ULL, start_time = 0ULL;
-  int nice = 0;
 /* ctty maj is 31:16, min is 15:0; tty_nr s/b maj 15:8, min 31:20, 7:0;
    maj is 31:16 >> 16 & fff << 8; min is 15:0 >> 8 & ff << 20 | & ff */
   int tty_nr = 0;
@@ -1130,6 +1129,8 @@ format_process_stat (void *data, char *&destbuf)
     state = 'T';
   else
     state = get_process_state (p->dwProcessId);
+
+  int nice = 0, prio = 0;
 
   NTSTATUS status;
   HANDLE hProcess;
@@ -1168,7 +1169,26 @@ format_process_stat (void *data, char *&destbuf)
       if (!NT_SUCCESS (status))
 	debug_printf ("NtQueryInformationProcess(ProcessQuotaLimits): "
 		      "status %y", status);
-      nice = winprio_to_nice (GetPriorityClass (hProcess));
+
+      nice = p->nice;
+      DWORD winprio = GetPriorityClass (hProcess);
+      if (p->sched_policy == SCHED_FIFO || p->sched_policy == SCHED_RR)
+	/* Linux proc_pid_stat(5): (18) priority - For processes running a
+	   real-time scheduling policy ..., this is the negated scheduling
+	   priority, minus one. */
+	prio = - winprio_to_schedprio (winprio) - 1; /* -33(high)...-2(low) */
+      else if (p->sched_policy == SCHED_IDLE)
+	/* Return the lowest priority unless no longer consistent. */
+	prio = NZERO + (winprio == IDLE_PRIORITY_CLASS ? NZERO - 1 :
+			winprio_to_nice (winprio));
+      else
+	{
+	  /* Use originally requested nice value unless no longer consistent. */
+	  bool batch = (p->sched_policy == SCHED_BATCH);
+	  if (winprio != nice_to_winprio (nice, batch))
+	    nice = winprio_to_nice (winprio, batch);
+	  prio = NZERO + nice; /* 0(high)...39(low) */
+	}
       CloseHandle (hProcess);
     }
   status = NtQuerySystemInformation (SystemTimeOfDayInformation,
@@ -1201,7 +1221,7 @@ format_process_stat (void *data, char *&destbuf)
 			  p->ppid, p->pgid, p->sid, tty_nr,
 			  -1, 0, fault_count, fault_count, 0, 0,
 			  utime, stime, utime, stime,
-			  NZERO + nice, nice, 0, 0,
+			  prio, nice, 0, 0,
 			  start_time,
 			  vmsize, vmrss, vmmaxrss
 			  );
