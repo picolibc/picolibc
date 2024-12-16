@@ -144,10 +144,8 @@ foreach params : targets
     _lib_files += _lib.full_path()
   endforeach
 
-  if is_variable('crt0_semihost' + target)
-    _objs = [get_variable('crt0_semihost'+ target)]
-  elif is_variable('crt0_hosted' + target)
-    _objs = [get_variable('crt0_hosted'+ target)]
+  if is_variable(crt0_test + target)
+    _objs = [get_variable(crt0_test + target)]
   else
     _objs = []
   endif

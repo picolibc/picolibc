@@ -51,8 +51,8 @@ foreach params : targets
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('crt0_hosted' + target)
-    _objs = [get_variable('crt0_hosted'+ target)]
+  if is_variable(crt0_test + target)
+    _objs = [get_variable(crt0_test + target)]
   else
     _objs = []
   endif

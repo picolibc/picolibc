@@ -100,6 +100,7 @@ if has_semihost
                        'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
                        'src': src_picocrt,
                      }
+  crt0_test = 'crt0_semihost'
 endif
 
 foreach params : targets
