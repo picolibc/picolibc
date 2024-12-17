@@ -106,7 +106,7 @@ long    a64l (const char *__input);
 #endif
 __noreturn void	abort (void);
 int	abs (int);
-#if __ISO_C_VISIBLE >= 2011
+#if __ISO_C_VISIBLE >= 2011 || __GNU_VISIBLE
 void   *aligned_alloc(size_t, size_t) __malloc_like __alloc_align(1)
                          __alloc_size(2) __warn_unused_result __nothrow;
 #endif
