@@ -339,8 +339,8 @@ class mmap_record
 
     SIZE_T find_unused_pages (SIZE_T pages) const;
     bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len);
-    off_t map_pages (SIZE_T len);
-    bool map_pages (caddr_t addr, SIZE_T len);
+    off_t map_pages (SIZE_T len, int new_prot);
+    bool map_pages (caddr_t addr, SIZE_T len, int new_prot);
     bool unmap_pages (caddr_t addr, SIZE_T len);
     int access (caddr_t address);
 
@@ -373,7 +373,8 @@ class mmap_list
     void set (int nfd, struct stat *st);
     mmap_record *add_record (mmap_record &r);
     bool del_record (mmap_record *rec);
-    caddr_t try_map (void *addr, size_t len, int flags, off_t off);
+    caddr_t try_map (void *addr, size_t len, int new_prot, int flags,
+		     off_t off);
 };
 
 class mmap_areas
@@ -455,14 +456,15 @@ mmap_record::init_page_map (mmap_record &r)
 }
 
 off_t
-mmap_record::map_pages (SIZE_T len)
+mmap_record::map_pages (SIZE_T len, int new_prot)
 {
   /* Used ONLY if this mapping matches into the chunk of another already
      performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
 
      Otherwise it's job is now done by init_page_map(). */
   DWORD old_prot;
-  debug_printf ("map_pages (fd=%d, len=%lu)", get_fd (), len);
+  debug_printf ("map_pages (fd=%d, len=%lu, new_prot=%y)", get_fd (), len,
+		new_prot);
   len = PAGE_CNT (len);
 
   off_t off = find_unused_pages (len);
@@ -470,7 +472,8 @@ mmap_record::map_pages (SIZE_T len)
     return (off_t) 0;
   if (!noreserve ()
       && !VirtualProtect (get_address () + off * wincap.page_size (),
-			  len * wincap.page_size (), gen_protect (),
+			  len * wincap.page_size (),
+			  ::gen_protect (new_prot, get_flags ()),
 			  &old_prot))
     {
       __seterrno ();
@@ -483,9 +486,10 @@ mmap_record::map_pages (SIZE_T len)
 }
 
 bool
-mmap_record::map_pages (caddr_t addr, SIZE_T len)
+mmap_record::map_pages (caddr_t addr, SIZE_T len, int new_prot)
 {
-  debug_printf ("map_pages (addr=%p, len=%lu)", addr, len);
+  debug_printf ("map_pages (addr=%p, len=%lu, new_prot=%y)", addr, len,
+		new_prot);
   DWORD old_prot;
   off_t off = addr - get_address ();
   off /= wincap.page_size ();
@@ -499,7 +503,8 @@ mmap_record::map_pages (caddr_t addr, SIZE_T len)
       }
   if (!noreserve ()
       && !VirtualProtect (get_address () + off * wincap.page_size (),
-			  len * wincap.page_size (), gen_protect (),
+			  len * wincap.page_size (),
+			  ::gen_protect (new_prot, get_flags ()),
 			  &old_prot))
     {
       __seterrno ();
@@ -614,7 +619,7 @@ mmap_list::del_record (mmap_record *rec)
 }
 
 caddr_t
-mmap_list::try_map (void *addr, size_t len, int flags, off_t off)
+mmap_list::try_map (void *addr, size_t len, int new_prot, int flags, off_t off)
 {
   mmap_record *rec;
 
@@ -628,7 +633,7 @@ mmap_list::try_map (void *addr, size_t len, int flags, off_t off)
 	  break;
       if (rec && rec->compatible_flags (flags))
 	{
-	  if ((off = rec->map_pages (len)) == (off_t) -1)
+	  if ((off = rec->map_pages (len, new_prot)) == (off_t) -1)
 	    return (caddr_t) MAP_FAILED;
 	  return (caddr_t) rec->get_address () + off;
 	}
@@ -655,7 +660,7 @@ mmap_list::try_map (void *addr, size_t len, int flags, off_t off)
 	      set_errno (EINVAL);
 	      return (caddr_t) MAP_FAILED;
 	    }
-	  if (!rec->map_pages ((caddr_t) addr, len))
+	  if (!rec->map_pages ((caddr_t) addr, len, new_prot))
 	    return (caddr_t) MAP_FAILED;
 	  return (caddr_t) addr;
 	}
@@ -1051,7 +1056,7 @@ go_ahead:
   /* Test if an existing anonymous mapping can be recycled. */
   if (map_list && anonymous (flags))
     {
-      caddr_t tried = map_list->try_map (addr, len, flags, off);
+      caddr_t tried = map_list->try_map (addr, len, prot, flags, off);
       /* try_map returns NULL if no map matched, otherwise it returns
 	 a valid address, or MAP_FAILED in case of a fatal error. */
       if (tried)
