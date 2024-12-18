@@ -651,7 +651,7 @@ mmap_list::try_map (void *addr, size_t len, int new_prot, int flags, off_t off)
 	  break;
       if (rec)
 	{
-	  if (u_addr > (caddr_t) addr || u_addr + len < (caddr_t) addr + len
+	  if (u_addr > (caddr_t) addr || u_addr + u_len < (caddr_t) addr + len
 	      || !rec->compatible_flags (flags))
 	    {
 	      /* Partial match only, or access mode doesn't match. */
