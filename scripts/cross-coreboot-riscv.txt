@@ -1,0 +1,29 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['ccache', 'riscv64-elf-gcc', '-nostdlib']
+ar = 'riscv64-elf-ar'
+as = 'riscv64-elf-as'
+strip = 'riscv64-elf-strip'
+nm = 'riscv64-elf-nm'
+# only needed to run tests
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-riscv "$@"', 'run-riscv']
+
+[host_machine]
+system = 'unknown'
+cpu_family = 'riscv64'
+cpu = 'riscv'
+endian = 'little'
+
+[properties]
+# this uses shorter but slower function entry code
+c_args = [ '-msave-restore' ]
+# default multilib is 64 bit
+c_args_ = [ '-mcmodel=medany' ]
+skip_sanity_check = true
+default_flash_addr = '0x80000000'
+default_flash_size = '0x00200000'
+default_ram_addr   = '0x80200000'
+default_ram_size   = '0x00200000'
