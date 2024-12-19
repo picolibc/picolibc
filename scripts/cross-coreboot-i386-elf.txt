@@ -4,6 +4,7 @@
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
 c = ['ccache', 'i386-elf-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+cpp = ['ccache', 'i386-elf-g++', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
 ar = 'i386-elf-ar'
 as = 'i386-elf-as'
 nm = 'i386-elf-nm'

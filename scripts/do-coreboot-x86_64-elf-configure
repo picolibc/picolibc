@@ -4,4 +4,4 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 #
-exec "$(dirname "$0")"/do-configure coreboot-x86_64 -Dtests=true -Dtests-enable-posix-io=false -Dmultilib=false "$@"
+exec "$(dirname "$0")"/do-configure coreboot-x86_64-elf -Dtests=true -Dtests-enable-posix-io=false -Dmultilib=false "$@"

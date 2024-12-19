@@ -4,5 +4,5 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 #
-exec "$(dirname "$0")"/do-configure coreboot-arm -Dtests=true "$@" \
+exec "$(dirname "$0")"/do-configure coreboot-arm-eabi -Dtests=true "$@" \
      -Dmultilib=false "$@"

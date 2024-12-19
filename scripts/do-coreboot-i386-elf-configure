@@ -4,4 +4,4 @@
 # Use of this source code is governed by a BSD-style license that can be
 # found in the LICENSE file.
 #
-exec "$(dirname "$0")"/do-configure coreboot-riscv -Dtests=true "$@"
+exec "$(dirname "$0")"/do-configure coreboot-i386-elf -Dtests=true -Dtests-enable-posix-io=false -Dmultilib=false "$@"
