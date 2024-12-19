@@ -239,7 +239,7 @@ pinfo::exit (DWORD n)
 }
 # undef self
 
-/* Return next free Cygwin PID between 2 and 65535, round-robin.  Each new
+/* Return next free Cygwin PID between 2 and MAX_PID, round-robin.  Each new
    PID is checked that it doesn't collide with an existing PID.  For that,
    just check if the "cygpid.PID" section exists. */
 pid_t

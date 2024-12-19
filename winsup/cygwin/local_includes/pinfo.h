@@ -223,7 +223,7 @@ private:
   DWORD status_exit (DWORD);
 };
 
-#define MAX_PID 65536
+#define MAX_PID 4194304
 
 #define ISSTATE(p, f)	(!!((p)->process_state & f))
 #define NOTSTATE(p, f)	(!((p)->process_state & f))

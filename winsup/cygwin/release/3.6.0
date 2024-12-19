@@ -74,3 +74,7 @@ What changed:
   '(18) priority' is now set to the negated sched_policy minus one.
   If SCHED_IDLE is selected, this field is set to 39.  The '(19) nice'
   field is now set to the originally requested nice value.
+
+- Raise maximum pid from 65536 to 4194304 to account for scenarios
+  with lots of CPUs and lots of tasks.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-December/256927.html
