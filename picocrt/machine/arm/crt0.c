@@ -188,8 +188,11 @@ extern char __stack[];
 #define I_BIT           (1 << 7)
 #define F_BIT           (1 << 6)
 
+#define SET_MODE(mode) \
+    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "r" (mode | I_BIT | F_BIT): "r0")
+
 #define SET_SP(mode) \
-    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "r" (mode | I_BIT | F_BIT): "r0");   \
+    SET_MODE(mode);  \
     __asm__("mov sp, %0" : : "r" (__stack))
 
 #define SET_SPS()                               \
@@ -197,14 +200,16 @@ extern char __stack[];
         SET_SP(MODE_ABT);                       \
         SET_SP(MODE_UND);                       \
         SET_SP(MODE_FIQ);                       \
-        SET_SP(MODE_SVC);                       \
         SET_SP(MODE_SYS);
 
 #if __ARM_ARCH_ISA_THUMB == 1
+// _set_stacks presumes we're in supervisor mode and the stack for that
+// mode has already been set up correctly (in _start).
 static __noinline __attribute__((target("arm"))) void
 _set_stacks(void)
 {
         SET_SPS();
+        SET_MODE(MODE_SVC);
 }
 #endif
 
