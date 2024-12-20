@@ -27,14 +27,8 @@ details. */
    is to support mappings longer than the file, without the file growing
    to mapping length (POSIX semantics). */
 #define __PROT_ATTACH   0x8000000
-/* Filler pages are the pages from the last file backed page to the next
-   64K boundary.  These pages are created as anonymous pages, but with
-   the same page protection as the file's pages, since POSIX applications
-   expect to be able to access this part the same way as the file pages. */
-#define __PROT_FILLER   0x4000000
 
-/* Stick with 4K pages for bookkeeping, otherwise we just get confused
-   when trying to do file mappings with trailing filler pages correctly. */
+/* Stick with 4K pages for bookkeeping. */
 #define PAGE_CNT(bytes) howmany((bytes), wincap.page_size())
 
 #define PGBITS		(sizeof (DWORD)*8)
@@ -91,12 +85,6 @@ attached (int prot)
   return (prot & __PROT_ATTACH) == __PROT_ATTACH;
 }
 
-static inline bool
-filler (int prot)
-{
-  return (prot & __PROT_FILLER) == __PROT_FILLER;
-}
-
 static inline DWORD
 gen_create_protect (DWORD openflags, int flags)
 {
@@ -125,7 +113,7 @@ gen_protect (int prot, int flags)
     return PAGE_EXECUTE_READWRITE;
 
   if (prot & PROT_WRITE)
-    ret = (priv (flags) && (!anonymous (flags) || filler (prot)))
+    ret = (priv (flags) && !anonymous (flags))
 	  ? PAGE_WRITECOPY : PAGE_READWRITE;
   else if (prot & PROT_READ)
     ret = PAGE_READONLY;
@@ -330,7 +318,6 @@ class mmap_record
     bool noreserve () const { return ::noreserve (flags); }
     bool autogrow () const { return ::autogrow (flags); }
     bool attached () const { return ::attached (prot); }
-    bool filler () const { return ::filler (prot); }
     off_t get_offset () const { return offset; }
     SIZE_T get_len () const { return len; }
     caddr_t get_address () const { return base_address; }
@@ -431,13 +418,9 @@ mmap_record::match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len,
 		    bool &contains)
 {
   contains = false;
+  SIZE_T rec_len = PAGE_CNT (get_len ()) * wincap.page_size ();
   caddr_t low = MAX (addr, get_address ());
-  caddr_t high = get_address ();
-  if (filler ())
-    high += get_len ();
-  else
-    high += (PAGE_CNT (get_len ()) * wincap.page_size ());
-  high = MIN (addr + len, high);
+  caddr_t high = MIN (addr + len, get_address () + rec_len);
   if (low < high)
     {
       m_addr = low;
@@ -1571,7 +1554,7 @@ fhandler_dev_zero::mmap (caddr_t *addr, size_t len, int prot,
   HANDLE h;
   void *base;
 
-  if (priv (flags) && !filler (prot))
+  if (priv (flags))
     {
       /* Private anonymous maps are now implemented using VirtualAlloc.
 	 This has two advantages:
@@ -1680,7 +1663,7 @@ fhandler_dev_zero::fixup_mmap_after_fork (HANDLE h, int prot, int flags,
 {
   /* Re-create the map */
   void *base;
-  if (priv (flags) && !filler (prot))
+  if (priv (flags))
     {
       DWORD alloc_type = MEM_RESERVE | (noreserve (flags) ? 0 : MEM_COMMIT);
       /* Always allocate R/W so that ReadProcessMemory doesn't fail
