@@ -239,7 +239,6 @@ enum mmap_region_status
     MMAP_NORESERVE_COMMITED
   };
 mmap_region_status mmap_is_attached_or_noreserve (void *addr, size_t len);
-bool is_mmapped_region (caddr_t start_addr, caddr_t end_address);
 
 extern inline bool flush_file_buffers (HANDLE h)
 {
