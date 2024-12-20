@@ -188,8 +188,11 @@ extern char __stack[];
 #define I_BIT           (1 << 7)
 #define F_BIT           (1 << 6)
 
-#define SET_SP(mode) \
-    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "r" (mode | I_BIT | F_BIT): "r0");   \
+#define SET_MODE(mode)                                                  \
+    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "I" (mode | I_BIT | F_BIT) : "r0"); \
+
+#define SET_SP(mode)                                \
+    SET_MODE(mode);                                 \
     __asm__("mov sp, %0" : : "r" (__stack))
 
 #define SET_SPS()                               \
@@ -197,8 +200,8 @@ extern char __stack[];
         SET_SP(MODE_ABT);                       \
         SET_SP(MODE_UND);                       \
         SET_SP(MODE_FIQ);                       \
-        SET_SP(MODE_SVC);                       \
-        SET_SP(MODE_SYS);
+        SET_SP(MODE_SYS);                       \
+        SET_MODE(MODE_SVC);
 
 #if __ARM_ARCH_ISA_THUMB == 1
 static __noinline __attribute__((target("arm"))) void
@@ -303,9 +306,8 @@ _start(void)
 	/* Generate a reference to __vector_table so we get one loaded */
 	__asm__(".equ __my_vector_table, __vector_table");
 
-#if __ARM_ARCH_ISA_THUMB == 1
         __asm__("mov sp, %0" : : "r" (__stack));
-#else
+#if __ARM_ARCH_ISA_THUMB != 1
         SET_SPS();
 #endif
 	/* Branch to C code */
