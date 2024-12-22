@@ -81,6 +81,9 @@ cpu_family_aliases = {
 		       'arm64' : 'aarch64',
 		       # cris
 		       'crisv32' : 'cris',
+           # loongarch
+		       'loongarch64' : 'loongarch',
+		       'loongarch32' : 'loongarch',
 		       # m68hc11
 		       'm6811' : 'm68hc11',
 		       'm6812' : 'm68hc11',

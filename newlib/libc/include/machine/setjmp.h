@@ -444,6 +444,18 @@ _BEGIN_STD_C
 #endif
 #endif
 
+#ifdef __loongarch__
+#define _JBTYPE unsigned long
+#ifdef __loongarch_soft_float
+#define _JBLEN 13
+#elif __loongarch_frlen > 32 && __loongarch_grlen <= 32
+/* Extra padding for alignment */
+#define _JBLEN (13 + 1 + (8 * (__loongarch_frlen / __loongarch_grlen)))
+#else
+#define _JBLEN (13 + (8 * (__loongarch_frlen / __loongarch_frlen)))
+#endif
+#endif
+
 #ifdef _JBLEN
 #ifdef _JBTYPE
 typedef	_JBTYPE jmp_buf[_JBLEN];
