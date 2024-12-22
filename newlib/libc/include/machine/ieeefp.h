@@ -263,6 +263,17 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 #endif
 
+#ifdef __loongarch__
+#if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
+#define __IEEE_BIG_ENDIAN
+#else
+#define __IEEE_LITTLE_ENDIAN
+#endif
+#ifndef __loongarch_soft_float
+# define _SUPPORTS_ERREXCEPT
+#endif
+#endif
+
 #ifdef __riscv
 #if defined(__BYTE_ORDER__) && (__BYTE_ORDER__ == __ORDER_BIG_ENDIAN__)
 #define __IEEE_BIG_ENDIAN

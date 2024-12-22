@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2020 Keith Packard
 # Copyright © 2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,21 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_machine = [
-  'setjmp.S',
+inc_machine_headers_machine = [
+  'fenv.h',
+  'fenv-fp.h',
+  'math.h'
 ]
 
-subdir('machine')
-
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
-	set_variable('lib_machine' + target,
-		static_library('machine' + target,
-			srcs_machine,
-			pic: false,
-			include_directories: inc,
-			c_args: target_c_args + c_args + arg_fnobuiltin))
-endforeach
+install_headers(inc_machine_headers_machine,
+		install_dir: include_dir / 'machine')
