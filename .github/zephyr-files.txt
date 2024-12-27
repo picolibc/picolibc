@@ -15,5 +15,5 @@ https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/toolchain
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/toolchain_linux-x86_64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/toolchain_linux-x86_64_xtensa-sample_controller_zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/hosttools_linux-x86_64.tar.xz
-https://maps.altusmetrum.org/qemu-nios2-2.tar.xz
-https://maps.altusmetrum.org/qemu-arc.tar.xz
+https://github.com/picolibc/toolchains/raw/refs/heads/main/qemu-nios2-2.tar.xz
+https://github.com/picolibc/toolchains/raw/refs/heads/main/qemu-arc.tar.xz

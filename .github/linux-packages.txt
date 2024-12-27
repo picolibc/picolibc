@@ -35,3 +35,6 @@ qemu-system-arm
 qemu-system-misc
 qemu-system-ppc64
 libdbus-1-dev
+ca-certificates
+wget
+gnupg
