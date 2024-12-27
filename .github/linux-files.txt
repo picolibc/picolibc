@@ -5,3 +5,5 @@ https://github.com/picolibc/toolchains/raw/refs/heads/main/qemu-m68k.tar.xz
 https://github.com/picolibc/toolchains/raw/refs/heads/main/sh-unknown-elf.tar.xz
 https://github.com/ARM-software/LLVM-embedded-toolchain-for-Arm/releases/download/release-18.1.3/LLVM-ET-Arm-18.1.3-Linux-x86_64.tar.xz
 https://developer.arm.com/-/cdn-downloads/permalink/FVPs-Architecture/FM-11.27/FVP_Base_RevC-2xAEMvA_11.27_19_Linux64.tgz
+https://github.com/FlyGoat/picolibc-ci-tools/releases/download/v20241227/loongarch64-unknown-elf.linux-amd64.tar.xz
+https://github.com/FlyGoat/picolibc-ci-tools/releases/download/v20241227/qemu-stable.linux-amd64.tar.xz
