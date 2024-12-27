@@ -338,6 +338,8 @@ class mmap_record
     void init_page_map (mmap_record &r);
 
     SIZE_T find_unused_pages (SIZE_T pages) const;
+    bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len,
+                bool &contains);
     bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len);
     off_t map_pages (SIZE_T len, int new_prot);
     bool map_pages (caddr_t addr, SIZE_T len, int new_prot);
@@ -418,23 +420,40 @@ mmap_record::find_unused_pages (SIZE_T pages) const
   return (SIZE_T) -1;
 }
 
+/* Return true if the interval I from addr to addr + len intersects
+   the interval J of this mmap_record.  The endpoint of the latter is
+   first rounded up to a page boundary.  If there is an intersection,
+   then it is the interval from m_addr to m_addr + m_len.  The
+   variable 'contains' is set to true if J contains I.
+*/
 bool
-mmap_record::match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len)
+mmap_record::match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len,
+		    bool &contains)
 {
-  caddr_t low = (addr >= get_address ()) ? addr : get_address ();
+  contains = false;
+  caddr_t low = MAX (addr, get_address ());
   caddr_t high = get_address ();
   if (filler ())
     high += get_len ();
   else
     high += (PAGE_CNT (get_len ()) * wincap.page_size ());
-  high = (addr + len < high) ? addr + len : high;
+  high = MIN (addr + len, high);
   if (low < high)
     {
       m_addr = low;
       m_len = high - low;
+      /* I is contained in J iff their intersection equals I. */
+      contains = (addr == m_addr && len == m_len);
       return true;
     }
   return false;
+}
+
+inline bool
+mmap_record:: match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len)
+{
+  bool contains;
+  return match (addr, len, m_addr, m_len, contains);
 }
 
 void
@@ -653,14 +672,14 @@ mmap_list::try_map (void *addr, size_t len, int new_prot, int flags, off_t off)
 	 request, try to reset the protection on the requested area. */
       caddr_t u_addr;
       SIZE_T u_len;
+      bool contains;
 
       LIST_FOREACH (rec, &recs, mr_next)
-	if (rec->match ((caddr_t) addr, len, u_addr, u_len))
+	if (rec->match ((caddr_t) addr, len, u_addr, u_len, contains))
 	  break;
       if (rec)
 	{
-	  if (u_addr > (caddr_t) addr || u_addr + u_len < (caddr_t) addr + len
-	      || !rec->compatible_flags (flags))
+	  if (!contains || !rec->compatible_flags (flags))
 	    {
 	      /* Partial match only, or access mode doesn't match. */
 	      /* FIXME: Handle partial mappings gracefully if adjacent
