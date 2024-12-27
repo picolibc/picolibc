@@ -494,18 +494,24 @@ mmap_record::map_pages (caddr_t addr, SIZE_T len, int new_prot)
   off_t off = addr - get_address ();
   off /= wincap.page_size ();
   len = PAGE_CNT (len);
-  /* First check if the area is unused right now. */
-  for (SIZE_T l = 0; l < len; ++l)
-    if (MAP_ISSET (off + l))
-      {
-	set_errno (EINVAL);
-	return false;
-      }
-  if (!noreserve ()
-      && !VirtualProtect (get_address () + off * wincap.page_size (),
-			  len * wincap.page_size (),
-			  ::gen_protect (new_prot, get_flags ()),
-			  &old_prot))
+  /* VirtualProtect can only be called on committed pages, so it's not
+     clear how to change protection in the noreserve case.  In this
+     case we will therefore require that the pages are unmapped, in
+     order to keep the behavior the same as it was before new_prot was
+     introduced.  FIXME: Is there a better way to handle this? */
+  if (noreserve ())
+    {
+      for (SIZE_T l = 0; l < len; ++l)
+	if (MAP_ISSET (off + l))
+	  {
+	    set_errno (EINVAL);
+	    return false;
+	  }
+    }
+  else if (!VirtualProtect (get_address () + off * wincap.page_size (),
+			    len * wincap.page_size (),
+			    ::gen_protect (new_prot, get_flags ()),
+			    &old_prot))
     {
       __seterrno ();
       return false;
@@ -625,8 +631,9 @@ mmap_list::try_map (void *addr, size_t len, int new_prot, int flags, off_t off)
 
   if (off == 0 && !fixed (flags))
     {
-      /* If MAP_FIXED isn't given, check if this mapping matches into the
-	 chunk of another already performed mapping. */
+      /* If MAP_FIXED isn't given, try to satisfy this mapping request
+	 by recycling unmapped pages in the chunk of an existing
+	 mapping. */
       SIZE_T plen = PAGE_CNT (len);
       LIST_FOREACH (rec, &recs, mr_next)
 	if (rec->find_unused_pages (plen) != (SIZE_T) -1)
@@ -640,9 +647,10 @@ mmap_list::try_map (void *addr, size_t len, int new_prot, int flags, off_t off)
     }
   else if (fixed (flags))
     {
-      /* If MAP_FIXED is given, test if the requested area is in an
-	 unmapped part of an still active mapping.  This can happen
-	 if a memory region is unmapped and remapped with MAP_FIXED. */
+      /* If MAP_FIXED is given, test if the requested area is
+	 contained in the chunk of an existing mapping.  If so, and if
+	 the flags of that mapping are compatible with those in the
+	 request, try to reset the protection on the requested area. */
       caddr_t u_addr;
       SIZE_T u_len;
 
@@ -1058,7 +1066,8 @@ go_ahead:
   LIST_WRITE_LOCK ();
   map_list = mmapped_areas.get_list_by_fd (fd, &st);
 
-  /* Test if an existing anonymous mapping can be recycled. */
+  /* Try to satisfy the request by resetting the protection on part of
+     an existing anonymous mapping. */
   if (map_list && anonymous (flags))
     {
       caddr_t tried = map_list->try_map (addr, len, prot, flags, off);

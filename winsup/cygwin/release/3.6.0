@@ -78,3 +78,9 @@ What changed:
 - Raise maximum pid from 65536 to 4194304 to account for scenarios
   with lots of CPUs and lots of tasks.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-December/256927.html
+
+- Allow mmap with MAP_FIXED to succeed on an address range contained
+  in the chunk of an existing anonymous mapping, provided the
+  MAP_SHARED/MAP_PRIVATE flags agree and MAP_NORESERVE is not set for
+  either mapping.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-December/256901.html
