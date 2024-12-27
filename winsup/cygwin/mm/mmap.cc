@@ -738,18 +738,18 @@ is_mmapped_region (caddr_t start_addr, caddr_t end_address)
 
 /* This function is called from exception_handler when a segmentation
    violation has occurred.  It should also be called from all Cygwin
-   functions that want to support passing noreserve mmap page addresses
-   to Windows system calls.  In that case, it should be called only after
-   a system call indicates that the application buffer passed had an
-   invalid virtual address to avoid any performance impact in non-noreserve
-   cases.
+   functions that want to support passing noreserve (anonymous) mmap
+   page addresses to Windows system calls.  In that case, it should be
+   called only after a system call indicates that the application
+   buffer passed had an invalid virtual address to avoid any
+   performance impact in non-noreserve cases.
 
    Check if the address range is all within noreserve mmap regions.  If so,
    call VirtualAlloc to commit the pages and return MMAP_NORESERVE_COMMITED
-   on success.  If the page has __PROT_ATTACH (SUSv3 memory protection
-   extension), or if VirtualAlloc fails, return MMAP_RAISE_SIGBUS.
-   Otherwise, return MMAP_NONE if the address range is not covered by an
-   attached or noreserve map.
+   on success.  If some page in the address range has __PROT_ATTACH
+   (SUSv3 memory protection extension), or if VirtualAlloc fails,
+   return MMAP_RAISE_SIGBUS.  Otherwise, return MMAP_NONE if the
+   address range is not covered by noreserve maps.
 
    On MAP_NORESERVE_COMMITED, the exeception handler should return 0 to
    allow the application to retry the memory access, or the calling Cygwin
@@ -768,12 +768,16 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
   len += ((caddr_t) addr - start_addr);
   len = roundup2 (len, pagesize);
 
-  if (map_list == NULL)
-    goto out;
-
   mmap_record *rec;
   caddr_t u_addr;
   SIZE_T u_len;
+  /* nocover is set to true if we discover that our address range
+     cannot be covered by noreserve mmap regions. */
+  bool nocover = false;
+  size_t remaining = len;
+
+  if (map_list == NULL)
+    goto out;
 
   LIST_FOREACH (rec, &map_list->recs, mr_next)
     {
@@ -784,23 +788,24 @@ mmap_is_attached_or_noreserve (void *addr, size_t len)
 	  ret = MMAP_RAISE_SIGBUS;
 	  break;
 	}
-      if (!rec->noreserve ())
-	break;
+      if (nocover || !rec->noreserve ())
+	{
+	/* We need to continue in case we encounter an attached mmap
+	   later in the list. */
+	  nocover = true;
+	  continue;
+	}
 
-      size_t commit_len = u_len - (start_addr - u_addr);
-      if (commit_len > len)
-	commit_len = len;
-
-      if (!VirtualAlloc (start_addr, commit_len, MEM_COMMIT,
-			 rec->gen_protect ()))
+      /* The interval determined by u_addr and u_len is the part of
+	 our address range contained in the mmap region of rec.  */
+      if (!VirtualAlloc (u_addr, u_len, MEM_COMMIT, rec->gen_protect ()))
 	{
 	  ret = MMAP_RAISE_SIGBUS;
 	  break;
 	}
 
-      start_addr += commit_len;
-      len -= commit_len;
-      if (!len)
+      remaining -= u_len;
+      if (!remaining)
 	{
 	  ret = MMAP_NORESERVE_COMMITED;
 	  break;
