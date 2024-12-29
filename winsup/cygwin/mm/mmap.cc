@@ -328,7 +328,7 @@ class mmap_record
     bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len,
                 bool &contains);
     bool match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len);
-    off_t map_pages (SIZE_T len, int new_prot);
+    bool map_pages (SIZE_T len, int new_prot, off_t off);
     bool map_pages (caddr_t addr, SIZE_T len, int new_prot);
     bool unmap_pages (caddr_t addr, SIZE_T len);
     int access (caddr_t address);
@@ -457,21 +457,18 @@ mmap_record::init_page_map (mmap_record &r)
     MAP_SET (len);
 }
 
-off_t
-mmap_record::map_pages (SIZE_T len, int new_prot)
+bool
+mmap_record::map_pages (SIZE_T len, int new_prot, off_t off)
 {
-  /* Used ONLY if this mapping matches into the chunk of another already
-     performed mapping in a special case of MAP_ANON|MAP_PRIVATE.
-
-     Otherwise it's job is now done by init_page_map(). */
+  /* Used only in a MAP_ANON|MAP_PRIVATE request for len bytes, with
+     MAP_FIXED not given.  Moreover, we know when this function is
+     called that this record contains enough unused pages starting at
+     off to satisfy the request. */
   DWORD old_prot;
   debug_printf ("map_pages (fd=%d, len=%lu, new_prot=%y)", get_fd (), len,
 		new_prot);
   len = PAGE_CNT (len);
 
-  off_t off = find_unused_pages (len);
-  if (off == (off_t) -1)
-    return (off_t) 0;
   if (!noreserve ()
       && !VirtualProtect (get_address () + off * wincap.page_size (),
 			  len * wincap.page_size (),
@@ -479,12 +476,12 @@ mmap_record::map_pages (SIZE_T len, int new_prot)
 			  &old_prot))
     {
       __seterrno ();
-      return (off_t) -1;
+      return false;
     }
 
   while (len-- > 0)
     MAP_SET (off + len);
-  return off * wincap.page_size ();
+  return true;
 }
 
 bool
@@ -638,13 +635,14 @@ mmap_list::try_map (void *addr, size_t len, int new_prot, int flags, off_t off)
 	 mapping. */
       SIZE_T plen = PAGE_CNT (len);
       LIST_FOREACH (rec, &recs, mr_next)
-	if (rec->find_unused_pages (plen) != (SIZE_T) -1)
+	if ((off = rec->find_unused_pages (plen)) != (off_t) -1
+	    && rec->compatible_flags (flags))
 	  break;
-      if (rec && rec->compatible_flags (flags))
+      if (rec)
 	{
-	  if ((off = rec->map_pages (len, new_prot)) == (off_t) -1)
+	  if (!rec->map_pages (len, new_prot, off))
 	    return (caddr_t) MAP_FAILED;
-	  return (caddr_t) rec->get_address () + off;
+	  return (caddr_t) rec->get_address () + off * wincap.page_size ();
 	}
     }
   else if (fixed (flags))
