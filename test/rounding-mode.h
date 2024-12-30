@@ -34,13 +34,13 @@
  */
 
 double
-div(double a, double b);
+div_d(double a, double b);
 
 double
-mul(double a, double b);
+mul_d(double a, double b);
 
 double
-sub(double a, double b);
+sub_d(double a, double b);
 
 float
 div_f(float a, float b);
