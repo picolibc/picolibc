@@ -48,7 +48,7 @@ void xdr_warnx (const char *, ...)
 
 /* byteswap and ntohl stuff; platform may provide optimzed version
  * of this, but we don't have access to that here.*/
-_ELIDABLE_INLINE uint32_t xdr_ntohl (uint32_t x)
+__elidable_inline uint32_t xdr_ntohl (uint32_t x)
 {
 #if _BYTE_ORDER == _BIG_ENDIAN
   return x;

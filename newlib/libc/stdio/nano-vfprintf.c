@@ -386,7 +386,7 @@ out:
   return err;
 }
 
-_NOINLINE_STATIC int
+__noinline_static int
 _sfputc (
        int c,
        FILE *fp)

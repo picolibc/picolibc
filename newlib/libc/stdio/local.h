@@ -279,7 +279,7 @@ void _reclaim_reent (void *);
    from inside the wide-char functions. */
 int	__swbufw (int, FILE *);
 #ifdef __GNUC__
-_ELIDABLE_INLINE int __swputc(int _c, FILE *_p) {
+__elidable_inline int __swputc(int _c, FILE *_p) {
 #ifdef __SCLE
 	if ((_p->_flags & __SCLE) && _c == '\n')
 	  __swputc ('\r', _p);

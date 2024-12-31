@@ -54,7 +54,7 @@ NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
 #endif
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
-_NOINLINE_STATIC void
+__noinline_static void
 #else
 static void
 #endif

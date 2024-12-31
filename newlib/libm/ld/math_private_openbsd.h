@@ -116,7 +116,7 @@ do {								\
 #define	LDBL_MANH_SIZE	48
 #define	LDBL_MANL_SIZE	64
 
-static ALWAYS_INLINE int
+static __always_inline int
 isnanl_inline(long double x)
 {
     u_int64_t high, low;
@@ -131,7 +131,7 @@ isnanl_inline(long double x)
     return 1;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 issignalingl_inline(long double x)
 {
     if (!isnanl_inline(x))
@@ -144,7 +144,7 @@ issignalingl_inline(long double x)
         return (high & 0x0000800000000000ULL) == 0;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 signbitl_inline(long double x)
 {
     int64_t high;
@@ -314,7 +314,7 @@ do {								\
 	(a)[1] = (uint32_t)(u).bits.manh;		\
 } while (0)
 
-static ALWAYS_INLINE int
+static __always_inline int
 isnanl_inline(long double x)
 {
     u_int32_t exp, msw, lsw;
@@ -328,7 +328,7 @@ isnanl_inline(long double x)
     return 1;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 issignalingl_inline(long double x)
 {
     u_int32_t msw;
@@ -341,7 +341,7 @@ issignalingl_inline(long double x)
         return (msw & 0x40000000U) == 0;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 signbitl_inline(long double x)
 {
     int exp;
@@ -510,7 +510,7 @@ do {								\
   (d) = se_u.value;						\
 } while (0)
 
-static ALWAYS_INLINE int
+static __always_inline int
 isnanl_inline(long double x)
 {
     uint64_t high;
@@ -524,7 +524,7 @@ isnanl_inline(long double x)
     return 1;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 issignalingl_inline(long double x)
 {
     uint64_t high;
@@ -537,7 +537,7 @@ issignalingl_inline(long double x)
         return (high & 0x0008000000000000ULL) == 0;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 signbitl_inline(long double x)
 {
     int exp;

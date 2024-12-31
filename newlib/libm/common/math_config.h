@@ -54,18 +54,6 @@
 #define _IEEE_  -1
 #define _POSIX_ 0
 
-#ifdef _HAVE_ATTRIBUTE_ALWAYS_INLINE
-#define ALWAYS_INLINE __inline__ __attribute__((__always_inline__))
-#else
-#define ALWAYS_INLINE __inline__
-#endif
-
-#ifdef _HAVE_ATTRIBUTE_NOINLINE
-# define NOINLINE __attribute__ ((__noinline__))
-#else
-# define NOINLINE
-#endif
-
 #ifdef _HAVE_BUILTIN_EXPECT
 # define likely(x) __builtin_expect (!!(x), 1)
 # define unlikely(x) __builtin_expect (x, 0)
@@ -100,7 +88,7 @@
 /* Round x to nearest int in all rounding modes, ties have to be rounded
    consistently with converttoint so the results match.  If the result
    would be outside of [-2^31, 2^31-1] then the semantics is unspecified.  */
-static ALWAYS_INLINE double_t
+static __always_inline double_t
 roundtoint (double_t x)
 {
   return round (x);
@@ -109,7 +97,7 @@ roundtoint (double_t x)
 /* Convert x to nearest int in all rounding modes, ties have to be rounded
    consistently with roundtoint.  If the result is not representible in an
    int32_t then the semantics is unspecified.  */
-static ALWAYS_INLINE int32_t
+static __always_inline int32_t
 converttoint (double_t x)
 {
 # if HAVE_FAST_LROUND
@@ -132,7 +120,7 @@ typedef long double __float64;
 # define _NEED_FLOAT64
 #endif
 
-static ALWAYS_INLINE uint32_t
+static __always_inline uint32_t
 asuint (float f)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 32
@@ -149,7 +137,7 @@ asuint (float f)
 #endif
 }
 
-static ALWAYS_INLINE float
+static __always_inline float
 asfloat (uint32_t i)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 32
@@ -166,37 +154,37 @@ asfloat (uint32_t i)
 #endif
 }
 
-static ALWAYS_INLINE int32_t
+static __always_inline int32_t
 _asint32 (float f)
 {
     return (int32_t) asuint(f);
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 _sign32(int32_t ix)
 {
     return ((uint32_t) ix) >> 31;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 _exponent32(int32_t ix)
 {
     return (ix >> 23) & 0xff;
 }
 
-static ALWAYS_INLINE int32_t
+static __always_inline int32_t
 _significand32(int32_t ix)
 {
     return ix & 0x7fffff;
 }
 
-static ALWAYS_INLINE float
+static __always_inline float
 _asfloat(int32_t i)
 {
     return asfloat((uint32_t) i);
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 issignalingf_inline (float x)
 {
   uint32_t ix = asuint (x);
@@ -206,25 +194,25 @@ issignalingf_inline (float x)
 }
 
 #ifdef _NEED_FLOAT64
-static ALWAYS_INLINE int
+static __always_inline int
 _sign64(int64_t ix)
 {
     return ((uint64_t) ix) >> 63;
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 _exponent64(int64_t ix)
 {
     return (ix >> 52) & 0x7ff;
 }
 
-static ALWAYS_INLINE int64_t
+static __always_inline int64_t
 _significand64(int64_t ix)
 {
     return ix & 0xfffffffffffffLL;
 }
 
-static ALWAYS_INLINE uint64_t
+static __always_inline uint64_t
 asuint64 (__float64 f)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
@@ -241,7 +229,7 @@ asuint64 (__float64 f)
 #endif
 }
 
-static ALWAYS_INLINE __float64
+static __always_inline __float64
 asfloat64 (uint64_t i)
 {
 #if defined(__riscv_flen) && __riscv_flen >= 64 && __riscv_xlen >= 64
@@ -258,19 +246,19 @@ asfloat64 (uint64_t i)
 #endif
 }
 
-static ALWAYS_INLINE int64_t
+static __always_inline int64_t
 _asint64(__float64 f)
 {
     return (int64_t) asuint64(f);
 }
 
-static ALWAYS_INLINE __float64
+static __always_inline __float64
 _asfloat64(int64_t i)
 {
     return asfloat64((uint64_t) i);
 }
 
-static ALWAYS_INLINE int
+static __always_inline int
 issignaling64_inline (__float64 x)
 {
   uint64_t ix = asuint64 (x);
@@ -325,28 +313,28 @@ issignaling64_inline (__float64 x)
 #define pick_long_double_except(expr,val)       (expr)
 #endif
 
-static ALWAYS_INLINE float
+static __always_inline float
 opt_barrier_float (float x)
 {
   FORCE_FLOAT y = x;
   return y;
 }
 
-static ALWAYS_INLINE double
+static __always_inline double
 opt_barrier_double (double x)
 {
   FORCE_DOUBLE y = x;
   return y;
 }
 
-static ALWAYS_INLINE void
+static __always_inline void
 force_eval_float (float x)
 {
   FORCE_FLOAT y = x;
   (void) y;
 }
 
-static ALWAYS_INLINE void
+static __always_inline void
 force_eval_double (double x)
 {
   FORCE_DOUBLE y = x;
@@ -354,14 +342,14 @@ force_eval_double (double x)
 }
 
 #ifdef _HAVE_LONG_DOUBLE
-static ALWAYS_INLINE long double
+static __always_inline long double
 opt_barrier_long_double (long double x)
 {
   FORCE_LONG_DOUBLE y = x;
   return y;
 }
 
-static ALWAYS_INLINE void
+static __always_inline void
 force_eval_long_double (long double x)
 {
     FORCE_LONG_DOUBLE y = x;
@@ -875,12 +863,12 @@ force_eval_long_double (long double x)
    cast should be enough, but compilers implement non-standard
    excess-precision handling, so when FLT_EVAL_METHOD != 0 then
    these functions may need to be customized.  */
-static ALWAYS_INLINE float
+static __always_inline float
 eval_as_float (float x)
 {
   return x;
 }
-static ALWAYS_INLINE double
+static __always_inline double
 eval_as_double (double x)
 {
   return x;

@@ -900,21 +900,19 @@
   as the Gnu C 'extern inline'.  */
 #if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
 /* We're using GCC, but without the new C99-compatible behaviour.  */
-#define _ELIDABLE_INLINE extern __inline__ _ATTRIBUTE ((__always_inline__))
+#define __elidable_inline extern __always_inline
 #else
 /* We're using GCC in C99 mode, or an unknown compiler which
   we just have to hope obeys the C99 semantics of inline.  */
-#define _ELIDABLE_INLINE static __inline__
+#define __elidable_inline static __inline__
 #endif
 
 #if __GNUC_PREREQ (3, 1)
-#define _NOINLINE		__attribute__ ((__noinline__))
-#define _NOINLINE_STATIC	_NOINLINE static
+#define __noinline_static	__noinline static
 #else
 /* On non-GNU compilers and GCC prior to version 3.1 the compiler can't be
    trusted not to inline if it is static. */
-#define _NOINLINE
-#define _NOINLINE_STATIC
+#define __noinline_static
 #endif
 
 #endif /* !_SYS_CDEFS_H_ */

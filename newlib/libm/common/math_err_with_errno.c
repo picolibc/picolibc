@@ -32,9 +32,9 @@
 
 #if WANT_ERRNO
 #include <errno.h>
-/* NOINLINE reduces code size and avoids making math functions non-leaf
+/* __noinline reduces code size and avoids making math functions non-leaf
    when the error handling is inlined.  */
-NOINLINE HIDDEN __float64
+__noinline HIDDEN __float64
 __math_with_errno (__float64 y, int e)
 {
   errno = e;

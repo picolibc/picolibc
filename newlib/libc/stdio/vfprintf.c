@@ -195,7 +195,7 @@ static char *rcsid = "$Id$";
  *
  * Make sure to avoid inlining.
  */
-_NOINLINE_STATIC int
+__noinline_static int
 __sbprintf (
        register FILE *fp,
        const char *fmt,

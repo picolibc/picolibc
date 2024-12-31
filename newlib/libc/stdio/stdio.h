@@ -675,9 +675,9 @@ FILE *fopencookie ( void *__cookie,
   compilers we're just stuck.  At the moment, this issue only
   affects the Cygwin target, so we'll most likely be using GCC. */
 
-_ELIDABLE_INLINE int _sgetc( FILE *__p);
+__elidable_inline int _sgetc( FILE *__p);
 
-_ELIDABLE_INLINE int _sgetc( FILE *__p)
+__elidable_inline int _sgetc( FILE *__p)
   {
     int __c = _sgetc_raw( __p);
     if ((__p->_flags & __SCLE) && (__c == '\r'))
@@ -695,7 +695,7 @@ _ELIDABLE_INLINE int _sgetc( FILE *__p)
 #endif
 
 #ifdef __GNUC__
-_ELIDABLE_INLINE int _sputc( int _c, FILE *_p) {
+__elidable_inline int _sputc( int _c, FILE *_p) {
 #ifdef __SCLE
 	if ((_p->_flags & __SCLE) && _c == '\n')
 	  _sputc ( '\r', _p);
