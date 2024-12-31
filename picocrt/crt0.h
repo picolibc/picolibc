@@ -88,7 +88,7 @@ extern void __libc_init_array(void);
 #define CONSTRUCTORS 1
 #endif
 
-static inline void
+static _Noreturn __always_inline void
 __start(void)
 {
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);

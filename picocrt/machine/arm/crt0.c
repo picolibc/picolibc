@@ -217,7 +217,7 @@ _set_stacks(void)
  * and then branches here.
  */
 
-static void __attribute__((used)) __section(".init")
+static _Noreturn __attribute__((used)) __section(".init") void
 _cstart(void)
 {
 #if __ARM_ARCH_ISA_THUMB == 1
