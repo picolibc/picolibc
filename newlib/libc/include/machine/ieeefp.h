@@ -333,7 +333,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 
 #ifdef __mips__
+#ifndef __mips_nan2008
 #define _IEEE_754_2008_SNAN 0
+#endif
 #ifndef __mips_soft_float
 #define _SUPPORTS_ERREXCEPT
 #endif
