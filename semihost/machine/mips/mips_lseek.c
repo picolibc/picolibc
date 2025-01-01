@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
+#include "mips_semihost.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -41,30 +41,10 @@
 #include <string.h>
 #include <errno.h>
 
-_off64_t lseek64(int fd, _off64_t offset, int whence)
+off_t
+lseek(int fd, off_t offset, int whence)
 {
-	return (_off64_t) lseek(fd, (off_t) offset, whence);
-}
-
-int
-stat(const char *pathname, struct stat *restrict statbuf)
-{
-    int fd, ret;
-
-    fd = open(pathname, O_RDONLY);
-
-    if (fd < 0)
-    	return fd;
-
-    ret = fstat(fd, statbuf);
-    close(fd);
+    off_t ret = mips_semihost3(SYS_SEMIHOST_lseek, fd, offset, whence);
 
     return ret;
-}
-
-int
-isatty (int fd)
-{
-        (void) fd;
-	return 1;
 }

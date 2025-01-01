@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 # Copyright © 2021 Keith Packard
+# Copyright © 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,12 +33,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 lib_semihost_srcs = [
-  'mips_stub.c',
+  'mips_close.c',
   'mips_exit.c',
-  'mips_iob.c',
-  ]
+  'mips_fstat.c',
+  'mips_lseek.c',
+  'mips_open.c',
+  'mips_read.c',
+  'mips_stub.c',
+  'mips_unlink.c',
+  'mips_write.c',
+]
 
 has_semihost = true
 
@@ -62,4 +68,3 @@ foreach params : targets
   set_variable('lib_semihost' + target, local_lib_semihost_target)
 
 endforeach
-

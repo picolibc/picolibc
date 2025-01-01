@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2023 Keith Packard
+ * Copyright © 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,17 +33,27 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _MIPS_SEMIHOST_H_
-#define _MIPS_SEMIHOST_H_
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdint.h>
-#include <unistd.h>
-#include <fcntl.h>
+#include "mips_semihost.h"
+#include <sys/types.h>
 #include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
-int
-mips_putc(char c, FILE *file);
+ssize_t
+read(int fd, void *buf, size_t count)
+{
+    ssize_t ret;
 
-#endif /* _MIPS_SEMIHOST_H_ */
+    /*
+     * Console input is non-blocking, returning -1 (without setting
+     * errno) when nothing is available. Spin waiting for input to
+     * appear.
+     */
+    do {
+        ret = mips_semihost3(SYS_SEMIHOST_read, fd, (uintptr_t) buf, count);
+    } while (ret == 0 && fd == 0);
+
+    return ret;
+}

@@ -33,38 +33,28 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
+#ifdef __GNUC__
+#pragma GCC diagnostic ignored "-Wpragmas"
+/* False positive for mips_stat */
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#endif
+
+#include "mips_semihost.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-
-_off64_t lseek64(int fd, _off64_t offset, int whence)
-{
-	return (_off64_t) lseek(fd, (off_t) offset, whence);
-}
+#include <stdarg.h>
 
 int
-stat(const char *pathname, struct stat *restrict statbuf)
+fstat(int fd, struct stat *restrict statbuf)
 {
-    int fd, ret;
+    struct mips_stat mips_stat;
+    int ret;
 
-    fd = open(pathname, O_RDONLY);
-
-    if (fd < 0)
-    	return fd;
-
-    ret = fstat(fd, statbuf);
-    close(fd);
+    ret = mips_semihost2(SYS_SEMIHOST_fstat, fd, (uintptr_t)&mips_stat);
+    if (ret >= 0)
+        copy_stat(statbuf, &mips_stat);
 
     return ret;
-}
-
-int
-isatty (int fd)
-{
-        (void) fd;
-	return 1;
 }

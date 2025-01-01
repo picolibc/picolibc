@@ -33,38 +33,45 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
+#include "mips_semihost.h"
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
+#include <stdarg.h>
 
-_off64_t lseek64(int fd, _off64_t offset, int whence)
-{
-	return (_off64_t) lseek(fd, (off_t) offset, whence);
+static int mips_flags(int flags) {
+    int mips = 0;
+
+    if (flags & O_WRONLY)
+        mips |= MIPS_O_WRONLY;
+    if (flags & O_RDWR)
+        mips |= MIPS_O_RDWR;
+    if (flags & O_APPEND)
+        mips |= MIPS_O_APPEND;
+    if (flags & O_CREAT)
+        mips |= MIPS_O_CREAT;
+    if (flags & O_TRUNC)
+        mips |= MIPS_O_TRUNC;
+    if (flags & O_EXCL)
+        mips |= MIPS_O_EXCL;
+
+    return mips;
 }
 
 int
-stat(const char *pathname, struct stat *restrict statbuf)
+open(const char *pathname, int flags, ...)
 {
-    int fd, ret;
+    va_list ap;
+    int ret;
 
-    fd = open(pathname, O_RDONLY);
-
-    if (fd < 0)
-    	return fd;
-
-    ret = fstat(fd, statbuf);
-    close(fd);
+    va_start(ap,flags);
+    uintptr_t mode = va_arg(ap, uintptr_t);
+    va_end(ap);
+    ret = mips_semihost3(SYS_SEMIHOST_open, (uintptr_t)pathname,
+                         mips_flags(flags), mode);
 
     return ret;
-}
-
-int
-isatty (int fd)
-{
-        (void) fd;
-	return 1;
 }
