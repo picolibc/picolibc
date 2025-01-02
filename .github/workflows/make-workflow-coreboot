@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cat head-coreboot
+
+for build in minsize release; do
+    for arch in coreboot; do
+	echo "  $build-$arch:"
+	cat variants
+	cat targets-$arch
+	cat steps-head
+	cat steps-$build
+    done
+done

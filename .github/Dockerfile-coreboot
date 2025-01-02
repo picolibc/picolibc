@@ -1,0 +1,29 @@
+# syntax=docker/dockerfile:1
+FROM coreboot/coreboot-sdk
+
+COPY .github/coreboot-packages.txt /
+
+COPY .github/coreboot-files.txt /
+
+USER root
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends ca-certificates wget gnupg && \
+    (apt-get update || apt-get update || apt-get update) && \
+    (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
+    (xargs -a coreboot-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a coreboot-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a coreboot-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a coreboot-packages.txt apt-get install -y --no-install-recommends) && \
+    mkdir -p /opt && \
+    (cd /opt && \
+     for file in `cat /coreboot-files.txt`; do \
+	echo "Fetching $file"; \
+	wget "$file" || exit 1; \
+	echo "Unpacking $file"; \
+	tar xf `basename "$file"`; \
+	echo "Removing $file"; \
+	rm `basename "$file"`; \
+     done) && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+

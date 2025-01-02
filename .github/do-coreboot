@@ -1,0 +1,7 @@
+#!/bin/sh    
+set -e
+HERE=`dirname "$0"`
+"$HERE"/do-test coreboot-arm "$@"
+"$HERE"/do-test coreboot-i386 "$@"
+"$HERE"/do-test coreboot-riscv "$@"
+"$HERE"/do-test coreboot-x86_64 "$@"
