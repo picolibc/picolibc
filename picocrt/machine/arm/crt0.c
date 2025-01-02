@@ -188,28 +188,43 @@ extern char __stack[];
 #define I_BIT           (1 << 7)
 #define F_BIT           (1 << 6)
 
-#define SET_MODE(mode)                                                  \
+#define SHADOW_STACK_SIZE 0x10
+#define STACK_IRQ (__stack - SHADOW_STACK_SIZE * 0)
+#define STACK_ABT (__stack - SHADOW_STACK_SIZE * 1)
+#define STACK_UND (__stack - SHADOW_STACK_SIZE * 2)
+#define STACK_FIQ (__stack - SHADOW_STACK_SIZE * 3)
+#define STACK_SYS (__stack - SHADOW_STACK_SIZE * 4)
+#define STACK_SVC (__stack - SHADOW_STACK_SIZE * 5)
+
+#define SET_MODE(mode)                                                          \
     __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "I" (mode | I_BIT | F_BIT) : "r0"); \
 
-#define SET_SP(mode)                                \
-    SET_MODE(mode);                                 \
-    __asm__("mov sp, %0" : : "r" (__stack))
+#define SET_SP(mode, address)                   \
+    SET_MODE(mode);                             \
+    __asm__("mov sp, %0" : : "r" (address))
 
 #define SET_SPS()                               \
-        SET_SP(MODE_IRQ);                       \
-        SET_SP(MODE_ABT);                       \
-        SET_SP(MODE_UND);                       \
-        SET_SP(MODE_FIQ);                       \
-        SET_SP(MODE_SYS);                       \
+        SET_SP(MODE_IRQ, STACK_IRQ);            \
+        SET_SP(MODE_ABT, STACK_ABT);            \
+        SET_SP(MODE_UND, STACK_UND);            \
+        SET_SP(MODE_FIQ, STACK_FIQ);            \
+        SET_SP(MODE_SYS, STACK_SYS);            \
         SET_MODE(MODE_SVC);
 
 #if __ARM_ARCH_ISA_THUMB == 1
 static __noinline __attribute__((target("arm"))) void
 _set_stacks(void)
 {
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif /* __GNUC__ */
         SET_SPS();
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
 }
-#endif
+#endif /*__ARM_ARCH_ISA_THUMB == 1 */
 
 /*
  * Regular ARM has an 8-entry exception vector and starts without SP
@@ -306,11 +321,21 @@ _start(void)
 	/* Generate a reference to __vector_table so we get one loaded */
 	__asm__(".equ __my_vector_table, __vector_table");
 
-        __asm__("mov sp, %0" : : "r" (__stack));
+#ifdef __GNUC__
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif /* __GNUC__ */
+        __asm__("mov sp, %0" : : "r" (STACK_SVC));
+
 #if __ARM_ARCH_ISA_THUMB != 1
         SET_SPS();
-#endif
-	/* Branch to C code */
+#endif /* __ARM_ARCH_ISA_THUMB != 1 */
+
+#ifdef __GNUC__
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
+
+        /* Branch to C code */
 	__asm__("b _cstart");
 }
 
