@@ -1,4 +1,4 @@
-FROM debian:testing
+FROM debian:sid
 
 COPY .github/linux-packages.txt /
 
