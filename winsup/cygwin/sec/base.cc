@@ -604,8 +604,14 @@ check_access (security_descriptor &sd, GENERIC_MAPPING &mapping,
 int
 check_file_access (path_conv &pc, int flags, bool effective)
 {
-  int ret = -1;
   ACCESS_MASK desired = 0;
+  OBJECT_ATTRIBUTES attr;
+  IO_STATUS_BLOCK io;
+  NTSTATUS status;
+  HANDLE h = NULL;
+  ULONG opts = 0;
+  int ret = -1;
+
   if (flags & R_OK)
     desired |= FILE_READ_DATA;
   if (flags & W_OK)
@@ -613,16 +619,23 @@ check_file_access (path_conv &pc, int flags, bool effective)
   if (flags & X_OK)
     desired |= FILE_EXECUTE;
 
+  /* For R_OK and W_OK we check with FILE_OPEN_FOR_BACKUP_INTENT since
+     we want to enable the full power of backup/restore privileges.
+     For X_OK, drop the FILE_OPEN_FOR_BACKUP_INTENT flag.  If the caller
+     holds SE_BACKUP_PRIVILEGE, FILE_OPEN_FOR_BACKUP_INTENT opens the file,
+     no matter what access is requested.
+     For directories, FILE_OPEN_FOR_BACKUP_INTENT flag is always required. */
+  if (!(flags & X_OK) || pc.isdir ())
+    opts = FILE_OPEN_FOR_BACKUP_INTENT;
+  else /* For a regular file to be executable, it must also be readable. */
+    desired |= FILE_READ_DATA;
+
   if (!effective)
     cygheap->user.deimpersonate ();
 
-  OBJECT_ATTRIBUTES attr;
   pc.init_reopen_attr (attr, pc.handle ());
-  NTSTATUS status;
-  IO_STATUS_BLOCK io;
-  HANDLE h;
-  status = NtOpenFile (&h, desired, &attr, &io, FILE_SHARE_VALID_FLAGS,
-		       FILE_OPEN_FOR_BACKUP_INTENT);
+
+  status = NtOpenFile (&h, desired, &attr, &io, FILE_SHARE_VALID_FLAGS, opts);
   if (NT_SUCCESS (status))
     {
       NtClose (h);
