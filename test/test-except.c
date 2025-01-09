@@ -47,7 +47,7 @@ main(void)
 #ifdef __arm__
 
 #ifdef __thumb__
-    __asm__(".hword 0xde00");
+    __asm__(".inst.n 0xde00");
 #else
     __asm__(".word 0xe7f000f0");
 #endif
