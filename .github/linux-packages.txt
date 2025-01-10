@@ -19,6 +19,7 @@ gcc-mips64-linux-gnuabi64
 libc6-dev-mips64-cross
 gcc-mipsel-linux-gnu
 libc6-dev-mipsel-cross
+gcc-or1k-elf
 gcc-powerpc64-linux-gnu
 libc6-dev-ppc64-cross
 gcc-powerpc64le-linux-gnu
