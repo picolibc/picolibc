@@ -28,8 +28,8 @@ details. */
    to mapping length (POSIX semantics). */
 #define __PROT_ATTACH   0x8000000
 
-/* Stick with 4K pages for bookkeeping. */
-#define PAGE_CNT(bytes) howmany((bytes), wincap.page_size())
+/* Use 64K pages throughout. */
+#define PAGE_CNT(bytes) howmany((bytes), wincap.allocation_granularity())
 
 #define PGBITS		(sizeof (DWORD)*8)
 #define MAPSIZE(pages)	howmany ((pages), PGBITS)
@@ -407,18 +407,33 @@ mmap_record::find_unused_pages (SIZE_T pages) const
   return (SIZE_T) -1;
 }
 
-/* Return true if the interval I from addr to addr + len intersects
-   the interval J of this mmap_record.  The endpoint of the latter is
-   first rounded up to a page boundary.  If there is an intersection,
-   then it is the interval from m_addr to m_addr + m_len.  The
-   variable 'contains' is set to true if J contains I.
+/* Return true if the interval I from addr to addr+len intersects the
+   interval J of this mmap_record.  The endpoint of the latter is
+   first rounded up to a 4K Windows page boundary.  If there is an
+   intersection, then it is the interval from m_addr to m_addr+m_len.
+   The variable 'contains' is set to true if J contains I.
+
+   The use of a 4K Windows page boundary above is only relevant for
+   file mappings; anonymous mappings are already forced by mmap to
+   have length a multiple of the 64K Windows allocation granularity,
+   so the rounding has no effect.  The reason for using a Windows page
+   boundary for file mappings is that Windows files are length-aligned
+   to 4K pages, not to the 64K allocation granularity.  If we were to
+   align the record length to 64K, then callers of this function might
+   try to access the unallocated memory from the EOF page to the last
+   page in the 64K area.  See
+
+     https://cygwin.com/pipermail/cygwin-patches/2025q1/013240.html
+
+   for an example in which mprotect and mmap_record::unmap_pages both
+   fail when we align the record length to 64K.
 */
 bool
 mmap_record::match (caddr_t addr, SIZE_T len, caddr_t &m_addr, SIZE_T &m_len,
 		    bool &contains)
 {
   contains = false;
-  SIZE_T rec_len = PAGE_CNT (get_len ()) * wincap.page_size ();
+  SIZE_T rec_len = roundup2 (get_len (), wincap.page_size());
   caddr_t low = MAX (addr, get_address ());
   caddr_t high = MIN (addr + len, get_address () + rec_len);
   if (low < high)
@@ -470,8 +485,9 @@ mmap_record::map_pages (SIZE_T len, int new_prot, off_t off)
   len = PAGE_CNT (len);
 
   if (!noreserve ()
-      && !VirtualProtect (get_address () + off * wincap.page_size (),
-			  len * wincap.page_size (),
+      && !VirtualProtect (get_address ()
+			  + off * wincap.allocation_granularity (),
+			  len * wincap.allocation_granularity (),
 			  ::gen_protect (new_prot, get_flags ()),
 			  &old_prot))
     {
@@ -491,7 +507,7 @@ mmap_record::map_pages (caddr_t addr, SIZE_T len, int new_prot)
 		new_prot);
   DWORD old_prot;
   off_t off = addr - get_address ();
-  off /= wincap.page_size ();
+  off /= wincap.allocation_granularity ();
   len = PAGE_CNT (len);
   /* VirtualProtect can only be called on committed pages, so it's not
      clear how to change protection in the noreserve case.  In this
@@ -507,8 +523,9 @@ mmap_record::map_pages (caddr_t addr, SIZE_T len, int new_prot)
 	    return false;
 	  }
     }
-  else if (!VirtualProtect (get_address () + off * wincap.page_size (),
-			    len * wincap.page_size (),
+  else if (!VirtualProtect (get_address ()
+			    + off * wincap.allocation_granularity (),
+			    len * wincap.allocation_granularity (),
 			    ::gen_protect (new_prot, get_flags ()),
 			    &old_prot))
     {
@@ -532,7 +549,7 @@ mmap_record::unmap_pages (caddr_t addr, SIZE_T len)
 			    &old_prot))
     debug_printf ("VirtualProtect in unmap_pages () failed, %E");
 
-  off /= wincap.page_size ();
+  off /= wincap.allocation_granularity ();
   len = PAGE_CNT (len);
   for (; len-- > 0; ++off)
     MAP_CLR (off);
@@ -549,7 +566,7 @@ mmap_record::access (caddr_t address)
 {
   if (address < get_address () || address >= get_address () + get_len ())
     return 0;
-  SIZE_T off = (address - get_address ()) / wincap.page_size ();
+  SIZE_T off = (address - get_address ()) / wincap.allocation_granularity ();
   return MAP_ISSET (off);
 }
 
@@ -642,7 +659,8 @@ mmap_list::try_map (void *addr, size_t len, int new_prot, int flags, off_t off)
 	{
 	  if (!rec->map_pages (len, new_prot, off))
 	    return (caddr_t) MAP_FAILED;
-	  return (caddr_t) rec->get_address () + off * wincap.page_size ();
+	  return (caddr_t) rec->get_address ()
+	    + off * wincap.allocation_granularity ();
 	}
     }
   else if (fixed (flags))
@@ -879,8 +897,8 @@ mmap (void *addr, size_t len, int prot, int flags, int fd, off_t off)
       /* The autoconf mmap test maps a file of size 1 byte.  It then tests
 	 every byte of the entire mapped page of 64K for 0-bytes since that's
 	 what POSIX requires.  The problem is, we can't create that mapping.
-	 The file mapping will be only a single page, 4K, and the remainder
-	 of the 64K slot will result in a SEGV when accessed.
+	 The file mapping will be only a single Windows page, 4K, and the
+	 remainder of the 64K slot will result in a SEGV when accessed.
 
 	 So, what we do here is cheating for the sake of the autoconf test.
 	 The justification is that there's very likely no application actually
