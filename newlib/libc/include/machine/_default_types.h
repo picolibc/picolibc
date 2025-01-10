@@ -33,101 +33,213 @@
 #define __have_long32 1
 #endif
 
+/* Determine the width of integers if the compiler doesn't provide __X_WIDTH__ macros. */
+
+#if !defined(__SCHAR_WIDTH__)
+#if __EXP(SCHAR_MAX) == 0x7f
+#define __SCHAR_WIDTH__ 8
+#elif __EXP(SCHAR_MAX) == 0x7fff
+#define __SCHAR_WIDTH__ 16
+#elif __EXP(SCHAR_MAX) == 0x7fffffffL
+#define __SCHAR_WIDTH__ 32
+#endif
+#endif
+
+#if !defined(__SHRT_WIDTH__)
+#if __EXP(SHRT_MAX) == 0x7fff
+#define __SHRT_WIDTH__ 16
+#elif __EXP(SHRT_MAX) == 0x7fffffffL
+#define __SHRT_WIDTH__ 32
+#endif
+#endif
+
+#if !defined(__INT_WIDTH__)
+#if __EXP(INT_MAX) == 0x7fff
+#define __INT_WIDTH__ 16
+#elif __EXP(INT_MAX) == 0x7fffffffL
+#define __INT_WIDTH__ 32
+#elif __EXP(INT_MAX) > 0x7fffffffL
+#define __INT_WIDTH__ 64
+#endif
+#endif
+
+#if !defined(__LONG_WIDTH__)
+#if __have_long32
+#define __LONG_WIDTH__ 32
+#elif __have_long64
+#define __LONG_WIDTH__ 64
+#endif
+#endif
+
+#if !defined(__LONG_LONG_WIDTH__)
+#if __have_longlong64
+#define __LONG_LONG_WIDTH__ 64
+#endif
+#endif
+
+/* Determine the size of types if the compiler doesn't provide __SIZEOF_X__ macros. */
+
+#if !defined(__SIZEOF_SHORT__)
+#if __SHRT_WIDTH__ == 16
+#define __SIZEOF_SHORT__ 2
+#elif __SHRT_WIDTH__ == 32
+#define __SIZEOF_SHORT__ 4
+#endif
+#endif
+
+#if !defined(__SIZEOF_INT__)
+#if __INT_WIDTH__ == 16
+#define __SIZEOF_INT__ 2
+#elif __INT_WIDTH__ == 32
+#define __SIZEOF_INT__ 4
+#elif __INT_WIDTH__ == 64
+#define __SIZEOF_INT__ 8
+#endif
+#endif
+
+#ifndef __SIZEOF_LONG__
+#if __LONG_WIDTH__ == 32
+#define __SIZEOF_LONG__ 4
+#elif __LONG_WIDTH__ == 64
+#define __SIZEOF_LONG__ 8
+#endif
+#endif
+
+#if (!defined(__SIZEOF_LONG_LONG__) && __LONG_LONG_WIDTH__ == 64)
+#define __SIZEOF_LONG_LONG__ 8
+#endif
+
+#if (!defined(__SIZEOF_FLOAT__) && defined(__FLT_MANT_DIG__))
+#if __FLT_MANT_DIG__ == 24
+#define __SIZEOF_FLOAT__ 4
+#else
+#error "unexpected __FLT_MANT_DIG__ value"
+#endif
+#endif
+
+#if (!defined(__SIZEOF_DOUBLE__) && defined(__DBL_MANT_DIG__))
+#if __DBL_MANT_DIG__ == 53
+#define __SIZEOF_DOUBLE__ 8
+#else
+#error "unexpected __DBL_MANT_DIG__ value"
+#endif
+#endif
+
+#if (!defined(__SIZEOF_LONG_DOUBLE__) && defined(__LDBL_MANT_DIG__))
+#if __LDBL_MANT_DIG__ == 53
+#define __SIZEOF_LONG_DOUBLE__ 8
+#elif __LDBL_MANT_DIG__ == 64 || __LDBL_MANT_DIG__ == 113
+#define __SIZEOF_LONG_DOUBLE__ 16
+#else
+#error "unexpected __LDBL_MANT_DIG__ values"
+#endif
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/* Select type of fixed width integers if the compiler doesn't specify them. */
+
+#if !defined(__INT8_TYPE__) && __SCHAR_WIDTH__ == 8
+#define __INT8_TYPE__ signed char
+#endif
+
+#if !defined(__UINT8_TYPE__) && __SCHAR_WIDTH__ == 8
+#define __UINT8_TYPE__ unsigned char
+#endif
+
+#if !defined(__INT16_TYPE__)
+#if __INT_WIDTH__ == 16
+#define __INT16_TYPE__ int
+#elif __SHRT_WIDTH__ == 16
+#define __INT16_TYPE__ short
+#elif __SCHAR_WIDTH__ == 16
+#define __INT16_TYPE__ signed char
+#if !defined(__UINT16_TYPE__)
+#define __UINT16_TYPE__ unsigned char
+#endif
+#endif
+#endif
+
+#if !defined(__UINT16_TYPE__) && defined(__INT16_TYPE__)
+#define __UINT16_TYPE__ unsigned __INT16_TYPE__
+#endif
+
+#if !defined(__INT32_TYPE__)
+#if __INT_WIDTH__ == 32
+#define __INT32_TYPE__ int
+#elif __LONG_WIDTH__ == 32
+#define __INT32_TYPE__ long
+#elif __SHRT_WIDTH__ == 32
+#define __INT32_TYPE__ short
+#elif __SCHAR_WIDTH__ == 32
+#define __INT32_TYPE__ signed char
+#if !defined(__UINT32_TYPE__)
+#define __UINT32_TYPE__ unsigned char
+#endif
+#endif
+#endif
+
+#if !defined(__UINT32_TYPE__) && defined(__INT32_TYPE__)
+#define __UINT32_TYPE__ unsigned __INT32_TYPE__
+#endif
+
+#if !defined(__INT64_TYPE__)
+#if __LONG_WIDTH__ == 64
+#define __INT64_TYPE__ long
+#elif __LONG_LONG_WIDTH__ == 64
+#define __INT64_TYPE__ long long
+#endif
+#endif
+
+#if !defined(__UINT64_TYPE__) && defined(__INT64_TYPE__)
+#define __UINT64_TYPE__ unsigned __INT64_TYPE__
+#endif
+
+#if defined(__GNUC__) && !__GNUC_PREREQ (4, 5)
+#ifndef __INTPTR_TYPE__
+#define __INTPTR_TYPE__ long int
+#endif
+#ifndef __UINTPTR_TYPE__
+#define __UINTPTR_TYPE__ long unsigned int
+#endif
+#endif
+
 #ifdef __INT8_TYPE__
 typedef __INT8_TYPE__ __int8_t;
+#define ___int8_t_defined 1
+#endif
+
 #ifdef __UINT8_TYPE__
 typedef __UINT8_TYPE__ __uint8_t;
-#else
-typedef unsigned __INT8_TYPE__ __uint8_t;
-#endif
-#define ___int8_t_defined 1
-#elif __EXP(SCHAR_MAX) == 0x7f
-typedef signed char __int8_t ;
-typedef unsigned char __uint8_t ;
-#define ___int8_t_defined 1
 #endif
 
 #ifdef __INT16_TYPE__
 typedef __INT16_TYPE__ __int16_t;
+#define ___int16_t_defined 1
+#endif
+
 #ifdef __UINT16_TYPE__
 typedef __UINT16_TYPE__ __uint16_t;
-#else
-typedef unsigned __INT16_TYPE__ __uint16_t;
-#endif
-#define ___int16_t_defined 1
-#elif __EXP(INT_MAX) == 0x7fff
-typedef signed int __int16_t;
-typedef unsigned int __uint16_t;
-#define ___int16_t_defined 1
-#elif __EXP(SHRT_MAX) == 0x7fff
-typedef signed short __int16_t;
-typedef unsigned short __uint16_t;
-#define ___int16_t_defined 1
-#elif __EXP(SCHAR_MAX) == 0x7fff
-typedef signed char __int16_t;
-typedef unsigned char __uint16_t;
-#define ___int16_t_defined 1
 #endif
 
 #ifdef __INT32_TYPE__
 typedef __INT32_TYPE__ __int32_t;
+#define ___int32_t_defined 1
+#endif
+
 #ifdef __UINT32_TYPE__
 typedef __UINT32_TYPE__ __uint32_t;
-#else
-typedef unsigned __INT32_TYPE__ __uint32_t;
-#endif
-#define ___int32_t_defined 1
-#elif __EXP(INT_MAX) == 0x7fffffffL
-typedef signed int __int32_t;
-typedef unsigned int __uint32_t;
-#define ___int32_t_defined 1
-#elif __EXP(LONG_MAX) == 0x7fffffffL
-typedef signed long __int32_t;
-typedef unsigned long __uint32_t;
-#define ___int32_t_defined 1
-#elif __EXP(SHRT_MAX) == 0x7fffffffL
-typedef signed short __int32_t;
-typedef unsigned short __uint32_t;
-#define ___int32_t_defined 1
-#elif __EXP(SCHAR_MAX) == 0x7fffffffL
-typedef signed char __int32_t;
-typedef unsigned char __uint32_t;
-#define ___int32_t_defined 1
 #endif
 
 #ifdef __INT64_TYPE__
 typedef __INT64_TYPE__ __int64_t;
+#define ___int64_t_defined 1
+#endif
+
 #ifdef __UINT64_TYPE__
 typedef __UINT64_TYPE__ __uint64_t;
-#else
-typedef unsigned __INT64_TYPE__ __uint64_t;
-#endif
-#define ___int64_t_defined 1
-#elif __EXP(LONG_MAX) > 0x7fffffff
-typedef signed long __int64_t;
-typedef unsigned long __uint64_t;
-#define ___int64_t_defined 1
-
-/* GCC has __LONG_LONG_MAX__ */
-#elif  defined(__LONG_LONG_MAX__) && (__LONG_LONG_MAX__ > 0x7fffffff)
-typedef signed long long __int64_t;
-typedef unsigned long long __uint64_t;
-#define ___int64_t_defined 1
-
-/* POSIX mandates LLONG_MAX in <limits.h> */
-#elif  defined(LLONG_MAX) && (LLONG_MAX > 0x7fffffff)
-typedef signed long long __int64_t;
-typedef unsigned long long __uint64_t;
-#define ___int64_t_defined 1
-
-#elif  __EXP(INT_MAX) > 0x7fffffff
-typedef signed int __int64_t;
-typedef unsigned int __uint64_t;
-#define ___int64_t_defined 1
 #endif
 
 #ifdef __INT_LEAST8_TYPE__
