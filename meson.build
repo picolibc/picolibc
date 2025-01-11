@@ -302,6 +302,7 @@ has_link_defsym = meson.get_cross_property('has_link_defsym',
                                            cc.has_link_argument('-Wl,--defsym=' + '___start=0') )
 has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias'))
 lib_gcc = meson.get_cross_property('libgcc', '-lgcc')
+stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
 
 # tinystdio options
 posix_console = tinystdio and get_option('posix-console')
@@ -1239,6 +1240,7 @@ foreach params : [default_target] + targets
       meson.get_cross_property('default_alignment_' + custom_mem_config,
                                meson.get_cross_property('default_alignment',
                                                         '8')))
+    picolibc_linker_type_data.set('STACK', stack_symbol)
 
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)

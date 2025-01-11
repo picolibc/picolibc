@@ -65,6 +65,11 @@ if not machine_found
   error(test_machine + ': requested test machine not found')
 endif
 
+stack_c_args = []
+if stack_symbol != '__stack'
+  stack_c_args += ['-D__stack=' + stack_symbol]
+endif
+
 # crt0 variants
 picocrt_variants = [
   {
@@ -106,7 +111,7 @@ endif
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
-  target_c_args = params['c_args']
+  target_c_args = params['c_args'] + stack_c_args
   target_lib_prefix = params['lib_prefix']
 
   instdir = join_paths(lib_dir, target_dir)
