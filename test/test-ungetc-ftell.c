@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME "UNGETCFTELL.DAT"
@@ -54,7 +55,10 @@ int main(void) {
     fclose(file);
 
     file = fopen( TEST_FILE_NAME, "rb" );
-    if(file == NULL) return 1;
+    if(file == NULL) {
+        unlink(TEST_FILE_NAME);
+        return 1;
+    }
 
     first = fgetc(file);
     printf("First character read: %c\n", first);
@@ -71,9 +75,11 @@ int main(void) {
 
     if (position == 0) {
         printf("Test passed: ungetc and ftell working as expected.\n");
+        unlink(TEST_FILE_NAME);
         return 0;
     } else {
         printf("Test failed: Incorrect position after ungetc.\n");
+        unlink(TEST_FILE_NAME);
         return 1;
     }
 }
