@@ -130,7 +130,7 @@ struct __file_ext {
 */
 #ifndef ___FILE_DECLARED
 typedef struct __file __FILE;
-# define __FILE_DECLARED
+# define ___FILE_DECLARED
 #endif
 
 #ifndef _FILE_DECLARED
