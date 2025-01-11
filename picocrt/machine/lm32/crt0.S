@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,10 +33,20 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "../../crt0.h"
+	// Defined in crt0.c
+	.global _cstart
+	.type cstart, %function
 
-void __section(".init")
-_cstart(void)
-{
-	__start();
-}
+	// _start: Main entry point function, sets up the hardware to the point where
+	// we can execute C code. 
+	.section .text.init.enter, "ax", %progbits
+	.global _start
+	.type _start, %function
+_start:
+	# Initialize r0
+	xor	r0, r0, r0
+	mvhi	sp, hi(__stack-8)
+	ori 	sp, sp, lo(__stack-8)
+
+	/* Branch to C code */
+        bi	_cstart
