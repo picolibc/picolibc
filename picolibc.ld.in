@@ -60,7 +60,7 @@ PHDRS
 
 SECTIONS
 {
-	PROVIDE(@PREFIX@__stack = ORIGIN(ram) + LENGTH(ram));
+	PROVIDE(@PREFIX@@STACK@ = ORIGIN(ram) + LENGTH(ram));
 @INIT_SECTIONS@
 	.text : {
 
@@ -260,7 +260,7 @@ SECTIONS
 
 	/* Make the rest of memory available for heap storage */
 	PROVIDE (@PREFIX@__heap_start = @PREFIX@__end);
-	PROVIDE (@PREFIX@__heap_end = @PREFIX@__stack - (DEFINED(@PREFIX@__stack_size) ? @PREFIX@__stack_size : @DEFAULT_STACK_SIZE@));
+	PROVIDE (@PREFIX@__heap_end = @PREFIX@@STACK@ - (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@));
 	PROVIDE (@PREFIX@__heap_size = @PREFIX@__heap_end - @PREFIX@__heap_start);
 
         /* Allow a minimum heap size to be specified */
@@ -270,7 +270,7 @@ SECTIONS
 
 	/* Define a stack region to make sure it fits in memory */
 	.stack (NOLOAD) : {
-		. += (DEFINED(@PREFIX@__stack_size) ? @PREFIX@__stack_size : @DEFAULT_STACK_SIZE@);
+		. += (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@);
 	} >ram :ram
 
 	/* Throw away C++ exception handling information */
