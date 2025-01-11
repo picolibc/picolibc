@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 
 #ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME "FGETSEOF.TXT"
@@ -56,7 +57,10 @@ int main(void)
     fclose(file);
 
     file = fopen( TEST_FILE_NAME, "r" );
-    if(file == NULL) return 1;
+    if(file == NULL) {
+        unlink( TEST_FILE_NAME );
+        return 1;
+    }
 
     /*Calling fgets to reach EOF and check on the returned value*/
     pchar = fgets( line, 12, file);
@@ -76,6 +80,7 @@ int main(void)
     }
 
     fclose( file );
+    unlink( TEST_FILE_NAME );
 
     return ret;
 }

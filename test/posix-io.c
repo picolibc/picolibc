@@ -38,7 +38,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-static const char file_name[] = "posix-io-test-file";
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "posix-io-test-file"
+#endif
+
+static const char file_name[] = TEST_FILE_NAME;
 static const char test_string[] = "hello, world\n";
 
 static void test_cleanup(void)

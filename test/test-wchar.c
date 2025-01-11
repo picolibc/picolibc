@@ -1,6 +1,6 @@
 /*
 * SPDX-License-Identifier: BSD-3-Clause
-* 
+*
 * Copyright © 2024, Synopsys Inc.
 * Copyright © 2024, Solid Sands B.V.
 *
@@ -36,7 +36,11 @@
 
 #include <stdio.h>
 #include <wchar.h>
+#include <unistd.h>
 
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "WCHAR.DAT"
+#endif
 
 const wchar_t *string = L"Hello\n";
 
@@ -47,31 +51,34 @@ int main (void)
 	wint_t res;
 
     /* Create testfile.dat in write mode */
-    file = fopen("testfile.dat", "w");
+    file = fopen(TEST_FILE_NAME, "w");
     if (file == NULL) return 1;
-    
+
     /* Write wide characters to the file */
     fputws(string, file);
-	fclose(file);
-    
-    /* Open testfile.dat in read mode */
-    file = fopen("testfile.dat", "r");
+    fclose(file);
 
-	for (ref = string; *ref != L'\0'; ref++) {
-        
+    /* Open testfile.dat in read mode */
+    file = fopen(TEST_FILE_NAME, "r");
+
+    for (ref = string; *ref != L'\0'; ref++) {
+
         /* Read wide-char by wide-char from the file */
-		res = fgetwc(file);
+        res = fgetwc(file);
         if((wchar_t) res != *ref) {
             printf("Test Failed: Failed to read wide character from file\n");
+            unlink(TEST_FILE_NAME);
             return 1;
         }
-	}
+    }
 
     if(fgetwc(file) != WEOF) {
         printf("Test Failed: Failed to check if end-of-file reached\n");
-        return 1;    
+        unlink(TEST_FILE_NAME);
+        return 1;
     }
-    
+
     printf("Test Passed: Wide characters were written & read successfuly\n");
+    unlink(TEST_FILE_NAME);
     return 0;
 }
