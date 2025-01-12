@@ -9,16 +9,19 @@ ar = 'lm32-unknown-elf-ar'
 as = 'lm32-unknown-elf-as'
 nm = 'lm32-unknown-elf-nm'
 strip = 'lm32-unknown-elf-strip'
+# only needed to run tests
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-lm32 "$@"', 'run-lm32']
 
 [host_machine]
-system = 'none'
+system = 'unknown'
 cpu_family = 'lm32'
 cpu = 'lm32'
 endian = 'little'
 
 [properties]
 skip_sanity_check = true
-default_flash_addr = '0x00460000'
-default_flash_size = '0x00450000'
-default_ram_addr   = '0x40000000'
+default_flash_addr = '0x00000000'
+default_flash_size = '0x00400000'
+default_ram_addr   = '0x00400000'
 default_ram_size   = '0x00400000'
+stack_symbol = '_fstack'
