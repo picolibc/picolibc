@@ -22,6 +22,7 @@ endif
 LIBC_CHEWOUT_FILES += \
 	%D%/duplocale.def \
 	%D%/freelocale.def \
+	%D%/getlocalename_l.def \
 	%D%/locale.def \
 	%D%/newlocale.def \
 	%D%/uselocale.def
