@@ -43,7 +43,6 @@ echo '#include "'$input'"' | ("$@" -E - || exit 0) |
 		 filename = "";
 	}
 	{
-		print $0
 		if ($1 == "#") {
 			name = $3;
 			gsub(/"/, "", name);
