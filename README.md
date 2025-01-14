@@ -145,6 +145,65 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc release 1.8.next
+
+ * Use common clang/gcc feature detection macros on arm.
+
+ * Additional clang/compiler-rt work-arounds for arm which is less
+   consistent in handling exceptions.
+
+ * Use clang multilib support for aarch64
+
+ * Build fix on arc which would build two strchr versions in release
+   mode.
+
+ * Add picocrt and semihost support for xtensa. Test xtensa dc233c.
+
+ * Add C11's <uchar.h> header and implementation.
+
+ * Add nano-malloc-clear-freed option to erase memory released in free
+   or realloc.
+
+ * Add memset_explicit from C23.
+
+ * Work around broken clang builtin malloc which fails to set errno.
+
+ * Widen C++ _CTYPE_DATA array to fix mis-classification of \t; C++
+   requires bitmasks for all ctype operations, and 8 bits is not
+   enough. Thanks to M-Moawad.
+
+ * Update case conversion tables to Unicode 15.1.0
+
+ * Fix documentation formatting. Thanks to Eduard Tanase.
+
+ * Fix support for using long-long vfprintf version by default. Thanks
+   to Louis Peens.
+
+ * Remove arm unaligned memcpy asm code. This couldn't support targets
+   that only supported unaligned access. Use a new faster C version
+   for this case.
+
+ * Add asnprintf and vasnprintf as provided by newlib
+
+ * Support ARM's FVP emulator. Thanks to Oliver Stannard.
+
+ * Remove arc strlen asm code as it would access memory *before* the
+   provided buffer and fall afoul of the stack bounds checking
+   hardware.
+
+ * Support --printf={d,f,l,i,m} in place of
+   -DPICOLIBC_*_PRINTF_SCANF. This is the syntax proposed in the
+   patches submitted to gcc for picolibc support.
+
+ * Add LoongArch support, including testing. Thanks to Jiaxun Yang.
+
+ * Use new picolibc-ci-tools project which builds custom toolchain
+   bits automatically. Thanks to Jiaxun Yang.
+
+ * Add OpenRisc support, including testing. Thanks to Joel Holdsworth.
+
+ * Add LatticMico32 support, including testing. Thanks to Jiaxun Yang.
+
 ### Picolibc release 1.8.8
 
  * Fixed 3 bugs in the powf computation. Thanks to Fabian Schriever.
