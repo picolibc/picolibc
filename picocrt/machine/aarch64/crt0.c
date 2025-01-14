@@ -50,7 +50,9 @@ extern char __arm64_tls_tcb_offset;
 #define TP_OFFSET ((size_t)&__arm64_tls_tcb_offset)
 #endif
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
 
 static inline void
 _set_tls(void *tls)

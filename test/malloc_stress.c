@@ -197,8 +197,8 @@ main(void)
 
 		reset_blocks();
 
+#if (((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4) && !defined(__clang__))
 #pragma GCC diagnostic push
-#ifndef __clang__
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than=PTRDIFF_MAX"
 #endif
 		/* Test huge malloc sizes */
@@ -218,7 +218,9 @@ main(void)
 		/* Test allocating negative amounts */
 		for (i = -1; i >= -128; i--) {
 			blocks[0] = malloc((size_t) i);
+#if (((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4) && !defined(__clang__))
 #pragma GCC diagnostic pop
+#endif
 			if (blocks[0]) {
 				printf("malloc size %ld succeeded\n", i);
 				result++;

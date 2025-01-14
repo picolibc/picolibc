@@ -2,7 +2,14 @@
   * This program has been placed in the public domain.
   */
 
-#ifdef __GNUC__
+#define _DEFAULT_SOURCE
+
+#ifndef _USE_GDTOA
+#include <string.h>
+#include <stdlib.h>
+#include "mprec.h"
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
@@ -11,13 +18,6 @@
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
 #endif
-
-#define _DEFAULT_SOURCE
-
-#ifndef _USE_GDTOA
-#include <string.h>
-#include <stdlib.h>
-#include "mprec.h"
 
 /* These are the externally visible entries. */
 /* linux name:  long double _IO_strtold (char *, char **); */

@@ -546,7 +546,7 @@ signbitl_inline(long double x)
 }
 
 #ifdef __PPC__
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 /* the bitfields confuse the ppc compiler into thinking accessing

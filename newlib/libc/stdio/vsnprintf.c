@@ -64,7 +64,7 @@ vsniprintf (char *, size_t, const char *, __VALIST)
 
 #ifdef __LONG_DOUBLE_IEEE128__
 #if defined(_HAVE_ALIAS_ATTRIBUTE)
-#ifndef __clang__
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
 __strong_reference(vsnprintf, __vsnprintfieee128);

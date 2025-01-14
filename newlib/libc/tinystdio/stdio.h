@@ -203,7 +203,9 @@ int	fflush(FILE *stream);
 
 #ifdef _HAVE_FORMAT_ATTRIBUTE
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wformat"
+#endif
 #define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, 0)))
 #else
 #define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, __f)))

@@ -127,7 +127,7 @@ stderr_init(FILE *ptr)
   std (ptr, __SRW | __SNBF, 2);
 }
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"

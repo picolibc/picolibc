@@ -12,7 +12,9 @@
  * mis-compiles this function. Work around that by switching
  * optimization mode
  */
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
+#endif
 #pragma GCC optimize("O2")
 #endif
 

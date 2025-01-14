@@ -48,12 +48,14 @@ TEST(t, d, (double)x, "%a != %a") )
 TEST(i, sscanf(v, "%lf", &d), 1, "got %d fields, expected %d"), \
 TEST(t, d, (double)x, "%a != %a") )
 
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wunused-value"
 #pragma GCC diagnostic ignored "-Woverflow"
 #pragma GCC diagnostic ignored "-Wliteral-range"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
 
 #if defined(__PICOLIBC__)
 
@@ -273,8 +275,10 @@ static int test_sscanf(void)
 	TEST(i, u, 256, "%d != %d");
 	TEST(i, v, 256, "%d != %d");
 
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wformat"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
 
 #ifdef _WANT_IO_PERCENT_B
 	TEST(i, sscanf("011 0x100 0b101 11 100 101", "%i %i %i %o %x %b\n", &x, &y, &z, &u, &v, &w), 6, "only %d fields, expected %d");

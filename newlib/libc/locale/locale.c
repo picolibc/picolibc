@@ -378,7 +378,7 @@ setlocale (
 	  while (*locale);
 	  while (i < _LC_LAST)
 	    {
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
@@ -389,7 +389,7 @@ setlocale (
 #pragma GCC diagnostic ignored "-Wanalyzer-overlapping-buffers"
 #endif
 	      strcpy (new_categories[i], new_categories[i-1]);
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic pop
 #endif
 	      i++;

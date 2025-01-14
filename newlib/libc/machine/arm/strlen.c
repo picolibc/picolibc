@@ -52,7 +52,10 @@
   /* Implemented in strlen.S.  */
 
 #else
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wunused-parameter"
+#endif
+
 size_t __attribute__((naked))
 strlen (const char* str)
 {

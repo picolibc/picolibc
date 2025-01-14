@@ -1884,7 +1884,7 @@ computejumps(struct parse *p, struct re_guts *g)
 		g->charjump[(unsigned char) g->must[mindex]] = g->mlen - mindex - 1;
 }
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"

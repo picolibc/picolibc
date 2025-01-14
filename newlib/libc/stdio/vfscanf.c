@@ -407,7 +407,7 @@ _SVFSCANF (
 #define _WANT_IO_POSIX_EXTENSIONS
 #endif
 #ifdef _WANT_IO_POSIX_EXTENSIONS
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"

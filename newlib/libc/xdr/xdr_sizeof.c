@@ -80,7 +80,7 @@ x_setpostn (XDR * xdrs,
   return FALSE;
 }
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 /* 'len' is used directly with calloc which confuses -fanalyzer */

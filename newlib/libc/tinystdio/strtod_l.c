@@ -47,9 +47,11 @@ strtod_l (const char *__restrict s00,
 
 #if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wattribute-alias="
+#endif
 extern long double strtold_l(const char *, char **, locale_t loc) __attribute__ ((__alias__ ("strtod_l")));
 #else
 long double

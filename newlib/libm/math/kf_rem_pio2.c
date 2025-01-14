@@ -38,7 +38,7 @@ static const float zero = 0.0, one = 1.0,
                    two8 = 2.5600000000e+02, /* 0x43800000 */
     twon8 = 3.9062500000e-03; /* 0x3b800000 */
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"

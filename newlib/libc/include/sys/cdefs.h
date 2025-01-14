@@ -190,6 +190,10 @@
 #define	__GNUCLIKE___TYPEOF 1
 #define	__GNUCLIKE___SECTION 1
 
+#if __GNUC_PREREQ (4, 2) || defined(__clang__)
+#define __GNUCLIKE_PRAGMA_DIAGNOSTIC 1
+#endif
+
 #define	__GNUCLIKE_CTOR_SECTION_HANDLING 1
 
 #define	__GNUCLIKE_BUILTIN_CONSTANT_P 1

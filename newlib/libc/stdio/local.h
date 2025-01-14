@@ -252,7 +252,7 @@ void _reclaim_reent (void *);
  * Set the orientation for a stream. If o > 0, the stream has wide-
  * orientation. If o < 0, the stream has byte-orientation.
  */
-#ifndef __clang__
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wunused-value"
 #endif
 #define ORIENT(fp,ori)			\

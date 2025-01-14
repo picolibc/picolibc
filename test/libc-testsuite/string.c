@@ -30,11 +30,13 @@
  * m = message to print on failure (with formats for r & x)
 **/
 
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #pragma GCC diagnostic ignored "-Wformat"
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
 
 #define TEST(r, f, x, m) do {                                           \
         (r) = (f);                                                      \

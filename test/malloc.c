@@ -42,7 +42,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-#ifdef __GNUC__
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Walloc-size-larger-than="

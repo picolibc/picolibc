@@ -215,12 +215,12 @@ extern char __stack[];
 static __noinline __attribute__((target("arm"))) void
 _set_stacks(void)
 {
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif /* __GNUC__ */
         SET_SPS();
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic pop
 #endif /* __GNUC__ */
 }
@@ -321,7 +321,7 @@ _start(void)
 	/* Generate a reference to __vector_table so we get one loaded */
 	__asm__(".equ __my_vector_table, __vector_table");
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif /* __GNUC__ */
@@ -331,7 +331,7 @@ _start(void)
         SET_SPS();
 #endif /* __ARM_ARCH_ISA_THUMB != 1 */
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic pop
 #endif /* __GNUC__ */
 

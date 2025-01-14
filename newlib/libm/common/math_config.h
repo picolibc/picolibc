@@ -447,7 +447,7 @@ force_eval_long_double (long double x)
  * There is limited support for long double greater than 64 bits
  */
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wattribute-alias="
