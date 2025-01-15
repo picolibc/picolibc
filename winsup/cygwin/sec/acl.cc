@@ -1020,6 +1020,9 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   /* For old-style or non-Cygwin ACLs, check for merging permissions. */
   if (!new_style)
     {
+      /* Make sure `pos' contains the number of used entries in lacl. */
+      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
+	pos = MAX_ACL_ENTRIES;
       /* First loop handles object permissions */
       for (idx = 0; idx < pos; ++idx)
 	{
@@ -1087,16 +1090,16 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	    {
 	    case USER_OBJ:
 	    case USER:
-	      obj_idx = searchace (lacl, pos + 1, USER_OBJ, id);
+	      obj_idx = searchace (lacl, pos, USER_OBJ, id);
 	      if (obj_idx < 0)
-		obj_idx = searchace (lacl, pos + 1, USER,
+		obj_idx = searchace (lacl, pos, USER,
 				     lacl[idx].a_id);
 	      break;
 	    case GROUP_OBJ:
 	    case GROUP:
-	      obj_idx = searchace (lacl, pos + 1, GROUP_OBJ, id);
+	      obj_idx = searchace (lacl, pos, GROUP_OBJ, id);
 	      if (obj_idx < 0)
-		obj_idx = searchace (lacl, pos + 1, GROUP,
+		obj_idx = searchace (lacl, pos, GROUP,
 				     lacl[idx].a_id);
 	      break;
 	    }
@@ -1181,9 +1184,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       aclsid[pos] = well_known_null_sid;
     }
 
-  /* Make sure `pos' contains the number of used entries in lacl. */
-  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
-    pos = MAX_ACL_ENTRIES;
   /* If owner SID == group SID (Microsoft Accounts) merge group perms into
      user perms but leave group perms intact.  That's a fake, but it allows
      to keep track of the POSIX group perms without much effort. */
@@ -1219,6 +1219,9 @@ out:
   attr_ret = attr;
   if (aclbufp)
     {
+      /* Make sure `pos' contains the number of used entries in lacl. */
+      if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
+	pos = MAX_ACL_ENTRIES;
       if (pos > nentries)
 	{
 	  set_errno (ENOSPC);
