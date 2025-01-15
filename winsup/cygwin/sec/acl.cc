@@ -1016,101 +1016,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	    }
 	}
     }
-  /* If this is a just created file, and this is an ACL with only standard
-     entries, or if standard POSIX permissions are missing (probably no
-     inherited ACEs so created from a default DACL), assign the permissions
-     specified by the file creation mask.  The values get masked by the
-     actually requested permissions by the caller per POSIX 1003.1e draft 17. */
-  if (just_created)
-    {
-      mode_t perms = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
-      if (standard_ACEs_only || !saw_user_obj)
-	lacl[0].a_perm = (perms >> 6) & S_IRWXO;
-      if (standard_ACEs_only || !saw_group_obj)
-	lacl[1].a_perm = (perms >> 3) & S_IRWXO;
-      if (standard_ACEs_only || !saw_other_obj)
-	lacl[2].a_perm = perms & S_IRWXO;
-    }
-  /* If this is an old-style or non-Cygwin ACL, and secondary user and group
-     entries exist in the ACL, fake a matching CLASS_OBJ entry. The CLASS_OBJ
-     permissions are the or'ed permissions of the primary group permissions
-     and all secondary user and group permissions. */
-  if (!new_style && has_class_perm
-      && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
-    {
-      lacl[pos].a_type = CLASS_OBJ;
-      lacl[pos].a_id = ACL_UNDEFINED_ID;
-      class_perm |= lacl[1].a_perm;
-      lacl[pos].a_perm = class_perm;
-      aclsid[pos] = well_known_null_sid;
-    }
-  /* For ptys, fake a mask if the admins group is neither owner nor group.
-     In that case we have an extra ACE for the admins group, and we need a
-     CLASS_OBJ to get a valid POSIX ACL.  However, Windows filters the ACE
-     Mask value so it only reflects the bit values supported by the object
-     type.  The result is that we can't set an explicit CLASS_OBJ value for
-     ptys in the NULL SID ACE. */
-  else if (S_ISCHR (attr) && owner_sid != well_known_admins_sid
-	   && group_sid != well_known_admins_sid
-	   && (pos = searchace (lacl, MAX_ACL_ENTRIES, CLASS_OBJ)) >= 0)
-    {
-      lacl[pos].a_type = CLASS_OBJ;
-      lacl[pos].a_id = ACL_UNDEFINED_ID;
-      lacl[pos].a_perm = lacl[1].a_perm; /* == group perms */
-      aclsid[pos] = well_known_null_sid;
-    }
-  /* Ensure that the default acl contains at least
-     DEF_(USER|GROUP|OTHER)_OBJ entries.  */
-  if (types_def && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
-    {
-      if (!(types_def & USER_OBJ))
-	{
-	  lacl[pos].a_type = DEF_USER_OBJ;
-	  lacl[pos].a_id = ACL_UNDEFINED_ID;
-	  lacl[pos].a_perm = lacl[0].a_perm;
-	  aclsid[pos] = well_known_creator_owner_sid;
-	  pos++;
-	}
-      if (!(types_def & GROUP_OBJ) && pos < MAX_ACL_ENTRIES)
-	{
-	  lacl[pos].a_type = DEF_GROUP_OBJ;
-	  lacl[pos].a_id = ACL_UNDEFINED_ID;
-	  lacl[pos].a_perm = lacl[1].a_perm;
-	  /* If owner == group, the owner perms should be used. */
-	  if (owner_eq_group)
-	    lacl[pos].a_perm |= lacl[0].a_perm;
-	  /* Note the position of the DEF_GROUP_OBJ entry. */
-	  def_pgrp_pos = pos;
-	  aclsid[pos] = well_known_creator_group_sid;
-	  pos++;
-	}
-      if (!(types_def & OTHER_OBJ) && pos < MAX_ACL_ENTRIES)
-	{
-	  lacl[pos].a_type = DEF_OTHER_OBJ;
-	  lacl[pos].a_id = ACL_UNDEFINED_ID;
-	  lacl[pos].a_perm = lacl[2].a_perm;
-	  aclsid[pos] = well_known_world_sid;
-	}
-    }
-  /* If this is an old-style or non-Cygwin ACL, and secondary user default
-     and group default entries exist in the ACL, fake a matching DEF_CLASS_OBJ
-     entry. The DEF_CLASS_OBJ permissions are the or'ed permissions of the
-     primary group default permissions and all secondary user and group def.
-     permissions. */
-  if (!new_style && has_def_class_perm
-      && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
-    {
-      lacl[pos].a_type = DEF_CLASS_OBJ;
-      lacl[pos].a_id = ACL_UNDEFINED_ID;
-      lacl[pos].a_perm = def_class_perm;
-      if (def_pgrp_pos >= 0)
-	lacl[pos].a_perm |= lacl[def_pgrp_pos].a_perm;
-      aclsid[pos] = well_known_null_sid;
-    }
-
-  /* Make sure `pos' contains the number of used entries in lacl. */
-  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
-    pos = MAX_ACL_ENTRIES;
 
   /* For old-style or non-Cygwin ACLs, check for merging permissions. */
   if (!new_style)
@@ -1199,11 +1104,106 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	      lacl[idx].a_perm |= lacl[obj_idx].a_perm;
 	}
     }
+  /* If this is an old-style or non-Cygwin ACL, and secondary user and group
+     entries exist in the ACL, fake a matching CLASS_OBJ entry. The CLASS_OBJ
+     permissions are the or'ed permissions of the primary group permissions
+     and all secondary user and group permissions. */
+  if (!new_style && has_class_perm
+      && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+    {
+      lacl[pos].a_type = CLASS_OBJ;
+      lacl[pos].a_id = ACL_UNDEFINED_ID;
+      class_perm |= lacl[1].a_perm;
+      lacl[pos].a_perm = class_perm;
+      aclsid[pos] = well_known_null_sid;
+    }
+  /* For ptys, fake a mask if the admins group is neither owner nor group.
+     In that case we have an extra ACE for the admins group, and we need a
+     CLASS_OBJ to get a valid POSIX ACL.  However, Windows filters the ACE
+     Mask value so it only reflects the bit values supported by the object
+     type.  The result is that we can't set an explicit CLASS_OBJ value for
+     ptys in the NULL SID ACE. */
+  else if (S_ISCHR (attr) && owner_sid != well_known_admins_sid
+	   && group_sid != well_known_admins_sid
+	   && (pos = searchace (lacl, MAX_ACL_ENTRIES, CLASS_OBJ)) >= 0)
+    {
+      lacl[pos].a_type = CLASS_OBJ;
+      lacl[pos].a_id = ACL_UNDEFINED_ID;
+      lacl[pos].a_perm = lacl[1].a_perm; /* == group perms */
+      aclsid[pos] = well_known_null_sid;
+    }
+  /* Ensure that the default acl contains at least
+     DEF_(USER|GROUP|OTHER)_OBJ entries.  */
+  if (types_def && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+    {
+      if (!(types_def & USER_OBJ))
+	{
+	  lacl[pos].a_type = DEF_USER_OBJ;
+	  lacl[pos].a_id = ACL_UNDEFINED_ID;
+	  lacl[pos].a_perm = lacl[0].a_perm;
+	  aclsid[pos] = well_known_creator_owner_sid;
+	  pos++;
+	}
+      if (!(types_def & GROUP_OBJ) && pos < MAX_ACL_ENTRIES)
+	{
+	  lacl[pos].a_type = DEF_GROUP_OBJ;
+	  lacl[pos].a_id = ACL_UNDEFINED_ID;
+	  lacl[pos].a_perm = lacl[1].a_perm;
+	  /* If owner == group, the owner perms should be used. */
+	  if (owner_eq_group)
+	    lacl[pos].a_perm |= lacl[0].a_perm;
+	  /* Note the position of the DEF_GROUP_OBJ entry. */
+	  def_pgrp_pos = pos;
+	  aclsid[pos] = well_known_creator_group_sid;
+	  pos++;
+	}
+      if (!(types_def & OTHER_OBJ) && pos < MAX_ACL_ENTRIES)
+	{
+	  lacl[pos].a_type = DEF_OTHER_OBJ;
+	  lacl[pos].a_id = ACL_UNDEFINED_ID;
+	  lacl[pos].a_perm = lacl[2].a_perm;
+	  aclsid[pos] = well_known_world_sid;
+	}
+    }
+  /* If this is an old-style or non-Cygwin ACL, and secondary user default
+     and group default entries exist in the ACL, fake a matching DEF_CLASS_OBJ
+     entry. The DEF_CLASS_OBJ permissions are the or'ed permissions of the
+     primary group default permissions and all secondary user and group def.
+     permissions. */
+  if (!new_style && has_def_class_perm
+      && (pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) >= 0)
+    {
+      lacl[pos].a_type = DEF_CLASS_OBJ;
+      lacl[pos].a_id = ACL_UNDEFINED_ID;
+      lacl[pos].a_perm = def_class_perm;
+      if (def_pgrp_pos >= 0)
+	lacl[pos].a_perm |= lacl[def_pgrp_pos].a_perm;
+      aclsid[pos] = well_known_null_sid;
+    }
+
+  /* Make sure `pos' contains the number of used entries in lacl. */
+  if ((pos = searchace (lacl, MAX_ACL_ENTRIES, 0)) < 0)
+    pos = MAX_ACL_ENTRIES;
   /* If owner SID == group SID (Microsoft Accounts) merge group perms into
      user perms but leave group perms intact.  That's a fake, but it allows
      to keep track of the POSIX group perms without much effort. */
   if (owner_eq_group)
     lacl[0].a_perm |= lacl[1].a_perm;
+  /* If this is a just created file, and this is an ACL with only standard
+     entries, or if standard POSIX permissions are missing (probably no
+     inherited ACEs so created from a default DACL), assign the permissions
+     specified by the file creation mask.  The values get masked by the
+     actually requested permissions by the caller per POSIX 1003.1e draft 17. */
+  if (just_created)
+    {
+      mode_t perms = (S_IRWXU | S_IRWXG | S_IRWXO) & ~cygheap->umask;
+      if (standard_ACEs_only || !saw_user_obj)
+	lacl[0].a_perm = (perms >> 6) & S_IRWXO;
+      if (standard_ACEs_only || !saw_group_obj)
+	lacl[1].a_perm = (perms >> 3) & S_IRWXO;
+      if (standard_ACEs_only || !saw_other_obj)
+	lacl[2].a_perm = perms & S_IRWXO;
+    }
   /* Construct POSIX permission bits.  Fortunately we know exactly where
      to fetch the affecting bits from, at least as long as the array
      hasn't been sorted. */
