@@ -995,11 +995,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 		  if (type & (USER | GROUP))
 		    {
 		      has_def_class_perm = true;
-		      /* Accommodate Windows: Never add SYSTEM and Admins to
-			 CLASS_OBJ.  Unless (implicitly) if they are the
-			 GROUP_OBJ entry. */
-		      if (ace_sid != well_known_system_sid
-			  && ace_sid != well_known_admins_sid)
 		      def_class_perm |= lacl[pos].a_perm;
 		    }
 		  /* And note the position of the DEF_GROUP_OBJ entry. */
