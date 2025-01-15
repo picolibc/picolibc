@@ -37,7 +37,7 @@ details. */
 #define FS_TEMP_FL		0x000000100ULL /* DOS Temporary */
 #define FS_SPARSE_FL		0x000000200ULL /* Sparse file */
 #define FS_REPARSE_FL		0x000000400ULL /* Reparse point */
-#define FS_COMPRESSED_FL	0x000000800ULL /* Compressed file */
+#define FS_COMPR_FL		0x000000800ULL /* Compressed file */
 #define FS_OFFLINE_FL		0x000001000ULL /* DOS Offline */
 #define FS_NOTINDEXED_FL	0x000002000ULL /* DOS Not context indexed */
 #define FS_ENCRYPT_FL		0x000004000ULL /* Encrypted file */
@@ -53,5 +53,9 @@ details. */
 #define RENAME_NOREPLACE (1 << 0)
 /* #define RENAME_EXCHANGE  (1 << 1) */
 /* #define RENAME_WHITEOUT  (1 << 2) */
+
+/* Add for backward compatibility */
+#define FS_COMPRESSED_FL FS_COMPR_FL
+
 
 #endif

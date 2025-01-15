@@ -49,7 +49,7 @@ struct
   { FS_TEMP_FL,		't',	"Temporary" },
   { FS_SPARSE_FL,	'S',	"Sparse" },
   { FS_REPARSE_FL,	'r',	"Reparse" },
-  { FS_COMPRESSED_FL,	'c',	"Compressed" },
+  { FS_COMPR_FL,	'c',	"Compressed" },
   { FS_OFFLINE_FL,	'o',	"Offline" },
   { FS_NOTINDEXED_FL,	'n',	"Notindexed" },
   { FS_ENCRYPT_FL,	'e',	"Encrypted" },
