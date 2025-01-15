@@ -1075,7 +1075,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	 and default perms from the same Windows ACE. */
       for (idx = 0; idx < pos; ++idx)
 	{
-	  int obj_idx;
+	  int obj_idx = -1;
 
 	  if (!(lacl[idx].a_perm & FULL_ACE))
 	    continue;
