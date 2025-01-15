@@ -1101,7 +1101,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
     pos = MAX_ACL_ENTRIES;
 
   /* For old-style or non-Cygwin ACLs, check for merging permissions. */
-  if (!just_created && !new_style)
+  if (!new_style)
     for (idx = 0; idx < pos; ++idx)
       {
 	if (lacl[idx].a_type & (USER_OBJ | USER)
