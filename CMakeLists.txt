@@ -371,6 +371,10 @@ if(NOT DEFINED _MB_CAPABLE)
   option(_MB_CAPABLE "Enable multi-byte support" OFF)
 endif()
 
+if(NOT DEFINED _MB_EXTENDED_CHARSETS_ALL)
+  option(_MB_EXTENDED_CHARSETS_ALL "Enable ISO, Windows and JIS multibyte encodings" OFF)
+endif()
+
 set(_NANO_FORMATTED_IO OFF)
 
 option(_NANO_MALLOC "Use smaller malloc implementation" ON)

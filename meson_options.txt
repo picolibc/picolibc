@@ -238,6 +238,8 @@ option('newlib-locale-info-extended', type: 'boolean', value: false,
        description: 'extended locale support')
 option('newlib-mb', type: 'boolean', value: false,
        description: 'enable multibyte support')
+option('mb-extended-charsets', type: 'boolean', value: false,
+       description: 'enable additional ISO, Windows and JIS multibyte encodings')
 
 #
 # Startup/shutdown options

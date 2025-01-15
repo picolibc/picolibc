@@ -248,6 +248,7 @@ endif
 fast_strcmp = get_option('fast-strcmp')
 
 newlib_mb = get_option('newlib-mb')
+mb_extended_charsets = newlib_mb and get_option('mb-extended-charsets')
 newlib_locale_info = get_option('newlib-locale-info')
 
 newlib_obsolete_math = get_option('newlib-obsolete-math')
@@ -1382,6 +1383,7 @@ if not tinystdio
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
 conf_data.set('_MB_CAPABLE', newlib_mb)
+conf_data.set('_MB_EXTENDED_CHARSETS_ALL', mb_extended_charsets)
 conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
 conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
 conf_data.set('_ELIX_LEVEL', newlib_elix_level)
