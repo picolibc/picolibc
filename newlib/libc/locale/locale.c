@@ -567,6 +567,15 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
   /* We only support this subset of charsets. */
   switch (charset[0])
     {
+    case 'A':
+    case 'a':
+      if (strcasecmp (charset, "ASCII"))
+	FAIL;
+      strcpy (charset, "ASCII");
+      mbc_max = 1;
+      l_wctomb = __ascii_wctomb;
+      l_mbtowc = __ascii_mbtowc;
+      break;
     case 'U':
     case 'u':
       if (strcasecmp (charset, "UTF-8") && strcasecmp (charset, "UTF8"))
@@ -613,6 +622,7 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
       l_mbtowc = __sjis_mbtowc;
     break;
 #endif
+#ifdef _MB_EXTENDED_CHARSETS_ISO
     case 'I':
     case 'i':
       /* Must be exactly one of ISO-8859-1, [...] ISO-8859-16, except for
@@ -637,14 +647,11 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
       *c++ = val % 10 + '0';
       *c = '\0';
       mbc_max = 1;
-#ifdef _MB_EXTENDED_CHARSETS_ISO
       l_wctomb = __iso_wctomb (val);
       l_mbtowc = __iso_mbtowc (val);
-#else /* !_MB_EXTENDED_CHARSETS_ISO */
-      l_wctomb = __ascii_wctomb;
-      l_mbtowc = __ascii_mbtowc;
-#endif /* _MB_EXTENDED_CHARSETS_ISO */
     break;
+#endif /* _MB_EXTENDED_CHARSETS_ISO */
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
     case 'C':
     case 'c':
       if (charset[1] != 'P' && charset[1] != 'p')
@@ -678,13 +685,8 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
 	case 1257:
 	case 1258:
 	  mbc_max = 1;
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 	  l_wctomb = __cp_wctomb (val);
 	  l_mbtowc = __cp_mbtowc (val);
-#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
-	  l_wctomb = __ascii_wctomb;
-	  l_mbtowc = __ascii_mbtowc;
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 	  break;
 #ifdef _MB_EXTENDED_CHARSETS_JIS
 	case 932:
@@ -723,22 +725,8 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
       else
 	FAIL;
       mbc_max = 1;
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb (val);
       l_mbtowc = __cp_mbtowc (val);
-#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
-      l_wctomb = __ascii_wctomb;
-      l_mbtowc = __ascii_mbtowc;
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
-      break;
-    case 'A':
-    case 'a':
-      if (strcasecmp (charset, "ASCII"))
-	FAIL;
-      strcpy (charset, "ASCII");
-      mbc_max = 1;
-      l_wctomb = __ascii_wctomb;
-      l_mbtowc = __ascii_mbtowc;
       break;
     case 'G':
     case 'g':
@@ -753,13 +741,8 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
 	  val = 101;
 	  strcpy (charset, "CP101");
 	  mbc_max = 1;
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 	  l_wctomb = __cp_wctomb (val);
 	  l_mbtowc = __cp_mbtowc (val);
-#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
-	  l_wctomb = __ascii_wctomb;
-	  l_mbtowc = __ascii_mbtowc;
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 	}
       else
 	FAIL;
@@ -772,13 +755,8 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
       val = 102;
       strcpy (charset, "CP102");
       mbc_max = 1;
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb (val);
       l_mbtowc = __cp_mbtowc (val);
-#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
-      l_wctomb = __ascii_wctomb;
-      l_mbtowc = __ascii_mbtowc;
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
       break;
     case 'T':
     case 't':
@@ -792,14 +770,10 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
       val = 874;
       strcpy (charset, "CP874");
       mbc_max = 1;
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
       l_wctomb = __cp_wctomb (val);
       l_mbtowc = __cp_mbtowc (val);
-#else /* !_MB_EXTENDED_CHARSETS_WINDOWS */
-      l_wctomb = __ascii_wctomb;
-      l_mbtowc = __ascii_mbtowc;
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
       break;
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
     default:
       FAIL;
     }
