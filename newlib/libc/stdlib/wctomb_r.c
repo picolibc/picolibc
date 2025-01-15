@@ -10,6 +10,7 @@ All rights reserved.
 #include <stdint.h>
 #include "mbctype.h"
 #include "local.h"
+#include "../ctype/local.h"
 
 int
 __ascii_wctomb (
@@ -25,8 +26,8 @@ __ascii_wctomb (
   (void) state;
   if (s == NULL)
     return 0;
- 
-  if ((size_t)wchar >= 0x100)
+
+  if ((size_t)wchar >= 0x80)
     {
       _REENT_ERRNO(r) = EILSEQ;
       return -1;
@@ -86,45 +87,53 @@ __utf8_wctomb (
     }
   if (wchar >= 0x800 && wchar <= 0xffff)
     {
-      /* No UTF-16 surrogate handling in UCS-4 */
-      if (sizeof (wchar_t) == 2 && wchar >= 0xd800 && wchar <= 0xdfff)
+      if (wchar >= 0xd800 && wchar <= 0xdfff)
 	{
-	  uint32_t tmp;
-	  if (wchar <= 0xdbff)
-	    {
-              if (state->__count == -4)
+          if (sizeof (wchar_t) == 2)
+            {
+              uint32_t tmp;
+              if (wchar <= 0xdbff)
+              {
+                if (state->__count == -4)
                 {
                   /* Extra high surrogate */
                   _REENT_ERRNO(r) = EILSEQ;
                   return -1;
                 }
-	      /* First half of a surrogate pair.  Store the state and
-	         return ret + 0. */
-	      tmp = ((wchar & 0x3ff) << 10) + 0x10000;
-	      state->__value.__wchb[0] = (tmp >> 16) & 0xff;
-	      state->__value.__wchb[1] = (tmp >> 8) & 0xff;
-	      state->__count = -4;
-	      *s = (0xf0 | ((tmp & 0x1c0000) >> 18));
-	      return ret;
-	    }
-	  if (state->__count == -4)
-	    {
-	      /* Second half of a surrogate pair.  Reconstruct the full
-		 Unicode value and return the trailing three bytes of the
-		 UTF-8 character. */
-              tmp = ((uint32_t) state->__value.__wchb[0] << 16)
-		    | (state->__value.__wchb[1] << 8)
-		    | (wchar & 0x3ff);
-	      state->__count = 0;
-	      *s++ = 0xf0 | ((tmp & 0x1c0000) >> 18);
-	      *s++ = 0x80 | ((tmp &  0x3f000) >> 12);
-	      *s++ = 0x80 | ((tmp &    0xfc0) >> 6);
-	      *s   = 0x80 |  (tmp &     0x3f);
-	      return 4;
-	    }
-          /* Unexpected second half */
-          _REENT_ERRNO(r) = EILSEQ;
-          return -1;
+                /* First half of a surrogate pair.  Store the state and
+                   return ret + 0. */
+                tmp = ((wchar & 0x3ff) << 10) + 0x10000;
+                state->__value.__wchb[0] = (tmp >> 16) & 0xff;
+                state->__value.__wchb[1] = (tmp >> 8) & 0xff;
+                state->__count = -4;
+                *s = (0xf0 | ((tmp & 0x1c0000) >> 18));
+                return ret;
+              }
+              if (state->__count == -4)
+              {
+                /* Second half of a surrogate pair.  Reconstruct the full
+                   Unicode value and return the trailing three bytes of the
+                   UTF-8 character. */
+                tmp = ((uint32_t) state->__value.__wchb[0] << 16)
+                  | (state->__value.__wchb[1] << 8)
+                  | (wchar & 0x3ff);
+                state->__count = 0;
+                *s++ = 0xf0 | ((tmp & 0x1c0000) >> 18);
+                *s++ = 0x80 | ((tmp &  0x3f000) >> 12);
+                *s++ = 0x80 | ((tmp &    0xfc0) >> 6);
+                *s   = 0x80 |  (tmp &     0x3f);
+                return 4;
+              }
+              /* Unexpected second half */
+              _REENT_ERRNO(r) = EILSEQ;
+              return -1;
+            }
+          else
+            {
+              /* No UTF-16 surrogate handling in UCS-4 */
+              _REENT_ERRNO(r) = EILSEQ;
+              return -1;
+            }
 	}
       *s++ = 0xe0 | ((wchar & 0xf000) >> 12);
       *s++ = 0x80 | ((wchar &  0xfc0) >> 6);
@@ -144,18 +153,17 @@ __utf8_wctomb (
   return -1;
 }
 
-/* Cygwin defines its own doublebyte charset conversion functions 
-   because the underlying OS requires wchar_t == UTF-16. */
+#ifdef _MB_EXTENDED_CHARSETS_JIS
 int
 __sjis_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
 {
-  wint_t wchar = _wchar;
+  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_SJIS);
 
-  unsigned char char2 = (unsigned char)wchar;
-  unsigned char char1 = (unsigned char)(wchar >> 8);
+  unsigned char char2 = (unsigned char)jischar;
+  unsigned char char1 = (unsigned char)(jischar >> 8);
 
   (void) state;
   if (s == NULL)
@@ -164,7 +172,7 @@ __sjis_wctomb (
   if (char1 != 0x00)
     {
     /* first byte is non-zero..validate multi-byte char */
-      if (_issjis1(char1) && _issjis2(char2)) 
+      if (_issjis1(char1) && _issjis2(char2))
 	{
 	  *s++ = (char)char1;
 	  *s = (char)char2;
@@ -176,7 +184,7 @@ __sjis_wctomb (
 	  return -1;
 	}
     }
-  *s = (char) wchar;
+  *s = (char) jischar;
   return 1;
 }
 
@@ -186,9 +194,10 @@ __eucjp_wctomb (
         wchar_t        _wchar,
         mbstate_t     *state)
 {
-  wint_t wchar = _wchar;
-  unsigned char char2 = (unsigned char)wchar;
-  unsigned char char1 = (unsigned char)(wchar >> 8);
+  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_EUCJP);
+
+  unsigned char char2 = (unsigned char)jischar;
+  unsigned char char1 = (unsigned char)(jischar >> 8);
 
   (void) state;
   if (s == NULL)
@@ -197,7 +206,7 @@ __eucjp_wctomb (
   if (char1 != 0x00)
     {
     /* first byte is non-zero..validate multi-byte char */
-      if (_iseucjp1 (char1) && _iseucjp2 (char2)) 
+      if (_iseucjp1 (char1) && _iseucjp2 (char2))
 	{
 	  *s++ = (char)char1;
 	  *s = (char)char2;
@@ -216,7 +225,7 @@ __eucjp_wctomb (
 	  return -1;
 	}
     }
-  *s = (char) wchar;
+  *s = (char) jischar;
   return 1;
 }
 
@@ -226,10 +235,10 @@ __jis_wctomb (
         wchar_t        _wchar,
         mbstate_t     *state)
 {
-  wint_t wchar = _wchar;
-  int cnt = 0; 
-  unsigned char char2 = (unsigned char)wchar;
-  unsigned char char1 = (unsigned char)(wchar >> 8);
+  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_JIS);
+  unsigned char char2 = (unsigned char)jischar;
+  unsigned char char1 = (unsigned char)(jischar >> 8);
+  int cnt = 0;
 
   if (s == NULL)
     return 1;  /* state-dependent */
@@ -237,7 +246,7 @@ __jis_wctomb (
   if (char1 != 0x00)
     {
     /* first byte is non-zero..validate multi-byte char */
-      if (_isjis (char1) && _isjis (char2)) 
+      if (_isjis (char1) && _isjis (char2))
 	{
 	  if (state->__state == 0)
 	    {
@@ -267,6 +276,8 @@ __jis_wctomb (
   *s = (char)char2;
   return cnt + 1;
 }
+#endif /* _MB_EXTENDED_CHARSETS_JIS */
+
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 static int
@@ -275,6 +286,7 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
 {
   wint_t wchar = _wchar;
 
+  (void) state;
   if (s == NULL)
     return 0;
 
@@ -286,7 +298,7 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
 	  unsigned char mb;
 
 	  for (mb = 0; mb < 0x60; ++mb)
-	    if (__iso_8859_conv[iso_idx][mb] == wchar)
+	    if (__iso_8859_conv[iso_idx][mb] == _wchar)
 	      {
 		*s = (char) (mb + 0xa0);
 		return 1;
@@ -295,7 +307,7 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
 	  return -1;
 	}
     }
- 
+
   if ((size_t)wchar >= 0x100)
     {
       _REENT_ERRNO(r) = EILSEQ;
@@ -306,91 +318,91 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
   return 1;
 }
 
-int __iso_8859_1_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_1_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, -1, state);
 }
 
-int __iso_8859_2_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_2_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 0, state);
 }
 
-int __iso_8859_3_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_3_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 1, state);
 }
 
-int __iso_8859_4_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_4_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 2, state);
 }
 
-int __iso_8859_5_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_5_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 3, state);
 }
 
-int __iso_8859_6_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_6_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 4, state);
 }
 
-int __iso_8859_7_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_7_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 5, state);
 }
 
-int __iso_8859_8_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_8_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 6, state);
 }
 
-int __iso_8859_9_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_9_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 7, state);
 }
 
-int __iso_8859_10_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_10_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 8, state);
 }
 
-int __iso_8859_11_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_11_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 9, state);
 }
 
-int __iso_8859_13_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_13_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 10, state);
 }
 
-int __iso_8859_14_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_14_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 11, state);
 }
 
-int __iso_8859_15_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_15_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 12, state);
 }
 
-int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
   return ___iso_wctomb (s, _wchar, 13, state);
@@ -432,6 +444,7 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 {
   wint_t wchar = _wchar;
 
+  (void) state;
   if (s == NULL)
     return 0;
 
@@ -442,7 +455,7 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 	  unsigned char mb;
 
 	  for (mb = 0; mb < 0x80; ++mb)
-	    if (__cp_conv[cp_idx][mb] == wchar)
+	    if (__cp_conv[cp_idx][mb] == _wchar)
 	      {
 		*s = (char) (mb + 0x80);
 		return 1;
@@ -619,9 +632,9 @@ __cp_102_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 }
 
 static int
-__cp_103_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_103_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 26, state);
+  return ___cp_wctomb (s, _wchar, 26, state);
 }
 
 static wctomb_p __cp_xxx_wctomb[27] = {

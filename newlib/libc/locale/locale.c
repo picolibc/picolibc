@@ -465,8 +465,11 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
      dependent on the cateogry. */
   char *locale = NULL;
   char charset[ENCODING_LEN + 1] = {};
+#if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
   long val = 0;
-  char *end, *c = NULL;
+  char *end;
+#endif
+  char *c = NULL;
   int mbc_max;
   wctomb_p l_wctomb;
   mbtowc_p l_mbtowc;
@@ -573,7 +576,7 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
       l_wctomb = __utf8_wctomb;
       l_mbtowc = __utf8_mbtowc;
     break;
-    /* Cygwin does not support JIS at all. */
+#ifdef _MB_EXTENDED_CHARSETS_JIS
     case 'J':
     case 'j':
       if (strcasecmp (charset, "JIS"))
@@ -609,6 +612,7 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
       l_wctomb = __sjis_wctomb;
       l_mbtowc = __sjis_mbtowc;
     break;
+#endif
     case 'I':
     case 'i':
       /* Must be exactly one of ISO-8859-1, [...] ISO-8859-16, except for
@@ -682,11 +686,13 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
 	  l_mbtowc = __ascii_mbtowc;
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 	  break;
+#ifdef _MB_EXTENDED_CHARSETS_JIS
 	case 932:
 	  mbc_max = 2;
 	  l_wctomb = __sjis_wctomb;
 	  l_mbtowc = __sjis_mbtowc;
 	  break;
+#endif
 	default:
 	  FAIL;
 	}

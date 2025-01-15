@@ -319,6 +319,7 @@ SUCH DAMAGE.
 #ifdef _MB_EXTENDED_CHARSETS_ALL
 #define _MB_EXTENDED_CHARSETS_ISO 1
 #define _MB_EXTENDED_CHARSETS_WINDOWS 1
+#define _MB_EXTENDED_CHARSETS_JIS 1
 #endif
 
 /* Figure out if long double is the same size as double. If the system

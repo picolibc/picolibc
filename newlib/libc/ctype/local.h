@@ -71,15 +71,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 uint16_t
 __ctype_table_lookup(wint_t ic);
 
-/* internal functions to translate between JP and Unicode */
-/* note this is not applicable to Cygwin, where wchar_t is always Unicode,
-   and should not be applicable to most other platforms either;
-   * platforms for which wchar_t is not Unicode should be explicitly listed
-   * the transformation should be applied to all non-Unicode locales
-     (also Chinese, Korean, and even 8-bit locales such as *.CP1252)
-   * for towupper and towlower, the result must be back-transformed
-     into the respective locale encoding; currently NOT IMPLEMENTED
-*/
-wint_t _jp2uc (wint_t);
-wint_t _jp2uc_l (wint_t, struct __locale_t *);
-wint_t _uc2jp_l (wint_t, struct __locale_t *);
+/* Japanese encoding types supported */
+#define JP_JIS		1
+#define JP_SJIS		2
+#define JP_EUCJP	3
+
+wint_t
+__jp2uc (wint_t c, int type);
+
+wint_t
+__uc2jp (wint_t c, int type);
+

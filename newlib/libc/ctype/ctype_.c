@@ -32,6 +32,7 @@
 #define _PICOLIBC_CTYPE_SMALL 0
 #include "ctype_.h"
 #include "../locale/setlocale.h"
+#include "../stdlib/local.h"
 
 #if defined(_MB_CAPABLE)
 #if defined(_MB_EXTENDED_CHARSETS_ISO)

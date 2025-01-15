@@ -13,7 +13,6 @@ iswprint_l (wint_t c, struct __locale_t *locale)
 {
   (void) locale;
 #ifdef _MB_CAPABLE
-  c = _jp2uc_l (c, locale);
   uint16_t cat = __ctype_table_lookup (c);
   return cat & CLASS_print;
 #else

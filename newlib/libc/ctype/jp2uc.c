@@ -32,23 +32,16 @@
 
 #include <picolibc.h>
 
-#ifdef _MB_CAPABLE
-/* Under Cygwin, the incoming wide character is already given in UTF due
-   to the requirements of the underlying OS. */
-
 #include <string.h>
 #include <wctype.h>
 #include "local.h"
 
-/* Japanese encoding types supported */
-#define JP_JIS		1
-#define JP_SJIS		2
-#define JP_EUCJP	3
-
 /* Japanese to Unicode conversion routine */
+#ifdef _MB_EXTENDED_CHARSETS_JIS
+
 #include "jp2uc.h"
 
-static wint_t
+wint_t
 __jp2uc (wint_t c, int type)
 {
   int index, adj;
@@ -153,48 +146,13 @@ __jp2uc (wint_t c, int type)
 }
 
 /* Unicode to Japanese conversion routine */
-static wint_t
+wint_t
 __uc2jp (wint_t c, int type)
 {
   (void) c;
   (void) type;
-//#warning back-conversion Unicode to Japanese not implemented; needed for towupper/towlower
+//#warning back-conversion Unicode to Japanese not implemented
   return c;
 }
 
-/* Japanese to Unicode conversion interface */
-wint_t
-_jp2uc_l (wint_t c, struct __locale_t * l)
-{
-  const char * cs = l ? __locale_charset(l) : __current_locale_charset();
-  if (0 == strcmp (cs, "JIS"))
-    c = __jp2uc (c, JP_JIS);
-  else if (0 == strcmp (cs, "SJIS"))
-    c = __jp2uc (c, JP_SJIS);
-  else if (0 == strcmp (cs, "EUCJP"))
-    c = __jp2uc (c, JP_EUCJP);
-  return c;
-}
-
-wint_t
-_jp2uc (wint_t c)
-{
-  (void) c;
-  return _jp2uc_l (c, 0);
-}
-
-/* Unicode to Japanese conversion interface */
-wint_t
-_uc2jp_l (wint_t c, struct __locale_t * l)
-{
-  const char * cs = l ? __locale_charset(l) : __current_locale_charset();
-  if (0 == strcmp (cs, "JIS"))
-    c = __uc2jp (c, JP_JIS);
-  else if (0 == strcmp (cs, "SJIS"))
-    c = __uc2jp (c, JP_SJIS);
-  else if (0 == strcmp (cs, "EUCJP"))
-    c = __uc2jp (c, JP_EUCJP);
-  return c;
-}
-
-#endif /* _MB_CAPABLE */
+#endif /* _MB_EXTENDED_CHARSETS_JIS */

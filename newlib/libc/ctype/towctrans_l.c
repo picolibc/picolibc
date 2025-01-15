@@ -155,14 +155,9 @@ touupper (wint_t c)
 }
 
 wint_t
-towctrans_l (wint_t c, wctrans_t w, struct __locale_t *locale)
+towctrans_l (wint_t u, wctrans_t w, struct __locale_t *locale)
 {
   (void) locale;
-#ifdef _MB_CAPABLE
-  wint_t u = _jp2uc_l (c, locale);
-#else
-  wint_t u = c;
-#endif
   wint_t res;
   if (w == WCT_TOLOWER)
     res = toulower (u);
@@ -173,14 +168,10 @@ towctrans_l (wint_t c, wctrans_t w, struct __locale_t *locale)
       // skipping the errno setting that was previously involved
       // by delegating to towctrans; it was causing trouble (cygwin crash)
       // and there is no errno specified for towctrans
-      return c;
+      return u;
     }
   if (res != u)
-#ifdef _MB_CAPABLE
-    return _uc2jp_l (res, locale);
-#else
     return res;
-#endif
   else
-    return c;
+    return u;
 }
