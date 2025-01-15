@@ -661,7 +661,8 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
   mode_t attr = 0;
   aclent_t *lacl = NULL;
   cygpsid ace_sid, *aclsid;
-  int pos, type, id, idx;
+  int pos, type, idx;
+  id_t id;
 
   bool owner_eq_group;
   bool just_created = false;
