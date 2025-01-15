@@ -60,6 +60,7 @@ typedef union {
     double d;
     long long ll;
     size_t s;
+    long double ld;
 } align_chunk_t;
 
 /*          --------------------------------------
