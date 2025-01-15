@@ -1069,6 +1069,9 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  lacl[pos].a_type = DEF_GROUP_OBJ;
 	  lacl[pos].a_id = gid;
 	  lacl[pos].a_perm = lacl[1].a_perm;
+	  /* If owner == group, the owner perms should be used. */
+	  if (owner_eq_group)
+	    lacl[pos].a_perm |= lacl[0].a_perm;
 	  /* Note the position of the DEF_GROUP_OBJ entry. */
 	  def_pgrp_pos = pos;
 	  aclsid[pos] = well_known_creator_group_sid;
