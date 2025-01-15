@@ -328,10 +328,10 @@ static __inline char __ctype_lookup_l(int c, locale_t l) {
    function.  */
 #   define toupper(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
-      (void) __CTYPE_PTR[__x]; (toupper) (__x);})
+      (void) __CTYPE_PTR[(int) __x]; (toupper) (__x);})
 #   define tolower(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
-      (void) __CTYPE_PTR[__x]; (tolower) (__x);})
+      (void) __CTYPE_PTR[(int) __x]; (tolower) (__x);})
 #  endif /* _MB_EXTENDED_CHARSETS* */
 # endif /* __GNUC__ */
 
