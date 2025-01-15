@@ -1054,7 +1054,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       if (!(types_def & USER_OBJ))
 	{
 	  lacl[pos].a_type = DEF_USER_OBJ;
-	  lacl[pos].a_id = uid;
+	  lacl[pos].a_id = ACL_UNDEFINED_ID;
 	  lacl[pos].a_perm = lacl[0].a_perm;
 	  aclsid[pos] = well_known_creator_owner_sid;
 	  pos++;
@@ -1062,7 +1062,7 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
       if (!(types_def & GROUP_OBJ) && pos < MAX_ACL_ENTRIES)
 	{
 	  lacl[pos].a_type = DEF_GROUP_OBJ;
-	  lacl[pos].a_id = gid;
+	  lacl[pos].a_id = ACL_UNDEFINED_ID;
 	  lacl[pos].a_perm = lacl[1].a_perm;
 	  /* If owner == group, the owner perms should be used. */
 	  if (owner_eq_group)
