@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
+#include <limits.h>
 
 static struct {
     char *n;
@@ -63,6 +64,9 @@ int main(int argc, char **argv)
     wchar_t     c;
     unsigned    f;
     FILE        *out = stdout;
+    int         i;
+    char        *encode = "ascii";
+    char        mbbuf[MB_LEN_MAX];
 
     if (argc > 1) {
         out = fopen(argv[1], "w");
@@ -72,22 +76,28 @@ int main(int argc, char **argv)
         }
     }
 
-    c = 0x0000;
-    setlocale(LC_ALL, "C.UTF-8");
-    for (;;) {
-        fprintf(out, "0x%04x", c);
-        for (f = 0; f < NFUNC; f++)
-            fprintf(out, "%6.6s ", funcs[f].f(c) ? funcs[f].n : "      ");
+    for (i = 0; i < 2; i++) {
+        for (c = 0x0000; ; c++) {
+            /* Skip TAG characters as glibc allows them? */
+            if (i == 0 && (c >> 7 == (0xe0000 >> 7)))
+                continue;
+            if(wctomb(mbbuf, c) >= 0) {
+                fprintf(out, "%s 0x%04x", encode, c);
+                for (f = 0; f < NFUNC; f++)
+                    fprintf(out, "%6.6s ", funcs[f].f(c) ? funcs[f].n : "      ");
 
-        fprintf(out, "\n");
+                fprintf(out, "\n");
+            }
 #if __SIZEOF_WCHAR_T__ == 2
-        if (c == 0xffff)
-            break;
+            if (c == 0xffff)
+                break;
 #else
-        if (c == 0xe01ef)
-            break;
+            if (c == 0xe01ef)
+                break;
 #endif
-        c++;
+        }
+        setlocale(LC_ALL, "C.UTF-8");
+        encode = "utf-8";
     }
     fflush(out);
     return 0;
