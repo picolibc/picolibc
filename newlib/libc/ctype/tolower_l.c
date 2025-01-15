@@ -27,8 +27,8 @@ tolower_l (int c, struct __locale_t *locale)
       mbstate_t state;
 
       memset (&state, 0, sizeof state);
-      if (locale->mbtowc (_REENT, &wc, s, 1, &state) >= 0
-	  && locale->wctomb (_REENT, s,
+      if (locale->mbtowc (&wc, s, 1, &state) >= 0
+	  && locale->wctomb (s,
 			     (wchar_t) towlower_l ((wint_t) wc, locale),
 			     &state) == 1)
 	c = (unsigned char) s[0];
