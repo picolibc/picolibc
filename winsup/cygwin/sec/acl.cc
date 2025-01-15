@@ -1080,7 +1080,6 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  lacl[pos].a_id = ACL_UNDEFINED_ID;
 	  lacl[pos].a_perm = lacl[2].a_perm;
 	  aclsid[pos] = well_known_world_sid;
-	  pos++;
 	}
     }
   /* If this is an old-style or non-Cygwin ACL, and secondary user default
