@@ -94,6 +94,13 @@ MKSID (mandatory_system_integrity_sid, "S-1-16-16384",
 MKSID (well_known_samba_unix_user_fake_sid, "S-1-22-1-0",
        SECURITY_SAMBA_UNIX_AUTHORITY, 2, 1, 0);
 
+void
+cygpsid::debug_print (const char *prefix) const
+{
+  char buf[256] __attribute__ ((unused));
+  small_printf ("%s %s\r\n", prefix ?: "", string (buf) ?: "NULL");
+}
+
 bool
 cygpsid::operator== (const char *nsidstr) const
 {
