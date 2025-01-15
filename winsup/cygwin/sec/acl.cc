@@ -595,6 +595,10 @@ setacl (HANDLE handle, path_conv &pc, int nentries, aclent_t *aclbufp,
 #define DENY_W 020000
 #define DENY_X 010000
 #define DENY_RWX (DENY_R | DENY_W | DENY_X)
+/* Temporary bit to indicate that an incoming Windows ACE is valid for
+   the object as well (so it's not an INHERIT_ONLY ACE).  Used by
+   get_posix_access to create useful default perms. */
+#define FULL_ACE 0100000
 
 /* New style ACL means, just read the bits and store them away.  Don't
    create masked values on your own. */
@@ -875,8 +879,10 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	  if (type == USER_OBJ)
 	    owner_eq_group = true;
 	}
+      bool default_only_ace = true;
       if (!(ace->Header.AceFlags & INHERIT_ONLY || type & ACL_DEFAULT))
 	{
+	  default_only_ace = false;
 	  if (type == USER_OBJ)
 	    {
 	      /* If we get a second entry for the owner SID, it's either a
@@ -991,6 +997,12 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 	      aclsid[pos] = ace_sid;
 	      if (!new_style)
 		{
+		  /* Add flag that we're generating object and default ACL
+		     entry from the same Windows ACE and so permissions are
+		     supposed to be the same. */
+		  if (!default_only_ace
+		      && type & (USER_OBJ | USER | GROUP_OBJ | GROUP))
+		    lacl[pos].a_perm |= FULL_ACE;
 		  /* Fix up DEF_CLASS_OBJ value. */
 		  if (type & (USER | GROUP))
 		    {
@@ -1102,55 +1114,91 @@ get_posix_access (PSECURITY_DESCRIPTOR psd,
 
   /* For old-style or non-Cygwin ACLs, check for merging permissions. */
   if (!new_style)
-    for (idx = 0; idx < pos; ++idx)
-      {
-	if (lacl[idx].a_type & (USER_OBJ | USER)
-	    && !(lacl[idx].a_type & ACL_DEFAULT))
-	  {
-	    mode_t perm;
+    {
+      /* First loop handles object permissions */
+      for (idx = 0; idx < pos; ++idx)
+	{
+	  mode_t perm;
 
-	    /* Don't merge if the user already has all permissions, or... */
-	    if (lacl[idx].a_perm == S_IRWXO)
-	      continue;
-	    /* ...if the sum of perms is less than or equal the user's perms. */
-	    perm = lacl[idx].a_perm
-		   | (has_class_perm ? class_perm : lacl[1].a_perm)
-		   | lacl[2].a_perm;
-	    if (perm == lacl[idx].a_perm)
-	      continue;
-	    /* Otherwise, if we use the Windows user DB, utilize Authz to make
-	       sure all user permissions are correctly reflecting the Windows
-	       permissions. */
-	    if (cygheap->pg.nss_pwd_db ()
-		&& authz_get_user_attribute (&perm, psd, aclsid[idx]))
-	      lacl[idx].a_perm = perm;
-	    /* Otherwise we only check the current user.  If the user entry
-	       has a deny ACE, don't check. */
-	    else if (lacl[idx].a_id == myself->uid
-		     && !(lacl[idx].a_perm & DENY_RWX))
-	      {
-		/* Sum up all permissions of groups the user is member of, plus
-		   everyone perms, and merge them to user perms.  */
-		BOOL ret;
+	  if (lacl[idx].a_type & (USER_OBJ | USER)
+	      && !(lacl[idx].a_type & ACL_DEFAULT))
+	    {
 
-		perm = lacl[2].a_perm & S_IRWXO;
-		for (int gidx = 1; gidx < pos; ++gidx)
-		  if (lacl[gidx].a_type & (GROUP_OBJ | GROUP)
-		      && CheckTokenMembership (cygheap->user.issetuid ()
-					       ? cygheap->user.imp_token () : NULL,
-					       aclsid[gidx], &ret)
-		      && ret)
-		    perm |= lacl[gidx].a_perm & S_IRWXO;
-		lacl[idx].a_perm |= perm;
-	      }
-	  }
-	/* For all groups, if everyone has more permissions, add everyone
-	   perms to group perms.  Skip groups with deny ACE. */
-	else if (lacl[idx].a_type & (GROUP_OBJ | GROUP)
-		 && !(lacl[idx].a_type & ACL_DEFAULT)
-		 && !(lacl[idx].a_perm & DENY_RWX))
-	  lacl[idx].a_perm |= lacl[2].a_perm & S_IRWXO;
-      }
+	      /* Don't merge if the user already has all permissions, or... */
+	      if (lacl[idx].a_perm == S_IRWXO)
+		continue;
+	      /* ...the sum of perms is less than or equal the user's perms. */
+	      perm = lacl[idx].a_perm
+		     | (has_class_perm ? class_perm : lacl[1].a_perm)
+		     | lacl[2].a_perm;
+	      if (perm == lacl[idx].a_perm)
+		continue;
+	      /* Otherwise, if we utilize the Windows user DB, use Authz to
+		 make sure all user permissions are correctly reflecting the
+		 Windows permissions. */
+	      if (cygheap->pg.nss_pwd_db ()
+		  && authz_get_user_attribute (&perm, psd, aclsid[idx]))
+		lacl[idx].a_perm = perm;
+	      /* Otherwise we only check the current user.  If the user entry
+		 has a deny ACE, don't check. */
+	      else if (lacl[idx].a_id == myself->uid
+		       && !(lacl[idx].a_perm & DENY_RWX))
+		{
+		  /* Sum up all permissions of groups the user is member of,
+		     plus everyone perms, and merge them to user perms.  */
+		  BOOL ret;
+
+		  perm = lacl[2].a_perm & S_IRWXO;
+		  for (int gidx = 1; gidx < pos; ++gidx)
+		    if (lacl[gidx].a_type & (GROUP_OBJ | GROUP)
+			&& CheckTokenMembership (cygheap->user.issetuid ()
+						 ? cygheap->user.imp_token ()
+						 : NULL, aclsid[gidx], &ret)
+			&& ret)
+		      perm |= lacl[gidx].a_perm & S_IRWXO;
+		  lacl[idx].a_perm |= perm;
+		}
+	    }
+	  /* For all groups, if everyone has more permissions, add everyone
+	     perms to group perms.  Skip groups with deny ACE. */
+	  else if (lacl[idx].a_type & (GROUP_OBJ | GROUP)
+		   && !(lacl[idx].a_type & ACL_DEFAULT)
+		   && !(lacl[idx].a_perm & DENY_RWX))
+	    lacl[idx].a_perm |= lacl[2].a_perm & S_IRWXO;
+	}
+      /* Second loop handles default permissions in case we get object
+	 and default perms from the same Windows ACE. */
+      for (idx = 0; idx < pos; ++idx)
+	{
+	  int obj_idx;
+
+	  if (!(lacl[idx].a_perm & FULL_ACE))
+	    continue;
+
+	  type = lacl[idx].a_type & (USER_OBJ | USER | GROUP_OBJ | GROUP);
+	  id = (type & (USER_OBJ | GROUP_OBJ)) ? ACL_UNDEFINED_ID
+					       : lacl[idx].a_id;
+	  switch (type)
+	    {
+	    case USER_OBJ:
+	    case USER:
+	      obj_idx = searchace (lacl, pos + 1, USER_OBJ, id);
+	      if (obj_idx < 0)
+		obj_idx = searchace (lacl, pos + 1, USER,
+				     lacl[idx].a_id);
+	      break;
+	    case GROUP_OBJ:
+	    case GROUP:
+	      obj_idx = searchace (lacl, pos + 1, GROUP_OBJ, id);
+	      if (obj_idx < 0)
+		obj_idx = searchace (lacl, pos + 1, GROUP,
+				     lacl[idx].a_id);
+	      break;
+	    }
+	    if (obj_idx >= 0 && obj_idx <= pos)
+	      lacl[idx].a_perm |= lacl[obj_idx].a_perm;
+	}
+    }
   /* If owner SID == group SID (Microsoft Accounts) merge group perms into
      user perms but leave group perms intact.  That's a fake, but it allows
      to keep track of the POSIX group perms without much effort. */
