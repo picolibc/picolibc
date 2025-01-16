@@ -1051,9 +1051,11 @@ posix_madvise SIGFE
 posix_memalign SIGFE
 posix_openpt SIGFE
 posix_spawn SIGFE
+posix_spawn_file_actions_addchdir = posix_spawn_file_actions_addchdir_np SIGFE
 posix_spawn_file_actions_addchdir_np SIGFE
 posix_spawn_file_actions_addclose SIGFE
 posix_spawn_file_actions_adddup2 SIGFE
+posix_spawn_file_actions_addfchdir = posix_spawn_file_actions_addfchdir_np SIGFE
 posix_spawn_file_actions_addfchdir_np SIGFE
 posix_spawn_file_actions_addopen SIGFE
 posix_spawn_file_actions_destroy SIGFE

@@ -9,6 +9,11 @@ What's new:
 
 - New API call: timespec_get.
 
+- New POSIX-defined entry points posix_spawn_file_actions_addchdir and
+  posix_spawn_file_actions_addfchdir.  These are the same as the already
+  exported posix_spawn_file_actions_addchdir_np and
+  posix_spawn_file_actions_addfchdir_np.
+
 - Add FS_IOC_[GS]ETFLAGS FS_PINNED_FL and FS_UNPINNED_FL flags to handle
   Windows attributes FILE_ATTRIBUTE_PINNED and FILE_ATTRIBUTE_UNPINNED.
   Add matching 'p' and 'u' mode bits in chattr(1) and lsattr(1).
