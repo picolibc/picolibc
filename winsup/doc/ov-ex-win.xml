@@ -12,19 +12,19 @@ to become acquainted with UNIX basics (search for "UNIX basics" or
 "UNIX tutorial"). 
 </para>
 <para>
-To install a basic Cygwin environment, run the
-<command>setup.exe</command> program and click <literal>Next</literal>
+To install a basic Cygwin environment, run the Cygwin Setup program from
+the <ulink url="https://cygwin.com/">Cygwin homepage</ulink> and click
+<literal>Next</literal>
 at each page.  The default settings are correct for most users. If you
 want to know more about what each option means, see 
-<xref linkend="internet-setup"></xref>. Use <command>setup.exe</command>
+<xref linkend="internet-setup"></xref>. Use the Cygwin Setup program
 any time you want to update or install a Cygwin package.  If you are
 installing Cygwin for a specific purpose, use it to install the tools
 that you need. For example, if you want to compile C++ programs, you 
 need the <systemitem>gcc-g++</systemitem> package and probably a text
-editor like <systemitem>nano</systemitem>.  When running
-<command>setup.exe</command>, clicking on categories and packages in the
-package installation screen will provide you with the ability to control
-what is installed or updated. 
+editor like <systemitem>nano</systemitem>.  When running Cygwin Setup,
+clicking on categories and packages in the package installation screen
+will provide you with the ability to control what is installed or updated. 
 </para>
 <para>
 After installation, you can find Cygwin-specific documentation in

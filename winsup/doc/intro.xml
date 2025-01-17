@@ -56,7 +56,7 @@
       <title>NOTES</title>
       <para>To port applications you will need to install the development tools,
       which you can do by selecting <package>gcc</package> in
-      <emphasis>setup.exe</emphasis> (dependencies are automatically handled).
+      the Cygwin Setup program (dependencies are automatically handled).
       If you need a specific program or library, you can search for a
       <emphasis>Cygwin</emphasis> package containing it at:</para>
       <para>

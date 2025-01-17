@@ -100,10 +100,9 @@ the GNU configure mechanism. Self hosting was achieved as of the beta
 The entire Cygwin toolset was available as a monolithic install. In
 April 2000, the project announced a
 <ulink url="https://www.cygwin.com/ml/cygwin/2000-04/msg00269.html">
-New Cygwin Net Release</ulink> which provided the native non-Cygwin Win32 program
-<command>setup.exe</command> to install and upgrade each package
-separately. Since then, the Cygwin DLL and <command>setup.exe</command> 
-have seen continuous development.
+New Cygwin Net Release</ulink> which provided a graphical non-Cygwin
+Setup program to install and upgrade each package separately. Since then,
+the Cygwin DLL and the Setup tool have seen continuous development.
 </para>
 
 <para>

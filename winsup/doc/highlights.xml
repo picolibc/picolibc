@@ -87,9 +87,9 @@ that the root path is <filename>C:\Cygwin</filename>.  So it looks for the
 <filename>fstab</filename> file in <filename>C:\Cygwin\etc\fstab</filename>. 
 The layout of this file is very similar to the layout of the
 <filename>fstab</filename> file on Linux.  Just instead of block devices,
-the mount points point to Win32 paths.  An installation with
-<command>setup.exe</command> installs a <filename>fstab</filename> file by
-default, which can easily be changed using the editor of your choice.</para>
+the mount points point to Win32 paths.  On installation, a default
+<filename>fstab</filename> file is created, which can easily be changed
+using the editor of your choice.</para>
 
 <para>The <filename>fstab</filename> file allows mounting arbitrary Win32
 paths into the POSIX file system space.  A special case is the so-called
