@@ -168,7 +168,7 @@ will slow things down tremendously if it does not exist.
 <answer>
 
 <para>If your service is one of those which switch the user context
-(sshd, inetd, etc), then it depends on the method used to switch to
+(cygsshd, inetd, etc), then it depends on the method used to switch to
 another user.  This problem as well as its solution is described in
 detail in the Cygwin User's Guide, see
 <ulink url="https://cygwin.com/cygwin-ug-net/ntsec.html"/>.
@@ -355,7 +355,9 @@ See the documentation for the option <literal>-noleaf</literal> in the man page.
 it has not been ported to Cygwin and has never worked.  It is
 currently installed as part of the sh-utils, but again, it does not work.
 </para>
-<para>You should rather install <literal>sshd</literal> and use
+<para>You should rather install <literal>sshd</literal> as a service
+(the service will be called <literal>cygsshd</literal> so as not to
+collide with the Microsoft <literal>sshd</literal> service) and use
 <literal>ssh username@localhost</literal> as a <literal>su</literal>
 replacement.
 </para>
@@ -535,7 +537,7 @@ running at the same time which conflict with each other.  Apart from
 mixing executables of different Cygwin installations, this could also happen
 if you have one a single Cygwin installation, for example, if you update the
 Cygwin package without exiting <emphasis>all</emphasis> Cygwin apps (including
-services like sshd) beforehand.</para>
+services like cygsshd) beforehand.</para>
 <para>The only DLL that is sanctioned by the Cygwin project is the one that
 you get by running the <ulink url="https://cygwin.com/install.html">Cygwin Setup program</ulink>,
 installed in a directory controlled by this program.  If you have other

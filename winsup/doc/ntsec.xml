@@ -687,7 +687,7 @@ startup, you may wish to consider starting
 <command><link linkend="using-cygserver">cygserver</link></command> first in
 order to take advantage of this system-wide caching.  To assure that
 <command><link linkend="using-cygserver">cygserver</link></command> has started
-prior to starting <command>sshd</command> or other Cygwin processes, you may
+prior to starting <command>cygsshd</command> or other Cygwin services, you may
 wish to create service startup dependencies.
 <command><link linkend="using-cygserver">Cygserver</link></command> should
 probably wait for Windows TCPIP and AFD services before it starts, and then
@@ -707,7 +707,7 @@ shown below.  You will need an administrative prompt to run the
   # Delay sshd until after Cygserver has started
   # Again note the (odd) required space character after "depend="
 
-  sc config sshd depend= cygserver
+  sc config cygsshd depend= cygserver
 
   # View the Cygserver service details
 
@@ -2212,8 +2212,8 @@ to 3.0 tried to creat a user token from scratch using an officially
 undocumented function <command>NtCreateToken</command> which
 is now disabled.</para>
 
-<para>So we just start the servers which have to switch the user context
-(<command>sshd</command>, <command>inetd</command>, <command>cron</command>,
+<para>So we just start the services which have to switch the user context
+(<command>cygsshd</command>, <command>inetd</command>, <command>cron</command>,
 ...) as Windows services under the SYSTEM (or LocalSystem in the GUI)
 account and everything just works.  Unfortunately that's too simple.
 Using <literal>S4U</literal> has a drawback.</para>

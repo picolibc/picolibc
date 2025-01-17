@@ -558,7 +558,7 @@ of Cygwin is as follows:
 the instructions in <ulink
 url="https://cygwin.com/faq/faq.html#faq.setup.uninstall-service"/> for
 all services that you installed.  Common services that might have been
-installed are <literal>sshd</literal>, <literal>cron</literal>, 
+installed are <literal>cygsshd</literal>, <literal>cron</literal>, 
 <literal>cygserver</literal>, <literal>inetd</literal>, <literal>apache</literal>, 
 <literal>postgresql</literal>, and so on.
 </para>

@@ -94,8 +94,9 @@ or <literal>Just Me</literal> should always be left on the default
 <literal>All Users</literal>, unless you do not have write access to 
 <literal>HKEY_LOCAL_MACHINE</literal> in the registry or the All Users 
 Start Menu. This is true  even if you are the only user planning to use Cygwin 
-on the machine.  Selecting <literal>Just Me</literal> will cause problems 
-for programs such as <command>crond</command> and <command>sshd</command>.
+on the machine.  Note that selecting <literal>Just Me</literal> will cause
+problems for Cygwin applications running as service, such as
+<command>crond</command> or <command>sshd</command>.
 If you do not have the necessary permissions, but still want to use these
 programs, consult the Cygwin mailing list archives about others' experiences.
 
