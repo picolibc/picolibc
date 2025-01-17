@@ -32,6 +32,7 @@
  */
 
 #define _DEFAULT_SOURCE
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
@@ -55,6 +56,9 @@ void __malloc_validate_block(chunk_t *r);
 #define MALLOC_UNLOCK __LIBC_UNLOCK()
 #endif
 
+#if __STDC_VERSION__ >= 201112L
+typedef max_align_t align_chunk_t;
+#else
 typedef union {
     void *p;
     double d;
@@ -62,6 +66,7 @@ typedef union {
     size_t s;
     long double ld;
 } align_chunk_t;
+#endif
 
 /*          --------------------------------------
  *          | size                               |
