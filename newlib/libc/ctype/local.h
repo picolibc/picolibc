@@ -69,7 +69,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CLASS_xdigit    (1 << 12)
 
 uint16_t
-__ctype_table_lookup(wint_t ic);
+__ctype_table_lookup(wint_t ic, struct __locale_t *locale);
 
 /* Japanese encoding types supported */
 #define JP_JIS		1

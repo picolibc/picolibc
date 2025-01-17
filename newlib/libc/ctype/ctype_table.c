@@ -33,12 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <ctype.h>
 #include <wctype.h>
+#include <langinfo.h>
 #include "local.h"
 
-#define NEED_CTYPE_TABLE
+#ifdef _MB_CAPABLE
 
 static struct {
     wchar_t             code;
@@ -50,17 +51,26 @@ static struct {
 #define N_CAT_TABLE     (sizeof(ctype_table) / sizeof(ctype_table[0]))
 
 uint16_t
-__ctype_table_lookup(wint_t ic)
+__ctype_table_lookup(wint_t ic, struct __locale_t *locale)
 {
     size_t      low = 0;
     size_t      high = N_CAT_TABLE - 1;
     size_t      mid;
+    const char  *ctype_locale;
     wchar_t     c;
 
     if (ic == WEOF)
         return CLASS_none;
 
     c = (wchar_t) ic;
+
+    if (!locale)
+        locale = __get_current_locale();
+
+    /* Be compatible with glibc where the C locale has no classes outside of ASCII */
+    ctype_locale = locale->categories[NL_LOCALE_NAME(LC_CTYPE) - NL_LOCALE_NAME(LC_ALL)];
+    if (c >= 0x80 && !strcmp (ctype_locale, "C"))
+        return CLASS_none;
 
     while (low < high) {
         mid = (low + high) >> 1;
@@ -75,3 +85,4 @@ __ctype_table_lookup(wint_t ic)
     }
     return ctype_table[high].category;
 }
+#endif /* _MB_CAPABLE */

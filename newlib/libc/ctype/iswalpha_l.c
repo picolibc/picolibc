@@ -13,7 +13,7 @@ iswalpha_l (wint_t c, struct __locale_t *locale)
 {
   (void) locale;
 #ifdef _MB_CAPABLE
-  uint16_t cat = __ctype_table_lookup (c);
+  uint16_t cat = __ctype_table_lookup (c, locale);
   return cat & CLASS_alpha;
 #else
   return c < (wint_t)0x100 ? isalpha (c) : 0;
