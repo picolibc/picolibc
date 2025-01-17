@@ -75,11 +75,17 @@ if objcopy.found()
   # (0x100000)
 
   bios_ld = '@0@/@1@'.format(meson.current_source_dir(), 'bios.ld')
+  link_args = ['-nostdlib', '-m32', '-Wl,--build-id=none', '-T', bios_ld]
+  # x86_64 compiler needs a elf32-i386 target set if using -m32.
+  if compiler_id == 'gcc' and target_machine.cpu_family() == 'x86_64'
+    link_args = ['-Wl,-b,elf32-i386', '-Wl,-melf_i386'] + link_args
+  endif
+
   bios = executable('bios', 'bios.S',
 		    c_args: ['-m32'] + c_args,
                     include_directories: inc,
                     link_depends: [bios_ld],
-		    link_args: ['-nostdlib', '-m32', '-Wl,--build-id=none', '-T', bios_ld])
+		    link_args: link_args)
 
   bios_bin = custom_target('bios.bin',
 		           build_by_default: true,

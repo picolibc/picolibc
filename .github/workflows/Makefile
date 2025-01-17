@@ -9,7 +9,7 @@ LINUX_DEPS=\
 	steps-minsize \
 	steps-release
 
-all: linux.yml zephyr.yml
+all: linux.yml zephyr.yml coreboot.yml
 
 linux.yml: $(LINUX_DEPS)
 	./make-workflow > $@
@@ -26,5 +26,17 @@ ZEPHYR_DEPS=\
 zephyr.yml: $(ZEPHYR_DEPS)
 	./make-workflow-zephyr > $@
 
+COREBOOT_DEPS=\
+	make-workflow-coreboot \
+	head-coreboot \
+	variants \
+	targets-coreboot \
+	steps-head \
+	steps-minsize \
+	steps-release
+
+coreboot.yml: $(COREBOOT_DEPS)
+	./make-workflow-coreboot > $@
+
 clean:
-	rm -f linux.yml zephyr.yml
+	rm -f linux.yml zephyr.yml coreboot.yml
