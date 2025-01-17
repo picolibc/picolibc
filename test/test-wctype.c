@@ -34,39 +34,65 @@
  */
 
 #include <wctype.h>
+#include <wchar.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <locale.h>
 #include <limits.h>
 
 static struct {
-    char *n;
+    char n;
     int (*f)(wint_t);
 } funcs[] = {
-    { .n = "alnum", iswalnum },
-    { .n = "alpha", iswalpha },
-    { .n = "blank", iswblank },
-    { .n = "cntrl", iswcntrl },
-    { .n = "digit", iswdigit },
-    { .n = "graph", iswgraph },
-    { .n = "lower", iswlower },
-    { .n = "print", iswprint },
-    { .n = "punct", iswpunct },
-    { .n = "space", iswspace },
-    { .n = "upper", iswupper },
-    { .n = "xdigit", iswxdigit },
+    { .n = 'A', iswalnum },
+    { .n = 'a', iswalpha },
+    { .n = 'b', iswblank },
+    { .n = 'c', iswcntrl },
+    { .n = 'd', iswdigit },
+    { .n = 'g', iswgraph },
+    { .n = 'l', iswlower },
+    { .n = 'p', iswprint },
+    { .n = '!', iswpunct },
+    { .n = 's', iswspace },
+    { .n = 'u', iswupper },
+    { .n = 'x', iswxdigit },
 };
 
 #define NFUNC sizeof(funcs)/sizeof(funcs[0])
+
+static const char *locales[] = {
+    "C",
+#ifdef HAVE_UTF_CHARSETS
+    "C.UTF-8",
+#endif
+#ifdef HAVE_ISO_CHARSETS
+    "C.ISO-8859-2",
+#endif
+#ifdef HAVE_WINDOWS_CHARSETS
+    "C.CP1125",
+#endif
+#ifdef HAVE_JIS_CHARSETS
+    "C.SJIS",
+#endif
+};
+
+#define NUM_LOCALE sizeof(locales)/sizeof(locales[0])
+
+#if __SIZEOF_WCHAR_T__ == 2
+#define LAST_CHAR 0xffff
+#else
+#define LAST_CHAR 0xe01ef
+#endif
 
 int main(int argc, char **argv)
 {
     wchar_t     c;
     unsigned    f;
     FILE        *out = stdout;
-    int         i;
-    char        *encode = "ascii";
-    char        mbbuf[MB_LEN_MAX];
+    unsigned    i;
+    const char  *encode;
+    unsigned    prev_mask;
+    unsigned    this_mask;
 
     if (argc > 1) {
         out = fopen(argv[1], "w");
@@ -76,28 +102,28 @@ int main(int argc, char **argv)
         }
     }
 
-    for (i = 0; i < 2; i++) {
+    for (i = 0; i < NUM_LOCALE; i++) {
+        if (setlocale(LC_ALL, locales[i]) == NULL) {
+            printf("invalid locale %s\n", locales[i]);
+            continue;
+        }
+        encode = locales[i];
+        prev_mask = ~0;
         for (c = 0x0000; ; c++) {
-            /* Skip TAG characters as glibc allows them? */
-            if (i == 0 && (c >> 7 == (0xe0000 >> 7)))
-                continue;
-            if(wctomb(mbbuf, c) >= 0) {
-                fprintf(out, "%s 0x%04x", encode, c);
+            this_mask = 0;
+            for (f = 0; f < NFUNC; f++)
+                if (funcs[f].f(c))
+                    this_mask |= (1 << f);
+            if (this_mask != prev_mask) {
+                fprintf(out, "%-12s 0x%04lx ", encode, (unsigned long) c);
                 for (f = 0; f < NFUNC; f++)
-                    fprintf(out, "%6.6s ", funcs[f].f(c) ? funcs[f].n : "      ");
-
+                    fprintf(out, "%c", (this_mask & (1 << f)) ? funcs[f].n : '.');
+                prev_mask = this_mask;
                 fprintf(out, "\n");
             }
-#if __SIZEOF_WCHAR_T__ == 2
-            if (c == 0xffff)
+            if (c == LAST_CHAR)
                 break;
-#else
-            if (c == 0xe01ef)
-                break;
-#endif
         }
-        setlocale(LC_ALL, "C.UTF-8");
-        encode = "utf-8";
     }
     fflush(out);
     return 0;

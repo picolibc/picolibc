@@ -604,32 +604,61 @@ if enable_native_tests
 		    link_args: native_c_args))
   endforeach
 
-  if newlib_mb
-    diff = find_program('diff', required: false)
+  diff = find_program('diff', required: false)
 
-    if diff.found()
-      wctype = executable('test-wctype', 'test-wctype.c',
-                          c_args: _c_args,
-                          link_args: _link_args,
-                          objects: _objs,
-                          link_depends: _link_depends,
-                          link_with: _libs,
-                          include_directories: inc)
+  if diff.found()
+    wctype_c_args = []
+    if newlib_mb
+      wctype_c_args += ['-DHAVE_UTF_CHARSETS']
+    endif
 
-      wctype_native = executable('test-wctype-native', 'test-wctype.c',
-                                 c_args: native_c_args,
-                                 link_args: native_c_args)
+    localedef = find_program('localedef', required: false)
 
-      wctype_out = custom_target ('wctype-out', output: 'wctype-out',
-                                  command: [wctype, '@OUTPUT@'])
+    locales=[]
+    # need meson 0.57 so we can use 'env' in custom_target
+    if mb_extended_charsets and localedef.found() and meson.version().version_compare('>=0.57')
+      foreach ctype : ['ISO-8859-2', 'CP1125', 'SJIS']
+        locale = 'C.' + ctype
+        if ctype == 'SJIS'
+          ctype = 'SHIFT_JIS'
+        endif
+        locales += [custom_target(locale, output: locale,
+                                  command: [localedef, '--no-warnings=ascii',
+                                            '-f', ctype, '-i', 'C', '.' / '@OUTPUT@'])]
+      endforeach
+      wctype_c_args += ['-DHAVE_ISO_CHARSETS',
+                        '-DHAVE_WINDOWS_CHARSETS',
+                        '-DHAVE_JIS_CHARSETS'
+                       ]
+    endif
 
+    wctype = executable('test-wctype', 'test-wctype.c',
+                        c_args: _c_args + wctype_c_args,
+                        link_args: _link_args,
+                        objects: _objs,
+                        link_depends: _link_depends,
+                        link_with: _libs,
+                        include_directories: inc)
+
+    wctype_native = executable('test-wctype-native', 'test-wctype.c',
+                               c_args: native_c_args + wctype_c_args,
+                               link_args: native_c_args)
+
+    wctype_out = custom_target ('wctype-out', output: 'wctype-out',
+                                command: [wctype, '@OUTPUT@'])
+
+    if locales != [] and meson.version().version_compare('>=0.57')
+      wctype_native_out = custom_target ('wctype-native-out', output: 'wctype-native-out',
+                                         depends: locales,
+                                         env: ['LOCPATH=' + meson.current_build_dir()],
+                                         command: [wctype_native, '@OUTPUT@'])
+    else
       wctype_native_out = custom_target ('wctype-native-out', output: 'wctype-native-out',
                                          command: [wctype_native, '@OUTPUT@'])
-
-      test('wctype-compare', diff, args: [wctype_out, wctype_native_out])
     endif
+
+    test('wctype-compare', diff, args: [wctype_out, wctype_native_out])
   endif
-       
 endif
 
 subdir('libc-testsuite')
