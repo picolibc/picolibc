@@ -44,7 +44,8 @@
 wint_t
 __jp2uc (wint_t c, int type)
 {
-  int index, adj;
+  unsigned index;
+  int adj;
   unsigned char byte1, byte2;
   wint_t ret;
 
@@ -61,10 +62,32 @@ __jp2uc (wint_t c, int type)
     case JP_EUCJP:
       byte1 = (c >> 8);
       byte2 = (c & 0xff);
+      if (byte1 == 0)
+        {
+          switch(byte2) {
+          case 0x5c:
+            return 0xa5;        /* ¥ */
+          case 0x7e:
+            return 0x203e;      /* ‾ */
+          default:
+            return byte2;
+          }
+        }
       break;
     case JP_SJIS:
       byte1 = c >> 8;
       byte2 = c & 0xff;
+      if (byte1 == 0)
+        {
+          switch(byte2) {
+          case 0x5c:
+            return 0xa5;        /* ¥ */
+          case 0x7e:
+            return 0x203e;      /* ‾ */
+          default:
+            return byte2;
+          }
+        }
       if (byte2 <= 0x9e)
         {
           adj = 0xa1 - 0x22;
@@ -84,31 +107,43 @@ __jp2uc (wint_t c, int type)
       return WEOF;
     }
 
+#define in_bounds(array, val)   (val < (sizeof(array)/sizeof(array[0])))
+
+#define in_bounds_o(array, val, offset)   (offset <= val && val < offset + (sizeof(array)/sizeof(array[0])))
+
   /* find conversion in jp2uc arrays */
 
   /* handle larger ranges first */
-  if (byte1 >= 0xb0 && byte1 <= 0xcf && c <= (wint_t) 0xcfd3)
+  if (byte1 >= 0xb0 && byte1 <= 0xcf && c <= (wint_t) 0xcfd3 && byte2 >= 0xa1)
     {
       index = (byte1 - 0xb0) * 0xfe + (byte2 - 0xa1);
-      return b02cf[index];
+      if (in_bounds(b02cf, index))
+        return b02cf[index];
     }
-  else if (byte1 >= 0xd0 && byte1 <= 0xf4 && c <= (wint_t) 0xf4a6)
+  else if (byte1 >= 0xd0 && byte1 <= 0xf4 && c <= (wint_t) 0xf4a6 && byte2 >= 0xa1)
     {
       index = (byte1 - 0xd0) * 0xfe + (byte2 - 0xa1);
-      return d02f4[index];
+      if (in_bounds(d02f4, index))
+        return d02f4[index];
     }
 
   /* handle smaller ranges here */
   switch (byte1)
     {
     case 0xA1:
+      if (!in_bounds_o (a1, byte2, 0xa1))
+        break;
       return (wint_t)a1[byte2 - 0xa1];
     case 0xA2:
+      if (!in_bounds_o (a2, byte2, 0xa1))
+        break;
       ret = a2[byte2 - 0xa1];
       if (ret != 0)
 	return (wint_t)ret;
       break;
     case 0xA3:
+      if (!in_bounds_o (a3, byte2, 0xa1))
+        break;
       if (a3[byte2 - 0xa1])
 	return (wint_t)(0xff00 + (byte2 - 0xa0));
       break;
@@ -121,6 +156,8 @@ __jp2uc (wint_t c, int type)
 	return (wint_t)(0x3000 + byte2);
       break;
     case 0xA6:
+      if (!in_bounds_o (a6, byte2, 0xa1))
+        break;
       ret = 0;
       if (byte2 <= 0xd8)
 	ret = (wint_t)a6[byte2 - 0xa1];
@@ -128,6 +165,8 @@ __jp2uc (wint_t c, int type)
 	return ret;
       break;
     case 0xA7:
+      if (!in_bounds_o (a7, byte2, 0xa1))
+        break;
       ret = 0;
       if (byte2 <= 0xf1)
 	ret = (wint_t)a7[byte2 - 0xa1];
@@ -135,24 +174,31 @@ __jp2uc (wint_t c, int type)
 	return ret;
       break;
     case 0xA8:
+      if (!in_bounds_o (a8, byte2, 0xa1))
+        break;
       if (byte2 <= 0xc0)
 	return (wint_t)a8[byte2 - 0xa1];
       break;
     default:
-      return WEOF;
+      break;
     }
 
   return WEOF;
 }
 
-/* Unicode to Japanese conversion routine */
+/* Unicode to Japanese conversion routine. Not the most elegant solution. */
 wint_t
 __uc2jp (wint_t c, int type)
 {
-  (void) c;
-  (void) type;
-//#warning back-conversion Unicode to Japanese not implemented
-  return c;
+  wint_t u;
+  if (c == WEOF)
+    return WEOF;
+  for (u = 0x0001; ; u++) {
+    if (__jp2uc(u, type) == c)
+      return u;
+    if (u == 0xffff)
+      return WEOF;
+  }
 }
 
 #endif /* _MB_EXTENDED_CHARSETS_JIS */
