@@ -191,7 +191,7 @@ char *nl_langinfo_l (nl_item item, struct __locale_t *locale)
 do_codeset:
 #endif
 #if   !defined (_MB_CAPABLE)
-		ret = "US-ASCII";
+		ret = "ASCII";
 #endif /* __CYGWIN__ */
 		break;
 	case D_T_FMT:
