@@ -158,7 +158,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     crealf
     creall
     creat
-    crypt			(available in external "crypt" library)
+    crypt			(available in external "libcrypt" library)
     csin
     csinf
     csinh
@@ -200,7 +200,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     dup
     dup2
     duplocale
-    encrypt			(available in external "crypt" library)
+    encrypt			(available in external "libcrypt" library)
     endgrent
     endhostent
     endprotoent
@@ -849,7 +849,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     sethostent
     setitimer			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     setjmp
-    setkey			(available in external "crypt" library)
+    setkey			(available in external "libcrypt" library)
     setlocale
     setlogmask
     setpgid
@@ -1299,7 +1299,7 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     clog10f
     clog10l
     close_range			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
-    crypt_r			(available in external "crypt" library)
+    crypt_r			(available in external "libcrypt" library)
     dladdr			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     dremf
     dup3
