@@ -1420,7 +1420,7 @@ api_fatal_debug ()
 
 /* Attempt to carefully handle SIGCONT when we are stopped. */
 void
-_cygtls::handle_SIGCONT (threadlist_t * &tl_entry)
+_cygtls::handle_SIGCONT ()
 {
   if (NOTSTATE (myself, PID_STOPPED))
     return;
@@ -1431,23 +1431,17 @@ _cygtls::handle_SIGCONT (threadlist_t * &tl_entry)
      Make sure that any pending signal is handled before trying to
      send a new one.  Then make sure that SIGCONT has been recognized
      before exiting the loop.  */
-  bool sigsent = false;
-  while (1)
-    if (current_sig)	/* Assume that it's ok to just test sig outside of a
-			   lock since setup_handler does it this way.  */
-      {
-	cygheap->unlock_tls (tl_entry);
-	yield ();	/* Attempt to schedule another thread.  */
-	tl_entry = cygheap->find_tls (_main_tls);
-      }
-    else if (sigsent)
-      break;		/* SIGCONT has been recognized by other thread */
-    else
-      {
-	current_sig = SIGCONT;
-	set_signal_arrived (); /* alert sig_handle_tty_stop */
-	sigsent = true;
-      }
+  while (current_sig)  /* Assume that it's ok to just test sig outside of a */
+    yield ();          /* lock since setup_handler does it this way.  */
+
+  lock ();
+  current_sig = SIGCONT;
+  set_signal_arrived (); /* alert sig_handle_tty_stop */
+  unlock ();
+
+  while (current_sig == SIGCONT)
+    yield ();
+
   /* Clear pending stop signals */
   sig_clear (SIGSTOP, false);
   sig_clear (SIGTSTP, false);
@@ -1479,11 +1473,7 @@ sigpacket::process ()
   myself->rusage_self.ru_nsignals++;
 
   if (si.si_signo == SIGCONT)
-    {
-      tl_entry = cygheap->find_tls (_main_tls);
-      _main_tls->handle_SIGCONT (tl_entry);
-      cygheap->unlock_tls (tl_entry);
-    }
+    _main_tls->handle_SIGCONT ();
 
   /* SIGKILL is special.  It always goes through.  */
   if (si.si_signo == SIGKILL)

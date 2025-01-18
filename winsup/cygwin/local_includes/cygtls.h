@@ -195,7 +195,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   class cygthread *_ctinfo;
   class san *andreas;
   waitq wq;
-  int current_sig;
+  volatile int current_sig;
   unsigned incyg;
   volatile unsigned stacklock;
   __tlsstack_t *stackptr;
@@ -275,7 +275,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   {
     will_wait_for_signal = false;
   }
-  void handle_SIGCONT (threadlist_t * &);
+  void handle_SIGCONT ();
   static void cleanup_early(struct _reent *);
 private:
   void call2 (DWORD (*) (void *, void *), void *, void *);
