@@ -15,17 +15,23 @@
 
   A global load average estimate is maintained in shared memory.  Access to that
   is guarded by a mutex.  This estimate is only updated at most every 5 seconds.
+  The updates are done by any/all callers of the getloadavg() syscall.
 
-  We attempt to count running and runnable processes, but unlike linux we don't
-  count processes in uninterruptible sleep (blocked on I/O).
+  We attempt to count running and runnable tasks (i.e., threads), but unlike
+  Linux we don't count tasks in uninterruptible sleep (blocked on I/O).  There
+  doesn't seem to be a kernel counter for the latter on Windows.
 
-  The number of running processes is estimated as (NumberOfProcessors) * (%
-  Processor Time).  The number of runnable processes is estimated as
-  ProcessorQueueLength.
+  In the following text and code, "PDH" refers to Performance Data Helper, a
+  Windows component that arranges access to kernel counters.
+
+  The number of running tasks is estimated as
+    (the NumberOfProcessors counter) * (the % Processor Time counter).
+  The number of runnable tasks is taken to be the ProcessorQueueLength counter.
 
   Note that PDH will only return data for '% Processor Time' afer the second
   call to PdhCollectQueryData(), as it's computed over an interval, so the first
-  attempt to estimate load will fail and 0.0 will be returned.
+  attempt to estimate load will fail and 0.0 will be returned.  (This nuisance
+  is now worked-around near the end of load_init() below.)
 
   We also assume that '% Processor Time' averaged over the interval since the
   last time getloadavg() was called is a good approximation of the instantaneous
@@ -68,8 +74,19 @@ static bool load_init (void)
     if (status != STATUS_SUCCESS)
       {
 	debug_printf ("PdhAddEnglishCounterW(time), status %y", status);
-	return false;
+
+	/* Windows 10 Pro 21H1, and maybe others, use an alternative name */
+        status = PdhAddEnglishCounterW (query,
+                        L"\\Processor Information(_Total)\\% Processor Time",
+                        0, &counter1);
+        if (status != STATUS_SUCCESS)
+          {
+            debug_printf ("PdhAddEnglishCounterW(alt time), status %y", status);
+            return false;
+          }
       }
+
+    /* Windows 10 Pro 21H1, and maybe others, are missing this counter */
     status = PdhAddEnglishCounterW (query,
 				    L"\\System\\Processor Queue Length",
 				    0, &counter2);
@@ -77,7 +94,7 @@ static bool load_init (void)
     if (status != STATUS_SUCCESS)
       {
 	debug_printf ("PdhAddEnglishCounterW(queue length), status %y", status);
-	return false;
+	; /* Ignore missing counter, just use zero in later calculations */
       }
 
     mutex = CreateMutex(&sec_all_nih, FALSE, "cyg.loadavg.mutex");
@@ -87,6 +104,12 @@ static bool load_init (void)
     }
 
     initialized = true;
+
+    /* Do the first data collection (which always fails) here, rather than in
+       get_load(). We wait at least one tick afterward so the collection done
+       in get_load() is guaranteed to have data to work with. */
+    (void) PdhCollectQueryData (query); /* ignore errors */
+    Sleep (15/*ms*/); /* wait for at least one kernel tick to have occurred */
   }
 
   return initialized;
@@ -101,8 +124,8 @@ static bool get_load (double *load)
   if (ret != ERROR_SUCCESS)
     return false;
 
-  /* Estimate the number of running processes as (NumberOfProcessors) * (%
-     Processor Time) */
+  /* Estimate number of running tasks as
+     (NumberOfProcessors) * (% Processor Time) */
   PDH_FMT_COUNTERVALUE fmtvalue1;
   ret = PdhGetFormattedCounterValue (counter1, PDH_FMT_DOUBLE, NULL, &fmtvalue1);
   if (ret != ERROR_SUCCESS)
@@ -110,11 +133,10 @@ static bool get_load (double *load)
 
   double running = fmtvalue1.doubleValue * wincap.cpu_count () / 100;
 
-  /* Estimate the number of runnable processes using ProcessorQueueLength */
-  PDH_FMT_COUNTERVALUE fmtvalue2;
+  /* Estimate the number of runnable tasks as ProcessorQueueLength */
+  PDH_FMT_COUNTERVALUE fmtvalue2 = { 0 };
   ret = PdhGetFormattedCounterValue (counter2, PDH_FMT_LONG, NULL, &fmtvalue2);
-  if (ret != ERROR_SUCCESS)
-    return false;
+  /* Ignore any error accessing this counter, just treat as if zero was read */
 
   LONG rql = fmtvalue2.longValue;
 
