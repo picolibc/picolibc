@@ -557,7 +557,7 @@ change_back:
 
 	/* For Thumb, constants must be after the code since only 
 	   positive offsets are supported for PC relative addresses.  */
-	.align 0
+	.p2align 2
 .LC0:
 #ifdef ARM_RDI_MONITOR
 	.word	HeapBase
