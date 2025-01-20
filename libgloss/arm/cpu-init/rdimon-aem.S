@@ -60,7 +60,7 @@
 
 _rdimon_hw_init_hook:
     @ Only run the code on CPU 0 - otherwise spin
-    mrc         15, 0, r4, cr0, cr0, 5  @ Read MPIDR
+    mrc         p15, 0, r4, cr0, cr0, 5  @ Read MPIDR
     ands        r4, r4, #15
 spin:
     bne spin
@@ -70,15 +70,15 @@ spin:
 #ifdef __ARMEB__
     @ Setup for Big Endian
     setend      be
-    mrc         15, 0, r4, cr1, cr0, 0  @ Read SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 0  @ Read SCTLR
     orr         r4, r4, #(1<<25)        @ Switch to Big Endian (Set SCTLR.EE)
-    mcr         15, 0, r4, cr1, cr0, 0  @ Write SCTLR
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Write SCTLR
 #else
     @ Setup for Little Endian
     setend      le
-    mrc         15, 0, r4, cr1, cr0, 0  @ Read SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 0  @ Read SCTLR
     bic         r4, r4, #(1<<25)        @ Switch to LE (unset SCTLR.EE)
-    mcr         15, 0, r4, cr1, cr0, 0  @ Write SCTLR
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Write SCTLR
 #endif
 
     bl          is_a15_a7
@@ -87,44 +87,44 @@ spin:
     @ Write zero into the ACTLR to turn everything on.
     itt		eq
     moveq       r4, #0
-    mcreq       15, 0, r4, c1, c0, 1
+    mcreq       p15, 0, r4, c1, c0, 1
     isb
 
     @ For Cortex-A15 and Cortex-A7 only:
     @ Set ACTLR:SMP bit before enabling the caches and MMU,
     @ or performing any cache and TLB maintenance operations.
     ittt	eq
-    mrceq       15, 0, r4, c1, c0, 1    @ Read ACTLR
+    mrceq       p15, 0, r4, c1, c0, 1    @ Read ACTLR
     orreq       r4, r4, #(1<<6)         @ Enable ACTLR:SMP
-    mcreq       15, 0, r4, c1, c0, 1    @ Write ACTLR
+    mcreq       p15, 0, r4, c1, c0, 1    @ Write ACTLR
     isb
 
     @ Setup for exceptions being taken to Thumb/ARM state
-    mrc         15, 0, r4, cr1, cr0, 0	@ Read SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 0	@ Read SCTLR
 #if defined(__thumb__)
     orr         r4, r4, #(1 << 30)	@ Enable SCTLR.TE
 #else
     bic         r4, r4, #(1 << 30)      @ Disable SCTLR.TE
 #endif
-    mcr         15, 0, r4, cr1, cr0, 0  @ Write SCTLR
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Write SCTLR
 
     bl          __reset_caches
 
-    mrc         15, 0, r4, cr1, cr0, 0  @ Read SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 0  @ Read SCTLR
     orr         r4, r4, #(1<<22)        @ Enable unaligned mode
     bic         r4, r4, #2              @ Disable alignment faults
     bic         r4, r4, #1              @ Disable MMU
-    mcr         15, 0, r4, cr1, cr0, 0  @ Write SCTLR
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Write SCTLR
 
     mov         r4, #0
-    mcr         15, 0, r4, cr8, cr7, 0  @ Write TLBIALL - Invaliidate unified
+    mcr         p15, 0, r4, cr8, cr7, 0  @ Write TLBIALL - Invaliidate unified
                                         @ TLB
     @ Setup MMU Primary table P=V mapping.
     mvn         r4, #0
-    mcr         15, 0, r4, cr3, cr0, 0  @ Write DACR
+    mcr         p15, 0, r4, cr3, cr0, 0  @ Write DACR
 
     mov         r4, #0                  @ Always use TTBR0, no LPAE
-    mcr         15, 0, r4, cr2, cr0, 2  @ Write TTBCR
+    mcr         p15, 0, r4, cr2, cr0, 2  @ Write TTBCR
     adr         r4, page_table_addr	@ Load the base for vectors
     ldr         r4, [r4]
     mrc         p15, 0, r0, c0, c0, 5   @ read MPIDR
@@ -138,17 +138,17 @@ spin:
     addne       r4, r4, #0x58
     add         r4, r4, #1
 
-    mcr         15, 0, r4, cr2, cr0, 0  @ Write TTBR0
+    mcr         p15, 0, r4, cr2, cr0, 0  @ Write TTBR0
 
     mov         r0, #34 @ 0x22          @ TR0 and TR1 - normal memory
     orr         r0, r0, #(1 << 19)      @ Shareable
-    mcr         15, 0, r0, cr10, cr2, 0 @ Write PRRR
+    mcr         p15, 0, r0, cr10, cr2, 0 @ Write PRRR
     movw        r0, #0x33
     movt        r0, #0x33
-    mcr         15, 0, r0, cr10, cr2, 1 @ Write NMRR
-    mrc         15, 0, r0, cr1, cr0, 0  @ Read SCTLR
+    mcr         p15, 0, r0, cr10, cr2, 1 @ Write NMRR
+    mrc         p15, 0, r0, cr1, cr0, 0  @ Read SCTLR
     bic         r0, r0, #(1 << 28)      @ Clear TRE bit
-    mcr         15, 0, r0, cr1, cr0, 0  @ Write SCTLR
+    mcr         p15, 0, r0, cr1, cr0, 0  @ Write SCTLR
 
     @ Now install the vector code - we move the Vector code from where it is
     @ in the image to be based at _rdimon_vector_base.  We have to do this copy
@@ -166,25 +166,25 @@ copy_loop:                              @ Do the copy
     subs        r7, r7, #4
     bne         copy_loop
 
-    mrc         15, 0, r4, cr1, cr0, 0  @ Read SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 0  @ Read SCTLR
     bic         r4, r4, #0x1000         @ Disable I Cache
     bic         r4, r4, #4              @ Disable D Cache
     orr         r4, r4, #1              @ Enable MMU
     bic         r4, r4, #(1 << 28)      @ Clear TRE bit
-    mcr         15, 0, r4, cr1, cr0, 0  @ Write SCTLR
-    mrc         15, 0, r4, cr1, cr0, 2  @ Read CPACR
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Write SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 2  @ Read CPACR
     orr         r4, r4, #0x00f00000     @ Turn on VFP Co-procs
     bic         r4, r4, #0x80000000     @ Clear ASEDIS bit
-    mcr         15, 0, r4, cr1, cr0, 2  @ Write CPACR
+    mcr         p15, 0, r4, cr1, cr0, 2  @ Write CPACR
     isb
     mov         r4, #0
-    mcr         15, 0, r4, cr7, cr5, 4  @ Flush prefetch buffer
-    mrc         15, 0, r4, cr1, cr0, 2  @ Read CPACR
+    mcr         p15, 0, r4, cr7, cr5, 4  @ Flush prefetch buffer
+    mrc         p15, 0, r4, cr1, cr0, 2  @ Read CPACR
     ubfx        r4, r4, #20, #4		@ Extract bits [20, 23)
     cmp         r4, #0xf		@ If not all set then the CPU does not
     itt		eq			@ have FP or Advanced SIMD.
     moveq       r4, #0x40000000		@ Enable FP and Advanced SIMD
-    mcreq       10, 7, r4, cr8, cr0, 0  @ vmsr  fpexc, r4
+    mcreq       p10, 7, r4, cr8, cr0, 0  @ vmsr  fpexc, r4
 skip_vfp_enable:
     bl          __enable_caches         @ Turn caches on
     bx		r10                     @ Return to CRT startup routine
@@ -285,8 +285,9 @@ vector_common_2:
     bl          out_string
     bl          out_nl
 
-    @ Dump the registers
-    adrl        r6, register_names
+    @ Dump the registers, these are 4-byte aligned so we can reach them
+    @ with a simple ADR here.
+    adr         r6, register_names
     mov         r7, #0
 dump_r_loop:
     mov         r0, r6
@@ -362,6 +363,8 @@ vector_names:
     .asciz	"irq       "
     .asciz	"fiq       "
 
+    @ 4-byte aligned so that we can reach this with a simple ADR above.
+    .p2align	2
 register_names:
     .asciz	"apsr "
     .asciz	"spsr "
@@ -386,14 +389,14 @@ register_names:
     @ Enable the caches
 __enable_caches:
     mov         r0, #0
-    mcr         15, 0, r0, cr8, cr7, 0  @ Invalidate all unified-TLB
+    mcr         p15, 0, r0, cr8, cr7, 0  @ Invalidate all unified-TLB
     mov         r0, #0
-    mcr         15, 0, r0, cr7, cr5, 6  @ Invalidate branch predictor
-    mrc         15, 0, r4, cr1, cr0, 0  @ Read SCTLR
+    mcr         p15, 0, r0, cr7, cr5, 6  @ Invalidate branch predictor
+    mrc         p15, 0, r4, cr1, cr0, 0  @ Read SCTLR
     orr         r4, r4, #0x800          @ Enable branch predictor
-    mcr         15, 0, r4, cr1, cr0, 0  @ Set SCTLR
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Set SCTLR
     mov         r5, lr                  @ Save LR as we're going to BL
-    mrc         15, 0, r4, cr1, cr0, 0  @ Read SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 0  @ Read SCTLR
     bl          init_cpu_client_enable_icache
     cmp         r0, #0
     it		ne
@@ -402,24 +405,24 @@ __enable_caches:
     cmp         r0, #0
     it		ne
     orrne       r4, r4, #4
-    mcr         15, 0, r4, cr1, cr0, 0  @ Enable D-Cache
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Enable D-Cache
     bx          r5                      @ Return
 
 __reset_caches:
     mov         ip, lr                  @ Save LR
     mov         r0, #0
-    mcr         15, 0, r0, cr7, cr5, 6  @ Invalidate branch predictor
-    mrc         15, 0, r6, cr1, cr0, 0  @ Read SCTLR
-    mrc         15, 0, r0, cr1, cr0, 0  @ Read SCTLR!
+    mcr         p15, 0, r0, cr7, cr5, 6  @ Invalidate branch predictor
+    mrc         p15, 0, r6, cr1, cr0, 0  @ Read SCTLR
+    mrc         p15, 0, r0, cr1, cr0, 0  @ Read SCTLR!
     bic         r0, r0, #0x1000         @ Disable I cache
-    mcr         15, 0, r0, cr1, cr0, 0  @ Write SCTLR
-    mrc         15, 1, r0, cr0, cr0, 1  @ Read CLIDR
+    mcr         p15, 0, r0, cr1, cr0, 0  @ Write SCTLR
+    mrc         p15, 1, r0, cr0, cr0, 1  @ Read CLIDR
     tst         r0, #3                  @ Harvard Cache?
     mov         r0, #0
     it		ne
-    mcrne       15, 0, r0, cr7, cr5, 0  @ Invalidate Instruction Cache?
+    mcrne       p15, 0, r0, cr7, cr5, 0  @ Invalidate Instruction Cache?
 
-    mrc         15, 0, r1, cr1, cr0, 0  @ Read SCTLR (again!)
+    mrc         p15, 0, r1, cr1, cr0, 0  @ Read SCTLR (again!)
     orr         r1, r1, #0x800          @ Enable branch predictor
 
                                         @ If we're not enabling caches we have
@@ -436,25 +439,25 @@ __reset_caches:
     cmpeq       r0, #0
     beq         Finished1
 
-    mcr         15, 0, r1, cr1, cr0, 0  @ Write SCTLR (turn on Branch predictor & I-cache)
+    mcr         p15, 0, r1, cr1, cr0, 0  @ Write SCTLR (turn on Branch predictor & I-cache)
 
-    mrc         15, 1, r0, cr0, cr0, 1  @ Read CLIDR
+    mrc         p15, 1, r0, cr0, cr0, 1  @ Read CLIDR
     ands        r3, r0, #0x7000000
     lsr         r3, r3, #23             @ Total cache levels << 1
     beq         Finished1
 
     mov         lr, #0                  @ lr = cache level << 1
 Loop11:
-    mrc         15, 1, r0, cr0, cr0, 1  @ Read CLIDR
+    mrc         p15, 1, r0, cr0, cr0, 1  @ Read CLIDR
     add         r2, lr, lr, lsr #1      @ r2 holds cache 'set' position
     lsr         r1, r0, r2              @ Bottom 3-bits are Ctype for this level
     and         r1, r1, #7              @ Get those 3-bits alone
     cmp         r1, #2
     blt         Skip1                   @ No cache or only I-Cache at this level
-    mcr         15, 2, lr, cr0, cr0, 0  @ Write CSSELR
+    mcr         p15, 2, lr, cr0, cr0, 0  @ Write CSSELR
     mov         r1, #0
     isb         sy
-    mrc         15, 1, r1, cr0, cr0, 0  @ Read CCSIDR
+    mrc         p15, 1, r1, cr0, cr0, 0  @ Read CCSIDR
     and         r2, r1, #7              @ Extract line length field
     add         r2, r2, #4              @ Add 4 for the line length offset (log2 16 bytes)
     movw        r0, #0x3ff
@@ -469,8 +472,8 @@ Loop31:
     orr         r1, r1, r5, lsl r2      @ factor in set number
     tst         r6, #4                  @ D-Cache on?
     ite         eq
-    mcreq       15, 0, r1, cr7, cr6, 2  @ No - invalidate by set/way
-    mcrne       15, 0, r1, cr7, cr14, 2 @ yes - clean + invalidate by set/way
+    mcreq       p15, 0, r1, cr7, cr6, 2  @ No - invalidate by set/way
+    mcrne       p15, 0, r1, cr7, cr14, 2 @ yes - clean + invalidate by set/way
     subs        r7, r7, #1              @ Decrement way number
     bge         Loop31
     subs        r5, r5, #1              @ Decrement set number
@@ -481,18 +484,18 @@ Skip1:
     bgt         Loop11
 Finished1:
     @ Now we know the caches are clean we can:
-    mrc         15, 0, r4, cr1, cr0, 0  @ Read SCTLR
+    mrc         p15, 0, r4, cr1, cr0, 0  @ Read SCTLR
     bic         r4, r4, #4              @ Disable D-Cache
-    mcr         15, 0, r4, cr1, cr0, 0  @ Write SCTLR
+    mcr         p15, 0, r4, cr1, cr0, 0  @ Write SCTLR
     mov         r4, #0
-    mcr         15, 0, r4, cr7, cr5, 6  @ Write BPIALL
+    mcr         p15, 0, r4, cr7, cr5, 6  @ Write BPIALL
 
     bx          ip                      @ Return
 
     @ Set Z if this is a Cortex-A15 or Cortex_A7
     @ Other flags corrupted
 is_a15_a7:
-    mrc         15, 0, r8, c0, c0, 0
+    mrc         p15, 0, r8, c0, c0, 0
     movw        r9, #0xfff0
     movt        r9, #0xff0f
     and         r8, r8, r9
