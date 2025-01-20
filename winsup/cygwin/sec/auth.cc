@@ -815,6 +815,7 @@ s4uauth (bool logon, PCWSTR domain, PCWSTR user, NTSTATUS &ret_status)
 			      translated_name, &size) == 0)
 	    {
 	      debug_printf ("TranslateNameW(%W, NameCanonical) %E", sam_name);
+	      __seterrno ();
 	      goto out;
 	    }
 	  p = wcschr (translated_name, L'/');
