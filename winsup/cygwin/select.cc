@@ -385,10 +385,14 @@ next_while:;
      to create the timer once per thread.  Since WFMO checks the handles
      in order, we append the timer as last object, otherwise it's preferred
      over actual events on the descriptors. */
-  HANDLE &wait_timer = _my_tls.locals.cw_timer;
+  HANDLE local_timer = NULL;
+  HANDLE &wait_timer =
+    _my_tls.locals.cw_timer_inuse ? local_timer : _my_tls.locals.cw_timer;
   if (us > 0LL)
     {
       NTSTATUS status;
+      if (!_my_tls.locals.cw_timer_inuse)
+	_my_tls.locals.cw_timer_inuse = true;
       if (!wait_timer)
 	{
 	  status = NtCreateTimer (&wait_timer, TIMER_ALL_ACCESS, NULL,
@@ -431,6 +435,10 @@ next_while:;
     {
       BOOLEAN current_state;
       NtCancelTimer (wait_timer, &current_state);
+      if (local_timer)
+	NtClose (local_timer);
+      else
+	_my_tls.locals.cw_timer_inuse = false;
     }
 
   wait_states res;
