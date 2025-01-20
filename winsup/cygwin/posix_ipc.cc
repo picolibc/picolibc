@@ -225,11 +225,14 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
   int ret = -1;
 
   cygheap_fdget fd ((int) mqd, true);
-  fhandler_mqueue *fh = fd->is_mqueue ();
-  if (!fh)
-    set_errno (EBADF);
-  else
-    ret = fh->mq_getattr (mqstat);
+  if (fd >= 0)
+    {
+      fhandler_mqueue *fh = fd->is_mqueue ();
+      if (!fh)
+        set_errno (EBADF);
+      else
+        ret = fh->mq_getattr (mqstat);
+    }
   return ret;
 }
 
@@ -239,11 +242,14 @@ mq_setattr (mqd_t mqd, const struct mq_attr *mqstat, struct mq_attr *omqstat)
   int ret = -1;
 
   cygheap_fdget fd ((int) mqd, true);
-  fhandler_mqueue *fh = fd->is_mqueue ();
-  if (!fh)
-    set_errno (EBADF);
-  else
-    ret = fh->mq_setattr (mqstat, omqstat);
+  if (fd >= 0)
+    {
+      fhandler_mqueue *fh = fd->is_mqueue ();
+      if (!fh)
+        set_errno (EBADF);
+      else
+        ret = fh->mq_setattr (mqstat, omqstat);
+    }
   return ret;
 }
 
@@ -253,11 +259,14 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
   int ret = -1;
 
   cygheap_fdget fd ((int) mqd, true);
-  fhandler_mqueue *fh = fd->is_mqueue ();
-  if (!fh)
-    set_errno (EBADF);
-  else
-    ret = fh->mq_notify (notification);
+  if (fd >= 0)
+    {
+      fhandler_mqueue *fh = fd->is_mqueue ();
+      if (!fh)
+        set_errno (EBADF);
+      else
+        ret = fh->mq_notify (notification);
+    }
   return ret;
 }
 
@@ -268,11 +277,14 @@ mq_timedsend (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
   int ret = -1;
 
   cygheap_fdget fd ((int) mqd, true);
-  fhandler_mqueue *fh = fd->is_mqueue ();
-  if (!fh)
-    set_errno (EBADF);
-  else
-    ret = fh->mq_timedsend (ptr, len, prio, abstime);
+  if (fd >= 0)
+    {
+      fhandler_mqueue *fh = fd->is_mqueue ();
+      if (!fh)
+        set_errno (EBADF);
+      else
+        ret = fh->mq_timedsend (ptr, len, prio, abstime);
+    }
   return ret;
 }
 
@@ -289,11 +301,14 @@ mq_timedreceive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
   int ret = -1;
 
   cygheap_fdget fd ((int) mqd, true);
-  fhandler_mqueue *fh = fd->is_mqueue ();
-  if (!fh)
-    set_errno (EBADF);
-  else
-    ret = fh->mq_timedrecv (ptr, maxlen, priop, abstime);
+  if (fd >= 0)
+    {
+      fhandler_mqueue *fh = fd->is_mqueue ();
+      if (!fh)
+        set_errno (EBADF);
+      else
+        ret = fh->mq_timedrecv (ptr, maxlen, priop, abstime);
+    }
   return ret;
 }
 
@@ -309,14 +324,14 @@ mq_close (mqd_t mqd)
   __try
     {
       cygheap_fdget fd ((int) mqd, true);
-      if (!fd->is_mqueue ())
-	{
-	  set_errno (EBADF);
-	  __leave;
-	}
+      if (fd < 0 || !fd->is_mqueue ())
+        {
+          set_errno (EBADF);
+          __leave;
+        }
 
-      if (mq_notify (mqd, NULL))	/* unregister calling process */
-	__leave;
+      if (mq_notify (mqd, NULL))        /* unregister calling process */
+        __leave;
 
       fd->isclosed (true);
       fd->close ();
