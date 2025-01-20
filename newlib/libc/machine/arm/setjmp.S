@@ -78,10 +78,10 @@
     covers all the cases we need in this file for hardware
     floating-point and should be compatible with all required FPUs
     that we need to support.  */
-# if __ARM_FP
+# if __ARM_FP && !__clang__
 	.fpu vfpxd
 # endif
-# if __ARM_FEATURE_MVE
+# if __ARM_FEATURE_MVE && !__clang__
 	.arch_extension mve
 # endif
 #endif
