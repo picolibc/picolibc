@@ -1136,15 +1136,16 @@ unlink (const char *ourname)
       set_errno (EROFS);
       goto done;
     }
-  if (!win32_name.isondisk ())
-    {
-      set_errno (EPERM);
-      goto done;
-    }
   if (!win32_name.exists ())
     {
       debug_printf ("unlinking a nonexistent file");
       set_errno (ENOENT);
+      goto done;
+    }
+  if (!win32_name.isondisk ())
+    {
+      debug_printf ("unlinking a virtual file");
+      set_errno (EPERM);
       goto done;
     }
   else if (win32_name.isdir ())
