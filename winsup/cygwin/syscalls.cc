@@ -1136,7 +1136,7 @@ unlink (const char *ourname)
       set_errno (EROFS);
       goto done;
     }
-  if (isdevfd_dev (devn) || (win32_name.isdevice () && !win32_name.issocket ()))
+  if (!win32_name.isondisk ())
     {
       set_errno (EPERM);
       goto done;

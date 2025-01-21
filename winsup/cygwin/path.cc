@@ -2080,8 +2080,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
       syscall_printf ("symlink (%s, %S) wsym_type %d", oldpath,
 		      win32_newpath.get_nt_native_path (), wsym_type);
 
-      if ((!isdevice && win32_newpath.exists ())
-	  || (win32_newpath.isdevice () && !win32_newpath.is_fs_special ()))
+      if (win32_newpath.exists() && (!isdevice || !win32_newpath.isondisk ()))
 	{
 	  set_errno (EEXIST);
 	  __leave;

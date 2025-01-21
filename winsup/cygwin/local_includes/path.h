@@ -214,21 +214,33 @@ class path_conv
   {
     return (path_flags & (PATH_REP | PATH_REP_NOAPI)) == PATH_REP;
   }
-  int isdevice () const {return dev.not_device (FH_FS) && dev.not_device (FH_FIFO);}
-  int isfifo () const {return dev.is_device (FH_FIFO);}
-  int isspecial () const {return dev.not_device (FH_FS);}
-  int iscygdrive () const {return dev.is_device (FH_CYGDRIVE);}
-  int is_fs_special () const {return dev.is_fs_special ();}
 
-  int is_lnk_special () const {return (isdevice () && is_fs_special ()
-				       && !issocket ())
-      || isfifo () || is_lnk_symlink ();}
+  int isfifo () const {return dev.is_device (FH_FIFO);}
+  int iscygdrive () const {return dev.is_device (FH_CYGDRIVE);}
 #ifdef __WITH_AF_UNIX
   int issocket () const {return dev.is_device (FH_LOCAL)
 				|| dev.is_device (FH_UNIX);}
 #else
   int issocket () const {return dev.is_device (FH_LOCAL);}
 #endif /* __WITH_AF_UNIX */
+
+  /* FIXME: This needs a cleanup with better, descriptive names and checking
+     all usages for correctness. */
+
+  /* Any file or device with representation on disk.  This includes local
+     sockets, FIFOs, message queues and devices created with mknod.  It does
+     not include the /proc hierarchy. */
+  int isondisk () const {return dev.isfs ();}
+  /* Any device, virtual or with on-disk representation, and anything under
+     /proc. */
+  int isspecial () const {return dev.not_device (FH_FS);}
+  /* Devices with representation on disk. This includes local sockets, FIFOs,
+     message queues and devices created with mknod.  It does not include
+     the /proc hierarchy. */
+  int is_fs_special () const {return dev.is_fs_special ();}
+  /* Like is_fs_special but excluding local sockets. */
+  int is_lnk_special () const {return is_fs_special () && !issocket ();}
+
   int iscygexec () const {return mount_flags & MOUNT_CYGWIN_EXEC;}
   int isopen () const {return path_flags & PATH_OPEN;}
   int isctty_capable () const {return path_flags & PATH_CTTY;}
