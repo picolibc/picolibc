@@ -1273,7 +1273,10 @@ path_conv::check (const char *src, unsigned opt,
 
 	  /* FIXME: bad hack alert!!!  We need a better solution */
 	  if (!strncmp (path_copy, MQ_PATH, MQ_LEN) && path_copy[MQ_LEN])
-	    dev.parse (FH_MQUEUE);
+	    {
+	      dev.parse (FH_MQUEUE);
+	      dev.setfs (1);
+	    }
 	}
 
       if (opt & PC_NOFULL)
