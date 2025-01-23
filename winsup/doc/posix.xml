@@ -990,9 +990,11 @@ also IEEE Std 1003.1-2017 (POSIX.1-2017).</para>
     tcgetattr
     tcgetpgrp
     tcgetsid
+    tcgetwinsize
     tcsendbreak
     tcsetattr
     tcsetpgrp
+    tcsetwinsize
     tdelete
     telldir
     tempnam

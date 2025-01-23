@@ -9,6 +9,8 @@ What's new:
 
 - New API call: timespec_get.
 
+- New API calls: tcgetwinsize, tcsetwinsize.
+
 - New POSIX-defined entry points posix_spawn_file_actions_addchdir and
   posix_spawn_file_actions_addfchdir.  These are the same as the already
   exported posix_spawn_file_actions_addchdir_np and

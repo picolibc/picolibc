@@ -398,3 +398,15 @@ cfmakeraw(struct termios *tp)
   tp->c_cflag &= ~(CSIZE | PARENB);
   tp->c_cflag |= CS8;
 }
+
+extern "C" int
+tcgetwinsize (int fd, const struct winsize *winsz)
+{
+  return ioctl (fd, TIOCGWINSZ, winsz);
+}
+
+extern "C" int
+tcsetwinsize (int fd, const struct winsize *winsz)
+{
+  return ioctl (fd, TIOCSWINSZ, winsz);
+}

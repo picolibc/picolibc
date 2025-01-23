@@ -1530,9 +1530,11 @@ tcflush SIGFE
 tcgetattr SIGFE
 tcgetpgrp SIGFE
 tcgetsid SIGFE
+tcgetwinsize SIGFE
 tcsendbreak SIGFE
 tcsetattr SIGFE
 tcsetpgrp SIGFE
+tcsetwinsize SIGFE
 tdelete SIGFE
 tdestroy NOSIGFE
 telldir SIGFE

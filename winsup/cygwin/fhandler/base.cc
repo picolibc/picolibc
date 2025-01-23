@@ -1333,6 +1333,8 @@ fhandler_base::ioctl (unsigned int cmd, void *buf)
       break;
     case FIONREAD:
     case TIOCSCTTY:
+    case TIOCGWINSZ:
+    case TIOCSWINSZ:
       set_errno (ENOTTY);
       res = -1;
       break;
