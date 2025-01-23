@@ -774,18 +774,15 @@ unlink_nt (path_conv &pc, bool shareable)
       if (access & FILE_WRITE_ATTRIBUTES)
 	NtSetAttributesFile (fh, pc.file_attributes ());
       NtClose (fh);
-      /* Trying to delete in-use executables and DLLs using
-         FILE_DISPOSITION_POSIX_SEMANTICS returns STATUS_CANNOT_DELETE.
-	 Fall back to the default method. */
-      /* Additionaly that returns STATUS_INVALID_PARAMETER
-         on a bind mounted fs in hyper-v container. Falling back too. */
-      if (status != STATUS_CANNOT_DELETE
-          && status != STATUS_INVALID_PARAMETER)
-        {
-          debug_printf ("NtSetInformationFile returns %y "
-                        "with posix semantics. Disable it and retry.", status);
-          goto out;
-        }
+      /* Trying POSIX delete on in-use executables and DLLs returns
+	 STATUS_CANNOT_DELETE.  Trying POSIX delete on a bind mounted fs
+	 in hyper-v container returns STATUS_INVALID_PARAMETER.
+         Fall back to default method in both cases. */
+      if (status != STATUS_CANNOT_DELETE && status != STATUS_INVALID_PARAMETER)
+	goto out;
+
+      debug_printf ("POSIX delete %S fails with %y, try default method",
+		    pc.get_nt_native_path (), status);
     }
 
   /* If the R/O attribute is set, we have to open the file with
