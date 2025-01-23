@@ -400,7 +400,7 @@ cfmakeraw(struct termios *tp)
 }
 
 extern "C" int
-tcgetwinsize (int fd, const struct winsize *winsz)
+tcgetwinsize (int fd, struct winsize *winsz)
 {
   return ioctl (fd, TIOCGWINSZ, winsz);
 }
