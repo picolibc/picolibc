@@ -21,6 +21,7 @@ __ascii_mbtowc (
 {
   wchar_t dummy;
   unsigned char *t = (unsigned char *)s;
+  unsigned char c;
 
   (void) state;
   if (pwc == NULL)
@@ -32,7 +33,15 @@ __ascii_mbtowc (
   if (n == 0)
     return -2;
 
-  *pwc = (wchar_t)*t;
+  c = *t;
+
+  if (c >= 0x80)
+    {
+      _REENT_ERRNO(r) = EILSEQ;
+      return -1;
+    }
+
+  *pwc = (wchar_t)c;
 
   if (*t == '\0')
     return 0;
