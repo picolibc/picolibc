@@ -111,6 +111,7 @@ hdrs_ctype = [
     'ctype_cp.h',
     'ctype_.h',
     'ctype_iso.h',
+    'ctype_extended.h',
     'jp2uc.h',
     'local.h',
 ]
