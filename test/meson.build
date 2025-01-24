@@ -617,10 +617,26 @@ if enable_native_tests
     locales=[]
     # need meson 0.57 so we can use 'env' in custom_target
     if mb_extended_charsets and localedef.found() and meson.version().version_compare('>=0.57')
-      foreach ctype : ['ISO-8859-2', 'CP1125', 'SJIS']
+      locale = 'en_US.UTF-8'
+      locales += [custom_target(locale, output: locale,
+                                command: [localedef, '--no-warnings=ascii',
+                                          '-f', 'UTF-8', '-i', 'en_US', '.' / '@OUTPUT@'])]
+      foreach ctype : ['UTF-8',
+
+                       'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4',
+                       'ISO-8859-5', 'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8',
+                       'ISO-8859-9', 'ISO-8859-10', 'ISO-8859-11', 'ISO-8859-13',
+                       'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16',
+
+                       'GEORGIAN-PS', 'PT154', 'KOI8-T', 'IBM437', 'CP720', 'CP737', 'CP775',
+                       'IBM850', 'IBM852', 'IBM855', 'IBM857', 'IBM858', 'IBM862', 'IBM866',
+                       'IBM874', 'CP1125', 'CP1250', 'CP1251', 'CP1252', 'CP1253',
+                       'CP1254', 'CP1255', 'CP1256', 'CP1257', 'CP1258', 'KOI8-R', 'KOI8-U',
+
+                       'SHIFT_JIS']
         locale = 'C.' + ctype
-        if ctype == 'SJIS'
-          ctype = 'SHIFT_JIS'
+        if ctype == 'CP720'
+          ctype = meson.current_source_dir() / ctype
         endif
         locales += [custom_target(locale, output: locale,
                                   command: [localedef, '--no-warnings=ascii',

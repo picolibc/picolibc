@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <ctype.h>
 #include <wctype.h>
 #include <wchar.h>
 #include <stdio.h>
@@ -42,31 +43,66 @@
 
 static struct {
     char n;
-    int (*f)(wint_t);
+    int (*f)(int);
 } funcs[] = {
-    { .n = 'A', iswalnum },
-    { .n = 'a', iswalpha },
-    { .n = 'b', iswblank },
-    { .n = 'c', iswcntrl },
-    { .n = 'd', iswdigit },
-    { .n = 'g', iswgraph },
-    { .n = 'l', iswlower },
-    { .n = 'p', iswprint },
-    { .n = '!', iswpunct },
-    { .n = 's', iswspace },
-    { .n = 'u', iswupper },
-    { .n = 'x', iswxdigit },
+    { .n = 'n', isalnum },
+    { .n = 'a', isalpha },
+    { .n = 'b', isblank },
+    { .n = 'c', iscntrl },
+    { .n = 'd', isdigit },
+    { .n = 'g', isgraph },
+    { .n = 'l', islower },
+    { .n = 'p', isprint },
+    { .n = 'c', ispunct },
+    { .n = 's', isspace },
+    { .n = 'u', isupper },
+    { .n = 'x', isxdigit },
 };
 
 #define NFUNC sizeof(funcs)/sizeof(funcs[0])
+
+static struct {
+    char n;
+    int (*f)(wint_t);
+} wfuncs[] = {
+    { .n = 'N', iswalnum },
+    { .n = 'A', iswalpha },
+    { .n = 'B', iswblank },
+    { .n = 'C', iswcntrl },
+    { .n = 'D', iswdigit },
+    { .n = 'G', iswgraph },
+    { .n = 'L', iswlower },
+    { .n = 'P', iswprint },
+    { .n = 'C', iswpunct },
+    { .n = 'S', iswspace },
+    { .n = 'U', iswupper },
+    { .n = 'X', iswxdigit },
+};
+
+#define NWFUNC sizeof(wfuncs)/sizeof(wfuncs[0])
 
 static const char *locales[] = {
     "C",
 #ifdef HAVE_UTF_CHARSETS
     "C.UTF-8",
+    "en_US.UTF-8",
 #endif
 #ifdef HAVE_ISO_CHARSETS
+    "C.ISO-8859-1",
     "C.ISO-8859-2",
+    "C.ISO-8859-3",
+    "C.ISO-8859-4",
+    "C.ISO-8859-5",
+    "C.ISO-8859-6",
+    "C.ISO-8859-7",
+    "C.ISO-8859-8",
+    "C.ISO-8859-9",
+    "C.ISO-8859-10",
+    "C.ISO-8859-11",
+    "C.ISO-8859-13",
+    "C.ISO-8859-14",
+    "C.ISO-8859-15",
+    "C.ISO-8859-16",
 #endif
 #ifdef HAVE_WINDOWS_CHARSETS
     "C.CP1125",
@@ -111,13 +147,21 @@ int main(int argc, char **argv)
         prev_mask = ~0;
         for (c = 0x0000; ; c++) {
             this_mask = 0;
-            for (f = 0; f < NFUNC; f++)
-                if (funcs[f].f(c))
-                    this_mask |= (1 << f);
+            if (c < 0x100)
+            {
+                for (f = 0; f < NFUNC; f++)
+                    if (funcs[f].f((unsigned char) c))
+                        this_mask |= (1 << f);
+            }
+            for (f = 0; f < NWFUNC; f++)
+                if (wfuncs[f].f(c))
+                    this_mask |= (1 << (f + NFUNC));
             if (this_mask != prev_mask) {
-                fprintf(out, "%-12s 0x%04lx ", encode, (unsigned long) c);
+                fprintf(out, "%-12s 0x%05lx ", encode, (unsigned long) c);
                 for (f = 0; f < NFUNC; f++)
                     fprintf(out, "%c", (this_mask & (1 << f)) ? funcs[f].n : '.');
+                for (f = 0; f < NWFUNC; f++)
+                    fprintf(out, "%c", (this_mask & (1 << (f + NFUNC))) ? wfuncs[f].n : '.');
                 prev_mask = this_mask;
                 fprintf(out, "\n");
             }
