@@ -3,8 +3,12 @@
 
 # define DEFAULT_CTYPE_PTR	((char *) _ctype_)
 
+#ifdef _MB_EXTENDED_CHARSETS_ANY
 void
 __set_ctype (struct __locale_t *loc, const char *charset);
+#else
+#define __set_ctype(loc, charset)
+#endif
 
 #define _CTYPE_DATA_0_127 \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \

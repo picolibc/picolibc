@@ -313,6 +313,15 @@ SUCH DAMAGE.
 
 #define _REENT_THREAD_LOCAL
 
+#ifndef _MB_CAPABLE
+/* Make sure all of these are disabled if multi-byte is disabled*/
+#undef _MB_EXTENDED_CHARSETS_ALL
+#undef _MB_EXTENDED_CHARSETS_ANY
+#undef _MB_EXTENDED_CHARSETS_ISO
+#undef _MB_EXTENDED_CHARSETS_WINDOWS
+#undef _MB_EXTENDED_CHARSETS_JIS
+#endif
+
 /* If _MB_EXTENDED_CHARSETS_ALL is set, we want all of the extended
    charsets.  The extended charsets add a few functions and a couple
    of tables of a few K each. */
@@ -320,6 +329,12 @@ SUCH DAMAGE.
 #define _MB_EXTENDED_CHARSETS_ISO 1
 #define _MB_EXTENDED_CHARSETS_WINDOWS 1
 #define _MB_EXTENDED_CHARSETS_JIS 1
+#endif
+
+#if defined(_MB_EXTENDED_CHARSETS_ISO) || \
+    defined(_MB_EXTENDED_CHARSETS_WINDOWS) || \
+    defined(_MB_EXTENDED_CHARSETS_JIS)
+#define _MB_EXTENDED_CHARSETS_ANY
 #endif
 
 /* Figure out if long double is the same size as double. If the system

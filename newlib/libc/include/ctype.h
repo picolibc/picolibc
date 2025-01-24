@@ -46,10 +46,7 @@ _BEGIN_STD_C
  * The small ctype code does not support locales or extended character sets. It also breaks
  * libstdc++'s ctype implementation, so just skip it for c++
  */
-#if defined(__HAVE_LOCALE_INFO__) || \
-    defined (_MB_EXTENDED_CHARSETS_ISO) || \
-    defined (_MB_EXTENDED_CHARSETS_WINDOWS) || \
-    defined (__cplusplus)
+#if defined(_MB_EXTENDED_CHARSETS_ANY) || defined (__cplusplus)
 #undef _PICOLIBC_CTYPE_SMALL
 #define _PICOLIBC_CTYPE_SMALL 0
 #endif
@@ -221,16 +218,16 @@ __declare_extern_inline(int) toupper_l (int c, locale_t l) { (void) l; return to
 
 #else
 
-#define	_U	01
-#define	_L	02
-#define	_N	04
-#define	_S	010
-#define _P	020
-#define _C	040
-#define _X	0100
-#define	_B	0200
+#define	_U	0x001    /* upper */
+#define	_L	0x002    /* lower */
+#define	_N	0x004    /* digit */
+#define	_S	0x008    /* space */
+#define _P	0x010    /* punct */
+#define _C	0x020    /* control */
+#define _X	0x040    /* hex */
+#define	_B	0x080    /* blank (but not tab) */
 /* _T used for _ctype_wide table */
-#define _T 0400
+#define _T      0x100    /* tab */
 
 #ifndef __CHAR_UNSIGNED__
 #define ALLOW_NEGATIVE_CTYPE_INDEX
@@ -245,7 +242,7 @@ extern const char	_ctype_[];
 
 extern const short _ctype_wide[];
 
-#ifdef __HAVE_LOCALE_INFO__
+#if defined(__HAVE_LOCALE_INFO__) && defined(_MB_EXTENDED_CHARSETS_ANY)
 const char *__locale_ctype_ptr (void);
 #else
 #define __locale_ctype_ptr()	_ctype_
@@ -316,14 +313,14 @@ static __inline char __ctype_lookup_l(int c, locale_t l) {
    slightly slower.  These macros are not NLS-aware so they are
    disabled if the system supports the extended character sets. */
 # if defined(__GNUC__)
-#  if !defined (_MB_EXTENDED_CHARSETS_ISO) && !defined (_MB_EXTENDED_CHARSETS_WINDOWS)
+#  ifndef _MB_EXTENDED_CHARSETS_ANY
 #   define toupper(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
       islower (__x) ? (int) __x - 'a' + 'A' : (int) __x;})
 #   define tolower(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
       isupper (__x) ? (int) __x - 'A' + 'a' : (int) __x;})
-#  else /* _MB_EXTENDED_CHARSETS* */
+#  else /* _MB_EXTENDED_CHARSETS_ANY */
 /* Allow a gcc warning if the user passed 'char', but defer to the
    function.  */
 #   define toupper(__c) \
@@ -332,7 +329,7 @@ static __inline char __ctype_lookup_l(int c, locale_t l) {
 #   define tolower(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
       (void) __CTYPE_PTR[(int) __x]; (tolower) (__x);})
-#  endif /* _MB_EXTENDED_CHARSETS* */
+#  endif /* _MB_EXTENDED_CHARSETS_ANY */
 # endif /* __GNUC__ */
 
 #endif /* !__cplusplus */

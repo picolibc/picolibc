@@ -179,7 +179,9 @@ struct __locale_t
   int			(*mbtowc) (wchar_t *,
 				   const char *, size_t, mbstate_t *);
   int			 cjk_lang;
+#ifdef _MB_EXTENDED_CHARSETS_ANY
   const char		 *ctype_ptr;
+#endif
   struct lconv		 lconv;
 #ifndef __HAVE_LOCALE_INFO__
   char			 mb_cur_max[2];

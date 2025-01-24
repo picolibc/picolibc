@@ -195,7 +195,9 @@ const struct __locale_t __C_locale =
   __ascii_wctomb,
   __ascii_mbtowc,
   0,
+#ifdef _MB_EXTENDED_CHARSETS_ANY
   DEFAULT_CTYPE_PTR,
+#endif
   {
     ".", "", "", "", "", "", "", "", "", "",
     CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
@@ -227,7 +229,9 @@ struct __locale_t __global_locale =
   __ascii_wctomb,
   __ascii_mbtowc,
   0,
+#ifdef _MB_EXTENDED_CHARSETS_ANY
   DEFAULT_CTYPE_PTR,
+#endif
   {
     ".", "", "", "", "", "", "", "", "", "",
     CHAR_MAX, CHAR_MAX, CHAR_MAX, CHAR_MAX,
@@ -642,7 +646,7 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
 	FAIL;
       strcpy (charset, "ISO-8859-");
       c = charset + 9;
-      if (val > 10)
+      if (val >= 10)
       	*c++ = '1';
       *c++ = val % 10 + '0';
       *c = '\0';
@@ -844,7 +848,7 @@ __locale_mb_cur_max (void)
 #endif
 }
 
-#ifdef __HAVE_LOCALE_INFO__
+#ifdef _MB_EXTENDED_CHARSETS_ANY
 const char *
 __locale_ctype_ptr_l (struct __locale_t *locale)
 {
@@ -856,4 +860,4 @@ __locale_ctype_ptr (void)
 {
   return __get_current_locale ()->ctype_ptr;
 }
-#endif /* __HAVE_LOCALE_INFO__ */
+#endif /* _MB_EXTENDED_CHARSETS_ANY */

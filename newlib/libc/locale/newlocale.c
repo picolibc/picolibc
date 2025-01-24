@@ -173,7 +173,9 @@ newlocale (int category_mask, const char *locale,
 	      tmp_locale.wctomb = base->wctomb;
 	      tmp_locale.mbtowc = base->mbtowc;
 	      tmp_locale.cjk_lang = base->cjk_lang;
+#ifdef _MB_EXTENDED_CHARSETS_ANY
 	      tmp_locale.ctype_ptr = base->ctype_ptr;
+#endif
 	    }
 #ifdef __HAVE_LOCALE_INFO__
 	  /* Mark the values as "has still to be copied".  We do this in
