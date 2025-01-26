@@ -586,6 +586,72 @@ endif
 
 if enable_native_tests
 
+  localedef = find_program('localedef', required: false)
+
+  ctype_c_args = []
+
+  locales=[]
+  # need meson 0.57 so we can use 'env' in custom_target
+  if localedef.found() and meson.version().version_compare('>=0.57')
+    if newlib_mb
+      locale = 'fr_FR.UTF-8'
+      locales += [custom_target(locale, output: locale,
+                                command: [localedef, '--no-warnings=ascii',
+                                          '-f', 'UTF-8', '-i', 'fr_FR', '.' / '@OUTPUT@'])]
+      locale = 'C.UTF-8'
+      locales += [custom_target(locale, output: locale,
+                                command: [localedef, '--no-warnings=ascii',
+                                          '-f', 'UTF-8', '-i', 'C', '.' / '@OUTPUT@'])]
+      ctype_c_args += ['-DHAVE_UTF_CHARSETS']
+    endif
+    if mb_extended_charsets
+      # CP720 doesn't have any Linux support.
+      # JIS doesn't make any sense to me.
+      # CP1255 and CP1258 seem to be broken in Linux
+      foreach ctype : ['ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4',
+                       'ISO-8859-5', 'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8',
+                       'ISO-8859-9', 'ISO-8859-10', 'ISO-8859-11', 'ISO-8859-13',
+                       'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16',
+
+                       'GEORGIAN-PS', 'PT154', 'KOI8-T', 'CP437', 'CP737', 'CP775',
+                       'CP850', 'CP852', 'CP855', 'CP857', 'CP858', 'CP862', 'CP866',
+                       'CP874', 'CP1125', 'CP1250', 'CP1251', 'CP1252', 'CP1253',
+                       'CP1254', 'CP1256', 'CP1257', 'KOI8-R', 'KOI8-U',
+
+                       'SJIS', 'EUC-JP']
+        locale = 'C.' + ctype
+        if ctype == 'SJIS'
+          ctype = 'SHIFT_JIS'
+        elif ctype == 'CP437'
+          ctype = 'IBM437'
+        elif ctype == 'CP850'
+          ctype = 'IBM850'
+        elif ctype == 'CP852'
+          ctype = 'IBM852'
+        elif ctype == 'CP855'
+          ctype = 'IBM855'
+        elif ctype == 'CP857'
+          ctype = 'IBM857'
+        elif ctype == 'CP858'
+          ctype = 'IBM858'
+        elif ctype == 'CP862'
+          ctype = 'IBM862'
+        elif ctype == 'CP866'
+          ctype = 'IBM866'
+        elif ctype == 'CP874'
+          ctype = 'IBM874'
+        endif
+        locales += [custom_target(locale, output: locale,
+                                  command: [localedef, '--no-warnings=ascii',
+                                            '-f', ctype, '-i', 'C', '.' / '@OUTPUT@'])]
+      endforeach
+      ctype_c_args += ['-DHAVE_ISO_CHARSETS',
+                       '-DHAVE_WINDOWS_CHARSETS',
+                       '-DHAVE_JIS_CHARSETS'
+                      ]
+    endif
+  endif
+
   if have_cplusplus
     test('test-cplusplus-native',
          executable('test-cplusplus-native', 'test-cplusplus.cpp',
@@ -600,80 +666,51 @@ if enable_native_tests
 
     test(t1 + target,
 	 executable(t1 + '-native', t1_src,
-		    c_args: native_c_args,
-		    link_args: native_c_args))
+		    c_args: native_c_args + ctype_c_args,
+		    link_args: native_c_args),
+         env: ['LOCPATH=' + meson.current_build_dir()])
   endforeach
 
   diff = find_program('diff', required: false)
 
   if diff.found()
-    wctype_c_args = []
-    if newlib_mb
-      wctype_c_args += ['-DHAVE_UTF_CHARSETS']
-    endif
+    diff_tests = ['test-wctype', 'test-encode']
 
-    localedef = find_program('localedef', required: false)
+    foreach t : diff_tests
+      src = t + '.c'
+      n = t + '-native'
+      o = t + '-out'
+      no = n + '-out'
 
-    locales=[]
-    # need meson 0.57 so we can use 'env' in custom_target
-    if mb_extended_charsets and localedef.found() and meson.version().version_compare('>=0.57')
-      locale = 'en_US.UTF-8'
-      locales += [custom_target(locale, output: locale,
-                                command: [localedef, '--no-warnings=ascii',
-                                          '-f', 'UTF-8', '-i', 'en_US', '.' / '@OUTPUT@'])]
-      foreach ctype : ['UTF-8',
+      test = t + '-compare'
 
-                       'ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4',
-                       'ISO-8859-5', 'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8',
-                       'ISO-8859-9', 'ISO-8859-10', 'ISO-8859-11', 'ISO-8859-13',
-                       'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16',
+      e = executable(t, src, 
+                 c_args: _c_args + ctype_c_args,
+                 link_args: _link_args,
+                 objects: _objs,
+                 link_depends: _link_depends,
+                 link_with: _libs,
+                 include_directories: inc)
 
-                       'GEORGIAN-PS', 'PT154', 'KOI8-T', 'IBM437', 'CP720', 'CP737', 'CP775',
-                       'IBM850', 'IBM852', 'IBM855', 'IBM857', 'IBM858', 'IBM862', 'IBM866',
-                       'IBM874', 'CP1125', 'CP1250', 'CP1251', 'CP1252', 'CP1253',
-                       'CP1254', 'CP1255', 'CP1256', 'CP1257', 'CP1258', 'KOI8-R', 'KOI8-U',
+      out = custom_target (o, output: o,
+                           command: [e, '@OUTPUT@'])
 
-                       'SHIFT_JIS']
-        locale = 'C.' + ctype
-        if ctype == 'CP720'
-          ctype = meson.current_source_dir() / ctype
-        endif
-        locales += [custom_target(locale, output: locale,
-                                  command: [localedef, '--no-warnings=ascii',
-                                            '-f', ctype, '-i', 'C', '.' / '@OUTPUT@'])]
-      endforeach
-      wctype_c_args += ['-DHAVE_ISO_CHARSETS',
-                        '-DHAVE_WINDOWS_CHARSETS',
-                        '-DHAVE_JIS_CHARSETS'
-                       ]
-    endif
+      ne = executable(n, src, 
+                      c_args: native_c_args + ctype_c_args,
+                      link_args: native_c_args)
 
-    wctype = executable('test-wctype', 'test-wctype.c',
-                        c_args: _c_args + wctype_c_args,
-                        link_args: _link_args,
-                        objects: _objs,
-                        link_depends: _link_depends,
-                        link_with: _libs,
-                        include_directories: inc)
+      if locales != [] and meson.version().version_compare('>=0.57')
+        native_out = custom_target (no, output: no,
+                                    depends: locales,
+                                    env: ['LOCPATH=' + meson.current_build_dir()],
+                                    command: [ne, '@OUTPUT@'])
+      else
+        native_out = custom_target (no, output: no,
+                                    command: [ne, '@OUTPUT@'])
+      endif
 
-    wctype_native = executable('test-wctype-native', 'test-wctype.c',
-                               c_args: native_c_args + wctype_c_args,
-                               link_args: native_c_args)
-
-    wctype_out = custom_target ('wctype-out', output: 'wctype-out',
-                                command: [wctype, '@OUTPUT@'])
-
-    if locales != [] and meson.version().version_compare('>=0.57')
-      wctype_native_out = custom_target ('wctype-native-out', output: 'wctype-native-out',
-                                         depends: locales,
-                                         env: ['LOCPATH=' + meson.current_build_dir()],
-                                         command: [wctype_native, '@OUTPUT@'])
-    else
-      wctype_native_out = custom_target ('wctype-native-out', output: 'wctype-native-out',
-                                         command: [wctype_native, '@OUTPUT@'])
-    endif
-
-    test('wctype-compare', diff, args: [wctype_out, wctype_native_out])
+      test(test, diff, args: ['-u', out, native_out])
+    endforeach
   endif
 endif
 
