@@ -67,6 +67,3 @@ const struct lc_monetary_T _C_monetary_locale = {
 	wempty		/* wnegative_sign */
 #endif
 };
-
-#ifdef __HAVE_LOCALE_INFO__
-#endif

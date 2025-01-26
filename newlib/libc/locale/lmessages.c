@@ -46,4 +46,3 @@ const struct lc_messages_T _C_messages_locale = {
 #endif
 #endif
 };
-

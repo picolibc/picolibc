@@ -41,4 +41,3 @@ const struct lc_ctype_T _C_ctype_locale = {
 	  L"5", L"6", L"7", L"8", L"9" }
 #endif
 };
-
