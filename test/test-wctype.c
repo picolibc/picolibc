@@ -85,7 +85,7 @@ static const char *locales[] = {
     "C",
 #ifdef HAVE_UTF_CHARSETS
     "C.UTF-8",
-    "en_US.UTF-8",
+    "fr_FR.UTF-8",
 #endif
 #ifdef HAVE_ISO_CHARSETS
     "C.ISO-8859-1",
@@ -105,10 +105,14 @@ static const char *locales[] = {
     "C.ISO-8859-16",
 #endif
 #ifdef HAVE_WINDOWS_CHARSETS
-    "C.CP1125",
+    "C.GEORGIAN-PS", "C.PT154", "C.KOI8-T", "C.CP437", "C.CP737", "C.CP775",
+    "C.CP850", "C.CP852", "C.CP855", "C.CP857", "C.CP858", "C.CP862", "C.CP866",
+    "C.CP874", "C.CP1125", "C.CP1250", "C.CP1251", "C.CP1252", "C.CP1253",
+    "C.CP1254", "C.CP1256", "C.CP1257", "C.KOI8-R", "C.KOI8-U",
 #endif
 #ifdef HAVE_JIS_CHARSETS
     "C.SJIS",
+    "C.EUC-JP",
 #endif
 };
 
