@@ -45,8 +45,7 @@ wint_t
 __jp2uc (wint_t c, int type)
 {
   unsigned index;
-  int adj;
-  unsigned char byte1, byte2;
+  unsigned char byte1, byte2, sjis1, sjis2;
   wint_t ret;
 
   /* we actually use tables of EUCJP to Unicode.  For JIS, we simply
@@ -65,6 +64,8 @@ __jp2uc (wint_t c, int type)
       if (byte1 == 0)
         {
           switch (byte2) {
+          case 0x8e:
+          case 0x8f:
           case 0xa0:
           case 0xff:
             break;
@@ -74,35 +75,39 @@ __jp2uc (wint_t c, int type)
         }
       break;
     case JP_SJIS:
-      byte1 = c >> 8;
-      byte2 = c & 0xff;
-      if (byte1 == 0)
+      sjis1 = c >> 8;
+      sjis2 = c & 0xff;
+      if (sjis1 == 0)
         {
-          switch(byte2) {
+          switch(sjis2) {
           case 0x5c:
             return 0xa5;        /* ¥ */
           case 0x7e:
             return 0x203e;      /* ‾ */
           default:
-            if (0xa1 <= byte2 && byte2 <= 0xdf)
-              return byte2 + (0xff61 - 0xa1);
-            return byte2;
+            if (0xa1 <= sjis2 && sjis2 <= 0xdf)
+              return sjis2 + (0xff61 - 0xa1);
+            return sjis2;
           }
         }
-      if (byte2 <= 0x9e)
-        {
-          adj = 0xa1 - 0x22;
-          byte2 = (byte2 - 31) + 0xa1;
-        }
+
+      if (0x81 <= sjis1 && sjis1 <= 0x9f)
+          byte1 = (sjis1 - 112 + 64) << 1;
+      else if (0xe0 <= sjis1 && sjis1 <= 0xef)
+          byte1 = (sjis1 - 176 + 64) << 1;
       else
-        {
-          adj = 0xa1 - 0x21;
-          byte2 = (byte2 - 126) + 0xa1;
-        }
-      if (byte1 <= 0x9f)
-        byte1 = ((byte1 - 112) << 1) + adj;
-      else
-        byte1 = ((byte1 - 176) << 1) + adj;
+          return WEOF;
+
+      if (0x40 <= sjis2 && sjis2 <= 0x9e && sjis2 != 0x7f) {
+          byte1 -= 1;
+          byte2 = sjis2 - 31 + 128;
+          if (sjis2 >= 0x7f)
+              byte2--;
+      } else if (0x9f <= sjis2 && sjis2 <= 0xfc) {
+          byte2 = sjis2 - 126 + 128;
+      } else {
+          return WEOF;
+      }
       break;
     default:
       return WEOF;
