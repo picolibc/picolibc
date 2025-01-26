@@ -749,7 +749,7 @@ __sjis_mbtowc (
         mbstate_t      *state)
 {
   wchar_t dummy;
-  wint_t jischar;
+  wint_t jischar, uchar;
   unsigned char *t = (unsigned char *)s;
   int ch;
   int i = 0;
@@ -774,14 +774,25 @@ __sjis_mbtowc (
 	    return -2;
 	  ch = t[i++];
 	}
+      else if (!_issjis1b(ch))
+        {
+          _REENT_ERRNO(r) = EILSEQ;
+          return -1;
+        }
     }
   if (state->__count == 1)
     {
       if (_issjis2 (ch))
 	{
           jischar = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
-          *pwc = __jp2uc(jischar, JP_SJIS);
+          uchar = __jp2uc(jischar, JP_SJIS);
 	  state->__count = 0;
+          if (uchar == WEOF)
+            {
+              _REENT_ERRNO(r) = EILSEQ;
+              return -1;
+            }
+          *pwc = (wchar_t) uchar;
 	  return i;
 	}
       else
@@ -791,8 +802,14 @@ __sjis_mbtowc (
 	}
     }
 
-  *pwc = __jp2uc((wint_t) *t, JP_SJIS);
+  uchar = __jp2uc((wint_t) *t, JP_SJIS);
+  if (uchar == WEOF)
+    {
+      _REENT_ERRNO(r) = EILSEQ;
+      return -1;
+    }
 
+  *pwc = uchar;
   if (*t == '\0')
     return 0;
 
@@ -807,7 +824,7 @@ __eucjp_mbtowc (
         mbstate_t      *state)
 {
   wchar_t dummy;
-  wint_t jischar;
+  wint_t jischar, uchar;
   unsigned char *t = (unsigned char *)s;
   int ch;
   int i = 0;
@@ -848,8 +865,14 @@ __eucjp_mbtowc (
 	  else
 	    {
 	      jischar = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
-              *pwc = __jp2uc(jischar, JP_EUCJP);
+              uchar = __jp2uc(jischar, JP_EUCJP);
 	      state->__count = 0;
+              if (uchar == WEOF)
+                {
+                  _REENT_ERRNO(r) = EILSEQ;
+                  return -1;
+                }
+              *pwc = (wchar_t) uchar;
 	      return i;
 	    }
 	}
@@ -865,8 +888,14 @@ __eucjp_mbtowc (
 	{
 	  jischar = (((wchar_t)state->__value.__wchb[1]) << 8)
             + (wchar_t)(ch & 0x7f);
-          *pwc = __jp2uc(jischar, JP_EUCJP);
+          uchar = __jp2uc(jischar, JP_EUCJP);
 	  state->__count = 0;
+          if (uchar == WEOF)
+            {
+              _REENT_ERRNO(r) = EILSEQ;
+              return -1;
+            }
+          *pwc = (wchar_t) uchar;
 	  return i;
 	}
       else
@@ -876,7 +905,14 @@ __eucjp_mbtowc (
 	}
     }
 
-  *pwc = __jp2uc((wint_t)(wchar_t) *t, JP_EUCJP);
+  uchar = __jp2uc((wint_t)(wchar_t) *t, JP_EUCJP);
+
+  if (uchar == WEOF)
+    {
+      _REENT_ERRNO(r) = EILSEQ;
+      return -1;
+    }
+  *pwc = (wchar_t) uchar;
 
   if (*t == '\0')
     return 0;
@@ -892,7 +928,7 @@ __jis_mbtowc (
         mbstate_t      *state)
 {
   wchar_t dummy;
-  wint_t jischar;
+  wint_t jischar, uchar;
   unsigned char *t = (unsigned char *)s;
   JIS_STATE curr_state;
   JIS_ACTION action;
@@ -970,7 +1006,13 @@ __jis_mbtowc (
 	case COPY_J2:
 	  state->__state = JIS;
 	  jischar = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)(t[i]);
-          *pwc = __jp2uc(jischar, JP_JIS);
+          uchar = __jp2uc(jischar, JP_JIS);
+          if (uchar == WEOF)
+            {
+              _REENT_ERRNO(r) = EILSEQ;
+              return -1;
+            }
+          *pwc = uchar;
 	  return (i + 1);
 	case MAKE_A:
 	  ptr = (unsigned char *)(t + i + 1);
