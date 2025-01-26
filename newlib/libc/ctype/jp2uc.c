@@ -64,11 +64,10 @@ __jp2uc (wint_t c, int type)
       byte2 = (c & 0xff);
       if (byte1 == 0)
         {
-          switch(byte2) {
-          case 0x5c:
-            return 0xa5;        /* ¥ */
-          case 0x7e:
-            return 0x203e;      /* ‾ */
+          switch (byte2) {
+          case 0xa0:
+          case 0xff:
+            break;
           default:
             return byte2;
           }
@@ -85,6 +84,8 @@ __jp2uc (wint_t c, int type)
           case 0x7e:
             return 0x203e;      /* ‾ */
           default:
+            if (0xa1 <= byte2 && byte2 <= 0xdf)
+              return byte2 + (0xff61 - 0xa1);
             return byte2;
           }
         }
@@ -116,13 +117,13 @@ __jp2uc (wint_t c, int type)
   /* handle larger ranges first */
   if (byte1 >= 0xb0 && byte1 <= 0xcf && c <= (wint_t) 0xcfd3 && byte2 >= 0xa1)
     {
-      index = (byte1 - 0xb0) * 0xfe + (byte2 - 0xa1);
+      index = (byte1 - 0xb0) * 94 + (byte2 - 0xa1);
       if (in_bounds(b02cf, index))
         return b02cf[index];
     }
   else if (byte1 >= 0xd0 && byte1 <= 0xf4 && c <= (wint_t) 0xf4a6 && byte2 >= 0xa1)
     {
-      index = (byte1 - 0xd0) * 0xfe + (byte2 - 0xa1);
+      index = (byte1 - 0xd0) * 94 + (byte2 - 0xa1);
       if (in_bounds(d02f4, index))
         return d02f4[index];
     }
@@ -130,6 +131,11 @@ __jp2uc (wint_t c, int type)
   /* handle smaller ranges here */
   switch (byte1)
     {
+    case 0x8E:
+        /* Upper half of JIS X 0201 */
+        if (0xa1 <= byte2 && byte2 <= 0xdf)
+            return byte2 + (0xff61 - 0xa1);
+        break;
     case 0xA1:
       if (!in_bounds_o (a1, byte2, 0xa1))
         break;
