@@ -848,7 +848,7 @@ __locale_mb_cur_max (void)
 #endif
 }
 
-#ifdef _MB_EXTENDED_CHARSETS_ANY
+#if defined(__HAVE_LOCALE_INFO__) && defined(_MB_EXTENDED_CHARSETS_ANY)
 const char *
 __locale_ctype_ptr_l (struct __locale_t *locale)
 {
