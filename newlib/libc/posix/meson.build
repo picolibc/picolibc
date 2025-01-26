@@ -34,6 +34,7 @@
 #
 srcs_posix = [
   'basename.c',
+  'collcmp.c',
   'dirname.c',
   'fnmatch.c',
   'fpathconf.c',
@@ -43,12 +44,6 @@ srcs_posix = [
   'regexec.c',
   'regfree.c',
 ]
-
-if newlib_locale_info
-  srcs_posix += [
-    'collcmp.c',
-  ]
-endif
 
 srcs_posix_use = []
 foreach file : srcs_posix

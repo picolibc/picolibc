@@ -31,7 +31,10 @@
 #define	_COLLATE_H_
 
 _BEGIN_STD_C
+/* Picolibc doesn't have any LC_COLLATE support, so this is never defined */
+#ifdef _HAVE_REAL_STRCOLL
 int	__collate_range_cmp(int, int);
+#endif
 __END_DECLS
 
 #endif /* !_COLLATE_H_ */
