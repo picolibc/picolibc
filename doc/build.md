@@ -119,6 +119,17 @@ configuration
 
 ### Internationalization options
 
+These options control how much internationalization support is included
+in the library. Picolibc only supports the 'C' locale but allows any
+supported charset to be specified using the locale 'C.<charset>'.
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| mb-capable                  | false   | Enable multibyte support for UTF-8 charset                                           |
+| mb-extended-charsets        | false   | Enable additional ISO, Windows and JIS charsets                                      |
+| locale-info		      | false   | Enable locale support beyond charsets. Not useful.                                   |
+| locale-info-extended        | false   | Enable even more locale support. Not useful.                                         |
+
 These options control which character sets are supported by iconv.
 
 | Option                      | Default | Description                                                                          |
@@ -129,15 +140,6 @@ These options control which character sets are supported by iconv.
 | newlib-iconv-external-ccs   | false   | Use file system to store iconv tables. Requires fopen. (default built-in to memory)  |
 | newlib-iconv-dir            | libdir/locale | Directory to install external CCS files. Only used with newlib-iconv-external-ccs=true |
 | newlib-iconv-runtime-dir    | newlib-iconv-dir | Directory to read external CCS files from at runtime. |
-
-These options control how much Locale support is included in the
-library. By default, picolibc only supports the 'C' locale.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-locale-info          | false   | Enable locale support                                                                |
-| newlib-locale-info-extended | false   | Enable even more locale support                                                      |
-| newlib-mb                   | false   | Enable multibyte support                                                             |
 
 ### Startup/shutdown options
 

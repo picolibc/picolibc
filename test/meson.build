@@ -593,7 +593,7 @@ if enable_native_tests
   locales=[]
   # need meson 0.57 so we can use 'env' in custom_target
   if localedef.found() and meson.version().version_compare('>=0.57')
-    if newlib_mb
+    if mb_capable
       locale = 'fr_FR.UTF-8'
       locales += [custom_target(locale, output: locale,
                                 command: [localedef, '--no-warnings=ascii',

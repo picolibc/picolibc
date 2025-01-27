@@ -37,7 +37,7 @@ tests = []
 
 mb_tests = ['UTF-8']
 
-if newlib_mb
+if mb_capable
   tests += mb_tests
 endif
 

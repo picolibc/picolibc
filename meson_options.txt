@@ -185,7 +185,7 @@ option('minimal-io-long-long', type: 'boolean', value: false,
 option('fast-bufio', type: 'boolean', value: false,
        description: 'enable some faster buffered i/o operations')
 option('io-wchar', type: 'boolean', value: false,
-       description: 'enable wide character support in printf/scanf even when newlib-mb is false')
+       description: 'enable wide character support in printf/scanf (requires multi-byte support)')
 
 #
 # Options applying to only legacy stdio
@@ -232,14 +232,21 @@ option('newlib-iconv-runtime-dir', type: 'string',
 option('newlib-iconv-encodings-exclude', type: 'array',
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be excluded')
 
+option('locale-info', type: 'boolean', value: false,
+       description: 'enable locale info support be')
+option('locale-info-extended', type: 'boolean', value: false,
+       description: 'extended locale info support')
+option('mb-capable', type: 'boolean', value: false,
+       description: 'enable multibyte support for UTF-8 charset')
+option('mb-extended-charsets', type: 'boolean', value: false,
+       description: 'enable additional ISO, Windows and JIS charsets')
+
 option('newlib-locale-info', type: 'boolean', value: false,
-       description: 'locale support')
+       description: 'locale info support')
 option('newlib-locale-info-extended', type: 'boolean', value: false,
-       description: 'extended locale support')
+       description: 'extended locale info support')
 option('newlib-mb', type: 'boolean', value: false,
        description: 'enable multibyte support')
-option('mb-extended-charsets', type: 'boolean', value: false,
-       description: 'enable additional ISO, Windows and JIS multibyte encodings')
 
 #
 # Startup/shutdown options

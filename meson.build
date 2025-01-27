@@ -247,9 +247,10 @@ else
 endif
 fast_strcmp = get_option('fast-strcmp')
 
-newlib_mb = get_option('newlib-mb')
-mb_extended_charsets = newlib_mb and get_option('mb-extended-charsets')
-newlib_locale_info = get_option('newlib-locale-info')
+mb_capable = get_option('mb-capable') or get_option('newlib-mb')
+mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
+locale_info = get_option('locale-info') or get_option('newlib-locale-info')
+locale_info_extended = locale_info and (get_option('locale-info-extended') or get_option('newlib-locale-info-extended'))
 
 newlib_obsolete_math = get_option('newlib-obsolete-math')
 newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
@@ -1382,7 +1383,7 @@ if not tinystdio
   conf_data.set('__LARGE64_FILES', newlib_stdio64)
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
-conf_data.set('_MB_CAPABLE', newlib_mb)
+conf_data.set('_MB_CAPABLE', mb_capable)
 conf_data.set('_MB_EXTENDED_CHARSETS_ALL', mb_extended_charsets)
 conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
 conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
@@ -1408,8 +1409,8 @@ conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'mat
 conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
-conf_data.set('__HAVE_LOCALE_INFO__', newlib_locale_info, description: 'locale support')
-conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', get_option('newlib-locale-info-extended'), description: 'extended locale support')
+conf_data.set('__HAVE_LOCALE_INFO__', locale_info, description: 'locale support')
+conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', locale_info_extended, description: 'extended locale support')
 conf_data.set('NEWLIB_GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
 conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
