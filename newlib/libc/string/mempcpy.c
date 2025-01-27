@@ -53,7 +53,7 @@ mempcpy (void *dst0,
 
   /* If the size is small, or either SRC or DST is unaligned,
      then punt into the byte copy loop.  This should be rare.  */
-  if (!TOO_SMALL_BIG_BLOCK(len0) && !UNALIGNED_X_Y(src, dst))
+  if (!TOO_SMALL_LITTLE_BLOCK(len0) && !UNALIGNED_X_Y(src, dst))
     {
       aligned_dst = (long*)dst;
       aligned_src = (long*)src;

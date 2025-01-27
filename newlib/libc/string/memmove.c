@@ -85,7 +85,7 @@ memmove (void *dst_void,
       /* Use optimizing algorithm for a non-destructive copy to closely 
          match memcpy. If the size is small or either SRC or DST is unaligned,
          then punt into the byte copy loop.  This should be rare.  */
-      if (!TOO_SMALL_BIG_BLOCK(length) && !UNALIGNED_X_Y(src, dst))
+      if (!TOO_SMALL_LITTLE_BLOCK(length) && !UNALIGNED_X_Y(src, dst))
         {
           aligned_dst = (long*)dst;
           aligned_src = (long*)src;
