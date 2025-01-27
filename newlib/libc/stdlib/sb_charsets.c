@@ -6,7 +6,7 @@
 #include "sb_charsets.h"
 
 #if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-/* Handle one to five decimal digits.  Return -1 in any other case. */
+/* Handle one to four decimal digits.  Return -1 in any other case. */
 static int
 __micro_atoi (const char *s)
 {
@@ -16,7 +16,7 @@ __micro_atoi (const char *s)
     return -1;
   while (*s)
     {
-      if (*s < '0' || *s > '9' || ret >= 100000)
+      if (*s < '0' || *s > '9' || ret >= 10000)
 	return -1;
       ret = 10 * ret + (*s++ - '0');
     }
