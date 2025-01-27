@@ -29,7 +29,6 @@ __ascii_wctomb (
 
   if ((size_t)wchar >= 0x80)
     {
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -59,7 +58,6 @@ __utf8_wctomb (
       /* Unexpected extra high surrogate */
       if (0xd800 <= wchar && wchar <= 0xdbff)
         {
-          _REENT_ERRNO(r) = EILSEQ;
           return -1;
         }
       /* There's a leftover lone high surrogate.  Write out the CESU-8 value
@@ -97,7 +95,6 @@ __utf8_wctomb (
                 if (state->__count == -4)
                 {
                   /* Extra high surrogate */
-                  _REENT_ERRNO(r) = EILSEQ;
                   return -1;
                 }
                 /* First half of a surrogate pair.  Store the state and
@@ -125,13 +122,11 @@ __utf8_wctomb (
                 return 4;
               }
               /* Unexpected second half */
-              _REENT_ERRNO(r) = EILSEQ;
               return -1;
             }
           else
             {
               /* No UTF-16 surrogate handling in UCS-4 */
-              _REENT_ERRNO(r) = EILSEQ;
               return -1;
             }
 	}
@@ -149,7 +144,6 @@ __utf8_wctomb (
       return 4;
     }
 
-  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -180,7 +174,6 @@ __sjis_wctomb (
 	}
       else
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -221,7 +214,6 @@ __eucjp_wctomb (
 	}
       else
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -261,7 +253,6 @@ __jis_wctomb (
 	  *s = (char)char2;
 	  return cnt + 2;
 	}
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   if (state->__state != 0)
@@ -303,14 +294,12 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
 		*s = (char) (mb + 0xa0);
 		return 1;
 	      }
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
 
   if ((size_t)wchar >= 0x100)
     {
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -460,14 +449,12 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 		*s = (char) (mb + 0x80);
 		return 1;
 	      }
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
 
   if ((size_t)wchar >= 0x100)
     {
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 

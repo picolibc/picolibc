@@ -60,9 +60,10 @@ mbtowc (wchar_t *__restrict pwc,
 
   retval = __MBTOWC (pwc, s, n, &_mbtowc_state);
 
-  if (retval < 0)
+  if (retval == -1)
     {
       _mbtowc_state.__count = 0;
+      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   return retval;

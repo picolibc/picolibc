@@ -36,10 +36,7 @@ __ascii_mbtowc (
   c = *t;
 
   if (c >= 0x80)
-    {
-      _REENT_ERRNO(r) = EILSEQ;
-      return -1;
-    }
+    return -1;
 
   *pwc = (wchar_t)c;
 
@@ -96,10 +93,8 @@ __utf8_mbtowc (
     }
   if (ch >= 0xc0 && ch <= 0xdf)
     {
-      if (ch == 0xc0) {
-        _REENT_ERRNO(r) = EILSEQ;
+      if (ch == 0xc0)
         return -1;
-      }
       /* two-byte sequence */
       state->__value.__wchb[0] = ch;
       if (state->__count == 0)
@@ -110,14 +105,10 @@ __utf8_mbtowc (
 	return -2;
       ch = t[i++];
       if (ch < 0x80 || ch > 0xbf)
-	{
-	  _REENT_ERRNO(r) = EILSEQ;
-	  return -1;
-	}
+        return -1;
       if (state->__value.__wchb[0] < 0xc2)
 	{
 	  /* overlong UTF-8 sequence */
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__count = 0;
@@ -140,12 +131,10 @@ __utf8_mbtowc (
       if (state->__value.__wchb[0] == 0xe0 && ch < 0xa0)
 	{
 	  /* overlong UTF-8 sequence */
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__value.__wchb[1] = ch;
@@ -158,7 +147,6 @@ __utf8_mbtowc (
       ch = t[i++];
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__count = 0;
@@ -168,7 +156,6 @@ __utf8_mbtowc (
       /* Check for surrogates */
       if (0xd800 <= tmp && tmp <= 0xdfff)
         {
-          _REENT_ERRNO(r) = EILSEQ;
           return -1;
         }
       *pwc = tmp;
@@ -190,12 +177,10 @@ __utf8_mbtowc (
 	  || (state->__value.__wchb[0] == 0xf4 && ch >= 0x90))
 	{
 	  /* overlong UTF-8 sequence or result is > 0x10ffff */
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__value.__wchb[1] = ch;
@@ -208,7 +193,6 @@ __utf8_mbtowc (
       ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       state->__value.__wchb[2] = ch;
@@ -241,7 +225,6 @@ __utf8_mbtowc (
       ch = t[i++];
       if (ch < 0x80 || ch > 0xbf)
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
       tmp = (((uint32_t)state->__value.__wchb[0] & 0x07) << 18)
@@ -258,7 +241,6 @@ __utf8_mbtowc (
       return i;
     }
 
-  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
@@ -287,7 +269,6 @@ ___iso_mbtowc (wchar_t *pwc, const char *s, size_t n,
 	  *pwc = __iso_8859_conv[iso_idx][*t - 0xa0];
 	  if (*pwc == 0) /* Invalid character */
 	    {
-	      _REENT_ERRNO(r) = EILSEQ;
 	      return -1;
 	    }
 	  return 1;
@@ -461,7 +442,6 @@ ___cp_mbtowc (wchar_t *pwc, const char *s, size_t n,
 	  *pwc = __cp_conv[cp_idx][*t - 0x80];
 	  if (*pwc == 0) /* Invalid character */
 	    {
-	      _REENT_ERRNO(r) = EILSEQ;
 	      return -1;
 	    }
 	  return 1;
@@ -776,7 +756,6 @@ __sjis_mbtowc (
 	}
       else if (!_issjis1b(ch))
         {
-          _REENT_ERRNO(r) = EILSEQ;
           return -1;
         }
     }
@@ -789,7 +768,6 @@ __sjis_mbtowc (
 	  state->__count = 0;
           if (uchar == WEOF)
             {
-              _REENT_ERRNO(r) = EILSEQ;
               return -1;
             }
           *pwc = (wchar_t) uchar;
@@ -797,7 +775,6 @@ __sjis_mbtowc (
 	}
       else
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -805,7 +782,6 @@ __sjis_mbtowc (
   uchar = __jp2uc((wint_t) *t, JP_SJIS);
   if (uchar == WEOF)
     {
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -869,7 +845,6 @@ __eucjp_mbtowc (
 	      state->__count = 0;
               if (uchar == WEOF)
                 {
-                  _REENT_ERRNO(r) = EILSEQ;
                   return -1;
                 }
               *pwc = (wchar_t) uchar;
@@ -878,7 +853,6 @@ __eucjp_mbtowc (
 	}
       else
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -892,7 +866,6 @@ __eucjp_mbtowc (
 	  state->__count = 0;
           if (uchar == WEOF)
             {
-              _REENT_ERRNO(r) = EILSEQ;
               return -1;
             }
           *pwc = (wchar_t) uchar;
@@ -900,7 +873,6 @@ __eucjp_mbtowc (
 	}
       else
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
@@ -909,7 +881,6 @@ __eucjp_mbtowc (
 
   if (uchar == WEOF)
     {
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   *pwc = (wchar_t) uchar;
@@ -1009,7 +980,6 @@ __jis_mbtowc (
           uchar = __jp2uc(jischar, JP_JIS);
           if (uchar == WEOF)
             {
-              _REENT_ERRNO(r) = EILSEQ;
               return -1;
             }
           *pwc = uchar;
@@ -1019,7 +989,6 @@ __jis_mbtowc (
 	  break;
 	case ERROR:
 	default:
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
 

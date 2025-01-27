@@ -8,7 +8,6 @@ Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 #include <string.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
 size_t
 mbrtowc (wchar_t *__restrict pwc,
 	const char *__restrict s,
@@ -39,4 +38,3 @@ mbrtowc (wchar_t *__restrict pwc,
   else
     return (size_t)retval;
 }
-#endif /* !_REENT_ONLY */

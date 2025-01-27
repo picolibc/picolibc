@@ -51,9 +51,15 @@ wctomb (char *s,
         wchar_t wchar)
 {
 #ifdef _MB_CAPABLE
+        int retval;
 	static NEWLIB_THREAD_LOCAL mbstate_t _wctomb_state;
 
-        return __WCTOMB (s, wchar, &_wctomb_state);
+        retval = __WCTOMB (s, wchar, &_wctomb_state);
+        if (retval == -1) {
+                _wctomb_state.__count = 0;
+                errno = EILSEQ;
+        }
+        return retval;
 #else /* not _MB_CAPABLE */
         if (s == NULL)
                 return 0;
