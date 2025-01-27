@@ -376,7 +376,8 @@ public:
   }
   fh_devices operator = (fh_devices n) {return d.devn_fh_devices = n;}
   inline void setfs (bool x) {dev_on_fs = x;}
-  inline bool isfs () const {return dev_on_fs || d.devn == FH_FS;}
+  inline bool isfs () const {return dev_on_fs || d.devn == FH_FS
+				    || d.devn == FH_MQUEUE;}
   inline bool is_fs_special () const {return dev_on_fs && d.devn != FH_FS;}
   inline bool is_dev_resident () const {return lives_in_dev;}
   inline int exists () const {return exists_func (*this);}

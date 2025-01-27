@@ -235,8 +235,7 @@ class path_conv
      /proc. */
   int isspecial () const {return dev.not_device (FH_FS);}
   /* Devices with representation on disk. This includes local sockets, FIFOs,
-     message queues and devices created with mknod.  It does not include
-     the /proc hierarchy. */
+     devices created with mknod.  It does not include the /proc hierarchy. */
   int is_fs_special () const {return dev.is_fs_special ();}
   /* Like is_fs_special but excluding local sockets. */
   int is_lnk_special () const {return is_fs_special () && !issocket ();}
