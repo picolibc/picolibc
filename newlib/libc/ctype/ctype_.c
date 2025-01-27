@@ -34,21 +34,6 @@
 #include "../locale/setlocale.h"
 #include "../stdlib/local.h"
 
-#if defined(_MB_EXTENDED_CHARSETS_ANY)
-#include "ctype_extended.h"
-
-#if defined(_MB_EXTENDED_CHARSETS_ISO)
-#include "ctype_iso.h"
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-#include "ctype_cp.h"
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_JIS)
-#include "ctype_jis.h"
-#endif
-
-#endif
-
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 /* No static const on Cygwin since it's referenced and potentially overwritten
    for compatibility with older applications. */
@@ -69,9 +54,20 @@ const char _ctype_[1 + 256] = {
 
 #endif	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
-#if defined(_MB_EXTENDED_CHARSETS_ANY)
-/* Cygwin has its own implementation which additionally maintains backward
-   compatibility with applications built under older Cygwin releases. */
+#ifdef _MB_EXTENDED_CHARSETS_ANY
+
+#include "ctype_extended.h"
+
+#if defined(_MB_EXTENDED_CHARSETS_ISO)
+#include "ctype_iso.h"
+#endif
+#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
+#include "ctype_cp.h"
+#endif
+#if defined(_MB_EXTENDED_CHARSETS_JIS)
+#include "ctype_jis.h"
+#endif
+
 void
 __set_ctype (struct __locale_t *loc, const char *charset)
 {
@@ -128,4 +124,4 @@ __set_ctype (struct __locale_t *loc, const char *charset)
   loc->ctype_ptr = ctype_ptr;
 #  endif
 }
-#endif /* _MB_CAPABLE */
+#endif /* _MB_EXTENDED_CHARSETS_ANY */
