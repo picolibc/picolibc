@@ -101,7 +101,9 @@ extern const void *__vector_table[];
  * system registers. */
 #if defined(MACHINE_qemu)
 #define BOOT_EL "EL1"
-#elif defined(MACHINE_fvp)
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE == 'R'
+#define BOOT_EL "EL2"
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE != 'R'
 #define BOOT_EL "EL3"
 #else
 #error "Unknown machine type"
@@ -115,6 +117,7 @@ void _cstart(void)
         __asm__("ic iallu");
         __asm__("isb\n");
 
+        #if __ARM_ARCH_PROFILE != 'R'
         /*
          * Set up the TCR register to provide a 33bit VA space using
          * 4kB pages over 4GB of PA
@@ -130,6 +133,16 @@ void _cstart(void)
 
         /* Load the page table base */
         __asm__("msr    ttbr0_"BOOT_EL", %x0" :: "r" (__identity_page_table));
+        #else
+        /* Enable the 8-R.64 MPU, and configure a single 'normal memory' region
+         * covering the whole address map
+         */
+
+        /* Set the base address for the region */
+        __asm__("msr    PRBAR_EL2, %x0\n" :: "r" (4));
+        /* Set the limit address for the region */
+        __asm__("msr    PRLAR_EL2, %x0\n" :: "r" (0x000fffffffffffd1));
+        #endif
 
         /*
          * Set the memory attributions in the MAIR register:
@@ -137,8 +150,13 @@ void _cstart(void)
          * Region 0 is Normal memory
          * Region 1 is Device memory
          */
-        __asm__("msr    mair_"BOOT_EL", %x0" ::
+        #if __ARM_ARCH_PROFILE != 'R'
+        __asm__ ("msr    mair_"BOOT_EL", %x0" ::
                 "r" ((0xffLL << 0) | (0x00LL << 8)));
+        #else
+        __asm__ ("msr    mair_"BOOT_EL", %x0" ::
+                "r" ((0x77LL << 0) | (0x00LL << 8)));
+        #endif
 
         /*
          * Enable caches, and the MMU, disable alignment requirements
@@ -157,7 +175,7 @@ void _cstart(void)
 
         /* Set the vector base address register */
         __asm__("msr    vbar_"BOOT_EL", %x0" :: "r" (__vector_table));
-	__start();
+       __start();
 }
 
 
