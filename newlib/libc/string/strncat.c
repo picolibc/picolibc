@@ -59,16 +59,17 @@ strncat (char *__restrict s1,
 #else
   char *s = s1;
 
-  /* Skip over the data in s1 as quickly as possible.  */
-  if (!UNALIGNED_X(s1))
-    {
-      unsigned long *aligned_s1 = (unsigned long *)s1;
-      while (!DETECT_NULL(*aligned_s1))
-	aligned_s1++;
+  /* Skip unaligned memory in s1.  */
+  while (UNALIGNED_X(s1) && *s1)
+    s1++;
 
-      s1 = (char *)aligned_s1;
-    }
+  /* Skip over the aligned data in s1 as quickly as possible.  */
+  unsigned long *aligned_s1 = (unsigned long *)s1;
+  while (!DETECT_NULL(*aligned_s1))
+    aligned_s1++;
+  s1 = (char *)aligned_s1;
 
+  /* Find string terminator.  */
   while (*s1)
     s1++;
 
