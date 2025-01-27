@@ -43,7 +43,7 @@ SUCH DAMAGE.
 _BEGIN_STD_C
 
 /*
- * The small ctype code does not support locales or extended character sets. It also breaks
+ * The small ctype code does not support extended character sets. It also breaks
  * libstdc++'s ctype implementation, so just skip it for c++
  */
 #if defined(_MB_EXTENDED_CHARSETS_ANY) || defined (__cplusplus)
@@ -53,7 +53,7 @@ _BEGIN_STD_C
 
 /*
  * The default ctype style depends upon whether we are optimizing for
- * size and whether the library supports locale-specific ctype data
+ * size and whether the library supports charset-specific ctype data
  */
 #if !defined(_PICOLIBC_CTYPE_SMALL)
 #ifdef __OPTIMIZE_SIZE__
@@ -242,7 +242,7 @@ extern const char	_ctype_[];
 
 extern const short _ctype_wide[];
 
-#if defined(__HAVE_LOCALE_INFO__) && defined(_MB_EXTENDED_CHARSETS_ANY)
+#ifdef _MB_EXTENDED_CHARSETS_ANY
 const char *__locale_ctype_ptr (void);
 #else
 #define __locale_ctype_ptr()	_ctype_
@@ -274,7 +274,7 @@ static __inline char __ctype_lookup(int c) { return (__CTYPE_PTR + 1)[c]; }
 #endif
 
 #if __POSIX_VISIBLE >= 200809
-#ifdef __HAVE_LOCALE_INFO__
+#ifdef _MB_EXTENDED_CHARSETS_ANY
 const char *__locale_ctype_ptr_l (locale_t);
 #else
 static __inline const char *
