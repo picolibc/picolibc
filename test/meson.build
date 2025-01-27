@@ -674,7 +674,7 @@ if enable_native_tests
   diff = find_program('diff', required: false)
 
   if diff.found()
-    diff_tests = ['test-wctype', 'test-encode']
+    diff_tests = ['test-wctype', 'test-encode', 'test-wcase']
 
     foreach t : diff_tests
       src = t + '.c'
