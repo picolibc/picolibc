@@ -5,6 +5,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 /* Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling */
 #define _DEFAULT_SOURCE
 #include <wctype.h>
+#include <ctype.h>
 #include <stdint.h>
 //#include <errno.h>
 #include "local.h"
@@ -37,6 +38,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
    be split up (reduce limit max=255 e.g. to max=127 or max=63 in 
    script mkcaseconv, check increasing table size).
  */
+#ifdef _MB_CAPABLE
 enum {TO1, TOLO, TOUP, TOBOTH};
 enum {EVENCAP, ODDCAP};
 static const struct caseconv_entry {
@@ -153,25 +155,37 @@ touupper (wint_t c)
 
   return c;
 }
+#endif /* _MB_CAPABLE */
 
 wint_t
 towctrans_l (wint_t u, wctrans_t w, struct __locale_t *locale)
 {
   (void) locale;
-  wint_t res;
-  if (w == WCT_TOLOWER)
-    res = toulower (u);
-  else if (w == WCT_TOUPPER)
-    res = touupper (u);
-  else
-    {
+
+  #ifdef _MB_CAPABLE
+    wint_t res;
+    uint16_t cat = __ctype_table_lookup(u, locale);
+    if (w == WCT_TOLOWER && (cat & CLASS_case)) {
+      res = toulower (u);
+      return res;
+    }
+    else if (w == WCT_TOUPPER && (cat & CLASS_case)) {
+      res = touupper (u);
+      return res;
+    }
+    else
+      {
       // skipping the errno setting that was previously involved
       // by delegating to towctrans; it was causing trouble (cygwin crash)
       // and there is no errno specified for towctrans
       return u;
-    }
-  if (res != u)
-    return res;
-  else
-    return u;
+      }
+  #else
+    if (w == WCT_TOLOWER)
+      return u < 0x00ff ? (wint_t)(tolower ((int)u)) : u;
+    else if (w == WCT_TOUPPER)
+      return u < 0x00ff ? (wint_t)(toupper ((int)u)) : u;
+    else
+      return u;
+  #endif
 }
