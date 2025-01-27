@@ -14,3 +14,4 @@ qemu-system-x86
 ca-certificates
 wget
 gnupg
+locales

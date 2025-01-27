@@ -39,3 +39,4 @@ libdbus-1-dev
 ca-certificates
 wget
 gnupg
+locales
