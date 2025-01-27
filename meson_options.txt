@@ -240,6 +240,12 @@ option('mb-capable', type: 'boolean', value: false,
        description: 'enable multibyte support for UTF-8 charset')
 option('mb-extended-charsets', type: 'boolean', value: false,
        description: 'enable additional ISO, Windows and JIS charsets')
+option('mb-iso-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable additional ISO multibyte encodings')
+option('mb-jis-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable additional JIS multibyte encodings')
+option('mb-windows-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable additional Windows multibyte encodings')
 
 option('newlib-locale-info', type: 'boolean', value: false,
        description: 'locale info support')

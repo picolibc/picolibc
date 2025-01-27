@@ -249,6 +249,21 @@ fast_strcmp = get_option('fast-strcmp')
 
 mb_capable = get_option('mb-capable') or get_option('newlib-mb')
 mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
+if get_option('mb-iso-charsets') == 'auto'
+  mb_iso_charsets = mb_extended_charsets
+else
+  mb_iso_charsets = mb_capable and get_option('mb-iso-charsets') == 'true'
+endif
+if get_option('mb-windows-charsets') == 'auto'
+  mb_windows_charsets = mb_extended_charsets
+else
+  mb_windows_charsets = mb_capable and get_option('mb-windows-charsets') == 'true'
+endif
+if get_option('mb-jis-charsets') == 'auto'
+  mb_jis_charsets = mb_extended_charsets
+else
+  mb_jis_charsets = mb_capable and get_option('mb-jis-charsets') == 'true'
+endif
 locale_info = get_option('locale-info') or get_option('newlib-locale-info')
 locale_info_extended = locale_info and (get_option('locale-info-extended') or get_option('newlib-locale-info-extended'))
 
@@ -1384,7 +1399,9 @@ if not tinystdio
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
 conf_data.set('_MB_CAPABLE', mb_capable)
-conf_data.set('_MB_EXTENDED_CHARSETS_ALL', mb_extended_charsets)
+conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
+conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
+conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
 conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
 conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
 conf_data.set('_ELIX_LEVEL', newlib_elix_level)
