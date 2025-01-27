@@ -224,7 +224,7 @@ mq_getattr (mqd_t mqd, struct mq_attr *mqstat)
 {
   int ret = -1;
 
-  cygheap_fdget fd ((int) mqd, true);
+  cygheap_fdget fd ((int) mqd);
   if (fd >= 0)
     {
       fhandler_mqueue *fh = fd->is_mqueue ();
@@ -241,7 +241,7 @@ mq_setattr (mqd_t mqd, const struct mq_attr *mqstat, struct mq_attr *omqstat)
 {
   int ret = -1;
 
-  cygheap_fdget fd ((int) mqd, true);
+  cygheap_fdget fd ((int) mqd);
   if (fd >= 0)
     {
       fhandler_mqueue *fh = fd->is_mqueue ();
@@ -258,7 +258,7 @@ mq_notify (mqd_t mqd, const struct sigevent *notification)
 {
   int ret = -1;
 
-  cygheap_fdget fd ((int) mqd, true);
+  cygheap_fdget fd ((int) mqd);
   if (fd >= 0)
     {
       fhandler_mqueue *fh = fd->is_mqueue ();
@@ -276,7 +276,7 @@ mq_timedsend (mqd_t mqd, const char *ptr, size_t len, unsigned int prio,
 {
   int ret = -1;
 
-  cygheap_fdget fd ((int) mqd, true);
+  cygheap_fdget fd ((int) mqd);
   if (fd >= 0)
     {
       fhandler_mqueue *fh = fd->is_mqueue ();
@@ -300,7 +300,7 @@ mq_timedreceive (mqd_t mqd, char *ptr, size_t maxlen, unsigned int *priop,
 {
   int ret = -1;
 
-  cygheap_fdget fd ((int) mqd, true);
+  cygheap_fdget fd ((int) mqd);
   if (fd >= 0)
     {
       fhandler_mqueue *fh = fd->is_mqueue ();
