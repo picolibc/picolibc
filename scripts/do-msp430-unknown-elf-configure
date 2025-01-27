@@ -38,5 +38,6 @@ exec "$(dirname "$0")"/do-configure msp430-unknown-elf \
      -Dtests-enable-posix-io=false \
      -Dsplit-large-tests=true \
      -Dmultilib=false \
+     -Dmb-windows-charsets=false \
      -Ddebug=false \
      "$@"
