@@ -86,6 +86,16 @@ __identity_page_table:
 #error "Unknown machine type"
 #endif
 
+#if defined(MACHINE_qemu)
+  #define BOOT_EL(CPACR) CPACR ## _EL1
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE == 'R'
+  #define BOOT_EL(CPTR) CPTR ## _EL2
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE != 'R'
+  #define BOOT_EL(CPTR) CPTR ## _EL3
+#else
+#error "Unknown machine type"
+#endif
+
 
 /************ Entry point ************/
 
@@ -111,16 +121,16 @@ _start:
 #if __ARM_FP
 #if defined(MACHINE_qemu)
 	mov x1, #(0x3 << 20)
-	msr CPACR_EL1, x1
+	msr BOOT_EL(CPACR), x1
 #elif defined(MACHINE_fvp)
-	mrs x0, CPTR_EL3
+	mrs x0, BOOT_EL(CPTR)
   /* Clear CPTR_ELx.TFP, to enable FP/SIMD instructions at EL0 and EL1. */
 	and x0, x0, #~(1<<10)
   /* Set CPTR_ELx.EZ and .ESM, to enable SVE and SME instructions at EL3. These
    * bits are ignored for cores which don't have the relevant feature. */
   ORR x0, x0, #1<<8
 	ORR x0, x0, #1<<12
-	msr CPTR_EL3, x0
+	msr BOOT_EL(CPTR), x0
 #else
 #error "Unknown machine type"
 #endif
