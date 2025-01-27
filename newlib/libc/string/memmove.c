@@ -75,10 +75,28 @@ memmove (void *dst_void,
       /* Destructive overlap...have to copy backwards */
       src += length;
       dst += length;
+
+      if (!TOO_SMALL_LITTLE_BLOCK(length) && !UNALIGNED_X_Y(src, dst))
+        {
+          aligned_dst = (long*)dst;
+          aligned_src = (long*)src;
+
+          /* Copy one long word at a time if possible.  */
+          while (!TOO_SMALL_LITTLE_BLOCK(length))
+            {
+              *--aligned_dst = *--aligned_src;
+              length -= LITTLE_BLOCK_SIZE;
+            }
+
+          /* Pick up any residual with a byte copier.  */
+          dst = (char*)aligned_dst;
+          src = (char*)aligned_src;
+        }
+
       while (length--)
-	{
-	  *--dst = *--src;
-	}
+        {
+          *--dst = *--src;
+        }
     }
   else
     {
