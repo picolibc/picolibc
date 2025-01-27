@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_ctype = [
+    'caseconv.c',
     'ctype_.c',
     'ctype_table.c',
     'ctype_wide.c',

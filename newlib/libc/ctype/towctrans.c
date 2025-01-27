@@ -59,8 +59,7 @@ LC_GLOBAL_LOCALE or not a valid locale object, the behaviour is undefined.
 RETURNS
 <<towctrans>>, <<towctrans_l>> return the translated equivalent of <[c]>
 when it is a valid for the given translation, otherwise, it returns the
-input character.  When the translation type is invalid, <<errno>> is
-set to <<EINVAL>>.
+input character.
 
 PORTABILITY
 <<towctrans>> is C99.
@@ -71,22 +70,11 @@ No supporting OS subroutines are required.
 
 #define _DEFAULT_SOURCE
 #include <wctype.h>
-//#include <errno.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
 wint_t
 towctrans (wint_t c,
 	wctrans_t w)
 {
-  if (w == WCT_TOLOWER || w == WCT_TOUPPER)
-    return towctrans_l (c, w, 0);
-  else
-    {
-      // skipping this because it was causing trouble (cygwin crash)
-      // and there is no errno specified for towctrans
-      //__errno_r(r) = EINVAL;
-      return c;
-    }
+  return towctrans_l (c, w, 0);
 }
-#endif /* !_REENT_ONLY */

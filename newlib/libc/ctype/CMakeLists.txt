@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_sources(
+  caseconv.c
   ctype_.c
   ctype_table.c
   ctype_wide.c

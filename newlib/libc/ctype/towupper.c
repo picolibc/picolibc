@@ -65,6 +65,7 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
+#define _DEFAULT_SOURCE
 #include <string.h>
 #include <ctype.h>
 #include <wctype.h>
@@ -74,7 +75,7 @@ wint_t
 towupper (wint_t c)
 {
 #ifdef _MB_CAPABLE
-  return towctrans (c, WCT_TOUPPER);
+  return towupper_l(c, 0);
 #else
   return c < 0x00ff ? (wint_t)(toupper ((int)c)) : c;
 #endif /* _MB_CAPABLE */

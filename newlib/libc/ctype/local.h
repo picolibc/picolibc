@@ -82,3 +82,56 @@ __jp2uc (wint_t c, int type);
 wint_t
 __uc2jp (wint_t c, int type);
 
+/*
+   struct caseconv_entry describes the case conversion behaviour
+   of a range of Unicode characters.
+   It was designed to be compact for a minimal table size.
+   The range is first...first + diff.
+   Conversion behaviour for a character c in the respective range:
+     mode == TOLO	towlower (c) = c + delta
+     mode == TOUP	towupper (c) = c + delta
+     mode == TOBOTH	(titling case characters)
+			towlower (c) = c + 1
+			towupper (c) = c - 1
+     mode == TO1	capital/small letters are alternating
+	delta == EVENCAP	even codes are capital
+	delta == ODDCAP		odd codes are capital
+			(this correlates with an even/odd first range value
+			as of Unicode 10.0 but we do not rely on this)
+   As of Unicode 10.0, the following field lengths are sufficient
+	first: 17 bits
+	diff: 8 bits
+	delta: 17 bits
+	mode: 2 bits
+   The reserve of 4 bits (to limit the struct to 6 bytes)
+   is currently added to the 'first' field;
+   should a future Unicode version make it necessary to expand the others,
+   the 'first' field could be reduced as needed, or larger ranges could
+   be split up (reduce limit max=255 e.g. to max=127 or max=63 in 
+   script mkcaseconv, check increasing table size).
+ */
+enum {TO1, TOLO, TOUP, TOBOTH};
+enum {EVENCAP, ODDCAP};
+
+struct caseconv_entry
+{
+  uint_least32_t first: 21;
+  uint_least32_t diff: 8;
+  uint_least32_t mode: 2;
+#ifdef __MSP430__
+  /*
+   * MSP430 has 20-bit integers which the compiler attempts to use and
+   * fails. Waste some memory to fix that.
+   */
+  int_least32_t delta;
+#else
+  int_least32_t delta: 17;
+#endif
+}
+#ifdef _HAVE_BITFIELDS_IN_PACKED_STRUCTS
+__attribute__((packed))
+#endif
+;
+
+const struct caseconv_entry *
+__caseconv_lookup(wint_t c, struct __locale_t *locale);
