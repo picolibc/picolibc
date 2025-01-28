@@ -649,7 +649,7 @@ fhandler_socket_local::open (int flags, mode_t mode)
 }
 
 int
-fhandler_socket_local::close ()
+fhandler_socket_local::close (int flag)
 {
   if (get_flags () & O_PATH)
     return fhandler_base::close ();

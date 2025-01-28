@@ -1035,10 +1035,25 @@ fhandler_socket_wsock::shutdown (int how)
 }
 
 int
-fhandler_socket_wsock::close ()
+fhandler_socket_wsock::close (int flag)
 {
   int res = 0;
+  unsigned wait_flags;
 
+  switch (flag)
+    {
+    /* See comment preceeding close() functions in syscalls.cc.  Given
+       WSAEWOULDBLOCK leaves the socket open, the default behaviour is
+       equivalent to posix_close w/ POSIX_CLOSE_RESTART. */
+    case -1:
+    case POSIX_CLOSE_RESTART:
+      wait_flags = cw_cancel | cw_sig;
+      break;
+    case 0:
+    default:	/* shouldn't happen, already handled in syscall.cc:__close() */
+      wait_flags = cw_cancel | cw_sig | cw_sig_restart;
+      break;
+    }
   release_events ();
   while ((res = ::closesocket (get_socket ())) != 0)
     {
@@ -1048,7 +1063,7 @@ fhandler_socket_wsock::close ()
 	  res = -1;
 	  break;
 	}
-      if (cygwait (10) == WAIT_SIGNALED)
+      if (cygwait (NULL, 10, wait_flags) == WAIT_SIGNALED)
 	{
 	  set_errno (EINTR);
 	  res = -1;

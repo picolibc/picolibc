@@ -1795,7 +1795,7 @@ fhandler_socket_unix::open (int flags, mode_t mode)
 }
 
 int
-fhandler_socket_unix::close ()
+fhandler_socket_unix::close (int flag)
 {
   if (get_flags () & O_PATH)
     return fhandler_base::close ();

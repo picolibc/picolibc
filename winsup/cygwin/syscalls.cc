@@ -1678,12 +1678,26 @@ lseek (int fd, off_t pos, int dir)
   return res;
 }
 
-extern "C" int
-close (int fd)
+/* Takes three flag values:
+
+   -1: default behaviour, called from close(2).
+
+    0: called via posix_close (0), i.e., the call shall not return -1 with
+       errno set to [EINTR], which implies that fildes will always be closed
+       (except for [EBADF], where fildes was invalid).
+
+    POSIX_CLOSE_RESTART: called via posix_close (POSIX_CLOSE_RESTART), i. e.
+       if the call is interrupted by a signal that is to be caught, the call
+       may return -1 with errno set to [EINTR], in which case fildes
+       shall be left open; however, it is unspecified whether fildes can
+       subsequently be passed to any function except close() or posix_close()
+       without error.
+
+     Note that POSIX_CLOSE_RESTART means the opposite of SA_RESTART! */
+static inline int
+__close (int fd, int flag)
 {
   int res;
-
-  syscall_printf ("close(%d)", fd);
 
   pthread_testcancel ();
 
@@ -1692,12 +1706,42 @@ close (int fd)
     res = -1;
   else
     {
-      res = cfd->close_with_arch ();
-      cfd.release ();
+      res = cfd->close_with_arch (flag);
+      if (res != EINTR)
+	cfd.release ();
     }
 
-  syscall_printf ("%R = close(%d)", res, fd);
   return res;
+}
+
+extern "C" int
+close (int fd)
+{
+  syscall_printf ("close(%d)", fd);
+  int ret =  __close (fd, -1);
+  syscall_printf ("%R = close(%d)", ret, fd);
+  return ret;
+}
+
+extern "C" int
+posix_close (int fd, int flag)
+{
+   int real_flag = flag;
+
+  /* POSIX-1.2024 says: If flag is invalid, posix_close() may fail with errno
+     set to [EINVAL], but shall otherwise behave as if flag had been 0 and
+     close fd. */
+  if (real_flag != 0 && real_flag != POSIX_CLOSE_RESTART)
+    real_flag = 0;
+  syscall_printf ("posix_close(%d, %d)", fd, flag);
+  int ret = __close (fd, real_flag);
+  if (!ret && flag != real_flag)
+    {
+      set_errno (EINVAL);
+      ret = -1;
+    }
+  syscall_printf ("%R = posix_close(%d, %d)", ret, fd, flag);
+  return ret;
 }
 
 extern "C" int

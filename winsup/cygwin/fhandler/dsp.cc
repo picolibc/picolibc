@@ -1230,7 +1230,7 @@ fhandler_dev_dsp::close_audio_out (bool immediately)
 }
 
 int
-fhandler_dev_dsp::close ()
+fhandler_dev_dsp::close (int flag)
 {
   debug_printf ("audio_in=%p audio_out=%p", audio_in_, audio_out_);
   being_closed = true;

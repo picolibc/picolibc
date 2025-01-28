@@ -898,7 +898,7 @@ out:
 }
 
 int
-fhandler_registry::close ()
+fhandler_registry::close (int flag)
 {
   int res = fhandler_virtual::close ();
   if (res != 0)

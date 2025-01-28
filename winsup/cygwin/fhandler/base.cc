@@ -1255,7 +1255,7 @@ fhandler_base::pwrite (void *, size_t, off_t, void *)
 }
 
 int
-fhandler_base::close_with_arch ()
+fhandler_base::close_with_arch (int flag)
 {
   int res;
   fhandler_base *fh;
@@ -1285,7 +1285,7 @@ fhandler_base::close_with_arch ()
     }
 
   cleanup ();
-  res = fh->close ();
+  res = fh->close (flag);
   if (archetype)
     {
       cygheap->fdtab.delete_archetype (archetype);
@@ -1304,7 +1304,7 @@ fhandler_base::cleanup ()
 }
 
 int
-fhandler_base::close ()
+fhandler_base::close (int flag)
 {
   int res = -1;
 

@@ -59,7 +59,7 @@ fhandler_dev::open (int flags, mode_t mode)
 }
 
 int
-fhandler_dev::close ()
+fhandler_dev::close (int flag)
 {
   return fhandler_disk_file::close ();
 }

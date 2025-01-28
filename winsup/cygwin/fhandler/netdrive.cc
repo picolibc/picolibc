@@ -580,7 +580,7 @@ fhandler_netdrive::open (int flags, mode_t mode)
 }
 
 int
-fhandler_netdrive::close ()
+fhandler_netdrive::close (int flag)
 {
   /* Skip fhandler_virtual::close, which is a no-op. */
   return fhandler_base::close ();

@@ -981,7 +981,7 @@ fhandler_pty_slave::cleanup ()
 }
 
 int
-fhandler_pty_slave::close ()
+fhandler_pty_slave::close (int flag)
 {
   termios_printf ("closing last open %s handle", ttyname ());
   if (inuse && !CloseHandle (inuse))
@@ -1957,7 +1957,7 @@ fhandler_pty_common::lseek (off_t, int)
 }
 
 int
-fhandler_pty_common::close ()
+fhandler_pty_common::close (int flag)
 {
   termios_printf ("pty%d <%p,%p> closing",
 		  get_minor (), get_handle (), get_output_handle ());
@@ -2004,7 +2004,7 @@ fhandler_pty_master::cleanup ()
 }
 
 int
-fhandler_pty_master::close ()
+fhandler_pty_master::close (int flag)
 {
   OBJECT_BASIC_INFORMATION obi;
   NTSTATUS status;

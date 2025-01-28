@@ -559,7 +559,7 @@ fhandler_mqueue::ioctl (unsigned int cmd, void *buf)
 }
 
 int
-fhandler_mqueue::close ()
+fhandler_mqueue::close (int flag)
 {
   __try
     {

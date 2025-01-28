@@ -1249,7 +1249,7 @@ fhandler_dev_tape::open (int flags, mode_t)
 }
 
 int
-fhandler_dev_tape::close ()
+fhandler_dev_tape::close (int flag)
 {
   int ret = 0;
   int cret = 0;

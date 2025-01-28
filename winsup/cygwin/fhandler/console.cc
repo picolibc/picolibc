@@ -1970,7 +1970,7 @@ fhandler_console::post_open_setup (int fd)
 }
 
 int
-fhandler_console::close ()
+fhandler_console::close (int flag)
 {
   debug_printf ("closing: %p, %p", get_handle (), get_output_handle ());
 

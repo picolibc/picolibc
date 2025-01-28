@@ -1654,7 +1654,7 @@ fhandler_disk_file::open (int flags, mode_t mode)
 }
 
 int
-fhandler_disk_file::close ()
+fhandler_disk_file::close (int flag)
 {
   /* Close extra pread/pwrite handle, if it exists. */
   if (prw_handle)

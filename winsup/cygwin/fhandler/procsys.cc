@@ -472,7 +472,7 @@ fhandler_procsys::open (int flags, mode_t mode)
 }
 
 int
-fhandler_procsys::close ()
+fhandler_procsys::close (int flag)
 {
   if (!nohandle ())
     NtClose (get_handle ());

@@ -759,7 +759,7 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
 }
 
 int
-fhandler_pipe::close ()
+fhandler_pipe::close (int flag)
 {
   isclosed (true);
   if (select_sem)

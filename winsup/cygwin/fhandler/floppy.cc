@@ -357,7 +357,7 @@ fhandler_dev_floppy::open (int flags, mode_t)
 }
 
 int
-fhandler_dev_floppy::close ()
+fhandler_dev_floppy::close (int flag)
 {
   int ret = fhandler_dev_raw::close ();
 

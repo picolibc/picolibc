@@ -341,7 +341,7 @@ fhandler_dev_clipboard::lseek (off_t offset, int whence)
 }
 
 int
-fhandler_dev_clipboard::close ()
+fhandler_dev_clipboard::close (int flag)
 {
   if (!have_execed)
     {

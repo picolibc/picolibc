@@ -241,7 +241,7 @@ fhandler_timerfd::fixup_after_exec ()
 }
 
 int
-fhandler_timerfd::close ()
+fhandler_timerfd::close (int flag)
 {
   int ret = -1;
 

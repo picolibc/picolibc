@@ -162,7 +162,7 @@ fhandler_virtual::dup (fhandler_base * child, int flags)
 }
 
 int
-fhandler_virtual::close ()
+fhandler_virtual::close (int flag)
 {
   if (!have_execed)
     {

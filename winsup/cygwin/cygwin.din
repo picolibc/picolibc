@@ -1044,6 +1044,7 @@ pipe SIGFE
 pipe2 SIGFE
 poll SIGFE
 popen SIGFE
+posix_close SIGFE
 posix_fadvise SIGFE
 posix_fallocate SIGFE
 posix_getdents SIGFE
