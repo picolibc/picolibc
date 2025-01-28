@@ -101,7 +101,9 @@ extern const void *__vector_table[];
  * system registers. */
 #if defined(MACHINE_qemu)
 #define BOOT_EL "EL1"
-#elif defined(MACHINE_fvp)
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE == 'R'
+#define BOOT_EL "EL2"
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE != 'R'
 #define BOOT_EL "EL3"
 #else
 #error "Unknown machine type"
@@ -115,6 +117,7 @@ void _cstart(void)
         __asm__("ic iallu");
         __asm__("isb\n");
 
+        #if __ARM_ARCH_PROFILE != 'R'
         /*
          * Set up the TCR register to provide a 33bit VA space using
          * 4kB pages over 4GB of PA
@@ -130,6 +133,31 @@ void _cstart(void)
 
         /* Load the page table base */
         __asm__("msr    ttbr0_"BOOT_EL", %x0" :: "r" (__identity_page_table));
+        #else
+        /* Enable the 8-R.64 MPU, and configure a single 'normal memory' region
+         * covering the whole address map
+         */
+
+        /* Select the MPU region */
+        __asm__("msr    PRSELR_"BOOT_EL", %x0" :: "r" (0));
+
+        /* Set the base address of memory region
+         *
+         * bits 5,4 are SH = 0b00: we don't care about shareability in  8-R.64 FVPs.
+         * bits 3,2 are AP = 0b01: read and write permissions at all ELs
+         * bits 1,0 are XN = 0b00: don't prohibit execution at any EL
+         */
+        __asm__("msr    PRBAR_"BOOT_EL", %x0\n" :: "r" (4));
+
+        /* Set the limit address of memory region
+         * bit 5 is reserved
+         * bit 4 is NS = 1: this is non-secure address space
+         * bits 3,2,1 are AttrIndx = 0b000: this memory region is
+         * controlled by the low byte of MAIR_EL2.
+         * bit 0 is EN = 1: this memory region is enabled at all
+         */
+        __asm__("msr    PRLAR_"BOOT_EL", %x0\n" :: "r" (0x000fffffffffffd1));
+        #endif
 
         /*
          * Set the memory attributions in the MAIR register:
