@@ -6,10 +6,19 @@
 # define DEFAULT_CTYPE_PTR	((char *) _ctype_)
 
 #ifdef _MB_EXTENDED_CHARSETS_ANY
+#ifdef _TINY_LOCALE
+void
+__set_ctype(enum locale_id, const char ** ctype);
+#else
 void
 __set_ctype (struct __locale_t *loc, const char *charset);
+#endif
+#else
+#ifdef _TINY_LOCALE
+#define __set_ctype(id, ctype, wc, mb)
 #else
 #define __set_ctype(loc, charset)
+#endif
 #endif
 
 #define _CTYPE_DATA_0_127 \

@@ -35,7 +35,7 @@
 
 libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc',
 	   'posix', 'search', 'signal', 'ssp', 'stdlib',
-	   'string', 'time', 'xdr', 'locale', 'uchar']
+	   'string', 'time', 'xdr', 'uchar']
 
 if enable_picolib
   libdirs += 'picolib'
@@ -48,6 +48,12 @@ else
   if newlib_stdio64
     libdirs += 'stdio64'
   endif
+endif
+
+if tiny_locale
+  libdirs += 'tinylocale'
+else
+  libdirs += 'locale'
 endif
 
 libnames = libdirs

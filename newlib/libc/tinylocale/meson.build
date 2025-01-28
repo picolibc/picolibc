@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,24 +33,34 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add_subdirectory(machine)
+srcs_tinylocale = [
+  'duplocale.c',
+  'freelocale.c',
+  'getlocalename_l.c',
+  'localeconv.c',
+  'localedata.c',
+  'locale_ctype_ptr.c',
+  'locale_ctype_ptr_l.c',
+  'locale_mb_cur_max.c',
+  'locale_names.c',
+  'newlocale.c',
+  'posix_locale.c',
+  'setlocale.c',
+  'setwcfuncs.c',
+  'timedata.c',
+  'uselocale.c',
+]
 
-add_subdirectory(include)
+srcs_tinylocale_use = []
+foreach file : srcs_tinylocale
+  s_file = fs.replace_suffix(file, '.S')
+  if file in srcs_machine
+    message('libc/tinylocale/' + file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message('libc/tinylocale/' + s_file + ': machine overrides generic')
+  else
+    srcs_tinylocale_use += file
+  endif
+endforeach
 
-add_subdirectory(argz)
-add_subdirectory(ctype)
-add_subdirectory(errno)
-add_subdirectory(iconv)
-add_subdirectory(misc)
-add_subdirectory(picolib)
-add_subdirectory(posix)
-add_subdirectory(search)
-add_subdirectory(signal)
-add_subdirectory(ssp)
-add_subdirectory(stdlib)
-add_subdirectory(string)
-add_subdirectory(time)
-add_subdirectory(tinystdio)
-add_subdirectory(uchar)
-add_subdirectory(xdr)
-add_subdirectory(tinylocale)
+src_tinylocale = files(srcs_tinylocale_use)

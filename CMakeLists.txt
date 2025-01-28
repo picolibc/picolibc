@@ -124,6 +124,9 @@ set(REENTRANT_SYSCALLS_PROVIDED 0)
 # Use tiny stdio from gcc avr
 option(TINY_STDIO "Use tiny stdio from avr libc" ON)
 
+# Use tiny locale
+option(_TINY_LOCALE "Use tiny locale" ON)
+
 if(NOT TLS_MODEL)
   set(TLS_MODEL "local-exec")
 endif()
@@ -373,6 +376,18 @@ endif()
 
 if(NOT DEFINED _MB_EXTENDED_CHARSETS_ALL)
   option(_MB_EXTENDED_CHARSETS_ALL "Enable ISO, Windows and JIS multibyte encodings" OFF)
+endif()
+
+if(NOT DEFINED _MB_EXTENDED_CHARSETS_ISO)
+  option(_MB_EXTENDED_CHARSETS_ISO "Enable ISO encodings" OFF)
+endif()
+
+if(NOT DEFINED _MB_EXTENDED_CHARSETS_WINDOWS)
+  option(_MB_EXTENDED_CHARSETS_WINDOWS "Enable Windows encodings" OFF)
+endif()
+
+if(NOT DEFINED _MB_EXTENDED_CHARSETS_JIS)
+  option(_MB_EXTENDED_CHARSETS_JIS "Enable JIS multibyte encodings" OFF)
 endif()
 
 set(_NANO_FORMATTED_IO OFF)

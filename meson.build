@@ -247,6 +247,7 @@ else
 endif
 fast_strcmp = get_option('fast-strcmp')
 
+tiny_locale = get_option('tiny-locale')
 mb_capable = get_option('mb-capable') or get_option('newlib-mb')
 mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
 if get_option('mb-iso-charsets') == 'auto'
@@ -1398,6 +1399,7 @@ if not tinystdio
   conf_data.set('__LARGE64_FILES', newlib_stdio64)
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
+conf_data.set('_TINY_LOCALE', tiny_locale)
 conf_data.set('_MB_CAPABLE', mb_capable)
 conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
@@ -1630,7 +1632,11 @@ conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major
 conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
-locale_inc_dir = 'newlib/libc/locale'
+if tiny_locale
+  locale_inc_dir = 'newlib/libc/tinylocale'
+else
+  locale_inc_dir = 'newlib/libc/locale'
+endif
 
 if tinystdio
   stdio_inc_dir = 'newlib/libc/tinystdio'

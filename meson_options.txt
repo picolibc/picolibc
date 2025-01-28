@@ -232,6 +232,8 @@ option('newlib-iconv-runtime-dir', type: 'string',
 option('newlib-iconv-encodings-exclude', type: 'array',
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be excluded')
 
+option('tiny-locale', type: 'boolean', value: true,
+       description: 'enable small locale implementation')
 option('locale-info', type: 'boolean', value: false,
        description: 'enable locale info support be')
 option('locale-info-extended', type: 'boolean', value: false,

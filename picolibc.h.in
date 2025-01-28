@@ -44,6 +44,9 @@
 /* Use tiny stdio from gcc avr */
 #cmakedefine TINY_STDIO
 
+/* Use tiny locale */
+#cmakedefine _TINY_LOCALE
+
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
 
 #cmakedefine _PICOLIBC_ATOMIC_SIGNAL
@@ -374,6 +377,14 @@
 #cmakedefine _LITE_EXIT
 
 #cmakedefine _MB_CAPABLE
+
+#cmakedefine _MB_EXTENDED_CHARSETS_ALL
+
+#cmakedefine _MB_EXTENDED_CHARSETS_ISO
+
+#cmakedefine _MB_EXTENDED_CHARSETS_WINDOWS
+
+#cmakedefine _MB_EXTENDED_CHARSETS_JIS
 
 #cmakedefine _NANO_FORMATTED_IO
 

@@ -35,6 +35,7 @@
 
 #include "stdio_private.h"
 #include "../../libm/common/math_config.h"
+#include "../stdlib/local.h"
 
 #ifdef WIDE_CHARS
 #define CHAR wchar_t
@@ -442,10 +443,10 @@ _mbslen(const wchar_t *s, size_t maxlen)
     char tmp[MB_LEN_MAX];
     size_t len = 0;
     while (len < maxlen && (c = *s++) != L'\0') {
-        size_t clen;
-        clen = wcrtomb(tmp, c, &ps);
-        if (clen == (size_t) -1)
-            return clen;
+        int clen;
+        clen = __WCTOMB (tmp, c, &ps);
+        if (clen == -1)
+            return (size_t) clen;
         len += clen;
     }
     return len;
@@ -500,6 +501,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	char __buf[PRINTF_BUF_SIZE];	/* size for -1 in smallest base, without '\0'	*/
 #ifdef _NEED_IO_WCHAR
         wchar_t __wbuf[PRINTF_BUF_SIZE/2]; /* for wide char output */
+#ifdef _NEED_IO_WIDETOMB
+        char __mb[MB_LEN_MAX];
+#endif
 #endif
 #if PRINTF_LEVEL >= PRINTF_FLT
 	struct dtoa __dtoa;
@@ -1129,9 +1133,8 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     mbstate_t   ps = {0};
                     while(size) {
                         wchar_t c = *wstr++;
-                        char mb[MB_LEN_MAX], *m;
-                        size_t mb_len = wcrtomb(mb, c, &ps);
-                        m = mb;
+                        char *m = u.__mb;
+                        int mb_len = __WCTOMB(m, c, &ps);
                         while (size && mb_len) {
                             my_putc(*m++, stream);
                             size--;

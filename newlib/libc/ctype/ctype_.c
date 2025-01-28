@@ -68,6 +68,89 @@ const char _ctype_[1 + 256] = {
 #include "ctype_jis.h"
 #endif
 
+#ifdef _TINY_LOCALE
+#if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+#define __ctype_ascii   _ctype_b
+#define CTYPE_OFFSET    127
+#else
+#define __ctype_ascii   _ctype_
+#define CTYPE_OFFSET    0
+#endif
+
+void
+__set_ctype(enum locale_id id,
+            const char ** ctype)
+{
+    switch (id) {
+    default:
+    case locale_C:
+    case locale_UTF_8:
+        *ctype = __ctype_ascii + CTYPE_OFFSET;
+        break;
+#ifdef _MB_EXTENDED_CHARSETS_ISO
+    case locale_ISO_8859_1:
+    case locale_ISO_8859_2:
+    case locale_ISO_8859_3:
+    case locale_ISO_8859_4:
+    case locale_ISO_8859_5:
+    case locale_ISO_8859_6:
+    case locale_ISO_8859_7:
+    case locale_ISO_8859_8:
+    case locale_ISO_8859_9:
+    case locale_ISO_8859_10:
+    case locale_ISO_8859_11:
+    case locale_ISO_8859_13:
+    case locale_ISO_8859_14:
+    case locale_ISO_8859_15:
+    case locale_ISO_8859_16:
+        *ctype = __ctype_iso[id - locale_ISO_8859_1] + CTYPE_OFFSET;
+        break;
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+    case locale_GEORGIAN_PS:
+    case locale_PT154:
+    case locale_KOI8_T:
+    case locale_CP437:
+    case locale_CP720:
+    case locale_CP737:
+    case locale_CP775:
+    case locale_CP850:
+    case locale_CP852:
+    case locale_CP855:
+    case locale_CP857:
+    case locale_CP858:
+    case locale_CP862:
+    case locale_CP866:
+    case locale_CP874:
+    case locale_CP1125:
+    case locale_CP1250:
+    case locale_CP1251:
+    case locale_CP1252:
+    case locale_CP1253:
+    case locale_CP1254:
+    case locale_CP1255:
+    case locale_CP1256:
+    case locale_CP1257:
+    case locale_CP1258:
+    case locale_KOI8_R:
+    case locale_KOI8_U:
+        *ctype = __ctype_cp[id - locale_CP437] + CTYPE_OFFSET;
+        break;
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_JIS
+    case locale_JIS:
+        *ctype = __ctype_ascii + CTYPE_OFFSET;
+        break;
+    case locale_EUCJP:
+        *ctype = __ctype_eucjp + CTYPE_OFFSET;
+        break;
+    case locale_SJIS:
+        *ctype = __ctype_sjis + CTYPE_OFFSET;
+        break;
+#endif
+    }
+}
+#else
 void
 __set_ctype (struct __locale_t *loc, const char *charset)
 {
@@ -124,4 +207,5 @@ __set_ctype (struct __locale_t *loc, const char *charset)
   loc->ctype_ptr = ctype_ptr;
 #  endif
 }
+#endif
 #endif /* _MB_EXTENDED_CHARSETS_ANY */

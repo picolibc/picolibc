@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,25 +32,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+picolibc_sources(
+  duplocale.c
+  freelocale.c
+  getlocalename_l.c
+  localeconv.c
+  localedata.c
+  locale_ctype_ptr.c
+  locale_ctype_ptr_l.c
+  localedata.c
+  locale_mb_cur_max.c
+  locale_names.c
+  newlocale.c
+  posix_locale.c
+  setlocale.c
+  setwcfuncs.c
+  timedata.c
+  uselocale.c
+  )
 
-add_subdirectory(machine)
-
-add_subdirectory(include)
-
-add_subdirectory(argz)
-add_subdirectory(ctype)
-add_subdirectory(errno)
-add_subdirectory(iconv)
-add_subdirectory(misc)
-add_subdirectory(picolib)
-add_subdirectory(posix)
-add_subdirectory(search)
-add_subdirectory(signal)
-add_subdirectory(ssp)
-add_subdirectory(stdlib)
-add_subdirectory(string)
-add_subdirectory(time)
-add_subdirectory(tinystdio)
-add_subdirectory(uchar)
-add_subdirectory(xdr)
-add_subdirectory(tinylocale)
+target_include_directories(c PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
