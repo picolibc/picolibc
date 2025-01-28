@@ -313,6 +313,15 @@ AC_ARG_ENABLE(newlib-use-gdtoa,
   esac
  fi], [newlib_use_gdtoa=yes])dnl
 
+dnl Support --enable-newlib-use-malloc-in-execl
+AC_ARG_ENABLE(newlib-use-malloc-in-execl,
+[  --enable-newlib-use-malloc-in-execl   use malloc instead of alloca in execl, execle and execlp],
+[case "${enableval}" in
+  yes) newlib_use_malloc_in_execl=yes;;
+  no)  newlib_use_malloc_in_execl=no ;;
+  *)   AC_MSG_ERROR(bad value ${enableval} for newlib-use-malloc-in-execl option) ;;
+ esac], [newlib_use_malloc_in_execl=no])dnl
+
 AM_ENABLE_MULTILIB(, ..)
 NEWLIB_CONFIGURE(.)
 
@@ -525,6 +534,10 @@ fi
 
 if test "${newlib_use_gdtoa}" = "yes"; then
   AC_DEFINE(_WANT_USE_GDTOA, 1, [Define if using gdtoa rather than legacy ldtoa.])
+fi
+
+if test "${newlib_use_malloc_in_execl}" = "yes"; then
+  AC_DEFINE(_EXECL_USE_MALLOC, 1, [Define if using malloc for execl, execle and execlp.])
 fi
 
 dnl

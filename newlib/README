@@ -364,6 +364,14 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      less conversion accuracy.
      Enabled by default.
 
+`--enable-newlib-use-malloc-in-execl'
+     Use malloc instead of alloca in execl, execle and execlp. Using malloc
+     avoids unbounded stack allocations in those functions, preventing stack
+     overflows especially for platforms without virtual memory and small stacks.
+     However, POSIX.1-2008 requires execl and execle to be callable from signal
+     handlers while malloc isn't.
+     Disabled by default.
+
 `--enable-multilib'
      Build many library versions.
      Enabled by default.

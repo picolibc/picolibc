@@ -999,6 +999,7 @@ enable_newlib_nano_formatted_io
 enable_newlib_retargetable_locking
 enable_newlib_long_time_t
 enable_newlib_use_gdtoa
+enable_newlib_use_malloc_in_execl
 enable_multilib
 enable_target_optspace
 enable_malloc_debugging
@@ -1668,6 +1669,7 @@ Optional Features:
   --enable-newlib-retargetable-locking    Allow locking routines to be retargeted at link time
   --enable-newlib-long-time_t   define time_t to long
   --enable-newlib-use-gdtoa   Use gdtoa rather than legacy ldtoa
+  --enable-newlib-use-malloc-in-execl   use malloc instead of alloca in execl, execle and execlp
   --enable-multilib       build many library versions (default)
   --enable-target-optspace  optimize for space
   --enable-malloc-debugging indicate malloc debugging requested
@@ -2592,6 +2594,17 @@ if test "${enable_newlib_use_gdtoa+set}" = set; then :
  fi
 else
   newlib_use_gdtoa=yes
+fi
+
+# Check whether --enable-newlib-use-malloc-in-execl was given.
+if test "${enable_newlib_use_malloc_in_execl+set}" = set; then :
+  enableval=$enable_newlib_use_malloc_in_execl; case "${enableval}" in
+  yes) newlib_use_malloc_in_execl=yes;;
+  no)  newlib_use_malloc_in_execl=no ;;
+  *)   as_fn_error $? "bad value ${enableval} for newlib-use-malloc-in-execl option" "$LINENO" 5 ;;
+ esac
+else
+  newlib_use_malloc_in_execl=no
 fi
 
 # Default to --enable-multilib
@@ -6671,6 +6684,12 @@ fi
 if test "${newlib_use_gdtoa}" = "yes"; then
 
 $as_echo "#define _WANT_USE_GDTOA 1" >>confdefs.h
+
+fi
+
+if test "${newlib_use_malloc_in_execl}" = "yes"; then
+
+$as_echo "#define _EXECL_USE_MALLOC 1" >>confdefs.h
 
 fi
 

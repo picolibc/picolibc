@@ -35,6 +35,9 @@
 /* EL/IX level */
 #undef _ELIX_LEVEL
 
+/* Define if using malloc for execl, execle and execlp. */
+#undef _EXECL_USE_MALLOC
+
 /* Define if fseek functions support seek optimization. */
 #undef _FSEEK_OPTIMIZATION
 
