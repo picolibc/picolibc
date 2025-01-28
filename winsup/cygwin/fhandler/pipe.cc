@@ -31,7 +31,10 @@ STATUS_PIPE_EMPTY simply means there's no data to be read. */
 		   || _s == STATUS_PIPE_EMPTY; })
 
 fhandler_pipe_fifo::fhandler_pipe_fifo ()
-  : fhandler_base (), pipe_buf_size (DEFAULT_PIPEBUFSIZE), pipe_mtx (NULL)
+  : fhandler_base (),
+    status (),
+    pipe_buf_size (DEFAULT_PIPEBUFSIZE),
+    pipe_mtx (NULL)
 {
 }
 
@@ -758,6 +761,7 @@ fhandler_pipe::dup (fhandler_base *child, int flags)
 int
 fhandler_pipe::close ()
 {
+  isclosed (true);
   if (select_sem)
     {
       release_select_sem ("close");

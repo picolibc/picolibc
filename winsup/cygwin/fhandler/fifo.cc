@@ -1524,6 +1524,7 @@ fhandler_fifo::cancel_reader_thread ()
 int
 fhandler_fifo::close ()
 {
+  isclosed (true);
   if (select_sem)
     {
       release_select_sem ("close");

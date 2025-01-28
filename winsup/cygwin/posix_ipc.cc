@@ -333,7 +333,6 @@ mq_close (mqd_t mqd)
       if (mq_notify (mqd, NULL))        /* unregister calling process */
         __leave;
 
-      fd->isclosed (true);
       fd->close ();
       fd.release ();
       return 0;

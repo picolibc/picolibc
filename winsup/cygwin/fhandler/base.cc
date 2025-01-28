@@ -1579,7 +1579,6 @@ fhandler_base::fhandler_base () :
   ra.raixget = 0;
   ra.raixput = 0;
   ra.rabuflen = 0;
-  isclosed (false);
 }
 
 /* Normal I/O destructor */

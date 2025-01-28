@@ -179,14 +179,13 @@ class fhandler_base
 					read or write access */
     unsigned close_on_exec      : 1; /* close-on-exec */
     unsigned need_fork_fixup    : 1; /* Set if need to fixup after fork. */
-    unsigned isclosed		: 1; /* Set when fhandler is closed. */
     unsigned mandatory_locking	: 1; /* Windows mandatory locking */
 
    public:
     status_flags () :
       rbinary (0), rbinset (0), wbinary (0), wbinset (0), nohandle (0),
       did_lseek (0), query_open (no_query), close_on_exec (0),
-      need_fork_fixup (0), isclosed (0), mandatory_locking (0)
+      need_fork_fixup (0), mandatory_locking (0)
       {}
   } status, open_status;
 
@@ -290,7 +289,6 @@ class fhandler_base
   IMPLEMENT_STATUS_FLAG (query_state, query_open)
   IMPLEMENT_STATUS_FLAG (bool, close_on_exec)
   IMPLEMENT_STATUS_FLAG (bool, need_fork_fixup)
-  IMPLEMENT_STATUS_FLAG (bool, isclosed)
   IMPLEMENT_STATUS_FLAG (bool, mandatory_locking)
 
   int get_default_fmode (int flags);
@@ -1195,10 +1193,19 @@ class fhandler_socket_unix : public fhandler_socket
 /* A parent of fhandler_pipe and fhandler_fifo. */
 class fhandler_pipe_fifo: public fhandler_base
 {
+  struct status_flags
+  {
+    unsigned isclosed		: 1; /* Set when pipe/FIFO fhandler is closed. */
+   public:
+    status_flags () : isclosed (0) {}
+  } status;
+
  protected:
   size_t pipe_buf_size;
   HANDLE pipe_mtx; /* Used only in the pipe case */
   virtual void release_select_sem (const char *) {};
+
+  IMPLEMENT_STATUS_FLAG (bool, isclosed)
 
  public:
   fhandler_pipe_fifo ();
