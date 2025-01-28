@@ -26,6 +26,9 @@ int     chown (const char *__path, uid_t __owner, gid_t __group);
 int     chroot (const char *__path);
 #endif
 int     close (int __fildes);
+#if __POSIX_VISIBLE >= 202405
+int	posix_close (int __fildes, int __flag);
+#endif
 #if defined(__CYGWIN__) && (__BSD_VISIBLE || __GNU_VISIBLE)
 /* Available on FreeBSD (__BSD_VISIBLE) and Linux (__GNU_VISIBLE). */
 int     close_range (unsigned int __firstfd, unsigned int __lastfd, int __flags);
@@ -340,6 +343,13 @@ int	unlinkat (int, const char *, int);
 #define STDIN_FILENO    0       /* standard input file descriptor */
 #define STDOUT_FILENO   1       /* standard output file descriptor */
 #define STDERR_FILENO   2       /* standard error file descriptor */
+
+/*
+ * Flag values for posix_close per IEEE Std 1003.1, 2024 Edition
+ */
+#if __POSIX_VISIBLE >= 202405
+#define POSIX_CLOSE_RESTART	1
+#endif
 
 /*
  *  sysconf values per IEEE Std 1003.1, 2008 Edition
