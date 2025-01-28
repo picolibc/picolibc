@@ -41,9 +41,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
-#include "../locale/setlocale.h"
-
-#define _ctloc(x) (_CurrentTimeLocale->x)
+#include "setlocale.h"
 
 static const int _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
@@ -160,7 +158,6 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
     char c;
     int ymd = 0;
 
-    const struct lc_time_T *_CurrentTimeLocale = __get_time_locale (locale);
     for (; (c = *format) != '\0'; ++format) {
 	char *s;
 	int ret;
@@ -174,21 +171,21 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		c = *++format;
 	    switch (c) {
 	    case 'A' :
-		ret = match_string (&buf, _ctloc (weekday), locale);
+		ret = match_string (&buf, TIME_WEEKDAY, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		ymd |= SET_WDAY;
 		break;
 	    case 'a' :
-		ret = match_string (&buf, _ctloc (wday), locale);
+		ret = match_string (&buf, TIME_WDAY, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		ymd |= SET_WDAY;
 		break;
 	    case 'B' :
-		ret = match_string (&buf, _ctloc (month), locale);
+		ret = match_string (&buf, TIME_MONTH, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
@@ -196,7 +193,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		break;
 	    case 'b' :
 	    case 'h' :
-		ret = match_string (&buf, _ctloc (mon), locale);
+		ret = match_string (&buf, TIME_MON, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
@@ -211,7 +208,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ymd |= SET_YEAR;
 		break;
 	    case 'c' :		/* %a %b %e %H:%M:%S %Y */
-		s = strptime_l (buf, _ctloc (c_fmt), timeptr, locale);
+		s = strptime_l (buf, TIME_C_FMT, timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
@@ -289,7 +286,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		    return NULL;
 		break;
 	    case 'p' :
-		ret = match_string (&buf, _ctloc (am_pm), locale);
+		ret = match_string (&buf, TIME_AM_PM, locale);
 		if (ret < 0)
 		    return NULL;
 		if (timeptr->tm_hour > 12)
@@ -308,7 +305,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ymd |= SET_MON;
 		break;
 	    case 'r' :		/* %I:%M:%S %p */
-		s = strptime_l (buf, _ctloc (ampm_fmt), timeptr, locale);
+		s = strptime_l (buf, TIME_AMPM_FMT, timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
@@ -399,14 +396,14 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ymd |= SET_YDAY;
 		break;
 	    case 'x' :
-		s = strptime_l (buf, _ctloc (x_fmt), timeptr, locale);
+		s = strptime_l (buf, TIME_X_FMT, timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;
 		ymd |= SET_YMD;
 		break;
 	    case 'X' :
-		s = strptime_l (buf, _ctloc (X_fmt), timeptr, locale);
+		s = strptime_l (buf, TIME_UX_FMT, timeptr, locale);
 		if (s == NULL)
 		    return NULL;
 		buf = s;

@@ -123,9 +123,7 @@ __typeof(vfwscanf) vfiwscanf;
 #include <math.h>
 #include <float.h>
 #include <locale.h>
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
-#include "../locale/setlocale.h"
-#endif
+#include "setlocale.h"
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the __ldtoa code be
@@ -472,22 +470,22 @@ _SVFWSCANF (
 
 #ifdef FLOATING_POINT
 #ifdef _MB_CAPABLE
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	  decpt = *__get_current_numeric_locale ()->wdecimal_point;
+#ifdef WDECIMAL_POINT
+          decpt = *WDECIMAL_POINT;
 #else
 	  {
 	    size_t nconv;
 
 	    memset (&mbs, '\0', sizeof (mbs));
 	    nconv = mbrtowc (&decpt,
-				localeconv ()->decimal_point,
+				DECIMAL_POINT,
 				MB_CUR_MAX, &mbs);
 	    if (nconv == (size_t) -1 || nconv == (size_t) -2)
 	      decpt = L'.';
 	  }
-#endif /* !__HAVE_LOCALE_INFO_EXTENDED__ */
+#endif /* !WDECIMAL_POINT */
 #else
-	  decpt = (wchar_t) *localeconv ()->decimal_point;
+	  decpt = (wchar_t) *DECIMAL_POINT;
 #endif /* !_MB_CAPABLE */
 #endif /* FLOATING_POINT */
 

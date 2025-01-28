@@ -136,7 +136,7 @@ THIS SOFTWARE.
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 
 /* #ifndef NO_FENV_H */
 /* #include <fenv.h> */
@@ -263,7 +263,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 	int rounding;
 #endif
 #ifdef __HAVE_LOCALE_INFO__
-	const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
+	const char *decimal_point = DECIMAL_POINT_L(loc);
 	const int dec_len = strlen (decimal_point);
 #else
 	const char *decimal_point = ".";

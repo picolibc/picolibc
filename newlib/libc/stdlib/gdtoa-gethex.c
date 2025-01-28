@@ -157,15 +157,15 @@ gethex (const char **sp, const FPI *fpi,
 	Long e, e1;
 #ifdef __HAVE_LOCALE_INFO__
 	const unsigned char *decimalpoint = (const unsigned char *)
-				      __get_numeric_locale(loc)->decimal_point;
+				      DECIMAL_POINT_L(loc);
 	const size_t decp_len = strlen ((const char *) decimalpoint);
 	const unsigned char decp_end = decimalpoint[decp_len - 1];
 #else
 	const unsigned char *decimalpoint = (const unsigned char *) ".";
 	const size_t decp_len = 1;
 	const unsigned char decp_end = (unsigned char) '.';
-        (void) loc;
 #endif
+        (void) loc;
 
 	havedig = 0;
 	s0 = *(const unsigned char **)sp + 2;

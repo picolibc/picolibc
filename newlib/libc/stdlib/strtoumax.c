@@ -42,7 +42,7 @@ static char sccsid[] = "from @(#)strtoul.c	8.1 (Berkeley) 6/4/93";
 #include <stdlib.h>
 #include <inttypes.h>
 #include <stdint.h>
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 
 /*
  * Convert a string to a uintmax_t integer.

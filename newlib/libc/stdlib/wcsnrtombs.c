@@ -70,7 +70,7 @@ PORTABILITY
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 
 size_t
 _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
@@ -101,7 +101,7 @@ _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
     {
       int count = ps->__count;
       wint_t wch = ps->__value.__wch;
-      int bytes = loc->wctomb (buff, *pwcs, ps);
+      int bytes = __WCTOMB_L(loc) (buff, *pwcs, ps);
       if (bytes == -1)
 	{
 	  _REENT_ERRNO(r) = EILSEQ;

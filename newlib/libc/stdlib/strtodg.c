@@ -449,7 +449,7 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 	Long L;
 	__ULong y, z;
 	_Bigint *ab = NULL, *bb = NULL, *bb1 = NULL, *bd = NULL, *bd0 = NULL, *bs = NULL, *delta = NULL, *rvb = NULL, *rvb0 = NULL;
-	const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
+	const char *decimal_point = DECIMAL_POINT_L(loc);
 	int dec_len = strlen (decimal_point);
 
 	irv = STRTOG_Zero;

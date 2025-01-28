@@ -121,7 +121,7 @@ PORTABILITY
 #include <wchar.h>
 #include <errno.h>
 #include <stdlib.h>
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 
 /*
  * Convert a wide string to an unsigned long integer.

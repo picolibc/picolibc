@@ -11,7 +11,7 @@ All rights reserved.
 
 char *	_gcvt (double , int , char *, char, int);
 
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 
 #ifndef __machine_mbstate_t_defined
 #include <wchar.h>
@@ -36,8 +36,6 @@ wctomb_p __cp_wctomb (int val);
 #endif
 #endif
 
-#define __WCTOMB (__get_current_locale()->wctomb)
-
 typedef int mbtowc_f (wchar_t *, const char *, size_t,
 		      mbstate_t *);
 typedef mbtowc_f *mbtowc_p;
@@ -58,8 +56,6 @@ mbtowc_p __cp_mbtowc (int val);
 #endif
 #endif
 
-#define __MBTOWC (__get_current_locale()->mbtowc)
-
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 extern const uint16_t __iso_8859_conv[14][0x60];
 int __iso_8859_val_index (int);
@@ -71,5 +67,8 @@ extern const uint16_t __cp_conv[][0x80];
 int __cp_val_index (int);
 int __cp_index (const char *);
 #endif
+
+size_t _wcsnrtombs_l (char *, const wchar_t **,
+                      size_t, size_t, mbstate_t *, struct __locale_t *);
 
 #endif

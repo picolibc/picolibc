@@ -33,7 +33,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /* wctrans constants */
 
 #include <stdint.h>
-#include "../locale/setlocale.h"
+#include <wctype.h>
+#include <wchar.h>
+#include <string.h>
+#include "setlocale.h"
 
 /* valid values for wctrans_t */
 #define WCT_TOLOWER 1

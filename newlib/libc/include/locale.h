@@ -52,6 +52,7 @@ SUCH DAMAGE.
 #define LC_NUMERIC  4
 #define LC_TIME     5
 #define _LC_MESSAGES    6
+#define _LC_LAST        7
 
 _BEGIN_STD_C
 
@@ -111,11 +112,7 @@ locale_t uselocale (locale_t);
 
 #endif
 
-#if __POSIX_VISIBLE >= 202405
-const char *getlocalename_l (int, struct __locale_t *);
-#endif
-
-#if __MISC_VISIBLE
+#if __POSIX_VISIBLE >= 202405 || __MISC_VISIBLE
 const char *getlocalename_l (int, struct __locale_t *);
 #endif
 

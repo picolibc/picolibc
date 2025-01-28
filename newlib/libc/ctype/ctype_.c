@@ -31,7 +31,7 @@
 /* Make sure we're using fast ctype */
 #define _PICOLIBC_CTYPE_SMALL 0
 #include "ctype_.h"
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 #include "../stdlib/local.h"
 
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)

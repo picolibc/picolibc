@@ -24,12 +24,8 @@ __caseconv_lookup (wint_t ucs, struct __locale_t *locale)
   size_t min = 0;
   size_t max = NCASECONV-1;
   size_t mid;
-  const char *ctype_locale;
 
-  if (!locale)
-      locale = __get_current_locale();
-  ctype_locale = locale->categories[NL_LOCALE_NAME(LC_CTYPE) - NL_LOCALE_NAME(LC_ALL)];
-  if (ucs >= 0x80 && !strcmp (ctype_locale, "C"))
+  if (ucs >= 0x80 && __locale_is_C(locale))
     return 0;
 
   if (ucs < first(table[0]) || ucs > last(table[max]))

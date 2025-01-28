@@ -121,7 +121,7 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 #include <errno.h>
 #include <wchar.h>
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 
 /*
  * Convert a wide string to a long integer.

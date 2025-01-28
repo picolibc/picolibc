@@ -1539,7 +1539,7 @@ _SVFSCANF (
 	  unsigned width_left = 0;
 	  char nancount = 0;
 	  char infcount = 0;
-	  const char *decpt = localeconv ()->decimal_point;
+	  const char *decpt = DECIMAL_POINT;
 #ifdef _MB_CAPABLE
 	  int decptpos = 0;
 #endif

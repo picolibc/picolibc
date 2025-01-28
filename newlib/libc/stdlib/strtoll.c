@@ -121,7 +121,7 @@ No supporting OS subroutines are required.
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-#include "../locale/setlocale.h"
+#include "setlocale.h"
 
 /*
  * Convert a string to a long long integer.

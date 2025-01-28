@@ -1630,13 +1630,15 @@ conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major
 conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
+locale_inc_dir = 'newlib/libc/locale'
+
 if tinystdio
   stdio_inc_dir = 'newlib/libc/tinystdio'
 else
   stdio_inc_dir = 'newlib/libc/stdio'
 endif
 
-inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
+inc_dirs = [stdio_inc_dir, locale_inc_dir, '.', 'newlib/libc/include']
 
 machine_dir = 'newlib/libc/machine' / host_cpu_family
 if fs.is_dir(machine_dir)

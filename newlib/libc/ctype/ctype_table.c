@@ -56,7 +56,6 @@ __ctype_table_lookup(wint_t ic, struct __locale_t *locale)
     size_t      low = 0;
     size_t      high = N_CAT_TABLE - 1;
     size_t      mid;
-    const char  *ctype_locale;
     wchar_t     c;
 
     if (ic == WEOF)
@@ -64,12 +63,8 @@ __ctype_table_lookup(wint_t ic, struct __locale_t *locale)
 
     c = (wchar_t) ic;
 
-    if (!locale)
-        locale = __get_current_locale();
-
     /* Be compatible with glibc where the C locale has no classes outside of ASCII */
-    ctype_locale = locale->categories[NL_LOCALE_NAME(LC_CTYPE) - NL_LOCALE_NAME(LC_ALL)];
-    if (c >= 0x80 && !strcmp (ctype_locale, "C"))
+    if (c >= 0x80 && __locale_is_C(locale))
         return CLASS_none;
 
     while (low < high) {

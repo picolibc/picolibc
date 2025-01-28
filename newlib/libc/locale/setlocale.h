@@ -36,6 +36,7 @@
 #include <wchar.h>
 #include <locale.h>
 #include <langinfo.h>
+#include <stdbool.h>
 
 __BEGIN_DECLS
 
@@ -45,7 +46,6 @@ extern struct __locale_t __global_locale;
 
 #define ENCODING_LEN 31
 #define CATEGORY_LEN 11
-#define _LC_LAST      7
 
 
 struct lc_ctype_T
@@ -192,15 +192,17 @@ struct __locale_t
 #endif
 };
 
+#define __WCTOMB        (__get_current_locale()->wctomb)
+#define __MBTOWC        (__get_current_locale()->mbtowc)
+#define __WCTOMB_L(l)   ((l)->wctomb)
+#define __MBTOWC_L(l)   ((l)->mbtowc)
+
 #ifdef _MB_CAPABLE
 extern char *__loadlocale (struct __locale_t *, int, char *);
 extern const char *__get_locale_env(int);
 #endif /* _MB_CAPABLE */
 
 extern struct lconv *__localeconv_l (struct __locale_t *locale);
-
-extern size_t _wcsnrtombs_l (char *, const wchar_t **,
-			     size_t, size_t, mbstate_t *, struct __locale_t *);
 
 #ifdef __HAVE_LOCALE_INFO__
 #define NEWLIB_THREAD_LOCAL_LOCALE NEWLIB_THREAD_LOCAL
@@ -367,6 +369,63 @@ __get_current_messages_locale (void)
 }
 #endif /* !__HAVE_LOCALE_INFO__ */
 
+/* LC_NUMERIC data */
+#define DECIMAL_POINT           (__get_current_numeric_locale()->decimal_point)
+#define DECIMAL_POINT_L(l)      (__get_numeric_locale(l)->decimal_point)
+#define THOUSANDS_SEP           (__get_current_numeric_locale()->thousands_sep)
+#define THOUSANDS_SEP_L(l)      (__get_numeric_locale(l)->thousands_sep)
+#define NUMERIC_GROUPING        (__get_current_numeric_locale()->grouping)
+#define NUMERIC_GROUPING_L(l)   (__get_numeric_locale(l)->grouping)
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+#define WDECIMAL_POINT          (__get_current_numeric_locale()->wdecimal_point)
+#define WDECIMAL_POINT_L(l)     (__get_numeric_locale(l)->wdecimal_point)
+#define WTHOUSANDS_SEP          (__get_current_numeric_locale()->wthousands_sep)
+#define WTHOUSANDS_SEP_L(l)     (__get_numeric_locale(l)->wthousands_sep
+#endif
+
+/* LC_TIME data */
+#define TIME_ERA_L(l)           (__get_time_locale(l)->era)
+#define TIME_ERA                (__get_current_time_locale()->era)
+#define TIME_ERA_D_T_FMT_L(l)   (__get_time_locale(l)->era_d_t_fmt)
+#define TIME_ERA_D_T_FMT        (__get_current_time_locale()->era_d_t_fmt)
+#define TIME_ERA_D_FMT_L(l)     (__get_time_locale(l)->era_d_fmt)
+#define TIME_ERA_D_FMT          (__get_current_time_locale()->era_d_fmt)
+#define TIME_ERA_T_FMT_L(l)     (__get_time_locale(l)->era_t_fmt)
+#define TIME_ERA_T_FMT          (__get_current_time_locale()->era_t_fmt)
+#define TIME_ALT_DIGITS_L(l)    (__get_time_locale(l)->alt_digits)
+#define TIME_ALT_DIGITS         (__get_current_time_locale()->alt_digits)
+#define TIME_WDAY               (__get_current_time_locale()->wday)
+#define TIME_WEEKDAY            (__get_current_time_locale()->weekday)
+#define TIME_MON                (__get_current_time_locale()->mon)
+#define TIME_MONTH              (__get_current_time_locale()->month)
+#define TIME_AM_PM              (__get_current_time_locale()->am_pm)
+#define TIME_C_FMT              (__get_current_time_locale()->c_fmt)
+#define TIME_X_FMT              (__get_current_time_locale()->x_fmt)
+#define TIME_UX_FMT             (__get_current_time_locale()->X_fmt)
+#define TIME_AMPM_FMT           (__get_current_time_locale()->ampm_fmt)
+
+#ifdef __HAVE_LOCALE_INFO_EXTENDED__
+#define WTIME_ERA_L(l)          (__get_time_locale(l)->wera)
+#define WTIME_ERA               (__get_current_time_locale()->wera)
+#define WTIME_ERA_D_T_FMT_L(l)  (__get_time_locale(l)->wera_d_t_fmt)
+#define WTIME_ERA_D_T_FMT       (__get_current_time_locale()->wera_d_t_fmt)
+#define WTIME_ERA_D_FMT_L(l)    (__get_time_locale(l)->wera_d_fmt)
+#define WTIME_ERA_D_FMT         (__get_current_time_locale()->wera_d_fmt)
+#define WTIME_ERA_T_FMT_L(l)    (__get_time_locale(l)->wera_t_fmt)
+#define WTIME_ERA_T_FMT         (__get_current_time_locale()->wera_t_fmt)
+#define WTIME_ALT_DIGITS_L(l)   (__get_time_locale(l)->walt_digits)
+#define WTIME_ALT_DIGITS        (__get_current_time_locale()->walt_digits)
+#define WTIME_WDAY              (__get_current_time_locale()->wwday)
+#define WTIME_WEEKDAY           (__get_current_time_locale()->wweekday)
+#define WTIME_MON               (__get_current_time_locale()->wmon)
+#define WTIME_MONTH             (__get_current_time_locale()->wmonth)
+#define WTIME_AM_PM             (__get_current_time_locale()->wam_pm)
+#define WTIME_C_FMT             (__get_current_time_locale()->wc_fmt)
+#define WTIME_X_FMT             (__get_current_time_locale()->wx_fmt)
+#define WTIME_UX_FMT            (__get_current_time_locale()->wX_fmt)
+#define WTIME_AMPM_FMT          (__get_current_time_locale()->wampm_fmt)
+#endif
+
 __elidable_inline const char *
 __locale_charset (struct __locale_t *locale)
 {
@@ -406,6 +465,16 @@ __elidable_inline int
 __locale_cjk_lang (void)
 {
   return __get_current_locale()->cjk_lang;
+}
+
+__elidable_inline bool
+__locale_is_C(struct __locale_t *locale)
+{
+    if (!locale)
+        locale = __get_current_locale();
+    const char *ctype_locale = locale->categories[LC_CTYPE - LC_ALL];
+
+    return strcmp (ctype_locale, "C") == 0;
 }
 
 int __ctype_load_locale (struct __locale_t *, const char *, void *,
