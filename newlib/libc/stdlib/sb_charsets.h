@@ -40,7 +40,7 @@
    table is a value computed from the value x (function __iso_8859_index),
    the second index is the value of the incoming character - 0xa0.
    Values < 0xa0 don't have to be converted anyway. */
-uint16_t __iso_8859_conv[14][0x60] = {
+const uint16_t __iso_8859_conv[14][0x60] = {
   /* ISO-8859-2 */
   { 0xa0, 0x104, 0x2d8, 0x141, 0xa4, 0x13d, 0x15a, 0xa7,
     0xa8, 0x160, 0x15e, 0x164, 0x179, 0xad, 0x17d, 0x17b,
@@ -232,7 +232,7 @@ uint16_t __iso_8859_conv[14][0x60] = {
    value (function __cp_index), the second index is the value of the
    incoming character - 0x80.
    Values < 0x80 don't have to be converted anyway. */
-uint16_t __cp_conv[27][0x80] = {
+const uint16_t __cp_conv[27][0x80] = {
   /* CP437 */
   { 0xc7, 0xfc, 0xe9, 0xe2, 0xe4, 0xe0, 0xe5, 0xe7,
     0xea, 0xeb, 0xe8, 0xef, 0xee, 0xec, 0xc4, 0xc5,

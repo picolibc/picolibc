@@ -368,7 +368,7 @@ def dump_table():
    table is a value computed from the value x (function __iso_8859_index),
    the second index is the value of the incoming character - 0xa0.
    Values < 0xa0 don't have to be converted anyway. */
-wchar_t __iso_8859_conv[14][0x60] = {''')
+const uint16_t __iso_8859_conv[14][0x60] = {''')
     for val in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16):
         encoding = 'ISO-8859-%d' % val
         dump_range(encoding, 0xa0, 0xff)
@@ -381,7 +381,7 @@ wchar_t __iso_8859_conv[14][0x60] = {''')
    value (function __cp_index), the second index is the value of the
    incoming character - 0x80.
    Values < 0x80 don't have to be converted anyway. */
-wchar_t __cp_conv[27][0x80] = {''')
+const uint16_t __cp_conv[27][0x80] = {''')
     for cp in ('CP437', 'CP720', 'CP737', 'CP775', 'CP850', 'CP852', 'CP855',
                'CP857', 'CP858', 'CP862', 'CP866', 'CP874', 'CP1125', 'CP1250', 'CP1251',
                'CP1252', 'CP1253', 'CP1254', 'CP1255', 'CP1256', 'CP1257',

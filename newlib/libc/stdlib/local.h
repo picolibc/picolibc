@@ -61,13 +61,13 @@ mbtowc_p __cp_mbtowc (int val);
 #define __MBTOWC (__get_current_locale()->mbtowc)
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
-extern uint16_t __iso_8859_conv[14][0x60];
+extern const uint16_t __iso_8859_conv[14][0x60];
 int __iso_8859_val_index (int);
 int __iso_8859_index (const char *);
 #endif
 
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-extern uint16_t __cp_conv[][0x80];
+extern const uint16_t __cp_conv[][0x80];
 int __cp_val_index (int);
 int __cp_index (const char *);
 #endif
