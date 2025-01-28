@@ -138,10 +138,25 @@ void _cstart(void)
          * covering the whole address map
          */
 
-        /* Set the base address for the region */
-        __asm__("msr    PRBAR_EL2, %x0\n" :: "r" (4));
-        /* Set the limit address for the region */
-        __asm__("msr    PRLAR_EL2, %x0\n" :: "r" (0x000fffffffffffd1));
+        /* Select the MPU region */
+        __asm__("msr    PRSELR_"BOOT_EL", %x0" :: "r" (0));
+
+        /* Set the base address of memory region
+         *
+         * bits 5,4 are SH = 0b00: we don't care about shareability in  8-R.64 FVPs.
+         * bits 3,2 are AP = 0b01: read and write permissions at all ELs
+         * bits 1,0 are XN = 0b00: don't prohibit execution at any EL
+         */
+        __asm__("msr    PRBAR_"BOOT_EL", %x0\n" :: "r" (4));
+
+        /* Set the limit address of memory region
+         * bit 5 is reserved
+         * bit 4 is NS = 1: this is non-secure address space
+         * bits 3,2,1 are AttrIndx = 0b000: this memory region is
+         * controlled by the low byte of MAIR_EL2.
+         * bit 0 is EN = 1: this memory region is enabled at all
+         */
+        __asm__("msr    PRLAR_"BOOT_EL", %x0\n" :: "r" (0x000fffffffffffd1));
         #endif
 
         /*
@@ -150,13 +165,8 @@ void _cstart(void)
          * Region 0 is Normal memory
          * Region 1 is Device memory
          */
-        #if __ARM_ARCH_PROFILE != 'R'
-        __asm__ ("msr    mair_"BOOT_EL", %x0" ::
+        __asm__("msr    mair_"BOOT_EL", %x0" ::
                 "r" ((0xffLL << 0) | (0x00LL << 8)));
-        #else
-        __asm__ ("msr    mair_"BOOT_EL", %x0" ::
-                "r" ((0x77LL << 0) | (0x00LL << 8)));
-        #endif
 
         /*
          * Enable caches, and the MMU, disable alignment requirements
@@ -175,7 +185,7 @@ void _cstart(void)
 
         /* Set the vector base address register */
         __asm__("msr    vbar_"BOOT_EL", %x0" :: "r" (__vector_table));
-       __start();
+	__start();
 }
 
 

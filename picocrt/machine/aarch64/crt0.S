@@ -87,11 +87,11 @@ __identity_page_table:
 #endif
 
 #if defined(MACHINE_qemu)
-  #define BOOT_EL(CPACR) CPACR ## _EL1
+  #define BOOT_EL(Reg) Reg ## _EL1
 #elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE == 'R'
-  #define BOOT_EL(CPTR) CPTR ## _EL2
+  #define BOOT_EL(Reg) Reg ## _EL2
 #elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE != 'R'
-  #define BOOT_EL(CPTR) CPTR ## _EL3
+  #define BOOT_EL(Reg) Reg ## _EL3
 #else
 #error "Unknown machine type"
 #endif
@@ -179,18 +179,18 @@ _start:
   str x29, [sp, #232]
   str x30, [sp, #240]
 #if defined(MACHINE_qemu)
-  mrs x0, ELR_EL1
+  mrs x0, BOOT_EL(ELR)
   str x0, [sp, #248]
-  mrs x0, ESR_EL1
+  mrs x0, BOOT_EL(ESR)
   str x0, [sp, #256]
-  mrs x0, FAR_EL1
+  mrs x0, BOOT_EL(FAR)
   str x0, [sp, #264]
 #elif defined(MACHINE_fvp)
-  mrs x0, ELR_EL3
+  mrs x0, BOOT_EL(ELR)
   str x0, [sp, #248]
-  mrs x0, ESR_EL3
+  mrs x0, BOOT_EL(ESR)
   str x0, [sp, #256]
-  mrs x0, FAR_EL3
+  mrs x0, BOOT_EL(FAR)
   str x0, [sp, #264]
 #else
 #error "Unknown machine type"
