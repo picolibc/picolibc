@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,29 +33,22 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-dirs = [
-	'newlib.locale',
-	'newlib.search',
-	'newlib.stdio',
-	'newlib.stdlib',
-	'newlib.string',
-	'newlib.time',
-	'newlib.wctype']
-
-if tiny_iconv
-  dirs += ['newlib.iconv']
-else
-  if newlib_iconv_encodings != []
-    dirs += ['newlib.iconv']
-  endif
-endif
-
-skip_dirs = [
-  'newlib.elix', # depends on mmap(2)
+srcs_tinyiconv = [
+  'iconv.c',
+  'iconv_close.c',
+  'iconv_open.c',
 ]
 
-test_inc = [include_directories('include'), inc]
-
-foreach dir : dirs
-  subdir(dir)
+srcs_tinyiconv_use = []
+foreach file : srcs_tinyiconv
+  s_file = fs.replace_suffix(file, '.S')
+  if file in srcs_machine
+    message('libc/tinyiconv/' + file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message('libc/tinyiconv/' + s_file + ': machine overrides generic')
+  else
+    srcs_tinyiconv_use += file
+  endif
 endforeach
+
+src_tinyiconv = files(srcs_tinyiconv_use)

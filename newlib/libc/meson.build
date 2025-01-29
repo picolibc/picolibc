@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc',
+libdirs = ['argz', 'ctype', 'errno', 'misc',
 	   'posix', 'search', 'signal', 'ssp', 'stdlib',
 	   'string', 'time', 'xdr', 'uchar']
 
@@ -51,9 +51,9 @@ else
 endif
 
 if tiny_locale
-  libdirs += 'tinylocale'
+  libdirs += ['tinylocale', 'tinyiconv']
 else
-  libdirs += 'locale'
+  libdirs += ['locale', 'iconv']
 endif
 
 libnames = libdirs

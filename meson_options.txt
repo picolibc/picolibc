@@ -216,7 +216,8 @@ option('newlib-have-fcntl', type: 'boolean', value: false,
 #
 # Internationalization options
 #
-
+option('tiny-iconv', type: 'boolean', value: true,
+       description: 'enable small iconv implementation')
 option('newlib-iconv-encodings', type: 'array',
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
 option('newlib-iconv-from-encodings', type: 'array',
@@ -231,6 +232,7 @@ option('newlib-iconv-runtime-dir', type: 'string',
        description: 'Path used at runtime to locate iconv CCS files')
 option('newlib-iconv-encodings-exclude', type: 'array',
        description: 'enable specific comma-separated list of bidirectional iconv encodings to be excluded')
+
 
 option('tiny-locale', type: 'boolean', value: true,
        description: 'enable small locale implementation')

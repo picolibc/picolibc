@@ -40,11 +40,15 @@ tests_ccs = ['iconvjp', 'iconvru']
 # Add CCS tests if the data are internal or we're not using semihosting
 # or we're using arm semihosting
 
-if not newlib_iconv_external_ccs or has_arm_semihost or not has_semihost
+if tiny_iconv or not newlib_iconv_external_ccs or has_arm_semihost or not has_semihost
   tests += tests_ccs
 endif
 
-iconv_test_c_args = ['-DTEST_NLSPATH="' + newlib_iconv_ccs_dir + '"']
+if not tiny_iconv
+  iconv_test_c_args = ['-DTEST_NLSPATH="' + newlib_iconv_ccs_dir + '"']
+else
+  iconv_test_c_args = []
+endif
 
 foreach params : targets
   target = params['name']

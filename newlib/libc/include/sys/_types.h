@@ -216,7 +216,8 @@ typedef struct
 
 #ifndef __machine_iconv_t_defined
 /* Iconv descriptor type */
-typedef void *_iconv_t;
+struct __iconv_t;
+typedef struct __iconv_t *_iconv_t;
 #endif
 
 #ifndef __machine_clock_t_defined

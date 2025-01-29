@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,30 +32,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-dirs = [
-	'newlib.locale',
-	'newlib.search',
-	'newlib.stdio',
-	'newlib.stdlib',
-	'newlib.string',
-	'newlib.time',
-	'newlib.wctype']
-
-if tiny_iconv
-  dirs += ['newlib.iconv']
-else
-  if newlib_iconv_encodings != []
-    dirs += ['newlib.iconv']
-  endif
-endif
-
-skip_dirs = [
-  'newlib.elix', # depends on mmap(2)
-]
-
-test_inc = [include_directories('include'), inc]
-
-foreach dir : dirs
-  subdir(dir)
-endforeach
+picolibc_sources(
+  iconv.c
+  iconv_close.c
+  iconv_open.c
+  )
