@@ -43,6 +43,7 @@ plain_tests_common = ['regex', 'ungetc',
                       'test-sprintf-percent-n',
                       'test-ctype',
                       'test-uchar',
+                      'time-tests',
 	      ]
 
 math_tests_common = [
@@ -101,7 +102,6 @@ plain_tests = plain_tests_common
 
 plain_tests += math_tests + [
   'test-funopen',
-  'time-tests',
   'tls',  
 ]
 
