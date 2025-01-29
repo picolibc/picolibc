@@ -69,7 +69,7 @@ memccpy (void *__restrict dst0,
   if (!TOO_SMALL_LITTLE_BLOCK(len0) && !UNALIGNED_X_Y(src, dst))
     {
       unsigned int i;
-      unsigned long mask = 0;
+      unsigned long mask;
 
       aligned_dst = (long*)dst;
       aligned_src = (long*)src;
@@ -80,9 +80,10 @@ memccpy (void *__restrict dst0,
          the word-sized segment with a word-sized block of the search
          character and then detecting for the presence of NULL in the
          result.  */
-      for (i = 0; i < sizeof(mask); i++)
-        mask = (mask << 8) + endchar;
-
+      mask = endchar << 8 | endchar;
+      mask = mask << 16 | mask;
+      for (i = 32; i < sizeof(mask) * 8; i <<= 1)
+        mask = (mask << i) | mask;
 
       /* Copy one long word at a time if possible.  */
       while (!TOO_SMALL_LITTLE_BLOCK(len0))
