@@ -618,9 +618,9 @@ if enable_native_tests
                        'CP874', 'CP1125', 'CP1250', 'CP1251', 'CP1252', 'CP1253',
                        'CP1254', 'CP1256', 'CP1257', 'KOI8-R', 'KOI8-U',
 
-                       'SJIS', 'EUC-JP']
+                       'SHIFT-JIS', 'EUC-JP']
         locale = 'C.' + ctype
-        if ctype == 'SJIS'
+        if ctype == 'SHIFT-JIS'
           ctype = 'SHIFT_JIS'
         elif ctype == 'CP437'
           ctype = 'IBM437'

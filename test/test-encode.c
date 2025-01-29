@@ -71,7 +71,7 @@ static const char *locales[] = {
 #ifdef HAVE_JIS_CHARSETS
 #define JIS_START       (NUM_LOCALE-2)
     "C.EUC-JP",
-    "C.SJIS",
+    "C.SHIFT-JIS",
 #endif
 };
 

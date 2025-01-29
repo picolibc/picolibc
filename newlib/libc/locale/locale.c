@@ -41,7 +41,7 @@ for instance <<"C.UTF-8">>, which keeps all settings as in the C locale,
 but uses the UTF-8 charset.
 
 The following charsets are recognized:
-<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SJIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
+<<"UTF-8">>, <<"JIS">>, <<"EUCJP">>, <<"SHIFT-JIS">>, <<"KOI8-R">>, <<"KOI8-U">>,
 <<"KOI8-T">>, <<"GEORGIAN-PS">>, <<"PT154">>, <<"TIS-620">>, <<"ISO-8859-x">>
 with 1 <= x <= 16, or <<"CPxxx">> with xxx in [437, 720, 737, 775, 850, 852,
 855, 857, 858, 862, 866, 874, 932, 1125, 1250, 1251, 1252, 1253, 1254, 1255,
@@ -618,9 +618,9 @@ __loadlocale (struct __locale_t *loc, int category, char *new_locale)
     break;
     case 'S':
     case 's':
-      if (strcasecmp (charset, "SJIS"))
+      if (strcasecmp (charset, "SJIS") && strcasecmp (charset, "SHIFT-JIS"))
 	FAIL;
-      strcpy (charset, "SJIS");
+      strcpy (charset, "SHIFT-JIS");
       mbc_max = 2;
       l_wctomb = __sjis_wctomb;
       l_mbtowc = __sjis_mbtowc;

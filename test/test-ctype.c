@@ -103,7 +103,8 @@ static const char *locales[] = {
     "C.CP1254", "C.CP1256", "C.CP1257", "C.KOI8-R", "C.KOI8-U",
 #endif
 #ifdef HAVE_JIS_CHARSETS
-    "C.SJIS",
+    "C.SHIFT-JIS",
+    "C.EUC-JP",
 #endif
 };
 
