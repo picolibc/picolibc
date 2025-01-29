@@ -223,46 +223,49 @@ main(void)
   if (!test_strftime(__LINE__, &dtForTimegm6, "%a %b %d %Y %R", "Tue Jan 19 2038 03:14"))
     ret = 1;
 
-  // Test the next time_t value of 0x80000000 right after
-  // the 32-bit signed integer overflow, aka "year 2038 problem".
-
-  dtForTimegm7.tm_sec++;
-
-  time_t t7 = timegm( &dtForTimegm7 );
-
-  if ( t7 != 0x80000000            ||
-       dtForTimegm7.tm_wday  != 2  ||  // 2 means Tuesday.
-       dtForTimegm7.tm_yday  != 18 ||
-       dtForTimegm7.tm_isdst != 0   )
+  if (sizeof (time_t) > 4)
   {
-    puts("Test t7 failed.");
-    ret = 1;
+    // Test the next time_t value of 0x80000000 right after
+    // the 32-bit signed integer overflow, aka "year 2038 problem".
+
+    dtForTimegm7.tm_sec++;
+
+    time_t t7 = timegm( &dtForTimegm7 );
+
+    if ( (unsigned long) t7 != 0x80000000UL          ||
+         dtForTimegm7.tm_wday  != 2  ||  // 2 means Tuesday.
+         dtForTimegm7.tm_yday  != 18 ||
+         dtForTimegm7.tm_isdst != 0   )
+    {
+      puts("Test t7 failed.");
+      ret = 1;
+    }
+
+    if (!test_strftime(__LINE__, &dtForTimegm7, "%a %b %d %Y %I:%M:%S %p", "Tue Jan 19 2038 03:14:08 AM"))
+      ret = 1;
+
+    // Test the 29th of February in a leap year far in the future.
+
+    struct tm dtForTimegm8;
+    init_struct_tm( &dtForTimegm8 );
+
+    dtForTimegm8.tm_mon   = 1;  // February.
+    dtForTimegm8.tm_mday  = 29;
+    dtForTimegm8.tm_year  = 2104 - TIME_TM_YEAR_BASE;
+
+    time_t t8 = timegm( &dtForTimegm8 );
+
+    if ( (unsigned long) t8 != 4233686400UL           ||  // That is much higher than INT32_MAX.
+         dtForTimegm8.tm_wday != 5  ||  // 5 means Friday.
+         dtForTimegm8.tm_yday != 59  )
+    {
+      puts("Test t8 failed.");
+      ret = 1;
+    }
+
+    if (!test_strftime(__LINE__, &dtForTimegm8, "%a %b %d %Y %H:%M:%S", "Fri Feb 29 2104 00:00:00"))
+      ret = 1;
   }
-
-  if (!test_strftime(__LINE__, &dtForTimegm7, "%a %b %d %Y %I:%M:%S %p", "Tue Jan 19 2038 03:14:08 AM"))
-    ret = 1;
-
-  // Test the 29th of February in a leap year far in the future.
-
-  struct tm dtForTimegm8;
-  init_struct_tm( &dtForTimegm8 );
-
-  dtForTimegm8.tm_mon   = 1;  // February.
-  dtForTimegm8.tm_mday  = 29;
-  dtForTimegm8.tm_year  = 2104 - TIME_TM_YEAR_BASE;
-
-  time_t t8 = timegm( &dtForTimegm8 );
-
-  if ( t8 != 4233686400           ||  // That is much higher than INT32_MAX.
-       dtForTimegm8.tm_wday != 5  ||  // 5 means Friday.
-       dtForTimegm8.tm_yday != 59  )
-  {
-    puts("Test t8 failed.");
-    ret = 1;
-  }
-
-  if (!test_strftime(__LINE__, &dtForTimegm8, "%a %b %d %Y %H:%M:%S", "Fri Feb 29 2104 00:00:00"))
-    ret = 1;
 
   return ret;
 }
