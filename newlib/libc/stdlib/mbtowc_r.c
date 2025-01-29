@@ -112,8 +112,8 @@ __utf8_mbtowc (
 	  return -1;
 	}
       state->__count = 0;
-      *pwc = (wchar_t)((state->__value.__wchb[0] & 0x1f) << 6)
-	|    (wchar_t)(ch & 0x3f);
+      *pwc = ((wchar_t)(state->__value.__wchb[0] & 0x1f) << 6)
+          |    (wchar_t)(ch & 0x3f);
       return i;
     }
   if (ch >= 0xe0 && ch <= 0xef)
@@ -150,8 +150,8 @@ __utf8_mbtowc (
 	  return -1;
 	}
       state->__count = 0;
-      tmp = (wchar_t)((state->__value.__wchb[0] & 0x0f) << 12)
-	|    (wchar_t)((state->__value.__wchb[1] & 0x3f) << 6)
+      tmp = ((wchar_t)(state->__value.__wchb[0] & 0x0f) << 12)
+          |    ((wchar_t)(state->__value.__wchb[1] & 0x3f) << 6)
 	|     (wchar_t)(ch & 0x3f);
       /* Check for surrogates */
       if (0xd800 <= tmp && tmp <= 0xdfff)
