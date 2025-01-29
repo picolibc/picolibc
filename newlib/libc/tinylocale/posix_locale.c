@@ -39,12 +39,4 @@
 
 NEWLIB_THREAD_LOCAL struct __locale_t    *_locale;
 
-#ifdef _MB_EXTENDED_CHARSETS_ANY
-
-NEWLIB_THREAD_LOCAL const char           *_ctype;
-NEWLIB_THREAD_LOCAL int                  (*_wctomb)(char *, wchar_t, mbstate_t *);
-NEWLIB_THREAD_LOCAL int                  (*_mbtowc)(wchar_t *, const char *, size_t, mbstate_t *);
-
-#endif
-
 #endif
