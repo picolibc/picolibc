@@ -878,7 +878,7 @@ recurse:
 		if (width < 2)
 		  width = 2;
 		len = t_snprintf (&s[count], maxsize - count, fmt,
-				neg ? "-" : pos, width - neg, century);
+                                  neg ? "-" : pos, (int) (width - neg), century);
 	      }
             CHECK_LENGTH ();
 	  }
@@ -1010,7 +1010,7 @@ recurse:
 	    if (pad)
 	      *fmt++ = CQ('0');
 	    STRCPY (fmt, CQ(".*u"));
-	    len = t_snprintf (&s[count], maxsize - count, fmtbuf, width, p_year);
+	    len = t_snprintf (&s[count], maxsize - count, fmtbuf, (int) width, p_year);
             if (len < 0  ||  (count+=len) >= maxsize)
               return 0;
 	  }
@@ -1362,7 +1362,7 @@ recurse:
 	      if (pad)
 		*fmt++ = CQ('0');
 	      STRCPY (fmt, CQ(".*u"));
-	      len = t_snprintf (&s[count], maxsize - count, fmtbuf, width,
+	      len = t_snprintf (&s[count], maxsize - count, fmtbuf, (int) width,
 			      year);
 	      CHECK_LENGTH ();
 	    }
