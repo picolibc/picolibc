@@ -51,9 +51,15 @@ else
 endif
 
 if tiny_locale
-  libdirs += ['tinylocale', 'tinyiconv']
+  libdirs += ['tinylocale']
 else
-  libdirs += ['locale', 'iconv']
+  libdirs += ['locale']
+endif
+
+if tiny_iconv
+  libdirs += ['tinyiconv']
+else
+  libdirs += ['iconv']
 endif
 
 libnames = libdirs
