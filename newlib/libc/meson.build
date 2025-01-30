@@ -44,7 +44,7 @@ endif
 if tinystdio
   libdirs += 'tinystdio'
 else
-  libdirs += ['stdio', 'reent']
+  libdirs += ['stdio']
   if newlib_stdio64
     libdirs += 'stdio64'
   endif
