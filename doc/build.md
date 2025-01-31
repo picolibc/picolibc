@@ -125,21 +125,8 @@ supported charset to be specified using the locale 'C.<charset>'.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| mb-capable                  | false   | Enable multibyte support for UTF-8 charset                                           |
+| mb-capable                  | false   | Enable multibyte support including UTF-8 charset                                     |
 | mb-extended-charsets        | false   | Enable additional ISO, Windows and JIS charsets                                      |
-| locale-info		      | false   | Enable locale support beyond charsets. Not useful.                                   |
-| locale-info-extended        | false   | Enable even more locale support. Not useful.                                         |
-
-These options control which character sets are supported by iconv.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-iconv-encodings      | <empty> | Comma-separated list of iconv encodings to be built-in (default all supported). <br> Set to `none` to disable all encodings. |
-| newlib-iconv-from-encodings | <empty> | Comma-separated list of "from" iconv encodings to be built-in (default iconv-encodings) |
-| newlib-iconv-to-encodings   | <empty> | Comma-separated list of "to" iconv encodings to be built-in (default iconv-encodings) |
-| newlib-iconv-external-ccs   | false   | Use file system to store iconv tables. Requires fopen. (default built-in to memory)  |
-| newlib-iconv-dir            | libdir/locale | Directory to install external CCS files. Only used with newlib-iconv-external-ccs=true |
-| newlib-iconv-runtime-dir    | newlib-iconv-dir | Directory to read external CCS files from at runtime. |
 
 ### Startup/shutdown options
 

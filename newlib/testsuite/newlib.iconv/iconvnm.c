@@ -30,15 +30,15 @@
 #include "check.h"
 
 static const char * const good_names[] = {
-#ifdef _ICONV_FROM_ENCODING_ISO_8859_5
-"iso_8859_5", "iso-8859-5", "iso-8859_5", "IsO-8859_5"
-#elif defined _ICONV_FROM_ENCODING_US_ASCII
-"us_ascii", "US_ASCII", "us-ASCII", "US-ASCII"
-#elif defined _ICONV_FROM_ENCODING_EUC_JP
-"euc-jp", "EUC_JP", "euc-JP", "EUC-JP" 
-#elif defined _ICONV_FROM_ENCODING_UTF_8
-"utf_8", "UTF_8", "uTf-8", "UTF-8"
-#else
+    "us_ascii", "US_ASCII", "us-ASCII", "US-ASCII",
+#ifdef _MB_CAPABLE
+    "utf_8", "UTF_8", "uTf-8", "UTF-8",
+#endif
+#ifdef MB_EXTENDED_CHARSETS_ISO
+    "iso_8859_5", "iso-8859-5", "iso-8859_5", "IsO-8859_5",
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_JIS
+    "euc-jp", "EUC_JP", "euc-JP", "EUC-JP",
 #endif
 };
 
@@ -48,9 +48,6 @@ static const char * const bad_names[] =
  "us_as", "us_", "us_ascii ", " us_ascii",
  "CCCP", "", "-1", "-", "_", "---", "___", "-_-_-", "_-_-_", NULL};
 
-#ifndef TEST_NLSPATH
-#define TEST_NLSPATH "./"
-#endif
 
 int main(void)
 {
@@ -59,15 +56,13 @@ int main(void)
 
     puts("iconv names test");
 
-    CHECK(setenv("NLSPATH", TEST_NLSPATH, 0) != -1);
-
     for (i = 0; i < sizeof(good_names)/sizeof(char *); i++)
     {
         printf("Trying iconv(%s, %s)", good_names[0], good_names[i]);
         fflush(stdout);
 
         cd = iconv_open(good_names[0], good_names[i]);
-        
+
         if (cd == (iconv_t)-1)
         {
             puts(" ... FAILED");
@@ -79,14 +74,14 @@ int main(void)
             CHECK(iconv_close(cd) != -1);
         }
     }
-    
+
     for (i = 0; i < sizeof(bad_names)/sizeof(char *); i++)
     {
         printf("Trying iconv(%s, \"%s\")", good_names[0], bad_names[i]);
         fflush(stdout);
 
         cd = iconv_open(good_names[0], bad_names[i]);
-        
+
         if (cd != (iconv_t)-1)
         {
             puts(" ... FAILED");
@@ -95,7 +90,7 @@ int main(void)
         else
             puts(" ... PASSED");
     }
-    
+
     if (failed)
     {
         printf("%d FAILTURES\n", failed);

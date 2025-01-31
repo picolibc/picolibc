@@ -33,22 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = [ 'iconvnm' ]
-
-tests_ccs = ['iconvjp', 'iconvru']
-
-# Add CCS tests if the data are internal or we're not using semihosting
-# or we're using arm semihosting
-
-if tiny_iconv or not newlib_iconv_external_ccs or has_arm_semihost or not has_semihost
-  tests += tests_ccs
-endif
-
-if not tiny_iconv
-  iconv_test_c_args = ['-DTEST_NLSPATH="' + newlib_iconv_ccs_dir + '"']
-else
-  iconv_test_c_args = []
-endif
+tests = [ 'iconvnm', 'iconvjp', 'iconvru']
 
 foreach params : targets
   target = params['name']
@@ -71,7 +56,7 @@ foreach params : targets
   _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
-  _c_args += ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE'] + iconv_test_c_args
+  _c_args += ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE']
 
   foreach test : tests
     test_name = test + target

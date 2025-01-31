@@ -34,6 +34,7 @@
 #
 
 dirs = [
+        'newlib.iconv',
 	'newlib.locale',
 	'newlib.search',
 	'newlib.stdio',
@@ -41,14 +42,6 @@ dirs = [
 	'newlib.string',
 	'newlib.time',
 	'newlib.wctype']
-
-if tiny_iconv
-  dirs += ['newlib.iconv']
-else
-  if newlib_iconv_encodings != []
-    dirs += ['newlib.iconv']
-  endif
-endif
 
 skip_dirs = [
   'newlib.elix', # depends on mmap(2)

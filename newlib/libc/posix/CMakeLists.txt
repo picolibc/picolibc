@@ -34,6 +34,7 @@
 #
 picolibc_sources(
   basename.c
+  collcmp.c
   dirname.c
   fnmatch.c
   fpathconf.c
@@ -43,9 +44,3 @@ picolibc_sources(
   regexec.c
   regfree.c
   )
-
-if(__HAVE_LOCALE_INFO__)
-  picolibc_sources(
-    collcmp.c
-    )
-endif()

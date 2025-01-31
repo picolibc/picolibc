@@ -68,7 +68,6 @@ const char _ctype_[1 + 256] = {
 #include "ctype_jis.h"
 #endif
 
-#ifdef _TINY_LOCALE
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 #define __ctype_ascii   _ctype_b
 #define CTYPE_OFFSET    127
@@ -150,62 +149,4 @@ __set_ctype(enum locale_id id,
 #endif
     }
 }
-#else
-void
-__set_ctype (struct __locale_t *loc, const char *charset)
-{
-#if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-  int idx;
-#endif
-  const char *ctype_ptr = NULL;
-
-  switch (*charset)
-    {
-#if defined(_MB_EXTENDED_CHARSETS_ISO)
-    case 'I':
-      idx = __iso_8859_index (charset + 9);
-      /* The ctype table has a leading ISO-8859-1 element so we have to add
-	 1 to the index returned by __iso_8859_index.  If __iso_8859_index
-	 returns < 0, it's ISO-8859-1. */
-      if (idx < 0)
-        idx = 0;
-      else
-        ++idx;
-      ctype_ptr = __ctype_iso[idx];
-      break;
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-    case 'C':
-      idx = __cp_index (charset + 2);
-      if (idx < 0)
-        break;
-      ctype_ptr = __ctype_cp[idx];
-      break;
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_JIS)
-    case 'E':
-      ctype_ptr = __ctype_eucjp;
-      break;
-    case 'S':
-      ctype_ptr = __ctype_sjis;
-      break;
-#endif
-    default:
-      break;
-    }
-  if (!ctype_ptr)
-    {
-#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-     ctype_ptr = _ctype_b;
-#  else
-     ctype_ptr = _ctype_;
-#  endif
-    }
-#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-  loc->ctype_ptr = ctype_ptr + 127;
-#  else
-  loc->ctype_ptr = ctype_ptr;
-#  endif
-}
-#endif
 #endif /* _MB_EXTENDED_CHARSETS_ANY */

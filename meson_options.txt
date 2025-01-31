@@ -216,30 +216,7 @@ option('newlib-have-fcntl', type: 'boolean', value: false,
 #
 # Internationalization options
 #
-option('tiny-iconv', type: 'boolean', value: true,
-       description: 'enable small iconv implementation')
-option('newlib-iconv-encodings', type: 'array',
-       description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
-option('newlib-iconv-from-encodings', type: 'array',
-       description: 'enable specific comma-separated list of "from" iconv encodings to be built-in')
-option('newlib-iconv-to-encodings', type: 'array',
-       description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
-option('newlib-iconv-external-ccs', type: 'boolean', value:false,
-       description: 'Load iconv CCS tables from files rather than having them built-in')
-option('newlib-iconv-dir', type: 'string',
-       description: 'Installation directory for iconv CCS files')
-option('newlib-iconv-runtime-dir', type: 'string',
-       description: 'Path used at runtime to locate iconv CCS files')
-option('newlib-iconv-encodings-exclude', type: 'array',
-       description: 'enable specific comma-separated list of bidirectional iconv encodings to be excluded')
 
-
-option('tiny-locale', type: 'boolean', value: true,
-       description: 'enable small locale implementation')
-option('locale-info', type: 'boolean', value: false,
-       description: 'enable locale info support be')
-option('locale-info-extended', type: 'boolean', value: false,
-       description: 'extended locale info support')
 option('mb-capable', type: 'boolean', value: false,
        description: 'enable multibyte support for UTF-8 charset')
 option('mb-extended-charsets', type: 'boolean', value: false,
@@ -250,11 +227,6 @@ option('mb-jis-charsets', type: 'combo', choices: ['true', 'false', 'auto'], val
        description: 'enable additional JIS multibyte encodings')
 option('mb-windows-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable additional Windows multibyte encodings')
-
-option('newlib-locale-info', type: 'boolean', value: false,
-       description: 'locale info support')
-option('newlib-locale-info-extended', type: 'boolean', value: false,
-       description: 'extended locale info support')
 option('newlib-mb', type: 'boolean', value: false,
        description: 'enable multibyte support')
 

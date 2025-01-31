@@ -124,12 +124,6 @@ set(REENTRANT_SYSCALLS_PROVIDED 0)
 # Use tiny stdio from gcc avr
 option(TINY_STDIO "Use tiny stdio from avr libc" ON)
 
-# Use tiny locale
-option(_TINY_LOCALE "Use tiny locale" ON)
-
-# Use tiny iconv
-option(_TINY_ICONV "Use tiny iconv" ON)
-
 if(NOT TLS_MODEL)
   set(TLS_MODEL "local-exec")
 endif()
@@ -378,20 +372,6 @@ set(_WANT_REGISTER_FINI OFF)
 set(_WANT_USE_LONG_TIME_T OFF)
 
 set(_WIDE_ORIENT OFF)
-
-# locale support
-if(NOT DEFINED __HAVE_LOCALE_INFO__)
-  option(__HAVE_LOCALE_INFO__ "Provide locale support" OFF)
-endif()
-
-# extended locale support
-if(NOT DEFINED __HAVE_LOCALE_INFO_EXTENDED__)
-  option(__HAVE_LOCALE_INFO_EXTENDED__ "Provide even more locale support" OFF)
-endif()
-
-if(__HAVE_LOCALE_INFO_EXTENDED__ AND NOT __HAVE_LOCALE_INFO__)
-  message(FATAL_ERROR "Must have locale support to enable extended locale support")
-endif()
 
 if(NOT DEFINED _ELIX_LEVEL)
   set(_ELIX_LEVEL 4)

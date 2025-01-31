@@ -241,8 +241,6 @@ else
 endif
 fast_strcmp = get_option('fast-strcmp')
 
-tiny_locale = get_option('tiny-locale')
-tiny_iconv = get_option('tiny-iconv') and tiny_locale
 mb_capable = get_option('mb-capable') or get_option('newlib-mb')
 mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
 if get_option('mb-iso-charsets') == 'auto'
@@ -260,8 +258,6 @@ if get_option('mb-jis-charsets') == 'auto'
 else
   mb_jis_charsets = mb_capable and get_option('mb-jis-charsets') == 'true'
 endif
-locale_info = get_option('locale-info') or get_option('newlib-locale-info')
-locale_info_extended = locale_info and (get_option('locale-info-extended') or get_option('newlib-locale-info-extended'))
 
 newlib_obsolete_math = get_option('newlib-obsolete-math')
 newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
@@ -598,24 +594,6 @@ build_type_subdir = get_option('build-type-subdir')
 lib_dir = prefix / get_option('libdir') / build_type_subdir
 
 include_dir = prefix / get_option('includedir') / build_type_subdir
-
-if not tiny_iconv
-  newlib_iconv_encodings = get_option('newlib-iconv-encodings')
-  newlib_iconv_encodings_exclude = get_option('newlib-iconv-encodings-exclude')
-  newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
-  newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
-  newlib_iconv_external_ccs = get_option('newlib-iconv-external-ccs')
-
-  newlib_iconv_dir = get_option('newlib-iconv-dir')
-  if newlib_iconv_dir == ''
-    newlib_iconv_dir = join_paths(lib_dir, 'locale')
-  endif
-
-  newlib_iconv_runtime_dir = get_option('newlib-iconv-runtime-dir')
-  if newlib_iconv_runtime_dir == ''
-    newlib_iconv_runtime_dir = newlib_iconv_dir
-  endif
-endif
 
 specs_dir_option = get_option('specsdir')
 if build_type_subdir != ''
@@ -1402,20 +1380,12 @@ if not tinystdio
   conf_data.set('__LARGE64_FILES', newlib_stdio64)
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
-conf_data.set('_TINY_LOCALE', tiny_locale)
-conf_data.set('_TINY_ICONV', tiny_iconv)
 conf_data.set('_MB_CAPABLE', mb_capable)
 conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
 conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
 conf_data.set('_ELIX_LEVEL', newlib_elix_level)
-if not tiny_iconv
-  conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
-  if newlib_iconv_external_ccs
-    conf_data.set_quoted('ICONV_DEFAULT_NLSPATH', newlib_iconv_runtime_dir)
-  endif
-endif
 conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
 conf_data.set('_REENT_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
 conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
@@ -1434,8 +1404,6 @@ conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'mat
 conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
-conf_data.set('__HAVE_LOCALE_INFO__', locale_info, description: 'locale support')
-conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', locale_info_extended, description: 'extended locale support')
 conf_data.set('NEWLIB_GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
 conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
@@ -1550,71 +1518,6 @@ if cc.has_argument('-fno-builtin')
   arg_fnobuiltin = ['-fno-builtin']
 endif
 
-if not tiny_iconv
-  # Compute iconv encodings to support in the library
-
-  # Dig out the list of available encodings from the encoding.aliases file. Only
-  # accept the first entry from each line
-
-  available_encodings = []
-  # fs.read was added in meson version 0.57.0. The sed invocation can be
-  # removed once picolibc requires a version of meson newer than that.
-  if meson.version().version_compare('>=0.57')
-    foreach line : fs.read('newlib/libc/iconv/encoding.aliases').split('\n')
-      if line != '' and not line.startswith('#')
-        available_encodings += [line.split()[0]]
-      endif
-    endforeach
-  else
-    _available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
-    foreach _encoding : _available_encodings
-      if _encoding != ''
-        available_encodings += _encoding
-      endif
-    endforeach
-  endif
-
-  # Include all available encodings if none were specified on the command line
-
-  if newlib_iconv_encodings.length() == 0
-    newlib_iconv_encodings = available_encodings
-  elif newlib_iconv_encodings.length() == 1 and newlib_iconv_encodings[0] == 'none'
-    newlib_iconv_encodings = []
-  endif
-
-  # Use newlib_iconv_encodings for from/to by default
-
-  if newlib_iconv_from_encodings.length() == 0
-    newlib_iconv_from_encodings = newlib_iconv_encodings
-  endif
-  if newlib_iconv_to_encodings.length() == 0
-    newlib_iconv_to_encodings = newlib_iconv_encodings
-  endif
-
-  # Set config variables for each requested 'from' encoding
-
-  foreach from : newlib_iconv_from_encodings
-    if not available_encodings.contains(from)
-      error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-    endif
-    encoding_include = true
-    if from not in newlib_iconv_encodings_exclude
-      conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
-    endif
-  endforeach
-
-  # Set config variables for each requested 'to' encoding
-
-  foreach to : newlib_iconv_to_encodings
-    if not available_encodings.contains(to)
-      error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-    endif
-    if to not in newlib_iconv_encodings_exclude
-      conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
-    endif
-  endforeach
-endif
-
 version_array = meson.project_version().split('.')
 
 if version_array.length() > 2
@@ -1640,11 +1543,7 @@ conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major
 conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
-if tiny_locale
-  locale_inc_dir = 'newlib/libc/tinylocale'
-else
-  locale_inc_dir = 'newlib/libc/locale'
-endif
+locale_inc_dir = 'newlib/libc/tinylocale'
 
 if tinystdio
   stdio_inc_dir = 'newlib/libc/tinystdio'

@@ -44,9 +44,6 @@
 /* Use tiny stdio from gcc avr */
 #cmakedefine TINY_STDIO
 
-/* Use tiny locale */
-#cmakedefine _TINY_LOCALE
-
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
 
 #cmakedefine _PICOLIBC_ATOMIC_SIGNAL
@@ -242,12 +239,6 @@
 
 /* chatty assert */
 #cmakedefine _ASSERT_VERBOSE
-
-/* extended locale support */
-#cmakedefine __HAVE_LOCALE_INFO_EXTENDED__
-
-/* locale support */
-#cmakedefine __HAVE_LOCALE_INFO__
 
 /* elix level */
 #cmakedefine _ELIX_LEVEL @_ELIX_LEVEL@
