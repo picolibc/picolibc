@@ -36,13 +36,13 @@
 #ifndef _ICONV_PRIVATE_H_
 #define _ICONV_PRIVATE_H_
 
-#include "setlocale.h"
+#include "../stdlib/local.h"
 #include "../ctype/ctype_.h"
 #include <iconv.h>
 
 struct __iconv_t {
-    mbtowc_t    in_mbtowc;
-    wctomb_t    out_wctomb;
+    mbtowc_p    in_mbtowc;
+    wctomb_p    out_wctomb;
     mbstate_t   in_state;
     mbstate_t   out_state;
     char        buf[MB_LEN_MAX];

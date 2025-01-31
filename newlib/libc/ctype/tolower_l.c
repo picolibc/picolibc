@@ -10,7 +10,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include <stdlib.h>
 #include <wctype.h>
 #include <wchar.h>
-#include "setlocale.h"
+#include "locale_private.h"
 #endif
 
 int

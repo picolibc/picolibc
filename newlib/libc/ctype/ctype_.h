@@ -1,16 +1,28 @@
 /* Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de> */
 #include <ctype.h>
 #include <wchar.h>
-#include "setlocale.h"
+#include "locale_private.h"
 
 # define DEFAULT_CTYPE_PTR	((char *) _ctype_)
 
 #ifdef _MB_EXTENDED_CHARSETS_ANY
-void
-__set_ctype(enum locale_id, const char ** ctype);
+
+#if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+#define CTYPE_OFFSET    127
 #else
-void
-__set_ctype (struct __locale_t *loc, const char *charset);
+#define CTYPE_OFFSET    0
+#endif
+
+extern const char __ctype[locale_END - locale_EXTENDED_BASE][CTYPE_OFFSET + 1 + 256];
+
+static inline const char *
+__get_ctype(enum locale_id id)
+{
+    if (id < locale_EXTENDED_BASE)
+        return _ctype_;
+    return __ctype[id - locale_EXTENDED_BASE] + CTYPE_OFFSET;
+}
+
 #endif
 
 #define _CTYPE_DATA_0_127 \

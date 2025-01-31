@@ -120,7 +120,7 @@ SEEALSO
 #include "local.h"
 #include "fvwrite.h"
 #include "vfieeefp.h"
-#include "setlocale.h"
+#include "locale_private.h"
 
 int VFWPRINTF (FILE *, const wchar_t *, va_list);
 

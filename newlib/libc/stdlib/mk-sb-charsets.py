@@ -309,8 +309,9 @@ def translate(code, encoding):
         ucode = 0
     return ucode
 
-def dump_range(encoding, start, end):
-    print("  /* %s */" % encoding)
+def dump_range(encoding, base, start, end):
+    name = encoding.replace('-', '_')
+    print("  [ locale_%s - locale_%s ] = " % (name, base.replace('-', '_')))
     print("  { ", end="")
     for code in range(start, end + 1):
         if code == end:
@@ -365,20 +366,21 @@ def dump_table():
 ''')   
     print('''#ifdef _MB_EXTENDED_CHARSETS_ISO
 /* Tables for the ISO-8859-x to UTF conversion.  The first index into the
-   table is a value computed from the value x (function __iso_8859_index),
-   the second index is the value of the incoming character - 0xa0.
+   table is a value computed from locale id - locale_ISO_8859-2 (ISO-8859-1
+   is not included as it doesn't require translation).
+   The second index is the value of the incoming character - 0xa0.
    Values < 0xa0 don't have to be converted anyway. */
 const uint16_t __iso_8859_conv[14][0x60] = {''')
     for val in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16):
         encoding = 'ISO-8859-%d' % val
-        dump_range(encoding, 0xa0, 0xff)
+        dump_range(encoding, 'ISO_8859_2', 0xa0, 0xff)
     print('};')
     print('#endif /* _MB_EXTENDED_CHARSETS_ISO */')
     print('')
     print('''#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
 /* Tables for the Windows default singlebyte ANSI codepage conversion.
-   The first index into the table is a value computed from the codepage
-   value (function __cp_index), the second index is the value of the
+   The first index into the table is a value computed from locale id
+   minus locale_WINDOWS_BASE, the second index is the value of the
    incoming character - 0x80.
    Values < 0x80 don't have to be converted anyway. */
 const uint16_t __cp_conv[27][0x80] = {''')
@@ -406,7 +408,7 @@ const uint16_t __cp_conv[27][0x80] = {''')
         else:
             name = cp
                 
-        dump_range(encoding, 0x80, 0xff)
+        dump_range(encoding, 'WINDOWS_BASE', 0x80, 0xff)
     print('};')
     print('#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */')
     print('')

@@ -44,9 +44,9 @@ picolibc_sources(
   locale_mb_cur_max.c
   locale_names.c
   newlocale.c
+  nl_langinfo.c
   posix_locale.c
   setlocale.c
-  setwcfuncs.c
   timedata.c
   uselocale.c
   )

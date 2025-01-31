@@ -119,7 +119,7 @@ PORTABILITY
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-#include "setlocale.h"
+#include "local.h"
 
 /*
  * Convert a string to an unsigned long integer.

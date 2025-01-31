@@ -107,15 +107,6 @@ srcs_ctype = [
     'wctype.c',
     'wctype_l.c',
 ]
-hdrs_ctype = [
-    'categories.h',
-    'ctype_cp.h',
-    'ctype_.h',
-    'ctype_iso.h',
-    'ctype_extended.h',
-    'jp2uc.h',
-    'local.h',
-]
 
 srcs_ctype_use = []
 foreach file : srcs_ctype

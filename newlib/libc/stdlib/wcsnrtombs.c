@@ -70,7 +70,7 @@ PORTABILITY
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
-#include "setlocale.h"
+#include "local.h"
 
 size_t
 _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,

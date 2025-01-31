@@ -33,8 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include "locale_private.h"
 #include "../ctype/ctype_.h"
+#include "../stdlib/local.h"
 
 char *
 setlocale(int category, const char *locale)
@@ -62,9 +64,10 @@ setlocale(int category, const char *locale)
             __global_locale.id[category] = id;
     }
 #ifdef _MB_CAPABLE
-    __set_wc_funcs(__global_locale.id[LC_CTYPE], &__global_locale.wctomb, &__global_locale.mbtowc);
+    __global_locale.wctomb = __get_wctomb(__global_locale.id[LC_CTYPE]);
+    __global_locale.mbtowc = __get_mbtowc(__global_locale.id[LC_CTYPE]);
 #ifdef _MB_EXTENDED_CHARSETS_ANY
-    __set_ctype(__global_locale.id[LC_CTYPE], &__global_locale.ctype);
+    __global_locale.ctype = __get_ctype(__global_locale.id[LC_CTYPE]);
 #endif
 #endif
     return (char *) __locale_name(id);

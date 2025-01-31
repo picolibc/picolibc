@@ -200,7 +200,8 @@ __utf8_mbtowc (
 	state->__count = 3;
       else if (n < (size_t)-1)
 	++n;
-      if (state->__count == 3 && sizeof(wchar_t) == 2)
+#if __SIZEOF_WCHAR_T__ == 2
+      if (state->__count == 3)
 	{
 	  /* On systems which have wchar_t being UTF-16 values, the value
 	     doesn't fit into a single wchar_t in this case.  So what we
@@ -220,6 +221,7 @@ __utf8_mbtowc (
 	  *pwc = 0xd800 | ((tmp - 0x10000) >> 10);
 	  return i;
 	}
+#endif
       if (n < 4)
 	return -2;
       ch = t[i++];
@@ -231,11 +233,13 @@ __utf8_mbtowc (
         |   (((uint32_t)state->__value.__wchb[1] & 0x3f) << 12)
         |   (((uint32_t)state->__value.__wchb[2] & 0x3f) << 6)
         |   ((uint32_t)ch & 0x3f);
-      if (state->__count == 4 && sizeof(wchar_t) == 2)
+#if __SIZEOF_WCHAR_T__ == 2
+      if (state->__count == 4)
 	/* Create the second half of the surrogate pair for systems with
 	   wchar_t == UTF-16 . */
 	*pwc = 0xdc00 | (tmp & 0x3ff);
       else
+#endif
 	*pwc = tmp;
       state->__count = 0;
       return i;
@@ -247,7 +251,7 @@ __utf8_mbtowc (
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 static int
 ___iso_mbtowc (wchar_t *pwc, const char *s, size_t n,
-	       int iso_idx, mbstate_t *state)
+	       enum locale_id id, mbstate_t *state)
 {
   wchar_t dummy;
   unsigned char *t = (unsigned char *)s;
@@ -264,9 +268,9 @@ ___iso_mbtowc (wchar_t *pwc, const char *s, size_t n,
 
   if (*t >= 0xa0)
     {
-      if (iso_idx >= 0)
+      if (id > locale_ISO_8859_1)
 	{
-	  *pwc = __iso_8859_conv[iso_idx][*t - 0xa0];
+	  *pwc = __iso_8859_conv[id - locale_ISO_8859_2][*t - 0xa0];
 	  if (*pwc == 0) /* Invalid character */
 	    {
 	      return -1;
@@ -287,140 +291,114 @@ static int
 __iso_8859_1_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, -1, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_1, state);
 }
 
 static int
 __iso_8859_2_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 0, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_2, state);
 }
 
 static int
 __iso_8859_3_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 1, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_3, state);
 }
 
 static int
 __iso_8859_4_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 2, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_4, state);
 }
 
 static int
 __iso_8859_5_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 3, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_5, state);
 }
 
 static int
 __iso_8859_6_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 4, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_6, state);
 }
 
 static int
 __iso_8859_7_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 5, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_7, state);
 }
 
 static int
 __iso_8859_8_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 6, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_8, state);
 }
 
 static int
 __iso_8859_9_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		     mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 7, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_9, state);
 }
 
 static int
 __iso_8859_10_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		      mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 8, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_10, state);
 }
 
 static int
 __iso_8859_11_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		      mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 9, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_11, state);
 }
 
 static int
 __iso_8859_13_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		      mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 10, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_13, state);
 }
 
 static int
 __iso_8859_14_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		      mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 11, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_14, state);
 }
 
 static int
 __iso_8859_15_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		      mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 12, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_15, state);
 }
 
 static int
 __iso_8859_16_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		      mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, 13, state);
+  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_16, state);
 }
 
-static mbtowc_p __iso_8859_mbtowc[17] = {
-  NULL,
-  __iso_8859_1_mbtowc,
-  __iso_8859_2_mbtowc,
-  __iso_8859_3_mbtowc,
-  __iso_8859_4_mbtowc,
-  __iso_8859_5_mbtowc,
-  __iso_8859_6_mbtowc,
-  __iso_8859_7_mbtowc,
-  __iso_8859_8_mbtowc,
-  __iso_8859_9_mbtowc,
-  __iso_8859_10_mbtowc,
-  __iso_8859_11_mbtowc,
-  NULL,			/* No ISO 8859-12 */
-  __iso_8859_13_mbtowc,
-  __iso_8859_14_mbtowc,
-  __iso_8859_15_mbtowc,
-  __iso_8859_16_mbtowc
-};
-
-/* val *MUST* be valid!  All checks for validity are supposed to be
-   performed before calling this function. */
-mbtowc_p
-__iso_mbtowc (int val)
-{
-  return __iso_8859_mbtowc[val];
-}
 #endif /* _MB_EXTENDED_CHARSETS_ISO */
 
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+
 static int
 ___cp_mbtowc (wchar_t *pwc, const char *s, size_t n,
-	      int cp_idx, mbstate_t *state)
+	      enum locale_id id, mbstate_t *state)
 {
   wchar_t dummy;
   unsigned char *t = (unsigned char *)s;
@@ -437,15 +415,10 @@ ___cp_mbtowc (wchar_t *pwc, const char *s, size_t n,
 
   if (*t >= 0x80)
     {
-      if (cp_idx >= 0)
-	{
-	  *pwc = __cp_conv[cp_idx][*t - 0x80];
-	  if (*pwc == 0) /* Invalid character */
-	    {
-	      return -1;
-	    }
-	  return 1;
-	}
+        *pwc = __cp_conv[id - locale_WINDOWS_BASE][*t - 0x80];
+        if (*pwc == 0) /* Invalid character */
+            return -1;
+        return 1;
     }
 
   *pwc = (wchar_t)*t;
@@ -460,228 +433,191 @@ static int
 __cp_437_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 0, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP437, state);
 }
 
 static int
 __cp_720_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 1, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP720, state);
 }
 
 static int
 __cp_737_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 2, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP737, state);
 }
 
 static int
 __cp_775_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 3, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP775, state);
 }
 
 static int
 __cp_850_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 4, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP850, state);
 }
 
 static int
 __cp_852_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 5, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP852, state);
 }
 
 static int
 __cp_855_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 6, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP855, state);
 }
 
 static int
 __cp_857_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 7, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP857, state);
 }
 
 static int
 __cp_858_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 8, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP858, state);
 }
 
 static int
 __cp_862_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 9, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP862, state);
 }
 
 static int
 __cp_866_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 10, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP866, state);
 }
 
 static int
 __cp_874_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 11, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP874, state);
 }
 
 static int
 __cp_1125_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 12, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1125, state);
 }
 
 static int
 __cp_1250_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 13, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1250, state);
 }
 
 static int
 __cp_1251_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 14, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1251, state);
 }
 
 static int
 __cp_1252_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 15, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1252, state);
 }
 
 static int
 __cp_1253_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 16, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1253, state);
 }
 
 static int
 __cp_1254_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 17, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1254, state);
 }
 
 static int
 __cp_1255_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 18, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1255, state);
 }
 
 static int
 __cp_1256_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 19, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1256, state);
 }
 
 static int
 __cp_1257_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 20, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1257, state);
 }
 
 static int
 __cp_1258_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		  mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 21, state);
+  return ___cp_mbtowc (pwc, s, n, locale_CP1258, state);
 }
 
 static int
 __cp_20866_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		   mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 22, state);
+  return ___cp_mbtowc (pwc, s, n, locale_KOI8_R, state);
 }
 
 static int
 __cp_21866_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		   mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 23, state);
+  return ___cp_mbtowc (pwc, s, n, locale_KOI8_U, state);
 }
 
 static int
 __cp_101_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 24, state);
+  return ___cp_mbtowc (pwc, s, n, locale_GEORGIAN_PS, state);
 }
 
 static int
 __cp_102_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 25, state);
+  return ___cp_mbtowc (pwc, s, n, locale_PT154, state);
 }
 
 static int
 __cp_103_mbtowc (wchar_t *pwc, const char *s, size_t n,
 		 mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, 26, state);
+  return ___cp_mbtowc (pwc, s, n, locale_KOI8_T, state);
 }
 
-static mbtowc_p __cp_xxx_mbtowc[27] = {
-  __cp_437_mbtowc,
-  __cp_720_mbtowc,
-  __cp_737_mbtowc,
-  __cp_775_mbtowc,
-  __cp_850_mbtowc,
-  __cp_852_mbtowc,
-  __cp_855_mbtowc,
-  __cp_857_mbtowc,
-  __cp_858_mbtowc,
-  __cp_862_mbtowc,
-  __cp_866_mbtowc,
-  __cp_874_mbtowc,
-  __cp_1125_mbtowc,
-  __cp_1250_mbtowc,
-  __cp_1251_mbtowc,
-  __cp_1252_mbtowc,
-  __cp_1253_mbtowc,
-  __cp_1254_mbtowc,
-  __cp_1255_mbtowc,
-  __cp_1256_mbtowc,
-  __cp_1257_mbtowc,
-  __cp_1258_mbtowc,
-  __cp_20866_mbtowc,
-  __cp_21866_mbtowc,
-  __cp_101_mbtowc,
-  __cp_102_mbtowc,
-  __cp_103_mbtowc,
-};
-
-/* val *MUST* be valid!  All checks for validity are supposed to be
-   performed before calling this function. */
-mbtowc_p
-__cp_mbtowc (int val)
-{
-  return __cp_xxx_mbtowc[__cp_val_index (val)];
-}
 #endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 
 #ifdef _MB_EXTENDED_CHARSETS_JIS
@@ -721,7 +657,7 @@ static JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /* J_ESC_BR */{ ERROR,   ERROR,    ERROR,    ERROR,   MAKE_A,  MAKE_A,  ERROR,   ERROR,   ERROR },
 };
 
-int
+static int
 __sjis_mbtowc (
         wchar_t       *pwc,
         const char    *s,
@@ -792,7 +728,7 @@ __sjis_mbtowc (
   return 1;
 }
 
-int
+static int
 __eucjp_mbtowc (
         wchar_t       *pwc,
         const char    *s,
@@ -891,7 +827,7 @@ __eucjp_mbtowc (
   return 1;
 }
 
-int
+static int
 __jis_mbtowc (
         wchar_t       *pwc,
         const char    *s,
@@ -998,5 +934,61 @@ __jis_mbtowc (
   return -2;  /* n < bytes needed */
 }
 #endif /* _MB_EXTENDED_CHARSETS_JIS */
+
+const mbtowc_p __mbtowc[locale_END] = {
+    [locale_C] = __ascii_mbtowc,
+    [locale_UTF_8] = __utf8_mbtowc,
+#ifdef _MB_EXTENDED_CHARSETS_ISO
+    [locale_ISO_8859_1] = __iso_8859_1_mbtowc,
+    [locale_ISO_8859_2] = __iso_8859_2_mbtowc,
+    [locale_ISO_8859_3] = __iso_8859_3_mbtowc,
+    [locale_ISO_8859_4] = __iso_8859_4_mbtowc,
+    [locale_ISO_8859_5] = __iso_8859_5_mbtowc,
+    [locale_ISO_8859_6] = __iso_8859_6_mbtowc,
+    [locale_ISO_8859_7] = __iso_8859_7_mbtowc,
+    [locale_ISO_8859_8] = __iso_8859_8_mbtowc,
+    [locale_ISO_8859_9] = __iso_8859_9_mbtowc,
+    [locale_ISO_8859_10] = __iso_8859_10_mbtowc,
+    [locale_ISO_8859_11] = __iso_8859_11_mbtowc,
+    [locale_ISO_8859_13] = __iso_8859_13_mbtowc,
+    [locale_ISO_8859_14] = __iso_8859_14_mbtowc,
+    [locale_ISO_8859_15] = __iso_8859_15_mbtowc,
+    [locale_ISO_8859_16] = __iso_8859_16_mbtowc,
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+    [locale_CP437] = __cp_437_mbtowc,
+    [locale_CP720] = __cp_720_mbtowc,
+    [locale_CP737] = __cp_737_mbtowc,
+    [locale_CP775] = __cp_775_mbtowc,
+    [locale_CP850] = __cp_850_mbtowc,
+    [locale_CP852] = __cp_852_mbtowc,
+    [locale_CP855] = __cp_855_mbtowc,
+    [locale_CP857] = __cp_857_mbtowc,
+    [locale_CP858] = __cp_858_mbtowc,
+    [locale_CP862] = __cp_862_mbtowc,
+    [locale_CP866] = __cp_866_mbtowc,
+    [locale_CP874] = __cp_874_mbtowc,
+    [locale_CP1125] = __cp_1125_mbtowc,
+    [locale_CP1250] = __cp_1250_mbtowc,
+    [locale_CP1251] = __cp_1251_mbtowc,
+    [locale_CP1252] = __cp_1252_mbtowc,
+    [locale_CP1253] = __cp_1253_mbtowc,
+    [locale_CP1254] = __cp_1254_mbtowc,
+    [locale_CP1255] = __cp_1255_mbtowc,
+    [locale_CP1256] = __cp_1256_mbtowc,
+    [locale_CP1257] = __cp_1257_mbtowc,
+    [locale_CP1258] = __cp_1258_mbtowc,
+    [locale_KOI8_R] = __cp_20866_mbtowc,
+    [locale_KOI8_U] = __cp_21866_mbtowc,
+    [locale_GEORGIAN_PS] = __cp_101_mbtowc,
+    [locale_PT154] = __cp_102_mbtowc,
+    [locale_KOI8_T] = __cp_103_mbtowc,
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_JIS
+    [locale_JIS] = __jis_mbtowc,
+    [locale_EUCJP] = __eucjp_mbtowc,
+    [locale_SJIS] = __sjis_mbtowc,
+#endif
+};
 
 #endif /* _MB_CAPABLE */

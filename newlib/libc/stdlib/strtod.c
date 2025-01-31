@@ -136,7 +136,7 @@ THIS SOFTWARE.
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"
-#include "setlocale.h"
+#include "local.h"
 
 /* #ifndef NO_FENV_H */
 /* #include <fenv.h> */

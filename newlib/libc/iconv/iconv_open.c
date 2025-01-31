@@ -36,30 +36,16 @@
 #define _DEFAULT_SOURCE
 #include "iconv_private.h"
 
-#ifdef _MB_CAPABLE
-static bool
-get_iconv_funcs(const char *code, wctomb_t *wctomb, mbtowc_t *mbtowc)
-{
-    enum locale_id      id;
-    wctomb_t            _wctomb;
-    mbtowc_t            _mbtowc;
-
-    id = __find_charset(code);
-    if (id == locale_INVALID)
-        return false;
-    if (!wctomb)
-        wctomb = &_wctomb;
-    if (!mbtowc)
-        mbtowc = &_mbtowc;
-    __set_wc_funcs(id, wctomb, mbtowc);
-    return true;
-}
-#endif
-
 iconv_t
 iconv_open (const char *tocode, const char *fromcode)
 {
     if (!tocode || !fromcode)
+        goto fail;
+
+    enum locale_id      toid = __find_charset(tocode);
+    enum locale_id      fromid = __find_charset(fromcode);
+
+    if (toid == locale_INVALID || fromid == locale_INVALID)
         goto fail;
 
 #ifdef _MB_CAPABLE
@@ -69,18 +55,10 @@ iconv_open (const char *tocode, const char *fromcode)
     if (!ic)
         goto fail;
 
-    if (!get_iconv_funcs(fromcode, NULL, &ic->in_mbtowc) ||
-        !get_iconv_funcs(tocode, &ic->out_wctomb, NULL))
-    {
-        free(ic);
-        goto fail;
-    }
+    ic->in_mbtowc = __get_mbtowc(fromid);
+    ic->out_wctomb = __get_wctomb(toid);
     return ic;
-
 #else
-    if (__find_charset(fromcode) == locale_INVALID ||
-        __find_charset(tocode) == locale_INVALID)
-        goto fail;
     return NULL;
 #endif
 

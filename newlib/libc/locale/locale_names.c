@@ -37,6 +37,7 @@
 
 const char * const __locale_names[] = {
     [locale_C] = "C",
+#ifdef _MB_CAPABLE
     [locale_UTF_8] = "C.UTF-8",
 #ifdef _MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1] = "C.ISO-8859-1",
@@ -88,6 +89,7 @@ const char * const __locale_names[] = {
     [locale_JIS] = "C.JIS",
     [locale_EUCJP] = "C.EUC-JP",
     [locale_SJIS] = "C.SHIFT-JIS",
+#endif
 #endif
 };
 
@@ -149,14 +151,24 @@ __find_charset(const char *charset)
         __match_charset(charset, "us_ascii"))
         return locale_C;
 
+#ifdef _MB_CAPABLE
     for (id = locale_UTF_8; id < locale_END; id++) {
         if (__match_charset(charset, __locale_names[id] + 2))
             break;
     }
     if (id == locale_END)
         id = locale_INVALID;
+#else
+    id = locale_INVALID;
+#endif
     return id;
 }
+
+#ifdef _MB_CAPABLE
+#define LOCALE_DEFAULT  locale_UTF_8
+#else
+#define LOCALE_DEFAULT  locale_C
+#endif
 
 /*
  * Map a locale name to one of our internal locale ids.
@@ -165,7 +177,7 @@ __find_charset(const char *charset)
 enum locale_id
 __find_locale(const char *name)
 {
-    enum locale_id     id = locale_UTF_8;
+    enum locale_id     id = LOCALE_DEFAULT;
     const char          *lang_end;
 
     if (!*name)

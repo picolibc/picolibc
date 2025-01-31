@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <wctype.h>
 #include <wchar.h>
 #include <string.h>
-#include "setlocale.h"
+#include "locale_private.h"
 
 /* valid values for wctrans_t */
 #define WCT_TOLOWER 1

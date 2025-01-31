@@ -113,7 +113,7 @@ No supporting OS subroutines are required.
 #include <ctype.h>
 #include <errno.h>
 #include <stdlib.h>
-#include "setlocale.h"
+#include "local.h"
 
 /*
  * Convert a string to a long integer.

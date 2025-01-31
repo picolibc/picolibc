@@ -58,9 +58,12 @@
 
 enum locale_id {
     locale_C,
+#ifdef _MB_CAPABLE
     locale_UTF_8,
 #ifdef _MB_EXTENDED_CHARSETS_ISO
-    locale_ISO_8859_1,
+    locale_ISO_BASE,
+    locale_EXTENDED_BASE = locale_ISO_BASE,
+    locale_ISO_8859_1 = locale_ISO_BASE,
     locale_ISO_8859_2,
     locale_ISO_8859_3,
     locale_ISO_8859_4,
@@ -77,7 +80,11 @@ enum locale_id {
     locale_ISO_8859_16,
 #endif
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-    locale_CP437,
+    locale_WINDOWS_BASE,
+#ifndef _MB_EXTENDED_CHARSETS_ISO
+    locale_EXTENDED_BASE = locale_WINDOWS_BASE,
+#endif
+    locale_CP437 = locale_WINDOWS_BASE,
     locale_CP720,
     locale_CP737,
     locale_CP775,
@@ -106,22 +113,31 @@ enum locale_id {
     locale_KOI8_T,
 #endif
 #ifdef _MB_EXTENDED_CHARSETS_JIS
-    locale_JIS,
+    locale_JIS_BASE,
+#if !defined(_MB_EXTENDED_CHARSETS_ISO) && !defined(_MB_EXTENDED_CHARSETS_WINDOWS)
+    locale_EXTENDED_BASE = locale_JIS_BASE,
+#endif
+    locale_JIS = locale_JIS_BASE,
     locale_EUCJP,
     locale_SJIS,
+#endif
 #endif
     locale_END,
     locale_INVALID = locale_END,
 } __packed;
 
-typedef int (*wctomb_t)(char *, wchar_t, mbstate_t *);
-typedef int (*mbtowc_t)(wchar_t *, const char *, size_t, mbstate_t *);
+typedef int             wctomb_f (char *, wchar_t, mbstate_t *);
+typedef wctomb_f        *wctomb_p;
+
+typedef int             mbtowc_f (wchar_t *, const char *, size_t,
+                                  mbstate_t *);
+typedef mbtowc_f        *mbtowc_p;
 
 struct __locale_t {
     enum locale_id id[NUMCAT];
 #ifdef _MB_CAPABLE
-    wctomb_t    wctomb;
-    mbtowc_t    mbtowc;
+    wctomb_p    wctomb;
+    mbtowc_p    mbtowc;
 #ifdef _MB_EXTENDED_CHARSETS_ANY
     const char *ctype;
 #endif
@@ -133,7 +149,6 @@ struct __locale_t {
 #endif
 
 extern const char       * const __locale_names[];
-
 extern struct __locale_t        __global_locale;
 
 #ifdef _HAVE_POSIX_LOCALE_API
@@ -141,9 +156,9 @@ extern NEWLIB_THREAD_LOCAL struct __locale_t    *_locale;
 #endif
 
 #ifdef _MB_CAPABLE
-void                    __set_wc_funcs(enum locale_id,
-                                       wctomb_t *wctomb,
-                                       mbtowc_t *mbtowc);
+
+#define __get_wctomb(id)        __wctomb[id]
+#define __get_mbtowc(id)        __mbtowc[id]
 
 #ifdef _HAVE_POSIX_LOCALE_API
 #define __WCTOMB_L(l)   ((l)->wctomb)
@@ -248,15 +263,21 @@ extern const wchar_t *const __wtime_am_pm[2];
 static inline bool
 __locale_is_C(struct __locale_t *locale)
 {
+#ifdef _MB_CAPABLE
     if (!locale)
         locale = __get_current_locale();
     return locale->id[LC_CTYPE] == locale_C;
+#else
+    (void) locale;
+    return true;
+#endif
 }
 
 static inline size_t
 __locale_mb_cur_max_l(struct __locale_t *locale)
 {
     switch (locale->id[LC_CTYPE]) {
+#ifdef _MB_CAPABLE
     case locale_UTF_8:
         return 6;
 #ifdef _MB_EXTENDED_CHARSETS_JIS
@@ -266,6 +287,7 @@ __locale_mb_cur_max_l(struct __locale_t *locale)
         return 3;
     case locale_SJIS:
         return 2;
+#endif
 #endif
     default:
         return 1;

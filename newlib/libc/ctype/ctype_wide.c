@@ -31,7 +31,7 @@
 /* Make sure we're using fast ctype */
 #define _PICOLIBC_CTYPE_SMALL 0
 #include "ctype_.h"
-#include "setlocale.h"
+#include "locale_private.h"
 
 const short _ctype_wide[1 + 256] = {
 	0,

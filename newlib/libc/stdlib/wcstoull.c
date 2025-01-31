@@ -126,7 +126,7 @@ PORTABILITY
 #include <wchar.h>
 #include <wctype.h>
 #include <errno.h>
-#include "setlocale.h"
+#include "local.h"
 
 /* Make up for older non-compliant limits.h.  (This is a C99/POSIX function,
  * and both require ULLONG_MAX in limits.h.)  */

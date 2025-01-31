@@ -32,7 +32,7 @@
 #include <errno.h>
 #include <assert.h>
 #include <sys/types.h>
-#include "setlocale.h"
+#include "local.h"
 
 #ifdef __IEEE_LITTLE_ENDIAN
 #define IEEE_8087

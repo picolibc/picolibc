@@ -123,7 +123,7 @@ __typeof(vfwscanf) vfiwscanf;
 #include <math.h>
 #include <float.h>
 #include <locale.h>
-#include "setlocale.h"
+#include "locale_private.h"
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the __ldtoa code be

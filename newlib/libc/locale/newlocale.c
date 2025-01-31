@@ -36,6 +36,7 @@
 #define _DEFAULT_SOURCE
 #include "locale_private.h"
 #include "../ctype/ctype_.h"
+#include "../stdlib/local.h"
 
 #ifdef _HAVE_POSIX_LOCALE_API
 
@@ -69,9 +70,10 @@ newlocale (int category_mask, const char *locale, locale_t base)
             base->id[category] = id;
 
 #ifdef _MB_CAPABLE
-    __set_wc_funcs(base->id[LC_CTYPE], &base->wctomb, &base->mbtowc);
+    base->wctomb = __get_wctomb(base->id[LC_CTYPE]);
+    base->mbtowc = __get_mbtowc(base->id[LC_CTYPE]);
 #ifdef _MB_EXTENDED_CHARSETS_ANY
-    __set_ctype(base->id[LC_CTYPE], &base->ctype);
+    base->ctype = __get_ctype(base->id[LC_CTYPE]);
 #endif
 #endif
 

@@ -41,7 +41,7 @@
 #include <errno.h>
 #include <inttypes.h>
 #include <limits.h>
-#include "setlocale.h"
+#include "locale_private.h"
 
 static const int _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};

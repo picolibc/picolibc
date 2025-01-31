@@ -565,7 +565,7 @@ def print_classes(code, encoding, comma):
         end = ' ' * (8 - len(c))
     if code & 7 == 0:
         print('        ', end='')
-    print('/* %02x %04x */ %s%s' % (code, ucode, c,comma), end=end)
+    print('%s%s' % (c, comma), end=end)
 
 def dump_range(title, encoding, start, end):
     print(title, end='')
@@ -653,6 +653,12 @@ def dump_table():
             name = 'GEORGIAN_PS'
         elif cp == 'CP102':
             name = 'PT154'
+        elif cp == 'CP103':
+            name = 'KOI8_T'
+        elif cp == 'CP20866':
+            name = 'KOI8_R'
+        elif cp == 'CP21866':
+            name = 'KOI8_U'
         else:
             name = cp
                 

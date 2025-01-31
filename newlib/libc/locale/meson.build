@@ -47,7 +47,6 @@ srcs_locale = [
   'nl_langinfo.c',
   'posix_locale.c',
   'setlocale.c',
-  'setwcfuncs.c',
   'timedata.c',
   'uselocale.c',
 ]

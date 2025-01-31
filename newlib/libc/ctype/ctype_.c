@@ -31,7 +31,7 @@
 /* Make sure we're using fast ctype */
 #define _PICOLIBC_CTYPE_SMALL 0
 #include "ctype_.h"
-#include "setlocale.h"
+#include "locale_private.h"
 #include "../stdlib/local.h"
 
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
@@ -58,95 +58,78 @@ const char _ctype_[1 + 256] = {
 
 #include "ctype_extended.h"
 
-#if defined(_MB_EXTENDED_CHARSETS_ISO)
-#include "ctype_iso.h"
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-#include "ctype_cp.h"
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_JIS)
-#include "ctype_jis.h"
-#endif
-
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-#define __ctype_ascii   _ctype_b
-#define CTYPE_OFFSET    127
+
+#define __CTYPE(base) [locale_ ## base - locale_EXTENDED_BASE] = { \
+        _CTYPE_ ## base ## _128_254,        \
+        0,                                  \
+        _CTYPE_DATA_0_127,                  \
+        _CTYPE_ ## base ## _128_254,        \
+        _CTYPE_ ## base ## _255             \
+        }
+
 #else
-#define __ctype_ascii   _ctype_
-#define CTYPE_OFFSET    0
+
+#define __CTYPE(base) [locale_ ## base - locale_EXTENDED_BASE] = { \
+        0,                                  \
+        _CTYPE_DATA_0_127,                  \
+        _CTYPE_ ## base ## _128_254,        \
+        _CTYPE_ ## base ## _255             \
+        }
+
 #endif
 
-void
-__set_ctype(enum locale_id id,
-            const char ** ctype)
-{
-    switch (id) {
-    default:
-    case locale_C:
-    case locale_UTF_8:
-        *ctype = __ctype_ascii + CTYPE_OFFSET;
-        break;
+const char __ctype[locale_END - locale_EXTENDED_BASE][CTYPE_OFFSET + 1 + 256] = {
 #ifdef _MB_EXTENDED_CHARSETS_ISO
-    case locale_ISO_8859_1:
-    case locale_ISO_8859_2:
-    case locale_ISO_8859_3:
-    case locale_ISO_8859_4:
-    case locale_ISO_8859_5:
-    case locale_ISO_8859_6:
-    case locale_ISO_8859_7:
-    case locale_ISO_8859_8:
-    case locale_ISO_8859_9:
-    case locale_ISO_8859_10:
-    case locale_ISO_8859_11:
-    case locale_ISO_8859_13:
-    case locale_ISO_8859_14:
-    case locale_ISO_8859_15:
-    case locale_ISO_8859_16:
-        *ctype = __ctype_iso[id - locale_ISO_8859_1] + CTYPE_OFFSET;
-        break;
+    __CTYPE(ISO_8859_1),
+    __CTYPE(ISO_8859_2),
+    __CTYPE(ISO_8859_3),
+    __CTYPE(ISO_8859_4),
+    __CTYPE(ISO_8859_5),
+    __CTYPE(ISO_8859_6),
+    __CTYPE(ISO_8859_7),
+    __CTYPE(ISO_8859_8),
+    __CTYPE(ISO_8859_9),
+    __CTYPE(ISO_8859_10),
+    __CTYPE(ISO_8859_11),
+    __CTYPE(ISO_8859_13),
+    __CTYPE(ISO_8859_14),
+    __CTYPE(ISO_8859_15),
+    __CTYPE(ISO_8859_16),
 #endif
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-    case locale_GEORGIAN_PS:
-    case locale_PT154:
-    case locale_KOI8_T:
-    case locale_CP437:
-    case locale_CP720:
-    case locale_CP737:
-    case locale_CP775:
-    case locale_CP850:
-    case locale_CP852:
-    case locale_CP855:
-    case locale_CP857:
-    case locale_CP858:
-    case locale_CP862:
-    case locale_CP866:
-    case locale_CP874:
-    case locale_CP1125:
-    case locale_CP1250:
-    case locale_CP1251:
-    case locale_CP1252:
-    case locale_CP1253:
-    case locale_CP1254:
-    case locale_CP1255:
-    case locale_CP1256:
-    case locale_CP1257:
-    case locale_CP1258:
-    case locale_KOI8_R:
-    case locale_KOI8_U:
-        *ctype = __ctype_cp[id - locale_CP437] + CTYPE_OFFSET;
-        break;
+    __CTYPE(CP437),
+    __CTYPE(CP720),
+    __CTYPE(CP737),
+    __CTYPE(CP775),
+    __CTYPE(CP850),
+    __CTYPE(CP852),
+    __CTYPE(CP855),
+    __CTYPE(CP857),
+    __CTYPE(CP858),
+    __CTYPE(CP862),
+    __CTYPE(CP866),
+    __CTYPE(CP874),
+    __CTYPE(CP1125),
+    __CTYPE(CP1250),
+    __CTYPE(CP1251),
+    __CTYPE(CP1252),
+    __CTYPE(CP1253),
+    __CTYPE(CP1254),
+    __CTYPE(CP1255),
+    __CTYPE(CP1256),
+    __CTYPE(CP1257),
+    __CTYPE(CP1258),
+    __CTYPE(KOI8_R),
+    __CTYPE(KOI8_U),
+    __CTYPE(GEORGIAN_PS),
+    __CTYPE(PT154),
+    __CTYPE(KOI8_T),
 #endif
 #ifdef _MB_EXTENDED_CHARSETS_JIS
-    case locale_JIS:
-        *ctype = __ctype_ascii + CTYPE_OFFSET;
-        break;
-    case locale_EUCJP:
-        *ctype = __ctype_eucjp + CTYPE_OFFSET;
-        break;
-    case locale_SJIS:
-        *ctype = __ctype_sjis + CTYPE_OFFSET;
-        break;
+    __CTYPE(EUCJP),
+    __CTYPE(SJIS),
 #endif
-    }
-}
+};
+
 #endif /* _MB_EXTENDED_CHARSETS_ANY */

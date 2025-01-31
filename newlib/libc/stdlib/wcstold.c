@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <wctype.h>
 #include <locale.h>
 #include "local.h"
-#include "setlocale.h"
+#include "local.h"
 
 #if defined(_HAVE_LONG_DOUBLE) && __LDBL_MANT_DIG == 64
 
