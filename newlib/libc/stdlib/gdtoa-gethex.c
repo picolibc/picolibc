@@ -155,7 +155,7 @@ gethex (const char **sp, const FPI *fpi,
 	int esign, havedig, irv, k, n, nbits, up, zret;
 	__ULong L, lostbits, *x;
 	Long e, e1;
-#ifdef __HAVE_LOCALE_INFO__
+#ifdef DECIMAL_POINT_L
 	const unsigned char *decimalpoint = (const unsigned char *)
 				      DECIMAL_POINT_L(loc);
 	const size_t decp_len = strlen ((const char *) decimalpoint);

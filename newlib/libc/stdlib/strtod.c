@@ -262,7 +262,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 #ifdef Honor_FLT_ROUNDS
 	int rounding;
 #endif
-#ifdef __HAVE_LOCALE_INFO__
+#ifdef DECIMAL_POINT_L
 	const char *decimal_point = DECIMAL_POINT_L(loc);
 	const int dec_len = strlen (decimal_point);
 #else
