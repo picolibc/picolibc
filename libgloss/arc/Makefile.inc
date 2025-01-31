@@ -1,5 +1,6 @@
 multilibtool_LIBRARIES += %D%/libnsim.a
 %C%_libnsim_a_SOURCES = \
+	%D%/arc-timer.c \
 	%D%/libcfunc.c \
 	%D%/mcount.c \
 	%D%/nsim-syscalls.c \

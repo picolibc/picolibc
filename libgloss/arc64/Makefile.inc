@@ -1,6 +1,7 @@
 multilibtool_LIBRARIES += %D%/libnsim.a
 %C%_libnsim_a_CPPFLAGS = -I$(srcdir)/arc
 %C%_libnsim_a_SOURCES = \
+	arc/arc-timer.c \
 	arc/libcfunc.c \
 	arc/nsim-syscalls.c \
 	arc/sbrk.c

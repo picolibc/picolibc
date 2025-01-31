@@ -654,8 +654,8 @@ arc_libiotdk_uart_a_LIBADD =
 arc_libiotdk_uart_a_OBJECTS = $(am_arc_libiotdk_uart_a_OBJECTS)
 arc_libnsim_a_AR = $(AR) $(ARFLAGS)
 arc_libnsim_a_LIBADD =
-@CONFIG_ARC_TRUE@am_arc_libnsim_a_OBJECTS = arc/libcfunc.$(OBJEXT) \
-@CONFIG_ARC_TRUE@	arc/mcount.$(OBJEXT) \
+@CONFIG_ARC_TRUE@am_arc_libnsim_a_OBJECTS = arc/arc-timer.$(OBJEXT) \
+@CONFIG_ARC_TRUE@	arc/libcfunc.$(OBJEXT) arc/mcount.$(OBJEXT) \
 @CONFIG_ARC_TRUE@	arc/nsim-syscalls.$(OBJEXT) \
 @CONFIG_ARC_TRUE@	arc/sbrk.$(OBJEXT)
 arc_libnsim_a_OBJECTS = $(am_arc_libnsim_a_OBJECTS)
@@ -693,6 +693,7 @@ arc64_libhl_a_OBJECTS = $(am_arc64_libhl_a_OBJECTS)
 arc64_libnsim_a_AR = $(AR) $(ARFLAGS)
 arc64_libnsim_a_LIBADD =
 @CONFIG_ARC64_TRUE@am_arc64_libnsim_a_OBJECTS =  \
+@CONFIG_ARC64_TRUE@	arc/arc64_libnsim_a-arc-timer.$(OBJEXT) \
 @CONFIG_ARC64_TRUE@	arc/arc64_libnsim_a-libcfunc.$(OBJEXT) \
 @CONFIG_ARC64_TRUE@	arc/arc64_libnsim_a-nsim-syscalls.$(OBJEXT) \
 @CONFIG_ARC64_TRUE@	arc/arc64_libnsim_a-sbrk.$(OBJEXT)
@@ -2171,6 +2172,7 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_AARCH64_TRUE@	aarch64/cpu-init/rdimon-aem-v8-r.o
 
 @CONFIG_ARC_TRUE@arc_libnsim_a_SOURCES = \
+@CONFIG_ARC_TRUE@	arc/arc-timer.c \
 @CONFIG_ARC_TRUE@	arc/libcfunc.c \
 @CONFIG_ARC_TRUE@	arc/mcount.c \
 @CONFIG_ARC_TRUE@	arc/nsim-syscalls.c \
@@ -2217,6 +2219,7 @@ TEXINFO_TEX = ../texinfo/texinfo.tex
 @CONFIG_ARC_TRUE@arc_libemsdp_uart_a_SOURCES = arc/emsdp-uart-setup.c
 @CONFIG_ARC64_TRUE@arc64_libnsim_a_CPPFLAGS = -I$(srcdir)/arc
 @CONFIG_ARC64_TRUE@arc64_libnsim_a_SOURCES = \
+@CONFIG_ARC64_TRUE@	arc/arc-timer.c \
 @CONFIG_ARC64_TRUE@	arc/libcfunc.c \
 @CONFIG_ARC64_TRUE@	arc/nsim-syscalls.c \
 @CONFIG_ARC64_TRUE@	arc/sbrk.c
@@ -3376,6 +3379,8 @@ arc/libiotdk_uart.a: $(arc_libiotdk_uart_a_OBJECTS) $(arc_libiotdk_uart_a_DEPEND
 	$(AM_V_at)-rm -f arc/libiotdk_uart.a
 	$(AM_V_AR)$(arc_libiotdk_uart_a_AR) arc/libiotdk_uart.a $(arc_libiotdk_uart_a_OBJECTS) $(arc_libiotdk_uart_a_LIBADD)
 	$(AM_V_at)$(RANLIB) arc/libiotdk_uart.a
+arc/arc-timer.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
 arc/libcfunc.$(OBJEXT): arc/$(am__dirstamp) \
 	arc/$(DEPDIR)/$(am__dirstamp)
 arc/mcount.$(OBJEXT): arc/$(am__dirstamp) \
@@ -3447,6 +3452,8 @@ arc64/libhl.a: $(arc64_libhl_a_OBJECTS) $(arc64_libhl_a_DEPENDENCIES) $(EXTRA_ar
 	$(AM_V_at)-rm -f arc64/libhl.a
 	$(AM_V_AR)$(arc64_libhl_a_AR) arc64/libhl.a $(arc64_libhl_a_OBJECTS) $(arc64_libhl_a_LIBADD)
 	$(AM_V_at)$(RANLIB) arc64/libhl.a
+arc/arc64_libnsim_a-arc-timer.$(OBJEXT): arc/$(am__dirstamp) \
+	arc/$(DEPDIR)/$(am__dirstamp)
 arc/arc64_libnsim_a-libcfunc.$(OBJEXT): arc/$(am__dirstamp) \
 	arc/$(DEPDIR)/$(am__dirstamp)
 arc/arc64_libnsim_a-nsim-syscalls.$(OBJEXT): arc/$(am__dirstamp) \
@@ -5675,11 +5682,13 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@aarch64/$(DEPDIR)/aarch64_librdimon_a-truncate.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc-main-helper.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-arc-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-hl-setup.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-hl-stub.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-libcfunc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libhl_a-sbrk.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libnsim_a-arc-timer.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libnsim_a-nsim-syscalls.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@arc/$(DEPDIR)/arc64_libnsim_a-sbrk.Po@am__quote@
@@ -7368,6 +7377,20 @@ arc/hl/arc64_libhl_a-hl_exit.obj: arc/hl/hl_exit.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/hl/hl_exit.c' object='arc/hl/arc64_libhl_a-hl_exit.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libhl_a_CPPFLAGS) $(CPPFLAGS) $(arc64_libhl_a_CFLAGS) $(CFLAGS) -c -o arc/hl/arc64_libhl_a-hl_exit.obj `if test -f 'arc/hl/hl_exit.c'; then $(CYGPATH_W) 'arc/hl/hl_exit.c'; else $(CYGPATH_W) '$(srcdir)/arc/hl/hl_exit.c'; fi`
+
+arc/arc64_libnsim_a-arc-timer.o: arc/arc-timer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-arc-timer.o -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-arc-timer.Tpo -c -o arc/arc64_libnsim_a-arc-timer.o `test -f 'arc/arc-timer.c' || echo '$(srcdir)/'`arc/arc-timer.c
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-arc-timer.Tpo arc/$(DEPDIR)/arc64_libnsim_a-arc-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/arc-timer.c' object='arc/arc64_libnsim_a-arc-timer.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-arc-timer.o `test -f 'arc/arc-timer.c' || echo '$(srcdir)/'`arc/arc-timer.c
+
+arc/arc64_libnsim_a-arc-timer.obj: arc/arc-timer.c
+@am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-arc-timer.obj -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-arc-timer.Tpo -c -o arc/arc64_libnsim_a-arc-timer.obj `if test -f 'arc/arc-timer.c'; then $(CYGPATH_W) 'arc/arc-timer.c'; else $(CYGPATH_W) '$(srcdir)/arc/arc-timer.c'; fi`
+@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) arc/$(DEPDIR)/arc64_libnsim_a-arc-timer.Tpo arc/$(DEPDIR)/arc64_libnsim_a-arc-timer.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='arc/arc-timer.c' object='arc/arc64_libnsim_a-arc-timer.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o arc/arc64_libnsim_a-arc-timer.obj `if test -f 'arc/arc-timer.c'; then $(CYGPATH_W) 'arc/arc-timer.c'; else $(CYGPATH_W) '$(srcdir)/arc/arc-timer.c'; fi`
 
 arc/arc64_libnsim_a-libcfunc.o: arc/libcfunc.c
 @am__fastdepCC_TRUE@	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(arc64_libnsim_a_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT arc/arc64_libnsim_a-libcfunc.o -MD -MP -MF arc/$(DEPDIR)/arc64_libnsim_a-libcfunc.Tpo -c -o arc/arc64_libnsim_a-libcfunc.o `test -f 'arc/libcfunc.c' || echo '$(srcdir)/'`arc/libcfunc.c

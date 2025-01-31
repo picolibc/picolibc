@@ -39,6 +39,7 @@
 
 #include "glue.h"
 #include "nsim-syscall.h"
+#include "arc-timer.h"
 
 /* Those system calls are implemented in both nSIM and CGEN.  */
 _syscall3 (_ssize_t, read, int, fd, void *, buf, size_t, count)
@@ -221,6 +222,15 @@ _getentropy (void *buf, size_t buflen)
 {
   errno = ENOSYS;
   return -1;
+}
+
+clock_t
+_clock (void)
+{
+  if (_arc_timer_default_present ())
+    return _arc_timer_default_read ();
+  else
+    return -1;
 }
 
 /* Some system calls are implemented in nSIM hostlink, but are available only
