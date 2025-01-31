@@ -114,3 +114,10 @@ _argv (int a __attribute__ ((unused)), char *arg __attribute__ ((unused)))
 {
   return -1;
 }
+
+int
+_getentropy (void *buf, size_t buflen)
+{
+  errno = ENOSYS;
+  return -1;
+}

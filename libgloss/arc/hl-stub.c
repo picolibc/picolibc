@@ -93,3 +93,10 @@ _link (const char *oldpath __attribute__ ((unused)),
   errno = ENOSYS;
   return -1;
 }
+
+int
+_getentropy (void *buf, size_t buflen)
+{
+  errno = ENOSYS;
+  return -1;
+}

@@ -216,6 +216,13 @@ _fstat (int fd, struct stat *buf)
   return __res;
 }
 
+int
+_getentropy (void *buf, size_t buflen)
+{
+  errno = ENOSYS;
+  return -1;
+}
+
 /* Some system calls are implemented in nSIM hostlink, but are available only
    on Linux hosts.  To minimize potential compatibility issues they are by
    default disabled in libgloss build.  */
