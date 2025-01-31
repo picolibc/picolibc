@@ -33,22 +33,35 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_tinyiconv = [
-  'iconv.c',
-  'iconv_close.c',
-  'iconv_open.c',
+srcs_locale = [
+  'duplocale.c',
+  'freelocale.c',
+  'getlocalename_l.c',
+  'localeconv.c',
+  'localedata.c',
+  'locale_ctype_ptr.c',
+  'locale_ctype_ptr_l.c',
+  'locale_mb_cur_max.c',
+  'locale_names.c',
+  'newlocale.c',
+  'nl_langinfo.c',
+  'posix_locale.c',
+  'setlocale.c',
+  'setwcfuncs.c',
+  'timedata.c',
+  'uselocale.c',
 ]
 
-srcs_tinyiconv_use = []
-foreach file : srcs_tinyiconv
+srcs_locale_use = []
+foreach file : srcs_locale
   s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
-    message('libc/tinyiconv/' + file + ': machine overrides generic')
+    message('libc/locale/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message('libc/tinyiconv/' + s_file + ': machine overrides generic')
+    message('libc/locale/' + s_file + ': machine overrides generic')
   else
-    srcs_tinyiconv_use += file
+    srcs_locale_use += file
   endif
 endforeach
 
-src_tinyiconv = files(srcs_tinyiconv_use)
+src_locale = files(srcs_locale_use)

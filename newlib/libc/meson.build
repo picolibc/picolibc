@@ -33,9 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['argz', 'ctype', 'errno', 'misc',
-	   'posix', 'search', 'signal', 'ssp', 'stdlib',
-	   'string', 'time', 'tinyiconv', 'tinylocale', 'xdr', 'uchar']
+libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
+           'misc', 'posix', 'search', 'signal', 'ssp',
+           'stdlib', 'string', 'time', 'xdr', 'uchar']
 
 if enable_picolib
   libdirs += 'picolib'
