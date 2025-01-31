@@ -63,7 +63,7 @@ jobs:
         cmake_flags: [
           "",
           # optional configurations
-          "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_MB_EXTENDED_CHARSETS_ALL=y -D_WANT_IO_POS_ARGS=y -D__HAVE_LOCALE_INFO__=y -D__HAVE_LOCALE_INFO_EXTENDED__=y -D_WANT_MINIMAL_IO_LONG_LONG=y -D_PRINTF_PERCENT_N=y",
+          "-D__IO_FLOAT=y -D_IO_FLOAT_EXACT=n -D_WANT_IO_LONG_LONG=y -D_MB_CAPABLE=y -D_MB_EXTENDED_CHARSETS_ALL=y -D_WANT_IO_POS_ARGS=y -D_WANT_MINIMAL_IO_LONG_LONG=y -D_PRINTF_PERCENT_N=y",
         ]
         test: [
           "./.github/do-cmake-linux -DCMAKE_BUILD_TYPE=RelWithDebInfo",
@@ -119,12 +119,12 @@ jobs:
           "",
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dlocale-info=true -Dlocale-info-extended=true -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
           "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dlocale-info=true -Dlocale-info-extended=true -Dmb-capable=true -Dmb-extended-charsets=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true",
         ]
         test: [
           "./.github/do-linux",
@@ -179,12 +179,12 @@ jobs:
           "",
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dlocale-info=true -Dlocale-info-extended=true -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-iconv-external-ccs=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
           "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dlocale-info=true -Dlocale-info-extended=true -Dmb-capable=true -Dmb-extended-charsets=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true",
         ]
         test: [
           "./.github/do-linux",
