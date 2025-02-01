@@ -38,10 +38,12 @@
 int
 iconv_close (iconv_t ic)
 {
+    if (ic == (iconv_t) -1) {
+        errno = EINVAL;
+        return -1;
+    }
 #ifdef _MB_CAPABLE
     free(ic);
-#else
-    (void) ic;
 #endif
     return 0;
 }

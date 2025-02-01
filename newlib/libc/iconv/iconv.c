@@ -40,6 +40,11 @@ iconv (iconv_t ic,
        char **__restrict inbuf, size_t *__restrict inbytesleft,
        char **__restrict outbuf, size_t *__restrict outbytesleft)
 {
+    if (ic == (iconv_t) -1) {
+        errno = EINVAL;
+        return (size_t) -1;
+    }
+
     if (!inbuf || !inbytesleft)
         return 0;
 
@@ -68,6 +73,11 @@ iconv (iconv_t ic,
         } else if (inbytes && ic->buf_len == 0) {
             ret = ic->in_mbtowc(&wc, in, inbytes, &ic->in_state);
             switch (ret) {
+            case 0:
+                wc = L'\0';
+                in += inbytes;
+                inbytes = 0;
+                break;
             case -1:
                 goto fail;
             case -2:
