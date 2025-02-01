@@ -165,7 +165,6 @@ foreach params : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -178,7 +177,6 @@ foreach params : targets
 		  link_args: float_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -191,7 +189,6 @@ foreach params : targets
 		  link_args: llong_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -204,7 +201,6 @@ foreach params : targets
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -217,7 +213,6 @@ foreach params : targets
 		  link_args: min_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -230,7 +225,6 @@ foreach params : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -243,7 +237,6 @@ foreach params : targets
 		  link_args: float_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -256,7 +249,6 @@ foreach params : targets
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -269,7 +261,6 @@ foreach params : targets
 		  link_args: min_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -282,7 +273,6 @@ foreach params : targets
 		  link_args: int_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -295,7 +285,6 @@ foreach params : targets
 		  link_args: _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -309,7 +298,6 @@ foreach params : targets
 		  link_args:  _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -320,7 +308,6 @@ foreach params : targets
 		  link_args:  _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -335,7 +322,6 @@ foreach params : targets
 		  link_args:  _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -356,7 +342,6 @@ foreach params : targets
 		    link_args:  _link_args,
 		    objects: _objs_minimal,
 		    link_depends:  _link_depends,
-		    link_with: _libs,
 		    include_directories: inc),
          depends: bios_bin,
 	 env: test_env)
@@ -370,7 +355,6 @@ foreach params : targets
 		  link_args: _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -383,7 +367,6 @@ foreach params : targets
 		  link_args: _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env)
@@ -397,7 +380,6 @@ foreach params : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -413,7 +395,6 @@ foreach params : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        env: test_env,
@@ -429,7 +410,6 @@ foreach params : targets
 		           link_args: _link_args,
 		           objects: _objs,
 		           link_depends:  _link_depends,
-		           link_with: _libs,
 		           include_directories: inc)
 
     test(t1 + target + '-success',
@@ -466,7 +446,6 @@ foreach params : targets
 		    link_args: _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
-		    link_with: _libs,
 		    include_directories: inc),
 	 depends: bios_bin,
 	 env: test_env,
@@ -482,7 +461,6 @@ foreach params : targets
 		  link_args: llong_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        timeout: 120,
@@ -497,7 +475,6 @@ foreach params : targets
 		  link_args: double_printf_link_args + _link_args,
 		  objects: _objs,
 		  link_depends:  _link_depends,
-		  link_with: _libs,
 		  include_directories: inc),
        depends: bios_bin,
        timeout: 120,
@@ -514,7 +491,6 @@ foreach params : targets
 		    link_args: double_printf_link_args + _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
-		    link_with: _libs,
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: 60,
@@ -530,7 +506,6 @@ foreach params : targets
 		    link_args: _cpp_args + _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
-		    link_with: _libs,
                     include_directories: inc))
   endif
 endforeach
@@ -689,7 +664,6 @@ if enable_native_tests
                  link_args: _link_args,
                  objects: _objs,
                  link_depends: _link_depends,
-                 link_with: _libs,
                  include_directories: inc)
 
       out = custom_target (o, output: o,
