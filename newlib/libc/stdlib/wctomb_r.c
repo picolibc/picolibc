@@ -8,6 +8,7 @@ All rights reserved.
 #include <wchar.h>
 #include <locale.h>
 #include <stdint.h>
+#include <endian.h>
 #include "mbctype.h"
 #include "local.h"
 #include "../ctype/local.h"
@@ -143,6 +144,86 @@ __utf8_wctomb (
 #endif
 
   return -1;
+}
+
+#if _BYTE_ORDER == _LITTLE_ENDIAN
+#define __ucs2le_wctomb __ucs2_wctomb
+#define __ucs2be_wctomb __ucs2swap_wctomb
+#define __ucs4le_wctomb __ucs4_wctomb
+#define __ucs4be_wctomb __ucs4swap_wctomb
+#else
+#define __ucs2le_wctomb __ucs2swap_wctomb
+#define __ucs2be_wctomb __ucs2_wctomb
+#define __ucs4le_wctomb __ucs4swap_wctomb
+#define __ucs4be_wctomb __ucs4_wctomb
+#endif
+
+static int
+__ucs2_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint16_t    uchar = (uint16_t) wchar;
+
+    (void) state;
+    /* Surrogates are invalid in UCS-2 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 2);
+    return 2;
+}
+
+static int
+__ucs2swap_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint16_t    uchar = __bswap16((uint16_t) wchar);
+
+    (void) state;
+    /* Surrogates are invalid in UCS-2 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 2);
+    return 2;
+}
+
+static int
+__ucs4_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint32_t    uchar = (uint32_t) wchar;
+
+    (void) state;
+    /* Surrogates are invalid in UCS-4 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 4);
+    return 4;
+}
+
+static int
+__ucs4swap_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint32_t    uchar = __bswap32((uint32_t) wchar);
+
+    (void) state;
+    /* Surrogates are invalid in UCS-4 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 4);
+    return 4;
 }
 
 #ifdef _MB_EXTENDED_CHARSETS_JIS
@@ -609,6 +690,12 @@ __cp_103_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 const wctomb_p __wctomb[locale_END] = {
     [locale_C] = __ascii_wctomb,
     [locale_UTF_8] = __utf8_wctomb,
+    [locale_UCS_2] = __ucs2_wctomb,
+    [locale_UCS_2LE] = __ucs2le_wctomb,
+    [locale_UCS_2BE] = __ucs2be_wctomb,
+    [locale_UCS_4] = __ucs4_wctomb,
+    [locale_UCS_4LE] = __ucs4le_wctomb,
+    [locale_UCS_4BE] = __ucs4be_wctomb,
 #ifdef _MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1] = __iso_8859_1_wctomb,
     [locale_ISO_8859_2] = __iso_8859_2_wctomb,

@@ -210,6 +210,7 @@ typedef struct
     wint_t __wch;
     unsigned char __wchb[4];
     __uint32_t __ucs;
+    __uint16_t __ucs2;
   } __value;		/* Value so far.  */
 } _mbstate_t;
 #endif

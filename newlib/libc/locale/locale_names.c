@@ -39,6 +39,12 @@ const char * const __locale_names[] = {
     [locale_C] = "C",
 #ifdef _MB_CAPABLE
     [locale_UTF_8] = "C.UTF-8",
+    [locale_UCS_2] = "C.UCS-2",
+    [locale_UCS_2LE] = "C.UCS-2LE",
+    [locale_UCS_2BE] = "C.UCS-2BE",
+    [locale_UCS_4] = "C.UCS-4",
+    [locale_UCS_4LE] = "C.UCS-4LE",
+    [locale_UCS_4BE] = "C.UCS-4BE",
 #ifdef _MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1] = "C.ISO-8859-1",
     [locale_ISO_8859_2] = "C.ISO-8859-2",

@@ -9,6 +9,7 @@ All rights reserved.
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
+#include <endian.h>
 #include "local.h"
 #include "../ctype/local.h"
 
@@ -246,6 +247,86 @@ __utf8_mbtowc (
     }
 
   return -1;
+}
+
+#if _BYTE_ORDER == _LITTLE_ENDIAN
+#define __ucs2le_mbtowc __ucs2_mbtowc
+#define __ucs2be_mbtowc __ucs2swap_mbtowc
+#define __ucs4le_mbtowc __ucs4_mbtowc
+#define __ucs4be_mbtowc __ucs4swap_mbtowc
+#else
+#define __ucs2le_mbtowc __ucs2swap_mbtowc
+#define __ucs2be_mbtowc __ucs2_mbtowc
+#define __ucs4le_mbtowc __ucs4swap_mbtowc
+#define __ucs4be_mbtowc __ucs4_mbtowc
+#endif
+
+static int
+__ucs2_mbtowc (
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
+        mbstate_t      *state)
+{
+    uint16_t    uchar;
+
+    (void) state;
+    if (n < 2)
+        return -1;
+    memcpy(&uchar, s, 2);
+    *pwc = uchar;
+    return 2;
+}
+
+static int
+__ucs2swap_mbtowc (
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
+        mbstate_t      *state)
+{
+    uint16_t    uchar;
+
+    (void) state;
+    if (n < 2)
+        return -1;
+    memcpy(&uchar, s, 2);
+    *pwc = __bswap16(uchar);
+    return 2;
+}
+
+static int
+__ucs4_mbtowc (
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
+        mbstate_t      *state)
+{
+    uint32_t    uchar;
+
+    (void) state;
+    if (n < 4)
+        return -1;
+    memcpy(&uchar, s, 4);
+    *pwc = uchar;
+    return 4;
+}
+
+static int
+__ucs4swap_mbtowc (
+        wchar_t       *pwc,
+        const char    *s,
+        size_t         n,
+        mbstate_t      *state)
+{
+    uint32_t    uchar;
+
+    (void) state;
+    if (n < 4)
+        return -1;
+    memcpy(&uchar, s, 4);
+    *pwc = __bswap32(uchar);
+    return 4;
 }
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
@@ -938,6 +1019,12 @@ __jis_mbtowc (
 const mbtowc_p __mbtowc[locale_END] = {
     [locale_C] = __ascii_mbtowc,
     [locale_UTF_8] = __utf8_mbtowc,
+    [locale_UCS_2] = __ucs2_mbtowc,
+    [locale_UCS_2LE] = __ucs2le_mbtowc,
+    [locale_UCS_2BE] = __ucs2be_mbtowc,
+    [locale_UCS_4] = __ucs4_mbtowc,
+    [locale_UCS_4LE] = __ucs4le_mbtowc,
+    [locale_UCS_4BE] = __ucs4be_mbtowc,
 #ifdef _MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1] = __iso_8859_1_mbtowc,
     [locale_ISO_8859_2] = __iso_8859_2_mbtowc,

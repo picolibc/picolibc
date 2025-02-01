@@ -60,6 +60,12 @@ enum locale_id {
     locale_C,
 #ifdef _MB_CAPABLE
     locale_UTF_8,
+    locale_UCS_2,
+    locale_UCS_2LE,
+    locale_UCS_2BE,
+    locale_UCS_4,
+    locale_UCS_4LE,
+    locale_UCS_4BE,
 #ifdef _MB_EXTENDED_CHARSETS_ISO
     locale_ISO_BASE,
     locale_EXTENDED_BASE = locale_ISO_BASE,
