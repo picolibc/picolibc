@@ -205,6 +205,24 @@ use Picolibc:
 
  * Add LatticMico32 support, including testing. Thanks to Jiaxun Yang.
 
+ * Add MIPS semihosting support. Thanks to Jiaxun Yang.
+
+ * Add older GCC compiler support, including versions < 4.4. Thanks to
+   Joel Holdsworth.
+
+ * Add coreboot configurations and tests. Thanks to Jeremy Bettis and
+   Jon Murphy.
+
+ * Fix numerous charset conversion errors for non-Unicode locales.
+
+ * Make sure malloc return is aligned by using max_align_t. Thanks to
+   Alex Richardson.
+
+ * Replace iconv and locale implementations with smaller code offering
+   the same locale functionality as before while the iconv code shares
+   the same charset support as the locale code instead of having a
+   completely separate implementation.
+
 ### Picolibc release 1.8.8
 
  * Fixed 3 bugs in the powf computation. Thanks to Fabian Schriever.
