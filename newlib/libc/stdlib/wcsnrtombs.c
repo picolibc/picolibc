@@ -74,7 +74,7 @@ PORTABILITY
 
 size_t
 _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
-	       size_t len, mbstate_t *ps, struct __locale_t *loc)
+	       size_t len, mbstate_t *ps, locale_t loc)
 {
   char *ptr = dst;
   char buff[10];
@@ -85,7 +85,7 @@ _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
 #ifdef _MB_CAPABLE
   if (ps == NULL)
     {
-      static NEWLIB_THREAD_LOCAL mbstate_t _wcsrtombs_state;
+      static mbstate_t _wcsrtombs_state;
       ps = &_wcsrtombs_state;
     }
 #endif
@@ -135,7 +135,7 @@ _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
     }
 
   return n;
-} 
+}
 
 size_t
 wcsnrtombs (char *__restrict dst,

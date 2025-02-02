@@ -49,31 +49,26 @@ effects vary with the locale.
 #include <wchar.h>
 #include "local.h"
 
+#ifdef _MB_CAPABLE
+static mbstate_t _mbtowc_state;
+#define ps &_mbtowc_state
+#else
+#define ps NULL
+#endif
+
 int
 mbtowc (wchar_t *__restrict pwc,
         const char *__restrict s,
         size_t n)
 {
+        int retval;
+
+        retval = __MBTOWC (pwc, s, n, ps);
+        if (retval == -1) {
 #ifdef _MB_CAPABLE
-  int retval = 0;
-  static NEWLIB_THREAD_LOCAL mbstate_t _mbtowc_state;
-
-  retval = __MBTOWC (pwc, s, n, &_mbtowc_state);
-
-  if (retval == -1)
-    {
-      _mbtowc_state.__count = 0;
-      _REENT_ERRNO(r) = EILSEQ;
-      return -1;
-    }
-  return retval;
-#else /* not _MB_CAPABLE */
-  if (s == NULL)
-    return 0;
-  if (n == 0)
-    return -1;
-  if (pwc)
-    *pwc = (wchar_t) *s;
-  return (*s != '\0');
-#endif /* not _MB_CAPABLE */
+                _mbtowc_state.__count = 0;
+#endif
+                errno = EILSEQ;
+        }
+        return retval;
 }
