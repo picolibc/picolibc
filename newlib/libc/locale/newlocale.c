@@ -69,14 +69,6 @@ newlocale (int category_mask, const char *locale, locale_t base)
         if (category_mask & (1 << category))
             base->id[category] = id;
 
-#ifdef _MB_CAPABLE
-    base->wctomb = __get_wctomb(base->id[LC_CTYPE]);
-    base->mbtowc = __get_mbtowc(base->id[LC_CTYPE]);
-#ifdef _MB_EXTENDED_CHARSETS_ANY
-    base->ctype = __get_ctype(base->id[LC_CTYPE]);
-#endif
-#endif
-
     return base;
 }
 

@@ -141,13 +141,6 @@ typedef mbtowc_f        *mbtowc_p;
 
 struct __locale_t {
     enum locale_id id[NUMCAT];
-#ifdef _MB_CAPABLE
-    wctomb_p    wctomb;
-    mbtowc_p    mbtowc;
-#ifdef _MB_EXTENDED_CHARSETS_ANY
-    const char *ctype;
-#endif
-#endif
 };
 
 #ifndef _DEFAULT_LOCALE
@@ -163,12 +156,15 @@ extern NEWLIB_THREAD_LOCAL struct __locale_t    *_locale;
 
 #ifdef _MB_CAPABLE
 
+extern const wctomb_p __wctomb[locale_END];
+extern const mbtowc_p __mbtowc[locale_END];
+
 #define __get_wctomb(id)        __wctomb[id]
 #define __get_mbtowc(id)        __mbtowc[id]
 
 #ifdef _HAVE_POSIX_LOCALE_API
-#define __WCTOMB_L(l)   ((l)->wctomb)
-#define __MBTOWC_L(l)   ((l)->mbtowc)
+#define __WCTOMB_L(l)   (__get_wctomb(l->id[LC_CTYPE]))
+#define __MBTOWC_L(l)   (__get_mbtowc(l->id[LC_CTYPE]))
 #define __WCTOMB        (__WCTOMB_L(__get_current_locale()))
 #define __MBTOWC        (__MBTOWC_L(__get_current_locale()))
 #else

@@ -37,14 +37,4 @@
 #include "../ctype/ctype_.h"
 #include "../stdlib/local.h"
 
-struct __locale_t       __global_locale
-#ifdef _MB_CAPABLE
-= {
-    .wctomb = __ascii_wctomb,
-    .mbtowc = __ascii_mbtowc,
-#ifdef _MB_EXTENDED_CHARSETS_ANY
-    .ctype = _ctype_,
-#endif
-}
-#endif
-;
+struct __locale_t       __global_locale;

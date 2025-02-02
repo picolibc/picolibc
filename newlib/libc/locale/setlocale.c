@@ -63,12 +63,5 @@ setlocale(int category, const char *locale)
         for (category = LC_ALL + 1; category < _LC_LAST; category++)
             __global_locale.id[category] = id;
     }
-#ifdef _MB_CAPABLE
-    __global_locale.wctomb = __get_wctomb(__global_locale.id[LC_CTYPE]);
-    __global_locale.mbtowc = __get_mbtowc(__global_locale.id[LC_CTYPE]);
-#ifdef _MB_EXTENDED_CHARSETS_ANY
-    __global_locale.ctype = __get_ctype(__global_locale.id[LC_CTYPE]);
-#endif
-#endif
     return (char *) __locale_name(id);
 }

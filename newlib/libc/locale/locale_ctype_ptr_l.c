@@ -35,13 +35,14 @@
 
 #define _DEFAULT_SOURCE
 #include "locale_private.h"
+#include "../ctype/ctype_.h"
 
 #ifdef _MB_EXTENDED_CHARSETS_ANY
 
 const char *
 __locale_ctype_ptr_l(locale_t locale)
 {
-    return locale->ctype;
+    return __get_ctype(locale->id[LC_CTYPE]);
 }
 
 #endif

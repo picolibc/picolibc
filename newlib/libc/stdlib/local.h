@@ -24,8 +24,6 @@ wctomb_f __ascii_wctomb;
 
 mbtowc_f __utf8_mbtowc;
 wctomb_f __utf8_wctomb;
-extern const wctomb_p __wctomb[locale_END];
-extern const mbtowc_p __mbtowc[locale_END];
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
 extern const uint16_t __iso_8859_conv[14][0x60];
