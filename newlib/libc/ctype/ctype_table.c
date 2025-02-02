@@ -51,7 +51,7 @@ static struct {
 #define N_CAT_TABLE     (sizeof(ctype_table) / sizeof(ctype_table[0]))
 
 uint16_t
-__ctype_table_lookup(wint_t ic, struct __locale_t *locale)
+__ctype_table_lookup(wint_t ic, locale_t locale)
 {
     size_t      low = 0;
     size_t      high = N_CAT_TABLE - 1;

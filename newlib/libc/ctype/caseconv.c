@@ -19,7 +19,7 @@ static const struct caseconv_entry table [] = {
 
 /* auxiliary function for binary search in interval properties table */
 const struct caseconv_entry *
-__caseconv_lookup (wint_t ucs, struct __locale_t *locale)
+__caseconv_lookup (wint_t ucs, locale_t locale)
 {
   size_t min = 0;
   size_t max = NCASECONV-1;

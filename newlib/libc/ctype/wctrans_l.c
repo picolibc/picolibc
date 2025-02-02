@@ -6,7 +6,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include <wctype.h>
 
 wctrans_t
-wctrans_l (const char *c, struct __locale_t *locale)
+wctrans_l (const char *c, locale_t locale)
 {
   (void) locale;
   /* We're using a locale-independent representation of upper/lower case

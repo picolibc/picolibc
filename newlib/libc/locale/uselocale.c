@@ -44,11 +44,12 @@ uselocale (locale_t locale)
 {
     locale_t current = _locale;
 
-    if (current == NULL)
+    if (current == 0)
         current = LC_GLOBAL_LOCALE;
 
     if (locale == LC_GLOBAL_LOCALE)
-        locale = NULL;
+        locale = 0;
+
     _locale = locale;
 
     return current;

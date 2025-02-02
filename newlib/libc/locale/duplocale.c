@@ -37,16 +37,9 @@
 #include "locale_private.h"
 
 locale_t
-duplocale (locale_t old)
+duplocale (locale_t locale)
 {
-    locale_t    dup;
-
-    if (old == LC_GLOBAL_LOCALE)
-        old = &__global_locale;
-
-    dup = calloc(1, sizeof(*dup));
-    if (!dup)
-        return NULL;
-    memcpy(dup, old, sizeof *dup);
-    return dup;
+    if (locale == LC_GLOBAL_LOCALE)
+        locale = __global_locale;
+    return locale;
 }

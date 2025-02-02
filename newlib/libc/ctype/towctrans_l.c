@@ -9,7 +9,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include "local.h"
 
 wint_t
-towctrans_l (wint_t u, wctrans_t w, struct __locale_t *locale)
+towctrans_l (wint_t u, wctrans_t w, locale_t locale)
 {
   switch (w) {
   case WCT_TOLOWER:

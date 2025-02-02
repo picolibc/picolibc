@@ -674,12 +674,12 @@ conv_to_alt_digits (CHAR *buf, size_t bufsiz, unsigned num, alt_digits_t *adi)
 
 static size_t
 __strftime (CHAR *s, size_t maxsize, const CHAR *format,
-	    const struct tm *tim_p, struct __locale_t *locale,
+	    const struct tm *tim_p, locale_t locale,
 	    era_info_t **era_info, alt_digits_t **alt_digits)
 #else /* !_WANT_C99_TIME_FORMATS */
 static size_t
 __strftime (CHAR *s, size_t maxsize, const CHAR *format,
-	    const struct tm *tim_p, struct __locale_t *locale)
+	    const struct tm *tim_p, locale_t locale)
 
 #define __strftime(s,m,f,t,l,e,a)	__strftime((s),(m),(f),(t),(l))
 #endif /* !_WANT_C99_TIME_FORMATS */
@@ -1473,7 +1473,7 @@ strftime (CHAR *__restrict s,
 
 size_t
 strftime_l (CHAR *__restrict s, size_t maxsize, const CHAR *__restrict format,
-	    const struct tm *__restrict tim_p, struct __locale_t *locale)
+	    const struct tm *__restrict tim_p, locale_t locale)
 {
 #ifdef _WANT_C99_TIME_FORMATS
   era_info_t *era_info = NULL;

@@ -36,6 +36,6 @@ extern const uint16_t __cp_conv[][0x80];
 #endif
 
 size_t _wcsnrtombs_l (char *, const wchar_t **,
-                      size_t, size_t, mbstate_t *, struct __locale_t *);
+                      size_t, size_t, mbstate_t *, locale_t);
 
 #endif

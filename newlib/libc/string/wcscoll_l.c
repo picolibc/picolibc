@@ -40,7 +40,7 @@ PORTABILITY
 #include <wchar.h>
 
 int
-wcscoll_l (const wchar_t *a, const wchar_t *b, struct __locale_t *locale)
+wcscoll_l (const wchar_t *a, const wchar_t *b, locale_t locale)
 {
   (void) locale;
   return wcscmp (a, b);

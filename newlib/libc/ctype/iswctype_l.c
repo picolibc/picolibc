@@ -5,7 +5,7 @@
 #include "local.h"
 
 int
-iswctype_l (wint_t c, wctype_t desc, struct __locale_t *locale)
+iswctype_l (wint_t c, wctype_t desc, locale_t locale)
 {
   switch (desc)
     {

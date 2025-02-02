@@ -46,7 +46,7 @@ QUICKREF
 
 int 
 strncasecmp_l (const char *s1, const char *s2, size_t n,
-	       struct __locale_t *locale)
+	       locale_t locale)
 {
   int d = 0;
   for ( ; n != 0; n--)

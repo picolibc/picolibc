@@ -8,7 +8,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include "local.h"
 
 wint_t
-towlower_l (wint_t c, struct __locale_t *locale)
+towlower_l (wint_t c, locale_t locale)
 {
 #ifdef _MB_CAPABLE
   const struct caseconv_entry * cce = __caseconv_lookup(c, locale);

@@ -35,66 +35,66 @@
 
 #include "locale_private.h"
 
-const char * const __locale_names[] = {
-    [locale_C] = "C",
+const char * const __locale_names[locale_END - locale_BASE] = {
+    [locale_C - locale_BASE] = "C",
 #ifdef _MB_CAPABLE
-    [locale_UTF_8] = "C.UTF-8",
-    [locale_UCS_2] = "C.UCS-2",
-    [locale_UCS_2LE] = "C.UCS-2LE",
-    [locale_UCS_2BE] = "C.UCS-2BE",
-    [locale_UCS_4] = "C.UCS-4",
-    [locale_UCS_4LE] = "C.UCS-4LE",
-    [locale_UCS_4BE] = "C.UCS-4BE",
+    [locale_UTF_8 - locale_BASE] = "C.UTF-8",
+    [locale_UCS_2 - locale_BASE] = "C.UCS-2",
+    [locale_UCS_2LE - locale_BASE] = "C.UCS-2LE",
+    [locale_UCS_2BE - locale_BASE] = "C.UCS-2BE",
+    [locale_UCS_4 - locale_BASE] = "C.UCS-4",
+    [locale_UCS_4LE - locale_BASE] = "C.UCS-4LE",
+    [locale_UCS_4BE - locale_BASE] = "C.UCS-4BE",
 #ifdef _MB_EXTENDED_CHARSETS_ISO
-    [locale_ISO_8859_1] = "C.ISO-8859-1",
-    [locale_ISO_8859_2] = "C.ISO-8859-2",
-    [locale_ISO_8859_3] = "C.ISO-8859-3",
-    [locale_ISO_8859_4] = "C.ISO-8859-4",
-    [locale_ISO_8859_5] = "C.ISO-8859-5",
-    [locale_ISO_8859_6] = "C.ISO-8859-6",
-    [locale_ISO_8859_7] = "C.ISO-8859-7",
-    [locale_ISO_8859_8] = "C.ISO-8859-8",
-    [locale_ISO_8859_9] = "C.ISO-8859-9",
-    [locale_ISO_8859_10] = "C.ISO-8859-10",
-    [locale_ISO_8859_11] = "C.ISO-8859-11",
-    [locale_ISO_8859_13] = "C.ISO-8859-13",
-    [locale_ISO_8859_14] = "C.ISO-8859-14",
-    [locale_ISO_8859_15] = "C.ISO-8859-15",
-    [locale_ISO_8859_16] = "C.ISO-8859-16",
+    [locale_ISO_8859_1 - locale_BASE] = "C.ISO-8859-1",
+    [locale_ISO_8859_2 - locale_BASE] = "C.ISO-8859-2",
+    [locale_ISO_8859_3 - locale_BASE] = "C.ISO-8859-3",
+    [locale_ISO_8859_4 - locale_BASE] = "C.ISO-8859-4",
+    [locale_ISO_8859_5 - locale_BASE] = "C.ISO-8859-5",
+    [locale_ISO_8859_6 - locale_BASE] = "C.ISO-8859-6",
+    [locale_ISO_8859_7 - locale_BASE] = "C.ISO-8859-7",
+    [locale_ISO_8859_8 - locale_BASE] = "C.ISO-8859-8",
+    [locale_ISO_8859_9 - locale_BASE] = "C.ISO-8859-9",
+    [locale_ISO_8859_10 - locale_BASE] = "C.ISO-8859-10",
+    [locale_ISO_8859_11 - locale_BASE] = "C.ISO-8859-11",
+    [locale_ISO_8859_13 - locale_BASE] = "C.ISO-8859-13",
+    [locale_ISO_8859_14 - locale_BASE] = "C.ISO-8859-14",
+    [locale_ISO_8859_15 - locale_BASE] = "C.ISO-8859-15",
+    [locale_ISO_8859_16 - locale_BASE] = "C.ISO-8859-16",
 #endif
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
-    [locale_CP437] = "C.CP437",
-    [locale_CP720] = "C.CP720",
-    [locale_CP737] = "C.CP737",
-    [locale_CP775] = "C.CP775",
-    [locale_CP850] = "C.CP850",
-    [locale_CP852] = "C.CP852",
-    [locale_CP855] = "C.CP855",
-    [locale_CP857] = "C.CP857",
-    [locale_CP858] = "C.CP858",
-    [locale_CP862] = "C.CP862",
-    [locale_CP866] = "C.CP866",
-    [locale_CP874] = "C.CP874",
-    [locale_CP1125] = "C.CP1125",
-    [locale_CP1250] = "C.CP1250",
-    [locale_CP1251] = "C.CP1251",
-    [locale_CP1252] = "C.CP1252",
-    [locale_CP1253] = "C.CP1253",
-    [locale_CP1254] = "C.CP1254",
-    [locale_CP1255] = "C.CP1255",
-    [locale_CP1256] = "C.CP1256",
-    [locale_CP1257] = "C.CP1257",
-    [locale_CP1258] = "C.CP1258",
-    [locale_KOI8_R] = "C.KOI8-R",
-    [locale_KOI8_U] = "C.KOI8-U",
-    [locale_GEORGIAN_PS] = "C.GEORGIAN-PS",
-    [locale_PT154] = "C.PT154",
-    [locale_KOI8_T] = "C.KOI8-T",
+    [locale_CP437 - locale_BASE] = "C.CP437",
+    [locale_CP720 - locale_BASE] = "C.CP720",
+    [locale_CP737 - locale_BASE] = "C.CP737",
+    [locale_CP775 - locale_BASE] = "C.CP775",
+    [locale_CP850 - locale_BASE] = "C.CP850",
+    [locale_CP852 - locale_BASE] = "C.CP852",
+    [locale_CP855 - locale_BASE] = "C.CP855",
+    [locale_CP857 - locale_BASE] = "C.CP857",
+    [locale_CP858 - locale_BASE] = "C.CP858",
+    [locale_CP862 - locale_BASE] = "C.CP862",
+    [locale_CP866 - locale_BASE] = "C.CP866",
+    [locale_CP874 - locale_BASE] = "C.CP874",
+    [locale_CP1125 - locale_BASE] = "C.CP1125",
+    [locale_CP1250 - locale_BASE] = "C.CP1250",
+    [locale_CP1251 - locale_BASE] = "C.CP1251",
+    [locale_CP1252 - locale_BASE] = "C.CP1252",
+    [locale_CP1253 - locale_BASE] = "C.CP1253",
+    [locale_CP1254 - locale_BASE] = "C.CP1254",
+    [locale_CP1255 - locale_BASE] = "C.CP1255",
+    [locale_CP1256 - locale_BASE] = "C.CP1256",
+    [locale_CP1257 - locale_BASE] = "C.CP1257",
+    [locale_CP1258 - locale_BASE] = "C.CP1258",
+    [locale_KOI8_R - locale_BASE] = "C.KOI8-R",
+    [locale_KOI8_U - locale_BASE] = "C.KOI8-U",
+    [locale_GEORGIAN_PS - locale_BASE] = "C.GEORGIAN-PS",
+    [locale_PT154 - locale_BASE] = "C.PT154",
+    [locale_KOI8_T - locale_BASE] = "C.KOI8-T",
 #endif
 #ifdef _MB_EXTENDED_CHARSETS_JIS
-    [locale_JIS] = "C.JIS",
-    [locale_EUCJP] = "C.EUC-JP",
-    [locale_SJIS] = "C.SHIFT-JIS",
+    [locale_JIS - locale_BASE] = "C.JIS",
+    [locale_EUCJP - locale_BASE] = "C.EUC-JP",
+    [locale_SJIS - locale_BASE] = "C.SHIFT-JIS",
 #endif
 #endif
 };
@@ -159,7 +159,7 @@ __find_charset(const char *charset)
 
 #ifdef _MB_CAPABLE
     for (id = locale_UTF_8; id < locale_END; id++) {
-        if (__match_charset(charset, __locale_names[id] + 2))
+        if (__match_charset(charset, __locale_name(id) + 2))
             break;
     }
     if (id == locale_END)
@@ -191,7 +191,7 @@ __find_locale(const char *name)
 
     /* POSIX is an alias for C */
     if (!strcmp(name, "POSIX"))
-        name = __locale_names[locale_C];
+        name = __locale_name(locale_C);
 
     lang_end = __find_locale_sep(name);
 

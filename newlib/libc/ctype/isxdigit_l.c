@@ -8,7 +8,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isxdigit_l
 int
-isxdigit_l (int c, struct __locale_t *locale)
+isxdigit_l (int c, locale_t locale)
 {
     (void) locale;
 #if _PICOLIBC_CTYPE_SMALL

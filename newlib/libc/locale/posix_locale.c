@@ -37,6 +37,6 @@
 
 #ifdef _HAVE_POSIX_LOCALE_API
 
-NEWLIB_THREAD_LOCAL struct __locale_t    *_locale;
+NEWLIB_THREAD_LOCAL locale_t    _locale;
 
 #endif

@@ -41,10 +41,7 @@
 void
 freelocale (locale_t locale)
 {
-    if (locale == &__global_locale || locale == LC_GLOBAL_LOCALE)
-        return;
-
-    free(locale);
+    (void) locale;
 }
 
 #endif

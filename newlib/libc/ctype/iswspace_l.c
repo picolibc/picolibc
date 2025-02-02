@@ -39,7 +39,7 @@
 #include "local.h"
 
 int
-iswspace_l (wint_t c, struct __locale_t *locale)
+iswspace_l (wint_t c, locale_t locale)
 {
   (void) locale;
 #ifdef _MB_CAPABLE

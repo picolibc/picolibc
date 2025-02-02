@@ -9,7 +9,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include "local.h"
 
 int
-iswpunct_l (wint_t c, struct __locale_t *locale)
+iswpunct_l (wint_t c, locale_t locale)
 {
   (void) locale;
 #ifdef _MB_CAPABLE

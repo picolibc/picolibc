@@ -15,7 +15,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #endif
 
 int
-toupper_l (int c, struct __locale_t *locale)
+toupper_l (int c, locale_t locale)
 {
 #if defined (_MB_EXTENDED_CHARSETS_ISO) \
     || defined (_MB_EXTENDED_CHARSETS_WINDOWS)

@@ -42,7 +42,7 @@ nl_langinfo_l (nl_item item, locale_t locale)
 {
     switch (item) {
     case CODESET:
-        return (char *) __locale_name(locale->id[LC_CTYPE]);
+        return (char *) __locale_name(locale);
     case D_T_FMT:
         return TIME_C_FMT;
     case D_FMT:

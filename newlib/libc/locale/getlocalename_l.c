@@ -46,7 +46,7 @@ getlocalename_l (int category, locale_t locale)
     }
 
     if (locale == LC_GLOBAL_LOCALE)
-        locale = &__global_locale;
+        locale = __global_locale;
 
-    return __locale_name(locale->id[category]);
+    return __locale_name(locale);
 }

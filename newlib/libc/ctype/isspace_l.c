@@ -7,7 +7,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isspace_l
 int
-isspace_l (int c, struct __locale_t *locale)
+isspace_l (int c, locale_t locale)
 {
     (void) locale;
 #if _PICOLIBC_CTYPE_SMALL

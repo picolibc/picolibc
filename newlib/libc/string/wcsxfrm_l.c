@@ -44,7 +44,7 @@ PORTABILITY
 
 size_t
 wcsxfrm_l (wchar_t *__restrict a, const wchar_t *__restrict b, size_t n,
-	   struct __locale_t *locale)
+	   locale_t locale)
 {
   (void) locale;
   return wcslcpy (a, b, n);

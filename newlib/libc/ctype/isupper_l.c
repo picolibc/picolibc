@@ -7,7 +7,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isupper_l
 int
-isupper_l (int c, struct __locale_t *locale)
+isupper_l (int c, locale_t locale)
 {
 #if _PICOLIBC_CTYPE_SMALL
     (void) locale;

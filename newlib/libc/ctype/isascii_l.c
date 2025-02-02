@@ -7,7 +7,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isascii_l
 int
-isascii_l (int c, struct __locale_t *locale)
+isascii_l (int c, locale_t locale)
 {
     (void) locale;
     return (unsigned) c <= 0177;

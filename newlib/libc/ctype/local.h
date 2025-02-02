@@ -72,7 +72,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CLASS_xdigit    (1 << 12)
 
 uint16_t
-__ctype_table_lookup(wint_t ic, struct __locale_t *locale);
+__ctype_table_lookup(wint_t ic, locale_t locale);
 
 /* Japanese encoding types supported */
 #define JP_JIS		1
@@ -137,4 +137,4 @@ __attribute__((packed))
 ;
 
 const struct caseconv_entry *
-__caseconv_lookup(wint_t c, struct __locale_t *locale);
+__caseconv_lookup(wint_t c, locale_t locale);

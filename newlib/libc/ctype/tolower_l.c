@@ -14,7 +14,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #endif
 
 int
-tolower_l (int c, struct __locale_t *locale)
+tolower_l (int c, locale_t locale)
 {
 #if defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
   if ((unsigned char) c <= 0x7f) 

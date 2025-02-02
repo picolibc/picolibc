@@ -39,9 +39,9 @@
 #include "../stdlib/local.h"
 
 char *
-setlocale(int category, const char *locale)
+setlocale(int category, const char *name)
 {
-    enum locale_id      id;
+    enum locale_id      locale;
 
     if (category < LC_ALL || category >= _LC_LAST)
     {
@@ -50,18 +50,22 @@ setlocale(int category, const char *locale)
     }
 
     /* Return current locale value */
-    if (locale == NULL)
-        return (char *) __locale_name(__global_locale.id[category]);
+    if (name == NULL)
+        return (char *) __locale_name(__global_locale);
 
     /* Set the global locale */
-    id = __find_locale(locale);
-    if (id == locale_INVALID)
+    locale = __find_locale(name);
+    if (locale == locale_INVALID)
         return NULL;
 
-    __global_locale.id[category] = id;
-    if (category == LC_ALL) {
-        for (category = LC_ALL + 1; category < _LC_LAST; category++)
-            __global_locale.id[category] = id;
+    switch (category) {
+    case LC_ALL:
+    case LC_CTYPE:
+        __global_locale = locale;
+        break;
+    default:
+        break;
     }
-    return (char *) __locale_name(id);
+
+    return (char *) __locale_name(__global_locale);
 }

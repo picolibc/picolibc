@@ -41,35 +41,29 @@
 #ifdef _HAVE_POSIX_LOCALE_API
 
 locale_t
-newlocale (int category_mask, const char *locale, locale_t base)
+newlocale (int category_mask, const char *name, locale_t base)
 {
-    enum locale_id id;
-    int category;
+    enum locale_id locale;
 
-    id = __find_locale(locale);
+    locale = __find_locale(name);
+
     /*
-     * Make sure the mask doesn't contain invalid bits and that locale
-     * specifies a known locale value
+     * Make sure the mask doesn't contain invalid bits, that locale
+     * specifies a known locale value and that base is not
+     * LC_GLOBAL_LOCALE
      */
-    if ((category_mask & ~LC_ALL_MASK) != 0 || id == locale_INVALID) {
+    if ((category_mask & ~LC_ALL_MASK) != 0 ||
+        locale == locale_INVALID ||
+        base == LC_GLOBAL_LOCALE)
+    {
         errno = EINVAL;
-        return NULL;
-    }
-    if (!base) {
-        base = calloc(1, sizeof (struct __locale_t));
-        if (!base)
-            return NULL;
-        base->id[LC_ALL] = id;
-    } else {
-        if (base == LC_GLOBAL_LOCALE)
-            return NULL;
+        return 0;
     }
 
-    for (category = LC_ALL + 1; category < _LC_LAST; category++)
-        if (category_mask & (1 << category))
-            base->id[category] = id;
+    if ((category_mask & LC_CTYPE) == 0)
+        locale = locale_C;
 
-    return base;
+    return locale;
 }
 
 #endif
