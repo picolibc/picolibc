@@ -269,7 +269,11 @@ if(NOT DEFINED _MB_CAPABLE)
 endif()
 
 if(NOT DEFINED _MB_EXTENDED_CHARSETS_ALL)
-  option(_MB_EXTENDED_CHARSETS_ALL "Enable ISO, Windows and JIS multibyte encodings" OFF)
+  option(_MB_EXTENDED_CHARSETS_ALL "Enable UCS, ISO, Windows and JIS multibyte encodings" OFF)
+endif()
+
+if(NOT DEFINED _MB_EXTENDED_CHARSETS_UCS)
+  option(_MB_EXTENDED_CHARSETS_UCS "Enable UCS encodings" OFF)
 endif()
 
 if(NOT DEFINED _MB_EXTENDED_CHARSETS_ISO)

@@ -37,7 +37,7 @@
 #include "locale_private.h"
 #include "../ctype/ctype_.h"
 
-#ifdef _MB_EXTENDED_CHARSETS_ANY
+#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
 
 const char *
 __locale_ctype_ptr(void)

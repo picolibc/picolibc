@@ -46,7 +46,7 @@ _BEGIN_STD_C
  * The small ctype code does not support extended character sets. It also breaks
  * libstdc++'s ctype implementation, so just skip it for c++
  */
-#if defined(_MB_EXTENDED_CHARSETS_ANY) || defined (__cplusplus)
+#if defined(_MB_EXTENDED_CHARSETS_NON_UNICODE) || defined (__cplusplus)
 #undef _PICOLIBC_CTYPE_SMALL
 #define _PICOLIBC_CTYPE_SMALL 0
 #endif
@@ -242,7 +242,7 @@ extern const char	_ctype_[];
 
 extern const short _ctype_wide[];
 
-#ifdef _MB_EXTENDED_CHARSETS_ANY
+#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
 const char *__locale_ctype_ptr (void);
 #else
 #define __locale_ctype_ptr()	_ctype_
@@ -274,7 +274,7 @@ static __inline char __ctype_lookup(int c) { return (__CTYPE_PTR + 1)[c]; }
 #endif
 
 #if __POSIX_VISIBLE >= 200809
-#ifdef _MB_EXTENDED_CHARSETS_ANY
+#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
 const char *__locale_ctype_ptr_l (locale_t);
 #else
 static __inline const char *
@@ -313,14 +313,14 @@ static __inline char __ctype_lookup_l(int c, locale_t l) {
    slightly slower.  These macros are not NLS-aware so they are
    disabled if the system supports the extended character sets. */
 # if defined(__GNUC__)
-#  ifndef _MB_EXTENDED_CHARSETS_ANY
+#  ifndef _MB_EXTENDED_CHARSETS_NON_UNICODE
 #   define toupper(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
       islower (__x) ? (int) __x - 'a' + 'A' : (int) __x;})
 #   define tolower(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
       isupper (__x) ? (int) __x - 'A' + 'a' : (int) __x;})
-#  else /* _MB_EXTENDED_CHARSETS_ANY */
+#  else /* _MB_EXTENDED_CHARSETS_NON_UNICODE */
 /* Allow a gcc warning if the user passed 'char', but defer to the
    function.  */
 #   define toupper(__c) \
@@ -329,7 +329,7 @@ static __inline char __ctype_lookup_l(int c, locale_t l) {
 #   define tolower(__c) \
   __extension__ ({ __typeof__ (__c) __x = (__c);	\
       (void) __CTYPE_PTR[(int) __x]; (tolower) (__x);})
-#  endif /* _MB_EXTENDED_CHARSETS_ANY */
+#  endif /* _MB_EXTENDED_CHARSETS_NON_UNICODE */
 # endif /* __GNUC__ */
 
 #endif /* !__cplusplus */

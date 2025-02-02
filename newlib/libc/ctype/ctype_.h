@@ -5,7 +5,7 @@
 
 # define DEFAULT_CTYPE_PTR	((char *) _ctype_)
 
-#ifdef _MB_EXTENDED_CHARSETS_ANY
+#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
 
 #if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
 #define CTYPE_OFFSET    127

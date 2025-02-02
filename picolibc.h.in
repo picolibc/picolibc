@@ -175,6 +175,8 @@
 
 #cmakedefine _MB_EXTENDED_CHARSETS_ALL
 
+#cmakedefine _MB_EXTENDED_CHARSETS_UCS
+
 #cmakedefine _MB_EXTENDED_CHARSETS_ISO
 
 #cmakedefine _MB_EXTENDED_CHARSETS_WINDOWS

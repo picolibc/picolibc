@@ -317,6 +317,7 @@ SUCH DAMAGE.
 /* Make sure all of these are disabled if multi-byte is disabled*/
 #undef _MB_EXTENDED_CHARSETS_ALL
 #undef _MB_EXTENDED_CHARSETS_ANY
+#undef _MB_EXTENDED_CHARSETS_UCS
 #undef _MB_EXTENDED_CHARSETS_ISO
 #undef _MB_EXTENDED_CHARSETS_WINDOWS
 #undef _MB_EXTENDED_CHARSETS_JIS
@@ -326,14 +327,20 @@ SUCH DAMAGE.
    charsets.  The extended charsets add a few functions and a couple
    of tables of a few K each. */
 #ifdef _MB_EXTENDED_CHARSETS_ALL
+#define _MB_EXTENDED_CHARSETS_UCS 1
 #define _MB_EXTENDED_CHARSETS_ISO 1
 #define _MB_EXTENDED_CHARSETS_WINDOWS 1
 #define _MB_EXTENDED_CHARSETS_JIS 1
 #endif
 
-#if defined(_MB_EXTENDED_CHARSETS_ISO) || \
+#if defined(_MB_EXTENDED_CHARSETS_ISO) ||     \
     defined(_MB_EXTENDED_CHARSETS_WINDOWS) || \
     defined(_MB_EXTENDED_CHARSETS_JIS)
+#define _MB_EXTENDED_CHARSETS_NON_UNICODE
+#endif
+
+#if defined(_MB_EXTENDED_CHARSETS_UCS) ||       \
+    defined(_MB_EXTENDED_CHARSETS_NON_UNICODE)
 #define _MB_EXTENDED_CHARSETS_ANY
 #endif
 

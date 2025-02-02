@@ -54,7 +54,7 @@ const char _ctype_[1 + 256] = {
 
 #endif	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
 
-#ifdef _MB_EXTENDED_CHARSETS_ANY
+#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
 
 #include "ctype_extended.h"
 
@@ -132,4 +132,4 @@ const char __ctype[locale_END - locale_EXTENDED_BASE][CTYPE_OFFSET + 1 + 256] = 
 #endif
 };
 
-#endif /* _MB_EXTENDED_CHARSETS_ANY */
+#endif /* _MB_EXTENDED_CHARSETS_NON_UNICODE */

@@ -243,6 +243,11 @@ fast_strcmp = get_option('fast-strcmp')
 
 mb_capable = get_option('mb-capable') or get_option('newlib-mb')
 mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
+if get_option('mb-ucs-charsets') == 'auto'
+  mb_ucs_charsets = mb_extended_charsets
+else
+  mb_ucs_charsets = mb_capable and get_option('mb-ucs-charsets') == 'true'
+endif
 if get_option('mb-iso-charsets') == 'auto'
   mb_iso_charsets = mb_extended_charsets
 else
@@ -1381,6 +1386,7 @@ if not tinystdio
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
 conf_data.set('_MB_CAPABLE', mb_capable)
+conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
