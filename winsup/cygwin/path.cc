@@ -1756,6 +1756,31 @@ symlink (const char *oldpath, const char *newpath)
   return -1;
 }
 
+/* The symlink target is relative to the directory in which the symlink gets
+   created, not relative to the cwd.  Therefore we have to mangle the path
+   quite a bit before calling path_conv. */
+static bool
+resolve_symlink_target (const char *oldpath, const path_conv &win32_newpath,
+			path_conv &win32_oldpath)
+{
+  if (isabspath (oldpath))
+    {
+      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+      return true;
+    }
+  else
+    {
+      tmp_pathbuf tp;
+      size_t len = strrchr (win32_newpath.get_posix (), '/')
+		    - win32_newpath.get_posix () + 1;
+      char *absoldpath = tp.t_get ();
+      stpcpy (stpncpy (absoldpath, win32_newpath.get_posix (), len),
+	      oldpath);
+      win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
+      return false;
+    }
+}
+
 static int
 symlink_nfs (const char *oldpath, path_conv &win32_newpath)
 {
@@ -1816,23 +1841,10 @@ symlink_native (const char *oldpath, path_conv &win32_newpath)
   UNICODE_STRING final_oldpath_buf;
   DWORD flags;
 
-  if (isabspath (oldpath))
-    {
-      win32_oldpath.check (oldpath, PC_SYM_NOFOLLOW, stat_suffixes);
-      final_oldpath = win32_oldpath.get_nt_native_path ();
-    }
+  if (resolve_symlink_target (oldpath, win32_newpath, win32_oldpath))
+    final_oldpath = win32_oldpath.get_nt_native_path ();
   else
     {
-      /* The symlink target is relative to the directory in which
-	 the symlink gets created, not relative to the cwd.  Therefore
-	 we have to mangle the path quite a bit before calling path_conv. */
-      ssize_t len = strrchr (win32_newpath.get_posix (), '/')
-		    - win32_newpath.get_posix () + 1;
-      char *absoldpath = tp.t_get ();
-      stpcpy (stpncpy (absoldpath, win32_newpath.get_posix (), len),
-	      oldpath);
-      win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW, stat_suffixes);
-
       /* Try hard to keep Windows symlink path relative. */
 
       /* 1. Find common path prefix.  Skip leading \\?\, but take pre-increment
@@ -2025,7 +2037,6 @@ int
 symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 {
   int res = -1;
-  size_t len;
   char *buf, *cp;
   tmp_pathbuf tp;
   winsym_t wsym_type;
@@ -2134,24 +2145,7 @@ symlink_worker (const char *oldpath, path_conv &win32_newpath, bool isdevice)
 		 going to be. */
 	      IShellFolder *psl;
 
-	      /* The symlink target is relative to the directory in which the
-		 symlink gets created, not relative to the cwd.  Therefore we
-		 have to mangle the path quite a bit before calling path_conv.*/
-	      if (isabspath (oldpath))
-		win32_oldpath.check (oldpath,
-				     PC_SYM_NOFOLLOW,
-				     stat_suffixes);
-	      else
-		{
-		  len = strrchr (win32_newpath.get_posix (), '/')
-			- win32_newpath.get_posix () + 1;
-		  char *absoldpath = tp.t_get ();
-		  stpcpy (stpncpy (absoldpath, win32_newpath.get_posix (),
-				   len),
-			  oldpath);
-		  win32_oldpath.check (absoldpath, PC_SYM_NOFOLLOW,
-				       stat_suffixes);
-		}
+	      resolve_symlink_target (oldpath, win32_newpath, win32_oldpath);
 	      if (SUCCEEDED (SHGetDesktopFolder (&psl)))
 		{
 		  WCHAR wc_path[win32_oldpath.get_wide_win32_path_len () + 1];
