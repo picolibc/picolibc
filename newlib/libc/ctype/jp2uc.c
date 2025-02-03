@@ -204,7 +204,7 @@ __uc2jp (wint_t c, int type)
   wint_t u;
   if (c == WEOF)
     return WEOF;
-  for (u = 0x0001; ; u++) {
+  for (u = 0x0000; ; u++) {
     if (__jp2uc(u, type) == c)
       return u;
     if (u == 0xffff)
