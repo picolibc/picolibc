@@ -13,6 +13,6 @@ isblank_l (int c, locale_t locale)
     (void) locale;
     return isblank(c);
 #else
-    return (__locale_ctype_ptr_l (locale)[c+1] & _B) || (c == '\t');
+    return (__CTYPE_PTR_L (locale)[c+1] & _B) || (c == '\t');
 #endif
 }

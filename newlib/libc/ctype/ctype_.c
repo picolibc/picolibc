@@ -34,17 +34,15 @@
 #include "locale_private.h"
 #include "../stdlib/local.h"
 
-#if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-/* No static const on Cygwin since it's referenced and potentially overwritten
-   for compatibility with older applications. */
-const
-char _ctype_b[128 + 256] = {
+#if defined(_ALLOW_NEGATIVE_CTYPE_INDEX)
+
+const char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
 };
 
-#else	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
+#else	/* !_ALLOW_NEGATIVE_CTYPE_INDEX */
 
 const char _ctype_[1 + 256] = {
 	0,
@@ -52,13 +50,13 @@ const char _ctype_[1 + 256] = {
 	_CTYPE_DATA_128_255
 };
 
-#endif	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
+#endif	/* !_ALLOW_NEGATIVE_CTYPE_INDEX */
 
 #ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
 
 #include "ctype_extended.h"
 
-#if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
+#if defined(_ALLOW_NEGATIVE_CTYPE_INDEX)
 
 #define __CTYPE(base) [locale_ ## base - locale_EXTENDED_BASE] = { \
         _CTYPE_ ## base ## _128_254,        \
@@ -79,7 +77,7 @@ const char _ctype_[1 + 256] = {
 
 #endif
 
-const char __ctype[locale_END - locale_EXTENDED_BASE][CTYPE_OFFSET + 1 + 256] = {
+const char __ctype[locale_END - locale_EXTENDED_BASE][_CTYPE_OFFSET + 1 + 256] = {
 #ifdef _MB_EXTENDED_CHARSETS_ISO
     __CTYPE(ISO_8859_1),
     __CTYPE(ISO_8859_2),

@@ -13,6 +13,6 @@ iscntrl_l (int c, locale_t locale)
 #if _PICOLIBC_CTYPE_SMALL
     return (0x00 <= c && c <= 0x1f) || c == 0x7f;
 #else
-    return __locale_ctype_ptr_l (locale)[c+1] & _C;
+    return __CTYPE_PTR_L (locale)[c+1] & _C;
 #endif
 }

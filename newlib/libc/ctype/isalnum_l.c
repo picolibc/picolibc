@@ -13,6 +13,6 @@ isalnum_l (int c, locale_t locale)
     (void) locale;
     return isalnum(c);
 #else
-    return __locale_ctype_ptr_l (locale)[c+1] & (_U|_L|_N);
+    return __CTYPE_PTR_L (locale)[c+1] & (_U|_L|_N);
 #endif
 }
