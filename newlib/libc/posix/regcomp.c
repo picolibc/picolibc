@@ -48,6 +48,14 @@
 #include "cclass.h"
 #include "cname.h"
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
+#endif
+
 /*
  * parse structure, passed up and down to avoid global variables and
  * other clumsinesses
@@ -1880,12 +1888,6 @@ computejumps(struct parse *p, struct re_guts *g)
 	for (mindex = 0; mindex < g->mlen; mindex++)
 		g->charjump[(unsigned char) g->must[mindex]] = g->mlen - mindex - 1;
 }
-
-#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
-#pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wunknown-warning-option"
-#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
-#endif
 
 /*
  - computematchjumps - compute match jumps for BM scan
