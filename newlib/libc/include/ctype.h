@@ -225,8 +225,6 @@ extern const short      _ctype_wide[];
 
 #define _ctype_ (_ctype_b + _CTYPE_OFFSET)
 
-#ifndef __cplusplus
-
 #define	_U	0x001    /* upper */
 #define	_L	0x002    /* lower */
 #define	_N	0x004    /* digit */
@@ -244,6 +242,8 @@ const char *__locale_ctype_ptr (void);
 #else
 #define __CTYPE_PTR	_ctype_
 #endif
+
+#ifndef __cplusplus
 
 #define __ctype_lookup(__c) (__CTYPE_PTR + 1)[(int) (__c)]
 
