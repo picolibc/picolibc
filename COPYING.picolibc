@@ -385,7 +385,6 @@ License: BSD2-6
 
 Files: newlib/libc/machine/xtensa/machine/fenv-fp.h
  newlib/libc/machine/xtensa/machine/fenv.h
- newlib/libc/sys/xtensa/include/fenv.h
 Copyright: 2011 Tensilica Inc.
 License: BSD2-7
 
@@ -401,29 +400,21 @@ Files: newlib/libc/signal/sig2str.c
 Copyright: 2021 Matthew Joyce
 License: BSD2-10
 
-Files: newlib/libc/sys/xtensa/clibrary_init.c
-Copyright: 2003-2006 Tensilica Inc.
-License: BSD2-11
-
-Files: newlib/libc/sys/xtensa/sys/file.h
-Copyright: 2005-2006 Tensilica Inc.
-License: BSD2-11
-
 Files: newlib/libm/ld/common/e_sqrtl.c
  newlib/libm/ld/common/s_cosl.c
  newlib/libm/ld/common/s_sinl.c
  newlib/libm/ld/common/s_tanl.c
 Copyright: 2007 Steven G. Kargl
-License: BSD2-12
+License: BSD2-11
 
 Files: newlib/libm/ld/common/s_roundl.c
 Copyright: 2003, Steven G. Kargl
-License: BSD2-12
+License: BSD2-11
 
 Files: newlib/libm/ld/ld128/s_nanl.c
  newlib/libm/ld/ld80/s_nanl.c
 Copyright: 2007 David Schultz
-License: BSD2-13
+License: BSD2-12
 
 Files: CMakeLists.txt
  cmake/picolibc.cmake
@@ -2634,26 +2625,22 @@ Copyright: 1992, 1993 The Regents of the University of California.
  2011 The FreeBSD Foundation
 License: BSD3-31
 
-Files: newlib/libc/sys/rtems/include/sys/poll.h
-Copyright: 1997 Peter Wemm <peter@freebsd.org>
-License: BSD3-32
-
 Files: newlib/libc/time/strptime.c
 Copyright: 1999 Kungliga Tekniska Högskolan Royal Institute of Technology, Stockholm, Sweden).
-License: BSD3-33
+License: BSD3-32
 
 Files: newlib/libc/tinystdio/ftoa_engine.c
 Copyright: 2005, Dmitry Xmelkov
-License: BSD3-34
+License: BSD3-33
 
 Files: newlib/libm/common/nexttoward.c
  newlib/libm/common/nexttowardl.c
 Copyright: 2014 Mentor Graphics, Inc.
-License: BSD3-35
+License: BSD3-34
 
 Files: newlib/libm/ld/common/s_fabsl.c
 Copyright: 2003 Dag-Erling Coïdan Smørgrav
-License: BSD3-36
+License: BSD3-35
 
 Files: newlib/libm/machine/spu/headers/acos.h
  newlib/libm/machine/spu/headers/acosd2.h
@@ -2778,7 +2765,7 @@ Files: newlib/libm/machine/spu/headers/acos.h
  newlib/libm/machine/spu/wf_sqrt.c
  newlib/libm/machine/spu/wf_tgamma.c
 Copyright: 2006,2008, International Business Machines Corporation
-License: BSD3-37
+License: BSD3-36
 
 Files: newlib/libm/machine/spu/headers/acosf4.h
  newlib/libm/machine/spu/headers/asinf4.h
@@ -2814,7 +2801,7 @@ Files: newlib/libm/machine/spu/headers/acosf4.h
  newlib/libm/machine/spu/headers/truncd2.h
  newlib/libm/machine/spu/headers/truncf4.h
 Copyright: 2001,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-37
+License: BSD3-36
 
 Files: newlib/libm/machine/spu/headers/acoshd2.h
  newlib/libm/machine/spu/headers/acoshf4.h
@@ -2846,13 +2833,13 @@ Files: newlib/libm/machine/spu/headers/acoshd2.h
  newlib/libm/machine/spu/headers/tgammad2.h
  newlib/libm/machine/spu/headers/tgammaf4.h
 Copyright: 2007,2008, International Business Machines Corporation
-License: BSD3-37
+License: BSD3-36
 
 Files: newlib/libm/machine/spu/headers/nearbyintf4.h
  newlib/libm/machine/spu/headers/rintf4.h
  newlib/libm/machine/spu/headers/scalbnf4.h
 Copyright: 2006,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-37
+License: BSD3-36
 
 Files: .clang-format
  .editorconfig
@@ -2925,12 +2912,6 @@ Files: .clang-format
  newlib/libc/stdio/swprint.c
  newlib/libc/stdlib/mul_overflow.h
  newlib/libc/string/wcstrings.tex
- newlib/libc/sys.tex
- newlib/libc/sys/amdgcn/include/sys/lock.h
- newlib/libc/sys/rtems/include/README
- newlib/libc/sys/xtensa/include/unistd.h
- newlib/libc/sys/xtensa/isatty.c
- newlib/libc/syscalls/sysgetentropy.c
  newlib/libc/time/strftime.c
  newlib/libc/time/tzset.c
  newlib/libc/xdr/README
@@ -3758,10 +3739,6 @@ Files: newlib/libc/machine/xtensa/xtensa-asm.h
 Copyright: 2006 Tensilica Inc.
 License: Other-3
 
-Files: newlib/libc/sys/xtensa/include/xtensa/config/core-isa.h
-Copyright: 1999-2023 Tensilica Inc.
-License: Other-3
-
 Files: test/libc-testsuite/basename.c
  test/libc-testsuite/dirname.c
  test/libc-testsuite/fnmatch.c
@@ -3939,10 +3916,6 @@ Files: newlib/libc/machine/nvptx/printf.c
  newlib/libc/machine/nvptx/putchar.c
  newlib/libc/machine/nvptx/puts.c
 Copyright: 2015-2018 Mentor Graphics.
-License: Other-8
-
-Files: newlib/libc/sys/amdgcn/lock.c
-Copyright: 2024 BayLibre.
 License: Other-8
 
 Files: newlib/libc/machine/cris/include/pthread.h
@@ -4235,15 +4208,11 @@ Files: newlib/libc/string/wcsnlen.c
 Copyright: 2003, Artem B. Bityuckiy (dedekind@mail.ru).
 License: Other-22
 
-Files: newlib/libc/sys/xtensa/crt0.c
-Copyright: 2003 Tensilica Inc.
-License: Other-23
-
 Files: newlib/libc/tinystdio/atod_ryu.c
  newlib/libc/tinystdio/atof_ryu.c
  newlib/libc/tinystdio/ryu/ryu_parse.h
 Copyright: 2019 Ulf Adams
-License: Other-24
+License: Other-23
 
 Files: newlib/libc/tinystdio/dtoa_ryu.c
  newlib/libc/tinystdio/ftoa_ryu.c
@@ -4259,12 +4228,12 @@ Files: newlib/libc/tinystdio/dtoa_ryu.c
  newlib/libc/tinystdio/ryu_table.c
  newlib/libc/tinystdio/ryu_umul128.c
 Copyright: 2018 Ulf Adams
-License: Other-24
+License: Other-23
 
 Files: newlib/libc/xdr/xdr_private.c
  newlib/libc/xdr/xdr_private.h
 Copyright: 2009 Charles S. Wilson
-License: Other-25
+License: Other-24
 
 Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/isgreater.c
@@ -4449,7 +4418,7 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/math/sr_lgamma.c
  newlib/libm/math/srf_lgamma.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-26
+License: Other-25
 
 Files: newlib/libm/common/s_remquo.c
  newlib/libm/common/sf_remquo.c
@@ -4462,28 +4431,28 @@ Files: newlib/libm/common/s_remquo.c
  newlib/libm/ld/ld80/e_fmodl.c
  newlib/libm/ld/ld80/s_remquol.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-27
+License: Other-26
 
 Files: newlib/libm/ld/common/s_cbrtl.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-28
+License: Other-27
 
 Files: newlib/libm/ld/ld128/e_rem_pio2l.h
  newlib/libm/ld/ld80/e_rem_pio2l.h
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-29
+License: Other-28
 
 Files: newlib/libm/ld/ld128/k_cosl.c
  newlib/libm/ld/ld128/k_sinl.c
  newlib/libm/ld/ld80/k_cosl.c
  newlib/libm/ld/ld80/k_sinl.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-30
+License: Other-29
 
 Files: newlib/libm/ld/ld128/k_tanl.c
  newlib/libm/ld/ld80/k_tanl.c
 Copyright: 2004 Sun Microsystems, Inc.
-License: Other-31
+License: Other-30
 
 Files: newlib/libm/machine/x86/f_llrint.c
  newlib/libm/machine/x86/f_llrintf.c
@@ -4495,7 +4464,7 @@ Files: newlib/libm/machine/x86/f_llrint.c
  newlib/libm/machine/x86/f_rintf.c
  newlib/libm/machine/x86/f_rintl.c
 Copyright: 2007 Dave Korn
-License: Other-32
+License: Other-31
 
 Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/machine/d30v/setjmp.S
@@ -4935,29 +4904,6 @@ License: BSD2-10
 
 License: BSD2-11
  Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions are met:
- .
- 1. Redistributions of source code must retain the above copyright
- notice, this list of conditions and the following disclaimer.
- .
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
- .
- THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS
- IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL TENSILICA
- INCORPORATED BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-License: BSD2-12
- Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
  1. Redistributions of source code must retain the above copyright
@@ -4978,7 +4924,7 @@ License: BSD2-12
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD2-13
+License: BSD2-12
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -5821,30 +5767,6 @@ License: BSD3-32
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
- 1. Redistributions of source code must retain the above copyright
- notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
- 3. The name of the author may not be used to endorse or promote products
- derived from this software without specific prior written permission.
- .
- THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
- ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
- FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
- OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
- HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
- LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
- OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- SUCH DAMAGE.
-
-License: BSD3-33
- Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
  .
  1. Redistributions of source code must retain the above copyright
  notice, this list of conditions and the following disclaimer.
@@ -5869,7 +5791,7 @@ License: BSD3-33
  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-34
+License: BSD3-33
  Rewritten in C by Soren Kuula
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -5894,7 +5816,7 @@ License: BSD3-34
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-35
+License: BSD3-34
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  Redistributions of source code must retain the above copyright
@@ -5917,7 +5839,7 @@ License: BSD3-35
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-36
+License: BSD3-35
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -5941,7 +5863,7 @@ License: BSD3-36
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-37
+License: BSD3-36
  Redistribution and use in source and binary forms, with or
  without modification, are permitted provided that the
  following conditions are met:
@@ -6252,10 +6174,6 @@ License: Other-22
  SUCH DAMAGE.
 
 License: Other-23
- These coded instructions, statements, and computer programs are the
- copyrighted works and confidential proprietary information of Tensilica Inc.
-
-License: Other-24
  The contents of this file may be used under the terms of the Apache License,
  Version 2.0.
  .
@@ -6271,7 +6189,7 @@ License: Other-24
  is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  KIND, either express or implied.
 
-License: Other-25
+License: Other-24
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
@@ -6290,19 +6208,19 @@ License: Other-25
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  OTHER DEALINGS IN THE SOFTWARE.
 
-License: Other-26
+License: Other-25
  Developed at SunPro, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-27
+License: Other-26
  Developed at SunSoft, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-28
+License: Other-27
  Copyright (c) 2009-2011, Bruce D. Evans, Steven G. Kargl, David Schultz.
  .
  Developed at SunPro, a Sun Microsystems, Inc. business.
@@ -6315,7 +6233,7 @@ License: Other-28
  written by Steven G. Kargl with input from Bruce D. Evans
  and David A. Schultz.
 
-License: Other-29
+License: Other-28
  Copyright (c) 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
  .
  Developed at SunSoft, a Sun Microsystems, Inc. business.
@@ -6326,7 +6244,7 @@ License: Other-29
  .
  Optimized by Bruce D. Evans.
 
-License: Other-30
+License: Other-29
  Copyright (c) 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
  .
  Developed at SunSoft, a Sun Microsystems, Inc. business.
@@ -6334,14 +6252,14 @@ License: Other-30
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-31
+License: Other-30
  Copyright (c) 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
  .
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-32
+License: Other-31
  x87 FP implementation contributed to Newlib by
  Dave Korn, November 2007.  This file is placed in the
  public domain.  Permission to use, copy, modify, and
