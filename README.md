@@ -146,7 +146,7 @@ use Picolibc:
 
 ## Releases
 
-### Picolibc release 1.8.next
+### Picolibc release 1.8.9
 
  * Use common clang/gcc feature detection macros on arm.
 
