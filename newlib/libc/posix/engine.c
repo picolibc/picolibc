@@ -133,11 +133,13 @@ static char *pchar(int ch);
  ==	size_t nmatch, regmatch_t pmatch[], int eflags);
  */
 static int			/* 0 success, REG_NOMATCH failure */
-matcher(struct re_guts *g,
-        char *string,
-        size_t nmatch,
-        regmatch_t pmatch[],
-        int eflags)
+matcher(
+	struct re_guts *g,
+	char *string,
+	size_t nmatch,
+	regmatch_t pmatch[],
+	int eflags
+)
 {
 	char *endp;
 	size_t i;
@@ -343,11 +345,13 @@ matcher(struct re_guts *g,
  ==	char *stop, sopno startst, sopno stopst);
  */
 static char *			/* == stop (success) always */
-dissect(struct match *m,
-        char *start,
-        char *stop,
-        sopno startst,
-        sopno stopst)
+dissect(
+	struct match *m,
+	char *start,
+	char *stop,
+	sopno startst,
+	sopno stopst
+)
 {
 	int i;
 	sopno ss;		/* start sop of current subRE */
@@ -533,12 +537,14 @@ dissect(struct match *m,
  ==	char *stop, sopno startst, sopno stopst, sopno lev);
  */
 static char *			/* == stop (success) or NULL (failure) */
-backref(struct match *m,
-        char *start,
-        char *stop,
-        sopno startst,
-        sopno stopst,
-        sopno lev)		/* PLUS nesting level */
+backref(
+	struct match *m,
+	char *start,
+	char *stop,
+	sopno startst,
+	sopno stopst,
+	sopno lev			/* PLUS nesting level */
+)
 {
 	int i;
 	sopno ss;		/* start sop of current subRE */
@@ -737,11 +743,13 @@ backref(struct match *m,
  ==	char *stop, sopno startst, sopno stopst);
  */
 static char *			/* where tentative match ended, or NULL */
-fast(struct match *m,
-     char *start,
-     char *stop,
-     sopno startst,
-     sopno stopst)
+fast(
+	struct match *m,
+	char *start,
+	char *stop,
+	sopno startst,
+	sopno stopst
+)
 {
 	states st = m->st;
 	states fresh = m->fresh;
@@ -827,11 +835,13 @@ fast(struct match *m,
  ==	char *stop, sopno startst, sopno stopst);
  */
 static char *			/* where it ended */
-slow(struct match *m,
-     char *start,
-     char *stop,
-     sopno startst,
-     sopno stopst)
+slow(
+	struct match *m,
+	char *start,
+	char *stop,
+	sopno startst,
+	sopno stopst
+)
 {
 	states st = m->st;
 	states empty = m->empty;
@@ -922,12 +932,14 @@ slow(struct match *m,
  == #define	NNONCHAR	(CODEMAX-CHAR_MAX)
  */
 static states
-step(struct re_guts *g,
-     sopno start,		/* start state within strip */
-     sopno stop,		/* state after stop state within strip */
-     states bef,		/* states reachable before */
-     int ch,			/* character or NONCHAR code */
-     states aft)		/* states already known reachable after */
+step(
+	struct re_guts *g,
+	sopno start,			/* start state within strip */
+	sopno stop,			/* state after stop state within strip */
+	states bef,			/* states reachable before */
+	int ch,				/* character or NONCHAR code */
+	states aft			/* states already known reachable after */
+)
 {
 	cset *cs;
 	sop s;
