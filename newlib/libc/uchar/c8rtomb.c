@@ -38,7 +38,7 @@
 size_t
 c8rtomb (char *s, char8_t c8, mbstate_t *ps)
 {
-    static NEWLIB_THREAD_LOCAL mbstate_t _state;
+    static mbstate_t _state;
     char32_t    c32;
     int count;
 

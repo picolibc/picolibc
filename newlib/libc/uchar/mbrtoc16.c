@@ -39,7 +39,7 @@ size_t
 mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n,
          _mbstate_t * __restrict ps)
 {
-    static NEWLIB_THREAD_LOCAL mbstate_t local_state;
+    static mbstate_t local_state;
 
     if (ps == NULL)
         ps = &local_state;

@@ -38,7 +38,7 @@
 size_t
 c32rtomb (char *s, char32_t c32, mbstate_t *ps)
 {
-    static NEWLIB_THREAD_LOCAL mbstate_t local_state;
+    static mbstate_t local_state;
 
     if (ps == NULL)
         ps = &local_state;
