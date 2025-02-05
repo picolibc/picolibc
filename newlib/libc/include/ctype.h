@@ -218,20 +218,12 @@ __declare_extern_inline(int) toupper_l (int c, locale_t l) { (void) l; return to
 
 #else  /* _PICOLIBC_CTYPE_SMALL */
 
-#ifndef __CHAR_UNSIGNED__
-#define _ALLOW_NEGATIVE_CTYPE_INDEX
-#endif
-
-#if defined(_ALLOW_NEGATIVE_CTYPE_INDEX)
-extern const char	_ctype_b[];
 #define _CTYPE_OFFSET   127
-#define _ctype_ (_ctype_b + _CTYPE_OFFSET)
-#else
-#define _CTYPE_OFFSET   0
-extern const char	_ctype_[];
-#endif
 
-extern const short _ctype_wide[];
+extern const char       _ctype_b[];
+extern const short      _ctype_wide[];
+
+#define _ctype_ (_ctype_b + _CTYPE_OFFSET)
 
 #ifndef __cplusplus
 
