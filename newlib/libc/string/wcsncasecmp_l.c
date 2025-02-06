@@ -46,7 +46,7 @@ QUICKREF
 
 int 
 wcsncasecmp_l (const wchar_t *s1, const wchar_t *s2, size_t n,
-	       struct __locale_t *locale)
+	       locale_t locale)
 {
   int d = 0;
   for ( ; n != 0; n--)

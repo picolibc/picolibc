@@ -23,12 +23,14 @@
  *    As described by items in quotes
  */
 
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wmemset-transposed-args"
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wstringop-overflow="
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
 #endif
 #pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
 
 
 const char *it = "<UNSET>";	/* Routine name for message routines. */

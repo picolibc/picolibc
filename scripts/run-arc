@@ -50,6 +50,7 @@ if command -v "$readelf" >/dev/null 2>/dev/null; then
     else
         archstring=$("$readelf" --arch-specific "$elf" | grep Tag_ARC_CPU_name | cut -d: -f2 | tr -d '" ')
     fi
+    isaconfig=$("$readelf" --arch-specific "$elf" | grep Tag_ARC_ISA_config | cut -d: -f2 | tr -d '" ')
 fi
 if [ -z "$archstring" ]; then
     echo "Could not determine architecture for $elf, is readelf installed?" >&2
@@ -65,6 +66,30 @@ case "$cpu" in
         ;;
     hs6x|fpud)
         qemu=qemu-system-arc64
+        ;;
+    arc700|arc600|nps400)
+        echo "unsupported cpu $cpu"
+        exit 77
+        ;;
+    arcem)
+        case "$isaconfig" in
+            *DPFP*|*SPFP*|*FPUS*|*FPUDA*)
+                echo "arcem with FPU is not complete"
+                exit 77
+                ;;
+        esac
+        qemu=qemu-system-arc
+        cpu=arcem
+        ;;
+    archs)
+        case "$isaconfig" in
+            *FPU*)
+                echo "archs with FPU is not complete"
+                exit 77
+                ;;
+        esac
+        qemu=qemu-system-arc
+        cpu=archs
         ;;
     *)
         qemu=qemu-system-arc

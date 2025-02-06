@@ -4,7 +4,7 @@ DIR=build-"$TARGET"
 CONFIGURE=do-"$TARGET"-configure
 shift
 
-for p in /opt/*/bin; do
+for p in /opt/*/bin /opt/*/models/*; do
     PATH="$p":$PATH
 done
 

@@ -45,7 +45,7 @@ static char sccsid[] = "from @(#)strtoul.c	8.1 (Berkeley) 6/4/93";
 #include <wchar.h>
 #include <wctype.h>
 #include <stdint.h>
-#include "../locale/setlocale.h"
+#include "local.h"
 
 /*
  * Convert a wide character string to a uintmax_t integer.

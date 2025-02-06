@@ -46,24 +46,62 @@ if file "$elf" | grep -q LSB; then
     qemu="qemu-system-mipsel"
 fi
 
-# Disable monitor
+cpu=24Kf
+
+# Map stdio to a multiplexed character device so we can use it
+# for the monitor and semihosting output
+
+chardev=stdio,mux=on,id=stdio0
+
+# Point the semihosting driver at our new chardev
+
+cmdline="program-name"
+input=""
+done=0
+
+while [ "$done" != "1" ]; do
+    case "$1" in
+        --)
+            shift
+            done=1
+            ;;
+        -s|"")
+            done=1
+            ;;
+        *)
+            cmdline="$cmdline $1"
+            case "$input" in
+                "")
+                    input="$1"
+                    ;;
+                *)
+                    input="$input $1"
+                    ;;
+            esac
+            shift
+            ;;
+    esac
+done
+
+semi=enable=on,chardev=stdio0,arg="$cmdline"
+
+# Point the monitor at the new chardev too
 
 mon=none
 
-# Point serial port at new chardev
+# Disable the serial port
 
-serial=stdio
+serial=none
 
-cpu=24Kf
-
-"$dir"/monitor-e9 $qemu \
-  -chardev stdio,id=con,mux=on \
+echo "$input" | $qemu \
+  -chardev $chardev \
+  -semihosting-config "$semi" \
   -machine malta \
   -cpu $cpu \
   -serial null \
   -serial null \
-  -serial chardev:con \
-  -mon chardev=con,mode=readline \
+  -serial "$serial" \
+  -monitor "$mon" \
   -net none \
   -nographic \
-  -kernel "$elf" "$@" < /dev/null
+  -kernel "$elf" "$@"

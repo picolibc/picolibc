@@ -41,6 +41,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+/*
+ * fall-through case statement annotations
+ */
+#if __cplusplus >= 201703L || __STDC_VERSION__ > 201710L
+/* Standard C++17/C23 attribute */
+#define __TEST_PICOLIBC_FALLTHROUGH [[fallthrough]]
+#elif __has_attribute(fallthrough)
+/* Non-standard but supported by at least gcc and clang */
+#define __TEST_PICOLIBC_FALLTHROUGH __attribute__((fallthrough))
+#else
+#define __TEST_PICOLIBC_FALLTHROUGH do { } while(0)
+#endif
+
 #ifdef _TEST_LONG_DOUBLE
 
 static long double max_error;
@@ -267,7 +280,6 @@ naive_strtold(const char *buf)
                 }
                 return -(long double)INFINITY;
             }
-            /* FALLTHROUGH */
             if (base == 10.0L) {
                 if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
                     state = LDOUBLE_EXP;
@@ -275,7 +287,7 @@ naive_strtold(const char *buf)
                 }
                 return -(long double)INFINITY;
             }
-            /* FALLTHROUGH */
+            __TEST_PICOLIBC_FALLTHROUGH;
         case 'A': case 'B': case 'C':
         case 'D': case 'F':
             if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
@@ -291,7 +303,7 @@ naive_strtold(const char *buf)
                 }
                 return -(long double)INFINITY;
             }
-            /* FALLTHROUGH */
+            __TEST_PICOLIBC_FALLTHROUGH;
         case 'a': case 'b': case 'c':
         case 'd': case 'f':
             if (state == LDOUBLE_INT || state == LDOUBLE_FRAC) {
@@ -454,12 +466,85 @@ test_io(void)
 }
 #endif
 
+union double_long
+{
+  double d;
+  struct {
+      long upper;
+      unsigned long lower;
+    } l;
+};
+
+union float_long {
+  float f;
+  long l;
+};
+
+#ifdef __MSP430__
+#define STEP_I  8
+#define STEP_J  4
+#else
+#define STEP_I  1
+#define STEP_J  1
+#endif
+
+static int
+test_conv(void)
+{
+    union double_long dl;
+    long double ld;
+    double d;
+    union float_long fl;
+    float f;
+    long i;
+    unsigned long j, k;
+    int ret = 0;
+
+    for (i = 0; i <= 0xffff; i += STEP_I) {
+        for (j = 0; j < 0xf; j += STEP_J) {
+            for (k = 0; k < 0x2; k++) {
+                dl.l.upper = i << 16;
+                dl.l.lower = (j << 28) | k;
+                ld = (long double) dl.d;
+                if (fabsl(ld) > 1) {
+                    ld /= 2;
+                    ld *= 2;
+                } else {
+                    ld *= 2;
+                    ld /= 2;
+                }
+                d = (double) ld;
+                if (isnan(d) && isnan(dl.d))
+                    ;
+                else if (d != dl.d) {
+                    printf("convert double %a -> %La -> %a\n", dl.d, ld, d);
+                    ret++;
+                }
+
+                fl.l = (i << 16) | k;
+                ld = (long double) fl.f;
+                f = (float) ld;
+                if (isnan(f) && isnan(fl.f))
+                    ;
+                else if (f != fl.f) {
+                    printf("convert float %a -> %La -> %a\n", (double) fl.f, ld, (double) f);
+                    ret++;
+                }
+            }
+        }
+    }
+    return ret;
+}
+
 int main(void)
 {
     int result = 0;
     unsigned int i;
 
-    printf("LDBL_MANT_DIG %d\n", LDBL_MANT_DIG);
+#ifdef __mcffpu__
+    printf("coldfile: qemu doesn't emulate coldfire FPU correctly, skipping\n");
+    return 77;
+#endif
 #ifdef __m68k__
     volatile long double zero = 0.0L;
     volatile long double one = 1.0L;
@@ -470,9 +555,13 @@ int main(void)
     }
 #endif
 #ifdef TEST_IO_LONG_DOUBLE
+    printf("test_io\n");
     result += test_io();
 #endif
+    printf("test_conv\n");
+    result += test_conv();
     for (i = 0; i < sizeof(long_double_tests) / sizeof(long_double_tests[0]); i++) {
+        printf("test %s\n", long_double_tests[i].name);
         result += long_double_tests[i].test();
     }
     return result != 0;

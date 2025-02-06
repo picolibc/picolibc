@@ -136,7 +136,7 @@ THIS SOFTWARE.
 #include <string.h>
 #include "mprec.h"
 #include "gdtoa.h"
-#include "../locale/setlocale.h"
+#include "local.h"
 
 /* #ifndef NO_FENV_H */
 /* #include <fenv.h> */
@@ -262,8 +262,8 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 #ifdef Honor_FLT_ROUNDS
 	int rounding;
 #endif
-#ifdef __HAVE_LOCALE_INFO__
-	const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
+#ifdef DECIMAL_POINT_L
+	const char *decimal_point = DECIMAL_POINT_L(loc);
 	const int dec_len = strlen (decimal_point);
 #else
 	const char *decimal_point = ".";
@@ -1283,9 +1283,11 @@ strtod (const char *__restrict s00,
 
 #if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wattribute-alias="
+#endif
 extern long double strtold(const char *, char **) __attribute__ ((__alias__ ("strtod")));
 #else
 long double

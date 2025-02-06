@@ -221,6 +221,11 @@ typedef __off_t off_t;
 #define	_OFF_T_DECLARED
 #endif
 
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
+
 #ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
 #define	_SSIZE_T_DECLARED
@@ -670,9 +675,9 @@ FILE *fopencookie ( void *__cookie,
   compilers we're just stuck.  At the moment, this issue only
   affects the Cygwin target, so we'll most likely be using GCC. */
 
-_ELIDABLE_INLINE int _sgetc( FILE *__p);
+__elidable_inline int _sgetc( FILE *__p);
 
-_ELIDABLE_INLINE int _sgetc( FILE *__p)
+__elidable_inline int _sgetc( FILE *__p)
   {
     int __c = _sgetc_raw( __p);
     if ((__p->_flags & __SCLE) && (__c == '\r'))
@@ -690,7 +695,7 @@ _ELIDABLE_INLINE int _sgetc( FILE *__p)
 #endif
 
 #ifdef __GNUC__
-_ELIDABLE_INLINE int _sputc( int _c, FILE *_p) {
+__elidable_inline int _sputc( int _c, FILE *_p) {
 #ifdef __SCLE
 	if ((_p->_flags & __SCLE) && _c == '\n')
 	  _sputc ( '\r', _p);

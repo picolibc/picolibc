@@ -72,11 +72,11 @@ No supporting OS subroutines are required.
 int
 isxdigit (int c)
 {
-#ifdef __HAVE_LOCALE_INFO__
-    return __CTYPE_PTR[c+1] & ((_X)|(_N));
-#else
+#if _PICOLIBC_CTYPE_SMALL
     return (isdigit(c) ||
             ('A' <= c && c <= 'F') ||
             ('a' <= c && c <= 'f'));
+#else
+    return __CTYPE_PTR[c+1] & ((_X)|(_N));
 #endif
 }

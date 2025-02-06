@@ -407,7 +407,7 @@ _SVFSCANF (
 #define _WANT_IO_POSIX_EXTENSIONS
 #endif
 #ifdef _WANT_IO_POSIX_EXTENSIONS
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
@@ -1090,7 +1090,8 @@ _SVFSCANF (
                     *wcp = L'\0';
                   if (mbslen != (size_t)-2) /* Incomplete sequence */
                     {
-                      if (!ccltab[__wctob (*wcp)])
+                      int wcb = __wctob(*wcp);
+                      if (wcb == EOF || !ccltab[wcb])
                         {
                           while (s != 0)
                             ungetc ( (unsigned char) buf[--s], fp);
@@ -1538,7 +1539,7 @@ _SVFSCANF (
 	  unsigned width_left = 0;
 	  char nancount = 0;
 	  char infcount = 0;
-	  const char *decpt = localeconv ()->decimal_point;
+	  const char *decpt = DECIMAL_POINT;
 #ifdef _MB_CAPABLE
 	  int decptpos = 0;
 #endif
@@ -1576,7 +1577,7 @@ _SVFSCANF (
 			}
 		      goto fskip;
 		    }
-		  /* Fall through.  */
+                  __PICOLIBC_FALLTHROUGH;
 		case '1':
 		case '2':
 		case '3':

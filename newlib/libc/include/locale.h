@@ -52,6 +52,7 @@ SUCH DAMAGE.
 #define LC_NUMERIC  4
 #define LC_TIME     5
 #define _LC_MESSAGES    6
+#define _LC_LAST        7
 
 _BEGIN_STD_C
 
@@ -86,7 +87,7 @@ struct lconv
 char *setlocale (int, const char *);
 struct lconv *localeconv (void);
 
-#if __POSIX_VISIBLE >= 200809
+#if __POSIX_VISIBLE >= 200809 || defined(_LIBC)
 
 #include <sys/_locale.h>
 
@@ -102,7 +103,7 @@ struct lconv *localeconv (void);
 #define LC_ALL_MASK	(LC_COLLATE_MASK | LC_CTYPE_MASK | LC_MONETARY_MASK \
 			 | LC_NUMERIC_MASK | LC_TIME_MASK | LC_MESSAGES_MASK)
 
-#define LC_GLOBAL_LOCALE	((struct __locale_t *) -1)
+#define LC_GLOBAL_LOCALE	((locale_t) -1)
 
 locale_t newlocale (int, const char *, locale_t);
 void freelocale (locale_t);
@@ -111,12 +112,8 @@ locale_t uselocale (locale_t);
 
 #endif
 
-#if __POSIX_VISIBLE >= 202405
-const char *getlocalename_l (int, struct __locale_t *);
-#endif
-
-#if __MISC_VISIBLE
-const char *getlocalename_l (int, struct __locale_t *);
+#if __POSIX_VISIBLE >= 202405 || __MISC_VISIBLE
+const char *getlocalename_l (int, locale_t);
 #endif
 
 _END_STD_C

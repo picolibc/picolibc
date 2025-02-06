@@ -391,9 +391,11 @@ main(void)
 				errors++;
 			}
 			if (y > 0 && strncmp(tbuf, "123", y - 1) != 0) {
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
 				strncpy(buf, "123", y - 1);
 				buf[y-1] = '\0';
 				printf("%s: returned buffer want %s got %s\n", name, buf, tbuf);
@@ -424,8 +426,10 @@ main(void)
 #ifdef BINARY_FORMAT
         printf("checking binary format\n");
 #define VERIFY_BINARY(prefix) VERIFY(prefix, "b")
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wformat"
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
+#endif
 #else
 #define VERIFY_BINARY(prefix)
 #endif

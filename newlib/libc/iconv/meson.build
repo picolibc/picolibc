@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,14 +32,23 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-libdirs = ['ces', 'ccs', 'lib']
 
-libsrcs = []
+srcs_iconv = [
+  'iconv.c',
+  'iconv_close.c',
+  'iconv_open.c',
+]
 
-foreach libdir : libdirs
-  subdir(libdir)
-  libsrcs += get_variable('src_iconv_' + libdir, [])
+srcs_iconv_use = []
+foreach file : srcs_iconv
+  s_file = fs.replace_suffix(file, '.S')
+  if file in srcs_machine
+    message('libc/iconv/' + file + ': machine overrides generic')
+  elif s_file in srcs_machine
+    message('libc/iconv/' + s_file + ': machine overrides generic')
+  else
+    srcs_iconv_use += file
+  endif
 endforeach
 
-src_iconv = libsrcs
-
+src_iconv = files(srcs_iconv_use)

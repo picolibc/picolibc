@@ -68,6 +68,7 @@ struct __file_str {
         char	*pos;		/* current buffer position */
         char    *end;           /* end of buffer */
         size_t  size;           /* size of allocated storage */
+        bool    alloc;          /* current storage was allocated */
 };
 
 int
@@ -125,14 +126,26 @@ bool __matchcaseprefix(const char *input, const char *pattern);
                 .end = (_s) + (_size),          \
 	}
 
-#define FDEV_SETUP_STRING_ALLOC() {		\
+#define FDEV_SETUP_STRING_ALLOC() {  \
 		.file = {			\
 			.flags = __SWR,		\
 			.put = __file_str_put_alloc	\
 		},				\
 		.pos = NULL,			\
-		.end = NULL,			\
+                .end = NULL,                    \
                 .size = 0,                      \
+                .alloc = false,                 \
+	}
+
+#define FDEV_SETUP_STRING_ALLOC_BUF(_buf, _size) {  \
+		.file = {			\
+			.flags = __SWR,		\
+			.put = __file_str_put_alloc	\
+		},				\
+		.pos = _buf,			\
+                .end = (char *) (_buf) + (_size), \
+                .size = _size,                  \
+                .alloc = false,                 \
 	}
 
 #define _FDEV_BUFIO_FD(bf) ((int)((intptr_t) (bf)->ptr))

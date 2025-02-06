@@ -139,7 +139,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <wctype.h>
 #include <locale.h>
 #include <math.h>
-#include "../locale/setlocale.h"
+#include "local.h"
 
 #ifndef _REENT_ONLY
 
@@ -190,7 +190,7 @@ wcstod_l (const wchar_t *nptr, wchar_t **endptr,
          * corresponding position in the wide char string.
          */
         if (endptr != NULL) {
-		const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
+		const char *decimal_point = DECIMAL_POINT_L(loc);
 		/* The only valid multibyte char in a float converted by
 		   strtod/wcstod is the radix char.  What we do here is,
 		   figure out if the radix char was in the valid leading
@@ -262,7 +262,7 @@ wcstof_l (const wchar_t *nptr, wchar_t **endptr,
          * corresponding position in the wide char string.
          */
         if (endptr != NULL) {
-		const char *decimal_point = __get_numeric_locale(loc)->decimal_point;
+		const char *decimal_point = DECIMAL_POINT_L(loc);
 		/* The only valid multibyte char in a float converted by
 		   strtod/wcstod is the radix char.  What we do here is,
 		   figure out if the radix char was in the valid leading

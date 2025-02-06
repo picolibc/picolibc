@@ -120,9 +120,7 @@ SEEALSO
 #include "local.h"
 #include "fvwrite.h"
 #include "vfieeefp.h"
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
-#include "../locale/setlocale.h"
-#endif
+#include "locale_private.h"
 
 int VFWPRINTF (FILE *, const wchar_t *, va_list);
 
@@ -380,7 +378,7 @@ VFWPRINTF (
 	wchar_t thousands_sep = L'\0';
 	const char *grouping = NULL;
 #endif
-#if defined (_MB_CAPABLE) && !defined (__HAVE_LOCALE_INFO_EXTENDED__) \
+#if defined (_MB_CAPABLE) && !defined (WDECIMAL_POINT) \
     && (defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS))
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
@@ -432,22 +430,22 @@ VFWPRINTF (
 
 #ifdef FLOATING_POINT
 #ifdef _MB_CAPABLE
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
-	decimal_point = *__get_current_numeric_locale ()->wdecimal_point;
+#ifdef WDECIMAL_POINT
+	decimal_point = *WDECIMAL_POINT;
 #else
 	{
 	  size_t nconv;
 
 	  memset (&state, '\0', sizeof (state));
 	  nconv = mbrtowc (&decimal_point,
-			      localeconv ()->decimal_point,
+			      DECIMAL_POINT,
 			      MB_CUR_MAX, &state);
 	  if (nconv == (size_t) -1 || nconv == (size_t) -2)
 	    decimal_point = L'.';
 	}
 #endif
 #else
-	decimal_point = (wchar_t) *localeconv ()->decimal_point;
+	decimal_point = (wchar_t) *DECIMAL_POINT;
 #endif
 #endif
 	/*
@@ -652,24 +650,24 @@ reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
 		case L'\'':
 #ifdef _MB_CAPABLE
-#ifdef __HAVE_LOCALE_INFO_EXTENDED__
-		  thousands_sep = *__get_current_numeric_locale ()->wthousands_sep;
+#ifdef WTHOUSANDS_SEP
+                  thousands_sep = *WTHOUSANDS_SEP;
 #else
 		  {
 		    size_t nconv;
 
 		    memset (&state, '\0', sizeof (state));
 		    nconv = mbrtowc (&thousands_sep,
-					localeconv ()->thousands_sep,
+					THOUSANDS_SEP,
 					MB_CUR_MAX, &state);
 		    if (nconv == (size_t) -1 || nconv == (size_t) -2)
 		      thousands_sep = L'\0';
 		  }
 #endif
 #else
-		  thousands_sep = (wchar_t) *localeconv ()->thousands_sep;
+		  thousands_sep = (wchar_t) *THOUSANDS_SEP;
 #endif
-		  grouping = localeconv ()->grouping;
+		  grouping = NUMERIC_GROUPING;
 		  if (thousands_sep && grouping && *grouping)
 		    flags |= GROUPING;
 		  goto rflag;

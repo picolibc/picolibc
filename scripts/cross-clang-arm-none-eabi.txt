@@ -1,0 +1,46 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['clang', '--target=arm-none-eabi', '-nostdlib']
+cpp = ['clang', '--target=arm-none-eabi', '-nostdlib']
+ar = 'llvm-ar'
+nm = 'llvm-nm'
+strip = 'llvm-strip'
+# only needed to run tests
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-arm "$@"', 'run-arm']
+
+[host_machine]
+system = 'none'
+cpu_family = 'arm'
+cpu = 'arm'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
+libgcc='-lclang_rt.builtins'
+default_flash_addr = '0x00000000'
+default_flash_size = '0x00400000'
+default_ram_addr   = '0x20000000'
+default_ram_size   = '0x00200000'
+
+custom_mem_config_arm_none_eabi_armv8m_main = 'mps2_an505'
+
+custom_mem_config_arm_none_eabi_armv8_1m_main = 'mps3_an547'
+
+separate_boot_flash_mps2_an505 = true
+default_boot_flash_addr_mps2_an505 = '0x10000000'
+default_boot_flash_size_mps2_an505 = '0x10000400'
+default_flash_addr_mps2_an505 = '0x10000400'
+default_flash_size_mps2_an505 = '0x103ffc00'
+default_ram_addr_mps2_an505 = '0x80000000'
+default_ram_size_mps2_an505 = '0x01000000'
+
+separate_boot_flash_mps3_an547 = true
+default_boot_flash_addr_mps3_an547 = '0x00000000'
+default_boot_flash_size_mps3_an547 = '0x00080000'
+default_flash_addr_mps3_an547 = '0x01000000'
+default_flash_size_mps3_an547 = '0x00200000'
+default_ram_addr_mps3_an547 = '0x60000000'
+default_ram_size_mps3_an547 = '0x01000000'

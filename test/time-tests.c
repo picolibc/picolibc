@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-
+#include <string.h>
 
 #define TIME_TM_YEAR_BASE 1900
 
@@ -45,34 +45,37 @@
 static void
 init_struct_tm ( struct tm * stm )
 {
-  if ( sizeof( struct tm ) != 9 * sizeof( int ) )
-  {
-    puts("Error: struct tm has changed, so these tests probably need adjusting.");
-    exit(1);
-  }
-
-  stm->tm_sec   = 0;
-  stm->tm_min   = 0;
-  stm->tm_hour  = 0;
-  stm->tm_mday  = 0;
-  stm->tm_mon   = 0;
-  stm->tm_year  = 0;
-  stm->tm_wday  = 0;
-  stm->tm_yday  = 0;
-  stm->tm_isdst = 0;
+  memset(stm, 0, sizeof *stm);
 }
 
+static int
+test_strftime(int line, const struct tm *tm, const char *fmt, const char *expect)
+{
+  char  strbuf[128];
+  size_t len;
+  size_t expect_len = strlen(expect);
+
+  len = strftime(strbuf, sizeof(strbuf), fmt, tm);
+  if (strcmp(strbuf, expect) != 0 || len != strlen(expect)) {
+    printf("%s:%d: strftime(%s) = '%s'(%zd) expect '%s'(%zd)\n",
+           __FILE__, line,
+           fmt, strbuf, len, expect, expect_len);
+    return 0;
+  }
+  return 1;
+}
 
 int
 main(void)
 {
+  int ret = 0;
   // Time zone ART3 is America/Buenos_Aires.
   // There is no daylight saving time (aka sommer time).
 
   if ( 0 != setenv( "TZ", "ART3", 1 ) )
   {
     puts("Error calling setenv().");
-    exit(1);
+    return 1;
   }
 
   tzset();
@@ -96,8 +99,11 @@ main(void)
        dtForTimegm1.tm_wday != 2 )  // 2 means Tuesday.
   {
     puts("Test t1 failed.");
-    exit(1);
+    ret = 1;
   }
+
+  if (!test_strftime(__LINE__, &dtForTimegm1, "%a %b %d %Y %H:%M:%S", "Tue Feb 03 1970 00:00:00"))
+    ret = 1;
 
   // mktime() is affected by the time zone. Check that the offset is the expected one.
 
@@ -107,9 +113,11 @@ main(void)
        dtForMktime2.tm_wday != 2 )
   {
     puts("Test t2 failed.");
-    exit(1);
+    ret = 1;
   }
 
+  if (!test_strftime(__LINE__, &dtForMktime2, "%A %B %d %Y %H:%M:%S", "Tuesday February 03 1970 00:00:00"))
+    ret = 1;
 
   // The European Central Time goes the other direction (negative)
   // and has a daylight saving time (aka sommer time).
@@ -117,7 +125,7 @@ main(void)
   if ( 0 != setenv( "TZ", "CET-1CEST,M3.5.0,M10.5.0/3", 1 ) )
   {
     puts("Error calling setenv().");
-    exit(1);
+    ret = 1;
   }
 
   tzset();
@@ -141,8 +149,11 @@ main(void)
        dtForTimegm3.tm_isdst != 0  )  // timegm() should reset the daylight saving time flag.
   {
     puts("Test t3 failed.");
-    exit(1);
+    ret = 1;
   }
+
+  if (!test_strftime(__LINE__, &dtForTimegm3, "%U %u %Y %H:%M:%S", "17 6 2021 00:00:00"))
+    ret = 1;
 
   time_t t4 = mktime( &dtForMktime4 );
 
@@ -152,9 +163,11 @@ main(void)
        dtForMktime4.tm_isdst != 1  )  // mktime() should leave the daylight saving time flag set.
   {
     puts("Test t4 failed.");
-    exit(1);
+    ret = 1;
   }
 
+  if (!test_strftime(__LINE__, &dtForMktime4, "%V %u %a %b %d %Y %H:%M:%S", "17 6 Sat May 01 2021 00:00:00"))
+    ret = 1;
 
   // Test the first non-negative time_t value of 0,
   // which is the "UNIX Epoch time" of 1st Januar 1970 00:00:00.
@@ -174,9 +187,11 @@ main(void)
        dtForTimegm5.tm_isdst != 0  )
   {
     puts("Test t5 failed.");
-    exit(1);
+    ret = 1;
   }
 
+  if (!test_strftime(__LINE__, &dtForTimegm5, "%W %w %a %b %d %Y %H:%M:%S", "00 4 Thu Jan 01 1970 00:00:00"))
+    ret = 1;
 
   // Test the last time_t value of 0x7FFFFFFF before the 32-bit signed integer overflow,
   // aka "year 2038 problem". That corresponds to 2038-01-19 03:14:07.
@@ -202,46 +217,55 @@ main(void)
        dtForTimegm6.tm_isdst != 0   )
   {
     puts("Test t6 failed.");
-    exit(1);
+    ret = 1;
   }
 
+  if (!test_strftime(__LINE__, &dtForTimegm6, "%a %b %d %Y %R", "Tue Jan 19 2038 03:14"))
+    ret = 1;
 
-  // Test the next time_t value of 0x80000000 right after
-  // the 32-bit signed integer overflow, aka "year 2038 problem".
-
-  dtForTimegm7.tm_sec++;
-
-  time_t t7 = timegm( &dtForTimegm7 );
-
-  if ( t7 != 0x80000000            ||
-       dtForTimegm7.tm_wday  != 2  ||  // 2 means Tuesday.
-       dtForTimegm7.tm_yday  != 18 ||
-       dtForTimegm7.tm_isdst != 0   )
+  if (sizeof (time_t) > 4)
   {
-    puts("Test t7 failed.");
-    exit(1);
+    // Test the next time_t value of 0x80000000 right after
+    // the 32-bit signed integer overflow, aka "year 2038 problem".
+
+    dtForTimegm7.tm_sec++;
+
+    time_t t7 = timegm( &dtForTimegm7 );
+
+    if ( (unsigned long) t7 != 0x80000000UL          ||
+         dtForTimegm7.tm_wday  != 2  ||  // 2 means Tuesday.
+         dtForTimegm7.tm_yday  != 18 ||
+         dtForTimegm7.tm_isdst != 0   )
+    {
+      puts("Test t7 failed.");
+      ret = 1;
+    }
+
+    if (!test_strftime(__LINE__, &dtForTimegm7, "%a %b %d %Y %I:%M:%S %p", "Tue Jan 19 2038 03:14:08 AM"))
+      ret = 1;
+
+    // Test the 29th of February in a leap year far in the future.
+
+    struct tm dtForTimegm8;
+    init_struct_tm( &dtForTimegm8 );
+
+    dtForTimegm8.tm_mon   = 1;  // February.
+    dtForTimegm8.tm_mday  = 29;
+    dtForTimegm8.tm_year  = 2104 - TIME_TM_YEAR_BASE;
+
+    time_t t8 = timegm( &dtForTimegm8 );
+
+    if ( (unsigned long) t8 != 4233686400UL           ||  // That is much higher than INT32_MAX.
+         dtForTimegm8.tm_wday != 5  ||  // 5 means Friday.
+         dtForTimegm8.tm_yday != 59  )
+    {
+      puts("Test t8 failed.");
+      ret = 1;
+    }
+
+    if (!test_strftime(__LINE__, &dtForTimegm8, "%a %b %d %Y %H:%M:%S", "Fri Feb 29 2104 00:00:00"))
+      ret = 1;
   }
 
-
-  // Test the 29th of February in a leap year far in the future.
-
-  struct tm dtForTimegm8;
-  init_struct_tm( &dtForTimegm8 );
-
-  dtForTimegm8.tm_mon   = 1;  // February.
-  dtForTimegm8.tm_mday  = 29;
-  dtForTimegm8.tm_year  = 2104 - TIME_TM_YEAR_BASE;
-
-  time_t t8 = timegm( &dtForTimegm8 );
-
-  if ( t8 != 4233686400           ||  // That is much higher than INT32_MAX.
-       dtForTimegm8.tm_wday != 5  ||  // 5 means Friday.
-       dtForTimegm8.tm_yday != 59  )
-  {
-    puts("Test t8 failed.");
-    exit(1);
-  }
-
-
-  return 0;
+  return ret;
 }

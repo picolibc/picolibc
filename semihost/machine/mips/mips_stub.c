@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,51 +34,12 @@
  */
 
 #define _GNU_SOURCE
-#include "mips-semihost.h"
-
-ssize_t
-read(int fd, void *buf, size_t count)
-{
-        (void) fd;
-        (void) buf;
-        (void) count;
-	return 0;
-}
-
-ssize_t
-write(int fd, const void *buf, size_t count)
-{
-	const char *b = buf;
-	size_t c = count;
-
-        (void) fd;
-	while (c--)
-                mips_putc(*b++, NULL);
-	return count;
-}
-
-int
-open(const char *pathname, int flags, ...)
-{
-        (void) pathname;
-        (void) flags;
-	return -1;
-}
-
-int
-close(int fd)
-{
-        (void) fd;
-	return 0;
-}
-
-off_t lseek(int fd, off_t offset, int whence)
-{
-        (void) fd;
-        (void) offset;
-        (void) whence;
-	return (off_t) -1;
-}
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <string.h>
+#include <errno.h>
 
 _off64_t lseek64(int fd, _off64_t offset, int whence)
 {
@@ -86,18 +47,19 @@ _off64_t lseek64(int fd, _off64_t offset, int whence)
 }
 
 int
-unlink(const char *pathname)
+stat(const char *pathname, struct stat *restrict statbuf)
 {
-        (void) pathname;
-	return 0;
-}
+    int fd, ret;
 
-int
-fstat (int fd, struct stat *sbuf)
-{
-        (void) fd;
-        (void) sbuf;
-	return -1;
+    fd = open(pathname, O_RDONLY);
+
+    if (fd < 0)
+    	return fd;
+
+    ret = fstat(fd, statbuf);
+    close(fd);
+
+    return ret;
 }
 
 int

@@ -18,6 +18,7 @@ int _isjis (int c);
 
 #define _issjis1(c)    (((c) >= 0x81 && (c) <= 0x9f) || ((c) >= 0xe0 && (c) <= 0xef))
 #define _issjis2(c)    (((c) >= 0x40 && (c) <= 0x7e) || ((c) >= 0x80 && (c) <= 0xfc))
+#define _issjis1b(c)   (((c) <= 0x7f) || ((c) >= 0xa1 && (c) <= 0xdf))
 #define _iseucjp1(c)   ((c) == 0x8e || (c) == 0x8f || ((c) >= 0xa1 && (c) <= 0xfe))
 #define _iseucjp2(c)   ((c) >= 0xa1 && (c) <= 0xfe)
 #define _isjis(c)      ((c) >= 0x21 && (c) <= 0x7e)

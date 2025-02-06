@@ -33,9 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['argz', 'ctype', 'errno', 'iconv', 'misc',
-	   'posix', 'search', 'signal', 'ssp', 'stdlib',
-	   'string', 'time', 'xdr', 'locale']
+libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
+           'misc', 'posix', 'search', 'signal', 'ssp',
+           'stdlib', 'string', 'time', 'xdr', 'uchar']
 
 if enable_picolib
   libdirs += 'picolib'
@@ -44,7 +44,7 @@ endif
 if tinystdio
   libdirs += 'tinystdio'
 else
-  libdirs += ['stdio', 'reent']
+  libdirs += ['stdio']
   if newlib_stdio64
     libdirs += 'stdio64'
   endif
@@ -58,13 +58,6 @@ srcs_machine = []
 
 machine_dir = 'machine' / host_cpu_family
 if fs.is_dir(machine_dir)
-
-  machine_inc_dir = machine_dir / 'include'
-  if fs.is_dir(machine_inc_dir)
-    inc = [include_directories(machine_inc_dir), inc]
-  endif
-
-  inc = [include_directories(machine_dir), inc]
 
   libdirs = [machine_dir] + libdirs
   libnames = ['machine'] + libnames
@@ -83,8 +76,11 @@ endforeach
 
 subdir('include')
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
   libobjs = []
   libsrcs_target = []
 
@@ -97,17 +93,11 @@ foreach target : targets
 
   set_variable('src_cpart_' + target, libsrcs_target)
 
-  if target == ''
-    libcpart_name = 'cpart'
-  else
-    libcpart_name = 'cpart' + '_' + target
-  endif
-
-  local_lib_cpart_target = static_library(libcpart_name,
+  local_lib_cpart_target = static_library('cpart' + target,
 				          pic: false,
 				          objects : libobjs,
 					  include_directories: inc,
-					  c_args: value[1] + c_args)
+					  c_args: target_c_args + c_args)
 
   set_variable('lib_cpart' + target, local_lib_cpart_target)
 endforeach

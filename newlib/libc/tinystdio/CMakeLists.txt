@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_sources(
+  asnprintf.c
   asprintf.c
   atold_engine.c
   bufio.c
@@ -142,6 +143,7 @@ picolibc_sources(
   tmpnam.c
   ungetc.c
   ungetwc.c
+  vasnprintf.c
   vasprintf.c
   vffprintf.c
   vffscanf.c
@@ -167,6 +169,8 @@ picolibc_sources(
   wprintf.c
   wscanf.c
   sprintf_s.c
+  vfprintf_s.c
+  vsnprintf_s.c
   )
 
 picolibc_sources(

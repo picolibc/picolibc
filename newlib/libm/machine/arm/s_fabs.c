@@ -34,7 +34,7 @@
  */
 
 
-#if (__ARM_FP & 0x8) && !defined(__SOFTFP__)
+#if (__ARM_FP & 0x8) 
 #include "fdlibm.h"
 
 double

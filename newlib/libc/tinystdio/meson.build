@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_tinystdio = [
+  'asnprintf.c',
   'asprintf.c',
   'atomic_load.c',
   'atold_engine.c',
@@ -145,6 +146,7 @@ srcs_tinystdio = [
   'tmpnam.c',
   'ungetc.c',
   'ungetwc.c',
+  'vasnprintf.c',
   'vasprintf.c',
   'vffprintf.c',
   'vffscanf.c',
@@ -170,6 +172,8 @@ srcs_tinystdio = [
   'wprintf.c',
   'wscanf.c',
   'sprintf_s.c',
+  'vfprintf_s.c',
+  'vsnprintf_s.c',
 ]
 
 # exact float/string conversion code

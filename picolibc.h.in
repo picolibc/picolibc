@@ -156,208 +156,6 @@
 
 #cmakedefine _HAVE_WEAK_ATTRIBUTE
 
-#cmakedefine _ICONV_ENABLE_EXTERNAL_CCS
-
-#cmakedefine _ICONV_FROM_ENCODING_BIG5
-
-#cmakedefine _ICONV_FROM_ENCODING_CP775
-
-#cmakedefine _ICONV_FROM_ENCODING_CP850
-
-#cmakedefine _ICONV_FROM_ENCODING_CP852
-
-#cmakedefine _ICONV_FROM_ENCODING_CP855
-
-#cmakedefine _ICONV_FROM_ENCODING_CP866
-
-#cmakedefine _ICONV_FROM_ENCODING_EUC_JP
-
-#cmakedefine _ICONV_FROM_ENCODING_EUC_KR
-
-#cmakedefine _ICONV_FROM_ENCODING_EUC_TW
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_1
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_10
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_11
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_13
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_14
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_15
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_2
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_3
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_4
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_5
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_6
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_7
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_8
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_8859_9
-
-#cmakedefine _ICONV_FROM_ENCODING_ISO_IR_111
-
-#cmakedefine _ICONV_FROM_ENCODING_KOI8_R
-
-#cmakedefine _ICONV_FROM_ENCODING_KOI8_RU
-
-#cmakedefine _ICONV_FROM_ENCODING_KOI8_U
-
-#cmakedefine _ICONV_FROM_ENCODING_KOI8_UNI
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_2
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_2BE
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_2LE
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_2_INTERNAL
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_4
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_4BE
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_4LE
-
-#cmakedefine _ICONV_FROM_ENCODING_UCS_4_INTERNAL
-
-#cmakedefine _ICONV_FROM_ENCODING_US_ASCII
-
-#cmakedefine _ICONV_FROM_ENCODING_UTF_16
-
-#cmakedefine _ICONV_FROM_ENCODING_UTF_16BE
-
-#cmakedefine _ICONV_FROM_ENCODING_UTF_16LE
-
-#cmakedefine _ICONV_FROM_ENCODING_UTF_8
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1250
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1251
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1252
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1253
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1254
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1255
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1256
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1257
-
-#cmakedefine _ICONV_FROM_ENCODING_WIN_1258
-
-#cmakedefine _ICONV_TO_ENCODING_BIG5
-
-#cmakedefine _ICONV_TO_ENCODING_CP775
-
-#cmakedefine _ICONV_TO_ENCODING_CP850
-
-#cmakedefine _ICONV_TO_ENCODING_CP852
-
-#cmakedefine _ICONV_TO_ENCODING_CP855
-
-#cmakedefine _ICONV_TO_ENCODING_CP866
-
-#cmakedefine _ICONV_TO_ENCODING_EUC_JP
-
-#cmakedefine _ICONV_TO_ENCODING_EUC_KR
-
-#cmakedefine _ICONV_TO_ENCODING_EUC_TW
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_1
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_10
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_11
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_13
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_14
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_15
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_2
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_3
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_4
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_5
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_6
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_7
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_8
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_8859_9
-
-#cmakedefine _ICONV_TO_ENCODING_ISO_IR_111
-
-#cmakedefine _ICONV_TO_ENCODING_KOI8_R
-
-#cmakedefine _ICONV_TO_ENCODING_KOI8_RU
-
-#cmakedefine _ICONV_TO_ENCODING_KOI8_U
-
-#cmakedefine _ICONV_TO_ENCODING_KOI8_UNI
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_2
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_2BE
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_2LE
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_2_INTERNAL
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_4
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_4BE
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_4LE
-
-#cmakedefine _ICONV_TO_ENCODING_UCS_4_INTERNAL
-
-#cmakedefine _ICONV_TO_ENCODING_US_ASCII
-
-#cmakedefine _ICONV_TO_ENCODING_UTF_16
-
-#cmakedefine _ICONV_TO_ENCODING_UTF_16BE
-
-#cmakedefine _ICONV_TO_ENCODING_UTF_16LE
-
-#cmakedefine _ICONV_TO_ENCODING_UTF_8
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1250
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1251
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1252
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1253
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1254
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1255
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1256
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1257
-
-#cmakedefine _ICONV_TO_ENCODING_WIN_1258
-
 /* math library does not set errno (offering only ieee semantics) */
 #cmakedefine _IEEE_LIBM
 
@@ -374,6 +172,16 @@
 #cmakedefine _LITE_EXIT
 
 #cmakedefine _MB_CAPABLE
+
+#cmakedefine _MB_EXTENDED_CHARSETS_ALL
+
+#cmakedefine _MB_EXTENDED_CHARSETS_UCS
+
+#cmakedefine _MB_EXTENDED_CHARSETS_ISO
+
+#cmakedefine _MB_EXTENDED_CHARSETS_WINDOWS
+
+#cmakedefine _MB_EXTENDED_CHARSETS_JIS
 
 #cmakedefine _NANO_FORMATTED_IO
 
@@ -433,12 +241,6 @@
 
 /* chatty assert */
 #cmakedefine _ASSERT_VERBOSE
-
-/* extended locale support */
-#cmakedefine __HAVE_LOCALE_INFO_EXTENDED__
-
-/* locale support */
-#cmakedefine __HAVE_LOCALE_INFO__
 
 /* elix level */
 #cmakedefine _ELIX_LEVEL @_ELIX_LEVEL@

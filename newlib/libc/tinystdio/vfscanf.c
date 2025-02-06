@@ -35,6 +35,7 @@
 #include "stdio_private.h"
 #include <wctype.h>
 #include "scanf_private.h"
+#include "../stdlib/local.h"
 
 /*
  * Compute which features are required
@@ -146,7 +147,7 @@ getmb(FILE *stream, scanf_context_t *context, mbstate_t *ps, uint16_t flags)
         wchar_t     ch;
         char        mb[MB_LEN_MAX];
         size_t      n = 0;
-        size_t      s;
+        int         s;
         mbstate_t   save;
 
         while (n < MB_LEN_MAX) {
@@ -155,11 +156,11 @@ getmb(FILE *stream, scanf_context_t *context, mbstate_t *ps, uint16_t flags)
                 return WEOF;
             mb[n++] = (char) i;
             save = *ps;
-            s = mbrtowc(&ch, mb, n, ps);
+            s = __MBTOWC(&ch, mb, n, ps);
             switch (s) {
-            case (size_t) -1:
+            case -1:
                 return WEOF;
-            case (size_t) -2:
+            case -2:
                 *ps = save;
                 break;
             default:
@@ -186,9 +187,9 @@ _putmb(void *addr, wint_t wi, mbstate_t *ps, uint16_t flags)
         *(wchar_t *) addr = (wchar_t) wi;
         addr = (wchar_t *) addr + 1;
     } else {
-        size_t  s;
-        s = wcrtomb((char *) addr, (wchar_t) wi, ps);
-        if (s == (size_t) -1)
+        int  s;
+        s = __WCTOMB((char *) addr, (wchar_t) wi, ps);
+        if (s == -1)
             return NULL;
         addr = (char *) addr + s;
     }

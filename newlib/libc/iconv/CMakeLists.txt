@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,7 +32,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-add_subdirectory(ces)
-add_subdirectory(ccs)
-add_subdirectory(lib)
+picolibc_sources(
+  iconv.c
+  iconv_close.c
+  iconv_open.c
+  )

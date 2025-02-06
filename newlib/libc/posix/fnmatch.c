@@ -40,10 +40,7 @@
 #include <fnmatch.h>
 #include <string.h>
 #include <stdio.h>
-
-#ifdef __HAVE_LOCALE_INFO__
 #include "collate.h"
-#endif
 
 #define	EOS	'\0'
 
@@ -157,7 +154,12 @@ fnmatch(const char *pattern, const char *string, int flags)
 }
 
 static int
-rangematch(const char *pattern, char test, int flags, char **newp)
+rangematch(
+	const char *pattern,
+	char test,
+	int flags,
+	char **newp
+)
 {
 	int negate, ok;
 	char c, c2;
@@ -206,7 +208,7 @@ rangematch(const char *pattern, char test, int flags, char **newp)
 				c2 = tolower((unsigned char)c2);
 
 			if (
-#ifdef __HAVE_LOCALE_INFO__
+#ifdef _HAVE_REAL_STRCOLL
                             __collate_range_cmp(c, test) <= 0
 			    && __collate_range_cmp(test, c2) <= 0
 #else

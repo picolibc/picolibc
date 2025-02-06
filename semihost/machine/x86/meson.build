@@ -47,23 +47,22 @@ has_semihost = true
 
 objcopy = find_program('objcopy', required: false)
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
-  instdir = join_paths(lib_dir, value[0])
+  instdir = join_paths(lib_dir, target_dir)
 
-  if target == ''
-    libsemihost_name = 'semihost'
-  else
-    libsemihost_name = join_paths(target, 'libsemihost')
-  endif
+  libsemihost_name = 'semihost'
 
-  local_lib_semihost_target = static_library(libsemihost_name,
+  local_lib_semihost_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
 				       lib_semihost_srcs,
 				       install : true,
 				       install_dir : instdir,
 				       include_directories : inc,
-				       c_args : value[1] + c_args,
+				       c_args : target_c_args + c_args,
 				       pic: false)
 
   set_variable('lib_semihost' + target, local_lib_semihost_target)
@@ -76,11 +75,17 @@ if objcopy.found()
   # (0x100000)
 
   bios_ld = '@0@/@1@'.format(meson.current_source_dir(), 'bios.ld')
+  link_args = ['-nostdlib', '-m32', '-Wl,--build-id=none', '-T', bios_ld]
+  # x86_64 compiler needs a elf32-i386 target set if using -m32.
+  if compiler_id == 'gcc' and target_machine.cpu_family() == 'x86_64'
+    link_args = ['-Wl,-b,elf32-i386', '-Wl,-melf_i386'] + link_args
+  endif
+
   bios = executable('bios', 'bios.S',
 		    c_args: ['-m32'] + c_args,
                     include_directories: inc,
                     link_depends: [bios_ld],
-		    link_args: ['-nostdlib', '-m32', '-Wl,--build-id=none', '-T', bios_ld])
+		    link_args: link_args)
 
   bios_bin = custom_target('bios.bin',
 		           build_by_default: true,

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,15 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "mips-semihost.h"
+#include "mips_semihost.h"
+#include <sys/cdefs.h>
+#include <unistd.h>
 
 _Noreturn void
 _exit(int code)
 {
-        char buf[15];
-        int n;
-        /* Can't use printf because stdout has already been cleaned up */
-        n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
-        write(1, buf, n);
-	while(1);
+    mips_semihost1(SYS_SEMIHOST_exit, code);
+    __unreachable();
 }

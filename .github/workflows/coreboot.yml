@@ -1,0 +1,177 @@
+name: Coreboot
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+# When a PR is updated, cancel the jobs from the previous version. Merges
+# do not define head_ref, so use run_id to never cancel those jobs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  # .github/do-coreboot --buildtype release
+  # is the largest cache, 429.5M (September 2023).
+  CCACHE_SIZE: "450M"
+  CCACHE_CMD: ccache
+  DOCKERFILE: picolibc/.github/Dockerfile-coreboot
+  IMAGE_FILE: dockerimg-coreboot.tar.zst
+  IMAGE: picolibc
+  PACKAGES_FILE: picolibc/.github/coreboot-packages.txt
+  EXTRA_FILE: picolibc/.github/coreboot-files.txt
+
+jobs:
+  cache-maker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v4
+        with:
+          path: picolibc
+
+      - name: Cache the Docker Image
+        id: cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          lookup-only: true
+
+      - name: Set up Docker Buildx
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build picolibc container
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64
+          file: .github/Dockerfile-coreboot
+          tags: ${{ env.IMAGE }}:latest
+          outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
+
+  minsize-coreboot:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
+
+          # Original stdio, one with multithread disabled
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true",
+        ]
+        test: [
+          "./.github/do-coreboot",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v4
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
+        run: |
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.17
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
+      - name: Minsize test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize"
+
+  release-coreboot:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dposix-io=false -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
+
+          # Original stdio, one with multithread disabled
+          "-Dtinystdio=false",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true",
+        ]
+        test: [
+          "./.github/do-coreboot",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v4
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+
+      # The docker image contains ccache, but the ccache action uses the ccache
+      # outside docker for statistics, so install the same ccache version.
+      # Install in /usr/bin so the ccache action gets the expected environment.
+      - name: install ccache
+        if: matrix.test == './.github/do-zephyr'
+        run: |
+          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
+          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
+          rm -f ccache-*-linux-x86_64.tar.xz
+
+      # Key on job name and cache size to get separate caches for linux
+      # and zephyr.
+      - name: ccache
+        if: matrix.test == './.github/do-zephyr'
+        uses: hendrikmuhs/ccache-action@v1.2.17
+        with:
+          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
+          max-size: ${{ env.CCACHE_SIZE }}
+
+      - name: Release test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc -v $GITHUB_WORKSPACE/.ccache:/root/.ccache $IMAGE bash --login -c "${{ env.CCACHE_CMD }} --set-config=max_size=${{ env.CCACHE_SIZE }} && ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release"
+

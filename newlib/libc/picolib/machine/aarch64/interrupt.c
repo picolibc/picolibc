@@ -66,7 +66,7 @@ vector(fiq);
 void
 __weak_vector_table(void);
 
-void __section(".text.init.enter") __attribute__((aligned(1024)))
+void __section(".text.init.enter") __attribute__((aligned(2048)))
 __weak_vector_table(void)
 {
 	/*

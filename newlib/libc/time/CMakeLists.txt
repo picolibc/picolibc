@@ -53,4 +53,5 @@ picolibc_sources(
   tzcalc_limits.c
   tzset.c
   tzvars.c
+  wcsftime.c
   )

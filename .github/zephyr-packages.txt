@@ -11,3 +11,7 @@ libvte-2.91-0
 meson
 ninja-build
 qemu-system-x86
+ca-certificates
+wget
+gnupg
+locales

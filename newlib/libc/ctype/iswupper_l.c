@@ -7,18 +7,14 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include <ctype.h>
 #include <wctype.h>
 #include "local.h"
-#include "categories.h"
 
 int
-iswupper_l (wint_t c, struct __locale_t *locale)
+iswupper_l (wint_t c, locale_t locale)
 {
   (void) locale;
 #ifdef _MB_CAPABLE
-  c = _jp2uc_l (c, locale);
-  // The wide-character class "upper" contains at least those characters wc
-  // which are equal to towupper(wc) and different from towlower(wc).
-  enum category cat = category (c);
-  return cat == CAT_Lu || (cat == CAT_LC && towupper (c) == c);
+  uint16_t cat = __ctype_table_lookup (c, locale);
+  return (cat & CLASS_upper) || ((cat & CLASS_case) && towlower_l(c, locale) != c);
 #else
   return c < 0x100 ? isupper (c) : 0;
 #endif /* _MB_CAPABLE */

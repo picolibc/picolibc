@@ -178,6 +178,11 @@ typedef	__off_t		off_t;		/* file offset */
 #define	_OFF_T_DECLARED
 #endif
 
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
+
 #ifndef _DEV_T_DECLARED
 typedef	__dev_t		dev_t;		/* device number or struct cdev */
 #define	_DEV_T_DECLARED
@@ -216,11 +221,17 @@ typedef	__nlink_t	nlink_t;	/* link count */
 #ifndef _CLOCKID_T_DECLARED
 typedef	__clockid_t	clockid_t;
 #define	_CLOCKID_T_DECLARED
+#ifdef __ZEPHYR__
+#define __clockid_t_defined             /* Zephyr <= 3.7 compat */
+#endif
 #endif
 
 #ifndef _TIMER_T_DECLARED
 typedef	__timer_t	timer_t;
 #define	_TIMER_T_DECLARED
+#ifdef __ZEPHYR__
+#define __timer_t_defined               /* Zephyr <= 3.7 compat */
+#endif
 #endif
 
 #ifndef _USECONDS_T_DECLARED

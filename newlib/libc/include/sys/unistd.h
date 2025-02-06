@@ -59,6 +59,11 @@ typedef __off_t off_t;
 #define	_OFF_T_DECLARED
 #endif
 
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
+
 #ifndef _UID_T_DECLARED
 typedef	__uid_t		uid_t;		/* user id */
 #define	_UID_T_DECLARED

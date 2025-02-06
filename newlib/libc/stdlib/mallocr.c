@@ -245,16 +245,6 @@ int _dummy_mallocr = 1;
 
 /* Preliminaries */
 
-#ifdef __GNUC__
-#pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wunknown-warning-option"
-#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
-#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
-#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
-#pragma GCC diagnostic ignored "-Warray-bounds"
-#pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
-#endif
-
 #define _DEFAULT_SOURCE
 
 #include <stddef.h>   /* for size_t */
@@ -265,6 +255,16 @@ int _dummy_mallocr = 1;
 #include <stdint.h>   /* for uintptr_t */
 #include <unistd.h>   /* for sbrk */
 #include <sys/lock.h>
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
+#endif
 
 /*
   Compile-time options
@@ -2285,12 +2285,14 @@ void fREe(void* mem)
 #endif /* MALLOC_PROVIDED */
 }
 #ifdef _HAVE_ALIAS_ATTRIBUTE
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic push
-#ifndef __clang__
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
 __strong_reference(free, __malloc_free);
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic pop
+#endif
 #endif
 #endif /* DEFINE_FREE */
 

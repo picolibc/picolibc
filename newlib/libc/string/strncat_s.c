@@ -38,7 +38,7 @@
 #include "string_private.h"
 
 __errno_t
-strncat_s(char *restrict s1, rsize_t s1max, const char *restrict s2, rsize_t n)
+strncat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2, rsize_t n)
 {
     const char *msg = "";
     size_t s1_len = 0;

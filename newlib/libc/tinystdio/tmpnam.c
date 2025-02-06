@@ -33,13 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef __GNUC__
+#include "stdio_private.h"
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 #endif
-
-#include "stdio_private.h"
 
 /* No requirement for re-entrancy for this variable */
 static char _tmpnam[L_tmpnam];

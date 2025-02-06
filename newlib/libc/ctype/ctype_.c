@@ -31,122 +31,78 @@
 /* Make sure we're using fast ctype */
 #define _PICOLIBC_CTYPE_SMALL 0
 #include "ctype_.h"
-#include "../locale/setlocale.h"
+#include "locale_private.h"
+#include "../stdlib/local.h"
 
-#define _CTYPE_DATA_0_127 \
-	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
-	_C,	_C|_S, _C|_S, _C|_S,	_C|_S,	_C|_S,	_C,	_C, \
-	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
-	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
-	_S|_B,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
-	_P,	_P,	_P,	_P,	_P,	_P,	_P,	_P, \
-	_N,	_N,	_N,	_N,	_N,	_N,	_N,	_N, \
-	_N,	_N,	_P,	_P,	_P,	_P,	_P,	_P, \
-	_P,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U|_X,	_U, \
-	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
-	_U,	_U,	_U,	_U,	_U,	_U,	_U,	_U, \
-	_U,	_U,	_U,	_P,	_P,	_P,	_P,	_P, \
-	_P,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L|_X,	_L, \
-	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
-	_L,	_L,	_L,	_L,	_L,	_L,	_L,	_L, \
-	_L,	_L,	_L,	_P,	_P,	_P,	_P,	_C
-
-#define _CTYPE_DATA_128_255 \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0, \
-	0,	0,	0,	0,	0,	0,	0,	0
-
-#if defined(_MB_CAPABLE)
-#if defined(_MB_EXTENDED_CHARSETS_ISO)
-#include "ctype_iso.h"
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-#include "ctype_cp.h"
-#endif
-#endif
-
-#if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-/* No static const on Cygwin since it's referenced and potentially overwritten
-   for compatibility with older applications. */
-const
-char _ctype_b[128 + 256] = {
+const char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255,
 	_CTYPE_DATA_0_127,
 	_CTYPE_DATA_128_255
 };
 
-#else	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
+#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
 
-const char _ctype_[1 + 256] = {
-	0,
-	_CTYPE_DATA_0_127,
-	_CTYPE_DATA_128_255
+#include "ctype_extended.h"
+
+#define __CTYPE(base) [locale_ ## base - locale_EXTENDED_BASE] = { \
+        _CTYPE_ ## base ## _128_254,        \
+        0,                                  \
+        _CTYPE_DATA_0_127,                  \
+        _CTYPE_ ## base ## _128_254,        \
+        _CTYPE_ ## base ## _255             \
+        }
+
+const char __ctype[locale_END - locale_EXTENDED_BASE][_CTYPE_OFFSET + 1 + 256] = {
+#ifdef _MB_EXTENDED_CHARSETS_ISO
+    __CTYPE(ISO_8859_1),
+    __CTYPE(ISO_8859_2),
+    __CTYPE(ISO_8859_3),
+    __CTYPE(ISO_8859_4),
+    __CTYPE(ISO_8859_5),
+    __CTYPE(ISO_8859_6),
+    __CTYPE(ISO_8859_7),
+    __CTYPE(ISO_8859_8),
+    __CTYPE(ISO_8859_9),
+    __CTYPE(ISO_8859_10),
+    __CTYPE(ISO_8859_11),
+    __CTYPE(ISO_8859_13),
+    __CTYPE(ISO_8859_14),
+    __CTYPE(ISO_8859_15),
+    __CTYPE(ISO_8859_16),
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+    __CTYPE(CP437),
+    __CTYPE(CP720),
+    __CTYPE(CP737),
+    __CTYPE(CP775),
+    __CTYPE(CP850),
+    __CTYPE(CP852),
+    __CTYPE(CP855),
+    __CTYPE(CP857),
+    __CTYPE(CP858),
+    __CTYPE(CP862),
+    __CTYPE(CP866),
+    __CTYPE(CP874),
+    __CTYPE(CP1125),
+    __CTYPE(CP1250),
+    __CTYPE(CP1251),
+    __CTYPE(CP1252),
+    __CTYPE(CP1253),
+    __CTYPE(CP1254),
+    __CTYPE(CP1255),
+    __CTYPE(CP1256),
+    __CTYPE(CP1257),
+    __CTYPE(CP1258),
+    __CTYPE(KOI8_R),
+    __CTYPE(KOI8_U),
+    __CTYPE(GEORGIAN_PS),
+    __CTYPE(PT154),
+    __CTYPE(KOI8_T),
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_JIS
+    __CTYPE(EUCJP),
+    __CTYPE(SJIS),
+#endif
 };
 
-#endif	/* !ALLOW_NEGATIVE_CTYPE_INDEX */
-
-#if defined(_MB_CAPABLE)
-/* Cygwin has its own implementation which additionally maintains backward
-   compatibility with applications built under older Cygwin releases. */
-void
-__set_ctype (struct __locale_t *loc, const char *charset)
-{
-#if defined(_MB_EXTENDED_CHARSETS_ISO) || defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-  int idx;
-#endif
-  const char *ctype_ptr = NULL;
-
-  switch (*charset)
-    {
-#if defined(_MB_EXTENDED_CHARSETS_ISO)
-    case 'I':
-      idx = __iso_8859_index (charset + 9);
-      /* The ctype table has a leading ISO-8859-1 element so we have to add
-	 1 to the index returned by __iso_8859_index.  If __iso_8859_index
-	 returns < 0, it's ISO-8859-1. */
-      if (idx < 0)
-        idx = 0;
-      else
-        ++idx;
-      ctype_ptr = __ctype_iso[idx];
-      break;
-#endif
-#if defined(_MB_EXTENDED_CHARSETS_WINDOWS)
-    case 'C':
-      idx = __cp_index (charset + 2);
-      if (idx < 0)
-        break;
-      ctype_ptr = __ctype_cp[idx];
-      break;
-#endif
-    default:
-      break;
-    }
-  if (!ctype_ptr)
-    {
-#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-     ctype_ptr = _ctype_b;
-#  else
-     ctype_ptr = _ctype_;
-#  endif
-    }
-#  if defined(ALLOW_NEGATIVE_CTYPE_INDEX)
-  loc->ctype_ptr = ctype_ptr + 127;
-#  else
-  loc->ctype_ptr = ctype_ptr;
-#  endif
-}
-#endif /* _MB_CAPABLE */
+#endif /* _MB_EXTENDED_CHARSETS_NON_UNICODE */

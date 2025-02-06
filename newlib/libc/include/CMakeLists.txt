@@ -70,6 +70,7 @@ picolibc_headers(""
   malloc.h
   math.h
   memory.h
+  ndbm.h
   newlib.h
   paths.h
   picotls.h
@@ -91,6 +92,7 @@ picolibc_headers(""
   termios.h
   threads.h
   time.h
+  uchar.h
   unctrl.h
   unistd.h
   utime.h

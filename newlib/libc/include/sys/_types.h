@@ -209,13 +209,16 @@ typedef struct
   {
     wint_t __wch;
     unsigned char __wchb[4];
+    __uint32_t __ucs;
+    __uint16_t __ucs2;
   } __value;		/* Value so far.  */
 } _mbstate_t;
 #endif
 
 #ifndef __machine_iconv_t_defined
 /* Iconv descriptor type */
-typedef void *_iconv_t;
+struct __iconv_t;
+typedef struct __iconv_t *_iconv_t;
 #endif
 
 #ifndef __machine_clock_t_defined

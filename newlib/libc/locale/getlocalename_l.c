@@ -1,74 +1,52 @@
 /*
-FUNCTION
-	<<getlocalename_l>>---create or modify a locale object
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
 
-INDEX
-	getlocalename_l
-
-INDEX
-	_getlocalename_l_r
-
-SYNOPSIS
-	#include <locale.h>
-	locale_t getlocalename_l(int <[category]>, locale_t <[locobj]>);
-
-	locale_t _getlocalename_l_r(void *<[reent]>, int <[category]>,
-			      locale_t <[locobj]>);
-
-DESCRIPTION
-The <<getlocalename_l>> function shall return the locale name for the
-given locale category of the locale object locobj, or of the global
-locale if locobj is the special locale object LC_GLOBAL_LOCALE.
-
-The category argument specifies the locale category to be queried. If
-the value is LC_ALL or is not a supported locale category value (see
-<<setlocale>>), <<getlocalename_l>> shall fail.
-
-The behavior is undefined if the locobj argument is neither the special
-locale object LC_GLOBAL_LOCALE nor a valid locale object handle.
-
-RETURNS
-Upon successful completion, <<getlocalename_l>> shall return a pointer
-to a string containing the locale name; otherwise, a null pointer shall
-be returned.
-
-If locobj is LC_GLOBAL_LOCALE, the returned string pointer might be
-invalidated or the string content might be overwritten by a subsequent
-call in the same thread to <<getlocalename_l>> with LC_GLOBAL_LOCALE;
-the returned string pointer might also be invalidated if the calling
-thread is terminated. Otherwise, the returned string pointer and content
-shall remain valid until the locale object locobj is used in a call to
-<<freelocale>> or as the base argument in a successful call to
-<<newlocale>>.
-
-No errors are defined.
-
-PORTABILITY
-<<getlocalename_l>> is POSIX-1.2008 since Base Specification Issue 8
-*/
-
-#define _GNU_SOURCE
-#include "setlocale.h"
+#define _DEFAULT_SOURCE
+#include "locale_private.h"
 
 const char *
-getlocalename_l (int category, struct __locale_t *locobj)
+getlocalename_l (int category, locale_t locale)
 {
-  if (category <= LC_ALL || category > LC_MESSAGES)
-    return NULL;
-#ifndef _MB_CAPABLE
-  (void) locobj;
-  return "C";
-#else
-  if (locobj == LC_GLOBAL_LOCALE)
+    if (category < LC_ALL || category >= _LC_LAST)
     {
-        static NEWLIB_THREAD_LOCAL char getlocalename_l_buf[32 /*ENCODING + 1*/];
-        /* getlocalename_l is supposed to return the value in a
-           thread-safe manner.  This requires to copy over the
-           category string into thread-local storage. */
-        strcpy (getlocalename_l_buf,
-	      __get_global_locale ()->categories[category]);
-        return getlocalename_l_buf;
+        errno = EINVAL;
+        return NULL;
     }
-  return locobj->categories[category];
-#endif
+
+    if (locale == LC_GLOBAL_LOCALE)
+        locale = __global_locale;
+
+    return __locale_name(locale);
 }

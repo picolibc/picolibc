@@ -6,7 +6,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include <wctype.h>
 
 int
-iswxdigit_l (wint_t c, struct __locale_t *locale)
+iswxdigit_l (wint_t c, locale_t locale)
 {
   (void) locale;
   return ((c >= (wint_t)'0' && c <= (wint_t)'9') ||

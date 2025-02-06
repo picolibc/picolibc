@@ -8,7 +8,7 @@ code.
 ### Prerequisites
 
 It is expected that the toolchain used for compilation of applicatons
-against Picolibc provides the follwoing headers in its default search
+against Picolibc provides the following headers in its default search
 paths:
 
  * float.h

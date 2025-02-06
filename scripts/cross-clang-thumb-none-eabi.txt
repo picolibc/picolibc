@@ -20,8 +20,8 @@ endian = 'little'
 
 [properties]
 c_args = ['-Werror=double-promotion', '-Wno-unsupported-floating-point-opt', '-fshort-enums']
-c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/nofp/', '-Wl,-z,noexecstack', '-Wno-unused-command-line-argument']
-cpp_link_args = ['-L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/nofp/', '-Wl,-z,noexecstack', '-Wno-unused-command-line-argument']
+c_link_args = ['-L/usr/lib/gcc/arm-none-eabi/13.3.1/thumb/nofp/', '-L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/nofp/', '-Wl,-z,noexecstack', '-Wno-unused-command-line-argument']
+cpp_link_args = ['-L/usr/lib/gcc/arm-none-eabi/13.3.1/thumb/nofp/', '-L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/nofp/', '-Wl,-z,noexecstack', '-Wno-unused-command-line-argument']
 skip_sanity_check = true
 default_flash_addr = '0x00000000'
 default_flash_size = '0x00400000'

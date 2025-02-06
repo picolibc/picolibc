@@ -46,25 +46,25 @@ effects vary with the locale.
 #include <errno.h>
 #include "local.h"
 
+#ifdef _MB_CAPABLE
+static mbstate_t _mbtowc_state;
+#define ps &_mbtowc_state
+#else
+#define ps NULL
+#endif
+
 int
 wctomb (char *s,
         wchar_t wchar)
 {
+        int retval;
+
+        retval = __WCTOMB (s, wchar, ps);
+        if (retval == -1) {
 #ifdef _MB_CAPABLE
-	static NEWLIB_THREAD_LOCAL mbstate_t _wctomb_state;
-
-        return __WCTOMB (s, wchar, &_wctomb_state);
-#else /* not _MB_CAPABLE */
-        if (s == NULL)
-                return 0;
-
-	/* Verify that wchar is a valid single-byte character.  */
-	if ((size_t)wchar >= 0x100) {
-		errno = EILSEQ;
-		return -1;
-	}
-
-        *s = (char) wchar;
-        return 1;
-#endif /* not _MB_CAPABLE */
+                _mbtowc_state.__count = 0;
+#endif
+                errno = EILSEQ;
+        }
+        return retval;
 }

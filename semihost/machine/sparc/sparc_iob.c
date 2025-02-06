@@ -44,7 +44,7 @@ struct apbuart {
     vuint32_t   control;
 };
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 /* 'bsize' is used directly with malloc/realloc which confuses -fanalyzer */

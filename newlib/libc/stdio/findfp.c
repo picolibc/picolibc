@@ -54,7 +54,7 @@ NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
 #endif
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
-_NOINLINE_STATIC void
+__noinline_static void
 #else
 static void
 #endif
@@ -127,7 +127,7 @@ stderr_init(FILE *ptr)
   std (ptr, __SRW | __SNBF, 2);
 }
 
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"

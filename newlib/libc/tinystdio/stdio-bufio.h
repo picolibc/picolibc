@@ -95,10 +95,10 @@ struct __file_bufio {
                 .size = _size,                                          \
                 .len = 0,                                               \
                 .off = 0,                                               \
-                .read_int = _read,                                      \
-                .write_int = _write,                                    \
-                .lseek_int = _lseek,                                    \
-                .close_int = _close,                                    \
+                { .read_int = _read },                                  \
+                { .write_int = _write },                                \
+                { .lseek_int = _lseek },                                \
+                { .close_int = _close }                                 \
         }
 
 #define FDEV_SETUP_BUFIO_PTR(_ptr, _buf, _size, _read, _write, _lseek, _close, _rwflag, _bflags) \
@@ -115,10 +115,10 @@ struct __file_bufio {
                 .size = _size,                                          \
                 .len = 0,                                               \
                 .off = 0,                                               \
-                .read_ptr = _read,                                      \
-                .write_ptr = _write,                                    \
-                .lseek_ptr = _lseek,                                    \
-                .close_ptr = _close,                                    \
+                { .read_ptr = _read },                                  \
+                { .write_ptr = _write },                                \
+                { .lseek_ptr = _lseek },                                \
+                { .close_ptr = _close }                                 \
         }
 
 static inline void __bufio_lock_init(FILE *f) {

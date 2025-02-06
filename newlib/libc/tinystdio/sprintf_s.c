@@ -40,7 +40,7 @@
 #include "../stdlib/local_s.h"
 
 int
-sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
+sprintf_s(char *__restrict s, rsize_t bufsize, const char *__restrict fmt, ...)
 {
     bool write_null = true;
     const char *msg = "";
@@ -49,84 +49,20 @@ sprintf_s(char *restrict s, rsize_t bufsize, const char *restrict fmt, ...)
 
     if (s == NULL) {
         write_null = false;
-        msg = "sprintf_s: dest buffer is null";
+        msg = "dest buffer is null";
         goto handle_error;
     } else if ((bufsize == 0) || (CHECK_RSIZE(bufsize))) {
         write_null = false;
-        msg = "sprintf_s: invalid buffer size";
-        goto handle_error;
-    } else if (fmt == NULL) {
-        msg = "sprintf_s: null format string";
-        goto handle_error;
-    } else if (strstr(fmt, " %n") != NULL) {
-        msg = "sprintf_s: format string contains percent-n";
+        msg = "invalid buffer size";
         goto handle_error;
     } else {
         va_start(args, fmt);
-
-        va_list args_copy;
-        va_copy(args_copy, args);
-
-        const char *check_ptr = fmt;
-        uint8_t null_str = 0;
-        while (*check_ptr && null_str == 0) {
-            if (check_ptr[0] == '%') {
-                switch (check_ptr[1]) {
-                case 's': {
-                    char *str_arg = va_arg(args_copy, char *);
-                    if (str_arg == NULL) {
-                        msg = "sprintf_s: null string argument";
-                        va_end(args_copy);
-                        va_end(args);
-                        null_str = 1;
-                        goto handle_error;
-                    }
-                    break;
-                }
-                case 'd':
-                case 'i':
-                case 'u':
-                case 'o':
-                case 'x':
-                case 'X':
-                case 'c':
-                case 'h':
-                case 'l':
-                case 'L':
-                case 'z':
-                case 't':
-                    va_arg(args_copy, int);
-                    break;
-                case 'f':
-                case 'F':
-                case 'e':
-                case 'E':
-                case 'g':
-                case 'G':
-                case 'a':
-                case 'A':
-                    va_arg(args_copy, double);
-                    break;
-                case 'p':
-                    va_arg(args_copy, void *);
-                    break;
-                default:
-                    break;
-                }
-            }
-            check_ptr++;
-        }
-
-        rc = vsnprintf(s, bufsize, fmt, args);
-        va_end(args_copy);
+        rc = vsnprintf_s(s, bufsize, fmt, args);
         va_end(args);
     }
 
-    if (rc < 0 || rc >= (int)bufsize) {
-        msg = "sprintf_s: dest buffer overflow";
-        goto handle_error;
-    } else {
-        s[rc] = 0;
+    if (rc < 0) {
+        rc = 0;
     }
 
     // Normal return path

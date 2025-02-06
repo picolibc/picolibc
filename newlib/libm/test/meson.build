@@ -148,21 +148,24 @@ endif
 
 skip_math_test = meson.get_cross_property('skip_math_test', [])
 
-foreach target : targets
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
-  if target in skip_math_test
+  if target.strip('_') in skip_math_test
     continue
   endif
 
-  value = get_variable('target_' + target)
 
   _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
   endif
 
-  if is_variable('crt0_hosted' + target)
-    _objs = [get_variable('crt0_hosted'+ target)]
+  if is_variable(crt0_test + target)
+    _objs = [get_variable(crt0_test + target)]
   else
     _objs = []
   endif
@@ -172,9 +175,9 @@ foreach target : targets
     _lib_files += _lib.full_path()
   endforeach
 
-  _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + _lib_files + get_variable('test_link_args_' + target, test_link_args)
-  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
+  _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
   _c_args = double_printf_compile_args + _c_args
   _link_args = double_printf_link_args + _link_args
@@ -185,17 +188,15 @@ foreach target : targets
     else
       test_part_name = '_' + test_part
     endif
-    if target == ''
-      test_name = 'math_test' + test_part_name
-    else
-      test_name = 'math_test' + test_part_name + '_' + target
-    endif
+    test_name = 'math_test' + test_part_name + target
+
     test(test_name,
          executable(test_name, math_test_src,
 		    c_args: _c_args +  ['-DTEST_PART=' + test_part],
 		    objects: _objs,
 		    link_args: _link_args,
-		    link_depends: _libs + _link_depends,
+                    link_with: _libs,
+		    link_depends: _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
          env: test_env)

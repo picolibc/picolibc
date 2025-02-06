@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,24 +32,22 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_locale = [
-    'duplocale.c',
-    'freelocale.c',
-    'getlocalename_l.c',
-    'locale.c',
-    'localeconv.c',
-    'lnumeric.c',
-    'newlocale.c',
-    'timelocal.c',
-    'uselocale.c',
-    'lctype.c',
-    'lmessages.c',
-    'lmonetary.c',
-    'nl_langinfo.c',
-]
 
-hdrs_locale = [
-    'setlocale.h',
+srcs_locale = [
+  'duplocale.c',
+  'freelocale.c',
+  'getlocalename_l.c',
+  'localeconv.c',
+  'localedata.c',
+  'locale_ctype_ptr.c',
+  'locale_ctype_ptr_l.c',
+  'locale_mb_cur_max.c',
+  'locale_names.c',
+  'newlocale.c',
+  'nl_langinfo.c',
+  'setlocale.c',
+  'timedata.c',
+  'uselocale.c',
 ]
 
 srcs_locale_use = []

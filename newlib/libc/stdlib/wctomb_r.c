@@ -8,57 +8,57 @@ All rights reserved.
 #include <wchar.h>
 #include <locale.h>
 #include <stdint.h>
+#include <endian.h>
 #include "mbctype.h"
 #include "local.h"
+#include "../ctype/local.h"
 
 int
 __ascii_wctomb (
         char          *s,
-        wchar_t        _wchar,
+        wchar_t        wchar,
         mbstate_t     *state)
 {
-  /* Avoids compiler warnings about comparisons that are always false
-     due to limited range when sizeof(wchar_t) is 2 but sizeof(wint_t)
-     is 4, as is the case on cygwin.  */
-  wint_t wchar = _wchar;
-
   (void) state;
   if (s == NULL)
-    return 0;
- 
-  if ((size_t)wchar >= 0x100)
-    {
-      _REENT_ERRNO(r) = EILSEQ;
+      return 0;
+
+  if (wchar >= 0x80)
       return -1;
-    }
 
   *s = (char) wchar;
   return 1;
 }
 
 #ifdef _MB_CAPABLE
+
 /* for some conversions, we use the __count field as a place to store a state value */
 #define __state __count
 
 int
 __utf8_wctomb (
         char          *s,
-        wchar_t        _wchar,
+        wchar_t        wchar,
         mbstate_t     *state)
 {
-  uint32_t wchar = _wchar;
   int ret = 0;
 
+  (void) state;         /* unused when wchar_t is 32-bits */
   if (s == NULL)
     return 0; /* UTF-8 encoding is not state-dependent */
 
-  if (sizeof (wchar_t) == 2 && state->__count == -4
-      && (wchar < 0xdc00 || wchar > 0xdfff))
+#if __SIZEOF_WCHAR_T__ == 2
+  if (state->__count == -4 && (wchar < 0xdc00 || wchar > 0xdfff))
     {
+      /* Unexpected extra high surrogate */
+      if (0xd800 <= wchar && wchar <= 0xdbff)
+        {
+          return -1;
+        }
       /* There's a leftover lone high surrogate.  Write out the CESU-8 value
 	 of the surrogate and proceed to convert the given character.  Note
 	 to return extra 3 bytes. */
-      wchar_t tmp;
+      uint32_t tmp;
       tmp = ((uint32_t) state->__value.__wchb[0] << 16 | (uint32_t) state->__value.__wchb[1] << 8)
           - ((uint32_t) 0x10000 >> 10 | (uint32_t) 0xd80d);
       *s++ = 0xe0 | ((tmp & 0xf000) >> 12);
@@ -67,6 +67,7 @@ __utf8_wctomb (
       state->__count = 0;
       ret = 3;
     }
+#endif
   if (wchar <= 0x7f)
     {
       *s = wchar;
@@ -78,46 +79,61 @@ __utf8_wctomb (
       *s   = 0x80 |  (wchar &  0x3f);
       return ret + 2;
     }
-  if (wchar >= 0x800 && wchar <= 0xffff)
+  if (wchar >= 0x800
+#if __SIZEOF_WCHAR_T__ > 2
+      && wchar <= 0xffff
+#endif
+      )
     {
-      /* No UTF-16 surrogate handling in UCS-4 */
-      if (sizeof (wchar_t) == 2 && wchar >= 0xd800 && wchar <= 0xdfff)
+      if (wchar >= 0xd800 && wchar <= 0xdfff)
 	{
-	  uint32_t tmp;
-	  if (wchar <= 0xdbff)
-	    {
-	      /* First half of a surrogate pair.  Store the state and
-	         return ret + 0. */
-	      tmp = ((wchar & 0x3ff) << 10) + 0x10000;
-	      state->__value.__wchb[0] = (tmp >> 16) & 0xff;
-	      state->__value.__wchb[1] = (tmp >> 8) & 0xff;
-	      state->__count = -4;
-	      *s = (0xf0 | ((tmp & 0x1c0000) >> 18));
-	      return ret;
-	    }
-	  if (state->__count == -4)
-	    {
-	      /* Second half of a surrogate pair.  Reconstruct the full
-		 Unicode value and return the trailing three bytes of the
-		 UTF-8 character. */
-              tmp = ((uint32_t) state->__value.__wchb[0] << 16)
-		    | (state->__value.__wchb[1] << 8)
-		    | (wchar & 0x3ff);
-	      state->__count = 0;
-	      *s++ = 0xf0 | ((tmp & 0x1c0000) >> 18);
-	      *s++ = 0x80 | ((tmp &  0x3f000) >> 12);
-	      *s++ = 0x80 | ((tmp &    0xfc0) >> 6);
-	      *s   = 0x80 |  (tmp &     0x3f);
-	      return 4;
-	    }
-	  /* Otherwise translate into CESU-8 value. */
+#if __SIZEOF_WCHAR_T__ == 2
+            uint32_t tmp;
+            if (wchar <= 0xdbff)
+            {
+                if (state->__count == -4)
+                {
+                    /* Extra high surrogate */
+                    return -1;
+                }
+                /* First half of a surrogate pair.  Store the state and
+                   return ret + 0. */
+                tmp = ((wchar & 0x3ff) << 10) + 0x10000;
+                state->__value.__wchb[0] = (tmp >> 16) & 0xff;
+                state->__value.__wchb[1] = (tmp >> 8) & 0xff;
+                state->__count = -4;
+                *s = (0xf0 | ((tmp & 0x1c0000) >> 18));
+                return ret;
+            }
+            if (state->__count == -4)
+            {
+                /* Second half of a surrogate pair.  Reconstruct the full
+                   Unicode value and return the trailing three bytes of the
+                   UTF-8 character. */
+                tmp = ((uint32_t) state->__value.__wchb[0] << 16)
+                    | (state->__value.__wchb[1] << 8)
+                    | (wchar & 0x3ff);
+                state->__count = 0;
+                *s++ = 0xf0 | ((tmp & 0x1c0000) >> 18);
+                *s++ = 0x80 | ((tmp &  0x3f000) >> 12);
+                *s++ = 0x80 | ((tmp &    0xfc0) >> 6);
+                *s   = 0x80 |  (tmp &     0x3f);
+                return 4;
+            }
+            /* Unexpected second half */
+            return -1;
+#else
+            /* No UTF-16 surrogate handling in UCS-4 */
+            return -1;
+#endif
 	}
       *s++ = 0xe0 | ((wchar & 0xf000) >> 12);
       *s++ = 0x80 | ((wchar &  0xfc0) >> 6);
       *s   = 0x80 |  (wchar &   0x3f);
       return ret + 3;
     }
-  if (wchar >= (uint32_t) 0x10000 && wchar <= (uint32_t) 0x10ffff)
+#if __SIZEOF_WCHAR_T__ == 4
+  if (wchar >= (wchar_t) 0x10000 && wchar <= (wchar_t) 0x10ffff)
     {
       *s++ = 0xf0 | ((wchar & 0x1c0000) >> 18);
       *s++ = 0x80 | ((wchar &  0x3f000) >> 12);
@@ -125,23 +141,103 @@ __utf8_wctomb (
       *s   = 0x80 |  (wchar &     0x3f);
       return 4;
     }
+#endif
 
-  _REENT_ERRNO(r) = EILSEQ;
   return -1;
 }
 
-/* Cygwin defines its own doublebyte charset conversion functions 
-   because the underlying OS requires wchar_t == UTF-16. */
-int
+#if _BYTE_ORDER == _LITTLE_ENDIAN
+#define __ucs2le_wctomb __ucs2_wctomb
+#define __ucs2be_wctomb __ucs2swap_wctomb
+#define __ucs4le_wctomb __ucs4_wctomb
+#define __ucs4be_wctomb __ucs4swap_wctomb
+#else
+#define __ucs2le_wctomb __ucs2swap_wctomb
+#define __ucs2be_wctomb __ucs2_wctomb
+#define __ucs4le_wctomb __ucs4swap_wctomb
+#define __ucs4be_wctomb __ucs4_wctomb
+#endif
+
+static int
+__ucs2_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint16_t    uchar = (uint16_t) wchar;
+
+    (void) state;
+    /* Surrogates are invalid in UCS-2 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 2);
+    return 2;
+}
+
+static int
+__ucs2swap_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint16_t    uchar = __bswap16((uint16_t) wchar);
+
+    (void) state;
+    /* Surrogates are invalid in UCS-2 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 2);
+    return 2;
+}
+
+static int
+__ucs4_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint32_t    uchar = (uint32_t) wchar;
+
+    (void) state;
+    /* Surrogates are invalid in UCS-4 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 4);
+    return 4;
+}
+
+static int
+__ucs4swap_wctomb (
+        char          *s,
+        wchar_t        wchar,
+        mbstate_t     *state)
+{
+    uint32_t    uchar = __bswap32((uint32_t) wchar);
+
+    (void) state;
+    /* Surrogates are invalid in UCS-4 */
+    if (wchar >= 0xd800 && wchar <= 0xdfff)
+        return -1;
+
+    memcpy((void *) s, &uchar, 4);
+    return 4;
+}
+
+#ifdef _MB_EXTENDED_CHARSETS_JIS
+
+static int
 __sjis_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
 {
-  wint_t wchar = _wchar;
+  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_SJIS);
 
-  unsigned char char2 = (unsigned char)wchar;
-  unsigned char char1 = (unsigned char)(wchar >> 8);
+  unsigned char char2 = (unsigned char)jischar;
+  unsigned char char1 = (unsigned char)(jischar >> 8);
 
   (void) state;
   if (s == NULL)
@@ -150,7 +246,7 @@ __sjis_wctomb (
   if (char1 != 0x00)
     {
     /* first byte is non-zero..validate multi-byte char */
-      if (_issjis1(char1) && _issjis2(char2)) 
+      if (_issjis1(char1) && _issjis2(char2))
 	{
 	  *s++ = (char)char1;
 	  *s = (char)char2;
@@ -158,23 +254,23 @@ __sjis_wctomb (
 	}
       else
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
-  *s = (char) wchar;
+  *s = (char) jischar;
   return 1;
 }
 
-int
+static int
 __eucjp_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
 {
-  wint_t wchar = _wchar;
-  unsigned char char2 = (unsigned char)wchar;
-  unsigned char char1 = (unsigned char)(wchar >> 8);
+  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_EUCJP);
+
+  unsigned char char2 = (unsigned char)jischar;
+  unsigned char char1 = (unsigned char)(jischar >> 8);
 
   (void) state;
   if (s == NULL)
@@ -183,7 +279,7 @@ __eucjp_wctomb (
   if (char1 != 0x00)
     {
     /* first byte is non-zero..validate multi-byte char */
-      if (_iseucjp1 (char1) && _iseucjp2 (char2)) 
+      if (_iseucjp1 (char1) && _iseucjp2 (char2))
 	{
 	  *s++ = (char)char1;
 	  *s = (char)char2;
@@ -198,24 +294,23 @@ __eucjp_wctomb (
 	}
       else
 	{
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
-  *s = (char) wchar;
+  *s = (char) jischar;
   return 1;
 }
 
-int
+static int
 __jis_wctomb (
         char          *s,
         wchar_t        _wchar,
         mbstate_t     *state)
 {
-  wint_t wchar = _wchar;
-  int cnt = 0; 
-  unsigned char char2 = (unsigned char)wchar;
-  unsigned char char1 = (unsigned char)(wchar >> 8);
+  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_JIS);
+  unsigned char char2 = (unsigned char)jischar;
+  unsigned char char1 = (unsigned char)(jischar >> 8);
+  int cnt = 0;
 
   if (s == NULL)
     return 1;  /* state-dependent */
@@ -223,7 +318,7 @@ __jis_wctomb (
   if (char1 != 0x00)
     {
     /* first byte is non-zero..validate multi-byte char */
-      if (_isjis (char1) && _isjis (char2)) 
+      if (_isjis (char1) && _isjis (char2))
 	{
 	  if (state->__state == 0)
 	    {
@@ -238,7 +333,6 @@ __jis_wctomb (
 	  *s = (char)char2;
 	  return cnt + 2;
 	}
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
   if (state->__state != 0)
@@ -253,38 +347,36 @@ __jis_wctomb (
   *s = (char)char2;
   return cnt + 1;
 }
+#endif /* _MB_EXTENDED_CHARSETS_JIS */
 
 #ifdef _MB_EXTENDED_CHARSETS_ISO
+
 static int
-___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
+___iso_wctomb (char *s, wchar_t _wchar, enum locale_id id,
 	       mbstate_t *state)
 {
   wint_t wchar = _wchar;
 
+  (void) state;
   if (s == NULL)
     return 0;
 
   /* wchars <= 0x9f translate to all ISO charsets directly. */
   if (wchar >= 0xa0)
     {
-      if (iso_idx >= 0)
-	{
-	  unsigned char mb;
+        unsigned char mb;
 
-	  for (mb = 0; mb < 0x60; ++mb)
-	    if (__iso_8859_conv[iso_idx][mb] == wchar)
-	      {
+        for (mb = 0; mb < 0x60; ++mb)
+	    if (__iso_8859_conv[id - locale_ISO_8859_2][mb] == _wchar)
+              {
 		*s = (char) (mb + 0xa0);
 		return 1;
-	      }
-	  _REENT_ERRNO(r) = EILSEQ;
-	  return -1;
-	}
+              }
+        return -1;
     }
- 
+
   if ((size_t)wchar >= 0x100)
     {
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -292,132 +384,117 @@ ___iso_wctomb (char *s, wchar_t _wchar, int iso_idx,
   return 1;
 }
 
-int __iso_8859_1_wctomb (char *s, wchar_t _wchar,
-			 mbstate_t *state)
+static int
+__iso_8859_1_wctomb (char *s, wchar_t wchar, mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, -1, state);
+  (void) state;
+  if (s == NULL)
+    return 0;
+
+  if (wchar >= 0x100)
+    {
+      return -1;
+    }
+
+  *s = (char) wchar;
+  return 1;
 }
 
-int __iso_8859_2_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_2_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 0, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_2, state);
 }
 
-int __iso_8859_3_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_3_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 1, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_3, state);
 }
 
-int __iso_8859_4_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_4_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 2, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_4, state);
 }
 
-int __iso_8859_5_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_5_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 3, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_5, state);
 }
 
-int __iso_8859_6_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_6_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 4, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_6, state);
 }
 
-int __iso_8859_7_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_7_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 5, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_7, state);
 }
 
-int __iso_8859_8_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_8_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 6, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_8, state);
 }
 
-int __iso_8859_9_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_9_wctomb (char *s, wchar_t _wchar,
 			 mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 7, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_9, state);
 }
 
-int __iso_8859_10_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_10_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 8, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_10, state);
 }
 
-int __iso_8859_11_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_11_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 9, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_11, state);
 }
 
-int __iso_8859_13_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_13_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 10, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_13, state);
 }
 
-int __iso_8859_14_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_14_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 11, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_14, state);
 }
 
-int __iso_8859_15_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_15_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 12, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_15, state);
 }
 
-int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
+static int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
 			  mbstate_t *state)
 {
-  return ___iso_wctomb (s, _wchar, 13, state);
+  return ___iso_wctomb (s, _wchar, locale_ISO_8859_16, state);
 }
 
-static wctomb_p __iso_8859_wctomb[17] = {
-  NULL,
-  __iso_8859_1_wctomb,
-  __iso_8859_2_wctomb,
-  __iso_8859_3_wctomb,
-  __iso_8859_4_wctomb,
-  __iso_8859_5_wctomb,
-  __iso_8859_6_wctomb,
-  __iso_8859_7_wctomb,
-  __iso_8859_8_wctomb,
-  __iso_8859_9_wctomb,
-  __iso_8859_10_wctomb,
-  __iso_8859_11_wctomb,
-  NULL,			/* No ISO 8859-12 */
-  __iso_8859_13_wctomb,
-  __iso_8859_14_wctomb,
-  __iso_8859_15_wctomb,
-  __iso_8859_16_wctomb
-};
-
-/* val *MUST* be valid!  All checks for validity are supposed to be
-   performed before calling this function. */
-wctomb_p
-__iso_wctomb (int val)
-{
-  return __iso_8859_wctomb[val];
-}
 #endif /* _MB_EXTENDED_CHARSETS_ISO */
 
 #ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+
 static int
 ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 	      mbstate_t *state)
 {
   wint_t wchar = _wchar;
 
+  (void) state;
   if (s == NULL)
     return 0;
 
@@ -428,19 +505,17 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 	  unsigned char mb;
 
 	  for (mb = 0; mb < 0x80; ++mb)
-	    if (__cp_conv[cp_idx][mb] == wchar)
+	    if (__cp_conv[cp_idx][mb] == _wchar)
 	      {
 		*s = (char) (mb + 0x80);
 		return 1;
 	      }
-	  _REENT_ERRNO(r) = EILSEQ;
 	  return -1;
 	}
     }
 
   if ((size_t)wchar >= 0x100)
     {
-      _REENT_ERRNO(r) = EILSEQ;
       return -1;
     }
 
@@ -605,47 +680,73 @@ __cp_102_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 }
 
 static int
-__cp_103_wctomb (struct _reent *r, char *s, wchar_t _wchar, mbstate_t *state)
+__cp_103_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 {
-  return ___cp_wctomb (r, s, _wchar, 26, state);
+  return ___cp_wctomb (s, _wchar, 26, state);
 }
 
-static wctomb_p __cp_xxx_wctomb[27] = {
-  __cp_437_wctomb,
-  __cp_720_wctomb,
-  __cp_737_wctomb,
-  __cp_775_wctomb,
-  __cp_850_wctomb,
-  __cp_852_wctomb,
-  __cp_855_wctomb,
-  __cp_857_wctomb,
-  __cp_858_wctomb,
-  __cp_862_wctomb,
-  __cp_866_wctomb,
-  __cp_874_wctomb,
-  __cp_1125_wctomb,
-  __cp_1250_wctomb,
-  __cp_1251_wctomb,
-  __cp_1252_wctomb,
-  __cp_1253_wctomb,
-  __cp_1254_wctomb,
-  __cp_1255_wctomb,
-  __cp_1256_wctomb,
-  __cp_1257_wctomb,
-  __cp_1258_wctomb,
-  __cp_20866_wctomb,
-  __cp_21866_wctomb,
-  __cp_101_wctomb,
-  __cp_102_wctomb,
-  __cp_103_wctomb,
+#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+
+const wctomb_p __wctomb[locale_END - locale_BASE] = {
+    [locale_C - locale_BASE] = __ascii_wctomb,
+    [locale_UTF_8 - locale_BASE] = __utf8_wctomb,
+    [locale_UCS_2 - locale_BASE] = __ucs2_wctomb,
+    [locale_UCS_2LE - locale_BASE] = __ucs2le_wctomb,
+    [locale_UCS_2BE - locale_BASE] = __ucs2be_wctomb,
+    [locale_UCS_4 - locale_BASE] = __ucs4_wctomb,
+    [locale_UCS_4LE - locale_BASE] = __ucs4le_wctomb,
+    [locale_UCS_4BE - locale_BASE] = __ucs4be_wctomb,
+#ifdef _MB_EXTENDED_CHARSETS_ISO
+    [locale_ISO_8859_1 - locale_BASE] = __iso_8859_1_wctomb,
+    [locale_ISO_8859_2 - locale_BASE] = __iso_8859_2_wctomb,
+    [locale_ISO_8859_3 - locale_BASE] = __iso_8859_3_wctomb,
+    [locale_ISO_8859_4 - locale_BASE] = __iso_8859_4_wctomb,
+    [locale_ISO_8859_5 - locale_BASE] = __iso_8859_5_wctomb,
+    [locale_ISO_8859_6 - locale_BASE] = __iso_8859_6_wctomb,
+    [locale_ISO_8859_7 - locale_BASE] = __iso_8859_7_wctomb,
+    [locale_ISO_8859_8 - locale_BASE] = __iso_8859_8_wctomb,
+    [locale_ISO_8859_9 - locale_BASE] = __iso_8859_9_wctomb,
+    [locale_ISO_8859_10 - locale_BASE] = __iso_8859_10_wctomb,
+    [locale_ISO_8859_11 - locale_BASE] = __iso_8859_11_wctomb,
+    [locale_ISO_8859_13 - locale_BASE] = __iso_8859_13_wctomb,
+    [locale_ISO_8859_14 - locale_BASE] = __iso_8859_14_wctomb,
+    [locale_ISO_8859_15 - locale_BASE] = __iso_8859_15_wctomb,
+    [locale_ISO_8859_16 - locale_BASE] = __iso_8859_16_wctomb,
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+    [locale_CP437 - locale_BASE] = __cp_437_wctomb,
+    [locale_CP720 - locale_BASE] = __cp_720_wctomb,
+    [locale_CP737 - locale_BASE] = __cp_737_wctomb,
+    [locale_CP775 - locale_BASE] = __cp_775_wctomb,
+    [locale_CP850 - locale_BASE] = __cp_850_wctomb,
+    [locale_CP852 - locale_BASE] = __cp_852_wctomb,
+    [locale_CP855 - locale_BASE] = __cp_855_wctomb,
+    [locale_CP857 - locale_BASE] = __cp_857_wctomb,
+    [locale_CP858 - locale_BASE] = __cp_858_wctomb,
+    [locale_CP862 - locale_BASE] = __cp_862_wctomb,
+    [locale_CP866 - locale_BASE] = __cp_866_wctomb,
+    [locale_CP874 - locale_BASE] = __cp_874_wctomb,
+    [locale_CP1125 - locale_BASE] = __cp_1125_wctomb,
+    [locale_CP1250 - locale_BASE] = __cp_1250_wctomb,
+    [locale_CP1251 - locale_BASE] = __cp_1251_wctomb,
+    [locale_CP1252 - locale_BASE] = __cp_1252_wctomb,
+    [locale_CP1253 - locale_BASE] = __cp_1253_wctomb,
+    [locale_CP1254 - locale_BASE] = __cp_1254_wctomb,
+    [locale_CP1255 - locale_BASE] = __cp_1255_wctomb,
+    [locale_CP1256 - locale_BASE] = __cp_1256_wctomb,
+    [locale_CP1257 - locale_BASE] = __cp_1257_wctomb,
+    [locale_CP1258 - locale_BASE] = __cp_1258_wctomb,
+    [locale_KOI8_R - locale_BASE] = __cp_20866_wctomb,
+    [locale_KOI8_U - locale_BASE] = __cp_21866_wctomb,
+    [locale_GEORGIAN_PS - locale_BASE] = __cp_101_wctomb,
+    [locale_PT154 - locale_BASE] = __cp_102_wctomb,
+    [locale_KOI8_T - locale_BASE] = __cp_103_wctomb,
+#endif
+#ifdef _MB_EXTENDED_CHARSETS_JIS
+    [locale_JIS - locale_BASE] = __jis_wctomb,
+    [locale_EUCJP - locale_BASE] = __eucjp_wctomb,
+    [locale_SJIS - locale_BASE] = __sjis_wctomb,
+#endif
 };
 
-/* val *MUST* be valid!  All checks for validity are supposed to be
-   performed before calling this function. */
-wctomb_p
-__cp_wctomb (int val)
-{
-  return __cp_xxx_wctomb[__cp_val_index (val)];
-}
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
 #endif /* _MB_CAPABLE */

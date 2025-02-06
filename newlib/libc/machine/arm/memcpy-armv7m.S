@@ -97,9 +97,9 @@
 	ASM_ALIAS __aeabi_memcpy4, memcpy
 	ASM_ALIAS __aeabi_memcpy8, memcpy
 memcpy:
-	@ r0: dst
-	@ r1: src
-	@ r2: len
+	// r0: dst
+	// r1: src
+	// r2: len
 #ifdef __ARM_FEATURE_UNALIGNED
 	/* In case of UNALIGNED access supported, ip is not used in
 	   function body.  */

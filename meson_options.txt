@@ -132,6 +132,9 @@ option('test-stdin', type: 'boolean', value: false,
        description: 'Enable tests that use stdin. This only works on a few targets')
 option('fortify-source', type: 'combo', choices: ['none', '1', '2', '3'], value: '3',
        description: 'Set _FORTIFY_SOURCE=<value> when building tests')
+option('test-machine', type: 'string', value: 'qemu',
+       description: 'Machine-specific startup code to use when running tests')
+
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
@@ -182,7 +185,7 @@ option('minimal-io-long-long', type: 'boolean', value: false,
 option('fast-bufio', type: 'boolean', value: false,
        description: 'enable some faster buffered i/o operations')
 option('io-wchar', type: 'boolean', value: false,
-       description: 'enable wide character support in printf/scanf even when newlib-mb is false')
+       description: 'enable wide character support in printf/scanf (requires multi-byte support)')
 
 #
 # Options applying to only legacy stdio
@@ -214,27 +217,21 @@ option('newlib-have-fcntl', type: 'boolean', value: false,
 # Internationalization options
 #
 
-option('newlib-iconv-encodings', type: 'array',
-       description: 'enable specific comma-separated list of bidirectional iconv encodings to be built-in')
-option('newlib-iconv-from-encodings', type: 'array',
-       description: 'enable specific comma-separated list of "from" iconv encodings to be built-in')
-option('newlib-iconv-to-encodings', type: 'array',
-       description: 'enable specific comma-separated list of "to" iconv encodings to be built-in')
-option('newlib-iconv-external-ccs', type: 'boolean', value:false,
-       description: 'Load iconv CCS tables from files rather than having them built-in')
-option('newlib-iconv-dir', type: 'string',
-       description: 'Installation directory for iconv CCS files')
-option('newlib-iconv-runtime-dir', type: 'string',
-       description: 'Path used at runtime to locate iconv CCS files')
-option('newlib-iconv-encodings-exclude', type: 'array',
-       description: 'enable specific comma-separated list of bidirectional iconv encodings to be excluded')
+option('mb-capable', type: 'boolean', value: false,
+       description: 'enable multibyte support for UTF-8 charset')
+option('mb-extended-charsets', type: 'boolean', value: false,
+       description: 'enable additional ISO, Windows and JIS charsets')
+option('mb-ucs-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable additional UCS encodings')
+option('mb-iso-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable ISO-8859 encodings')
+option('mb-jis-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable additional JIS multibyte encodings')
+option('mb-windows-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'enable additional Windows encodings')
 
-option('newlib-locale-info', type: 'boolean', value: false,
-       description: 'locale support')
-option('newlib-locale-info-extended', type: 'boolean', value: false,
-       description: 'extended locale support')
 option('newlib-mb', type: 'boolean', value: false,
-       description: 'enable multibyte support')
+       description: 'enable multibyte support [deprecated, use mb-capable]')
 
 #
 # Startup/shutdown options
@@ -263,6 +260,8 @@ option('atomic-signal', type: 'boolean', value: true,
 #
 option('newlib-nano-malloc', type: 'boolean', value: true,
        description: 'use small-footprint nano-malloc implementation')
+option('nano-malloc-clear-freed', type: 'boolean', value: false,
+       description: 'nano version erases memory on free/realloc')
 
 #
 # Locking support

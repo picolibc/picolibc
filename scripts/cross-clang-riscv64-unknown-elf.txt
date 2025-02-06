@@ -22,8 +22,8 @@ endian = 'little'
 
 [properties]
 c_args = ['-Werror=double-promotion', '-fshort-enums']
-c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
-cpp_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
+c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
+cpp_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
 skip_sanity_check = true
 has_link_defsym = true
 default_flash_addr = '0x80000000'

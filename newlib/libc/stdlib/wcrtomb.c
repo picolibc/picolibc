@@ -18,7 +18,7 @@ wcrtomb (char *__restrict s,
 #ifdef _MB_CAPABLE
   if (ps == NULL)
     {
-      static NEWLIB_THREAD_LOCAL mbstate_t _wcrtomb_state;
+      static mbstate_t _wcrtomb_state;
       ps = &_wcrtomb_state;
     }
 #endif
@@ -30,7 +30,9 @@ wcrtomb (char *__restrict s,
 
   if (retval == -1)
     {
+#ifdef _MB_CAPABLE
       ps->__count = 0;
+#endif
       _REENT_ERRNO(reent) = EILSEQ;
       return (size_t)(-1);
     }

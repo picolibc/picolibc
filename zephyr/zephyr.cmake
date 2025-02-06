@@ -85,8 +85,6 @@ if(CONFIG_PICOLIBC_USE_MODULE)
   picolibc_option_true("_FORMAT_DEFAULT_INTEGER" CONFIG_PICOLIBC_IO_INTEGER)
   picolibc_option_true("_FORMAT_DEFAULT_MINIMAL" CONFIG_PICOLIBC_IO_MINIMAL)
   picolibc_option_true("_IO_FLOAT_EXACT" CONFIG_PICOLIBC_IO_FLOAT_EXACT)
-  picolibc_option_true("__HAVE_LOCALE_INFO__" CONFIG_PICOLIBC_LOCALE_INFO)
-  picolibc_option_true("__HAVE_LOCALE_INFO_EXTENDED__" CONFIG_PICOLIBC_LOCALE_EXTENDED_INFO)
   picolibc_option_true("_MB_CAPABLE" CONFIG_PICOLIBC_MULTIBYTE)
   picolibc_option_false("__SINGLE_THREAD__" CONFIG_PICOLIBC_MULTITHREAD)
   picolibc_option_true("PICOLIBC_TLS" CONFIG_THREAD_LOCAL_STORAGE)
@@ -100,6 +98,9 @@ if(CONFIG_PICOLIBC_USE_MODULE)
 
   # Fetch zephyr compile flags from interface
   get_property(PICOLIBC_EXTRA_COMPILE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
+
+  # Disable LTO
+  list(APPEND PICOLIBC_EXTRA_COMPILE_OPTIONS $<TARGET_PROPERTY:compiler,prohibit_lto>)
 
   # Tell Zephyr about the module built picolibc library to link against.
   # We need to construct the absolute path to picolibc in same fashion as CMake

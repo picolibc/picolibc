@@ -65,6 +65,7 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
+#define _DEFAULT_SOURCE
 #include <ctype.h>
 #include <wctype.h>
 #include "local.h"
@@ -73,7 +74,7 @@ wint_t
 towlower (wint_t c)
 {
 #ifdef _MB_CAPABLE
-  return towctrans (c, WCT_TOLOWER);
+  return towlower_l(c, 0);
 #else
   return c < 0x00ff ? (wint_t)(tolower ((int)c)) : c;
 #endif /* _MB_CAPABLE */

@@ -252,7 +252,7 @@ void _reclaim_reent (void *);
  * Set the orientation for a stream. If o > 0, the stream has wide-
  * orientation. If o < 0, the stream has byte-orientation.
  */
-#ifndef __clang__
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wunused-value"
 #endif
 #define ORIENT(fp,ori)			\
@@ -279,7 +279,7 @@ void _reclaim_reent (void *);
    from inside the wide-char functions. */
 int	__swbufw (int, FILE *);
 #ifdef __GNUC__
-_ELIDABLE_INLINE int __swputc(int _c, FILE *_p) {
+__elidable_inline int __swputc(int _c, FILE *_p) {
 #ifdef __SCLE
 	if ((_p->_flags & __SCLE) && _c == '\n')
 	  __swputc ('\r', _p);

@@ -79,13 +79,13 @@ _start(void)
 	__asm__("vmsr fpscr, %0" : : "r" (INIT_FPSCR));
 #endif
 
-#if defined(__ARM_FEATURE_PAUTH) || defined(__ARM_FEATURE_BTI)
+#if defined(__ARM_FEATURE_PAC_DEFAULT) || defined(__ARM_FEATURE_BTI_DEFAULT)
         uint32_t        control;
         __asm__("mrs %0, CONTROL" : "=r" (control));
-#ifdef __ARM_FEATURE_PAUTH
+#ifdef __ARM_FEATURE_PAC_DEFAULT
         control |= (3 << 6);
 #endif
-#ifdef __ARM_FEATURE_BTI
+#ifdef __ARM_FEATURE_BTI_DEFAULT
         control |= (3 << 4);
 #endif
         __asm__("msr CONTROL, %0" : : "r" (control));
@@ -188,25 +188,43 @@ extern char __stack[];
 #define I_BIT           (1 << 7)
 #define F_BIT           (1 << 6)
 
-#define SET_SP(mode) \
-    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "r" (mode | I_BIT | F_BIT): "r0");   \
-    __asm__("mov sp, %0" : : "r" (__stack))
+#define SHADOW_STACK_SIZE 0x10
+#define STACK_IRQ (__stack - SHADOW_STACK_SIZE * 0)
+#define STACK_ABT (__stack - SHADOW_STACK_SIZE * 1)
+#define STACK_UND (__stack - SHADOW_STACK_SIZE * 2)
+#define STACK_FIQ (__stack - SHADOW_STACK_SIZE * 3)
+#define STACK_SYS (__stack - SHADOW_STACK_SIZE * 4)
+#define STACK_SVC (__stack - SHADOW_STACK_SIZE * 5)
+
+#define SET_MODE(mode)                                                          \
+    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "I" (mode | I_BIT | F_BIT) : "r0"); \
+
+#define SET_SP(mode, address)                   \
+    SET_MODE(mode);                             \
+    __asm__("mov sp, %0" : : "r" (address))
 
 #define SET_SPS()                               \
-        SET_SP(MODE_IRQ);                       \
-        SET_SP(MODE_ABT);                       \
-        SET_SP(MODE_UND);                       \
-        SET_SP(MODE_FIQ);                       \
-        SET_SP(MODE_SVC);                       \
-        SET_SP(MODE_SYS);
+        SET_SP(MODE_IRQ, STACK_IRQ);            \
+        SET_SP(MODE_ABT, STACK_ABT);            \
+        SET_SP(MODE_UND, STACK_UND);            \
+        SET_SP(MODE_FIQ, STACK_FIQ);            \
+        SET_SP(MODE_SYS, STACK_SYS);            \
+        SET_MODE(MODE_SVC);
 
 #if __ARM_ARCH_ISA_THUMB == 1
 static __noinline __attribute__((target("arm"))) void
 _set_stacks(void)
 {
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif /* __GNUC__ */
         SET_SPS();
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
 }
-#endif
+#endif /*__ARM_ARCH_ISA_THUMB == 1 */
 
 /*
  * Regular ARM has an 8-entry exception vector and starts without SP
@@ -214,7 +232,7 @@ _set_stacks(void)
  * and then branches here.
  */
 
-static void __attribute__((used)) __section(".init")
+static _Noreturn __attribute__((used)) __section(".init") void
 _cstart(void)
 {
 #if __ARM_ARCH_ISA_THUMB == 1
@@ -246,6 +264,8 @@ _cstart(void)
 #define SCTLR_BRANCH_PRED (1 << 11)
 #define SCTLR_ICACHE (1 << 12)
 #define SCTLR_TRE       (1 << 28)
+#define SCTLR_A (1 << 1)
+#define SCTLR_U (1 << 22)
 
         uint32_t        mmfr0;
         __asm__("mrc p15, 0, %0, c0, c1, 4" : "=r" (mmfr0));
@@ -280,6 +300,10 @@ _cstart(void)
                 uint32_t sctlr;
                 __asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
                 sctlr |= SCTLR_ICACHE | SCTLR_BRANCH_PRED | SCTLR_DATA_L2 | SCTLR_MMU;
+                #ifndef __ARM_FEATURE_UNALIGNED
+                    sctlr |= SCTLR_A;
+                    sctlr &= ~SCTLR_U;
+                #endif
                 sctlr &= ~SCTLR_TRE;
                 __asm__("mcr p15, 0, %0, c1, c0, 0\n" :: "r" (sctlr));
                 __asm__("isb\n");
@@ -297,12 +321,21 @@ _start(void)
 	/* Generate a reference to __vector_table so we get one loaded */
 	__asm__(".equ __my_vector_table, __vector_table");
 
-#if __ARM_ARCH_ISA_THUMB == 1
-        __asm__("mov sp, %0" : : "r" (__stack));
-#else
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
+#endif /* __GNUC__ */
+        __asm__("mov sp, %0" : : "r" (STACK_SVC));
+
+#if __ARM_ARCH_ISA_THUMB != 1
         SET_SPS();
-#endif
-	/* Branch to C code */
+#endif /* __ARM_ARCH_ISA_THUMB != 1 */
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic pop
+#endif /* __GNUC__ */
+
+        /* Branch to C code */
 	__asm__("b _cstart");
 }
 

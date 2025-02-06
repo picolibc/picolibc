@@ -35,6 +35,7 @@
 
 #include "stdio_private.h"
 #include "../../libm/common/math_config.h"
+#include "../stdlib/local.h"
 
 #ifdef WIDE_CHARS
 #define CHAR wchar_t
@@ -442,10 +443,10 @@ _mbslen(const wchar_t *s, size_t maxlen)
     char tmp[MB_LEN_MAX];
     size_t len = 0;
     while (len < maxlen && (c = *s++) != L'\0') {
-        size_t clen;
-        clen = wcrtomb(tmp, c, &ps);
-        if (clen == (size_t) -1)
-            return clen;
+        int clen;
+        clen = __WCTOMB (tmp, c, &ps);
+        if (clen == -1)
+            return (size_t) clen;
         len += clen;
     }
     return len;
@@ -477,7 +478,12 @@ _wcslen(const char *s, size_t maxlen)
 }
 #endif
 
+#ifdef VFPRINTF_S
+int
+vfprintf_s(FILE *__restrict stream, const char *__restrict fmt, va_list ap_orig)
+#else
 int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
+#endif
 {
     unsigned c;		/* holds a char from the format string */
     uint16_t flags;
@@ -495,6 +501,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	char __buf[PRINTF_BUF_SIZE];	/* size for -1 in smallest base, without '\0'	*/
 #ifdef _NEED_IO_WCHAR
         wchar_t __wbuf[PRINTF_BUF_SIZE/2]; /* for wide char output */
+#ifdef _NEED_IO_WIDETOMB
+        char __mb[MB_LEN_MAX];
+#endif
 #endif
 #if PRINTF_LEVEL >= PRINTF_FLT
 	struct dtoa __dtoa;
@@ -510,6 +519,18 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #define dtoa	(u.__dtoa)
 
     int stream_len = 0;
+
+#ifdef VFPRINTF_S
+    const char *msg = "";
+
+    if (stream == NULL) {
+        msg = "output stream is null";
+        goto handle_error;
+    } else if (fmt == NULL) {
+        msg = "null format string";
+        goto handle_error;
+    }
+#endif
 
 #ifndef my_putc
 #ifdef WIDE_CHARS
@@ -1080,8 +1101,13 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                 } else
 #endif
                     pnt = va_arg (ap, char *);
-                if (!pnt)
+                if (!pnt) {
+#ifdef VFPRINTF_S
+                    msg = "arg corresponding to '%s' is null";
+                    goto handle_error;
+#endif
                     pnt = "(null)";
+                }
 #ifdef _NEED_IO_SHRINK
                 char c;
                 while ( (c = *pnt++) )
@@ -1107,9 +1133,8 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     mbstate_t   ps = {0};
                     while(size) {
                         wchar_t c = *wstr++;
-                        char mb[MB_LEN_MAX], *m;
-                        size_t mb_len = wcrtomb(mb, c, &ps);
-                        m = mb;
+                        char *m = u.__mb;
+                        int mb_len = __WCTOMB(m, c, &ps);
                         while (size && mb_len) {
                             my_putc(*m++, stream);
                             size--;
@@ -1137,8 +1162,12 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
                 }
 #endif
-#ifdef _PRINTF_PERCENT_N
+#if defined(_PRINTF_PERCENT_N) || defined(VFPRINTF_S)
             } else if (c == 'n') {
+#ifdef VFPRINTF_S
+                msg = "format string contains percent-n";
+                goto handle_error;
+#else
                 if (flags & FL_LONG) {
                     if (flags & FL_REPD_TYPE)
                         *va_arg(ap, long long *) = stream_len;
@@ -1152,6 +1181,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                 } else {
                     *va_arg(ap, int *) = stream_len;
                 }
+#endif
 #endif
             } else {
                 if (c == 'd' || c == 'i') {
@@ -1319,12 +1349,24 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     stream->flags |= __SERR;
     stream_len = -1;
     goto ret;
+#ifdef VFPRINTF_S
+  handle_error:
+    if (__cur_handler != NULL) {
+        __cur_handler(msg, NULL, -1);
+    }
+    if (stream)
+        stream->flags |= __SERR;
+    stream_len = -1;
+    goto ret;
+#endif
 }
 
+#ifndef VFPRINTF_S
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
 #ifdef _HAVE_ALIAS_ATTRIBUTE
 __strong_reference(vfprintf, __d_vfprintf);
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
+#endif
 #endif
 #endif

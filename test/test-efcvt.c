@@ -53,11 +53,13 @@ const struct test ecvt_tests[] = {
     { 1.0e-12,  4, -11, 0, "1000" },
 };
 
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wunused-value"
 #pragma GCC diagnostic ignored "-Woverflow"
 #pragma GCC diagnostic ignored "-Wliteral-range"
+#endif
 
 #if !defined(TINY_STDIO) && !defined(NO_NEWLIB)
 #define ecvt_r(n, dig, dec, sign, buf, len) (ecvtbuf(n, dig, dec, sign, buf) ? 0 : -1)

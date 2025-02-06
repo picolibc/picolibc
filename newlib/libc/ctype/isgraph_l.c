@@ -8,12 +8,12 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isgraph_l
 int
-isgraph_l (int c, struct __locale_t *locale)
+isgraph_l (int c, locale_t locale)
 {
 #if _PICOLIBC_CTYPE_SMALL
     (void) locale;
     return isgraph(c);
 #else
-    return __locale_ctype_ptr_l (locale)[c+1] & (_P|_U|_L|_N);
+    return __CTYPE_PTR_L (locale)[c+1] & (_P|_U|_L|_N);
 #endif
 }

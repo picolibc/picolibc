@@ -119,25 +119,14 @@ configuration
 
 ### Internationalization options
 
-These options control which character sets are supported by iconv.
+These options control how much internationalization support is included
+in the library. Picolibc only supports the 'C' locale but allows any
+supported charset to be specified using the locale 'C.<charset>'.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-iconv-encodings      | <empty> | Comma-separated list of iconv encodings to be built-in (default all supported). <br> Set to `none` to disable all encodings. |
-| newlib-iconv-from-encodings | <empty> | Comma-separated list of "from" iconv encodings to be built-in (default iconv-encodings) |
-| newlib-iconv-to-encodings   | <empty> | Comma-separated list of "to" iconv encodings to be built-in (default iconv-encodings) |
-| newlib-iconv-external-ccs   | false   | Use file system to store iconv tables. Requires fopen. (default built-in to memory)  |
-| newlib-iconv-dir            | libdir/locale | Directory to install external CCS files. Only used with newlib-iconv-external-ccs=true |
-| newlib-iconv-runtime-dir    | newlib-iconv-dir | Directory to read external CCS files from at runtime. |
-
-These options control how much Locale support is included in the
-library. By default, picolibc only supports the 'C' locale.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-locale-info          | false   | Enable locale support                                                                |
-| newlib-locale-info-extended | false   | Enable even more locale support                                                      |
-| newlib-mb                   | false   | Enable multibyte support                                                             |
+| mb-capable                  | false   | Enable multibyte support including UTF-8 charset                                     |
+| mb-extended-charsets        | false   | Enable additional ISO, Windows and JIS charsets                                      |
 
 ### Startup/shutdown options
 
@@ -366,14 +355,16 @@ the library code size. Here's the
 [do-riscv-configure](../scripts/do-riscv-configure) script from the repository
 that configures the library for small RISC-V systems:
 
-    #!/bin/sh
-    ARCH=riscv64-unknown-elf
-    DIR=`dirname $0`
-    meson "$DIR" \
-	    -Dincludedir=picolibc/$ARCH/include \
-	    -Dlibdir=picolibc/$ARCH/lib \
-	    --cross-file "$DIR"/cross-$ARCH.txt \
-	    "$@"
+```sh
+#!/bin/sh
+ARCH=riscv64-unknown-elf
+DIR=`dirname $0`
+meson "$DIR" \
+    -Dincludedir=picolibc/$ARCH/include \
+    -Dlibdir=picolibc/$ARCH/lib \
+    --cross-file "$DIR"/cross-$ARCH.txt \
+    "$@"
+```
 
 This script is designed to be run from a build directory, so you'd do:
 

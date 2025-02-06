@@ -8,13 +8,13 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isxdigit_l
 int
-isxdigit_l (int c, struct __locale_t *locale)
+isxdigit_l (int c, locale_t locale)
 {
-#ifdef __HAVE_LOCALE_INFO__
-    return __locale_ctype_ptr_l (locale)[c+1] & ((_X)|(_N));
-#else
     (void) locale;
+#if _PICOLIBC_CTYPE_SMALL
     return isxdigit(c);
+#else
+    return __CTYPE_PTR_L (locale)[c+1] & ((_X)|(_N));
 #endif
 }
 

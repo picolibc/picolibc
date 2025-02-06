@@ -92,8 +92,6 @@ struct tm
 #define CLK_TCK CLOCKS_PER_SEC
 #endif
 
-#define CLOCK_REALTIME		((clockid_t) 1)
-
 /* Flag indicating time is "absolute" with respect to the clock
    associated with a time.  Value 4 is historic. */
 
@@ -123,8 +121,12 @@ struct itimerspec {
 #endif
 
 #if __GNU_VISIBLE
-#define CLOCK_REALTIME_COARSE	((clockid_t) 0)
+#define CLOCK_REALTIME_COARSE	(0)
 #endif
+
+#define CLOCK_REALTIME		(1)
+
+/* Manifest Constants, P1003.4b/D8, p. 55 */
 
 #if defined(_POSIX_CPUTIME)
 
@@ -132,7 +134,7 @@ struct itimerspec {
    the identifier of the CPU_time clock associated with the PROCESS
    making the function call.  */
 
-#define CLOCK_PROCESS_CPUTIME_ID ((clockid_t) 2)
+#define CLOCK_PROCESS_CPUTIME_ID (2)
 
 #endif
 
@@ -142,7 +144,7 @@ struct itimerspec {
     the identifier of the CPU_time clock associated with the THREAD
     making the function call.  */
 
-#define CLOCK_THREAD_CPUTIME_ID	((clockid_t) 3)
+#define CLOCK_THREAD_CPUTIME_ID	(3)
 
 #endif
 
@@ -152,21 +154,21 @@ struct itimerspec {
  *  as a clock whose value cannot be set via clock_settime() and which
  *  cannot have backward clock jumps. */
 
-#define CLOCK_MONOTONIC		((clockid_t) 4)
+#define CLOCK_MONOTONIC		(4)
 
 #endif
 
 #if __GNU_VISIBLE
 
-#define CLOCK_MONOTONIC_RAW	((clockid_t) 5)
+#define CLOCK_MONOTONIC_RAW	(5)
 
-#define CLOCK_MONOTONIC_COARSE	((clockid_t) 6)
+#define CLOCK_MONOTONIC_COARSE	(6)
 
-#define CLOCK_BOOTTIME		((clockid_t) 7)
+#define CLOCK_BOOTTIME		(7)
 
-#define CLOCK_REALTIME_ALARM	((clockid_t) 8)
+#define CLOCK_REALTIME_ALARM	(8)
 
-#define CLOCK_BOOTTIME_ALARM	((clockid_t) 9)
+#define CLOCK_BOOTTIME_ALARM	(9)
 
 #endif
 
@@ -228,7 +230,7 @@ int	   getdate_r (const char *, struct tm *);
 
 struct tm *gmtime (const time_t *_timer);
 
-#if __POSIX_VISIBLE
+#if __POSIX_VISIBLE || __ZEPHYR_VISIBLE
 struct tm *gmtime_r (const time_t *__restrict,
                      struct tm *__restrict);
 #endif

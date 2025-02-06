@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 #
 # Copyright © 2021 Keith Packard
+# Copyright © 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,35 +33,38 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 lib_semihost_srcs = [
-  'mips_stub.c',
+  'mips_close.c',
   'mips_exit.c',
-  'mips_iob.c',
-  ]
+  'mips_fstat.c',
+  'mips_lseek.c',
+  'mips_open.c',
+  'mips_read.c',
+  'mips_stub.c',
+  'mips_unlink.c',
+  'mips_write.c',
+]
 
 has_semihost = true
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
-  instdir = join_paths(lib_dir, value[0])
+  instdir = join_paths(lib_dir, target_dir)
 
-  if target == ''
-    libsemihost_name = 'semihost'
-  else
-    libsemihost_name = join_paths(target, 'libsemihost')
-  endif
+  libsemihost_name = 'semihost'
 
-  local_lib_semihost_target = static_library(libsemihost_name,
+  local_lib_semihost_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
 				       lib_semihost_srcs,
 				       install : true,
 				       install_dir : instdir,
 				       include_directories : inc,
-				       c_args : value[1] + c_args,
+				       c_args : target_c_args + c_args,
 				       pic: false)
 
   set_variable('lib_semihost' + target, local_lib_semihost_target)
 
 endforeach
-

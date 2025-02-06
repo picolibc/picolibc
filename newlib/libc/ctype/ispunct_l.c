@@ -7,13 +7,13 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef ispunct_l
 int
-ispunct_l (int c, struct __locale_t *locale)
+ispunct_l (int c, locale_t locale)
 {
 #if _PICOLIBC_CTYPE_SMALL
     (void) locale;
     return ispunct(c);
 #else
-    return __locale_ctype_ptr_l (locale)[c+1] & _P;
+    return __CTYPE_PTR_L (locale)[c+1] & _P;
 #endif
 }
 

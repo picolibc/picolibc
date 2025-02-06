@@ -237,8 +237,5 @@ wcwidth (const wchar_t wc)
 {
   wint_t wi = wc;
 
-#ifdef _MB_CAPABLE
-  wi = _jp2uc (wi);
-#endif /* _MB_CAPABLE */
   return __wcwidth (wi);
 }

@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -36,19 +36,18 @@ picolibc_sources(
   duplocale.c
   freelocale.c
   getlocalename_l.c
-  locale.c
   localeconv.c
-  lnumeric.c
+  localedata.c
+  locale_ctype_ptr.c
+  locale_ctype_ptr_l.c
+  localedata.c
+  locale_mb_cur_max.c
+  locale_names.c
   newlocale.c
-  timelocal.c
+  nl_langinfo.c
+  setlocale.c
+  timedata.c
   uselocale.c
   )
 
-if(__HAVE_LOCALE_INFO__)
-  picolibc_sources(
-    lctype.c
-    lmessages.c
-    lmonetary.c
-    nl_langinfo.c
-    )
-endif()
+target_include_directories(c PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")

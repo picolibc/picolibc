@@ -73,11 +73,7 @@
 setjmp:
 	entry	sp, 16
 
-	/* Flush registers.  */
-	mov	a4, a2			// save a2 (jmp_buf)
-	movi	a2, SYS_nop
-	syscall
-	mov	a2, a4			// restore a2
+	call4	__xtensa_libgcc_window_spill
 
 	/* Copy the register save area at (sp - 16).  */
 	addi	a5, a1, -16

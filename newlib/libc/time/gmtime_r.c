@@ -65,7 +65,8 @@ struct tm *
 gmtime_r (const time_t *__restrict tim_p,
 	struct tm *__restrict res)
 {
-  long days, rem;
+  long rem;
+  time_t days;
   const time_t lcltime = *tim_p;
   int era, weekday, year;
   unsigned erayear, yearday, month, day;

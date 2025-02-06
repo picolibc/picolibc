@@ -8,12 +8,39 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include "local.h"
 
 wint_t
-towupper_l (wint_t c, struct __locale_t *locale)
+towupper_l (wint_t c, locale_t locale)
 {
-  (void) locale;
 #ifdef _MB_CAPABLE
-  return towctrans_l (c, WCT_TOUPPER, locale);
+  const struct caseconv_entry * cce = __caseconv_lookup(c, locale);
+
+  if (cce)
+    switch (cce->mode)
+      {
+      case TOUP:
+	return c + cce->delta;
+      case TOBOTH:
+	return c - 1;
+      case TO1:
+	switch (cce->delta)
+	  {
+	  case EVENCAP:
+	    if (c & 1)
+	      return c - 1;
+	    break;
+	  case ODDCAP:
+	    if (!(c & 1))
+	      return c - 1;
+	    break;
+	  default:
+	    break;
+	  }
+      default:
+	break;
+      }
+
+  return c;
 #else
-  return towupper (c);
-#endif /* _MB_CAPABLE */
+  (void) locale;
+  return towupper(c);
+#endif
 }

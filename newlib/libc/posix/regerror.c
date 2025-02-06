@@ -158,7 +158,10 @@ regerror(int errcode,
  == static char *regatoi(const regex_t *preg, char *localbuf);
  */
 static const char *
-regatoi(const regex_t *preg, char *localbuf)
+regatoi(
+	const regex_t *preg,
+	char *localbuf
+)
 {
 	const struct rerr *r;
 

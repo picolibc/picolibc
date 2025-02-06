@@ -49,6 +49,12 @@
 
 _BEGIN_STD_C
 
+#if !((defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
+     (defined(__cplusplus) && __cplusplus >= 201402L))
+     //Provide this function for applications which use an earlier C standard before C11 and C++14
+     #define _PICOLIBC_USE_DEPRECATED_GETS
+#endif
+
 /*
  * This is an internal structure of the library that is subject to be
  * changed without warnings at any time.  Please do *never* reference
@@ -56,7 +62,7 @@ _BEGIN_STD_C
  */
 
 #ifdef ATOMIC_UNGETC
-#if defined(__riscv) || defined(__MICROBLAZE__)
+#if defined(__riscv) || defined(__MICROBLAZE__) || (__loongarch__)
 /*
  * Use 32-bit ungetc storage when doing atomic ungetc on RISC-V and
  * MicroBlaze, which have 4-byte swap intrinsics but not 2-byte swap
@@ -130,7 +136,7 @@ struct __file_ext {
 */
 #ifndef ___FILE_DECLARED
 typedef struct __file __FILE;
-# define __FILE_DECLARED
+# define ___FILE_DECLARED
 #endif
 
 #ifndef _FILE_DECLARED
@@ -203,7 +209,9 @@ int	fflush(FILE *stream);
 
 #ifdef _HAVE_FORMAT_ATTRIBUTE
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wformat"
+#endif
 #define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, 0)))
 #else
 #define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, __f)))
@@ -230,7 +238,9 @@ int	snprintf(char *__s, size_t __n, const char *__fmt, ...) __PRINTF_ATTRIBUTE__
 int	vsprintf(char *__s, const char *__fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
 int	vsnprintf(char *__s, size_t __n, const char *__fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(3, 0);
 int     asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2,3);
+char    *asnprintf(char *str, size_t *lenp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(3,4);
 int     vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2,0);
+char    *vasnprintf(char *str, size_t *lenp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(3,0);
 
 int	fputs(const char *__str, FILE *__stream);
 int	puts(const char *__str);
@@ -252,7 +262,9 @@ int	sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf
 int	vsscanf(const char *__buf, const char *__fmt, __gnuc_va_list ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 
 char	*fgets(char *__str, int __size, FILE *__stream);
-char	*gets(char *__str);
+#ifdef _PICOLIBC_USE_DEPRECATED_GETS
+     char *gets(char *str);
+#endif
 size_t	fread(void *__ptr, size_t __size, size_t __nmemb,
 		      FILE *__stream);
 
@@ -313,6 +325,11 @@ typedef _fpos_t fpos_t;
 typedef	__off_t		off_t;		/* file offset */
 #  define _OFF_T_DECLARED
 # endif
+
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
 
 # ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
@@ -383,6 +400,7 @@ int	putchar_unlocked (int);
 
 #if __STDC_WANT_LIB_EXT1__ == 1
 #include <sys/_types.h>
+#include <stdarg.h>
 
 #ifndef _ERRNO_T_DEFINED
 typedef __errno_t errno_t;
@@ -396,6 +414,10 @@ typedef __rsize_t rsize_t;
 
 int sprintf_s(char *__restrict __s, rsize_t __bufsize,
               const char *__restrict __format, ...);
+int vsnprintf_s(char *__restrict s, rsize_t n, const char *__restrict fmt,
+                va_list arg);
+int vfprintf_s(FILE *__restrict stream, const char *__restrict fmt,
+               va_list ap_orig);
 #endif
 
 /*
@@ -427,6 +449,20 @@ __printf_float(float f)
 	} u = { .f = f };
 	return u.u;
 }
+
+#ifdef _PICOLIBC_PRINTF
+#if _PICOLIBC_PRINTF == 'd'
+#define PICOLIBC_DOUBLE_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'f'
+#define PICOLIBC_FLOAT_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'l'
+#define PICOLIBC_LONG_LONG_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'i'
+#define PICOLIBC_INTEGER_PRINTF_SCANF
+#elif _PICOLIBC_PRINTF == 'm'
+#define PICOLIBC_MINIMAL_PRINTF_SCANF
+#endif
+#endif
 
 #if !defined(PICOLIBC_DOUBLE_PRINTF_SCANF) && \
     !defined(PICOLIBC_FLOAT_PRINTF_SCANF) && \

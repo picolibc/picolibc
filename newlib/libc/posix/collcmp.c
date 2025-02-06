@@ -28,6 +28,7 @@
 #include <limits.h>
 #include "collate.h"
 
+#ifdef _HAVE_REAL_STRCOLL
 /*
  * Compare two characters converting collate information
  * into ASCII-compatible range, it allows to handle
@@ -51,3 +52,4 @@ int __collate_range_cmp (int c1, int c2)
 		return (ret);
 	return (c1 - c2);
 }
+#endif

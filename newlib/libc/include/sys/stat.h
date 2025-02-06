@@ -80,6 +80,11 @@ typedef	__off_t		off_t;		/* file offset */
 #define	_OFF_T_DECLARED
 #endif
 
+#ifndef _OFF64_T_DECLARED
+typedef __off64_t       off64_t;        /* 64-bit file offset */
+#define	_OFF64_T_DECLARED
+#endif
+
 #ifndef _TIME_T_DECLARED
 typedef	_TIME_T_	time_t;
 #define	_TIME_T_DECLARED
@@ -296,8 +301,11 @@ int	stat64 (const char *__restrict __path, struct stat64 *__restrict __sbuf );
 int	fstat64 (int __fd, struct stat64 *__sbuf );
 #endif
 
-#if defined (__SPU__) || defined(__rtems__) || defined(__CYGWIN__)
+#if defined (__SPU__) || defined(__rtems__) || defined(__CYGWIN__) || __POSIX_VISIBLE >= 200112L || defined(__BSD_VISIBLE) || (_XOPEN_SOURCE - 0) >= 500
 int	lstat (const char *__restrict __path, struct stat *__restrict __buf );
+#endif
+
+#if defined (__SPU__) || defined(__rtems__) || defined(__CYGWIN__) || defined(__BSD_VISIBLE) || (_XOPEN_SOURCE - 0) >= 500 || __SVID_VISIBLE
 int	mknod (const char *__path, mode_t __mode, dev_t __dev );
 #endif
 

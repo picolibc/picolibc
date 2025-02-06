@@ -289,7 +289,7 @@ locale, hard-coding the "C" locale settings.
 #include <wctype.h>
 #include <wchar.h>
 #include "local.h"
-#include "../locale/setlocale.h"
+#include "locale_private.h"
 
 /* Defines to make the file dual use for either strftime() or wcsftime().
  * To get wcsftime, define MAKE_WCSFTIME.
@@ -304,7 +304,7 @@ locale, hard-coding the "C" locale settings.
 #  define t_snprintf	snprintf	/* char equivalent function name */
 #  define t_strncmp	strncmp		/* char equivalent function name */
 #  define SFLG				/* %s flag (null for normal char) */
-#  define _ctloc(x)     (ctloclen = strlen (ctloc = _CurrentTimeLocale->x))
+#  define _ctloc(x)     (ctloclen = strlen (ctloc = x))
 #  define TOLOWER(c)	tolower((int)(unsigned char)(c))
 #  define STRTOUL(c,p,b) strtoul((c),(p),(b))
 #  define STRCPY(a,b)	strcpy((a),(b))
@@ -323,8 +323,8 @@ locale, hard-coding the "C" locale settings.
 #  define STRCHR(a,b)	wcschr((a),(b))
 #  define STRLEN(a)	wcslen(a)
 #  define SFLG		"l"		/* %s flag (l for wide char) */
-#  ifdef __HAVE_LOCALE_INFO_EXTENDED__
-#   define _ctloc(x)    (ctloclen = wcslen (ctloc = _CurrentTimeLocale->w##x))
+#  ifdef WTIME_WDAY
+#   define _ctloc(x)    (ctloclen = wcslen (ctloc = W ## x))
 #  else
 #   define CTLOCBUFLEN   256		/* Arbitrary big buffer size */
     static const wchar_t *
@@ -336,7 +336,7 @@ locale, hard-coding the "C" locale settings.
 	*len_ret = 0;
       return buf;
     }
-#   define _ctloc(x)    (ctloc = __ctloc (ctlocbuf, _CurrentTimeLocale->x, \
+#   define _ctloc(x)    (ctloc = __ctloc (ctlocbuf, x, \
 					  &ctloclen))
 #  endif
 #endif  /* MAKE_WCSFTIME */
@@ -403,13 +403,13 @@ typedef struct {
 } era_info_t;
 
 static era_info_t *
-#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && defined (WTIME_ERA)
 get_era_info (const struct tm *tim_p, const wchar_t *era)
 #else
 get_era_info (const struct tm *tim_p, const char *era)
 #endif
 {
-#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && defined (WTIME_ERA)
   wchar_t *c;
   const wchar_t *dir;
 # define ERA_STRCHR(a,b)	wcschr((a),(b))
@@ -495,7 +495,7 @@ get_era_info (const struct tm *tim_p, const char *era)
 	    ei->year = etm.tm_year - tim_p->tm_year + offset;
 	  /* era_C */
 	  c = ERA_STRCHR (era, ':');
-#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
 	  len = mbsnrtowcs (NULL, &era, c - era, 0, NULL);
 	  if (len == (size_t) -1)
 	    {
@@ -511,7 +511,7 @@ get_era_info (const struct tm *tim_p, const char *era)
 	      free (ei);
 	      return NULL;
 	    }
-#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
 	  len = mbsnrtowcs (ei->era_C, &era, c - era, len + 1, NULL);
 #else
 	  ERA_STRNCPY (ei->era_C, era, len);
@@ -523,7 +523,7 @@ get_era_info (const struct tm *tim_p, const char *era)
 	  c = ERA_STRCHR (era, ';');
 	  if (!c)
 	    c = ERA_STRCHR (era, '\0');
-#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
 	  len = mbsnrtowcs (NULL, &era, c - era, 0, NULL);
 	  if (len == (size_t) -1)
 	    {
@@ -541,7 +541,7 @@ get_era_info (const struct tm *tim_p, const char *era)
 	      free (ei);
 	      return NULL;
 	    }
-#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
 	  len = mbsnrtowcs (ei->era_Y, &era, c - era, len + 1, NULL);
 #else
 	  ERA_STRNCPY (ei->era_Y, era, len);
@@ -573,14 +573,14 @@ typedef struct {
 } alt_digits_t;
 
 static alt_digits_t *
-#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && defined (WTIME_ALT_DIGITS)
 get_alt_digits (const wchar_t *alt_digits)
 #else
 get_alt_digits (const char *alt_digits)
 #endif
 {
   alt_digits_t *adi;
-#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && defined (WTIME_ALT_DIGITS)
   const wchar_t *a, *e;
 # define ALT_STRCHR(a,b)	wcschr((a),(b))
 # define ALT_STRCPY(a,b)	wcscpy((a),(b))
@@ -611,7 +611,7 @@ get_alt_digits (const char *alt_digits)
       return NULL;
     }
   /* Compute memory required for `buffer'. */
-#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && !defined (WTIME_ALT_DIGITS)
   len = mbstowcs (NULL, alt_digits, 0);
   if (len == (size_t) -1)
     {
@@ -631,7 +631,7 @@ get_alt_digits (const char *alt_digits)
       return NULL;
     }
   /* Store digits in it. */
-#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && !defined (WTIME_ALT_DIGITS)
   mbstowcs (adi->buffer, alt_digits, len + 1);
 #else
   ALT_STRCPY (adi->buffer, alt_digits);
@@ -674,12 +674,12 @@ conv_to_alt_digits (CHAR *buf, size_t bufsiz, unsigned num, alt_digits_t *adi)
 
 static size_t
 __strftime (CHAR *s, size_t maxsize, const CHAR *format,
-	    const struct tm *tim_p, struct __locale_t *locale,
+	    const struct tm *tim_p, locale_t locale,
 	    era_info_t **era_info, alt_digits_t **alt_digits)
 #else /* !_WANT_C99_TIME_FORMATS */
 static size_t
 __strftime (CHAR *s, size_t maxsize, const CHAR *format,
-	    const struct tm *tim_p, struct __locale_t *locale)
+	    const struct tm *tim_p, locale_t locale)
 
 #define __strftime(s,m,f,t,l,e,a)	__strftime((s),(m),(f),(t),(l))
 #endif /* !_WANT_C99_TIME_FORMATS */
@@ -687,7 +687,7 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
   size_t count = 0;
   int len = 0;
   const CHAR *ctloc;
-#if defined (MAKE_WCSFTIME) && !defined (__HAVE_LOCALE_INFO_EXTENDED__)
+#if defined (MAKE_WCSFTIME) && !defined (WTIME_WDAY)
   CHAR ctlocbuf[CTLOCBUFLEN];
 #endif
   size_t i, ctloclen;
@@ -696,7 +696,6 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
   unsigned long width;
   int tzset_called = 0;
 
-  const struct lc_time_T *_CurrentTimeLocale = __get_time_locale (locale);
   for (;;)
     {
       while (*format && *format != CQ('%'))
@@ -730,12 +729,12 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	{
 	  alt = *format++;
 #ifdef _WANT_C99_TIME_FORMATS
-#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
-	  if (!*era_info && *_CurrentTimeLocale->wera)
-	    *era_info = get_era_info (tim_p, _CurrentTimeLocale->wera);
+#if defined (MAKE_WCSFTIME) && defined (TIME_WERA)
+	  if (!*era_info && *TIME_WERA)
+	    *era_info = get_era_info (tim_p, TIME_WERA);
 #else
-	  if (!*era_info && *_CurrentTimeLocale->era)
-	    *era_info = get_era_info (tim_p, _CurrentTimeLocale->era);
+          if (!*era_info && *TIME_ERA)
+	    *era_info = get_era_info (tim_p, TIME_ERA);
 #endif
 #endif /* _WANT_C99_TIME_FORMATS */
 	}
@@ -743,12 +742,12 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	{
 	  alt = *format++;
 #ifdef _WANT_C99_TIME_FORMATS
-#if defined (MAKE_WCSFTIME) && defined (__HAVE_LOCALE_INFO_EXTENDED__)
-	  if (!*alt_digits && *_CurrentTimeLocale->walt_digits)
-	    *alt_digits = get_alt_digits (_CurrentTimeLocale->walt_digits);
+#if defined (MAKE_WCSFTIME) && defined (TIME_WALT_DIGITS)
+	  if (!*alt_digits && *TIME_WALT_DIGITS)
+            *alt_digits = get_alt_digits (TIME_WALT_DIGITS);
 #else
-	  if (!*alt_digits && *_CurrentTimeLocale->alt_digits)
-	    *alt_digits = get_alt_digits (_CurrentTimeLocale->alt_digits);
+	  if (!*alt_digits && *TIME_ALT_DIGITS)
+	    *alt_digits = get_alt_digits (TIME_ALT_DIGITS);
 #endif
 #endif /* _WANT_C99_TIME_FORMATS */
 	}
@@ -756,7 +755,7 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
       switch (*format)
 	{
 	case CQ('a'):
-	  _ctloc (wday[tim_p->tm_wday]);
+	  _ctloc (TIME_WDAY[tim_p->tm_wday]);
 	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
@@ -766,7 +765,7 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	    }
 	  break;
 	case CQ('A'):
-	  _ctloc (weekday[tim_p->tm_wday]);
+	  _ctloc (TIME_WEEKDAY[tim_p->tm_wday]);
 	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
@@ -777,7 +776,7 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	  break;
 	case CQ('b'):
 	case CQ('h'):
-	  _ctloc (mon[tim_p->tm_mon]);
+	  _ctloc (TIME_MON[tim_p->tm_mon]);
 	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
@@ -787,7 +786,7 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	    }
 	  break;
 	case CQ('B'):
-	  _ctloc (month[tim_p->tm_mon]);
+	  _ctloc (TIME_MONTH[tim_p->tm_mon]);
 	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
@@ -798,30 +797,30 @@ __strftime (CHAR *s, size_t maxsize, const CHAR *format,
 	  break;
 	case CQ('c'):
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == 'E' && *era_info && *_CurrentTimeLocale->era_d_t_fmt)
-	    _ctloc (era_d_t_fmt);
+	  if (alt == 'E' && *era_info && *TIME_ERA_D_T_FMT)
+	    _ctloc (TIME_ERA_E_T_FMT);
 	  else
 #endif /* _WANT_C99_TIME_FORMATS */
-	    _ctloc (c_fmt);
+	    _ctloc (TIME_C_FMT);
 	  goto recurse;
 	case CQ('r'):
-	  _ctloc (ampm_fmt);
+	  _ctloc (TIME_AMPM_FMT);
 	  goto recurse;
 	case CQ('x'):
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == 'E' && *era_info && *_CurrentTimeLocale->era_d_fmt)
-	    _ctloc (era_d_fmt);
+	  if (alt == 'E' && *era_info && *TIME_ERA_D_FMT)
+	    _ctloc (TIME_ERA_D_FMT);
 	  else
 #endif /* _WANT_C99_TIME_FORMATS */
-	    _ctloc (x_fmt);
+	    _ctloc (TIME_X_FMT);
 	  goto recurse;
 	case CQ('X'):
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == 'E' && *era_info && *_CurrentTimeLocale->era_t_fmt)
-	    _ctloc (era_t_fmt);
+	  if (alt == 'E' && *era_info && *TIME_ERA_T_FMT)
+	    _ctloc (TIME_ERA_T_FMT)
 	  else
 #endif /* _WANT_C99_TIME_FORMATS */
-	    _ctloc (X_fmt);
+	    _ctloc (TIME_UX_FMT);
 recurse:
 	  if (*ctloc)
 	    {
@@ -878,7 +877,7 @@ recurse:
 		if (width < 2)
 		  width = 2;
 		len = t_snprintf (&s[count], maxsize - count, fmt,
-				neg ? "-" : pos, width - neg, century);
+                                  neg ? "-" : pos, (int) (width - neg), century);
 	      }
             CHECK_LENGTH ();
 	  }
@@ -1010,7 +1009,7 @@ recurse:
 	    if (pad)
 	      *fmt++ = CQ('0');
 	    STRCPY (fmt, CQ(".*u"));
-	    len = t_snprintf (&s[count], maxsize - count, fmtbuf, width, p_year);
+	    len = t_snprintf (&s[count], maxsize - count, fmtbuf, (int) width, p_year);
             if (len < 0  ||  (count+=len) >= maxsize)
               return 0;
 	  }
@@ -1026,7 +1025,7 @@ recurse:
 		break;
 	    }
 #endif /* _WANT_C99_TIME_FORMATS */
-	  /*FALLTHRU*/
+	  __PICOLIBC_FALLTHROUGH;
 	case CQ('k'):	/* newlib extension */
 	  len = t_snprintf (&s[count], maxsize - count,
 			  *format == CQ('k') ? CQ("%2d") : CQ("%.2d"),
@@ -1036,7 +1035,7 @@ recurse:
 	case CQ('l'):	/* newlib extension */
 	  if (alt == CQ('O'))
 	    alt = CQ('\0');
-	  /*FALLTHRU*/
+	  __PICOLIBC_FALLTHROUGH;
 	case CQ('I'):
 	  {
 	    register int  h12;
@@ -1085,7 +1084,7 @@ recurse:
 	  break;
 	case CQ('p'):
 	case CQ('P'):
-	  _ctloc (am_pm[tim_p->tm_hour < 12 ? 0 : 1]);
+	  _ctloc (TIME_AM_PM[tim_p->tm_hour < 12 ? 0 : 1]);
 	  for (i = 0; i < ctloclen; i++)
 	    {
 	      if (count < maxsize - 1)
@@ -1362,7 +1361,7 @@ recurse:
 	      if (pad)
 		*fmt++ = CQ('0');
 	      STRCPY (fmt, CQ(".*u"));
-	      len = t_snprintf (&s[count], maxsize - count, fmtbuf, width,
+	      len = t_snprintf (&s[count], maxsize - count, fmtbuf, (int) width,
 			      year);
 	      CHECK_LENGTH ();
 	    }
@@ -1474,7 +1473,7 @@ strftime (CHAR *__restrict s,
 
 size_t
 strftime_l (CHAR *__restrict s, size_t maxsize, const CHAR *__restrict format,
-	    const struct tm *__restrict tim_p, struct __locale_t *locale)
+	    const struct tm *__restrict tim_p, locale_t locale)
 {
 #ifdef _WANT_C99_TIME_FORMATS
   era_info_t *era_info = NULL;

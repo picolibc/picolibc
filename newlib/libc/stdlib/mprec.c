@@ -80,7 +80,13 @@
  *	down depends on the machine and the number being converted.
  */
 
-#ifdef __GNUC__
+#define _DEFAULT_SOURCE
+#include <stdlib.h>
+#include <string.h>
+#include "mprec.h"
+#include "atexit.h"
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
@@ -89,12 +95,6 @@
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
 #endif
-
-#define _DEFAULT_SOURCE
-#include <stdlib.h>
-#include <string.h>
-#include "mprec.h"
-#include "atexit.h"
 
 /* This is defined in sys/reent.h as (sizeof (size_t) << 3) now, as in NetBSD.
    The old value of 15 was wrong and made newlib vulnerable against buffer

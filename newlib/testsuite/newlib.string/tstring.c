@@ -18,11 +18,13 @@
 #endif
 
 /* Ignore warnings about odd (but intended) use of functions */
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wmemset-transposed-args"
 #ifndef __clang__
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
 #endif
 #pragma GCC diagnostic ignored "-Wunused-value"
+#endif
 
 #define MAX_2 (2 * MAX_1 + MAX_1 / 10)
 

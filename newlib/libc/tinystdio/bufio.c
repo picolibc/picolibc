@@ -53,6 +53,7 @@ __bufio_flush_locked(FILE *f)
                                 return _FDEV_ERR;
                                 break;
 			}
+                        buf += this;
 			bf->pos += this;
 			bf->len -= this;
 		}

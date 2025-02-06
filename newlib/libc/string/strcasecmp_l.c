@@ -42,7 +42,7 @@ QUICKREF
 #include <ctype.h>
 
 int
-strcasecmp_l (const char *s1, const char *s2, struct __locale_t *locale)
+strcasecmp_l (const char *s1, const char *s2, locale_t locale)
 {
   int d = 0;
   for ( ; ; )

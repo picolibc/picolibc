@@ -42,10 +42,8 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.8.8'
+	version: '1.8.9'
        )
-
-targets = []
 
 fs = import('fs')
 
@@ -83,6 +81,9 @@ cpu_family_aliases = {
 		       'arm64' : 'aarch64',
 		       # cris
 		       'crisv32' : 'cris',
+           # loongarch
+		       'loongarch64' : 'loongarch',
+		       'loongarch32' : 'loongarch',
 		       # m68hc11
 		       'm6811' : 'm68hc11',
 		       'm6812' : 'm68hc11',
@@ -151,6 +152,7 @@ multilib_exclude = get_option('multilib-exclude')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
+test_machine = get_option('test-machine')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
 if get_option('tests-cdefs') == 'auto'
@@ -177,14 +179,9 @@ else
   have_cplusplus = false
 endif
 
-newlib_iconv_encodings = get_option('newlib-iconv-encodings')
-newlib_iconv_encodings_exclude = get_option('newlib-iconv-encodings-exclude')
-newlib_iconv_from_encodings = get_option('newlib-iconv-from-encodings')
-newlib_iconv_to_encodings = get_option('newlib-iconv-to-encodings')
-newlib_iconv_external_ccs = get_option('newlib-iconv-external-ccs')
-
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 newlib_nano_malloc = get_option('newlib-nano-malloc')
+nano_malloc_clear_freed = get_option('nano-malloc-clear-freed')
 lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
@@ -244,8 +241,28 @@ else
 endif
 fast_strcmp = get_option('fast-strcmp')
 
-newlib_mb = get_option('newlib-mb')
-newlib_locale_info = get_option('newlib-locale-info')
+mb_capable = get_option('mb-capable') or get_option('newlib-mb')
+mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
+if get_option('mb-ucs-charsets') == 'auto'
+  mb_ucs_charsets = mb_extended_charsets
+else
+  mb_ucs_charsets = mb_capable and get_option('mb-ucs-charsets') == 'true'
+endif
+if get_option('mb-iso-charsets') == 'auto'
+  mb_iso_charsets = mb_extended_charsets
+else
+  mb_iso_charsets = mb_capable and get_option('mb-iso-charsets') == 'true'
+endif
+if get_option('mb-windows-charsets') == 'auto'
+  mb_windows_charsets = mb_extended_charsets
+else
+  mb_windows_charsets = mb_capable and get_option('mb-windows-charsets') == 'true'
+endif
+if get_option('mb-jis-charsets') == 'auto'
+  mb_jis_charsets = mb_extended_charsets
+else
+  mb_jis_charsets = mb_capable and get_option('mb-jis-charsets') == 'true'
+endif
 
 newlib_obsolete_math = get_option('newlib-obsolete-math')
 newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
@@ -299,6 +316,7 @@ has_link_defsym = meson.get_cross_property('has_link_defsym',
                                            cc.has_link_argument('-Wl,--defsym=' + '___start=0') )
 has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias'))
 lib_gcc = meson.get_cross_property('libgcc', '-lgcc')
+stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
 
 # tinystdio options
 posix_console = tinystdio and get_option('posix-console')
@@ -582,16 +600,6 @@ lib_dir = prefix / get_option('libdir') / build_type_subdir
 
 include_dir = prefix / get_option('includedir') / build_type_subdir
 
-newlib_iconv_dir = get_option('newlib-iconv-dir')
-if newlib_iconv_dir == ''
-  newlib_iconv_dir = join_paths(lib_dir, 'locale')
-endif
-
-newlib_iconv_runtime_dir = get_option('newlib-iconv-runtime-dir')
-if newlib_iconv_runtime_dir == ''
-  newlib_iconv_runtime_dir = newlib_iconv_dir
-endif
-
 specs_dir_option = get_option('specsdir')
 if build_type_subdir != ''
   specs_dir = ''
@@ -826,6 +834,8 @@ common_warnings = [
   '-Wno-unused-command-line-argument',
   '-Wmissing-prototypes',
   '-Wmissing-declarations',
+  '-Werror=implicit-fallthrough=5',
+  '-Werror=unreachable-code-fallthrough',
 ]
 if get_option('analyzer')
   common_warnings += [
@@ -930,6 +940,8 @@ void __attribute__((destructor(101))) dtor (void) {}
 '''
 have_attr_ctor_dtor = cc.compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : werror_c_args)
 
+targets = []
+
 if enable_multilib
   used_libs = []
 
@@ -946,7 +958,6 @@ if enable_multilib
   endforeach
 
   foreach target : target_list
-    message('target ' + target)
     tmp = target.split(';')
     matches_exclude = false
     foreach exclude : multilib_exclude
@@ -994,26 +1005,35 @@ if enable_multilib
 	  endif
 	endforeach
 	if tmp[0] == '.'
+          dir = ''
 	  name = ''
+          lib_prefix = ''
 	else
-	  name = tmp[0].underscorify()
+          dir = tmp[0]
+	  name = '_' + tmp[0].underscorify()
+          lib_prefix = 'lib'
 	endif
       else
+        dir = ''
 	name = ''
+        lib_prefix = ''
       endif
-      targets += name
 
       # rv64 needs to use a non-default mcmodel so that variables can
       # live in a broader range of memory addresses
-      if not has_mcmodel and name.startswith('rv64')
+      if not has_mcmodel and name.strip('_').startswith('rv64')
 	flags += [ '-mcmodel=medany' ]
       endif
 
       # Add any extra flags for this target from the cross file
-      flags += meson.get_cross_property('c_args_' + name, [])
+      flags += meson.get_cross_property('c_args_' + name.strip('_'), [])
 
-      value = [tmp[0], flags]
-      set_variable('target_' + name, value)
+      targets += {
+                  'name': name,
+                  'dir': dir,
+                  'c_args': flags,
+                  'lib_prefix': lib_prefix,
+                }
     endif
   endforeach
 
@@ -1027,15 +1047,44 @@ if enable_multilib
     endforeach
   endif
 else
-  targets = ['']
-  target_ = ['.', []]
+  targets += {
+              'name': '',
+              'dir': '',
+              'c_args': [],
+              'lib_prefix': '',
+            }
 endif
 
-foreach target : ['default-target'] + targets
-  
-  message('generate linker script target ' + target)
+default_target = {
+              'name': 'default-target',
+              'dir': '',
+              'c_args': [],
+              'lib_prefix': '',
+            }
 
-  custom_mem_config = meson.get_cross_property('custom_mem_config_' + target, '')
+foreach params : [default_target] + targets
+  
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
+
+  custom_mem_config = ''
+
+  if target != 'default-target'
+    target_part = ''
+    foreach part : target.split('_')
+      if part != ''
+        target_part += '_' + part
+        custom_mem_config = meson.get_cross_property('custom_mem_config' + target_part, custom_mem_config)
+      endif
+    endforeach
+
+    target_head = target_dir.split('_')[0].underscorify()
+    custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_head, custom_mem_config)
+  endif
+
+  custom_mem_config = meson.get_cross_property('custom_mem_config' + target, custom_mem_config)
 
   if target == 'default-target' or custom_mem_config != ''
 
@@ -1195,6 +1244,7 @@ foreach target : ['default-target'] + targets
       meson.get_cross_property('default_alignment_' + custom_mem_config,
                                meson.get_cross_property('default_alignment',
                                                         '8')))
+    picolibc_linker_type_data.set('STACK', stack_symbol)
 
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)
@@ -1215,10 +1265,10 @@ foreach target : ['default-target'] + targets
     else
       picolibc_ld_file = 'picolibc_' + custom_mem_config + '.ld'
       picolibc_ld_variable = 'picolibc_' + target + '_ld'
-      picolibc_ld_config_variable = 'picolibc_' + target + 'ld_config'
+      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + 'ld_config'
       picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
       picolibcpp_ld_variable = 'picolibcpp_' + target + '_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_' + target + 'ld_config'
+      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + 'ld_config'
       picolibc_ld_install = false
     endif
 
@@ -1335,13 +1385,13 @@ if not tinystdio
   conf_data.set('__LARGE64_FILES', newlib_stdio64)
 endif
 conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
-conf_data.set('_MB_CAPABLE', newlib_mb)
+conf_data.set('_MB_CAPABLE', mb_capable)
+conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
+conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
+conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
+conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
 conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
-conf_data.set('_ICONV_ENABLE_EXTERNAL_CCS', newlib_iconv_external_ccs)
 conf_data.set('_ELIX_LEVEL', newlib_elix_level)
-if newlib_iconv_external_ccs
-  conf_data.set_quoted('ICONV_DEFAULT_NLSPATH', newlib_iconv_runtime_dir)
-endif
 conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
 conf_data.set('_REENT_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
 conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
@@ -1349,6 +1399,7 @@ conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
 conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
 conf_data.set('_HAVE_FCNTL', newlib_have_fcntl)
 conf_data.set('_NANO_MALLOC', newlib_nano_malloc)
+conf_data.set('_NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
 conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
 conf_data.set('_LITE_EXIT', lite_exit)
 conf_data.set('_PICO_EXIT', picoexit)
@@ -1359,8 +1410,6 @@ conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'mat
 conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
-conf_data.set('__HAVE_LOCALE_INFO__', newlib_locale_info, description: 'locale support')
-conf_data.set('__HAVE_LOCALE_INFO_EXTENDED__', get_option('newlib-locale-info-extended'), description: 'extended locale support')
 conf_data.set('NEWLIB_GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
 conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
@@ -1397,6 +1446,9 @@ if tinystdio
   conf_data.set('_FORMAT_DEFAULT_FLOAT',
                 format_default == 'float',
                 description: 'The default printf functions is the float variant')
+  conf_data.set('_FORMAT_DEFAULT_LONG_LONG',
+                format_default == 'long-long',
+                description: 'The default printf functions is the long-long variant')
   conf_data.set('_FORMAT_DEFAULT_INTEGER',
                 format_default == 'integer',
                 description: 'The default printf functions is the integer variant')
@@ -1472,70 +1524,6 @@ if cc.has_argument('-fno-builtin')
   arg_fnobuiltin = ['-fno-builtin']
 endif
 
-# Compute iconv encodings to support in the library
-
-# Dig out the list of available encodings from the encoding.aliases file. Only
-# accept the first entry from each line
-
-available_encodings = []
-# fs.read was added in meson version 0.57.0. The sed invocation can be
-# removed once picolibc requires a version of meson newer than that.
-if meson.version().version_compare('>=0.57')
-  foreach line : fs.read('newlib/libc/iconv/encoding.aliases').split('\n')
-    if line != '' and not line.startswith('#')
-      available_encodings += [line.split()[0]]
-    endif
-  endforeach
-else
-  _available_encodings = run_command(['sed', '-e', '/^#/d', '-e', '/^$/d', '-e', 's/ .*$//', files('newlib/libc/iconv/encoding.aliases')[0]], check : true).stdout().split('\n')
-  foreach _encoding : _available_encodings
-    if _encoding != ''
-      available_encodings += _encoding
-    endif
-  endforeach
-endif
-
-# Include all available encodings if none were specified on the command line
-
-if newlib_iconv_encodings.length() == 0
-  newlib_iconv_encodings = available_encodings
-elif newlib_iconv_encodings.length() == 1 and newlib_iconv_encodings[0] == 'none'
-  newlib_iconv_encodings = []
-endif
-
-# Use newlib_iconv_encodings for from/to by default
-
-if newlib_iconv_from_encodings.length() == 0
-  newlib_iconv_from_encodings = newlib_iconv_encodings
-endif
-if newlib_iconv_to_encodings.length() == 0
-  newlib_iconv_to_encodings = newlib_iconv_encodings
-endif
-
-# Set config variables for each requested 'from' encoding
-
-foreach from : newlib_iconv_from_encodings
-  message('from ' + from)
-  if not available_encodings.contains(from)
-    error('Requested from encoding ' + from + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-  endif
-  encoding_include = true
-  if from not in newlib_iconv_encodings_exclude
-    conf_data.set('_ICONV_FROM_ENCODING_' + from.to_upper(), true)
-  endif
-endforeach
-
-# Set config variables for each requested 'to' encoding
-
-foreach to : newlib_iconv_to_encodings
-  if not available_encodings.contains(to)
-    error('Requested to encoding ' + to + ' is not available. Look in newlib/libc/iconv/encoding.aliases')
-  endif
-  if to not in newlib_iconv_encodings_exclude
-    conf_data.set('_ICONV_TO_ENCODING_' + to.to_upper(), true)
-  endif
-endforeach
-
 version_array = meson.project_version().split('.')
 
 if version_array.length() > 2
@@ -1567,7 +1555,16 @@ else
   stdio_inc_dir = 'newlib/libc/stdio'
 endif
 
-inc_dirs = [stdio_inc_dir, '.', 'newlib/libc/include']
+inc_dirs = [stdio_inc_dir, 'newlib/libc/locale', '.', 'newlib/libc/include']
+
+machine_dir = 'newlib/libc/machine' / host_cpu_family
+if fs.is_dir(machine_dir)
+  machine_inc_dir = machine_dir / 'include'
+  if fs.is_dir(machine_inc_dir)
+    inc_dirs = [machine_inc_dir] + inc_dirs
+  endif
+  inc_dirs = [machine_dir] + inc_dirs
+endif
 
 inc = include_directories(inc_dirs)
 
@@ -1605,6 +1602,8 @@ has_semihost = false
 # arm compatible semihosting, enough to run arm semihost tests
 has_arm_semihost = false
 
+crt0_test = 'crt0_hosted'
+
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
 
@@ -1617,6 +1616,7 @@ if tinystdio
 endif
 
 conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+conf_data.set('_HAVE_ARM_SEMIHOST', has_arm_semihost, description: 'ARM Semihost APIs supported')
 
 # By default, tests don't require any special arguments
 
@@ -1653,17 +1653,24 @@ endif
 test_env = environment({'PICOLIBC_TEST' : '1'})
 test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
+test_link_defaults = cc.get_supported_link_arguments(['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments'])
+
 if has_semihost
-  foreach target : ['default-target'] + targets
+  foreach params : [default_target] + targets
+    
+    target = params['name']
+    target_dir = params['dir']
+    target_c_args = params['c_args']
+    target_lib_prefix = params['lib_prefix']
     if target == 'default-target'
       test_link_args_variable = 'test_link_args'
       test_linker_files_variable = 'test_linker_files'
       test_link_depends_variable = 'test_link_depends'
       picolibc_ld_value = picolibc_ld
     else
-      test_link_args_variable = 'test_link_args_' + target
+      test_link_args_variable = 'test_link_args' + target
       test_linker_files_variable = 'test_linker_files_' + target
-      test_link_depends_variable = 'test_link_depends_' + target
+      test_link_depends_variable = 'test_link_depends' + target
       picolibc_ld_value = get_variable('picolibc_' + target + '_ld', picolibc_ld)
     endif
 
@@ -1674,7 +1681,7 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-		 ['-Wl,--gc-sections', '-nostdlib', '-T', picolibc_ld_string]
+		 test_link_defaults + ['-nostdlib', '-T', picolibc_ld_string]
        + additional_libs_list
        + [lib_gcc])
 
@@ -1684,7 +1691,7 @@ if has_semihost
     set_variable(test_link_depends_variable, [picolibc_ld_value])
   endforeach
 else
-  test_link_args = ['-Wl,--gc-sections']
+  test_link_args = test_link_defaults + cc.get_supported_link_arguments(['-lgcc'])
   test_link_depends = []
 endif
 

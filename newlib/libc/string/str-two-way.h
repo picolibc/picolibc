@@ -288,7 +288,7 @@ two_way_short_needle (const unsigned char *haystack, size_t haystack_len,
    If AVAILABLE modifies HAYSTACK_LEN (as in strstr), then at most 3 *
    HAYSTACK_LEN - NEEDLE_LEN comparisons occur in searching, and
    sublinear performance is not possible.  */
-_NOINLINE_STATIC RETURN_TYPE __attribute__ ((__used__))
+__noinline_static RETURN_TYPE __attribute__ ((__used__))
 two_way_long_needle (const unsigned char *haystack, size_t haystack_len,
 		     const unsigned char *needle, size_t needle_len)
 {

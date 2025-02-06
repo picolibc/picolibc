@@ -61,8 +61,11 @@ foreach libname : libnames
   src_mpart += get_variable('src_libm_' + libname, [])
 endforeach
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
   libobjs = []
   libsrcs_target = []
 
@@ -75,18 +78,12 @@ foreach target : targets
 
   set_variable('src_mpart_' + target, libsrcs_target)
 
-  if target == ''
-    libmpart_name = 'mpart'
-  else
-    libmpart_name = 'mpart' + '_' + target
-  endif
-
   if libobjs != []
-    local_lib_mpart_target = static_library(libmpart_name,
+    local_lib_mpart_target = static_library('mpart' + target,
 					    pic: false,
 					    objects : libobjs,
 					    include_directories: inc,
-					    c_args: value[1] + c_args)
+					    c_args: target_c_args + c_args)
     set_variable('lib_mpart' + target, local_lib_mpart_target)
   endif
 endforeach

@@ -43,12 +43,20 @@ __file_str_put_alloc(char c, FILE *stream)
                 size_t old_size = sstream->size;
                 char *old = sstream->end - old_size;
                 size_t new_size = old_size + 32;
-                char *new = realloc(old, new_size);
+                char *new;
+                if (sstream->alloc)
+                        new = realloc(old, new_size);
+                else {
+                        new = malloc(new_size);
+                        if (new)
+                                memcpy(new, old, old_size);
+                }
 		if (!new)
 			return EOF;
 		sstream->size = new_size;
                 sstream->pos = new + old_size;
                 sstream->end = new + new_size;
+                sstream->alloc = true;
 	}
 	*sstream->pos++ = c;
 	return (unsigned char) c;

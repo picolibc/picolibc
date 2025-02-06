@@ -39,31 +39,30 @@ if not tinystdio and not newlib_nano_formatted_io and newlib_elix_level >= 4
   tests += ['swprintf']
 endif
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
 
   _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)
     _libs += [get_variable('lib_semihost' + target)]
   endif
-  if is_variable('crt0_hosted' + target)
-    _objs = [get_variable('crt0_hosted'+ target)]
+  if is_variable(crt0_test + target)
+    _objs = [get_variable(crt0_test + target)]
   else
     _objs = []
   endif
   
-  _c_args = value[1] + get_variable('test_c_args_' + target, test_c_args)
-  _link_args = value[1] + get_variable('test_link_args_' + target, test_link_args)
-  _link_depends = get_variable('test_link_depends_' + target, test_link_depends)
+  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
+  _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
   _c_args += ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE']
 
   foreach test : tests
-    if target == ''
-      test_name = test
-    else
-      test_name = test + '_' + target
-    endif
+    test_name = test + target
 
     src = test + '.c'
 

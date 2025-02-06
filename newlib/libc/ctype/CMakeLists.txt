@@ -33,8 +33,10 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_sources(
-  categories.c
+  caseconv.c
   ctype_.c
+  ctype_table.c
+  ctype_wide.c
   isalnum.c
   isalnum_l.c
   isalpha.c

@@ -44,27 +44,26 @@ effects vary with the locale.
 #include "local.h"
 
 int
-mblen (const char *s,
-        size_t n)
+mblen (const char *s, size_t n)
 {
 #ifdef _MB_CAPABLE
-  int retval = 0;
-  static NEWLIB_THREAD_LOCAL _mbstate_t _mblen_state;
+    int retval = 0;
+    static _mbstate_t _mblen_state;
 
-  retval = __MBTOWC (NULL, s, n, &_mblen_state);
-  if (retval < 0)
+    retval = __MBTOWC (NULL, s, n, &_mblen_state);
+    if (retval < 0)
     {
-      _mblen_state.__count = 0;
-      return -1;
+        _mblen_state.__count = 0;
+        return -1;
     }
-  else
-    return retval;
+    else
+        return retval;
 
 #else /* not _MB_CAPABLE */
-  if (s == NULL || *s == '\0')
-    return 0;
-  if (n == 0)
-    return -1;
-  return 1;
+    if (s == NULL || *s == '\0')
+        return 0;
+    if (n == 0)
+        return -1;
+    return 1;
 #endif /* not _MB_CAPABLE */
 }

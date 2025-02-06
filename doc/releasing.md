@@ -27,7 +27,11 @@ picolibc:
 
     * Enables errno in the math functions using -Dwant-math-errno=true
 
-    * Enables long-double io for RISC-V compiles using -Dio-long-double=true
+    * Enables long-double io for RISC-V compiles using
+      -Dio-long-double=true
+
+    * Enables full locale support with -Dmb-capable=true and
+      -Dmb-extended-charsets=true
 
     * Builds and installs minsize and release builds
 

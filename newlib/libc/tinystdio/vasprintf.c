@@ -38,20 +38,21 @@
 int
 vasprintf(char **strp, const char *fmt, va_list ap)
 {
-	struct __file_str f = FDEV_SETUP_STRING_ALLOC();
+        struct __file_str f = FDEV_SETUP_STRING_ALLOC();
 	int i;
 
 	i = vfprintf(&f.file, fmt, ap);
+        char *buf = f.end - f.size;
 	if (i >= 0) {
-                char *buf = f.end - f.size;
 		char *s = realloc(buf, i+1);
 		if (s) {
 			s[i] = 0;
 			*strp = s;
 		} else {
-			free(buf);
 			i = EOF;
 		}
 	}
+        if (i < 0)
+                free(buf);
 	return i;
 }

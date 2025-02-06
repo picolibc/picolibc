@@ -80,7 +80,7 @@ extern void __libc_init_array(void);
 
 #include <picotls.h>
 #include <stdio.h>
-#ifdef CRT0_SEMIHOST
+#ifdef _HAVE_ARM_SEMIHOST
 #include <semihost.h>
 #endif
 
@@ -88,7 +88,7 @@ extern void __libc_init_array(void);
 #define CONSTRUCTORS 1
 #endif
 
-static inline void
+static _Noreturn __always_inline void
 __start(void)
 {
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
@@ -100,7 +100,7 @@ __start(void)
 	__libc_init_array();
 #endif
 
-#ifdef CRT0_SEMIHOST
+#if defined(CRT0_SEMIHOST) && defined(_HAVE_ARM_SEMIHOST)
 #define CMDLINE_LEN     1024
 #define ARGV_LEN        64
         static char cmdline[CMDLINE_LEN];

@@ -8,7 +8,6 @@ Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 #include <string.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
 size_t
 mbrtowc (wchar_t *__restrict pwc,
 	const char *__restrict s,
@@ -20,7 +19,7 @@ mbrtowc (wchar_t *__restrict pwc,
 #ifdef _MB_CAPABLE
   if (ps == NULL)
     {
-      static NEWLIB_THREAD_LOCAL mbstate_t _mbrtowc_state;
+      static mbstate_t _mbrtowc_state;
       ps = &_mbrtowc_state;
     }
 #endif
@@ -32,11 +31,12 @@ mbrtowc (wchar_t *__restrict pwc,
 
   if (retval == -1)
     {
+#ifdef _MB_CAPABLE
       ps->__count = 0;
+#endif
       _REENT_ERRNO(reent) = EILSEQ;
       return (size_t)(-1);
     }
   else
     return (size_t)retval;
 }
-#endif /* !_REENT_ONLY */

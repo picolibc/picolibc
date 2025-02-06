@@ -46,7 +46,12 @@ free (void * free_p)
     if (free_p == NULL) return;
 
     p_to_free = ptr_to_chunk(free_p);
+
+#ifdef _NANO_MALLOC_CLEAR_FREED
+    memset(p_to_free, 0, chunk_usable(p_to_free));
+#else
     p_to_free->next = NULL;
+#endif
 
 #if MALLOC_DEBUG
     __malloc_validate_block(p_to_free);
@@ -88,14 +93,14 @@ no_insert:
     /* Merge blocks together */
     if (chunk_after(p_to_free) == r)
     {
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
 #endif
 	*_size_ref(p_to_free) += _size(r);
-#ifdef __GNUC__
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic pop
 #endif
 	p_to_free->next = r->next;
@@ -106,7 +111,7 @@ unlock:
 }
 
 #ifdef _HAVE_ALIAS_ATTRIBUTE
-#ifndef __clang__
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
 __strong_reference(free, __malloc_free);

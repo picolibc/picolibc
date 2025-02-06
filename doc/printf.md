@@ -137,11 +137,13 @@ level, that macro is also correctly defined for the other two levels.
 
 Here's an example program to experiment with these options:
 
-	#include <stdio.h>
+```c
+#include <stdio.h>
 
-	void main(void) {
-		printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
-	}
+void main(void) {
+	printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
+}
+```
 
 Now we can build and run it with the double options:
 

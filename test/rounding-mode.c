@@ -92,24 +92,6 @@ do_roundf_int(float value, int mode)
 }
 #endif
 
-double
-div(double a, double b);
-
-double
-mul(double a, double b);
-
-double
-sub(double a, double b);
-
-float
-div_f(float a, float b);
-
-float
-mul_f(float a, float b);
-
-float
-sub_f(float a, float b);
-
 #if defined(FE_UPWARD) && defined(FE_DOWNWARD) && defined(FE_TOWARDZERO)
 
 #ifndef PICOLIBC_DOUBLE_NOROUND
@@ -117,7 +99,7 @@ sub_f(float a, float b);
 static double
 div_mul_sub(double a, double b, double c, double d)
 {
-	return sub(mul(div(a,b), c), d);
+	return sub_d(mul_d(div_d(a,b), c), d);
 }
 
 #define do_fancy(sign) div_mul_sub(sign 1.0, 3.0, 3.0, sign 1.0)

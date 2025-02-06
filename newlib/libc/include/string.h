@@ -92,6 +92,9 @@ void    *mempcpy (void *, const void *, size_t);
 void    *memrchr (const void *, int, size_t);
 #endif
 void    *memset (void *, int, size_t);
+#if __ISO_C_VISIBLE >= 2023
+void    *memset_explicit(void *, int, size_t);
+#endif
 #if __GNU_VISIBLE
 void    *rawmemchr (const void *, int);
 #endif
@@ -148,6 +151,10 @@ int	 strerror_r (int, char *, size_t) _ASMNAME("__xpg_strerror_r");
 int	__xpg_strerror_r (int, char *, size_t);
 #  define strerror_r __xpg_strerror_r
 # endif
+#endif
+#if __GNU_VISIBLE
+const char *strerrorname_np(int errnum);
+const char *strerrordesc_np(int errnum);
 #endif
 #if __BSD_VISIBLE
 size_t   strlcat (char *, const char *, size_t);

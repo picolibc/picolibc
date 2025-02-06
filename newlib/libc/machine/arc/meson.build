@@ -58,10 +58,6 @@ srcs_arc32 = [
     'strcpy-bs.S',
     'strcpy.S',
     'strcpy-stub.c',
-    'strlen-bs-norm.S',
-    'strlen-bs.S',
-    'strlen.S',
-    'strlen-stub.c',
     'strncpy-bs.S',
     'strncpy.S',
     'strncpy-stub.c',
@@ -75,12 +71,15 @@ if arc64 == ''
   srcs_machine += srcs_arc32
 endif
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
   set_variable('lib_machine' + target,
 	       static_library('machine' + target,
 			      srcs_machine,
 			      pic: false,
 			      include_directories: inc,
-			      c_args: value[1] + c_args + arg_fnobuiltin))
+			      c_args: target_c_args + c_args + arg_fnobuiltin))
 endforeach

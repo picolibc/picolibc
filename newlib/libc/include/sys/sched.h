@@ -38,6 +38,14 @@ _BEGIN_STD_C
 #define SCHED_SPORADIC 4
 #endif
 
+#if __GNU_VISIBLE
+#define SCHED_IDLE     5
+#define SCHED_BATCH    6
+
+/* Flag to drop realtime policies and negative nice values on fork(). */
+#define SCHED_RESET_ON_FORK     0x40000000
+#endif
+
 /* Scheduling Parameters */
 /* Open Group Specifications Issue 6 */
 

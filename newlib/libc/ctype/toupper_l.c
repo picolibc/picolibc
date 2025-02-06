@@ -11,11 +11,11 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 #include <stdlib.h>
 #include <wctype.h>
 #include <wchar.h>
-#include <../locale/setlocale.h>
+#include "locale_private.h"
 #endif
 
 int
-toupper_l (int c, struct __locale_t *locale)
+toupper_l (int c, locale_t locale)
 {
 #if defined (_MB_EXTENDED_CHARSETS_ISO) \
     || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
@@ -29,8 +29,8 @@ toupper_l (int c, struct __locale_t *locale)
       mbstate_t state;
 
       memset (&state, 0, sizeof state);
-      if (locale->mbtowc (_REENT, &wc, s, 1, &state) >= 0
-	  && locale->wctomb (_REENT, s,
+      if (__MBTOWC_L(locale) (&wc, s, 1, &state) >= 0
+	  && __WCTOMB_L(locale) (s,
 			     (wchar_t) towupper_l ((wint_t) wc, locale),
 			     &state) == 1)
 	c = (unsigned char) s[0];

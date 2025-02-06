@@ -43,8 +43,12 @@ foreach libname : libnames
   libsrcs += get_variable('src_' + libname, [])
 endforeach
 
-foreach target : targets
-  value = get_variable('target_' + target)
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+  target_lib_prefix = params['lib_prefix']
+
   libobjs = []
   libsrcs_target = libsrcs
 
@@ -55,42 +59,45 @@ foreach target : targets
     libsrcs_target += get_variable('src_' + libname + target, [])
   endforeach
 
-  instdir = join_paths(lib_dir, value[0])
+  instdir = join_paths(lib_dir, target_dir)
 
-  if target == ''
-    libc_name = 'c'
-    libg_name = 'g'
-    libm_name = 'm'
-  else
-    libc_name = join_paths(target, 'libc')
-    libg_name = join_paths(target, 'libg')
-    libm_name = join_paths(target, 'libm')
-  endif
+  libc_name = 'c'
+  libg_name = 'g'
+  libm_name = 'm'
+  libnosys_name = 'nosys'
 
-  local_lib_c_target = static_library(libc_name,
+  local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
 				      libsrcs_target,
 				      install : true,
 				      install_dir : instdir,
 				      pic: false,
 				      objects : libobjs,
 				      include_directories: inc,
-				      c_args: value[1] + c_args)
+				      c_args: target_c_args + c_args)
+
+  static_library(join_paths(target_dir, target_lib_prefix + libm_name),
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+                 c_args: target_c_args + c_args,
+		 objects : [])
+  static_library(join_paths(target_dir, target_lib_prefix + libg_name),
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+                 c_args: target_c_args + c_args,
+		 objects : [])
+  static_library(join_paths(target_dir, target_lib_prefix + libnosys_name),
+		 ['empty.c'],
+		 install : true,
+		 install_dir : instdir,
+		 pic: false,
+                 c_args: target_c_args + c_args,
+		 objects : [])
 
   set_variable('lib_c' + target, local_lib_c_target)
-  static_library(libm_name,
-		 ['empty.c'],
-		 install : true,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: value[1] + c_args,
-		 objects : [])
-  static_library(libg_name,
-		 ['empty.c'],
-		 install : true,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: value[1] + c_args,
-		 objects : [])
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,

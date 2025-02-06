@@ -195,7 +195,7 @@ static char *rcsid = "$Id$";
  *
  * Make sure to avoid inlining.
  */
-_NOINLINE_STATIC int
+__noinline_static int
 __sbprintf (
        register FILE *fp,
        const char *fmt,
@@ -413,7 +413,7 @@ VFPRINTF (
 	const char *grouping = NULL;
 #endif
 #ifdef FLOATING_POINT
-	char *decimal_point = localeconv ()->decimal_point;
+	char *decimal_point = DECIMAL_POINT;
 	size_t decp_len = strlen (decimal_point);
 	char softsign;		/* temporary negative sign for floats */
 	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};
@@ -701,9 +701,9 @@ rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
 #ifdef _WANT_IO_C99_FORMATS
 		case '\'':
-			thousands_sep = localeconv ()->thousands_sep;
+			thousands_sep = THOUSANDS_SEP;
 			thsnd_len = strlen (thousands_sep);
-			grouping = localeconv ()->grouping;
+			grouping = NUMERIC_GROUPING;
 			if (thsnd_len > 0 && grouping && *grouping)
 			  flags |= GROUPING;
 			goto rflag;
@@ -1353,8 +1353,14 @@ number:			if ((dprec = prec) >= 0)
 					      && *grouping != CHAR_MAX
 					      && _uquad > 9) {
 					    cp -= thsnd_len;
-					    strncpy (cp, thousands_sep,
-						     thsnd_len);
+/* when thousands_sep is a constant empty string, the compiler complains */
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wstringop-truncation"
+#endif
+                                            strncpy (cp, thousands_sep,
+                                                     thsnd_len);
 					    ndig = 0;
 					    /* If (grouping[1] == '\0') then we
 					       have to use *grouping character

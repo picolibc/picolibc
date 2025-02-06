@@ -59,11 +59,6 @@
 #define __ptr_t void *
 #define __long_double_t  long double
 
-#define __attribute_malloc__
-#define __attribute_pure__
-#define __attribute_format_strfmon__(a,b)
-#define __flexarr      [0]
-
 #ifndef __BOUNDED_POINTERS__
 # define __bounded      /* nothing */
 # define __unbounded    /* nothing */
@@ -88,6 +83,51 @@
 #ifndef	__has_builtin
 #define	__has_builtin(x)	0
 #endif
+
+#if __has_attribute(__pure__)
+# define __attribute_pure__ __attribute__((__pure__))
+#else
+# define __attribute_pure__
+#endif
+
+#if __has_attribute(__format__)
+# define __attribute_format_strfmon__(a,b) \
+    __attribute__((__format__(__strfmon__, a, b)))
+#else
+# define __attribute_format_strfmon__(a,b)
+#endif
+
+#if __has_attribute(__nonnull__)
+# define __attribute_nonnull__(params) __attribute__((__nonnull__ params))
+#else
+# define __attribute_nonnull__(params)
+#endif
+
+#if __has_attribute(__returns_nonnull__)
+# define __returns_nonnull __attribute__((__returns_nonnull__))
+#else
+# define __returns_nonnull
+#endif
+
+#if __has_attribute (__malloc__)
+# define __attribute_malloc__ __attribute__ ((__malloc__))
+#else
+# define __attribute_malloc__
+#endif
+
+#if __has_attribute(__alloc_size__)
+# define __attribute_alloc_size__(params) __attribute__ ((__alloc_size__ params))
+#else
+# define __attribute_alloc_size__(params)
+#endif
+
+#if __has_attribute (__alloc_align__)
+# define __attribute_alloc_align__(param) __attribute__ ((__alloc_align__ param))
+#else
+# define __attribute_alloc_align__(param)
+#endif
+
+#define __flexarr      []
 
 #if defined(__cplusplus)
 #define	__BEGIN_DECLS	extern "C" {
@@ -149,6 +189,10 @@
 #endif
 #define	__GNUCLIKE___TYPEOF 1
 #define	__GNUCLIKE___SECTION 1
+
+#if __GNUC_PREREQ (4, 2) || defined(__clang__)
+#define __GNUCLIKE_PRAGMA_DIAGNOSTIC 1
+#endif
 
 #define	__GNUCLIKE_CTOR_SECTION_HANDLING 1
 
@@ -293,6 +337,8 @@
 
 #if __GNUC_PREREQ__(4,5) || defined(__clang__)
 #define __picolibc_deprecated(m) __attribute__((__deprecated__(m)))
+#elif __GNUC_PREREQ__(3,1)
+#define __picolibc_deprecated(m) __attribute__((__deprecated__))
 #else
 #define __picolibc_deprecated(m) _ATTRIBUTE(__deprecated__)
 #endif
@@ -402,6 +448,7 @@
 #endif
 
 #define	__malloc_like __malloc_like_with_free(free, 1)
+#define __attr_dealloc_free __malloc_like_with_free(__builtin_free, 1)
 
 #ifndef __always_inline
 #if __GNUC_PREREQ__(3, 1)
@@ -477,10 +524,10 @@
 
 /*
  * Additionally, we allow to use `__restrict_arr' for declaring arrays as
- * non-overlapping per C99.  That's supported since gcc 3.1, but it's not
+ * non-overlapping per C99.  That's supported since gcc 4.3, but it's not
  * allowed in C++.
  */
-#if defined(__cplusplus) || !__GNUC_PREREQ__(3, 1)
+#if defined(__cplusplus) || !__GNUC_PREREQ__(4, 3)
 #define __restrict_arr
 #elif defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L
 #define __restrict_arr       restrict
@@ -859,21 +906,19 @@
   as the Gnu C 'extern inline'.  */
 #if defined(__GNUC__) && !defined(__GNUC_STDC_INLINE__)
 /* We're using GCC, but without the new C99-compatible behaviour.  */
-#define _ELIDABLE_INLINE extern __inline__ _ATTRIBUTE ((__always_inline__))
+#define __elidable_inline extern __always_inline
 #else
 /* We're using GCC in C99 mode, or an unknown compiler which
   we just have to hope obeys the C99 semantics of inline.  */
-#define _ELIDABLE_INLINE static __inline__
+#define __elidable_inline static __inline__
 #endif
 
 #if __GNUC_PREREQ (3, 1)
-#define _NOINLINE		__attribute__ ((__noinline__))
-#define _NOINLINE_STATIC	_NOINLINE static
+#define __noinline_static	__noinline static
 #else
 /* On non-GNU compilers and GCC prior to version 3.1 the compiler can't be
    trusted not to inline if it is static. */
-#define _NOINLINE
-#define _NOINLINE_STATIC
+#define __noinline_static
 #endif
 
 #endif /* !_SYS_CDEFS_H_ */

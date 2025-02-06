@@ -1,0 +1,29 @@
+[binaries]
+c = ['xtensa-dc233c_zephyr-elf-gcc', '-nostdlib']
+ar = 'xtensa-dc233c_zephyr-elf-ar'
+as = 'xtensa-dc233c_zephyr-elf-as'
+nm = 'xtensa-dc233c_zephyr-elf-nm'
+strip = 'xtensa-dc233c_zephyr-elf-strip'
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-xtensa-dc233c "$@"', 'run-xtensa-dc233c']
+
+[host_machine]
+system = 'unknown'
+cpu_family = 'xtensa'
+cpu = 'xtensa'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
+default_flash_addr = '0x00004000'
+default_flash_size = '0x007fc000'
+default_ram_addr   = '0x00800000'
+default_ram_size   = '0x00800000'
+
+additional_sections_ = [ 'vectors', 'reset' ]
+default_vectors_addr = '0x00002000'
+default_vectors_size = '0x00002000'
+default_vectors_contents = [ 'KEEP(*(.vectors .vectors.*))' ]
+
+default_reset_addr = '0xfe000000'
+default_reset_size = '0x00001000'
+default_reset_contents = [ 'KEEP(*(.reset.entry))', 'KEEP(*(.reset.literal))', 'KEEP(*(.reset.text))' ]
