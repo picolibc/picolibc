@@ -59,7 +59,7 @@ picolibc:
 
  10. Tag release
 
-	$ git tag -m'Version <version>' <version> main
+	$ git tag -s -m'Version <version>' <version> main
 
  11. Use arm configuration to build bits for the Arm embedded toolkit:
 
@@ -124,7 +124,7 @@ how to build debian packages:
 
  10. Tag release
 
-	$ git tag -m'debian: Version <version>-1' <version>-1 debian
+	$ git tag -s -m'debian: Version <version>-1' <version>-1 debian
 
  11. Push tags and branches to salsa
 
