@@ -232,6 +232,8 @@ _set_stacks(void)
  * and then branches here.
  */
 
+extern void __vector_table(void);
+
 static _Noreturn __attribute__((used)) __section(".init") void
 _cstart(void)
 {
@@ -253,6 +255,12 @@ _cstart(void)
 #endif
 	/* Enable FPU */
 	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
+#endif
+
+/* Set up exception table base address (register VBAR_ELx).
+   Architectures earlier than v7 have the base address fixed. */
+#if __ARM_ARCH >= 7
+    __asm__("mcr p15, #0, %0, c12, c0, 0" : : "r"(__vector_table) :);
 #endif
 
 #ifdef _PICOCRT_ENABLE_MMU
