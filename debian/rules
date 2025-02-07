@@ -11,7 +11,8 @@ export DEB_LDFLAGS_MAINT_SET =
 
 BUILDDIR=build
 
-BUILDPATH=$(shell pwd)/debian/$(BUILDDIR)
+DEBPATH=$(shell pwd)/debian
+BUILDPATH=$(DEBPATH)/$(BUILDDIR)
 
 %:
 	dh $@ -B$(BUILDDIR)
@@ -133,10 +134,10 @@ override_dh_auto_build:
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && meson test --timeout-multiplier=10
-	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && meson test --timeout-multiplier=10 --wrapper=$(DEBPATH)/debian-run-aarch64
 	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && meson test --timeout-multiplier=10
 	cd debian/$(BUILDDIR)/$(ARM_ARCH)-release && meson test --timeout-multiplier=10
-	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && meson test --timeout-multiplier=10 --wrapper=$(DEBPATH)/debian-run-aarch64
 	cd debian/$(BUILDDIR)/$(RISCV_ARCH)-release && meson test --timeout-multiplier=10
 endif
 

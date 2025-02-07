@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if [ "$1" = "sh" ] || file "$1" | grep -q script; then
+    exec "$@"
+else
+    $(dirname "$0")/../scripts/run-aarch64 "$@"
+fi
