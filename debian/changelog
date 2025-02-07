@@ -1,3 +1,11 @@
+picolibc (1.8.9-2) unstable; urgency=medium
+
+  * Make sure aarch64 runs tests under qemu
+
+  * Enable autopkgtest on arm64 and s390x too.
+
+ -- Keith Packard <keithp@keithp.com>  Fri, 07 Feb 2025 15:21:28 -0800
+
 picolibc (1.8.9-1) unstable; urgency=medium
 
   * New upstream
