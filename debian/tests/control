@@ -1,11 +1,11 @@
-Test-Command: riscv64-unknown-elf-gcc -mcmodel=medany -fno-stack-protector --specs=picolibc.specs -o /tmp/touch-risc-v debian/tests/touch.c
+Test-Command: riscv64-unknown-elf-gcc -mcmodel=medany -fno-stack-protector --specs=picolibc.specs --crt0=semihost --oslib=semihost -o /tmp/touch-risc-v debian/tests/touch.c
 Depends: @, gcc-riscv64-unknown-elf
-Architecture: amd64, i386, ppc64el
+Architecture: amd64, i386, ppc64el, arm64, s390x
 
-Test-Command: arm-none-eabi-gcc -fno-stack-protector --specs=picolibc.specs -o /tmp/touch-arm debian/tests/touch.c
+Test-Command: arm-none-eabi-gcc -fno-stack-protector --specs=picolibc.specs --crt0=semihost --oslib=semihost -o /tmp/touch-arm debian/tests/touch.c
 Depends: @, gcc-arm-none-eabi
-Architecture: amd64, i386, ppc64el
+Architecture: amd64, i386, ppc64el, arm64, s390x
 
-Test-Command: aarch64-linux-gnu-gcc -fno-stack-protector --specs=picolibc.specs -o /tmp/touch-aarch64 debian/tests/touch.c -Wl,--no-warn-rwx-segments
+Test-Command: aarch64-linux-gnu-gcc -fno-stack-protector --specs=picolibc.specs --crt0=semihost --oslib=semihost -o /tmp/touch-aarch64 debian/tests/touch.c -Wl,--no-warn-rwx-segments
 Depends: @, gcc-arm-none-eabi
-Architecture: amd64, i386, ppc64el
+Architecture: amd64, i386, ppc64el, arm64, s390x
