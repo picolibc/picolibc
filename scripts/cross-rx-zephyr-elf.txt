@@ -1,0 +1,35 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['rx-zephyr-elf-gcc', '-nostdlib', '-ffinite-math-only']
+cpp = ['rx-zephyr-elf-g++', '-nostdlib', '-ffinite-math-only']
+ar = 'rx-zephyr-elf-ar'
+as = 'rx-zephyr-elf-as'
+nm = 'rx-zephyr-elf-nm'
+strip = 'rx-zephyr-elf-strip'
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-rx "$@"', 'run-rx']
+
+[host_machine]
+system = 'none'
+cpu_family = 'rx'
+cpu = 'rx100'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
+default_flash_addr = '0x01000000'
+default_flash_size = '0x00800000'
+default_ram_addr   = '0x01800000'
+default_ram_size   = '0x00800000'
+additional_sections = ['fvector']
+default_fvector_addr = '0xffffff80'
+default_fvector_size = '0x00000080'
+default_fvector_contents = ['KEEP (*(.rodata.fvector*))']
+extra_text_sections = 'P P.*'
+extra_rodata_sections = 'C C.*'
+extra_data_sections = 'D D_1 D.* D_1.*'
+extra_sdata_sections = 'D_2 D_2.*'
+extra_bss_sections = 'B B_1 B.* B_1.*'
+extra_sbss_sections = 'B_2 B_2.*'
