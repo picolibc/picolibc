@@ -34,19 +34,6 @@ QUICKREF
 #include <limits.h>
 #include "local.h"
 
-/* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
-  (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
-
-/* How many bytes are copied each iteration of the 4X unrolled loop.  */
-#define BIGBLOCKSIZE    (sizeof (long) << 2)
-
-/* How many bytes are copied each iteration of the word copy loop.  */
-#define LITTLEBLOCKSIZE (sizeof (long))
-
-/* Threshhold for punting to the byte copier.  */
-#define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
-
 /*SUPPRESS 20*/
 void *
 __inhibit_loop_to_libcall
@@ -98,26 +85,26 @@ memmove (void *dst_void,
       /* Use optimizing algorithm for a non-destructive copy to closely 
          match memcpy. If the size is small or either SRC or DST is unaligned,
          then punt into the byte copy loop.  This should be rare.  */
-      if (!TOO_SMALL(length) && !UNALIGNED (src, dst))
+      if (!TOO_SMALL_BIG_BLOCK(length) && !UNALIGNED_X_Y(src, dst))
         {
           aligned_dst = (long*)dst;
           aligned_src = (long*)src;
 
           /* Copy 4X long words at a time if possible.  */
-          while (length >= BIGBLOCKSIZE)
+          while (!TOO_SMALL_BIG_BLOCK(length))
             {
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
-              length -= BIGBLOCKSIZE;
+              length -= BIG_BLOCK_SIZE;
             }
 
           /* Copy one long word at a time if possible.  */
-          while (length >= LITTLEBLOCKSIZE)
+          while (!TOO_SMALL_LITTLE_BLOCK(length))
             {
               *aligned_dst++ = *aligned_src++;
-              length -= LITTLEBLOCKSIZE;
+              length -= LITTLE_BLOCK_SIZE;
             }
 
           /* Pick up any residual with a byte copier.  */

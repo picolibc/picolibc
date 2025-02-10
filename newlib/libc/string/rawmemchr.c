@@ -31,34 +31,7 @@ QUICKREF
 #include <_ansi.h>
 #include <string.h>
 #include <limits.h>
-
-/* Nonzero if X is not aligned on a "long" boundary.  */
-#define UNALIGNED(X) ((long)X & (sizeof (long) - 1))
-
-/* How many bytes are loaded each iteration of the word copy loop.  */
-#define LBLOCKSIZE (sizeof (long))
-
-/* Threshhold for punting to the bytewise iterator.  */
-#define TOO_SMALL(LEN)  ((LEN) < LBLOCKSIZE)
-
-#if LONG_MAX == 2147483647L
-#define DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080)
-#else
-#if LONG_MAX == 9223372036854775807L
-/* Nonzero if X (a long int) contains a NULL byte. */
-#define DETECTNULL(X) (((X) - 0x0101010101010101) & ~(X) & 0x8080808080808080)
-#else
-#error long int is not a 32bit or 64bit type.
-#endif
-#endif
-
-#ifndef DETECTNULL
-#error long int is not a 32bit or 64bit byte
-#endif
-
-/* DETECTCHAR returns nonzero if (long)X contains the byte used
-   to fill (long)MASK. */
-#define DETECTCHAR(X,MASK) (DETECTNULL(X ^ MASK))
+#include "local.h"
 
 void *
 rawmemchr (const void *src_void,
@@ -72,7 +45,7 @@ rawmemchr (const void *src_void,
   unsigned long  mask;
   unsigned int i;
 
-  while (UNALIGNED (src))
+  while (UNALIGNED_X (src))
     {
       if (*src == d)
         return (void *) src;
@@ -89,12 +62,12 @@ rawmemchr (const void *src_void,
   asrc = (unsigned long *) src;
   mask = d << 8 | d;
   mask = mask << 16 | mask;
-  for (i = 32; i < LBLOCKSIZE * 8; i <<= 1)
+  for (i = 32; i < sizeof(mask) * 8; i <<= 1)
     mask = (mask << i) | mask;
 
   while (1)
     {
-      if (DETECTCHAR (*asrc, mask))
+      if (DETECT_CHAR (*asrc, mask))
         break;
       asrc++;
     }
