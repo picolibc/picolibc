@@ -64,7 +64,7 @@ mbtowc (wchar_t *__restrict pwc,
         int retval;
 
         retval = __MBTOWC (pwc, s, n, ps);
-        if (retval == -1) {
+        if (retval < 0) {
 #ifdef _MB_CAPABLE
                 _mbtowc_state.__count = 0;
 #endif
