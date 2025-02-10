@@ -76,6 +76,7 @@ default_newlib_io_pos_args=no
 default_newlib_atexit_dynamic_alloc=yes
 default_newlib_nano_malloc=no
 default_newlib_reent_check_verify=yes
+default_newlib_hw_misaligned_access=
 lpfx="lib_a-"
 newlib_msg_warn=
 
@@ -941,6 +942,11 @@ if [ "x${newlib_reent_check_verify}" = "x" ]; then
 	if [ ${default_newlib_reent_check_verify} = "yes" ]; then
 		newlib_reent_check_verify="yes";
 	fi
+fi
+
+# Set newlib-hw-misaligned-access to default if not defined.
+if [ "x${newlib_hw_misaligned_access}" = "x" ]; then
+	newlib_hw_misaligned_access="${default_newlib_hw_misaligned_access}";
 fi
 
 # Remove rpc headers if xdr_dir not specified

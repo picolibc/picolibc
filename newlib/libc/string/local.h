@@ -17,12 +17,21 @@ int __wcwidth (wint_t);
 # define __inhibit_loop_to_libcall
 #endif
 
-/* Nonzero if X is not aligned on a "long" boundary.  */
+/* Nonzero if X is not aligned on a "long" boundary.
+ * This macro is used to skip a few bytes to find an aligned pointer.
+ * It's better to keep it as is even if _HAVE_HW_MISALIGNED_ACCESS is enabled,
+ * to avoid small performance penalties (if they are not zero).  */
 #define UNALIGNED_X(X) ((long)X & (sizeof (long) - 1))
 
+#ifdef _HAVE_HW_MISALIGNED_ACCESS
+/* Hardware performs unaligned operations with little
+ * to no penalty compared to byte-to-byte copy.  */
+#define UNALIGNED_X_Y(X, Y) (0)
+#else /* _HAVE_HW_MISALIGNED_ACCESS */
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED_X_Y(X, Y) \
   (((long)X & (sizeof (long) - 1)) | ((long)Y & (sizeof (long) - 1)))
+#endif /* _HAVE_HW_MISALIGNED_ACCESS */
 
 /* How many bytes are copied each iteration of the word copy loop.  */
 #define LITTLE_BLOCK_SIZE (sizeof (long))

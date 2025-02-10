@@ -30,10 +30,13 @@ strcmp:
 
 .size	strcmp, .-strcmp
 #else
-  or    a4, a0, a1
   li    t2, -1
+
+#if !(__riscv_misaligned_slow || __riscv_misaligned_fast)
+  or    a4, a0, a1
   and   a4, a4, SZREG-1
   bnez  a4, .Lmisaligned
+#endif
 
 #if SZREG == 4
   li a5, 0x7f7f7f7f

@@ -477,6 +477,13 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
 
      Disabled by default.
 
+`--enable-newlib-hw-misaligned-access'
+	 Use word-by-word access for misaligned memory in string functions
+	 (e.g., memcpy, strcmp, etc.) instead of byte-by-byte access.
+	 This approach may offer better performance on some architectures
+	 that have little to no penalty for unaligned memory access.
+     Disabled by default.
+
 Running the Testsuite
 =====================
 
