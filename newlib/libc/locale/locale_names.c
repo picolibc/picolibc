@@ -183,7 +183,7 @@ __find_charset(const char *charset)
 enum locale_id
 __find_locale(const char *name)
 {
-    enum locale_id     id = LOCALE_DEFAULT;
+    enum locale_id     id = locale_INVALID;
     const char          *lang_end;
 
     if (!*name)
