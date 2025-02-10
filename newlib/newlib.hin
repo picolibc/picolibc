@@ -47,6 +47,10 @@
 /* Define if compiler supports -fno-tree-loop-distribute-patterns. */
 #undef _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 
+/* Define if hardware has little to no penalty for misaligned memory access.
+   */
+#undef _HAVE_HW_MISALIGNED_ACCESS
+
 /* Define if the linker supports .preinit_array/.init_array/.fini_array
    sections. */
 #undef _HAVE_INITFINI_ARRAY
