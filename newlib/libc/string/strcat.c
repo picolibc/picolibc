@@ -54,15 +54,18 @@ strcat (char *__restrict s1,
   while (UNALIGNED_X(s1) && *s1)
     s1++;
 
-  /* Skip over the aligned data in s1 as quickly as possible.  */
-  unsigned long *aligned_s1 = (unsigned long *)s1;
-  while (!DETECT_NULL(*aligned_s1))
-    aligned_s1++;
-  s1 = (char *)aligned_s1;
+  if (*s1)
+    {
+      /* Skip over the aligned data in s1 as quickly as possible.  */
+      unsigned long *aligned_s1 = (unsigned long *)s1;
+      while (!DETECT_NULL(*aligned_s1))
+        aligned_s1++;
+      s1 = (char *)aligned_s1;
 
-  /* Find string terminator.  */
-  while (*s1)
-    s1++;
+      /* Find string terminator.  */
+      while (*s1)
+        s1++;
+    }
 
   /* s1 now points to the its trailing null character, we can
      just use strcpy to do the work for us now.
