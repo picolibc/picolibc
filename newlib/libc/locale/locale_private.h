@@ -238,7 +238,7 @@ extern const wchar_t *const __wtime_am_pm[2];
 #define TIME_AM_PM              __time_am_pm
 #define TIME_C_FMT              "%a %b %e %H:%M:%S %Y"
 #define TIME_X_FMT              "%m/%d/%y"
-#define TIME_UX_FMT             "%M/%D/%Y"
+#define TIME_UX_FMT             "%H:%M:%S"
 #define TIME_AMPM_FMT           "%I:%M:%S %p"
 
 #define WTIME_ERA               L""
@@ -257,7 +257,7 @@ extern const wchar_t *const __wtime_am_pm[2];
 #define WTIME_AM_PM             __wtime_am_pm
 #define WTIME_C_FMT             L"%a %b %e %H:%M:%S %Y"
 #define WTIME_X_FMT             L"%m/%d/%y"
-#define WTIME_UX_FMT            L"%M/%D/%Y"
+#define WTIME_UX_FMT            L"%H:%M:%S"
 #define WTIME_AMPM_FMT          L"%I:%M:%S %p"
 
 static inline bool
