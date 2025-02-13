@@ -121,6 +121,12 @@ _cygtls::remove (DWORD wait)
       CloseHandle (h);
     }
 
+  if (locals.drivemappings)
+    {
+      delete locals.drivemappings;
+      locals.drivemappings = NULL;
+    }
+
   /* Close handle and free memory used by select. */
   if (locals.select.sockevt)
     {

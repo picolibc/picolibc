@@ -93,10 +93,10 @@ struct _local_storage
   int dl_error;
   char dl_buffer[256];
 
-  /* path.cc */
+  /* mount.cc */
   struct mntent mntbuf;
   int iteration;
-  unsigned available_drives;
+  class dos_drive_mappings *drivemappings;
   char mnt_type[80];
   char mnt_opts[80];
   char mnt_fsname[CYG_MAX_PATH];
@@ -181,7 +181,7 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   siginfo_t *sigwait_info;
   HANDLE signal_arrived;
   bool will_wait_for_signal;
-#if 1
+#if 0
   long __align;			/* Needed to align context to 16 byte. */
 #endif
   /* context MUST be aligned to 16 byte, otherwise RtlCaptureContext fails.

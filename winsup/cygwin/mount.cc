@@ -1645,14 +1645,8 @@ fillout_mntent (const char *native_path, const char *posix_path, unsigned flags)
   struct mntent& ret=_my_tls.locals.mntbuf;
   bool append_bs = false;
 
-  /* Remove drivenum from list if we see a x: style path */
   if (strlen (native_path) == 2 && native_path[1] == ':')
-    {
-      int drivenum = cyg_tolower (native_path[0]) - 'a';
-      if (drivenum >= 0 && drivenum <= 31)
-	_my_tls.locals.available_drives &= ~(1 << drivenum);
       append_bs = true;
-    }
 
   /* Pass back pointers to mount_table strings reserved for use by
      getmntent rather than pointers to strings in the internal mount
@@ -1744,41 +1738,74 @@ mount_item::getmntent ()
   return fillout_mntent (native_path, posix_path, flags);
 }
 
-static struct mntent *
-cygdrive_getmntent ()
+struct mntent *
+mount_info::cygdrive_getmntent ()
 {
-  char native_path[4];
-  char posix_path[CYG_MAX_PATH];
-  DWORD mask = 1, drive = 'a';
-  struct mntent *ret = NULL;
+  tmp_pathbuf tp;
+  const wchar_t *wide_path;
+  char *win32_path, *posix_path;
+  int err;
 
-  while (_my_tls.locals.available_drives)
+  if (!_my_tls.locals.drivemappings)
+    _my_tls.locals.drivemappings = new dos_drive_mappings ();
+
+  wide_path = _my_tls.locals.drivemappings->next_dos_mount ();
+  if (wide_path)
     {
-      for (/* nothing */; drive <= 'z'; mask <<= 1, drive++)
-	if (_my_tls.locals.available_drives & mask)
-	  break;
+      win32_path = tp.c_get ();
+      sys_wcstombs (win32_path, NT_MAX_PATH, wide_path);
+      posix_path = tp.c_get ();
+      if ((err = conv_to_posix_path (win32_path, posix_path, 0)))
+      {
+	set_errno (err);
+	return NULL;
+      }
 
-      __small_sprintf (native_path, "%c:\\", cyg_toupper (drive));
-      if (GetFileAttributes (native_path) == INVALID_FILE_ATTRIBUTES)
-	{
-	  _my_tls.locals.available_drives &= ~mask;
-	  continue;
-	}
-      native_path[2] = '\0';
-      __small_sprintf (posix_path, "%s%c", mount_table->cygdrive, drive);
-      ret = fillout_mntent (native_path, posix_path, mount_table->cygdrive_flags);
-      break;
+      return fillout_mntent (win32_path, posix_path, cygdrive_flags);
     }
-
-  return ret;
+  else
+    {
+      if (_my_tls.locals.drivemappings)
+	{
+	  delete _my_tls.locals.drivemappings;
+	  _my_tls.locals.drivemappings = NULL;
+	}
+      return NULL;
+    }
 }
 
 struct mntent *
 mount_info::getmntent (int x)
 {
   if (x < 0 || x >= nmounts)
-    return cygdrive_getmntent ();
-
+    {
+      struct mntent *ret;
+      /* de-duplicate against explicit mount entries */
+      while ((ret = cygdrive_getmntent ()))
+	{
+	  tmp_pathbuf tp;
+	  char *backslash_fsname = NULL;
+	  for (int i = 0; i < nmounts; ++i)
+	    {
+	      if (!strcmp (ret->mnt_dir, mount[i].posix_path))
+		{
+		  /* mount_item::native_path has backslashes, but
+		     mntent::mnt_fsname has forward slashes.  Lazily
+		     backslashify only if mnt_dir equals posix_path. */
+		  if (!backslash_fsname)
+		    {
+		      backslash_fsname = tp.c_get ();
+		      backslashify (ret->mnt_fsname, backslash_fsname, false);
+		    }
+		  if (strcasematch (backslash_fsname, mount[i].native_path))
+		    goto cygdrive_mntent_continue;
+		}
+	    }
+	  break;
+cygdrive_mntent_continue:;
+	}
+      return ret;
+    }
   return mount[native_sorted[x]].getmntent ();
 }
 
@@ -1943,14 +1970,11 @@ extern "C" FILE *
 setmntent (const char *filep, const char *)
 {
   _my_tls.locals.iteration = 0;
-  _my_tls.locals.available_drives = GetLogicalDrives ();
-  /* Filter floppy drives on A: and B: */
-  if ((_my_tls.locals.available_drives & 1)
-      && get_disk_type (L"A:") == DT_FLOPPY)
-    _my_tls.locals.available_drives &= ~1;
-  if ((_my_tls.locals.available_drives & 2)
-      && get_disk_type (L"B:") == DT_FLOPPY)
-    _my_tls.locals.available_drives &= ~2;
+  if (_my_tls.locals.drivemappings)
+    {
+      delete _my_tls.locals.drivemappings;
+      _my_tls.locals.drivemappings = NULL;
+    }
   return (FILE *) filep;
 }
 
@@ -1996,6 +2020,8 @@ endmntent (FILE *)
 
 dos_drive_mappings::dos_drive_mappings ()
 : mappings(0)
+, cur_mapping(0)
+, cur_dos(0)
 {
   tmp_pathbuf tp;
   wchar_t vol[64]; /* Long enough for Volume GUID string */
@@ -2110,6 +2136,24 @@ dos_drive_mappings::fixup_if_match (wchar_t *path)
 	break;
       }
   return path;
+}
+
+const wchar_t *
+dos_drive_mappings::next_dos_mount ()
+{
+  if (cur_dos)
+    cur_dos = cur_dos->next;
+  while (!cur_dos)
+    {
+      if (cur_mapping)
+	cur_mapping = cur_mapping->next;
+      else
+	cur_mapping = mappings;
+      if (!cur_mapping)
+	return NULL;
+      cur_dos = &cur_mapping->dos;
+    }
+  return cur_dos->path;
 }
 
 dos_drive_mappings::~dos_drive_mappings ()

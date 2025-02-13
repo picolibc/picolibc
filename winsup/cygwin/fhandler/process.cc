@@ -1395,16 +1395,11 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
     u_shared = user_shared;
   mount_info *mtab = &u_shared->mountinfo;
 
-  /* Store old value of _my_tls.locals here. */
-  int iteration = _my_tls.locals.iteration;
-  unsigned available_drives = _my_tls.locals.available_drives;
-  /* This reinitializes the above values in _my_tls. */
-  setmntent (NULL, NULL);
-  /* Restore iteration immediately since it's not used below.  We use the
-     local iteration variable instead*/
-  _my_tls.locals.iteration = iteration;
+  /* Store old value of _my_tls.locals.drivemappings here. */
+  class dos_drive_mappings *drivemappings = _my_tls.locals.drivemappings;
+  _my_tls.locals.drivemappings = NULL;
 
-  for (iteration = 0; (mnt = mtab->getmntent (iteration)); ++iteration)
+  for (int iteration = 0; (mnt = mtab->getmntent (iteration)); ++iteration)
     {
       /* We have no access to the drives mapped into another user session and
 	 _my_tls.locals.available_drives contains the mappings of the current
@@ -1470,8 +1465,8 @@ format_process_mountstuff (void *data, char *&destbuf, bool mountinfo)
 	}
     }
 
-  /* Restore available_drives */
-  _my_tls.locals.available_drives = available_drives;
+  /* Restore old value of _my_tls.locals.drivemappings here. */
+  _my_tls.locals.drivemappings = drivemappings;
 
   if (u_hdl) /* Only not-NULL if open_shared has been called. */
     {

@@ -216,6 +216,7 @@ class mount_info
   bool from_fstab (bool user, WCHAR [], PWCHAR);
 
   int cygdrive_win32_path (const char *src, char *dst, int& unit);
+  struct mntent *cygdrive_getmntent ();
 };
 
 class dos_drive_mappings
@@ -231,11 +232,13 @@ class dos_drive_mappings
       wchar_t *path;
       size_t len;
     } dos;
-  } *mappings;
+  } *mappings, *cur_mapping;
+  mapping::dosmount *cur_dos;
 
 public:
   dos_drive_mappings ();
   ~dos_drive_mappings ();
   wchar_t *fixup_if_match (wchar_t *path);
+  const wchar_t *next_dos_mount ();
 };
 #endif
