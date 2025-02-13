@@ -1246,6 +1246,19 @@ foreach params : [default_target] + targets
                                                         '8')))
     picolibc_linker_type_data.set('STACK', stack_symbol)
 
+    picolibc_linker_type_data.set('EXTRA_TEXT_SECTIONS',
+                                  meson.get_cross_property('extra_text_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_RODATA_SECTIONS',
+                                  meson.get_cross_property('extra_rodata_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_DATA_SECTIONS',
+                                  meson.get_cross_property('extra_data_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_SDATA_SECTIONS',
+                                  meson.get_cross_property('extra_sdata_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_BSS_SECTIONS',
+                                  meson.get_cross_property('extra_bss_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_SBSS_SECTIONS',
+                                  meson.get_cross_property('extra_sbss_sections', ''))
+
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)
     picolibc_ld_data.set('CPP_START', '/*')

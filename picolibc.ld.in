@@ -67,7 +67,7 @@ SECTIONS
 		/* code */
 		*(.literal.unlikely .text.unlikely .literal.unlikely.* .text.unlikely.*)
 		*(.literal.startup .text.startup .literal.startup.* .text.startup.*)
-		*(.literal .text .literal.* .text.* .opd .opd.*)
+		*(.literal .text .literal.* .text.* .opd .opd.* @EXTRA_TEXT_SECTIONS@)
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
 		@PREFIX@__text_end = .;
@@ -100,7 +100,7 @@ SECTIONS
 
 		/* read-only data */
 		*(.rdata)
-		*(.rodata .rodata.*)
+		*(.rodata .rodata.* @EXTRA_RODATA_SECTIONS@)
 		*(.gnu.linkonce.r.*)
 
 		*(.srodata.cst16)
@@ -170,7 +170,7 @@ SECTIONS
 	} >ram AT>ram :ram
 
 	.data : @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
-		*(.data .data.*)
+		*(.data .data.* @EXTRA_DATA_SECTIONS@)
 		*(.gnu.linkonce.d.*)
 
 		/* Need to pre-align so that the symbols come after padding */
@@ -178,7 +178,7 @@ SECTIONS
 
 		PROVIDE( @PREFIX@__global_pointer$ = . + 0x800 );
 		PROVIDE( @PREFIX@_gp = . + 0x8000);
-		*(.sdata .sdata.* .sdata2.*)
+		*(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
 		*(.gnu.linkonce.s.*)
 	} >ram AT>flash :ram_init
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
@@ -243,9 +243,9 @@ SECTIONS
 	} >ram AT>ram :ram
 	@BFD_END@
 	.bss (NOLOAD) : {
-		*(.sbss*)
+		*(.sbss* @EXTRA_SBSS_SECTIONS@)
 		*(.gnu.linkonce.sb.*)
-		*(.bss .bss.*)
+		*(.bss .bss.* @EXTRA_BSS_SECTIONS@)
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
 
