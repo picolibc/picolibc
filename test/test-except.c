@@ -60,6 +60,10 @@ main(void)
 
     __asm__(".word 0x00000000");
 
+#elif defined(__RX__)
+
+    __asm__(".word 0xffffffff");
+
 #else
 
 #define NO_INVALID
