@@ -223,12 +223,15 @@ class dos_drive_mappings
   struct mapping
   {
     mapping *next;
-    size_t doslen;
     size_t ntlen;
-    wchar_t *dospath;
     wchar_t *ntdevpath;
-  };
-  mapping *mappings;
+    struct dosmount
+    {
+      dosmount *next;
+      wchar_t *path;
+      size_t len;
+    } dos;
+  } *mappings;
 
 public:
   dos_drive_mappings ();

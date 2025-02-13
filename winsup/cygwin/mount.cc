@@ -2002,13 +2002,13 @@ dos_drive_mappings::dos_drive_mappings ()
   wchar_t *devpath = tp.w_get ();
   wchar_t *mounts = tp.w_get ();
 
-  /* Iterate over all volumes, fetch the first path from the list of
-     DOS paths the volume is mounted to, or use the GUID volume path
-     otherwise. */
+  /* Iterate over all volumes, fetch the list of DOS paths the volume is
+     mounted to. */
   HANDLE sh = FindFirstVolumeW (vol, 64);
   if (sh == INVALID_HANDLE_VALUE)
     debug_printf ("FindFirstVolumeW, %E");
   else {
+    mapping **nextm = &mappings;
     do
       {
 	/* Skip drives which are not mounted. */
@@ -2047,20 +2047,32 @@ dos_drive_mappings::dos_drive_mappings ()
 	    mapping *m = new mapping ();
 	    if (m)
 	      {
-		m->dospath = wcsdup (mounts);
+		/* store mount point list */
+		if ((m->dos.path = (wchar_t *) malloc (len * sizeof (WCHAR))))
+		  memcpy (m->dos.path, mounts, len * sizeof (WCHAR));
 		m->ntdevpath = wcsdup (devpath);
-		if (!m->dospath || !m->ntdevpath)
+		if (!m->dos.path || !m->ntdevpath)
 		  {
-		    free (m->dospath);
+		    free (m->dos.path);
 		    free (m->ntdevpath);
 		    delete m;
 		    continue;
 		  }
-		m->doslen = wcslen (m->dospath);
-		m->dospath[--m->doslen] = L'\0'; /* Drop trailing backslash */
+		/* split mount point list into dosmount entries */
+		mapping::dosmount *dos = &m->dos;
+		for (wchar_t *mount = m->dos.path;
+		    dos;
+		    mount += dos->len + 2,
+		      dos->next = mount[0] ? new mapping::dosmount () : NULL,
+		      dos = dos->next)
+		  {
+		    dos->path = mount;
+		    dos->len = wcslen (dos->path);
+		    dos->path[--dos->len] = L'\0'; /* Drop trailing backslash */
+		  }
 		m->ntlen = wcslen (m->ntdevpath);
-		m->next = mappings;
-		mappings = m;
+		*nextm = m;
+		nextm = &m->next;
 	      }
 	  }
 	else
@@ -2088,11 +2100,11 @@ dos_drive_mappings::fixup_if_match (wchar_t *path)
       {
 	wchar_t *tmppath;
 
-	if (m->ntlen > m->doslen)
-	  wcsncpy (path += m->ntlen - m->doslen, m->dospath, m->doslen);
+	if (m->ntlen > m->dos.len)
+	  wcsncpy (path += m->ntlen - m->dos.len, m->dos.path, m->dos.len);
 	else if ((tmppath = wcsdup (path + m->ntlen)) != NULL)
 	  {
-	    wcpcpy (wcpcpy (path, m->dospath), tmppath);
+	    wcpcpy (wcpcpy (path, m->dos.path), tmppath);
 	    free (tmppath);
 	  }
 	break;
@@ -2106,8 +2118,14 @@ dos_drive_mappings::~dos_drive_mappings ()
   for (mapping *m = mappings; m; m = n)
     {
       n = m->next;
-      free (m->dospath);
+      free (m->dos.path);
       free (m->ntdevpath);
+      mapping::dosmount *dn;
+      for (mapping::dosmount *dm = m->dos.next; dm; dm = dn)
+	{
+	  dn = dm->next;
+	  delete dm;
+	}
       delete m;
     }
 }
