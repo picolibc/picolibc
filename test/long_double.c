@@ -173,6 +173,9 @@ typedef const struct {
 #elif LDBL_MANT_DIG == 53
 #define DEFAULT_PREC 0x1p-48L
 #define SQRTL_PREC 0x1.0p-52L
+#elif LDBL_MANT_DIG == 24
+#define DEFAULT_PREC 0x1p-21L
+#define SQRTL_PREC 0x1.0p-23L
 #else
 #error unsupported long double
 #endif
