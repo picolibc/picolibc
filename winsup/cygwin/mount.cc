@@ -1744,7 +1744,6 @@ mount_info::cygdrive_getmntent ()
   tmp_pathbuf tp;
   const wchar_t *wide_path;
   char *win32_path, *posix_path;
-  int err;
 
   if (!_my_tls.locals.drivemappings)
     _my_tls.locals.drivemappings = new dos_drive_mappings ();
@@ -1755,12 +1754,7 @@ mount_info::cygdrive_getmntent ()
       win32_path = tp.c_get ();
       sys_wcstombs (win32_path, NT_MAX_PATH, wide_path);
       posix_path = tp.c_get ();
-      if ((err = conv_to_posix_path (win32_path, posix_path, 0)))
-      {
-	set_errno (err);
-	return NULL;
-      }
-
+      cygdrive_posix_path (win32_path, posix_path, 0);
       return fillout_mntent (win32_path, posix_path, cygdrive_flags);
     }
   else
@@ -1778,34 +1772,8 @@ struct mntent *
 mount_info::getmntent (int x)
 {
   if (x < 0 || x >= nmounts)
-    {
-      struct mntent *ret;
-      /* de-duplicate against explicit mount entries */
-      while ((ret = cygdrive_getmntent ()))
-	{
-	  tmp_pathbuf tp;
-	  char *backslash_fsname = NULL;
-	  for (int i = 0; i < nmounts; ++i)
-	    {
-	      if (!strcmp (ret->mnt_dir, mount[i].posix_path))
-		{
-		  /* mount_item::native_path has backslashes, but
-		     mntent::mnt_fsname has forward slashes.  Lazily
-		     backslashify only if mnt_dir equals posix_path. */
-		  if (!backslash_fsname)
-		    {
-		      backslash_fsname = tp.c_get ();
-		      backslashify (ret->mnt_fsname, backslash_fsname, false);
-		    }
-		  if (strcasematch (backslash_fsname, mount[i].native_path))
-		    goto cygdrive_mntent_continue;
-		}
-	    }
-	  break;
-cygdrive_mntent_continue:;
-	}
-      return ret;
-    }
+    return cygdrive_getmntent ();
+
   return mount[native_sorted[x]].getmntent ();
 }
 
