@@ -6,7 +6,7 @@ import subprocess
 
 status = 1
 
-with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.DEVNULL) as proc:
+with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.PIPE) as proc:
     while True:
         status = proc.poll()
         if status:
@@ -23,5 +23,9 @@ with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.DE
                         status = status | 1
                     break
         sys.stdout.write(c.decode('utf-8'))
+    stderr = proc.stderr.read()
+    for line in stderr.strip().split(b'\n'):
+        if b'terminating on signal' not in line:
+            print(line)
 
 exit(status)
