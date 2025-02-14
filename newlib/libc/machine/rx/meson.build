@@ -46,6 +46,18 @@ srcs_machine = [
   'strncat.S',
   'strncmp.S',
   'strncpy.S',
+  'memchr.c',
+  'memcpy.c',
+  'memmove.c',
+  'mempcpy.c',
+  'memset.c',
+  'strcat.c',
+  'strcmp.c',
+  'strcpy.c',
+  'strlen.c',
+  'strncat.c',
+  'strncmp.c',
+  'strncpy.c',
 ]
 
 src_machine = files(srcs_machine)
