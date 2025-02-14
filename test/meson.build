@@ -43,6 +43,7 @@ plain_tests_common = ['regex', 'ungetc',
                       'test-sprintf-percent-n',
                       'test-ctype',
                       'test-uchar',
+                      'test-scmpu',
                       'time-tests',
 	      ]
 
