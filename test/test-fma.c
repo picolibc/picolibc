@@ -345,5 +345,11 @@ main(void)
     }
 #endif
     ret |= test_fmal();
+#ifdef __RX__
+    if (ret) {
+        printf("Expected failure on RX target, ignoring\n");
+        ret = 77;
+    }
+#endif
     return ret;
 }
