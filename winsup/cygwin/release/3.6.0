@@ -112,3 +112,12 @@ What changed:
   explicitly in Cygwin will now also show up as mounted under the
   cygdrive prefix, whereas before that entry would have been suppressed.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-June/256081.html
+
+
+Fixes:
+------
+
+- Fix an off-by-one bug in lseek(2)'s SEEK_DATA/SEEK_HOLE handling on
+  filesystem-compressed files, potentially triggering a hang in cp(1).
+  Addresses: https://sourceware.org/pipermail/cygwin/2025-January/257082.html
+             https://cygwin.com/pipermail/cygwin/2025-February/257326.html

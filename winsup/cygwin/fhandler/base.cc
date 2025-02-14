@@ -1144,7 +1144,7 @@ fhandler_base::lseek (off_t offset, int whence)
 	    return -1;
 	  }
 	/* Per Linux man page, ENXIO if offset is beyond EOF */
-	if (offset > fsi.EndOfFile.QuadPart)
+	if (offset >= fsi.EndOfFile.QuadPart)
 	  {
 	    set_errno (ENXIO);
 	    return -1;
