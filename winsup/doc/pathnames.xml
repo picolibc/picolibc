@@ -243,12 +243,12 @@ arguments:</para>
 <title>Displaying the current set of mount points</title>
 <screen>
   <prompt>bash$</prompt> <userinput>mount</userinput>
-  f:/cygwin/bin on /usr/bin type ntfs (binary,auto)
-  f:/cygwin/lib on /usr/lib type ntfs (binary,auto)
-  f:/cygwin on / type ntfs (binary,auto)
-  e:/src on /usr/src type vfat (binary)
-  c: on /cygdrive/c type ntfs (binary,posix=0,user,noumount,auto)
-  e: on /cygdrive/e type vfat (binary,posix=0,user,noumount,auto)
+  F:/cygwin/bin on /usr/bin type ntfs (binary,auto)
+  F:/cygwin/lib on /usr/lib type ntfs (binary,auto)
+  F:/cygwin on / type ntfs (binary,auto)
+  E:/src on /usr/src type vfat (binary)
+  C: on /cygdrive/c type ntfs (binary,posix=0,user,noumount,auto)
+  E: on /cygdrive/e type vfat (binary,posix=0,user,noumount,auto)
 </screen>
 </example>
 
@@ -309,28 +309,35 @@ consider these <filename>/etc/fstab</filename> entries:</para>
   none           /cygdrive cygdrive posix=0,noacl 0 0
 </screen>
 
-<para>Assume there's a file <filename>\\server\share\foo</filename> on the
-share.  When accessing it as <filename>/mysrv/foo</filename>, then the flags
+<para>Consider a file <filename>\\server\share\foo</filename>.
+When opening the file as <filename>/mysrv/foo</filename>, the flags
 <literal>posix=1,acl</literal> of the /mysrv mount point are used.  When
-accessing it as <filename>//server/share/foo</filename>, then the flags
-for the cygdrive prefix, <literal>posix=0,noacl</literal> are used.</para>
+opening the file as <filename>//server/share/foo</filename>, the flags
+<literal>posix=0,noacl</literal> for the cygdrive prefix are used.</para>
 
 <note><para>This only applies to UNC paths using forward slashes.  When
 using backslashes the flags for native paths are used.  See
 <xref linkend="pathnames-win32"></xref>.</para></note>
 
-<para>The cygdrive prefix may be changed in the fstab file as outlined above.
-Please note that you must not use the cygdrive prefix for any other mount
-point.  For instance this:</para>
+<para>The cygdrive prefix may be changed in the fstab file to another path
+and mode:</para>
+
+<screen>
+  none /mnt cygdrive posix=1,sparse 0 0
+</screen>
+
+<para>Please note that you cannot use the cygdrive prefix for any other mount
+point to change modes.  For instance, these mount table entries...</para>
 
 <screen>
   none /cygdrive cygdrive binary 0 0
   D:   /cygdrive/d somefs text 0 0
 </screen>
 
-<para>will not make file access using the /mnt/d path prefix suddenly using
-textmode.  If you want to mount any drive explicitly in another mode than
-the cygdrive prefix, use a distinct path prefix:</para>
+<para>...will not open files using the <filename>/cygdrive/d</filename> path
+prefix in textmode by default, but in binary mode per the cygdrive prefix
+mode.  If you want to mount any drive explicitly in another mode than
+the cygdrive prefix, use a different path prefix:</para>
 
 <screen>
   none /cygdrive cygdrive binary 0 0
