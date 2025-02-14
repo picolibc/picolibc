@@ -13,8 +13,8 @@ with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.PI
             break;
         c = proc.stdout.read(1)
         if c == b'\xe9':
-            c = proc.stdout.readline().decode('utf-8')
-            words = c.split()
+            line = proc.stdout.readline().decode('utf-8', errors='ignore')
+            words = line.split()
             if len(words) > 0:
                 if words[0] == 'exit':
                     proc.send_signal(1)
@@ -22,7 +22,7 @@ with subprocess.Popen(sys.argv[1:], stdout=subprocess.PIPE, stderr=subprocess.PI
                     if status >= 128:
                         status = status | 1
                     break
-        sys.stdout.write(c.decode('utf-8'))
+        sys.stdout.write(c.decode('utf-8', errors='ignore'))
     stderr = proc.stderr.read()
     for line in stderr.strip().split(b'\n'):
         if b'terminating on signal' not in line:
