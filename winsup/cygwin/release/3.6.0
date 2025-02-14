@@ -91,3 +91,24 @@ What changed:
   MAP_SHARED/MAP_PRIVATE flags agree and MAP_NORESERVE is not set for
   either mapping.
   Addresses: https://cygwin.com/pipermail/cygwin/2024-December/256901.html
+
+- Fix a long-standing hang issue when running on ARM64 under emulation.
+  This was due to a thread being terminated while the emulation was
+  holding an internal lock.
+  Addresses: https://cygwin.com/pipermail/cygwin-developers/2024-May/012694.html
+
+- Add a host machine tag to uname(2)'s sysname field.  This echoes what
+  used to be done with -WOW64 (when that was supported), but now with
+  -ARM64 when running on an ARM64 host under emulation.  The Cygwin DLL's
+  own architecture continues to be reported in the machine field.
+
+- Escape special characters in /proc/<PID>/mount*.  This allows the
+  contents to be parsed consistently, and matches what is done on Linux.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-June/256082.html
+
+- Expose all Windows volume mount points via getmntent(3).  This also
+  exposes them via /proc/<PID>/mount*.  A change in behavior from
+  previous Cygwin versions is that volumes whose root is mounted
+  explicitly in Cygwin will now also show up as mounted under the
+  cygdrive prefix, whereas before that entry would have been suppressed.
+  Addresses: https://cygwin.com/pipermail/cygwin/2024-June/256081.html
