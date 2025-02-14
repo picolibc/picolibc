@@ -252,6 +252,26 @@ arguments:</para>
 </screen>
 </example>
 
+<para>Starting with Cygwin 3.6.0, the <function>getmntent(3)</function>
+function exposes Windows mount points of partitions mounted into a directory
+of another drive as if they are cygdrive mounts.  This affects the content
+of <filename>/proc/mounts</filename> as well as the output of
+<command>mount</command>.</para>
+
+<para>For instance, consider you have two local disks, one containing the
+<filename>C:</filename> drive, the other disk has one partition mounted
+into <filename>C:\docs</filename>.  The output from mount will now show this
+mount point like this:</para>
+
+<example id="pathnames-mount-dir">
+<title>Displaying Windows mount points as cygdrives</title>
+<screen>
+  <prompt>bash$</prompt> <userinput>mount | grep cygdrive</userinput>
+  C: on /cygdrive/c type ntfs (binary,posix=0,user,noumount,auto)
+  C:/docs on /cygdrive/c/docs type ntfs (binary,posix=0,user,noumount,auto)
+</screen>
+</example>
+
 <para>You can also use the <command>mount</command> command to add
 new mount points, and the <command>umount</command> to delete
 them.  However, since they are only stored in memory, these mount
