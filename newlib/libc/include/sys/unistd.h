@@ -333,7 +333,7 @@ int	unlinkat (int, const char *, int);
 # define	SEEK_SET	0
 # define	SEEK_CUR	1
 # define	SEEK_END	2
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
 # define	SEEK_DATA	3
 # define	SEEK_HOLE	4
 #endif
