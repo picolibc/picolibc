@@ -135,6 +135,12 @@ ffcheck_id(double is,
   {
     mag = 64;
   }
+#ifdef __RX__
+  /* RX doesn't support nan at all */
+  if (isnan(correct.value) || isinf(correct.value))
+      mag = 64;
+#endif
+
 
   if (mag < error_bit)
   {
@@ -219,6 +225,11 @@ fffcheck_id (float is,
   {
 	mag = 32;
   }
+#ifdef __RX__
+  /* RX doesn't support nan or inf at all */
+  if (isnan(correct.value) || isinf(correct.value))
+      mag = 32;
+#endif
 
   if (mag < error_bit)
   {
