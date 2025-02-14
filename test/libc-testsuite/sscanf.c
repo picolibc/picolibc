@@ -69,6 +69,11 @@ TEST(t, d, (double)x, "%a != %a") )
 
 #endif
 
+#ifdef __RX__
+#define NO_NAN
+#define NO_INF
+#endif
+
 static int test_sscanf(void)
 {
 	int i;
@@ -215,6 +220,7 @@ static int test_sscanf(void)
 	TEST(i, sscanf("hello, world\n", "%8c%8c", a, b), 1, "%d fields, expected %d");
 	TEST_S(a, "hello, wX", "");
 
+#ifndef NO_NAN
     /* testing nan(n-seq-char) in the expected form */
     a[0] = '#';
     a[1] = '\0';
@@ -245,7 +251,9 @@ static int test_sscanf(void)
     TEST(i, sscanf("Nan(12345)", "%9lf%c", &d, a), 0, "got %d fields, expected %d");
     TEST(i, d, 1.0, "%d expected %lf");
     TEST_S(a, "#", "");
+#endif
     
+#ifndef NO_INF
     /* testing inf(n-seq-char) should 'inf' should be evaluated sperately */
     a[0] = '#';
     a[1] = '\0';
@@ -261,6 +269,7 @@ static int test_sscanf(void)
     TEST(i, sscanf("infinity(abcd)", "%lf%c", &d, a), 2, "got %d fields, expected %d");
     TEST(i, isinf(d), 1, "%d expected %d");
     TEST_S(a, "(", "");
+#endif
 #endif
 
 	TEST(i, sscanf("56789 0123 56a72", "%2d%d%*d %[0123456789]\n", &x, &y, a), 3, "only %d fields, expected %d");
@@ -313,25 +322,32 @@ static int test_sscanf(void)
 	TEST_F(123.0);
 	TEST_F(123.0e+0);
 	TEST_F(123.0e+4);
+#ifndef NO_INF
 	TEST_F(1.234e1234);
 	TEST_F(1.234e-1234);
 	TEST_F(1.234e56789);
 	TEST_F(1.234e-56789);
+#endif
 	TEST_F(-0.5);
 	TEST_F(0.1);
 	TEST_F(0.2);
 	TEST_F(0.1e-10);
 	TEST_F(0x1234p56);
         TEST_F(3752432815e-39);
+#ifndef NO_NAN
         TEST(i, sscanf("nan", "%lg", &d), 1, "got %d fields, expected %d");
         TEST(i, isnan(d), 1, "isnan %d expected %d");
         TEST(i, !!signbit(d), 0, "signbit %d expected %d");
         TEST(i, sscanf("-nan", "%lg", &d), 1, "got %d fields, expected %d");
         TEST(i, isnan(d), 1, "isnan %d expected %d");
         TEST(i, !!signbit(d), 1, "signbit %d expected %d");
+#endif
+#ifndef NO_INF
         TEST_FV(INFINITY, "inf");
         TEST_FV(-INFINITY, "-inf");
+#endif
 
+#ifndef NO_INF
         d = 1.0;
         TEST(i, sscanf("-inf", "%3lg", &d), 0, "got %d fields, expected %d");
         TEST(i, d, 1.0, "%g expected %g");
@@ -339,6 +355,7 @@ static int test_sscanf(void)
         TEST(i, sscanf("-inf", "%4lg", &d), 1, "got %d fields, expected %d");
         TEST(i, isinf(d), 1, "isinf %d expected %d");
         TEST(i, !!signbit(d), 1, "signbit %d expected %d");
+#endif
 
 #ifndef __PICOLIBC__
         /* both tinystdio and legacy stdio fail this test */
