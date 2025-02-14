@@ -78,6 +78,10 @@ main (int ac,
      calc = 1;
     }
   }
+  if (sizeof (double) < 8) {
+      printf("Skipping math tests on target without 64-bit double\n");
+      exit(77);
+  }
   if (cvt)
    test_cvt();
 
@@ -183,7 +187,7 @@ int
 mag_of_error (double is,
        double shouldbe)
 {
-  __ieee_double_shape_type a,b;
+  __ieee_double_shape_type a = {},b = {};
   int i;
   int a_big;
   uint32_t mask;
@@ -365,7 +369,7 @@ test_mok (double value,
        double shouldbe,
        int okmag)
 {
-  __ieee_double_shape_type a,b;
+  __ieee_double_shape_type a = {},b = {};
   int mag = mag_of_error(value, shouldbe);
   if (mag == 0) 
   {
