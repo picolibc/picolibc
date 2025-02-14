@@ -151,7 +151,7 @@ Add code to handle setrlimit(RLIMIT_AS).
 </para></listitem>
 
 <listitem><para>
-- Add code to handle signal masks in /proc/&lt;PID&gt;/status.
+Add code to handle signal masks in /proc/&lt;PID&gt;/status.
 </para></listitem>
 
 <listitem><para>
@@ -688,7 +688,7 @@ Support for /proc/&lt;PID&gt;/environ.
 </para></listitem>
 
 <listitem><para>
-- New API: getentropy, getrandom.
+New API: getentropy, getrandom.
 </para></listitem>
 
 </itemizedlist>
