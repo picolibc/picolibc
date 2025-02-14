@@ -12,6 +12,159 @@
 New API calls: tcgetwinsize, tcsetwinsize.
 </para></listitem>
 
+<listitem><para>
+New API call: getlocalename_l.
+</para></listitem>
+
+<listitem><para>
+New API calls: fdclosedir, posix_getdents.
+</para></listitem>
+
+<listitem><para>
+New API call: setproctitle.
+</para></listitem>
+
+<listitem><para>
+New API call: timespec_get.
+</para></listitem>
+
+<listitem><para>
+New API calls: tcgetwinsize, tcsetwinsize.
+</para></listitem>
+
+<listitem><para>
+New POSIX-defined entry points posix_spawn_file_actions_addchdir and
+posix_spawn_file_actions_addfchdir.  These are the same as the already
+exported posix_spawn_file_actions_addchdir_np and
+posix_spawn_file_actions_addfchdir_np.
+</para></listitem>
+
+<listitem><para>
+Add FS_IOC_[GS]ETFLAGS FS_PINNED_FL and FS_UNPINNED_FL flags to handle
+Windows attributes FILE_ATTRIBUTE_PINNED and FILE_ATTRIBUTE_UNPINNED.
+Add matching 'p' and 'u' mode bits in chattr(1) and lsattr(1).
+</para></listitem>
+
+<listitem><para>
+New libaio.a provided for projects checking for POSIX aio support by
+looking for this library at configure time.
+</para></listitem>
+
+<listitem><para>
+cygpath -r option allows to generate all Windows paths with root-local
+path prefix \\?\.
+</para></listitem>
+
+<listitem><para>
+ps -f now prints the commandline rather than the full path to the
+executable.
+</para></listitem>
+
+<listitem><para>
+Drop support for NT4 and Samba &lt; 3.0.22.
+</para></listitem>
+
+<listitem><para>
+Now that SMBv1 is ultimately deprecated and not installed by default on
+latest Windows versions, use Network Discovery (i. e. WSD, "Web Service
+Discovery") for enumerating network servers in //, just like Windows
+Explorer.
+</para></listitem>
+
+<listitem><para>
+If "server" is given as FQDN, and if "server" is an NFS server, ls
+//server now also enumerates NFS shares.  If "server" is given as a flat
+name, only SMB shares are enumerated.
+</para></listitem>
+
+<listitem><para>
+Expose //tsclient (Microsoft Terminal Services) shares as well as wsl$
+(Plan 9 Network Provider) shares, i. e., WSL installation root dirs.
+</para></listitem>
+
+<listitem><para>
+Redesign pipe handling to minimize toggling blocking mode.  The
+query_hdl stuff is no longer needed in new implementation.
+</para></listitem>
+
+<listitem><para>
+Now using AVX/AVX2/AVX-512 instructions in signal handler does not break
+their context.
+</para></listitem>
+
+<listitem><para>
+nice(2), setpriority(2) and sched_setparam(2) now fail with EACCES or
+EPERM if Windows would silently set a lower priority
+(HIGH_PRIORITY_CLASS instead of REALTIME_PRIORITY_CLASS) due to missing
+administrator privileges.
+</para></listitem>
+
+<listitem><para>
+nice(2) now returns the new nice value instead of 0 on success and sets
+errno to EPERM instead of EACCES on failure.  This confirms to POSIX and
+Linux (glibc &gt;= 2.2.4) behavior.
+</para></listitem>
+
+<listitem><para>
+sched_setscheduler(2) now emulates changes between SCHED_OTHER,
+SCHED_BATCH, SCHED_IDLE, SCHED_FIFO and SCHED_RR.  If SCHED_OTHER or
+SCHED_BATCH is selected, the Windows priority is set according to the
+nice value where SCHED_BATCH sets a one step lower priority.  If
+SCHED_IDLE is selected, the nice value is preserved and the Windows
+priority is set to IDLE_PRIORITY_CLASS.  If SCHED_FIFO or SCHED_RR is
+selected, the nice value is preserved and the Windows priority is set
+according to the realtime priority.  If the SCHED_RESET_ON_FORK flag is
+set, SCHED_FIFO and SCHED_RR are reset to SCHED_OTHER and negative nice
+values are reset to zero in each child process created with fork(2).
+Note: Windows does not offer alternative scheduling policies so this
+could only emulate API behavior.
+</para></listitem>
+
+<listitem><para>
+If SCHED_FIFO or SCHED_RR is selected, the /proc/&lt;PID&gt;/stat field '(18)
+priority' is now set to the negated sched_policy minus one.  If
+SCHED_IDLE is selected, this field is set to 39.  The '(19) nice' field
+is now set to the originally requested nice value.
+</para></listitem>
+
+<listitem><para>
+Raise maximum pid from 65536 to 4194304 to account for scenarios with
+lots of CPUs and lots of tasks.
+</para></listitem>
+
+<listitem><para>
+Allow mmap with MAP_FIXED to succeed on an address range contained in
+the chunk of an existing anonymous mapping, provided the
+MAP_SHARED/MAP_PRIVATE flags agree and MAP_NORESERVE is not set for
+either mapping.
+</para></listitem>
+
+<listitem><para>
+Fix a long-standing hang issue when running on ARM64 under emulation.
+This was due to a thread being terminated while the emulation was
+holding an internal lock.
+</para></listitem>
+
+<listitem><para>
+Add a host machine tag to uname(2)'s sysname field.  This echoes what
+used to be done with -WOW64 (when that was supported), but now with
+-ARM64 when running on an ARM64 host under emulation.  The Cygwin DLL's
+own architecture continues to be reported in the machine field.
+</para></listitem>
+
+<listitem><para>
+Escape special characters in /proc/&lt;PID&gt;/mount*.  This allows the
+contents to be parsed consistently, and matches what is done on Linux.
+</para></listitem>
+
+<listitem><para>
+Expose all Windows volume mount points via getmntent(3).  This also
+exposes them via /proc/&gt;PID&gt;/mount*.  A change in behavior from
+previous Cygwin versions is that volumes whose root is mounted
+explicitly in Cygwin will now also show up as mounted under the cygdrive
+prefix, whereas before that entry would have been suppressed.
+</para></listitem>
+
 </itemizedlist>
 
 </sect2>
