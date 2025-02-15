@@ -74,6 +74,10 @@
 # define NORMALIZED_A
 #endif
 
+#if defined(__RX__) && !defined(TINY_STDIO)
+#define NO_DENORM
+#endif
+
 #ifndef FLOAT
 #define FLOAT double
 #endif
@@ -616,9 +620,11 @@
     result |= test(__LINE__, "hi x", "%*sx", -3, "hi");
 #endif
 #ifndef NO_FLOAT
+#ifndef NO_DENORM
     result |= test(__LINE__, "1.000e-38", "%.3e", printf_float(1e-38));
 #ifndef LOW_FLOAT
     result |= test(__LINE__, "1.000e-308", "%.3e", printf_float(1e-308));
+#endif
 #endif
 #endif
 #ifndef _NANO_FORMATTED_IO
@@ -777,6 +783,7 @@
     result |= test(__LINE__, "INF", "%LA", (long double) INFINITY);
     result |= test(__LINE__, "-INF", "%LA", (long double) -INFINITY);
 #endif
+#ifndef NO_DENORM
 #ifdef LOW_FLOAT
 #ifdef NORMALIZED_A
     result |= test(__LINE__, "0x1p-149", "%a", printf_float(0x1p-149));
@@ -803,6 +810,7 @@
     result |= test(__LINE__, "0X1.23456789ABCDEP-1022", "%A", printf_float(0x1.23456789abcdep-1022));
     result |= test(__LINE__, "0X1.23456789ABCDFP-1022", "%A", printf_float(0x1.23456789abcdfp-1022));
     result |= test(__LINE__, "0X1.D749096BB98C800P+8", "%.15A", printf_float(0x1.D749096BB98C8p+8));
+#endif
 #endif
 #endif
     /* test %ls for wchar_t string */
