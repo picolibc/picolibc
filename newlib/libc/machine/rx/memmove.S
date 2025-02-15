@@ -6,7 +6,7 @@ Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
 #ifdef __RX_ALLOW_STRING_INSNS__
 	.file	"memmove.S"
 
-	.section .text
+	.section .text.memmove
 	.global  _memmove
 	.type	 _memmove,@function
 _memmove:

@@ -6,7 +6,7 @@ Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
 #ifdef __RX_ALLOW_STRING_INSNS__
 	.file	"strlen.S"
 
-	.section .text
+	.section .text.strlen
 	
 	.global  _strlen
 	.type	 _strlen,@function

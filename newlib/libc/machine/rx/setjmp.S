@@ -35,7 +35,7 @@ Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
 # careful to always leave the stack in a usable state in case an
 # interrupt happens.
 
-	.text
+	.section .text.setjmp
 	.global	_setjmp
 	.type	_setjmp, @function
 _setjmp:
@@ -63,6 +63,7 @@ _setjmp:
 	.size	_setjmp, .Lend1 - _setjmp
 
 
+	.section .text.longjmp
 	.global	_longjmp
 	.type	_longjmp, @function
 _longjmp:

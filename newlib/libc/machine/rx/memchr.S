@@ -4,7 +4,7 @@
 #ifdef __RX_ALLOW_STRING_INSNS__
 	.file	"memchr.S"
 
-	.section .text
+	.section .text.memchr
 	
 	.global  _memchr
 	.type	 _memchr,@function

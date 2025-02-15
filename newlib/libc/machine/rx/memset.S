@@ -6,7 +6,7 @@ Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
 #ifdef __RX_ALLOW_STRING_INSNS__
 	.file	"memset.S"
 
-	.section .text
+	.section .text.memset
 	.global  _memset
 	.type	 _memset,@function
 _memset:

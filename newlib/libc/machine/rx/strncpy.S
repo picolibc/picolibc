@@ -6,7 +6,7 @@ Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
 #ifdef __RX_ALLOW_STRING_INSNS__
 	.file	"strncpy.S"
 
-	.section .text
+	.section .text.strncpy
 	.global  _strncpy
 	.type	 _strncpy,@function
 _strncpy:

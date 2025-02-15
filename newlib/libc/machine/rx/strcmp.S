@@ -7,7 +7,7 @@ Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
 
 	.file	"strcmp.S"
 
-	.section .text
+	.section .text.strcmp
 	
 	.global  _strcmp
 	.type	 _strcmp,@function

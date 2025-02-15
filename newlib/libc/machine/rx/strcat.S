@@ -6,7 +6,7 @@ Copyright (c) 2009 Nick Clifton <nickc@redhat.com>
 #ifdef __RX_ALLOW_STRING_INSNS__
 	.file	"strcat.S"
 
-	.section .text
+	.section .text.strcat
 	.global  _strcat
 	.type	 _strcat,@function
 _strcat:
