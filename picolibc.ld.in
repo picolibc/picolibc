@@ -110,6 +110,7 @@ SECTIONS
 		*(.srodata .srodata.*)
 
 	} >flash AT>flash :text
+	PROVIDE(@PREFIX@_pid_base = ADDR(.rodata));
 
 	.data.rel.ro : {
 
