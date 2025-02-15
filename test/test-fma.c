@@ -132,6 +132,10 @@ struct fmal_vec {
 };
 #endif
 
+#ifdef _RX_PID
+#define SMALL_FMA_TEST
+#endif
+
 #include "fma_vec.h"
 
 #define NUM_FMAF_VEC (sizeof(fmaf_vec)/sizeof(fmaf_vec[0]))
