@@ -167,6 +167,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printff_scanff'
@@ -179,6 +180,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printfl_scanfl'
@@ -191,6 +193,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printfi_scanfi'
@@ -203,6 +206,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printfm_scanfm'
@@ -215,6 +219,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printf-tests'
@@ -227,6 +232,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printff-tests'
@@ -239,6 +245,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printfi-tests'
@@ -251,6 +258,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'printfm-tests'
@@ -263,6 +271,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'time-sprintf'
@@ -275,6 +284,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'try-ilp32'
@@ -287,6 +297,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'hosted-exit'
@@ -300,6 +311,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   test(t1_fail + target,
@@ -310,6 +322,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env,
        should_fail: true
       )
@@ -324,6 +337,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env,
        should_fail: true
       )
@@ -344,6 +358,7 @@ foreach params : targets
 		    link_depends:  _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
+         suite: 'test',
 	 env: test_env)
   endif
 
@@ -357,6 +372,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'rounding-mode'
@@ -369,6 +385,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env)
 
   t1 = 'test-except'
@@ -382,6 +399,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env,
        should_fail: true
       )
@@ -397,6 +415,7 @@ foreach params : targets
 		  link_depends:  _link_depends,
 		  include_directories: inc),
        depends: bios_bin,
+       suite: 'test',
        env: test_env,
        timeout: 90,
       )
@@ -416,6 +435,7 @@ foreach params : targets
          test_gets,
          depends: bios_bin,
          args: ['hi'],
+         suite: 'test',
          env: test_env,
          timeout: 90
         )
@@ -425,6 +445,7 @@ foreach params : targets
          test_gets,
          depends: bios_bin,
          args: ['this is a long string that should overflow the buffer'],
+         suite: 'test',
          env: test_env,
          timeout: 90,
          should_fail: true
@@ -448,6 +469,7 @@ foreach params : targets
 		    link_depends:  _link_depends,
 		    include_directories: inc),
 	 depends: bios_bin,
+         suite: 'test',
 	 env: test_env,
 	 should_fail: sanitize_trap_on_error
 	)
@@ -465,6 +487,7 @@ foreach params : targets
        depends: bios_bin,
        timeout: 120,
        priority: -1,
+       suite: 'test',
        env: test_env)
 
   t1 = 'test-long-long'
@@ -479,6 +502,7 @@ foreach params : targets
        depends: bios_bin,
        timeout: 120,
        priority: -1,
+       suite: 'test',
        env: test_env)
 
   foreach t1 : plain_tests
@@ -494,6 +518,7 @@ foreach params : targets
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: 60,
+         suite: 'test',
 	 env: test_env)
   endforeach
 
@@ -506,7 +531,10 @@ foreach params : targets
 		    link_args: _cpp_args + _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
-                    include_directories: inc))
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
   endif
 endforeach
 

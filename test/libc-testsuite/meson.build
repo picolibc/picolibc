@@ -94,6 +94,7 @@ foreach params : targets
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: timeout,
+         suite: 'libc-testsuite',
 	 env: test_env)
   endforeach
 endforeach

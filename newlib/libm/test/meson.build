@@ -199,6 +199,7 @@ foreach params : targets
 		    link_depends: _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
+         suite: 'math',
          env: test_env)
   endforeach
 endforeach

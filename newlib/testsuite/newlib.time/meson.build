@@ -72,7 +72,7 @@ foreach params : targets
 		    link_depends: _link_depends,
 		    include_directories: test_inc),
          depends: bios_bin,
-	 env: test_env)
+	 suite: 'newlib.iconv', env: test_env)
     if enable_native_tests
       test(test_name + '-native',
            executable(test_name + '-native', [src],

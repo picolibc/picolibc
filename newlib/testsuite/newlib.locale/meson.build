@@ -76,6 +76,6 @@ foreach params : targets
 		    link_depends:  _link_depends,
 		    include_directories: inc),
 	 depends: bios_bin,
-	 env: test_env)
+	 suite: 'newlib.iconv', env: test_env)
   endforeach
 endforeach
