@@ -133,7 +133,9 @@ struct fmal_vec {
 #endif
 
 #ifdef _RX_PID
-#define SMALL_FMA_TEST
+#define TEST_CONST
+#else
+#define TEST_CONST static const
 #endif
 
 #include "fma_vec.h"

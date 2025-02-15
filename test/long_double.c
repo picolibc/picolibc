@@ -112,25 +112,35 @@ check_long_long(const char *name, int i, long long expect, long long result)
     return 0;
 }
 
-typedef const struct {
-    const char *name;
+/*
+ * Force the large table to be loaded into RAM as the PID area
+ * of read-only data is only 64kB
+ */
+#ifdef _RX_PID
+#define CONST volatile
+#else
+#define CONST const
+#endif
+
+typedef CONST struct {
+    CONST char *name;
     int (*test)(void);
 } long_double_test_t;
 
-typedef const struct {
+typedef CONST struct {
     int line;
     long double x;
     long double y;
 } long_double_test_f_f_t;
 
-typedef const struct {
+typedef CONST struct {
     int line;
     long double x0;
     long double x1;
     long double y;
 } long_double_test_f_ff_t;
 
-typedef const struct {
+typedef CONST struct {
     int line;
     long double x0;
     long double x1;
@@ -138,14 +148,14 @@ typedef const struct {
     long double y;
 } long_double_test_f_fff_t;
 
-typedef const struct {
+typedef CONST struct {
     int line;
     long double x0;
     int x1;
     long double y;
 } long_double_test_f_fi_t;
 
-typedef const struct {
+typedef CONST struct {
     int line;
     long double x;
     long long y;
