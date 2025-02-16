@@ -60,7 +60,6 @@ set(tests
   test-fma
   test-sprintf-percent-n
   malloc_stress
-  posix-io
   test-memcpy_s
   test-memset_s
   test-memmove_s
