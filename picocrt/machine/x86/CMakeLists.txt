@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2025 Renesas Electronics Corporation
+# Copyright © 2021 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,8 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-add_library(picocrt OBJECT crt0.c)
-add_library(picocrt-semihost OBJECT crt0.c)
+add_library(picocrt OBJECT crt0.S)
+add_library(picocrt-semihost OBJECT crt0.S)
 
 target_compile_options(picocrt PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
 target_compile_options(picocrt-semihost PRIVATE -DCRT0_EXIT -DCRT0_SEMIHOST ${PICOLIBC_COMPILE_OPTIONS})

@@ -20,4 +20,6 @@ set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 set(_HAVE_PICOLIBC_TLS_API TRUE)
 
+set(TEST_RUNNER run-arm)
+
 set(PICOLIBC_LINK_FLAGS -nostartfiles -T ${CMAKE_CURRENT_SOURCE_DIR}/cmake/TC-arm-none-eabi.ld -lgcc)
