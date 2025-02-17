@@ -128,6 +128,7 @@ the options, including their meaning, follows.</para>
 	      (default for all other mount points).
   sparse    - Switch on support for sparse files.  This option only makes
               sense on NTFS and then only if you really need sparse files.
+	      This flag is always silently enabled on SSD drives.
 	      Cygwin does not try to create sparse files by default for
 	      performance reasons.
   text      - Files default to CRLF text mode line endings.
