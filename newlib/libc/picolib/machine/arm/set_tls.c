@@ -1,7 +1,8 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2019 Keith Packard
+ * Copyright © 2024 Stephen Street
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,28 +34,41 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if ((__ARM_FEATURE_COPROC & 1) || __ARM_ARCH >= 8) && __ARM_ARCH_PROFILE != 'M' && __ARM_ARCH >= 6
-#define ARM_TLS_CP15
-#endif
+#include <picotls.h>
+#include <string.h>
+#include <stdint.h>
+#include "arm_tls.h"
 
-/* Switch cortex-m0 to use RP2040 CPUID register if requested */
-#if __ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M' && defined(_HAVE_PICOLIBC_TLS_RP2040)
-#define ARM_RP2040
-#endif
-
-#ifdef ARM_RP2040
-#define RP2040_SIO_BASE        0xd0000000
-#define RP2040_CPUID           (RP2040_SIO_BASE + 0)
-#define ARM_TLS_COUNT           2
-#else
-#define ARM_TLS_COUNT           1
-#endif
-
-#ifndef _IN_ASM
 /* This needs to be global so that __aeabi_read_tp can
  * refer to it in an asm statement
  */
 #ifndef ARM_TLS_CP15
-extern void *__tls[ARM_TLS_COUNT];
+extern void *__tls[];
+#endif
+
+/* The size of the thread control block.
+ * TLS relocations are generated relative to
+ * a location this far *before* the first thread
+ * variable (!)
+ * NB: The actual size before tp also includes padding
+ * to align up to the alignment of .tdata/.tbss.
+ */
+#define TCB_SIZE	8
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
+
+void
+_set_tls(void *tls)
+{
+        tls = (uint8_t *) tls - TP_OFFSET;
+#ifdef ARM_TLS_CP15
+	__asm__("mcr p15, 0, %0, cr13, cr0, 3" : : "r" (tls));
+#else
+#ifdef ARM_RP2040
+        uint32_t cpuid = *(uint32_t *)0xd0000000;
+        __tls[cpuid] = tls;
+#else
+	__tls[0] = tls;
 #endif
 #endif
+}

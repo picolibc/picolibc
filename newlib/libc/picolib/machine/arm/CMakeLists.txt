@@ -38,6 +38,7 @@ picolibc_sources(interrupt.c)
 if(${_HAVE_PICOLIBC_TLS_API})
   picolibc_sources(
     tls.c
+    set_tls.c
     read_tp.S
     )
 endif()

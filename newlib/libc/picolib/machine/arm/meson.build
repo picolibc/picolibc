@@ -35,5 +35,5 @@
 
 src_picolib += files('interrupt.c')
 if thread_local_storage
-  src_picolib += files('tls.c', 'read_tp.S')
+  src_picolib += files('tls.c', 'set_tls.c', 'read_tp.S')
 endif
