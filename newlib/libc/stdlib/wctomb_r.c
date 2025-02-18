@@ -41,43 +41,47 @@ __utf8_wctomb (
         wchar_t        wchar,
         mbstate_t     *state)
 {
-  int ret = 0;
-
   (void) state;         /* unused when wchar_t is 32-bits */
   if (s == NULL)
-    return 0; /* UTF-8 encoding is not state-dependent */
+    {
+#if __SIZEOF_WCHAR_T__ == 2
+      state->__count = 0;       /* UTF-16 encoding is state-dependent */
+#endif
+      return 0;
+    }
 
 #if __SIZEOF_WCHAR_T__ == 2
-  if (state->__count == -4 && (wchar < 0xdc00 || wchar > 0xdfff))
+  if (state->__count == -4)
     {
-      /* Unexpected extra high surrogate */
-      if (0xd800 <= wchar && wchar <= 0xdbff)
-        {
-          return -1;
-        }
-      /* There's a leftover lone high surrogate.  Write out the CESU-8 value
-	 of the surrogate and proceed to convert the given character.  Note
-	 to return extra 3 bytes. */
-      uint32_t tmp;
-      tmp = ((uint32_t) state->__value.__wchb[0] << 16 | (uint32_t) state->__value.__wchb[1] << 8)
-          - ((uint32_t) 0x10000 >> 10 | (uint32_t) 0xd80d);
-      *s++ = 0xe0 | ((tmp & 0xf000) >> 12);
-      *s++ = 0x80 | ((tmp &  0xfc0) >> 6);
-      *s++ = 0x80 |  (tmp &   0x3f);
       state->__count = 0;
-      ret = 3;
+      /* Check for low surrogate */
+      if (0xdc00 <= wchar && wchar <= 0xdfff)
+        {
+            uint32_t tmp;
+            /* Second half of a surrogate pair.  Reconstruct the full
+               Unicode value and return the trailing three bytes of the
+               UTF-8 character. */
+            tmp = state->__value.__ucs | (wchar & 0x3ff);
+            *s++ = 0xf0 | ((tmp & 0x1c0000) >> 18);
+            *s++ = 0x80 | ((tmp &  0x3f000) >> 12);
+            *s++ = 0x80 | ((tmp &    0xfc0) >> 6);
+            *s   = 0x80 |  (tmp &     0x3f);
+            return 4;
+        }
+      /* Not a low surrogate */
+      return -1;
     }
 #endif
   if (wchar <= 0x7f)
     {
       *s = wchar;
-      return ret + 1;
+      return 1;
     }
   if (wchar >= 0x80 && wchar <= 0x7ff)
     {
       *s++ = 0xc0 | ((wchar & 0x7c0) >> 6);
       *s   = 0x80 |  (wchar &  0x3f);
-      return ret + 2;
+      return 2;
     }
   if (wchar >= 0x800
 #if __SIZEOF_WCHAR_T__ > 2
@@ -88,49 +92,22 @@ __utf8_wctomb (
       if (wchar >= 0xd800 && wchar <= 0xdfff)
 	{
 #if __SIZEOF_WCHAR_T__ == 2
-            uint32_t tmp;
-            if (wchar <= 0xdbff)
+          if (wchar <= 0xdbff)
             {
-                if (state->__count == -4)
-                {
-                    /* Extra high surrogate */
-                    return -1;
-                }
-                /* First half of a surrogate pair.  Store the state and
-                   return ret + 0. */
-                tmp = ((wchar & 0x3ff) << 10) + 0x10000;
-                state->__value.__wchb[0] = (tmp >> 16) & 0xff;
-                state->__value.__wchb[1] = (tmp >> 8) & 0xff;
-                state->__count = -4;
-                *s = (0xf0 | ((tmp & 0x1c0000) >> 18));
-                return ret;
+              /* First half of a surrogate pair.  Store the state and
+                 return 0. */
+              state->__value.__ucs = ((uint32_t) (wchar & 0x3ff) << 10) + 0x10000;
+              state->__count = -4;
+              return 0;
             }
-            if (state->__count == -4)
-            {
-                /* Second half of a surrogate pair.  Reconstruct the full
-                   Unicode value and return the trailing three bytes of the
-                   UTF-8 character. */
-                tmp = ((uint32_t) state->__value.__wchb[0] << 16)
-                    | (state->__value.__wchb[1] << 8)
-                    | (wchar & 0x3ff);
-                state->__count = 0;
-                *s++ = 0xf0 | ((tmp & 0x1c0000) >> 18);
-                *s++ = 0x80 | ((tmp &  0x3f000) >> 12);
-                *s++ = 0x80 | ((tmp &    0xfc0) >> 6);
-                *s   = 0x80 |  (tmp &     0x3f);
-                return 4;
-            }
-            /* Unexpected second half */
-            return -1;
-#else
-            /* No UTF-16 surrogate handling in UCS-4 */
-            return -1;
 #endif
+          /* Unexpected surrogate */
+          return -1;
 	}
       *s++ = 0xe0 | ((wchar & 0xf000) >> 12);
       *s++ = 0x80 | ((wchar &  0xfc0) >> 6);
       *s   = 0x80 |  (wchar &   0x3f);
-      return ret + 3;
+      return 3;
     }
 #if __SIZEOF_WCHAR_T__ == 4
   if (wchar >= (wchar_t) 0x10000 && wchar <= (wchar_t) 0x10ffff)
