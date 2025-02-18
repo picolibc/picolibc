@@ -97,7 +97,10 @@ const struct {
     { .c16 = { 0x0000 }, .mb = "" },
 #if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
     { .c16 = { 0x3330 }, .mb = "㌰" },
-    { .c16 = { 0xd83d, 0xde80 }, .mb = "🚀" },
+    { .c16 = { 0xd83d, 0xde80 }, .mb = "🚀" },                   /* 0x01f680 */
+    { .c16 = { 0xdbc2, 0xdd7f }, .mb = "\xf4\x80\xa5\xbf" },     /* 0x10097f */
+    { .c16 = { 0xd800, 0xdc00 }, .mb = "\xf0\x90\x80\x80" },     /* 0x010000 */
+    { .c16 = { 0xdbff, 0xdfff }, .mb = "\xf4\x8f\xbf\xbf" },     /* 0x10ffff */
 
     /* Missing low surrogate */
     { .c16 = { 0xd83d, 0x0000 }, .mb = "", .err = 1 + 1 },
@@ -150,6 +153,7 @@ int main(void)
 {
     unsigned i;
     unsigned j;
+    unsigned k;
     int status = 0;
     mbstate_t mbstate;
 
@@ -255,7 +259,10 @@ int main(void)
                 status = 1;
                 break;
             } else if (test_c16[i].err == j + 1) {
-                printf("c16rtomb %d unexpected success\n", i);
+                printf("c16rtomb %d unexpected success c16[%u] is %#x: ", i, j, test_c16[i].c16[j]);
+                for (k = 0; test_c16[i].c16[k] != 0; k++)
+                    printf(" %#04x", test_c16[i].c16[k]);
+                printf("\n");
                 status = 1;
                 break;
             }
