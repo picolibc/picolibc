@@ -36,6 +36,8 @@
 #include <math.h>
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
+#include "math_config.h"
+
 long int
 lrint (double x)
 {
@@ -51,6 +53,9 @@ lrint (double x)
        "\t%0, %1" : "=r"(result) : "f"(x));
   return result;
 }
+
+_MATH_ALIAS_j_d(lrint)
+
 #else
 #include "../../common/s_lrint.c"
 #endif
