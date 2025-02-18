@@ -107,6 +107,9 @@ const struct {
 
     /* Extra high surrogate */
     { .c16 = { 0xd83d, 0xda80 }, .mb = "🚀", .err = 1 + 1 },
+
+    /* High surrogate, non-surrogate, low surrogate */
+    { .c16 = { 0xd83d, 0x3330, 0xde80 }, .mb = "🚀", .err = 1 + 1 },
 #endif
 };
 
