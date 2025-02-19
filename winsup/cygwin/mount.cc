@@ -1746,7 +1746,7 @@ mount_info::cygdrive_getmntent ()
   char *win32_path, *posix_path;
 
   if (!_my_tls.locals.drivemappings)
-    _my_tls.locals.drivemappings = new dos_drive_mappings ();
+    _my_tls.locals.drivemappings = new dos_drive_mappings (NO_FLOPPIES);
 
   wide_path = _my_tls.locals.drivemappings->next_dos_mount ();
   if (wide_path)
@@ -1899,11 +1899,9 @@ cygwin_umount (const char *path, unsigned flags)
 #define is_dev(d,s)	wcsncmp((d),(s),sizeof(s) - 1)
 
 disk_type
-get_disk_type (LPCWSTR dos)
+get_device_type (LPCWSTR dev)
 {
-  WCHAR dev[MAX_PATH], *d = dev;
-  if (!QueryDosDeviceW (dos, dev, MAX_PATH))
-    return DT_NODISK;
+  const WCHAR *d = dev;
   if (is_dev (dev, L"\\Device\\"))
     {
       d += 8;
@@ -1932,6 +1930,15 @@ get_disk_type (LPCWSTR dos)
 	}
     }
   return DT_NODISK;
+}
+
+disk_type
+get_disk_type (LPCWSTR dos)
+{
+  WCHAR dev[MAX_PATH];
+  if (!QueryDosDeviceW (dos, dev, MAX_PATH))
+    return DT_NODISK;
+  return get_device_type (dev);
 }
 
 extern "C" FILE *
@@ -2020,7 +2027,7 @@ resolve_dos_device (const wchar_t *dosname, wchar_t *devpath)
   return false;
 }
 
-dos_drive_mappings::dos_drive_mappings ()
+dos_drive_mappings::dos_drive_mappings (bool with_floppies)
 : mappings(0)
 , cur_mapping(0)
 , cur_dos(0)
@@ -2044,6 +2051,8 @@ dos_drive_mappings::dos_drive_mappings ()
 	mount[--len] = L'\0'; /* Drop trailing backslash */
 	if (resolve_dos_device (mount, devpath))
 	  {
+	    if (!with_floppies && get_device_type (devpath) == DT_FLOPPY)
+	      continue;
 	    mapping *m = new mapping ();
 	    if (m)
 	      {
@@ -2088,6 +2097,8 @@ dos_drive_mappings::dos_drive_mappings ()
 	*wcsrchr (vol, L'\\') = L'\0';
 	if (resolve_dos_device (vol + 4, devpath))
 	  {
+	    if (!with_floppies && get_device_type (devpath) == DT_FLOPPY)
+	      continue;
 	    mapping *m = new mapping ();
 	    bool hadrootmount = false;
 	    if (m)

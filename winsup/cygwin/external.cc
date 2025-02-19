@@ -576,7 +576,7 @@ cygwin_internal (cygwin_getinfo_types t, ...)
 
       case CW_ALLOC_DRIVE_MAP:
 	{
-	  dos_drive_mappings *ddm = new dos_drive_mappings ();
+	  dos_drive_mappings *ddm = new dos_drive_mappings (WITH_FLOPPIES);
 	  res = (uintptr_t) ddm;
 	}
 	break;

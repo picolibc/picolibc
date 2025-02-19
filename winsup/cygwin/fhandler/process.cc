@@ -887,7 +887,7 @@ format_process_maps (void *data, char *&destbuf)
   } cur = {{{'\0'}}, (char *)1, 0, 0};
 
   MEMORY_BASIC_INFORMATION mb;
-  dos_drive_mappings drive_maps;
+  dos_drive_mappings drive_maps (WITH_FLOPPIES);
   heap_info heaps (p->dwProcessId);
   thread_info threads (p->dwProcessId, proc);
   struct stat st;
