@@ -1986,6 +1986,40 @@ endmntent (FILE *)
   return 1;
 }
 
+static bool
+resolve_dos_device (const wchar_t *dosname, wchar_t *devpath)
+{
+  if (QueryDosDeviceW (dosname, devpath, NT_MAX_PATH))
+    {
+      /* The DOS drive mapping can be another symbolic link.  If so,
+	 the mapping won't work since the section name is the name
+	 after resolving all symlinks.  Resolve symlinks here, too. */
+      for (int syml_cnt = 0; syml_cnt < SYMLOOP_MAX; ++syml_cnt)
+	{
+	  UNICODE_STRING upath;
+	  OBJECT_ATTRIBUTES attr;
+	  NTSTATUS status;
+	  HANDLE h;
+
+	  RtlInitUnicodeString (&upath, devpath);
+	  InitializeObjectAttributes (&attr, &upath, OBJ_CASE_INSENSITIVE,
+				      NULL, NULL);
+	  status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY, &attr);
+	  if (!NT_SUCCESS (status))
+	    break;
+	  RtlInitEmptyUnicodeString (&upath, devpath, (NT_MAX_PATH - 1)
+						      * sizeof (WCHAR));
+	  status = NtQuerySymbolicLinkObject (h, &upath, NULL);
+	  NtClose (h);
+	  if (!NT_SUCCESS (status))
+	    break;
+	  devpath[upath.Length / sizeof (WCHAR)] = L'\0';
+	}
+      return true;
+    }
+  return false;
+}
+
 dos_drive_mappings::dos_drive_mappings ()
 : mappings(0)
 , cur_mapping(0)
@@ -1995,6 +2029,44 @@ dos_drive_mappings::dos_drive_mappings ()
   wchar_t vol[64]; /* Long enough for Volume GUID string */
   wchar_t *devpath = tp.w_get ();
   wchar_t *mounts = tp.w_get ();
+  mapping **nextm = &mappings;
+  mapping *endfirstloop = NULL;
+  DWORD len;
+
+  /* Iterate over all drive letters, fetch the DOS device path */
+  if (!(len = GetLogicalDriveStringsW (NT_MAX_PATH - 1, mounts)) ||
+      len >= NT_MAX_PATH)
+    debug_printf ("GetLogicalDriveStringsW, %E");
+  else {
+    for (wchar_t *mount = mounts; *mount; mount += len + 2)
+      {
+	len = wcslen (mount);
+	mount[--len] = L'\0'; /* Drop trailing backslash */
+	if (resolve_dos_device (mount, devpath))
+	  {
+	    mapping *m = new mapping ();
+	    if (m)
+	      {
+		m->dos.path = wcsdup (mount);
+		m->ntdevpath = wcsdup (devpath);
+		if (!m->dos.path || !m->ntdevpath)
+		  {
+		    free (m->dos.path);
+		    free (m->ntdevpath);
+		    delete m;
+		    continue;
+		  }
+		m->dos.len = len;
+		m->ntlen = wcslen (m->ntdevpath);
+		*nextm = endfirstloop = m;
+		nextm = &m->next;
+	      }
+	  }
+	else
+	  debug_printf ("Unable to determine the native mapping for %ls "
+			"(error %E)", mount);
+      }
+  }
 
   /* Iterate over all volumes, fetch the list of DOS paths the volume is
      mounted to. */
@@ -2002,43 +2074,22 @@ dos_drive_mappings::dos_drive_mappings ()
   if (sh == INVALID_HANDLE_VALUE)
     debug_printf ("FindFirstVolumeW, %E");
   else {
-    mapping **nextm = &mappings;
     do
       {
-	/* Skip drives which are not mounted. */
-	DWORD len;
+	/* Skip volumes which are not mounted. */
 	if (!GetVolumePathNamesForVolumeNameW (vol, mounts, NT_MAX_PATH, &len)
 	    || mounts[0] == L'\0')
 	  continue;
-	*wcsrchr (vol, L'\\') = L'\0';
-	if (QueryDosDeviceW (vol + 4, devpath, NT_MAX_PATH))
-	  {
-	    /* The DOS drive mapping can be another symbolic link.  If so,
-	       the mapping won't work since the section name is the name
-	       after resolving all symlinks.  Resolve symlinks here, too. */
-	    for (int syml_cnt = 0; syml_cnt < SYMLOOP_MAX; ++syml_cnt)
-	      {
-		UNICODE_STRING upath;
-		OBJECT_ATTRIBUTES attr;
-		NTSTATUS status;
-		HANDLE h;
+	/* Skip volumes which are only mounted to the root of a drive letter:
+	   they were handled in the loop above */
+	if (len == 5 && mounts[1] == L':' && mounts[2] == L'\\' && !mounts[3])
+	  continue;
 
-		RtlInitUnicodeString (&upath, devpath);
-		InitializeObjectAttributes (&attr, &upath,
-					    OBJ_CASE_INSENSITIVE, NULL, NULL);
-		status = NtOpenSymbolicLinkObject (&h, SYMBOLIC_LINK_QUERY,
-						   &attr);
-		if (!NT_SUCCESS (status))
-		  break;
-		RtlInitEmptyUnicodeString (&upath, devpath, (NT_MAX_PATH - 1)
-							    * sizeof (WCHAR));
-		status = NtQuerySymbolicLinkObject (h, &upath, NULL);
-		NtClose (h);
-		if (!NT_SUCCESS (status))
-		  break;
-		devpath[upath.Length / sizeof (WCHAR)] = L'\0';
-	      }
+	*wcsrchr (vol, L'\\') = L'\0';
+	if (resolve_dos_device (vol + 4, devpath))
+	  {
 	    mapping *m = new mapping ();
+	    bool hadrootmount = false;
 	    if (m)
 	      {
 		/* store mount point list */
@@ -2063,15 +2114,45 @@ dos_drive_mappings::dos_drive_mappings ()
 		    dos->path = mount;
 		    dos->len = wcslen (dos->path);
 		    dos->path[--dos->len] = L'\0'; /* Drop trailing backslash */
+		    if (dos->len == 2 && dos->path[1] == L':')
+		      hadrootmount = true;
 		  }
 		m->ntlen = wcslen (m->ntdevpath);
-		*nextm = m;
-		nextm = &m->next;
+		if (hadrootmount)
+		{
+		  /* This device has already been added to the mappings list
+		     in the first loop above, but with only the drive root
+		     mount.  Find that entry and replace it with the complete
+		     list of mounts. */
+		  hadrootmount = false;
+		  for (mapping *m2 = mappings;
+		       endfirstloop && m2 != endfirstloop->next;
+		       m2 = m2->next)
+		    {
+		      if (m->ntlen == m2->ntlen &&
+			  !wcscmp (m->ntdevpath, m2->ntdevpath))
+			{
+			  free (m2->dos.path);
+			  m2->dos.next = m->dos.next;
+			  m2->dos.path = m->dos.path;
+			  m2->dos.len = m->dos.len;
+			  free (m->ntdevpath);
+			  delete m;
+			  hadrootmount = true;
+			  break;
+			}
+		    }
+		}
+		if (!hadrootmount)
+		  {
+		    *nextm = m;
+		    nextm = &m->next;
+		  }
 	      }
 	  }
 	else
 	  debug_printf ("Unable to determine the native mapping for %ls "
-			"(error %u)", vol, GetLastError ());
+			"(error %E)", vol);
       }
     while (FindNextVolumeW (sh, vol, 64));
     FindVolumeClose (sh);
