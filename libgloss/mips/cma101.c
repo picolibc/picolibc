@@ -133,6 +133,7 @@ set_pclock (void)
   return;
 }
 
+extern void __cpu_timer_poll (int);
 #define PCLOCK_WAIT(x)  __cpu_timer_poll((x) * pclock)
 
 /* NOTE: On the Cogent CMA101 board the LCD controller will sometimes
@@ -178,6 +179,7 @@ lcd_display (int line, const char *msg)
 extern unsigned int __buserr_count(void);
 extern void __default_buserr_handler(void);
 extern void __restore_buserr_handler(void);
+extern void __cpu_flush(void);
 
 /* Allow the user to provide his/her own defaults.  */
 unsigned int __sizemem_default;
@@ -261,15 +263,13 @@ __sizemem ()
 /* Provided as a function, so as to avoid reading the I/O location
    multiple times: */
 static int
-convertbcd(byte)
-     unsigned char byte;
+convertbcd(unsigned char byte)
 {
   return ((((byte >> 4) & 0xF) * 10) + (byte & 0xF));
 }
 
 time_t
-time (_timer)
-     time_t *_timer;
+time (time_t *_timer)
 {
   time_t result = 0;
   struct tm tm;

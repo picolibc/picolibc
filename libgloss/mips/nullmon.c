@@ -45,8 +45,7 @@ struct s_mem
 };
 
 void
-get_mem_info (mem)
-     struct s_mem *mem;
+get_mem_info (struct s_mem *mem)
 {
   mem->size = BOARD_MEM_SIZE - (_end - _ftext);
 }

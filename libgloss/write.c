@@ -14,8 +14,6 @@
  */
 #include "glue.h"
 
-extern int  outbyte (char x);
-
 /*
  * write -- write bytes to the serial port. Ignore fd, since
  *          stdout and stderr are the same. Since we have no filesystem,

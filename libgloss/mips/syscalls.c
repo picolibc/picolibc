@@ -4,23 +4,26 @@
 
 #include "regs.S"
 
+struct s_mem {
+  unsigned int size;
+  unsigned int icsize;
+  unsigned int dcsize;
+};
+
+void *get_mem_info (struct s_mem *);
+
 extern char _end[];
 
 /* FIXME: This is not ideal, since we do a get_mem_info() call for
    every sbrk() call. */
 char *
-sbrk (nbytes)
-     int nbytes;
+sbrk (int nbytes)
 {
   static char *heap_ptr = _end;
   static char *heap_start = _end;
   char        *base;
-  struct s_mem {
-    unsigned int size;
-    unsigned int icsize;
-    unsigned int dcsize;
-  } mem;
-  unsigned int avail = 0;
+  struct s_mem mem;
+  ptrdiff_t avail = 0;
 
   /* The sizeof (s_mem.size) must be 4 bytes.  The compiler should be
      able to eliminate this check */
@@ -31,8 +34,8 @@ sbrk (nbytes)
   /* NOTE: The value returned from the get_mem_info call is the amount
      of memory, and not the address of the (last byte + 1) */
 
-  if (((size_t)heap_ptr >= heap_start) && ((size_t)heap_ptr < (heap_start + mem.size))) {
-    avail = (heap_start + mem.size) - (size_t)heap_ptr;
+  if (((uintptr_t)heap_ptr >= heap_start) && ((uintptr_t)heap_ptr < (heap_start + mem.size))) {
+    avail = (heap_start + mem.size) - heap_ptr;
     base = heap_ptr;
   } /* else will fail since "nbytes" will be greater than zeroed "avail" value */
 

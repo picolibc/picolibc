@@ -47,7 +47,7 @@ void *get_mem_info (struct s_mem *);
 extern char _end[];
 
 /* Address immediately after available memory.  */
-static unsigned long memtop;
+static void *memtop;
 
 /* Program stack size.  */
 static unsigned long stack_size;
@@ -63,15 +63,15 @@ __libcfe_meminit (void)
     {
       uint64_t start, length, type;
       int i, rv;
-      long end_segbits, end_pa;
+      uintptr_t end_segbits, end_pa;
 
       /* Note that this only works if _end and the program live in kseg0
          or kseg1.  Not a problem with the default linker script, but
          if you're writing your own, keep it in mind.  For more complex
          memory allocation needs, you're encouraged to copy this file
          and syscalls.c (for sbrk()), and reimplement as appropriate.  */
-      end_segbits = (long)_end & ~ 0x1fffffffL;
-      end_pa = (long)_end & 0x1fffffffL;
+      end_segbits = (uintptr_t)_end & ~ 0x1fffffffL;
+      end_pa = (uintptr_t)_end & 0x1fffffffL;
 
       for (i = 0; ; i++)
         {
@@ -92,7 +92,7 @@ __libcfe_meminit (void)
 	     a winner.  */
           if (end_pa >= start && end_pa < (start + length))
             {
-              memtop = (start + length) | end_segbits;
+              memtop = (void*)(uintptr_t)((start + length) | end_segbits);
               break;
             }
         }
@@ -107,7 +107,7 @@ __libcfe_meminit (void)
 
   /* Chop the top of memory to a 32-byte aligned location, and
      round the stack size up to a 32-byte multiple.  */
-  memtop = memtop & ~(unsigned long)31;
+  memtop = (void*)((uintptr_t)memtop & ~(uintptr_t)31);
   stack_size = (stack_size + 31) & ~(unsigned long)31;
 }
 
