@@ -432,7 +432,7 @@ fhandler_netdrive::exists ()
   if (strlen (get_name ()) == 2)
     return virt_rootdir;
 
-  wchar_t name[MAX_PATH];
+  wchar_t name[CYG_MAX_PATH];
   struct addrinfoW *ai;
   INT ret;
   DWORD protocol = 0;
@@ -460,7 +460,10 @@ fhandler_netdrive::exists ()
   sys_mbstowcs (name, CYG_MAX_PATH, get_name ());
   ret = GetAddrInfoW (name + 2, NULL, NULL, &ai);
   if (!ret)
-    FreeAddrInfoW (ai);
+    {
+      debug_printf ("GetAddrInfoW(%W) returned %d", ret);
+      FreeAddrInfoW (ai);
+    }
 
   return ret ? virt_none : virt_directory;
 }
