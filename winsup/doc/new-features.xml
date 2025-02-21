@@ -78,8 +78,9 @@ name, only SMB shares are enumerated.
 </para></listitem>
 
 <listitem><para>
-Expose //tsclient (Microsoft Terminal Services) shares as well as wsl$
-(Plan 9 Network Provider) shares, i. e., WSL installation root dirs.
+Expose WebDav shares, //tsclient (Microsoft Terminal Services) shares as
+well as //wsl$ (Plan 9 Network Provider) shares, i. e., WSL installation
+root dirs.
 </para></listitem>
 
 <listitem><para>

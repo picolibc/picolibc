@@ -44,9 +44,9 @@ What changed:
   ls //server now also enumerates NFS shares.  If "server" is given
   as a flat name, only SMB shares are enumerated.
 
-- Expose //tsclient (Microsoft Terminal Services) shares as well as
-  //wsl$ (Plan 9 Network Provider) shares, i. e., WSL installation
-  root dirs.
+- Expose WebDav shares, //tsclient (Microsoft Terminal Services)
+  shares as well as //wsl$ (Plan 9 Network Provider) shares, i. e.,
+  WSL installation root dirs.
 
 - Redesign pipe handling to minimize toggling blocking mode.
   The query_hdl stuff is no longer needed in new implementation.

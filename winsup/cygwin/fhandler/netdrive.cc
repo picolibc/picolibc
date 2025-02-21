@@ -432,7 +432,7 @@ fhandler_netdrive::exists ()
   if (strlen (get_name ()) == 2)
     return virt_rootdir;
 
-  wchar_t name[CYG_MAX_PATH];
+  wchar_t name[CYG_MAX_PATH], *dav_at;
   struct addrinfoW *ai;
   INT ret;
   DWORD protocol = 0;
@@ -458,6 +458,11 @@ fhandler_netdrive::exists ()
      into IP addresses.  This may take up to about 3 secs if the name
      doesn't exist, or about 8 secs if DNS is unavailable. */
   sys_mbstowcs (name, CYG_MAX_PATH, get_name ());
+  /* Webdav URLs contain a @ after the hostname, followed by stuff.
+     Drop @ for GetAddrInfoW to succeed. */
+  if ((dav_at = wcschr (name, L'@')) != NULL)
+    *dav_at = L'\0';
+
   ret = GetAddrInfoW (name + 2, NULL, NULL, &ai);
   if (ret)
     {
