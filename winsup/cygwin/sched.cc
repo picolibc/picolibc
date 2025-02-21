@@ -406,7 +406,7 @@ sched_setscheduler (pid_t pid, int policy,
       return -1;
     }
 
-  pinfo p (pid ? pid : getpid ());
+  pinfo p ((pid ? pid : getpid ()), PID_MAP_RW);
   if (!p)
     {
       set_errno (ESRCH);
