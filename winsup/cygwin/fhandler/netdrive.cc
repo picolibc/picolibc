@@ -459,13 +459,14 @@ fhandler_netdrive::exists ()
      doesn't exist, or about 8 secs if DNS is unavailable. */
   sys_mbstowcs (name, CYG_MAX_PATH, get_name ());
   ret = GetAddrInfoW (name + 2, NULL, NULL, &ai);
-  if (!ret)
+  if (ret)
     {
-      debug_printf ("GetAddrInfoW(%W) returned %d", ret);
-      FreeAddrInfoW (ai);
+      debug_printf ("GetAddrInfoW(%W) returned %d", name + 2, ret);
+      return virt_none;
     }
 
-  return ret ? virt_none : virt_directory;
+  FreeAddrInfoW (ai);
+  return virt_directory;
 }
 
 fhandler_netdrive::fhandler_netdrive ():
