@@ -25,10 +25,6 @@ ISO®/IEC DIS 9945 Information technology
     FD_ZERO
     _Exit
     _exit
-    _longjmp
-    _setjmp
-    _tolower
-    _toupper
     a64l
     abort
     abs
@@ -73,7 +69,6 @@ ISO®/IEC DIS 9945 Information technology
     atanl
     atexit
     atof
-    atoff
     atoi
     atol
     atoll
@@ -382,7 +377,6 @@ ISO®/IEC DIS 9945 Information technology
     ftok
     ftruncate
     ftrylockfile
-    ftw
     funlockfile
     futimens
     fwide
@@ -397,7 +391,6 @@ ISO®/IEC DIS 9945 Information technology
     getchar_unlocked
     getcwd
     getdelim
-    getdomainname
     getegid
     getentropy
     getenv
@@ -411,7 +404,6 @@ ISO®/IEC DIS 9945 Information technology
     getgroups
     gethostid
     gethostname
-    getitimer			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     getline
     getlocalename_l
     getlogin
@@ -434,7 +426,6 @@ ISO®/IEC DIS 9945 Information technology
     getpwuid_r
     getrlimit			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     getrusage
-    gets
     getservbyname
     getservbyport
     getservent
@@ -443,7 +434,6 @@ ISO®/IEC DIS 9945 Information technology
     getsockopt
     getsubopt
     gettext			(available in external "libintl" library)
-    gettimeofday
     getuid
     getutxent
     getutxid
@@ -489,12 +479,10 @@ ISO®/IEC DIS 9945 Information technology
     inet_pton
     initstate
     insque
-    ioctl
     isalnum
     isalnum_l
     isalpha
     isalpha_l
-    isascii
     isatty
     isblank
     isblank_l
@@ -799,7 +787,6 @@ ISO®/IEC DIS 9945 Information technology
     pthread_detach
     pthread_equal
     pthread_exit
-    pthread_getconcurrency
     pthread_getcpuclockid
     pthread_getschedparam
     pthread_getspecific
@@ -845,7 +832,6 @@ ISO®/IEC DIS 9945 Information technology
     pthread_self
     pthread_setcancelstate
     pthread_setcanceltype
-    pthread_setconcurrency
     pthread_setschedparam
     pthread_setschedprio
     pthread_setspecific
@@ -873,7 +859,6 @@ ISO®/IEC DIS 9945 Information technology
     quick_exit
     raise
     rand
-    rand_r
     random
     read
     readdir
@@ -954,13 +939,11 @@ ISO®/IEC DIS 9945 Information technology
     setgid
     setgrent
     sethostent
-    setitimer			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     setjmp
     setkey			(available in external "libcrypt" library)
     setlocale
     setlogmask
     setpgid
-    setpgrp
     setpriority			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     setprotoent
     setpwent
@@ -988,20 +971,14 @@ ISO®/IEC DIS 9945 Information technology
     sigdelset
     sigemptyset
     sigfillset
-    sighold
-    sigignore
-    siginterrupt
     sigismember
     siglongjmp
     signal
     signbit			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     signgam
-    sigpause			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     sigpending
     sigprocmask
     sigqueue
-    sigrelse
-    sigset
     sigsetjmp
     sigsuspend
     sigtimedwait
@@ -1108,7 +1085,6 @@ ISO®/IEC DIS 9945 Information technology
     tcsetwinsize
     tdelete
     telldir
-    tempnam
     textdomain			(available in external "libintl" library)
     tfind
     tgamma
@@ -1166,7 +1142,6 @@ ISO®/IEC DIS 9945 Information technology
     unlockpt
     unsetenv
     uselocale
-    utime
     utimensat
     utimes
     va_arg
@@ -1318,6 +1293,7 @@ ISO®/IEC DIS 9945 Information technology
     gamma_r
     gammaf
     gammaf_r
+    getdomainname
     getdtablesize
     getgrouplist
     getifaddrs
@@ -1631,6 +1607,11 @@ ISO®/IEC DIS 9945 Information technology
 <sect1 id="std-deprec"><title>Other UNIX system interfaces, not in POSIX.1-2008 or deprecated:</title>
 
 <screen>
+    _longjmp			(SUSv4)
+    _setjmp			(SUSv4)
+    _tolower			(SUSv4)
+    _toupper			(SUSv4)
+    atoff			(AIX)
     bcmp			(POSIX.1-2001, SUSv3)
     bcopy			(SUSv3)
     bzero			(SUSv3)
@@ -1641,12 +1622,16 @@ ISO®/IEC DIS 9945 Information technology
     endutent			(XPG2)
     fcvt			(SUSv3)
     ftime			(SUSv3)
+    ftw				(SUSv4)
     gcvt			(SUSv3)
     getcontext			(SUSv3)
     gethostbyaddr		(SUSv3)
     gethostbyname		(SUSv3)
     gethostbyname2		(first defined in BIND 4.9.4)
+    getitimer			(SUSv4 - see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     getpass			(SUSv2)
+    gets			(SUSv4)
+    gettimeofday		(SUSv4)
     getutent			(XPG2)
     getutid			(XPG2)
     getutline			(XPG2)
@@ -1654,6 +1639,8 @@ ISO®/IEC DIS 9945 Information technology
     getwd			(SUSv3)
     h_errno			(SUSv3)
     index			(SUSv3)
+    ioctl			(SUSv4)
+    isascii			(SUSv4)
     makecontext			(SUSv3)
     mallinfo			(SVID)
     mallopt			(SVID)
@@ -1662,24 +1649,37 @@ ISO®/IEC DIS 9945 Information technology
     pthread_attr_getstackaddr	(SUSv3)
     pthread_attr_setstackaddr	(SUSv3)
     pthread_continue		(XPG2)
+    pthread_getconcurrency	(SUSv4)
     pthread_getsequence_np	(Tru64)
+    pthread_setconcurrency	(SUSv4)
     pthread_suspend		(XPG2)
     pthread_yield		(POSIX.1c drafts)
     pututline			(XPG2)
     putw			(SVID)
+    rand_r			(SUSv4)
     rindex			(SUSv3)
     scalb			(SUSv3)
     setcontext			(SUSv3)
+    setitimer			(SUSv4 - see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    setpgrp			(SUSv4)
     setutent			(XPG2)
+    sighold			(SUSv4)
+    sigignore			(SUSv4)
+    siginterrupt		(SUSv4)
+    sigpause			(SUSv4 - see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    sigrelse			(SUSv4)
+    sigset			(SUSv4)
     stime			(SVID)
     swapcontext			(SUSv3)
     sys_errlist			(BSD)
     sys_nerr			(BSD)
     sys_siglist			(BSD)
-    toascii			(SUSv3)
+    tempnam			(SUSv4)
+    toascii			(SUSv4)
     ttyslot			(SUSv2)
     ualarm			(SUSv3)
     usleep			(SUSv3)
+    utime			(SUSv4)
     utmpname			(XPG2)
     vfork			(SUSv3)		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
 </screen>
@@ -1695,36 +1695,28 @@ ISO®/IEC DIS 9945 Information technology
     dgettext_l
     dngettext_l
     endnetent
-    fattach
     fmtmsg
     getdate
     getdate_err
     gethostent
-    getmsg
     getnetbyaddr
     getnetbyname
     getnetent
-    getpmsg
     getresgid
     getresuid
     gettext_l
-    isastream
     mlockall
     munlockall
     ngettext_l
     posix_mem_offset
-    posix_trace[...]
-    posix_typed_[...]
     posix_typed_mem_get_info
     posix_typed_mem_open
     pthread_mutex_consistent
     pthread_mutexattr_getrobust
     pthread_mutexattr_setrobust
-    putmsg
     setnetent
     setresgid
     setresuid
-    ulimit
     waitid
 </screen>
 
