@@ -16,6 +16,9 @@ ISO®/IEC DIS 9945 Information technology
 - Issue 8.</para>
 
 <screen>
+    CMPLX
+    CMPLXF
+    CMPLXL
     FD_CLR
     FD_ISSET
     FD_SET
@@ -57,6 +60,7 @@ ISO®/IEC DIS 9945 Information technology
     asinhl
     asinl
     asprintf
+    assert
     at_quick_exit
     atan
     atan2
@@ -73,8 +77,41 @@ ISO®/IEC DIS 9945 Information technology
     atoi
     atol
     atoll
+    atomic_compare_exchange_strong
+    atomic_compare_exchange_strong_explicit
+    atomic_compare_exchange_weak
+    atomic_compare_exchange_weak_explicit
+    atomic_exchange
+    atomic_exchange_explicit
+    atomic_fetch_add
+    atomic_fetch_add_explicit
+    atomic_fetch_and
+    atomic_fetch_and_explicit
+    atomic_fetch_or
+    atomic_fetch_or_explicit
+    atomic_fetch_sub
+    atomic_fetch_sub_explicit
+    atomic_fetch_xor
+    atomic_fetch_xor_explicit
+    atomic_flag_clear
+    atomic_flag_clear_explicit
+    atomic_flag_test_and_set
+    atomic_flag_test_and_set_explicit
+    atomic_init
+    atomic_is_lock_free
+    atomic_load
+    atomic_load_explicit
+    atomic_signal_fence
+    atomic_store
+    atomic_store_explicit
+    atomic_thread_fence
     basename			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    be16toh
+    be32toh
+    be64toh
     bind
+    bind_textdomain_codeset
+    bindtextdomain
     bsearch
     btowc
     c16rtomb
@@ -205,6 +242,9 @@ ISO®/IEC DIS 9945 Information technology
     dbm_nextkey			(available in external "libgdbm" library)
     dbm_open			(available in external "libgdbm" library)
     dbm_store			(available in external "libgdbm" library)
+    dcgettext			(available in external "libintl" library)
+    dcngettext			(available in external "libintl" library)
+    dgettext			(available in external "libintl" library)
     difftime
     dirfd
     dirname
@@ -214,6 +254,7 @@ ISO®/IEC DIS 9945 Information technology
     dlerror
     dlopen
     dlsym
+    dngettext			(available in external "libintl" library)
     dprintf
     drand48
     dup
@@ -358,6 +399,7 @@ ISO®/IEC DIS 9945 Information technology
     getdelim
     getdomainname
     getegid
+    getentropy
     getenv
     geteuid
     getgid
@@ -371,6 +413,7 @@ ISO®/IEC DIS 9945 Information technology
     gethostname
     getitimer			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     getline
+    getlocalename_l
     getlogin
     getlogin_r
     getnameinfo
@@ -399,6 +442,7 @@ ISO®/IEC DIS 9945 Information technology
     getsockname
     getsockopt
     getsubopt
+    gettext			(available in external "libintl" library)
     gettimeofday
     getuid
     getutxent
@@ -414,6 +458,12 @@ ISO®/IEC DIS 9945 Information technology
     hcreate
     hdestroy
     hsearch
+    htobe16
+    htobe32
+    htobe64
+    htole16
+    htole32
+    htole64
     htonl
     htons
     hypot
@@ -431,6 +481,8 @@ ISO®/IEC DIS 9945 Information technology
     ilogbl
     imaxabs
     imaxdiv
+    in6addr_any
+    in6addr_loopback
     inet_addr
     inet_ntoa
     inet_ntop
@@ -505,6 +557,7 @@ ISO®/IEC DIS 9945 Information technology
     jn
     jrand48
     kill
+    kill_dependency
     killpg
     l64a
     labs
@@ -514,6 +567,9 @@ ISO®/IEC DIS 9945 Information technology
     ldexpf
     ldexpl
     ldiv
+    le16toh
+    le32toh
+    le64toh
     lfind
     lgamma
     lgammaf
@@ -633,6 +689,7 @@ ISO®/IEC DIS 9945 Information technology
     nexttowardf
     nexttowardl
     nftw
+    ngettext			(available in external "libintl" library)
     nice			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     nl_langinfo
     nl_langinfo_l
@@ -657,14 +714,18 @@ ISO®/IEC DIS 9945 Information technology
     pipe2
     poll
     popen
+    posix_devctl
     posix_fadvise
     posix_fallocate
+    posix_getdents
     posix_madvise
     posix_memalign
     posix_openpt
     posix_spawn
+    posix_spawn_file_actions_addchdir
     posix_spawn_file_actions_addclose
     posix_spawn_file_actions_adddup2
+    posix_spawn_file_actions_addfchdir
     posix_spawn_file_actions_addopen
     posix_spawn_file_actions_destroy
     posix_spawn_file_actions_init
@@ -719,6 +780,8 @@ ISO®/IEC DIS 9945 Information technology
     pthread_barrierattr_init
     pthread_barrierattr_setpshared
     pthread_cancel
+    pthread_cleanup_pop
+    pthread_cleanup_push
     pthread_cond_broadcast
     pthread_cond_clockwait
     pthread_cond_destroy
@@ -1046,6 +1109,7 @@ ISO®/IEC DIS 9945 Information technology
     tdelete
     telldir
     tempnam
+    textdomain			(available in external "libintl" library)
     tfind
     tgamma
     tgammaf
@@ -1065,6 +1129,7 @@ ISO®/IEC DIS 9945 Information technology
     timer_gettime
     timer_settime
     times
+    timespec_get
     timezone
     tmpfile
     tmpnam
