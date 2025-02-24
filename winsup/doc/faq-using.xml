@@ -802,6 +802,69 @@ for a detailed description of what's possible with filenames and what is not.
 </para>
 </answer></qandaentry>
 
+<qandaentry id="faq.using.sparse-files">
+<question><para>Does Cygwin support sparse files?</para></question>
+<answer>
+
+<para>Filesystems of Unix-like operating systems traditionally provide
+automatic support for sparse files: no disk blocks are allocated for file
+regions which are not explicitly written.  The Windows NTFS filesystem
+supports sparse files, but requires to enable it for individual files via
+<literal>FILE_ATTRIBUTE_SPARSE_FILE</literal>.  If the mount option
+<literal>sparse</literal> is used or the mount point is on a solid state
+device, Cygwin heuristically detects skipped file regions and sets this
+attribute then.  Independent of mount option or SSD, sparse files may also
+be created if an application uses the related POSIX functionality
+(<literal>FALLOC_FL_PUNCH_HOLE</literal>) as the <literal>cp</literal>
+command does if <literal>--sparse=always</literal> is specified.  In some use
+cases requiring only a single sparse file, for example creating disk images
+with <literal>dd</literal> or <literal>ddrescue</literal>, it is also
+possible to preset the sparse attribute with <literal>chattr</literal>.
+</para>
+<para>Example (<literal>sparse</literal> not set, no SSD):
+</para>
+<screen>
+	$ mkdir 0
+	$ > 0/is_sparse
+	$ chattr +S 0/is_sparse
+	$ dd if=/dev/zero bs=1M count=1 of=0/is_sparse conv=sparse,notrunc
+	$ echo EOF >> 0/is_sparse
+	$ dd if=/dev/zero bs=1M count=1 of=0/maybe_sparse conv=sparse
+	$ echo EOF >> 0/maybe_sparse
+	$ dd if=/dev/zero bs=1M count=1 of=0/not_sparse
+	$ echo EOF >> 0/not_sparse
+	$ cp -a 0 1
+	$ cp -a --sparse=always 0 2
+	$ ls -hls ?/*
+	 64K -rw-r--r-- 1 user group 1.1M Feb 22 12:42 0/is_sparse
+	1.1M -rw-r--r-- 1 user group 1.1M Feb 22 12:42 0/maybe_sparse
+	1.1M -rw-r--r-- 1 user group 1.1M Feb 22 12:42 0/not_sparse
+	1.1M -rw-r--r-- 1 user group 1.1M Feb 22 12:42 1/is_sparse
+	1.1M -rw-r--r-- 1 user group 1.1M Feb 22 12:42 1/maybe_sparse
+	1.1M -rw-r--r-- 1 user group 1.1M Feb 22 12:42 1/not_sparse
+	 64K -rw-r--r-- 1 user group 1.1M Feb 22 12:42 2/is_sparse
+	 64K -rw-r--r-- 1 user group 1.1M Feb 22 12:42 2/maybe_sparse
+	 64K -rw-r--r-- 1 user group 1.1M Feb 22 12:42 2/not_sparse
+	$ lsattr ?/*
+	---a-S-------- 0/is_sparse
+	---a---------- 0/maybe_sparse
+	---a---------- 0/not_sparse
+	---a---------- 1/is_sparse
+	---a---------- 1/maybe_sparse
+	---a---------- 1/not_sparse
+	---a-S-------- 2/is_sparse
+	---a-S-------- 2/maybe_sparse
+	---a-S-------- 2/not_sparse
+</screen>
+<para>With <literal>sparse</literal> mount option or a SSD, all
+<literal>?/maybe_sparse</literal> files would be sparse.
+</para>
+<para>Note that the detection of solid state devices may be false negative in
+various configurations, for example RAID volumes, USB flash drives, very old
+SATA SSDs, or SSDs behind USB docking stations.
+</para>
+</answer></qandaentry>
+
 <qandaentry id="faq.using.hangs">
 <question><para>When it hangs, how do I get it back?</para></question>
 <answer>
