@@ -1464,10 +1464,10 @@ ISO®/IEC DIS 9945 Information technology
     pthread_tryjoin_np
     putwc_unlocked
     putwchar_unlocked
-    renameat2			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     quotactl
     rawmemchr
     removexattr
+    renameat2			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     scandirat
     sched_getaffinity
     sched_getcpu
@@ -1489,11 +1489,11 @@ ISO®/IEC DIS 9945 Information technology
     strverscmp
     sysinfo
     tdestroy
+    timegm
+    timelocal
     timerfd_create
     timerfd_gettime
     timerfd_settime
-    timegm
-    timelocal
     toascii_l
     updwtmpx
     utmpxname
@@ -1525,6 +1525,8 @@ ISO®/IEC DIS 9945 Information technology
     __fsetlocking
     __fwritable
     __fwriting
+    __xdrrec_getrec		(available in external "libtirpc" library)
+    __xdrrec_setnonblock	(available in external "libtirpc" library)
     acl
     aclcheck
     aclfrommode
@@ -1588,8 +1590,6 @@ ISO®/IEC DIS 9945 Information technology
     xdrrec_endofrecord		(available in external "libtirpc" library)
     xdrrec_eof			(available in external "libtirpc" library)
     xdrrec_skiprecord		(available in external "libtirpc" library)
-    __xdrrec_getrec		(available in external "libtirpc" library)
-    __xdrrec_setnonblock	(available in external "libtirpc" library)
     xdrstdio_create		(available in external "libtirpc" library)
 </screen>
 
