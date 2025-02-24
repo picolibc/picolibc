@@ -702,6 +702,7 @@ ISO®/IEC DIS 9945 Information technology
     pipe2
     poll
     popen
+    posix_close
     posix_devctl
     posix_fadvise
     posix_fallocate
