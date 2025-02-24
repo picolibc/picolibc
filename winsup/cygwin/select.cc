@@ -778,7 +778,7 @@ out:
 	}
       ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT | PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
-      gotone += s->write_ready = (n >= PIPE_BUF);
+      gotone += s->write_ready = (n > 0);
       if (n < 0 && s->except_selected)
 	gotone += s->except_ready = true;
     }
@@ -992,7 +992,7 @@ out:
       ssize_t n = pipe_data_available (s->fd, fh, fh->get_handle (),
 				       PDA_SELECT | PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
-      gotone += s->write_ready = (n >= PIPE_BUF);
+      gotone += s->write_ready = (n > 0);
       if (n < 0 && s->except_selected)
 	gotone += s->except_ready = true;
     }
@@ -1418,7 +1418,7 @@ out:
     {
       ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT | PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
-      gotone += s->write_ready = (n >= PIPE_BUF);
+      gotone += s->write_ready = (n > 0);
       if (n < 0 && s->except_selected)
 	gotone += s->except_ready = true;
     }
