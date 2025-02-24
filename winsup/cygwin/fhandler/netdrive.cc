@@ -393,8 +393,8 @@ create_thread_and_wait (DIR *dir)
   /* For shares, use WNet functions. */
 
   /* Try NFS first, if the name contains a dot (i. e., supposedly is a FQDN
-     as used in NFS server enumeration). */
-  if (strchr (dir->__d_dirname, '.'))
+     as used in NFS server enumeration) but no at-sign. */
+  if (strchr (dir->__d_dirname, '.') && !strchr (dir->__d_dirname + 2, '@'))
     {
       ndi.provider = WNNC_NET_MS_NFS;
       ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
