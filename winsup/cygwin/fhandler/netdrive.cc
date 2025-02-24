@@ -409,13 +409,25 @@ create_thread_and_wait (DIR *dir)
     }
 
   /* Eventually, try TERMSRV/P9/SMB via WNet for share enumeration,
-     depending on "server" name. */
+     depending on "server" name.
+
+     TODO: There's no known way yet to enumerate connected WebDAV resources.
+     Whatever I try, WNetGetResourceInformationW or WNetOpenEnumW return
+     ERROR_BAD_NET_NAME (67).  Therefore, short-circuit WebDAV here for
+     the time being. */
   if (!strcmp (dir->__d_dirname + 2, TERMSRV_DIR))
     ndi.provider = WNNC_NET_TERMSRV;
   else if (!strcmp (dir->__d_dirname + 2, PLAN9_DIR))
     ndi.provider = WNNC_NET_9P;
+  else if (strchr (dir->__d_dirname + 2, '@') != NULL)
+    {
+      /* ndi.provider = WNNC_NET_DAV; */
+      ndi.err = 0;
+      goto out;
+    }
   else
     ndi.provider = WNNC_NET_SMB;
+
   ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
   thr = new cygthread (thread_netdrive_wnet, &ndi, "netdrive_smb");
   if (thr->detach (ndi.sem))
