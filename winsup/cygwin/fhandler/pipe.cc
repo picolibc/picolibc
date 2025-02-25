@@ -945,8 +945,8 @@ is_running_as_service (void)
    simplicity, nt_create will omit the 'open_mode' and 'name'
    parameters, which aren't needed for our purposes.  */
 
-static int nt_create (LPSECURITY_ATTRIBUTES, HANDLE &, HANDLE &, DWORD,
-		      int64_t *);
+static NTSTATUS nt_create (LPSECURITY_ATTRIBUTES, HANDLE &, HANDLE &, DWORD,
+			   int64_t *);
 
 int
 fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
@@ -956,10 +956,10 @@ fhandler_pipe::create (fhandler_pipe *fhs[2], unsigned psize, int mode)
   int res = -1;
   int64_t unique_id = 0; /* Compiler complains if not initialized... */
 
-  int ret = nt_create (sa, r, w, psize, &unique_id);
-  if (ret)
+  NTSTATUS status = nt_create (sa, r, w, psize, &unique_id);
+  if (!NT_SUCCESS (status))
     {
-      __seterrno_from_win_error (ret);
+      __seterrno_from_nt_status (status);
       goto out;
     }
   if ((fhs[0] = (fhandler_pipe *) build_fh_dev (*piper_dev)) == NULL)
@@ -1010,9 +1010,9 @@ out:
   return res;
 }
 
-static int
-nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
-		DWORD psize, int64_t *unique_id)
+static NTSTATUS
+nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w, DWORD psize,
+	   int64_t *unique_id)
 {
   NTSTATUS status;
   HANDLE npfsh;
@@ -1027,10 +1027,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
 
   status = fhandler_base::npfs_handle (npfsh);
   if (!NT_SUCCESS (status))
-    {
-      __seterrno_from_nt_status (status);
-      return GetLastError ();
-    }
+    return status;
 
   /* Ensure that there is enough pipe buffer space for atomic writes.  */
   if (!psize)
@@ -1045,12 +1042,12 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
   access = GENERIC_READ | FILE_WRITE_ATTRIBUTES | SYNCHRONIZE;
 
   ULONG pipe_type = pipe_byte ? FILE_PIPE_BYTE_STREAM_TYPE
-    : FILE_PIPE_MESSAGE_TYPE;
+			      : FILE_PIPE_MESSAGE_TYPE;
 
   /* Retry NtCreateNamedPipeFile as long as the pipe name is in use.
      Retrying will probably never be necessary, but we want
      to be as robust as possible.  */
-  DWORD err = 0;
+  NTSTATUS err = STATUS_SUCCESS;
   while (!r)
     {
       static volatile ULONG pipe_unique_id;
@@ -1082,7 +1079,7 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
       if (NT_SUCCESS (status))
 	{
 	  debug_printf ("pipe read handle %p", r);
-	  err = 0;
+	  err = STATUS_SUCCESS;
 	  break;
 	}
 
@@ -1104,9 +1101,8 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
 	  break;
 	default:
 	  {
-	    __seterrno_from_nt_status (status);
-	    err = GetLastError ();
-	    debug_printf ("failed, %E");
+	    err = status;
+	    debug_printf ("NtCreateNamedPipeFile failed: %y", err);
 	    r = NULL;
 	  }
 	}
@@ -1124,16 +1120,14 @@ nt_create (LPSECURITY_ATTRIBUTES sa_ptr, HANDLE &r, HANDLE &w,
   status = NtOpenFile (&w, access, &attr, &io, 0, 0);
   if (!NT_SUCCESS (status))
     {
-      DWORD err = GetLastError ();
-      debug_printf ("NtOpenFile failed, r %p, %E", r);
+      debug_printf ("NtOpenFile failed, r %p: %y", r, status);
       if (r)
 	NtClose (r);
       w = NULL;
-      return err;
+      return status;
     }
 
-  /* Success. */
-  return 0;
+  return STATUS_SUCCESS;
 }
 
 /* Called by dtable::init_std_file_from_handle for stdio handles
