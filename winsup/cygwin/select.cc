@@ -593,12 +593,12 @@ no_verify (select_record *, fd_set *, fd_set *, fd_set *)
 }
 
 ssize_t
-pipe_data_available (int fd, fhandler_base *fh, HANDLE h, int flags)
+pipe_data_available (int fd, fhandler_base *fh, HANDLE h, int mode)
 {
   if (fh->get_device () == FH_PIPER)
     {
       DWORD nbytes_in_pipe;
-      if (!(flags & PDA_WRITE)
+      if (mode == PDA_READ
 	  && PeekNamedPipe (h, NULL, 0, NULL, &nbytes_in_pipe, NULL))
 	return nbytes_in_pipe;
       return -1;
@@ -618,17 +618,9 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, int flags)
 	 access on the write end.  */
       select_printf ("fd %d, %s, NtQueryInformationFile failed, status %y",
 		     fd, fh->get_name (), status);
-      switch (flags)
-	{
-	case PDA_WRITE:
-	  return 1;
-	case PDA_SELECT | PDA_WRITE:
-	  return PIPE_BUF;
-	default:
-	  return -1;
-	}
+      return (mode == PDA_WRITE) ? 1 : -1;
     }
-  if (flags & PDA_WRITE)
+  if (mode == PDA_WRITE)
     {
       /* If there is anything available in the pipe buffer then signal
         that.  This means that a pipe could still block since you could
@@ -665,7 +657,7 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, int flags)
 	    return 0; /* Full */
 	  else if (!NT_SUCCESS (status))
 	    /* We cannot know actual write pipe space. */
-	    return (flags & PDA_SELECT) ? PIPE_BUF : 1;
+	    return 1;
 	  /* Restore pipe mode to blocking mode */
 	  ((fhandler_pipe *) fh)->set_pipe_non_blocking (false);
 	  /* Empty */
@@ -732,10 +724,10 @@ peek_pipe (select_record *s, bool from_select)
 	  gotone = s->read_ready = true;
 	  goto out;
 	}
-      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT);
+      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_READ);
       /* On PTY masters, check if input from the echo pipe is available. */
       if (n == 0 && fh->get_echo_handle ())
-	n = pipe_data_available (s->fd, fh, fh->get_echo_handle (), PDA_SELECT);
+	n = pipe_data_available (s->fd, fh, fh->get_echo_handle (), PDA_READ);
 
       if (n < 0)
 	{
@@ -776,7 +768,7 @@ out:
 	    gotone += s->except_ready = true;
 	  return gotone;
 	}
-      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT | PDA_WRITE);
+      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
       gotone += s->write_ready = (n > 0);
       if (n < 0 && s->except_selected)
@@ -989,8 +981,7 @@ peek_fifo (select_record *s, bool from_select)
 out:
   if (s->write_selected)
     {
-      ssize_t n = pipe_data_available (s->fd, fh, fh->get_handle (),
-				       PDA_SELECT | PDA_WRITE);
+      ssize_t n = pipe_data_available (s->fd, fh, fh->get_handle (), PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
       gotone += s->write_ready = (n > 0);
       if (n < 0 && s->except_selected)
@@ -1416,7 +1407,7 @@ out:
   HANDLE h = ptys->get_output_handle ();
   if (s->write_selected)
     {
-      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_SELECT | PDA_WRITE);
+      ssize_t n = pipe_data_available (s->fd, fh, h, PDA_WRITE);
       select_printf ("write: %s, n %d", fh->get_name (), n);
       gotone += s->write_ready = (n > 0);
       if (n < 0 && s->except_selected)
