@@ -311,6 +311,9 @@ thread_netdrive_wnet (void *arg)
   DIR *dir = ndi->dir;
   DWORD wres;
 
+  DWORD connected_only = false;
+  size_t srv_len = 0;
+
   size_t entry_cache_size = DIR_cache.count ();
   WCHAR provider[256], *dummy = NULL;
   wchar_t srv_name[CYG_MAX_PATH];
@@ -396,10 +399,12 @@ thread_netdrive_wnet (void *arg)
 	}
       break;
     case WNNC_NET_DAV:
-      /* FIXME: WebDAV enumeration isn't supported, but we could try
-         to find the connected shares by enumerating all remembered
-	 connections. */
-      goto out;
+      /* WebDAV enumeration isn't supported, by the provider, but we can
+         find the connected shares of the server by enumerating all connected
+	 disk resources. */
+      connected_only = true;
+      srv_len = wcslen (srv_name);
+      break;
     case WNNC_NET_RDR2SAMPLE:
       /* Lots of OSS drivers uses this provider.  No idea yet, what
          to do with them. */
@@ -408,8 +413,11 @@ thread_netdrive_wnet (void *arg)
       break;
     }
 
-  wres = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
-			RESOURCEUSAGE_ALL, nro, &dom);
+  if (connected_only)
+    wres = WNetOpenEnumW (RESOURCE_CONNECTED, RESOURCETYPE_DISK, 0, NULL, &dom);
+  else
+    wres = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+			  RESOURCEUSAGE_ALL, nro, &dom);
   if (wres != NO_ERROR)
     {
       ndi->err = geterrno_from_win_error (wres);
@@ -420,6 +428,15 @@ thread_netdrive_wnet (void *arg)
 				    (size = NT_MAX_PATH, &size))) == NO_ERROR)
     {
       size_t cache_idx;
+
+      /* Skip unrelated entries in connection list. */
+      if (connected_only)
+	{
+	  if (wcsncasecmp (srv_name, nro->lpRemoteName, srv_len)
+	      || wcslen (nro->lpRemoteName) <= srv_len
+	      || nro->lpRemoteName[srv_len] != L'\\')
+	    continue;
+	}
 
       /* Skip server name and trailing backslash */
       wchar_t *name = nro->lpRemoteName + 2;
