@@ -266,6 +266,44 @@ out:
   return 0;
 }
 
+#define NO_PROVIDER_FOUND 1
+
+static DWORD
+wnet_find_server (wchar_t *srv_name, LPNETRESOURCEW nro, bool start)
+{
+  DWORD wres, cnt, size;
+  DWORD provider = NO_PROVIDER_FOUND;
+  HANDLE dom;
+
+  wres = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
+			RESOURCEUSAGE_CONTAINER, start ? NULL : nro, &dom);
+  if (wres != NO_ERROR)
+    return NO_PROVIDER_FOUND;
+  while ((wres = WNetEnumResourceW (dom, (cnt = 1, &cnt), nro,
+				    (size = NT_MAX_PATH, &size))) == NO_ERROR)
+    {
+      NETINFOSTRUCT netinfo = { 0 };
+      netinfo.cbStructure = sizeof netinfo;
+      wres = WNetGetNetworkInformationW (nro->lpProvider, &netinfo);
+      if (wres != NO_ERROR)
+	continue;
+      /* Do not even try to enumerate SMB servers!  It takes 10 seconds just to
+         return with error 1208 ERROR_EXTENDED_ERROR, with extended error info
+	 "The list of servers for this workgroup is not currently available". */
+      if ((nro->dwDisplayType == RESOURCEDISPLAYTYPE_NETWORK
+	   || nro->dwDisplayType == RESOURCEDISPLAYTYPE_DOMAIN)
+	  && ((DWORD) netinfo.wNetType << 16) != WNNC_NET_SMB)
+	provider = wnet_find_server (srv_name, nro, false);
+      else if (nro->dwDisplayType == RESOURCEDISPLAYTYPE_SERVER
+	       && !wcscasecmp (srv_name, nro->lpRemoteName))
+	provider = ((DWORD) netinfo.wNetType << 16);
+      if (provider != NO_PROVIDER_FOUND)
+	break;
+    }
+  WNetCloseEnum (dom);
+  return provider;
+}
+
 static DWORD
 thread_netdrive_wnet (void *arg)
 {
@@ -309,16 +347,16 @@ thread_netdrive_wnet (void *arg)
 				      (size = NT_MAX_PATH, &size), &dummy);
   if (wres != NO_ERROR)
     {
-      /* WNetGetResourceInformationW fails for WebDAV server names.
-	 We don't want a "No such file or directory" in this case, but since
-	 neither WNetGetResourceInformationW, nor WNetGetProviderNameW works
-	 for them, we have to skip the error message heuristically...
-	 FIXME: While WNetGetResourceInformationW fails, enumerating the
-	 entire WNet namespace recursively down to the server level will
-	 actually show the connected WebDAV servers. */
-      if (wres != ERROR_BAD_NET_NAME || !wcschr (srv_name, L'@'))
-	ndi->err = geterrno_from_win_error (wres);
-      goto out;
+      /* WNetGetResourceInformationW fails for instance for WebDAV server
+         names, even if we have connected resources on the server.  We don't
+	 want a "No such file or directory" in this case, so try to find the
+	 server by WNet enumerating from the top. */
+      ndi->provider = wnet_find_server (srv_name, nro, true);
+      if (ndi->provider == NO_PROVIDER_FOUND)
+	{
+	  ndi->err = geterrno_from_win_error (wres);
+	  goto out;
+	}
     }
 
   if (ndi->provider)
@@ -334,6 +372,10 @@ thread_netdrive_wnet (void *arg)
   /* More heuristics... */
   switch (net_type)
     {
+    case 0:
+    case NO_PROVIDER_FOUND:
+      /* Nothing to enumerate. */
+      goto out;
     case WNNC_NET_MS_NFS:
       /* If ndi->provider is 0 and the machine name contains dots, we already
 	 handled NFS.  However, if the machine supports both, NFS and SMB,
