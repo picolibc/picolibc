@@ -1397,7 +1397,7 @@ fhandler_base::fstatvfs (struct statvfs *sfs)
 }
 
 int
-fhandler_base::init (HANDLE f, DWORD a, mode_t bin)
+fhandler_base::init (HANDLE f, DWORD a, mode_t bin, int64_t dummy)
 {
   set_handle (f);
   access = a;

@@ -239,7 +239,7 @@ err:
 }
 
 int
-fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin)
+fhandler_serial::init (HANDLE f, DWORD flags, mode_t bin, int64_t dummy)
 {
   return open (flags, bin & (O_BINARY | O_TEXT));
 }

@@ -1006,7 +1006,7 @@ fhandler_pty_slave::close (int flag)
 }
 
 int
-fhandler_pty_slave::init (HANDLE h, DWORD a, mode_t)
+fhandler_pty_slave::init (HANDLE h, DWORD a, mode_t, int64_t dummy)
 {
   int flags = 0;
 

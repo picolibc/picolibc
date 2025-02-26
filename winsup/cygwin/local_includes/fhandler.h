@@ -433,7 +433,7 @@ public:
 
   void *operator new (size_t, void *p) __attribute__ ((nothrow)) {return p;}
 
-  virtual int init (HANDLE, DWORD, mode_t);
+  virtual int init (HANDLE, DWORD, mode_t, int64_t = 0);
 
   virtual int tcflush (int);
   virtual int tcsendbreak (int);
@@ -1244,7 +1244,7 @@ public:
   int fstatvfs (struct statvfs *buf);
   int fadvise (off_t, off_t, int);
   int fallocate (int, off_t, off_t);
-  int init (HANDLE, DWORD, mode_t, int64_t);
+  int init (HANDLE, DWORD, mode_t, int64_t = 0);
   static int create (fhandler_pipe *[2], unsigned, int);
   static DWORD create (LPSECURITY_ATTRIBUTES, HANDLE *, HANDLE *, DWORD,
 		       const char *, DWORD, int64_t *unique_id = NULL);
@@ -1845,7 +1845,7 @@ class fhandler_serial: public fhandler_base
   fhandler_serial ();
 
   int open (int flags, mode_t mode);
-  int init (HANDLE h, DWORD a, mode_t flags);
+  int init (HANDLE h, DWORD a, mode_t flags, int64_t = 0);
   void raw_read (void *ptr, size_t& ulen);
   ssize_t raw_write (const void *ptr, size_t ulen);
   int tcsendbreak (int);
@@ -1926,7 +1926,7 @@ class fhandler_termios: public fhandler_base
  protected:
   virtual void doecho (const void *, DWORD) {};
   virtual int accept_input () {return 1;};
-  int ioctl (int, void *);
+  int ioctl (unsigned int, void *);
   tty_min *_tc;
   tty *get_ttyp () {return (tty *) tc ();}
   int eat_readahead (int n);
@@ -2273,7 +2273,7 @@ private:
   int tcgetattr (struct termios *t);
 
   int ioctl (unsigned int cmd, void *);
-  int init (HANDLE, DWORD, mode_t);
+  int init (HANDLE, DWORD, mode_t, int64_t = 0);
   bool mouse_aware (MOUSE_EVENT_RECORD& mouse_event);
   bool focus_aware () {return shared_console_info[unit]->con.use_focus;}
   bool get_cons_readahead_valid ()
@@ -2453,7 +2453,7 @@ class fhandler_pty_slave: public fhandler_pty_common
   bool open_setup (int flags);
   ssize_t write (const void *ptr, size_t len);
   void read (void *ptr, size_t& len);
-  int init (HANDLE, DWORD, mode_t);
+  int init (HANDLE, DWORD, mode_t, int64_t = 0);
 
   int tcsetattr (int a, const struct termios *t);
   int tcgetattr (struct termios *t);

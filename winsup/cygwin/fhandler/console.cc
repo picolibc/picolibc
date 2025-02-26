@@ -4257,7 +4257,7 @@ fhandler_console::get_nonascii_key (INPUT_RECORD& input_rec, char *tmp)
 }
 
 int
-fhandler_console::init (HANDLE h, DWORD a, mode_t bin)
+fhandler_console::init (HANDLE h, DWORD a, mode_t bin, int64_t dummy)
 {
   // this->fhandler_termios::init (h, mode, bin);
   /* Ensure both input and output console handles are open */

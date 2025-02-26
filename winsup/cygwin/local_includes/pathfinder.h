@@ -103,14 +103,14 @@ public:
       searchdirlist::buffer_iterator dirbuf (dir);
       memcpy (dirbuf->buffer () + dirbuf->stringlength (),
 	      name->string (), name->stringlength () + 1);
-      bool ret = test (dirbuf->string ());
+      bool ret = testfile (dirbuf->string ());
       /* reset original dir */
       dirbuf->buffer ()[dirbuf->stringlength ()] = '\0';
       return ret;
     }
 
   public:
-    virtual bool test (const char * filename) const = 0;
+    virtual bool testfile (const char * filename) const = 0;
   };
 
 
@@ -124,10 +124,10 @@ public:
     unsigned opt_;
 
     /* simple_criterion_interface */
-    virtual bool test (const char * filename) const
+    virtual bool testfile (const char * filename) const
     {
       pc_.check (filename, opt_);
-      return test (pc_);
+      return testpc (pc_);
     }
 
   public:
@@ -143,7 +143,7 @@ public:
       , opt_ (opt)
     {}
 
-    virtual bool test (path_conv & pc) const = 0;
+    virtual bool testpc (path_conv & pc) const = 0;
   };
 
 
@@ -159,7 +159,7 @@ public:
     {}
 
     /* path_conv_criterion_interface */
-    virtual bool test (path_conv & pc) const
+    virtual bool testpc (path_conv & pc) const
     {
       if (pc.exists () && !pc.isdir ())
 	return true;

@@ -723,7 +723,7 @@ is_console_app (const WCHAR *filename)
 }
 
 int
-fhandler_termios::ioctl (int cmd, void *varg)
+fhandler_termios::ioctl (unsigned int cmd, void *varg)
 {
   if (cmd != TIOCSCTTY)
     return 1;		/* Not handled by this function */
