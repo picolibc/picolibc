@@ -110,6 +110,8 @@ public:
 
 #define DIR_cache	(*reinterpret_cast<dir_cache *> (dir->__handle))
 
+#define RETRY_SMB	INT_MAX
+
 struct netdriveinf
 {
   DIR *dir;
@@ -174,6 +176,7 @@ server_is_running_nfs (const wchar_t *servername)
   FreeAddrInfoW (ai);
   return ret;
 }
+
 
 /* Use only to enumerate the Network top level. */
 static DWORD
@@ -275,41 +278,94 @@ thread_netdrive_wnet (void *arg)
   wchar_t srv_name[CYG_MAX_PATH];
   NETRESOURCEW nri = { 0 };
   LPNETRESOURCEW nro;
-  tmp_pathbuf tp;
+  NETINFOSTRUCT netinfo;
+  DWORD net_type = 0;
   HANDLE dom = NULL;
   DWORD cnt, size;
+  tmp_pathbuf tp;
 
   ReleaseSemaphore (ndi->sem, 1, NULL);
-
-  wres = WNetGetProviderNameW (ndi->provider, provider, (size = 256, &size));
-  if (wres != NO_ERROR)
-    {
-      ndi->err = geterrno_from_win_error (wres);
-      goto out;
-    }
 
   sys_mbstowcs (srv_name, CYG_MAX_PATH, dir->__d_dirname);
   srv_name[0] = L'\\';
   srv_name[1] = L'\\';
-
-  if (ndi->provider == WNNC_NET_MS_NFS
-      && !server_is_running_nfs (srv_name + 2))
-    {
-      ndi->err = ENOENT;
-      goto out;
-    }
-
   nri.lpRemoteName = srv_name;
-  nri.lpProvider = provider;
   nri.dwType = RESOURCETYPE_DISK;
   nro = (LPNETRESOURCEW) tp.c_get ();
+
+  if (ndi->provider)
+    {
+      wres = WNetGetProviderNameW (ndi->provider, provider,
+				   (size = 256, &size));
+      if (wres != NO_ERROR)
+	{
+	  ndi->err = geterrno_from_win_error (wres);
+	  goto out;
+	}
+      nri.lpProvider = provider;
+
+    }
   wres = WNetGetResourceInformationW (&nri, nro,
 				      (size = NT_MAX_PATH, &size), &dummy);
   if (wres != NO_ERROR)
     {
-      ndi->err = geterrno_from_win_error (wres);
+      /* WNetGetResourceInformationW fails for WebDAV server names.
+	 We don't want a "No such file or directory" in this case, but since
+	 neither WNetGetResourceInformationW, nor WNetGetProviderNameW works
+	 for them, we have to skip the error message heuristically...
+	 FIXME: While WNetGetResourceInformationW fails, enumerating the
+	 entire WNet namespace recursively down to the server level will
+	 actually show the connected WebDAV servers. */
+      if (wres != ERROR_BAD_NET_NAME || !wcschr (srv_name, L'@'))
+	ndi->err = geterrno_from_win_error (wres);
       goto out;
     }
+
+  if (ndi->provider)
+    net_type = ndi->provider;
+  else
+    {
+      netinfo.cbStructure = sizeof netinfo;
+      wres = WNetGetNetworkInformationW (nro->lpProvider, &netinfo);
+      if (wres == NO_ERROR)
+	net_type = ((DWORD) netinfo.wNetType << 16);
+    }
+
+  /* More heuristics... */
+  switch (net_type)
+    {
+    case WNNC_NET_MS_NFS:
+      /* If ndi->provider is 0 and the machine name contains dots, we already
+	 handled NFS.  However, if the machine supports both, NFS and SMB,
+	 sometimes WNetGetNetworkInformationW returns the NFS provider,
+	 sometimes the SMB provider.  So if we get the NFS provider again
+	 here, enforce the SMB provider. */
+      if (ndi->provider == 0)
+	{
+	  ndi->err = RETRY_SMB;
+	  goto out;
+	}
+      /* Check on port 2049 if the server is replying.  Otherwise the
+         timeout on WNetOpenEnumW is excessive! */
+      if (!server_is_running_nfs (srv_name + 2))
+	{
+	  ndi->err = ENOENT;
+	  goto out;
+	}
+      break;
+    case WNNC_NET_DAV:
+      /* FIXME: WebDAV enumeration isn't supported, but we could try
+         to find the connected shares by enumerating all remembered
+	 connections. */
+      goto out;
+    case WNNC_NET_RDR2SAMPLE:
+      /* Lots of OSS drivers uses this provider.  No idea yet, what
+         to do with them. */
+      fallthrough;
+    default:
+      break;
+    }
+
   wres = WNetOpenEnumW (RESOURCE_GLOBALNET, RESOURCETYPE_DISK,
 			RESOURCEUSAGE_ALL, nro, &dom);
   if (wres != NO_ERROR)
@@ -330,7 +386,7 @@ thread_netdrive_wnet (void *arg)
 	continue;
       ++name;
 
-      if (ndi->provider == WNNC_NET_MS_NFS)
+      if (net_type == WNNC_NET_MS_NFS)
 	{
 	  wchar_t *nm = name;
 	  /* Convert from "ANSI embedded in widechar" to multibyte and convert
@@ -345,17 +401,17 @@ thread_netdrive_wnet (void *arg)
 	      ndi->err = ENOMEM;
 	      goto out;
 	    }
-	  /* NFS has deep links so convert embedded '\\' to '/' here */
-	  for (wchar_t *bs = name; (bs = wcschr (bs, L'\\')); *bs++ = L'/')
-	    ;
 	}
+      /* Some providers have deep links so convert embedded '\\' to '/' here */
+      for (wchar_t *bs = name; (bs = wcschr (bs, L'\\')); *bs++ = L'/')
+	;
       /* If we already collected shares, drop duplicates. */
       for (cache_idx = 0; cache_idx < entry_cache_size; ++ cache_idx)
 	if (!wcscmp (name, DIR_cache[cache_idx]))	// wcscasecmp?
 	  break;
       if (cache_idx >= entry_cache_size)
 	DIR_cache.add (name);
-      if (ndi->provider == WNNC_NET_MS_NFS)
+      if (net_type == WNNC_NET_MS_NFS)
 	free (name);
     }
 out:
@@ -369,15 +425,13 @@ static DWORD
 create_thread_and_wait (DIR *dir)
 {
   netdriveinf ndi = { dir, 0, 0, NULL };
+  WCHAR provider[256];
   cygthread *thr;
-  const char *thread_name = NULL;
+  DWORD size;
 
   /* For the Network root, fetch WSD info. */
   if (strlen (dir->__d_dirname) == 2)
     {
-      WCHAR provider[256];
-      DWORD size;
-
       ndi.provider = WNNC_NET_SMB;
       ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
       thr = new cygthread (thread_netdrive_wsd, &ndi, "netdrive_wsd");
@@ -395,7 +449,9 @@ create_thread_and_wait (DIR *dir)
 
   /* Try NFS first, if the name contains a dot (i. e., supposedly is a FQDN
      as used in NFS server enumeration) but no at-sign. */
-  if (strchr (dir->__d_dirname, '.') && !strchr (dir->__d_dirname + 2, '@'))
+  if (strchr (dir->__d_dirname, '.') && !strchr (dir->__d_dirname + 2, '@')
+      && WNetGetProviderNameW (WNNC_NET_MS_NFS, provider, (size = 256, &size))
+	 == NO_ERROR)
     {
       ndi.provider = WNNC_NET_MS_NFS;
       ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
@@ -409,41 +465,22 @@ create_thread_and_wait (DIR *dir)
 
     }
 
-  /* Eventually, try TERMSRV/P9/SMB via WNet for share enumeration,
-     depending on "server" name.
-
-     TODO: There's no known way yet to enumerate connected WebDAV resources.
-     Whatever I try, WNetGetResourceInformationW or WNetOpenEnumW return
-     ERROR_BAD_NET_NAME (67).  Therefore, short-circuit WebDAV here for
-     the time being. */
-  if (!strcmp (dir->__d_dirname + 2, TERMSRV_DIR))
-    {
-      ndi.provider = WNNC_NET_TERMSRV;
-      thread_name = "netdrive_termsrv";
-    }
-  else if (!strcmp (dir->__d_dirname + 2, PLAN9_DIR))
-    {
-      ndi.provider = WNNC_NET_9P;
-      thread_name = "netdrive_9p";
-    }
-  else if (strchr (dir->__d_dirname + 2, '@') != NULL)
-    {
-      /* ndi.provider = WNNC_NET_DAV; */
-      /* thread_name = "netdrive_dav"; */
-      ndi.err = 0;
-      goto out;
-    }
-  else
-    {
-      ndi.provider = WNNC_NET_SMB;
-      thread_name = "netdrive_smb";
-    }
-
   ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
-  thr = new cygthread (thread_netdrive_wnet, &ndi, thread_name);
+  ndi.provider = 0;
+  thr = new cygthread (thread_netdrive_wnet, &ndi, "netdrive_wnet");
   if (thr->detach (ndi.sem))
     ndi.err = EINTR;
   CloseHandle (ndi.sem);
+
+  if (ndi.err == RETRY_SMB)
+    {
+      ndi.sem = CreateSemaphore (&sec_none_nih, 0, 2, NULL);
+      ndi.provider = WNNC_NET_SMB;
+      thr = new cygthread (thread_netdrive_wnet, &ndi, "netdrive_smb");
+      if (thr->detach (ndi.sem))
+	ndi.err = EINTR;
+      CloseHandle (ndi.sem);
+    }
 
 out:
   return DIR_cache.count() > 0 ? 0 : ndi.err;
