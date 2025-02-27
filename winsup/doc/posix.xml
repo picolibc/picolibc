@@ -1762,6 +1762,38 @@ ISO®/IEC DIS 9945 Information technology
 
 </sect1>
 
+<sect1 id="std-other"><title>Other system interfaces, some from Windows:</title>
+
+<screen>
+    _get_osfhandle             (Windows)
+    _setmode                   (Windows)
+    cwait                      (Windows)
+    cygwin_attach_handle_to_fd
+    cygwin_conv_path
+    cygwin_conv_path_list
+    cygwin_create_path
+    cygwin_detach_dll
+    cygwin_dll_init
+    cygwin_internal
+    cygwin_logon_user
+    cygwin_posix_path_list_p
+    cygwin_set_impersonation_token
+    cygwin_split_path
+    cygwin_stackdump
+    cygwin_umount
+    cygwin_winpid_to_pid
+    spawnl                     (Windows)
+    spawnle                    (Windows)
+    spawnlp                    (Windows)
+    spawnlpe                   (Windows)
+    spawnv                     (Windows)
+    spawnve                    (Windows)
+    spawnvp                    (Windows)
+    spawnvpe                   (Windows)
+</screen>
+
+</sect1>
+
 <sect1 id="std-notes"><title>Implementation Notes</title>
 
 <para><function>chroot</function> only emulates a chroot function call
