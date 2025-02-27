@@ -86,7 +86,6 @@ viscanf (
        const char *fmt,
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (ptr);
   return _svfiscanf ( _stdin_r (ptr), fmt, ap);
 }
 

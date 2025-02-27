@@ -25,7 +25,6 @@ int
 vprintf (const char *fmt,
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (reent);
   return vfprintf ( _stdout_r (reent), fmt, ap);
 }
 

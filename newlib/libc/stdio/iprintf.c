@@ -27,7 +27,6 @@ iprintf (const char *fmt, ...)
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
   va_start (ap, fmt);
   ret = vfiprintf ( _stdout_r (ptr), fmt, ap);
   va_end (ap);

@@ -88,7 +88,6 @@ struct __sbuf {
  * _ub._base!=NULL) and _up and _ur save the current values of _p and _r.
  */
 
-#define _REENT_SMALL_CHECK_INIT(ptr) /* nothing */
 
 #ifdef __CUSTOM_FILE_IO__
 
@@ -733,7 +732,6 @@ __elidable_inline int _sputc( int _c, FILE *_p) {
 #define	__sfileno(p)	((p)->_file)
 
 #ifndef __cplusplus
-#ifndef _REENT_SMALL
 #define	feof(p)		__sfeof(p)
 #define	ferror(p)	__sferror(p)
 #define	clearerr(p)	__sclearerr(p)
@@ -743,7 +741,6 @@ __elidable_inline int _sputc( int _c, FILE *_p) {
 #define	ferror_unlocked(p)	__sferror(p)
 #define	clearerr_unlocked(p)	__sclearerr(p)
 #endif /* __MISC_VISIBLE */
-#endif /* _REENT_SMALL */
 
 #if 0 /* __POSIX_VISIBLE - FIXME: must initialize stdio first, use fn */
 #define	fileno(p)	__sfileno(p)

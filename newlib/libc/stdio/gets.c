@@ -71,7 +71,6 @@ gets (
   register char *s = buf;
   FILE *fp;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
   fp = _stdin_r (ptr);
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);

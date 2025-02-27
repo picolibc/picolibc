@@ -230,8 +230,6 @@
 /* math library sets errno */
 #cmakedefine _WANT_MATH_ERRNO
 
-#cmakedefine _WANT_REENT_SMALL
-
 #cmakedefine _WANT_REGISTER_FINI
 
 /* Obsoleted. Define time_t to long instead of using a 64-bit type */

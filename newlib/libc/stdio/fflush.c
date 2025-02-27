@@ -255,22 +255,6 @@ fflush (register FILE * fp)
 
   int ret;
 
-#ifdef _REENT_SMALL
-  /* For REENT_SMALL platforms, it is possible we are being
-     called for the first time on a std stream.  This std
-     stream can belong to a reentrant struct that is not
-     _REENT.  If CHECK_INIT gets called below based on _REENT,
-     we will end up changing said file pointers to the equivalent
-     std stream off of _REENT.  This causes unexpected behavior if
-     there is any data to flush on the _REENT std stream.  There
-     are two alternatives to fix this:  1) make a reentrant fflush
-     or 2) simply recognize that this file has nothing to flush
-     and return immediately before performing a CHECK_INIT.  Choice
-     2 is implemented here due to its simplicity.  */
-  if (fp->_bf._base == NULL)
-    return 0;
-#endif /* _REENT_SMALL  */
-
   CHECK_INIT (ptr, fp);
 
   if (!fp->_flags)

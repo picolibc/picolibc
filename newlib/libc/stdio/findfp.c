@@ -31,12 +31,10 @@ __FILE __sf[3];
 
 struct _glue __sglue = {NULL, 3, &__sf[0]};
 
-#ifdef _REENT_THREAD_LOCAL
 NEWLIB_THREAD_LOCAL __FILE *_tls_stdin = &__sf[0];
 NEWLIB_THREAD_LOCAL __FILE *_tls_stdout = &__sf[1];
 NEWLIB_THREAD_LOCAL __FILE *_tls_stderr = &__sf[2];
 NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
-#endif
 
 #ifdef _STDIO_BSD_SEMANTICS
   /* BSD and Glibc systems only flush streams which have been written to

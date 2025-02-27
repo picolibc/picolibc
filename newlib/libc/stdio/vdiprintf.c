@@ -21,7 +21,6 @@ vdiprintf (
   char buf[512];
   size_t n = sizeof buf;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
   p = vasniprintf ( buf, &n, format, ap);
   if (!p)
     return -1;

@@ -202,8 +202,6 @@ option('newlib-io-float', type: 'boolean', value: false,
        description: 'enable printf/scanf family float support')
 option('newlib-nano-formatted-io', type: 'boolean', value: false,
        description: 'Use nano version formatted IO')
-option('newlib-reent-small', type: 'boolean', value: false,
-       description: 'enable small reentrant struct support')
 option('newlib-stdio64', type: 'boolean', value: true,
        description: 'Include stdio64 with newlib stdio')
 option('newlib-unbuf-stream-opt', type: 'boolean', value: false,

@@ -368,8 +368,6 @@ endif()
 # math library sets errno
 set(_WANT_MATH_ERRNO OFF)
 
-set(_WANT_REENT_SMALL OFF)
-
 set(_WANT_REGISTER_FINI OFF)
 
 # Obsoleted. Define time_t to long instead of using a 64-bit type

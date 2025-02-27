@@ -26,7 +26,6 @@ scanf(const char *__restrict fmt, ...)
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT (reent);
   va_start (ap, fmt);
   ret = vfscanf (stdin, fmt, ap);
   va_end (ap);

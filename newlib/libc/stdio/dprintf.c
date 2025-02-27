@@ -58,7 +58,6 @@ dprintf (int fd,
   va_list ap;
   int n;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
   va_start (ap, format);
   n = vdprintf ( fd, format, ap);
   va_end (ap);

@@ -37,6 +37,5 @@
 wint_t
 getwchar_unlocked (void)
 {
-  _REENT_SMALL_CHECK_INIT (_REENT);
   return fgetwc_unlocked (stdin);
 }

@@ -97,6 +97,5 @@ PORTABILITY
 wint_t
 getwchar (void)
 {
-  _REENT_SMALL_CHECK_INIT (_REENT);
   return fgetwc (stdin);
 }

@@ -1397,7 +1397,6 @@ if not tinystdio
   conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)
   conf_data.set('__LARGE64_FILES', newlib_stdio64)
 endif
-conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
 conf_data.set('_MB_CAPABLE', mb_capable)
 conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)

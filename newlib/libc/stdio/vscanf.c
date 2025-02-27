@@ -26,7 +26,6 @@ int
 vscanf (const char *fmt,
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (reent);
   return _svfscanf ( _stdin_r (reent), fmt, ap);
 }
 

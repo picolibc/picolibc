@@ -37,10 +37,6 @@ SUCH DAMAGE.
 #define MALLOC_ALIGNMENT 16
 #endif
 
-#ifdef __AMDGCN__
-#define __DYNAMIC_REENT__
-#endif
-
 /* exceptions first */
 #if defined(__H8500__) || defined(__W65__)
 #define __SMALL_BITFIELDS
@@ -119,7 +115,6 @@ SUCH DAMAGE.
 #endif
 #if defined(__linux__) || defined(__RDOS__)
 /* we want the reentrancy structure to be returned by a function */
-#define __DYNAMIC_REENT__
 #define HAVE_GETDATE
 #ifndef __LARGE64_FILES
 #define __LARGE64_FILES 1
@@ -152,11 +147,7 @@ SUCH DAMAGE.
 #endif
 #endif
 
-/* Configure small REENT structure for Xilinx MicroBlaze platforms */
 #if defined (__MICROBLAZE__) && !defined(__rtems__)
-#ifndef _REENT_SMALL
-#define _REENT_SMALL
-#endif
 /* Xilinx XMK uses Unix98 mutex */
 #ifdef __XMK__
 #define _UNIX98_THREAD_MUTEX_ATTRIBUTES
@@ -176,13 +167,9 @@ SUCH DAMAGE.
 #define MALLOC_ALIGNMENT 8
 #define _POINTER_INT short
 #define __BUFSIZ__ 16
-#define _REENT_SMALL
 #endif
 
 #if defined __MSP430__
-#ifndef _REENT_SMALL
-#define _REENT_SMALL
-#endif
 
 #define __BUFSIZ__ 256
 #define __SMALL_BITFIELDS
@@ -207,16 +194,11 @@ SUCH DAMAGE.
 #define _POINTER_INT long
 #endif
 #define __BUFSIZ__ 16
-#define _REENT_SMALL
 #endif /* __m32c__ */
 
 #ifdef __SPU__
 #define MALLOC_ALIGNMENT 16
 #define __CUSTOM_FILE_IO__
-#endif
-
-#if defined(__or1k__) || defined(__or1knd__)
-#define __DYNAMIC_REENT__
 #endif
 
 /* This block should be kept in sync with GCC's limits.h.  The point
@@ -263,7 +245,6 @@ SUCH DAMAGE.
 
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
-#define __DYNAMIC_REENT__
 #endif
 
 #ifndef __WCHAR_MAX__
@@ -285,14 +266,6 @@ SUCH DAMAGE.
 #define NEWLIB_THREAD_LOCAL
 #endif
 
-/* See if small reent asked for at configuration time and
-   is not chosen by the platform by default.  */
-#ifdef _WANT_REENT_SMALL
-#ifndef _REENT_SMALL
-#define _REENT_SMALL
-#endif
-#endif
-
 #ifdef _WANT_USE_LONG_TIME_T
 #ifndef _USE_LONG_TIME_T
 #define _USE_LONG_TIME_T
@@ -304,14 +277,6 @@ SUCH DAMAGE.
 #define _USE_GDTOA
 #endif
 #endif
-
-#ifdef _WANT_REENT_BACKWARD_BINARY_COMPAT
-#ifndef _REENT_BACKWARD_BINARY_COMPAT
-#define _REENT_BACKWARD_BINARY_COMPAT
-#endif
-#endif
-
-#define _REENT_THREAD_LOCAL
 
 #ifndef _MB_CAPABLE
 /* Make sure all of these are disabled if multi-byte is disabled*/

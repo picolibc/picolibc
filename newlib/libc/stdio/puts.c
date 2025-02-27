@@ -82,7 +82,6 @@ puts (
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
   fp = _stdout_r (ptr);
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
@@ -96,7 +95,6 @@ puts (
   int result = EOF;
   const char *p = s;
   FILE *fp;
-  _REENT_SMALL_CHECK_INIT (ptr);
 
   fp = _stdout_r (ptr);
   CHECK_INIT (ptr, fp);
