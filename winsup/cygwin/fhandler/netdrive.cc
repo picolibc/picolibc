@@ -317,6 +317,7 @@ thread_netdrive_wnet (void *arg)
   size_t entry_cache_size = DIR_cache.count ();
   WCHAR provider[256], *dummy = NULL;
   wchar_t srv_name[CYG_MAX_PATH];
+  wchar_t *nfs_namebuf = NULL;
   NETRESOURCEW nri = { 0 };
   LPNETRESOURCEW nro;
   NETINFOSTRUCT netinfo;
@@ -397,6 +398,10 @@ thread_netdrive_wnet (void *arg)
 	  ndi->err = ENOENT;
 	  goto out;
 	}
+      /* We need a temporary buffer for the multibyte to widechar conversion
+	 only required for NFS shares. */
+      if (!nfs_namebuf)
+	nfs_namebuf = tp.w_get ();
       break;
     case WNNC_NET_DAV:
       /* WebDAV enumeration isn't supported, by the provider, but we can
@@ -447,19 +452,21 @@ thread_netdrive_wnet (void *arg)
 
       if (net_type == WNNC_NET_MS_NFS)
 	{
-	  wchar_t *nm = name;
-	  /* Convert from "ANSI embedded in widechar" to multibyte and convert
-	     back to widechar. */
+	  /* With MS NFS, the bytes of the share name on the remote side
+	     are simply dropped into a WCHAR buffer without conversion to
+	     Unicode.  So convert from "multibyte embedded in widechar" to
+	     real multibyte and then convert back to widechar here.
+
+	     Quirky: This conversion is already performed for files on an
+	     MS NFS filesystem when calling NtQueryDirectoryFile, but it's
+	     not performed on the strings returned by WNetEnumResourceW. */
 	  char mbname[wcslen (name) + 1];
 	  char *mb = mbname;
-	  while ((*mb++ = *nm++))
+	  while ((*mb++ = *name++))
 	    ;
-	  sys_mbstowcs_alloc (&name, HEAP_NOTHEAP, mbname);
-	  if (!name)
-	    {
-	      ndi->err = ENOMEM;
-	      goto out;
-	    }
+
+	  name = nfs_namebuf;
+	  MultiByteToWideChar (CP_ACP, 0, mbname, -1, name, NT_MAX_PATH);
 	}
       /* Some providers have deep links so convert embedded '\\' to '/' here */
       for (wchar_t *bs = name; (bs = wcschr (bs, L'\\')); *bs++ = L'/')
@@ -470,8 +477,6 @@ thread_netdrive_wnet (void *arg)
 	  break;
       if (cache_idx >= entry_cache_size)
 	DIR_cache.add (name);
-      if (net_type == WNNC_NET_MS_NFS)
-	free (name);
     }
 out:
   if (dom)
