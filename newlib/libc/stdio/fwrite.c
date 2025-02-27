@@ -131,7 +131,7 @@ fwrite (
    * generally slow and since this occurs whenever size==0.
    */
 
-  CHECK_INIT(ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
   if (ORIENT (fp, -1) != -1)
@@ -151,7 +151,7 @@ fwrite (
   const char *p = buf;
   if (!(n = count * size))
       return 0;
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
   /* Make sure we can write.  */

@@ -41,7 +41,7 @@ _swbuf (
 
   /* Ensure stdio has been initialized.  */
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   /*
    * In case we cannot write, or longjmp takes us out early,

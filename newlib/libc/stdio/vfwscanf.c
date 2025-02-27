@@ -225,7 +225,7 @@ VFWSCANF (
        const wchar_t *fmt,
        va_list ap)
 {
-  CHECK_INIT(data, fp);
+  CHECK_INIT();
   return _SVFWSCANF (fp, fmt, ap);
 }
 #endif /* !STRING_ONLY */

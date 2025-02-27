@@ -35,6 +35,6 @@
 void
 clearerr_unlocked (FILE * fp)
 {
-  CHECK_INIT(_REENT, fp);
+  CHECK_INIT();
   __sclearerr (fp);
 }

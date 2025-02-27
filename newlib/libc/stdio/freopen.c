@@ -83,7 +83,7 @@ freopen (
   int flags, oflags, oflags2;
   int e = 0;
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   /* We can't use the _newlib_flockfile_XXX macros here due to the
      interlocked locking with the sfp_lock. */

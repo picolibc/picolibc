@@ -72,7 +72,7 @@ gets (
   FILE *fp;
 
   fp = stdin;
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
   while ((c = _sgetc ( fp)) != '\n')
     if (c == EOF)

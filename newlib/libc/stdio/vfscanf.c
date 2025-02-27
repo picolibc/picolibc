@@ -226,7 +226,7 @@ VFSCANF (
        const char *fmt,
        va_list ap)
 {
-  CHECK_INIT(data, fp);
+  CHECK_INIT();
   return _SVFSCANF (fp, fmt, ap);
 }
 #endif /* !STRING_ONLY */

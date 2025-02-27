@@ -100,7 +100,7 @@ fputs (
   uio.uio_iov = &iov;
   uio.uio_iovcnt = 1;
 
-  CHECK_INIT(ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
   if (ORIENT (fp, -1) != -1)
@@ -112,7 +112,7 @@ fputs (
 #else
   const char *p = s;
 
-  CHECK_INIT(ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
   /* Make sure we can write.  */

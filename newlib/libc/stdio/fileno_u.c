@@ -33,7 +33,7 @@ int
 fileno_unlocked (FILE * f)
 {
   int result;
-  CHECK_INIT (_REENT, f);
+  CHECK_INIT();
   if (f->_flags)
     result = __sfileno (f);
   else

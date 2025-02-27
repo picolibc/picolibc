@@ -97,7 +97,7 @@ setvbuf (register FILE * fp,
   size_t iosize;
   int ttyflag;
 
-  CHECK_INIT (reent, fp);
+  CHECK_INIT();
 
   /*
    * Verify arguments.  The `int' limit on `size' is due to this
@@ -168,13 +168,6 @@ nbf:
         }
       fp->_flags |= __SMBF;
     }
-
-  /*
-   * We're committed to buffering from here, so make sure we've
-   * registered to flush buffers on exit.
-   */
-  if (!_REENT_CLEANUP(reent))
-    __sinit();
 
 #ifdef _FSEEK_OPTIMIZATION
   /*

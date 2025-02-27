@@ -83,7 +83,7 @@ puts (
   uio.uio_iovcnt = 2;
 
   fp = stdout;
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
   if (ORIENT (fp, -1) != -1)
     result = EOF;
@@ -97,7 +97,7 @@ puts (
   FILE *fp;
 
   fp = stdout;
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
   /* Make sure we can write.  */
   if (cantwrite (ptr, fp))

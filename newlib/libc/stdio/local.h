@@ -195,7 +195,7 @@ extern void (*_stdio_cleanup)(void);
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
-#define CHECK_INIT(ptr, fp) \
+#define CHECK_INIT() \
   do								\
     {								\
       if (!_stdio_cleanup)			                \

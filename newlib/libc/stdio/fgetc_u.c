@@ -32,6 +32,6 @@ int
 fgetc_unlocked (
        FILE * fp)
 {
-  CHECK_INIT(ptr, fp);
+  CHECK_INIT();
   return _sgetc ( fp);
 }

@@ -37,7 +37,7 @@ _srget (
 {
   /* Ensure that any fake std stream is resolved before
      we call __srefill_r so we may access the true read buffer. */
-  CHECK_INIT(ptr, fp);
+  CHECK_INIT();
 
   /* Have to set and check orientation here, otherwise the macros in
      stdio.h never set it. */

@@ -41,7 +41,7 @@ _srefill (
 {
   /* make sure stdio is set up */
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   fp->_r = 0;			/* largely a convenience for callers */
 

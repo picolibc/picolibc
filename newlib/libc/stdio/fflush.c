@@ -255,7 +255,7 @@ fflush (register FILE * fp)
 
   int ret;
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   if (!fp->_flags)
     return 0;

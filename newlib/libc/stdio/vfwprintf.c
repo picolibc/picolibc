@@ -560,7 +560,7 @@ VFWPRINTF (
 
 #ifndef STRING_ONLY
 	/* Initialize std streams if not dealing with sprintf family.  */
-	CHECK_INIT (data, fp);
+	CHECK_INIT();
 	_newlib_flockfile_start (fp);
 
 	if (ORIENT(fp, 1) != 1) {

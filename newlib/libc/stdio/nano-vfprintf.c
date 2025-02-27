@@ -464,7 +464,7 @@ VFPRINTF (
 
 #ifndef STRING_ONLY
   /* Initialize std streams if not dealing with sprintf family.  */
-  CHECK_INIT (data, fp);
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
 
   /* Sorry, fprintf(read_only_file, "") returns EOF, not 0.  */

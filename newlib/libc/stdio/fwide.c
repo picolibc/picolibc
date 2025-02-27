@@ -79,7 +79,7 @@ fwide (
 {
   int ret;
 
-  CHECK_INIT(ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
   if (mode != 0) {

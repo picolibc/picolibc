@@ -155,7 +155,7 @@ fread (
   if ((resid = count * size) == 0)
     return 0;
 
-  CHECK_INIT(ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
   if (ORIENT (fp, -1) != -1)

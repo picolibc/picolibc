@@ -82,7 +82,7 @@ perror (
   int dummy;
   FILE *fp = stderr;
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start(fp);
   fflush ( fp);

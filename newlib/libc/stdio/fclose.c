@@ -63,7 +63,7 @@ fclose (
   if (fp == NULL)
     return (0);			/* on NULL */
 
-  CHECK_INIT (rptr, fp);
+  CHECK_INIT();
 
   /* We can't use the _newlib_flockfile_XXX macros here due to the
      interlocked locking with the sfp_lock. */

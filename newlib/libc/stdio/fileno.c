@@ -66,7 +66,7 @@ int
 fileno (FILE * f)
 {
   int result;
-  CHECK_INIT (_REENT, f);
+  CHECK_INIT();
   _newlib_flockfile_start (f);
   if (f->_flags)
     result = __sfileno (f);
