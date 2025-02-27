@@ -640,7 +640,7 @@ class fhandler_socket: public fhandler_base
   void set_addr_family (int af) {addr_family = af;}
   int get_addr_family () {return addr_family;}
   virtual void set_socket_type (int st) { type = st;}
-  virtual int get_socket_type () {return type;}
+  virtual int get_socket_type () const {return type;}
 
   /* select.cc */
   virtual select_record *select_read (select_stuff *) = 0;
@@ -1477,10 +1477,10 @@ public:
       cfree (pipe_name_buf);
   }
   /* Called if we appear to be at EOF after polling fc_handlers. */
-  bool hit_eof () const
+  bool hit_eof ()
   { return !nwriters () && !IsEventSignalled (writer_opening); }
   /* Special EOF test needed by select.cc:peek_fifo(). */
-  bool select_hit_eof () const { return hit_eof () && writer_opened (); }
+  bool select_hit_eof () { return hit_eof () && writer_opened (); }
   int get_nhandlers () const { return nhandlers; }
   fifo_client_handler &get_fc_handler (int i) { return fc_handler[i]; }
   PUNICODE_STRING get_pipe_name ();
