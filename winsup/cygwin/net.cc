@@ -2006,8 +2006,9 @@ cygwin_if_nametoindex (const char *name)
     for (pap = pa0; pap; pap = pap->Next)
       if (strcmp (name, pap->AdapterName) == 0)
 	{
+	  unsigned idx = pap->IfIndex;
 	  free (pa0);
-	  return pap->IfIndex;
+	  return idx;
 	}
   if (pa0)
     free (pa0);
