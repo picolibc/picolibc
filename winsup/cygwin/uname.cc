@@ -32,7 +32,7 @@ uname_x (struct utsname *name)
 {
   __try
     {
-      char buf[NI_MAXHOST + 1] ATTRIBUTE_NONSTRING;
+      char buf[NI_MAXHOST + 1];
       int n;
 
       memset (name, 0, sizeof (*name));
@@ -55,7 +55,8 @@ uname_x (struct utsname *name)
       /* nodename */
       memset (buf, 0, sizeof buf);
       cygwin_gethostname (buf, sizeof buf - 1);
-      strncat (name->nodename, buf, sizeof (name->nodename) - 1);
+      buf[sizeof (name->nodename) - 1] = '\0';
+      strcpy (name->nodename, buf);
       /* machine */
       switch (wincap.cpu_arch ())
 	{
@@ -92,7 +93,8 @@ uname_x (struct utsname *name)
       /* domainame */
       memset (buf, 0, sizeof buf);
       getdomainname (buf, sizeof buf - 1);
-      strncat (name->domainname, buf, sizeof (name->domainname) - 1);
+      buf[sizeof (name->domainname) - 1] = '\0';
+      strcpy (name->domainname, buf);
     }
   __except (EFAULT) { return -1; }
   __endtry
