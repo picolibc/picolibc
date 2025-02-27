@@ -88,7 +88,6 @@ QUICKREF
 #include <string.h>
 #include <stdlib.h>
 
-#ifndef _REENT_ONLY
 
 static NEWLIB_THREAD_LOCAL char *_strtok_last;
 
@@ -100,4 +99,3 @@ strtok (register char *__restrict s,
 {
 	return __strtok_r (s, delim, &_strtok_last, 1);
 }
-#endif

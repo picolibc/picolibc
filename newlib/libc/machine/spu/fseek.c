@@ -45,7 +45,6 @@ typedef struct
   int whence;
 } c99_fseek_t;
 
-#ifndef _REENT_ONLY
 
 int
 fseek (register FILE *fp,
@@ -62,4 +61,3 @@ fseek (register FILE *fp,
 
   return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSEEK, &args);
 }
-#endif /* ! _REENT_ONLY */

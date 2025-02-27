@@ -125,7 +125,6 @@ No supporting OS subroutines are required.
 /*
  * Convert a wide string to a long long integer.
  */
-#ifndef _REENT_ONLY
 
 long long
 wcstoll_l (const wchar_t *nptr, wchar_t **endptr,
@@ -216,4 +215,3 @@ wcstoll (const wchar_t *__restrict s,
 	return wcstoll_l (s, ptr, base, __get_current_locale ());
 }
 
-#endif

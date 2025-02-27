@@ -36,7 +36,6 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-#ifndef _REENT_ONLY
 
 int
 feof (FILE * fp)
@@ -49,4 +48,3 @@ feof (FILE * fp)
 
   return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FEOF, &result);
 }
-#endif /* ! _REENT_ONLY */

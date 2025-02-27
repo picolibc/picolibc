@@ -45,7 +45,6 @@ typedef struct
   int fp;
 } c99_freopen_t;
 
-#ifndef _REENT_ONLY
 
 FILE *
 freopen (const char *__restrict file,
@@ -72,4 +71,3 @@ freopen (const char *__restrict file,
     return NULL;
   }
 }
-#endif /* ! _REENT_ONLY */

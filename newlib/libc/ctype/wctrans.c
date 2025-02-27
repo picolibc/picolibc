@@ -72,7 +72,6 @@ No supporting OS subroutines are required.
 #include <errno.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
 wctrans_t
 wctrans (const char *c)
 {
@@ -86,4 +85,3 @@ wctrans (const char *c)
       return 0;
     }
 }
-#endif /* !_REENT_ONLY */

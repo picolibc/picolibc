@@ -57,7 +57,6 @@ on two different systems.
 <<rand>> requires no supporting OS subroutines.
 */
 
-#ifndef _REENT_ONLY
 
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
@@ -68,4 +67,3 @@ rand (void)
   return (int) random();
 }
 
-#endif /* _REENT_ONLY */

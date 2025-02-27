@@ -51,7 +51,6 @@ static char sccsid[] = "from @(#)strtol.c	8.1 (Berkeley) 6/4/93";
  * alphabets and digits are each contiguous.
  */
 
-#ifndef _REENT_ONLY
 
 intmax_t
 strtoimax_l(const char * __restrict nptr, char ** __restrict endptr, int base,
@@ -150,4 +149,3 @@ strtoimax(const char* __restrict nptr, char** __restrict endptr, int base)
 	return strtoimax_l(nptr, endptr, base, __get_current_locale());
 }
 
-#endif

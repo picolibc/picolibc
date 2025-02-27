@@ -141,7 +141,6 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <math.h>
 #include "local.h"
 
-#ifndef _REENT_ONLY
 
 double
 wcstod_l (const wchar_t *nptr, wchar_t **endptr,
@@ -300,4 +299,3 @@ wcstof (const wchar_t *__restrict nptr,
   return wcstof_l (nptr, endptr, __get_current_locale ());
 }
 
-#endif

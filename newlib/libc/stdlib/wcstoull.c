@@ -137,7 +137,6 @@ PORTABILITY
 /*
  * Convert a wide string to an unsigned long long integer.
  */
-#ifndef _REENT_ONLY
 
 unsigned long long
 wcstoull_l (const wchar_t *nptr, wchar_t **endptr,
@@ -211,4 +210,3 @@ wcstoull (const wchar_t *__restrict s,
 	return wcstoull_l (s, ptr, base, __get_current_locale ());
 }
 
-#endif

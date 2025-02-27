@@ -51,7 +51,6 @@ static char sccsid[] = "from @(#)strtoul.c	8.1 (Berkeley) 6/4/93";
  * Convert a wide character string to a uintmax_t integer.
  */
 
-#ifndef _REENT_ONLY
 uintmax_t
 wcstoumax_l(const wchar_t * __restrict nptr,
 	     wchar_t ** __restrict endptr, int base, locale_t loc)
@@ -133,4 +132,3 @@ wcstoumax(const wchar_t* __restrict nptr, wchar_t** __restrict endptr, int base)
 	return wcstoumax_l(nptr, endptr, base, __get_current_locale());
 }
 
-#endif

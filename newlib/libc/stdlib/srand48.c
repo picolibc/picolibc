@@ -26,10 +26,8 @@ _srand48_r (struct _rand48 *r,
   r->_add = _RAND48_ADD;
 }
 
-#ifndef _REENT_ONLY
 void
 srand48 (long seed)
 {
   _srand48_r (&_rand48, seed);
 }
-#endif /* !_REENT_ONLY */

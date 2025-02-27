@@ -208,7 +208,6 @@ _strtol_l (const char *__restrict nptr,
 	return (acc);
 }
 
-#ifndef _REENT_ONLY
 
 long
 strtol_l (const char *__restrict s, char **__restrict ptr, int base,
@@ -225,4 +224,3 @@ strtol (const char *__restrict s,
 	return _strtol_l (s, ptr, base, __get_current_locale ());
 }
 
-#endif

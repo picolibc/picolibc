@@ -46,7 +46,6 @@ typedef struct
   va_list ap;
 } c99_vprintf_t;
 
-#ifndef _REENT_ONLY
 
 int
 vprintf (const char *fmt,
@@ -60,4 +59,3 @@ vprintf (const char *fmt,
   return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
 }
 
-#endif /* ! _REENT_ONLY */

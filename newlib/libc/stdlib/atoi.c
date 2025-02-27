@@ -48,10 +48,8 @@ No supporting OS subroutines are required.
 
 #include <stdlib.h>
 
-#ifndef _REENT_ONLY
 int
 atoi (const char *s)
 {
   return (int) strtol (s, NULL, 10);
 }
-#endif /* !_REENT_ONLY */

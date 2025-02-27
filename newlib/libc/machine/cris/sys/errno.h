@@ -42,10 +42,8 @@ extern "C" {
 
 #include <sys/reent.h>
 
-#ifndef _REENT_ONLY
 #define errno (*__errno())
 extern int *__errno (void);
-#endif
 
 /* Please don't use these variables directly.
    Use strerror instead. */

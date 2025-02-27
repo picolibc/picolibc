@@ -2822,12 +2822,10 @@ void* cALLOc(size_t n, size_t elem_size)
 */
 
 #if !defined(INTERNAL_LINUX_C_LIB) || !defined(__ELF__)
-#if !defined(_LIBC) || !defined(_REENT_ONLY)
 void cfree(void *mem)
 {
   fREe(mem);
 }
-#endif
 #endif
 
 #endif /* DEFINE_CFREE */

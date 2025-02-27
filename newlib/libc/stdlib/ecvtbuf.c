@@ -156,7 +156,6 @@ print_e (
   *buf++ = 0;
 }
 
-#ifndef _REENT_ONLY
 
 static NEWLIB_THREAD_LOCAL int _cvtlen;
 static NEWLIB_THREAD_LOCAL char *_cvtbuf;
@@ -289,7 +288,6 @@ ecvtbuf (double invalue,
   return save;
 }
 
-#endif
 
 char *
 _gcvt (

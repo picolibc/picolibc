@@ -182,7 +182,6 @@ _strtoull_l (const char *__restrict nptr,
 	return (acc);
 }
 
-#ifndef _REENT_ONLY
 
 unsigned long long
 strtoull_l (const char *__restrict s, char **__restrict ptr, int base,
@@ -199,4 +198,3 @@ strtoull (const char *__restrict s,
 	return _strtoull_l (s, ptr, base, __get_current_locale ());
 }
 
-#endif

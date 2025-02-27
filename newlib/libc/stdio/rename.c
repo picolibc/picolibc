@@ -50,7 +50,6 @@ Supporting OS subroutines required: <<link>>, <<unlink>>, or <<rename>>.
 #include <stdio.h>
 #include <sys/unistd.h>
 
-#ifndef _REENT_ONLY
 
 int
 rename (const char *old,
@@ -59,4 +58,3 @@ rename (const char *old,
   return rename ( old, new);
 }
 
-#endif

@@ -51,7 +51,6 @@ static char sccsid[] = "from @(#)strtoul.c	8.1 (Berkeley) 6/4/93";
  * alphabets and digits are each contiguous.
  */
 
-#ifndef _REENT_ONLY
 
 uintmax_t
 strtoumax_l(const char * __restrict nptr,
@@ -130,4 +129,3 @@ strtoumax(const char* __restrict nptr, char** __restrict endptr, int base)
 	return strtoumax_l(nptr, endptr, base, __get_current_locale());
 }
 
-#endif

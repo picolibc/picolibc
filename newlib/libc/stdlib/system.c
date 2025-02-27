@@ -59,7 +59,6 @@ Supporting OS subroutines required: <<_exit>>, <<_execve>>, <<_fork_r>>,
 static int do_system (const char *s);
 #endif
 
-#ifndef _REENT_ONLY
 
 int
 system (const char *s)
@@ -92,7 +91,6 @@ system (const char *s)
 #endif
 }
 
-#endif
 
 #if defined (unix) && !defined (__CYGWIN__) && !defined(__rtems__)
 extern char **environ;

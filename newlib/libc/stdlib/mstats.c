@@ -89,7 +89,6 @@ not portable.
    previous version of the malloc routines.  It now just calls
    malloc_stats.  */
 
-#ifndef _REENT_ONLY
 
 void
 mstats (char *s)
@@ -98,7 +97,6 @@ mstats (char *s)
   malloc_stats ();
 }
 
-#endif
 
 #endif /* !_ELIX_LEVEL || _ELIX_LEVEL >= 2 */
 

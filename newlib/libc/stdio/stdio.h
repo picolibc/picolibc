@@ -393,7 +393,6 @@ void	clearerr (FILE *);
 int	feof (FILE *);
 int	ferror (FILE *);
 void    perror (const char *);
-#ifndef _REENT_ONLY
 FILE *	fopen (const char *__restrict _name, const char *__restrict _type);
 int	sprintf (char *__restrict, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
@@ -401,7 +400,6 @@ int	remove (const char *);
 int	rename (const char *, const char *);
 #ifdef _LIBC
 int	_rename (const char *, const char *);
-#endif
 #endif
 #if __LARGEFILE_VISIBLE || __POSIX_VISIBLE >= 200112
 #ifdef _LIBC
@@ -415,7 +413,6 @@ off_t	ftello (FILE *);
 #if __GNU_VISIBLE
 int	fcloseall (void);
 #endif
-#ifndef _REENT_ONLY
 #if __ISO_C_VISIBLE >= 1999
 int	snprintf (char *__restrict, size_t, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__printf__, 3, 4)));
@@ -485,16 +482,13 @@ int	vsiscanf (const char *, const char *, va_list)
 int	vsniprintf (char *, size_t, const char *, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 3, 0)));
 #endif /* __MISC_VISIBLE */
-#endif /* !_REENT_ONLY */
 
 /*
  * Routines in POSIX 1003.1:2001.
  */
 
 #if __POSIX_VISIBLE
-#ifndef _REENT_ONLY
 FILE *	fdopen (int, const char *);
-#endif
 int	fileno (FILE *);
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 199209
@@ -526,7 +520,6 @@ int	putchar_unlocked (int);
  */
 
 #if __POSIX_VISIBLE >= 200809
-# ifndef _REENT_ONLY
 #  ifndef dprintf
 int	dprintf (int, const char *__restrict, ...)
                _ATTRIBUTE ((__format__ (__printf__, 2, 3)));
@@ -537,7 +530,6 @@ FILE *	fmemopen (void *__restrict, size_t, const char *__restrict);
 FILE *	open_memstream (char **, size_t *);
 int	vdprintf (int, const char *__restrict, va_list)
                _ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-# endif
 #endif
 #if __ATFILE_VISIBLE
 int	renameat (int, const char *, int, const char *);
