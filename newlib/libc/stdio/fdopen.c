@@ -72,7 +72,7 @@ fdopen (
   fdmode = fdflags & O_ACCMODE;
   if (fdmode != O_RDWR && (fdmode != (oflags & O_ACCMODE)))
     {
-      _REENT_ERRNO(ptr) = EBADF;
+      errno = EBADF;
       return 0;
     }
 #endif

@@ -193,7 +193,7 @@ __sfp (void)
 	break;
     }
   _newlib_sfp_lock_exit ();
-  _REENT_ERRNO(d) = ENOMEM;
+  errno = ENOMEM;
   return NULL;
 
 found:

@@ -93,7 +93,7 @@ ftello64 (
 
   if (fp->_seek64 == NULL)
     {
-      _REENT_ERRNO(ptr) = ESPIPE;
+      errno = ESPIPE;
       _newlib_flockfile_exit(fp);
       return (_off64_t) -1;
     }

@@ -34,7 +34,7 @@ mbrtowc (wchar_t *__restrict pwc,
 #ifdef _MB_CAPABLE
       ps->__count = 0;
 #endif
-      _REENT_ERRNO(reent) = EILSEQ;
+      errno = EILSEQ;
       return (size_t)(-1);
     }
   else

@@ -40,7 +40,7 @@ vsnprintf (
 
   if (size > INT_MAX)
     {
-      _REENT_ERRNO(ptr) = EOVERFLOW;
+      errno = EOVERFLOW;
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -50,7 +50,7 @@ vsnprintf (
   f._file = -1;  /* No file. */
   ret = svfprintf ( &f, fmt, ap);
   if (ret < EOF)
-    _REENT_ERRNO(ptr) = EOVERFLOW;
+    errno = EOVERFLOW;
   if (size > 0)
     *f._p = 0;
   return ret;

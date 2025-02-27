@@ -95,7 +95,7 @@ ftello (
 
   if (fp->_seek == NULL)
     {
-      _REENT_ERRNO(ptr) = ESPIPE;
+      errno = ESPIPE;
       _newlib_flockfile_exit (fp);
       return (_off_t) -1;
     }

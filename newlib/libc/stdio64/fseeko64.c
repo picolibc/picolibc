@@ -105,7 +105,7 @@ fseeko64 (
     {
       if ((_off_t) offset != offset)
 	{
-	  _REENT_ERRNO(ptr) = EOVERFLOW;
+	  errno = EOVERFLOW;
 	  return EOF;
 	}
       return (_off64_t) fseeko (fp, offset, whence);
@@ -132,7 +132,7 @@ fseeko64 (
 
   if ((seekfn = fp->_seek64) == NULL)
     {
-      _REENT_ERRNO(ptr) = ESPIPE;	/* ??? */
+      errno = ESPIPE;	/* ??? */
       _newlib_flockfile_exit(fp);
       return EOF;
     }
@@ -182,7 +182,7 @@ fseeko64 (
       break;
 
     default:
-      _REENT_ERRNO(ptr) = EINVAL;
+      errno = EINVAL;
       _newlib_flockfile_exit(fp);
       return (EOF);
     }

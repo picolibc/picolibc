@@ -132,10 +132,10 @@ strtoimax_l(const char * __restrict nptr, char ** __restrict endptr, int base,
 	}
 	if (any < 0) {
 		acc = neg ? INTMAX_MIN : INTMAX_MAX;
-		_REENT_ERRNO(rptr) = ERANGE;
+		errno = ERANGE;
 	} else if (!any) {
 noconv:
-		_REENT_ERRNO(rptr) = EINVAL;
+		errno = EINVAL;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != NULL)

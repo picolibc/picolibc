@@ -68,7 +68,7 @@ mbstowcs (wchar_t *__restrict pwcs,
       if (bytes < 0)
 	{
 	  state.__count = 0;
-          _REENT_ERRNO(r) = EILSEQ;
+          errno = EILSEQ;
 	  return -1;
 	}
       else if (bytes == 0)

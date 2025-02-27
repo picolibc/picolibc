@@ -92,7 +92,7 @@ perror (
       WRITE_STR (": ");
     }
 
-  if ((error = _strerror_r (_REENT_ERRNO(ptr), 1, &dummy)) != NULL)
+  if ((error = _strerror_r (errno, 1, &dummy)) != NULL)
     WRITE_STR (error);
 
 #ifdef __SCLE

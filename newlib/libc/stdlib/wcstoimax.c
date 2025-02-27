@@ -117,10 +117,10 @@ wcstoimax_l(const wchar_t * __restrict nptr,
 	}
 	if (any < 0) {
 		acc = neg ? INTMAX_MIN : INTMAX_MAX;
-		_REENT_ERRNO(rptr) = ERANGE;
+		errno = ERANGE;
 	} else if (!any) {
 noconv:
-		_REENT_ERRNO(rptr) = EINVAL;
+		errno = EINVAL;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != NULL)

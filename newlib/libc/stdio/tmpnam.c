@@ -122,7 +122,7 @@ worker (
       t = open (result, O_RDONLY, 0);
       if (t == -1)
 	{
-	  if (_REENT_ERRNO(ptr) == ENOSYS)
+	  if (errno == ENOSYS)
 	    {
 	      result[0] = '\0';
 	      return 0;

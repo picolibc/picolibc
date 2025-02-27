@@ -117,7 +117,7 @@ mbsnrtowcs (
       else
 	{
 	  ps->__count = 0;
-	  _REENT_ERRNO(r) = EILSEQ;
+	  errno = EILSEQ;
 	  return (size_t)-1;
 	}
     }

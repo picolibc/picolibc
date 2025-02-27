@@ -589,7 +589,7 @@ VFWPRINTF (
 		fp->_bf._base = fp->_p = malloc (64);
 		if (!fp->_p)
 		{
-			_REENT_ERRNO(data) = ENOMEM;
+			errno = ENOMEM;
 			return EOF;
 		}
 		fp->_bf._size = 64;
@@ -1099,7 +1099,7 @@ reswitch:	switch (ch) {
 		case L'm':  /* GNU extension */
 			{
 				int dummy;
-				cp = (wchar_t *) strerror ( _REENT_ERRNO(data), 1, &dummy);
+				cp = (wchar_t *) strerror ( errno, 1, &dummy);
 			}
 			flags &= ~LONGINT;
 			goto string;

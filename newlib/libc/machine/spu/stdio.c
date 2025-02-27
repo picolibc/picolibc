@@ -49,7 +49,7 @@ __sfp (struct _reent *d)
       return &__fp[i];
     }
   }
-  _REENT_ERRNO(d) = EMFILE;
+  errno = EMFILE;
   return NULL;
 }
 

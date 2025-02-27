@@ -57,7 +57,7 @@ __sflags (
       o = O_CREAT | O_APPEND;
       break;
     default:			/* illegal mode */
-      _REENT_ERRNO(ptr) = EINVAL;
+      errno = EINVAL;
       return (0);
     }
   while (*++mode)

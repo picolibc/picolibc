@@ -137,8 +137,8 @@ _sflush (
 	  /* Save last errno and set errno to 0, so we can check if a device
 	     returns with a valid position -1.  We restore the last errno if
 	     no other error condition has been encountered. */
-	  tmp_errno = _REENT_ERRNO(ptr);
-	  _REENT_ERRNO(ptr) = 0;
+	  tmp_errno = errno;
+	  errno = 0;
 	  /* Get the physical position we are at in the file.  */
 	  if (fp->_flags & __SOFF)
 	    curoff = fp->_offset;
@@ -152,13 +152,13 @@ _sflush (
 	      else
 #endif
 		curoff = fp->_seek (fp->_cookie, 0, SEEK_CUR);
-	      if (curoff == -1L && _REENT_ERRNO(ptr) != 0)
+	      if (curoff == -1L && errno != 0)
 		{
 		  int result = EOF;
-		  if (_REENT_ERRNO(ptr) == ESPIPE || _REENT_ERRNO(ptr) == EINVAL)
+		  if (errno == ESPIPE || errno == EINVAL)
 		    {
 		      result = 0;
-		      _REENT_ERRNO(ptr) = tmp_errno;
+		      errno = tmp_errno;
 		    }
 		  else
 		    fp->_flags |= __SERR;
@@ -180,8 +180,8 @@ _sflush (
 	  else
 #endif
 	    curoff = fp->_seek (fp->_cookie, curoff, SEEK_SET);
-	  if (curoff != -1 || _REENT_ERRNO(ptr) == 0
-	      || _REENT_ERRNO(ptr) == ESPIPE || _REENT_ERRNO(ptr) == EINVAL)
+	  if (curoff != -1 || errno == 0
+	      || errno == ESPIPE || errno == EINVAL)
 	    {
 	      /* Seek successful or ignorable error condition.
 		 We can clear read buffer now.  */
@@ -190,9 +190,9 @@ _sflush (
 #endif
 	      fp->_r = 0;
 	      fp->_p = fp->_bf._base;
-	      if ((fp->_flags & __SOFF) && (curoff != -1 || _REENT_ERRNO(ptr) == 0))
+	      if ((fp->_flags & __SOFF) && (curoff != -1 || errno == 0))
 		fp->_offset = curoff;
-	      _REENT_ERRNO(ptr) = tmp_errno;
+	      errno = tmp_errno;
 	      if (HASUB (fp))
 		FREEUB (ptr, fp);
 	    }

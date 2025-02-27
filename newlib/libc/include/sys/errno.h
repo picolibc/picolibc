@@ -58,8 +58,6 @@ extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
 #define errno errno
 #endif
 
-#define _REENT_ERRNO(r) (errno)
-
 #define	EPERM 1			/* Not owner */
 #define	ENOENT 2		/* No such file or directory */
 #define	ESRCH 3			/* No such process */

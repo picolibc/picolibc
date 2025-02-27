@@ -129,7 +129,7 @@ fseeko (
 
   if ((seekfn = fp->_seek) == NULL)
     {
-      _REENT_ERRNO(ptr) = ESPIPE;	/* ??? */
+      errno = ESPIPE;	/* ??? */
       _newlib_flockfile_exit (fp);
       return EOF;
     }
@@ -179,7 +179,7 @@ fseeko (
       break;
 
     default:
-      _REENT_ERRNO(ptr) = EINVAL;
+      errno = EINVAL;
       _newlib_flockfile_exit (fp);
       return (EOF);
     }

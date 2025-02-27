@@ -177,7 +177,7 @@ strtoul_l (const char *__restrict nptr, char **__restrict endptr, int base,
 	}
 	if (any < 0) {
 		acc = ULONG_MAX;
-		_REENT_ERRNO(rptr) = ERANGE;
+		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)

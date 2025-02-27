@@ -136,7 +136,7 @@ freopen (
   if (file != NULL)
     {
       f = open ((char *) file, oflags, 0666);
-      e = _REENT_ERRNO(ptr);
+      e = errno;
     }
   else
     {
@@ -204,7 +204,7 @@ freopen (
     {				/* did not get it after all */
       __sfp_lock_acquire ();
       fp->_flags = 0;		/* set it free */
-      _REENT_ERRNO(ptr) = e;	/* restore in case _close clobbered */
+      errno = e;	/* restore in case _close clobbered */
       if (!(oflags2 & __SNLK))
 	_funlockfile (fp);
 #ifndef __SINGLE_THREAD__

@@ -54,7 +54,7 @@ _srefill (
     {
       if ((fp->_flags & __SRW) == 0)
 	{
-	  _REENT_ERRNO(ptr) = EBADF;
+	  errno = EBADF;
 	  fp->_flags |= __SERR;
 	  return EOF;
 	}

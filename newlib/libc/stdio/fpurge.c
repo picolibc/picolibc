@@ -72,7 +72,7 @@ fpurge (
   t = fp->_flags;
   if (!t)
     {
-      _REENT_ERRNO(ptr) = EBADF;
+      errno = EBADF;
       _newlib_flockfile_exit (fp);
       return EOF;
     }

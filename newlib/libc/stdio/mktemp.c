@@ -159,7 +159,7 @@ _gettemp (
     continue;
   if (trv - path < (ptrdiff_t) suffixlen)
     {
-      _REENT_ERRNO(ptr) = EINVAL;
+      errno = EINVAL;
       return 0;
     }
   trv -= suffixlen;
@@ -171,7 +171,7 @@ _gettemp (
     }
   if (end - trv < 6)
     {
-      _REENT_ERRNO(ptr) = EINVAL;
+      errno = EINVAL;
       return 0;
     }
 
@@ -195,7 +195,7 @@ _gettemp (
 	    return (0);
 	  if (!(sbuf.st_mode & S_IFDIR))
 	    {
-	      _REENT_ERRNO(ptr) = ENOTDIR;
+	      errno = ENOTDIR;
 	      return (0);
 	    }
 	  *trv = '/';
@@ -211,10 +211,10 @@ _gettemp (
 #ifdef HAVE_MKDIR
 	  if (mkdir ( path, 0700) == 0)
 	    return 1;
-	  if (_REENT_ERRNO(ptr) != EEXIST)
+	  if (errno != EEXIST)
 	    return 0;
 #else /* !HAVE_MKDIR */
-	  _REENT_ERRNO(ptr) = ENOSYS;
+	  errno = ENOSYS;
 	  return 0;
 #endif /* !HAVE_MKDIR */
 	}
@@ -225,7 +225,7 @@ _gettemp (
 	  if ((*doopen = open (path, O_CREAT | O_EXCL | O_RDWR | flags,
 				  0600)) >= 0)
 	    return 1;
-	  if (_REENT_ERRNO(ptr) != EEXIST)
+	  if (errno != EEXIST)
 	    return 0;
 	}
 #ifdef __USE_INTERNAL_STAT64
@@ -233,7 +233,7 @@ _gettemp (
 #else
       else if (stat (path, &sbuf))
 #endif
-	return (_REENT_ERRNO(ptr) == ENOENT ? 1 : 0);
+	return (errno == ENOENT ? 1 : 0);
 
       /* tricky little algorithm for backward compatibility */
       for (trv = start;;)

@@ -81,7 +81,7 @@ wctrans (const char *c)
     return WCT_TOUPPER;
   else
     {
-      _REENT_ERRNO(r) = EINVAL;
+      errno = EINVAL;
       return 0;
     }
 }

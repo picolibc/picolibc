@@ -661,7 +661,7 @@ _SVFWSCANF (
 	      width = 0;
 	      goto again;
 	    }
-	  _REENT_ERRNO(rptr) = EINVAL;
+	  errno = EINVAL;
 	  goto input_failure;
 #endif /* !_NO_POS_ARGS */
 

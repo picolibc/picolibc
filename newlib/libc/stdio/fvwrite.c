@@ -170,7 +170,7 @@ _sfvwrite (
 		      str = (unsigned char *)malloc (newsize);
 		      if (!str)
 			{
-			  _REENT_ERRNO(ptr) = ENOMEM;
+			  errno = ENOMEM;
 			  goto err;
 			}
 		      memcpy (str, fp->_bf._base, curpos);
@@ -187,7 +187,7 @@ _sfvwrite (
 			  free (fp->_bf._base);
 			  fp->_flags &=  ~__SMBF;
 			  /* Ensure correct errno, even if free changed it.  */
-			  _REENT_ERRNO(ptr) = ENOMEM;
+			  errno = ENOMEM;
 			  goto err;
 			}
 		    }

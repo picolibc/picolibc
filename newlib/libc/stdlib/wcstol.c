@@ -199,7 +199,7 @@ wcstol_l (const wchar_t *nptr, wchar_t **endptr,
 	}
 	if (any < 0) {
 		acc = neg ? LONG_MIN : LONG_MAX;
-		_REENT_ERRNO(rptr) = ERANGE;
+		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)
