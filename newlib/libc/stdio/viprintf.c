@@ -101,5 +101,5 @@ int
 viprintf (const char *fmt,
        va_list ap)
 {
-  return vfiprintf ( _stdout_r (reent), fmt, ap);
+  return vfiprintf ( stdout, fmt, ap);
 }

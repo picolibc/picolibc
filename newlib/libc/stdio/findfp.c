@@ -31,10 +31,10 @@ __FILE __sf[3];
 
 struct _glue __sglue = {NULL, 3, &__sf[0]};
 
-NEWLIB_THREAD_LOCAL __FILE *_tls_stdin = &__sf[0];
-NEWLIB_THREAD_LOCAL __FILE *_tls_stdout = &__sf[1];
-NEWLIB_THREAD_LOCAL __FILE *_tls_stderr = &__sf[2];
-NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
+__FILE *stdin = &__sf[0];
+__FILE *stdout = &__sf[1];
+__FILE *stderr = &__sf[2];
+void (*_stdio_cleanup)(void);
 
 #ifdef _STDIO_BSD_SEMANTICS
   /* BSD and Glibc systems only flush streams which have been written to
@@ -80,11 +80,7 @@ std (FILE *ptr,
   ptr->_flags |= __SL64;
 #endif /* __LARGE64_FILES */
   ptr->_seek = __sseek;
-#ifdef _STDIO_CLOSE_PER_REENT_STD_STREAMS
   ptr->_close = __sclose;
-#else /* _STDIO_CLOSE_STD_STREAMS */
-  ptr->_close = NULL;
-#endif /* _STDIO_CLOSE_STD_STREAMS */
 #ifndef __SINGLE_THREAD__
   if (ptr == &__sf[0] || ptr == &__sf[1] || ptr == &__sf[2])
     __lock_init_recursive (ptr->_lock);
@@ -232,12 +228,12 @@ found:
 static void
 cleanup_stdio (void)
 {
-  if (_REENT_STDIN(ptr) != &__sf[0])
-    CLEANUP_FILE (_REENT_STDIN(ptr));
-  if (_REENT_STDOUT(ptr) != &__sf[1])
-    CLEANUP_FILE (_REENT_STDOUT(ptr));
-  if (_REENT_STDERR(ptr) != &__sf[2])
-    CLEANUP_FILE (_REENT_STDERR(ptr));
+  if (stdin != &__sf[0])
+    CLEANUP_FILE (stdin);
+  if (stdout != &__sf[1])
+    CLEANUP_FILE (stdout);
+  if (stderr != &__sf[2])
+    CLEANUP_FILE (stderr);
 }
 
 /*
@@ -249,14 +245,14 @@ __sinit (void)
 {
   __sfp_lock_acquire ();
 
-  if (_REENT_CLEANUP(s))
+  if (_stdio_cleanup)
     {
       __sfp_lock_release ();
       return;
     }
 
   /* make sure we clean up on exit */
-  _REENT_CLEANUP(s) = cleanup_stdio;	/* conservative */
+  _stdio_cleanup = cleanup_stdio;	/* conservative */
 
   global_stdio_init ();
   __sfp_lock_release ();

@@ -27,5 +27,5 @@
 int
 vwscanf (const wchar_t *__restrict fmt, va_list ap)
 {
-  return _svfwscanf ( _stdin_r (reent), fmt, ap);
+  return _svfwscanf ( stdin, fmt, ap);
 }

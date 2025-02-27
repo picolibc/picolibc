@@ -26,5 +26,5 @@ int
 vwprintf (const wchar_t *__restrict fmt,
        va_list ap)
 {
-  return vfwprintf ( _stdout_r (reent), fmt, ap);
+  return vfwprintf ( stdout, fmt, ap);
 }

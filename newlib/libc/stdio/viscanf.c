@@ -86,6 +86,6 @@ viscanf (
        const char *fmt,
        va_list ap)
 {
-  return _svfiscanf ( _stdin_r (ptr), fmt, ap);
+  return _svfiscanf ( stdin, fmt, ap);
 }
 

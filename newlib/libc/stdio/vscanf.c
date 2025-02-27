@@ -26,7 +26,7 @@ int
 vscanf (const char *fmt,
        va_list ap)
 {
-  return _svfscanf ( _stdin_r (reent), fmt, ap);
+  return _svfscanf ( stdin, fmt, ap);
 }
 
 #ifdef _NANO_FORMATTED_IO

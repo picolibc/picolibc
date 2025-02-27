@@ -29,7 +29,7 @@ printf (
   va_list ap;
 
   va_start (ap, fmt);
-  ret = vfprintf ( _stdout_r (ptr), fmt, ap);
+  ret = vfprintf ( stdout, fmt, ap);
   va_end (ap);
   return ret;
 }

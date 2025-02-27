@@ -71,7 +71,7 @@ gets (
   register char *s = buf;
   FILE *fp;
 
-  fp = _stdin_r (ptr);
+  fp = stdin;
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
   while ((c = _sgetc ( fp)) != '\n')

@@ -82,7 +82,7 @@ puts (
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
 
-  fp = _stdout_r (ptr);
+  fp = stdout;
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
   if (ORIENT (fp, -1) != -1)
@@ -96,7 +96,7 @@ puts (
   const char *p = s;
   FILE *fp;
 
-  fp = _stdout_r (ptr);
+  fp = stdout;
   CHECK_INIT (ptr, fp);
   _newlib_flockfile_start (fp);
   /* Make sure we can write.  */

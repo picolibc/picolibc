@@ -188,12 +188,9 @@ struct __file {
 
 extern __FILE __sf[3];
 
-extern NEWLIB_THREAD_LOCAL __FILE *_tls_stdin;
-#define _REENT_STDIN(_ptr) (_tls_stdin)
-extern NEWLIB_THREAD_LOCAL __FILE *_tls_stdout;
-#define _REENT_STDOUT(_ptr) (_tls_stdout)
-extern NEWLIB_THREAD_LOCAL __FILE *_tls_stderr;
-#define _REENT_STDERR(_ptr) (_tls_stderr)
+extern __FILE *stdin;
+extern __FILE *stdout;
+extern __FILE *stderr;
 
 extern void (*__stdio_exit_handler) (void);
 
@@ -309,14 +306,6 @@ typedef _ssize_t ssize_t;
 #endif
 
 #define	TMP_MAX		26
-
-#define	stdin	_REENT_STDIN(_REENT)
-#define	stdout	_REENT_STDOUT(_REENT)
-#define	stderr	_REENT_STDERR(_REENT)
-
-#define _stdin_r(x)	_REENT_STDIN(x)
-#define _stdout_r(x)	_REENT_STDOUT(x)
-#define _stderr_r(x)	_REENT_STDERR(x)
 
 /*
  * Functions defined in ANSI C standard.

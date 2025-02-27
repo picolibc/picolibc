@@ -28,7 +28,7 @@ iprintf (const char *fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  ret = vfiprintf ( _stdout_r (ptr), fmt, ap);
+  ret = vfiprintf ( stdout, fmt, ap);
   va_end (ap);
   return ret;
 }

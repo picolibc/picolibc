@@ -29,7 +29,7 @@ wscanf(const wchar_t *__restrict fmt, ...)
   va_list ap;
 
   va_start (ap, fmt);
-  ret = vfwscanf ( _stdin_r (reent), fmt, ap);
+  ret = vfwscanf ( stdin, fmt, ap);
   va_end (ap);
   return ret;
 }

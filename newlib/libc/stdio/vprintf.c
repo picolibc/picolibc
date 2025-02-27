@@ -25,7 +25,7 @@ int
 vprintf (const char *fmt,
        va_list ap)
 {
-  return vfprintf ( _stdout_r (reent), fmt, ap);
+  return vfprintf ( stdout, fmt, ap);
 }
 
 #ifdef _NANO_FORMATTED_IO

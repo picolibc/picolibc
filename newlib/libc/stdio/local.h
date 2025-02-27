@@ -32,16 +32,6 @@
 #endif
 #include "fvwrite.h"
 
-/* The following define determines if the per-reent stdin, stdout and stderr
-   streams are closed during _reclaim_reent().  The stdin, stdout and stderr
-   streams are initialized to use file descriptors 0, 1 and 2 respectively.  In
-   case _STDIO_CLOSE_PER_REENT_STD_STREAMS is defined these file descriptors
-   will be closed via close() provided the owner of the reent structure
-   triggerd the on demand reent initilization, see CHECK_INIT(). */
-#if !defined(__tirtos__)
-#define _STDIO_CLOSE_PER_REENT_STD_STREAMS
-#endif
-
 /* The following macros are supposed to replace calls to _flockfile/_funlockfile
    and __sfp_lock_acquire/__sfp_lock_release.  In case of multi-threaded
    environments using pthreads, it's not sufficient to lock the stdio functions
@@ -201,25 +191,14 @@ extern ssize_t __swrite64 (void *,
 						  size_t);
 #endif
 
-extern NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
-#define _REENT_CLEANUP(_ptr) (_tls_cleanup)
-extern NEWLIB_THREAD_LOCAL struct _Bigint **_tls_mp_freelist;
-#define _REENT_MP_FREELIST(_ptr) (_tls_mp_freelist)
-extern NEWLIB_THREAD_LOCAL struct _Bigint *_tls_mp_p5s;
-#define _REENT_MP_P5S(_ptr) (_tls_mp_p5s)
-extern NEWLIB_THREAD_LOCAL struct _Bigint *_tls_mp_result;
-#define _REENT_MP_RESULT(_ptr) (_tls_mp_result)
-extern NEWLIB_THREAD_LOCAL int _tls_mp_result_k;
-#define _REENT_MP_RESULT_K(_ptr) (_tls_mp_result_k)
-
-void _reclaim_reent (void *);
+extern void (*_stdio_cleanup)(void);
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
 #define CHECK_INIT(ptr, fp) \
   do								\
     {								\
-      if (!_tls_cleanup)			                \
+      if (!_stdio_cleanup)			                \
 	__sinit ();				                \
     }								\
   while (0)
