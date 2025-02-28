@@ -1425,22 +1425,17 @@ _cygtls::handle_SIGCONT ()
   if (NOTSTATE (myself, PID_STOPPED))
     return;
 
-  myself->stopsig = 0;
-  myself->process_state &= ~PID_STOPPED;
-  /* Carefully tell sig_handle_tty_stop to wake up.
-     Make sure that any pending signal is handled before trying to
-     send a new one.  Then make sure that SIGCONT has been recognized
-     before exiting the loop.  */
-  while (current_sig)  /* Assume that it's ok to just test sig outside of a */
-    yield ();          /* lock since setup_handler does it this way.  */
-
   lock ();
   current_sig = SIGCONT;
   set_signal_arrived (); /* alert sig_handle_tty_stop */
   unlock ();
 
+  /* Make sure that SIGCONT has been recognized before exiting the loop. */
   while (current_sig == SIGCONT)
     yield ();
+
+  myself->stopsig = 0;
+  myself->process_state &= ~PID_STOPPED;
 
   /* Clear pending stop signals */
   sig_clear (SIGSTOP, false);
@@ -1473,7 +1468,17 @@ sigpacket::process ()
   myself->rusage_self.ru_nsignals++;
 
   if (si.si_signo == SIGCONT)
-    _main_tls->handle_SIGCONT ();
+    {
+      /* Carefully tell sig_handle_tty_stop to wake up.
+	 Make sure that any pending signal is handled before trying to
+	 send a new one. */
+      if (_main_tls->current_sig)
+	{
+	  rc = -1;
+	  goto done;
+	}
+      _main_tls->handle_SIGCONT ();
+    }
 
   /* SIGKILL is special.  It always goes through.  */
   if (si.si_signo == SIGKILL)
