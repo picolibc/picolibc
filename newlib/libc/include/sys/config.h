@@ -266,12 +266,6 @@ SUCH DAMAGE.
 #define NEWLIB_THREAD_LOCAL
 #endif
 
-#ifdef _WANT_USE_LONG_TIME_T
-#ifndef _USE_LONG_TIME_T
-#define _USE_LONG_TIME_T
-#endif
-#endif
-
 #ifdef _WANT_USE_GDTOA
 #ifndef _USE_GDTOA
 #define _USE_GDTOA

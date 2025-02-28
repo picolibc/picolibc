@@ -302,15 +302,3 @@ option('newlib-obsolete-math-double', type: 'combo', choices: ['true', 'false', 
        description: 'Use old math code for double valued math routines (default: automatic based on platform)')
 option('want-math-errno', type: 'boolean', value: false,
        description: 'Set errno in math functions according to stdc (default: false)')
-
-#
-# Obsolete newlib options
-#
-option('newlib-long-time_t', type: 'boolean', value: false,
-       description: 'define time_t to long instead of a 64-bit type')
-option('newlib-missing-syscall-names', type: 'boolean', value: false,
-       description: 'system only provides regular syscall API')
-option('newlib-reentrant-syscalls-provided', type: 'boolean', value: false,
-       description: 'system provides reentrant syscall API')
-option('newlib-supplied-syscalls', type: 'boolean', value: false,
-       description: 'newlib supplies system call functions')

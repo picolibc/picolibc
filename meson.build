@@ -1494,11 +1494,6 @@ if errno_function != 'false'
   conf_data.set('__PICOLIBC_ERRNO_FUNCTION', errno_function)
 endif
 
-# Obsolete newlib options
-conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')
-conf_data.set('REENTRANT_SYSCALLS_PROVIDED', get_option('newlib-reentrant-syscalls-provided'), description: 'Obsoleted. Reentrant syscalls provided for us')
-conf_data.set('MISSING_SYSCALL_NAMES', get_option('newlib-missing-syscall-names'), description: 'Obsoleted. Use regular syscalls')
-
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
 elif newlib_obsolete_math == 'true'

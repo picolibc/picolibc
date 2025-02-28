@@ -86,9 +86,6 @@ if(NOT DEFINED FAST_STRCMP)
   option(FAST_STRCMP "Always optimize strcmp for performance" ON)
 endif()
 
-# Obsoleted. Use regular syscalls
-set(MISSING_SYSCALL_NAMES 0)
-
 # use global errno variable
 if(NOT DEFINED NEWLIB_GLOBAL_ERRNO)
   option(NEWLIB_GLOBAL_ERRNO "use global errno variable" OFF)
@@ -117,9 +114,6 @@ if(NOT DEFINED PREFER_SIZE_OVER_SPEED)
   endif()
   option(PREFER_SIZE_OVER_SPEED "Prefer smaller code size" ${default_prefer_size})
 endif()
-
-# Obsoleted. Reentrant syscalls provided for us
-set(REENTRANT_SYSCALLS_PROVIDED 0)
 
 # Use tiny stdio from gcc avr
 option(TINY_STDIO "Use tiny stdio from avr libc" ON)
@@ -367,9 +361,6 @@ endif()
 set(_WANT_MATH_ERRNO OFF)
 
 set(_WANT_REGISTER_FINI OFF)
-
-# Obsoleted. Define time_t to long instead of using a 64-bit type
-set(_WANT_USE_LONG_TIME_T OFF)
 
 set(_WIDE_ORIENT OFF)
 
