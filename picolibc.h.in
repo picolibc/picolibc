@@ -172,9 +172,6 @@
 
 #cmakedefine _WANT_REGISTER_FINI
 
-/* Obsoleted. Define time_t to long instead of using a 64-bit type */
-#cmakedefine _WANT_USE_LONG_TIME_T
-
 #cmakedefine _WIDE_ORIENT
 
 /* chatty assert */
