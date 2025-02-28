@@ -1675,7 +1675,7 @@ _cygtls::call_signal_handler ()
   while (1)
     {
       lock ();
-      if (!current_sig)
+      if (!current_sig || exit_state > ES_EXIT_STARTING)
 	{
 	  unlock ();
 	  break;
