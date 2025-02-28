@@ -54,7 +54,7 @@ public:
 
   /* Various flags indicating the state of the process.  See PID_
      constants in <sys/cygwin.h>. */
-  DWORD process_state;
+  volatile DWORD process_state;
 
   pid_t ppid;		/* Parent process id.  */
 
@@ -271,9 +271,9 @@ public:
   push_process_state (int add_flag)
   {
     flag = add_flag;
-    myself->process_state |= flag;
+    InterlockedOr ((LONG *) &myself->process_state, flag);
   }
-  void pop () { myself->process_state &= ~(flag); }
+  void pop () { InterlockedAnd ((LONG *) &myself->process_state, ~(flag)); }
   ~push_process_state () { pop (); }
 };
 

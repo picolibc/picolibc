@@ -882,7 +882,7 @@ sig_handle_tty_stop (int sig, siginfo_t *, void *)
   /* Silently ignore attempts to suspend if there is no accommodating
      cygwin parent to deal with this behavior. */
   if (!myself->cygstarted)
-    myself->process_state &= ~PID_STOPPED;
+    InterlockedAnd ((LONG *) &myself->process_state, ~PID_STOPPED);
   else
     {
       _my_tls.incyg = 1;
@@ -948,7 +948,7 @@ _cygtls::interrupt_setup (siginfo_t& si, void *handler, struct sigaction& siga)
   if (handler == sig_handle_tty_stop)
     {
       myself->stopsig = 0;
-      myself->process_state |= PID_STOPPED;
+      InterlockedOr ((LONG *) &myself->process_state, PID_STOPPED);
     }
 
   infodata = si;
@@ -1435,7 +1435,7 @@ _cygtls::handle_SIGCONT ()
     yield ();
 
   myself->stopsig = 0;
-  myself->process_state &= ~PID_STOPPED;
+  InterlockedAnd ((LONG *) &myself->process_state, ~PID_STOPPED);
 
   /* Clear pending stop signals */
   sig_clear (SIGSTOP, false);

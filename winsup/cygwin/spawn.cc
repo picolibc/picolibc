@@ -543,7 +543,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       refresh_cygheap ();
 
       if (c_flags & CREATE_NEW_PROCESS_GROUP)
-	myself->process_state |= PID_NEW_PG;
+	InterlockedOr ((LONG *) &myself->process_state, PID_NEW_PG);
 
       if (mode == _P_DETACH)
 	/* all set */;
@@ -603,7 +603,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
       ::cygheap->user.deimpersonate ();
 
       if (!real_path.iscygexec () && mode == _P_OVERLAY)
-	myself->process_state |= PID_NOTCYGWIN;
+	InterlockedOr ((LONG *) &myself->process_state, PID_NOTCYGWIN);
 
       cygpid = (mode != _P_OVERLAY) ? create_cygwin_pid () : myself->pid;
 
@@ -705,7 +705,7 @@ child_info_spawn::worker (const char *prog_arg, const char *const *argv,
 	      myself->sendsig = myself->exec_sendsig;
 	      myself->exec_sendsig = NULL;
 	    }
-	  myself->process_state &= ~PID_NOTCYGWIN;
+	  InterlockedAnd ((LONG *) &myself->process_state, ~PID_NOTCYGWIN);
 	  /* Reset handle inheritance to default when the execution of a'
 	     non-Cygwin process fails.  Only need to do this for _P_OVERLAY
 	     since the handle will be closed otherwise.  Don't need to do

@@ -69,7 +69,7 @@ pinfo::thisproc (HANDLE h)
      child_info_spawn::handle_spawn. */
 
   init (cygheap->pid, flags, h);
-  procinfo->process_state |= PID_IN_USE;
+  InterlockedOr ((LONG *) &procinfo->process_state, PID_IN_USE);
   procinfo->dwProcessId = myself_initial.dwProcessId;
   procinfo->sendsig = myself_initial.sendsig;
   wcscpy (procinfo->progname, myself_initial.progname);
@@ -89,7 +89,7 @@ pinfo_init (char **envp, int envc)
     {
       environ_init (envp, envc);
       /* spawn has already set up a pid structure for us so we'll use that */
-      myself->process_state |= PID_CYGPARENT;
+      InterlockedOr ((LONG *) &myself->process_state, PID_CYGPARENT);
     }
   else
     {
@@ -108,10 +108,11 @@ pinfo_init (char **envp, int envc)
       debug_printf ("Set nice to %d", myself->nice);
     }
 
-  myself->process_state |= PID_ACTIVE;
-  myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
+  InterlockedOr ((LONG *) &myself->process_state, PID_ACTIVE);
+  InterlockedAnd ((LONG *) &myself->process_state,
+		  ~(PID_INITIALIZING | PID_EXITED | PID_REAPED));
   if (being_debugged ())
-    myself->process_state |= PID_DEBUGGED;
+    InterlockedOr ((LONG *) &myself->process_state, PID_DEBUGGED);
   myself.preserve ();
   debug_printf ("pid %d, pgid %d, process_state %y",
 		myself->pid, myself->pgid, myself->process_state);

@@ -678,8 +678,9 @@ dofork (void **proc, bool *with_forkables)
 
   if (ischild)
     {
-      myself->process_state |= PID_ACTIVE;
-      myself->process_state &= ~(PID_INITIALIZING | PID_EXITED | PID_REAPED);
+      InterlockedOr ((LONG *) &myself->process_state, PID_ACTIVE);
+      InterlockedAnd ((LONG *) &myself->process_state,
+		      ~(PID_INITIALIZING | PID_EXITED | PID_REAPED));
     }
   else if (res < 0)
     {

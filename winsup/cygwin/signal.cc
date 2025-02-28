@@ -456,9 +456,11 @@ sigaction_worker (int sig, const struct sigaction *newact,
 		sig_clear (sig, true);
 	      if (sig == SIGCHLD)
 		{
-		  myself->process_state &= ~PID_NOCLDSTOP;
+		  InterlockedAnd ((LONG *)&myself->process_state,
+				  ~PID_NOCLDSTOP);
 		  if (gs.sa_flags & SA_NOCLDSTOP)
-		    myself->process_state |= PID_NOCLDSTOP;
+		    InterlockedOr ((LONG *) &myself->process_state,
+				   PID_NOCLDSTOP);
 		}
 	    }
 

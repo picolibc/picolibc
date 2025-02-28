@@ -252,7 +252,7 @@ proc_subproc (DWORD what, uintptr_t val)
 	  vchild->sid = myself->sid;
 	  vchild->ctty = myself->ctty;
 	  vchild->cygstarted = true;
-	  vchild->process_state |= PID_INITIALIZING;
+	  InterlockedOr ((LONG *)&vchild->process_state, PID_INITIALIZING);
 	  vchild->ppid = myself->pid;	/* always set last */
 	}
       break;
