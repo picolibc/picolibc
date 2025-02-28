@@ -57,33 +57,28 @@ picolibc_sources(
   cexpf.c
   cpowf.c
   csinhf.c
+  cabsl.c
+  creall.c
+  cimagl.c
+  conjl.c
+  cprojl.c
+  csqrtl.c
+  cacoshl.c
+  cacosl.c
+  cargl.c
+  casinhl.c
+  casinl.c
+  catanhl.c
+  catanl.c
+  cephes_subrl.c
+  ccoshl.c
+  ccosl.c
+  cexpl.c
+  clog10l.c
+  clogl.c
+  cpowl.c
+  csinhl.c
+  csinl.c
+  ctanhl.c
+  ctanl.c
   )
-
-if(${_HAVE_LONG_DOUBLE})
-  picolibc_sources(
-    cabsl.c
-    creall.c
-    cimagl.c
-    conjl.c
-    cprojl.c
-    csqrtl.c
-    cacoshl.c
-    cacosl.c
-    cargl.c
-    casinhl.c
-    casinl.c
-    catanhl.c
-    catanl.c
-    cephes_subrl.c
-    ccoshl.c
-    ccosl.c
-    cexpl.c
-    clog10l.c
-    clogl.c
-    cpowl.c
-    csinhl.c
-    csinl.c
-    ctanhl.c
-    ctanl.c
-    )
-endif()

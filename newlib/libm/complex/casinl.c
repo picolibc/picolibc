@@ -30,7 +30,6 @@
  */
 
 #include <complex.h>
-#include <math.h>
 
 #ifdef _HAVE_LONG_DOUBLE_MATH
 

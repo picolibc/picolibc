@@ -38,7 +38,7 @@ THIS SOFTWARE.
 
 #include "locale.h"
 
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
+#if defined(_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
 
 #define USE_LOCALE
 

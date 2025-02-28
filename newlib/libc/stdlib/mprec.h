@@ -383,7 +383,7 @@ __ULong		any_on (_Bigint *b, int k);
 void		copybits (__ULong *c, int n, _Bigint *b);
 double		_strtod_l (const char *__restrict s00,
 			   char **__restrict se, locale_t loc);
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
+#if defined(_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
 int		_strtorx_l (const char *, char **, int,
 			    void *, locale_t);
 int		_strtodg_l (const char *s00, char **se,

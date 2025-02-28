@@ -226,9 +226,6 @@ set(_HAVE_INIT_FINI 1)
 # Enable MMU in pico crt startup
 set(_PICOCRT_ENABLE_MMU 1)
 
-# Compiler has long double type
-picolibc_flag(_HAVE_LONG_DOUBLE)
-
 # Compiler attribute to prevent the optimizer from adding new builtin calls
 picolibc_flag(_HAVE_NO_BUILTIN_ATTRIBUTE)
 

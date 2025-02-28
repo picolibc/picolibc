@@ -130,22 +130,6 @@ Unsupported architecture: "@0@"
   error(message.format(host_cpu_family))
 endif
 
-# Find out about float types
-
-long_double_code = '''
-#include <float.h>
-#ifndef __LDBL_MANT_DIG__
-#error No long double support in float.h
-#endif
-long double test(void)
-{
-	long double ld = 0.0L;
-	return ld;
-}
-'''
-
-have_long_double = cc.compiles(long_double_code, name : 'long double check', args: core_c_args)
-
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 multilib_exclude = get_option('multilib-exclude')
@@ -1373,8 +1357,6 @@ conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE',
 			  args : werror_c_args),
 	      description: 'Compiler attribute to prevent the optimizer from adding new builtin calls')
 
-conf_data.set('_HAVE_LONG_DOUBLE', have_long_double,
-	      description: 'Compiler has long double type')
 conf_data.set('_HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
 conf_data.set('_HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
 conf_data.set('_HAVE_WEAK_ATTRIBUTE', have_weak_attribute)
@@ -1639,7 +1621,7 @@ if not tests_enable_stack_protector
   test_c_args += cc.get_supported_arguments(['-fno-stack-protector'])
 endif
 
-if have_long_double and get_option('test-long-double')
+if get_option('test-long-double')
   test_c_args += ['-D_TEST_LONG_DOUBLE']
   native_c_args += ['-D_TEST_LONG_DOUBLE']
 endif

@@ -36,7 +36,7 @@ THIS SOFTWARE.
 #include "mprec.h"
 #include "gdtoa.h"
 
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) && __LDBL_MANT_DIG__ == 64
+#if defined(_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) && __LDBL_MANT_DIG__ == 64
 
 /* one or the other of IEEE_MC68k or IEEE_8087 should be #defined */
 

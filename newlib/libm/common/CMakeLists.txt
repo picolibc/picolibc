@@ -140,22 +140,17 @@ picolibc_sources(
   math_errf_invalidf.c
   math_errf_check_oflowf.c
   math_errf_check_uflowf.c
-)
-
-if(_HAVE_LONG_DOUBLE)
-  picolibc_sources(
-    copysignl.c
-    frexpl.c
-    exp10l.c
-    fabsl.c
-    frexpl.c
-    isinfl.c
-    isnanl.c
-    math_inexactl.c
-    nanl.c
-    nexttoward.c
-    nexttowardf.c
-    sl_iseqsig.c
-    sl_issignaling.c
+  copysignl.c
+  frexpl.c
+  exp10l.c
+  fabsl.c
+  frexpl.c
+  isinfl.c
+  isnanl.c
+  math_inexactl.c
+  nanl.c
+  nexttoward.c
+  nexttowardf.c
+  sl_iseqsig.c
+  sl_issignaling.c
   )
-endif()

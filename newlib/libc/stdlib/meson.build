@@ -171,6 +171,7 @@ srcs_stdlib_stdio = [
     'efgcvt.c',
     'gdtoa-gethex.c',
     'gdtoa-hexnan.c',
+    'ldtoa.c',
     'mprec.c',
     'strtod.c',
     'strtodg.c',
@@ -180,22 +181,13 @@ srcs_stdlib_stdio = [
     'strtoull.c',
     'strtoimax.c',
     'strtoumax.c',
-]
-
-lsrcs_stdlib = [
-  'strtold.c',
-  'strtorx.c',
-  'wcstold.c'
+    'strtold.c',
+    'strtorx.c',
+    'wcstold.c',
 ]
 
 if not tinystdio
   srcs_stdlib += srcs_stdlib_stdio
-  if have_long_double
-    srcs_stdlib += lsrcs_stdlib
-    if io_long_double
-      srcs_stdlib += 'ldtoa.c'
-    endif
-  endif
 endif
 
 # Work around compiler optimizing calls involving malloc/free

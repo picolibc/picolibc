@@ -30,6 +30,8 @@
 #include <math.h>
 #include <stdbool.h>
 
+#ifdef _HAVE_LONG_DOUBLE
+
 /*
  * gcc doesn't implement complex multiplication or division correctly,
  * so we need to handle infinities specially. We turn on this pragma to
@@ -105,3 +107,5 @@ csqrtl(long double complex z)
 	else
 		return (result);
 }
+
+#endif /* _HAVE_LONG_DOUBLE */

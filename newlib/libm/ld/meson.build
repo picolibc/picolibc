@@ -35,8 +35,6 @@
 
 srcs_ld_use = []
 
-if have_long_double
-
 srcs_ld_arch = [
     'e_acoshl.c',
     'e_atanhl.c',
@@ -134,7 +132,5 @@ foreach file : srcs_ld
     srcs_ld_use += file
   endif
 endforeach
-
-endif
 
 src_libm_ld = files(srcs_ld_use)

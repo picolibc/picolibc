@@ -4,10 +4,11 @@
 
 #define _DEFAULT_SOURCE
 
-#ifndef _USE_GDTOA
 #include <string.h>
 #include <stdlib.h>
 #include "mprec.h"
+
+#if defined(_WANT_IO_LONG_DOUBLE) && defined(_HAVE_LONG_DOUBLE)
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -3899,4 +3900,4 @@ enan (short unsigned int *nan, int size)
     *nan++ = *p++;
 }
 
-#endif /* !_USE_GDTOA */
+#endif /* _WANT_IO_LONG_DOUBLE */

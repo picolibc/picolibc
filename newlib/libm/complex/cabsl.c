@@ -7,6 +7,8 @@
 #include <complex.h>
 #include <math.h>
 
+#ifdef _HAVE_LONG_DOUBLE
+
 long double
 cabsl (long double complex z)
 {
@@ -16,3 +18,5 @@ cabsl (long double complex z)
   return hypotl (creall (z), cimagl (z));
 #endif
 }
+
+#endif /* _HAVE_LONG_DOUBLE */

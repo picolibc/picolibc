@@ -29,6 +29,8 @@
 #include <complex.h>
 #include "../common/fdlibm.h"
 
+#ifdef _HAVE_LONG_DOUBLE
+
 /*
  * conjl(long double complex z)
  * This function returns the complex conjugate value of its argument, z.
@@ -42,3 +44,5 @@ conjl(long double complex z)
 
 	return (w.z);
 }
+
+#endif /* _HAVE_LONG_DOUBLE */

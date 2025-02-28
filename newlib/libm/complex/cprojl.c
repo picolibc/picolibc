@@ -31,6 +31,8 @@
 
 #include "../common/fdlibm.h"
 
+#ifdef _HAVE_LONG_DOUBLE
+
 /*
  * cprojl(long double complex z)
  *
@@ -60,3 +62,5 @@ cprojl(long double complex z)
 
 	return (w.z);
 }
+
+#endif /* _HAVE_LONG_DOUBLE */

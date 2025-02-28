@@ -303,10 +303,16 @@ SUCH DAMAGE.
 #define _MB_EXTENDED_CHARSETS_ANY
 #endif
 
+/* Figure out if the compiler supports the long double type. */
+#ifdef __SIZEOF_LONG_DOUBLE__
+#define _HAVE_LONG_DOUBLE
+#endif
+
 /* Figure out if long double is the same size as double. If the system
  * doesn't provide long double, then those values will be undefined
  * and cpp will substitute 0 for them in the test
  */
+
 #if LDBL_MANT_DIG == DBL_MANT_DIG && LDBL_MIN_EXP == DBL_MIN_EXP && \
     LDBL_MAX_EXP == DBL_MAX_EXP
 #define _LDBL_EQ_DBL
@@ -317,7 +323,7 @@ SUCH DAMAGE.
    simply call the double functions.  On Cygwin the long double functions
    are implemented independently from newlib to be able to use optimized
    assembler functions despite using the Microsoft x86_64 ABI. */
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(__SIZEOF_LONG_DOUBLE__) && __SIZEOF_LONG_DOUBLE__ <= 8) || (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(_HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) || (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
 #define _HAVE_LONG_DOUBLE_MATH
 #endif
 

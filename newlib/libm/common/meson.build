@@ -162,11 +162,7 @@ lsrcs_common = [
   'sl_issignaling.c',
   ]
 
-srcs_common += dsrcs_common + fsrcs_common
-
-if have_long_double
-  srcs_common += lsrcs_common
-endif
+srcs_common += dsrcs_common + fsrcs_common + lsrcs_common
 
 srcs_common_use = []
 foreach file : srcs_common

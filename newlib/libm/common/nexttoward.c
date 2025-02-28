@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "math_config.h"
 
-#if defined(_NEED_FLOAT64) && !defined(_NEED_FLOAT_HUGE)
+#if defined(_NEED_FLOAT64) && !defined(_NEED_FLOAT_HUGE) && defined(_HAVE_LONG_DOUBLE)
 __float64
 nexttoward64 (__float64 x, long double y)
 {

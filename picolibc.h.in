@@ -142,9 +142,6 @@
 /* Support _init() and _fini() functions */
 #cmakedefine _HAVE_INIT_FINI
 
-/* Compiler has long double type */
-#cmakedefine _HAVE_LONG_DOUBLE
-
 /* Compiler attribute to prevent the optimizer from adding new builtin calls */
 #cmakedefine _HAVE_NO_BUILTIN_ATTRIBUTE
 
