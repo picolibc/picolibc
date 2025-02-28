@@ -64,10 +64,8 @@ exit (int code)
     __call_exitprocs (code, NULL);
 
 #ifndef TINY_STDIO
-  if (_REENT_CLEANUP(_GLOBAL_REENT))
-    (*_REENT_CLEANUP(_GLOBAL_REENT)) ();
-  if (__stdio_exit_handler != NULL)
-    (*__stdio_exit_handler) ();
+  if (_stdio_cleanup)
+    (*_stdio_cleanup) ();
 #endif
   _exit (code);
 }

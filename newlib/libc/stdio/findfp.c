@@ -25,8 +25,6 @@
 #include <sys/lock.h>
 #include "local.h"
 
-void (*__stdio_exit_handler) (void);
-
 __FILE __sf[3];
 
 struct _glue __sglue = {NULL, 3, &__sf[0]};
@@ -148,23 +146,6 @@ sfmoreglue (int n)
   return &g->glue;
 }
 
-static void
-stdio_exit_handler (void)
-{
-  (void) _fwalk_sglue (CLEANUP_FILE, &__sglue);
-}
-
-static void
-global_stdio_init (void)
-{
-  if (__stdio_exit_handler == NULL) {
-    __stdio_exit_handler = stdio_exit_handler;
-    stdin_init (&__sf[0]);
-    stdout_init (&__sf[1]);
-    stderr_init (&__sf[2]);
-  }
-}
-
 /*
  * Find a free FILE for fopen et al.
  */
@@ -176,8 +157,8 @@ __sfp (void)
   int n;
   struct _glue *g;
 
+  CHECK_INIT();
   _newlib_sfp_lock_start ();
-  global_stdio_init ();
 
   for (g = &__sglue;; g = g->_next)
     {
@@ -234,6 +215,7 @@ cleanup_stdio (void)
     CLEANUP_FILE (stdout);
   if (stderr != &__sf[2])
     CLEANUP_FILE (stderr);
+  (void) _fwalk_sglue (CLEANUP_FILE, &__sglue);
 }
 
 /*
@@ -254,6 +236,8 @@ __sinit (void)
   /* make sure we clean up on exit */
   _stdio_cleanup = cleanup_stdio;	/* conservative */
 
-  global_stdio_init ();
+  stdin_init (&__sf[0]);
+  stdout_init (&__sf[1]);
+  stderr_init (&__sf[2]);
   __sfp_lock_release ();
 }
