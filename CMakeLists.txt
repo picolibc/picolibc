@@ -143,68 +143,11 @@ picolibc_flag(_HAVE_ATTRIBUTE_GNU_INLINE)
 # Use bitfields in packed structs
 picolibc_flag(_HAVE_BITFIELDS_IN_PACKED_STRUCTS)
 
-# The compiler supports __builtin_alloca
-picolibc_flag(_HAVE_BUILTIN_ALLOCA)
-
-# The compiler supports __builtin_copysign
-picolibc_flag(_HAVE_BUILTIN_COPYSIGN)
-
-# The compiler supports __builtin_copysignl
-picolibc_flag(_HAVE_BUILTIN_COPYSIGNL)
-
-# The compiler supports __builtin_ctz
-picolibc_flag(_HAVE_BUILTIN_CTZ)
-
-# The compiler supports __builtin_ctzl
-picolibc_flag(_HAVE_BUILTIN_CTZL)
-
-# The compiler supports __builtin_ctzll
-picolibc_flag(_HAVE_BUILTIN_CTZLL)
-
-# Compiler has __builtin_expect
-picolibc_flag(_HAVE_BUILTIN_EXPECT)
-
-# The compiler supports __builtin_ffs
-picolibc_flag(_HAVE_BUILTIN_FFS)
-
-# The compiler supports __builtin_ffsl
-picolibc_flag(_HAVE_BUILTIN_FFSL)
-
-# The compiler supports __builtin_ffsll
-picolibc_flag(_HAVE_BUILTIN_FFSLL)
-
-# The compiler supports __builtin_finitel
-picolibc_flag(_HAVE_BUILTIN_FINITEL)
-
-# The compiler supports __builtin_isfinite
-picolibc_flag(_HAVE_BUILTIN_ISFINITE)
-
-# The compiler supports __builtin_isinf
-picolibc_flag(_HAVE_BUILTIN_ISINF)
-
-# The compiler supports __builtin_isinfl
-picolibc_flag(_HAVE_BUILTIN_ISINFL)
-
-# The compiler supports __builtin_isnan
-picolibc_flag(_HAVE_BUILTIN_ISNAN)
-
-# The compiler supports __builtin_isnanl
-picolibc_flag(_HAVE_BUILTIN_ISNANL)
-
-# Compiler has __builtin_mul_overflow
-picolibc_flag(_HAVE_BUILTIN_MUL_OVERFLOW)
-
-# Compiler has __builtin_add_overflow
-picolibc_flag(_HAVE_BUILTIN_ADD_OVERFLOW)
-
 # Compiler has support for flag to prevent mis-optimizing memcpy/memset patterns
 picolibc_flag(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 
 # Compiler supports _Complex
 picolibc_flag(_HAVE_COMPLEX)
-
-# Compiler supports __builtin_complex
-picolibc_flag(_HAVE_BUILTIN_COMPLEX)
 
 # Compiler supports format function attribute
 picolibc_flag(_HAVE_FORMAT_ATTRIBUTE 1)

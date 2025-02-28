@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "fdlibm.h"
 
-#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_ISINFL)
+#if defined(_NEED_FLOAT_HUGE) && _HAVE_BUILTIN_ISINFL
 int
 isinfl (long double x)
 {

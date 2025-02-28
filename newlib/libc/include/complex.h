@@ -110,7 +110,7 @@ double creal(double complex);
 float crealf(float complex);
 
 #if __ISO_C_VISIBLE >= 2011
-#ifdef _HAVE_BUILTIN_COMPLEX
+#if _HAVE_BUILTIN_COMPLEX
 #define CMPLX(r,i) __builtin_complex((double)(r), (double)(i))
 #define CMPLXF(r,i) __builtin_complex((float)(r), (float)(i))
 #define CMPLXL(r,i) __builtin_complex((long double)(r), (long double)(i))

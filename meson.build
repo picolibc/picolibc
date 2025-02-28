@@ -1303,40 +1303,66 @@ endforeach
 
 conf_data = configuration_data()
 
-# The supported builtins vary depending on compiler and target.
-# If you want to check for a given builtin, add an array
-#   ['some_builtin_name', '__call_to_builtin(1,2,3);']
-# The below loop will then add the define HAVE_SOME_BUILTIN_NAME if the code snippet
-#   > int main (void) { __call_to_builtin(1,2,3); return 0; }
-# can be compiled + linked.
-# The name should match the builtin, but technically it's not necessary
-builtins = [
-  ['builtin_alloca', '__builtin_alloca(1)', 'void *'],
-  ['builtin_ffs', '__builtin_ffs(42)', 'int'],
-  ['builtin_ffsl', '__builtin_ffsl((long)42)', 'long'],
-  ['builtin_ffsll', '__builtin_ffsll((long long)42)', 'long long'],
-  ['builtin_ctz', '__builtin_ctz((unsigned int)42)', 'int'],
-  ['builtin_ctzl', '__builtin_ctzl((unsigned long)42)', 'int'],
-  ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42)', 'int'],
-  ['builtin_copysignl', '__builtin_copysignl((long double)42, (long double) 42)', 'long double'],
-  ['builtin_copysign', '__builtin_copysign(42, 42)', 'double'],
-  ['builtin_isinfl', '__builtin_isinfl((long double)42)', 'int'],
-  ['builtin_isinf', '__builtin_isinf((long double)42)', 'int'],
-  ['builtin_isnanl', '__builtin_isnanl((long double)42)', 'int'],
-  ['builtin_isnan', '__builtin_isnan((long double)42)', 'int'],
-  ['builtin_finitel', '__builtin_finitel((long double)42)', 'int'],
-  ['builtin_isfinite', '__builtin_isfinite((long double)42)', 'int'],
-  ['builtin_issignalingl', '__builtin_issignalingl((long double)42)', 'int'],
-]
-foreach builtin : builtins
-  builtin_template='''
+has_builtin_code = '''
+int main(void) {
+#if __has_builtin(__builtin_object_size)
+return 0;
+#else
+return 1;
+#endif
+}
+'''
+
+have_has_builtin = cc.compiles(has_builtin_code,
+                               name : '__has_builtin builtin',
+                               args : werror_c_args)
+
+if not have_has_builtin
+
+  # For compilers without __has_builtin, detect the available builtins
+  # at meson time. This list should match that in include/sys/config.h
+  #
+  # The supported builtins vary depending on compiler and target.
+  # If you want to check for a given builtin, add an array
+  #   ['some_builtin_name', '__call_to_builtin(1,2,3);']
+  # The below loop will then add the define HAVE_SOME_BUILTIN_NAME if the code snippet
+  #   > int main (void) { __call_to_builtin(1,2,3); return 0; }
+  # can be compiled + linked.
+
+  builtins = [
+    ['builtin_alloca', '__builtin_alloca(1)', 'void *'],
+    ['builtin_ffs', '__builtin_ffs(42)', 'int'],
+    ['builtin_ffsl', '__builtin_ffsl((long)42)', 'long'],
+    ['builtin_ffsll', '__builtin_ffsll((long long)42)', 'long long'],
+    ['builtin_ctz', '__builtin_ctz((unsigned int)42)', 'int'],
+    ['builtin_ctzl', '__builtin_ctzl((unsigned long)42)', 'int'],
+    ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42)', 'int'],
+    ['builtin_copysignl', '__builtin_copysignl((long double)42, (long double) 42)', 'long double'],
+    ['builtin_copysign', '__builtin_copysign(42, 42)', 'double'],
+    ['builtin_isinfl', '__builtin_isinfl((long double)42)', 'int'],
+    ['builtin_isinf', '__builtin_isinf((long double)42)', 'int'],
+    ['builtin_isnanl', '__builtin_isnanl((long double)42)', 'int'],
+    ['builtin_isnan', '__builtin_isnan((long double)42)', 'int'],
+    ['builtin_finitel', '__builtin_finitel((long double)42)', 'int'],
+    ['builtin_isfinite', '__builtin_isfinite((long double)42)', 'int'],
+    ['builtin_issignalingl', '__builtin_issignalingl((long double)42)', 'int'],
+    ['builtin_mul_overflow', '__builtin_mul_overflow(1, 2, &u)', 'int'],
+    ['builtin_add_overflow', '__builtin_add_overflow(1, 2, &u)', 'int'],
+    ['builtin_complex', '__builtin_complex(1.0, 2.0)', 'double _Complex'],
+    ['builtin_expect', '__builtin_expect(1 > 0)', 'int'],
+  ]
+
+  foreach builtin : builtins
+    builtin_template='''
 static int foo(@1@ i __attribute__((unused))) { return 0; }
+unsigned u;
 int main(void) { return foo(@0@); }
 '''
-  builtin_code = builtin_template.format(builtin[1], builtin[2])
-  have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
-  conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
-endforeach
+    builtin_code = builtin_template.format(builtin[1], builtin[2])
+    have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
+    conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+  endforeach
+endif
 
 NEWLIB_VERSION='4.3.0'
 NEWLIB_MAJOR_VERSION=4
@@ -1416,11 +1442,7 @@ conf_data.set('_PRINTF_PERCENT_N', printf_percent_n, description: 'support %n in
 conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('_PICOLIBC_ATOMIC_SIGNAL', atomic_signal, description: 'Use atomics for signal/raise for re-entrancy')
 conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
-conf_data.set('_HAVE_BUILTIN_MUL_OVERFLOW', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
-conf_data.set('_HAVE_BUILTIN_ADD_OVERFLOW', have_builtin_add_overflow, description: 'Compiler has __builtin_add_overflow')
 conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
-conf_data.set('_HAVE_BUILTIN_COMPLEX', have_builtin_complex, description: 'Compiler has __builtin_complex')
-conf_data.set('_HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
 conf_data.set('_HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
 conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
 	      cc.has_function_attribute('always_inline'),

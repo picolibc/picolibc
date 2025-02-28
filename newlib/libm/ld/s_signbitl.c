@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "math_ld.h"
 
-#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_BUILTIN_ISINFL)
+#if defined(_NEED_FLOAT_HUGE) && !_HAVE_BUILTIN_ISINFL
 
 #include "common/s_signbitl.c"
 

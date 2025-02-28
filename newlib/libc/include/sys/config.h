@@ -266,6 +266,33 @@ SUCH DAMAGE.
 #define NEWLIB_THREAD_LOCAL
 #endif
 
+/*
+ * Use __has_builtin if available. If it isn't, these are detected
+ * by meson
+ */
+#ifdef __has_builtin
+#define _HAVE_BUILTIN_ADD_OVERFLOW __has_builtin(__builtin_add_overflow)
+#define _HAVE_BUILTIN_ALLOCA __has_builtin(__builtin_alloca)
+#define _HAVE_BUILTIN_COMPLEX __has_builtin(__builtin_complex)
+#define _HAVE_BUILTIN_COPYSIGN __has_builtin(__builtin_copysign)
+#define _HAVE_BUILTIN_COPYSIGNL __has_builtin(__builtin_copysignl)
+#define _HAVE_BUILTIN_CTZ __has_builtin(__builtin_ctz)
+#define _HAVE_BUILTIN_CTZL __has_builtin(__builtin_ctzl)
+#define _HAVE_BUILTIN_CTZLL __has_builtin(__builtin_ctzll)
+#define _HAVE_BUILTIN_EXPECT __has_builtin(__builtin_expect)
+#define _HAVE_BUILTIN_FFS __has_builtin(__builtin_ffs)
+#define _HAVE_BUILTIN_FFSL __has_builtin(__builtin_ffsl)
+#define _HAVE_BUILTIN_FFSLL __has_builtin(__builtin_ffsll)
+#define _HAVE_BUILTIN_FINITEL __has_builtin(__builtin_finitel)
+#define _HAVE_BUILTIN_ISFINITE __has_builtin(__builtin_isfinite)
+#define _HAVE_BUILTIN_ISINF __has_builtin(__builtin_isinf)
+#define _HAVE_BUILTIN_ISINFL __has_builtin(__builtin_isinfl)
+#define _HAVE_BUILTIN_ISNAN __has_builtin(__builtin_isnan)
+#define _HAVE_BUILTIN_ISNANL __has_builtin(__builtin_isnanl)
+#define _HAVE_BUILTIN_ISSIGNALINGL __has_builtin(__builtin_issignalingl)
+#define _HAVE_BUILTIN_MUL_OVERFLOW __has_builtin(__builtin_mul_overflow)
+#endif
+
 #ifdef _WANT_USE_GDTOA
 #ifndef _USE_GDTOA
 #define _USE_GDTOA

@@ -54,7 +54,7 @@
 #define _IEEE_  -1
 #define _POSIX_ 0
 
-#ifdef _HAVE_BUILTIN_EXPECT
+#if _HAVE_BUILTIN_EXPECT
 # define likely(x) __builtin_expect (!!(x), 1)
 # define unlikely(x) __builtin_expect (x, 0)
 #else

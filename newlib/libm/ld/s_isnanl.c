@@ -35,7 +35,7 @@
 
 #include "math_ld.h"
 
-#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_BUILTIN_ISNANL)
+#if defined(_NEED_FLOAT_HUGE) && !_HAVE_BUILTIN_ISNANL
 
 #include "common/s_isnanl.c"
 

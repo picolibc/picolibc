@@ -31,7 +31,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #define _DEFAULT_SOURCE
 #include "math_config.h"
 
-#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_ISNANL)
+#if defined(_NEED_FLOAT_HUGE) && _HAVE_BUILTIN_ISNANL
 int
 isnanl (long double x)
 {

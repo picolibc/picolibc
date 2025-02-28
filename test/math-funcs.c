@@ -102,13 +102,13 @@ main(void)
     i1 = finite (d1);
     i1 = finitef (f1);
 #ifdef _TEST_LONG_DOUBLE
-#if defined(_HAVE_BUILTIN_FINITEL) || defined(_HAVE_BUILTIN_ISFINITE)
+#if _HAVE_BUILTIN_FINITEL || _HAVE_BUILTIN_ISFINITE
     i1 = finitel (l1);
 #endif
-#ifdef _HAVE_BUILTIN_ISINFL
+#if _HAVE_BUILTIN_ISINFL
     i1 = isinfl (l1);
 #endif
-#ifdef _HAVE_BUILTIN_ISNANL
+#if _HAVE_BUILTIN_ISNANL
     i1 = isnanl (l1);
 #endif
 #endif
