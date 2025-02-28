@@ -201,7 +201,7 @@
 /* The Picolibc major version number. */
 #define _PICOLIBC__ @PROJECT_VERSION_MAJOR@
 
-#cmakedefine _REENT_GLOBAL_ATEXIT
+#cmakedefine _GLOBAL_ATEXIT
 
 #cmakedefine _RETARGETABLE_LOCKING
 

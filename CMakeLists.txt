@@ -252,8 +252,6 @@ if(NOT DEFINED _IO_FLOAT_EXACT)
   option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
 endif()
 
-set(_LITE_EXIT 1)
-
 set(_PICO_EXIT 1)
 
 if(NOT DEFINED _ASSERT_VERBOSE)
@@ -292,7 +290,7 @@ set(_NANO_FORMATTED_IO OFF)
 
 option(_NANO_MALLOC "Use smaller malloc implementation" ON)
 
-set(_REENT_GLOBAL_ATEXIT OFF)
+set(_GLOBAL_ATEXIT OFF)
 
 set(_UNBUF_STREAM_OPT OFF)
 

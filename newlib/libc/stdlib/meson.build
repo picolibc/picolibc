@@ -69,6 +69,7 @@ pico_exit_srcs_stdlib = [
   'pico-exit.c',
   'pico-onexit.c',
   'pico-cxa-atexit.c',
+  'pico-exitprocs.c',
 ]
 
 newlib_exit_srcs_stdlib = [

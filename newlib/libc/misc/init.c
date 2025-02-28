@@ -20,20 +20,31 @@
 void
 __libc_init_array (void)
 {
-  size_t count;
-  size_t i;
-
-  count = __preinit_array_end - __preinit_array_start;
-  for (i = 0; i < count; i++)
-    __preinit_array_start[i] ();
+    void (**fn)(void);
+    void (**fn_end)(void);
 
 #ifdef _HAVE_INIT_FINI
-  if (_init)
-    _init ();
-#endif
+    fn = __preinit_array_start;
+    fn_end = __preinit_array_end;
+    while (fn != fn_end)
+        (*fn++) ();
 
-  count = __init_array_end - __init_array_start;
-  for (i = 0; i < count; i++)
-    __init_array_start[i] ();
+    if (_init)
+        _init ();
+
+    fn = __init_array_start;
+    fn_end = __preinit_array_end;
+    while (fn != fn_end)
+        (*fn++) ();
+#else
+    /*
+     * The init array immediately follows the preinit array,
+     * so we can just run both in one loop
+     */
+    fn = __bothinit_array_start;
+    fn_end = __bothinit_array_end;
+    while (fn != fn_end)
+        (*fn++)();
+#endif
 }
 #endif

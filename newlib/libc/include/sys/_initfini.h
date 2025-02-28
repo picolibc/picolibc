@@ -35,17 +35,22 @@
 
 #ifndef __INITFINI_H_
 #define __INITFINI_H_
+#include <stdlib.h>
 
 /* These magic symbols are provided by the linker.  */
 extern void (*__preinit_array_start []) (void) __attribute__((weak));
 extern void (*__preinit_array_end []) (void) __attribute__((weak));
 extern void (*__init_array_start []) (void) __attribute__((weak));
 extern void (*__init_array_end []) (void) __attribute__((weak));
+extern void (*__bothinit_array_start []) (void) __attribute__((weak));
+extern void (*__bothinit_array_end []) (void) __attribute__((weak));
 extern void (*__fini_array_start []) (void) __attribute__((weak));
 extern void (*__fini_array_end []) (void) __attribute__((weak));
 
+#ifdef _HAVE_INIT_FINI
 extern void _init (void) __attribute__((weak));
 extern void _fini (void) __attribute__((weak));
+#endif
 
 void
 __libc_init_array (void);

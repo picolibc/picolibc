@@ -15,7 +15,7 @@ enum __atexit_types
   __et_cxa
 };
 
-#ifdef _REENT_GLOBAL_ATEXIT
+#ifdef _GLOBAL_ATEXIT
 #define NEWLIB_THREAD_LOCAL_ATEXIT
 #else
 #define  NEWLIB_THREAD_LOCAL_ATEXIT NEWLIB_THREAD_LOCAL

@@ -155,7 +155,7 @@ __call_exitprocs (int code, void *d)
       break;
 #else
       /* Move to the next block.  Free empty blocks except the last one,
-	 which is part of _GLOBAL_REENT.  */
+	 which is _atexit0.  */
       if (p->_ind == 0 && p->_next)
 	{
 	  /* Remove empty block from the list.  */

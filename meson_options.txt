@@ -83,9 +83,6 @@ option('sysroot-install-skip-checks', type: 'boolean', value: false,
 option('system-libc', type: 'boolean', value: false,
        description: 'Install as system C library')
 					      
-option('picoexit', type: 'boolean', value: true,
-       description: 'Smaller exit/atexit/onexit code')
-
 option('sanitize-bounds', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize=bounds')
 
@@ -234,24 +231,28 @@ option('newlib-mb', type: 'boolean', value: false,
 #
 # Startup/shutdown options
 #
-option('lite-exit', type: 'boolean', value: true,
-       description: 'enable light weight exit')
-option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
-       description: 'enable dynamic allocation of atexit entries')
-option('newlib-global-atexit', type: 'boolean', value: false,
-       description: 'enable atexit data structure as global')
-option('newlib-initfini', type: 'boolean', value: true,
-       description: 'Supports _init() and _fini()')
+option('picoexit', type: 'boolean', value: true,
+       description: 'Smaller exit/atexit/onexit code')
 option('newlib-initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
-option('newlib-register-fini', type: 'boolean', value: false,
-       description: 'enable finalization function registration using atexit')
+option('newlib-initfini', type: 'boolean', value: false,
+       description: 'Supports _init() and _fini()')
 option('fake-semihost', type: 'boolean', value: false,
        description: 'create fake semihost library to link tests')
 option('crt-runtime-size', type: 'boolean', value: false,
        description: 'compute crt memory space sizes at runtime')
 option('atomic-signal', type: 'boolean', value: true,
        description: 'use atomics in signal/raise to make them re-entrant')
+
+#
+# Non-picoexit startup/shutdown options
+#
+option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
+       description: 'enable dynamic allocation of atexit entries')
+option('newlib-global-atexit', type: 'boolean', value: false,
+       description: 'enable legacy atexit data structure as global')
+option('newlib-register-fini', type: 'boolean', value: false,
+       description: 'enable finalization function registration using atexit')
 
 #
 # Malloc option

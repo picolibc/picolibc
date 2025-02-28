@@ -56,11 +56,9 @@ Supporting OS subroutines required: <<_exit>>.
 void
 exit (int code)
 {
-#ifdef _LITE_EXIT
-  /* Refer to comments in __atexit.c for more details of lite exit.  */
+  /* Refer to comments in __atexit.c and pico-onexit.c for why this is weak */
   void __call_exitprocs (int, void *) __attribute__((weak));
   if (__call_exitprocs)
-#endif
     __call_exitprocs (code, NULL);
 
 #ifndef TINY_STDIO

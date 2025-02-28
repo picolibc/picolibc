@@ -16,20 +16,27 @@
 
 #ifdef _HAVE_INITFINI_ARRAY
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#endif
+
 /* Run all the cleanup routines.  */
 void
 __libc_fini_array (void)
 {
-  size_t count;
-  size_t i;
-  
-  count = __fini_array_end - __fini_array_start;
-  for (i = count; i > 0; i--)
-    __fini_array_start[i-1] ();
+    void (**fn)(void);
+    void (**fn_start)(void);
+
+    fn = __fini_array_end;
+    fn_start = __fini_array_start;
+    while (fn != fn_start)
+        (*--fn)();
 
 #ifdef _HAVE_INIT_FINI
-  if (_fini)
-    _fini ();
+    if (_fini)
+        _fini ();
 #endif
 }
 #endif
