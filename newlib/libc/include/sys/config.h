@@ -293,12 +293,6 @@ SUCH DAMAGE.
 #define _HAVE_BUILTIN_MUL_OVERFLOW __has_builtin(__builtin_mul_overflow)
 #endif
 
-#ifdef _WANT_USE_GDTOA
-#ifndef _USE_GDTOA
-#define _USE_GDTOA
-#endif
-#endif
-
 #ifndef _MB_CAPABLE
 /* Make sure all of these are disabled if multi-byte is disabled*/
 #undef _MB_EXTENDED_CHARSETS_ALL
