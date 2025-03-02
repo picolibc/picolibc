@@ -261,7 +261,7 @@ gdtoa
 		dval(d) *= 1 << j1;
 	word0(d) += j << Exp_shift - 2 & Exp_mask;
 #else
-	word0(d) += (be + bbits - 1) << Exp_shift;
+	word0(d) += (__ULong)(be + bbits - 1) << Exp_shift;
 #endif
 	if (k >= 0 && k <= Ten_pmax) {
 		if (dval(d) < tens[k])
