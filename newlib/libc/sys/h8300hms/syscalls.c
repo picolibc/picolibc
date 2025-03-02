@@ -3,15 +3,13 @@
 #include <_ansi.h>
 #include <errno.h>
 
-int _isatty(file)
-     int file;
+int _isatty(int file)
 {
   return 1;
 }
 
 int
-_unlink (path)
-     const char *path;
+_unlink (const char *path)
 {
   errno = EIO;
   return -1;
