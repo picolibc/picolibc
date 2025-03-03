@@ -916,8 +916,7 @@ fhandler_console::cleanup_for_non_cygwin_app (handle_set_t *p)
   /* Cleaning-up console mode for non-cygwin app. */
   /* conmode can be tty::restore when non-cygwin app is
      exec'ed from login shell. */
-  tty::cons_mode conmode =
-    (con.owner == GetCurrentProcessId ()) ? tty::restore : tty::cygwin;
+  tty::cons_mode conmode = cons_mode_on_close (p);
   set_output_mode (conmode, ti, p);
   set_input_mode (conmode, ti, p);
   set_disable_master_thread (con.owner == GetCurrentProcessId ());
@@ -1976,31 +1975,13 @@ fhandler_console::close (int flag)
 
   acquire_output_mutex (mutex_timeout);
 
-  if (shared_console_info[unit] && !myself->cygstarted
+  if (shared_console_info[unit] && myself->ppid == 1
       && (dev_t) myself->ctty == get_device ())
     {
-      /* Restore console mode if this is the last closure. */
-      OBJECT_BASIC_INFORMATION obi;
-      NTSTATUS status;
-      status = NtQueryObject (get_handle (), ObjectBasicInformation,
-			      &obi, sizeof obi, NULL);
-      /* If the process is not myself->cygstarted and is the console owner,
-	 the process is the last process on this console device. The console
-	 owner has two console handles, i.e. one is io_handle and the other
-	 is the dupplicated handle for cons_master_thread.
-	 If myself->cygstarted is false and the process is not console owner,
-	 the process is supposed to be started by the exec command in the
-	 owner shell. In this case, the owner process is still alive in the
-	 background and waiting for this process. So the handle count is
-	 three (two in the owner process, one is mine). */
-      if (NT_SUCCESS (status)
-	  && obi.HandleCount == (con.owner == GetCurrentProcessId () ? 2 : 3))
-	{
-	  /* Cleaning-up console mode for cygwin apps. */
-	  set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
-	  set_input_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
-	  set_disable_master_thread (true, this);
-	}
+      tty::cons_mode conmode = cons_mode_on_close (&handle_set);
+      set_output_mode (conmode, &get_ttyp ()->ti, &handle_set);
+      set_input_mode (conmode, &get_ttyp ()->ti, &handle_set);
+      set_disable_master_thread (true, this);
     }
 
   if (shared_console_info[unit] && con.owner == GetCurrentProcessId ())
@@ -4703,4 +4684,29 @@ fhandler_console::fstat (struct stat *st)
       st->st_gid = p->gid;
     }
   return 0;
+}
+
+tty::cons_mode
+fhandler_console::cons_mode_on_close (handle_set_t *p)
+{
+  const _minor_t unit = p->unit;
+
+  if (myself->ppid != 1) /* Execed from normal cygwin process. */
+    return tty::cygwin;
+
+  if (!process_alive (con.owner)) /* The Master process already died. */
+    return tty::restore;
+  if (con.owner == GetCurrentProcessId ()) /* Master process */
+    return tty::restore;
+
+  PROCESS_BASIC_INFORMATION pbi;
+  NTSTATUS status =
+    NtQueryInformationProcess (GetCurrentProcess (), ProcessBasicInformation,
+			       &pbi, sizeof (pbi), NULL);
+  if (NT_SUCCESS (status)
+      && con.owner == (DWORD) pbi.InheritedFromUniqueProcessId)
+    /* The parent is the stub process. */
+    return tty::restore;
+
+  return tty::native; /* Otherwise */
 }

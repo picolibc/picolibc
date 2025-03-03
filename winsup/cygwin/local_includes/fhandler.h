@@ -2366,6 +2366,7 @@ private:
 
   void setup_pcon_hand_over ();
   static void pcon_hand_over_proc ();
+  static tty::cons_mode cons_mode_on_close (handle_set_t *);
 
   friend tty_min * tty_list::get_cttyp ();
 };
