@@ -50,11 +50,11 @@
 #define RSBUFSZ	(16*BLOCKSZ)
 
 #if SIZE_MAX <= 65535
-#define REKEY_BASE	(  32*1024) /* NB. should be a power of 2 */
+#define REKEY_BASE	(  (size_t)32*1024) /* NB. should be a power of 2 */
 #elif SIZE_MAX <= 1048575
-#define REKEY_BASE	( 512*1024) /* NB. should be a power of 2 */
+#define REKEY_BASE	( (size_t)512*1024) /* NB. should be a power of 2 */
 #else
-#define REKEY_BASE	(1024*1024) /* NB. should be a power of 2 */
+#define REKEY_BASE	((size_t)1024*1024) /* NB. should be a power of 2 */
 #endif
 
 /* Marked MAP_INHERIT_ZERO, so zero'd out in fork children. */
