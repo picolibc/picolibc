@@ -70,6 +70,7 @@ PORTABILITY
 #ifdef _NEED_FLOAT64
 
 static const __float64 atanhi[] = {
+    _F_64(0.0),                        /* atan(0.0) */
     _F_64(4.63647609000806093515e-01), /* atan(0.5)hi 0x3FDDAC67, 0x0561BB4F */
     _F_64(7.85398163397448278999e-01), /* atan(1.0)hi 0x3FE921FB, 0x54442D18 */
     _F_64(9.82793723247329054082e-01), /* atan(1.5)hi 0x3FEF730B, 0xD281F69B */
@@ -77,6 +78,7 @@ static const __float64 atanhi[] = {
 };
 
 static const __float64 atanlo[] = {
+    _F_64(0.0),                        /* atan(0.0) */
     _F_64(2.26987774529616870924e-17), /* atan(0.5)lo 0x3C7A2B7F, 0x222F65E2 */
     _F_64(3.06161699786838301793e-17), /* atan(1.0)lo 0x3C81A626, 0x33145C07 */
     _F_64(1.39033110312309984516e-17), /* atan(1.5)lo 0x3C700788, 0x7AF0CBBD */
@@ -112,34 +114,33 @@ atan64(__float64 x)
         GET_LOW_WORD(low, x);
         if (ix > 0x7ff00000 || (ix == 0x7ff00000 && (low != 0)))
             return x + x; /* NaN */
-        if (hx > 0)
-            return atanhi[3] + atanlo[3];
-        else
-            return -atanhi[3] - atanlo[3];
-    }
-    if (ix < 0x3fdc0000) { /* |x| < 0.4375 */
-        if (ix < 0x3e200000) { /* |x| < 2^-29 */
-            if (huge + x > one)
-                return x; /* raise inexact */
-        }
-        id = -1;
+        x = 0.0;
+        id = 4;
     } else {
         x = fabs64(x);
-        if (ix < 0x3ff30000) { /* |x| < 1.1875 */
-            if (ix < 0x3fe60000) { /* 7/16 <=|x|<11/16 */
-                id = 0;
-                x = (_F_64(2.0) * x - one) / (_F_64(2.0) + x);
-            } else { /* 11/16<=|x|< 19/16 */
-                id = 1;
-                x = (x - one) / (x + one);
+        if (ix < 0x3fdc0000) { /* |x| < 0.4375 */
+            if (ix < 0x3e200000) { /* |x| < 2^-29 */
+                if (huge + x > one)
+                    return x; /* raise inexact */
             }
+            id = 0;
         } else {
-            if (ix < 0x40038000) { /* |x| < 2.4375 */
-                id = 2;
-                x = (x - _F_64(1.5)) / (one + 1.5 * x);
-            } else { /* 2.4375 <= |x| < 2^66 */
-                id = 3;
-                x = _F_64(-1.0) / x;
+            if (ix < 0x3ff30000) { /* |x| < 1.1875 */
+                if (ix < 0x3fe60000) { /* 7/16 <=|x|<11/16 */
+                    id = 1;
+                    x = (_F_64(2.0) * x - one) / (_F_64(2.0) + x);
+                } else { /* 11/16<=|x|< 19/16 */
+                    id = 2;
+                    x = (x - one) / (x + one);
+                }
+            } else {
+                if (ix < 0x40038000) { /* |x| < 2.4375 */
+                    id = 3;
+                    x = (x - _F_64(1.5)) / (one + 1.5 * x);
+                } else { /* 2.4375 <= |x| < 2^66 */
+                    id = 4;
+                    x = _F_64(-1.0) / x;
+                }
             }
         }
     }
@@ -151,12 +152,8 @@ atan64(__float64 x)
          (aT[0] +
           w * (aT[2] + w * (aT[4] + w * (aT[6] + w * (aT[8] + w * aT[10])))));
     s2 = w * (aT[1] + w * (aT[3] + w * (aT[5] + w * (aT[7] + w * aT[9]))));
-    if (id < 0)
-        return x - x * (s1 + s2);
-    else {
-        z = atanhi[id] - ((x * (s1 + s2) - atanlo[id]) - x);
-        return (hx < 0) ? -z : z;
-    }
+    z = atanhi[id] - ((x * (s1 + s2) - atanlo[id]) - x);
+    return (hx < 0) ? -z : z;
 }
 
 _MATH_ALIAS_d_d(atan)
