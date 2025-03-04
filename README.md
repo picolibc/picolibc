@@ -42,22 +42,27 @@ is used to validate the code for all patch integration:
  * ARC (32- and 64- bit)
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
+ * LatticeMico32
+ * LoongArch
  * Motorola 68000 (m68k)
  * MIPS
  * MSP430
  * Nios II
+ * OpenRisc
  * Power9
+ * Renesas RX
  * RISC-V (both 32- and 64- bit)
  * SparcV8 (32 bit)
+ * SuperH
  * x86_64 (Native and Linux hosted, for testing)
+ * Xtensa ESP32
 
 There is also build infrastructure and continuous build validation,
 but no integrated testing available for additional architectures:
 
  * Microblaze (32-bit, big and little endian)
- * PowerPC (big and little endian)
  * Sparc64
- * Xtensa (ESP8266, ESP32)
+ * Xtensa (ESP8266, LX106)
 
 Supporting architectures that already have Newlib code requires:
 
@@ -203,7 +208,7 @@ use Picolibc:
 
  * Add OpenRisc support, including testing. Thanks to Joel Holdsworth.
 
- * Add LatticMico32 support, including testing. Thanks to Jiaxun Yang.
+ * Add Lattic3Mico32 support, including testing. Thanks to Jiaxun Yang.
 
  * Add MIPS semihosting support. Thanks to Jiaxun Yang.
 
