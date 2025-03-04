@@ -182,6 +182,17 @@ SECTIONS
 		PROVIDE( @PREFIX@_gp = . + 0x8000);
 		*(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
 		*(.gnu.linkonce.s.*)
+		/*
+		 * Make sure there is space for PowerPC thread-local
+		 * stack-check value which lives before the thread
+		 * local storage block. We can't include this in
+		 * .tdata because the linker would then allocate TLS
+		 * offsets for it; in reality, it lives at a known
+		 * fixed offset outside of the usual TLS range
+		 */
+		PROVIDE( @PREFIX@__stack_chk_start = .);
+		KEEP (*(.stack_chk .stack_chk.*))
+		PROVIDE( @PREFIX@__stack_chk_end = .);
 	} >ram AT>flash :ram_init
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
 	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
@@ -203,12 +214,13 @@ SECTIONS
 		PROVIDE(@PREFIX@__data_end = .);
 		PROVIDE(@PREFIX@__tdata_end = .);
 	} >ram AT>flash :@TLS_INIT_SEG@ :ram_init
-	PROVIDE( @PREFIX@__tls_base = ADDR(.tdata));
-	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata));
-	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) );
+	PROVIDE( @PREFIX@__stack_chk_size = @PREFIX@__stack_chk_end - @PREFIX@__stack_chk_start );
+	PROVIDE( @PREFIX@__tls_base = ADDR(.tdata) - @PREFIX@__stack_chk_size );
+	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata) - @PREFIX@__stack_chk_size );
+	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
 	PROVIDE( @PREFIX@__data_source_end = @PREFIX@__tdata_source_end );
-	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) );
+	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) + @PREFIX@__stack_chk_size );
 
 	PROVIDE( @PREFIX@__edata = @PREFIX@__data_end );
 	PROVIDE( @PREFIX@_edata = @PREFIX@__data_end );
@@ -222,6 +234,7 @@ SECTIONS
 		PROVIDE( @PREFIX@__tls_end = . );
 		PROVIDE( @PREFIX@__tbss_end = . );
 	} >ram AT>ram :tls :ram
+	PROVIDE( @PREFIX@__tls_first = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
 	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss));
 	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss));
 	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - ADDR(.tdata) );

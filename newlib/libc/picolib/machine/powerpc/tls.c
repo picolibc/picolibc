@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,46 +32,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <picolibc.h>
 
-#define PPC_BIT(bit)            (0x8000000000000000ULL >> (bit))
-	.text
-	.section	.text.init.enter
-	.global _start
-	.type	_start, @function
-_start:
-	/* Get stack pointer */
-	lis	%r1,__stack@h
-	ori	%r1,%r1,__stack@l
+#include <picotls.h>
+#include <string.h>
+#include <stdint.h>
 
-#ifdef __PPC64__
-	/* Where are we? */
-	bl	here
-here:	mflr	%r2
+#define TP_OFFSET       0x7000
 
-	/* Figure out the initial TOC value */
-	ld	%r2,(toc-here)(%r2)
-#endif
-	
-	mfmsr	%r0
-	/* Enable FPU */
-	ori	%r0,%r0,PPC_BIT(50)
-	/* Enable VSX */
-	oris	%r0,%r0,PPC_BIT(40)>>16
-	/* Enable Altivec */
-	oris	%r0,%r0,PPC_BIT(38)>>16
-	mtmsr	%r0
+extern char __stack_chk_size[];
 
-	/*
-	 *   r8 is the OPAL base
-	 *   r9 is the OPAL entry point point
-	 */
-	mr	%r3, %r8
-	mr	%r4, %r9
-	bl	_cstart
-#ifdef __PPC64__
-	.align	3
-toc:	
-	.quad 	.TOC.@tocbase
-#endif
-	
+/* This code is duplicated in picocrt/machine/riscv/crt0.c */
+void
+_set_tls(void *tls)
+{
+    tls = (uint8_t *) tls + TP_OFFSET + (uintptr_t) __stack_chk_size;
+    __asm__("mr 13, %0" : : "r" (tls));
+}
