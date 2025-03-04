@@ -6,7 +6,7 @@ HERE=`dirname "$0"`
 "$HERE"/do-build mips "$@"
 "$HERE"/do-build mips64 "$@"
 "$HERE"/do-build mipsel "$@"
-"$HERE"/do-test-noopt or1k "$@"
+"$HERE"/do-test or1k "$@"
 "$HERE"/do-test-noopt native "$@"
 "$HERE"/do-test-noopt native-m32 "$@"
 "$HERE"/do-test aarch64 "$@"
