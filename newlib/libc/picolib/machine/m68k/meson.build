@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2024 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,4 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-src_picolib += files('interrupt.c')
+src_picolib += files(
+  'interrupt.c',
+  'read_tp.s',
+  'set_tls.c',
+  'tls.c'
+)
