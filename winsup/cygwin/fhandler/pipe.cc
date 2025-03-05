@@ -590,14 +590,23 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	  else
 	    status = NtWriteFile (get_handle (), evt, NULL, NULL, &io,
 				  (PVOID) ptr, len1, NULL, NULL);
+	  bool signalled = false;
+	  bool saw_select_sem = false;
 	  if (status == STATUS_PENDING)
 	    {
 	      do
 		{
 		  waitret = cygwait (evt, (DWORD) 0);
-		  /* Break out if no SA_RESTART. */
-		  if (waitret == WAIT_SIGNALED)
+		  if (signalled && !saw_select_sem
+		      && WAIT_OBJECT_0 == cygwait (pipe_mtx, (DWORD) 0))
 		    break;
+		  /* Break out if no SA_RESTART. But not now. After waiting
+		     for completion of NtWriteFile() for a while. */
+		  if (waitret == WAIT_SIGNALED)
+		    {
+		      signalled = true;
+		      saw_select_sem = false;
+		    }
 		  /* Break out on completion */
 		  if (waitret == WAIT_OBJECT_0)
 		    break;
@@ -608,17 +617,19 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 		      waitret = WAIT_SIGNALED;
 		      break;
 		    }
-		  cygwait (select_sem, 10, cw_cancel);
+		  if (WAIT_OBJECT_0 == cygwait (select_sem, 10, cw_cancel))
+		    saw_select_sem = true;
 		}
-	      while (waitret == WAIT_TIMEOUT);
+	      while (waitret == WAIT_TIMEOUT || waitret == WAIT_SIGNALED);
 	      /* If io.Status is STATUS_CANCELLED after CancelIo, IO has
 		 actually been cancelled and io.Information contains the
 		 number of bytes processed so far.
 		 Otherwise IO has been finished regulary and io.Status
 		 contains valid success or error information. */
 	      CancelIo (get_handle ());
-	      if (waitret == WAIT_SIGNALED && io.Status != STATUS_CANCELLED)
-		waitret = WAIT_OBJECT_0;
+	      ReleaseMutex (pipe_mtx);
+	      if (signalled)
+		waitret = WAIT_SIGNALED;
 
 	      if (waitret == WAIT_CANCELED)
 		status = STATUS_THREAD_CANCELED;
@@ -629,7 +640,7 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
 	      else
 		status = io.Status;
 	    }
-	  if (status != STATUS_THREAD_SIGNALED && !NT_SUCCESS (status))
+	  if (!NT_SUCCESS (status))
 	    break;
 	  if (io.Information > 0 || len <= PIPE_BUF || short_write_once)
 	    break;
@@ -684,7 +695,8 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
       else
 	__seterrno_from_nt_status (status);
 
-      if (nbytes_now == 0 || short_write_once)
+      if (nbytes_now == 0 || short_write_once
+	  || status == STATUS_THREAD_SIGNALED)
 	break;
     }
 
