@@ -215,7 +215,7 @@ int     setpgrp (void);
 #if defined(__CYGWIN__) && __BSD_VISIBLE
 /* Stub for Linux libbsd compatibility. */
 #define initsetproctitle(c, a, e) setproctitle_init((c), (a), (e))
-static inline void setproctitle_init (int, char *[], char *[]) {}
+static inline void setproctitle_init (int _c, char *_a[], char *_e[]) {}
 
 void setproctitle (const char *, ...)
 		   _ATTRIBUTE ((__format__ (__printf__, 1, 2)));
