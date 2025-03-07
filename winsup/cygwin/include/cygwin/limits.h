@@ -41,7 +41,7 @@ details. */
 
 #define __RTSIG_MAX 33
 #define __SEM_VALUE_MAX 1147483648
-#define __SIGQUEUE_MAX 32
+#define __SIGQUEUE_MAX 1024
 #define __STREAM_MAX 20
 #define __SYMLOOP_MAX 10
 #define __TIMER_MAX 32
