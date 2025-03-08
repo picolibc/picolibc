@@ -661,7 +661,8 @@ sched_setaffinity (pid_t pid, size_t sizeof_set, const cpu_set_t *set)
   if (p)
     {
       process = pid && pid != myself->pid ?
-		OpenProcess (PROCESS_SET_INFORMATION, FALSE,
+		OpenProcess (PROCESS_SET_INFORMATION |
+			     PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
 			     p->dwProcessId) : GetCurrentProcess ();
       if (!GetProcessGroupAffinity (process, &groupcount, grouparray))
 	{
