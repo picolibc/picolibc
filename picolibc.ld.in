@@ -67,6 +67,7 @@ SECTIONS
 		/* code */
 		*(.literal.unlikely .text.unlikely .literal.unlikely.* .text.unlikely.*)
 		*(.literal.startup .text.startup .literal.startup.* .text.startup.*)
+		*(SORT(.text.sorted.*))
 		*(.literal .text .literal.* .text.* .opd .opd.* .branch_lt .branch_lt.* @EXTRA_TEXT_SECTIONS@)
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
