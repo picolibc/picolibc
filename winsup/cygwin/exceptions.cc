@@ -1850,14 +1850,6 @@ _cygtls::call_signal_handler ()
 					? context.uc_sigmask : this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
-      if (this_sa_flags & SA_SIGINFO)
-	{
-	  /* If more than just the sigmask in the context has been changed by
-	     the signal handler, call setcontext. */
-	  context_copy.uc_sigmask = context.uc_sigmask;
-	  if (memcmp (&context, &context_copy, sizeof context) != 0)
-	    setcontext (&context);
-	}
     }
 
   /* FIXME: Since 2011 this return statement always returned 1 (meaning
