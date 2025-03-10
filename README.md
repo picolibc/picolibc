@@ -151,6 +151,17 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc release 1.8.next
+
+ * Add missing POSIX constants to limits.h.
+
+ * Add Renesas RX support. Thanks to Duy Dguyen.
+
+ * Update to Unicode 16.0. This matches glibc 2.41.
+
+ * Add TLS support and testing on loongarch, m68k, or1k, powerpc and
+   superh.
+
 ### Picolibc release 1.8.9
 
  * Use common clang/gcc feature detection macros on arm.

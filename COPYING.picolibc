@@ -475,8 +475,10 @@ Files: CMakeLists.txt
  newlib/libc/picolib/machine/arm/CMakeLists.txt
  newlib/libc/picolib/machine/mips/tls.c
  newlib/libc/picolib/machine/msp430/CMakeLists.txt
+ newlib/libc/picolib/machine/or1k/CMakeLists.txt
  newlib/libc/picolib/machine/riscv/CMakeLists.txt
  newlib/libc/picolib/machine/rx/CMakeLists.txt
+ newlib/libc/picolib/machine/sh/CMakeLists.txt
  newlib/libc/picolib/machine/sparc/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/tls.c
@@ -785,6 +787,19 @@ Files: cmake/TC-rx.ld
  newlib/libc/locale/setlocale.c
  newlib/libc/locale/timedata.c
  newlib/libc/locale/uselocale.c
+ newlib/libc/picolib/machine/loongarch/CMakeLists.txt
+ newlib/libc/picolib/machine/loongarch/tls.c
+ newlib/libc/picolib/machine/m68k/meson.build
+ newlib/libc/picolib/machine/m68k/read_tp.s
+ newlib/libc/picolib/machine/m68k/set_tls.c
+ newlib/libc/picolib/machine/m68k/tls-local.h
+ newlib/libc/picolib/machine/m68k/tls.c
+ newlib/libc/picolib/machine/or1k/meson.build
+ newlib/libc/picolib/machine/or1k/tls.c
+ newlib/libc/picolib/machine/powerpc/CMakeLists.txt
+ newlib/libc/picolib/machine/powerpc/meson.build
+ newlib/libc/picolib/machine/powerpc/tls.c
+ newlib/libc/picolib/machine/sh/tls.c
  newlib/libc/stdlib/mk-sb-charsets.py
  newlib/libc/stdlib/sb_charsets.h
  picocrt/machine/lm32/crt0.S
@@ -796,6 +811,7 @@ Files: cmake/TC-rx.ld
  semihost/machine/rx/rx_semihost.h
  test/test-scmpu.c
  test/test-wcase.c
+ test/test-wctomb.c
 Copyright: 2025 Keith Packard
 License: BSD3-1
 
@@ -1112,9 +1128,11 @@ Files: newlib/empty.c
  newlib/libc/picolib/machine/arc/meson.build
  newlib/libc/picolib/machine/arc64/meson.build
  newlib/libc/picolib/machine/arm/meson.build
+ newlib/libc/picolib/machine/loongarch/meson.build
  newlib/libc/picolib/machine/mips/meson.build
  newlib/libc/picolib/machine/msp430/meson.build
  newlib/libc/picolib/machine/riscv/meson.build
+ newlib/libc/picolib/machine/sh/meson.build
  newlib/libc/picolib/machine/sparc/meson.build
  newlib/libc/picolib/machine/xtensa/meson.build
  newlib/libc/stdlib/pico-atexit.c
@@ -1234,7 +1252,6 @@ Files: newlib/libc/ctype/ctype_extended.h
  newlib/libc/machine/sh/machine/meson.build
  newlib/libc/picolib/machine/arc/vector_table.c
  newlib/libc/picolib/machine/m68k/interrupt.c
- newlib/libc/picolib/machine/m68k/meson.build
  newlib/libc/posix/fpathconf.c
  newlib/libc/posix/pathconf.c
  newlib/libc/stdio/flockfile.c
@@ -1372,7 +1389,8 @@ Copyright: 2020 Keith Packard
  2024 Stephen Street
 License: BSD3-1
 
-Files: newlib/libc/picolib/machine/arm/tls.c
+Files: newlib/libc/picolib/machine/arm/set_tls.c
+ newlib/libc/picolib/machine/arm/tls.c
 Copyright: 2019 Keith Packard
  2024 Stephen Street
 License: BSD3-1
@@ -2994,6 +3012,7 @@ Files: .clang-format
  scripts/cross-msp430.txt
  scripts/cross-nios2-zephyr-elf.txt
  scripts/cross-or1k-elf.txt
+ scripts/cross-or1k-unknown-elf.txt
  scripts/cross-power9-fp128.txt
  scripts/cross-power9.txt
  scripts/cross-powerpc64-linux-gnu.txt
