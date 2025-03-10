@@ -1719,7 +1719,6 @@ _cygtls::call_signal_handler ()
 	      /* Software-generated signal.  We're fetching the current
 		 context, unwind to the caller and in case we're called
 		 from sigdelayed, fix the instruction pointer accordingly. */
-	      context.uc_mcontext.ctxflags = CONTEXT_FULL;
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 	      RtlCaptureContext ((PCONTEXT) &context.uc_mcontext);
@@ -1911,7 +1910,6 @@ extern "C" int
 getcontext (ucontext_t *ucp)
 {
   PCONTEXT ctx = (PCONTEXT) &ucp->uc_mcontext;
-  ctx->ContextFlags = CONTEXT_FULL;
   RtlCaptureContext (ctx);
   __unwind_single_frame (ctx);
   /* Successful getcontext is supposed to return 0.  If we don't set the
