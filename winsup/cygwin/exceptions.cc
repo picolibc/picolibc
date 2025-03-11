@@ -1436,12 +1436,6 @@ _cygtls::handle_SIGCONT ()
 
   myself->stopsig = 0;
   InterlockedAnd ((LONG *) &myself->process_state, ~PID_STOPPED);
-
-  /* Clear pending stop signals */
-  sig_clear (SIGSTOP, false);
-  sig_clear (SIGTSTP, false);
-  sig_clear (SIGTTIN, false);
-  sig_clear (SIGTTOU, false);
 }
 
 int
@@ -1547,15 +1541,7 @@ sigpacket::process ()
   if (si.si_signo == SIGKILL)
     goto exit_sig;
   if (si.si_signo == SIGSTOP)
-    {
-      sig_clear (SIGCONT, false);
-      goto stop;
-    }
-
-  /* Clear pending SIGCONT on stop signals */
-  if (si.si_signo == SIGTSTP || si.si_signo == SIGTTIN
-      || si.si_signo == SIGTTOU)
-    sig_clear (SIGCONT, false);
+    goto stop;
 
   if (handler == (void *) SIG_DFL)
     {
