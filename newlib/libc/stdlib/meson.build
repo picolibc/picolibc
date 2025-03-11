@@ -163,6 +163,7 @@ srcs_stdlib = [
     'wctomb.c',
     'wctomb_r.c',
     'set_constraint_handler_s.c',
+    'ignore_handler_s.c',
 ]
 
 srcs_stdlib_stdio = [
