@@ -78,7 +78,11 @@ typedef __uint32_t __fsfilcnt_t;
 #endif
 
 #ifndef __machine_off_t_defined
+#if __SIZEOF_SIZE_T__ == 8 && __SIZEOF_LONG__ < 8
+typedef __uint64_t _off_t;
+#else
 typedef long _off_t;
+#endif
 #endif
 
 #if defined(__XMK__)
