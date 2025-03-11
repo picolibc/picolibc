@@ -1482,7 +1482,10 @@ sigpacket::process ()
     }
   else if (ISSTATE (myself, PID_STOPPED))
     {
-      rc = -1;		/* Don't send signals when stopped */
+      if (si.si_signo == SIGSTOP)
+	rc = 1;		/* Ignore (discard) SIGSTOP */
+      else
+	rc = -1;	/* Don't send signals when stopped */
       goto done;
     }
   else if (!sigtls)
