@@ -30,11 +30,11 @@ They can be used from one of the provided Unix shells like bash, tcsh or zsh.
 <question><para>What versions of Windows are supported?</para></question>
 <answer>
 
-<para>Cygwin can be expected to run on all modern, released versions of Windows.
-This includes Windows 7, Windows Server 2008 R2 and all later versions of
-Windows, except Windows S mode due to its limitations, on 64 bit AMD/Intel
-compatible PCs, and under x64 emulation on ARM PCs running Windows 11.</para>
-
+<para>Cygwin can be expected to run on all modern, released 64 bit versions of
+Windows.  This includes Windows 8.1, Windows Server 2012 R2 and all later
+versions of Windows on AMD/Intel compatible PCs, as well as under x64 emulation
+on ARM PCs running Windows 11. Windows S mode is not supported due to its
+limitations, </para>
 <para>Keep in mind that Cygwin can only do as much as the underlying OS
 supports.  Because of this, Cygwin will behave differently, and
 exhibit different limitations, on the various versions of Windows.
