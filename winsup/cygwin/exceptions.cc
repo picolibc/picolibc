@@ -1694,7 +1694,7 @@ _cygtls::call_signal_handler ()
       siginfo_t thissi = infodata;
       void (*thisfunc) (int, siginfo_t *, void *) = func;
 
-      ucontext_t *thiscontext = NULL, context_copy;
+      ucontext_t *thiscontext = NULL;
 
       /* Only make a context for SA_SIGINFO handlers */
       if (this_sa_flags & SA_SIGINFO)
@@ -1752,7 +1752,6 @@ _cygtls::call_signal_handler ()
 				     ? (uintptr_t) thissi.si_addr : 0;
 
 	  thiscontext = &context1;
-	  context_copy = context1;
 	}
 
       int this_errno = saved_errno;
