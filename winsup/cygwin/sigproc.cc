@@ -96,6 +96,10 @@ static NO_COPY HANDLE my_readsig;
 /* Used in select if a signalfd is part of the read descriptor set */
 HANDLE NO_COPY my_pendingsigs_evt;
 
+/* Used by sig_send() with __SIGFLUSHFAST */
+static NO_COPY HANDLE sigflush_evt;
+static NO_COPY HANDLE sigflush_done_evt;
+
 /* Function declarations */
 static int checkstate (waitq *);
 static __inline__ bool get_proc_lock (DWORD, DWORD);
@@ -123,6 +127,7 @@ public:
   void clear (_cygtls *tls);
   friend void sig_dispatch_pending (bool);
   friend void wait_sig (VOID *arg);
+  friend sigset_t sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls);
 };
 
 static NO_COPY pending_signals sigq;
@@ -531,6 +536,8 @@ sigproc_init ()
   ProtectHandle (my_readsig);
   myself->sendsig = my_sendsig;
   my_pendingsigs_evt = CreateEvent (NULL, TRUE, FALSE, NULL);
+  sigflush_evt = CreateEvent (NULL, FALSE, FALSE, NULL);
+  sigflush_done_evt = CreateEvent (NULL, FALSE, FALSE, NULL);
   if (!my_pendingsigs_evt)
     api_fatal ("couldn't create pending signal event, %E");
 
@@ -599,6 +606,7 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   int rc = 1;
   bool its_me;
   HANDLE sendsig;
+  HANDLE mtx;
   sigpacket pack;
   bool communing = si.si_signo == __SIGCOMMUNE;
 
@@ -757,6 +765,38 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
   unsigned cw_mask;
   cw_mask = pack.si.si_signo == __SIGFLUSHFAST ? 0 : cw_sig_restart;
 
+  char mtx_name[MAX_PATH];
+  shared_name (mtx_name, "sig_send", p->pid);
+  mtx = CreateMutex (&sec_none_nih, FALSE, mtx_name);
+  cygwait (mtx, INFINITE, cw_mask);
+
+  if (its_me && (si.si_signo == __SIGFLUSHFAST || si.si_signo == __SIGFLUSH))
+    {
+      /* Currently, __SIGFLUSH is automatically processed in wait_sig() by
+	 itself if pending signals exist. Therefore, sending __SIGFLUSH* is
+	 not absolutely necessary. So, if there is not enough space in the
+	 queue or the pipe, do not send __SIGFLUSHFAST to avoid deadlock.
+	 Do the same for __SIGFLUSH. */
+      IO_STATUS_BLOCK io;
+      FILE_PIPE_LOCAL_INFORMATION fpli;
+      fpli.WriteQuotaAvailable = 0;
+      NtQueryInformationFile (my_sendsig, &io, &fpli, sizeof (fpli),
+			      FilePipeLocalInformation);
+      int pkts_in_pipe =
+	PIPE_DEPTH - fpli.WriteQuotaAvailable / sizeof (sigpacket);
+      if (sigq.queue_left < pkts_in_pipe + 2
+	  || fpli.WriteQuotaAvailable < sizeof (sigpacket))
+	{
+	  ReleaseMutex (mtx);
+	  CloseHandle (mtx);
+	  ResetEvent (sigflush_done_evt);
+	  SetEvent (sigflush_evt);
+	  cygwait (sigflush_done_evt, INFINITE, cw_mask);
+	  rc = 0;
+	  goto out;
+	}
+    }
+
   DWORD nb;
   BOOL res;
   /* Try multiple times to send if packsize != nb since that probably
@@ -766,9 +806,13 @@ sig_send (_pinfo *p, siginfo_t& si, _cygtls *tls)
       res = WriteFile (sendsig, leader, packsize, &nb, NULL);
       if (!res || packsize == nb)
 	break;
+      ReleaseMutex (mtx);
       cygwait (NULL, 10, cw_mask);
+      cygwait (mtx, INFINITE, cw_mask);
       res = 0;
     }
+  ReleaseMutex (mtx);
+  CloseHandle (mtx);
 
   if (!res)
     {
@@ -1433,7 +1477,9 @@ wait_sig (VOID *)
       else if (sigq.start.next
 	       && PeekNamedPipe (my_readsig, NULL, 0, NULL, &nb, NULL) && !nb)
 	{
-	  Sleep ((sig_held || GetTickCount () - t0 > 10) ? 1 : 0);
+	  yield ();
+	  if (sig_held || GetTickCount () - t0 > 10)
+	    WaitForSingleObject (sigflush_evt, 1);
 	  pack.si.si_signo = __SIGFLUSH;
 	}
       else if (!ReadFile (my_readsig, &pack, sizeof (pack), &nb, NULL))
@@ -1608,6 +1654,7 @@ wait_sig (VOID *)
       if (clearwait && !have_execed)
 	proc_subproc (PROC_CLEARWAIT, 0);
 skip_process_signal:
+      SetEvent (sigflush_done_evt);
       if (pack.wakeup)
 	{
 	  sigproc_printf ("signalling pack.wakeup %p", pack.wakeup);
