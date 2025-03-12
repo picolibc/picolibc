@@ -1660,6 +1660,8 @@ altstack_wrapper (int sig, siginfo_t *siginfo, ucontext_t *sigctx,
 int
 _cygtls::call_signal_handler ()
 {
+  ucontext_t context1 = context;
+
   int this_sa_flags = SA_RESTART;
   while (1)
     {
@@ -1697,10 +1699,10 @@ _cygtls::call_signal_handler ()
       /* Only make a context for SA_SIGINFO handlers */
       if (this_sa_flags & SA_SIGINFO)
 	{
-	  context.uc_link = 0;
-	  context.uc_flags = 0;
+	  context1.uc_link = 0;
+	  context1.uc_flags = 0;
 	  if (thissi.si_cyg)
-	    memcpy (&context.uc_mcontext,
+	    memcpy (&context1.uc_mcontext,
 		    ((cygwin_exception *) thissi.si_cyg)->context (),
 		    sizeof (CONTEXT));
 	  else
@@ -1710,13 +1712,13 @@ _cygtls::call_signal_handler ()
 		 from sigdelayed, fix the instruction pointer accordingly. */
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
-	      RtlCaptureContext ((PCONTEXT) &context.uc_mcontext);
+	      RtlCaptureContext ((PCONTEXT) &context1.uc_mcontext);
 #pragma GCC diagnostic pop
-	      __unwind_single_frame ((PCONTEXT) &context.uc_mcontext);
+	      __unwind_single_frame ((PCONTEXT) &context1.uc_mcontext);
 	      if (stackptr > stack)
 		{
 #ifdef __x86_64__
-		  context.uc_mcontext.rip = retaddr ();
+		  context1.uc_mcontext.rip = retaddr ();
 #else
 #error unimplemented for this target
 #endif
@@ -1727,30 +1729,30 @@ _cygtls::call_signal_handler ()
 	      && !_my_tls.altstack.ss_flags
 	      && _my_tls.altstack.ss_sp)
 	    {
-	      context.uc_stack = _my_tls.altstack;
-	      context.uc_stack.ss_flags = SS_ONSTACK;
+	      context1.uc_stack = _my_tls.altstack;
+	      context1.uc_stack.ss_flags = SS_ONSTACK;
 	    }
 	  else
 	    {
-	      context.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
-	      context.uc_stack.ss_flags = 0;
+	      context1.uc_stack.ss_sp = NtCurrentTeb ()->Tib.StackBase;
+	      context1.uc_stack.ss_flags = 0;
 	      if (!NtCurrentTeb ()->DeallocationStack)
-		context.uc_stack.ss_size
+		context1.uc_stack.ss_size
 		  = (uintptr_t) NtCurrentTeb ()->Tib.StackLimit
 		    - (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
 	      else
-		context.uc_stack.ss_size
+		context1.uc_stack.ss_size
 		  = (uintptr_t) NtCurrentTeb ()->DeallocationStack
 		    - (uintptr_t) NtCurrentTeb ()->Tib.StackBase;
 	    }
-	  context.uc_sigmask = context.uc_mcontext.oldmask = this_oldmask;
+	  context1.uc_sigmask = context1.uc_mcontext.oldmask = this_oldmask;
 
-	  context.uc_mcontext.cr2 = (thissi.si_signo == SIGSEGV
-				     || thissi.si_signo == SIGBUS)
-				    ? (uintptr_t) thissi.si_addr : 0;
+	  context1.uc_mcontext.cr2 = (thissi.si_signo == SIGSEGV
+				      || thissi.si_signo == SIGBUS)
+				     ? (uintptr_t) thissi.si_addr : 0;
 
-	  thiscontext = &context;
-	  context_copy = context;
+	  thiscontext = &context1;
+	  context_copy = context1;
 	}
 
       int this_errno = saved_errno;
@@ -1863,10 +1865,11 @@ _cygtls::call_signal_handler ()
       incyg = true;
 
       set_signal_mask (_my_tls.sigmask, (this_sa_flags & SA_SIGINFO)
-					? context.uc_sigmask : this_oldmask);
+					? context1.uc_sigmask : this_oldmask);
       if (this_errno >= 0)
 	set_errno (this_errno);
     }
+  context = context1;
 
   /* FIXME: Since 2011 this return statement always returned 1 (meaning
      SA_RESTART is effective) if the thread we're running in is not the
