@@ -627,6 +627,7 @@ _VFPRINTF_R (struct _reent *data,
 		GET_ARG (N, ap_copy, _LONG_DOUBLE);
 	      else
 		GET_ARG (N, ap_copy, double);
+	      n = 0;
 	    }
 	  else
             n = _printf_float (data, &prt_data, fp, pfunc, &ap_copy);
