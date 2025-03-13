@@ -21,9 +21,9 @@ const char *getprogname (void);
 void	setprogname (const char *);
 
 #if __BSD_VISIBLE
-/* Cygwin exports arc4random_stir() for backward compatibility.  Define
-   here as empty macro to avoid compiler warnings. */
-#define arc4random_stir()
+/* Cygwin exports arc4random_stir() for backward compatibility.
+   Keep the declaration compatible with libbsd. */
+void arc4random_stir(void);
 #endif
 #if __GNU_VISIBLE
 char *canonicalize_file_name (const char *);
