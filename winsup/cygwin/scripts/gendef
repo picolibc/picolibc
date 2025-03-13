@@ -161,7 +161,7 @@ _sigbe:						# return here after cygwin syscall
 	jz	2f				#  if so
 	pause
 	jmp	1b				#  and loop
-2:	movq	\$-8,%r11			# decrement signal stack
+2:	movq	\$-8,%r11			# now decrement aux stack
 	xaddq	%r11,_cygtls.stackptr(%r10)	#  and get pointer
 	movq	-8(%r11),%r11			# get return address from signal stack
 	decl	_cygtls.incyg(%r10)
@@ -250,16 +250,6 @@ sigdelayed:
 
 	movq	%gs:8,%r12			# get tls
 	movl	_cygtls.saved_errno(%r12),%r15d	# temporarily save saved_errno
-
-	# We have to fetch the original return address from the signal stack
-	# prior to calling the signal handler.  This avoids filling up the
-	# signal stack if the signal handler longjumps (longjmp/setcontext).
-	# Store the return address in a callee-saved register (r13).
-	movq	\$-8,%r11			# decrement signal stack
-	xaddq	%r11,_cygtls.stackptr(%r12)	#  and get pointer
-	xorq	%r13,%r13
-	xchgq	%r13,-8(%r11)			# get return address from signal stack
-
 	movq	\$_cygtls.start_offset,%rcx	# point to beginning of tls block
 	addq	%r12,%rcx			#  and store as first arg to method
 	call	_ZN7_cygtls19call_signal_handlerEv	# call handler
@@ -270,13 +260,15 @@ sigdelayed:
 	jz	2f				#  if so
 	pause
 	jmp	1b				#  and loop
-
 2:	testl	%r15d,%r15d			# was saved_errno < 0
 	jl	3f				# yup.  ignore it
 	movq	_cygtls.errno_addr(%r12),%r11
 	movl	%r15d,(%r11)
-
-3:	xorl	%r11d,%r11d
+3:	movq	\$-8,%r11			# now decrement aux stack
+	xaddq	%r11,_cygtls.stackptr(%r12)	#  and get pointer
+	xorq	%r10,%r10
+	xchgq	%r10,-8(%r11)			# get return address from signal stack
+	xorl	%r11d,%r11d
 	movl	%r11d,_cygtls.incyg(%r12)
 	movl	%r11d,_cygtls.stacklock(%r12)	# release lock
 
@@ -292,10 +284,6 @@ sigdelayed:
 2:
 	movl	0x24(%rsp),%ebx
 	addq	%rbx,%rsp
-
-	# Before restoring callee-saved registers, move return address from
-	# callee-saved r13 to caller-saved r10.
-	movq	%r13, %r10
 
 	popq	%rax
 	popq	%rbx
@@ -319,17 +307,6 @@ sigdelayed:
 	.seh_endproc
 _sigdelayed_end:
 	.global _sigdelayed_end
-
-# _cygtls::pop
-	.global _ZN7_cygtls3popEv
-	.seh_proc _ZN7_cygtls3popEv
-_ZN7_cygtls3popEv:
-	.seh_endprologue
-	movq	\$-8,%r11
-	xaddq	%r11,_cygtls.stackptr_p(%rcx)
-	movq	-8(%r11),%rax
-	ret
-	.seh_endproc
 
 	.seh_proc stabilize_sig_stack
 stabilize_sig_stack:

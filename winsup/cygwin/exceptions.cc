@@ -1768,6 +1768,12 @@ _cygtls::call_signal_handler ()
       reset_signal_arrived ();
       incyg = false;
       current_sig = 0;	/* Flag that we can accept another signal */
+
+      /* We have to fetch the original return address from the signal stack
+        prior to calling the signal handler.  This avoids filling up the
+        signal stack if the signal handler longjumps (longjmp/setcontext). */
+      __tlsstack_t orig_retaddr = pop ();
+      __tlsstack_t *orig_stackptr = stackptr;
       unlock ();	/* unlock signal stack */
 
       /* Alternate signal stack requested for this signal and alternate signal
@@ -1843,6 +1849,27 @@ _cygtls::call_signal_handler ()
 	/* No alternate signal stack requested or available, just call
 	   signal handler. */
 	thisfunc (thissig, &thissi, thiscontext);
+
+      lock ();
+      switch (stackptr - orig_stackptr)
+	{
+	case 2:	/* sigdelayed + added retaddr, pop sigdelayed */
+	  pop ();
+	  fallthrough;
+	case 1:	/* added retaddr */
+	  {
+	    __tlsstack_t added_retaddr = pop();
+	    push (orig_retaddr);
+	    push (added_retaddr);
+	  }
+	  break;
+	case 0:
+	  push (orig_retaddr);
+	  break;
+	default:
+	  api_fatal ("Signal stack corrupted (%D)?", stackptr - orig_stackptr);
+	}
+      unlock ();
 
       incyg = true;
 

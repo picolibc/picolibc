@@ -26,7 +26,9 @@ details. */
 # define UNLEN 256
 #endif
 
-#define TLS_STACK_SIZE 256
+/* Room for two full frames including an extra sigdelayed, plus an
+   empty slot so stackptr never grows beyond the stack. */
+#define TLS_STACK_SIZE 5
 
 #include "cygthread.h"
 
@@ -206,8 +208,19 @@ public: /* Do NOT remove this public: line, it's a marker for gentls_offsets. */
   void init_thread (void *, DWORD (*) (void *, void *));
   static void call (DWORD (*) (void *, void *), void *);
   void remove (DWORD);
-  void push (__tlsstack_t addr) {*stackptr++ = (__tlsstack_t) addr;}
-  __tlsstack_t pop ();
+  void push (__tlsstack_t addr)
+  {
+    /* Make sure stackptr never points beyond stack (to initialized). */
+    if (stackptr < (__tlsstack_t *) stack + TLS_STACK_SIZE - 1)
+      *stackptr++ = (__tlsstack_t) addr;
+  }
+  __tlsstack_t pop ()
+  {
+    /* Make sure stackptr never points below stack (to itself). */
+    if (stackptr > stack)
+      --stackptr;
+    return *stackptr;
+  }
   __tlsstack_t retaddr () {return stackptr[-1];}
   bool isinitialized () const
   {
