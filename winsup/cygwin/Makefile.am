@@ -459,6 +459,8 @@ VERSION_OFILES = version.o winver.o
 #
 
 NEW_FUNCTIONS=$(addprefix --replace=,\
+	arc4random_addrandom= \
+	arc4random_stir= \
 	atexit= \
 	timezone= \
 	uname=uname_x \
