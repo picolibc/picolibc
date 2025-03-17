@@ -56,6 +56,7 @@ srcs_tinystdio = [
   'fcvtl_r.c',
   'fcvt_r.c',
   'fdevopen.c',
+  'fdopen.c',
   'feof.c',
   'ferror.c',
   'fflush.c',
@@ -71,12 +72,14 @@ srcs_tinystdio = [
   'filewstrget.c',
   'flockfile.c',
   'fmemopen.c',
+  'fopen.c',
   'fprintf.c',
   'fputc.c',
   'fputs.c',
   'fputwc.c',
   'fputws.c',
   'fread.c',
+  'freopen.c',
   'fscanf.c',
   'fseek.c',
   'fseeko.c',
@@ -204,17 +207,6 @@ if io_float_exact
   srcs_tinystdio += srcs_dtoa_ryu
 else
   srcs_tinystdio += srcs_dtoa_float
-endif
-
-# code using POSIX APIs
-srcs_tinystdio_posix = [
-  'fdopen.c',
-  'fopen.c',
-  'freopen.c',
-]
-
-if posix_io
-  srcs_tinystdio += srcs_tinystdio_posix
 endif
 
 # stdin/stdout/stderr using POSIX APIs

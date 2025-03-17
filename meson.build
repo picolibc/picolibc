@@ -303,7 +303,6 @@ stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
 
 # tinystdio options
 posix_console = tinystdio and get_option('posix-console')
-posix_io = tinystdio and (get_option('posix-io') or posix_console)
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 atomic_signal = get_option('atomic-signal')
@@ -1436,7 +1435,6 @@ conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread loc
 conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('_HAVE_PICOLIBC_TLS_RP2040', get_option('tls-rp2040'),
               description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
-conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
 conf_data.set('_PRINTF_SMALL_ULTOA', printf_small_ultoa, description: 'avoid software division in decimal conversion')
 conf_data.set('_PRINTF_PERCENT_N', printf_percent_n, description: 'support %n in printf format strings')
 conf_data.set('_ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')

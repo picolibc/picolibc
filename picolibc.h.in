@@ -29,9 +29,6 @@
 /* use thread local storage */
 #cmakedefine PICOLIBC_TLS
 
-/* Use open/close/read/write in tinystdio */
-#cmakedefine POSIX_IO
-
 /* Use posix apis for console too */
 #cmakedefine POSIX_CONSOLE
 

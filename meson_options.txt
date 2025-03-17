@@ -163,8 +163,6 @@ option('io-float-exact', type: 'boolean', value: true,
        description: 'use float/string code which supports round-tripping')
 option('atomic-ungetc', type: 'boolean', value: true,
        description: 'use atomics in fgetc/ungetc to make them re-entrant')
-option('posix-io', type: 'boolean', value: true,
-       description: 'Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)')
 option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
 option('format-default', type: 'combo', choices: ['double', 'float', 'long-long', 'integer', 'minimal'], value: 'double',

@@ -47,7 +47,7 @@ freopen(const char *pathname, const char *mode, FILE *stream)
         if (!(stream->flags & __SBUF))
             return NULL;
 
-	stdio_flags = __posix_sflags(mode, &open_flags);
+	stdio_flags = __stdio_flags(mode, &open_flags);
 	if (stdio_flags == 0)
 		return NULL;
 

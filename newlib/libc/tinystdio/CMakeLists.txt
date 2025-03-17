@@ -55,6 +55,7 @@ picolibc_sources(
   fcvtl_r.c
   fcvt_r.c
   fdevopen.c
+  fdopen.c
   feof.c
   ferror.c
   fflush.c
@@ -69,12 +70,14 @@ picolibc_sources(
   filewstrget.c
   flockfile.c
   fmemopen.c
+  fopen.c
   fprintf.c
   fputc.c
   fputs.c
   fputwc.c
   fputws.c
   fread.c
+  freopen.c
   fscanf.c
   fseek.c
   fseeko.c
@@ -173,12 +176,6 @@ picolibc_sources(
   sprintf_s.c
   vfprintf_s.c
   vsnprintf_s.c
-  )
-
-picolibc_sources(
-  fdopen.c
-  fopen.c
-  freopen.c
   )
 
 if(_IO_FLOAT_EXACT)

@@ -212,29 +212,13 @@ static inline int bufio_close(struct __file_bufio *bf)
     return ret;
 }
 
-#ifdef POSIX_IO
-
 #define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)        \
         FDEV_SETUP_BUFIO(fd, buf, size,                         \
                          read, write,                           \
                          lseek, close, rwflags, bflags)
 
 int
-__posix_sflags (const char *mode, int *optr);
-
-static inline int
-__stdio_sflags (const char *mode)
-{
-    int omode;
-    return __posix_sflags (mode, &omode);
-}
-
-#else
-
-int
-__stdio_sflags (const char *mode);
-
-#endif
+__stdio_flags (const char *mode, int *optr);
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);

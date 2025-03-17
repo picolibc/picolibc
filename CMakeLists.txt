@@ -99,9 +99,6 @@ endif()
 # use thread local storage
 set(NEWLIB_TLS ${PICOLIBC_TLS})
 
-# Use open/close/read/write in tinystdio
-option(POSIX_IO "Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)" ON)
-
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed

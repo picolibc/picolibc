@@ -80,7 +80,7 @@ if atomic_ungetc or atomic_signal
   plain_tests_common += 'test-atomic'
 endif
 
-if (posix_io or not tinystdio) and tests_enable_posix_io
+if tests_enable_posix_io
   plain_tests_common += ['posix-io']
 
   # legacy stdio doesn't work on semihosting, so just skip it
