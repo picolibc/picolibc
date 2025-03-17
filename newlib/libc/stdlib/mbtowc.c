@@ -69,6 +69,7 @@ mbtowc (wchar_t *__restrict pwc,
                 _mbtowc_state.__count = 0;
 #endif
                 errno = EILSEQ;
+                retval = -1;
         }
         return retval;
 }
