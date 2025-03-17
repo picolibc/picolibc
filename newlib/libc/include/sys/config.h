@@ -133,15 +133,7 @@ SUCH DAMAGE.
 #define _POINTER_INT short
 #endif
 
-#if defined(__v850) && !defined(__rtems__)
-#define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__sda__))
-#endif
-
-/* For the PowerPC eabi, force the _impure_ptr to be in .sdata */
 #if defined(__PPC__)
-#if defined(_CALL_SYSV)
-#define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
-#endif
 #ifdef __SPE__
 #define _LONG_DOUBLE double
 #endif
@@ -152,10 +144,6 @@ SUCH DAMAGE.
 #ifdef __XMK__
 #define _UNIX98_THREAD_MUTEX_ATTRIBUTES
 #endif
-#endif
-
-#if defined(__mips__) && !defined(__rtems__)
-#define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
 #endif
 
 #ifdef __xstormy16__
@@ -232,9 +220,6 @@ SUCH DAMAGE.
 #define _POINTER_INT long
 #endif
 
-#ifdef __frv__
-#define __ATTRIBUTE_IMPURE_PTR__ __attribute__((__section__(".sdata")))
-#endif
 #undef __RAND_MAX
 #if __INT_MAX__ == 32767
 #define __RAND_MAX 32767
