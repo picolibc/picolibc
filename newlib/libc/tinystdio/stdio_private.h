@@ -681,7 +681,7 @@ __non_atomic_load_ungetc(const volatile __ungetc_t *p)
         return *p;
 }
 
-#ifdef ATOMIC_UNGETC
+#ifdef _ATOMIC_UNGETC
 
 #if __PICOLIBC_UNGETC_SIZE == 4 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
 #define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
@@ -746,7 +746,7 @@ __picolibc_non_atomic_compare_exchange_ungetc(__ungetc_t *p,
 
 #define __atomic_load_ungetc(p) (*(p))
 
-#endif /* ATOMIC_UNGETC */
+#endif /* _ATOMIC_UNGETC */
 
 /*
  * This operates like _tolower on upper case letters, but also works

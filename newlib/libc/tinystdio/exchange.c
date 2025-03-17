@@ -35,7 +35,7 @@
 
 #include "stdio_private.h"
 
-#if defined(ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
+#if defined(_ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
 
 __ungetc_t
 __picolibc_non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)

@@ -35,7 +35,7 @@
 
 #include "stdio_private.h"
 
-#if defined(ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
+#if defined(_ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
 
 /* Provide a non-atomic emulation and let the application replace it
  * with a real version

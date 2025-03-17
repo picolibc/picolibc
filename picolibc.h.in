@@ -6,7 +6,7 @@
 #pragma once
 
 /* Use atomics for fgetc/ungetc for re-entrancy */
-#cmakedefine ATOMIC_UNGETC
+#cmakedefine _ATOMIC_UNGETC
 
 /* Always optimize strcmp for performance */
 #cmakedefine FAST_STRCMP

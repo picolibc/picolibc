@@ -61,7 +61,7 @@ _BEGIN_STD_C
  * elements of it beyond by using the official interfaces provided.
  */
 
-#ifdef ATOMIC_UNGETC
+#ifdef _ATOMIC_UNGETC
 #if defined(__riscv) || defined(__MICROBLAZE__) || (__loongarch__)
 /*
  * Use 32-bit ungetc storage when doing atomic ungetc on RISC-V and

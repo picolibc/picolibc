@@ -79,7 +79,7 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # Set all configure values to defaults for now
 
 # Use atomics for fgetc/ungetc for re-entrancy
-set(ATOMIC_UNGETC 1)
+set(_ATOMIC_UNGETC 1)
 
 # Always optimize strcmp for performance
 if(NOT DEFINED FAST_STRCMP)
