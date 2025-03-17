@@ -38,6 +38,7 @@ picolibc_sources(
   atold_engine.c
   bufio.c
   clearerr.c
+  compare_exchange.c
   dtox_engine.c
   ecvt.c
   ecvtf.c
@@ -45,6 +46,7 @@ picolibc_sources(
   ecvtl.c
   ecvtl_r.c
   ecvt_r.c
+  exchange.c
   fclose.c
   fcvt.c
   fcvtf.c
@@ -172,11 +174,6 @@ picolibc_sources(
   vfprintf_s.c
   vsnprintf_s.c
   )
-
-picolibc_sources(
-  compare_exchange.c
-  exchange.c
-  )  
 
 picolibc_sources(
   fdopen.c

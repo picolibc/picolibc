@@ -39,6 +39,7 @@ srcs_tinystdio = [
   'atold_engine.c',
   'bufio.c',
   'clearerr.c',
+  'compare_exchange.c',
   'dtox_engine.c',
   'ecvt.c',
   'ecvtf.c',
@@ -46,6 +47,7 @@ srcs_tinystdio = [
   'ecvtl.c',
   'ecvtl_r.c',
   'ecvt_r.c',
+  'exchange.c',
   'fclose.c',
   'fcvt.c',
   'fcvtf.c',
@@ -202,16 +204,6 @@ if io_float_exact
   srcs_tinystdio += srcs_dtoa_ryu
 else
   srcs_tinystdio += srcs_dtoa_float
-endif
-
-# atomic support for ungetc
-srcs_tinystdio_atomic = [
-  'compare_exchange.c',
-  'exchange.c',
-]
-
-if atomic_ungetc
-  srcs_tinystdio += srcs_tinystdio_atomic
 endif
 
 # code using POSIX APIs
