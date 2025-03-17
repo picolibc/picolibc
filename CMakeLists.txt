@@ -189,10 +189,6 @@ if(NOT DEFINED _ASSERT_VERBOSE)
   option(_ASSERT_VERBOSE "Assert provides verbose information" ON)
 endif()
 
-if(NOT DEFINED _PICOLIBC_ATOMIC_SIGNAL)
-  option(_PICOLIBC_ATOMIC_SIGNAL "Use atomics in signal/raise" ON)
-endif()
-
 if(NOT DEFINED _MB_CAPABLE)
   option(_MB_CAPABLE "Enable multi-byte support" OFF)
 endif()

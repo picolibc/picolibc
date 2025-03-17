@@ -37,6 +37,7 @@ plain_tests_common = ['regex', 'ungetc',
 	              'malloc',
 	              'ffs', 'setjmp', 'atexit', 'on_exit',
 	              'timegm',
+                      'test-atomic',
                       'test-strchr',
 	              'test-memset', 'test-put',
 	              'test-raise',
@@ -77,7 +78,6 @@ if tinystdio
 endif
 
 if atomic_ungetc or atomic_signal
-  plain_tests_common += 'test-atomic'
 endif
 
 if tests_enable_posix_io

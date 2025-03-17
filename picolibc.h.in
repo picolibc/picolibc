@@ -43,8 +43,6 @@
 
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
 
-#cmakedefine _PICOLIBC_ATOMIC_SIGNAL
-
 #cmakedefine _FSEEK_OPTIMIZATION
 
 #cmakedefine _FVWRITE_IN_STREAMIO
