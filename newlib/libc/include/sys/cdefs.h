@@ -608,17 +608,6 @@
 #define __restrict_arr
 #endif
 
-#if __GNUC_PREREQ__(4, 0)
-#define	__null_sentinel	__attribute__((__sentinel__))
-#define	__exported	__attribute__((__visibility__("default")))
-/* Only default visibility is supported on PE/COFF targets. */
-#define	__hidden	__attribute__((__visibility__("hidden")))
-#else
-#define	__null_sentinel
-#define	__exported
-#define	__hidden
-#endif
-
 #define __offsetof(type, field)	offsetof(type, field)
 #define	__rangeof(type, start, end) \
 	(__offsetof(type, end) - __offsetof(type, start))
