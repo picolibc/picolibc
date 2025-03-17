@@ -273,7 +273,6 @@ SUCH DAMAGE.
 #ifdef __has_builtin
 #define _HAVE_BUILTIN_ADD_OVERFLOW __has_builtin(__builtin_add_overflow)
 #define _HAVE_BUILTIN_ALLOCA __has_builtin(__builtin_alloca)
-#define _HAVE_BUILTIN_COMPLEX __has_builtin(__builtin_complex)
 #define _HAVE_BUILTIN_COPYSIGN __has_builtin(__builtin_copysign)
 #define _HAVE_BUILTIN_COPYSIGNL __has_builtin(__builtin_copysignl)
 #define _HAVE_BUILTIN_CTZ __has_builtin(__builtin_ctz)

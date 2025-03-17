@@ -1301,6 +1301,14 @@ have_has_builtin = cc.compiles(has_builtin_code,
                                name : '__has_builtin builtin',
                                args : werror_c_args)
 
+#
+# Some builtins cannot be detected with has_builtin as they are
+# keywords instead of functions
+#
+builtins = [
+    ['builtin_complex', '__builtin_complex(1.0, 2.0)', 'double _Complex'],
+]
+
 if not have_has_builtin
 
   # For compilers without __has_builtin, detect the available builtins
@@ -1313,7 +1321,7 @@ if not have_has_builtin
   #   > int main (void) { __call_to_builtin(1,2,3); return 0; }
   # can be compiled + linked.
 
-  builtins = [
+  builtins += [
     ['builtin_alloca', '__builtin_alloca(1)', 'void *'],
     ['builtin_ffs', '__builtin_ffs(42)', 'int'],
     ['builtin_ffsl', '__builtin_ffsl((long)42)', 'long'],
@@ -1332,21 +1340,20 @@ if not have_has_builtin
     ['builtin_issignalingl', '__builtin_issignalingl((long double)42)', 'int'],
     ['builtin_mul_overflow', '__builtin_mul_overflow(1, 2, &u)', 'int'],
     ['builtin_add_overflow', '__builtin_add_overflow(1, 2, &u)', 'int'],
-    ['builtin_complex', '__builtin_complex(1.0, 2.0)', 'double _Complex'],
     ['builtin_expect', '__builtin_expect(1 > 0)', 'int'],
   ]
+endif
 
-  foreach builtin : builtins
-    builtin_template='''
+foreach builtin : builtins
+  builtin_template='''
 static int foo(@1@ i __attribute__((unused))) { return 0; }
 unsigned u;
 int main(void) { return foo(@0@); }
 '''
-    builtin_code = builtin_template.format(builtin[1], builtin[2])
-    have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
-    conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
-  endforeach
-endif
+  builtin_code = builtin_template.format(builtin[1], builtin[2])
+  have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
+  conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+endforeach
 
 NEWLIB_VERSION='4.3.0'
 NEWLIB_MAJOR_VERSION=4
