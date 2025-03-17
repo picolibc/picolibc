@@ -129,6 +129,79 @@
 
 #define __flexarr      []
 
+/*
+ * Use __has_builtin if available. If it isn't, these are detected
+ * by meson
+ */
+#ifdef __has_builtin
+#if __has_builtin(__builtin_add_overflow)
+#define _HAVE_BUILTIN_ADD_OVERFLOW 1
+#endif
+#if __has_builtin(__builtin_alloca)
+#define _HAVE_BUILTIN_ALLOCA 1
+#endif
+#if __has_builtin(__builtin_copysign)
+#define _HAVE_BUILTIN_COPYSIGN 1
+#endif
+#if __has_builtin(__builtin_copysignl)
+#define _HAVE_BUILTIN_COPYSIGNL 1
+#endif
+#if __has_builtin(__builtin_ctz)
+#define _HAVE_BUILTIN_CTZ 1
+#endif
+#if __has_builtin(__builtin_ctzl)
+#define _HAVE_BUILTIN_CTZL 1
+#endif
+#if __has_builtin(__builtin_ctzll)
+#define _HAVE_BUILTIN_CTZLL 1
+#endif
+#if __has_builtin(__builtin_expect)
+#define _HAVE_BUILTIN_EXPECT 1
+#endif
+#if __has_builtin(__builtin_ffs)
+#define _HAVE_BUILTIN_FFS 1
+#endif
+#if __has_builtin(__builtin_ffsl)
+#define _HAVE_BUILTIN_FFSL 1
+#endif
+#if __has_builtin(__builtin_ffsll)
+#define _HAVE_BUILTIN_FFSLL 1
+#endif
+#if __has_builtin(__builtin_finitel)
+#define _HAVE_BUILTIN_FINITEL 1
+#endif
+#if __has_builtin(__builtin_isfinite)
+#define _HAVE_BUILTIN_ISFINITE 1
+#endif
+#if __has_builtin(__builtin_isinf)
+#define _HAVE_BUILTIN_ISINF 1
+#endif
+#if __has_builtin(__builtin_isinfl)
+#define _HAVE_BUILTIN_ISINFL 1
+#endif
+#if __has_builtin(__builtin_isnan)
+#define _HAVE_BUILTIN_ISNAN 1
+#endif
+#if __has_builtin(__builtin_isnanl)
+#define _HAVE_BUILTIN_ISNANL 1
+#endif
+#if __has_builtin(__builtin_issignalingl)
+#define _HAVE_BUILTIN_ISSIGNALINGL 1
+#endif
+#if __has_builtin(__builtin_mul_overflow)
+#define _HAVE_BUILTIN_MUL_OVERFLOW 1
+#endif
+#endif
+
+/*
+ * When the address sanitizer is enabled, we must prevent the library
+ * from even reading beyond the end of input data. This happens in
+ * many optimized string functions.
+ */
+#if __has_feature(address_sanitizer) || defined(__SANITIZE_ADDRESS__)
+#define PICOLIBC_NO_OUT_OF_BOUNDS_READS
+#endif
+
 #if defined(__cplusplus)
 #define	__BEGIN_DECLS	extern "C" {
 #define	__END_DECLS	}

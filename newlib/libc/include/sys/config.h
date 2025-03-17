@@ -1,31 +1,31 @@
 /*
-Copyright (c) 1982, 1986, 1993
-The Regents of the University of California.  All rights reserved.
+  Copyright (c) 1982, 1986, 1993
+  The Regents of the University of California.  All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions
-are met:
-1. Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-2. Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution.
-3. Neither the name of the University nor the names of its contributors
-may be used to endorse or promote products derived from this software
-without specific prior written permission.
+  Redistribution and use in source and binary forms, with or without
+  modification, are permitted provided that the following conditions
+  are met:
+  1. Redistributions of source code must retain the above copyright
+  notice, this list of conditions and the following disclaimer.
+  2. Redistributions in binary form must reproduce the above copyright
+  notice, this list of conditions and the following disclaimer in the
+  documentation and/or other materials provided with the distribution.
+  3. Neither the name of the University nor the names of its contributors
+  may be used to endorse or promote products derived from this software
+  without specific prior written permission.
 
-THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
-FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-SUCH DAMAGE.
- */
+  THIS SOFTWARE IS PROVIDED BY THE REGENTS AND CONTRIBUTORS ``AS IS'' AND
+  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+  ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR CONTRIBUTORS BE LIABLE
+  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+  OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+  HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+  LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+  SUCH DAMAGE.
+*/
 #ifndef __SYS_CONFIG_H__
 #define __SYS_CONFIG_H__
 
@@ -207,7 +207,7 @@ SUCH DAMAGE.
 #  define __LONG_MAX__ LONG_MAX
 # else
 #  if defined (__alpha__) || (defined (__sparc__) && defined(__arch64__)) \
-      || defined (__sparcv9)
+    || defined (__sparcv9)
 #   define __LONG_MAX__ 9223372036854775807L
 #  else
 #   define __LONG_MAX__ 2147483647L
@@ -239,7 +239,7 @@ SUCH DAMAGE.
 #endif
 
 #ifdef PICOLIBC_TLS
-#if (defined(__cplusplus) && (__cplusplus) >= 201103L) ||       \
+#if (defined(__cplusplus) && (__cplusplus) >= 201103L) ||               \
     (defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 202311L)
 #define NEWLIB_THREAD_LOCAL thread_local
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 201112L
@@ -249,32 +249,6 @@ SUCH DAMAGE.
 #endif
 #else
 #define NEWLIB_THREAD_LOCAL
-#endif
-
-/*
- * Use __has_builtin if available. If it isn't, these are detected
- * by meson
- */
-#ifdef __has_builtin
-#define _HAVE_BUILTIN_ADD_OVERFLOW __has_builtin(__builtin_add_overflow)
-#define _HAVE_BUILTIN_ALLOCA __has_builtin(__builtin_alloca)
-#define _HAVE_BUILTIN_COPYSIGN __has_builtin(__builtin_copysign)
-#define _HAVE_BUILTIN_COPYSIGNL __has_builtin(__builtin_copysignl)
-#define _HAVE_BUILTIN_CTZ __has_builtin(__builtin_ctz)
-#define _HAVE_BUILTIN_CTZL __has_builtin(__builtin_ctzl)
-#define _HAVE_BUILTIN_CTZLL __has_builtin(__builtin_ctzll)
-#define _HAVE_BUILTIN_EXPECT __has_builtin(__builtin_expect)
-#define _HAVE_BUILTIN_FFS __has_builtin(__builtin_ffs)
-#define _HAVE_BUILTIN_FFSL __has_builtin(__builtin_ffsl)
-#define _HAVE_BUILTIN_FFSLL __has_builtin(__builtin_ffsll)
-#define _HAVE_BUILTIN_FINITEL __has_builtin(__builtin_finitel)
-#define _HAVE_BUILTIN_ISFINITE __has_builtin(__builtin_isfinite)
-#define _HAVE_BUILTIN_ISINF __has_builtin(__builtin_isinf)
-#define _HAVE_BUILTIN_ISINFL __has_builtin(__builtin_isinfl)
-#define _HAVE_BUILTIN_ISNAN __has_builtin(__builtin_isnan)
-#define _HAVE_BUILTIN_ISNANL __has_builtin(__builtin_isnanl)
-#define _HAVE_BUILTIN_ISSIGNALINGL __has_builtin(__builtin_issignalingl)
-#define _HAVE_BUILTIN_MUL_OVERFLOW __has_builtin(__builtin_mul_overflow)
 #endif
 
 #ifndef _MB_CAPABLE
@@ -297,8 +271,8 @@ SUCH DAMAGE.
 #define _MB_EXTENDED_CHARSETS_JIS 1
 #endif
 
-#if defined(_MB_EXTENDED_CHARSETS_ISO) ||     \
-    defined(_MB_EXTENDED_CHARSETS_WINDOWS) || \
+#if defined(_MB_EXTENDED_CHARSETS_ISO) ||       \
+    defined(_MB_EXTENDED_CHARSETS_WINDOWS) ||   \
     defined(_MB_EXTENDED_CHARSETS_JIS)
 #define _MB_EXTENDED_CHARSETS_NON_UNICODE
 #endif
@@ -318,7 +292,7 @@ SUCH DAMAGE.
  * and cpp will substitute 0 for them in the test
  */
 
-#if LDBL_MANT_DIG == DBL_MANT_DIG && LDBL_MIN_EXP == DBL_MIN_EXP && \
+#if LDBL_MANT_DIG == DBL_MANT_DIG && LDBL_MIN_EXP == DBL_MIN_EXP &&     \
     LDBL_MAX_EXP == DBL_MAX_EXP
 #define _LDBL_EQ_DBL
 #endif
@@ -330,19 +304,6 @@ SUCH DAMAGE.
    assembler functions despite using the Microsoft x86_64 ABI. */
 #if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(_HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) || (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
 #define _HAVE_LONG_DOUBLE_MATH
-#endif
-
-/*
- * When the address sanitizer is enabled, we must prevent the library
- * from even reading beyond the end of input data. This happens in
- * many optimized string functions.
- */
-#ifdef __has_feature
-#if __has_feature(address_sanitizer)
-#define PICOLIBC_NO_OUT_OF_BOUNDS_READS
-#endif
-#elif defined(__SANITIZE_ADDRESS__)
-#define PICOLIBC_NO_OUT_OF_BOUNDS_READS
 #endif
 
 #endif /* __SYS_CONFIG_H__ */
