@@ -521,6 +521,15 @@ tls_model_spec = ''
 thread_local_storage = false
 thread_local_storage_option = get_option('thread-local-storage')
 have_picolibc_tls_api = fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
+if not have_picolibc_tls_api
+  have_picolibc_tls_api = fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.S')
+endif
+if not have_picolibc_tls_api
+  have_picolibc_tls_api = fs.is_file('semihost/machine' / host_cpu_family / 'tls.c')
+endif
+if not have_picolibc_tls_api
+  have_picolibc_tls_api = fs.is_file('semihost/machine' / host_cpu_family / 'tls.S')
+endif
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if thread_local_storage_option == 'auto' or have_picolibc_tls_api
@@ -531,6 +540,15 @@ else
 endif
 if thread_local_storage
   tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
+endif
+
+stack_guard_spec = ''
+if host_cpu_family == 'x86'
+  c_stack_guard_global_flags = cc.get_supported_arguments(['-mstack-protector-guard=global'])
+  if c_stack_guard_global_flags != []
+    c_args += c_stack_guard_global_flags
+    stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=global}'
+  endif
 endif
 
 if sysroot_install
@@ -770,6 +788,7 @@ specs_data.set('SPECS_ISYSTEM', specs_isystem)
 specs_data.set('SPECS_LIBPATH', specs_libpath)
 specs_data.set('SPECS_STARTFILE', specs_startfile)
 specs_data.set('TLSMODEL', tls_model_spec)
+specs_data.set('STACKGUARD', stack_guard_spec)
 specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
 specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
 specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))

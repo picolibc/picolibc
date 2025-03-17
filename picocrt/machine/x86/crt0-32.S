@@ -42,11 +42,11 @@
 	.text
 	.section	.text.init.enter
 	.globl	_start
-	.type	start, @function
+	.type	_start, @function
 _start:
 	.code16
 	cs
-	lgdtl gdt_desc - _start + 0x10
+	lgdtl gdt_desc - _start + 0x10	# use copy of GDT in read-only memory
 	mov $1, %eax
 	mov %eax, %cr0
 	ljmpl $0x10,$_start32
@@ -59,6 +59,9 @@ _start32:
 	mov	%eax, %ss
 	mov	%eax, %ds
 	mov	%eax, %fs
+#ifdef PICOLIBC_TLS
+	mov	$0x20, %eax		# selector for thread local storage
+#endif
 	mov	%eax, %gs
 	fninit				# initialize x87 FPU
 
@@ -89,6 +92,10 @@ _start32:
 	addl	$12, %esp
 
 #ifdef PICOLIBC_TLS
+	// switch to copy of GDT in writable memory, so we can modify TLS
+	// segment base (in case machine lacks MSR_GS_BASE register)
+	lgdtl	gdt2_desc
+
 	// call to _set_tls(__tls_base)
 	pushl	$__tls_base
 	call	_set_tls
@@ -112,16 +119,40 @@ _start32:
 1:
 	jmp	1b
 #endif
-	
-gdt_desc:
-	.word gdt_end - gdt - 1
-	.long gdt
 
-gdt:
+	gdt_size = gdt_end - __x86_gdt
+
+	.balign	2
+gdt_desc:
+	.word gdt_size - 1
+	.long __x86_gdt_ro
+
+	// if GDT will not be modified, place it in read-only memory
+	// otherwise place it in writable memory, and arrange to first use
+	// the read-only copy at early startup
+	// linker script computes address of __x86_gdt_ro in that case
+#ifndef PICOLIBC_TLS
+	.globl 	__x86_gdt_ro
+	.globl	__x86_gdt
+__x86_gdt_ro:
+__x86_gdt:
+#else
+gdt2_desc:
+	.word gdt_size - 1
+	.long __x86_gdt
+
+	.data
+
+	.globl 	__x86_gdt
+__x86_gdt:
+#endif
 	.quad 0x0000000000000000	# unused (null selector)
 	.quad 0x0000000000000000	# 0x08: space for Task State Segment
 	.quad 0x00CF9B000000FFFF        # 0x10: ring 0 32-bit code segment
 	.quad 0x00CF93000000FFFF        # 0x18: ring 0 data segment
+#ifdef PICOLIBC_TLS
+	.quad 0x00CF93000000FFFF	# 0x20: thread local storage
+#endif
 gdt_end:
 
 #if defined(__linux__) && defined(__ELF__)

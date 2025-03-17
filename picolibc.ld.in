@@ -197,6 +197,7 @@ SECTIONS
 	} >ram AT>flash :ram_init
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
 	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
+	PROVIDE(@PREFIX@__x86_gdt_ro = DEFINED(@PREFIX@__x86_gdt) ? @PREFIX@__x86_gdt - @PREFIX@__data_start + @PREFIX@__data_source : 0);
 
 	/* Thread local initialized data. This gets
 	 * space allocated as it is expected to be placed
@@ -240,13 +241,14 @@ SECTIONS
 	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss));
 	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
 	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
-	PROVIDE( @PREFIX@__tls_size = @PREFIX@__tls_end - @PREFIX@__tls_base );
+	PROVIDE( @PREFIX@__tls_size = (@PREFIX@__tls_tail_extra_size ? @PREFIX@__tls_tail_extra_end : @PREFIX@__tls_end) - @PREFIX@__tls_base );
 	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
 	PROVIDE( @PREFIX@__tls_size_align = (@PREFIX@__tls_size + @PREFIX@__tls_align - 1) & ~(@PREFIX@__tls_align - 1));
 	PROVIDE( @PREFIX@__arm32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
 	PROVIDE( @PREFIX@__arm64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
 	PROVIDE( @PREFIX@__or1k_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
 	PROVIDE( @PREFIX@__sh32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__x86_tls_tcb_offset = @PREFIX@__tls_tail_extra_start - @PREFIX@__tls_base );
 
 	/*
 	 * Unlike ld.lld, ld.bfd does not advance the location counter for
@@ -260,6 +262,27 @@ SECTIONS
 		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
 	@BFD_END@
+	/*
+	 * For the x86-32 and x86-64, we must further allocate extra space
+	 * for the thread control block -- at a minimum, the TCB needs to
+	 * contain a pointer to itself (https://akkadia.org/drepper/tls.pdf).
+	 * Unlike the PowerPC case, the x86 TCB appears after the thread
+	 * local variables.
+	 * On the x86, the precise procedure to set the TLS pointer depends
+	 * on the operating system; because of this, the implementation of
+	 * _set_tls() is currently the responsibility of the system library
+	 * (e.g. libsemihost).
+	 * The library should also reserve space for the TCB via
+	 * .tls_tail_extra sections.
+	 */
+	.tls_tail_extra (NOLOAD) : {
+		. = ALIGN(@PREFIX@__tls_align);
+		PROVIDE( @PREFIX@__tls_tail_extra_start = . );
+		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
+		PROVIDE( @PREFIX@__tls_tail_extra_end = . );
+	} >ram AT>ram :ram
+	PROVIDE( @PREFIX@__tls_tail_extra_size = @PREFIX@__tls_tail_extra_end - @PREFIX@__tls_tail_extra_start );
+
 	.bss (NOLOAD) : {
 		*(.sbss* @EXTRA_SBSS_SECTIONS@)
 		*(.gnu.linkonce.sb.*)

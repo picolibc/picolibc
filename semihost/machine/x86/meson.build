@@ -43,6 +43,10 @@ if tinystdio
   lib_semihost_srcs += 'e9_io.c'
 endif
 
+if thread_local_storage
+  lib_semihost_srcs += 'tls.S'
+endif
+
 has_semihost = true
 
 objcopy = find_program('objcopy', required: false)
