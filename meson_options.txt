@@ -132,7 +132,6 @@ option('fortify-source', type: 'combo', choices: ['none', '1', '2', '3'], value:
 option('test-machine', type: 'string', value: 'qemu',
        description: 'Machine-specific startup code to use when running tests')
 
-
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
 
@@ -141,19 +140,11 @@ option('tinystdio', type: 'boolean', value: true,
 #
 option('io-c99-formats', type: 'boolean', value: true,
        description: 'enable C99 support in IO functions like printf/scanf')
-option('newlib-io-c99-formats', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'enable C99 support in IO functions like printf/scanf')
 option('io-long-long', type: 'boolean', value: false,
-       description: 'enable long long type support in IO functions like printf/scanf')
-option('newlib-io-long-long', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable long long type support in IO functions like printf/scanf')
 option('io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
-option('newlib-io-pos-args', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 option('io-long-double', type: 'boolean', value: false,
-       description: 'enable long double type support in IO functions printf/scanf')
-option('newlib-io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 
 #
@@ -209,11 +200,10 @@ option('newlib-have-fcntl', type: 'boolean', value: false,
 #
 # Internationalization options
 #
-
 option('mb-capable', type: 'boolean', value: false,
        description: 'enable multibyte support for UTF-8 charset')
 option('mb-extended-charsets', type: 'boolean', value: false,
-       description: 'enable additional ISO, Windows and JIS charsets')
+       description: 'enable additional UCS, ISO-8859, JIS and Windows charsets')
 option('mb-ucs-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable additional UCS encodings')
 option('mb-iso-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
@@ -223,17 +213,14 @@ option('mb-jis-charsets', type: 'combo', choices: ['true', 'false', 'auto'], val
 option('mb-windows-charsets', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'enable additional Windows encodings')
 
-option('newlib-mb', type: 'boolean', value: false,
-       description: 'enable multibyte support [deprecated, use mb-capable]')
-
 #
 # Startup/shutdown options
 #
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
-option('newlib-initfini-array', type: 'boolean', value: true,
+option('initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
-option('newlib-initfini', type: 'boolean', value: false,
+option('initfini', type: 'boolean', value: false,
        description: 'Supports _init() and _fini()')
 option('fake-semihost', type: 'boolean', value: false,
        description: 'create fake semihost library to link tests')
@@ -246,7 +233,7 @@ option('crt-runtime-size', type: 'boolean', value: false,
 option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
        description: 'enable dynamic allocation of atexit entries')
 option('newlib-global-atexit', type: 'boolean', value: false,
-       description: 'enable legacy atexit data structure as global')
+       description: 'make legacy atexit data structure global instead of thread-local')
 option('newlib-register-fini', type: 'boolean', value: false,
        description: 'enable finalization function registration using atexit')
 

@@ -224,7 +224,7 @@ else
 endif
 fast_strcmp = get_option('fast-strcmp')
 
-mb_capable = get_option('mb-capable') or get_option('newlib-mb')
+mb_capable = get_option('mb-capable')
 mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
 if get_option('mb-ucs-charsets') == 'auto'
   mb_ucs_charsets = mb_extended_charsets
@@ -272,22 +272,9 @@ picoexit = get_option('picoexit')
 
 # Shared stdio options
 io_long_long = get_option('io-long-long')
-newlib_io_long_long = get_option('newlib-io-long-long')
-if newlib_io_long_long != 'auto'
-  io_long_long = newlib_io_long_long == 'true'
-endif
-
 io_c99_formats = get_option('io-c99-formats')
-newlib_io_c99_formats = get_option('newlib-io-c99-formats')
-if newlib_io_c99_formats != 'auto'
-  io_c99_formats = newlib_io_c99_formats == 'true'
-endif
-
 io_pos_args = get_option('io-pos-args')
-newlib_io_pos_args = get_option('newlib-io-pos-args')
-if newlib_io_pos_args != 'auto'
-  io_pos_args = newlib_io_pos_args == 'true'
-endif
+io_long_double = get_option('io-long-double')
 
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
@@ -308,7 +295,6 @@ atomic_ungetc = tinystdio and get_option('atomic-ungetc')
 format_default = get_option('format-default')
 printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
-io_long_double = get_option('io-long-double') or get_option('newlib-io-long-double')
 printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
 printf_percent_n = tinystdio and get_option('printf-percent-n')
 minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
@@ -1427,8 +1413,8 @@ conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'm
 conf_data.set('PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
 conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
 conf_data.set('NEWLIB_GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
-conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), description: 'compiler supports INIT_ARRAY sections')
-conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
+conf_data.set('_HAVE_INITFINI_ARRAY', get_option('initfini-array'), description: 'compiler supports INIT_ARRAY sections')
+conf_data.set('_HAVE_INIT_FINI', get_option('initfini'), description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
 conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
