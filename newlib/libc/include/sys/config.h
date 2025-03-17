@@ -104,15 +104,7 @@
 #define _POINTER_INT short
 #endif
 
-#ifdef ___AM29K__
-#define _FLOAT_RET double
-#endif
-
 #ifdef __i386__
-#ifndef __unix__
-/* in other words, go32 */
-#define _FLOAT_RET double
-#endif
 #if defined(__linux__) || defined(__RDOS__)
 /* we want the reentrancy structure to be returned by a function */
 #define HAVE_GETDATE
