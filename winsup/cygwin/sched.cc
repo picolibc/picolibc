@@ -587,9 +587,16 @@ __sched_getaffinity_sys (pid_t pid, size_t sizeof_set, cpu_set_t *set)
 	  goto done;
 	}
 
-      KAFFINITY miscmask = groupmask (__get_cpus_per_group ());
+      KAFFINITY fullmask = groupmask (__get_cpus_per_group ());
+      /* if process is multi-group, we don't have processor visibility. */
+      /*TODO We could provide the missing Windows visibility by book-keeping
+        each thread's current group and mask in our thread overhead, updating
+        them on sched_set_thread_affinity() calls. We could then assemble the
+        total mask here by looping through all threads. */
+      if (groupcount > 1)
+	procmask = fullmask;
       for (int i = 0; i < groupcount; i++)
-	setgroup (sizeof_set, set, grouparray[i], miscmask);
+	setgroup (sizeof_set, set, grouparray[i], fullmask & procmask);
     }
   else
     status = ESRCH;
