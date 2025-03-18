@@ -1917,7 +1917,7 @@ atomic either.  Over-allocation with FALLOC_FL_KEEP_SIZE is only
 temporary on Windows until the last handle to the file is closed.
 Over-allocation on sparse files is entirely ignored on Windows.</para>
 
-<para><function>sched_setpolicy</function> only emulates API behavior
+<para><function>sched_setscheduler</function> only emulates API behavior
 because Windows does not offer alternative scheduling policies.
 If <literal>SCHED_OTHER</literal> or <literal>SCHED_BATCH</literal> is
 selected, the Windows priority is set according to the nice value.
@@ -1931,7 +1931,7 @@ policies and negative nice values are dropped on
 <function>fork</function>.</para>
 
 <para><function>nice</function>, <function>setpriority</function>,
-<function>sched_setparam</function> and <function>sched_setpolicy</function>
+<function>sched_setparam</function> and <function>sched_setscheduler</function>
 map the nice value (<literal>SCHED_OTHER</literal>,
 <literal>SCHED_BATCH</literal>) or the <literal>sched_priority</literal>
 (<literal>SCHED_FIFO</literal>, <literal>SCHED_RR</literal>) to Windows
