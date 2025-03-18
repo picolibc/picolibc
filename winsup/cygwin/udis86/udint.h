@@ -26,9 +26,11 @@
 #ifndef _UDINT_H_
 #define _UDINT_H_
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif /* HAVE_CONFIG_H */
+#ifndef __INSIDE_CYGWIN__
+# ifdef HAVE_CONFIG_H
+#  include <config.h>
+# endif /* HAVE_CONFIG_H */
+#endif /* __INSIDE_CYGWIN__ */
 
 #if defined(UD_DEBUG) && HAVE_ASSERT_H
 # include <assert.h>

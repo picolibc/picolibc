@@ -673,6 +673,8 @@ enum ud_mnemonic_code {
     UD_MAX_MNEMONIC_CODE
 } UD_ATTR_PACKED;
 
+#ifndef __INSIDE_CYGWIN__
 extern const char * ud_mnemonics_str[];
+#endif /* __INSIDE_CYGWIN__ */
 
 #endif /* UD_ITAB_H */

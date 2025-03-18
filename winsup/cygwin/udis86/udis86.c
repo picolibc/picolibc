@@ -24,8 +24,9 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "udint.h"
+#include "winsup.h"
 #include "extern.h"
+#include "udint.h"
 #include "decode.h"
 
 #if !defined(__UD_STANDALONE__)
@@ -33,6 +34,10 @@
 #  include <string.h>
 # endif
 #endif /* !__UD_STANDALONE__ */
+
+#ifdef __INSIDE_CYGWIN__
+#define sprintf __small_sprintf
+#endif /* __INSIDE_CYGWIN__ */
 
 static void ud_inp_init(struct ud *u);
 
@@ -324,6 +329,7 @@ ud_insn_mnemonic(const struct ud *u)
 }
 
 
+#ifndef __INSIDE_CYGWIN__
 /* =============================================================================
  * ud_lookup_mnemonic
  *    Looks up mnemonic code in the mnemonic string table.
@@ -339,6 +345,7 @@ ud_lookup_mnemonic(enum ud_mnemonic_code c)
     return NULL;
   }
 }
+#endif /* __INSIDE_CYGWIN__ */
 
 
 /* 

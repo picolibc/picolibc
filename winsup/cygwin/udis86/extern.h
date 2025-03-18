@@ -60,9 +60,11 @@ extern unsigned int ud_decode(struct ud*);
 
 extern unsigned int ud_disassemble(struct ud*);
 
+#ifndef __INSIDE_CYGWIN__
 extern void ud_translate_intel(struct ud*);
 
 extern void ud_translate_att(struct ud*);
+#endif /* __INSIDE_CYGWIN__ */
 
 extern const char* ud_insn_asm(const struct ud* u);
 
@@ -82,7 +84,9 @@ extern int ud_opr_is_gpr(const struct ud_operand *opr);
 
 extern enum ud_mnemonic_code ud_insn_mnemonic(const struct ud *u);
 
+#ifndef __INSIDE_CYGWIN__
 extern const char* ud_lookup_mnemonic(enum ud_mnemonic_code c);
+#endif /* __INSIDE_CYGWIN__ */
 
 extern void ud_set_user_opaque_data(struct ud*, void*);
 

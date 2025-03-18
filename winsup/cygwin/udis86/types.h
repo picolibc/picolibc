@@ -36,6 +36,14 @@
 #endif
 #endif /* __KERNEL__ */
 
+#ifdef __INSIDE_CYGWIN__
+# include <inttypes.h>
+# ifndef __UD_STANDALONE__
+#  define __UD_STANDALONE__ 1
+# endif
+#endif /* __INSIDE_CYGWIN__ */
+
+
 #if defined(_MSC_VER) || defined(__BORLANDC__)
 # include <stdint.h>
 # include <stdio.h>
@@ -221,8 +229,8 @@ struct ud
   uint8_t   modrm;
   uint8_t   primary_opcode;
   void *    user_opaque_data;
-  struct ud_itab_entry * itab_entry;
-  struct ud_lookup_table_list_entry *le;
+  const struct ud_itab_entry * itab_entry;
+  const struct ud_lookup_table_list_entry *le;
 };
 
 /* -----------------------------------------------------------------------------
@@ -235,8 +243,10 @@ typedef enum ud_mnemonic_code ud_mnemonic_code_t;
 typedef struct ud             ud_t;
 typedef struct ud_operand     ud_operand_t;
 
+#ifndef __INSIDE_CYGWIN__
 #define UD_SYN_INTEL          ud_translate_intel
 #define UD_SYN_ATT            ud_translate_att
+#endif /* __INSIDE_CYGWIN__ */
 #define UD_EOI                (-1)
 #define UD_INP_CACHE_SZ       32
 #define UD_VENDOR_AMD         0

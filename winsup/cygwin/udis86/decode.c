@@ -23,8 +23,9 @@
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS 
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include "udint.h"
+#include "winsup.h"
 #include "types.h"
+#include "udint.h"
 #include "decode.h"
 
 #ifndef __UD_STANDALONE__
@@ -204,7 +205,7 @@ static int
 decode_prefixes(struct ud *u)
 {
   int done = 0;
-  uint8_t curr, last = 0;
+  uint8_t curr = 0, last = 0;
   UD_RETURN_ON_ERROR(u);
 
   do {
@@ -653,12 +654,12 @@ decode_operand(struct ud           *u,
       break;
     case OP_F:
       u->br_far  = 1;
-      /* intended fall through */
+      fallthrough;
     case OP_M:
       if (MODRM_MOD(modrm(u)) == 3) {
         UDERR(u, "expected modrm.mod != 3\n");
       }
-      /* intended fall through */
+      fallthrough;
     case OP_E:
       decode_modrm_rm(u, operand, REGCLASS_GPR, size);
       break;
@@ -677,7 +678,7 @@ decode_operand(struct ud           *u,
       if (MODRM_MOD(modrm(u)) != 3) {
         UDERR(u, "expected modrm.mod == 3\n");
       }
-      /* intended fall through */
+      fallthrough;
     case OP_Q:
       decode_modrm_rm(u, operand, REGCLASS_MMX, size);
       break;
@@ -688,7 +689,7 @@ decode_operand(struct ud           *u,
       if (MODRM_MOD(modrm(u)) != 3) {
         UDERR(u, "expected modrm.mod == 3\n");
       }
-      /* intended fall through */
+      fallthrough;
     case OP_W:
       decode_modrm_rm(u, operand, REGCLASS_XMM, size);
       break;
