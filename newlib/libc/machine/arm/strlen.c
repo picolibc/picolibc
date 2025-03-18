@@ -56,7 +56,7 @@
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #endif
 
-size_t __attribute__((naked))
+size_t __naked
 strlen (const char* str)
 {
   __asm__("len .req r0\n\t"

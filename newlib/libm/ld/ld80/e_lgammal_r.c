@@ -392,16 +392,16 @@ lgammal_r(long double x, int *signgamp)
 	{
 	case 7:
 	  z *= (y + 6.0L);
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 	case 6:
 	  z *= (y + 5.0L);
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 	case 5:
 	  z *= (y + 4.0L);
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 	case 4:
 	  z *= (y + 3.0L);
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 	case 3:
 	  z *= (y + 2.0L);
 	  r += logl (z);

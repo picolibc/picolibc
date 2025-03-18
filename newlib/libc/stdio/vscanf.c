@@ -29,7 +29,4 @@ vscanf (const char *fmt,
   return _svfscanf ( stdin, fmt, ap);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-viscanf (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf")));
-#endif
+__nano_reference(vscanf, viscanf);

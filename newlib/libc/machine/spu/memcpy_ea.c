@@ -41,7 +41,7 @@ POSSIBILITY OF SUCH DAMAGE.
 COMPAT_EA_ALIAS (memcpy_ea);
 
 __ea void *
-__inhibit_loop_to_libcall
+__no_builtin
 memcpy_ea (__ea void *dest, __ea const void *src, size_ea_t n)
 {
   __ea void *curr_dest = dest;

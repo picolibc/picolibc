@@ -136,7 +136,7 @@ fnmatch(const char *pattern, const char *string, int flags)
 					--pattern;
 				}
 			}
-			__PICOLIBC_FALLTHROUGH;
+			__fallthrough;
 		default:
 		norm:
 			if (c == *string)

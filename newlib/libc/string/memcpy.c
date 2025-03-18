@@ -63,7 +63,7 @@ QUICKREF
 #undef memcpy
 
 void *
-__inhibit_loop_to_libcall
+__no_builtin
 memcpy (void *__restrict dst0,
 	const void *__restrict src0,
 	size_t len0)

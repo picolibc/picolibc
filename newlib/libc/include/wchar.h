@@ -191,8 +191,8 @@ wchar_t *wcscpy (wchar_t *__restrict, const wchar_t *__restrict);
 size_t   wcscspn (const wchar_t *, const wchar_t *);
 
 #if __POSIX_VISIBLE >= 200809
-void     free (void *) _NOTHROW;
-wchar_t *wcsdup (const wchar_t *) __malloc_like __result_use_check;
+void     free (void *) __nothrow;
+wchar_t *wcsdup (const wchar_t *) __malloc_like __warn_unused_result;
 #endif
 size_t   wcsftime (wchar_t *__restrict, size_t,
                   const wchar_t *__restrict, const struct tm *__restrict);

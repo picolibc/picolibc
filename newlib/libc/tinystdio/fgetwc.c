@@ -58,7 +58,7 @@ fgetwc(FILE *stream)
 	return (wint_t) u.wc;
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(fgetwc, getwc);
 #elif !defined(getwc)
 wint_t getwc(FILE *stream) { return fgetwc(stream); }

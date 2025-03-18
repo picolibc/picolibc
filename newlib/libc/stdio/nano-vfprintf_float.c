@@ -186,7 +186,7 @@ _printf_float (struct _reent *data,
 
   if (pdata->flags & LONGDBL)
     {
-      _fpvalue = (double) GET_ARG (N, *ap, _LONG_DOUBLE);
+      _fpvalue = (double) GET_ARG (N, *ap, long double);
     }
   else
     {

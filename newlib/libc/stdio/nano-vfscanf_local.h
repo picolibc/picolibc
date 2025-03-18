@@ -173,6 +173,6 @@ _scanf_i (
 extern int
 _scanf_float (
 	      struct _scan_data_t *pdata,
-	      FILE *fp, va_list *ap) _ATTRIBUTE((__weak__));
+	      FILE *fp, va_list *ap) __weak;
 
 #endif

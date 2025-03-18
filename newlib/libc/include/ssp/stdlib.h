@@ -5,7 +5,7 @@
 #include <ssp/ssp.h>
 
 #if __SSP_FORTIFY_LEVEL > 0
-__BEGIN_DECLS
+_BEGIN_STD_C
 
 __ssp_decl(size_t, mbstowcs, (wchar_t *__buf, const char *__src, size_t __n))
 {
@@ -25,7 +25,7 @@ __ssp_decl(int, wctomb, (char *__buf, wchar_t __wc))
   return __ssp_real_wctomb (__buf, __wc);
 }
 
-__END_DECLS
+_END_STD_C
 
 #endif /* __SSP_FORTIFY_LEVEL > 0 */
 #endif /* _SSP_STDLIB_H_ */

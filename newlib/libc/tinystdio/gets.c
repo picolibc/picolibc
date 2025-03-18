@@ -43,7 +43,7 @@ gets(char *str)
                 case EOF:
                         if (ferror(stdin) || cp == str)
                                 return NULL;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
                 case '\n':
                         *cp = '\0';
                         return str;

@@ -25,7 +25,7 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
 /* sparclet scan instruction */
 
-extern __inline__ int
+extern __inline int
 scan (int a, int b)
 {
   int res;
@@ -35,7 +35,7 @@ scan (int a, int b)
 
 /* sparclet shuffle instruction */
 
-extern __inline__ int
+extern __inline int
 shuffle (int a, int b)
 {
   int res;

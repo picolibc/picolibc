@@ -118,8 +118,8 @@ int	 strcoll_l (const char *, const char *, locale_t);
 char 	*strcpy (char *__restrict, const char *__restrict);
 size_t	 strcspn (const char *, const char *);
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
-void	free (void *) _NOTHROW; /* for __malloc_like */
-char 	*strdup (const char *) __malloc_like __result_use_check;
+void	free (void *) __nothrow; /* for __malloc_like */
+char 	*strdup (const char *) __malloc_like __warn_unused_result;
 #endif
 #if __GNU_VISIBLE && defined(__GNUC__)
 #define strdupa(__s) \
@@ -170,7 +170,7 @@ char 	*strncat (char *__restrict, const char *__restrict, size_t);
 int	 strncmp (const char *, const char *, size_t);
 char 	*strncpy (char *__restrict, const char *__restrict, size_t);
 #if __POSIX_VISIBLE >= 200809
-char 	*strndup (const char *, size_t) __malloc_like __result_use_check;
+char 	*strndup (const char *, size_t) __malloc_like __warn_unused_result;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __ZEPHYR_VISIBLE
 size_t	 strnlen (const char *, size_t);

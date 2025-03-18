@@ -41,8 +41,8 @@
 #include <string.h>
 #include <errno.h>
 
-extern struct timeval __semihost_write_time _ATTRIBUTE((__weak__));
-int gettimeofday(struct timeval *restrict tv, void *restrict tz) _ATTRIBUTE((__weak__));
+extern struct timeval __semihost_write_time __weak;
+int gettimeofday(struct timeval *restrict tv, void *restrict tz) __weak;
 
 ssize_t
 write(int fd, const void *buf, size_t count)

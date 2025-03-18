@@ -65,13 +65,13 @@ struct mallinfo {
 
 /* The routines.  */
 
-void	free (void *) _NOTHROW;
-void	*malloc(size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
-void	*calloc(size_t, size_t) __malloc_like __result_use_check
-    __alloc_size2(1, 2) _NOTHROW;
-void	*realloc(void *, size_t) __result_use_check __alloc_size(2) _NOTHROW;
+void	free (void *) __nothrow;
+void	*malloc(size_t) __malloc_like __warn_unused_result __alloc_size(1) __nothrow;
+void	*calloc(size_t, size_t) __malloc_like __warn_unused_result
+    __alloc_size2(1, 2) __nothrow;
+void	*realloc(void *, size_t) __warn_unused_result __alloc_size(2) __nothrow;
 void    *memalign (size_t __alignment, size_t __size)  __malloc_like
-    __result_use_check __alloc_size(2) _NOTHROW;
+    __warn_unused_result __alloc_size(2) __nothrow;
 
 struct mallinfo mallinfo (void);
 void malloc_stats (void);

@@ -460,11 +460,11 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 	for(s = s00;;s++) switch(*s) {
 		case '-':
 			sign = 1;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
 		case '+':
 			if (*++s)
 				goto break2;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
 		case 0:
 			sign = 0;
 			irv = STRTOG_NoNumber;
@@ -562,7 +562,7 @@ _strtodg_l (const char *s00, char **se, FPI *fpi, Long *exp,
 		switch(c = *++s) {
 			case '-':
 				esign = 1;
-                                __PICOLIBC_FALLTHROUGH;
+                                __fallthrough;
 			case '+':
 				c = *++s;
 			}

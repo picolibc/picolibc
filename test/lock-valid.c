@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include <sys/lock.h>
 
-#ifdef RETARGETABLE_LOCKING
+#ifdef _RETARGETABLE_LOCKING
 
 /*
  * Validate lock usage in libc by creating fake locks

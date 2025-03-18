@@ -318,7 +318,7 @@ _SVFWSCANF (
   int *ip;
 #ifdef FLOATING_POINT
   float *flp;
-  _LONG_DOUBLE *ldp;
+  long double *ldp;
   double *dp;
   wchar_t decpt;
 #endif
@@ -715,7 +715,7 @@ _SVFWSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case L'S':
 	  flags |= LONG;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 #endif
 
 	case L's':
@@ -744,7 +744,7 @@ _SVFWSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 #endif
 
 	case 'c':
@@ -1328,7 +1328,7 @@ _SVFWSCANF (
 			}
 		      goto fskip;
 		    }
-                  __PICOLIBC_FALLTHROUGH;
+                  __fallthrough;
 		case L'1':
 		case L'2':
 		case L'3':
@@ -1575,8 +1575,8 @@ _SVFWSCANF (
 		}
 	      else if (flags & LONGDBL)
 		{
-		  ldp = GET_ARG (N, ap, _LONG_DOUBLE *);
-		  *ldp = (_LONG_DOUBLE) QUAD_RES;
+		  ldp = GET_ARG (N, ap, long double *);
+		  *ldp = (long double) QUAD_RES;
 		}
 	      else
 		{

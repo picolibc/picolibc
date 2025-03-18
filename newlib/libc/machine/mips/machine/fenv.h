@@ -71,8 +71,8 @@ extern fenv_t		_fe_dfl_env;
 #define	_FCSR_ENABLE_SHIFT	5
 #define	_FCSR_ENABLE_MASK	(FE_ALL_EXCEPT << _FCSR_ENABLE_SHIFT)
 
-#define	__cfc1(__fcsr)	__asm __volatile("cfc1 %0, $31" : "=r" (__fcsr))
-#define	__ctc1(__fcsr)	__asm __volatile("ctc1 %0, $31" :: "r" (__fcsr))
+#define	__cfc1(__fcsr)	__asm__ __volatile__("cfc1 %0, $31" : "=r" (__fcsr))
+#define	__ctc1(__fcsr)	__asm__ __volatile__("ctc1 %0, $31" :: "r" (__fcsr))
 
 #else
 #define	FE_TONEAREST	0x0000

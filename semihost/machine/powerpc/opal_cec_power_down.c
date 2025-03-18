@@ -35,9 +35,9 @@
 
 #include "opal.h"
 
-_Noreturn void
+__noreturn void
 opal_cec_power_down(uint64_t request)
 {
     opal_call((void *) (intptr_t) request, NULL, NULL, OPAL_CEC_POWER_DOWN, __opal_base, __opal_entry);
-    __unreachable();
+    __builtin_unreachable();
 }

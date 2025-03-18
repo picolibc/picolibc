@@ -77,9 +77,6 @@ if tinystdio
   ]
 endif
 
-if atomic_ungetc or atomic_signal
-endif
-
 if tests_enable_posix_io
   plain_tests_common += ['posix-io']
 

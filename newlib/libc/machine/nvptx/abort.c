@@ -17,7 +17,7 @@
 
 #include <stdlib.h>
 
-void __attribute__((noreturn))
+void __noreturn
 abort (void)
 {
   for (;;)

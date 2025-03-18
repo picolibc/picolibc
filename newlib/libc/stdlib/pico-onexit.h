@@ -36,6 +36,8 @@
 #ifndef _PICO_ONEXIT_H_
 #define _PICO_ONEXIT_H_
 
+#include <stdlib.h>
+
 enum pico_onexit_kind {
     PICO_ONEXIT_EMPTY,
     PICO_ONEXIT_ONEXIT,
@@ -52,7 +54,14 @@ union on_exit_func {
 int
 _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg);
 
+int
+__cxa_atexit (void (*func) (void *), void *arg, void *d);
+
+void __libc_fini_array(void);
+
+#ifndef _HAVE_INITFINI_ARRAY
 void
-__call_exitprocs (int, void *);
+__call_exitprocs(int code, void *param) __weak;
+#endif
 
 #endif /* _PICO_ONEXIT_H_ */

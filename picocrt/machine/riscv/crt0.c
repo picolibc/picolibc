@@ -36,7 +36,7 @@
 #include <stddef.h>
 #include "../../crt0.h"
 
-static void __attribute__((used)) __section(".init")
+static void __used __section(".init")
 _cstart(void)
 {
 	__start();
@@ -78,7 +78,7 @@ static const char *const names[NUM_REG] = {
 };
 
 
-static void __attribute__((used)) __section(".init")
+static void __used __section(".init")
 _ctrap(struct fault *fault)
 {
         int r;
@@ -94,7 +94,7 @@ _ctrap(struct fault *fault)
 #define _PASTE(r) #r
 #define PASTE(r) _PASTE(r)
 
-void __attribute__((naked)) __section(".init") __attribute__((used)) __attribute((aligned(4)))
+void __naked __section(".init") __used __attribute((aligned(4)))
 _trap(void)
 {
 #ifndef __clang__
@@ -166,7 +166,7 @@ _trap(void)
 }
 #endif
 
-void __attribute__((naked)) __section(".text.init.enter") __attribute__((used))
+void __naked __section(".text.init.enter") __used
 _start(void)
 {
 

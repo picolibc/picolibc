@@ -48,7 +48,7 @@ int finite(double x)
 	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

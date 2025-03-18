@@ -138,9 +138,7 @@ VFSCANF (
   return _SVFSCANF (fp, fmt, ap);
 }
 
-int __nonnull((2))
-vfiscanf ( FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vfscanf")));
+__nano_reference(vfscanf, vfiscanf);
 #endif /* !STRING_ONLY.  */
 
 #if defined (STRING_ONLY)
@@ -308,7 +306,7 @@ _SVFSCANF (
 
 	case 'p':
 	  scan_data.flags |= POINTER;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 	case 'x':
 	case 'X':
 	  scan_data.flags |= PFXOK;
@@ -425,12 +423,7 @@ all_done:
 }
 
 #ifdef STRING_ONLY
-int
-_ssvfiscanf ( FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_ssvfscanf")));
+__nano_reference(_ssvfscanf, ssvfiscanf);
 #else
-int
-_svfiscanf ( FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("_svfscanf")));
+__nano_reference(_svfscanf, svfiscanf);
 #endif
-

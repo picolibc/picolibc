@@ -141,15 +141,15 @@ extern int    _svfwscanf (FILE *, const wchar_t *,va_list);
 extern int    _ssvfwscanf (FILE *, const wchar_t *,va_list);
 extern int    _svfiwscanf (FILE *, const wchar_t *,va_list);
 extern int    _ssvfiwscanf (FILE *, const wchar_t *,va_list);
-int	      svfprintf ( FILE *, const char *, 
+int	      svfprintf ( FILE *, const char *,
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	      svfiprintf ( FILE *, const char *, 
+               			__format(__printf__, 2, 0);
+int	      svfiprintf ( FILE *, const char *,
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	      svfwprintf ( FILE *, const wchar_t *, 
+               			__format(__printf__, 2, 0);
+int	      svfwprintf ( FILE *, const wchar_t *,
 				  va_list);
-int	      svfiwprintf ( FILE *, const wchar_t *, 
+int	      svfiwprintf ( FILE *, const wchar_t *,
 				  va_list);
 extern FILE  *__sfp (void);
 extern int    __sflags (const char*, int*);
@@ -360,3 +360,15 @@ typedef enum __packed {
 extern const __CH_CLASS __chclass[256];
 extern const __STATE __state_table[MAX_STATE][MAX_CH_CLASS];
 extern const __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];
+
+#if defined(_NANO_FORMATTED_IO) && defined(__strong_reference)
+#define __nano_reference(a,b) __strong_reference(a,b)
+#else
+#define __nano_reference(a,b)
+#endif
+
+#if defined(_LONG_DOUBLE_IEEE128__) && defined(__strong_reference)
+#define __ieee128_reference(a,b) __strong_reference(a,b)
+#else
+#define __ieee128_reference(a,b)
+#endif

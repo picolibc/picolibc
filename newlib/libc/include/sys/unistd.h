@@ -80,7 +80,7 @@ typedef	__pid_t		pid_t;		/* process id */
 #endif
 extern char **environ;
 
-_Noreturn void	_exit (int __status);
+__noreturn void	_exit (int __status);
 
 int	access (const char *__path, int __amode);
 unsigned  alarm (unsigned __secs);

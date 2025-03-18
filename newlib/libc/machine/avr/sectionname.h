@@ -40,8 +40,8 @@
 #define STR(x)   _STR(x)
 #define _STR(x)  #x
 
-#define ATTRIBUTE_CLIB_SECTION  __attribute__ ((section (STR(CLIB_SECTION))))
-#define ATTRIBUTE_MLIB_SECTION  __attribute__ ((section (STR(MLIB_SECTION))))
+#define ATTRIBUTE_CLIB_SECTION  __section(STR(CLIB_SECTION))
+#define ATTRIBUTE_MLIB_SECTION  __section(STR(MLIB_SECTION))
 
 #define ASSEMBLY_CLIB_SECTION   .section CLIB_SECTION, "ax", @progbits
 #define ASSEMBLY_MLIB_SECTION   .section MLIB_SECTION, "ax", @progbits

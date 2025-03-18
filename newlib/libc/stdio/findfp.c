@@ -50,7 +50,7 @@ void (*_stdio_cleanup)(void);
 #endif
 
 #if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
-__noinline_static void
+__noinline static void
 #else
 static void
 #endif

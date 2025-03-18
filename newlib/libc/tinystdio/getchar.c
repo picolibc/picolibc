@@ -41,7 +41,7 @@ getchar(void)
 }
 
 #undef getchar_unlocked
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(getchar, getchar_unlocked);
 #else
 int getchar_unlocked(void) { return getchar(); }

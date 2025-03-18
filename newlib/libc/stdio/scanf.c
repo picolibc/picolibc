@@ -32,8 +32,4 @@ scanf(const char *__restrict fmt, ...)
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-iscanf (const char *, ...)
-       _ATTRIBUTE ((__alias__("scanf")));
-#endif
+__nano_reference(scanf, iscanf);

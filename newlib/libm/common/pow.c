@@ -397,7 +397,7 @@ pow (double x, double y)
   return exp_inline (ehi, elo, sign_bias);
 }
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

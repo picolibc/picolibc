@@ -42,14 +42,14 @@ SUCH DAMAGE.
 typedef	__sigset_t	sigset_t;
 #endif
 
-__BEGIN_DECLS
+_BEGIN_STD_C
 
 #if __POSIX_VISIBLE >= 200112
-int pselect __P ((int __n, fd_set *__readfds, fd_set *__writefds,
-		  fd_set *__exceptfds, const struct timespec *__timeout,
-		  const sigset_t *__set));
+int pselect (int __n, fd_set *__readfds, fd_set *__writefds,
+             fd_set *__exceptfds, const struct timespec *__timeout,
+             const sigset_t *__set);
 #endif
 
-__END_DECLS
+_END_STD_C
 
 #endif /* sys/select.h */

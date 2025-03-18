@@ -35,7 +35,7 @@
 
 #include "../../crt0.h"
 
-static void __attribute__((used)) __section(".text.startup")
+static void __used __section(".text.startup")
 _cstart(void)
 {
     __start();
@@ -50,7 +50,7 @@ extern char __stack[];
 #define FPSCR_RN        (0 << 0)
 #define FPSCR_RM        (3 << 0)
 
-void __section(".init") __attribute__((used))
+void __section(".init") __used
 _start(void)
 {
     /* Set up the stack pointer */

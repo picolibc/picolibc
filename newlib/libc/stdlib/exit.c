@@ -57,7 +57,7 @@ void
 exit (int code)
 {
   /* Refer to comments in __atexit.c and pico-onexit.c for why this is weak */
-  void __call_exitprocs (int, void *) __attribute__((weak));
+  void __call_exitprocs (int, void *) __weak;
   if (__call_exitprocs)
     __call_exitprocs (code, NULL);
 

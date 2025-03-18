@@ -75,10 +75,10 @@ __ssp_decl(rtype, fun, args) \
 #define __ssp_overlap(a, b, l) \
     (((a) <= (b) && (b) < (a) + (l)) || ((b) <= (a) && (a) < (b) + (l)))
 
-__BEGIN_DECLS
-void __stack_chk_fail(void) __dead2;
-void __chk_fail(void) __dead2;
+_BEGIN_STD_C
+void __stack_chk_fail(void) __noreturn;
+void __chk_fail(void) __noreturn;
 void set_fortify_handler (void (*handler) (int sig));
-__END_DECLS
+_END_STD_C
 
 #endif /* _SSP_SSP_H_ */

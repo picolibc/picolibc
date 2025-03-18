@@ -261,7 +261,7 @@ conv_int (FILE *stream, scanf_context_t *context, width_t width, void *addr, uin
     switch (i) {
       case '-':
         flags |= FL_MINUS;
-	__PICOLIBC_FALLTHROUGH;
+	__fallthrough;
       case '+':
         if (!--width || IS_EOF(i = scanf_getc(stream, context)))
 	    goto err;
@@ -769,7 +769,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	          case 'p':
                       if (sizeof(void *) > sizeof(int))
                           flags |= FL_LONG;
-                      __PICOLIBC_FALLTHROUGH;
+                      __fallthrough;
 		  case 'x':
 	          case 'X':
                     base = 16;
@@ -788,7 +788,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	          case 'o':
                     base = 8;
-		    __PICOLIBC_FALLTHROUGH;
+		    __fallthrough;
 		  case 'i':
 		  conv_int:
                     c = conv_int (stream, &context, width, addr, flags, base);
@@ -810,14 +810,14 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	          case 'o':
                     base = 8;
-		    __PICOLIBC_FALLTHROUGH;
+		    __fallthrough;
 		  case 'i':
 		    goto conv_int;
 
                   case 'p':
                       if (sizeof(void *) > sizeof(int))
                           flags |= FL_LONG;
-                      __PICOLIBC_FALLTHROUGH;
+                      __fallthrough;
 		  default:			/* p,x,X	*/
                     base = 16;
 		  conv_int:
@@ -857,7 +857,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #undef ap
 
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(vfscanf, __d_vfscanf);
 #else
 int __d_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }

@@ -88,7 +88,7 @@ QUICKREF
  * no branching!
  */
 
-#define __isnan __isnand
+#define _ADD_D_TO_DOUBLE_FUNCS
 
 #include "fdlibm.h"
 

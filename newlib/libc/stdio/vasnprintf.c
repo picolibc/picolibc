@@ -54,8 +54,4 @@ vasnprintf (
   return (char *) f._bf._base;
 }
 
-#ifdef _NANO_FORMATTED_IO
-char *
-vasniprintf (char *, size_t *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vasnprintf")));
-#endif
+__nano_reference(vasnprintf, vasniprintf);

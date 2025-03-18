@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdint.h>
+#include <inttypes.h>
 
 #if __ARM_ARCH_PROFILE == 'M'
 
@@ -94,7 +94,7 @@ __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 void arm_halt_vector(void);
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")
 arm_halt_vector(void)
 {
 	/* Loop forever. */
@@ -103,7 +103,7 @@ arm_halt_vector(void)
 
 void arm_ignore_vector(void);
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")
 arm_ignore_vector(void)
 {
 	/* Ignore the interrupt by returning */
@@ -111,10 +111,10 @@ arm_ignore_vector(void)
 }
 
 #define vector(name) \
-	void  arm_ ## name ## _vector(void) __attribute__ ((weak, alias("arm_ignore_vector")))
+    __weak_reference(arm_ignore_vector, arm_ ## name ## _vector)
 
 #define vector_halt(name) \
-	void  arm_ ## name ## _vector(void) __attribute__ ((weak, alias("arm_halt_vector")))
+    __weak_reference(arm_halt_vector, arm_ ## name ## _vector)
 
 vector_halt(undef);
 vector_halt(svc);
@@ -127,7 +127,7 @@ vector(fiq);
 void
 __weak_vector_table(void);
 
-void __attribute__((naked)) __section(".text.init.enter")
+void __naked __section(".text.init.enter")
 __weak_vector_table(void)
 {
 	/*

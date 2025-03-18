@@ -207,17 +207,13 @@ int	fflush(FILE *stream);
 
 # define fdev_close(f) (fflush(f))
 
-#ifdef _HAVE_FORMAT_ATTRIBUTE
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wformat"
 #endif
-#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, 0)))
+#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __format(__a, __s, 0)
 #else
-#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, __f)))
-#endif
-#else
-#define __FORMAT_ATTRIBUTE__(__a, __s, __f)
+#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __format(__a, __s, __f)
 #endif
 
 #define __PRINTF_ATTRIBUTE__(__s, __f) __FORMAT_ATTRIBUTE__(printf, __s, __f)
@@ -541,7 +537,7 @@ __printf_float(float f)
 #  define _HAS_IO_PERCENT_B
 # endif
 # ifdef _WANT_IO_LONG_DOUBLE
-#  define _HAS_IO_LONG_DOUBLE
+#  define _HAS_IOlong double
 # endif
 #endif
 

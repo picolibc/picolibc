@@ -147,8 +147,8 @@ bail:
 	return ret;
 }
 
-extern FILE *const stdin _ATTRIBUTE((__weak__));
-extern FILE *const stdout _ATTRIBUTE((__weak__));
+extern FILE *const stdin __weak;
+extern FILE *const stdout __weak;
 
 int
 __bufio_get(FILE *f)
@@ -216,7 +216,7 @@ __bufio_seek(FILE *f, off_t offset, int whence)
                         /* Map CUR -> SET, accounting for position within buffer */
                         whence = SEEK_SET;
                         offset += buf_pos + bf->off;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
                 case SEEK_SET:
                         /* Optimize for seeks within buffer or just past buffer */
                         if (buf_pos <= offset && offset <= buf_pos + bf->len) {
@@ -224,7 +224,7 @@ __bufio_seek(FILE *f, off_t offset, int whence)
                                 ret = offset;
                                 break;
                         }
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
                 default:
                         ret = bufio_lseek(bf, offset, whence);
                         if (ret >= 0)

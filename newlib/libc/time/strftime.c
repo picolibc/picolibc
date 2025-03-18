@@ -1025,7 +1025,7 @@ recurse:
 		break;
 	    }
 #endif /* _WANT_C99_TIME_FORMATS */
-	  __PICOLIBC_FALLTHROUGH;
+	  __fallthrough;
 	case CQ('k'):	/* newlib extension */
 	  len = t_snprintf (&s[count], maxsize - count,
 			  *format == CQ('k') ? CQ("%2d") : CQ("%.2d"),
@@ -1035,7 +1035,7 @@ recurse:
 	case CQ('l'):	/* newlib extension */
 	  if (alt == CQ('O'))
 	    alt = CQ('\0');
-	  __PICOLIBC_FALLTHROUGH;
+	  __fallthrough;
 	case CQ('I'):
 	  {
 	    register int  h12;

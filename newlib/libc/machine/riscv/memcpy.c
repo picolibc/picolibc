@@ -24,7 +24,7 @@
 #undef memcpy
 
 void *
-__inhibit_loop_to_libcall
+__no_builtin
 memcpy(void *__restrict aa, const void *__restrict bb, size_t n)
 {
   #define BODY(a, b, t) { \

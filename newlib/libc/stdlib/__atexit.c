@@ -40,7 +40,7 @@
 
 /* Make this a weak reference to avoid pulling in malloc.  */
 #ifndef MALLOC_PROVIDED
-void * malloc(size_t) _ATTRIBUTE((__weak__));
+void * malloc(size_t) __weak;
 #endif
 
 /* As __call_exitprocs is weak reference in lite exit, make a

@@ -34,8 +34,4 @@ printf (
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-iprintf (const char *, ...)
-       _ATTRIBUTE ((__alias__("printf")));
-#endif
+__nano_reference(printf, iprintf);

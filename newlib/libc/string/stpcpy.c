@@ -61,7 +61,7 @@ stpcpy (char *__restrict dst,
 	const char *__restrict src)
 {
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
-    !defined(PICOLIBC_NO_OUT_OF_BOUNDS_READS)
+    !defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   long *aligned_dst;
   const long *aligned_src;
 

@@ -542,7 +542,7 @@ _SVFSCANF (
   int *ip;
 #ifdef FLOATING_POINT
   float *flp;
-  _LONG_DOUBLE *ldp;
+  long double *ldp;
   double *dp;
 #endif
   long *lp;
@@ -775,7 +775,7 @@ _SVFSCANF (
 
 	case 'D':		/* compat */
 	  flags |= LONG;
-	  __PICOLIBC_FALLTHROUGH;
+	  __fallthrough;
 	case 'd':
 	  c = CT_INT;
 	  ccfn = (u_long (*)CCFN_PARAMS)strtol;
@@ -790,7 +790,7 @@ _SVFSCANF (
 
 	case 'O':		/* compat */
 	  flags |= LONG;
-	  __PICOLIBC_FALLTHROUGH;
+	  __fallthrough;
 	case 'o':
 	  c = CT_INT;
 	  ccfn = strtoul;
@@ -829,7 +829,7 @@ _SVFSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'S':
 	  flags |= LONG;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 #endif
 
 	case 's':
@@ -845,7 +845,7 @@ _SVFSCANF (
 #ifdef _WANT_IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 #endif
 
 	case 'c':
@@ -1577,7 +1577,7 @@ _SVFSCANF (
 			}
 		      goto fskip;
 		    }
-                  __PICOLIBC_FALLTHROUGH;
+                  __fallthrough;
 		case '1':
 		case '2':
 		case '3':
@@ -1929,8 +1929,8 @@ _SVFSCANF (
 		}
 	      else if (flags & LONGDBL)
 		{
-		  ldp = GET_ARG (N, ap, _LONG_DOUBLE *);
-		  *ldp = (_LONG_DOUBLE) QUAD_RES;
+		  ldp = GET_ARG (N, ap, long double *);
+		  *ldp = (long double) QUAD_RES;
 		}
 	      else
 		{

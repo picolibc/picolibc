@@ -12,7 +12,7 @@ is preserved.
  * Added by Cygnus Support.
  */
 
-#define __isinf __isinfd
+#define _ADD_D_TO_DOUBLE_FUNCS
 
 #include "fdlibm.h"
 

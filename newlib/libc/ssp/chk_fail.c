@@ -11,7 +11,7 @@ static void (*fortify_handler)(int sig);
 
 #define CHK_FAIL_MSG "*** overflow detected ***: terminated"
 
-_Noreturn void
+__noreturn void
 __chk_fail(void)
 {
 #ifdef TINY_STDIO

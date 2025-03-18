@@ -234,7 +234,7 @@ _set_stacks(void)
 
 extern void __vector_table(void);
 
-static _Noreturn __attribute__((used)) __section(".init") void
+static __noreturn __used __section(".init") void
 _cstart(void)
 {
 #if __ARM_ARCH_ISA_THUMB == 1
@@ -323,7 +323,7 @@ _cstart(void)
 	__start();
 }
 
-void __attribute__((naked)) __section(".init") __attribute__((used))
+void __naked __section(".init") __used
 _start(void)
 {
 	/* Generate a reference to __vector_table so we get one loaded */
@@ -402,7 +402,7 @@ static const char *const reasons[] = {
 #define REASON_BUSFAULT         2
 #define REASON_USAGE            3
 
-static void __attribute__((used))
+static void __used
 arm_fault(struct fault *f, int reason)
 {
     fputs("ARM fault: ", stdout);
@@ -418,7 +418,7 @@ arm_fault(struct fault *f, int reason)
     _exit(1);
 }
 
-void __attribute__((naked))
+void __naked
 arm_hardfault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -426,7 +426,7 @@ arm_hardfault_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked))
+void __naked
 arm_memmange_isr(void)
 {
     __asm__("mov r0, sp");
@@ -434,7 +434,7 @@ arm_memmange_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked))
+void __naked
 arm_busfault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -442,7 +442,7 @@ arm_busfault_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked))
+void __naked
 arm_usagefault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -469,7 +469,7 @@ static const char *const reasons[] = {
 #define REASON_PREFETCH_ABORT   2
 #define REASON_DATA_ABORT       3
 
-static void __attribute__((used))
+static void __used
 arm_fault(struct fault *f, int reason)
 {
     int r;
@@ -489,7 +489,7 @@ arm_fault(struct fault *f, int reason)
     __asm__("push {r0-r6}");                            \
     __asm__("mov r0, sp")
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")
 arm_undef_vector(void)
 {
     VECTOR_COMMON;
@@ -497,7 +497,7 @@ arm_undef_vector(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")
 arm_prefetch_abort_vector(void)
 {
     VECTOR_COMMON;
@@ -505,7 +505,7 @@ arm_prefetch_abort_vector(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")
 arm_data_abort_vector(void)
 {
     VECTOR_COMMON;

@@ -39,7 +39,7 @@ _scanf_float (struct _reent *rptr,
   int c;
   char *p;
   float *flp;
-  _LONG_DOUBLE *ldp;
+  long double *ldp;
 
   /* Scan a floating point number as if by strtod.  */
   /* This code used to assume that the number of digits is reasonable.
@@ -321,7 +321,7 @@ fskip:
 	*GET_ARG (N, *ap, double *) = fp;
       else if (pdata->flags & LONGDBL)
 	{
-	  ldp = GET_ARG (N, *ap, _LONG_DOUBLE *);
+	  ldp = GET_ARG (N, *ap, long double *);
 	  *ldp = fp;
 	}
       else

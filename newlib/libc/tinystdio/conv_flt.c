@@ -213,7 +213,7 @@ conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, u
     switch ((unsigned char)i) {
     case '-':
         flags |= FL_MINUS;
-	__PICOLIBC_FALLTHROUGH;
+	__fallthrough;
     case '+':
 	if (!CHECK_WIDTH() || (i = scanf_getc (stream, context)) < 0)
 	    return 0;
@@ -377,7 +377,7 @@ conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, u
 	    switch ((unsigned char)esign) {
             case '-':
 		flags |= FL_MEXP;
-		__PICOLIBC_FALLTHROUGH;
+		__fallthrough;
             case '+':
                 if (!CHECK_WIDTH()) {
                     scanf_ungetc(esign, stream, context);

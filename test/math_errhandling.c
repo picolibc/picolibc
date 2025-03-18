@@ -43,10 +43,10 @@
 #include <limits.h>
 #include <stdbool.h>
 
-#ifdef _HAVE_ATTRIBUTE_ALWAYS_INLINE
-#define ALWAYS_INLINE __inline__ __attribute__((__always_inline__))
+#if __has_attribute(__always_inline__)
+#define ALWAYS_INLINE __inline __attribute__((__always_inline__))
 #else
-#define ALWAYS_INLINE __inline__
+#define ALWAYS_INLINE __inline
 #endif
 
 static ALWAYS_INLINE float

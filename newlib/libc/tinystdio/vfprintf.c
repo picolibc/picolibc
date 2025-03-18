@@ -575,7 +575,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    continue;
 		  case '+':
 		    flags |= FL_PLUS;
-		    __PICOLIBC_FALLTHROUGH;
+		    __fallthrough;
 		  case ' ':
 		    flags |= FL_SPACE;
 		    continue;
@@ -1363,7 +1363,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 #ifndef VFPRINTF_S
 #if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(vfprintf, __d_vfprintf);
 #else
 int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }

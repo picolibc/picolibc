@@ -35,7 +35,7 @@
 
 #include <sys/features.h>
 
-#ifdef __LONG_DOUBLE_IEEE128__
+#ifdef _LONG_DOUBLE_IEEE128__
 
 #define TCtype long double __complex
 #define TFtype long double

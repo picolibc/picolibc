@@ -34,7 +34,7 @@
 #include <sys/cdefs.h>
 #include <ssp/ssp.h>
 
-__BEGIN_DECLS
+_BEGIN_STD_C
 void *__memcpy_chk(void *, const void *, size_t, size_t);
 void *__memmove_chk(void *, const void *, size_t, size_t);
 void *__mempcpy_chk(void *, const void *, size_t, size_t);
@@ -44,7 +44,7 @@ char *__strcat_chk(char *, const char *, size_t);
 char *__strcpy_chk(char *, const char *, size_t);
 char *__strncat_chk(char *, const char *, size_t, size_t);
 char *__strncpy_chk(char *, const char *, size_t, size_t);
-__END_DECLS
+_END_STD_C
 
 #if __SSP_FORTIFY_LEVEL > 0
 
@@ -79,7 +79,7 @@ __ ## fun ## _ichk(type1 __restrict dst, type2 __restrict src) { \
 	return __builtin___ ## fun ## _chk(dst, src, __ssp_bos0(dst)); \
 }
 
-__BEGIN_DECLS
+_BEGIN_STD_C
 __ssp_bos_icheck3_restrict(memcpy, void *, const void *)
 __ssp_bos_icheck3(memmove, void *, const void *)
 __ssp_bos_icheck3_restrict(mempcpy, void *, const void *)
@@ -92,7 +92,7 @@ __ssp_bos_icheck2_restrict(strcpy, char *, const char *)
 __ssp_bos_icheck2_restrict(strcat, char *, const char *)
 __ssp_bos_icheck3_restrict(strncpy, char *, const char *)
 __ssp_bos_icheck3_restrict(strncat, char *, const char *)
-__END_DECLS
+_END_STD_C
 
 #define memcpy(dst, src, len) __ssp_bos_check3(memcpy, dst, src, len)
 #define memmove(dst, src, len) __ssp_bos_check3(memmove, dst, src, len)

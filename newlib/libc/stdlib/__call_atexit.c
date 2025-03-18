@@ -44,7 +44,7 @@ LITE_EXIT.
 
 /* Make this a weak reference to avoid pulling in free.  */
 #ifndef MALLOC_PROVIDED
-void free(void *) _ATTRIBUTE((__weak__));
+void free(void *) __weak;
 #endif
 
 #ifdef _WANT_REGISTER_FINI
@@ -63,7 +63,7 @@ void free(void *) _ATTRIBUTE((__weak__));
    configure-time option, so that the same C library binary can be
    used with multiple BSPs, some of which register finalizers from
    startup code, while others defer to the C library.  */
-extern char __libc_fini __attribute__((weak));
+extern char __libc_fini __weak;
 
 /* Register the application finalization function with atexit.  These
    finalizers should run last.  Therefore, we want to call atexit as

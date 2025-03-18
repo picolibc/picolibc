@@ -82,7 +82,7 @@ strncat (char *__restrict s1,
 	size_t n)
 {
 #if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
-    defined(PICOLIBC_NO_OUT_OF_BOUNDS_READS)
+    defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   char *s = s1;
 
   while (*s1)

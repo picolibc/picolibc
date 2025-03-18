@@ -55,12 +55,12 @@ __float64
 nearbyint64(__float64 x)
 {
     if (isnan(x)) return x + x;
-#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXCEPT)
     fenv_t env;
     fegetenv(&env);
 #endif
     x = rint64(x);
-#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXCEPT)
     fesetenv(&env);
 #endif
     return x;

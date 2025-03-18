@@ -49,7 +49,7 @@
 #define sgetrune(s, n, r)       (*__sgetrune)((s), (n), (r))
 #define sputrune(c, s, n, r)    (*__sputrune)((c), (s), (n), (r))
 
-__BEGIN_DECLS
+_BEGIN_STD_C
 char	*mbrune(const char *, rune_t);
 char	*mbrrune(const char *, rune_t);
 char	*mbmb(const char *, char *);
@@ -58,6 +58,6 @@ int	 fputrune(rune_t, FILE *);
 int	 fungetrune(rune_t, FILE *);
 int	 setrunelocale(char *);
 void	 setinvalidrune(rune_t);
-__END_DECLS
+_END_STD_C
 
 #endif	/*! _RUNE_H_ */

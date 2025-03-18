@@ -47,7 +47,7 @@ fputc(int c, FILE *stream)
 
 #undef putc
 #undef putc_unlocked
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(fputc, putc);
 __strong_reference(fputc, putc_unlocked);
 #else

@@ -54,7 +54,7 @@ extern char _gp[];
 #endif
 #endif
 
-void __section(".text.startup") __attribute__((used))
+void __section(".text.startup") __used
 _start(void)
 {
     __asm__("mov %0, r0" : : "i" (__stack));
@@ -110,7 +110,7 @@ static void rx_fault_write_reg(const char *prefix, uint32_t reg)
     putchar('\n');
 }
 
-static void __attribute__((used))
+static void __used
 rx_fault(struct fault *f, int exception)
 {
     int r;

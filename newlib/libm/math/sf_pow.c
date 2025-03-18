@@ -290,7 +290,7 @@ powf(float x, float y)
     return s * z;
 }
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

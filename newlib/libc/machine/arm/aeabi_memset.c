@@ -31,28 +31,25 @@
 #include <stddef.h>
 #include <string.h>
 
-/* Support the alias for the __aeabi_memset which may
-   assume memory alignment.  */
-void __aeabi_memset4 (void *dest, size_t n, int c)
-	_ATTRIBUTE ((alias ("__aeabi_memset"), weak));
-
-void __aeabi_memset8 (void *dest, size_t n, int c)
-	_ATTRIBUTE ((alias ("__aeabi_memset"), weak));
-
 /* Support the routine __aeabi_memset.  Can't alias to memset
    because the arguments are in a different order */
 /*
- *__attribute__((used)) added so that building with clang -flto
+ *__used added so that building with clang -flto
  * doesn't discard this function
  */
 
 #undef memset
 
-void __attribute__((used, weak)) __aeabi_memset (void *dest, size_t n, int c);
+void __used __weak __aeabi_memset (void *dest, size_t n, int c);
 
-void __attribute__((used, weak)) __aeabi_memset (void *dest, size_t n, int c)
+void __aeabi_memset (void *dest, size_t n, int c)
 {
   /*Note that relative to ANSI memset, __aeabi_memset hase the order
     of its second and third arguments reversed.  */
   memset (dest, c, n);
 }
+
+/* Support the alias for the __aeabi_memset which may
+   assume memory alignment.  */
+__weak_reference(__aeabi_memset, __aeabi_memset4);
+__weak_reference(__aeabi_memset, __aeabi_memset8);

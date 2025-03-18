@@ -69,7 +69,7 @@
 # ifdef _WANT_IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
-int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
+int vfscanf (FILE * stream, const char *fmt, va_list ap) __weak;
 #elif SCANF_LEVEL == SCANF_LLONG
 # define _NEED_IO_BRACKET
 # ifdef _WANT_IO_POS_ARGS

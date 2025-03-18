@@ -55,17 +55,5 @@ snprintf (
   return (ret);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-sniprintf (char *, size_t, const char *, ...)
-       _ATTRIBUTE ((__alias__("snprintf")));
-#endif
-
-#ifdef __LONG_DOUBLE_IEEE128__
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(snprintf, __snprintfieee128);
-#endif
-#endif
+__nano_reference(snprintf, sniprintf);
+__ieee128_reference(snprintf, __snprintfieee128);

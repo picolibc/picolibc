@@ -101,6 +101,7 @@ SECTIONS
 		PROVIDE_HIDDEN ( ___fini_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
+		KEEP (*(.fini_array*))
 		PROVIDE_HIDDEN ( ___fini_array_end = . );
 
 	} >flash AT>flash :text

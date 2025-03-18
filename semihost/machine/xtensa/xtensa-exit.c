@@ -35,9 +35,9 @@
 
 #include "xtensa-semihost.h"
 
-_Noreturn void
+__noreturn void
 _exit(int code)
 {
     _simcall(SYS_exit, code, 0, 0, 0, 0);
-    __unreachable();
+    __builtin_unreachable();
 }

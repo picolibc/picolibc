@@ -278,11 +278,11 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 	for(s = s00;;s++) switch(*s) {
 		case '-':
 			sign = 1;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
 		case '+':
 			if (*++s)
 				goto break2;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
 		case 0:
 			goto ret0;
 		case '\t':
@@ -323,7 +323,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 			  case STRTOG_NoNumber:
 				s = s00;
 				sign = 0;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 			  case STRTOG_Zero:
 				break;
 			  default:
@@ -399,7 +399,7 @@ strtod_l (const char *__restrict s00, char **__restrict se,
 		switch(c = *++s) {
 			case '-':
 				esign = 1;
-                                __PICOLIBC_FALLTHROUGH;
+                                __fallthrough;
 			case '+':
 				c = *++s;
 			}
@@ -1282,7 +1282,7 @@ strtod (const char *__restrict s00,
 }
 
 #if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"

@@ -38,9 +38,6 @@
 #include "pico-onexit.h"
 
 int
-__cxa_atexit (void (*func) (void *), void *arg, void *d);
-
-int
 __cxa_atexit (void (*func) (void *), void *arg, void *d)
 {
         union on_exit_func func_u = { .cxa_atexit = func };

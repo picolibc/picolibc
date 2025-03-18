@@ -829,7 +829,7 @@ int     pOSIx_mEMALIGn(void **, size_t, size_t);
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 extern __typeof(free) __malloc_free;
 #else
 #define __malloc_free(x) fREe(x)
@@ -2284,7 +2284,7 @@ void fREe(void* mem)
 
 #endif /* MALLOC_PROVIDED */
 }
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -2693,7 +2693,7 @@ void* mEMALIGn(size_t alignment, size_t bytes)
 
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(memalign, aligned_alloc);
 #endif
 #endif /* DEFINE_MEMALIGN */

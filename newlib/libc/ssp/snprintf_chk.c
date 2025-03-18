@@ -57,8 +57,8 @@ __snprintf_chk(char * __restrict buf, size_t len, int flags, size_t slen,
 	return rv;
 }
 
-#ifdef __LONG_DOUBLE_IEEE128__
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifdef _LONG_DOUBLE_IEEE128__
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

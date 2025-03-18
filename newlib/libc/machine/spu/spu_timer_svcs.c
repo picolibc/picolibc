@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "spu_timer_internal.h"
 
 /* The timers.  */
-spu_timer_t __spu_timers[SPU_TIMER_NTIMERS] __attribute__ ((aligned (16)));
+spu_timer_t __spu_timers[SPU_TIMER_NTIMERS] __aligned(16);
 
 /* Active timer list.  */
 spu_timer_t *__spu_timers_active;

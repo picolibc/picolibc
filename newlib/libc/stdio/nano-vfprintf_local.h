@@ -140,6 +140,11 @@ typedef short *  short_ptr_t;
 /* Define as 0, to make SARG and UARG occupy fewer instructions.  */
 # define CHARINT	0
 
+#define u_char unsigned char
+#define u_long unsigned long
+#define u_short unsigned short
+#define u_int unsigned int
+
 /* Macros to support positional arguments.  */
 #define GET_ARG(n, ap, type) (va_arg ((ap), type))
 
@@ -221,11 +226,11 @@ _printf_i (struct _prt_data_t *pdata, FILE *fp,
 
 /* Make _printf_float weak symbol, so it won't be linked in if target program
    does not need it.  */
-extern int
+int
 _printf_float (
 	       struct _prt_data_t *pdata,
 	       FILE *fp,
 	       int (*pfunc)(FILE *,
 			    const char *, size_t len),
-	       va_list *ap) _ATTRIBUTE((__weak__));
+	       va_list *ap) __weak;
 #endif

@@ -125,12 +125,6 @@
 #define _POINTER_INT short
 #endif
 
-#if defined(__PPC__)
-#ifdef __SPE__
-#define _LONG_DOUBLE double
-#endif
-#endif
-
 #if defined (__MICROBLAZE__) && !defined(__rtems__)
 /* Xilinx XMK uses Unix98 mutex */
 #ifdef __XMK__

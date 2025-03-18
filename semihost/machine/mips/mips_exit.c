@@ -37,9 +37,9 @@
 #include <sys/cdefs.h>
 #include <unistd.h>
 
-_Noreturn void
+__noreturn void
 _exit(int code)
 {
     mips_semihost1(SYS_SEMIHOST_exit, code);
-    __unreachable();
+    __builtin_unreachable();
 }

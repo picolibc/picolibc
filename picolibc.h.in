@@ -47,16 +47,7 @@
 
 #cmakedefine _FVWRITE_IN_STREAMIO
 
-#cmakedefine _HAVE_ALIAS_ATTRIBUTE
-
-/* The compiler REALLY has the attribute __alloc_size__ */
-#cmakedefine _HAVE_ALLOC_SIZE
-
-/* The compiler supports the always_inline function attribute */
-#cmakedefine _HAVE_ATTRIBUTE_ALWAYS_INLINE
-
-/* The compiler supports the gnu_inline function attribute */
-#cmakedefine _HAVE_ATTRIBUTE_GNU_INLINE
+#cmakedefine __strong_reference
 
 /* Use bitfields in packed structs */
 #cmakedefine _HAVE_BITFIELDS_IN_PACKED_STRUCTS
@@ -69,8 +60,6 @@
 
 #cmakedefine _HAVE_FCNTL
 
-#cmakedefine _HAVE_FORMAT_ATTRIBUTE
-
 /* IEEE fp funcs available */
 #cmakedefine _HAVE_IEEEFP_FUNCS
 
@@ -80,16 +69,11 @@
 /* Support _init() and _fini() functions */
 #cmakedefine _HAVE_INIT_FINI
 
-/* Compiler attribute to prevent the optimizer from adding new builtin calls */
-#cmakedefine _HAVE_NO_BUILTIN_ATTRIBUTE
-
 /* _set_tls and _init_tls functions available */
 #cmakedefine _HAVE_PICOLIBC_TLS_API
 
 /* Semihost APIs supported */
 #cmakedefine _HAVE_SEMIHOST
-
-#cmakedefine _HAVE_WEAK_ATTRIBUTE
 
 /* math library does not set errno (offering only ieee semantics) */
 #cmakedefine _IEEE_LIBM

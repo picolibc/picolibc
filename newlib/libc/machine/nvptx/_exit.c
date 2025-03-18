@@ -25,7 +25,7 @@
    error, not a link error.  */
 int *__attribute((weak)) __exitval_ptr;
 
-void __attribute__((noreturn))
+void __noreturn
 _exit (int status)
 {
   if (__exitval_ptr)

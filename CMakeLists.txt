@@ -125,18 +125,6 @@ set(_FSEEK_OPTIMIZATION 0)
 
 set(_FVWRITE_IN_STREAMIO 0)
 
-# Compiler supports alias symbol attribute
-picolibc_flag(_HAVE_ALIAS_ATTRIBUTE)
-
-# The compiler REALLY has the attribute __alloc_size__
-picolibc_flag(_HAVE_ALLOC_SIZE)
-
-# The compiler supports the always_inline function attribute
-picolibc_flag(_HAVE_ATTRIBUTE_ALWAYS_INLINE)
-
-# The compiler supports the gnu_inline function attribute
-picolibc_flag(_HAVE_ATTRIBUTE_GNU_INLINE)
-
 # Use bitfields in packed structs
 picolibc_flag(_HAVE_BITFIELDS_IN_PACKED_STRUCTS)
 
@@ -145,12 +133,6 @@ picolibc_flag(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 
 # Compiler supports _Complex
 picolibc_flag(_HAVE_COMPLEX)
-
-# Compiler supports format function attribute
-picolibc_flag(_HAVE_FORMAT_ATTRIBUTE 1)
-
-# Compiler supports weak attribute
-picolibc_flag(_HAVE_WEAK_ATTRIBUTE)
 
 set(_HAVE_FCNTL 0)
 
@@ -165,9 +147,6 @@ set(_HAVE_INIT_FINI 1)
 
 # Enable MMU in pico crt startup
 set(_PICOCRT_ENABLE_MMU 1)
-
-# Compiler attribute to prevent the optimizer from adding new builtin calls
-picolibc_flag(_HAVE_NO_BUILTIN_ATTRIBUTE)
 
 # _set_tls and _init_tls functions available
 if(NOT DEFINED _HAVE_PICOLIBC_TLS_API OR NOT PICOLIBC_TLS)

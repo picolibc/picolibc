@@ -16,12 +16,12 @@
 float nearbyintf(float x)
 {
     if (isnan(x)) return x + x;
-#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXCEPT)
     fenv_t env;
     fegetenv(&env);
 #endif
     x = rintf(x);
-#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXECPT)
+#if defined(FE_INEXACT) && !defined(PICOLIBC_DOUBLE_NOEXCEPT)
     fesetenv(&env);
 #endif
     return x;

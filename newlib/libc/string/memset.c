@@ -53,7 +53,7 @@ QUICKREF
 #undef memset
 
 void *
-__inhibit_loop_to_libcall
+__no_builtin
 memset (void *m,
 	int c,
 	size_t n)

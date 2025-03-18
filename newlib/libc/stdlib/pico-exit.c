@@ -35,16 +35,16 @@
 
 #include <stdlib.h>
 #include <unistd.h>
+#include "pico-onexit.h"
 
 void
 exit(int code)
 {
-	void __call_exitprocs (int, void *) __attribute__((weak));
-	void __libc_fini_array(void);
-	if (__call_exitprocs)
-		__call_exitprocs (code, NULL);
 #ifdef _HAVE_INITFINI_ARRAY
 	__libc_fini_array();
+#else
+        if (__call_exitprocs)
+            __call_exitprocs(code, NULL);
 #endif
 	_exit(code);
 }

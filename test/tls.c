@@ -52,9 +52,9 @@
 
 NEWLIB_THREAD_LOCAL volatile int32_t data_var = DATA_VAL;
 NEWLIB_THREAD_LOCAL volatile int32_t bss_var;
-_Alignas(OVERALIGN_DATA) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_data_var = DATA_VAL2;
-_Alignas(OVERALIGN_BSS) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_bss_var;
-_Alignas(OVERALIGN_NON_TLS_BSS) volatile int32_t overaligned_non_tls_bss_var;
+__aligned(OVERALIGN_DATA) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_data_var = DATA_VAL2;
+__aligned(OVERALIGN_BSS) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_bss_var;
+__aligned(OVERALIGN_NON_TLS_BSS) volatile int32_t overaligned_non_tls_bss_var;
 
 volatile int32_t *volatile data_addr;
 volatile int32_t *volatile overaligned_data_addr;
@@ -74,12 +74,12 @@ inside_tls_region(void *ptr, const void *tls)
 	       (uintptr_t)ptr < (uintptr_t)tls + _tls_size();
 }
 
-#define check_inside_tls_region(ptr, tls_start)                                \
-	if (!inside_tls_region(__DEVOLATILE(void *, ptr), tls_start)) {        \
-		printf("%s (%p) is not inside TLS region [%p-%p)\n", #ptr,     \
-		       ptr, tls_start, (char *)tls_start + _tls_size());       \
-		result++;                                                      \
-	}
+#define check_inside_tls_region(ptr, tls_start)                         \
+        if (!inside_tls_region((void *) ptr, tls_start)) {              \
+                printf("%s (%p) is not inside TLS region [%p-%p)\n", #ptr, \
+                       ptr, tls_start, (char *)tls_start + _tls_size()); \
+                result++;                                               \
+        }
 #endif
 
 static int

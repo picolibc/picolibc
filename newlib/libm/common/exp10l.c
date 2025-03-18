@@ -44,7 +44,7 @@ exp10l (long double x)
     return _powl(10.0l, x);
 }
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

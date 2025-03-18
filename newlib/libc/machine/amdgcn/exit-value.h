@@ -16,7 +16,7 @@
 #ifndef _AMDGCN_EXIT_VALUE_H_
 #define _AMDGCN_EXIT_VALUE_H_
 
-static inline void  __attribute__((noreturn))
+static inline void  __noreturn
 exit_with_int (int val)
 {
   /* Write the exit value to the conventional place.  */
@@ -36,7 +36,7 @@ exit_with_int (int val)
   __builtin_unreachable ();
 }
 
-static inline void  __attribute__((noreturn))
+static inline void  __noreturn
 exit_with_status_and_signal (int val, int signal)
 {
   if (signal == 0)

@@ -101,10 +101,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 # define _DOUBLE_IS_32BITS
 #endif
 
-#if _SIZEOF_LONG_DOUBLE__ == 4
-# define _LONG_DOUBLE_IS_32BITS
-#endif
-
 #if (defined(__arm__) || defined(__thumb__)) && !defined(__MAVERICK__)
 /* arm with hard fp and soft dp cannot use new float code */
 # if (__ARM_FP & 4) && !(__ARM_FP & 8)

@@ -165,10 +165,17 @@ static char *rcsid = "$Id$";
 #include "vfieeefp.h"
 #include "nano-vfprintf_local.h"
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#endif
+
 /* The _ssputs function is shared between all versions of vfprintf
    and vfwprintf.  */
 #ifdef STRING_ONLY
-int
+static int
 _ssputs (
        FILE *fp,
        const char *buf,
@@ -239,7 +246,7 @@ err:
    char output, but _ssprint cannot be discarded because it is used
    by a serial of functions like svfwprintf for wide char output.  */
 int
-_ssprint (
+__ssprint (
        FILE *fp,
        register struct __suio *uio)
 {
@@ -342,7 +349,7 @@ err:
 /* Flush out all the vectors defined by the given uio,
    then reset it so that it can be reused.  */
 int
-_sprint (
+__sprint (
        FILE *fp,
        register struct __suio *uio)
 {
@@ -386,7 +393,7 @@ out:
   return err;
 }
 
-__noinline_static int
+__noinline static int
 _sfputc (
        int c,
        FILE *fp)
@@ -397,7 +404,7 @@ _sfputc (
     return (_swbuf( c, fp));
 }
 
-int
+static int
 _sfputs (
        FILE *fp,
        const char *buf,
@@ -604,7 +611,7 @@ VFPRINTF (
 	  if (_printf_float == NULL)
 	    {
 	      if (prt_data.flags & LONGDBL)
-		GET_ARG (N, ap_copy, _LONG_DOUBLE);
+		GET_ARG (N, ap_copy, long double);
 	      else
 		GET_ARG (N, ap_copy, double);
 	    }
@@ -631,11 +638,7 @@ error:
 }
 
 #ifdef STRING_ONLY
-int __nonnull((1))
-svfiprintf ( FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("svfprintf")));
+__nano_reference(svfprintf, svfiprintf);
 #else
-int __nonnull((1))
-vfiprintf ( FILE *, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vfprintf")));
+__nano_reference(vfprintf, vfiprintf);
 #endif

@@ -96,19 +96,19 @@ size_t	__locale_mb_cur_max (void);
 #define MB_CUR_MAX __locale_mb_cur_max()
 
 /* Declare free up here so it can be used with __malloc_like */
-void	free (void *) _NOTHROW;
+void	free (void *) __nothrow;
 
 #if __ISO_C_VISIBLE >= 1999
-_Noreturn void	_Exit (int __status);
+__noreturn void	_Exit (int __status);
 #endif
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4
 long    a64l (const char *__input);
 #endif
-_Noreturn void	abort (void);
+__noreturn void	abort (void);
 int	abs (int);
 #if __ISO_C_VISIBLE >= 2011
 void   *aligned_alloc(size_t, size_t) __malloc_like __alloc_align(1)
-                         __alloc_size(2) __result_use_check _NOTHROW;
+                         __alloc_size(2) __warn_unused_result __nothrow;
 #endif
 #if __BSD_VISIBLE
 __uint32_t arc4random (void);
@@ -133,8 +133,8 @@ void *	bsearch (const void *__key,
                  size_t __nmemb,
                  size_t __size,
                  __compar_fn_t _compar);
-void	*calloc(size_t, size_t) __malloc_like __result_use_check
-	     __alloc_size2(1, 2) _NOTHROW;
+void	*calloc(size_t, size_t) __malloc_like __warn_unused_result
+	     __alloc_size2(1, 2) __nothrow;
 div_t	div (int __numer, int __denom);
 #if __SVID_VISIBLE || __XSI_VISIBLE
 struct _rand48;
@@ -143,8 +143,8 @@ double _drand48_r (struct _rand48 *);
 double erand48 (unsigned short [3]);
 double _erand48_r (struct _rand48 *, unsigned short [3]);
 #endif
-_Noreturn void	exit (int __status);
-void	free (void *) _NOTHROW;
+__noreturn void	exit (int __status);
+void	free (void *) __nothrow;
 char *  getenv (const char *__string);
 #if __GNU_VISIBLE
 char *  secure_getenv (const char *__string);
@@ -180,7 +180,7 @@ lldiv_t	lldiv (long long __numer, long long __denom);
 long   lrand48 (void);
 long   _lrand48_r (struct _rand48 *);
 #endif
-void	*malloc(size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
+void	*malloc(size_t) __malloc_like __warn_unused_result __alloc_size(1) __nothrow;
 int	mblen (const char *, size_t);
 size_t	mbstowcs (wchar_t *__restrict, const char *__restrict, size_t);
 int	mbtowc (wchar_t *__restrict, const char *__restrict, size_t);
@@ -198,7 +198,7 @@ int	mkstemp (char *);
 int	mkstemps (char *, int);
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-char *	mktemp (char *) __picolibc_deprecated("the use of `mktemp' is dangerous; use `mkstemp' instead");
+char *	mktemp (char *) __deprecated("the use of `mktemp' is dangerous; use `mkstemp' instead");
 #endif
 #if __SVID_VISIBLE || __XSI_VISIBLE
 long   mrand48 (void);
@@ -208,13 +208,13 @@ long   _nrand48_r (struct _rand48 *, unsigned short [3]);
 #endif
 #if __POSIX_VISIBLE >= 200112
 int	posix_memalign (void **, size_t, size_t) __nonnull((1))
-	    __result_use_check;
+	    __warn_unused_result;
 #endif
 #if __SVID_VISIBLE || __XSI_VISIBLE
 int	putenv (char *__string);
 #endif
 #if __ISO_C_VISIBLE >= 2011
-_Noreturn void
+__noreturn void
 	quick_exit(int);
 #endif /* __ISO_C_VISIBLE >= 2011 */
 void	qsort (void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar);
@@ -240,10 +240,10 @@ int	rand_r (unsigned *__seed);
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4 || __BSD_VISIBLE
 long	random (void);
 #endif
-void	*realloc(void *, size_t) __result_use_check __alloc_size(2) _NOTHROW;
+void	*realloc(void *, size_t) __warn_unused_result __alloc_size(2) __nothrow;
 #if __BSD_VISIBLE
-void	*reallocarray(void *, size_t, size_t) __result_use_check __alloc_size2(2, 3);
-void	*reallocf(void *, size_t) __result_use_check __alloc_size(2);
+void	*reallocarray(void *, size_t, size_t) __warn_unused_result __alloc_size2(2, 3);
+void	*reallocf(void *, size_t) __warn_unused_result __alloc_size(2);
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
 char *	realpath (const char *__restrict path, char *__restrict resolved_path);
@@ -342,7 +342,7 @@ int	unsetenv (const char *__string);
 #endif
 size_t	wcstombs (char *__restrict, const wchar_t *__restrict, size_t);
 int	wctomb (char *, wchar_t);
-void   *valloc (size_t) __malloc_like __result_use_check __alloc_size(1) _NOTHROW;
+void   *valloc (size_t) __malloc_like __warn_unused_result __alloc_size(1) __nothrow;
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4
 char   *l64a (long __input);
 #endif

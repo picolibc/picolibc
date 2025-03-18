@@ -43,7 +43,7 @@
 __asm__ (".syntax no_register_prefix");
 
 void *
-__inhibit_loop_to_libcall
+__no_builtin
 memcpy(void *__restrict pdst, const void *__restrict psrc, size_t pn)
 {
   /* Now we want the parameters put in special registers.

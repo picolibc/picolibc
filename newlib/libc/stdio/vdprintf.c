@@ -30,8 +30,4 @@ vdprintf (
   return n;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-vdiprintf (int, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vdprintf")));
-#endif
+__nano_reference(vdprintf, vdiprintf);

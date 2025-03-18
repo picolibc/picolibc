@@ -57,7 +57,7 @@ fgetc(FILE *stream)
 
 #undef getc
 #undef getc_unlocked
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(fgetc, getc);
 __strong_reference(fgetc, getc_unlocked);
 #else

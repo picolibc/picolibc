@@ -64,8 +64,4 @@ dprintf (int fd,
   return n;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-diprintf (int, const char *, ...)
-       _ATTRIBUTE ((__alias__("dprintf")));
-#endif
+__nano_reference(dprintf, diprintf);

@@ -423,7 +423,7 @@ p_ere_exp(struct parse *p)
 		break;
 	case '{':		/* okay as ordinary except if digit follows */
 		(void)REQUIRE(!MORE() || !isdigit((uch)PEEK()), REG_BADRPT);
-		__PICOLIBC_FALLTHROUGH;
+		__fallthrough;
 	default:
 		ordinary(p, c);
 		break;
@@ -627,7 +627,7 @@ p_simp_re(
 		break;
 	case '*':
 		(void)REQUIRE(starordinary, REG_BADRPT);
-		__PICOLIBC_FALLTHROUGH;
+		__fallthrough;
 	default:
 		ordinary(p, (char)c);
 		break;
@@ -1753,7 +1753,7 @@ findmust(
 					return;
 				}
 			} while (OP(s) != O_QUEST && OP(s) != O_CH);
-			__PICOLIBC_FALLTHROUGH;
+			__fallthrough;
 		case OBOW:		/* things that break a sequence */
 		case OEOW:
 		case OBOL:
@@ -1912,7 +1912,7 @@ altoffset(
 		case OANYOF:
 			if (mccs)
 				return -1;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
 		case OCHAR:
 		case OANY:
 			try++;

@@ -28,7 +28,4 @@ vprintf (const char *fmt,
   return vfprintf ( stdout, fmt, ap);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-viprintf (const char *, __VALIST) _ATTRIBUTE ((__alias__("vprintf")));
-#endif
+__nano_reference(vprintf, viprintf);

@@ -48,8 +48,4 @@ asprintf (char **__restrict strp,
   return (ret);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-asiprintf (char **, const char *, ...)
-       _ATTRIBUTE ((__alias__("asprintf")));
-#endif
+__nano_reference(asprintf, asiprintf);

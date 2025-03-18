@@ -40,7 +40,7 @@
 #include "vfscanf.c"
 
 #ifdef _FORMAT_DEFAULT_MINIMAL
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(vfscanf, __m_vfscanf);
 #else
 int __m_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }

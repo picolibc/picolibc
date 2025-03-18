@@ -220,9 +220,9 @@ __sbwprintf (
 
 # else /* !_NO_LONGDBL */
 
-extern int _ldcheck (_LONG_DOUBLE *);
+extern int _ldcheck (long double *);
 
-#  define _PRINTF_FLOAT_TYPE _LONG_DOUBLE
+#  define _PRINTF_FLOAT_TYPE long double
 #  define _DTOA __ldtoa
 #  define FREXP frexpl
 # endif /* !_NO_LONGDBL */
@@ -288,7 +288,7 @@ union arg_val
   u_long val_u_long;
   float val_float;
   double val_double;
-  _LONG_DOUBLE val__LONG_DOUBLE;
+  long double val_long double;
   int_ptr_t val_int_ptr_t;
   short_ptr_t val_short_ptr_t;
   long_ptr_t val_long_ptr_t;
@@ -728,7 +728,7 @@ reswitch:	switch (ch) {
 			if (width >= 0)
 				goto rflag;
 			width = -width;
-			__PICOLIBC_FALLTHROUGH;
+			__fallthrough;
 		case L'-':
 			flags |= LADJUST;
 			goto rflag;
@@ -921,7 +921,7 @@ reswitch:	switch (ch) {
 		case L'G':
 # ifdef _NO_LONGDBL
 			if (flags & LONGDBL) {
-				_fpvalue = (double) GET_ARG (N, ap, _LONG_DOUBLE);
+				_fpvalue = (double) GET_ARG (N, ap, long double);
 			} else {
 				_fpvalue = GET_ARG (N, ap, double);
 			}
@@ -958,9 +958,9 @@ reswitch:	switch (ch) {
 # else /* !_NO_LONGDBL */
 
 			if (flags & LONGDBL) {
-				_fpvalue = GET_ARG (N, ap, _LONG_DOUBLE);
+				_fpvalue = GET_ARG (N, ap, long double);
 			} else {
-				_fpvalue = (_LONG_DOUBLE)GET_ARG (N, ap, double);
+				_fpvalue = (long double)GET_ARG (N, ap, double);
 			}
 
 			/* do this before tricky precision changes */
@@ -1545,7 +1545,7 @@ wcvt(_PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 	union
 	{
 	  struct ldieee ieee;
-	  _LONG_DOUBLE val;
+	  long double val;
 	} ld;
 
 	ld.val = value;
@@ -1907,7 +1907,7 @@ get_arg (
 			args[numargs++].val_double = va_arg (ap->ap, double);
 			break;
 		      case LONG_DOUBLE:
-			args[numargs++].val__LONG_DOUBLE = va_arg (ap->ap, _LONG_DOUBLE);
+			args[numargs++].val_long double = va_arg (ap->ap, long double);
 			break;
 		      }
 		  }
@@ -1928,7 +1928,7 @@ get_arg (
 	      break;
 	    case GETPWB: /* we require format pushback */
 	      --fmt;
-	      __PICOLIBC_FALLTHROUGH;
+	      __fallthrough;
 	    case GETPW:  /* we have a variable precision or width to acquire */
 	      args[numargs++].val_int = va_arg (ap->ap, int);
 	      break;
@@ -1975,7 +1975,7 @@ get_arg (
 	  args[numargs++].val_double = va_arg (ap->ap, double);
 	  break;
 	case LONG_DOUBLE:
-	  args[numargs++].val__LONG_DOUBLE = va_arg (ap->ap, _LONG_DOUBLE);
+	  args[numargs++].val_long double = va_arg (ap->ap, long double);
 	  break;
 	case WIDE_CHAR:
 	  args[numargs++].val_wint_t = va_arg (ap->ap, wint_t);

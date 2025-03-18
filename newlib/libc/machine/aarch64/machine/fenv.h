@@ -104,11 +104,11 @@ typedef	__uint64_t	fexcept_t;
 #define _FPUSW_SHIFT	8
 #define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
 
-#define	__mrs_fpcr(__r)	__asm __volatile("mrs %0, fpcr" : "=r" (__r))
-#define	__msr_fpcr(__r)	__asm __volatile("msr fpcr, %0" : : "r" (__r))
+#define	__mrs_fpcr(__r)	__asm__ __volatile__("mrs %0, fpcr" : "=r" (__r))
+#define	__msr_fpcr(__r)	__asm__ __volatile__("msr fpcr, %0" : : "r" (__r))
 
-#define	__mrs_fpsr(__r)	__asm __volatile("mrs %0, fpsr" : "=r" (__r))
-#define	__msr_fpsr(__r)	__asm __volatile("msr fpsr, %0" : : "r" (__r))
+#define	__mrs_fpsr(__r)	__asm__ __volatile__("mrs %0, fpsr" : "=r" (__r))
+#define	__msr_fpsr(__r)	__asm__ __volatile__("msr fpsr, %0" : : "r" (__r))
 
 #else
 #define	FE_TONEAREST		0x00000000

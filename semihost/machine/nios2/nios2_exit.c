@@ -37,9 +37,9 @@
 #include <sys/cdefs.h>
 #include <unistd.h>
 
-_Noreturn void
+__noreturn void
 _exit(int code)
 {
     nios2_semihost1_immediate(HOSTED_EXIT, code);
-    __unreachable();
+    __builtin_unreachable();
 }

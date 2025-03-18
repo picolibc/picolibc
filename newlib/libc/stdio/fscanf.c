@@ -32,8 +32,4 @@ fscanf(FILE *__restrict fp, const char *__restrict fmt, ...)
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-fiscanf (FILE *, const char *, ...)
-       _ATTRIBUTE ((__alias__("fscanf")));
-#endif
+__nano_reference(fscanf, fiscanf);

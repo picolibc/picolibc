@@ -67,7 +67,7 @@ QUICKREF
 
 /*SUPPRESS 20*/
 void *
-__inhibit_loop_to_libcall
+__no_builtin
 memmove (void *dst_void,
 	const void *src_void,
 	size_t length)

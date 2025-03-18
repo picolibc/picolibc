@@ -403,7 +403,7 @@ QUICKREF
 #include "string_private.h"
 #include "local.h"
 
-extern char *_user_strerror (int, int, int *) _ATTRIBUTE((__weak__));
+extern char *_user_strerror (int, int, int *) __weak;
 
 char *
 _strerror_r (

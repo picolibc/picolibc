@@ -63,7 +63,7 @@ setjmp:
 	ret
 	.size	setjmp, .-setjmp
 
-// void longjmp (jmp_buf, int) __attribute__ ((noreturn))
+// void longjmp (jmp_buf, int) __noreturn
 	.global	longjmp
 	.type	longjmp, %function
 longjmp:

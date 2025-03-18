@@ -107,6 +107,6 @@ memalign(size_t align, size_t s)
     return aligned_p;
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(memalign, aligned_alloc);
 #endif

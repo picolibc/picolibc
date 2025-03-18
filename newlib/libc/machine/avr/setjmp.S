@@ -50,7 +50,7 @@
    All multibytes are stored as little-endian.
 
    int setjmp(jmp_buf __jmpb);
-   void longjmp(jmp_buf __jmpb, int __val) __attribute__((noreturn));
+   void longjmp(jmp_buf __jmpb, int __val) __noreturn;
  */
 
 #include <picolibc.h>

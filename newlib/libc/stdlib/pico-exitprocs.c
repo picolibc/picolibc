@@ -68,9 +68,12 @@ _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg)
 }
 
 /*
- * _call_exitprocs is in the same file as _on_exit so that the weak
- * symbol in will be resolved here when any _on_exit function is used.
+ * _call_exitprocs is in the same file as _on_exit so that the destructor
+ * will be included when any _on_exit function is used.
  */
+#ifdef _HAVE_INITFINI_ARRAY
+static
+#endif
 void
 __call_exitprocs(int code, void *param)
 {
@@ -107,3 +110,7 @@ __call_exitprocs(int code, void *param)
                 }
 	}
 }
+
+#ifdef _HAVE_INITFINI_ARRAY
+static const void *__call_exitprocs_ref __section(".fini_array_onexit") __used = __call_exitprocs;
+#endif

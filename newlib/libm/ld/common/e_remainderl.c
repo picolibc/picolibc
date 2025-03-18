@@ -40,7 +40,7 @@ remainderl(long double x, long double y)
 	return (remquol(x, y, &quo));
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(remainderl, dreml);
 #else
 long double

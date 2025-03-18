@@ -9,7 +9,7 @@
 
 #ifdef _NEED_FLOAT64
 
-void __inhibit_new_builtin_calls
+void __no_builtin
 sincos64(__float64 x, __float64 *sinx, __float64 *cosx)
 {
     *sinx = _sin64(x);

@@ -72,11 +72,11 @@ _BEGIN_STD_C
 
 #endif /* !NDEBUG */
 
-_Noreturn void __assert (const char *, const char *, int);
+__noreturn void __assert (const char *, const char *, int);
 
-_Noreturn void __assert_func (const char *, int, const char *, const char *);
+__noreturn void __assert_func (const char *, int, const char *, const char *);
 
-_Noreturn void __assert_no_args (void);
+__noreturn void __assert_no_args (void);
 
 #if __STDC_VERSION__ >= 201112L && !defined __cplusplus
 # define static_assert _Static_assert

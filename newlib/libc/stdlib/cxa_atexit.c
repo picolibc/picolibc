@@ -54,7 +54,7 @@ __cxa_atexit (void (*fn) (void *),
 #ifdef _LITE_EXIT
   /* Refer to comments in __atexit.c for more details of lite exit.  */
   int __register_exitproc (int, void (*fn) (void), void *, void *)
-    __attribute__ ((weak));
+      __weak;
 
   if (!__register_exitproc)
     return 0;

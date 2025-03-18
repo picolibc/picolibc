@@ -51,7 +51,7 @@ fputwc(wchar_t c, FILE *stream)
 	return (wint_t) c;
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(fputwc, putwc);
 #elif !defined(getwc)
 wint_t putwc(wchar_t c, FILE *stream) { return fputwc(c, stream); }
