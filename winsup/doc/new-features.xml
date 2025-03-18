@@ -65,7 +65,7 @@ executable.
 </para></listitem>
 
 <listitem><para>
-Drop support for NT4 and Samba &lt; 3.0.22.
+Drop workarounds for connecting with NT4 and Samba &lt; 3.0.22 shares.
 </para></listitem>
 
 <listitem><para>

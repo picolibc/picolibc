@@ -35,7 +35,7 @@ What changed:
 - ps -f now prints the commandline rather than the full path to the
   executable.
 
-- Drop support for NT4 and Samba < 3.0.22.
+- Drop workarounds for connecting with NT4 and Samba < 3.0.22 shares.
 
 - Now that SMBv1 is ultimately deprecated and not installed by default
   on latest Windows versions, use Network Discovery (i. e. WSD, "Web
