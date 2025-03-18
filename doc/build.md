@@ -135,13 +135,21 @@ at startup and shutdown times.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| lite-exit                   | true    | Enable lightweight exit                                                             |
-| newlib-atexit-dynamic-alloc | false   | Enable dynamic allocation of atexit entries                                          |
-| newlib-global-atexit        | false   | Enable atexit data structure as global, instead of in TLS. <br> If `thread-local-storage` == false, then the atexit data structure is always global. |
-| newlib-initfini             | true    | Support _init() and _fini() functions in picocrt                                     |
-| newlib-initfini-array       | true    | Use .init_array and .fini_array sections in picocrt                                  |
-| newlib-register-fini        | false   | Enable finalization function registration using atexit                               |
+| picoexit                    | true    | Use smaller implementation that allows only 32 init and fini handlers                |
+| initfini-array              | true    | Use .init_array and .fini_array sections in picocrt                                  |
+| initfini                    | false   | Support _init() and _fini() functions in picocrt                                     |
 | crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime. <br> This option exists for targets where the linker can't handle a symbol that is the difference between two other symbols, e.g. m68k.|
+
+### Startup/shutdown options for non-picoexit configuration
+
+When picoexit is disabled, these options can be used to control
+library behavior.
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| newlib-atexit-dynamic-alloc | false   | Enable dynamic allocation of atexit entries                                          |
+| newlib-global-atexit        | false   | Make atexit data structure global, instead of in TLS. <br> If `thread-local-storage` == false, then the atexit data structure is always global. |
+| newlib-register-fini        | false   | Enable finalization function registration using atexit                               |
 
 ### Thread local storage support
 

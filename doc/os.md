@@ -108,7 +108,7 @@ callbacks registered with atexit. To make it work, you'll need to
 implement the `_exit` function:
 
 ```c
-_Noreturn void _exit (int status);
+__noreturn void _exit (int status);
 ```
 
 ### malloc and free
