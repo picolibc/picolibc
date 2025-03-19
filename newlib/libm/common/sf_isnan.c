@@ -18,6 +18,9 @@
  * isnanf is an extension declared in <math.h>.
  */
 
+#define _ADD_D_TO_DOUBLE_FUNCS
+#define isnand isnan
+
 #include "fdlibm.h"
 
 #undef isnanf
@@ -31,6 +34,15 @@ isnanf (float x)
 	return FLT_UWORD_IS_NAN(ix);
 }
 
-#undef isnan
+#ifdef __strong_reference
+__strong_reference(isnanf, __isnanf);
+#else
+int
+__isnanf(float x)
+{
+    return isnanf(x);
+}
+#endif
 
 _MATH_ALIAS_i_f(isnan)
+_MATH_ALIAS_i_f(__isnan)

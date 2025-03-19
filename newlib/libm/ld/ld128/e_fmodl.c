@@ -32,10 +32,10 @@ fmodl(long double x, long double y)
 	hx ^=sx;				/* |x| */
 	hy &= 0x7fffffffffffffffLL;		/* |y| */
 
-        if (isnanl(x) || isnanl(y))
+        if (isnan(x) || isnan(y))
             return x + y;
 
-        if (isinfl(x))
+        if (isinf(x))
             return __math_invalidl(x);
 
         if (y == 0.0L)

@@ -301,7 +301,7 @@ if( x == 0.0L )
 else
 	{
         q = check_oflowl(1.0L/x);
-        if (!isinfl(q))
+        if (!isinf(q))
                 {
                 if( x < 0.0L )
                         {

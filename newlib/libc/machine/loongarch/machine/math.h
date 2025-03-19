@@ -149,6 +149,20 @@ finite(double x)
 }
 
 __declare_extern_inline(int)
+__isinfd(double x)
+{
+	long fclass = _fclass_d (x);
+	return (fclass & _FCLASS_INF) != 0;
+}
+
+__declare_extern_inline(int)
+__isnand(double x)
+{
+	long fclass = _fclass_d (x);
+	return (fclass & _FCLASS_NAN) != 0;
+}
+
+__declare_extern_inline(int)
 __fpclassifyd (double x)
 {
   long fclass = _fclass_d (x);
@@ -239,6 +253,20 @@ __declare_extern_inline(int)
 finitef(float x)
 {
         return __finitef(x);
+}
+
+__declare_extern_inline(int)
+__isinff(float x)
+{
+	long fclass = _fclass_f (x);
+	return (fclass & _FCLASS_INF) != 0;
+}
+
+__declare_extern_inline(int)
+__isnanf(float x)
+{
+	long fclass = _fclass_f (x);
+	return (fclass & _FCLASS_NAN) != 0;
 }
 
 __declare_extern_inline(int)

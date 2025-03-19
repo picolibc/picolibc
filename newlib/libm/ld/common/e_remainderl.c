@@ -34,7 +34,7 @@ remainderl(long double x, long double y)
         if (isnanl_inline(x) || isnanl_inline(y))
             return x + y;
 
-        if (isinfl(x) || y == 0.0L)
+        if (isinf(x) || y == 0.0L)
             return __math_invalidl(x);
 
 	return (remquol(x, y, &quo));

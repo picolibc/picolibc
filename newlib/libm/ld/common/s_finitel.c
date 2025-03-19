@@ -36,15 +36,10 @@ finitel(long double e)
 }
 
 #ifdef __strong_reference
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(finitel, __finitel);
+__strong_reference_dup(finitel, __finitel);
 #else
-
 int __finitel(long double x)
 {
     return finitel(x);
 }
-
 #endif

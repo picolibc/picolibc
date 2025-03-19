@@ -451,7 +451,7 @@ force_eval_long_double (long double x)
 
 #ifdef _DOUBLE_IS_32BITS
 # ifdef __strong_reference
-#  define _MATH_ALIAS_d_to_f(name) __strong_reference_dup(_FLOAT_NAME(name), _D_NAME(name))
+#  define _MATH_ALIAS_d_to_f(name) __strong_reference_dup(_FLOAT_NAME(name), _D_NAME(name));
 #  define _MATH_ALIAS_d_d_to_f(name) _MATH_ALIAS_d_to_f(name)
 #  define _MATH_ALIAS_d_D_to_f(name) _MATH_ALIAS_d_to_f(name)
 #  define _MATH_ALIAS_d_s_to_f(name) _MATH_ALIAS_d_to_f(name)
@@ -519,7 +519,7 @@ force_eval_long_double (long double x)
 #ifdef _LDBL_EQ_DBL
 # ifdef _DOUBLE_IS_32BITS
 #  ifdef __strong_reference
-#   define _MATH_ALIAS_l_to_f(name) __strong_reference_dup(_FLOAT_NAME(name), _LD_NAME(name))
+#   define _MATH_ALIAS_l_to_f(name) __strong_reference_dup(_FLOAT_NAME(name), _LD_NAME(name));
 #   define _MATH_ALIAS_l_l_to_f(name) _MATH_ALIAS_l_to_f(name)
 #   define _MATH_ALIAS_l_L_to_f(name) _MATH_ALIAS_l_to_f(name)
 #   define _MATH_ALIAS_l_s_to_f(name) _MATH_ALIAS_l_to_f(name)

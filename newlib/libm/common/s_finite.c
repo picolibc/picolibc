@@ -28,22 +28,13 @@ finite64(__float64 x)
 	return  (int)((__uint32_t)((hx&0x7fffffff)-0x7ff00000)>>31);
 }
 
-_MATH_ALIAS_i_d(finite)
-
 #ifdef __strong_reference
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
 __strong_reference(finite64, __finite64);
 #else
-
-int __finite64(__float64 x)
-{
-    return finite64(x);
-}
-
+int __finite64(__float64 x) { return finite64(x); }
 #endif
 
+_MATH_ALIAS_i_d(finite)
 _MATH_ALIAS_i_d(__finite)
 
 #endif /* _NEED_FLOAT64 */

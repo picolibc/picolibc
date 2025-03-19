@@ -138,7 +138,9 @@ extern double fmod (double, double);
 #if __MISC_VISIBLE
 extern int finite (double);
 extern int finitef (float);
+extern int isinf (double);
 extern int isinff (float);
+extern int isnan (double);
 extern int isnanf (float);
 #if defined(_HAVE_LONG_DOUBLE)
 extern int finitel (long double);
@@ -306,27 +308,24 @@ extern int __signbitl (long double);
   #define issubnormal(__x) (__builtin_issubnormal (__x))
   #define iszero(__x) (__builtin_iszero(__x))
 #else
-#if defined(_HAVE_LONG_DOUBLE)
-  #define fpclassify(__x)                                                 \
-      ((sizeof(__x) == sizeof(float)  ? __fpclassifyf(__x)                \
-        : (sizeof(__x) == sizeof(double)) ?  __fpclassifyd((double) (__x)) \
-        : __fpclassifyl((long double) (__x))))
-  #define isfinite(__x)                                           \
-      ((sizeof(__x) == sizeof(float)) ? __finitef(__x)            \
-       : (sizeof(__x) == sizeof(double)) ? __finite((double) (__x))     \
-       : __finitel((long double) (__x)))
-#else
-  #define fpclassify(__x) \
-	  ((sizeof(__x) == sizeof(float))  ? __fpclassifyf(__x) : \
-	  __fpclassifyd((double) (__x)))
-  #define isfinite(__x) ((sizeof(__x) == sizeof(float)) ?         \
-                         __finitef(__x) : __finite((double) __x))
-#endif
-  #define isinf(__x) (fpclassify(__x) == FP_INFINITE)
-  #define isnan(__x) (fpclassify(__x) == FP_NAN)
-  #define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
-  #define issubnormal(__x) (fpclassify(__x) == FP_SUBNORMAL)
-  #define iszero(__x) (fpclassify(__x) == FP_ZERO)
+# if defined(_HAVE_LONG_DOUBLE)
+#  define __float_generic3(__f, __d, __l, __x)                           \
+    ((sizeof(__x) == sizeof(float))  ? __f(__x)                    \
+     : (sizeof(__x) == sizeof(double)) ?  __d((double) (__x))       \
+     : __l((long double) (__x)))
+# else
+#  define __float_generic3(__f, __d, __l, __x)           \
+    ((sizeof(__x) == sizeof(float))  ? __f(__x)    \
+     : __d((double) (__x)))
+# endif
+# define __float_generic(__p, __x) __float_generic3(__p ## f, __p ## d, __p ## l, __x)
+# define fpclassify(__x) __float_generic(__fpclassify, __x)
+# define isfinite(__x) __float_generic3(__finitef, __finite, __finitel, __x)
+# define isinf(__x) __float_generic(__isinf, __x)
+# define isnan(__x) __float_generic(__isnan, __x)
+# define isnormal(__x) (fpclassify(__x) == FP_NORMAL)
+# define issubnormal(__x) (fpclassify(__x) == FP_SUBNORMAL)
+# define iszero(__x) (fpclassify(__x) == FP_ZERO)
 #endif
 
 #define isfinitef(x) isfinite((float) (x))
@@ -334,6 +333,14 @@ extern int __signbitl (long double);
 #define isnanf(x) isnan((float) (x))
 #define isnormalf(x) isnormal((float) (x))
 #define iszerof(x) iszero((float) (x))
+
+#ifdef _HAVE_LONG_DOUBLE
+#define isfinitel(x) isfinite((long double) (x))
+#define isinfl(x) isinf((long double) (x))
+#define isnanl(x) isnan((long double) (x))
+#define isnormall(x) isnormal((long double) (x))
+#define iszerol(x) iszero((long double) (x))
+#endif
 
 #ifndef iseqsig
 int __iseqsigd(double x, double y);

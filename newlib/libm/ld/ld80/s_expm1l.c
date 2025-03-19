@@ -144,7 +144,7 @@ if (k == __LDBL_MAX_EXP__)
 else
     px = ldexpl (1.0L, k);
 x = px - 1.0L;
-if (!isinfl(x))
+if (!isinf(x))
     x += px * qx;
 return x;
 }

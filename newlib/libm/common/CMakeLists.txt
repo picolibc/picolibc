@@ -47,9 +47,7 @@ picolibc_sources(
   s_infinity.c
   s_iseqsig.c
   s_isinf.c
-  s_isinfd.c
   s_isnan.c
-  s_isnand.c
   s_issignaling.c
   s_log1p.c
   s_nan.c
@@ -101,9 +99,7 @@ picolibc_sources(
   sf_infinity.c
   sf_iseqsig.c
   sf_isinf.c
-  sf_isinff.c
   sf_isnan.c
-  sf_isnanf.c
   sf_issignaling.c
   sf_log1p.c
   sf_nan.c
@@ -145,8 +141,6 @@ picolibc_sources(
   exp10l.c
   fabsl.c
   frexpl.c
-  isinfl.c
-  isnanl.c
   math_inexactl.c
   nanl.c
   nexttoward.c

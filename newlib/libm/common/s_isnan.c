@@ -185,11 +185,15 @@ QUICKREF
  * <math.h> for compatibility.
  */
 
+#define _ADD_D_TO_DOUBLE_FUNCS
+#define isnand isnan
+
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64
 
 #undef isnan
+#undef isnanl
 
 int
 isnan64(__float64 x)
@@ -202,6 +206,17 @@ isnan64(__float64 x)
 	return (int)(((__uint32_t)(hx))>>31);
 }
 
+#ifdef __strong_reference
+__strong_reference(isnan64, __isnan64);
+#else
+int
+__isnan64(float x)
+{
+    return isnan64(x);
+}
+#endif
+
 _MATH_ALIAS_i_d(isnan)
+_MATH_ALIAS_i_d(__isnan)
 
 #endif /* _NEED_FLOAT64 */

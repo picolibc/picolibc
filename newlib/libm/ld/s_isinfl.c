@@ -30,7 +30,7 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include "math_ld.h"
 
-#if defined(_NEED_FLOAT_HUGE) && !_HAVE_BUILTIN_ISINFL
+#if defined(_NEED_FLOAT_HUGE)
 
 #include "common/s_isinfl.c"
 

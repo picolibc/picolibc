@@ -29,12 +29,8 @@ int finitef(float x)
 }
 
 #ifdef __strong_reference
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
 __strong_reference(finitef, __finitef);
 #else
-
 int
 __finitef(float x)
 {
