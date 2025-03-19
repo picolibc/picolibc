@@ -81,7 +81,7 @@ ENTRY (memset)
 	brls	r2,SMALL,.Ltiny
 #endif
 .Lnot_tiny:
-	add_s	r12,r2,r0
+	add_s	r12,r2,r3
 	stb	r1,[r12,-1]
 	bclr_l	r12,r12,0
 	stw	r1,[r12,-2]
