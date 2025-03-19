@@ -72,13 +72,13 @@ ENTRY (strncpy)
 	sub	r12,r3,r8
 	bic_s	r12,r12,r3
 	BRand	(r12,r11,.Lr3z2)
-	st.ab	r3,[r10,8]
+	st.ab	r3,[r10,4]
 	sub	r12,r4,r8
 	bic	r12,r12,r4
 	BRand	(r12,r11,.Lr4z)
 	ld.a	r3,[r1,4]
 	brlo.d	r10,r6,1b
-	st	r4,[r10,-4]
+	st.ab	r4,[r10,4]
 .Loop_end:
 	add	r6,r6,4
 	brhs	r10,r6,.Lastword
