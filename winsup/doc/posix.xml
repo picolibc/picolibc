@@ -1528,17 +1528,17 @@ ISO®/IEC DIS 9945 Information technology
     __fwriting
     __xdrrec_getrec		(available in external "libtirpc" library)
     __xdrrec_setnonblock	(available in external "libtirpc" library)
-    acl
-    aclcheck
-    aclfrommode
-    aclfrompbits
-    aclfromtext
-    aclsort
-    acltomode
-    acltopbits
-    acltotext
+    acl				(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    aclcheck			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    aclfrommode			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    aclfrompbits		(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    aclfromtext			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    aclsort			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    acltomode			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    acltopbits			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
+    acltotext			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     endmntent
-    facl
+    facl			(see <xref linkend="std-notes">chapter "Implementation Notes"</xref>)
     fegetprec
     fesetprec
     futimesat
@@ -1808,6 +1808,17 @@ currently support only CLOCK_REALTIME.</para>
 
 <para><function>close_range</function> does not support the Linux-specific
 flag CLOSE_RANGE_UNSHARE.</para>
+
+<para>The Solaris-invented ACL functions <function>acl</function>,
+<function>facl</function>, <function>aclcheck</function>,
+<function>aclfrommode</function>, <function>aclfrompbits</function>,
+<function>aclfromtext</function>, <function>aclsort</function>,
+<function>acltomode</function>, <function>acltopbits</function> and
+<function>acltotext</function> and the belonging macros and datatypes
+are defined in &lt;cygwin/acl.h&gt; since they collide with the
+Linux-compatible POSIX.1e draft macros in &lt;sys/acl.h&gt;.  Just
+include &lt;cygwin/acl.h&gt; if you prefer them over the POSIX.1e
+functions.</para>
 
 <para>POSIX file locks via <function>fcntl</function> or
 <function>lockf</function>, as well as BSD <function>flock</function> locks
