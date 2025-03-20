@@ -69,11 +69,7 @@ SEEALSO
 
 #ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
 static const __float64
-#else
-static __float64 
-#endif
 TWO52[2]={
     _F_64(4.50359962737049600000e+15), /* 0x43300000, 0x00000000 */
     _F_64(-4.50359962737049600000e+15), /* 0xC3300000, 0x00000000 */
