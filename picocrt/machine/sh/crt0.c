@@ -65,9 +65,9 @@ _start(void)
     /* set round to nearest */
     fpscr &= ~FPSCR_RM;
     fpscr |= FPSCR_RN;
-#ifdef __SH4__
+#if defined(__SH_FPU_DOUBLE__) && !defined(__SH2A_SINGLE__) && !defined(__SH4_SINGLE__)
     fpscr |= FPSCR_PR;
-#elif defined(__SH4_SINGLE_ONLY__)
+#else
     fpscr &= ~FPSCR_PR;
 #endif
     __asm__("lds %0,fpscr" : : "r" (fpscr));
