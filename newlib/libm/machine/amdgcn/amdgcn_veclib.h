@@ -85,8 +85,21 @@ typedef union {
 
 #define RESIZE_VECTOR(to_t, from) \
 ({ \
-  __auto_type __from = (from); \
-  *((to_t *) &__from); \
+  to_t __to; \
+  if (VECTOR_WIDTH (to_t) < VECTOR_WIDTH (__typeof (from))) \
+    asm ("; no-op cast %0" : "=v"(__to) : "0"(from)); \
+  else \
+    { \
+      unsigned long __mask = -1L; \
+      int lanes = VECTOR_WIDTH (__typeof (from)); \
+      __mask <<= lanes; \
+      __builtin_choose_expr ( \
+	V_SF_SI_P (to_t), \
+	({asm ("v_mov_b32 %0, 0" : "=v"(__to) : "0"(from), "e"(__mask));}), \
+	({asm ("v_mov_b32 %H0, 0\n\t" \
+	       "v_mov_b32 %L0, 0" : "=v"(__to) : "0"(from), "e"(__mask));})); \
+    } \
+  __to; \
 })
 
 /* Bit-wise cast vector FROM to type TO_T.  */
