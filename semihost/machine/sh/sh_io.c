@@ -45,7 +45,7 @@ sh_putc(char c, FILE *file)
 #ifdef SH_QEMU
         sh_serial0.tdr = (unsigned char) c;
 #else
-        sh_cons.data = c;
+        sh_syscall(TARGET_NEWLIB_SH_SYS_write, 1, (uint32_t) (uintptr_t) &c, 1);
 #endif
 	return (unsigned char) c;
 }
@@ -54,16 +54,7 @@ int
 sh_getc(FILE *file)
 {
 	(void) file;
-#ifdef SH_QEMU
         return EOF;
-#else
-        for (;;) {
-                uint8_t c;
-                c = sh_cons.data;
-                if (c != 0)
-                        return (int) c;
-        }
-#endif
 }
 
 #ifdef TINY_STDIO

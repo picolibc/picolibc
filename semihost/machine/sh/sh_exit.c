@@ -49,7 +49,7 @@ _exit(int code)
         write(1, buf, n);
 	while(1);
 #else
-        sh_cons.halt = code;
+        sh_syscall(TARGET_NEWLIB_SH_SYS_exit, code, 0, 0);
 #endif
         __builtin_unreachable();
 }

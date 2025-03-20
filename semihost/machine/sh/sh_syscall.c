@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2023 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,51 +33,20 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _SH_SEMIHOST_H_
-#define _SH_SEMIHOST_H_
+#include "sh_semihost.h"
 
-#include <stdio.h>
-#include <stdint.h>
-
-#if defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__)
-#define SH_QEMU
-#endif
-
-typedef volatile uint8_t vuint8_t;
-typedef volatile uint32_t vuint32_t;
-
-#ifdef SH_QEMU
-
-struct sh_serial {
-    vuint32_t   smr;
-    vuint32_t   brr;
-    vuint32_t   scr;
-    vuint32_t   tdr;
-};
-
-#define sh_serial0 (*(struct sh_serial *) 0xffe00000)
-#define sh_serial1 (*(struct sh_serial *) 0xffe80000)
-
-#else
-
-#define TARGET_NEWLIB_SH_SYS_exit 1
-#define TARGET_NEWLIB_SH_SYS_write 4
-
-struct sh_syscall_args {
-    uint32_t    r5;
-    uint32_t    r6;
-    uint32_t    r7;
-};
+#ifndef SH_QEMU
 
 uint32_t
-sh_syscall(uint32_t r4, uint32_t r5, uint32_t r6, uint32_t r7);
+sh_syscall(uint32_t _r4, uint32_t _r5, uint32_t _r6, uint32_t _r7)
+{
+    register uint32_t   r4 __asm__("r4") = _r4;
+    register uint32_t   r5 __asm__("r5") = _r5;
+    register uint32_t   r6 __asm__("r6") = _r6;
+    register uint32_t   r7 __asm__("r7") = _r7;
+    register uint32_t   r0 __asm__("r0");
+    __asm__("trapa #34" : "=r" (r0) : "r" (r4), "r" (r5), "r" (r6), "r" (r7));
+    return r0;
+}
 
 #endif
-
-int
-sh_putc(char c, FILE *file);
-
-int
-sh_getc(FILE *file);
-
-#endif /* _SH_SEMIHOST_H_ */

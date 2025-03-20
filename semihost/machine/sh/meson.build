@@ -37,6 +37,7 @@ lib_semihost_srcs = [
   'sh_stub.c',
   'sh_exit.c',
   'sh_io.c',
+  'sh_syscall.c',
   ]
 
 has_semihost = true
