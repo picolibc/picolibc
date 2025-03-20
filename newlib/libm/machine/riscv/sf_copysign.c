@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 
@@ -44,6 +44,8 @@ copysignf (float x, float y)
   __asm__("fsgnj.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
   return result;
 }
+
+_MATH_ALIAS_f_ff(copysign)
 
 #else
 #include "../../common/sf_copysign.c"

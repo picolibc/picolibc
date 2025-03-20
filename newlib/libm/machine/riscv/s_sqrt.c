@@ -36,10 +36,10 @@
 #if defined(__riscv_fsqrt) && __riscv_flen >= 64
 #include "fdlibm.h"
 
-double
-sqrt (double x)
+__float64
+sqrt64(__float64 x)
 {
-	double result;
+	__float64 result;
 #ifdef _WANT_MATH_ERRNO
         if (isless(x, 0.0))
             return __math_invalid(x);

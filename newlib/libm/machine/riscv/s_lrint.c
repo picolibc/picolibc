@@ -33,13 +33,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
-#include "math_config.h"
 
 long int
-lrint (double x)
+lrint64 (__float64 x)
 {
   long result;
   __asm__(

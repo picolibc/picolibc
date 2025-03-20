@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 
@@ -47,6 +47,8 @@ fmaxf (float x, float y)
     __asm__("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
     return result;
 }
+
+_MATH_ALIAS_f_ff(fmax)
 
 #else
 #include "../../common/sf_fmax.c"

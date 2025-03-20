@@ -33,8 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
@@ -46,6 +45,9 @@ isnan (double x)
 	long fclass = _fclass_d (x);
 	return (fclass & FCLASS_NAN);
 }
+
+_MATH_ALIAS_i_d(isnan)
+
 #else
 #include "../../common/s_isnan.c"
 #endif
