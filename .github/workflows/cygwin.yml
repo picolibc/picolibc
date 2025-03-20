@@ -105,6 +105,9 @@ jobs:
     # endings, but this could still be dangerous e.g if we need symlinks in the
     # repo)
     - run: git config --global core.autocrlf input
+    # remove inheritable permissions since they break assumptions testsuite
+    # makes about file modes
+    - run: icacls . /inheritance:r
     - uses: actions/checkout@v3
 
     # install cygwin and build tools
