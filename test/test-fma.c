@@ -41,6 +41,12 @@
 #include <stdbool.h>
 #include <fenv.h>
 
+#ifdef __sh__
+#if !(defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__))
+#define GDB_SIMULATOR
+#endif
+#endif
+
 #if FLT_MANT_DIG == 24
 
 static int roundings[] = {
@@ -336,6 +342,10 @@ main(void)
         printf("ARC soft float bug, skipping FMA tests\n");
         return 77;
     }
+#endif
+#ifdef GDB_SIMULATOR
+    printf("GDB simulator doesn't support FMA. Skipping\n");
+    return 77;
 #endif
     (void) rounding_names;
     (void) roundings;

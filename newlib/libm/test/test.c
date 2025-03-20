@@ -426,6 +426,12 @@ test_mfok (float value,
   if (isnan(shouldbe) || isinf(shouldbe))
       mag = 32;
 #endif
+#ifdef __sh__
+  /* SuperH has a different canonical representation for nans */
+  if (!!isnan(shouldbe) == !!isnan(value) &&
+      !!__issignalingf(shouldbe) == !!__issignalingf(value))
+      mag = 32;
+#endif
   a.value = shouldbe;
   b.value = value;
   

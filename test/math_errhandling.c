@@ -49,6 +49,12 @@
 #define ALWAYS_INLINE __inline
 #endif
 
+#ifdef __sh__
+#if !(defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__))
+#define GDB_SIMULATOR
+#endif
+#endif
+
 static ALWAYS_INLINE float
 opt_barrier_float (float x)
 {

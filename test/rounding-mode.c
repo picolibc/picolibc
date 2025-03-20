@@ -38,6 +38,12 @@
 #include <fenv.h>
 #include "rounding-mode.h"
 
+#ifdef __sh__
+#if !(defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__))
+#define GDB_SIMULATOR
+#endif
+#endif
+
 #ifndef PICOLIBC_DOUBLE_NOROUND
 static double
 do_round_int(double value, int mode)
@@ -229,6 +235,10 @@ int main(void)
 	unsigned i;
 	int ret = 0;
 
+#ifdef GDB_SIMULATOR
+        printf("GDB simulator doesn't support rounding modes. Skipping\n");
+        return 77;
+#endif
 	for (i = 0; i < NUM_VALUE; i++) {
 #ifdef FE_TONEAREST
 		ret += check(FE_TONEAREST, "FE_TONEAREST", my_values[i]);
