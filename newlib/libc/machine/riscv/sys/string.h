@@ -12,10 +12,12 @@
 #ifndef _SYS_STRING_H
 #define _SYS_STRING_H
 
-static __inline unsigned long __libc_detect_null(unsigned long w)
+#include "asm.h"
+
+static __inline uintxlen_t __libc_detect_null(uintxlen_t w)
 {
-  unsigned long mask = 0x7f7f7f7f;
-  if (sizeof (long) == 8)
+  uintxlen_t mask = 0x7f7f7f7f;
+  if (sizeof (w) == 8)
     mask = ((mask << 16) << 16) | mask;
   return ~(((w & mask) + mask) | w | mask);
 }
