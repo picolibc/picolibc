@@ -33,6 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+picolibc_sources(hwcap.c)
+
 if(_HAVE_PICOLIBC_TLS_API)
   picolibc_sources(tls.c)
 endif()
