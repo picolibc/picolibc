@@ -52,6 +52,7 @@ LIB_NAME=libcygwin.a
 if TARGET_X86_64
 TARGET_FILES= \
 	x86_64/bcopy.S \
+	x86_64/fastcwd.cc \
 	x86_64/memchr.S \
 	x86_64/memcpy.S \
 	x86_64/memmove.S \
