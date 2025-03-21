@@ -93,6 +93,10 @@ __start(void)
 {
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+#ifdef POST_MEMORY_SETUP
+        POST_MEMORY_SETUP();
+#endif
+
 #ifdef PICOLIBC_TLS
 	_set_tls(__tls_base);
 #endif

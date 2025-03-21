@@ -124,6 +124,22 @@ SECTIONS
 	} >flash AT>flash :text
 
 	/*
+	 * Procedure linkage table. This ends up
+	 * with an array of structs containing pointers
+	 * to the function descriptors and iplt references
+	 * that need to contain them after startup.
+	 */
+	@BFD_START@
+	.plt : {
+		*(.rela.iplt)
+		*(.rela.*)
+	} >flash AT>flash :text
+
+	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
+	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
+	@BFD_END@
+
+	/*
 	 * Needs to be in its own segment with the PLT entries first
 	 * so that the linker will compute the offsets to those
 	 * entries correctly.
@@ -135,6 +151,12 @@ SECTIONS
 
 	.toc : {
 		*(.toc .toc.*)
+		/*
+		 * These get written at startup, so this isn't correct,
+		 * but they must be reachable from tocbase so we can't
+		 * stick them in :ram
+		 */
+		*(.iplt .iplt.*)
 	} >flash AT>flash :text
 
 	/* additional sections when compiling with C++ exception support */
