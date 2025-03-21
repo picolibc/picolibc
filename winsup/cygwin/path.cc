@@ -4495,21 +4495,36 @@ fcwd_access_t **
 find_fast_cwd_pointer_x86_64 ();
 #endif
 
+fcwd_access_t **
+find_fast_cwd_pointer_aarch64 ();
+
 static fcwd_access_t **
 find_fast_cwd ()
 {
   fcwd_access_t **f_cwd_ptr;
 
-  /* First check if we're running on an ARM64 system.  Skip
-     fetching FAST_CWD pointer as long as there's no solution for finding
-     it on that system. */
-  if (wincap.host_machine () == IMAGE_FILE_MACHINE_ARM64)
-    return NULL;
+  switch (wincap.host_machine ())
+    {
+    case IMAGE_FILE_MACHINE_ARM64:
+      f_cwd_ptr = find_fast_cwd_pointer_aarch64 ();
+      break;
+#ifdef __x86_64__
+    case IMAGE_FILE_MACHINE_AMD64:
+      f_cwd_ptr = find_fast_cwd_pointer_x86_64 ();
+      break;
+#endif
+    default:
+      small_printf ("Cygwin WARNING:\n"
+"  Couldn't compute FAST_CWD pointer for an unknown architecture (%04y)\n"
+"  Please update to the latest available Cygwin version from\n"
+"  https://cygwin.com/.  If the problem persists, please see\n"
+"  https://cygwin.com/problems.html\n\n", (int) wincap.host_machine ());
+      return NULL;
+    }
 
   /* Fetch the pointer but don't set the global fast_cwd_ptr yet.  First
      we have to make sure we know the version of the FAST_CWD structure
      used on the system. */
-  f_cwd_ptr = find_fast_cwd_pointer_x86_64 ();
   if (!f_cwd_ptr)
     small_printf ("Cygwin WARNING:\n"
 "  Couldn't compute FAST_CWD pointer.  This typically occurs if you're using\n"
