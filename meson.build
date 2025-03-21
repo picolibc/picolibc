@@ -149,9 +149,6 @@ enable_native_math_tests = enable_native_tests and get_option('native-math-tests
 tests_enable_stack_protector = get_option('tests-enable-stack-protector')
 tests_enable_full_malloc_stress = get_option('tests-enable-full-malloc-stress')
 tests_enable_posix_io = get_option('tests-enable-posix-io')
-have_alias_attribute_option = get_option('have-alias-attribute')
-have_format_attribute_option = get_option('have-format-attribute')
-have_weak_attribute_option = get_option('have-weak-attribute')
 
 # C++ is only used in tests, so only check for it when tests are enabled
 if enable_tests
@@ -481,24 +478,6 @@ if host_cpu_family == ''
   host_cc_machine=run_command(cc.cmd_array() + ['-dumpmachine'], check : true).stdout().strip().split('-')
   host_cpu_family=host_cc_machine[0]
   message('Computed host_cpu_family as ' + host_cpu_family)
-endif
-
-if have_alias_attribute_option == 'auto'
-  have_alias_attribute = cc.has_function_attribute('alias')
-else
-  have_alias_attribute = have_alias_attribute_option == 'true'
-endif
-
-if have_format_attribute_option == 'auto'
-  have_format_attribute = cc.has_function_attribute('format')
-else
-  have_format_attribute = have_format_attribute_option == 'true'
-endif
-
-if have_weak_attribute_option == 'auto'
-  have_weak_attribute = cc.has_function_attribute('weak')
-else
-  have_weak_attribute = have_weak_attribute_option == 'true'
 endif
 
 tls_model_spec = ''

@@ -32,17 +32,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
+
+# General build options
+
 option('fast-strcmp', type: 'boolean', value: true,
        description: 'Always optimize strcmp for performance')
-
-option('have-alias-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'Compiler supports __alias__ attribute')
-
-option('have-format-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'Compiler supports __format__ attribute')
-
-option('have-weak-attribute', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
-       description: 'Compiler supports __weak__ attribute')
 
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
