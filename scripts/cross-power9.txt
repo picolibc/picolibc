@@ -1,6 +1,6 @@
 [binaries]
-c = ['powerpc64-linux-gnu-gcc', '-fno-pic', '-fno-pie', '-static', '-mfloat128-hardware', '-mvsx', '-mcpu=power9', '-Wno-psabi']
-cpp = ['powerpc64-linux-gnu-g++', '-fno-pic', '-fno-pie', '-static', '-mfloat128-hardware', '-mvsx', '-mcpu=power9', '-Wno-psabi']
+c = ['powerpc64-linux-gnu-gcc', '-fno-pic', '-fno-pie', '-static', '-mfloat128-hardware', '-mvsx', '-mcpu=power9', '-Wno-psabi', '-Wl,--build-id=none']
+cpp = ['powerpc64-linux-gnu-g++', '-fno-pic', '-fno-pie', '-static', '-mfloat128-hardware', '-mvsx', '-mcpu=power9', '-Wno-psabi', '-Wl,--build-id=none']
 ar = 'powerpc64-linux-gnu-ar'
 nm = 'powerpc64-linux-gnu-nm'
 strip = 'powerpc64-linux-gnu-strip'
