@@ -367,7 +367,10 @@ extern const __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];
 #define __nano_reference(a,b)
 #endif
 
-#if defined(_LONG_DOUBLE_IEEE128__) && defined(__strong_reference)
+#if defined(__LONG_DOUBLE_128__) && defined(__strong_reference)
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
 #define __ieee128_reference(a,b) __strong_reference(a,b)
 #else
 #define __ieee128_reference(a,b)

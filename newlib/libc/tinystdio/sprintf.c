@@ -47,11 +47,4 @@ sprintf(char *s, const char *fmt, ...)
 	return i;
 }
 
-#ifdef _LONG_DOUBLE_IEEE128__
-#ifdef __strong_reference
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(sprintf, __sprintfieee128);
-#endif
-#endif
+__ieee128_reference(sprintf, __sprintfieee128);

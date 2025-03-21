@@ -665,6 +665,15 @@ __non_atomic_load_ungetc(const volatile __ungetc_t *p)
         return *p;
 }
 
+#if defined(__LONG_DOUBLE_128__) && defined(__strong_reference)
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+#define __ieee128_reference(a,b) __strong_reference(a,b)
+#else
+#define __ieee128_reference(a,b)
+#endif
+
 #ifdef _ATOMIC_UNGETC
 
 #if __PICOLIBC_UNGETC_SIZE == 4 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)

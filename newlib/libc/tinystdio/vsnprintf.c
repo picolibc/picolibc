@@ -55,11 +55,4 @@ vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 	return i;
 }
 
-#ifdef _LONG_DOUBLE_IEEE128__
-#ifdef __strong_reference
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(vsnprintf, __vsnprintfieee128);
-#endif
-#endif
+__ieee128_reference(vsnprintf, __vsnprintfieee128);
