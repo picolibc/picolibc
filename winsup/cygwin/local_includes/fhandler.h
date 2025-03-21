@@ -2146,6 +2146,8 @@ class dev_console
   bool disable_master_thread;
   tty::cons_mode curr_input_mode;
   tty::cons_mode curr_output_mode;
+  DWORD prev_input_mode;
+  DWORD prev_output_mode;
   bool master_thread_suspended;
   int num_processed; /* Number of input events in the current input buffer
 			already processed by cons_master_thread(). */
@@ -2366,7 +2368,7 @@ private:
 
   void setup_pcon_hand_over ();
   static void pcon_hand_over_proc ();
-  static tty::cons_mode cons_mode_on_close (handle_set_t *);
+  static tty::cons_mode cons_mode_on_close ();
 
   friend tty_min * tty_list::get_cttyp ();
 };

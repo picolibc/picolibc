@@ -804,6 +804,9 @@ fhandler_console::rabuflen ()
   return con_ra.rabuflen;
 }
 
+static DWORD prev_input_mode_backup;
+static DWORD prev_output_mode_backup;
+
 /* The function set_{in,out}put_mode() should be static so that they
    can be called even after the fhandler_console instance is deleted. */
 void
@@ -818,11 +821,11 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
   GetConsoleMode (p->input_handle, &oflags);
   DWORD flags = oflags
     & (ENABLE_EXTENDED_FLAGS | ENABLE_INSERT_MODE | ENABLE_QUICK_EDIT_MODE);
-  con.curr_input_mode = m;
   switch (m)
     {
     case tty::restore:
-      flags |= ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT | ENABLE_PROCESSED_INPUT;
+      flags = con.prev_input_mode;
+      con.prev_input_mode = prev_input_mode_backup;
       break;
     case tty::cygwin:
       flags |= ENABLE_WINDOW_INPUT;
@@ -846,6 +849,12 @@ fhandler_console::set_input_mode (tty::cons_mode m, const termios *t,
 	flags |= ENABLE_PROCESSED_INPUT;
       break;
     }
+  if (con.curr_input_mode != tty::cygwin && m == tty::cygwin)
+    {
+      prev_input_mode_backup = con.prev_input_mode;
+      con.prev_input_mode = oflags;
+    }
+  con.curr_input_mode = m;
   SetConsoleMode (p->input_handle, flags);
   if (!(oflags & ENABLE_VIRTUAL_TERMINAL_INPUT)
       && (flags & ENABLE_VIRTUAL_TERMINAL_INPUT)
@@ -868,10 +877,11 @@ fhandler_console::set_output_mode (tty::cons_mode m, const termios *t,
   if (con.orig_virtual_terminal_processing_mode)
     flags |= ENABLE_VIRTUAL_TERMINAL_PROCESSING;
   WaitForSingleObject (p->output_mutex, mutex_timeout);
-  con.curr_output_mode = m;
   switch (m)
     {
     case tty::restore:
+      flags = con.prev_output_mode;
+      con.prev_output_mode = prev_output_mode_backup;
       break;
     case tty::cygwin:
       if (wincap.has_con_24bit_colors () && !con_is_legacy)
@@ -883,6 +893,12 @@ fhandler_console::set_output_mode (tty::cons_mode m, const termios *t,
 	flags |= DISABLE_NEWLINE_AUTO_RETURN;
       break;
     }
+  if (con.curr_output_mode != tty::cygwin && m == tty::cygwin)
+    {
+      prev_output_mode_backup = con.prev_output_mode;
+      GetConsoleMode (p->output_handle, &con.prev_output_mode);
+    }
+  con.curr_output_mode = m;
   acquire_attach_mutex (mutex_timeout);
   DWORD resume_pid = attach_console (con.owner);
   SetConsoleMode (p->output_handle, flags);
@@ -916,7 +932,7 @@ fhandler_console::cleanup_for_non_cygwin_app (handle_set_t *p)
   /* Cleaning-up console mode for non-cygwin app. */
   /* conmode can be tty::restore when non-cygwin app is
      exec'ed from login shell. */
-  tty::cons_mode conmode = cons_mode_on_close (p);
+  tty::cons_mode conmode = cons_mode_on_close ();
   set_output_mode (conmode, ti, p);
   set_input_mode (conmode, ti, p);
   set_disable_master_thread (con.owner == GetCurrentProcessId ());
@@ -1978,9 +1994,8 @@ fhandler_console::close (int flag)
   if (shared_console_info[unit] && myself->ppid == 1
       && (dev_t) myself->ctty == get_device ())
     {
-      tty::cons_mode conmode = cons_mode_on_close (&handle_set);
-      set_output_mode (conmode, &get_ttyp ()->ti, &handle_set);
-      set_input_mode (conmode, &get_ttyp ()->ti, &handle_set);
+      set_output_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
+      set_input_mode (tty::restore, &get_ttyp ()->ti, &handle_set);
       set_disable_master_thread (true, this);
     }
 
@@ -4687,26 +4702,10 @@ fhandler_console::fstat (struct stat *st)
 }
 
 tty::cons_mode
-fhandler_console::cons_mode_on_close (handle_set_t *p)
+fhandler_console::cons_mode_on_close ()
 {
-  const _minor_t unit = p->unit;
-
   if (myself->ppid != 1) /* Execed from normal cygwin process. */
     return tty::cygwin;
 
-  if (!process_alive (con.owner)) /* The Master process already died. */
-    return tty::restore;
-  if (con.owner == GetCurrentProcessId ()) /* Master process */
-    return tty::restore;
-
-  PROCESS_BASIC_INFORMATION pbi;
-  NTSTATUS status =
-    NtQueryInformationProcess (GetCurrentProcess (), ProcessBasicInformation,
-			       &pbi, sizeof (pbi), NULL);
-  if (NT_SUCCESS (status)
-      && con.owner == (DWORD) pbi.InheritedFromUniqueProcessId)
-    /* The parent is the stub process. */
-    return tty::restore;
-
-  return tty::native; /* Otherwise */
+  return tty::restore; /* otherwise, restore */
 }
