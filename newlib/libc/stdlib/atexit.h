@@ -16,9 +16,9 @@ enum __atexit_types
 };
 
 #ifdef _GLOBAL_ATEXIT
-#define NEWLIB_THREAD_LOCAL_ATEXIT
+#define __THREAD_LOCAL_ATEXIT
 #else
-#define  NEWLIB_THREAD_LOCAL_ATEXIT NEWLIB_THREAD_LOCAL
+#define  __THREAD_LOCAL_ATEXIT __THREAD_LOCAL
 #endif
 
 #define	_ATEXIT_SIZE 32	/* must be at least 32 to guarantee ANSI conformance */
@@ -41,8 +41,8 @@ struct _atexit {
         struct _on_exit_args _on_exit_args;
 };
 
-extern NEWLIB_THREAD_LOCAL_ATEXIT struct _atexit _atexit0;
-extern NEWLIB_THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
+extern __THREAD_LOCAL_ATEXIT struct _atexit _atexit0;
+extern __THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
 
 void __call_exitprocs (int, void *);
 int __register_exitproc (int, void (*fn) (void), void *, void *);

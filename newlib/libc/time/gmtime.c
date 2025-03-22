@@ -62,7 +62,7 @@ ANSI C requires <<gmtime>>.
 #include <stdlib.h>
 #include <time.h>
 
-extern NEWLIB_THREAD_LOCAL struct tm _localtime_buf;
+extern __THREAD_LOCAL struct tm _localtime_buf;
 
 struct tm *
 gmtime (const time_t * tim_p)

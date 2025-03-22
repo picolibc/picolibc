@@ -89,7 +89,7 @@ QUICKREF
 #include <stdlib.h>
 
 
-static NEWLIB_THREAD_LOCAL char *_strtok_last;
+static __THREAD_LOCAL char *_strtok_last;
 
 extern char *__strtok_r (char *, const char *, char **, int);
 

@@ -55,7 +55,7 @@ algorithm as <<rand>>.
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
 
-NEWLIB_THREAD_LOCAL long long _rand_next = 1;
+__THREAD_LOCAL long long _rand_next = 1;
 
 long int
 random (void)

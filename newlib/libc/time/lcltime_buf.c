@@ -61,4 +61,4 @@ ANSI C requires <<gmtime>>.
 #include <stdlib.h>
 #include <time.h>
 
-NEWLIB_THREAD_LOCAL struct tm _localtime_buf;
+__THREAD_LOCAL struct tm _localtime_buf;

@@ -39,7 +39,7 @@
 
 #include "dtoa.h"
 
-static NEWLIB_THREAD_LOCAL char ecvtf_buf[FTOA_MAX_DIG + 1];
+static __THREAD_LOCAL char ecvtf_buf[FTOA_MAX_DIG + 1];
 
 char *
 ecvtf (float invalue,

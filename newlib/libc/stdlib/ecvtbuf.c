@@ -157,8 +157,8 @@ print_e (
 }
 
 
-static NEWLIB_THREAD_LOCAL int _cvtlen;
-static NEWLIB_THREAD_LOCAL char *_cvtbuf;
+static __THREAD_LOCAL int _cvtlen;
+static __THREAD_LOCAL char *_cvtbuf;
 
 static void
 _cvtcleanup(void)

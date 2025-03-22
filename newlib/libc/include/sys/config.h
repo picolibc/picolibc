@@ -227,14 +227,14 @@
 #ifdef PICOLIBC_TLS
 #if (defined(__cplusplus) && (__cplusplus) >= 201103L) ||               \
     (defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 202311L)
-#define NEWLIB_THREAD_LOCAL thread_local
+#define __THREAD_LOCAL thread_local
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 201112L
-#define NEWLIB_THREAD_LOCAL _Thread_local
+#define __THREAD_LOCAL _Thread_local
 #else
-#define NEWLIB_THREAD_LOCAL __thread
+#define __THREAD_LOCAL __thread
 #endif
 #else
-#define NEWLIB_THREAD_LOCAL
+#define __THREAD_LOCAL
 #endif
 
 #ifndef _MB_CAPABLE

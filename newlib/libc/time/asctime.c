@@ -58,7 +58,7 @@ ANSI C requires <<asctime>>.
 #define _DEFAULT_SOURCE
 #include <time.h>
 
-static NEWLIB_THREAD_LOCAL char _asctime_buf[__ASCTIME_SIZE];
+static __THREAD_LOCAL char _asctime_buf[__ASCTIME_SIZE];
 
 char *
 asctime (const struct tm *tim_p)

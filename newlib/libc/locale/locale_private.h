@@ -149,7 +149,7 @@ extern const char       * const __locale_names[];
 extern locale_t         __global_locale;
 
 #ifdef _HAVE_POSIX_LOCALE_API
-extern NEWLIB_THREAD_LOCAL locale_t    _locale;
+extern __THREAD_LOCAL locale_t    _locale;
 #endif
 
 #ifdef _MB_CAPABLE

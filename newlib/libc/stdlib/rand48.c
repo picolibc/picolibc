@@ -129,7 +129,7 @@ No supporting OS subroutines are required.
 
 #include "rand48.h"
 
-NEWLIB_THREAD_LOCAL struct _rand48 _rand48 =
+__THREAD_LOCAL struct _rand48 _rand48 =
 {
   ._seed = { _RAND48_SEED_0, _RAND48_SEED_1, _RAND48_SEED_2 },
   ._mult = { _RAND48_MULT_0, _RAND48_MULT_1, _RAND48_MULT_2 },

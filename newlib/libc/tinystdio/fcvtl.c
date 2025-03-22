@@ -41,7 +41,7 @@
 
 #define FCVTL_MAXDIG (__LDBL_MAX_10_EXP__ + LONG_FLOAT_MAX_DIG + 1)
 
-static NEWLIB_THREAD_LOCAL char fcvt_buf[FCVTL_MAXDIG];
+static __THREAD_LOCAL char fcvt_buf[FCVTL_MAXDIG];
 
 char *
 fcvtl (long double invalue,

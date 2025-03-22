@@ -17,7 +17,7 @@ unsigned short *
 _seed48_r (struct _rand48 *r,
        unsigned short xseed[3])
 {
-  static NEWLIB_THREAD_LOCAL unsigned short sseed[3];
+  static __THREAD_LOCAL unsigned short sseed[3];
 
   sseed[0] = r->_seed[0];
   sseed[1] = r->_seed[1];

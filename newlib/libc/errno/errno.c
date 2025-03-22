@@ -36,5 +36,5 @@
 #include <errno.h>
 
 #ifndef __PICOLIBC_ERRNO_FUNCTION
-NEWLIB_THREAD_LOCAL_ERRNO int errno;
+__THREAD_LOCAL_ERRNO int errno;
 #endif

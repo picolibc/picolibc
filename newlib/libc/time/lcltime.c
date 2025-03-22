@@ -56,7 +56,7 @@ ANSI C requires <<localtime>>.
 #include <stdlib.h>
 #include <time.h>
 
-extern NEWLIB_THREAD_LOCAL struct tm _localtime_buf;
+extern __THREAD_LOCAL struct tm _localtime_buf;
 
 struct tm *
 localtime (const time_t * tim_p)

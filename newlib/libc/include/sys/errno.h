@@ -45,16 +45,16 @@ _user_strerror (int errnum,
 #endif
 
 #ifdef NEWLIB_GLOBAL_ERRNO
-#define NEWLIB_THREAD_LOCAL_ERRNO
+#define __THREAD_LOCAL_ERRNO
 #else
-#define NEWLIB_THREAD_LOCAL_ERRNO NEWLIB_THREAD_LOCAL
+#define __THREAD_LOCAL_ERRNO __THREAD_LOCAL
 #endif
 
 #ifdef __PICOLIBC_ERRNO_FUNCTION
 int *__PICOLIBC_ERRNO_FUNCTION(void);
 #define errno (*__PICOLIBC_ERRNO_FUNCTION())
 #else
-extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
+extern __THREAD_LOCAL_ERRNO int errno;
 #define errno errno
 #endif
 

@@ -56,7 +56,7 @@ char *
 strsignal (int signal)
 {
   char *buffer;
-  static NEWLIB_THREAD_LOCAL char _signal_buf[24];
+  static __THREAD_LOCAL char _signal_buf[24];
 
   buffer = _signal_buf;
 #if defined(SIGRTMIN) && defined(SIGRTMAX)

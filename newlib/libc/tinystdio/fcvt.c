@@ -43,7 +43,7 @@
 
 #define FCVT_MAXDIG (__DBL_MAX_10_EXP__ + DTOA_MAX_DIG + 1)
 
-static NEWLIB_THREAD_LOCAL char fcvt_buf[FCVT_MAXDIG];
+static __THREAD_LOCAL char fcvt_buf[FCVT_MAXDIG];
 
 char *
 fcvt (double invalue,
