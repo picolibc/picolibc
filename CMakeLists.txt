@@ -92,12 +92,9 @@ if(NOT DEFINED __GLOBAL_ERRNO)
 endif()
 
 # use thread local storage
-if(NOT DEFINED PICOLIBC_TLS)
-  option(PICOLIBC_TLS "use thread local storage for static data" ON)
+if(NOT DEFINED __THREAD_LOCAL_STORAGE)
+  option(__THREAD_LOCAL_STORAGE "use thread local storage for static data" ON)
 endif()
-
-# use thread local storage
-set(NEWLIB_TLS ${PICOLIBC_TLS})
 
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
@@ -149,8 +146,8 @@ set(_HAVE_INIT_FINI 1)
 set(_PICOCRT_ENABLE_MMU 1)
 
 # _set_tls and _init_tls functions available
-if(NOT DEFINED _HAVE_PICOLIBC_TLS_API OR NOT PICOLIBC_TLS)
-  set(_HAVE_PICOLIBC_TLS_API 0)
+if(NOT DEFINED __THREAD_LOCAL_STORAGE_API OR NOT __THREAD_LOCAL_STORAGE)
+  set(__THREAD_LOCAL_STORAGE_API 0)
 endif()
 
 set(_HAVE_SEMIHOST 1)
@@ -310,7 +307,7 @@ configure_file(picolibc.h.in "${PICOLIBC_INCLUDE}/picolibc.h")
 
 set(INCLUDEDIR include)
 set(LIBDIR .)
-if(PICOLIBC_TLS)
+if(__THREAD_LOCAL_STORAGE)
   set(TLSMODEL "-ftls-model=${TLS_MODEL}")
 endif()
 set(LINK_SPEC "")

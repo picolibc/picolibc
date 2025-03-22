@@ -224,7 +224,7 @@
 #endif
 #endif
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE
 #if (defined(__cplusplus) && (__cplusplus) >= 201103L) ||               \
     (defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 202311L)
 #define __THREAD_LOCAL thread_local

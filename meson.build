@@ -1391,10 +1391,9 @@ conf_data.set('__FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp
 conf_data.set('__GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
 conf_data.set('_HAVE_INITFINI_ARRAY', get_option('initfini-array'), description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('_HAVE_INIT_FINI', get_option('initfini'), description: 'Support _init() and _fini() functions')
-conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
-conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
-conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
-conf_data.set('_HAVE_PICOLIBC_TLS_RP2040', get_option('tls-rp2040'),
+conf_data.set('__THREAD_LOCAL_STORAGE', thread_local_storage, description: 'use thread local storage')
+conf_data.set('__THREAD_LOCAL_STORAGE_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
+conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),
               description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
 conf_data.set('_PRINTF_SMALL_ULTOA', printf_small_ultoa, description: 'avoid software division in decimal conversion')
 conf_data.set('_PRINTF_PERCENT_N', printf_percent_n, description: 'support %n in printf format strings')

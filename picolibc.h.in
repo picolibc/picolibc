@@ -20,14 +20,11 @@
 /* use function to get errno address */
 #cmakedefine __PICOLIBC_ERRNO_FUNCTION @__PICOLIBC_ERRNO_FUNCTION@
 
-/* use thread local storage */
-#cmakedefine NEWLIB_TLS
-
 /* Turn on mmu in picocrt startup code */
 #cmakedefine _PICOCRT_ENABLE_MMU
 
 /* use thread local storage */
-#cmakedefine PICOLIBC_TLS
+#cmakedefine __THREAD_LOCAL_STORAGE
 
 /* Use posix apis for console too */
 #cmakedefine POSIX_CONSOLE
@@ -70,7 +67,7 @@
 #cmakedefine _HAVE_INIT_FINI
 
 /* _set_tls and _init_tls functions available */
-#cmakedefine _HAVE_PICOLIBC_TLS_API
+#cmakedefine __THREAD_LOCAL_STORAGE_API
 
 /* Semihost APIs supported */
 #cmakedefine _HAVE_SEMIHOST

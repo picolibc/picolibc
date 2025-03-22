@@ -97,7 +97,7 @@ __start(void)
         POST_MEMORY_SETUP();
 #endif
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE
 	_set_tls(__tls_base);
 #endif
 #if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS

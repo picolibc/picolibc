@@ -38,7 +38,7 @@
 #endif
 
 /* Switch cortex-m0 to use RP2040 CPUID register if requested */
-#if __ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M' && defined(_HAVE_PICOLIBC_TLS_RP2040)
+#if __ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M' && defined(__THREAD_LOCAL_STORAGE_RP2040)
 #define ARM_RP2040
 #endif
 

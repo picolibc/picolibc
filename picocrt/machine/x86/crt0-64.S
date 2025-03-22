@@ -92,7 +92,7 @@ _start64:
 	mov	$__bss_start, %rdi
 	call	memset
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE
 	// call to _set_tls(__tls_base)
 	mov	$__tls_base, %rdi
 	call	_set_tls

@@ -35,6 +35,6 @@
 
 picolibc_sources(hwcap.c)
 
-if(_HAVE_PICOLIBC_TLS_API)
+if(__THREAD_LOCAL_STORAGE_API)
   picolibc_sources(tls.c)
 endif()

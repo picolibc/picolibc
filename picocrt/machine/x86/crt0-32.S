@@ -88,7 +88,7 @@ _start32:
 	call	memset
 	addl	$12, %esp
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE
 	// call to _set_tls(__tls_base)
 	pushl	$__tls_base
 	call	_set_tls
