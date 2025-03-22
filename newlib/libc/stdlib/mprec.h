@@ -340,11 +340,11 @@ typedef struct _Bigint _Bigint;
 #define copybits 	__copybits
 #define hexnan	__hexnan
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 #define __get_hexdig(x) __hexdig[x] /* NOTE: must evaluate arg only once */
-#else /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#else /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 #define __get_hexdig(x) __hexdig_fun(x)
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 
 #define tens __mprec_tens
 #define bigtens __mprec_bigtens
@@ -391,9 +391,9 @@ int		_strtodg_l (const char *s00, char **se,
 			    locale_t);
 #endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(_SMALL_HEXDIG)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(_SMALL_HEXDIG)
 unsigned char __hexdig_fun (unsigned char);
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 #ifdef INFNAN_CHECK
 int		hexnan (const char **sp, const struct FPI *fpi, __ULong *x0);
 #endif
@@ -403,9 +403,9 @@ int		hexnan (const char **sp, const struct FPI *fpi, __ULong *x0);
 extern const double tinytens[];
 extern const double bigtens[];
 extern const double tens[];
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 extern const unsigned char __hexdig[];
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 
 
 double _mprec_log10 (int);

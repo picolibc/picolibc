@@ -69,7 +69,7 @@ rawmemchr (const void *src_void,
   const unsigned char *src = (const unsigned char *) src_void;
   unsigned char d = c;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
     !defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   unsigned long *asrc;
   unsigned long  mask;
@@ -106,7 +106,7 @@ rawmemchr (const void *src_void,
 
   src = (unsigned char *) asrc;
 
-#endif /* !PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
+#endif /* !__PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
 
   while (1)
     {

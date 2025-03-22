@@ -82,7 +82,7 @@ strncpy (char *__restrict dst0,
 	const char *__restrict src0,
 	size_t count)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
     defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   char *dscan;
   const char *sscan;
@@ -134,5 +134,5 @@ strncpy (char *__restrict dst0,
     *dst++ = '\0';
 
   return dst0;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

@@ -70,7 +70,7 @@ memcpy (void *__restrict dst0,
 {
   char *dst = dst0;
   const char *src = src0;
-#if !(defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__))
+#if !(defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__))
   unsigned long *aligned_dst;
   const unsigned long *aligned_src;
 

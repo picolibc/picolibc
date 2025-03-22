@@ -51,7 +51,7 @@ strcpy:
 	.cfi_startproc
 	prologue push_ip=HAVE_PAC_LEAF
 	
-#if !(defined(__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED) || \
+#if !(defined(__OPTIMIZE_SIZE__) || defined (__PREFER_SIZE_OVER_SPEED) || \
       (defined (__thumb__) && !defined (__thumb2__)))
 	
 #ifdef _ISA_ARM_7

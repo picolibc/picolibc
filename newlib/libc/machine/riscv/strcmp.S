@@ -17,7 +17,7 @@
 .globl strcmp
 .type  strcmp, @function
 strcmp:
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 1:
   lbu   a2, 0(a0)
   lbu   a3, 0(a1)

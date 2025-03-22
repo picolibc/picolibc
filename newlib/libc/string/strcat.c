@@ -76,7 +76,7 @@ char *
 strcat (char *__restrict s1,
 	const char *__restrict s2)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
     defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   char *s = s1;
 
@@ -113,5 +113,5 @@ strcat (char *__restrict s1,
   strcpy (s1, s2);
 
   return s;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

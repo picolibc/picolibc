@@ -168,7 +168,7 @@ fread (
   total = resid;
   p = buf;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
 
   /* Optimize unbuffered I/O.  */
   if (fp->_flags & __SNBF)
@@ -220,7 +220,7 @@ fread (
 	}
     }
   else
-#endif /* !PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
+#endif /* !__PREFER_SIZE_OVER_SPEED && !__OPTIMIZE_SIZE__ */
     {
         while (resid > (size_t) (r = fp->_r))
 	{

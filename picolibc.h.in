@@ -30,7 +30,7 @@
 #cmakedefine POSIX_CONSOLE
 
 /* Optimize for space over speed */
-#cmakedefine PREFER_SIZE_OVER_SPEED
+#cmakedefine __PREFER_SIZE_OVER_SPEED
 
 /* Obsoleted. Reentrant syscalls provided for us */
 #cmakedefine REENTRANT_SYSCALLS_PROVIDED

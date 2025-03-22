@@ -48,7 +48,7 @@ typedef unsigned hi_type __attribute__ ((mode (HI)));
 char *
 strncpy (char *dst0, const char *src0, size_t count)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(__mips16) || !defined(__GNUC__) || (__GNUC__ < 3)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(__mips16) || !defined(__GNUC__) || (__GNUC__ < 3)
   char *dst, *end;
   const char *src;
   int ch;

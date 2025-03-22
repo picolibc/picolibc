@@ -72,7 +72,7 @@ stpncpy (char *__restrict dst,
 {
   char *ret = NULL;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
     !defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   long *aligned_dst;
   const long *aligned_src;
@@ -94,7 +94,7 @@ stpncpy (char *__restrict dst,
       dst = (char*)aligned_dst;
       src = (char*)aligned_src;
     }
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 
   while (count > 0)
     {

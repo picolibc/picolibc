@@ -89,7 +89,7 @@ strcmp (const char *s1,
 
 #ifndef HAVE_HW_PCMP
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   while (*s1 != '\0' && *s1 == *s2)
     {
       s1++;
@@ -129,7 +129,7 @@ strcmp (const char *s1,
       s2++;
     }
   return (*(unsigned char *) s1) - (*(unsigned char *) s2);
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 
 #else
 

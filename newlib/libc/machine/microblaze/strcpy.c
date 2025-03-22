@@ -89,7 +89,7 @@ strcpy (char *__restrict dst0,
 
 #ifndef HAVE_HW_PCMP
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *s = dst0;
 
   while ((*dst0++ = *src0++))
@@ -122,7 +122,7 @@ strcpy (char *__restrict dst0,
   while ((*dst++ = *src++))
     ;
   return dst0;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 
 #else    
 

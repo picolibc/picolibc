@@ -19,7 +19,7 @@ size_t strlen(const char *str)
 {
   const char *start = str;
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   while (*str++)
     ;
   return str - start - 1;
@@ -52,5 +52,5 @@ size_t strlen(const char *str)
   if (c2 == 0)            return ret + 6 - sl;
 
   return ret + 7 - sl;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

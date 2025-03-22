@@ -74,7 +74,7 @@ char*
 strcpy (char *dst0,
 	const char *src0)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
     defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   char *s = dst0;
 
@@ -108,5 +108,5 @@ strcpy (char *dst0,
   while ((*dst++ = *src++))
     ;
   return dst0;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

@@ -85,7 +85,7 @@ memchr (const void *src_void,
   const unsigned char *src = (const unsigned char *) src_void;
   unsigned char d = c;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
     !defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   unsigned long *asrc;
   unsigned long  mask;
@@ -130,7 +130,7 @@ memchr (const void *src_void,
       src = (unsigned char *) asrc;
     }
 
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 
   while (length--)
     {

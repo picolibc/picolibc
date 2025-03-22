@@ -81,7 +81,7 @@ a64l (const char *input)
     {
       ch = *(--ptr);
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
       if (ch >= 'a')
 	digit = (ch - 'a') + 38;
       else if (ch >= 'A')
@@ -92,7 +92,7 @@ a64l (const char *input)
 	digit = 1;
       else
 	digit = 0;
-#else /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) */
+#else /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) */
       switch (ch)
 	{
 	case '/':
@@ -170,7 +170,7 @@ a64l (const char *input)
 	  digit = 0;
 	  break;
 	}
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) */ 
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) */ 
       
       result = (result << 6) + digit;
     }

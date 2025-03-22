@@ -72,7 +72,7 @@ memmove (void *dst_void,
 	const void *src_void,
 	size_t length)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *dst = dst_void;
   const char *src = src_void;
 
@@ -150,5 +150,5 @@ memmove (void *dst_void,
     }
 
   return dst_void;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

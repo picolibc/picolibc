@@ -100,13 +100,13 @@ option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed
 
-if(NOT DEFINED PREFER_SIZE_OVER_SPEED)
+if(NOT DEFINED __PREFER_SIZE_OVER_SPEED)
   if(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
     set(default_prefer_size ON)
   else()
     set(default_prefer_size OFF)
   endif()
-  option(PREFER_SIZE_OVER_SPEED "Prefer smaller code size" ${default_prefer_size})
+  option(__PREFER_SIZE_OVER_SPEED "Prefer smaller code size" ${default_prefer_size})
 endif()
 
 # Use tiny stdio from gcc avr

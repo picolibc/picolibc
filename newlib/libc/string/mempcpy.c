@@ -51,7 +51,7 @@ mempcpy (void *dst0,
 	const void *src0,
 	size_t len0)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *dst = (char *) dst0;
   char *src = (char *) src0;
 
@@ -100,5 +100,5 @@ mempcpy (void *dst0,
     *dst++ = *src++;
 
   return dst;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

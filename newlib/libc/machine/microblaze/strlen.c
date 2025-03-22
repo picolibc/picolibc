@@ -84,7 +84,7 @@ strlen (const char *str)
 
 #ifndef HAVE_HW_PCMP
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   const char *start = str;
 
   while (*str)
@@ -111,7 +111,7 @@ strlen (const char *str)
   while (*str)
     str++;
   return str - start;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 
 #else
 
