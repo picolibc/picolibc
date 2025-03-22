@@ -44,7 +44,7 @@ _user_strerror (int errnum,
                 int *errptr);
 #endif
 
-#ifdef NEWLIB_GLOBAL_ERRNO
+#ifdef __GLOBAL_ERRNO
 #define __THREAD_LOCAL_ERRNO
 #else
 #define __THREAD_LOCAL_ERRNO __THREAD_LOCAL

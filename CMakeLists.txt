@@ -87,8 +87,8 @@ if(NOT DEFINED __FAST_STRCMP)
 endif()
 
 # use global errno variable
-if(NOT DEFINED NEWLIB_GLOBAL_ERRNO)
-  option(NEWLIB_GLOBAL_ERRNO "use global errno variable" OFF)
+if(NOT DEFINED __GLOBAL_ERRNO)
+  option(__GLOBAL_ERRNO "use global errno variable" OFF)
 endif()
 
 # use thread local storage

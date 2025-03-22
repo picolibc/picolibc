@@ -1388,7 +1388,7 @@ conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'mat
 conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
 conf_data.set('__FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
-conf_data.set('NEWLIB_GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
+conf_data.set('__GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
 conf_data.set('_HAVE_INITFINI_ARRAY', get_option('initfini-array'), description: 'compiler supports INIT_ARRAY sections')
 conf_data.set('_HAVE_INIT_FINI', get_option('initfini'), description: 'Support _init() and _fini() functions')
 conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')

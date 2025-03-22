@@ -15,7 +15,7 @@
 #cmakedefine MISSING_SYSCALL_NAMES
 
 /* use global errno variable */
-#cmakedefine NEWLIB_GLOBAL_ERRNO
+#cmakedefine __GLOBAL_ERRNO
 
 /* use function to get errno address */
 #cmakedefine __PICOLIBC_ERRNO_FUNCTION @__PICOLIBC_ERRNO_FUNCTION@
