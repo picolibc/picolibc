@@ -65,12 +65,12 @@ jobs:
           "",
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
           "-Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true",
         ]
         test: [
           "./.github/do-zephyr",
@@ -125,12 +125,12 @@ jobs:
           "",
 
           # Tinystdio and math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dnewlib-nano-malloc=false -Dpicoexit=false -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
           "-Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true",
 
           # Original stdio, one with multithread disabled
           "-Dtinystdio=false",
-          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dnewlib-multithread=false -Dnewlib-retargetable-locking=false -Dmb-capable=true -Dmb-extended-charsets=true",
+          "-Dtinystdio=false -Dnewlib-io-float=true -Dio-long-long=true -Dio-long-double=true -Dnewlib-fvwrite-in-streamio=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true",
         ]
         test: [
           "./.github/do-zephyr",
