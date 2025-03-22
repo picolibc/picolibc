@@ -85,10 +85,6 @@ int malloc_trim (size_t);
 void __malloc_lock(void);
 void __malloc_unlock(void);
 
-/* A compatibility routine for an earlier version of the allocator.  */
-
-void mstats (char *);
-
 /* SVID2/XPG mallopt options */
 
 #define M_MXFAST  1    /* UNUSED in this malloc */

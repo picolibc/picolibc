@@ -79,7 +79,6 @@ picolibc_sources(
   mbtowc.c
   mbtowc_r.c
   mrand48.c
-  mstats.c
   nrand48.c
   putenv.c
   rand48.c
