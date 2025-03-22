@@ -1589,7 +1589,7 @@ if enable_semihost
   subdir('semihost')
 endif
 
-conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+conf_data.set('__SEMIHOST', has_semihost, description: 'Semihost APIs supported')
 conf_data.set('_HAVE_ARM_SEMIHOST', has_arm_semihost, description: 'ARM Semihost APIs supported')
 
 # By default, tests don't require any special arguments

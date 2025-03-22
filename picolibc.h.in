@@ -70,7 +70,7 @@
 #cmakedefine __THREAD_LOCAL_STORAGE_API
 
 /* Semihost APIs supported */
-#cmakedefine _HAVE_SEMIHOST
+#cmakedefine __SEMIHOST
 
 /* math library does not set errno (offering only ieee semantics) */
 #cmakedefine _IEEE_LIBM

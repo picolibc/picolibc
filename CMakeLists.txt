@@ -150,7 +150,7 @@ if(NOT DEFINED __THREAD_LOCAL_STORAGE_API OR NOT __THREAD_LOCAL_STORAGE)
   set(__THREAD_LOCAL_STORAGE_API 0)
 endif()
 
-set(_HAVE_SEMIHOST 1)
+set(__SEMIHOST 1)
 
 # math library does not set errno (offering only ieee semantics)
 set(_IEEE_LIBM 1)
