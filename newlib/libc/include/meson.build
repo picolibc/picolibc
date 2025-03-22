@@ -48,7 +48,6 @@ inc_headers = [
   'ctype.h',
   'devctl.h',
   'dirent.h',
-  'elf.h',
   'endian.h',
   'envlock.h',
   'envz.h',

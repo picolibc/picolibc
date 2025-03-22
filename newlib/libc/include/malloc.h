@@ -43,9 +43,7 @@ SUCH DAMAGE.
 /* include any machine-specific extensions */
 #include <machine/malloc.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 /* This version of struct mallinfo must match the one in
    libc/stdlib/mallocr.c.  */
@@ -102,8 +100,6 @@ void __malloc_unlock(void);
 /* Some systems provide this, so do too for compatibility.  */
 void cfree (void *);
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* _INCLUDE_MALLOC_H_ */
