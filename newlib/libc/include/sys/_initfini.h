@@ -47,7 +47,7 @@ extern void (*__bothinit_array_end []) (void) __weak;
 extern void (*__fini_array_start []) (void) __weak;
 extern void (*__fini_array_end []) (void) __weak;
 
-#ifdef _HAVE_INIT_FINI
+#ifdef __INIT_FINI_FUNCS
 extern void _init (void) __weak;
 extern void _fini (void) __weak;
 #endif

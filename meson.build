@@ -1369,7 +1369,7 @@ conf_data.set('__PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', des
 conf_data.set('__FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
 conf_data.set('__GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
 conf_data.set('__INIT_FINI_ARRAY', get_option('initfini-array'), description: 'Support INIT_ARRAY linker sections')
-conf_data.set('_HAVE_INIT_FINI', get_option('initfini'), description: 'Support _init() and _fini() functions')
+conf_data.set('__INIT_FINI_FUNCS', get_option('initfini'), description: 'Support _init() and _fini() functions')
 conf_data.set('__THREAD_LOCAL_STORAGE', thread_local_storage, description: 'use thread local storage')
 conf_data.set('__THREAD_LOCAL_STORAGE_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),

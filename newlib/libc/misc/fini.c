@@ -34,7 +34,7 @@ __libc_fini_array (void)
     while (fn != fn_start)
         (*--fn)();
 
-#ifdef _HAVE_INIT_FINI
+#ifdef __INIT_FINI_FUNCS
     if (_fini)
         _fini ();
 #endif

@@ -140,7 +140,7 @@ set(__IEEEFP_FUNCS 0)
 set(__INIT_FINI_ARRAY 1)
 
 # Support _init() and _fini() functions
-set(_HAVE_INIT_FINI 1)
+set(__INIT_FINI_FUNCS 1)
 
 # Enable MMU in pico crt startup
 set(_PICOCRT_ENABLE_MMU 1)

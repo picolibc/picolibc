@@ -23,7 +23,7 @@ __libc_init_array (void)
     void (**fn)(void);
     void (**fn_end)(void);
 
-#ifdef _HAVE_INIT_FINI
+#ifdef __INIT_FINI_FUNCS
     fn = __preinit_array_start;
     fn_end = __preinit_array_end;
     while (fn != fn_end)
