@@ -208,15 +208,15 @@ typedef CONST struct {
 
 #include "long_double_vec.h"
 
-#if !defined(__PICOLIBC__) || (defined(_WANT_IO_LONG_DOUBLE) && (defined(TINY_STDIO) || defined(FLOATING_POINT)))
+#if !defined(__PICOLIBC__) || (defined(_WANT_IO_LONG_DOUBLE) && (defined(__TINY_STDIO) || defined(FLOATING_POINT)))
 #define TEST_IO_LONG_DOUBLE
 #endif
 
-#if defined(__PICOLIBC__) && defined(__m68k__) && !defined(TINY_STDIO)
+#if defined(__PICOLIBC__) && defined(__m68k__) && !defined(__TINY_STDIO)
 #undef TEST_IO_LONG_DOUBLE
 #endif
 
-#if defined(__PICOLIBC__) && !defined(TINY_STDIO) && __LDBL_MANT_DIG__ != 64
+#if defined(__PICOLIBC__) && !defined(__TINY_STDIO) && __LDBL_MANT_DIG__ != 64
 #undef TEST_IO_LONG_DOUBLE
 #endif
 

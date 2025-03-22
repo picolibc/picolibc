@@ -59,11 +59,11 @@ TEST(t, d, (double)x, "%a != %a") )
 
 #if defined(__PICOLIBC__)
 
-#if !defined(TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
+#if !defined(__TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
 #define NO_FLOATING_POINT
 #endif
 
-#if !defined(_MB_CAPABLE) || !defined(TINY_STDIO)
+#if !defined(_MB_CAPABLE) || !defined(__TINY_STDIO)
 #define NO_MULTI_BYTE
 #endif
 
@@ -213,7 +213,7 @@ static int test_sscanf(void)
         TEST_WS(cw, L"\n", L"");
 #endif
 
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 	a[8] = 'X';
 	a[9] = 0;
         /* legacy stdio fails this test */

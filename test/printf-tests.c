@@ -13,7 +13,7 @@
 #include <wchar.h>
 #include <locale.h>
 
-#ifndef TINY_STDIO
+#ifndef __TINY_STDIO
 #define printf_float(x) ((double) (x))
 #ifdef _NANO_FORMATTED_IO
 #ifndef NO_FLOATING_POINT

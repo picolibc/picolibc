@@ -41,7 +41,7 @@
 
 int main(void) {
 
-#if defined(__PICOLIBC__) && defined(TINY_STDIO) && !defined(_PRINTF_PERCENT_N)
+#if defined(__PICOLIBC__) && defined(__TINY_STDIO) && !defined(_PRINTF_PERCENT_N)
     printf("printf: %%n unsupported\n");
     return 77;
 #else

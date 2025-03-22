@@ -1511,7 +1511,7 @@ static const struct {
         { 0 },
 };
 
-#if defined(TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if defined(__TINY_STDIO) || !defined(NO_FLOATING_POINT)
 #define PRINT	if (!printed++) printf("    %-30.30s = %g errno %d (%s) except %s\n", \
                        makemathname(tests)[t].name, (double) v, err, strerror(err), e_to_str(except))
 #else

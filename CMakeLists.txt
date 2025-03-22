@@ -110,7 +110,7 @@ if(NOT DEFINED __PREFER_SIZE_OVER_SPEED)
 endif()
 
 # Use tiny stdio from gcc avr
-option(TINY_STDIO "Use tiny stdio from avr libc" ON)
+option(__TINY_STDIO "Use tiny stdio from avr libc" ON)
 
 if(NOT TLS_MODEL)
   set(TLS_MODEL "local-exec")

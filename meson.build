@@ -1383,7 +1383,7 @@ conf_data.set('_NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nan
 conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
 conf_data.set('_PICO_EXIT', picoexit)
 conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
-conf_data.set('TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
+conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
 conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('__PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')

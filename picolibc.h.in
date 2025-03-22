@@ -36,7 +36,7 @@
 #cmakedefine REENTRANT_SYSCALLS_PROVIDED
 
 /* Use tiny stdio from gcc avr */
-#cmakedefine TINY_STDIO
+#cmakedefine __TINY_STDIO
 
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
 

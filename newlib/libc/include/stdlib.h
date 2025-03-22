@@ -275,7 +275,7 @@ void    _srand48_r (struct _rand48 *, long);
 void	srandom (unsigned);
 #endif
 double	strtod (const char *__restrict __n, char **__restrict __end_PTR);
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 int     strfromd(char *__restrict str, size_t n,
                  const char *__restrict format, double fp);
 #endif
@@ -285,7 +285,7 @@ float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
 long double
         strtold (const char *__restrict __n, char **__restrict __end_PTR);
 #endif
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 int     strfromf(char *__restrict str, size_t n,
                  const char *__restrict format, float fp);
 #ifdef _HAVE_LONG_DOUBLE
@@ -353,34 +353,34 @@ int	on_exit (void (*__func)(int, void *),void *__arg);
 /* XSI Legacy option group */
 #if __XSI_VISIBLE >= 4
 char   *ecvt (double,int,int *,int *);
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 int	ecvt_r (double,int,int *,int *, char*, size_t);
 #else
 char   *ecvtbuf (double, int, int*, int*, char *);
 #endif
 
 char   *ecvtf (float,int,int *,int *);
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 int	ecvtf_r (float,int,int *,int *, char*, size_t);
 #else
 char   *ecvtfbuf (float, int, int*, int*, char *);
 #endif
 
 char   *fcvt (double,int,int *,int *);
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 int	fcvt_r (double, int, int*, int*, char *, size_t);
 #else
 char   *fcvtbuf (double, int, int*, int*, char *);
 #endif
 
 char   *fcvtf (float,int,int *,int *);
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 int	fcvtf_r (float, int, int*, int*, char *, size_t);
 #else
 char   *fcvtfbuf (float, int, int*, int*, char *);
 #endif
 
-#if defined(_HAVE_LONG_DOUBLE) && defined(TINY_STDIO)
+#if defined(_HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
 char   *ecvtl(long double, int, int*, int*);
 int     ecvtl_r(long double, int, int*, int*, char *, size_t);
 char   *fcvtl(long double, int, int*, int*);
@@ -390,7 +390,7 @@ int     fcvtl_r(long double, int, int*, int*, char *, size_t);
 char   *gcvt (double,int,char *);
 char   *gcvtf (float,int,char *);
 
-#if defined(_HAVE_LONG_DOUBLE) && defined(TINY_STDIO)
+#if defined(_HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
 char   *gcvtl(long double, int, char *);
 #endif
 

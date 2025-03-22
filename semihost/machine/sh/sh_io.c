@@ -57,7 +57,7 @@ sh_getc(FILE *file)
         return EOF;
 }
 
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 static FILE __stdio = FDEV_SETUP_STREAM(sh_putc, sh_getc, NULL, _FDEV_SETUP_RW);
 
 #ifdef __strong_reference

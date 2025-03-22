@@ -40,7 +40,7 @@
 #include <string.h>
 #include <assert.h>
 
-#if !defined(__PICOLIBC__) || defined(TINY_STDIO) || defined(_WANT_IO_LONG_LONG)
+#if !defined(__PICOLIBC__) || defined(__TINY_STDIO) || defined(_WANT_IO_LONG_LONG)
 
 #if 0
 static unsigned long long

@@ -50,7 +50,7 @@
 
 #ifndef __PICOLIBC__
 # define printf_float(x) ((double) (x))
-#elif defined(TINY_STDIO)
+#elif defined(__TINY_STDIO)
 # if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
 #  define NO_POS_ARGS
@@ -164,7 +164,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #define nextafter(a,b) nextafterf((float)(a), (float)(b))
 #define fabs(a) fabsf(a)
 #define scanf_format "%f"
-#if (defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
+#if (defined(__TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
 #define ERROR_MAX 1e-6
 #else
 #define ERROR_MAX 0
@@ -172,14 +172,14 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #else
 #define float_type double
 #define scanf_format "%lf"
-#if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
+#if defined(__TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
 # if __SIZEOF_DOUBLE__ == 4
 #  define ERROR_MAX 1e-6
 # else
 #  define ERROR_MAX 1e-14
 # endif
 #else
-#if (!defined(TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
+#if (!defined(__TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
 /* __ldtoa is really broken */
 #define ERROR_MAX 1e-5
 #else

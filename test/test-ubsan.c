@@ -56,7 +56,7 @@ abrt_handler(int sig)
     if (sig == (int) SIGABRT)
         _Exit(0);
     else {
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
         printf("unexpected signal %d\n", sig);
         fflush(stdout);
 #endif

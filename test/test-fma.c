@@ -162,7 +162,7 @@ equalf(float x, float y)
     return x == y;
 }
 
-#if defined(__PICOLIBC__) && !defined(TINY_STDIO)
+#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
 static
 int strfromf(char *str, size_t n, const char *format, float f)
 {

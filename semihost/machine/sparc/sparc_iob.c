@@ -94,7 +94,7 @@ sparc_putc(char c, FILE *file)
 	return (unsigned char) c;
 }
 
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 
 static int
 sparc_getc(FILE *file)

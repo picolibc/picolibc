@@ -91,7 +91,7 @@ rx_putc(char c, FILE *file)
 	return (unsigned char) c;
 }
 
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 
 static int
 rx_getc(FILE *file)

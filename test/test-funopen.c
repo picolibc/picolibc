@@ -38,7 +38,7 @@
 #include <string.h>
 #include <stdlib.h>
 
-#if defined(__PICOLIBC__) && !defined(TINY_STDIO)
+#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
 # define IO_T int
 # define BUF_T char
 # ifdef __LARGE64_FILES
