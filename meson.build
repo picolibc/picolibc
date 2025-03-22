@@ -1357,7 +1357,7 @@ conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
 conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
 conf_data.set('_WANT_IO_LONG_DOUBLE', io_long_double)
 conf_data.set('_WANT_IO_WCHAR', io_wchar)
-conf_data.set('_ASSERT_VERBOSE', get_option('assert-verbose'))
+conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'))
 
 if not tinystdio
   conf_data.set('NO_FLOATING_POINT', not newlib_io_float)

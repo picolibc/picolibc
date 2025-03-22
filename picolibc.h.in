@@ -151,7 +151,7 @@
 #cmakedefine _WIDE_ORIENT
 
 /* chatty assert */
-#cmakedefine _ASSERT_VERBOSE
+#cmakedefine __ASSERT_VERBOSE
 
 /* elix level */
 #cmakedefine _ELIX_LEVEL @_ELIX_LEVEL@

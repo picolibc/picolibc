@@ -161,8 +161,8 @@ endif()
 
 set(_PICO_EXIT 1)
 
-if(NOT DEFINED _ASSERT_VERBOSE)
-  option(_ASSERT_VERBOSE "Assert provides verbose information" ON)
+if(NOT DEFINED __ASSERT_VERBOSE)
+  option(__ASSERT_VERBOSE "Assert provides verbose information" ON)
 endif()
 
 if(NOT DEFINED _MB_CAPABLE)

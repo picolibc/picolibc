@@ -44,7 +44,7 @@ _BEGIN_STD_C
 #ifdef NDEBUG           /* required by ANSI standard */
 # define assert(__e) ((void)0)
 #else
-# ifndef _ASSERT_VERBOSE
+# ifndef __ASSERT_VERBOSE
 # define assert(__e) ((__e) ? (void)0 : __assert_no_args ())
 #else
 # ifndef __ASSERT_FUNC
