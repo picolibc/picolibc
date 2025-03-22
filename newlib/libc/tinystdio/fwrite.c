@@ -31,7 +31,7 @@
 
 #include "stdio_private.h"
 
-#ifdef _WANT_FAST_BUFIO
+#ifdef __FAST_BUFIO
 #include "../stdlib/mul_overflow.h"
 #endif
 
@@ -44,7 +44,7 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 	if ((stream->flags & __SWR) == 0 || size == 0)
 		return 0;
 
-#ifdef _WANT_FAST_BUFIO
+#ifdef __FAST_BUFIO
         size_t bytes;
         struct __file_bufio *bf = (struct __file_bufio *) stream;
 

@@ -31,7 +31,7 @@
 
 #include "stdio_private.h"
 
-#ifdef _WANT_FAST_BUFIO
+#ifdef __FAST_BUFIO
 #include "../stdlib/mul_overflow.h"
 #endif
 
@@ -48,7 +48,7 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 	if ((stream->flags & __SRD) == 0 || size == 0)
 		return 0;
 
-#ifdef _WANT_FAST_BUFIO
+#ifdef __FAST_BUFIO
         size_t bytes;
         if ((stream->flags & __SBUF) != 0 &&
             !mul_overflow(size, nmemb, &bytes) && bytes > 0)
