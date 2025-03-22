@@ -95,7 +95,7 @@ _start32:
 	addl	$4, %esp
 #endif
 	
-#if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
+#if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
 	call	__libc_init_array
 #endif
 

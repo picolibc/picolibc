@@ -137,7 +137,7 @@ set(_HAVE_FCNTL 0)
 set(__IEEEFP_FUNCS 0)
 
 # compiler supports INIT_ARRAY sections
-set(_HAVE_INITFINI_ARRAY 1)
+set(__INIT_FINI_ARRAY 1)
 
 # Support _init() and _fini() functions
 set(_HAVE_INIT_FINI 1)

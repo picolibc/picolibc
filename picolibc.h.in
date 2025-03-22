@@ -61,7 +61,7 @@
 #cmakedefine __IEEEFP_FUNCS
 
 /* compiler supports INIT_ARRAY sections */
-#cmakedefine _HAVE_INITFINI_ARRAY
+#cmakedefine __INIT_FINI_ARRAY
 
 /* Support _init() and _fini() functions */
 #cmakedefine _HAVE_INIT_FINI

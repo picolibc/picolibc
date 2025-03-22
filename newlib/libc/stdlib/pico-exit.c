@@ -40,7 +40,7 @@
 void
 exit(int code)
 {
-#ifdef _HAVE_INITFINI_ARRAY
+#ifdef __INIT_FINI_ARRAY
 	__libc_fini_array();
 #else
         if (__call_exitprocs)

@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <sys/_initfini.h>
 
-#ifdef _HAVE_INITFINI_ARRAY
+#ifdef __INIT_FINI_ARRAY
 
 /* Iterate over all the init routines.  */
 void

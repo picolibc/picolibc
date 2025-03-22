@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <sys/_initfini.h>
 
-#ifdef _HAVE_INITFINI_ARRAY
+#ifdef __INIT_FINI_ARRAY
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"

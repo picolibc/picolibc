@@ -59,7 +59,7 @@ __cxa_atexit (void (*func) (void *), void *arg, void *d);
 
 void __libc_fini_array(void);
 
-#ifndef _HAVE_INITFINI_ARRAY
+#ifndef __INIT_FINI_ARRAY
 void
 __call_exitprocs(int code, void *param) __weak;
 #endif

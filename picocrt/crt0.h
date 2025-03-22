@@ -65,7 +65,7 @@ _start(void);
 int
 main(int, char **);
 
-#ifdef _HAVE_INITFINI_ARRAY
+#ifdef __INIT_FINI_ARRAY
 extern void __libc_init_array(void);
 #endif
 
@@ -100,7 +100,7 @@ __start(void)
 #ifdef __THREAD_LOCAL_STORAGE
 	_set_tls(__tls_base);
 #endif
-#if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
+#if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
 	__libc_init_array();
 #endif
 

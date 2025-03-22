@@ -75,7 +75,7 @@ static void
 register_fini(void)
 {
   if (&__libc_fini) {
-#ifdef _HAVE_INITFINI_ARRAY
+#ifdef __INIT_FINI_ARRAY
     extern void __libc_fini_array (void);
     atexit (__libc_fini_array);
 #else
