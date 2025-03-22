@@ -242,10 +242,8 @@ option('nano-malloc-clear-freed', type: 'boolean', value: false,
 #
 # Locking support
 #
-option('newlib-multithread', type: 'boolean', value: true,
-       description: 'enable support for multiple threads')
-option('newlib-retargetable-locking', type: 'boolean', value: true,
-       description: 'Allow locking routines to be retargeted at link time')
+option('single-thread', type: 'boolean', value: false,
+       description: 'disable support for multiple threads')
 
 #
 # Thread-local storage support

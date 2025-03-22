@@ -45,12 +45,11 @@
    section before reaching the end of the critical section's code end, use
    the appropriate _newlib_XXX_exit macro. */
 
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS) \
-    && !defined (__rtems__)
+#if !defined (__SINGLE_THREAD) && defined (_POSIX_THREADS)
 #define _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
 #endif
 
-#if defined(__SINGLE_THREAD__) || defined(__IMPL_UNLOCKED__)
+#if defined(__SINGLE_THREAD) || defined(__IMPL_UNLOCKED__)
 
 # define _newlib_flockfile_start(_fp)
 # define _newlib_flockfile_exit(_fp)
@@ -101,7 +100,7 @@
 	  pthread_setcancelstate (__oldsfpcancel, &__oldsfpcancel); \
 	}
 
-#else /* !__SINGLE_THREAD__ && !__IMPL_UNLOCKED__ && !_STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
+#else
 
 # define _newlib_flockfile_start(_fp) \
 	{ \
@@ -128,7 +127,7 @@
 		__sfp_lock_release (); \
 	}
 
-#endif /* __SINGLE_THREAD__ || __IMPL_UNLOCKED__ */
+#endif
 
 extern wint_t __fgetwc (FILE *);
 extern wint_t __fputwc (wchar_t, FILE *);
@@ -301,17 +300,10 @@ char *_llicvt (char *, long long, char);
 
 #define	NDYNAMIC 4	/* add four more whenever necessary */
 
-#ifdef __SINGLE_THREAD__
-#define __sfp_lock_acquire()
-#define __sfp_lock_release()
-#define __sinit_lock_acquire()
-#define __sinit_lock_release()
-#else
 #define __sfp_lock_acquire() __LIBC_LOCK()
 #define __sfp_lock_release() __LIBC_UNLOCK()
 #define __sinit_lock_acquire() __LIBC_LOCK()
 #define __sinit_lock_release() __LIBC_UNLOCK()
-#endif
 
 /* Types used in positional argument support in vfprinf/vfwprintf.
    The implementation is char/wchar_t dependent but the class and state

@@ -289,14 +289,8 @@ set(__OBSOLETE_MATH_DOUBLE ON)
 # Compute static memory area sizes at runtime instead of link time
 set(__PICOLIBC_CRT_RUNTIME_SIZE OFF)
 
-if(NOT DEFINED __SINGLE_THREAD__)
-  option(__SINGLE_THREAD__ "Disable multithreading support" OFF)
-endif()
-
-if(__SINGLE_THREAD__)
-  set(_RETARGETABLE_LOCKING OFF)
-else()
-  set(_RETARGETABLE_LOCKING ON)
+if(NOT DEFINED __SINGLE_THREAD)
+  option(__SINGLE_THREAD "Disable multithreading support" OFF)
 endif()
 
 set(NEWLIB_VERSION 4.3.0)

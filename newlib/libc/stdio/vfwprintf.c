@@ -181,9 +181,7 @@ __sbwprintf (
 	fake._bf._base = fake._p = buf;
 	fake._bf._size = fake._w = sizeof (buf);
 	fake._lbfsize = 0;	/* not actually used, but Just In Case */
-#ifndef __SINGLE_THREAD__
 	__lock_init_recursive (fake._lock);
-#endif
 
 	/* do the work, then copy any error status */
 	ret = VFWPRINTF (&fake, fmt, ap);
@@ -192,9 +190,7 @@ __sbwprintf (
 	if (fake._flags & __SERR)
 		fp->_flags |= __SERR;
 
-#ifndef __SINGLE_THREAD__
 	__lock_close_recursive (fake._lock);
-#endif
 	return (ret);
 }
 #endif /* _UNBUF_STREAM_OPT */

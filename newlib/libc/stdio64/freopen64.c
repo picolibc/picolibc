@@ -210,11 +210,9 @@ freopen64 (
       errno = e;	/* restore in case _close clobbered */
       if (!(oflags2 & __SNLK))
 	_funlockfile (fp);
-#ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
-#endif
       __sfp_lock_release ();
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
       return NULL;
@@ -238,7 +236,7 @@ freopen64 (
 
   if (!(oflags2 & __SNLK))
     _funlockfile (fp);
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS)
+#ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
   pthread_setcancelstate (__oldcancel, &__oldcancel);
 #endif
   return fp;

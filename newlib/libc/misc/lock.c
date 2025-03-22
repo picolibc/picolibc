@@ -75,7 +75,7 @@ subroutines are required for linking multi-threaded applications.
 
 #include <sys/lock.h>
 
-#ifdef _RETARGETABLE_LOCKING
+#ifndef __SINGLE_THREAD
 
 struct __lock {
   char unused;
@@ -131,4 +131,4 @@ __retarget_lock_release_recursive (_LOCK_T lock)
   (void) lock;
 }
 
-#endif /* _RETARGETABLE_LOCKING */
+#endif /* __SINGLE_THREAD */

@@ -207,9 +207,7 @@ freopen (
       errno = e;	/* restore in case _close clobbered */
       if (!(oflags2 & __SNLK))
 	_funlockfile (fp);
-#ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
-#endif
       __sfp_lock_release ();
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);

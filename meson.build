@@ -1343,10 +1343,6 @@ NEWLIB_MAJOR_VERSION=4
 NEWLIB_MINOR_VERSION=3
 NEWLIB_PATCHLEVEL_VERSION=0
 
-if get_option('newlib-retargetable-locking') != get_option('newlib-multithread')
-  error('newlib-retargetable-locking and newlib-multithread must be set to the same value')
-endif
-
 conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      cc.has_argument('-fno-tree-loop-distribute-patterns'),
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
@@ -1374,7 +1370,7 @@ conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
 conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
-conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
+conf_data.set('__SINGLE_THREAD', get_option('single-thread'))
 conf_data.set('_ELIX_LEVEL', newlib_elix_level)
 conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
 conf_data.set('_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
@@ -1387,7 +1383,6 @@ conf_data.set('_NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nan
 conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
 conf_data.set('_PICO_EXIT', picoexit)
 conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
-conf_data.set('_RETARGETABLE_LOCKING', get_option('newlib-retargetable-locking'))
 conf_data.set('TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
 conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')

@@ -317,9 +317,7 @@ internalopen_memstream (
     {
       _newlib_sfp_lock_start ();
       fp->_flags = 0;		/* release */
-#ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
-#endif
       _newlib_sfp_lock_end ();
       return NULL;
     }
@@ -342,9 +340,7 @@ internalopen_memstream (
     {
       _newlib_sfp_lock_start ();
       fp->_flags = 0;		/* release */
-#ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
-#endif
       _newlib_sfp_lock_end ();
       free (c);
       return NULL;

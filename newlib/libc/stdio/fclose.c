@@ -104,9 +104,7 @@ fclose (
   fp->_flags = 0;		/* release this FILE for reuse */
   if (!(fp->_flags2 & __SNLK))
     _funlockfile (fp);
-#ifndef __SINGLE_THREAD__
   __lock_close_recursive (fp->_lock);
-#endif
 
   __sfp_lock_release ();
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT

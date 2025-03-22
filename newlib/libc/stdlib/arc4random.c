@@ -196,24 +196,16 @@ arc4random(void)
 {
 	uint32_t val;
 
-#ifndef __SINGLE_THREAD__
 	_ARC4_LOCK();
-#endif
 	_rs_random_u32(&val);
-#ifndef __SINGLE_THREAD__
 	_ARC4_UNLOCK();
-#endif
 	return val;
 }
 
 void
 arc4random_buf(void *buf, size_t n)
 {
-#ifndef __SINGLE_THREAD__
 	_ARC4_LOCK();
-#endif
 	_rs_random_buf(buf, n);
-#ifndef __SINGLE_THREAD__
 	_ARC4_UNLOCK();
-#endif
 }

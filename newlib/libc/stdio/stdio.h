@@ -37,9 +37,11 @@
 #include <stdarg.h>
 #include <sys/_types.h>
 
+#ifndef __SINGLE_THREAD
 #ifndef __machine_flock_t_defined
 #include <sys/lock.h>
 typedef _LOCK_RECURSIVE_T _flock_t;
+#endif
 #endif
 
 _BEGIN_STD_C
@@ -132,7 +134,7 @@ struct __file {
   int	_blksize;	/* stat.st_blksize (may be != _bf._size) */
   _off_t _offset;	/* current lseek offset */
 
-#ifndef __SINGLE_THREAD__
+#ifndef __SINGLE_THREAD
   _flock_t _lock;	/* for thread-safety locking */
 #endif
   _mbstate_t _mbstate;	/* for wide char stdio functions. */
@@ -178,7 +180,7 @@ struct __file {
   _off64_t _offset;     /* current lseek offset */
   _fpos64_t (*_seek64) (void *, _fpos64_t, int);
 
-#ifndef __SINGLE_THREAD__
+#ifndef __SINGLE_THREAD
   _flock_t _lock;	/* for thread-safety locking */
 #endif
   _mbstate_t _mbstate;	/* for wide char stdio functions. */
@@ -739,12 +741,12 @@ _putchar_unlocked(int _c)
 	return (_sputc( _c, stdout));
 }
 
-#ifdef __SINGLE_THREAD__
+#ifdef __SINGLE_THREAD
 #define	getc(_p)	_sgetc( _p)
 #define	putc(_c, _p)	_sputc( _c, _p)
 #define	getchar()	_getchar_unlocked()
 #define	putchar(_c)	_putchar_unlocked(_c)
-#endif /* __SINGLE_THREAD__ */
+#endif /* __SINGLE_THREAD */
 
 #if __MISC_VISIBLE || __POSIX_VISIBLE
 #define	getchar_unlocked()	_getchar_unlocked()

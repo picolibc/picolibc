@@ -76,7 +76,7 @@ struct __file_bufio {
                 int     (*close_int)(int fd);
                 int     (*close_ptr)(void *ptr);
         };
-#ifndef __SINGLE_THREAD__
+#ifndef __SINGLE_THREAD
 	_LOCK_T lock;
 #endif
 };

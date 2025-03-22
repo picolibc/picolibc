@@ -79,10 +79,8 @@ std (FILE *ptr,
 #endif /* __LARGE64_FILES */
   ptr->_seek = __sseek;
   ptr->_close = __sclose;
-#ifndef __SINGLE_THREAD__
   if (ptr == &__sf[0] || ptr == &__sf[1] || ptr == &__sf[2])
     __lock_init_recursive (ptr->_lock);
-#endif
 #ifdef __SCLE
   if (__stextmode (ptr->_file))
     ptr->_flags |= __SCLE;
@@ -177,9 +175,7 @@ found:
   fp->_file = -1;		/* no file */
   fp->_flags = 1;		/* reserve this slot; caller sets real flags */
   fp->_flags2 = 0;
-#ifndef __SINGLE_THREAD__
   __lock_init_recursive (fp->_lock);
-#endif
   _newlib_sfp_lock_end ();
 
   fp->_p = NULL;		/* no current pointer */
