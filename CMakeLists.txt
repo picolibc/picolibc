@@ -82,8 +82,8 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 set(_ATOMIC_UNGETC 1)
 
 # Always optimize strcmp for performance
-if(NOT DEFINED FAST_STRCMP)
-  option(FAST_STRCMP "Always optimize strcmp for performance" ON)
+if(NOT DEFINED __FAST_STRCMP)
+  option(__FAST_STRCMP "Always optimize strcmp for performance" ON)
 endif()
 
 # use global errno variable
