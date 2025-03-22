@@ -1414,7 +1414,7 @@ if tinystdio
   conf_data.set('_PRINTF_PERCENT_N',
                 printf_percent_n,
                 description: 'support %n in printf format strings')
-  conf_data.set('_ATOMIC_UNGETC',
+  conf_data.set('__ATOMIC_UNGETC',
                 atomic_ungetc,
                 description: 'Use atomics for fgetc/ungetc for re-entrancy')
 else
