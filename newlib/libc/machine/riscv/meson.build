@@ -45,7 +45,7 @@ srcs_machine = [
   'strlen.c',
 ]
 
-has_ieeefp_funcs = true
+ieeefp_funcs = true
 
 subdir('machine')
 

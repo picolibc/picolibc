@@ -58,7 +58,7 @@
 #cmakedefine _HAVE_FCNTL
 
 /* IEEE fp funcs available */
-#cmakedefine _HAVE_IEEEFP_FUNCS
+#cmakedefine __IEEEFP_FUNCS
 
 /* compiler supports INIT_ARRAY sections */
 #cmakedefine _HAVE_INITFINI_ARRAY

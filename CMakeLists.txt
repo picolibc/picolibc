@@ -134,7 +134,7 @@ picolibc_flag(_HAVE_COMPLEX)
 set(_HAVE_FCNTL 0)
 
 # IEEE fp funcs available
-set(_HAVE_IEEEFP_FUNCS 0)
+set(__IEEEFP_FUNCS 0)
 
 # compiler supports INIT_ARRAY sections
 set(_HAVE_INITFINI_ARRAY 1)

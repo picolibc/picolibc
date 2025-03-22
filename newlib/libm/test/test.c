@@ -46,7 +46,7 @@ main (int ac,
   int is = 1;
   int math= 1;
   int cvt = 1;
-#ifdef _HAVE_IEEEFP_FUNCS
+#ifdef __IEEEFP_FUNCS
   int ieee= 1;
 #endif
   int vector=0;
@@ -68,7 +68,7 @@ main (int ac,
     (void) math;
     if (strcmp(av[i],"-nocvt") == 0)
      cvt = 0;
-#ifdef _HAVE_IEEEFP_FUNCS
+#ifdef __IEEEFP_FUNCS
     if (strcmp(av[i],"-noiee") == 0)
      ieee= 0;
   (void) ieee;
@@ -96,7 +96,7 @@ main (int ac,
 #if TEST_PART == 0 || TEST_PART == -1
   if (is)
    test_is();
-#ifdef _HAVE_IEEEFP_FUNCS
+#ifdef __IEEEFP_FUNCS
   if (ieee)
    test_ieee();
 #endif

@@ -138,7 +138,7 @@ math_test_src = [
   'yn_vec.c',
 ]
 
-if has_ieeefp_funcs
+if ieeefp_funcs
   math_test_src += [
     'test_ieee.c',
   ]
