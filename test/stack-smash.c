@@ -46,7 +46,7 @@
 static volatile bool expect_smash;
 
 static void __attribute__((noinline))
-#ifdef _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
+#ifdef __HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 __attribute((__optimize__("-fno-tree-loop-distribute-patterns")))
 #endif
     my_strcpy(char *d, char *s)

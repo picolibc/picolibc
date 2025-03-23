@@ -376,13 +376,13 @@ __ULong		any_on (_Bigint *b, int k);
 void		copybits (__ULong *c, int n, _Bigint *b);
 double		_strtod_l (const char *__restrict s00,
 			   char **__restrict se, locale_t loc);
-#if defined(_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
+#if defined(__HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
 int		_strtorx_l (const char *, char **, int,
 			    void *, locale_t);
 int		_strtodg_l (const char *s00, char **se,
 			    struct FPI *fpi, Long *exp, __ULong *bits,
 			    locale_t);
-#endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
+#endif /* __HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
 
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(_SMALL_HEXDIG)
 unsigned char __hexdig_fun (unsigned char);

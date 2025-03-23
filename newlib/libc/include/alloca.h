@@ -11,7 +11,7 @@
 
 #undef alloca
 
-#if _HAVE_BUILTIN_ALLOCA
+#if __HAVE_BUILTIN_ALLOCA
 #define alloca(size) __builtin_alloca(size)
 #else
 void * alloca (size_t);

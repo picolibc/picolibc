@@ -36,7 +36,7 @@ THIS SOFTWARE.
 #include "mprec.h"
 #include "gdtoa.h"
 
-#if defined(_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) && __LDBL_MANT_DIG__ == 64
+#if defined(__HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) && __LDBL_MANT_DIG__ == 64
 
 /* one or the other of IEEE_MC68k or IEEE_8087 should be #defined */
 
@@ -117,4 +117,4 @@ _strtorx_l(const char *s, char **sp, int rounding, void *L,
 	return k;
 	}
 
-#endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
+#endif /* __HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */

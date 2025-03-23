@@ -196,7 +196,7 @@ e_to_str(int e)
 /* Tests with long doubles */
 #ifdef _TEST_LONG_DOUBLE
 
-#if defined(__PICOLIBC__) && !defined(_HAVE_LONG_DOUBLE_MATH)
+#if defined(__PICOLIBC__) && !defined(__HAVE_LONG_DOUBLE_MATH)
 #define SIMPLE_MATH_ONLY
 #define NO_NEXTTOWARD
 #endif

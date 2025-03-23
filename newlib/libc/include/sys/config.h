@@ -270,7 +270,7 @@
 
 /* Figure out if the compiler supports the long double type. */
 #ifdef __SIZEOF_LONG_DOUBLE__
-#define _HAVE_LONG_DOUBLE
+#define __HAVE_LONG_DOUBLE
 #endif
 
 /* Figure out if long double is the same size as double. If the system
@@ -288,8 +288,8 @@
    simply call the double functions.  On Cygwin the long double functions
    are implemented independently from newlib to be able to use optimized
    assembler functions despite using the Microsoft x86_64 ABI. */
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(_HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) || (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
-#define _HAVE_LONG_DOUBLE_MATH
+#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) || (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
+#define __HAVE_LONG_DOUBLE_MATH
 #endif
 
 #endif /* __SYS_CONFIG_H__ */

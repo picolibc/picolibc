@@ -813,7 +813,7 @@ p_b_term(
 		if (start == finish)
 			CHadd(cs, start);
 		else {
-#ifdef _HAVE_REAL_STRCOLL
+#ifdef __HAVE_REAL_STRCOLL
                     (void)REQUIRE(__collate_range_cmp(start, finish) <= 0, REG_ERANGE);
                     for (i = CHAR_MIN; i <= CHAR_MAX; i++) {
                         if (   __collate_range_cmp(start, i) <= 0

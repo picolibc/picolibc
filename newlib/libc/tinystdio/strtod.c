@@ -83,7 +83,7 @@ strtod (const char * nptr, char ** endptr)
     return flt;
 }
 
-#if defined(_HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#if defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 #ifdef __strong_reference
 __strong_reference_dup(strtod, strtold);
 #else

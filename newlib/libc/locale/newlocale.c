@@ -38,7 +38,7 @@
 #include "../ctype/ctype_.h"
 #include "../stdlib/local.h"
 
-#ifdef _HAVE_POSIX_LOCALE_API
+#ifdef __HAVE_POSIX_LOCALE_API
 
 locale_t
 newlocale (int category_mask, const char *name, locale_t base)

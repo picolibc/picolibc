@@ -123,13 +123,13 @@ set(_FSEEK_OPTIMIZATION 0)
 set(_FVWRITE_IN_STREAMIO 0)
 
 # Use bitfields in packed structs
-picolibc_flag(_HAVE_BITFIELDS_IN_PACKED_STRUCTS)
+picolibc_flag(__HAVE_BITFIELDS_IN_PACKED_STRUCTS)
 
 # Compiler has support for flag to prevent mis-optimizing memcpy/memset patterns
-picolibc_flag(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
+picolibc_flag(__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 
 # Compiler supports _Complex
-picolibc_flag(_HAVE_COMPLEX)
+picolibc_flag(__HAVE_COMPLEX)
 
 set(__HAVE_FCNTL 0)
 

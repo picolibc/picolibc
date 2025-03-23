@@ -35,7 +35,7 @@
 
 #include "math_ld.h"
 
-#if !_HAVE_FAST_FMAL && (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
+#if !__HAVE_FAST_FMAL && (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
 
 typedef long double FLOAT_T;
 

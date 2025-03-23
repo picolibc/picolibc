@@ -1333,9 +1333,9 @@ int main(void) { return foo(@0@); }
   builtin_code = builtin_template.format(builtin[1], builtin[2])
   have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
   if have_current_builtin
-    conf_data.set10('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+    conf_data.set10('__HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
   else
-    conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+    conf_data.set('__HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
   endif
 endforeach
 
@@ -1344,11 +1344,10 @@ NEWLIB_MAJOR_VERSION=4
 NEWLIB_MINOR_VERSION=3
 NEWLIB_PATCHLEVEL_VERSION=0
 
-conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
+conf_data.set('__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      cc.has_argument('-fno-tree-loop-distribute-patterns'),
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
 
-conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 conf_data.set('__IO_LONG_LONG', io_long_long)
 conf_data.set('__IO_MINIMAL_LONG_LONG', minimal_io_long_long)
 conf_data.set('__FAST_BUFIO', fast_bufio)
@@ -1374,8 +1373,8 @@ conf_data.set('__THREAD_LOCAL_STORAGE', thread_local_storage, description: 'use 
 conf_data.set('__THREAD_LOCAL_STORAGE_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),
               description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
-conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
-conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
+conf_data.set('__HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
+conf_data.set('__HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 
 conf_data.set('_MB_CAPABLE', mb_capable)
 if mb_capable
@@ -1389,6 +1388,7 @@ conf_data.set('_PICO_EXIT', picoexit)
 if not picoexit
   conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
   conf_data.set('_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
+  conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 endif
 
 conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')

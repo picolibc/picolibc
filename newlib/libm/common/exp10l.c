@@ -36,7 +36,7 @@
 #define _GNU_SOURCE
 #include "math_config.h"
 
-#if defined(_HAVE_LONG_DOUBLE_MATH) && defined(_NEED_FLOAT_HUGE)
+#if defined(__HAVE_LONG_DOUBLE_MATH) && defined(_NEED_FLOAT_HUGE)
 
 long double
 exp10l (long double x)

@@ -125,7 +125,7 @@
 #endif
 #endif
 
-#if (!defined(_HAVE_LONG_DOUBLE) && defined(__LDBL_MANT_DIG__))
+#if (!defined(__HAVE_LONG_DOUBLE) && defined(__LDBL_MANT_DIG__))
 #if __LDBL_MANT_DIG__ == 53
 #define __SIZEOF_LONG_DOUBLE__ 8
 #elif __LDBL_MANT_DIG__ == 64 || __LDBL_MANT_DIG__ == 113

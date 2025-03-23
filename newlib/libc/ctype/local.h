@@ -131,7 +131,7 @@ struct caseconv_entry
   int_least32_t delta: 17;
 #endif
 }
-#ifdef _HAVE_BITFIELDS_IN_PACKED_STRUCTS
+#ifdef __HAVE_BITFIELDS_IN_PACKED_STRUCTS
 __attribute__((packed))
 #endif
 ;

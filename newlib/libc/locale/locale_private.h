@@ -46,7 +46,7 @@
 #include <limits.h>
 #include <ctype.h>
 
-#define _HAVE_POSIX_LOCALE_API
+#define __HAVE_POSIX_LOCALE_API
 
 #define NUMCAT  ((_LC_MESSAGES - LC_ALL) + 1)
 
@@ -148,7 +148,7 @@ typedef mbtowc_f        *mbtowc_p;
 extern const char       * const __locale_names[];
 extern locale_t         __global_locale;
 
-#ifdef _HAVE_POSIX_LOCALE_API
+#ifdef __HAVE_POSIX_LOCALE_API
 extern __THREAD_LOCAL locale_t    _locale;
 #endif
 
@@ -160,7 +160,7 @@ extern const mbtowc_p __mbtowc[locale_END - locale_BASE];
 #define __get_wctomb(id)        __wctomb[(id) - locale_BASE]
 #define __get_mbtowc(id)        __mbtowc[(id) - locale_BASE]
 
-#ifdef _HAVE_POSIX_LOCALE_API
+#ifdef __HAVE_POSIX_LOCALE_API
 #define __WCTOMB_L(l)   (__get_wctomb(l))
 #define __MBTOWC_L(l)   (__get_mbtowc(l))
 #define __WCTOMB        (__WCTOMB_L(__get_current_locale()))
@@ -181,7 +181,7 @@ extern const mbtowc_p __mbtowc[locale_END - locale_BASE];
 
 static inline locale_t
 __get_current_locale(void) {
-#ifdef _HAVE_POSIX_LOCALE_API
+#ifdef __HAVE_POSIX_LOCALE_API
     if (_locale)
         return _locale;
 #endif

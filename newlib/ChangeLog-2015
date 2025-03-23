@@ -106,7 +106,7 @@
 
 2015-11-26  Corinna Vinschen  <corinna@vinschen.de>
 
-	* libc/stdlib/strtodg.c: Add ifdef to check _HAVE_LONG_DOUBLE and
+	* libc/stdlib/strtodg.c: Add ifdef to check __HAVE_LONG_DOUBLE and
 	_LDBL_EQ_DBL.
 
 2015-11-24  Steve Ellcey  <sellcey@imgtec.com>
@@ -1897,7 +1897,7 @@ summary.
 2014-03-07  Corinna Vinschen  <vinschen@redhat.com>
 	    Jeff Johnston  <jjohnstn@redhat.com>
 
-	* libc/include/stdlib.h (strtold): Define if _HAVE_LONG_DOUBLE is
+	* libc/include/stdlib.h (strtold): Define if __HAVE_LONG_DOUBLE is
 	defined.
 	* libc/stdlib/strtold.c (strtold): Ditto.  Call strtod on systems
 	with long double == double, _strtold otherwise.
@@ -2064,11 +2064,11 @@ summary.
 
 2013-12-10  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* acconfig.h: Add _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL.
+	* acconfig.h: Add __HAVE_CC_INHIBIT_LOOP_TO_LIBCALL.
 	* newlib.hin: Ditto.
 	* configure: Regenerate.
-	* configure.in: Add setting of _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL.
-	* libc/string/local.h: Add check for _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
+	* configure.in: Add setting of __HAVE_CC_INHIBIT_LOOP_TO_LIBCALL.
+	* libc/string/local.h: Add check for __HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 	and set __inhibit_loop_to_libcall macro appropriately.
 	* libc/string/memmove.c: Use __inhibit_loop_to_libcall macro in
 	function declaration.
@@ -2527,7 +2527,7 @@ summary.
 
 2013-10-10  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
-	* libc/sys/rtems/machine/_types.h (_HAVE_SYSTYPES): Define.
+	* libc/sys/rtems/machine/_types.h (__HAVE_SYSTYPES): Define.
 
 2013-10-10  Sebastian Huber  <sebastian.huber@embedded-brains.de>
 
@@ -5957,7 +5957,7 @@ summary.
 
 2009-08-18  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* acconfig.h: Add templates for _HAVE_LONG_DOUBLE and _LDBL_EQ_DBL.
+	* acconfig.h: Add templates for __HAVE_LONG_DOUBLE and _LDBL_EQ_DBL.
 
 2009-08-18  Eric Blake  <ebb9@byu.net>
 
@@ -6173,16 +6173,16 @@ summary.
 2009-05-15  Craig Howland <howland@LGSInnovations.com>
 
 	* configure.in:  Add configuration test for long double type existing
-	and set flag _HAVE_LONG_DOUBLE if true.  Fix INIT_ARRAY (.init_array)
+	and set flag __HAVE_LONG_DOUBLE if true.  Fix INIT_ARRAY (.init_array)
 	and _LDBL_EQ_DBL tests to not link so that will work with
 	cross-compilers.
 	* configure: Regenerated.
 	* Makefile.in: Ditto.
-	* newlib.hin: Add _HAVE_LONG_DOUBLE flag.
+	* newlib.hin: Add __HAVE_LONG_DOUBLE flag.
 	* libc/include/math.h:  Change non-builtin defines for HUGE_VAL,
 	HUGE_VALF, and HUGE_VALL to be constant expressions.  Add definitions
 	for the non-builtin case for INFINITY and NAN.  Gate HUGE_VALL and
-	union __ldmath definitions with (new) _HAVE_LONG_DOUBLE.
+	union __ldmath definitions with (new) __HAVE_LONG_DOUBLE.
 	*libm/common/s_infconst.c:  Change definitions to use values from
 	float.h instead of non-so-portable integer forms.  Mark as being
 	deprecated (because now removed from math.h, are not used anywhere
@@ -6279,9 +6279,9 @@ summary.
 	* configure: Regenerated.
 	* newlib.hin: Add _LDBL_EQ_DBL flag.
 	* libc/include/math.h: Use _LDBL_EQ_DBL flag instead of
-	_HAVE_LDBL_MATH.
+	__HAVE_LDBL_MATH.
 	* libc/include/stdlib.h: Use _LDBL_EQ_DBL flag instead of
-	_HAVE_LDBL_STDLIB.
+	__HAVE_LDBL_STDLIB.
 	* libc/common/local.h: Remove _LDBL_EQ_DBL flag setting.
 	* libc/stdlib/local.h: Ditto.
 
@@ -6371,9 +6371,9 @@ summary.
 2009-04-20  Jeff johnston  <jjohnstn@redhat.com>
 
 	* libc/include/math.h: Change _LDBL_EQ_DBL flag usage to
-	be _HAVE_LDBL_MATH.
+	be __HAVE_LDBL_MATH.
 	* libc/include/stdlib.h: Change _LDBL_EQ_DBL flag usage to
-	be _HAVE_LDBL_STDLIB.
+	be __HAVE_LDBL_STDLIB.
 
 2009-04-17  Jeff johnston  <jjohnstn@redhat.com>
 
@@ -6453,11 +6453,11 @@ summary.
 
 2009-04-17  Jeff johnston  <jjohnstn@redhat.com>
 
-	* configure.in: Remove _HAVE_ARRAY_ALIASING check.
+	* configure.in: Remove __HAVE_ARRAY_ALIASING check.
 	* configure: Regenerated.
 	* Makefile.in: Regenerated.
-	* newlib.hin: Remove _HAVE_ARRAY_ALIASING flag.
-	* libc/ctype/ctype_.c: Do not check for _HAVE_ARRAY_ALIASING.
+	* newlib.hin: Remove __HAVE_ARRAY_ALIASING flag.
+	* libc/ctype/ctype_.c: Do not check for __HAVE_ARRAY_ALIASING.
 	* libm/configure.in: Change AC_TRY_COMPILE to AC_TRY_COMMAND to
 	avoid executable test.
 	* libm/configure: Regenerated.
@@ -12867,11 +12867,11 @@ summary.
 2005-03-17  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.in: Add new check to see if compiler supports
-	aliasing of arrays and define _HAVE_ARRAY_ALIASING if true.
+	aliasing of arrays and define __HAVE_ARRAY_ALIASING if true.
 	* configure: Regenerated.
 	* Makefile.in: Ditto.
-	* newlib.hin: Add _HAVE_ARRAY_ALIASING.
-	* libc/ctype/ctype_.c: Check for _HAVE_ARRAY_ALIASING before
+	* newlib.hin: Add __HAVE_ARRAY_ALIASING.
+	* libc/ctype/ctype_.c: Check for __HAVE_ARRAY_ALIASING before
 	aliasing the _ctype_ array to _ctype_b.
 	* libc/include/ctype.h: Change macros to use __ctype_ptr.  Mark
 	_ctype_ as deprecated.
@@ -17681,7 +17681,7 @@ Wed Jun 26 16:33:25 2002  J"orn Rennecke <joern.rennecke@superh.com>
 
 	* libc/include/math.h: Add <sys/types.h> to get _uint32_t definition.
 	* libc/include/machine/types.h: Skip __off_t, __pid_t, and
-	__loff_t definitions if special _HAVE_SYSTYPES macro defined.
+	__loff_t definitions if special __HAVE_SYSTYPES macro defined.
 	* libc/include/sys/config.h: Removed _uint*, _int* definitions.
 	* libc/include/sys/param.h: Remove i386 case which is handled
 	by default case.
@@ -24512,9 +24512,9 @@ Sat Sep 30 15:00:15 1995  Jason Molenda  (crash@phyeaux.cygnus.com)
 
 Sat Sep 30 10:25:57 1995  Jason Molenda    (crash@phydeaux.cygnus.com)
 
-	* libc/include/_ansi.h: set _HAVE_STDC if __STDC__ is defined
+	* libc/include/_ansi.h: set __HAVE_STDC if __STDC__ is defined
 	at all, not just == 1.
-	* libm/math/wf_acos.c (acosf): check for _HAVE_STDC, not __STDC__.
+	* libm/math/wf_acos.c (acosf): check for __HAVE_STDC, not __STDC__.
 
 Sat Sep 30 04:30:09 1995  Jason Molenda   (crash@phydeaux.cygnus.com)
 
@@ -25522,7 +25522,7 @@ Tue Jan  3 15:57:03 1995  Rob Savoye  <rob@darkstar.cygnus.com>
 
 Thu Dec 22 10:42:08 1994  Ian Lance Taylor  <ian@sanguine.cygnus.com>
 
-	* libc/syscalls/sysopen.c: Write _HAVE_STDC version of open, which
+	* libc/syscalls/sysopen.c: Write __HAVE_STDC version of open, which
 	uses ... in prototype.
 
 
@@ -26765,7 +26765,7 @@ Thu Apr  1 16:47:08 1993  Doug Evans  (dje@canuck.cygnus.com)
 	* libc/locale/locale.c: Reentrant routines _r_xxx renamed to
 	_xxx_r.  struct reent_struct renamed to struct _reent for ANSI.
 
-	* libc/include/machine/fastmath.h: Use _HAVE_STDC instead of
+	* libc/include/machine/fastmath.h: Use __HAVE_STDC instead of
 	__STDC__.
 
 	* libc/reent/{execr.c, filer.c, fstatr.c, linkr.c, reent.c,
@@ -26784,7 +26784,7 @@ Thu Apr  1 16:47:08 1993  Doug Evans  (dje@canuck.cygnus.com)
 	vfscanf.c, vprintf.c, vsprintf.c}: Reentrant routines _r_xxx
 	renamed to _xxx_r.  struct reent_struct renamed to struct _reent
 	for ANSI.  structure members given leading "_" for ANSI.  Use
-	_HAVE_STDC instead of __STDC__ and _HAVE_STDARG.
+	__HAVE_STDC instead of __STDC__ and __HAVE_STDARG.
 
 	* libc/stdlib/{__adjust.c, calloc.c, dtoa.c, ecvtbuf.c, malloc.c,
 	mprec.c, mprec.h, rand.c, std.h, strtod.c, strtol.c, strtoul.c,
@@ -26792,7 +26792,7 @@ Thu Apr  1 16:47:08 1993  Doug Evans  (dje@canuck.cygnus.com)
 	reent_struct renamed to struct _reent for ANSI.
 	Structure members given leading "_" for ANSI.
 	_CONST --> const in prototypes.
-	Use _HAVE_STDC instead of __STDC__.
+	Use __HAVE_STDC instead of __STDC__.
 
 	* libc/string/strtok.c: Reentrant routines _r_xxx renamed to
 	_xxx_r.
@@ -26811,7 +26811,7 @@ Thu Apr  1 16:47:08 1993  Doug Evans  (dje@canuck.cygnus.com)
 
 	* libc/include/{_ansi.h, ctype.h, math.h, reent.h, locale.h,
 	signal.h, stdio.h, stdlib.h, string.h, time.h}:
-	Use _HAVE_STDC instead of __STDC__ and _HAVE_STDARG.
+	Use __HAVE_STDC instead of __STDC__ and __HAVE_STDARG.
 	#ifndef _STRICT_ANSI non-ANSI routines.
 	Reentrant routines renamed from _r_xxx to _xxx_r.
 	No need to use _STRICT_ANSI on _xxx_r reentrant routines.

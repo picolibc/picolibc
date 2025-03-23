@@ -30,7 +30,7 @@
 #include <math.h>
 #include <stdbool.h>
 
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 
 /*
  * gcc doesn't implement complex multiplication or division correctly,
@@ -108,4 +108,4 @@ csqrtl(long double complex z)
 		return (result);
 }
 
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* __HAVE_LONG_DOUBLE */

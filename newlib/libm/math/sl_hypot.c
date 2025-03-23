@@ -6,7 +6,7 @@
 
 #include "fdlibm.h"
 
-#if defined(_NEED_FLOAT_HUGE) && !defined(_HAVE_LONG_DOUBLE_MATH)
+#if defined(_NEED_FLOAT_HUGE) && !defined(__HAVE_LONG_DOUBLE_MATH)
 
 long double
 hypotl(long double x, long double y)

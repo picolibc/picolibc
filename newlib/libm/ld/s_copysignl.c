@@ -35,7 +35,7 @@
 
 #include "math_ld.h"
 
-#ifndef _HAVE_BUILTIN_COPYSIGNL
+#ifndef __HAVE_BUILTIN_COPYSIGNL
 
 #if LDBL_MANT_DIG == 64
 
@@ -47,5 +47,5 @@
 
 #endif
 
-#endif /* _HAVE_BUILTIN_COPYSIGNL */
+#endif /* __HAVE_BUILTIN_COPYSIGNL */
 

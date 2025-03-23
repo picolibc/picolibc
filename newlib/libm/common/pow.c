@@ -81,7 +81,7 @@ log_inline (uint64_t ix, double_t *tail)
 
   /* Note: 1/c is j/N or j/N/2 where j is an integer in [N,2N) and
      |z/c - 1| < 1/N, so r = z/c - 1 is exactly representible.  */
-#if _HAVE_FAST_FMA
+#if __HAVE_FAST_FMA
   r = fma (z, invc, -1.0);
 #else
   /* Split z such that rhi, rlo and rhi*rhi are exact and |rlo| <= |r|.  */
@@ -104,7 +104,7 @@ log_inline (uint64_t ix, double_t *tail)
   ar2 = r * ar;
   ar3 = r * ar2;
   /* k*Ln2 + log(c) + r + A[0]*r*r.  */
-#if _HAVE_FAST_FMA
+#if __HAVE_FAST_FMA
   hi = t2 + ar2;
   lo3 = fma (ar, r, -ar2);
   lo4 = t2 - hi + ar2;
@@ -383,7 +383,7 @@ pow (double x, double y)
   double_t lo;
   double_t hi = log_inline (ix, &lo);
   double_t ehi, elo;
-#if _HAVE_FAST_FMA
+#if __HAVE_FAST_FMA
   ehi = y * hi;
   elo = y * lo + fma (y, hi, -ehi);
 #else

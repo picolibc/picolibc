@@ -1281,7 +1281,7 @@ strtod (const char *__restrict s00,
   return strtod_l (s00, se, __get_current_locale ());
 }
 
-#if defined(_HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
+#if defined(__HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
 #ifdef __strong_reference
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"

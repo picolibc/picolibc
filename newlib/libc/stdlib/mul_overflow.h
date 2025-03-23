@@ -1,4 +1,4 @@
-#if _HAVE_BUILTIN_MUL_OVERFLOW && !defined(__MSP430__)
+#if __HAVE_BUILTIN_MUL_OVERFLOW && !defined(__MSP430__)
 // gcc should use the correct one here
 #define mul_overflow __builtin_mul_overflow
 #else

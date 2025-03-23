@@ -35,7 +35,7 @@
 
 #include "stdio_private.h"
 
-#if defined(_HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
+#if defined(__HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
 
 long double
 strtold_l (const char *__restrict s00,

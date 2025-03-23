@@ -39,11 +39,11 @@
 #define _MACHINE_MATH_H_
 
 # if (__ARM_FEATURE_FMA && (__ARM_FP & 8))
-#define _HAVE_FAST_FMA  1
+#define __HAVE_FAST_FMA  1
 #endif
 
 #if (__ARM_FEATURE_FMA && (__ARM_FP & 4))
-#define _HAVE_FAST_FMAF 1
+#define __HAVE_FAST_FMAF 1
 #endif
 
 #ifdef __declare_extern_inline
@@ -140,7 +140,7 @@ trunc (double x)
 }
 #endif /* __ARM_ARCH >= 8 */
 
-#if _HAVE_FAST_FMA
+#if __HAVE_FAST_FMA
 
 __declare_extern_inline(double)
 fma (double x, double y, double z)
@@ -241,7 +241,7 @@ truncf (float x)
 }
 #endif /* __ARM_ARCH >= 8 */
 
-#if _HAVE_FAST_FMAF
+#if __HAVE_FAST_FMAF
 
 __declare_extern_inline(float)
 fmaf (float x, float y, float z)

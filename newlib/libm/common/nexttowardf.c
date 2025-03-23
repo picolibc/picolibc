@@ -27,7 +27,7 @@
 // properly when long double == double.
 // See: https://sourceware.org/ml/newlib/2014/msg00684.html
 
-#if !defined(_NEED_FLOAT_HUGE) && defined(_HAVE_LONG_DOUBLE)
+#if !defined(_NEED_FLOAT_HUGE) && defined(__HAVE_LONG_DOUBLE)
 
 float
 nexttowardf (float x, long double y)

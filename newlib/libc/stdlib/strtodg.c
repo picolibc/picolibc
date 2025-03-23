@@ -38,7 +38,7 @@ THIS SOFTWARE.
 
 #include "locale.h"
 
-#if defined(_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
+#if defined(__HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
 
 #define USE_LOCALE
 
@@ -1218,4 +1218,4 @@ nomem:
 	return STRTOG_NoNumber;
 	}
 
-#endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
+#endif /* __HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */

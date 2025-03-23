@@ -7,7 +7,7 @@
 #include <complex.h>
 #include "../common/fdlibm.h"
 
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 
 long double
 cimagl (long double complex z)
@@ -17,4 +17,4 @@ cimagl (long double complex z)
   return IMAG_PART (w);
 }
 
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* __HAVE_LONG_DOUBLE */

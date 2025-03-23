@@ -37,11 +37,11 @@
 #define _MACHINE_MATH_H_
 
 #if __ARM_FP & 0x8
-#define _HAVE_FAST_FMA 1
+#define __HAVE_FAST_FMA 1
 #endif
 
 #if __ARM_FP & 0x4
-#define _HAVE_FAST_FMAF 1
+#define __HAVE_FAST_FMAF 1
 #endif
 
 #ifdef __declare_extern_inline

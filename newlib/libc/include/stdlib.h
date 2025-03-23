@@ -281,14 +281,14 @@ int     strfromd(char *__restrict str, size_t n,
 #endif
 #if __ISO_C_VISIBLE >= 1999
 float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 long double
         strtold (const char *__restrict __n, char **__restrict __end_PTR);
 #endif
 #ifdef __TINY_STDIO
 int     strfromf(char *__restrict str, size_t n,
                  const char *__restrict format, float fp);
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 int     strfroml (char *__restrict str, size_t n,
                   const char *__restrict format, long double fp);
 #endif
@@ -301,12 +301,12 @@ int     strfroml (char *__restrict str, size_t n,
 # endif
 #endif
 long	strtol (const char *__restrict __n, char **__restrict __end_PTR, int __base);
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 #if __ISO_C_VISIBLE >= 1999
 extern long double
         strtold (const char *__restrict, char **__restrict);
 #endif
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* __HAVE_LONG_DOUBLE */
 #if __ISO_C_VISIBLE >= 1999
 long long
         strtoll (const char *__restrict __n, char **__restrict __end_PTR, int __base);
@@ -321,11 +321,11 @@ unsigned long long
 #if __GNU_VISIBLE
 double	strtod_l (const char *__restrict, char **__restrict, locale_t);
 float	strtof_l (const char *__restrict, char **__restrict, locale_t);
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 extern long double
         strtold_l (const char *__restrict, char **__restrict,
                    locale_t);
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* __HAVE_LONG_DOUBLE */
 long	strtol_l (const char *__restrict, char **__restrict, int, locale_t);
 unsigned long
         strtoul_l (const char *__restrict, char **__restrict, int,
@@ -380,7 +380,7 @@ int	fcvtf_r (float, int, int*, int*, char *, size_t);
 char   *fcvtfbuf (float, int, int*, int*, char *);
 #endif
 
-#if defined(_HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
+#if defined(__HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
 char   *ecvtl(long double, int, int*, int*);
 int     ecvtl_r(long double, int, int*, int*, char *, size_t);
 char   *fcvtl(long double, int, int*, int*);
@@ -390,7 +390,7 @@ int     fcvtl_r(long double, int, int*, int*, char *, size_t);
 char   *gcvt (double,int,char *);
 char   *gcvtf (float,int,char *);
 
-#if defined(_HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
+#if defined(__HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
 char   *gcvtl(long double, int, char *);
 #endif
 

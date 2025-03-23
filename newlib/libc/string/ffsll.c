@@ -30,9 +30,9 @@
 int
 ffsll(long long i)
 {
-#if _HAVE_BUILTIN_FFSLL
+#if __HAVE_BUILTIN_FFSLL
 	return (__builtin_ffsll(i));
-#elif _HAVE_BUILTIN_CTZLL
+#elif __HAVE_BUILTIN_CTZLL
 	if (i == 0)
 		return 0;
 	return __builtin_ctzll((unsigned long long)i) + 1;

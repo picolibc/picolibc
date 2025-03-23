@@ -44,11 +44,11 @@ ANSI C, POSIX.
 
 #include "fdlibm.h"
 
-#if !_HAVE_FAST_FMA
+#if !__HAVE_FAST_FMA
 
 #ifdef _NEED_FLOAT64
 
-#if __FLT_EVAL_METHOD__ == 2 && defined(_HAVE_LONG_DOUBLE)
+#if __FLT_EVAL_METHOD__ == 2 && defined(__HAVE_LONG_DOUBLE)
 
 __float64
 fma64(__float64 x, __float64 y, __float64 z)
@@ -97,4 +97,4 @@ _MATH_ALIAS_d_ddd(fma)
 
 #endif /* _NEED_FLOAT64 */
 
-#endif /* !_HAVE_FAST_FMA */
+#endif /* !__HAVE_FAST_FMA */

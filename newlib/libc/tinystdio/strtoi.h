@@ -33,7 +33,7 @@
 #include "stdio_private.h"
 #include <inttypes.h>
 
-#if _HAVE_BUILTIN_MUL_OVERFLOW && _HAVE_BUILTIN_ADD_OVERFLOW && !defined(strtoi_signed)
+#if __HAVE_BUILTIN_MUL_OVERFLOW && __HAVE_BUILTIN_ADD_OVERFLOW && !defined(strtoi_signed)
 #define USE_OVERFLOW
 #endif
 

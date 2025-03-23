@@ -28,7 +28,7 @@
 #include <limits.h>
 #include "collate.h"
 
-#ifdef _HAVE_REAL_STRCOLL
+#ifdef __HAVE_REAL_STRCOLL
 /*
  * Compare two characters converting collate information
  * into ASCII-compatible range, it allows to handle

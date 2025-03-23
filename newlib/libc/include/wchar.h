@@ -241,11 +241,11 @@ long     wcstol (const wchar_t *__restrict, wchar_t **__restrict, int);
 #if __GNU_VISIBLE
 long     wcstol_l (const wchar_t *__restrict, wchar_t **__restrict, int, locale_t);
 #endif
-#if __ISO_C_VISIBLE >= 1999 && defined(_HAVE_LONG_DOUBLE)
+#if __ISO_C_VISIBLE >= 1999 && defined(__HAVE_LONG_DOUBLE)
 long double
          wcstold (const wchar_t *, wchar_t **);
 #endif
-#if __GNU_VISIBLE && defined(_HAVE_LONG_DOUBLE)
+#if __GNU_VISIBLE && defined(__HAVE_LONG_DOUBLE)
 long double
          wcstold_l (const wchar_t *, wchar_t **, locale_t);
 #endif

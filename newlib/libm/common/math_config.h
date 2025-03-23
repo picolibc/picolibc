@@ -336,7 +336,7 @@ force_eval_double (double x)
   (void) y;
 }
 
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 static __always_inline long double
 opt_barrier_long_double (long double x)
 {
@@ -1000,7 +1000,7 @@ __float64 __math_denorm (__float64 x);
 
 #endif /* _NEED_FLOAT64 */
 
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 HIDDEN long double __math_oflowl (uint32_t);
 /* The result underflows to 0 in nearest rounding mode.  */
 HIDDEN long double __math_uflowl (uint32_t);
@@ -1056,7 +1056,7 @@ long double __math_denorml(long double x);
 #define __math_denorml(x) (x)
 #endif
 
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* __HAVE_LONG_DOUBLE */
 
 /* Shared between expf, exp2f and powf.  */
 #define EXP2F_TABLE_BITS 5
@@ -1143,7 +1143,7 @@ extern const struct log_data
   double poly[LOG_POLY_ORDER - 1]; /* First coefficient is 1.  */
   double poly1[LOG_POLY1_ORDER - 1];
   struct {double invc, logc;} tab[1 << LOG_TABLE_BITS];
-#if !_HAVE_FAST_FMA
+#if !__HAVE_FAST_FMA
   struct {double chi, clo;} tab2[1 << LOG_TABLE_BITS];
 #endif
 } __log_data HIDDEN;
@@ -1158,7 +1158,7 @@ extern const struct log2_data
   double poly[LOG2_POLY_ORDER - 1];
   double poly1[LOG2_POLY1_ORDER - 1];
   struct {double invc, logc;} tab[1 << LOG2_TABLE_BITS];
-#if !_HAVE_FAST_FMA
+#if !__HAVE_FAST_FMA
   struct {double chi, clo;} tab2[1 << LOG2_TABLE_BITS];
 #endif
 } __log2_data HIDDEN;
@@ -1289,7 +1289,7 @@ __float64 _sin64(__float64);
 __float64 _cos64(__float64);
 #endif
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE_MATH
 long double _powl(long double, long double);
 long double _sinl(long double);
 long double _cosl(long double);
@@ -1308,11 +1308,11 @@ long double _cosl(long double);
 #define _sin64(x) sin64(x)
 #define _cos64(x) cos64(x)
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE_MATH
 #define _powl(x,y) powl(x,y)
 #define _sinl(x) sinl(x)
 #define _cosl(x) cosl(x)
-#endif /* _HAVE_LONG_DOUBLE_MATH */
+#endif /* __HAVE_LONG_DOUBLE_MATH */
 
 #endif /* __strong_reference */
 

@@ -51,7 +51,7 @@ Supporting OS subroutines required (only if enabled): <<close>>, <<fstat>>,
 #include <stdlib.h>
 #include <stdio.h>
 
-#ifndef _HAVE_ASSERT_FUNC
+#ifndef __HAVE_ASSERT_FUNC
 /* func can be NULL, in which case no function information is given.  */
 void
 __assert_func (const char *file,
@@ -66,4 +66,4 @@ __assert_func (const char *file,
   abort();
   /* NOTREACHED */
 }
-#endif /* _HAVE_ASSERT_FUNC */
+#endif /* __HAVE_ASSERT_FUNC */

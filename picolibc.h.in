@@ -47,13 +47,13 @@
 #cmakedefine __strong_reference
 
 /* Use bitfields in packed structs */
-#cmakedefine _HAVE_BITFIELDS_IN_PACKED_STRUCTS
+#cmakedefine __HAVE_BITFIELDS_IN_PACKED_STRUCTS
 
 /* Compiler flag to prevent detecting memcpy/memset patterns */
-#cmakedefine _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
+#cmakedefine __HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 
 /* Compiler supports _Complex */
-#cmakedefine _HAVE_COMPLEX
+#cmakedefine __HAVE_COMPLEX
 
 #cmakedefine __HAVE_FCNTL
 

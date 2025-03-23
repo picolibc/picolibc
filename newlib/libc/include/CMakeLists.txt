@@ -101,7 +101,7 @@ picolibc_headers(""
   wordexp.h
   )
 
-if(${_HAVE_COMPLEX})
+if(${__HAVE_COMPLEX})
   picolibc_headers(""
     complex.h
     )

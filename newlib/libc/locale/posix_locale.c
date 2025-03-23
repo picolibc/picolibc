@@ -35,7 +35,7 @@
 
 #include "locale_private.h"
 
-#ifdef _HAVE_POSIX_LOCALE_API
+#ifdef __HAVE_POSIX_LOCALE_API
 
 __THREAD_LOCAL locale_t    _locale;
 

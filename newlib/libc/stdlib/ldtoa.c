@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "mprec.h"
 
-#if defined(__IO_LONG_DOUBLE) && defined(_HAVE_LONG_DOUBLE)
+#if defined(__IO_LONG_DOUBLE) && defined(__HAVE_LONG_DOUBLE)
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"

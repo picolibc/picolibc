@@ -7,7 +7,7 @@
 #include <complex.h>
 #include <math.h>
 
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 
 long double
 cabsl (long double complex z)
@@ -19,4 +19,4 @@ cabsl (long double complex z)
 #endif
 }
 
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* __HAVE_LONG_DOUBLE */

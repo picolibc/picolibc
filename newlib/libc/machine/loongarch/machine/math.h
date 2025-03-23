@@ -62,7 +62,7 @@
 #if __loongarch_frlen >= 64
 
 /* anything with a 64-bit FPU has FMA */
-#define _HAVE_FAST_FMA 1
+#define __HAVE_FAST_FMA 1
 
 #define _fclass_d(_x) (__extension__(                                   \
                                {                                        \
@@ -78,7 +78,7 @@
 #if __loongarch_frlen >= 32
 
 /* anything with a 32-bit FPU has FMAF */
-#define _HAVE_FAST_FMAF 1
+#define __HAVE_FAST_FMAF 1
 
 #define _fclass_f(_x) (__extension__(                                   \
                                {                                        \
