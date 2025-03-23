@@ -79,7 +79,7 @@ No supporting OS subroutines are required.
 */ 
 
 #include <ctype.h>
-#if defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
+#if defined (__MB_EXTENDED_CHARSETS_ISO) || defined (__MB_EXTENDED_CHARSETS_WINDOWS)
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -91,7 +91,7 @@ No supporting OS subroutines are required.
 int
 tolower (int c)
 {
-#if defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
+#if defined (__MB_EXTENDED_CHARSETS_ISO) || defined (__MB_EXTENDED_CHARSETS_WINDOWS)
   if ((unsigned char) c <= 0x7f) 
     return isupper (c) ? c - 'A' + 'a' : c;
   else if (c != EOF && MB_CUR_MAX == 1 && isupper (c))

@@ -14,20 +14,20 @@ SYNOPSIS
 	int mbstowcs(wchar_t *restrict <[pwc]>, const char *restrict <[s]>, size_t <[n]>);
 
 DESCRIPTION
-When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
 implementation of <<mbstowcs>>.  In this case, the
 only ``multi-byte character sequences'' recognized are single bytes,
 and they are ``converted'' to wide-char versions simply by byte
 extension.
 
-When _MB_CAPABLE is defined, this uses a state variable to allow state
+When __MB_CAPABLE is defined, this uses a state variable to allow state
 dependent decoding.  The result is based on the locale setting which
 may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<mbstowcs>> returns <<0>> if
 <[s]> is <<NULL>> or is the empty string; 
-it returns <<-1>> if _MB_CAPABLE and one of the
+it returns <<-1>> if __MB_CAPABLE and one of the
 multi-byte characters is invalid or incomplete;
 otherwise it returns the minimum of: <<n>> or the
 number of multi-byte characters in <<s>> plus 1 (to
@@ -52,7 +52,7 @@ mbstowcs (wchar_t *__restrict pwcs,
         const char *__restrict s,
         size_t n)
 {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   mbstate_t state;
   state.__count = 0;
   
@@ -82,7 +82,7 @@ mbstowcs (wchar_t *__restrict pwcs,
 	}
     }
   return ret;
-#else /* not _MB_CAPABLE */
+#else /* not __MB_CAPABLE */
   
   int count = 0;
   
@@ -95,5 +95,5 @@ mbstowcs (wchar_t *__restrict pwcs,
   }
   
   return count;
-#endif /* not _MB_CAPABLE */
+#endif /* not __MB_CAPABLE */
 }

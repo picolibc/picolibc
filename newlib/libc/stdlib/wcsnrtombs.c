@@ -82,7 +82,7 @@ _wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
   size_t n;
   int i;
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   if (ps == NULL)
     {
       static mbstate_t _wcsrtombs_state;

@@ -87,17 +87,17 @@
 
 #cmakedefine _LITE_EXIT
 
-#cmakedefine _MB_CAPABLE
+#cmakedefine __MB_CAPABLE
 
-#cmakedefine _MB_EXTENDED_CHARSETS_ALL
+#cmakedefine __MB_EXTENDED_CHARSETS_ALL
 
-#cmakedefine _MB_EXTENDED_CHARSETS_UCS
+#cmakedefine __MB_EXTENDED_CHARSETS_UCS
 
-#cmakedefine _MB_EXTENDED_CHARSETS_ISO
+#cmakedefine __MB_EXTENDED_CHARSETS_ISO
 
-#cmakedefine _MB_EXTENDED_CHARSETS_WINDOWS
+#cmakedefine __MB_EXTENDED_CHARSETS_WINDOWS
 
-#cmakedefine _MB_EXTENDED_CHARSETS_JIS
+#cmakedefine __MB_EXTENDED_CHARSETS_JIS
 
 #cmakedefine _NANO_FORMATTED_IO
 

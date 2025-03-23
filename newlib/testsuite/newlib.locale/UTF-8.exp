@@ -12,8 +12,8 @@ if [file exists $picolibc_header_name] {
     set picolibc_header_fid [open $picolibc_header_name r]
     set picolibc_header_text [read $picolibc_header_fid]
     close $picolibc_header_fid
-    if {![regexp "#define _MB_CAPABLE" $picolibc_header_text] || \
-            [regexp "#define _MB_LEN_MAX 1" $picolibc_header_text]} {
+    if {![regexp "#define __MB_CAPABLE" $picolibc_header_text] || \
+            [regexp "#define __MB_LEN_MAX 1" $picolibc_header_text]} {
         return
     }
 }

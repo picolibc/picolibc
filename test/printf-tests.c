@@ -325,7 +325,7 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
 
 int main(void) {
     int result = 0;
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     if (!setlocale(LC_CTYPE, "C.UTF-8")) {
         printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
         return 1;

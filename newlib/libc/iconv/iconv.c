@@ -53,7 +53,7 @@ iconv (iconv_t ic,
     size_t      inbytes = *inbytesleft;
     size_t      outbytes = *outbytesleft;
     size_t      tocopy;
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     int         ret;
     wchar_t     wc;
     size_t      char_count = 0;

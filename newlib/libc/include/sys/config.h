@@ -237,35 +237,35 @@
 #define __THREAD_LOCAL
 #endif
 
-#ifndef _MB_CAPABLE
+#ifndef __MB_CAPABLE
 /* Make sure all of these are disabled if multi-byte is disabled*/
-#undef _MB_EXTENDED_CHARSETS_ALL
-#undef _MB_EXTENDED_CHARSETS_ANY
-#undef _MB_EXTENDED_CHARSETS_UCS
-#undef _MB_EXTENDED_CHARSETS_ISO
-#undef _MB_EXTENDED_CHARSETS_WINDOWS
-#undef _MB_EXTENDED_CHARSETS_JIS
+#undef __MB_EXTENDED_CHARSETS_ALL
+#undef __MB_EXTENDED_CHARSETS_ANY
+#undef __MB_EXTENDED_CHARSETS_UCS
+#undef __MB_EXTENDED_CHARSETS_ISO
+#undef __MB_EXTENDED_CHARSETS_WINDOWS
+#undef __MB_EXTENDED_CHARSETS_JIS
 #endif
 
-/* If _MB_EXTENDED_CHARSETS_ALL is set, we want all of the extended
+/* If __MB_EXTENDED_CHARSETS_ALL is set, we want all of the extended
    charsets.  The extended charsets add a few functions and a couple
    of tables of a few K each. */
-#ifdef _MB_EXTENDED_CHARSETS_ALL
-#define _MB_EXTENDED_CHARSETS_UCS 1
-#define _MB_EXTENDED_CHARSETS_ISO 1
-#define _MB_EXTENDED_CHARSETS_WINDOWS 1
-#define _MB_EXTENDED_CHARSETS_JIS 1
+#ifdef __MB_EXTENDED_CHARSETS_ALL
+#define __MB_EXTENDED_CHARSETS_UCS 1
+#define __MB_EXTENDED_CHARSETS_ISO 1
+#define __MB_EXTENDED_CHARSETS_WINDOWS 1
+#define __MB_EXTENDED_CHARSETS_JIS 1
 #endif
 
-#if defined(_MB_EXTENDED_CHARSETS_ISO) ||       \
-    defined(_MB_EXTENDED_CHARSETS_WINDOWS) ||   \
-    defined(_MB_EXTENDED_CHARSETS_JIS)
-#define _MB_EXTENDED_CHARSETS_NON_UNICODE
+#if defined(__MB_EXTENDED_CHARSETS_ISO) ||       \
+    defined(__MB_EXTENDED_CHARSETS_WINDOWS) ||   \
+    defined(__MB_EXTENDED_CHARSETS_JIS)
+#define __MB_EXTENDED_CHARSETS_NON_UNICODE
 #endif
 
-#if defined(_MB_EXTENDED_CHARSETS_UCS) ||       \
-    defined(_MB_EXTENDED_CHARSETS_NON_UNICODE)
-#define _MB_EXTENDED_CHARSETS_ANY
+#if defined(__MB_EXTENDED_CHARSETS_UCS) ||       \
+    defined(__MB_EXTENDED_CHARSETS_NON_UNICODE)
+#define __MB_EXTENDED_CHARSETS_ANY
 #endif
 
 /* Figure out if the compiler supports the long double type. */

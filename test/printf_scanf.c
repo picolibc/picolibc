@@ -287,7 +287,7 @@ main(void)
 	char	buf[256];
 	int	errors = 0;
 
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
         if (!setlocale(LC_CTYPE, "C.UTF-8")) {
             printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
             return 1;

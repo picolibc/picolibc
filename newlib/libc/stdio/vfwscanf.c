@@ -469,7 +469,7 @@ _SVFWSCANF (
 #endif
 
 #ifdef FLOATING_POINT
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 #ifdef WDECIMAL_POINT
           decpt = *WDECIMAL_POINT;
 #else
@@ -486,7 +486,7 @@ _SVFWSCANF (
 #endif /* !WDECIMAL_POINT */
 #else
 	  decpt = (wchar_t) *DECIMAL_POINT;
-#endif /* !_MB_CAPABLE */
+#endif /* !__MB_CAPABLE */
 #endif /* FLOATING_POINT */
 
   _newlib_flockfile_start (fp);

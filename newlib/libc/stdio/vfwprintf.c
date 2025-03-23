@@ -248,7 +248,7 @@ static int wexponent(wchar_t *, int, int);
 #else
 #define	BUF		40
 #endif
-#if defined _MB_CAPABLE && MB_LEN_MAX > BUF
+#if defined __MB_CAPABLE && MB_LEN_MAX > BUF
 # undef BUF
 # define BUF MB_LEN_MAX
 #endif
@@ -374,7 +374,7 @@ VFWPRINTF (
 	wchar_t thousands_sep = L'\0';
 	const char *grouping = NULL;
 #endif
-#if defined (_MB_CAPABLE) && !defined (WDECIMAL_POINT) \
+#if defined (__MB_CAPABLE) && !defined (WDECIMAL_POINT) \
     && (defined (FLOATING_POINT) || defined (__IO_C99_FORMATS))
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
@@ -425,7 +425,7 @@ VFWPRINTF (
 	  L'0',L'0',L'0',L'0',L'0',L'0',L'0',L'0'};
 
 #ifdef FLOATING_POINT
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 #ifdef WDECIMAL_POINT
 	decimal_point = *WDECIMAL_POINT;
 #else
@@ -645,7 +645,7 @@ rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
 #ifdef __IO_C99_FORMATS
 		case L'\'':
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 #ifdef WTHOUSANDS_SEP
                   thousands_sep = *WTHOUSANDS_SEP;
 #else
@@ -1160,7 +1160,7 @@ string:
 			}
 			else
 #endif /* __OPTIMIZE_SIZE__ */
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 			if (ch != L'S' && !(flags & LONGINT)) {
 				char *arg = (char *) cp;
 				size_t insize = 0, nchars = 0, nconv = 0;
@@ -1234,7 +1234,7 @@ string:
 					cp[size] = arg[size];
 				cp[size] = L'\0';
 			}
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */
 			else if (prec >= 0) {
 				/*
 				 * can't use wcslen; can only look for the
@@ -1601,7 +1601,7 @@ wcvt(_PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 
 	{
 	  char *digits, *bp, *rve;
-#ifndef _MB_CAPABLE
+#ifndef __MB_CAPABLE
 	  int i;
 #endif
 
@@ -1621,7 +1621,7 @@ wcvt(_PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 	  }
 
 	  *length = rve - digits; /* full length of the string */
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 	  mbsnrtowcs (buf, (const char **) &digits, *length,
 			 len, NULL);
 #else

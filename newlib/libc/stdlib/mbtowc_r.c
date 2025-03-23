@@ -46,7 +46,7 @@ __ascii_mbtowc (
   return 1;
 }
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 
 /* we override the mbstate_t __count field for more complex encodings and use it store a state value */
 #define __state __count
@@ -328,7 +328,7 @@ __ucs4swap_mbtowc (
     return 4;
 }
 
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
 static int
 ___iso_mbtowc (wchar_t *pwc, const char *s, size_t n,
 	       enum locale_id id, mbstate_t *state)
@@ -472,9 +472,9 @@ __iso_8859_16_mbtowc (wchar_t *pwc, const char *s, size_t n,
   return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_16, state);
 }
 
-#endif /* _MB_EXTENDED_CHARSETS_ISO */
+#endif /* __MB_EXTENDED_CHARSETS_ISO */
 
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 
 static int
 ___cp_mbtowc (wchar_t *pwc, const char *s, size_t n,
@@ -698,9 +698,9 @@ __cp_103_mbtowc (wchar_t *pwc, const char *s, size_t n,
   return ___cp_mbtowc (pwc, s, n, locale_KOI8_T, state);
 }
 
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif /* __MB_EXTENDED_CHARSETS_WINDOWS */
 
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
 
 typedef enum __packed { ESCAPE, DOLLAR, BRACKET, AT, B, J,
                NUL, JIS_CHAR, OTHER, JIS_C_NUM } JIS_CHAR_TYPE;
@@ -1013,7 +1013,7 @@ __jis_mbtowc (
   state->__state = curr_state;
   return -2;  /* n < bytes needed */
 }
-#endif /* _MB_EXTENDED_CHARSETS_JIS */
+#endif /* __MB_EXTENDED_CHARSETS_JIS */
 
 const mbtowc_p __mbtowc[locale_END - locale_BASE] = {
     [locale_C - locale_BASE] = __ascii_mbtowc,
@@ -1024,7 +1024,7 @@ const mbtowc_p __mbtowc[locale_END - locale_BASE] = {
     [locale_UCS_4 - locale_BASE] = __ucs4_mbtowc,
     [locale_UCS_4LE - locale_BASE] = __ucs4le_mbtowc,
     [locale_UCS_4BE - locale_BASE] = __ucs4be_mbtowc,
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1 - locale_BASE] = __iso_8859_1_mbtowc,
     [locale_ISO_8859_2 - locale_BASE] = __iso_8859_2_mbtowc,
     [locale_ISO_8859_3 - locale_BASE] = __iso_8859_3_mbtowc,
@@ -1041,7 +1041,7 @@ const mbtowc_p __mbtowc[locale_END - locale_BASE] = {
     [locale_ISO_8859_15 - locale_BASE] = __iso_8859_15_mbtowc,
     [locale_ISO_8859_16 - locale_BASE] = __iso_8859_16_mbtowc,
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
     [locale_CP437 - locale_BASE] = __cp_437_mbtowc,
     [locale_CP720 - locale_BASE] = __cp_720_mbtowc,
     [locale_CP737 - locale_BASE] = __cp_737_mbtowc,
@@ -1070,11 +1070,11 @@ const mbtowc_p __mbtowc[locale_END - locale_BASE] = {
     [locale_PT154 - locale_BASE] = __cp_102_mbtowc,
     [locale_KOI8_T - locale_BASE] = __cp_103_mbtowc,
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     [locale_JIS - locale_BASE] = __jis_mbtowc,
     [locale_EUCJP - locale_BASE] = __eucjp_mbtowc,
     [locale_SJIS - locale_BASE] = __sjis_mbtowc,
 #endif
 };
 
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */

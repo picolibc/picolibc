@@ -15,7 +15,7 @@ wcrtomb (char *__restrict s,
   int retval = 0;
   char buf[10];
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   if (ps == NULL)
     {
       static mbstate_t _wcrtomb_state;
@@ -30,7 +30,7 @@ wcrtomb (char *__restrict s,
 
   if (retval == -1)
     {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
       ps->__count = 0;
 #endif
       errno = EILSEQ;

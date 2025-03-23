@@ -53,7 +53,7 @@ const struct {
 #if __SIZEOF_WCHAR_T__ == 2
     { .wc = { 0x0061 }, .mb = "a" },
     { .wc = { 0x0000 }, .mb = "" },
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .wc = { 0x3330 }, .mb = "㌰" },
     { .wc = { 0xd83d, 0xde80 }, .mb = "🚀" },                   /* 0x01f680 */
     { .wc = { 0xdbc2, 0xdd7f }, .mb = "\xf4\x80\xa5\xbf" },     /* 0x10097f */
@@ -77,7 +77,7 @@ const struct {
 
     { .wc = { 0x00000061 }, .mb = "a" },
     { .wc = { 0x00000000 }, .mb = "" },
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .wc = { 0x00003330 }, .mb = "㌰" },
     { .wc = { 0x0001f680 }, .mb = "🚀" },
 
@@ -96,7 +96,7 @@ const struct {
 
     /* Low surrogate value */
     { .wc = { 0x0000de80 }, .mb = "", .err = 0 + 1 },
-#endif /* !defined(__PICOLIBC__) || defined(_MB_CAPABLE) */
+#endif /* !defined(__PICOLIBC__) || defined(__MB_CAPABLE) */
 
 #endif /* else __SIZEOF_WCHAR_T__ == 2 */
 };
@@ -111,7 +111,7 @@ int main(void)
     int status = 0;
     mbstate_t mbstate;
 
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     if (!setlocale(LC_CTYPE, "C.UTF-8")) {
         printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
         return 1;

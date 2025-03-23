@@ -527,10 +527,10 @@ __printf_float(float f)
 # define _HAS_IO_POS_ARGS
 # define _HAS_IO_C99_FORMATS
 # define _HAS_IO_DOUBLE
-# if defined(_MB_CAPABLE) || defined(__IO_WCHAR)
+# if defined(__MB_CAPABLE) || defined(__IO_WCHAR)
 #  define _HAS_IO_WCHAR
 # endif
-# ifdef _MB_CAPABLE
+# ifdef __MB_CAPABLE
 #  define _HAS_IO_MBCHAR
 # endif
 # ifdef __IO_PERCENT_B

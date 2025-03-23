@@ -50,7 +50,7 @@ typedef long int_scanf_t;
 #endif
 
 /* Figure out which multi-byte char support we need */
-#if defined(_NEED_IO_WCHAR) && defined(_MB_CAPABLE)
+#if defined(_NEED_IO_WCHAR) && defined(__MB_CAPABLE)
 # ifdef WIDE_CHARS
 /* need to convert wide chars to multi-byte chars */
 #  define _NEED_IO_WIDETOMB

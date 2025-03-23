@@ -4,7 +4,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 #define _DEFAULT_SOURCE
 #include <ctype.h>
-#if defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
+#if defined (__MB_EXTENDED_CHARSETS_ISO) || defined (__MB_EXTENDED_CHARSETS_WINDOWS)
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,7 +16,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 int
 tolower_l (int c, locale_t locale)
 {
-#if defined (_MB_EXTENDED_CHARSETS_ISO) || defined (_MB_EXTENDED_CHARSETS_WINDOWS)
+#if defined (__MB_EXTENDED_CHARSETS_ISO) || defined (__MB_EXTENDED_CHARSETS_WINDOWS)
   if ((unsigned char) c <= 0x7f) 
     return isupper_l (c, locale) ? c - 'A' + 'a' : c;
   else if (c != EOF && __locale_mb_cur_max_l (locale) == 1

@@ -31,13 +31,13 @@
 
 static const char * const good_names[] = {
     "us_ascii", "US_ASCII", "us-ASCII", "US-ASCII",
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     "utf_8", "UTF_8", "uTf-8", "UTF-8",
 #endif
 #ifdef MB_EXTENDED_CHARSETS_ISO
     "iso_8859_5", "iso-8859-5", "iso-8859_5", "IsO-8859_5",
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     "euc-jp", "EUC_JP", "euc-JP", "EUC-JP",
 #endif
 };

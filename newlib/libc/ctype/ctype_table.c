@@ -39,7 +39,7 @@
 #include <langinfo.h>
 #include "local.h"
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 
 static struct {
     wchar_t             code;
@@ -80,4 +80,4 @@ __ctype_table_lookup(wint_t ic, locale_t locale)
     }
     return ctype_table[high].category;
 }
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */

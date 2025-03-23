@@ -63,7 +63,7 @@ TEST(t, d, (double)x, "%a != %a") )
 #define NO_FLOATING_POINT
 #endif
 
-#if !defined(_MB_CAPABLE) || !defined(__TINY_STDIO)
+#if !defined(__MB_CAPABLE) || !defined(__TINY_STDIO)
 #define NO_MULTI_BYTE
 #endif
 
@@ -87,7 +87,7 @@ static int test_sscanf(void)
 	double d, t;
 //	long lo[10];
 
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
         if (!setlocale(LC_CTYPE, "C.UTF-8")) {
             printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
             return 1;

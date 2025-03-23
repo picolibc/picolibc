@@ -61,7 +61,7 @@ enum locale_id {
     locale_INVALID,
     locale_BASE,
     locale_C = locale_BASE,
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     locale_UTF_8,
     locale_UCS_2,
     locale_UCS_2LE,
@@ -69,7 +69,7 @@ enum locale_id {
     locale_UCS_4,
     locale_UCS_4LE,
     locale_UCS_4BE,
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
     locale_ISO_BASE,
     locale_EXTENDED_BASE = locale_ISO_BASE,
     locale_ISO_8859_1 = locale_ISO_BASE,
@@ -88,9 +88,9 @@ enum locale_id {
     locale_ISO_8859_15,
     locale_ISO_8859_16,
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
     locale_WINDOWS_BASE,
-#ifndef _MB_EXTENDED_CHARSETS_ISO
+#ifndef __MB_EXTENDED_CHARSETS_ISO
     locale_EXTENDED_BASE = locale_WINDOWS_BASE,
 #endif
     locale_CP437 = locale_WINDOWS_BASE,
@@ -121,9 +121,9 @@ enum locale_id {
     locale_PT154,
     locale_KOI8_T,
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     locale_JIS_BASE,
-#if !defined(_MB_EXTENDED_CHARSETS_ISO) && !defined(_MB_EXTENDED_CHARSETS_WINDOWS)
+#if !defined(__MB_EXTENDED_CHARSETS_ISO) && !defined(__MB_EXTENDED_CHARSETS_WINDOWS)
     locale_EXTENDED_BASE = locale_JIS_BASE,
 #endif
     locale_JIS = locale_JIS_BASE,
@@ -152,7 +152,7 @@ extern locale_t         __global_locale;
 extern __THREAD_LOCAL locale_t    _locale;
 #endif
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 
 extern const wctomb_p __wctomb[locale_END - locale_BASE];
 extern const mbtowc_p __mbtowc[locale_END - locale_BASE];
@@ -263,7 +263,7 @@ extern const wchar_t *const __wtime_am_pm[2];
 static inline bool
 __locale_is_C(locale_t locale)
 {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     if (!locale)
         locale = __get_current_locale();
     return locale == locale_C;
@@ -277,10 +277,10 @@ static inline size_t
 __locale_mb_cur_max_l(locale_t locale)
 {
     switch (locale) {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     case locale_UTF_8:
         return 6;
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     case locale_JIS:
         return 8;
     case locale_EUCJP:
@@ -297,7 +297,7 @@ __locale_mb_cur_max_l(locale_t locale)
 static inline int
 __locale_cjk_lang(void)
 {
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     switch (__get_current_locale()) {
     case locale_JIS:
     case locale_EUCJP:

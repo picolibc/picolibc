@@ -40,7 +40,7 @@ const char _ctype_b[128 + 256] = {
 	_CTYPE_DATA_128_255
 };
 
-#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
+#ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
 
 #include "ctype_extended.h"
 
@@ -53,7 +53,7 @@ const char _ctype_b[128 + 256] = {
         }
 
 const char __ctype[locale_END - locale_EXTENDED_BASE][_CTYPE_OFFSET + 1 + 256] = {
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
     __CTYPE(ISO_8859_1),
     __CTYPE(ISO_8859_2),
     __CTYPE(ISO_8859_3),
@@ -70,7 +70,7 @@ const char __ctype[locale_END - locale_EXTENDED_BASE][_CTYPE_OFFSET + 1 + 256] =
     __CTYPE(ISO_8859_15),
     __CTYPE(ISO_8859_16),
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
     __CTYPE(CP437),
     __CTYPE(CP720),
     __CTYPE(CP737),
@@ -99,10 +99,10 @@ const char __ctype[locale_END - locale_EXTENDED_BASE][_CTYPE_OFFSET + 1 + 256] =
     __CTYPE(PT154),
     __CTYPE(KOI8_T),
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     __CTYPE(EUCJP),
     __CTYPE(SJIS),
 #endif
 };
 
-#endif /* _MB_EXTENDED_CHARSETS_NON_UNICODE */
+#endif /* __MB_EXTENDED_CHARSETS_NON_UNICODE */

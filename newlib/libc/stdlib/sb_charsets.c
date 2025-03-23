@@ -2,6 +2,6 @@
 #include <wchar.h>
 #include "local.h"
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 #include "sb_charsets.h"
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */

@@ -283,7 +283,7 @@ static int exponent(char *, int, int);
 #else
 #define	BUF		40
 #endif
-#if defined _MB_CAPABLE && MB_LEN_MAX > BUF
+#if defined __MB_CAPABLE && MB_LEN_MAX > BUF
 # undef BUF
 # define BUF MB_LEN_MAX
 #endif
@@ -440,7 +440,7 @@ VFPRINTF (
 #endif
 	char buf[BUF];		/* space for %c, %S, %[diouxX], %[aA] */
 	char ox[2] = {0};	/* space for 0x hex-prefix */
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 	wchar_t wc;
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
@@ -457,7 +457,7 @@ VFPRINTF (
 	static const char zeroes[PADSIZE] =
 	 {'0','0','0','0','0','0','0','0','0','0','0','0','0','0','0','0'};
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 	memset (&state, '\0', sizeof (state));
 #endif
 	/*
@@ -645,7 +645,7 @@ VFPRINTF (
 	 */
 	for (;;) {
 	        cp = fmt;
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 	        while ((n = __MBTOWC (&wc, fmt, MB_CUR_MAX,
 				      &state)) != 0) {
 		    if (n < 0) {
@@ -665,7 +665,7 @@ VFPRINTF (
 			PRINT (cp, m);
 			ret += m;
 		}
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 		if (n <= 0)
                     goto done;
 #else
@@ -909,7 +909,7 @@ reswitch:	switch (ch) {
 #endif /* __IO_C99_FORMATS */
 		case 'c':
 			cp = buf;
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 			if (ch == 'C' || (flags & LONGINT)) {
 				mbstate_t ps;
 
@@ -922,7 +922,7 @@ reswitch:	switch (ch) {
 				}
 			}
 			else
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */
 			{
 				*cp = GET_ARG (N, ap, int);
 				size = 1;
@@ -1193,7 +1193,7 @@ string:
 				size = ((unsigned) prec > 6U) ? 6 : prec;
 			}
 			else
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 			if (ch == 'S' || (flags & LONGINT)) {
 				mbstate_t ps;
 				const wchar_t *wcp;
@@ -1255,7 +1255,7 @@ string:
 				cp[size] = '\0';
 			}
 			else
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */
 			if (prec >= 0) {
 				/*
 				 * can't use strlen; can only look for the
@@ -1808,7 +1808,7 @@ get_arg (
   int max_pos_arg = n;
   /* Only need types that can be reached via vararg promotions.  */
   enum types { INT, LONG_INT, QUAD_INT, CHAR_PTR, DOUBLE, LONG_DOUBLE, WIDE_CHAR };
-# ifdef _MB_CAPABLE
+# ifdef __MB_CAPABLE
   wchar_t wc;
   mbstate_t wc_state;
   int nbytes;
@@ -1818,7 +1818,7 @@ get_arg (
   if (*last_fmt != NULL)
     fmt = *last_fmt;
 
-# ifdef _MB_CAPABLE
+# ifdef __MB_CAPABLE
   memset (&wc_state, '\0', sizeof (wc_state));
 # endif
 
@@ -1826,7 +1826,7 @@ get_arg (
      read the desired parameter from the vararg list. */
   while (*fmt && n >= numargs)
     {
-# ifdef _MB_CAPABLE
+# ifdef __MB_CAPABLE
       while ((nbytes = __MBTOWC (data, &wc, fmt, MB_CUR_MAX, &wc_state)) > 0)
 	{
 	  fmt += nbytes;
@@ -1844,7 +1844,7 @@ get_arg (
 	break;
 
       fmt++;
-# endif /* ! _MB_CAPABLE */
+# endif /* ! __MB_CAPABLE */
       state = START;
       flags = 0;
       pos = -1;

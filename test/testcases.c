@@ -55,7 +55,7 @@
 #  define NO_CASE_HEX
 # endif
 #else
-# ifndef _MB_CAPABLE
+# ifndef __MB_CAPABLE
 #  define NO_WCHAR
 #  define NO_MBCHAR
 # endif

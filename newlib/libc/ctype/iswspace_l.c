@@ -42,7 +42,7 @@ int
 iswspace_l (wint_t c, locale_t locale)
 {
   (void) locale;
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   /*
    * This is used by scanf, so avoid the table
    * to save space
@@ -61,6 +61,6 @@ iswspace_l (wint_t c, locale_t locale)
           break;
       }
   }
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */
   return c < 0x100 ? isspace (c) : 0;
 }

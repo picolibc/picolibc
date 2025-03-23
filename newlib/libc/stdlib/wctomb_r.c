@@ -30,7 +30,7 @@ __ascii_wctomb (
   return 1;
 }
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 
 /* for some conversions, we use the __count field as a place to store a state value */
 #define __state __count
@@ -203,7 +203,7 @@ __ucs4swap_wctomb (
     return 4;
 }
 
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
 
 static int
 __sjis_wctomb (
@@ -324,9 +324,9 @@ __jis_wctomb (
   *s = (char)char2;
   return cnt + 1;
 }
-#endif /* _MB_EXTENDED_CHARSETS_JIS */
+#endif /* __MB_EXTENDED_CHARSETS_JIS */
 
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
 
 static int
 ___iso_wctomb (char *s, wchar_t _wchar, enum locale_id id,
@@ -461,9 +461,9 @@ static int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
   return ___iso_wctomb (s, _wchar, locale_ISO_8859_16, state);
 }
 
-#endif /* _MB_EXTENDED_CHARSETS_ISO */
+#endif /* __MB_EXTENDED_CHARSETS_ISO */
 
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 
 static int
 ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
@@ -662,7 +662,7 @@ __cp_103_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
   return ___cp_wctomb (s, _wchar, 26, state);
 }
 
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif /* __MB_EXTENDED_CHARSETS_WINDOWS */
 
 const wctomb_p __wctomb[locale_END - locale_BASE] = {
     [locale_C - locale_BASE] = __ascii_wctomb,
@@ -673,7 +673,7 @@ const wctomb_p __wctomb[locale_END - locale_BASE] = {
     [locale_UCS_4 - locale_BASE] = __ucs4_wctomb,
     [locale_UCS_4LE - locale_BASE] = __ucs4le_wctomb,
     [locale_UCS_4BE - locale_BASE] = __ucs4be_wctomb,
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1 - locale_BASE] = __iso_8859_1_wctomb,
     [locale_ISO_8859_2 - locale_BASE] = __iso_8859_2_wctomb,
     [locale_ISO_8859_3 - locale_BASE] = __iso_8859_3_wctomb,
@@ -690,7 +690,7 @@ const wctomb_p __wctomb[locale_END - locale_BASE] = {
     [locale_ISO_8859_15 - locale_BASE] = __iso_8859_15_wctomb,
     [locale_ISO_8859_16 - locale_BASE] = __iso_8859_16_wctomb,
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
     [locale_CP437 - locale_BASE] = __cp_437_wctomb,
     [locale_CP720 - locale_BASE] = __cp_720_wctomb,
     [locale_CP737 - locale_BASE] = __cp_737_wctomb,
@@ -719,11 +719,11 @@ const wctomb_p __wctomb[locale_END - locale_BASE] = {
     [locale_PT154 - locale_BASE] = __cp_102_wctomb,
     [locale_KOI8_T - locale_BASE] = __cp_103_wctomb,
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     [locale_JIS - locale_BASE] = __jis_wctomb,
     [locale_EUCJP - locale_BASE] = __eucjp_wctomb,
     [locale_SJIS - locale_BASE] = __sjis_wctomb,
 #endif
 };
 
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */

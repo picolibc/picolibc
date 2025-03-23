@@ -37,7 +37,7 @@
 #include "local.h"
 
 /* Japanese to Unicode conversion routine */
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
 
 #include "jp2uc.h"
 
@@ -212,4 +212,4 @@ __uc2jp (wint_t c, int type)
   }
 }
 
-#endif /* _MB_EXTENDED_CHARSETS_JIS */
+#endif /* __MB_EXTENDED_CHARSETS_JIS */

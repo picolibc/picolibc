@@ -10,7 +10,7 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 wint_t
 towlower_l (wint_t c, locale_t locale)
 {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   const struct caseconv_entry * cce = __caseconv_lookup(c, locale);
 
   if (cce)

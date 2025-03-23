@@ -48,7 +48,7 @@ iconv_open (const char *tocode, const char *fromcode)
     if (toid == locale_INVALID || fromid == locale_INVALID)
         goto fail;
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     iconv_t     ic;
 
     ic = calloc(1, sizeof(*ic));

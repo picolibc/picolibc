@@ -46,7 +46,7 @@ _BEGIN_STD_C
  * The small ctype code does not support extended character sets. It also breaks
  * libstdc++'s ctype implementation, so just skip it for c++
  */
-#if defined(_MB_EXTENDED_CHARSETS_NON_UNICODE) || defined (__cplusplus)
+#if defined(__MB_EXTENDED_CHARSETS_NON_UNICODE) || defined (__cplusplus)
 #undef _PICOLIBC_CTYPE_SMALL
 #define _PICOLIBC_CTYPE_SMALL 0
 #endif
@@ -236,7 +236,7 @@ extern const short      _ctype_wide[];
 /* _T used for _ctype_wide table */
 #define _T      0x100    /* tab */
 
-#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
+#ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
 const char *__locale_ctype_ptr (void);
 #define __CTYPE_PTR     __locale_ctype_ptr()
 #else
@@ -267,7 +267,7 @@ __declare_extern_inline(int) isblank(int c) {
 
 #if __POSIX_VISIBLE >= 200809
 
-#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
+#ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
 const char *__locale_ctype_ptr_l (locale_t);
 #define __CTYPE_PTR_L(__l)        __locale_ctype_ptr_l(__l)
 #else

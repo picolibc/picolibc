@@ -14,19 +14,19 @@ SYNOPSIS
 	size_t wcstombs(char *restrict <[s]>, const wchar_t *restrict <[pwc]>, size_t <[n]>);
 
 DESCRIPTION
-When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
 implementation of <<wcstombs>>.  In this case,
 all wide-characters are expected to represent single bytes and so
 are converted simply by casting to char.
 
-When _MB_CAPABLE is defined, this routine uses a state variable to
+When __MB_CAPABLE is defined, this routine uses a state variable to
 allow state dependent decoding.  The result is based on the locale
 setting which may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<wcstombs>> returns <<0>> if
 <[s]> is <<NULL>> or is the empty string; 
-it returns <<-1>> if _MB_CAPABLE and one of the
+it returns <<-1>> if __MB_CAPABLE and one of the
 wide-char characters does not represent a valid multi-byte character;
 otherwise it returns the minimum of: <<n>> or the
 number of bytes that are transferred to <<s>>, not including the
@@ -53,7 +53,7 @@ wcstombs (char          *__restrict s,
         const wchar_t *__restrict pwcs,
         size_t         n)
 {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   mbstate_t state;
   state.__count = 0;
 
@@ -92,7 +92,7 @@ wcstombs (char          *__restrict s,
         }
       return max;
     }
-#else /* not _MB_CAPABLE */
+#else /* not __MB_CAPABLE */
   int count = 0;
   
   if (n != 0) {
@@ -104,5 +104,5 @@ wcstombs (char          *__restrict s,
   }
   
   return count;
-#endif /* not _MB_CAPABLE */
+#endif /* not __MB_CAPABLE */
 }

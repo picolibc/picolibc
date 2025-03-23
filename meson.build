@@ -1376,12 +1376,12 @@ conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),
 conf_data.set('__HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('__HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 
-conf_data.set('_MB_CAPABLE', mb_capable)
+conf_data.set('__MB_CAPABLE', mb_capable)
 if mb_capable
-  conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
-  conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
-  conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
-  conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
+  conf_data.set('__MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
+  conf_data.set('__MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
+  conf_data.set('__MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
+  conf_data.set('__MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
 endif
 
 conf_data.set('_PICO_EXIT', picoexit)

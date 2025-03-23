@@ -35,7 +35,7 @@
 
 /* This file is auto-generated from mk-sb-charsets.py */
 
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
 /* Tables for the ISO-8859-x to UTF conversion.  The first index into the
    table is a value computed from locale id - locale_ISO_8859-2 (ISO-8859-1
    is not included as it doesn't require translation).
@@ -225,9 +225,9 @@ const uint16_t __iso_8859_conv[14][0x60] = {
     0x111, 0x144, 0xf2, 0xf3, 0xf4, 0x151, 0xf6, 0x15b,
     0x171, 0xf9, 0xfa, 0xfb, 0xfc, 0x119, 0x21b, 0xff },
 };
-#endif /* _MB_EXTENDED_CHARSETS_ISO */
+#endif /* __MB_EXTENDED_CHARSETS_ISO */
 
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 /* Tables for the Windows default singlebyte ANSI codepage conversion.
    The first index into the table is a value computed from locale id
    minus locale_WINDOWS_BASE, the second index is the value of the
@@ -694,5 +694,5 @@ const uint16_t __cp_conv[27][0x80] = {
     0x41f, 0x42f, 0x420, 0x421, 0x422, 0x423, 0x416, 0x412,
     0x42c, 0x42b, 0x417, 0x428, 0x42d, 0x429, 0x427, 0x42a },
 };
-#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */
+#endif /* __MB_EXTENDED_CHARSETS_WINDOWS */
 

@@ -53,7 +53,7 @@ const struct {
 } test_c8[] = {
     { .c8 = {0x61}, .mb = "a" },
     { .c8 = {0x0}, .mb = "" },
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .c8 = "\xF4\x8F\xBF\xBF", .mb = "\xF4\x8F\xBF\xBF" },
 
     { .c8 = "㌰", .mb = "㌰" },
@@ -95,7 +95,7 @@ const struct {
 } test_c16[] = {
     { .c16 = { 0x0061 }, .mb = "a" },
     { .c16 = { 0x0000 }, .mb = "" },
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .c16 = { 0x3330 }, .mb = "㌰" },
     { .c16 = { 0xd83d, 0xde80 }, .mb = "🚀" },                   /* 0x01f680 */
     { .c16 = { 0xdbc2, 0xdd7f }, .mb = "\xf4\x80\xa5\xbf" },     /* 0x10097f */
@@ -125,7 +125,7 @@ const struct {
 } test_c32[] = {
     { .c32 = { 0x00000061 }, .mb = "a" },
     { .c32 = { 0x00000000 }, .mb = "" },
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .c32 = { 0x00003330 }, .mb = "㌰" },
     { .c32 = { 0x0001f680 }, .mb = "🚀" },
 
@@ -157,7 +157,7 @@ int main(void)
     int status = 0;
     mbstate_t mbstate;
 
-#if !defined(__PICOLIBC__) || defined(_MB_CAPABLE)
+#if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     if (!setlocale(LC_CTYPE, "C.UTF-8")) {
         printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
         return 1;

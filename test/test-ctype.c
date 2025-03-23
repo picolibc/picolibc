@@ -64,15 +64,15 @@
         }                                                               \
     } while(0)
 
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
 #define HAVE_ISO_CHARSETS
 #endif
 
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 #define HAVE_WINDOWS_CHARSETS
 #endif
 
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
 #define HAVE_JIS_CHARSETS
 #endif
 

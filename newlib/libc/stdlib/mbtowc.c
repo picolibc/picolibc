@@ -14,7 +14,7 @@ SYNOPSIS
 	int mbtowc(wchar_t *restrict <[pwc]>, const char *restrict <[s]>, size_t <[n]>);
 
 DESCRIPTION
-When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
 implementation of <<mbtowc>>.  In this case,
 only ``multi-byte character sequences'' recognized are single bytes,
 and they are ``converted'' to themselves.
@@ -22,14 +22,14 @@ Each call to <<mbtowc>> copies one character from <<*<[s]>>> to
 <<*<[pwc]>>>, unless <[s]> is a null pointer.  The argument n
 is ignored.
 
-When _MB_CAPABLE is defined, this routine uses a state variable to
+When __MB_CAPABLE is defined, this routine uses a state variable to
 allow state dependent decoding.  The result is based on the locale
 setting which may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<mbtowc>> returns <<0>> if
 <[s]> is <<NULL>> or is the empty string; 
-it returns <<1>> if not _MB_CAPABLE or
+it returns <<1>> if not __MB_CAPABLE or
 the character is a single-byte character; it returns <<-1>>
 if n is <<0>> or the multi-byte character is invalid; 
 otherwise it returns the number of bytes in the multibyte character.
@@ -49,7 +49,7 @@ effects vary with the locale.
 #include <wchar.h>
 #include "local.h"
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 static mbstate_t _mbtowc_state;
 #define ps &_mbtowc_state
 #else
@@ -65,7 +65,7 @@ mbtowc (wchar_t *__restrict pwc,
 
         retval = __MBTOWC (pwc, s, n, ps);
         if (retval < 0) {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
                 _mbtowc_state.__count = 0;
 #endif
                 errno = EILSEQ;

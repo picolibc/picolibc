@@ -400,7 +400,7 @@ _SVFSCANF (
   wchar_t wc;                   /* wchar to use to read format string */
   wchar_t *wcp;                 /* handy wide character pointer */
   size_t mbslen = 0;            /* length of converted multibyte sequence */
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   mbstate_t state;              /* value to keep track of multibyte state */
 #endif
 #ifdef __IO_C99_FORMATS
@@ -580,13 +580,13 @@ _SVFSCANF (
 
   nassigned = 0;
   nread = 0;
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   memset (&state, 0, sizeof (state));
 #endif
 
   for (;;)
     {
-#ifndef _MB_CAPABLE
+#ifndef __MB_CAPABLE
       wc = *fmt;
 #else
       nbytes = __MBTOWC (&wc, (char *) fmt, MB_CUR_MAX, &state);
@@ -1540,7 +1540,7 @@ _SVFSCANF (
 	  char nancount = 0;
 	  char infcount = 0;
 	  const char *decpt = DECIMAL_POINT;
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 	  int decptpos = 0;
 #endif
 #ifdef hardway
@@ -1751,7 +1751,7 @@ _SVFSCANF (
 		    }
 		  break;
 		default:
-#ifndef _MB_CAPABLE
+#ifndef __MB_CAPABLE
 		  if ((unsigned char) c == (unsigned char) decpt[0]
 		      && (flags & DPTOK))
 		    {

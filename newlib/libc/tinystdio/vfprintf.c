@@ -138,7 +138,7 @@
 #endif
 
 /* Figure out which multi-byte char support we need */
-#if defined(_NEED_IO_WCHAR) && defined(_MB_CAPABLE)
+#if defined(_NEED_IO_WCHAR) && defined(__MB_CAPABLE)
 # ifdef WIDE_CHARS
 /* need to convert multi-byte chars to wide chars */
 #  define _NEED_IO_MBTOWIDE

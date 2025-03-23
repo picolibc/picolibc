@@ -42,7 +42,7 @@ iconv_close (iconv_t ic)
         errno = EINVAL;
         return -1;
     }
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     free(ic);
 #endif
     return 0;

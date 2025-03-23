@@ -364,7 +364,7 @@ def dump_table():
 
 /* This file is auto-generated from mk-sb-charsets.py */
 ''')   
-    print('''#ifdef _MB_EXTENDED_CHARSETS_ISO
+    print('''#ifdef __MB_EXTENDED_CHARSETS_ISO
 /* Tables for the ISO-8859-x to UTF conversion.  The first index into the
    table is a value computed from locale id - locale_ISO_8859-2 (ISO-8859-1
    is not included as it doesn't require translation).
@@ -375,9 +375,9 @@ const uint16_t __iso_8859_conv[14][0x60] = {''')
         encoding = 'ISO-8859-%d' % val
         dump_range(encoding, 'ISO_8859_2', 0xa0, 0xff)
     print('};')
-    print('#endif /* _MB_EXTENDED_CHARSETS_ISO */')
+    print('#endif /* __MB_EXTENDED_CHARSETS_ISO */')
     print('')
-    print('''#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+    print('''#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 /* Tables for the Windows default singlebyte ANSI codepage conversion.
    The first index into the table is a value computed from locale id
    minus locale_WINDOWS_BASE, the second index is the value of the
@@ -410,7 +410,7 @@ const uint16_t __cp_conv[27][0x80] = {''')
                 
         dump_range(encoding, 'WINDOWS_BASE', 0x80, 0xff)
     print('};')
-    print('#endif /* _MB_EXTENDED_CHARSETS_WINDOWS */')
+    print('#endif /* __MB_EXTENDED_CHARSETS_WINDOWS */')
     print('')
 
 
