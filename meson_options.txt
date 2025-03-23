@@ -33,78 +33,48 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+#
 # General build options
-
-option('fast-strcmp', type: 'boolean', value: true,
-       description: 'Always optimize strcmp for performance')
+#
 
 option('multilib', type: 'boolean', value: true,
        description: 'Enable multilib compile')
-
 option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
-
 option('multilib-exclude', type: 'array', value: [],
        description: 'Multilib configurations containing any of these strings will not be built')
+option('sanitize-bounds', type: 'boolean', value: false,
+       description: 'Build the library with -fsanitize=bounds')
+option('sanitize-trap-on-error', type: 'boolean', value: false,
+       description: 'Build the library with -fsanitize-undefined-trap-on-error')
+option('profile', type: 'boolean', value: false,
+       description: 'Enable profiling by adding -pg -no-pie to compile flags')
+option('analyzer', type: 'boolean', value: false,
+       description: 'Enable the analyzer while compiling with -fanalyzer')
+option('assert-verbose', type: 'boolean', value: true,
+       description: 'Assert provides verbose information')
+option('fast-strcmp', type: 'boolean', value: true,
+       description: 'Always optimize strcmp for performance')
+
+#
+# Installation options
+#
 
 option('build-type-subdir', type: 'string',
        description: 'Build-type subdir. Also skips installing .specs file')
-
-option('picolib', type: 'boolean', value: true,
-       description: 'Include pico lib bits')
-
-option('picocrt', type: 'boolean', value: true,
-       description: 'Include pico crt bits')
-
-option('picocrt-enable-mmu', type: 'boolean', value: true,
-       description: 'Enable memory management unit in picocrt startup')
-
-option('picocrt-lib', type: 'boolean', value: true,
-       description: 'Include pico crt bits in lib form')
-
-option('semihost', type: 'boolean', value: true,
-       description: 'Include semihost bits')
-
 option('specsdir', type: 'string',
        description: 'Installation directory for .specs file')
-
 option('sysroot-install', type: 'boolean', value: false,
        description: 'Install in gcc sysroot')
-
 option('sysroot-install-skip-checks', type: 'boolean', value: false,
        description: 'Skip sysroot path checks during config')
-
 option('system-libc', type: 'boolean', value: false,
        description: 'Install as system C library')
-					      
-option('sanitize-bounds', type: 'boolean', value: false,
-       description: 'Build the library with -fsanitize=bounds')
-
-option('sanitize-trap-on-error', type: 'boolean', value: false,
-       description: 'Build the library with -fsanitize-undefined-trap-on-error')
-
-option('use-stdlib', type: 'boolean', value: false,
-       description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
-
-option('profile', type: 'boolean', value: false,
-       description: 'Enable profiling by adding -pg -no-pie to compile flags')
-
-option('freestanding', type: 'boolean', value: false,
-       description: 'Build the library with -ffreestanding (useful for Zephyr testing)')
-
-option('analyzer', type: 'boolean', value: false,
-       description: 'Enable the analyzer while compiling with -fanalyzer')
-
-option('assert-verbose', type: 'boolean', value: true,
-       description: 'Assert provides verbose information')
 
 #
 # Testing options
 #
-option('native-tests', type: 'boolean', value: false,
-       description: 'Run some tests against native libc too')
-option('native-math-tests', type: 'boolean', value: true,
-       description: 'Run math tests against native libm when native-tests is enable')
+
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
 option('tests-cdefs', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
@@ -125,13 +95,27 @@ option('fortify-source', type: 'combo', choices: ['none', '1', '2', '3'], value:
        description: 'Set _FORTIFY_SOURCE=<value> when building tests')
 option('test-machine', type: 'string', value: 'qemu',
        description: 'Machine-specific startup code to use when running tests')
+option('freestanding', type: 'boolean', value: false,
+       description: 'Build the library with -ffreestanding (useful for Zephyr testing)')
+option('native-tests', type: 'boolean', value: false,
+       description: 'Run some tests against native libc too')
+option('native-math-tests', type: 'boolean', value: true,
+       description: 'Run math tests against native libm when native-tests is enable')
+option('use-stdlib', type: 'boolean', value: false,
+       description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
+option('picolib', type: 'boolean', value: true,
+       description: 'Include pico lib bits. Disable when doing native testing.')
+option('semihost', type: 'boolean', value: true,
+       description: 'Include semihost bits. Disable when doing native testing.')
+option('fake-semihost', type: 'boolean', value: false,
+       description: 'create fake semihost library to link tests')
+
+#
+# Stdio options
+#
 
 option('tinystdio', type: 'boolean', value: true,
        description: 'Use tiny stdio from avr libc')
-
-#
-# Options applying to both legacy stdio and tinystdio
-#
 option('io-c99-formats', type: 'boolean', value: true,
        description: 'enable C99 support in IO functions like printf/scanf')
 option('io-long-long', type: 'boolean', value: false,
@@ -142,8 +126,9 @@ option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 
 #
-# Options applying only to tinystdio
+# Tinystdio options
 #
+
 option('io-float-exact', type: 'boolean', value: true,
        description: 'use float/string code which supports round-tripping')
 option('atomic-ungetc', type: 'boolean', value: true,
@@ -168,8 +153,9 @@ option('io-wchar', type: 'boolean', value: false,
        description: 'enable wide character support in printf/scanf (requires multi-byte support)')
 
 #
-# Options applying to only legacy stdio
+# Legacy stdio options
 #
+
 option('newlib-elix-level', type: 'integer', value: 4,
        description: 'desired elix library level (0-4)')
 option('newlib-fseek-optimization', type: 'boolean', value: false,
@@ -185,13 +171,14 @@ option('newlib-stdio64', type: 'boolean', value: true,
 option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
        description: 'enable unbuffered stream optimization in streamio')
 option('newlib-wide-orient', type: 'boolean', value: false,
-       description: 'Turn off wide orientation in streamio')
+       description: 'Track wide orientation in streams.')
 option('newlib-have-fcntl', type: 'boolean', value: false,
        description: 'System has fcntl function')
 
 #
 # Internationalization options
 #
+
 option('mb-capable', type: 'boolean', value: false,
        description: 'enable multibyte support for UTF-8 charset')
 option('mb-extended-charsets', type: 'boolean', value: false,
@@ -208,20 +195,26 @@ option('mb-windows-charsets', type: 'combo', choices: ['true', 'false', 'auto'],
 #
 # Startup/shutdown options
 #
+
+option('picocrt', type: 'boolean', value: true,
+       description: 'Include pico crt bits')
+option('picocrt-enable-mmu', type: 'boolean', value: true,
+       description: 'Enable memory management unit in picocrt startup')
+option('picocrt-lib', type: 'boolean', value: true,
+       description: 'Include pico crt bits in lib form')
 option('picoexit', type: 'boolean', value: true,
        description: 'Smaller exit/atexit/onexit code')
 option('initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
 option('initfini', type: 'boolean', value: false,
        description: 'Supports _init() and _fini()')
-option('fake-semihost', type: 'boolean', value: false,
-       description: 'create fake semihost library to link tests')
 option('crt-runtime-size', type: 'boolean', value: false,
        description: 'compute crt memory space sizes at runtime')
 
 #
 # Non-picoexit startup/shutdown options
 #
+
 option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
        description: 'enable dynamic allocation of atexit entries')
 option('newlib-global-atexit', type: 'boolean', value: false,
@@ -230,30 +223,32 @@ option('newlib-register-fini', type: 'boolean', value: false,
        description: 'enable finalization function registration using atexit')
 
 #
-# Malloc option
+# Malloc options
 #
+
 option('newlib-nano-malloc', type: 'boolean', value: true,
        description: 'use small-footprint nano-malloc implementation')
 option('nano-malloc-clear-freed', type: 'boolean', value: false,
        description: 'nano version erases memory on free/realloc')
 
 #
-# Locking support
+# Locking options
 #
+
 option('single-thread', type: 'boolean', value: false,
        description: 'disable support for multiple threads')
 
 #
-# Thread-local storage support
+# Thread-local storage options
 #
+
 option('thread-local-storage', type: 'combo', choices: ['true', 'false', 'auto', 'picolibc'], value: 'picolibc',
        description: 'use thread local storage for static data ("picolibc": picolibc and toolchain support) ("auto": toolchain supports) (default: "picolibc")')
 option('tls-model', type: 'combo', choices: ['global-dynamic', 'local-dynamic', 'initial-exec', 'local-exec'], value: 'local-exec',
        description: 'Set TLS model. No-op when thread-local-storage is false')
 option('newlib-global-errno', type: 'boolean', value: false,
        description: 'use global errno variable')
-option('errno-function', type: 'string',
-       value: 'false',
+option('errno-function', type: 'string', value: 'false',
        description: 'Use this function to compute errno address (default false, auto means autodetect, zephyr means use z_errno_wrap if !tls)')
 option('tls-rp2040', type: 'boolean', value: false,
        description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
@@ -261,9 +256,7 @@ option('tls-rp2040', type: 'boolean', value: false,
 #
 # Math options
 #
-# Use "obsolete" math code, which use 'float' for 'float' functions
-# instead of the newer code which uses 'double' instead.
-#
+
 option('newlib-obsolete-math', type: 'combo', choices: ['true', 'false', 'auto'],
        value: 'auto',
        description: 'Use float type for float valued math routines (default: automatic based on platform)')
