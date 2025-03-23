@@ -101,7 +101,7 @@
 
 #cmakedefine _NANO_FORMATTED_IO
 
-#cmakedefine _NANO_MALLOC
+#cmakedefine __NANO_MALLOC
 
 /* The newlib version in string format. */
 #define _NEWLIB_VERSION "@NEWLIB_VERSION@"

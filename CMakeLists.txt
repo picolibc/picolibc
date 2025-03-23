@@ -191,7 +191,7 @@ endif()
 
 set(_NANO_FORMATTED_IO OFF)
 
-option(_NANO_MALLOC "Use smaller malloc implementation" ON)
+option(__NANO_MALLOC "Use smaller malloc implementation" ON)
 
 set(_GLOBAL_ATEXIT OFF)
 

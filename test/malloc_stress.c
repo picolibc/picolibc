@@ -132,7 +132,7 @@ check_malloc(size_t in_use)
 	int result = 0;
 
         (void) in_use;
-#ifdef _NANO_MALLOC
+#ifdef __NANO_MALLOC
 	struct mallinfo info = mallinfo();
 	if (info.arena < info.fordblks + in_use) {
 		printf("non-free bytes in arena %zu free %zu\n", info.arena, info.fordblks);
@@ -154,7 +154,7 @@ check_malloc(size_t in_use)
 	return result;
 }
 
-#ifdef _NANO_MALLOC
+#ifdef __NANO_MALLOC
 extern size_t __malloc_minsize, __malloc_align, __malloc_head;
 #endif
 
