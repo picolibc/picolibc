@@ -77,7 +77,7 @@
 
 #cmakedefine __IO_FLOAT_EXACT
 
-#cmakedefine _PRINTF_SMALL_ULTOA
+#cmakedefine __IO_SMALL_ULTOA
 
 #cmakedefine __IO_PERCENT_N
 

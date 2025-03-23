@@ -219,8 +219,8 @@ endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" ON)
 
-if(NOT DEFINED _PRINTF_SMALL_ULTOA)
-  option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" ON)
+if(NOT DEFINED __IO_SMALL_ULTOA)
+  option(__IO_SMALL_ULTOA "Avoid soft divide in printf" ON)
 endif()
 
 if(NOT DEFINED __IO_PERCENT_N)

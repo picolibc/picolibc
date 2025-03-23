@@ -1408,7 +1408,7 @@ if tinystdio
   conf_data.set('__IO_DEFAULT_MINIMAL',
                 format_default == 'minimal',
                 description: 'The default printf functions is the minimal variant')
-  conf_data.set('_PRINTF_SMALL_ULTOA',
+  conf_data.set('__IO_SMALL_ULTOA',
                 printf_small_ultoa,
                 description: 'avoid software division in decimal conversion')
   conf_data.set('__IO_PERCENT_N',
