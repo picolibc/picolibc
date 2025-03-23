@@ -133,15 +133,15 @@
 
 #cmakedefine __IO_POS_ARGS
 
-#cmakedefine _FORMAT_DEFAULT_DOUBLE
+#cmakedefine __IO_DEFAULT_DOUBLE
 
-#cmakedefine _FORMAT_DEFAULT_FLOAT
+#cmakedefine __IO_DEFAULT_FLOAT
 
-#cmakedefine _FORMAT_DEFAULT_LONG_LONG
+#cmakedefine __IO_DEFAULT_LONG_LONG
 
-#cmakedefine _FORMAT_DEFAULT_INTEGER
+#cmakedefine __IO_DEFAULT_INTEGER
 
-#cmakedefine _FORMAT_DEFAULT_MINIMAL
+#cmakedefine __IO_DEFAULT_MINIMAL
 
 /* math library sets errno */
 #cmakedefine _WANT_MATH_ERRNO

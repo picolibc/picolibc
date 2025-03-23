@@ -33,13 +33,13 @@
 #include "stdio_private.h"
 
 #define PRINTF_LEVEL PRINTF_MIN
-#ifndef _FORMAT_DEFAULT_MINIMAL
+#ifndef __IO_DEFAULT_MINIMAL
 #define vfprintf __m_vfprintf
 #endif
 
 #include "vfprintf.c"
 
-#ifdef _FORMAT_DEFAULT_MINIMAL
+#ifdef __IO_DEFAULT_MINIMAL
 #ifdef __strong_reference
 __strong_reference(vfprintf, __m_vfprintf);
 #else

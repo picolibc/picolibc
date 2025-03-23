@@ -34,13 +34,13 @@
 
 #define PICOLIBC_LONG_LONG_PRINTF_SCANF
 #define PRINTF_LEVEL PRINTF_LLONG
-#ifndef _FORMAT_DEFAULT_LONG_LONG
+#ifndef __IO_DEFAULT_LONG_LONG
 #define vfprintf __l_vfprintf
 #endif
 
 #include "vfprintf.c"
 
-#ifdef _FORMAT_DEFAULT_LONG_LONG
+#ifdef __IO_DEFAULT_LONG_LONG
 #ifdef __strong_reference
 __strong_reference(vfprintf, __l_vfprintf);
 #else

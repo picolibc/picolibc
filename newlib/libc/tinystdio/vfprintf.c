@@ -63,7 +63,7 @@
 
 #ifndef PRINTF_LEVEL
 #  define PRINTF_LEVEL PRINTF_DBL
-#  ifndef _FORMAT_DEFAULT_DOUBLE
+#  ifndef __IO_DEFAULT_DOUBLE
 #    define vfprintf __d_vfprintf
 #  endif
 #endif
@@ -1362,7 +1362,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 }
 
 #ifndef VFPRINTF_S
-#if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfprintf)
+#if defined(__IO_DEFAULT_DOUBLE) && !defined(vfprintf)
 #ifdef __strong_reference
 __strong_reference(vfprintf, __d_vfprintf);
 #else

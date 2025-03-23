@@ -33,13 +33,13 @@
 #include "stdio_private.h"
 
 #define SCANF_LEVEL SCANF_STD
-#ifndef _FORMAT_DEFAULT_INTEGER
+#ifndef __IO_DEFAULT_INTEGER
 #define vfscanf __i_vfscanf
 #endif
 
 #include "vfscanf.c"
 
-#ifdef _FORMAT_DEFAULT_INTEGER
+#ifdef __IO_DEFAULT_INTEGER
 #ifdef __strong_reference
 __strong_reference(vfscanf, __i_vfscanf);
 #else

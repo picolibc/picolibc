@@ -1393,19 +1393,19 @@ endif
 
 conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 if tinystdio
-  conf_data.set('_FORMAT_DEFAULT_DOUBLE',
+  conf_data.set('__IO_DEFAULT_DOUBLE',
                 format_default == 'double',
                 description: 'The default printf functions is the double variant')
-  conf_data.set('_FORMAT_DEFAULT_FLOAT',
+  conf_data.set('__IO_DEFAULT_FLOAT',
                 format_default == 'float',
                 description: 'The default printf functions is the float variant')
-  conf_data.set('_FORMAT_DEFAULT_LONG_LONG',
+  conf_data.set('__IO_DEFAULT_LONG_LONG',
                 format_default == 'long-long',
                 description: 'The default printf functions is the long-long variant')
-  conf_data.set('_FORMAT_DEFAULT_INTEGER',
+  conf_data.set('__IO_DEFAULT_INTEGER',
                 format_default == 'integer',
                 description: 'The default printf functions is the integer variant')
-  conf_data.set('_FORMAT_DEFAULT_MINIMAL',
+  conf_data.set('__IO_DEFAULT_MINIMAL',
                 format_default == 'minimal',
                 description: 'The default printf functions is the minimal variant')
   conf_data.set('_PRINTF_SMALL_ULTOA',

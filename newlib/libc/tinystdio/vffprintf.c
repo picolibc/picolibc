@@ -34,13 +34,13 @@
 
 #define PRINTF_LEVEL PRINTF_FLT
 #define PICOLIBC_FLOAT_PRINTF_SCANF
-#ifndef _FORMAT_DEFAULT_FLOAT
+#ifndef __IO_DEFAULT_FLOAT
 #define vfprintf __f_vfprintf
 #endif
 
 #include "vfprintf.c"
 
-#ifdef _FORMAT_DEFAULT_FLOAT
+#ifdef __IO_DEFAULT_FLOAT
 #ifdef __strong_reference
 __strong_reference(vfprintf, __f_vfprintf);
 #else

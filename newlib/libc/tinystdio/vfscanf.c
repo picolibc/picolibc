@@ -856,7 +856,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 #undef ap
 
-#if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
+#if defined(__IO_DEFAULT_DOUBLE) && !defined(vfscanf)
 #ifdef __strong_reference
 __strong_reference(vfscanf, __d_vfscanf);
 #else
