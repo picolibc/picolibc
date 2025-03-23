@@ -73,7 +73,7 @@
 #cmakedefine __SEMIHOST
 
 /* math library does not set errno (offering only ieee semantics) */
-#cmakedefine _IEEE_LIBM
+#cmakedefine __IEEE_LIBM
 
 #cmakedefine __IO_FLOAT_EXACT
 

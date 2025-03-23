@@ -242,7 +242,7 @@ extern int isnan (double);
 # define MATH_ERREXCEPT 2
 #endif
 #ifndef math_errhandling
-# ifdef _IEEE_LIBM
+# ifdef __IEEE_LIBM
 #  define _MATH_ERRHANDLING_ERRNO 0
 # else
 #  define _MATH_ERRHANDLING_ERRNO MATH_ERRNO

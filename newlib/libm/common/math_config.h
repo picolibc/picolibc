@@ -38,7 +38,7 @@
 /* Correct special case results in non-nearest rounding modes.  */
 # define WANT_ROUNDING 1
 #endif
-#ifdef _IEEE_LIBM
+#ifdef __IEEE_LIBM
 # define WANT_ERRNO 0
 # define _LIB_VERSION _IEEE_
 #else

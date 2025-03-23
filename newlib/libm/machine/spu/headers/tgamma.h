@@ -51,7 +51,7 @@ static __inline double _tgamma(double x)
   vx = spu_promote(x, 0);
   res = spu_extract(_tgammad2(vx), 0);
 
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   /*
    * use vector truncd2 rather than splat x, and splat truncx.
    */

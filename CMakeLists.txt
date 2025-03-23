@@ -153,7 +153,7 @@ endif()
 set(__SEMIHOST 1)
 
 # math library does not set errno (offering only ieee semantics)
-set(_IEEE_LIBM 1)
+set(__IEEE_LIBM 1)
 
 if(NOT DEFINED __IO_FLOAT_EXACT)
   option(__IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
