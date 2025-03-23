@@ -31,9 +31,7 @@
 
 #include <sys/_types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
@@ -127,8 +125,6 @@ typedef	__uint64_t	fexcept_t;
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif	/* !_FENV_H_ */

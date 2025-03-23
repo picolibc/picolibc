@@ -29,10 +29,6 @@
 #include <sys/param.h>
 #include <sys/types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef void (*xdr_vprintf_t) (const char *, va_list);
 
 xdr_vprintf_t xdr_set_vprintf (xdr_vprintf_t);
@@ -60,10 +56,6 @@ __elidable_inline uint32_t xdr_ntohl (uint32_t x)
 #endif
 }
 #define xdr_htonl(x) xdr_ntohl(x)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _XDR_PRIVATE_H */
 

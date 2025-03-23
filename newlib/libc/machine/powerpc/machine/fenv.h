@@ -31,10 +31,9 @@
 #ifndef	_MACHINE_FENV_H_
 #define	_MACHINE_FENV_H_
 
+#include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 typedef	int	fenv_t;
 typedef	int	fexcept_t;
@@ -125,8 +124,6 @@ union __fpscr {
 #include <machine/fenv-fp.h>
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif	/* !_MACHINE_FENV_H_ */

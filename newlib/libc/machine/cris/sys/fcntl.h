@@ -31,10 +31,12 @@ POSSIBILITY OF SUCH DAMAGE.
    be those of the Linux/CRIS kernel.  */
 
 #ifndef	_FCNTL_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define	_FCNTL_
+
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
+
 #define	_FOPEN		(-1)	/* from sys/file.h, kernel use only */
 #define	_FREAD		0x0001	/* read enabled */
 #define	_FWRITE		0x0002	/* write enabled */
@@ -184,7 +186,6 @@ extern int _open64 (const char *, int, ...);
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif	/* !_FCNTL_ */

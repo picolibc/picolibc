@@ -31,15 +31,12 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
  */
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 /* The utime function is defined in libc/sys/<arch>/sys if it exists. */
 #include <sys/utime.h>
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C

@@ -101,10 +101,6 @@ enum {	/* FPI.rounding values: same as FLT_ROUNDS */
 typedef unsigned short __UShort;
 typedef struct _Bigint Bigint;
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 extern char* __dtoa  (
 			double d, int mode, int ndigits, int *decpt,
 			int *sign, char **rve);
@@ -164,7 +160,4 @@ extern int	__strtopxL ANSI((CONST char*, char**, void*));
 #endif
 __END_HIDDEN_DECLS
 
-#ifdef __cplusplus
-}
-#endif
 #endif /* GDTOA_H_INCLUDED */

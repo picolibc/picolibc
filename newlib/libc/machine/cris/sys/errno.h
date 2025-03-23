@@ -35,15 +35,14 @@ POSSIBILITY OF SUCH DAMAGE.
    __errno.  */
 
 #ifndef _SYS_ERRNO_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _SYS_ERRNO_H_
 
-#include <sys/reent.h>
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 #define errno (*__errno())
-extern int *__errno (void);
+int *__errno (void);
 
 /* Please don't use these variables directly.
    Use strerror instead. */
@@ -197,7 +196,6 @@ extern int _sys_nerr;
 
 #define __ELASTERROR 2000	/* Users can add values starting here */
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _SYS_ERRNO_H */

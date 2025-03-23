@@ -33,6 +33,10 @@
 #ifndef _MACHINE_FENV_H
 #define _MACHINE_FENV_H
 
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
+
 /*
  * The exception macros are such that the functions to pack/unpack them
  * will map a 32 bit fenv_t from/to the 128 bit fpscr.
@@ -140,5 +144,7 @@ typedef unsigned int fenv_t;
 
 extern fenv_t _fe_dfl_env;
 #define FE_DFL_ENV	((const fenv_t *) &_fe_dfl_env)
+
+_END_STD_C
 
 #endif /* fenv.h */

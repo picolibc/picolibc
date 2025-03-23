@@ -31,14 +31,13 @@
 #ifndef	_MACHINE_FENV_H_
 #define	_MACHINE_FENV_H_
 
+#include <sys/cdefs.h>
 
 #if !defined(__mips_soft_float) && !defined(__mips_hard_float)
 #error compiler didnt set soft/hard float macros
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 typedef int fenv_t;
 typedef int fexcept_t;
@@ -90,8 +89,6 @@ extern fenv_t		_fe_dfl_env;
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif	/* !_FENV_H_ */

@@ -47,7 +47,11 @@
 
 #define __PMT(args)	args
 #define __DOTS    	, ...
+#ifdef __cplusplus
+#define __THROW throw()
+#else
 #define __THROW
+#endif
 
 #ifdef __GNUC__
 # define __ASMNAME(cname)  __XSTRING (__USER_LABEL_PREFIX__) cname

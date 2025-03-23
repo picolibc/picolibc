@@ -35,12 +35,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef _SYS_SIGNAL_H
 #define _SYS_SIGNAL_H
-#ifdef __cplusplus
-extern "C" {
-#endif
 
 #include <sys/features.h>
 #include <sys/types.h>
+
+_BEGIN_STD_C
 
 typedef unsigned long sigset_t;
 
@@ -140,9 +139,8 @@ int str2sig(const char *__restrict, int *__restrict);
 #define SIGPWR		30
 #define	NSIG 31
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #ifndef _SIGNAL_H_
 /* Some applications take advantage of the fact that <sys/signal.h>
  * and <signal.h> are equivalent in glibc.  Allow for that here.  */

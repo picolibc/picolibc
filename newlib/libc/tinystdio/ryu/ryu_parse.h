@@ -17,10 +17,6 @@
 #ifndef RYU_PARSE_H
 #define RYU_PARSE_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 // This is an experimental implementation of parsing strings to 64-bit floats
 // using a Ryu-like algorithm. At this time, it only support up to 17 non-zero
 // digits in the input, and also does not support all formats. Use at your own
@@ -41,9 +37,5 @@ enum Status s2d(const char * buffer, double * result);
 
 enum Status s2f_n(const char * buffer, const int len, float * result);
 enum Status s2f(const char * buffer, float * result);
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif // RYU_PARSE_H

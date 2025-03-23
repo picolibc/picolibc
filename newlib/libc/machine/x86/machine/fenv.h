@@ -29,10 +29,9 @@
 #ifndef _MACHINE_FENV_H
 #define _MACHINE_FENV_H 1
 
+#include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 #ifdef _SOFT_FLOAT
 typedef int fenv_t;
@@ -167,8 +166,6 @@ extern const fenv_t *_fe_nomask_env;
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* _FENV_H */

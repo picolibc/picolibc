@@ -24,12 +24,9 @@
 #ifndef _FTW_H
 #define	_FTW_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
 
-#include <sys/features.h>
-#include <sys/stat.h>
+_BEGIN_STD_C
 
 /*
  * Valid flags for the 3rd argument to the function that is passed as the
@@ -59,8 +56,6 @@ struct FTW {
 int ftw(const char *, int (*)(const char *, const struct stat *, int), int);
 int nftw(const char *, int (*)(const char *, const struct stat *, int, struct FTW *), int, int);
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif

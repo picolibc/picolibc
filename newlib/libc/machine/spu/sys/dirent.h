@@ -32,9 +32,10 @@
 */
 #ifndef _SYS_DIRENT_H
 #define _SYS_DIRENT_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 #define MAXNAMLEN	255
 
@@ -51,7 +52,6 @@ typedef struct {
   struct dirent dirent;
 } DIR;
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif

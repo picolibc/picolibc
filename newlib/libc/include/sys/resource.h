@@ -29,11 +29,9 @@ SUCH DAMAGE.
 #ifndef _SYS_RESOURCE_H_
 #define _SYS_RESOURCE_H_
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include <sys/time.h>
+
+_BEGIN_STD_C
 
 #define	RUSAGE_SELF	0		/* calling process */
 #define	RUSAGE_CHILDREN	-1		/* terminated child processes */
@@ -48,8 +46,7 @@ struct rusage {
 
 int	getrusage (int, struct rusage*);
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* !_SYS_RESOURCE_H_ */
 

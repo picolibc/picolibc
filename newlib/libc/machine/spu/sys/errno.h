@@ -21,21 +21,25 @@
    be those of the Linux ppc.  */
 
 #ifndef _SYS_ERRNO_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _SYS_ERRNO_H_
 
-#include <sys/reent.h>
+#include <sys/cdefs.h>
 
-#define errno (_impure_data._errno)
+_BEGIN_STD_C
 
-/* Please don't use these variables directly.
-   Use strerror instead. */
-extern const char * const _sys_errlist[];
-extern int _sys_nerr;
+#ifdef __GLOBAL_ERRNO
+#define __THREAD_LOCAL_ERRNO
+#else
+#define __THREAD_LOCAL_ERRNO __THREAD_LOCAL
+#endif
 
-#define __errno_r(ptr) errno
+#ifdef __PICOLIBC_ERRNO_FUNCTION
+int *__PICOLIBC_ERRNO_FUNCTION(void);
+#define errno (*__PICOLIBC_ERRNO_FUNCTION())
+#else
+extern __THREAD_LOCAL_ERRNO int errno;
+#define errno errno
+#endif
 
 /* Adjusted to the linux asm/errno.h */
 #define	EPERM		 1	/* Operation not permitted */
@@ -173,7 +177,6 @@ extern int _sys_nerr;
 
 #define __ELASTERROR 2000	/* Users can add values starting here */
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _SYS_ERRNO_H */

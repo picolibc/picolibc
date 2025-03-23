@@ -309,13 +309,6 @@ extern double rnd_prod(double, double), rnd_quot(double, double);
 #define ALL_ON 0xffff
 #endif
 
-#ifdef __cplusplus
-extern "C" double strtod(const char *s00, char **se);
-extern "C" char *dtoa(double d, int mode, int ndigits,
-			int *decpt, int *sign, char **rve);
-#endif
-
-
 typedef struct _Bigint _Bigint;
 
 #define Balloc	_Balloc

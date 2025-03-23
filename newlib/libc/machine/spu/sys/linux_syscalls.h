@@ -293,9 +293,7 @@ struct spu_syscall_block
   unsigned long long parm[6];	/* System call arguments.  */
 };
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 /* Issues a Linux system call.  */
 int __linux_syscall (struct spu_syscall_block *s);
@@ -304,7 +302,6 @@ int __linux_syscall (struct spu_syscall_block *s);
 pid_t linux_getpid(void);
 pid_t linux_gettid(void);
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif
