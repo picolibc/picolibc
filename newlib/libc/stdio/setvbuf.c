@@ -169,7 +169,7 @@ nbf:
       fp->_flags |= __SMBF;
     }
 
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
   /*
    * Kill any seek optimization if the buffer is not the
    * right size.

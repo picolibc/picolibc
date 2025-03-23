@@ -79,7 +79,7 @@ _swhatbuf (
 	size_t *bufsize,
 	int *couldbetty)
 {
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
   const int snpt = __SNPT;
 #else
   const int snpt = 0;

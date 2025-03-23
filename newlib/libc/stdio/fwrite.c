@@ -115,7 +115,7 @@ fwrite (
        FILE * __restrict fp)
 {
   size_t n;
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
   struct __suio uio;
   struct __siov iov;
 

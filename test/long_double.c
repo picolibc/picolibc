@@ -208,7 +208,7 @@ typedef CONST struct {
 
 #include "long_double_vec.h"
 
-#if !defined(__PICOLIBC__) || (defined(__IO_LONG_DOUBLE) && (defined(__TINY_STDIO) || defined(FLOATING_POINT)))
+#if !defined(__PICOLIBC__) || (defined(__IO_LONG_DOUBLE) && (defined(__TINY_STDIO) || defined(__IO_FLOATING_POINT)))
 #define TEST_IO_LONG_DOUBLE
 #endif
 

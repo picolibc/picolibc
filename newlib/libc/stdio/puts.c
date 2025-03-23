@@ -67,7 +67,7 @@ int
 puts (
        const char * s)
 {
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
   int result;
   size_t c = strlen (s);
   struct __suio uio;

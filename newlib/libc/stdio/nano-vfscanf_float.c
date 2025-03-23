@@ -30,7 +30,7 @@
 #include "../stdlib/local.h"
 #include "nano-vfscanf_local.h"
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 int
 _scanf_float (struct _reent *rptr,
 	      struct _scan_data_t *pdata,

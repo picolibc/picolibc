@@ -15,8 +15,8 @@
 
 #ifndef __TINY_STDIO
 #define printf_float(x) ((double) (x))
-#ifdef _NANO_FORMATTED_IO
-#ifndef NO_FLOATING_POINT
+#ifdef __NANO_FORMATTED_IO
+#ifndef __IO_NO_FLOATING_POINT
 extern int _printf_float();
 extern int _scanf_float();
 
@@ -72,7 +72,7 @@ static int test(int serial, char *expect, char *fmt, ...) {
     va_list aanp;
     va_copy(aanp, ap);
 #endif
-#ifndef NO_FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
 # ifdef _HAS_IO_FLOAT
     uint32_t dv;
 # else
@@ -93,7 +93,7 @@ static int test(int serial, char *expect, char *fmt, ...) {
     case 'G':
     case 'a':
     case 'A':
-#ifdef NO_FLOATING_POINT
+#ifdef __IO_NO_FLOATING_POINT
 	    return 0;
 #else
 	    star = strchr(fmt, '*');
@@ -260,7 +260,7 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
     wchar_t *abuf = NULL;
     va_start(ap, fmt);
     int n;
-#ifndef NO_FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
 # ifdef _HAS_IO_FLOAT
     uint32_t dv;
 # else
@@ -277,7 +277,7 @@ static int testw(int serial, wchar_t *expect, wchar_t *fmt, ...) {
     case 'G':
     case 'a':
     case 'A':
-#ifdef NO_FLOATING_POINT
+#ifdef __IO_NO_FLOATING_POINT
 	    return 0;
 #else
 	    star = wcschr(fmt, '*');

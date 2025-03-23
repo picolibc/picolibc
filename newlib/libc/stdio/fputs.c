@@ -90,7 +90,7 @@ fputs (
        char const *__restrict s,
        FILE *__restrict fp)
 {
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
   int result;
   struct __suio uio;
   struct __siov iov;

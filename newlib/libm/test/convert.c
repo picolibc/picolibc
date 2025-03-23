@@ -400,7 +400,7 @@ diterate (void (*func)(),
 static void
 deltest (void)
 {
-#if defined(__TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if defined(__TINY_STDIO) || !defined(__IO_NO_FLOATING_POINT)
   newfunc("rounding");
   line(1);
   sprintf(buffer,"%.2f", 9.999);
@@ -434,7 +434,7 @@ deltest (void)
 static void
 test_sprint (void)
 {
-#if defined(__TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if defined(__TINY_STDIO) || !defined(__IO_NO_FLOATING_POINT)
   extern sprint_double_type sprint_doubles[];
   sprint_double_type *s = sprint_doubles;
 #endif
@@ -445,7 +445,7 @@ test_sprint (void)
   newfunc( "sprintf");
 
 
-#if defined(__TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if defined(__TINY_STDIO) || !defined(__IO_NO_FLOATING_POINT)
   while (s->line)
   {
     line( s->line);
@@ -533,7 +533,7 @@ static void
 test_scan (void)
 {
   int i,j;
-#if defined(__TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if defined(__TINY_STDIO) || !defined(__IO_NO_FLOATING_POINT)
   extern sprint_double_type sprint_doubles[];
   sprint_double_type *s = sprint_doubles;
 #endif
@@ -542,7 +542,7 @@ test_scan (void)
 
   newfunc( "scanf");
 
-#if defined(__TINY_STDIO) || !defined(NO_FLOATING_POINT)
+#if defined(__TINY_STDIO) || !defined(__IO_NO_FLOATING_POINT)
   /* Test scanf by converting all the numbers in the sprint vectors
      to and from their source and making sure nothing breaks */
 

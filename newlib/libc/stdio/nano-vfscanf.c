@@ -357,7 +357,7 @@ _SVFSCANF (
 	  va_end (ap_copy);
 	  return EOF;
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 	case 'e': case 'E':
 	case 'f': case 'F':
 	case 'g': case 'G':
@@ -395,7 +395,7 @@ _SVFSCANF (
 	ret = _scanf_chars (&scan_data, fp, &ap_copy);
       else if (scan_data.code < CT_FLOAT)
 	ret = _scanf_i (&scan_data, fp, &ap_copy);
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
       else if (_scanf_float)
 	ret = _scanf_float (rptr, &scan_data, fp, &ap_copy);
 #endif

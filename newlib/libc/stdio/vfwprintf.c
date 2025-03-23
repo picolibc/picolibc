@@ -97,8 +97,8 @@ SEEALSO
 # else
 #   define VFWPRINTF vfwprintf
 # endif
-# ifndef NO_FLOATING_POINT
-#  define FLOATING_POINT
+# ifndef __IO_NO_FLOATING_POINT
+#  define __IO_FLOATING_POINT
 # endif
 #endif
 
@@ -139,7 +139,7 @@ int VFWPRINTF (FILE *, const wchar_t *, va_list);
 #endif
 
 /* Defined in vfprintf.c. */
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
 # ifdef STRING_ONLY
 #  define __SPRINT __sswprint
 # else
@@ -154,7 +154,7 @@ int __SPRINT (FILE *, register struct __suio *);
 # endif
 #endif
 #ifndef STRING_ONLY
-#ifdef _UNBUF_STREAM_OPT
+#ifdef __UNBUF_STREAM_OPT
 /*
  * Helper function for `fprintf to unbuffered unix file': creates a
  * temporary buffer.  We only work on write-only files; this avoids
@@ -193,14 +193,14 @@ __sbwprintf (
 	__lock_close_recursive (fake._lock);
 	return (ret);
 }
-#endif /* _UNBUF_STREAM_OPT */
+#endif /* __UNBUF_STREAM_OPT */
 #endif /* !STRING_ONLY */
 
 
-#if defined (FLOATING_POINT) || defined (__IO_C99_FORMATS)
+#if defined (__IO_FLOATING_POINT) || defined (__IO_C99_FORMATS)
 # include <locale.h>
 #endif
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # include <math.h>
 
 /* For %La, an exponent of 15 bits occupies the exponent character, a
@@ -228,7 +228,7 @@ static wchar_t *wcvt(_PRINTF_FLOAT_TYPE, int, int, wchar_t *,
 
 static int wexponent(wchar_t *, int, int);
 
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 
 /* BUF must be big enough for the maximum %#llo (assuming long long is
    at most 64 bits, this would be 23 characters), the maximum
@@ -375,10 +375,10 @@ VFWPRINTF (
 	const char *grouping = NULL;
 #endif
 #if defined (__MB_CAPABLE) && !defined (WDECIMAL_POINT) \
-    && (defined (FLOATING_POINT) || defined (__IO_C99_FORMATS))
+    && (defined (__IO_FLOATING_POINT) || defined (__IO_C99_FORMATS))
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 	wchar_t decimal_point;
 	wchar_t softsign;		/* temporary negative sign for floats */
 	union { int i; _PRINTF_FLOAT_TYPE fp; } _double_ = {0};
@@ -387,11 +387,11 @@ VFWPRINTF (
 	int expsize = 0;	/* character count for expstr */
 	wchar_t expstr[MAXEXPLEN];	/* buffer for exponent string */
 	int lead;		/* sig figs before decimal or group sep */
-#endif /* FLOATING_POINT */
-#if defined (FLOATING_POINT) || defined (__IO_C99_FORMATS)
+#endif /* __IO_FLOATING_POINT */
+#if defined (__IO_FLOATING_POINT) || defined (__IO_C99_FORMATS)
 	int ndig = 0;		/* actual number of digits returned by cvt */
 #endif
-#if defined (FLOATING_POINT) && defined (__IO_C99_FORMATS)
+#if defined (__IO_FLOATING_POINT) && defined (__IO_C99_FORMATS)
 	int nseps;		/* number of group separators with ' */
 	int nrepeats;		/* number of repeats of the last group */
 #endif
@@ -401,7 +401,7 @@ VFWPRINTF (
 	int realsz;		/* field size expanded by dprec */
 	int size = 0;		/* size of converted field or string */
 	wchar_t *xdigs = NULL;	/* digits for [xX] conversion */
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
 #define NIOV 8
 	struct __suio uio;	/* output information: summary */
 	struct __siov iov[NIOV];/* ... and individual io vectors */
@@ -424,7 +424,7 @@ VFWPRINTF (
 	 {L'0',L'0',L'0',L'0',L'0',L'0',L'0',L'0',
 	  L'0',L'0',L'0',L'0',L'0',L'0',L'0',L'0'};
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 #ifdef __MB_CAPABLE
 #ifdef WDECIMAL_POINT
 	decimal_point = *WDECIMAL_POINT;
@@ -447,7 +447,7 @@ VFWPRINTF (
 	/*
 	 * BEWARE, these `goto error' on error, and PAD uses `n'.
 	 */
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
 #define	PRINT(ptr, len) { \
 	iovp->iov_base = (char *) (ptr); \
 	iovp->iov_len = (len); \
@@ -570,7 +570,7 @@ VFWPRINTF (
 		return (EOF);
 	}
 
-#ifdef _UNBUF_STREAM_OPT
+#ifdef __UNBUF_STREAM_OPT
 	/* optimise fwprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
@@ -593,7 +593,7 @@ VFWPRINTF (
 #endif /* STRING_ONLY */
 
 	fmt = (wchar_t *)fmt0;
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
 	uio.uio_iov = iovp = iov;
 	uio.uio_resid = 0;
 	uio.uio_iovcnt = 0;
@@ -630,7 +630,7 @@ VFWPRINTF (
 		width = 0;
 		prec = -1;
 		sign = L'\0';
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 		lead = 0;
 #ifdef __IO_C99_FORMATS
 		nseps = nrepeats = 0;
@@ -805,7 +805,7 @@ reswitch:	switch (ch) {
 #endif /* !_NO_POS_ARGS */
 			width = n;
 			goto reswitch;
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 		case L'L':
 			flags |= LONGDBL;
 			goto rflag;
@@ -904,7 +904,7 @@ reswitch:	switch (ch) {
 			}
 			base = DEC;
 			goto number;
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # ifdef __IO_C99_FORMATS
 		case L'a':
 		case L'A':
@@ -1090,7 +1090,7 @@ reswitch:	switch (ch) {
 			if (softsign)
 				sign = L'-';
 			break;
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 #ifdef _GLIBC_EXTENSION
 		case L'm':  /* GNU extension */
 			{
@@ -1418,7 +1418,7 @@ number:			if ((dprec = prec) >= 0)
 		PAD (dprec - size, zeroes);
 
 		/* the string or number proper */
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 		if ((flags & FPT) == 0) {
 			PRINT (cp, size);
 		} else {	/* glue together f_p fragments */
@@ -1481,7 +1481,7 @@ number:			if ((dprec = prec) >= 0)
 				PRINT (expstr, expsize);
 			}
 		}
-#else /* !FLOATING_POINT */
+#else /* !__IO_FLOATING_POINT */
 		PRINT (cp, size);
 #endif
 		/* left-adjusting padding (always blank) */
@@ -1510,7 +1510,7 @@ error:
 	/* NOTREACHED */
 }
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 
 /* Convert finite VALUE into a string of digits
    with no decimal point, using NDIGITS precision and FLAGS as guides
@@ -1666,7 +1666,7 @@ wexponent(wchar_t *p0, int exp, int fmtch)
 	}
 	return (p - p0);
 }
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 
 
 #ifndef _NO_POS_ARGS

@@ -40,9 +40,9 @@
 
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
 
-#cmakedefine _FSEEK_OPTIMIZATION
+#cmakedefine __FSEEK_OPTIMIZATION
 
-#cmakedefine _FVWRITE_IN_STREAMIO
+#cmakedefine __FVWRITE_IN_STREAMIO
 
 #cmakedefine __strong_reference
 
@@ -99,7 +99,7 @@
 
 #cmakedefine __MB_EXTENDED_CHARSETS_JIS
 
-#cmakedefine _NANO_FORMATTED_IO
+#cmakedefine __NANO_FORMATTED_IO
 
 #cmakedefine __NANO_MALLOC
 
@@ -121,7 +121,7 @@
 
 #cmakedefine __SINGLE_THREAD
 
-#cmakedefine _UNBUF_STREAM_OPT
+#cmakedefine __UNBUF_STREAM_OPT
 
 #cmakedefine __IO_C99_FORMATS
 
@@ -148,13 +148,13 @@
 
 #cmakedefine _WANT_REGISTER_FINI
 
-#cmakedefine _WIDE_ORIENT
+#cmakedefine __WIDE_ORIENT
 
 /* chatty assert */
 #cmakedefine __ASSERT_VERBOSE
 
 /* elix level */
-#cmakedefine _ELIX_LEVEL @_ELIX_LEVEL@
+#cmakedefine __ELIX_LEVEL @__ELIX_LEVEL@
 
 /* The newlib minor version number. */
 #define __NEWLIB_MINOR__ @NEWLIB_MINOR@

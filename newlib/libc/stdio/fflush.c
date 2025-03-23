@@ -111,7 +111,7 @@ _sflush (
   flags = fp->_flags;
   if ((flags & __SWR) == 0)
     {
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
       /* For a read stream, an fflush causes the next seek to be
          unoptimized (i.e. forces a system-level seek).  This conforms
          to the POSIX and SUSv3 standards.  */
@@ -185,7 +185,7 @@ _sflush (
 	    {
 	      /* Seek successful or ignorable error condition.
 		 We can clear read buffer now.  */
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
 	      fp->_flags &= ~__SNPT;
 #endif
 	      fp->_r = 0;

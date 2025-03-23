@@ -1717,17 +1717,17 @@ summary.
 2014-07-04  Bin Cheng  <bin.cheng@arm.com>
 
 	* README (--enable-newlib-nano-formatted-io): Describe.
-	* acconfig.h (_NANO_FORMATTED_IO): Undef.
-	* newlib.hin (_NANO_FORMATTED_IO): Undef.
+	* acconfig.h (__NANO_FORMATTED_IO): Undef.
+	* newlib.hin (__NANO_FORMATTED_IO): Undef.
 	* configure.in (--enable-newlib-nano-formatted-io): New option.
 	* configure: Regenerated.
 	* libc/configure.in (--enable-newlib-nano-formatted-io): New option.
 	* libc/configure: Regenerated.
-	* libc/stdio/Makefile.am (NEWLIB_NANO_FORMATTED_IO): Support new
+	* libc/stdio/Makefile.am (NEWLIB__NANO_FORMATTED_IO): Support new
 	configuration option.
 	* libc/stdio/Makefile.in: Regenerated.
 	* libc/stdio/asnprintf.c (_asniprintf_r, asniprintf): Use
-	_NANO_FORMATTED_IO to declare alias prototypes.
+	__NANO_FORMATTED_IO to declare alias prototypes.
 	* libc/stdio/asprintf.c (_asiprintf_r, asiprintf): Ditto.
 	* libc/stdio/dprintf.c (_diprintf_r, diprintf): Ditto.
 	* libc/stdio/fprintf.c (_fiprintf_r, fiprintf): Ditto.
@@ -2783,8 +2783,8 @@ summary.
 
 2013-06-19  Bin Cheng  <bin.cheng@arm.com>
 
-	* acconfig.h (_UNBUF_STREAM_OPT): Undefine.
-	* newlib.hin (_UNBUF_STREAM_OPT): Undefine.
+	* acconfig.h (__UNBUF_STREAM_OPT): Undefine.
+	* newlib.hin (__UNBUF_STREAM_OPT): Undefine.
 	* configure.in (--enable-newlib-unbuf-stream-opt): New option.
 	* configure: Regenerate.
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Don't do optimization on
@@ -3109,11 +3109,11 @@ summary.
 
 2013-04-10  Bin Cheng  <bin.cheng@arm.com>
 
-	* acconfig.h (_FSEEK_OPTIMIZATION): Undef
-	* newlib.hin (_FSEEK_OPTIMIZATION): Undef
+	* acconfig.h (__FSEEK_OPTIMIZATION): Undef
+	* newlib.hin (__FSEEK_OPTIMIZATION): Undef
 	* configure.in (--disable-newlib-fseek-optimization): New option.
 	* configure: Regenerated.
-	* libc/stdio/fflush.c (__sflush_r): Use _FSEEK_OPTIMIZATION to
+	* libc/stdio/fflush.c (__sflush_r): Use __FSEEK_OPTIMIZATION to
 	control fseek optimization.
 	* libc/stdio/fseeko.c (_fseeko_r): Ditto.
 	* libc/stdio/makebuf.c (__smakebuf_r): Ditto.
@@ -3130,19 +3130,19 @@ summary.
 
 2013-03-27  Bin Cheng  <bin.cheng@arm.com>
 
-	* acconfig.h (_FVWRITE_IN_STREAMIO): Undefine.
-	* newlib.hin (_FVWRITE_IN_STREAMIO): Undefine.
+	* acconfig.h (__FVWRITE_IN_STREAMIO): Undefine.
+	* newlib.hin (__FVWRITE_IN_STREAMIO): Undefine.
 	* configure.in (--disable-newlib-fvwrite-in-streamio): New option.
 	* configure: Regenerated.
-	* libc/stdio/fputs.c (_fputs_r): Use _FVWRITE_IN_STREAMIO to
+	* libc/stdio/fputs.c (_fputs_r): Use __FVWRITE_IN_STREAMIO to
 	control __sfvwrite_r.  Add alternative implementation.
 	* libc/stdio/fputws.c (_fputws_r): Ditto.
 	* libc/stdio/fwrite.c (_fwrite_r): Ditto.
 	* libc/stdio/puts.c (_puts_r): Ditto.
 	* libc/stdio/vfprintf.c (__ssputs_r, __sfputs_r): New function.
-	(_VFPRINTF_R): Use _FVWRITE_IN_STREAMIO to control vector buffer.
-	(__SPRINT): Use _FVWRITE_IN_STREAMIO to control macro definition.
-	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Use _FVWRITE_IN_STREAMIO
+	(_VFPRINTF_R): Use __FVWRITE_IN_STREAMIO to control vector buffer.
+	(__SPRINT): Use __FVWRITE_IN_STREAMIO to control macro definition.
+	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Use __FVWRITE_IN_STREAMIO
 	to control vector buffer.
 
 2013-03-26  Sebastian Huber  <sebastian.huber@embedded-brains.de>
@@ -3586,7 +3586,7 @@ summary.
 2012-08-10  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Fix guard around state to
-	allow usage in !FLOATING_POINT && __IO_C99_FORMATS case.
+	allow usage in !__IO_FLOATING_POINT && __IO_C99_FORMATS case.
 
 2012-08-08  Eric Blake  <eblake@redhat.com>
 
@@ -10307,7 +10307,7 @@ summary.
 2007-05-23  Eric Blake  <ebb9@byu.net>
 
 	* libc/stdio/vfscanf.c (__SVFSCANF_R): Support scanf(%1$s).
-	Avoid warning when !FLOATING_POINT.
+	Avoid warning when !__IO_FLOATING_POINT.
 	* libc/stdio/vfprintf.c (_VFPRINTF_R): Simplify _NO_POS_ARGS
 	slightly.
 
@@ -13483,7 +13483,7 @@ summary.
 
 2004-08-16  Nathan Sidwell  <nathan@codesourcery.com>
 
-	* libc/stdio/vfscanf.c (_NO_LONGLONG): Move out of FLOATING_POINT
+	* libc/stdio/vfscanf.c (_NO_LONGLONG): Move out of __IO_FLOATING_POINT
 	#if.
 
 2004-08-12  Jeff Johnston  <jjohnstn@redhat.com>
@@ -14626,7 +14626,7 @@ summary.
 	* iconvdata/Makefile.am: Make dependent on newlib's configure.host
 	and set up default flags to pass to aclocal.
 	* iconvdata/Makefile.in: Regenerated.
-	* libc/sys/linux/Makefile.am: Add _ELIX_LEVEL_4 getlogin, getpwnam,
+	* libc/sys/linux/Makefile.am: Add __ELIX_LEVEL_4 getlogin, getpwnam,
 	and getpwuid routines.
 	* libc/sys/linux/Makefile.in: Regenerated.
 	* libc/sys/linux/getlogin.c: New stub file to allow x86-linux
@@ -14637,7 +14637,7 @@ summary.
 	that were formerly supplied by /usr/include/linux/types.h with
 	kernel types.
 	* testsuite/newlib.wctype/twctype.c: Fix testcase to properly
-	test _ELIX_LEVEL macro.
+	test __ELIX_LEVEL macro.
 
 2003-11-07  Jeff Johnston  <jjohnstn@redhat.com>
 
@@ -14848,7 +14848,7 @@ summary.
 
 2003-09-04  Ben Elliston  <bje@wasabisystems.com>
 
-	* libc/stdlib/mstats.c[_ELIX_LEVEL]: Fix guards.  #ifndef FOO ||
+	* libc/stdlib/mstats.c[__ELIX_LEVEL]: Fix guards.  #ifndef FOO ||
 	FOO >= 2 is invalid; use #if !defined (FOO) || FOO >= 2 instead.
 
 2003-09-02  Thomas Pfaff  <tpfaff@gmx.net>
@@ -16767,14 +16767,14 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 
 2002-08-27  Jeff Johnston  <jjohnstn@redhat.com>
 
-	* configure.host: Remove _ELIX_LEVEL flag setting.
+	* configure.host: Remove __ELIX_LEVEL flag setting.
 	* Makefile.am(stmp-targ-include): Copy newlib.h to targ-include.
 	(install-data-local): Install newlib.h.
 	* Makefile.in: Regenerated.
 	* aclocal.m4: Ditto.
 	* configure: Ditto.
 	* configure.in: Add AM_CONFIG_HEADER to generate newlib.h based on
-	newlib.hin.  Add AC_DEFINE_UNQUOTED entries for _ELIX_LEVEL
+	newlib.hin.  Add AC_DEFINE_UNQUOTED entries for __ELIX_LEVEL
 	and _NEWLIB_VERSION to fill in newlib.h header file entries.
 	In AC_OUTPUT statement, unset ac_file so multilib support does
 	not use last ac_file temporary used in newlib.h configuration.
@@ -16793,7 +16793,7 @@ Thu Apr  3 14:01:16 2003  J"orn Rennecke <joern.rennecke@superh.com>
 	* acinclude.m4: Add support for --enable-newlib-elix-level option.
 	* aclocal.m4: Regenerated.
 	* configure: Ditto.
-	* configure.host: Add code to define _ELIX_LEVEL if
+	* configure.host: Add code to define __ELIX_LEVEL if
 	--enable-newlib-elix-level option is used.
 	* configure.in:
 	* libc/aclocal.m4: Regenerated.
@@ -18957,7 +18957,7 @@ Wed Mar  6 10:24:26 2002  J"orn Rennecke <joern.rennecke@superh.com>
 2002-02-27  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* configure.host: Add check for --disable-newlib-io-float
-	configuration option and add -DNO_FLOATING_POINT to newlib cflags
+	configuration option and add -D__IO_NO_FLOATING_POINT to newlib cflags
 	if appropriate.
 	* acinclude.m4: Added --disable-newlib-io-float option.
 	* aclocal.m4: Regenerated.
@@ -18965,8 +18965,8 @@ Wed Mar  6 10:24:26 2002  J"orn Rennecke <joern.rennecke@superh.com>
 	* doc/aclocal.m4 doc/configure libc/aclocal.m4 libc/configure
 	* libc/*/aclocal.m4 libc/*/configure
 	* libm/*/aclocal.m4 libm/*/configure: Ditto.
-	* libc/stdio/vfprintf.c [!INTEGER_ONLY]: Only set FLOATING_POINT
-	if NO_FLOATING_POINT flag is not defined.
+	* libc/stdio/vfprintf.c [!INTEGER_ONLY]: Only set __IO_FLOATING_POINT
+	if __IO_NO_FLOATING_POINT flag is not defined.
 
 2002-02-25  Jeff Johnston  <jjohnstn@redhat.com>
 

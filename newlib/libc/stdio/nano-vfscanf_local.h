@@ -46,8 +46,8 @@
 #ifndef VFSCANF_LOCAL
 #define VFSCANF_LOCAL
 
-#ifndef NO_FLOATING_POINT
-#define FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
+#define __IO_FLOATING_POINT
 #endif
 
 #ifdef STRING_ONLY
@@ -61,7 +61,7 @@
 #define _srefill _ssrefill
 #endif
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 #include <math.h>
 #include <float.h>
 

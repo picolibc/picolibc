@@ -61,8 +61,8 @@
 #ifndef VFPRINTF_LOCAL
 #define VFPRINTF_LOCAL
 
-#ifndef NO_FLOATING_POINT
-# define FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
+# define __IO_FLOATING_POINT
 #endif
 
 #define _NO_POS_ARGS
@@ -77,10 +77,10 @@
 
 #define _PRINTF_FLOAT_TYPE double
 
-#if defined (FLOATING_POINT)
+#if defined (__IO_FLOATING_POINT)
 # include <locale.h>
 #endif
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # include <math.h>
 
 /* For %La, an exponent of 15 bits occupies the exponent character,
@@ -91,7 +91,7 @@
 # define _DTOA __dtoa
 # define FREXP frexp
 
-#endif /* FLOATING_POINT.  */
+#endif /* __IO_FLOATING_POINT.  */
 
 /* BUF must be big enough for the maximum %#llo (assuming long long is
    at most 64 bits, this would be 23 characters), the maximum
@@ -204,7 +204,7 @@ struct _prt_data_t
   char zero;		/* Zero character.  */
   char buf[BUF];	/* Output buffer for non-floating point number.  */
   char l_buf[3];	/* Sign&hex_prefix, "+/-" and "0x/X".  */
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
   _PRINTF_FLOAT_TYPE _double_;	/* Double value.  */
   char expstr[MAXEXPLEN];	/* Buffer for exponent string.  */
   int lead;		/* The sig figs before decimal or group sep.  */

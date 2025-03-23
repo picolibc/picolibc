@@ -13,7 +13,7 @@ is freely granted, provided that this notice is preserved.
 
 int main()
 {
-#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL > 1
+#if !defined(__ELIX_LEVEL) || __ELIX_LEVEL > 1
   if (__MB_LEN_MAX == 1)
     {
       CHECK (iswalpha(L'a'));

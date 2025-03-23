@@ -435,7 +435,6 @@ if tinystdio and printf_aliases
 endif
 
 # A bunch of newlib-stdio only options
-newlib_global_stdio_streams = get_option('newlib-global-stdio-streams')
 newlib_fvwrite_in_streamio = get_option('newlib-fvwrite-in-streamio')
 newlib_fseek_optimization = get_option('newlib-fseek-optimization')
 newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
@@ -450,9 +449,6 @@ newlib_have_fcntl = get_option('newlib-have-fcntl')
 if tinystdio
   if newlib_io_float
     error('tinystdio uses a run-time mechanism to select floating point io (newlib-io-float)')
-  endif
-  if newlib_global_stdio_streams
-    error('tinystdio always has (reentrant) global stdio streams (newlib-global-stdio-streams)')
   endif
   if newlib_fvwrite_in_streamio
     error('tinystdio has no fvwrite support (newlib-fvwrite-in-streamio)')
@@ -1418,16 +1414,15 @@ if tinystdio
                 atomic_ungetc,
                 description: 'Use atomics for fgetc/ungetc for re-entrancy')
 else
-  conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
-  conf_data.set('FLOATING_POINT', newlib_io_float)
-  conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)
+  conf_data.set('__IO_NO_FLOATING_POINT', not newlib_io_float)
+  conf_data.set('__IO_FLOATING_POINT', newlib_io_float)
   conf_data.set('__LARGE64_FILES', newlib_stdio64)
-  conf_data.set('_ELIX_LEVEL', newlib_elix_level)
-  conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
-  conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
-  conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
-  conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
-  conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
+  conf_data.set('__ELIX_LEVEL', newlib_elix_level)
+  conf_data.set('__FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
+  conf_data.set('__FSEEK_OPTIMIZATION', newlib_fseek_optimization)
+  conf_data.set('__WIDE_ORIENT', newlib_wide_orient)
+  conf_data.set('__UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
+  conf_data.set('__NANO_FORMATTED_IO', newlib_nano_formatted_io)
 endif
 
 if enable_picocrt

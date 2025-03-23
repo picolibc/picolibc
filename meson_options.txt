@@ -176,8 +176,6 @@ option('newlib-fseek-optimization', type: 'boolean', value: false,
        description: 'enable fseek optimization')
 option('newlib-fvwrite-in-streamio', type: 'boolean', value: false,
        description: 'disable iov in streamio')
-option('newlib-global-stdio-streams', type: 'boolean', value: false,
-       description: 'enable global stdio streams')
 option('newlib-io-float', type: 'boolean', value: false,
        description: 'enable printf/scanf family float support')
 option('newlib-nano-formatted-io', type: 'boolean', value: false,

@@ -52,7 +52,7 @@
 # define printf_float(x) ((double) (x))
 #elif defined(__TINY_STDIO)
 # if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
-#  define NO_FLOATING_POINT
+#  define __IO_NO_FLOATING_POINT
 #  define NO_POS_ARGS
 #  define NO_MULTI_BYTE
 #  if !defined(__IO_MINIMAL_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
@@ -62,7 +62,7 @@
 #   define NO_C99_FORMATS
 #  endif
 # elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
-#  define NO_FLOATING_POINT
+#  define __IO_NO_FLOATING_POINT
 #  define NO_MULTI_BYTE
 #  ifndef __IO_POS_ARGS
 #   define NO_POS_ARGS
@@ -77,7 +77,7 @@
 #   define BINARY_FORMAT
 #  endif
 # elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
-#  define NO_FLOATING_POINT
+#  define __IO_NO_FLOATING_POINT
 #  define NO_MULTI_BYTE
 #  ifndef __IO_POS_ARGS
 #   define NO_POS_ARGS
@@ -110,28 +110,28 @@
 #else
 #define printf_float(x) ((double) (x))
 
-#ifndef _WIDE_ORIENT
+#ifndef __WIDE_ORIENT
 #define NO_WIDE_IO
 #endif
 
 #ifndef __IO_POS_ARGS
 #define NO_POS_ARGS
 #endif
-#if !defined(__IO_C99_FORMATS) || defined(_NANO_FORMATTED_IO)
+#if !defined(__IO_C99_FORMATS) || defined(__NANO_FORMATTED_IO)
 # define NO_C99_FORMATS
 #endif
 
 #if __SIZEOF_DOUBLE__ != 8
-#define NO_FLOATING_POINT
+#define __IO_NO_FLOATING_POINT
 #endif
 
 #ifndef __IO_LONG_LONG
 #define NO_LONG_LONG
 #endif
 
-#ifdef _NANO_FORMATTED_IO
+#ifdef __NANO_FORMATTED_IO
 
-#ifndef NO_FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
 extern int _printf_float();
 extern int _scanf_float();
 
@@ -141,7 +141,7 @@ int (*_reference_scanf_float)() = _scanf_float;
 #endif
 #endif
 
-#if !defined(NO_FLOATING_POINT)
+#if !defined(__IO_NO_FLOATING_POINT)
 static const double test_vals[] = { 1.234567, 1.1, M_PI };
 #endif
 
@@ -157,7 +157,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 	return i;
 }
 
-#if !defined(NO_FLOATING_POINT)
+#if !defined(__IO_NO_FLOATING_POINT)
 #ifdef PICOLIBC_FLOAT_PRINTF_SCANF
 #define float_type float
 #define pow(a,b) powf((float) (a), (float) (b))
@@ -231,7 +231,7 @@ static struct {
 };
 #endif
 
-#ifndef NO_FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
 
 static float_type
 int_exp10(int n)
@@ -347,7 +347,7 @@ main(void)
 #endif
 #endif
 
-#if !defined(NO_FLOATING_POINT)
+#if !defined(__IO_NO_FLOATING_POINT)
         printf("checking floating point\n");
 	sprintf(buf, "%g", printf_float(0.0f));
 	if (strcmp(buf, "0") != 0) {
@@ -450,7 +450,7 @@ main(void)
         }                                                               \
         } while(0)
 
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
 	CHECK_RT(unsigned char, "hh");
 #endif
 	CHECK_RT(unsigned short, "h");
@@ -478,7 +478,7 @@ main(void)
             void *r = (void *) -1;
             VERIFY("", "p");
         }
-#if !defined(NO_FLOATING_POINT)
+#if !defined(__IO_NO_FLOATING_POINT)
 
 #ifndef NO_FLOAT_EXACT
         for (x = 0; x < 37; x++) {

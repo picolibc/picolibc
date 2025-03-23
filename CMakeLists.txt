@@ -118,9 +118,9 @@ endif()
 
 set(_ATEXIT_DYNAMIC_ALLOC 0)
 
-set(_FSEEK_OPTIMIZATION 0)
+set(__FSEEK_OPTIMIZATION 0)
 
-set(_FVWRITE_IN_STREAMIO 0)
+set(__FVWRITE_IN_STREAMIO 0)
 
 # Use bitfields in packed structs
 picolibc_flag(__HAVE_BITFIELDS_IN_PACKED_STRUCTS)
@@ -189,13 +189,13 @@ if(NOT DEFINED __MB_EXTENDED_CHARSETS_JIS)
   option(__MB_EXTENDED_CHARSETS_JIS "Enable JIS multibyte encodings" OFF)
 endif()
 
-set(_NANO_FORMATTED_IO OFF)
+set(__NANO_FORMATTED_IO OFF)
 
 option(__NANO_MALLOC "Use smaller malloc implementation" ON)
 
 set(_GLOBAL_ATEXIT OFF)
 
-set(_UNBUF_STREAM_OPT OFF)
+set(__UNBUF_STREAM_OPT OFF)
 
 if(NOT DEFINED __IO_C99_FORMATS)
   option(__IO_C99_FORMATS "Support C99 formats in printf/scanf" ON)
@@ -271,10 +271,10 @@ set(__MATH_ERRNO OFF)
 
 set(_WANT_REGISTER_FINI OFF)
 
-set(_WIDE_ORIENT OFF)
+set(__WIDE_ORIENT OFF)
 
-if(NOT DEFINED _ELIX_LEVEL)
-  set(_ELIX_LEVEL 4)
+if(NOT DEFINED __ELIX_LEVEL)
+  set(__ELIX_LEVEL 4)
 endif()
 
 # Use old math code for double funcs (0 no, 1 yes)

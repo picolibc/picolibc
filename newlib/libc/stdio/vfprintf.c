@@ -132,8 +132,8 @@ static char *rcsid = "$Id$";
 # else
 #   define VFPRINTF vfprintf
 # endif
-# ifndef NO_FLOATING_POINT
-#  define FLOATING_POINT
+# ifndef __IO_NO_FLOATING_POINT
+#  define __IO_FLOATING_POINT
 # endif
 #endif
 
@@ -173,7 +173,7 @@ static char *rcsid = "$Id$";
 
 #ifdef STRING_ONLY
 
-# ifdef _FVWRITE_IN_STREAMIO
+# ifdef __FVWRITE_IN_STREAMIO
 #  define __SPRINT __ssprint
 # else
 #  define __SPRINT __ssputs
@@ -181,13 +181,13 @@ static char *rcsid = "$Id$";
 
 #else /* !STRING_ONLY */
 
-# ifdef _FVWRITE_IN_STREAMIO
+# ifdef __FVWRITE_IN_STREAMIO
 #  define __SPRINT __sprint
 # else
 #  define __SPRINT __sfputs
 # endif
 
-#ifdef _UNBUF_STREAM_OPT
+#ifdef __UNBUF_STREAM_OPT
 /*
  * Helper function for `fprintf to unbuffered unix file': creates a
  * temporary buffer.  We only work on write-only files; this avoids
@@ -228,14 +228,14 @@ __sbprintf (
 	__lock_close_recursive (fake._lock);
 	return (ret);
 }
-#endif /* _UNBUF_STREAM_OPT */
+#endif /* __UNBUF_STREAM_OPT */
 #endif /* !STRING_ONLY */
 
 
-#if defined (FLOATING_POINT) || defined (__IO_C99_FORMATS)
+#if defined (__IO_FLOATING_POINT) || defined (__IO_C99_FORMATS)
 # include <locale.h>
 #endif
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # include <math.h>
 
 /* For %La, an exponent of 15 bits occupies the exponent character, a
@@ -263,7 +263,7 @@ static char *cvt(_PRINTF_FLOAT_TYPE, int, int, char *, int *,
 
 static int exponent(char *, int, int);
 
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 
 /* BUF must be big enough for the maximum %#llo (assuming long long is
    at most 64 bits, this would be 23 characters), the maximum
@@ -408,7 +408,7 @@ VFPRINTF (
 	size_t thsnd_len = 0;
 	const char *grouping = NULL;
 #endif
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 	char *decimal_point = DECIMAL_POINT;
 	size_t decp_len = strlen (decimal_point);
 	char softsign;		/* temporary negative sign for floats */
@@ -418,11 +418,11 @@ VFPRINTF (
 	int expsize = 0;	/* character count for expstr */
 	char expstr[MAXEXPLEN];	/* buffer for exponent string */
 	int lead;		/* sig figs before decimal or group sep */
-#endif /* FLOATING_POINT */
-#if defined (FLOATING_POINT) || defined (__IO_C99_FORMATS)
+#endif /* __IO_FLOATING_POINT */
+#if defined (__IO_FLOATING_POINT) || defined (__IO_C99_FORMATS)
 	int ndig = 0;		/* actual number of digits returned by cvt */
 #endif
-#if defined (FLOATING_POINT) && defined (__IO_C99_FORMATS)
+#if defined (__IO_FLOATING_POINT) && defined (__IO_C99_FORMATS)
 	int nseps;		/* number of group separators with ' */
 	int nrepeats;		/* number of repeats of the last group */
 #endif
@@ -432,7 +432,7 @@ VFPRINTF (
 	int realsz;		/* field size expanded by dprec */
 	int size;		/* size of converted field or string */
 	char *xdigs = NULL;	/* digits for [xX] conversion */
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
 #define NIOV 8
 	struct __suio uio;	/* output information: summary */
 	struct __siov iov[NIOV];/* ... and individual io vectors */
@@ -463,7 +463,7 @@ VFPRINTF (
 	/*
 	 * BEWARE, these `goto error' on error, and PAD uses `n'.
 	 */
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
 #define	PRINT(ptr, len) { \
 	iovp->iov_base = (ptr); \
 	iovp->iov_len = (len); \
@@ -603,7 +603,7 @@ VFPRINTF (
 		return (EOF);
 	}
 
-#ifdef _UNBUF_STREAM_OPT
+#ifdef __UNBUF_STREAM_OPT
 	/* optimise fprintf(stderr) (and other unbuffered Unix files) */
 	if ((fp->_flags & (__SNBF|__SWR|__SRW)) == (__SNBF|__SWR) &&
 	    fp->_file >= 0) {
@@ -626,7 +626,7 @@ VFPRINTF (
 #endif /* STRING_ONLY */
 
 	fmt = (char *)fmt0;
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
 	uio.uio_iov = iovp = iov;
 	uio.uio_resid = 0;
 	uio.uio_iovcnt = 0;
@@ -682,7 +682,7 @@ VFPRINTF (
 		width = 0;
 		prec = -1;
 		sign = '\0';
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 		lead = 0;
 #ifdef __IO_C99_FORMATS
 		nseps = nrepeats = 0;
@@ -841,7 +841,7 @@ reswitch:	switch (ch) {
 #endif /* !_NO_POS_ARGS */
 			width = n;
 			goto reswitch;
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 		case 'L':
 			flags |= LONGDBL;
 			goto rflag;
@@ -947,7 +947,7 @@ reswitch:	switch (ch) {
 			}
 			base = DEC;
 			goto number;
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # ifdef __IO_C99_FORMATS
 		case 'a':
 		case 'A':
@@ -1123,7 +1123,7 @@ reswitch:	switch (ch) {
 			if (softsign)
 				sign = '-';
 			break;
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 #ifdef _GLIBC_EXTENSION
 		case 'm':  /* extension */
 			{
@@ -1448,7 +1448,7 @@ number:			if ((dprec = prec) >= 0)
 		PAD (dprec - size, zeroes);
 
 		/* the string or number proper */
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 		if ((flags & FPT) == 0) {
 			PRINT (cp, size);
 		} else {	/* glue together f_p fragments */
@@ -1510,7 +1510,7 @@ number:			if ((dprec = prec) >= 0)
 				PRINT (expstr, expsize);
 			}
 		}
-#else /* !FLOATING_POINT */
+#else /* !__IO_FLOATING_POINT */
 		PRINT (cp, size);
 #endif
 		/* left-adjusting padding (always blank) */
@@ -1539,7 +1539,7 @@ error:
 	/* NOTREACHED */
 }
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 
 /* Using reentrant DATA, convert finite VALUE into a string of digits
    with no decimal point, using NDIGITS precision and FLAGS as guides
@@ -1678,7 +1678,7 @@ exponent(char *p0, int exp, int fmtch)
 	}
 	return (p - p0);
 }
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 
 
 #ifndef _NO_POS_ARGS

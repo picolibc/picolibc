@@ -53,7 +53,7 @@ char *__cvt (_PRINTF_FLOAT_TYPE value, int ndigits,
 
 int __exponent (char *p0, int exp, int fmtch);
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 
 /* Using reentrant DATA, convert finite VALUE into a string of digits
    with no decimal point, using NDIGITS precision and FLAGS as guides

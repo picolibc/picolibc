@@ -360,7 +360,7 @@ __sprint (
       uio->uio_iovcnt = 0;
       return 0;
     }
-#if defined _WIDE_ORIENT && (!defined _ELIX_LEVEL || _ELIX_LEVEL >= 4)
+#if defined __WIDE_ORIENT && (!defined __ELIX_LEVEL || __ELIX_LEVEL >= 4)
     if (fp->_flags2 & __SWID)
       {
 	struct __siov *iov;
@@ -412,7 +412,7 @@ _sfputs (
 {
   register size_t i;
 
-#if defined _WIDE_ORIENT && (!defined _ELIX_LEVEL || _ELIX_LEVEL >= 4)
+#if defined __WIDE_ORIENT && (!defined __ELIX_LEVEL || __ELIX_LEVEL >= 4)
   if (fp->_flags2 & __SWID)
     {
       wchar_t *p;
@@ -525,7 +525,7 @@ VFPRINTF (
       prt_data.prec = -1;
       prt_data.dprec = 0;
       prt_data.l_buf[0] = '\0';
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
       prt_data.lead = 0;
 #endif
       /* The flags.  */
@@ -602,7 +602,7 @@ VFPRINTF (
       /* The conversion specifiers.  */
       prt_data.code = *fmt++;
       cp = memchr ("efgEFG", prt_data.code, 6);
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
       /* If cp is not NULL, we are facing FLOATING POINT NUMBER.  */
       if (cp)
 	{

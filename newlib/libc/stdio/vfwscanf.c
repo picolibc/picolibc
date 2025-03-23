@@ -102,8 +102,8 @@ __typeof(vfwscanf) vfiwscanf;
 #else
 #  define _SVFWSCANF _svfwscanf
 #endif
-#ifndef NO_FLOATING_POINT
-#define FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
+#define __IO_FLOATING_POINT
 #endif
 #endif
 
@@ -119,7 +119,7 @@ __typeof(vfwscanf) vfiwscanf;
 #define fgetwc sfgetwc
 #endif
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 #include <math.h>
 #include <float.h>
 #include <locale.h>
@@ -316,7 +316,7 @@ _SVFWSCANF (
   char *cp;
   short *sp;
   int *ip;
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
   float *flp;
   long double *ldp;
   double *dp;
@@ -468,7 +468,7 @@ _SVFWSCANF (
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 #ifdef __MB_CAPABLE
 #ifdef WDECIMAL_POINT
           decpt = *WDECIMAL_POINT;
@@ -487,7 +487,7 @@ _SVFWSCANF (
 #else
 	  decpt = (wchar_t) *DECIMAL_POINT;
 #endif /* !__MB_CAPABLE */
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 
   _newlib_flockfile_start (fp);
 
@@ -697,7 +697,7 @@ _SVFWSCANF (
 	  base = 16;
 	  break;
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # ifdef __IO_C99_FORMATS
 	case L'A':
 	case L'a':
@@ -1280,7 +1280,7 @@ _SVFWSCANF (
 	  nread += p - buf;
 	  break;
 	}
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 	case CT_FLOAT:
 	{
 	  /* scan a floating point number as if by wcstod */
@@ -1590,7 +1590,7 @@ _SVFWSCANF (
 	    }
 	  break;
 	}
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 	}
     }
 input_failure:

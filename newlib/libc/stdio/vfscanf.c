@@ -102,8 +102,8 @@ Supporting OS subroutines required:
 #else
 #  define _SVFSCANF _svfscanf
 #endif
-#ifndef NO_FLOATING_POINT
-#define FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
+#define __IO_FLOATING_POINT
 #endif
 #endif
 
@@ -119,7 +119,7 @@ Supporting OS subroutines required:
 #define _fread_r _sfread_r
 #endif
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 #include <math.h>
 #include <float.h>
 #include <locale.h>
@@ -540,7 +540,7 @@ _SVFSCANF (
   char *cp;
   short *sp;
   int *ip;
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
   float *flp;
   long double *ldp;
   double *dp;
@@ -811,7 +811,7 @@ _SVFSCANF (
 	  base = 16;
 	  break;
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # ifdef __IO_C99_FORMATS
 	case 'a':
 	case 'A':
@@ -937,7 +937,7 @@ _SVFSCANF (
 	  /* scan arbitrary characters (sets NOSKIP) */
 	  if (width == 0)
 	    width = 1;
-#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+#if !defined(__ELIX_LEVEL) || __ELIX_LEVEL >= 2
           if (flags & LONG)
             {
 #ifdef __IO_POSIX_EXTENSIONS
@@ -1055,7 +1055,7 @@ _SVFSCANF (
 	  if (width == 0)
 	    width = SIZE_MAX;
 	  /* take only those things in the class */
-#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+#if !defined(__ELIX_LEVEL) || __ELIX_LEVEL >= 2
 	  if (flags & LONG)
 	    {
 #ifdef __IO_POSIX_EXTENSIONS
@@ -1191,7 +1191,7 @@ _SVFSCANF (
 	  /* like CCL, but zero-length string OK, & no NOSKIP */
 	  if (width == 0)
 	    width = SIZE_MAX;
-#if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
+#if !defined(__ELIX_LEVEL) || __ELIX_LEVEL >= 2
           if (flags & LONG)
             {
 #ifdef __IO_POSIX_EXTENSIONS
@@ -1525,7 +1525,7 @@ _SVFSCANF (
 	  nread += p - buf + skips;
 	  break;
 	}
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 	case CT_FLOAT:
 	{
 	  /* scan a floating point number as if by strtod */
@@ -1944,7 +1944,7 @@ _SVFSCANF (
 	    }
 	  break;
 	}
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 	}
     }
 input_failure:

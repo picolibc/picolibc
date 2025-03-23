@@ -60,7 +60,7 @@ TEST(t, d, (double)x, "%a != %a") )
 #if defined(__PICOLIBC__)
 
 #if !defined(__TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
-#define NO_FLOATING_POINT
+#define __IO_NO_FLOATING_POINT
 #endif
 
 #if !defined(__MB_CAPABLE) || !defined(__TINY_STDIO)
@@ -317,7 +317,7 @@ static int test_sscanf(void)
 
         (void) d;
         (void) t;
-#if !defined(NO_FLOATING_POINT) && defined(__IO_FLOAT_EXACT)
+#if !defined(__IO_NO_FLOATING_POINT) && defined(__IO_FLOAT_EXACT)
 	TEST_F(123);
 	TEST_F(123.0);
 	TEST_F(123.0e+0);

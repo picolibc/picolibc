@@ -225,7 +225,7 @@ extern void (*_stdio_cleanup)(void);
 #define	FREELB(ptr, fp) { free((char *)(fp)->_lb._base);	\
       (fp)->_lb._base = NULL; }
 
-#ifdef _WIDE_ORIENT
+#ifdef __WIDE_ORIENT
 /*
  * Set the orientation for a stream. If o > 0, the stream has wide-
  * orientation. If o < 0, the stream has byte-orientation.
@@ -353,7 +353,7 @@ extern const __CH_CLASS __chclass[256];
 extern const __STATE __state_table[MAX_STATE][MAX_CH_CLASS];
 extern const __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];
 
-#if defined(_NANO_FORMATTED_IO) && defined(__strong_reference)
+#if defined(__NANO_FORMATTED_IO) && defined(__strong_reference)
 #define __nano_reference(a,b) __strong_reference(a,b)
 #else
 #define __nano_reference(a,b)

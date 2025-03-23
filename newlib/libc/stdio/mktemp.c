@@ -205,7 +205,7 @@ _gettemp (
 
   for (;;)
     {
-#if !defined _ELIX_LEVEL || _ELIX_LEVEL >= 4
+#if !defined __ELIX_LEVEL || __ELIX_LEVEL >= 4
       if (domkdir)
 	{
 #ifdef HAVE_MKDIR
@@ -219,7 +219,7 @@ _gettemp (
 #endif /* !HAVE_MKDIR */
 	}
       else
-#endif /* _ELIX_LEVEL */
+#endif /* __ELIX_LEVEL */
       if (doopen)
 	{
 	  if ((*doopen = open (path, O_CREAT | O_EXCL | O_RDWR | flags,
@@ -269,7 +269,7 @@ mkstemp (
   return (_gettemp (path, &fd, 0, 0, O_BINARY) ? fd : -1);
 }
 
-#if !defined _ELIX_LEVEL || _ELIX_LEVEL >= 4
+#if !defined __ELIX_LEVEL || __ELIX_LEVEL >= 4
 char *
 mkdtemp (
        char *path)
@@ -307,7 +307,7 @@ mkostemps (
 
   return (_gettemp (path, &fd, 0, len, flags & ~O_ACCMODE) ? fd : -1);
 }
-#endif /* _ELIX_LEVEL */
+#endif /* __ELIX_LEVEL */
 
 char *
 mktemp (

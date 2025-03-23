@@ -62,7 +62,7 @@
 # if __SIZEOF_DOUBLE__ == 4
 #  define LOW_FLOAT
 # endif
-# ifdef NO_FLOATING_POINT
+# ifdef __IO_NO_FLOATING_POINT
 #  define NO_FLOAT
 # endif
 # ifndef __IO_LONG_LONG
@@ -215,7 +215,7 @@
     result |= test(__LINE__, "$", "%c", 36);
     result |= test(__LINE__, "10", "%d", 10);
 
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
     result |= test(__LINE__, I("1000000","16960"), "%'d", 1000000);
 #endif
     /* 72: anti-test */
@@ -348,7 +348,7 @@
 #endif
     result |= test(__LINE__, "%0", "%%0");
     result |= test(__LINE__, "2345", "%hx", 74565);
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
     result |= test(__LINE__, "61", "%hhx", 0x61);
     result |= test(__LINE__, "61", "%hhx", 0x161);
     result |= test(__LINE__, "97", "%hhd", 0x61);
@@ -627,7 +627,7 @@
 #endif
 #endif
 #endif
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
 #ifndef NO_LONGLONG
     result |= test(__LINE__, "1, 1", "%-*.llu, %-*.llu",1,1ULL,1,1ULL);
 #endif
@@ -677,7 +677,7 @@
 #ifndef __IO_LONG_LONG
     if (sizeof (intmax_t) <= sizeof(long))
 #endif
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
 #ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "  42", "%4jd", (intmax_t)42L);
 #endif
