@@ -1357,10 +1357,10 @@ conf_data.set('__IO_FLOAT_EXACT', io_float_exact)
 conf_data.set('__IO_PERCENT_B', io_percent_b)
 conf_data.set('__IO_LONG_DOUBLE', io_long_double)
 conf_data.set('__IO_WCHAR', io_wchar)
-conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'))
-conf_data.set('__SINGLE_THREAD', get_option('single-thread'))
-conf_data.set('__HAVE_FCNTL', newlib_have_fcntl)
-conf_data.set('__NANO_MALLOC', newlib_nano_malloc)
+conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'), description: 'assert() is verbose by default')
+conf_data.set('__SINGLE_THREAD', get_option('single-thread'), description: 'Disable multi-thread support')
+conf_data.set('__HAVE_FCNTL', newlib_have_fcntl, description: 'System provides fcntl function')
+conf_data.set('__NANO_MALLOC', newlib_nano_malloc, description: 'Provide smaller malloc implementation')
 conf_data.set('__NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
 conf_data.set('__IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
 conf_data.set('__MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
@@ -1431,7 +1431,7 @@ else
 endif
 
 if enable_picocrt
-  conf_data.set('_PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
+  conf_data.set('__PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
                 description: 'Turn on mmu in picocrt startup code')
   conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
 	        get_option('crt-runtime-size'),

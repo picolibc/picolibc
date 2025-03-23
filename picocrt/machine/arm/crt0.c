@@ -95,7 +95,7 @@ _start(void)
 
 #else /*  __ARM_ARCH_PROFILE == 'M' */
 
-#ifdef _PICOCRT_ENABLE_MMU
+#ifdef __PICOCRT_ENABLE_MMU
 
 #if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
 
@@ -167,7 +167,7 @@ __asm__(
 );
 #endif
 
-#endif /* _PICOCRT_ENABLE_MMU */
+#endif /* __PICOCRT_ENABLE_MMU */
 
 /*
  * Set up all of the shadow stack pointers. With Thumb 1 ISA we need
@@ -263,7 +263,7 @@ _cstart(void)
     __asm__("mcr p15, #0, %0, c12, c0, 0" : : "r"(__vector_table) :);
 #endif
 
-#ifdef _PICOCRT_ENABLE_MMU
+#ifdef __PICOCRT_ENABLE_MMU
 
 #if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
 
@@ -318,7 +318,7 @@ _cstart(void)
         }
 #endif
 
-#endif /* _PICOCRT_ENABLE_MMU */
+#endif /* __PICOCRT_ENABLE_MMU */
 
 	__start();
 }

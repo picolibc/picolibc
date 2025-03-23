@@ -143,7 +143,7 @@ set(__INIT_FINI_ARRAY 1)
 set(__INIT_FINI_FUNCS 1)
 
 # Enable MMU in pico crt startup
-set(_PICOCRT_ENABLE_MMU 1)
+set(__PICOCRT_ENABLE_MMU 1)
 
 # _set_tls and _init_tls functions available
 if(NOT DEFINED __THREAD_LOCAL_STORAGE_API OR NOT __THREAD_LOCAL_STORAGE)
