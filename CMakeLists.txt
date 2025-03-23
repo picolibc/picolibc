@@ -209,8 +209,8 @@ if(NOT DEFINED __IO_LONG_DOUBLE)
   option(__IO_LONG_DOUBLE "Support long double in printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_MINIMAL_IO_LONG_LONG)
-  option(_WANT_MINIMAL_IO_LONG_LONG "Support long long in minimal printf/scanf" OFF)
+if(NOT DEFINED __IO_MINIMAL_LONG_LONG)
+  option(__IO_MINIMAL_LONG_LONG "Support long long in minimal printf/scanf" OFF)
 endif()
 
 if(NOT DEFINED __IO_POS_ARGS)

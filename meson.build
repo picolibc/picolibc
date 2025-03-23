@@ -1350,7 +1350,7 @@ conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 
 conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 conf_data.set('__IO_LONG_LONG', io_long_long)
-conf_data.set('_WANT_MINIMAL_IO_LONG_LONG', minimal_io_long_long)
+conf_data.set('__IO_MINIMAL_LONG_LONG', minimal_io_long_long)
 conf_data.set('__FAST_BUFIO', fast_bufio)
 conf_data.set('__IO_POS_ARGS', io_pos_args)
 conf_data.set('__IO_C99_FORMATS', io_c99_formats)

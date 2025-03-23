@@ -55,7 +55,7 @@
 #  define NO_FLOATING_POINT
 #  define NO_POS_ARGS
 #  define NO_MULTI_BYTE
-#  if !defined(_WANT_MINIMAL_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
+#  if !defined(__IO_MINIMAL_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #   define NO_LONG_LONG
 #  endif
 #  ifndef __IO_C99_FORMATS

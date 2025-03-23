@@ -480,7 +480,7 @@ __printf_float(float f)
 
 #if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
 # define printf_float(x) ((double) (x))
-# if defined(_WANT_MINIMAL_IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+# if defined(__IO_MINIMAL_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
 # endif
 # ifdef __IO_C99_FORMATS

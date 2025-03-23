@@ -129,7 +129,7 @@
 
 #cmakedefine __IO_LONG_DOUBLE
 
-#cmakedefine _WANT_MINIMAL_IO_LONG_LONG
+#cmakedefine __IO_MINIMAL_LONG_LONG
 
 #cmakedefine __IO_POS_ARGS
 
