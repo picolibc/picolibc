@@ -267,7 +267,7 @@ if(NOT DEFINED __IO_DEFAULT_INTEGER)
 endif()
 
 # math library sets errno
-set(_WANT_MATH_ERRNO OFF)
+set(__MATH_ERRNO OFF)
 
 set(_WANT_REGISTER_FINI OFF)
 

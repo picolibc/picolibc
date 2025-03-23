@@ -40,7 +40,7 @@ __float64
 sqrt64(__float64 x)
 {
 	__float64 result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0))
             return __math_invalid(x);
 #endif

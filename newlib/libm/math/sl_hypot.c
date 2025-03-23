@@ -17,7 +17,7 @@ hypotl(long double x, long double y)
 
     /* Keep it simple for now...  */
     long double z = sqrtl((x * x) + (y * y));
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
     if (!finite(z) && finite(x) && finite(y))
         errno = ERANGE;
 #endif

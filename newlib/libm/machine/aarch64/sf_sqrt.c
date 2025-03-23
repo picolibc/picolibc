@@ -31,7 +31,7 @@ float
 sqrtf (float x)
 {
   float result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
   if (isless(x, 0.0f))
       return __math_invalidf(x);
 #endif

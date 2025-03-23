@@ -144,7 +144,7 @@
 #cmakedefine __IO_DEFAULT_MINIMAL
 
 /* math library sets errno */
-#cmakedefine _WANT_MATH_ERRNO
+#cmakedefine __MATH_ERRNO
 
 #cmakedefine _WANT_REGISTER_FINI
 

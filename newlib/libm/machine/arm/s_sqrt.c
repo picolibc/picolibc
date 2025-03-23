@@ -31,7 +31,7 @@ double
 sqrt(double x)
 {
 	double result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0))
             return __math_invalid(x);
 #endif

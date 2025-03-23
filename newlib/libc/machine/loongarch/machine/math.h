@@ -38,7 +38,7 @@
 
 #ifndef __loongarch_soft_float
 
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
 #include <errno.h>
 #endif
 
@@ -183,7 +183,7 @@ __declare_extern_inline(double)
 sqrt (double x)
 {
 	double result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0))
             errno = EDOM;
 #endif
@@ -290,7 +290,7 @@ __declare_extern_inline(float)
 sqrtf (float x)
 {
 	float result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0f))
             errno = EDOM;
 #endif
