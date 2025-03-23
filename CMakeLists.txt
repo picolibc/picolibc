@@ -159,7 +159,7 @@ if(NOT DEFINED __IO_FLOAT_EXACT)
   option(__IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
 endif()
 
-set(_PICO_EXIT 1)
+set(__PICO_EXIT 1)
 
 if(NOT DEFINED __ASSERT_VERBOSE)
   option(__ASSERT_VERBOSE "Assert provides verbose information" ON)

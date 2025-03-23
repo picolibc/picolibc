@@ -1384,7 +1384,7 @@ if mb_capable
   conf_data.set('__MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
 endif
 
-conf_data.set('_PICO_EXIT', picoexit)
+conf_data.set('__PICO_EXIT', picoexit)
 if not picoexit
   conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
   conf_data.set('_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
