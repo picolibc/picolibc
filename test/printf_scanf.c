@@ -189,7 +189,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #endif
 #endif
 
-#if defined(__PICOLIBC__) && !defined(TINYSTDIO)
+#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
 #define LEGACY_NEWLIB
 #endif
 
