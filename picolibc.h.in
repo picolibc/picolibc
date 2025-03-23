@@ -171,7 +171,7 @@
 #define __OBSOLETE_MATH_DOUBLE @__OBSOLETE_MATH_DOUBLE@
 
 /* Compute static memory area sizes at runtime instead of link time */
-#cmakedefine __PICOLIBC_CRT_RUNTIME_SIZE
+#cmakedefine __PICOCRT_RUNTIME_SIZE
 
 /* The Picolibc minor version number. */
 #define __PICOLIBC_MINOR__ @PROJECT_VERSION_MINOR@

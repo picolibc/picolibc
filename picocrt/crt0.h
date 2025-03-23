@@ -49,7 +49,7 @@ extern char __tls_base[];
 extern char __tdata_end[];
 extern char __tls_end[];
 
-#ifdef __PICOLIBC_CRT_RUNTIME_SIZE
+#ifdef __PICOCRT_RUNTIME_SIZE
 #define __data_size (__data_end - __data_start)
 #define __bss_size (__bss_end - __bss_start)
 #endif

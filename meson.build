@@ -1433,7 +1433,7 @@ endif
 if enable_picocrt
   conf_data.set('__PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
                 description: 'Turn on mmu in picocrt startup code')
-  conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
+  conf_data.set('__PICOCRT_RUNTIME_SIZE',
 	        get_option('crt-runtime-size'),
 	        description: 'Compute static memory area sizes at runtime instead of link time')
 endif

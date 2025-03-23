@@ -284,7 +284,7 @@ set(__OBSOLETE_MATH_FLOAT ON)
 set(__OBSOLETE_MATH_DOUBLE ON)
 
 # Compute static memory area sizes at runtime instead of link time
-set(__PICOLIBC_CRT_RUNTIME_SIZE OFF)
+set(__PICOCRT_RUNTIME_SIZE OFF)
 
 if(NOT DEFINED __SINGLE_THREAD)
   option(__SINGLE_THREAD "Disable multithreading support" OFF)
