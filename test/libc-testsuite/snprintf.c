@@ -199,7 +199,7 @@ static int test_snprintf(void)
 #endif
 #endif
 
-#if !defined(__TINY_STDIO) || defined(_PRINTF_PERCENT_N)
+#if !defined(__TINY_STDIO) || defined(__IO_PERCENT_N)
         /* Tests for %hhn, %hn, %n, %ln, %lln */
         int len;
         short slen;

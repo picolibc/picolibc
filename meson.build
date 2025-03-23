@@ -1411,7 +1411,7 @@ if tinystdio
   conf_data.set('_PRINTF_SMALL_ULTOA',
                 printf_small_ultoa,
                 description: 'avoid software division in decimal conversion')
-  conf_data.set('_PRINTF_PERCENT_N',
+  conf_data.set('__IO_PERCENT_N',
                 printf_percent_n,
                 description: 'support %n in printf format strings')
   conf_data.set('__ATOMIC_UNGETC',

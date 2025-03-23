@@ -79,7 +79,7 @@
 
 #cmakedefine _PRINTF_SMALL_ULTOA
 
-#cmakedefine _PRINTF_PERCENT_N
+#cmakedefine __IO_PERCENT_N
 
 #cmakedefine __IO_PERCENT_B
 

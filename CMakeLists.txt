@@ -223,8 +223,8 @@ if(NOT DEFINED _PRINTF_SMALL_ULTOA)
   option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" ON)
 endif()
 
-if(NOT DEFINED _PRINTF_PERCENT_N)
-  option(_PRINTF_PERCENT_N "Support %n formats in printf" OFF)
+if(NOT DEFINED __IO_PERCENT_N)
+  option(__IO_PERCENT_N "Support %n formats in printf" OFF)
 endif()
 
 if(NOT DEFINED __IO_PERCENT_B)

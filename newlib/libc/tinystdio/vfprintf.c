@@ -1162,7 +1162,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
                 }
 #endif
-#if defined(_PRINTF_PERCENT_N) || defined(VFPRINTF_S)
+#if defined(__IO_PERCENT_N) || defined(VFPRINTF_S)
             } else if (c == 'n') {
 #ifdef VFPRINTF_S
                 msg = "format string contains percent-n";
