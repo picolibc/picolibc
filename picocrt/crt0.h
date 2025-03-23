@@ -80,7 +80,7 @@ extern void __libc_init_array(void);
 
 #include <picotls.h>
 #include <stdio.h>
-#ifdef _HAVE_ARM_SEMIHOST
+#ifdef __ARM_SEMIHOST
 #include <semihost.h>
 #endif
 
@@ -104,7 +104,7 @@ __start(void)
 	__libc_init_array();
 #endif
 
-#if defined(CRT0_SEMIHOST) && defined(_HAVE_ARM_SEMIHOST)
+#if defined(CRT0_SEMIHOST) && defined(__ARM_SEMIHOST)
 #define CMDLINE_LEN     1024
 #define ARGV_LEN        64
         static char cmdline[CMDLINE_LEN];
