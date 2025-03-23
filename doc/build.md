@@ -233,6 +233,7 @@ As a separate option, you can make `errno` not use TLS if necessary.
 | newlib-global-errno         | false   | Use single global errno even when thread-local-storage=true                          |
 | errno-function              | <empty> | If set, names a function which returns the address of errno. 'auto' will try to auto-detect. |
 | tls-rp2040                  | false   | Use Raspberry PI RP2040 CPUID register to index thread local storage value           |
+| stack-protector-guard       | auto    | Select stack protection canary type (global, tls or auto)                            |
 
 ### Math options
 
