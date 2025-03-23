@@ -399,6 +399,40 @@ if thread_local_storage
   tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
 endif
 
+stack_guard_spec = ''
+stack_guard_option = get_option('stack-protector-guard')
+prefer_tls_stack_guard = false
+if stack_guard_option == 'tls'
+  prefer_tls_stack_guard = true
+else
+  if stack_guard_option == 'auto' and host_cpu_family == 'powerpc'
+    prefer_tls_stack_guard = true
+  endif
+endif
+have_tls_stack_guard = fs.is_file('newlib/libc/machine' / host_cpu_family / 'machine/_ssp_tls.h')
+if have_tls_stack_guard
+  c_stack_guard_tls_flags = cc.get_supported_arguments(['-mstack-protector-guard=tls'])
+  if c_stack_guard_tls_flags == []
+    have_tls_stack_guard = false
+  endif
+endif
+tls_stack_guard = prefer_tls_stack_guard and have_tls_stack_guard
+if tls_stack_guard
+  stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=tls}'
+else
+  if stack_guard_option == 'tls'
+    if not thread_local_storage
+      error('stack-protector-guard=tls option selected, but thread local storage disabled')
+    else
+      error('stack-protector-guard=tls option selected, but not supported for this CPU')
+    endif
+  endif
+  c_stack_guard_global_flags = cc.get_supported_arguments(['-mstack-protector-guard=global'])
+  if c_stack_guard_global_flags != []
+    stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=global}'
+  endif
+endif
+
 if sysroot_install
   # Get 'sysroot' or 'GCC_EXEC_PREFIX' from GCC output
   sysroot = run_command(cc.cmd_array() + ['-print-sysroot'], check : true).stdout().split('\n')[0]
@@ -638,6 +672,7 @@ specs_data.set('SPECS_ISYSTEM', specs_isystem)
 specs_data.set('SPECS_LIBPATH', specs_libpath)
 specs_data.set('SPECS_STARTFILE', specs_startfile)
 specs_data.set('TLSMODEL', tls_model_spec)
+specs_data.set('STACKGUARD', stack_guard_spec)
 specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
 specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
 specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
@@ -1277,6 +1312,7 @@ conf_data.set('__THREAD_LOCAL_STORAGE', thread_local_storage, description: 'use 
 conf_data.set('__THREAD_LOCAL_STORAGE_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),
               description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
+conf_data.set('__THREAD_LOCAL_STORAGE_STACK_GUARD', tls_stack_guard, description: 'use thread local storage for stack protection canary')
 conf_data.set('__HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('__HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
 

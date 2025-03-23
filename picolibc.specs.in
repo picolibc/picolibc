@@ -7,10 +7,10 @@
 @SPECS_ISYSTEM@ %{-printf=*: -D_PICOLIBC_PRINTF='%*'} %{-scanf=*: -D_PICOLIBC_SCANF='%*'} %(picolibc_cpp)
 
 *cc1:
-@TLSMODEL@ %(picolibc_cc1) @CC1_SPEC@
+@TLSMODEL@ @STACKGUARD@ %(picolibc_cc1) @CC1_SPEC@
 
 *cc1plus:
-@SPECS_ISYSTEM@ @TLSMODEL@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
+@SPECS_ISYSTEM@ @TLSMODEL@ @STACKGUARD@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
 
 *link:
 @SPECS_PRINTF@ @SPECS_LIBPATH@ %{-printf=*:--defsym=vfprintf=__%*_vfprintf} %{-scanf=*:--defsym=vfscanf=__%*_vfscanf} %{!T:-T@PICOLIBC_LD@} %(picolibc_link) --gc-sections @LINK_SPEC@

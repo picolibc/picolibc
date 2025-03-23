@@ -96,6 +96,11 @@ if(NOT DEFINED __THREAD_LOCAL_STORAGE)
   option(__THREAD_LOCAL_STORAGE "use thread local storage for static data" ON)
 endif()
 
+# use thread local storage for stack protection canary
+if(NOT DEFINED __THREAD_LOCAL_STORAGE_STACK_GUARD)
+  option(__THREAD_LOCAL_STORAGE_STACK_GUARD "use thread local storage for stack protection canary" OFF)
+endif()
+
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed

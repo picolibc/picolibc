@@ -26,6 +26,9 @@
 /* use thread local storage */
 #cmakedefine __THREAD_LOCAL_STORAGE
 
+/* use thread local storage for stack protection canary */
+#cmakedefine __THREAD_LOCAL_STORAGE_STACK_GUARD
+
 /* Use posix apis for console too */
 #cmakedefine POSIX_CONSOLE
 
