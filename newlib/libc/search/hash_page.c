@@ -880,7 +880,7 @@ open_temp(
         strcpy(namestr, "_hashXXXXXX");
 	if ((hashp->fp = mkstemp(namestr)) != -1) {
 		(void)unlink(namestr);
-#ifdef _HAVE_FCNTL
+#ifdef __HAVE_FCNTL
 		(void)fcntl(hashp->fp, F_SETFD, 1);
 #endif
 	}

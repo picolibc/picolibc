@@ -102,7 +102,7 @@ stdout_init(FILE *ptr)
      we will default to line buffered mode here.  Technically, POSIX
      requires both stdin and stdout to be line-buffered, but tradition
      leaves stdin alone on systems without fcntl.  */
-#ifdef _HAVE_FCNTL
+#ifdef __HAVE_FCNTL
   std (ptr, __SWR, 1);
 #else
   std (ptr, __SWR | __SLBF, 1);

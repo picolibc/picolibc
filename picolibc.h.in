@@ -55,7 +55,7 @@
 /* Compiler supports _Complex */
 #cmakedefine _HAVE_COMPLEX
 
-#cmakedefine _HAVE_FCNTL
+#cmakedefine __HAVE_FCNTL
 
 /* IEEE fp funcs available */
 #cmakedefine __IEEEFP_FUNCS

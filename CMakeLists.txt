@@ -131,7 +131,7 @@ picolibc_flag(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 # Compiler supports _Complex
 picolibc_flag(_HAVE_COMPLEX)
 
-set(_HAVE_FCNTL 0)
+set(__HAVE_FCNTL 0)
 
 # IEEE fp funcs available
 set(__IEEEFP_FUNCS 0)
