@@ -87,7 +87,7 @@ check_long_double(const char *name, int i, long double prec, long double expect,
     if (!within_error(expect, result, prec)) {
         long double diff = fabsl(expect - result);
 #ifdef __PICOLIBC__
-#ifdef _WANT_IO_LONG_DOUBLE
+#ifdef __IO_LONG_DOUBLE
         printf("%s test %d got %La expect %La diff %La\n", name, i, result, expect, diff);
 #else
         printf("%s test %d got %a expect %a diff %a\n", name, i, (double) result, (double) expect, (double) diff);
@@ -208,7 +208,7 @@ typedef CONST struct {
 
 #include "long_double_vec.h"
 
-#if !defined(__PICOLIBC__) || (defined(_WANT_IO_LONG_DOUBLE) && (defined(__TINY_STDIO) || defined(FLOATING_POINT)))
+#if !defined(__PICOLIBC__) || (defined(__IO_LONG_DOUBLE) && (defined(__TINY_STDIO) || defined(FLOATING_POINT)))
 #define TEST_IO_LONG_DOUBLE
 #endif
 
@@ -403,7 +403,7 @@ static const int test_exp[] = {
  * For 64-bit values, we may have exact conversions. Otherwise, allow
  * some error
  */
-#ifdef _IO_FLOAT_EXACT
+#ifdef __IO_FLOAT_EXACT
 # if __SIZEOF_LONG_DOUBLE__ == 8
 #  define MAX_DECIMAL_ERROR       0
 # else

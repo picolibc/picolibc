@@ -75,15 +75,15 @@
 /* math library does not set errno (offering only ieee semantics) */
 #cmakedefine _IEEE_LIBM
 
-#cmakedefine _IO_FLOAT_EXACT
+#cmakedefine __IO_FLOAT_EXACT
 
 #cmakedefine _PRINTF_SMALL_ULTOA
 
 #cmakedefine _PRINTF_PERCENT_N
 
-#cmakedefine _WANT_IO_PERCENT_B
+#cmakedefine __IO_PERCENT_B
 
-#cmakedefine _WANT_IO_WCHAR
+#cmakedefine __IO_WCHAR
 
 #cmakedefine _LITE_EXIT
 
@@ -123,15 +123,15 @@
 
 #cmakedefine _UNBUF_STREAM_OPT
 
-#cmakedefine _WANT_IO_C99_FORMATS
+#cmakedefine __IO_C99_FORMATS
 
-#cmakedefine _WANT_IO_LONG_LONG
+#cmakedefine __IO_LONG_LONG
 
-#cmakedefine _WANT_IO_LONG_DOUBLE
+#cmakedefine __IO_LONG_DOUBLE
 
 #cmakedefine _WANT_MINIMAL_IO_LONG_LONG
 
-#cmakedefine _WANT_IO_POS_ARGS
+#cmakedefine __IO_POS_ARGS
 
 #cmakedefine _FORMAT_DEFAULT_DOUBLE
 

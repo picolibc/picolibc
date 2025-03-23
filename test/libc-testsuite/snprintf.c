@@ -182,7 +182,7 @@ static int test_snprintf(void)
 	TEST(i, b[5], 'x', "buffer overrun");
 
 #if __SIZEOF_DOUBLE__ == 8
-#if defined(__TINY_STDIO) || (!defined(NO_FLOATING_POINT) && (!defined(_WANT_IO_LONG_DOUBLE) || defined(_LDBL_EQ_DBL)))
+#if defined(__TINY_STDIO) || (!defined(NO_FLOATING_POINT) && (!defined(__IO_LONG_DOUBLE) || defined(_LDBL_EQ_DBL)))
 	/* Perform ascii arithmetic to test printing tiny doubles */
 	TEST(i, snprintf(b, sizeof b, "%.1022f", 0x1p-1021), 1024, "%d != %d");
 	b[1] = '0';
@@ -219,7 +219,7 @@ static int test_snprintf(void)
         TEST(i, snprintf(b, sizeof b, "%d%ln456", n, &llen), 6, "length for %ln");
         TEST_S(b, "123456", "incorrect output");
         TEST(i, llen, 3, "incorrect len");
-#if !defined(__PICOLIBC__) || defined(__TINY_STDIO) || defined(_WANT_IO_LONG_LONG)
+#if !defined(__PICOLIBC__) || defined(__TINY_STDIO) || defined(__IO_LONG_LONG)
         long long lllen;
         TEST(i, snprintf(b, sizeof b, "%d%lln456", n, &lllen), 6, "length for %lln");
         TEST_S(b, "123456", "incorrect output");
@@ -241,7 +241,7 @@ static int test_snprintf(void)
 
         (void) fp_tests;
         (void) k;
-#if !defined(NO_FLOATING_POINT) && defined(_IO_FLOAT_EXACT) && __SIZEOF_DOUBLE__ == 8
+#if !defined(NO_FLOATING_POINT) && defined(__IO_FLOAT_EXACT) && __SIZEOF_DOUBLE__ == 8
 	for (j=0; fp_tests[j].fmt; j++) {
 		TEST(i, snprintf(b, sizeof b, fp_tests[j].fmt, fp_tests[j].f), (int) strlen(b), "%d != %d");
 		TEST_S(b, fp_tests[j].expect, "bad floating point conversion");

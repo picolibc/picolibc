@@ -32,7 +32,7 @@ extern double_type doubles[];
 
 double_type *pd = doubles;
 
-#ifdef _IO_FLOAT_EXACT
+#ifdef __IO_FLOAT_EXACT
 #if !defined(TINYSTDIO) && defined(__m68k__) && !defined(__mcf_fpu__) && !defined(__HAVE_M68881__)
 /* soft floats on m68k have rounding bugs for 64-bit values */
 #define CONVERT_BITS_DOUBLE	63

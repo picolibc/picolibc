@@ -66,7 +66,7 @@
 #endif
 
 #define _NO_POS_ARGS
-#undef _WANT_IO_C99_FORMATS
+#undef __IO_C99_FORMATS
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the __ldtoa code be

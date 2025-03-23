@@ -81,7 +81,7 @@ static int test_sscanf(void)
 	char a[100], b[100], c[100];
         wchar_t aw[100], bw[100], cw[100];
 	int x, y, z, u, v;
-#ifdef _WANT_IO_PERCENT_B
+#ifdef __IO_PERCENT_B
         int w;
 #endif
 	double d, t;
@@ -289,7 +289,7 @@ static int test_sscanf(void)
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #endif
 
-#ifdef _WANT_IO_PERCENT_B
+#ifdef __IO_PERCENT_B
 	TEST(i, sscanf("011 0x100 0b101 11 100 101", "%i %i %i %o %x %b\n", &x, &y, &z, &u, &v, &w), 6, "only %d fields, expected %d");
 	TEST(i, x, 9, "%d != %d");
 	TEST(i, y, 256, "%d != %d");
@@ -317,7 +317,7 @@ static int test_sscanf(void)
 
         (void) d;
         (void) t;
-#if !defined(NO_FLOATING_POINT) && defined(_IO_FLOAT_EXACT)
+#if !defined(NO_FLOATING_POINT) && defined(__IO_FLOAT_EXACT)
 	TEST_F(123);
 	TEST_F(123.0);
 	TEST_F(123.0e+0);

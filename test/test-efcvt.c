@@ -156,14 +156,14 @@ const struct test fcvtf_tests[] = {
 
 #define N_FCVTF_TESTS    (sizeof(fcvtf_tests) / sizeof(fcvtf_tests[0]))
 
-#if defined(__TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
+#if defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT)
 /* non-exact tinystdio conversions are not precise over about 6 digits */
 #define SKIP_LONG_FLOAT 1
 #else
 #define SKIP_LONG_FLOAT 0
 #endif
 
-#if (!defined(__TINY_STDIO) || !defined(_IO_FLOAT_EXACT)) && __SIZEOF_DOUBLE__ < 8
+#if (!defined(__TINY_STDIO) || !defined(__IO_FLOAT_EXACT)) && __SIZEOF_DOUBLE__ < 8
 #undef SKIP_LONG_FLOAT
 #define SKIP_LONG_FLOAT 1
 #define SKIP_LONGISH_FLOAT 1

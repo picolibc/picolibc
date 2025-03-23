@@ -58,52 +58,52 @@
 #  if !defined(_WANT_MINIMAL_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #   define NO_LONG_LONG
 #  endif
-#  ifndef _WANT_IO_C99_FORMATS
+#  ifndef __IO_C99_FORMATS
 #   define NO_C99_FORMATS
 #  endif
 # elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
 #  define NO_MULTI_BYTE
-#  ifndef _WANT_IO_POS_ARGS
+#  ifndef __IO_POS_ARGS
 #   define NO_POS_ARGS
 #  endif
-#  if !defined(_WANT_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
+#  if !defined(__IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #   define NO_LONG_LONG
 #  endif
-#  ifndef _WANT_IO_C99_FORMATS
+#  ifndef __IO_C99_FORMATS
 #   define NO_C99_FORMATS
 #  endif
-#  ifdef _WANT_IO_PERCENT_B
+#  ifdef __IO_PERCENT_B
 #   define BINARY_FORMAT
 #  endif
 # elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
 #  define NO_FLOATING_POINT
 #  define NO_MULTI_BYTE
-#  ifndef _WANT_IO_POS_ARGS
+#  ifndef __IO_POS_ARGS
 #   define NO_POS_ARGS
 #  endif
-#  ifndef _WANT_IO_C99_FORMATS
+#  ifndef __IO_C99_FORMATS
 #   define NO_C99_FORMATS
 #  endif
-#  ifdef _WANT_IO_PERCENT_B
+#  ifdef __IO_PERCENT_B
 #   define BINARY_FORMAT
 #  endif
 # elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
 #  define NO_MULTI_BYTE
-#  ifndef _IO_FLOAT_EXACT
+#  ifndef __IO_FLOAT_EXACT
 #   define NO_FLOAT_EXACT
 #  endif
-#  ifdef _WANT_IO_PERCENT_B
+#  ifdef __IO_PERCENT_B
 #   define BINARY_FORMAT
 #  endif
 # elif defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
 #  ifndef _HAS_IO_MBCHAR
 #   define NO_MULTI_BYTE
 #  endif
-#  ifndef _IO_FLOAT_EXACT
+#  ifndef __IO_FLOAT_EXACT
 #   define NO_FLOAT_EXACT
 #  endif
-#  ifdef _WANT_IO_PERCENT_B
+#  ifdef __IO_PERCENT_B
 #   define BINARY_FORMAT
 #  endif
 # endif
@@ -114,10 +114,10 @@
 #define NO_WIDE_IO
 #endif
 
-#ifndef _WANT_IO_POS_ARGS
+#ifndef __IO_POS_ARGS
 #define NO_POS_ARGS
 #endif
-#if !defined(_WANT_IO_C99_FORMATS) || defined(_NANO_FORMATTED_IO)
+#if !defined(__IO_C99_FORMATS) || defined(_NANO_FORMATTED_IO)
 # define NO_C99_FORMATS
 #endif
 
@@ -125,7 +125,7 @@
 #define NO_FLOATING_POINT
 #endif
 
-#ifndef _WANT_IO_LONG_LONG
+#ifndef __IO_LONG_LONG
 #define NO_LONG_LONG
 #endif
 
@@ -164,7 +164,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #define nextafter(a,b) nextafterf((float)(a), (float)(b))
 #define fabs(a) fabsf(a)
 #define scanf_format "%f"
-#if (defined(__TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
+#if (defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT))
 #define ERROR_MAX 1e-6
 #else
 #define ERROR_MAX 0
@@ -172,14 +172,14 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #else
 #define float_type double
 #define scanf_format "%lf"
-#if defined(__TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
+#if defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT)
 # if __SIZEOF_DOUBLE__ == 4
 #  define ERROR_MAX 1e-6
 # else
 #  define ERROR_MAX 1e-14
 # endif
 #else
-#if (!defined(__TINY_STDIO) && defined(_WANT_IO_LONG_DOUBLE))
+#if (!defined(__TINY_STDIO) && defined(__IO_LONG_DOUBLE))
 /* __ldtoa is really broken */
 #define ERROR_MAX 1e-5
 #else

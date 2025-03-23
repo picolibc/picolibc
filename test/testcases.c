@@ -18,9 +18,9 @@
 */
 
 #ifndef __PICOLIBC__
-# define _WANT_IO_C99_FORMATS
-# define _WANT_IO_LONG_LONG
-# define _WANT_IO_POS_ARGS
+# define __IO_C99_FORMATS
+# define __IO_LONG_LONG
+# define __IO_POS_ARGS
 #elif defined(__TINY_STDIO)
 # ifdef _HAS_IO_PERCENT_B
 #  define BINARY_FORMAT
@@ -65,10 +65,10 @@
 # ifdef NO_FLOATING_POINT
 #  define NO_FLOAT
 # endif
-# ifndef _WANT_IO_LONG_LONG
+# ifndef __IO_LONG_LONG
 #  define NO_LONGLONG
 # endif
-# ifndef _WANT_IO_POS_ARGS
+# ifndef __IO_POS_ARGS
 #  define NO_POS_ARGS
 # endif
 # define NORMALIZED_A
@@ -176,7 +176,7 @@
     result |= test(__LINE__, "12.0 Hot Pockets", "%1$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1);
     result |= test(__LINE__, " 12.0 Hot Pockets", "%1$*5$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1, 5);
     result |= test(__LINE__, " 12.0 Hot Pockets 5", "%1$5.*4$f %2$s %3$ss %5$d", printf_float(12.0), "Hot", "Pocket", 1, 5);
-#if !defined(__TINY_STDIO) || defined(_IO_FLOAT_EXACT)
+#if !defined(__TINY_STDIO) || defined(__IO_FLOAT_EXACT)
     result |= test(__LINE__,
                    "   12345  1234    11145401322     321.765400   3.217654e+02   5    test-string",
                    "%1$*5$d %2$*6$hi %3$*7$lo %4$*8$f %9$*12$e %10$*13$g %11$*14$s",
@@ -195,7 +195,7 @@
 #ifndef NO_FLOAT
     result |= test(__LINE__, "      3.14", "%*.*f", 10, 2, printf_float(3.14159265));
     result |= test(__LINE__, "3.14      ", "%-*.*f", 10, 2, printf_float(3.14159265));
-# if !(defined(__TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
+# if !(defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT))
 #  ifndef LOW_FLOAT
 #   ifdef __TINY_STDIO
 #    define SQRT2_60 "1414213562373095000000000000000000000000000000000000000000000.000"
@@ -671,10 +671,10 @@
     result |= test(__LINE__,      "0.1", "%.*f",  1, printf_float(0.123));
     result |= test(__LINE__, "0.123000", "%.*f", -1, printf_float(0.123));
 #endif
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 {
     char c[64];
-#ifndef _WANT_IO_LONG_LONG
+#ifndef __IO_LONG_LONG
     if (sizeof (intmax_t) <= sizeof(long))
 #endif
 #ifndef _NANO_FORMATTED_IO

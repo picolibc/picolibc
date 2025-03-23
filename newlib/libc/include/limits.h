@@ -14,7 +14,7 @@
 #endif
 #define MB_LEN_MAX	_MB_LEN_MAX
 
-/* Maximum number of positional arguments, if _WANT_IO_POS_ARGS.  */
+/* Maximum number of positional arguments, if __IO_POS_ARGS.  */
 # ifndef NL_ARGMAX
 #  define NL_ARGMAX 32
 # endif

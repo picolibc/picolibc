@@ -40,7 +40,7 @@ static const char pstr_an[] = "an";
         if (__class == FP_INFINITE || __class == FP_SUBNORMAL || __class == FP_ZERO) \
             errno = ERANGE;                                             \
     } while (0);
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
 # if defined(STRTOD)

@@ -136,6 +136,7 @@ multilib_exclude = get_option('multilib-exclude')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
+picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
@@ -1348,42 +1349,20 @@ conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
 
 conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
-conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
+conf_data.set('__IO_LONG_LONG', io_long_long)
 conf_data.set('_WANT_MINIMAL_IO_LONG_LONG', minimal_io_long_long)
 conf_data.set('_WANT_FAST_BUFIO', fast_bufio)
-conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
-conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
-conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
-conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
-conf_data.set('_WANT_IO_LONG_DOUBLE', io_long_double)
-conf_data.set('_WANT_IO_WCHAR', io_wchar)
+conf_data.set('__IO_POS_ARGS', io_pos_args)
+conf_data.set('__IO_C99_FORMATS', io_c99_formats)
+conf_data.set('__IO_FLOAT_EXACT', io_float_exact)
+conf_data.set('__IO_PERCENT_B', io_percent_b)
+conf_data.set('__IO_LONG_DOUBLE', io_long_double)
+conf_data.set('__IO_WCHAR', io_wchar)
 conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'))
-
-if not tinystdio
-  conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
-  conf_data.set('FLOATING_POINT', newlib_io_float)
-  conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)
-  conf_data.set('__LARGE64_FILES', newlib_stdio64)
-endif
-conf_data.set('_MB_CAPABLE', mb_capable)
-conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
-conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
-conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
-conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
 conf_data.set('__SINGLE_THREAD', get_option('single-thread'))
-conf_data.set('_ELIX_LEVEL', newlib_elix_level)
-conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
-conf_data.set('_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
-conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
-conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
-conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
 conf_data.set('_HAVE_FCNTL', newlib_have_fcntl)
 conf_data.set('_NANO_MALLOC', newlib_nano_malloc)
 conf_data.set('_NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
-conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
-conf_data.set('_PICO_EXIT', picoexit)
-conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
-conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
 conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('__PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
@@ -1395,14 +1374,24 @@ conf_data.set('__THREAD_LOCAL_STORAGE', thread_local_storage, description: 'use 
 conf_data.set('__THREAD_LOCAL_STORAGE_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
 conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),
               description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
-conf_data.set('_PRINTF_SMALL_ULTOA', printf_small_ultoa, description: 'avoid software division in decimal conversion')
-conf_data.set('_PRINTF_PERCENT_N', printf_percent_n, description: 'support %n in printf format strings')
-conf_data.set('_ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
 conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
-conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
-	      get_option('crt-runtime-size'),
-	      description: 'Compute static memory area sizes at runtime instead of link time')
+
+conf_data.set('_MB_CAPABLE', mb_capable)
+if mb_capable
+  conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
+  conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
+  conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
+  conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
+endif
+
+conf_data.set('_PICO_EXIT', picoexit)
+if not picoexit
+  conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
+  conf_data.set('_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
+endif
+
+conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 if tinystdio
   conf_data.set('_FORMAT_DEFAULT_DOUBLE',
                 format_default == 'double',
@@ -1419,7 +1408,36 @@ if tinystdio
   conf_data.set('_FORMAT_DEFAULT_MINIMAL',
                 format_default == 'minimal',
                 description: 'The default printf functions is the minimal variant')
+  conf_data.set('_PRINTF_SMALL_ULTOA',
+                printf_small_ultoa,
+                description: 'avoid software division in decimal conversion')
+  conf_data.set('_PRINTF_PERCENT_N',
+                printf_percent_n,
+                description: 'support %n in printf format strings')
+  conf_data.set('_ATOMIC_UNGETC',
+                atomic_ungetc,
+                description: 'Use atomics for fgetc/ungetc for re-entrancy')
+else
+  conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
+  conf_data.set('FLOATING_POINT', newlib_io_float)
+  conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)
+  conf_data.set('__LARGE64_FILES', newlib_stdio64)
+  conf_data.set('_ELIX_LEVEL', newlib_elix_level)
+  conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
+  conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
+  conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
+  conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
+  conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
 endif
+
+if enable_picocrt
+  conf_data.set('_PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
+                description: 'Turn on mmu in picocrt startup code')
+  conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
+	        get_option('crt-runtime-size'),
+	        description: 'Compute static memory area sizes at runtime instead of link time')
+endif
+
 errno_function=get_option('errno-function')
 if errno_function == 'auto'
   errno_function = 'false'
@@ -1654,9 +1672,6 @@ endif
 # make sure to include semihost BEFORE picocrt!
 if enable_picocrt
   subdir('picocrt')
-  picocrt_enable_mmu = get_option('picocrt-enable-mmu')
-  conf_data.set('_PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
-                description: 'Turn on mmu in picocrt startup code')
 endif
 subdir('newlib')
 

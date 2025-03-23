@@ -3702,7 +3702,7 @@ double_type doubles[] =
 {__LINE__, "6.0e-350", 6.0e-350, 8, },
 {__LINE__, "1.7e350", 1.7e350, 7, },
 {__LINE__, "1.8e350", 1.8e350, 7, },
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 {__LINE__, "0x1.8p-1040", 0x1.8p-1040, 11, },
 {__LINE__, "0x1.8p-1022", 0x1.8p-1022, 11, },
 {__LINE__, "0x1.8p10", 0x1.8p10, 8, },

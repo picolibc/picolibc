@@ -483,33 +483,33 @@ __printf_float(float f)
 # if defined(_WANT_MINIMAL_IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _HAS_IO_C99_FORMATS
 # endif
 #elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
 # define printf_float(x) ((double) (x))
-# if defined(_WANT_IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+# if defined(__IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _HAS_IO_POS_ARGS
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _HAS_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
 #elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
 # define printf_float(x) ((double) (x))
 # define _HAS_IO_LONG_LONG
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _HAS_IO_POS_ARGS
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _HAS_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
 #elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
@@ -517,7 +517,7 @@ __printf_float(float f)
 # define _HAS_IO_LONG_LONG
 # define _HAS_IO_POS_ARGS
 # define _HAS_IO_C99_FORMATS
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
 # define _HAS_IO_FLOAT
@@ -527,16 +527,16 @@ __printf_float(float f)
 # define _HAS_IO_POS_ARGS
 # define _HAS_IO_C99_FORMATS
 # define _HAS_IO_DOUBLE
-# if defined(_MB_CAPABLE) || defined(_WANT_IO_WCHAR)
+# if defined(_MB_CAPABLE) || defined(__IO_WCHAR)
 #  define _HAS_IO_WCHAR
 # endif
 # ifdef _MB_CAPABLE
 #  define _HAS_IO_MBCHAR
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
-# ifdef _WANT_IO_LONG_DOUBLE
+# ifdef __IO_LONG_DOUBLE
 #  define _HAS_IOlong double
 # endif
 #endif

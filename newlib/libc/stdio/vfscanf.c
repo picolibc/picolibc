@@ -128,7 +128,7 @@ Supporting OS subroutines required:
    This could be changed in the future should the __ldtoa code be
    preferred over __dtoa.  */
 #define _NO_LONGDBL
-#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG == 64)
+#if defined __IO_LONG_DOUBLE && (LDBL_MANT_DIG == 64)
 #undef _NO_LONGDBL
 #endif
 
@@ -144,13 +144,13 @@ Supporting OS subroutines required:
 #endif
 
 #define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG \
+#if defined __IO_LONG_LONG \
 	&& (defined __GNUC__ || __STDC_VERSION__ >= 199901L)
 # undef _NO_LONGLONG
 #endif
 
 #define _NO_POS_ARGS
-#ifdef _WANT_IO_POS_ARGS
+#ifdef __IO_POS_ARGS
 # undef _NO_POS_ARGS
 # ifdef NL_ARGMAX
 #  define MAX_POS_ARGS NL_ARGMAX
@@ -163,7 +163,7 @@ typedef struct {
 } my_va_list;
 
 static void * get_arg (int, my_va_list *, int *, void **);
-#endif /* _WANT_IO_POS_ARGS */
+#endif /* __IO_POS_ARGS */
 
 /*
  * Flags used during conversion.
@@ -403,10 +403,10 @@ _SVFSCANF (
 #ifdef _MB_CAPABLE
   mbstate_t state;              /* value to keep track of multibyte state */
 #endif
-#ifdef _WANT_IO_C99_FORMATS
-#define _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_C99_FORMATS
+#define __IO_POSIX_EXTENSIONS
 #endif
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
@@ -653,7 +653,7 @@ _SVFSCANF (
 	case 'l':
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
 	    goto match_failure;
-#if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
+#if defined __IO_C99_FORMATS || !defined _NO_LONGLONG
 	  if (*fmt == 'l')	/* Check for 'll' = long long (SUSv3) */
 	    {
 	      ++fmt;
@@ -671,7 +671,7 @@ _SVFSCANF (
 	case 'h':
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
 	    goto match_failure;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	  if (*fmt == 'h')	/* Check for 'hh' = char int (SUSv3) */
 	    {
 	      ++fmt;
@@ -681,7 +681,7 @@ _SVFSCANF (
 #endif
 	    flags |= SHORT;
 	  goto again;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	case 'j': /* intmax_t */
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
 	    goto match_failure;
@@ -725,8 +725,8 @@ _SVFSCANF (
 	       have size_t as wide as long long.  */
 	    flags |= LONGDBL;
 	  goto again;
-#endif /* _WANT_IO_C99_FORMATS */
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#endif /* __IO_C99_FORMATS */
+#ifdef __IO_POSIX_EXTENSIONS
 	case 'm':
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL | MALLOC))
 	    goto match_failure;
@@ -812,7 +812,7 @@ _SVFSCANF (
 	  break;
 
 #ifdef FLOATING_POINT
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 	case 'a':
 	case 'A':
 	case 'F':
@@ -826,7 +826,7 @@ _SVFSCANF (
 	  break;
 #endif
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	case 'S':
 	  flags |= LONG;
           __fallthrough;
@@ -842,7 +842,7 @@ _SVFSCANF (
 	  c = CT_CCL;
 	  break;
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
           __fallthrough;
@@ -863,7 +863,7 @@ _SVFSCANF (
 	case 'n':
 	  if (flags & SUPPRESS)	/* ??? */
 	    continue;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	  if (flags & CHAR)
 	    {
 	      cp = GET_ARG (N, ap, char *);
@@ -940,7 +940,7 @@ _SVFSCANF (
 #if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
           if (flags & LONG)
             {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      wchar_t **wcp_p = NULL;
 	      wchar_t *wcp0 = NULL;
 	      size_t wcp_siz = 0;
@@ -948,7 +948,7 @@ _SVFSCANF (
               mbstate_t state;
               if (flags & SUPPRESS)
                 wcp = NULL;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		wcp_siz = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, 32);
 #endif
@@ -979,7 +979,7 @@ _SVFSCANF (
 			width -= 1;
                       if (!(flags & SUPPRESS))
 			{
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 			  wcp_siz = realloc_m_ptr (wchar_t, wcp, wcp0, wcp_p,
 						   wcp_siz);
 #endif
@@ -994,7 +994,7 @@ _SVFSCANF (
                       break;
                     }
                 }
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (wchar_t, wcp_p, wcp - wcp0, wcp_siz);
 #endif
               if (!(flags & SUPPRESS))
@@ -1032,7 +1032,7 @@ _SVFSCANF (
 	  else
 	    {
 	      size_t r;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      char **p_p = NULL;
 	      if (flags & MALLOC)
 		alloc_m_ptr (char, p, p0, p_p, width);
@@ -1042,7 +1042,7 @@ _SVFSCANF (
 	      r = fread ( p, 1, width, fp);
 	      if (r == 0)
 		goto input_failure;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (char, p_p, r, width);
 #endif
 	      nread += r;
@@ -1058,7 +1058,7 @@ _SVFSCANF (
 #if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
 	  if (flags & LONG)
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      wchar_t **wcp_p = NULL;
 	      wchar_t *wcp0 = NULL;
 	      size_t wcp_siz = 0;
@@ -1066,7 +1066,7 @@ _SVFSCANF (
               mbstate_t state;
               if (flags & SUPPRESS)
                 wcp = &wc;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		wcp_siz = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, 32);
 #endif
@@ -1104,7 +1104,7 @@ _SVFSCANF (
                       if ((flags & SUPPRESS) == 0)
 			{
 			  wcp += 1;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 			  wcp_siz = realloc_m_ptr (wchar_t, wcp, wcp0, wcp_p,
 						   wcp_siz);
 #endif
@@ -1121,7 +1121,7 @@ _SVFSCANF (
               if (!(flags & SUPPRESS))
                 {
                   *wcp = L'\0';
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  shrink_m_ptr (wchar_t, wcp_p, wcp - wcp0 + 1, wcp_siz);
 #endif
                   nassigned++;
@@ -1150,7 +1150,7 @@ _SVFSCANF (
 	    }
 	  else
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      char **p_p = NULL;
 	      size_t p_siz = 0;
 
@@ -1163,7 +1163,7 @@ _SVFSCANF (
 		{
 		  fp->_r--;
 		  *p++ = *fp->_p++;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  p_siz = realloc_m_ptr (char, p, p0, p_p, p_siz);
 #endif
 		  if (--width == 0)
@@ -1179,7 +1179,7 @@ _SVFSCANF (
 	      if (n == 0)
 		goto match_failure;
 	      *p = 0;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (char, p_p, n + 1, p_siz);
 #endif
 	      nassigned++;
@@ -1194,7 +1194,7 @@ _SVFSCANF (
 #if !defined(_ELIX_LEVEL) || _ELIX_LEVEL >= 2
           if (flags & LONG)
             {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      wchar_t **wcp_p = NULL;
 	      wchar_t *wcp0 = NULL;
 	      size_t wcp_siz = 0;
@@ -1203,7 +1203,7 @@ _SVFSCANF (
               mbstate_t state;
               if (flags & SUPPRESS)
                 wcp = &wc;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		wcp_siz = alloc_m_ptr (wchar_t, wcp, wcp0, wcp_p, 32);
 #endif
@@ -1241,7 +1241,7 @@ _SVFSCANF (
                       if ((flags & SUPPRESS) == 0)
 			{
 			  wcp += 1;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 			  wcp_siz = realloc_m_ptr (wchar_t, wcp, wcp0, wcp_p,
 						   wcp_siz);
 #endif
@@ -1258,7 +1258,7 @@ _SVFSCANF (
               if (!(flags & SUPPRESS))
                 {
                   *wcp = L'\0';
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  shrink_m_ptr (wchar_t, wcp_p, wcp - wcp0 + 1, wcp_siz);
 #endif
                   nassigned++;
@@ -1281,7 +1281,7 @@ _SVFSCANF (
 	    }
 	  else
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      char **p_p = NULL;
 	      size_t p_siz = 0;
 
@@ -1295,7 +1295,7 @@ _SVFSCANF (
 		{
 		  fp->_r--;
 		  *p++ = *fp->_p++;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  p_siz = realloc_m_ptr (char, p, p0, p_p, p_siz);
 #endif
 		  if (--width == 0)
@@ -1304,7 +1304,7 @@ _SVFSCANF (
 		    break;
 		}
 	      *p = 0;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (char, p_p, p - p0 + 1, p_siz);
 #endif
 	      nread += p - p0;
@@ -1486,7 +1486,7 @@ _SVFSCANF (
 #endif /* !_NO_LONGLONG */
 		    *vp = (void *) (uintptr_t) res;
 		}
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	      else if (flags & CHAR)
 		{
 		  cp = GET_ARG (N, ap, char *);
@@ -1957,7 +1957,7 @@ match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
   _newlib_flockfile_end (fp);
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
   free_m_ptr ();
 #endif
   return nassigned;

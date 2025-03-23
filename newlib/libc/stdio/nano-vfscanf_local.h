@@ -88,8 +88,8 @@
 
 
 #define _NO_LONGLONG
-#undef _WANT_IO_C99_FORMATS
-#undef _WANT_IO_POS_ARGS
+#undef __IO_C99_FORMATS
+#undef __IO_POS_ARGS
 
 #define _NO_POS_ARGS
 

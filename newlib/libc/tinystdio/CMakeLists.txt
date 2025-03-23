@@ -178,7 +178,7 @@ picolibc_sources(
   vsnprintf_s.c
   )
 
-if(_IO_FLOAT_EXACT)
+if(__IO_FLOAT_EXACT)
   picolibc_sources(
     atod_ryu.c
     atof_ryu.c

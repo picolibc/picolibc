@@ -103,7 +103,7 @@ SEEALSO
 #endif
 
 #define _NO_POS_ARGS
-#ifdef _WANT_IO_POS_ARGS
+#ifdef __IO_POS_ARGS
 # undef _NO_POS_ARGS
 #endif
 
@@ -128,12 +128,12 @@ int VFWPRINTF (FILE *, const wchar_t *, va_list);
    This could be changed in the future should the __ldtoa code be
    preferred over __dtoa.  */
 #define _NO_LONGDBL
-#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined __IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
 #endif
 
 #define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG \
+#if defined __IO_LONG_LONG \
 	&& (defined __GNUC__ || __STDC_VERSION__ >= 199901L)
 # undef _NO_LONGLONG
 #endif
@@ -197,7 +197,7 @@ __sbwprintf (
 #endif /* !STRING_ONLY */
 
 
-#if defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS)
+#if defined (FLOATING_POINT) || defined (__IO_C99_FORMATS)
 # include <locale.h>
 #endif
 #ifdef FLOATING_POINT
@@ -243,7 +243,7 @@ static int wexponent(wchar_t *, int, int);
    strings using the locale's grouping character.  Since that's a multibyte
    value, we should use a conservative value.
    */
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 #define BUF             100
 #else
 #define	BUF		40
@@ -332,12 +332,12 @@ get_arg (int n, wchar_t *fmt,
 #define	SHORTINT	0x040		/* short integer */
 #define	ZEROPAD		0x080		/* zero (as opposed to blank) pad */
 #define FPT		0x100		/* Floating point number */
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 # define CHARINT	0x200		/* char as integer */
 #else /* define as 0, to make SARG and UARG occupy fewer instructions  */
 # define CHARINT	0
 #endif
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 # define GROUPING	0x400		/* use grouping ("'" flag) */
 #endif
 
@@ -369,13 +369,13 @@ VFWPRINTF (
 	int width;		/* width from format (%8d), or 0 */
 	int prec;		/* precision from format (%.3d), or -1 */
 	wchar_t sign;		/* sign prefix (' ', '+', '-', or \0) */
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 				/* locale specific numeric grouping */
 	wchar_t thousands_sep = L'\0';
 	const char *grouping = NULL;
 #endif
 #if defined (_MB_CAPABLE) && !defined (WDECIMAL_POINT) \
-    && (defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS))
+    && (defined (FLOATING_POINT) || defined (__IO_C99_FORMATS))
 	mbstate_t state;        /* mbtowc calls from library must not change state */
 #endif
 #ifdef FLOATING_POINT
@@ -388,10 +388,10 @@ VFWPRINTF (
 	wchar_t expstr[MAXEXPLEN];	/* buffer for exponent string */
 	int lead;		/* sig figs before decimal or group sep */
 #endif /* FLOATING_POINT */
-#if defined (FLOATING_POINT) || defined (_WANT_IO_C99_FORMATS)
+#if defined (FLOATING_POINT) || defined (__IO_C99_FORMATS)
 	int ndig = 0;		/* actual number of digits returned by cvt */
 #endif
-#if defined (FLOATING_POINT) && defined (_WANT_IO_C99_FORMATS)
+#if defined (FLOATING_POINT) && defined (__IO_C99_FORMATS)
 	int nseps;		/* number of group separators with ' */
 	int nrepeats;		/* number of repeats of the last group */
 #endif
@@ -632,7 +632,7 @@ VFWPRINTF (
 		sign = L'\0';
 #ifdef FLOATING_POINT
 		lead = 0;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 		nseps = nrepeats = 0;
 #endif
 #endif
@@ -643,7 +643,7 @@ VFWPRINTF (
 
 rflag:		ch = *fmt++;
 reswitch:	switch (ch) {
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 		case L'\'':
 #ifdef _MB_CAPABLE
 #ifdef WTHOUSANDS_SEP
@@ -811,7 +811,7 @@ reswitch:	switch (ch) {
 			goto rflag;
 #endif
 		case L'h':
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 			if (*fmt == L'h') {
 				fmt++;
 				flags |= CHARINT;
@@ -820,7 +820,7 @@ reswitch:	switch (ch) {
 				flags |= SHORTINT;
 			goto rflag;
 		case L'l':
-#if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
+#if defined __IO_C99_FORMATS || !defined _NO_LONGLONG
 			if (*fmt == L'l') {
 				fmt++;
 				flags |= QUADINT;
@@ -831,7 +831,7 @@ reswitch:	switch (ch) {
 		case L'q': /* GNU extension */
 			flags |= QUADINT;
 			goto rflag;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 		case L'j':
 		  if (sizeof (intmax_t) == sizeof (long))
 		    flags |= LONGINT;
@@ -870,7 +870,7 @@ reswitch:	switch (ch) {
 		    flags |= QUADINT;
 		  goto rflag;
 		case L'C':	/* POSIX extension */
-#endif /* _WANT_IO_C99_FORMATS */
+#endif /* __IO_C99_FORMATS */
 		case L'c':
 			cp = buf;
 			if (ch == L'c' && !(flags & LONGINT)) {
@@ -905,7 +905,7 @@ reswitch:	switch (ch) {
 			base = DEC;
 			goto number;
 #ifdef FLOATING_POINT
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 		case L'a':
 		case L'A':
 		case L'F':
@@ -986,7 +986,7 @@ reswitch:	switch (ch) {
 # endif /* !_NO_LONGDBL */
 
 			cp = buf;
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 			if (ch == L'a' || ch == L'A') {
 				ox[0] = L'0';
 				ox[1] = ch == L'a' ? L'x' : L'X';
@@ -1003,7 +1003,7 @@ reswitch:	switch (ch) {
 				    cp = malloc_buf;
 				  }
 			} else
-# endif /* _WANT_IO_C99_FORMATS */
+# endif /* __IO_C99_FORMATS */
 			if (prec == -1) {
 				prec = DEFPREC;
 			} else if ((ch == L'g' || ch == L'G') && prec == 0) {
@@ -1037,7 +1037,7 @@ reswitch:	switch (ch) {
 				else
 					ch = L'g';
 			}
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 			else if (ch == L'F')
 				ch = L'f';
 # endif
@@ -1047,7 +1047,7 @@ reswitch:	switch (ch) {
 				size = expsize + ndig;
 				if (ndig > 1 || flags & ALT)
 					++size;
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 				flags &= ~GROUPING;
 # endif
 			} else {
@@ -1067,7 +1067,7 @@ reswitch:	switch (ch) {
 				} else
 					size = ndig + (expt > 0 ?
 						1 : 2 - expt);
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 				if ((flags & GROUPING) && expt > 0) {
 					/* space for thousands' grouping */
 					nseps = nrepeats = 0;
@@ -1110,7 +1110,7 @@ reswitch:	switch (ch) {
 				*GET_ARG (N, ap, long_ptr_t) = ret;
 			else if (flags & SHORTINT)
 				*GET_ARG (N, ap, short_ptr_t) = ret;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 			else if (flags & CHARINT)
 				*GET_ARG (N, ap, char_ptr_t) = ret;
 #endif
@@ -1120,7 +1120,7 @@ reswitch:	switch (ch) {
 		case L'o':
 			_uquad = UARG ();
 			base = OCT;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 			flags &= ~GROUPING;
 #endif
 			goto nosign;
@@ -1141,7 +1141,7 @@ reswitch:	switch (ch) {
 			ox[1] = ch = L'x';
 			goto nosign;
 		case L's':
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 		case L'S':	/* POSIX extension */
 #endif
 			cp = GET_ARG (N, ap, wchar_ptr_t);
@@ -1271,7 +1271,7 @@ hex:			_uquad = UARG ();
 				flags |= HEXPREFIX;
 			}
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 			flags &= ~GROUPING;
 #endif
 			/* unsigned conversions */
@@ -1313,12 +1313,12 @@ number:			if ((dprec = prec) >= 0)
 						*--cp = to_char(_uquad);
 						break;
 					}
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 					ndig = 0;
 #endif
 					do {
 					  *--cp = to_char (_uquad % 10);
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 					  ndig++;
 					  /* If (*grouping == CHAR_MAX) then no
 					     more grouping */
@@ -1442,7 +1442,7 @@ number:			if ((dprec = prec) >= 0)
 					PRINTANDPAD(cp, convbuf + ndig,
 						    lead, zeroes);
 					cp += lead;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 					if (flags & GROUPING) {
 					    while (nseps > 0 || nrepeats > 0) {
 						if (nrepeats > 0)
@@ -1552,7 +1552,7 @@ wcvt(_PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*sign = L'\0';
 # endif /* !_NO_LONGDBL */
 
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 	if (ch == L'a' || ch == L'A') {
 		wchar_t *digits, *bp, *rve;
 		/* This code assumes FLT_RADIX is a power of 2.  The initial
@@ -1585,7 +1585,7 @@ wcvt(_PRINTF_FLOAT_TYPE value, int ndigits, int flags,
 		*length = bp - buf;
 		return buf;
 	}
-# endif /* _WANT_IO_C99_FORMATS */
+# endif /* __IO_C99_FORMATS */
 	if (ch == L'f' || ch == L'F') {
 		mode = 3;		/* ndigits after the decimal point */
 	} else {
@@ -1637,7 +1637,7 @@ wexponent(wchar_t *p0, int exp, int fmtch)
 {
 	register wchar_t *p, *t;
 	wchar_t expbuf[MAXEXPLEN];
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 	int isa = fmtch == L'a' || fmtch == L'A';
 # else
 #  define isa 0
@@ -1769,7 +1769,7 @@ get_arg (
 		case L'q':
 		  flags |= QUADINT;
 		  break;
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 		case L'j':
 		  if (sizeof (intmax_t) == sizeof (long))
 		    flags |= LONGINT;
@@ -1800,10 +1800,10 @@ get_arg (
 		       have ptrdiff_t as wide as long long.  */
 		    flags |= QUADINT;
 		  break;
-# endif /* _WANT_IO_C99_FORMATS */
+# endif /* __IO_C99_FORMATS */
 		case L'l':
 		default:
-# if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
+# if defined __IO_C99_FORMATS || !defined _NO_LONGLONG
 		  if (*fmt == L'l')
 		    {
 		      flags |= QUADINT;
@@ -1836,7 +1836,7 @@ get_arg (
 		    else
 		      spec_type = INT;
 		    break;
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 		  case L'a':
 		  case L'A':
 		  case L'F':
@@ -1854,7 +1854,7 @@ get_arg (
 		      spec_type = DOUBLE;
 		    break;
 		  case L's':
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 		  case L'S':	/* POSIX extension */
 # endif
 		  case L'p':
@@ -1862,14 +1862,14 @@ get_arg (
 		    spec_type = CHAR_PTR;
 		    break;
 		  case L'c':
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 		    if (flags & LONGINT)
 		      spec_type = WIDE_CHAR;
 		    else
 # endif
 		      spec_type = INT;
 		    break;
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 		  case L'C':	/* POSIX extension */
 		    spec_type = WIDE_CHAR;
 		    break;

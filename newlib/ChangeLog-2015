@@ -1379,7 +1379,7 @@ summary.
 2014-12-03  Jeff Johnston  <jjohnstn@redhat.com>
 
 	* libc/include/inttypes.h: Only enable the 8-bit scanning macros
-	if _WANT_IO_C99_FORMATS is defined by configuration.  Add comment
+	if __IO_C99_FORMATS is defined by configuration.  Add comment
 	on why.
 
 2014-11-28  Matthew Fortune  <matthew.fortune@imgtec.com>
@@ -3586,7 +3586,7 @@ summary.
 2012-08-10  Corinna Vinschen  <vinschen@redhat.com>
 
 	* libc/stdio/vfwprintf.c (_VFWPRINTF_R): Fix guard around state to
-	allow usage in !FLOATING_POINT && _WANT_IO_C99_FORMATS case.
+	allow usage in !FLOATING_POINT && __IO_C99_FORMATS case.
 
 2012-08-08  Eric Blake  <eblake@redhat.com>
 
@@ -5307,7 +5307,7 @@ summary.
 
 2010-02-05  Corinna Vinschen  <corinna@vinschen.de>
 
-	* libc/stdio/vfprintf.c: Include locale.h also if _WANT_IO_C99_FORMATS
+	* libc/stdio/vfprintf.c: Include locale.h also if __IO_C99_FORMATS
 	is defined.  Raise conversion buffer size to make sure it has enough
 	room for numbers plus grouping character.  Define GROUPING flag.
 	(_VFPRINTF_R): Add PRINTANDPAD macro.  Handle grouping flag character.
@@ -10320,7 +10320,7 @@ summary.
 
 2007-05-18  Eric Blake  <ebb9@byu.net>
 
-	* libc/stdio/vfprintf.c [_WANT_IO_LONG_LONG]: Allow non-gcc
+	* libc/stdio/vfprintf.c [__IO_LONG_LONG]: Allow non-gcc
 	compilers.
 	* libc/stdio/vfscanf.c: Likewise.
 
@@ -10377,14 +10377,14 @@ summary.
 2007-05-11  Eric Blake  <ebb9@byu.net>
 
 	Minimize printf/scanf size on platforms that don't need C99.
-	* acconfig.h (_WANT_IO_C99_FORMATS): New macro.
-	* newlib.hin (_WANT_IO_C99_FORMATS): Likewise.
+	* acconfig.h (__IO_C99_FORMATS): New macro.
+	* newlib.hin (__IO_C99_FORMATS): Likewise.
 	* configure.in (newlib-io-c99-formats): New configure option.
-	(_WANT_IO_C99_FORMATS): Define appropriately.
+	(__IO_C99_FORMATS): Define appropriately.
 	* configure.host (*-linux*, cygwin): Default c99-formats to yes.
-	* libc/stdio/vfprintf.c (_VFPRINTF_R) [!_WANT_IO_C99_FORMATS]:
+	* libc/stdio/vfprintf.c (_VFPRINTF_R) [!__IO_C99_FORMATS]:
 	Cripple ' flag; hh, z, j, t sizes; a, A, F, C, S specifiers.
-	* libc/stdio/vfscanf.c (_VFSCANF_R) [!_WANT_IO_C99_FORMATS]:
+	* libc/stdio/vfscanf.c (_VFSCANF_R) [!__IO_C99_FORMATS]:
 	Likewise.
 	* configure: Regenerate.
 
@@ -12847,8 +12847,8 @@ summary.
 
 2005-03-21  Nicholas Wourms  <nwourms@netscape.net>
 
-	* libc/stdio/vfprintf.c: Move newlib.h before _WANT_IO_POS_ARGS test,
-	since _WANT_IO_POS_ARGS is now defined in there.  Remove duplicate
+	* libc/stdio/vfprintf.c: Move newlib.h before __IO_POS_ARGS test,
+	since __IO_POS_ARGS is now defined in there.  Remove duplicate
 	reent.h include.
 
 2005-03-18  Hans-Peter Nilsson  <hp@axis.com>
@@ -13851,9 +13851,9 @@ summary.
 
 2004-05-25  Artem B. Bityuckiy  <abitytsky@softminecorp.com>
 
-	* newlib.hin: (_WANT_IO_POS_ARGS): New define.
-	(_WANT_IO_LONG_LONG): Ditto.
-	(_WANT_IO_LONG_DOUBLE): Ditto.
+	* newlib.hin: (__IO_POS_ARGS): New define.
+	(__IO_LONG_LONG): Ditto.
+	(__IO_LONG_DOUBLE): Ditto.
 	* configure.in: Add new configuration options
 	--enable-newlib-io-long-long and --enable-newlib-io-long-double
 	which tie to new defines in newlib.hin.

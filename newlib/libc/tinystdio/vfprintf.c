@@ -78,33 +78,33 @@
 # if defined(_WANT_MINIMAL_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
 #elif PRINTF_LEVEL == PRINTF_STD
-# if defined(_WANT_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
+# if defined(__IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _NEED_IO_POS_ARGS
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
 #elif PRINTF_LEVEL == PRINTF_LLONG
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _NEED_IO_POS_ARGS
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
 #elif PRINTF_LEVEL == PRINTF_FLT
@@ -113,7 +113,7 @@
 # endif
 # define _NEED_IO_POS_ARGS
 # define _NEED_IO_C99_FORMATS
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
 # define _NEED_IO_FLOAT
@@ -126,11 +126,11 @@
 # endif
 # define _NEED_IO_POS_ARGS
 # define _NEED_IO_C99_FORMATS
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
 # define _NEED_IO_DOUBLE
-# if defined(_WANT_IO_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
+# if defined(__IO_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
 #  define _NEED_IO_LONG_DOUBLE
 # endif
 #else

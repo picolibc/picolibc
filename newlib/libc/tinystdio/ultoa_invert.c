@@ -110,7 +110,7 @@ static inline ultoa_unsigned_t
 udivmod(ultoa_unsigned_t val, int base, char *dig)
 {
     switch(base) {
-#ifdef _WANT_IO_PERCENT_B
+#ifdef __IO_PERCENT_B
     case 2:
         *dig = val & 1;
         return val >> 1;

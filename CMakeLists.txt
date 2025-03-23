@@ -155,8 +155,8 @@ set(_HAVE_SEMIHOST 1)
 # math library does not set errno (offering only ieee semantics)
 set(_IEEE_LIBM 1)
 
-if(NOT DEFINED _IO_FLOAT_EXACT)
-  option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
+if(NOT DEFINED __IO_FLOAT_EXACT)
+  option(__IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
 endif()
 
 set(_PICO_EXIT 1)
@@ -197,24 +197,24 @@ set(_GLOBAL_ATEXIT OFF)
 
 set(_UNBUF_STREAM_OPT OFF)
 
-if(NOT DEFINED _WANT_IO_C99_FORMATS)
-  option(_WANT_IO_C99_FORMATS "Support C99 formats in printf/scanf" ON)
+if(NOT DEFINED __IO_C99_FORMATS)
+  option(__IO_C99_FORMATS "Support C99 formats in printf/scanf" ON)
 endif()
 
-if(NOT DEFINED _WANT_IO_LONG_LONG)
-  option(_WANT_IO_LONG_LONG "Support long long in integer printf/scanf" OFF)
+if(NOT DEFINED __IO_LONG_LONG)
+  option(__IO_LONG_LONG "Support long long in integer printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_LONG_DOUBLE)
-  option(_WANT_IO_LONG_DOUBLE "Support long double in printf/scanf" OFF)
+if(NOT DEFINED __IO_LONG_DOUBLE)
+  option(__IO_LONG_DOUBLE "Support long double in printf/scanf" OFF)
 endif()
 
 if(NOT DEFINED _WANT_MINIMAL_IO_LONG_LONG)
   option(_WANT_MINIMAL_IO_LONG_LONG "Support long long in minimal printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_POS_ARGS)
-  option(_WANT_IO_POS_ARGS "Support positional args in integer printf/scanf" OFF)
+if(NOT DEFINED __IO_POS_ARGS)
+  option(__IO_POS_ARGS "Support positional args in integer printf/scanf" OFF)
 endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" ON)
@@ -227,12 +227,12 @@ if(NOT DEFINED _PRINTF_PERCENT_N)
   option(_PRINTF_PERCENT_N "Support %n formats in printf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_PERCENT_B)
-  option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
+if(NOT DEFINED __IO_PERCENT_B)
+  option(__IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_WCHAR)
-  option(_WANT_IO_WCHAR "Support %ls/%lc formats in printf even without multi-byte" OFF)
+if(NOT DEFINED __IO_WCHAR)
+  option(__IO_WCHAR "Support %ls/%lc formats in printf even without multi-byte" OFF)
 endif()
 
 if(NOT DEFINED _FORMAT_DEFAULT_MINIMAL)
