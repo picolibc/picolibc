@@ -63,12 +63,14 @@ enum locale_id {
     locale_C = locale_BASE,
 #ifdef __MB_CAPABLE
     locale_UTF_8,
+#ifdef __MB_EXTENDED_CHARSETS_UCS
     locale_UCS_2,
     locale_UCS_2LE,
     locale_UCS_2BE,
     locale_UCS_4,
     locale_UCS_4LE,
     locale_UCS_4BE,
+#endif
 #ifdef __MB_EXTENDED_CHARSETS_ISO
     locale_ISO_BASE,
     locale_EXTENDED_BASE = locale_ISO_BASE,

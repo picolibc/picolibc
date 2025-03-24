@@ -123,6 +123,8 @@ __utf8_wctomb (
   return -1;
 }
 
+#ifdef __MB_EXTENDED_CHARSETS_UCS
+
 #if _BYTE_ORDER == _LITTLE_ENDIAN
 #define __ucs2le_wctomb __ucs2_wctomb
 #define __ucs2be_wctomb __ucs2swap_wctomb
@@ -202,6 +204,8 @@ __ucs4swap_wctomb (
     memcpy((void *) s, &uchar, 4);
     return 4;
 }
+
+#endif /* __MB_EXTENDED_CHARSETS_UCS */
 
 #ifdef __MB_EXTENDED_CHARSETS_JIS
 
@@ -667,12 +671,14 @@ __cp_103_wctomb (char *s, wchar_t _wchar, mbstate_t *state)
 const wctomb_p __wctomb[locale_END - locale_BASE] = {
     [locale_C - locale_BASE] = __ascii_wctomb,
     [locale_UTF_8 - locale_BASE] = __utf8_wctomb,
+#ifdef __MB_EXTENDED_CHARSETS_UCS
     [locale_UCS_2 - locale_BASE] = __ucs2_wctomb,
     [locale_UCS_2LE - locale_BASE] = __ucs2le_wctomb,
     [locale_UCS_2BE - locale_BASE] = __ucs2be_wctomb,
     [locale_UCS_4 - locale_BASE] = __ucs4_wctomb,
     [locale_UCS_4LE - locale_BASE] = __ucs4le_wctomb,
     [locale_UCS_4BE - locale_BASE] = __ucs4be_wctomb,
+#endif
 #ifdef __MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1 - locale_BASE] = __iso_8859_1_wctomb,
     [locale_ISO_8859_2 - locale_BASE] = __iso_8859_2_wctomb,

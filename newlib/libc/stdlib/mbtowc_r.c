@@ -248,6 +248,8 @@ __utf8_mbtowc (
   return -1;
 }
 
+#ifdef __MB_EXTENDED_CHARSETS_UCS
+
 #if _BYTE_ORDER == _LITTLE_ENDIAN
 #define __ucs2le_mbtowc __ucs2_mbtowc
 #define __ucs2be_mbtowc __ucs2swap_mbtowc
@@ -327,6 +329,8 @@ __ucs4swap_mbtowc (
     *pwc = __bswap32(uchar);
     return 4;
 }
+
+#endif /* __MB_EXTENDED_CHARSETS_UCS */
 
 #ifdef __MB_EXTENDED_CHARSETS_ISO
 static int
@@ -1018,12 +1022,14 @@ __jis_mbtowc (
 const mbtowc_p __mbtowc[locale_END - locale_BASE] = {
     [locale_C - locale_BASE] = __ascii_mbtowc,
     [locale_UTF_8 - locale_BASE] = __utf8_mbtowc,
+#ifdef __MB_EXTENDED_CHARSETS_UCS
     [locale_UCS_2 - locale_BASE] = __ucs2_mbtowc,
     [locale_UCS_2LE - locale_BASE] = __ucs2le_mbtowc,
     [locale_UCS_2BE - locale_BASE] = __ucs2be_mbtowc,
     [locale_UCS_4 - locale_BASE] = __ucs4_mbtowc,
     [locale_UCS_4LE - locale_BASE] = __ucs4le_mbtowc,
     [locale_UCS_4BE - locale_BASE] = __ucs4be_mbtowc,
+#endif
 #ifdef __MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1 - locale_BASE] = __iso_8859_1_mbtowc,
     [locale_ISO_8859_2 - locale_BASE] = __iso_8859_2_mbtowc,
