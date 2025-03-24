@@ -3,3 +3,6 @@ Fixes:
 
 - Console mode is really restored to the previous mode.
   Addresses: https://github.com/msys2/msys2-runtime/issues/268
+
+- Clear direction flag in sigdeleyed before calling signal handler.
+  Addresses: https://cygwin.com/pipermail/cygwin/2025-March/257704.html

@@ -179,6 +179,7 @@ sigdelayed:
 	movq	%rsp,%rbp
 	pushf
 	.seh_pushreg %rax			# fake, there's no .seh_pushreg for the flags
+	cld					# x86_64 ABI requires direction flag cleared
 	# stack is aligned or unaligned on entry!
 	# make sure it is aligned from here on
 	# We could be called from an interrupted thread which doesn't know
