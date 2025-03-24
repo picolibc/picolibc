@@ -688,8 +688,8 @@ if enable_native_tests
       test = t + '-compare'
 
       e = executable(t, src, 
-                 c_args: _c_args + ctype_c_args,
-                 link_args: _link_args,
+                 c_args: printf_compile_args_d + _c_args + ctype_c_args,
+                 link_args: printf_link_args_d + _link_args,
                  objects: _objs,
                  link_depends: _link_depends,
                  include_directories: inc)

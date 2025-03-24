@@ -52,8 +52,8 @@ foreach params : targets
     _objs = []
   endif
   
-  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
-  _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
+  _c_args = printf_compile_args_d + target_c_args + get_variable('test_c_args' + target, test_c_args)
+  _link_args = printf_link_args_d + target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
   _c_args += ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE']
