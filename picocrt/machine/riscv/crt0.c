@@ -110,7 +110,9 @@ _trap(void)
 
         /* Make space for saved registers */
         __asm__("addi   sp, sp, %0\n"
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
                 ".cfi_def_cfa sp, 0\n"
+#endif
                 :: "i"(-sizeof(struct fault)));
 
         /* Save registers on stack */
@@ -139,10 +141,14 @@ _trap(void)
          */
         __asm__("csrr   ra, mepc\n"
                 SD "    ra, %0(sp)\n"
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
                 ".cfi_offset ra, %0\n"
+#endif
                 "csrrw t0, mscratch, zero\n"
                 SD "    t0, %1(sp)\n"
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
                 ".cfi_offset sp, %1\n"
+#endif
                 :: "i"(offsetof(struct fault, mepc)),
                    "i"(offsetof(struct fault, r[2])));
         SAVE_CSR(mcause);
