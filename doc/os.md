@@ -192,14 +192,17 @@ picolibc configuration parameters:
 ```console
 $ meson \
 	-Dtls-model=global-dynamic \
+	-Derrno-function=auto \
 	-Dmultilib=false \
 	-Dpicolib=false \
 	-Dpicocrt=false \
+	-Dsemihost=false \
+	-Duse-stdlib=true \
 	-Dposix-console=true \
-	-Dnewlib-global-atexit=true \
+	-Dnewlib-global-atexit=true
 	-Dincludedir=lib/picolibc/include \
 	-Dlibdir=lib/picolibc/lib \
-	-Dspecsdir=none
+	-Dspecsdir=none \
 ```
 
  * -Dtls-model=global-dynamic makes picolibc use the default TLS model
@@ -214,17 +217,20 @@ $ meson \
  * -Dpicocrt=false disables building the C startup code as that is
    provided by the underlying system.
 
+ * -Dsemihost=false disables building semihosting support as OS
+   interfaces are provided by the underlying system.
+
+ * -Duse-stdlib=true removes -nostdlib from the compile and link
+   command lines so that the native C library will be used.
+
  * -Dposix-console=true uses POSIX I/O read/write APIs for stdin,
     stdout and stderr.
 
  * -Dnewlib-global-atexit=true disables the per-thread atexit behavior
    so that picolibc acts like a regular C library.
 
- * -Dincludedir and -Dlibdir specify install locations for the headers
-   and library
-
- * -Dspecsdir=none disables installing picolibc.specs as that file
-   is not useful in this environment
+ * -Dincludedir, -Dlibdir and -Dspecsdir set up the installation so it
+   doesn't conflict with the native system.
 
 Once built, you can install and use picolibc on the host:
 
