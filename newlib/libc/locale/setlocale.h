@@ -183,6 +183,10 @@ struct __lc_cats
 struct __locale_t
 {
   char			 categories[_LC_LAST][ENCODING_LEN + 1];
+#ifdef _MB_CAPABLE
+  char			 locale_string[_LC_LAST
+				       * (ENCODING_LEN + 1/*"/"*/ + 1)];
+#endif
   int			(*wctomb) (struct _reent *, char *, wchar_t,
 				   mbstate_t *);
   int			(*mbtowc) (struct _reent *, wchar_t *,
@@ -200,6 +204,7 @@ struct __locale_t
 };
 
 #ifdef _MB_CAPABLE
+char *__currentlocale (struct __locale_t *, char *);
 extern char *__loadlocale (struct __locale_t *, int, char *);
 extern const char *__get_locale_env(struct _reent *, int);
 #endif /* _MB_CAPABLE */

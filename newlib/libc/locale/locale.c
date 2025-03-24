@@ -199,6 +199,7 @@ static char *categories[_LC_LAST] = {
  */
 #ifndef DEFAULT_LOCALE
 #define DEFAULT_LOCALE	"C"
+#define DEFAULT_LOCALE_IS_C
 #endif
 
 #ifdef _MB_CAPABLE
@@ -211,6 +212,9 @@ char __default_locale[ENCODING_LEN + 1] = DEFAULT_LOCALE;
 const struct __locale_t __C_locale =
 {
   { "C", "C", "C", "C", "C", "C", "C", },
+#ifdef _MB_CAPABLE
+  "C",
+#endif
   __ascii_wctomb,
   __ascii_mbtowc,
   0,
@@ -247,6 +251,13 @@ const struct __locale_t __C_locale =
 struct __locale_t __global_locale =
 {
   { "C", "C", DEFAULT_LOCALE, "C", "C", "C", "C", },
+#ifdef _MB_CAPABLE
+# ifdef DEFAULT_LOCALE_IS_C
+  "C",
+# else
+  "C/" DEFAULT_LOCALE "/C/C/C/C",
+# endif
+#endif
 #ifdef __CYGWIN__
   __utf8_wctomb,
   __utf8_mbtowc,
@@ -285,16 +296,6 @@ struct __locale_t __global_locale =
 #endif /* __HAVE_LOCALE_INFO__ */
 };
 
-#ifdef _MB_CAPABLE
-/* Renamed from current_locale_string to make clear this is only the
-   *global* string for setlocale (LC_ALL, NULL).  There's no equivalent
-   functionality for uselocale. */
-static char global_locale_string[_LC_LAST * (ENCODING_LEN + 1/*"/"*/ + 1)]
-	    = "C";
-static char *currentlocale (void);
-
-#endif /* _MB_CAPABLE */
-
 char *
 _setlocale_r (struct _reent *p,
        int category,
@@ -323,7 +324,7 @@ _setlocale_r (struct _reent *p,
 
   if (locale == NULL)
     return category != LC_ALL ? __get_global_locale ()->categories[category]
-			      : global_locale_string;
+			      : __get_global_locale ()->locale_string;
 
   /*
    * Default to the current locale for everything.
@@ -420,7 +421,8 @@ _setlocale_r (struct _reent *p,
     {
       ret = __loadlocale (__get_global_locale (), category,
 			  new_categories[category]);
-      currentlocale ();
+      __currentlocale (__get_global_locale (),
+		       __get_global_locale ()->locale_string);
       return ret;
     }
 
@@ -444,31 +446,31 @@ _setlocale_r (struct _reent *p,
 	  return NULL;
 	}
     }
-  return currentlocale ();
+  return __currentlocale (__get_global_locale (),
+			  __get_global_locale ()->locale_string);
 #endif /* _MB_CAPABLE */
 }
 
 #ifdef _MB_CAPABLE
-static char *
-currentlocale ()
+char *
+__currentlocale (struct __locale_t *locobj, char *locale_string)
 {
   int i;
 
-  strcpy (global_locale_string, __get_global_locale ()->categories[1]);
+  strcpy (locale_string, locobj->categories[1]);
 
   for (i = 2; i < _LC_LAST; ++i)
-    if (strcmp (__get_global_locale ()->categories[1],
-		__get_global_locale ()->categories[i]))
+    if (strcmp (locobj->categories[1],
+		locobj->categories[i]))
       {
 	for (i = 2; i < _LC_LAST; ++i)
 	  {
-	    (void)strcat(global_locale_string, "/");
-	    (void)strcat(global_locale_string,
-			 __get_global_locale ()->categories[i]);
+	    (void)strcat(locale_string, "/");
+	    (void)strcat(locale_string, locobj->categories[i]);
 	  }
 	break;
       }
-  return global_locale_string;
+  return locale_string;
 }
 
 extern void __set_ctype (struct __locale_t *, const char *charset);
