@@ -44,7 +44,7 @@ shall remain valid until the locale object locobj is used in a call to
 No errors are defined.
 
 PORTABILITY
-<<getlocalename_l>> is POSIX-1.2008 since Base Specification Issue 8
+<<getlocalename_l>> is POSIX-1.2024
 */
 
 #include <newlib.h>
