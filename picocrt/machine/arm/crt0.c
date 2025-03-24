@@ -259,7 +259,7 @@ _cstart(void)
 
 /* Set up exception table base address (register VBAR_ELx).
    Architectures earlier than v7 have the base address fixed. */
-#if __ARM_ARCH >= 7
+#if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
     __asm__("mcr p15, #0, %0, c12, c0, 0" : : "r"(__vector_table) :);
 #endif
 
