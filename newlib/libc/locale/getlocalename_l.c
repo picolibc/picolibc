@@ -63,8 +63,8 @@ _getlocalename_l_r (struct _reent *ptr, int category, struct __locale_t *locobj)
       /* getlocalename_l is supposed to return the value in a
 	 thread-safe manner.  This requires to copy over the
 	 category string into thread-local storage. */
-      strcpy (_REENT_GETLOCALENAME_L_BUF (ptr),
-	      __get_global_locale ()->categories[category]);
+      return strcpy (_REENT_GETLOCALENAME_L_BUF (ptr),
+		     __get_global_locale ()->categories[category]);
     }
   return locobj->categories[category];
 #endif
