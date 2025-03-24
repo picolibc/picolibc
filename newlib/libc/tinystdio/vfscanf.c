@@ -32,10 +32,19 @@
 
 /* $Id: vfscanf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
+#ifndef SCANF_NAME
+# define SCANF_VARIANT __IO_VARIANT_DOUBLE
+# define SCANF_NAME __d_vfscanf
+#endif
+
 #include "stdio_private.h"
 #include <wctype.h>
 #include "scanf_private.h"
 #include "../stdlib/local.h"
+
+# if __IO_DEFAULT != SCANF_VARIANT || defined(WIDE_CHARS)
+#  define vfscanf SCANF_NAME
+# endif
 
 /*
  * Compute which features are required
@@ -68,8 +77,6 @@ typedef long int_scanf_t;
 # define GETC(s) getwc(s)
 # define UNGETC(c,s) ungetwc(c,s)
 # define ISSPACE(c) iswspace(c)
-# undef vfscanf
-# define vfscanf vfwscanf
 # define IS_EOF(c)       ((c) == WEOF)
 # define WINT            wint_t
 # define IS_WEOF(c)      ((c) == WEOF)
@@ -856,10 +863,13 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 #undef ap
 
-#if defined(__IO_DEFAULT_DOUBLE) && !defined(vfscanf)
-#ifdef __strong_reference
-__strong_reference(vfscanf, __d_vfscanf);
-#else
-int __d_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
-#endif
+#if !defined(WIDE_CHARS)
+# if SCANF_VARIANT == __IO_DEFAULT
+#  undef vfscanf
+#  ifdef __strong_reference
+__strong_reference(vfscanf, SCANF_NAME);
+#  else
+int SCANF_NAME (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
+#  endif
+# endif
 #endif

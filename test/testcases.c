@@ -50,7 +50,7 @@
 # ifndef _HAS_IO_MBCHAR
 #  define NO_MBCHAR
 # endif
-# ifdef PICOLIBC_MINIMAL_PRINTF_SCANF
+# if _PICOLIBC_PRINTF == 'm'
 #  define NO_WIDTH_PREC
 #  define NO_CASE_HEX
 # endif

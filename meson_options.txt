@@ -135,7 +135,7 @@ option('atomic-ungetc', type: 'boolean', value: true,
        description: 'use atomics in fgetc/ungetc to make them re-entrant')
 option('posix-console', type: 'boolean', value: false,
        description: 'Use POSIX I/O for stdin/stdout/stderr')
-option('format-default', type: 'combo', choices: ['double', 'float', 'long-long', 'integer', 'minimal'], value: 'double',
+option('format-default', type: 'combo', choices: ['double', 'float', 'long-long', 'integer', 'minimal', 'd', 'f', 'l', 'i', 'm'], value: 'd',
        description: 'which printf/scanf versions should be the default')
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
@@ -212,7 +212,7 @@ option('crt-runtime-size', type: 'boolean', value: false,
        description: 'compute crt memory space sizes at runtime')
 
 #
-# Non-picoexit startup/shutdown options
+# Legacy (non-picoexit) startup/shutdown options
 #
 
 option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,

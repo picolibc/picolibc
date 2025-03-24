@@ -34,6 +34,7 @@ static const char pstr_nfinity[] = "nfinity";
 static const char pstr_an[] = "an";
 
 #if defined(STRTOD) || defined(STRTOF) || defined(STRTOLD)
+
 # define CHECK_WIDTH()   1
 # define CHECK_RANGE(flt) do {                                          \
         int __class = fpclassify(flt);                                  \
@@ -43,21 +44,28 @@ static const char pstr_an[] = "an";
 # ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
+
 # if defined(STRTOD)
+
 #  define _NEED_IO_DOUBLE
-#  define SCANF_LEVEL           SCANF_DBL
+#  define SCANF_VARIANT           __IO_VARIANT_DOUBLE
 #  define CHECK_LONG()          1
 #  define CHECK_LONG_LONG()     0
+
 # elif defined(STRTOLD)
+
 #  define _NEED_IO_LONG_DOUBLE
-#  define SCANF_LEVEL           SCANF_DBL
+#  define SCANF_VARIANT           __IO_VARIANT_DOUBLE
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     1
+
 # elif defined(STRTOF)
+
 #  define _NEED_IO_FLOAT
-#  define SCANF_LEVEL           SCANF_FLT
+#  define SCANF_VARIANT           __IO_VARIANT_FLOAT
 #  define CHECK_LONG()          0
 #  define CHECK_LONG_LONG()     0
+
 # endif
 
 #define FLT_STREAM const char

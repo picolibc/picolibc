@@ -207,7 +207,49 @@ int	fflush(FILE *stream);
 
 # define fdev_close(f) (fflush(f))
 
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+/* Check for old-style printf selection symbols */
+
+#define __IO_VARIANT_DOUBLE       'd'
+#define __IO_VARIANT_FLOAT        'f'
+#define __IO_VARIANT_LLONG        'l'
+#define __IO_VARIANT_INTEGER      'i'
+#define __IO_VARIANT_MINIMAL      'm'
+
+#ifndef _PICOLIBC_PRINTF
+# if defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_DOUBLE
+# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_FLOAT
+# elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_LLONG
+# elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_INTEGER
+# elif defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_MINIMAL
+# else
+#  define _PICOLIBC_PRINTF __IO_DEFAULT
+# endif
+#endif
+
+/* Check for old-style scanf selection symbols */
+
+#ifndef _PICOLIBC_SCANF
+# if defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_DOUBLE
+# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_FLOAT
+# elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_LLONG
+# elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_INTEGER
+# elif defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_MINIMAL
+# else
+#  define _PICOLIBC_SCANF __IO_DEFAULT
+# endif
+#endif
+
+#if _PICOLIBC_PRINTF == __IO_VARIANT_FLOAT
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wformat"
 #endif
@@ -446,39 +488,9 @@ __printf_float(float f)
 	return u.u;
 }
 
-#ifdef _PICOLIBC_PRINTF
-#if _PICOLIBC_PRINTF == 'd'
-#define PICOLIBC_DOUBLE_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'f'
-#define PICOLIBC_FLOAT_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'l'
-#define PICOLIBC_LONG_LONG_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'i'
-#define PICOLIBC_INTEGER_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'm'
-#define PICOLIBC_MINIMAL_PRINTF_SCANF
-#endif
-#endif
+/* Express printf capabilities to applications in the form of _HAS_IO values */
 
-#if !defined(PICOLIBC_DOUBLE_PRINTF_SCANF) && \
-    !defined(PICOLIBC_FLOAT_PRINTF_SCANF) && \
-    !defined(PICOLIBC_LONG_LONG_PRINTF_SCANF) && \
-    !defined(PICOLIBC_INTEGER_PRINTF_SCANF) && \
-    !defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
-#if defined(__IO_DEFAULT_FLOAT)
-#define PICOLIBC_FLOAT_PRINTF_SCANF
-#elif defined(__IO_DEFAULT_LONG_LONG)
-#define PICOLIBC_LONG_LONG_PRINTF_SCANF
-#elif defined(__IO_DEFAULT_INTEGER)
-#define PICOLIBC_INTEGER_PRINTF_SCANF
-#elif defined(__IO_DEFAULT_MINIMAL)
-#define PICOLIBC_MINIMAL_PRINTF_SCANF
-#else
-#define PICOLIBC_DOUBLE_PRINTF_SCANF
-#endif
-#endif
-
-#if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#if _PICOLIBC_PRINTF == __IO_VARIANT_MINIMAL
 # define printf_float(x) ((double) (x))
 # if defined(__IO_MINIMAL_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
@@ -486,7 +498,7 @@ __printf_float(float f)
 # ifdef __IO_C99_FORMATS
 #  define _HAS_IO_C99_FORMATS
 # endif
-#elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+#elif _PICOLIBC_PRINTF == __IO_VARIANT_INTEGER
 # define printf_float(x) ((double) (x))
 # if defined(__IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
@@ -500,7 +512,7 @@ __printf_float(float f)
 # ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
-#elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+#elif _PICOLIBC_PRINTF == __IO_VARIANT_LLONG
 # define printf_float(x) ((double) (x))
 # define _HAS_IO_LONG_LONG
 # ifdef __IO_POS_ARGS
@@ -512,7 +524,7 @@ __printf_float(float f)
 # ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
-#elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+#elif _PICOLIBC_PRINTF == __IO_VARIANT_FLOAT
 # define printf_float(x) __printf_float(x)
 # define _HAS_IO_LONG_LONG
 # define _HAS_IO_POS_ARGS
@@ -521,7 +533,7 @@ __printf_float(float f)
 #  define _HAS_IO_PERCENT_B
 # endif
 # define _HAS_IO_FLOAT
-#else
+#else /* _PICOLIBC_PRINTF == __IO_VARIANT_DOUBLE */
 # define printf_float(x) ((double) (x))
 # define _HAS_IO_LONG_LONG
 # define _HAS_IO_POS_ARGS
@@ -537,7 +549,7 @@ __printf_float(float f)
 #  define _HAS_IO_PERCENT_B
 # endif
 # ifdef __IO_LONG_DOUBLE
-#  define _HAS_IOlong double
+#  define _HAS_IO_LONG_DOUBLE
 # endif
 #endif
 

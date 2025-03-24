@@ -290,7 +290,14 @@ stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
 posix_console = tinystdio and get_option('posix-console')
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
-format_default = get_option('format-default')
+_line = get_option('format-default')
+# Pick off just the leading character
+if meson.version().version_compare('>=0.56')
+  format_default = _line.substring(0, 1)
+else
+  format_default = run_command(['expr', 'substr', _line, '1', '1'], check : false).stdout().split('\n')[0]
+endif
+
 printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
 printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
@@ -299,139 +306,38 @@ minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 fast_bufio = tinystdio and get_option('fast-bufio')
 io_wchar = tinystdio and get_option('io-wchar')
 
+foreach format : ['d', 'f', 'l', 'i', 'm']
 
-if printf_aliases
-  double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
-  float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
-  llong_printf_compile_args=['-DPICOLIBC_LONG_LONG_PRINTF_SCANF']
-  int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
-  min_printf_compile_args=['-DPICOLIBC_MINIMAL_PRINTF_SCANF']
-else
-  double_printf_compile_args=[]
-  float_printf_compile_args=[]
-  llong_printf_compile_args=[]
-  int_printf_compile_args=[]
-  min_printf_compile_args=[]
-endif
-double_printf_link_args=double_printf_compile_args
-float_printf_link_args=float_printf_compile_args
-llong_printf_link_args=llong_printf_compile_args
-int_printf_link_args=int_printf_compile_args
-min_printf_link_args=min_printf_compile_args
-
-if tinystdio and printf_aliases
-  vfprintf_symbol = global_prefix + 'vfprintf'
-  __d_vfprintf_symbol = global_prefix + '__d_vfprintf'
-  __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
-  __l_vfprintf_symbol = global_prefix + '__l_vfprintf'
-  __i_vfprintf_symbol = global_prefix + '__i_vfprintf'
-  __m_vfprintf_symbol = global_prefix + '__m_vfprintf'
-  vfscanf_symbol = global_prefix + 'vfscanf'
-  __d_vfscanf_symbol = global_prefix + '__d_vfscanf'
-  __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
-  __l_vfscanf_symbol = global_prefix + '__l_vfscanf'
-  __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
-  __m_vfscanf_symbol = global_prefix + '__m_vfscanf'
-
-  if has_link_defsym
-    if format_default != 'double'
-      double_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __d_vfprintf_symbol
-      double_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __d_vfscanf_symbol
-    endif
-    if format_default != 'float'
-      float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
-      float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
-    endif
-    if format_default != 'long-long'
-      llong_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __l_vfprintf_symbol
-      llong_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __l_vfscanf_symbol
-    endif
-    if format_default != 'integer'
-      int_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __i_vfprintf_symbol
-      int_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __i_vfscanf_symbol
-    endif
-    if format_default != 'minimal'
-      min_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __m_vfprintf_symbol
-      min_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __m_vfscanf_symbol
-    endif
-  elif has_link_alias
-    if format_default == 'double'
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-    endif
-    if format_default == 'float'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-    endif
-    if format_default == 'long-long'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-    endif
-    if format_default == 'integer'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-    endif
-    if format_default == 'minimal'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-    endif
-    if format_default != 'double'
-      double_printf_link_args += '-Wl,-alias,' + __d_vfprintf_symbol +  ',' + vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + __d_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'float'
-      float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'long-long'
-      llong_printf_link_args += '-Wl,-alias,' + __l_vfprintf_symbol +  ',' + vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + __l_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'integer'
-      int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + __i_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'minimal'
-      min_printf_link_args += '-Wl,-alias,' + __m_vfprintf_symbol +  ',' + vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + __m_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
+  compile_variable = 'printf_compile_args_@0@'.format(format)
+  if tinystdio and printf_aliases
+    compile_value = ['-D_PICOLIBC_PRINTF=\'@0@\''.format(format),
+                     '-D_PICOLIBC_SCANF=\'@0@\''.format(format)]
   else
-    if enable_tests
-      # If the alias flag is not supported and we are building tests, emit an
-      # error here to avoid surprising test failures.
-      error('Symbol alias linker flag not supported - printf tests will fail!')
+    compile_value = []
+  endif
+  set_variable(compile_variable, compile_value)
+
+  link_variable = 'printf_link_args_@0@'.format(format)
+  link_value = compile_value
+  if tinystdio and printf_aliases
+    if format_default != format
+      if has_link_defsym
+        link_value += '-Wl,--defsym=@0@vfprintf=@0@__@1@_vfprintf'.format(global_prefix, format)
+        link_value += '-Wl,--defsym=@0@vfscanf=@0@__@1@_vfscanf'.format(global_prefix, format)
+      else
+        link_value += '-Wl,-alias,@0@__@1@_vfprintf,@0@vfprintf'.format(global_prefix, format)
+        link_value += '-Wl,-alias,@0@__@1@_vfscanf,@0@vfscanf'.format(global_prefix, format)
+      endif
     endif
   endif
+  set_variable(link_variable, link_value)
+
+endforeach
+
+if tinystdio and enable_tests and not (has_link_defsym or has_link_alias)
+  # If the alias flag is not supported and we are building tests, emit an
+  # error here to avoid surprising test failures.
+  error('Symbol alias linker flag not supported - printf tests will fail!')
 endif
 
 # A bunch of newlib-stdio only options
@@ -583,18 +489,20 @@ if specs_extra_list != []
   specs_extra = '\n' + '\n'.join(specs_extra_list)
 endif
 
+# Handle old-style printf/scanf selection mechanism in the specs file
+
 specs_printf = ''
 if tinystdio and printf_aliases
-  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=' + __d_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=' + __d_vfscanf_symbol + '}' +
-                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=' + __f_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=' + __f_vfscanf_symbol + '}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfprintf=' + __l_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfscanf=' + __l_vfscanf_symbol + '}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=' + __i_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=' + __i_vfscanf_symbol + '}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=' + __m_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=' + __m_vfscanf_symbol + '}')
+  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=@0@__d_vfprintf}' +
+		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=@0@__d_vfscanf}' +
+                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=@0@__f_vfprintf}' +
+		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=@0@__f_vfscanf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfprintf=@0@__l_vfprintf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfscanf=@0@__l_vfscanf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=@0@__i_vfprintf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=@0@__i_vfscanf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=@0@__m_vfprintf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=@0@__m_vfscanf}').format(global_prefix)
 endif
 
 crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
@@ -1389,21 +1297,8 @@ endif
 
 conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
 if tinystdio
-  conf_data.set('__IO_DEFAULT_DOUBLE',
-                format_default == 'double',
-                description: 'The default printf functions is the double variant')
-  conf_data.set('__IO_DEFAULT_FLOAT',
-                format_default == 'float',
-                description: 'The default printf functions is the float variant')
-  conf_data.set('__IO_DEFAULT_LONG_LONG',
-                format_default == 'long-long',
-                description: 'The default printf functions is the long-long variant')
-  conf_data.set('__IO_DEFAULT_INTEGER',
-                format_default == 'integer',
-                description: 'The default printf functions is the integer variant')
-  conf_data.set('__IO_DEFAULT_MINIMAL',
-                format_default == 'minimal',
-                description: 'The default printf functions is the minimal variant')
+  conf_data.set('__IO_DEFAULT', '\'@0@\''.format(format_default),
+                description: 'The default printf and scanf variants')
   conf_data.set('__IO_SMALL_ULTOA',
                 printf_small_ultoa,
                 description: 'avoid software division in decimal conversion')

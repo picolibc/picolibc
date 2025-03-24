@@ -30,6 +30,8 @@
 
 */
 
+#define PRINTF_VARIANT __IO_VARIANT_DOUBLE
+#define PRINTF_NAME vfwprintf
 #define WIDE_CHARS
 
 #include "vfprintf.c"

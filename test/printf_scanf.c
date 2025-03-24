@@ -51,61 +51,23 @@
 #ifndef __PICOLIBC__
 # define printf_float(x) ((double) (x))
 #elif defined(__TINY_STDIO)
-# if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+# ifndef _HAS_IO_FLOAT
 #  define __IO_NO_FLOATING_POINT
+# endif
+# ifndef _HAS_IO_POS_ARGS
 #  define NO_POS_ARGS
+# endif
+# ifndef _HAS_IO_MBCHAR
 #  define NO_MULTI_BYTE
-#  if !defined(__IO_MINIMAL_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
-#   define NO_LONG_LONG
-#  endif
-#  ifndef __IO_C99_FORMATS
-#   define NO_C99_FORMATS
-#  endif
-# elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
-#  define __IO_NO_FLOATING_POINT
-#  define NO_MULTI_BYTE
-#  ifndef __IO_POS_ARGS
-#   define NO_POS_ARGS
-#  endif
-#  if !defined(__IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
-#   define NO_LONG_LONG
-#  endif
-#  ifndef __IO_C99_FORMATS
-#   define NO_C99_FORMATS
-#  endif
-#  ifdef __IO_PERCENT_B
-#   define BINARY_FORMAT
-#  endif
-# elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
-#  define __IO_NO_FLOATING_POINT
-#  define NO_MULTI_BYTE
-#  ifndef __IO_POS_ARGS
-#   define NO_POS_ARGS
-#  endif
-#  ifndef __IO_C99_FORMATS
-#   define NO_C99_FORMATS
-#  endif
-#  ifdef __IO_PERCENT_B
-#   define BINARY_FORMAT
-#  endif
-# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
-#  define NO_MULTI_BYTE
-#  ifndef __IO_FLOAT_EXACT
-#   define NO_FLOAT_EXACT
-#  endif
-#  ifdef __IO_PERCENT_B
-#   define BINARY_FORMAT
-#  endif
-# elif defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
-#  ifndef _HAS_IO_MBCHAR
-#   define NO_MULTI_BYTE
-#  endif
-#  ifndef __IO_FLOAT_EXACT
-#   define NO_FLOAT_EXACT
-#  endif
-#  ifdef __IO_PERCENT_B
-#   define BINARY_FORMAT
-#  endif
+# endif
+# ifndef _HAS_IO_LONG_LONG
+#  define NO_LONG_LONG
+# endif
+# ifndef __HAS_C99_FORMATS
+#  define NO_C99_FORMATS
+# endif
+# ifdef _HAS_IO_PERCENT_B
+#  define BINARY_FORMAT
 # endif
 #else
 #define printf_float(x) ((double) (x))
@@ -158,7 +120,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 }
 
 #if !defined(__IO_NO_FLOATING_POINT)
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+#if _PICOLIBC_PRINTF == 'f'
 #define float_type float
 #define pow(a,b) powf((float) (a), (float) (b))
 #define nextafter(a,b) nextafterf((float)(a), (float)(b))

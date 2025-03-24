@@ -49,20 +49,6 @@
 #include <stdio-bufio.h>
 #include <sys/lock.h>
 
-/* values for PRINTF_LEVEL */
-#define PRINTF_MIN 1
-#define PRINTF_STD 2
-#define PRINTF_LLONG 3
-#define PRINTF_FLT 4
-#define PRINTF_DBL 5
-
-/* values for SCANF_LEVEL */
-#define SCANF_MIN 1
-#define SCANF_STD 2
-#define SCANF_LLONG 3
-#define SCANF_FLT 4
-#define SCANF_DBL 5
-
 struct __file_str {
 	struct __file file;	/* main file struct */
         char	*pos;		/* current buffer position */
@@ -150,6 +136,7 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 
 #define _FDEV_BUFIO_FD(bf) ((int)((intptr_t) (bf)->ptr))
 
+#define IO_VARIANT_IS_FLOAT(v)        ((v) == __IO_VARIANT_FLOAT || (v) == __IO_VARIANT_DOUBLE)
 
 /*
  * While there are notionally two different ways to invoke the

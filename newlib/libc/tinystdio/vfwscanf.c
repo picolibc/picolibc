@@ -30,6 +30,8 @@
 
 */
 
+#define SCANF_VARIANT __IO_VARIANT_DOUBLE
+#define SCANF_NAME vfwscanf
 #define WIDE_CHARS
 
 #include "vfscanf.c"

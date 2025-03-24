@@ -33,39 +33,42 @@
 /* From: Id: printf_p_new.c,v 1.1.1.9 2002/10/15 20:10:28 joerg_wunsch Exp */
 /* $Id: vfprintf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
+#ifndef PRINTF_NAME
+# define PRINTF_VARIANT __IO_VARIANT_DOUBLE
+# define PRINTF_NAME __d_vfprintf
+#endif
+
 #include "stdio_private.h"
 #include "../../libm/common/math_config.h"
 #include "../stdlib/local.h"
 
-#ifdef WIDE_CHARS
-#define CHAR wchar_t
-#define UCHAR wchar_t
-#define vfprintf vfwprintf
-#define PRINTF_LEVEL PRINTF_DBL
-#else
-#define CHAR char
-#define UCHAR unsigned char
-#endif
-
 /*
- * This file can be compiled into more than one flavour:
+ * This file can be compiled into more than one flavour by setting
+ * PRINTF_VARIANT to:
  *
- *  PRINTF_MIN: limited integer-only support with option for long long
+ *  __IO_VARIANT_MINIMAL: limited integer-only support with option for long long
  *
- *  PRINTF_STD: full integer support with options for positional
- *              params and long long
+ *  __IO_VARIANT_INTEGER: integer support except for long long with
+ *              options for positional params
  *
- *  PRINTF_LLONG: full integer support including long long with
+ *  __IO_VARIANT_LLONG: full integer support including long long with
  *                options for positional params
  *
- *  PRINTF_FLT: full support
+ *  __IO_VARIANT_FLOAT: full integer support along with float, but not double
+ *
+ *  __IO_VARIANT_DOUBLE: full support
  */
 
-#ifndef PRINTF_LEVEL
-#  define PRINTF_LEVEL PRINTF_DBL
-#  ifndef __IO_DEFAULT_DOUBLE
-#    define vfprintf __d_vfprintf
-#  endif
+# if __IO_DEFAULT != PRINTF_VARIANT || defined(WIDE_CHARS)
+#  define vfprintf PRINTF_NAME
+# endif
+
+#ifdef WIDE_CHARS
+# define CHAR wchar_t
+# define UCHAR wchar_t
+#else
+# define CHAR char
+# define UCHAR unsigned char
 #endif
 
 /*
@@ -73,7 +76,8 @@
  * values computed in stdio.h
  */
 
-#if PRINTF_LEVEL == PRINTF_MIN
+#if PRINTF_VARIANT == __IO_VARIANT_MINIMAL
+
 # define _NEED_IO_SHRINK
 # if defined(__IO_MINIMAL_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
@@ -81,7 +85,9 @@
 # ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
-#elif PRINTF_LEVEL == PRINTF_STD
+
+#elif PRINTF_VARIANT == __IO_VARIANT_INTEGER
+
 # if defined(__IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
@@ -94,7 +100,9 @@
 # ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
-#elif PRINTF_LEVEL == PRINTF_LLONG
+
+#elif PRINTF_VARIANT == __IO_VARIANT_LLONG
+
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
@@ -107,7 +115,9 @@
 # ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
-#elif PRINTF_LEVEL == PRINTF_FLT
+
+#elif PRINTF_VARIANT == __IO_VARIANT_FLOAT
+
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
@@ -117,7 +127,9 @@
 #  define _NEED_IO_PERCENT_B
 # endif
 # define _NEED_IO_FLOAT
-#elif PRINTF_LEVEL == PRINTF_DBL
+
+#elif PRINTF_VARIANT == __IO_VARIANT_DOUBLE
+
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
@@ -133,8 +145,11 @@
 # if defined(__IO_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
 #  define _NEED_IO_LONG_DOUBLE
 # endif
+
 #else
-# error invalid PRINTF_LEVEL
+
+# error invalid PRINTF_VARIANT
+
 #endif
 
 /* Figure out which multi-byte char support we need */
@@ -147,7 +162,7 @@
 # endif
 #endif
 
-#if PRINTF_LEVEL >= PRINTF_FLT
+#if IO_VARIANT_IS_FLOAT(PRINTF_VARIANT)
 #include "dtoa.h"
 #endif
 
@@ -505,7 +520,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
         char __mb[MB_LEN_MAX];
 #endif
 #endif
-#if PRINTF_LEVEL >= PRINTF_FLT
+#if IO_VARIANT_IS_FLOAT(PRINTF_VARIANT)
 	struct dtoa __dtoa;
 #endif
     } u;
@@ -565,6 +580,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	prec = 0;
 #ifdef _NEED_IO_POS_ARGS
         argno = 0;
+#endif
+#ifdef _NEED_IO_WCHAR
+        wchar_t *wstr = NULL;
 #endif
 
 	do {
@@ -704,7 +722,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
             )
         {
-#if PRINTF_LEVEL >= PRINTF_FLT
+#if IO_VARIANT_IS_FLOAT(PRINTF_VARIANT)
             uint8_t sign;		/* sign character (or 0)	*/
             uint8_t ndigs;		/* number of digits to convert */
             unsigned char case_convert; /* subtract to correct case */
@@ -1050,7 +1068,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     my_putc ('0' + exp, stream);
                 }
 	    }
-#else		/* to: PRINTF_LEVEL >= PRINTF_FLT */
+#else		/* to: IO_VARIANT_IS_FLOAT(PRINTF_VARIANT) */
             SKIP_FLOAT_ARG(flags, ap);
 	    pnt = "*float*";
 	    size = sizeof ("*float*") - 1;
@@ -1061,7 +1079,6 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
         {
             int buf_len;
 #ifdef _NEED_IO_WCHAR
-            wchar_t *wstr = NULL;
             pnt = NULL;
 #endif
 
@@ -1361,12 +1378,13 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 }
 
-#ifndef VFPRINTF_S
-#if defined(__IO_DEFAULT_DOUBLE) && !defined(vfprintf)
-#ifdef __strong_reference
-__strong_reference(vfprintf, __d_vfprintf);
-#else
-int __d_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
-#endif
-#endif
+#if !defined(VFPRINTF_S) && !defined(WIDE_CHARS)
+# if PRINTF_VARIANT == __IO_DEFAULT
+#  undef vfprintf
+#  ifdef __strong_reference
+__strong_reference(vfprintf, PRINTF_NAME);
+#  else
+int PRINTF_NAME (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
+#  endif
+# endif
 #endif

@@ -30,19 +30,7 @@
 
 */
 
-#include "stdio_private.h"
-
-#define PRINTF_LEVEL PRINTF_MIN
-#ifndef __IO_DEFAULT_MINIMAL
-#define vfprintf __m_vfprintf
-#endif
+#define PRINTF_VARIANT __IO_VARIANT_MINIMAL
+#define PRINTF_NAME __m_vfprintf
 
 #include "vfprintf.c"
-
-#ifdef __IO_DEFAULT_MINIMAL
-#ifdef __strong_reference
-__strong_reference(vfprintf, __m_vfprintf);
-#else
-int __m_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
-#endif
-#endif

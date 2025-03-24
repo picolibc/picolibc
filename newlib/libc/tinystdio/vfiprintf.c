@@ -30,20 +30,7 @@
 
 */
 
-#include "stdio_private.h"
-
-#define PICOLIBC_INTEGER_PRINTF_SCANF
-#define PRINTF_LEVEL PRINTF_STD
-#ifndef __IO_DEFAULT_INTEGER
-#define vfprintf __i_vfprintf
-#endif
+#define PRINTF_VARIANT __IO_VARIANT_INTEGER
+#define PRINTF_NAME __i_vfprintf
 
 #include "vfprintf.c"
-
-#ifdef __IO_DEFAULT_INTEGER
-#ifdef __strong_reference
-__strong_reference(vfprintf, __i_vfprintf);
-#else
-int __i_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
-#endif
-#endif

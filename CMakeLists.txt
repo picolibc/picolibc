@@ -235,35 +235,8 @@ if(NOT DEFINED __IO_WCHAR)
   option(__IO_WCHAR "Support %ls/%lc formats in printf even without multi-byte" OFF)
 endif()
 
-if(NOT DEFINED __IO_DEFAULT_MINIMAL)
-  set(__IO_DEFAULT_MINIMAL ${IO_MINIMAL})
-endif()
-
-if(__IO_DEFAULT_MINIMAL)
-  set(__IO_DEFAULT_DOUBLE OFF)
-  set(__IO_DEFAULT_FLOAT OFF)
-  set(__IO_DEFAULT_INTEGER OFF)
-  set(__IO_DEFAULT_LONG_LONG OFF)
-endif()
-
-if(NOT DEFINED __IO_DEFAULT_DOUBLE)
-  set(__IO_DEFAULT_DOUBLE ${__IO_FLOAT})
-endif()
-
-if(NOT DEFINED __IO_DEFAULT_FLOAT)
-  set(__IO_DEFAULT_FLOAT OFF)
-endif()
-
-if(NOT DEFINED __IO_DEFAULT_LONG_LONG)
-  set(__IO_DEFAULT_LONG_LONG OFF)
-endif()
-
-if(NOT DEFINED __IO_DEFAULT_INTEGER)
-  if (__IO_FLOAT)
-    set(__IO_DEFAULT_INTEGER OFF)
-  else()
-    set(__IO_DEFAULT_INTEGER ON)
-  endif()
+if(NOT DEFINED __IO_DEFAULT)
+  set(__IO_DEFAULT d)
 endif()
 
 # math library sets errno

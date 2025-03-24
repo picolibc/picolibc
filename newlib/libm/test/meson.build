@@ -189,8 +189,8 @@ foreach params : targets
   _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
-  _c_args = double_printf_compile_args + _c_args
-  _link_args = double_printf_link_args + _link_args
+  _c_args = printf_compile_args_d + _c_args
+  _link_args = printf_link_args_d + _link_args
 
   foreach test_part : test_parts
     if test_part == '-1'

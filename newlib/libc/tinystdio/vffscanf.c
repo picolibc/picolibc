@@ -30,20 +30,7 @@
 
 */
 
-#include "stdio_private.h"
-
-#define PICOLIBC_FLOAT_PRINTF_SCANF
-#define SCANF_LEVEL SCANF_FLT
-#ifndef __IO_DEFAULT_FLOAT
-#define vfscanf __f_vfscanf
-#endif
+#define SCANF_VARIANT __IO_VARIANT_FLOAT
+#define SCANF_NAME __f_vfscanf
 
 #include "vfscanf.c"
-
-#ifdef __IO_DEFAULT_FLOAT
-#ifdef __strong_reference
-__strong_reference(vfscanf, __f_vfscanf);
-#else
-int __f_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
-#endif
-#endif
