@@ -268,6 +268,7 @@ typedef enum _FILE_INFORMATION_CLASS
   FileLinkInformationExBypassAccessCheck,	// 73
   FileStorageReserveIdInformation,		// 74
   FileCaseSensitiveInformationForceAccessCheck,	// 75
+  FileKnownFolderInformation,			// 76
   FileMaximumInformation
 } FILE_INFORMATION_CLASS, *PFILE_INFORMATION_CLASS;
 
