@@ -370,7 +370,7 @@ struct _misc_reent
   _mbstate_t _wcrtomb_state;
   _mbstate_t _wcsrtombs_state;
 #ifdef _MB_CAPABLE
-  char _getlocalename_l_buf[32 /*ENCODING + 1*/];
+  char _getlocalename_l_buf[7 /* _LC_LAST */ * 32 /*ENCODING + 1*/];
 #endif
 };
 
@@ -570,7 +570,9 @@ struct _reent
 #define _REENT_WCSRTOMBS_STATE(ptr) ((ptr)->_misc->_wcsrtombs_state)
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_misc->_l64a_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_misc->_getdate_err))
+#ifdef _MB_CAPABLE
 #define _REENT_GETLOCALENAME_L_BUF(ptr) ((ptr)->_misc->_getlocalename_l_buf)
+#endif
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_signal_buf)
 
 #else /* !_REENT_SMALL */
@@ -641,10 +643,13 @@ struct _reent
           _mbstate_t _mbrtoc16_state;
           _mbstate_t _mbrtoc32_state;
 #endif
+#ifdef _MB_CAPABLE
 	  /* No errors are defined for getlocalename_l.  So we can't use
 	     buffer allocation which might lead to an ENOMEM error.  We
 	     have to use a "static" buffer here instead. */
-	  char _getlocalename_l_buf[32 /* ENCODING_LEN + 1 */];
+	  char _getlocalename_l_buf[7 /* _LC_LAST */
+				    * 32 /* ENCODING_LEN + 1 */];
+#endif
         } _reent;
 #ifdef _REENT_BACKWARD_BINARY_COMPAT
       struct
@@ -764,7 +769,9 @@ struct _reent
 #define _REENT_L64A_BUF(ptr)    ((ptr)->_new._reent._l64a_buf)
 #define _REENT_SIGNAL_BUF(ptr)  ((ptr)->_new._reent._signal_buf)
 #define _REENT_GETDATE_ERR_P(ptr) (&((ptr)->_new._reent._getdate_err))
+#ifdef _MB_CAPABLE
 #define _REENT_GETLOCALENAME_L_BUF(ptr)((ptr)->_new._reent._getlocalename_l_buf)
+#endif
 
 #endif /* !_REENT_SMALL */
 

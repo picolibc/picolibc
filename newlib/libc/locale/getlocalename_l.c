@@ -53,11 +53,18 @@ PORTABILITY
 const char *
 _getlocalename_l_r (struct _reent *ptr, int category, struct __locale_t *locobj)
 {
-  if (category <= LC_ALL || category > LC_MESSAGES)
+  if (category < LC_ALL || category > LC_MESSAGES)
     return NULL;
 #ifndef _MB_CAPABLE
   return "C";
 #else
+  if (category == LC_ALL)
+    {
+      if (locobj == LC_GLOBAL_LOCALE)
+	return __currentlocale (__get_global_locale (),
+				_REENT_GETLOCALENAME_L_BUF (ptr));
+      return __currentlocale (locobj, locobj->locale_string);
+    }
   if (locobj == LC_GLOBAL_LOCALE)
     {
       /* getlocalename_l is supposed to return the value in a
