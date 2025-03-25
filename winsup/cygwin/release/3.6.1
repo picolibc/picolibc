@@ -10,3 +10,8 @@ Fixes:
 - getlocalename_l: Fix a crash and handle LC_ALL according to final
   POSIX-1.2024 docs.
   Addresses: https://cygwin.com/pipermail/cygwin/2025-March/257715.html
+
+- Copy context to alternate signal stack area in call_signal_handler()
+  in the SA_ONSTACK case, because locally-copied context on the normal
+  stack area is not accessible from the signal handler.
+  Addresses: https://cygwin.com/pipermail/cygwin/2025-March/257714.html

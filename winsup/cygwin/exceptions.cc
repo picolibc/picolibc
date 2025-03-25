@@ -1791,6 +1791,13 @@ _cygtls::call_signal_handler ()
 	     to 16 byte. */
 	  uintptr_t new_sp = ((uintptr_t) _my_tls.altstack.ss_sp
 			      + _my_tls.altstack.ss_size) & ~0xf;
+	  /* Copy context1 to the alternate signal stack area, because the
+	     context1 allocated in the normal stack area is not accessible
+	     from the signal handler that uses alternate signal stack. */
+	  thiscontext = (ucontext_t *) ((new_sp - sizeof (ucontext_t)) & ~0xf);
+	  memcpy (thiscontext, &context1, sizeof (ucontext_t));
+	  new_sp = (uintptr_t) thiscontext;
+
 	  /* In assembler: Save regs on new stack, move to alternate stack,
 	     call thisfunc, revert stack regs. */
 #ifdef __x86_64__
@@ -1834,6 +1841,7 @@ _cygtls::call_signal_handler ()
 #else
 #error unimplemented for this target
 #endif
+	  memcpy (&context1, thiscontext, sizeof (ucontext_t));
 	}
       else
 	/* No alternate signal stack requested or available, just call
