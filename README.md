@@ -162,6 +162,37 @@ use Picolibc:
  * Add TLS support and testing on loongarch, m68k, or1k, powerpc and
    superh.
 
+ * Fix a couple of strncpy bugs in ARC assembly code.
+
+ * Clean up preprocessor symbols: remove unused symbols, rename
+   picolibc.h symbols to use a __ prefix and not include PICOLIBC or
+   NEWLIB in the names.
+
+ * Detect compiler attributes and builtins at compile time rather than
+   configure time where possible. Delete attributes and builtins not
+   used within the library implementation.
+
+ * Remove non-standard elf.h and mstats API.
+
+ * Clean up float predicates to make sure we provide implementations
+   of isinf, isnan and finite for all three types, both with and
+   without __ prefixes. Use symbol aliases to share the same function
+   implementation. Use the __ versions for the type generic macros
+   instead of fpclassify. Switch users of these within the math
+   library to use the type-generic versions.
+
+ * Start SuperH FPU in single mode when required.
+
+ * Test sh1 and sh2 targets using the binutils simulator.
+
+ * Initialize PowerPC IPLT table at startup.
+
+ * Switch printf/scanf aliases to prefer --printf=/--scanf= compiler
+   options
+
+ * Control UCS-2 and UCS-4 locales with mb-ucs-charsets configuration
+   option.
+
 ### Picolibc release 1.8.9
 
  * Use common clang/gcc feature detection macros on arm.

@@ -797,6 +797,7 @@ Files: cmake/TC-rx.ld
  newlib/libc/picolib/machine/or1k/meson.build
  newlib/libc/picolib/machine/or1k/tls.c
  newlib/libc/picolib/machine/powerpc/CMakeLists.txt
+ newlib/libc/picolib/machine/powerpc/hwcap.c
  newlib/libc/picolib/machine/powerpc/meson.build
  newlib/libc/picolib/machine/powerpc/tls.c
  newlib/libc/picolib/machine/sh/tls.c
@@ -809,6 +810,7 @@ Files: cmake/TC-rx.ld
  semihost/machine/lm32/lm32_errno.c
  semihost/machine/rx/rx_iob.c
  semihost/machine/rx/rx_semihost.h
+ semihost/machine/sh/sh_syscall.c
  test/test-scmpu.c
  test/test-wcase.c
  test/test-wctomb.c
@@ -817,7 +819,6 @@ License: BSD3-1
 
 Files: doc/printf-sample/Makefile
  doc/printf-sample/printf.c
- dummyhost/exit.c
  newlib/libc/machine/arm/machine/fenv-fp.h
  newlib/libc/machine/m68k/CMakeLists.txt
  newlib/libc/machine/m68k/machine/fenv-fp.h
@@ -885,9 +886,7 @@ Files: doc/printf-sample/Makefile
 Copyright: 2023 Keith Packard
 License: BSD3-1
 
-Files: dummyhost/iob.c
- dummyhost/meson.build
- hello-world/Makefile
+Files: hello-world/Makefile
  hello-world/hello-world.c
  hello-world/printf.c
  hello-world/run-aarch64
@@ -1525,6 +1524,10 @@ Files: test/test-sprintf-percent-n.c
  test/test-wchar.c
 Copyright: 2024, Synopsys Inc.
  2024, Solid Sands B.V.
+License: BSD3-1
+
+Files: test/test-strncpy.c
+Copyright: 2025 Fredrik Gihl
 License: BSD3-1
 
 Files: test/test-tmpnam.c
@@ -2333,8 +2336,6 @@ Files: newlib/libc/machine/spu/fdopen.c
  newlib/libm/common/copysignl.c
  newlib/libm/common/fabsl.c
  newlib/libm/common/frexpl.c
- newlib/libm/common/isinfl.c
- newlib/libm/common/isnanl.c
  newlib/libm/common/nanl.c
  newlib/libm/common/scalbnl.c
  newlib/libm/ld/s_isinfl.c
@@ -3412,7 +3413,6 @@ Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/mbstowcs.c
  newlib/libc/stdlib/mbtowc.c
  newlib/libc/stdlib/mbtowc_r.c
- newlib/libc/stdlib/mstats.c
  newlib/libc/stdlib/on_exit.c
  newlib/libc/stdlib/rand.c
  newlib/libc/stdlib/rand_r.c
@@ -3750,12 +3750,6 @@ Files: newlib/libc/string/explicit_bzero.c
 Copyright: 2014 Ted Unangst
 License: Other-2
 
-Files: newlib/libc/include/elf.h
- newlib/libc/string/strverscmp.c
- newlib/libm/common/nexttowardf.c
-Copyright: 2005-2014 Rich Felker, et al.
-License: Other-3
-
 Files: newlib/libc/include/ftw.h
 Copyright: 2005-2020 Rich Felker, et al.
 License: Other-3
@@ -3785,6 +3779,11 @@ License: Other-3
 
 Files: newlib/libc/machine/xtensa/xtensa-asm.h
 Copyright: 2006 Tensilica Inc.
+License: Other-3
+
+Files: newlib/libc/string/strverscmp.c
+ newlib/libm/common/nexttowardf.c
+Copyright: 2005-2014 Rich Felker, et al.
 License: Other-3
 
 Files: test/libc-testsuite/basename.c
@@ -4293,9 +4292,7 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/s_ilogb.c
  newlib/libm/common/s_infinity.c
  newlib/libm/common/s_isinf.c
- newlib/libm/common/s_isinfd.c
  newlib/libm/common/s_isnan.c
- newlib/libm/common/s_isnand.c
  newlib/libm/common/s_llrint.c
  newlib/libm/common/s_llround.c
  newlib/libm/common/s_log1p.c
@@ -4321,9 +4318,7 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/sf_ilogb.c
  newlib/libm/common/sf_infinity.c
  newlib/libm/common/sf_isinf.c
- newlib/libm/common/sf_isinff.c
  newlib/libm/common/sf_isnan.c
- newlib/libm/common/sf_isnanf.c
  newlib/libm/common/sf_llrint.c
  newlib/libm/common/sf_llround.c
  newlib/libm/common/sf_log1p.c
