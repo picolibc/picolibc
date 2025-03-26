@@ -96,9 +96,9 @@
 #endif
 
 #if __has_attribute(__format__)
-# define __format(a,b,c) __attribute__((__format__(a,b,c)))
+# define __picolibc_format(a,b,c) __attribute__((__format__(a,b,c)))
 #else
-# define __format(a,b,c)
+# define __picolibc_format(a,b,c)
 #endif
 
 #if __has_attribute(__nonnull__)

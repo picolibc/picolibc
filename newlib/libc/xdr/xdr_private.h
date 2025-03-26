@@ -34,10 +34,10 @@ typedef void (*xdr_vprintf_t) (const char *, va_list);
 xdr_vprintf_t xdr_set_vprintf (xdr_vprintf_t);
 
 void xdr_vwarnx (const char *, va_list)
-    __format(__printf__, 1, 0);
+    __picolibc_format(__printf__, 1, 0);
 
 void xdr_warnx (const char *, ...)
-    __format(__printf__, 1, 2);
+    __picolibc_format(__printf__, 1, 2);
 
 /* endian issues */
 #include <machine/endian.h>

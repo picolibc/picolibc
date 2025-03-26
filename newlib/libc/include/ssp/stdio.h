@@ -36,16 +36,16 @@
 _BEGIN_STD_C
 
 int __sprintf_chk(char *__restrict, int, size_t, const char *__restrict, ...)
-    __format(__printf__, 4, 5);
+    __picolibc_format(__printf__, 4, 5);
 int __vsprintf_chk(char *__restrict, int, size_t, const char *__restrict,
     __gnuc_va_list)
-    __format(__printf__, 4, 0);
+    __picolibc_format(__printf__, 4, 0);
 int __snprintf_chk(char *__restrict, size_t, int, size_t,
     const char *__restrict, ...)
-    __format(__printf__, 5, 6);
+    __picolibc_format(__printf__, 5, 6);
 int __vsnprintf_chk(char *__restrict, size_t, int, size_t,
      const char *__restrict, __gnuc_va_list)
-    __format(__printf__, 5, 0);
+    __picolibc_format(__printf__, 5, 0);
 char *__gets_chk(char *, size_t);
 
 #if __SSP_FORTIFY_LEVEL > 0
