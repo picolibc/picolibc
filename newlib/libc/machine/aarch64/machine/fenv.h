@@ -45,17 +45,17 @@ typedef	__uint64_t	fexcept_t;
 
 /* compiler-rt has no exceptions in soft-float */
 
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
 
 #if (__ARM_FP & 0x8) == 0
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
 #endif
 
 #if (__ARM_FP & 0x4) == 0
-#define PICOLIBC_FLOAT_NOROUND
-#define PICOLIBC_FLOAT_NOEXCEPT
+#define __FLOAT_NOROUND
+#define __FLOAT_NOEXCEPT
 #endif
 
 #else
@@ -63,12 +63,12 @@ typedef	__uint64_t	fexcept_t;
 /* libgcc has exceptions when there is an FPU */
 
 #if __ARM_FP == 0
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
-#define PICOLIBC_FLOAT_NOROUND
-#define PICOLIBC_FLOAT_NOEXCEPT
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
+#define __FLOAT_NOROUND
+#define __FLOAT_NOEXCEPT
 #endif
 
 #endif

@@ -201,7 +201,7 @@ e_to_str(int e)
 #define NO_NEXTTOWARD
 #endif
 
-#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#ifdef __LONG_DOUBLE_NOEXCEPT
 #define EXCEPTION_TEST 0
 #else
 #define EXCEPTION_TEST	MATH_ERREXCEPT
@@ -265,7 +265,7 @@ e_to_str(int e)
 #endif
 
 /* Tests with doubles */
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#ifdef __DOUBLE_NOEXCEPT
 #define EXCEPTION_TEST 0
 #else
 #define EXCEPTION_TEST	MATH_ERREXCEPT

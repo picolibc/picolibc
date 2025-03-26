@@ -278,7 +278,7 @@ issignaling64_inline (__float64 x)
 #define CONST_FORCE_FLOAT_MODIFIER
 #endif
 
-#ifdef PICOLIBC_FLOAT_NOEXCEPT
+#ifdef __FLOAT_NOEXCEPT
 #define FORCE_FLOAT     float
 #define CONST_FORCE_FLOAT const float
 #define pick_float_except(expr,val)    (val)
@@ -288,7 +288,7 @@ issignaling64_inline (__float64 x)
 #define pick_float_except(expr,val)    (expr)
 #endif
 
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#ifdef __DOUBLE_NOEXCEPT
 #define FORCE_DOUBLE    double
 #define CONST_FORCE_DOUBLE      const double
 #define pick_double_except(expr,val)    (val)
@@ -298,7 +298,7 @@ issignaling64_inline (__float64 x)
 #define pick_double_except(expr,val)    (expr)
 #endif
 
-#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#ifdef __LONG_DOUBLE_NOEXCEPT
 #define FORCE_LONG_DOUBLE       long double
 #define CONST_FORCE_LONG_DOUBLE const long double
 #define pick_long_double_except(expr,val)       (val)
@@ -508,11 +508,11 @@ force_eval_long_double (long double x)
 # define _MATH_ALIAS_k_d_to_f(name)
 # define _MATH_ALIAS_i_dd_to_f(name)
 # define _MATH_ALIAS_v_dDD_to_f(name)
-# ifdef PICOLIBC_DOUBLE_NOEXCEPT
-#  define PICOLIBC_FLOAT64_NOEXCEPT
+# ifdef __DOUBLE_NOEXCEPT
+#  define __FLOAT64_NOEXCEPT
 # endif
-# ifdef PICOLIBC_DOUBLE_NOROUND
-#  define PICOLIBC_FLOAT64_NOROUND
+# ifdef __DOUBLE_NOROUND
+#  define __FLOAT64_NOROUND
 # endif
 #endif
 
@@ -635,11 +635,11 @@ force_eval_long_double (long double x)
 #  define CONST_FORCE_FLOAT64 CONST_FORCE_LONG_DOUBLE
 #  define pick_float64_except(a,b) pick_long_double_except(a,b)
 #  define _NEED_FLOAT64
-#  ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
-#   define PICOLIBC_FLOAT64_NOEXCEPT
+#  ifdef __LONG_DOUBLE_NOEXCEPT
+#   define __FLOAT64_NOEXCEPT
 #  endif
-#  ifdef PICOLIBC_LONG_DOUBLE_NOROUND
-#   define PICOLIBC_FLOAT64_NOROUND
+#  ifdef __LONG_DOUBLE_NOROUND
+#   define __FLOAT64_NOROUND
 #  endif
 #  define __F_64(x)     x ## L
 #  define _F_64(x)      __F_64(x)
@@ -891,7 +891,7 @@ HIDDEN float __math_divzerof (uint32_t);
 /* Invalid input unless it is a quiet NaN.  */
 HIDDEN float __math_invalidf (float);
 /* set invalid exception */
-#if defined(FE_INVALID) && !defined(PICOLIBC_FLOAT_NOEXCEPT)
+#if defined(FE_INVALID) && !defined(__FLOAT_NOEXCEPT)
 HIDDEN void __math_set_invalidf(void);
 #else
 #define __math_set_invalidf()   ((void) 0)
@@ -915,7 +915,7 @@ check_uflowf (float x)
   return WANT_ERRNO ? __math_check_uflowf (x) : x;
 }
 
-#if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT_NOEXCEPT)
+#if defined(FE_INEXACT) && !defined(__FLOAT_NOEXCEPT)
 float __math_inexactf(float val);
 void __math_set_inexactf(void);
 #else
@@ -931,7 +931,7 @@ __math_with_errnof (float y, int e);
 #endif
 
 /* Check if the result is a denorm. */
-#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_FLOAT_NOEXCEPT)) || WANT_ERRNO
+#if (defined(FE_UNDERFLOW) && !defined(__FLOAT_NOEXCEPT)) || WANT_ERRNO
 float __math_denormf (float x);
 #else
 #define __math_denormf(x) (x)
@@ -952,7 +952,7 @@ HIDDEN __float64 __math_divzero (uint32_t);
 /* Invalid input unless it is a quiet NaN.  */
 HIDDEN __float64 __math_invalid (__float64);
 /* set invalid exception */
-#if defined(FE_INVALID) && !defined(PICOLIBC_DOUBLE_NOEXCEPT)
+#if defined(FE_INVALID) && !defined(__DOUBLE_NOEXCEPT)
 HIDDEN void __math_set_invalid(void);
 #else
 #define __math_set_invalid()    ((void) 0)
@@ -977,7 +977,7 @@ check_uflow (__float64 x)
 }
 
 /* Set inexact exception */
-#if defined(FE_INEXACT) && !defined(PICOLIBC_FLOAT64_NOEXCEPT)
+#if defined(FE_INEXACT) && !defined(__FLOAT64_NOEXCEPT)
 __float64 __math_inexact64(__float64 x);
 void __math_set_inexact64(void);
 #else
@@ -992,7 +992,7 @@ __math_with_errno (__float64 y, int e);
 #define __math_with_errno(x, e) (x)
 #endif
 
-#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_FLOAT64_NOEXCEPT)) || WANT_ERRNO
+#if (defined(FE_UNDERFLOW) && !defined(__FLOAT64_NOEXCEPT)) || WANT_ERRNO
 __float64 __math_denorm (__float64 x);
 #else
 #define __math_denorm(x) (x)
@@ -1011,7 +1011,7 @@ HIDDEN long double __math_divzerol (uint32_t);
 /* Invalid input unless it is a quiet NaN.  */
 HIDDEN long double __math_invalidl (long double);
 /* set invalid exception */
-#if defined(FE_INVALID) && !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)
+#if defined(FE_INVALID) && !defined(__LONG_DOUBLE_NOEXCEPT)
 HIDDEN void __math_set_invalidl(void);
 #else
 #define __math_set_invalidl()    ((void) 0)
@@ -1035,7 +1035,7 @@ check_uflowl (long double x)
   return WANT_ERRNO ? __math_check_uflowl (x) : x;
 }
 
-#if defined(FE_INEXACT) && !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)
+#if defined(FE_INEXACT) && !defined(__LONG_DOUBLE_NOEXCEPT)
 long double __math_inexactl(long double val);
 void __math_set_inexactl(void);
 #else
@@ -1050,7 +1050,7 @@ __math_with_errnol (long double y, int e);
 #define __math_with_errnol(x, e) (x)
 #endif
 
-#if (defined(FE_UNDERFLOW) && !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)) || WANT_ERRNO
+#if (defined(FE_UNDERFLOW) && !defined(__LONG_DOUBLE_NOEXCEPT)) || WANT_ERRNO
 long double __math_denorml(long double x);
 #else
 #define __math_denorml(x) (x)

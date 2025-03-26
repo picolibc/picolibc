@@ -38,14 +38,14 @@ typedef int fenv_t;
 typedef int fexcept_t;
 
 #if (__ARM_FP & 0x8) == 0
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
+#define __LONG_DOUBLE_NOEXCEPT
 #endif
 
 #if (__ARM_FP & 0x4) == 0
-#define PICOLIBC_FLOAT_NOROUND
-#define PICOLIBC_FLOAT_NOEXCEPT
+#define __FLOAT_NOROUND
+#define __FLOAT_NOEXCEPT
 #endif
 
 #if __ARM_FP != 0

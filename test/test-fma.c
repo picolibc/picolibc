@@ -100,7 +100,7 @@ static const char *rounding_names[] = {
 
 #define NROUND  (sizeof(roundings)/sizeof(roundings[0]))
 
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#ifdef __DOUBLE_NOEXCEPT
 /*
  * Assume that a lack of exceptions for doubles also means a lack of
  * support for non-default rounding modes for doubles.
@@ -213,7 +213,7 @@ test_fmaf(void)
 
 #ifdef HAVE_DOUBLE_FMA_VEC
 
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#ifdef __DOUBLE_NOEXCEPT
 /*
  * Assume that a lack of exceptions for doubles also means a lack of
  * support for non-default rounding modes for doubles.
@@ -272,7 +272,7 @@ test_fma(void)
 
 #if defined (_TEST_LONG_DOUBLE) && defined(HAVE_LONG_DOUBLE_FMA_VEC)
 
-#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#ifdef __LONG_DOUBLE_NOEXCEPT
 /*
  * Assume that a lack of exceptions for doubles also means a lack of
  * support for non-default rounding modes for doubles.

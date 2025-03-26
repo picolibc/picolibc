@@ -79,7 +79,7 @@ EXPONENT(FLOAT_T x)
     return u.bits.exp;
 }
 
-#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#ifdef __LONG_DOUBLE_NOEXCEPT
 #define feraiseexcept(x) ((void) (x))
 #endif
 

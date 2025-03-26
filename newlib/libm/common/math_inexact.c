@@ -35,7 +35,7 @@
 
 #include "math_config.h"
 
-#if FE_INEXACT && !defined(PICOLIBC_FLOAT64_NOEXCEPT)
+#if FE_INEXACT && !defined(__FLOAT64_NOEXCEPT)
 
 static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MIN, _F_64(0.0));
 

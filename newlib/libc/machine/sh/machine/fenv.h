@@ -41,17 +41,17 @@ typedef int fexcept_t;
 #ifdef __SH_FPU_ANY__
 
 #ifdef __SH2E__
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
 #if __SIZEOF_DOUBLE__ > 4
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
 #endif
 #endif
 
 #ifdef __SH4_SINGLE_ONLY__
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
 #endif
 
 /* Exception flags */
