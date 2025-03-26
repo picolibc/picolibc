@@ -339,21 +339,21 @@ FILE *	freopen (const char *__restrict, const char *__restrict, FILE *__restrict
 void	setbuf (FILE *__restrict, char *__restrict);
 int	setvbuf (FILE *__restrict, char *__restrict, int, size_t);
 int	fprintf (FILE *__restrict, const char *__restrict, ...)
-               __format(__printf__, 2, 3);
+               __picolibc_format(__printf__, 2, 3);
 int	fscanf (FILE *__restrict, const char *__restrict, ...)
-               __format(__scanf__,  2, 3);
+               __picolibc_format(__scanf__,  2, 3);
 int	printf (const char *__restrict, ...)
-               __format(__printf__, 1, 2);
+               __picolibc_format(__printf__, 1, 2);
 int	scanf (const char *__restrict, ...)
-               __format(__scanf__,  1, 2);
+               __picolibc_format(__scanf__,  1, 2);
 int	sscanf (const char *__restrict, const char *__restrict, ...)
-               __format(__scanf__,  2, 3);
+               __picolibc_format(__scanf__,  2, 3);
 int	vfprintf (FILE *__restrict, const char *__restrict, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 int	vprintf (const char *, va_list)
-               __format(__printf__, 1, 0);
+               __picolibc_format(__printf__, 1, 0);
 int	vsprintf (char *__restrict, const char *__restrict, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 int	fgetc (FILE *);
 char *  fgets (char *__restrict, int, FILE *__restrict);
 int	fputc (int, FILE *);
@@ -386,7 +386,7 @@ int	ferror (FILE *);
 void    perror (const char *);
 FILE *	fopen (const char *__restrict _name, const char *__restrict _type);
 int	sprintf (char *__restrict, const char *__restrict, ...)
-               __format(__printf__, 2, 3);
+               __picolibc_format(__printf__, 2, 3);
 int	remove (const char *);
 int	rename (const char *, const char *);
 #ifdef _LIBC
@@ -406,72 +406,72 @@ int	fcloseall (void);
 #endif
 #if __ISO_C_VISIBLE >= 1999
 int	snprintf (char *__restrict, size_t, const char *__restrict, ...)
-               __format(__printf__, 3, 4);
+               __picolibc_format(__printf__, 3, 4);
 int	vsnprintf (char *__restrict, size_t, const char *__restrict, va_list)
-               __format(__printf__, 3, 0);
+               __picolibc_format(__printf__, 3, 0);
 int	vfscanf (FILE *__restrict, const char *__restrict, va_list)
-               __format(__scanf__,  2, 0);
+               __picolibc_format(__scanf__,  2, 0);
 int	vscanf (const char *, va_list)
-               __format(__scanf__,  1, 0);
+               __picolibc_format(__scanf__,  1, 0);
 int	vsscanf (const char *__restrict, const char *__restrict, va_list)
-               __format(__scanf__,  2, 0);
+               __picolibc_format(__scanf__,  2, 0);
 #endif
 #if __GNU_VISIBLE
 int	asprintf (char **__restrict, const char *__restrict, ...)
-               __format(__printf__, 2, 3);
+               __picolibc_format(__printf__, 2, 3);
 int	vasprintf (char **, const char *, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 #endif
 #if __MISC_VISIBLE /* Newlib-specific */
 int	asiprintf (char **, const char *, ...)
-               __format(__printf__, 2, 3);
+               __picolibc_format(__printf__, 2, 3);
 char *	asniprintf (char *, size_t *, const char *, ...)
-               __format(__printf__, 3, 4);
+               __picolibc_format(__printf__, 3, 4);
 char *	asnprintf (char *__restrict, size_t *__restrict, const char *__restrict, ...)
-               __format(__printf__, 3, 4);
+               __picolibc_format(__printf__, 3, 4);
 #ifndef diprintf
 int	diprintf (int, const char *, ...)
-               __format(__printf__, 2, 3);
+               __picolibc_format(__printf__, 2, 3);
 #endif
 int	fiprintf (FILE *, const char *, ...)
-               __format(__printf__, 2, 3) __nothrow;
+               __picolibc_format(__printf__, 2, 3) __nothrow;
 #define __i_fprintf fiprintf
 int	fiscanf (FILE *, const char *, ...)
-               __format(__scanf__,  2, 3);
+               __picolibc_format(__scanf__,  2, 3);
 int	iprintf (const char *, ...)
-               __format(__printf__, 1, 2);
+               __picolibc_format(__printf__, 1, 2);
 int	iscanf (const char *, ...)
-               __format(__scanf__,  1, 2);
+               __picolibc_format(__scanf__,  1, 2);
 int	siprintf (char *, const char *, ...)
-               __format(__printf__, 2, 3) __nothrow;
+               __picolibc_format(__printf__, 2, 3) __nothrow;
 #define __i_sprintf siprintf
 int	siscanf (const char *, const char *, ...)
-               __format(__scanf__,  2, 3);
+               __picolibc_format(__scanf__,  2, 3);
 int	sniprintf (char *, size_t, const char *, ...)
-               __format(__printf__, 3, 4) __nothrow;
+               __picolibc_format(__printf__, 3, 4) __nothrow;
 #define  __i_snprintf sniprintf
 int	vasiprintf (char **, const char *, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 char *	vasniprintf (char *, size_t *, const char *, va_list)
-               __format(__printf__, 3, 0);
+               __picolibc_format(__printf__, 3, 0);
 char *	vasnprintf (char *, size_t *, const char *, va_list)
-               __format(__printf__, 3, 0);
+               __picolibc_format(__printf__, 3, 0);
 int	vdiprintf (int, const char *, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 int	vfiprintf (FILE *, const char *, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 int	vfiscanf (FILE *, const char *, va_list)
-               __format(__scanf__,  2, 0);
+               __picolibc_format(__scanf__,  2, 0);
 int	viprintf (const char *, va_list)
-               __format(__printf__, 1, 0);
+               __picolibc_format(__printf__, 1, 0);
 int	viscanf (const char *, va_list)
-               __format(__scanf__,  1, 0);
+               __picolibc_format(__scanf__,  1, 0);
 int	vsiprintf (char *, const char *, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 int	vsiscanf (const char *, const char *, va_list)
-               __format(__scanf__,  2, 0);
+               __picolibc_format(__scanf__,  2, 0);
 int	vsniprintf (char *, size_t, const char *, va_list)
-               __format(__printf__, 3, 0) __nothrow;
+               __picolibc_format(__printf__, 3, 0) __nothrow;
 #endif /* __MISC_VISIBLE */
 
 /*
@@ -513,14 +513,14 @@ int	putchar_unlocked (int);
 #if __POSIX_VISIBLE >= 200809
 #  ifndef dprintf
 int	dprintf (int, const char *__restrict, ...)
-               __format(__printf__, 2, 3);
+               __picolibc_format(__printf__, 2, 3);
 #  endif
 FILE *	fmemopen (void *__restrict, size_t, const char *__restrict);
 /* getdelim - see __getdelim for now */
 /* getline - see __getline for now */
 FILE *	open_memstream (char **, size_t *);
 int	vdprintf (int, const char *__restrict, va_list)
-               __format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0);
 #endif
 #if __ATFILE_VISIBLE
 int	renameat (int, const char *, int, const char *);
