@@ -30,7 +30,7 @@
 
 #ifndef __math_denormf
 
-#ifndef PICOLIBC_FLOAT_NOEXCEPT
+#ifndef __FLOAT_NOEXCEPT
 static CONST_FORCE_FLOAT VAL = __FLT_MIN__;
 #endif
 

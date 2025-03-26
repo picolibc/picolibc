@@ -489,7 +489,7 @@ static FLOAT_T makemathname(test_nexttoward_negmin_neg1)(void) { return makemath
 static FLOAT_T makemathname(test_nexttoward_qnan_1)(void) { return makemathname(nexttoward)(makemathname(qnanval), makelname(one)); }
 static FLOAT_T makemathname(test_nexttoward_snan_1)(void) { return makemathname(nexttoward)(makemathname(snanval), makelname(one)); }
 static FLOAT_T makemathname(test_nexttoward_1_qnan)(void) { return makemathname(nexttoward)(makemathname(one), makelname(qnanval)); }
-#if !defined(__clang__) || !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)
+#if !defined(__clang__) || !defined(__LONG_DOUBLE_NOEXCEPT)
 /* compiler.rt is inconsistent when dealing with long double snan on hardware with only non-ld floats */
 static FLOAT_T makemathname(test_nexttoward_1_snan)(void) { return makemathname(nexttoward)(makemathname(one), makelname(snanval)); }
 #endif
@@ -1290,7 +1290,7 @@ const struct {
         TEST(nexttoward_qnan_1, (FLOAT_T)NAN, 0, 0),
         TEST(nexttoward_snan_1, (FLOAT_T)NAN, FE_INVALID, 0),
         TEST(nexttoward_1_qnan, (FLOAT_T)NAN, 0, 0),
-#if !defined(__clang__) || !defined(PICOLIBC_LONG_DOUBLE_NOEXCEPT)
+#if !defined(__clang__) || !defined(__LONG_DOUBLE_NOEXCEPT)
         TEST(nexttoward_1_snan, (FLOAT_T)NAN, FE_INVALID, 0),
 #endif
         TEST(nexttoward_max_inf, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
