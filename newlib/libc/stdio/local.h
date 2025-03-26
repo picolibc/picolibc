@@ -142,10 +142,10 @@ extern int    _svfiwscanf (FILE *, const wchar_t *,va_list);
 extern int    _ssvfiwscanf (FILE *, const wchar_t *,va_list);
 int	      svfprintf ( FILE *, const char *,
 				  va_list)
-               			__format(__printf__, 2, 0);
+                    __picolibc_format(__printf__, 2, 0);
 int	      svfiprintf ( FILE *, const char *,
 				  va_list)
-               			__format(__printf__, 2, 0);
+                    __picolibc_format(__printf__, 2, 0);
 int	      svfwprintf ( FILE *, const wchar_t *,
 				  va_list);
 int	      svfiwprintf ( FILE *, const wchar_t *,
