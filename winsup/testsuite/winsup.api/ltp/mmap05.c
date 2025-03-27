@@ -97,7 +97,7 @@ sigjmp_buf env;			/* environment for sigsetjmp/siglongjmp */
 
 void setup();			/* Main setup function of test */
 void cleanup(void) __attribute__((noreturn));			/* cleanup function for the test */
-void sig_handler();		/* signal handler to catch SIGSEGV */
+void sig_handler(int sig);		/* signal handler to catch SIGSEGV */
 
 int
 main(int ac, char **av)

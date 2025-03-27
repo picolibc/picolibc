@@ -99,7 +99,7 @@
 
 void setup();
 void cleanup(void) __attribute__((noreturn));
-void alarm_received();
+void alarm_received(int sig);
 
 
 
@@ -232,7 +232,7 @@ cleanup()
     tst_exit();
 }
 
-void alarm_received()
+void alarm_received(int sig)
 {
   received_alarm = 1;
 }

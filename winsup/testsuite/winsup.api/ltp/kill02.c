@@ -185,19 +185,19 @@ int alarm_flag = FALSE;		/*This flag indicates an alarm time out.			*/
 char who_am_i = '0';		/*This indicates which process is which when using	*/
 				/*interrupt routine usr1_rout.				*/
 
-void notify_timeout();		/*Signal handler that the parent enters if it times out	*/
+void notify_timeout(int sig);		/*Signal handler that the parent enters if it times out	*/
 				/*waiting for the child to indicate its set up status.	*/
 void parent_rout();		/*This is the parents routine.				*/
 void child1_rout();		/*This is child 1's routine.				*/
 void child2_rout();		/*This is child 2's routine.				*/
 void childA_rout();		/*This is child A's routine.				*/
 void childB_rout();		/*This is child B's routine.				*/
-void usr1_rout();		/*This routine is used by all children to indicate that	*/
+void usr1_rout(int sig);		/*This routine is used by all children to indicate that	*/
 				/*they have caught signal SIGUSR1.			*/
 void par_kill();		/*This routine is called by the original parent to	*/
 				/*remove child 2 and to indicate to child 1 to 		*/
 				/*remove its children.					*/
-void chld1_kill();		/*This routine is used by child 1 to remove itself and	*/
+void chld1_kill(int sig);		/*This routine is used by child 1 to remove itself and	*/
 				/*its children A and B.					*/
 
 void setup();
@@ -515,7 +515,7 @@ void child1_rout()
    if (signal(SIGUSR2,chld1_kill) == SIG_ERR) {
 	tst_brkm(TBROK,NULL,"Could not set to catch the parents signal.");
 	(void) write(pipe1_fd[1],CHAR_SET_FAILED,1);
-	(void) chld1_kill();
+	(void) chld1_kill(SIGUSR1);
 	exit(0);
    }
 
@@ -525,7 +525,7 @@ void child1_rout()
    if (signal(SIGALRM,notify_timeout) == SIG_ERR) {
 	tst_brkm(TBROK,NULL,"Could not set to catch the childs time out alarm.");
 	(void) write(pipe1_fd[1],CHAR_SET_FAILED,1);
-	(void) chld1_kill();
+	(void) chld1_kill(SIGUSR1);
 	exit(0);
    }
 
@@ -550,7 +550,7 @@ void child1_rout()
    */
    if (alarm_flag == TRUE) {
 	tst_brkm(TBROK,NULL,"The set up of the children failed by timing out.");
-	(void) chld1_kill();
+	(void) chld1_kill(SIGUSR1);
 	(void) write(pipe1_fd[1],CHAR_SET_FAILED,1);
 	exit(0);
    }
@@ -740,7 +740,7 @@ setup()
 /***********************************************************
  *  This routine indicates that the process caught SIGUSR1.
  **********************************************************/
-void usr1_rout()
+void usr1_rout(int sig)
 {
 	char mesg[MAXMESG];	/*Used to buffer messages for tst_res.	*/
 
@@ -772,7 +772,7 @@ void usr1_rout()
  *  which occurs when the child fails to notify the parent
  *  the status of set up.
  **********************************************************/
-void notify_timeout()
+void notify_timeout(int sig)
 {
   alarm_flag = TRUE;
 
@@ -810,7 +810,7 @@ void par_kill()
  *  This routine is executed by child 1 when the parent tells it to
  *  remove it's children and itself.
  ********************************************************************/
-void chld1_kill()
+void chld1_kill(int sig)
 {
 	char mesg[MAXMESG];	/*Used to buffer messages for tst_resm.	*/
 

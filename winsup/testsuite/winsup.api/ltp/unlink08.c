@@ -129,15 +129,15 @@ extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 int exp_enos[]={0, 0};
 
-int unwrite_dir_setup();
-int unsearch_dir_setup();
-int dir_setup();
-int no_setup();
+int unwrite_dir_setup(int flag);
+int unsearch_dir_setup(int flag);
+int dir_setup(int flag);
+int no_setup(int flag);
 
 struct test_case_t {
    const char *pathname;
    const char *desc;
-   int (*setupfunc)();
+   int (*setupfunc)(int flag);
    int exp_ret;		/* -1 means error, 0 means != -1 */
    int exp_errno;
 } Test_cases[] = {
@@ -306,8 +306,7 @@ cleanup()
  *
  ******************************************************************/
 int
-unwrite_dir_setup(flag)
-int flag;
+unwrite_dir_setup(int flag)
 {
     int fd;
 
@@ -358,8 +357,7 @@ int flag;
  *
  ******************************************************************/
 int
-unsearch_dir_setup(flag)
-int flag;
+unsearch_dir_setup(int flag)
 {
     int fd;
 
@@ -410,8 +408,7 @@ int flag;
  *
  ******************************************************************/
 int
-dir_setup(flag)
-int flag;
+dir_setup(int flag)
 {
     if (mkdir("regdir", 0777) == -1 ) {
 	tst_brkm(TBROK, cleanup, 
@@ -425,8 +422,7 @@ int flag;
  *
  ******************************************************************/
 int
-no_setup(flag)
-int flag;
+no_setup(int flag)
 {
 	return 0;
 }

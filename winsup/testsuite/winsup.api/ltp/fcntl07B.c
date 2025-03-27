@@ -142,7 +142,7 @@
 #include "usctest.h"
 #include "search_path.h"
 
-void setup();
+void setup(char *path);
 void cleanup(void) __attribute__((noreturn));
 void help();
 

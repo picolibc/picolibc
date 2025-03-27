@@ -45,6 +45,7 @@
 #include <signal.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <string.h>
 #include "test.h"
 #include "usctest.h"
 
@@ -69,7 +70,6 @@ main(int ac, char **av)
 	char wbuf[BUFSIZ], rbuf[BUFSIZ];
 	int len, rlen;
 	int rval = 0;
-	char *strcpy();
 	int lc;				/* loop counter */
 	const char *msg;		/* message returned from parse_opts */
 

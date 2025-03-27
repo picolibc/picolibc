@@ -90,7 +90,7 @@ unsigned int map_len;		/* length of the region to be mapped */
 
 void setup();			/* Main setup function of test */
 void cleanup(void);		/* cleanup function for the test */
-void sig_handler();		/* signal catching function */
+void sig_handler(int sig);		/* signal catching function */
 
 int
 main(int ac, char **av)
@@ -255,7 +255,7 @@ setup()
  *   cleanup function and exit the program.
  */
 void
-sig_handler()
+sig_handler(int sig)
 {
 	tst_resm(TPASS, "Functionality of munmap() successful");
 

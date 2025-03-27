@@ -188,7 +188,7 @@ main(int ac, char **av)
 void 
 setup()
 {
-    void trapper();
+    void trapper(int sig);
 
     /* capture signals */
     tst_sig(NOFORK, DEF_HANDLER, cleanup);
@@ -218,8 +218,7 @@ cleanup()
 }	/* End cleanup() */
 
 void
-trapper(sig)
-int sig;
+trapper(int sig)
 {
    signal(SIGALRM, trapper);
 }

@@ -170,9 +170,9 @@
 
 void setup();
 void cleanup(void) __attribute__((noreturn));
-void do_test();
+void do_test(int test_case, int Tst_count);
 void sigdfl_test();
-void update_timings();
+void update_timings(struct tblock atblock);
 
 #if defined(linux)
 # define SIG_PF sig_t  /* This might need to be sighandler_t on some systems */
@@ -222,9 +222,7 @@ long Tret;
  *   M A I N
  ***********************************************************************/
 int
-main(argc, argv)
-int argc;
-char **argv;
+main(int argc, char *argv[])
 {
     int lc;
     const char *msg;
@@ -278,18 +276,16 @@ char **argv;
  *
  ***********************************************************************/
 void
-do_test(test_case, tst_count)
-int test_case;
-int tst_count;
+do_test(int test_case, int tst_count)
 {
   int term_stat;	/* Termination status of the child returned to	 */
 			/* the parent.					 */
   char string[30];
   int fd1[2];		/* ipc */
   int rd_sz;		/* size of read */
-  void p_timeout_handler();
+  void p_timeout_handler(int sig);
   void c_timeout_handler();
-  void catchsig();
+  void catchsig(int sig);
 
   Tst_count = tst_count;
 
@@ -620,7 +616,7 @@ cleanup()
  *  call cleanup.
  ***********************************************************************/
 void
-p_timeout_handler()
+p_timeout_handler(int sig)
 {
     kill(Pid, SIGKILL);
     cleanup();
@@ -643,7 +639,7 @@ c_timeout_handler()
  * if called.
  ***********************************************************************/
 void
-catchsig()
+catchsig(int sig)
 {
    exit_val = SIG_CAUGHT;
    return;
@@ -653,8 +649,7 @@ catchsig()
  * Update timing information
  ***********************************************************************/
 void
-update_timings(atblock)
-struct tblock atblock;
+update_timings(struct tblock atblock)
 {
     tblock.tb_max += atblock.tb_max;
     tblock.tb_min += atblock.tb_min;

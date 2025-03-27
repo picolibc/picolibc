@@ -124,7 +124,7 @@ int TST_TOTAL=1;    		/* Total number of test cases. */
 extern int Tst_count;		/* Test Case counter for tst_* routines */
 
 int exp_enos[]={EINTR, 0};
-void go();
+void go(int sig);
 
 int
 main(int ac, char **av)
@@ -224,6 +224,6 @@ cleanup()
 
 /* routine to catch the alarm signal */
 void
-go()
+go(int sig)
 {
 }

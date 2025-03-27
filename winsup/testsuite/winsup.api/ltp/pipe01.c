@@ -44,6 +44,7 @@
  *	NONE
  */
 #include <errno.h>
+#include <string.h>
 #include "test.h"
 #include "usctest.h"
 
@@ -64,7 +65,6 @@ main(int ac, char **av)
 	char wrbuf[BUFSIZ], rebuf[BUFSIZ];
 	int red, written;		/* no. of chars read/written to pipe */
 	int greater, length;
-	char *strcpy();
 
 	/* parse standard options */
 	if ((msg = parse_opts(ac, av, (option_t *)NULL, NULL)) != (char *)NULL){
