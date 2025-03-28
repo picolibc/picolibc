@@ -41,6 +41,7 @@
  */
 
 #include "test.h"
+#include "cpu_relax.h"
 
 /*
  * Create NUMTHREADS threads in addition to the Main thread.
@@ -89,7 +90,7 @@ mythread(void * arg)
 	{
 	  int i;
 	  for (i = 0; i < 1E7; i++)
-	    __asm__ volatile ("pause":::);
+	    CPU_RELAX();
 	}
     }
 
