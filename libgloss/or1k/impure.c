@@ -108,7 +108,7 @@ _or1k_libc_getreent(void) {
 }
 
 #ifdef __OR1K_MULTICORE__
-struct _or1k_reent (*_or1k_reent)[];
+struct _or1k_reent *_or1k_reent;
 #else
 struct _or1k_reent _or1k_reent;
 #endif

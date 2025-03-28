@@ -55,8 +55,8 @@ struct _or1k_reent {
 
 
 #ifdef __OR1K_MULTICORE__
-extern struct _or1k_reent (*_or1k_reent)[];
-#define OR1K_REENT (*_or1k_reent)[or1k_coreid()]
+extern struct _or1k_reent *_or1k_reent;
+#define OR1K_REENT _or1k_reent[or1k_coreid()]
 #else
 extern struct _or1k_reent _or1k_reent;
 #define OR1K_REENT _or1k_reent
