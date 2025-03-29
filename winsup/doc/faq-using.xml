@@ -956,6 +956,26 @@ contents are exempt from scanning.  In a default installation, this
 would be <literal>C:\cygwin\bin</literal>.  Obviously, this could be
 exploited by a hostile non-Cygwin program, so do this at your own risk.
 </para>
+<para>Anti-virus software typically reduce the speed of Windows
+<literal>CreateProcess</literal> calls which are used by Cygwin to provide
+<literal>fork()</literal> and <literal>exec()</literal>.  This in particular
+slows down shell scripts.  In the simple speed test shown below, the first
+column shows the number of <literal>date</literal> commands run per second.
+Anti-virus was turned off at the line marked with <literal>***</literal>.
+</para>
+<screen>
+	bash$ while :; do date +%s; done | uniq -c
+	...
+	122 1741712430
+	118 1741712431
+	118 1741712432
+	121 1741712433
+	142 1741712434  ***
+	140 1741712435
+	141 1741712436
+	144 1741712437
+	...
+</screen>
 <para>See also <xref linkend="faq.using.bloda"></xref>
 for a list of applications that have been known, at one time or another, to
 interfere with the normal functioning of Cygwin.
