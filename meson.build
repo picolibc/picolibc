@@ -420,6 +420,7 @@ endif
 tls_stack_guard = prefer_tls_stack_guard and have_tls_stack_guard
 if tls_stack_guard
   stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=tls}'
+  c_args += c_stack_guard_tls_flags
 else
   if stack_guard_option == 'tls'
     if not thread_local_storage
@@ -431,6 +432,7 @@ else
   c_stack_guard_global_flags = cc.get_supported_arguments(['-mstack-protector-guard=global'])
   if c_stack_guard_global_flags != []
     stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=global}'
+    c_args += c_stack_guard_global_flags
   endif
 endif
 
