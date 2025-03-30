@@ -256,7 +256,21 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	      }
 	  }
 	if (!aclsid[idx])
-	  aclsid[idx] = sidfromuid (aclbufp[idx].a_id, &cldap);
+	  {
+	    struct passwd *pw = internal_getpwuid (aclbufp[idx].a_id, &cldap);
+	    if (pw)
+	      {
+		/* Don't allow to pass special accounts as USER, only as
+		   USER_OBJ, GROUP_OBJ, or GROUP */
+#define BUILTIN	"U-BUILTIN\\"
+#define NT_AUTH "U-NT AUTHORITY\\"
+#define NT_SVC  "U-NT SERVICE\\"
+		if (strncmp (pw->pw_gecos, BUILTIN, strlen (BUILTIN)) != 0
+		    && strncmp (pw->pw_gecos, NT_AUTH, strlen (NT_AUTH)) != 0
+		    && strncmp (pw->pw_gecos, NT_SVC, strlen (NT_SVC)) != 0)
+		  aclsid[idx] = (PSID) ((pg_pwd *) pw)->sid;
+	      }
+	  }
 	break;
       case GROUP_OBJ:
 	aclsid[idx] = group;
