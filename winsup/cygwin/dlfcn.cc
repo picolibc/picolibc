@@ -194,9 +194,8 @@ dlopen (const char *name, int flags)
 	  break;
 	}
 
-      DWORD gmheflags = (flags & RTLD_NODELETE)
-		      ?  GET_MODULE_HANDLE_EX_FLAG_PIN
-		      : 0;
+      DWORD nodelete = (flags & RTLD_NODELETE) ? GET_MODULE_HANDLE_EX_FLAG_PIN
+					       : 0;
 
       tmp_pathbuf tp; /* single one per stack frame */
       tmp_pathbuf_allocator allocator (tp);
@@ -267,7 +266,7 @@ dlopen (const char *name, int flags)
 
       if (flags & RTLD_NOLOAD)
 	{
-	  GetModuleHandleExW (gmheflags, wpath, (HMODULE *) &ret);
+	  GetModuleHandleExW (nodelete, wpath, (HMODULE *) &ret);
 	  if (ret)
 	    break;
 	}
@@ -280,15 +279,15 @@ dlopen (const char *name, int flags)
 	  if (d)
 	    {
 	      /* count == INT_MIN is used to specify RTLD_NODELETE */
-	      if (d->count == INT_MIN || gmheflags)
+	      if (d->count == INT_MIN || nodelete)
 		d->count = INT_MIN;
 	      else
 		++d->count;
 	    }
 	}
 
-      if (ret && gmheflags)
-	GetModuleHandleExW (gmheflags, wpath, (HMODULE *) &ret);
+      if (ret && nodelete)
+	GetModuleHandleExW (nodelete, wpath, (HMODULE *) &ret);
 
       if (!ret)
 	__seterrno ();
