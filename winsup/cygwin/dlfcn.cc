@@ -278,7 +278,13 @@ dlopen (const char *name, int flags)
 	{
 	  dll *d = dlls.find (ret, true);
 	  if (d)
-	    ++d->count;
+	    {
+	      /* count == INT_MIN is used to specify RTLD_NODELETE */
+	      if (d->count == INT_MIN || gmheflags)
+		d->count = INT_MIN;
+	      else
+		++d->count;
+	    }
 	}
 
       if (ret && gmheflags)
@@ -348,14 +354,15 @@ dlclose (void *handle)
   int ret = 0;
   if (handle != GetModuleHandle (NULL))
     {
-      /* reference counting */
+      /* Reference counting.
+	 count == INT_MIN is used to specify RTLD_NODELETE */
       dll *d = dlls.find (handle, true);
-      if (!d || d->count <= 0)
+      if (!d || (d->count <= 0 && d->count != INT_MIN))
 	{
 	  errno = ENOENT;
 	  ret = -1;
 	}
-      else
+      else if (d->count != INT_MIN)
 	{
 	  --d->count;
 	  if (!FreeLibrary ((HMODULE) handle))

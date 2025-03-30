@@ -782,9 +782,19 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
       if (h != d->handle)
 	fabort ("unable to map %W (using %W) to same address as parent: %p != %p",
 		d->ntname, buffered_shortname (d->forkedntname ()), d->handle, h);
-      /* Fix OS reference count. */
-      for (int cnt = 1; cnt < d->count; ++cnt)
-	LoadLibraryW (buffered_shortname (d->forkedntname ()));
+      /* Fix OS reference count.
+	 count == INT_MIN is used to specify RTLD_NODELETE.  If so, we don't
+	 have to call LoadLibraryW count times, just mark the DLL as pinned. */
+      if (d->count == INT_MIN) /* RTLD_NODELETE */
+	{
+	  HMODULE hm;
+	  GetModuleHandleExW (GET_MODULE_HANDLE_EX_FLAG_PIN,
+			      buffered_shortname (d->forkedntname ()),
+			      &hm);
+	}
+      else
+	for (int cnt = 1; cnt < d->count; ++cnt)
+	  LoadLibraryW (buffered_shortname (d->forkedntname ()));
     }
 }
 
