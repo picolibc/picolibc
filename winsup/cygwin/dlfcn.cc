@@ -276,7 +276,7 @@ dlopen (const char *name, int flags)
       /* reference counting */
       if (ret)
 	{
-	  dll *d = dlls.find (ret);
+	  dll *d = dlls.find (ret, true);
 	  if (d)
 	    ++d->count;
 	}
@@ -349,7 +349,7 @@ dlclose (void *handle)
   if (handle != GetModuleHandle (NULL))
     {
       /* reference counting */
-      dll *d = dlls.find (handle);
+      dll *d = dlls.find (handle, true);
       if (!d || d->count <= 0)
 	{
 	  errno = ENOENT;

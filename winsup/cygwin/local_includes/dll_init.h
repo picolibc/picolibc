@@ -131,7 +131,7 @@ public:
   int reload_on_fork;
   dll *operator [] (PCWCHAR ntname);
   dll *alloc (HINSTANCE, per_process *, dll_type);
-  dll *find (void *);
+  dll *find (void *, bool = false);
   void detach (void *);
   void init ();
   void load_after_fork (HANDLE);

@@ -542,7 +542,7 @@ dll_list::topsort_visit (dll* d, bool seek_tail)
 
 
 dll *
-dll_list::find (void *retaddr)
+dll_list::find (void *retaddr, bool find_self)
 {
   MEMORY_BASIC_INFORMATION m;
   if (!VirtualQuery (retaddr, &m, sizeof m))
@@ -551,7 +551,7 @@ dll_list::find (void *retaddr)
 
   dll *d = &start;
   while ((d = d->next))
-    if (d->type != DLL_SELF && d->handle == h)
+    if ((d->type != DLL_SELF || find_self) && d->handle == h)
       break;
   return d;
 }
