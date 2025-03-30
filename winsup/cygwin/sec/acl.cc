@@ -219,10 +219,10 @@ set_posix_access (mode_t attr, uid_t uid, gid_t gid,
 	  aclbufp[3].a_type = DEF_USER_OBJ;
 	  aclbufp[3].a_id = ACL_UNDEFINED_ID;
 	  aclbufp[3].a_perm = (attr >> 6) & S_IRWXO;
-	  aclbufp[4].a_type = GROUP_OBJ;
+	  aclbufp[4].a_type = DEF_GROUP_OBJ;
 	  aclbufp[4].a_id = ACL_UNDEFINED_ID;
 	  aclbufp[4].a_perm = (attr >> 3) & S_IRWXO;
-	  aclbufp[5].a_type = OTHER_OBJ;
+	  aclbufp[5].a_type = DEF_OTHER_OBJ;
 	  aclbufp[5].a_id = ACL_UNDEFINED_ID;
 	  aclbufp[5].a_perm = attr & S_IRWXO;
 	  nentries += MIN_ACL_ENTRIES;
