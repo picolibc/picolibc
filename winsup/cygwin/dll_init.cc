@@ -314,7 +314,8 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
   /* Already loaded?  For linked DLLs, only compare the basenames.  Linked
      DLLs are loaded using just the basename and the default DLL search path.
      The Windows loader picks up the first one it finds.
-     This also applies to cygwin1.dll and the main-executable (DLL_SELF).
+     This also applies to cygwin1.dll and the main-executable (DLL_SELF)
+     and native DLLs (DLL_NATIVE).
      When in_load_after_fork, dynamically loaded dll's are reloaded
      using their parent's forkable_ntname, if available.  */
   dll *d = (type != DLL_LOAD) ? dlls.find_by_modname (modname) :
@@ -346,7 +347,6 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
     {
       size_t forkntsize = forkable_ntnamesize (type, ntname, modname);
 
-      /* FIXME: Change this to new at some point. */
       d = (dll *) cmalloc (HEAP_2_DLL, sizeof (*d)
 			   + ((ntnamelen + forkntsize) * sizeof (*ntname)));
 
@@ -356,14 +356,20 @@ dll_list::alloc (HINSTANCE h, per_process *p, dll_type type)
       d->modname = d->ntname + (modname - ntname);
       d->handle = h;
       d->count = 0;	/* Reference counting performed in dlopen/dlclose. */
-      /* DLL_SELF dtors (main-executable, cygwin1.dll) are run elsewhere */
-      d->has_dtors = type != DLL_SELF;
+      /* DLL_SELF dtors (main-executable, cygwin1.dll) are run elsewhere,
+         DLL_NATIVE dtors whereever native DLLs do it. */
+      d->has_dtors = (type == DLL_LINK || type == DLL_LOAD);
       d->p = p;
       d->ndeps = 0;
       d->deps = NULL;
       d->image_size = ((pefile*)h)->optional_hdr ()->SizeOfImage;
       d->preferred_base = (void*) ((pefile*)h)->optional_hdr()->ImageBase;
       d->type = type;
+      if (type == DLL_NATIVE)
+	{
+	  d->count = 1;
+	  reload_on_fork = 1;
+	}
       d->fii.IndexNumber.QuadPart = -1LL;
       if (!forkntsize)
 	d->forkable_ntname = NULL;
@@ -541,8 +547,10 @@ dll_list::topsort_visit (dll* d, bool seek_tail)
 }
 
 
+/* If called from dlopen/dlclose, from_dlfcn is true and we return any dll if
+   the address matches.  Otherwise we only want DLL_LINK and DLL_LOAD dlls. */
 dll *
-dll_list::find (void *retaddr, bool find_self)
+dll_list::find (void *retaddr, bool from_dlfcn)
 {
   MEMORY_BASIC_INFORMATION m;
   if (!VirtualQuery (retaddr, &m, sizeof m))
@@ -551,7 +559,8 @@ dll_list::find (void *retaddr, bool find_self)
 
   dll *d = &start;
   while ((d = d->next))
-    if ((d->type != DLL_SELF || find_self) && d->handle == h)
+    if ((from_dlfcn || d->type == DLL_LINK || d->type == DLL_LOAD)
+        && d->handle == h)
       break;
   return d;
 }
@@ -569,12 +578,16 @@ dll_list::detach (void *retaddr)
   guard (true);
   if ((d = find (retaddr)))
     {
-      /* Ensure our exception handler is enabled for destructors */
-      exception protect;
-      /* Call finalize function if we are not already exiting */
-      if (!exit_state)
-	__cxa_finalize (d->handle);
-      d->run_dtors ();
+      /* Only run dtors for Cygwin DLLs. */
+      if (d->type == DLL_LINK || d->type == DLL_LOAD)
+	{
+	  /* Ensure our exception handler is enabled for destructors */
+	  exception protect;
+	  /* Call finalize function if we are not already exiting */
+	  if (!exit_state)
+	    __cxa_finalize (d->handle);
+	  d->run_dtors ();
+	}
       d->prev->next = d->next;
       if (d->next)
 	d->next->prev = d->prev;
@@ -596,8 +609,9 @@ dll_list::init ()
   /* Walk the dll chain, initializing each dll */
   dll *d = &start;
   dll_global_dtors_recorded = d->next != NULL;
+  /* Init linked and early loaded Cygwin DLLs. */
   while ((d = d->next))
-    if (d->type != DLL_SELF) /* linked and early loaded dlls */
+    if (d->type == DLL_LINK || d->type == DLL_LOAD)
       d->init ();
 }
 
@@ -684,7 +698,10 @@ dll_list::load_after_fork (HANDLE parent)
 
   in_load_after_fork = true;
   if (reload_on_fork)
-    load_after_fork_impl (parent, dlls.istart (DLL_LOAD), 0);
+    {
+      load_after_fork_impl (parent, dlls.istart (DLL_NATIVE), 0);
+      load_after_fork_impl (parent, dlls.istart (DLL_LOAD), 0);
+    }
   track_self ();
   in_load_after_fork = false;
 }
@@ -709,7 +726,7 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
      the LoadLibraryExW call unconditional.
    */
   for ( ; d; d = dlls.inext ())
-    if (d->handle != d->preferred_base)
+    if (hold_type == DLL_LOAD && d->handle != d->preferred_base)
       {
 	/* See if the DLL will load in proper place. If not, unload it,
 	   reserve the memory around it, and try again.
@@ -757,9 +774,11 @@ void dll_list::load_after_fork_impl (HANDLE parent, dll* d, int retries)
      interim mapping (for rebased dlls) . The dll list is sorted in
      dependency order, so we shouldn't pull in any additional dlls
      outside our control.  */
-  for (dll *d = dlls.istart (DLL_LOAD); d; d = dlls.inext ())
+  for (dll *d = dlls.istart (hold_type); d; d = dlls.inext ())
     {
-      if (d->handle == d->preferred_base)
+      if (hold_type == DLL_NATIVE)
+	/* just LoadLibrary... */;
+      else if (d->handle == d->preferred_base)
 	{
 	  if (!VirtualFree (d->handle, 0, MEM_RELEASE))
 	    fabort ("unable to release protective reservation for %W (%p), %E",

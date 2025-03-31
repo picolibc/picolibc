@@ -34,7 +34,9 @@ struct per_module
 typedef enum
 {
   DLL_NONE,
-  DLL_SELF, /* main-program.exe, cygwin1.dll */
+  DLL_SELF,	/* main-program.exe, cygwin1.dll */
+  DLL_NATIVE,	/* dlopen'ed native DLLs.  reload after fork, but otherwise
+		   do nothing, just as with DLL_SELF. */
   DLL_LINK,
   DLL_LOAD,
   DLL_ANY

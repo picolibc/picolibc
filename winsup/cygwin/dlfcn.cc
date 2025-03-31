@@ -284,6 +284,16 @@ dlopen (const char *name, int flags)
 	      else
 		++d->count;
 	    }
+	  else
+	    {
+	      /* All Cygwin DLLs loaded or linked into this process get a dll
+	         record when they call dll_dllcrt0 on init.  So if we don't
+		 find the dll it's a native DLL.  Add it as DLL_NATIVE.
+		 Simply restore the LoadLibrary count after fork.  Don't care
+		 where they are loaded to, don't try to fix up their data and
+		 bss segments after fork, and don't run dtors. */
+	      dlls.alloc ((HMODULE) ret, user_data, DLL_NATIVE);
+	    }
 	}
 
       if (ret && nodelete)
@@ -364,6 +374,10 @@ dlclose (void *handle)
       else if (d->count != INT_MIN)
 	{
 	  --d->count;
+	  /* Native DLLs don't call cygwin_detach_dll so they have to be
+	     detached explicitely. */
+	  if (d->type == DLL_NATIVE && d->count <= 0)
+	    dlls.detach (handle);
 	  if (!FreeLibrary ((HMODULE) handle))
 	    {
 	      __seterrno ();
