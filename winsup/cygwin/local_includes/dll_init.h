@@ -59,7 +59,6 @@ struct dll
   PWCHAR forkable_ntname;
   WCHAR ntname[1]; /* must be the last data member */
 
-  void detach ();
   int init ();
   bool stat_real_file_once ();
   void nominate_forkable (PCWCHAR);
