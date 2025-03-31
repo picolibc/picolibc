@@ -92,6 +92,18 @@ extern ssize_t	acl_size (acl_t __acl);
 extern char    *acl_to_text (acl_t __acl, ssize_t *__len_p);
 extern int	acl_valid (acl_t __acl);
 
+/* Non-libacl extensions to POSIX.1e draft 17 */
+
+/* FreeBSD, NetBSD */
+extern acl_t	acl_get_fd_np (int __fd, acl_type_t __type);
+extern acl_t	acl_get_link_np (const char *__path_p, acl_type_t __type);
+extern int	acl_get_perm_np (acl_permset_t __permset_d, acl_perm_t __perm);
+extern int	acl_is_trivial_np (const acl_t __acl, int *__trivialp);
+extern int	acl_set_fd_np (int __fd, acl_t __acl, acl_type_t __type);
+extern int	acl_set_link_np (const char *__path_p, acl_type_t __type,
+				 acl_t __acl);
+extern acl_t	acl_strip_np (const acl_t __acl, int __recalculate_mask);
+
 #ifdef __cplusplus
 }
 #endif

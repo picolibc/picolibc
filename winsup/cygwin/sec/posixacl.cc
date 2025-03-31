@@ -322,7 +322,7 @@ acl_delete_perm (acl_permset_t permset_d, acl_perm_t perm)
     }
   __except (EINVAL) {}
   __endtry
-      return -1;
+  return -1;
 }
 
 extern "C" int
@@ -674,14 +674,11 @@ fhandler_socket_unix::acl_get (acl_type_t type)
 extern "C" acl_t
 acl_get_fd (int fd)
 {
-  cygheap_fdget cfd (fd);
-  if (cfd < 0)
-    return NULL;
-  return cfd->acl_get (ACL_TYPE_ACCESS);
+  return acl_get_fd_np (fd, ACL_TYPE_ACCESS);
 }
 
-extern "C" acl_t
-acl_get_file (const char *path_p, acl_type_t type)
+static acl_t
+__acl_get_file (const char *path_p, acl_type_t type, unsigned follow_mode)
 {
   if (type != ACL_TYPE_ACCESS && type != ACL_TYPE_DEFAULT)
     {
@@ -689,7 +686,7 @@ acl_get_file (const char *path_p, acl_type_t type)
       return NULL;
     }
   fhandler_base *fh;
-  if (!(fh = build_fh_name (path_p, PC_SYM_FOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (path_p, follow_mode, stat_suffixes)))
     return NULL;
   if (fh->error ())
     {
@@ -699,6 +696,12 @@ acl_get_file (const char *path_p, acl_type_t type)
   acl_t acl = fh->acl_get (type);
   delete fh;
   return acl;
+}
+
+extern "C" acl_t
+acl_get_file (const char *path_p, acl_type_t type)
+{
+  return __acl_get_file (path_p, type, PC_SYM_FOLLOW);
 }
 
 int
@@ -844,14 +847,12 @@ fhandler_socket_unix::acl_set (acl_t acl, acl_type_t type)
 extern "C" int
 acl_set_fd (int fd, acl_t acl)
 {
-  cygheap_fdget cfd (fd);
-  if (cfd < 0)
-    return -1;
-  return cfd->acl_set (acl, ACL_TYPE_ACCESS);
+  return acl_set_fd_np (fd, acl, ACL_TYPE_ACCESS);
 }
 
-extern "C" int
-acl_set_file(const char *path_p, acl_type_t type, acl_t acl)
+static int
+__acl_set_file (const char *path_p, acl_type_t type, acl_t acl,
+		unsigned follow_mode)
 {
   if (type != ACL_TYPE_ACCESS && type != ACL_TYPE_DEFAULT)
     {
@@ -859,7 +860,7 @@ acl_set_file(const char *path_p, acl_type_t type, acl_t acl)
       return -1;
     }
   fhandler_base *fh;
-  if (!(fh = build_fh_name (path_p, PC_SYM_FOLLOW, stat_suffixes)))
+  if (!(fh = build_fh_name (path_p, follow_mode, stat_suffixes)))
     return -1;
   if (fh->error ())
     {
@@ -869,6 +870,12 @@ acl_set_file(const char *path_p, acl_type_t type, acl_t acl)
   int ret = fh->acl_set (acl, type);
   delete fh;
   return ret;
+}
+
+extern "C" int
+acl_set_file (const char *path_p, acl_type_t type, acl_t acl)
+{
+  return __acl_set_file (path_p, type, acl, PC_SYM_FOLLOW);
 }
 
 extern "C" int
@@ -1149,5 +1156,147 @@ acl_to_any_text (acl_t acl, const char *prefix, char separator, int options)
     }
   __except (EINVAL) {}
   __endtry
+  return NULL;
+}
+
+/* FreeBSD extensions */
+
+extern "C" acl_t
+acl_get_fd_np (int fd, acl_type_t type)
+{
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return NULL;
+  return cfd->acl_get (type);
+}
+
+extern "C" int
+acl_is_trivial_np (const acl_t acl, int *trivialp)
+{
+  __try
+    {
+      if (!(__aclcheck (acl->entry, acl->count, NULL, true)))
+	*trivialp = acl->count - acl->deleted <= MIN_ACL_ENTRIES ? 1 : 0;
+      return 0;
+    }
+  __except (EINVAL) {}
+  __endtry
+  return -1;
+}
+
+extern "C" acl_t
+acl_get_link_np (const char *path_p, acl_type_t type)
+{
+  return __acl_get_file (path_p, type, PC_SYM_NOFOLLOW);
+}
+
+extern "C" int
+acl_set_fd_np (int fd, acl_t acl, acl_type_t type)
+{
+  if (type != ACL_TYPE_ACCESS && type != ACL_TYPE_DEFAULT)
+    {
+      set_errno (EINVAL);
+      return -1;
+    }
+  cygheap_fdget cfd (fd);
+  if (cfd < 0)
+    return -1;
+  return cfd->acl_set (acl, type);
+}
+
+extern "C" int
+acl_set_link_np (const char *path_p, acl_type_t type, acl_t acl)
+{
+  return __acl_set_file (path_p, type, acl, PC_SYM_NOFOLLOW);
+}
+
+/*-
+ * SPDX-License-Identifier: BSD-2-Clause
+ *
+ * Copyright (c) 2001 Chris D. Faulhaber
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE AUTHOR AND CONTRIBUTORS ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL THE AUTHOR OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ */
+
+extern "C" acl_t
+acl_strip_np (const acl_t acl, int recalculate_mask)
+{
+  acl_t acl_new, acl_old;
+  acl_entry_t entry, entry_new;
+  acl_tag_t tag;
+  int entry_id, have_mask_entry;
+
+  acl_old = acl_dup (acl);
+  if (acl_old == NULL)
+    return NULL;
+
+  have_mask_entry = 0;
+  acl_new = acl_init (MAX_ACL_ENTRIES);
+  if (acl_new == NULL)
+    {
+      acl_free (acl_old);
+      return NULL;
+    }
+  tag = ACL_UNDEFINED_TAG;
+
+  /* only save the default user/group/other entries */
+  entry_id = ACL_FIRST_ENTRY;
+  while (acl_get_entry (acl_old, entry_id, &entry) == 1)
+    {
+      entry_id = ACL_NEXT_ENTRY;
+
+      if (acl_get_tag_type (entry, &tag) == -1)
+	goto fail;
+
+      switch (tag)
+	{
+	  case ACL_USER_OBJ:
+	  case ACL_GROUP_OBJ:
+	  case ACL_OTHER:
+	    if (acl_create_entry (&acl_new, &entry_new) == -1)
+	      goto fail;
+	    if (acl_copy_entry (entry_new, entry) == -1)
+	      goto fail;
+	    break;
+	  case ACL_MASK:
+	    have_mask_entry = 1;
+	    break;
+	  default:
+	    break;
+	}
+    }
+
+  if (have_mask_entry && recalculate_mask)
+    {
+      if (acl_calc_mask (&acl_new) == -1)
+	goto fail;
+    }
+
+  return (acl_new);
+
+fail:
+  acl_free (acl_new);
+  acl_free (acl_old);
+
   return NULL;
 }
