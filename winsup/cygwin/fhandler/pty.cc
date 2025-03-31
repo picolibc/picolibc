@@ -1933,7 +1933,10 @@ int
 fhandler_pty_master::open (int flags, mode_t)
 {
   if (!setup ())
+    {
+      set_errno (EMFILE);
       return 0;
+    }
   set_open_status ();
   dwProcessId = GetCurrentProcessId ();
   return 1;

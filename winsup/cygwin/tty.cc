@@ -147,7 +147,7 @@ tty_list::allocate (HANDLE& r, HANDLE& w)
     termios_printf ("pty%d allocated", freetty);
   else
     {
-      system_printf ("No pty allocated");
+      termios_printf ("No pty allocated");
       r = w = NULL;
     }
 
