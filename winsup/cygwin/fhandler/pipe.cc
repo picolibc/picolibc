@@ -455,6 +455,11 @@ fhandler_pipe_fifo::raw_write (const void *ptr, size_t len)
   ssize_t avail = pipe_buf_size;
   bool real_non_blocking_mode = false;
 
+  /* Workaround for native ninja. Native ninja creates pipe with size == 0,
+     and starts cygwin process with that pipe. */
+  if (avail == 0)
+    avail = PIPE_BUF;
+
   if (pipe_mtx) /* pipe_mtx is NULL in the fifo case */
     {
       DWORD timeout = is_nonblocking () ? 0 : INFINITE;

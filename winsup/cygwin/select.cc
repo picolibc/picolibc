@@ -670,7 +670,9 @@ pipe_data_available (int fd, fhandler_base *fh, HANDLE h, int mode)
 			   fpli.WriteQuotaAvailable);
 	  return fpli.WriteQuotaAvailable;
 	}
-      /* TODO: Buffer really full or non-Cygwin reader? */
+      return PIPE_BUF; /* Workaround for native ninja. Native ninja creates
+			  pipe with size == 0, and starts cygwin process
+			  with that pipe. */
     }
   else if (fpli.ReadDataAvailable)
     {
