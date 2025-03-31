@@ -659,7 +659,7 @@ exception::handle (EXCEPTION_RECORD *e, exception_list *frame, CONTEXT *in,
 
   /* If we're exiting, tell Windows to keep looking for an
      exception handler.  */
-  if (exit_state || e->ExceptionFlags)
+  if (exit_state || (e->ExceptionFlags & ~EXCEPTION_SOFTWARE_ORIGINATE))
     return ExceptionContinueSearch;
 
   siginfo_t si = {};
