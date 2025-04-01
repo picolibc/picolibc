@@ -27,8 +27,13 @@ _start:
 .option pop
 
   /* Initialize jvt CSR (reg addr: 0x0017) */
+#ifndef __riscv_cmodel_large
   .weak __jvt_base$
   lla a0, __jvt_base$
+#else
+  la a0, .Laddr_jvt_base
+  ld a0, 0(a0)
+#endif
   beqz a0, .Ljvt_init_end
 .option push
 .option norelax
@@ -38,21 +43,38 @@ _start:
 .Ljvt_init_end:
 
   # Clear the bss segment
+#ifndef __riscv_cmodel_large
   la      a0, __bss_start
   la      a2, _end
+#else
+  la      a0, .Laddr_bss_start
+  ld      a0, 0(a0)
+  la      a2, .Laddr_end
+  ld      a2, 0(a2)
+#endif
   sub     a2, a2, a0
   li      a1, 0
   call    memset
 #ifdef _LITE_EXIT
   # Make reference to atexit weak to avoid unconditionally pulling in
   # support code.  Refer to comments in __atexit.c for more details.
+#ifndef __riscv_cmodel_large
   .weak   atexit
   la      a0, atexit
+#else
+  la      a0, .Laddr_atexit
+  ld      a0, 0(a0)
+#endif
   beqz    a0, .Lweak_atexit
   .weak   __libc_fini_array
 #endif
 
+#ifndef __riscv_cmodel_large
   la      a0, __libc_fini_array   # Register global termination functions
+#else
+  la      a0, .Laddr_libc_fini_array
+  ld      a0, 0(a0)
+#endif
   call    atexit                  #  to be called upon exit
 #ifdef _LITE_EXIT
 .Lweak_atexit:
@@ -66,4 +88,21 @@ _start:
   add     a2, a2, a1                 # a2 = envp
   call    main
   tail    exit
+#ifdef __riscv_cmodel_large
+.Laddr_gp:
+  .dword __global_pointer$
+.Laddr_jvt_base:
+  .weak __jvt_base$
+  .dword __jvt_base$
+.Laddr_bss_start:
+  .dword __bss_start
+.Laddr_end:
+  .dword _end
+.Laddr_atexit:
+  .weak   atexit
+  .dword atexit
+.Laddr_libc_fini_array:
+  .weak   __libc_fini_array
+  .dword __libc_fini_array
+#endif
   .size  _start, .-_start

@@ -188,9 +188,16 @@ strcmp:
   foundnull 1 3
   foundnull 2 3
 #endif
+#ifdef __riscv_cmodel_large
+  # Put the data within the funciton for large code model to prevent
+  # the data put too far.
+.align 3
+mask:
+.dword 0x7f7f7f7f7f7f7f7f
+#endif
 .size	strcmp, .-strcmp
 
-#if SZREG == 8
+#if SZREG == 8 && !defined(__riscv_cmodel_large)
 .section .srodata.cst8,"aM",@progbits,8
 .align 3
 mask:
