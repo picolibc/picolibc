@@ -288,26 +288,27 @@
 #include "test.h"
 #include "usctest.h"
 
+struct all_test_cases;
 void setup();
 void cleanup(void) __attribute__((noreturn));
 void help();
-void delete_files();
-void do_EEXIST();
-void do_ENOENT();
-void do_ELOOP();
-void do_ENOTDIR();
-void do_EXDEV();
-void do_ENAMETOOLONG();
-void do_EINVAL();
-void do_readlink();
-void do_stat();
-void do_chdir();
-void do_link();
-void do_unlink();
-void do_chmod();
-void do_utime();
-void do_rename();
-void do_open();
+void delete_files(char *path1, char *path2);
+void do_EEXIST(struct all_test_cases *tc_ptr);
+void do_ENOENT(struct all_test_cases *tc_ptr);
+void do_ELOOP(struct all_test_cases *tc_ptr);
+void do_ENOTDIR(struct all_test_cases *tc_ptr);
+void do_EXDEV(struct all_test_cases *tc_ptr);
+void do_ENAMETOOLONG(struct all_test_cases *tc_ptr);
+void do_EINVAL(struct all_test_cases *tc_ptr);
+void do_readlink(struct all_test_cases *tc_ptr);
+void do_stat(struct all_test_cases *tc_ptr);
+void do_chdir(struct all_test_cases *tc_ptr);
+void do_link(struct all_test_cases *tc_ptr);
+void do_unlink(struct all_test_cases *tc_ptr);
+void do_chmod(struct all_test_cases *tc_ptr);
+void do_utime(struct all_test_cases *tc_ptr);
+void do_rename(struct all_test_cases *tc_ptr);
+void do_open(struct all_test_cases *tc_ptr);
 
 #define S_FILE "symbolic"    /* Name of symbolic link file */
 #define O_FILE "object"      /* Name of object file */
@@ -378,8 +379,14 @@ const char *msgs[] = {
 /*
  * Define test object setup and validation functions
  */
-int creat_both(), creat_symlink(), creat_path_max(), ck_symlink(),
-    creat_object(), ck_object(), ck_both(), ck_path_max();
+int creat_both(const char *path1, const char *path2, const char *path3);
+int creat_symlink(const char *path1, const char *path2, const char *unused);
+int creat_path_max(const char *path1, const char *path2, const char *path3);
+int creat_object(const char *path1, const char *unused1, const char *unused2);
+int ck_symlink(const char *path1, const char *path2, const char *path3);
+int ck_object(const char *path1, const char *path2, const char *path3);
+int ck_both(const char *path1, const char *path2, const char *path3);
+int ck_path_max(const char *path1, const char *path2, const char *path3);
 
 
 /*
@@ -391,10 +398,10 @@ struct all_test_cases
     int test_fail;
     int errno_val;
     int pass_msg;
-    int (*test_setup)();
-    int (*ck_test)();
+    int (*test_setup)(const char *, const char *, const char *);
+    int (*ck_test)(const char *, const char *, const char *);
     const char *fn_arg[3];
-    
+
 } test_objects[] = {
     {SYMLINK, 0, 0, 0, creat_symlink, ck_symlink, {"%bc+eFhi!k", S_FILE, NULL}},
     {SYMLINK, 0, 0, 0, creat_symlink, ck_symlink,  {O_FILE, S_FILE, NULL}},
@@ -491,7 +498,6 @@ char test_msg[BUFMAX];
 char full_path[PATH_MAX+1+1]; /* Add one for '\0' and another to exceed the PATH_MAX limit, see creat_path_max() */
 extern int Tst_count;
 extern char *TESTDIR;
-extern char *strrchr();
 extern int errno;
 
 struct stat asymlink, statter;
@@ -511,8 +517,8 @@ option_t Options[] = {
 int
 main(int argc, char *argv[])
 {
-    struct tcses *tcs_ptr, *get_tcs_info();
-    int do_syscalltests();
+    struct tcses *tcs_ptr, *get_tcs_info(char *ptr);
+    int do_syscalltests(struct tcses *tcs);
     void cleanup();
     int lc;             /* loop counter */
     const char *msg;          /* message returned from parse_opts */
@@ -589,8 +595,7 @@ main(int argc, char *argv[])
  *
  *      Argument is path to program name.
  ***********************************************************************/
-struct tcses *get_tcs_info(ptr)
-char *ptr;
+struct tcses *get_tcs_info(char *ptr)
 {
     unsigned ctr;
     struct tcses *tcs_ptr;
@@ -605,16 +610,14 @@ char *ptr;
     }
 #endif
 
-    
     for(ctr=0; ctr < (sizeof(all_tcses)/sizeof(struct tcses)); ctr++) {
-       if ( strcmp(ptr, all_tcses[ctr].tcid) == 0 || 
+       if ( strcmp(ptr, all_tcses[ctr].tcid) == 0 ||
 	    strcmp(ptr, all_tcses[ctr].syscall) == 0 ) {
           tcs_ptr = &all_tcses[ctr];
 	  TCID = all_tcses[ctr].tcid;
           TST_TOTAL=tcs_ptr->test_cases;
           return(tcs_ptr);
        }
-       
     }
     return(NULL);
 }
@@ -628,8 +631,7 @@ char *ptr;
  *  link file and a minus one if the path doesn't point at a file.
  ***********************************************************************/
 int
-see_if_a_symlink(path)
-char *path;
+see_if_a_symlink(const char *path)
 {
    if (lstat(path, &asymlink) < 0)
       return(-1);
@@ -644,8 +646,7 @@ char *path;
  * This function performs without any hesitation, file(s) deletions
  ***********************************************************************/
 void
-delete_files(path1, path2)
-char *path1, *path2;
+delete_files(char *path1, char *path2)
 {
    unlink(path1);
    unlink(path2);
@@ -660,8 +661,7 @@ char *path1, *path2;
  *
  ***********************************************************************/
 int
-creat_symlink(path1, path2)
-char *path1, *path2;
+creat_symlink(const char *path1, const char *path2, const char *unused)
 {
    TEST( symlink(path1, path2) );
    errno=TEST_ERRNO;
@@ -671,7 +671,7 @@ char *path1, *path2;
 	"symlink(2) Failure when creating setup %s object file: errno:%d %s",
 	path1, errno, strerror(errno));
       return(0);
-   } 
+   }
    else {
 	sprintf(Buf, "symlink(%s, %s) was succesful.\n", path1, path2);
 	strcat(Buffer, Buf);
@@ -690,8 +690,7 @@ char *path1, *path2;
  *
  ***********************************************************************/
 int
-creat_object(path1)
-char *path1;
+creat_object(const char *path1, const char *unused1, const char *unused2)
 {
    int fd;
    if ((fd=creat(path1, MODE)) == -1) {
@@ -700,7 +699,7 @@ char *path1;
 	"creat(2) Failure when creating setup %s object file: errno:%d %s",
 	path1, errno, strerror(errno));
       return(0);
-   } 
+   }
    else {
 	sprintf(Buf, "creat(%s, %#o) was succesful.\n", path1, MODE);
 	strcat(Buffer, Buf);
@@ -728,12 +727,11 @@ char *path1;
  *
  ***********************************************************************/
 int
-creat_both(path1, path2, path3)
-char *path1, *path2, *path3;
+creat_both(const char *path1, const char *path2, const char *path3)
 {
-   if (creat_symlink(path1, path2) == -1)
+   if (creat_symlink(path1, path2, NULL) == -1)
       return(0);
-   else if (creat_object(path3) == -1)
+   else if (creat_object(path3, NULL, NULL) == -1)
       return(0);
    return(1);
 }
@@ -748,8 +746,7 @@ char *path1, *path2, *path3;
  *
  ***********************************************************************/
 int
-ck_symlink(path1, path2, path3)
-char *path1, *path2, *path3;
+ck_symlink(const char *path1, const char *path2, const char *path3)
 {
    int ret;
 
@@ -780,8 +777,7 @@ char *path1, *path2, *path3;
  *
  ***********************************************************************/
 int
-ck_both(path1, path2, path3)
-char *path1, *path2, *path3;
+ck_both(const char *path1, const char *path2, const char *path3)
 {
    if (ck_symlink(path1, path2, path3) == 0)
       return(0);
@@ -804,7 +800,6 @@ char *path1, *path2, *path3;
       return(0);
    }
    return(1);
-   
 }
 
 /***********************************************************************
@@ -816,8 +811,7 @@ char *path1, *path2, *path3;
  *      Argument three is regular file name
  ***********************************************************************/
 int
-creat_path_max(path1, path2, path3)
-char *path1, *path2, *path3;
+creat_path_max(const char *path1, const char *path2, const char *path3)
 {
    int ctr, to_go, size, whole_chunks;
    char buf [PATH_MAX];
@@ -858,8 +852,7 @@ char *path1, *path2, *path3;
  *      Argument three is regular file name
  ***********************************************************************/
 int
-ck_path_max(path1, path2, path3)
-char *path1, *path2, *path3;
+ck_path_max(const char *path1, const char *path2, const char *path3)
 {
    if (strlen(full_path) == (PATH_MAX+1))
       return(1);
@@ -884,8 +877,7 @@ char *path1, *path2, *path3;
  *
  ***********************************************************************/
 int
-ck_object(path1, path2, path3)
-char *path1, *path2, *path3;
+ck_object(const char *path1, const char *path2, const char *path3)
 {
     int ret;
 
@@ -897,7 +889,7 @@ char *path1, *path2, *path3;
     }
     else if (ret == 1) {
        TEST_RESULT=TFAIL;
-       sprintf(test_msg, 
+       sprintf(test_msg,
 	   "lstat(2) detected a regular object file as a symbolic link file");
        return(0);
     }
@@ -912,7 +904,6 @@ char *path1, *path2, *path3;
        sprintf(test_msg,
 	   "lstat(2) and stat(2) do not return same inode information for an object file");
        return(0);
-        
     }
     return(1);
 }
@@ -923,8 +914,7 @@ char *path1, *path2, *path3;
  *  Argument is a ptr into the all_tcses array of structures of type tcses
  ***********************************************************************/
 int
-do_syscalltests(tcs)
-struct tcses *tcs;
+do_syscalltests(struct tcses *tcs)
 {
    int ctr, ret;
    struct all_test_cases *tc_ptr;
@@ -957,20 +947,20 @@ struct tcses *tcs;
        }
        TEST_RESULT=TPASS;
        delete_files(S_FILE, O_FILE);
-       /* 
+       /*
         * Perform test case setup
         */
        ret = (tc_ptr->test_setup)(tc_ptr->fn_arg[0], tc_ptr->fn_arg[1],
-	   tc_ptr->fn_arg[2], tc_ptr->errno_val);
+	   tc_ptr->fn_arg[2]);
 
        /* If an expected error, try it out */
 
        if (tc_ptr->test_fail) {
-          /* 
+          /*
            * Try to perform test verification function
            */
           if (! (tc_ptr->ck_test)(tc_ptr->fn_arg[0], tc_ptr->fn_arg[1],
-			tc_ptr->fn_arg[2], tc_ptr->errno_val))
+			tc_ptr->fn_arg[2]))
              tst_resm(TEST_RESULT, test_msg);
           else if (tc_ptr->errno_val == EEXIST)
              do_EEXIST(tc_ptr);
@@ -990,22 +980,22 @@ struct tcses *tcs;
              tst_resm(TBROK, "Test Case Declaration Error");
        }
        else if (ret == 1) {  /*  No setup function error */
- 
+
           if (tc_ptr->errno_val != 0)
              tst_resm(TBROK, "Test Case Declaration Error");
           else {
-             /* 
+             /*
               * Perform test verification function
               */
              ret=(tc_ptr->ck_test)(tc_ptr->fn_arg[0], tc_ptr->fn_arg[1],
-		tc_ptr->fn_arg[2], tc_ptr->errno_val);
+		tc_ptr->fn_arg[2]);
 
              /* Perform requested symbolic link system call test */
 
              if ((cktcsid(tc_ptr->tcid, SYMLINK)) ||
 				(cktcsid(tc_ptr->tcid, LSTAT))) {
                 if (ret == 1)
-                   tst_resm(TEST_RESULT, msgs[tc_ptr->pass_msg]);   
+                   tst_resm(TEST_RESULT, msgs[tc_ptr->pass_msg]);
                 else
                    tst_resm(TEST_RESULT, test_msg);
              }
@@ -1047,8 +1037,7 @@ struct tcses *tcs;
  *   all_test_cases
  ***********************************************************************/
 void
-do_EEXIST(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_EEXIST(struct all_test_cases *tc_ptr)
 {
     if (cktcsid(tc_ptr->tcid, SYMLINK)) {
 
@@ -1109,8 +1098,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_ENOENT(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_ENOENT(struct all_test_cases *tc_ptr)
 {
      if (cktcsid(tc_ptr->tcid, STAT)) {
 
@@ -1204,8 +1192,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_ELOOP(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_ELOOP(struct all_test_cases *tc_ptr)
 {
      if (cktcsid(tc_ptr->tcid, STAT)) {
 
@@ -1314,8 +1301,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_ENOTDIR(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_ENOTDIR(struct all_test_cases *tc_ptr)
 {
      if (cktcsid(tc_ptr->tcid, RMDIR)) {
 
@@ -1350,8 +1336,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_EXDEV(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_EXDEV(struct all_test_cases *tc_ptr)
 {
      if (cktcsid(tc_ptr->tcid, RENAME)) {
 
@@ -1388,8 +1373,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_ENAMETOOLONG(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_ENAMETOOLONG(struct all_test_cases *tc_ptr)
 {
      int ret;
 
@@ -1440,8 +1424,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_EINVAL(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_EINVAL(struct all_test_cases *tc_ptr)
 {
      if (cktcsid(tc_ptr->tcid, READLINK)) {
 	TEST( readlink(tc_ptr->fn_arg[0], test_msg, BUFMAX) );
@@ -1473,8 +1456,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_readlink(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_readlink(struct all_test_cases *tc_ptr)
 {
      char scratch[PATH_MAX];
      int ret;
@@ -1514,8 +1496,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_stat(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_stat(struct all_test_cases *tc_ptr)
 {
     if (statter.st_dev != asymlink.st_dev)
         tst_resm(TFAIL,
@@ -1575,8 +1556,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_chdir(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_chdir(struct all_test_cases *tc_ptr)
 {
      if (mkdir(tc_ptr->fn_arg[2],MODE) == -1)
         tst_resm(TFAIL, "Could not create a setup directory file");
@@ -1626,8 +1606,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_link(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_link(struct all_test_cases *tc_ptr)
 {
     struct stat stbuf;
 
@@ -1688,8 +1667,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_unlink(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_unlink(struct all_test_cases *tc_ptr)
 {
     if (stat(tc_ptr->fn_arg[2], &asymlink) == -1)
         tst_resm(TBROK,
@@ -1730,8 +1708,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_chmod(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_chmod(struct all_test_cases *tc_ptr)
 {
     if (stat(tc_ptr->fn_arg[2], &asymlink) == -1)
         tst_resm(TBROK,
@@ -1772,8 +1749,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_utime(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_utime(struct all_test_cases *tc_ptr)
 {
      struct utimbuf utimes;
 
@@ -1828,8 +1804,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_rename(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_rename(struct all_test_cases *tc_ptr)
 {
      int pts_at_object = 0;
 
@@ -1870,8 +1845,7 @@ struct all_test_cases *tc_ptr;
  *   all_test_cases
  ***********************************************************************/
 void
-do_open(tc_ptr)
-struct all_test_cases *tc_ptr;
+do_open(struct all_test_cases *tc_ptr)
 {
      int fd = -1;
      int ret, pts_at_object = 0;

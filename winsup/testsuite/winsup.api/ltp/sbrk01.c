@@ -140,7 +140,7 @@ main(int ac, char **av)
      ***************************************************************/
     if ( (msg=parse_opts(ac, av, (option_t *) NULL, NULL)) != (char *) NULL ) {
 	tst_brkm(TBROK, NULL, "OPTION PARSING ERROR - %s", msg);
-	tst_exit(0);
+	tst_exit();
     }
 
     /***************************************************************
