@@ -9,11 +9,11 @@
    http://www.opensource.org/licenses.
 */
 
-#ifndef _SYS_STRING_H
-#define _SYS_STRING_H
+#ifndef _RV_STRING_H
+#define _RV_STRING_H
 
 #include <stdbool.h>
-#include "asm.h"
+#include "xlenint.h"
 
 #if __riscv_zbb
   #include <riscv_bitmanip.h>
@@ -121,4 +121,4 @@ static __inline char *__libc_strcpy(char *dst, const char *src, bool ret_start)
 }
 
 
-#endif
+#endif /* _RV_STRING_H */

@@ -9,8 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
-#include <string.h>
 #include <stdbool.h>
+#include "rv_string.h"
 
 char *strcpy(char *dst, const char *src)
 {

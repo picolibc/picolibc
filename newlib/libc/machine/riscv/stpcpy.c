@@ -1,5 +1,5 @@
-#include <string.h>
 #include <stdbool.h>
+#include "rv_string.h"
 
 char *stpcpy(char *dst, const char *src)
 {

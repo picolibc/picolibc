@@ -11,7 +11,7 @@
 
 #include <string.h>
 #include <stdint.h>
-#include "sys/asm.h"
+#include "rv_string.h"
 
 size_t strlen(const char *str)
 {
