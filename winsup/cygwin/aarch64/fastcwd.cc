@@ -35,8 +35,8 @@ GetArm64ProcAddress (HMODULE hModule, LPCSTR procname)
 #else
 #error "Unhandled architecture for thunk detection"
 #endif
-  if (memcmp (proc, thunk, sizeof (thunk) - 1) == 0 ||
-     (sizeof(thunk2) && memcmp (proc, thunk2, sizeof (thunk2) - 1) == 0))
+  if (proc && (memcmp (proc, thunk, sizeof (thunk) - 1) == 0 ||
+	(sizeof(thunk2) && memcmp (proc, thunk2, sizeof (thunk2) - 1) == 0)))
     {
       proc += sizeof (thunk) - 1;
       proc += 4 + *(const int32_t *) proc;
