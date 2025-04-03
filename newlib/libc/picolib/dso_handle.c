@@ -37,4 +37,4 @@
  * destruction. We don't have shared objects, so this is just a stub
  * to let C++ programs link
  */
-void *__dso_handle;
+const void *const __dso_handle;
