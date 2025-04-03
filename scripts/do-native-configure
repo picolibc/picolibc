@@ -38,6 +38,7 @@ meson setup \
         --buildtype debug \
 	--fatal-meson-warnings \
         -Dtls-model=global-dynamic \
+	-Dthread-local-storage=true \
 	-Derrno-function=auto \
         -Dmultilib=false \
         -Dpicolib=false \
