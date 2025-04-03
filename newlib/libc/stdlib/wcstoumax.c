@@ -61,6 +61,13 @@ wcstoumax_l(const wchar_t * __restrict nptr,
 	uintmax_t cutoff;
 	int neg = 0, any, cutlim;
 
+        /* Check for invalid base value */
+        if ((unsigned) base > 36 || base == 1) {
+                errno = EINVAL;
+                if (endptr)
+                        *endptr = (wchar_t *) nptr;
+                return 0;
+        }
 	/*
 	 * See strtoimax for comments as to the logic used.
 	 */
@@ -78,6 +85,7 @@ wcstoumax_l(const wchar_t * __restrict nptr,
 	if ((base == 0 || base == 16) &&
 	    c == L'0' && (*s == L'x' || *s == L'X')) {
 		c = s[1];
+                nptr = s;
 		s += 2;
 		base = 16;
 	}

@@ -136,6 +136,13 @@ wcstol_l (const wchar_t *nptr, wchar_t **endptr,
 	register unsigned long cutoff;
 	register int neg = 0, any, cutlim;
 
+        /* Check for invalid base value */
+        if ((unsigned) base > 36 || base == 1) {
+                errno = EINVAL;
+                if (endptr)
+                        *endptr = (wchar_t *) nptr;
+                return 0;
+        }
 	/*
 	 * Skip white space and pick up leading +/- sign if any.
 	 * If base is 0, allow 0x for hex and 0 for octal, else
@@ -152,6 +159,7 @@ wcstol_l (const wchar_t *nptr, wchar_t **endptr,
 	if ((base == 0 || base == 16) &&
 	    c == L'0' && (*s == L'x' || *s == L'X')) {
 		c = s[1];
+                nptr = s;
 		s += 2;
 		base = 16;
 	}
