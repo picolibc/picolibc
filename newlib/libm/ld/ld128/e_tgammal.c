@@ -17,16 +17,14 @@
  */
 
 
-volatile long double _x, _y, _z, _w;
 
 long double
 tgammal(long double x)
 {
 	int64_t i0,i1;
         int sign;
-        long double y;
+        long double y, z;
 
-        _x = x;
 	GET_LDOUBLE_WORDS64(i0,i1,x);
 	if (((i0&0x7fffffffffffffffLL)|i1) == 0)
                 return __math_divzerol(i0 < 0);
@@ -38,9 +36,8 @@ tgammal(long double x)
 		return __math_invalidl(x);
 
         y = lgammal_r(x, &sign);
-        _y = y;
-        _z = expl(y);
-        _w = (long double) sign;
-        return _z * _w;
-//	return expl(y) * (long double) sign;
+        z = expl(y);
+        if (sign < 0)
+            z = -z;
+        return z;
 }
