@@ -147,7 +147,7 @@ typedef __uint32_t fexcept_t;
    represents an environment where every exception raised causes a trap
    to occur. You can test for this macro using #ifdef. It is only defined
    if _GNU_SOURCE is defined.  */
-extern const fenv_t *_fe_nomask_env;
+extern const fenv_t *const _fe_nomask_env;
 #define FE_NOMASK_ENV (_fe_nomask_env)
 #endif
 

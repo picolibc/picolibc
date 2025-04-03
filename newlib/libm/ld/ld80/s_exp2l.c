@@ -36,7 +36,7 @@ static const long double huge = 0x1p10000L;
 #if 0 /* XXX Prevent gcc from erroneously constant folding this. */
 static const long double twom10000 = 0x1p-10000L;
 #else
-static volatile long double twom10000 = 0x1p-10000L;
+static const volatile long double twom10000 = 0x1p-10000L;
 #endif
 
 static const double
