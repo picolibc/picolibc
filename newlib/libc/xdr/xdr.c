@@ -595,7 +595,7 @@ xdr_opaque (XDR * xdrs,
 	u_int cnt)
 {
   u_int rndup;
-  static char crud[BYTES_PER_XDR_UNIT];
+  char crud[BYTES_PER_XDR_UNIT];
 
   /*
    * if no data we are done
