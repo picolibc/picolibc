@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,23 +34,21 @@
  */
 
 #include "stdio_private.h"
-
-#if defined(__HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
+#include <inttypes.h>
 
 #ifdef WIDE_CHARS
 #include <wctype.h>
-#define strtold_l wcstold_l
-#define strtold wcstold
+#define strtoimax_l wcstoimax_l
+#define strtoimax wcstoimax
 #define char wchar_t
 #endif
 
-long double
-strtold_l (const char *__restrict s00,
-	  char **__restrict se,
-	  locale_t loc)
+intmax_t
+strtoimax_l (const char *__restrict s,
+          char **__restrict ptr,
+          int base,
+          locale_t loc)
 {
-        (void) loc;
-	return strtold (s00, se);
+    (void) loc;
+    return strtoimax(s, ptr, base);
 }
-
-#endif

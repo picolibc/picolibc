@@ -99,14 +99,7 @@ picolibc_sources(
   wcrtomb.c
   wcsnrtombs.c
   wcsrtombs.c
-  wcstod.c
-  wcstoimax.c
-  wcstol.c
-  wcstoll.c
   wcstombs.c
-  wcstoul.c
-  wcstoull.c
-  wcstoumax.c
   wctob.c
   wctomb.c
   wctomb_r.c

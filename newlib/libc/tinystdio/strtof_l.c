@@ -35,6 +35,13 @@
 
 #include "stdio_private.h"
 
+#ifdef WIDE_CHARS
+#include <wctype.h>
+#define strtof_l wcstof_l
+#define strtof wcstof
+#define char wchar_t
+#endif
+
 float
 strtof_l (const char *__restrict s00,
 	  char **__restrict se,

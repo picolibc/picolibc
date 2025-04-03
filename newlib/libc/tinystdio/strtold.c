@@ -62,16 +62,22 @@
      returned and \c ERANGE is stored in \c errno.
  */
 
+#define STRTOLD
+
 #include "conv_flt.c"
 
+#ifdef WIDE_CHARS
+#define strtold wcstold
+#endif
+
 long double
-strtold (const char * nptr, char ** endptr)
+strtold (const CHAR * nptr, CHAR ** endptr)
 {
     int len = 0;
     long double flt;
-    unsigned char ret;
+    UCHAR ret;
 
-    while (isspace(nptr[len]))
+    while (ISSPACE(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);
@@ -80,7 +86,7 @@ strtold (const char * nptr, char ** endptr)
         len = 0;
     }
     if (endptr)
-        *endptr = (char *) nptr + len;
+        *endptr = (CHAR *) nptr + len;
     return flt;
 }
 

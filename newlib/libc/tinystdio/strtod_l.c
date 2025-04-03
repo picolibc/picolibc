@@ -35,6 +35,14 @@
 
 #include "stdio_private.h"
 
+#ifdef WIDE_CHARS
+#include <wctype.h>
+#define strtod_l wcstod_l
+#define strtod wcstod
+#define strtold_l wcstold_l
+#define char wchar_t
+#endif
+
 double
 strtod_l (const char *__restrict s00,
 	  char **__restrict se,

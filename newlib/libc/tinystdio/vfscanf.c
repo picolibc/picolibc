@@ -77,10 +77,13 @@ typedef long int_scanf_t;
 # define GETC(s) getwc_unlocked(s)
 # define UNGETC(c,s) ungetwc(c,s)
 # define ISSPACE(c) iswspace(c)
+# define ISALNUM(c) iswalnum(c)
 # define IS_EOF(c)       ((c) == WEOF)
 # define WINT            wint_t
 # define IS_WEOF(c)      ((c) == WEOF)
 # define ISWSPACE(c)     iswspace(c)
+# define STRCHR(s,c)     wcschr(s, c)
+# define CQ(a)          L##a
 #else
 # define INT int
 # define MY_EOF          EOF
@@ -90,6 +93,9 @@ typedef long int_scanf_t;
 # define GETC(s) getc_unlocked(s)
 # define UNGETC(c,s) ungetc(c,s)
 # define ISSPACE(c) isspace(c)
+# define ISALNUM(c) isalnum(c)
+# define STRCHR(s,c) strchr(s, c)
+# define CQ(a) a
 # ifdef _NEED_IO_MBTOWIDE
 #  define WINT            wint_t
 #  define MY_WEOF         WEOF

@@ -35,6 +35,13 @@
 
 #include "stdio_private.h"
 
+#ifdef WIDE_CHARS
+#include <wctype.h>
+#define strtoul_l wcstoul_l
+#define strtoul wcstoul
+#define char wchar_t
+#endif
+
 unsigned long
 strtoul_l (const char *__restrict s,
           char **__restrict ptr,

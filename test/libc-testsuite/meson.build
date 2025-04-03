@@ -41,6 +41,7 @@ libc_tests_common = [
   'sscanf',
   'string',
   'strtol',
+  'wcstol',
 ]
 
 libc_tests_picolibc = libc_tests_common
