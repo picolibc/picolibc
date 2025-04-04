@@ -76,6 +76,6 @@ isdigit (int c)
 #if _PICOLIBC_CTYPE_SMALL
     return '0' <= c && c <= '9';
 #else
-    return __CTYPE_PTR[c+1] & _N;
+    return __CTYPE_PTR[c+1] & __CTYPE_DIGIT;
 #endif
 }

@@ -75,6 +75,6 @@ isspace (int c)
 #if _PICOLIBC_CTYPE_SMALL
     return c == ' ' || ('\t' <= c && c <= '\r');
 #else
-    return(__CTYPE_PTR[c+1] & _S);
+    return(__CTYPE_PTR[c+1] & __CTYPE_SPACE);
 #endif
 }

@@ -13,6 +13,6 @@ isdigit_l (int c, locale_t locale)
     (void) locale;
     return isdigit(c);
 #else
-    return __CTYPE_PTR_L (locale)[c+1] & _N;
+    return __CTYPE_PTR_L (locale)[c+1] & __CTYPE_DIGIT;
 #endif
 }

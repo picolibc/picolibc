@@ -225,16 +225,27 @@ extern const short      _ctype_wide[];
 
 #define _ctype_ (_ctype_b + _CTYPE_OFFSET)
 
-#define	_U	0x001    /* upper */
-#define	_L	0x002    /* lower */
-#define	_N	0x004    /* digit */
-#define	_S	0x008    /* space */
-#define _P	0x010    /* punct */
-#define _C	0x020    /* control */
-#define _X	0x040    /* hex */
-#define	_B	0x080    /* blank (but not tab) */
-/* _T used for _ctype_wide table */
-#define _T      0x100    /* tab */
+#define	__CTYPE_UPPER	0x001    /* upper */
+#define	__CTYPE_LOWER	0x002    /* lower */
+#define	__CTYPE_DIGIT	0x004    /* digit */
+#define	__CTYPE_SPACE	0x008    /* space */
+#define __CTYPE_PUNCT	0x010    /* punct */
+#define __CTYPE_CNTRL	0x020    /* control */
+#define __CTYPE_HEX	0x040    /* hex */
+#define	__CTYPE_BLANK	0x080    /* blank (but not tab) */
+#define __CTYPE_TAB     0x100    /* tab (only in wide table) */
+
+#ifdef __cplusplus
+/* We need these legacy symbols to build libstdc++ */
+#define _U __CTYPE_UPPER
+#define _L __CTYPE_LOWER
+#define _N __CTYPE_DIGIT
+#define _S __CTYPE_SPACE
+#define _P __CTYPE_PUNCT
+#define _C __CTYPE_CNTRL
+#define _X __CTYPE_HEX
+#define _B __CTYPE_BLANK
+#endif
 
 #ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
 const char *__locale_ctype_ptr (void);
@@ -247,21 +258,21 @@ const char *__locale_ctype_ptr (void);
 
 #define __ctype_lookup(__c) (__CTYPE_PTR + 1)[(int) (__c)]
 
-#define	isalpha(__c)	(__ctype_lookup(__c)&(_U|_L))
-#define	isupper(__c)	((__ctype_lookup(__c)&(_U|_L))==_U)
-#define	islower(__c)	((__ctype_lookup(__c)&(_U|_L))==_L)
-#define	isdigit(__c)	(__ctype_lookup(__c)&_N)
-#define	isxdigit(__c)	(__ctype_lookup(__c)&(_X|_N))
-#define	isspace(__c)	(__ctype_lookup(__c)&_S)
-#define ispunct(__c)	(__ctype_lookup(__c)&_P)
-#define isalnum(__c)	(__ctype_lookup(__c)&(_U|_L|_N))
-#define isprint(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N|_B))
-#define	isgraph(__c)	(__ctype_lookup(__c)&(_P|_U|_L|_N))
-#define iscntrl(__c)	(__ctype_lookup(__c)&_C)
+#define	isalpha(__c)	(__ctype_lookup(__c)&(__CTYPE_UPPER|__CTYPE_LOWER))
+#define	isupper(__c)	((__ctype_lookup(__c)&(__CTYPE_UPPER|__CTYPE_LOWER))==__CTYPE_UPPER)
+#define	islower(__c)	((__ctype_lookup(__c)&(__CTYPE_UPPER|__CTYPE_LOWER))==__CTYPE_LOWER)
+#define	isdigit(__c)	(__ctype_lookup(__c)&__CTYPE_DIGIT)
+#define	isxdigit(__c)	(__ctype_lookup(__c)&(__CTYPE_HEX|__CTYPE_DIGIT))
+#define	isspace(__c)	(__ctype_lookup(__c)&__CTYPE_SPACE)
+#define ispunct(__c)	(__ctype_lookup(__c)&__CTYPE_PUNCT)
+#define isalnum(__c)	(__ctype_lookup(__c)&(__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT))
+#define isprint(__c)	(__ctype_lookup(__c)&(__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT|__CTYPE_BLANK))
+#define	isgraph(__c)	(__ctype_lookup(__c)&(__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT))
+#define iscntrl(__c)	(__ctype_lookup(__c)&__CTYPE_CNTRL)
 
 #if __ISO_C_VISIBLE >= 1999 && defined(__declare_extern_inline)
 __declare_extern_inline(int) isblank(int c) {
-    return c == '\t' || __ctype_lookup(c) & _B;
+    return c == '\t' || __ctype_lookup(c) & __CTYPE_BLANK;
 }
 #endif
 
@@ -276,21 +287,21 @@ const char *__locale_ctype_ptr_l (locale_t);
 
 #define __ctype_lookup_l(__c, __l) ((__CTYPE_PTR_L(__l)+1)[(int)(__c)])
 
-#define	isalpha_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L))
-#define	isupper_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(_U|_L))==_U)
-#define	islower_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(_U|_L))==_L)
-#define	isdigit_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_N)
-#define	isxdigit_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_X|_N))
-#define	isspace_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_S)
-#define ispunct_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_P)
-#define isalnum_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_U|_L|_N))
-#define isprint_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_P|_U|_L|_N|_B))
-#define	isgraph_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(_P|_U|_L|_N))
-#define iscntrl_l(__c,__l)	(__ctype_lookup_l(__c,__l)&_C)
+#define	isalpha_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(__CTYPE_UPPER|__CTYPE_LOWER))
+#define	isupper_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(__CTYPE_UPPER|__CTYPE_LOWER))==__CTYPE_UPPER)
+#define	islower_l(__c,__l)	((__ctype_lookup_l(__c,__l)&(__CTYPE_UPPER|__CTYPE_LOWER))==__CTYPE_LOWER)
+#define	isdigit_l(__c,__l)	(__ctype_lookup_l(__c,__l)&__CTYPE_DIGIT)
+#define	isxdigit_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(__CTYPE_HEX|__CTYPE_DIGIT))
+#define	isspace_l(__c,__l)	(__ctype_lookup_l(__c,__l)&__CTYPE_SPACE)
+#define ispunct_l(__c,__l)	(__ctype_lookup_l(__c,__l)&__CTYPE_PUNCT)
+#define isalnum_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT))
+#define isprint_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT|__CTYPE_BLANK))
+#define	isgraph_l(__c,__l)	(__ctype_lookup_l(__c,__l)&(__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT))
+#define iscntrl_l(__c,__l)	(__ctype_lookup_l(__c,__l)&__CTYPE_CNTRL)
 
 #ifdef __declare_extern_inline
 __declare_extern_inline(int) isblank_l(int c, locale_t l) {
-    return c == '\t' || (__ctype_lookup_l(c, l) & _B);
+    return c == '\t' || (__ctype_lookup_l(c, l) & __CTYPE_BLANK);
 }
 #endif
 
