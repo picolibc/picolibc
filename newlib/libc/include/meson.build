@@ -88,7 +88,6 @@ inc_headers = [
   '_syslist.h',
   'tar.h',
   'termios.h',
-  'threads.h',
   'time.h',
   'uchar.h',
   'unctrl.h',
