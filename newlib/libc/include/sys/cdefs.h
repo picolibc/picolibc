@@ -209,12 +209,14 @@
 
 #if __has_attribute(__deprecated__)
 # if __GNUC_PREREQ__(4,5) || defined(__clang__)
-#  define __deprecated(m) __attribute__((__deprecated__(m)))
+#  define __deprecated_m(m) __attribute__((__deprecated__(m)))
 # else
-#  define __deprecated(m) __attribute__((__deprecated__))
+#  define __deprecated_m(m) __attribute__((__deprecated__))
 # endif
+# define __deprecated __attribute__((__deprecated__))
 #else
-# define __deprecated(m)
+# define __deprecated_m(m)
+# define __deprecated
 #endif
 
 #if __has_attribute(__no_builtin__)

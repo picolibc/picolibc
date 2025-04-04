@@ -198,7 +198,7 @@ int	mkstemp (char *);
 int	mkstemps (char *, int);
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-char *	mktemp (char *) __deprecated("the use of `mktemp' is dangerous; use `mkstemp' instead");
+char *	mktemp (char *) __deprecated_m("the use of `mktemp' is dangerous; use `mkstemp' instead");
 #endif
 #if __SVID_VISIBLE || __XSI_VISIBLE
 long   mrand48 (void);
