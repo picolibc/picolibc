@@ -14,6 +14,6 @@ isgraph_l (int c, locale_t locale)
     (void) locale;
     return isgraph(c);
 #else
-    return __CTYPE_PTR_L (locale)[c+1] & (_P|_U|_L|_N);
+    return __CTYPE_PTR_L (locale)[c+1] & (__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT);
 #endif
 }

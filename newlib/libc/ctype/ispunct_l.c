@@ -13,7 +13,7 @@ ispunct_l (int c, locale_t locale)
     (void) locale;
     return ispunct(c);
 #else
-    return __CTYPE_PTR_L (locale)[c+1] & _P;
+    return __CTYPE_PTR_L (locale)[c+1] & __CTYPE_PUNCT;
 #endif
 }
 

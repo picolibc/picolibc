@@ -45,6 +45,6 @@ isblank (int c)
 #if _PICOLIBC_CTYPE_SMALL
     return c == ' ' || c == '\t';
 #else
-    return(__CTYPE_PTR[c+1] & _B) || c == '\t';
+    return(__CTYPE_PTR[c+1] & __CTYPE_BLANK) || c == '\t';
 #endif
 }

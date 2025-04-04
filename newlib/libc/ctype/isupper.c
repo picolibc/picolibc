@@ -73,6 +73,6 @@ isupper (int c)
 #if _PICOLIBC_CTYPE_SMALL
     return 'A' <= c && c <= 'Z';
 #else
-    return ((__CTYPE_PTR[c+1] & (_U|_L)) == _U);
+    return ((__CTYPE_PTR[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER)) == __CTYPE_UPPER);
 #endif
 }
