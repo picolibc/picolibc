@@ -40,6 +40,7 @@ srcs_machine = [
   'memmove-stub.c',
   'memset.S',
   'setjmp.S',
+  'stpcpy.c',
   'strcmp.S',
   'strcpy.c',
   'strlen.c',
