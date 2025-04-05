@@ -58,8 +58,8 @@ strcasecmp (const char *s1,
   int d = 0;
   for ( ; ; )
     {
-      const int c1 = tolower(*s1++);
-      const int c2 = tolower(*s2++);
+      const int c1 = tolower(*(unsigned char *)s1++);
+      const int c2 = tolower(*(unsigned char *)s2++);
       if (((d = c1 - c2) != 0) || (c2 == '\0'))
         break;
     }

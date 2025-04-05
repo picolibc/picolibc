@@ -47,19 +47,6 @@ QUICKREF
 #include "local.h"
 #include <stdint.h>
 
-/* Distance from X to previous aligned boundary. Zero if aligned */
-#define UNALIGNED(X) \
-    (((uintptr_t)X & (sizeof (long) - 1)))
-
-/* How many bytes are copied each iteration of the 4X unrolled loop.  */
-#define BIGBLOCKSIZE    (sizeof (long) << 2)
-
-/* How many bytes are copied each iteration of the word copy loop.  */
-#define LITTLEBLOCKSIZE (sizeof (long))
-
-/* Threshhold for punting to the byte copier.  */
-#define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
-
 #undef memcpy
 
 void *
@@ -76,40 +63,40 @@ memcpy (void *__restrict dst0,
 
   /* If the size is small, or either SRC or DST is unaligned,
      then punt into the byte copy loop.  This should be rare.  */
-  if (!TOO_SMALL(len0))
+  if (!TOO_SMALL_BIG_BLOCK(len0))
   {
       /*
        * Align dst and make sure
        * we won't fetch anything before src
        */
-      unsigned start = LITTLEBLOCKSIZE*2 - UNALIGNED(dst);
+      unsigned start = LITTLE_BLOCK_SIZE*2 - UNALIGNED_X(dst);
       while(start--) {
           *dst++ = *src++;
           len0--;
       }
 
       aligned_dst = (unsigned long*)dst;
-      int byte_shift = UNALIGNED(src);
+      int byte_shift = UNALIGNED_X(src);
 
       if (!byte_shift)
       {
           aligned_src = (unsigned long*)src;
 
           /* Copy 4X long words at a time if possible.  */
-          while (len0 >= BIGBLOCKSIZE)
+          while (len0 >= BIG_BLOCK_SIZE)
           {
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
-              len0 -= BIGBLOCKSIZE;
+              len0 -= BIG_BLOCK_SIZE;
           }
 
           /* Copy one long word at a time if possible.  */
-          while (len0 >= LITTLEBLOCKSIZE)
+          while (len0 >= LITTLE_BLOCK_SIZE)
           {
               *aligned_dst++ = *aligned_src++;
-              len0 -= LITTLEBLOCKSIZE;
+              len0 -= LITTLE_BLOCK_SIZE;
           }
 
           src = (char*)aligned_src;
@@ -130,7 +117,7 @@ memcpy (void *__restrict dst0,
            */
 
           /* bytes used from the left word */
-          int remain = LITTLEBLOCKSIZE - byte_shift;
+          int remain = LITTLE_BLOCK_SIZE - byte_shift;
           /* bit shifts for the left and right words */
           int left_shift = byte_shift << 3;
           int right_shift = remain << 3;
@@ -138,7 +125,7 @@ memcpy (void *__restrict dst0,
           aligned_src = (unsigned long*)(src - byte_shift);
           unsigned long left = *aligned_src++, right;
 
-          while (len0 >= LITTLEBLOCKSIZE + remain) {
+          while (len0 >= LITTLE_BLOCK_SIZE + remain) {
               right = *aligned_src++;
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
               *aligned_dst++ = (left >> left_shift) | (right << right_shift);
@@ -146,7 +133,7 @@ memcpy (void *__restrict dst0,
               *aligned_dst++ = (left << left_shift) | (right >> right_shift);
 #endif
               left = right;
-              len0 -= LITTLEBLOCKSIZE;
+              len0 -= LITTLE_BLOCK_SIZE;
           }
           src = (char *)aligned_src - remain;
       }

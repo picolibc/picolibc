@@ -44,15 +44,15 @@ QUICKREF
 #include <strings.h>
 #include <ctype.h>
 
-int 
+int
 strncasecmp_l (const char *s1, const char *s2, size_t n,
 	       locale_t locale)
 {
   int d = 0;
   for ( ; n != 0; n--)
     {
-      const int c1 = tolower_l (*s1++, locale);
-      const int c2 = tolower_l (*s2++, locale);
+      const int c1 = tolower_l (*(unsigned char*)s1++, locale);
+      const int c2 = tolower_l (*(unsigned char*)s2++, locale);
       if (((d = c1 - c2) != 0) || (c2 == '\0'))
         break;
     }

@@ -614,6 +614,7 @@ VFPRINTF (
 		GET_ARG (N, ap_copy, long double);
 	      else
 		GET_ARG (N, ap_copy, double);
+	      n = 0;
 	    }
 	  else
             n = _printf_float (data, &prt_data, fp, pfunc, &ap_copy);

@@ -43,12 +43,8 @@ QUICKREF
 */
 
 #include <string.h>
-#include "local.h"
 #include <stdint.h>
-
-#define LBLOCKSIZE (sizeof(long))
-#define UNALIGNED(X)   ((uintptr_t)X & (LBLOCKSIZE - 1))
-#define TOO_SMALL(LEN) ((LEN) < LBLOCKSIZE)
+#include "local.h"
 
 #undef memset
 
@@ -67,7 +63,7 @@ memset (void *m,
   unsigned int d = c & 0xff;	/* To avoid sign extension, copy C to an
 				   unsigned variable.  */
 
-  while (UNALIGNED (s))
+  while (UNALIGNED_X(s))
     {
       if (n--)
         *s++ = (char) c;
@@ -75,7 +71,7 @@ memset (void *m,
         return m;
     }
 
-  if (!TOO_SMALL (n))
+  if (!TOO_SMALL_LITTLE_BLOCK(n))
     {
       /* If we get this far, we know that n is large and s is word-aligned. */
       aligned_addr = (unsigned long *) s;
@@ -84,23 +80,23 @@ memset (void *m,
          we can set large blocks quickly.  */
       buffer = (d << 8) | d;
       buffer |= (buffer << 16);
-      for (i = 32; i < LBLOCKSIZE * 8; i <<= 1)
+      for (i = 32; i < sizeof(buffer) * 8; i <<= 1)
         buffer = (buffer << i) | buffer;
 
       /* Unroll the loop.  */
-      while (n >= LBLOCKSIZE*4)
+      while (!TOO_SMALL_BIG_BLOCK(n))
         {
           *aligned_addr++ = buffer;
           *aligned_addr++ = buffer;
           *aligned_addr++ = buffer;
           *aligned_addr++ = buffer;
-          n -= 4*LBLOCKSIZE;
+          n -= BIG_BLOCK_SIZE;
         }
 
-      while (n >= LBLOCKSIZE)
+      while (!TOO_SMALL_LITTLE_BLOCK(n))
         {
           *aligned_addr++ = buffer;
-          n -= LBLOCKSIZE;
+          n -= LITTLE_BLOCK_SIZE;
         }
       /* Pick up the remainder with a bytewise loop.  */
       s = (char*)aligned_addr;

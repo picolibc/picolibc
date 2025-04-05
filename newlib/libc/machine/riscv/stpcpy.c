@@ -1,4 +1,4 @@
-/* Copyright (c) 2017  SiFive Inc. All rights reserved.
+/* Copyright (c) 2025  SiFive Inc. All rights reserved.
 
    This copyrighted material is made available to anyone wishing to use,
    modify, copy, or redistribute it subject to the terms and conditions
@@ -9,10 +9,13 @@
    http://www.opensource.org/licenses.
 */
 
-static __inline unsigned long __libc_detect_null(unsigned long w)
+#define _DEFAULT_SOURCE
+#include <stdbool.h>
+#include "rv_string.h"
+
+#undef stpcpy
+
+char *stpcpy(char *dst, const char *src)
 {
-  unsigned long mask = 0x7f7f7f7f;
-  if (sizeof (long) == 8)
-    mask = ((mask << 16) << 16) | mask;
-  return ~(((w & mask) + mask) | w | mask);
+  return __libc_strcpy(dst, src, false);
 }
