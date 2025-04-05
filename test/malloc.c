@@ -51,6 +51,7 @@
 #pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
 #pragma GCC diagnostic ignored "-Wuse-after-free"
 #pragma GCC diagnostic ignored "-Warray-bounds"
+#pragma GCC diagnostic ignored "-Wunused-result"
 #endif
 
 #ifdef __clang__
