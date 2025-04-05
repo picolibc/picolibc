@@ -75,6 +75,6 @@ isalpha (int c)
 #if _PICOLIBC_CTYPE_SMALL
     return isupper(c) || islower(c);
 #else
-    return __CTYPE_PTR[c+1] & (_U|_L);
+    return __CTYPE_PTR[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER);
 #endif
 }

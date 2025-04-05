@@ -75,6 +75,6 @@ islower (int c)
 #if _PICOLIBC_CTYPE_SMALL
     return 'a' <= c && c <= 'z';
 #else
-    return ((__CTYPE_PTR[c+1] & (_U|_L)) == _L);
+    return ((__CTYPE_PTR[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER)) == __CTYPE_LOWER);
 #endif
 }

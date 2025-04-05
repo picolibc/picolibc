@@ -77,6 +77,6 @@ isxdigit (int c)
             ('A' <= c && c <= 'F') ||
             ('a' <= c && c <= 'f'));
 #else
-    return __CTYPE_PTR[c+1] & ((_X)|(_N));
+    return __CTYPE_PTR[c+1] & ((__CTYPE_HEX)|(__CTYPE_DIGIT));
 #endif
 }
