@@ -156,6 +156,12 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #define BUFIO_ABI_MATCHES
 #endif
 
+#if defined(__has_feature)
+#if __has_feature(undefined_behavior_sanitizer)
+#undef BUFIO_ABI_MATCHES
+#endif
+#endif
+
 /* Buffered I/O routines for tiny stdio */
 
 static inline ssize_t bufio_read(struct __file_bufio *bf, void *buf, size_t count)
