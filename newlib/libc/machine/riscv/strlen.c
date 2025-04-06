@@ -35,33 +35,23 @@ size_t strlen(const char *str)
   uintxlen_t *ps = (uintxlen_t *)str;
   uintxlen_t psval;
 
-  while (!__libc_detect_null ((psval = *ps++)))
-    ;
+  while (!__libc_detect_null ((psval = *ps)))
+      ps++;
   __asm__ volatile ("" : "+r"(ps)); /* prevent "optimization" */
 
   str = (const char *)ps;
-  size_t ret = str - start, sp = sizeof (*ps);
 
   #if __riscv_zbb
     psval = ~__LIBC_RISCV_ZBB_ORC_B(psval);
     psval = __LIBC_RISCV_ZBB_CNT_Z(psval);
 
-    return ret + (psval >> 3) - sp;
+    str += (psval >> 3);
   #else
-    char c0 = str[0 - sp], c1 = str[1 - sp], c2 = str[2 - sp], c3 = str[3 - sp];
-    if (c0 == 0)    return ret + 0 - sp;
-    if (c1 == 0)    return ret + 1 - sp;
-    if (c2 == 0)    return ret + 2 - sp;
-    if (c3 == 0)    return ret + 3 - sp;
-
-    #if __riscv_xlen == 64
-      c0 = str[4 - sp], c1 = str[5 - sp], c2 = str[6 - sp];
-      if (c0 == 0)  return ret + 4 - sp;
-      if (c1 == 0)  return ret + 5 - sp;
-      if (c2 == 0)  return ret + 6 - sp;
-    #endif
-
-    return ret + 7 - sp;
+    while (psval & 0xff) {
+        psval >>= 8;
+        str++;
+    }
   #endif
+    return str - start;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }
