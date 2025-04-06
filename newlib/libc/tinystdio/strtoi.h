@@ -140,7 +140,8 @@ strtoi(const strtoi_char *__restrict nptr, strtoi_char **__restrict endptr, int 
 #else
         if (val > cutoff || (val == cutoff && i > cutlim))
             flags |= FLAG_OFLOW;
-        val = val * (strtoi_type) base + (strtoi_type) i;
+        else
+            val = val * (strtoi_type) base + (strtoi_type) i;
 #endif
         /* Parsed another digit */
         nptr = (const strtoi_char *) s;
