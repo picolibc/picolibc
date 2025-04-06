@@ -58,6 +58,6 @@ gettimeofday(struct timeval *restrict tv, void *restrict tz)
     ticks = start_ticks + (elapsed - start_elapsed);
 
     tv->tv_sec = (time_t) (ticks / tick_freq);
-    tv->tv_usec = (suseconds_t) (ticks % tick_freq) * 1000000 / tick_freq;
+    tv->tv_usec = (suseconds_t) ((ticks % tick_freq) * 1000000 / tick_freq);
     return 0;
 }
