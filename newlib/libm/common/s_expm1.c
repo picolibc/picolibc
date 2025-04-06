@@ -232,7 +232,7 @@ _NAME_64(expm1)(__float64 x)
 	        __uint32_t high;
 	        y = one-(e-x);
 		GET_HIGH_WORD(high,y);
-		SET_HIGH_WORD(y,high+(k<<20));	/* add k to y's exponent */
+		SET_HIGH_WORD(y,high+lsl(k, 20));	/* add k to y's exponent */
 	        return y-one;
 	    }
 	    t = one;
@@ -241,14 +241,14 @@ _NAME_64(expm1)(__float64 x)
 	        SET_HIGH_WORD(t,0x3ff00000 - (0x200000>>k));  /* t=1-2^-k */
 	       	y = t-(e-x);
 		GET_HIGH_WORD(high,y);
-		SET_HIGH_WORD(y,high+(k<<20));	/* add k to y's exponent */
+		SET_HIGH_WORD(y,high+lsl(k, 20));	/* add k to y's exponent */
 	   } else {
 	        __uint32_t high;
-		SET_HIGH_WORD(t,((0x3ff-k)<<20));	/* 2^-k */
+		SET_HIGH_WORD(t,lsl((0x3ff-k), 20));	/* 2^-k */
 	       	y = x-(e+t);
 	       	y += one;
 		GET_HIGH_WORD(high,y);
-		SET_HIGH_WORD(y,high+(k<<20));	/* add k to y's exponent */
+		SET_HIGH_WORD(y,high+lsl(k, 20));	/* add k to y's exponent */
 	    }
 	}
 	return y;

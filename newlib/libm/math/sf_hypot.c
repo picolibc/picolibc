@@ -83,7 +83,7 @@ hypotf(float x, float y)
         w = sqrtf(t1 * y1 - (w * (-w) - (t1 * y2 + t2 * b)));
     }
     if (k != 0) {
-        SET_FLOAT_WORD(t1, 0x3f800000L + (k << 23));
+        SET_FLOAT_WORD(t1, 0x3f800000L + lsl(k, 23));
         w *= t1;
     }
     return check_oflowf(w);

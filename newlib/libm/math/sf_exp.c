@@ -86,12 +86,12 @@ expf(float x) /* default IEEE double exp */
     if (k >= -125) {
         __uint32_t hy;
         GET_FLOAT_WORD(hy, y);
-        SET_FLOAT_WORD(y, hy + (k << 23)); /* add k to y's exponent */
+        SET_FLOAT_WORD(y, hy + lsl(k, 23)); /* add k to y's exponent */
         return y;
     } else {
         __uint32_t hy;
         GET_FLOAT_WORD(hy, y);
-        SET_FLOAT_WORD(y, hy + ((k + 100) << 23)); /* add k to y's exponent */
+        SET_FLOAT_WORD(y, hy + lsl((k + 100), 23)); /* add k to y's exponent */
         return y * twom100;
     }
 }

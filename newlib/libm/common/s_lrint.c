@@ -118,9 +118,9 @@ lrint64(__float64 x)
       if (j0 >= 52)
 	/* 64bit return: j0 in [52,62] */
 	/* 64bit return: left shift amt in [32,42] */
-        result = ((long int) ((i0 & 0x000fffff) | 0x00100000) << (j0 - 20)) |
+        result = lsl((long int) ((i0 & 0x000fffff) | 0x00100000), (j0 - 20)) |
 		/* 64bit return: right shift amt in [0,10] */
-                   ((long int) i1 << (j0 - 52));
+                   lsl((long int) i1, (j0 - 52));
       else
         {
           if (sizeof (long) == 4 && x > LONG_MAX) {
@@ -146,7 +146,7 @@ lrint64(__float64 x)
 	  /* 64bit return: left shift amt in [0,32] */
           /* ***32bit return: right shift amt in [32,21] */
           /* ***64bit return: right shift amt in [32,0] */
-          result = ((long int) i0 << (j0 - 20))
+          result = (lsl((long int) i0, (j0 - 20)))
 			| SAFE_RIGHT_SHIFT (i1, (52 - j0));
         }
     }

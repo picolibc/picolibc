@@ -153,12 +153,12 @@ exp64(__float64 x) /* default IEEE double exp */
     if (k >= -1021) {
         __uint32_t hy;
         GET_HIGH_WORD(hy, y);
-        SET_HIGH_WORD(y, hy + (k << 20)); /* add k to y's exponent */
+        SET_HIGH_WORD(y, hy + lsl(k, 20)); /* add k to y's exponent */
         return y;
     } else {
         __uint32_t hy;
         GET_HIGH_WORD(hy, y);
-        SET_HIGH_WORD(y, hy + ((k + 1000) << 20)); /* add k to y's exponent */
+        SET_HIGH_WORD(y, hy + lsl((k + 1000), 20)); /* add k to y's exponent */
         return y * twom1000;
     }
 }

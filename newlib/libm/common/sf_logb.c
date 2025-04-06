@@ -32,7 +32,7 @@ logbf(float x)
 		return -1.f/fabsf(x);	/* logbf(0) = -inf */
 		}
 	if(FLT_UWORD_IS_SUBNORMAL(hx)) {
-	    for (ix = -126,hx<<=8; hx>0; hx<<=1) ix -=1;
+	    for (ix = -126,hx = lsl(hx, 8); hx>0; hx = lsl(hx, 1)) ix -=1;
 	    return (float) ix;
 	}
 	else if (FLT_UWORD_IS_INFINITE(hx)) return HUGE_VALF;	/* x==+|-inf */
