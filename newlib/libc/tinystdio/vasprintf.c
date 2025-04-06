@@ -35,7 +35,7 @@
 
 #include "stdio_private.h"
 
-int
+int __disable_sanitizer
 vasprintf(char **strp, const char *fmt, va_list ap)
 {
         struct __file_str f = FDEV_SETUP_STRING_ALLOC();

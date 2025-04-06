@@ -35,7 +35,7 @@
 
 #include "stdio_private.h"
 
-char *
+char * __disable_sanitizer
 vasnprintf(char *str, size_t *lenp, const char *fmt, va_list ap)
 {
 	struct __file_str f = FDEV_SETUP_STRING_ALLOC_BUF(str, *lenp);
@@ -52,7 +52,7 @@ vasnprintf(char *str, size_t *lenp, const char *fmt, va_list ap)
                         i = EOF;
         }
 
-        char *ret = f.end - f.size;
+        char *ret = POINTER_MINUS(f.end, f.size);
 
         if (i >= 0) {
                 *lenp = (size_t) i;
