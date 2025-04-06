@@ -248,6 +248,15 @@ static inline void __flockfile_close(FILE *f) {
 #endif
 }
 
+/* Silence santizer errors when adding/subtracting 0 to a NULL pointer */
+#ifdef __clang__
+#define POINTER_MINUS(a,b)     ((__typeof(a)) ((uintptr_t) (a) - (b) * sizeof((*a))))
+#define POINTER_PLUS(a,b)      ((__typeof(a)) ((uintptr_t) (a) + (b) * sizeof((*a))))
+#else
+#define POINTER_MINUS(a,b)     ((a) - (b))
+#define POINTER_PLUS(a,b)      ((a) + (b))
+#endif
+
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__i_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);

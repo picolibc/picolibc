@@ -41,14 +41,14 @@ __file_str_put_alloc(char c, FILE *stream)
 	struct __file_str *sstream = (struct __file_str *) stream;
 	if (sstream->pos == sstream->end) {
                 size_t old_size = sstream->size;
-                char *old = sstream->end - old_size;
+                char *old = POINTER_MINUS(sstream->end, old_size);
                 size_t new_size = old_size + 32;
                 char *new;
                 if (sstream->alloc)
                         new = realloc(old, new_size);
                 else {
                         new = malloc(new_size);
-                        if (new)
+                        if (new && old_size)
                                 memcpy(new, old, old_size);
                 }
 		if (!new)
