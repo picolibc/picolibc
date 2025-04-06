@@ -36,17 +36,7 @@ snprintf(char *s, size_t n, const char *fmt, ...)
 {
 	va_list ap;
 	int i;
-
-	/* Restrict max output length to INT_MAX, as snprintf() return
-	   signed int. The fputc() function uses a signed comparison
-	   between estimated len and f.size field. So we can write a
-	   negative value into f.size in the case of n was 0. Note,
-	   that f.size will be a max number of nonzero symbols.	*/
-
-	if ((int) n < 0)
-		n = (unsigned)INT_MAX + 1;
-
-	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n ? n - 1 : 0);
+	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, FDEV_STRING_WRITE_END(s, n));
 
 	va_start(ap, fmt);
 	i = vfprintf(&f.file, fmt, ap);

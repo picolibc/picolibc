@@ -105,14 +105,17 @@ bool __matchcaseprefix(const char *input, const char *pattern);
                 .end = (char *) (_s)            \
 	}
 
-#define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
+#define FDEV_STRING_WRITE_END(_s, _n) \
+    (((int) (_n) < 0) ? NULL : ((_n) ? (_s) + (_n)-1 : (_s)))
+
+#define FDEV_SETUP_STRING_WRITE(_s, _end) {	\
 		.file = {			\
 			.flags = __SWR,		\
 			.put = __file_str_put,	\
                         __LOCK_INIT_NONE        \
 		},				\
 		.pos = (_s),			\
-                .end = (_s) + (_size),          \
+                .end = (_end),                  \
 	}
 
 #define FDEV_SETUP_STRING_ALLOC() {  \
