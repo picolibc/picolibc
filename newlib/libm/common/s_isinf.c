@@ -29,7 +29,7 @@ is preserved.
 int
 isinf64(__float64 x)
 {
-	__int32_t hx,lx;
+	__uint32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
 	hx &= 0x7fffffff;
 	hx |= (__uint32_t)(lx|(-lx))>>31;
