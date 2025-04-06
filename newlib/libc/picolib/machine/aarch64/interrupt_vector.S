@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,32 +33,32 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdint.h>
-
-void aarch64_halt_vector(void);
-
-void __section(".init")
-aarch64_halt_vector(void)
-{
-	/* Loop forever. */
-        for(;;);
-}
-
-void aarch64_ignore_vector(void);
-
-void __section(".init")
-aarch64_ignore_vector(void)
-{
-	/* Ignore the interrupt by returning */
-}
-
-#define vector(name) \
-	void  aarch64_ ## name ## _vector(void) __attribute__ ((weak, alias("aarch64_ignore_vector")))
-
-#define vector_halt(name) \
-	void  aarch64_ ## name ## _vector(void) __attribute__ ((weak, alias("aarch64_halt_vector")))
-
-vector_halt(sync);
-vector_halt(serror);
-vector(irq);
-vector(fiq);
+	.section	.text.init.enter,"ax",@progbits
+	.align 		11
+	.global	__weak_vector_table
+	.type	__weak_vector_table, %function
+__weak_vector_table:
+	.cfi_startproc
+SP_EL0:
+	b aarch64_sync_vector
+	. = SP_EL0 + 0x80
+	b aarch64_irq_vector
+	. = SP_EL0 + 0x100
+	b aarch64_fiq_vector
+	. = SP_EL0 + 0x180
+	b aarch64_serror_vector
+	. = SP_EL0 + 0x200
+SP_ELx:
+	b aarch64_sync_vector
+	. = SP_ELx + 0x80
+	b aarch64_irq_vector
+	. = SP_ELx + 0x100
+	b aarch64_fiq_vector
+	. = SP_ELx + 0x180
+	b aarch64_serror_vector
+	. = SP_ELx + 0x200
+	.cfi_endproc
+.LFE2:
+	.size	__weak_vector_table, .-__weak_vector_table
+	.weak	__vector_table
+	.set	__vector_table,__weak_vector_table
