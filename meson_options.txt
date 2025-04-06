@@ -45,8 +45,12 @@ option('multilib-exclude', type: 'array', value: [],
        description: 'Multilib configurations containing any of these strings will not be built')
 option('sanitize-bounds', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize=bounds')
+option('sanitize-undefined', type: 'boolean', value: false,
+       description: 'Build the library with -fsanitize=undefined')
 option('sanitize-trap-on-error', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize-undefined-trap-on-error')
+option('sanitize-allow-missing', type: 'boolean', value: false,
+       description: 'Do not bail if sanitizer is requested but unavailable')
 option('profile', type: 'boolean', value: false,
        description: 'Enable profiling by adding -pg -no-pie to compile flags')
 option('analyzer', type: 'boolean', value: false,

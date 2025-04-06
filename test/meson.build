@@ -454,7 +454,7 @@ foreach params : targets
         )
   endif
 
-  if have_ubsan
+  if c_sanitize_flags != []
     t1 = 'test-ubsan'
     t1_src = t1 + '.c'
 
@@ -465,7 +465,7 @@ foreach params : targets
 
     test(t1 + target,
 	 executable(t1 + target, t1_src,
-		    c_args: c_sanitize_bounds_flags + _c_args + test_ubsan_flags,
+		    c_args: c_sanitize_flags + _c_args + test_ubsan_flags,
 		    link_args: _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
