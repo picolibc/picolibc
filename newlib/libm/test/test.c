@@ -278,7 +278,7 @@ fmag_of_error (float is,
     b.p1 = t;
   }
 
-  sw = (a.p1) - (b.p1);
+  sw = (uint32_t) (a.p1) - (uint32_t) (b.p1);
 
   mask = 0x80000000UL;
   for (i = 0; i < 32; i++)
