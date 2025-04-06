@@ -59,7 +59,11 @@
 #define CHECK_ERRNO()   (errno != ENOMEM)
 #endif
 
-int
+#ifndef __disable_sanitizer
+#define __disable_sanitizer
+#endif
+
+int __disable_sanitizer
 main(void)
 {
         void *r, *q;

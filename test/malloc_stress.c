@@ -158,7 +158,11 @@ check_malloc(size_t in_use)
 extern size_t __malloc_minsize, __malloc_align, __malloc_head;
 #endif
 
-int
+#ifndef __disable_sanitizer
+#define __disable_sanitizer
+#endif
+
+int __disable_sanitizer
 main(void)
 {
 	int loops;
