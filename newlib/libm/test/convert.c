@@ -449,6 +449,8 @@ test_sprint (void)
   while (s->line)
   {
     line( s->line);
+    if (s->format_string == NULL)
+        break;
     sprintf(buffer, s->format_string, s->value);
 #ifdef GENERATE_VECTORS
     if (s->mag)
