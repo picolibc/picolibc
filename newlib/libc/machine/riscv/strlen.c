@@ -42,7 +42,7 @@ size_t strlen(const char *str)
   str = (const char *)ps;
   size_t ret = str - start, sp = sizeof (*ps);
 
-  #if __riscv_zbb
+  #if defined(__LIBC_RISCV_ZBB_ORC_B) && defined(__LIBC_RISCV_ZBB_CNT_Z)
     psval = ~__LIBC_RISCV_ZBB_ORC_B(psval);
     psval = __LIBC_RISCV_ZBB_CNT_Z(psval);
 
