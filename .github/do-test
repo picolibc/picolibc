@@ -8,23 +8,28 @@ for p in /opt/*/bin /opt/*/models/*; do
     PATH="$p":$PATH
 done
 
-ANALYZER="-Danalyzer=true"
+# We can't use both the analyzer and sanitizer because
+# the analyzer is run after the sanitizer and generates a lot
+# of false positives, so just use the sanitizer as it
+# appears to find more relevant bugs at this point.
 
-# Disable analyzer on m68k because the compiler gets very confused
-# about complex values
+SANITIZER="-Db_sanitize=undefined"
+
+# Use traps with the sanitizer on msp430 as the handlers make many
+# tests too large
 
 case "$TARGET" in
-    *m68k*)
-	ANALYZER=""
+    *msp430*)
+	SANITIZER="$SANITIZER -Dsanitize-trap-on-error=true"
 	;;
 esac
 
-# Disable the analyser when not using tinystdio as the stdio code is
+# Disable the sanitizer when not using tinystdio as the stdio code is
 # full of problems
 
 case "$*" in
     *-Dtinystdio=false*)
-	ANALYZER=""
+	SANITIZER=""
 	;;
 esac
 
@@ -32,9 +37,9 @@ mkdir "$DIR"
 trap 'rm -rf "$DIR"' 0 1 15
 (cd "$DIR" || exit 1
  echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER "$@"
+ echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $SANITIZER "$@"
  echo '##################################################'
- ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER "$@"
+ ../scripts/"$CONFIGURE" -Dwerror=true $SANITIZER "$@"
  case $? in
      0)
 	 echo 'Configuration succeeded'
