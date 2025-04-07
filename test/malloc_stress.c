@@ -46,8 +46,11 @@
 static uint8_t *blocks[NUM_MALLOC];
 static size_t block_size[NUM_MALLOC];
 static uint8_t block_data[NUM_MALLOC];
-
 static int order[NUM_MALLOC];
+
+#ifdef __NANO_MALLOC
+struct mallinfo start_info;
+#endif
 
 static int
 randint(int max)
@@ -134,6 +137,11 @@ check_malloc(size_t in_use)
         (void) in_use;
 #ifdef __NANO_MALLOC
 	struct mallinfo info = mallinfo();
+
+        info.ordblks -= start_info.ordblks;
+        info.arena -= start_info.arena;
+        info.fordblks -= start_info.fordblks;
+        info.uordblks -= start_info.uordblks;
 	if (info.arena < info.fordblks + in_use) {
 		printf("non-free bytes in arena %zu free %zu\n", info.arena, info.fordblks);
 		result++;
@@ -168,6 +176,9 @@ main(void)
 	int loops;
 	int result = 0;
 
+#ifdef __NANO_MALLOC
+        start_info = mallinfo();
+#endif
 	for (loops = 0; loops < 10; loops++)
 	{
 		long i;
