@@ -240,7 +240,6 @@ SECTIONS
 		PROVIDE(@PREFIX@__tdata_end = .);
 	} >ram AT>flash :@TLS_INIT_SEG@ :ram_init
 	PROVIDE( @PREFIX@__stack_chk_size = @PREFIX@__stack_chk_end - @PREFIX@__stack_chk_start );
-	PROVIDE( @PREFIX@__tls_base = ADDR(.tdata) - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata) - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
@@ -260,9 +259,10 @@ SECTIONS
 		PROVIDE( @PREFIX@__tbss_end = . );
 	} >ram AT>ram :tls :ram
 	PROVIDE( @PREFIX@__tls_first = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
+	PROVIDE( @PREFIX@__tls_base = @PREFIX@__tls_first - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss));
 	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss));
-	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
+	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - @PREFIX@__tls_first );
 	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
 	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
 	PROVIDE( @PREFIX@__tls_size = (@PREFIX@__tls_tail_extra_size ? ALIGN(@PREFIX@__tls_end, @PREFIX@__tls_align) + @PREFIX@__tls_tail_extra_size : @PREFIX@__tls_end) - @PREFIX@__tls_base );
