@@ -193,6 +193,15 @@ use Picolibc:
  * Control UCS-2 and UCS-4 locales with mb-ucs-charsets configuration
    option.
 
+ * Add stdio-locking option to provide full POSIX re-entrancy support
+   in tinystdio. Thanks to Alexey Lapshin.
+
+ * Add wcsto* string to number functions using tinystdio conversion
+   code. Avoids malloc call for float conversions.
+
+ * Add -fsanitize=undefined handlers and make library build with that
+   enabled.
+
 ### Picolibc release 1.8.9
 
  * Use common clang/gcc feature detection macros on arm.
