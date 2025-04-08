@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,53 +33,35 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
 #include <stdio.h>
+#include <inttypes.h>
+#include <unistd.h>
 
-int
-main(void)
+#ifdef CRT0_SEMIHOST
+
+/* Trap faults, print error message and exit */
+
+struct interrupt_frame {
+    uintptr_t   eip;
+    uintptr_t   cs;
+    uintptr_t   code;
+};
+
+#ifdef __x86_64
+#define FMT     "%#016" PRIxPTR
+#else
+#define FMT     "%#08" PRIxPTR
+#endif
+
+void
+x86_fault(struct interrupt_frame *frame, const char *type)
 {
-    printf("executing invalid instructions\n");
-
-    /*
-     * ARM architecture reference says these are mostly reserved for
-     * undefined instructions and should raise exceptions
-     */
-#ifdef __arm__
-
-#ifdef __thumb__
-    __asm__(".inst.n 0xde00");
-#else
-    __asm__(".inst 0xe7f000f0");
-#endif
-
-#elif defined(__riscv)
-
-    __asm__(".word 0x00000000");
-
-#elif defined(__aarch64__)
-
-    __asm__(".word 0x00000000");
-
-#elif defined(__RX__)
-
-    __asm__(".word 0xffffffff");
-
-#elif defined(__x86_64__) || defined(__i386__)
-
-    __asm__("ud2");
-
-#else
-
-#define NO_INVALID
-
-#endif
-
-#ifdef NO_INVALID
-    printf("no invalid instruction defined for target\n");
-    return 77;
-#else
-    printf("ERROR: invalid instruction worked\n");
-    return 0;
-#endif
-
+    printf("FAULT %s\n", type);
+    printf("    EIP    " FMT "\n", frame->eip);
+    printf("    CS     " FMT "\n", frame->cs);
+    printf("    CODE   " FMT "\n", frame->code);
+    _exit(1);
 }
+
+#endif

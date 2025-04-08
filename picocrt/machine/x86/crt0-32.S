@@ -91,6 +91,9 @@ _start32:
 	call	memset
 	addl	$12, %esp
 
+	/* Initialize the IDT */
+	lidtl	__idt
+
 #ifdef __THREAD_LOCAL_STORAGE
 	// switch to copy of GDT in writable memory, so we can modify TLS
 	// segment base (in case machine lacks MSR_GS_BASE register)

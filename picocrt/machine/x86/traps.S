@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,53 +33,47 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-
-int
-main(void)
-{
-    printf("executing invalid instructions\n");
-
-    /*
-     * ARM architecture reference says these are mostly reserved for
-     * undefined instructions and should raise exceptions
-     */
-#ifdef __arm__
-
-#ifdef __thumb__
-    __asm__(".inst.n 0xde00");
+#ifdef CRT0_SEMIHOST
+	
+	.macro trap name, str
+	.section	.text.\name,"ax",@progbits
+	.globl		\name
+	.type		\name, @function
+\name:
+#ifdef __x86_64
+	pushq	%rdi
+	pushq	%rsi
+	movl	$0f, %esi
+	subq	$8, %rsp
+	leaq	24(%rsp), %rdi
+	cld
+	call	x86_fault
 #else
-    __asm__(".inst 0xe7f000f0");
+	pushl	%ebp
+	movl	%esp, %ebp
+	pushl	%eax
+	leal	4(%ebp), %eax
+	andl	$-16, %esp
+	subl	$24, %esp
+	pushl	$0f
+	pushl	%eax
+	cld
+	call	x86_fault
 #endif
+	.size	\name, . - \name
+0:
+	.string	"\str"
+	.endm
+	
+	trap x86_divide_interrupt "divide"
+	trap x86_nmi_interrupt "nmi"
+	trap x86_breakpoint_interrupt "breakpoint"
+	trap x86_invalid_opcode_interrupt "invalid opcode"
+	trap x86_segment_not_present_interrupt "segment not present"
+	trap x86_stack_segment_fault_interrupt "stack segment fault"
+	trap x86_general_protection_fault_interrupt "general protection fault"
+	trap x86_page_fault_interrupt "page fault"
+	trap x86_machine_check_interrupt "machine check"
 
-#elif defined(__riscv)
-
-    __asm__(".word 0x00000000");
-
-#elif defined(__aarch64__)
-
-    __asm__(".word 0x00000000");
-
-#elif defined(__RX__)
-
-    __asm__(".word 0xffffffff");
-
-#elif defined(__x86_64__) || defined(__i386__)
-
-    __asm__("ud2");
-
-#else
-
-#define NO_INVALID
-
+	.section	.note.GNU-stack,"",@progbits
 #endif
-
-#ifdef NO_INVALID
-    printf("no invalid instruction defined for target\n");
-    return 77;
-#else
-    printf("ERROR: invalid instruction worked\n");
-    return 0;
-#endif
-
-}
