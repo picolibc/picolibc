@@ -45,7 +45,7 @@
 typedef ptrdiff_t regoff_t;
 
 typedef struct {
-	int re_magic;
+	unsigned int re_magic;
 	size_t re_nsub;		/* number of parenthesized subexpressions */
 	const char *re_endp;	/* end pointer for REG_PEND */
 	struct re_guts *re_g;	/* none of your business :-) */
