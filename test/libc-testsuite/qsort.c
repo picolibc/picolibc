@@ -33,8 +33,10 @@ static int scmp(const void *a, const void *b)
 
 static int icmp(const void *a, const void *b)
 {
-        long d = *(long*)a - *(long*)b;
-	return (d > 0) ? 1 : (d < 0) ? -1 : 0;
+        long av = *(long *)a;
+        long bv = *(long *)b;
+        int ret = (av > bv) ? 1 : (av < bv) ? -1 : 0;
+	return ret;
 }
 
 struct three {
