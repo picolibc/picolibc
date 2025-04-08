@@ -46,7 +46,7 @@ static inline bool multipleOfPowerOf5_32(const uint32_t value, const uint32_t p)
 // Returns true if value is divisible by 2^p.
 static inline bool multipleOfPowerOf2_32(const uint32_t value, const uint32_t p) {
   // __builtin_ctz doesn't appear to be faster here.
-  return (value & ((1u << p) - 1)) == 0;
+  return (value & ((1ul << p) - 1)) == 0;
 }
 
 uint32_t __mulPow5InvDivPow2(const uint32_t m, const uint32_t q, const int32_t j);
