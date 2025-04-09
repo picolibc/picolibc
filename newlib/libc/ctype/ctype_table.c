@@ -41,7 +41,7 @@
 
 #ifdef __MB_CAPABLE
 
-static struct {
+static const struct {
     wchar_t             code;
     uint16_t            category;
 } ctype_table[] = {
