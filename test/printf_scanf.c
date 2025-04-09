@@ -156,9 +156,9 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #endif
 
 #ifndef NO_WIDE_IO
-static struct {
-    const wchar_t *str;
-    const wchar_t *fmt;
+static const struct {
+    const wchar_t *const str;
+    const wchar_t *const fmt;
     int expect;
 } wtest[] = {
     { .str = L"foo\n", .fmt = L"foo\nbar", .expect = -1 },

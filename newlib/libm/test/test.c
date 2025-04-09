@@ -111,16 +111,16 @@ main (int ac,
   exit(inacc != 0);
 }
 
-static const char *iname = "foo";
+static const char *iname;
 void newfunc (const char *string)
 {
-  if (strcmp(iname, string)) 
+  if (!iname || strcmp(iname, string)) 
   {
 #ifdef MALLOC_DEBUG
     char *memcheck = getenv("CHECK_NAME");
     if (memcheck && !strcmp(string, memcheck))
       _malloc_test_fail = atoi(getenv("CHECK_COUNT"));
-    if (memcheck && !strcmp(iname, memcheck)) {
+    if (memcheck && iname && !strcmp(iname, memcheck)) {
       if (_malloc_test_fail) {
 	printf("malloc test fail remain %d\n", _malloc_test_fail);
 	_malloc_test_fail = 0;

@@ -81,7 +81,7 @@ static int rounding_map[] = {
 #endif
 };
 
-static const char *rounding_names[] = {
+static const char * const rounding_names[] = {
 #ifdef FE_TONEAREST
     "FE_TONEAREST",
 #else

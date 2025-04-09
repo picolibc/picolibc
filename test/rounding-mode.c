@@ -221,7 +221,7 @@ check(int mode, char *name, double value)
 	return ret;
 }
 
-static double my_values[] = {
+static const double my_values[] = {
 	1.0,
 	1.0 / 3.0,
 	3.0 / 2.0,	/* let either round out or round even work */

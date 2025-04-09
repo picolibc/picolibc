@@ -61,7 +61,7 @@ rand_double(void)
     return (double) rand() / RAND_MAX;
 }
 
-static struct {
+static const struct {
         char    *name;
         double  (*func)(void);
         double  mean_err;

@@ -221,7 +221,7 @@ typedef CONST struct {
 #endif
 
 #ifdef TEST_IO_LONG_DOUBLE
-static long double vals[] = {
+static const long double vals[] = {
     1.0L,
     0x1.8p0L,
     3.141592653589793238462643383279502884197169L,
@@ -352,7 +352,7 @@ naive_strtold(const char *buf)
         return ldexpl(v, exp * exp_sign);
 }
 
-static const char *formats[] = { "%La", "%.30Le", };
+static const char * const formats[] = { "%La", "%.30Le", };
 
 #define NFMTS (sizeof (formats)/sizeof(formats[0]))
 

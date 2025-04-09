@@ -33,8 +33,8 @@
 #endif
 
 
-const char *it = "<UNSET>";	/* Routine name for message routines. */
-int  errors = 0;
+static const char *it = "<UNSET>";	/* Routine name for message routines. */
+static int  errors = 0;
 
 /* Complain if condition is not true.  */
 #define check(thing) checkit(thing, __LINE__)

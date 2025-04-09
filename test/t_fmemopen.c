@@ -59,19 +59,19 @@
 #include <stdlib.h>
 #include <string.h>
 
-const char *mode_rwa[] = {
+const char *const mode_rwa[] = {
     "r", "rb", "r+", "rb+", "r+b",
     "w", "wb", "w+", "wb+", "w+b",
     "a", "ab", "a+", "ab+", "a+b",
     NULL
 };
 
-const char *mode_r[] = { "r", "rb", "r+", "rb+", "r+b", NULL };
-const char *mode_w[] = { "w", "wb", "w+", "wb+", "w+b", NULL };
-const char *mode_a[] = { "a", "ab", "a+", "ab+", "a+b", NULL };
+const char *const mode_r[] = { "r", "rb", "r+", "rb+", "r+b", NULL };
+const char *const mode_w[] = { "w", "wb", "w+", "wb+", "w+b", NULL };
+const char *const mode_a[] = { "a", "ab", "a+", "ab+", "a+b", NULL };
 
-struct testcase {
-	const char *s;
+const struct testcase {
+	const char * const s;
 	off_t n;
 } testcases[] = {
 #define TESTSTR(s)	{ s, sizeof(s)-1 }
@@ -129,7 +129,7 @@ ATF_TC_HEAD(test00, tc)
 }
 ATF_TC_BODY(test00, tc)
 {
-	const char **p;
+	const char * const * p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -152,8 +152,8 @@ ATF_TC_HEAD(test01, tc)
 }
 ATF_TC_BODY(test01, tc)
 {
-	const char **p;
-	const char *mode[] = {
+	const char * const * p;
+	static const char * const mode[] = {
 	    "r+", "rb+", "r+b",
 	    "w+", "wb+", "w+b",
 	    "a+", "ab+", "a+b",
@@ -186,7 +186,7 @@ ATF_TC_HEAD(test02, tc)
 }
 ATF_TC_BODY(test02, tc)
 {
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -239,7 +239,7 @@ ATF_TC_HEAD(test03, tc)
 }
 ATF_TC_BODY(test03, tc)
 {
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -277,7 +277,7 @@ ATF_TC_HEAD(test04, tc)
 }
 ATF_TC_BODY(test04, tc)
 {
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -321,7 +321,7 @@ ATF_TC_HEAD(test05, tc)
 ATF_TC_BODY(test05, tc)
 {
 #if !defined(__GLIBC__)
-	const char **p;
+	const char *const *p;
 	FILE *fp;
 	char buf[BUFSIZ];
 
@@ -350,7 +350,7 @@ ATF_TC_HEAD(test06, tc)
 }
 ATF_TC_BODY(test06, tc)
 {
-	const char **p;
+	const char *const *p;
 	const char *mode[] = { "", " ", "???", NULL };
 	FILE *fp;
 
@@ -372,8 +372,8 @@ ATF_TC_HEAD(test07, tc)
 ATF_TC_BODY(test07, tc)
 {
 #if !defined(__GLIBC__)
-	const char **p;
-	const char *mode[] = {
+	const char *const *p;
+	const char *const mode[] = {
 	    "r", "rb",
 	    "w", "wb",
 	    "a", "ab",
@@ -403,8 +403,8 @@ ATF_TC_HEAD(test08, tc)
 ATF_TC_BODY(test08, tc)
 {
 #if !defined(__GLIBC__)
-	const char **p;
-	const char *mode[] = {
+	const char *const *p;
+	const char *const mode[] = {
 	    "r+", "rb+", "r+b",
 	    "w+", "wb+", "w+b",
 	    "a+", "ab+", "a+b",
@@ -437,8 +437,8 @@ ATF_TC_HEAD(test09, tc)
 }
 ATF_TC_BODY(test09, tc)
 {
-	struct testcase *t;
-	const char **p;
+	const struct testcase *t;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 	off_t i;
@@ -482,7 +482,7 @@ ATF_TC_BODY(test09, tc)
 	}
 }
 
-const char *mode_rw[] = {
+const char *const mode_rw[] = {
     "r", "rb", "r+", "rb+", "r+b",
     "w", "wb", "w+", "wb+", "w+b",
     NULL
@@ -495,9 +495,9 @@ ATF_TC_HEAD(test10, tc)
 }
 ATF_TC_BODY(test10, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	off_t i;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -543,9 +543,9 @@ ATF_TC_HEAD(test11, tc)
 }
 ATF_TC_BODY(test11, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	off_t len, rest, i;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -597,9 +597,9 @@ ATF_TC_HEAD(test12, tc)
 }
 ATF_TC_BODY(test12, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	off_t len, rest, i;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -659,9 +659,9 @@ ATF_TC_HEAD(test13, tc)
 }
 ATF_TC_BODY(test13, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	off_t i;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -708,9 +708,9 @@ ATF_TC_HEAD(test14, tc)
 }
 ATF_TC_BODY(test14, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	off_t len, rest, i;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -756,7 +756,7 @@ ATF_TC_BODY(test14, tc)
 	}
 }
 
-const char *mode_rw1[] = {
+const char *const mode_rw1[] = {
     "r", "rb", "r+", "rb+", "r+b",
     "w+", "wb+",
     NULL
@@ -775,8 +775,8 @@ ATF_TC_HEAD(test15, tc)
 }
 ATF_TC_BODY(test15, tc)
 {
-	struct testcase *t;
-	const char **p;
+	const struct testcase *t;
+	const char *const *p;
 	char buf0[BUFSIZ];
 	FILE *fp;
 	off_t i, read_end;
@@ -818,8 +818,8 @@ ATF_TC_HEAD(test16, tc)
 }
 ATF_TC_BODY(test16, tc)
 {
-	struct testcase *t;
-	const char **p;
+	const struct testcase *t;
+	const char *const *p;
 	char buf0[BUFSIZ], buf1[BUFSIZ];
 	FILE *fp;
 	size_t read_end;
@@ -852,7 +852,7 @@ ATF_TC_BODY(test16, tc)
 	}
 }
 
-const char *mode_a1[] = { "a+", "ab+", NULL };
+const char *const mode_a1[] = { "a+", "ab+", NULL };
 
 ATF_TC(test17);
 ATF_TC_HEAD(test17, tc)
@@ -861,10 +861,10 @@ ATF_TC_HEAD(test17, tc)
 }
 ATF_TC_BODY(test17, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	size_t len;
 	size_t i;
-	const char **p;
+	const char * const * p;
 	char buf[BUFSIZ];
 	FILE *fp;
 	size_t read_end;
@@ -920,9 +920,9 @@ ATF_TC_HEAD(test18, tc)
 }
 ATF_TC_BODY(test18, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	size_t len, readlen1, readlen2;
-	const char **p;
+	const char * const * p;
 	char buf0[BUFSIZ], buf1[BUFSIZ];
 	FILE *fp;
 
@@ -970,7 +970,7 @@ ATF_TC_BODY(test18, tc)
  * buffer if it fits.
  */
 
-const char *mode_rw2[] = {
+const char *const mode_rw2[] = {
     "r+", "rb+", "r+b",
     "w", "wb", "w+", "wb+", "w+b",
     NULL
@@ -983,9 +983,9 @@ ATF_TC_HEAD(test19, tc)
 }
 ATF_TC_BODY(test19, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	int i;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -1047,8 +1047,8 @@ ATF_TC_HEAD(test20, tc)
 }
 ATF_TC_BODY(test20, tc)
 {
-	struct testcase *t;
-	const char **p;
+	const struct testcase *t;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -1099,9 +1099,9 @@ ATF_TC_HEAD(test21, tc)
 }
 ATF_TC_BODY(test21, tc)
 {
-	struct testcase *t;
+	const struct testcase *t;
 	int len, i;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 
@@ -1158,9 +1158,9 @@ ATF_TC_HEAD(test22, tc)
 }
 ATF_TC_BODY(test22, tc)
 {
-	struct testcase *t0, *t1;
+	const struct testcase *t0, *t1;
 	size_t len0, len1, nleft, written, writelen;
-	const char **p;
+	const char *const *p;
 	char buf[BUFSIZ];
 	FILE *fp;
 

@@ -30,7 +30,7 @@ extern double_type doubles[];
 
 /* TEST ATOF  ATOFF */
 
-double_type *pd = doubles;
+double_type *pd;
 
 #ifdef __IO_FLOAT_EXACT
 #if !defined(__TINY_STDIO) && defined(__m68k__) && !defined(__mcf_fpu__) && !defined(__HAVE_M68881__)
@@ -164,7 +164,7 @@ iterate (void (*func) (void),
 
 extern int_type ints[];
 
-int_type *p = ints;
+int_type *p;
 
 
 static void
