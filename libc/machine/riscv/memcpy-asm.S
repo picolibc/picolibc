@@ -16,14 +16,14 @@
 .global memcpy
 .type	memcpy, @function
 memcpy:
-  mv t1, a0
+  mv a3, a0
   beqz a2, 2f
 
 1:
-  lbu t2, 0(a1)
-  sb t2, 0(t1)
+  lbu a4, 0(a1)
+  sb a4, 0(a3)
   add   a2, a2, -1
-  add   t1, t1, 1
+  add   a3, a3, 1
   add   a1, a1, 1
   bnez a2, 1b
 
