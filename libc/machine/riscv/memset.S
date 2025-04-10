@@ -16,13 +16,13 @@
 .type	memset, @function
 memset:
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-  mv t1, a0
+  mv a3, a0
   beqz a2, 2f
 
 1:
-  sb a1, 0(t1)
+  sb a1, 0(a3)
   add   a2, a2, -1
-  add   t1, t1, 1
+  add   a3, a3, 1
   bnez a2, 1b
 
 2:
