@@ -21,8 +21,8 @@ memset:
 
 .Lset:
   sb a1, 0(a3)
-  add   a2, a2, -1
-  add   a3, a3, 1
+  addi   a2, a2, -1
+  addi   a3, a3, 1
   bnez a2, .Lset
 
 .Ldone:

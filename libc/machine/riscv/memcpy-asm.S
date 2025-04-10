@@ -22,9 +22,9 @@ memcpy:
 1:
   lbu a4, 0(a1)
   sb a4, 0(a3)
-  add   a2, a2, -1
-  add   a3, a3, 1
-  add   a1, a1, 1
+  addi   a2, a2, -1
+  addi   a3, a3, 1
+  addi   a1, a1, 1
   bnez a2, 1b
 
 2:

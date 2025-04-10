@@ -31,7 +31,7 @@ memmove:
   add   a1, a1, a3
 .Lcopy:
   lbu a5, 0(a1)
-  add   a2, a2, -1		/* copy bytes as long as a2 (= the number of bytes to be copied) > 0. the increment is done here to relax the RAW dependency between load and store */
+  addi   a2, a2, -1		/* copy bytes as long as a2 (= the number of bytes to be copied) > 0. the increment is done here to relax the RAW dependency between load and store */
   sb a5, 0(a4)
   bnez a2, .Lincrement
 
