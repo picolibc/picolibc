@@ -17,15 +17,15 @@
 memset:
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   mv a3, a0
-  beqz a2, 2f
+  beqz a2, .Ldone
 
-1:
+.Lset:
   sb a1, 0(a3)
   add   a2, a2, -1
   add   a3, a3, 1
-  bnez a2, 1b
+  bnez a2, .Lset
 
-2:
+.Ldone:
   ret
 
 #else
