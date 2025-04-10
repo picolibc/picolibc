@@ -16,26 +16,26 @@
 .global memmove
 .type	memmove, @function
 memmove:
-  beqz a2, 2f
+  beqz a2, .Ldone
 
   mv a4, a0
   li a3, 1
-  bgtu  a1, a0, 1f
+  bgtu  a1, a0, .Lcopy
 
   li a3, -1
   add   a4, a4, a2
   add   a1, a1, a2
 
-3:
+.Lincrement:
   add   a4, a4, a3
   add   a1, a1, a3
-1:
+.Lcopy:
   lb a5, 0(a1)
   sb a5, 0(a4)
   add   a2, a2, -1
-  bnez a2, 3b
+  bnez a2, .Lincrement
 
-2:
+.Ldone:
   ret
 
   .size	memmove, .-memmove
