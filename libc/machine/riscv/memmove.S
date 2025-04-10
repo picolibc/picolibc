@@ -28,8 +28,8 @@ memmove:
   add a1, a1, a4
 
 1:
-  lb t2, 0(a1)
-  sb t2, 0(t1)
+  lb a5, 0(a1)
+  sb a5, 0(t1)
   add   a2, a2, -1
   add   t1, t1, a3
   add   a1, a1, a3
