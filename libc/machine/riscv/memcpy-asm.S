@@ -20,7 +20,7 @@ memcpy:
   beqz a2, 2f
 
 1:
-  lb t2, 0(a1)
+  lbu t2, 0(a1)
   sb t2, 0(t1)
   add   a2, a2, -1
   add   t1, t1, 1
