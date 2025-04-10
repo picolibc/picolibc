@@ -18,22 +18,22 @@
 memmove:
   beqz a2, 2f
 
-  mv t1, a0
+  mv a4, a0
   li a3, 1
   bgtu  a1, a0, 1f
 
   li a3, -1
-  addi  a4, a2 , -1
-  add t1, t1, a4
-  add a1, a1, a4
+  add   a4, a4, a2
+  add   a1, a1, a2
 
+3:
+  add   a4, a4, a3
+  add   a1, a1, a3
 1:
   lb a5, 0(a1)
-  sb a5, 0(t1)
+  sb a5, 0(a4)
   add   a2, a2, -1
-  add   t1, t1, a3
-  add   a1, a1, a3
-  bnez a2, 1b
+  bnez a2, 3b
 
 2:
   ret
