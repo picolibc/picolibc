@@ -30,9 +30,9 @@ memmove:
   add   a4, a4, a3 		/* in case of source address < destination address, increment both addresses by -1 before copying any data to obtain the correct start addresses */
   add   a1, a1, a3
 .Lcopy:
-  lbu a5, 0(a1)			/* copy bytes as long as a2 (= the number of bytes to be copied) > 0 */
+  lbu a5, 0(a1)
+  add   a2, a2, -1		/* copy bytes as long as a2 (= the number of bytes to be copied) > 0. the increment is done here to relax the RAW dependency between load and store */
   sb a5, 0(a4)
-  add   a2, a2, -1
   bnez a2, .Lincrement
 
 .Ldone:
