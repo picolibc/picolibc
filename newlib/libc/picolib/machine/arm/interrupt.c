@@ -43,13 +43,16 @@
 
 void arm_halt_isr(void);
 
-void arm_halt_isr(void)
+void __disable_sanitizer
+arm_halt_isr(void)
 {
 	for(;;);
 }
 
 void arm_ignore_isr(void);
-void arm_ignore_isr(void)
+
+void __disable_sanitizer
+arm_ignore_isr(void)
 {
 }
 
@@ -94,7 +97,7 @@ __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 void arm_halt_vector(void);
 
-void __naked __section(".init")
+void __naked __section(".init") __disable_sanitizer
 arm_halt_vector(void)
 {
 	/* Loop forever. */
@@ -103,7 +106,7 @@ arm_halt_vector(void)
 
 void arm_ignore_vector(void);
 
-void __naked __section(".init")
+void __naked __section(".init") __disable_sanitizer
 arm_ignore_vector(void)
 {
 	/* Ignore the interrupt by returning */
@@ -127,7 +130,7 @@ vector(fiq);
 void
 __weak_vector_table(void);
 
-void __naked __section(".text.init.enter")
+void __naked __section(".text.init.enter") __disable_sanitizer
 __weak_vector_table(void)
 {
 	/*

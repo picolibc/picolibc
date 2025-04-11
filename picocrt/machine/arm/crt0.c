@@ -51,7 +51,7 @@ extern const void *__interrupt_vector[];
 const void *__interrupt_reference = __interrupt_vector;
 #endif
 
-void
+void __disable_sanitizer
 _start(void)
 {
 	/* Generate a reference to __interrupt_vector so we get one loaded */
@@ -212,7 +212,8 @@ extern char __stack[];
         SET_MODE(MODE_SVC);
 
 #if __ARM_ARCH_ISA_THUMB == 1
-static __noinline __attribute__((target("arm"))) void
+static __noinline __attribute__((target("arm"))) __disable_sanitizer
+void 
 _set_stacks(void)
 {
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
@@ -234,7 +235,8 @@ _set_stacks(void)
 
 extern void __vector_table(void);
 
-static __noreturn __used __section(".init") void
+static __noreturn __used __section(".init") __disable_sanitizer
+void
 _cstart(void)
 {
 #if __ARM_ARCH_ISA_THUMB == 1
@@ -323,7 +325,8 @@ _cstart(void)
 	__start();
 }
 
-void __naked __section(".init") __used
+void
+__naked __section(".init") __used __disable_sanitizer
 _start(void)
 {
 	/* Generate a reference to __vector_table so we get one loaded */
@@ -362,7 +365,8 @@ _start(void)
 #define _REASON(r) #r
 #define REASON(r) _REASON(r)
 
-static void arm_fault_write_reg(const char *prefix, unsigned reg)
+static void
+arm_fault_write_reg(const char *prefix, unsigned reg)
 {
     fputs(prefix, stdout);
 
@@ -418,7 +422,7 @@ arm_fault(struct fault *f, int reason)
     _exit(1);
 }
 
-void __naked
+void __naked __disable_sanitizer
 arm_hardfault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -426,7 +430,7 @@ arm_hardfault_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __naked
+void __naked __disable_sanitizer
 arm_memmange_isr(void)
 {
     __asm__("mov r0, sp");
@@ -434,7 +438,7 @@ arm_memmange_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __naked
+void __naked __disable_sanitizer
 arm_busfault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -442,7 +446,7 @@ arm_busfault_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __naked
+void __naked __disable_sanitizer
 arm_usagefault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -489,7 +493,7 @@ arm_fault(struct fault *f, int reason)
     __asm__("push {r0-r6}");                            \
     __asm__("mov r0, sp")
 
-void __naked __section(".init")
+void __naked __section(".init")  __disable_sanitizer
 arm_undef_vector(void)
 {
     VECTOR_COMMON;
@@ -497,7 +501,7 @@ arm_undef_vector(void)
     __asm__("bl  arm_fault");
 }
 
-void __naked __section(".init")
+void __naked __section(".init")  __disable_sanitizer
 arm_prefetch_abort_vector(void)
 {
     VECTOR_COMMON;
@@ -505,7 +509,7 @@ arm_prefetch_abort_vector(void)
     __asm__("bl  arm_fault");
 }
 
-void __naked __section(".init")
+void __naked __section(".init")  __disable_sanitizer
 arm_data_abort_vector(void)
 {
     VECTOR_COMMON;
