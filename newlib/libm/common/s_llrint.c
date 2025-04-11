@@ -62,7 +62,7 @@ llrint64(__float64 x)
       GET_HIGH_WORD(i0, t);
       /* Detect the all-zeros representation of plus and
          minus zero, which fails the calculation below. */
-      if ((i0 & ~((__int32_t)1 << 31)) == 0)
+      if ((i0 & ~lsl((__int32_t) 1, 31)) == 0)
           return 0;
       j0 = ((i0 & 0x7ff00000) >> 20) - 1023;
       i0 &= 0x000fffff;
@@ -75,9 +75,9 @@ llrint64(__float64 x)
       if (j0 >= 52)
 	/* 64bit return: j0 in [52,62] */
 	/* 64bit return: left shift amt in [32,42] */
-        result = ((long long int) ((i0 & 0x000fffff) | 0x00100000) << (j0 - 20)) |
+        result = lsl((long long int) ((i0 & 0x000fffff) | 0x00100000), (j0 - 20)) |
 		/* 64bit return: right shift amt in [0,10] */
-                   ((long long int) i1 << (j0 - 52));
+                   lsl((long long int) i1, (j0 - 52));
       else
         {
 	  /* 64bit return: j0 in [20,51] */
@@ -91,7 +91,7 @@ llrint64(__float64 x)
 	   * 64bit return: j0 in [20,52] */
 	  /* 64bit return: left shift amt in [0,32] */
           /* ***64bit return: right shift amt in [32,0] */
-          result = ((long long int) i0 << (j0 - 20))
+          result = lsl((long long int) i0, (j0 - 20))
 			| SAFE_RIGHT_SHIFT (i1, (52 - j0));
         }
     }

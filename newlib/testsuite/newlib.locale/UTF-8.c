@@ -16,7 +16,7 @@
 
 int num_invalid(const char *s, int len);
 
-char first[6][6] = {
+const char first[6][6] = {
   {0x0},                                   /* U-00000000 */
   {0xc2, 0x80},                            /* U-00000080 */
   {0xe0, 0xa0, 0x80},                      /* U-00000800 */
@@ -25,7 +25,7 @@ char first[6][6] = {
   {0xfc, 0x84, 0x80, 0x80, 0x80, 0x80}     /* U-04000000 */
 };
 
-char last[6][6] = {
+const char last[6][6] = {
   {0x7f},                                  /* U-0000007F */
   {0xdf, 0xbf},                            /* U-000007FF */
   {0xef, 0xbf, 0xbf},                      /* U-0000FFFF */
@@ -34,7 +34,7 @@ char last[6][6] = {
   {0xfd, 0xbf, 0xbf, 0xbf, 0xbf, 0xbf}     /* U-7FFFFFFF */
 };
 
-char boundary[5][6] = {
+const char boundary[5][6] = {
   {0xed, 0x9f, 0xbf},                      /* U-0000D7FF */
   {0xee, 0x80, 0x80},                      /* U-0000E000 */
   {0xef, 0xbf, 0xbd},                      /* U-0000FFFD */
@@ -42,7 +42,7 @@ char boundary[5][6] = {
   {0xf4, 0x90, 0x80, 0x80}                 /* U-00110000 */
 };
 
-char continuation_bytes[8][7] = {
+const char continuation_bytes[8][7] = {
   {0x80},
   {0xbf},
   {0x80, 0xbf},
@@ -62,7 +62,7 @@ char all_four_byte_seq[8];
 char all_five_byte_seq[4];
 char all_six_byte_seq[2];
 
-char incomplete_seq[10][6] = {
+const char incomplete_seq[10][6] = {
   {0xc2},                            /* U-00000080 */
   {0xe0, 0x80},                      /* U-00000800 */
   {0xf0, 0x80, 0x80},                /* U-00010000 */
@@ -77,13 +77,13 @@ char incomplete_seq[10][6] = {
 
 char incomplete_seq_concat[30];
 
-char impossible_bytes[3][4] = {
+const char impossible_bytes[3][4] = {
   {0xfe},
   {0xff},
   {0xfe, 0xfe, 0xff, 0xff}
 };
 
-char overlong[5][6] = {
+const char overlong[5][6] = {
   {0xc0, 0xaf},
   {0xe0, 0x80, 0xaf},
   {0xf0, 0x80, 0x80, 0xaf},
@@ -91,7 +91,7 @@ char overlong[5][6] = {
   {0xfc, 0x80, 0x80, 0x80, 0x80, 0xaf}
 };
 
-char overlong_max[5][6] = {
+const char overlong_max[5][6] = {
   {0xc1, 0xbf},
   {0xe0, 0x9f, 0xbf},
   {0xf0, 0x8f, 0xbf, 0xbf},
@@ -99,7 +99,7 @@ char overlong_max[5][6] = {
   {0xfc, 0x83, 0xbf, 0xbf, 0xbf, 0xbf}
 };
 
-char overlong_nul[5][6] = {
+const char overlong_nul[5][6] = {
   {0xc0, 0x80},
   {0xe0, 0x80, 0x80},
   {0xf0, 0x80, 0x80, 0x80},
@@ -107,7 +107,7 @@ char overlong_nul[5][6] = {
   {0xfc, 0x80, 0x80, 0x80, 0x80, 0x80}
 };
 
-char single_surrogates[7][3] = {
+const char single_surrogates[7][3] = {
   {0xed, 0xa0, 0x80},
   {0xed, 0xad, 0xbf},
   {0xed, 0xae, 0x80},
@@ -117,7 +117,7 @@ char single_surrogates[7][3] = {
   {0xed, 0xbf, 0xbf}
 };
 
-char paired_surrogates[8][6] = {
+const char paired_surrogates[8][6] = {
   {0xed, 0xa0, 0x80, 0xed, 0xb0, 0x80},
   {0xed, 0xa0, 0x80, 0xed, 0xbf, 0xbf},
   {0xed, 0xad, 0xbf, 0xed, 0xb0, 0x80},
@@ -128,7 +128,7 @@ char paired_surrogates[8][6] = {
   {0xed, 0xaf, 0xbf, 0xed, 0xbf, 0xbf}
 };
 
-char illegal_pos[2][3] = {
+const char illegal_pos[2][3] = {
   {0xff, 0xfe},
   {0xff, 0xff}
 };

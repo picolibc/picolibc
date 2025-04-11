@@ -38,7 +38,7 @@
  * First, the stuff that ends up in the outside-world include file
  = typedef off_t regoff_t;
  = typedef struct {
- = 	int re_magic;
+ = 	unsigned int re_magic;
  = 	size_t re_nsub;		// number of parenthesized subexpressions
  = 	const char *re_endp;	// end pointer for REG_PEND
  = 	struct re_guts *re_g;	// none of your business :-)
@@ -51,7 +51,7 @@
 /*
  * internals of regex_t
  */
-#define	MAGIC1	((('r'^0200)<<8) | 'e')
+#define	MAGIC1	((((unsigned int) 'r'^0200)<<8) | 'e')
 
 /*
  * The internal representation is a *strip*, a sequence of
@@ -137,8 +137,8 @@ typedef unsigned char cat_t;
  * main compiled-expression structure
  */
 struct re_guts {
-	int magic;
-#		define	MAGIC2	((('R'^0200)<<8)|'E')
+	unsigned int magic;
+#		define	MAGIC2	((((unsigned int) 'R'^0200)<<8)|'E')
 	sop *strip;		/* malloced area for strip */
 	int csetsize;		/* number of bits in a cset vector */
 	int ncsets;		/* number of csets in use */

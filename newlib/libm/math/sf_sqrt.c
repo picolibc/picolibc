@@ -75,7 +75,7 @@ sqrtf(float x)
             q += 2;
     }
     ix = (q >> 1) + 0x3f000000L;
-    ix += (m << 23);
+    ix += lsl(m, 23);
     SET_FLOAT_WORD(z, ix);
     return z;
 }

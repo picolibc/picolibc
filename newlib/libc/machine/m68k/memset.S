@@ -94,10 +94,11 @@ SYM(memset):
 .Lbset:
 #if !defined (__mcoldfire__)
 	dbra	d1,1b		| loop until done
+	sub.l	#0x10000,d1
 #else
 	subq.l	#1,d1
-	bpl	1b
 #endif
+	bpl	1b
 	move.l	4(sp),a0	| return value
 	move.l	a0,d0		| in both a0 and d0
 	rts

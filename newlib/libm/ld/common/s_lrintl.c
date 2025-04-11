@@ -43,24 +43,15 @@
 dtype
 fn(long double x)
 {
-	dtype d;
-
-        if (!__finitel(x))
-            __math_set_invalidl();
-#ifdef FE_INVALID
-	fenv_t env;
-	feholdexcept(&env);
-#endif
 	x = rintl(x);
-        d = (dtype) x;
-#ifdef FE_INVALID
-	if (fetestexcept(FE_INVALID))
-		feclearexcept(FE_INVALID);
-	feupdateenv(&env);
-#endif
-        if ((long double) d != x) {
+
+        /*
+         * Bounds check to ensure the operation is defined and
+         * to prevent an exception from being raised
+         */
+        if (!(DTYPE_MIN <= x && x <= DTYPE_MAX)) {
             __math_set_invalidl();
-            return x > 0 ? DTYPE_MAX : DTYPE_MIN;
+            return signbit(x) ? DTYPE_MIN : DTYPE_MAX;
         }
-	return (d);
+	return (dtype) x;
 }

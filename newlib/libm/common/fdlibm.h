@@ -312,6 +312,63 @@ do {								\
 #define SAFE_RIGHT_SHIFT(op,amt)				\
   (((amt) < (int) (8 * sizeof(op))) ? ((op) >> (amt)) : 0)
 
+int
+__undefined_shift_size(int x, int s);
+
+/*
+ * Shift left of negative integers is UB. Cast to unsigned, shift,
+ * cast back.
+ *
+ * Shift right of negative integers is ID. When we want arithmetic
+ * shifts, we use the shift operator directly when the sanitizer is
+ * disabled because the alternative is a whole lotta code.
+ */
+#define lsl(__x,__s) ((sizeof(__x) == sizeof(char)) ?                   \
+                      (__typeof(__x)) ((unsigned char) (__x) << (__s)) :  \
+                      (sizeof(__x) == sizeof(short)) ?                  \
+                      (__typeof(__x)) ((unsigned short) (__x) << (__s)) : \
+                      (sizeof(__x) == sizeof(int)) ?                    \
+                      (__typeof(__x)) ((unsigned int) (__x) << (__s)) :   \
+                      (sizeof(__x) == sizeof(long)) ?                   \
+                      (__typeof(__x)) ((unsigned long) (__x) << (__s)) :  \
+                      (sizeof(__x) == sizeof(long long)) ?              \
+                      (__typeof(__x)) ((unsigned long long) (__x) << (__s)) : \
+                      __undefined_shift_size(__x, __s))
+
+#if defined(__has_feature) && __has_feature(undefined_behavior_sanitizer)
+
+/*
+ * Compute arithmetic right shift the hard way -- logical shift and
+ * then shift the sign bit and negate it to replicate it
+ */
+#define __asr(t, n)                                                     \
+    static inline t                                                     \
+    __asr_ ## n(t x, int s) {                                           \
+        return (t) ((unsigned t) x >> s) |                              \
+            -(((unsigned t) x & ((unsigned t) 1 << (8 * sizeof(t) - 1))) >> s); \
+    }                                                                   \
+
+__asr(char, char)
+__asr(short, short)
+__asr(int, int)
+__asr(long, long)
+__asr(long long, long_long)
+
+#define asr(__x,__s) ((sizeof(__x) == sizeof(char)) ?           \
+                      (__typeof(__x))__asr_char(__x, __s) :       \
+                      (sizeof(__x) == sizeof(short)) ?          \
+                      (__typeof(__x))__asr_short(__x, __s) :      \
+                      (sizeof(__x) == sizeof(int)) ?            \
+                      (__typeof(__x))__asr_int(__x, __s) :        \
+                      (sizeof(__x) == sizeof(long)) ?           \
+                      (__typeof(__x))__asr_long(__x, __s) :       \
+                      (sizeof(__x) == sizeof(long long)) ?      \
+                      (__typeof(__x))__asr_long_long(__x, __s):   \
+                      __undefined_shift_size(__x, __s))
+#else
+#define asr(__x, __s) ((__x) >> (__s))
+#endif
+
 #ifdef  _COMPLEX_H
 
 /*

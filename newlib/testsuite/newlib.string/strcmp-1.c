@@ -94,7 +94,7 @@
 #define TOO_MANY_ERRORS 11
 int errors = 0;
 
-const char *testname = "strcmp";
+const char testname[] = "strcmp";
 
 static void
 print_error (char const* msg, ...)

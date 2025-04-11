@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -133,7 +133,7 @@ o-
 	<<isnan>> returns 1 if the argument is a nan. <<isinf>>
 	returns 1 if the argument is infinity.  <<finite>> returns 1 if the
 	argument is zero, subnormal or normal.
-	
+
 	The <<isnanf>>, <<isinff>> and <<finitef>> functions perform the same
 	operations as their <<isnan>>, <<isinf>> and <<finite>>
 	counterparts, but on single-precision floating-point numbers.
@@ -198,12 +198,12 @@ QUICKREF
 int
 isnan64(__float64 x)
 {
-	__int32_t hx,lx;
+	__uint32_t hx,lx;
 	EXTRACT_WORDS(hx,lx,x);
 	hx &= 0x7fffffff;
-	hx |= (__uint32_t)(lx|(-lx))>>31;	
+	hx |= (lx|(-lx))>>31;
 	hx = 0x7ff00000 - hx;
-	return (int)(((__uint32_t)(hx))>>31);
+	return (int)(hx>>31);
 }
 
 #ifdef __strong_reference

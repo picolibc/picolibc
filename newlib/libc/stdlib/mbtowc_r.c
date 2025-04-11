@@ -719,7 +719,7 @@ typedef enum __packed { COPY_A, COPY_J1, COPY_J2, MAKE_A, NOOP, EMPTY, ERROR } J
  * is 2 (switch to JIS) + 2 (JIS characters) + 2 (switch back to ASCII) = 6.
  *************************************************************************************/
 
-static JIS_STATE JIS_state_table[JIS_S_NUM][JIS_C_NUM] = {
+static const JIS_STATE JIS_state_table[JIS_S_NUM][JIS_C_NUM] = {
 /*              ESCAPE   DOLLAR    BRACKET   AT       B       J        NUL      JIS_CHAR  OTHER */
 /* ASCII */   { A_ESC,   ASCII,    ASCII,    ASCII,   ASCII,  ASCII,   ASCII,   ASCII,    ASCII },
 /* JIS */     { J_ESC,   JIS_1,    JIS_1,    JIS_1,   JIS_1,  JIS_1,   INV,     JIS_1,    INV },
@@ -730,7 +730,7 @@ static JIS_STATE JIS_state_table[JIS_S_NUM][JIS_C_NUM] = {
 /* J_ESC_BR */{ INV,     INV,      INV,      INV,     ASCII,  ASCII,   INV,     INV,      INV },
 };
 
-static JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
+static const JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /*              ESCAPE   DOLLAR    BRACKET   AT       B        J        NUL      JIS_CHAR  OTHER */
 /* ASCII */   { NOOP,    COPY_A,   COPY_A,   COPY_A,  COPY_A,  COPY_A,  EMPTY,   COPY_A,  COPY_A},
 /* JIS */     { NOOP,    COPY_J1,  COPY_J1,  COPY_J1, COPY_J1, COPY_J1, ERROR,   COPY_J1, ERROR },

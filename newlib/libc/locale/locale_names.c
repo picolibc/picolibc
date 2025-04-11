@@ -188,6 +188,9 @@ __find_locale(const char *name)
     enum locale_id     id = LOCALE_DEFAULT;
     const char          *lang_end;
 
+    if (!name)
+        return locale_INVALID;
+
     if (!*name)
         return _DEFAULT_LOCALE;
 

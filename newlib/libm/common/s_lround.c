@@ -95,9 +95,9 @@ lround64(__float64 x)
       if (exponent_less_1023 >= 52)
 	/* 64bit long: exponent_less_1023 in [52,62] */
 	/* 64bit long: shift amt in [32,42] */
-        result = ((long int) msw << (exponent_less_1023 - 20))
+        result = lsl((long int) msw, (exponent_less_1023 - 20))
 		/* 64bit long: shift amt in [0,10] */
-            | ((long int) lsw << (exponent_less_1023 - 52));
+            | lsl((long int) lsw, (exponent_less_1023 - 52));
       else
         {
 	  /* 32bit long: exponent_less_1023 in [20,30] */
@@ -110,7 +110,7 @@ lround64(__float64 x)
             ++msw;
 	  /* 32bit long: shift amt in [0,10] */
 	  /* 64bit long: shift amt in [0,31] */
-          result = ((long int) msw << (exponent_less_1023 - 20))
+          result = lsl((long int) msw, (exponent_less_1023 - 20))
 		    /* ***32bit long: shift amt in [32,22] */
 		    /* ***64bit long: shift amt in [32,1] */
                     | SAFE_RIGHT_SHIFT (tmp, (52 - exponent_less_1023));

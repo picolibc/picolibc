@@ -39,7 +39,7 @@
 #include <stdbool.h>
 #include <string.h>
 
-static struct {
+static const struct {
     struct tm   tm;
     char        *result;
     int         _errno;

@@ -82,49 +82,54 @@ static inline void	 swapfunc(char *, char *, size_t, int, int);
 
 #define min(a, b)	(a) < (b) ? a : b
 
+typedef unsigned int swap_uint_t;
+typedef unsigned long swap_ulong_t;
+
+#define need_both_sizes() (sizeof(swap_uint_t) != sizeof(swap_ulong_t))
+
 /*
  * Qsort routine from Bentley & McIlroy's "Engineering a Sort Function".
  */
-#define swapcode(TYPE, parmi, parmj, n) { 		\
-	size_t i = (n) / sizeof (TYPE); 			\
-	TYPE *pi = (TYPE *) (parmi); 		\
-	TYPE *pj = (TYPE *) (parmj); 		\
-	do { 						\
-		TYPE	t = *pi;		\
-		*pi++ = *pj;				\
-		*pj++ = t;				\
-        } while (--i > 0);				\
-}
+#define swapcode(TYPE, parmi, parmj, n) do {    \
+                size_t i = (n) / sizeof (TYPE); \
+                TYPE *pi = (TYPE *) (parmi);    \
+                TYPE *pj = (TYPE *) (parmj);    \
+                do {                            \
+                        TYPE	t = *pi;        \
+                        *pi++ = *pj;            \
+                        *pj++ = t;              \
+                } while (--i > 0);              \
+        } while(0)
 
 #define	SWAPINIT(TYPE, a, es) swaptype_ ## TYPE =	\
 	((uintptr_t)(a) % sizeof(TYPE)) ||	\
 	((es) % sizeof(TYPE)) ? 2 : ((es) == sizeof(TYPE)) ? 0 : 1;
 
 static inline void
-swapfunc(char *a, char *b, size_t n, int swaptype_intptr_t, int swaptype_int)
+swapfunc(char *a, char *b, size_t n, int swaptype_swap_ulong_t, int swaptype_swap_uint_t)
 {
-	if (swaptype_intptr_t <= 1)
-		swapcode(intptr_t, a, b, n)
-	else if (swaptype_int <= 1)
-		swapcode(int, a, b, n)
+	if (swaptype_swap_ulong_t <= 1)
+		swapcode(swap_ulong_t, a, b, n);
+        else if (need_both_sizes() && swaptype_swap_uint_t <= 1)
+                swapcode(swap_uint_t, a, b, n);
 	else
-		swapcode(char, a, b, n)
+		swapcode(unsigned char, a, b, n);
 }
 
-#define	swap(a, b)					\
-	if (swaptype_intptr_t == 0) {			\
-		intptr_t t = *(intptr_t *)(a);		\
-		*(intptr_t *)(a) = *(intptr_t *)(b);	\
-		*(intptr_t *)(b) = t;			\
-	} else if (swaptype_int == 0) {			\
-		int t = *(int *)(a);			\
-		*(int *)(a) = *(int *)(b);		\
-		*(int *)(b) = t;			\
-	} else						\
-		swapfunc(a, b, es, swaptype_intptr_t, swaptype_int)
+#define	swap(a, b)                                                      \
+        if (swaptype_swap_ulong_t == 0) {                               \
+                swap_ulong_t t = *(swap_ulong_t *)(a);                  \
+                *(swap_ulong_t *)(a) = *(swap_ulong_t *)(b);            \
+                *(swap_ulong_t *)(b) = t;                               \
+        } else if (need_both_sizes() && swaptype_swap_uint_t == 0) {    \
+                swap_uint_t t = *(swap_uint_t *)(a);                    \
+                *(swap_uint_t *)(a) = *(swap_uint_t *)(b);              \
+                *(swap_uint_t *)(b) = t;                                \
+        } else                                                          \
+                swapfunc(a, b, es, swaptype_swap_ulong_t, swaptype_swap_uint_t)
 
 #define	vecswap(a, b, n)				\
-	if ((n) > 0) swapfunc(a, b, n, swaptype_intptr_t, swaptype_int)
+	if ((n) > 0) swapfunc(a, b, n, swaptype_swap_ulong_t, swaptype_swap_uint_t)
 
 #if defined(I_AM_QSORT_R)
 #define	CMP(t, x, y) (cmp((t), (x), (y)))
@@ -199,12 +204,12 @@ qsort (void *a,
 	char *pa, *pb, *pc, *pd, *pl, *pm, *pn;
 	size_t d, r;
 	int cmp_result;
-	int swaptype_intptr_t, swaptype_int, swap_cnt;
+	int swaptype_swap_ulong_t, swaptype_swap_uint_t, swap_cnt;
 	size_t recursion_level = 0;
 	struct { void *a; size_t n; } parameter_stack[PARAMETER_STACK_LEVELS];
 
-	SWAPINIT(intptr_t, a, es);
-	SWAPINIT(int, a, es);
+	SWAPINIT(swap_ulong_t, a, es);
+	SWAPINIT(swap_uint_t, a, es);
 loop:	swap_cnt = 0;
 	if (n < 7) {
 		/* Short arrays are insertion sorted. */

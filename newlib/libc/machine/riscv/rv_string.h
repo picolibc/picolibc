@@ -59,7 +59,11 @@ static __inline uintxlen_t __libc_detect_null(uintxlen_t w)
 }
 
 
-static __inline char *__libc_strcpy(char *dst, const char *src, bool ret_start)
+static __inline
+#if __riscv_misaligned_slow || __riscv_misaligned_fast
+__disable_sanitizer
+#endif
+char *__libc_strcpy(char *dst, const char *src, bool ret_start)
 {
   char *dst0 = dst;
 

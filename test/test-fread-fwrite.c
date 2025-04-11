@@ -49,13 +49,13 @@
         }                                               \
     } while(0)
 
-#define RAND_MUL        1664525
-#define RAND_ADD        1013904223
+#define RAND_MUL        1664525UL
+#define RAND_ADD        1013904223UL
 
 static inline unsigned long
 my_permute(long input)
 {
-    return input * RAND_MUL + RAND_ADD;
+    return (unsigned long) input * RAND_MUL + RAND_ADD;
 }
 
 static inline uint8_t
@@ -174,7 +174,7 @@ main(int argc, char **argv)
                         check(ret == per_op, "fread ordered");
                     }
                 } else {
-                    random_offsets(generation * 1146533039, num_ops, per_op);
+                    random_offsets((unsigned int) generation * 1146533039UL, num_ops, per_op);
                     offset = 0;
                     for (op = 0; op < num_ops; op++) {
                         fseek(f, size * offsets[op] - offset, SEEK_CUR);

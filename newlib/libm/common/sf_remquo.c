@@ -61,12 +61,12 @@ remquof(float x, float y, int *quo)
 
     /* determine ix = ilogb(x) */
 	if(hx<0x00800000) {	/* subnormal x */
-	    for (ix = -126,i=(hx<<8); i>0; i<<=1) ix -=1;
+	    for (ix = -126,i=lsl(hx, 8); i>0; i = lsl(i, 1)) ix -=1;
 	} else ix = (hx>>23)-127;
 
     /* determine iy = ilogb(y) */
 	if(hy<0x00800000) {	/* subnormal y */
-	    for (iy = -126,i=(hy<<8); i>0; i<<=1) iy -=1;
+	    for (iy = -126,i=(lsl(hy, 8)); i>0; i = lsl(i, 1)) iy -=1;
 	} else iy = (hy>>23)-127;
 
     /* set up {hx,lx}, {hy,ly} and align y to x */
@@ -74,13 +74,13 @@ remquof(float x, float y, int *quo)
 	    hx = 0x00800000|(0x007fffff&hx);
 	else {		/* subnormal x, shift x to normal */
 	    n = -126-ix;
-	    hx <<= n;
+	    hx = lsl(hx, n);
 	}
 	if(iy >= -126)
 	    hy = 0x00800000|(0x007fffff&hy);
 	else {		/* subnormal y, shift y to normal */
 	    n = -126-iy;
-	    hy <<= n;
+	    hy = lsl(hy, n);
 	}
 
     /* fix point fmod */
@@ -88,8 +88,8 @@ remquof(float x, float y, int *quo)
 	q = 0;
 	while(n--) {
 	    hz=hx-hy;
-	    if(hz<0) hx = hx << 1;
-	    else {hx = hz << 1; q++;}
+	    if(hz<0) hx = lsl(hx, 1);
+	    else {hx = lsl(hz, 1); q++;}
 	    q <<= 1;
 	}
 	hz=hx-hy;
@@ -101,11 +101,11 @@ remquof(float x, float y, int *quo)
 	    return Zero[(__uint32_t)sx>>31];
 	}
 	while(hx<0x00800000) {		/* normalize x */
-	    hx <<= 1;
+	    hx = lsl(hx, 1);
 	    iy -= 1;
 	}
 	if(iy>= -126) {		/* normalize output */
-	    hx = ((hx-0x00800000)|((iy+127)<<23));
+	    hx = ((hx-0x00800000)|lsl((iy+127), 23));
 	} else {		/* subnormal output */
 	    n = -126 - iy;
 	    hx >>= n;

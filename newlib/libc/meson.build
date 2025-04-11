@@ -35,7 +35,8 @@
 
 libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
            'misc', 'posix', 'search', 'signal', 'ssp',
-           'stdlib', 'string', 'time', 'xdr', 'uchar']
+           'stdlib', 'string', 'time', 'xdr', 'uchar',
+           'ubsan']
 
 if enable_picolib
   libdirs += 'picolib'

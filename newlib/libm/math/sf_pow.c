@@ -93,7 +93,7 @@ powf(float x, float y)
         else if (iy >= 0x3f800000) {
             k = (iy >> 23) - 0x7f; /* exponent */
             j = iy >> (23 - k);
-            if ((j << (23 - k)) == iy)
+            if (lsl(j, (23 - k)) == iy)
                 yisint = 2 - (j & 1);
         }
     }
@@ -200,7 +200,7 @@ powf(float x, float y)
         SET_FLOAT_WORD(s_h, is & 0xfffff000);
         /* t_h=ax+bp[k] High */
         is = ((ix >> 1) & 0xfffff000U) | 0x20000000;
-        SET_FLOAT_WORD(t_h, is + 0x00400000 + (k << 21));
+        SET_FLOAT_WORD(t_h, is + 0x00400000 + lsl(k, 21));
         t_l = ax - (t_h - bp[k]);
         s_l = v * ((u - s_h * t_h) - s_h * t_l);
         /* compute log(ax) */
@@ -282,8 +282,8 @@ powf(float x, float y)
     r = (z * t1) / (t1 - two) - (w + z * w);
     z = one - (r - z);
     GET_FLOAT_WORD(j, z);
-    j += (n << 23);
-    if ((j >> 23) <= 0)
+    j += lsl(n, 23);
+    if (asr(j, 23) <= 0)
         z = scalbnf(z, (int)n); /* subnormal output */
     else
         SET_FLOAT_WORD(z, j);

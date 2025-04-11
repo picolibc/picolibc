@@ -186,7 +186,7 @@ sqrt64(__float64 x)
     ix1 = q1 >> 1;
     if ((q & 1) == 1)
         ix1 |= sign;
-    ix0 += (m << 20);
+    ix0 += lsl(m, 20);
     INSERT_WORDS(z, ix0, ix1);
     return z;
 }

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,30 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <inttypes.h>
-#include <stdlib.h>
-
-struct source_location {
-    const char *filename;
-    uint32_t line;
-    uint32_t column;
-};
-
-struct out_of_bounds_data {
-    struct source_location location;
-    const void *array_type;
-    const void *index_type;
-};
+#include "ubsan.h"
 
 void
-__ubsan_handle_out_of_bounds(struct out_of_bounds_data *data, void *id);
-
-void
-__ubsan_handle_out_of_bounds(struct out_of_bounds_data *data, void *id)
+__ubsan_handle_nullability_arg(void *_data)
 {
-    (void) id;
-    printf("out of bounds access at %s:%" PRIu32 ":%" PRIu32"\n",
-           data->location.filename, data->location.line, data->location.column);
-    abort();
+    struct nonnull_arg_data *data = _data;
+    __ubsan_error(&data->location, "nullability_arg", "arg %d %s:%u\n",
+                  data->arg_index,
+                  data->attr_location.file_name,
+                  data->attr_location.line);
 }

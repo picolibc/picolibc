@@ -221,7 +221,7 @@ typedef CONST struct {
 #endif
 
 #ifdef TEST_IO_LONG_DOUBLE
-static long double vals[] = {
+static const long double vals[] = {
     1.0L,
     0x1.8p0L,
     3.141592653589793238462643383279502884197169L,
@@ -352,7 +352,7 @@ naive_strtold(const char *buf)
         return ldexpl(v, exp * exp_sign);
 }
 
-static const char *formats[] = { "%La", "%.30Le", };
+static const char * const formats[] = { "%La", "%.30Le", };
 
 #define NFMTS (sizeof (formats)/sizeof(formats[0]))
 
@@ -541,7 +541,7 @@ test_conv(void)
     for (i = 0; i <= 0xffff; i += STEP_I) {
         for (j = 0; j < 0xf; j += STEP_J) {
             for (k = 0; k < 0x2; k++) {
-                dl.l.upper = i << 16;
+                dl.l.upper = (unsigned long) i << 16;
                 dl.l.lower = (j << 28) | k;
                 ld = (long double) dl.d;
                 if (fabsl(ld) > 1) {
@@ -559,7 +559,7 @@ test_conv(void)
                     ret++;
                 }
 
-                fl.l = (i << 16) | k;
+                fl.l = ((unsigned long) i << 16) | k;
                 ld = (long double) fl.f;
                 f = (float) ld;
                 if (isnan(f) && isnan(fl.f))

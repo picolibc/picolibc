@@ -207,6 +207,32 @@
 #define __nothrow
 #endif
 
+#if __has_attribute(__no_sanitize_address__)
+#define __no_sanitize_address __attribute__((__no_sanitize_address__))
+#else
+#define __no_sanitize_address
+#endif
+
+#if __has_attribute(__no_sanitize__)
+#define __no_sanitize(s) __attribute__((__no_sanitize__(s)))
+#else
+#define __no_sanitize(s)
+#endif
+
+#if __has_attribute(__no_sanitize_undefined__)
+#define __no_sanitize_undefined __attribute__((__no_sanitize_undefined__))
+#else
+#define __no_sanitize_undefined
+#endif
+
+#if __has_attribute(__disable_sanitizer_instrumentation__)
+#define __disable_sanitizer_instrumentation __attribute__((__disable_sanitizer_instrumentation__))
+#else
+#define __disable_sanitizer_instrumentation
+#endif
+
+#define __disable_sanitizer __no_sanitize_address __no_sanitize_undefined __disable_sanitizer_instrumentation __no_sanitize("undefined")
+
 #if __has_attribute(__deprecated__)
 # if __GNUC_PREREQ__(4,5) || defined(__clang__)
 #  define __deprecated_m(m) __attribute__((__deprecated__(m)))

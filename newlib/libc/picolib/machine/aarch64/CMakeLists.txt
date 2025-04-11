@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources(interrupt.c)
+picolibc_sources(interrupt.c interrupt_vector.S)
 
 if(${__THREAD_LOCAL_STORAGE_API})
   picolibc_sources(

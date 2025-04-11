@@ -1417,7 +1417,8 @@ static void do_check_free_chunk(mchunkptr p)
     assert(sz == SIZE_SZ);
 }
 
-static void do_check_inuse_chunk(mchunkptr p)
+static void __disable_sanitizer
+do_check_inuse_chunk(mchunkptr p)
 {
   mchunkptr next = next_chunk(p);
   do_check_chunk(p);
@@ -2183,7 +2184,8 @@ void* mALLOc(size_t bytes)
 */
 
 
-void fREe(void* mem)
+void __disable_sanitizer
+fREe(void* mem)
 {
 #ifdef MALLOC_PROVIDED
 
@@ -2334,7 +2336,8 @@ __strong_reference(free, __malloc_free);
 */
 
 
-void* rEALLOc(void* oldmem, size_t bytes)
+void* __disable_sanitizer
+rEALLOc(void* oldmem, size_t bytes)
 {
 #ifdef MALLOC_PROVIDED
 

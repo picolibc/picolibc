@@ -76,7 +76,7 @@
 #define HAVE_JIS_CHARSETS
 #endif
 
-static const char *locales[] = {
+static const char *const locales[] = {
     "C",
 #define C_LOCALE        0
 #ifdef HAVE_ISO_CHARSETS

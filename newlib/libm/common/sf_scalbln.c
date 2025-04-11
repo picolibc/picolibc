@@ -38,8 +38,10 @@ scalblnf (float x, long int n)
                 return __math_uflowf(ix<0); 	/*underflow*/
 	    }
         if (k==0xff) return x+x;		/* NaN or Inf */
+        if (n > 50000)
+            return __math_oflowf(ix < 0);        /* overflow  */
         k = k+n;
-        if (n> 50000 || k >  0xfe)
+        if (k > 0xfe)
             return __math_oflowf(ix < 0);       /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_FLOAT_WORD(x,(ix&0x807fffff)|(k<<23)); return x;}

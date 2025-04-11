@@ -115,18 +115,18 @@ remquo64(__float64 x, __float64 y, int *quo)
     /* determine ix = ilogb(x) */
 	if(hx<0x00100000) {	/* subnormal x */
 	    if(hx==0) {
-		for (ix = -1043, i=lx; i>0; i<<=1) ix -=1;
+		for (ix = -1043, i=lx; i>0; i = lsl(i, 1)) ix -=1;
 	    } else {
-		for (ix = -1022,i=(hx<<11); i>0; i<<=1) ix -=1;
+		for (ix = -1022,i=lsl(hx, 11); i>0; i = lsl(i, 1)) ix -=1;
 	    }
 	} else ix = (hx>>20)-1023;
 
     /* determine iy = ilogb(y) */
 	if(hy<0x00100000) {	/* subnormal y */
 	    if(hy==0) {
-		for (iy = -1043, i=ly; i>0; i<<=1) iy -=1;
+		for (iy = -1043, i=ly; i>0; i = lsl(i, 1)) iy -=1;
 	    } else {
-		for (iy = -1022,i=(hy<<11); i>0; i<<=1) iy -=1;
+		for (iy = -1022,i= lsl(hy, 11); i>0; i = lsl(i, 1)) iy -=1;
 	    }
 	} else iy = (hy>>20)-1023;
 
@@ -136,7 +136,7 @@ remquo64(__float64 x, __float64 y, int *quo)
 	else {		/* subnormal x, shift x to normal */
 	    n = -1022-ix;
 	    if(n<=31) {
-	        hx = (hx<<n)|(lx>>(32-n));
+	        hx = lsl(hx, n)|(lx>>(32-n));
 	        lx <<= n;
 	    } else {
 		hx = lx<<(n-32);
@@ -148,7 +148,7 @@ remquo64(__float64 x, __float64 y, int *quo)
 	else {		/* subnormal y, shift y to normal */
 	    n = -1022-iy;
 	    if(n<=31) {
-	        hy = (hy<<n)|(ly>>(32-n));
+	        hy = lsl(hy, n)|(ly>>(32-n));
 	        ly <<= n;
 	    } else {
 		hy = ly<<(n-32);
@@ -179,7 +179,7 @@ remquo64(__float64 x, __float64 y, int *quo)
 	    iy -= 1;
 	}
 	if(iy>= -1022) {	/* normalize output */
-	    hx = ((hx-0x00100000)|((iy+1023)<<20));
+	    hx = ((hx-0x00100000)|lsl((iy+1023), 20));
 	} else {		/* subnormal output */
 	    n = -1022 - iy;
 	    if(n<=20) {

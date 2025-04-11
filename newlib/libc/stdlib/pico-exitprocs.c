@@ -72,10 +72,14 @@ _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg)
  * will be included when any _on_exit function is used.
  */
 #ifdef __INIT_FINI_ARRAY
-static
-#endif
+static void
+__call_exitprocs(void)
+#define code 0
+#define param 0
+#else
 void
 __call_exitprocs(int code, void *param)
+#endif
 {
         (void) param;
 	for (;;) {

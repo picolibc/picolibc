@@ -53,8 +53,13 @@
 static void
 abrt_handler(int sig)
 {
-    if (sig == (int) SIGABRT)
+    if (sig == (int) SIGABRT) {
+#ifdef SANITIZE_TRAP_ON_ERROR
+        _Exit(1);
+#else
         _Exit(0);
+#endif
+    }
     else {
 #ifdef __TINY_STDIO
         printf("unexpected signal %d\n", sig);

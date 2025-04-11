@@ -89,9 +89,9 @@ logb64(__float64 x)
 		}
 	    else			/* subnormal x */
 		if(hx==0) {
-		    for (ix = -1043; lx>0; lx<<=1) ix -=1;
+		    for (ix = -1043; lx>0; lx = lsl(lx, 1)) ix -=1;
 		} else {
-		    for (ix = -1022,hx<<=11; hx>0; hx<<=1) ix -=1;
+		    for (ix = -1022, hx = lsl(hx, 11); hx>0; hx = lsl(hx, 1)) ix -=1;
 		}
 	    return (__float64) ix;
 	}

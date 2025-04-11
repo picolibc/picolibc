@@ -58,10 +58,7 @@ vsnprintf_s(char *__restrict s, rsize_t n, const char *__restrict fmt, va_list a
         msg = "null format string";
         goto handle_error;
     } else {
-        if ((int)n < 0) {
-            n = (unsigned)INT_MAX + 1;
-        }
-        struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n ? n - 1 : 0);
+        struct __file_str f = FDEV_SETUP_STRING_WRITE(s, FDEV_STRING_WRITE_END(s, n));
         rc = vfprintf_s(&f.file, fmt, arg);
         if (n) {
             *f.pos = '\0';

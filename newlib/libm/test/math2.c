@@ -22,8 +22,8 @@
 static int
 randi (void)
 {
-  static int32_t next;
-  next = (next * 1103515245) + 12345;
+  static uint32_t next;
+  next = (next * 1103515245UL) + 12345UL;
   return ((next >> 16) & 0xffff);
 }
 

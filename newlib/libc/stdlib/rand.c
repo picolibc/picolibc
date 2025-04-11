@@ -64,6 +64,6 @@ on two different systems.
 int
 rand (void)
 {
-  return (int) random();
+  return (int) (random() & RAND_MAX);
 }
 

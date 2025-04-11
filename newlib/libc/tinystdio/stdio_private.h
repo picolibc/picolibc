@@ -105,14 +105,17 @@ bool __matchcaseprefix(const char *input, const char *pattern);
                 .end = (char *) (_s)            \
 	}
 
-#define FDEV_SETUP_STRING_WRITE(_s, _size) {	\
+#define FDEV_STRING_WRITE_END(_s, _n) \
+    (((int) (_n) < 0) ? NULL : ((_n) ? (_s) + (_n)-1 : (_s)))
+
+#define FDEV_SETUP_STRING_WRITE(_s, _end) {	\
 		.file = {			\
 			.flags = __SWR,		\
 			.put = __file_str_put,	\
                         __LOCK_INIT_NONE        \
 		},				\
 		.pos = (_s),			\
-                .end = (_s) + (_size),          \
+                .end = (_end),                  \
 	}
 
 #define FDEV_SETUP_STRING_ALLOC() {  \
@@ -151,6 +154,12 @@ bool __matchcaseprefix(const char *input, const char *pattern);
  */
 #if __SIZEOF_POINTER__ == __SIZEOF_INT__ || defined(__x86_64) || defined(__arm__) || defined(__riscv)
 #define BUFIO_ABI_MATCHES
+#endif
+
+#if defined(__has_feature)
+#if __has_feature(undefined_behavior_sanitizer)
+#undef BUFIO_ABI_MATCHES
+#endif
 #endif
 
 /* Buffered I/O routines for tiny stdio */
@@ -247,6 +256,15 @@ static inline void __flockfile_close(FILE *f) {
             __lock_close(f->lock);
 #endif
 }
+
+/* Silence santizer errors when adding/subtracting 0 to a NULL pointer */
+#ifdef __clang__
+#define POINTER_MINUS(a,b)     ((__typeof(a)) ((uintptr_t) (a) - (b) * sizeof((*a))))
+#define POINTER_PLUS(a,b)      ((__typeof(a)) ((uintptr_t) (a) + (b) * sizeof((*a))))
+#else
+#define POINTER_MINUS(a,b)     ((a) - (b))
+#define POINTER_PLUS(a,b)      ((a) + (b))
+#endif
 
 int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);

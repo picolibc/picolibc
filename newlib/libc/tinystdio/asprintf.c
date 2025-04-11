@@ -35,7 +35,7 @@
 
 #include "stdio_private.h"
 
-int
+int __disable_sanitizer
 asprintf(char **strp, const char *fmt, ...)
 {
 	va_list ap;
@@ -45,7 +45,7 @@ asprintf(char **strp, const char *fmt, ...)
 	va_start(ap, fmt);
 	i = vfprintf(&f.file, fmt, ap);
 	va_end(ap);
-        char *buf = f.end - f.size;
+        char *buf = POINTER_MINUS(f.end, f.size);
 	if (i >= 0) {
 		char *s = realloc(buf, i+1);
 		if (s) {

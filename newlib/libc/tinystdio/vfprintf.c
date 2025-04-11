@@ -1209,7 +1209,8 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     arg_to_signed(ap, flags, x_s);
 
                     if (x_s < 0) {
-                        x_s = -x_s;
+                        /* Use unsigned in case x_s is the largest negative value */
+                        x_s = (ultoa_signed_t) -(ultoa_unsigned_t) x_s;
                         flags |= FL_NEGATIVE;
                     }
 
