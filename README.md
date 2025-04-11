@@ -199,6 +199,8 @@ use Picolibc:
  * Add wcsto* string to number functions using tinystdio conversion
    code. Avoids malloc call for float conversions.
 
+ * Add TLS API support for x86 targets. Thanks to TK Chia.
+
  * Add -fsanitize=undefined handlers and make library build with that
    enabled.
 

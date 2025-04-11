@@ -475,6 +475,7 @@ Files: CMakeLists.txt
  newlib/libc/picolib/machine/rx/CMakeLists.txt
  newlib/libc/picolib/machine/sh/CMakeLists.txt
  newlib/libc/picolib/machine/sparc/CMakeLists.txt
+ newlib/libc/picolib/machine/x86/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/tls.c
  newlib/libc/posix/CMakeLists.txt
@@ -801,6 +802,8 @@ Files: cmake/TC-rx.ld
  newlib/libc/picolib/machine/powerpc/meson.build
  newlib/libc/picolib/machine/powerpc/tls.c
  newlib/libc/picolib/machine/sh/tls.c
+ newlib/libc/picolib/machine/x86/interrupt.S
+ newlib/libc/picolib/machine/x86/interrupt.c
  newlib/libc/stdlib/mk-sb-charsets.py
  newlib/libc/stdlib/sb_charsets.h
  newlib/libc/tinystdio/flockfile_init.c
@@ -861,6 +864,8 @@ Files: cmake/TC-rx.ld
  picocrt/machine/or1k/crt0.S
  picocrt/machine/or1k/crt0.c
  picocrt/machine/rx/crt0.c
+ picocrt/machine/x86/traps.S
+ picocrt/machine/x86/traps.c
  semihost/machine/lm32/lm32_errno.c
  semihost/machine/rx/rx_iob.c
  semihost/machine/rx/rx_semihost.h
@@ -1187,6 +1192,7 @@ Files: newlib/empty.c
  newlib/libc/picolib/machine/riscv/meson.build
  newlib/libc/picolib/machine/sh/meson.build
  newlib/libc/picolib/machine/sparc/meson.build
+ newlib/libc/picolib/machine/x86/meson.build
  newlib/libc/picolib/machine/xtensa/meson.build
  newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-cxa-atexit.c
@@ -1432,6 +1438,14 @@ License: BSD3-1
 
 Files: newlib/libc/machine/sh/meson.build
 Copyright: 2023 Adrian Siekierka
+License: BSD3-1
+
+Files: newlib/libc/machine/x86/machine/_ssp_tls.h
+ newlib/libc/machine/x86/machine/_tls.h
+ newlib/libc/picolib/machine/x86/tcb-32.S
+ newlib/libc/picolib/machine/x86/tcb-64.S
+ newlib/libc/picolib/machine/x86/tls.c
+Copyright: 2025 TK Chia
 License: BSD3-1
 
 Files: newlib/libc/machine/xtensa/meson.build
