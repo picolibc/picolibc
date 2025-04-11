@@ -71,6 +71,9 @@ option('sysroot-install-skip-checks', type: 'boolean', value: false,
 option('system-libc', type: 'boolean', value: false,
        description: 'Install as system C library')
 
+option('libgccdir', type: 'string',
+       description: 'path to picolibc libgcc dirictory')
+
 #
 # Testing options
 #
