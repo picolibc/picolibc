@@ -73,7 +73,7 @@ asin64(__float64 x)
     if (ix >= 0x3ff00000) { /* |x|>= 1 */
         __uint32_t lx;
         GET_LOW_WORD(lx, x);
-        if (((ix - 0x3ff00000) | lx) == 0)
+        if ((((__uint32_t) ix - 0x3ff00000) | lx) == 0)
             /* asin(1)=+-pi/2 with inexact */
             return x * pio2_hi + x * pio2_lo;
         return __math_invalid(x); /* asin(|x|>1) is NaN */

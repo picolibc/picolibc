@@ -118,7 +118,7 @@ pow64(__float64 x, __float64 y)
     /* x|y==NaN return NaN unless x==1 then return 1 */
     if (ix > 0x7ff00000 || ((ix == 0x7ff00000) && (lx != 0)) ||
         iy > 0x7ff00000 || ((iy == 0x7ff00000) && (ly != 0))) {
-        if (((hx - 0x3ff00000) | lx) == 0 && !issignaling64_inline(y))
+        if ((((__uint32_t) hx - 0x3ff00000) | lx) == 0 && !issignaling64_inline(y))
             return one;
         else
             return x + y;
@@ -150,7 +150,7 @@ pow64(__float64 x, __float64 y)
     /* special value of y */
     if (ly == 0) {
         if (iy == 0x7ff00000) { /* y is +-inf */
-            if (((ix - 0x3ff00000) | lx) == 0)
+            if ((((__uint32_t) ix - 0x3ff00000) | lx) == 0)
                 return one; /* +-1**+-inf = 1 */
             else if (ix >= 0x3ff00000) /* (|x|>1)**+-inf = inf,0 */
                 return (hy >= 0) ? y : zero;
@@ -181,7 +181,7 @@ pow64(__float64 x, __float64 y)
             if (hy < 0)
                 z = one / z; /* z = (1/|x|) */
             if (hx < 0) {
-                if (((ix - 0x3ff00000) | yisint) == 0) {
+                if ((((__uint32_t) ix - 0x3ff00000) | yisint) == 0) {
                     return __math_invalid(x); /* (-1)**non-int is NaN */
                 } else if (yisint == 1)
                     z = -z; /* (x<0)**odd = -(|x|**odd) */

@@ -256,7 +256,7 @@ __math_lgamma_r(__float64 x, int *signgamp, int *divzero)
     }
 
     /* purge off 1 and 2 */
-    if ((((ix - 0x3ff00000) | lx) == 0) || (((ix - 0x40000000) | lx) == 0))
+    if (((((__uint32_t) ix - 0x3ff00000) | lx) == 0) || ((((__uint32_t) ix - 0x40000000) | lx) == 0))
         r = 0;
     /* for x < 2.0 */
     else if (ix < 0x40000000) {
