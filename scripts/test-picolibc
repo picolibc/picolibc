@@ -43,7 +43,7 @@ done
 
 options="-Dwerror=true"
 minoptions="$options --buildtype=minsize"
-reloptions="$options --buildtype=release -Dpicolibc-buildtype=release"
+reloptions="$options --buildtype=release -Ddebug=true -Dpicolibc-buildtype=release"
 
 for arch in arm riscv; do
 
