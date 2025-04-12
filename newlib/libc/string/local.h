@@ -11,11 +11,11 @@ char *	_strerror_r (int, int, int *);
  * This macro is used to skip a few bytes to find an aligned pointer.
  * It's better to keep it as is even if _HAVE_HW_MISALIGNED_ACCESS is enabled,
  * to avoid small performance penalties (if they are not zero).  */
-#define UNALIGNED_X(X) ((uintptr_t)X & (sizeof (unsigned long) - 1))
+#define UNALIGNED_X(X) ((uintptr_t)(X) & (sizeof (unsigned long) - 1))
 
 /* Nonzero if either X or Y is not aligned on a "long" boundary.  */
 #define UNALIGNED_X_Y(X, Y) \
-  (((uintptr_t)X & (sizeof (unsigned long) - 1)) | ((uintptr_t)Y & (sizeof (unsigned long) - 1)))
+    (((uintptr_t)(X) & (sizeof (unsigned long) - 1)) | ((uintptr_t)(Y) & (sizeof (unsigned long) - 1)))
 
 /* How many bytes are copied each iteration of the word copy loop.  */
 #define LITTLE_BLOCK_SIZE (sizeof (unsigned long))

@@ -43,13 +43,12 @@ memrchr (const void *src_void,
   const unsigned char *src = (const unsigned char *) src_void + length - 1;
   unsigned char d = c;
 
-#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
-    !defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
   unsigned long *asrc;
   unsigned long  mask;
   unsigned int i;
 
-  while (UNALIGNED_X(src))
+  while (UNALIGNED_X(src+1))
     {
       if (!length--)
         return NULL;
