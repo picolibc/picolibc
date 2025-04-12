@@ -51,6 +51,10 @@
 #define strtoi_isspace(c) isspace(c)
 #endif
 
+#ifndef strtoi_signed
+#define strtoi_utype strtoi_type
+#endif
+
 #if __HAVE_BUILTIN_MUL_OVERFLOW && __HAVE_BUILTIN_ADD_OVERFLOW && !defined(strtoi_signed)
 #define USE_OVERFLOW
 #endif
@@ -72,7 +76,7 @@ strtoi(const strtoi_char *__restrict nptr, strtoi_char **__restrict endptr, int 
 #define FLAG_OFLOW      0x2     /* Value overflow */
 
     const strtoi_uchar *s = (const strtoi_uchar *) nptr;
-    strtoi_type val = 0;
+    strtoi_utype val = 0;
     unsigned char flags = 0;
     strtoi_uint i;
 
@@ -110,7 +114,7 @@ strtoi(const strtoi_char *__restrict nptr, strtoi_char **__restrict endptr, int 
 #ifdef strtoi_signed
     /* works because strtoi_min = (strtoi_type) ((strtoi_utype) strtoi_max + 1) */
     strtoi_utype ucutoff = (strtoi_utype) strtoi_max + flags;
-    strtoi_type cutoff = ucutoff / base;
+    strtoi_utype cutoff = ucutoff / base;
     unsigned int cutlim = ucutoff % base;
 #else
     strtoi_type cutoff = strtoi_max / base;
@@ -141,7 +145,7 @@ strtoi(const strtoi_char *__restrict nptr, strtoi_char **__restrict endptr, int 
         if (val > cutoff || (val == cutoff && i > cutlim))
             flags |= FLAG_OFLOW;
         else
-            val = val * (strtoi_type) base + (strtoi_type) i;
+            val = val * (strtoi_utype) base + (strtoi_utype) i;
 #endif
         /* Parsed another digit */
         nptr = (const strtoi_char *) s;
@@ -157,12 +161,12 @@ strtoi(const strtoi_char *__restrict nptr, strtoi_char **__restrict endptr, int 
 
     if (flags & FLAG_OFLOW) {
 #ifdef strtoi_signed
-        val = (strtoi_type) ucutoff;
+        val = ucutoff;
 #else
         val = strtoi_max;
 #endif
         errno = ERANGE;
     }
 
-    return val;
+    return (strtoi_type) val;
 }
