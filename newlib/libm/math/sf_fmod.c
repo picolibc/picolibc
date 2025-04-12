@@ -56,14 +56,14 @@ fmodf(float x, float y)
 
     /* determine ix = ilogb(x) */
     if (FLT_UWORD_IS_SUBNORMAL(hx)) { /* subnormal x */
-        for (ix = -126, i = (hx << 8); i > 0; i <<= 1)
+        for (ix = -126, i = lsl(hx, 8); i > 0; i = lsl(i, 1))
             ix -= 1;
     } else
         ix = (hx >> 23) - 127;
 
     /* determine iy = ilogb(y) */
     if (FLT_UWORD_IS_SUBNORMAL(hy)) { /* subnormal y */
-        for (iy = -126, i = (hy << 8); i >= 0; i <<= 1)
+        for (iy = -126, i = lsl(hy, 8); i >= 0; i = lsl(i, 1))
             iy -= 1;
     } else
         iy = (hy >> 23) - 127;
