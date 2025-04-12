@@ -37,7 +37,9 @@
 #include <semihost.h>
 #include <string.h>
 
+#ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME	"SEMIREAD.TXT"
+#endif
 #define TEST_STRING	"hello, world"
 #define TEST_STRING_LEN	12
 

@@ -36,7 +36,10 @@
 #include <stdlib.h>
 #include <semihost.h>
 
+#ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME	"SEMIFLEN.TXT"
+#endif
+
 #define TEST_STRING	"hello, world"
 #define TEST_STRING_LEN	12
 

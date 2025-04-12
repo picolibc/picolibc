@@ -99,6 +99,10 @@ foreach params : targets
 
     _cmd_arg = ['-DCOMMAND_LINE="' + 'program-name' + ' ' + ' '.join(test_args) + '"']
 
+    test_file_name_arg=['-DTEST_FILE_NAME="' + semihost_test + target + '.txt"']
+
+    _cmd_arg += test_file_name_arg
+
     test(semihost_test + target,
 	 executable(semihost_test + target, [semihost_test_src],
 		    c_args: printf_compile_args_d + _c_args + _cmd_arg,

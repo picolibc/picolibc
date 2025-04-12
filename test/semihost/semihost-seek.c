@@ -37,7 +37,9 @@
 #include <string.h>
 #include <semihost.h>
 
+#ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME	"SEMISEEK.TXT"
+#endif
 #define TEST_STRING	"hello, world"
 #define TEST_STRING_LEN	12
 #define TEST_SEEK_POS	2
