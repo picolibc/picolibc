@@ -76,6 +76,7 @@ freopen(const char *pathname, const char *mode, FILE *stream)
         pf->lseek_int = lseek;
         pf->close_int = close;
 
+        ret = stream;
 	__bufio_unlock(stream);
 exit:
 	__funlock_return(stream, ret);
