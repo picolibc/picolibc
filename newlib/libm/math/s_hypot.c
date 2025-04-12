@@ -132,7 +132,7 @@ hypot64(__float64 x, __float64 y)
         __uint32_t high;
         t1 = _F_64(1.0);
         GET_HIGH_WORD(high, t1);
-        SET_HIGH_WORD(t1, high + (k << 20));
+        SET_HIGH_WORD(t1, high + lsl(k, 20));
         w *= t1;
     }
     return check_oflow(w);
