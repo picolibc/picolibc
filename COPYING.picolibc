@@ -828,11 +828,15 @@ Files: cmake/TC-rx.ld
  newlib/libc/ubsan/CMakeLists.txt
  newlib/libc/ubsan/meson.build
  newlib/libc/ubsan/ubsan.h
+ newlib/libc/ubsan/ubsan_cfi_type_check_to_string.c
  newlib/libc/ubsan/ubsan_error.c
  newlib/libc/ubsan/ubsan_handle_add_overflow.c
  newlib/libc/ubsan/ubsan_handle_alignment_assumption.c
  newlib/libc/ubsan/ubsan_handle_builtin_unreachable.c
+ newlib/libc/ubsan/ubsan_handle_cfi_bad_type.c
+ newlib/libc/ubsan/ubsan_handle_cfi_check_fail.c
  newlib/libc/ubsan/ubsan_handle_divrem_overflow.c
+ newlib/libc/ubsan/ubsan_handle_dynamic_type_cache_miss.c
  newlib/libc/ubsan/ubsan_handle_float_cast_overflow.c
  newlib/libc/ubsan/ubsan_handle_function_type_mismatch.c
  newlib/libc/ubsan/ubsan_handle_implicit_conversion.c
@@ -1289,6 +1293,7 @@ Files: newlib/empty.c
  test/rounding-mode-sub.c
  test/rounding-mode.c
  test/rounding-mode.h
+ test/test-memchr.c
  test/test-memset.c
  test/test-put.c
  test/test-strchr.c
