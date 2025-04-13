@@ -73,7 +73,11 @@ typedef long int_scanf_t;
 # define INT wint_t
 # define MY_EOF          WEOF
 # define CHAR wchar_t
-# define UCHAR wchar_t
+# if __SIZEOF_WCHAR_T__ == 2
+#  define UCHAR          uint16_t
+# elif __SIZEOF_WCHAR_T__ == 4
+#  define UCHAR          uint32_t
+# endif
 # define GETC(s) getwc_unlocked(s)
 # define UNGETC(c,s) ungetwc(c,s)
 # define ISSPACE(c) iswspace(c)

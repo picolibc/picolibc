@@ -65,7 +65,11 @@
 
 #ifdef WIDE_CHARS
 # define CHAR wchar_t
-# define UCHAR wchar_t
+# if __SIZEOF_WCHAR_T__ == 2
+#  define UCHAR          uint16_t
+# elif __SIZEOF_WCHAR_T__ == 4
+#  define UCHAR          uint32_t
+# endif
 #else
 # define CHAR char
 # define UCHAR unsigned char
