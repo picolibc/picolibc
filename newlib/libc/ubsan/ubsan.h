@@ -76,6 +76,16 @@ enum {
     implicit_conversion_signed_integer_truncation_or_sign_change = 4,
 };
 
+enum {
+    cfi_type_check_v_call,
+    cfi_type_check_nv_call,
+    cfi_type_check_derived_cast,
+    cfi_type_check_unrelated_cast,
+    cfi_type_check_i_call,
+    cfi_type_check_nvmf_call,
+    cfi_type_check_vmf_call,
+};
+
 struct type_descriptor {
     uint16_t type_kind;
     uint16_t type_info;
@@ -119,6 +129,13 @@ struct float_cast_overflow_data {
     struct source_location location;
     struct type_descriptor *from_type;
     struct type_descriptor *to_type;
+};
+
+struct dynamic_type_cache_miss_data {
+    struct source_location location;
+    struct type_descriptor *type;
+    void *type_info;
+    unsigned char type_check_kind;
 };
 
 struct type_mismatch_data {
@@ -201,6 +218,12 @@ struct alignment_assumption_data {
     struct type_descriptor *type;
 };
 
+struct cfi_check_fail_data {
+    unsigned char cfi_type_check_kind;
+    struct source_location location;
+    struct type_descriptor *type;
+};
+
 struct vla_bound_not_positive_data {
     struct source_location location;
     struct type_descriptor *type;
@@ -221,18 +244,26 @@ void
 __ubsan_handle_builtin_unreachable(void *data);
 
 void
-__ubsan_cfi_bad_icall(void *data,
-                      void *function);
+__ubsan_handle_cfi_bad_type(void *data,
+                            void *vtable,
+                            void *valid_vtable,
+                            void *opts);
+
 
 void
-__ubsan_cfi_check_fail(void *data,
-                       void *function,
-                       uintptr_t vtable_is_valid);
+__ubsan_handle_cfi_check_fail(void *data,
+                              void *function,
+                              void *vtable_is_valid);
 
 void
 __ubsan_handle_divrem_overflow(void *data,
                                void *lhs,
                                void *rhs);
+
+void
+__ubsan_handle_dynamic_type_cache_miss(void *data,
+                                       void *pointer,
+                                       void *hash);
 
 void
 __ubsan_handle_float_cast_overflow(void *data,
@@ -257,6 +288,10 @@ __ubsan_handle_invalid_objc_cast(void *data,
 void
 __ubsan_handle_load_invalid_value(void *data,
                                   void *val);
+
+void
+__ubsan_handle_local_out_of_bounds(
+    );
 
 void
 __ubsan_handle_missing_return(void *data);
@@ -356,5 +391,8 @@ __ubsan_val_to_umax(struct type_descriptor *type,
 
 const char*
 __ubsan_type_check_to_string(unsigned char type_check_kind);
+
+const char*
+__ubsan_cfi_type_check_to_string(unsigned char cfi_type_check_kind);
 
 #endif /* _UBSAN_H_ */

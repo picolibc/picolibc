@@ -33,11 +33,15 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_sources(
+  ubsan_cfi_type_check_to_string.c
   ubsan_error.c
   ubsan_handle_add_overflow.c
   ubsan_handle_alignment_assumption.c
   ubsan_handle_builtin_unreachable.c
+  ubsan_handle_cfi_bad_type.c
+  ubsan_handle_cfi_check_fail.c
   ubsan_handle_divrem_overflow.c
+  ubsan_handle_dynamic_type_cache_miss.c
   ubsan_handle_float_cast_overflow.c
   ubsan_handle_function_type_mismatch.c
   ubsan_handle_implicit_conversion.c
