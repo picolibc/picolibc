@@ -55,10 +55,6 @@ Files: newlib/libc/include/sys/iconvnls.h
 Copyright: 2003-2004, Artem B. Bityuckiy. Rights transferred to Franklin Electronic Publishers.
 License: BSD2-1
 
-Files: newlib/libc/include/threads.h
-Copyright: 2011 Ed Schouten <ed@FreeBSD.org>
-License: BSD2-1
-
 Files: newlib/libc/machine/aarch64/machine/_fpmath.h
  newlib/libc/machine/riscv/machine/_fpmath.h
 Copyright: 2002, 2003 David Schultz <das@FreeBSD.ORG>
@@ -465,7 +461,6 @@ Files: CMakeLists.txt
  newlib/libc/machine/xtensa/CMakeLists.txt
  newlib/libc/machine/xtensa/machine/CMakeLists.txt
  newlib/libc/misc/CMakeLists.txt
- newlib/libc/misc/ubsan.c
  newlib/libc/picolib/CMakeLists.txt
  newlib/libc/picolib/machine/CMakeLists.txt
  newlib/libc/picolib/machine/aarch64/CMakeLists.txt
@@ -475,8 +470,12 @@ Files: CMakeLists.txt
  newlib/libc/picolib/machine/arm/CMakeLists.txt
  newlib/libc/picolib/machine/mips/tls.c
  newlib/libc/picolib/machine/msp430/CMakeLists.txt
+ newlib/libc/picolib/machine/or1k/CMakeLists.txt
  newlib/libc/picolib/machine/riscv/CMakeLists.txt
+ newlib/libc/picolib/machine/rx/CMakeLists.txt
+ newlib/libc/picolib/machine/sh/CMakeLists.txt
  newlib/libc/picolib/machine/sparc/CMakeLists.txt
+ newlib/libc/picolib/machine/x86/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/CMakeLists.txt
  newlib/libc/picolib/machine/xtensa/tls.c
  newlib/libc/posix/CMakeLists.txt
@@ -497,10 +496,12 @@ Files: CMakeLists.txt
  newlib/libc/tinystdio/getline.c
  newlib/libc/tinystdio/remove.c
  newlib/libc/tinystdio/stdio-bufio.h
+ newlib/libc/tinystdio/strtoimax_l.c
  newlib/libc/tinystdio/strtol_l.c
  newlib/libc/tinystdio/strtoll_l.c
  newlib/libc/tinystdio/strtoul_l.c
  newlib/libc/tinystdio/strtoull_l.c
+ newlib/libc/tinystdio/strtoumax_l.c
  newlib/libc/tinystdio/tmpfile.c
  newlib/libc/tinystdio/tmpnam.c
  newlib/libc/xdr/CMakeLists.txt
@@ -630,6 +631,7 @@ Files: CMakeLists.txt
  test/CMakeLists.txt
  test/lock-valid.c
  test/long_double.c
+ test/native-locks.c
  test/test-efcvt.c
  test/test-except.c
  test/test-fopen.c
@@ -757,9 +759,129 @@ Files: cmake/TC-arm-none-eabi.ld
 Copyright: 2020 Keith Packard
 License: BSD3-1
 
+Files: cmake/TC-rx.ld
+ newlib/libc/ctype/iswspace_l.c
+ newlib/libc/ctype/mkctype-extended.py
+ newlib/libc/iconv/CMakeLists.txt
+ newlib/libc/iconv/iconv.c
+ newlib/libc/iconv/iconv_close.c
+ newlib/libc/iconv/iconv_open.c
+ newlib/libc/iconv/iconv_private.h
+ newlib/libc/iconv/meson.build
+ newlib/libc/locale/CMakeLists.txt
+ newlib/libc/locale/duplocale.c
+ newlib/libc/locale/freelocale.c
+ newlib/libc/locale/getlocalename_l.c
+ newlib/libc/locale/locale_ctype_ptr.c
+ newlib/libc/locale/locale_ctype_ptr_l.c
+ newlib/libc/locale/locale_mb_cur_max.c
+ newlib/libc/locale/locale_names.c
+ newlib/libc/locale/locale_private.h
+ newlib/libc/locale/localeconv.c
+ newlib/libc/locale/localedata.c
+ newlib/libc/locale/meson.build
+ newlib/libc/locale/newlocale.c
+ newlib/libc/locale/nl_langinfo.c
+ newlib/libc/locale/posix_locale.c
+ newlib/libc/locale/setlocale.c
+ newlib/libc/locale/timedata.c
+ newlib/libc/locale/uselocale.c
+ newlib/libc/machine/powerpc/machine/_ssp_tls.h
+ newlib/libc/picolib/machine/aarch64/interrupt_vector.S
+ newlib/libc/picolib/machine/loongarch/CMakeLists.txt
+ newlib/libc/picolib/machine/loongarch/tls.c
+ newlib/libc/picolib/machine/m68k/meson.build
+ newlib/libc/picolib/machine/m68k/read_tp.s
+ newlib/libc/picolib/machine/m68k/set_tls.c
+ newlib/libc/picolib/machine/m68k/tls-local.h
+ newlib/libc/picolib/machine/m68k/tls.c
+ newlib/libc/picolib/machine/or1k/meson.build
+ newlib/libc/picolib/machine/or1k/tls.c
+ newlib/libc/picolib/machine/powerpc/CMakeLists.txt
+ newlib/libc/picolib/machine/powerpc/hwcap.c
+ newlib/libc/picolib/machine/powerpc/meson.build
+ newlib/libc/picolib/machine/powerpc/tls.c
+ newlib/libc/picolib/machine/sh/tls.c
+ newlib/libc/picolib/machine/x86/interrupt.S
+ newlib/libc/picolib/machine/x86/interrupt.c
+ newlib/libc/stdlib/mk-sb-charsets.py
+ newlib/libc/stdlib/sb_charsets.h
+ newlib/libc/tinystdio/flockfile_init.c
+ newlib/libc/tinystdio/wcstod.c
+ newlib/libc/tinystdio/wcstod_l.c
+ newlib/libc/tinystdio/wcstof.c
+ newlib/libc/tinystdio/wcstof_l.c
+ newlib/libc/tinystdio/wcstoimax.c
+ newlib/libc/tinystdio/wcstoimax_l.c
+ newlib/libc/tinystdio/wcstol.c
+ newlib/libc/tinystdio/wcstol_l.c
+ newlib/libc/tinystdio/wcstold.c
+ newlib/libc/tinystdio/wcstold_l.c
+ newlib/libc/tinystdio/wcstoll.c
+ newlib/libc/tinystdio/wcstoll_l.c
+ newlib/libc/tinystdio/wcstoul.c
+ newlib/libc/tinystdio/wcstoul_l.c
+ newlib/libc/tinystdio/wcstoull.c
+ newlib/libc/tinystdio/wcstoull_l.c
+ newlib/libc/tinystdio/wcstoumax.c
+ newlib/libc/tinystdio/wcstoumax_l.c
+ newlib/libc/ubsan/CMakeLists.txt
+ newlib/libc/ubsan/meson.build
+ newlib/libc/ubsan/ubsan.h
+ newlib/libc/ubsan/ubsan_cfi_type_check_to_string.c
+ newlib/libc/ubsan/ubsan_error.c
+ newlib/libc/ubsan/ubsan_handle_add_overflow.c
+ newlib/libc/ubsan/ubsan_handle_alignment_assumption.c
+ newlib/libc/ubsan/ubsan_handle_builtin_unreachable.c
+ newlib/libc/ubsan/ubsan_handle_cfi_bad_type.c
+ newlib/libc/ubsan/ubsan_handle_cfi_check_fail.c
+ newlib/libc/ubsan/ubsan_handle_divrem_overflow.c
+ newlib/libc/ubsan/ubsan_handle_dynamic_type_cache_miss.c
+ newlib/libc/ubsan/ubsan_handle_float_cast_overflow.c
+ newlib/libc/ubsan/ubsan_handle_function_type_mismatch.c
+ newlib/libc/ubsan/ubsan_handle_implicit_conversion.c
+ newlib/libc/ubsan/ubsan_handle_invalid_builtin.c
+ newlib/libc/ubsan/ubsan_handle_invalid_objc_cast.c
+ newlib/libc/ubsan/ubsan_handle_load_invalid_value.c
+ newlib/libc/ubsan/ubsan_handle_missing_return.c
+ newlib/libc/ubsan/ubsan_handle_mul_overflow.c
+ newlib/libc/ubsan/ubsan_handle_negate_overflow.c
+ newlib/libc/ubsan/ubsan_handle_nonnull_arg.c
+ newlib/libc/ubsan/ubsan_handle_nonnull_return.c
+ newlib/libc/ubsan/ubsan_handle_nonnull_return_v1.c
+ newlib/libc/ubsan/ubsan_handle_nullability_arg.c
+ newlib/libc/ubsan/ubsan_handle_nullability_return.c
+ newlib/libc/ubsan/ubsan_handle_nullability_return_v1.c
+ newlib/libc/ubsan/ubsan_handle_out_of_bounds.c
+ newlib/libc/ubsan/ubsan_handle_pointer_overflow.c
+ newlib/libc/ubsan/ubsan_handle_shift_out_of_bounds.c
+ newlib/libc/ubsan/ubsan_handle_sub_overflow.c
+ newlib/libc/ubsan/ubsan_handle_type_mismatch.c
+ newlib/libc/ubsan/ubsan_handle_type_mismatch_v1.c
+ newlib/libc/ubsan/ubsan_message.c
+ newlib/libc/ubsan/ubsan_type_check_to_string.c
+ newlib/libc/ubsan/ubsan_val_to_imax.c
+ newlib/libc/ubsan/ubsan_val_to_string.c
+ newlib/libc/ubsan/ubsan_val_to_umax.c
+ newlib/libc/ubsan/ubsan_warning.c
+ picocrt/machine/lm32/crt0.S
+ picocrt/machine/or1k/crt0.S
+ picocrt/machine/or1k/crt0.c
+ picocrt/machine/rx/crt0.c
+ picocrt/machine/x86/traps.S
+ picocrt/machine/x86/traps.c
+ semihost/machine/lm32/lm32_errno.c
+ semihost/machine/rx/rx_iob.c
+ semihost/machine/rx/rx_semihost.h
+ semihost/machine/sh/sh_syscall.c
+ test/test-scmpu.c
+ test/test-wcase.c
+ test/test-wctomb.c
+Copyright: 2025 Keith Packard
+License: BSD3-1
+
 Files: doc/printf-sample/Makefile
  doc/printf-sample/printf.c
- dummyhost/exit.c
  newlib/libc/machine/arm/machine/fenv-fp.h
  newlib/libc/machine/m68k/CMakeLists.txt
  newlib/libc/machine/m68k/machine/fenv-fp.h
@@ -827,9 +949,7 @@ Files: doc/printf-sample/Makefile
 Copyright: 2023 Keith Packard
 License: BSD3-1
 
-Files: dummyhost/iob.c
- dummyhost/meson.build
- hello-world/Makefile
+Files: hello-world/Makefile
  hello-world/hello-world.c
  hello-world/printf.c
  hello-world/run-aarch64
@@ -1070,14 +1190,18 @@ Files: newlib/empty.c
  newlib/libc/picolib/machine/arc/meson.build
  newlib/libc/picolib/machine/arc64/meson.build
  newlib/libc/picolib/machine/arm/meson.build
+ newlib/libc/picolib/machine/loongarch/meson.build
  newlib/libc/picolib/machine/mips/meson.build
  newlib/libc/picolib/machine/msp430/meson.build
  newlib/libc/picolib/machine/riscv/meson.build
+ newlib/libc/picolib/machine/sh/meson.build
  newlib/libc/picolib/machine/sparc/meson.build
+ newlib/libc/picolib/machine/x86/meson.build
  newlib/libc/picolib/machine/xtensa/meson.build
  newlib/libc/stdlib/pico-atexit.c
  newlib/libc/stdlib/pico-cxa-atexit.c
  newlib/libc/stdlib/pico-exit.c
+ newlib/libc/stdlib/pico-exitprocs.c
  newlib/libc/stdlib/pico-onexit.c
  newlib/libc/stdlib/pico-onexit.h
  newlib/libc/tinystdio/atold_engine.c
@@ -1112,6 +1236,7 @@ Files: newlib/empty.c
  picocrt/machine/riscv/meson.build
  picocrt/machine/sh/meson.build
  picocrt/machine/sparc/meson.build
+ picocrt/machine/x86/CMakeLists.txt
  picocrt/machine/x86/meson.build
  scripts/do-power9-configure
  scripts/do-power9-fp128-configure
@@ -1139,6 +1264,10 @@ Files: newlib/empty.c
  semihost/machine/powerpc/powerpc_kill.c
  semihost/machine/powerpc/powerpc_stub.c
  semihost/machine/riscv/meson.build
+ semihost/machine/rx/CMakeLists.txt
+ semihost/machine/rx/meson.build
+ semihost/machine/rx/rx_exit.c
+ semihost/machine/rx/rx_stub.c
  semihost/machine/sh/meson.build
  semihost/machine/sh/sh_exit.c
  semihost/machine/sh/sh_stub.c
@@ -1164,6 +1293,7 @@ Files: newlib/empty.c
  test/rounding-mode-sub.c
  test/rounding-mode.c
  test/rounding-mode.h
+ test/test-memchr.c
  test/test-memset.c
  test/test-put.c
  test/test-strchr.c
@@ -1180,12 +1310,12 @@ Files: newlib/libc/ctype/ctype_extended.h
  newlib/libc/include/sys/_initfini.h
  newlib/libc/include/uchar.h
  newlib/libc/machine/m68k/machine/meson.build
+ newlib/libc/machine/rx/CMakeLists.txt
  newlib/libc/machine/sh/CMakeLists.txt
  newlib/libc/machine/sh/machine/CMakeLists.txt
  newlib/libc/machine/sh/machine/meson.build
  newlib/libc/picolib/machine/arc/vector_table.c
  newlib/libc/picolib/machine/m68k/interrupt.c
- newlib/libc/picolib/machine/m68k/meson.build
  newlib/libc/posix/fpathconf.c
  newlib/libc/posix/pathconf.c
  newlib/libc/stdio/flockfile.c
@@ -1237,46 +1367,11 @@ Files: newlib/libc/ctype/ctype_extended.h
  test/test-cplusplus.cpp
  test/test-ctype.c
  test/test-encode.c
+ test/test-flockfile.c
  test/test-funopen.c
  test/test-uchar.c
  test/test-wctype.c
 Copyright: 2024 Keith Packard
-License: BSD3-1
-
-Files: newlib/libc/ctype/iswspace_l.c
- newlib/libc/ctype/mkctype-extended.py
- newlib/libc/iconv/CMakeLists.txt
- newlib/libc/iconv/iconv.c
- newlib/libc/iconv/iconv_close.c
- newlib/libc/iconv/iconv_open.c
- newlib/libc/iconv/iconv_private.h
- newlib/libc/iconv/meson.build
- newlib/libc/locale/CMakeLists.txt
- newlib/libc/locale/duplocale.c
- newlib/libc/locale/freelocale.c
- newlib/libc/locale/getlocalename_l.c
- newlib/libc/locale/locale_ctype_ptr.c
- newlib/libc/locale/locale_ctype_ptr_l.c
- newlib/libc/locale/locale_mb_cur_max.c
- newlib/libc/locale/locale_names.c
- newlib/libc/locale/locale_private.h
- newlib/libc/locale/localeconv.c
- newlib/libc/locale/localedata.c
- newlib/libc/locale/meson.build
- newlib/libc/locale/newlocale.c
- newlib/libc/locale/nl_langinfo.c
- newlib/libc/locale/posix_locale.c
- newlib/libc/locale/setlocale.c
- newlib/libc/locale/timedata.c
- newlib/libc/locale/uselocale.c
- newlib/libc/stdlib/mk-sb-charsets.py
- newlib/libc/stdlib/sb_charsets.h
- picocrt/machine/lm32/crt0.S
- picocrt/machine/or1k/crt0.S
- picocrt/machine/or1k/crt0.c
- semihost/machine/lm32/lm32_errno.c
- test/test-wcase.c
-Copyright: 2025 Keith Packard
 License: BSD3-1
 
 Files: newlib/libc/machine/aarch64/meson.build
@@ -1336,8 +1431,26 @@ Files: newlib/libc/machine/powerpc/meson.build
 Copyright: 2019 Ash Logan, Keith Packard
 License: BSD3-1
 
+Files: newlib/libc/machine/rx/meson.build
+ newlib/libc/picolib/machine/rx/interrupt.c
+ newlib/libc/picolib/machine/rx/meson.build
+ picocrt/machine/rx/CMakeLists.txt
+ picocrt/machine/rx/meson.build
+ scripts/do-rx-zephyr-elf-configure
+ scripts/run-rx
+Copyright: 2025 Renesas Electronics Corporation
+License: BSD3-1
+
 Files: newlib/libc/machine/sh/meson.build
 Copyright: 2023 Adrian Siekierka
+License: BSD3-1
+
+Files: newlib/libc/machine/x86/machine/_ssp_tls.h
+ newlib/libc/machine/x86/machine/_tls.h
+ newlib/libc/picolib/machine/x86/tcb-32.S
+ newlib/libc/picolib/machine/x86/tcb-64.S
+ newlib/libc/picolib/machine/x86/tls.c
+Copyright: 2025 TK Chia
 License: BSD3-1
 
 Files: newlib/libc/machine/xtensa/meson.build
@@ -1349,7 +1462,8 @@ Copyright: 2020 Keith Packard
  2024 Stephen Street
 License: BSD3-1
 
-Files: newlib/libc/picolib/machine/arm/tls.c
+Files: newlib/libc/picolib/machine/arm/set_tls.c
+ newlib/libc/picolib/machine/arm/tls.c
 Copyright: 2019 Keith Packard
  2024 Stephen Street
 License: BSD3-1
@@ -1484,6 +1598,10 @@ Files: test/test-sprintf-percent-n.c
  test/test-wchar.c
 Copyright: 2024, Synopsys Inc.
  2024, Solid Sands B.V.
+License: BSD3-1
+
+Files: test/test-strncpy.c
+Copyright: 2025 Fredrik Gihl
 License: BSD3-1
 
 Files: test/test-tmpnam.c
@@ -2292,8 +2410,6 @@ Files: newlib/libc/machine/spu/fdopen.c
  newlib/libm/common/copysignl.c
  newlib/libm/common/fabsl.c
  newlib/libm/common/frexpl.c
- newlib/libm/common/isinfl.c
- newlib/libm/common/isnanl.c
  newlib/libm/common/nanl.c
  newlib/libm/common/scalbnl.c
  newlib/libm/ld/s_isinfl.c
@@ -2854,6 +2970,7 @@ Files: .clang-format
  .github/do-test
  .github/do-test-noopt
  .github/do-zephyr
+ .github/linux-files.txt
  .github/linux-packages.txt
  .github/workflows/Makefile
  .github/workflows/coreboot.yml
@@ -2874,6 +2991,7 @@ Files: .clang-format
  README.md
  cmake/TC-clang-thumbv6m.cmake
  cmake/TC-clang-thumbv7m.cmake
+ cmake/TC-rx.cmake
  cmake/TC-thumbv6m.cmake
  cmake/TC-thumbv7m.cmake
  cross.tmpl
@@ -2900,6 +3018,7 @@ Files: .clang-format
  newlib/libc/machine/aarch64/sys/fcntl.h
  newlib/libc/machine/necv70/necv70.tex
  newlib/libc/machine/nvptx/clock.c
+ newlib/libc/machine/riscv/xlenint.h
  newlib/libc/machine/xtensa/xtensa.tex
  newlib/libc/ssp/ssp.tex
  newlib/libc/stdio/sfputs.c
@@ -2936,8 +3055,11 @@ Files: .clang-format
  scripts/cross-avr.txt
  scripts/cross-clang-aarch64-none-elf.txt
  scripts/cross-clang-arm-none-eabi.txt
+ scripts/cross-clang-cortex-r82.txt
  scripts/cross-clang-msp430.txt
  scripts/cross-clang-riscv64-unknown-elf.txt
+ scripts/cross-clang-riscv64-zephyr-elf.txt
+ scripts/cross-clang-rv32imafc.txt
  scripts/cross-clang-rv32imafdc-unknown-elf.txt
  scripts/cross-clang-thumb-none-eabi.txt
  scripts/cross-clang-thumbv6m-none-eabi.txt
@@ -2966,6 +3088,7 @@ Files: .clang-format
  scripts/cross-msp430.txt
  scripts/cross-nios2-zephyr-elf.txt
  scripts/cross-or1k-elf.txt
+ scripts/cross-or1k-unknown-elf.txt
  scripts/cross-power9-fp128.txt
  scripts/cross-power9.txt
  scripts/cross-powerpc64-linux-gnu.txt
@@ -2974,6 +3097,7 @@ Files: .clang-format
  scripts/cross-riscv64-zephyr-elf.txt
  scripts/cross-rv32imac.txt
  scripts/cross-rv32imac_zicsr_zbb.txt
+ scripts/cross-rx-zephyr-elf.txt
  scripts/cross-sh-unknown-elf.txt
  scripts/cross-sparc-zephyr-elf.txt
  scripts/cross-sparc64-linux-gnu.txt
@@ -3364,7 +3488,6 @@ Files: newlib/libc/stdlib/abort.c
  newlib/libc/stdlib/mbstowcs.c
  newlib/libc/stdlib/mbtowc.c
  newlib/libc/stdlib/mbtowc_r.c
- newlib/libc/stdlib/mstats.c
  newlib/libc/stdlib/on_exit.c
  newlib/libc/stdlib/rand.c
  newlib/libc/stdlib/rand_r.c
@@ -3475,10 +3598,10 @@ License: Default-1
 Files: newlib/libc/include/fenv.h
  newlib/libc/machine/riscv/asm.h
  newlib/libc/machine/riscv/ieeefp.c
- newlib/libc/machine/riscv/local.h
  newlib/libc/machine/riscv/machine/fenv.h
  newlib/libc/machine/riscv/memcpy.c
  newlib/libc/machine/riscv/memset.S
+ newlib/libc/machine/riscv/rv_string.h
  newlib/libc/machine/riscv/setjmp.S
  newlib/libc/machine/riscv/strcmp.S
  newlib/libc/machine/riscv/strcpy.c
@@ -3498,6 +3621,10 @@ Files: newlib/libc/machine/riscv/memcpy-asm.S
  newlib/libc/machine/riscv/memmove-stub.c
  newlib/libc/machine/riscv/memmove.S
 Copyright: 2019  SiFive Inc.
+License: FreeBSD-1
+
+Files: newlib/libc/machine/riscv/stpcpy.c
+Copyright: 2025  SiFive Inc.
 License: FreeBSD-1
 
 Files: test/printf-tests.c
@@ -3702,12 +3829,6 @@ Files: newlib/libc/string/explicit_bzero.c
 Copyright: 2014 Ted Unangst
 License: Other-2
 
-Files: newlib/libc/include/elf.h
- newlib/libc/string/strverscmp.c
- newlib/libm/common/nexttowardf.c
-Copyright: 2005-2014 Rich Felker, et al.
-License: Other-3
-
 Files: newlib/libc/include/ftw.h
 Copyright: 2005-2020 Rich Felker, et al.
 License: Other-3
@@ -3739,6 +3860,11 @@ Files: newlib/libc/machine/xtensa/xtensa-asm.h
 Copyright: 2006 Tensilica Inc.
 License: Other-3
 
+Files: newlib/libc/string/strverscmp.c
+ newlib/libm/common/nexttowardf.c
+Copyright: 2005-2014 Rich Felker, et al.
+License: Other-3
+
 Files: test/libc-testsuite/basename.c
  test/libc-testsuite/dirname.c
  test/libc-testsuite/fnmatch.c
@@ -3748,6 +3874,7 @@ Files: test/libc-testsuite/basename.c
  test/libc-testsuite/string.c
  test/libc-testsuite/strtod.c
  test/libc-testsuite/strtol.c
+ test/libc-testsuite/wcstol.c
 Copyright: 2005-2020 Rich Felker
 License: Other-3
 
@@ -4245,9 +4372,7 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/s_ilogb.c
  newlib/libm/common/s_infinity.c
  newlib/libm/common/s_isinf.c
- newlib/libm/common/s_isinfd.c
  newlib/libm/common/s_isnan.c
- newlib/libm/common/s_isnand.c
  newlib/libm/common/s_llrint.c
  newlib/libm/common/s_llround.c
  newlib/libm/common/s_log1p.c
@@ -4273,9 +4398,7 @@ Files: newlib/libm/common/fdlibm.h
  newlib/libm/common/sf_ilogb.c
  newlib/libm/common/sf_infinity.c
  newlib/libm/common/sf_isinf.c
- newlib/libm/common/sf_isinff.c
  newlib/libm/common/sf_isnan.c
- newlib/libm/common/sf_isnanf.c
  newlib/libm/common/sf_llrint.c
  newlib/libm/common/sf_llround.c
  newlib/libm/common/sf_log1p.c
@@ -4576,7 +4699,6 @@ Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/stdio/putw.c
  newlib/libc/stdio/refill.c
  newlib/libc/stdio/remove.c
- newlib/libc/stdio/rename.c
  newlib/libc/stdio/rewind.c
  newlib/libc/stdio/rget.c
  newlib/libc/stdio/scanf.c
