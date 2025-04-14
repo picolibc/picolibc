@@ -151,7 +151,7 @@ use Picolibc:
 
 ## Releases
 
-### Picolibc release 1.8.next
+### Picolibc release 1.8.10
 
  * Add missing POSIX constants to limits.h.
 
