@@ -71,7 +71,6 @@ MESON_LX106_MINSIZE_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
 	--cross-file scripts/cross-$(LX106_ARCH).txt \
-	-Dnewlib-long-time_t=true \
 	-Dspecsdir=/usr/lib/$(LX106_ARCH) \
 	-Dincludedir=lib/$(LX106_ARCH)/include \
 	-Dlibdir=lib/$(LX106_ARCH)/lib
@@ -81,7 +80,6 @@ MESON_LX106_RELEASE_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
 	--cross-file scripts/cross-$(LX106_ARCH).txt \
-	-Dnewlib-long-time_t=true \
 	-Dspecsdir=/usr/lib/$(LX106_ARCH) \
 	-Dincludedir=lib/$(LX106_ARCH)/include \
 	-Dlibdir=lib/$(LX106_ARCH)/lib
