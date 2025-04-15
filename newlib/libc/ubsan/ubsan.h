@@ -224,7 +224,7 @@ struct cfi_check_fail_data {
     struct type_descriptor *type;
 };
 
-struct vla_bound_not_positive_data {
+struct vla_bound_data {
     struct source_location location;
     struct type_descriptor *type;
 };

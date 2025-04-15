@@ -63,6 +63,7 @@ srcs_ubsan = [
   'ubsan_handle_sub_overflow.c',
   'ubsan_handle_type_mismatch.c',
   'ubsan_handle_type_mismatch_v1.c',
+  'ubsan_handle_vla_bound_not_positive.c',
   'ubsan_message.c',
   'ubsan_type_check_to_string.c',
   'ubsan_val_to_imax.c',
