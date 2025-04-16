@@ -39,6 +39,6 @@
 
 locale_t        __global_locale = locale_C;
 
-#ifdef _HAVE_POSIX_LOCALE_API
-NEWLIB_THREAD_LOCAL locale_t    _locale;
+#ifdef __HAVE_POSIX_LOCALE_API
+__THREAD_LOCAL locale_t    _locale;
 #endif

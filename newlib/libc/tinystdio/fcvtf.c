@@ -39,7 +39,7 @@
 
 #define FCVTF_MAXDIG (__FLT_MAX_10_EXP__ + FTOA_MAX_DIG + 1)
 
-static NEWLIB_THREAD_LOCAL char fcvtf_buf[FCVTF_MAXDIG];
+static __THREAD_LOCAL char fcvtf_buf[FCVTF_MAXDIG];
 
 char *
 fcvtf (float invalue,

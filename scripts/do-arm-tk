@@ -42,20 +42,23 @@ mkdir -p "$MINSIZE_DIR" "$RELEASE_DIR" "$DESTDIR"
 set -e
 
 
+#build_options=-Dmultilib-exclude=pacbti
+build_options=
+
 echo '###################################'
-echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize -Dmultilib-exclude=pacbti
+echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize $build_options
 echo '###################################'
 
 cd "$MINSIZE_DIR"
-../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize -Dmultilib-exclude=pacbti
+../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize $build_options
 ninja test install
 
 echo '###################################'
-echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release -Dmultilib-exclude=pacbti
+echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
 echo '###################################'
 
 cd "$RELEASE_DIR"
-../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release -Dmultilib-exclude=pacbti
+../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
 ninja test install
 
 cd "$DESTDIR"/"$ARM_TK"

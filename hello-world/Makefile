@@ -75,10 +75,10 @@ printf.elf: printf.c
 	$(CC_ARM) -o $@ $^ -Wl,-Map=printf.map
 
 printf-int.elf: printf.c
-	$(CC_ARM) -DPICOLIBC_INTEGER_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-int.map
+	$(CC_ARM) --printf=i -o $@ $^ -Wl,-Map=printf-int.map
 
 printf-float.elf: printf.c
-	$(CC_ARM) -DPICOLIBC_FLOAT_PRINTF_SCANF -o $@ $^ -Wl,-Map=printf-float.map
+	$(CC_ARM) --printf=f -o $@ $^ -Wl,-Map=printf-float.map
 
 hello-worldpp-native.elf: hello-worldpp.cpp
 	c++ -o $@ $^

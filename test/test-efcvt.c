@@ -61,7 +61,7 @@ const struct test ecvt_tests[] = {
 #pragma GCC diagnostic ignored "-Wliteral-range"
 #endif
 
-#if !defined(TINY_STDIO) && !defined(NO_NEWLIB)
+#if !defined(__TINY_STDIO) && !defined(NO_NEWLIB)
 #define ecvt_r(n, dig, dec, sign, buf, len) (ecvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
 #define fcvt_r(n, dig, dec, sign, buf, len) (fcvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
 #define ecvtf_r(n, dig, dec, sign, buf, len) (ecvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
@@ -112,7 +112,7 @@ const struct test fcvt_tests[] = {
 #define N_FCVT_TESTS    (sizeof(fcvt_tests) / sizeof(fcvt_tests[0]))
 
 const struct test fcvt_extra_tests[] = {
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 #if __SIZEOF_DOUBLE__ == 4
     { 0x1.fffffep127, 9, 39, 0, "340282350000000000000000000000000000000000000000" },
 #else
@@ -146,7 +146,7 @@ const struct test fcvt_extra_tests[] = {
 #define N_FCVT_EXTRA_TESTS      (sizeof(fcvt_extra_tests) / sizeof(fcvt_extra_tests[0]))
 
 const struct test fcvtf_tests[] = {
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
     { 0x1.fffffep127, 9, 39, 0, "340282350000000000000000000000000000000000000000" },
 #else
     /* legacy newlib uses the double path for this operation */
@@ -156,14 +156,14 @@ const struct test fcvtf_tests[] = {
 
 #define N_FCVTF_TESTS    (sizeof(fcvtf_tests) / sizeof(fcvtf_tests[0]))
 
-#if defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT)
+#if defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT)
 /* non-exact tinystdio conversions are not precise over about 6 digits */
 #define SKIP_LONG_FLOAT 1
 #else
 #define SKIP_LONG_FLOAT 0
 #endif
 
-#if (!defined(TINY_STDIO) || !defined(_IO_FLOAT_EXACT)) && __SIZEOF_DOUBLE__ < 8
+#if (!defined(__TINY_STDIO) || !defined(__IO_FLOAT_EXACT)) && __SIZEOF_DOUBLE__ < 8
 #undef SKIP_LONG_FLOAT
 #define SKIP_LONG_FLOAT 1
 #define SKIP_LONGISH_FLOAT 1

@@ -4,10 +4,11 @@
 
 #define _DEFAULT_SOURCE
 
-#ifndef _USE_GDTOA
 #include <string.h>
 #include <stdlib.h>
 #include "mprec.h"
+
+#if defined(__IO_LONG_DOUBLE) && defined(__HAVE_LONG_DOUBLE)
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -1849,7 +1850,7 @@ e113toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 
 /* move out internal format to ieee long double */
 static void
-__attribute__ ((__unused__))
+__unused
 toe113 (short unsigned int *a, short unsigned int *b)
 {
   register unsigned short *p, *q;
@@ -1986,7 +1987,7 @@ e64toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 
 /* move out internal format to ieee long double */
 static void
-__attribute__ ((__unused__))
+__unused
 toe64 (short unsigned int *a, short unsigned int *b)
 {
   register unsigned short *p, *q;
@@ -2167,7 +2168,7 @@ etoe53 (x, e)
 }
 
 static void
-__attribute__ ((__unused__))
+__unused
 toe53 (x, y)
      unsigned short *x, *y;
 {
@@ -2177,7 +2178,7 @@ toe53 (x, y)
 #else
 
 static void
-__attribute__ ((__unused__))
+__unused
 toe53 (short unsigned int *x, short unsigned int *y)
 {
   unsigned short i;
@@ -2346,7 +2347,7 @@ e24toe (short unsigned int *pe, short unsigned int *y, LDPARMS * ldp)
 }
 
 static void
-__attribute__ ((__unused__))
+__unused
 toe24 (short unsigned int *x, short unsigned int *y)
 {
   unsigned short i;
@@ -3899,4 +3900,4 @@ enan (short unsigned int *nan, int size)
     *nan++ = *p++;
 }
 
-#endif /* !_USE_GDTOA */
+#endif /* __IO_LONG_DOUBLE */

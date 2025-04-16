@@ -32,10 +32,19 @@
 
 /* $Id: vfscanf.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
+#ifndef SCANF_NAME
+# define SCANF_VARIANT __IO_VARIANT_DOUBLE
+# define SCANF_NAME __d_vfscanf
+#endif
+
 #include "stdio_private.h"
 #include <wctype.h>
 #include "scanf_private.h"
 #include "../stdlib/local.h"
+
+# if __IO_DEFAULT != SCANF_VARIANT || defined(WIDE_CHARS)
+#  define vfscanf SCANF_NAME
+# endif
 
 /*
  * Compute which features are required
@@ -50,7 +59,7 @@ typedef long int_scanf_t;
 #endif
 
 /* Figure out which multi-byte char support we need */
-#if defined(_NEED_IO_WCHAR) && defined(_MB_CAPABLE)
+#if defined(_NEED_IO_WCHAR) && defined(__MB_CAPABLE)
 # ifdef WIDE_CHARS
 /* need to convert wide chars to multi-byte chars */
 #  define _NEED_IO_WIDETOMB
@@ -64,25 +73,33 @@ typedef long int_scanf_t;
 # define INT wint_t
 # define MY_EOF          WEOF
 # define CHAR wchar_t
-# define UCHAR wchar_t
-# define GETC(s) getwc(s)
+# if __SIZEOF_WCHAR_T__ == 2
+#  define UCHAR          uint16_t
+# elif __SIZEOF_WCHAR_T__ == 4
+#  define UCHAR          uint32_t
+# endif
+# define GETC(s) getwc_unlocked(s)
 # define UNGETC(c,s) ungetwc(c,s)
 # define ISSPACE(c) iswspace(c)
-# undef vfscanf
-# define vfscanf vfwscanf
+# define ISALNUM(c) iswalnum(c)
 # define IS_EOF(c)       ((c) == WEOF)
 # define WINT            wint_t
 # define IS_WEOF(c)      ((c) == WEOF)
 # define ISWSPACE(c)     iswspace(c)
+# define STRCHR(s,c)     wcschr(s, c)
+# define CQ(a)          L##a
 #else
 # define INT int
 # define MY_EOF          EOF
 # define IS_EOF(c)       ((c) < 0)
 # define CHAR char
 # define UCHAR unsigned char
-# define GETC(s) getc(s)
+# define GETC(s) getc_unlocked(s)
 # define UNGETC(c,s) ungetc(c,s)
 # define ISSPACE(c) isspace(c)
+# define ISALNUM(c) isalnum(c)
+# define STRCHR(s,c) strchr(s, c)
+# define CQ(a) a
 # ifdef _NEED_IO_MBTOWIDE
 #  define WINT            wint_t
 #  define MY_WEOF         WEOF
@@ -261,7 +278,7 @@ conv_int (FILE *stream, scanf_context_t *context, width_t width, void *addr, uin
     switch (i) {
       case '-':
         flags |= FL_MINUS;
-	__PICOLIBC_FALLTHROUGH;
+	__fallthrough;
       case '+':
         if (!--width || IS_EOF(i = scanf_getc(stream, context)))
 	    goto err;
@@ -585,6 +602,8 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     INT i;
     scanf_context_t context = SCANF_CONTEXT_INIT;
 
+    __flockfile(stream);
+
     nconvs = 0;
 
     /* Initialization of stream_flags at each pass simplifies the register
@@ -769,7 +788,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	          case 'p':
                       if (sizeof(void *) > sizeof(int))
                           flags |= FL_LONG;
-                      __PICOLIBC_FALLTHROUGH;
+                      __fallthrough;
 		  case 'x':
 	          case 'X':
                     base = 16;
@@ -788,7 +807,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	          case 'o':
                     base = 8;
-		    __PICOLIBC_FALLTHROUGH;
+		    __fallthrough;
 		  case 'i':
 		  conv_int:
                     c = conv_int (stream, &context, width, addr, flags, base);
@@ -810,14 +829,14 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	          case 'o':
                     base = 8;
-		    __PICOLIBC_FALLTHROUGH;
+		    __fallthrough;
 		  case 'i':
 		    goto conv_int;
 
                   case 'p':
                       if (sizeof(void *) > sizeof(int))
                           flags |= FL_LONG;
-                      __PICOLIBC_FALLTHROUGH;
+                      __fallthrough;
 		  default:			/* p,x,X	*/
                     base = 16;
 		  conv_int:
@@ -841,7 +860,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     if (!IS_EOF(context.unget))
         UNGETC(context.unget, stream);
 #endif
-    return nconvs;
+    __funlock_return(stream, nconvs);
 
   eof:
 #ifdef _NEED_IO_POS_ARGS
@@ -851,15 +870,18 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     if (!IS_EOF(context.unget))
         UNGETC(context.unget, stream);
 #endif
-    return nconvs ? nconvs : EOF;
+    __funlock_return(stream, nconvs ? nconvs : EOF);
 }
 
 #undef ap
 
-#if defined(_FORMAT_DEFAULT_DOUBLE) && !defined(vfscanf)
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-__strong_reference(vfscanf, __d_vfscanf);
-#else
-int __d_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
-#endif
+#if !defined(WIDE_CHARS)
+# if SCANF_VARIANT == __IO_DEFAULT
+#  undef vfscanf
+#  ifdef __strong_reference
+__strong_reference(vfscanf, SCANF_NAME);
+#  else
+int SCANF_NAME (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
+#  endif
+# endif
 #endif

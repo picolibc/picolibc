@@ -35,7 +35,7 @@ int
 sprintf(char *s, const char *fmt, ...)
 {
 	va_list ap;
-	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, INT_MAX);
+	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, NULL);
 	int i;
 
 	va_start(ap, fmt);
@@ -47,11 +47,4 @@ sprintf(char *s, const char *fmt, ...)
 	return i;
 }
 
-#ifdef __LONG_DOUBLE_IEEE128__
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(sprintf, __sprintfieee128);
-#endif
-#endif
+__ieee128_reference(sprintf, __sprintfieee128);

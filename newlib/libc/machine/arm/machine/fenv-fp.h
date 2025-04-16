@@ -33,8 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define	_vmrs_fpscr(__r)	__asm __volatile("vmrs %0, fpscr" : "=&r"(__r))
-#define	_vmsr_fpscr(__r)	__asm __volatile("vmsr fpscr, %0" : : "r"(__r))
+#define	_vmrs_fpscr(__r)	__asm__ __volatile__("vmrs %0, fpscr" : "=&r"(__r))
+#define	_vmsr_fpscr(__r)	__asm__ __volatile__("vmsr fpscr, %0" : : "r"(__r))
 #define	_FPU_MASK_SHIFT	8
 #define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
 			 FE_UPWARD | FE_TOWARDZERO)

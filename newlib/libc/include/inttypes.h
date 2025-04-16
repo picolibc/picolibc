@@ -57,11 +57,11 @@ typdef wchar_t _wchar_t;
  * undefined behaviour.
  */
 
-#if defined(_WANT_IO_C99_FORMATS)
+#if defined(__IO_C99_FORMATS)
   #define __SCN8(x) __INT8 __STRINGIFY(x)
 	#define __SCN8LEAST(x) __LEAST8 __STRINGIFY(x)
 	#define __SCN8FAST(x) __FAST8 __STRINGIFY(x)
-#endif /* _WANT_IO_C99_FORMATS */
+#endif /* __IO_C99_FORMATS */
 
 
 #define PRId8		__PRI8(d)
@@ -72,7 +72,7 @@ typdef wchar_t _wchar_t;
 #define PRIX8		__PRI8(X)
 
 /* Macros below are only enabled for a newlib built with C99 I/O format support. */
-#if defined(_WANT_IO_C99_FORMATS)
+#if defined(__IO_C99_FORMATS)
 
 #define SCNd8		__SCN8(d)
 #define SCNi8		__SCN8(i)
@@ -80,7 +80,7 @@ typdef wchar_t _wchar_t;
 #define SCNu8		__SCN8(u)
 #define SCNx8		__SCN8(x)
 
-#endif /* _WANT_IO_C99_FORMATS */
+#endif /* __IO_C99_FORMATS */
 
 
 #define PRIdLEAST8	__PRI8LEAST(d)
@@ -91,7 +91,7 @@ typdef wchar_t _wchar_t;
 #define PRIXLEAST8	__PRI8LEAST(X)
 
 /* Macros below are only enabled for a newlib built with C99 I/O format support. */
-#if defined(_WANT_IO_C99_FORMATS)
+#if defined(__IO_C99_FORMATS)
 
   #define SCNdLEAST8	__SCN8LEAST(d)
   #define SCNiLEAST8	__SCN8LEAST(i)
@@ -99,7 +99,7 @@ typdef wchar_t _wchar_t;
   #define SCNuLEAST8	__SCN8LEAST(u)
   #define SCNxLEAST8	__SCN8LEAST(x)
 
-#endif /* _WANT_IO_C99_FORMATS */
+#endif /* __IO_C99_FORMATS */
 
 #define PRIdFAST8	__PRI8FAST(d)
 #define PRIiFAST8	__PRI8FAST(i)
@@ -109,7 +109,7 @@ typdef wchar_t _wchar_t;
 #define PRIXFAST8	__PRI8FAST(X)
 
 /* Macros below are only enabled for a newlib built with C99 I/O format support. */
-#if defined(_WANT_IO_C99_FORMATS)
+#if defined(__IO_C99_FORMATS)
 
   #define SCNdFAST8	__SCN8FAST(d)
   #define SCNiFAST8	__SCN8FAST(i)
@@ -117,7 +117,7 @@ typdef wchar_t _wchar_t;
   #define SCNuFAST8	__SCN8FAST(u)
   #define SCNxFAST8	__SCN8FAST(x)
 
-#endif /* _WANT_IO_C99_FORMATS */
+#endif /* __IO_C99_FORMATS */
 
 /* 16-bit types */
 #define __PRI16(x) __INT16 __STRINGIFY(x)

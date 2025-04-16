@@ -93,9 +93,6 @@ lsrc_complex = [
   'conjl.c',
   'cprojl.c',
   'csqrtl.c',
-]
-
-lsrc_complex_long_double_equal_double = [
   'cacoshl.c',
   'cacosl.c',
   'cargl.c',
@@ -116,12 +113,7 @@ lsrc_complex_long_double_equal_double = [
   'ctanl.c',
 ]
 
-srcs_complex = dsrc_complex + fsrc_complex
-
-if have_long_double
-  lsrc_complex += lsrc_complex_long_double_equal_double
-  srcs_complex += lsrc_complex
-endif
+srcs_complex = dsrc_complex + fsrc_complex + lsrc_complex
 
 hdrs_complex = [
     'cephes_subrf.h',

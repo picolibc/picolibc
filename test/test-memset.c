@@ -73,8 +73,13 @@ init_crc(void)
 }
 
 static char
-expect(size_t pos)
+expect(size_t _pos)
 {
+#ifdef __MSP430__
+    uint32_t pos = (uint32_t) _pos;
+#else
+    size_t pos = _pos;
+#endif
     unsigned int i;
     uint8_t     c = 0xff;
     for (i = 0; i < sizeof(size_t); i++)

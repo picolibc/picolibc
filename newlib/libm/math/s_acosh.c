@@ -48,7 +48,7 @@ acosh64(__float64 x)
             return x + x;
         } else
             return log64(x) + ln2; /* acosh(huge)=log(2x) */
-    } else if (((hx - 0x3ff00000) | lx) == 0) {
+    } else if ((((__uint32_t) hx - 0x3ff00000) | lx) == 0) {
         return _F_64(0.0); /* acosh(1) = 0 */
     } else if (hx > 0x40000000) { /* 2**28 > x > 2 */
         t = x * x;

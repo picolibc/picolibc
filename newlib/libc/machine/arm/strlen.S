@@ -28,7 +28,7 @@
 
 #include "arm_asm.h"
 
-#if defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED
+#if defined __OPTIMIZE_SIZE__ || defined __PREFER_SIZE_OVER_SPEED
 #if __ARM_ARCH_ISA_THUMB == 2
 #include "strlen-thumb2-Os.S"
 
@@ -40,7 +40,7 @@
 
 #endif
 
-#else /* defined __OPTIMIZE_SIZE__ || defined PREFER_SIZE_OVER_SPEED */
+#else /* defined __OPTIMIZE_SIZE__ || defined __PREFER_SIZE_OVER_SPEED */
 #if defined __thumb__ && ! defined __thumb2__
   /* Implemented in strlen-stub.c.  */
 

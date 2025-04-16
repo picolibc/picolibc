@@ -35,6 +35,6 @@
 int
 feof_unlocked (FILE * fp)
 {
-  CHECK_INIT(_REENT, fp);
+  CHECK_INIT();
   return __sfeof (fp);
 }

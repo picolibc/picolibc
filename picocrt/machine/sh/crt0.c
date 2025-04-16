@@ -35,7 +35,7 @@
 
 #include "../../crt0.h"
 
-static void __attribute__((used)) __section(".text.startup")
+static void __used __section(".text.startup")
 _cstart(void)
 {
     __start();
@@ -50,7 +50,7 @@ extern char __stack[];
 #define FPSCR_RN        (0 << 0)
 #define FPSCR_RM        (3 << 0)
 
-void __section(".init") __attribute__((used))
+void __section(".init") __used
 _start(void)
 {
     /* Set up the stack pointer */
@@ -65,9 +65,9 @@ _start(void)
     /* set round to nearest */
     fpscr &= ~FPSCR_RM;
     fpscr |= FPSCR_RN;
-#ifdef __SH4__
+#if defined(__SH_FPU_DOUBLE__) && !defined(__SH2A_SINGLE__) && !defined(__SH4_SINGLE__)
     fpscr |= FPSCR_PR;
-#elif defined(__SH4_SINGLE_ONLY__)
+#else
     fpscr &= ~FPSCR_PR;
 #endif
     __asm__("lds %0,fpscr" : : "r" (fpscr));

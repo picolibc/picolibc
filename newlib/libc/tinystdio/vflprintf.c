@@ -30,20 +30,7 @@
 
 */
 
-#include "stdio_private.h"
-
-#define PICOLIBC_LONG_LONG_PRINTF_SCANF
-#define PRINTF_LEVEL PRINTF_LLONG
-#ifndef _FORMAT_DEFAULT_LONG_LONG
-#define vfprintf __l_vfprintf
-#endif
+#define PRINTF_VARIANT __IO_VARIANT_LLONG
+#define PRINTF_NAME __l_vfprintf
 
 #include "vfprintf.c"
-
-#ifdef _FORMAT_DEFAULT_LONG_LONG
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-__strong_reference(vfprintf, __l_vfprintf);
-#else
-int __l_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
-#endif
-#endif

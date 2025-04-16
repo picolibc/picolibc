@@ -32,14 +32,14 @@
 #include <picolibc.h>
 
 /* strchr.S */
-#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
+#if !defined (__OPTIMIZE_SIZE__) && !defined (__PREFER_SIZE_OVER_SPEED)
 #if defined (__ARC601__) || !defined (__ARC_BARREL_SHIFTER__)
 #define STRCHR_ASM
 #endif
 #endif
 
 /* strchr-bs.S */
-#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED) \
+#if !defined (__OPTIMIZE_SIZE__) && !defined (__PREFER_SIZE_OVER_SPEED) \
     && !defined (__ARC_RF16__)
 #if defined (__ARC_BARREL_SHIFTER__) && \
    (defined (__ARC600__) || (!defined (__ARC_NORM__) && !defined (__ARC601__)))
@@ -48,7 +48,7 @@
 #endif
 
 /* strchr-bs-norm.S */
-#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED) \
+#if !defined (__OPTIMIZE_SIZE__) && !defined (__PREFER_SIZE_OVER_SPEED) \
     && !defined (__ARC_RF16__)
 #if (defined (__ARC700__) || defined (__ARCEM__) || defined (__ARCHS__)) \
     && defined (__ARC_NORM__) && defined (__ARC_BARREL_SHIFTER__)

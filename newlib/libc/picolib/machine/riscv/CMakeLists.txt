@@ -33,6 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-if(_HAVE_PICOLIBC_TLS_API)
+if(__THREAD_LOCAL_STORAGE_API)
   picolibc_sources(tls.c)
 endif()

@@ -44,12 +44,13 @@ FTELL_TYPE
 FTELL(FILE *stream)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
+        __flockfile(stream);
         if ((stream->flags & __SEXT) && xf->seek) {
                 FTELL_TYPE ret = (FTELL_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
                 if (__atomic_load_ungetc(&stream->unget) != 0)
                     ret--;
-                return ret;
+                __funlock_return(stream, ret);
         }
         errno = ESPIPE;
-	return -1;
+	__funlock_return(stream, -1);
 }

@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include "msp430-semihost.h"
 
-_Noreturn void
+__noreturn void
 _exit(int code)
 {
         msp430_semihost_1(MSP430_SEMIHOST_EXIT, code);

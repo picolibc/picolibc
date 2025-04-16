@@ -35,7 +35,7 @@ THIS SOFTWARE.
 #include "mprec.h"
 #include "gdtoa.h"
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 const unsigned char __hexdig[256]=
 {
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -55,7 +55,7 @@ const unsigned char __hexdig[256]=
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 	0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 };
-#else /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#else /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 unsigned char
 __hexdig_fun (unsigned char c)
 {
@@ -64,7 +64,7 @@ __hexdig_fun (unsigned char c)
 	else if(c>='A' && c<='F') return c-'A'+0x10+10;
 	else return 0;
 }
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 
 static void
 rshift (_Bigint *b,
@@ -211,7 +211,7 @@ gethex (const char **sp, const FPI *fpi,
 		switch(*++s) {
 		  case '-':
 			esign = 1;
-			__PICOLIBC_FALLTHROUGH;
+			__fallthrough;
 		  case '+':
 			s++;
 		  }

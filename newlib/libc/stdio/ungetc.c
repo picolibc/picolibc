@@ -120,7 +120,7 @@ ungetc (
      ??? Might be able to remove this as some other stdio routine should
      have already been called to get the char we are un-getting.  */
 
-  CHECK_INIT (rptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
 

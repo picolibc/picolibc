@@ -39,7 +39,9 @@
 #include <stdio.h>
 #include <stdint.h>
 
+#if defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__)
 #define SH_QEMU
+#endif
 
 typedef volatile uint8_t vuint8_t;
 typedef volatile uint32_t vuint32_t;
@@ -58,13 +60,17 @@ struct sh_serial {
 
 #else
 
-struct sh_cons {
-    vuint8_t    data;
-    uint8_t     unused_01[0xf];
-    vuint8_t    halt;
+#define TARGET_NEWLIB_SH_SYS_exit 1
+#define TARGET_NEWLIB_SH_SYS_write 4
+
+struct sh_syscall_args {
+    uint32_t    r5;
+    uint32_t    r6;
+    uint32_t    r7;
 };
 
-#define sh_cons (*(struct sh_cons *) 0x10000000)
+uint32_t
+sh_syscall(uint32_t r4, uint32_t r5, uint32_t r6, uint32_t r7);
 
 #endif
 

@@ -354,7 +354,7 @@ int _dummy_mallocr = 1;
 
 #ifndef INTERNAL_SIZE_T
 #define INTERNAL_SIZE_T size_t
-#elif !defined(_HAVE_BUILTIN_MUL_OVERFLOW)
+#elif !__HAVE_BUILTIN_MUL_OVERFLOW
 #error Compiler does not support __builtin_mul_overflow, hence INTERNAL_SIZE_T cannot be set
 #endif
 
@@ -829,7 +829,7 @@ int     pOSIx_mEMALIGn(void **, size_t, size_t);
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 extern __typeof(free) __malloc_free;
 #else
 #define __malloc_free(x) fREe(x)
@@ -1417,7 +1417,8 @@ static void do_check_free_chunk(mchunkptr p)
     assert(sz == SIZE_SZ);
 }
 
-static void do_check_inuse_chunk(mchunkptr p)
+static void __disable_sanitizer
+do_check_inuse_chunk(mchunkptr p)
 {
   mchunkptr next = next_chunk(p);
   do_check_chunk(p);
@@ -2183,7 +2184,8 @@ void* mALLOc(size_t bytes)
 */
 
 
-void fREe(void* mem)
+void __disable_sanitizer
+fREe(void* mem)
 {
 #ifdef MALLOC_PROVIDED
 
@@ -2284,7 +2286,7 @@ void fREe(void* mem)
 
 #endif /* MALLOC_PROVIDED */
 }
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -2334,7 +2336,8 @@ __strong_reference(free, __malloc_free);
 */
 
 
-void* rEALLOc(void* oldmem, size_t bytes)
+void* __disable_sanitizer
+rEALLOc(void* oldmem, size_t bytes)
 {
 #ifdef MALLOC_PROVIDED
 
@@ -2693,7 +2696,7 @@ void* mEMALIGn(size_t alignment, size_t bytes)
 
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(memalign, aligned_alloc);
 #endif
 #endif /* DEFINE_MEMALIGN */
@@ -2822,12 +2825,10 @@ void* cALLOc(size_t n, size_t elem_size)
 */
 
 #if !defined(INTERNAL_LINUX_C_LIB) || !defined(__ELF__)
-#if !defined(_LIBC) || !defined(_REENT_ONLY)
 void cfree(void *mem)
 {
   fREe(mem);
 }
-#endif
 #endif
 
 #endif /* DEFINE_CFREE */

@@ -28,7 +28,7 @@
 #include <errno.h>
 #include "check.h"
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 
 static const char utf8[] =
 {
@@ -221,7 +221,7 @@ static const char utf8[] =
     0xe3,0x83,0x83,0xe3,0x83,0x88,0x0d,0xa
  };
 
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
  static const char euc_jp[] =
  {
     0xbf,0xa7,0xa1,0xb9,0xa5,0xc6,0xa5,0xad,0xa5,0xb9,
@@ -551,7 +551,7 @@ static const char shift_jis[] =
     0x83,0x69,0x83,0x8a,0x49,0x49,0x83,0x74,0x83,0x48,
     0x81,0x5b,0x83,0x7d,0x83,0x62,0x83,0x67,0x0d,0x0a
 };
-#endif /* _MB_EXTENDED_CHARSETS_JIS */
+#endif /* __MB_EXTENDED_CHARSETS_JIS */
 
 struct iconv_data
 {
@@ -562,11 +562,11 @@ struct iconv_data
 
 static const struct iconv_data data[] =
 {
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     {sizeof(euc_jp), "EUC-JP", (char *)euc_jp},
     {sizeof(shift_jis), "SHIFT-JIS", (char *)shift_jis},
 #endif
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     {sizeof(utf8), "UTF-8", (char *)utf8},
 #endif
 };
@@ -668,10 +668,10 @@ int main(void)
     exit(0);
 }
 
-#else /* #ifdef _MB_CAPABLE */
+#else /* #ifdef __MB_CAPABLE */
 int main(void)
 {
     puts("No multi-byte support linked, SKIP test");
     exit(77);
 }
-#endif /* #ifdef _MB_CAPABLE */
+#endif /* #ifdef __MB_CAPABLE */

@@ -33,17 +33,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 
 float
-fabsf (float x)
+fabsf(float x)
 {
   float result;
   __asm__("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
   return result;
 }
+
+_MATH_ALIAS_f_f(fabs)
 
 #else
 #include "../../math/sf_fabs.c"

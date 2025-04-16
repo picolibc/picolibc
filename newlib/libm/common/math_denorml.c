@@ -32,7 +32,7 @@
 
 #ifndef __math_denorml
 
-#ifndef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#ifndef __LONG_DOUBLE_NOEXCEPT
 static CONST_FORCE_LONG_DOUBLE VAL = __LDBL_MIN__;
 #endif
 

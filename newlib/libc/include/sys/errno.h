@@ -44,21 +44,19 @@ _user_strerror (int errnum,
                 int *errptr);
 #endif
 
-#ifdef NEWLIB_GLOBAL_ERRNO
-#define NEWLIB_THREAD_LOCAL_ERRNO
+#ifdef __GLOBAL_ERRNO
+#define __THREAD_LOCAL_ERRNO
 #else
-#define NEWLIB_THREAD_LOCAL_ERRNO NEWLIB_THREAD_LOCAL
+#define __THREAD_LOCAL_ERRNO __THREAD_LOCAL
 #endif
 
 #ifdef __PICOLIBC_ERRNO_FUNCTION
 int *__PICOLIBC_ERRNO_FUNCTION(void);
 #define errno (*__PICOLIBC_ERRNO_FUNCTION())
 #else
-extern NEWLIB_THREAD_LOCAL_ERRNO int errno;
+extern __THREAD_LOCAL_ERRNO int errno;
 #define errno errno
 #endif
-
-#define _REENT_ERRNO(r) (errno)
 
 #define	EPERM 1			/* Not owner */
 #define	ENOENT 2		/* No such file or directory */

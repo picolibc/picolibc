@@ -32,44 +32,78 @@ These options control some general build configuration values.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| fast-strcmp                 | true    | Always optimize strcmp for performance (to make Dhrystone happy)                     |
-| have-alias-attribute        | auto    | Compiler supports __alias__ attribute (default autodetected)                         |
-| have-format-attribute       | auto    | Compiler supports __format__ attribute (default autodetected)                        |
 | multilib                    | true    | Build every multilib configuration supported by the compiler                         |
 | multilib-list               | <empty> | If non-empty, the set of multilib configurations to compile for                      |
-| native-tests                | false   | Build tests against native libc (used to validate tests)                             |
-| picolib                     | true    | Include picolib bits for tls and sbrk support                                        |
-| picocrt                     | true    | Build crt0.o (C startup function)                                                    |
-| picocrt-lib                 | true    | Also wrap crt0.o into a library -lcrt0, which is easier to find via the library path |
-| semihost                    | true    | Build the semihost library (libsemihost.a)                                           |
-| fake-semihost               | false   | Create a fake semihost library to allow tests to link                                |
-| specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory). <br> If set to `none`, then picolibc.specs will not be installed at all.|
-| sysroot-install             | false   | Install in GCC sysroot location (requires sysroot in GCC)                            |
-| tests                       | false   | Enable tests                                                                         |
-| tinystdio                   | true    | Use tiny stdio from avr libc                                                         |
+| multilib-exclude            | <empty> | Multilib configurations containing any of these strings will not be built            |
+| b_sanitize=_option list_    | false   | Build the library -fsanitize set to the provided list, e.g. -Db_sanitize=undefined   |
+| sanitize-trap-on-error      | false   | Build the library with -fsanitize-undefined-trap-on-error                            |
+| sanitize-allow-missing      | false   | Don't bail if the selected sanitize option is not supported by the compiler          |
+| profile                     | false   | Enable profiling by adding -pg -no-pie to compile flags                              |
+| analyzer                    | false   | Enable the analyzer while compiling with -fanalyzer                                  |
+| assert-verbose              | false   | Display file, line and expression in assert() messages                               |
+| fast-strcmp                 | true    | Always optimize strcmp for performance (to make Dhrystone happy)                     |
 
-### Options applying to both legacy stdio and tinystdio
+### Installation options
 
-These options extend support in printf and scanf for additional
-types and formats.
+These options select where to install the library. Picolibc supports
+installing multiple versions of the library into the same destination
+root with the build-type-subdir option. This can be used to install
+both space and speed optimized versions of the library. Users can
+select which version with the 
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
+| build-type-subdir
+| specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory). <br> If set to `none`, then picolibc.specs will not be installed at all.|
+| sysroot-install             | false   | Install in GCC sysroot location                                                      |
+| sysroot-install-skip-checks | false   | Skip sysroot path check when using sysroot-install.                                  |
+| system-libc                 | false   | Install as system C library. Requires compiler support for picolibc                  |
+
+### Testing options
+
+Use these options to configure the library for testing. This includes
+testing the library using the host compiler and host C library.
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| tests                       | false   | Enable tests                                                                         |
+| tests-cdefs                 | auto    | Ensure every public header ends up including sys/cdefs.h. When set to auto, follows tests value |
+| tests-enable-stack-protector| true    | Build tests with stack protector enabled using -fstack-protector-all -fstack-protector-strong |
+| tests-enable-full-malloc-stress | false | Also enable malloc stress testing when building full malloc. This is always enabled for nano-malloc |
+| tests-enable-posix-io       | true    | Include tests which require full POSIX API                                           |
+| test-long-double            | true    | Enable long double tests.                                                            |
+| split-large-tests           | false   | For tests which generate large executables, split them apart for smaller targets     |
+| test-stdin                  | false   | Include tests which require working stdin                                            |
+| fortify-source              | 3       | Use this for _FORTIFY_SOURCE value when building tests                               |
+| test-machine                | qemu    | Target machine type for tests. AArch64 also supports 'fvp'                           |
+| freestanding                | false   | Build entire library with -ffreestanding. Used to be useful for Zephyr testing       |
+| native-tests                | false   | Build tests against host libc (used to validate tests)                               |
+| native-math-tests           | true    | Also build math tests against host libc when native-tests is enabled                 |
+| use-stdlib                  | false   | Do not link tests with -nostdlib. Useful for native testing.                         |
+| picolib                     | true    | Include 'picolib' bits. Disable when doing native testing.                           |
+| semihost                    | true    | Build semihost libary. Disable when doing native testing.                            |
+| fake-semihost               | false   | Create a fake semihost library to allow tests to link                                |
+
+### Stdio options
+
+These options select which stdio implementation to use along with
+options common to both implementations.
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| tinystdio                   | true    | Use tiny stdio from avr libc                                                         |
 | io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
-| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf. For tiny-stdio, this only affects the integer-only versions, the full version always includes long long support. |
-| io-pos-args                 | false   | Enable printf-family positional arg support. For tiny-stdio, this only affects the integer-only versions, the full version always includes positional argument support. |
+| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf. For tiny-stdio, this only affects the integer-only versions, the double and float versions always include long long support. |
+| io-pos-args                 | false   | Enable printf-family positional arg support. For tiny-stdio, this only affects the integer-only versions, the double and float versions always include positional argument support. |
 | io-long-double              | false   | Enable long double support in printf/scanf.                                          |
 
+### Tinystdio options
 
-`long long` support is always enabled for the tinystdio full
-printf/scanf modes, the `io-long-long` option adds them to the limited
-(float and integer) versions, as well as to the original newlib stdio
-bits.
+Tinystdio offers a smaller implementation than the legacy code while
+avoiding the use of malloc except when creating new FILE objects. Most
+I/O operations are done one byte at a time.
 
-### Options when using tinystdio bits
-
-These options apply when tinystdio is enabled, which is the
-default. For stdin/stdout/stderr, the application will need to provide
+For stdin/stdout/stderr, the application will need to provide
 `stdin`, `stdout` and `stderr`, which are three pointers to FILE
 structures (which can all reference a single shared FILE structure,
 and which can be aliases to the same underlying global pointer).
@@ -81,52 +115,56 @@ definitions which use the same POSIX I/O functions.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| atomic-ungetc               | true    | Make getc/ungetc re-entrant using atomic operations                                  |
 | io-float-exact              | true    | Provide round-trip support in float/string conversions                               |
-| posix-io                    | true    | Provide fopen/fdopen using POSIX I/O (requires open, close, read, write, lseek)      |
+| atomic-ungetc               | true    | Make getc/ungetc re-entrant using atomic operations                                  |
 | posix-console               | false   | Use POSIX I/O for stdin/stdout/stderr                                                |
-| format-default              | double  | Sets the default printf/scanf style ('double', 'float' or 'integer')                 |
+| format-default              | double  | Sets the default printf/scanf style ('d, 'f', 'l', 'i' or 'm')                       |
 | printf-aliases              | true    | Support link-time printf aliases to set the default printf/scanf variant             |
-| io-percent-b                | false   | Support the %b as proposed in the upcoming C standard                                |
+| io-percent-b                | false   | Support the C23 %b printf specifier for binary formatted integers                    |
 | printf-small-ultoa          | false   | Avoid soft division routine during integer binary to decimal conversion in printf    |
-| minimal-io-long-long        | false   | Support long long integers in the minimal printf and scanf variants                  |
+| printf-percent-n            | false   | Support the dangerous %n format specifier in printf                                  |
+| minimal-io-long-long        | false   | Support long long values in the minimal ('m') printf and scanf variants              |
 | fast-bufio                  | false   | Improve performance of some I/O operations when using bufio                          |
+| io-wchar                    | false   | Enable wide character support in printf and scanf when mb-capable is not set         |
 
-
-### Options when using legacy stdio bits
+### Legacy stdio options
 
 Normally, Picolibc is built with the small stdio library adapted from
-avrlibc (tinystdio=true). It still has the original newlib
-stdio bits and those still work (tinystdio=false), but depend
-on POSIX I/O functions from the underlying system, and perform many
-malloc calls at runtime. These options are relevant only in that
-configuration
+avrlibc (tinystdio=true). It still has the original newlib stdio bits
+and those still work (tinystdio=false), but depend on POSIX I/O
+functions from the underlying system, and perform many malloc calls at
+runtime. These options are relevant only in that configuration
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-elix-level           |  0      | Extends stdio API based on level                                                     |
+| newlib-elix-level           | 4       | Extends stdio API based on level                                                     |
 | newlib-fseek-optimization   | false   | Enable fseek optimization                                                            |
 | newlib-fvwrite-in-streamio  | false   | Enable iov in streamio                                                               |
-| newlib-global-stdio-streams | false   | Enable global stdio streams                                                          |
-| newlib-have-fcntl           | false   | System has fcntl function available                                                  |
 | newlib-io-float             | false   | Enable printf/scanf family float support                                             |
-| newlib-io-long-double       | false   | Enable long double type support in IO functions printf/scanf                         |
 | newlib-nano-formatted-io    | false   | Use nano version formatted IO                                                        |
-| newlib-reent-small          | false   | Enable small reentrant struct support                                                |
 | newlib-stdio64              | true    | Include 64-bit APIs                                                                  |
 | newlib-unbuf-stream-opt     | false   | Enable unbuffered stream optimization in streamio                                    |
-| newlib-wide-orient          | false   | Turn off wide orientation in streamio                                                |
+| newlib-wide-orient          | false   | Track wide character orientation in streamio                                         |
+| newlib-have-fcntl           | false   | System has fcntl function available                                                  |
 
 ### Internationalization options
 
 These options control how much internationalization support is included
-in the library. Picolibc only supports the 'C' locale but allows any
-supported charset to be specified using the locale 'C.<charset>'.
+in the library. Picolibc supports locale names of the form '<locale>' or
+'<locale>.<charset>'; e.g. POSIX or C.UTF-8. When no charset is
+specified, picolibc selects ASCII when multi-byte support is disabled
+or locale is C. Otherwise, picolibc selects UTF-8.
+
+Picolibc supports the same charsets for locales and iconv.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| mb-capable                  | false   | Enable multibyte support including UTF-8 charset                                     |
-| mb-extended-charsets        | false   | Enable additional ISO, Windows and JIS charsets                                      |
+| mb-capable                  | false   | Enable multibyte support including UTF-8                                             |
+| mb-extended-charsets        | false   | Enable all additional UCS, ISO, Windows and JIS charsets                             |
+| mb-ucs-charsets             | false   | Enable additional UCS charsets (UCS-2 and UCS-4)                                     |
+| mb-iso-charsets             | false   | Enable ISO-8859 charsets (ISO 8859-1 through ISO 8859-16)                            |
+| mb-jis-charsets             | false   | Enable JIS charsets (JIS X 0208, EUC-JP and Shift-JIS)                               |
+| mb-windows-charsets         | false   | Enable various code-page based charsets                                              |
 
 ### Startup/shutdown options
 
@@ -135,15 +173,52 @@ at startup and shutdown times.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| lite-exit                   | true    | Enable lightweight exit                                                             |
-| newlib-atexit-dynamic-alloc | false   | Enable dynamic allocation of atexit entries                                          |
-| newlib-global-atexit        | false   | Enable atexit data structure as global, instead of in TLS. <br> If `thread-local-storage` == false, then the atexit data structure is always global. |
-| newlib-initfini             | true    | Support _init() and _fini() functions in picocrt                                     |
-| newlib-initfini-array       | true    | Use .init_array and .fini_array sections in picocrt                                  |
-| newlib-register-fini        | false   | Enable finalization function registration using atexit                               |
-| crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime. <br> This option exists for targets where the linker can't handle a symbol that is the difference between two other symbols, e.g. m68k.|
+| picocrt                     | true    | Build crt0.o (C startup function)                                                    |
+| picocrt-enable-mmu          | true    | Enable memory management unit in picocrt where supported by the hardware             |
+| picocrt-lib                 | true    | Also wrap crt0.o into a library -lcrt0, which is easier to find via the library path |
+| picoexit                    | true    | Use smaller implementation that allows only 32 init and fini handlers                |
+| initfini-array              | true    | Use .init_array and .fini_array sections in picocrt                                  |
+| initfini                    | false   | Support _init() and _fini() functions in picocrt                                    |
+| crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime. <br> This option exists for targets where the linker can't handle a symbol that is the difference between two other symbols |
 
-### Thread local storage support
+### Legacy (non-picoexit) startup/shutdown options
+
+These options cover the (non-default) legacy exit handler support when
+picoexit is disabled.
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| newlib-atexit-dynamic-alloc | false   | Allocate additional space for handlers as necessary                                  |
+| newlib-global-atexit        | false   | Place exit handlers in global variables instead of thread-local ones                 |
+| newlib-register-fini        | false   | Register function that invokes destructors using atexit                              |
+| newlib-register-fini        | false   | Register 
+
+### Malloc options
+
+Picolibc offers two malloc implementations, the larger version offers
+better performance on large memory systems and for applications doing
+a lot of variable-sized allocations and deallocations. The smaller,
+default, implementation works best when applications perform few,
+persistent allocations.
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| newlib-nano-malloc          | true    | Use small-footprint nano-malloc implementation                                       |
+| nano-malloc-clear-freed     | false   | Set contents of freed memory to zero when using nano-malloc                          |
+
+### Locking options
+
+This option selects whether to disable locking support within the
+library. By default, locking support is enabled, but the default
+locking functions are just stubs which don't do anything. Applications
+can replace these stubs with their own implementation and enable full
+locking as described in [locking.md](locking.md).
+
+| Option                      | Default | Description                                                                          |
+| ------                      | ------- | -----------                                                                          |
+| single-thread               | false   | Disable support for locks                                                            |
+
+### Thread local storage options
 
 By default, Picolibc can uses native TLS support as provided by the
 compiler, this allows re-entrancy into the library if the run-time
@@ -158,49 +233,10 @@ As a separate option, you can make `errno` not use TLS if necessary.
 | tls-model                   | local-exec | Select TLS model (global-dynamic, local-dynamic, initial-exec or local-exec)      |
 | newlib-global-errno         | false   | Use single global errno even when thread-local-storage=true                          |
 | errno-function              | <empty> | If set, names a function which returns the address of errno. 'auto' will try to auto-detect. |
+| tls-rp2040                  | false   | Use Raspberry PI RP2040 CPUID register to index thread local storage value           |
+| stack-protector-guard       | auto    | Select stack protection canary type (global, tls or auto)                            |
 
-### Malloc option
-
-Picolibc offers two malloc implementations, the larger version offers
-better performance on large memory systems and for applications doing
-a lot of variable-sized allocations and deallocations. The smaller,
-default, implementation works best when applications perform few,
-persistent allocations.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-nano-malloc          | true    | Use small-footprint nano-malloc implementation                                       |
-
-### Locking support
-
-There are some functions in picolibc that use global data that needs
-protecting when accessed by multiple threads. The largest set of these
-are the legacy stdio code, but there are other functions that can use
-locking, e.g. when newlib-global-atexit is enabled, calls to atexit
-need to lock the shared global data structure if they may be called
-from multiple threads at the same time. By default, these are enabled
-and use the retargetable API defined in [locking.md](locking.md).
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-retargetable-locking | true    | Allow locking routines to be retargeted at link time                                 |
-| newlib-multithread          | true    | Enable support for multiple threads                                                  |
-
-
-### Legacy newlib options
-
-These either have no effect or should not be enabled in normal use of
-picolibc, they're left in the library to help users porting from
-newlib environments.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-long-time_t          | false   | Define time_t to long instead of using a 64-bit type                                 |
-| newlib-supplied-syscalls    | false   | Enable newlib supplied syscalls (obsolete)                                           |
-| newlib-reentrant-syscalls-provided| false| Underlying system provides reentrant syscall API                                  |
-| newlib-missing-syscall-names| false   | Underlying system provides syscall names without leading underscore                  |
-
-### Math library options
+### Math options
 
 There are two versions of many libm functions, old ones from SunPro
 and new ones from ARM. The new ones are generally faster for targets

@@ -33,7 +33,7 @@
    used.  */
 #include <picolibc.h>
 
-#if !defined (__OPTIMIZE_SIZE__) && !defined (PREFER_SIZE_OVER_SPEED)
+#if !defined (__OPTIMIZE_SIZE__) && !defined (__PREFER_SIZE_OVER_SPEED)
 
 #include "asm.h"
 
@@ -207,4 +207,4 @@ ENTRY (strchr)
 ENDFUNC (strchr)
 #endif /* __ARC601__ || !__ARC_BARREL_SHIFTER__ */
 
-#endif /* !__OPTIMIZE_SIZE__ && !PREFER_SIZE_OVER_SPEED */
+#endif /* !__OPTIMIZE_SIZE__ && !__PREFER_SIZE_OVER_SPEED */

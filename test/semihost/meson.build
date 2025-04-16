@@ -38,10 +38,12 @@ semihost_tests = [
   'semihost-exit',
   'semihost-exit-extended',
   'semihost-clock',
+  'semihost-close',
   'semihost-errno',
   'semihost-flen',
   'semihost-get-cmdline',
   'semihost-gettimeofday',
+  'semihost-iserror',
   'semihost-istty',
   'semihost-open',
   'semihost-read',
@@ -99,10 +101,14 @@ foreach params : targets
 
     _cmd_arg = ['-DCOMMAND_LINE="' + 'program-name' + ' ' + ' '.join(test_args) + '"']
 
+    test_file_name_arg=['-DTEST_FILE_NAME="' + semihost_test + target + '.txt"']
+
+    _cmd_arg += test_file_name_arg
+
     test(semihost_test + target,
 	 executable(semihost_test + target, [semihost_test_src],
-		    c_args: _c_args + _cmd_arg,
-		    link_args: double_printf_link_args + _link_args,
+		    c_args: printf_compile_args_d + _c_args + _cmd_arg,
+		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,
 		    link_with: _libs,
 		    link_depends:  _link_depends,
@@ -137,8 +143,8 @@ foreach params : targets
 
       test(semihost_test + target,
 	   executable(semihost_test + target, [semihost_test_src],
-		      c_args: _c_args + _cmd_arg,
-		      link_args: double_printf_link_args + _link_args,
+		      c_args: printf_compile_args_d + _c_args + _cmd_arg,
+		      link_args: printf_link_args_d + _link_args,
 		      objects: _objs,
 		      link_with: _libs,
 		      link_depends:  test_link_depends,

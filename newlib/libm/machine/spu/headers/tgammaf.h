@@ -50,7 +50,7 @@ static __inline float _tgammaf(float x)
 
   vx = spu_promote(x, 0);
   res = spu_extract(_tgammaf4(vx), 0);
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   /*
    * use vector truncf4 rather than splat x, and splat truncx.
    */

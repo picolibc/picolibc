@@ -35,16 +35,11 @@ finitel(long double e)
 	return (u.bits.exp != LDBL_INF_NAN_EXP);
 }
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(finitel, __finitel);
+#ifdef __strong_reference
+__strong_reference_dup(finitel, __finitel);
 #else
-
 int __finitel(long double x)
 {
     return finitel(x);
 }
-
 #endif

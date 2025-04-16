@@ -30,7 +30,7 @@
 #include "stdio_private.h"
 
 wchar_t *
-fgetws(wchar_t *str, int size, FILE *stream)
+__STDIO_UNLOCKED(fgetws)(wchar_t *str, int size, FILE *stream)
 {
 	wchar_t *cp;
 	wint_t c;
@@ -40,7 +40,7 @@ fgetws(wchar_t *str, int size, FILE *stream)
 
 	size--;
 	for (c = 0, cp = str; c != L'\n' && size > 0; size--, cp++) {
-		if ((c = getwc(stream)) == WEOF)
+		if ((c = __STDIO_UNLOCKED(getwc)(stream)) == WEOF)
 			return NULL;
 		*cp = (wchar_t)c;
 	}
@@ -48,3 +48,15 @@ fgetws(wchar_t *str, int size, FILE *stream)
 
 	return str;
 }
+
+#if defined(__STDIO_LOCKING) && !defined(_FILE_INCLUDED)
+wchar_t *
+fgetws(wchar_t *str, int size, FILE *stream)
+{
+    wchar_t *ret;
+    __flockfile(stream);
+    ret = __STDIO_UNLOCKED(fgetws)(str, size, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#endif

@@ -95,11 +95,7 @@ gpietsch@comcast.net
 #define required_argument	1
 #define optional_argument	2
 
-#ifdef __cplusplus
-extern "C"
-{
-
-#endif				/* __cplusplus */
+_BEGIN_STD_C
 
 /* types defined by this include file */
   struct option
@@ -175,11 +171,6 @@ extern "C"
 	       struct getopt_data * __data);
 #endif /* __need_getopt_newlib */
 
-#ifdef __cplusplus
-};
-
-#endif /* __cplusplus  */
+_END_STD_C
 
 #endif /* GETOPT_H */
-
-/* END OF FILE getopt.h */

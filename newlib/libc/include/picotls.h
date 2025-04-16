@@ -38,7 +38,7 @@
 
 #include <sys/cdefs.h>
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE
 
 #include <sys/types.h>
 

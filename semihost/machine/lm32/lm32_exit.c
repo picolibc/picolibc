@@ -36,7 +36,7 @@
 #include <unistd.h>
 #include "lm32_semihost.h"
 
-_Noreturn void
+__noreturn void
 _exit(int code)
 {
     struct lm32_scall_args args = {

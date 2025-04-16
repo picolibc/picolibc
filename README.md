@@ -42,22 +42,27 @@ is used to validate the code for all patch integration:
  * ARC (32- and 64- bit)
  * ARM (32- and 64- bit)
  * i386 (Native and Linux hosted, for testing)
+ * LatticeMico32
+ * LoongArch
  * Motorola 68000 (m68k)
  * MIPS
  * MSP430
  * Nios II
+ * OpenRisc
  * Power9
+ * Renesas RX
  * RISC-V (both 32- and 64- bit)
  * SparcV8 (32 bit)
+ * SuperH
  * x86_64 (Native and Linux hosted, for testing)
+ * Xtensa ESP32
 
 There is also build infrastructure and continuous build validation,
 but no integrated testing available for additional architectures:
 
  * Microblaze (32-bit, big and little endian)
- * PowerPC (big and little endian)
  * Sparc64
- * Xtensa (ESP8266, ESP32)
+ * Xtensa (ESP8266, LX106)
 
 Supporting architectures that already have Newlib code requires:
 
@@ -146,6 +151,59 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc release 1.8.10
+
+ * Add missing POSIX constants to limits.h.
+
+ * Add Renesas RX support. Thanks to Duy Dguyen.
+
+ * Update to Unicode 16.0. This matches glibc 2.41.
+
+ * Add TLS support and testing on loongarch, m68k, or1k, powerpc and
+   superh.
+
+ * Fix a couple of strncpy bugs in ARC assembly code.
+
+ * Clean up preprocessor symbols: remove unused symbols, rename
+   picolibc.h symbols to use a __ prefix and not include PICOLIBC or
+   NEWLIB in the names.
+
+ * Detect compiler attributes and builtins at compile time rather than
+   configure time where possible. Delete attributes and builtins not
+   used within the library implementation.
+
+ * Remove non-standard elf.h and mstats API.
+
+ * Clean up float predicates to make sure we provide implementations
+   of isinf, isnan and finite for all three types, both with and
+   without __ prefixes. Use symbol aliases to share the same function
+   implementation. Use the __ versions for the type generic macros
+   instead of fpclassify. Switch users of these within the math
+   library to use the type-generic versions.
+
+ * Start SuperH FPU in single mode when required.
+
+ * Test sh1 and sh2 targets using the binutils simulator.
+
+ * Initialize PowerPC IPLT table at startup.
+
+ * Switch printf/scanf aliases to prefer --printf=/--scanf= compiler
+   options
+
+ * Control UCS-2 and UCS-4 locales with mb-ucs-charsets configuration
+   option.
+
+ * Add stdio-locking option to provide full POSIX re-entrancy support
+   in tinystdio. Thanks to Alexey Lapshin.
+
+ * Add wcsto* string to number functions using tinystdio conversion
+   code. Avoids malloc call for float conversions.
+
+ * Add TLS API support for x86 targets. Thanks to TK Chia.
+
+ * Add -fsanitize=undefined handlers and make library build with that
+   enabled.
+
 ### Picolibc release 1.8.9
 
  * Use common clang/gcc feature detection macros on arm.
@@ -203,7 +261,7 @@ use Picolibc:
 
  * Add OpenRisc support, including testing. Thanks to Joel Holdsworth.
 
- * Add LatticMico32 support, including testing. Thanks to Jiaxun Yang.
+ * Add Lattic3Mico32 support, including testing. Thanks to Jiaxun Yang.
 
  * Add MIPS semihosting support. Thanks to Jiaxun Yang.
 

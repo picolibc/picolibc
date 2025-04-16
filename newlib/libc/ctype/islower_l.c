@@ -13,6 +13,6 @@ islower_l (int c, locale_t locale)
     (void) locale;
     return islower(c);
 #else
-    return (__CTYPE_PTR_L (locale)[c+1] & (_U|_L)) == _L;
+    return (__CTYPE_PTR_L (locale)[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER)) == __CTYPE_LOWER;
 #endif
 }

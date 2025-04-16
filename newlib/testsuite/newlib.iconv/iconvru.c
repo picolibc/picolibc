@@ -29,9 +29,9 @@
 #include <errno.h>
 #include "check.h"
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
 static const char iso_8859_5[] =
 {
     0xbe,0xdf,0xd5,0xe0,0xd0,0xe2,0xde,0xe0,0xeb,0x20,
@@ -134,7 +134,7 @@ static const char iso_8859_5[] =
 };
 #endif
 
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 static const char koi8_r[] =
 {
     0xef,0xd0,0xc5,0xd2,0xc1,0xd4,0xcf,0xd2,0xd9,0x20,
@@ -237,7 +237,7 @@ static const char koi8_r[] =
 };
 #endif
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 static const char utf8[] =
 {
     0xd0,0x9e,0xd0,0xbf,0xd0,0xb5,0xd1,0x80,0xd0,0xb0,
@@ -360,13 +360,13 @@ struct iconv_data
 
 static const struct iconv_data data[] =
 {
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#ifdef __MB_EXTENDED_CHARSETS_ISO
     {sizeof(iso_8859_5), "ISO-8859-5", (char *)iso_8859_5},
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
     {sizeof(koi8_r), "KOI8-R", (char *)koi8_r},
 #endif
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     {sizeof(utf8), "UTF-8", (char *)utf8},
 #endif
     {0, NULL, NULL}
@@ -467,10 +467,10 @@ int main(void)
     exit(0);
 }
 
-#else /* #ifdef _MB_CAPABLE */
+#else /* #ifdef __MB_CAPABLE */
 int main(void)
 {
     puts("None of ISO-8859-5, KOI8-R and UTF-8 converters linked, SKIP test");
     exit(0);
 }
-#endif /* #ifdef _MB_CAPABLE */
+#endif /* #ifdef __MB_CAPABLE */

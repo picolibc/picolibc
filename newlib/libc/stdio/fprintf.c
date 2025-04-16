@@ -19,6 +19,7 @@
 #define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdarg.h>
+#include "local.h"
 
 int
 fprintf (
@@ -34,8 +35,4 @@ fprintf (
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-fiprintf ( FILE *__restrict, const char *__restrict, ...)
-       _ATTRIBUTE ((__alias__("fprintf")));
-#endif
+__nano_reference(fprintf, fiprintf);

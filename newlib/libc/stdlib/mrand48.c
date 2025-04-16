@@ -22,10 +22,8 @@ _mrand48_r (struct _rand48 *r)
   return (long) i;
 }
 
-#ifndef _REENT_ONLY
 long
 mrand48 (void)
 {
   return _mrand48_r (&_rand48);
 }
-#endif /* !_REENT_ONLY */

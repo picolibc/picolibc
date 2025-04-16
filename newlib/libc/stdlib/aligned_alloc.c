@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <malloc.h>
 
-#ifndef _HAVE_ALIAS_ATTRIBUTE
+#ifndef __strong_reference
 void *
 aligned_alloc (size_t align, size_t size)
 {

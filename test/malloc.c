@@ -59,7 +59,11 @@
 #define CHECK_ERRNO()   (errno != ENOMEM)
 #endif
 
-int
+#ifndef __disable_sanitizer
+#define __disable_sanitizer
+#endif
+
+int __disable_sanitizer
 main(void)
 {
         void *r, *q;
@@ -180,7 +184,7 @@ main(void)
         if (fzero) {
             for (pow = 0; pow < 128; pow++)
                 fzero[pow] = pow + 2;
-#ifndef _NANO_MALLOC_CLEAR_FREED
+#ifndef __NANO_MALLOC_CLEAR_FREED
 #ifdef __GLIBC__
             explicit_bzero(fzero, 128);
 #else
@@ -203,7 +207,7 @@ main(void)
         if (rzero) {
             for (pow = 0; pow < 128; pow++)
                 rzero[pow] = pow + 2;
-#ifndef _NANO_MALLOC_CLEAR_FREED
+#ifndef __NANO_MALLOC_CLEAR_FREED
 #ifdef __GLIBC__
             explicit_bzero(rzero + 16, 128 - 16);
 #else
@@ -239,7 +243,7 @@ main(void)
 			char *med = realloc(small, 1024);
 			if (med) {
 //                                printf("med %p\n", med);
-#ifdef _NANO_MALLOC
+#ifdef __NANO_MALLOC
 				int i;
 				for (i = 128; i < 1024; i++)
 					if (med[i] != 0) {

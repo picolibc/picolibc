@@ -32,10 +32,26 @@
 #include "stdio_private.h"
 
 #undef clearerr
+#undef clearerr_unlocked
 
-void 
-clearerr(FILE *stream)
+void
+__STDIO_UNLOCKED(clearerr)(FILE *stream)
 {
-
 	stream->flags &= ~(__SERR | __SEOF);
 }
+
+#if defined(__STDIO_LOCKING)
+void
+clearerr(FILE *stream)
+{
+    __flockfile(stream);
+    clearerr_unlocked(stream);
+    __funlockfile(stream);
+}
+#else
+#ifdef __strong_reference
+__strong_reference(clearerr, clearerr_unlocked);
+#else
+void clearerr_unlocked(FILE *stream) { return clearerr(stream); }
+#endif
+#endif

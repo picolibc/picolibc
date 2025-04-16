@@ -16,7 +16,7 @@ mbrtowc (wchar_t *__restrict pwc,
 {
   int retval = 0;
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   if (ps == NULL)
     {
       static mbstate_t _mbrtowc_state;
@@ -31,10 +31,10 @@ mbrtowc (wchar_t *__restrict pwc,
 
   if (retval == -1)
     {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
       ps->__count = 0;
 #endif
-      _REENT_ERRNO(reent) = EILSEQ;
+      errno = EILSEQ;
       return (size_t)(-1);
     }
   else

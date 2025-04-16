@@ -50,29 +50,16 @@ QUICKREF
 #include <stdint.h>
 #include "local.h"
 
-/* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
-  (((uintptr_t)X & (sizeof (long) - 1)) | ((uintptr_t)Y & (sizeof (long) - 1)))
-
-/* How many bytes are copied each iteration of the 4X unrolled loop.  */
-#define BIGBLOCKSIZE    (sizeof (long) << 2)
-
-/* How many bytes are copied each iteration of the word copy loop.  */
-#define LITTLEBLOCKSIZE (sizeof (long))
-
-/* Threshhold for punting to the byte copier.  */
-#define TOO_SMALL(LEN)  ((LEN) < BIGBLOCKSIZE)
-
 #undef memmove
 
 /*SUPPRESS 20*/
 void *
-__inhibit_loop_to_libcall
+__no_builtin
 memmove (void *dst_void,
 	const void *src_void,
 	size_t length)
 {
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
   char *dst = dst_void;
   const char *src = src_void;
 
@@ -106,36 +93,54 @@ memmove (void *dst_void,
       /* Destructive overlap...have to copy backwards */
       src += length;
       dst += length;
+
+      if (!TOO_SMALL_LITTLE_BLOCK(length) && !UNALIGNED_X_Y(src, dst))
+        {
+          aligned_dst = (long*)dst;
+          aligned_src = (long*)src;
+
+          /* Copy one long word at a time if possible.  */
+          while (!TOO_SMALL_LITTLE_BLOCK(length))
+            {
+              *--aligned_dst = *--aligned_src;
+              length -= LITTLE_BLOCK_SIZE;
+            }
+
+          /* Pick up any residual with a byte copier.  */
+          dst = (char*)aligned_dst;
+          src = (char*)aligned_src;
+        }
+
       while (length--)
-	{
-	  *--dst = *--src;
-	}
+        {
+          *--dst = *--src;
+        }
     }
   else
     {
       /* Use optimizing algorithm for a non-destructive copy to closely
          match memcpy. If the size is small or either SRC or DST is unaligned,
          then punt into the byte copy loop.  This should be rare.  */
-      if (!TOO_SMALL(length) && !UNALIGNED (src, dst))
+      if (!TOO_SMALL_LITTLE_BLOCK(length) && !UNALIGNED_X_Y(src, dst))
         {
           aligned_dst = (long*)dst;
           aligned_src = (long*)src;
 
           /* Copy 4X long words at a time if possible.  */
-          while (length >= BIGBLOCKSIZE)
+          while (!TOO_SMALL_BIG_BLOCK(length))
             {
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
               *aligned_dst++ = *aligned_src++;
-              length -= BIGBLOCKSIZE;
+              length -= BIG_BLOCK_SIZE;
             }
 
           /* Copy one long word at a time if possible.  */
-          while (length >= LITTLEBLOCKSIZE)
+          while (!TOO_SMALL_LITTLE_BLOCK(length))
             {
               *aligned_dst++ = *aligned_src++;
-              length -= LITTLEBLOCKSIZE;
+              length -= LITTLE_BLOCK_SIZE;
             }
 
           /* Pick up any residual with a byte copier.  */
@@ -150,5 +155,5 @@ memmove (void *dst_void,
     }
 
   return dst_void;
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

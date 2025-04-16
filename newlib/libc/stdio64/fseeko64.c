@@ -93,7 +93,7 @@ fseeko64 (
 {
   _fpos64_t (*seekfn) (void *, _fpos64_t, int);
   _fpos64_t curoff;
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
   _fpos64_t target;
   size_t n;
 #endif
@@ -105,7 +105,7 @@ fseeko64 (
     {
       if ((_off_t) offset != offset)
 	{
-	  _REENT_ERRNO(ptr) = EOVERFLOW;
+	  errno = EOVERFLOW;
 	  return EOF;
 	}
       return (_off64_t) fseeko (fp, offset, whence);
@@ -113,7 +113,7 @@ fseeko64 (
 
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
 
@@ -132,7 +132,7 @@ fseeko64 (
 
   if ((seekfn = fp->_seek64) == NULL)
     {
-      _REENT_ERRNO(ptr) = ESPIPE;	/* ??? */
+      errno = ESPIPE;	/* ??? */
       _newlib_flockfile_exit(fp);
       return EOF;
     }
@@ -182,7 +182,7 @@ fseeko64 (
       break;
 
     default:
-      _REENT_ERRNO(ptr) = EINVAL;
+      errno = EINVAL;
       _newlib_flockfile_exit(fp);
       return (EOF);
     }
@@ -200,7 +200,7 @@ fseeko64 (
   if (fp->_bf._base == NULL)
     _smakebuf (fp);
 
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)

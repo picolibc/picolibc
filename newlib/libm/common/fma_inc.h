@@ -149,7 +149,7 @@ dd_mul(FLOAT_T a, FLOAT_T b)
 	return (ret);
 }
 
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
 static FLOAT_T
 _scalbn_no_errno(FLOAT_T x, int n)
 {

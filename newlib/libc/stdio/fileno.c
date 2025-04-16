@@ -66,14 +66,14 @@ int
 fileno (FILE * f)
 {
   int result;
-  CHECK_INIT (_REENT, f);
+  CHECK_INIT();
   _newlib_flockfile_start (f);
   if (f->_flags)
     result = __sfileno (f);
   else
     {
       result = -1;
-      _REENT_ERRNO(_REENT) = EBADF;
+      errno = EBADF;
     }
   _newlib_flockfile_end (f);
   return result;

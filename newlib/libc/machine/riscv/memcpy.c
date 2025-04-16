@@ -11,7 +11,7 @@
 
 #include <picolibc.h>
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 //memcpy defined in memcpy-asm.S
 #else
 
@@ -24,7 +24,10 @@
 #undef memcpy
 
 void *
-__inhibit_loop_to_libcall
+__no_builtin
+#if __riscv_misaligned_slow || __riscv_misaligned_fast
+__disable_sanitizer
+#endif
 memcpy(void *__restrict aa, const void *__restrict bb, size_t n)
 {
   #define BODY(a, b, t) { \
@@ -37,8 +40,12 @@ memcpy(void *__restrict aa, const void *__restrict bb, size_t n)
   const char *b = (const char *)bb;
   char *end = a + n;
   uintptr_t msk = sizeof (long) - 1;
+#if __riscv_misaligned_slow || __riscv_misaligned_fast
+  if (n < sizeof (long))
+#else
   if (unlikely ((((uintptr_t)a & msk) != ((uintptr_t)b & msk))
 	       || n < sizeof (long)))
+#endif
     {
 small:
       if (__builtin_expect (a < end, 1))

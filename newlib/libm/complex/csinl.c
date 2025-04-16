@@ -33,7 +33,7 @@
 #include <math.h>
 #include "cephes_subrl.h"
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE_MATH
 
 long double complex
 csinl(long double complex z)

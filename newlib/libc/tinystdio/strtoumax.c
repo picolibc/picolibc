@@ -32,6 +32,10 @@
 
 #define strtoi_type uintmax_t
 #define strtoi_max UINTMAX_MAX
-#define strtoi strtoumax
 #undef strtoi_signed
+#ifdef WIDE_CHARS
+#define strtoi wcstoumax
+#else
+#define strtoi strtoumax
+#endif
 #include "strtoi.h"

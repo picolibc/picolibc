@@ -17,7 +17,7 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 /*
 FUNCTION
 	<<strcmp>>---character string compare
-	
+
 INDEX
 	strcmp
 
@@ -47,33 +47,14 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
-#include <stdint.h>
-
-/* Nonzero if either X or Y is not aligned on a "long" boundary.  */
-#define UNALIGNED(X, Y) \
-  (((uintptr_t)X & (sizeof (long) - 1)) | ((uintptr_t)Y & (sizeof (long) - 1)))
-
-/* DETECTNULL returns nonzero if (long)X contains a NULL byte. */
-#if LONG_MAX == 2147483647L
-#define DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080)
-#else
-#if LONG_MAX == 9223372036854775807L
-#define DETECTNULL(X) (((X) - 0x0101010101010101) & ~(X) & 0x8080808080808080)
-#else
-#error long int is not a 32bit or 64bit type.
-#endif
-#endif
-
-#ifndef DETECTNULL
-#error long int is not a 32bit or 64bit byte
-#endif
+#include "local.h"
 
 int
 strcmp (const char *s1,
 	const char *s2)
-{ 
-#if ((defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)) && !defined(FAST_STRCMP)) \
-    || defined(PICOLIBC_NO_OUT_OF_BOUNDS_READS)
+{
+#if ((defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)) && !defined(__FAST_STRCMP)) \
+    || defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   while (*s1 != '\0' && *s1 == *s2)
     {
       s1++;
@@ -86,8 +67,8 @@ strcmp (const char *s1,
   unsigned long *a2;
 
   /* If s1 or s2 are unaligned, then compare bytes. */
-  if (!UNALIGNED (s1, s2))
-    {  
+  if (!UNALIGNED_X_Y(s1, s2))
+    {
       /* If s1 and s2 are word-aligned, compare them a word at a time. */
       a1 = (unsigned long*)s1;
       a2 = (unsigned long*)s2;
@@ -95,7 +76,7 @@ strcmp (const char *s1,
         {
           /* To get here, *a1 == *a2, thus if we find a null in *a1,
 	     then the strings must be equal, so return zero.  */
-          if (DETECTNULL (*a1))
+          if (DETECT_NULL(*a1))
 	    return 0;
 
           a1++;
@@ -113,5 +94,5 @@ strcmp (const char *s1,
       s2++;
     }
   return (*(unsigned char *) s1) - (*(unsigned char *) s2);
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 }

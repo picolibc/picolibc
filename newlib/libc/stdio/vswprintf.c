@@ -41,7 +41,7 @@ vswprintf (
 
   if (size > INT_MAX / sizeof (wchar_t))
     {
-      _REENT_ERRNO(ptr) = EOVERFLOW;	/* POSIX extension */
+      errno = EOVERFLOW;	/* POSIX extension */
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -60,7 +60,7 @@ vswprintf (
     /* _svfwprintf_r() returns how many wide characters it would have printed
      * if there were enough space.  Return an error if too big to fit in str,
      * unlike snprintf, which returns the size needed.  */
-    _REENT_ERRNO(ptr) = EOVERFLOW;	/* POSIX extension */
+    errno = EOVERFLOW;	/* POSIX extension */
     ret = -1;
   }
   return ret;

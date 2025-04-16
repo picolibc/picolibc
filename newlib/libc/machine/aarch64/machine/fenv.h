@@ -31,9 +31,7 @@
 
 #include <sys/_types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 typedef	__uint64_t	fenv_t;
 typedef	__uint64_t	fexcept_t;
@@ -47,17 +45,17 @@ typedef	__uint64_t	fexcept_t;
 
 /* compiler-rt has no exceptions in soft-float */
 
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
 
 #if (__ARM_FP & 0x8) == 0
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
 #endif
 
 #if (__ARM_FP & 0x4) == 0
-#define PICOLIBC_FLOAT_NOROUND
-#define PICOLIBC_FLOAT_NOEXCEPT
+#define __FLOAT_NOROUND
+#define __FLOAT_NOEXCEPT
 #endif
 
 #else
@@ -65,12 +63,12 @@ typedef	__uint64_t	fexcept_t;
 /* libgcc has exceptions when there is an FPU */
 
 #if __ARM_FP == 0
-#define PICOLIBC_LONG_DOUBLE_NOROUND
-#define PICOLIBC_LONG_DOUBLE_NOEXCEPT
-#define PICOLIBC_DOUBLE_NOROUND
-#define PICOLIBC_DOUBLE_NOEXCEPT
-#define PICOLIBC_FLOAT_NOROUND
-#define PICOLIBC_FLOAT_NOEXCEPT
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
+#define __FLOAT_NOROUND
+#define __FLOAT_NOEXCEPT
 #endif
 
 #endif
@@ -104,11 +102,11 @@ typedef	__uint64_t	fexcept_t;
 #define _FPUSW_SHIFT	8
 #define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
 
-#define	__mrs_fpcr(__r)	__asm __volatile("mrs %0, fpcr" : "=r" (__r))
-#define	__msr_fpcr(__r)	__asm __volatile("msr fpcr, %0" : : "r" (__r))
+#define	__mrs_fpcr(__r)	__asm__ __volatile__("mrs %0, fpcr" : "=r" (__r))
+#define	__msr_fpcr(__r)	__asm__ __volatile__("msr fpcr, %0" : : "r" (__r))
 
-#define	__mrs_fpsr(__r)	__asm __volatile("mrs %0, fpsr" : "=r" (__r))
-#define	__msr_fpsr(__r)	__asm __volatile("msr fpsr, %0" : : "r" (__r))
+#define	__mrs_fpsr(__r)	__asm__ __volatile__("mrs %0, fpsr" : "=r" (__r))
+#define	__msr_fpsr(__r)	__asm__ __volatile__("msr fpsr, %0" : : "r" (__r))
 
 #else
 #define	FE_TONEAREST		0x00000000
@@ -127,8 +125,6 @@ typedef	__uint64_t	fexcept_t;
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif	/* !_FENV_H_ */

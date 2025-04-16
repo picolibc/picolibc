@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include "sh_semihost.h"
 
-_Noreturn void
+__noreturn void
 _exit(int code)
 {
 #ifdef SH_QEMU
@@ -49,7 +49,7 @@ _exit(int code)
         write(1, buf, n);
 	while(1);
 #else
-        sh_cons.halt = code;
+        sh_syscall(TARGET_NEWLIB_SH_SYS_exit, code, 0, 0);
 #endif
         __builtin_unreachable();
 }

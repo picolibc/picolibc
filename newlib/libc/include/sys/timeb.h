@@ -40,7 +40,7 @@ SUCH DAMAGE.
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 
-__BEGIN_DECLS
+_BEGIN_STD_C
 
 #ifndef _TIME_T_DECLARED
 typedef	_TIME_T_	time_t;
@@ -57,6 +57,6 @@ struct timeb
 
 extern int ftime (struct timeb *);
 
-__END_DECLS
+_END_STD_C
 
 #endif /* ! defined (_SYS_TIMEB_H) */

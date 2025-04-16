@@ -29,7 +29,6 @@
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
 
-#ifndef _REENT_ONLY
 void *
 reallocf (void *ptr,
 	size_t size)
@@ -42,4 +41,3 @@ reallocf (void *ptr,
 	return (nptr);
 }
 
-#endif

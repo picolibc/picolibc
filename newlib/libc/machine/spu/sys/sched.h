@@ -1,13 +1,13 @@
 /* Copyright (c) 2007 Patrick Mansfield <patmans@us.ibm.com> */
 #ifndef _SYS_SCHED_H
 #define _SYS_SCHED_H
-#ifdef __cplusplus
-extern "C" {
-#endif
+
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 int sched_yield(void);
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif

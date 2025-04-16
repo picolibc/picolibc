@@ -45,7 +45,7 @@ static __inline double _log(double x)
 
   vx = spu_promote(x, 0);
   res = spu_extract(_logd2(vx), 0);
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   dom_chkd_less_than(vx, vc);
 #endif
   return res;

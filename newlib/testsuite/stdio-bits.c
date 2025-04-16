@@ -37,7 +37,7 @@ OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <errno.h>
 #include <sys/stat.h>
 
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 /* Buffered output routines for newlib-nano stdio */
 
 static char write_buf[512];

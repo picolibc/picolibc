@@ -66,7 +66,7 @@
  * Theoretical peak relative error = 2.32e-20
  */
 
-static long double P[] = {
+static const long double P[] = {
  4.5270000862445199635215E-5L,
  4.9854102823193375972212E-1L,
  6.5787325942061044846969E0L,
@@ -75,7 +75,7 @@ static long double P[] = {
  5.7112963590585538103336E1L,
  2.0039553499201281259648E1L,
 };
-static long double Q[] = {
+static const long double Q[] = {
 /* 1.0000000000000000000000E0,*/
  1.5062909083469192043167E1L,
  8.3047565967967209469434E1L,
@@ -91,13 +91,13 @@ static long double Q[] = {
  * Theoretical peak relative error = 6.16e-22
  */
 
-static long double R[4] = {
+static const long double R[4] = {
  1.9757429581415468984296E-3L,
 -7.1990767473014147232598E-1L,
  1.0777257190312272158094E1L,
 -3.5717684488096787370998E1L,
 };
-static long double S[4] = {
+static const long double S[4] = {
 /* 1.00000000000000000000E0L,*/
 -2.6201045551331104417768E1L,
  1.9361891836232102174846E2L,

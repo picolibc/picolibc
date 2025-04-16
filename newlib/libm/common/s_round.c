@@ -89,14 +89,14 @@ round64(__float64 x)
     }
   else
     {
-      __uint32_t exponent_mask = 0xffffffff >> (exponent_less_1023 - 20);
+      __uint32_t exponent_mask = (__uint32_t) 0xffffffff >> (exponent_less_1023 - 20);
       __uint32_t tmp;
 
       if ((lsw & exponent_mask) == 0)
         /* x is an integral value. */
         return x;
 
-      tmp = lsw + (1 << (51 - exponent_less_1023));
+      tmp = lsw + ((__uint32_t) 1 << (51 - exponent_less_1023));
       if (tmp < lsw)
         msw += 1;
       lsw = tmp;

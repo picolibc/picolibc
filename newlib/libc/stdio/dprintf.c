@@ -58,15 +58,10 @@ dprintf (int fd,
   va_list ap;
   int n;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
   va_start (ap, format);
   n = vdprintf ( fd, format, ap);
   va_end (ap);
   return n;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int
-diprintf (int, const char *, ...)
-       _ATTRIBUTE ((__alias__("dprintf")));
-#endif
+__nano_reference(dprintf, diprintf);

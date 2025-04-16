@@ -39,7 +39,7 @@
 #include <math.h>
 #include <fenv.h>
 #include <stdlib.h>
-#ifdef _HAVE_COMPLEX
+#ifdef __HAVE_COMPLEX
 #include <complex.h>
 #endif
 
@@ -53,7 +53,7 @@ long long int lli1;
 long double l1, l2, l3;
 #endif
 
-#ifdef _HAVE_COMPLEX
+#ifdef __HAVE_COMPLEX
 double complex cd1, cd2, cd3;
 float complex cf1, cf2, cf3;
 
@@ -102,13 +102,13 @@ main(void)
     i1 = finite (d1);
     i1 = finitef (f1);
 #ifdef _TEST_LONG_DOUBLE
-#if defined(_HAVE_BUILTIN_FINITEL) || defined(_HAVE_BUILTIN_ISFINITE)
+#if __HAVE_BUILTIN_FINITEL || __HAVE_BUILTIN_ISFINITE
     i1 = finitel (l1);
 #endif
-#ifdef _HAVE_BUILTIN_ISINFL
+#if __HAVE_BUILTIN_ISINFL
     i1 = isinfl (l1);
 #endif
-#ifdef _HAVE_BUILTIN_ISNANL
+#if __HAVE_BUILTIN_ISNANL
     i1 = isnanl (l1);
 #endif
 #endif
@@ -266,7 +266,7 @@ main(void)
     l1 = ceill (l1);
     l1 = floorl (l1);
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE_MATH
     l1 = atanl (l1);
     l1 = cosl (l1);
     l1 = sinl (l1);
@@ -309,7 +309,7 @@ main(void)
     d1 = nexttoward (d1, l1);
     l1 = nextafterl (l1, l2);
     l1 = nexttowardl (l1, l2);
-#endif /* _HAVE_LONG_DOUBLE_MATH */
+#endif /* __HAVE_LONG_DOUBLE_MATH */
 #endif /* _TEST_LONG_DOUBLE */
 
     d1 = drem (d1, d2);
@@ -338,7 +338,7 @@ main(void)
     f1 = exp10f (f1);
     f1 = pow10f (f1);
 
-#ifdef _HAVE_COMPLEX
+#ifdef __HAVE_COMPLEX
     cd1 = cacos(cd1);
     cf1 = cacosf(cf1);
 
@@ -443,7 +443,7 @@ main(void)
     cl1 = conjl(cl1);
     l1 = cimagl(cl1);
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE_MATH
     l1 = cargl(cl1);
     cl1 = casinl(cl1);
     cl1 = cacosl(cl1);
@@ -463,11 +463,11 @@ main(void)
 #if __GNU_VISIBLE
     cl1 = clog10l(cl1);
 #endif
-#endif /* _HAVE_LONG_DOUBLE_MATH */
+#endif /* __HAVE_LONG_DOUBLE_MATH */
 
 #endif /* _TEST_LONG_DOUBLE */
 
-#endif /* _HAVE_COMPLEX */
+#endif /* __HAVE_COMPLEX */
 
     i1 = feclearexcept(FE_ALL_EXCEPT);
     i1 = fegetexceptflag(&fex, FE_ALL_EXCEPT);

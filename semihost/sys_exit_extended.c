@@ -36,9 +36,9 @@
 #include "semihost-private.h"
 #include <sys/cdefs.h>
 
-_Noreturn void
+__noreturn void
 sys_semihost_exit_extended(uintptr_t code)
 {
     (void)sys_semihost2(SYS_EXIT_EXTENDED, ADP_Stopped_ApplicationExit, code);
-    __unreachable();
+    __builtin_unreachable();
 }

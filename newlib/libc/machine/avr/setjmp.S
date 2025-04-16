@@ -50,7 +50,7 @@
    All multibytes are stored as little-endian.
 
    int setjmp(jmp_buf __jmpb);
-   void longjmp(jmp_buf __jmpb, int __val) __attribute__((noreturn));
+   void longjmp(jmp_buf __jmpb, int __val) __noreturn;
  */
 
 #include <picolibc.h>
@@ -99,7 +99,7 @@ _U(setjmp):
   ; save stack pointer (after poping)
 	in	ret_lo, AVR_STACK_POINTER_LO_ADDR
 	st	X+, ret_lo
-#ifdef _HAVE_AVR_STACK_POINTER_HI    
+#ifdef __HAVE_AVR_STACK_POINTER_HI    
 	in	ret_lo, AVR_STACK_POINTER_HI_ADDR
 	st	X+, ret_lo
 #else
@@ -152,7 +152,7 @@ _U(longjmp):
 	out	AVR_STACK_POINTER_LO_ADDR, ZL
 	out	AVR_STACK_POINTER_HI_ADDR, ZH
 #else
-# ifdef _HAVE_AVR_STACK_POINTER_HI
+# ifdef __HAVE_AVR_STACK_POINTER_HI
 	/* interrupts disabled for shortest possible time (3 cycles) */
 	cli
 	out	AVR_STACK_POINTER_HI_ADDR, ZH

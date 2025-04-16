@@ -35,7 +35,7 @@
 
 #include "math_ld.h"
 
-#if !_HAVE_FAST_FMAL && (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
+#if !__HAVE_FAST_FMAL && (LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113)
 
 typedef long double FLOAT_T;
 
@@ -79,7 +79,7 @@ EXPONENT(FLOAT_T x)
     return u.bits.exp;
 }
 
-#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#ifdef __LONG_DOUBLE_NOEXCEPT
 #define feraiseexcept(x) ((void) (x))
 #endif
 

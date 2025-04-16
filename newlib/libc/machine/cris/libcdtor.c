@@ -53,7 +53,7 @@ extern vfnp * const _Dtors __asm__(".$global.lib.dtors");
    thinks it can remove defaultors, so we need to artificially mark it
    as used.  FIXME: Perhaps a GCC bug.  */
 
-static vfnp const defaultors[] __attribute__ ((__used__)) = {0, 0};
+static vfnp const defaultors[] __used = {0, 0};
 
 extern vfnp * __CTOR_LIST__ __attribute__ ((weak, alias ("defaultors")));
 extern vfnp * __DTOR_LIST__ __attribute__ ((weak, alias ("defaultors")));

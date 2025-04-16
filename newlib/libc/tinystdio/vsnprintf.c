@@ -35,17 +35,7 @@ int
 vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 {
 	int i;
-
-	/* Restrict max output length to INT_MAX, as snprintf() return
-	   signed int. The fputc() function uses a signed comparison
-	   between estimated len and f.size field. So we can write a
-	   negative value into f.size in the case of n was 0. Note,
-	   that f.size will be a max number of nonzero symbols.	*/
-
-	if ((int) n < 0)
-		n = (unsigned)INT_MAX + 1;
-
-	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, n ? n - 1 : 0);
+	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, FDEV_STRING_WRITE_END(s, n));
 
 	i = vfprintf(&f.file, fmt, ap);
 
@@ -55,11 +45,4 @@ vsnprintf(char *s, size_t n, const char *fmt, va_list ap)
 	return i;
 }
 
-#ifdef __LONG_DOUBLE_IEEE128__
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(vsnprintf, __vsnprintfieee128);
-#endif
-#endif
+__ieee128_reference(vsnprintf, __vsnprintfieee128);

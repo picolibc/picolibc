@@ -44,7 +44,7 @@ static __inline float _atanhf(float x)
 
   vx = spu_splats(x);
   res = spu_extract(_atanhf4(vx), 0);
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   /*
    * Domain error if not in the interval [-1, +1]
    */

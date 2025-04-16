@@ -45,7 +45,6 @@ typedef struct
   int fp;
 } c99_fgets_t;
 
-#ifndef _REENT_ONLY
 
 char *
 fgets (char *__restrict buf,
@@ -62,4 +61,3 @@ fgets (char *__restrict buf,
 
   return (char*) __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETS, &args);
 }
-#endif /* ! _REENT_ONLY */

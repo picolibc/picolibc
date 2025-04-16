@@ -28,15 +28,10 @@ printf (
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
   va_start (ap, fmt);
-  ret = vfprintf ( _stdout_r (ptr), fmt, ap);
+  ret = vfprintf ( stdout, fmt, ap);
   va_end (ap);
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-iprintf (const char *, ...)
-       _ATTRIBUTE ((__alias__("printf")));
-#endif
+__nano_reference(printf, iprintf);

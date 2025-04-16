@@ -642,11 +642,11 @@ __ibitmap(
 	__uint32_t *ip;
 	int clearbytes, clearints;
 
-	if ((ip = (__uint32_t *)malloc(hashp->BSIZE)) == NULL)
-		return (1);
-	hashp->nmaps++;
 	clearints = ((nbits - 1) >> INT_BYTE_SHIFT) + 1;
 	clearbytes = clearints << INT_TO_BYTE;
+	if (clearbytes > hashp->BSIZE || (ip = (__uint32_t *)malloc(hashp->BSIZE)) == NULL)
+		return (1);
+	hashp->nmaps++;
 	(void)memset((char *)ip, 0, clearbytes);
 	(void)memset(((char *)ip) + clearbytes, 0xFF,
 	    hashp->BSIZE - clearbytes);
@@ -880,7 +880,7 @@ open_temp(
         strcpy(namestr, "_hashXXXXXX");
 	if ((hashp->fp = mkstemp(namestr)) != -1) {
 		(void)unlink(namestr);
-#ifdef _HAVE_FCNTL
+#ifdef __HAVE_FCNTL
 		(void)fcntl(hashp->fp, F_SETFD, 1);
 #endif
 	}

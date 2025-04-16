@@ -24,6 +24,8 @@
  * SUCH DAMAGE.
  */
 
+#undef isinfl
+
 int
 isinfl(long double e)
 {
@@ -33,3 +35,13 @@ isinfl(long double e)
 	mask_nbit_l(u);
 	return (u.bits.exp == LDBL_INF_NAN_EXP && (u.bits.manl == 0 && u.bits.manh == 0));
 }
+
+#ifdef __strong_reference
+__strong_reference_dup(isinfl, __isinfl);
+#else
+int
+__isinfl(long double x)
+{
+    return isinfl(x);
+}
+#endif

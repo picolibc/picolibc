@@ -62,11 +62,8 @@ __sprintf_chk(char * __restrict buf, int flags, size_t slen,
 }
 
 
-#ifdef __LONG_DOUBLE_IEEE128__
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
+#ifdef __LONG_DOUBLE_128__
+#ifdef __strong_reference
 __strong_reference(__sprintf_chk, __sprintf_chkieee128);
 #endif
 #endif

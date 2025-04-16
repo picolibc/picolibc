@@ -63,7 +63,7 @@ QUICKREF
 #include <string.h>
 #include <stdint.h>
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 
 /* Small and efficient memmem implementation (quadratic worst-case).  */
 void *
@@ -130,7 +130,8 @@ memmem (const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
 
   if (ne_len == 2)
     {
-      uint32_t nw = (uint32_t) ne[0] << 16 | ne[1], hw = (uint32_t) hs[0] << 16 | hs[1];
+      uint32_t nw = ((uint32_t)ne[0] << 16) | ne[1],
+			   hw = ((uint32_t)hs[0] << 16) | hs[1];
       for (hs++; hs <= end && hw != nw; )
 	hw = hw << 16 | *++hs;
       return hw == nw ? (void *)(hs - 1) : NULL;

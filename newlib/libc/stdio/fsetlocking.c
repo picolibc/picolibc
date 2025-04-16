@@ -69,7 +69,7 @@ __fsetlocking (FILE * fp,
        int type)
 {
   int result;
-  CHECK_INIT(_REENT, fp);
+  CHECK_INIT();
   result = (fp->_flags2 & __SNLK) ? FSETLOCKING_BYCALLER : FSETLOCKING_INTERNAL;
   switch (type)
     {

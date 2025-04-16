@@ -25,18 +25,14 @@
 #include <sys/lock.h>
 #include "local.h"
 
-void (*__stdio_exit_handler) (void);
-
 __FILE __sf[3];
 
 struct _glue __sglue = {NULL, 3, &__sf[0]};
 
-#ifdef _REENT_THREAD_LOCAL
-NEWLIB_THREAD_LOCAL __FILE *_tls_stdin = &__sf[0];
-NEWLIB_THREAD_LOCAL __FILE *_tls_stdout = &__sf[1];
-NEWLIB_THREAD_LOCAL __FILE *_tls_stderr = &__sf[2];
-NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
-#endif
+__FILE *stdin = &__sf[0];
+__FILE *stdout = &__sf[1];
+__FILE *stderr = &__sf[2];
+void (*_stdio_cleanup)(void);
 
 #ifdef _STDIO_BSD_SEMANTICS
   /* BSD and Glibc systems only flush streams which have been written to
@@ -53,8 +49,8 @@ NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
 #endif
 #endif
 
-#if (defined (__OPTIMIZE_SIZE__) || defined (PREFER_SIZE_OVER_SPEED))
-__noinline_static void
+#if (defined (__OPTIMIZE_SIZE__) || defined (__PREFER_SIZE_OVER_SPEED))
+__noinline static void
 #else
 static void
 #endif
@@ -82,15 +78,9 @@ std (FILE *ptr,
   ptr->_flags |= __SL64;
 #endif /* __LARGE64_FILES */
   ptr->_seek = __sseek;
-#ifdef _STDIO_CLOSE_PER_REENT_STD_STREAMS
   ptr->_close = __sclose;
-#else /* _STDIO_CLOSE_STD_STREAMS */
-  ptr->_close = NULL;
-#endif /* _STDIO_CLOSE_STD_STREAMS */
-#ifndef __SINGLE_THREAD__
   if (ptr == &__sf[0] || ptr == &__sf[1] || ptr == &__sf[2])
     __lock_init_recursive (ptr->_lock);
-#endif
 #ifdef __SCLE
   if (__stextmode (ptr->_file))
     ptr->_flags |= __SCLE;
@@ -112,7 +102,7 @@ stdout_init(FILE *ptr)
      we will default to line buffered mode here.  Technically, POSIX
      requires both stdin and stdout to be line-buffered, but tradition
      leaves stdin alone on systems without fcntl.  */
-#ifdef _HAVE_FCNTL
+#ifdef __HAVE_FCNTL
   std (ptr, __SWR, 1);
 #else
   std (ptr, __SWR | __SLBF, 1);
@@ -154,23 +144,6 @@ sfmoreglue (int n)
   return &g->glue;
 }
 
-static void
-stdio_exit_handler (void)
-{
-  (void) _fwalk_sglue (CLEANUP_FILE, &__sglue);
-}
-
-static void
-global_stdio_init (void)
-{
-  if (__stdio_exit_handler == NULL) {
-    __stdio_exit_handler = stdio_exit_handler;
-    stdin_init (&__sf[0]);
-    stdout_init (&__sf[1]);
-    stderr_init (&__sf[2]);
-  }
-}
-
 /*
  * Find a free FILE for fopen et al.
  */
@@ -182,8 +155,8 @@ __sfp (void)
   int n;
   struct _glue *g;
 
+  CHECK_INIT();
   _newlib_sfp_lock_start ();
-  global_stdio_init ();
 
   for (g = &__sglue;; g = g->_next)
     {
@@ -195,16 +168,14 @@ __sfp (void)
 	break;
     }
   _newlib_sfp_lock_exit ();
-  _REENT_ERRNO(d) = ENOMEM;
+  errno = ENOMEM;
   return NULL;
 
 found:
   fp->_file = -1;		/* no file */
   fp->_flags = 1;		/* reserve this slot; caller sets real flags */
   fp->_flags2 = 0;
-#ifndef __SINGLE_THREAD__
   __lock_init_recursive (fp->_lock);
-#endif
   _newlib_sfp_lock_end ();
 
   fp->_p = NULL;		/* no current pointer */
@@ -234,12 +205,13 @@ found:
 static void
 cleanup_stdio (void)
 {
-  if (_REENT_STDIN(ptr) != &__sf[0])
-    CLEANUP_FILE (_REENT_STDIN(ptr));
-  if (_REENT_STDOUT(ptr) != &__sf[1])
-    CLEANUP_FILE (_REENT_STDOUT(ptr));
-  if (_REENT_STDERR(ptr) != &__sf[2])
-    CLEANUP_FILE (_REENT_STDERR(ptr));
+  if (stdin != &__sf[0])
+    CLEANUP_FILE (stdin);
+  if (stdout != &__sf[1])
+    CLEANUP_FILE (stdout);
+  if (stderr != &__sf[2])
+    CLEANUP_FILE (stderr);
+  (void) _fwalk_sglue (CLEANUP_FILE, &__sglue);
 }
 
 /*
@@ -251,15 +223,17 @@ __sinit (void)
 {
   __sfp_lock_acquire ();
 
-  if (_REENT_CLEANUP(s))
+  if (_stdio_cleanup)
     {
       __sfp_lock_release ();
       return;
     }
 
   /* make sure we clean up on exit */
-  _REENT_CLEANUP(s) = cleanup_stdio;	/* conservative */
+  _stdio_cleanup = cleanup_stdio;	/* conservative */
 
-  global_stdio_init ();
+  stdin_init (&__sf[0]);
+  stdout_init (&__sf[1]);
+  stderr_init (&__sf[2]);
   __sfp_lock_release ();
 }

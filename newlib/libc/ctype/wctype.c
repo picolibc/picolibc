@@ -123,6 +123,6 @@ wctype (const char *c)
     }
 
   /* otherwise invalid */
-  _REENT_ERRNO(r) = EINVAL;
+  errno = EINVAL;
   return 0;
 }

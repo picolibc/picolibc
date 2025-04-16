@@ -80,7 +80,7 @@ nextafterl(long double x, long double y)
 	return x;
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(nextafterl, nexttowardl);
 #else
 long double

@@ -48,7 +48,7 @@ wcswidth (const wchar_t *pwcs,
   do {
     uint32_t wi = (uint32_t) *pwcs;
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   /* First half of a surrogate pair? */
   if (sizeof (wchar_t) == 2 && wi >= (uint32_t) 0xd800 && wi <= (uint32_t) 0xdbff)
     {
@@ -60,7 +60,7 @@ wcswidth (const wchar_t *pwcs,
       /* Compute actual unicode value to use in call to __wcwidth. */
       wi = (((wi & 0x3ff) << 10) | (wi2 & 0x3ff)) + 0x10000;
     }
-#endif /* _MB_CAPABLE */
+#endif /* __MB_CAPABLE */
     if ((w = __wcwidth (wi)) < 0)
       return -1;
     len += w;

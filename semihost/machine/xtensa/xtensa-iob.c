@@ -42,7 +42,7 @@ xtensa_putc(char c, FILE *file)
     _simcall(SYS_write, 1, (intptr_t) &c, 1);
 }
 
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
 
 static int
 xtensa_getc(FILE *file)

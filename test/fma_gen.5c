@@ -465,7 +465,7 @@ void main()
 
 	printf("#if __FLT_EVAL_METHOD__ == 0 && FLT_MANT_DIG == 24\n");
 	printf("#define HAVE_FLOAT_FMA_VEC\n");
-	printf("static const struct fmaf_vec fmaf_vec[] = {\n");
+	printf("TEST_CONST struct fmaf_vec fmaf_vec[] = {\n");
 	generate("f", ieee_32, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -473,7 +473,7 @@ void main()
 
 	printf("#if __FLT_EVAL_METHOD__ == 2 && FLT_MANT_DIG == 24 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
 	printf("#define HAVE_FLOAT_FMA_VEC\n");
-	printf("static const struct fmaf_vec fmaf_vec[] = {\n");
+	printf("TEST_CONST struct fmaf_vec fmaf_vec[] = {\n");
 	generate("f", ieee_32, intel_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -481,7 +481,7 @@ void main()
 
 	printf("#if __FLT_EVAL_METHOD__ == 2 && FLT_MANT_DIG == 24 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
 	printf("#define HAVE_FLOAT_FMA_VEC\n");
-	printf("static const struct fmaf_vec fmaf_vec[] = {\n");
+	printf("TEST_CONST struct fmaf_vec fmaf_vec[] = {\n");
 	generate("f", ieee_32, moto_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -489,7 +489,7 @@ void main()
 
 	printf("#if __FLT_EVAL_METHOD__ <= 1 && DBL_MANT_DIG == 53\n");
 	printf("#define HAVE_DOUBLE_FMA_VEC\n");
-	printf("static const struct fma_vec fma_vec[] = {\n");
+	printf("TEST_CONST struct fma_vec fma_vec[] = {\n");
 	generate("", ieee_64, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -497,7 +497,7 @@ void main()
 
 	printf("#if __FLT_EVAL_METHOD__ == 2 && DBL_MANT_DIG == 53 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
 	printf("#define HAVE_DOUBLE_FMA_VEC\n");
-	printf("static const struct fma_vec fma_vec[] = {\n");
+	printf("TEST_CONST struct fma_vec fma_vec[] = {\n");
 	generate("", ieee_64, intel_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -505,7 +505,7 @@ void main()
 
 	printf("#if __FLT_EVAL_METHOD__ == 2 && DBL_MANT_DIG == 53 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
 	printf("#define HAVE_DOUBLE_FMA_VEC\n");
-	printf("static const struct fma_vec fma_vec[] = {\n");
+	printf("TEST_CONST struct fma_vec fma_vec[] = {\n");
 	generate("", ieee_64, moto_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -513,7 +513,7 @@ void main()
 
 	printf("#if LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
 	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
-	printf("static const struct fmal_vec fmal_vec[] = {\n");
+	printf("TEST_CONST struct fmal_vec fmal_vec[] = {\n");
 	generate("l", intel_80, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -521,7 +521,7 @@ void main()
 
 	printf("#if LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
 	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
-	printf("static const struct fmal_vec fmal_vec[] = {\n");
+	printf("TEST_CONST struct fmal_vec fmal_vec[] = {\n");
 	generate("l", moto_80, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -529,7 +529,7 @@ void main()
 
 	printf("#if LDBL_MANT_DIG == 113\n");
 	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
-	printf("static const struct fmal_vec fmal_vec[] = {\n");
+	printf("TEST_CONST struct fmal_vec fmal_vec[] = {\n");
 	generate("l", ieee_128, none_format);
 	printf("};\n");
 	printf("#endif\n");

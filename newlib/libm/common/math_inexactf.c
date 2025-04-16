@@ -35,7 +35,7 @@
 
 #include "math_config.h"
 
-#if FE_INEXACT && !defined(PICOLIBC_FLOAT_NOEXECPT)
+#if FE_INEXACT && !defined(__FLOAT_NOEXCEPT)
 
 static CONST_FORCE_FLOAT VAL = pick_float_except(FLT_MIN, 0.0f);
 

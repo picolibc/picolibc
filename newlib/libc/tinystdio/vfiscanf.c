@@ -30,19 +30,7 @@
 
 */
 
-#include "stdio_private.h"
-
-#define SCANF_LEVEL SCANF_STD
-#ifndef _FORMAT_DEFAULT_INTEGER
-#define vfscanf __i_vfscanf
-#endif
+#define SCANF_VARIANT __IO_VARIANT_INTEGER
+#define SCANF_NAME __i_vfscanf
 
 #include "vfscanf.c"
-
-#ifdef _FORMAT_DEFAULT_INTEGER
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-__strong_reference(vfscanf, __i_vfscanf);
-#else
-int __i_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
-#endif
-#endif

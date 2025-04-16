@@ -4,9 +4,7 @@
 
 #include <sys/types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 /*
  * Per POSIX
@@ -20,8 +18,6 @@ struct iovec {
 ssize_t readv(int, const struct iovec *, int);
 ssize_t writev(int, const struct iovec *, int);
 
-#ifdef __cplusplus
-};
-#endif
+_END_STD_C
 
 #endif

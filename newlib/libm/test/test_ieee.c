@@ -17,7 +17,7 @@
 
 #include "test.h"
 
-#ifdef _HAVE_IEEEFP_FUNCS
+#ifdef __IEEEFP_FUNCS
 #include <ieeefp.h>
 
 
@@ -192,7 +192,7 @@ test_round (void)
 void
 test_ieee (void)
 {
-#ifdef _HAVE_IEEEFP_FUNCS
+#ifdef __IEEEFP_FUNCS
   fp_rnd old = fpgetround();
   test_getround();
   test_getmask();

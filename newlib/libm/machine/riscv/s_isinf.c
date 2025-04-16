@@ -33,19 +33,35 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <math.h>
+#define _ADD_D_TO_DOUBLE_FUNCS
+#define isinfd isinf
+
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
 #undef isinf
 
 int
-isinf (double x)
+isinf64(__float64 x)
 {
 	long fclass = _fclass_d (x);
 	return (fclass & FCLASS_INF);
 }
+
+#ifdef __strong_reference
+__strong_reference(isinf64, __isinf64);
+#else
+int
+__isinf64(float x)
+{
+    return isinf64(x);
+}
+#endif
+
+_MATH_ALIAS_i_d(isinf)
+_MATH_ALIAS_i_d(__isinf)
+
 #else
 #include "../../common/s_isinf.c"
 #endif

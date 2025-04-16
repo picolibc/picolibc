@@ -403,7 +403,7 @@ QUICKREF
 #include "string_private.h"
 #include "local.h"
 
-extern char *_user_strerror (int, int, int *) _ATTRIBUTE((__weak__));
+extern char *_user_strerror (int, int, int *) __weak;
 
 char *
 _strerror_r (
@@ -902,7 +902,7 @@ _strerror_r (
 #endif
     default:
       if (!errptr)
-        errptr = &_REENT_ERRNO(ptr);
+        errptr = &errno;
       if (&_user_strerror == NULL || (error = _user_strerror (errnum, internal, errptr)) == 0)
         error = "";
       break;

@@ -36,7 +36,9 @@
 #include <stdlib.h>
 #include <semihost.h>
 
+#ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME	"SEMICLOS.TXT"
+#endif
 
 int
 main(void)

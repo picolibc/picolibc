@@ -40,8 +40,10 @@ scalbln64 (__float64 x, long int n)
             if (n< -50000) return __math_uflow(hx < 0); /*underflow*/
 	    }
         if (k==0x7ff) return x+x;		/* NaN or Inf */
+        if (n > 50000)
+            return __math_oflow(hx<0);          /* overflow  */
         k = k+n;
-        if (n> 50000 || k >  0x7fe)
+        if (k > 0x7fe)
             return __math_oflow(hx<0);          /* overflow  */
         if (k > 0) 				/* normal result */
 	    {SET_HIGH_WORD(x,(hx&0x800fffff)|(k<<20)); return x;}

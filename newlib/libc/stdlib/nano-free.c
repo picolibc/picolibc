@@ -47,7 +47,7 @@ free (void * free_p)
 
     p_to_free = ptr_to_chunk(free_p);
 
-#ifdef _NANO_MALLOC_CLEAR_FREED
+#ifdef __NANO_MALLOC_CLEAR_FREED
     memset(p_to_free, 0, chunk_usable(p_to_free));
 #else
     p_to_free->next = NULL;
@@ -110,7 +110,7 @@ unlock:
     MALLOC_UNLOCK;
 }
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

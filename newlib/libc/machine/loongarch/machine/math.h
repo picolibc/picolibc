@@ -38,7 +38,7 @@
 
 #ifndef __loongarch_soft_float
 
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
 #include <errno.h>
 #endif
 
@@ -62,7 +62,7 @@
 #if __loongarch_frlen >= 64
 
 /* anything with a 64-bit FPU has FMA */
-#define _HAVE_FAST_FMA 1
+#define __HAVE_FAST_FMA 1
 
 #define _fclass_d(_x) (__extension__(                                   \
                                {                                        \
@@ -78,7 +78,7 @@
 #if __loongarch_frlen >= 32
 
 /* anything with a 32-bit FPU has FMAF */
-#define _HAVE_FAST_FMAF 1
+#define __HAVE_FAST_FMAF 1
 
 #define _fclass_f(_x) (__extension__(                                   \
                                {                                        \
@@ -149,6 +149,20 @@ finite(double x)
 }
 
 __declare_extern_inline(int)
+__isinfd(double x)
+{
+	long fclass = _fclass_d (x);
+	return (fclass & _FCLASS_INF) != 0;
+}
+
+__declare_extern_inline(int)
+__isnand(double x)
+{
+	long fclass = _fclass_d (x);
+	return (fclass & _FCLASS_NAN) != 0;
+}
+
+__declare_extern_inline(int)
 __fpclassifyd (double x)
 {
   long fclass = _fclass_d (x);
@@ -169,7 +183,7 @@ __declare_extern_inline(double)
 sqrt (double x)
 {
 	double result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0))
             errno = EDOM;
 #endif
@@ -242,6 +256,20 @@ finitef(float x)
 }
 
 __declare_extern_inline(int)
+__isinff(float x)
+{
+	long fclass = _fclass_f (x);
+	return (fclass & _FCLASS_INF) != 0;
+}
+
+__declare_extern_inline(int)
+__isnanf(float x)
+{
+	long fclass = _fclass_f (x);
+	return (fclass & _FCLASS_NAN) != 0;
+}
+
+__declare_extern_inline(int)
 __fpclassifyf (float x)
 {
   long fclass = _fclass_f (x);
@@ -262,7 +290,7 @@ __declare_extern_inline(float)
 sqrtf (float x)
 {
 	float result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0f))
             errno = EDOM;
 #endif

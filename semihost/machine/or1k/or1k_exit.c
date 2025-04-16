@@ -40,7 +40,7 @@
 #define FINISHER_PASS   0x5555
 #define FINISHER_RESET  0x7777
 
-_Noreturn void
+__noreturn void
 _exit(int code)
 {
         uint32_t        val;

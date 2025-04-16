@@ -6,9 +6,9 @@
 
 #include "fdlibm.h"
 
-#if !_HAVE_FAST_FMAF
+#if !__HAVE_FAST_FMAF
 
-#if __FLT_EVAL_METHOD__ == 2 && defined(_HAVE_LONG_DOUBLE)
+#if __FLT_EVAL_METHOD__ == 2 && defined(__HAVE_LONG_DOUBLE)
 
 float
 fmaf(float x, float y, float z)

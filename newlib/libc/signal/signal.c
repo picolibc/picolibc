@@ -87,8 +87,6 @@ without an operating system that can actually raise exceptions.
 #include <unistd.h>
 #include <_syslist.h>
 
-#ifdef _PICOLIBC_ATOMIC_SIGNAL
-
 #if __SIZEOF_POINTER__ == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
 #define _USE_ATOMIC_SIGNAL
 #endif
@@ -99,8 +97,6 @@ without an operating system that can actually raise exceptions.
 
 #if __SIZEOF_POINTER__ == 8 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
 #define _USE_ATOMIC_SIGNAL
-#endif
-
 #endif
 
 #ifdef _USE_ATOMIC_SIGNAL

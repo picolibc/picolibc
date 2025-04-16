@@ -29,19 +29,15 @@
 #include <sys/param.h>
 #include <sys/types.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 typedef void (*xdr_vprintf_t) (const char *, va_list);
 
 xdr_vprintf_t xdr_set_vprintf (xdr_vprintf_t);
 
 void xdr_vwarnx (const char *, va_list)
-              _ATTRIBUTE ((__format__ (__printf__, 1, 0)));
+    __picolibc_format(__printf__, 1, 0);
 
 void xdr_warnx (const char *, ...)
-              _ATTRIBUTE ((__format__ (__printf__, 1, 2)));
+    __picolibc_format(__printf__, 1, 2);
 
 /* endian issues */
 #include <machine/endian.h>
@@ -60,10 +56,6 @@ __elidable_inline uint32_t xdr_ntohl (uint32_t x)
 #endif
 }
 #define xdr_htonl(x) xdr_ntohl(x)
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _XDR_PRIVATE_H */
 

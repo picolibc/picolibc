@@ -44,7 +44,7 @@ static __inline double _asin(double x)
 
   vx = spu_splats(x);
   res = spu_extract(_asind2(vx), 0);
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   /*
    * Domain error if not in the interval [-1, +1]
    */

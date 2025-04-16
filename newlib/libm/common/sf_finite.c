@@ -28,13 +28,9 @@ int finitef(float x)
 	return (FLT_UWORD_IS_FINITE(ix));
 }
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
+#ifdef __strong_reference
 __strong_reference(finitef, __finitef);
 #else
-
 int
 __finitef(float x)
 {

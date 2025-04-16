@@ -30,19 +30,7 @@
 
 */
 
-#include "stdio_private.h"
-
-#define SCANF_LEVEL SCANF_LLONG
-#ifndef _FORMAT_DEFAULT_LONG_LONG
-#define vfscanf __l_vfscanf
-#endif
+#define SCANF_VARIANT __IO_VARIANT_LLONG
+#define SCANF_NAME __l_vfscanf
 
 #include "vfscanf.c"
-
-#ifdef _FORMAT_DEFAULT_LONG_LONG
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-__strong_reference(vfscanf, __l_vfscanf);
-#else
-int __l_vfscanf (FILE * stream, const char *fmt, va_list ap) { return vfscanf(stream, fmt, ap); }
-#endif
-#endif

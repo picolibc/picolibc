@@ -71,7 +71,7 @@ scalbnl(long double x, int n)
 
 #endif
 
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 __strong_reference(scalbnl, ldexpl);
 #else
 long double

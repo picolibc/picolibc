@@ -27,7 +27,7 @@ int ilogbf(float x)
 	    return FP_ILOGB0;	/* ilogb(0) = special case error */
         }
 	if(FLT_UWORD_IS_SUBNORMAL(hx)) {
-	    for (ix = -126,hx<<=8; hx>0; hx<<=1) ix -=1;
+	    for (ix = -126,hx = lsl(hx, 8); hx>0; hx = lsl(hx, 1)) ix -=1;
 	    return ix;
 	}
 #if FP_ILOGBNAN != INT_MAX

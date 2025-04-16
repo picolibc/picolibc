@@ -29,10 +29,9 @@
 #ifndef _MACHINE_FENV_H
 #define _MACHINE_FENV_H
 
+#include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 typedef unsigned long fenv_t;
 typedef unsigned long fexcept_t;
@@ -83,8 +82,6 @@ typedef unsigned long fexcept_t;
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif

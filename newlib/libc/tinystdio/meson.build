@@ -39,6 +39,7 @@ srcs_tinystdio = [
   'atold_engine.c',
   'bufio.c',
   'clearerr.c',
+  'compare_exchange.c',
   'dtox_engine.c',
   'ecvt.c',
   'ecvtf.c',
@@ -46,6 +47,7 @@ srcs_tinystdio = [
   'ecvtl.c',
   'ecvtl_r.c',
   'ecvt_r.c',
+  'exchange.c',
   'fclose.c',
   'fcvt.c',
   'fcvtf.c',
@@ -54,6 +56,7 @@ srcs_tinystdio = [
   'fcvtl_r.c',
   'fcvt_r.c',
   'fdevopen.c',
+  'fdopen.c',
   'feof.c',
   'ferror.c',
   'fflush.c',
@@ -68,13 +71,16 @@ srcs_tinystdio = [
   'filestrput.c',
   'filewstrget.c',
   'flockfile.c',
+  'flockfile_init.c',
   'fmemopen.c',
+  'fopen.c',
   'fprintf.c',
   'fputc.c',
   'fputs.c',
   'fputwc.c',
   'fputws.c',
   'fread.c',
+  'freopen.c',
   'fscanf.c',
   'fseek.c',
   'fseeko.c',
@@ -129,6 +135,7 @@ srcs_tinystdio = [
   'strtof.c',
   'strtof_l.c',
   'strtoimax.c',
+  'strtoimax_l.c',
   'strtol.c',
   'strtold.c',
   'strtold_l.c',
@@ -140,6 +147,7 @@ srcs_tinystdio = [
   'strtoull.c',
   'strtoull_l.c',
   'strtoumax.c',
+  'strtoumax_l.c',
   'swprintf.c',
   'swscanf.c',
   'tmpfile.c',
@@ -169,6 +177,24 @@ srcs_tinystdio = [
   'vswscanf.c',
   'vwprintf.c',
   'vwscanf.c',
+  'wcstod.c',
+  'wcstod_l.c',
+  'wcstof.c',
+  'wcstof_l.c',
+  'wcstoimax.c',
+  'wcstoimax_l.c',
+  'wcstol.c',
+  'wcstold.c',
+  'wcstold_l.c',
+  'wcstol_l.c',
+  'wcstoll.c',
+  'wcstoll_l.c',
+  'wcstoul.c',
+  'wcstoul_l.c',
+  'wcstoull.c',
+  'wcstoull_l.c',
+  'wcstoumax.c',
+  'wcstoumax_l.c',
   'wprintf.c',
   'wscanf.c',
   'sprintf_s.c',
@@ -202,27 +228,6 @@ if io_float_exact
   srcs_tinystdio += srcs_dtoa_ryu
 else
   srcs_tinystdio += srcs_dtoa_float
-endif
-
-# atomic support for ungetc
-srcs_tinystdio_atomic = [
-  'compare_exchange.c',
-  'exchange.c',
-]
-
-if atomic_ungetc
-  srcs_tinystdio += srcs_tinystdio_atomic
-endif
-
-# code using POSIX APIs
-srcs_tinystdio_posix = [
-  'fdopen.c',
-  'fopen.c',
-  'freopen.c',
-]
-
-if posix_io
-  srcs_tinystdio += srcs_tinystdio_posix
 endif
 
 # stdin/stdout/stderr using POSIX APIs

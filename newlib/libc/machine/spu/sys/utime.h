@@ -2,9 +2,9 @@
 #ifndef _SYS_UTIME_H
 #define _SYS_UTIME_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 /*
  * Per POSIX
@@ -17,8 +17,6 @@ struct utimbuf
 
 int utime(const char *, const struct utimbuf *);
 
-#ifdef __cplusplus
-};
-#endif
+_END_STD_C
 
 #endif

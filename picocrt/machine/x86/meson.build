@@ -32,4 +32,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-src_picocrt += files('crt0.S')
+src_picocrt += files('crt0.S', 'traps.c', 'traps.S')

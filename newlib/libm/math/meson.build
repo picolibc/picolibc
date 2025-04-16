@@ -118,15 +118,8 @@ srcs_math = [
     'sf_tgamma.c',
     'sr_lgamma.c',
     'srf_lgamma.c',
-]
-
-l_srcs_math = [
     'sl_hypot.c',
-  ]
-
-if have_long_double
-  srcs_math += l_srcs_math
-endif
+]
 
 srcs_math_use = []
 foreach file : srcs_math

@@ -33,4 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure or1k-elf -Dtests=true -Dtests-enable-posix-io=false "$@"
+exec "$(dirname "$0")"/do-configure or1k-unknown-elf -Dtests=true -Dtests-enable-posix-io=false "$@"

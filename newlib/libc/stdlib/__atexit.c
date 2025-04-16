@@ -40,17 +40,15 @@
 
 /* Make this a weak reference to avoid pulling in malloc.  */
 #ifndef MALLOC_PROVIDED
-void * malloc(size_t) _ATTRIBUTE((__weak__));
+void * malloc(size_t) __weak;
 #endif
 
-#ifdef _LITE_EXIT
 /* As __call_exitprocs is weak reference in lite exit, make a
    non-weak reference to it here.  */
 const void * __atexit_dummy = &__call_exitprocs;
-#endif
 
-NEWLIB_THREAD_LOCAL_ATEXIT struct _atexit _atexit0;
-NEWLIB_THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
+__THREAD_LOCAL_ATEXIT struct _atexit _atexit0;
+__THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
 
 /*
  * Register a function to be performed at exit or on shared library unload.

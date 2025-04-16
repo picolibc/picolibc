@@ -63,7 +63,7 @@ fclose (
   if (fp == NULL)
     return (0);			/* on NULL */
 
-  CHECK_INIT (rptr, fp);
+  CHECK_INIT();
 
   /* We can't use the _newlib_flockfile_XXX macros here due to the
      interlocked locking with the sfp_lock. */
@@ -104,9 +104,7 @@ fclose (
   fp->_flags = 0;		/* release this FILE for reuse */
   if (!(fp->_flags2 & __SNLK))
     _funlockfile (fp);
-#ifndef __SINGLE_THREAD__
   __lock_close_recursive (fp->_lock);
-#endif
 
   __sfp_lock_release ();
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT

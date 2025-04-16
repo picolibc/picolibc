@@ -63,10 +63,8 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 #include <stddef.h>
 
-#ifndef _REENT_ONLY
 long long
 atoll (const char *str)
 {
 	return strtoll(str, (char **)NULL, 10);
 }
-#endif /* !_REENT_ONLY */

@@ -67,7 +67,7 @@ int
 puts (
        const char * s)
 {
-#ifdef _FVWRITE_IN_STREAMIO
+#ifdef __FVWRITE_IN_STREAMIO
   int result;
   size_t c = strlen (s);
   struct __suio uio;
@@ -82,9 +82,8 @@ puts (
   uio.uio_iov = &iov[0];
   uio.uio_iovcnt = 2;
 
-  _REENT_SMALL_CHECK_INIT (ptr);
-  fp = _stdout_r (ptr);
-  CHECK_INIT (ptr, fp);
+  fp = stdout;
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
   if (ORIENT (fp, -1) != -1)
     result = EOF;
@@ -96,10 +95,9 @@ puts (
   int result = EOF;
   const char *p = s;
   FILE *fp;
-  _REENT_SMALL_CHECK_INIT (ptr);
 
-  fp = _stdout_r (ptr);
-  CHECK_INIT (ptr, fp);
+  fp = stdout;
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
   /* Make sure we can write.  */
   if (cantwrite (ptr, fp))

@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 long int
@@ -51,6 +51,9 @@ lrintf (float x)
        "\t%0, %1" : "=r"(result) : "f"(x));
   return result;
 }
+
+_MATH_ALIAS_j_f(lrint)
+
 #else
 #include "../../common/sf_lrint.c"
 #endif

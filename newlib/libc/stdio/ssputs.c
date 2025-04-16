@@ -62,7 +62,7 @@ __ssputs (
 	return 0;
 
 err:
-	_REENT_ERRNO(ptr) = ENOMEM;
+	errno = ENOMEM;
 	fp->_flags |= __SERR;
 	return EOF;
 }

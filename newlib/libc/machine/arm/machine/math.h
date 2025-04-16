@@ -39,16 +39,16 @@
 #define _MACHINE_MATH_H_
 
 # if (__ARM_FEATURE_FMA && (__ARM_FP & 8))
-#define _HAVE_FAST_FMA  1
+#define __HAVE_FAST_FMA  1
 #endif
 
 #if (__ARM_FEATURE_FMA && (__ARM_FP & 4))
-#define _HAVE_FAST_FMAF 1
+#define __HAVE_FAST_FMAF 1
 #endif
 
 #ifdef __declare_extern_inline
 
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
 #include <errno.h>
 #endif
 
@@ -62,7 +62,7 @@ __declare_extern_inline(double)
 sqrt(double x)
 {
 	double result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0))
             errno = EDOM;
 #endif
@@ -140,7 +140,7 @@ trunc (double x)
 }
 #endif /* __ARM_ARCH >= 8 */
 
-#if _HAVE_FAST_FMA
+#if __HAVE_FAST_FMA
 
 __declare_extern_inline(double)
 fma (double x, double y, double z)
@@ -163,7 +163,7 @@ __declare_extern_inline(float)
 sqrtf(float x)
 {
 	float result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0f))
             errno = EDOM;
 #endif
@@ -241,7 +241,7 @@ truncf (float x)
 }
 #endif /* __ARM_ARCH >= 8 */
 
-#if _HAVE_FAST_FMAF
+#if __HAVE_FAST_FMAF
 
 __declare_extern_inline(float)
 fmaf (float x, float y, float z)

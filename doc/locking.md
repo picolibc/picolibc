@@ -1,11 +1,9 @@
 # Locking in Picolibc
 
-When newlib-multithread and newlib-retargetable-locking are enabled,
-Picolibc uses the following locking API. Picolibc provides stubs for
-all of these functions that do not actually perform any locking, so
-that a single-threaded application can still use a Picolibc compiled
-with locking enabled. An application needing locking must provide a
-real implementation of the locking API.
+Picolibc uses locking and atomics to protect global state between
+re-entrant calls. The amount of global state protected by locks has
+been minimized so that applications can avoid needing them for
+most common operations.
 
 ## Where Picolibc uses locking
 
@@ -15,39 +13,45 @@ data. That includes:
  * malloc family
  * onexit/atexit
  * arc4random
+ * getenv/setenv
  * functions using timezones (localtime, et al)
- * legacy stdio struct reent globals
+ * legacy stdio globals
 
 Tinystdio (the default stdio) uses per-file locks for the buffered
 POSIX file backend, but it doesn't require any locks for the bulk of
-the implementation. It uses atomic exchanges to handle the one
-reentrancy issue related to ungetc/getc.
+the implementation. You can enable POSIX-compliant locking in
+tinystdio with -Dstdio-locking-true. That will prevent I/O from stdio
+operations from interleaving between threads.
 
 The legacy stdio implementation is full of locking, and has per-file
 locks for every operation.
 
+## Where Picolibc uses atomics
+
+Picolibc also uses atomics to protect other data structures while
+avoiding the need for locking:
+
+ * getc/ungetc in tinystdio
+ * signal handling
+
 ## Configuration options controlling locking
 
-There are two configuration options related to locking:
+There is only one configuration option related to locking:
 
- * newlib-retargetable-locking. When 'true', locking operations are
-   enabled and performed by the retargetable locking API described below.
+ * single-thread. When 'true', all locking operations are elided from
+   the library. Re-entrant usage of the library will result in
+   undefined behavior.
 
- * newlib-multithread. When 'true', the library is built with
-   multithreading support enabled and uses the locking operations.
-
-Picolibc inherits these options from newlib, and they're so
-interrelated as to make them effectively co-dependent, so users must
-set them to the same value.
+Atomics will still be used as defined above, so disabling locking
+will still allow safe re-entrancy for those parts of the library.
 
 ## Retargetable locking API
 
-When newlib-multithread and newlib-retargetable-locking are enabled
-enabled, Picolibc uses the following interface. Picolibc provides
-stubs for all of these functions that do not perform locking, so a
-single threaded application can still use a library compiled to enable
-locking. An application needing locking would provide a real
-implementation of the API.
+When -Dsingle-thread is not selected, Picolibc uses the following
+interface. Picolibc provides stubs for all of these functions that do
+not perform locking, so a single threaded application can still use a
+library compiled to enable locking. An application needing locking
+would provide a real implementation of the API.
 
 This API requires recursive mutexes; if the underlying implementation
 only provides non-recursive mutexes, a suitable wrapper implementing
@@ -56,6 +60,11 @@ involving recursive mutexes contain `recursive` in their names.
 
 In this section, *the locking implementation* refers to the external
 implementation of this API.
+
+When implementing this API every function and variable must be
+defined. If not, the application will fail to link as the default
+implementation will be used to satisfy any missing symbol and other
+symbols will collide with the application versions.
 
 ### `struct __lock; typedef struct __lock *_LOCK_T;`
 

@@ -30,20 +30,7 @@
 
 */
 
-#include "stdio_private.h"
-
-#define PRINTF_LEVEL PRINTF_FLT
-#define PICOLIBC_FLOAT_PRINTF_SCANF
-#ifndef _FORMAT_DEFAULT_FLOAT
-#define vfprintf __f_vfprintf
-#endif
+#define PRINTF_VARIANT __IO_VARIANT_FLOAT
+#define PRINTF_NAME __f_vfprintf
 
 #include "vfprintf.c"
-
-#ifdef _FORMAT_DEFAULT_FLOAT
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-__strong_reference(vfprintf, __f_vfprintf);
-#else
-int __f_vfprintf (FILE * stream, const char *fmt, va_list ap) { return vfprintf(stream, fmt, ap); }
-#endif
-#endif

@@ -49,7 +49,7 @@ extern char __tls_base[];
 extern char __tdata_end[];
 extern char __tls_end[];
 
-#ifdef __PICOLIBC_CRT_RUNTIME_SIZE
+#ifdef __PICOCRT_RUNTIME_SIZE
 #define __data_size (__data_end - __data_start)
 #define __bss_size (__bss_end - __bss_start)
 #endif
@@ -65,7 +65,7 @@ _start(void);
 int
 main(int, char **);
 
-#ifdef _HAVE_INITFINI_ARRAY
+#ifdef __INIT_FINI_ARRAY
 extern void __libc_init_array(void);
 #endif
 
@@ -80,7 +80,7 @@ extern void __libc_init_array(void);
 
 #include <picotls.h>
 #include <stdio.h>
-#ifdef _HAVE_ARM_SEMIHOST
+#ifdef __ARM_SEMIHOST
 #include <semihost.h>
 #endif
 
@@ -88,19 +88,23 @@ extern void __libc_init_array(void);
 #define CONSTRUCTORS 1
 #endif
 
-static _Noreturn __always_inline void
+static __noreturn __always_inline void
 __start(void)
 {
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
-#ifdef PICOLIBC_TLS
+#ifdef POST_MEMORY_SETUP
+        POST_MEMORY_SETUP();
+#endif
+
+#ifdef __THREAD_LOCAL_STORAGE
 	_set_tls(__tls_base);
 #endif
-#if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
+#if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
 	__libc_init_array();
 #endif
 
-#if defined(CRT0_SEMIHOST) && defined(_HAVE_ARM_SEMIHOST)
+#if defined(CRT0_SEMIHOST) && defined(__ARM_SEMIHOST)
 #define CMDLINE_LEN     1024
 #define ARGV_LEN        64
         static char cmdline[CMDLINE_LEN];

@@ -35,7 +35,7 @@ _swsetup (
 {
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (_REENT, fp);
+  CHECK_INIT();
 
   /*
    * If we are not writing, we had better be reading and writing.
@@ -45,7 +45,7 @@ _swsetup (
     {
       if ((fp->_flags & __SRW) == 0)
         {
-	  _REENT_ERRNO(ptr) = EBADF;
+	  errno = EBADF;
 	  fp->_flags |= __SERR;
 	  return EOF;
         }

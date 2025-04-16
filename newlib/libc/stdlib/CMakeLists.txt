@@ -79,7 +79,6 @@ picolibc_sources(
   mbtowc.c
   mbtowc_r.c
   mrand48.c
-  mstats.c
   nrand48.c
   putenv.c
   rand48.c
@@ -100,22 +99,17 @@ picolibc_sources(
   wcrtomb.c
   wcsnrtombs.c
   wcsrtombs.c
-  wcstod.c
-  wcstoimax.c
-  wcstol.c
-  wcstoll.c
   wcstombs.c
-  wcstoul.c
-  wcstoull.c
-  wcstoumax.c
   wctob.c
   wctomb.c
   wctomb_r.c
   pico-atexit.c
   pico-exit.c
+  pico-exitprocs.c
   pico-onexit.c
   pico-cxa-atexit.c
   set_constraint_handler_s.c
+  ignore_handler_s.c
   )
 
 picolibc_sources_flags("-fno-builtin-malloc;-fno-builtin-free"

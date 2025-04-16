@@ -18,14 +18,15 @@ set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
 set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
-set(_HAVE_PICOLIBC_TLS_API TRUE)
+set(__THREAD_LOCAL_STORAGE_API TRUE)
+
+set(TEST_RUNNER run-arm)
 
 set(PICOLIBC_LINK_FLAGS
   --ld-path=/usr/bin/arm-none-eabi-ld
+  -L/usr/lib/gcc/arm-none-eabi/14.2.1/thumb/v7-m/nofp/
   -L/usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v7-m/nofp/
   -L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v7-m/nofp/
-  -L/usr/lib/gcc/arm-none-eabi/12.3.1/thumb/v7-m/nofp/
-  -L/usr/lib/gcc/arm-none-eabi/12.2.1/thumb/v7-m/nofp/
   -Wl,-z,noexecstack
   -Wl,-no-enum-size-warning
   -T ${CMAKE_CURRENT_SOURCE_DIR}/cmake/TC-arm-none-eabi.ld

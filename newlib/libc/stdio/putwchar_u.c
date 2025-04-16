@@ -38,6 +38,5 @@
 wint_t
 putwchar_unlocked (wchar_t wc)
 {
-  _REENT_SMALL_CHECK_INIT (_REENT);
   return fputwc_unlocked (wc, stdout);
 }

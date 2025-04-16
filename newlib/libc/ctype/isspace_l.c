@@ -13,7 +13,7 @@ isspace_l (int c, locale_t locale)
 #if _PICOLIBC_CTYPE_SMALL
     return isspace(c);
 #else
-    return __CTYPE_PTR_L (locale)[c+1] & _S;
+    return __CTYPE_PTR_L (locale)[c+1] & __CTYPE_SPACE;
 #endif
 }
 

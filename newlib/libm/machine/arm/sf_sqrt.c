@@ -32,7 +32,7 @@ float
 sqrtf(float x)
 {
 	float result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0f))
             errno = EDOM;
 #endif

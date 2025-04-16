@@ -126,7 +126,7 @@ static __inline double _sqrt(double in)
 
   dg = spu_sel(spu_andc(spu_or(dg, neg), denorm), x, nochange);
 
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   dom_chkd_less_than(spu_splats(in), vc);
 #endif
   return (spu_extract(dg, 0));

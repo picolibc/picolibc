@@ -18,10 +18,10 @@
 */
 
 #ifndef __PICOLIBC__
-# define _WANT_IO_C99_FORMATS
-# define _WANT_IO_LONG_LONG
-# define _WANT_IO_POS_ARGS
-#elif defined(TINY_STDIO)
+# define __IO_C99_FORMATS
+# define __IO_LONG_LONG
+# define __IO_POS_ARGS
+#elif defined(__TINY_STDIO)
 # ifdef _HAS_IO_PERCENT_B
 #  define BINARY_FORMAT
 # endif
@@ -50,28 +50,32 @@
 # ifndef _HAS_IO_MBCHAR
 #  define NO_MBCHAR
 # endif
-# ifdef PICOLIBC_MINIMAL_PRINTF_SCANF
+# if _PICOLIBC_PRINTF == 'm'
 #  define NO_WIDTH_PREC
 #  define NO_CASE_HEX
 # endif
 #else
-# ifndef _MB_CAPABLE
+# ifndef __MB_CAPABLE
 #  define NO_WCHAR
 #  define NO_MBCHAR
 # endif
 # if __SIZEOF_DOUBLE__ == 4
 #  define LOW_FLOAT
 # endif
-# ifdef NO_FLOATING_POINT
+# ifdef __IO_NO_FLOATING_POINT
 #  define NO_FLOAT
 # endif
-# ifndef _WANT_IO_LONG_LONG
+# ifndef __IO_LONG_LONG
 #  define NO_LONGLONG
 # endif
-# ifndef _WANT_IO_POS_ARGS
+# ifndef __IO_POS_ARGS
 #  define NO_POS_ARGS
 # endif
 # define NORMALIZED_A
+#endif
+
+#if defined(__RX__) && !defined(__TINY_STDIO)
+#define NO_DENORM
 #endif
 
 #ifndef FLOAT
@@ -172,7 +176,7 @@
     result |= test(__LINE__, "12.0 Hot Pockets", "%1$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1);
     result |= test(__LINE__, " 12.0 Hot Pockets", "%1$*5$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1, 5);
     result |= test(__LINE__, " 12.0 Hot Pockets 5", "%1$5.*4$f %2$s %3$ss %5$d", printf_float(12.0), "Hot", "Pocket", 1, 5);
-#if !defined(TINY_STDIO) || defined(_IO_FLOAT_EXACT)
+#if !defined(__TINY_STDIO) || defined(__IO_FLOAT_EXACT)
     result |= test(__LINE__,
                    "   12345  1234    11145401322     321.765400   3.217654e+02   5    test-string",
                    "%1$*5$d %2$*6$hi %3$*7$lo %4$*8$f %9$*12$e %10$*13$g %11$*14$s",
@@ -182,7 +186,7 @@
 #endif
 #endif
     /* 58: anti-test */
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
     result |= test(__LINE__, "%(foo", "%(foo");
 #endif
 #ifndef NO_WIDTH_PREC
@@ -191,9 +195,9 @@
 #ifndef NO_FLOAT
     result |= test(__LINE__, "      3.14", "%*.*f", 10, 2, printf_float(3.14159265));
     result |= test(__LINE__, "3.14      ", "%-*.*f", 10, 2, printf_float(3.14159265));
-# if !(defined(TINY_STDIO) && !defined(_IO_FLOAT_EXACT))
+# if !(defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT))
 #  ifndef LOW_FLOAT
-#   ifdef TINY_STDIO
+#   ifdef __TINY_STDIO
 #    define SQRT2_60 "1414213562373095000000000000000000000000000000000000000000000.000"
 #   else
 #    define SQRT2_60 "1414213562373095053224405813183213153460812619236586568024064.000"
@@ -211,7 +215,7 @@
     result |= test(__LINE__, "$", "%c", 36);
     result |= test(__LINE__, "10", "%d", 10);
 
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
     result |= test(__LINE__, I("1000000","16960"), "%'d", 1000000);
 #endif
     /* 72: anti-test */
@@ -233,13 +237,13 @@
 #ifndef NO_LONGLONG
 #ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "    +100", "%+8lld", 100LL);
-#if defined(TINY_STDIO) || !defined(__PICOLIBC__)
+#if defined(__TINY_STDIO) || !defined(__PICOLIBC__)
     result |= test(__LINE__, "    +100", "%+8Ld", 100LL);
 #endif
     result |= test(__LINE__, "+00000100", "%+.8lld", 100LL);
     result |= test(__LINE__, " +00000100", "%+10.8lld", 100LL);
 #endif
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
     result |= test(__LINE__, "%_1lld", "%_1lld", 100LL);
 #endif
 #ifndef NO_WIDTH_PREC
@@ -300,7 +304,7 @@
     result |= test(__LINE__, "foo  ", "%*s", -5, "foo");
 #endif
     result |= test(__LINE__, "hello", "hello");
-#if defined(TINY_STDIO) && !defined(_HAS_IO_PERCENT_B)
+#if defined(__TINY_STDIO) && !defined(_HAS_IO_PERCENT_B)
     result |= test(__LINE__, "%b", "%b");
 #endif
 #ifndef NO_WIDTH_PREC
@@ -328,23 +332,23 @@
     result |= test(__LINE__, "12", "%o", 10);
     /* 166: excluded for C */
     /* 167: excluded for C */
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
     result |= test(__LINE__, "(null)", "%s", NULL);
 #endif
     result |= test(__LINE__, "%%%%", "%s", "%%%%");
     result |= test(__LINE__, I("4294967295", "65535"), "%u", -1);
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
     result |= test(__LINE__, "%w", "%w", -1);
 #endif
     /* 172: excluded for C */
     /* 173: excluded for C */
     /* 174: excluded for C */
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
     result |= test(__LINE__, "%H", "%H", -1);
 #endif
     result |= test(__LINE__, "%0", "%%0");
     result |= test(__LINE__, "2345", "%hx", 74565);
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
     result |= test(__LINE__, "61", "%hhx", 0x61);
     result |= test(__LINE__, "61", "%hhx", 0x161);
     result |= test(__LINE__, "97", "%hhd", 0x61);
@@ -616,12 +620,14 @@
     result |= test(__LINE__, "hi x", "%*sx", -3, "hi");
 #endif
 #ifndef NO_FLOAT
+#ifndef NO_DENORM
     result |= test(__LINE__, "1.000e-38", "%.3e", printf_float(1e-38));
 #ifndef LOW_FLOAT
     result |= test(__LINE__, "1.000e-308", "%.3e", printf_float(1e-308));
 #endif
 #endif
-#ifndef _NANO_FORMATTED_IO
+#endif
+#ifndef __NANO_FORMATTED_IO
 #ifndef NO_LONGLONG
     result |= test(__LINE__, "1, 1", "%-*.llu, %-*.llu",1,1ULL,1,1ULL);
 #endif
@@ -665,13 +671,13 @@
     result |= test(__LINE__,      "0.1", "%.*f",  1, printf_float(0.123));
     result |= test(__LINE__, "0.123000", "%.*f", -1, printf_float(0.123));
 #endif
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 {
     char c[64];
-#ifndef _WANT_IO_LONG_LONG
+#ifndef __IO_LONG_LONG
     if (sizeof (intmax_t) <= sizeof(long))
 #endif
-#ifndef _NANO_FORMATTED_IO
+#ifndef __NANO_FORMATTED_IO
 #ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "  42", "%4jd", (intmax_t)42L);
 #endif
@@ -714,7 +720,7 @@
     result |= test(__LINE__, "-INF", "%A", printf_float(-(FLOAT) INFINITY));
 
 #ifndef NO_LONGDOUBLE
-#if __LDBL_MANT_DIG__ == 64 && (!defined(__PICOLIBC__) || defined(TINY_STDIO))
+#if __LDBL_MANT_DIG__ == 64 && (!defined(__PICOLIBC__) || defined(__TINY_STDIO))
     /*
      * x86 and m68k 80-bit format fill the top
      * hex digit so they generate a different result than
@@ -777,6 +783,7 @@
     result |= test(__LINE__, "INF", "%LA", (long double) INFINITY);
     result |= test(__LINE__, "-INF", "%LA", (long double) -INFINITY);
 #endif
+#ifndef NO_DENORM
 #ifdef LOW_FLOAT
 #ifdef NORMALIZED_A
     result |= test(__LINE__, "0x1p-149", "%a", printf_float(0x1p-149));
@@ -803,6 +810,7 @@
     result |= test(__LINE__, "0X1.23456789ABCDEP-1022", "%A", printf_float(0x1.23456789abcdep-1022));
     result |= test(__LINE__, "0X1.23456789ABCDFP-1022", "%A", printf_float(0x1.23456789abcdfp-1022));
     result |= test(__LINE__, "0X1.D749096BB98C800P+8", "%.15A", printf_float(0x1.D749096BB98C8p+8));
+#endif
 #endif
 #endif
     /* test %ls for wchar_t string */

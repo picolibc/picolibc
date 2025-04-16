@@ -12,9 +12,14 @@
 uintptr_t __stack_chk_guard = 0x00000aff; /* 0, 0, '\n', 255  */
 
 #else
-uintptr_t __stack_chk_guard = 0;
 
-int     getentropy (void *, size_t) _ATTRIBUTE((__weak__));
+#ifdef __THREAD_LOCAL_STORAGE_STACK_GUARD
+#include "machine/_ssp_tls.h"
+#else
+uintptr_t __stack_chk_guard = 0;
+#endif
+
+int     getentropy (void *, size_t) __weak;
 
 void __stack_chk_init (void) __attribute__((__constructor__));
 
@@ -40,16 +45,16 @@ __stack_chk_init (void)
 }
 #endif
 
-_Noreturn void __stack_chk_fail (void);
+__noreturn void __stack_chk_fail (void);
 
 #define STACK_CHK_MSG "*** stack smashing detected ***: terminated"
 
 __typeof(__stack_chk_fail) __stack_chk_fail_weak;
 
-_Noreturn void
+__noreturn void
 __stack_chk_fail_weak (void)
 {
-#ifdef TINY_STDIO
+#ifdef __TINY_STDIO
   puts(STACK_CHK_MSG);
 #else
   static const char msg[] = STACK_CHK_MSG "\n";

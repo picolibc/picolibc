@@ -24,19 +24,11 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
    detect if FILE is private to sprintf/sscanf class of functions; if
    set then do nothing as lock is not initialised. */
 #if !defined(_flockfile)
-#ifndef __SINGLE_THREAD__
-#  define _flockfile(fp) (((fp)->_flags & __SSTR) ? 0 : __lock_acquire_recursive((fp)->_lock))
-#else
-#  define _flockfile(fp)	((void) 0)
-#endif
+# define _flockfile(fp) (((fp)->_flags & __SSTR) ? 0 : __lock_acquire_recursive((fp)->_lock))
 #endif
 
 #if !defined(_funlockfile)
-#ifndef __SINGLE_THREAD__
-#  define _funlockfile(fp) (((fp)->_flags & __SSTR) ? 0 : __lock_release_recursive((fp)->_lock))
-#else
-#  define _funlockfile(fp)	((void) 0)
-#endif
+# define _funlockfile(fp) (((fp)->_flags & __SSTR) ? 0 : __lock_release_recursive((fp)->_lock))
 #endif
 
 #endif /* _NEWLIB_STDIO_H */

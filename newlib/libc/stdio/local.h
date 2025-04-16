@@ -32,16 +32,6 @@
 #endif
 #include "fvwrite.h"
 
-/* The following define determines if the per-reent stdin, stdout and stderr
-   streams are closed during _reclaim_reent().  The stdin, stdout and stderr
-   streams are initialized to use file descriptors 0, 1 and 2 respectively.  In
-   case _STDIO_CLOSE_PER_REENT_STD_STREAMS is defined these file descriptors
-   will be closed via close() provided the owner of the reent structure
-   triggerd the on demand reent initilization, see CHECK_INIT(). */
-#if !defined(__tirtos__)
-#define _STDIO_CLOSE_PER_REENT_STD_STREAMS
-#endif
-
 /* The following macros are supposed to replace calls to _flockfile/_funlockfile
    and __sfp_lock_acquire/__sfp_lock_release.  In case of multi-threaded
    environments using pthreads, it's not sufficient to lock the stdio functions
@@ -55,12 +45,11 @@
    section before reaching the end of the critical section's code end, use
    the appropriate _newlib_XXX_exit macro. */
 
-#if !defined (__SINGLE_THREAD__) && defined (_POSIX_THREADS) \
-    && !defined (__rtems__)
+#if !defined (__SINGLE_THREAD) && defined (_POSIX_THREADS)
 #define _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
 #endif
 
-#if defined(__SINGLE_THREAD__) || defined(__IMPL_UNLOCKED__)
+#if defined(__SINGLE_THREAD) || defined(__IMPL_UNLOCKED__)
 
 # define _newlib_flockfile_start(_fp)
 # define _newlib_flockfile_exit(_fp)
@@ -111,7 +100,7 @@
 	  pthread_setcancelstate (__oldsfpcancel, &__oldsfpcancel); \
 	}
 
-#else /* !__SINGLE_THREAD__ && !__IMPL_UNLOCKED__ && !_STDIO_WITH_THREAD_CANCELLATION_SUPPORT */
+#else
 
 # define _newlib_flockfile_start(_fp) \
 	{ \
@@ -138,7 +127,7 @@
 		__sfp_lock_release (); \
 	}
 
-#endif /* __SINGLE_THREAD__ || __IMPL_UNLOCKED__ */
+#endif
 
 extern wint_t __fgetwc (FILE *);
 extern wint_t __fputwc (wchar_t, FILE *);
@@ -151,15 +140,15 @@ extern int    _svfwscanf (FILE *, const wchar_t *,va_list);
 extern int    _ssvfwscanf (FILE *, const wchar_t *,va_list);
 extern int    _svfiwscanf (FILE *, const wchar_t *,va_list);
 extern int    _ssvfiwscanf (FILE *, const wchar_t *,va_list);
-int	      svfprintf ( FILE *, const char *, 
+int	      svfprintf ( FILE *, const char *,
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	      svfiprintf ( FILE *, const char *, 
+                    __picolibc_format(__printf__, 2, 0);
+int	      svfiprintf ( FILE *, const char *,
 				  va_list)
-               			_ATTRIBUTE ((__format__ (__printf__, 2, 0)));
-int	      svfwprintf ( FILE *, const wchar_t *, 
+                    __picolibc_format(__printf__, 2, 0);
+int	      svfwprintf ( FILE *, const wchar_t *,
 				  va_list);
-int	      svfiwprintf ( FILE *, const wchar_t *, 
+int	      svfiwprintf ( FILE *, const wchar_t *,
 				  va_list);
 extern FILE  *__sfp (void);
 extern int    __sflags (const char*, int*);
@@ -201,25 +190,14 @@ extern ssize_t __swrite64 (void *,
 						  size_t);
 #endif
 
-extern NEWLIB_THREAD_LOCAL void (*_tls_cleanup)(void);
-#define _REENT_CLEANUP(_ptr) (_tls_cleanup)
-extern NEWLIB_THREAD_LOCAL struct _Bigint **_tls_mp_freelist;
-#define _REENT_MP_FREELIST(_ptr) (_tls_mp_freelist)
-extern NEWLIB_THREAD_LOCAL struct _Bigint *_tls_mp_p5s;
-#define _REENT_MP_P5S(_ptr) (_tls_mp_p5s)
-extern NEWLIB_THREAD_LOCAL struct _Bigint *_tls_mp_result;
-#define _REENT_MP_RESULT(_ptr) (_tls_mp_result)
-extern NEWLIB_THREAD_LOCAL int _tls_mp_result_k;
-#define _REENT_MP_RESULT_K(_ptr) (_tls_mp_result_k)
-
-void _reclaim_reent (void *);
+extern void (*_stdio_cleanup)(void);
 
 /* Called by the main entry point fns to ensure stdio has been initialized.  */
 
-#define CHECK_INIT(ptr, fp) \
+#define CHECK_INIT() \
   do								\
     {								\
-      if (!_tls_cleanup)			                \
+      if (!_stdio_cleanup)			                \
 	__sinit ();				                \
     }								\
   while (0)
@@ -247,7 +225,7 @@ void _reclaim_reent (void *);
 #define	FREELB(ptr, fp) { free((char *)(fp)->_lb._base);	\
       (fp)->_lb._base = NULL; }
 
-#ifdef _WIDE_ORIENT
+#ifdef __WIDE_ORIENT
 /*
  * Set the orientation for a stream. If o > 0, the stream has wide-
  * orientation. If o < 0, the stream has byte-orientation.
@@ -322,17 +300,10 @@ char *_llicvt (char *, long long, char);
 
 #define	NDYNAMIC 4	/* add four more whenever necessary */
 
-#ifdef __SINGLE_THREAD__
-#define __sfp_lock_acquire()
-#define __sfp_lock_release()
-#define __sinit_lock_acquire()
-#define __sinit_lock_release()
-#else
 #define __sfp_lock_acquire() __LIBC_LOCK()
 #define __sfp_lock_release() __LIBC_UNLOCK()
 #define __sinit_lock_acquire() __LIBC_LOCK()
 #define __sinit_lock_release() __LIBC_UNLOCK()
-#endif
 
 /* Types used in positional argument support in vfprinf/vfwprintf.
    The implementation is char/wchar_t dependent but the class and state
@@ -381,3 +352,18 @@ typedef enum __packed {
 extern const __CH_CLASS __chclass[256];
 extern const __STATE __state_table[MAX_STATE][MAX_CH_CLASS];
 extern const __ACTION __action_table[MAX_STATE][MAX_CH_CLASS];
+
+#if defined(__NANO_FORMATTED_IO) && defined(__strong_reference)
+#define __nano_reference(a,b) __strong_reference(a,b)
+#else
+#define __nano_reference(a,b)
+#endif
+
+#if defined(__LONG_DOUBLE_128__) && defined(__strong_reference)
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+#define __ieee128_reference(a,b) __strong_reference(a,b)
+#else
+#define __ieee128_reference(a,b)
+#endif

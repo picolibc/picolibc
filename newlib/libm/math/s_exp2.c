@@ -54,7 +54,7 @@ PORTABILITY
 
 extern __float64 _pow64(__float64, __float64);
 
-__float64 __inhibit_new_builtin_calls
+__float64 __no_builtin
 exp264(__float64 x) /* wrapper exp2 */
 {
     return _pow64(2.0, x);

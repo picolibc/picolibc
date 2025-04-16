@@ -74,7 +74,7 @@ No supporting OS subroutines are required.
 void
 clearerr (FILE * fp)
 {
-  CHECK_INIT(_REENT, fp);
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
   __sclearerr (fp);
   _newlib_flockfile_end (fp);

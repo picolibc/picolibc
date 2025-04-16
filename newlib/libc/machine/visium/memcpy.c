@@ -425,7 +425,7 @@ do {				\
 
 
 static inline void
-__inhibit_loop_to_libcall
+__no_builtin
 __int_memcpy (void *__restrict s1, const void *__restrict s2, size_t n) 
 {
   int value = n;
@@ -566,7 +566,7 @@ __int_memcpy (void *__restrict s1, const void *__restrict s2, size_t n)
 }
 
 static inline void
-__inhibit_loop_to_libcall
+__no_builtin
 __shrt_int_memcpy (void *__restrict s1, const void *__restrict s2, size_t n) 
 {
   int value = n;
@@ -708,7 +708,7 @@ __shrt_int_memcpy (void *__restrict s1, const void *__restrict s2, size_t n)
 
 
 static inline void
-__inhibit_loop_to_libcall
+__no_builtin
 __byte_memcpy (void *__restrict s1, const void *__restrict s2, size_t n) 
 {
   int value = n;
@@ -852,7 +852,7 @@ __byte_memcpy (void *__restrict s1, const void *__restrict s2, size_t n)
 /* Exposed interface.  */
 
 void *
-__inhibit_loop_to_libcall
+__no_builtin
 memcpy (void *__restrict s1, const void *__restrict s2, size_t n)
 {
   void *result = s1;

@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.53',
-	version: '1.8.9'
+	version: '1.8.10'
        )
 
 fs = import('fs')
@@ -130,28 +130,13 @@ Unsupported architecture: "@0@"
   error(message.format(host_cpu_family))
 endif
 
-# Find out about float types
-
-long_double_code = '''
-#include <float.h>
-#ifndef __LDBL_MANT_DIG__
-#error No long double support in float.h
-#endif
-long double test(void)
-{
-	long double ld = 0.0L;
-	return ld;
-}
-'''
-
-have_long_double = cc.compiles(long_double_code, name : 'long double check', args: core_c_args)
-
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 multilib_exclude = get_option('multilib-exclude')
 enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
+picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
@@ -165,9 +150,6 @@ enable_native_math_tests = enable_native_tests and get_option('native-math-tests
 tests_enable_stack_protector = get_option('tests-enable-stack-protector')
 tests_enable_full_malloc_stress = get_option('tests-enable-full-malloc-stress')
 tests_enable_posix_io = get_option('tests-enable-posix-io')
-have_alias_attribute_option = get_option('have-alias-attribute')
-have_format_attribute_option = get_option('have-format-attribute')
-have_weak_attribute_option = get_option('have-weak-attribute')
 
 # C++ is only used in tests, so only check for it when tests are enabled
 if enable_tests
@@ -182,7 +164,6 @@ endif
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 newlib_nano_malloc = get_option('newlib-nano-malloc')
 nano_malloc_clear_freed = get_option('nano-malloc-clear-freed')
-lite_exit = get_option('lite-exit')
 
 newlib_elix_level = get_option('newlib-elix-level')
 c_args = core_c_args
@@ -211,27 +192,33 @@ c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsigna
 				      '-Wno-unsupported-floating-point-opt',
 				      '-fno-builtin-copysignl'])
 
-c_sanitize_bounds_flags = cc.get_supported_arguments(['-fsanitize=bounds'])
-c_sanitize_trap_flags = cc.get_supported_arguments(['-fsanitize-undefined-trap-on-error'])
-c_sanitize_no_trap_flags = cc.get_supported_arguments(['-fno-sanitize-undefined-trap-on-error', '-static-libubsan'])
-have_ubsan = c_sanitize_bounds_flags != []
 c_args += c_flags
 native_c_args = native_common_args + c_flags
 
-sanitize_bounds = get_option('sanitize-bounds')
+sanitize_flag = get_option('b_sanitize')
+if sanitize_flag == 'none'
+  sanitize_flag = ''
+endif
+
+if get_option('sanitize-bounds')
+  sanitize_flag = ','.join(sanitize_flag, 'bounds')
+endif
 sanitize_trap_on_error = get_option('sanitize-trap-on-error')
 
-if sanitize_bounds
-  if not have_ubsan
-    error('sanitize-bounds option selected but -fsanitize=bounds is not supported')
+if sanitize_flag == ''
+  c_sanitize_flags = []
+else
+  c_sanitize_flags = cc.get_supported_arguments('-fsanitize=' + sanitize_flag)
+  if c_sanitize_flags == [] and not get_option('sanitize-allow-missing')
+    error('not supported: -fsanitize=' + sanitize_flag)
   endif
-  c_args += c_sanitize_bounds_flags
-  native_c_args += c_sanitize_bounds_flags
+
   if sanitize_trap_on_error
-    c_args += c_sanitize_trap_flags
-  else
-    c_args += c_sanitize_no_trap_flags
+    c_sanitize_flags += cc.get_supported_arguments(['-fsanitize-undefined-trap-on-error'])
   endif
+
+  c_args += c_sanitize_flags
+  native_c_args += c_sanitize_flags
 endif
 
 if cc.symbols_have_underscore_prefix()
@@ -241,7 +228,7 @@ else
 endif
 fast_strcmp = get_option('fast-strcmp')
 
-mb_capable = get_option('mb-capable') or get_option('newlib-mb')
+mb_capable = get_option('mb-capable')
 mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
 if get_option('mb-ucs-charsets') == 'auto'
   mb_ucs_charsets = mb_extended_charsets
@@ -289,22 +276,9 @@ picoexit = get_option('picoexit')
 
 # Shared stdio options
 io_long_long = get_option('io-long-long')
-newlib_io_long_long = get_option('newlib-io-long-long')
-if newlib_io_long_long != 'auto'
-  io_long_long = newlib_io_long_long == 'true'
-endif
-
 io_c99_formats = get_option('io-c99-formats')
-newlib_io_c99_formats = get_option('newlib-io-c99-formats')
-if newlib_io_c99_formats != 'auto'
-  io_c99_formats = newlib_io_c99_formats == 'true'
-endif
-
 io_pos_args = get_option('io-pos-args')
-newlib_io_pos_args = get_option('newlib-io-pos-args')
-if newlib_io_pos_args != 'auto'
-  io_pos_args = newlib_io_pos_args == 'true'
-endif
+io_long_double = get_option('io-long-double')
 
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
@@ -320,157 +294,60 @@ stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
 
 # tinystdio options
 posix_console = tinystdio and get_option('posix-console')
-posix_io = tinystdio and (get_option('posix-io') or posix_console)
 io_float_exact = not tinystdio or get_option('io-float-exact')
 atomic_ungetc = tinystdio and get_option('atomic-ungetc')
-atomic_signal = get_option('atomic-signal')
-format_default = get_option('format-default')
+_line = get_option('format-default')
+# Pick off just the leading character
+if meson.version().version_compare('>=0.56')
+  format_default = _line.substring(0, 1)
+else
+  format_default = run_command(['expr', 'substr', _line, '1', '1'], check : false).stdout().split('\n')[0]
+endif
+
 printf_aliases = get_option('printf-aliases')
 io_percent_b = tinystdio and get_option('io-percent-b')
-io_long_double = get_option('io-long-double') or get_option('newlib-io-long-double')
 printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
 printf_percent_n = tinystdio and get_option('printf-percent-n')
 minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
 fast_bufio = tinystdio and get_option('fast-bufio')
 io_wchar = tinystdio and get_option('io-wchar')
+stdio_locking = tinystdio and get_option('stdio-locking') and not get_option('single-thread')
 
+foreach format : ['d', 'f', 'l', 'i', 'm']
 
-if printf_aliases
-  double_printf_compile_args=['-DPICOLIBC_DOUBLE_PRINTF_SCANF']
-  float_printf_compile_args=['-DPICOLIBC_FLOAT_PRINTF_SCANF']
-  llong_printf_compile_args=['-DPICOLIBC_LONG_LONG_PRINTF_SCANF']
-  int_printf_compile_args=['-DPICOLIBC_INTEGER_PRINTF_SCANF']
-  min_printf_compile_args=['-DPICOLIBC_MINIMAL_PRINTF_SCANF']
-else
-  double_printf_compile_args=[]
-  float_printf_compile_args=[]
-  llong_printf_compile_args=[]
-  int_printf_compile_args=[]
-  min_printf_compile_args=[]
-endif
-double_printf_link_args=double_printf_compile_args
-float_printf_link_args=float_printf_compile_args
-llong_printf_link_args=llong_printf_compile_args
-int_printf_link_args=int_printf_compile_args
-min_printf_link_args=min_printf_compile_args
-
-if tinystdio and printf_aliases
-  vfprintf_symbol = global_prefix + 'vfprintf'
-  __d_vfprintf_symbol = global_prefix + '__d_vfprintf'
-  __f_vfprintf_symbol = global_prefix + '__f_vfprintf'
-  __l_vfprintf_symbol = global_prefix + '__l_vfprintf'
-  __i_vfprintf_symbol = global_prefix + '__i_vfprintf'
-  __m_vfprintf_symbol = global_prefix + '__m_vfprintf'
-  vfscanf_symbol = global_prefix + 'vfscanf'
-  __d_vfscanf_symbol = global_prefix + '__d_vfscanf'
-  __f_vfscanf_symbol = global_prefix + '__f_vfscanf'
-  __l_vfscanf_symbol = global_prefix + '__l_vfscanf'
-  __i_vfscanf_symbol = global_prefix + '__i_vfscanf'
-  __m_vfscanf_symbol = global_prefix + '__m_vfscanf'
-
-  if has_link_defsym
-    if format_default != 'double'
-      double_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __d_vfprintf_symbol
-      double_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __d_vfscanf_symbol
-    endif
-    if format_default != 'float'
-      float_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __f_vfprintf_symbol
-      float_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __f_vfscanf_symbol
-    endif
-    if format_default != 'long-long'
-      llong_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __l_vfprintf_symbol
-      llong_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __l_vfscanf_symbol
-    endif
-    if format_default != 'integer'
-      int_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __i_vfprintf_symbol
-      int_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __i_vfscanf_symbol
-    endif
-    if format_default != 'minimal'
-      min_printf_link_args += '-Wl,--defsym=' + vfprintf_symbol +  '=' + __m_vfprintf_symbol
-      min_printf_link_args += '-Wl,--defsym=' + vfscanf_symbol + '=' + __m_vfscanf_symbol
-    endif
-  elif has_link_alias
-    if format_default == 'double'
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __d_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __d_vfscanf_symbol
-    endif
-    if format_default == 'float'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __f_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __f_vfscanf_symbol
-    endif
-    if format_default == 'long-long'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __l_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __l_vfscanf_symbol
-    endif
-    if format_default == 'integer'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __i_vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __i_vfscanf_symbol
-    endif
-    if format_default == 'minimal'
-      double_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfprintf_symbol +  ',' + __m_vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + vfscanf_symbol + ',' + __m_vfscanf_symbol
-    endif
-    if format_default != 'double'
-      double_printf_link_args += '-Wl,-alias,' + __d_vfprintf_symbol +  ',' + vfprintf_symbol
-      double_printf_link_args += '-Wl,-alias,' + __d_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'float'
-      float_printf_link_args += '-Wl,-alias,' + __f_vfprintf_symbol +  ',' + vfprintf_symbol
-      float_printf_link_args += '-Wl,-alias,' + __f_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'long-long'
-      llong_printf_link_args += '-Wl,-alias,' + __l_vfprintf_symbol +  ',' + vfprintf_symbol
-      llong_printf_link_args += '-Wl,-alias,' + __l_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'integer'
-      int_printf_link_args += '-Wl,-alias,' + __i_vfprintf_symbol +  ',' + vfprintf_symbol
-      int_printf_link_args += '-Wl,-alias,' + __i_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
-    if format_default != 'minimal'
-      min_printf_link_args += '-Wl,-alias,' + __m_vfprintf_symbol +  ',' + vfprintf_symbol
-      min_printf_link_args += '-Wl,-alias,' + __m_vfscanf_symbol + ',' + vfscanf_symbol
-    endif
+  compile_variable = 'printf_compile_args_@0@'.format(format)
+  if tinystdio and printf_aliases
+    compile_value = ['-D_PICOLIBC_PRINTF=\'@0@\''.format(format),
+                     '-D_PICOLIBC_SCANF=\'@0@\''.format(format)]
   else
-    if enable_tests
-      # If the alias flag is not supported and we are building tests, emit an
-      # error here to avoid surprising test failures.
-      error('Symbol alias linker flag not supported - printf tests will fail!')
+    compile_value = []
+  endif
+  set_variable(compile_variable, compile_value)
+
+  link_variable = 'printf_link_args_@0@'.format(format)
+  link_value = compile_value
+  if tinystdio and printf_aliases
+    if format_default != format
+      if has_link_defsym
+        link_value += '-Wl,--defsym=@0@vfprintf=@0@__@1@_vfprintf'.format(global_prefix, format)
+        link_value += '-Wl,--defsym=@0@vfscanf=@0@__@1@_vfscanf'.format(global_prefix, format)
+      else
+        link_value += '-Wl,-alias,@0@__@1@_vfprintf,@0@vfprintf'.format(global_prefix, format)
+        link_value += '-Wl,-alias,@0@__@1@_vfscanf,@0@vfscanf'.format(global_prefix, format)
+      endif
     endif
   endif
+  set_variable(link_variable, link_value)
+
+endforeach
+
+if tinystdio and enable_tests and not (has_link_defsym or has_link_alias)
+  # If the alias flag is not supported and we are building tests, emit an
+  # error here to avoid surprising test failures.
+  error('Symbol alias linker flag not supported - printf tests will fail!')
 endif
 
 # A bunch of newlib-stdio only options
-newlib_global_stdio_streams = get_option('newlib-global-stdio-streams')
 newlib_fvwrite_in_streamio = get_option('newlib-fvwrite-in-streamio')
 newlib_fseek_optimization = get_option('newlib-fseek-optimization')
 newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
@@ -485,9 +362,6 @@ newlib_have_fcntl = get_option('newlib-have-fcntl')
 if tinystdio
   if newlib_io_float
     error('tinystdio uses a run-time mechanism to select floating point io (newlib-io-float)')
-  endif
-  if newlib_global_stdio_streams
-    error('tinystdio always has (reentrant) global stdio streams (newlib-global-stdio-streams)')
   endif
   if newlib_fvwrite_in_streamio
     error('tinystdio has no fvwrite support (newlib-fvwrite-in-streamio)')
@@ -516,28 +390,10 @@ if host_cpu_family == ''
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
 
-if have_alias_attribute_option == 'auto'
-  have_alias_attribute = cc.has_function_attribute('alias')
-else
-  have_alias_attribute = have_alias_attribute_option == 'true'
-endif
-
-if have_format_attribute_option == 'auto'
-  have_format_attribute = cc.has_function_attribute('format')
-else
-  have_format_attribute = have_format_attribute_option == 'true'
-endif
-
-if have_weak_attribute_option == 'auto'
-  have_weak_attribute = cc.has_function_attribute('weak')
-else
-  have_weak_attribute = have_weak_attribute_option == 'true'
-endif
-
 tls_model_spec = ''
 thread_local_storage = false
 thread_local_storage_option = get_option('thread-local-storage')
-have_picolibc_tls_api = fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
+have_picolibc_tls_api = enable_picolib and fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if thread_local_storage_option == 'auto' or have_picolibc_tls_api
@@ -548,6 +404,42 @@ else
 endif
 if thread_local_storage
   tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
+endif
+
+stack_guard_spec = ''
+stack_guard_option = get_option('stack-protector-guard')
+prefer_tls_stack_guard = false
+if stack_guard_option == 'tls'
+  prefer_tls_stack_guard = true
+else
+  if stack_guard_option == 'auto' and host_cpu_family == 'powerpc'
+    prefer_tls_stack_guard = true
+  endif
+endif
+have_tls_stack_guard = fs.is_file('newlib/libc/machine' / host_cpu_family / 'machine/_ssp_tls.h')
+if have_tls_stack_guard
+  c_stack_guard_tls_flags = cc.get_supported_arguments(['-mstack-protector-guard=tls'])
+  if c_stack_guard_tls_flags == []
+    have_tls_stack_guard = false
+  endif
+endif
+tls_stack_guard = prefer_tls_stack_guard and have_tls_stack_guard
+if tls_stack_guard
+  stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=tls}'
+  c_args += c_stack_guard_tls_flags
+else
+  if stack_guard_option == 'tls'
+    if not thread_local_storage
+      error('stack-protector-guard=tls option selected, but thread local storage disabled')
+    else
+      error('stack-protector-guard=tls option selected, but not supported for this CPU')
+    endif
+  endif
+  c_stack_guard_global_flags = cc.get_supported_arguments(['-mstack-protector-guard=global'])
+  if c_stack_guard_global_flags != []
+    stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=global}'
+    c_args += c_stack_guard_global_flags
+  endif
 endif
 
 if sysroot_install
@@ -640,18 +532,20 @@ if specs_extra_list != []
   specs_extra = '\n' + '\n'.join(specs_extra_list)
 endif
 
+# Handle old-style printf/scanf selection mechanism in the specs file
+
 specs_printf = ''
 if tinystdio and printf_aliases
-  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=' + __d_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=' + __d_vfscanf_symbol + '}' +
-                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=' + __f_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=' + __f_vfscanf_symbol + '}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfprintf=' + __l_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfscanf=' + __l_vfscanf_symbol + '}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=' + __i_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=' + __i_vfscanf_symbol + '}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=' + __m_vfprintf_symbol + '}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=' + __m_vfscanf_symbol + '}')
+  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=@0@__d_vfprintf}' +
+		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=@0@__d_vfscanf}' +
+                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=@0@__f_vfprintf}' +
+		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=@0@__f_vfscanf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfprintf=@0@__l_vfprintf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfscanf=@0@__l_vfscanf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=@0@__i_vfprintf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=@0@__i_vfscanf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=@0@__m_vfprintf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=@0@__m_vfscanf}').format(global_prefix)
 endif
 
 crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
@@ -787,6 +681,7 @@ specs_data.set('SPECS_ISYSTEM', specs_isystem)
 specs_data.set('SPECS_LIBPATH', specs_libpath)
 specs_data.set('SPECS_STARTFILE', specs_startfile)
 specs_data.set('TLSMODEL', tls_model_spec)
+specs_data.set('STACKGUARD', stack_guard_spec)
 specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
 specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
 specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
@@ -1246,6 +1141,19 @@ foreach params : [default_target] + targets
                                                         '8')))
     picolibc_linker_type_data.set('STACK', stack_symbol)
 
+    picolibc_linker_type_data.set('EXTRA_TEXT_SECTIONS',
+                                  meson.get_cross_property('extra_text_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_RODATA_SECTIONS',
+                                  meson.get_cross_property('extra_rodata_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_DATA_SECTIONS',
+                                  meson.get_cross_property('extra_data_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_SDATA_SECTIONS',
+                                  meson.get_cross_property('extra_sdata_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_BSS_SECTIONS',
+                                  meson.get_cross_property('extra_bss_sections', ''))
+    picolibc_linker_type_data.set('EXTRA_SBSS_SECTIONS',
+                                  meson.get_cross_property('extra_sbss_sections', ''))
+
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)
     picolibc_ld_data.set('CPP_START', '/*')
@@ -1307,39 +1215,76 @@ endforeach
 
 conf_data = configuration_data()
 
-# The supported builtins vary depending on compiler and target.
-# If you want to check for a given builtin, add an array
-#   ['some_builtin_name', '__call_to_builtin(1,2,3);']
-# The below loop will then add the define HAVE_SOME_BUILTIN_NAME if the code snippet
-#   > int main (void) { __call_to_builtin(1,2,3); return 0; }
-# can be compiled + linked.
-# The name should match the builtin, but technically it's not necessary
+has_builtin_code = '''
+int main(void) {
+#if __has_builtin(__builtin_object_size)
+return 0;
+#else
+return 1;
+#endif
+}
+'''
+
+have_has_builtin = cc.compiles(has_builtin_code,
+                               name : '__has_builtin builtin',
+                               args : werror_c_args)
+
+#
+# Some builtins cannot be detected with has_builtin as they are
+# keywords instead of functions
+#
 builtins = [
-  ['builtin_alloca', '__builtin_alloca(1)', 'void *'],
-  ['builtin_ffs', '__builtin_ffs(42)', 'int'],
-  ['builtin_ffsl', '__builtin_ffsl((long)42)', 'long'],
-  ['builtin_ffsll', '__builtin_ffsll((long long)42)', 'long long'],
-  ['builtin_ctz', '__builtin_ctz((unsigned int)42)', 'int'],
-  ['builtin_ctzl', '__builtin_ctzl((unsigned long)42)', 'int'],
-  ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42)', 'int'],
-  ['builtin_copysignl', '__builtin_copysignl((long double)42, (long double) 42)', 'long double'],
-  ['builtin_copysign', '__builtin_copysign(42, 42)', 'double'],
-  ['builtin_isinfl', '__builtin_isinfl((long double)42)', 'int'],
-  ['builtin_isinf', '__builtin_isinf((long double)42)', 'int'],
-  ['builtin_isnanl', '__builtin_isnanl((long double)42)', 'int'],
-  ['builtin_isnan', '__builtin_isnan((long double)42)', 'int'],
-  ['builtin_finitel', '__builtin_finitel((long double)42)', 'int'],
-  ['builtin_isfinite', '__builtin_isfinite((long double)42)', 'int'],
-  ['builtin_issignalingl', '__builtin_issignalingl((long double)42)', 'int'],
+    ['builtin_complex', '__builtin_complex(1.0, 2.0)', 'double _Complex'],
 ]
+
+if not have_has_builtin
+
+  # For compilers without __has_builtin, detect the available builtins
+  # at meson time. This list should match that in include/sys/config.h
+  #
+  # The supported builtins vary depending on compiler and target.
+  # If you want to check for a given builtin, add an array
+  #   ['some_builtin_name', '__call_to_builtin(1,2,3);']
+  # The below loop will then add the define HAVE_SOME_BUILTIN_NAME if the code snippet
+  #   > int main (void) { __call_to_builtin(1,2,3); return 0; }
+  # can be compiled + linked.
+
+  builtins += [
+    ['builtin_alloca', '__builtin_alloca(1)', 'void *'],
+    ['builtin_ffs', '__builtin_ffs(42)', 'int'],
+    ['builtin_ffsl', '__builtin_ffsl((long)42)', 'long'],
+    ['builtin_ffsll', '__builtin_ffsll((long long)42)', 'long long'],
+    ['builtin_ctz', '__builtin_ctz((unsigned int)42)', 'int'],
+    ['builtin_ctzl', '__builtin_ctzl((unsigned long)42)', 'int'],
+    ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42)', 'int'],
+    ['builtin_copysignl', '__builtin_copysignl((long double)42, (long double) 42)', 'long double'],
+    ['builtin_copysign', '__builtin_copysign(42, 42)', 'double'],
+    ['builtin_isinfl', '__builtin_isinfl((long double)42)', 'int'],
+    ['builtin_isinf', '__builtin_isinf((long double)42)', 'int'],
+    ['builtin_isnanl', '__builtin_isnanl((long double)42)', 'int'],
+    ['builtin_isnan', '__builtin_isnan((long double)42)', 'int'],
+    ['builtin_finitel', '__builtin_finitel((long double)42)', 'int'],
+    ['builtin_isfinite', '__builtin_isfinite((long double)42)', 'int'],
+    ['builtin_issignalingl', '__builtin_issignalingl((long double)42)', 'int'],
+    ['builtin_mul_overflow', '__builtin_mul_overflow(1, 2, &u)', 'int'],
+    ['builtin_add_overflow', '__builtin_add_overflow(1, 2, &u)', 'int'],
+    ['builtin_expect', '__builtin_expect(1 > 0)', 'int'],
+  ]
+endif
+
 foreach builtin : builtins
   builtin_template='''
 static int foo(@1@ i __attribute__((unused))) { return 0; }
+unsigned u;
 int main(void) { return foo(@0@); }
 '''
   builtin_code = builtin_template.format(builtin[1], builtin[2])
   have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
-  conf_data.set('_HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+  if have_current_builtin
+    conf_data.set10('__HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+  else
+    conf_data.set('__HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
+  endif
 endforeach
 
 NEWLIB_VERSION='4.3.0'
@@ -1347,115 +1292,90 @@ NEWLIB_MAJOR_VERSION=4
 NEWLIB_MINOR_VERSION=3
 NEWLIB_PATCHLEVEL_VERSION=0
 
-if get_option('newlib-retargetable-locking') != get_option('newlib-multithread')
-  error('newlib-retargetable-locking and newlib-multithread must be set to the same value')
-endif
-
-conf_data.set('_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
+conf_data.set('__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 	      cc.has_argument('-fno-tree-loop-distribute-patterns'),
 	      description: 'Compiler flag to prevent detecting memcpy/memset patterns')
 
-conf_data.set('_HAVE_NO_BUILTIN_ATTRIBUTE',
-	      cc.compiles('int __attribute__((no_builtin)) foo(int x) { return x + 1; }',
-			  name : 'no_builtin attribute',
-			  args : werror_c_args),
-	      description: 'Compiler attribute to prevent the optimizer from adding new builtin calls')
-
-conf_data.set('_HAVE_LONG_DOUBLE', have_long_double,
-	      description: 'Compiler has long double type')
-conf_data.set('_HAVE_ALIAS_ATTRIBUTE', have_alias_attribute)
-conf_data.set('_HAVE_FORMAT_ATTRIBUTE', have_format_attribute)
-conf_data.set('_HAVE_WEAK_ATTRIBUTE', have_weak_attribute)
-conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
-conf_data.set('_WANT_IO_LONG_LONG', io_long_long)
-conf_data.set('_WANT_MINIMAL_IO_LONG_LONG', minimal_io_long_long)
-conf_data.set('_WANT_FAST_BUFIO', fast_bufio)
-conf_data.set('_WANT_IO_POS_ARGS', io_pos_args)
-conf_data.set('_WANT_IO_C99_FORMATS', io_c99_formats)
-conf_data.set('_IO_FLOAT_EXACT', io_float_exact)
-conf_data.set('_WANT_IO_PERCENT_B', io_percent_b)
-conf_data.set('_WANT_IO_LONG_DOUBLE', io_long_double)
-conf_data.set('_WANT_IO_WCHAR', io_wchar)
-conf_data.set('_ASSERT_VERBOSE', get_option('assert-verbose'))
-
-if not tinystdio
-  conf_data.set('NO_FLOATING_POINT', not newlib_io_float)
-  conf_data.set('FLOATING_POINT', newlib_io_float)
-  conf_data.set('_WANT_REENT_GLOBAL_STDIO_STREAMS', newlib_global_stdio_streams)
-  conf_data.set('__LARGE64_FILES', newlib_stdio64)
-endif
-conf_data.set('_WANT_REENT_SMALL', get_option('newlib-reent-small'))
-conf_data.set('_MB_CAPABLE', mb_capable)
-conf_data.set('_MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
-conf_data.set('_MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
-conf_data.set('_MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
-conf_data.set('_MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
-conf_data.set('__SINGLE_THREAD__', get_option('newlib-multithread') == false)
-conf_data.set('_ELIX_LEVEL', newlib_elix_level)
-conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
-conf_data.set('_REENT_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
-conf_data.set('_FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
-conf_data.set('_FSEEK_OPTIMIZATION', newlib_fseek_optimization)
-conf_data.set('_WIDE_ORIENT', newlib_wide_orient)
-conf_data.set('_HAVE_FCNTL', newlib_have_fcntl)
-conf_data.set('_NANO_MALLOC', newlib_nano_malloc)
-conf_data.set('_NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
-conf_data.set('_UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
-conf_data.set('_LITE_EXIT', lite_exit)
-conf_data.set('_PICO_EXIT', picoexit)
-conf_data.set('_NANO_FORMATTED_IO', newlib_nano_formatted_io)
-conf_data.set('_RETARGETABLE_LOCKING', get_option('newlib-retargetable-locking'))
-conf_data.set('TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
-conf_data.set('_IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
-conf_data.set('_WANT_MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
-conf_data.set('PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
-conf_data.set('FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
-conf_data.set('NEWLIB_GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
-conf_data.set('_HAVE_INITFINI_ARRAY', get_option('newlib-initfini-array'), description: 'compiler supports INIT_ARRAY sections')
-conf_data.set('_HAVE_INIT_FINI', get_option('newlib-initfini'), description: 'Support _init() and _fini() functions')
-conf_data.set('NEWLIB_TLS', thread_local_storage, description: 'use thread local storage')
-conf_data.set('PICOLIBC_TLS', thread_local_storage, description: 'use thread local storage')
-conf_data.set('_HAVE_PICOLIBC_TLS_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
-conf_data.set('_HAVE_PICOLIBC_TLS_RP2040', get_option('tls-rp2040'),
+conf_data.set('__IO_LONG_LONG', io_long_long)
+conf_data.set('__IO_MINIMAL_LONG_LONG', minimal_io_long_long)
+conf_data.set('__FAST_BUFIO', fast_bufio)
+conf_data.set('__IO_POS_ARGS', io_pos_args)
+conf_data.set('__IO_C99_FORMATS', io_c99_formats)
+conf_data.set('__IO_FLOAT_EXACT', io_float_exact)
+conf_data.set('__IO_PERCENT_B', io_percent_b)
+conf_data.set('__IO_LONG_DOUBLE', io_long_double)
+conf_data.set('__IO_WCHAR', io_wchar)
+conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'), description: 'assert() is verbose by default')
+conf_data.set('__SINGLE_THREAD', get_option('single-thread'), description: 'Disable multi-thread support')
+conf_data.set('__HAVE_FCNTL', newlib_have_fcntl, description: 'System provides fcntl function')
+conf_data.set('__NANO_MALLOC', newlib_nano_malloc, description: 'Provide smaller malloc implementation')
+conf_data.set('__NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
+conf_data.set('__IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
+conf_data.set('__MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
+conf_data.set('__PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
+conf_data.set('__FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
+conf_data.set('__GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
+conf_data.set('__INIT_FINI_ARRAY', get_option('initfini-array'), description: 'Support INIT_ARRAY linker sections')
+conf_data.set('__INIT_FINI_FUNCS', get_option('initfini'), description: 'Support _init() and _fini() functions')
+conf_data.set('__THREAD_LOCAL_STORAGE', thread_local_storage, description: 'use thread local storage')
+conf_data.set('__THREAD_LOCAL_STORAGE_API', thread_local_storage and have_picolibc_tls_api, description: '_set_tls and _init_tls functions available')
+conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),
               description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
-conf_data.set('POSIX_IO', posix_io, description: 'Use open/close/read/write in tinystdio')
-conf_data.set('_PRINTF_SMALL_ULTOA', printf_small_ultoa, description: 'avoid software division in decimal conversion')
-conf_data.set('_PRINTF_PERCENT_N', printf_percent_n, description: 'support %n in printf format strings')
-conf_data.set('ATOMIC_UNGETC', atomic_ungetc, description: 'Use atomics for fgetc/ungetc for re-entrancy')
-conf_data.set('_PICOLIBC_ATOMIC_SIGNAL', atomic_signal, description: 'Use atomics for signal/raise for re-entrancy')
-conf_data.set('_HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
-conf_data.set('_HAVE_BUILTIN_MUL_OVERFLOW', have_builtin_mul_overflow, description: 'Compiler has __builtin_mul_overflow')
-conf_data.set('_HAVE_BUILTIN_ADD_OVERFLOW', have_builtin_add_overflow, description: 'Compiler has __builtin_add_overflow')
-conf_data.set('_HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
-conf_data.set('_HAVE_BUILTIN_COMPLEX', have_builtin_complex, description: 'Compiler has __builtin_complex')
-conf_data.set('_HAVE_BUILTIN_EXPECT', have_builtin_expect, description: 'Compiler has __builtin_expect')
-conf_data.set('_HAVE_ALLOC_SIZE', have_alloc_size, description: 'The compiler REALLY has the attribute __alloc_size__')
-conf_data.set('_HAVE_ATTRIBUTE_ALWAYS_INLINE',
-	      cc.has_function_attribute('always_inline'),
-	      description: 'The compiler supports the always_inline function attribute')
-conf_data.set('_HAVE_ATTRIBUTE_GNU_INLINE',
-	      cc.has_function_attribute('gnu_inline'),
-	      description: 'The compiler supports the gnu_inline function attribute')
-conf_data.set('__PICOLIBC_CRT_RUNTIME_SIZE',
-	      get_option('crt-runtime-size'),
-	      description: 'Compute static memory area sizes at runtime instead of link time')
-if tinystdio
-  conf_data.set('_FORMAT_DEFAULT_DOUBLE',
-                format_default == 'double',
-                description: 'The default printf functions is the double variant')
-  conf_data.set('_FORMAT_DEFAULT_FLOAT',
-                format_default == 'float',
-                description: 'The default printf functions is the float variant')
-  conf_data.set('_FORMAT_DEFAULT_LONG_LONG',
-                format_default == 'long-long',
-                description: 'The default printf functions is the long-long variant')
-  conf_data.set('_FORMAT_DEFAULT_INTEGER',
-                format_default == 'integer',
-                description: 'The default printf functions is the integer variant')
-  conf_data.set('_FORMAT_DEFAULT_MINIMAL',
-                format_default == 'minimal',
-                description: 'The default printf functions is the minimal variant')
+conf_data.set('__THREAD_LOCAL_STORAGE_STACK_GUARD', tls_stack_guard, description: 'use thread local storage for stack protection canary')
+conf_data.set('__HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
+conf_data.set('__HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
+
+conf_data.set('__MB_CAPABLE', mb_capable)
+if mb_capable
+  conf_data.set('__MB_EXTENDED_CHARSETS_UCS', mb_ucs_charsets)
+  conf_data.set('__MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
+  conf_data.set('__MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
+  conf_data.set('__MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
 endif
+
+conf_data.set('__PICO_EXIT', picoexit)
+if not picoexit
+  conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
+  conf_data.set('_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
+  conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
+endif
+
+conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
+if tinystdio
+  conf_data.set('__IO_DEFAULT', '\'@0@\''.format(format_default),
+                description: 'The default printf and scanf variants')
+  conf_data.set('__IO_SMALL_ULTOA',
+                printf_small_ultoa,
+                description: 'avoid software division in decimal conversion')
+  conf_data.set('__IO_PERCENT_N',
+                printf_percent_n,
+                description: 'support %n in printf format strings')
+  conf_data.set('__ATOMIC_UNGETC',
+                atomic_ungetc,
+                description: 'Use atomics for fgetc/ungetc for re-entrancy')
+  conf_data.set('__STDIO_LOCKING',
+                stdio_locking,
+                description: 'Perform POSIX-conforming file locking for all stdio operations')
+else
+  conf_data.set('__IO_NO_FLOATING_POINT', not newlib_io_float)
+  conf_data.set('__IO_FLOATING_POINT', newlib_io_float)
+  conf_data.set('__LARGE64_FILES', newlib_stdio64)
+  conf_data.set('__ELIX_LEVEL', newlib_elix_level)
+  conf_data.set('__FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
+  conf_data.set('__FSEEK_OPTIMIZATION', newlib_fseek_optimization)
+  conf_data.set('__WIDE_ORIENT', newlib_wide_orient)
+  conf_data.set('__UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
+  conf_data.set('__NANO_FORMATTED_IO', newlib_nano_formatted_io)
+endif
+
+if enable_picocrt
+  conf_data.set('__PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
+                description: 'Turn on mmu in picocrt startup code')
+  conf_data.set('__PICOCRT_RUNTIME_SIZE',
+	        get_option('crt-runtime-size'),
+	        description: 'Compute static memory area sizes at runtime instead of link time')
+endif
+
 errno_function=get_option('errno-function')
 if errno_function == 'auto'
   errno_function = 'false'
@@ -1483,11 +1403,6 @@ endif
 if errno_function != 'false'
   conf_data.set('__PICOLIBC_ERRNO_FUNCTION', errno_function)
 endif
-
-# Obsolete newlib options
-conf_data.set('_WANT_USE_LONG_TIME_T', get_option('newlib-long-time_t'), description: 'Obsoleted. Define time_t to long instead of using a 64-bit type')
-conf_data.set('REENTRANT_SYSCALLS_PROVIDED', get_option('newlib-reentrant-syscalls-provided'), description: 'Obsoleted. Reentrant syscalls provided for us')
-conf_data.set('MISSING_SYSCALL_NAMES', get_option('newlib-missing-syscall-names'), description: 'Obsoleted. Use regular syscalls')
 
 if newlib_obsolete_math == 'auto'
   obsolete_math_value = false
@@ -1537,13 +1452,8 @@ conf_data.set('__PICOLIBC__', version_array[0], description: 'The Picolibc major
 conf_data.set('__PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
 conf_data.set('__PICOLIBC_PATCHLEVEL__', picolibc_patch_level, description: 'The Picolibc patch level.')
 
-# Old version macros. These have just a single leading underscore,
-# which isn't consistent with the newlib macros; they were created
-# by mistake.
-conf_data.set('_PICOLIBC_VERSION', '"@0@"'.format(meson.project_version()), description: 'The Picolibc version in string format.')
-conf_data.set('_PICOLIBC__', version_array[0], description: 'The Picolibc major version number.')
-conf_data.set('_PICOLIBC_MINOR__', version_array[1], description: 'The Picolibc minor version number.')
-
+conf_data.set('__NEWLIB_VERSION__', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
+# The macro below is used in the LLVM's libcxx code base, so we define it for compatibility
 conf_data.set('_NEWLIB_VERSION', '"@0@"'.format(NEWLIB_VERSION), description: 'The newlib version in string format.')
 conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major version number.')
 conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
@@ -1592,7 +1502,7 @@ endif
 add_project_arguments(arguments, language: 'c')
 
 # libc will adjust this if supported
-has_ieeefp_funcs = false
+ieeefp_funcs = false
 
 # semihost will adjust these if supported
 
@@ -1611,12 +1521,9 @@ bios_bin = []
 if enable_semihost
   subdir('semihost')
 endif
-if tinystdio
-  subdir('dummyhost')
-endif
 
-conf_data.set('_HAVE_SEMIHOST', has_semihost, description: 'Semihost APIs supported')
-conf_data.set('_HAVE_ARM_SEMIHOST', has_arm_semihost, description: 'ARM Semihost APIs supported')
+conf_data.set('__SEMIHOST', has_semihost, description: 'Semihost APIs supported')
+conf_data.set('__ARM_SEMIHOST', has_arm_semihost, description: 'ARM Semihost APIs supported')
 
 # By default, tests don't require any special arguments
 
@@ -1634,7 +1541,7 @@ if not tests_enable_stack_protector
   test_c_args += cc.get_supported_arguments(['-fno-stack-protector'])
 endif
 
-if have_long_double and get_option('test-long-double')
+if get_option('test-long-double')
   test_c_args += ['-D_TEST_LONG_DOUBLE']
   native_c_args += ['-D_TEST_LONG_DOUBLE']
 endif
@@ -1698,9 +1605,6 @@ endif
 # make sure to include semihost BEFORE picocrt!
 if enable_picocrt
   subdir('picocrt')
-  picocrt_enable_mmu = get_option('picocrt-enable-mmu')
-  conf_data.set('_PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
-                description: 'Turn on mmu in picocrt startup code')
 endif
 subdir('newlib')
 
@@ -1708,7 +1612,7 @@ if enable_tests
   subdir('test')
 endif
 
-conf_data.set('_HAVE_IEEEFP_FUNCS', has_ieeefp_funcs, description: 'IEEE fp funcs available')
+conf_data.set('__IEEEFP_FUNCS', ieeefp_funcs, description: 'IEEE fp funcs available')
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,

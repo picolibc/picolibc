@@ -138,7 +138,7 @@ math_test_src = [
   'yn_vec.c',
 ]
 
-if has_ieeefp_funcs
+if ieeefp_funcs
   math_test_src += [
     'test_ieee.c',
   ]
@@ -157,6 +157,16 @@ foreach params : targets
   if target.strip('_') in skip_math_test
     continue
   endif
+  skip = false
+  foreach part : target.split('_')
+    if part != '' and part in skip_math_test
+      skip = true
+    endif
+  endforeach
+  if skip
+    continue
+  endif
+  
 
 
   _libs = [get_variable('lib_c' + target)]
@@ -179,8 +189,8 @@ foreach params : targets
   _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
-  _c_args = double_printf_compile_args + _c_args
-  _link_args = double_printf_link_args + _link_args
+  _c_args = printf_compile_args_d + _c_args
+  _link_args = printf_link_args_d + _link_args
 
   foreach test_part : test_parts
     if test_part == '-1'
@@ -199,6 +209,7 @@ foreach params : targets
 		    link_depends: _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
+         suite: 'math',
          env: test_env)
   endforeach
 endforeach

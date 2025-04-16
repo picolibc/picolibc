@@ -45,7 +45,7 @@ static __inline float _acoshf(float x)
 
   vx = spu_promote(x, 0);
   res = spu_extract(_acoshf4(vx), 0);
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   dom_chkf_less_than(vx, vc);
 #endif
   return res;

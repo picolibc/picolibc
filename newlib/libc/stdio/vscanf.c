@@ -26,11 +26,7 @@ int
 vscanf (const char *fmt,
        va_list ap)
 {
-  _REENT_SMALL_CHECK_INIT (reent);
-  return _svfscanf ( _stdin_r (reent), fmt, ap);
+  return _svfscanf ( stdin, fmt, ap);
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1))
-viscanf (const char *, __VALIST) _ATTRIBUTE ((__alias__("vscanf")));
-#endif
+__nano_reference(vscanf, viscanf);

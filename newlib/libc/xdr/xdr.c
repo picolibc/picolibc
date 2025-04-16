@@ -569,7 +569,7 @@ xdr_enum (XDR * xdrs,
           if (!XDR_GETLONG (xdrs, &l))
             return FALSE;
           *ep = l;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
         case XDR_FREE:
           return TRUE;
         }
@@ -595,7 +595,7 @@ xdr_opaque (XDR * xdrs,
 	u_int cnt)
 {
   u_int rndup;
-  static char crud[BYTES_PER_XDR_UNIT];
+  char crud[BYTES_PER_XDR_UNIT];
 
   /*
    * if no data we are done
@@ -672,7 +672,7 @@ xdr_bytes (XDR * xdrs,
           errno = ENOMEM;
           return FALSE;
         }
-      __PICOLIBC_FALLTHROUGH;
+      __fallthrough;
 
     case XDR_ENCODE:
       return xdr_opaque (xdrs, sp, nodesize);
@@ -779,7 +779,7 @@ xdr_string (XDR * xdrs,
       if (sp == NULL)
         return TRUE;        /* already free */
 
-      __PICOLIBC_FALLTHROUGH;
+      __fallthrough;
     case XDR_ENCODE:
       if (sp == NULL)
         return FALSE;
@@ -821,7 +821,7 @@ xdr_string (XDR * xdrs,
           return FALSE;
         }
       sp[size] = 0;
-      __PICOLIBC_FALLTHROUGH;
+      __fallthrough;
 
     case XDR_ENCODE:
       return xdr_opaque (xdrs, sp, size);

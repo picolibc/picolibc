@@ -36,7 +36,9 @@
 #include <stdlib.h>
 #include <semihost.h>
 
-#define TEST_FILE_NAME	"SEMITEST.TXT"
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME	"SEMIISTTY.TXT"
+#endif
 
 int
 main(void)

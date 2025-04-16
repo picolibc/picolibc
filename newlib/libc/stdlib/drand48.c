@@ -20,10 +20,8 @@ _drand48_r (struct _rand48 *r)
   return _erand48_r(r, r->_seed);
 }
 
-#ifndef _REENT_ONLY
 double
 drand48 (void)
 {
   return _drand48_r (&_rand48);
 }
-#endif /* !_REENT_ONLY */

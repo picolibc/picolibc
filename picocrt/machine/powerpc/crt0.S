@@ -45,15 +45,6 @@ _start:
 	ori	%r1,%r1,__stack@l
 
 #ifdef __PPC64__
-#define TARGET_THREAD_SSP_OFFSET	0x7010
-#else
-#define TARGET_THREAD_SSP_OFFSET	0x7008
-#endif	
-	/* Compute stack protector location */
-	lis	%r13,(__stack_chk_guard+TARGET_THREAD_SSP_OFFSET)@h
-	ori	%r13,%r13,(__stack_chk_guard+TARGET_THREAD_SSP_OFFSET)@l
-
-#ifdef __PPC64__
 	/* Where are we? */
 	bl	here
 here:	mflr	%r2

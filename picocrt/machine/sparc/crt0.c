@@ -35,7 +35,7 @@
 
 #include "../../crt0.h"
 
-static void __attribute__((used)) __section(".init")
+static void __used __section(".init")
 _cstart(void)
 {
 	__start();
@@ -44,7 +44,7 @@ _cstart(void)
 extern char __stack[];
 extern char __interrupt_vector[];
 
-void __section(".init") __attribute__((used))
+void __section(".init") __used
 _start(void)
 {
         /* Initialize trap base register */

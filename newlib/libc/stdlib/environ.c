@@ -29,8 +29,8 @@
 
 /* Provide a definition of `environ' if crt0.o doesn't.  */
 
-static char *initial_env[] = { 0 };
+static const char *const initial_env[] = { 0 };
 
 /* Posix says `environ' is a pointer to a null terminated list of pointers.
    Hence `environ' itself is never NULL.  */
-char **environ = &initial_env[0];
+char **environ = (char **) &initial_env[0];

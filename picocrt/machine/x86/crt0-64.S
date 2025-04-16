@@ -92,13 +92,16 @@ _start64:
 	mov	$__bss_start, %rdi
 	call	memset
 
-#ifdef PICOLIBC_TLS
+	/* Initialize the IDT */
+	lidt	__idt
+
+#ifdef __THREAD_LOCAL_STORAGE
 	// call to _set_tls(__tls_base)
 	mov	$__tls_base, %rdi
 	call	_set_tls
 #endif
 	
-#if defined(_HAVE_INITFINI_ARRAY) && CONSTRUCTORS
+#if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
 	call	__libc_init_array
 #endif
 

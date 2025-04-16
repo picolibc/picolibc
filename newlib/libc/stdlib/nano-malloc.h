@@ -145,7 +145,7 @@ bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */
-#ifdef _HAVE_ALIAS_ATTRIBUTE
+#ifdef __strong_reference
 void __malloc_free(void *);
 void *__malloc_malloc(size_t);
 #else

@@ -22,7 +22,7 @@
 #include <errno.h>
 #include <math.h>
 
-float __inhibit_new_builtin_calls
+float __no_builtin
 exp2f(float x) /* wrapper exp2f */
 {
     return _powf(2.0, x);

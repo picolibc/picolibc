@@ -26,9 +26,8 @@ iscanf(const char *fmt, ...)
   int ret;
   va_list ap;
 
-  _REENT_SMALL_CHECK_INIT (_REENT);
   va_start (ap, fmt);
-  ret = _svfiscanf ( _stdin_r (_REENT), fmt, ap);
+  ret = _svfiscanf (stdin, fmt, ap);
   va_end (ap);
   return ret;
 }

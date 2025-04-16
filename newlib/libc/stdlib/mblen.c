@@ -14,20 +14,20 @@ SYNOPSIS
 	int mblen(const char *<[s]>, size_t <[n]>);
 
 DESCRIPTION
-When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
 implementation of <<mblen>>.  In this case, the
 only ``multi-byte character sequences'' recognized are single bytes,
 and thus <<1>> is returned unless <[s]> is the null pointer or
 has a length of 0 or is the empty string.
 
-When _MB_CAPABLE is defined, this routine calls <<__MBTOWC>> to perform
+When __MB_CAPABLE is defined, this routine calls <<__MBTOWC>> to perform
 the conversion, passing a state variable to allow state dependent
 decoding.  The result is based on the locale setting which may
 be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<mblen>> returns <<0>> if
-<[s]> is <<NULL>> or the empty string; it returns <<1>> if not _MB_CAPABLE or
+<[s]> is <<NULL>> or the empty string; it returns <<1>> if not __MB_CAPABLE or
 the character is a single-byte character; it returns <<-1>>
 if the multi-byte character is invalid; otherwise it returns
 the number of bytes in the multibyte character.
@@ -46,7 +46,7 @@ effects vary with the locale.
 int
 mblen (const char *s, size_t n)
 {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     int retval = 0;
     static _mbstate_t _mblen_state;
 
@@ -59,11 +59,11 @@ mblen (const char *s, size_t n)
     else
         return retval;
 
-#else /* not _MB_CAPABLE */
+#else /* not __MB_CAPABLE */
     if (s == NULL || *s == '\0')
         return 0;
     if (n == 0)
         return -1;
     return 1;
-#endif /* not _MB_CAPABLE */
+#endif /* not __MB_CAPABLE */
 }

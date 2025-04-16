@@ -34,7 +34,7 @@
 #include <ssp/ssp.h>
 
 #if __SSP_FORTIFY_LEVEL > 0
-__BEGIN_DECLS
+_BEGIN_STD_C
 
 #if __POSIX_VISIBLE >= 199209
 __ssp_redirect(size_t, confstr, (int __name, char *__buf, size_t __len), \
@@ -87,7 +87,7 @@ __ssp_redirect(ssize_t, readlinkat, \
 __ssp_redirect(int, ttyname_r, (int __fd, char *__buf, size_t __len), \
     (__fd, __buf, __len));
 
-__END_DECLS
+_END_STD_C
 
 #endif /* __SSP_FORTIFY_LEVEL > 0 */
 #endif /* _SSP_UNISTD_H_ */

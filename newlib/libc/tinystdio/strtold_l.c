@@ -35,7 +35,14 @@
 
 #include "stdio_private.h"
 
-#if defined(_HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
+#if defined(__HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
+
+#ifdef WIDE_CHARS
+#include <wctype.h>
+#define strtold_l wcstold_l
+#define strtold wcstold
+#define char wchar_t
+#endif
 
 long double
 strtold_l (const char *__restrict s00,

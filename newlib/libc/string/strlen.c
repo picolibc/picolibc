@@ -44,37 +44,19 @@ QUICKREF
 
 #include <string.h>
 #include <limits.h>
-#include <stdint.h>
-
-#define LBLOCKSIZE   (sizeof (long))
-#define UNALIGNED(X) ((uintptr_t)X & (LBLOCKSIZE - 1))
-
-#if LONG_MAX == 2147483647L
-#define DETECTNULL(X) (((X) - 0x01010101) & ~(X) & 0x80808080)
-#else
-#if LONG_MAX == 9223372036854775807L
-/* Nonzero if X (a long int) contains a NULL byte. */
-#define DETECTNULL(X) (((X) - 0x0101010101010101) & ~(X) & 0x8080808080808080)
-#else
-#error long int is not a 32bit or 64bit type.
-#endif
-#endif
-
-#ifndef DETECTNULL
-#error long int is not a 32bit or 64bit byte
-#endif
+#include "local.h"
 
 size_t
 strlen (const char *str)
 {
   const char *start = str;
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
-    !defined(PICOLIBC_NO_OUT_OF_BOUNDS_READS)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && \
+    !defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
   unsigned long *aligned_addr;
 
   /* Align the pointer, so we can search a word at a time.  */
-  while (UNALIGNED (str))
+  while (UNALIGNED_X(str))
     {
       if (!*str)
 	return str - start;
@@ -84,14 +66,14 @@ strlen (const char *str)
   /* If the string is word-aligned, we can check for the presence of
      a null in each word-sized block.  */
   aligned_addr = (unsigned long *)str;
-  while (!DETECTNULL (*aligned_addr))
+  while (!DETECT_NULL(*aligned_addr))
     aligned_addr++;
 
   /* Once a null is detected, we check each byte in that block for a
      precise position of the null.  */
   str = (char *) aligned_addr;
 
-#endif /* not PREFER_SIZE_OVER_SPEED */
+#endif /* not __PREFER_SIZE_OVER_SPEED */
 
   while (*str)
     str++;

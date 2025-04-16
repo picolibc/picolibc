@@ -32,7 +32,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "local.h"
 
 /* On platforms where long double is as wide as double.  */
-#if defined(_NEED_FLOAT_HUGE) && defined(_HAVE_BUILTIN_NANL)
+#if defined(_NEED_FLOAT_HUGE) && __HAVE_BUILTIN_NANL
 long double
 nanl (const char *tagp)
 {

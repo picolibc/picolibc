@@ -118,10 +118,5 @@ picolibc_sources(
   sf_tgamma.c
   sr_lgamma.c
   srf_lgamma.c
-)
-
-if(_HAVE_LONG_DOUBLE)
-  picolibc_sources(
-    sl_hypot.c
-    )
-endif()
+  sl_hypot.c
+  )

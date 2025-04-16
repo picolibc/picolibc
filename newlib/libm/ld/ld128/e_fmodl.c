@@ -32,10 +32,10 @@ fmodl(long double x, long double y)
 	hx ^=sx;				/* |x| */
 	hy &= 0x7fffffffffffffffLL;		/* |y| */
 
-        if (isnanl(x) || isnanl(y))
+        if (isnan(x) || isnan(y))
             return x + y;
 
-        if (isinfl(x))
+        if (isinf(x))
             return __math_invalidl(x);
 
         if (y == 0.0L)
@@ -50,18 +50,18 @@ fmodl(long double x, long double y)
     /* determine ix = ilogb(x) */
 	if(hx<0x0001000000000000LL) {	/* subnormal x */
 	    if(hx==0) {
-		for (ix = -16431, i=lx; i>0; i<<=1) ix -=1;
+		for (ix = -16431, i=lx; i>0; i=lsl(i, 1)) ix -=1;
 	    } else {
-		for (ix = -16382, i=hx<<15; i>0; i<<=1) ix -=1;
+		for (ix = -16382, i=lsl(hx, 15); i>0; i=lsl(i, 1)) ix -=1;
 	    }
 	} else ix = (hx>>48)-0x3fff;
 
     /* determine iy = ilogb(y) */
 	if(hy<0x0001000000000000LL) {	/* subnormal y */
 	    if(hy==0) {
-		for (iy = -16431, i=ly; i>0; i<<=1) iy -=1;
+		for (iy = -16431, i=ly; i>0; i=lsl(i, 1)) iy -=1;
 	    } else {
-		for (iy = -16382, i=hy<<15; i>0; i<<=1) iy -=1;
+		for (iy = -16382, i=lsl(hy, 15); i>0; i=lsl(i, 1)) iy -=1;
 	    }
 	} else iy = (hy>>48)-0x3fff;
 

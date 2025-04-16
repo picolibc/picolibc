@@ -398,7 +398,7 @@ __dtoa (
       break;
     case 2:
       leftright = 0;
-      __PICOLIBC_FALLTHROUGH;
+      __fallthrough;
     case 4:
       if (ndigits <= 0)
 	ndigits = 1;
@@ -406,7 +406,7 @@ __dtoa (
       break;
     case 3:
       leftright = 0;
-      __PICOLIBC_FALLTHROUGH;
+      __fallthrough;
     case 5:
       i = ndigits + k + 1;
       ilim = i;

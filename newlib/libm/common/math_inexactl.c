@@ -35,7 +35,7 @@
 
 #include "math_config.h"
 
-#if defined(FE_INEXACT) && !defined(PICOLIBC_LONG_DOUBLE_NOEXECPT) && defined(_NEED_FLOAT_HUGE)
+#if defined(FE_INEXACT) && !defined(__LONG_DOUBLE_NOEXCEPT) && defined(_NEED_FLOAT_HUGE)
 
 #ifdef _DOUBLE_DOUBLE_FLOAT
 static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);

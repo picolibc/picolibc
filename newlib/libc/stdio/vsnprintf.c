@@ -40,7 +40,7 @@ vsnprintf (
 
   if (size > INT_MAX)
     {
-      _REENT_ERRNO(ptr) = EOVERFLOW;
+      errno = EOVERFLOW;
       return EOF;
     }
   f._flags = __SWR | __SSTR;
@@ -50,23 +50,11 @@ vsnprintf (
   f._file = -1;  /* No file. */
   ret = svfprintf ( &f, fmt, ap);
   if (ret < EOF)
-    _REENT_ERRNO(ptr) = EOVERFLOW;
+    errno = EOVERFLOW;
   if (size > 0)
     *f._p = 0;
   return ret;
 }
 
-#ifdef _NANO_FORMATTED_IO
-int __nonnull((1)) _NOTHROW
-vsniprintf (char *, size_t, const char *, __VALIST)
-       _ATTRIBUTE ((__alias__("vsnprintf")));
-#endif
-
-#ifdef __LONG_DOUBLE_IEEE128__
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(vsnprintf, __vsnprintfieee128);
-#endif
-#endif
+__nano_reference(vsnprintf, vsniprintf);
+__ieee128_reference(vsnprintf, __vsnprintfieee128);

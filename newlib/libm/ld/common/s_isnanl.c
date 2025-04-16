@@ -26,6 +26,8 @@
  * $FreeBSD: src/lib/msun/src/s_isnan.c,v 1.9 2010/06/12 17:32:05 das Exp $
  */
 
+#undef isnanl
+
 int
 isnanl(long double e)
 {
@@ -35,3 +37,13 @@ isnanl(long double e)
 	mask_nbit_l(u);
 	return (u.bits.exp == LDBL_INF_NAN_EXP && (u.bits.manl != 0 || u.bits.manh != 0));
 }
+
+#ifdef __strong_reference
+__strong_reference_dup(isnanl, __isnanl);
+#else
+int
+__isnanl(long double x)
+{
+    return isnanl(x);
+}
+#endif

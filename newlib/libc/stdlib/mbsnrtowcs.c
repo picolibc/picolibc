@@ -75,7 +75,7 @@ mbsnrtowcs (
   size_t count = 0;
   int bytes;
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   if (ps == NULL)
     {
       static mbstate_t _mbsrtowcs_state;
@@ -117,7 +117,7 @@ mbsnrtowcs (
       else
 	{
 	  ps->__count = 0;
-	  _REENT_ERRNO(r) = EILSEQ;
+	  errno = EILSEQ;
 	  return (size_t)-1;
 	}
     }

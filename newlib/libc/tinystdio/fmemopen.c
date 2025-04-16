@@ -138,12 +138,13 @@ FILE *
 fmemopen(void *buf, size_t size, const char *mode)
 {
     int stdio_flags;
+    int open_flags;
     uint8_t mflags = 0;
     size_t initial_pos = 0;
     size_t initial_size;
     struct __file_mem *mf;
 
-    stdio_flags = __stdio_sflags(mode);
+    stdio_flags = __stdio_flags(mode, &open_flags);
 
     if (stdio_flags == 0 || size == 0) {
         errno = EINVAL;
@@ -174,17 +175,17 @@ fmemopen(void *buf, size_t size, const char *mode)
         mflags |= __MALL;
     }
 
-    /* Check mode directly to avoid _POSIX_IO dependency. */
-    if (mode[0] == 'a') {
-        /* For append the position is set to the first NUL byte or the end. */
-        initial_pos = (mflags & __MALL) ? 0 : strnlen(buf, size);
-        initial_size = initial_pos;
-        mflags |= __MAPP;
-    } else if (mode[0] == 'w') {
-        initial_size = 0;
-        /* w+ mode truncates the buffer, writing NUL */
-        if ((stdio_flags & (__SRD | __SWR)) == (__SRD | __SWR)) {
-            *((char *)buf) = '\0';
+    if (open_flags & O_CREAT) {
+        if (open_flags & O_APPEND) {
+            /* For append the position is set to the first NUL byte or the end. */
+            initial_pos = (mflags & __MALL) ? 0 : strnlen(buf, size);
+            initial_size = initial_pos;
+            mflags |= __MAPP;
+        } else {
+            initial_size = 0;
+            /* w+ mode truncates the buffer, writing NUL */
+            if ((open_flags & O_ACCMODE) == O_RDWR)
+                *((char *)buf) = '\0';
         }
     } else {
         initial_size = size;

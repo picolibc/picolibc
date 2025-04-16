@@ -38,6 +38,7 @@ picolibc_sources(
   atold_engine.c
   bufio.c
   clearerr.c
+  compare_exchange.c
   dtox_engine.c
   ecvt.c
   ecvtf.c
@@ -45,6 +46,7 @@ picolibc_sources(
   ecvtl.c
   ecvtl_r.c
   ecvt_r.c
+  exchange.c
   fclose.c
   fcvt.c
   fcvtf.c
@@ -53,6 +55,7 @@ picolibc_sources(
   fcvtl_r.c
   fcvt_r.c
   fdevopen.c
+  fdopen.c
   feof.c
   ferror.c
   fflush.c
@@ -67,12 +70,14 @@ picolibc_sources(
   filewstrget.c
   flockfile.c
   fmemopen.c
+  fopen.c
   fprintf.c
   fputc.c
   fputs.c
   fputwc.c
   fputws.c
   fread.c
+  freopen.c
   fscanf.c
   fseek.c
   fseeko.c
@@ -126,6 +131,7 @@ picolibc_sources(
   strtof.c
   strtof_l.c
   strtoimax.c
+  strtoimax_l.c
   strtol.c
   strtold.c
   strtold_l.c
@@ -137,6 +143,7 @@ picolibc_sources(
   strtoull.c
   strtoull_l.c
   strtoumax.c
+  strtoumax_l.c
   swprintf.c
   swscanf.c
   tmpfile.c
@@ -166,6 +173,24 @@ picolibc_sources(
   vswscanf.c
   vwprintf.c
   vwscanf.c
+  wcstod.c
+  wcstod_l.c
+  wcstof.c
+  wcstof_l.c
+  wcstoimax.c
+  wcstoimax_l.c
+  wcstol.c
+  wcstold.c
+  wcstold_l.c
+  wcstol_l.c
+  wcstoll.c
+  wcstoll_l.c
+  wcstoul.c
+  wcstoul_l.c
+  wcstoull.c
+  wcstoull_l.c
+  wcstoumax.c
+  wcstoumax_l.c
   wprintf.c
   wscanf.c
   sprintf_s.c
@@ -173,18 +198,7 @@ picolibc_sources(
   vsnprintf_s.c
   )
 
-picolibc_sources(
-  compare_exchange.c
-  exchange.c
-  )  
-
-picolibc_sources(
-  fdopen.c
-  fopen.c
-  freopen.c
-  )
-
-if(_IO_FLOAT_EXACT)
+if(__IO_FLOAT_EXACT)
   picolibc_sources(
     atod_ryu.c
     atof_ryu.c

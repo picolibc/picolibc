@@ -38,9 +38,9 @@
 #ifndef __SIMD_MATH_H__
 #define __SIMD_MATH_H__ 1
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <sys/cdefs.h>
+
+_BEGIN_STD_C
 
 #if !defined(__SPU__) && !defined(__ALTIVEC__)
 #error Bad platform
@@ -260,8 +260,6 @@ vector double truncd2(vector double x);
 
 #endif /* __SPU__ || __ALTIVEC__ */
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* __SIMD_MATH_H__  */

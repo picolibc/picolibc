@@ -3,7 +3,7 @@
 #include <wchar.h>
 #include "locale_private.h"
 
-#ifdef _MB_EXTENDED_CHARSETS_NON_UNICODE
+#ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
 
 extern const char __ctype[locale_END - locale_EXTENDED_BASE][_CTYPE_OFFSET + 1 + 256];
 
@@ -16,6 +16,16 @@ __get_ctype(enum locale_id id)
 }
 
 #endif
+
+#define _U __CTYPE_UPPER
+#define _L __CTYPE_LOWER
+#define _N __CTYPE_DIGIT
+#define _S __CTYPE_SPACE
+#define _P __CTYPE_PUNCT
+#define _C __CTYPE_CNTRL
+#define _X __CTYPE_HEX
+#define _B __CTYPE_BLANK
+#define _T __CTYPE_TAB
 
 #define _CTYPE_DATA_0_127 \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \

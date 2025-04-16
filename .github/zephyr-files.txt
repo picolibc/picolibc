@@ -15,6 +15,6 @@ https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/toolchain
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/toolchain_linux-x86_64_xtensa-nxp_imx_adsp_zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/toolchain_linux-x86_64_xtensa-sample_controller_zephyr-elf.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.17.0/hosttools_linux-x86_64.tar.xz
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v1/qemu-9.0.linux-amd64.tar.xz
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v1/qemu-arc.linux-amd64.tar.xz
-https://github.com/FlyGoat/picolibc-ci-tools/releases/download/v20250110/qemu-stable.linux-amd64.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v7/qemu-9.0.linux-amd64.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v7/qemu-arc.linux-amd64.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v7/qemu-stable.linux-amd64.tar.xz

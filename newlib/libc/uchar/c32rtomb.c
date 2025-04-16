@@ -47,8 +47,9 @@ c32rtomb (char *s, char32_t c32, mbstate_t *ps)
         errno = EILSEQ;
         return (size_t) -1;
     }
+
 #if __SIZEOF_WCHAR_T__ == 2
-    if (char32_needs_surrogates(c32)) {
+    if (char32_needs_surrogates(c32) && s != NULL) {
         const wchar_t wc[2] = {
             [0] = ((c32 - 0x10000) >> 10) + HIGH_SURROGATE_FIRST,
             [1] = (c32 & 0x3ff) + LOW_SURROGATE_FIRST,

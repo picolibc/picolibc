@@ -29,10 +29,9 @@
 #ifndef _MACHINE_FENV_H
 #define _MACHINE_FENV_H 1
 
+#include <sys/cdefs.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 #ifdef _SOFT_FLOAT
 typedef int fenv_t;
@@ -148,7 +147,7 @@ typedef __uint32_t fexcept_t;
    represents an environment where every exception raised causes a trap
    to occur. You can test for this macro using #ifdef. It is only defined
    if _GNU_SOURCE is defined.  */
-extern const fenv_t *_fe_nomask_env;
+extern const fenv_t *const _fe_nomask_env;
 #define FE_NOMASK_ENV (_fe_nomask_env)
 #endif
 
@@ -167,8 +166,6 @@ extern const fenv_t *_fe_nomask_env;
 
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* _FENV_H */

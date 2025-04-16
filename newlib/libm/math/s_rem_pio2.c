@@ -161,7 +161,7 @@ __rem_pio2(__float64 x, __float64 *y)
     GET_LOW_WORD(low, x);
     SET_LOW_WORD(z, low);
     e0 = (int)((ix >> 20) - 1046); /* e0 = ilogb(z)-23; */
-    SET_HIGH_WORD(z, ix - ((__int32_t)e0 << 20));
+    SET_HIGH_WORD(z, ix - lsl((__int32_t)e0, 20));
     for (i = 0; i < 2; i++) {
         tx[i] = (__float64)((__int32_t)(z));
         z = (z - tx[i]) * two24;

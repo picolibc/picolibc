@@ -191,8 +191,8 @@ wchar_t *wcscpy (wchar_t *__restrict, const wchar_t *__restrict);
 size_t   wcscspn (const wchar_t *, const wchar_t *);
 
 #if __POSIX_VISIBLE >= 200809
-void     free (void *) _NOTHROW;
-wchar_t *wcsdup (const wchar_t *) __malloc_like __result_use_check;
+void     free (void *) __nothrow;
+wchar_t *wcsdup (const wchar_t *) __malloc_like __warn_unused_result;
 #endif
 size_t   wcsftime (wchar_t *__restrict, size_t,
                   const wchar_t *__restrict, const struct tm *__restrict);
@@ -241,11 +241,11 @@ long     wcstol (const wchar_t *__restrict, wchar_t **__restrict, int);
 #if __GNU_VISIBLE
 long     wcstol_l (const wchar_t *__restrict, wchar_t **__restrict, int, locale_t);
 #endif
-#if __ISO_C_VISIBLE >= 1999 && defined(_HAVE_LONG_DOUBLE)
+#if __ISO_C_VISIBLE >= 1999 && defined(__HAVE_LONG_DOUBLE)
 long double
          wcstold (const wchar_t *, wchar_t **);
 #endif
-#if __GNU_VISIBLE && defined(_HAVE_LONG_DOUBLE)
+#if __GNU_VISIBLE && defined(__HAVE_LONG_DOUBLE)
 long double
          wcstold_l (const wchar_t *, wchar_t **, locale_t);
 #endif

@@ -78,14 +78,14 @@
    Theoretical peak relative error = 2.2e-37,
    relative peak error spread = 9.2e-38
  */
-static long double P[5] = {
+static const long double P[5] = {
  3.279723985560247033712687707263393506266E-10L,
  6.141506007208645008909088812338454698548E-7L,
  2.708775201978218837374512615596512792224E-4L,
  3.508710990737834361215404761139478627390E-2L,
  9.999999999999999999999999999999999998502E-1L
 };
-static long double Q[6] = {
+static const long double Q[6] = {
  2.980756652081995192255342779918052538681E-12L,
  1.771372078166251484503904874657985291164E-8L,
  1.504792651814944826817779302637284053660E-5L,
@@ -104,7 +104,7 @@ static const long double huge = 0x1p10000L;
 #if 0 /* XXX Prevent gcc from erroneously constant folding this. */
 static const long double twom10000 = 0x1p-10000L;
 #else
-static volatile long double twom10000 = 0x1p-10000L;
+static const volatile long double twom10000 = 0x1p-10000L;
 #endif
 
 long double

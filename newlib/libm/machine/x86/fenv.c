@@ -44,7 +44,7 @@
 static fenv_t fe_nomask_env;
 
 /* These pointers provide the outside world with read-only access to them.  */
-const fenv_t *_fe_nomask_env = &fe_nomask_env;
+const fenv_t *const _fe_nomask_env = &fe_nomask_env;
 
 /* Assume i686 or above (hence SSE available) these days, with the
    compiler feels free to use it (depending on compile- time flags of

@@ -34,6 +34,10 @@
 #define strtoi_utype unsigned long long
 #define strtoi_max LLONG_MAX
 #define strtoi_min LLONG_MIN
-#define strtoi strtoll
 #define strtoi_signed
+#ifdef WIDE_CHARS
+#define strtoi wcstoll
+#else
+#define strtoi strtoll
+#endif
 #include "strtoi.h"

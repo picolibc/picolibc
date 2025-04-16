@@ -42,7 +42,7 @@ fopen(const char *pathname, const char *mode)
 	int stdio_flags;
 	int open_flags;
 
-	stdio_flags = __posix_sflags(mode, &open_flags);
+	stdio_flags = __stdio_flags(mode, &open_flags);
 	if (stdio_flags == 0)
 		return NULL;
 

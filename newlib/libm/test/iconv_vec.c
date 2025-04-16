@@ -308,6 +308,9 @@ int_type ints[]={
 {__LINE__,0xffffffc5, 5, 0,0xffffffb7, 5, 0,0xffffff8d, 5, 0,0xffffffc5, 5, 0,0xffffff47, 5, 0, " -073", },
 {__LINE__,0xfffffff9, 4, 0,0xfffffff9, 4, 0,0xfffffff9, 4, 0,0xfffffff9, 4, 0,0xfffffff9, 4, 0, " -07", },
 {__LINE__,0xfc12cdae,12, 0,0xe9c0f1ee,12, 0,0x80000000,12,34,0xfc12cdae,12, 0,0x80000000,12,34, " -0373231122", },
+{__LINE__,0x0000233c, 6, 0,0x7fffffff,11,34,0x7fffffff,11,34,0x7fffffff,11,34,0x7fffffff,11,34, " 2147483648", },
+{__LINE__,0x0000233c, 6, 0,0x7fffffff,11, 0,0x7fffffff,11,34,0x7fffffff,11, 0,0x7fffffff,11,34, " 2147483647", },
+{__LINE__,0xffffdcc4, 7, 0,0x80000000,12, 0,0x80000000,12,34,0x80000000,12, 0,0x80000000,12,34, " -2147483648", },
 #endif
 #if TEST_PART == 2 || TEST_PART == -1
 {__LINE__,0xffffffe1, 5, 0,0xffffffdb, 5, 0,0xffffffc9, 5, 0,0xffffffe1, 5, 0,0xffffffab, 5, 0, " -037w", },

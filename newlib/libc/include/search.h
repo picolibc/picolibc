@@ -75,7 +75,7 @@ struct hsearch_data
 typedef int (*__compar_fn_t) (const void *, const void *);
 #endif
 
-__BEGIN_DECLS
+_BEGIN_STD_C
 int	 hcreate(size_t);
 void	 hdestroy(void);
 ENTRY	*hsearch(ENTRY, ACTION);
@@ -87,6 +87,6 @@ void	tdestroy (void *, void (*)(void *));
 void	*tfind(const void *, void **, __compar_fn_t);
 void	*tsearch(const void *, void **, __compar_fn_t);
 void      twalk(const void *, void (*)(const void *, VISIT, int));
-__END_DECLS
+_END_STD_C
 
 #endif /* !_SEARCH_H_ */

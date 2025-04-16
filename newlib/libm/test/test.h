@@ -27,7 +27,11 @@
 #ifdef INCLUDE_GENERATE
 #define TEST_CONST
 #else
+#ifdef _RX_PID
+#define TEST_CONST
+#else
 #define TEST_CONST const
+#endif
 #endif
 
 /* FIXME FIXME FIXME:

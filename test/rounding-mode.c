@@ -38,7 +38,13 @@
 #include <fenv.h>
 #include "rounding-mode.h"
 
-#ifndef PICOLIBC_DOUBLE_NOROUND
+#ifdef __sh__
+#if !(defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__))
+#define GDB_SIMULATOR
+#endif
+#endif
+
+#ifndef __DOUBLE_NOROUND
 static double
 do_round_int(double value, int mode)
 {
@@ -65,7 +71,7 @@ do_round_int(double value, int mode)
 }
 #endif
 
-#ifndef PICOLIBC_FLOAT_NOROUND
+#ifndef __FLOAT_NOROUND
 static float
 do_roundf_int(float value, int mode)
 {
@@ -94,7 +100,7 @@ do_roundf_int(float value, int mode)
 
 #if defined(FE_UPWARD) && defined(FE_DOWNWARD) && defined(FE_TOWARDZERO)
 
-#ifndef PICOLIBC_DOUBLE_NOROUND
+#ifndef __DOUBLE_NOROUND
 
 static double
 div_mul_sub(double a, double b, double c, double d)
@@ -106,7 +112,7 @@ div_mul_sub(double a, double b, double c, double d)
 
 #endif
 
-#ifndef PICOLIBC_FLOAT_NOROUND
+#ifndef __FLOAT_NOROUND
 
 static float
 div_f_mul_sub(float a, float b, float c, float d)
@@ -137,7 +143,7 @@ check(int mode, char *name, double value)
         (void) mode;
         (void) name;
         (void) value;
-#ifndef PICOLIBC_DOUBLE_NOROUND
+#ifndef __DOUBLE_NOROUND
 	double want, got;
 	printf("test double %s for value %g \n", name, value);
 	want = do_round_int(value, mode);
@@ -173,7 +179,7 @@ check(int mode, char *name, double value)
 		ret++;
 	}
 #endif
-#ifndef PICOLIBC_FLOAT_NOROUND
+#ifndef __FLOAT_NOROUND
 	float valuef = value, wantf, gotf;
 
 	printf("test float %s for value %g \n", name, value);
@@ -215,7 +221,7 @@ check(int mode, char *name, double value)
 	return ret;
 }
 
-static double my_values[] = {
+static const double my_values[] = {
 	1.0,
 	1.0 / 3.0,
 	3.0 / 2.0,	/* let either round out or round even work */
@@ -229,6 +235,10 @@ int main(void)
 	unsigned i;
 	int ret = 0;
 
+#ifdef GDB_SIMULATOR
+        printf("GDB simulator doesn't support rounding modes. Skipping\n");
+        return 77;
+#endif
 	for (i = 0; i < NUM_VALUE; i++) {
 #ifdef FE_TONEAREST
 		ret += check(FE_TONEAREST, "FE_TONEAREST", my_values[i]);
@@ -262,7 +272,7 @@ int main(void)
 	} while(0)
 
 
-#ifndef PICOLIBC_DOUBLE_NOROUND
+#ifndef __DOUBLE_NOROUND
 	double up_plus, toward_plus, down_plus, up_minus, toward_minus, down_minus;
 
 	fesetround(FE_UPWARD);
@@ -306,7 +316,7 @@ int main(void)
         check_sqrt(FE_TOWARDZERO, n4, 2.0);
         check_sqrt(FE_TOWARDZERO, nn4, 2.0);
 #endif
-#ifndef PICOLIBC_FLOAT_NOROUND
+#ifndef __FLOAT_NOROUND
 	float fup_plus, ftoward_plus, fdown_plus, fup_minus, ftoward_minus, fdown_minus;
 
 	fesetround(FE_UPWARD);

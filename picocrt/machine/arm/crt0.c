@@ -51,7 +51,7 @@ extern const void *__interrupt_vector[];
 const void *__interrupt_reference = __interrupt_vector;
 #endif
 
-void
+void __disable_sanitizer
 _start(void)
 {
 	/* Generate a reference to __interrupt_vector so we get one loaded */
@@ -95,7 +95,7 @@ _start(void)
 
 #else /*  __ARM_ARCH_PROFILE == 'M' */
 
-#ifdef _PICOCRT_ENABLE_MMU
+#ifdef __PICOCRT_ENABLE_MMU
 
 #if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
 
@@ -167,7 +167,7 @@ __asm__(
 );
 #endif
 
-#endif /* _PICOCRT_ENABLE_MMU */
+#endif /* __PICOCRT_ENABLE_MMU */
 
 /*
  * Set up all of the shadow stack pointers. With Thumb 1 ISA we need
@@ -212,7 +212,8 @@ extern char __stack[];
         SET_MODE(MODE_SVC);
 
 #if __ARM_ARCH_ISA_THUMB == 1
-static __noinline __attribute__((target("arm"))) void
+static __noinline __attribute__((target("arm"))) __disable_sanitizer
+void 
 _set_stacks(void)
 {
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
@@ -232,7 +233,10 @@ _set_stacks(void)
  * and then branches here.
  */
 
-static _Noreturn __attribute__((used)) __section(".init") void
+extern void __vector_table(void);
+
+static __noreturn __used __section(".init") __disable_sanitizer
+void
 _cstart(void)
 {
 #if __ARM_ARCH_ISA_THUMB == 1
@@ -255,7 +259,13 @@ _cstart(void)
 	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
 #endif
 
-#ifdef _PICOCRT_ENABLE_MMU
+/* Set up exception table base address (register VBAR_ELx).
+   Architectures earlier than v7 have the base address fixed. */
+#if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
+    __asm__("mcr p15, #0, %0, c12, c0, 0" : : "r"(__vector_table) :);
+#endif
+
+#ifdef __PICOCRT_ENABLE_MMU
 
 #if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
 
@@ -310,12 +320,13 @@ _cstart(void)
         }
 #endif
 
-#endif /* _PICOCRT_ENABLE_MMU */
+#endif /* __PICOCRT_ENABLE_MMU */
 
 	__start();
 }
 
-void __attribute__((naked)) __section(".init") __attribute__((used))
+void
+__naked __section(".init") __used __disable_sanitizer
 _start(void)
 {
 	/* Generate a reference to __vector_table so we get one loaded */
@@ -354,7 +365,8 @@ _start(void)
 #define _REASON(r) #r
 #define REASON(r) _REASON(r)
 
-static void arm_fault_write_reg(const char *prefix, unsigned reg)
+static void
+arm_fault_write_reg(const char *prefix, unsigned reg)
 {
     fputs(prefix, stdout);
 
@@ -394,7 +406,7 @@ static const char *const reasons[] = {
 #define REASON_BUSFAULT         2
 #define REASON_USAGE            3
 
-static void __attribute__((used))
+static void __used
 arm_fault(struct fault *f, int reason)
 {
     fputs("ARM fault: ", stdout);
@@ -410,7 +422,7 @@ arm_fault(struct fault *f, int reason)
     _exit(1);
 }
 
-void __attribute__((naked))
+void __naked __disable_sanitizer
 arm_hardfault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -418,7 +430,7 @@ arm_hardfault_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked))
+void __naked __disable_sanitizer
 arm_memmange_isr(void)
 {
     __asm__("mov r0, sp");
@@ -426,7 +438,7 @@ arm_memmange_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked))
+void __naked __disable_sanitizer
 arm_busfault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -434,7 +446,7 @@ arm_busfault_isr(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked))
+void __naked __disable_sanitizer
 arm_usagefault_isr(void)
 {
     __asm__("mov r0, sp");
@@ -461,7 +473,7 @@ static const char *const reasons[] = {
 #define REASON_PREFETCH_ABORT   2
 #define REASON_DATA_ABORT       3
 
-static void __attribute__((used))
+static void __used
 arm_fault(struct fault *f, int reason)
 {
     int r;
@@ -481,7 +493,7 @@ arm_fault(struct fault *f, int reason)
     __asm__("push {r0-r6}");                            \
     __asm__("mov r0, sp")
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")  __disable_sanitizer
 arm_undef_vector(void)
 {
     VECTOR_COMMON;
@@ -489,7 +501,7 @@ arm_undef_vector(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")  __disable_sanitizer
 arm_prefetch_abort_vector(void)
 {
     VECTOR_COMMON;
@@ -497,7 +509,7 @@ arm_prefetch_abort_vector(void)
     __asm__("bl  arm_fault");
 }
 
-void __attribute__((naked)) __section(".init")
+void __naked __section(".init")  __disable_sanitizer
 arm_data_abort_vector(void)
 {
     VECTOR_COMMON;

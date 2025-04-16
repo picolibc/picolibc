@@ -78,7 +78,11 @@ typedef __uint32_t __fsfilcnt_t;
 #endif
 
 #ifndef __machine_off_t_defined
+#if __SIZEOF_SIZE_T__ == 8 && __SIZEOF_LONG__ < 8
+typedef __uint64_t _off_t;
+#else
 typedef long _off_t;
+#endif
 #endif
 
 #if defined(__XMK__)
@@ -227,7 +231,7 @@ typedef struct __iconv_t *_iconv_t;
 
 typedef	_CLOCK_T_	__clock_t;
 
-#if defined(_USE_LONG_TIME_T) || __LONG_MAX__ > 0x7fffffffL
+#if __SIZEOF_LONG__ == 8
 #define	_TIME_T_ long
 #else
 #define	_TIME_T_ __int_least64_t

@@ -33,69 +33,76 @@
 #ifndef _SCANF_PRIVATE_H_
 #define _SCANF_PRIVATE_H_
 
-#if	!defined (SCANF_LEVEL)
-# define SCANF_LEVEL SCANF_DBL
-# ifndef _FORMAT_DEFAULT_DOUBLE
-#  define vfscanf __d_vfscanf
-# endif
-#endif
-
 #if defined(STRTOF)
+
 # define _NEED_IO_FLOAT
+
 #elif defined(STRTOD)
+
 # define _NEED_IO_DOUBLE
+
 #elif defined(STRTOLD)
+
 # define _NEED_IO_DOUBLE
 # define _NEED_IO_LONG_DOUBLE
-#elif SCANF_LEVEL == SCANF_MIN
+
+#elif SCANF_VARIANT == __IO_VARIANT_MINIMAL
+
 # define _NEED_IO_SHRINK
-# if defined(_WANT_MINIMAL_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
+# if defined(__IO_MINIMAL_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
-#elif SCANF_LEVEL == SCANF_STD
+
+#elif SCANF_VARIANT == __IO_VARIANT_INTEGER
+
 # define _NEED_IO_BRACKET
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _NEED_IO_POS_ARGS
 # endif
-# if defined(_WANT_IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
+# if defined(__IO_LONG_LONG) && __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
-int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
-#elif SCANF_LEVEL == SCANF_LLONG
+
+#elif SCANF_VARIANT == __IO_VARIANT_LLONG
+
 # define _NEED_IO_BRACKET
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _NEED_IO_POS_ARGS
 # endif
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _NEED_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
-#elif SCANF_LEVEL == SCANF_FLT
+
+#elif SCANF_VARIANT == __IO_VARIANT_FLOAT
+
 # define _NEED_IO_BRACKET
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
 #  define _NEED_IO_LONG_LONG
 # endif
 # define _NEED_IO_POS_ARGS
 # define _NEED_IO_C99_FORMATS
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
 # define _NEED_IO_FLOAT
-#elif SCANF_LEVEL == SCANF_DBL
+
+#elif SCANF_VARIANT == __IO_VARIANT_DOUBLE
+
 # define _NEED_IO_BRACKET
 # define _NEED_IO_WCHAR
 # if __SIZEOF_LONG_LONG__ > __SIZEOF_LONG__
@@ -103,15 +110,18 @@ int vfscanf (FILE * stream, const char *fmt, va_list ap) __attribute__((weak));
 # endif
 # define _NEED_IO_POS_ARGS
 # define _NEED_IO_C99_FORMATS
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _NEED_IO_PERCENT_B
 # endif
 # define _NEED_IO_DOUBLE
-# if defined(_WANT_IO_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
+# if defined(__IO_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
 #  define _NEED_IO_LONG_DOUBLE
 # endif
+
 #else
-# error	 "Not a known scanf level."
+
+# error	 "Not a known scanf variant."
+
 #endif
 
 #if defined(WIDE_CHARS) && !defined(_NEED_IO_WCHAR)

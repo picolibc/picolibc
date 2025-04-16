@@ -71,7 +71,7 @@ __getdelim (char **bufptr,
       *n = DEFAULT_LINE_SIZE;
     }
 
-  CHECK_INIT (_REENT, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
 

@@ -33,9 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
+
 long int
 lroundf(float x)
 {
@@ -51,6 +52,9 @@ lroundf(float x)
        "\t%0, %1, rmm" : "=r"(result) : "f"(x));
   return result;
 }
+
+_MATH_ALIAS_j_f(lround)
+
 #else
 #include "../../common/sf_lround.c"
 #endif

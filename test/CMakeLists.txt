@@ -60,7 +60,7 @@ set(tests
   test-fma
   test-sprintf-percent-n
   malloc_stress
-  posix-io
+  test-memchr
   test-memcpy_s
   test-memset_s
   test-memmove_s
@@ -92,7 +92,7 @@ function(picolibc_test test)
 
   add_test(
     NAME ${test}
-    COMMAND "${PICOLIBC_SCRIPTS}/run-arm" $<TARGET_FILE:${test}>
+    COMMAND "${PICOLIBC_SCRIPTS}/${TEST_RUNNER}" $<TARGET_FILE:${test}>
     )
   set_tests_properties(${test} PROPERTIES SKIP_RETURN_CODE 77)
 endfunction()

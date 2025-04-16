@@ -69,7 +69,7 @@ No supporting OS subroutines are required.
 int
 iswupper (wint_t c)
 {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
   return iswupper_l (c, 0);
 #else
   return c < (wint_t)0x100 ? isupper (c) : 0;

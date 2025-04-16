@@ -22,10 +22,8 @@ _nrand48_r (struct _rand48 *r,
     ((unsigned long) xseed[1] >> 1);
 }
 
-#ifndef _REENT_ONLY
 long
 nrand48 (unsigned short xseed[3])
 {
   return _nrand48_r (&_rand48, xseed);
 }
-#endif /* !_REENT_ONLY */

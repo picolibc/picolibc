@@ -67,7 +67,8 @@ SECTIONS
 		/* code */
 		*(.literal.unlikely .text.unlikely .literal.unlikely.* .text.unlikely.*)
 		*(.literal.startup .text.startup .literal.startup.* .text.startup.*)
-		*(.literal .text .literal.* .text.* .opd .opd.*)
+		*(SORT(.text.sorted.*))
+		*(.literal .text .literal.* .text.* .opd .opd.* .branch_lt .branch_lt.* @EXTRA_TEXT_SECTIONS@)
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
 		@PREFIX@__text_end = .;
@@ -81,6 +82,7 @@ SECTIONS
 
 		/* lists of constructors and destructors */
 		PROVIDE_HIDDEN ( @PREFIX@__preinit_array_start = . );
+		PROVIDE_HIDDEN ( @PREFIX@__bothinit_array_start = . );
 		KEEP (*(.preinit_array))
 		PROVIDE_HIDDEN ( @PREFIX@__preinit_array_end = . );
 
@@ -88,10 +90,12 @@ SECTIONS
 		KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
 		KEEP (*(.init_array .ctors))
 		PROVIDE_HIDDEN ( @PREFIX@__init_array_end = . );
+		PROVIDE_HIDDEN ( @PREFIX@__bothinit_array_end = . );
 
 		PROVIDE_HIDDEN ( @PREFIX@__fini_array_start = . );
 		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
 		KEEP (*(.fini_array .dtors))
+		KEEP (*(.fini_array*))
 		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
 
 	} >flash AT>flash :text
@@ -100,7 +104,7 @@ SECTIONS
 
 		/* read-only data */
 		*(.rdata)
-		*(.rodata .rodata.*)
+		*(.rodata .rodata.* @EXTRA_RODATA_SECTIONS@)
 		*(.gnu.linkonce.r.*)
 
 		*(.srodata.cst16)
@@ -110,6 +114,7 @@ SECTIONS
 		*(.srodata .srodata.*)
 
 	} >flash AT>flash :text
+	PROVIDE(@PREFIX@_pid_base = ADDR(.rodata));
 
 	.data.rel.ro : {
 
@@ -117,6 +122,22 @@ SECTIONS
 		*(.data.rel.ro .data.rel.ro.*)
 
 	} >flash AT>flash :text
+
+	/*
+	 * Procedure linkage table. This ends up
+	 * with an array of structs containing pointers
+	 * to the function descriptors and iplt references
+	 * that need to contain them after startup.
+	 */
+	@BFD_START@
+	.plt : {
+		*(.rela.iplt)
+		*(.rela.*)
+	} >flash AT>flash :text
+
+	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
+	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
+	@BFD_END@
 
 	/*
 	 * Needs to be in its own segment with the PLT entries first
@@ -130,6 +151,12 @@ SECTIONS
 
 	.toc : {
 		*(.toc .toc.*)
+		/*
+		 * These get written at startup, so this isn't correct,
+		 * but they must be reachable from tocbase so we can't
+		 * stick them in :ram
+		 */
+		*(.iplt .iplt.*)
 	} >flash AT>flash :text
 
 	/* additional sections when compiling with C++ exception support */
@@ -169,7 +196,7 @@ SECTIONS
 	} >ram AT>ram :ram
 
 	.data : @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
-		*(.data .data.*)
+		*(.data .data.* @EXTRA_DATA_SECTIONS@)
 		*(.gnu.linkonce.d.*)
 
 		/* Need to pre-align so that the symbols come after padding */
@@ -177,11 +204,23 @@ SECTIONS
 
 		PROVIDE( @PREFIX@__global_pointer$ = . + 0x800 );
 		PROVIDE( @PREFIX@_gp = . + 0x8000);
-		*(.sdata .sdata.* .sdata2.*)
+		*(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
 		*(.gnu.linkonce.s.*)
+		/*
+		 * Make sure there is space for PowerPC thread-local
+		 * stack-check value which lives before the thread
+		 * local storage block. We can't include this in
+		 * .tdata because the linker would then allocate TLS
+		 * offsets for it; in reality, it lives at a known
+		 * fixed offset outside of the usual TLS range
+		 */
+		PROVIDE( @PREFIX@__stack_chk_start = .);
+		KEEP (*(.stack_chk .stack_chk.*))
+		PROVIDE( @PREFIX@__stack_chk_end = .);
 	} >ram AT>flash :ram_init
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
 	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
+	PROVIDE(@PREFIX@__x86_gdt_ro = DEFINED(@PREFIX@__x86_gdt) ? @PREFIX@__x86_gdt - @PREFIX@__data_start + @PREFIX@__data_source : 0);
 
 	/* Thread local initialized data. This gets
 	 * space allocated as it is expected to be placed
@@ -200,12 +239,12 @@ SECTIONS
 		PROVIDE(@PREFIX@__data_end = .);
 		PROVIDE(@PREFIX@__tdata_end = .);
 	} >ram AT>flash :@TLS_INIT_SEG@ :ram_init
-	PROVIDE( @PREFIX@__tls_base = ADDR(.tdata));
-	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata));
-	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) );
+	PROVIDE( @PREFIX@__stack_chk_size = @PREFIX@__stack_chk_end - @PREFIX@__stack_chk_start );
+	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata) - @PREFIX@__stack_chk_size );
+	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
 	PROVIDE( @PREFIX@__data_source_end = @PREFIX@__tdata_source_end );
-	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) );
+	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) + @PREFIX@__stack_chk_size );
 
 	PROVIDE( @PREFIX@__edata = @PREFIX@__data_end );
 	PROVIDE( @PREFIX@_edata = @PREFIX@__data_end );
@@ -219,15 +258,21 @@ SECTIONS
 		PROVIDE( @PREFIX@__tls_end = . );
 		PROVIDE( @PREFIX@__tbss_end = . );
 	} >ram AT>ram :tls :ram
+	PROVIDE( @PREFIX@__tls_first = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
+	PROVIDE( @PREFIX@__tls_base = @PREFIX@__tls_first - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss));
 	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss));
-	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
+	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - @PREFIX@__tls_first );
 	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
-	PROVIDE( @PREFIX@__tls_size = @PREFIX@__tls_end - @PREFIX@__tls_base );
 	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( @PREFIX@__tls_size = (@PREFIX@__tls_tail_extra_size ? ALIGN(@PREFIX@__tls_end, @PREFIX@__tls_align) + @PREFIX@__tls_tail_extra_size : @PREFIX@__tls_end) - @PREFIX@__tls_base );
 	PROVIDE( @PREFIX@__tls_size_align = (@PREFIX@__tls_size + @PREFIX@__tls_align - 1) & ~(@PREFIX@__tls_align - 1));
 	PROVIDE( @PREFIX@__arm32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
 	PROVIDE( @PREFIX@__arm64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__or1k_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__sh32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__x86_tls_tcb = ALIGN(@PREFIX@__tls_end, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__x86_tls_tcb_offset = @PREFIX@__x86_tls_tcb - @PREFIX@__tls_base );
 
 	/*
 	 * Unlike ld.lld, ld.bfd does not advance the location counter for
@@ -242,9 +287,28 @@ SECTIONS
 	} >ram AT>ram :ram
 	@BFD_END@
 	.bss (NOLOAD) : {
-		*(.sbss*)
+		/*
+		 * For the x86-32 and x86-64, we must further allocate extra
+		 * space for the thread control block -- at a minimum, the
+		 * TCB needs to contain a pointer to itself
+		 * (https://akkadia.org/drepper/tls.pdf).  Unlike the
+		 * PowerPC case, the x86 TCB appears after the thread local
+		 * variables.
+		 * On the x86, the precise procedure to set the TCB pointer
+		 * depends on the operating system.  The system library
+		 * should implement a __set_tcb() function to set this
+		 * pointer (similar to OpenBSD's, https://man.openbsd.org/
+		 *__get_tcb.2).  __set_tcb() will be called by _set_tls().
+		 */
+		. = ALIGN(@PREFIX@__tls_align);
+		PROVIDE( @PREFIX@__tls_tail_extra_start = . );
+		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
+		PROVIDE( @PREFIX@__tls_tail_extra_end = . );
+
+		PROVIDE( @PREFIX@__non_tls_bss_start = . );
+		*(.sbss* @EXTRA_SBSS_SECTIONS@)
 		*(.gnu.linkonce.sb.*)
-		*(.bss .bss.*)
+		*(.bss .bss.* @EXTRA_BSS_SECTIONS@)
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
 
@@ -252,7 +316,7 @@ SECTIONS
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 		@PREFIX@__bss_end = .;
 	} >ram AT>ram :ram
-	PROVIDE( @PREFIX@__non_tls_bss_start = ADDR(.bss) );
+	PROVIDE( @PREFIX@__tls_tail_extra_size = @PREFIX@__tls_tail_extra_end - @PREFIX@__tls_tail_extra_start );
 	PROVIDE( @PREFIX@__end = @PREFIX@__bss_end );
 	@PREFIX@_end = @PREFIX@__bss_end;
 	PROVIDE( @PREFIX@end = @PREFIX@__bss_end );

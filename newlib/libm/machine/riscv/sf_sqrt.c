@@ -33,20 +33,23 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if defined(__riscv_fsqrt) && __riscv_flen >= 32
 #include "fdlibm.h"
+
+#if defined(__riscv_fsqrt) && __riscv_flen >= 32
 
 float
 sqrtf (float x)
 {
 	float result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
         if (isless(x, 0.0f))
             return __math_invalidf(x);
 #endif
 	__asm__("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
 	return result;
 }
+
+_MATH_ALIAS_f_f(sqrt)
 
 #else
 #include "../../math/sf_sqrt.c"

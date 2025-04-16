@@ -36,7 +36,7 @@
 #include <math.h>
 #include "math_config.h"
 
-#if _HAVE_FAST_FMAF
+#if __HAVE_FAST_FMAF
 
 float
 fmaf (float x, float y, float z)

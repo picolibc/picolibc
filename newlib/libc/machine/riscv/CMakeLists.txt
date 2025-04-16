@@ -43,6 +43,7 @@ picolibc_sources_flags("-fno-builtin"
   memmove-stub.c
   memset.S
   setjmp.S
+  stpcpy.c
   strcmp.S
   strcpy.c
   strlen.c

@@ -39,7 +39,7 @@ picolibc_sources(
   getauxval.c
   )
 
-if(${_HAVE_PICOLIBC_TLS_API})
+if(${__THREAD_LOCAL_STORAGE_API})
   picolibc_sources(inittls.c)
 endif()
 

@@ -44,7 +44,6 @@ typedef struct
   unsigned int pad1[ 3 ];
 } c99_putc_t;
 
-#ifndef _REENT_ONLY
 
 int
 putc (c, fp)
@@ -61,4 +60,3 @@ putc (c, fp)
   return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTC, &args);
 }
 
-#endif /* ! _REENT_ONLY */

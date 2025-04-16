@@ -53,7 +53,7 @@ objcopy=powerpc64-linux-gnu-objcopy
 
 $objcopy "$elf" -Obinary $one_bin 2>/dev/null
 
-$objcopy --update-section .init="$one_bin" --remove-section=.text --remove-section=.sfpr --remove-section=.toc --remove-section=.data "$elf" "$one_elf" 2>/dev/null
+$objcopy --update-section .init="$one_bin" --remove-section=.text --remove-section=.sfpr --remove-section=.toc --remove-section=.data --remove-section=.tdata "$elf" "$one_elf" 2>/dev/null
 
 mon=none
 

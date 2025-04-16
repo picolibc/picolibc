@@ -51,8 +51,8 @@ foreach params : targets
     _objs = []
   endif
   
-  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
-  _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
+  _c_args = printf_compile_args_d + target_c_args + get_variable('test_c_args' + target, test_c_args)
+  _link_args = printf_link_args_d + target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
   _c_args_extra = ['-D_XOPEN_SOURCE=700', '-D_GNU_SOURCE']
@@ -72,7 +72,7 @@ foreach params : targets
 		    link_depends: _link_depends,
 		    include_directories: test_inc),
          depends: bios_bin,
-	 env: test_env)
+	 suite: 'newlib.time', env: test_env)
     if enable_native_tests
       test(test_name + '-native',
            executable(test_name + '-native', [src],

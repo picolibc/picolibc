@@ -7,7 +7,7 @@
 
 #include <errno.h>
 
-void __inhibit_new_builtin_calls
+void __no_builtin
 sincosf(float x, float *sinx, float *cosx)
 {
     *sinx = _sinf(x);

@@ -62,34 +62,3 @@ vector_halt(sync);
 vector_halt(serror);
 vector(irq);
 vector(fiq);
-
-void
-__weak_vector_table(void);
-
-void __section(".text.init.enter") __attribute__((aligned(2048)))
-__weak_vector_table(void)
-{
-	/*
-	 * Exception vector
-	 */
-        __asm__("SP_EL0:\n"
-                "b aarch64_sync_vector\n"
-                ". = SP_EL0 + 0x80\n"
-                "b aarch64_irq_vector\n"
-                ". = SP_EL0 + 0x100\n"
-                "b aarch64_fiq_vector\n"
-                ". = SP_EL0 + 0x180\n"
-                "b aarch64_serror_vector\n"
-                ". = SP_EL0 + 0x200\n"
-                "SP_ELx:\n"
-                "b aarch64_sync_vector\n"
-                ". = SP_ELx + 0x80\n"
-                "b aarch64_irq_vector\n"
-                ". = SP_ELx + 0x100\n"
-                "b aarch64_fiq_vector\n"
-                ". = SP_ELx + 0x180\n"
-                "b aarch64_serror_vector\n"
-                ". = SP_ELx + 0x200\n");
-}
-
-__weak_reference(__weak_vector_table, __vector_table);

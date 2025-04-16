@@ -113,7 +113,7 @@ realloc(void * ptr, size_t size)
     {
 	size_t extra = old_size - new_size;
 
-#ifdef _NANO_MALLOC_CLEAR_FREED
+#ifdef __NANO_MALLOC_CLEAR_FREED
         if (extra > MALLOC_HEAD)
             memset((char *) ptr + new_size, 0, extra - MALLOC_HEAD);
 #endif

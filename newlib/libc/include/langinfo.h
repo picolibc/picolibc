@@ -173,11 +173,11 @@ enum
 
 };
 
-__BEGIN_DECLS
+_BEGIN_STD_C
 char	*nl_langinfo (nl_item);
 #if __POSIX_VISIBLE >= 200809
 char	*nl_langinfo_l (nl_item, locale_t);
 #endif
-__END_DECLS
+_END_STD_C
 
 #endif /* !_LANGINFO_H_ */

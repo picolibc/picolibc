@@ -35,13 +35,13 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "spu_timer_internal.h"
 
 /* The software managed timebase value.  */
-volatile uint64_t __spu_tb_val __attribute__ ((aligned (16)));
+volatile uint64_t __spu_tb_val __aligned(16);
 
 /* Timeout value of the current interval.  */
-volatile int __spu_tb_timeout __attribute__ ((aligned (16)));
+volatile int __spu_tb_timeout __aligned(16);
 
 /* Clock start count (clock is running if >0).  */
-volatile unsigned __spu_clock_startcnt __attribute__ ((aligned (16)));
+volatile unsigned __spu_clock_startcnt __aligned(16);
 
 /* Saved interrupt state from clock_start.  */
 volatile unsigned __spu_clock_state_was_enabled;

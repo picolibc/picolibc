@@ -48,7 +48,6 @@ picolibc_headers(""
   ctype.h
   devctl.h
   dirent.h
-  elf.h
   endian.h
   envlock.h
   envz.h
@@ -90,7 +89,6 @@ picolibc_headers(""
   _syslist.h
   tar.h
   termios.h
-  threads.h
   time.h
   uchar.h
   unctrl.h
@@ -102,7 +100,7 @@ picolibc_headers(""
   wordexp.h
   )
 
-if(${_HAVE_COMPLEX})
+if(${__HAVE_COMPLEX})
   picolibc_headers(""
     complex.h
     )

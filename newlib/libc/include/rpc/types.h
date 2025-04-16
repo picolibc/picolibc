@@ -44,9 +44,7 @@
 #define __need_NULL
 #include <stddef.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 #if defined(___int64_t_defined)
 typedef u_int64_t u_quad_t;
@@ -78,8 +76,6 @@ typedef   int32_t rpc_inline_t;
 #define mem_free(ptr, bsize)    free(ptr)
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif /* !_RPC_TYPES_H */

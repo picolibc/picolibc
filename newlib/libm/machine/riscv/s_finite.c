@@ -37,30 +37,24 @@
  * finite(x) returns 1 is x is finite, else 0;
  */
 
-#define _DEFAULT_SOURCE
-#include <math.h>
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
-int finite(double x)
+int finite64(__float64 x)
 {
 	long fclass = _fclass_d (x);
 	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
-#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
-#pragma GCC diagnostic ignored "-Wmissing-attributes"
-#endif
-__strong_reference(finite, __finite);
+#ifdef __strong_reference
+__strong_reference(finite64, __finite64);
 #else
-
-int __finite(double x)
-{
-    return finite(x);
-}
-
+int __finite64(__float64 x) { return finite64(x); }
 #endif
+
+_MATH_ALIAS_i_d(finite)
+_MATH_ALIAS_i_d(__finite)
 
 #else
 #include "../../common/s_finite.c"

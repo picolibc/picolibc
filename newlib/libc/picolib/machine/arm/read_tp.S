@@ -35,6 +35,7 @@
  */
 #include <picolibc.h>
 
+#define _IN_ASM
 #include "arm_tls.h"
 /*
  * This cannot be a C ABI function as the compiler assumes that it
@@ -90,14 +91,3 @@ __aeabi_read_tp:
 #endif
 
 	.cfi_endproc
-
-#ifndef ARM_TLS_CP15
-	.global __tls
-	.bss
-	.align 4
-	.type __tls, %object
-	.size __tls, TLS_SIZE
-__tls:
-	.space TLS_SIZE
-
-#endif

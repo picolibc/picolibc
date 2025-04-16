@@ -33,12 +33,34 @@
 #include "stdio_private.h"
 #include <inttypes.h>
 
-#if defined(_HAVE_BUILTIN_MUL_OVERFLOW) && defined(_HAVE_BUILTIN_ADD_OVERFLOW) && !defined(strtoi_signed)
+#ifdef WIDE_CHARS
+#include <wctype.h>
+#include <wchar.h>
+#define strtoi_char wchar_t
+#if __SIZEOF_WCHAR_T__ == 2
+# define strtoi_uchar uint16_t
+#elif __SIZEOF_WCHAR_T__ == 4
+# define strtoi_uchar uint32_t
+#endif
+#define strtoi_uint strtoi_uchar
+#define strtoi_isspace(c) iswspace(c)
+#else
+#define strtoi_char char
+#define strtoi_uint unsigned int
+#define strtoi_uchar unsigned char
+#define strtoi_isspace(c) isspace(c)
+#endif
+
+#ifndef strtoi_signed
+#define strtoi_utype strtoi_type
+#endif
+
+#if __HAVE_BUILTIN_MUL_OVERFLOW && __HAVE_BUILTIN_ADD_OVERFLOW && !defined(strtoi_signed)
 #define USE_OVERFLOW
 #endif
 
 strtoi_type
-strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
+strtoi(const strtoi_char *__restrict nptr, strtoi_char **__restrict endptr, int ibase)
 {
     unsigned int base = ibase;
 
@@ -46,28 +68,28 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
     if (base > 36 || base == 1) {
         errno = EINVAL;
         if (endptr)
-            *endptr = (char *) nptr;
+            *endptr = (strtoi_char *) nptr;
         return 0;
     }
 
 #define FLAG_NEG        0x1     /* Negative. Must be 1 for ucutoff below */
 #define FLAG_OFLOW      0x2     /* Value overflow */
 
-    const unsigned char *s = (const unsigned char *) nptr;
-    strtoi_type val = 0;
+    const strtoi_uchar *s = (const strtoi_uchar *) nptr;
+    strtoi_utype val = 0;
     unsigned char flags = 0;
-    unsigned int i;
+    strtoi_uint i;
 
     /* Skip leading spaces */
     do {
         i = *s++;
-    } while (isspace(i));
+    } while (strtoi_isspace(i));
 
     /* Parse a leading sign */
     switch (i) {
     case '-':
         flags = FLAG_NEG;
-	__PICOLIBC_FALLTHROUGH;
+	__fallthrough;
     case '+':
         i = *s++;
     }
@@ -77,7 +99,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
         if (TOLOWER(*s) == 'x' && ((base | 16) == 16)) {
             base = 16;
             /* Parsed the '0' */
-            nptr = (const char *) s;
+            nptr = (const strtoi_char *) s;
             i = s[1];
             s += 2;
 	} else if (base == 0) {
@@ -92,7 +114,7 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #ifdef strtoi_signed
     /* works because strtoi_min = (strtoi_type) ((strtoi_utype) strtoi_max + 1) */
     strtoi_utype ucutoff = (strtoi_utype) strtoi_max + flags;
-    strtoi_type cutoff = ucutoff / base;
+    strtoi_utype cutoff = ucutoff / base;
     unsigned int cutlim = ucutoff % base;
 #else
     strtoi_type cutoff = strtoi_max / base;
@@ -122,28 +144,29 @@ strtoi(const char *__restrict nptr, char **__restrict endptr, int ibase)
 #else
         if (val > cutoff || (val == cutoff && i > cutlim))
             flags |= FLAG_OFLOW;
-        val = val * (strtoi_type) base + (strtoi_type) i;
+        else
+            val = val * (strtoi_utype) base + (strtoi_utype) i;
 #endif
         /* Parsed another digit */
-        nptr = (const char *) s;
+        nptr = (const strtoi_char *) s;
         i = *s++;
     }
 
     /* Mark the end of the parsed region */
     if (endptr != NULL)
-        *endptr = (char *) nptr;
+        *endptr = (strtoi_char *) nptr;
 
     if (flags & FLAG_NEG)
         val = -val;
 
     if (flags & FLAG_OFLOW) {
 #ifdef strtoi_signed
-        val = (strtoi_type) ucutoff;
+        val = ucutoff;
 #else
         val = strtoi_max;
 #endif
         errno = ERANGE;
     }
 
-    return val;
+    return (strtoi_type) val;
 }

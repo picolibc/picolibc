@@ -44,7 +44,6 @@ typedef struct
   unsigned int pad1[ 3 ];
 } c99_fopen_t;
 
-#ifndef _REENT_ONLY
 FILE *
 fopen (const char *__restrict file,
 	const char *__restrict mode)
@@ -75,4 +74,3 @@ fopen (const char *__restrict file,
     return NULL;
   }
 }
-#endif /* ! _REENT_ONLY */

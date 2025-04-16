@@ -47,12 +47,6 @@ FILE *const __posix_stderr = &__stderr.xfile.cfile.file;
 
 __weak_reference(__posix_stderr,stderr);
 
-__attribute__((constructor))
-static void posix_init(void)
-{
-    __bufio_lock_init(&__stderr.xfile.cfile.file);
-}
-
 #if __PICOLIBC_STDERR_BUFSIZE > 1
 /*
  * Add a destructor function to get stderr flushed on

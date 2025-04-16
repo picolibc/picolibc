@@ -309,13 +309,6 @@ extern double rnd_prod(double, double), rnd_quot(double, double);
 #define ALL_ON 0xffff
 #endif
 
-#ifdef __cplusplus
-extern "C" double strtod(const char *s00, char **se);
-extern "C" char *dtoa(double d, int mode, int ndigits,
-			int *decpt, int *sign, char **rve);
-#endif
-
-
 typedef struct _Bigint _Bigint;
 
 #define Balloc	_Balloc
@@ -340,11 +333,11 @@ typedef struct _Bigint _Bigint;
 #define copybits 	__copybits
 #define hexnan	__hexnan
 
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 #define __get_hexdig(x) __hexdig[x] /* NOTE: must evaluate arg only once */
-#else /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#else /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 #define __get_hexdig(x) __hexdig_fun(x)
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 
 #define tens __mprec_tens
 #define bigtens __mprec_bigtens
@@ -383,17 +376,17 @@ __ULong		any_on (_Bigint *b, int k);
 void		copybits (__ULong *c, int n, _Bigint *b);
 double		_strtod_l (const char *__restrict s00,
 			   char **__restrict se, locale_t loc);
-#if defined (_HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
+#if defined(__HAVE_LONG_DOUBLE) && !defined (_LDBL_EQ_DBL) || 1
 int		_strtorx_l (const char *, char **, int,
 			    void *, locale_t);
 int		_strtodg_l (const char *s00, char **se,
 			    struct FPI *fpi, Long *exp, __ULong *bits,
 			    locale_t);
-#endif /* _HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
+#endif /* __HAVE_LONG_DOUBLE && !_LDBL_EQ_DBL */
 
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(_SMALL_HEXDIG)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || defined(_SMALL_HEXDIG)
 unsigned char __hexdig_fun (unsigned char);
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 #ifdef INFNAN_CHECK
 int		hexnan (const char **sp, const struct FPI *fpi, __ULong *x0);
 #endif
@@ -403,9 +396,9 @@ int		hexnan (const char **sp, const struct FPI *fpi, __ULong *x0);
 extern const double tinytens[];
 extern const double bigtens[];
 extern const double tens[];
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG)
 extern const unsigned char __hexdig[];
-#endif /* !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
+#endif /* !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__) && !defined(_SMALL_HEXDIG) */
 
 
 double _mprec_log10 (int);

@@ -80,7 +80,7 @@ typedef	__pid_t		pid_t;		/* process id */
 #endif
 extern char **environ;
 
-_Noreturn void	_exit (int __status);
+__noreturn void	_exit (int __status);
 
 int	access (const char *__path, int __amode);
 unsigned  alarm (unsigned __secs);
@@ -91,6 +91,9 @@ int     chown (const char *__path, uid_t __owner, gid_t __group);
 int     chroot (const char *__path);
 #endif
 int     close (int __fildes);
+#if __POSIX_VISIBLE >= 202405
+int	posix_close (int __fildes, int __flag);
+#endif
 #if __POSIX_VISIBLE >= 199209
 size_t	confstr (int __name, char *__buf, size_t __len);
 #endif
@@ -369,7 +372,7 @@ int	unlinkat (int, const char *, int);
 # define	SEEK_SET	0
 # define	SEEK_CUR	1
 # define	SEEK_END	2
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
 # define	SEEK_DATA	3
 # define	SEEK_HOLE	4
 #endif
@@ -385,6 +388,13 @@ int	unlinkat (int, const char *, int);
  *    permitted when using the interval notation `\{M,N\}'.  */
 #define _POSIX2_RE_DUP_MAX              255
 #endif /* _POSIX2_RE_DUP_MAX  */
+
+/*
+ * Flag values for posix_close per IEEE Std 1003.1, 2024 Edition
+ */
+#if __POSIX_VISIBLE >= 202405
+#define POSIX_CLOSE_RESTART	1
+#endif
 
 /*
  *  sysconf values per IEEE Std 1003.1, 2008 Edition

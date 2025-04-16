@@ -91,6 +91,5 @@ PORTABILITY
 wint_t
 putwchar (wchar_t wc)
 {
-  _REENT_SMALL_CHECK_INIT (_REENT);
   return fputwc (wc, stdout);
 }

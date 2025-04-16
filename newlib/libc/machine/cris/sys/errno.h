@@ -35,24 +35,21 @@ POSSIBILITY OF SUCH DAMAGE.
    __errno.  */
 
 #ifndef _SYS_ERRNO_H_
-#ifdef __cplusplus
-extern "C" {
-#endif
 #define _SYS_ERRNO_H_
 
-#include <sys/reent.h>
+#include <sys/cdefs.h>
 
-#ifndef _REENT_ONLY
+_BEGIN_STD_C
+
 #define errno (*__errno())
-extern int *__errno (void);
-#endif
+int *__errno (void);
 
 /* Please don't use these variables directly.
    Use strerror instead. */
 extern const char * const _sys_errlist[];
 extern int _sys_nerr;
 
-#define __errno_r(ptr) _REENT_ERRNO(ptr)
+#define __errno_r(ptr) errno
 
 /* Adjusted to the linux asm/errno.h */
 #define	EPERM		 1	/* Operation not permitted */
@@ -199,7 +196,6 @@ extern int _sys_nerr;
 
 #define __ELASTERROR 2000	/* Users can add values starting here */
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
+
 #endif /* _SYS_ERRNO_H */

@@ -111,7 +111,7 @@ _sflush (
   flags = fp->_flags;
   if ((flags & __SWR) == 0)
     {
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
       /* For a read stream, an fflush causes the next seek to be
          unoptimized (i.e. forces a system-level seek).  This conforms
          to the POSIX and SUSv3 standards.  */
@@ -137,8 +137,8 @@ _sflush (
 	  /* Save last errno and set errno to 0, so we can check if a device
 	     returns with a valid position -1.  We restore the last errno if
 	     no other error condition has been encountered. */
-	  tmp_errno = _REENT_ERRNO(ptr);
-	  _REENT_ERRNO(ptr) = 0;
+	  tmp_errno = errno;
+	  errno = 0;
 	  /* Get the physical position we are at in the file.  */
 	  if (fp->_flags & __SOFF)
 	    curoff = fp->_offset;
@@ -152,13 +152,13 @@ _sflush (
 	      else
 #endif
 		curoff = fp->_seek (fp->_cookie, 0, SEEK_CUR);
-	      if (curoff == -1L && _REENT_ERRNO(ptr) != 0)
+	      if (curoff == -1L && errno != 0)
 		{
 		  int result = EOF;
-		  if (_REENT_ERRNO(ptr) == ESPIPE || _REENT_ERRNO(ptr) == EINVAL)
+		  if (errno == ESPIPE || errno == EINVAL)
 		    {
 		      result = 0;
-		      _REENT_ERRNO(ptr) = tmp_errno;
+		      errno = tmp_errno;
 		    }
 		  else
 		    fp->_flags |= __SERR;
@@ -180,19 +180,19 @@ _sflush (
 	  else
 #endif
 	    curoff = fp->_seek (fp->_cookie, curoff, SEEK_SET);
-	  if (curoff != -1 || _REENT_ERRNO(ptr) == 0
-	      || _REENT_ERRNO(ptr) == ESPIPE || _REENT_ERRNO(ptr) == EINVAL)
+	  if (curoff != -1 || errno == 0
+	      || errno == ESPIPE || errno == EINVAL)
 	    {
 	      /* Seek successful or ignorable error condition.
 		 We can clear read buffer now.  */
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
 	      fp->_flags &= ~__SNPT;
 #endif
 	      fp->_r = 0;
 	      fp->_p = fp->_bf._base;
-	      if ((fp->_flags & __SOFF) && (curoff != -1 || _REENT_ERRNO(ptr) == 0))
+	      if ((fp->_flags & __SOFF) && (curoff != -1 || errno == 0))
 		fp->_offset = curoff;
-	      _REENT_ERRNO(ptr) = tmp_errno;
+	      errno = tmp_errno;
 	      if (HASUB (fp))
 		FREEUB (ptr, fp);
 	    }
@@ -255,23 +255,7 @@ fflush (register FILE * fp)
 
   int ret;
 
-#ifdef _REENT_SMALL
-  /* For REENT_SMALL platforms, it is possible we are being
-     called for the first time on a std stream.  This std
-     stream can belong to a reentrant struct that is not
-     _REENT.  If CHECK_INIT gets called below based on _REENT,
-     we will end up changing said file pointers to the equivalent
-     std stream off of _REENT.  This causes unexpected behavior if
-     there is any data to flush on the _REENT std stream.  There
-     are two alternatives to fix this:  1) make a reentrant fflush
-     or 2) simply recognize that this file has nothing to flush
-     and return immediately before performing a CHECK_INIT.  Choice
-     2 is implemented here due to its simplicity.  */
-  if (fp->_bf._base == NULL)
-    return 0;
-#endif /* _REENT_SMALL  */
-
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   if (!fp->_flags)
     return 0;

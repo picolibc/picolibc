@@ -40,17 +40,20 @@
 #define FSEEK_TYPE long
 #endif
 
-int FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
+int
+FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
 {
         struct __file_ext *xf = (struct __file_ext *) stream;
+
+        __flockfile(stream);
         if ((stream->flags & __SEXT) && xf->seek) {
                 if ((xf->seek) (stream, (__off_t) offset, whence) >= 0) {
                         stream->flags &= ~__SEOF;
                         (void) __atomic_exchange_ungetc(&stream->unget, 0);
-                        return 0;
+                        __funlock_return(stream, 0);
                 }
-                return -1;
+                __funlock_return(stream, -1);
         }
 	errno = ESPIPE;
-	return -1;
+	__funlock_return(stream, -1);
 }

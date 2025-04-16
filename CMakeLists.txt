@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.8.9 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8.10 LANGUAGES C ASM)
 
 # Set a default build type if none was specified
 set(default_build_type "MinSizeRel")
@@ -79,50 +79,43 @@ set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
 # Set all configure values to defaults for now
 
 # Use atomics for fgetc/ungetc for re-entrancy
-set(ATOMIC_UNGETC 1)
+set(__ATOMIC_UNGETC 1)
 
 # Always optimize strcmp for performance
-if(NOT DEFINED FAST_STRCMP)
-  option(FAST_STRCMP "Always optimize strcmp for performance" ON)
+if(NOT DEFINED __FAST_STRCMP)
+  option(__FAST_STRCMP "Always optimize strcmp for performance" ON)
 endif()
-
-# Obsoleted. Use regular syscalls
-set(MISSING_SYSCALL_NAMES 0)
 
 # use global errno variable
-if(NOT DEFINED NEWLIB_GLOBAL_ERRNO)
-  option(NEWLIB_GLOBAL_ERRNO "use global errno variable" OFF)
+if(NOT DEFINED __GLOBAL_ERRNO)
+  option(__GLOBAL_ERRNO "use global errno variable" OFF)
 endif()
 
 # use thread local storage
-if(NOT DEFINED PICOLIBC_TLS)
-  option(PICOLIBC_TLS "use thread local storage for static data" ON)
+if(NOT DEFINED __THREAD_LOCAL_STORAGE)
+  option(__THREAD_LOCAL_STORAGE "use thread local storage for static data" ON)
 endif()
 
-# use thread local storage
-set(NEWLIB_TLS ${PICOLIBC_TLS})
-
-# Use open/close/read/write in tinystdio
-option(POSIX_IO "Provide fopen/fdopen using POSIX I/O (open, close, read, write, lseek)" ON)
+# use thread local storage for stack protection canary
+if(NOT DEFINED __THREAD_LOCAL_STORAGE_STACK_GUARD)
+  option(__THREAD_LOCAL_STORAGE_STACK_GUARD "use thread local storage for stack protection canary" OFF)
+endif()
 
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed
 
-if(NOT DEFINED PREFER_SIZE_OVER_SPEED)
+if(NOT DEFINED __PREFER_SIZE_OVER_SPEED)
   if(CMAKE_BUILD_TYPE STREQUAL "MinSizeRel")
     set(default_prefer_size ON)
   else()
     set(default_prefer_size OFF)
   endif()
-  option(PREFER_SIZE_OVER_SPEED "Prefer smaller code size" ${default_prefer_size})
+  option(__PREFER_SIZE_OVER_SPEED "Prefer smaller code size" ${default_prefer_size})
 endif()
 
-# Obsoleted. Reentrant syscalls provided for us
-set(REENTRANT_SYSCALLS_PROVIDED 0)
-
 # Use tiny stdio from gcc avr
-option(TINY_STDIO "Use tiny stdio from avr libc" ON)
+option(__TINY_STDIO "Use tiny stdio from avr libc" ON)
 
 if(NOT TLS_MODEL)
   set(TLS_MODEL "local-exec")
@@ -130,255 +123,136 @@ endif()
 
 set(_ATEXIT_DYNAMIC_ALLOC 0)
 
-set(_FSEEK_OPTIMIZATION 0)
+set(__FSEEK_OPTIMIZATION 0)
 
-set(_FVWRITE_IN_STREAMIO 0)
-
-# Compiler supports alias symbol attribute
-picolibc_flag(_HAVE_ALIAS_ATTRIBUTE)
-
-# The compiler REALLY has the attribute __alloc_size__
-picolibc_flag(_HAVE_ALLOC_SIZE)
-
-# The compiler supports the always_inline function attribute
-picolibc_flag(_HAVE_ATTRIBUTE_ALWAYS_INLINE)
-
-# The compiler supports the gnu_inline function attribute
-picolibc_flag(_HAVE_ATTRIBUTE_GNU_INLINE)
+set(__FVWRITE_IN_STREAMIO 0)
 
 # Use bitfields in packed structs
-picolibc_flag(_HAVE_BITFIELDS_IN_PACKED_STRUCTS)
-
-# The compiler supports __builtin_alloca
-picolibc_flag(_HAVE_BUILTIN_ALLOCA)
-
-# The compiler supports __builtin_copysign
-picolibc_flag(_HAVE_BUILTIN_COPYSIGN)
-
-# The compiler supports __builtin_copysignl
-picolibc_flag(_HAVE_BUILTIN_COPYSIGNL)
-
-# The compiler supports __builtin_ctz
-picolibc_flag(_HAVE_BUILTIN_CTZ)
-
-# The compiler supports __builtin_ctzl
-picolibc_flag(_HAVE_BUILTIN_CTZL)
-
-# The compiler supports __builtin_ctzll
-picolibc_flag(_HAVE_BUILTIN_CTZLL)
-
-# Compiler has __builtin_expect
-picolibc_flag(_HAVE_BUILTIN_EXPECT)
-
-# The compiler supports __builtin_ffs
-picolibc_flag(_HAVE_BUILTIN_FFS)
-
-# The compiler supports __builtin_ffsl
-picolibc_flag(_HAVE_BUILTIN_FFSL)
-
-# The compiler supports __builtin_ffsll
-picolibc_flag(_HAVE_BUILTIN_FFSLL)
-
-# The compiler supports __builtin_finitel
-picolibc_flag(_HAVE_BUILTIN_FINITEL)
-
-# The compiler supports __builtin_isfinite
-picolibc_flag(_HAVE_BUILTIN_ISFINITE)
-
-# The compiler supports __builtin_isinf
-picolibc_flag(_HAVE_BUILTIN_ISINF)
-
-# The compiler supports __builtin_isinfl
-picolibc_flag(_HAVE_BUILTIN_ISINFL)
-
-# The compiler supports __builtin_isnan
-picolibc_flag(_HAVE_BUILTIN_ISNAN)
-
-# The compiler supports __builtin_isnanl
-picolibc_flag(_HAVE_BUILTIN_ISNANL)
-
-# Compiler has __builtin_mul_overflow
-picolibc_flag(_HAVE_BUILTIN_MUL_OVERFLOW)
-
-# Compiler has __builtin_add_overflow
-picolibc_flag(_HAVE_BUILTIN_ADD_OVERFLOW)
+picolibc_flag(__HAVE_BITFIELDS_IN_PACKED_STRUCTS)
 
 # Compiler has support for flag to prevent mis-optimizing memcpy/memset patterns
-picolibc_flag(_HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
+picolibc_flag(__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 
 # Compiler supports _Complex
-picolibc_flag(_HAVE_COMPLEX)
+picolibc_flag(__HAVE_COMPLEX)
 
-# Compiler supports __builtin_complex
-picolibc_flag(_HAVE_BUILTIN_COMPLEX)
-
-# Compiler supports format function attribute
-picolibc_flag(_HAVE_FORMAT_ATTRIBUTE 1)
-
-# Compiler supports weak attribute
-picolibc_flag(_HAVE_WEAK_ATTRIBUTE)
-
-set(_HAVE_FCNTL 0)
+set(__HAVE_FCNTL 0)
 
 # IEEE fp funcs available
-set(_HAVE_IEEEFP_FUNCS 0)
+set(__IEEEFP_FUNCS 0)
 
 # compiler supports INIT_ARRAY sections
-set(_HAVE_INITFINI_ARRAY 1)
+set(__INIT_FINI_ARRAY 1)
 
 # Support _init() and _fini() functions
-set(_HAVE_INIT_FINI 1)
+set(__INIT_FINI_FUNCS 1)
 
 # Enable MMU in pico crt startup
-set(_PICOCRT_ENABLE_MMU 1)
-
-# Compiler has long double type
-picolibc_flag(_HAVE_LONG_DOUBLE)
-
-# Compiler attribute to prevent the optimizer from adding new builtin calls
-picolibc_flag(_HAVE_NO_BUILTIN_ATTRIBUTE)
+set(__PICOCRT_ENABLE_MMU 1)
 
 # _set_tls and _init_tls functions available
-if(NOT DEFINED _HAVE_PICOLIBC_TLS_API OR NOT PICOLIBC_TLS)
-  set(_HAVE_PICOLIBC_TLS_API 0)
+if(NOT DEFINED __THREAD_LOCAL_STORAGE_API OR NOT __THREAD_LOCAL_STORAGE)
+  set(__THREAD_LOCAL_STORAGE_API 0)
 endif()
 
-set(_HAVE_SEMIHOST 1)
+set(__SEMIHOST 1)
 
 # math library does not set errno (offering only ieee semantics)
-set(_IEEE_LIBM 1)
+set(__IEEE_LIBM 1)
 
-if(NOT DEFINED _IO_FLOAT_EXACT)
-  option(_IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
+if(NOT DEFINED __IO_FLOAT_EXACT)
+  option(__IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
 endif()
 
-set(_LITE_EXIT 1)
+set(__PICO_EXIT 1)
 
-set(_PICO_EXIT 1)
-
-if(NOT DEFINED _ASSERT_VERBOSE)
-  option(_ASSERT_VERBOSE "Assert provides verbose information" ON)
+if(NOT DEFINED __ASSERT_VERBOSE)
+  option(__ASSERT_VERBOSE "Assert provides verbose information" ON)
 endif()
 
-if(NOT DEFINED _PICOLIBC_ATOMIC_SIGNAL)
-  option(_PICOLIBC_ATOMIC_SIGNAL "Use atomics in signal/raise" ON)
+if(NOT DEFINED __MB_CAPABLE)
+  option(__MB_CAPABLE "Enable multi-byte support" OFF)
 endif()
 
-if(NOT DEFINED _MB_CAPABLE)
-  option(_MB_CAPABLE "Enable multi-byte support" OFF)
+if(NOT DEFINED __MB_EXTENDED_CHARSETS_ALL)
+  option(__MB_EXTENDED_CHARSETS_ALL "Enable UCS, ISO, Windows and JIS multibyte encodings" OFF)
 endif()
 
-if(NOT DEFINED _MB_EXTENDED_CHARSETS_ALL)
-  option(_MB_EXTENDED_CHARSETS_ALL "Enable UCS, ISO, Windows and JIS multibyte encodings" OFF)
+if(NOT DEFINED __MB_EXTENDED_CHARSETS_UCS)
+  option(__MB_EXTENDED_CHARSETS_UCS "Enable UCS encodings" OFF)
 endif()
 
-if(NOT DEFINED _MB_EXTENDED_CHARSETS_UCS)
-  option(_MB_EXTENDED_CHARSETS_UCS "Enable UCS encodings" OFF)
+if(NOT DEFINED __MB_EXTENDED_CHARSETS_ISO)
+  option(__MB_EXTENDED_CHARSETS_ISO "Enable ISO encodings" OFF)
 endif()
 
-if(NOT DEFINED _MB_EXTENDED_CHARSETS_ISO)
-  option(_MB_EXTENDED_CHARSETS_ISO "Enable ISO encodings" OFF)
+if(NOT DEFINED __MB_EXTENDED_CHARSETS_WINDOWS)
+  option(__MB_EXTENDED_CHARSETS_WINDOWS "Enable Windows encodings" OFF)
 endif()
 
-if(NOT DEFINED _MB_EXTENDED_CHARSETS_WINDOWS)
-  option(_MB_EXTENDED_CHARSETS_WINDOWS "Enable Windows encodings" OFF)
+if(NOT DEFINED __MB_EXTENDED_CHARSETS_JIS)
+  option(__MB_EXTENDED_CHARSETS_JIS "Enable JIS multibyte encodings" OFF)
 endif()
 
-if(NOT DEFINED _MB_EXTENDED_CHARSETS_JIS)
-  option(_MB_EXTENDED_CHARSETS_JIS "Enable JIS multibyte encodings" OFF)
+set(__NANO_FORMATTED_IO OFF)
+
+option(__NANO_MALLOC "Use smaller malloc implementation" ON)
+
+set(_GLOBAL_ATEXIT OFF)
+
+set(__UNBUF_STREAM_OPT OFF)
+
+if(NOT DEFINED __IO_C99_FORMATS)
+  option(__IO_C99_FORMATS "Support C99 formats in printf/scanf" ON)
 endif()
 
-set(_NANO_FORMATTED_IO OFF)
-
-option(_NANO_MALLOC "Use smaller malloc implementation" ON)
-
-set(_REENT_GLOBAL_ATEXIT OFF)
-
-set(_UNBUF_STREAM_OPT OFF)
-
-if(NOT DEFINED _WANT_IO_C99_FORMATS)
-  option(_WANT_IO_C99_FORMATS "Support C99 formats in printf/scanf" ON)
+if(NOT DEFINED __IO_LONG_LONG)
+  option(__IO_LONG_LONG "Support long long in integer printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_LONG_LONG)
-  option(_WANT_IO_LONG_LONG "Support long long in integer printf/scanf" OFF)
+if(NOT DEFINED __IO_LONG_DOUBLE)
+  option(__IO_LONG_DOUBLE "Support long double in printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_LONG_DOUBLE)
-  option(_WANT_IO_LONG_DOUBLE "Support long double in printf/scanf" OFF)
+if(NOT DEFINED __IO_MINIMAL_LONG_LONG)
+  option(__IO_MINIMAL_LONG_LONG "Support long long in minimal printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_MINIMAL_IO_LONG_LONG)
-  option(_WANT_MINIMAL_IO_LONG_LONG "Support long long in minimal printf/scanf" OFF)
-endif()
-
-if(NOT DEFINED _WANT_IO_POS_ARGS)
-  option(_WANT_IO_POS_ARGS "Support positional args in integer printf/scanf" OFF)
+if(NOT DEFINED __IO_POS_ARGS)
+  option(__IO_POS_ARGS "Support positional args in integer printf/scanf" OFF)
 endif()
 
 option(__IO_FLOAT "Support floating point in printf/scanf by default" ON)
 
-if(NOT DEFINED _PRINTF_SMALL_ULTOA)
-  option(_PRINTF_SMALL_ULTOA "Avoid soft divide in printf" ON)
+if(NOT DEFINED __IO_SMALL_ULTOA)
+  option(__IO_SMALL_ULTOA "Avoid soft divide in printf" ON)
 endif()
 
-if(NOT DEFINED _PRINTF_PERCENT_N)
-  option(_PRINTF_PERCENT_N "Support %n formats in printf" OFF)
+if(NOT DEFINED __IO_PERCENT_N)
+  option(__IO_PERCENT_N "Support %n formats in printf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_PERCENT_B)
-  option(_WANT_IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
+if(NOT DEFINED __IO_PERCENT_B)
+  option(__IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
 endif()
 
-if(NOT DEFINED _WANT_IO_WCHAR)
-  option(_WANT_IO_WCHAR "Support %ls/%lc formats in printf even without multi-byte" OFF)
+if(NOT DEFINED __IO_WCHAR)
+  option(__IO_WCHAR "Support %ls/%lc formats in printf even without multi-byte" OFF)
 endif()
 
-if(NOT DEFINED _FORMAT_DEFAULT_MINIMAL)
-  set(_FORMAT_DEFAULT_MINIMAL ${IO_MINIMAL})
-endif()
-
-if(_FORMAT_DEFAULT_MINIMAL)
-  set(_FORMAT_DEFAULT_DOUBLE OFF)
-  set(_FORMAT_DEFAULT_FLOAT OFF)
-  set(_FORMAT_DEFAULT_INTEGER OFF)
-  set(_FORMAT_DEFAULT_LONG_LONG OFF)
-endif()
-
-if(NOT DEFINED _FORMAT_DEFAULT_DOUBLE)
-  set(_FORMAT_DEFAULT_DOUBLE ${__IO_FLOAT})
-endif()
-
-if(NOT DEFINED _FORMAT_DEFAULT_FLOAT)
-  set(_FORMAT_DEFAULT_FLOAT OFF)
-endif()
-
-if(NOT DEFINED _FORMAT_DEFAULT_LONG_LONG)
-  set(_FORMAT_DEFAULT_LONG_LONG OFF)
-endif()
-
-if(NOT DEFINED _FORMAT_DEFAULT_INTEGER)
-  if (__IO_FLOAT)
-    set(_FORMAT_DEFAULT_INTEGER OFF)
-  else()
-    set(_FORMAT_DEFAULT_INTEGER ON)
-  endif()
+if(NOT DEFINED __IO_DEFAULT)
+  set(__IO_DEFAULT d)
 endif()
 
 # math library sets errno
-set(_WANT_MATH_ERRNO OFF)
-
-set(_WANT_REENT_SMALL OFF)
+set(__MATH_ERRNO OFF)
 
 set(_WANT_REGISTER_FINI OFF)
 
-# Obsoleted. Define time_t to long instead of using a 64-bit type
-set(_WANT_USE_LONG_TIME_T OFF)
+set(__WIDE_ORIENT OFF)
 
-set(_WIDE_ORIENT OFF)
-
-if(NOT DEFINED _ELIX_LEVEL)
-  set(_ELIX_LEVEL 4)
+if(NOT DEFINED __ELIX_LEVEL)
+  set(__ELIX_LEVEL 4)
 endif()
 
 # Use old math code for double funcs (0 no, 1 yes)
@@ -388,16 +262,10 @@ set(__OBSOLETE_MATH_FLOAT ON)
 set(__OBSOLETE_MATH_DOUBLE ON)
 
 # Compute static memory area sizes at runtime instead of link time
-set(__PICOLIBC_CRT_RUNTIME_SIZE OFF)
+set(__PICOCRT_RUNTIME_SIZE OFF)
 
-if(NOT DEFINED __SINGLE_THREAD__)
-  option(__SINGLE_THREAD__ "Disable multithreading support" OFF)
-endif()
-
-if(__SINGLE_THREAD__)
-  set(_RETARGETABLE_LOCKING OFF)
-else()
-  set(_RETARGETABLE_LOCKING ON)
+if(NOT DEFINED __SINGLE_THREAD)
+  option(__SINGLE_THREAD "Disable multithreading support" OFF)
 endif()
 
 set(NEWLIB_VERSION 4.3.0)
@@ -417,7 +285,7 @@ configure_file(picolibc.h.in "${PICOLIBC_INCLUDE}/picolibc.h")
 
 set(INCLUDEDIR include)
 set(LIBDIR .)
-if(PICOLIBC_TLS)
+if(__THREAD_LOCAL_STORAGE)
   set(TLSMODEL "-ftls-model=${TLS_MODEL}")
 endif()
 set(LINK_SPEC "")

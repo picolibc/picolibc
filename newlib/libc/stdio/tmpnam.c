@@ -98,7 +98,7 @@ The global pointer <<environ>> is also required.
 #include <errno.h>
 #include <unistd.h>
 
-static NEWLIB_THREAD_LOCAL int _tls_inc;
+static __THREAD_LOCAL int _tls_inc;
 
 /* Try to open the file specified, if it can't be opened then try
    another one.  Return nonzero if successful, otherwise zero.  */
@@ -122,7 +122,7 @@ worker (
       t = open (result, O_RDONLY, 0);
       if (t == -1)
 	{
-	  if (_REENT_ERRNO(ptr) == ENOSYS)
+	  if (errno == ENOSYS)
 	    {
 	      result[0] = '\0';
 	      return 0;
@@ -136,7 +136,7 @@ worker (
 
 #define _TMPNAM_SIZE 25
 
-static NEWLIB_THREAD_LOCAL char _tmpnam_buf[_TMPNAM_SIZE];
+static __THREAD_LOCAL char _tmpnam_buf[_TMPNAM_SIZE];
 
 char *
 tmpnam (

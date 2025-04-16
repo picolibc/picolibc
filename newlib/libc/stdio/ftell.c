@@ -91,7 +91,7 @@ ftell (
   if ((long)pos != pos)
     {
       pos = -1;
-      _REENT_ERRNO(ptr) = EOVERFLOW;
+      errno = EOVERFLOW;
     }
   return (long)pos;
 }

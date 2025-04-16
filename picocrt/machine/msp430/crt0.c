@@ -43,13 +43,13 @@
 
 extern char __stack[];
 
-static void  __attribute__((used))
+static void  __used
 _cstart(void)
 {
     __start();
 }
 
-void __section(".text.init.enter") __attribute__((used))
+void __section(".text.init.enter") __used
 _start(void)
 {
     /* Generate a reference to __interrupt_vector so we get one loaded */

@@ -41,7 +41,7 @@
 
 #include "dtoa.h"
 
-static NEWLIB_THREAD_LOCAL char ecvt_buf[DTOA_MAX_DIG + 1];
+static __THREAD_LOCAL char ecvt_buf[DTOA_MAX_DIG + 1];
 
 char *
 ecvt (double invalue,

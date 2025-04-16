@@ -148,7 +148,7 @@ __atof_engine(uint32_t m10, int e10)
 	// trailing zeros or the result would otherwise be odd.
 	//
 	// We need to update trailingZeros given that we have the exact output exponent ieee_e2 now.
-	trailingZeros &= (m2 & ((1u << (shift - 1)) - 1)) == 0;
+	trailingZeros &= (m2 & (((uint32_t) 1u << (shift - 1)) - 1)) == 0;
 	uint32_t lastRemovedBit = (m2 >> (shift - 1)) & 1;
 	bool roundUp = (lastRemovedBit != 0) && (!trailingZeros || (((m2 >> shift) & 1) != 0));
 
@@ -157,7 +157,7 @@ __atof_engine(uint32_t m10, int e10)
 	printf("ieee_m2 = %lu\n", (m2 >> shift) + roundUp);
 #endif
 	uint32_t ieee_m2 = (m2 >> shift) + roundUp;
-	assert(ieee_m2 <= (1u << (FLOAT_MANTISSA_BITS + 1)));
+	assert(ieee_m2 <= ((uint32_t) 1u << (FLOAT_MANTISSA_BITS + 1)));
 	ieee_m2 &= ((uint32_t)1u << FLOAT_MANTISSA_BITS) - 1;
 	if (ieee_m2 == 0 && roundUp) {
 		// Rounding up may overflow the mantissa.

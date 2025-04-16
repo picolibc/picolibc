@@ -69,6 +69,5 @@ int
 putchar (
        int c)
 {
-  _REENT_SMALL_CHECK_INIT (ptr);
   return putc ( c, stdout );
 }

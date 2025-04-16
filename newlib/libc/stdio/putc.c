@@ -83,7 +83,7 @@ putc (
        register FILE *fp)
 {
   int result;
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
   _newlib_flockfile_start (fp);
   result = _sputc ( c, fp);
   _newlib_flockfile_end (fp);

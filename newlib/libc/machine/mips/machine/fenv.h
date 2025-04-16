@@ -31,14 +31,13 @@
 #ifndef	_MACHINE_FENV_H_
 #define	_MACHINE_FENV_H_
 
+#include <sys/cdefs.h>
 
 #if !defined(__mips_soft_float) && !defined(__mips_hard_float)
 #error compiler didnt set soft/hard float macros
 #endif
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+_BEGIN_STD_C
 
 typedef int fenv_t;
 typedef int fexcept_t;
@@ -71,8 +70,8 @@ extern fenv_t		_fe_dfl_env;
 #define	_FCSR_ENABLE_SHIFT	5
 #define	_FCSR_ENABLE_MASK	(FE_ALL_EXCEPT << _FCSR_ENABLE_SHIFT)
 
-#define	__cfc1(__fcsr)	__asm __volatile("cfc1 %0, $31" : "=r" (__fcsr))
-#define	__ctc1(__fcsr)	__asm __volatile("ctc1 %0, $31" :: "r" (__fcsr))
+#define	__cfc1(__fcsr)	__asm__ __volatile__("cfc1 %0, $31" : "=r" (__fcsr))
+#define	__ctc1(__fcsr)	__asm__ __volatile__("ctc1 %0, $31" :: "r" (__fcsr))
 
 #else
 #define	FE_TONEAREST	0x0000
@@ -90,8 +89,6 @@ extern fenv_t		_fe_dfl_env;
 #endif
 #endif
 
-#ifdef __cplusplus
-}
-#endif
+_END_STD_C
 
 #endif	/* !_FENV_H_ */

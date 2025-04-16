@@ -38,12 +38,23 @@
 #endif
 
 /* Switch cortex-m0 to use RP2040 CPUID register if requested */
-#if __ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M' && defined(_HAVE_PICOLIBC_TLS_RP2040)
+#if __ARM_ARCH == 6 && __ARM_ARCH_PROFILE == 'M' && defined(__THREAD_LOCAL_STORAGE_RP2040)
 #define ARM_RP2040
 #endif
 
 #ifdef ARM_RP2040
 #define RP2040_SIO_BASE        0xd0000000
 #define RP2040_CPUID           (RP2040_SIO_BASE + 0)
-#define RP2040_NCORE            2
+#define ARM_TLS_COUNT           2
+#else
+#define ARM_TLS_COUNT           1
+#endif
+
+#ifndef _IN_ASM
+/* This needs to be global so that __aeabi_read_tp can
+ * refer to it in an asm statement
+ */
+#ifndef ARM_TLS_CP15
+extern void *__tls[ARM_TLS_COUNT];
+#endif
 #endif

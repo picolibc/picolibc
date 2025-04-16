@@ -37,7 +37,7 @@
 
 extern char __stack[];
 
-void __section(".init") __attribute__((used))
+void __section(".init") __used
 _start(void)
 {
 	/* Initialize stack pointer */
@@ -54,7 +54,7 @@ _start(void)
 	__asm__("jmp _cstart");
 }
 
-static void __attribute__((used)) __section(".init")
+static void __used __section(".init")
 _cstart(void)
 {
 	__start();

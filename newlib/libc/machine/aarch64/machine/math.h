@@ -37,16 +37,16 @@
 #define _MACHINE_MATH_H_
 
 #if __ARM_FP & 0x8
-#define _HAVE_FAST_FMA 1
+#define __HAVE_FAST_FMA 1
 #endif
 
 #if __ARM_FP & 0x4
-#define _HAVE_FAST_FMAF 1
+#define __HAVE_FAST_FMAF 1
 #endif
 
 #ifdef __declare_extern_inline
 
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
 #include <errno.h>
 #endif
 
@@ -56,7 +56,7 @@ __declare_extern_inline(double)
 sqrt (double x)
 {
     double result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
     if (isless(x, 0.0))
         errno = EDOM;
 #endif
@@ -79,7 +79,7 @@ __declare_extern_inline(float)
 sqrtf (float x)
 {
     float result;
-#ifdef _WANT_MATH_ERRNO
+#ifdef __MATH_ERRNO
     if (isless(x, 0.0f))
         errno = EDOM;
 #endif

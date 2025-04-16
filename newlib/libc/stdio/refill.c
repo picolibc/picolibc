@@ -41,7 +41,7 @@ _srefill (
 {
   /* make sure stdio is set up */
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   fp->_r = 0;			/* largely a convenience for callers */
 
@@ -54,7 +54,7 @@ _srefill (
     {
       if ((fp->_flags & __SRW) == 0)
 	{
-	  _REENT_ERRNO(ptr) = EBADF;
+	  errno = EBADF;
 	  fp->_flags |= __SERR;
 	  return EOF;
 	}

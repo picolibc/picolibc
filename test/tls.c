@@ -50,18 +50,18 @@
 
 #define TLS_ALIGN      (OVERALIGN_DATA > OVERALIGN_BSS ? OVERALIGN_DATA : OVERALIGN_BSS)
 
-NEWLIB_THREAD_LOCAL volatile int32_t data_var = DATA_VAL;
-NEWLIB_THREAD_LOCAL volatile int32_t bss_var;
-_Alignas(OVERALIGN_DATA) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_data_var = DATA_VAL2;
-_Alignas(OVERALIGN_BSS) NEWLIB_THREAD_LOCAL volatile int32_t overaligned_bss_var;
-_Alignas(OVERALIGN_NON_TLS_BSS) volatile int32_t overaligned_non_tls_bss_var;
+__THREAD_LOCAL volatile int32_t data_var = DATA_VAL;
+__THREAD_LOCAL volatile int32_t bss_var;
+__aligned(OVERALIGN_DATA) __THREAD_LOCAL volatile int32_t overaligned_data_var = DATA_VAL2;
+__aligned(OVERALIGN_BSS) __THREAD_LOCAL volatile int32_t overaligned_bss_var;
+__aligned(OVERALIGN_NON_TLS_BSS) volatile int32_t overaligned_non_tls_bss_var;
 
 volatile int32_t *volatile data_addr;
 volatile int32_t *volatile overaligned_data_addr;
 volatile int32_t *volatile bss_addr;
 volatile int32_t *volatile overaligned_bss_addr;
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE_API
 extern char __tdata_start[], __tdata_end[];
 extern char __tdata_source[], __tdata_source_end[];
 extern char __data_start[], __data_source[];
@@ -74,12 +74,12 @@ inside_tls_region(void *ptr, const void *tls)
 	       (uintptr_t)ptr < (uintptr_t)tls + _tls_size();
 }
 
-#define check_inside_tls_region(ptr, tls_start)                                \
-	if (!inside_tls_region(__DEVOLATILE(void *, ptr), tls_start)) {        \
-		printf("%s (%p) is not inside TLS region [%p-%p)\n", #ptr,     \
-		       ptr, tls_start, (char *)tls_start + _tls_size());       \
-		result++;                                                      \
-	}
+#define check_inside_tls_region(ptr, tls_start)                         \
+        if (!inside_tls_region((void *) ptr, tls_start)) {              \
+                printf("%s (%p) is not inside TLS region [%p-%p)\n", #ptr, \
+                       ptr, tls_start, (char *)tls_start + _tls_size()); \
+                result++;                                               \
+        }
 #endif
 
 static int
@@ -89,7 +89,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
 
 	printf("tls check %s %p %p %p %p\n", where, &data_var,
 	       &overaligned_data_var, &bss_var, &overaligned_bss_var);
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE_API
         if (_tls_align() & (OVERALIGN_DATA-1)) {
                 printf("TLS alignment too small for data (need %ld, got %ld)\n",
                        (unsigned long) OVERALIGN_DATA,
@@ -203,7 +203,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
 			result++;
 		}
 	}
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE_API
 	check_inside_tls_region(&data_var, tls_region);
 	check_inside_tls_region(&overaligned_data_var, tls_region);
 	check_inside_tls_region(&bss_var, tls_region);
@@ -230,7 +230,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
 	return result;
 }
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE_API
 static void
 hexdump(const void *ptr, int length, const char *hdr)
 {
@@ -260,7 +260,7 @@ main(void)
 	bss_addr = &bss_var;
         overaligned_bss_addr = &overaligned_bss_var;
 
-#ifdef PICOLIBC_TLS
+#ifdef __THREAD_LOCAL_STORAGE_API
         printf("TLS region: %p-%p (%zd bytes)\n", __tdata_start,
 	       __tdata_start + _tls_size(), _tls_size());
 	size_t tdata_source_size = __tdata_source_end - __tdata_source;
@@ -287,7 +287,7 @@ main(void)
 #endif
 
 
-#ifdef _HAVE_PICOLIBC_TLS_API
+#ifdef __THREAD_LOCAL_STORAGE_API
 
         size_t tls_align = _tls_align();
         size_t tls_size = _tls_size();

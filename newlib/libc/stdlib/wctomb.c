@@ -14,24 +14,24 @@ SYNOPSIS
 	int wctomb(char *<[s]>, wchar_t <[wchar]>);
 
 DESCRIPTION
-When _MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
 implementation of <<wctomb>>.  The
 only ``wide characters'' recognized are single bytes,
 and they are ``converted'' to themselves.  
 
-When _MB_CAPABLE is defined, this routine calls <<_wctomb_r>> to perform
+When __MB_CAPABLE is defined, this routine calls <<_wctomb_r>> to perform
 the conversion, passing a state variable to allow state dependent
 decoding.  The result is based on the locale setting which may
 be restricted to a defined set of locales.
 
 Each call to <<wctomb>> modifies <<*<[s]>>> unless <[s]> is a null
-pointer or _MB_CAPABLE is defined and <[wchar]> is invalid.
+pointer or __MB_CAPABLE is defined and <[wchar]> is invalid.
 
 RETURNS
 This implementation of <<wctomb>> returns <<0>> if
-<[s]> is <<NULL>>; it returns <<-1>> if _MB_CAPABLE is enabled
+<[s]> is <<NULL>>; it returns <<-1>> if __MB_CAPABLE is enabled
 and the wchar is not a valid multi-byte character, it returns <<1>>
-if _MB_CAPABLE is not defined or the wchar is in reality a single
+if __MB_CAPABLE is not defined or the wchar is in reality a single
 byte character, otherwise it returns the number of bytes in the
 multi-byte character.
 
@@ -46,7 +46,7 @@ effects vary with the locale.
 #include <errno.h>
 #include "local.h"
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 static mbstate_t _mbtowc_state;
 #define ps &_mbtowc_state
 #else
@@ -61,7 +61,7 @@ wctomb (char *s,
 
         retval = __WCTOMB (s, wchar, ps);
         if (retval == -1) {
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
                 _mbtowc_state.__count = 0;
 #endif
                 errno = EILSEQ;

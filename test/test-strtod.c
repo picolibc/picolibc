@@ -37,8 +37,9 @@
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
+#include <wchar.h>
 
-#if defined (TINY_STDIO) || !defined(__PICOLIBC__)
+#if defined (__TINY_STDIO) || !defined(__PICOLIBC__)
 #define FULL_TESTS
 #endif
 
@@ -59,7 +60,7 @@ static const struct {
 } tests[] = {
     { "1e2@", 100.0, 100.0f, 100.0l, "@" },
 #ifdef FULL_TESTS
-#if !defined(TINY_STDIO) || defined(_IO_FLOAT_EXACT)
+#if !defined(__TINY_STDIO) || defined(__IO_FLOAT_EXACT)
     { "3752432815e-39%", 0x1.306efbp-98, 0x1.306efcp-98f, 3752432815e-39l, "%" },
     { "3.752432815e-30%", 0x1.306efbp-98, 0x1.306efcp-98f, 3752432815e-39l, "%" },
     { "3752432814e-39^", 3752432814e-39, 0x1.306efap-98f, 3752432814e-39l, "^" },
@@ -130,6 +131,8 @@ static const struct {
 
 #define NTESTS (sizeof(tests)/sizeof(tests[0]))
 
+static wchar_t wbuf[256], wendbuf[256];
+
 int main(void)
 {
     int i;
@@ -141,6 +144,7 @@ int main(void)
 #endif
 #endif
     char *end;
+    wchar_t *wend;
     int ret = 0;
 
     for (i = 0; i < (int) NTESTS; i++) {
@@ -155,6 +159,7 @@ int main(void)
                    tests[i].string, end, tests[i].end_test);
             ret = 1;
         }
+
         f = strtof(tests[i].string, &end);
         if (f != tests[i].fvalue) {
             printf("strtof(\"%s\"): got %.17e %a want %.17e %a\n", tests[i].string,
@@ -172,6 +177,40 @@ int main(void)
                 ret = 1;
             }
         }
+
+        mbstowcs(wbuf, tests[i].string, sizeof(wbuf)/sizeof(wchar_t));
+        mbstowcs(wendbuf, tests[i].end_test, sizeof(wendbuf)/sizeof(wchar_t));
+
+        d = wcstod(wbuf, &wend);
+        if (d != tests[i].dvalue) {
+            printf("wcstod(\"%ls\"): got %.17e %a want %.17e %a\n", wbuf,
+                   d, d, tests[i].dvalue, tests[i].dvalue);
+            ret = 1;
+        }
+        if (wcscmp(wend, wendbuf) != 0) {
+            printf("wcstod(\"%ls\") end is \"%ls\" expected \"%ls\"\n",
+                   wbuf, wend, wendbuf);
+            ret = 1;
+        }
+
+        f = wcstof(wbuf, &wend);
+        if (f != tests[i].fvalue) {
+            printf("wcstof(\"%ls\"): got %.17e %a want %.17e %a\n", wbuf,
+                   (double) f, (double) f, (double) tests[i].fvalue, (double) tests[i].fvalue);
+            ret = 1;
+        }
+        if (wcscmp(wend, wendbuf) != 0) {
+            printf("wcstof(\"%ls\") end is \"%ls\" expected \"%ls\"\n",
+                   wbuf, wend, wendbuf);
+            ret = 1;
+        }
+        if (tests[i].end_test[0] == '%') {
+            if ((float) d != f) {
+                printf("wcstof(\"%ls\") got %a wcstod got %a\n", wbuf, (double) f, d);
+                ret = 1;
+            }
+        }
+
 #ifdef _TEST_LONG_DOUBLE
 #ifdef FULL_TESTS
         if (sizeof(long double) > sizeof(double)
@@ -189,6 +228,19 @@ int main(void)
                        tests[i].string, end, tests[i].end_test);
                 ret = 1;
             }
+
+            ld = wcstold(wbuf, &wend);
+            if (ld != tests[i].ldvalue) {
+                printf("wcstold(\"%ls\"): got %.17Le %La want %.17Le %La\n", wbuf,
+                       ld, ld, tests[i].ldvalue, tests[i].ldvalue);
+                ret = 1;
+            }
+            if (wcscmp(wend, wendbuf) != 0) {
+                printf("wcstold(\"%ls\") end is \"%ls\" expected \"%ls\"\n",
+                       wbuf, wend, wendbuf);
+                ret = 1;
+            }
+
         }
 #endif
 #endif

@@ -33,6 +33,6 @@ fputc_unlocked (
        int ch,
        FILE * file)
 {
-  CHECK_INIT(ptr, file);
+  CHECK_INIT();
   return putc_unlocked ( ch, file);
 }

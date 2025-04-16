@@ -364,6 +364,14 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
      less conversion accuracy.
      Enabled by default.
 
+`--enable-newlib-use-malloc-in-execl'
+     Use malloc instead of alloca in execl, execle and execlp. Using malloc
+     avoids unbounded stack allocations in those functions, preventing stack
+     overflows especially for platforms without virtual memory and small stacks.
+     However, POSIX.1-2008 requires execl and execle to be callable from signal
+     handlers while malloc isn't.
+     Disabled by default.
+
 `--enable-multilib'
      Build many library versions.
      Enabled by default.
@@ -467,6 +475,13 @@ One feature can be enabled by specifying `--enable-FEATURE=yes' or
       5) As a rule, no features from outside of C89 standard will be
 	 considered in this implementation.
 
+     Disabled by default.
+
+`--enable-newlib-hw-misaligned-access'
+	 Use word-by-word access for misaligned memory in string functions
+	 (e.g., memcpy, strcmp, etc.) instead of byte-by-byte access.
+	 This approach may offer better performance on some architectures
+	 that have little to no penalty for unaligned memory access.
      Disabled by default.
 
 Running the Testsuite

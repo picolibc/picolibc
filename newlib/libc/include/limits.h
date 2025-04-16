@@ -5,16 +5,16 @@
 #include <sys/cdefs.h>
 #include <sys/syslimits.h>
 
-#ifndef _MB_LEN_MAX
-# ifdef _MB_CAPABLE
-#  define _MB_LEN_MAX   8
+#ifndef __MB_LEN_MAX
+# ifdef __MB_CAPABLE
+#  define __MB_LEN_MAX   8
 # else
-#  define _MB_LEN_MAX   1
+#  define __MB_LEN_MAX   1
 # endif
 #endif
-#define MB_LEN_MAX	_MB_LEN_MAX
+#define MB_LEN_MAX	__MB_LEN_MAX
 
-/* Maximum number of positional arguments, if _WANT_IO_POS_ARGS.  */
+/* Maximum number of positional arguments, if __IO_POS_ARGS.  */
 # ifndef NL_ARGMAX
 #  define NL_ARGMAX 32
 # endif

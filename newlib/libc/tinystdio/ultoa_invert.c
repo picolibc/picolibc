@@ -26,7 +26,7 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#if PRINTF_LEVEL < PRINTF_DBL && defined(_PRINTF_SMALL_ULTOA)
+#if !IO_VARIANT_IS_FLOAT(PRINTF_VARIANT) && defined(__IO_SMALL_ULTOA)
 
 /*
  * Enable fancy divmod for targets where we don't expect either
@@ -110,7 +110,7 @@ static inline ultoa_unsigned_t
 udivmod(ultoa_unsigned_t val, int base, char *dig)
 {
     switch(base) {
-#ifdef _WANT_IO_PERCENT_B
+#ifdef __IO_PERCENT_B
     case 2:
         *dig = val & 1;
         return val >> 1;

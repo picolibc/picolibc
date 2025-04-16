@@ -35,7 +35,6 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #undef putchar
 
-#ifndef _REENT_ONLY
 
 int
 putchar (c)
@@ -46,4 +45,3 @@ putchar (c)
   return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTCHAR, &c);
 }
 
-#endif /* ! _REENT_ONLY */

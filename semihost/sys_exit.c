@@ -36,7 +36,7 @@
 #include "semihost-private.h"
 #include <sys/cdefs.h>
 
-_Noreturn void
+__noreturn void
 sys_semihost_exit(uintptr_t exception, uintptr_t subcode)
 {
 	if (sizeof(sh_param_t) == 8) {
@@ -44,5 +44,5 @@ sys_semihost_exit(uintptr_t exception, uintptr_t subcode)
 	}
 	else
 		(void) sys_semihost(SYS_EXIT, exception);
-	__unreachable();
+	__builtin_unreachable();
 }

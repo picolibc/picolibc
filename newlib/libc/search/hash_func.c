@@ -133,25 +133,25 @@ hash3(keyarg, len)
 		case 0:
 			do {
 				HASHC;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 		case 7:
 				HASHC;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 		case 6:
 				HASHC;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 		case 5:
 				HASHC;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 		case 4:
 				HASHC;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 		case 3:
 				HASHC;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 		case 2:
 				HASHC;
-				__PICOLIBC_FALLTHROUGH;
+				__fallthrough;
 		case 1:
 				HASHC;
 			} while (--loop);

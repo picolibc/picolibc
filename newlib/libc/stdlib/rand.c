@@ -57,7 +57,6 @@ on two different systems.
 <<rand>> requires no supporting OS subroutines.
 */
 
-#ifndef _REENT_ONLY
 
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
@@ -65,7 +64,6 @@ on two different systems.
 int
 rand (void)
 {
-  return (int) random();
+  return (int) (random() & RAND_MAX);
 }
 
-#endif /* _REENT_ONLY */

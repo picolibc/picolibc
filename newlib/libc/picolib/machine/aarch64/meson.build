@@ -33,7 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-src_picolib += files('interrupt.c')
+src_picolib += files('interrupt.c',
+                     'interrupt_vector.S')
 
 if thread_local_storage
   src_picolib += files('tls.c')

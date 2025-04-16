@@ -102,8 +102,8 @@ __typeof(vfwscanf) vfiwscanf;
 #else
 #  define _SVFWSCANF _svfwscanf
 #endif
-#ifndef NO_FLOATING_POINT
-#define FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
+#define __IO_FLOATING_POINT
 #endif
 #endif
 
@@ -119,7 +119,7 @@ __typeof(vfwscanf) vfiwscanf;
 #define fgetwc sfgetwc
 #endif
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 #include <math.h>
 #include <float.h>
 #include <locale.h>
@@ -129,7 +129,7 @@ __typeof(vfwscanf) vfiwscanf;
    This could be changed in the future should the __ldtoa code be
    preferred over __dtoa.  */
 #define _NO_LONGDBL
-#if defined _WANT_IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
+#if defined __IO_LONG_DOUBLE && (LDBL_MANT_DIG > DBL_MANT_DIG)
 #undef _NO_LONGDBL
 #endif
 
@@ -149,13 +149,13 @@ __typeof(vfwscanf) vfiwscanf;
 #endif
 
 #define _NO_LONGLONG
-#if defined _WANT_IO_LONG_LONG \
+#if defined __IO_LONG_LONG \
 	&& (defined __GNUC__ || __STDC_VERSION__ >= 199901L)
 # undef _NO_LONGLONG
 #endif
 
 #define _NO_POS_ARGS
-#ifdef _WANT_IO_POS_ARGS
+#ifdef __IO_POS_ARGS
 # undef _NO_POS_ARGS
 # ifdef NL_ARGMAX
 #  define MAX_POS_ARGS NL_ARGMAX
@@ -168,7 +168,7 @@ typedef struct {
 } my_va_list;
 
 static void * get_arg (int, my_va_list *, int *, void **);
-#endif /* _WANT_IO_POS_ARGS */
+#endif /* __IO_POS_ARGS */
 
 /*
  * Flags used during conversion.
@@ -225,7 +225,7 @@ VFWSCANF (
        const wchar_t *fmt,
        va_list ap)
 {
-  CHECK_INIT(data, fp);
+  CHECK_INIT();
   return _SVFWSCANF (fp, fmt, ap);
 }
 #endif /* !STRING_ONLY */
@@ -316,9 +316,9 @@ _SVFWSCANF (
   char *cp;
   short *sp;
   int *ip;
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
   float *flp;
-  _LONG_DOUBLE *ldp;
+  long double *ldp;
   double *dp;
   wchar_t decpt;
 #endif
@@ -326,10 +326,10 @@ _SVFWSCANF (
 #ifndef _NO_LONGLONG
   long long *llp;
 #endif
-#ifdef _WANT_IO_C99_FORMATS
-#define _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_C99_FORMATS
+#define __IO_POSIX_EXTENSIONS
 #endif
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
   /* POSIX requires that fwscanf frees all allocated strings from 'm'
      conversions in case it returns EOF.  m_ptr is used to keep track.
      It will be allocated on the stack the first time an 'm' conversion
@@ -468,8 +468,8 @@ _SVFWSCANF (
 # define GET_ARG(n, ap, type) (va_arg (ap, type))
 #endif
 
-#ifdef FLOATING_POINT
-#ifdef _MB_CAPABLE
+#ifdef __IO_FLOATING_POINT
+#ifdef __MB_CAPABLE
 #ifdef WDECIMAL_POINT
           decpt = *WDECIMAL_POINT;
 #else
@@ -486,8 +486,8 @@ _SVFWSCANF (
 #endif /* !WDECIMAL_POINT */
 #else
 	  decpt = (wchar_t) *DECIMAL_POINT;
-#endif /* !_MB_CAPABLE */
-#endif /* FLOATING_POINT */
+#endif /* !__MB_CAPABLE */
+#endif /* __IO_FLOATING_POINT */
 
   _newlib_flockfile_start (fp);
 
@@ -553,7 +553,7 @@ _SVFWSCANF (
 	case L'l':
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
 	    goto match_failure;
-#if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
+#if defined __IO_C99_FORMATS || !defined _NO_LONGLONG
 	  if (*fmt == L'l')	/* Check for 'll' = long long (SUSv3) */
 	    {
 	      ++fmt;
@@ -569,7 +569,7 @@ _SVFWSCANF (
 	  flags |= LONGDBL;
 	  goto again;
 	case L'h':
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
 	    goto match_failure;
 	  if (*fmt == 'h')	/* Check for 'hh' = char int (SUSv3) */
@@ -581,7 +581,7 @@ _SVFWSCANF (
 #endif
 	    flags |= SHORT;
 	  goto again;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	case L'j': /* intmax_t */
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL))
 	    goto match_failure;
@@ -625,8 +625,8 @@ _SVFWSCANF (
 	       have size_t as wide as long long.  */
 	    flags |= LONGDBL;
 	  goto again;
-#endif /* _WANT_IO_C99_FORMATS */
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#endif /* __IO_C99_FORMATS */
+#ifdef __IO_POSIX_EXTENSIONS
 	case 'm':
 	  if (flags & (CHAR | SHORT | LONG | LONGDBL | MALLOC))
 	    goto match_failure;
@@ -661,7 +661,7 @@ _SVFWSCANF (
 	      width = 0;
 	      goto again;
 	    }
-	  _REENT_ERRNO(rptr) = EINVAL;
+	  errno = EINVAL;
 	  goto input_failure;
 #endif /* !_NO_POS_ARGS */
 
@@ -697,8 +697,8 @@ _SVFWSCANF (
 	  base = 16;
 	  break;
 
-#ifdef FLOATING_POINT
-# ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_FLOATING_POINT
+# ifdef __IO_C99_FORMATS
 	case L'A':
 	case L'a':
 	case L'F':
@@ -712,10 +712,10 @@ _SVFWSCANF (
 	  break;
 #endif
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	case L'S':
 	  flags |= LONG;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 #endif
 
 	case L's':
@@ -741,10 +741,10 @@ _SVFWSCANF (
 	  c = CT_CCL;
 	  break;
 
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	case 'C':
 	  flags |= LONG;
-          __PICOLIBC_FALLTHROUGH;
+          __fallthrough;
 #endif
 
 	case 'c':
@@ -762,7 +762,7 @@ _SVFWSCANF (
 	case 'n':
 	  if (flags & SUPPRESS)	/* ??? */
 	    continue;
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	  if (flags & CHAR)
 	    {
 	      cp = GET_ARG (N, ap, char *);
@@ -823,7 +823,7 @@ _SVFWSCANF (
 	    width = 1;
           if (flags & LONG)
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      wchar_t **p_p = NULL;
 	      wchar_t *p0 = NULL;
 	      size_t p_siz = 0;
@@ -831,7 +831,7 @@ _SVFWSCANF (
 
 	      if (flags & SUPPRESS)
 		;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		p_siz = alloc_m_ptr (wchar_t, p, p0, p_p, 32);
 #endif
@@ -842,7 +842,7 @@ _SVFWSCANF (
 		{
 		  if (!(flags & SUPPRESS))
 		    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		      /* Check before ++ because we never add a \0 */
 		      p_siz = realloc_m_ptr (wchar_t, p, p0, p_p, p_siz);
 #endif
@@ -853,7 +853,7 @@ _SVFWSCANF (
 	      if (n == 0)
 		goto input_failure;
 	      nread += n;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (wchar_t, p_p, p - p0, p_siz);
 #endif
 	      if (!(flags & SUPPRESS))
@@ -861,7 +861,7 @@ _SVFWSCANF (
 	    }
 	  else
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      char **mbp_p = NULL;
 	      char *mbp0 = NULL;
 	      size_t mbp_siz = 0;
@@ -869,7 +869,7 @@ _SVFWSCANF (
 
 	      if (flags & SUPPRESS)
 		mbp = mbbuf;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		mbp_siz = alloc_m_ptr (char, mbp, mbp0, mbp_p, 32);
 #endif
@@ -887,7 +887,7 @@ _SVFWSCANF (
 		    width--;
 		  if (!(flags & SUPPRESS))
 		    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
 #endif
 		      mbp += nconv;
@@ -897,7 +897,7 @@ _SVFWSCANF (
 	      if (n == 0)
 		goto input_failure;
 	      nread += n;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (char, mbp_p, mbp - mbp0, mbp_siz);
 #endif
 	      if (!(flags & SUPPRESS))
@@ -923,7 +923,7 @@ _SVFWSCANF (
 	    }
 	  else if (flags & LONG)
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      wchar_t **p_p = NULL;
 	      size_t p_siz = 0;
 
@@ -936,7 +936,7 @@ _SVFWSCANF (
 		     && width-- != 0 && INCCL (wi))
 		{
 		  *p++ = (wchar_t) wi;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  p_siz = realloc_m_ptr (wchar_t, p, p0, p_p, p_siz);
 #endif
 		}
@@ -946,14 +946,14 @@ _SVFWSCANF (
 	      if (n == 0)
 		goto match_failure;
 	      *p = L'\0';
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (wchar_t, p_p, n + 1, p_siz);
 #endif
 	      nassigned++;
 	    }
 	  else
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      char **mbp_p = NULL;
 	      char *mbp0 = NULL;
 	      size_t mbp_siz = 0;
@@ -961,7 +961,7 @@ _SVFWSCANF (
 
 	      if (flags & SUPPRESS)
 		mbp = mbbuf;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		mbp_siz = alloc_m_ptr (char, mbp, mbp0, mbp_p, 32);
 #endif
@@ -981,7 +981,7 @@ _SVFWSCANF (
 		  if (!(flags & SUPPRESS))
 		    {
 		      mbp += nconv;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
 #endif
 		    }
@@ -992,7 +992,7 @@ _SVFWSCANF (
 	      if (!(flags & SUPPRESS))
 		{
 		  *mbp = 0;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  shrink_m_ptr (char, mbp_p, mbp - mbp0 + 1, mbp_siz);
 #endif
 		  nassigned++;
@@ -1015,7 +1015,7 @@ _SVFWSCANF (
 	    }
 	  else if (flags & LONG)
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
               wchar_t **p_p = NULL;
               size_t p_siz = 0;
 
@@ -1028,7 +1028,7 @@ _SVFWSCANF (
 		     && width-- != 0 && !iswspace (wi))
 		{
 		  *p++ = (wchar_t) wi;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  p_siz = realloc_m_ptr (wchar_t, p, p0, p_p, p_siz);
 #endif
 		  nread++;
@@ -1036,14 +1036,14 @@ _SVFWSCANF (
 	      if (wi != WEOF)
 		ungetwc ( wi, fp);
 	      *p = L'\0';
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      shrink_m_ptr (wchar_t, p_p, p - p0 + 1, p_siz);
 #endif
 	      nassigned++;
 	    }
 	  else
 	    {
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      char **mbp_p = NULL;
 	      char *mbp0 = NULL;
 	      size_t mbp_siz = 0;
@@ -1051,7 +1051,7 @@ _SVFWSCANF (
 
 	      if (flags & SUPPRESS)
 		mbp = mbbuf;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 	      else if (flags & MALLOC)
 		mbp_siz = alloc_m_ptr (char, mbp, mbp0, mbp_p, 32);
 #endif
@@ -1070,7 +1070,7 @@ _SVFWSCANF (
 		  if (!(flags & SUPPRESS))
 		    {
 		      mbp += nconv;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		      mbp_siz = realloc_m_ptr (char, mbp, mbp0, mbp_p, mbp_siz);
 #endif
 		    }
@@ -1081,7 +1081,7 @@ _SVFWSCANF (
 	      if (!(flags & SUPPRESS))
 		{
 		  *mbp = 0;
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
 		  shrink_m_ptr (char, mbp_p, mbp - mbp0 + 1, mbp_siz);
 #endif
 		  nassigned++;
@@ -1241,7 +1241,7 @@ _SVFWSCANF (
 #endif /* !_NO_LONGLONG */
 		    *vp = (void *) (uintptr_t) res;
 		}
-#ifdef _WANT_IO_C99_FORMATS
+#ifdef __IO_C99_FORMATS
 	      else if (flags & CHAR)
 		{
 		  cp = GET_ARG (N, ap, char *);
@@ -1280,7 +1280,7 @@ _SVFWSCANF (
 	  nread += p - buf;
 	  break;
 	}
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 	case CT_FLOAT:
 	{
 	  /* scan a floating point number as if by wcstod */
@@ -1328,7 +1328,7 @@ _SVFWSCANF (
 			}
 		      goto fskip;
 		    }
-                  __PICOLIBC_FALLTHROUGH;
+                  __fallthrough;
 		case L'1':
 		case L'2':
 		case L'3':
@@ -1575,8 +1575,8 @@ _SVFWSCANF (
 		}
 	      else if (flags & LONGDBL)
 		{
-		  ldp = GET_ARG (N, ap, _LONG_DOUBLE *);
-		  *ldp = (_LONG_DOUBLE) QUAD_RES;
+		  ldp = GET_ARG (N, ap, long double *);
+		  *ldp = (long double) QUAD_RES;
 		}
 	      else
 		{
@@ -1590,7 +1590,7 @@ _SVFWSCANF (
 	    }
 	  break;
 	}
-#endif /* FLOATING_POINT */
+#endif /* __IO_FLOATING_POINT */
 	}
     }
 input_failure:
@@ -1603,7 +1603,7 @@ match_failure:
 all_done:
   /* Return number of matches, which can be 0 on match failure.  */
   _newlib_flockfile_end (fp);
-#ifdef _WANT_IO_POSIX_EXTENSIONS
+#ifdef __IO_POSIX_EXTENSIONS
   free_m_ptr ();
 #endif
   return nassigned;

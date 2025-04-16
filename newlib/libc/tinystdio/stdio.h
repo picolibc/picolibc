@@ -45,6 +45,7 @@
 #include <stddef.h>
 #define __need___va_list
 #include <stdarg.h>
+#include <sys/lock.h>
 #include <sys/_types.h>
 
 _BEGIN_STD_C
@@ -61,7 +62,7 @@ _BEGIN_STD_C
  * elements of it beyond by using the official interfaces provided.
  */
 
-#ifdef ATOMIC_UNGETC
+#ifdef __ATOMIC_UNGETC
 #if defined(__riscv) || defined(__MICROBLAZE__) || (__loongarch__)
 /*
  * Use 32-bit ungetc storage when doing atomic ungetc on RISC-V and
@@ -99,7 +100,16 @@ struct __file {
 	int	(*put)(char, struct __file *);	/* function to write one char to device */
 	int	(*get)(struct __file *);	/* function to read one char from device */
 	int	(*flush)(struct __file *);	/* function to flush output to device */
+#ifdef __STDIO_LOCKING
+	_LOCK_RECURSIVE_T lock;
+#endif
 };
+
+#ifdef __STDIO_LOCKING
+#define __STDIO_UNLOCKED(_fn) _fn##_unlocked
+#else
+#define __STDIO_UNLOCKED(_fn) _fn
+#endif
 
 /*
  * This variant includes a 'close' function which is
@@ -110,10 +120,10 @@ struct __file_close {
 	int	(*close)(struct __file *);	/* function to close file */
 };
 
-#define FDEV_SETUP_CLOSE(put, get, flush, _close, rwflag) \
+#define FDEV_SETUP_CLOSE(__put, __get, __flush, __close, __flags) \
         {                                                               \
-                .file = FDEV_SETUP_STREAM(put, get, flush, (rwflag) | __SCLOSE),   \
-                .close = (_close),                                      \
+                .file = FDEV_SETUP_STREAM(__put, __get, __flush, (__flags) | __SCLOSE),   \
+                .close = (__close),                                      \
         }
 
 struct __file_ext {
@@ -122,11 +132,11 @@ struct __file_ext {
         int     (*setvbuf)(struct __file *, char *buf, int mode, size_t size);
 };
 
-#define FDEV_SETUP_EXT(put, get, flush, close, _seek, _setvbuf, rwflag) \
+#define FDEV_SETUP_EXT(__put, __get, __flush, __close, __seek, __setvbuf, __flags) \
         {                                                               \
-                .cfile = FDEV_SETUP_CLOSE(put, get, flush, close, (rwflag) | __SEXT), \
-                .seek = (_seek),                                        \
-                .setvbuf = (_setvbuf),                                  \
+                .cfile = FDEV_SETUP_CLOSE(__put, __get, __flush, __close, (__flags) | __SEXT), \
+                .seek = (__seek),                                        \
+                .setvbuf = (__setvbuf),                                  \
         }
 
 /*@{*/
@@ -149,7 +159,7 @@ typedef __FILE FILE;
    variables. When undefined, the old __iob array is used which
    contains the pointers instead
 */
-#define PICOLIBC_STDIO_GLOBALS
+#define __PICOLIBC_STDIO_GLOBALS
 
 extern FILE *const stdin;
 extern FILE *const stdout;
@@ -166,14 +176,6 @@ extern FILE *const stderr;
 #define	_IOFBF	0		/* setvbuf should set fully buffered */
 #define	_IOLBF	1		/* setvbuf should set line buffered */
 #define	_IONBF	2		/* setvbuf should set unbuffered */
-
-#define fdev_setup_stream(stream, p, g, fl, f)	\
-	do { \
-		(stream)->flags = f; \
-		(stream)->put = p; \
-		(stream)->get = g; \
-		(stream)->flush = fl; \
-	} while(0)
 
 #define _FDEV_SETUP_READ  __SRD	/**< fdev_setup_stream() with read intent */
 #define _FDEV_SETUP_WRITE __SWR	/**< fdev_setup_stream() with write intent */
@@ -193,12 +195,12 @@ extern FILE *const stderr;
  */
 #define _FDEV_EOF (-2)
 
-#define FDEV_SETUP_STREAM(p, g, fl, f)		\
-	{ \
-                .flags = (f),                   \
-                .put = (p),                     \
-                .get = (g),                     \
-                .flush = (fl),                  \
+#define FDEV_SETUP_STREAM(__put, __get, __flush, __flags)        \
+	{                                           \
+                .flags = (__flags),                 \
+                .put = (__put),                     \
+                .get = (__get),                     \
+                .flush = (__flush),                 \
 	}
 
 FILE *fdevopen(int (*__put)(char, FILE*), int (*__get)(FILE*), int(*__flush)(FILE *));
@@ -207,17 +209,55 @@ int	fflush(FILE *stream);
 
 # define fdev_close(f) (fflush(f))
 
-#ifdef _HAVE_FORMAT_ATTRIBUTE
-#ifdef PICOLIBC_FLOAT_PRINTF_SCANF
+/* Check for old-style printf selection symbols */
+
+#define __IO_VARIANT_DOUBLE       'd'
+#define __IO_VARIANT_FLOAT        'f'
+#define __IO_VARIANT_LLONG        'l'
+#define __IO_VARIANT_INTEGER      'i'
+#define __IO_VARIANT_MINIMAL      'm'
+
+#ifndef _PICOLIBC_PRINTF
+# if defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_DOUBLE
+# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_FLOAT
+# elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_LLONG
+# elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_INTEGER
+# elif defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#  define _PICOLIBC_PRINTF __IO_VARIANT_MINIMAL
+# else
+#  define _PICOLIBC_PRINTF __IO_DEFAULT
+# endif
+#endif
+
+/* Check for old-style scanf selection symbols */
+
+#ifndef _PICOLIBC_SCANF
+# if defined(PICOLIBC_DOUBLE_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_DOUBLE
+# elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_FLOAT
+# elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_LLONG
+# elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_INTEGER
+# elif defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#  define _PICOLIBC_SCANF __IO_VARIANT_MINIMAL
+# else
+#  define _PICOLIBC_SCANF __IO_DEFAULT
+# endif
+#endif
+
+#if _PICOLIBC_PRINTF == __IO_VARIANT_FLOAT
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wformat"
 #endif
-#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, 0)))
+#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __picolibc_format(__a, __s, 0)
 #else
-#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __attribute__((__format__ (__a, __s, __f)))
-#endif
-#else
-#define __FORMAT_ATTRIBUTE__(__a, __s, __f)
+#define __FORMAT_ATTRIBUTE__(__a, __s, __f) __picolibc_format(__a, __s, __f)
 #endif
 
 #define __PRINTF_ATTRIBUTE__(__s, __f) __FORMAT_ATTRIBUTE__(printf, __s, __f)
@@ -250,8 +290,7 @@ size_t	fwrite(const void *__ptr, size_t __size, size_t __nmemb,
 int	fgetc(FILE *__stream);
 int	getc(FILE *__stream);
 int	getchar(void);
-#define getc(__stream) fgetc(__stream)
-#define getchar() fgetc(stdin)
+#define getchar() getc(stdin)
 int	ungetc(int __c, FILE *__stream);
 
 int	scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
@@ -263,25 +302,36 @@ int	vsscanf(const char *__buf, const char *__fmt, __gnuc_va_list ap) __FORMAT_AT
 
 char	*fgets(char *__str, int __size, FILE *__stream);
 #ifdef _PICOLIBC_USE_DEPRECATED_GETS
-     char *gets(char *str);
+char *gets(char *str);
 #endif
 size_t	fread(void *__ptr, size_t __size, size_t __nmemb,
 		      FILE *__stream);
 
 void	clearerr(FILE *__stream);
+int     ferror(FILE *__stream);
+int     feof(FILE *__stream);
 
-/* fast inlined version of clearerr() */
-#define clearerr(s) ((s)->flags &= ~(__SERR | __SEOF))
+/* fast inlined versions */
+#define __clearerr_unlocked(s) ((s)->flags &= ~(__SERR | __SEOF))
+#define __ferror_unlocked(s) ((s)->flags & __SERR)
+#define __feof_unlocked(s) ((s)->flags & __SEOF)
 
-int	feof(FILE *__stream);
+/* When locking is disabled, use the unlocked macros */
+#ifndef __STDIO_LOCKING
+#define clearerr(s) __clearerr_unlocked(s)
+#define ferror(s) __ferror_unlocked(s)
+#define feof(s) __feof_unlocked(s)
+#endif
 
-/* fast inlined version of feof() */
-#define feof(s) ((s)->flags & __SEOF)
-
-int	ferror(FILE *__stream);
-
-/* fast inlined version of ferror() */
-#define ferror(s) ((s)->flags & __SERR)
+/* Expose the unlocked symbols when requested */
+#ifdef __MISC_VISIBLE
+void    clearerr_unlocked(FILE *__stream);
+int     ferror_unlocked(FILE *__stream);
+int     feof_unlocked(FILE *__stream);
+#define clearerr_unlocked(s) __clearerr_unlocked(s)
+#define ferror_unlocked(s) __ferror_unlocked(s)
+#define feof_unlocked(s) __feof_unlocked(s)
+#endif
 
 #ifndef SEEK_SET
 #define	SEEK_SET	0	/* set file offset to offset */
@@ -392,10 +442,12 @@ int	ftrylockfile (FILE *);
 void	funlockfile (FILE *);
 int	putc_unlocked (int, FILE *);
 int	putchar_unlocked (int);
-#define getc_unlocked(f) fgetc(f)
-#define getchar_unlocked(f) fgetc(stdin)
-#define putc_unlocked(c, f) fputc(c, f)
-#define putchar_unlocked(c, f) fgetc(c, stdin)
+#ifndef __STDIO_LOCKING
+#define getc_unlocked(f) getc(f)
+#define getchar_unlocked(f) getc(stdin)
+#define putc_unlocked(c, f) putc(c, f)
+#define putchar_unlocked(c, f) putc(c, stdout)
+#endif
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1
@@ -450,97 +502,67 @@ __printf_float(float f)
 	return u.u;
 }
 
-#ifdef _PICOLIBC_PRINTF
-#if _PICOLIBC_PRINTF == 'd'
-#define PICOLIBC_DOUBLE_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'f'
-#define PICOLIBC_FLOAT_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'l'
-#define PICOLIBC_LONG_LONG_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'i'
-#define PICOLIBC_INTEGER_PRINTF_SCANF
-#elif _PICOLIBC_PRINTF == 'm'
-#define PICOLIBC_MINIMAL_PRINTF_SCANF
-#endif
-#endif
+/* Express printf capabilities to applications in the form of _HAS_IO values */
 
-#if !defined(PICOLIBC_DOUBLE_PRINTF_SCANF) && \
-    !defined(PICOLIBC_FLOAT_PRINTF_SCANF) && \
-    !defined(PICOLIBC_LONG_LONG_PRINTF_SCANF) && \
-    !defined(PICOLIBC_INTEGER_PRINTF_SCANF) && \
-    !defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
-#if defined(_FORMAT_DEFAULT_FLOAT)
-#define PICOLIBC_FLOAT_PRINTF_SCANF
-#elif defined(_FORMAT_DEFAULT_LONG_LONG)
-#define PICOLIBC_LONG_LONG_PRINTF_SCANF
-#elif defined(_FORMAT_DEFAULT_INTEGER)
-#define PICOLIBC_INTEGER_PRINTF_SCANF
-#elif defined(_FORMAT_DEFAULT_MINIMAL)
-#define PICOLIBC_MINIMAL_PRINTF_SCANF
-#else
-#define PICOLIBC_DOUBLE_PRINTF_SCANF
-#endif
-#endif
-
-#if defined(PICOLIBC_MINIMAL_PRINTF_SCANF)
+#if _PICOLIBC_PRINTF == __IO_VARIANT_MINIMAL
 # define printf_float(x) ((double) (x))
-# if defined(_WANT_MINIMAL_IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+# if defined(__IO_MINIMAL_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _HAS_IO_C99_FORMATS
 # endif
-#elif defined(PICOLIBC_INTEGER_PRINTF_SCANF)
+#elif _PICOLIBC_PRINTF == __IO_VARIANT_INTEGER
 # define printf_float(x) ((double) (x))
-# if defined(_WANT_IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
+# if defined(__IO_LONG_LONG) || __SIZEOF_LONG_LONG__ == __SIZEOF_LONG__
 #  define _HAS_IO_LONG_LONG
 # endif
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _HAS_IO_POS_ARGS
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _HAS_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
-#elif defined(PICOLIBC_LONG_LONG_PRINTF_SCANF)
+#elif _PICOLIBC_PRINTF == __IO_VARIANT_LLONG
 # define printf_float(x) ((double) (x))
 # define _HAS_IO_LONG_LONG
-# ifdef _WANT_IO_POS_ARGS
+# ifdef __IO_POS_ARGS
 #  define _HAS_IO_POS_ARGS
 # endif
-# ifdef _WANT_IO_C99_FORMATS
+# ifdef __IO_C99_FORMATS
 #  define _HAS_IO_C99_FORMATS
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
-#elif defined(PICOLIBC_FLOAT_PRINTF_SCANF)
+#elif _PICOLIBC_PRINTF == __IO_VARIANT_FLOAT
 # define printf_float(x) __printf_float(x)
 # define _HAS_IO_LONG_LONG
 # define _HAS_IO_POS_ARGS
 # define _HAS_IO_C99_FORMATS
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
 # define _HAS_IO_FLOAT
-#else
+#else /* _PICOLIBC_PRINTF == __IO_VARIANT_DOUBLE */
 # define printf_float(x) ((double) (x))
 # define _HAS_IO_LONG_LONG
 # define _HAS_IO_POS_ARGS
 # define _HAS_IO_C99_FORMATS
 # define _HAS_IO_DOUBLE
-# if defined(_MB_CAPABLE) || defined(_WANT_IO_WCHAR)
+# if defined(__MB_CAPABLE) || defined(__IO_WCHAR)
 #  define _HAS_IO_WCHAR
 # endif
-# ifdef _MB_CAPABLE
+# ifdef __MB_CAPABLE
 #  define _HAS_IO_MBCHAR
 # endif
-# ifdef _WANT_IO_PERCENT_B
+# ifdef __IO_PERCENT_B
 #  define _HAS_IO_PERCENT_B
 # endif
-# ifdef _WANT_IO_LONG_DOUBLE
+# ifdef __IO_LONG_DOUBLE
 #  define _HAS_IO_LONG_DOUBLE
 # endif
 #endif

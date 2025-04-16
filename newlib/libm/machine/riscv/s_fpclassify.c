@@ -32,12 +32,15 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#include <math.h>
+
+#define _ADD_D_TO_DOUBLE_FUNCS
+
+#include "fdlibm.h"
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
 int
-__fpclassifyd (double x)
+__fpclassify64(__float64 x)
 {
   long fclass = _fclass_d (x);
 
@@ -52,6 +55,8 @@ __fpclassifyd (double x)
   else
     return FP_NAN;
 }
+
+_MATH_ALIAS_i_d(__fpclassify)
 
 #else
 #include "../../common/s_fpclassify.c"

@@ -33,10 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <math.h>
-#include "math_config.h"
+#include "fdlibm.h"
 
-#if _HAVE_FAST_FMAF
+#if __HAVE_FAST_FMAF
 
 float
 fmaf (float x, float y, float z)
@@ -45,6 +44,8 @@ fmaf (float x, float y, float z)
 	__asm__("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
 	return result;
 }
+
+_MATH_ALIAS_f_fff(fma)
 
 #else
 #include "../../common/sf_fma.c"

@@ -107,7 +107,7 @@ ffcheck_id(double is,
 	   int id)
 {
   /* Make sure the answer isn't to far wrong from the correct value */
-  __ieee_double_shape_type correct = {}, isbits;
+  __ieee_double_shape_type correct = {}, isbits = {};
   int mag;
   isbits.value = is;
 
@@ -135,6 +135,12 @@ ffcheck_id(double is,
   {
     mag = 64;
   }
+#ifdef __RX__
+  /* RX doesn't support nan at all */
+  if (isnan(correct.value) || isinf(correct.value))
+      mag = 64;
+#endif
+
 
   if (mag < error_bit)
   {
@@ -188,7 +194,7 @@ fffcheck_id (float is,
   /* Make sure the answer isn't to far wrong from the correct value */
   __ieee_float_shape_type correct, isbits;
   __ieee_double_shape_type correct_double;
-  __ieee_double_shape_type is_double;
+  __ieee_double_shape_type is_double = {};
   int mag;
 
   (void) serrno;
@@ -219,6 +225,11 @@ fffcheck_id (float is,
   {
 	mag = 32;
   }
+#ifdef __RX__
+  /* RX doesn't support nan or inf at all */
+  if (isnan(correct.value) || isinf(correct.value))
+      mag = 32;
+#endif
 
   if (mag < error_bit)
   {

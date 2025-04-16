@@ -90,10 +90,10 @@ sys_semihost_elapsed(void);
 int
 sys_semihost_errno(void);
 
-_Noreturn void
+__noreturn void
 sys_semihost_exit(uintptr_t exception, uintptr_t subcode);
 
-_Noreturn void
+__noreturn void
 sys_semihost_exit_extended(uintptr_t code);
 
 bool

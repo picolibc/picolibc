@@ -69,11 +69,7 @@ SEEALSO
 
 #ifdef _NEED_FLOAT64
 
-#ifdef __STDC__
 static const __float64
-#else
-static __float64 
-#endif
 TWO52[2]={
     _F_64(4.50359962737049600000e+15), /* 0x43300000, 0x00000000 */
     _F_64(-4.50359962737049600000e+15), /* 0xC3300000, 0x00000000 */
@@ -99,7 +95,7 @@ rint64(__float64 x)
 	        w = TWO52[sx]+x;
 	        t =  w-TWO52[sx];
 		GET_HIGH_WORD(i0,t);
-		SET_HIGH_WORD(t,(i0&0x7fffffff)|(sx<<31));
+		SET_HIGH_WORD(t,(i0&0x7fffffff)|lsl(sx, 31));
 	        return t;
 	    } else {			/* x has integer and maybe fraction */
 		i = (0x000fffff)>>j0;

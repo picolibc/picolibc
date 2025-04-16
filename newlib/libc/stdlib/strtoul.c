@@ -124,7 +124,6 @@ PORTABILITY
 /*
  * Convert a string to an unsigned long integer.
  */
-#ifndef _REENT_ONLY
 
 unsigned long
 strtoul_l (const char *__restrict nptr, char **__restrict endptr, int base,
@@ -178,7 +177,7 @@ strtoul_l (const char *__restrict nptr, char **__restrict endptr, int base,
 	}
 	if (any < 0) {
 		acc = ULONG_MAX;
-		_REENT_ERRNO(rptr) = ERANGE;
+		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)
@@ -194,4 +193,3 @@ strtoul (const char *__restrict s,
 	return strtoul_l (s, ptr, base, __get_current_locale ());
 }
 
-#endif

@@ -73,6 +73,6 @@ foreach params : targets
 		    link_depends: _link_depends,
 		    include_directories: test_inc),
          depends: bios_bin,
-	 env: test_env)
+	 suite: 'newlib.wctype', env: test_env)
   endforeach
 endforeach

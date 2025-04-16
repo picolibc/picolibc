@@ -107,8 +107,8 @@
    we define it here, rather than in stdlib/misc.c, as before. */
 #define _Kmax (sizeof (size_t) << 3)
 
-static NEWLIB_THREAD_LOCAL char *__dtoa_result;
-static NEWLIB_THREAD_LOCAL int __dtoa_result_len;
+static __THREAD_LOCAL char *__dtoa_result;
+static __THREAD_LOCAL int __dtoa_result_len;
 
 char *__alloc_dtoa_result(int len)
 {
@@ -124,7 +124,7 @@ char *__alloc_dtoa_result(int len)
   return __dtoa_result;
 }
 
-static NEWLIB_THREAD_LOCAL int _mprec_exit_registered;
+static __THREAD_LOCAL int _mprec_exit_registered;
 
 static void
 __mprec_exit(void)

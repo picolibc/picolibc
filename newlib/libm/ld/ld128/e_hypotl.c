@@ -116,7 +116,7 @@ hypotl(long double x, long double y)
 	    u_int64_t high;
 	    t1 = 1.0L;
 	    GET_LDOUBLE_MSW64(high,t1);
-	    SET_LDOUBLE_MSW64(t1,high+(k<<48));
+	    SET_LDOUBLE_MSW64(t1,high+lsl(k, 48));
 	    return check_oflowl(t1*w);
 	} else return w;
 }

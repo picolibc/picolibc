@@ -6,191 +6,110 @@
 #pragma once
 
 /* Use atomics for fgetc/ungetc for re-entrancy */
-#cmakedefine ATOMIC_UNGETC
+#cmakedefine __ATOMIC_UNGETC
 
 /* Always optimize strcmp for performance */
-#cmakedefine FAST_STRCMP
+#cmakedefine __FAST_STRCMP
 
 /* Obsoleted. Use regular syscalls */
 #cmakedefine MISSING_SYSCALL_NAMES
 
 /* use global errno variable */
-#cmakedefine NEWLIB_GLOBAL_ERRNO
+#cmakedefine __GLOBAL_ERRNO
 
 /* use function to get errno address */
 #cmakedefine __PICOLIBC_ERRNO_FUNCTION @__PICOLIBC_ERRNO_FUNCTION@
 
-/* use thread local storage */
-#cmakedefine NEWLIB_TLS
-
 /* Turn on mmu in picocrt startup code */
-#cmakedefine _PICOCRT_ENABLE_MMU
+#cmakedefine __PICOCRT_ENABLE_MMU
 
 /* use thread local storage */
-#cmakedefine PICOLIBC_TLS
+#cmakedefine __THREAD_LOCAL_STORAGE
 
-/* Use open/close/read/write in tinystdio */
-#cmakedefine POSIX_IO
+/* use thread local storage for stack protection canary */
+#cmakedefine __THREAD_LOCAL_STORAGE_STACK_GUARD
 
 /* Use posix apis for console too */
 #cmakedefine POSIX_CONSOLE
 
 /* Optimize for space over speed */
-#cmakedefine PREFER_SIZE_OVER_SPEED
+#cmakedefine __PREFER_SIZE_OVER_SPEED
 
 /* Obsoleted. Reentrant syscalls provided for us */
 #cmakedefine REENTRANT_SYSCALLS_PROVIDED
 
 /* Use tiny stdio from gcc avr */
-#cmakedefine TINY_STDIO
+#cmakedefine __TINY_STDIO
 
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
 
-#cmakedefine _PICOLIBC_ATOMIC_SIGNAL
+#cmakedefine __FSEEK_OPTIMIZATION
 
-#cmakedefine _FSEEK_OPTIMIZATION
+#cmakedefine __FVWRITE_IN_STREAMIO
 
-#cmakedefine _FVWRITE_IN_STREAMIO
-
-#cmakedefine _HAVE_ALIAS_ATTRIBUTE
-
-/* The compiler REALLY has the attribute __alloc_size__ */
-#cmakedefine _HAVE_ALLOC_SIZE
-
-/* The compiler supports the always_inline function attribute */
-#cmakedefine _HAVE_ATTRIBUTE_ALWAYS_INLINE
-
-/* The compiler supports the gnu_inline function attribute */
-#cmakedefine _HAVE_ATTRIBUTE_GNU_INLINE
+#cmakedefine __strong_reference
 
 /* Use bitfields in packed structs */
-#cmakedefine _HAVE_BITFIELDS_IN_PACKED_STRUCTS
-
-/* The compiler supports __builtin_alloca */
-#cmakedefine _HAVE_BUILTIN_ALLOCA
-
-/* The compiler supports __builtin_copysign */
-#cmakedefine _HAVE_BUILTIN_COPYSIGN
-
-/* The compiler supports __builtin_copysignl */
-#cmakedefine _HAVE_BUILTIN_COPYSIGNL
-
-/* The compiler supports __builtin_ctz */
-#cmakedefine _HAVE_BUILTIN_CTZ
-
-/* The compiler supports __builtin_ctzl */
-#cmakedefine _HAVE_BUILTIN_CTZL
-
-/* The compiler supports __builtin_ctzll */
-#cmakedefine _HAVE_BUILTIN_CTZLL
-
-/* Compiler has __builtin_expect */
-#cmakedefine _HAVE_BUILTIN_EXPECT
-
-/* The compiler supports __builtin_ffs */
-#cmakedefine _HAVE_BUILTIN_FFS
-
-/* The compiler supports __builtin_ffsl */
-#cmakedefine _HAVE_BUILTIN_FFSL
-
-/* The compiler supports __builtin_ffsll */
-#cmakedefine _HAVE_BUILTIN_FFSLL
-
-/* The compiler supports __builtin_finitel */
-#cmakedefine _HAVE_BUILTIN_FINITEL
-
-/* The compiler supports __builtin_isfinite */
-#cmakedefine _HAVE_BUILTIN_ISFINITE
-
-/* The compiler supports __builtin_isinf */
-#cmakedefine _HAVE_BUILTIN_ISINF
-
-/* The compiler supports __builtin_isinfl */
-#cmakedefine _HAVE_BUILTIN_ISINFL
-
-/* The compiler supports __builtin_isnan */
-#cmakedefine _HAVE_BUILTIN_ISNAN
-
-/* The compiler supports __builtin_isnanl */
-#cmakedefine _HAVE_BUILTIN_ISNANL
-
-/* Compiler has __builtin_mul_overflow */
-#cmakedefine _HAVE_BUILTIN_MUL_OVERFLOW
-
-/* Compiler has __builtin_add_overflow */
-#cmakedefine _HAVE_BUILTIN_ADD_OVERFLOW
+#cmakedefine __HAVE_BITFIELDS_IN_PACKED_STRUCTS
 
 /* Compiler flag to prevent detecting memcpy/memset patterns */
-#cmakedefine _HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
+#cmakedefine __HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 
 /* Compiler supports _Complex */
-#cmakedefine _HAVE_COMPLEX
+#cmakedefine __HAVE_COMPLEX
 
-/* Compiler supports __builtin_complex */
-#cmakedefine _HAVE_BUILTIN_COMPLEX
-
-#cmakedefine _HAVE_FCNTL
-
-#cmakedefine _HAVE_FORMAT_ATTRIBUTE
+#cmakedefine __HAVE_FCNTL
 
 /* IEEE fp funcs available */
-#cmakedefine _HAVE_IEEEFP_FUNCS
+#cmakedefine __IEEEFP_FUNCS
 
 /* compiler supports INIT_ARRAY sections */
-#cmakedefine _HAVE_INITFINI_ARRAY
+#cmakedefine __INIT_FINI_ARRAY
 
 /* Support _init() and _fini() functions */
-#cmakedefine _HAVE_INIT_FINI
-
-/* Compiler has long double type */
-#cmakedefine _HAVE_LONG_DOUBLE
-
-/* Compiler attribute to prevent the optimizer from adding new builtin calls */
-#cmakedefine _HAVE_NO_BUILTIN_ATTRIBUTE
+#cmakedefine __INIT_FINI_FUNCS
 
 /* _set_tls and _init_tls functions available */
-#cmakedefine _HAVE_PICOLIBC_TLS_API
+#cmakedefine __THREAD_LOCAL_STORAGE_API
 
 /* Semihost APIs supported */
-#cmakedefine _HAVE_SEMIHOST
-
-#cmakedefine _HAVE_WEAK_ATTRIBUTE
+#cmakedefine __SEMIHOST
 
 /* math library does not set errno (offering only ieee semantics) */
-#cmakedefine _IEEE_LIBM
+#cmakedefine __IEEE_LIBM
 
-#cmakedefine _IO_FLOAT_EXACT
+#cmakedefine __IO_FLOAT_EXACT
 
-#cmakedefine _PRINTF_SMALL_ULTOA
+#cmakedefine __IO_SMALL_ULTOA
 
-#cmakedefine _PRINTF_PERCENT_N
+#cmakedefine __IO_PERCENT_N
 
-#cmakedefine _WANT_IO_PERCENT_B
+#cmakedefine __IO_PERCENT_B
 
-#cmakedefine _WANT_IO_WCHAR
+#cmakedefine __IO_WCHAR
 
 #cmakedefine _LITE_EXIT
 
-#cmakedefine _MB_CAPABLE
+#cmakedefine __MB_CAPABLE
 
-#cmakedefine _MB_EXTENDED_CHARSETS_ALL
+#cmakedefine __MB_EXTENDED_CHARSETS_ALL
 
-#cmakedefine _MB_EXTENDED_CHARSETS_UCS
+#cmakedefine __MB_EXTENDED_CHARSETS_UCS
 
-#cmakedefine _MB_EXTENDED_CHARSETS_ISO
+#cmakedefine __MB_EXTENDED_CHARSETS_ISO
 
-#cmakedefine _MB_EXTENDED_CHARSETS_WINDOWS
+#cmakedefine __MB_EXTENDED_CHARSETS_WINDOWS
 
-#cmakedefine _MB_EXTENDED_CHARSETS_JIS
+#cmakedefine __MB_EXTENDED_CHARSETS_JIS
 
-#cmakedefine _NANO_FORMATTED_IO
+#cmakedefine __NANO_FORMATTED_IO
 
-#cmakedefine _NANO_MALLOC
+#cmakedefine __NANO_MALLOC
 
 /* The newlib version in string format. */
 #define _NEWLIB_VERSION "@NEWLIB_VERSION@"
 
-#cmakedefine _PICO_EXIT
+#cmakedefine __PICO_EXIT
 
 /* The Picolibc minor version number. */
 #define _PICOLIBC_MINOR__ @PROJECT_VERSION_MINOR@
@@ -201,49 +120,36 @@
 /* The Picolibc major version number. */
 #define _PICOLIBC__ @PROJECT_VERSION_MAJOR@
 
-#cmakedefine _REENT_GLOBAL_ATEXIT
+#cmakedefine _GLOBAL_ATEXIT
 
-#cmakedefine _RETARGETABLE_LOCKING
+#cmakedefine __SINGLE_THREAD
 
-#cmakedefine _UNBUF_STREAM_OPT
+#cmakedefine __UNBUF_STREAM_OPT
 
-#cmakedefine _WANT_IO_C99_FORMATS
+#cmakedefine __IO_C99_FORMATS
 
-#cmakedefine _WANT_IO_LONG_LONG
+#cmakedefine __IO_LONG_LONG
 
-#cmakedefine _WANT_IO_LONG_DOUBLE
+#cmakedefine __IO_LONG_DOUBLE
 
-#cmakedefine _WANT_MINIMAL_IO_LONG_LONG
+#cmakedefine __IO_MINIMAL_LONG_LONG
 
-#cmakedefine _WANT_IO_POS_ARGS
+#cmakedefine __IO_POS_ARGS
 
-#cmakedefine _FORMAT_DEFAULT_DOUBLE
-
-#cmakedefine _FORMAT_DEFAULT_FLOAT
-
-#cmakedefine _FORMAT_DEFAULT_LONG_LONG
-
-#cmakedefine _FORMAT_DEFAULT_INTEGER
-
-#cmakedefine _FORMAT_DEFAULT_MINIMAL
+#define __IO_DEFAULT '@__IO_DEFAULT@'
 
 /* math library sets errno */
-#cmakedefine _WANT_MATH_ERRNO
-
-#cmakedefine _WANT_REENT_SMALL
+#cmakedefine __MATH_ERRNO
 
 #cmakedefine _WANT_REGISTER_FINI
 
-/* Obsoleted. Define time_t to long instead of using a 64-bit type */
-#cmakedefine _WANT_USE_LONG_TIME_T
-
-#cmakedefine _WIDE_ORIENT
+#cmakedefine __WIDE_ORIENT
 
 /* chatty assert */
-#cmakedefine _ASSERT_VERBOSE
+#cmakedefine __ASSERT_VERBOSE
 
 /* elix level */
-#cmakedefine _ELIX_LEVEL @_ELIX_LEVEL@
+#cmakedefine __ELIX_LEVEL @__ELIX_LEVEL@
 
 /* The newlib minor version number. */
 #define __NEWLIB_MINOR__ @NEWLIB_MINOR@
@@ -260,7 +166,7 @@
 #define __OBSOLETE_MATH_DOUBLE @__OBSOLETE_MATH_DOUBLE@
 
 /* Compute static memory area sizes at runtime instead of link time */
-#cmakedefine __PICOLIBC_CRT_RUNTIME_SIZE
+#cmakedefine __PICOCRT_RUNTIME_SIZE
 
 /* The Picolibc minor version number. */
 #define __PICOLIBC_MINOR__ @PROJECT_VERSION_MINOR@
@@ -273,8 +179,6 @@
 
 /* The Picolibc major version number. */
 #define __PICOLIBC__ @PROJECT_VERSION_MAJOR@
-
-#cmakedefine __SINGLE_THREAD__
 
 /* Compiler has Xtensa-specific core-isa.h header file */
 #cmakedefine _XTENSA_HAVE_CONFIG_CORE_ISA_H

@@ -115,7 +115,7 @@ remquol(long double x, long double y, int *quo)
 	    hz=_hx-hy;lz=lx-ly; if(lx<ly) hz -= 1;
 	    if(hz<0){_hx = _hx+_hx+(lx>>MANL_SHIFT); lx = lx+lx;}
 	    else {_hx = hz+hz+(lz>>MANL_SHIFT); lx = lz+lz; q++;}
-	    q <<= 1;
+	    q = lsl(q, 1);
 	}
 	hz=_hx-hy;lz=lx-ly; if(lx<ly) hz -= 1;
 	if(hz>=0) {_hx=hz;lx=lz;q++;}

@@ -7,9 +7,9 @@ set -e
 
 #test=echo
 
-options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true"
+options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Db_sanitize=undefined"
 minoptions="$options"
-reloptions="$options --buildtype=release -Dbuild-type-subdir=release -Dwerror=true"
+reloptions="$options --buildtype=release -Ddebug=true -Dbuild-type-subdir=release"
 
 for arch in arm riscv; do
 
@@ -43,7 +43,7 @@ done
 
 options="-Dwerror=true"
 minoptions="$options --buildtype=minsize"
-reloptions="$options --buildtype=release -Dpicolibc-buildtype=release"
+reloptions="$options --buildtype=release -Ddebug=true -Dpicolibc-buildtype=release"
 
 for arch in arm riscv; do
 

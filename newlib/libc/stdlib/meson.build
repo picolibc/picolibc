@@ -69,6 +69,7 @@ pico_exit_srcs_stdlib = [
   'pico-exit.c',
   'pico-onexit.c',
   'pico-cxa-atexit.c',
+  'pico-exitprocs.c',
 ]
 
 newlib_exit_srcs_stdlib = [
@@ -129,7 +130,6 @@ srcs_stdlib = [
     'mbtowc.c',
     'mbtowc_r.c',
     'mrand48.c',
-    'mstats.c',
     'nrand48.c',
     'putenv.c',
     'rand48.c',
@@ -150,18 +150,12 @@ srcs_stdlib = [
     'wcrtomb.c',
     'wcsnrtombs.c',
     'wcsrtombs.c',
-    'wcstod.c',
-    'wcstoimax.c',
-    'wcstol.c',
-    'wcstoll.c',
     'wcstombs.c',
-    'wcstoul.c',
-    'wcstoull.c',
-    'wcstoumax.c',
     'wctob.c',
     'wctomb.c',
     'wctomb_r.c',
     'set_constraint_handler_s.c',
+    'ignore_handler_s.c',
 ]
 
 srcs_stdlib_stdio = [
@@ -170,6 +164,7 @@ srcs_stdlib_stdio = [
     'efgcvt.c',
     'gdtoa-gethex.c',
     'gdtoa-hexnan.c',
+    'ldtoa.c',
     'mprec.c',
     'strtod.c',
     'strtodg.c',
@@ -179,22 +174,20 @@ srcs_stdlib_stdio = [
     'strtoull.c',
     'strtoimax.c',
     'strtoumax.c',
-]
-
-lsrcs_stdlib = [
-  'strtold.c',
-  'strtorx.c',
-  'wcstold.c'
+    'strtold.c',
+    'strtorx.c',
+    'wcstod.c',
+    'wcstol.c',
+    'wcstold.c',
+    'wcstoul.c',
+    'wcstoimax.c',
+    'wcstoll.c',
+    'wcstoull.c',
+    'wcstoumax.c',
 ]
 
 if not tinystdio
   srcs_stdlib += srcs_stdlib_stdio
-  if have_long_double
-    srcs_stdlib += lsrcs_stdlib
-    if io_long_double
-      srcs_stdlib += 'ldtoa.c'
-    endif
-  endif
 endif
 
 # Work around compiler optimizing calls involving malloc/free

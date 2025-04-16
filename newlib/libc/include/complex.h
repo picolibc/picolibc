@@ -110,7 +110,7 @@ double creal(double complex);
 float crealf(float complex);
 
 #if __ISO_C_VISIBLE >= 2011
-#ifdef _HAVE_BUILTIN_COMPLEX
+#if __HAVE_BUILTIN_COMPLEX
 #define CMPLX(r,i) __builtin_complex((double)(r), (double)(i))
 #define CMPLXF(r,i) __builtin_complex((float)(r), (float)(i))
 #define CMPLXL(r,i) __builtin_complex((long double)(r), (long double)(i))
@@ -126,7 +126,7 @@ double complex clog10(double complex);
 float complex clog10f(float complex);
 #endif
 
-#ifdef _HAVE_LONG_DOUBLE
+#ifdef __HAVE_LONG_DOUBLE
 long double complex csqrtl(long double complex);
 long double cabsl(long double complex) ;
 long double complex cprojl(long double complex);
@@ -134,7 +134,7 @@ long double creall(long double complex);
 long double complex conjl(long double complex);
 long double cimagl(long double complex);
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE_MATH
 long double cargl(long double complex);
 long double complex casinl(long double complex);
 long double complex cacosl(long double complex);
@@ -154,9 +154,9 @@ long double complex cpowl(long double complex, long double complex);
 #if __GNU_VISIBLE
 long double complex clog10l(long double complex);
 #endif
-#endif /* _HAVE_LONG_DOUBLE_MATH */
+#endif /* __HAVE_LONG_DOUBLE_MATH */
 
-#endif /* _HAVE_LONG_DOUBLE */
+#endif /* __HAVE_LONG_DOUBLE */
 
 _END_STD_C
 

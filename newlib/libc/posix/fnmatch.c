@@ -136,7 +136,7 @@ fnmatch(const char *pattern, const char *string, int flags)
 					--pattern;
 				}
 			}
-			__PICOLIBC_FALLTHROUGH;
+			__fallthrough;
 		default:
 		norm:
 			if (c == *string)
@@ -208,7 +208,7 @@ rangematch(
 				c2 = tolower((unsigned char)c2);
 
 			if (
-#ifdef _HAVE_REAL_STRCOLL
+#ifdef __HAVE_REAL_STRCOLL
                             __collate_range_cmp(c, test) <= 0
 			    && __collate_range_cmp(test, c2) <= 0
 #else

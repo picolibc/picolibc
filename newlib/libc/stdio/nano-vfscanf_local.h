@@ -46,8 +46,8 @@
 #ifndef VFSCANF_LOCAL
 #define VFSCANF_LOCAL
 
-#ifndef NO_FLOATING_POINT
-#define FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
+#define __IO_FLOATING_POINT
 #endif
 
 #ifdef STRING_ONLY
@@ -61,7 +61,7 @@
 #define _srefill _ssrefill
 #endif
 
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 #include <math.h>
 #include <float.h>
 
@@ -88,8 +88,8 @@
 
 
 #define _NO_LONGLONG
-#undef _WANT_IO_C99_FORMATS
-#undef _WANT_IO_POS_ARGS
+#undef __IO_C99_FORMATS
+#undef __IO_POS_ARGS
 
 #define _NO_POS_ARGS
 
@@ -173,6 +173,6 @@ _scanf_i (
 extern int
 _scanf_float (
 	      struct _scan_data_t *pdata,
-	      FILE *fp, va_list *ap) _ATTRIBUTE((__weak__));
+	      FILE *fp, va_list *ap) __weak;
 
 #endif

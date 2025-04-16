@@ -44,6 +44,12 @@
 #define HAVE_HW_DOUBLE
 #endif
 
+#ifdef __sh__
+#if !(defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__))
+#define GDB_SIMULATOR
+#endif
+#endif
+
 #ifdef HAVE_HW_DOUBLE
 typedef double test_t;
 #define test_sqrt(x) sqrt(x)
@@ -206,6 +212,10 @@ int main(void)
         int ret;
         unsigned i;
 
+#ifdef GDB_SIMULATOR
+        printf("GDB simulator doesn't support fenv. Skipping\n");
+        return 77;
+#endif
 	(void) report;
 	(void) e_to_str;
 	if (math_errhandling & MATH_ERREXCEPT) {

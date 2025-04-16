@@ -41,6 +41,7 @@ libc_tests_common = [
   'sscanf',
   'string',
   'strtol',
+  'wcstol',
 ]
 
 libc_tests_picolibc = libc_tests_common
@@ -86,14 +87,15 @@ foreach params : targets
 
     test(t1 + target,
 	 executable(t1 + target, [t1_src],
-		    c_args: double_printf_compile_args + _c_args,
-		    link_args: double_printf_link_args + _link_args,
+		    c_args: printf_compile_args_d + _c_args,
+		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
                     link_with: _libs,
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: timeout,
+         suite: 'libc-testsuite',
 	 env: test_env)
   endforeach
 endforeach

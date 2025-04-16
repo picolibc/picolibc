@@ -4,11 +4,15 @@ DIR=build-"$TARGET"
 CONFIGURE=do-"$TARGET"-configure
 shift
 
+for p in /opt/*/bin /opt/*/models/*; do
+    PATH="$p":$PATH
+done
+
 mkdir $DIR
 trap 'rm -rf "$DIR"' 0
 (cd $DIR || exit 1
  echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true "$@"
+ echo '##########' ../scripts/"$CONFIGURE" "$@"
  echo '##################################################'
  ../scripts/$CONFIGURE "$@"
  case $? in

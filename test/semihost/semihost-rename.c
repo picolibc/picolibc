@@ -36,8 +36,12 @@
 #include <stdlib.h>
 #include <semihost.h>
 
-#define TEST_FILE_NAME_1	"SEMIREN1.TXT"
-#define TEST_FILE_NAME_2	"SEMIREN2.TXT"
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "SEMIREN.TXT"
+#endif
+
+#define TEST_FILE_NAME_1	"A" TEST_FILE_NAME
+#define TEST_FILE_NAME_2	"B" TEST_FILE_NAME
 
 int
 main(void)

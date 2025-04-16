@@ -30,9 +30,8 @@
  */
 
 #include <complex.h>
-#include <math.h>
 
-#ifdef _HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE_MATH
 
 #ifdef __weak_alias
 __weak_alias(casinl, _casinl)

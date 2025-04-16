@@ -199,7 +199,7 @@ _strtoll_l (const char *__restrict nptr,
 	}
 	if (any < 0) {
 		acc = neg ? LLONG_MIN : LLONG_MAX;
-		_REENT_ERRNO(rptr) = ERANGE;
+		errno = ERANGE;
 	} else if (neg)
 		acc = -acc;
 	if (endptr != 0)
@@ -207,7 +207,6 @@ _strtoll_l (const char *__restrict nptr,
 	return (acc);
 }
 
-#ifndef _REENT_ONLY
 
 long long
 strtoll_l (const char *__restrict s, char **__restrict ptr, int base,
@@ -224,4 +223,3 @@ strtoll (const char *__restrict s,
 	return _strtoll_l (s, ptr, base, __get_current_locale ());
 }
 
-#endif

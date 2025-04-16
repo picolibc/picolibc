@@ -63,14 +63,19 @@
 
 #include "conv_flt.c"
 
+#ifdef WIDE_CHARS
+#define strtod wcstod
+#define strtold wcstold
+#endif
+
 double
-strtod (const char * nptr, char ** endptr)
+strtod (const CHAR * nptr, CHAR ** endptr)
 {
     int len = 0;
     double flt;
-    unsigned char ret;
+    UCHAR ret;
 
-    while (isspace(nptr[len]))
+    while (ISSPACE(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);
@@ -79,21 +84,16 @@ strtod (const char * nptr, char ** endptr)
         len = 0;
     }
     if (endptr)
-        *endptr = (char *) nptr + len;
+        *endptr = (CHAR *) nptr + len;
     return flt;
 }
 
-#if defined(_HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
-#ifdef _HAVE_ALIAS_ATTRIBUTE
-#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
-#pragma GCC diagnostic ignored "-Wpragmas"
-#pragma GCC diagnostic ignored "-Wunknown-warning-option"
-#pragma GCC diagnostic ignored "-Wattribute-alias="
-#endif
-extern long double strtold(const char *, char **) __attribute__ ((__alias__ ("strtod")));
+#if defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
+#ifdef __strong_reference
+__strong_reference_dup(strtod, strtold);
 #else
 long double
-strtold (const char * nptr, char ** endptr)
+strtold (const CHAR * nptr, CHAR ** endptr)
 {
 	return (long double) strtod(nptr, endptr);
 }

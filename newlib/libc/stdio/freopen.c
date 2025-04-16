@@ -83,7 +83,7 @@ freopen (
   int flags, oflags, oflags2;
   int e = 0;
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   /* We can't use the _newlib_flockfile_XXX macros here due to the
      interlocked locking with the sfp_lock. */
@@ -136,11 +136,11 @@ freopen (
   if (file != NULL)
     {
       f = open ((char *) file, oflags, 0666);
-      e = _REENT_ERRNO(ptr);
+      e = errno;
     }
   else
     {
-#ifdef _HAVE_FCNTL
+#ifdef __HAVE_FCNTL
       int oldflags;
       /*
        * Reuse the file descriptor, but only if the new access mode is
@@ -204,12 +204,10 @@ freopen (
     {				/* did not get it after all */
       __sfp_lock_acquire ();
       fp->_flags = 0;		/* set it free */
-      _REENT_ERRNO(ptr) = e;	/* restore in case _close clobbered */
+      errno = e;	/* restore in case _close clobbered */
       if (!(oflags2 & __SNLK))
 	_funlockfile (fp);
-#ifndef __SINGLE_THREAD__
       __lock_close_recursive (fp->_lock);
-#endif
       __sfp_lock_release ();
 #ifdef _STDIO_WITH_THREAD_CANCELLATION_SUPPORT
       pthread_setcancelstate (__oldcancel, &__oldcancel);

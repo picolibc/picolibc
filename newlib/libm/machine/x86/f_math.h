@@ -10,7 +10,7 @@ is preserved.
 
 #include "fdlibm.h"
 
-__inline__
+__inline
 static 
 int 
 check_finite (double x)
@@ -20,7 +20,7 @@ check_finite (double x)
   return  (int)((__uint32_t)((hx&0x7fffffff)-0x7ff00000)>>31);
 }
 
-__inline__
+__inline
 static 
 int 
 check_finitef (float x)

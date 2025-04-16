@@ -7,6 +7,8 @@
 #include <complex.h>
 #include "../common/fdlibm.h"
 
+#ifdef __HAVE_LONG_DOUBLE
+
 long double
 creall (long double complex z)
 {
@@ -14,3 +16,5 @@ creall (long double complex z)
 
   return (REAL_PART(w));
 }
+
+#endif /* __HAVE_LONG_DOUBLE */

@@ -35,6 +35,6 @@
 int
 ferror_unlocked (FILE * fp)
 {
-  CHECK_INIT(_REENT, fp);
+  CHECK_INIT();
   return __sferror (fp);
 }

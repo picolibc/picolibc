@@ -41,6 +41,12 @@
 #include <stdbool.h>
 #include <fenv.h>
 
+#ifdef __sh__
+#if !(defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__))
+#define GDB_SIMULATOR
+#endif
+#endif
+
 #if FLT_MANT_DIG == 24
 
 static int roundings[] = {
@@ -75,7 +81,7 @@ static int rounding_map[] = {
 #endif
 };
 
-static const char *rounding_names[] = {
+static const char * const rounding_names[] = {
 #ifdef FE_TONEAREST
     "FE_TONEAREST",
 #else
@@ -94,7 +100,7 @@ static const char *rounding_names[] = {
 
 #define NROUND  (sizeof(roundings)/sizeof(roundings[0]))
 
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#ifdef __DOUBLE_NOEXCEPT
 /*
  * Assume that a lack of exceptions for doubles also means a lack of
  * support for non-default rounding modes for doubles.
@@ -132,6 +138,12 @@ struct fmal_vec {
 };
 #endif
 
+#ifdef _RX_PID
+#define TEST_CONST
+#else
+#define TEST_CONST static const
+#endif
+
 #include "fma_vec.h"
 
 #define NUM_FMAF_VEC (sizeof(fmaf_vec)/sizeof(fmaf_vec[0]))
@@ -150,7 +162,7 @@ equalf(float x, float y)
     return x == y;
 }
 
-#if defined(__PICOLIBC__) && !defined(TINY_STDIO)
+#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
 static
 int strfromf(char *str, size_t n, const char *format, float f)
 {
@@ -201,7 +213,7 @@ test_fmaf(void)
 
 #ifdef HAVE_DOUBLE_FMA_VEC
 
-#ifdef PICOLIBC_DOUBLE_NOEXCEPT
+#ifdef __DOUBLE_NOEXCEPT
 /*
  * Assume that a lack of exceptions for doubles also means a lack of
  * support for non-default rounding modes for doubles.
@@ -260,7 +272,7 @@ test_fma(void)
 
 #if defined (_TEST_LONG_DOUBLE) && defined(HAVE_LONG_DOUBLE_FMA_VEC)
 
-#ifdef PICOLIBC_LONG_DOUBLE_NOEXCEPT
+#ifdef __LONG_DOUBLE_NOEXCEPT
 /*
  * Assume that a lack of exceptions for doubles also means a lack of
  * support for non-default rounding modes for doubles.
@@ -331,6 +343,10 @@ main(void)
         return 77;
     }
 #endif
+#ifdef GDB_SIMULATOR
+    printf("GDB simulator doesn't support FMA. Skipping\n");
+    return 77;
+#endif
     (void) rounding_names;
     (void) roundings;
     int ret = 0;
@@ -345,5 +361,11 @@ main(void)
     }
 #endif
     ret |= test_fmal();
+#ifdef __RX__
+    if (ret) {
+        printf("Expected failure on RX target, ignoring\n");
+        ret = 77;
+    }
+#endif
     return ret;
 }

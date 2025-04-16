@@ -62,22 +62,26 @@
 
 #include "conv_flt.c"
 
+#ifdef WIDE_CHARS
+#define strtof wcstof
+#endif
+
 float
-strtof (const char * nptr, char ** endptr)
+strtof (const CHAR * nptr, CHAR ** endptr)
 {
     int len = 0;
     float flt;
-    unsigned char ret;
+    UCHAR ret;
 
-    while (isspace(nptr[len]))
+    while (ISSPACE(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, 0);
     if (!ret) {
-        flt = 0.0;
+        flt = 0.0f;
         len = 0;
     }
     if (endptr)
-        *endptr = (char *) nptr + len;
+        *endptr = (CHAR *) nptr + len;
     return flt;
 }

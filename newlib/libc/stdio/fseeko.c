@@ -98,7 +98,7 @@ fseeko (
        int whence)
 {
   _fpos_t (*seekfn) (void *, _fpos_t, int);
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
   _fpos_t target;
   size_t n;
 #ifdef __USE_INTERNAL_STAT64
@@ -112,7 +112,7 @@ fseeko (
 
   /* Make sure stdio is set up.  */
 
-  CHECK_INIT (ptr, fp);
+  CHECK_INIT();
 
   _newlib_flockfile_start (fp);
 
@@ -129,7 +129,7 @@ fseeko (
 
   if ((seekfn = fp->_seek) == NULL)
     {
-      _REENT_ERRNO(ptr) = ESPIPE;	/* ??? */
+      errno = ESPIPE;	/* ??? */
       _newlib_flockfile_exit (fp);
       return EOF;
     }
@@ -179,7 +179,7 @@ fseeko (
       break;
 
     default:
-      _REENT_ERRNO(ptr) = EINVAL;
+      errno = EINVAL;
       _newlib_flockfile_exit (fp);
       return (EOF);
     }
@@ -198,7 +198,7 @@ fseeko (
   if (fp->_bf._base == NULL)
     _smakebuf ( fp);
 
-#ifdef _FSEEK_OPTIMIZATION
+#ifdef __FSEEK_OPTIMIZATION
   if (fp->_flags & (__SWR | __SRW | __SNBF | __SNPT))
     goto dumb;
   if ((fp->_flags & __SOPT) == 0)

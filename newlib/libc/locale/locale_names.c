@@ -37,15 +37,17 @@
 
 const char * const __locale_names[locale_END - locale_BASE] = {
     [locale_C - locale_BASE] = "C",
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     [locale_UTF_8 - locale_BASE] = "C.UTF-8",
+#ifdef __MB_EXTENDED_CHARSETS_UCS
     [locale_UCS_2 - locale_BASE] = "C.UCS-2",
     [locale_UCS_2LE - locale_BASE] = "C.UCS-2LE",
     [locale_UCS_2BE - locale_BASE] = "C.UCS-2BE",
     [locale_UCS_4 - locale_BASE] = "C.UCS-4",
     [locale_UCS_4LE - locale_BASE] = "C.UCS-4LE",
     [locale_UCS_4BE - locale_BASE] = "C.UCS-4BE",
-#ifdef _MB_EXTENDED_CHARSETS_ISO
+#endif
+#ifdef __MB_EXTENDED_CHARSETS_ISO
     [locale_ISO_8859_1 - locale_BASE] = "C.ISO-8859-1",
     [locale_ISO_8859_2 - locale_BASE] = "C.ISO-8859-2",
     [locale_ISO_8859_3 - locale_BASE] = "C.ISO-8859-3",
@@ -62,7 +64,7 @@ const char * const __locale_names[locale_END - locale_BASE] = {
     [locale_ISO_8859_15 - locale_BASE] = "C.ISO-8859-15",
     [locale_ISO_8859_16 - locale_BASE] = "C.ISO-8859-16",
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_WINDOWS
+#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
     [locale_CP437 - locale_BASE] = "C.CP437",
     [locale_CP720 - locale_BASE] = "C.CP720",
     [locale_CP737 - locale_BASE] = "C.CP737",
@@ -91,7 +93,7 @@ const char * const __locale_names[locale_END - locale_BASE] = {
     [locale_PT154 - locale_BASE] = "C.PT154",
     [locale_KOI8_T - locale_BASE] = "C.KOI8-T",
 #endif
-#ifdef _MB_EXTENDED_CHARSETS_JIS
+#ifdef __MB_EXTENDED_CHARSETS_JIS
     [locale_JIS - locale_BASE] = "C.JIS",
     [locale_EUCJP - locale_BASE] = "C.EUC-JP",
     [locale_SJIS - locale_BASE] = "C.SHIFT-JIS",
@@ -157,7 +159,7 @@ __find_charset(const char *charset)
         __match_charset(charset, "us_ascii"))
         return locale_C;
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
     for (id = locale_UTF_8; id < locale_END; id++) {
         if (__match_charset(charset, __locale_name(id) + 2))
             break;
@@ -170,7 +172,7 @@ __find_charset(const char *charset)
     return id;
 }
 
-#ifdef _MB_CAPABLE
+#ifdef __MB_CAPABLE
 #define LOCALE_DEFAULT  locale_UTF_8
 #else
 #define LOCALE_DEFAULT  locale_C
@@ -185,6 +187,9 @@ __find_locale(const char *name)
 {
     enum locale_id     id = LOCALE_DEFAULT;
     const char          *lang_end;
+
+    if (!name)
+        return locale_INVALID;
 
     if (!*name)
         return _DEFAULT_LOCALE;

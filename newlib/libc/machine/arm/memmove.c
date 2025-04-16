@@ -39,11 +39,6 @@
 
 /* Support the alias for the __aeabi_memmove which may
    assume memory alignment.  */
-void *__aeabi_memmove4 (void *__restrict dest, const void *source, size_t n)
-	_ATTRIBUTE ((alias ("memmove"), weak));
-
-void *__aeabi_memmove8 (void *dest, const void *source, size_t n)
-	_ATTRIBUTE ((alias ("memmove"), weak));
-
-void *__aeabi_memmove (void *dest, const void *source, size_t n)
-	_ATTRIBUTE ((alias ("memmove"), weak));
+__weak_reference(memmove, __aeabi_memmove4);
+__weak_reference(memmove, __aeabi_memmove8);
+__weak_reference(memmove, __aeabi_memmove);

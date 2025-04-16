@@ -33,9 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_sources(interrupt.c)
+picolibc_sources(interrupt.c interrupt_vector.S)
 
-if(${_HAVE_PICOLIBC_TLS_API})
+if(${__THREAD_LOCAL_STORAGE_API})
   picolibc_sources(
     tls.c
     )

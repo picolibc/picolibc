@@ -17,7 +17,7 @@
 .globl strcmp
 .type  strcmp, @function
 strcmp:
-#if defined(PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 1:
   lbu   a2, 0(a0)
   lbu   a3, 0(a1)
@@ -32,10 +32,13 @@ strcmp:
 
 .size	strcmp, .-strcmp
 #else
-  or    a4, a0, a1
   li    t2, -1
+
+#if !(__riscv_misaligned_slow || __riscv_misaligned_fast)
+  or    a4, a0, a1
   and   a4, a4, SZREG-1
   bnez  a4, .Lmisaligned
+#endif
 
 #ifndef __riscv_zbb
 #if SZREG == 4
@@ -191,12 +194,11 @@ strcmp:
   foundnull 1 3
   foundnull 2 3
 #endif
-.size	strcmp, .-strcmp
-
-#if SZREG == 8 && !defined(__riscv_zbb)
-.section .srodata.cst8,"aM",@progbits,8
+#if !defined(__riscv_zbb) && SZREG != 4
 .align 3
 mask:
 .dword 0x7f7f7f7f7f7f7f7f
 #endif
+.size	strcmp, .-strcmp
+
 #endif

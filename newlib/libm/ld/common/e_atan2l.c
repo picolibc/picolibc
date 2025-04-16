@@ -103,7 +103,7 @@ atan2l(long double y, long double x)
 }
 
 #if __LDBL_MANT_DIG__ == 113
-#if defined(_HAVE_ALIAS_ATTRIBUTE)
+#ifdef __strong_reference
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif

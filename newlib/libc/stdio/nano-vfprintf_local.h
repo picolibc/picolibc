@@ -61,12 +61,12 @@
 #ifndef VFPRINTF_LOCAL
 #define VFPRINTF_LOCAL
 
-#ifndef NO_FLOATING_POINT
-# define FLOATING_POINT
+#ifndef __IO_NO_FLOATING_POINT
+# define __IO_FLOATING_POINT
 #endif
 
 #define _NO_POS_ARGS
-#undef _WANT_IO_C99_FORMATS
+#undef __IO_C99_FORMATS
 
 /* Currently a test is made to see if long double processing is warranted.
    This could be changed in the future should the __ldtoa code be
@@ -77,10 +77,10 @@
 
 #define _PRINTF_FLOAT_TYPE double
 
-#if defined (FLOATING_POINT)
+#if defined (__IO_FLOATING_POINT)
 # include <locale.h>
 #endif
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
 # include <math.h>
 
 /* For %La, an exponent of 15 bits occupies the exponent character,
@@ -91,7 +91,7 @@
 # define _DTOA __dtoa
 # define FREXP frexp
 
-#endif /* FLOATING_POINT.  */
+#endif /* __IO_FLOATING_POINT.  */
 
 /* BUF must be big enough for the maximum %#llo (assuming long long is
    at most 64 bits, this would be 23 characters), the maximum
@@ -139,6 +139,11 @@ typedef short *  short_ptr_t;
 #define FPT		0x400		/* Floating point number.  */
 /* Define as 0, to make SARG and UARG occupy fewer instructions.  */
 # define CHARINT	0
+
+#define u_char unsigned char
+#define u_long unsigned long
+#define u_short unsigned short
+#define u_int unsigned int
 
 /* Macros to support positional arguments.  */
 #define GET_ARG(n, ap, type) (va_arg ((ap), type))
@@ -199,7 +204,7 @@ struct _prt_data_t
   char zero;		/* Zero character.  */
   char buf[BUF];	/* Output buffer for non-floating point number.  */
   char l_buf[3];	/* Sign&hex_prefix, "+/-" and "0x/X".  */
-#ifdef FLOATING_POINT
+#ifdef __IO_FLOATING_POINT
   _PRINTF_FLOAT_TYPE _double_;	/* Double value.  */
   char expstr[MAXEXPLEN];	/* Buffer for exponent string.  */
   int lead;		/* The sig figs before decimal or group sep.  */
@@ -221,11 +226,11 @@ _printf_i (struct _prt_data_t *pdata, FILE *fp,
 
 /* Make _printf_float weak symbol, so it won't be linked in if target program
    does not need it.  */
-extern int
+int
 _printf_float (
 	       struct _prt_data_t *pdata,
 	       FILE *fp,
 	       int (*pfunc)(FILE *,
 			    const char *, size_t len),
-	       va_list *ap) _ATTRIBUTE((__weak__));
+	       va_list *ap) __weak;
 #endif

@@ -49,7 +49,7 @@ __gets_chk(char * __restrict str, size_t slen)
                 case EOF:
                         if (ferror(stdin) || cp == str)
                                 return NULL;
-                        __PICOLIBC_FALLTHROUGH;
+                        __fallthrough;
                 case '\n':
                         if (slen == 0)
                                 __chk_fail();

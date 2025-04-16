@@ -36,7 +36,7 @@
 #include <stddef.h>
 #include "../../crt0.h"
 
-static void __attribute__((used)) __section(".init")
+static void __used __section(".init")
 _cstart(void)
 {
 	__start();
@@ -78,7 +78,7 @@ static const char *const names[NUM_REG] = {
 };
 
 
-static void __attribute__((used)) __section(".init")
+static void __used __section(".init")
 _ctrap(struct fault *fault)
 {
         int r;
@@ -94,7 +94,7 @@ _ctrap(struct fault *fault)
 #define _PASTE(r) #r
 #define PASTE(r) _PASTE(r)
 
-void __attribute__((naked)) __section(".init") __attribute__((used)) __attribute((aligned(4)))
+void __naked __section(".init") __used __attribute((aligned(4)))
 _trap(void)
 {
 #ifndef __clang__
@@ -110,7 +110,9 @@ _trap(void)
 
         /* Make space for saved registers */
         __asm__("addi   sp, sp, %0\n"
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
                 ".cfi_def_cfa sp, 0\n"
+#endif
                 :: "i"(-sizeof(struct fault)));
 
         /* Save registers on stack */
@@ -139,10 +141,14 @@ _trap(void)
          */
         __asm__("csrr   ra, mepc\n"
                 SD "    ra, %0(sp)\n"
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
                 ".cfi_offset ra, %0\n"
+#endif
                 "csrrw t0, mscratch, zero\n"
                 SD "    t0, %1(sp)\n"
+#ifdef __GCC_HAVE_DWARF2_CFI_ASM
                 ".cfi_offset sp, %1\n"
+#endif
                 :: "i"(offsetof(struct fault, mepc)),
                    "i"(offsetof(struct fault, r[2])));
         SAVE_CSR(mcause);
@@ -166,7 +172,7 @@ _trap(void)
 }
 #endif
 
-void __attribute__((naked)) __section(".text.init.enter") __attribute__((used))
+void __naked __section(".text.init.enter") __used
 _start(void)
 {
 

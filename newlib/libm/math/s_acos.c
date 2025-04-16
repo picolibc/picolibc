@@ -65,7 +65,7 @@ acos64(__float64 x)
     if (ix >= 0x3ff00000) { /* |x| >= 1 */
         __uint32_t lx;
         GET_LOW_WORD(lx, x);
-        if (((ix - 0x3ff00000) | lx) == 0) { /* |x|==1 */
+        if ((((__uint32_t) ix - 0x3ff00000) | lx) == 0) { /* |x|==1 */
             if (hx > 0)
                 return _F_64(0.0); /* acos(1) = 0  */
             else

@@ -152,7 +152,7 @@ static __inline double _fmod(double x, double y)
   result = spu_sel(spu_andc(result, spu_rlmask(result0, -1)), vx,
                    resultx);
 
-#ifndef _IEEE_LIBM
+#ifndef __IEEE_LIBM
   /*
    * If y is zero, set errno to EDOM
    */

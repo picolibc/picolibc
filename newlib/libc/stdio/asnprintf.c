@@ -41,7 +41,7 @@ asnprintf (
      for _size.  */
   if (len > INT_MAX)
     {
-      _REENT_ERRNO(ptr) = EOVERFLOW;
+      errno = EOVERFLOW;
       return NULL;
     }
   f._bf._size = f._w = len;
@@ -56,8 +56,4 @@ asnprintf (
   return (char *) f._bf._base;
 }
 
-#ifdef _NANO_FORMATTED_IO
-char *
-asniprintf (char *, size_t *, const char *, ...)
-       _ATTRIBUTE ((__alias__("asnprintf")));
-#endif
+__nano_reference(asnprintf, asniprintf);
