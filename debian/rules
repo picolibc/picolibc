@@ -132,11 +132,11 @@ override_dh_auto_build:
 override_dh_auto_test:
 ifeq (,$(filter nocheck,$(DEB_BUILD_OPTIONS)))
 	cd debian/$(BUILDDIR)/$(ARM_ARCH) && meson test --timeout-multiplier=10
-	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && meson test --timeout-multiplier=10 --wrapper=$(DEBPATH)/debian-run-aarch64
-	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && (test ! -x /usr/bin/qemu-system-aarch64 || meson test --timeout-multiplier=10 --wrapper=$(DEBPATH)/debian-run-aarch64)
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH) && (test ! -x /usr/bin/qemu-system-riscv64 || meson test --timeout-multiplier=10)
 	cd debian/$(BUILDDIR)/$(ARM_ARCH)-release && meson test --timeout-multiplier=10
-	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && meson test --timeout-multiplier=10 --wrapper=$(DEBPATH)/debian-run-aarch64
-	cd debian/$(BUILDDIR)/$(RISCV_ARCH)-release && meson test --timeout-multiplier=10
+	cd debian/$(BUILDDIR)/$(AARCH64_ARCH)-release && (test ! -x /usr/bin/qemu-system-aarch64 || meson test --timeout-multiplier=10 --wrapper=$(DEBPATH)/debian-run-aarch64)
+	cd debian/$(BUILDDIR)/$(RISCV_ARCH)-release && (test ! -x /usr/bin/qemu-system-riscv64 || meson test --timeout-multiplier=10)
 endif
 
 override_dh_auto_install:
