@@ -446,7 +446,7 @@ int	siprintf (char *, const char *, ...)
                __picolibc_format(__printf__, 2, 3) __nothrow;
 #define __i_sprintf siprintf
 int	siscanf (const char *, const char *, ...)
-               __picolibc_format(__scanf__,  2, 3);
+               __picolibc_format(__scanf__,  2, 3) __nothrow;
 int	sniprintf (char *, size_t, const char *, ...)
                __picolibc_format(__printf__, 3, 4) __nothrow;
 #define  __i_snprintf sniprintf
@@ -467,9 +467,9 @@ int	viprintf (const char *, va_list)
 int	viscanf (const char *, va_list)
                __picolibc_format(__scanf__,  1, 0);
 int	vsiprintf (char *, const char *, va_list)
-               __picolibc_format(__printf__, 2, 0);
+               __picolibc_format(__printf__, 2, 0) __nothrow;
 int	vsiscanf (const char *, const char *, va_list)
-               __picolibc_format(__scanf__,  2, 0);
+               __picolibc_format(__scanf__,  2, 0) __nothrow;
 int	vsniprintf (char *, size_t, const char *, va_list)
                __picolibc_format(__printf__, 3, 0) __nothrow;
 #endif /* __MISC_VISIBLE */

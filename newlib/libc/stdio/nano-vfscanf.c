@@ -397,7 +397,7 @@ _SVFSCANF (
 	ret = _scanf_i (&scan_data, fp, &ap_copy);
 #ifdef __IO_FLOATING_POINT
       else if (_scanf_float)
-	ret = _scanf_float (rptr, &scan_data, fp, &ap_copy);
+	ret = _scanf_float (&scan_data, fp, &ap_copy);
 #endif
 
       if (ret == MATCH_FAILURE)

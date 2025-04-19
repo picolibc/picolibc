@@ -617,7 +617,7 @@ VFPRINTF (
 	      n = 0;
 	    }
 	  else
-            n = _printf_float (data, &prt_data, fp, pfunc, &ap_copy);
+            n = _printf_float (&prt_data, fp, pfunc, &ap_copy);
 	}
       else
 #endif
