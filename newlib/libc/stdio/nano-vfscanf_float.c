@@ -32,8 +32,7 @@
 
 #ifdef __IO_FLOATING_POINT
 int
-_scanf_float (struct _reent *rptr,
-	      struct _scan_data_t *pdata,
+_scanf_float (struct _scan_data_t *pdata,
 	      FILE *fp, va_list *ap)
 {
   int c;
@@ -84,7 +83,7 @@ _scanf_float (struct _reent *rptr,
 		}
 	      goto fskip;
 	    }
-	/* Fall through.  */
+          __fallthrough;
 	case '1':
 	case '2':
 	case '3':
@@ -212,7 +211,7 @@ fskip:
       ++pdata->nread;
       if (--fp->_r > 0)
 	fp->_p++;
-      else if (pdata->pfn_refill (rptr, fp))
+      else if (pdata->pfn_refill (fp))
 	/* "EOF".  */
 	break;
     }
@@ -234,7 +233,7 @@ fskip:
 	 guarantee that in all implementations of ungetc.  */
       while (p > pdata->buf)
 	{
-	  pdata->pfn_ungetc (rptr, *--p, fp); /* "[-+nNaA]".  */
+	  pdata->pfn_ungetc (*--p, fp); /* "[-+nNaA]".  */
 	  --pdata->nread;
 	}
       return MATCH_FAILURE;
@@ -248,14 +247,14 @@ fskip:
       if (infcount >= 3) /* valid 'inf', but short of 'infinity'.  */
 	while (infcount-- > 3)
 	  {
-	    pdata->pfn_ungetc (rptr, *--p, fp); /* "[iInNtT]".  */
+	    pdata->pfn_ungetc (*--p, fp); /* "[iInNtT]".  */
 	    --pdata->nread;
 	  }
       else
         {
 	  while (p > pdata->buf)
 	    {
-	      pdata->pfn_ungetc (rptr, *--p, fp); /* "[-+iInN]".  */
+	      pdata->pfn_ungetc (*--p, fp); /* "[-+iInN]".  */
 	      --pdata->nread;
 	    }
 	  return MATCH_FAILURE;
@@ -271,7 +270,7 @@ fskip:
 	  /* No digits at all.  */
 	  while (p > pdata->buf)
 	    {
-	      pdata->pfn_ungetc (rptr, *--p, fp); /* "[-+.]".  */
+	      pdata->pfn_ungetc (*--p, fp); /* "[-+.]".  */
 	      --pdata->nread;
 	    }
 	  return MATCH_FAILURE;
@@ -281,11 +280,11 @@ fskip:
       --pdata->nread;
       if (c != 'e' && c != 'E')
 	{
-	  pdata->pfn_ungetc (rptr, c, fp); /* "[-+]".  */
+	  pdata->pfn_ungetc (c, fp); /* "[-+]".  */
 	  c = *--p;
 	  --pdata->nread;
 	}
-      pdata->pfn_ungetc (rptr, c, fp); /* "[eE]".  */
+      pdata->pfn_ungetc (c, fp); /* "[eE]".  */
     }
   if ((pdata->flags & SUPPRESS) == 0)
     {
