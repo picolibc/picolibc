@@ -144,7 +144,6 @@ fsrcs_common = [
 
 lsrcs_common = [
   'copysignl.c',
-  'frexpl.c',
   'exp10l.c',
   'fabsl.c',
   'frexpl.c',
