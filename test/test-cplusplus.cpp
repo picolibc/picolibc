@@ -56,7 +56,6 @@
 #include <float.h>
 //#include <fmtmsg.h>
 #include <fnmatch.h>
-#include <ftw.h>
 #include <glob.h>
 #include <grp.h>
 #include <iconv.h>

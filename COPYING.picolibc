@@ -3829,10 +3829,6 @@ Files: newlib/libc/string/explicit_bzero.c
 Copyright: 2014 Ted Unangst
 License: Other-2
 
-Files: newlib/libc/include/ftw.h
-Copyright: 2005-2020 Rich Felker, et al.
-License: Other-3
-
 Files: newlib/libc/machine/xtensa/machine/core-isa.h
 Copyright: 1999-2010 Tensilica Inc.
 License: Other-3
