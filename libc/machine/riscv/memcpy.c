@@ -1,4 +1,5 @@
 /* Copyright (c) 2017  SiFive Inc. All rights reserved.
+   Copyright (c) 2025 Mahmoud Abumandour <ma.mandourr@gmail.com>
 
    This copyrighted material is made available to anyone wishing to use,
    modify, copy, or redistribute it subject to the terms and conditions
@@ -20,6 +21,14 @@
 
 #define unlikely(X) __builtin_expect(!!(X), 0)
 
+static inline void
+__libc_memcpy_bytewise(unsigned char *dst, const unsigned char *src, const size_t sz)
+{
+    const unsigned char *end = dst + sz;
+    while (dst < end)
+        *dst++ = *src++;
+}
+
 #undef memcpy
 
 void * __no_builtin
@@ -28,33 +37,27 @@ __disable_sanitizer
 #endif
 memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
 {
-#define BODY(a, b, t)  \
-    {                  \
-        t tt = *b;     \
-        a++, b++;      \
-        *(a - 1) = tt; \
-    }
-
-    char       *a = (char *)aa;
-    const char *b = (const char *)bb;
-    char       *end = a + n;
-    uintptr_t   msk = SZREG - 1;
+    unsigned char       *a = (unsigned char *)aa;
+    const unsigned char *b = (const unsigned char *)bb;
+    unsigned char       *end = a + n;
+    uintptr_t            msk = SZREG - 1;
 #if __riscv_misaligned_slow || __riscv_misaligned_fast
     if (n < SZREG)
 #else
     if (unlikely((((uintptr_t)a & msk) != ((uintptr_t)b & msk)) || n < SZREG))
 #endif
     {
-    small:
         if (__builtin_expect(a < end, 1))
-            while (a < end)
-                BODY(a, b, char);
+            __libc_memcpy_bytewise(a, b, n);
         return aa;
     }
 
-    if (unlikely(((uintptr_t)a & msk) != 0))
-        while ((uintptr_t)a & msk)
-            BODY(a, b, char);
+    if (unlikely(((uintptr_t)a & msk) != 0)) {
+        size_t rem = SZREG - ((uintptr_t)a & msk);
+        __libc_memcpy_bytewise(a, b, rem);
+        a += rem;
+        b += rem;
+    }
 
     uintxlen_t       *la = (uintxlen_t *)a;
     const uintxlen_t *lb = (const uintxlen_t *)b;
@@ -84,12 +87,12 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
     }
 
     while (la < lend)
-        BODY(la, lb, uintxlen_t);
+        *la++ = *lb++;
 
-    a = (char *)la;
-    b = (const char *)lb;
+    a = (unsigned char *)la;
+    b = (const unsigned char *)lb;
     if (unlikely(a < end))
-        goto small;
+        __libc_memcpy_bytewise(a, b, end - a);
     return aa;
 }
 #endif /* _MACHINE_RISCV_MEMCPY_C_ */
