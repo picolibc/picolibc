@@ -15,6 +15,8 @@
 #include <string.h>
 #include <stdint.h>
 #include "../../string/local.h"
+#include "asm.h"
+#include "xlenint.h"
 
 #define unlikely(X) __builtin_expect(!!(X), 0)
 
@@ -36,11 +38,11 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
     char       *a = (char *)aa;
     const char *b = (const char *)bb;
     char       *end = a + n;
-    uintptr_t   msk = sizeof(long) - 1;
+    uintptr_t   msk = SZREG - 1;
 #if __riscv_misaligned_slow || __riscv_misaligned_fast
-    if (n < sizeof(long))
+    if (n < SZREG)
 #else
-    if (unlikely((((uintptr_t)a & msk) != ((uintptr_t)b & msk)) || n < sizeof(long)))
+    if (unlikely((((uintptr_t)a & msk) != ((uintptr_t)b & msk)) || n < SZREG))
 #endif
     {
     small:
@@ -54,21 +56,21 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
         while ((uintptr_t)a & msk)
             BODY(a, b, char);
 
-    long       *la = (long *)a;
-    const long *lb = (const long *)b;
-    long       *lend = (long *)((uintptr_t)end & ~msk);
+    uintxlen_t       *la = (uintxlen_t *)a;
+    const uintxlen_t *lb = (const uintxlen_t *)b;
+    uintxlen_t       *lend = (uintxlen_t *)((uintptr_t)end & ~msk);
 
     if (unlikely(lend - la > 8)) {
         while (lend - la > 8) {
-            long b0 = *lb++;
-            long b1 = *lb++;
-            long b2 = *lb++;
-            long b3 = *lb++;
-            long b4 = *lb++;
-            long b5 = *lb++;
-            long b6 = *lb++;
-            long b7 = *lb++;
-            long b8 = *lb++;
+            uintxlen_t b0 = *lb++;
+            uintxlen_t b1 = *lb++;
+            uintxlen_t b2 = *lb++;
+            uintxlen_t b3 = *lb++;
+            uintxlen_t b4 = *lb++;
+            uintxlen_t b5 = *lb++;
+            uintxlen_t b6 = *lb++;
+            uintxlen_t b7 = *lb++;
+            uintxlen_t b8 = *lb++;
             *la++ = b0;
             *la++ = b1;
             *la++ = b2;
@@ -82,7 +84,7 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
     }
 
     while (la < lend)
-        BODY(la, lb, long);
+        BODY(la, lb, uintxlen_t);
 
     a = (char *)la;
     b = (const char *)lb;
