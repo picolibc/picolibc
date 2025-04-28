@@ -33,7 +33,7 @@ __libc_init_array (void)
         _init ();
 
     fn = __init_array_start;
-    fn_end = __preinit_array_end;
+    fn_end = __init_array_end;
     while (fn != fn_end)
         (*fn++) ();
 #else
