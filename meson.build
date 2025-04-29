@@ -536,16 +536,16 @@ endif
 
 specs_printf = ''
 if tinystdio and printf_aliases
-  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfprintf=@0@__d_vfprintf}' +
-		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=vfscanf=@0@__d_vfscanf}' +
-                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfprintf=@0@__f_vfprintf}' +
-		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=vfscanf=@0@__f_vfscanf}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfprintf=@0@__l_vfprintf}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=vfscanf=@0@__l_vfscanf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfprintf=@0@__i_vfprintf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=vfscanf=@0@__i_vfscanf}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfprintf=@0@__m_vfprintf}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=vfscanf=@0@__m_vfscanf}').format(global_prefix)
+  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__d_vfprintf}' +
+		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__d_vfscanf}' +
+                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__f_vfprintf}' +
+		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__f_vfscanf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__l_vfprintf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__l_vfscanf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__i_vfprintf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__i_vfscanf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__m_vfprintf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__m_vfscanf}').format(global_prefix)
 endif
 
 crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
@@ -688,6 +688,7 @@ specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
 specs_data.set('ADDITIONAL_LIBS', additional_libs)
 specs_data.set('SPECS_EXTRA', specs_extra)
 specs_data.set('SPECS_PRINTF', specs_printf)
+specs_data.set('PREFIX', global_prefix)
 
 # Create C and C++ specific specs data,
 # that includes setting the correct linker script
