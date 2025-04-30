@@ -1,3 +1,9 @@
+picolibc (1.8.10-2) unstable; urgency=medium
+
+  * Add qemu version 10 patch for riscv. Closes: #1104372.
+
+ -- Keith Packard <keithp@keithp.com>  Tue, 29 Apr 2025 21:40:39 -0700
+
 picolibc (1.8.10-1) unstable; urgency=medium
 
   * New upstream
