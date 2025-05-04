@@ -33,11 +33,19 @@
  */
 
 #include <complex.h>
+#include <math.h>
 
 float complex
 cacoshf(float complex z)
 {
 	float complex w;
+	float x = crealf(z);
+	float y = cimagf(z);
+
+	if (y == 0.0f && x >= 1.0f) {
+		float w = acoshf(x);
+		return CMPLXF(w, 0.0f);
+	}
 
 #if 0 /* does not give the principal value */
 	w = I * cacosf(z);
