@@ -48,8 +48,17 @@ catanl(long double complex z)
 	x = creall(z);
 	y = cimagl(z);
 
-	if ((x == 0.0L) && (y > 1.0L))
-		goto ovrf;
+	if (x == 0.0L) {
+		if (y > 1.0L) {
+			return CMPLXL(_M_PI_2L, 0.5L * logl((1.0L + y)/(y - 1.0L)));
+		}
+		if (y < -1.0L) {
+			return CMPLXL(-_M_PI_2L, 0.5L * logl((1.0L - y)/(-y - 1.0L)));
+		}
+		if (fabsl(y) <= 1.0L) {
+			return CMPLXL(0.0L, atanhl(y));
+		}
+	}
 
 	x2 = x * x;
 	a = 1.0L - x2 - (y * y);
