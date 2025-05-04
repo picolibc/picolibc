@@ -81,9 +81,24 @@ double complex
 clog(double complex z)
 {
 	double p, rr;
+	double x = creal(z);
+	double y = cimag(z);
 
-	rr = cabs(z);
-	p = log(rr);
-	rr = atan2(cimag(z), creal(z));
+	rr = hypot(x, y);
+
+        /* use log1p when rr ~= 1.0 */
+	if (0.5 < rr && rr < 2.0) {
+                double d;
+                if (fabs(x) > fabs(y))
+                        d = (x - 1) * (x + 1) + y * y;
+                else
+                        d = (y - 1) * (y + 1) + x * x;
+                p = 0.5 * log1p(d);
+	}
+	else {
+                p = log(rr);
+	}
+
+	rr = atan2(y, x);
 	return (double complex) p + rr * (double complex) I;
 }

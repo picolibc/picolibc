@@ -39,9 +39,24 @@ float complex
 clogf(float complex z)
 {
 	float p, rr;
+	float x = crealf(z);
+	float y = cimagf(z);
 
-	rr = cabsf(z);
-	p = logf(rr);
-	rr = atan2f(cimagf(z), crealf(z));
+	rr = hypotf(x, y);
+
+	/* use log1pf and compute x^2 + y^2 -1 more accuratly when rr ~= 1.0 */
+	if (0.5f < rr && rr < 2.0f) {
+                float d;
+                if (fabsf(x) > fabsf(y))
+                        d = (x - 1) * (x + 1) + y * y;
+                else
+                        d = (y - 1) * (y + 1) + x * x;
+                p = 0.5f * log1pf(d);
+	}
+	else {
+                p = logf(rr);
+	}
+
+	rr = atan2f(y, x);
 	return (float complex) p + rr * I;
 }

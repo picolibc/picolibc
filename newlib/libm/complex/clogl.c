@@ -39,9 +39,25 @@ clogl(long double complex z)
 {
 	long double p, rr;
 
-	rr = cabsl(z);
-	p = logl(rr);
-	rr = atan2l(cimagl(z), creall(z));
+	long double x = creall(z);
+	long double y = cimagl(z);
+
+	rr = hypotl(x, y);
+
+	/* use log1pl and compute x^2 + y^2 -1 more accuratly when rr ~= 1.0 */
+	if (0.5 < rr && rr < 2.0) {
+                long double d;
+                if (fabsl(x) > fabsl(y))
+                        d = (x - 1) * (x + 1) + y * y;
+                else
+                        d = (y - 1) * (y + 1) + x * x;
+		p = 0.5 * log1pl(d);
+	}
+	else {
+		p = logl(rr);
+	}
+
+	rr = atan2l(y, x);
 	return (long double complex) p + rr * (long double complex) I;
 }
 
