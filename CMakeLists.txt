@@ -279,6 +279,7 @@ set(PICOLIBC_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 
 include(CheckIncludeFile)
 
+set(CMAKE_REQUIRED_QUIET TRUE)
 CHECK_INCLUDE_FILE(xtensa/config/core-isa.h _XTENSA_HAVE_CONFIG_CORE_ISA_H)
 
 configure_file(picolibc.h.in "${PICOLIBC_INCLUDE}/picolibc.h")
