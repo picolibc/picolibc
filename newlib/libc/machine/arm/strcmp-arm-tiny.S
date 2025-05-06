@@ -35,7 +35,7 @@
 
 	.syntax unified
 def_fn strcmp
-	.fnstart
+	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue
@@ -50,6 +50,6 @@ def_fn strcmp
 	subs	r0, r2, r3
 	epilogue
 	.cfi_endproc
-	.cantunwind
-	.fnend
+	cantunwind
+	fnend
 	.size	strcmp, . - strcmp

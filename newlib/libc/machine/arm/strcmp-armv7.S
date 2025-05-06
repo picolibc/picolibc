@@ -127,7 +127,7 @@
 	.text
 	.p2align	5
 def_fn	strcmp
-	.fnstart
+	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue push_ip=HAVE_PAC_LEAF
@@ -479,6 +479,6 @@ def_fn	strcmp
 	sub	result, result, data2, lsr #24
 	epilogue push_ip=HAVE_PAC_LEAF
 	.cfi_endproc
-	.cantunwind
-	.fnend
+	cantunwind
+	fnend
 	.size strcmp, . - strcmp

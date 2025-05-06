@@ -293,7 +293,7 @@ memchr:
 	.p2align 4,,15
 	.global memchr
 	.type memchr,%function
-	.fnstart
+	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
 memchr:
@@ -419,8 +419,8 @@ memchr:
 	subs	r0,r0,#1
 	epilogue
 	.cfi_endproc
-	.cantunwind
-	.fnend
+	cantunwind
+	fnend
 #else
   /* Defined in memchr.c.  */
 #endif

@@ -151,6 +151,28 @@
 *
 ******************************************************************************/
 
+
+/* Don't emit unwind or exception table entries */
+
+        .macro fnstart
+#ifdef __INCLUDE_EXIDX
+        .fnstart
+#endif
+        .endm
+
+        .macro cantunwind
+#ifdef __INCLUDE_EXIDX
+        .cantunwind
+#endif
+        .endm
+
+        .macro fnend
+#ifdef __INCLUDE_EXIDX
+        .fnend
+#endif
+        .endm
+
+
 /* Emit .cfi_restore directives for a consecutive sequence of registers.  */
 	.macro cfirestorelist first, last
 	.cfi_restore \last

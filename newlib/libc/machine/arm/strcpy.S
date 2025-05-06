@@ -46,7 +46,7 @@
 	.global strcpy
 	.type strcpy, %function
 strcpy:
-	.fnstart
+	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue push_ip=HAVE_PAC_LEAF
@@ -180,8 +180,8 @@ strcpy:
 #endif
 	epilogue push_ip=HAVE_PAC_LEAF
 	.cfi_endproc
-	.cantunwind
-	.fnend
+	cantunwind
+	fnend
 	.size strcpy, . - strcpy
 
 #if defined(__linux__) && defined(__ELF__)

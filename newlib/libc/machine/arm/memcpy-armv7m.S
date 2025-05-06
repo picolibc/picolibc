@@ -89,7 +89,7 @@
 	.global	memcpy
 	.thumb
 	.thumb_func
-	.fnstart
+	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
 	.type	memcpy, %function
@@ -345,6 +345,6 @@ memcpy:
 	epilogue 0 push_ip=HAVE_PAC_LEAF
 #endif /* __ARM_FEATURE_UNALIGNED */
 	.cfi_endproc
-	.cantunwind
-	.fnend
+	cantunwind
+	fnend
 	.size	memcpy, .-memcpy

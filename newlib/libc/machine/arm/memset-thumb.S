@@ -36,7 +36,7 @@
 	.type	memset, %function
 	.p2align 1
 memset:
-	.fnstart
+	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue 4 6 push_ip=HAVE_PAC_LEAF
@@ -125,6 +125,6 @@ memset:
 	movs	r4, r2
 	b	3b
 	.cfi_endproc
-	.cantunwind
-	.fnend
+	cantunwind
+	fnend
 	.size memset, . - memset

@@ -47,7 +47,7 @@
 	.syntax unified
 
 def_fn	strlen p2align=1
-	.fnstart
+	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
 	prologue
@@ -59,8 +59,8 @@ def_fn	strlen p2align=1
 	subs    r0, #1
 	epilogue
 	.cfi_endproc
-	.cantunwind
-	.fnend
+	cantunwind
+	fnend
 	.size	strlen, . - strlen
 
 #if defined(__linux__) && defined(__ELF__)
