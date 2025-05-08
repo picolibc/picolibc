@@ -102,46 +102,46 @@ casinh(double complex z)
 
     if (y == 0.0) {
         if (isnan(x)) {
-            res = NAN + copysign(0.0, cimag(z)) * I;
+            res = (double complex) NAN + copysign(0.0, cimag(z)) * (double complex) I;
         }
         else if (isinf(x)) {
-            res = x + copysign(0.0, cimag(z)) * I;
+            res = x + copysign(0.0, cimag(z)) * (double complex) I;
         }
         else {
-            res = asinh(x) + copysign(0.0, cimag(z)) * I;
+            res = asinh(x) + copysign(0.0, cimag(z)) * (double complex) I;
         }
     }
     /* Handle large values */
     else if (x >= 1.0/eps || y >= 1.0/eps) {
-        res = clog(x + y * I);
-        res = creal(res) + M_LN2 + cimag(res) * I;
+        res = clog(x + y * (double complex) I);
+        res = creal(res) + (double) _M_LN2 + cimag(res) * (double complex) I;
 
     }
 
     /* Case where real part >= 0.5 and imag part very samll */
     else if (x >= 0.5 && y < eps/8.0) {
         double s = hypot(1.0, x);
-        res = log(x + s) + atan2(y, s) * I;
+        res = log(x + s) + atan2(y, s) * (double complex) I;
     }
 
     /* Case Where real part very small and imag part >= 1.5 */
     else if (x < eps/8.0 && y >= 1.5) {
         double s = sqrt((y + 1.0) * (y - 1.0));
-        res = log(y + s) + atan2(s, x) * I;
+        res = log(y + s) + atan2(s, x) * (double complex) I;
     }
 
     else {
         /* General case */
-        w = (x - y) * (x + y) + 1.0 + (2.0 * x * y) * I;
+        w = (x - y) * (x + y) + 1.0 + (2.0 * x * y) * (double complex) I;
         w = csqrt(w);
 
-        w = (x + creal(w)) + (y + cimag(w)) * I;
+        w = (x + creal(w)) + (y + cimag(w)) * (double complex) I;
         res = clog(w);
     }
 
     /* Apply correct signs */
     res = copysign(creal(res), creal(z)) +
-          copysign(cimag(res), cimag(z)) * I;
+          copysign(cimag(res), cimag(z)) * (double complex) I;
 
     return res;
 }

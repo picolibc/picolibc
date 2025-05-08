@@ -75,6 +75,12 @@ set(tests
   test-uchar
   test-vfprintf_s
   test-vsnprintf_s
+  test-casin
+  test-casinf
+  test-casinl
+  test-casinh
+  test-casinhf
+  test-casinhl
   )
 
 set(tests_fail

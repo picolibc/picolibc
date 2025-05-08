@@ -60,7 +60,7 @@ casinhl(long double complex z)
     /* Handle large values */
     else if (x >= 1.0L/eps || y >= 1.0L/eps) {
         res = clogl(x + y * I);
-        res = creall(res) + M_LN2 + cimagl(res) * I;
+        res = creall(res) + _M_LN2_LD + cimagl(res) * I;
 
     }
 

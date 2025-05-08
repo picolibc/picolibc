@@ -61,7 +61,7 @@ casinhf(float complex z)
     /* Handle large values */
     else if (x >= 1.0f/eps || y >= 1.0f/eps) {
         res = clogf(x + y * I);
-        res = crealf(res) + M_LN2 + cimagf(res) * I;
+        res = crealf(res) + (float) _M_LN2 + cimagf(res) * I;
 
     }
 
