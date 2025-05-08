@@ -15,6 +15,7 @@
 
 #include <sys/cdefs.h>
 #include <stdint.h>
+#include <sys/_intsup.h>
 
 _BEGIN_STD_C
 
