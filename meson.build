@@ -778,45 +778,11 @@ unsigned int foobar (const struct test *p) { return p->part; }
 '''
 have_bitfields_in_packed_structs = cc.compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields', args: core_c_args)
 
-# CompCert does not have __builtin_mul_overflow
-builtin_mul_overflow_code = '''
-#include <stddef.h>
-int overflows (size_t a, size_t b) { size_t x; return __builtin_mul_overflow(a, b, &x); }
-volatile size_t aa = 42;
-int main (void) { return overflows(aa, aa); }
-'''
-have_builtin_mul_overflow = cc.links(builtin_mul_overflow_code, name : 'has __builtin_mul_overflow', args: core_c_args)
-
-# CompCert does not have __builtin_add_overflow
-builtin_add_overflow_code = '''
-#include <stddef.h>
-int overflows (size_t a, size_t b) { size_t x; return __builtin_add_overflow(a, b, &x); }
-volatile size_t aa = 42;
-int main (void) { return overflows(aa, aa); }
-'''
-have_builtin_add_overflow = cc.links(builtin_add_overflow_code, name : 'has __builtin_add_overflow', args: core_c_args)
-
 # CompCert does not support _Complex
 complex_code = '''
 float _Complex test(float _Complex z) { return z; }
 '''
 have_complex = cc.compiles(complex_code, name : 'supports _Complex', args: core_c_args)
-
-builtin_complex_code = '''
-#include <stddef.h>
-double _Complex test(double r, double i) { return __builtin_complex(r, i); }
-'''
-
-have_builtin_complex = have_complex and cc.compiles(builtin_complex_code, name : 'supports __builtin_complex', args: core_c_args)
-
-# CompCert does not have __builtin_expect
-builtin_expect_code = '''
-volatile int a = 42;
-int main (void) {
-  return __builtin_expect(a, 1);
-}
-'''
-have_builtin_expect = cc.links(builtin_expect_code, name : 'has __builtin_expect', args: core_c_args)
 
 werror_c_args = core_c_args + cc.get_supported_arguments('-Werror')
 
