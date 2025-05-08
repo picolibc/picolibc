@@ -688,7 +688,7 @@ _u128_gt(_u128 a, _u128 b)
 long double
 __atold_engine(_u128 m10, int e10);
 
-static inline uint16_t
+static inline __ungetc_t
 __non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
 	__ungetc_t e = *p;
@@ -705,7 +705,7 @@ __non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 	return true;
 }
 
-static inline uint16_t
+static inline __ungetc_t
 __non_atomic_load_ungetc(const volatile __ungetc_t *p)
 {
         return *p;
