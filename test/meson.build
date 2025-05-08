@@ -63,7 +63,15 @@ if have_attr_ctor_dtor
 endif
 
 if have_complex
-  math_tests_common += 'complex-funcs'
+  math_tests_common += [
+    'complex-funcs',
+    'test-casin',
+    'test-casinf',
+    'test-casinl',
+    'test-casinh',
+    'test-casinhf',
+    'test-casinhl',
+  ]
 endif
 
 if newlib_nano_malloc or tests_enable_full_malloc_stress

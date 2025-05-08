@@ -93,14 +93,14 @@ casin(double complex z)
 
         if (isnan(x) || isnan(y)) {
                 if (isinf(x) || isinf(y)) {
-                        return NAN + copysign(INFINITY, y) * I;
+                        return (double complex) NAN + copysign(INFINITY, y) * (double complex) I;
                 }
-                return NAN + NAN * I;
+                return (double complex) NAN + (double complex) NAN * (double complex) I;
         }
 
 	double complex iz = CMPLX(-y,x);
 	double complex w = casinh(iz);
-	res = cimag(w) - creal(w) * I;
+	res = cimag(w) - creal(w) * (double complex) I;
 
 	return res;
 }
