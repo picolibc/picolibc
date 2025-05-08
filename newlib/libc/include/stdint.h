@@ -11,8 +11,8 @@
 
 #include <sys/cdefs.h>
 #include <machine/_default_types.h>
-#include <sys/_intsup.h>
 #include <sys/_stdint.h>
+#include <sys/_intsup.h>
 
 _BEGIN_STD_C
 
