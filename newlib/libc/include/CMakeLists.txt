@@ -86,7 +86,6 @@ picolibc_headers(""
   stdlib.h
   string.h
   strings.h
-  _syslist.h
   tar.h
   termios.h
   time.h

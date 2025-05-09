@@ -52,7 +52,6 @@ Supporting OS subroutines required: <<_exit>>, <<_execve>>, <<_fork_r>>,
 #include <stddef.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include <_syslist.h>
 #include <sys/wait.h>
 
 #if defined (unix) || defined (__CYGWIN__)
