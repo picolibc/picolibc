@@ -283,13 +283,73 @@ io_long_double = get_option('io-long-double')
 # Select stdio implementation
 tinystdio = get_option('tinystdio')
 
-has_link_defsym = meson.get_cross_property('has_link_defsym',
-                                           cc.has_link_argument('-Wl,--defsym=' + 'start=0') or
-                                           cc.has_link_argument('-Wl,--defsym=' + '_start=0') or
-                                           cc.has_link_argument('-Wl,--defsym=' + '__start=0') or
-                                           cc.has_link_argument('-Wl,--defsym=' + '___start=0') )
-has_link_alias = meson.get_cross_property('has_link_alias', cc.has_link_argument('-Wl,-alias,' + global_prefix + 'main,testalias'))
-lib_gcc = meson.get_cross_property('libgcc', '-lgcc')
+# Figure out what flags the linker supports
+
+has_link_defsym = false
+has_link_alias = false
+
+
+# Figure out how to pass aliases on the compiler command line.  Do
+# that by finding a suitable alias for the default entry point.
+
+foreach start : ['start', '_start', '__start', '___start']
+  _defsym = '-Wl,--defsym=@0@=@1@main'.format(start, global_prefix)
+  if cc.has_link_argument(_defsym)
+    has_link_defsym = true
+    break
+  endif
+  _alias = '-Wl,-alias,@1@main,@0@'.format(start, global_prefix)
+  if cc.has_link_argument(_alias)
+    has_link_alias = true
+    break
+  endif
+endforeach
+
+has_link_defsym = meson.get_cross_property('has_link_defsym', has_link_defsym)
+has_link_alias = meson.get_cross_property('has_link_alias', has_link_alias)
+
+# If an empty linker command line doesn't work, then pass the alias
+# argument computed above when performing compiler tests involving
+# linking
+
+link_test_args = []
+
+if not cc.has_multi_link_arguments([])
+  if has_link_defsym
+    link_test_args += [_defsym]
+  elif has_link_alias
+    link_test_args += [_alias]
+  endif
+endif
+
+# Find the compiler support library
+
+lib_gcc = [meson.get_cross_property('libgcc', false)]
+
+if lib_gcc == [false]
+  lib_gcc = []
+  foreach lg : ['-lgcc', '-lclang_rt.builtins']
+    if cc.has_multi_link_arguments(link_test_args + [lg])
+      lib_gcc = [lg]
+      break
+    endif
+  endforeach
+endif
+
+# Add libgcc for use in future linking tests
+
+link_test_args += lib_gcc
+
+# Get additional flags used for linking tests.
+
+test_link_args_base = lib_gcc
+
+foreach ld : ['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments']
+  if cc.has_multi_link_arguments(link_test_args + [ld])
+    test_link_args_base += [ld]
+  endif
+endforeach
+
 stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
 
 # tinystdio options
@@ -397,7 +457,7 @@ have_picolibc_tls_api = enable_picolib and fs.is_file('newlib/libc/picolib/machi
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if thread_local_storage_option == 'auto' or have_picolibc_tls_api
-    thread_local_storage = not cc.has_function('__emutls_get_address', args: core_c_args + [lib_gcc])
+    thread_local_storage = not cc.has_function('__emutls_get_address', args: core_c_args + link_test_args)
   endif
 else
   thread_local_storage = get_option('thread-local-storage') == 'true'
@@ -520,7 +580,7 @@ additional_libs = ' '.join(additional_libs_list)
 
 if compiler_id == 'gcc' and target_machine.cpu_family() == 'msp430'
   # Extract -mhwmult-selection-snippet from GCC.
-  dumped_specs = run_command(cc.cmd_array() + '-dumpspecs').stdout()
+  dumped_specs = run_command(cc.cmd_array() + ['-dumpspecs']).stdout()
   hwmult_start = dumped_specs.split('%{mhwmult=auto')[1]
   hwmult_snippet = '%{mhwmult=auto' + hwmult_start.split('-lc')[0]
   additional_libs += hwmult_snippet
@@ -1527,8 +1587,6 @@ endif
 test_env = environment({'PICOLIBC_TEST' : '1'})
 test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
-test_link_defaults = cc.get_supported_link_arguments(['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments'])
-
 if has_semihost
   foreach params : [default_target] + targets
     
@@ -1555,9 +1613,9 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-		 test_link_defaults + ['-nostdlib', '-T', picolibc_ld_string]
-       + additional_libs_list
-       + [lib_gcc])
+                 additional_libs_list + 
+		 test_link_args_base +
+                 ['-nostdlib', '-T', picolibc_ld_string])
 
     set_variable(test_linker_files_variable, [picolibc_ld_value])
 
@@ -1565,7 +1623,7 @@ if has_semihost
     set_variable(test_link_depends_variable, [picolibc_ld_value])
   endforeach
 else
-  test_link_args = test_link_defaults + cc.get_supported_link_arguments(['-lgcc'])
+  test_link_args = test_link_args_base
   test_link_depends = []
 endif
 
