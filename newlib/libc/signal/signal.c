@@ -85,7 +85,6 @@ without an operating system that can actually raise exceptions.
 #include <errno.h>
 #include <signal.h>
 #include <unistd.h>
-#include <_syslist.h>
 
 #if __SIZEOF_POINTER__ == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
 #define _USE_ATOMIC_SIGNAL

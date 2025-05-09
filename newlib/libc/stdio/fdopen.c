@@ -49,7 +49,6 @@ PORTABILITY
 #include <stdio.h>
 #include <errno.h>
 #include "local.h"
-#include <_syslist.h>
 
 FILE *
 fdopen (
