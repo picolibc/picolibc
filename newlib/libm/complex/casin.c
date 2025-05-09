@@ -85,81 +85,22 @@ __weak_alias(casin, _casin)
 double complex
 casin(double complex z)
 {
-	double complex w;
-	double complex ca, ct, zz, z2;
-	double x, y;
+	double x = creal(z);
+	double y = cimag(z);
+	double complex res;
 
-	x = creal(z);
-	y = cimag(z);
+	if (x == 0.0 && y == 0.0) return z;
 
-#if 0 /* MD: test is incorrect, casin(>1) is defined */
-	if (y == 0.0) {
-		if (fabs(x) > 1.0) {
-			w = M_PI_2 + 0.0 * (double complex) I;
-#if 0
-			mtherr ("casin", DOMAIN);
-#endif
-		} else {
-			w = asin(x) + 0.0 * (double complex) I;
-		}
-		return w;
-	}
-#endif
+        if (isnan(x) || isnan(y)) {
+                if (isinf(x) || isinf(y)) {
+                        return NAN + copysign(INFINITY, y) * I;
+                }
+                return NAN + NAN * I;
+        }
 
-/* Power series expansion */
-/*
-b = cabs(z);
-if( b < 0.125 )
-{
-z2.r = (x - y) * (x + y);
-z2.i = 2.0 * x * y;
+	double complex iz = CMPLX(-y,x);
+	double complex w = casinh(iz);
+	res = cimag(w) - creal(w) * I;
 
-cn = 1.0;
-n = 1.0;
-ca.r = x;
-ca.i = y;
-sum.r = x;
-sum.i = y;
-do
-	{
-	ct.r = z2.r * ca.r  -  z2.i * ca.i;
-	ct.i = z2.r * ca.i  +  z2.i * ca.r;
-	ca.r = ct.r;
-	ca.i = ct.i;
-
-	cn *= n;
-	n += 1.0;
-	cn /= n;
-	n += 1.0;
-	b = cn/n;
-
-	ct.r *= b;
-	ct.i *= b;
-	sum.r += ct.r;
-	sum.i += ct.i;
-	b = fabs(ct.r) + fabs(ct.i);
-	}
-while( b > MACHEP );
-w->r = sum.r;
-w->i = sum.i;
-return;
-}
-*/
-
-
-	ca = x + y * (double complex) I;
-	ct = ca * (double complex) I;
-	/* sqrt( 1 - z*z) */
-	/* cmul( &ca, &ca, &zz ) */
-	/*x * x  -  y * y */
-	zz = (x - y) * (x + y) + (2.0 * x * y) * (double complex) I;
-
-	zz = 1.0 - creal(zz) - cimag(zz) * (double complex) I;
-	z2 = csqrt(zz);
-
-	zz = ct + z2;
-	zz = clog(zz);
-	/* multiply by 1/i = -i */
-	w = zz * (-1.0 * (double complex) I);
-	return w;
+	return res;
 }

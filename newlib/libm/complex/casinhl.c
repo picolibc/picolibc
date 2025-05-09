@@ -30,16 +30,66 @@
  */
 
 #include <complex.h>
+#include <math.h>
+#include <float.h>
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
 long double complex
 casinhl(long double complex z)
 {
-	long double complex w;
 
-	w = -1.0L * (long double complex) I * casinl(z * (long double complex) I);
-	return w;
+    long double x = fabsl(creall(z));
+    long double y = fabsl(cimagl(z));
+    long double complex res;
+    long double complex w;
+
+    const long double eps = LDBL_EPSILON;
+
+    if (y == 0.0L) {
+        if (isnan(x)) {
+            res = NAN + copysignl(0.0L, cimagl(z)) * I;
+        }
+        else if (isinf(x)) {
+            res = x + copysignl(0.0L, cimagl(z)) * I;
+        }
+        else {
+            res = asinhl(x) + copysignl(0.0L, cimagl(z)) * I;
+        }
+    }
+    /* Handle large values */
+    else if (x >= 1.0L/eps || y >= 1.0L/eps) {
+        res = clogl(x + y * I);
+        res = creall(res) + M_LN2 + cimagl(res) * I;
+
+    }
+
+    /* Case where real part >= 0.5 and imag part very samll */
+    else if (x >= 0.5L && y < eps/8.0L) {
+        long double s = hypotl(1.0L, x);
+        res = logl(x + s) + atan2l(y, s) * I;
+    }
+
+    /* Case Where real part very small and imag part >= 1.5 */
+    else if (x < eps/8.0L && y >= 1.5L) {
+        long double s = sqrtl((y + 1.0L) * (y - 1.0L));
+        res = logl(y + s) + atan2l(s, x) * I;
+    }
+
+    else {
+        /* General case */
+        w = (x - y) * (x + y) + 1.0L + (2.0L * x * y) * I;
+        w = csqrtl(w);
+
+        w = (x + creall(w)) + (y + cimagl(w)) * I;
+        res = clogl(w);
+    }
+
+    /* Apply correct signs */
+    res = copysignl(creall(res), creall(z)) +
+          copysignl(cimagl(res), cimagl(z)) * I;
+
+    return res;
 }
 
 #endif
