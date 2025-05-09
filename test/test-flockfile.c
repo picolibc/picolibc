@@ -125,6 +125,7 @@ static int myput(char c, FILE *file)
     (void) file;
     write(fd, &c, 1);
     usleep(rand() & 31);
+    return (unsigned char) c;
 }
 
 static int myget(FILE *file)

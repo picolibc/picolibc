@@ -668,7 +668,8 @@ if enable_native_tests
                   'test-flockfile.c',
                   c_args: test_c_args + test_file_name_arg,
                   link_args: test_link_args,
-                  link_with: [native_lib, lib_c],
+                  link_whole: [native_lib],
+                  link_with: [lib_c],
                   include_directories: inc),
        depends: bios_bin,
        env: test_env)
