@@ -30,7 +30,6 @@ File pointer or <<NULL>>, as for <<fopen>>.
 
 #include <stdio.h>
 #include <errno.h>
-#include <_syslist.h>
 #include <sys/lock.h>
 #include "../stdio/local.h"
 

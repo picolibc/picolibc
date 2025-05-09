@@ -1795,8 +1795,7 @@ Files: newlib/libc/stdlib/environ.c
 Copyright: 1995, 1996, 2002 Red Hat Incorporated.
 License: BSD3-3
 
-Files: newlib/libc/include/_syslist.h
- newlib/libc/include/ar.h
+Files: newlib/libc/include/ar.h
  newlib/libc/include/assert.h
  newlib/libc/include/ctype.h
  newlib/libc/include/errno.h
