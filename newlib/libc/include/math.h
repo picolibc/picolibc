@@ -513,7 +513,7 @@ extern float logf (float);
 extern float log10f (float);
 extern float powf (float, float);
 extern float sqrtf (float);
-#if !(__ARM_FP & 0x4) 
+#ifdef __ARM_ARCH  
 extern float rsqrtf (float);
 #endif
 extern float fmodf (float, float);
