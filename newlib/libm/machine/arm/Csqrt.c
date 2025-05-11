@@ -45,7 +45,8 @@
 uint32_t __mantissa_sqrt_asm(uint32_t x);
 uint32_t __mantissa_rsqrt_asm(uint32_t x);
 
-#if  !defined(__ARM_ARCH) || defined(__OPTIMIZE_SIZE__)
+//#if  !defined(__ARM_ARCH) || defined(__OPTIMIZE_SIZE__)
+#if 1
 static uint32_t sqrt_core(uint32_t x, uint32_t y)
 {
     x<<=6;
@@ -148,12 +149,10 @@ float sqrtf(float x)
             exponent = exponent - (127);
             mantissa += 1 << 23; // adds implicit bit to mantissa.
             mantissa <<= (exponent & 1);
-
             exponent >>= 1;
             // This is meant to be a floor division
             // meaning -1/2= -0.5 should map to -1
             exponent = (exponent + (126 ));
-
             uint32_t new_mantissa=mantissa_sqrt(mantissa);
             xu.i = (exponent<<23) + new_mantissa;
             return xu.f;
@@ -165,14 +164,12 @@ float sqrtf(float x)
         {   
             if (likely (xu.i !=0) )
             {
-
                 uint32_t mantissa = xu.i &~ ((uint32_t)exponent << 23);
                 int32_t shift=__builtin_clz(mantissa)- (31-23);
                 mantissa<<=shift; // normalize subnormal
                 int32_t exponent =  - (126)-shift;
                 mantissa <<= (exponent & 1);
                 uint32_t new_mantissa=mantissa_sqrt(mantissa); 
-
                 exponent >>= 1;
                 exponent = (exponent + (126));
                 xu.i = (exponent<<23) + new_mantissa;

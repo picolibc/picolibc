@@ -35,7 +35,6 @@
 
 .syntax  unified
 .arm
-
 .text
 .balign 4
 .global __mantissa_sqrt_asm
@@ -76,6 +75,7 @@ __sqrt_core_asm:
     bx lr
 
 .arm
+.text
 .balign    4
 .global __mantissa_rsqrt_asm
 .type   __mantissa_rsqrt_asm, %function
