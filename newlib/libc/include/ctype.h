@@ -245,6 +245,7 @@ extern const short      _ctype_wide[];
 #define _C __CTYPE_CNTRL
 #define _X __CTYPE_HEX
 #define _B __CTYPE_BLANK
+#define _T __CTYPE_TAB
 #endif
 
 #ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
