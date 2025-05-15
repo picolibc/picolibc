@@ -33,14 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
+#include <fdlibm.h>
 #include <stdint.h>
 #define QUIET_NAN ((255 << 23) | ((1 << 22) | 1))
 #define INF (0xFF << 23)
 #define NEGATIVE_INF (1u<<31)|(0xFF << 23)
-
-# define likely(x) __builtin_expect (!!(x), 1)
-# define unlikely(x) __builtin_expect ((x), 0)
 
 uint32_t __mantissa_sqrt_asm(uint32_t x);
 uint32_t __mantissa_rsqrt_asm(uint32_t x);
@@ -51,9 +48,11 @@ static uint32_t sqrt_core(uint32_t x, uint32_t y)
 {
     x<<=6;
     uint32_t t=x+(x>>1);
-    if (t < (1u<<31)){ //first iteration is special cased
+    if (t < (1u<<31))
+    { //first iteration is special cased
         t+=t>>1;
-        if (t < (1u<<31)) {
+        if (t < (1u<<31)) 
+        {
             x=t;
             y+=y>>1;
         }
@@ -61,10 +60,12 @@ static uint32_t sqrt_core(uint32_t x, uint32_t y)
     #ifndef __OPTIMIZE_SIZE__
     #pragma GCC unroll 12 
     #endif
-    for (uint32_t i =2; i<14; i+=1){
+    for (uint32_t i =2; i<14; i+=1)
+    {
         uint32_t t=x+(x>>i);
         t+=t>>i;
-        if (t < (1u<<31)) {
+        if (t < (1u<<31))
+        {
             x=t;
             y+=y>>i;
         }
