@@ -39,7 +39,11 @@
 	.type	__m6k_read_tp, @function
 __m68k_read_tp:
 	.cfi_startproc
+#if __pic__
+	lea	__tls(%pc),%a0
+#else
 	move.l	__tls,%a0
+#endif
 	rts
 	.cfi_endproc
 	.size	__m68k_read_tp, . - __m68k_read_tp
