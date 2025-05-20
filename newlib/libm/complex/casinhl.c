@@ -48,46 +48,46 @@ casinhl(long double complex z)
 
     if (y == 0.0L) {
         if (isnan(x)) {
-            res = NAN + copysignl(0.0L, cimagl(z)) * I;
+            res = CMPLXL(NAN, copysignl(0.0L, cimagl(z)));
         }
         else if (isinf(x)) {
-            res = x + copysignl(0.0L, cimagl(z)) * I;
+            res = CMPLXL(x, copysignl(0.0L, cimagl(z)));
         }
         else {
-            res = asinhl(x) + copysignl(0.0L, cimagl(z)) * I;
+            res = CMPLXL(asinhl(x), copysignl(0.0L, cimagl(z)));
         }
     }
     /* Handle large values */
     else if (x >= 1.0L/eps || y >= 1.0L/eps) {
-        res = clogl(x + y * I);
-        res = creall(res) + _M_LN2_LD + cimagl(res) * I;
+        res = clogl(CMPLXL(x, y));
+        res = CMPLXL(creall(res) + _M_LN2_LD, cimagl(res));
 
     }
 
     /* Case where real part >= 0.5 and imag part very samll */
     else if (x >= 0.5L && y < eps/8.0L) {
         long double s = hypotl(1.0L, x);
-        res = logl(x + s) + atan2l(y, s) * I;
+        res = CMPLXL(logl(x + s), atan2l(y, s));
     }
 
     /* Case Where real part very small and imag part >= 1.5 */
     else if (x < eps/8.0L && y >= 1.5L) {
         long double s = sqrtl((y + 1.0L) * (y - 1.0L));
-        res = logl(y + s) + atan2l(s, x) * I;
+        res = CMPLXL(logl(y + s), atan2l(s, x));
     }
 
     else {
         /* General case */
-        w = (x - y) * (x + y) + 1.0L + (2.0L * x * y) * I;
+        w = CMPLXL((x - y) * (x + y) + 1.0L, (2.0L * x * y));
         w = csqrtl(w);
 
-        w = (x + creall(w)) + (y + cimagl(w)) * I;
+        w = CMPLXL(x + creall(w), y + cimagl(w));
         res = clogl(w);
     }
 
     /* Apply correct signs */
-    res = copysignl(creall(res), creall(z)) +
-          copysignl(cimagl(res), cimagl(z)) * I;
+    res = CMPLXL(copysignl(creall(res), creall(z)),
+                 copysignl(cimagl(res), cimagl(z)));
 
     return res;
 }

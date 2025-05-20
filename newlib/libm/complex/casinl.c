@@ -43,22 +43,19 @@ casinl(long double complex z)
 {
 	long double x = creall(z);
 	long double y = cimagl(z);
-	long double complex res;
 
 	if (x == 0.0L && y == 0.0L) return z;
 
         if (isnanl(x) || isnanl(y)) {
                 if (isinfl(x) || isinfl(y)) {
-                        return NAN + copysignl(INFINITY, y) * I;
+                        return CMPLXL(NAN, copysignl((long double) INFINITY, y));
                 }
-                return NAN + NAN * I;
+                return CMPLXL(NAN, NAN);
         }
 
 	long double complex iz = CMPLXL(-y,x);
 	long double complex w = casinhl(iz);
-	res = cimagl(w) - creall(w) * I;
-
-	return res;
+        return CMPLXL(cimagl(w), -creall(w));
 }
 
 #endif

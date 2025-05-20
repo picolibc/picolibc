@@ -102,46 +102,46 @@ casinh(double complex z)
 
     if (y == 0.0) {
         if (isnan(x)) {
-            res = (double complex) NAN + copysign(0.0, cimag(z)) * (double complex) I;
+            res = CMPLX((double) NAN, copysign(0.0, cimag(z)));
         }
         else if (isinf(x)) {
-            res = x + copysign(0.0, cimag(z)) * (double complex) I;
+            res = CMPLX(x, copysign(0.0, cimag(z)));
         }
         else {
-            res = asinh(x) + copysign(0.0, cimag(z)) * (double complex) I;
+            res = CMPLX(asinh(x), copysign(0.0, cimag(z)));
         }
     }
     /* Handle large values */
     else if (x >= 1.0/eps || y >= 1.0/eps) {
-        res = clog(x + y * (double complex) I);
-        res = creal(res) + (double) _M_LN2 + cimag(res) * (double complex) I;
+        res = clog(CMPLX(x, y));
+        res = CMPLX(creal(res) + (double) _M_LN2, cimag(res));
 
     }
 
     /* Case where real part >= 0.5 and imag part very samll */
     else if (x >= 0.5 && y < eps/8.0) {
         double s = hypot(1.0, x);
-        res = log(x + s) + atan2(y, s) * (double complex) I;
+        res = CMPLX(log(x + s), atan2(y, s));
     }
 
     /* Case Where real part very small and imag part >= 1.5 */
     else if (x < eps/8.0 && y >= 1.5) {
         double s = sqrt((y + 1.0) * (y - 1.0));
-        res = log(y + s) + atan2(s, x) * (double complex) I;
+        res = CMPLX(log(y + s), atan2(s, x));
     }
 
     else {
         /* General case */
-        w = (x - y) * (x + y) + 1.0 + (2.0 * x * y) * (double complex) I;
+        w = CMPLX((x - y) * (x + y) + 1.0, 2.0 * x * y);
         w = csqrt(w);
 
-        w = (x + creal(w)) + (y + cimag(w)) * (double complex) I;
+        w = CMPLX(x + creal(w), y + cimag(w));
         res = clog(w);
     }
 
     /* Apply correct signs */
-    res = copysign(creal(res), creal(z)) +
-          copysign(cimag(res), cimag(z)) * (double complex) I;
+    res = CMPLX(copysign(creal(res), creal(z)),
+                copysign(cimag(res), cimag(z)));
 
     return res;
 }

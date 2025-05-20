@@ -50,14 +50,14 @@ casinf(float complex z)
 
         if (isnanf(x) || isnanf(y)) {
                 if (isinff(x) || isinff(y)) {
-                        return NAN + copysignf(INFINITY, y) * I;
+                        return CMPLXF(NAN, copysignf(INFINITY, y));
                 }
-                return NAN + NAN * I;
+                return CMPLXF(NAN, NAN);
         }
 
 	float complex iz = CMPLXF(-y,x);
 	float complex w = casinhf(iz);
-	res = cimagf(w) - crealf(w) * I;
+	res = CMPLXF(cimagf(w), - crealf(w));
 
 	return res;
 }
