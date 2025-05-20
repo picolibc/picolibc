@@ -35,6 +35,7 @@
 
 #include "fdlibm.h"
 #include <math.h>
+#include <float.h>
 
 #if defined(__HAVE_LONG_DOUBLE_MATH) && defined(_NEED_FLOAT_HUGE)
 #define __HAVE_LD_SUPPORT

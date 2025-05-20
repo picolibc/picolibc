@@ -213,8 +213,8 @@ __declare_fenv_inline(int) feraiseexcept(int excepts)
 {
   const float fp_zero = 0.0f;
   const float fp_one = 1.0f;
-  const float fp_max = FLT_MAX;
-  const float fp_min = FLT_MIN;
+  const float fp_max = __FLT_MAX__;
+  const float fp_min = __FLT_MIN__;
   const float fp_1e32 = 1.0e32f;
   const float fp_two = 2.0f;
   const float fp_three = 3.0f;

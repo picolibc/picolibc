@@ -33,6 +33,7 @@
 #include <stdint.h>
 #include <errno.h>
 #include <fenv.h>
+#include <float.h>
 
 #ifndef WANT_ROUNDING
 /* Correct special case results in non-nearest rounding modes.  */
