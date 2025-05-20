@@ -162,6 +162,7 @@ else
 endif
 
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
+enable_malloc = get_option('enable-malloc')
 newlib_nano_malloc = get_option('newlib-nano-malloc')
 nano_malloc_clear_freed = get_option('nano-malloc-clear-freed')
 

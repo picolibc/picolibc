@@ -232,6 +232,8 @@ option('newlib-register-fini', type: 'boolean', value: false,
 # Malloc options
 #
 
+option('enable-malloc', type: 'boolean', value: true,
+       description: 'provide malloc family of functions based on sbrk')
 option('newlib-nano-malloc', type: 'boolean', value: true,
        description: 'use small-footprint nano-malloc implementation')
 option('nano-malloc-clear-freed', type: 'boolean', value: false,

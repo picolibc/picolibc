@@ -190,23 +190,6 @@ if not tinystdio
   srcs_stdlib += srcs_stdlib_stdio
 endif
 
-# Work around compiler optimizing calls involving malloc/free
-
-c_args_malloc = []
-if cc.has_argument('-fno-builtin-malloc')
-  c_args_malloc += ['-fno-builtin-malloc']
-endif
-
-if cc.has_argument('-fno-builtin-free')
-  c_args_malloc += ['-fno-builtin-free']
-endif
-
-if newlib_nano_malloc
-  srcs_stdlib_malloc = nano_malloc_srcs_stdlib
-else
-  srcs_stdlib_malloc = std_malloc_srcs_stdlib
-endif
-
 if picoexit
   srcs_stdlib += pico_exit_srcs_stdlib
 else
@@ -238,32 +221,51 @@ foreach file : srcs_stdlib
   endif
 endforeach
 
-srcs_stdlib_malloc_use = []
-foreach file : srcs_stdlib_malloc
-  s_file = fs.replace_suffix(file, '.S')
-  if file in srcs_machine
-    message('libc/stdlib/' + file + ': machine overrides generic')
-  elif s_file in srcs_machine
-    message('libc/stdlib/' + s_file + ': machine overrides generic')
-  else
-    srcs_stdlib_malloc_use += file
-  endif
-endforeach
-
 src_stdlib = files(srcs_stdlib_use)
 
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
+if enable_malloc
+  # Work around compiler optimizing calls involving malloc/free
 
-  # Have to build a sub-library to get custom c_args for malloc
-  set_variable('lib_stdlib' + target,
-	       static_library('stdlib_malloc' + target,
-			      srcs_stdlib_malloc_use,
-			      pic: false,
-			      include_directories: inc,
-			      c_args: target_c_args + c_args + c_args_malloc))
+  c_args_malloc = []
+  if cc.has_argument('-fno-builtin-malloc')
+    c_args_malloc += ['-fno-builtin-malloc']
+  endif
 
-endforeach
+  if cc.has_argument('-fno-builtin-free')
+    c_args_malloc += ['-fno-builtin-free']
+  endif
+
+  if newlib_nano_malloc
+    srcs_stdlib_malloc = nano_malloc_srcs_stdlib
+  else
+    srcs_stdlib_malloc = std_malloc_srcs_stdlib
+  endif
+
+  srcs_stdlib_malloc_use = []
+  foreach file : srcs_stdlib_malloc
+    s_file = fs.replace_suffix(file, '.S')
+    if file in srcs_machine
+      message('libc/stdlib/' + file + ': machine overrides generic')
+    elif s_file in srcs_machine
+      message('libc/stdlib/' + s_file + ': machine overrides generic')
+    else
+      srcs_stdlib_malloc_use += file
+    endif
+  endforeach
+
+  foreach params : targets
+    target = params['name']
+    target_dir = params['dir']
+    target_c_args = params['c_args']
+    target_lib_prefix = params['lib_prefix']
+
+    # Have to build a sub-library to get custom c_args for malloc
+    set_variable('lib_stdlib' + target,
+	         static_library('stdlib_malloc' + target,
+			        srcs_stdlib_malloc_use,
+			        pic: false,
+			        include_directories: inc,
+			        c_args: target_c_args + c_args + c_args_malloc))
+
+  endforeach
+endif
