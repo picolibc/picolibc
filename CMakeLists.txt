@@ -101,6 +101,11 @@ if(NOT DEFINED __THREAD_LOCAL_STORAGE_STACK_GUARD)
   option(__THREAD_LOCAL_STORAGE_STACK_GUARD "use thread local storage for stack protection canary" OFF)
 endif()
 
+# enable malloc code
+if(NOT DEFINED ENABLE_MALLOC)
+  option(ENABLE_MALLOC "provide malloc family of functions based on sbrk" ON)
+endif()
+
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed

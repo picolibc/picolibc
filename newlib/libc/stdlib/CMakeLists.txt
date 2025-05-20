@@ -112,18 +112,20 @@ picolibc_sources(
   ignore_handler_s.c
   )
 
-picolibc_sources_flags("-fno-builtin-malloc;-fno-builtin-free"
-  nano-calloc.c
-  nano-free.c
-  nano-getpagesize.c
-  nano-mallinfo.c
-  nano-malloc.c
-  nano-malloc-stats.c
-  nano-malloc-usable-size.c
-  nano-mallopt.c
-  nano-memalign.c
-  nano-posix-memalign.c
-  nano-pvalloc.c
-  nano-realloc.c
-  nano-valloc.c
-  )
+if(ENABLE_MALLOC)
+  picolibc_sources_flags("-fno-builtin-malloc;-fno-builtin-free"
+    nano-calloc.c
+    nano-free.c
+    nano-getpagesize.c
+    nano-mallinfo.c
+    nano-malloc.c
+    nano-malloc-stats.c
+    nano-malloc-usable-size.c
+    nano-mallopt.c
+    nano-memalign.c
+    nano-posix-memalign.c
+    nano-pvalloc.c
+    nano-realloc.c
+    nano-valloc.c
+    )
+endif()
