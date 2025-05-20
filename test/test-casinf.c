@@ -40,6 +40,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <float.h>
 
 #define ALLOWED_ULP 4
 

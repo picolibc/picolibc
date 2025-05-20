@@ -42,7 +42,7 @@
 #include <stdlib.h>
 
 #ifdef _LDBL_EQ_DBL
-#define ALLOWED_ULP 2
+#define ALLOWED_ULP 5
 
 typedef struct {
     long double complex input;

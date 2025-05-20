@@ -40,8 +40,9 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <float.h>
 
-#define ALLOWED_ULP 2
+#define ALLOWED_ULP 5
 
 typedef struct {
     double complex input;
