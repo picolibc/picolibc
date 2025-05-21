@@ -37,8 +37,10 @@ inc_arpa_headers = [
   'inet.h'
 ]
 
-install_headers(inc_arpa_headers,
-		install_dir: include_dir / 'arpa')
+if really_install
+  install_headers(inc_arpa_headers,
+                  install_dir: include_dir / 'arpa')
+endif
 
 if enable_cdefs_tests
   ignore_headers = []
