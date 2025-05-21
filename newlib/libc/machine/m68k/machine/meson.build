@@ -37,5 +37,7 @@ inc_sys_headers_machine = [
   'fenv-fp.h'
 ]
 
-install_headers(inc_sys_headers_machine,
-		install_dir: include_dir / 'machine')
+if really_install
+  install_headers(inc_sys_headers_machine,
+                  install_dir: include_dir / 'machine')
+endif

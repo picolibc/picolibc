@@ -85,8 +85,10 @@ foreach file : inc_sys_headers_all
   endif
 endforeach
 
-install_headers(inc_sys_headers,
-		install_dir: include_dir / 'sys')
+if really_install
+  install_headers(inc_sys_headers,
+                  install_dir: include_dir / 'sys')
+endif
 
 if enable_cdefs_tests
   ignore_headers = ['config.h', 'features.h', 'string.h', 'custom_file.h', 'dirent.h']

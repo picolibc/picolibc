@@ -53,7 +53,7 @@ foreach params : targets
 
   local_lib_semihost_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
 				       lib_semihost_srcs,
-				       install : true,
+				       install : really_install,
 				       install_dir : instdir,
 				       include_directories : inc,
 				       c_args : target_c_args + c_args,

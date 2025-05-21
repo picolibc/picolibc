@@ -34,8 +34,10 @@
 #
 subdir('sys')
 inc_headers = ['stdio.h']
-install_headers(inc_headers,
-		install_dir: include_dir)
+if really_install
+  install_headers(inc_headers,
+                  install_dir: include_dir)
+endif
 
 general_srcs_stdio = [
   'clearerr.c',

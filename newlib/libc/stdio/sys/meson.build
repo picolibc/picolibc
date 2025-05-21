@@ -46,8 +46,10 @@ foreach file : inc_stdio_sys_headers_all
   endif
 endforeach
 
-install_headers(inc_stdio_sys_headers,
-		install_dir: include_dir / 'sys')
+if really_install
+  install_headers(inc_stdio_sys_headers,
+                  install_dir: include_dir / 'sys')
+endif
 
 if enable_cdefs_tests
   foreach header : inc_stdio_sys_headers
