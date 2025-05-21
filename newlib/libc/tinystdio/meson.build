@@ -242,9 +242,10 @@ if posix_console
 endif
 
 inc_headers = ['stdio.h', 'stdio-bufio.h']
-install_headers(inc_headers,
-		install_dir: include_dir
-	       )
+if really_install
+  install_headers(inc_headers,
+                  install_dir: include_dir)
+endif
 
 srcs_tinystdio_use = []
 foreach file : srcs_tinystdio

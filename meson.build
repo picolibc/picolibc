@@ -45,6 +45,12 @@ project('picolibc', 'c',
 	version: '1.8.10'
        )
 
+# When picolibc is embedded as a subproject you probably don't expect
+# installing of the outter project cause picolibc to get installed.
+# However, the user can force install even if picolibc is a subproject
+# via the force-install option.
+really_install = get_option('force-install') or not meson.is_subproject()
+
 fs = import('fs')
 
 cc = meson.get_compiler('c')
@@ -771,7 +777,7 @@ picolibc_specs = configure_file(input: 'picolibc.specs.in',
 				output: 'picolibc.specs',
 				configuration: specs_c_data,
 				install_dir: specs_dir,
-				install: specs_install)
+				install: specs_install and really_install)
 
 picolibc_specs_name = 'picolibc.specs'
 
@@ -779,7 +785,7 @@ picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
 				  output: 'picolibcpp.specs',
 				  configuration: specs_cpp_data,
 				  install_dir: specs_dir,
-				  install: specs_install)
+				  install: specs_install and really_install)
 
 # Not all compilers necessarily support all warnings; only use these which are:
 common_warnings = [
@@ -1213,7 +1219,7 @@ foreach params : [default_target] + targets
                    configure_file(input: 'picolibc.ld.in',
                                   output: picolibc_ld_file,
                                   configuration: picolibc_ld_data,
-                                  install: picolibc_ld_install,
+                                  install: picolibc_ld_install and really_install,
                                   install_dir: lib_dir))
     endif
 
@@ -1232,7 +1238,7 @@ foreach params : [default_target] + targets
                  configure_file(input: 'picolibc.ld.in',
                                 output: picolibcpp_ld_file,
                                 configuration: picolibcpp_ld_data,
-                                install: picolibc_ld_install,
+                                install: picolibc_ld_install and really_install,
                                 install_dir: lib_dir))
     endif
                    
@@ -1642,7 +1648,8 @@ conf_data.set('__IEEEFP_FUNCS', ieeefp_funcs, description: 'IEEE fp funcs availa
 
 configure_file(output : 'picolibc.h',
 	       configuration: conf_data,
-	       install_dir: include_dir)
+	       install_dir: include_dir,
+	       install: really_install)
 
 # Usage as an embedded subproject:
 # If picolibc is embedded into the source as a subproject,

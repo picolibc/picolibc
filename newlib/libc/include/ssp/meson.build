@@ -43,5 +43,7 @@ inc_ssp_headers = [
     'wchar.h',
 ]
 
-install_headers(inc_ssp_headers,
-		install_dir: include_dir / 'ssp')
+if really_install
+  install_headers(inc_ssp_headers,
+                  install_dir: include_dir / 'ssp')
+endif

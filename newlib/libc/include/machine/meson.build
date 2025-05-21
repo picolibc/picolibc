@@ -63,7 +63,9 @@ foreach file : inc_machine_headers_all
   endif
 endforeach
 
-install_headers(
-  inc_machine_headers,
-  install_dir: include_dir / 'machine'
-)
+if really_install
+  install_headers(
+    inc_machine_headers,
+    install_dir: include_dir / 'machine'
+  )
+endif

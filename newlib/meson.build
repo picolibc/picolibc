@@ -68,7 +68,7 @@ foreach params : targets
 
   local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
 				      libsrcs_target,
-				      install : true,
+				      install : really_install,
 				      install_dir : instdir,
 				      pic: false,
 				      objects : libobjs,
@@ -77,21 +77,21 @@ foreach params : targets
 
   static_library(join_paths(target_dir, target_lib_prefix + libm_name),
 		 ['empty.c'],
-		 install : true,
+		 install : really_install,
 		 install_dir : instdir,
 		 pic: false,
                  c_args: target_c_args + c_args,
 		 objects : [])
   static_library(join_paths(target_dir, target_lib_prefix + libg_name),
 		 ['empty.c'],
-		 install : true,
+		 install : really_install,
 		 install_dir : instdir,
 		 pic: false,
                  c_args: target_c_args + c_args,
 		 objects : [])
   static_library(join_paths(target_dir, target_lib_prefix + libnosys_name),
 		 ['empty.c'],
-		 install : true,
+		 install : really_install,
 		 install_dir : instdir,
 		 pic: false,
                  c_args: target_c_args + c_args,

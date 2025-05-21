@@ -96,9 +96,10 @@ if src_semihost != []
   endif
 
   inc_headers = ['semihost.h']
-  install_headers(inc_headers,
-		  install_dir: include_dir
-		 )
+  if really_install
+    install_headers(inc_headers,
+                    install_dir: include_dir)
+  endif
 
   inc = [inc, include_directories('.')]
   inc_args += '-I' + meson.current_source_dir()
@@ -122,7 +123,7 @@ if src_semihost != []
     set_variable('lib_semihost' + target,
 		 static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
 				src_semihost,
-				install : true,
+				install : really_install,
 				install_dir : instdir,
 				include_directories : inc,
 				c_args : target_c_args + c_args))
