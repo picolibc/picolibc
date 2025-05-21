@@ -40,6 +40,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdlib.h>
+#include <float.h>
 
 #ifdef _LDBL_EQ_DBL
 #define ALLOWED_ULP 2
