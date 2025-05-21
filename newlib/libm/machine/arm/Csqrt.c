@@ -223,10 +223,6 @@ float sqrtf(float x)
 //hard float rsqrtf
 float rsqrtf(float x)
 {
-    #ifdef __MATH_ERRNO
-    if (isless(x, 0.0f))
-        errno = EDOM;
-    #endif
     return (1.0/(double)x)*sqrt((double)x);
 }
 
