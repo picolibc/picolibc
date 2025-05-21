@@ -42,7 +42,11 @@
 #include <stdlib.h>
 #include <float.h>
 
+#if __STDC_IEC_559__
 #define ALLOWED_ULP 2
+#else
+#define ALLOWED_ULP 4
+#endif
 
 typedef struct {
     double complex input;
