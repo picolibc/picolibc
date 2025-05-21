@@ -35,6 +35,14 @@
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+/* GCC analyzer gets confused about the use of 'res' here */
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#endif
+
 long double complex
 casinhl(long double complex z)
 {
