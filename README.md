@@ -124,6 +124,64 @@ The bulk of newlib changes over the last several years have been in
 areas unrelated to the code used by picolibc, so keeping things in
 sync has not been difficult so far.
 
+Here's a list of some differences between picolibc and newlib:
+
+ 1. Designed for and tested on 32- and 64- bit embedded
+    systems. Newlib (and newlib-nano) are used on both embedded
+    systems and Cygwin, with the bulk of the development focused on
+    improving the Cygwin support. Because the Cygwin version needs to
+    be very careful about ABI stability, many parts of the newlib code
+    base are very difficult to change. Picolibc has no such
+    constraints, so much work has been done to improve the ABI and API
+    for use in embedded systems.
+
+ 2. Tinystdio. This new stdio implementation borrows some code from
+    AVR-Libc along with substantial new code. The goal of tinystdio is
+    to remain compatible with relevant C and POSIX standards while
+    using a very narrow API to the underlying system (it only requires
+    getc and putc) along with doing no internal allocation and using a
+    minimal amount of RAM (16 bytes on a 32 bit system for
+    stdin/stdout/stderr).
+
+ 3. Thread-local-storage support. Instead of creating a large data
+    structure containing all possible thread-specific data, Picolibc
+    uses the underlying TLS support from the compiler which only
+    allocates the amount of per-thread storage needed to support the
+    API called by the application. Typically, this means you use only
+    4 bytes for errno.
+
+ 4. Integrated test suite. The old newlib test code, which hasn't
+    worked for years, has been fixed up and is used to test changes to
+    the library. The test suite was used to correct numerous bugs in
+    the library; many of those changes have been passed on to newlib.
+
+ 5. Bare-metal startup code and linker scripts for many
+    architectures. These may not support precisely what your
+    application requires, but these provide a good basis for writing
+    your own startup code and linker scripts. These are used to create
+    bare-metal versions of the test suite which can then be run using
+    QEMU.
+
+ 6. Meson-based build system. This is largely used to avoid conflicts
+    with the newlib autotools build system files, but a side effect is
+    that the library builds very quickly.
+
+ 7. Narrow and well-defined POSIX OS requirements. Portions of
+    Picolibc which require underlying OS support are documented so
+    that you will know which functions are necessary based on the API
+    in use. In particular, tinystdio requires no POSIX functions to
+    support stdin/stdout/stderr, and instead requires only functions
+    to get and put single characters to the target device.
+
+ 8. Built-in semihosting support for many architectures. This allows
+    you to take advantage of existing gdb, openocd and qemu
+    semihosting support for things like debugging output even before
+    you have a serial port working.
+
+ 9. Clear BSD licensing. All non-BSD compatible library source code
+    has been removed so that the status of the resulting library is
+    not in question.
+
 ## Documentation
 
 Introductory documentation. Read these first:
