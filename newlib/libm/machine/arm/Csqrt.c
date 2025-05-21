@@ -33,17 +33,23 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <fdlibm.h>
+#include <stdio.h>
+#include "fdlibm.h"
 #include <stdint.h>
+
 #define QUIET_NAN ((255 << 23) | ((1 << 22) | 1))
 #define INF (0xFF << 23)
 #define NEGATIVE_INF (1u<<31)|(0xFF << 23)
 
+#if !(__ARM_FP & 0x4) 
 uint32_t __mantissa_sqrt_asm(uint32_t x);
+#endif
+#if !(__ARM_FP & 0x8) 
 uint32_t __mantissa_rsqrt_asm(uint32_t x);
+#endif
 
 //#if  !defined(__ARM_ARCH) || defined(__OPTIMIZE_SIZE__)
-#if 1
+#if !(__ARM_FP & 0x4) || !(__ARM_FP & 0x8) 
 static uint32_t sqrt_core(uint32_t x, uint32_t y)
 {
     x<<=6;
@@ -74,7 +80,9 @@ static uint32_t sqrt_core(uint32_t x, uint32_t y)
     y+=y>>1; //this can overflow
     return ((y)-(hi) ); //but then this underflows so they cancel
 }
+#endif
 
+#if !(__ARM_FP & 0x4)
 static uint32_t mantissa_sqrt(uint32_t x)
 {
     uint32_t new_mantissa=sqrt_core(x,x<<7 )>>8;
@@ -89,7 +97,9 @@ static uint32_t mantissa_sqrt(uint32_t x)
     }  
     return new_mantissa; 
 }
+#endif
 
+#if !(__ARM_FP & 0x8) 
 static uint32_t mantissa_rsqrt(uint32_t x)
 {
     uint32_t Y=x;
@@ -113,7 +123,10 @@ static uint32_t mantissa_rsqrt(uint32_t x)
        return (U+1)>>1;
     }
 }
-#else
+#endif
+
+
+#if 0
 static inline uint32_t mantissa_sqrt(uint32_t x)
 {
     return __mantissa_sqrt_asm(x);
@@ -125,6 +138,7 @@ static inline uint32_t mantissa_rsqrt(uint32_t x)
 }
 #endif
 
+#if !(__ARM_FP & 0x4)
 float sqrtf(float x)
 {
     union
@@ -141,7 +155,15 @@ float sqrtf(float x)
         {
             // Expected behavior:
             // sqrt(-f)=+qNaN, sqrt(-NaN)=+qNaN,sqrt(-Inf)=+qNaN
-            xu.i = (xu.i == INF) ? INF : QUIET_NAN;
+            if (xu.i == INF)
+            {
+                xu.i=INF;
+            }
+            else 
+            {
+                __math_set_invalid();
+                xu.i=QUIET_NAN;
+            }
             return xu.f;
         } else 
         {
@@ -185,13 +207,32 @@ float sqrtf(float x)
             xu.i= (1u<<31); //sqrt(-0)=-0
             return xu.f;             
         } else {
+            __math_set_invalid();
+            #ifdef __MATH_ERRNO
+            errno = EDOM;
+            #endif
             xu.i=QUIET_NAN;  //sqrt(negative)=qNaN
             return xu.f;        
         }
 
     }
 }
+#endif
 
+#if (__ARM_FP & 0x4) && (__ARM_FP & 0x8) 
+//hard float rsqrtf
+float rsqrtf(float x)
+{
+    #ifdef __MATH_ERRNO
+    if (isless(x, 0.0f))
+        errno = EDOM;
+    #endif
+    return (1.0/(double)x)*sqrt((double)x);
+}
+
+#endif
+#if !(__ARM_FP & 0x8)
+//soft float rsqrtf. May still be faster than hard float if double support is slow. Requires testing.
 float rsqrtf(float x)
 {
     union
@@ -208,7 +249,15 @@ float rsqrtf(float x)
         {
             // 1 / sqrt(+Inf) = +0
             // 1 / sqrt(NaN) = qNaN
-            xu.i = (xu.i == INF) ? 0 : QUIET_NAN;
+            if ((xu.i == INF))
+            {
+                xu.i=0;
+            } 
+            else
+            {
+                __math_set_invalid();
+                xu.i=QUIET_NAN;
+            }
             return xu.f;
         } else //normal case 
         {
@@ -235,18 +284,27 @@ float rsqrtf(float x)
                 uint32_t new_mantissa=mantissa_rsqrt(mantissa); 
                 xu.i = new_mantissa + ((uint32_t)newExp << 23);
                 return xu.f;
-            } else //rsqrt(+0)=+INF
+            } 
+            else //rsqrt(+0)=+INF
             {
                 xu.i = INF; 
                 return xu.f;
             }
-        } else if (xu.i == (1u<<31))
+        } 
+        else if (xu.i == (1u<<31))
         {
             xu.i= NEGATIVE_INF; //rsqrt(-0)=-INF
             return xu.f;             
-        } else {
+        } 
+        else 
+        {
+            __math_set_invalid();
+            #ifdef __MATH_ERRNO
+            errno = EDOM;
+            #endif
             xu.i=QUIET_NAN;  //rsqrt(negative)=qNaN
             return xu.f;        
         }
     }
 }
+#endif 

@@ -44,12 +44,6 @@ sqrtf(float x)
 #endif
 	return result;
 }
-
-float rsqrtf(float x)
-{
-    return (1.0/(double)x)*sqrt((double)x);
-}
-
-#else
-#include "Csqrt.c"
 #endif
+
+#include "Csqrt.c"
