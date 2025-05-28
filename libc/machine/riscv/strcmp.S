@@ -18,15 +18,15 @@
 .type  strcmp, @function
 strcmp:
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-1:
+.Lcompare:
   lbu   a2, 0(a0)
   lbu   a3, 0(a1)
   addi   a0, a0, 1
   addi   a1, a1, 1
-  bne   a2, a3, 2f
-  bnez  a2, 1b
+  bne   a2, a3, .Lreturn_diff
+  bnez  a2, .Lcompare
 
-2:
+.Lreturn_diff:
   sub   a0, a2, a3
   ret
 
@@ -120,7 +120,7 @@ strcmp:
   srl   a5, a3, 8*SZREG-16
   sub   a0, a4, a5
   and   a1, a0, 0xff
-  bnez  a1, 1f
+  bnez  a1, .Lfinal_upper_diff
   ret
 
 .Lmismatch_upper:
@@ -128,10 +128,11 @@ strcmp:
   srl   a5, a5, 8*SZREG-16
   sub   a0, a4, a5
   and   a1, a0, 0xff
-  bnez  a1, 1f
+  bnez  a1, .Lfinal_upper_diff
   ret
 
-1:and   a4, a4, 0xff
+.Lfinal_upper_diff:
+  and   a4, a4, 0xff
   and   a5, a5, 0xff
   sub   a0, a4, a5
   ret
@@ -152,19 +153,23 @@ strcmp:
 
   srl	a4, a2, 8
   srl   a5, a3, 8
-  bne   a4, a5, 1f
+  bne   a4, a5, .Lbyte_diff
   and   a4, a2, 0xff
   and   a5, a3, 0xff
-1:sub	a0, a4, a5
+
+.Lbyte_diff:
+  sub	a0, a4, a5
   ret
 
 .Lmismatch_lower:
   srl	a2, a4, 8
   srl   a3, a5, 8
-  bne   a2, a3, 1f
+  bne   a2, a3, .Lfinal_lower_diff
   and   a2, a4, 0xff
   and   a3, a5, 0xff
-1:sub	a0, a2, a3
+
+.Lfinal_lower_diff:
+  sub	a0, a2, a3
   ret
 
 #endif
@@ -175,10 +180,10 @@ strcmp:
   lbu   a3, 0(a1)
   add   a0, a0, 1
   add   a1, a1, 1
-  bne   a2, a3, 1f
+  bne   a2, a3, .Lmisaligned_diff
   bnez  a2, .Lmisaligned
 
-1:
+.Lmisaligned_diff:
   sub   a0, a2, a3
   ret
 
