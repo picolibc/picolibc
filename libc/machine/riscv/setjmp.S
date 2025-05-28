@@ -19,21 +19,33 @@
   .type   setjmp, @function
 setjmp:
 	REG_S ra,  0*SZREG(a0)
-	REG_S s0,  1*SZREG(a0)
-	REG_S s1,  2*SZREG(a0)
+  #if __riscv_xlen == 32 && (__riscv_zilsd) && (__riscv_misaligned_fast)
+	  sd    s0,  1*SZREG(a0)
+  #else
+	  REG_S s0,  1*SZREG(a0)
+	  REG_S s1,  2*SZREG(a0)
+  #endif
 
 #ifndef __riscv_abi_rve
-	REG_S s2,  3*SZREG(a0)
-	REG_S s3,  4*SZREG(a0)
-	REG_S s4,  5*SZREG(a0)
-	REG_S s5,  6*SZREG(a0)
-	REG_S s6,  7*SZREG(a0)
-	REG_S s7,  8*SZREG(a0)
-	REG_S s8,  9*SZREG(a0)
-	REG_S s9, 10*SZREG(a0)
-	REG_S s10,11*SZREG(a0)
-	REG_S s11,12*SZREG(a0)
-	REG_S sp, 13*SZREG(a0)
+  #if __riscv_xlen == 32 && (__riscv_zilsd) && (__riscv_misaligned_fast)
+	  sd    s2,  3*SZREG(a0)
+	  sd    s4,  5*SZREG(a0)
+	  sd    s6,  7*SZREG(a0)
+	  sd    s8,  9*SZREG(a0)
+	  sd    s10,11*SZREG(a0)
+  #else
+	  REG_S s2,  3*SZREG(a0)
+	  REG_S s3,  4*SZREG(a0)
+	  REG_S s4,  5*SZREG(a0)
+	  REG_S s5,  6*SZREG(a0)
+	  REG_S s6,  7*SZREG(a0)
+	  REG_S s7,  8*SZREG(a0)
+	  REG_S s8,  9*SZREG(a0)
+	  REG_S s9, 10*SZREG(a0)
+	  REG_S s10,11*SZREG(a0)
+	  REG_S s11,12*SZREG(a0)
+  #endif
+  REG_S sp, 13*SZREG(a0)
 #else
 	REG_S sp, 3*SZREG(a0)
 #endif
@@ -63,19 +75,31 @@ setjmp:
   .type   longjmp, @function
 longjmp:
 	REG_L ra,  0*SZREG(a0)
-	REG_L s0,  1*SZREG(a0)
-	REG_L s1,  2*SZREG(a0)
+  #if __riscv_xlen == 32 && (__riscv_zilsd) && (__riscv_misaligned_fast)
+    ld s0, 1*SZREG(a0)
+  #else
+    REG_L s0,  1*SZREG(a0)
+    REG_L s1,  2*SZREG(a0)
+  #endif
 #ifndef __riscv_abi_rve
-	REG_L s2,  3*SZREG(a0)
-	REG_L s3,  4*SZREG(a0)
-	REG_L s4,  5*SZREG(a0)
-	REG_L s5,  6*SZREG(a0)
-	REG_L s6,  7*SZREG(a0)
-	REG_L s7,  8*SZREG(a0)
-	REG_L s8,  9*SZREG(a0)
-	REG_L s9, 10*SZREG(a0)
-	REG_L s10,11*SZREG(a0)
-	REG_L s11,12*SZREG(a0)
+  #if __riscv_xlen == 32 && (__riscv_zilsd) && (__riscv_misaligned_fast)
+	  ld    s2,  3*SZREG(a0)
+	  ld    s4,  5*SZREG(a0)
+	  ld    s6,  7*SZREG(a0)
+	  ld    s8,  9*SZREG(a0)
+	  ld    s10,11*SZREG(a0)
+  #else
+	  REG_L s2,  3*SZREG(a0)
+	  REG_L s3,  4*SZREG(a0)
+	  REG_L s4,  5*SZREG(a0)
+	  REG_L s5,  6*SZREG(a0)
+	  REG_L s6,  7*SZREG(a0)
+	  REG_L s7,  8*SZREG(a0)
+	  REG_L s8,  9*SZREG(a0)
+	  REG_L s9, 10*SZREG(a0)
+	  REG_L s10,11*SZREG(a0)
+	  REG_L s11,12*SZREG(a0)
+  #endif
 	REG_L sp, 13*SZREG(a0)
 #else
 	REG_L sp, 3*SZREG(a0)
