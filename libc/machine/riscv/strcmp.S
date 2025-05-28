@@ -52,14 +52,14 @@ strcmp:
     REG_L a2, \i*SZREG(a0)
     REG_L a3, \i*SZREG(a1)
 #ifdef __riscv_zbb
-    orc.b t0, a2
+    orc.b a4, a2
 #else
-    and   t0, a2, a5
+    and   a4, a2, a5
     or    t1, a2, a5
-    add   t0, t0, a5
-    or    t0, t0, t1
+    add   a4, a4, a5
+    or    a4, a4, t1
 #endif
-    bne   t0, t2, .Lnull\i
+    bne   a4, t2, .Lnull\i
     .if \i+1-\n
       bne   a2, a3, .Lmismatch
     .else
