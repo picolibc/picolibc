@@ -717,13 +717,13 @@ static FLOAT_T makemathname(test_sqrt_2)(void) { return makemathname(sqrt)(makem
 #endif
 
 #if 0
-static FLOAT_T makemathname(test_rsqrtf_qnan)(void) { return makemathname(rsqrtf)(makemathname(qnanval)); }
-static FLOAT_T makemathname(test_rsqrtf_snan)(void) { return makemathname(rsqrtf)(makemathname(snanval)); }
-static FLOAT_T makemathname(test_rsqrtf_0)(void) { return makemathname(rsqrtf)(makemathname(zero)); }
-static FLOAT_T makemathname(test_rsqrtf_neg0)(void) { return makemathname(rsqrtf)(-makemathname(zero)); }
-static FLOAT_T makemathname(test_rsqrtf_inf)(void) { return makemathname(rsqrtf)(makemathname(infval)); }
-static FLOAT_T makemathname(test_rsqrtf_neginf)(void) { return makemathname(rsqrtf)(-makemathname(infval)); }
-static FLOAT_T makemathname(test_rsqrtf_neg)(void) { return makemathname(rsqrtf)(-makemathname(two)); }
+static FLOAT_T makemathname(test_rsqrt_qnan)(void) { return makemathname(rsqrt)(makemathname(qnanval)); }
+static FLOAT_T makemathname(test_rsqrt_snan)(void) { return makemathname(rsqrt)(makemathname(snanval)); }
+static FLOAT_T makemathname(test_rsqrt_0)(void) { return makemathname(rsqrt)(makemathname(zero)); }
+static FLOAT_T makemathname(test_rsqrt_neg0)(void) { return makemathname(rsqrt)(-makemathname(zero)); }
+static FLOAT_T makemathname(test_rsqrt_inf)(void) { return makemathname(rsqrt)(makemathname(infval)); }
+static FLOAT_T makemathname(test_rsqrt_neginf)(void) { return makemathname(rsqrt)(-makemathname(infval)); }
+static FLOAT_T makemathname(test_rsqrt_neg)(void) { return makemathname(rsqrt)(-makemathname(two)); }
 #endif
 #ifndef SIMPLE_MATH_ONLY
 
@@ -1347,13 +1347,13 @@ const struct {
 #endif
 
 #if 0
-	TEST(rsqrtf_qnan, (FLOAT_T)NAN, 0, 0),
-	TEST(rsqrtf_snan, (FLOAT_T)NAN, FE_INVALID, 0),
-    TEST(rsqrtf_0, (FLOAT_T)INFINITY, 0, 0),
-    TEST(rsqrtf_neg0, (FLOAT_T)-INFINITY, 0, 0),
-    TEST(rsqrtf_inf, (FLOAT_T)0.0, 0, 0),
-    TEST(rsqrtf_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
-	TEST(rsqrtf_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
+    TEST(rsqrt_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(rsqrt_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(rsqrt_0, (FLOAT_T)INFINITY, 0, ERANGE),
+    TEST(rsqrt_neg0, (FLOAT_T)-INFINITY, 0, ERANGE),
+    TEST(rsqrt_inf, (FLOAT_T)0.0, 0, 0),
+    TEST(rsqrt_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
+    TEST(rsqrt_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
 #endif
 #ifndef SIMPLE_MATH_ONLY
 
