@@ -283,12 +283,18 @@ float rsqrtf(float x)
             } 
             else //rsqrt(+0)=+INF
             {
+                #ifdef __MATH_ERRNO
+                errno = ERANGE;
+                #endif
                 xu.i = INF; 
                 return xu.f;
             }
         } 
         else if (xu.i == (1u<<31))
         {
+            #ifdef __MATH_ERRNO
+            errno = ERANGE;
+            #endif
             xu.i= NEGATIVE_INF; //rsqrt(-0)=-INF
             return xu.f;             
         } 
