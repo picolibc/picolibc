@@ -104,12 +104,16 @@ endif
 
 inc_headers += ['picotls.h']
 
-install_headers(inc_headers,
-		install_dir: include_dir)
-
+if really_install
+  install_headers(inc_headers,
+                  install_dir: include_dir)
+endif
 # For compatibility with libc++'s __mbstate_t.h:
-install_headers(['bits/types/mbstate_t.h'],
-		install_dir: include_dir / 'bits/types')
+
+if really_install
+  install_headers(['bits/types/mbstate_t.h'],
+                  install_dir: include_dir / 'bits/types')
+endif
 
 if enable_cdefs_tests
 

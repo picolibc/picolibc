@@ -132,7 +132,7 @@ foreach params : targets
       _crt = executable(join_paths(target_dir, crt_name),
                         _src,
                         include_directories : inc,
-                        install : true,
+                        install : really_install,
                         install_dir : instdir,
                         c_args : _c_args,
                         link_args : _link_args)
@@ -147,7 +147,7 @@ foreach params : targets
         static_library(join_paths(target_dir, target_lib_prefix + libcrt_name),
                        [],
                        include_directories : inc,
-                       install : true,
+                       install : really_install,
                        install_dir : instdir,
                        c_args : _c_args,
                        objects: _crt.extract_objects(_src),

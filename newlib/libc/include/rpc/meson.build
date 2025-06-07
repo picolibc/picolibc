@@ -38,8 +38,10 @@ inc_rpc_headers = [
   'xdr.h',
 ]
 
-install_headers(inc_rpc_headers,
-		install_dir: include_dir / 'rpc')
+if really_install
+  install_headers(inc_rpc_headers,
+                  install_dir: include_dir / 'rpc')
+endif
 
 if enable_cdefs_tests
   ignore_headers = []
