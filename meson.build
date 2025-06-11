@@ -615,13 +615,16 @@ if tinystdio and printf_aliases
 		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__m_vfscanf}').format(global_prefix)
 endif
 
-crt0_expr = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
-
 if system_libc
   specs_isystem = ''
   specs_libpath = ''
-  specs_startfile = crt0_expr
+  # The '%s' here asks gcc to search for this file in the 'usual' library path
+  specs_startfile = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
 else
+
+# Note that this value does *not* include the trailing %s which
+# means we have to compute the full path to the file
+crt0_expr = '%{-crt0=*:crt0-%*%O; :crt0%O}'
 
 #
 # Construct path values for specs file
