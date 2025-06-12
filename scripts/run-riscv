@@ -119,7 +119,7 @@ chardev=stdio,mux=on,id=stdio0
 
 # Point the semihosting driver at our new chardev
 
-cmdline="program-name"
+cmdline="$elf" 
 input=""
 done=0
 
