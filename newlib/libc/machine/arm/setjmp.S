@@ -6,6 +6,7 @@
 #include <picolibc.h>
 
 #include "machine/acle-compat.h"
+#include "toolchain.h"
 
 /* ANSI concatenation macros.  */
 #define CONCAT(a, b)  CONCAT2(a, b)
@@ -16,14 +17,6 @@
 #endif
 
 #define SYM(x) CONCAT (__USER_LABEL_PREFIX__, x)
-
-#ifdef __ELF__
-#define TYPE(x) .type SYM(x),function
-#define SIZE(x) .size SYM(x), . - SYM(x)
-#else
-#define TYPE(x)
-#define SIZE(x)
-#endif
 
 /* Jump buffer allocation sizes.  */
 #define JUMPBUF_CORE_REGS_SIZE (10 * 4)

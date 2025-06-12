@@ -78,6 +78,7 @@
 	.syntax unified
 
 #include "arm_asm.h"
+#include "toolchain.h"
 
 // NOTE: This ifdef MUST match the one in memchr-stub.c
 #if defined (__ARM_NEON__) || defined (__ARM_NEON)
@@ -133,7 +134,7 @@
 	.align 4
 	.p2align 4,,15
 	.global memchr
-	.type memchr,%function
+	TYPE (memchr)
 
 memchr:
 	.cfi_sections .debug_frame
@@ -292,7 +293,7 @@ memchr:
 	.align 2
 	.p2align 4,,15
 	.global memchr
-	.type memchr,%function
+	TYPE (memchr)
 	fnstart
 	.cfi_sections .debug_frame
 	.cfi_startproc
