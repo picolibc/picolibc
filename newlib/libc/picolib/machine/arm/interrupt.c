@@ -137,7 +137,7 @@ __weak_vector_table(void)
 	 * Exception vector that lives at the
 	 * start of program text (usually 0x0)
 	 */
-#if __thumb2__ && __ARM_ARCH_PROFILE != 'A'
+#ifdef __thumb2__
 	/* Thumb 2 processors start in thumb mode */
 	__asm__(".thumb\n"
                 ".syntax unified\n"
