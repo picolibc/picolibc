@@ -531,6 +531,12 @@
 #endif
 .endm
 
+.macro	ASM_ALIAS_ARM_STATE new old
+	.global	\new
+	.type	\new, %function
+	.set	\new, \old
+.endm
+
 #endif /* __ASSEMBLER__ */
 
 #endif /* ARM_ASM__H */
