@@ -157,9 +157,9 @@
 	.endm
 
 def_fn memcpy p2align=6
-	ASM_ALIAS __aeabi_memcpy, memcpy
-	ASM_ALIAS __aeabi_memcpy4, memcpy
-	ASM_ALIAS __aeabi_memcpy8, memcpy
+	ASM_ALIAS_ARM_STATE __aeabi_memcpy, memcpy
+	ASM_ALIAS_ARM_STATE __aeabi_memcpy4, memcpy
+	ASM_ALIAS_ARM_STATE __aeabi_memcpy8, memcpy
 
 	mov	dst, dstin	/* Preserve dstin, we need to return it.  */
 	cmp	count, #64

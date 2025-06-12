@@ -243,7 +243,7 @@ _cstart(void)
         _set_stacks();
 #endif
 
-#if __thumb2__ && __ARM_ARCH_PROFILE != 'A'
+#ifdef __thumb2__
 	/* Make exceptions run in Thumb mode */
 	uint32_t sctlr;
 	__asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
@@ -308,7 +308,7 @@ _cstart(void)
 
                 /* Enable caches, branch prediction and the MMU. Disable TRE */
                 uint32_t sctlr;
-                __asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
+                __asm__ __volatile__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
                 sctlr |= SCTLR_ICACHE | SCTLR_BRANCH_PRED | SCTLR_DATA_L2 | SCTLR_MMU;
                 #ifndef __ARM_FEATURE_UNALIGNED
                     sctlr |= SCTLR_A;
