@@ -33,12 +33,62 @@
  */
 
 #include <complex.h>
+#include <math.h>
+#include <float.h>
 
 float complex
 casinhf(float complex z)
 {
-	float complex w;
 
-	w = -1.0f * I * casinf(z * I);
-	return w;
+    float x = fabsf(crealf(z));
+    float y = fabsf(cimagf(z));
+    float complex res;
+    float complex w;
+
+    const float eps = FLT_EPSILON;
+
+    if (y == 0.0f) {
+        if (isnanf(x)) {
+            res = CMPLXF(NAN, copysignf(0.0, cimagf(z)));
+        }
+        else if (isinff(x)) {
+            res = CMPLXF(x, copysignf(0.0, cimagf(z)));
+        }
+        else {
+            res = CMPLXF(asinhf(x), copysignf(0.0, cimagf(z)));
+        }
+    }
+    /* Handle large values */
+    else if (x >= 1.0f/eps || y >= 1.0f/eps) {
+        res = clogf(CMPLXF(x, y));
+        res = CMPLXF(crealf(res) + (float) _M_LN2, cimagf(res));
+
+    }
+
+    /* Case where real part >= 0.5 and imag part very samll */
+    else if (x >= 0.5f && y < eps/8.0f) {
+        float s = hypotf(1.0f, x);
+        res = CMPLXF(logf(x + s), atan2f(y, s));
+    }
+
+    /* Case Where real part very small and imag part >= 1.5 */
+    else if (x < eps/8.0f && y >= 1.5f) {
+        float s = sqrtf((y + 1.0f) * (y - 1.0f));
+        res = CMPLXF(logf(y + s), atan2f(s, x));
+    }
+
+    else {
+        /* General case */
+        w = CMPLXF((x - y) * (x + y) + 1.0f, 2.0f * x * y);
+        w = csqrtf(w);
+
+        w = CMPLXF(x + crealf(w), y + cimagf(w));
+        res = clogf(w);
+    }
+
+    /* Apply correct signs */
+    res = CMPLXF(copysignf(crealf(res), crealf(z)),
+                 copysignf(cimagf(res), cimagf(z)));
+
+    return res;
 }
