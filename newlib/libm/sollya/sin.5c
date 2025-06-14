@@ -1,0 +1,76 @@
+real[] sin_coeff = {
+    0x1.5233b7cd5d4b8p-99 ,
+    0x1p0 ,
+    -0x1.8409946923a12p-48 ,
+    -0x1.55555555527ebp-3 ,
+    -0x1.d93efc74b6b69p-38 ,
+    0x1.1111113739b45p-7 ,
+    -0x1.c35a5064c8d36p-32 ,
+    -0x1.a019347dcf22p-13 ,
+    -0x1.d757ef6f2b89fp-29 ,
+    0x1.7287c3a2860c5p-19 ,
+    -0x1.1ef763875c73bp-28 ,
+    -0x1.9170dbea29735p-26 ,
+};
+
+real
+my_sin(real x)
+{
+	real r = 0;
+	if (x < 0x1p-27) return x;
+	for (int i = dim(sin_coeff) - 1; i >= 0; i--)
+		r = x * r + sin_coeff[i];
+	return r;
+}
+
+real[] cos_coeff = {
+    0x1.a2c24e8bff8fap-103 ,
+    -0x1.02d23ae614a02p-75 ,
+    0x1.0000000000004p-1 ,
+    -0x1.aa4aa0d13d64dp-44 ,
+    -0x1.55555554ced16p-5 ,
+    -0x1.0d56269707fbdp-34 ,
+    0x1.6c16ca0c5f29fp-10 ,
+    -0x1.464bce92408a2p-29 ,
+    -0x1.9ffc9319b8bc9p-16 ,
+    -0x1.a5a7ef5194eaap-27 ,
+    0x1.36327a9281de4p-22 ,
+    -0x1.146682b25870bp-27 ,
+};
+
+real
+my_cos(real x)
+{
+	real r = 0;
+	if (x < 0x1p-27) return 1;
+	for (int i = dim(cos_coeff) - 1; i >= 0; i--)
+		r = x * r + cos_coeff[i];
+	return 1 - r;
+}
+
+real
+ulps(real a, real b)
+{
+	return abs(mantissa(imprecise(a)) - mantissa(imprecise(b))) * 2**53;
+}
+
+int
+main()
+{
+	real maxerr = 0;
+	real errval = 0;
+	for (real x = 0; x < pi/4; x += 0.01) {
+		real libm = sin(x);
+		real my = my_sin(x);
+
+		real err = ulps(libm, my);
+		if (err > maxerr) {
+			maxerr = err;
+			errval = x;
+		}
+	}
+	printf("max ulps %f at %a got %a want %a\n", maxerr, imprecise(errval, 52), imprecise(my_sin(errval), 52), imprecise(sin(errval), 52));
+	return 0;
+}
+
+main();

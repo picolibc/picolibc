@@ -1,0 +1,28 @@
+real[] coeffs = {
+    0x1.6723ep2 ,
+    0x1.d2a90ep12 ,
+    -0x1.6c95ap21 ,
+    0x1.bc4152p28 ,
+    -0x1.111e66p35 ,
+    0x1.827e16p40 ,
+    -0x1.50ecb4p45 ,
+    0x1.75558cp49 ,
+    -0x1.074ee8p53 ,
+    0x1.c983e2p55 ,
+    -0x1.be01bcp57 ,
+    0x1.7518c8p58 ,
+};
+
+real
+lgamma(real x)
+{
+	int i = dim(coeffs) - 1;
+	real r = imprecise(coeffs[i]);
+	/* polynomial computes lgamma(1/8 - 1/x) */
+	real y = imprecise(0.125 - 1/x);
+	while (--i >= 0)
+		r = y * r + imprecise(coeffs[i]);
+	return r;
+}
+
+lgamma(100000)

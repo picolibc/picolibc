@@ -1,0 +1,30 @@
+real jn(int n, real x)
+{
+	real r = 0;
+	x = imprecise(x);
+	int prec = precision(x);
+	for (int j = 0; ; j++) {
+		real p = 0;
+		if (j >= 0)
+			p = ((-1)**(j & 1) / (j! * (j+n)!)) * (x/2)**(2*j+n);
+		if (p == 0)
+			break;
+		if (r != 0 && exponent(r) - exponent(p) > prec)
+			break;
+		r += p;
+	}
+	return r;
+}
+
+real yn(int n, real x)
+{
+	x = imprecise(x);
+	int prec = precision(x);
+	real a = 0;
+
+	for (int j = 0; j < n-1; j++) {
+		a += (n - j - 2)! / j! * (x/2)**(2*j - n);
+	}
+
+	return 2/pi * jn(n, x) * log(x/2) - a/pi;
+}

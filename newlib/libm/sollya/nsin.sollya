@@ -1,0 +1,190 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+autosimplify = off;
+prec = 1024;
+
+AkiyamaTanigawa = proc(l) {
+	var n, t, a, k, m;
+	n = 2 * l + 1;
+	t = [|1|];
+	a = [| |];
+	k = 1;
+	m = 2;
+	while m <= n do {
+		t[m-1] = 1/m;
+		j = m - 1;
+		while j >= 1 do {
+			t[j-1] = j * (t[j-1] - t[j]);
+			j = j - 1;
+		};
+		if mod(m, 2) != 0 then {
+			v = t[0]/((2*k-1)*(2*k));
+			if mod(k, 2) == 0 then {
+				a[k-1] = -v;
+			} else {
+				a[k-1] = v;
+			};
+			k = k + 1;
+		};
+		m = m + 1;
+	};
+	return a;
+};
+
+StieltjesCF = proc (len) {
+	var s, m, n, k, r, u;
+
+	s = AkiyamaTanigawa(len);
+
+	m = [|0, ..., (len-1)|];
+	for n from 0 to len - 1 do {
+		m[n] = [|0, ..., (len-1)|];
+	};
+	for n from 0 to len - 1 do {
+		u = m[n];
+		u[0] = 0;
+		m[n] = u;
+	};
+	for n from 0 to len - 2 do {
+		u = m[n];
+		u[1] = s[n+1]/s[n];
+		m[n] = u;
+	};
+	for k from 3 to len do {
+		for n from 1 to len - k + 1 do {
+			var a, b, c;
+			a = m[n][k-3];
+			b = m[n][k-2];
+			c = m[n-1][k-2];
+			if mod(k, 2) != 0 then {
+				u = m[n-1];
+				u[k-1] = a + b - c;
+				m[n-1] = u;
+			} else {
+				u = m[n-1];
+				u[k-1] = a * b / c;
+				m[n-1] = u;
+			};
+		};
+	};
+	u = m[0];
+	u[0] = s[0];
+	m[0] = u;
+
+	r = [| |];
+	for n from 0 to len - 1 do {
+		r[n] = m[0][n];
+	};
+	return r;
+};
+
+Stieltjes = proc(n, ord) {
+	var N, q, c, i, r;
+	
+	N = n + 1;
+	q = N;
+	c = StieltjesCF(ord);
+	for i from ord to 2 by -1 do {
+		q = N + c[i-1] / q;
+	};
+	r = sqrt(2 * Pi/N) * (N/exp(1)) ^ N * exp(1/(12*q));
+	return r;
+};
+
+//StieltjesCF(2,24);
+
+//Stieltjes(10, 2, 40);
+
+gamma = proc(x) {
+	var g, i, y;
+
+	y = x + 10;
+
+	g = Stieltjes(y - 1, 3);
+	for i from 1 to 10 do {
+		y = y - 1;
+		g = g / y;
+	};
+	return g;
+};
+
+gfunc = proc(x) { return 1- gamma(x + 1); };
+
+gamma(1.5);
+
+prec = 128!;
+ginterval = [0;1];
+gmaxerr = 0x1p-10;
+//print("Computing degree for", gfunc);
+//gammadeg = guessdegree(gfunc(_x_),ginterval,gmaxerr);
+//print("Computed as", gammadeg);
+
+gammadeg = 6;
+Pgamma = fpminimax(gfunc(_x_), gammadeg, [|D...|],ginterval);
+display = decimal;
+print("static const double gamma_coeffs[", gammadeg+1, "] = {");
+display = hexadecimal;
+for i from 0 to gammadeg do print("   ", coeff(Pgamma,i), ",");
+print("};");
+
+tfunc = proc (x) {
+	return sin(x);
+};
+
+lo = 0x1p-27;
+hi = Pi/4;
+ivl = [lo,hi];
+fitivl = [lo;hi];
+maxerr = 0x1p-53;
+
+sindeg = inf(guessdegree(tfunc(_x_),fitivl,maxerr));
+
+Psin = fpminimax(tfunc(_x_), sindeg, [|D...|], fitivl);
+
+display = decimal!;
+print("static const double sin_coeffs[", sindeg+1, "] = {");
+display = hexadecimal!;
+for i from 0 to sindeg do print("   ", coeff(Psin,i), ",");
+print("};");
+
+cosdeg = 12;
+
+Pcos = fpminimax(1-cos(_x_), cosdeg, [|D...|], fitivl);
+display = decimal!;
+print("static const double cos_coeffs[", cosdeg+1, "] = {");
+display = hexadecimal!;
+for i from 0 to cosdeg do print("   ", coeff(Pcos,i), ",");
+print("};");

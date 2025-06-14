@@ -1,0 +1,30 @@
+procedure cbrt(x){return (x)^(1/3);};
+deg = 6; // poly degree
+lo = 0.5;
+hi = 1.0;
+ivl = [lo,hi];
+fitivl = [lo;hi];
+maxerr = 1e-12;
+taylorterms = 50;
+taylorabout=1;
+tform=taylorform(x^(1/3),taylorterms,taylorabout,ivl,relative);
+tpoly=tform[0];
+
+// return p that minimizes |f(x) - poly(x) - x^d*p(x)|/|f(x)|
+approx = proc(poly,d) {
+  return remez(1 - poly(x)/(x^(1/3)), deg-d, fitivl, x^d/(x^(1/3)), maxerr);
+};
+
+// first coeff is fixed, iteratively find optimal double prec coeffs
+poly = 0;
+for i from 1 to deg do {
+  p = roundcoefficients(approx(poly,i), [|D ...|]);
+  poly = poly + x^i*coeff(p,0);
+};
+
+display = hexadecimal;
+print("rel error:", accurateinfnorm(1-poly(x)/(x^1/3), fitivl, 30));
+print("in [",lo,hi,"]");
+print("poly:", poly);
+print("coeffs:");
+for i from 0 to deg do coeff(poly,i);

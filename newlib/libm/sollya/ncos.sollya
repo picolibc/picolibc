@@ -1,0 +1,32 @@
+prec = 512;
+tfunc = 1 - cos(x);
+deg = 12; // poly degree
+
+lo = 0x1p-27;
+hi = Pi/4;
+ivl = [lo,hi];
+fitivl = [lo;hi];
+maxerr = 0x1p-52;
+
+tpoly = taylorform(tfunc, 50, Pi/8, fitivl, relative);
+//print("tpoly", tpoly);
+
+// return p that minimizes |f(x) - poly(x) - x^d*p(x)|/|f(x)|
+approx = proc(poly,tpoly,d) {
+  return remez(1 - poly(x)/tfunc, deg-d, fitivl, x^d/tfunc, maxerr);
+};
+
+// first coeff is fixed, iteratively find optimal double prec coeffs
+poly = 0;
+for i from 0 to deg do {
+	p = roundcoefficients(approx(poly,tpoly,i), [|D ...|]);
+	poly = x^i * coeff(p, 0) + poly;
+	print("poly:", poly);
+};
+
+display = hexadecimal;
+print("coeffs:");
+for i from 0 to deg do print("   ", coeff(poly,i), ",");
+
+print("rel error:", accurateinfnorm(1-poly(x)/(1 - cos(x)), fitivl, 30));
+print("in [",lo,hi,"]");

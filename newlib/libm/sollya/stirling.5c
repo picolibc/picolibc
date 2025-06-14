@@ -1,0 +1,7 @@
+real
+stirling(real n)
+{
+	return log(sqrt(2 * pi * n)) + n * log(n/Math::e);
+}
+
+stirling(1e36)

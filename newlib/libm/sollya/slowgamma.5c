@@ -1,0 +1,31 @@
+real intgamma(real x) {
+	int prec = precision(imprecise(x));
+	int iprec = prec * 2;
+	x = imprecise(x, iprec);
+	real step = imprecise(0x1p-16, iprec);
+	real r = 0;
+	for (real t = step;; t += step) {
+		real a = t**(x-1)*exp(-t)*step;
+		real s = r + a;
+		if (s == r)
+			break;
+		r = s;
+	}
+	return imprecise(r, prec);
+}
+
+real prodgamma(real x) {
+
+	x = imprecise(x);
+	int prec = precision(x);
+	int iprec = prec * 2;
+	x = imprecise(x, iprec);
+	real r = imprecise(1, iprec);
+	for (int n = 1; ; n++) {
+		real s = r * (1/(1 + x/n)) * (1 + 1/n)**x;
+		if (s == r)
+			break;
+		r = s;
+	}
+	return imprecise(r/x, prec);
+}
