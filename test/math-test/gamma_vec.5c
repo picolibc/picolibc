@@ -1,0 +1,130 @@
+#!/usr/bin/nickle
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+/*
+ * Use nickle's extended precision floating point implementation
+ * to generate some simple test vectors for the gamma function
+ */
+
+/* Special values from:
+
+   Accuracy of Mathematical Functions in Single, Double, Double
+               Extended, and Quadruple Precision
+
+  Brian Gladman, Vincenzo Innocente, John Mather, Paul Zimmermann
+
+   https://members.loria.fr/PZimmermann/papers/accuracy.pdf
+*/
+
+/* No values for 32-bit are provided; let's just duplicate the 64-bit ones */
+
+real[] test_32_values = {
+	-0x1.c18caecc00f7bp+2,
+	-0x1.3e0001ad3bee3p+6,
+	-0x1.535175475cc8dp+7,
+	-0x1.540b170c4e65ep+7,
+	-0x1.fc4b534c8eccp+2,
+	-0x1.5456e56919a19p+7,
+	-0x1.547cf3ddaaddap+7,
+	-0x1.2baa17692a3f2p+7,
+	-0x1.201a11d80c13dp+2,
+};
+
+real[] test_64_values = {
+	-0x1.c18caecc00f7bp+2,
+	-0x1.3e0001ad3bee3p+6,
+	-0x1.535175475cc8dp+7,
+	-0x1.540b170c4e65ep+7,
+	-0x1.fc4b534c8eccp+2,
+	-0x1.5456e56919a19p+7,
+	-0x1.5c00000003c15p+7,
+	-0x1.547cf3ddaaddap+7,
+	-0x1.2baa17692a3f2p+7,
+	-0x1.201a11d80c13dp+2,
+};
+
+real[] test_80_values = {
+	-0x1.70a55b2628a7cb68p+4,
+	-0x6.9c7abe03c485dbbp+8,
+	-0x6.db747ae147ae148p+8,
+	-0x2.8d19fd20f3aa62cp+4,
+	-0x6.e000000000000008p+8,
+	-0x6.db747ae147ae148p+8,
+	0x2.c5c85fdf170c604cp+12,
+};
+
+real[] test_128_values = {
+	-0x1.62ab0823decc5cf957d9a218cf27p+4,
+	0x2.00003274fc8659f8ed68e96e0378p-16224,
+};
+
+string format_32 =  "    { .x = float_32(%-18.6a), .y = float_32(%-18.6a) },\n";
+string format_64 =  "    { .x = float_64(%-26.13a), .y = float_64(%-26.13a) },\n";
+string format_80 =  "    { .x = float_80(%-30.16a), .y = float_80(%-30.16a) },\n";
+string format_128 = "    { .x = float_128(%-42.28a), .y = float_128(%-42.28a) },\n";
+
+real step = 10.1;
+
+void
+gen_test_vector(int bits, int prec, real[] values, real max, string format)
+{
+	printf("#ifdef INCLUDE_FLOAT_%d\n", bits);
+	printf("static const vector_%d gamma_%d[] = {\n", bits, bits);
+	for (real x = 0x1p-128; x <= max; x *= step) {
+		real xp = imprecise(imprecise(x, prec), 1024);
+		real yp = gamma(xp);
+		printf(format, imprecise(xp, prec), imprecise(yp, prec));
+	}
+	for (real x = 0x1p-128; x <= 0x1p23; x *= step) {
+		real xp = imprecise(imprecise(x, prec), 1024);
+		if (floor(xp) != xp) {
+			real yp = gamma(-xp);
+			printf(format, imprecise(-xp, prec), imprecise(yp, prec));
+		}
+	}
+	for (int i = 0; i < dim(values); i++) {
+		real xp = imprecise(imprecise(values[i], prec), 1024);
+		real yp = gamma(xp);
+		printf(format, imprecise(xp, prec), imprecise(yp, prec));
+	}
+	printf("};\n");
+	printf("#endif\n\n");
+}
+
+gen_test_vector(32, 24, test_32_values, 35, format_32);
+gen_test_vector(64, 53, test_64_values, 172, format_64);
+gen_test_vector(80, 64, test_80_values, 1756, format_80);
+gen_test_vector(128, 113, test_128_values, 1756, format_128);
