@@ -37,10 +37,12 @@
 
 #if LDBL_MANT_DIG == 64
 
-#include "ld80/e_tgammal.c"
+#define gamma_80 tgammal
+#include "../sollya/gamma_80.c"
 
 #elif LDBL_MANT_DIG == 113
 
-#include "ld128/e_tgammal.c"
+#define gamma_80 tgammal
+#include "../sollya/gamma_128.c"
 
 #endif

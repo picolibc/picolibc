@@ -22,6 +22,10 @@
 
 #include "fdlibm.h"
 
+#define gamma_32 tgammaf
+#include "../sollya/gamma_32.c"
+
+#if 0
 float
 tgammaf(float x)
 {
@@ -38,5 +42,6 @@ tgammaf(float x)
         return __math_oflowf(signgam_local < 0);
     return y;
 }
+#endif
 
 _MATH_ALIAS_f_f(tgamma)

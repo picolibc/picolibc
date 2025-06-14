@@ -22,6 +22,10 @@
 
 #ifdef _NEED_FLOAT64
 
+#define gamma_64 tgamma64
+#include "../sollya/gamma_64.c"
+
+#if 0
 __float64
 tgamma64(__float64 x)
 {
@@ -38,6 +42,7 @@ tgamma64(__float64 x)
         return __math_oflow(signgam_local < 0);
     return y;
 }
+#endif
 
 _MATH_ALIAS_d_d(tgamma)
 
