@@ -46,12 +46,12 @@
 # include "../../string/memcpy.c"
 
 void *__aeabi_memcpy4 (void *__restrict dest, const void * __restrict source, size_t n)
-	_ATTRIBUTE ((alias ("memcpy"), weak));
+	_ATTRIBUTE ((alias ("memcpy"), weak, used));
 
 void *__aeabi_memcpy8 (void * __restrict dest, const void * __restrict source, size_t n)
-	_ATTRIBUTE ((alias ("memcpy"), weak));
+	_ATTRIBUTE ((alias ("memcpy"), weak, used));
 
 void *__aeabi_memcpy (void * __restrict dest, const void * __restrict source, size_t n)
-	_ATTRIBUTE ((alias ("memcpy"), weak));
+	_ATTRIBUTE ((alias ("memcpy"), weak, used));
 
 #endif
