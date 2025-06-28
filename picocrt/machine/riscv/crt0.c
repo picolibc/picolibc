@@ -105,7 +105,11 @@ _trap(void)
 	__asm__(".option	push\n"
                 ".option	norelax\n"
                 "csrrw  sp, mscratch, sp\n"
+#ifdef __riscv_cmodel_large
+                "ld     sp, .trap_sp\n"
+#else
                 "la	sp, __heap_end\n"
+#endif
                 ".option	pop");
 
         /* Make space for saved registers */
@@ -157,7 +161,14 @@ _trap(void)
         /*
          * Pass pointer to saved registers in first parameter register
          */
-        __asm__("la	gp, __global_pointer$");
+	__asm__(".option	push\n"
+                ".option	norelax\n"
+#ifdef __riscv_cmodel_large
+                "ld     gp,.trap_gp\n"
+#else
+                "la	gp, __global_pointer$\n"
+#endif
+                ".option	pop");
         __asm__("mv     a0, sp");
 
         /* Enable FPU (just in case) */
@@ -169,6 +180,10 @@ _trap(void)
                 "csrwi	fcsr, 0");
 #endif
         __asm__("jal    _ctrap");
+#ifdef __riscv_cmodel_large
+        __asm__(".align 3\n.trap_sp:\n.dword __stack");
+        __asm__(".align 3\n.trap_gp:\n.dword __global_pointer$");
+#endif
 }
 #endif
 
@@ -190,8 +205,13 @@ _start(void)
 
 	__asm__(".option	push\n"
                 ".option	norelax\n"
+#ifdef __riscv_cmodel_large
+                "ld     sp,.start_sp\n"
+                "ld     gp,.start_gp\n"
+#else
                 "la	sp, __stack\n"
                 "la	gp, __global_pointer$\n"
+#endif
                 ".option	pop");
 
 #ifdef __riscv_flen
@@ -202,9 +222,22 @@ _start(void)
                 "csrwi	fcsr, 0");
 #endif
 #ifdef CRT0_SEMIHOST
+#ifdef __riscv_cmodel_large
+        __asm__("ld     t0,.start_trap");
+#else
         __asm__("la     t0, _trap");
+#endif
         __asm__("csrw   mtvec, t0");
         __asm__("csrr   t1, mtvec");
 #endif
         __asm__("j      _cstart");
+#ifdef __riscv_cmodel_large
+        __asm__(".align 3\n"
+                ".start_sp: .dword __stack\n"
+                ".start_gp: .dword __global_pointer$\n"
+#ifdef CRT0_SEMIHOST
+                ".start_trap: .dword _trap"
+#endif
+            );
+#endif
 }
