@@ -67,14 +67,9 @@ else
     echo "Unknown architecture for $elf: $archstring" >&2
     exit 1
 fi
-# The I extension is always required, and since it's the first one there is
-# no preceding _ to match on. Just assume it's always there
-options="i"
-test "${archstring#*_m}" != "$archstring" && options="$options m"
-test "${archstring#*_a}" != "$archstring" && options="$options a"
-test "${archstring#*_f}" != "$archstring" && options="$options f"
-test "${archstring#*_d}" != "$archstring" && options="$options d"
-test "${archstring#*_c}" != "$archstring" && options="$options c"
+options="$(echo "$archstring" | sed 's/rv[36][24]//' | sed 's/_/ /g' | sed 's/[0-9]p[0-9]\>//g')"
+
+qemu_version="$("$qemu" --version | grep version | sed 's/.*version \([0-9][0-9.]*\).*/\1/')"
 
 cpu="$cpu,mmu=false,pmp=false"
 
@@ -82,32 +77,57 @@ if [ -z "$options" ]; then
     options="$(echo "$elf" | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g')"
 fi
 
-all_options="i e g m a f d c s u"
-
-if $qemu --version | grep -q 'version \(7\|8\|9\|10\)'; then
-    all_options="h $all_options"
-fi
-
-if $qemu --version | grep -q 'version \(8\|9\|10\)'; then
-    if $qemu --version | grep -q 'version 8.1'; then
-        all_options="Zawrs $all_options"
-    else
-        all_options="zawrs $all_options"
-    fi
-fi
-
-if $qemu --version | grep -q 'version \(8.[1-9]\|9\|10\)'; then
-    all_options="zfa $all_options"
-fi
-
-for o in $all_options; do
-    if echo "$options" | grep -q "$o"; then
-	value=true
-    else
-	value=false
-    fi
-    cpu="$cpu,$o=$value"
+for o in $options; do
+    # Old versions of qemu don't have new extension subsets
+    case "$qemu_version" in
+        8*|7*)
+            case "$o" in
+                zmmul)
+                    o=m
+                    ;;
+                zaamo|zalrsc|zawrs)
+                    o=a
+                    ;;
+            esac
+            ;;
+    esac
+    case "$o" in
+        zvl*)
+            # qemu doesn't list zvl extensions
+            ;;
+        *)
+            cpu="$cpu,$o=true"
+            ;;
+    esac
 done
+
+# qemu enables some options by defualt; we need to explicitly
+# disable them when not selected
+enabled_options="i h e g m a f d c s u v zifencei zihintpause"
+
+# Add default enabled options for newer qemu versions
+case "$qemu_version" in
+    8.[01]*|7*)
+        ;;
+    *)
+        enabled_options="$enabled_options zawrs zfa zihintntl"
+        ;;
+esac
+
+for enabled in $enabled_options; do
+    if echo "$options" | grep -q -w $enabled; then
+        :
+    else
+        cpu="$cpu,$enabled=false"
+    fi
+done
+
+# Map lower case options to upper case for qemu version 8.1 and earlier
+case "$qemu_version" in
+    8.[01]*|7*)
+        cpu="$(echo "$cpu" | sed 's/\<z/Z/g')"
+        ;;
+esac
 
 # Set the target machine
 machine=virt,accel=tcg
