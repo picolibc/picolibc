@@ -221,6 +221,13 @@ _start(void)
                 "csrw	mstatus, t0\n"
                 "csrwi	fcsr, 0");
 #endif
+#ifdef __riscv_vector
+	__asm__("csrr	t0, mstatus\n"
+                "li	t1, 512\n"     	        // 1 << 9 = 512
+                "or	t0, t1, t0\n"
+                "csrw	mstatus, t0\n"
+                "csrwi	vxrm, 1");
+#endif
 #ifdef CRT0_SEMIHOST
 #ifdef __riscv_cmodel_large
         __asm__("ld     t0,.start_trap");
