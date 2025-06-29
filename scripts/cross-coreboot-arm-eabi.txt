@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'arm-eabi-gcc', '-nostdlib', '-mabi=aapcs', '-mfp16-format=ieee', '-mno-unaligned-access', '-mthumb', '-mcpu=cortex-m4']
-cpp = ['ccache', 'arm-eabi-g++', '-nostdlib', '-mabi=aapcs', '-mfp16-format=ieee', '-mno-unaligned-access', '-mthumb', '-mcpu=cortex-m4']
+c = ['ccache', 'arm-eabi-gcc', '-nostdlib', '-mabi=aapcs', '-mfp16-format=ieee', '-mno-unaligned-access' ]
+cpp = ['ccache', 'arm-eabi-g++', '-nostdlib', '-mabi=aapcs', '-mfp16-format=ieee', '-mno-unaligned-access' ]
 ar = 'arm-eabi-ar'
 as = 'arm-eabi-as'
 nm = 'arm-eabi-nm'
