@@ -48,11 +48,11 @@ memory=
 # Map ELF information to required core type
 #
 
-cpu_arch=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_CPU_arch:/ { print $2 }'`
-cpu_profile=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_CPU_arch_profile:/ { print $2 }'`
-fp_arch=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_FP_arch/ { print $2 }'`
-fp_use=`arm-none-eabi-readelf -A "$elf" | awk '/Tag_ABI_HardFP_use/ { print $2 }'`
-ram_addr=`arm-none-eabi-readelf -l "$elf" | awk '/LOAD.*RW/ { if (min_va == 0 || $3 < min_va) min_va = $3; } END { print(min_va); }'`
+cpu_arch=`readelf -A "$elf" | awk '/Tag_CPU_arch:/ { print $2 }'`
+cpu_profile=`readelf -A "$elf" | awk '/Tag_CPU_arch_profile:/ { print $2 }'`
+fp_arch=`readelf -A "$elf" | awk '/Tag_FP_arch/ { print $2 }'`
+fp_use=`readelf -A "$elf" | awk '/Tag_ABI_HardFP_use/ { print $2 }'`
+ram_addr=`readelf -l "$elf" | awk '/LOAD.*RW/ { if (min_va == 0 || $3 < min_va) min_va = $3; } END { print(min_va); }'`
 
 case "$cpu_arch"/"$cpu_profile" in
     v4T/)
