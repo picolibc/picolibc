@@ -97,7 +97,7 @@ static const __float64 aT[] = {
     _F_64(1.62858201153657823623e-02), /* 0x3F90AD3A, 0xE322DA11 */
 };
 
-static const __float64 one = _F_64(1.0), huge = _F_64(1.0e300);
+static const __float64 one = _F_64(1.0);
 
 __float64
 atan64(__float64 x)
@@ -118,10 +118,8 @@ atan64(__float64 x)
             return -atanhi[3] - atanlo[3];
     }
     if (ix < 0x3fdc0000) { /* |x| < 0.4375 */
-        if (ix < 0x3e200000) { /* |x| < 2^-29 */
-            if (huge + x > one)
-                return x; /* raise inexact */
-        }
+        if (ix < 0x3e200000) /* |x| < 2^-29 */
+            return __math_inexact64(x);
         id = -1;
     } else {
         x = fabs64(x);
