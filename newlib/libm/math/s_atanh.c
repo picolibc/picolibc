@@ -34,9 +34,7 @@
 
 #ifdef _NEED_FLOAT64
 
-static const __float64 one = _F_64(1.0), huge = _F_64(1e300);
-
-static const __float64 zero = _F_64(0.0);
+static const __float64 one = _F_64(1.0);
 
 __float64
 atanh64(__float64 x)
@@ -50,8 +48,8 @@ atanh64(__float64 x)
         return __math_invalid(x);
     if (ix == 0x3ff00000)
         return __math_divzero(x < 0);
-    if (ix < 0x3e300000 && (huge + x) > zero)
-        return x; /* x<2**-28 */
+    if (ix < 0x3e300000) /* x<2**-28 */
+        return __math_inexact64(x);
     SET_HIGH_WORD(x, ix);
     if (ix < 0x3fe00000) { /* x < 0.5 */
         t = x + x;
