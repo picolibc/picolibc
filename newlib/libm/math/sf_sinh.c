@@ -15,7 +15,7 @@
 
 #include "fdlibm.h"
 
-static const float one = 1.0, shuge = 1.0e37;
+static const float one = 1.0;
 
 float
 sinhf(float x)
@@ -36,8 +36,7 @@ sinhf(float x)
     /* |x| in [0,22], return sign(x)*0.5*(E+E/(E+1))) */
     if (ix < 0x41b00000) { /* |x|<22 */
         if (ix < 0x31800000) /* |x|<2**-28 */
-            if (shuge + x > one)
-                return x; /* sinh(tiny) = tiny with inexact */
+            return __math_inexactf(x); /* sinh(tiny) = tiny with inexact */
         t = expm1f(fabsf(x));
         if (ix < 0x3f800000)
             return h * ((float)2.0 * t - t * t / (t + one));

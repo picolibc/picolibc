@@ -33,7 +33,7 @@
 
 #ifdef _NEED_FLOAT64
 
-static const __float64 one = _F_64(1.0), shuge = _F_64(1.0e307);
+static const __float64 one = _F_64(1.0);
 
 __float64
 sinh64(__float64 x)
@@ -56,8 +56,7 @@ sinh64(__float64 x)
     /* |x| in [0,22], return sign(x)*0.5*(E+E/(E+1))) */
     if (ix < 0x40360000) { /* |x|<22 */
         if (ix < 0x3e300000) /* |x|<2**-28 */
-            if (shuge + x > one)
-                return x; /* sinh(tiny) = tiny with inexact */
+            return __math_inexact64(x); /* sinh(tiny) = tiny with inexact */
         t = expm164(fabs64(x));
         if (ix < 0x3ff00000)
             return h * (_F_64(2.0) * t - t * t / (t + one));
