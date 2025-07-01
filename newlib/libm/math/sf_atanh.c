@@ -16,9 +16,7 @@
 
 #include "fdlibm.h"
 
-static const float one = 1.0, huge = 1e30;
-
-static const float zero = 0.0;
+static const float one = 1.0;
 
 float
 atanhf(float x)
@@ -31,8 +29,8 @@ atanhf(float x)
         return __math_invalidf(x);
     if (ix == 0x3f800000)
         return __math_divzerof(x < 0);
-    if (ix < 0x31800000 && (huge + x) > zero)
-        return x; /* x<2**-28 */
+    if (ix < 0x31800000) /* x<2**-28 */
+        return __math_inexactf(x);
     SET_FLOAT_WORD(x, ix);
     if (ix < 0x3f000000) { /* x < 0.5 */
         t = x + x;
