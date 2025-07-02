@@ -211,7 +211,11 @@ exp_inline (double x, double xtail, uint32_t sign_bias)
 	{
 	  /* Avoid spurious underflow for tiny x.  */
 	  /* Note: 0 is common input.  */
-	  double_t one = WANT_ROUNDING ? 1.0 + x : 1.0;
+#if WANT_ROUNDING
+	  double_t one = 1.0 + x;
+#else
+	  double_t one = 1.0;
+#endif
 	  return sign_bias ? -one : one;
 	}
       if (abstop >= top12 (1024.0))
@@ -363,10 +367,11 @@ pow (double x, double y)
 	  if ((topy & 0x7ff) < 0x3be)
 	    {
 	      /* |y| < 2^-65, x^y ~= 1 + y*log(x).  */
-	      if (WANT_ROUNDING)
+#if WANT_ROUNDING
 		return ix > asuint64 (1.0) ? 1.0 + y : 1.0 - y;
-	      else
+#else
 		return 1.0;
+#endif
 	    }
 	  return (ix > asuint64 (1.0)) == (topy < 0x800) ? __math_oflow (0)
 							 : __math_uflow (0);
