@@ -93,9 +93,9 @@
 	.cfi_sections .debug_frame
 	.cfi_startproc
 	.type	memcpy, %function
-	ASM_ALIAS __aeabi_memcpy, memcpy
-	ASM_ALIAS __aeabi_memcpy4, memcpy
-	ASM_ALIAS __aeabi_memcpy8, memcpy
+	ASM_ALIAS_THUMB_STATE __aeabi_memcpy, memcpy
+	ASM_ALIAS_THUMB_STATE __aeabi_memcpy4, memcpy
+	ASM_ALIAS_THUMB_STATE __aeabi_memcpy8, memcpy
 memcpy:
 	// r0: dst
 	// r1: src

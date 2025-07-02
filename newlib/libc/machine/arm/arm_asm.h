@@ -521,14 +521,10 @@
 	.endif
 .endm
 
-.macro	ASM_ALIAS new old
+.macro	ASM_ALIAS_THUMB_STATE new old
 	.global	\new
 	.type	\new, %function
-#if defined (__thumb__)
 	.thumb_set	\new, \old
-#else
-	.set	\new, \old
-#endif
 .endm
 
 .macro	ASM_ALIAS_ARM_STATE new old
