@@ -81,8 +81,10 @@ specialcase (double_t tmp, uint64_t sbits, uint64_t ki)
       lo = 1.0 - hi + y + lo;
       y = eval_as_double (hi + lo) - 1.0;
       /* Avoid -0.0 with downward rounding.  */
-      if (WANT_ROUNDING && y == 0.0)
+#if WANT_ROUNDING
+      if (y == 0.0)
 	y = 0.0;
+#endif
       /* The underflow exception needs to be signaled explicitly.  */
       force_eval_double (opt_barrier_double (0x1p-1022) * 0x1p-1022);
     }
@@ -111,7 +113,11 @@ exp (double x)
       if (abstop - top12 (0x1p-54) >= 0x80000000)
 	/* Avoid spurious underflow for tiny x.  */
 	/* Note: 0 is common input.  */
-	return WANT_ROUNDING ? 1.0 + x : 1.0;
+#if WANT_ROUNDING
+	return 1.0 + x;
+#else
+	return 1.0;
+#endif
       if (abstop >= top12 (1024.0))
 	{
 	  if (asuint64 (x) == asuint64 ((double) -INFINITY))

@@ -69,8 +69,10 @@ double
     {
       /* Handle close to 1.0 inputs separately.  */
       /* Fix sign of zero with downward rounding when x==1.  */
-      if (WANT_ROUNDING && unlikely (ix == asuint64 (1.0)))
+#if WANT_ROUNDING
+      if (unlikely (ix == asuint64 (1.0)))
 	return 0;
+#endif
       r = x - 1.0;
 #if __HAVE_FAST_FMA
       hi = r * InvLn2hi;
