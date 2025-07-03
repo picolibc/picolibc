@@ -19,7 +19,6 @@
 static const float
 ln2_hi =   6.9313812256e-01,	/* 0x3f317180 */
 ln2_lo =   9.0580006145e-06,	/* 0x3717f7d1 */
-two25 =    3.355443200e+07,	/* 0x4c000000 */
 Lp1 = 6.6666668653e-01,	/* 3F2AAAAB */
 Lp2 = 4.0000000596e-01,	/* 3ECCCCCD */
 Lp3 = 2.8571429849e-01, /* 3E924925 */
@@ -49,11 +48,10 @@ log1pf(float x)
 		    return __math_invalidf (x);	/* log1p(x<-1)=NaN */
 	    }
 	    if(ax<0x31000000) {			/* |x| < 2**-29 */
-		if(two25+x>zero			/* raise inexact */
-	            &&ax<0x24800000) 		/* |x| < 2**-54 */
-		    return x;
+		if(ax<0x24800000) 		/* |x| < 2**-54 */
+		    return __math_inexactf(x);
 		else
-		    return x - x*x*(float)0.5;
+		    return __math_inexactf(x - x*x*(float)0.5);
 	    }
 	    if(hx>0||hx<=((__int32_t)0xbe95f61f)) {
 		k=0;f=x;hu=1;}	/* -0.2929<x<0.41422 */
