@@ -185,10 +185,8 @@ _NAME_64(expm1)(__float64 x)
 	        }
 	        if(x > o_threshold) return __math_oflow (0); /* overflow */
 	    }
-	    if(xsb!=0) { /* x < -56*ln2, return -1.0 with inexact */
-		if(x+tiny<_F_64(0.0))		/* raise inexact */
-		return tiny-one;	/* return -1 */
-	    }
+	    if(xsb!=0) /* x < -56*ln2, return -1.0 with inexact */
+		return __math_inexact64(tiny-one);	/* return -1 */
 	}
 
     /* argument reduction */

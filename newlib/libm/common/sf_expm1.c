@@ -53,10 +53,8 @@ float expm1f(float x)
 		return (xsb==0)? x:-1.0f;/* exp(+-inf)={inf,-1} */
 	    if(xsb == 0 && hx > FLT_UWORD_LOG_MAX) /* if x>=o_threshold */
 		return __math_oflowf (0); /* overflow */
-	    if(xsb!=0) { /* x < -27*ln2, return -1.0 with inexact */
-		if(x+tiny<0.0f)	/* raise inexact */
-		return tiny-one;	/* return -1 */
-	    }
+	    if(xsb!=0) /* x < -27*ln2, return -1.0 with inexact */
+		return __math_inexactf(tiny-one);	/* return -1 */
 	}
 
     /* argument reduction */
