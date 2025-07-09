@@ -44,7 +44,6 @@ sqrtf(float x)
 #endif
 	return result;
 }
-
-#else
-#include "../../math/sf_sqrt.c"
 #endif
+
+#include "Csqrt.c"
