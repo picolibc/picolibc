@@ -47,8 +47,8 @@ log1pf(float x)
 		else
 		    return __math_invalidf (x);	/* log1p(x<-1)=NaN */
 	    }
-	    if(ax<0x31000000) {			/* |x| < 2**-29 */
-		if(ax<0x24800000) 		/* |x| < 2**-54 */
+	    if(ax<0x39000000) {			/* |x| < 2**-13 */
+		if(ax<0x32800000) 		/* |x| < 2**-26 */
 		    return __math_inexactf(x);
 		else
 		    return __math_inexactf(x - x*x*(float)0.5);
