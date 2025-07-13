@@ -92,9 +92,8 @@ static uint32_t mantissa_sqrt(uint32_t x)
     x0<<=23;
     int64_t residual=x0-msquared;
     if (residual>new_mantissa)
-    {
             new_mantissa+=1;
-    }  
+
     return new_mantissa; 
 }
 #endif
@@ -115,13 +114,10 @@ static uint32_t mantissa_rsqrt(uint32_t x)
     uint64_t S=B_hi+C;
     uint32_t P=S>>32;
     uint32_t Q=1u<<(9);
-    if (P >= Q)
-    { 
-       return  U>>1;
-    } else 
-    {
-       return (U+1)>>1;
-    }
+    if (P < Q)
+       U+=1;
+
+    return U>>1;
 }
 #endif
 
