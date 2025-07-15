@@ -138,9 +138,7 @@ extern double fmod (double, double);
 #if __MISC_VISIBLE
 extern int finite (double);
 extern int finitef (float);
-extern int isinf (double);
 extern int isinff (float);
-extern int isnan (double);
 extern int isnanf (float);
 #if defined(__HAVE_LONG_DOUBLE)
 extern int finitel (long double);
