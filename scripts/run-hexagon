@@ -1,0 +1,40 @@
+#!/bin/sh
+dir="$(dirname "$0")"
+
+simulator="qemu-system-hexagon"
+# select the program
+elf="$1"
+shift
+
+cmdline="program-name"
+input=""
+done=0
+
+while [ "$done" != "1" ]; do
+    case "$1" in
+        --)
+            shift
+            done=1
+            ;;
+        -s|"")
+            done=1
+            ;;
+        *)
+            cmdline="$cmdline $1"
+            case "$input" in
+                "")
+                    input="$1"
+                    ;;
+                *)
+                    input="$input $1"
+                    ;;
+            esac
+            shift
+            ;;
+    esac
+done
+
+echo $input
+echo $cmdline
+
+echo $input | $simulator  -cpu v68 -M virt -kernel $elf
