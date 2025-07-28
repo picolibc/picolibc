@@ -1,0 +1,34 @@
+[binaries]
+# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
+# so we have to add -nostdlib to the compiler configuration itself or
+# early compiler tests will fail. This can be removed when picolibc
+# requires at least version 0.54.2 of meson.
+c = ['clang', '--target=hexagon-unknown-none-elf', '-mv68', '-fno-pic', '-fno-PIE', '-static', '-nostdlib', '-fuse-init-array', '-G0']
+cpp = ''
+c_ld = 'eld'
+ar = 'ar'
+as = 'as'
+nm = 'nm'
+strip = 'strip'
+objcopy = 'objcopy'
+# only needed to run tests
+exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-hexagon "$@"', 'run-hexagon']
+
+[host_machine]
+system='linux'
+cpu_family='hexagon'
+cpu='hexagon'
+endian='little'
+
+[properties]
+# hardcode runtime library, otherwise meson build configuration will add '-lgcc'
+# use -Dc_link_args=-L$(clang -print-resource-dir)/lib/hexagon-unknown-none-elf flag while calling hexagon configure script
+# so that clang can find builtins library
+libgcc = '-lclang_rt.builtins'
+skip_sanity_check = true
+needs_exe_wrapper = true
+link_spec = '--build-id=none'
+default_ram_addr   = '0x00500000'
+default_ram_size   = '0x00800000'
+default_flash_addr   = '0x00100000'
+default_flash_size   = '0x00400000'

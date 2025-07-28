@@ -1,0 +1,1 @@
+exec "$(dirname "$0")"/do-configure clang-hexagon -Dtests=true -Dmultilib=false -Dposix-console=true -Dtests-enable-posix-io=true -Dtests-enable-full-malloc-stress=true -Dtest-stdin=true "$@"
