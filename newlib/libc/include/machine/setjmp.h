@@ -14,6 +14,14 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 _BEGIN_STD_C
 
+#if defined (__HEXAGON_ARCH__)
+/*
+ * r16 -  r31
+ */
+#define _JBLEN 16
+#define _JBTYPE long
+#endif
+
 #if defined(__or1k__) || defined(__or1knd__)
 /*
  * r1, r2, r9, r14, r16 .. r30, SR.

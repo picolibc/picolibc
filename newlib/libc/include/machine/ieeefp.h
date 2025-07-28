@@ -495,6 +495,10 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __IEEE_LITTLE_ENDIAN
 #endif
 
+#ifdef __HEXAGON_ARCH__
+#define __IEEE_LITTLE_ENDIAN
+#endif
+
 #ifdef __x86_64__
 #define __IEEE_LITTLE_ENDIAN
 #ifndef _SOFT_FLOAT
