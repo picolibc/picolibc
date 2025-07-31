@@ -261,10 +261,10 @@ fmag_of_error (float is,
   int a_big;
   uint32_t mask;
   uint32_t sw;
+
   a.value = is;
-  
   b.value = shouldbe;
-  
+
   if (a.p1 == b.p1) return 32;
 
   /* Subtract the larger from the smaller number */
@@ -432,6 +432,16 @@ test_mfok (float value,
       !!__issignalingf(shouldbe) == !!__issignalingf(value))
       mag = 32;
 #endif
+
+  /* NAN bits can be different for some platforms, like Hexagon
+   * so instead of comparing all the bits, just ensure that
+   * both NAN values are of same kind (signaling/quiet)
+   */
+  if (isnan(value) && isnan(shouldbe) &&
+      (__issignalingf(value) == __issignalingf(shouldbe))) {
+      mag = 32;
+  }
+
   a.value = shouldbe;
   b.value = value;
   
