@@ -431,8 +431,12 @@ conv_flt (FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, u
 	    if (!isdigit (edig))
             {
                 scanf_ungetc(edig, stream, context);
-                if (esign != EOF)
-                    scanf_ungetc(esign, stream, context);
+                if (esign != EOF) {
+                    esign = scanf_getc (stream, context);
+                    if(!isdigit (esign))
+                        return 0;
+                    scanf_ungetc(edig, stream, context);
+                    }
                 goto no_exp;
             }
 
