@@ -1,6 +1,7 @@
 #include "hexagon_semihost.h"
+#include <errno.h>
 
-struct hexagon_semihost_return
+int
 hexagon_semihost(enum hexagon_system_call_code code, int *args)
 {
     // Store system call number in r0
@@ -8,6 +9,9 @@ hexagon_semihost(enum hexagon_system_call_code code, int *args)
     // Store pointer to array of system call arguments in r1
     register uintptr_t r1 __asm__("r1") = (int)args;
     __asm__ __volatile__(SWI : "=r"(r0), "=r"(r1) : "r"(r0), "r"(r1));
-    struct hexagon_semihost_return retval_errno = { r0, r1 };
-    return retval_errno;
+    int retval = r0;
+    if (retval == -1) {
+        errno = r1;
+    }
+    return retval;
 }

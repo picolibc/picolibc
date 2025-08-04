@@ -26,12 +26,6 @@ int flen(int fd);
 int hexagon_ftell(int fd);
 int sys_get_cmdline(char *buffer, int count);
 
-/* Semihosting call */
-struct hexagon_semihost_return {
-    int return_value;
-    int error_num;
-};
-struct hexagon_semihost_return
-hexagon_semihost(enum hexagon_system_call_code code, int *args);
+int hexagon_semihost(enum hexagon_system_call_code code, int *args);
 
 #endif

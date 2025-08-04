@@ -1,6 +1,5 @@
 #include "fcntl.h"
 #include "hexagon_semihost.h"
-#include <errno.h>
 #include <string.h>
 
 #define O_BINARY 0
@@ -62,9 +61,6 @@ open(const char *name, int mode, ...)
 
     size_t length = strlen(name);
     int args[] = { (int)name, semimode, length };
-    struct hexagon_semihost_return retval = hexagon_semihost(SYS_OPEN, args);
-    if (retval.return_value == -1) {
-        errno = retval.error_num;
-    }
-    return retval.return_value;
+    int retval = hexagon_semihost(SYS_OPEN, args);
+    return retval;
 }

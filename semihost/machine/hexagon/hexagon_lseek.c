@@ -1,12 +1,9 @@
 #include "hexagon_semihost.h"
-#include "sys/errno.h"
 #include <errno.h>
-#include <stdio.h>
 #include <unistd.h>
 
 off_t
 lseek(int fd, off_t offset, int whence)
-
 {
     off_t file_offset = 0;
     switch (whence) {
@@ -31,9 +28,6 @@ lseek(int fd, off_t offset, int whence)
     offset += file_offset;
 
     int args[] = { fd, offset };
-    struct hexagon_semihost_return retval = hexagon_semihost(SYS_SEEK, args);
-    if (retval.return_value == -1) {
-        errno = retval.error_num;
-    }
-    return retval.return_value;
+    int retval = hexagon_semihost(SYS_SEEK, args);
+    return retval;
 }
