@@ -6,7 +6,7 @@
 c = ['clang', '-target', 'aarch64-none-elf', '-nostdlib']
 cpp = ['clang', '-target', 'aarch64-none-elf', '-nostdlib']
 ar = 'llvm-ar'
-as = 'llvm-as'
+as = 'clang'
 nm = 'llvm-nm'
 strip = 'llvm-strip'
 # only needed to run tests
