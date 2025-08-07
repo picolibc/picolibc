@@ -67,7 +67,7 @@ fcvtf_r (float invalue,
          */
         if (ndecimal < 0)
             dtoa_decimal = 0;
-        ndigit = __ftoa_engine(invalue, &dtoa, FTOA_MAX_DIG, true, ndecimal);
+        ndigit = __ftoa_engine(asuint(invalue), &dtoa, FTOA_MAX_DIG, true, ndecimal);
         *sign = !!(dtoa.flags & DTOA_MINUS);
 
         /*

@@ -180,10 +180,14 @@
 #define FLOAT double
 #elif defined(_NEED_IO_FLOAT)
 #define SKIP_FLOAT_ARG(flags, ap) (void) va_arg(ap, uint32_t)
-#define FLOAT float
+#define FLOAT_UINT uint32_t
 #else
 #define SKIP_FLOAT_ARG(flags, ap) (void) va_arg(ap, double)
-#define FLOAT double
+#if __SIZEOF_DOUBLE__ == 8
+#define FLOAT_UINT uint64_t
+#elif __SIZEOF_DOUBLE__ == 4
+#define FLOAT_UINT uint32_t
+#endif
 #endif
 
 #ifdef _NEED_IO_LONG_LONG
@@ -743,8 +747,8 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #ifdef _NEED_IO_LONG_DOUBLE
             if ((flags & (FL_LONG | FL_REPD_TYPE)) == (FL_LONG | FL_REPD_TYPE))
             {
-                long double fval;
-                fval = va_arg(ap, long double);
+                PRINTF_LONG_DOUBLE_TYPE fval;
+                fval = PRINTF_LONG_DOUBLE_ARG(ap);
 
                 ndigs = 0;
 
@@ -794,7 +798,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
             else
 #endif
             {
-                FLOAT fval;        /* value to print */
+                FLOAT_UINT fval;        /* value to print */
                 fval = PRINTF_FLOAT_ARG(ap);
 
                 ndigs = 0;

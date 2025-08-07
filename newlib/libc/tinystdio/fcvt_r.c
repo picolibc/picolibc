@@ -69,7 +69,7 @@ fcvt_r (double invalue,
          */
         if (ndecimal < 0)
             dtoa_decimal = 0;
-        ndigit = __dtoa_engine(invalue, &dtoa, DTOA_MAX_DIG, true, ndecimal);
+        ndigit = __dtoa_engine(asuint64(invalue), &dtoa, DTOA_MAX_DIG, true, ndecimal);
         *sign = !!(dtoa.flags & DTOA_MINUS);
 
         /*
