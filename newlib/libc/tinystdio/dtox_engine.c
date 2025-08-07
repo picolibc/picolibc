@@ -51,7 +51,6 @@
 
 #define DTOX_UINT       uint64_t
 #define DTOX_INT        int64_t
-#define DTOX_FLOAT      FLOAT64
 #define DTOX_ASUINT(x)  asuint64(x)
 
 #define EXP_SHIFT       52
@@ -72,7 +71,6 @@
 
 #define DTOX_UINT       uint32_t
 #define DTOX_INT        int32_t
-#define DTOX_FLOAT      float
 #define DTOX_ASUINT(x)  asuint(x)
 
 #define EXP_SHIFT       23
@@ -97,19 +95,18 @@
  * This code assumes that there is an integer type suitable for holding
  * the entire floating point value.
  *
- * Define DTOX_UINT, DTOX_INT, DTOX_FLOAT and DTOX_SIZE before including
+ * Define DTOX_UINT, DTOX_INT and DTOX_SIZE before including
  * this file.
  */
 
 #define TOCASE(c)       ((c) - case_convert)
 
 int
-__dtox_engine (DTOX_FLOAT x, struct dtoa *dtoa, int prec, unsigned char case_convert)
+__dtox_engine (DTOX_UINT ufi, struct dtoa *dtoa, int prec, unsigned char case_convert)
 {
-    DTOX_INT fi, s;
+    DTOX_INT fi = (DTOX_INT) ufi;
+    DTOX_INT s;
     int exp, d;
-
-    fi = ASUINT(x);
 
     dtoa->flags = 0;
     if (fi < 0)

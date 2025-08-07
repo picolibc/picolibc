@@ -87,28 +87,21 @@ static const uint32_t factorTable[32] = {
 		__typeof(b) _b = b;\
 		_a < _b ? _a : _b; })
 
-int __ftoa_engine(float val, struct dtoa *ftoa, int maxDigits, bool fmode, int maxDecimals) 
+int __ftoa_engine(uint32_t val, struct dtoa *ftoa, int maxDigits, bool fmode, int maxDecimals) 
 {
     uint8_t flags = 0;
 
-    union {
-        float v;
-        uint32_t u;
-    } x;
-
-    x.v = val;
-
-    uint32_t frac = x.u & 0x007fffffUL;
+    uint32_t frac = val & 0x007fffffUL;
 
     if (maxDigits > FTOA_MAX_DIG)
         maxDigits = FTOA_MAX_DIG;
 
     /* Read the sign, shift the exponent in place and delete it from frac.
      */
-    if (x.u & ((uint32_t)1 << 31))
+    if (val & ((uint32_t)1 << 31))
         flags = DTOA_MINUS;
 
-    uint8_t exp = x.u >> 23;
+    uint8_t exp = val >> 23;
 
     ftoa->exp = 0;
 

@@ -62,16 +62,15 @@ high_bit_set(uint64_t fract)
 }
 
 int
-__dtoa_engine(FLOAT64 x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
+__dtoa_engine(uint64_t v, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
 {
-        uint64_t v = asuint64(x);
         uint64_t fract = (v << (EXPONENT_BITS + 1)) >> 1;
         int expo = (v << 1) >> (FRACTION_BITS + 1);
         int decexp = 0;
         int i;
 	uint8_t	flags = 0;
 
-	if (high_bit_set(v))
+	if ((int64_t) v < 0)
 		flags |= DTOA_MINUS;
 	if (expo == EXPONENT_MASK) {
                 if (fract)
