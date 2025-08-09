@@ -30,16 +30,74 @@
  */
 
 #include <complex.h>
+#include <math.h>
+#include <float.h>
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+/* GCC analyzer gets confused about the use of 'res' here */
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#endif
 
 long double complex
 casinhl(long double complex z)
 {
-	long double complex w;
 
-	w = -1.0L * (long double complex) I * casinl(z * (long double complex) I);
-	return w;
+    long double x = fabsl(creall(z));
+    long double y = fabsl(cimagl(z));
+    long double complex res;
+    long double complex w;
+
+    const long double eps = LDBL_EPSILON;
+
+    if (y == 0.0L) {
+        if (isnan(x)) {
+            res = CMPLXL(NAN, copysignl(0.0L, cimagl(z)));
+        }
+        else if (isinf(x)) {
+            res = CMPLXL(x, copysignl(0.0L, cimagl(z)));
+        }
+        else {
+            res = CMPLXL(asinhl(x), copysignl(0.0L, cimagl(z)));
+        }
+    }
+    /* Handle large values */
+    else if (x >= 1.0L/eps || y >= 1.0L/eps) {
+        res = clogl(CMPLXL(x, y));
+        res = CMPLXL(creall(res) + _M_LN2_LD, cimagl(res));
+
+    }
+
+    /* Case where real part >= 0.5 and imag part very samll */
+    else if (x >= 0.5L && y < eps/8.0L) {
+        long double s = hypotl(1.0L, x);
+        res = CMPLXL(logl(x + s), atan2l(y, s));
+    }
+
+    /* Case Where real part very small and imag part >= 1.5 */
+    else if (x < eps/8.0L && y >= 1.5L) {
+        long double s = sqrtl((y + 1.0L) * (y - 1.0L));
+        res = CMPLXL(logl(y + s), atan2l(s, x));
+    }
+
+    else {
+        /* General case */
+        w = CMPLXL((x - y) * (x + y) + 1.0L, (2.0L * x * y));
+        w = csqrtl(w);
+
+        w = CMPLXL(x + creall(w), y + cimagl(w));
+        res = clogl(w);
+    }
+
+    /* Apply correct signs */
+    res = CMPLXL(copysignl(creall(res), creall(z)),
+                 copysignl(cimagl(res), cimagl(z)));
+
+    return res;
 }
 
 #endif
