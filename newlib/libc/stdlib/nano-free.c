@@ -44,8 +44,9 @@ free (void * free_p)
     chunk_t     **p, *r;
 
     if (free_p == NULL) return;
-
-    p_to_free = ptr_to_chunk(free_p);
+    
+    r = chunk_to_blob(free_p);
+    p_to_free = ptr_to_chunk(r);
 
 #ifdef __NANO_MALLOC_CLEAR_FREED
     memset(p_to_free, 0, chunk_usable(p_to_free));
