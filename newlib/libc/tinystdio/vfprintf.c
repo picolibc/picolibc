@@ -628,10 +628,10 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 		    c -= '0';
 		    if (flags & FL_PREC) {
 			prec = 10*prec + c;
-			continue;
-		    }
-		    width = 10*width + c;
-		    flags |= FL_WIDTH;
+		    } else {
+                        width = 10*width + c;
+                        flags |= FL_WIDTH;
+                    }
 #endif
 		    continue;
 		}
@@ -647,20 +647,9 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 #endif
 		    if (flags & FL_PREC) {
 			prec = va_arg(ap, int);
-#ifdef _NEED_IO_SHRINK
-                        (void) prec;
-#endif
 		    } else {
 			width = va_arg(ap, int);
 			flags |= FL_WIDTH;
-#ifdef _NEED_IO_SHRINK
-                        (void) width;
-#else
-			if (width < 0) {
-			    width = -width;
-			    flags |= FL_LPAD;
-			}
-#endif
 		    }
 		    continue;
 		}
@@ -719,6 +708,15 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	    prec = 0;
 	    flags &= ~FL_PREC;
 	}
+
+        /* Handle negative width when provided via a '*' */
+        if (width < 0) {
+            width = -width;
+            flags |= FL_LPAD;
+        }
+#else
+        (void) prec;
+        (void) width;
 #endif
 
 	/* Only a format character is valid.	*/
