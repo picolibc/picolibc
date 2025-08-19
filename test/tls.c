@@ -66,6 +66,7 @@ extern char __tdata_start[], __tdata_end[];
 extern char __tdata_source[], __tdata_source_end[];
 extern char __data_start[], __data_source[];
 extern char __non_tls_bss_start[];
+extern char __tls_base[];
 
 static bool
 inside_tls_region(void *ptr, const void *tls)
@@ -203,19 +204,20 @@ check_tls(char *where, bool check_addr, void *tls_region)
 			result++;
 		}
 	}
-#ifdef __THREAD_LOCAL_STORAGE_API
+#if defined(__THREAD_LOCAL_STORAGE_API)
 	check_inside_tls_region(&data_var, tls_region);
 	check_inside_tls_region(&overaligned_data_var, tls_region);
 	check_inside_tls_region(&bss_var, tls_region);
 	check_inside_tls_region(&overaligned_bss_var, tls_region);
 
-        char *tdata_end = __tdata_start + _tls_size();
+#ifndef INIT_TLS
         /*
          * We allow for up to OVERALIGN_NON_TLS_BSS -1 bytes of padding after
          * the end of .tbss and the start of aligned .bss since in theory the
          * linker could fill this space with smaller .bss variables before the
          * overaligned value that we define in this file.
          */
+        char *tdata_end = __tls_base + _tls_size();
         char *non_tls_bss_start_latest = __align_up(
             tdata_end + OVERALIGN_NON_TLS_BSS, OVERALIGN_NON_TLS_BSS);
         if (__non_tls_bss_start < tdata_end ||
@@ -227,10 +229,11 @@ check_tls(char *where, bool check_addr, void *tls_region)
                 result++;
         }
 #endif
+#endif
 	return result;
 }
 
-#ifdef __THREAD_LOCAL_STORAGE_API
+#if defined(__THREAD_LOCAL_STORAGE_API)
 static void
 hexdump(const void *ptr, int length, const char *hdr)
 {
@@ -260,28 +263,31 @@ main(void)
 	bss_addr = &bss_var;
         overaligned_bss_addr = &overaligned_bss_var;
 
-#ifdef __THREAD_LOCAL_STORAGE_API
-        printf("TLS region: %p-%p (%zd bytes)\n", __tdata_start,
-	       __tdata_start + _tls_size(), _tls_size());
+#if defined(__THREAD_LOCAL_STORAGE_API)
+        printf("TLS region: %p-%p (%zd bytes)\n", __tls_base,
+	       __tls_base + _tls_size(), _tls_size());
 	size_t tdata_source_size = (uintptr_t) __tdata_source_end - (uintptr_t) __tdata_source;
 	size_t tdata_size = (uintptr_t) __tdata_end - (uintptr_t) __tdata_start;
 
+#ifndef INIT_TLS
 	if ((uintptr_t) __tdata_start - (uintptr_t) __data_start != (uintptr_t) __tdata_source - (uintptr_t) __data_source) {
 		printf("ROM/RAM .tdata offset from .data mismatch. "
 		       "VMA offset=%zd, LMA offset =%zd."
 		       "Linker behaviour changed?\n",
 		       (uintptr_t) __tdata_start - (uintptr_t) __data_start,
 		       (uintptr_t) __tdata_source - (uintptr_t) __data_source);
+                result++;
 	}
+#endif
 
 	if (tdata_source_size != tdata_size ||
-	    memcmp(&__tdata_source, &__tdata_start, tdata_size) != 0) {
+	    memcmp(&__tdata_source, &__tls_base, tdata_size) != 0) {
 		printf("TLS data in RAM does not match ROM\n");
 		hexdump(__tdata_source, tdata_source_size, "ROM:");
-		hexdump(__tdata_start, tdata_size, "RAM:");
+		hexdump(__tls_base, tdata_size, "RAM:");
 		result++;
 	}
-        result += check_tls("pre-defined", false, __tdata_start);
+        result += check_tls("pre-defined", false, __tls_base);
 #else
         result += check_tls("pre-defined", false, NULL);
 #endif
@@ -302,14 +308,12 @@ main(void)
 
             _init_tls(tls);
             _set_tls(tls);
-
             if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
 		printf("New TLS data in RAM does not match ROM\n");
 		hexdump(&__tdata_source, tdata_source_size, "ROM:");
 		hexdump(tls, tdata_size, "RAM:");
 		result++;
             }
-
             result += check_tls("allocated", true, tls);
         } else {
             printf("TLS allocation failed\n");

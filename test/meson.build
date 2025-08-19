@@ -108,7 +108,7 @@ plain_tests = plain_tests_common
 
 plain_tests += math_tests + [
   'test-funopen',
-  'tls',  
+  'tls',
 ]
 
 plain_tests += ['test-memcpy_s',
@@ -363,6 +363,24 @@ foreach params : targets
 		    link_args:  _link_args,
 		    objects: _objs_minimal,
 		    link_depends:  _link_depends,
+		    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+	 env: test_env)
+  endif
+
+  if is_variable('crt0_inittls_semihost' + target)
+    _link_inittls_args = target_c_args + _lib_files + get_variable('test_inittls_link_args' + target, test_link_args)
+    _link_inittls_depends = get_variable('test_inittls_link_depends' + target, test_inittls_link_depends) + _libs
+    _objs_inittls = [get_variable('crt0_inittls_semihost'+ target)]
+    t1 = 'tls-init'
+
+    test(t1 + target,
+	 executable(t1 + target, ['tls.c', 'lock-valid.c'],
+		    c_args: _c_args + ['-DINIT_TLS'],
+		    link_args:  _link_inittls_args,
+		    objects: _objs_inittls,
+		    link_depends:  _link_inittls_depends,
 		    include_directories: inc),
          depends: bios_bin,
          suite: 'test',
