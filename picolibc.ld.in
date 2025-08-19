@@ -123,21 +123,40 @@ SECTIONS
 
 	} >flash AT>flash :text
 
-	/*
-	 * Procedure linkage table. This ends up
-	 * with an array of structs containing pointers
-	 * to the function descriptors and iplt references
-	 * that need to contain them after startup.
-	 */
-	@BFD_START@
-	.plt : {
-		*(.rela.iplt)
-		*(.rela.*)
-	} >flash AT>flash :text
+@INITTLS@	/* TLS data when stored in separately allocate tls_space section */
+@INITTLS@	.tdata :
+@INITTLS@ @LLD@		ALIGN(@PREFIX@__tls_align)
+@INITTLS@	{
+@INITTLS@		PROVIDE( @PREFIX@__tls_first = . );
+@INITTLS@		*(.tdata .tdata.* .gnu.linkonce.td.*)
+@INITTLS@		PROVIDE( @PREFIX@__tdata_end = . );
+@INITTLS@	} >flash :@TLS_INIT_SEG@ :text
+@INITTLS@
+@INITTLS@	/* lld allocates flash space for this section; it would
+@INITTLS@	 * be nice to fix that. */
+@INITTLS@	.tbss (NOLOAD) : {
+@INITTLS@		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+@INITTLS@		*(.tcommon)
+@INITTLS@		PROVIDE( @PREFIX@__tls_end = . );
+@INITTLS@		PROVIDE( @PREFIX@__tbss_end = . );
+@INITTLS@	} >flash :tls :text
+@INITTLS@
+@INITTLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
+@INITTLS@	PROVIDE( @PREFIX@__tls_space_size = @PREFIX@__tls_end - @PREFIX@__tls_start );
 
-	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
-	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
-	@BFD_END@
+@BFD@	/*
+@BFD@	 * Procedure linkage table. This ends up
+@BFD@	 * with an array of structs containing pointers
+@BFD@	 * to the function descriptors and iplt references
+@BFD@	 * that need to contain them after startup.
+@BFD@	 */
+@BFD@	.plt : {
+@BFD@		*(.rela.iplt)
+@BFD@		*(.rela.*)
+@BFD@	} >flash AT>flash :text
+@BFD@
+@BFD@	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
+@BFD@	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
 
 	/*
 	 * Needs to be in its own segment with the PLT entries first
@@ -159,31 +178,29 @@ SECTIONS
 		*(.iplt .iplt.*)
 	} >flash AT>flash :text
 
-	/* additional sections when compiling with C++ exception support */
-	@CPP_START@
-	.except_ordered : {
-		*(.gcc_except_table *.gcc_except_table.*)
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
-	} >flash AT>flash :text
-	.eh_frame_hdr : {
-		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
-		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
-		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
-	} >flash AT>flash :text
-	.eh_frame : {
-		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
-		KEEP (*(.eh_frame .eh_frame.*))
-		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
-	} >flash AT>flash :text
-
-	.except_unordered : {
-		. = ALIGN(@DEFAULT_ALIGNMENT@);
-
-		PROVIDE(@PREFIX@__exidx_start = .);
-		*(.ARM.exidx*)
-		PROVIDE(@PREFIX@__exidx_end = .);
-	} >flash AT>flash :text
-	@CPP_END@
+@CPP@	/* additional sections when compiling with C++ exception support */
+@CPP@	.except_ordered : {
+@CPP@		*(.gcc_except_table *.gcc_except_table.*)
+@CPP@		*(.ARM.extab* .gnu.linkonce.armextab.*)
+@CPP@	} >flash AT>flash :text
+@CPP@	.eh_frame_hdr : {
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
+@CPP@		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
+@CPP@	} >flash AT>flash :text
+@CPP@	.eh_frame : {
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
+@CPP@		KEEP (*(.eh_frame .eh_frame.*))
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
+@CPP@	} >flash AT>flash :text
+@CPP@
+@CPP@	.except_unordered : {
+@CPP@		. = ALIGN(@DEFAULT_ALIGNMENT@);
+@CPP@
+@CPP@		PROVIDE(@PREFIX@__exidx_start = .);
+@CPP@		*(.ARM.exidx*)
+@CPP@		PROVIDE(@PREFIX@__exidx_end = .);
+@CPP@	} >flash AT>flash :text
 
 	/*
 	 * Data values which are preserved across reset
@@ -195,7 +212,27 @@ SECTIONS
 		PROVIDE(@PREFIX@__preserve_end__ = .);
 	} >ram AT>ram :ram
 
-	.data : @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
+@INITTLS@	/* Pre-allocate space for an initial TLS area */
+@INITTLS@	.tls_space (NOLOAD) : {
+@INITTLS@
+@INITTLS@		PROVIDE( @PREFIX@__tls_head_start = .);
+@INITTLS@		KEEP (*(.stack_chk .stack_chk.*))
+@INITTLS@		PROVIDE( @PREFIX@__tls_head_end = .);
+@INITTLS@
+@INITTLS@		. = ALIGN(@PREFIX@__tls_align);
+@INITTLS@		PROVIDE( @PREFIX@__tls_space = .);
+@INITTLS@		. = . + @PREFIX@__tls_space_size;
+@INITTLS@
+@INITTLS@		. = ALIGN(@PREFIX@__tls_align);
+@INITTLS@		PROVIDE( @PREFIX@__tls_tail_start = . );
+@INITTLS@		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
+@INITTLS@		PROVIDE( @PREFIX@__tls_tail_end = . );
+@INITTLS@
+@INITTLS@	} >ram AT>ram :ram
+
+	.data :
+@BFD@		ALIGN_WITH_INPUT
+	{
 		*(.data .data.* @EXTRA_DATA_SECTIONS@)
 		*(.gnu.linkonce.d.*)
 
@@ -206,6 +243,7 @@ SECTIONS
 		PROVIDE( @PREFIX@_gp = . + 0x8000);
 		*(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
 		*(.gnu.linkonce.s.*)
+
 		/*
 		 * Make sure there is space for PowerPC thread-local
 		 * stack-check value which lives before the thread
@@ -214,37 +252,71 @@ SECTIONS
 		 * offsets for it; in reality, it lives at a known
 		 * fixed offset outside of the usual TLS range
 		 */
-		PROVIDE( @PREFIX@__stack_chk_start = .);
-		KEEP (*(.stack_chk .stack_chk.*))
-		PROVIDE( @PREFIX@__stack_chk_end = .);
+@DATATLS@		PROVIDE( @PREFIX@__tls_head_start = .);
+@DATATLS@		KEEP (*(.stack_chk .stack_chk.*))
+@DATATLS@		PROVIDE( @PREFIX@__tls_head_end = .);
+
+@INITTLS@		PROVIDE( @PREFIX@__data_end = . );
+
 	} >ram AT>flash :ram_init
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
 	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
 	PROVIDE(@PREFIX@__x86_gdt_ro = DEFINED(@PREFIX@__x86_gdt) ? @PREFIX@__x86_gdt - @PREFIX@__data_start + @PREFIX@__data_source : 0);
 
-	/* Thread local initialized data. This gets
-	 * space allocated as it is expected to be placed
-	 * in ram to be used as a template for TLS data blocks
-	 * allocated at runtime. We're slightly abusing that
-	 * by placing the data in flash where it will be copied
-	 * into the allocate ram addresses by the existing
-	 * data initialization code in crt0.
-	 * BFD includes .tbss alignment when computing .tdata
-	 * alignment, but for ld.lld we have to explicitly pad
-	 * as it only guarantees usage as a TLS template works
-	 * rather than supporting this use case.
-	 */
-	.tdata : @LLD_START@ ALIGN(@PREFIX@__tls_align) @LLD_END@ @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
-		*(.tdata .tdata.* .gnu.linkonce.td.*)
-		PROVIDE(@PREFIX@__data_end = .);
-		PROVIDE(@PREFIX@__tdata_end = .);
-	} >ram AT>flash :@TLS_INIT_SEG@ :ram_init
-	PROVIDE( @PREFIX@__stack_chk_size = @PREFIX@__stack_chk_end - @PREFIX@__stack_chk_start );
-	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata) - @PREFIX@__stack_chk_size );
-	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) - @PREFIX@__stack_chk_size );
+@DATATLS@	/* Thread local initialized data. This gets
+@DATATLS@	 * space allocated as it is expected to be placed
+@DATATLS@	 * in ram to be used as a template for TLS data blocks
+@DATATLS@	 * allocated at runtime. We're slightly abusing that
+@DATATLS@	 * by placing the data in flash where it will be copied
+@DATATLS@	 * into the allocate ram addresses by the existing
+@DATATLS@	 * data initialization code in crt0.
+@DATATLS@	 * BFD includes .tbss alignment when computing .tdata
+@DATATLS@	 * alignment, but for ld.lld we have to explicitly pad
+@DATATLS@	 * as it only guarantees usage as a TLS template works
+@DATATLS@	 * rather than supporting this use case.
+@DATATLS@	 */
+@DATATLS@	.tdata :
+@DATATLS@ @LLD@		ALIGN(@PREFIX@__tls_align)
+@DATATLS@ @BFD@		ALIGN_WITH_INPUT
+@DATATLS@	{
+@DATATLS@		PROVIDE( @PREFIX@__tls_first = . );
+@DATATLS@		*(.tdata .tdata.* .gnu.linkonce.td.*)
+@DATATLS@		PROVIDE( @PREFIX@__data_end = . );
+@DATATLS@		PROVIDE( @PREFIX@__tdata_end = . );
+@DATATLS@	} >ram AT>flash :@TLS_INIT_SEG@ :ram_init
+@DATATLS@
+@DATATLS@	.tbss (NOLOAD) : {
+@DATATLS@		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+@DATATLS@		*(.tcommon)
+@DATATLS@		PROVIDE( @PREFIX@__tls_end = . );
+@DATATLS@		PROVIDE( @PREFIX@__tbss_end = . );
+@DATATLS@	} >ram AT>ram :tls :ram
+@DATATLS@
+@DATATLS@ @BFD@	/*
+@DATATLS@ @BFD@	 * Unlike ld.lld, ld.bfd does not advance the location counter for
+@DATATLS@ @BFD@	 * .tbss, but we actually need memory allocated for .tbss as we use
+@DATATLS@ @BFD@	 * it for the initial TLS storage.
+@DATATLS@ @BFD@	 * Create special section here just to make room.
+@DATATLS@ @BFD@	 */
+@DATATLS@ @BFD@
+@DATATLS@ @BFD@	.tbss_space (NOLOAD) : {
+@DATATLS@ @BFD@		. = ADDR(.tbss);
+@DATATLS@ @BFD@		. = . + SIZEOF(.tbss);
+@DATATLS@ @BFD@	} >ram AT>ram :ram
+@DATATLS@
+@DATATLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
+
+	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( @PREFIX@__tls_head_size = ALIGN ( @PREFIX@__tls_head_end - @PREFIX@__tls_head_start, @PREFIX@__tls_align ) );
+
+	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata) - @PREFIX@__tls_head_size );
+	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) - @PREFIX@__tls_head_size );
 	PROVIDE( @PREFIX@__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
-	PROVIDE( @PREFIX@__data_source_end = @PREFIX@__tdata_source_end );
-	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) + @PREFIX@__stack_chk_size );
+	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) + @PREFIX@__tls_head_size );
+
+@DATATLS@	PROVIDE( @PREFIX@__data_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
+
+@INITTLS@	PROVIDE( @PREFIX@__data_source_end = LOADADDR(.data) + SIZEOF (.data) );
 
 	PROVIDE( @PREFIX@__edata = @PREFIX@__data_end );
 	PROVIDE( @PREFIX@_edata = @PREFIX@__data_end );
@@ -252,59 +324,27 @@ SECTIONS
 	PROVIDE( @PREFIX@__data_size = @PREFIX@__data_end - @PREFIX@__data_start );
 	PROVIDE( @PREFIX@__data_source_size = @PREFIX@__data_source_end - @PREFIX@__data_source );
 
-	.tbss (NOLOAD) : {
-		*(.tbss .tbss.* .gnu.linkonce.tb.*)
-		*(.tcommon)
-		PROVIDE( @PREFIX@__tls_end = . );
-		PROVIDE( @PREFIX@__tbss_end = . );
-	} >ram AT>ram :tls :ram
-	PROVIDE( @PREFIX@__tls_first = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
-	PROVIDE( @PREFIX@__tls_base = @PREFIX@__tls_first - @PREFIX@__stack_chk_size );
-	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss));
-	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss));
-	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - @PREFIX@__tls_first );
-	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
-	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
-	PROVIDE( @PREFIX@__tls_size = (@PREFIX@__tls_tail_extra_size ? ALIGN(@PREFIX@__tls_end, @PREFIX@__tls_align) + @PREFIX@__tls_tail_extra_size : @PREFIX@__tls_end) - @PREFIX@__tls_base );
-	PROVIDE( @PREFIX@__tls_size_align = (@PREFIX@__tls_size + @PREFIX@__tls_align - 1) & ~(@PREFIX@__tls_align - 1));
-	PROVIDE( @PREFIX@__arm32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
-	PROVIDE( @PREFIX@__arm64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
-	PROVIDE( @PREFIX@__or1k_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
-	PROVIDE( @PREFIX@__sh32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
-	PROVIDE( @PREFIX@__x86_tls_tcb = ALIGN(@PREFIX@__tls_end, @PREFIX@__tls_align) );
-	PROVIDE( @PREFIX@__x86_tls_tcb_offset = @PREFIX@__x86_tls_tcb - @PREFIX@__tls_base );
-
-	/*
-	 * Unlike ld.lld, ld.bfd does not advance the location counter for
-	 * .tbss, but we actually need memory allocated for .tbss as we use
-	 * it for the initial TLS storage.
-	 * Create special section here just to make room.
-	 */
-        @BFD_START@
-        .tbss_space (NOLOAD) : {
-		. = ADDR(.tbss);
-		. = . + SIZEOF(.tbss);
-	} >ram AT>ram :ram
-	@BFD_END@
 	.bss (NOLOAD) : {
-		/*
-		 * For the x86-32 and x86-64, we must further allocate extra
-		 * space for the thread control block -- at a minimum, the
-		 * TCB needs to contain a pointer to itself
-		 * (https://akkadia.org/drepper/tls.pdf).  Unlike the
-		 * PowerPC case, the x86 TCB appears after the thread local
-		 * variables.
-		 * On the x86, the precise procedure to set the TCB pointer
-		 * depends on the operating system.  The system library
-		 * should implement a __set_tcb() function to set this
-		 * pointer (similar to OpenBSD's, https://man.openbsd.org/
-		 *__get_tcb.2).  __set_tcb() will be called by _set_tls().
-		 */
-		. = ALIGN(@PREFIX@__tls_align);
-		PROVIDE( @PREFIX@__tls_tail_extra_start = . );
-		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
-		PROVIDE( @PREFIX@__tls_tail_extra_end = . );
 
+@DATATLS@		/*
+@DATATLS@		 * For the x86-32 and x86-64, we must further allocate extra
+@DATATLS@		 * space for the thread control block -- at a minimum, the
+@DATATLS@		 * TCB needs to contain a pointer to itself
+@DATATLS@		 * (https://akkadia.org/drepper/tls.pdf).  Unlike the
+@DATATLS@		 * PowerPC case, the x86 TCB appears after the thread local
+@DATATLS@		 * variables.
+@DATATLS@		 * On the x86, the precise procedure to set the TCB pointer
+@DATATLS@		 * depends on the operating system.  The system library
+@DATATLS@		 * should implement a __set_tcb() function to set this
+@DATATLS@		 * pointer (similar to OpenBSD's, https://man.openbsd.org/
+@DATATLS@		 *__get_tcb.2).  __set_tcb() will be called by _set_tls().
+@DATATLS@		 */
+@DATATLS@		. = ALIGN( @PREFIX@__tls_align );
+@DATATLS@		PROVIDE( @PREFIX@__tls_tail_start = . );
+@DATATLS@		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
+@DATATLS@		PROVIDE( @PREFIX@__tls_tail_end = . );
+
+		/* this symbol is only used by test/tls.c */
 		PROVIDE( @PREFIX@__non_tls_bss_start = . );
 		*(.sbss* @EXTRA_SBSS_SECTIONS@)
 		*(.gnu.linkonce.sb.*)
@@ -315,17 +355,41 @@ SECTIONS
 		/* Align the heap */
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 		@PREFIX@__bss_end = .;
+		@PREFIX@_end = .;
 	} >ram AT>ram :ram
-	PROVIDE( @PREFIX@__tls_tail_extra_size = @PREFIX@__tls_tail_extra_end - @PREFIX@__tls_tail_extra_start );
-	PROVIDE( @PREFIX@__end = @PREFIX@__bss_end );
-	@PREFIX@_end = @PREFIX@__bss_end;
-	PROVIDE( @PREFIX@end = @PREFIX@__bss_end );
+
+@DATATLS@	PROVIDE( @PREFIX@__tls_space_size = @PREFIX@__tls_end - @PREFIX@__tls_start );
+@DATATLS@	PROVIDE( @PREFIX@__tls_space = @PREFIX@__tls_start );
+
+@DATATLS@	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss) );
+
+@INITTLS@	PROVIDE( @PREFIX@__bss_start = ADDR(.bss) );
+
+	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss) );
+	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - @PREFIX@__tls_start );
+	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
+	PROVIDE( @PREFIX@__tls_space_pad = ALIGN ( @PREFIX@__tls_space_size, @PREFIX@__tls_align ) - @PREFIX@__tls_space_size );
+	PROVIDE( @PREFIX@__tls_tail_size = @PREFIX@__tls_space_pad + (@PREFIX@__tls_tail_end - @PREFIX@__tls_tail_start) );
+
+	PROVIDE( @PREFIX@__tls_size = @PREFIX@__tls_head_size + @PREFIX@__tls_space_size + @PREFIX@__tls_tail_size );
+	PROVIDE( @PREFIX@__tls_base = @PREFIX@__tls_space - @PREFIX@__tls_head_size );
+
+	PROVIDE( @PREFIX@__arm32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__arm64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__or1k_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__sh32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+
+	PROVIDE( @PREFIX@__x86_tls_tcb = @PREFIX@__tls_space + ALIGN( @PREFIX@__tls_head_size + @PREFIX@__tls_space_size, @PREFIX@__tls_align ) );
+	PROVIDE( @PREFIX@__x86_tls_tcb_offset = @PREFIX@__x86_tls_tcb - @PREFIX@__tls_base );
+
+	PROVIDE( @PREFIX@__end = @PREFIX@_end );
+	PROVIDE( @PREFIX@end = @PREFIX@_end );
 	PROVIDE( @PREFIX@__bss_size = @PREFIX@__bss_end - @PREFIX@__bss_start );
 
 	/* Make the rest of memory available for heap storage */
-	PROVIDE (@PREFIX@__heap_start = @PREFIX@__end);
-	PROVIDE (@PREFIX@__heap_end = @PREFIX@@STACK@ - (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@));
-	PROVIDE (@PREFIX@__heap_size = @PREFIX@__heap_end - @PREFIX@__heap_start);
+	PROVIDE( @PREFIX@__heap_start = @PREFIX@__end );
+	PROVIDE( @PREFIX@__heap_end = @PREFIX@@STACK@ - (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@) );
+	PROVIDE( @PREFIX@__heap_size = @PREFIX@__heap_end - @PREFIX@__heap_start );
 
         /* Allow a minimum heap size to be specified */
         .heap (NOLOAD) : {
@@ -337,18 +401,14 @@ SECTIONS
 		. += (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@);
 	} >ram :ram
 
-	/* Throw away C++ exception handling information */
-
-	@C_START@
-
-	/DISCARD/ : {
-		*(.note .note.*)
-		*(.eh_frame .eh_frame.*)
-		*(.ARM.extab* .gnu.linkonce.armextab.*)
-		*(.ARM.exidx*)
-	}
-
-	@C_END@
+@C@	/* Throw away C++ exception handling information */
+@C@
+@C@	/DISCARD/ : {
+@C@		*(.note .note.*)
+@C@		*(.eh_frame .eh_frame.*)
+@C@		*(.ARM.extab* .gnu.linkonce.armextab.*)
+@C@		*(.ARM.exidx*)
+@C@	}
 
 	/* Stabs debugging sections.  */
 	.stab          0 : { *(.stab) }

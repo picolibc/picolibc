@@ -36,12 +36,12 @@
 #include <picotls.h>
 #include <stdint.h>
 
-extern char __tls_size_align[];
+extern char __tls_size[];
 
 void
 _set_tls(void *tls)
 {
         char *ctls = tls;
 
-        __asm__("mov %0, %%g7" : : "r" (ctls + (uintptr_t) __tls_size_align));
+        __asm__("mov %0, %%g7" : : "r" (ctls + (uintptr_t) __tls_size));
 }

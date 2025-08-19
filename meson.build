@@ -1003,6 +1003,8 @@ default_target = {
               'lib_prefix': '',
             }
 
+ld_comment = '#'
+
 foreach params : [default_target] + targets
   
   target = params['name']
@@ -1034,10 +1036,8 @@ foreach params : [default_target] + targets
     # (ALIGN(__tls_align), which is rejected as non-constant by ld.bfd), so we use
     # the {BFD,LLD}_{START,END} templates to comment out the incompatible flag.
     if cc.get_linker_id() == 'ld.lld'
-      picolibc_linker_type_data.set('BFD_START', '/* For ld.bfd: ')
-      picolibc_linker_type_data.set('BFD_END', '*/')
-      picolibc_linker_type_data.set('LLD_START', '')
-      picolibc_linker_type_data.set('LLD_END', '')
+      picolibc_linker_type_data.set('BFD', ld_comment)
+      picolibc_linker_type_data.set('LLD', '')
       picolibc_linker_type_data.set('TLS_PHDRS', 'tls PT_TLS;')
       picolibc_linker_type_data.set('TLS_INIT_SEG', 'tls')
       if host_cpu_family == 'riscv'
@@ -1052,10 +1052,8 @@ foreach params : [default_target] + targets
         endif
       endif
     else
-      picolibc_linker_type_data.set('BFD_START', '')
-      picolibc_linker_type_data.set('BFD_END', '')
-      picolibc_linker_type_data.set('LLD_START', '/* For ld.lld: ')
-      picolibc_linker_type_data.set('LLD_END', '*/')
+      picolibc_linker_type_data.set('BFD', '')
+      picolibc_linker_type_data.set('LLD', ld_comment)
       picolibc_linker_type_data.set('TLS_PHDRS', '''tls_init PT_TLS;
         tls PT_TLS;''')
       picolibc_linker_type_data.set('TLS_INIT_SEG', 'tls_init')
@@ -1201,11 +1199,16 @@ foreach params : [default_target] + targets
 
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)
-    picolibc_ld_data.set('CPP_START', '/*')
-    picolibc_ld_data.set('CPP_END', '*/')
-    picolibc_ld_data.set('C_START', '')
-    picolibc_ld_data.set('C_END', '')
+    picolibc_ld_data.set('CPP', ld_comment)
+    picolibc_ld_data.set('C', '')
     picolibc_ld_data.set('PREFIX', global_prefix)
+    picolibc_ld_data.set('INITTLS', ld_comment)
+    picolibc_ld_data.set('DATATLS', '')
+    if cc.get_linker_id() == 'ld.lld'
+      picolibc_ld_data.set('BFD', ld_comment)
+    else
+      picolibc_ld_data.set('BFD', '')
+    endif
 
     if target == 'default-target'
       picolibc_ld_file = 'picolibc.ld'
@@ -1215,13 +1218,27 @@ foreach params : [default_target] + targets
       picolibcpp_ld_variable = 'picolibcpp_ld'
       picolibcpp_ld_config_variable = 'picolibcpp_ld_config'
       picolibc_ld_install = true
+
+      if thread_local_storage
+        picolibc_inittls_ld_file = 'picolibc_inittls.ld'
+        picolibc_inittls_ld_variable = 'picolibc_inittls_ld'
+        picolibc_inittls_ld_config_variable = 'picolibc_inittls_ld_config'
+      endif
     else
       picolibc_ld_file = 'picolibc_' + custom_mem_config + '.ld'
       picolibc_ld_variable = 'picolibc_' + target + '_ld'
-      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + 'ld_config'
+      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + '_ld_config'
       picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
       picolibcpp_ld_variable = 'picolibcpp_' + target + '_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + 'ld_config'
+      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_ld_config'
+
+
+      if thread_local_storage
+        picolibc_inittls_ld_file = 'picolibc_inittls_' + custom_mem_config + '.ld'
+        picolibc_inittls_ld_variable = 'picolibc_inittls_' + target + '_ld'
+        picolibc_inittls_ld_config_variable = 'picolibc_inittls_' + custom_mem_config + '_ld_config'
+      endif
+
       picolibc_ld_install = false
     endif
 
@@ -1238,11 +1255,16 @@ foreach params : [default_target] + targets
 
     picolibcpp_ld_data = configuration_data()
     picolibcpp_ld_data.merge_from(picolibc_linker_type_data)
-    picolibcpp_ld_data.set('CPP_START', '')
-    picolibcpp_ld_data.set('CPP_END', '')
-    picolibcpp_ld_data.set('C_START', '/*')
-    picolibcpp_ld_data.set('C_END', '*/')
+    picolibcpp_ld_data.set('CPP', '')
+    picolibcpp_ld_data.set('C', ld_comment)
     picolibcpp_ld_data.set('PREFIX', global_prefix)
+    picolibcpp_ld_data.set('INITTLS', ld_comment)
+    picolibcpp_ld_data.set('DATATLS', '')
+    if cc.get_linker_id() == 'ld.lld'
+      picolibcpp_ld_data.set('BFD', ld_comment)
+    else
+      picolibcpp_ld_data.set('BFD', '')
+    endif
 
     if not is_variable(picolibcpp_ld_config_variable)
       set_variable(picolibcpp_ld_config_variable,
@@ -1254,6 +1276,32 @@ foreach params : [default_target] + targets
     endif
                    
     set_variable(picolibcpp_ld_variable, get_variable(picolibcpp_ld_config_variable))
+
+    if thread_local_storage
+      picolibc_inittls_ld_data = configuration_data()
+      picolibc_inittls_ld_data.merge_from(picolibc_linker_type_data)
+      picolibc_inittls_ld_data.set('CPP', ld_comment)
+      picolibc_inittls_ld_data.set('C', '')
+      picolibc_inittls_ld_data.set('PREFIX', global_prefix)
+      picolibc_inittls_ld_data.set('INITTLS', '')
+      picolibc_inittls_ld_data.set('DATATLS', ld_comment)
+      if cc.get_linker_id() == 'ld.lld'
+        picolibc_inittls_ld_data.set('BFD', ld_comment)
+      else
+        picolibc_inittls_ld_data.set('BFD', '')
+      endif
+
+      if not is_variable(picolibc_inittls_ld_config_variable)
+        set_variable(picolibc_inittls_ld_config_variable,
+                     configure_file(input: 'picolibc.ld.in',
+                                    output: picolibc_inittls_ld_file,
+                                    configuration: picolibc_inittls_ld_data,
+                                    install: picolibc_ld_install and really_install,
+                                    install_dir: lib_dir))
+      endif
+      
+      set_variable(picolibc_inittls_ld_variable, get_variable(picolibc_inittls_ld_config_variable))
+    endif
 
   endif
 endforeach
@@ -1616,17 +1664,39 @@ if has_semihost
       test_linker_files_variable = 'test_linker_files'
       test_link_depends_variable = 'test_link_depends'
       picolibc_ld_value = picolibc_ld
+
+      if thread_local_storage
+        test_inittls_link_args_variable = 'test_inittls_link_args'
+        test_inittls_linker_files_variable = 'test_inittls_linker_files'
+        test_inittls_link_depends_variable = 'test_inittls_link_depends'
+        picolibc_inittls_ld_value = picolibc_inittls_ld
+      endif
+
     else
       test_link_args_variable = 'test_link_args' + target
       test_linker_files_variable = 'test_linker_files_' + target
       test_link_depends_variable = 'test_link_depends' + target
       picolibc_ld_value = get_variable('picolibc_' + target + '_ld', picolibc_ld)
+
+      if thread_local_storage
+        test_inittls_link_args_variable = 'test_inittls_link_args' + target
+        test_inittls_linker_files_variable = 'test_inittls_linker_files_' + target
+        test_inittls_link_depends_variable = 'test_inittls_link_depends' + target
+        picolibc_inittls_ld_value = get_variable('picolibc_inittls_' + target + '_ld', picolibc_inittls_ld)
+      endif
+
     endif
 
     if meson.version().version_compare('>=1.4.0')
       picolibc_ld_string = picolibc_ld_value.full_path()
+      if thread_local_storage
+        picolibc_inittls_ld_string = picolibc_inittls_ld_value.full_path()
+      endif
     else
       picolibc_ld_string = '@0@'.format(picolibc_ld_value)
+      if thread_local_storage
+        picolibc_inittls_ld_string = '@0@'.format(picolibc_inittls_ld_value)
+      endif
     endif
 
     set_variable(test_link_args_variable,
@@ -1638,6 +1708,18 @@ if has_semihost
 
     # Make sure all of the tests get re-linked if the linker scripts change.
     set_variable(test_link_depends_variable, [picolibc_ld_value])
+
+    if thread_local_storage
+      set_variable(test_inittls_link_args_variable,
+                   additional_libs_list + 
+		   test_link_args_base +
+                   ['-nostdlib', '-T', picolibc_inittls_ld_string])
+
+      set_variable(test_inittls_linker_files_variable, [picolibc_ld_value])
+
+      # Make sure all of the tests get re-linked if the linker scripts change.
+      set_variable(test_inittls_link_depends_variable, [picolibc_inittls_ld_value])
+    endif
   endforeach
 else
   test_link_args = test_link_args_base

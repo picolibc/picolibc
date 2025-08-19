@@ -108,6 +108,21 @@ picocrt_variants = [
 # will have exception handling
 crt0_test = 'crt0_semihost'
 
+if thread_local_storage
+  picocrt_variants += {
+                       'name': 'inittls',
+                       'suffix': '-inittls',
+                       'c_args': ['-DINIT_TLS'],
+                       'src': src_picocrt,
+                     }
+  picocrt_variants += {
+    'name': 'inittls-semihost',
+    'suffix': '-inittls-semihost',
+    'c_args': ['-DINIT_TLS', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  }
+endif
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']

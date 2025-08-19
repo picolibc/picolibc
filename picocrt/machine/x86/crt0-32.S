@@ -99,6 +99,13 @@ _start32:
 	// segment base (in case machine lacks MSR_GS_BASE register)
 	lgdtl	gdt2_desc
 
+#ifdef INIT_TLS
+	// call to _init_tls(__tls_base)
+	pushl	$__tls_base
+	call	_init_tls
+	addl	$4, %esp
+#endif
+
 	// call to _set_tls(__tls_base)
 	pushl	$__tls_base
 	call	_set_tls

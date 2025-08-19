@@ -97,6 +97,9 @@ __start(void)
         POST_MEMORY_SETUP();
 #endif
 
+#ifdef INIT_TLS
+        _init_tls(__tls_base);
+#endif
 #ifdef __THREAD_LOCAL_STORAGE
 	_set_tls(__tls_base);
 #endif

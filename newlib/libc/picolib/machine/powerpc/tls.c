@@ -37,14 +37,18 @@
 #include <string.h>
 #include <stdint.h>
 
+/*
+ * This will be the size of __stack_chk_guard if in use. If not
+ * present, then we'll assume stack checking is disabled, and the
+ * missing symbol value, 0, will work fine.
+ */
+extern char __tls_head_size[] __weak;
+
 #define TP_OFFSET       0x7000
 
-extern char __stack_chk_size[];
-
-/* This code is duplicated in picocrt/machine/riscv/crt0.c */
 void
 _set_tls(void *tls)
 {
-    tls = (uint8_t *) tls + TP_OFFSET + (uintptr_t) __stack_chk_size;
+    tls = (uint8_t *) tls + TP_OFFSET + (uintptr_t) __tls_head_size;
     __asm__("mr 13, %0" : : "r" (tls));
 }
