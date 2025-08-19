@@ -510,8 +510,6 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 {
     unsigned c;		/* holds a char from the format string */
     uint16_t flags;
-    int width;
-    int prec;
 #ifdef _NEED_IO_POS_ARGS
     int argno;
     my_va_list my_ap;
@@ -582,8 +580,10 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 	}
 
 	flags = 0;
-	width = 0;
-	prec = 0;
+#ifndef _NEED_IO_SHRINK
+	int width = 0;
+	int prec = 0;
+#endif
 #ifdef _NEED_IO_POS_ARGS
         argno = 0;
 #endif
@@ -639,9 +639,17 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                         continue;
 #endif
 		    if (flags & FL_PREC) {
+#ifdef _NEED_IO_SHRINK
+                        (void) va_arg(ap, int);
+#else
 			prec = va_arg(ap, int);
+#endif
 		    } else {
+#ifdef _NEED_IO_SHRINK
+			(void) va_arg(ap, int);
+#else
 			width = va_arg(ap, int);
+#endif
 			flags |= FL_WIDTH;
 		    }
 		    continue;
@@ -707,9 +715,6 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
             width = -width;
             flags |= FL_LPAD;
         }
-#else
-        (void) prec;
-        (void) width;
 #endif
 
 	/* Only a format character is valid.	*/
