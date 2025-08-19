@@ -219,6 +219,15 @@ static int test_snprintf(void)
         TEST(i, snprintf(b, sizeof b, "%d%ln456", n, &llen), 6, "length for %ln");
         TEST_S(b, "123456", "incorrect output");
         TEST(i, llen, 3, "incorrect len");
+
+        /*
+         * Make sure the buffer limit isn't applied to value reported by %n.
+         *
+         * This is what glibc does, which seems inconsistent with the POSIX spec
+         */
+        TEST(i, snprintf(b, 2, "%d%n456", n, &len), 6, "length for %n");
+        TEST_S(b, "1", "incorrect output");
+        TEST(i, len, 3, "incorrect len");
 #if !defined(__PICOLIBC__) || defined(__TINY_STDIO) || defined(__IO_LONG_LONG)
         long long lllen;
         TEST(i, snprintf(b, sizeof b, "%d%lln456", n, &lllen), 6, "length for %lln");
