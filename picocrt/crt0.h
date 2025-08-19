@@ -88,8 +88,17 @@ extern void __libc_init_array(void);
 #define CONSTRUCTORS 1
 #endif
 
+#ifdef STACK_TLS
+#define __START_ARGS void *__tls_base
+
+#define ALLOC_TLS(sp) ((((sp) - (uintptr_t) __tls_size)) & ~((uintptr_t) __tls_align - 1))
+
+#else
+#define __START_ARGS void
+#endif
+
 static __noreturn __always_inline void
-__start(void)
+__start(__START_ARGS)
 {
 	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
@@ -97,6 +106,9 @@ __start(void)
         POST_MEMORY_SETUP();
 #endif
 
+#ifdef STACK_TLS
+        _init_tls(__tls_base);
+#endif
 #ifdef __THREAD_LOCAL_STORAGE
 	_set_tls(__tls_base);
 #endif

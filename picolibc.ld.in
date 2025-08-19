@@ -214,9 +214,14 @@ SECTIONS
 		 * offsets for it; in reality, it lives at a known
 		 * fixed offset outside of the usual TLS range
 		 */
+		@DATATLS_START@
 		PROVIDE( @PREFIX@__stack_chk_start = .);
 		KEEP (*(.stack_chk .stack_chk.*))
 		PROVIDE( @PREFIX@__stack_chk_end = .);
+		@DATATLS_END@
+		@STACKTLS_START@
+		PROVIDE( @PREFIX@__data_end = . );
+		@STACKTLS_END@
 	} >ram AT>flash :ram_init
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
 	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
@@ -236,14 +241,27 @@ SECTIONS
 	 */
 	.tdata : @LLD_START@ ALIGN(@PREFIX@__tls_align) @LLD_END@ @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
 		*(.tdata .tdata.* .gnu.linkonce.td.*)
-		PROVIDE(@PREFIX@__data_end = .);
-		PROVIDE(@PREFIX@__tdata_end = .);
+		@DATATLS_START@
+		PROVIDE( @PREFIX@__data_end = . );
+		@DATATLS_END@
+		PROVIDE( @PREFIX@__tdata_end = . );
 	} >ram AT>flash :@TLS_INIT_SEG@ :ram_init
+
+	@DATATLS_START@
 	PROVIDE( @PREFIX@__stack_chk_size = @PREFIX@__stack_chk_end - @PREFIX@__stack_chk_start );
+	@DATATLS_END@
+	@STACKTLS_START@
+	PROVIDE( @PREFIX@__stack_chk_size = 0 );
+	@STACKTLS_END@
 	PROVIDE( @PREFIX@__tdata_start = ADDR(.tdata) - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) - @PREFIX@__stack_chk_size );
 	PROVIDE( @PREFIX@__tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
+	@DATATLS_START@
 	PROVIDE( @PREFIX@__data_source_end = @PREFIX@__tdata_source_end );
+	@DATATLS_END@
+	@STACKTLS_START@
+	PROVIDE( @PREFIX@__data_source_end = LOADADDR(.data) + SIZEOF (.data) );
+	@STACKTLS_END@
 	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) + @PREFIX@__stack_chk_size );
 
 	PROVIDE( @PREFIX@__edata = @PREFIX@__data_end );
@@ -258,10 +276,10 @@ SECTIONS
 		PROVIDE( @PREFIX@__tls_end = . );
 		PROVIDE( @PREFIX@__tbss_end = . );
 	} >ram AT>ram :tls :ram
+
 	PROVIDE( @PREFIX@__tls_first = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
 	PROVIDE( @PREFIX@__tls_base = @PREFIX@__tls_first - @PREFIX@__stack_chk_size );
-	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss));
-	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss));
+	PROVIDE( @PREFIX@__tbss_start = ADDR(.tbss) );
 	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - @PREFIX@__tls_first );
 	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
 	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
@@ -280,12 +298,12 @@ SECTIONS
 	 * it for the initial TLS storage.
 	 * Create special section here just to make room.
 	 */
-        @BFD_START@
+        @BFD_DATATLS_START@
         .tbss_space (NOLOAD) : {
 		. = ADDR(.tbss);
 		. = . + SIZEOF(.tbss);
 	} >ram AT>ram :ram
-	@BFD_END@
+	@BFD_DATATLS_END@
 	.bss (NOLOAD) : {
 		/*
 		 * For the x86-32 and x86-64, we must further allocate extra
@@ -300,10 +318,12 @@ SECTIONS
 		 * pointer (similar to OpenBSD's, https://man.openbsd.org/
 		 *__get_tcb.2).  __set_tcb() will be called by _set_tls().
 		 */
+		@DATATLS_START@
 		. = ALIGN(@PREFIX@__tls_align);
 		PROVIDE( @PREFIX@__tls_tail_extra_start = . );
 		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
 		PROVIDE( @PREFIX@__tls_tail_extra_end = . );
+		@DATATLS_END@
 
 		PROVIDE( @PREFIX@__non_tls_bss_start = . );
 		*(.sbss* @EXTRA_SBSS_SECTIONS@)
@@ -316,7 +336,20 @@ SECTIONS
 		. = ALIGN(@DEFAULT_ALIGNMENT@);
 		@PREFIX@__bss_end = .;
 	} >ram AT>ram :ram
+
+	@DATATLS_START@
 	PROVIDE( @PREFIX@__tls_tail_extra_size = @PREFIX@__tls_tail_extra_end - @PREFIX@__tls_tail_extra_start );
+	@DATATLS_END@
+	@STACKTLS_START@
+	PROVIDE( @PREFIX@__tls_tail_extra_size = 0 );
+	@STACKTLS_END@
+
+	@DATATLS_START@
+	PROVIDE( @PREFIX@__bss_start = ADDR(.tbss) );
+	@DATATLS_END@
+	@STACKTLS_START@
+	PROVIDE( @PREFIX@__bss_start = ADDR(.bss) );
+	@STACKTLS_END@
 	PROVIDE( @PREFIX@__end = @PREFIX@__bss_end );
 	@PREFIX@_end = @PREFIX@__bss_end;
 	PROVIDE( @PREFIX@end = @PREFIX@__bss_end );
