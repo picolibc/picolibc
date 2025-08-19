@@ -67,6 +67,7 @@ extern char __tdata_source[], __tdata_source_end[];
 extern char __data_start[], __data_source[];
 extern char __non_tls_bss_start[];
 
+#ifndef STACK_TLS
 static bool
 inside_tls_region(void *ptr, const void *tls)
 {
@@ -80,6 +81,7 @@ inside_tls_region(void *ptr, const void *tls)
                        ptr, tls_start, (char *)tls_start + _tls_size()); \
                 result++;                                               \
         }
+#endif
 #endif
 
 static int
@@ -203,7 +205,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
 			result++;
 		}
 	}
-#ifdef __THREAD_LOCAL_STORAGE_API
+#if defined(__THREAD_LOCAL_STORAGE_API) && !defined(STACK_TLS)
 	check_inside_tls_region(&data_var, tls_region);
 	check_inside_tls_region(&overaligned_data_var, tls_region);
 	check_inside_tls_region(&bss_var, tls_region);
@@ -230,7 +232,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
 	return result;
 }
 
-#ifdef __THREAD_LOCAL_STORAGE_API
+#if defined(__THREAD_LOCAL_STORAGE_API) && !defined(STACK_TLS)
 static void
 hexdump(const void *ptr, int length, const char *hdr)
 {
@@ -260,7 +262,7 @@ main(void)
 	bss_addr = &bss_var;
         overaligned_bss_addr = &overaligned_bss_var;
 
-#ifdef __THREAD_LOCAL_STORAGE_API
+#if defined(__THREAD_LOCAL_STORAGE_API) && !defined(STACK_TLS)
         printf("TLS region: %p-%p (%zd bytes)\n", __tdata_start,
 	       __tdata_start + _tls_size(), _tls_size());
 	size_t tdata_source_size = (uintptr_t) __tdata_source_end - (uintptr_t) __tdata_source;
@@ -303,12 +305,14 @@ main(void)
             _init_tls(tls);
             _set_tls(tls);
 
+#ifndef STACK_TLS
             if (memcmp(tls, &__tdata_source, tdata_size) != 0) {
 		printf("New TLS data in RAM does not match ROM\n");
 		hexdump(&__tdata_source, tdata_source_size, "ROM:");
 		hexdump(tls, tdata_size, "RAM:");
 		result++;
             }
+#endif
 
             result += check_tls("allocated", true, tls);
         } else {
