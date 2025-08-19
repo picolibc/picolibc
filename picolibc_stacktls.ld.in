@@ -1,0 +1,348 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2019 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+ENTRY(@PREFIX@_start)
+
+/*
+ * These values should be provided by the application. We'll include
+ * some phony values here to make things link for testing
+ */
+
+MEMORY
+{@INIT_MEMORY@
+	flash (rx!w) :
+		ORIGIN = DEFINED(@PREFIX@__flash) ? @PREFIX@__flash : @DEFAULT_FLASH_ADDR@,
+		LENGTH = DEFINED(@PREFIX@__flash_size) ? @PREFIX@__flash_size : @DEFAULT_FLASH_SIZE@
+	ram (w!rx) :
+		ORIGIN = DEFINED(@PREFIX@__ram) ? @PREFIX@__ram : @DEFAULT_RAM_ADDR@,
+		LENGTH = DEFINED(@PREFIX@__ram_size) ? @PREFIX@__ram_size : @DEFAULT_RAM_SIZE@
+}
+
+PHDRS
+{@INIT_PHDRS@
+	text PT_LOAD;
+	ram_init PT_LOAD;
+	ram PT_LOAD;
+	@TLS_PHDRS@
+}
+
+SECTIONS
+{
+	PROVIDE(@PREFIX@@STACK@ = ORIGIN(ram) + LENGTH(ram));
+@INIT_SECTIONS@
+	.text : {
+
+		/* code */
+		*(.literal.unlikely .text.unlikely .literal.unlikely.* .text.unlikely.*)
+		*(.literal.startup .text.startup .literal.startup.* .text.startup.*)
+		*(SORT(.text.sorted.*))
+		*(.literal .text .literal.* .text.* .opd .opd.* .branch_lt .branch_lt.* @EXTRA_TEXT_SECTIONS@)
+		*(.gnu.linkonce.t.*)
+		KEEP (*(.fini .fini.*))
+		@PREFIX@__text_end = .;
+
+		PROVIDE (@PREFIX@__etext = @PREFIX@__text_end);
+		PROVIDE (@PREFIX@_etext = @PREFIX@__text_end);
+		PROVIDE (@PREFIX@etext = @PREFIX@__text_end);
+
+		/* Need to pre-align so that the symbols come after padding */
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
+
+		/* lists of constructors and destructors */
+		PROVIDE_HIDDEN ( @PREFIX@__preinit_array_start = . );
+		PROVIDE_HIDDEN ( @PREFIX@__bothinit_array_start = . );
+		KEEP (*(.preinit_array))
+		PROVIDE_HIDDEN ( @PREFIX@__preinit_array_end = . );
+
+		PROVIDE_HIDDEN ( @PREFIX@__init_array_start = . );
+		KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
+		KEEP (*(.init_array .ctors))
+		PROVIDE_HIDDEN ( @PREFIX@__init_array_end = . );
+		PROVIDE_HIDDEN ( @PREFIX@__bothinit_array_end = . );
+
+		PROVIDE_HIDDEN ( @PREFIX@__fini_array_start = . );
+		KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
+		KEEP (*(.fini_array .dtors))
+		KEEP (*(.fini_array*))
+		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
+
+	} >flash AT>flash :text
+
+	.rodata : {
+
+		/* read-only data */
+		*(.rdata)
+		*(.rodata .rodata.* @EXTRA_RODATA_SECTIONS@)
+		*(.gnu.linkonce.r.*)
+
+		*(.srodata.cst16)
+		*(.srodata.cst8)
+		*(.srodata.cst4)
+		*(.srodata.cst2)
+		*(.srodata .srodata.*)
+
+	} >flash AT>flash :text
+	PROVIDE(@PREFIX@_pid_base = ADDR(.rodata));
+
+	.data.rel.ro : {
+
+		/* data that needs relocating */
+		*(.data.rel.ro .data.rel.ro.*)
+
+	} >flash AT>flash :text
+
+	/*
+	 * Procedure linkage table. This ends up
+	 * with an array of structs containing pointers
+	 * to the function descriptors and iplt references
+	 * that need to contain them after startup.
+	 */
+	@BFD_START@
+	.plt : {
+		*(.rela.iplt)
+		*(.rela.*)
+	} >flash AT>flash :text
+
+	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
+	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
+	@BFD_END@
+
+	/*
+	 * Needs to be in its own segment with the PLT entries first
+	 * so that the linker will compute the offsets to those
+	 * entries correctly.
+	 */
+	.got : {
+		*(.got.plt)
+		*(.got)
+	} >flash AT>flash :text
+
+	.toc : {
+		*(.toc .toc.*)
+		/*
+		 * These get written at startup, so this isn't correct,
+		 * but they must be reachable from tocbase so we can't
+		 * stick them in :ram
+		 */
+		*(.iplt .iplt.*)
+	} >flash AT>flash :text
+
+	/* additional sections when compiling with C++ exception support */
+	@CPP_START@
+	.except_ordered : {
+		*(.gcc_except_table *.gcc_except_table.*)
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+	} >flash AT>flash :text
+	.eh_frame_hdr : {
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
+		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
+	} >flash AT>flash :text
+	.eh_frame : {
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
+		KEEP (*(.eh_frame .eh_frame.*))
+		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
+	} >flash AT>flash :text
+
+	.except_unordered : {
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
+
+		PROVIDE(@PREFIX@__exidx_start = .);
+		*(.ARM.exidx*)
+		PROVIDE(@PREFIX@__exidx_end = .);
+	} >flash AT>flash :text
+	@CPP_END@
+
+	.tdata : {
+		*(.tdata .tdata.* .gnu.linkonce.td.*)
+	} >flash
+
+	PROVIDE( @PREFIX@__tdata_source = LOADADDR(.tdata) );
+	PROVIDE( @PREFIX@__tdata_size = SIZEOF(.tdata) );
+
+	.tbss (NOLOAD) : {
+		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+		*(.tcommon)
+		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
+	} >flash
+
+	PROVIDE( @PREFIX@__tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
+	PROVIDE( @PREFIX@__tbss_size = SIZEOF(.tbss) );
+	PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( @PREFIX@__tls_size = ADDR(.tbss) + SIZEOF(.tbss) - ADDR(.tdata) );
+	PROVIDE( @PREFIX@__tls_size_align = (@PREFIX@__tls_size + @PREFIX@__tls_align - 1) & ~(@PREFIX@__tls_align - 1));
+	PROVIDE( @PREFIX@__arm32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__arm64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__or1k_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__sh32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__x86_tls_tcb = ALIGN(@PREFIX@__tls_end, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__x86_tls_tcb_offset = @PREFIX@__x86_tls_tcb - @PREFIX@__tls_base );
+
+	/*
+	 * Data values which are preserved across reset
+	 */
+	.preserve (NOLOAD) : {
+		PROVIDE(@PREFIX@__preserve_start__ = .);
+		KEEP(*(SORT_BY_NAME(.preserve.*)))
+		KEEP(*(.preserve))
+		PROVIDE(@PREFIX@__preserve_end__ = .);
+	} >ram AT>ram :ram
+
+	.data : @BFD_START@ ALIGN_WITH_INPUT @BFD_END@ {
+		*(.data .data.* @EXTRA_DATA_SECTIONS@)
+		*(.gnu.linkonce.d.*)
+
+		/* Need to pre-align so that the symbols come after padding */
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
+
+		PROVIDE( @PREFIX@__global_pointer$ = . + 0x800 );
+		PROVIDE( @PREFIX@_gp = . + 0x8000);
+		*(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
+		*(.gnu.linkonce.s.*)
+		PROVIDE(@PREFIX@__data_end = .);
+	} >ram AT>flash :ram_init
+
+	PROVIDE(@PREFIX@__data_start = ADDR(.data));
+	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
+	PROVIDE(@PREFIX@__data_source_end = LOADADDR(.data) + SIZEOF (.data));
+	PROVIDE(@PREFIX@__x86_gdt_ro = DEFINED(@PREFIX@__x86_gdt) ? @PREFIX@__x86_gdt - @PREFIX@__data_start + @PREFIX@__data_source : 0);
+
+	PROVIDE( @PREFIX@__edata = @PREFIX@__data_end );
+	PROVIDE( @PREFIX@_edata = @PREFIX@__data_end );
+	PROVIDE( @PREFIX@edata = @PREFIX@__data_end );
+	PROVIDE( @PREFIX@__data_size = @PREFIX@__data_end - @PREFIX@__data_start );
+	PROVIDE( @PREFIX@__data_source_size = @PREFIX@__data_source_end - @PREFIX@__data_source );
+
+	PROVIDE( @PREFIX@__bss_start = ADDR(.bss));
+
+	.bss (NOLOAD) : {
+		*(.sbss* @EXTRA_SBSS_SECTIONS@)
+		*(.gnu.linkonce.sb.*)
+		*(.bss .bss.* @EXTRA_BSS_SECTIONS@)
+		*(.gnu.linkonce.b.*)
+		*(COMMON)
+
+		/* Align the heap */
+		. = ALIGN(@DEFAULT_ALIGNMENT@);
+		@PREFIX@__bss_end = .;
+	} >ram AT>ram :ram
+
+	PROVIDE( @PREFIX@__end = @PREFIX@__bss_end );
+	@PREFIX@_end = @PREFIX@__bss_end;
+	PROVIDE( @PREFIX@end = @PREFIX@__bss_end );
+	PROVIDE( @PREFIX@__bss_size = @PREFIX@__bss_end - @PREFIX@__bss_start );
+
+	/* Make the rest of memory available for heap storage */
+	PROVIDE (@PREFIX@__heap_start = @PREFIX@__end);
+	PROVIDE (@PREFIX@__heap_end = @PREFIX@@STACK@ - (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@));
+	PROVIDE (@PREFIX@__heap_size = @PREFIX@__heap_end - @PREFIX@__heap_start);
+
+        /* Allow a minimum heap size to be specified */
+        .heap (NOLOAD) : {
+                . += (DEFINED(@PREFIX@__heap_size_min) ? @PREFIX@__heap_size_min : 0);
+        } >ram :ram
+
+	/* Define a stack region to make sure it fits in memory */
+	.stack (NOLOAD) : {
+		. += (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@);
+	} >ram :ram
+
+	/* Throw away C++ exception handling information */
+
+	@C_START@
+
+	/DISCARD/ : {
+		*(.note .note.*)
+		*(.eh_frame .eh_frame.*)
+		*(.ARM.extab* .gnu.linkonce.armextab.*)
+		*(.ARM.exidx*)
+	}
+
+	@C_END@
+
+	/* Stabs debugging sections.  */
+	.stab          0 : { *(.stab) }
+	.stabstr       0 : { *(.stabstr) }
+	.stab.excl     0 : { *(.stab.excl) }
+	.stab.exclstr  0 : { *(.stab.exclstr) }
+	.stab.index    0 : { *(.stab.index) }
+	.stab.indexstr 0 : { *(.stab.indexstr) }
+	.comment       0 : { *(.comment) }
+	.gnu.build.attributes : { *(.gnu.build.attributes .gnu.build.attributes.*) }
+	/* DWARF debug sections.
+	   Symbols in the DWARF debugging sections are relative to the beginning
+	   of the section so we begin them at 0.  */
+	/* DWARF 1.  */
+	.debug          0 : { *(.debug) }
+	.line           0 : { *(.line) }
+	/* GNU DWARF 1 extensions.  */
+	.debug_srcinfo  0 : { *(.debug_srcinfo) }
+	.debug_sfnames  0 : { *(.debug_sfnames) }
+	/* DWARF 1.1 and DWARF 2.  */
+	.debug_aranges  0 : { *(.debug_aranges) }
+	.debug_pubnames 0 : { *(.debug_pubnames) }
+	/* DWARF 2.  */
+	.debug_info     0 : { *(.debug_info .gnu.linkonce.wi.*) }
+	.debug_abbrev   0 : { *(.debug_abbrev) }
+	.debug_line     0 : { *(.debug_line .debug_line.* .debug_line_end) }
+	.debug_frame    0 : { *(.debug_frame) }
+	.debug_str      0 : { *(.debug_str) }
+	.debug_loc      0 : { *(.debug_loc) }
+	.debug_macinfo  0 : { *(.debug_macinfo) }
+	/* SGI/MIPS DWARF 2 extensions.  */
+	.debug_weaknames 0 : { *(.debug_weaknames) }
+	.debug_funcnames 0 : { *(.debug_funcnames) }
+	.debug_typenames 0 : { *(.debug_typenames) }
+	.debug_varnames  0 : { *(.debug_varnames) }
+	/* DWARF 3.  */
+	.debug_pubtypes 0 : { *(.debug_pubtypes) }
+	.debug_ranges   0 : { *(.debug_ranges) }
+	/* DWARF 5.  */
+	.debug_addr     0 : { *(.debug_addr) }
+	.debug_line_str 0 : { *(.debug_line_str) }
+	.debug_loclists 0 : { *(.debug_loclists) }
+	.debug_macro    0 : { *(.debug_macro) }
+	.debug_names    0 : { *(.debug_names) }
+	.debug_rnglists 0 : { *(.debug_rnglists) }
+	.debug_str_offsets 0 : { *(.debug_str_offsets) }
+	.debug_sup      0 : { *(.debug_sup) }
+	.gnu.attributes 0 : { KEEP (*(.gnu.attributes)) }
+}
+/*
+ * Check that sections that are copied from flash to RAM have matching
+ * padding, so that a single memcpy() of __data_size copies the correct bytes.
+ */
+ASSERT( @PREFIX@__data_size == @PREFIX@__data_source_size,
+	"ERROR: .data flash size does not match RAM size");
