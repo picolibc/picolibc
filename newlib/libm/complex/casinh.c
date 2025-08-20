@@ -86,12 +86,62 @@ QUICKREF
 
 
 #include <complex.h>
+#include <math.h>
+#include <float.h>
 
 double complex
 casinh(double complex z)
 {
-	double complex w;
 
-	w = -1.0 * (double complex) I * casin(z * (double complex) I);
-	return w;
+    double x = fabs(creal(z));
+    double y = fabs(cimag(z));
+    double complex res;
+    double complex w;
+
+    const double eps = DBL_EPSILON;
+
+    if (y == 0.0) {
+        if (isnan(x)) {
+            res = CMPLX((double) NAN, copysign(0.0, cimag(z)));
+        }
+        else if (isinf(x)) {
+            res = CMPLX(x, copysign(0.0, cimag(z)));
+        }
+        else {
+            res = CMPLX(asinh(x), copysign(0.0, cimag(z)));
+        }
+    }
+    /* Handle large values */
+    else if (x >= 1.0/eps || y >= 1.0/eps) {
+        res = clog(CMPLX(x, y));
+        res = CMPLX(creal(res) + (double) _M_LN2, cimag(res));
+
+    }
+
+    /* Case where real part >= 0.5 and imag part very samll */
+    else if (x >= 0.5 && y < eps/8.0) {
+        double s = hypot(1.0, x);
+        res = CMPLX(log(x + s), atan2(y, s));
+    }
+
+    /* Case Where real part very small and imag part >= 1.5 */
+    else if (x < eps/8.0 && y >= 1.5) {
+        double s = sqrt((y + 1.0) * (y - 1.0));
+        res = CMPLX(log(y + s), atan2(s, x));
+    }
+
+    else {
+        /* General case */
+        w = CMPLX((x - y) * (x + y) + 1.0, 2.0 * x * y);
+        w = csqrt(w);
+
+        w = CMPLX(x + creal(w), y + cimag(w));
+        res = clog(w);
+    }
+
+    /* Apply correct signs */
+    res = CMPLX(copysign(creal(res), creal(z)),
+                copysign(cimag(res), cimag(z)));
+
+    return res;
 }
