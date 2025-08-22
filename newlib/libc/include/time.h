@@ -109,6 +109,11 @@ typedef	__timer_t	timer_t;
 #define	_TIMER_T_DECLARED
 #endif
 
+#ifndef _PID_T_DECLARED
+typedef	__pid_t	pid_t;
+#define	_PID_T_DECLARED
+#endif
+
 /*
  * Structure defined by POSIX.1b to be like a itimerval, but with
  * timespecs. Used in the timer_*() system calls.
