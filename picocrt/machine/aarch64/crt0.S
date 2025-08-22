@@ -109,26 +109,21 @@ __identity_page_table:
   .global _start
   .type _start, %function
 _start:
-  /* Use EL-banked stack pointer */
-	msr     SPSel, #1
 
-	/* Initialize stack */
-	adrp x1, __stack
-	add  x1, x1, :lo12:__stack
-	mov sp, x1
-
-	/* Enable FPU */
+  /* Enable FPU */
 #if __ARM_FP
 #if defined(MACHINE_qemu)
 	mov x1, #(0x3 << 20)
 	msr BOOT_EL(CPACR), x1
 #elif defined(MACHINE_fvp)
 	mrs x0, BOOT_EL(CPTR)
+
   /* Clear CPTR_ELx.TFP, to enable FP/SIMD instructions at EL0 and EL1. */
 	and x0, x0, #~(1<<10)
+
   /* Set CPTR_ELx.EZ and .ESM, to enable SVE and SME instructions at EL3. These
    * bits are ignored for cores which don't have the relevant feature. */
-  ORR x0, x0, #1<<8
+	ORR x0, x0, #1<<8
 	ORR x0, x0, #1<<12
 	msr BOOT_EL(CPTR), x0
 #else
@@ -136,11 +131,27 @@ _start:
 #endif
 #endif // __ARM_FP
 
-	/* Jump into C code */
-	bl _cstart
-  .size _start, .-_start
+  /* Use EL-banked stack pointer */
+	msr     SPSel, #1
 
+  /* Initialize stack */
+	adrp	x0, __stack
+	add 	x0, x0, :lo12:__stack
+#ifdef STACK_TLS
+	adrp	x1, __tls_size
+	add	x1, x1, :lo12:__tls_size
+	sub	x0, x0, x1
+	adrp	x1, __tls_align
+	add	x1, x2, :lo12:__tls_align
+	mov	x2, 0
+	sub	x2, x2, x1
+	and	x0, x0, x2
+#endif
+	mov	sp, x0
 
+  /* Jump into C code */
+	bl	_cstart
+	.size _start, .-_start
 
 /************ Exception handlers ************/
 #ifdef CRT0_SEMIHOST

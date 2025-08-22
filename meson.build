@@ -459,6 +459,7 @@ endif
 
 tls_model_spec = ''
 thread_local_storage = false
+has_stacktls = false
 thread_local_storage_option = get_option('thread-local-storage')
 have_picolibc_tls_api = enable_picolib and fs.is_file('newlib/libc/picolib/machine' / host_cpu_family / 'tls.c')
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
@@ -1207,13 +1208,27 @@ foreach params : [default_target] + targets
       picolibcpp_ld_variable = 'picolibcpp_ld'
       picolibcpp_ld_config_variable = 'picolibcpp_ld_config'
       picolibc_ld_install = true
+
+      if thread_local_storage
+        picolibc_stacktls_ld_file = 'picolibc_stacktls.ld'
+        picolibc_stacktls_ld_variable = 'picolibc_stacktls_ld'
+        picolibc_stacktls_ld_config_variable = 'picolibc_stacktls_ld_config'
+      endif
     else
       picolibc_ld_file = 'picolibc_' + custom_mem_config + '.ld'
       picolibc_ld_variable = 'picolibc_' + target + '_ld'
-      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + 'ld_config'
+      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + '_ld_config'
       picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
       picolibcpp_ld_variable = 'picolibcpp_' + target + '_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + 'ld_config'
+      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_ld_config'
+
+
+      if thread_local_storage
+        picolibc_stacktls_ld_file = 'picolibc_stacktls_' + custom_mem_config + '.ld'
+        picolibc_stacktls_ld_variable = 'picolibc_stacktls_' + target + '_ld'
+        picolibc_stacktls_ld_config_variable = 'picolibc_stacktls_' + custom_mem_config + '_ld_config'
+      endif
+
       picolibc_ld_install = false
     endif
 
@@ -1246,6 +1261,27 @@ foreach params : [default_target] + targets
     endif
                    
     set_variable(picolibcpp_ld_variable, get_variable(picolibcpp_ld_config_variable))
+
+    if thread_local_storage
+      picolibc_stacktls_ld_data = configuration_data()
+      picolibc_stacktls_ld_data.merge_from(picolibc_linker_type_data)
+      picolibc_stacktls_ld_data.set('CPP_START', '')
+      picolibc_stacktls_ld_data.set('CPP_END', '')
+      picolibc_stacktls_ld_data.set('C_START', '/*')
+      picolibc_stacktls_ld_data.set('C_END', '*/')
+      picolibc_stacktls_ld_data.set('PREFIX', global_prefix)
+
+      if not is_variable(picolibc_stacktls_ld_config_variable)
+        set_variable(picolibc_stacktls_ld_config_variable,
+                     configure_file(input: 'picolibc_stacktls.ld.in',
+                                    output: picolibc_stacktls_ld_file,
+                                    configuration: picolibc_stacktls_ld_data,
+                                    install: picolibc_ld_install and really_install,
+                                    install_dir: lib_dir))
+      endif
+      
+      set_variable(picolibc_stacktls_ld_variable, get_variable(picolibc_stacktls_ld_config_variable))
+    endif
 
   endif
 endforeach
@@ -1609,17 +1645,39 @@ if has_semihost
       test_linker_files_variable = 'test_linker_files'
       test_link_depends_variable = 'test_link_depends'
       picolibc_ld_value = picolibc_ld
+
+      if thread_local_storage
+        test_stacktls_link_args_variable = 'test_stacktls_link_args'
+        test_stacktls_linker_files_variable = 'test_stacktls_linker_files'
+        test_stacktls_link_depends_variable = 'test_stacktls_link_depends'
+        picolibc_stacktls_ld_value = picolibc_stacktls_ld
+      endif
+
     else
       test_link_args_variable = 'test_link_args' + target
       test_linker_files_variable = 'test_linker_files_' + target
       test_link_depends_variable = 'test_link_depends' + target
       picolibc_ld_value = get_variable('picolibc_' + target + '_ld', picolibc_ld)
+
+      if thread_local_storage
+        test_stacktls_link_args_variable = 'test_stacktls_link_args' + target
+        test_stacktls_linker_files_variable = 'test_stacktls_linker_files_' + target
+        test_stacktls_link_depends_variable = 'test_stacktls_link_depends' + target
+        picolibc_stacktls_ld_value = get_variable('picolibc_stacktls_' + target + '_ld', picolibc_stacktls_ld)
+      endif
+
     endif
 
     if meson.version().version_compare('>=1.4.0')
       picolibc_ld_string = picolibc_ld_value.full_path()
+      if thread_local_storage
+        picolibc_stacktls_ld_string = picolibc_stacktls_ld_value.full_path()
+      endif
     else
       picolibc_ld_string = '@0@'.format(picolibc_ld_value)
+      if thread_local_storage
+        picolibc_stacktls_ld_string = '@0@'.format(picolibc_stacktls_ld_value)
+      endif
     endif
 
     set_variable(test_link_args_variable,
@@ -1631,6 +1689,18 @@ if has_semihost
 
     # Make sure all of the tests get re-linked if the linker scripts change.
     set_variable(test_link_depends_variable, [picolibc_ld_value])
+
+    if thread_local_storage
+      set_variable(test_stacktls_link_args_variable,
+                   additional_libs_list + 
+		   test_link_args_base +
+                   ['-nostdlib', '-T', picolibc_stacktls_ld_string])
+
+      set_variable(test_stacktls_linker_files_variable, [picolibc_ld_value])
+
+      # Make sure all of the tests get re-linked if the linker scripts change.
+      set_variable(test_stacktls_link_depends_variable, [picolibc_stacktls_ld_value])
+    endif
   endforeach
 else
   test_link_args = test_link_args_base

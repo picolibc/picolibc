@@ -102,7 +102,7 @@ plain_tests = plain_tests_common
 
 plain_tests += math_tests + [
   'test-funopen',
-  'tls',  
+  'tls',
 ]
 
 plain_tests += ['test-memcpy_s',
@@ -155,6 +155,10 @@ foreach params : targets
   _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
+  if has_stacktls
+    _link_stacktls_args = target_c_args + _lib_files + get_variable('test_stacktls_link_args' + target, test_link_args)
+    _link_stacktls_depends = get_variable('test_stacktls_link_depends' + target, test_stacktls_link_depends) + _libs
+  endif
   if have_cplusplus
     _cpp_args = target_c_args + get_variable('test_cpp_args_' + target, test_cpp_args)
   endif
@@ -358,6 +362,22 @@ foreach params : targets
 		    link_args:  _link_args,
 		    objects: _objs_minimal,
 		    link_depends:  _link_depends,
+		    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+	 env: test_env)
+  endif
+
+  if is_variable('crt0_stacktls_semihost' + target)
+    _objs_stacktls = [get_variable('crt0_stacktls_semihost'+ target)]
+    t1 = 'tls-stack'
+
+    test(t1 + target,
+	 executable(t1 + target, ['tls.c', 'lock-valid.c'],
+		    c_args: _c_args + ['-DSTACK_TLS'],
+		    link_args:  _link_stacktls_args,
+		    objects: _objs_stacktls,
+		    link_depends:  _link_stacktls_depends,
 		    include_directories: inc),
          depends: bios_bin,
          suite: 'test',
