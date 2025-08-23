@@ -290,6 +290,10 @@ locale, hard-coding the "C" locale settings.
 #include <wchar.h>
 #include "local.h"
 #include "locale_private.h"
+#ifdef __TINY_STDIO
+#include "stdio_private.h"
+#undef TOLOWER
+#endif
 
 /* Defines to make the file dual use for either strftime() or wcsftime().
  * To get wcsftime, define MAKE_WCSFTIME.
@@ -301,7 +305,11 @@ locale, hard-coding the "C" locale settings.
 #if !defined(MAKE_WCSFTIME)
 #  define CHAR		char		/* string type basis */
 #  define CQ(a)		a		/* character constant qualifier */
+#ifdef __TINY_STDIO
+#  define t_snprintf	__d_snprintf	/* char equivalent function name */
+#else
 #  define t_snprintf	snprintf	/* char equivalent function name */
+#endif
 #  define t_strncmp	strncmp		/* char equivalent function name */
 #  define SFLG				/* %s flag (null for normal char) */
 #  define _ctloc(x)     (ctloclen = strlen (ctloc = x))
@@ -315,7 +323,11 @@ locale, hard-coding the "C" locale settings.
 #  define strftime_l	wcsftime_l	/* Alternate function name */
 #  define CHAR		wchar_t		/* string type basis */
 #  define CQ(a)		L##a		/* character constant qualifier */
+#ifdef __TINY_STDIO
+#  define t_snprintf	__d_swprintf	/* wide-char equivalent function name */
+#else
 #  define t_snprintf	swprintf	/* wide-char equivalent function name */
+#endif
 #  define t_strncmp	wcsncmp		/* wide-char equivalent function name */
 #  define TOLOWER(c)	towlower((wint_t)(c))
 #  define STRTOUL(c,p,b) wcstoul((c),(p),(b))
