@@ -52,6 +52,7 @@ set(tests
   timegm
   time-tests
   test-funopen
+  test-getdate
   test-strtod
   test-strchr
   test-memset
@@ -68,6 +69,7 @@ set(tests
   test-strcpy_s
   test-strerror_s
   test-strerrorlen_s
+  test-strftime
   test-strncat_s
   test-strncpy_s
   test-strnlen_s
