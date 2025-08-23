@@ -51,6 +51,7 @@ srcs_time = [
     'month_lengths.c',
     'strftime.c',
     'strptime.c',
+    'strptime_l.c',
     'time.c',
     'tzcalc_limits.c',
     'tzset.c',
