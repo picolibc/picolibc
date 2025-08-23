@@ -249,6 +249,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 0 || 23 < ret)
+                    return NULL;
 		timeptr->tm_hour = ret;
 		buf = s;
 		break;
@@ -257,16 +259,19 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 1 || 12 < ret)
+                    return NULL;
 		if (ret == 12)
-		    timeptr->tm_hour = 0;
-		else
-		    timeptr->tm_hour = ret;
+                    ret = 0;
+                timeptr->tm_hour = ret;
 		buf = s;
 		break;
 	    case 'j' :
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 1 || 366 < ret)
+                    return NULL;
 		timeptr->tm_yday = ret - 1;
 		buf = s;
 		ymd |= SET_YDAY;
@@ -275,6 +280,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 1 || 12 < ret)
+                    return NULL;
 		timeptr->tm_mon = ret - 1;
 		buf = s;
 		ymd |= SET_MON;
@@ -283,6 +290,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 0 || 59 < ret)
+                    return NULL;
 		timeptr->tm_min = ret;
 		buf = s;
 		break;
@@ -334,6 +343,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 0 || 61 < ret)
+                    return NULL;
 		timeptr->tm_sec = ret;
 		buf = s;
 		break;
@@ -353,6 +364,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 1 || 7 < ret)
+                    return NULL;
                 if (ret == 7)
                     ret = 0;
 		timeptr->tm_wday = ret;
@@ -363,6 +376,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 0 || 6 < ret)
+                    return NULL;
 		timeptr->tm_wday = ret;
 		buf = s;
 		ymd |= SET_WDAY;
@@ -371,6 +386,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		wnum = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (wnum < 0 || 53 < wnum)
+                    return NULL;
 		buf = s;
 		ymd |= SET_WEEK_SUN;
 		break;
@@ -378,6 +395,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		wnum = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (wnum < 1 || 53 < wnum)
+                    return NULL;
 		buf = s;
 		ymd |= SET_WEEK_MON4;
 		break;
@@ -385,6 +404,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		wnum = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (wnum < 0 || 53 < wnum)
+                    return NULL;
 		buf = s;
 		ymd |= SET_WEEK_MON;
 		break;
@@ -405,6 +426,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
+                if (ret < 0 || 99 < ret)
+                    return NULL;
 		if (ret < 70)
 		    timeptr->tm_year = 100 + ret;
 		else
