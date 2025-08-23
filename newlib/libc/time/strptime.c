@@ -51,7 +51,11 @@ static const int _DAYS_BEFORE_MONTH[12] =
 #define SET_YEAR 4
 #define SET_WDAY 8
 #define SET_YDAY 16
+#define SET_WEEK_SUN 32
+#define SET_WEEK_MON 64
+#define SET_WEEK_MON4 128
 #define SET_YMD  (SET_YEAR | SET_MON | SET_MDAY)
+#define SET_WEEK (SET_WEEK_SUN | SET_WEEK_MON | SET_WEEK_MON4)
 
 /*
  * tm_year is relative this year 
@@ -138,13 +142,12 @@ set_week_number_mon (struct tm *timeptr, int wnum)
 static void
 set_week_number_mon4 (struct tm *timeptr, int wnum)
 {
-    int fday = (first_day (timeptr->tm_year + tm_year_base) + 6) % 7;
-    int offset = 0;
+    int fday = first_day (timeptr->tm_year + tm_year_base);
 
-    if (fday < 4)
-	offset += 7;
+    if (fday >= 4)
+	wnum++;
 
-    timeptr->tm_yday = offset + (wnum - 1) * 7 + timeptr->tm_wday - fday;
+    timeptr->tm_yday = (wnum - 1) * 7 + timeptr->tm_wday - fday;
     if (timeptr->tm_yday < 0) {
 	timeptr->tm_wday = fday;
 	timeptr->tm_yday = 0;
@@ -157,6 +160,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 {
     char c;
     int ymd = 0;
+    int wnum = 0;
 
     for (; (c = *format) != '\0'; ++format) {
 	char *s;
@@ -359,7 +363,9 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
-		timeptr->tm_wday = ret - 1;
+                if (ret == 7)
+                    ret = 0;
+		timeptr->tm_wday = ret;
 		buf = s;
 		ymd |= SET_WDAY;
 		break;
@@ -372,28 +378,25 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ymd |= SET_WDAY;
 		break;
 	    case 'U' :
-		ret = strtol_l (buf, &s, 10, locale);
+		wnum = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
-		set_week_number_sun (timeptr, ret);
 		buf = s;
-		ymd |= SET_YDAY;
+		ymd |= SET_WEEK_SUN;
 		break;
 	    case 'V' :
-		ret = strtol_l (buf, &s, 10, locale);
+		wnum = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
-		set_week_number_mon4 (timeptr, ret);
 		buf = s;
-		ymd |= SET_YDAY;
+		ymd |= SET_WEEK_MON4;
 		break;
 	    case 'W' :
-		ret = strtol_l (buf, &s, 10, locale);
+		wnum = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
-		set_week_number_mon (timeptr, ret);
 		buf = s;
-		ymd |= SET_YDAY;
+		ymd |= SET_WEEK_MON;
 		break;
 	    case 'x' :
 		s = strptime_l (buf, TIME_X_FMT, timeptr, locale);
@@ -454,6 +457,18 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 	}
     }
 
+    if ((ymd & SET_WEEK) != 0 && (ymd & (SET_YEAR|SET_WDAY)) == (SET_YEAR|SET_WDAY)) {
+        /* tm_year and week number, compute tm_yday */
+
+        if (ymd & SET_WEEK_SUN)
+            set_week_number_sun (timeptr, wnum);
+        else if (ymd & SET_WEEK_MON4)
+            set_week_number_mon4 (timeptr, wnum);
+        else if (ymd & SET_WEEK_MON)
+            set_week_number_mon (timeptr, wnum);
+        ymd |= SET_YDAY;
+    }
+
     if ((ymd & SET_YMD) == SET_YMD) {
 	/* all of tm_year, tm_mon and tm_mday, but... */
 
@@ -504,6 +519,8 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 	int fday = first_day (timeptr->tm_year + tm_year_base);
 	timeptr->tm_wday = (fday + timeptr->tm_yday) % 7;
     }
+
+    timeptr->tm_isdst = -1;
 
     return (char *)buf;
 }
