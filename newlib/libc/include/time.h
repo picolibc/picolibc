@@ -118,6 +118,11 @@ struct itimerspec {
 	struct timespec  it_value;
 };
 
+#ifndef _PID_T_DECLARED
+typedef	__pid_t		pid_t;		/* process id */
+#define	_PID_T_DECLARED
+#endif
+
 #endif
 
 #if __GNU_VISIBLE
@@ -219,11 +224,13 @@ char	  *ctime_r 	(const time_t *,
 double	   difftime (time_t _time2, time_t _time1);
 
 #if __XSI_VISIBLE >= 4
+
+extern int getdate_err;
+
 struct tm *getdate (const char *);
 #endif /* __XSI_VISIBLE >= 4 */
 
 #if __GNU_VISIBLE
-extern int getdate_err;
 
 int	   getdate_r (const char *, struct tm *);
 #endif /* __GNU_VISIBLE */
