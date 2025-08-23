@@ -39,11 +39,17 @@ int
 swprintf(wchar_t *s, size_t len, const wchar_t *fmt, ...)
 {
 	va_list ap;
-        int i;
+	int i;
+        struct __file_str f = FDEV_SETUP_STRING_WRITE((char *) s,
+                                                      (char *) FDEV_STRING_WRITE_END(s, len));
+        f.file.flags |= __SWIDE;
 
 	va_start(ap, fmt);
-	i = vswprintf(s, len, fmt, ap);
+	i = vfwprintf(&f.file, fmt, ap);
 	va_end(ap);
+
+	if (len)
+            *f.pos = '\0';
 
         return i;
 }

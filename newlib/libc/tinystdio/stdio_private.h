@@ -290,6 +290,8 @@ int	__i_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIB
 int	__l_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 int	__m_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 
+int      __d_swprintf(wchar_t *__restrict, size_t, const wchar_t *__restrict, ...);
+
 #if __SIZEOF_DOUBLE__ == 8
 #define FLOAT64 double
 #define _asdouble(x) _asfloat64(x)

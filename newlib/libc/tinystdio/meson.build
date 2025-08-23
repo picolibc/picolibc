@@ -149,6 +149,7 @@ srcs_tinystdio = [
   'strtoumax.c',
   'strtoumax_l.c',
   'swprintf.c',
+  'swprintfd.c',
   'swscanf.c',
   'tmpfile.c',
   'tmpnam.c',
