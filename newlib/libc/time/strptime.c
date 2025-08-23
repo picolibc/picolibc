@@ -295,12 +295,6 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		timeptr->tm_min = ret;
 		buf = s;
 		break;
-	    case 'n' :
-		if (*buf == '\n')
-		    ++buf;
-		else
-		    return NULL;
-		break;
 	    case 'p' :
 		ampm = match_string (&buf, TIME_AM_PM, locale);
 		if (ampm < 0)
@@ -348,11 +342,10 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		timeptr->tm_sec = ret;
 		buf = s;
 		break;
+	    case 'n' :
 	    case 't' :
-		if (*buf == '\t')
+                while (isspace_l((unsigned char) *buf, locale))
 		    ++buf;
-		else
-		    return NULL;
 		break;
 	    case 'T' :		/* %H:%M:%S */
 		s = strptime_l (buf, "%H:%M:%S", timeptr, locale);
