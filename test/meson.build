@@ -48,6 +48,7 @@ plain_tests_common = ['regex', 'ungetc',
                       'test-scmpu',
                       'test-strncpy',
                       'time-tests',
+                      'test-time',
 	      ]
 
 math_tests_common = [
