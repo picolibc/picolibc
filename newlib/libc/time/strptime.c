@@ -61,7 +61,8 @@ static const int _DAYS_BEFORE_MONTH[12] =
 /*
  * tm_year is relative this year 
  */
-const int tm_year_base = 1900;
+
+#define TM_YEAR_BASE    1900
 
 /*
  * Return TRUE iff `year' was a leap year.
@@ -110,7 +111,7 @@ first_day (int year)
 static void
 set_week_number_sun (struct tm *timeptr, int wnum)
 {
-    int fday = first_day (timeptr->tm_year + tm_year_base);
+    int fday = first_day (timeptr->tm_year + TM_YEAR_BASE);
 
     timeptr->tm_yday = wnum * 7 + timeptr->tm_wday - fday;
     if (timeptr->tm_yday < 0) {
@@ -127,7 +128,7 @@ set_week_number_sun (struct tm *timeptr, int wnum)
 static void
 set_week_number_mon (struct tm *timeptr, int wnum)
 {
-    int fday = (first_day (timeptr->tm_year + tm_year_base) + 6) % 7;
+    int fday = (first_day (timeptr->tm_year + TM_YEAR_BASE) + 6) % 7;
 
     timeptr->tm_yday = wnum * 7 + (timeptr->tm_wday + 6) % 7 - fday;
     if (timeptr->tm_yday < 0) {
@@ -143,7 +144,7 @@ set_week_number_mon (struct tm *timeptr, int wnum)
 static void
 set_week_number_mon4 (struct tm *timeptr, int wnum)
 {
-    int fday = first_day (timeptr->tm_year + tm_year_base);
+    int fday = first_day (timeptr->tm_year + TM_YEAR_BASE);
 
     if (fday >= 4)
 	wnum++;
@@ -209,7 +210,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
-		timeptr->tm_year = (ret * 100) - tm_year_base;
+		timeptr->tm_year = (ret * 100) - TM_YEAR_BASE;
 		buf = s;
 		ymd |= SET_YEAR;
 		break;
@@ -415,7 +416,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		ret = strtol_l (buf, &s, 10, locale);
 		if (s == buf)
 		    return NULL;
-		timeptr->tm_year = ret - tm_year_base;
+		timeptr->tm_year = ret - TM_YEAR_BASE;
 		buf = s;
 		ymd |= SET_YEAR;
 		break;
@@ -474,7 +475,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 	    /* ...not tm_yday, so fill it in */
 	    timeptr->tm_yday = _DAYS_BEFORE_MONTH[timeptr->tm_mon]
 		+ timeptr->tm_mday;
-	    if (!is_leap_year (timeptr->tm_year + tm_year_base)
+	    if (!is_leap_year (timeptr->tm_year + TM_YEAR_BASE)
 		|| timeptr->tm_mon < 2)
 	    {
 		timeptr->tm_yday--;
@@ -490,7 +491,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 	    if (timeptr->tm_yday < _DAYS_BEFORE_MONTH[1])
 		timeptr->tm_mon = 0;
 	    else {
-		int leap = is_leap_year (timeptr->tm_year + tm_year_base);
+		int leap = is_leap_year (timeptr->tm_year + TM_YEAR_BASE);
 		int i;
 		for (i = 2; i < 12; ++i) {
 		    if (timeptr->tm_yday < _DAYS_BEFORE_MONTH[i] + leap)
@@ -504,7 +505,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 	    /* ...not tm_mday, so fill it in */
 	    timeptr->tm_mday = timeptr->tm_yday
 		- _DAYS_BEFORE_MONTH[timeptr->tm_mon];
-	    if (!is_leap_year (timeptr->tm_year + tm_year_base)
+	    if (!is_leap_year (timeptr->tm_year + TM_YEAR_BASE)
 		|| timeptr->tm_mon < 2)
 	    {
 		timeptr->tm_mday++;
@@ -514,7 +515,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 
     if ((ymd & (SET_YEAR | SET_YDAY | SET_WDAY)) == (SET_YEAR | SET_YDAY)) {
 	/* fill in tm_wday */
-	int fday = first_day (timeptr->tm_year + tm_year_base);
+	int fday = first_day (timeptr->tm_year + TM_YEAR_BASE);
 	timeptr->tm_wday = (fday + timeptr->tm_yday) % 7;
     }
 
