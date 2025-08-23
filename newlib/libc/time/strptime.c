@@ -46,16 +46,17 @@
 static const int _DAYS_BEFORE_MONTH[12] =
 {0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334};
 
-#define SET_MDAY 1
-#define SET_MON  2
-#define SET_YEAR 4
-#define SET_WDAY 8
-#define SET_YDAY 16
-#define SET_WEEK_SUN 32
-#define SET_WEEK_MON 64
-#define SET_WEEK_MON4 128
-#define SET_YMD  (SET_YEAR | SET_MON | SET_MDAY)
-#define SET_WEEK (SET_WEEK_SUN | SET_WEEK_MON | SET_WEEK_MON4)
+#define SET_MDAY        (1 << 0)
+#define SET_MON         (1 << 1)
+#define SET_YEAR        (1 << 2)
+#define SET_WDAY        (1 << 3)
+#define SET_YDAY        (1 << 4)
+#define SET_WEEK_SUN    (1 << 5)
+#define SET_WEEK_MON    (1 << 6)
+#define SET_WEEK_MON4   (1 << 7)
+#define SET_AMPM        (1 << 8)
+#define SET_YMD         (SET_YEAR | SET_MON | SET_MDAY)
+#define SET_WEEK        (SET_WEEK_SUN | SET_WEEK_MON | SET_WEEK_MON4)
 
 /*
  * tm_year is relative this year 
@@ -161,6 +162,7 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
     char c;
     int ymd = 0;
     int wnum = 0;
+    int ampm = 0;
 
     for (; (c = *format) != '\0'; ++format) {
 	char *s;
@@ -290,23 +292,10 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
 		    return NULL;
 		break;
 	    case 'p' :
-		ret = match_string (&buf, TIME_AM_PM, locale);
-		if (ret < 0)
+		ampm = match_string (&buf, TIME_AM_PM, locale);
+		if (ampm < 0)
 		    return NULL;
-		if (timeptr->tm_hour > 12)
-		    return NULL;
-		else if (timeptr->tm_hour == 12)
-		    timeptr->tm_hour = ret * 12;
-		else
-		    timeptr->tm_hour += ret * 12;
-		break;
-	    case 'q' :		/* quarter year - GNU extension */
-		ret = strtol_l (buf, &s, 10, locale);
-		if (s == buf)
-		    return NULL;
-		timeptr->tm_mon = (ret - 1)*3;
-		buf = s;
-		ymd |= SET_MON;
+                ymd |= SET_AMPM;
 		break;
 	    case 'r' :		/* %I:%M:%S %p */
 		s = strptime_l (buf, TIME_AMPM_FMT, timeptr, locale);
@@ -467,6 +456,15 @@ strptime_l (const char *buf, const char *format, struct tm *timeptr,
         else if (ymd & SET_WEEK_MON)
             set_week_number_mon (timeptr, wnum);
         ymd |= SET_YDAY;
+    }
+
+    if (ymd & SET_AMPM) {
+        if (timeptr->tm_hour > 12)
+            return NULL;
+        else if (timeptr->tm_hour == 12)
+            timeptr->tm_hour = ampm * 12;
+        else
+            timeptr->tm_hour += ampm * 12;
     }
 
     if ((ymd & SET_YMD) == SET_YMD) {
