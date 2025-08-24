@@ -214,16 +214,6 @@ __find_locale(const char *name);
 #define WTHOUSANDS_SEP_L(l)     ((void) (l), THOUSANDS_SEP)
 
 /* LC_TIME data */
-extern const char *const __time_wday[7];
-extern const char *const __time_weekday[7];
-extern const char *const __time_mon[12];
-extern const char *const __time_month[12];
-extern const char *const __time_am_pm[2];
-extern const wchar_t *const __wtime_wday[7];
-extern const wchar_t *const __wtime_weekday[7];
-extern const wchar_t *const __wtime_mon[12];
-extern const wchar_t *const __wtime_month[12];
-extern const wchar_t *const __wtime_am_pm[2];
 
 #define TIME_ERA                ""
 #define TIME_ERA_D_T_FMT_L(l)   ((void) (l), "")
@@ -234,14 +224,30 @@ extern const wchar_t *const __wtime_am_pm[2];
 #define TIME_ERA_T_FMT          ""
 #define TIME_ALT_DIGITS         ""
 #define TIME_WDAY               __time_wday
+#define TIME_WDAY_NUM           7
 #define TIME_WEEKDAY            __time_weekday
+#define TIME_WEEKDAY_NUM        7
 #define TIME_MON                __time_mon
+#define TIME_MON_NUM            12
 #define TIME_MONTH              __time_month
+#define TIME_MONTH_NUM          12
 #define TIME_AM_PM              __time_am_pm
+#define TIME_AM_PM_NUM          2
 #define TIME_C_FMT              "%a %b %e %H:%M:%S %Y"
 #define TIME_X_FMT              "%m/%d/%y"
 #define TIME_UX_FMT             "%H:%M:%S"
 #define TIME_AMPM_FMT           "%I:%M:%S %p"
+
+extern const char *const __time_wday[TIME_WDAY_NUM];
+extern const char *const __time_weekday[TIME_WEEKDAY_NUM];
+extern const char *const __time_mon[TIME_MON_NUM];
+extern const char *const __time_month[TIME_MONTH_NUM];
+extern const char *const __time_am_pm[TIME_AM_PM_NUM];
+extern const wchar_t *const __wtime_wday[TIME_WDAY_NUM];
+extern const wchar_t *const __wtime_weekday[TIME_WEEKDAY_NUM];
+extern const wchar_t *const __wtime_mon[TIME_MON_NUM];
+extern const wchar_t *const __wtime_month[TIME_MONTH_NUM];
+extern const wchar_t *const __wtime_am_pm[TIME_AM_PM_NUM];
 
 #define WTIME_ERA               L""
 #define WTIME_ERA_D_T_FMT_L(l)  ((void) (l), L"")
