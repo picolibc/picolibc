@@ -233,3 +233,5 @@ picolibc_headers(""
   stdio.h
   stdio-bufio.h
   )
+
+target_include_directories(c PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
