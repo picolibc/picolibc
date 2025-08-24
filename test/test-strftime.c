@@ -21,6 +21,7 @@
 #include <limits.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 /* This test code relies on ANSI C features, in particular on the ability
  * of adjacent strings to be pasted together into one string.  */
@@ -30,12 +31,29 @@
 
 #define YEAR_BASE 1900
 
-#ifndef CHAR
-#define CHAR    char
-#define CQ(a)   a
-#define t_strncmp strncmp
-#define SFLG
-#endif
+#if !defined(MAKE_WCSFTIME)
+#  define CHAR		char		/* string type basis */
+#  define CQ(a)		a		/* character constant qualifier */
+#  define t_strncmp	strncmp		/* char equivalent function name */
+#  define SFLG				/* %s flag (null for normal char) */
+#  define TOLOWER(c)	tolower((int)(unsigned char)(c))
+#  define STRTOUL(c,p,b) strtoul((c),(p),(b))
+#  define STRCPY(a,b)	strcpy((a),(b))
+#  define STRCHR(a,b)	strchr((a),(b))
+#  define STRLEN(a)	strlen(a)
+# else
+#  define strftime	wcsftime	/* Alternate function name */
+#  define strftime_l	wcsftime_l	/* Alternate function name */
+#  define CHAR		wchar_t		/* string type basis */
+#  define CQ(a)		L##a		/* character constant qualifier */
+#  define t_strncmp	wcsncmp		/* wide-char equivalent function name */
+#  define TOLOWER(c)	towlower((wint_t)(c))
+#  define STRTOUL(c,p,b) wcstoul((c),(p),(b))
+#  define STRCPY(a,b)	wcscpy((a),(b))
+#  define STRCHR(a,b)	wcschr((a),(b))
+#  define STRLEN(a)	wcslen(a)
+#  define SFLG		"l"		/* %s flag (l for wide char) */
+#endif  /* MAKE_WCSFTIME */
 
 struct test {
 	CHAR  *fmt;	/* Testing format */

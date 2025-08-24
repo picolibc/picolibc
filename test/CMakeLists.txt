@@ -77,6 +77,7 @@ set(tests
   test-uchar
   test-vfprintf_s
   test-vsnprintf_s
+  test-wcsftime
   )
 
 set(tests_fail

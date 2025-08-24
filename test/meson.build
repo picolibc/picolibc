@@ -51,6 +51,7 @@ plain_tests_common = ['regex', 'ungetc',
                       'time-tests',
                       'test-time',
                       'test-getdate',
+                      'test-wcsftime',
 	      ]
 
 math_tests_common = [
