@@ -829,6 +829,9 @@ else
   test_fortify_arg = '-D_FORTIFY_SOURCE=' + fortify_source
 endif
 test_c_args += [test_fortify_arg]
+if tests_enable_posix_io
+  test_c_args += ['-DTESTS_ENABLE_POSIX_IO']
+endif
 
 c_args += cc.get_supported_arguments(['-fno-stack-protector'])
 
