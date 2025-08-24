@@ -77,12 +77,12 @@ is_leap_year (int year)
 /* Needed for strptime. */
 static int
 match_string (const char *__restrict *buf, const char * const*strs,
-	      locale_t locale)
+              int nstrs, locale_t locale)
 {
     int i = 0;
 
-    for (i = 0; strs[i] != NULL; ++i) {
-	int len = strlen (strs[i]);
+    for (i = 0; i < nstrs; i++) {
+	size_t len = strlen (strs[i]);
 
 	if (strncasecmp_l (*buf, strs[i], len, locale) == 0) {
 	    *buf += len;
@@ -178,21 +178,21 @@ __strptime (const char *buf, const char *format, struct tm *timeptr,
 		c = *++format;
 	    switch (c) {
 	    case 'A' :
-		ret = match_string (&buf, TIME_WEEKDAY, locale);
+		ret = match_string (&buf, TIME_WEEKDAY, TIME_WEEKDAY_NUM, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		ymd |= SET_WDAY;
 		break;
 	    case 'a' :
-		ret = match_string (&buf, TIME_WDAY, locale);
+		ret = match_string (&buf, TIME_WDAY, TIME_WDAY_NUM, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_wday = ret;
 		ymd |= SET_WDAY;
 		break;
 	    case 'B' :
-		ret = match_string (&buf, TIME_MONTH, locale);
+		ret = match_string (&buf, TIME_MONTH, TIME_MONTH_NUM, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
@@ -200,7 +200,7 @@ __strptime (const char *buf, const char *format, struct tm *timeptr,
 		break;
 	    case 'b' :
 	    case 'h' :
-		ret = match_string (&buf, TIME_MON, locale);
+		ret = match_string (&buf, TIME_MON, TIME_MON_NUM, locale);
 		if (ret < 0)
 		    return NULL;
 		timeptr->tm_mon = ret;
@@ -298,7 +298,7 @@ __strptime (const char *buf, const char *format, struct tm *timeptr,
 		buf = s;
 		break;
 	    case 'p' :
-		ampm = match_string (&buf, TIME_AM_PM, locale);
+		ampm = match_string (&buf, TIME_AM_PM, TIME_AM_PM_NUM, locale);
 		if (ampm < 0)
 		    return NULL;
                 ymd |= SET_AMPM;
