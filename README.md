@@ -8,10 +8,9 @@ code from [Newlib](http://sourceware.org/newlib/) and
 
 Build status:
 
- * ![Linux](https://github.com/picolibc/picolibc/workflows/Linux/badge.svg?branch=main)
- * ![Zephyr](https://github.com/picolibc/picolibc/workflows/Zephyr/badge.svg?branch=main)
- * ![Coreboot](https://github.com/picolibc/picolibc/workflows/Coreboot/badge.svg?branch=main)
- * ![Mac OS X](https://github.com/picolibc/picolibc/workflows/Mac%20OS%20X/badge.svg)
+ * [![Linux](https://github.com/picolibc/picolibc/actions/workflows/linux.yml/badge.svg)](https://github.com/picolibc/picolibc/actions/workflows/linux.yml)
+ * [![Zephyr](https://github.com/picolibc/picolibc/actions/workflows/zephyr.yml/badge.svg)](https://github.com/picolibc/picolibc/actions/workflows/zephyr.yml)
+ * [![Coreboot](https://github.com/picolibc/picolibc/actions/workflows/coreboot.yml/badge.svg?branch=main)](https://github.com/picolibc/picolibc/actions/workflows/coreboot.yml)
 
 ## License
 
