@@ -19,9 +19,24 @@
 #ifdef __HAVE_68881__
 #define LOW_PREC_1        62
 #define LOW_PREC_2        62
+#define LOW_PREC_3        63
+#define LOW_PREC_4        62
+#define LOW_PREC_5        60
+#define LOW_PREC_6        63
+#elif defined(__GLIBC__) && defined(__aarch64__)
+#define LOW_PREC_1        64
+#define LOW_PREC_2        62
+#define LOW_PREC_3        62
+#define LOW_PREC_4        61
+#define LOW_PREC_5        59
+#define LOW_PREC_6        62
 #else
 #define LOW_PREC_1        64
 #define LOW_PREC_2        63
+#define LOW_PREC_3        63
+#define LOW_PREC_4        62
+#define LOW_PREC_5        60
+#define LOW_PREC_6        63
 #endif
 
  one_line_type y0_vec[] = {
@@ -228,14 +243,14 @@
 {62, 0,123,__LINE__, 0xbfb638ac, 0x9857e6d4, 0x3fe99999, 0x999999a7},	/* -0.0868023=f(0.8)*/
 {63, 0,123,__LINE__, 0xbfb3bb56, 0xa0f5dce8, 0x3fe9eb85, 0x1eb851f9},	/* -0.0770773=f(0.81)*/
 {62, 0,123,__LINE__, 0xbfb14552, 0x2135f8ee, 0x3fea3d70, 0xa3d70a4b},	/* -0.067464=f(0.82)*/
-{63, 0,123,__LINE__, 0xbfadad00, 0x48d1344c, 0x3fea8f5c, 0x28f5c29d},	/* -0.0579605=f(0.83)*/
-{62, 0,123,__LINE__, 0xbfa8dd86, 0x0d3a74e3, 0x3feae147, 0xae147aef},	/* -0.0485651=f(0.84)*/
+{LOW_PREC_3, 0,123,__LINE__, 0xbfadad00, 0x48d1344c, 0x3fea8f5c, 0x28f5c29d},	/* -0.0579605=f(0.83)*/
+{LOW_PREC_4, 0,123,__LINE__, 0xbfa8dd86, 0x0d3a74e3, 0x3feae147, 0xae147aef},	/* -0.0485651=f(0.84)*/
 {61, 0,123,__LINE__, 0xbfa41bfc, 0xc78b8379, 0x3feb3333, 0x33333341},	/* -0.039276=f(0.85)*/
 {61, 0,123,__LINE__, 0xbf9ed05c, 0x1f5d00d6, 0x3feb851e, 0xb851eb93},	/* -0.0300917=f(0.86)*/
 {LOW_PREC_2, 0,123,__LINE__, 0xbf9583cb, 0x7f59a6c5, 0x3febd70a, 0x3d70a3e5},	/* -0.0210106=f(0.87)*/
 {60, 0,123,__LINE__, 0xbf88a3c7, 0x5dfcb6ba, 0x3fec28f5, 0xc28f5c37},	/* -0.0120311=f(0.88)*/
 {58, 0,123,__LINE__, 0xbf69d226, 0x276b52f6, 0x3fec7ae1, 0x47ae1489},	/* -0.00315196=f(0.89)*/
-{60, 0,123,__LINE__, 0x3f770db5, 0x0ee194be, 0x3feccccc, 0xccccccdb},	/* 0.00562831=f(0.9)*/
+{LOW_PREC_5, 0,123,__LINE__, 0x3f770db5, 0x0ee194be, 0x3feccccc, 0xccccccdb},	/* 0.00562831=f(0.9)*/
 {59, 0,123,__LINE__, 0x3f8d4f15, 0x757ba377, 0x3fed1eb8, 0x51eb852d},	/* 0.014311=f(0.91)*/
 {61, 0,123,__LINE__, 0x3f977268, 0x67a99a89, 0x3fed70a3, 0xd70a3d7f},	/* 0.0228974=f(0.92)*/
 {62, 0,123,__LINE__, 0x3fa0122b, 0xda106704, 0x3fedc28f, 0x5c28f5d1},	/* 0.0313886=f(0.93)*/
@@ -252,7 +267,7 @@
 {62, 0,123,__LINE__, 0x3fbe6ae9, 0x45d171b9, 0x3ff0a3d7, 0x0a3d70ab},	/* 0.118819=f(1.04)*/
 {63, 0,123,__LINE__, 0x3fc028e5, 0x7ba671d6, 0x3ff0cccc, 0xccccccd4},	/* 0.126248=f(1.05)*/
 {63, 0,123,__LINE__, 0x3fc1199e, 0x3305325a, 0x3ff0f5c2, 0x8f5c28fd},	/* 0.133594=f(1.06)*/
-{63, 0,123,__LINE__, 0x3fc207a4, 0xbafdecff, 0x3ff11eb8, 0x51eb8526},	/* 0.140858=f(1.07)*/
+{LOW_PREC_6, 0,123,__LINE__, 0x3fc207a4, 0xbafdecff, 0x3ff11eb8, 0x51eb8526},	/* 0.140858=f(1.07)*/
 {63, 0,123,__LINE__, 0x3fc2f2fe, 0xcf4c4294, 0x3ff147ae, 0x147ae14f},	/* 0.148041=f(1.08)*/
 {62, 0,123,__LINE__, 0x3fc3dbb1, 0xf7c61893, 0x3ff170a3, 0xd70a3d78},	/* 0.155142=f(1.09)*/
 {62, 0,123,__LINE__, 0x3fc4c1c3, 0x8a97c193, 0x3ff19999, 0x999999a1},	/* 0.162163=f(1.1)*/
