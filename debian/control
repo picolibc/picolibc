@@ -12,6 +12,7 @@ Vcs-Browser: https://keithp.com/cgit/picolibc.git/
 
 Package: picolibc-riscv64-unknown-elf
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends}, gcc-riscv64-unknown-elf
 Description: Smaller embedded C library for RISC-V development
  PicoLibc is a combination of Newlib and AVR libc bits designed
@@ -20,6 +21,7 @@ Description: Smaller embedded C library for RISC-V development
 
 Package: picolibc-arm-none-eabi
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends}, gcc-arm-none-eabi
 Description: Smaller embedded C library for ARM development
  PicoLibc is a combination of Newlib and AVR libc bits designed
@@ -28,6 +30,7 @@ Description: Smaller embedded C library for ARM development
 
 Package: picolibc-xtensa-lx106-elf
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends}, gcc-xtensa-lx106
 Description: Smaller embedded C library for ESP8266 development
  PicoLibc is a combination of Newlib and AVR libc bits designed
@@ -36,6 +39,7 @@ Description: Smaller embedded C library for ESP8266 development
 
 Package: picolibc-aarch64-linux-gnu
 Architecture: all
+Multi-Arch: foreign
 Depends: ${misc:Depends}, gcc-aarch64-linux-gnu
 Description: Smaller embedded C library for 64-bit ARM development
  PicoLibc is a combination of Newlib and AVR libc bits designed
