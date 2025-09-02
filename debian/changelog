@@ -1,3 +1,9 @@
+picolibc (1.8.10-3) unstable; urgency=medium
+
+  * Support cross builds.
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 01 Sep 2025 20:10:53 -0500
+
 picolibc (1.8.10-2) unstable; urgency=medium
 
   * Add qemu version 10 patch for riscv. Closes: #1104372.
