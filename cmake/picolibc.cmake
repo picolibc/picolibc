@@ -104,6 +104,7 @@ function(picolibc_headers subdir)
 endfunction()
 
 function(_picolibc_supported_compile_options var)
+  set(picolibc_compile_options)
   set(CMAKE_TRY_COMPILE_TARGET_TYPE STATIC_LIBRARY)
   foreach(flag ${ARGN})
     string(MAKE_C_IDENTIFIER ${flag} flag_under)
@@ -112,10 +113,10 @@ function(_picolibc_supported_compile_options var)
       COMPILE_DEFINITIONS "${PICOLIBC_TEST_COMPILE_OPTIONS};${PICOLIBC_FLAG_OPTIONS};${flag}"
       )
     if(${${flag_under}})
-      list(APPEND options ${flag})
+      list(APPEND picolibc_compile_options ${flag})
     endif()
   endforeach()
-  set(${var} ${options} PARENT_SCOPE)
+  set(${var} ${picolibc_compile_options} PARENT_SCOPE)
 endfunction()
 
 # These flags are needed to generate errors for invalid command line flags
