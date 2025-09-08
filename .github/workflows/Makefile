@@ -9,7 +9,7 @@ LINUX_DEPS=\
 	steps-minsize \
 	steps-release
 
-all: linux.yml zephyr.yml coreboot.yml
+all: linux.yml zephyr.yml # coreboot.yml
 
 linux.yml: $(LINUX_DEPS)
 	./make-workflow > $@
