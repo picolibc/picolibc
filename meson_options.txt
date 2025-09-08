@@ -59,6 +59,8 @@ option('assert-verbose', type: 'boolean', value: true,
        description: 'Assert provides verbose information')
 option('fast-strcmp', type: 'boolean', value: true,
        description: 'Always optimize strcmp for performance')
+option('sanitize', type: 'string', value: 'none',
+       description: 'Code sanitizer to use')
 
 #
 # Installation options

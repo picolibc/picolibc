@@ -202,7 +202,7 @@ c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsigna
 c_args += c_flags
 native_c_args = native_common_args + c_flags
 
-sanitize_flag = get_option('b_sanitize')
+sanitize_flag = get_option('sanitize')
 if sanitize_flag == 'none'
   sanitize_flag = ''
 endif
