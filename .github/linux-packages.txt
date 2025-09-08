@@ -4,8 +4,8 @@ cmake
 file
 ninja-build
 gcc
-libx32gcc-14-dev
-lib32gcc-14-dev
+libx32gcc-15-dev
+lib32gcc-15-dev
 gcc-i686-linux-gnu
 libc6-dev-i386-cross
 gcc-arm-none-eabi
@@ -28,7 +28,7 @@ gcc-sparc64-linux-gnu
 libc6-dev-sparc64-cross
 libc6:i386
 libc6-dev-i386
-lib32stdc++-14-dev
+lib32stdc++-15-dev
 lld
 clang
 qemu-system-x86
