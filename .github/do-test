@@ -13,7 +13,7 @@ done
 # of false positives, so just use the sanitizer as it
 # appears to find more relevant bugs at this point.
 
-SANITIZER="-Db_sanitize=undefined"
+SANITIZER="-Dsanitize=undefined"
 
 # Use traps with the sanitizer on msp430 as the handlers make many
 # tests too large
