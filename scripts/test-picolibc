@@ -7,7 +7,7 @@ set -e
 
 #test=echo
 
-options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Db_sanitize=undefined"
+options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Dsanitize=undefined"
 minoptions="$options"
 reloptions="$options --buildtype=release -Ddebug=true -Dbuild-type-subdir=release"
 
