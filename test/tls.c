@@ -263,15 +263,15 @@ main(void)
 #ifdef __THREAD_LOCAL_STORAGE_API
         printf("TLS region: %p-%p (%zd bytes)\n", __tdata_start,
 	       __tdata_start + _tls_size(), _tls_size());
-	size_t tdata_source_size = __tdata_source_end - __tdata_source;
-	size_t tdata_size = __tdata_end - __tdata_start;
+	size_t tdata_source_size = (uintptr_t) __tdata_source_end - (uintptr_t) __tdata_source;
+	size_t tdata_size = (uintptr_t) __tdata_end - (uintptr_t) __tdata_start;
 
-	if (__tdata_start - __data_start != __tdata_source - __data_source) {
+	if ((uintptr_t) __tdata_start - (uintptr_t) __data_start != (uintptr_t) __tdata_source - (uintptr_t) __data_source) {
 		printf("ROM/RAM .tdata offset from .data mismatch. "
 		       "VMA offset=%zd, LMA offset =%zd."
 		       "Linker behaviour changed?\n",
-		       __tdata_start - __data_start,
-		       __tdata_source - __data_source);
+		       (uintptr_t) __tdata_start - (uintptr_t) __data_start,
+		       (uintptr_t) __tdata_source - (uintptr_t) __data_source);
 	}
 
 	if (tdata_source_size != tdata_size ||
