@@ -167,7 +167,7 @@ case $cpu in
 
     cortex-m0)
         machine=microbit
-        memory="-global nrf51-soc.sram-size=2097152 -global nrf51-soc.flash-size=4194304"
+        memory="-global nrf51-soc.sram-size=8388608 -global nrf51-soc.flash-size=4194304"
         ;;
 
     # mps2-an385 offers a cortex-m3 processor
@@ -247,6 +247,7 @@ chardev=stdio,mux=on,id=stdio0
 
 cmdline="program-name"
 input=""
+input_file=""
 done=0
 
 while [ "$done" != "1" ]; do
@@ -257,6 +258,11 @@ while [ "$done" != "1" ]; do
             ;;
         -s|"")
             done=1
+            ;;
+        -i)
+            input_file="$2"
+            shift
+            shift
             ;;
         *)
             cmdline="$cmdline $1"
@@ -285,9 +291,13 @@ serial=none
 
 export QEMU_AUDIO_DRV=none
 
-input_file=`mktemp`
-trap 'rm "$input_file"' 0
-echo "$input" > "$input_file"
+case "$input_file" in
+    "")
+        input_file=`mktemp`
+        trap 'rm "$input_file"' 0
+        echo "$input" > "$input_file"
+        ;;
+esac        
 
 "$qemu" $memory \
       -chardev "$chardev" \

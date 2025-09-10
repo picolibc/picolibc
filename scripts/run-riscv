@@ -141,6 +141,7 @@ chardev=stdio,mux=on,id=stdio0
 
 cmdline="program-name"
 input=""
+input_file=""
 done=0
 
 while [ "$done" != "1" ]; do
@@ -151,6 +152,11 @@ while [ "$done" != "1" ]; do
             ;;
         -s|"")
             done=1
+            ;;
+        -i)
+            input_file="$2"
+            shift
+            shift
             ;;
         *)
             cmdline="$cmdline $1"
@@ -169,12 +175,30 @@ done
 
 semi=enable=on,chardev=stdio0,arg="$cmdline"
 
-# Point the monitor at the new chardev too
+# Disable monitor
 
 mon=none
 
-# Disable the serial port
+# Disable serial
 
 serial=none
 
-echo "$input" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -machine "$machine" -cpu "$cpu" -kernel "$elf" -nographic "$@" -bios none -m 2G
+case "$input_file" in
+    "")
+        input_file=`mktemp`
+        trap 'rm "$input_file"' 0
+        echo "$input" > "$input_file"
+        ;;
+esac        
+
+"$qemu" \
+    -chardev $chardev \
+    -semihosting-config "$semi" \
+    -monitor "$mon" \
+    -serial "$serial" \
+    -machine "$machine" \
+    -cpu "$cpu" \
+    -kernel "$elf" \
+    -nographic \
+    -bios none \
+    -m 2G "$@" < "$input_file"
