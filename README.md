@@ -208,6 +208,35 @@ use Picolibc:
 
 ## Releases
 
+### Picolibc release 1.8.next
+
+ * Use __math_inexact to generate FE_INEXACT in several math
+   functions. Thanks to Gergely Futo.
+
+ * Support riscv '-mlarge' model in asm code.
+
+ * Initialize riscv vector unit in startup code when present.
+
+ * Improve arm32 A-profile operation in Thumb state. Thanks to Victor
+   Campos.
+
+ * Remove duplicate isinf and isnan declarations that were visible
+   even when building with C++. Thanks to Mostafa Salman.
+
+ * Improve accuracy of cacoshf for real inputs. Thanks to Ahmed
+   Shehab.
+
+ * Avoid use of float types in vfprintf to avoid unnecessary fpu
+   register use.
+
+ * Add missing pid_t and getdate_err declarations to time.h.
+
+ * Implement getdate and getdate_r as required by POSIX.
+
+ * Fix numerous minor bugs in strptime.
+
+ * Test exception handling on m68k
+
 ### Picolibc release 1.8.10
 
  * Add missing POSIX constants to limits.h.
