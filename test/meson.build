@@ -740,6 +740,7 @@ if enable_native_tests
 endif
 
 subdir('libc-testsuite')
+subdir('test-math')
 
 if has_arm_semihost
   subdir('semihost')
