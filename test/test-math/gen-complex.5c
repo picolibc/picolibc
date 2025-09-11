@@ -1,0 +1,130 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "gen-test.5c"
+
+typedef struct {
+	int	r, a;
+} complex_ulp_t;
+
+typedef struct {
+	real	r, i;
+} complex_t;
+
+complex_t from_polar(real r, real a)
+{
+	return (complex_t) {
+		.r = cos(a) * r,
+		.i = sin(a) * r
+	};
+}
+
+complex_t from_rect(real r, real i)
+{
+	return (complex_t) {
+		.r = imprecise(r, prec),
+		.i = imprecise(i, prec)
+	};
+}
+
+complex_t
+complex32(complex_t x)
+{
+	return (complex_t) { .r = real32(x.r), .i = real32(x.i) };
+}
+
+complex_t
+complex64(complex_t x)
+{
+	return (complex_t) { .r = real64(x.r), .i = real64(x.i) };
+}
+
+complex_t
+complex80(complex_t x)
+{
+	return (complex_t) { .r = real80(x.r), .i = real80(x.i) };
+}
+
+complex_t
+complex128(complex_t x)
+{
+	return (complex_t) { .r = real128(x.r), .i = real128(x.i) };
+}
+
+complex_t
+setprec(complex_t x, int prec)
+{
+	return (complex_t) {
+		.r = imprecise(x.r, prec),
+		.i = imprecise(x.i, prec)
+	};
+}
+
+complex_t [](complex_t) complex_convs = { complex32, complex64, complex80, complex128 };
+
+void
+print_complex(complex_t[4] x, complex_t[4] y, complex_ulp_t[4] ulp)
+{
+	printf("{ .x = COMPLEX(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%a, %a", x[i].r, x[i].i);
+	}
+	printf("), .y = COMPLEX(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%a, %a", y[i].r, y[i].i);
+	}
+	printf("), .ulp = { COMPLEX_ULP(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%d, %d", ulp[i].r, ulp[i].a);
+	}
+	printf(") } },\n");
+}
+
+void
+compute_complex_one(complex_t x, complex_t(complex_t) f, complex_ulp_t[4] max_ulp)
+{
+	complex_t[4]	xp, yp;
+	for (int i = 0; i < 4; i++) {
+		xp[i] = complex_convs[i](x);
+		yp[i] = complex_convs[i](f(setprec(xp[i], prec)));
+	}
+	print_complex(xp, yp, max_ulp);
+}

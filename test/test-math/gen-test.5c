@@ -1,0 +1,98 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+int prec = 2048;
+
+/* These ignore denorms for now */
+real
+real32(real x)
+{
+	return imprecise(x, 24);
+}
+
+real
+real64(real x)
+{
+	return imprecise(x, 53);
+}
+
+real
+real80(real x)
+{
+	return imprecise(x, 64);
+}
+
+real
+real128(real x)
+{
+	return imprecise(x, 113);
+}
+
+real [](real) real_convs = { real32, real64, real80, real128 };
+
+void
+print_real(real[4] x, real[4] y, int[4] ulp)
+{
+	printf("{ .x = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%a", x[i]);
+	}
+	printf("), .y = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%a", y[i]);
+	}
+	printf("), .ulp = REAL_ULP(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%d", ulp[i]);
+	}
+	printf(") },\n");
+}
+
+void
+compute_real_one(real x, real(real) f, int[4] max_ulp)
+{
+	real[4]	xp, yp;
+	for (int i = 0; i < 4; i++) {
+		xp[i] = real_convs[i](x);
+		yp[i] = real_convs[i](f(imprecise(xp[i], prec)));
+	}
+	print_real(xp, yp, max_ulp);
+}
