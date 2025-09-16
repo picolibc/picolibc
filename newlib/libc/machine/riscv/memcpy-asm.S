@@ -9,9 +9,9 @@
    http://www.opensource.org/licenses.
 */
 
-#include <picolibc.h>
+#include "./memcpy.c"
 
-#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#ifdef _MACHINE_RISCV_MEMCPY_ASM_
 .section .text.memcpy
 .global memcpy
 .type	memcpy, @function
@@ -31,4 +31,4 @@ memcpy:
   ret
 
   .size	memcpy, .-memcpy
-#endif
+#endif /* _MACHINE_RISCV_MEMCPY_ASM_ */
