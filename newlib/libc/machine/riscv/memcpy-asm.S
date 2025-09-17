@@ -9,7 +9,7 @@
    http://www.opensource.org/licenses.
 */
 
-#include "./memcpy.c"
+#include "./rv_memcpy.h"
 
 #ifdef _MACHINE_RISCV_MEMCPY_ASM_
 .section .text.memcpy
