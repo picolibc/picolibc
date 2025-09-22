@@ -37,7 +37,7 @@ srcs_machine = [
   'memcpy-asm.S',
   'memcpy.c',
   'memmove.S',
-  'memmove-stub.c',
+  'memmove.c',
   'memset.S',
   'setjmp.S',
   'stpcpy.c',

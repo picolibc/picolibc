@@ -9,8 +9,8 @@
    http://www.opensource.org/licenses.
 */
 
-#include <picolibc.h>
+#include "rv_memmove.h"
 
-#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+#ifdef _MACHINE_RISCV_MEMMOVE_GENERIC_
 #include "../../string/memmove.c"
 #endif
