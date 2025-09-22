@@ -167,3 +167,43 @@ Picolibc code which requires constructors) may want to use the
 main returns. Select this using the `--crt0=minimal` flag:
 
 	$ gcc --specs=picolibc.specs --crt0=minimal -o program.elf program.o
+
+To avoid the complexity of arranging the TLS segments between the
+.data and .bss segments in your linker script, use the `crt0-stacktls`
+variant. This allocates space for and initializes the TLS data above
+the stack at program startup time. Select this using the
+`--crt0=stacktls` flag along with a linker script prepared for this
+purpose:
+
+	$ gcc --specs=picolibc.specs --crt0=stacktls -Tpicolibc_stacktls -o program.elf program.o
+
+To modify an existing linker script for use with `--crt0=stacktls`,
+add lines like this any place within the read-only data sections:
+
+	.tdata : {
+		*(.tdata .tdata.* .gnu.linkonce.td.*)
+	} >flash
+
+	PROVIDE( __tdata_source = LOADADDR(.tdata) );
+	PROVIDE( __tdata_size = SIZEOF(.tdata) );
+
+	.tbss (NOLOAD) : {
+		*(.tbss .tbss.* .gnu.linkonce.tb.*)
+		*(.tcommon)
+		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
+	} >flash
+
+	PROVIDE( __tbss_offset = ADDR(.tbss) - ADDR(.tdata) );
+	PROVIDE( __tbss_size = SIZEOF(.tbss) );
+	PROVIDE( __tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
+	PROVIDE( __tls_size = ADDR(.tbss) + SIZEOF(.tbss) - ADDR(.tdata) );
+	PROVIDE( __tls_size_align = (__tls_size + __tls_align - 1) & ~(__tls_align - 1));
+	PROVIDE( __arm32_tls_tcb_offset = MAX(8, __tls_align) );
+	PROVIDE( __arm64_tls_tcb_offset = MAX(16, __tls_align) );
+	PROVIDE( __or1k_tls_tcb_offset = MAX(16, __tls_align) );
+	PROVIDE( __sh32_tls_tcb_offset = MAX(8, __tls_align) );
+	PROVIDE( __x86_tls_tcb = ALIGN(__tls_end, __tls_align) );
+	PROVIDE( __x86_tls_tcb_offset = __x86_tls_tcb - __tls_base );
+
+Most of the symbols added are for specific architectures, so you only
+need add those relevant to your project.
