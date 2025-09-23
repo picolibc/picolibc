@@ -81,9 +81,20 @@ double complex
 clog(double complex z)
 {
 	double p, rr;
+	double x = creal(z);
+	double y = cimag(z);
 
 	rr = cabs(z);
-	p = log(rr);
-	rr = atan2(cimag(z), creal(z));
+
+        /* use log1p and compute x^2 + y^2 -1 more accuratly when rr ~= 1.0 */
+	if (0.5 < rr && rr < 2.0) {
+                double d = (x - 1.0) * (x + 1.0) + y * y;
+                p = 0.5 * log1p(d);
+	}
+	else {
+                p = log(rr);
+	}
+
+	rr = atan2(y, x);
 	return (double complex) p + rr * (double complex) I;
 }
