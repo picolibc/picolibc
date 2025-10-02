@@ -283,6 +283,12 @@
 # endif
 #endif
 
+#if __has_attribute(__returns_twice__)
+# define __returns_twice __attribute__((__returns_twice__))
+#else
+# define __returns_twice
+#endif
+
 /*
  * Builtins.
  *
