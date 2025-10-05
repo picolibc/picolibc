@@ -254,6 +254,7 @@ typedef	__int64_t	sbintime_t;
 #endif
 
 #include <sys/features.h>
+#include <sys/_pthreadtypes.h>
 #include <machine/types.h>
 
 #endif  /* !__need_inttypes */
