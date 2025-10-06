@@ -55,6 +55,12 @@
 #endif
 #endif
 
+#ifdef _RX_PID
+#define TEST_CONST
+#else
+#define TEST_CONST const
+#endif
+
 static ALWAYS_INLINE float
 opt_barrier_float (float x)
 {

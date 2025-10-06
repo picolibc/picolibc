@@ -35,38 +35,38 @@
 
 #define makelname(s) scat(s,l)
 
-volatile const FLOAT_T makemathname(zero) = (FLOAT_T) 0.0;
-volatile const FLOAT_T makemathname(negzero) = (FLOAT_T) -0.0;
-volatile const FLOAT_T makemathname(one) = (FLOAT_T) 1.0;
-volatile const FLOAT_T makemathname(two) = (FLOAT_T) 2.0;
-volatile const FLOAT_T makemathname(three) = (FLOAT_T) 3.0;
-volatile const FLOAT_T makemathname(half) = (FLOAT_T) 0.5;
-volatile const FLOAT_T makemathname(big) = BIG;
-volatile const FLOAT_T makemathname(bigodd) = BIGODD;
-volatile const FLOAT_T makemathname(bigeven) = BIGEVEN;
-volatile const FLOAT_T makemathname(small) = SMALL;
-volatile const FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
-volatile const FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
-volatile const FLOAT_T makemathname(qnanval) = (FLOAT_T) NAN;
-volatile const FLOAT_T makemathname(snanval) = (FLOAT_T) sNAN;
-volatile const FLOAT_T makemathname(pio2) = (FLOAT_T) (PI_VAL/(FLOAT_T)2.0);
-volatile const FLOAT_T makemathname(min_val) = (FLOAT_T) MIN_VAL;
-volatile const FLOAT_T makemathname(max_val) = (FLOAT_T) MAX_VAL;
+volatile TEST_CONST FLOAT_T makemathname(zero) = (FLOAT_T) 0.0;
+volatile TEST_CONST FLOAT_T makemathname(negzero) = (FLOAT_T) -0.0;
+volatile TEST_CONST FLOAT_T makemathname(one) = (FLOAT_T) 1.0;
+volatile TEST_CONST FLOAT_T makemathname(two) = (FLOAT_T) 2.0;
+volatile TEST_CONST FLOAT_T makemathname(three) = (FLOAT_T) 3.0;
+volatile TEST_CONST FLOAT_T makemathname(half) = (FLOAT_T) 0.5;
+volatile TEST_CONST FLOAT_T makemathname(big) = BIG;
+volatile TEST_CONST FLOAT_T makemathname(bigodd) = BIGODD;
+volatile TEST_CONST FLOAT_T makemathname(bigeven) = BIGEVEN;
+volatile TEST_CONST FLOAT_T makemathname(small) = SMALL;
+volatile TEST_CONST FLOAT_T makemathname(infval) = (FLOAT_T) INFINITY;
+volatile TEST_CONST FLOAT_T makemathname(minfval) = (FLOAT_T) -INFINITY;
+volatile TEST_CONST FLOAT_T makemathname(qnanval) = (FLOAT_T) NAN;
+volatile TEST_CONST FLOAT_T makemathname(snanval) = (FLOAT_T) sNAN;
+volatile TEST_CONST FLOAT_T makemathname(pio2) = (FLOAT_T) (PI_VAL/(FLOAT_T)2.0);
+volatile TEST_CONST FLOAT_T makemathname(min_val) = (FLOAT_T) MIN_VAL;
+volatile TEST_CONST FLOAT_T makemathname(max_val) = (FLOAT_T) MAX_VAL;
 #define FLOAT_LONG_MASK (~0UL << ((sizeof (long) * 8 <= MANT_DIG) ? 0 : (sizeof (long) * 8 - MANT_DIG - 1)))
 #define FLOAT_LONG_MIN (long) (LONG_MIN & FLOAT_LONG_MASK)
 #define FLOAT_LONG_MAX (long) (LONG_MAX & FLOAT_LONG_MASK)
-volatile const FLOAT_T makemathname(long_min_mask) = (FLOAT_T) FLOAT_LONG_MIN;
-volatile const FLOAT_T makemathname(long_max_mask) = (FLOAT_T) FLOAT_LONG_MAX;
-volatile const FLOAT_T makemathname(long_min_one) = (FLOAT_T) ((FLOAT_T) LONG_MIN - (FLOAT_T) (~FLOAT_LONG_MASK + 1) * 2);
-volatile const FLOAT_T makemathname(long_max_one) = (FLOAT_T) ((FLOAT_T) LONG_MAX + (FLOAT_T) (~FLOAT_LONG_MASK + 1));
+volatile TEST_CONST FLOAT_T makemathname(long_min_mask) = (FLOAT_T) FLOAT_LONG_MIN;
+volatile TEST_CONST FLOAT_T makemathname(long_max_mask) = (FLOAT_T) FLOAT_LONG_MAX;
+volatile TEST_CONST FLOAT_T makemathname(long_min_one) = (FLOAT_T) ((FLOAT_T) LONG_MIN - (FLOAT_T) (~FLOAT_LONG_MASK + 1) * 2);
+volatile TEST_CONST FLOAT_T makemathname(long_max_one) = (FLOAT_T) ((FLOAT_T) LONG_MAX + (FLOAT_T) (~FLOAT_LONG_MASK + 1));
 
 #define FLOAT_LONG_LONG_MASK (~0ULL << ((sizeof (long long) * 8 <= MANT_DIG) ? 0 : (sizeof (long long) * 8 - MANT_DIG - 1)))
 #define FLOAT_LONG_LONG_MIN (long long) (LLONG_MIN & FLOAT_LONG_LONG_MASK)
 #define FLOAT_LONG_LONG_MAX (long long) (LLONG_MAX & FLOAT_LONG_LONG_MASK)
-volatile const FLOAT_T makemathname(long_long_min_mask) = (FLOAT_T) FLOAT_LONG_LONG_MIN;
-volatile const FLOAT_T makemathname(long_long_max_mask) = (FLOAT_T) FLOAT_LONG_LONG_MAX;
-volatile const FLOAT_T makemathname(long_long_min_one) = (FLOAT_T) ((FLOAT_T) LLONG_MIN - (FLOAT_T) (~FLOAT_LONG_LONG_MASK + 1) * 2);
-volatile const FLOAT_T makemathname(long_long_max_one) = (FLOAT_T) ((FLOAT_T) LLONG_MAX + (FLOAT_T) (~FLOAT_LONG_LONG_MASK + 1));
+volatile TEST_CONST FLOAT_T makemathname(long_long_min_mask) = (FLOAT_T) FLOAT_LONG_LONG_MIN;
+volatile TEST_CONST FLOAT_T makemathname(long_long_max_mask) = (FLOAT_T) FLOAT_LONG_LONG_MAX;
+volatile TEST_CONST FLOAT_T makemathname(long_long_min_one) = (FLOAT_T) ((FLOAT_T) LLONG_MIN - (FLOAT_T) (~FLOAT_LONG_LONG_MASK + 1) * 2);
+volatile TEST_CONST FLOAT_T makemathname(long_long_max_one) = (FLOAT_T) ((FLOAT_T) LLONG_MAX + (FLOAT_T) (~FLOAT_LONG_LONG_MASK + 1));
 
 #ifdef __PICOLIBC__
 #define LROUND_LONG_MAX LONG_MAX
@@ -808,7 +808,7 @@ static FLOAT_T makemathname(test_scalbn_tiny)(void) { return makemathname(scalbn
 #define sNAN_EXCEPTION  0
 #endif
 
-const struct {
+TEST_CONST struct {
 	FLOAT_T	(*func)(void);
 	char	*name;
 	FLOAT_T	value;
@@ -1395,7 +1395,7 @@ const struct {
 	{ 0 },
 };
 
-static const struct {
+static TEST_CONST struct {
         long long       (*func)(void);
 	char	        *name;
 	long long       value;
@@ -1553,10 +1553,10 @@ makemathname(print_float)(FLOAT_T a)
 #endif
 }
 
-static volatile const FLOAT_T makemathname(except_zero) = (FLOAT_T) 0.0;
-static volatile const FLOAT_T makemathname(except_one) = (FLOAT_T) 1.0;
-static volatile const FLOAT_T makemathname(except_small) = SMALL;
-static volatile const FLOAT_T makemathname(except_big) = BIG;
+static volatile TEST_CONST FLOAT_T makemathname(except_zero) = (FLOAT_T) 0.0;
+static volatile TEST_CONST FLOAT_T makemathname(except_one) = (FLOAT_T) 1.0;
+static volatile TEST_CONST FLOAT_T makemathname(except_small) = SMALL;
+static volatile TEST_CONST FLOAT_T makemathname(except_big) = BIG;
 static volatile FLOAT_T makemathname(except_result);
 
 static bool makemathname(has_invalid)(void)
