@@ -273,6 +273,8 @@ typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
 typedef size_t __rsize_t;
 typedef int __errno_t;
 #endif
+#else
+#define __STDC_WANT_LIB_EXT1__ 0
 #endif
 
 #endif	/* _SYS__TYPES_H */
