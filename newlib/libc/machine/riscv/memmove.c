@@ -9,7 +9,7 @@
    http://www.opensource.org/licenses.
 */
 
-#include "rv_memmove.h"
+#include "rv_string.h"
 
 #ifdef _MACHINE_RISCV_MEMMOVE_GENERIC_
 #include "../../string/memmove.c"
