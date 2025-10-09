@@ -65,7 +65,7 @@ floorl(long double x)
 		if(sx) {
 		    if(jj0==31) i0+=1;
 		    else {
-			j = i1+(1<<(63-jj0));
+			j = i1+((u_int32_t)1<<(63-jj0));
 			if(j<(u_int32_t)i1) i0 +=1 ;	/* got a carry */
 			i1=j;
 		    }
