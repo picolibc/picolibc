@@ -68,7 +68,7 @@ funcqual (char *a,
   
   line(l);
   if (a == NULL && b == NULL) return;
-  if (strcmp(a,b)) {
+  if (!a || !b || strcmp(a,b)) {
       printf("string.c:%d (%s)\n", l, it);  
     }
 }
