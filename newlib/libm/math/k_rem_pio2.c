@@ -197,8 +197,8 @@ recompute:
     }
 
     /* compute n */
-    z = scalbn(z, (int)q0); /* actual value of z */
-    z -= _F_64(8.0) * floor(z * _F_64(0.125)); /* trim off integer >= 8 */
+    z = scalbn64(z, (int)q0); /* actual value of z */
+    z -= _F_64(8.0) * floor64(z * _F_64(0.125)); /* trim off integer >= 8 */
     n = (__int32_t)z;
     z -= (__float64)n;
     ih = 0;
@@ -238,7 +238,7 @@ recompute:
         if (ih == 2) {
             z = one - z;
             if (carry != 0)
-                z -= scalbn(one, (int)q0);
+                z -= scalbn64(one, (int)q0);
         }
     }
 
@@ -271,7 +271,7 @@ recompute:
             q0 -= 24;
         }
     } else { /* break z into 24-bit if necessary */
-        z = scalbn(z, -(int)q0);
+        z = scalbn64(z, -(int)q0);
         if (z >= two24) {
             fw = (__float64)((__int32_t)(twon24 * z));
             iq[jz] = (__int32_t)(z - two24 * fw);
@@ -283,7 +283,7 @@ recompute:
     }
 
     /* convert integer "bit" chunk to floating-point value */
-    fw = scalbn(one, (int)q0);
+    fw = scalbn64(one, (int)q0);
     for (i = jz; i >= 0; i--) {
         q[i] = fw * (__float64)iq[i];
         fw *= twon24;

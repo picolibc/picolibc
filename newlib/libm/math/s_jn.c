@@ -197,7 +197,7 @@ jn64(int n, __float64 x)
 		 */
             tmp = n;
             v = two / x;
-            tmp = tmp * log(fabs64(v * tmp));
+            tmp = tmp * log64(fabs64(v * tmp));
             if (tmp < _F_64(7.09782712893383973096e+02)) {
                 for (i = n - 1, di = (__float64)(i + i); i > 0; i--) {
                     temp = b;

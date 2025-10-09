@@ -57,7 +57,7 @@ cosh64(__float64 x)
 
     /* |x| in [0,0.5*ln2], return 1+expm1(|x|)^2/(2*exp(|x|)) */
     if (ix < 0x3fd62e43) {
-        t = expm1(x);
+        t = expm164(x);
         w = one + t;
         if (ix < 0x3c800000)
             return w; /* cosh(tiny) = 1 */
@@ -66,18 +66,18 @@ cosh64(__float64 x)
 
     /* |x| in [0.5*ln2,22], return (exp(|x|)+1/exp(|x|)/2; */
     if (ix < 0x40360000) {
-        t = exp(x);
+        t = exp64(x);
         return half * t + half / t;
     }
 
     /* |x| in [22, log(maxdouble)] return half*exp(|x|) */
     if (ix < 0x40862E42)
-        return half * exp(x);
+        return half * exp64(x);
 
     /* |x| in [log(maxdouble), overflowthresold] */
     GET_LOW_WORD(lx, x);
     if (ix < 0x408633CE || (ix == 0x408633ce && lx <= (__uint32_t)0x8fb9f87d)) {
-        w = exp(half * x);
+        w = exp64(half * x);
         t = half * w;
         return t * w;
     }

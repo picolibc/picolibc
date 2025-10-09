@@ -34,6 +34,13 @@
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* GCC analyzer gets confused about the use of CMPLXL here on m68k */
+#pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
+#endif
+
 long double complex
 ccoshl(long double complex z)
 {
@@ -41,7 +48,7 @@ ccoshl(long double complex z)
 
 	x = creall(z);
 	y = cimagl(z);
-	return (long double complex) (coshl(x) * cosl(y)) + (sinhl(x) * sinl(y)) * (long double complex) I;
+	return CMPLXL(coshl(x) * cosl(y), sinhl(x) * sinl(y));
 }
 
 #endif

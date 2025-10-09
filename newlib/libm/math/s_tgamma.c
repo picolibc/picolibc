@@ -28,13 +28,13 @@ tgamma64(__float64 x)
     int signgam_local;
     int divzero = 0;
 
-    if (isless(x, 0.0) && clang_barrier_double(rint64(x)) == x)
+    if (isless(x, _F_64(0.0)) && clang_barrier_double(rint64(x)) == x)
         return __math_invalid(x);
 
     __float64 y = exp64(__math_lgamma_r(x, &signgam_local, &divzero));
     if (signgam_local < 0)
         y = -y;
-    if (isinf(y) && finite(x) && !divzero)
+    if (isinf(y) && finite64(x) && !divzero)
         return __math_oflow(signgam_local < 0);
     return y;
 }

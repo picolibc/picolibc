@@ -169,7 +169,7 @@ pow64(__float64 x, __float64 y)
             return x * x; /* y is  2 */
         if (hy == 0x3fe00000) { /* y is  0.5 */
             if (hx >= 0) /* x >= +0 */
-                return sqrt(x);
+                return sqrt64(x);
         }
     }
 
@@ -347,7 +347,7 @@ pow64(__float64 x, __float64 y)
     GET_HIGH_WORD(j, z);
     j += lsl(n, 20);
     if (asr(j, 20) <= 0)
-        z = scalbn(z, (int)n); /* subnormal output */
+        z = scalbn64(z, (int)n); /* subnormal output */
     else
         SET_HIGH_WORD(z, j);
     return s * z;

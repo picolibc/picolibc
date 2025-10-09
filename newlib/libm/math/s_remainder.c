@@ -50,7 +50,7 @@ remainder64(__float64 x, __float64 p)
         return (x * p) / (x * p); /* p = 0 */
 
     if (hp <= 0x7fdfffff)
-        x = fmod(x, p + p); /* now x < 2p */
+        x = fmod64(x, p + p); /* now x < 2p */
 
     if (((hx - hp) | (lx - lp)) == 0)
         return zero * x;

@@ -80,7 +80,7 @@ log1064(__float64 x)
     hx = (hx & 0x000fffff) | ((0x3ff - i) << 20);
     y = (__float64)(k + i);
     SET_HIGH_WORD(x, hx);
-    z = y * log10_2lo + ivln10 * log(x);
+    z = y * log10_2lo + ivln10 * log64(x);
     return z + y * log10_2hi;
 }
 
