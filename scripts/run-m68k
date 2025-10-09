@@ -95,7 +95,6 @@ case "$elfbase" in
         ;;
     *m680?0)
         CPU=`echo "$elfbase" | sed 's/.*\(m680.0\)$/\1/'`
-        echo CPU set to $CPU
         ;;
     *)
         CPU=m68020
