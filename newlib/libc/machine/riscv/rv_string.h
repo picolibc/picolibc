@@ -7,133 +7,32 @@
    including the implied warranties of MERCHANTABILITY or FITNESS FOR
    A PARTICULAR PURPOSE.  A copy of this license is available at
    http://www.opensource.org/licenses.
+
+   Changes from Qualcomm Technologies, Inc. are provided under the following
+   license:
+   Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+   SPDX-License-Identifier: BSD-3-Clause-Clear
 */
 
-#ifndef _RV_STRING_H
-#define _RV_STRING_H
+#ifndef _RV_STRING_H_
+#define _RV_STRING_H_
 
-#include <stdbool.h>
-#include <string.h>
-#include "xlenint.h"
+/* This file defines macros to choose a specific custom implementation for
+ * 'string.h' APIs. The specialization is segretated per API to allow for
+ * different and/or complex scenarios for each API. */
 
-#if __riscv_zbb
-  // Determine which intrinsics to use based on XLEN and endianness
-  #if __riscv_xlen == 64
-    #if __has_builtin(__builtin_riscv_orc_b_64)
-      #define __LIBC_RISCV_ZBB_ORC_B(x)       __builtin_riscv_orc_b_64 (x)
-    #endif
+#include <picolibc.h>
 
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-      #if __has_builtin(__builtin_riscv_ctz_64)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_ctz_64(x)
-      #endif
-    #else
-      #if __has_builtin(__builtin_riscv_clz_64)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_clz_64(x)
-      #endif
-    #endif
-  #else
-    #if __has_builtin(__builtin_riscv_orc_b_32)
-      #define __LIBC_RISCV_ZBB_ORC_B(x)       __builtin_riscv_orc_b_32(x)
-    #endif
-
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-      #if __has_builtin(__builtin_riscv_ctz_32)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_ctz_32(x)
-      #endif
-    #else
-      #if __has_builtin(__builtin_riscv_clz_32)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_clz_32(x)
-      #endif
-    #endif
-  #endif
-#endif
-
-
-static __inline uintxlen_t __libc_detect_null(uintxlen_t w)
-{
-#ifdef __LIBC_RISCV_ZBB_ORC_B
-  /*
-    If there are any zeros in each byte of the register, all bits will
-    be unset for that byte value, otherwise, all bits will be set.
-    If the value is -1, all bits are set, meaning no null byte was found.
-  */
-  return __LIBC_RISCV_ZBB_ORC_B(w) != (uintxlen_t) -1;
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+# define _MACHINE_RISCV_MEMCPY_ASM_
 #else
-  uintxlen_t mask = 0x7f7f7f7f;
-  #if __riscv_xlen == 64
-    mask = ((mask << 16) << 16) | mask;
-  #endif
-  return ~(((w & mask) + mask) | w | mask);
-#endif
-}
+# define _MACHINE_RISCV_MEMCPY_C_
+# endif
 
+#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+# define _MACHINE_RISCV_MEMMOVE_GENERIC_
+#else
+# define _MACHINE_RISCV_MEMMOVE_ASM_
+# endif
 
-static __inline
-#if __riscv_misaligned_slow || __riscv_misaligned_fast
-__disable_sanitizer
-#endif
-char *__libc_strcpy(char *dst, const char *src, bool ret_start)
-{
-  char *dst0 = dst;
-
-#if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
-#if !(__riscv_misaligned_slow || __riscv_misaligned_fast)
-  int misaligned = ((uintxlen_t)dst | (uintxlen_t)src) & (sizeof (uintxlen_t) - 1);
-  if (__builtin_expect(!misaligned, 1))
-#endif
-    {
-      uintxlen_t *pdst = (uintxlen_t *)dst;
-      const uintxlen_t *psrc = (const uintxlen_t *)src;
-
-      while (!__libc_detect_null(*psrc))
-        *pdst++ = *psrc++;
-
-      dst = (char *)pdst;
-      src = (const char *)psrc;
-
-      if (ret_start)
-        {
-          if (!(*dst++ = src[0])) return dst0;
-          if (!(*dst++ = src[1])) return dst0;
-          if (!(*dst++ = src[2])) return dst0;
-          if (!(*dst++ = src[3])) return dst0;
-          #if __riscv_xlen == 64
-            if (!(*dst++ = src[4])) return dst0;
-            if (!(*dst++ = src[5])) return dst0;
-            if (!(*dst++ = src[6])) return dst0;
-          #endif
-        }
-      else
-        {
-          if (!(*dst++ = src[0])) return dst - 1;
-          if (!(*dst++ = src[1])) return dst - 1;
-          if (!(*dst++ = src[2])) return dst - 1;
-          if (!(*dst++ = src[3])) return dst - 1;
-          #if __riscv_xlen == 64
-            if (!(*dst++ = src[4])) return dst - 1;
-            if (!(*dst++ = src[5])) return dst - 1;
-            if (!(*dst++ = src[6])) return dst - 1;
-            dst0 = dst;
-          #endif
-        }
-
-      *dst = 0;
-      return dst0;
-    }
-#endif /* not PREFER_SIZE_OVER_SPEED */
-
-  char ch;
-  do
-    {
-      ch = *src;
-      src++;
-      dst++;
-      *(dst - 1) = ch;
-    } while (ch);
-
-  return ret_start ? dst0 : dst - 1;
-}
-
-
-#endif /* _RV_STRING_H */
+#endif /* _RV_STRING_H_ */
