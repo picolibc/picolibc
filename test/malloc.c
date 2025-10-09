@@ -214,15 +214,18 @@ main(void)
             memset_explicit(rzero + 16, 0, 128-16);
 #endif
 #endif
-            rzero = realloc(rzero, 16);
-            for (pow = 16; pow < 128; pow++) {
-                if (rzero[pow] == pow + 2) {
-                    wrong++;
-                    break;
+            char *newrzero = realloc(rzero, 16);
+            if (newrzero) {
+                rzero = newrzero;
+                for (pow = 16; pow < 128; pow++) {
+                    if (rzero[pow] == pow + 2) {
+                        wrong++;
+                        break;
+                    }
                 }
             }
-            free(rzero);
         }
+        free(rzero);
         if (wrong > 3)  {
             printf("realloc: %d bytes of memory not cleared\n", wrong);
             result = 1;
