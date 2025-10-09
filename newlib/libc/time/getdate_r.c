@@ -68,7 +68,7 @@ int getdate_r(const char *restrict string, struct tm *restrict tm)
     char        line[64];
     const char  *datemsk_name;
     FILE        *datemsk;
-    char        *ret;
+    char        *ret = NULL;
 
     datemsk_name = getenv("DATEMSK");
     if (!datemsk_name || datemsk_name[0] == '\0')
