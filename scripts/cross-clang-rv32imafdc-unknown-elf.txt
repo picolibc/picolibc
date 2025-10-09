@@ -22,8 +22,8 @@ endian = 'little'
 
 [properties]
 c_args = ['-Werror=double-promotion']
-c_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv32imafdc/ilp32d']
-cpp_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv32imafdc/ilp32d']
+c_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/15.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv32imafdc/ilp32d']
+cpp_link_args = ['-Wl,-melf32lriscv', '-L/usr/lib/gcc/riscv64-unknown-elf/15.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv32imafdc/ilp32d', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv32imafdc/ilp32d']
 skip_sanity_check = true
 has_link_defsym = true
 default_flash_addr = '0x80000000'
