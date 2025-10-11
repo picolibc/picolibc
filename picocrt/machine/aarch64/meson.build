@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_picocrt += files('crt0.c', 'crt0.S')
+has_stacktls = true
 
 picocrt_machines += [
   {

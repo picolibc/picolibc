@@ -109,7 +109,7 @@ extern const void *__vector_table[];
 #error "Unknown machine type"
 #endif
 
-void _cstart(void)
+void _cstart(void *sp)
 {
         uint64_t        sctlr;
 
@@ -185,7 +185,12 @@ void _cstart(void)
 
         /* Set the vector base address register */
         __asm__("msr    vbar_"BOOT_EL", %x0" :: "r" (__vector_table));
+#ifdef STACK_TLS
+	__start(sp);
+#else
+        (void) sp;
 	__start();
+#endif
 }
 
 
