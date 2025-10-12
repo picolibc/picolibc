@@ -25,7 +25,6 @@ case "$*" in
 esac
 
 mkdir "$DIR"
-trap 'rm -rf "$DIR"' 0 1 15
 (cd "$DIR" || exit 1
  echo '##################################################'
  echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER "$@"
@@ -46,4 +45,12 @@ trap 'rm -rf "$DIR"' 0 1 15
 	 ;;
  esac
  cat meson-logs/*
- ninja && meson test -t 20 -v) || exit 1
+ ninja && meson test -t 20 -v)
+case $? in
+    0)
+	rm -rf "$DIR"
+	;;
+    *)
+	exit $?
+	;;
+esac

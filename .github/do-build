@@ -4,7 +4,12 @@ DIR=build-"$TARGET"
 CONFIGURE=do-"$TARGET"-configure
 shift
 
-for p in /opt/*/bin; do
+if [ -d /opt/picolibc-ci ]; then
+    TOP=/opt/picolibc-ci
+else
+    TOP=/opt
+fi
+for p in "$TOP"/*/bin "$TOP"/*/models/*; do
     PATH="$p":$PATH
 done
 
@@ -32,7 +37,6 @@ case "$*" in
 esac
 
 mkdir "$DIR"
-trap 'rm -rf "$DIR"' 0 1 15
 (cd "$DIR" || exit 1
  echo '##################################################'
  echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER $CDEFS "$@"
@@ -53,4 +57,13 @@ trap 'rm -rf "$DIR"' 0 1 15
 	 ;;
  esac
  cat meson-logs/*
- ninja $TEST || exit 1) || exit 1
+ ninja $TEST)
+case $? in
+    0)
+	rm -rf "$DIR"
+	;;
+    *)
+	exit $?
+	;;
+esac
+
