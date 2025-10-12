@@ -215,6 +215,9 @@ ulp64(binary64 a, binary64 b)
         return 0;
     if (isnan(a) && isnan(b))
         return 0;
+    /* sometimes inf != inf on m68k? */
+    if (isinf(a) && isinf(b) && (a>0) == (b>0))
+        return 0;
     if (isnan(a) || isnan(b)) {
 #ifdef __RX__
         printf("RX fails to generate NaN, ignoring\n");
