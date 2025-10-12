@@ -33,15 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
 #define TEST_VECTORS    "test-pow.h"
 #define TEST_FUNC       pow
-
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-/* picolibc is returning -inf when it should return +inf */
-#define MATH_ULP_BINARY80       MAX_ULP
-#endif
 
 #include "test-real-real.h"

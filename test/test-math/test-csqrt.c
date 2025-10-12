@@ -36,14 +36,4 @@
 #define TEST_VECTORS    "test-csqrt.h"
 #define TEST_FUNC       csqrt
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#ifdef __HAVE_68881__
-#define MATH_ULP_BINARY32       MAX_ULP
-#define MATH_ULP_BINARY64       MAX_ULP
-#endif
-#define MATH_ULP_BINARY128      2
-#endif
-
 #include "test-complex-one.h"

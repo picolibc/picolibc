@@ -36,13 +36,4 @@
 #define TEST_VECTORS    "test-cexp.h"
 #define TEST_FUNC       cexp
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY32       INVALID_ULP
-#define MATH_ULP_BINARY64       INVALID_ULP
-#define MATH_ULP_BINARY80       INVALID_ULP
-#define MATH_ULP_BINARY128      INVALID_ULP
-#endif
-
 #include "test-complex-one.h"

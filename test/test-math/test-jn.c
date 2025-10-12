@@ -37,18 +37,10 @@
 #include <sys/types.h>
 
 #ifdef __PICOLIBC__
-#define MATH_ULP_BINARY32       3
-#define MATH_ULP_BINARY64       3
-#else
-#define MATH_ULP_BINARY32       2
-#define MATH_ULP_BINARY64       2
-#define MATH_ULP_BINARY80       3
-#endif
-
-#ifdef __PICOLIBC__
 #define SKIP_BINARY80
 #define SKIP_BINARY128
 #endif
+
 #define TEST_VECTORS    "test-jn.h"
 #define TEST_FUNC       jn
 

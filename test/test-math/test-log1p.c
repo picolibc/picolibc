@@ -36,10 +36,4 @@
 #define TEST_VECTORS    "test-log1p.h"
 #define TEST_FUNC       log1p
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY80       2
-#endif
-
 #include "test-real-one.h"

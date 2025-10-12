@@ -50,8 +50,9 @@ test_binary32(void)
 {
     size_t      i;
     int         ret = 1;
-    ulp_t       max_ulp = 0;
+    ulp_t       math_ulp_binary32 = math_find_ulp_binary32();
 
+    max_ulp = 0;
     printf("test %s\n", MATH_STRING(TEST_FUNC_32));
     for (i = 0; i < count(test_32_vec); i++) {
         if (SKIP_CDENORM32(test_32_vec[i].x)) {
@@ -62,7 +63,7 @@ test_binary32(void)
         ulp_t          ulp = culp32(y, test_32_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
-        if (ulp > MATH_ULP_BINARY32) {
+        if (ulp > math_ulp_binary32) {
             ret = 0;
             printf("%5zu " FMT32 " + " FMT32 " i got " FMT32 " + " FMT32 " i want " FMT32 " + " FMT32 " i ulp %" PRIdULP "\n",
                    i + 1,
@@ -93,8 +94,9 @@ test_binary64(void)
 {
     size_t      i;
     int         ret = 1;
-    ulp_t       max_ulp = 0;
+    ulp_t       math_ulp_binary64 = math_find_ulp_binary64();
 
+    max_ulp = 0;
     printf("test %s\n", MATH_STRING(TEST_FUNC_64));
     for (i = 0; i < count(test_64_vec); i++) {
         if (SKIP_CDENORM64(test_64_vec[i].x)) {
@@ -105,7 +107,7 @@ test_binary64(void)
         ulp_t           ulp = culp64(y, test_64_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
-        if (ulp > MATH_ULP_BINARY64) {
+        if (ulp > math_ulp_binary64) {
             ret = 0;
             printf("%5zu " FMT64 " + " FMT64 " i got " FMT64 " + " FMT64 " i want " FMT64 " + " FMT64 " i ulp %" PRIdULP "\n",
                    i + 1,
@@ -137,8 +139,9 @@ test_binary80(void)
 {
     size_t      i;
     int         ret = 1;
-    ulp_t       max_ulp = {};
+    ulp_t       math_ulp_binary80 = math_find_ulp_binary80();
 
+    max_ulp = 0;
     if (skip_binary80())
         return ret;
     printf("test %s\n", MATH_STRING(TEST_FUNC_80));
@@ -151,7 +154,7 @@ test_binary80(void)
         ulp_t           ulp = culp80(y, test_80_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
-        if (ulp > MATH_ULP_BINARY80) {
+        if (ulp > math_ulp_binary80) {
             ret = 0;
             printf("%5zu " FMT80 " + " FMT80 " i got " FMT80 " + " FMT80 " i want " FMT80 " + " FMT80 " i ulp %" PRIdULP "\n",
                    i + 1,
@@ -183,8 +186,9 @@ test_binary128(void)
 {
     size_t      i;
     int         ret = 1;
-    ulp_t       max_ulp = 0;
+    ulp_t       math_ulp_binary128 = math_find_ulp_binary128();
 
+    max_ulp = 0;
     printf("test %s\n", MATH_STRING(TEST_FUNC_128));
     for (i = 0; i < count(test_128_vec); i++) {
         if (SKIP_CDENORM128(test_128_vec[i].x)) {
@@ -195,7 +199,7 @@ test_binary128(void)
         ulp_t           ulp = culp128(y, test_128_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
-        if (ulp > MATH_ULP_BINARY128) {
+        if (ulp > math_ulp_binary128) {
             ret = 0;
             printf("%5zu " FMT128 " + " FMT128 " i got " FMT128 " + " FMT128 " i want " FMT128 " + " FMT128 " i ulp %" PRIdULP "\n",
                    i + 1,
@@ -215,14 +219,32 @@ test_binary128(void)
 
 int main(void)
 {
+    const char spaces[] = "               ";
+
     int ret = 0;
+    max_ulp = math_find_ulp_binary32();
     if (!test_binary32())
         ret = 1;
+    ulp_t max_ulp_32 = max_ulp;
+    max_ulp = math_find_ulp_binary64();
     if (!test_binary64())
         ret = 1;
+    ulp_t max_ulp_64 = max_ulp;
+    max_ulp = math_find_ulp_binary80();
     if (!test_binary80())
         ret = 1;
+    ulp_t max_ulp_80 = max_ulp;
+    max_ulp = math_find_ulp_binary128();
     if (!test_binary128())
         ret = 1;
+    ulp_t max_ulp_128 = max_ulp;
+
+    size_t len = strlen(MATH_STRING(TEST_FUNC));
+    size_t want_len = 10;
+    size_t extra = want_len - len;
+    const char *space = spaces + strlen(spaces) - extra;
+    assert(strlen(space) == extra);
+    printf("    { .name = \"%s\",%s .b32 = %7" PRIdULP ", .b64 = %7" PRIdULP ", .b80 = %7" PRIdULP ", .b128 = %7" PRIdULP " },\n",
+           MATH_STRING(TEST_FUNC), space, max_ulp_32, max_ulp_64, max_ulp_80, max_ulp_128);
     return ret;
 }

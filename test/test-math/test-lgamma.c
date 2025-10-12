@@ -36,15 +36,4 @@
 #define TEST_VECTORS    "test-lgamma.h"
 #define TEST_FUNC       lgamma
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-/* returns inf for small negative values */
-#define MATH_ULP_BINARY32       MAX_ULP
-#define MATH_ULP_BINARY64       2
-#define MATH_ULP_BINARY80       2
-#else
-#define MATH_ULP_BINARY64       2
-#endif
-
 #include "test-real-one.h"

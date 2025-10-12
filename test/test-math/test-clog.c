@@ -36,18 +36,4 @@
 #define TEST_VECTORS    "test-clog.h"
 #define TEST_FUNC       clog
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#ifdef __HAVE_68881__
-#define MATH_ULP_BINARY32       MAX_ULP
-#define MATH_ULP_BINARY64       MAX_ULP
-#else
-#define MATH_ULP_BINARY32       4
-#define MATH_ULP_BINARY64       6
-#endif
-#define MATH_ULP_BINARY80       5
-#define MATH_ULP_BINARY128      8
-#endif
-
 #include "test-complex-one.h"

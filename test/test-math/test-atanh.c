@@ -36,12 +36,4 @@
 #define TEST_VECTORS    "test-atanh.h"
 #define TEST_FUNC       atanh
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY80       7
-#else
-#define MATH_ULP_BINARY80       2
-#endif
-
 #include "test-real-one.h"

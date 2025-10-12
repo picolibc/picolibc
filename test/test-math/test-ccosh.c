@@ -36,17 +36,4 @@
 #define TEST_VECTORS    "test-ccosh.h"
 #define TEST_FUNC       ccosh
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY32       INVALID_ULP
-#ifdef __HAVE_68881__
-#define MATH_ULP_BINARY64       MAX_ULP
-#endif
-#define MATH_ULP_BINARY80       INVALID_ULP
-#define MATH_ULP_BINARY128      INVALID_ULP
-#else
-#define MATH_ULP_BINARY32       2
-#endif
-
 #include "test-complex-one.h"

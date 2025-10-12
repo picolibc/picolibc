@@ -36,10 +36,4 @@
 #define TEST_VECTORS    "test-exp2.h"
 #define TEST_FUNC       exp2
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY80       2
-#endif
-
 #include "test-real-one.h"

@@ -36,6 +36,4 @@
 #define TEST_VECTORS    "test-acosh.h"
 #define TEST_FUNC       acosh
 
-#define MATH_ULP_BINARY80       2
-
 #include "test-real-one.h"

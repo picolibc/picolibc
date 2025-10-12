@@ -36,12 +36,4 @@
 #define TEST_VECTORS    "test-cbrt.h"
 #define TEST_FUNC       cbrt
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY32       2
-#else
-#define MATH_ULP_BINARY64       2
-#endif
-
 #include "test-real-one.h"

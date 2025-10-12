@@ -33,12 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE
+#endif
 #include <math.h>
 #include <float.h>
 #include <complex.h>
 #include <inttypes.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
 
 #if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -56,19 +60,6 @@
 #define TEST_CONST
 #else
 #define TEST_CONST const
-#endif
-
-#ifndef MATH_ULP_BINARY32
-#define MATH_ULP_BINARY32       1
-#endif
-#ifndef MATH_ULP_BINARY64
-#define MATH_ULP_BINARY64       1
-#endif
-#ifndef MATH_ULP_BINARY80
-#define MATH_ULP_BINARY80       1
-#endif
-#ifndef MATH_ULP_BINARY128
-#define MATH_ULP_BINARY128      1
 #endif
 
 #define count(a)        (sizeof(a)/sizeof(a[0]))
@@ -96,9 +87,61 @@
 #define SKIP_CDENORM128(z)       (SKIP_DENORM128(creal128(z)) || SKIP_DENORM128(cimag128(z)))
 
 #define MAX_ULP         9999
-#define INVALID_ULP     10000
+#define INV_ULP         10000
 typedef int32_t ulp_t;
 #define PRIdULP         PRId32
+
+typedef const struct {
+    const char *name;
+    ulp_t b32;
+    ulp_t b64;
+    ulp_t b80;
+    ulp_t b128;
+} math_ulps_t;
+
+extern math_ulps_t math_ulps[];
+
+ulp_t     max_ulp;
+
+#include "test-ulp.h"
+
+static inline math_ulps_t *
+math_find_ulps(void)
+{
+    const char *name = MATH_STRING(TEST_FUNC);
+    for (size_t i = 0; i < sizeof(math_ulps)/sizeof(math_ulps[0]); i++)
+        if (strcmp(name, math_ulps[i].name) == 0)
+            return &math_ulps[i];
+    assert(0);
+}
+
+static inline int
+math_find_ulp_binary32(void)
+{
+    math_ulps_t *ulps = math_find_ulps();
+    return ulps->b32;
+}
+
+static inline int
+math_find_ulp_binary64(void)
+{
+    math_ulps_t *ulps = math_find_ulps();
+    return ulps->b64;
+}
+
+static inline int
+math_find_ulp_binary80(void)
+{
+    math_ulps_t *ulps = math_find_ulps();
+    return ulps->b80;
+}
+
+static inline int
+math_find_ulp_binary128(void)
+{
+    math_ulps_t *ulps = math_find_ulps();
+    return ulps->b128;
+}
 
 #if __FLT_MANT_DIG__ == 24 && !defined(SKIP_BINARY32)
 #define HAS_BINARY32
@@ -139,7 +182,7 @@ ulp32 (binary32 a, binary32 b)
         printf("RX fails to generate NaN, ignoring\n");
         return 0;
 #endif
-        return INVALID_ULP;
+        return INV_ULP;
     }
 
     ulp_t     ulp = 0;
@@ -223,7 +266,7 @@ ulp64(binary64 a, binary64 b)
         printf("RX fails to generate NaN, ignoring\n");
         return 0;
 #endif
-        return INVALID_ULP;
+        return INV_ULP;
     }
 
     ulp_t     ulp = 0;
@@ -300,7 +343,7 @@ ulp80(binary80 a, binary80 b)
     if (isnan(a) && isnan(b))
         return 0;
     if (isnan(a) || isnan(b))
-        return INVALID_ULP;
+        return INV_ULP;
 
     ulp_t     ulp = 0;
     while (a != b) {
@@ -360,7 +403,7 @@ ulp128(binary128 a, binary128 b)
     if (isnan(a) && isnan(b))
         return 0;
     if (isnan(a) || isnan(b))
-        return INVALID_ULP;
+        return INV_ULP;
 
     ulp_t     ulp = 0;
     while (a != b) {

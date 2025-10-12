@@ -36,17 +36,4 @@
 #define TEST_VECTORS    "test-ccos.h"
 #define TEST_FUNC       ccos
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY32       INVALID_ULP
-#define MATH_ULP_BINARY64       INVALID_ULP
-#define MATH_ULP_BINARY80       INVALID_ULP
-#define MATH_ULP_BINARY128      INVALID_ULP
-#else
-#define MATH_ULP_BINARY32       2
-#define MATH_ULP_BINARY64       1
-#define MATH_ULP_BINARY80       1
-#endif
-
 #include "test-complex-one.h"

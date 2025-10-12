@@ -36,17 +36,4 @@
 #define TEST_VECTORS    "test-casin.h"
 #define TEST_FUNC       casin
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#define MATH_ULP_BINARY32       MAX_ULP
-#define MATH_ULP_BINARY64       MAX_ULP
-#define MATH_ULP_BINARY80       MAX_ULP
-#define MATH_ULP_BINARY128      MAX_ULP
-#else
-#define MATH_ULP_BINARY32       2
-#define MATH_ULP_BINARY64       2
-#define MATH_ULP_BINARY80       2
-#endif
-
 #include "test-complex-one.h"

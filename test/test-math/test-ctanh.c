@@ -36,22 +36,4 @@
 #define TEST_VECTORS    "test-ctanh.h"
 #define TEST_FUNC       ctanh
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#ifdef __HAVE_68881__
-#define MATH_ULP_BINARY32       MAX_ULP
-#define MATH_ULP_BINARY64       MAX_ULP
-#else
-#if defined(__clang__) && defined(__SOFTFP__)
-#define MATH_ULP_BINARY32       MAX_ULP
-#endif
-#define MATH_ULP_BINARY64       2
-#endif
-#define MATH_ULP_BINARY80       3
-#else
-#define MATH_ULP_BINARY64       2
-#define MATH_ULP_BINARY80       3
-#endif
-
 #include "test-complex-one.h"

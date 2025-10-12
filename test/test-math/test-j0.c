@@ -35,14 +35,12 @@
 
 #define _DEFAULT_SOURCE
 #include <sys/types.h>
+
 #ifdef __PICOLIBC__
-#if defined(__mc68020) && defined(__HAVE_68881__)
-/* qemu has some accuracy issues in this mode */
-#define MATH_ULP_BINARY32       2
-#endif
 #define SKIP_BINARY80
 #define SKIP_BINARY128
 #endif
+
 #define TEST_VECTORS    "test-j0.h"
 #define TEST_FUNC       j0
 

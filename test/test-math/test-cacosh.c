@@ -36,17 +36,4 @@
 #define TEST_VECTORS    "test-cacosh.h"
 #define TEST_FUNC       cacosh
 
-#include <sys/types.h>
-
-#ifdef __PICOLIBC__
-#ifdef __HAVE_68881__
-#define MATH_ULP_BINARY32       MAX_ULP
-#define MATH_ULP_BINARY64       MAX_ULP
-#else
-#define MATH_ULP_BINARY64       2
-#endif
-#define MATH_ULP_BINARY80       2
-#define MATH_ULP_BINARY128      MAX_ULP
-#endif
-
 #include "test-complex-one.h"
