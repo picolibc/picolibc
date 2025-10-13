@@ -236,7 +236,7 @@ ulp64(binary64 a, binary64 b)
     return ulp;
 }
 
-static inline
+static inline ulp_t
 culp64(cbinary64 a, cbinary64 b)
 {
     if (a == b)

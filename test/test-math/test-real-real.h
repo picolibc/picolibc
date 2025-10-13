@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <test-math.h>
+#include "test-math.h"
 
 #if defined(HAS_BINARY32) && !defined(SKIP_BINARY32)
 
