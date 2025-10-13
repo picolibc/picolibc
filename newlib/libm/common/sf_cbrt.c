@@ -33,7 +33,7 @@ static const float
 float cbrtf(float x)
 {
 	__int32_t	hx;
-	float r,s,t;
+	float r,s,t,w;
 	__uint32_t sign;
 	__uint32_t high;
 
@@ -59,6 +59,18 @@ float cbrtf(float x)
 	r=t*t/x;
 	s=C+r*t;
 	t*=G+F/(s+E+D/s);
+
+    /* chopped to 20 bits and make it larger than cbrt(x) */ 
+	GET_FLOAT_WORD(high,t);
+	high &= ~(__uint32_t)0xfU;
+	SET_FLOAT_WORD(t,high+0x00000010);
+
+    /* one step newton iteration to 24 bits. A lot of math for one more bit. */
+	s=t*t;		/* t*t is exact */
+	r=x/s;
+	w=t+t;
+	r=(r-t)/(w+r);	/* r-s is exact */
+	t=t+t*r;
 
     /* retore the sign bit */
 	GET_FLOAT_WORD(high,t);
