@@ -64,7 +64,7 @@ math_ulps_t math_ulps[] = {
     { .name = "pow",        .b32 =       1, .b64 =       1, .b80 = MAX_ULP, .b128 =       1 },
 
     /* Misc functions */
-    { .name = "cbrt",       .b32 =       2, .b64 =       1, .b80 =       1, .b128 =       1 },
+    { .name = "cbrt",       .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
     { .name = "erf",        .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
     { .name = "erfc",       .b32 =       1, .b64 =       0, .b80 =       0, .b128 =       1 },
     { .name = "hypot",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
