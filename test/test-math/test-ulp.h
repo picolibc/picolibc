@@ -68,8 +68,7 @@ math_ulps_t math_ulps[] = {
     { .name = "erf",        .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
     { .name = "erfc",       .b32 =       1, .b64 =       0, .b80 =       0, .b128 =       1 },
     { .name = "hypot",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
-#if defined(__mc68020) && defined(__HAVE_68881__)
-    /* qemu has some accuracy issues in this mode */
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "j0",         .b32 =       2, .b64 =       1, .b80 =       0, .b128 =       0 },
 #else
     { .name = "j0",         .b32 =       1, .b64 =       1, .b80 =       0, .b128 =       0 },
@@ -87,12 +86,12 @@ math_ulps_t math_ulps[] = {
     { .name = "tgamma",     .b32 = MAX_ULP, .b64 =      56, .b80 =       2, .b128 =      97 },
 
     /* Complex trig functions */
-#ifdef __HAVE_68881__
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "cacos",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 =       2, .b128 = MAX_ULP },
 #else
     { .name = "cacos",      .b32 =       2, .b64 =       3, .b80 =       2, .b128 = MAX_ULP },
 #endif
-#ifdef __HAVE_68881__
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "cacosh",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 =       2, .b128 = MAX_ULP },
 #else
     { .name = "cacosh",     .b32 =       1, .b64 =       2, .b80 =       2, .b128 = MAX_ULP },
@@ -102,7 +101,7 @@ math_ulps_t math_ulps[] = {
     { .name = "catan",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "catanh",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "ccos",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
-#ifdef __HAVE_68881__
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "ccosh",      .b32 = INV_ULP, .b64 = MAX_ULP, .b80 =       1, .b128 =       2 },
 #else
     { .name = "ccosh",      .b32 = INV_ULP, .b64 =       1, .b80 =       1, .b128 =       2 },
@@ -110,14 +109,14 @@ math_ulps_t math_ulps[] = {
     { .name = "csin",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
     { .name = "csinh",      .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
 
-#ifdef __HAVE_68881__
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "ctan",       .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 =       3, .b128 =       1 },
 #elif defined(__clang__) && defined(__SOFTFP__)
     { .name = "ctan",       .b32 = MAX_ULP, .b64 =       2, .b80 =       3, .b128 =       1 },
 #else
     { .name = "ctan",       .b32 =       1, .b64 =       2, .b80 =       3, .b128 =       1 },
 #endif
-#ifdef __HAVE_68881__
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "ctanh",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 =       3, .b128 =       1 },
 #elif defined(__clang__) && defined(__SOFTFP__)
     { .name = "ctanh",      .b32 = MAX_ULP, .b64 =       2, .b80 =       3, .b128 =       1 },
@@ -127,7 +126,7 @@ math_ulps_t math_ulps[] = {
 
     /* Complex exp/log functions */
     { .name = "cexp",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
-#ifdef __HAVE_68881__
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "clog",       .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 =       5, .b128 =       6 },
 #elif defined(__riscv_float_abi_soft) || defined(__clang__)
     { .name = "clog",       .b32 =       4, .b64 =       6, .b80 =       5, .b128 =       8 },
@@ -137,7 +136,7 @@ math_ulps_t math_ulps[] = {
     { .name = "cpow",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
 
     /* Complex misc functions */
-#ifdef __HAVE_68881__
+#if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "csqrt",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 =       1, .b128 =       1 },
 #elif defined(__riscv_float_abi_soft) || defined(__clang__)
     { .name = "csqrt",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       2 },
