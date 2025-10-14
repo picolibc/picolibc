@@ -16,6 +16,10 @@
 
 _BEGIN_STD_C
 
+#if __ISO_C_VISIBLE >= 2023
+#define __STDC_VERSION_STDINT_H__ 0x202311L
+#endif
+
 #ifdef ___int_least8_t_defined
 typedef __int_least8_t int_least8_t;
 typedef __uint_least8_t uint_least8_t;
@@ -463,6 +467,228 @@ typedef __uint_least64_t uint_least64_t;
 #define RSIZE_MAX SIZE_MAX
 #endif
 #endif
+
+#if __ISO_C_VISIBLE >= 2023
+
+/* define INT8_WIDTH and UINT8_WIDTH if possible */
+#ifdef __int8_t_defined
+#ifdef __INT8_WIDTH__
+#define INT8_WIDTH __INT8_WIDTH__
+#elif defined __UINT8_WIDTH__
+#define INT8_WIDTH __UINT8_WIDTH__
+#else
+#define INT8_WIDTH 8
+#endif
+#ifdef __UINT8_WIDTH__
+#define UINT8_WIDTH __UINT8_WIDTH__
+#elif defined __INT8_WIDTH__
+#define UINT8_WIDTH __INT8_WIDTH__
+#else
+#define UINT8_WIDTH 8
+#endif
+#endif
+
+/* define INT16_WIDTH and UINT16_WIDTH if possible */
+#ifdef _int16_t_defined
+#ifdef __INT16_WIDTH__
+#define INT16_WIDTH __INT16_WIDTH__
+#elif defined __UINT16_WIDTH__
+#define INT16_WIDTH __UINT16_WIDTH__
+#else
+#define INT16_WIDTH 16
+#endif
+#ifdef __UINT16_WIDTH__
+#define UINT16_WIDTH __UINT16_WIDTH__
+#elif defined __INT16_WIDTH__
+#define UINT16_WIDTH __INT16_WIDTH__
+#else
+#define UINT16_WIDTH 16
+#endif
+#endif
+
+/* define INT32_WIDTH and UINT32_WIDTH if possible */
+#ifdef __int32_t_defined
+#ifdef __INT32_WIDTH__
+#define INT32_WIDTH __INT32_WIDTH__
+#elif defined __UINT32_WIDTH__
+#define INT32_WIDTH __UINT32_WIDTH__
+#else
+#define INT32_WIDTH 32
+#endif
+#ifdef __UINT32_WIDTH__
+#define UINT32_WIDTH __UINT32_WIDTH__
+#elif defined __INT32_WIDTH__
+#define UINT32_WIDTH __INT32_WIDTH__
+#else
+#define UINT32_WIDTH 32
+#endif
+#endif
+
+/* define INT64_WIDTH and UINT64_WIDTH if possible */
+#ifdef __int64_t_defined
+#ifdef __INT64_WIDTH__
+#define INT64_WIDTH __INT64_WIDTH__
+#elif defined __UINT64_WIDTH__
+#define INT64_WIDTH __UINT64_WIDTH__
+#else
+#define INT64_WIDTH 64
+#endif
+#ifdef __UINT64_WIDTH__
+#define UINT64_WIDTH __UINT64_WIDTH__
+#elif defined __INT64_WIDTH__
+#define UINT64_WIDTH __INT64_WIDTH__
+#else
+#define UINT64_WIDTH 64
+#endif
+#endif
+
+/* define INT_LEAST8_WIDTH and UINT_LEAST8_WIDTH if possible */
+#ifdef __INT_LEAST8_WIDTH__
+#define INT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
+#elif defined __UINT_LEAST8_WIDTH__
+#define INT_LEAST8_WIDTH __UINT_LEAST8_WIDTH__
+#endif
+#ifdef __UINT_LEAST8_WIDTH__
+#define UINT_LEAST8_WIDTH __UINT_LEAST8_WIDTH__
+#elif defined __INT_LEAST8_WIDTH__
+#define UINT_LEAST8_WIDTH __INT_LEAST8_WIDTH__
+#endif
+
+/* define INT_LEAST16_WIDTH and UINT_LEAST16_WIDTH if possible */
+#ifdef __INT_LEAST16_WIDTH__
+#define INT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
+#elif defined __UINT_LEAST16_WIDTH__
+#define INT_LEAST16_WIDTH __UINT_LEAST16_WIDTH__
+#endif
+#ifdef __UINT_LEAST16_WIDTH__
+#define UINT_LEAST16_WIDTH __UINT_LEAST16_WIDTH__
+#elif defined __INT_LEAST16_WIDTH__
+#define UINT_LEAST16_WIDTH __INT_LEAST16_WIDTH__
+#endif
+
+/* define INT_LEAST32_WIDTH and UINT_LEAST32_WIDTH if possible */
+#ifdef __INT_LEAST32_WIDTH__
+#define INT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
+#elif defined __UINT_LEAST32_WIDTH__
+#define INT_LEAST32_WIDTH __UINT_LEAST32_WIDTH__
+#endif
+#ifdef __UINT_LEAST32_WIDTH__
+#define UINT_LEAST32_WIDTH __UINT_LEAST32_WIDTH__
+#elif defined __INT_LEAST32_WIDTH__
+#define UINT_LEAST32_WIDTH __INT_LEAST32_WIDTH__
+#endif
+
+/* define INT_LEAST64_WIDTH and UINT_LEAST64_WIDTH if possible */
+#ifdef __INT_LEAST64_WIDTH__
+#define INT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
+#elif defined __UINT_LEAST64_WIDTH__
+#define INT_LEAST64_WIDTH __UINT_LEAST64_WIDTH__
+#endif
+#ifdef __UINT_LEAST64_WIDTH__
+#define UINT_LEAST64_WIDTH __UINT_LEAST64_WIDTH__
+#elif defined __INT_LEAST64_WIDTH__
+#define UINT_LEAST64_WIDTH __INT_LEAST64_WIDTH__
+#endif
+
+/* define INT_FAST8_WIDTH and UINT_FAST8_WIDTH if possible */
+#ifdef __INT_FAST8_WIDTH__
+#define INT_FAST8_WIDTH __INT_FAST8_WIDTH__
+#elif defined __UINT_FAST8_WIDTH__
+#define INT_FAST8_WIDTH __UINT_FAST8_WIDTH__
+#endif
+#ifdef __UINT_FAST8_WIDTH__
+#define UINT_FAST8_WIDTH __UINT_FAST8_WIDTH__
+#elif defined __INT_FAST8_WIDTH__
+#define UINT_FAST8_WIDTH __INT_FAST8_WIDTH__
+#endif
+
+/* define INT_FAST16_WIDTH and UINT_FAST16_WIDTH if possible */
+#ifdef __INT_FAST16_WIDTH__
+#define INT_FAST16_WIDTH __INT_FAST16_WIDTH__
+#elif defined __UINT_FAST16_WIDTH__
+#define INT_FAST16_WIDTH __UINT_FAST16_WIDTH__
+#endif
+#ifdef __UINT_FAST16_WIDTH__
+#define UINT_FAST16_WIDTH __UINT_FAST16_WIDTH__
+#elif defined __INT_FAST16_WIDTH__
+#define UINT_FAST16_WIDTH __INT_FAST16_WIDTH__
+#endif
+
+/* define INT_FAST32_WIDTH and UINT_FAST32_WIDTH if possible */
+#ifdef __INT_FAST32_WIDTH__
+#define INT_FAST32_WIDTH __INT_FAST32_WIDTH__
+#elif defined __UINT_FAST32_WIDTH__
+#define INT_FAST32_WIDTH __UINT_FAST32_WIDTH__
+#endif
+#ifdef __UINT_FAST32_WIDTH__
+#define UINT_FAST32_WIDTH __UINT_FAST32_WIDTH__
+#elif defined __INT_FAST32_WIDTH__
+#define UINT_FAST32_WIDTH __INT_FAST32_WIDTH__
+#endif
+
+/* define INT_FAST64_WIDTH and UINT_FAST64_WIDTH if possible */
+#ifdef __INT_FAST64_WIDTH__
+#define INT_FAST64_WIDTH __INT_FAST64_WIDTH__
+#elif defined __UINT_FAST64_WIDTH__
+#define INT_FAST64_WIDTH __UINT_FAST64_WIDTH__
+#endif
+#ifdef __UINT_FAST64_WIDTH__
+#define UINT_FAST64_WIDTH __UINT_FAST64_WIDTH__
+#elif defined __INT_FAST64_WIDTH__
+#define UINT_FAST64_WIDTH __INT_FAST64_WIDTH__
+#endif
+
+/* define INTPTR_WIDTH and UINTPTR_WIDTH if possible */
+#ifdef __INTPTR_WIDTH__
+#define INTPTR_WIDTH __INTPTR_WIDTH__
+#elif defined __UINTPTR_WIDTH__
+#define INTPTR_WIDTH __UINTPTR_WIDTH__
+#endif
+#ifdef __UINTPTR_WIDTH__
+#define UINTPTR_WIDTH __UINTPTR_WIDTH__
+#elif defined __INTPTR_WIDTH__
+#define UINTPTR_WIDTH __INTPTR_WIDTH__
+#endif
+
+/* define INTMAX_WIDTH and UINTMAX_WIDTH if possible */
+#ifdef __INTMAX_WIDTH__
+#define INTMAX_WIDTH __INTMAX_WIDTH__
+#elif defined __UINTMAX_WIDTH__
+#define INTMAX_WIDTH __UINTMAX_WIDTH__
+#endif
+#ifdef __UINTMAX_WIDTH__
+#define UINTMAX_WIDTH __UINTMAX_WIDTH__
+#elif defined __INTMAX_WIDTH__
+#define UINTMAX_WIDTH __INTMAX_WIDTH__
+#endif
+
+/* define PTRDIFF_WIDTH if possible */
+#ifdef __PTRDIFF_WIDTH__
+#define PTRDIFF_WIDTH __PTRDIFF_WIDTH__
+#endif
+
+/* define SIG_ATOMIC_WIDTH if possible */
+#ifdef __SIG_ATOMIC_WIDTH__
+#define SIG_ATOMIC_WIDTH __SIG_ATOMIC_WIDTH__
+#endif
+
+/* define SIZE_WIDTH if possible */
+#ifdef __SIZE_WIDTH__
+#define SIZE_WIDTH __SIZE_WIDTH__
+#endif
+
+/* define WCHAR_WIDTH if possible */
+#ifdef __WCHAR_WIDTH__
+#define WCHAR_WIDTH __WCHAR_WIDTH__
+#endif
+
+/* define WINT_WIDTH if possible */
+#ifdef __WINT_WIDTH__
+#define WINT_WIDTH __WINT_WIDTH__
+#endif
+
+#endif /* __ISO_C_VISBLE >= 2023 */
+
 
   _END_STD_C
 
