@@ -164,7 +164,7 @@ __math_lgammaf_r(float x, int *signgamp, int *divzero)
         *divzero = 1;
         return __math_divzerof(0);
     }
-    if (ix < 0x1c800000) { /* |x|<2**-70, return -log(|x|) */
+    if (ix < 0x2e000000) { /* |x|<2**-35, return -log(|x|) */
         if (hx < 0) {
             *signgamp = -1;
             return -logf(-x);
