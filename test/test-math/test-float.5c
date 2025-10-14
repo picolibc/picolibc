@@ -47,29 +47,72 @@ imprecise_arg(complex x, int prec)
 	return imprecise(x, prec);
 }
 
-/* These ignore denorms for now */
+const real min_binary32 = imprecise(0x1p-126);
+const real min_denorm_binary32 = imprecise(0x1p-149);
+
 real
 real32(real x)
 {
-	return imprecise_arg(x, 24);
+	int	precision = 24;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary32)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary32)) {
+		precision = exp_x - exponent(min_denorm_binary32) + 1;
+	}
+	return imprecise_arg(x, precision);
 }
+
+const real min_binary64 = imprecise(0x1p-1022);
+const real min_denorm_binary64 = imprecise(0x1p-1074);
 
 real
 real64(real x)
 {
-	return imprecise_arg(x, 53);
+	int	precision = 53;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary64)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary64)) {
+		precision = exp_x - exponent(min_denorm_binary64) + 1;
+	}
+	return imprecise_arg(x, precision);
 }
+
+const real min_binary80 = imprecise(0x1p-16382);
+const real min_denorm_binary80 = imprecise(0x1p-16445);
 
 real
 real80(real x)
 {
-	return imprecise_arg(x, 64);
+	int	precision = 64;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary80)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary80)) {
+		precision = exp_x - exponent(min_denorm_binary80) + 1;
+	}
+	return imprecise_arg(x, precision);
 }
+
+const real min_binary128 = imprecise(0x1p-16382);
+const real min_denorm_binary128 = imprecise(0x1p-16494);
 
 real
 real128(real x)
 {
-	return imprecise_arg(x, 113);
+	int	precision = 113;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary128)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary128)) {
+		precision = exp_x - exponent(min_denorm_binary128) + 1;
+	}
+	return imprecise_arg(x, precision);
 }
 
 real [](real) real_convs = { real32, real64, real80, real128 };
