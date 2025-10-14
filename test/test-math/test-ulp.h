@@ -75,7 +75,7 @@ math_ulps_t math_ulps[] = {
 #endif
     { .name = "j1",         .b32 =       3, .b64 =       1, .b80 =       0, .b128 =       0 },
     { .name = "jn",         .b32 =       3, .b64 =       3, .b80 =       0, .b128 =       0 },
-    { .name = "lgamma",     .b32 = MAX_ULP, .b64 =       2, .b80 =       2, .b128 =       1 },
+    { .name = "lgamma",     .b32 =       1, .b64 =       2, .b80 =       2, .b128 =       1 },
 #if defined(__riscv_float_abi_soft) || defined(__clang__)
     { .name = "sqrt",       .b32 =       0, .b64 =       0, .b80 =       0, .b128 =       1 },
 #elif defined(__m68k__) && FLT_EVAL_METHOD != 0
@@ -83,7 +83,7 @@ math_ulps_t math_ulps[] = {
 #else
     { .name = "sqrt",       .b32 =       0, .b64 =       0, .b80 =       0, .b128 =       0 },
 #endif
-    { .name = "tgamma",     .b32 = MAX_ULP, .b64 =      56, .b80 =       2, .b128 =      97 },
+    { .name = "tgamma",     .b32 =      58, .b64 =      56, .b80 =       2, .b128 =      97 },
 
     /* Complex trig functions */
 #if defined(__m68k__) && FLT_EVAL_METHOD != 0
