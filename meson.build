@@ -647,6 +647,15 @@ isystem_gen = gen_format.format(gen_include_dir)
 
 specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_gen)
 
+gcc_dumpmachine = run_command(cc.cmd_array() + ['-dumpmachine'], check : true).stdout().split('\n')[0]
+
+cxxconfig_path_postfix = '..' / gcc_dumpmachine / 'include' / 'c++' / '%(version)' / gcc_dumpmachine / '%M'
+cxxconfig_isystem_prefix = isystem_prefix / cxxconfig_path_postfix
+cxxconfig_isystem_buildtype = isystem_buildtype / cxxconfig_path_postfix
+cxxconfig_isystem_gen = isystem_gen / cxxconfig_path_postfix
+
+specs_isystem = specs_isystem + ' -isystem ' + specs_option_format.format(cxxconfig_isystem_prefix, cxxconfig_isystem_buildtype, cxxconfig_isystem_gen)
+
 #
 # Build the non-multilib -L value
 #
