@@ -55,7 +55,11 @@ static TEST_CONST math_ulps_t math_ulps[] = {
 
     /* Exp/log functions */
     { .name = "exp",        .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
+#if defined(__arm__) && (__ARM_FP & 0x8) == 0
+    { .name = "exp10",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
+#else
     { .name = "exp10",      .b32 =       1, .b64 =       0, .b80 =       1, .b128 =       1 },
+#endif
     { .name = "exp2",       .b32 =       1, .b64 =       1, .b80 =       2, .b128 =       0 },
     { .name = "expm1",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
     { .name = "log10",      .b32 =       2, .b64 =       0, .b80 =       1, .b128 =       1 },
