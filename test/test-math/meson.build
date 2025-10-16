@@ -102,6 +102,12 @@ tests_complex_other = [
 tests = tests_real_trig + tests_real_exp + tests_real_other
 tests += tests_complex_trig + tests_complex_exp + tests_complex_other
 
+functions = [ 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atanh',
+              'cbrt', 'cos', 'cosh', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
+              'expm1', 'j0', 'j1', 'lgamma', 'log', 'log10', 'log1p', 'log2',
+              'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tgamma', 'y0', 'y1',
+            ]
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
@@ -143,6 +149,25 @@ foreach params : targets
          suite: 'test-math',
 	 env: test_env)
   endforeach
+
+  if enable_exhaustive_math_tests
+    foreach f : functions
+      test_name = 'test-math-compare-' + f
+      test_function_name_arg=['-DTEST_FUNC=' + f]
+      test(test_name,
+           executable(test_name, 'test-math-compare.c',
+                      c_args: printf_compile_args_d + test_function_name_arg + _c_args,
+                      link_args: printf_link_args_d + _link_args,
+                      objects: _objs,
+                      link_depends: _link_depends,
+                      include_directories: inc),
+           depends: bios_bin,
+	   timeout: 7200,
+           suite: 'test-math-compare',
+	   env: test_env)
+    endforeach
+  endif
+
 endforeach
 
 if enable_native_math_tests
@@ -162,4 +187,21 @@ if enable_native_math_tests
          suite: 'test-math'
         )
   endforeach
+
+  if enable_exhaustive_math_tests
+    foreach f : functions
+      test_name = 'test-math-compare-' + f + '-native'
+      test_function_name_arg=['-DTEST_FUNC=' + f]
+
+      test(test_name,
+	   executable(test_name, 'test-math-compare.c',
+		      c_args: native_c_args + test_function_name_arg + ctype_c_args,
+		      link_args: native_c_args,
+                      dependencies: native_lib_m),
+           suite: 'test-math-compare',
+           timeout: 7200,
+          )
+    endforeach
+  endif
+
 endif

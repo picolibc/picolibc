@@ -215,11 +215,11 @@ compute_real_one(real x, real(real) f)
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity(x);
+				raise infinity();
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity(real v) {
+		} catch infinity() {
 			yp[i].i = ◊;
 		} catch nan() {
 			yp[i].n = ◊;
@@ -241,11 +241,11 @@ compute_int_real(int x1, real x2, real(int, real) f)
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity(x);
+				raise infinity();
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity(real v) {
+		} catch infinity() {
 			yp[i].i = ◊;
 		} catch nan() {
 			yp[i].n = ◊;
@@ -292,11 +292,11 @@ compute_real_real(real x1, real x2, real(real, real) f)
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity(x);
+				raise infinity();
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity(real v) {
+		} catch infinity() {
 			yp[i].i = ◊;
 		} catch nan() {
 			yp[i].n = ◊;

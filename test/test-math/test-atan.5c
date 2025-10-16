@@ -35,10 +35,16 @@
 
 load "test-float.5c"
 
+real[] test_values = {
+        0x1.4f7476p-11,
+        0x1.1ad646p-4,
+};
 
 void
 main()
 {
+        for (int i = 0; i < dim(test_values); i++)
+                compute_real_one(test_values[i], atan);
 	for (real r = 1e-38; r <= pi/2; r *= 1.5) {
 		real ri = imprecise(r, prec);
 		compute_real_one(ri, atan);
