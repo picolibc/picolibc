@@ -70,7 +70,11 @@ math_ulps_t math_ulps[] = {
     { .name = "erfc",       .b32 =      64, .b64 =       1, .b80 =       1, .b128 =       2 },
     { .name = "hypot",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
     { .name = "j0",         .b32 = MAX_ULP, .b64 =      42, .b80 =       0, .b128 =       0 },
+#ifndef __OBSOLETE_MATH_FLOAT
     { .name = "j1",         .b32 =       5, .b64 =       1, .b80 =       0, .b128 =       0 },
+#else
+    { .name = "j1",         .b32 =       9, .b64 =       1, .b80 =       0, .b128 =       0 },
+#endif
     { .name = "jn",         .b32 =       3, .b64 =       3, .b80 =       0, .b128 =       0 },
     { .name = "y0",         .b32 = MAX_ULP, .b64 =       0, .b80 =       0, .b128 =       0 },
     { .name = "y1",         .b32 = MAX_ULP, .b64 =       0, .b80 =       0, .b128 =       0 },
