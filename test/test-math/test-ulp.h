@@ -71,7 +71,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     /* Misc functions */
     { .name = "cbrt",       .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
     { .name = "erf",        .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
-    { .name = "erfc",       .b32 =      64, .b64 =       1, .b80 =       1, .b128 =       2 },
+    { .name = "erfc",       .b32 =       3, .b64 =       1, .b80 =       2, .b128 =       2 },
     { .name = "hypot",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
     { .name = "j0",         .b32 = MAX_ULP, .b64 =      42, .b80 =       0, .b128 =       0 },
     { .name = "j1",         .b32 = MAX_ULP, .b64 =       1, .b80 =       0, .b128 =       0 },
