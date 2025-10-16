@@ -99,7 +99,7 @@ typedef const struct {
     ulp_t b128;
 } math_ulps_t;
 
-extern math_ulps_t math_ulps[];
+static TEST_CONST math_ulps_t math_ulps[];
 
 ulp_t     max_ulp;
 

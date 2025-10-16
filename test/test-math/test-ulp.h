@@ -35,7 +35,7 @@
 
 #include <sys/types.h>
 
-math_ulps_t math_ulps[] = {
+static TEST_CONST math_ulps_t math_ulps[] = {
 #ifdef __PICOLIBC__
 
     /* Trig functions */
