@@ -20,6 +20,7 @@ REAL_TRIG = \
 
 REAL_EXP = \
 	test-exp.h \
+	test-exp10.h \
 	test-exp2.h \
 	test-expm1.h \
 	test-log.h \
