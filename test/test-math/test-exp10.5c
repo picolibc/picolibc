@@ -36,25 +36,25 @@
 load "test-float.5c"
 
 real[] test_values = {
-        0x1p-23,
+        0x1.62623ep-20,
+        0x1.bcb7b2p-26,
 };
 
 real
-expm1(real x)
+exp10(real x)
 {
-	real xi = imprecise(x, 2048);
-	return exp(xi) - 1;
+	return 10 ** x;
 }
 
 void
 main()
 {
         for (int i = 0; i < dim(test_values); i++)
-                compute_real_one(test_values[i], expm1);
+                compute_real_one(test_values[i], exp10);
 	for (real r = 1e-38; r < 87; r *= 1.5) {
 		real ri = imprecise(r, prec);
-		compute_real_one(ri, expm1);
-		compute_real_one(-ri, expm1);
+		compute_real_one(ri, exp10);
+		compute_real_one(-ri, exp10);
 	}
 }
 

@@ -153,6 +153,12 @@ else
 endif
 enable_native_tests = get_option('native-tests')
 enable_native_math_tests = enable_native_tests and get_option('native-math-tests')
+exhaustive_math_tests_value = get_option('exhaustive-math-tests')
+if exhaustive_math_tests_value == 'native'
+  enable_exhaustive_math_tests = enable_native_tests
+else
+  enable_exhaustive_math_tests = exhaustive_math_tests_value == 'true'
+endif
 tests_enable_stack_protector = get_option('tests-enable-stack-protector')
 tests_enable_full_malloc_stress = get_option('tests-enable-full-malloc-stress')
 tests_enable_posix_io = get_option('tests-enable-posix-io')

@@ -235,7 +235,7 @@ erfcf(float x)
                                s * (sb4 + s * (sb5 + s * (sb6 + s * sb7))))));
         }
         GET_FLOAT_WORD(ix, x);
-        SET_FLOAT_WORD(z, ix & 0xfffff000);
+        SET_FLOAT_WORD(z, ix & 0xffffe000);
         r = expf(-z * z - (float)0.5625) * expf((z - x) * (z + x) + R / S);
         if (hx > 0)
             return r / x;
