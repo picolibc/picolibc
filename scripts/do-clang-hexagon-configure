@@ -1,1 +1,4 @@
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 exec "$(dirname "$0")"/do-configure clang-hexagon -Dtests=true -Dmultilib=false -Dposix-console=true -Dtests-enable-posix-io=true -Dtests-enable-full-malloc-stress=true -Dtest-stdin=true "$@"

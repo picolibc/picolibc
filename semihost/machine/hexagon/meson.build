@@ -1,3 +1,6 @@
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 lib_semihost_srcs = [
   'hexagon_close.c',
   'hexagon_exit.c',
