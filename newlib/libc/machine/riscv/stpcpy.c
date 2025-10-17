@@ -11,7 +11,7 @@
 
 #define _DEFAULT_SOURCE
 #include <stdbool.h>
-#include "rv_string.h"
+#include "rv_strcpy.h"
 
 #undef stpcpy
 

@@ -10,7 +10,7 @@
 */
 
 #include <stdbool.h>
-#include "rv_string.h"
+#include "rv_strcpy.h"
 
 #undef strcpy
 

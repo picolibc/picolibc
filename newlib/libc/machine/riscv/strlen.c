@@ -13,7 +13,7 @@
 
 #include <string.h>
 #include <stdint.h>
-#include "rv_string.h"
+#include "rv_strcpy.h"
 
 size_t strlen(const char *str)
 {
