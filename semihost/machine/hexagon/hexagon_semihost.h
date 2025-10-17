@@ -1,3 +1,8 @@
+/*
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+*/
+
 #ifndef _HEXAGON_SEMIHOST_H_
 #define _HEXAGON_SEMIHOST_H_
 

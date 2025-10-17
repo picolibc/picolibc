@@ -1,3 +1,6 @@
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+
 [binaries]
 # Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
 # so we have to add -nostdlib to the compiler configuration itself or
