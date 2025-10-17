@@ -259,5 +259,9 @@ int main(void)
     assert(strlen(space) == extra);
     printf("    { .name = \"%s\",%s .b32 = %7" PRIdULP ", .b64 = %7" PRIdULP ", .b80 = %7" PRIdULP ", .b128 = %7" PRIdULP " },\n",
            MATH_STRING(TEST_FUNC), space, max_ulp_32, max_ulp_64, max_ulp_80, max_ulp_128);
+    if (ret)
+        printf("FAILED\n");
+    else
+        printf("PASSED\n");
     return ret;
 }
