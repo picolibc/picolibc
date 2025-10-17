@@ -20,7 +20,7 @@
 #define const
 #endif
 
-static const float tiny = 1e-30, half = 5.0000000000e-01, /* 0x3F000000 */
+static const float tiny = 1e-30,
     one = 1.0000000000e+00, /* 0x3F800000 */
     two = 2.0000000000e+00, /* 0x40000000 */
     /* c = (subfloat)0.84506291151 */
@@ -164,6 +164,50 @@ erff(float x)
     else
         return r / x - one;
 }
+typedef struct { float h, l; } dd_float_t;
+
+/* |a| ≥ |b| */
+static inline dd_float_t
+f_fast_add_f(float a, float b)
+{
+    float     s, z, t;
+    s = a + b;
+    z = s - a;
+    t = b - z;
+    return (dd_float_t) { .h = s, .l = t };
+}
+
+/* |y| ≥ |x.h| */
+static inline dd_float_t
+dd_fast_add_f(dd_float_t x, float y)
+{
+    dd_float_t  s = f_fast_add_f(y, x.h);
+    float       v = x.l + s.l;
+    return f_fast_add_f(s.h, v);
+}
+
+
+static inline dd_float_t
+f_add_f(float a, float b)
+{
+    float     s, ap, bp, da, db, t;
+
+    s = a + b;
+    ap = s - b;
+    bp = s - ap;
+    da = a - ap;
+    db = b - bp;
+    t = da + db;
+    return (dd_float_t) { .h = s, .l = t };
+}
+
+static inline dd_float_t
+dd_add_f(dd_float_t x, float y)
+{
+    dd_float_t  s = f_add_f(y, x.h);
+    float       v = x.l + s.l;
+    return f_fast_add_f(s.h, v);
+}
 
 float
 erfcf(float x)
@@ -187,9 +231,11 @@ erfcf(float x)
         if (hx < 0x3e800000) { /* x<1/4 */
             return one - (x + x * y);
         } else {
-            r = x * y;
-            r += (x - half);
-            return half - r;
+            dd_float_t  a, b;
+            /* use an extended precision addition */
+            a = f_fast_add_f(-x, -x*y);
+            b = dd_fast_add_f(a, one);
+            return b.h;
         }
     }
     if (ix < 0x3fa00000) { /* 0.84375 <= |x| < 1.25 */
