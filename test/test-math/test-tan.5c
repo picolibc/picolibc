@@ -35,12 +35,15 @@
 
 load "test-float.5c"
 
+real[] test_values = {
+	0x1.921fcp+0,
+};
 
 void
 main()
 {
-	real to_rad = pi_value(prec) / imprecise(180, prec);
-
+	for (int i = 0; i < dim(test_values); i++)
+		compute_real_one(test_values[i], tan);
 	for (real r = 1e-38; r < 1e10; r *= 11) {
 		real ri = imprecise(r, prec);
 		compute_real_one(ri, tan);

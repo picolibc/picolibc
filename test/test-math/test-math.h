@@ -99,7 +99,7 @@ typedef const struct {
     ulp_t b128;
 } math_ulps_t;
 
-extern math_ulps_t math_ulps[];
+static TEST_CONST math_ulps_t math_ulps[];
 
 ulp_t     max_ulp;
 
@@ -115,21 +115,21 @@ math_find_ulps(void)
     assert(0);
 }
 
-static inline int
+static inline ulp_t
 math_find_ulp_binary32(void)
 {
     math_ulps_t *ulps = math_find_ulps();
     return ulps->b32;
 }
 
-static inline int
+static inline ulp_t
 math_find_ulp_binary64(void)
 {
     math_ulps_t *ulps = math_find_ulps();
     return ulps->b64;
 }
 
-static inline int
+static inline ulp_t
 math_find_ulp_binary80(void)
 {
     math_ulps_t *ulps = math_find_ulps();

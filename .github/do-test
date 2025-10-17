@@ -38,12 +38,14 @@ case "$*" in
 	;;
 esac
 
-mkdir "$DIR"
-(cd "$DIR" || exit 1
+OPTIONS="$SANITIZER"
+
+(mkdir "$DIR" || exit 1
+ cd "$DIR" || exit 2
  echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $SANITIZER "$@"
+ echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $OPTIONS "$@"
  echo '##################################################'
- ../scripts/"$CONFIGURE" -Dwerror=true $SANITIZER "$@"
+ ../scripts/"$CONFIGURE" -Dwerror=true $OPTIONS "$@"
  case $? in
      0)
 	 echo 'Configuration succeeded'
@@ -53,19 +55,52 @@ mkdir "$DIR"
 	 exit 0
 	 ;;
      *)
-	 echo 'Configuration failed with' "$?"
-	 cat meson-logs/*
-	 exit 1
+	 exit 3
 	 ;;
  esac
- cat meson-logs/*
- ninja && meson test -t 20 -v)
+ ninja || exit 4
+ meson test -t 20 || exit 5)
 case $? in
     0)
 	rm -rf "$DIR"
 	;;
+    1)
+	echo '##################################'
+	echo '############# mkdir' "$DIR" 'failed'
+	echo '##################################'
+	exit 1
+	;;
+    2)
+	echo '##################################'
+	echo '############# cd' "$DIR" 'failed'
+	echo '##################################'
+	exit 1
+	;;
+    3)
+	echo '##################################'
+	echo '############# Configuration failed'
+	echo '##################################'
+	cat "$DIR"/meson-logs/meson-log.txt
+	exit 1
+	;;
+    4)
+	echo '##################################'
+	echo '############# Build failed'
+	echo '##################################'
+	exit 1
+	;;
+    5)
+	echo '##################################'
+	echo '############# Test failed'
+	echo '##################################'
+	cat "$DIR"/meson-logs/testlog.txt
+	exit 1
+	;;
     *)
-	exit $?
+	echo '##################################'
+	echo '############# Unknown failure' "$?"
+	echo '##################################'
+	cat "$DIR"/meson-logs/*
+	exit 1
 	;;
 esac
-
