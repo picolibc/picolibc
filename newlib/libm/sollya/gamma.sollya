@@ -1,0 +1,212 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+autosimplify = off!;
+//prec = 1024!;
+
+AkiyamaTanigawa = proc(l) {
+	var n, t, a, k, m;
+	n = 2 * l + 1;
+	t = [|1|];
+	a = [| |];
+	k = 1;
+	m = 2;
+	while m <= n do {
+		t[m-1] = 1/m;
+		j = m - 1;
+		while j >= 1 do {
+			t[j-1] = j * (t[j-1] - t[j]);
+			j = j - 1;
+		};
+		if mod(m, 2) != 0 then {
+			v = t[0]/((2*k-1)*(2*k));
+			if mod(k, 2) == 0 then {
+				a[k-1] = -v;
+			} else {
+				a[k-1] = v;
+			};
+			k = k + 1;
+		};
+		m = m + 1;
+	};
+	return a;
+};
+
+StieltjesCF = proc (len) {
+	var s, m, n, k, r, u;
+
+	s = AkiyamaTanigawa(len);
+
+	m = [|0, ..., (len-1)|];
+	for n from 0 to len - 1 do {
+		m[n] = [|0, ..., (len-1)|];
+	};
+	for n from 0 to len - 1 do {
+		u = m[n];
+		u[0] = 0;
+		m[n] = u;
+	};
+	for n from 0 to len - 2 do {
+		u = m[n];
+		u[1] = s[n+1]/s[n];
+		m[n] = u;
+	};
+	for k from 3 to len do {
+		for n from 1 to len - k + 1 do {
+			var a, b, c;
+			a = m[n][k-3];
+			b = m[n][k-2];
+			c = m[n-1][k-2];
+			if mod(k, 2) != 0 then {
+				u = m[n-1];
+				u[k-1] = a + b - c;
+				m[n-1] = u;
+			} else {
+				u = m[n-1];
+				u[k-1] = a * b / c;
+				m[n-1] = u;
+			};
+		};
+	};
+	u = m[0];
+	u[0] = s[0];
+	m[0] = u;
+
+	r = [| |];
+	for n from 0 to len - 1 do {
+		r[n] = m[0][n];
+	};
+	return r;
+};
+
+Stieltjes = proc(n, ord) {
+	var N, q, c, i, r;
+	
+	N = n + 1;
+	q = N;
+	c = StieltjesCF(ord);
+	for i from ord to 2 by -1 do {
+		q = N + c[i-1] / q;
+	};
+	r = sqrt(2 * Pi/N) * (N/exp(1)) ^ N * exp(1/(12*q));
+	return r;
+};
+
+gamma = proc(x) {
+	var g, i, y;
+
+	y = x + 10;
+
+	g = Stieltjes(y - 1, 6);
+	for i from 1 to 10 do {
+		y = y - 1;
+		g = g / y;
+	};
+	return g;
+};
+
+// gfunc = proc(x) { return 1- gamma(x + 1); };
+gfunc = proc(x) { return gamma(x + 1); };
+
+ginterval = [0;1];
+
+///* Compute binary32 gamma polynomial */
+//
+//gammadeg_32 = 11;
+//autosimplify = off!;
+//Pgamma_32 = fpminimax(gfunc(_x_), gammadeg_32, [|single...|],ginterval, relative);
+//display = decimal!;
+//
+//err_32 = [0;0];
+////err_32 = supnorm(Pgamma_32,gfunc(_x_),ginterval,relative,2^(-24));
+//
+//autosimplify = on!;
+//print("/*", gammadeg_32 + 1, "coefficients, error limits", err_32, "*/");
+//print("#define COEFFS { \\");
+//display = hexadecimal!;
+//for i from 0 to gammadeg_32 do print("        float_32(", coeff(Pgamma_32,i), "), \\");
+//print("}");
+
+/* Compute binary64 gamma polynomial */
+
+gammadeg_64 = 24;
+autosimplify = off!;
+Pgamma_64 = fpminimax(gfunc(_x_), gammadeg_64, [|double...|], ginterval, relative);
+display = decimal!;
+
+err_64 = [0;0];
+//err_64 = supnorm(Pgamma_64, gfunc(_x_), ginterval, relative, 2^(-40));
+
+autosimplify = on!;
+print("/*", gammadeg_64 + 1, "coefficients, error limits", err_64, "*/");
+print("#define COEFFS { \\");
+display = hexadecimal!;
+for i from 0 to gammadeg_64 do print("        float_64(", coeff(Pgamma_64,i), "), \\");
+print("}");
+
+/* Compute extended binary 64 gamma polynomial */
+
+gammadeg_80 = 18;
+autosimplify = off!;
+Pgamma_80 = fpminimax(gfunc(_x_), gammadeg_80, [|doubleextended...|],ginterval, relative);
+display = decimal!;
+
+err_80 = [0;0];
+//err_80 = supnorm(Pgamma_80, gfunc(_x_), ginterval, relative, 2^(-40));
+
+autosimplify = on!;
+print("/*", gammadeg_80 + 1, "coefficients, error limits", err_80, "*/");
+print("#define COEFFS { \\");
+display = hexadecimal!;
+for i from 0 to gammadeg_80 do print("        float_80(", coeff(Pgamma_80,i), "), \\");
+print("}");
+
+/* Compute binary128 gamma polynomial */
+
+gammadeg_128 = 49;
+autosimplify = off!;
+Pgamma_128 = fpminimax(gfunc(_x_), gammadeg_128, [|quad...|],ginterval, relative);
+display = decimal!;
+
+err_128 = [0;0];
+//err_128 = supnorm(Pgamma_128, gfunc(_x_), ginterval, relative, 2^(-40));
+
+autosimplify = on!;
+print("/*", gammadeg_128 + 1, "coefficients, error limits", err_128, "*/");
+print("#define COEFFS { \\");
+display = hexadecimal!;
+for i from 0 to gammadeg_128 do print("        float_128(", coeff(Pgamma_128,i), "), \\");
+print("}");
+

@@ -1,0 +1,159 @@
+typedef struct {
+	real	hi, lo;
+} ff_t;
+
+ff_t
+split_d(real x, int bits)
+{
+	x = imprecise(x);
+	int	xbits = precision(x);
+	real	a = imprecise(x, bits);
+	real 	b = imprecise(x - imprecise(a, xbits), bits);
+	real	hi = a + b;
+	real	lo = imprecise(x - imprecise(hi, xbits), bits);
+	return (ff_t) { .hi = hi, .lo = lo };
+}
+
+real
+combine_f(ff_t x)
+{
+	int	outbits = exponent(x.hi) - exponent(x.lo) + precision(x.lo) + 100;
+	return imprecise(x.hi, outbits) + imprecise(x.lo, outbits);
+}
+
+void
+print_pi(int bits, int name)
+{
+	ff_t	pi_bits = split_d(pi, bits);
+	printf("static const ff_t pi_%d = { .hi = float_%d(%a), .lo = float_%d(%a) };\n",
+	       name, name,pi_bits.hi, name, pi_bits.lo);
+}
+
+print_pi(24, 32);
+print_pi(53, 64);
+print_pi(64, 80);
+print_pi(113, 128);
+
+real
+search_gamma(real max, real start, int bits)
+{
+	real	value = imprecise(start, bits);
+	real	bit = 2**floor(log2(start) - 1);
+
+	for (;;) {
+		real g = imprecise(gamma(value), bits);
+#		printf("%a -> %a bit %a\n", value, g, bit);
+		if (g == max)
+			return value;
+		real old_value = value;
+		if (g < max) {
+			value += bit;
+			if (value == old_value)
+				return value;
+		} else {
+			value -= bit;
+			if (value == old_value)
+				return value - bit * 2;
+			bit = bit / 2;
+		}
+	}
+}
+
+#printf("32-bit max: %a\n", search_gamma(0x1.fffffep+127, 35, 24));
+#printf("64-bit max: %a\n", search_gamma(0x1.fffffffffffffp1023, 171, 53));
+#printf("80-bit max: %a\n", search_gamma(0x1.fffffffffffffffep16383, 1755, 64));
+#printf("128-bit max: %a\n", search_gamma(0x1.ffffffffffffffffffffffffffffp16383, 1755, 113));
+
+/*
+real[] exp_values = {
+	0x1p0,
+        0x1p0,
+        0x1p-1,
+        0x1.5555555555555p-3,
+        0x1.55555555555afp-5,
+        0x1.111111110e99bp-7,
+        0x1.6c16c16d4cbddp-10,
+        0x1.a01a0141463f9p-13,
+        0x1.a01a14a309391p-16,
+        0x1.71dbaf767c08bp-19,
+        0x1.281e81e568872p-22,
+        0x1.a7f460b31e1f4p-26,
+        0x1.5359ad886b7aep-29,
+};
+*/
+
+/*
+real[] exp_values = {
+         0x1p0 ,
+         0x1p0 ,
+         0x1p-1 ,
+         0x1.555555555556p-3 ,
+         0x1.5555555554cp-5 ,
+         0x1.11111111475p-7 ,
+         0x1.6c16c156654ap-10 ,
+         0x1.a01a06ed0c26p-13 ,
+         0x1.a0192e9996e8p-16 ,
+         0x1.71f322969c3ep-19 ,
+         0x1.26a13d5b7192p-22 ,
+         0x1.c36e82cb921cp-26 ,
+         0x1.cae9fbeb4c34p-30 ,
+};
+*/
+
+/*
+real[] exp_values = {
+         0x1p0 ,
+         0x1p0 ,
+         0x1p-1 ,
+         0x1.555555555556p-3 ,
+         0x1.555555555446p-5 ,
+         0x1.11111111c926p-7 ,
+         0x1.6c16c0dd3f94p-10 ,
+         0x1.a01a4902b99ep-13 ,
+         0x1.a0018fec36eap-16 ,
+         0x1.77cddd10ba4cp-19 ,
+         0x1.d989dbb9ca34p-26 ,
+         0x1.153c7dbce83ep-20 ,
+         -0x1.8a675b4bf28ap-19 ,
+         0x1.932dbd236e9ep-18 ,
+         -0x1.11bda05d45e6p-17 ,
+         0x1.bbe63278a52p-18 ,
+         -0x1.4539da2292fp-19 ,
+};
+*/
+
+real[] exp_values = {
+         0x1p0 ,
+         0x1p0 ,
+         0x1p-1 ,
+         0x1.555555555556p-3 ,
+         0x1.55555555555ap-5 ,
+         0x1.111111110c68p-7 ,
+         0x1.6c16c16bd522p-10 ,
+         0x1.a01a01d0e7e4p-13 ,
+         0x1.a01a04518f9p-16 ,
+         0x1.71dd3efad6ep-19 ,
+         0x1.27d715a807eap-22 ,
+         0x1.b3ba9b46ff8ap-26 ,
+         0x1.6a8f8cca1578p-29 ,
+         -0x1.aa058e3d2bb8p-30 ,
+         -0x1.9f28dfba41cp-29 ,
+         0x1.026d9e05a7fep-28 ,
+         0x1.ca3c33ceff34p-28 ,
+};
+
+printf("static const ff_t exp_coeffs = {\n");
+for (int i = 0; i < dim(exp_values); i++) {
+	ff_t	v = split_d(exp_values[i], 24);
+	printf("        { .hi = float_32(%a), .lo = float_32(%a) },\n",
+	       v.hi, v.lo);
+}
+
+real[2] ln2_values = { log(2), -log(2) };
+printf("static const ff_t ln2[2] = {\n");
+for (int i = 0; i < dim(ln2_values); i++) {
+	ff_t	v = split_d(ln2_values[i], 24);
+	printf("        { .hi = float_32(%a), .lo = float_32(%a) },\n",
+	       v.hi, v.lo);
+}
+
