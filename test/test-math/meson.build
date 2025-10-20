@@ -108,6 +108,9 @@ functions = [ 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atanh',
               'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tgamma', 'y0', 'y1',
             ]
 
+target_tests = tests + ['test-_ff_scalbnf']
+native_tests = tests
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
@@ -133,7 +136,7 @@ foreach params : targets
   _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
-  foreach t1 : tests
+  foreach t1 : target_tests
     t1_src = t1 + '.c'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
@@ -174,7 +177,7 @@ if enable_native_math_tests
 
   native_lib_m = cc.find_library('m', required: false)
 
-  foreach t1 : tests
+  foreach t1 : native_tests
     t1_src = t1 + '.c'
     t1_name = t1 + '-native'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']

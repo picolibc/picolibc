@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,16 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if 0
-#include "math_ld.h"
+autosimplify = off!;
+prec = 1024!;
 
-#if LDBL_MANT_DIG == 64
+//sinh = proc(x) { return (exp(x) - exp(-x)) / 2; };
 
-#include "ld80/e_tgammal.c"
+sinhdeg = 11;
+Psinh = fpminimax(sinh(_x_), sinhdeg, [|single...|], [-1;1]);
+display = decimal!;
+print("static const double sinh_32_coeffs[", sinhdeg+1, "] = {");
+display = hexadecimal!;
+for i from 0 to sinhdeg do print("   ", coeff(Psinh,i), ",");
+print("};");
 
-#elif LDBL_MANT_DIG == 113
-
-#include "ld128/e_tgammal.c"
-
-#endif
-#endif

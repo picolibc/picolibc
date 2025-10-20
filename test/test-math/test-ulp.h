@@ -54,7 +54,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "tanh",       .b32 =       2, .b64 =       1, .b80 =       1, .b128 =       1 },
 
     /* Exp/log functions */
-    { .name = "exp",        .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
+    { .name = "exp",        .b32 =       0, .b64 =       1, .b80 =       1, .b128 =       1 },
 #if defined(__arm__) && (__ARM_FP & 0x8) == 0
     { .name = "exp10",      .b32 =       1, .b64 =       1, .b80 =       1, .b128 =       1 },
 #else
@@ -87,7 +87,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
 #else
     { .name = "sqrt",       .b32 =       0, .b64 =       0, .b80 =       0, .b128 =       0 },
 #endif
-    { .name = "tgamma",     .b32 =     238, .b64 =      56, .b80 =       4, .b128 =     132 },
+    { .name = "tgamma",     .b32 =       2, .b64 =       2, .b80 =       2, .b128 =       2 },
 
     /* Complex trig functions */
 #if defined(__m68k__) && FLT_EVAL_METHOD != 0

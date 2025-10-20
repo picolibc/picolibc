@@ -513,6 +513,14 @@ extern float powf (float, float);
 extern float sqrtf (float);
 extern float fmodf (float, float);
 
+#if __ISO_C_VISIBLE >= 2023 || __GNU_VISIBLE
+extern float sinpif (float);
+extern double sinpi (double);
+#ifdef __HAVE_LONG_DOUBLE
+extern long double sinpil (long double);
+#endif
+#endif
+
 /* Other single precision functions.  */
 
 extern float exp2f (float);

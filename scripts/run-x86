@@ -50,7 +50,8 @@ case "$elf" in
 esac
 
 "$dir"/monitor-e9 $qemu \
-	-cpu core2duo \
+        -enable-kvm \
+	-cpu host \
 	-bios semihost/machine/x86/bios.bin \
 	-monitor none \
 	-serial none \

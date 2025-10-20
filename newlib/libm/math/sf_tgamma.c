@@ -20,6 +20,7 @@
  * Method: See lgammaf
  */
 
+#if 0
 #include "fdlibm.h"
 
 float
@@ -40,3 +41,4 @@ tgammaf(float x)
 }
 
 _MATH_ALIAS_f_f(tgamma)
+#endif

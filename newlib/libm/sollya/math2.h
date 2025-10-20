@@ -36,6 +36,7 @@
 #ifndef _MATH2_H_
 #define _MATH2_H_
 
+#include "fdlibm.h"
 #include <math.h>
 #include <inttypes.h>
 

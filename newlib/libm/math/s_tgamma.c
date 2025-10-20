@@ -18,6 +18,7 @@
  * Method: See lgamma_r
  */
 
+#if 0
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64
@@ -41,4 +42,5 @@ tgamma64(__float64 x)
 
 _MATH_ALIAS_d_d(tgamma)
 
+#endif
 #endif

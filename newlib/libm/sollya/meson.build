@@ -39,6 +39,7 @@ srcs_sollya = [
   'gamma_80.c',
   'gamma_128.c',
   'exp_32.c',
+  'scalbn_d32.c',
   ]
 
 src_libm_sollya = files(srcs_sollya)

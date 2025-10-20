@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['math', 'common', 'fenv', 'ld']
+libdirs = ['math', 'common', 'fenv', 'ld', 'sollya']
 
 if have_complex
   libdirs = libdirs + ['complex']
@@ -61,6 +61,10 @@ foreach libname : libnames
   src_mpart += get_variable('src_libm_' + libname, [])
 endforeach
 
+foreach s : src_mpart
+  message(' mpart file ' + s.full_path())
+endforeach
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
@@ -74,6 +78,10 @@ foreach params : targets
       libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
     endif
     libsrcs_target += get_variable('src_libm_' + libname + target, [])
+  endforeach
+
+  foreach s : libsrcs_target
+    message(' target file ' + s.full_path())
   endforeach
 
   set_variable('src_mpart_' + target, libsrcs_target)

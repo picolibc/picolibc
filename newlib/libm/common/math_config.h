@@ -1273,6 +1273,7 @@ extern int __signgam;
 #define _sin64 _NAME_64(_sin)
 #define sincos64 _NAME_64(sincos)
 #define sinh64 _NAME_64(sinh)
+#define sinpi64 _NAME_64(sinpi)
 #define sqrt64 _NAME_64(sqrt)
 #define tan64 _NAME_64(tan)
 #define tanh64 _NAME_64(tanh)

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,16 +33,28 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if 0
-#include "math_ld.h"
+prec = 256!;
+log1pdeg = 11;
+lo = 0x1p-27;
+hi = Pi/2;
+lofitivl = [lo;mi];
+hifitivl = [mi-mi;hi-mi];
 
-#if LDBL_MANT_DIG == 64
+log1p = proc(x) { return log(1+x); };
 
-#include "ld80/e_tgammal.c"
+Plog1p = fpminimax(log1p(_x_), log1pdeg, [|double...|], [-1;1]);
 
-#elif LDBL_MANT_DIG == 113
+display = decimal!;
+print("static const double log1p_coeffs_lo[", log1pdeg+1, "] = {");
+display = hexadecimal!;
+for i from 0 to log1pdeg do print("   ", coeff(Plog1p,i), ",");
+print("};");
 
-#include "ld128/e_tgammal.c"
+Plog1p = fpminimax(log1p(_x_), log1pdeg, [|single...|], [0;
 
-#endif
-#endif
+display = decimal!;
+print("static const double log1p_coeffs_hi[", log1pdeg+1, "] = {");
+display = hexadecimal!;
+for i from 0 to log1pdeg do print("   ", coeff(Plog1phi,i), ",");
+print("};");
+

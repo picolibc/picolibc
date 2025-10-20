@@ -66,6 +66,17 @@ real[] test_values = {
 	/* values which generate large errors for tgammaf */
         0x1.bd0d52p-48,
         -0x1.01743cp+5,
+	-0x1.ffff97f8159cfp2,
+	0x1.1fffcbfc0ace8p3,
+	/* max args returning a finite value */
+	0x1.18521ep5,
+	0x1.185220p5,
+	0x1.573fae561f647p7,
+	0x1.573fae561f648p7,
+	0x1.b6e3180cd66a5c42p10,
+	0x1.b6e3180cd66a5c43p10,
+	0x1.b6e3180cd66a5c4206f128ba77f4p10,
+	0x1.b6e3180cd66a5c4206f128ba77f5p10,
 };
 
 real

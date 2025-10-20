@@ -117,6 +117,7 @@ srcs_ld_common = [
   's_signbitl.c',
   's_sincosl.c',
   's_sinl.c',
+  's_sinpil.c',
   's_tanl.c',
 ]
 

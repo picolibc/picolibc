@@ -1,0 +1,26 @@
+/*
+autosimplify = off!;
+prec = 1024!;
+*/
+
+one = 1;
+sb1 = 3.03380607434824582924e+01;
+sb2 = 3.25792512996573918826e+02;
+sb3 = 1.53672958608443695994e+03;
+sb4 = 3.19985821950859553908e+03;
+sb5 = 2.55305040643316442583e+03;
+sb6 = 4.74528541206955367215e+02;
+sb7 = -2.24409524465858183362e+01;
+
+spoly = proc(s) { return one +
+		  s * (sb1 +
+		       s * (sb2 +
+		            s * (sb3 + s * (sb4 + s * (sb5 + s * (sb6 + s * sb7)))))); };
+
+sdeg = 8!;
+Pspoly = fpminimax(spoly(_x_), sdeg, [|single...|], [0x1.6db6dap+1;28]);
+display = decimal!;
+print("static const float s_coeffs[", sdeg+1, "] = {");
+display = hexadecimal!;
+for i from 0 to sdeg do print("   ", coeff(Pspoly,i), ",");
+print("};");

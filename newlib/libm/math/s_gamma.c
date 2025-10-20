@@ -138,6 +138,7 @@ in terms of the base return values, although the <[signgam]> global for
 #include "fdlibm.h"
 #include <errno.h>
 
+#if 0
 #ifndef _DOUBLE_IS_32BITS
 
 double
@@ -147,3 +148,4 @@ gamma(double x)
 }
 
 #endif /* defined(_DOUBLE_IS_32BITS) */
+#endif

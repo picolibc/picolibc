@@ -1,0 +1,16 @@
+#!/bin/bash
+
+LINEWIDTH=2
+
+gnuplot -persist << EOF
+set title "$1"
+set ylabel "erfc"
+set xlabel "x"
+set xtics border out nomirror
+set ytics border out nomirror
+set y2tics border out nomirror
+set style line 1 linewidth $LINEWIDTH
+set style line 2 linewidth $LINEWIDTH
+plot "$1" using 1:2 with lines axes x1y1 title "erfcf" ls 1,\
+"$1" using 1:3 with lines axes x1y1 title "erfc" ls 2
+EOF

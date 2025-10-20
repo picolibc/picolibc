@@ -14,6 +14,7 @@
  *
  */
 
+#if 0
 #include "fdlibm.h"
 #include <errno.h>
 
@@ -24,3 +25,4 @@ gammaf(float x)
 }
 
 _MATH_ALIAS_f_f(gamma)
+#endif

@@ -1,0 +1,12 @@
+prec = 2048;
+
+maxerr = 0x1p-70;
+log1pivl = [1/sqrt(2),sqrt(2)];
+log1pdeg = inf(guessdegree(log1p(_x_), log1pivl, maxerr));
+print("#define LOG1P_DEG", log1pdeg);
+Plog1p = fpminimax(log1p(_x_), log1pdeg, [|doubleextended...|],log1pivl);
+display = decimal!;
+print("static const long double log1p_80_coeffs[", LOG1P_DEG, " + 1] = {");
+display = hexadecimal!;
+for i from 0 to log1pdeg do print("   ", coeff(Plog1p,i), ",");
+print("};");

@@ -33,16 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if 0
+#define _GNU_SOURCE
 #include "math_ld.h"
 
 #if LDBL_MANT_DIG == 64
 
-#include "ld80/e_tgammal.c"
+#include "ld80/s_sinpil.c"
 
 #elif LDBL_MANT_DIG == 113
 
-#include "ld128/e_tgammal.c"
+#include "ld128/s_sinpil.c"
 
-#endif
 #endif

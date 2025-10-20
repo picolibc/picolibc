@@ -204,3 +204,5 @@ ff_div_ff(ff_t x, ff_t y)
     ff_t        m = dd_add_f(de, th);
     return two_mul_ff_ff(x, m);
 }
+
+float_t name(_ff_scalbn)(ff_t x, int expo);
