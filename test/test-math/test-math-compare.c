@@ -110,16 +110,28 @@ compare_ulp32(binary32 x, binary32 y)
 #define LIBNAME "native"
 #endif
 
+#if 0
+#define START   0xc0000000UL
+#define END     0xd0000000UL
+#define STEP    0x00000001UL
+#else
+#define START   0x00000000UL
+#define END     0xffffffffUL
+#define STEP    0x00000001UL
+#endif
+
 int main(void)
 {
-    uint32_t    u32 = 0x00000000UL;
+    uint32_t    u32 = START;
     uint32_t    max_ulp = 0;
     uint32_t    max_ulp_u32 = 0;
     ulp_t       check_ulps = math_find_ulp_binary32();
     int         ret = 0;
+#define ULP_BINS        4
+    uint32_t    ulps[ULP_BINS] = {};
+    uint32_t    bin;
 
-    printf("%s: ", FNAME);
-    fflush(stdout);
+    printf("Testing %s: \n", FNAME);
     for (;;) {
         binary32        fx = binary32_from_uint32(u32);
         binary64        dx = (binary64) fx;
@@ -128,29 +140,46 @@ int main(void)
         binary32        fdy = (binary32) dy;
 
         uint32_t        ulp = compare_ulp32(fy, fdy);
+
+        if (ulp) {
+            bin = ulp - 1;
+            if (bin >= ULP_BINS)
+                bin = ULP_BINS - 1;
+            ulps[bin]++;
+        }
         if (ulp > max_ulp) {
             max_ulp = ulp;
             max_ulp_u32 = u32;
-            if (ulp > (uint32_t) check_ulps && check_ulps < MAX_ULP) {
-                ret = 1;
-                printf("%s: ulp %" PRIu32 " 0x%08" PRIx32 " %a got 0x%08" PRIx32 " %a want 0x%08" PRIx32 " %a\n",
-                       FNAME, ulp,
-                       uint32_from_binary32(fx), (binary64) fx,
-                       uint32_from_binary32(fy), (binary64) fy,
-                       uint32_from_binary32(fdy), (binary64) fdy);
+        }
+        if (ulp > (uint32_t) check_ulps && check_ulps < MAX_ULP) {
+            ret = 1;
+            printf("%s: ulp %" PRIu32 " 0x%08" PRIx32 " %a got 0x%08" PRIx32 " %a want 0x%08" PRIx32 " %a\n",
+                   FNAME, ulp,
+                   uint32_from_binary32(fx), (binary64) fx,
+                   uint32_from_binary32(fy), (binary64) fy,
+                   uint32_from_binary32(fdy), (binary64) fdy);
+            if (ulp == 1) {
+                if (fy < fdy)
+                    printf("plus %" PRIx32 "\n", uint32_from_binary32(fx));
+                else
+                    printf("minus %" PRIx32 "\n", uint32_from_binary32(fx));
             }
         }
+        if ((u32 & 0xfffffff) == 0)
+            printf("    0x%08" PRIx32 "\n", u32);
 
-        if ((u32 & 0xfffffff) == 0) {
-            printf(".");
-            fflush(stdout);
-        }
-
-        if (u32 == 0xffffffffUL)
+        if (u32 == END)
             break;
-        u32++;
+        u32 += STEP;
     }
-    printf("\n");
+    for (bin = 0; bin < ULP_BINS; bin++) {
+        if (ulps[bin]) {
+            if (bin == ULP_BINS - 1)
+                printf(">%d ulp: %8" PRIu32 "\n", bin + 1, ulps[bin]);
+            else
+                printf(" %d ulp: %8" PRIu32 "\n", bin + 1, ulps[bin]);
+        }
+    }
     printf("%s %s: max_ulp %" PRIu32 " at 0x%08" PRIx32 " %a\n",
            LIBNAME, FNAME, max_ulp, max_ulp_u32, (binary64) binary32_from_uint32(max_ulp_u32));
     if (ret)
