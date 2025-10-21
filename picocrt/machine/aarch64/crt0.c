@@ -195,7 +195,6 @@ void _cstart(void)
  * Trap faults, print message and exit when running under semihost
  */
 
-#include <semihost.h>
 #include <unistd.h>
 #include <stdio.h>
 

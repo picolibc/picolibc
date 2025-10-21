@@ -34,6 +34,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+dir="$(dirname "$0")"
+
 qemu="qemu-system-aarch64"
 
 # select the program
@@ -77,12 +79,24 @@ done
 
 semi=enable=on,chardev=stdio0,arg="$cmdline"
 
-# Disable monitor
-
-mon=none
-
-# Point serial port at new chardev
-
-serial=none
-
-echo "$input" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -M virt -cpu cortex-a57 -nographic -kernel "$elf" "$@" -nic none
+if nm "$elf" | grep -q aarch64_putc; then
+    "$dir"/monitor-e9 $qemu \
+        -chardev stdio,id=con,mux=on \
+        -mon chardev=con,mode=readline \
+        -serial chardev:con \
+        -M virt \
+        -cpu max \
+        -nic none \
+        -nographic \
+        -kernel "$elf" "$@"
+else
+    echo "$input" | $qemu -chardev $chardev \
+                          -semihosting-config "$semi" \
+                          -monitor none \
+                          -serial none \
+                          -M virt \
+                          -cpu cortex-a57 \
+                          -nic none \
+                          -nographic \
+                          -kernel "$elf" "$@"
+fi

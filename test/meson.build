@@ -427,6 +427,41 @@ foreach params : targets
        timeout: 90,
       )
 
+  if is_variable('lib_semihost_raw' + target) and test_machine == 'qemu'
+
+    _libs_raw = [get_variable('lib_c' + target)]
+    _libs_raw += [get_variable('lib_semihost_raw' + target)]
+    
+    _lib_raw_files=[]
+    foreach _lib_raw : _libs_raw
+      _lib_raw_files += _lib_raw.full_path()
+    endforeach
+
+    _link_raw_args = target_c_args + _lib_raw_files + get_variable('test_link_args' + target, test_link_args)
+    _link_raw_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs_raw
+
+    if is_variable('crt0_hosted' + target)
+      _objs_raw = [get_variable('crt0_hosted' + target)]
+    else
+      _objs_raw = []
+    endif
+
+    t1 = 'test-hello-raw'
+    t1_src = 'test-hello.c'
+    test(t1 + target,
+         executable(t1 + target, t1_src,
+		    c_args: printf_compile_args_d + _c_args,
+		    link_args: printf_link_args_d + _link_raw_args,
+		    objects: _objs_raw,
+		    link_depends:  _link_raw_depends,
+		    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env,
+         timeout: 90,
+        )
+  endif
+
   if get_option('test-stdin')
     t1 = 'test-gets'
     t1_src = 'test-gets.c'
