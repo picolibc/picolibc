@@ -35,6 +35,7 @@
 
 tests_mem = [
   'test-memmem',
+  'test-memchr',
   ]
 
 tests_string = tests_mem
