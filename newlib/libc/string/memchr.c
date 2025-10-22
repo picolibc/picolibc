@@ -83,7 +83,7 @@ memchr (const void *src_void,
          character and then detecting for the presence of NUL in the
          result.  */
       asrc = (unsigned long *) src;
-      mask = d << 8 | d;
+      mask = (unsigned long) d << 8 | (unsigned long) d;
       mask = mask << 16 | mask;
       for (i = 32; i < sizeof(mask) * 8; i <<= 1)
         mask = (mask << i) | mask;
