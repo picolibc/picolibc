@@ -54,6 +54,9 @@ if fs.is_dir(machine_dir)
 else
   src_picocrt = files('shared/crt0.c')
 endif
+if not thread_local_storage
+  has_stacktls = false
+endif
 
 machine_found = false
 foreach machine : picocrt_machines
@@ -98,6 +101,15 @@ picocrt_variants = [
   },
 ]
 
+if has_stacktls
+  picocrt_variants += {
+                       'name': 'stacktls',
+                       'suffix': '-stacktls',
+                       'c_args': ['-DSTACK_TLS'],
+                       'src': src_picocrt,
+                     }
+endif
+
 if has_semihost
   picocrt_variants += {
                        'name': 'semihost',
@@ -106,6 +118,15 @@ if has_semihost
                        'src': src_picocrt,
                      }
   crt0_test = 'crt0_semihost'
+  if has_stacktls
+    picocrt_variants += {
+                         'name': 'stacktls-semihost',
+                         'suffix': '-stacktls-semihost',
+                         'c_args': ['-DSTACK_TLS', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+                         'src': src_picocrt,
+                       }
+  endif
+
 endif
 
 foreach params : targets

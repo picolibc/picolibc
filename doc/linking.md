@@ -221,3 +221,11 @@ Memory between the end of the cleared ram contents and the stack is
 available for malloc. If you need to ensure that there is at least a
 certain amount of heap space available, you can set the
 `__heap_size_min` value in the linker script.
+
+## Using picolibc_stacktls.ld
+
+This is an alternate to picolibc.ld which is used with --crt0=stacktls
+and places the TLS variables at the top of the stack rather than
+alongside the rest of the data and bss variables. No changes to the
+application are needed, but you should ensure that the stack is large
+enough to hold the additional data.
