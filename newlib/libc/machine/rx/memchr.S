@@ -12,6 +12,7 @@ _memchr:
 	;; R1: string pointer
 	;; R2: byte sought
 	;; R3: max number to scan
+	and	#255, r2
 	cmp	#0, r3		; If r3 is 0 suntil.b will do nothing and not set any flags...
 	stz     #1, r1		; ...so store 1 into r1.  It will be decremented by the SUB later.
 	suntil.b    		; Search until *r1 == r2 or r3 bytes have been examined.
