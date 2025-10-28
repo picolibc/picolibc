@@ -97,8 +97,8 @@ char *__libc_strcpy(char *dst, const char *src, bool ret_start)
           if (!(*dst++ = src[0])) return dst0;
           if (!(*dst++ = src[1])) return dst0;
           if (!(*dst++ = src[2])) return dst0;
-          if (!(*dst++ = src[3])) return dst0;
           #if __riscv_xlen == 64
+            if (!(*dst++ = src[3])) return dst0;
             if (!(*dst++ = src[4])) return dst0;
             if (!(*dst++ = src[5])) return dst0;
             if (!(*dst++ = src[6])) return dst0;
@@ -109,8 +109,8 @@ char *__libc_strcpy(char *dst, const char *src, bool ret_start)
           if (!(*dst++ = src[0])) return dst - 1;
           if (!(*dst++ = src[1])) return dst - 1;
           if (!(*dst++ = src[2])) return dst - 1;
-          if (!(*dst++ = src[3])) return dst - 1;
           #if __riscv_xlen == 64
+            if (!(*dst++ = src[3])) return dst - 1;
             if (!(*dst++ = src[4])) return dst - 1;
             if (!(*dst++ = src[5])) return dst - 1;
             if (!(*dst++ = src[6])) return dst - 1;
