@@ -62,10 +62,6 @@ typedef int fexcept_t;
 #define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
 			 FE_UPWARD | FE_TOWARDZERO)
 
-/* Default floating-point environment */
-extern fenv_t		_fe_dfl_env;
-#define	FE_DFL_ENV	((const fenv_t *) &_fe_dfl_env)
-
 /* We need to be able to map status flag positions to mask flag positions */
 #define	_FCSR_ENABLE_SHIFT	5
 #define	_FCSR_ENABLE_MASK	(FE_ALL_EXCEPT << _FCSR_ENABLE_SHIFT)

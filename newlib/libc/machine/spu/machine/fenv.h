@@ -142,9 +142,6 @@ _BEGIN_STD_C
 typedef unsigned int fexcept_t;
 typedef unsigned int fenv_t;
 
-extern fenv_t _fe_dfl_env;
-#define FE_DFL_ENV	((const fenv_t *) &_fe_dfl_env)
-
 _END_STD_C
 
 #endif /* fenv.h */
