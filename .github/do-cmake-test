@@ -4,9 +4,20 @@ DIR=build-"$TARGET"
 CONFIGURE=do-"$TARGET"-configure
 shift
 
-for p in /opt/*/bin /opt/*/models/*; do
-    PATH="$p":$PATH
-done
+# Put only the relevant toolchain in PATH for specific CI targets.
+# Fallback to previous behavior for other targets.
+case "$TARGET" in
+    *clang-thumb*)
+        for p in /opt/LLVM-ET-Arm*/bin /opt/*/models/*; do
+            [ -d "$p" ] && PATH="$p":$PATH
+        done
+        ;;
+    *)
+        for p in /opt/*/bin /opt/*/models/*; do
+            PATH="$p":$PATH
+        done
+        ;;
+esac
 
 mkdir $DIR
 trap 'rm -rf "$DIR"' 0

@@ -9,9 +9,26 @@ if [ -d /opt/picolibc-ci ]; then
 else
     TOP=/opt
 fi
-for p in "$TOP"/*/bin "$TOP"/*/models/*; do
-    PATH="$p":$PATH
-done
+
+# Put only the relevant toolchain in PATH for specific CI targets.
+# Fallback to previous behavior for other targets.
+case "$TARGET" in
+    *clang-hexagon*)
+        for p in "$TOP"/*hexagon*/bin "$TOP"/*/models/*; do
+            [ -d "$p" ] && PATH="$p":$PATH
+        done
+        ;;
+    *clang-arm*|*clang-aarch64*|*clang-thumb*)
+        for p in "$TOP"/LLVM-ET-Arm*/bin "$TOP"/*/models/*; do
+            [ -d "$p" ] && PATH="$p":$PATH
+        done
+        ;;
+    *)
+        for p in "$TOP"/*/bin "$TOP"/*/models/*; do
+            PATH="$p":$PATH
+        done
+        ;;
+esac
 
 ANALYZER="-Danalyzer=true"
 
