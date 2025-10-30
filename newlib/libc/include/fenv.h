@@ -55,8 +55,10 @@ int fegetexcept(void);
  *       fenv_t with the default fenv_t. The format of fenv_t and where
  *       FE_DFL_ENV is are implementation specific.
  */
+#ifndef FE_DFL_ENV    /* guard is needed as machine/fenv.h may provide its definition for this macro*/
 extern fenv_t _fe_dfl_env;
 #define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
+#endif
 
 #ifdef __STDC_WANT_IEC_60559_BFP_EXT__
 
