@@ -337,25 +337,25 @@ endif
 
 # Find the compiler support library
 
-lib_gcc = [meson.get_cross_property('libgcc', false)]
+runtime_lib = [meson.get_cross_property('librt', meson.get_cross_property('libgcc', false))]
 
-if lib_gcc == [false]
-  lib_gcc = []
-  foreach lg : ['-lgcc', '-lclang_rt.builtins']
-    if cc.has_multi_link_arguments(link_test_args + [lg])
-      lib_gcc = [lg]
+if runtime_lib == [false]
+  runtime_lib = []
+  foreach lrt : ['-lgcc', '-lclang_rt.builtins']
+    if cc.has_multi_link_arguments(link_test_args + [lrt])
+      runtime_lib = [lrt]
       break
     endif
   endforeach
 endif
 
-# Add libgcc for use in future linking tests
+# Add run-time library for use in future linking tests
 
-link_test_args += lib_gcc
+link_test_args += runtime_lib
 
 # Get additional flags used for linking tests.
 
-test_link_args_base = lib_gcc
+test_link_args_base = runtime_lib
 
 foreach ld : ['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments']
   if cc.has_multi_link_arguments(link_test_args + [ld])

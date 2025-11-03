@@ -237,6 +237,10 @@ use Picolibc:
 
  * Test exception handling on m68k
 
+ * Rename cross compile property 'libgcc' to 'librt' since we can now
+   specify either libgcc or compiler-rt as run-time library. However,
+   'libgcc' is still supported for backward compatibility.
+
 ### Picolibc release 1.8.10
 
  * Add missing POSIX constants to limits.h.
