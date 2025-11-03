@@ -44,4 +44,6 @@ src_semihost += files([
                        'hexagon_get_cmdline.c',
                        'hexagon_unlink.c', 
                        'hexagon_write.c',
+                       'hexagon_stubs.c',
+                       'hexagon_isatty.c',
                      ])
