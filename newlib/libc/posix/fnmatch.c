@@ -153,6 +153,26 @@ fnmatch(const char *pattern, const char *string, int flags)
 	/* NOTREACHED */
 }
 
+static const struct {
+        const char      *name;
+        int             (*func)(int);
+} classes[] = {
+        { .name = "alnum", .func = isalnum },
+        { .name = "alpha", .func = isalpha },
+        { .name = "blank", .func = isblank },
+        { .name = "cntrl", .func = iscntrl },
+        { .name = "digit", .func = isdigit },
+        { .name = "graph", .func = isgraph },
+        { .name = "lower", .func = islower },
+        { .name = "print", .func = isprint },
+        { .name = "punct", .func = ispunct },
+        { .name = "space", .func = isspace },
+        { .name = "upper", .func = isupper },
+        { .name = "xdigit", .func = isxdigit },
+};
+
+#define NUM_CLASSES (sizeof(classes)/sizeof(classes[0]))
+
 static int
 rangematch(
 	const char *pattern,
@@ -192,6 +212,72 @@ rangematch(
 
 		if (c == '/' && (flags & FNM_PATHNAME))
 			return (RANGE_NOMATCH);
+
+                /* Equivalence classes -- [=class=] */
+                if (c == '[' &&
+                    pattern[0] == '=' &&
+                    pattern[1] != EOS &&
+                    pattern[2] == '=' &&
+                    pattern[3] == ']')
+                {
+                        c = pattern[1];
+                        pattern += 4;
+                }
+
+                /* Collating sequences -- [.symbol.] */
+                if (c == '[' &&
+                    pattern[0] == '.' &&
+                    pattern[1] != EOS)
+                {
+                        size_t  col_len = 1;
+
+                        /* Find the end of any potential collating symbol */
+                        while (pattern[1+col_len] != EOS) {
+                                if (pattern[1+col_len] == '.' && pattern[1+col_len+1] == ']')
+                                {
+                                        /* Found a collating symbol. */
+                                        if (col_len > 1) {
+                                                /* We have no collating symbols longer than 1 char */
+                                                return (RANGE_ERROR);
+                                        }
+                                        /* Extract collating symbol */
+                                        c = pattern[1];
+                                        /* Skip [. and .] */
+                                        pattern += 2 + 2;
+                                        break;
+                                }
+                                col_len++;
+                        }
+                }
+
+                /* Character class -- [:class:] */
+                if (c == '[' && pattern[0] == ':') {
+                        size_t  name_len = 0;
+
+                        while (islower(pattern[1 + name_len]))
+                                name_len++;
+
+                        if (pattern[1 + name_len] == ':' && pattern[1 + name_len + 1] == ']') {
+
+                                size_t class;
+
+                                /* Found a valid class pattern, now see if it's one we know */
+
+                                for (class = 0; class < NUM_CLASSES; class++) {
+                                        if (name_len == strlen(classes[class].name) &&
+                                            strncmp(&pattern[1], classes[class].name, name_len) == 0)
+                                        {
+                                                if (classes[class].func(test))
+                                                        ok = 1;
+                                                break;
+                                        }
+                                }
+
+                                /* Skip over the pattern and continue evaluating the expression */
+                                pattern = pattern + 1 + name_len + 2;
+                                continue;
+                        }
+                }
 
 		if (flags & FNM_CASEFOLD)
 			c = tolower((unsigned char)c);
