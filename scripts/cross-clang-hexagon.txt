@@ -57,7 +57,7 @@ endian='little'
 # hardcode runtime library, otherwise meson build configuration will add '-lgcc'
 # use -Dc_link_args=-L$(clang -print-resource-dir)/lib/hexagon-unknown-none-elf flag while calling hexagon configure script
 # so that clang can find builtins library
-libgcc = '-lclang_rt.builtins'
+librt = '-lclang_rt.builtins'
 skip_sanity_check = true
 needs_exe_wrapper = true
 link_spec = '--build-id=none'

@@ -18,5 +18,5 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
-libgcc = ['-lmul_none', '-lgcc']
+librt = ['-lmul_none', '-lgcc']
 default_alignment = 2
