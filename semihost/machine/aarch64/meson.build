@@ -45,7 +45,6 @@ foreach params : targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
 
   instdir = join_paths(lib_dir, target_dir)
 
@@ -61,6 +60,7 @@ foreach params : targets
 			  c_args : target_c_args + c_args,
 			  pic: false)
   else
+    target_lib_prefix = params['lib_prefix']
     _lib = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_raw_name),
 			  lib_semihost_raw_srcs,
 			  install : really_install,
@@ -70,6 +70,6 @@ foreach params : targets
 			  pic: false)
   endif
 
-  set_variable('lib_semihost_raw' + target, local_lib_semihost_raw_target)
+  set_variable('lib_semihost_raw' + target, _lib)
 
 endforeach

@@ -47,7 +47,6 @@ foreach params : targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
 
   libobjs = []
   libsrcs_target = libsrcs
@@ -66,36 +65,75 @@ foreach params : targets
   libm_name = 'm'
   libnosys_name = 'nosys'
 
-  local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
-				      libsrcs_target,
-				      install : really_install,
-				      install_dir : instdir,
-				      pic: false,
-				      objects : libobjs,
-				      include_directories: inc,
-				      c_args: target_c_args + c_args)
+  if meson.version().version_compare('>=1.10')
+    local_lib_c_target = static_library(libc_name,
+				        libsrcs_target,
+                                        build_subdir : target_dir,
+				        install : really_install,
+				        install_dir : instdir,
+				        pic: false,
+				        objects : libobjs,
+				        include_directories: inc,
+				        c_args: target_c_args + c_args)
 
-  static_library(join_paths(target_dir, target_lib_prefix + libm_name),
-		 ['empty.c'],
-		 install : really_install,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: target_c_args + c_args,
-		 objects : [])
-  static_library(join_paths(target_dir, target_lib_prefix + libg_name),
-		 ['empty.c'],
-		 install : really_install,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: target_c_args + c_args,
-		 objects : [])
-  static_library(join_paths(target_dir, target_lib_prefix + libnosys_name),
-		 ['empty.c'],
-		 install : really_install,
-		 install_dir : instdir,
-		 pic: false,
-                 c_args: target_c_args + c_args,
-		 objects : [])
+    static_library(libm_name,
+		   ['empty.c'],
+                   build_subdir : target_dir,
+		   install : really_install,
+		   install_dir : instdir,
+		   pic: false,
+                   c_args: target_c_args + c_args,
+		   objects : [])
+    static_library(libg_name,
+		   ['empty.c'],
+                   build_subdir : target_dir,
+		   install : really_install,
+		   install_dir : instdir,
+		   pic: false,
+                   c_args: target_c_args + c_args,
+		   objects : [])
+    static_library(libnosys_name,
+		   ['empty.c'],
+                   build_subdir : target_dir,
+		   install : really_install,
+		   install_dir : instdir,
+		   pic: false,
+                   c_args: target_c_args + c_args,
+		   objects : [])
+  else
+    target_lib_prefix = params['lib_prefix']
+
+    local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
+				        libsrcs_target,
+				        install : really_install,
+				        install_dir : instdir,
+				        pic: false,
+				        objects : libobjs,
+				        include_directories: inc,
+				        c_args: target_c_args + c_args)
+
+    static_library(join_paths(target_dir, target_lib_prefix + libm_name),
+		   ['empty.c'],
+		   install : really_install,
+		   install_dir : instdir,
+		   pic: false,
+                   c_args: target_c_args + c_args,
+		   objects : [])
+    static_library(join_paths(target_dir, target_lib_prefix + libg_name),
+		   ['empty.c'],
+		   install : really_install,
+		   install_dir : instdir,
+		   pic: false,
+                   c_args: target_c_args + c_args,
+		   objects : [])
+    static_library(join_paths(target_dir, target_lib_prefix + libnosys_name),
+		   ['empty.c'],
+		   install : really_install,
+		   install_dir : instdir,
+		   pic: false,
+                   c_args: target_c_args + c_args,
+		   objects : [])
+  endif
 
   set_variable('lib_c' + target, local_lib_c_target)
 
