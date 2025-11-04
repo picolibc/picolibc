@@ -1008,7 +1008,6 @@ foreach params : [default_target] + targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
 
   custom_mem_config = ''
 
@@ -1612,7 +1611,6 @@ if has_semihost
     target = params['name']
     target_dir = params['dir']
     target_c_args = params['c_args']
-    target_lib_prefix = params['lib_prefix']
     if target == 'default-target'
       test_link_args_variable = 'test_link_args'
       test_linker_files_variable = 'test_linker_files'

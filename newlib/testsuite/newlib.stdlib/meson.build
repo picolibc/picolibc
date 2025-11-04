@@ -39,7 +39,6 @@ foreach params : targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
 
   _libs = [get_variable('lib_c' + target)]
   if is_variable('lib_semihost' + target)

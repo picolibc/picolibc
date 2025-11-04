@@ -196,7 +196,6 @@ if srcs_strcmp_use != []
     target = params['name']
     target_dir = params['dir']
     target_c_args = params['c_args']
-    target_lib_prefix = params['lib_prefix']
 
     set_variable('lib_string' + target,
 		 static_library('strcmp' + target,

@@ -257,7 +257,6 @@ if enable_malloc
     target = params['name']
     target_dir = params['dir']
     target_c_args = params['c_args']
-    target_lib_prefix = params['lib_prefix']
 
     # Have to build a sub-library to get custom c_args for malloc
     set_variable('lib_stdlib' + target,

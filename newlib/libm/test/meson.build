@@ -152,7 +152,6 @@ foreach params : targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
 
   if target.strip('_') in skip_math_test
     continue
