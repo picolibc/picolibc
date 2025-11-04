@@ -50,8 +50,8 @@
 
 static int rangematch(const char *, char, int, char **);
 
-int
-fnmatch(const char *pattern, const char *string, int flags)
+static int
+_fnmatch(const char *pattern, const char *string, int flags, int level)
 {
 	const char *stringstart;
 	char *newp;
@@ -99,13 +99,22 @@ fnmatch(const char *pattern, const char *string, int flags)
 				break;
 			}
 
+                        if (level == 0)
+                                return (-FNM_NOMATCH);
+
 			/* General case, use recursion. */
 			while ((test = *string) != EOS) {
-				if (!fnmatch(pattern, string, flags & ~FNM_PERIOD))
-					return (0);
-				if (test == '/' && flags & FNM_PATHNAME)
-					break;
-				++string;
+                                switch (_fnmatch(pattern, string, flags & ~FNM_PERIOD, level-1)) {
+                                case 0:
+                                        return (0);
+                                case -FNM_NOMATCH:
+                                        return -FNM_NOMATCH;
+                                default:
+                                        break;
+                                }
+                                if (test == '/' && flags & FNM_PATHNAME)
+                                        break;
+                                ++string;
 			}
 			return (FNM_NOMATCH);
 		case '[':
@@ -151,6 +160,13 @@ fnmatch(const char *pattern, const char *string, int flags)
 			break;
 		}
 	/* NOTREACHED */
+}
+
+/* Limit recursion to 16 levels to avoid stack overflow */
+int
+fnmatch(const char *pattern, const char *string, int flags)
+{
+        return _fnmatch(pattern, string, flags, 16);
 }
 
 static const struct {
