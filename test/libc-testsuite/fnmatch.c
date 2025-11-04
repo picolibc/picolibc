@@ -145,6 +145,21 @@ const struct {
     { "[[=a=]][[=c=]]", "ab", 0, FNM_NOMATCH },
     { "[[.foo.]]", "f", 0, -FNM_NOMATCH },
     { "[[.a.]]", "a", 0, 0 },
+    { "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
+      "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
+      "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
+      "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a",
+      "aaaaaaaaaaaaaaaa"
+      "aaaaaaaaaaaaaaaa"
+      "aaaaaaaaaaaaaaaa"
+      "aaaaaaaaaaaaaaaa",
+      0,
+#ifdef __PICOLIBC__
+      -FNM_NOMATCH
+#else
+      0
+#endif
+    },
 };
 
 #define zassert_equal(x, v) do {                                        \
