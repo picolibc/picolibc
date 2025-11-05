@@ -35,6 +35,7 @@
 
 #include <unistd.h>
 #include <errno.h>
+#include <stdint.h>
 
 extern char __heap_start[];
 extern char __heap_end[];
@@ -44,17 +45,17 @@ static char *__brk = __heap_start;
 void *sbrk(ptrdiff_t incr)
 {
 	if (incr < 0) {
-                if ((size_t) (__brk - __heap_start) < (size_t) (-incr)) {
+                if ((size_t) ((uintptr_t)__brk - (uintptr_t)__heap_start) < (size_t) (-incr)) {
                     errno = ENOMEM;
                     return (void *) -1;
             }
 	} else {
-                if ((size_t) (__heap_end - __brk) < (size_t) incr) {
+                if ((size_t) ((uintptr_t)__heap_end - (uintptr_t)__brk) < (size_t) incr) {
                         errno = ENOMEM;
 			return (void *) -1;
                 }
 	}
 	void *ret = __brk;
-	__brk += incr;
+	__brk = (char *) ((uintptr_t) __brk + incr);
 	return ret;
 }
