@@ -97,6 +97,7 @@ fsrcs_common = [
   'sf_copysign.c',
   'sf_modf.c',
   'sf_scalbn.c',
+  'sf_signbit.c',
   'sf_cbrt.c',
   'sf_exp10.c',
   'sf_expm1.c',

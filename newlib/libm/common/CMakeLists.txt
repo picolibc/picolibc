@@ -120,6 +120,7 @@ picolibc_sources(
   sf_remquo.c
   sf_round.c
   sf_scalbln.c
+  sf_signbit.c
   sf_trunc.c
   sf_exp2_data.c
   sf_log_data.c

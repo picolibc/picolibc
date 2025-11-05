@@ -37,16 +37,14 @@ C99, POSIX.
 
 #include "fdlibm.h"
 
-#ifdef _NEED_FLOAT64
 int
-__signbit64(__float64 x)
+__signbitf (float x)
 {
-  __uint32_t msw;
+  __uint32_t w;
 
-  GET_HIGH_WORD(msw, x);
+  GET_FLOAT_WORD(w,x);
 
-  return (msw & 0x80000000) != 0;
+  return (w & 0x80000000) != 0;
 }
 
-_MATH_ALIAS_i_d(__signbit)
-#endif
+_MATH_ALIAS_i_f(__signbit)
