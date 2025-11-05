@@ -36,7 +36,7 @@
 #pragma once
 
 #include <stdint.h>
-#include <semihost.h>
+#include "semihost.h"
 
 #define SYS_CLOCK		(0x10)
 #define SYS_CLOSE		(0x02)

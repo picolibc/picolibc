@@ -33,41 +33,16 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-lib_semihost_srcs = [
-  'm68k_close.c',
-  'm68k_exit.c',
-  'm68k_fstat.c',
-  'm68k_lseek.c',
-  'm68k_open.c',
-  'm68k_read.c',
-  'm68k_semihost.S',
-  'm68k_stat.c',
-  'm68k_stub.c',
-  'm68k_unlink.c',
-  'm68k_write.c',
-  ]
-
-has_semihost = true
-
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
-
-  instdir = join_paths(lib_dir, target_dir)
-
-  libsemihost_name = 'semihost'
-
-  local_lib_semihost_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
-				       lib_semihost_srcs,
-				       install : really_install,
-				       install_dir : instdir,
-				       include_directories : inc,
-				       c_args : target_c_args + c_args,
-				       pic: false)
-
-  set_variable('lib_semihost' + target, local_lib_semihost_target)
-
-endforeach
-
+src_semihost += files([
+                       'm68k_close.c',
+                       'm68k_exit.c',
+                       'm68k_fstat.c',
+                       'm68k_lseek.c',
+                       'm68k_open.c',
+                       'm68k_read.c',
+                       'm68k_semihost.S',
+                       'm68k_stat.c',
+                       'm68k_stub.c',
+                       'm68k_unlink.c',
+                       'm68k_write.c',
+                     ])

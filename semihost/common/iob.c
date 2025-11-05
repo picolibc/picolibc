@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <semihost.h>
+#include "semihost.h"
 
 static FILE __stdio = FDEV_SETUP_STREAM(sys_semihost_putc, sys_semihost_getc, NULL, _FDEV_SETUP_RW);
 

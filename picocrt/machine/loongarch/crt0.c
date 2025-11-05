@@ -43,7 +43,6 @@ _cstart(void)
 }
 
 #ifdef CRT0_SEMIHOST
-#include <semihost.h>
 #include <unistd.h>
 #include <stdio.h>
 

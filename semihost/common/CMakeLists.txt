@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2024 Keith Packard
+# Copyright © 2022 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,15 +33,46 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-src_semihost += files([
-                       'lm32_close.c',
-                       'lm32_errno.c',
-                       'lm32_exit.c',
-                       'lm32_lseek.c',
-                       'lm32_open.c',
-                       'lm32_read.c',
-                       'lm32_scall.c',
-                       'lm32_stub.c',
-                       'lm32_unlink.c',
-                       'lm32_write.c',
-                     ])
+target_sources(semihost PRIVATE
+  close.c
+  exit.c
+  fstat.c
+  gettimeofday.c
+  isatty.c
+  kill.c
+  lseek.c
+  lseek64.c
+  mapstdio.c
+  open.c
+  read.c
+  unlink.c
+  write.c
+  sys_clock.c
+  sys_close.c
+  sys_elapsed.c
+  sys_errno.c
+  sys_exit.c
+  sys_exit_extended.c
+  sys_feature.c
+  sys_flen.c
+  sys_get_cmdline.c
+  sys_getc.c
+  sys_heapinfo.c
+  sys_iserror.c
+  sys_istty.c
+  sys_open.c
+  sys_putc.c
+  sys_read.c
+  sys_remove.c
+  sys_rename.c
+  sys_seek.c
+  sys_system.c
+  sys_tickfreq.c
+  sys_time.c
+  sys_tmpnam.c
+  sys_write.c
+  sys_write0.c
+  iob.c
+  )
+
+picolibc_headers("" semihost.h)

@@ -96,17 +96,17 @@ picocrt_variants = [
     'c_args': [],
     'src': src_picocrt_none,
   },
+  {
+    'name': 'semihost',
+    'suffix': '-semihost',
+    'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  }
 ]
 
-if has_semihost
-  picocrt_variants += {
-                       'name': 'semihost',
-                       'suffix': '-semihost',
-                       'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-                       'src': src_picocrt,
-                     }
-  crt0_test = 'crt0_semihost'
-endif
+# Use the semihost version of crt0 for testing as that
+# will have exception handling
+crt0_test = 'crt0_semihost'
 
 foreach params : targets
   target = params['name']

@@ -35,20 +35,18 @@
 
 if cc.get_define('_CALL_ELF') == '1'
 
-  lib_semihost_srcs = [
-    'opal_call.S',
-    'opal_console_write.c',
-    'opal_cec_power_down.c',
-    'powerpc_exit.c',
-    'powerpc_kill.c',
-    'powerpc_stub.c',
-  ]
+  src_semihost_ppc = files([
+                            'opal_call.S',
+                            'opal_console_write.c',
+                            'opal_cec_power_down.c',
+                            'powerpc_exit.c',
+                            'powerpc_kill.c',
+                            'powerpc_stub.c',
+                          ])
 
   if tinystdio
-    lib_semihost_srcs += 'powerpc_io.c'
+    src_semihost_ppc += files('powerpc_io.c')
   endif
-
-  has_semihost = true
 
   foreach params : targets
     target = params['name']
@@ -56,32 +54,21 @@ if cc.get_define('_CALL_ELF') == '1'
     target_c_args = params['c_args']
     target_lib_prefix = params['lib_prefix']
 
-    instdir = join_paths(lib_dir, target_dir)
-
-    test_flags = []
-    skipping = false
-    foreach tf : target_c_args
-      if skipping
-	skipping = false
-      elif tf == '-include'
-	skipping = true
+    # PowerPC only has semihost support on PPC64 targets
+    _test_flags = []
+    _skipping = false
+    foreach _tf : target_c_args
+      if _skipping
+	_skipping = false
+      elif _tf == '-include'
+	_skipping = true
       else
-	test_flags += tf
+	_test_flags += _tf
       endif
     endforeach
 
-    if cc.get_define('__PPC64__', args : test_flags) != ''
-      libsemihost_name = 'semihost'
-
-      local_lib_semihost_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
-						 lib_semihost_srcs,
-						 install : really_install,
-						 install_dir : instdir,
-						 include_directories : inc,
-						 c_args : target_c_args + c_args,
-						 pic: false)
-
-      set_variable('lib_semihost' + target, local_lib_semihost_target)
+    if cc.get_define('__PPC64__', args : _test_flags) != ''
+      set_variable('src_semihost_' + target, src_semihost_ppc)
     endif
 
   endforeach

@@ -33,14 +33,13 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_semihost += files('semihost-aarch64.S')
+has_arm_semihost = true
 
 lib_semihost_raw_srcs = [
   'aarch64_stub.c',
   'aarch64_exit.c',
   'aarch64_iob.c',
   ]
-
-has_semihost = true
 
 foreach params : targets
   target = params['name']
@@ -52,15 +51,25 @@ foreach params : targets
 
   libsemihost_raw_name = 'semihost_raw'
 
-  local_lib_semihost_raw_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_raw_name),
-				       lib_semihost_raw_srcs,
-				       install : really_install,
-				       install_dir : instdir,
-				       include_directories : inc,
-				       c_args : target_c_args + c_args,
-				       pic: false)
+  if meson.version().version_compare('>=1.10')
+    _lib = static_library(libsemihost_raw_name,
+			  lib_semihost_raw_srcs,
+                          build_subdir : target_dir,
+			  install : really_install,
+			  install_dir : instdir,
+			  include_directories : inc,
+			  c_args : target_c_args + c_args,
+			  pic: false)
+  else
+    _lib = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_raw_name),
+			  lib_semihost_raw_srcs,
+			  install : really_install,
+			  install_dir : instdir,
+			  include_directories : inc,
+			  c_args : target_c_args + c_args,
+			  pic: false)
+  endif
 
   set_variable('lib_semihost_raw' + target, local_lib_semihost_raw_target)
 
 endforeach
-

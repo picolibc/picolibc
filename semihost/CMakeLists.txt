@@ -33,8 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-picolibc_headers("" semihost.h)
-
 add_library(semihost STATIC)
 
 target_compile_options(semihost PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
@@ -44,46 +42,6 @@ target_include_directories(semihost SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES
 add_subdirectory(machine/${CMAKE_SYSTEM_PROCESSOR})
 
 if(DEFINED _SEMIHOST_ARM)
-  target_sources(semihost PRIVATE
-    close.c
-    exit.c
-    fstat.c
-    gettimeofday.c
-    isatty.c
-    kill.c
-    lseek.c
-    lseek64.c
-    mapstdio.c
-    open.c
-    read.c
-    unlink.c
-    write.c
-    sys_clock.c
-    sys_close.c
-    sys_elapsed.c
-    sys_errno.c
-    sys_exit.c
-    sys_exit_extended.c
-    sys_feature.c
-    sys_flen.c
-    sys_get_cmdline.c
-    sys_getc.c
-    sys_heapinfo.c
-    sys_iserror.c
-    sys_istty.c
-    sys_open.c
-    sys_putc.c
-    sys_read.c
-    sys_remove.c
-    sys_rename.c
-    sys_seek.c
-    sys_system.c
-    sys_tickfreq.c
-    sys_time.c
-    sys_tmpnam.c
-    sys_write.c
-    sys_write0.c
-    iob.c
-    )
+  add_subdirectory(common)
 endif()
 

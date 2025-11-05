@@ -33,3 +33,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_semihost += files('semihost-riscv.S')
+has_arm_semihost = true
