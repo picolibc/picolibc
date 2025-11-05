@@ -461,6 +461,12 @@ test_io(void)
                         printf("test_io is %s should be nan\n", buf);
 #ifdef __RX__
                         printf("ignoring error on RX\n");
+#elif __HEXAGON_ARCH__
+                        if (strcmp(buf, "-nan") != 0)
+                            result++;
+                        // Hexagon instructions always generate negative nan i.e 0xFFFFFFFF
+                        else
+                            printf("ignore negative nan on Hexagon\n");
 #else
                         result++;
 #endif
