@@ -66,13 +66,13 @@ __malloc_sbrk_aligned(size_t s)
     if (p == (void *)-1)
         return p;
 
-    __malloc_sbrk_top = p + s;
+    __malloc_sbrk_top = (char *) ((uintptr_t) p + s);
 
     /* Adjust returned space so that the storage area
      * is MALLOC_CHUNK_ALIGN aligned and the head is
      * MALLOC_HEAD_ALIGN aligned.
      */
-    align_p = __align_up(p + MALLOC_HEAD, MALLOC_CHUNK_ALIGN) - MALLOC_HEAD;
+    align_p = (char *) (__align_up((uintptr_t) p + MALLOC_HEAD, MALLOC_CHUNK_ALIGN) - MALLOC_HEAD);
 
     if (align_p != p)
     {
@@ -84,7 +84,7 @@ __malloc_sbrk_aligned(size_t s)
 	 */
 	intptr_t adjust = align_p - p;
         char *extra = sbrk(adjust);
-        if (extra != p + s)
+        if (extra != (char *) ((uintptr_t) p + s))
             return (void *) -1;
 	__malloc_sbrk_top = extra + adjust;
     }
