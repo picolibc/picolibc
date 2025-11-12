@@ -4,7 +4,7 @@
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
 c = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib']
-cpp = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib']
+cpp = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib', '-stdlib=libstdc++']
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
 cpp_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
