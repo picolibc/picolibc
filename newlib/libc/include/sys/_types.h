@@ -270,6 +270,10 @@ typedef	unsigned long	__useconds_t;	/* microseconds (unsigned) */
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1
+#ifndef __STDC_LIB_EXT1__
+#define __STDC_LIB_EXT1__ 1
+#endif
+
 typedef size_t __rsize_t;
 typedef int __errno_t;
 #endif

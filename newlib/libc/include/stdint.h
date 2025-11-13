@@ -462,6 +462,10 @@ typedef __uint_least64_t uint_least64_t;
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1
+#ifndef __STDC_LIB_EXT1__
+#define __STDC_LIB_EXT1__ 1
+#endif
+
   // could be defined by the user
 #ifndef RSIZE_MAX
 #define RSIZE_MAX SIZE_MAX

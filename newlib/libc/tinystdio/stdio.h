@@ -451,6 +451,10 @@ int	putchar_unlocked (int);
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1
+#ifndef __STDC_LIB_EXT1__
+#define __STDC_LIB_EXT1__ 1
+#endif
+
 #include <sys/_types.h>
 #include <stdarg.h>
 
