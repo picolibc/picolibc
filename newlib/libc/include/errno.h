@@ -37,6 +37,10 @@ SUCH DAMAGE.
 #include <sys/cdefs.h>
 
 #if __STDC_WANT_LIB_EXT1__ == 1
+#ifndef __STDC_LIB_EXT1__
+#define __STDC_LIB_EXT1__ 1
+#endif
+
 #include <sys/_types.h>
 
 #ifndef _ERRNO_T_DEFINED
