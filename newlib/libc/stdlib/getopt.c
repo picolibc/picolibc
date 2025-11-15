@@ -249,12 +249,12 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	case PERMUTE:
 	  data->permute_from = data->optind;
 	  data->num_nonopts = 0;
-	  while (!is_option (argv[data->optind], only))
+	  while (data->optind < argc && !is_option (argv[data->optind], only))
 	    {
 	      data->optind++;
 	      data->num_nonopts++;
 	    }
-	  if (argv[data->optind] == 0)
+	  if (data->optind >= argc || argv[data->optind] == 0)
 	    {
 	      /* no more options */
 	      data->optind = data->permute_from;
@@ -282,7 +282,7 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	}
     }
   /* End of option list? */
-  if (argv[data->optind] == 0)
+  if (data->optind >= argc || argv[data->optind] == 0)
     return EOF;
 
   /* we've got an option, so parse it */
