@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['arc64-zephyr-elf-gcc', '-nostdlib']
-cpp = ['arc64-zephyr-elf-g++', '-nostdlib']
+c = 'arc64-zephyr-elf-gcc'
+cpp = 'arc64-zephyr-elf-g++'
 ar = 'arc64-zephyr-elf-ar'
 as = 'arc64-zephyr-elf-as'
 nm = 'arc64-zephyr-elf-nm'
@@ -16,6 +16,10 @@ system = 'zephyr'
 cpu_family = 'arc64'
 cpu = 'arc64'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 skip_sanity_check = true

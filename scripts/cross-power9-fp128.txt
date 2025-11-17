@@ -1,6 +1,6 @@
 [binaries]
-c = ['powerpc64-linux-gnu-gcc', '-fno-pic', '-fno-pie', '-static', '-mabi=ieeelongdouble', '-mlong-double-128', '-mfloat128-hardware', '-mvsx', '-mfloat128', '-mcpu=power9', '-Wno-psabi', '-Wl,--build-id=none']
-cpp = ['powerpc64-linux-gnu-g++', '-fno-pic', '-fno-pie', '-static', '-mabi=ieeelongdouble', '-mlong-double-128', '-mfloat128-hardware', '-mvsx', '-mfloat128', '-mcpu=power9', '-Wno-psabi', '-Wl,--build-id=none']
+c = 'powerpc64-linux-gnu-gcc'
+cpp = 'powerpc64-linux-gnu-g++'
 ar = 'powerpc64-linux-gnu-ar'
 nm = 'powerpc64-linux-gnu-nm'
 strip = 'powerpc64-linux-gnu-strip'
@@ -12,6 +12,10 @@ system = 'linux'
 cpu_family = 'powerpc'
 cpu = 'power9'
 endian = 'big'
+
+[built-in options]
+c_args = ['-fno-pic', '-fno-pie', '-static', '-mabi=ieeelongdouble', '-mlong-double-128', '-mfloat128-hardware', '-mvsx', '-mfloat128', '-mcpu=power9', '-Wno-psabi', '-Wl,--build-id=none']
+cpp_args = ['-fno-pic', '-fno-pie', '-static', '-mabi=ieeelongdouble', '-mlong-double-128', '-mfloat128-hardware', '-mvsx', '-mfloat128', '-mcpu=power9', '-Wno-psabi', '-Wl,--build-id=none']
 
 [properties]
 skip_sanity_check = true

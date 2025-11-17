@@ -36,7 +36,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '--target=hexagon-unknown-none-elf', '-mv68', '-fno-pic', '-fno-PIE', '-static', '-nostdlib', '-fuse-init-array', '-G0']
+c = 'clang'
 cpp = ''
 c_ld = 'eld'
 ar = 'ar'
@@ -52,6 +52,9 @@ system='linux'
 cpu_family='hexagon'
 cpu='hexagon'
 endian='little'
+
+[built-in options]
+c_args = ['--target=hexagon-unknown-none-elf', '-mv68', '-nostdlib', '-fuse-init-array', '-G0']
 
 [properties]
 # hardcode runtime library, otherwise meson build configuration will add '-lgcc'

@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib']
-cpp = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib', '-stdlib=libstdc++']
+c = 'clang'
+cpp = 'clang++'
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
 cpp_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
@@ -19,6 +19,10 @@ system = 'none'
 cpu_family = 'riscv64'
 cpu = 'riscv'
 endian = 'little'
+
+[built-in options]
+c_args = ['-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib']
+cpp_args = ['-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib', '-stdlib=libstdc++']
 
 [properties]
 c_args = ['-Werror=double-promotion', '-fshort-enums']

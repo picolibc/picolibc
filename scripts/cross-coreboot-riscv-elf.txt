@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['ccache', 'riscv64-elf-gcc', '-nostdlib']
-cpp = ['ccache', 'riscv64-elf-g++', '-nostdlib']
+c = ['ccache', 'riscv64-elf-gcc']
+cpp = ['ccache', 'riscv64-elf-g++']
 ar = 'riscv64-elf-ar'
 as = 'riscv64-elf-as'
 strip = 'riscv64-elf-strip'
@@ -17,6 +17,11 @@ system = 'unknown'
 cpu_family = 'riscv64'
 cpu = 'riscv'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 # this uses shorter but slower function entry code

@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['sparc64-linux-gnu-gcc', '-nostdlib']
-cpp = ['sparc64-linux-gnu-g++', '-nostdlib']
+c = 'sparc64-linux-gnu-gcc'
+cpp = 'sparc64-linux-gnu-g++'
 ar = 'sparc64-linux-gnu-ar'
 as = 'sparc64-linux-gnu-as'
 ld = 'sparc64-linux-gnu-ld'
@@ -16,6 +16,10 @@ system = 'linux'
 cpu_family = 'sparc64'
 cpu = 'sparc64'
 endian = 'big'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 skip_sanity_check = true

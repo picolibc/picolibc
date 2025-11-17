@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '-m32', '-target', 'thumbv7e-none-eabi', '-mcpu=cortex-m7', '-mfloat-abi=hard', '-nostdlib']
-cpp = ['clang', '-m32', '-target', 'thumbv7e-none-eabi', '-mcpu=cortex-m7', '-mfloat-abi=hard', '-nostdlib']
+c = 'clang'
+cpp = 'clang++'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eab-as'
 nm = 'arm-none-eab-nm'
@@ -17,6 +17,10 @@ system = 'none'
 cpu_family = 'arm'
 cpu = 'arm'
 endian = 'little'
+
+[built-in options]
+c_args = ['-m32', '-target', 'thumbv7e-none-eabi', '-mcpu=cortex-m7', '-mfloat-abi=hard', '-nostdlib']
+cpp_args = ['-m32', '-target', 'thumbv7e-none-eabi', '-mcpu=cortex-m7', '-mfloat-abi=hard', '-nostdlib']
 
 [properties]
 c_args = ['-Werror=double-promotion', '-Wno-unsupported-floating-point-opt', '-fshort-enums']

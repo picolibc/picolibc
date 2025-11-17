@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['arm-none-eabi-gcc', '-mcpu=cortex-a9', '-nostdlib']
-cpp = ['arm-none-eabi-g++', '-mcpu=cortex-a9', '-nostdlib']
+c = 'arm-none-eabi-gcc'
+cpp = 'arm-none-eabi-g++'
 ar = 'arm-none-eabi-ar'
 as = 'arm-none-eabi-as'
 nm = 'arm-none-eabi-nm'
@@ -17,6 +17,10 @@ system = 'none'
 cpu_family = 'arm'
 cpu = 'cortex-a9'
 endian = 'little'
+
+[built-in options]
+c_args = ['-mcpu=cortex-a9', '-nostdlib']
+cpp_args = ['-mcpu=cortex-a9', '-nostdlib']
 
 [properties]
 skip_sanity_check = true

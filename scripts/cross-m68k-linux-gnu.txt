@@ -1,6 +1,6 @@
 [binaries]
-c = ['m68k-linux-gnu-gcc', '-march=68020', '-static', '-nostdlib', '-Wl,--build-id=none']
-cpp = ['m68k-linux-gnu-g++', '-march=68020', '-static', '-nostdlib', '-Wl,--build-id=none']
+c = 'm68k-linux-gnu-gcc'
+cpp = 'm68k-linux-gnu-g++'
 ar = 'm68k-linux-gnu-ar'
 as = 'm68k-linux-gnu-as'
 ld = 'm68k-linux-gnu-ld'
@@ -14,6 +14,10 @@ system = 'unknown'
 cpu_family = 'm68k'
 cpu = '68020'
 endian = 'big'
+
+[built-in options]
+c_args = ['-march=68020', '-static', '-nostdlib', '-Wl,--build-id=none']
+cpp_args = ['-march=68020', '-static', '-nostdlib', '-Wl,--build-id=none']
 
 [properties]
 link_spec = '--build-id=none'

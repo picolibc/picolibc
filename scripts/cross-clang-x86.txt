@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '-target', 'i686-none-elf', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
-cpp = ['clang', '-target', 'i686-none-elf', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+c = 'clang'
+cpp = 'clang++'
 c_ld = 'lld'
 cpp_ld = 'lld'
 ar = 'ar'
@@ -20,6 +20,10 @@ system='linux'
 cpu_family='x86'
 cpu='x86'
 endian='little'
+
+[built-in options]
+c_args = ['-target', 'i686-none-elf', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+cpp_args = ['-target', 'i686-none-elf', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
 
 [properties]
 skip_sanity_check = true

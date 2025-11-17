@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['mips-linux-gnu-gcc', '-nostdlib', '-Wl,--build-id=none']
-cpp = ['mips-linux-gnu-g++', '-nostdlib', '-Wl,--build-id=none']
+c = 'mips-linux-gnu-gcc'
+cpp = 'mips-linux-gnu-g++'
 ar = 'mips-linux-gnu-ar'
 as = 'mips-linux-gnu-as'
 ld = 'mips-linux-gnu-ld'
@@ -16,6 +16,10 @@ system = 'linux'
 cpu_family = 'mips'
 cpu = 'mips'
 endian = 'big'
+
+[built-in options]
+c_args = ['-nostdlib', '-Wl,--build-id=none']
+cpp_args = ['-nostdlib', '-Wl,--build-id=none']
 
 [properties]
 skip_sanity_check = true

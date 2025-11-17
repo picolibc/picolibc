@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['arm-zephyr-eabi-gcc', '-nostdlib']
-cpp = ['arm-zephyr-eabi-g++', '-nostdlib']
+c = 'arm-zephyr-eabi-gcc'
+cpp = 'arm-zephyr-eabi-g++'
 ar = 'arm-zephyr-eabi-ar'
 as = 'arm-zephyr-eabi-as'
 nm = 'arm-zephyr-eabi-nm'
@@ -17,6 +17,10 @@ system = 'zephyr'
 cpu_family = 'arm'
 cpu = 'arm'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 skip_sanity_check = true

@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['or1k-unknown-elf-gcc', '-nostdlib']
-cpp = ['or1k-unknown-elf-g++', '-nostdlib']
+c = 'or1k-unknown-elf-gcc'
+cpp = 'or1k-unknown-elf-g++'
 ar = 'or1k-unknown-elf-ar'
 as = 'or1k-unknown-elf-as'
 nm = 'or1k-unknown-elf-nm'
@@ -16,6 +16,10 @@ system = 'none'
 cpu_family = 'or1k'
 cpu = 'or1k'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 skip_sanity_check = true

@@ -3,7 +3,7 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '-target', 'msp430', '-nostdlib']
+c = 'clang'
 ar = 'msp430-unknown-elf-ar'
 as = 'msp430-unknown-elf-as'
 nm = 'msp430-unknown-elf-nm'
@@ -14,6 +14,9 @@ system = 'zephyr'
 cpu_family = 'msp430'
 cpu = 'msp430'
 endian = 'little'
+
+[built-in options]
+c_args = ['-target', 'msp430', '-nostdlib']
 
 [properties]
 skip_sanity_check = true
