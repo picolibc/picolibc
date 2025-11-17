@@ -14,6 +14,32 @@
 
 #include <stddef.h>
 
+/*
+ *  We can't tell if we're using compiler-rt or libgcc; instead
+ *  we assume a connection between the compiler in use and
+ *  the runtime library.
+ */
+#if defined(__clang__)
+
+/* compiler-rt has no exceptions in soft-float implementation */
+
+#if !defined(__riscv_q) && !defined(__riscv_zqinx)
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
+#endif
+
+#if !defined(__riscv_d) && !defined(__riscv_zdinx)
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
+#endif
+
+#if !defined(__riscv_f) && !defined(__riscv_zfinx)
+#define __FLOAT_NOROUND
+#define __FLOAT_NOEXCEPT
+#endif
+
+#endif
+
 #if defined(__riscv_flen) || defined(__riscv_zfinx)
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
