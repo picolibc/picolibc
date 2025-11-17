@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['clang', '--target=arm-none-eabi', '-nostdlib']
-cpp = ['clang', '--target=arm-none-eabi', '-nostdlib']
+c = 'clang'
+cpp = 'clang++'
 ar = 'llvm-ar'
 nm = 'llvm-nm'
 strip = 'llvm-strip'
@@ -16,6 +16,10 @@ system = 'none'
 cpu_family = 'arm'
 cpu = 'arm'
 endian = 'little'
+
+[built-in options]
+c_args = ['--target=arm-none-eabi', '-nostdlib']
+cpp_args = ['--target=arm-none-eabi', '-nostdlib']
 
 [properties]
 skip_sanity_check = true

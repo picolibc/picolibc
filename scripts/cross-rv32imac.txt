@@ -1,6 +1,6 @@
 [binaries]
-c = ['riscv64-unknown-elf-gcc', '-nostdlib']
-cpp = ['riscv64-unknown-elf-g++', '-nostdlib']
+c = 'riscv64-unknown-elf-gcc'
+cpp = 'riscv64-unknown-elf-g++'
 ar = 'riscv64-unknown-elf-ar'
 as = 'riscv64-unknown-elf-as'
 nm = 'riscv64-unknown-elf-nm'
@@ -13,6 +13,10 @@ system = 'unknown'
 cpu_family = 'riscv32'
 cpu = 'riscv32'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 c_args = ['-msave-restore', '-fshort-enums', '-march=rv32imac', '-mabi=ilp32']

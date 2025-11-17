@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['loongarch64-unknown-elf-gcc', '-nostdlib']
-cpp = ['loongarch64-unknown-elf-g++', '-nostdlib']
+c = 'loongarch64-unknown-elf-gcc'
+cpp = 'loongarch64-unknown-elf-g++'
 ar = 'loongarch64-unknown-elf-ar'
 as = 'loongarch64-unknown-elf-as'
 strip = 'loongarch64-unknown-elf-strip'
@@ -17,6 +17,10 @@ system = 'unknown'
 cpu_family = 'loongarch64'
 cpu = 'loongarch'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 # Use secondary flash as first is occupied by boot_code

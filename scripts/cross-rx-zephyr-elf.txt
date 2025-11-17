@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['rx-zephyr-elf-gcc', '-nostdlib', '-ffinite-math-only']
-cpp = ['rx-zephyr-elf-g++', '-nostdlib', '-ffinite-math-only']
+c = 'rx-zephyr-elf-gcc'
+cpp = 'rx-zephyr-elf-g++'
 ar = 'rx-zephyr-elf-ar'
 as = 'rx-zephyr-elf-as'
 nm = 'rx-zephyr-elf-nm'
@@ -16,6 +16,10 @@ system = 'none'
 cpu_family = 'rx'
 cpu = 'rx100'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib', '-ffinite-math-only']
+cpp_args = ['-nostdlib', '-ffinite-math-only']
 
 [properties]
 skip_sanity_check = true
