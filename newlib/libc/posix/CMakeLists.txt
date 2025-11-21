@@ -43,4 +43,7 @@ picolibc_sources(
   regerror.c
   regexec.c
   regfree.c
+  strfmon.c
+  strfmon_l.c
+  vstrfmon.c
   )
