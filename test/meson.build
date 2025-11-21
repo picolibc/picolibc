@@ -778,6 +778,7 @@ endif
 subdir('libc-testsuite')
 subdir('test-math')
 subdir('test-string')
+subdir('test-monetary')
 
 if has_arm_semihost
   subdir('semihost')
