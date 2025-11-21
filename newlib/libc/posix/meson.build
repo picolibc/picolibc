@@ -43,6 +43,9 @@ srcs_posix = [
   'regerror.c',
   'regexec.c',
   'regfree.c',
+  'strfmon.c',
+  'strfmon_l.c',
+  'vstrfmon.c',
 ]
 
 srcs_posix_use = []
