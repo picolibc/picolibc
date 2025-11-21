@@ -113,6 +113,7 @@ math_find_ulps(void)
         if (strcmp(name, math_ulps[i].name) == 0)
             return &math_ulps[i];
     assert(0);
+    return &math_ulps[0];
 }
 
 static inline ulp_t

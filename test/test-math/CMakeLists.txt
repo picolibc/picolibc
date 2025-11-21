@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2025 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,82 +33,82 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+set(tests_real_trig
+  test-acos
+  test-acosh
+  test-asin
+  test-asinh
+  test-atan
+  test-atan2
+  test-atanh
+  test-cos
+  test-cosh
+  test-sin
+  test-sinh
+  test-tan
+  test-tanh
+)
+
+set(tests_real_exp
+  test-exp
+  test-exp10
+  test-exp2
+  test-expm1
+  test-log
+  test-log10
+  test-log1p
+  test-log2
+  test-pow
+)
+
+set(tests_real_other
+  test-cbrt
+  test-erf
+  test-erfc
+  test-hypot
+  test-j0
+  test-j1
+  test-jn
+  test-lgamma
+  test-sqrt
+  test-tgamma
+  )
+
+set(tests_complex_trig
+  test-cacos
+  test-cacosh
+  test-casin
+  test-casinh
+  test-catan
+  test-catanh
+  test-ccos
+  test-ccosh
+  test-csin
+  test-csinh
+  test-ctan
+  test-ctanh
+)
+
+set(tests_complex_exp
+  test-cexp
+  test-clog
+  test-cpow
+)
+
+set(tests_complex_other
+  test-csqrt
+)
+
 set(tests
-  printf_scanf
-  printf-tests
-  rand
-  regex
-  ungetc
-  fenv
-  long_double
-  math_errhandling
-  malloc
-  tls
-  ffs
-  setjmp
-  atexit
-  on_exit
-  math-funcs
-  timegm
-  time-tests
-  test-funopen
-  test-getdate
-  test-strtod
-  test-strchr
-  test-memset
-  test-put
-  test-efcvt
-  test-fma
-  test-sprintf-percent-n
-  malloc_stress
-  test-memchr
-  test-memcpy_s
-  test-memset_s
-  test-memmove_s
-  test-strcat_s
-  test-strcpy_s
-  test-strerror_s
-  test-strerrorlen_s
-  test-strftime
-  test-strncat_s
-  test-strncpy_s
-  test-strnlen_s
-  test-sprintf_s
-  test-uchar
-  test-vfprintf_s
-  test-vsnprintf_s
-  test-wcsftime
+  ${tests_real_trig}
+  ${tests_real_exp}
+  ${tests_real_other}
+  ${tests_complex_trig}
+  ${tests_complex_exp}
+  ${tests_complex_other}
   )
-
-set(tests_fail
-  test-except
-  )
-  
-function(picolibc_test test)
-  add_executable(${test} ${test}.c ${ARGN})
-
-  target_link_libraries(${test} LINK_PUBLIC ${PICOLIBC_TEST_LINK_LIBRARIES})
-
-  target_compile_options(${test} PRIVATE -fno-builtin ${PICOLIBC_COMPILE_OPTIONS} -D_TEST_LONG_DOUBLE)
-
-  target_link_options(${test} PRIVATE ${TARGET_COMPILE_OPTIONS})
-
-  add_test(
-    NAME ${test}
-    COMMAND "${PICOLIBC_SCRIPTS}/${TEST_RUNNER}" $<TARGET_FILE:${test}>
-    )
-  set_tests_properties(${test} PROPERTIES SKIP_RETURN_CODE 77)
-endfunction()
 
 foreach(test IN LISTS tests)
   picolibc_test(${test})
 endforeach()
 
-foreach(test IN LISTS tests_fail)
-  picolibc_test(${test})
-  set_tests_properties(${test} PROPERTIES WILL_FAIL ON)
-endforeach()
-
-picolibc_test(rounding-mode rounding-mode-sub.c)
-
-add_subdirectory(test-math)
