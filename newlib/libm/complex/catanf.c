@@ -49,8 +49,17 @@ catanf(float complex z)
 	x = crealf(z);
 	y = cimagf(z);
 
-	if ((x == 0.0f) && (y > 1.0f))
-		goto ovrf;
+	if (x == 0.0f) {
+		if (y > 1.0f) {
+				return CMPLXF((float)M_PI_2, 0.5f * logf((1.0f + y)/(y - 1.0f)));
+		}
+		if (y < -1.0) {
+				return CMPLXF((float)-M_PI_2, 0.5f * logf((1.0f - y)/(-y - 1.0f)));
+		}
+		if (fabsf(y) <= 1.0f) {
+				return CMPLXF(0.0f, atanhf(y));
+		}
+	}
 
 	x2 = x * x;
 	a = 1.0f - x2 - (y * y);
