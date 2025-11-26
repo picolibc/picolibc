@@ -39,7 +39,10 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdio.h>
 #include <string.h>
 
-static const char *expect_prog = "test-argv";
+#ifndef EXPECT_PROG
+#define EXPECT_PROG "test-argv"
+#endif
+static const char *expect_prog = EXPECT_PROG;
 static const char *expect_args[] = { "hello", "world" };
 
 #define EXPECT_NARG (1 + (int)(sizeof(expect_args) / sizeof(expect_args[0])))
