@@ -1134,13 +1134,20 @@ foreach params : [default_target] + targets
     if additional_sections != []
       foreach section : additional_sections
         section_name = section['name']
-        init_memory += init_memory_template.format(section_name, section['addr'], section['size'])
+        if get_option('init-data-from-flash')
+          init_memory += init_memory_template.format(section_name, section['addr'], section['size'])
+        endif
         init_phdrs += init_phdr_template.format(section_name)
         init_sections += section['contents']
       endforeach
     else
       init_memory = ''
-      init_sections = default_init_section_template.format('init', 'flash', 'text')
+      memory_used_by_init = 'flash'
+      use_flash = get_option('init-data-from-flash')
+      if not use_flash
+        memory_used_by_init = 'ram'
+      endif
+      init_sections = default_init_section_template.format('init', memory_used_by_init, 'text')
     endif
 
     picolibc_linker_type_data.set('INIT_MEMORY', init_memory)
@@ -1206,6 +1213,16 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('C_START', '')
     picolibc_ld_data.set('C_END', '')
     picolibc_ld_data.set('PREFIX', global_prefix)
+    # Linker script templating for data init policy
+    if get_option('init-data-from-flash')
+      picolibc_ld_data.set('IF_DATA_FROM_FLASH', '')
+      picolibc_ld_data.set('ENDIF_DATA_FROM_FLASH', '')
+      picolibc_ld_data.set('DATA_AT', 'flash')
+    else
+      picolibc_ld_data.set('IF_DATA_FROM_FLASH', '/*')
+      picolibc_ld_data.set('ENDIF_DATA_FROM_FLASH', '*/')
+      picolibc_ld_data.set('DATA_AT', 'ram')
+    endif
 
     if target == 'default-target'
       picolibc_ld_file = 'picolibc.ld'
@@ -1243,6 +1260,16 @@ foreach params : [default_target] + targets
     picolibcpp_ld_data.set('C_START', '/*')
     picolibcpp_ld_data.set('C_END', '*/')
     picolibcpp_ld_data.set('PREFIX', global_prefix)
+    # Linker script templating for data init policy
+    if get_option('init-data-from-flash')
+      picolibcpp_ld_data.set('IF_DATA_FROM_FLASH', '')
+      picolibcpp_ld_data.set('ENDIF_DATA_FROM_FLASH', '')
+      picolibcpp_ld_data.set('DATA_AT', 'flash')
+    else
+      picolibcpp_ld_data.set('IF_DATA_FROM_FLASH', '/*')
+      picolibcpp_ld_data.set('ENDIF_DATA_FROM_FLASH', '*/')
+      picolibcpp_ld_data.set('DATA_AT', 'ram')
+    endif
 
     if not is_variable(picolibcpp_ld_config_variable)
       set_variable(picolibcpp_ld_config_variable,

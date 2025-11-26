@@ -63,6 +63,9 @@ _init_tls(void *tls);
 void
 _set_tls(void *tls);
 
+/* Get the TLS pointer for the current thread (TLS base address). */
+void *_get_tls(void);
+
 _END_STD_C
 
 #endif

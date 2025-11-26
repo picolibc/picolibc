@@ -59,3 +59,11 @@ _set_tls(void *tls)
 {
 	__asm__ volatile("msr tpidr_el0, %0" : : "r" (tls - TP_OFFSET));
 }
+
+void *
+_get_tls(void)
+{
+        void *tp;
+        __asm__ volatile("mrs %0, tpidr_el0" : "=r"(tp));
+        return (char *)tp + TP_OFFSET;
+}

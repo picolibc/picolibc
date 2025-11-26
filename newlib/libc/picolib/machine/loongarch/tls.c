@@ -42,3 +42,15 @@ _set_tls(void *tls)
 {
     __asm__("or $tp,%0,$r0" : : "r" (tls));
 }
+
+void *
+_get_tls(void)
+{
+    void *tp;
+#if __loongarch_grlen == 64
+    __asm__ volatile("move %0, $tp" : "=r"(tp));
+#else
+    __asm__ volatile("move %0, $tp" : "=r"(tp));
+#endif
+    return (uint8_t *)tp + TP_OFFSET;
+}

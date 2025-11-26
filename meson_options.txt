@@ -224,6 +224,12 @@ option('crt-runtime-size', type: 'boolean', value: false,
        description: 'compute crt memory space sizes at runtime')
 
 #
+# Picocrt data initialization option
+#
+option('init-data-from-flash', type: 'boolean', value: true,
+       description: 'Assume .data needs initialization from FLASH in crt0')
+
+#
 # Legacy (non-picoexit) startup/shutdown options
 #
 

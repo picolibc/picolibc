@@ -48,3 +48,15 @@ _set_tls(void *tls)
     tls = (uint8_t *) tls + TP_OFFSET + (uintptr_t) __stack_chk_size;
     __asm__("mr 13, %0" : : "r" (tls));
 }
+
+void *
+_get_tls(void)
+{
+    void *tp;
+#ifdef __powerpc64__
+    __asm__ volatile("mr %0, 13" : "=r"(tp));
+#else
+    __asm__ volatile("mr %0, 2" : "=r"(tp));
+#endif
+    return (uint8_t *)tp + TP_OFFSET;
+}

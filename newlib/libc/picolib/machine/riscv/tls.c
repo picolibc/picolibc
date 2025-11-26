@@ -43,3 +43,15 @@ _set_tls(void *tls)
 {
 	__asm__("mv tp, %0" : : "r" (tls));
 }
+
+void *
+_get_tls(void)
+{
+        void *tp;
+#if __riscv_xlen == 64
+        __asm__ volatile("mv %0, tp" : "=r"(tp));
+#else
+        __asm__ volatile("mv %0, tp" : "=r"(tp));
+#endif
+        return (uint8_t *)tp + TP_OFFSET;
+}

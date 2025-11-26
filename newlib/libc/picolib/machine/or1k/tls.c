@@ -54,3 +54,11 @@ _set_tls(void *tls)
         tls = (uint8_t *) tls - TP_OFFSET;
 	__asm__("l.or r10, %0, %0" : : "r" (tls));
 }
+
+void *
+_get_tls(void)
+{
+        void *tp;
+        __asm__ volatile("l.ori %0, r10, 0" : "=r"(tp));
+        return (uint8_t *)tp + TP_OFFSET;
+}
