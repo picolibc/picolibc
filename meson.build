@@ -1829,9 +1829,11 @@ if has_semihost
                  ['-nostdlib', '-T', picolibc_noflash_ld_string])
     set_variable(test_link_depends_noflash_variable, [picolibc_noflash_ld_value])
   endforeach
+  test_noflash = true
 else
   test_link_args = test_link_args_base
   test_link_depends = []
+  test_noflash = false
 endif
 
 # make sure to include semihost BEFORE picocrt!
