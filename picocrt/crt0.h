@@ -38,10 +38,20 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+/* Control whether .data is initialized from FLASH.
+ * Default is enabled to preserve legacy behavior.
+ * Set INIT_DATA_FROM_FLASH=0 at compile time to disable.
+ */
+#ifndef INIT_DATA_FROM_FLASH
+#define INIT_DATA_FROM_FLASH 1
+#endif
+
+#if INIT_DATA_FROM_FLASH
 extern char __data_source[];
 extern char __data_start[];
 extern char __data_end[];
 extern char __data_size[];
+#endif
 extern char __bss_start[];
 extern char __bss_end[];
 extern char __bss_size[];
@@ -50,7 +60,9 @@ extern char __tdata_end[];
 extern char __tls_end[];
 
 #ifdef __PICOCRT_RUNTIME_SIZE
+#if INIT_DATA_FROM_FLASH
 #define __data_size (__data_end - __data_start)
+#endif
 #define __bss_size (__bss_end - __bss_start)
 #endif
 
@@ -91,7 +103,10 @@ extern void __libc_init_array(void);
 static __noreturn __always_inline void
 __start(void)
 {
-	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+    /* Initialize .data from FLASH when enabled */
+#if INIT_DATA_FROM_FLASH
+    memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+#endif
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
 #ifdef POST_MEMORY_SETUP
         POST_MEMORY_SETUP();
