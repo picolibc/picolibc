@@ -1,6 +1,6 @@
 [binaries]
-c = ['powerpc64le-linux-gnu-gcc', '-fno-pic', '-static']
-cpp = ['powerpc64le-linux-gnu-g++', '-fno-pic', '-static']
+c = 'powerpc64le-linux-gnu-gcc'
+cpp = 'powerpc64le-linux-gnu-g++'
 ar = 'powerpc64le-linux-gnu-ar'
 as = 'powerpc64le-linux-gnu-as'
 nm = 'powerpc64le-linux-gnu-nm'
@@ -11,6 +11,10 @@ system = 'linux'
 cpu_family = 'ppc64'
 cpu = 'ppc64'
 endian = 'little'
+
+[built-in options]
+c_args = ['-fno-pic', '-static']
+cpp_args = ['-fno-pic', '-static']
 
 [properties]
 skip_sanity_check = true

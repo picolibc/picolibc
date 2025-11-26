@@ -111,7 +111,7 @@ crt0_test = 'crt0_semihost'
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
-  target_c_args = params['c_args'] + stack_c_args
+  target_c_args = get_option('c_args') + params['c_args'] + stack_c_args
 
   instdir = join_paths(lib_dir, target_dir)
 

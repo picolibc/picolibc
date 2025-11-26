@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['mips-zephyr-elf-gcc', '-nostdlib', '-G0']
-cpp = ['mips-zephyr-elf-g++', '-nostdlib', '-G0']
+c = 'mips-zephyr-elf-gcc'
+cpp = 'mips-zephyr-elf-g++'
 ar = 'mips-zephyr-elf-ar'
 as = 'mips-zephyr-elf-as'
 nm = 'mips-zephyr-elf-nm'
@@ -17,6 +17,10 @@ system = 'zephyr'
 cpu_family = 'mips'
 cpu = 'mips'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib', '-G0']
+cpp_args = ['-nostdlib', '-G0']
 
 [properties]
 skip_sanity_check = true

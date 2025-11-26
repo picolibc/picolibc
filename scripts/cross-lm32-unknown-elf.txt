@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['lm32-unknown-elf-gcc', '-nostdlib']
-cpp = ['lm32-unknown-elf-g++', '-nostdlib']
+c = 'lm32-unknown-elf-gcc'
+cpp = 'lm32-unknown-elf-g++'
 ar = 'lm32-unknown-elf-ar'
 as = 'lm32-unknown-elf-as'
 nm = 'lm32-unknown-elf-nm'
@@ -17,6 +17,10 @@ system = 'unknown'
 cpu_family = 'lm32'
 cpu = 'lm32'
 endian = 'little'
+
+[built-in options]
+c_args = ['-nostdlib']
+cpp_args = ['-nostdlib']
 
 [properties]
 skip_sanity_check = true

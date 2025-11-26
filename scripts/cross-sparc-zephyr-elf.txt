@@ -3,8 +3,8 @@
 # so we have to add -nostdlib to the compiler configuration itself or
 # early compiler tests will fail. This can be removed when picolibc
 # requires at least version 0.54.2 of meson.
-c = ['sparc-zephyr-elf-gcc', '-msoft-float', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
-cpp = ['sparc-zephyr-elf-g++', '-msoft-float', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+c = 'sparc-zephyr-elf-gcc'
+cpp = 'sparc-zephyr-elf-g++'
 ar = 'sparc-zephyr-elf-ar'
 as = 'sparc-zephyr-elf-as'
 nm = 'sparc-zephyr-elf-nm'
@@ -17,6 +17,10 @@ system='linux'
 cpu_family='sparc'
 cpu='sparc'
 endian='little'
+
+[built-in options]
+c_args = ['-msoft-float', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+cpp_args = ['-msoft-float', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
 
 [properties]
 skip_sanity_check = true
