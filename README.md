@@ -237,9 +237,44 @@ use Picolibc:
 
  * Test exception handling on m68k
 
+ * Add Hexagon architecture support. Thanks to Kushal Pal.
+
+ * Clean up RISC-V asm code integration. Thanks to Venkata Ramanaiah
+   Nalamothu.
+
+ * Add more math tests, including exhaustive binary 32 testing.
+
+ * Improve cbrtf precision to within 1ulp.
+
+ * Fix lgammaf for values between -0x1p-70 and -0x1p-64.
+
+ * Add some missing stdint.h bits that are new in C23.
+
+ * Improve accuracy of erfcf for values between 1.25 and 28. Improve
+   performance for values between 0x1p-56 and 0x1p-26.
+
+ * Fix memchr on targets with 16-bit int and 32-bit long (MSP430).
+
+ * Mask needle with 0xff on rx version of memchr.
+
+ * Add missing POSIX functionality in fnmatch to support character
+   classes, equivalence classes and collating sequences. Limit fnmatch
+   recursion for '*' operators to 16 levels.
+
  * Rename cross compile property 'libgcc' to 'librt' since we can now
    specify either libgcc or compiler-rt as run-time library. However,
    'libgcc' is still supported for backward compatibility.
+
+ * Fix bug in 32-bit riscv stpcpy which returned the wrong
+   value. Improve performance slightly by avoiding duplicate memory
+   reads of the tail of the string.
+
+ * Make sure `__STDC_LIB_EXT1__` gets defined as appropriate. Thanks to
+   Mostafa Salman.
+
+ * Fix -long_option parsing in getopt_long_only.
+
+ * Add strfmon and strfmon_l as required by POSIX.
 
 ### Picolibc release 1.8.10
 
