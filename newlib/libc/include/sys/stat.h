@@ -90,6 +90,13 @@ typedef	_TIME_T_	time_t;
 #define	_TIME_T_DECLARED
 #endif
 
+#ifdef _LIBC
+# define _STAT_HAS_BLOCKS
+# if defined(__svr4__) && !defined(__PPC__) && !defined(__sun__)
+#   undef _STAT_HAS_BLOCKS
+# endif
+#endif
+
 /* dj's stat defines _STAT_H_ */
 #ifndef _STAT_H_
 

@@ -54,6 +54,8 @@ union __file_bufio_cookie {
 #define __STDIO_BUFIO_LOCKING
 #endif
 
+#define __STDIO_BUFIO_SIZE_UNDEFINED (-1)
+
 struct __file_bufio {
         struct __file_ext xfile;
         const void *ptr;
@@ -158,6 +160,9 @@ static inline void __bufio_unlock(FILE *f) {
 	__lock_release(bf->lock);
 #endif
 }
+
+int
+__bufio_buffer_allocate_locked(struct __file_bufio *bf);
 
 int
 __bufio_flush_locked(FILE *f);

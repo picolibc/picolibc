@@ -75,6 +75,12 @@ fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
                                 /* Drain any buffered data */
                                 if (bytes < (size_t) this_time)
                                         this_time = bytes;
+                                if (bf->buf == NULL) {
+                                        if (__bufio_buffer_allocate_locked(bf) != 0) {
+                                                __bufio_unlock(stream);
+                                                __funlock_return(stream, 0);
+                                        }
+                                }
                                 memcpy(cp, bf->buf + bf->off, this_time);
                                 bf->off += this_time;
                                 cp += this_time;
