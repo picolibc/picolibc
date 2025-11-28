@@ -148,11 +148,11 @@ extern "C" {
 
 /* When building for Zephyr, set _ZEPHYR_SOURCE unless some other API
  * indicator is set by the application. Don't check __STRICT_ANSI__ as that
- * is set by the compiler for -std=cxx, or _POSIX_C_SOURCE as Zephyr defines
- * that for picolibc currently.
+ * is set by the compiler for -std=cxx.
  */
 
 #if defined(__ZEPHYR__) && !defined(_ZEPHYR_SOURCE) &&                  \
+    !defined(_POSIX_C_SOURCE) &&                                        \
     !defined(_GNU_SOURCE)&&                                             \
     !defined(_BSD_SOURCE) &&                                            \
     !defined(_SVID_SOURCE) &&                                           \
