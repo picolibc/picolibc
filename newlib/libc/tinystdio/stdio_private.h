@@ -48,6 +48,7 @@
 #include <limits.h>
 #include <stdio-bufio.h>
 #include <sys/lock.h>
+#include <sys/stat.h>
 
 struct __file_str {
 	struct __file file;	/* main file struct */

@@ -70,6 +70,12 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
                                 }
                                 if ((unsigned) this_time > bytes)
                                         this_time = bytes;
+                                if (bf->buf == NULL) {
+                                        if (__bufio_buffer_allocate_locked(bf) != 0) {
+                                                __bufio_unlock(stream);
+                                                __funlock_return(stream, 0);
+                                        }
+                                }
                                 memcpy(bf->buf + bf->len, cp, this_time);
                                 bf->len += this_time;
                                 cp += this_time;

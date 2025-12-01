@@ -67,6 +67,17 @@ freopen(const char *pathname, const char *mode, FILE *stream)
         close((int)(intptr_t) (pf->ptr));
         (void) __atomic_exchange_ungetc(&stream->unget, 0);
         stream->flags = (stream->flags & ~(__SRD|__SWR|__SERR|__SEOF)) | stdio_flags;
+        /*
+         * According to POSIX, the stream must be treated as newly opened after
+         * freopen(). This implies:
+         *  - a new preferred buffer size (st_blksize) may apply, and
+         *  - any external buffer previously supplied by the user must not be reused.
+         */
+        if (pf->bflags & __BALL) {
+            free(pf->buf);
+        }
+        pf->buf = NULL;
+        pf->size = __STDIO_BUFIO_SIZE_UNDEFINED;
         pf->pos = 0;
         pf->ptr = (void *) (intptr_t) (fd);
 

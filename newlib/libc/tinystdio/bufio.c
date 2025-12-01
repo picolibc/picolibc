@@ -86,12 +86,39 @@ __bufio_flush_locked(FILE *f)
 	return 0;
 }
 
+int __bufio_buffer_allocate_locked(struct __file_bufio *bf)
+{
+    if (bf->size == __STDIO_BUFIO_SIZE_UNDEFINED) {
+#ifdef _STAT_HAS_BLOCKS
+        struct stat st;
+        int fd = (int)(intptr_t) (bf->ptr);
+        if (fstat (fd, &st) == 0 && st.st_blksize > 0) {
+            bf->size = st.st_blksize;
+        } else {
+            bf->size = BUFSIZ;
+        }
+#else
+        bf->size = BUFSIZ;
+#endif
+    }
+    bf->buf = calloc(1, bf->size);
+    if (bf->buf == NULL) {
+        return -1;
+    }
+    bf->bflags |= __BALL;
+    return 0;
+}
 
 int __bufio_fill_locked(FILE *f)
 {
 	struct __file_bufio *bf = (struct __file_bufio *) f;
         ssize_t len;
 
+        if (bf->buf == NULL) {
+            if (__bufio_buffer_allocate_locked(bf) != 0) {
+                return -1; // ?? what correct error code to use
+            }
+        }
         /* Reset read pointer, read some data */
         bf->off = 0;
         len = bufio_read (bf, bf->buf, bf->size);
@@ -145,6 +172,12 @@ __bufio_put(char c, FILE *f)
         if (__bufio_setdir_locked(f, __SWR) < 0) {
                 ret = _FDEV_ERR;
                 goto bail;
+        }
+
+        if (bf->buf == NULL) {
+            if (__bufio_buffer_allocate_locked(bf) != 0) {
+                return -1; // ?? what correct error code to use
+            }
         }
 
 	bf->buf[bf->len++] = c;
@@ -255,13 +288,28 @@ int
 __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
 {
 	struct __file_bufio *bf = (struct __file_bufio *) f;
-        int ret = -1;
+	int ret = -1;
 
 	__bufio_lock(f);
+        if (bf->size != __STDIO_BUFIO_SIZE_UNDEFINED) {
+                /*
+                 * The POSIX standard does not allow calling setvbuf after any other
+                 * operation has been performed on the stream (except a failed call to setvbuf()).
+                 * In other words, the standard states that setvbuf cannot override buffer
+                 * parameters once they have been established by a prior operation.
+                 * However, the error behavior in this situation is not standardized.
+                 */
+                ret = 0;
+                goto bail;
+        }
         bf->bflags &= ~__BLBF;
         switch (mode) {
         case _IONBF:
-                buf = NULL;
+                /*
+                 * Use the buf pointer to hold the single byte
+                 * instead of performing a 1-byte allocation
+                 */
+                buf = (char *)&bf->buf;
                 size = 1;
                 break;
         case _IOLBF:
@@ -271,26 +319,6 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
                 break;
         default:
                 goto bail;
-        }
-        if (bf->bflags & __BALL) {
-                if (buf) {
-                        free(bf->buf);
-                        bf->bflags &= ~__BALL;
-                } else {
-                        /*
-                         * Handling allocation failures here is a bit tricky;
-                         * we don't want to lose the existing buffer. Instead,
-                         * we try to reallocate it
-                         */
-                        buf = realloc(bf->buf, size);
-                        if (!buf)
-                                goto bail;
-                }
-        } else if (!buf) {
-                buf = malloc(size);
-                if (!buf)
-                        goto bail;
-                bf->bflags |= __BALL;
         }
         bf->buf = buf;
         bf->size = size;
