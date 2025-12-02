@@ -45,3 +45,11 @@ _set_tls(void *tls)
 
         __asm__("mov %0, %%g7" : : "r" (ctls + (uintptr_t) __tls_size_align));
 }
+
+void *
+_get_tls(void)
+{
+        void *tp;
+        __asm__ volatile("mov %%g7, %0" : "=r"(tp));
+        return (uint8_t *)tp + TP_OFFSET;
+}

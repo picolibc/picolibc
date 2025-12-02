@@ -79,6 +79,12 @@ picocrt_variants = [
     'src': src_picocrt,
   },
   {
+    'name': 'noflash-semihost',
+    'suffix': '-noflash-semihost',
+    'c_args': ['-DINIT_DATA_FROM_FLASH=0', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  },
+  {
     'name': 'hosted',
     'suffix': '-hosted',
     'c_args': ['-DCRT0_EXIT'],
@@ -112,6 +118,11 @@ foreach params : targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args'] + stack_c_args
+  # Global switch: assume .data needs initialization from FLASH (default true)
+  # If disabled, define INIT_DATA_FROM_FLASH=0
+  if not get_option('init-data-from-flash')
+    target_c_args += ['-DINIT_DATA_FROM_FLASH=0']
+  endif
 
   instdir = join_paths(lib_dir, target_dir)
 

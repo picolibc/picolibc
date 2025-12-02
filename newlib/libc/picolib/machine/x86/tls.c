@@ -50,3 +50,11 @@ _set_tls(void *tls)
 /* Reserve space for a TCB. */
 __attribute__((__section__(".tls_tail_extra"), __aligned__(1), __used__))
 static char __tcb_space[sizeof(__tcb_head_t)];
+
+void *
+_get_tls(void)
+{
+        /* x86 stores the TCB pointer; TLS base is (tcb - TP_OFFSET). */
+        void *tcb = __get_tcb();
+        return (char *)tcb - TP_OFFSET;
+}

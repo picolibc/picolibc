@@ -72,3 +72,20 @@ _set_tls(void *tls)
 #endif
 #endif
 }
+
+void *
+_get_tls(void)
+{
+#ifdef ARM_TLS_CP15
+        void *tp;
+        __asm__("mrc p15, 0, %0, cr13, cr0, 3" : "=r"(tp));
+        return (uint8_t *)tp + TP_OFFSET;
+#else
+#ifdef ARM_RP2040
+        uint32_t cpuid = *(uint32_t *)0xd0000000;
+        return (uint8_t *)__tls[cpuid] + TP_OFFSET;
+#else
+        return (uint8_t *)__tls[0] + TP_OFFSET;
+#endif
+#endif
+}

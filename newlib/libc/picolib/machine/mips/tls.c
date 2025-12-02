@@ -51,3 +51,15 @@ _set_tls(void *tls)
             : : "Jr" (tls),
               "i" (2));
 }
+
+void *
+_get_tls(void)
+{
+    void *tp;
+#if _MIPS_SIM == _ABI64
+    __asm__ volatile("move %0, $3" : "=r"(tp));
+#else
+    __asm__ volatile("move %0, $3" : "=r"(tp));
+#endif
+    return (uint8_t *)tp + TP_OFFSET;
+}

@@ -38,10 +38,20 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+/* Control whether .data is initialized from FLASH.
+ * Default is enabled to preserve legacy behavior.
+ * Set INIT_DATA_FROM_FLASH=0 at compile time to disable.
+ */
+#ifndef INIT_DATA_FROM_FLASH
+#define INIT_DATA_FROM_FLASH 1
+#endif
+
+#if INIT_DATA_FROM_FLASH
 extern char __data_source[];
 extern char __data_start[];
 extern char __data_end[];
 extern char __data_size[];
+#endif
 extern char __bss_start[];
 extern char __bss_end[];
 extern char __bss_size[];
@@ -50,7 +60,9 @@ extern char __tdata_end[];
 extern char __tls_end[];
 
 #ifdef __PICOCRT_RUNTIME_SIZE
+#if INIT_DATA_FROM_FLASH
 #define __data_size (__data_end - __data_start)
+#endif
 #define __bss_size (__bss_end - __bss_start)
 #endif
 
@@ -91,14 +103,35 @@ extern void __libc_init_array(void);
 static __noreturn __always_inline void
 __start(void)
 {
-	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+    /* Initialize .data from FLASH when enabled */
+#if INIT_DATA_FROM_FLASH
+    memcpy(__data_start, __data_source, (uintptr_t) __data_size);
+#endif
 	memset(__bss_start, '\0', (uintptr_t) __bss_size);
 #ifdef POST_MEMORY_SETUP
         POST_MEMORY_SETUP();
 #endif
 
 #ifdef __THREAD_LOCAL_STORAGE
-	_set_tls(__tls_base);
+#if INIT_DATA_FROM_FLASH
+        /* In flash-init mode, the static TLS block is fully initialized
+	 * along with .data via the single memcpy, so use it directly. */
+        _set_tls(__tls_base);
+#else
+        /* In no-flash mode, __tdata_source aliases the static TLS block in RAM.
+	 * To prevent main-thread mutations from affecting the TLS template used
+	 * for new threads, allocate a dedicated TLS block for the main thread
+	 * and initialize it from the template, then set TP to that block. */
+        size_t tls_align = _tls_align();
+        size_t tls_size = _tls_size();
+        void *tls = aligned_alloc(tls_align, tls_size);
+        if (tls) {
+            _init_tls(tls);
+            _set_tls(tls);
+        } else {
+            exit(1);
+        }
+#endif
 #endif
 #if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
 	__libc_init_array();

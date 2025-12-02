@@ -138,7 +138,6 @@ check_malloc(size_t in_use)
 #ifdef __NANO_MALLOC
 	struct mallinfo info = mallinfo();
 
-        info.ordblks -= start_info.ordblks;
         info.arena -= start_info.arena;
         info.fordblks -= start_info.fordblks;
         info.uordblks -= start_info.uordblks;

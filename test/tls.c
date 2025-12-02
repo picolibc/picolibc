@@ -261,12 +261,14 @@ main(void)
         overaligned_bss_addr = &overaligned_bss_var;
 
 #ifdef __THREAD_LOCAL_STORAGE_API
-        printf("TLS region: %p-%p (%zd bytes)\n", __tdata_start,
-	       __tdata_start + _tls_size(), _tls_size());
-	size_t tdata_source_size = (uintptr_t) __tdata_source_end - (uintptr_t) __tdata_source;
-	size_t tdata_size = (uintptr_t) __tdata_end - (uintptr_t) __tdata_start;
+        void *tp = (void *)_get_tls();
+        printf("TLS region: %p-%p (%zd bytes)\n", tp, (char *)tp + _tls_size(),
+               _tls_size());
+        size_t tdata_source_size =
+            (uintptr_t)__tdata_source_end - (uintptr_t)__tdata_source;
+        size_t tdata_size = (uintptr_t)__tdata_end - (uintptr_t)__tdata_start;
 
-	if ((uintptr_t) __tdata_start - (uintptr_t) __data_start != (uintptr_t) __tdata_source - (uintptr_t) __data_source) {
+        if ((uintptr_t) __tdata_start - (uintptr_t) __data_start != (uintptr_t) __tdata_source - (uintptr_t) __data_source) {
 		printf("ROM/RAM .tdata offset from .data mismatch. "
 		       "VMA offset=%zd, LMA offset =%zd."
 		       "Linker behaviour changed?\n",
@@ -281,7 +283,7 @@ main(void)
 		hexdump(__tdata_start, tdata_size, "RAM:");
 		result++;
 	}
-        result += check_tls("pre-defined", false, __tdata_start);
+        result += check_tls("pre-defined", false, tp);
 #else
         result += check_tls("pre-defined", false, NULL);
 #endif

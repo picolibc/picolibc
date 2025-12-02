@@ -49,3 +49,11 @@ _set_tls(void *tls)
     uintptr_t   u = (uintptr_t) tls - TP_OFFSET;
     __asm__("wur %0," REG(THREADPTR) : : "r" (u));
 }
+
+void *
+_get_tls(void)
+{
+    void *tp;
+    __asm__ volatile("mov %0, a1" : "=r"(tp));
+    return (uint8_t *)tp + TP_OFFSET;
+}
