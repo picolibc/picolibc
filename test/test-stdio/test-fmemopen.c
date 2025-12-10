@@ -31,6 +31,7 @@
 #include <atf-c.h>
 #else
 #define _POSIX_C_SOURCE 200809L /* for strnlen */
+#undef NDEBUG
 #include <assert.h>
 #define ATF_TC(arg0)		static void arg0##_head(void)
 #define ATF_TC_HEAD(arg0, arg1)	static void arg0##_head(void)
@@ -1206,6 +1207,10 @@ ATF_TC_BODY(test22, tc)
 
 ATF_TP_ADD_TCS(tp)
 {
+#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
+        printf("legacy stdio fails fmemopen tests\n");
+        return 77;
+#endif
 	ATF_TP_ADD_TC(tp, test00);
 	ATF_TP_ADD_TC(tp, test01);
 	ATF_TP_ADD_TC(tp, test02);

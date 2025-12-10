@@ -33,16 +33,19 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-plain_tests_common = ['regex', 'ungetc',
+plain_tests_common = ['regex',
 	              'malloc',
-	              'ffs', 'setjmp', 'atexit', 'on_exit',
+	              'ffs',
+                      'setjmp',
+                      'atexit',
+                      'on_exit',
 	              'timegm',
                       'test-atomic',
                       'test-hello',
-                      'test-strchr', 'test-memchr',
-	              'test-memset', 'test-put',
+                      'test-strchr',
+                      'test-memchr',
+	              'test-memset',
 	              'test-raise',
-                      'test-sprintf-percent-n',
                       'test-ctype',
                       'test-uchar',
                       'test-wctomb',
@@ -76,31 +79,6 @@ if newlib_nano_malloc or tests_enable_full_malloc_stress
   math_tests_common += 'malloc_stress'
 endif
 
-if tinystdio
-  plain_tests_common += [
-    't_fmemopen',
-    'test-vfscanf-percent-a',
-  ]
-endif
-
-if tests_enable_posix_io
-  plain_tests_common += ['posix-io']
-
-  # legacy stdio doesn't work on semihosting, so just skip it
-  if tinystdio
-    plain_tests_common += ['test-fopen',
-                    'test-mktemp',
-                    'test-tmpnam',
-                    'test-fread-fwrite',
-                    'test-ungetc-ftell',
-                    'test-fgetc',
-                    'test-fgets-eof',
-                    'test-wchar',
-                    'test-dprintf',
-                   ]
-  endif
-endif
-
 math_tests = math_tests_common + [
   'math-funcs',
 ]
@@ -108,7 +86,6 @@ math_tests = math_tests_common + [
 plain_tests = plain_tests_common
 
 plain_tests += math_tests + [
-  'test-funopen',
   'tls',
 ]
 
@@ -124,17 +101,11 @@ plain_tests += ['test-memcpy_s',
                 'test-strnlen_s',
                ]
 
-if tinystdio
-  plain_tests += 'test-sprintf_s'
-endif
-
 if tests_enable_stack_protector
   plain_tests += 'stack-smash'
 endif
 
 plain_tests_native = plain_tests_common
-
-plain_tests_native += 'test-flockfile'
 
 math_tests_native = math_tests_common
 foreach params : targets
@@ -164,136 +135,6 @@ foreach params : targets
   if have_cplusplus
     _cpp_args = target_c_args + get_variable('test_cpp_args_' + target, test_cpp_args)
   endif
-
-  t1 = 'printf_scanf'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_d + _c_args,
-		  link_args: printf_link_args_d + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printff_scanff'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_f + _c_args,
-		  link_args: printf_link_args_f + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printfl_scanfl'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_l + _c_args,
-		  link_args: printf_link_args_l + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printfi_scanfi'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_i + _c_args,
-		  link_args: printf_link_args_i + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printfm_scanfm'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf_scanf.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_m + _c_args,
-		  link_args: printf_link_args_m + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printf-tests'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_d + _c_args,
-		  link_args: printf_link_args_d + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printff-tests'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_f + _c_args,
-		  link_args: printf_link_args_f + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printfi-tests'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_i + _c_args,
-		  link_args: printf_link_args_i + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'printfm-tests'
-
-  test(t1 + target,
-       executable(t1 + target, ['printf-tests.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_m + _c_args,
-		  link_args: printf_link_args_m + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'time-sprintf'
-
-  test(t1 + target,
-       executable(t1 + target, ['time-sprintf.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_i + _c_args + ['-fno-builtin'],
-		  link_args: printf_link_args_i + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       suite: 'test',
-       env: test_env)
 
   t1 = 'try-ilp32'
 
@@ -481,38 +322,6 @@ foreach params : targets
         )
   endif
 
-  if get_option('test-stdin')
-    t1 = 'test-gets'
-    t1_src = 'test-gets.c'
-
-    test_gets = executable(t1 + target, t1_src,
-		           c_args: _c_args,
-		           link_args: _link_args,
-		           objects: _objs,
-		           link_depends:  _link_depends,
-		           include_directories: inc)
-
-    test(t1 + target + '-success',
-         test_gets,
-         depends: bios_bin,
-         args: ['--stdin', 'hi'],
-         suite: 'test',
-         env: test_env,
-         timeout: 90
-        )
-
-
-    test(t1 + target + '-failure',
-         test_gets,
-         depends: bios_bin,
-         args: ['--stdin', 'this is a long string that should overflow the buffer'],
-         suite: 'test',
-         env: test_env,
-         timeout: 90,
-         should_fail: true
-        )
-  endif
-
   if c_sanitize_flags != []
     t1 = 'test-ubsan'
     t1_src = t1 + '.c'
@@ -613,9 +422,11 @@ foreach params : targets
   endif
 endforeach
 
-if enable_native_math_tests
+if enable_native_math_tests or enable_native_tests
+  native_lib_m = cc.find_library('m', required: true)
+endif
 
-  native_lib_m = cc.find_library('m', required: false)
+if enable_native_math_tests
 
   if native_lib_m.found()
     test('long_double-native',
@@ -631,18 +442,6 @@ if enable_native_math_tests
     test('rounding-mode-native',
 	 executable('rounding-mode-native',
 		    ['rounding-mode.c', 'rounding-mode-sub.c'],
-		    c_args: native_c_args,
-		    link_args: native_c_args,
-		    dependencies: native_lib_m))
-    test('printf-tests-native',
-	 executable('printf-tests-native',
-		    'printf-tests.c',
-		    c_args: native_c_args,
-		    link_args: native_c_args,
-		    dependencies: native_lib_m))
-    test('printf_scanf-native',
-	 executable('printf_scanf-native',
-		    'printf_scanf.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m))
@@ -734,19 +533,6 @@ if enable_native_tests
                               ['native-locks.c'],
                               c_args: native_c_args)
 
-  test_file_name_arg=['-DTEST_FILE_NAME="' + 'test-flockfile' + '.txt"']
-
-  test('test-flockfile',
-       executable('test-flockfile',
-                  'test-flockfile.c',
-                  c_args: test_c_args + test_file_name_arg,
-                  link_args: test_link_args,
-                  link_whole: [native_lib],
-                  link_with: [lib_c],
-                  include_directories: inc),
-       depends: bios_bin,
-       env: test_env)
-
   if have_cplusplus
     test('test-cplusplus-native',
          executable('test-cplusplus-native', 'test-cplusplus.cpp',
@@ -812,6 +598,7 @@ subdir('libc-testsuite')
 subdir('test-math')
 subdir('test-string')
 subdir('test-monetary')
+subdir('test-stdio')
 
 if has_arm_semihost
   subdir('semihost')

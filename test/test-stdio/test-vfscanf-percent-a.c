@@ -1,6 +1,6 @@
 /*
 * SPDX-License-Identifier: BSD-3-Clause
-* 
+*
 * Copyright © 2024, Synopsys Inc.
 * Copyright © 2024, Solid Sands B.V.
 *
@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <math.h>
 
+#if !defined(__PICOLIBC__) || defined(__TINY_STDIO)
 static int compare_floats(float a, float b, float tolerance) {
     float diff = a - b;
     if (diff < 0)
@@ -62,7 +63,7 @@ int main(void) {
         res = sscanf(strin, "%a %a ", &var1, &var2);
         ret1 = compare_floats(var1, ref_out1, tolerance);
         ret2 = compare_floats(var2, ref_out2, tolerance);
-        
+
         if ((res != 2) || (ret1 == 0) || (ret2 == 0)) {
             printf("Test Case 1 Failed: Failed to read the input string correctly using %%a\n");
             return 1;
@@ -81,11 +82,18 @@ int main(void) {
         if ((res != 2) || (ret1 == 0) || (ret2 == 0)) {
             printf("Test Case 2 Failed: Failed to read the input string correctly using %%A\n");
             return 1;
-        } 
+        }
         else {
             printf("Test Case 2 Passed: %%A is handled correctly\n");
-        }  
+        }
     }
 
     return 0;
 }
+#else
+int main(void)
+{
+    printf("vfscanf %%a not supported on legacy stdio\n");
+    return 77;
+}
+#endif

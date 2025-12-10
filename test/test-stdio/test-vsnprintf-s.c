@@ -38,6 +38,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
+#include <stdarg.h>
+
+#if defined(__STDC_LIB_EXT1__) && (!defined(__PICOLIBC__) || defined(__TINY_STDIO))
 
 #define MAX_ERROR_MSG 100
 
@@ -98,6 +101,20 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
     return ret;
 }
 
+static int
+test_vsnprintf_s(char *restrict buf, rsize_t bufsize, const char *restrict fmt,
+                 ...)
+{
+    va_list args;
+    int ret;
+
+    va_start(args, fmt);
+    ret = vsnprintf_s(buf, bufsize, fmt, args);
+    va_end(args);
+
+    return ret;
+}
+
 int
 main(void)
 {
@@ -110,7 +127,7 @@ main(void)
 
     // Test case 1: Normal formatting
     test_id++;
-    res = sprintf_s(buf, sizeof(buf), "Hello, %s!", "world");
+    res = test_vsnprintf_s(buf, sizeof(buf), "Hello, %s!", "world");
     handler_res = test_handler_called(0, "", test_id);
     TEST_RES(res == (int)strlen("Hello, world!"), "Normal formatting",
              handler_res, test_id);
@@ -119,39 +136,40 @@ main(void)
 
     // Test case 2: Formatting with buffer overflow
     test_id++;
-    res = sprintf_s(buf, 10, "Hello, %s!", "world");
+    res = test_vsnprintf_s(buf, 10, "Hello, %s!", "world");
     handler_res = test_handler_called(1, "dest buffer overflow", test_id);
-    TEST_RES(res == 0, "Formatting with buffer overflow", handler_res, test_id);
+    TEST_RES(res == -1, "Formatting with buffer overflow", handler_res,
+             test_id);
 
     // Test case 3: Formatting with Null buffer
     test_id++;
-    res = sprintf_s(NULL, sizeof(buf), "Hello, %s!", "world");
+    res = test_vsnprintf_s(NULL, sizeof(buf), "Hello, %s!", "world");
     handler_res = test_handler_called(1, "dest buffer is null", test_id);
-    TEST_RES(res == 0, "Formatting with Null buffer", handler_res, test_id);
+    TEST_RES(res == -1, "Formatting with Null buffer", handler_res, test_id);
 
     // Test case 4: Formatting with Null format string
     test_id++;
-    res = sprintf_s(buf, sizeof(buf), NULL, "world");
+    res = test_vsnprintf_s(buf, sizeof(buf), NULL, "world");
     handler_res = test_handler_called(1, "null format string", test_id);
-    TEST_RES(res == 0, "Formatting with Null format string", handler_res,
+    TEST_RES(res == -1, "Formatting with Null format string", handler_res,
              test_id);
 
     // Test case 5: Empty format string
     test_id++;
-    res = sprintf_s(buf, sizeof(buf), "", "world");
+    res = test_vsnprintf_s(buf, sizeof(buf), "");
     TEST_RES(res == 0, "Empty format string", handler_res, test_id);
     handler_res = test_handler_called(0, "", test_id);
     TEST_RES(strcmp(buf, "") == 0, "Empty format string Contents", handler_res,
              test_id);
 
-    // Test case 6: Large buffer size (bufsize = 0xffffffff)
-    test_id++;
-    res = sprintf_s(buf, (rsize_t)0xffffffff, "Test large buffer size");
-    TEST_RES(res == (int)strlen("Test large buffer size"), "Large buffer size check", handler_res, test_id);
-    handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(strcmp(buf, "Test large buffer size") == 0, "Large buffer size Contents", handler_res,
-             test_id);
-
     printf("All sprintf_s tests passed!\n");
     return 0;
 }
+#else
+int main(void)
+{
+    printf("vsnprintf_s not available\n");
+    return 77;
+}
+#endif
+

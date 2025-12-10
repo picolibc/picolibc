@@ -38,7 +38,9 @@
 #include <string.h>
 #include <stdlib.h>
 
-#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
+#ifdef __PICOLIBC__
+
+#ifndef __TINY_STDIO
 # define IO_T int
 # define BUF_T char
 # ifdef __LARGE64_FILES
@@ -132,3 +134,11 @@ int main(void)
     fclose(fp);
     return 0;
 }
+
+#else
+int main(void)
+{
+    printf("funopen only available on picolibc\n");
+    return 77;
+}
+#endif

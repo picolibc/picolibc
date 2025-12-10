@@ -51,7 +51,7 @@
 #ifndef __PICOLIBC__
 # define printf_float(x) ((double) (x))
 #elif defined(__TINY_STDIO)
-# ifndef _HAS_IO_FLOAT
+# if !defined(_HAS_IO_FLOAT) && !defined(_HAS_IO_DOUBLE)
 #  define __IO_NO_FLOATING_POINT
 # endif
 # ifndef _HAS_IO_POS_ARGS

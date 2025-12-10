@@ -218,8 +218,13 @@ if sanitize_flag == 'none'
 endif
 
 if get_option('sanitize-bounds')
-  sanitize_flag = ','.join(sanitize_flag, 'bounds')
+  if sanitize_flag == ''
+    sanitize_flag = 'bounds'
+  else
+    sanitize_flag = ','.join(sanitize_flag, 'bounds')
+  endif
 endif
+
 sanitize_trap_on_error = get_option('sanitize-trap-on-error')
 
 if sanitize_flag == ''

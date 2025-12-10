@@ -331,6 +331,6 @@ int main(void) {
         return 1;
     }
 #endif
-#include "testcases.c"
+#include "test-printf-testcases.h"
     return result;
 }
