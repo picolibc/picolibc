@@ -201,7 +201,11 @@ endif
 
 # Disable ssp and fortify source while building picolibc (it's enabled
 # by default by the ubuntu native compiler)
-c_flags = cc.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
+c_flags = cc.get_supported_arguments(['-fno-common',
+                                      '-frounding-math',
+                                      '-fsignaling-nans',
+                                      '-fstrict-flex-arrays=3',
+                                      '-Wflex-array-member-not-at-end',
 				      '-Wno-unsupported-floating-point-opt',
 				      '-fno-builtin-copysignl'])
 
