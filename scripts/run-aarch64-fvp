@@ -41,33 +41,33 @@ elf="$1"
 shift
 
 cmdline_param="cluster0.cpu0.semihosting-cmd_line"
-input="program-name"
-done=0
 
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        *)
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
 done
 
-$fvp_exe --quiet --application "$elf" --parameter "$cmdline_param=$input" \
+$fvp_exe --quiet --application "$elf" --parameter "$cmdline_param=program-name $args" \
     --parameter "bp.vis.disable_visualisation=1" \
     --parameter "bp.terminal_0.quiet=1" \
     --parameter "bp.terminal_1.quiet=1" \

@@ -80,8 +80,8 @@ extern void __libc_init_array(void);
 
 #include <picotls.h>
 #include <stdio.h>
-#ifdef __ARM_SEMIHOST
-#include <semihost.h>
+#if defined(__ARM_SEMIHOST) || defined(__HEXAGON_ARCH__)
+int sys_semihost_get_cmdline(char *buf, int size);
 #endif
 
 #ifndef CONSTRUCTORS
@@ -107,7 +107,8 @@ __start(void)
 	__libc_init_array();
 #endif
 
-#if defined(CRT0_SEMIHOST) && defined(__ARM_SEMIHOST)
+#if defined(CRT0_SEMIHOST) &&                                                  \
+    (defined(__ARM_SEMIHOST) || defined(__HEXAGON_ARCH__))
 #define CMDLINE_LEN     1024
 #define ARGV_LEN        64
         static char cmdline[CMDLINE_LEN];

@@ -38,6 +38,31 @@
 elf="$1"
 shift
 
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
 archstring=""
 readelf="arc-zephyr-elf-readelf"
 # If readelf is installed, we can use the attributes
@@ -101,37 +126,9 @@ esac
 
 chardev=stdio,mux=on,id=stdio0
 
-cmdline="program-name"
-input=""
-done=0
-
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        *)
-            cmdline="$cmdline $1"
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
-done
-
 # Point the semihosting driver at our new chardev
 
-semi=enable=on,chardev=stdio0,arg="$cmdline"
+semi=enable=on,chardev=stdio0,arg="program-name $args"
 
 # Disable monitor
 
@@ -143,5 +140,5 @@ mon=none
 
 serial=chardev:stdio0
 
-echo "$input" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -cpu $cpu -machine arc-sim -nographic -kernel "$elf" -nic none "$@"
+echo "$stdin" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -cpu $cpu -machine arc-sim -nographic -kernel "$elf" -nic none "$@"
 #gdb -fullname -args $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -cpu $cpu -nographic -kernel "$elf" -nic none -machine arc-sim "$@"

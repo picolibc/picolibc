@@ -42,6 +42,31 @@ qemu="qemu-system-aarch64"
 elf="$1"
 shift
 
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
 # Map stdio to a multiplexed character device so we can use it
 # for the monitor and semihosting output
 
@@ -49,35 +74,7 @@ chardev=stdio,mux=on,id=stdio0
 
 # Point the semihosting driver at our new chardev
 
-cmdline="program-name"
-input=""
-done=0
-
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        *)
-            cmdline="$cmdline $1"
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
-done
-
-semi=enable=on,chardev=stdio0,arg="$cmdline"
+semi=enable=on,chardev=stdio0,arg="program-name $args"
 
 if nm "$elf" | grep -q aarch64_putc; then
     "$dir"/monitor-e9 $qemu \
@@ -88,9 +85,9 @@ if nm "$elf" | grep -q aarch64_putc; then
         -cpu max \
         -nic none \
         -nographic \
-        -kernel "$elf" "$@"
+        -kernel "$elf"
 else
-    echo "$input" | $qemu -chardev $chardev \
+    echo "$stdin" | $qemu -chardev $chardev \
                           -semihosting-config "$semi" \
                           -monitor none \
                           -serial none \
@@ -98,5 +95,5 @@ else
                           -cpu cortex-a57 \
                           -nic none \
                           -nographic \
-                          -kernel "$elf" "$@"
+                          -kernel "$elf"
 fi

@@ -40,6 +40,31 @@ qemu="qemu-system-riscv32"
 elf="$1"
 shift
 
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
 archstring=""
 # If readelf is installed, we can use the .riscv.attributes section
 # in the file to determine required extensions that we need in QEMU.
@@ -139,41 +164,7 @@ chardev=stdio,mux=on,id=stdio0
 
 # Point the semihosting driver at our new chardev
 
-cmdline="program-name"
-input=""
-input_file=""
-done=0
-
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        -i)
-            input_file="$2"
-            shift
-            shift
-            ;;
-        *)
-            cmdline="$cmdline $1"
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
-done
-
-semi=enable=on,chardev=stdio0,arg="$cmdline"
+semi=enable=on,chardev=stdio0,arg="program-name $args"
 
 # Disable monitor
 
@@ -183,15 +174,8 @@ mon=none
 
 serial=none
 
-case "$input_file" in
-    "")
-        input_file=`mktemp`
-        trap 'rm "$input_file"' 0
-        echo "$input" > "$input_file"
-        ;;
-esac        
-
-"$qemu" \
+echo $stdin | \
+  "$qemu" \
     -chardev $chardev \
     -semihosting-config "$semi" \
     -monitor "$mon" \
@@ -201,4 +185,4 @@ esac
     -kernel "$elf" \
     -nographic \
     -bios none \
-    -m 2G "$@" < "$input_file"
+    -m 2G

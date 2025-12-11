@@ -39,35 +39,29 @@ simulator="qemu-system-hexagon"
 elf="$1"
 shift
 
-cmdline="program-name"
-input=""
-done=0
-
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        *)
-            cmdline="$cmdline $1"
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
 done
 
-echo $input
-echo $cmdline
-
-echo $input | $simulator  -cpu v68 -M virt -kernel $elf
+echo $stdin | $simulator  -cpu v68 -M virt -kernel $elf -append "$args"

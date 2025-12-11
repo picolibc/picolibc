@@ -33,71 +33,53 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifndef _HEXAGON_SEMIHOST_H_
-#define _HEXAGON_SEMIHOST_H_
+/* Basic test to verify argv/argc parsing via semihosting. */
 
-#include <stdint.h>
-#include <sys/stat.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-/* System call codes */
-enum hexagon_system_call_code {
-    SYS_OPEN = 1,
-    SYS_CLOSE = 2,
-    SYS_READ = 6,
-    SYS_WRITE = 5,
-    SYS_ISTTY = 9,
-    SYS_SEEK = 10,
-    SYS_FLEN = 12,
-    SYS_REMOVE = 14,
-    SYS_GET_CMDLINE = 21,
-    SYS_EXIT = 24,
-    SYS_FTELL = 0x100,
-};
+static const char *expect_prog = "test-argv";
+static const char *expect_args[] = { "hello", "world" };
 
-/* Software interrupt */
-#define SWI "trap0 (#0)"
+#define EXPECT_NARG (1 + (int)(sizeof(expect_args) / sizeof(expect_args[0])))
 
-/* Hexagon semihosting calls */
-int flen(int fd);
-int hexagon_ftell(int fd);
-int sys_semihost_get_cmdline(char *buffer, int count);
+int
+main(int argc, char **argv)
+{
+#if defined(__HEXAGON_ARCH__)
+    unsigned i;
+    int errors = 0;
 
-int hexagon_semihost(enum hexagon_system_call_code code, int *args);
+    if (argc != EXPECT_NARG) {
+        printf("argc is %d expect %d\n", argc, (int)EXPECT_NARG);
+        errors = 1;
+    }
 
-void hexagon_semihost_errno(int err);
-enum {
-    HEX_EPERM = 1,
-    HEX_ENOENT = 2,
-    HEX_EINTR = 4,
-    HEX_EIO = 5,
-    HEX_ENXIO = 6,
-    HEX_EBADF = 9,
-    HEX_EAGAIN = 11,
-    HEX_ENOMEM = 12,
-    HEX_EACCES = 13,
-    HEX_EFAULT = 14,
-    HEX_EBUSY = 16,
-    HEX_EEXIST = 17,
-    HEX_EXDEV = 18,
-    HEX_ENODEV = 19,
-    HEX_ENOTDIR = 20,
-    HEX_EISDIR = 21,
-    HEX_EINVAL = 22,
-    HEX_ENFILE = 23,
-    HEX_EMFILE = 24,
-    HEX_ENOTTY = 25,
-    HEX_ETXTBSY = 26,
-    HEX_EFBIG = 27,
-    HEX_ENOSPC = 28,
-    HEX_ESPIPE = 29,
-    HEX_EROFS = 30,
-    HEX_EMLINK = 31,
-    HEX_EPIPE = 32,
-    HEX_ERANGE = 34,
-    HEX_ENAMETOOLONG = 36,
-    HEX_ENOSYS = 38,
-    HEX_ELOOP = 40,
-    HEX_EOVERFLOW = 75,
-};
+    /* Check program name tail matches 'test-argv' */
+    const char *tail = strrchr(argv[0], '/');
+    tail = tail ? tail + 1 : argv[0];
+    if (strcmp(tail, expect_prog) != 0) {
+        printf("argv[0] tail is '%s' expect '%s'\n", tail, expect_prog);
+        errors = 1;
+    }
 
+    /* Check remaining arguments */
+    for (i = 1; (int)i < argc; i++) {
+        const char *exp = expect_args[i - 1];
+        if (strcmp(argv[i], exp) != 0) {
+            printf("argv[%u] is '%s' expect '%s'\n", i, argv[i], exp);
+            errors = 1;
+        }
+    }
+
+    return errors;
+#else
+    printf("Hexagon-only argv test; skipping\n");
+    (void)argc;
+    (void)argv;
+    (void)expect_prog;
+    (void)expect_args;
+    return 77;
 #endif
+}

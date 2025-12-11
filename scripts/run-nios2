@@ -40,39 +40,36 @@ dir="$(dirname "$0")"
 elf="$1"
 shift
 
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
 qemu="qemu-system-nios2"
 
 # Point the semihosting driver at our new chardev
 
-cmdline="program-name"
-input=""
-done=0
-
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        *)
-            cmdline="$cmdline $1"
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
-done
-
-semi=enable=on,chardev=stdio0,arg="$cmdline"
+semi=enable=on,chardev=stdio0,arg="program-name $args"
 
 # Disable monitor
 
@@ -84,7 +81,7 @@ serial=stdio
 
 machine=10m50-ghrd
 
-echo "$input" | $qemu \
+echo "$stdin" | $qemu \
   -chardev stdio,id=stdio0,mux=on \
   -machine $machine \
   -serial none \
@@ -92,4 +89,4 @@ echo "$input" | $qemu \
   -mon chardev=stdio0,mode=readline \
   -net none \
   -nographic \
-  -kernel "$elf" "$@"
+  -kernel "$elf"
