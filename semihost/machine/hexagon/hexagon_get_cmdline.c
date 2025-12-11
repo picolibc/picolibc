@@ -36,7 +36,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hexagon_semihost.h"
 
 int
-sys_get_cmdline(char *buffer, int count)
+sys_semihost_get_cmdline(char *buffer, int count)
 {
     /* read a buffer from file */
     int args[] = { (int)buffer, count };

@@ -494,7 +494,7 @@ foreach params : targets
     test(t1 + target + '-success',
          test_gets,
          depends: bios_bin,
-         args: ['hi'],
+         args: ['--stdin', 'hi'],
          suite: 'test',
          env: test_env,
          timeout: 90
@@ -504,7 +504,7 @@ foreach params : targets
     test(t1 + target + '-failure',
          test_gets,
          depends: bios_bin,
-         args: ['this is a long string that should overflow the buffer'],
+         args: ['--stdin', 'this is a long string that should overflow the buffer'],
          suite: 'test',
          env: test_env,
          timeout: 90,
@@ -581,6 +581,20 @@ foreach params : targets
          suite: 'test',
 	 env: test_env)
   endforeach
+
+  # Generic argv test source skips when not Hexagon
+  test('test-argv' + target,
+       executable('test-argv' + target,
+                  ['test-argv.c', 'lock-valid.c'],
+                  c_args: printf_compile_args_d + _c_args,
+                  link_args: printf_link_args_d + _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
+       args: ['--args', 'hello world'],
+       depends: bios_bin,
+       suite: 'test',
+       env: test_env)
 
   if have_cplusplus
     t1 = 'test-cplusplus'

@@ -1,5 +1,35 @@
 #!/bin/sh
-lm32-unknown-elf-run "$@"
+
+# select the program
+elf="$1"
+shift
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      echo "Unknown option: $1"
+      exit 1
+      ;;
+  esac
+done
+
+lm32-unknown-elf-run $elf
 ret=$?
 case "$1" in
     *printf*-tests*)
