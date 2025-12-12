@@ -39,6 +39,7 @@ picolibc_sources(
   bufio.c
   clearerr.c
   compare_exchange.c
+  dprintf.c
   dtox_engine.c
   ecvt.c
   ecvtf.c
@@ -153,6 +154,7 @@ picolibc_sources(
   ungetwc.c
   vasnprintf.c
   vasprintf.c
+  vdprintf.c
   vffprintf.c
   vffscanf.c
   vfiprintf.c

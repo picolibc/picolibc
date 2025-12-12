@@ -396,6 +396,9 @@ typedef __gnuc_va_list va_list;
 #  include <stdarg.h>
 # endif
 
+int dprintf(int fd, const char *__restrict fmt, ...);
+int vdprintf(int fd, const char *__restrict fmt, va_list ap);
+
 #endif
 
 int fgetpos(FILE * __restrict stream, fpos_t * __restrict pos);
