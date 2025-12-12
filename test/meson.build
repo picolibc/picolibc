@@ -96,6 +96,7 @@ if tests_enable_posix_io
                     'test-fgetc',
                     'test-fgets-eof',
                     'test-wchar',
+                    'test-dprintf',
                    ]
   endif
 endif
