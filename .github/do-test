@@ -55,7 +55,7 @@ case "$*" in
 	;;
 esac
 
-OPTIONS="$SANITIZER"
+OPTIONS="$SANITIZER -Dexhaustive-math-tests=native"
 
 (mkdir "$DIR" || exit 1
  cd "$DIR" || exit 2

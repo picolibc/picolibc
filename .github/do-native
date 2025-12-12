@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
 HERE=`dirname "$0"`
-"$HERE"/do-test-noopt native "$@"
-"$HERE"/do-test-noopt native-m32 "$@"
+"$HERE"/do-test-noopt native -Dexhaustive-math-tests=true "$@"
+"$HERE"/do-test-noopt native-m32 -Dexhaustive-math-tests=true "$@"

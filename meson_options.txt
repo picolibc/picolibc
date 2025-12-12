@@ -109,7 +109,7 @@ option('native-tests', type: 'boolean', value: false,
        description: 'Run some tests against native libc too')
 option('native-math-tests', type: 'boolean', value: true,
        description: 'Run math tests against native libm when native-tests is enabled')
-option('exhaustive-math-tests', type: 'combo', choices: ['true', 'false', 'native'], value: 'native',
+option('exhaustive-math-tests', type: 'combo', choices: ['true', 'false', 'native'], value: 'false',
        description: 'Run exhaustive binary32 math tests. If set to native, enable when native tests are enabled')
 option('use-stdlib', type: 'boolean', value: false,
        description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
