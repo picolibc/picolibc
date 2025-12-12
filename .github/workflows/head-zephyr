@@ -37,7 +37,7 @@ jobs:
 
       - name: Cache the Docker Image
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
