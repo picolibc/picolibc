@@ -794,8 +794,7 @@ int vfprintf (FILE * stream, const CHAR *fmt, va_list ap_orig)
     }
     if (stream)
         stream->flags |= __SERR;
-    stream_len = -1;
-    goto ret;
+    return -1;
 #endif
 }
 
