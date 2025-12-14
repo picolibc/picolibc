@@ -178,7 +178,6 @@ enable_malloc = get_option('enable-malloc')
 newlib_nano_malloc = get_option('newlib-nano-malloc')
 nano_malloc_clear_freed = get_option('nano-malloc-clear-freed')
 
-newlib_elix_level = get_option('newlib-elix-level')
 c_args = core_c_args
 native_common_args = ['-DNO_NEWLIB']
 
@@ -302,9 +301,6 @@ io_c99_formats = get_option('io-c99-formats')
 io_pos_args = get_option('io-pos-args')
 io_long_double = get_option('io-long-double')
 
-# Select stdio implementation
-tinystdio = get_option('tinystdio')
-
 # Figure out what flags the linker supports
 
 has_link_defsym = false
@@ -374,10 +370,10 @@ endforeach
 
 stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
 
-# tinystdio options
-posix_console = tinystdio and get_option('posix-console')
-io_float_exact = not tinystdio or get_option('io-float-exact')
-atomic_ungetc = tinystdio and get_option('atomic-ungetc')
+# stdio options
+posix_console = get_option('posix-console')
+io_float_exact = get_option('io-float-exact')
+atomic_ungetc = get_option('atomic-ungetc')
 _line = get_option('format-default')
 # Pick off just the leading character
 if meson.version().version_compare('>=0.56')
@@ -387,18 +383,18 @@ else
 endif
 
 printf_aliases = get_option('printf-aliases')
-io_percent_b = tinystdio and get_option('io-percent-b')
-printf_small_ultoa = tinystdio and get_option('printf-small-ultoa')
-printf_percent_n = tinystdio and get_option('printf-percent-n')
-minimal_io_long_long = tinystdio and get_option('minimal-io-long-long')
-fast_bufio = tinystdio and get_option('fast-bufio')
-io_wchar = tinystdio and get_option('io-wchar')
-stdio_locking = tinystdio and get_option('stdio-locking') and not get_option('single-thread')
+io_percent_b = get_option('io-percent-b')
+printf_small_ultoa = get_option('printf-small-ultoa')
+printf_percent_n = get_option('printf-percent-n')
+minimal_io_long_long = get_option('minimal-io-long-long')
+fast_bufio = get_option('fast-bufio')
+io_wchar = get_option('io-wchar')
+stdio_locking = get_option('stdio-locking') and not get_option('single-thread')
 
 foreach format : ['d', 'f', 'l', 'i', 'm']
 
   compile_variable = 'printf_compile_args_@0@'.format(format)
-  if tinystdio and printf_aliases
+  if printf_aliases
     compile_value = ['-D_PICOLIBC_PRINTF=\'@0@\''.format(format),
                      '-D_PICOLIBC_SCANF=\'@0@\''.format(format)]
   else
@@ -408,7 +404,7 @@ foreach format : ['d', 'f', 'l', 'i', 'm']
 
   link_variable = 'printf_link_args_@0@'.format(format)
   link_value = compile_value
-  if tinystdio and printf_aliases
+  if printf_aliases
     if format_default != format
       if has_link_defsym
         link_value += '-Wl,--defsym=@0@vfprintf=@0@__@1@_vfprintf'.format(global_prefix, format)
@@ -423,47 +419,10 @@ foreach format : ['d', 'f', 'l', 'i', 'm']
 
 endforeach
 
-if tinystdio and enable_tests and not (has_link_defsym or has_link_alias)
+if enable_tests and not (has_link_defsym or has_link_alias)
   # If the alias flag is not supported and we are building tests, emit an
   # error here to avoid surprising test failures.
   error('Symbol alias linker flag not supported - printf tests will fail!')
-endif
-
-# A bunch of newlib-stdio only options
-newlib_fvwrite_in_streamio = get_option('newlib-fvwrite-in-streamio')
-newlib_fseek_optimization = get_option('newlib-fseek-optimization')
-newlib_nano_formatted_io = get_option('newlib-nano-formatted-io')
-newlib_io_float = get_option('newlib-io-float')
-newlib_stdio64 = get_option('newlib-stdio64')
-newlib_wide_orient = get_option('newlib-wide-orient')
-newlib_have_fcntl = get_option('newlib-have-fcntl')
-
-# Check for a bunch of newlib-stdio only options and complain
-# if they are selected while using tinystdio
-
-if tinystdio
-  if newlib_io_float
-    error('tinystdio uses a run-time mechanism to select floating point io (newlib-io-float)')
-  endif
-  if newlib_fvwrite_in_streamio
-    error('tinystdio has no fvwrite support (newlib-fvwrite-in-streamio)')
-  endif
-  if newlib_fseek_optimization
-    error('tinystdio has no fseek support (newlib-fseek-optimization)')
-  endif
-  if newlib_nano_formatted_io
-    error('tinystdio uses a run-time mechanism to select smaller printf code (newlib-nano-formatted-io)')
-  endif
-  if newlib_wide_orient
-    error('tinystdio does not support the wide-orient option (newlib-wide-orient)')
-  endif
-else
-  if posix_console
-    error('newlib stdio does not support the posix-console option (posix-console)')
-  endif
-  if io_pos_args
-    error('newlib stdio has bugs with positional arguments (io-pos-args)')
-  endif	
 endif
 
 if host_cpu_family == ''
@@ -617,7 +576,7 @@ endif
 # Handle old-style printf/scanf selection mechanism in the specs file
 
 specs_printf = ''
-if tinystdio and printf_aliases
+if printf_aliases
   specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__d_vfprintf}' +
 		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__d_vfscanf}' +
                 ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__f_vfprintf}' +
@@ -1409,7 +1368,7 @@ conf_data.set('__IO_LONG_DOUBLE', io_long_double)
 conf_data.set('__IO_WCHAR', io_wchar)
 conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'), description: 'assert() is verbose by default')
 conf_data.set('__SINGLE_THREAD', get_option('single-thread'), description: 'Disable multi-thread support')
-conf_data.set('__HAVE_FCNTL', newlib_have_fcntl, description: 'System provides fcntl function')
+conf_data.set('__HAVE_FCNTL', get_option('have-fcntl'), description: 'System provides fcntl function')
 conf_data.set('__NANO_MALLOC', newlib_nano_malloc, description: 'Provide smaller malloc implementation')
 conf_data.set('__NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
 conf_data.set('__IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
@@ -1442,33 +1401,21 @@ if not picoexit
   conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 endif
 
-conf_data.set('__TINY_STDIO', tinystdio, description: 'Use tiny stdio from gcc avr')
-if tinystdio
-  conf_data.set('__IO_DEFAULT', '\'@0@\''.format(format_default),
-                description: 'The default printf and scanf variants')
-  conf_data.set('__IO_SMALL_ULTOA',
-                printf_small_ultoa,
-                description: 'avoid software division in decimal conversion')
-  conf_data.set('__IO_PERCENT_N',
-                printf_percent_n,
-                description: 'support %n in printf format strings')
-  conf_data.set('__ATOMIC_UNGETC',
-                atomic_ungetc,
-                description: 'Use atomics for fgetc/ungetc for re-entrancy')
-  conf_data.set('__STDIO_LOCKING',
-                stdio_locking,
-                description: 'Perform POSIX-conforming file locking for all stdio operations')
-else
-  conf_data.set('__IO_NO_FLOATING_POINT', not newlib_io_float)
-  conf_data.set('__IO_FLOATING_POINT', newlib_io_float)
-  conf_data.set('__LARGE64_FILES', newlib_stdio64)
-  conf_data.set('__ELIX_LEVEL', newlib_elix_level)
-  conf_data.set('__FVWRITE_IN_STREAMIO', newlib_fvwrite_in_streamio)
-  conf_data.set('__FSEEK_OPTIMIZATION', newlib_fseek_optimization)
-  conf_data.set('__WIDE_ORIENT', newlib_wide_orient)
-  conf_data.set('__UNBUF_STREAM_OPT', get_option('newlib-unbuf-stream-opt'))
-  conf_data.set('__NANO_FORMATTED_IO', newlib_nano_formatted_io)
-endif
+conf_data.set('__TINY_STDIO', true, description: 'Use tiny stdio from gcc avr')
+conf_data.set('__IO_DEFAULT', '\'@0@\''.format(format_default),
+              description: 'The default printf and scanf variants')
+conf_data.set('__IO_SMALL_ULTOA',
+              printf_small_ultoa,
+              description: 'avoid software division in decimal conversion')
+conf_data.set('__IO_PERCENT_N',
+              printf_percent_n,
+              description: 'support %n in printf format strings')
+conf_data.set('__ATOMIC_UNGETC',
+              atomic_ungetc,
+              description: 'Use atomics for fgetc/ungetc for re-entrancy')
+conf_data.set('__STDIO_LOCKING',
+              stdio_locking,
+              description: 'Perform POSIX-conforming file locking for all stdio operations')
 
 if enable_picocrt
   conf_data.set('__PICOCRT_ENABLE_MMU', picocrt_enable_mmu,
@@ -1561,13 +1508,7 @@ conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major
 conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
-if tinystdio
-  stdio_inc_dir = 'newlib/libc/tinystdio'
-else
-  stdio_inc_dir = 'newlib/libc/stdio'
-endif
-
-inc_dirs = [stdio_inc_dir, 'newlib/libc/locale', '.', 'newlib/libc/include']
+inc_dirs = ['newlib/libc/tinystdio', 'newlib/libc/locale', '.', 'newlib/libc/include']
 
 machine_dir = 'newlib/libc/machine' / host_cpu_family
 if fs.is_dir(machine_dir)

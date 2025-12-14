@@ -46,7 +46,7 @@ libc_tests_common = [
 
 libc_tests_picolibc = libc_tests_common
 
-if (tinystdio and io_float_exact) or newlib_io_float
+if io_float_exact
   libc_tests_picolibc += ['strtod']
 endif
 

@@ -33,11 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = ['nulprintf']
-
-if not tinystdio and not newlib_nano_formatted_io and newlib_elix_level >= 4
-  tests += ['swprintf']
-endif
+tests = ['nulprintf', 'swprintf']
 
 foreach params : targets
   target = params['name']

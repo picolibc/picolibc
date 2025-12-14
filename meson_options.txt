@@ -124,8 +124,6 @@ option('fake-semihost', type: 'boolean', value: true,
 # Stdio options
 #
 
-option('tinystdio', type: 'boolean', value: true,
-       description: 'Use tiny stdio from avr libc')
 option('io-c99-formats', type: 'boolean', value: true,
        description: 'enable C99 support in IO functions like printf/scanf')
 option('io-long-long', type: 'boolean', value: false,
@@ -134,11 +132,6 @@ option('io-pos-args', type: 'boolean', value: false,
        description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
 option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
-
-#
-# Tinystdio options
-#
-
 option('io-float-exact', type: 'boolean', value: true,
        description: 'use float/string code which supports round-tripping')
 option('atomic-ungetc', type: 'boolean', value: true,
@@ -163,29 +156,8 @@ option('io-wchar', type: 'boolean', value: false,
        description: 'enable wide character support in printf/scanf (requires multi-byte support)')
 option('stdio-locking', type: 'boolean', value: false,
        description: 'perform POSIX-conforming file locking for all stdio operations')
-
-#
-# Legacy stdio options
-#
-
-option('newlib-elix-level', type: 'integer', value: 4,
-       description: 'desired elix library level (0-4)')
-option('newlib-fseek-optimization', type: 'boolean', value: false,
-       description: 'enable fseek optimization')
-option('newlib-fvwrite-in-streamio', type: 'boolean', value: false,
-       description: 'disable iov in streamio')
-option('newlib-io-float', type: 'boolean', value: false,
-       description: 'enable printf/scanf family float support')
-option('newlib-nano-formatted-io', type: 'boolean', value: false,
-       description: 'Use nano version formatted IO')
-option('newlib-stdio64', type: 'boolean', value: true,
-       description: 'Include stdio64 with newlib stdio')
-option('newlib-unbuf-stream-opt', type: 'boolean', value: false,
-       description: 'enable unbuffered stream optimization in streamio')
-option('newlib-wide-orient', type: 'boolean', value: false,
-       description: 'Track wide orientation in streams.')
-option('newlib-have-fcntl', type: 'boolean', value: false,
-       description: 'System has fcntl function')
+option('have-fcntl', type: 'boolean', value: false,
+       description: 'system provides fcntl function')
 
 #
 # Internationalization options

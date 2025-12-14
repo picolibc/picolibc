@@ -158,38 +158,6 @@ srcs_stdlib = [
     'ignore_handler_s.c',
 ]
 
-srcs_stdlib_stdio = [
-    'dtoa.c',
-    'ecvtbuf.c',
-    'efgcvt.c',
-    'gdtoa-gethex.c',
-    'gdtoa-hexnan.c',
-    'ldtoa.c',
-    'mprec.c',
-    'strtod.c',
-    'strtodg.c',
-    'strtol.c',
-    'strtoul.c',
-    'strtoll.c',
-    'strtoull.c',
-    'strtoimax.c',
-    'strtoumax.c',
-    'strtold.c',
-    'strtorx.c',
-    'wcstod.c',
-    'wcstol.c',
-    'wcstold.c',
-    'wcstoul.c',
-    'wcstoimax.c',
-    'wcstoll.c',
-    'wcstoull.c',
-    'wcstoumax.c',
-]
-
-if not tinystdio
-  srcs_stdlib += srcs_stdlib_stdio
-endif
-
 if picoexit
   srcs_stdlib += pico_exit_srcs_stdlib
 else

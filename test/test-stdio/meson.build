@@ -69,20 +69,18 @@ if enable_native_tests
 endif
 
 if tests_enable_posix_io
-  tests += ['test-posix-io']
-  if tinystdio
-    tests += [
-      'test-dprintf',
-      'test-fgetc',
-      'test-fgets-eof',
-      'test-fopen',
-      'test-fread-fwrite',
-      'test-mktemp',
-      'test-tmpnam',
-      'test-ungetc-ftell',
-      'test-wchar',
-    ]
-  endif
+  tests += [
+    'test-posix-io',
+    'test-dprintf',
+    'test-fgetc',
+    'test-fgets-eof',
+    'test-fopen',
+    'test-fread-fwrite',
+    'test-mktemp',
+    'test-tmpnam',
+    'test-ungetc-ftell',
+    'test-wchar',
+  ]
 endif
 
 if get_option('test-stdin')
