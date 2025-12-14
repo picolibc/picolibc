@@ -1207,10 +1207,6 @@ ATF_TC_BODY(test22, tc)
 
 ATF_TP_ADD_TCS(tp)
 {
-#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
-        printf("legacy stdio fails fmemopen tests\n");
-        return 77;
-#endif
 	ATF_TP_ADD_TC(tp, test00);
 	ATF_TP_ADD_TC(tp, test01);
 	ATF_TP_ADD_TC(tp, test02);

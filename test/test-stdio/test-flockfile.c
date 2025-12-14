@@ -53,7 +53,7 @@
 #endif
 
 /* When __STDIO_LOCKING isn't defined, use flockfile/funlockfile */
-#if defined(__TINY_STDIO) && !defined(__STDIO_LOCKING)
+#if defined(__PICOLIBC__) && !defined(__STDIO_LOCKING)
 #define LOCK(out) flockfile(out)
 #define UNLOCK(out) funlockfile(out)
 #else
@@ -116,7 +116,7 @@ stop_thread(void)
 }
 #endif
 
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
 
 static int fd;
 
@@ -146,7 +146,7 @@ static int myclose(FILE *file)
 }
 
 static struct __file_close myout = FDEV_SETUP_CLOSE(myput, myget, NULL, myclose, _FDEV_SETUP_WRITE);
-#endif /* __TINY_STDIO */
+#endif /* __PICOLIBC__ */
 
 int
 main(void)
@@ -161,7 +161,7 @@ main(void)
     return(77);
 #endif
 
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
     fd = creat(TEST_FILE_NAME, 0666);
     if (fd < 0) {
         perror(TEST_FILE_NAME);

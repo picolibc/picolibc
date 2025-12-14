@@ -35,10 +35,7 @@
 
 src_semihost_fake = files([
                            'fake_exit.c',
+                           'fake_io.c',
                            'fake_kill.c',
                            'fake_stub.c',
                          ])
-
-if tinystdio
-  src_semihost_fake += files('fake_io.c')
-endif

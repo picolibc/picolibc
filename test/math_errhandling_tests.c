@@ -1511,13 +1511,8 @@ static TEST_CONST struct {
         { 0 },
 };
 
-#if defined(__TINY_STDIO) || !defined(__IO_NO_FLOATING_POINT)
 #define PRINT	if (!printed++) printf("    %-30.30s = %g errno %d (%s) except %s\n", \
                        makemathname(tests)[t].name, (double) v, err, strerror(err), e_to_str(except))
-#else
-#define PRINT	if (!printed++) printf("    %-30.30s = (float) errno %d (%s) except %s\n", \
-                       makemathname(tests)[t].name, err, strerror(err), e_to_str(except))
-#endif
 
 #define IPRINT	if (!printed++) printf("    %-30.30s = %lld errno %d (%s) except %s\n", \
                        makemathname(itests)[t].name, iv, err, strerror(err), e_to_str(except))

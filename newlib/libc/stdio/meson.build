@@ -32,7 +32,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_tinystdio = [
+srcs_stdio = [
   'asnprintf.c',
   'asprintf.c',
   'atomic_load.c',
@@ -228,48 +228,32 @@ srcs_dtoa_float = [
 ]
 
 if io_float_exact
-  srcs_tinystdio += srcs_dtoa_ryu
+  srcs_stdio += srcs_dtoa_ryu
 else
-  srcs_tinystdio += srcs_dtoa_float
+  srcs_stdio += srcs_dtoa_float
 endif
 
 # stdin/stdout/stderr using POSIX APIs
-srcs_tinystdio_posix_console = [
+srcs_stdio_posix_console = [
   'posixiob_stdin.c',
   'posixiob_stdout.c',
   'posixiob_stderr.c',
 ]
 
 if posix_console
-  srcs_tinystdio += srcs_tinystdio_posix_console
+  srcs_stdio += srcs_stdio_posix_console
 endif
 
-inc_headers = ['stdio.h', 'stdio-bufio.h']
-if really_install
-  install_headers(inc_headers,
-                  install_dir: include_dir)
-endif
-
-srcs_tinystdio_use = []
-foreach file : srcs_tinystdio
+srcs_stdio_use = []
+foreach file : srcs_stdio
   s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
-    message('libc/tinystdio/' + file + ': machine overrides generic')
+    message('libc/stdio/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
-    message('libc/tinystdio/' + s_file + ': machine overrides generic')
+    message('libc/stdio/' + s_file + ': machine overrides generic')
   else
-    srcs_tinystdio_use += file
+    srcs_stdio_use += file
   endif
 endforeach
 
-src_tinystdio = files(srcs_tinystdio_use)
-
-if enable_cdefs_tests
-  foreach header : inc_headers
-    test_name = 'check-cdef-' + header
-    test(test_name,
-         validate_cdefs,
-         args: [meson.current_source_dir() / header] + cc.cmd_array() + c_args + inc_args,
-         suite: 'headers')
-  endforeach
-endif
+src_stdio = files(srcs_stdio_use)

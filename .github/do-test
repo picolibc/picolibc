@@ -46,15 +46,6 @@ case "$TARGET" in
 	;;
 esac
 
-# Disable the sanitizer when not using tinystdio as the stdio code is
-# full of problems
-
-case "$*" in
-    *-Dtinystdio=false*)
-	SANITIZER=""
-	;;
-esac
-
 OPTIONS="$SANITIZER -Dexhaustive-math-tests=native"
 
 (mkdir "$DIR" || exit 1

@@ -69,7 +69,7 @@ static const struct {
 	{ "%.0d", 0, "" },
 	{ "%.0o", 0, "" },
 	{ "%#.0d", 0, "" },
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
 	{ "%#.0o", 0, "" },
 #endif
 	{ "%#.0x", 0, "" },
@@ -115,11 +115,11 @@ static const struct {
 	{ "%.2f", 1.375, "1.38" },
 	{ "%.1f", 1.375, "1.4" },
 	{ "%.15f", 1.1, "1.100000000000000" },
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
 	{ "%.16f", 1.1, "1.1000000000000000" },
 	{ "%.17f", 1.1, "1.10000000000000000" },
 #else
-        /* legacy stdio adds non-zero digits beyond needed precision */
+        /* glibc stdio adds non-zero digits beyond needed precision */
 	{ "%.16f", 1.1, "1.1000000000000001" },
 	{ "%.17f", 1.1, "1.10000000000000009" },
 #endif
@@ -146,19 +146,19 @@ static const struct {
 
 	/* pi in double precision, printed to a few extra places */
 	{ "%.15f", M_PI, "3.141592653589793" },
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
 	{ "%.18f", M_PI, "3.141592653589793000" },
 #else
-        /* legacy stdio adds non-zero digits beyond needed precision */
+        /* glibc stdio adds non-zero digits beyond needed precision */
 	{ "%.18f", M_PI, "3.141592653589793116" },
 #endif
 
 	/* exact conversion of large integers */
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
 	{ "%.0f", 340282366920938463463374607431768211456.0,
 	         "340282366920938500000000000000000000000" },
 #else
-        /* legacy stdio adds non-zero digits beyond needed precision */
+        /* glibc stdio adds non-zero digits beyond needed precision */
 	{ "%.0f", 340282366920938463463374607431768211456.0,
 	         "340282366920938463463374607431768211456" },
 #endif
@@ -182,7 +182,6 @@ static int test_snprintf(void)
 	TEST(i, b[5], 'x', "buffer overrun");
 
 #if __SIZEOF_DOUBLE__ == 8
-#if defined(__TINY_STDIO) || (!defined(__IO_NO_FLOATING_POINT) && (!defined(__IO_LONG_DOUBLE) || defined(_LDBL_EQ_DBL)))
 	/* Perform ascii arithmetic to test printing tiny doubles */
 	TEST(i, snprintf(b, sizeof b, "%.1022f", 0x1p-1021), 1024, "%d != %d");
 	b[1] = '0';
@@ -197,9 +196,8 @@ static int test_snprintf(void)
 //	for (j=2; b[j]=='0'; j++);
 //	TEST(i, j, 1024, "%d != %d");
 #endif
-#endif
 
-#if !defined(__TINY_STDIO) || defined(__IO_PERCENT_N)
+#if !defined(__PICOLIBC__) || defined(__IO_PERCENT_N)
         /* Tests for %hhn, %hn, %n, %ln, %lln */
         int len;
         short slen;
@@ -228,12 +226,10 @@ static int test_snprintf(void)
         TEST(i, snprintf(b, 2, "%d%n456", n, &len), 6, "length for %n");
         TEST_S(b, "1", "incorrect output");
         TEST(i, len, 3, "incorrect len");
-#if !defined(__PICOLIBC__) || defined(__TINY_STDIO) || defined(__IO_LONG_LONG)
         long long lllen;
         TEST(i, snprintf(b, sizeof b, "%d%lln456", n, &lllen), 6, "length for %lln");
         TEST_S(b, "123456", "incorrect output");
         TEST(i, lllen, 3, "incorrect len");
-#endif
 #endif
 
 #ifndef DISABLE_SLOW_TESTS
@@ -245,12 +241,13 @@ static int test_snprintf(void)
 #endif
 	for (j=0; int_tests[j].fmt; j++) {
                 TEST(i, snprintf(b, sizeof b, int_tests[j].fmt, int_tests[j].i), (int) strlen(b), "%d != %d");
+//                printf("fmt '%s' got '%s' want '%s'\n", int_tests[j].fmt, b, int_tests[j].expect);
 		TEST_S(b, int_tests[j].expect, "bad integer conversion");
 	}
 
         (void) fp_tests;
         (void) k;
-#if !defined(__IO_NO_FLOATING_POINT) && defined(__IO_FLOAT_EXACT) && __SIZEOF_DOUBLE__ == 8
+#if (!defined(__PICOLIBC__) || defined(__IO_FLOAT_EXACT)) && __SIZEOF_DOUBLE__ == 8
 	for (j=0; fp_tests[j].fmt; j++) {
 		TEST(i, snprintf(b, sizeof b, fp_tests[j].fmt, fp_tests[j].f), (int) strlen(b), "%d != %d");
 		TEST_S(b, fp_tests[j].expect, "bad floating point conversion");

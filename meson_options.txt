@@ -129,7 +129,7 @@ option('io-c99-formats', type: 'boolean', value: true,
 option('io-long-long', type: 'boolean', value: false,
        description: 'enable long long type support in IO functions like printf/scanf')
 option('io-pos-args', type: 'boolean', value: false,
-       description: 'enable printf-family positional arg support (always enabled for tinystdio float)')
+       description: 'enable printf-family positional arg support (always enabled for float)')
 option('io-long-double', type: 'boolean', value: false,
        description: 'enable long double type support in IO functions printf/scanf')
 option('io-float-exact', type: 'boolean', value: true,
@@ -143,7 +143,7 @@ option('format-default', type: 'combo', choices: ['double', 'float', 'long-long'
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
 option('io-percent-b', type: 'boolean', value: false,
-       description: 'enable proposed %b/%B format in printf and scanf in tinystdio (default: false)')
+       description: 'enable proposed %b/%B format in printf and scanf (default: false)')
 option('printf-small-ultoa', type: 'boolean', value: true,
        description: 'Avoid softare division in decimal conversions')
 option('printf-percent-n', type: 'boolean', value: false,

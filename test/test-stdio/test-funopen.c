@@ -40,19 +40,9 @@
 
 #ifdef __PICOLIBC__
 
-#ifndef __TINY_STDIO
-# define IO_T int
-# define BUF_T char
-# ifdef __LARGE64_FILES
-#  define SEEK_T _fpos64_t
-# else
-#  define SEEK_T fpos_t
-# endif
-#else
 # define IO_T ssize_t
 # define BUF_T void
 # define SEEK_T __off_t
-#endif
 
 static char test_buf[1024];
 static SEEK_T test_pos;

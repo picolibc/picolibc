@@ -50,7 +50,7 @@
 
 #ifndef __PICOLIBC__
 # define printf_float(x) ((double) (x))
-#elif defined(__TINY_STDIO)
+#else
 # if !defined(_HAS_IO_FLOAT) && !defined(_HAS_IO_DOUBLE)
 #  define __IO_NO_FLOATING_POINT
 # endif
@@ -63,44 +63,12 @@
 # ifndef _HAS_IO_LONG_LONG
 #  define NO_LONG_LONG
 # endif
-# ifndef __HAS_C99_FORMATS
+# ifndef _HAS_IO_C99_FORMATS
 #  define NO_C99_FORMATS
 # endif
 # ifdef _HAS_IO_PERCENT_B
 #  define BINARY_FORMAT
 # endif
-#else
-#define printf_float(x) ((double) (x))
-
-#ifndef __WIDE_ORIENT
-#define NO_WIDE_IO
-#endif
-
-#ifndef __IO_POS_ARGS
-#define NO_POS_ARGS
-#endif
-#if !defined(__IO_C99_FORMATS) || defined(__NANO_FORMATTED_IO)
-# define NO_C99_FORMATS
-#endif
-
-#if __SIZEOF_DOUBLE__ != 8
-#define __IO_NO_FLOATING_POINT
-#endif
-
-#ifndef __IO_LONG_LONG
-#define NO_LONG_LONG
-#endif
-
-#ifdef __NANO_FORMATTED_IO
-
-#ifndef __IO_NO_FLOATING_POINT
-extern int _printf_float();
-extern int _scanf_float();
-
-int (*_reference_printf_float)() = _printf_float;
-int (*_reference_scanf_float)() = _scanf_float;
-#endif
-#endif
 #endif
 
 #if !defined(__IO_NO_FLOATING_POINT)
@@ -126,7 +94,7 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #define nextafter(a,b) nextafterf((float)(a), (float)(b))
 #define fabs(a) fabsf(a)
 #define scanf_format "%f"
-#if (defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT))
+#if (defined(__PICOLIBC__) && !defined(__IO_FLOAT_EXACT))
 #define ERROR_MAX 1e-6
 #else
 #define ERROR_MAX 0
@@ -134,25 +102,16 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #else
 #define float_type double
 #define scanf_format "%lf"
-#if defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT)
+#if defined(__PICOLIBC__) && !defined(__IO_FLOAT_EXACT)
 # if __SIZEOF_DOUBLE__ == 4
 #  define ERROR_MAX 1e-6
 # else
 #  define ERROR_MAX 1e-14
 # endif
 #else
-#if (!defined(__TINY_STDIO) && defined(__IO_LONG_DOUBLE))
-/* __ldtoa is really broken */
-#define ERROR_MAX 1e-5
-#else
 #define ERROR_MAX 0
 #endif
 #endif
-#endif
-#endif
-
-#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
-#define LEGACY_NEWLIB
 #endif
 
 #ifndef NO_WIDE_IO
@@ -174,18 +133,14 @@ static const struct {
     { .str = L"foo\t", .fmt = L"foo %d", .expect = -1 },
     { .str = L"foo\t", .fmt = L"foo\t%d", .expect = -1 },
     { .str = L"foo", .fmt = L"foo", .expect = 0 },
-#ifndef LEGACY_NEWLIB
     { .str = L"foon", .fmt = L"foo bar", .expect = 0 },
     { .str = L"foon", .fmt = L"foo %d", .expect = 0 },
     { .str = L"foo ", .fmt = L"fooxbar", .expect = 0 },
     { .str = L"foo ", .fmt = L"foox%d", .expect = 0 },
     { .str = L"foo bar", .fmt = L"foon", .expect = 0 },
-#endif
     { .str = L"foo bar", .fmt = L"foo bar", .expect = 0 },
     { .str = L"foo bar", .fmt = L"foo %d", .expect = 0 },
-#ifndef LEGACY_NEWLIB
     { .str = L"foo bar", .fmt = L"foon%d", .expect = 0 },
-#endif
     { .str = L"foo (nil)", .fmt = L"foo %4p", .expect = 0},
     { .str = L"foo ", .fmt = L"foo %n", .expect = 0 },
     { .str = L"foo%bar1", .fmt = L"foo%%bar%d", 1 },

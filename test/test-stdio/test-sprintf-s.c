@@ -39,7 +39,7 @@
 #include <string.h>
 #include <errno.h>
 
-#if defined(__STDC_LIB_EXT1__) && (!defined(__PICOLIBC__) || defined(__TINY_STDIO))
+#ifdef __STDC_LIB_EXT1__
 
 #define MAX_ERROR_MSG 100
 

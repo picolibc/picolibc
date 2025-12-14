@@ -321,14 +321,9 @@ int main(void)
 {
     int ret = 0;
 
-#if defined(__PICOLIBC__)
-#if !defined(__TINY_STDIO)
-    printf("skipping test-strfmon on legacy stdio target\n");
-    return 77;
-#elif !defined(__IO_FLOAT_EXACT)
+#if defined(__PICOLIBC__) && !defined(__IO_FLOAT_EXACT)
     printf("skipping test-strfmon on imprecise float stdio target\n");
     return 77;
-#endif
 #endif
     if (!setlocale(LC_MONETARY, "C")) {
         printf("setlocale(LC_MONETARY, \"C\") failed\n");

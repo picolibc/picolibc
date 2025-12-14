@@ -32,7 +32,6 @@
 /* Optimize for space over speed */
 #cmakedefine __PREFER_SIZE_OVER_SPEED
 
-/* Use tiny stdio from gcc avr */
 #cmakedefine __TINY_STDIO
 
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC

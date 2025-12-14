@@ -98,46 +98,6 @@ Files: newlib/libc/machine/x86_64/machine/_fpmath.h
 Copyright: 2002, 2003 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
-Files: newlib/libc/stdio/clearerr_u.c
- newlib/libc/stdio/feof_u.c
- newlib/libc/stdio/ferror_u.c
- newlib/libc/stdio/fflush_u.c
- newlib/libc/stdio/fgetc_u.c
- newlib/libc/stdio/fgets_u.c
- newlib/libc/stdio/fgetwc_u.c
- newlib/libc/stdio/fgetws_u.c
- newlib/libc/stdio/fileno_u.c
- newlib/libc/stdio/fputc_u.c
- newlib/libc/stdio/fputs_u.c
- newlib/libc/stdio/fputwc_u.c
- newlib/libc/stdio/fputws_u.c
- newlib/libc/stdio/fread_u.c
- newlib/libc/stdio/fsetlocking.c
- newlib/libc/stdio/fwrite_u.c
- newlib/libc/stdio/getwc_u.c
- newlib/libc/stdio/getwchar_u.c
- newlib/libc/stdio/putwc_u.c
- newlib/libc/stdio/putwchar_u.c
-Copyright: 2014 Red Hat, Inc.
-License: BSD2-1
-
-Files: newlib/libc/stdio/fgetwc.c
- newlib/libc/stdio/fgetws.c
- newlib/libc/stdio/fputwc.c
- newlib/libc/stdio/fputws.c
- newlib/libc/stdio/fwide.c
- newlib/libc/stdio/ungetwc.c
-Copyright: 2002-2004 Tim J. Robbins.
-License: BSD2-1
-
-Files: newlib/libc/stdio/getwc.c
- newlib/libc/stdio/getwchar.c
- newlib/libc/stdio/putwc.c
- newlib/libc/stdio/putwchar.c
- newlib/libc/stdlib/wcstod.c
-Copyright: 2002 Tim J. Robbins.
-License: BSD2-1
-
 Files: newlib/libc/stdlib/arc4random.h
 Copyright: 2016 embedded brains GmbH
 License: BSD2-1
@@ -485,25 +445,25 @@ Files: CMakeLists.txt
  newlib/libc/stdlib/CMakeLists.txt
  newlib/libc/string/CMakeLists.txt
  newlib/libc/time/CMakeLists.txt
- newlib/libc/tinystdio/CMakeLists.txt
- newlib/libc/tinystdio/ecvt_r.c
- newlib/libc/tinystdio/ecvtf_r.c
- newlib/libc/tinystdio/ecvtl_r.c
- newlib/libc/tinystdio/fcvt_r.c
- newlib/libc/tinystdio/fcvtf_r.c
- newlib/libc/tinystdio/fcvtl_r.c
- newlib/libc/tinystdio/fmemopen.c
- newlib/libc/tinystdio/getline.c
- newlib/libc/tinystdio/remove.c
- newlib/libc/tinystdio/stdio-bufio.h
- newlib/libc/tinystdio/strtoimax_l.c
- newlib/libc/tinystdio/strtol_l.c
- newlib/libc/tinystdio/strtoll_l.c
- newlib/libc/tinystdio/strtoul_l.c
- newlib/libc/tinystdio/strtoull_l.c
- newlib/libc/tinystdio/strtoumax_l.c
- newlib/libc/tinystdio/tmpfile.c
- newlib/libc/tinystdio/tmpnam.c
+ newlib/libc/stdio/CMakeLists.txt
+ newlib/libc/stdio/ecvt_r.c
+ newlib/libc/stdio/ecvtf_r.c
+ newlib/libc/stdio/ecvtl_r.c
+ newlib/libc/stdio/fcvt_r.c
+ newlib/libc/stdio/fcvtf_r.c
+ newlib/libc/stdio/fcvtl_r.c
+ newlib/libc/stdio/fmemopen.c
+ newlib/libc/stdio/getline.c
+ newlib/libc/stdio/remove.c
+ newlib/libc/stdio/stdio-bufio.h
+ newlib/libc/stdio/strtoimax_l.c
+ newlib/libc/stdio/strtol_l.c
+ newlib/libc/stdio/strtoll_l.c
+ newlib/libc/stdio/strtoul_l.c
+ newlib/libc/stdio/strtoull_l.c
+ newlib/libc/stdio/strtoumax_l.c
+ newlib/libc/stdio/tmpfile.c
+ newlib/libc/stdio/tmpnam.c
  newlib/libc/xdr/CMakeLists.txt
  newlib/libm/CMakeLists.txt
  newlib/libm/common/CMakeLists.txt
@@ -658,34 +618,31 @@ Files: cmake/TC-arm-none-eabi.ld
  newlib/libc/picolib/machine/aarch64/tls.c
  newlib/libc/picolib/machine/arm/arm_tls.h
  newlib/libc/posix/meson.build
- newlib/libc/stdio/nano-svfprintf.c
- newlib/libc/stdio/nano-svfscanf.c
- newlib/libc/stdio64/meson.build
- newlib/libc/tinystdio/asnprintf.c
- newlib/libc/tinystdio/asprintf.c
- newlib/libc/tinystdio/compare_exchange.c
- newlib/libc/tinystdio/ecvt.c
- newlib/libc/tinystdio/ecvtf.c
- newlib/libc/tinystdio/ecvtl.c
- newlib/libc/tinystdio/exchange.c
- newlib/libc/tinystdio/fcvt.c
- newlib/libc/tinystdio/fcvtf.c
- newlib/libc/tinystdio/fcvtl.c
- newlib/libc/tinystdio/fflush.c
- newlib/libc/tinystdio/filestrget.c
- newlib/libc/tinystdio/filestrput.c
- newlib/libc/tinystdio/filestrputalloc.c
- newlib/libc/tinystdio/filewstrget.c
- newlib/libc/tinystdio/gcvt.c
- newlib/libc/tinystdio/gcvtf.c
- newlib/libc/tinystdio/gcvtl.c
- newlib/libc/tinystdio/perror.c
- newlib/libc/tinystdio/setvbuf.c
- newlib/libc/tinystdio/strtod_l.c
- newlib/libc/tinystdio/strtof_l.c
- newlib/libc/tinystdio/strtold_l.c
- newlib/libc/tinystdio/vasnprintf.c
- newlib/libc/tinystdio/vasprintf.c
+ newlib/libc/stdio/asnprintf.c
+ newlib/libc/stdio/asprintf.c
+ newlib/libc/stdio/compare_exchange.c
+ newlib/libc/stdio/ecvt.c
+ newlib/libc/stdio/ecvtf.c
+ newlib/libc/stdio/ecvtl.c
+ newlib/libc/stdio/exchange.c
+ newlib/libc/stdio/fcvt.c
+ newlib/libc/stdio/fcvtf.c
+ newlib/libc/stdio/fcvtl.c
+ newlib/libc/stdio/fflush.c
+ newlib/libc/stdio/filestrget.c
+ newlib/libc/stdio/filestrput.c
+ newlib/libc/stdio/filestrputalloc.c
+ newlib/libc/stdio/filewstrget.c
+ newlib/libc/stdio/gcvt.c
+ newlib/libc/stdio/gcvtf.c
+ newlib/libc/stdio/gcvtl.c
+ newlib/libc/stdio/perror.c
+ newlib/libc/stdio/setvbuf.c
+ newlib/libc/stdio/strtod_l.c
+ newlib/libc/stdio/strtof_l.c
+ newlib/libc/stdio/strtold_l.c
+ newlib/libc/stdio/vasnprintf.c
+ newlib/libc/stdio/vasprintf.c
  newlib/libm/machine/arm/s_fma_arm.c
  newlib/libm/machine/arm/sf_fma_arm.c
  newlib/libm/machine/riscv/s_fma.c
@@ -814,25 +771,25 @@ Files: cmake/TC-rx.ld
  newlib/libc/stdlib/sb_charsets.h
  newlib/libc/time/getdate.c
  newlib/libc/time/getdate_r.c
- newlib/libc/tinystdio/flockfile_init.c
- newlib/libc/tinystdio/wcstod.c
- newlib/libc/tinystdio/wcstod_l.c
- newlib/libc/tinystdio/wcstof.c
- newlib/libc/tinystdio/wcstof_l.c
- newlib/libc/tinystdio/wcstoimax.c
- newlib/libc/tinystdio/wcstoimax_l.c
- newlib/libc/tinystdio/wcstol.c
- newlib/libc/tinystdio/wcstol_l.c
- newlib/libc/tinystdio/wcstold.c
- newlib/libc/tinystdio/wcstold_l.c
- newlib/libc/tinystdio/wcstoll.c
- newlib/libc/tinystdio/wcstoll_l.c
- newlib/libc/tinystdio/wcstoul.c
- newlib/libc/tinystdio/wcstoul_l.c
- newlib/libc/tinystdio/wcstoull.c
- newlib/libc/tinystdio/wcstoull_l.c
- newlib/libc/tinystdio/wcstoumax.c
- newlib/libc/tinystdio/wcstoumax_l.c
+ newlib/libc/stdio/flockfile_init.c
+ newlib/libc/stdio/wcstod.c
+ newlib/libc/stdio/wcstod_l.c
+ newlib/libc/stdio/wcstof.c
+ newlib/libc/stdio/wcstof_l.c
+ newlib/libc/stdio/wcstoimax.c
+ newlib/libc/stdio/wcstoimax_l.c
+ newlib/libc/stdio/wcstol.c
+ newlib/libc/stdio/wcstol_l.c
+ newlib/libc/stdio/wcstold.c
+ newlib/libc/stdio/wcstold_l.c
+ newlib/libc/stdio/wcstoll.c
+ newlib/libc/stdio/wcstoll_l.c
+ newlib/libc/stdio/wcstoul.c
+ newlib/libc/stdio/wcstoul_l.c
+ newlib/libc/stdio/wcstoull.c
+ newlib/libc/stdio/wcstoull_l.c
+ newlib/libc/stdio/wcstoumax.c
+ newlib/libc/stdio/wcstoumax_l.c
  newlib/libc/ubsan/CMakeLists.txt
  newlib/libc/ubsan/meson.build
  newlib/libc/ubsan/ubsan.h
@@ -1058,12 +1015,12 @@ Files: doc/printf-sample/Makefile
  newlib/libc/machine/m68k/CMakeLists.txt
  newlib/libc/machine/m68k/machine/fenv-fp.h
  newlib/libc/machine/m68k/machine/fenv.h
- newlib/libc/tinystdio/dtox_engine.c
- newlib/libc/tinystdio/ftox_engine.c
- newlib/libc/tinystdio/getdelim.c
- newlib/libc/tinystdio/ldtox_engine.c
- newlib/libc/tinystdio/swprintf.c
- newlib/libc/tinystdio/vswprintf.c
+ newlib/libc/stdio/dtox_engine.c
+ newlib/libc/stdio/ftox_engine.c
+ newlib/libc/stdio/getdelim.c
+ newlib/libc/stdio/ldtox_engine.c
+ newlib/libc/stdio/swprintf.c
+ newlib/libc/stdio/vswprintf.c
  newlib/testsuite/newlib.time/asctime.c
  picocrt/machine/m68k/crt0.c
  picocrt/machine/mips/crt0.c
@@ -1160,20 +1117,6 @@ Files: hello-world/Makefile
  newlib/libc/search/meson.build
  newlib/libc/signal/meson.build
  newlib/libc/ssp/meson.build
- newlib/libc/stdio/meson.build
- newlib/libc/stdio/svfiprintf.c
- newlib/libc/stdio/svfiscanf.c
- newlib/libc/stdio/svfiwprintf.c
- newlib/libc/stdio/svfiwscanf.c
- newlib/libc/stdio/svfprintf.c
- newlib/libc/stdio/svfscanf.c
- newlib/libc/stdio/svfwprintf.c
- newlib/libc/stdio/svfwscanf.c
- newlib/libc/stdio/sys/meson.build
- newlib/libc/stdio/vfiprintf.c
- newlib/libc/stdio/vfiscanf.c
- newlib/libc/stdio/vfiwprintf.c
- newlib/libc/stdio/vfiwscanf.c
  newlib/libc/stdlib/malloc-calloc.c
  newlib/libc/stdlib/malloc-cfree.c
  newlib/libc/stdlib/malloc-free.c
@@ -1190,23 +1133,23 @@ Files: hello-world/Makefile
  newlib/libc/stdlib/meson.build
  newlib/libc/string/meson.build
  newlib/libc/time/meson.build
- newlib/libc/tinystdio/bufio.c
- newlib/libc/tinystdio/fdopen.c
- newlib/libc/tinystdio/fileno.c
- newlib/libc/tinystdio/fopen.c
- newlib/libc/tinystdio/freopen.c
- newlib/libc/tinystdio/fseek.c
- newlib/libc/tinystdio/fseeko.c
- newlib/libc/tinystdio/ftell.c
- newlib/libc/tinystdio/ftello.c
- newlib/libc/tinystdio/fwide.c
- newlib/libc/tinystdio/meson.build
- newlib/libc/tinystdio/posixiob_stderr.c
- newlib/libc/tinystdio/posixiob_stdin.c
- newlib/libc/tinystdio/posixiob_stdout.c
- newlib/libc/tinystdio/setbuf.c
- newlib/libc/tinystdio/setbuffer.c
- newlib/libc/tinystdio/setlinebuf.c
+ newlib/libc/stdio/bufio.c
+ newlib/libc/stdio/fdopen.c
+ newlib/libc/stdio/fileno.c
+ newlib/libc/stdio/fopen.c
+ newlib/libc/stdio/freopen.c
+ newlib/libc/stdio/fseek.c
+ newlib/libc/stdio/fseeko.c
+ newlib/libc/stdio/ftell.c
+ newlib/libc/stdio/ftello.c
+ newlib/libc/stdio/fwide.c
+ newlib/libc/stdio/meson.build
+ newlib/libc/stdio/posixiob_stderr.c
+ newlib/libc/stdio/posixiob_stdin.c
+ newlib/libc/stdio/posixiob_stdout.c
+ newlib/libc/stdio/setbuf.c
+ newlib/libc/stdio/setbuffer.c
+ newlib/libc/stdio/setlinebuf.c
  newlib/libc/xdr/meson.build
  newlib/libm/common/meson.build
  newlib/libm/common/s_issignaling.c
@@ -1379,13 +1322,13 @@ Files: newlib/empty.c
  newlib/libc/stdlib/pico-exitprocs.c
  newlib/libc/stdlib/pico-onexit.c
  newlib/libc/stdlib/pico-onexit.h
- newlib/libc/tinystdio/atold_engine.c
- newlib/libc/tinystdio/ldtoa_engine.c
- newlib/libc/tinystdio/matchcaseprefix.c
- newlib/libc/tinystdio/rewind.c
- newlib/libc/tinystdio/strfromd.c
- newlib/libc/tinystdio/strfromf.c
- newlib/libc/tinystdio/strfroml.c
+ newlib/libc/stdio/atold_engine.c
+ newlib/libc/stdio/ldtoa_engine.c
+ newlib/libc/stdio/matchcaseprefix.c
+ newlib/libc/stdio/rewind.c
+ newlib/libc/stdio/strfromd.c
+ newlib/libc/stdio/strfromf.c
+ newlib/libc/stdio/strfroml.c
  newlib/libm/common/exp10l.c
  newlib/libm/common/math_inexact.c
  newlib/libm/common/math_inexactf.c
@@ -1495,14 +1438,12 @@ Files: newlib/libc/ctype/ctype_extended.h
  newlib/libc/picolib/machine/m68k/interrupt.c
  newlib/libc/posix/fpathconf.c
  newlib/libc/posix/pathconf.c
- newlib/libc/stdio/flockfile.c
- newlib/libc/stdio/funlockfile.c
  newlib/libc/string/memset_explicit.c
- newlib/libc/tinystdio/atomic_load.c
- newlib/libc/tinystdio/flockfile.c
- newlib/libc/tinystdio/ftrylockfile.c
- newlib/libc/tinystdio/funlockfile.c
- newlib/libc/tinystdio/funopen.c
+ newlib/libc/stdio/atomic_load.c
+ newlib/libc/stdio/flockfile.c
+ newlib/libc/stdio/ftrylockfile.c
+ newlib/libc/stdio/funlockfile.c
+ newlib/libc/stdio/funopen.c
  newlib/libc/uchar/CMakeLists.txt
  newlib/libc/uchar/c16rtomb.c
  newlib/libc/uchar/c32rtomb.c
@@ -1659,9 +1600,9 @@ Files: newlib/libc/stdlib/ignore_handler_s.c
  newlib/libc/string/strncat_s.c
  newlib/libc/string/strncpy_s.c
  newlib/libc/string/strnlen_s.c
- newlib/libc/tinystdio/sprintf_s.c
- newlib/libc/tinystdio/vfprintf_s.c
- newlib/libc/tinystdio/vsnprintf_s.c
+ newlib/libc/stdio/sprintf_s.c
+ newlib/libc/stdio/vfprintf_s.c
+ newlib/libc/stdio/vsnprintf_s.c
  test/test-fgetc.c
  test/test-fgets-eof.c
  test/test-memcpy_s.c
@@ -1911,17 +1852,6 @@ Files: newlib/libc/search/qsort.c
 Copyright: 1992, 1993 The Regents of the University of California.
 License: BSD3-2
 
-Files: newlib/libc/stdio/nano-vfprintf.c
- newlib/libc/stdio/nano-vfprintf_float.c
- newlib/libc/stdio/nano-vfprintf_local.h
- newlib/libc/stdio/vfprintf.c
- newlib/libc/stdlib/strtol.c
- newlib/libc/stdlib/strtoll.c
- newlib/libc/stdlib/wcstol.c
- newlib/libc/stdlib/wcstoll.c
-Copyright: 1990 The Regents of the University of California.
-License: BSD3-2
-
 Files: newlib/libc/stdlib/div.c
  newlib/libc/stdlib/ldiv.c
  newlib/libc/stdlib/strtoul.c
@@ -2049,10 +1979,6 @@ Files: newlib/libc/posix/sysexits.h
 Copyright: 1987, 1993 The Regents of the University of California.
 License: BSD3-5
 
-Files: newlib/libc/stdio/vfwprintf.c
-Copyright: 1990 The Regents of the University of California.
-License: BSD3-5
-
 Files: newlib/libc/string/strcasestr.c
 Copyright: 1990, 1993 The Regents of the University of California.
 License: BSD3-5
@@ -2160,8 +2086,6 @@ Files: newlib/libc/machine/arm/strcmp-arm-tiny.S
  newlib/libc/machine/arm/strcmp-armv7.S
  newlib/libc/machine/arm/strcmp-armv7m.S
  newlib/libc/machine/arm/strcmp.S
- newlib/libc/stdio/nano-vfprintf_i.c
- newlib/libc/stdio/nano-vfscanf_i.c
 Copyright: 2012-2014 ARM Ltd
 License: BSD3-8
 
@@ -2327,132 +2251,132 @@ Files: newlib/libc/machine/avr/setjmp.S
 Copyright: 2002, Marek Michalkiewicz
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/atod_engine.c
- newlib/libc/tinystdio/atof_engine.c
- newlib/libc/tinystdio/conv_flt.c
- newlib/libc/tinystdio/scanf_private.h
- newlib/libc/tinystdio/strtoi.h
- newlib/libc/tinystdio/strtoimax.c
- newlib/libc/tinystdio/strtol.c
- newlib/libc/tinystdio/strtoll.c
- newlib/libc/tinystdio/strtoul.c
- newlib/libc/tinystdio/strtoull.c
- newlib/libc/tinystdio/strtoumax.c
- newlib/libc/tinystdio/vfscanf.c
+Files: newlib/libc/stdio/atod_engine.c
+ newlib/libc/stdio/atof_engine.c
+ newlib/libc/stdio/conv_flt.c
+ newlib/libc/stdio/scanf_private.h
+ newlib/libc/stdio/strtoi.h
+ newlib/libc/stdio/strtoimax.c
+ newlib/libc/stdio/strtol.c
+ newlib/libc/stdio/strtoll.c
+ newlib/libc/stdio/strtoul.c
+ newlib/libc/stdio/strtoull.c
+ newlib/libc/stdio/strtoumax.c
+ newlib/libc/stdio/vfscanf.c
 Copyright: 2002,2004,2005 Joerg Wunsch
  2008  Dmitry Xmelkov
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/clearerr.c
- newlib/libc/tinystdio/fclose.c
- newlib/libc/tinystdio/feof.c
- newlib/libc/tinystdio/ferror.c
- newlib/libc/tinystdio/fgetc.c
- newlib/libc/tinystdio/stdio_private.h
+Files: newlib/libc/stdio/clearerr.c
+ newlib/libc/stdio/fclose.c
+ newlib/libc/stdio/feof.c
+ newlib/libc/stdio/ferror.c
+ newlib/libc/stdio/fgetc.c
+ newlib/libc/stdio/stdio_private.h
 Copyright: 2002,2005 Joerg Wunsch
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/dtoa.h
- newlib/libc/tinystdio/dtoa_engine.c
- newlib/libc/tinystdio/sprintfd.c
- newlib/libc/tinystdio/sprintff.c
- newlib/libc/tinystdio/vffprintf.c
- newlib/libc/tinystdio/vffscanf.c
- newlib/libc/tinystdio/vfiprintf.c
- newlib/libc/tinystdio/vfiscanf.c
- newlib/libc/tinystdio/vflprintf.c
- newlib/libc/tinystdio/vflscanf.c
- newlib/libc/tinystdio/vfmprintf.c
- newlib/libc/tinystdio/vfmscanf.c
- newlib/libc/tinystdio/vfwprintf.c
- newlib/libc/tinystdio/vfwscanf.c
+Files: newlib/libc/stdio/dtoa.h
+ newlib/libc/stdio/dtoa_engine.c
+ newlib/libc/stdio/sprintfd.c
+ newlib/libc/stdio/sprintff.c
+ newlib/libc/stdio/vffprintf.c
+ newlib/libc/stdio/vffscanf.c
+ newlib/libc/stdio/vfiprintf.c
+ newlib/libc/stdio/vfiscanf.c
+ newlib/libc/stdio/vflprintf.c
+ newlib/libc/stdio/vflscanf.c
+ newlib/libc/stdio/vfmprintf.c
+ newlib/libc/stdio/vfmscanf.c
+ newlib/libc/stdio/vfwprintf.c
+ newlib/libc/stdio/vfwscanf.c
 Copyright: 2018, Keith Packard
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/fdevopen.c
+Files: newlib/libc/stdio/fdevopen.c
 Copyright: 2002,2005, 2007 Joerg Wunsch
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/fgets.c
- newlib/libc/tinystdio/fgetwc.c
- newlib/libc/tinystdio/fgetws.c
- newlib/libc/tinystdio/fprintf.c
- newlib/libc/tinystdio/fputc.c
- newlib/libc/tinystdio/fputs.c
- newlib/libc/tinystdio/fputwc.c
- newlib/libc/tinystdio/fputws.c
- newlib/libc/tinystdio/fread.c
- newlib/libc/tinystdio/fscanf.c
- newlib/libc/tinystdio/fwprintf.c
- newlib/libc/tinystdio/fwrite.c
- newlib/libc/tinystdio/fwscanf.c
- newlib/libc/tinystdio/getchar.c
- newlib/libc/tinystdio/gets.c
- newlib/libc/tinystdio/getwchar.c
- newlib/libc/tinystdio/printf.c
- newlib/libc/tinystdio/putchar.c
- newlib/libc/tinystdio/puts.c
- newlib/libc/tinystdio/putwchar.c
- newlib/libc/tinystdio/scanf.c
- newlib/libc/tinystdio/snprintf.c
- newlib/libc/tinystdio/sprintf.c
- newlib/libc/tinystdio/sscanf.c
- newlib/libc/tinystdio/swscanf.c
- newlib/libc/tinystdio/ungetc.c
- newlib/libc/tinystdio/ungetwc.c
- newlib/libc/tinystdio/wprintf.c
- newlib/libc/tinystdio/wscanf.c
+Files: newlib/libc/stdio/fgets.c
+ newlib/libc/stdio/fgetwc.c
+ newlib/libc/stdio/fgetws.c
+ newlib/libc/stdio/fprintf.c
+ newlib/libc/stdio/fputc.c
+ newlib/libc/stdio/fputs.c
+ newlib/libc/stdio/fputwc.c
+ newlib/libc/stdio/fputws.c
+ newlib/libc/stdio/fread.c
+ newlib/libc/stdio/fscanf.c
+ newlib/libc/stdio/fwprintf.c
+ newlib/libc/stdio/fwrite.c
+ newlib/libc/stdio/fwscanf.c
+ newlib/libc/stdio/getchar.c
+ newlib/libc/stdio/gets.c
+ newlib/libc/stdio/getwchar.c
+ newlib/libc/stdio/printf.c
+ newlib/libc/stdio/putchar.c
+ newlib/libc/stdio/puts.c
+ newlib/libc/stdio/putwchar.c
+ newlib/libc/stdio/scanf.c
+ newlib/libc/stdio/snprintf.c
+ newlib/libc/stdio/sprintf.c
+ newlib/libc/stdio/sscanf.c
+ newlib/libc/stdio/swscanf.c
+ newlib/libc/stdio/ungetc.c
+ newlib/libc/stdio/ungetwc.c
+ newlib/libc/stdio/wprintf.c
+ newlib/libc/stdio/wscanf.c
 Copyright: 2002, Joerg Wunsch
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/snprintfd.c
- newlib/libc/tinystdio/snprintff.c
+Files: newlib/libc/stdio/snprintfd.c
+ newlib/libc/stdio/snprintff.c
 Copyright: 2021 Keith Packard
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/stdio.h
+Files: newlib/libc/stdio/stdio.h
 Copyright: 2002, 2005, 2007 Joerg Wunsch  
  1990, 1991, 1993 The Regents of the University of California. 
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/strtod.c
- newlib/libc/tinystdio/strtof.c
- newlib/libc/tinystdio/strtold.c
+Files: newlib/libc/stdio/strtod.c
+ newlib/libc/stdio/strtof.c
+ newlib/libc/stdio/strtold.c
 Copyright: 2002-2005  Michael Stumpf  <mistumpf@de.pepperl-fuchs.com>
  2006,2008  Dmitry Xmelkov 
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/swprintfd.c
+Files: newlib/libc/stdio/swprintfd.c
 Copyright: 2025 Keith Packard
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/ultoa_invert.c
+Files: newlib/libc/stdio/ultoa_invert.c
 Copyright: 2017 Keith Packard
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/vfprintf.c
- newlib/libc/tinystdio/vfprintf_char.c
- newlib/libc/tinystdio/vfprintf_float.c
- newlib/libc/tinystdio/vfprintf_int.c
- newlib/libc/tinystdio/vfprintf_n.c
- newlib/libc/tinystdio/vfprintf_str.c
+Files: newlib/libc/stdio/vfprintf.c
+ newlib/libc/stdio/vfprintf_char.c
+ newlib/libc/stdio/vfprintf_float.c
+ newlib/libc/stdio/vfprintf_int.c
+ newlib/libc/stdio/vfprintf_n.c
+ newlib/libc/stdio/vfprintf_str.c
 Copyright: 2002, Alexander Popov (sasho@vip.bg)
  2002,2004,2005 Joerg Wunsch
  2005, Helmut Wallner
  2007, Dmitry Xmelkov
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/vprintf.c
- newlib/libc/tinystdio/vscanf.c
- newlib/libc/tinystdio/vsscanf.c
- newlib/libc/tinystdio/vswscanf.c
- newlib/libc/tinystdio/vwprintf.c
- newlib/libc/tinystdio/vwscanf.c
+Files: newlib/libc/stdio/vprintf.c
+ newlib/libc/stdio/vscanf.c
+ newlib/libc/stdio/vsscanf.c
+ newlib/libc/stdio/vswscanf.c
+ newlib/libc/stdio/vwprintf.c
+ newlib/libc/stdio/vwscanf.c
 Copyright: 2005, Joerg Wunsch
 License: BSD3-13
 
-Files: newlib/libc/tinystdio/vsnprintf.c
- newlib/libc/tinystdio/vsprintf.c
+Files: newlib/libc/stdio/vsnprintf.c
+ newlib/libc/stdio/vsprintf.c
 Copyright: 2003, Joerg Wunsch
 License: BSD3-13
 
@@ -2940,7 +2864,7 @@ Files: newlib/libc/time/strptime.c
 Copyright: 1999 Kungliga Tekniska Högskolan Royal Institute of Technology, Stockholm, Sweden).
 License: BSD3-32
 
-Files: newlib/libc/tinystdio/ftoa_engine.c
+Files: newlib/libc/stdio/ftoa_engine.c
 Copyright: 2005, Dmitry Xmelkov
 License: BSD3-33
 
@@ -3221,14 +3145,6 @@ Files: .clang-format
  newlib/libc/machine/riscv/xlenint.h
  newlib/libc/machine/xtensa/xtensa.tex
  newlib/libc/ssp/ssp.tex
- newlib/libc/stdio/sfputs.c
- newlib/libc/stdio/sfputws.c
- newlib/libc/stdio/sprint.c
- newlib/libc/stdio/ssprint.c
- newlib/libc/stdio/ssputs.c
- newlib/libc/stdio/ssputws.c
- newlib/libc/stdio/sswprint.c
- newlib/libc/stdio/swprint.c
  newlib/libc/stdlib/mul_overflow.h
  newlib/libc/string/wcstrings.tex
  newlib/libc/time/strftime.c
@@ -3661,7 +3577,6 @@ License: Default-1
 
 Files: newlib/libc/search/bsd_qsort_r.c
  newlib/libc/search/qsort_r.c
- newlib/libc/stdio/stdio_ext.c
 Copyright: 2014 Yaakov Selkowitz <yselkowi@redhat.com>
 License: Default-1
 
@@ -3671,19 +3586,6 @@ License: Default-1
 
 Files: newlib/libc/ssp/chk_fail.c
 Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
-License: Default-1
-
-Files: newlib/libc/stdio/getdelim.c
- newlib/libc/stdio/getline.c
-Copyright: 2002, Red Hat Inc. -
-License: Default-1
-
-Files: newlib/libc/stdio/stdio_ext.h
-Copyright: 2011 Yaakov Selkowitz <yselkowi@redhat.com>
-License: Default-1
-
-Files: newlib/libc/stdio64/fdopen64.c
-Copyright: 2003 Christopher Faylor <me@cgf.cx>
 License: Default-1
 
 Files: newlib/libc/stdlib/__atexit.c
@@ -3976,34 +3878,6 @@ License: Other-1
 Files: newlib/libc/posix/basename.c
  newlib/libc/posix/dirname.c
 Copyright: 2005 Shaun Jackman
-License: Other-1
-
-Files: newlib/libc/stdio/asniprintf.c
- newlib/libc/stdio/asnprintf.c
- newlib/libc/stdio/vasniprintf.c
-Copyright: 2007, 2008 Eric Blake
-License: Other-1
-
-Files: newlib/libc/stdio/diprintf.c
-Copyright: 2005, 2007 Shaun Jackman
-License: Other-1
-
-Files: newlib/libc/stdio/dprintf.c
- newlib/libc/stdio/vdiprintf.c
- newlib/libc/stdio/vdprintf.c
-Copyright: 2005, 2007 Shaun Jackman
-License: Other-1
-
-Files: newlib/libc/stdio/fmemopen.c
- newlib/libc/stdio/fopencookie.c
- newlib/libc/stdio/funopen.c
- newlib/libc/stdio/open_memstream.c
- newlib/libc/stdio/vasnprintf.c
-Copyright: 2007 Eric Blake
-License: Other-1
-
-Files: newlib/libc/stdio/fpurge.c
-Copyright: 2009 Eric Blake
 License: Other-1
 
 Files: newlib/libc/string/gnu_basename.c
@@ -4513,13 +4387,6 @@ Files: newlib/libc/signal/signal.c
 Copyright: 1994 Cygnus Support.
 License: Other-16
 
-Files: newlib/libc/stdio/vfieeefp.h
- newlib/libc/stdlib/dtoa.c
- newlib/libc/stdlib/mprec.c
- newlib/libc/stdlib/mprec.h
-Copyright: 1991 AT&T.
-License: Other-17
-
 Files: newlib/libc/stdlib/drand48.c
  newlib/libc/stdlib/erand48.c
  newlib/libc/stdlib/jrand48.c
@@ -4564,25 +4431,25 @@ Files: newlib/libc/string/wcsnlen.c
 Copyright: 2003, Artem B. Bityuckiy (dedekind@mail.ru).
 License: Other-22
 
-Files: newlib/libc/tinystdio/atod_ryu.c
- newlib/libc/tinystdio/atof_ryu.c
- newlib/libc/tinystdio/ryu/ryu_parse.h
+Files: newlib/libc/stdio/atod_ryu.c
+ newlib/libc/stdio/atof_ryu.c
+ newlib/libc/stdio/ryu/ryu_parse.h
 Copyright: 2019 Ulf Adams
 License: Other-23
 
-Files: newlib/libc/tinystdio/dtoa_ryu.c
- newlib/libc/tinystdio/ftoa_ryu.c
- newlib/libc/tinystdio/ryu/common.h
- newlib/libc/tinystdio/ryu/d2s_intrinsics.h
- newlib/libc/tinystdio/ryu/digit_table.h
- newlib/libc/tinystdio/ryu/f2s_intrinsics.h
- newlib/libc/tinystdio/ryu/ryu.h
- newlib/libc/tinystdio/ryu_divpow2.c
- newlib/libc/tinystdio/ryu_log10.c
- newlib/libc/tinystdio/ryu_log2pow5.c
- newlib/libc/tinystdio/ryu_pow5bits.c
- newlib/libc/tinystdio/ryu_table.c
- newlib/libc/tinystdio/ryu_umul128.c
+Files: newlib/libc/stdio/dtoa_ryu.c
+ newlib/libc/stdio/ftoa_ryu.c
+ newlib/libc/stdio/ryu/common.h
+ newlib/libc/stdio/ryu/d2s_intrinsics.h
+ newlib/libc/stdio/ryu/digit_table.h
+ newlib/libc/stdio/ryu/f2s_intrinsics.h
+ newlib/libc/stdio/ryu/ryu.h
+ newlib/libc/stdio/ryu_divpow2.c
+ newlib/libc/stdio/ryu_log10.c
+ newlib/libc/stdio/ryu_log2pow5.c
+ newlib/libc/stdio/ryu_pow5bits.c
+ newlib/libc/stdio/ryu_table.c
+ newlib/libc/stdio/ryu_umul128.c
 Copyright: 2018 Ulf Adams
 License: Other-23
 
@@ -4876,135 +4743,17 @@ Files: newlib/libc/machine/d10v/setjmp.S
  newlib/libc/machine/x86/i386mach.h
  newlib/libc/machine/z8k/args.h
  newlib/libc/machine/z8k/setjmp.S
- newlib/libc/stdio/asiprintf.c
- newlib/libc/stdio/clearerr.c
- newlib/libc/stdio/fclose.c
- newlib/libc/stdio/fcloseall.c
- newlib/libc/stdio/fdopen.c
- newlib/libc/stdio/feof.c
- newlib/libc/stdio/ferror.c
- newlib/libc/stdio/fflush.c
- newlib/libc/stdio/fgetc.c
  newlib/libc/stdio/fgetpos.c
- newlib/libc/stdio/fgets.c
- newlib/libc/stdio/fileno.c
- newlib/libc/stdio/findfp.c
- newlib/libc/stdio/fiprintf.c
- newlib/libc/stdio/fiscanf.c
- newlib/libc/stdio/floatio.h
- newlib/libc/stdio/fopen.c
- newlib/libc/stdio/fprintf.c
- newlib/libc/stdio/fputc.c
- newlib/libc/stdio/fputs.c
- newlib/libc/stdio/fscanf.c
- newlib/libc/stdio/fseek.c
- newlib/libc/stdio/fseeko.c
  newlib/libc/stdio/fsetpos.c
- newlib/libc/stdio/ftell.c
- newlib/libc/stdio/ftello.c
- newlib/libc/stdio/fvwrite.c
- newlib/libc/stdio/fwalk.c
- newlib/libc/stdio/fwprintf.c
- newlib/libc/stdio/fwrite.c
- newlib/libc/stdio/fwscanf.c
- newlib/libc/stdio/getc.c
- newlib/libc/stdio/getc_u.c
- newlib/libc/stdio/getchar.c
- newlib/libc/stdio/getchar_u.c
- newlib/libc/stdio/gets.c
- newlib/libc/stdio/getw.c
- newlib/libc/stdio/iprintf.c
- newlib/libc/stdio/iscanf.c
- newlib/libc/stdio/nano-vfscanf.c
- newlib/libc/stdio/nano-vfscanf_float.c
- newlib/libc/stdio/nano-vfscanf_local.h
- newlib/libc/stdio/perror.c
- newlib/libc/stdio/printf.c
- newlib/libc/stdio/putc.c
- newlib/libc/stdio/putc_u.c
- newlib/libc/stdio/putchar.c
- newlib/libc/stdio/putchar_u.c
- newlib/libc/stdio/puts.c
- newlib/libc/stdio/putw.c
- newlib/libc/stdio/refill.c
- newlib/libc/stdio/remove.c
- newlib/libc/stdio/rewind.c
- newlib/libc/stdio/rget.c
- newlib/libc/stdio/scanf.c
- newlib/libc/stdio/sccl.c
- newlib/libc/stdio/setbuf.c
- newlib/libc/stdio/setbuffer.c
- newlib/libc/stdio/setlinebuf.c
- newlib/libc/stdio/setvbuf.c
- newlib/libc/stdio/siprintf.c
- newlib/libc/stdio/siscanf.c
- newlib/libc/stdio/sprintf.c
- newlib/libc/stdio/sscanf.c
- newlib/libc/stdio/stdio.c
- newlib/libc/stdio/stdio.h
- newlib/libc/stdio/stdio.tex
- newlib/libc/stdio/swscanf.c
- newlib/libc/stdio/sys/stdio.h
- newlib/libc/stdio/tmpfile.c
- newlib/libc/stdio/tmpnam.c
- newlib/libc/stdio/ungetc.c
- newlib/libc/stdio/vfscanf.c
- newlib/libc/stdio/vfwscanf.c
- newlib/libc/stdio/viprintf.c
- newlib/libc/stdio/viscanf.c
- newlib/libc/stdio/vprintf.c
- newlib/libc/stdio/vscanf.c
- newlib/libc/stdio/vsiprintf.c
- newlib/libc/stdio/vsiscanf.c
- newlib/libc/stdio/vsnprintf.c
- newlib/libc/stdio/vsprintf.c
- newlib/libc/stdio/vsscanf.c
- newlib/libc/stdio/vswprintf.c
- newlib/libc/stdio/vswscanf.c
- newlib/libc/stdio/vwprintf.c
- newlib/libc/stdio/vwscanf.c
- newlib/libc/stdio/wbuf.c
- newlib/libc/stdio/wbufw.c
- newlib/libc/stdio/wprintf.c
- newlib/libc/stdio/wscanf.c
- newlib/libc/stdio64/fgetpos64.c
- newlib/libc/stdio64/fopen64.c
- newlib/libc/stdio64/freopen64.c
- newlib/libc/stdio64/fseeko64.c
- newlib/libc/stdio64/fsetpos64.c
- newlib/libc/stdio64/ftello64.c
- newlib/libc/stdio64/stdio64.c
- newlib/libc/stdio64/stdio64.tex
- newlib/libc/stdio64/tmpfile64.c
- newlib/libc/tinystdio/fgetpos.c
- newlib/libc/tinystdio/fsetpos.c
 Copyright: 1990 The Regents of the University of California.
 License: UCB-1
 
-Files: newlib/libc/stdio/asprintf.c
- newlib/libc/stdio/fread.c
- newlib/libc/stdio/freopen.c
- newlib/libc/stdio/fvwrite.h
- newlib/libc/stdio/local.h
- newlib/libc/stdio/makebuf.c
- newlib/libc/stdio/sniprintf.c
- newlib/libc/stdio/snprintf.c
- newlib/libc/stdio/swprintf.c
- newlib/libc/stdio/vasiprintf.c
- newlib/libc/stdio/vasprintf.c
- newlib/libc/stdio/vsniprintf.c
- newlib/libc/stdio/wsetup.c
-Copyright: 1990, 2007 The Regents of the University of California.
-License: UCB-1
-
-Files: newlib/libc/stdio/flags.c
- newlib/libc/tinystdio/sflags.c
+Files: newlib/libc/stdio/sflags.c
 Copyright: 1990 Regents of the University of California.
 License: UCB-1
 
-Files: newlib/libc/stdio/mktemp.c
- newlib/libc/stdlib/setenv.c
- newlib/libc/tinystdio/mktemp.c
+Files: newlib/libc/stdlib/setenv.c
+ newlib/libc/stdio/mktemp.c
 Copyright: 1987 Regents of the University of California.
 License: UCB-2
 

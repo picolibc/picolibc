@@ -61,10 +61,8 @@ abrt_handler(int sig)
 #endif
     }
     else {
-#ifdef __TINY_STDIO
         printf("unexpected signal %d\n", sig);
         fflush(stdout);
-#endif
 #ifdef SANITIZE_TRAP_ON_ERROR
         _Exit(0);
 #else

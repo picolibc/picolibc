@@ -39,6 +39,7 @@ src_semihost += files([
                        'fstat.c',
                        'getentropy.c',
                        'gettimeofday.c',
+                       'iob.c',
                        'isatty.c',
                        'kill.c',
                        'lseek.c',
@@ -76,10 +77,6 @@ src_semihost += files([
                        'sys_write.c',
                        'sys_write0.c',
                      ])
-
-if tinystdio
-  src_semihost += files('iob.c')
-endif
 
 inc_headers = ['semihost.h']
 if really_install

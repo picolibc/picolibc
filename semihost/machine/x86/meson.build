@@ -35,13 +35,10 @@
 
 src_semihost += files([
                        'e9_exit.c',
+                       'e9_io.c',
                        'e9_kill.c',
                        'e9_stub.c',
                      ])
-
-if tinystdio
-  src_semihost += files('e9_io.c')
-endif
 
 objcopy = find_program('objcopy', required: false)
 

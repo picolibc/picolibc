@@ -57,7 +57,6 @@ sh_getc(FILE *file)
         return EOF;
 }
 
-#ifdef __TINY_STDIO
 static FILE __stdio = FDEV_SETUP_STREAM(sh_putc, sh_getc, NULL, _FDEV_SETUP_RW);
 
 #ifdef __strong_reference
@@ -69,4 +68,3 @@ static FILE __stdio = FDEV_SETUP_STREAM(sh_putc, sh_getc, NULL, _FDEV_SETUP_RW);
 FILE *const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-#endif

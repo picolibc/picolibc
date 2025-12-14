@@ -57,16 +57,8 @@ TEST(t, d, (double)x, "%a != %a") )
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #endif
 
-#if defined(__PICOLIBC__)
-
-#if !defined(__TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
-#define __IO_NO_FLOATING_POINT
-#endif
-
-#if !defined(__MB_CAPABLE) || !defined(__TINY_STDIO)
+#if defined(__PICOLIBC__) && !defined(__MB_CAPABLE)
 #define NO_MULTI_BYTE
-#endif
-
 #endif
 
 #ifdef __RX__
@@ -126,6 +118,14 @@ static int test_sscanf(void)
         TEST(i, sscanf("elloworld", "%5[a-z]%s", a, b), 2, "only %d fields, expected %d");
         TEST_S(a, "ellow", "");
         TEST_S(b, "orld", "");
+
+        memset(a, 0, sizeof(a));
+        TEST(i, sscanf("", "%c", a), -1, "only %d fields, expected %d");
+        TEST_S(a, "", "");
+
+        memset(a, 0, sizeof(a));
+        TEST(i, sscanf("a", "%2c", a), 1, "only %d fields, expected %d");
+        TEST_S(a, "a", "");
 
 #ifndef NO_MULTI_BYTE
         /* sscanf with mb results */
@@ -213,12 +213,12 @@ static int test_sscanf(void)
         TEST_WS(cw, L"\n", L"");
 #endif
 
-#ifdef __TINY_STDIO
 	a[8] = 'X';
 	a[9] = 0;
-        /* legacy stdio fails this test */
-	TEST(i, sscanf("hello, world\n", "%8c%8c", a, b), 1, "%d fields, expected %d");
+        memset(b, 0, sizeof(b));
+	TEST(i, sscanf("hello, world\n", "%8c%8c", a, b), 2, "%d fields, expected %d");
 	TEST_S(a, "hello, wX", "");
+        TEST_S(b, "orld\n", "");
 
 #ifndef NO_NAN
     /* testing nan(n-seq-char) in the expected form */
@@ -232,7 +232,13 @@ static int test_sscanf(void)
     a[0] = '#';
     a[1] = '\0';
     d = 1.0;
-    TEST(i, sscanf("NaN(abcdefg", "%lf%c", &d, a), -1, "got %d fields, expected %d");
+#ifdef __PICOLIBC__
+#define NAN_INCOMPLETE_RET -1
+#else
+/* glibc has a bug -- it returns 0 when reaching EOF without any conversions */
+#define NAN_INCOMPLETE_RET 0
+#endif
+    TEST(i, sscanf("NaN(abcdefg", "%lf%c", &d, a), NAN_INCOMPLETE_RET, "got %d fields, expected %d");
     TEST(i, d, 1.0, "%d expected %lf");
     TEST_S(a, "#", "");
 
@@ -243,7 +249,7 @@ static int test_sscanf(void)
     TEST(i, sscanf("NaN(12:b)", "%lf%c", &d, a), 0, "got %d fields, expected %d");
     TEST(i, d, 1.0, "%d expected %lf");
     TEST_S(a, "#", "");
-    
+
     /* testing nan(n-seq-char) overrunning a field width value */
     a[0] = '#';
     a[1] = '\0';
@@ -252,7 +258,7 @@ static int test_sscanf(void)
     TEST(i, d, 1.0, "%d expected %lf");
     TEST_S(a, "#", "");
 #endif
-    
+
 #ifndef NO_INF
     /* testing inf(n-seq-char) should 'inf' should be evaluated sperately */
     a[0] = '#';
@@ -269,7 +275,6 @@ static int test_sscanf(void)
     TEST(i, sscanf("infinity(abcd)", "%lf%c", &d, a), 2, "got %d fields, expected %d");
     TEST(i, isinf(d), 1, "%d expected %d");
     TEST_S(a, "(", "");
-#endif
 #endif
 
 	TEST(i, sscanf("56789 0123 56a72", "%2d%d%*d %[0123456789]\n", &x, &y, a), 3, "only %d fields, expected %d");
@@ -311,7 +316,7 @@ static int test_sscanf(void)
 	TEST(i, y, 345, "%d != %d");
 	TEST(i, z, 6, "%d != %d");
 
-// tinystdio only has one ungetc spot, so it can't unparse numbers
+// stdio only has one ungetc spot, so it can't unparse numbers
 //	TEST(i, sscanf(" 0x12 0x34", "%5i%2i", &x, &y), 1, "got %d fields, expected %d");
 //	TEST(i, x, 0x12, "%d != %d");
 
@@ -358,7 +363,7 @@ static int test_sscanf(void)
 #endif
 
 #ifndef __PICOLIBC__
-        /* both tinystdio and legacy stdio fail this test */
+        /* picolibc fails this test */
 	TEST(i, sscanf("10e", "%lf", &d), 0, "got %d fields, expected no match (%d)");
 #endif
 	TEST(i, sscanf("", "%lf\n", &d), -1, "got %d fields, expected input failure (%d)");

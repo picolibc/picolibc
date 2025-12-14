@@ -82,6 +82,8 @@ inc_headers = [
   'signal.h',
   'spawn.h',
   'stdint.h',
+  'stdio.h',
+  'stdio-bufio.h',
   'stdnoreturn.h',
   'stdlib.h',
   'string.h',

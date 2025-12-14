@@ -39,9 +39,7 @@
 #include <string.h>
 #include <wchar.h>
 
-#if defined (__TINY_STDIO) || !defined(__PICOLIBC__)
 #define FULL_TESTS
-#endif
 
 #if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -60,7 +58,7 @@ static const struct {
 } tests[] = {
     { "1e2@", 100.0, 100.0f, 100.0l, "@" },
 #ifdef FULL_TESTS
-#if !defined(__TINY_STDIO) || defined(__IO_FLOAT_EXACT)
+#if !defined(__PICOLIBC__) || defined(__IO_FLOAT_EXACT)
     { "3752432815e-39%", 0x1.306efbp-98, 0x1.306efcp-98f, 3752432815e-39l, "%" },
     { "3.752432815e-30%", 0x1.306efbp-98, 0x1.306efcp-98f, 3752432815e-39l, "%" },
     { "3752432814e-39^", 3752432814e-39, 0x1.306efap-98f, 3752432814e-39l, "^" },

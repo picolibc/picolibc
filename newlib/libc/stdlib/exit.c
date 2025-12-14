@@ -43,10 +43,6 @@ Supporting OS subroutines required: <<_exit>>.
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <unistd.h>	/* for _exit() declaration */
-#ifndef __TINY_STDIO
-#include "../stdio/local.h"
-#include <stdio.h>
-#endif
 #include "atexit.h"
 
 /*
@@ -60,10 +56,5 @@ exit (int code)
   void __call_exitprocs (int, void *) __weak;
   if (__call_exitprocs)
     __call_exitprocs (code, NULL);
-
-#ifndef __TINY_STDIO
-  if (_stdio_cleanup)
-    (*_stdio_cleanup) ();
-#endif
   _exit (code);
 }

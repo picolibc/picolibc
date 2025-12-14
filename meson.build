@@ -1401,7 +1401,7 @@ if not picoexit
   conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 endif
 
-conf_data.set('__TINY_STDIO', true, description: 'Use tiny stdio from gcc avr')
+conf_data.set('__TINY_STDIO', true, description: 'Picolibc stdio comes from the avr C library')
 conf_data.set('__IO_DEFAULT', '\'@0@\''.format(format_default),
               description: 'The default printf and scanf variants')
 conf_data.set('__IO_SMALL_ULTOA',
@@ -1508,7 +1508,7 @@ conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major
 conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
-inc_dirs = ['newlib/libc/tinystdio', 'newlib/libc/locale', '.', 'newlib/libc/include']
+inc_dirs = ['newlib/libc/stdio', 'newlib/libc/locale', '.', 'newlib/libc/include']
 
 machine_dir = 'newlib/libc/machine' / host_cpu_family
 if fs.is_dir(machine_dir)

@@ -124,8 +124,6 @@ aarch64_putc(char c, FILE *file)
 	return (unsigned char) c;
 }
 
-#ifdef __TINY_STDIO
-
 static int
 aarch64_getc(FILE *file)
 {
@@ -147,5 +145,3 @@ static FILE __stdio = FDEV_SETUP_STREAM(aarch64_putc, aarch64_getc, NULL, _FDEV_
 FILE *const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-
-#endif

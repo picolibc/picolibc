@@ -15,15 +15,6 @@ case "$TARGET" in
 	;;
 esac
 
-# Disable the analyser when not using tinystdio as the stdio code is
-# full of problems
-
-case "$*" in
-    *-Dtinystdio=false*)
-	ANALYZER=""
-	;;
-esac
-
 OPTIONS="$ANALYZER"
 
 (mkdir "$DIR" || exit 1

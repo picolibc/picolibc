@@ -13,17 +13,8 @@
 #include <wchar.h>
 #include <locale.h>
 
-#ifndef __TINY_STDIO
+#ifndef __PICOLIBC__
 #define printf_float(x) ((double) (x))
-#ifdef __NANO_FORMATTED_IO
-#ifndef __IO_NO_FLOATING_POINT
-extern int _printf_float();
-extern int _scanf_float();
-
-int (*_reference_printf_float)() = _printf_float;
-int (*_reference_scanf_float)() = _scanf_float;
-#endif
-#endif
 #endif
 
 #define TEST_ASPRINTF

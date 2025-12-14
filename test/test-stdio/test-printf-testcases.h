@@ -21,7 +21,7 @@
 # define __IO_C99_FORMATS
 # define __IO_LONG_LONG
 # define __IO_POS_ARGS
-#elif defined(__TINY_STDIO)
+#else
 # ifdef _HAS_IO_PERCENT_B
 #  define BINARY_FORMAT
 # endif
@@ -54,28 +54,6 @@
 #  define NO_WIDTH_PREC
 #  define NO_CASE_HEX
 # endif
-#else
-# ifndef __MB_CAPABLE
-#  define NO_WCHAR
-#  define NO_MBCHAR
-# endif
-# if __SIZEOF_DOUBLE__ == 4
-#  define LOW_FLOAT
-# endif
-# ifdef __IO_NO_FLOATING_POINT
-#  define NO_FLOAT
-# endif
-# ifndef __IO_LONG_LONG
-#  define NO_LONGLONG
-# endif
-# ifndef __IO_POS_ARGS
-#  define NO_POS_ARGS
-# endif
-# define NORMALIZED_A
-#endif
-
-#if defined(__RX__) && !defined(__TINY_STDIO)
-#define NO_DENORM
 #endif
 
 #ifndef FLOAT
@@ -176,7 +154,7 @@
     result |= test(__LINE__, "12.0 Hot Pockets", "%1$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1);
     result |= test(__LINE__, " 12.0 Hot Pockets", "%1$*5$.*4$f %2$s %3$ss", printf_float(12.0), "Hot", "Pocket", 1, 5);
     result |= test(__LINE__, " 12.0 Hot Pockets 5", "%1$5.*4$f %2$s %3$ss %5$d", printf_float(12.0), "Hot", "Pocket", 1, 5);
-#if !defined(__TINY_STDIO) || defined(__IO_FLOAT_EXACT)
+#if !defined(__PICOLIBC__) || defined(__IO_FLOAT_EXACT)
     result |= test(__LINE__,
                    "   12345  1234    11145401322     321.765400   3.217654e+02   5    test-string",
                    "%1$*5$d %2$*6$hi %3$*7$lo %4$*8$f %9$*12$e %10$*13$g %11$*14$s",
@@ -186,7 +164,7 @@
 #endif
 #endif
     /* 58: anti-test */
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
     result |= test(__LINE__, "%(foo", "%(foo");
 #endif
 #ifndef NO_WIDTH_PREC
@@ -195,9 +173,9 @@
 #ifndef NO_FLOAT
     result |= test(__LINE__, "      3.14", "%*.*f", 10, 2, printf_float(3.14159265));
     result |= test(__LINE__, "3.14      ", "%-*.*f", 10, 2, printf_float(3.14159265));
-# if !(defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT))
+# if !(defined(__PICOLIBC__) && !defined(__IO_FLOAT_EXACT))
 #  ifndef LOW_FLOAT
-#   ifdef __TINY_STDIO
+#   ifdef __PICOLIBC__
 #    define SQRT2_60 "1414213562373095000000000000000000000000000000000000000000000.000"
 #   else
 #    define SQRT2_60 "1414213562373095053224405813183213153460812619236586568024064.000"
@@ -237,15 +215,11 @@
 #ifndef NO_LONGLONG
 #ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "    +100", "%+8lld", 100LL);
-#if defined(__TINY_STDIO) || !defined(__PICOLIBC__)
     result |= test(__LINE__, "    +100", "%+8Ld", 100LL);
-#endif
     result |= test(__LINE__, "+00000100", "%+.8lld", 100LL);
     result |= test(__LINE__, " +00000100", "%+10.8lld", 100LL);
 #endif
-#ifdef __TINY_STDIO
     result |= test(__LINE__, "%_1lld", "%_1lld", 100LL);
-#endif
 #ifndef NO_WIDTH_PREC
     result |= test(__LINE__, "-00100", "%-1.5lld", -100LL);
     result |= test(__LINE__, "  100", "%5lld", 100LL);
@@ -304,7 +278,7 @@
     result |= test(__LINE__, "foo  ", "%*s", -5, "foo");
 #endif
     result |= test(__LINE__, "hello", "hello");
-#if defined(__TINY_STDIO) && !defined(_HAS_IO_PERCENT_B)
+#if defined(__PICOLIBC__) && !defined(_HAS_IO_PERCENT_B)
     result |= test(__LINE__, "%b", "%b");
 #endif
 #ifndef NO_WIDTH_PREC
@@ -332,30 +306,26 @@
     result |= test(__LINE__, "12", "%o", 10);
     /* 166: excluded for C */
     /* 167: excluded for C */
-#ifdef __TINY_STDIO
     result |= test(__LINE__, "(null)", "%s", NULL);
-#endif
     result |= test(__LINE__, "%%%%", "%s", "%%%%");
     result |= test(__LINE__, I("4294967295", "65535"), "%u", -1);
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
     result |= test(__LINE__, "%w", "%w", -1);
 #endif
     /* 172: excluded for C */
     /* 173: excluded for C */
     /* 174: excluded for C */
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
     result |= test(__LINE__, "%H", "%H", -1);
 #endif
     result |= test(__LINE__, "%0", "%%0");
     result |= test(__LINE__, "2345", "%hx", 74565);
-#ifndef __NANO_FORMATTED_IO
     result |= test(__LINE__, "61", "%hhx", 0x61);
     result |= test(__LINE__, "61", "%hhx", 0x161);
     result |= test(__LINE__, "97", "%hhd", 0x61);
     result |= test(__LINE__, "97", "%hhd", 0x161);
     result |= test(__LINE__, "-97", "%hhd", -0x61);
     result |= test(__LINE__, "-97", "%hhd", -0x161);
-#endif
     result |= test(__LINE__, "Hallo heimur", "Hallo heimur");
     result |= test(__LINE__, "Hallo heimur", "%s", "Hallo heimur");
     result |= test(__LINE__, "1024", "%d", 1024);
@@ -655,9 +625,6 @@
     result |= test(__LINE__, "10.00000000000000000000", "%#.22g", printf_float(10.0));
 #endif
 
-    // Regression test for wrong behavior with negative precision in tinystdio
-    // this might fail for configurations not using tinystdio, so for a first
-    // PR, only run these test for tinystdio.
 #ifndef NO_WIDTH_PREC
     result |= test(__LINE__,         "", "%.*s",  0, "123456");
     result |= test(__LINE__,     "1234", "%.*s",  4, "123456");
@@ -720,11 +687,11 @@
     result |= test(__LINE__, "-INF", "%A", printf_float(-(FLOAT) INFINITY));
 
 #ifndef NO_LONGDOUBLE
-#if __LDBL_MANT_DIG__ == 64 && (!defined(__PICOLIBC__) || defined(__TINY_STDIO))
+#if __LDBL_MANT_DIG__ == 64
     /*
      * x86 and m68k 80-bit format fill the top
      * hex digit so they generate a different result than
-     * regular formats when using tinystdio or glibc.
+     * regular formats
      */
     result |= test(__LINE__, "0x8p-3", "%La", 0x1p+0l);
     result |= test(__LINE__, "0x0p+0", "%La", 0x0p+0l);
@@ -785,24 +752,13 @@
 #endif
 #ifndef NO_DENORM
 #ifdef LOW_FLOAT
-#ifdef NORMALIZED_A
-    result |= test(__LINE__, "0x1p-149", "%a", printf_float(0x1p-149));
-    result |= test(__LINE__, "0x1p-127", "%.a", printf_float(0x1p-127));
-#else
     result |= test(__LINE__, "0x0.000002p-126", "%a", printf_float(0x1p-149));
     result |= test(__LINE__, "0x0p-126", "%.a", printf_float(0x1p-127));
-#endif
 #else
     result |= test(__LINE__, "0x1.306efbp-98", "%a", printf_float(3752432815e-39));
-#ifdef NORMALIZED_A
-    /* newlib legacy stdio normalizes %a format */
-    result |= test(__LINE__, "0x1p-1074", "%a", printf_float(0x1p-1074));
-    result |= test(__LINE__, "0x1p-1023", "%.a", printf_float(0x1p-1023));
-#else
     /* glibc and picolibc show denorms like this */
     result |= test(__LINE__, "0x0.0000000000001p-1022", "%a", printf_float(0x1p-1074));
     result |= test(__LINE__, "0x0p-1022", "%.a", printf_float(0x1p-1023));
-#endif
     result |= test(__LINE__, "0x1.fffffffffffffp+1022", "%a", printf_float(0x1.fffffffffffffp+1022));
     result |= test(__LINE__, "0x1.23456789abcdep-1022", "%a", printf_float(0x1.23456789abcdep-1022));
     result |= test(__LINE__, "0x1.23456789abcdfp-1022", "%a", printf_float(0x1.23456789abcdfp-1022));

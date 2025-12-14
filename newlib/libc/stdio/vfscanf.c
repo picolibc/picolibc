@@ -738,14 +738,19 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	    if (c == 'c') {
 		if (!(flags & FL_WIDTH)) width = 1;
+                bool have_put = false;
 #if defined(_NEED_IO_MBTOWIDE) || defined(_NEED_IO_WIDETOMB)
                 mbstate_t ps = {0};
 #endif
 		do {
                     WINT        wi = getmb (stream, &context, &ps, flags);
-                    if(IS_WEOF(wi))
+                    if(IS_WEOF(wi)) {
+                        if (have_put)
+                            break;
                         goto eof;
+                    }
                     putmb(addr, wi, &ps, flags, goto eof);
+                    have_put = true;
 		} while (--width);
 		c = 1;			/* no matter with smart GCC	*/
 
@@ -815,6 +820,7 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
 
 	          default:		/* a,A,e,E,f,F,g,G */
 		      c = conv_flt (stream, &context, width, addr, flags);
+                      break;
 #else
 	          case 'd':
 		  case 'u':
@@ -841,12 +847,13 @@ int vfscanf (FILE * stream, const CHAR *fmt, va_list ap_orig)
                     base = 16;
 		  conv_int:
 		    c = conv_int (stream, &context, width, addr, flags, base);
+                    break;
 #endif
 		}
 	    } /* else */
 
 	    if (!c) {
-		if (stream->flags & (__SERR | __SEOF))
+		if (stream->flags & __SERR || ((stream->flags & __SEOF) && nconvs == 0))
 		    goto eof;
 		break;
 	    }

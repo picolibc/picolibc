@@ -162,14 +162,6 @@ equalf(float x, float y)
     return x == y;
 }
 
-#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
-static
-int strfromf(char *str, size_t n, const char *format, float f)
-{
-    return snprintf(str, n, format, (double) f);
-}
-#endif
-
 static int
 test_fmaf(void)
 {

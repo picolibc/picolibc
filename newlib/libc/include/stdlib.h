@@ -275,23 +275,19 @@ void    _srand48_r (struct _rand48 *, long);
 void	srandom (unsigned);
 #endif
 double	strtod (const char *__restrict __n, char **__restrict __end_PTR);
-#ifdef __TINY_STDIO
 int     strfromd(char *__restrict str, size_t n,
                  const char *__restrict format, double fp);
-#endif
 #if __ISO_C_VISIBLE >= 1999
 float	strtof (const char *__restrict __n, char **__restrict __end_PTR);
 #ifdef __HAVE_LONG_DOUBLE
 long double
         strtold (const char *__restrict __n, char **__restrict __end_PTR);
 #endif
-#ifdef __TINY_STDIO
 int     strfromf(char *__restrict str, size_t n,
                  const char *__restrict format, float fp);
 #ifdef __HAVE_LONG_DOUBLE
 int     strfroml (char *__restrict str, size_t n,
                   const char *__restrict format, long double fp);
-#endif
 #endif
 #endif
 #if __MISC_VISIBLE
@@ -353,34 +349,18 @@ int	on_exit (void (*__func)(int, void *),void *__arg);
 /* XSI Legacy option group */
 #if __XSI_VISIBLE >= 4
 char   *ecvt (double,int,int *,int *);
-#ifdef __TINY_STDIO
 int	ecvt_r (double,int,int *,int *, char*, size_t);
-#else
-char   *ecvtbuf (double, int, int*, int*, char *);
-#endif
 
 char   *ecvtf (float,int,int *,int *);
-#ifdef __TINY_STDIO
 int	ecvtf_r (float,int,int *,int *, char*, size_t);
-#else
-char   *ecvtfbuf (float, int, int*, int*, char *);
-#endif
 
 char   *fcvt (double,int,int *,int *);
-#ifdef __TINY_STDIO
 int	fcvt_r (double, int, int*, int*, char *, size_t);
-#else
-char   *fcvtbuf (double, int, int*, int*, char *);
-#endif
 
 char   *fcvtf (float,int,int *,int *);
-#ifdef __TINY_STDIO
 int	fcvtf_r (float, int, int*, int*, char *, size_t);
-#else
-char   *fcvtfbuf (float, int, int*, int*, char *);
-#endif
 
-#if defined(__HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
+#if defined(__HAVE_LONG_DOUBLE)
 char   *ecvtl(long double, int, int*, int*);
 int     ecvtl_r(long double, int, int*, int*, char *, size_t);
 char   *fcvtl(long double, int, int*, int*);
@@ -390,7 +370,7 @@ int     fcvtl_r(long double, int, int*, int*, char *, size_t);
 char   *gcvt (double,int,char *);
 char   *gcvtf (float,int,char *);
 
-#if defined(__HAVE_LONG_DOUBLE) && defined(__TINY_STDIO)
+#if defined(__HAVE_LONG_DOUBLE)
 char   *gcvtl(long double, int, char *);
 #endif
 

@@ -61,14 +61,6 @@ const struct test ecvt_tests[] = {
 #pragma GCC diagnostic ignored "-Wliteral-range"
 #endif
 
-#if !defined(__TINY_STDIO) && !defined(NO_NEWLIB)
-#define ecvt_r(n, dig, dec, sign, buf, len) (ecvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
-#define fcvt_r(n, dig, dec, sign, buf, len) (fcvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
-#define ecvtf_r(n, dig, dec, sign, buf, len) (ecvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
-#define fcvtf_r(n, dig, dec, sign, buf, len) (fcvtbuf(n, dig, dec, sign, buf) ? 0 : -1)
-#define SKIP_FCVT_NEG
-#endif
-
 #define N_ECVT_TESTS    (sizeof(ecvt_tests) / sizeof(ecvt_tests[0]))
 
 const struct test fcvt_tests[] = {
@@ -77,8 +69,6 @@ const struct test fcvt_tests[] = {
     { -1.0e0,   4,   1, 1, "10000", },
     { 1.0e7,    7,   8, 0, "100000000000000" },
     { 1.0e-12,  4,  -4, 0, "" },
-#ifndef SKIP_FCVT_NEG
-    /* legacy newlib doesn't handle negative ndecimal correctly */
     { 1.23456e0,-4,  1, 0, "1" },
     { 1.23456e1,-4,  2, 0, "10" },
     { 1.23456e2,-4,  3, 0, "100" },
@@ -86,7 +76,6 @@ const struct test fcvt_tests[] = {
     { 1.23456e4,-4,  5, 0, "10000" },
     { 1.23456e5,-4,  6, 0, "120000" },
     { 1.23456e6,-4,  7, 0, "1230000" },
-#endif
     { 1.23456e-10,4,-4, 0, "" },
     { 1.23456e-9,4, -4, 0, "" },
     { 1.23456e-8,4, -4, 0, "" },
@@ -112,7 +101,7 @@ const struct test fcvt_tests[] = {
 #define N_FCVT_TESTS    (sizeof(fcvt_tests) / sizeof(fcvt_tests[0]))
 
 const struct test fcvt_extra_tests[] = {
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
 #if __SIZEOF_DOUBLE__ == 4
     { 0x1.fffffep127, 9, 39, 0, "340282350000000000000000000000000000000000000000" },
 #else
@@ -146,24 +135,24 @@ const struct test fcvt_extra_tests[] = {
 #define N_FCVT_EXTRA_TESTS      (sizeof(fcvt_extra_tests) / sizeof(fcvt_extra_tests[0]))
 
 const struct test fcvtf_tests[] = {
-#ifdef __TINY_STDIO
+#ifdef __PICOLIBC__
     { 0x1.fffffep127, 9, 39, 0, "340282350000000000000000000000000000000000000000" },
 #else
-    /* legacy newlib uses the double path for this operation */
+    /* glibc uses the double path for this operation */
     { 0x1.fffffep127, 9, 39, 0, "340282346638528859811704183484516925440000000000" },
 #endif
 };
 
 #define N_FCVTF_TESTS    (sizeof(fcvtf_tests) / sizeof(fcvtf_tests[0]))
 
-#if defined(__TINY_STDIO) && !defined(__IO_FLOAT_EXACT)
-/* non-exact tinystdio conversions are not precise over about 6 digits */
+#if defined(__PICOLIBC__) && !defined(__IO_FLOAT_EXACT)
+/* non-exact conversions are not precise over about 6 digits */
 #define SKIP_LONG_FLOAT 1
 #else
 #define SKIP_LONG_FLOAT 0
 #endif
 
-#if (!defined(__TINY_STDIO) || !defined(__IO_FLOAT_EXACT)) && __SIZEOF_DOUBLE__ < 8
+#if (!defined(__IO_FLOAT_EXACT)) && __SIZEOF_DOUBLE__ < 8
 #undef SKIP_LONG_FLOAT
 #define SKIP_LONG_FLOAT 1
 #define SKIP_LONGISH_FLOAT 1

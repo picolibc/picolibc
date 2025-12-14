@@ -42,8 +42,6 @@ xtensa_putc(char c, FILE *file)
     _simcall(SYS_write, 1, (intptr_t) &c, 1);
 }
 
-#ifdef __TINY_STDIO
-
 static int
 xtensa_getc(FILE *file)
 {
@@ -64,5 +62,3 @@ static FILE __stdio = FDEV_SETUP_STREAM(xtensa_putc, xtensa_getc, NULL, _FDEV_SE
 FILE *const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-
-#endif

@@ -162,7 +162,7 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 #endif
 #endif
 
-/* Buffered I/O routines for tiny stdio */
+/* Buffered I/O routines */
 
 static inline ssize_t bufio_read(struct __file_bufio *bf, void *buf, size_t count)
 {

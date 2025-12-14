@@ -54,12 +54,7 @@ __typeof(__stack_chk_fail) __stack_chk_fail_weak;
 __noreturn void
 __stack_chk_fail_weak (void)
 {
-#ifdef __TINY_STDIO
   puts(STACK_CHK_MSG);
-#else
-  static const char msg[] = STACK_CHK_MSG "\n";
-  write (2, msg, sizeof(msg)-1);
-#endif
   abort();
 }
 __weak_reference(__stack_chk_fail_weak, __stack_chk_fail);

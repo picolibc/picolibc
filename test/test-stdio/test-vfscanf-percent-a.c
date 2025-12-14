@@ -37,7 +37,6 @@
 #include <stdio.h>
 #include <math.h>
 
-#if !defined(__PICOLIBC__) || defined(__TINY_STDIO)
 static int compare_floats(float a, float b, float tolerance) {
     float diff = a - b;
     if (diff < 0)
@@ -90,10 +89,3 @@ int main(void) {
 
     return 0;
 }
-#else
-int main(void)
-{
-    printf("vfscanf %%a not supported on legacy stdio\n");
-    return 77;
-}
-#endif

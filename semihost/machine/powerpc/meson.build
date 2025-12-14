@@ -41,12 +41,9 @@ if cc.get_define('_CALL_ELF') == '1'
                             'opal_cec_power_down.c',
                             'powerpc_exit.c',
                             'powerpc_kill.c',
+                            'powerpc_io.c',
                             'powerpc_stub.c',
                           ])
-
-  if tinystdio
-    src_semihost_ppc += files('powerpc_io.c')
-  endif
 
   foreach params : targets
     target = params['name']

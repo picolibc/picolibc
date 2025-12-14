@@ -82,6 +82,8 @@ picolibc_headers(""
   setjmp.h
   signal.h
   spawn.h
+  stdio.h
+  stdio-bufio.h
   stdint.h
   stdnoreturn.h
   stdlib.h

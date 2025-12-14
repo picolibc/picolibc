@@ -43,6 +43,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include "posix-local.h"
+#include "stdio_private.h"
 
 /*
  * Shared function for strfmon and strfmon_l
@@ -71,13 +72,6 @@
  * int_p_sign_posn      -1
  * int_n_sign_posn      -1
  */
-
-#ifdef __TINY_STDIO
-# include "stdio_private.h"
-# define m_snprintf	__d_snprintf	/* char equivalent function name */
-#else
-# define m_snprintf	snprintf	/* char equivalent function name */
-#endif
 
 ssize_t
 __vstrfmon(char *__restrict buf, size_t size,
@@ -196,7 +190,7 @@ __vstrfmon(char *__restrict buf, size_t size,
             /* Write the value into the provided buffer */
             val_pos = buf + pos;
             val_size = size - pos;
-            val_width = m_snprintf(val_pos, val_size, "%.*f", right_precision, val);
+            val_width = __d_snprintf(val_pos, val_size, "%.*f", right_precision, val);
 
             /* Check to see if it fit */
             if (val_width < 0 || (size_t) val_width > val_size) {

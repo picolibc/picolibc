@@ -46,8 +46,6 @@ msp430_putc(char c, FILE *file)
         return (unsigned char) c;
 }
 
-#ifdef __TINY_STDIO
-
 static int
 msp430_getc(FILE *file)
 {
@@ -66,5 +64,3 @@ static FILE __stdio = FDEV_SETUP_STREAM(msp430_putc, msp430_getc, NULL, _FDEV_SE
 FILE *const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-
-#endif

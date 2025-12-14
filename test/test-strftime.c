@@ -401,11 +401,6 @@ main(void)
     size_t  ret;
     size_t  l;
 
-    /* skip tests if printf isn't good enough */
-#if defined(__PICOLIBC__) && !defined(__TINY_STDIO)
-    printf("skipping test-strftime on legacy stdio target\n");
-    return 77;
-#endif
 /* Set timezone so that %z and %Z tests come out right */
     cp = TZ;
     if((i=putenv((char *) cp)))  {

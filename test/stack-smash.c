@@ -67,14 +67,10 @@ void
 __stack_chk_fail (void)
 {
 	if (expect_smash) {
-#ifdef __TINY_STDIO
 		puts("caught expected stack smash");
-#endif
 		_exit(0);
 	} else {
-#ifdef __TINY_STDIO
 		puts("caught unexpected stack smash");
-#endif
 		_exit(1);
 	}
 }

@@ -91,8 +91,6 @@ rx_putc(char c, FILE *file)
 	return (unsigned char) c;
 }
 
-#ifdef __TINY_STDIO
-
 static int
 rx_getc(FILE *file)
 {
@@ -114,5 +112,3 @@ static FILE __stdio = FDEV_SETUP_STREAM(rx_putc, rx_getc, NULL, _FDEV_SETUP_RW);
 FILE *const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-
-#endif

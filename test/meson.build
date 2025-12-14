@@ -345,36 +345,6 @@ foreach params : targets
 	)
   endif
 
-  t1 = 'test-long-longl'
-
-  test(t1 + target,
-       executable(t1 + target, ['test-long-long.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_l + _c_args,
-		  link_args: printf_link_args_l + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       timeout: 120,
-       priority: -1,
-       suite: 'test',
-       env: test_env)
-
-  t1 = 'test-long-long'
-
-  test(t1 + target,
-       executable(t1 + target, ['test-long-long.c', 'lock-valid.c'],
-		  c_args: printf_compile_args_d + _c_args,
-		  link_args: printf_link_args_d + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
-       depends: bios_bin,
-       timeout: 120,
-       priority: -1,
-       suite: 'test',
-       env: test_env)
-
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']

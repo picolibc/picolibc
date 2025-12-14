@@ -71,8 +71,6 @@ or1k_putc(char c, FILE *file)
 	return (unsigned char) c;
 }
 
-#ifdef __TINY_STDIO
-
 static int
 or1k_getc(FILE *file)
 {
@@ -91,5 +89,3 @@ static FILE __stdio = FDEV_SETUP_STREAM(or1k_putc, or1k_getc, NULL, _FDEV_SETUP_
 FILE *const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-
-#endif

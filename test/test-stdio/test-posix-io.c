@@ -80,7 +80,6 @@ main(void)
 		return 1;
 	}
 
-#if defined(__TINY_STDIO) || !defined(__SEMIHOST)
         if (fseeko(f, -3, SEEK_CUR) < 0) {
                 printf("failed to seek back 3 bytes\n");
                 return 1;
@@ -94,7 +93,6 @@ main(void)
         }
         if (test_cmp(f, test_string + 2))
                 return 1;
-#endif
 
 	if (fclose(f) != 0) {
 		printf("fclose failed\n");
