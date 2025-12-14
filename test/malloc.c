@@ -202,6 +202,7 @@ main(void)
             printf("free: %d bytes of memory not cleared\n", wrong);
             result = 1;
         }
+#ifdef __PICOLIBC__
         wrong = 0;
         char *rzero = malloc(128);
         if (rzero) {
@@ -230,6 +231,7 @@ main(void)
             printf("realloc: %d bytes of memory not cleared\n", wrong);
             result = 1;
         }
+#endif
 
 	/* make sure realloc doesn't read past the source */
 
