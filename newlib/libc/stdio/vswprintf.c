@@ -36,16 +36,17 @@
 #include "stdio_private.h"
 
 int
-vswprintf(wchar_t *s, size_t len, const wchar_t *fmt, va_list ap)
+vswprintf(wchar_t *s, size_t n, const wchar_t *fmt, va_list ap)
 {
         struct __file_str f = FDEV_SETUP_STRING_WRITE((char *) s,
-                                                      (char *) FDEV_STRING_WRITE_END(s, len));
+                                                      (char *) FDEV_STRING_WRITE_END(s, n));
 	int i;
 
         f.file.flags |= __SWIDE;
 	i = vfwprintf(&f.file, fmt, ap);
-	if (i >= 0)
-		s[i] = 0;
+
+	if (n)
+                memset(f.pos, 0, sizeof(wchar_t));
 
 	return i;
 }
