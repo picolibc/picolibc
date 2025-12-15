@@ -40,7 +40,8 @@ qemu="qemu-system-xtensa"
 elf="$1"
 shift
 
-while [ $# -gt 0 ]; do
+done=0
+while [ $# -gt 0 -a $done -eq 0 ]; do
   case "$1" in
     --stdin)
       if [ $# -lt 2 ]; then
@@ -59,8 +60,7 @@ while [ $# -gt 0 ]; do
       shift 2
       ;;
     *)
-      echo "Unknown option: $1"
-      exit 1
+      done=1
       ;;
   esac
 done
