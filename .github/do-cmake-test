@@ -40,4 +40,4 @@ trap 'rm -rf "$DIR"' 0
 	 ;;
  esac
  cat CMakeFiles/CMakeOutput.log
- ninja && ninja test) || exit 1
+ ninja --quiet && ninja --quiet test) || exit 1

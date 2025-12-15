@@ -72,7 +72,7 @@ OPTIONS="$ANALYZER $CDEFS"
 	 exit 3
 	 ;;
  esac
- ninja || exit 4
+ ninja --quiet || exit 4
  meson test -t 20 || exit 5)
 case $? in
     0)
