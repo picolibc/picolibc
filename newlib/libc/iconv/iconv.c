@@ -65,6 +65,7 @@ iconv (iconv_t ic,
                 tocopy = outbytes;
             memcpy(out, ic->buf + ic->buf_off, tocopy);
             out += tocopy;
+            outbytes -= tocopy;
             ic->buf_off += tocopy;
             if (ic->buf_off == ic->buf_len) {
                 char_count++;
