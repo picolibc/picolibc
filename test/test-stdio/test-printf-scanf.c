@@ -196,6 +196,39 @@ fail:
 #endif
 #endif
 
+/*
+ * Compute arithmetic right shift. For negative values, flip the bits,
+ * shift and flip back. Otherwise, just shift. Thanks to Per Vognsen
+ * for this version which both gcc and clang both currently optimize
+ * to a single asr instruction in small tests.
+ */
+#define __asr(t, n)                             \
+    static inline t                             \
+    __asr_ ## n(t x, int s) {                   \
+        return x < 0 ? ~(~x >> s) : x >> s;     \
+    }                                           \
+
+__asr(signed char, signed_char)
+__asr(short, short)
+__asr(int, int)
+__asr(long, long)
+__asr(long long, long_long)
+
+int
+__undefined_shift_size(int x, int s);
+
+#define asr(__x,__s) ((sizeof(__x) == sizeof(char)) ?                   \
+                      (__typeof(__x))__asr_signed_char(__x, __s) :      \
+                      (sizeof(__x) == sizeof(short)) ?                  \
+                      (__typeof(__x))__asr_short(__x, __s) :            \
+                      (sizeof(__x) == sizeof(int)) ?                    \
+                      (__typeof(__x))__asr_int(__x, __s) :              \
+                      (sizeof(__x) == sizeof(long)) ?                   \
+                      (__typeof(__x))__asr_long(__x, __s) :             \
+                      (sizeof(__x) == sizeof(long long)) ?              \
+                      (__typeof(__x))__asr_long_long(__x, __s):         \
+                      __undefined_shift_size(__x, __s))
+
 int
 main(void)
 {
@@ -265,7 +298,7 @@ main(void)
 #endif
 
 #if !defined(__IO_NO_FLOATING_POINT)
-        printf("checking floating point\n");
+        printf("checking basic floating point\n");
 	sprintf(buf, "%g", printf_float(0.0f));
 	if (strcmp(buf, "0") != 0) {
 		printf("0: wanted \"0\" got \"%s\"\n", buf);
@@ -353,7 +386,23 @@ main(void)
 
 #define CHECK_RT(type, prefix) do {                                     \
         for (x = 0; x < (int) (sizeof(type) * 8); x++) {                \
-                type v = (type) (0x123456789abcdef0LL >> (64 - sizeof(type) * 8)) >> x; \
+                type v = (type) (((uint64_t) 0x123456789abcdef0LL >> (64 - sizeof(type) * 8)) >> x); \
+                type r = ~v;                                            \
+                VERIFY(prefix, "d");                                    \
+                r = ~v;                                                 \
+                VERIFY(prefix, "u");                                    \
+                r = ~v;                                                 \
+                VERIFY(prefix, "x");                                    \
+                r = ~v;                                                 \
+                VERIFY(prefix, "o");                                    \
+                r = ~v;                                                 \
+                VERIFY_BINARY(prefix);                                  \
+        }                                                               \
+        } while(0)
+
+#define CHECK_RTI(type, prefix) do {                                     \
+        for (x = 0; x < (int) (sizeof(type) * 8); x++) {                \
+                type v = asr((type) ((uint64_t) 0x123456789abcdef0LL >> (64 - sizeof(type) * 8)), x); \
                 type r = ~v;                                            \
                 VERIFY(prefix, "d");                                    \
                 r = ~v;                                                 \
@@ -383,10 +432,10 @@ main(void)
 	if (sizeof(intmax_t) <= sizeof(long))
 #endif
 	{
-	        CHECK_RT(intmax_t, "j");
+	        CHECK_RTI(intmax_t, "j");
 	}
         CHECK_RT(size_t, "z");
-        CHECK_RT(ptrdiff_t, "t");
+        CHECK_RTI(ptrdiff_t, "t");
 #endif
 
         {
@@ -397,6 +446,7 @@ main(void)
         }
 #if !defined(__IO_NO_FLOATING_POINT)
 
+        printf("checking floating point\n");
 #ifndef NO_FLOAT_EXACT
         for (x = 0; x < 37; x++) {
                 float_type m, n, a, b, c;
@@ -545,6 +595,7 @@ main(void)
 #endif
 	}
 #endif
+        printf("errors %d\n", errors);
 	fflush(stdout);
 	return errors;
 }
