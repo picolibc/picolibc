@@ -565,6 +565,7 @@ if enable_native_tests
 endif
 
 subdir('libc-testsuite')
+subdir('test-iconv')
 subdir('test-math')
 subdir('test-string')
 subdir('test-monetary')
