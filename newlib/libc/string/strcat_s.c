@@ -38,11 +38,11 @@
 #include "string_private.h"
 
 __errno_t
-strcat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2)
+strcat_s(char * __restrict s1, rsize_t s1max, const char * __restrict s2)
 {
     const char *msg = "";
-    size_t s1_len = 0;
-    bool write_null = true;
+    size_t      s1_len = 0;
+    bool        write_null = true;
 
     if (s1 == NULL) {
         msg = "strcat_s: dest is NULL";
@@ -78,9 +78,9 @@ strcat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2)
     }
 
     const char *overlap_point;
-    bool check_s1_for_overlap;
-    unsigned m = s1max - s1_len;
-    char *s1cp = s1 + s1_len;
+    bool        check_s1_for_overlap;
+    unsigned    m = s1max - s1_len;
+    char       *s1cp = s1 + s1_len;
     const char *s2cp = s2;
 
     if (s1 <= s2) {
@@ -101,7 +101,7 @@ strcat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2)
     }
 
     unsigned written = 0;
-    char c = '.';
+    char     c = '.';
     while (written < m) {
         if (check_s1_for_overlap) {
             if (s1cp == overlap_point) {

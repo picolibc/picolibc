@@ -36,12 +36,12 @@
 long double
 getpayloadl(const long double *x)
 {
-    u_int32_t se,hx,lx;
-    GET_LDOUBLE_WORDS(se,hx,lx,*x);
+    u_int32_t se, hx, lx;
+    GET_LDOUBLE_WORDS(se, hx, lx, *x);
 
     hx &= 0x7fffffff;
-    if ((se & 0x7fff) != 0x7fff || (hx|lx) == 0)
+    if ((se & 0x7fff) != 0x7fff || (hx | lx) == 0)
         return -1;
     hx &= 0x3fffffff;
-    return (long double) (((uint64_t) hx << 32) | lx);
+    return (long double)(((uint64_t)hx << 32) | lx);
 }

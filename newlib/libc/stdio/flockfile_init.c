@@ -45,7 +45,7 @@ __flockfile_init(FILE *f)
      */
     __LIBC_LOCK();
     if (!f->lock)
-	__lock_init_recursive(f->lock);
+        __lock_init_recursive(f->lock);
     __LIBC_UNLOCK();
 }
 #endif

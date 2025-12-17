@@ -32,23 +32,22 @@
 #include <string.h>
 
 void *
-memmove (void *dst, const void *src, size_t len)
+memmove(void *dst, const void *src, size_t len)
 {
-  char *d = dst;
-  const char *s = src;
+    char       *d = dst;
+    const char *s = src;
 
-  /* The overlap case is allegedly rare - with this implementation
-     it will have a high penalty on the GR6.  */
-  if (s < d && d < s + len)
-    {
-      s += len;
-      d += len;
+    /* The overlap case is allegedly rare - with this implementation
+       it will have a high penalty on the GR6.  */
+    if (s < d && d < s + len) {
+        s += len;
+        d += len;
 
-      while (len--)
-        *--d = *--s;
+        while (len--)
+            *--d = *--s;
 
-      return dst;
+        return dst;
     }
 
-  return memcpy (dst, src, len);
+    return memcpy(dst, src, len);
 }

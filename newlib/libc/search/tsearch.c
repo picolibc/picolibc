@@ -51,33 +51,32 @@ SUCH DAMAGE.
 
 /* find or insert datum into search tree */
 void *
-tsearch (const void *vkey,		/* key to be located */
-	void **vrootp,		/* address of tree root */
-	int (*compar)(const void *, const void *))
+tsearch(const void *vkey,   /* key to be located */
+        void      **vrootp, /* address of tree root */
+        int         (*compar)(const void *, const void *))
 {
-	node_t *q;
-	node_t **rootp = (node_t **)vrootp;
+    node_t  *q;
+    node_t **rootp = (node_t **)vrootp;
 
-	if (rootp == NULL)
-		return NULL;
+    if (rootp == NULL)
+        return NULL;
 
-	while (*rootp != NULL) {	/* Knuth's T1: */
-		int r;
+    while (*rootp != NULL) { /* Knuth's T1: */
+        int r;
 
-		if ((r = (*compar)(vkey, (*rootp)->key)) == 0)	/* T2: */
-			return *rootp;		/* we found it! */
+        if ((r = (*compar)(vkey, (*rootp)->key)) == 0) /* T2: */
+            return *rootp;                             /* we found it! */
 
-		rootp = (r < 0) ?
-		    &(*rootp)->llink :		/* T3: follow left branch */
-		    &(*rootp)->rlink;		/* T4: follow right branch */
-	}
+        rootp = (r < 0) ? &(*rootp)->llink : /* T3: follow left branch */
+            &(*rootp)->rlink;                /* T4: follow right branch */
+    }
 
-	q = malloc(sizeof(node_t));		/* T5: key not found */
-	if (q != 0) {				/* make new node */
-		*rootp = q;			/* link new node to old */
-		/* LINTED const castaway ok */
-		q->key = (void *)vkey;		/* initialize new node */
-		q->llink = q->rlink = NULL;
-	}
-	return q;
+    q = malloc(sizeof(node_t)); /* T5: key not found */
+    if (q != 0) {               /* make new node */
+        *rootp = q;             /* link new node to old */
+        /* LINTED const castaway ok */
+        q->key = (void *)vkey; /* initialize new node */
+        q->llink = q->rlink = NULL;
+    }
+    return q;
 }

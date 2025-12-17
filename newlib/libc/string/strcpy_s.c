@@ -38,10 +38,10 @@
 #include "string_private.h"
 
 __errno_t
-strcpy_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2)
+strcpy_s(char * __restrict s1, rsize_t s1max, const char * __restrict s2)
 {
     const char *msg = "";
-    bool write_null = true;
+    bool        write_null = true;
 
     if (s1 == NULL) {
         msg = "strcpy_s: dest is NULL";
@@ -70,8 +70,8 @@ strcpy_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2)
      * s2 to detect these violations prior to attempting the copy.
      */
     const char *overlap_point;
-    bool check_s1_for_overlap;
-    char *s1cp = s1;
+    bool        check_s1_for_overlap;
+    char       *s1cp = s1;
     const char *s2cp = s2;
     if (s1 < s2) {
         // if we ever reach s2 when storing to s1 we have overlap
@@ -84,7 +84,7 @@ strcpy_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2)
     }
 
     unsigned written = 0;
-    char c = '.';
+    char     c = '.';
     while (written < s1max) {
         if (check_s1_for_overlap) {
             if (s1cp == overlap_point) {

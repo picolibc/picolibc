@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Written by Matthias Drochner <drochner@NetBSD.org>.
  * Public domain.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -49,7 +49,7 @@ SYNOPSIS
 
 
 DESCRIPTION
-        These functions compute the argument (also called phase angle) 
+        These functions compute the argument (also called phase angle)
         of <[z]>, with a branch cut along the negative real axis.
 
         <<cargf>> is identical to <<carg>>, except that it performs
@@ -57,11 +57,11 @@ DESCRIPTION
 
 RETURNS
         @ifnottex
-        The carg functions return the value of the argument in the 
+        The carg functions return the value of the argument in the
         interval [-pi, +pi]
         @end ifnottex
         @tex
-        The carg functions return the value of the argument in the 
+        The carg functions return the value of the argument in the
         interval [$-\pi$, $+\pi$]
         @end tex
 
@@ -80,5 +80,5 @@ double
 carg(double complex z)
 {
 
-	return atan2( cimag(z) , creal(z) );
+    return atan2(cimag(z), creal(z));
 }

@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -38,10 +38,10 @@
 float complex
 cexpf(float complex z)
 {
-	float r, x, y;
+    float r, x, y;
 
-	x = crealf(z);
-	y = cimagf(z);
-	r = expf(x);
-	return (float complex) (r * cosf(y)) + r * sinf(y) * I;
+    x = crealf(z);
+    y = cimagf(z);
+    r = expf(x);
+    return (float complex)(r * cosf(y)) + r * sinf(y) * I;
 }

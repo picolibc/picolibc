@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -16,14 +16,14 @@ FUNCTION
 <<copysign>>, <<copysignf>>---sign of <[y]>, magnitude of <[x]>
 
 INDEX
-	copysign
+        copysign
 INDEX
-	copysignf
+        copysignf
 
 SYNOPSIS
-	#include <math.h>
-	double copysign (double <[x]>, double <[y]>);
-	float copysignf (float <[x]>, float <[y]>);
+        #include <math.h>
+        double copysign (double <[x]>, double <[y]>);
+        float copysignf (float <[x]>, float <[y]>);
 
 DESCRIPTION
 <<copysign>> constructs a number with the magnitude (absolute value)
@@ -54,9 +54,9 @@ Definition (Issue 2).
 long double
 copysignl(long double x, long double y)
 {
-        int32_t esx, esy;
-        GET_LDOUBLE_EXP(esx, x);
-        GET_LDOUBLE_EXP(esy, y);
-        SET_LDOUBLE_EXP(x, (esx & 0x7fff)|(esy & 0x8000));
-        return x;
+    int32_t esx, esy;
+    GET_LDOUBLE_EXP(esx, x);
+    GET_LDOUBLE_EXP(esy, y);
+    SET_LDOUBLE_EXP(x, (esx & 0x7fff) | (esy & 0x8000));
+    return x;
 }

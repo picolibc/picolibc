@@ -37,25 +37,18 @@ Author: Ken Werner <ken.werner@de.ibm.com>
 #include <spu_cache.h>
 #include "sys/linux_syscalls.h"
 
-extern void __cache_flush (void) __weak;
+extern void __cache_flush(void) __weak;
 
-COMPAT_EA_ALIAS (pread_ea);
+COMPAT_EA_ALIAS(pread_ea);
 
 ssize_ea_t
-pread_ea (int fd, __ea void *buf, size_ea_t count, off_t offset)
+pread_ea(int fd, __ea void *buf, size_ea_t count, off_t offset)
 {
-  struct spu_syscall_block s = {
-    __NR_pread64,
-    {
-     fd,
-     (size_ea_t) buf,
-     count,
-     offset,
-     0,
-     0}
-  };
-  /* Flush cache only if the application really uses the software cache.  */
-  if (__cache_flush)
-    __cache_flush ();
-  return __linux_syscall (&s);
+    struct spu_syscall_block s = {
+        __NR_pread64, { fd, (size_ea_t)buf, count, offset, 0, 0 }
+    };
+    /* Flush cache only if the application really uses the software cache.  */
+    if (__cache_flush)
+        __cache_flush();
+    return __linux_syscall(&s);
 }

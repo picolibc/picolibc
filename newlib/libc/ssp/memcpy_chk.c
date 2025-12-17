@@ -39,14 +39,13 @@
 void *__memcpy_chk(void * __restrict, const void * __restrict, size_t, size_t);
 
 void *
-__memcpy_chk(void * __restrict dst, const void * __restrict src, size_t len,
-    size_t slen)
+__memcpy_chk(void * __restrict dst, const void * __restrict src, size_t len, size_t slen)
 {
-	if (len > slen)
-		__chk_fail();
+    if (len > slen)
+        __chk_fail();
 
-	if (__ssp_overlap((const char *)src, (const char *)dst, len))
-		__chk_fail();
+    if (__ssp_overlap((const char *)src, (const char *)dst, len))
+        __chk_fail();
 
-	return memcpy(dst, src, len);
+    return memcpy(dst, src, len);
 }

@@ -37,15 +37,15 @@
 int
 __STDIO_UNLOCKED(putc)(int c, FILE *stream)
 {
-	if ((stream->flags & __SWR) == 0)
-		return EOF;
+    if ((stream->flags & __SWR) == 0)
+        return EOF;
 
-	if (stream->put(c, stream) < 0) {
-                stream->flags |= __SERR;
-		return EOF;
-        }
+    if (stream->put(c, stream) < 0) {
+        stream->flags |= __SERR;
+        return EOF;
+    }
 
-	return (unsigned char) c;
+    return (unsigned char)c;
 }
 
 #ifdef __STDIO_LOCKING
@@ -62,12 +62,20 @@ putc(int c, FILE *stream)
 #ifdef __strong_reference
 __strong_reference(putc, putc_unlocked);
 #else
-int putc_unlocked(int c, FILE *stream) { return putc(c, stream); }
+int
+putc_unlocked(int c, FILE *stream)
+{
+    return putc(c, stream);
+}
 #endif
 #endif
 
 #ifdef __strong_reference
 __strong_reference(putc, fputc);
 #else
-int fputc(int c, FILE *stream) { return putc(c, stream); }
+int
+fputc(int c, FILE *stream)
+{
+    return putc(c, stream);
+}
 #endif

@@ -26,92 +26,89 @@ extern int errno;
 
 /* The runtime passes in heap space like this.  */
 struct heap {
-  int64_t size;
-  char data[0];
+    int64_t size;
+    char    data[0];
 };
 
-static char *__heap_ptr = (char*)-1;
-static char *__heap_end = (char*)-1;
-static int __heap_lock = 0;
+static char *__heap_ptr = (char *)-1;
+static char *__heap_end = (char *)-1;
+static int   __heap_lock = 0;
 static void *__heap_lock_id = NULL;
-static int __heap_lock_cnt = 0;
+static int   __heap_lock_cnt = 0;
 
 void *
-sbrk (ptrdiff_t nbytes)
+sbrk(ptrdiff_t nbytes)
 {
-  if (__heap_ptr == (char *)-1)
-    {
-      /* Find the heap from kernargs.  */
-      char *kernargs;
+    if (__heap_ptr == (char *)-1) {
+        /* Find the heap from kernargs.  */
+        char *kernargs;
 #if defined(__has_builtin) && __has_builtin(__builtin_gcn_kernarg_ptr)
-      kernargs = __builtin_gcn_kernarg_ptr ();
+        kernargs = __builtin_gcn_kernarg_ptr();
 #else
-      /* The kernargs pointer is in s[8:9].
-	 This will break if the enable_sgpr_* flags are ever changed.  */
-      __asm__ ("s_mov_b64 %0, s[8:9]" : "=Sg"(kernargs));
+        /* The kernargs pointer is in s[8:9].
+           This will break if the enable_sgpr_* flags are ever changed.  */
+        __asm__("s_mov_b64 %0, s[8:9]" : "=Sg"(kernargs));
 #endif
 
-      /* The heap data is at kernargs[3].  */
-      struct heap *heap = *(struct heap **)(kernargs + 24);
+        /* The heap data is at kernargs[3].  */
+        struct heap *heap = *(struct heap **)(kernargs + 24);
 
-      __heap_ptr = heap->data;
-      __heap_end = __heap_ptr + heap->size;
+        __heap_ptr = heap->data;
+        __heap_end = __heap_ptr + heap->size;
     }
 
-  if ((__heap_ptr + nbytes) >= __heap_end)
-    {
-      errno = ENOMEM;
-      return (void*)-1;
+    if ((__heap_ptr + nbytes) >= __heap_end) {
+        errno = ENOMEM;
+        return (void *)-1;
     }
 
-  char *base = __heap_ptr;
-  __heap_ptr += nbytes;
+    char *base = __heap_ptr;
+    __heap_ptr += nbytes;
 
-  return base;
+    return base;
 }
 
 void
-__malloc_lock (struct _reent *reent)
+__malloc_lock(struct _reent *reent)
 {
-  void *id = reent;
+    void *id = reent;
 
-  if (id == __heap_lock_id)
-    {
-      if (__heap_lock_cnt < 1)
-	abort ();
-      ++__heap_lock_cnt;
-      return;
+    if (id == __heap_lock_id) {
+        if (__heap_lock_cnt < 1)
+            abort();
+        ++__heap_lock_cnt;
+        return;
     }
 
-  while (__sync_lock_test_and_set (&__heap_lock, 1))
-    /* A sleep seems like it should allow the wavefront to yeild (maybe?)
-       Use the shortest possible sleep time of 1*64 cycles.  */
-    __asm__ volatile ("s_sleep\t1" ::: "memory");
+    while (__sync_lock_test_and_set(&__heap_lock, 1))
+        /* A sleep seems like it should allow the wavefront to yeild (maybe?)
+           Use the shortest possible sleep time of 1*64 cycles.  */
+        __asm__ volatile("s_sleep\t1" ::: "memory");
 
-  if (__heap_lock_id != NULL)
-    abort ();
-  if (__heap_lock_cnt != 0)
-    abort ();
+    if (__heap_lock_id != NULL)
+        abort();
+    if (__heap_lock_cnt != 0)
+        abort();
 
-  __heap_lock_cnt = 1;
-  __heap_lock_id = id;
+    __heap_lock_cnt = 1;
+    __heap_lock_id = id;
 }
 
 void
-__malloc_unlock (struct _reent *reent)
+__malloc_unlock(struct _reent *reent)
 {
-  void *id = reent;
+    void *id = reent;
 
-  if (id != __heap_lock_id)
-    abort ();
-  if (__heap_lock_cnt < 1)
-    abort ();
+    if (id != __heap_lock_id)
+        abort();
+    if (__heap_lock_cnt < 1)
+        abort();
 
-  --__heap_lock_cnt;
+    --__heap_lock_cnt;
 
-  if (__heap_lock_cnt > 0)
-    return;
+    if (__heap_lock_cnt > 0)
+        return;
 
-  __heap_lock_id = NULL;
-  __sync_lock_release (&__heap_lock);
+    __heap_lock_id = NULL;
+    __sync_lock_release(&__heap_lock);
 }

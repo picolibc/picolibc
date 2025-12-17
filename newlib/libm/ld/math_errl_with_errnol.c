@@ -33,9 +33,9 @@
 /* __noinline reduces code size and avoids making math functions non-leaf
    when the error handling is inlined.  */
 __noinline HIDDEN long double
-__math_with_errnol (long double y, int e)
+__math_with_errnol(long double y, int e)
 {
-  errno = e;
-  return y;
+    errno = e;
+    return y;
 }
 #endif

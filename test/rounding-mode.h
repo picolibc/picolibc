@@ -33,20 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-double
-div_d(double a, double b);
+double div_d(double a, double b);
 
-double
-mul_d(double a, double b);
+double mul_d(double a, double b);
 
-double
-sub_d(double a, double b);
+double sub_d(double a, double b);
 
-float
-div_f(float a, float b);
+float  div_f(float a, float b);
 
-float
-mul_f(float a, float b);
+float  mul_f(float a, float b);
 
-float
-sub_f(float a, float b);
+float  sub_f(float a, float b);

@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _NEXTAFTERD2_H_
-#define _NEXTAFTERD2_H_	1
+#define _NEXTAFTERD2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -48,7 +48,7 @@
  * DESCRIPTION
  *  The nextafterf4 function returns a vector containing the next representable
  *  floating-point number after the element of x, in the direction of the
- *  corresponding element y. 
+ *  corresponding element y.
  *
  *  Special Cases:
  *	- nextafter(NaN, y) = NaN
@@ -59,18 +59,19 @@
  *
  */
 
-static __inline vector double _nextafterd2(vector double x, vector double y)
+static __inline vector double
+_nextafterd2(vector double x, vector double y)
 {
-    vec_double2 n1ulp = (vec_double2)spu_splats(0x8000000000000001ull);
-    vector unsigned char mov_carry = {0x80,0x80,0x80, 7, 0x80,0x80,0x80,0x80,
-                                      0x80,0x80,0x80,15, 0x80,0x80,0x80,0x80};
-    vec_double2 zerod = spu_splats(0.0);
-    vec_llong2  one   = spu_splats(1ll);
-    vec_ullong2 xlt0, xgty, xeqy, xeq0;
-    vec_llong2  xllong;
-    vec_int4    carry;
-    vec_llong2  delta, deltap1;
-    vec_double2 result;
+    vec_double2          n1ulp = (vec_double2)spu_splats(0x8000000000000001ull);
+    vector unsigned char mov_carry = { 0x80, 0x80, 0x80, 7,  0x80, 0x80, 0x80, 0x80,
+                                       0x80, 0x80, 0x80, 15, 0x80, 0x80, 0x80, 0x80 };
+    vec_double2          zerod = spu_splats(0.0);
+    vec_llong2           one = spu_splats(1ll);
+    vec_ullong2          xlt0, xgty, xeqy, xeq0;
+    vec_llong2           xllong;
+    vec_int4             carry;
+    vec_llong2           delta, deltap1;
+    vec_double2          result;
 
     /* Compiler Bug. Replace xtmp/ytmp with x/y when spu_cmpgt(x,y) doesn't change x/y!*/
     volatile vec_double2 xtmp = x;
@@ -94,14 +95,14 @@ static __inline vector double _nextafterd2(vector double x, vector double y)
     /* Determine value to add to x */
     delta = (vec_llong2)spu_xor(xgty, xlt0);
 
-    //deltap1 = delta + one;
+    // deltap1 = delta + one;
     carry = spu_genc((vec_int4)delta, (vec_int4)one);
     carry = spu_shuffle(carry, carry, mov_carry);
     deltap1 = (vec_llong2)spu_addx((vec_int4)delta, (vec_int4)one, (vec_int4)carry);
 
     delta = spu_sel(deltap1, delta, (vec_ullong2)delta);
 
-    //xllong = xllong + delta;
+    // xllong = xllong + delta;
     carry = spu_genc((vec_int4)xllong, (vec_int4)delta);
     carry = spu_shuffle(carry, carry, mov_carry);
     xllong = (vec_llong2)spu_addx((vec_int4)xllong, (vec_int4)delta, (vec_int4)carry);
@@ -109,7 +110,7 @@ static __inline vector double _nextafterd2(vector double x, vector double y)
     /* Fix the case of x = 0, and answer should be -1 ulp */
     result = spu_sel((vec_double2)xllong, n1ulp, spu_and((vec_ullong2)delta, xeq0));
 
-    /* 
+    /*
      * Special Cases
      */
 

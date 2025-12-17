@@ -25,14 +25,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
 /*
 FUNCTION
         <<cproj>>, <<cprojf>>--- Riemann sphere projection
- 
+
 INDEX
         cproj
 INDEX
@@ -45,9 +45,9 @@ SYNOPSIS
 
 
 DESCRIPTION
-        These functions compute a projection of <[z]> onto the Riemann 
-        sphere: <[z]> projects to <[z]> except that all complex infinities 
-        (even those with one infinite part and one NaN part) project 
+        These functions compute a projection of <[z]> onto the Riemann
+        sphere: <[z]> projects to <[z]> except that all complex infinities
+        (even those with one infinite part and one NaN part) project
         to positive infinity on the real axis. If <[z]> has an infinite part,
         then <<cproj>>(<[z]>) is equivalent to
 
@@ -57,7 +57,7 @@ DESCRIPTION
         its calculations on <<floats complex>>.
 
 RETURNS
-        The cproj functions return the value of the projection onto 
+        The cproj functions return the value of the projection onto
         the Riemann sphere.
 
 PORTABILITY
@@ -67,7 +67,6 @@ QUICKREF
         <<cproj>> and <<cprojf>> are ISO C99
 
 */
-
 
 #include <complex.h>
 #include <math.h>
@@ -89,16 +88,16 @@ QUICKREF
 double complex
 cproj(double complex z)
 {
-	double_complex w = { .z = z };
+    double_complex w = { .z = z };
 
-	if (isinf(creal(z)) || isinf(cimag(z))) {
+    if (isinf(creal(z)) || isinf(cimag(z))) {
 #ifdef __INFINITY
-		REAL_PART(w) = __INFINITY;
+        REAL_PART(w) = __INFINITY;
 #else
-		REAL_PART(w) = (double) INFINITY;
+        REAL_PART(w) = (double)INFINITY;
 #endif
-		IMAG_PART(w) = copysign(0.0, cimag(z));
-	}
+        IMAG_PART(w) = copysign(0.0, cimag(z));
+    }
 
-	return (w.z);
+    return (w.z);
 }

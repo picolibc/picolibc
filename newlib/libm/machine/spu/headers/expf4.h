@@ -40,8 +40,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _EXPF4_H_
-#define _EXPF4_H_	1
-
+#define _EXPF4_H_ 1
 
 #include "floorf4.h"
 #include "ldexpf4.h"
@@ -55,58 +54,57 @@
  *	each of the element of the float vector.
  *
  */
-static __inline vector float _expf4(vector float x)
+static __inline vector float
+_expf4(vector float x)
 {
 
-  //  log2(e)
-  vec_float4 log2e = spu_splats(1.4426950408889634074f);
+    //  log2(e)
+    vec_float4 log2e = spu_splats(1.4426950408889634074f);
 
-  // Extra precision for the ln2 multiply
-  vec_float4 ln2_hi = spu_splats(0.693359375f);
-  vec_float4 ln2_lo = spu_splats(-2.12194440E-4f);
+    // Extra precision for the ln2 multiply
+    vec_float4 ln2_hi = spu_splats(0.693359375f);
+    vec_float4 ln2_lo = spu_splats(-2.12194440E-4f);
 
-  // Coefficents for the Taylor series
-  vec_float4 f02 = spu_splats(5.0000000000000000E-1f); // 1/2!
-  vec_float4 f03 = spu_splats(1.6666666666666667E-1f); // 1/3!
-  vec_float4 f04 = spu_splats(4.1666666666666667E-2f); // 1/4!
-  vec_float4 f05 = spu_splats(8.3333333333333333E-3f); // 1/5!
-  vec_float4 f06 = spu_splats(1.3888888888888889E-3f); // 1/6!
-  vec_float4 f07 = spu_splats(1.9841269841269841E-4f); // 1/7!
+    // Coefficents for the Taylor series
+    vec_float4 f02 = spu_splats(5.0000000000000000E-1f); // 1/2!
+    vec_float4 f03 = spu_splats(1.6666666666666667E-1f); // 1/3!
+    vec_float4 f04 = spu_splats(4.1666666666666667E-2f); // 1/4!
+    vec_float4 f05 = spu_splats(8.3333333333333333E-3f); // 1/5!
+    vec_float4 f06 = spu_splats(1.3888888888888889E-3f); // 1/6!
+    vec_float4 f07 = spu_splats(1.9841269841269841E-4f); // 1/7!
 
-  //  Range reduce input, so that:
-  //  e^x = e^z * 2^n
-  //  e^x = e^z * e^(n * ln(2))
-  //  e^x = e^(z + (n * ln(2)))
+    //  Range reduce input, so that:
+    //  e^x = e^z * 2^n
+    //  e^x = e^z * e^(n * ln(2))
+    //  e^x = e^(z + (n * ln(2)))
 
-  vec_int4 n;  // exponent of reduction
-  vec_float4 q;  // range reduced result
+    vec_int4   n; // exponent of reduction
+    vec_float4 q; // range reduced result
 
-  vec_float4 z;
-  vec_float4 r;  
+    vec_float4 z;
+    vec_float4 r;
 
-  z = spu_madd(x,log2e,spu_splats(0.5f));
-  z = _floorf4(z);
-  r = spu_nmsub(z,ln2_hi,x);
-  r = spu_nmsub(z,ln2_lo,r);
-  n = spu_convts(z,0);
-  z = spu_mul(r,r);
+    z = spu_madd(x, log2e, spu_splats(0.5f));
+    z = _floorf4(z);
+    r = spu_nmsub(z, ln2_hi, x);
+    r = spu_nmsub(z, ln2_lo, r);
+    n = spu_convts(z, 0);
+    z = spu_mul(r, r);
 
-  //  Use Horner's method on the Taylor series
-  q = spu_madd(r,f07,f06);
-  q = spu_madd(q,r,f05);
-  q = spu_madd(q,r,f04);
-  q = spu_madd(q,r,f03);
-  q = spu_madd(q,r,f02);
-  q = spu_madd(q,z,r);
-  q = spu_add(q,spu_splats(1.0f));
+    //  Use Horner's method on the Taylor series
+    q = spu_madd(r, f07, f06);
+    q = spu_madd(q, r, f05);
+    q = spu_madd(q, r, f04);
+    q = spu_madd(q, r, f03);
+    q = spu_madd(q, r, f02);
+    q = spu_madd(q, z, r);
+    q = spu_add(q, spu_splats(1.0f));
 
-  //  Adjust the result by the range reduction
-  r  = _ldexpf4( q, n );
+    //  Adjust the result by the range reduction
+    r = _ldexpf4(q, n);
 
-  return(r);
-
+    return (r);
 }
 
 #endif /* _EXPF4_H_ */
 #endif /* __SPU__ */
-

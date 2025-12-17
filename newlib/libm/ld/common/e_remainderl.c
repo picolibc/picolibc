@@ -24,20 +24,18 @@
  * SUCH DAMAGE.
  */
 
-
-
 long double
 remainderl(long double x, long double y)
 {
-	int quo;
+    int quo;
 
-        if (isnanl_inline(x) || isnanl_inline(y))
-            return x + y;
+    if (isnanl_inline(x) || isnanl_inline(y))
+        return x + y;
 
-        if (isinf(x) || y == 0.0L)
-            return __math_invalidl(x);
+    if (isinf(x) || y == 0.0L)
+        return __math_invalidl(x);
 
-	return (remquol(x, y, &quo));
+    return (remquol(x, y, &quo));
 }
 
 #ifdef __strong_reference

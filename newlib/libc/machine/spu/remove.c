@@ -36,13 +36,10 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-int
-remove (filename)
-     const char *filename;
+int remove(filename) const char *filename;
 {
 
-  /* The return value gets written over buf
-   */
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_REMOVE, &filename);
+    /* The return value gets written over buf
+     */
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_REMOVE, &filename);
 }
-

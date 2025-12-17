@@ -41,7 +41,7 @@
  */
 #define __machine_fpos_t_defined
 typedef struct {
-  char __pos[16];
+    char __pos[16];
 } _fpos_t;
 
 #ifdef __LARGE64_FILES

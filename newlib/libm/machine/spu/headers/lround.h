@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _LROUND_H_
-#define _LROUND_H_	1
+#define _LROUND_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -41,44 +41,45 @@
  * outside the 32-bit range.
  */
 
-static __inline long int _lround(double x)
+static __inline long int
+_lround(double x)
 {
-  int shift;
-  vec_int4 exp;
-  vec_uint4 mant, sign, mask, addend;
-  vec_double2 in;
+    int         shift;
+    vec_int4    exp;
+    vec_uint4   mant, sign, mask, addend;
+    vec_double2 in;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Determine how many bits to shift the mantissa to correctly
-   * align it into long long element 0.
-   */
-  exp = spu_and(spu_rlmask((vec_int4)in, -20), 0x7FF);
-  exp = spu_add(exp, -979);
-  shift = spu_extract(exp, 0);
+    /* Determine how many bits to shift the mantissa to correctly
+     * align it into long long element 0.
+     */
+    exp = spu_and(spu_rlmask((vec_int4)in, -20), 0x7FF);
+    exp = spu_add(exp, -979);
+    shift = spu_extract(exp, 0);
 
-  mask = spu_cmpgt(exp, 0);
+    mask = spu_cmpgt(exp, 0);
 
-  /* Algn mantissa bits
-   */
-  mant = spu_sel(spu_rlmaskqwbyte((vec_uint4)in, -8), VEC_SPLAT_U32(0x00100000),
-                 VEC_LITERAL(vec_uint4, 0,0,0xFFF00000,0));
+    /* Algn mantissa bits
+     */
+    mant = spu_sel(spu_rlmaskqwbyte((vec_uint4)in, -8), VEC_SPLAT_U32(0x00100000),
+                   VEC_LITERAL(vec_uint4, 0, 0, 0xFFF00000, 0));
 
-  mant = spu_slqwbytebc(spu_slqw(mant, shift), shift);
+    mant = spu_slqwbytebc(spu_slqw(mant, shift), shift);
 
-  /* Perform round by adding 1 if the fraction bits are
-   * greater than or equal to .5
-   */
-  addend = spu_and(spu_rlqw(mant, 1), 1);
-  mant = spu_and(spu_add(mant, addend), mask);
+    /* Perform round by adding 1 if the fraction bits are
+     * greater than or equal to .5
+     */
+    addend = spu_and(spu_rlqw(mant, 1), 1);
+    mant = spu_and(spu_add(mant, addend), mask);
 
-  /* Compute the two's complement of the mantissa if the
-   * input is negative.
-   */
-  sign = (vec_uint4)spu_rlmaska((vec_int4)in, -31);
+    /* Compute the two's complement of the mantissa if the
+     * input is negative.
+     */
+    sign = (vec_uint4)spu_rlmaska((vec_int4)in, -31);
 
-  mant = spu_sub(spu_xor(mant, sign), sign);
+    mant = spu_sub(spu_xor(mant, sign), sign);
 
-  return ((long int)spu_extract(mant, 0));
+    return ((long int)spu_extract(mant, 0));
 }
 #endif /* _LROUND_H_ */

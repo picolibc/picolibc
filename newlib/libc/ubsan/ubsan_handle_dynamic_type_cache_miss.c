@@ -36,12 +36,9 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_dynamic_type_cache_miss(void *_data,
-                                       void *pointer,
-                                       void *hash)
+__ubsan_handle_dynamic_type_cache_miss(void *_data, void *pointer, void *hash)
 {
     struct dynamic_type_cache_miss_data *data = _data;
     __ubsan_error(&data->location, "dynamic_type_cache_miss", "(%s) %p (hash %p)\n",
                   data->type->type_name, pointer, hash);
 }
-

@@ -41,8 +41,8 @@ static const __float64 one = _F_64(1.0), half = _F_64(0.5);
 __float64
 cosh64(__float64 x)
 {
-    __float64 t, w;
-    __int32_t ix;
+    __float64  t, w;
+    __int32_t  ix;
     __uint32_t lx;
 
     x = fabs64(x);

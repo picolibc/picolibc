@@ -40,7 +40,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _TRUNCD2_H_
-#define _TRUNCD2_H_	1
+#define _TRUNCD2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -53,34 +53,34 @@
  *      downwards (towards zero) to the nearest integer.
  *
  */
-static __inline vector double _truncd2(vector double in)
+static __inline vector double
+_truncd2(vector double in)
 {
-  vec_uchar16 splat_hi = (vec_uchar16) { 0,1,2,3,0,1,2,3, 8,9,10,11, 8,9,10,11 };
-  vec_int4 exp, shift;
-  vec_uint4 sign = (vec_uint4) { 0x80000000, 0, 0x80000000, 0 };
-  vec_uint4 or_mask, and_mask, mask;
-  vec_double2 in_hi, out;
+    vec_uchar16 splat_hi = (vec_uchar16) { 0, 1, 2, 3, 0, 1, 2, 3, 8, 9, 10, 11, 8, 9, 10, 11 };
+    vec_int4    exp, shift;
+    vec_uint4   sign = (vec_uint4) { 0x80000000, 0, 0x80000000, 0 };
+    vec_uint4   or_mask, and_mask, mask;
+    vec_double2 in_hi, out;
 
-  /* Construct a mask to remove the fraction bits. The mask
-   * depends on the exponent of the floating point
-   * input value.
-   */
-  in_hi = spu_shuffle(in, in, splat_hi);
-  exp = spu_and(spu_rlmask((vec_int4)in_hi, -20), 0x7FF);
+    /* Construct a mask to remove the fraction bits. The mask
+     * depends on the exponent of the floating point
+     * input value.
+     */
+    in_hi = spu_shuffle(in, in, splat_hi);
+    exp = spu_and(spu_rlmask((vec_int4)in_hi, -20), 0x7FF);
 
-  shift = spu_sub(((vec_int4) { 1023, 1043, 1023, 1043 }), exp);
-  or_mask = spu_andc(spu_cmpgt(shift, 0), sign);
+    shift = spu_sub(((vec_int4) { 1023, 1043, 1023, 1043 }), exp);
+    or_mask = spu_andc(spu_cmpgt(shift, 0), sign);
 
-  and_mask = spu_rlmask(((vec_uint4) { 0xFFFFF, -1, 0xFFFFF, -1 }), shift);
-  mask = spu_or(spu_and(and_mask, spu_cmpgt(shift, -32)), or_mask);
+    and_mask = spu_rlmask(((vec_uint4) { 0xFFFFF, -1, 0xFFFFF, -1 }), shift);
+    mask = spu_or(spu_and(and_mask, spu_cmpgt(shift, -32)), or_mask);
 
-  /* Apply the mask and return the result.
-   */
-  out = spu_andc(in, (vec_double2)(mask));
+    /* Apply the mask and return the result.
+     */
+    out = spu_andc(in, (vec_double2)(mask));
 
-  return (out);
+    return (out);
 }
-
 
 #endif /* _TRUNCD2_H_ */
 #endif /* __SPU__ */

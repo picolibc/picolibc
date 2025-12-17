@@ -130,7 +130,7 @@
 
 #ifdef _NEED_FLOAT64
 
-static const int init_jk[] = { 2, 3, 4, 6 }; /* initial value for jk */
+static const int       init_jk[] = { 2, 3, 4, 6 }; /* initial value for jk */
 
 static const __float64 PIo2[] = {
     _F_64(1.57079625129699707031e+00), /* 0x3FF921FB, 0x40000000 */
@@ -143,10 +143,9 @@ static const __float64 PIo2[] = {
     _F_64(2.16741683877804819444e-51), /* 0x3569F31D, 0x00000000 */
 };
 
-static const __float64
-    zero = _F_64(0.0), one = _F_64(1.0),
-    two24 = _F_64(1.67772160000000000000e+07), /* 0x41700000, 0x00000000 */
-    twon24 = _F_64(5.96046447753906250000e-08); /* 0x3E700000, 0x00000000 */
+static const __float64 zero = _F_64(0.0), one = _F_64(1.0),
+                       two24 = _F_64(1.67772160000000000000e+07), /* 0x41700000, 0x00000000 */
+    twon24 = _F_64(5.96046447753906250000e-08);                   /* 0x3E700000, 0x00000000 */
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -157,8 +156,7 @@ static const __float64
 #endif
 
 int
-__kernel_rem_pio2(__float64 *x, __float64 *y, int e0, int nx, int prec,
-                  const __int32_t *ipio2)
+__kernel_rem_pio2(__float64 *x, __float64 *y, int e0, int nx, int prec, const __int32_t *ipio2)
 {
     __int32_t jz, jx, jv, jp, jk, carry, n, iq[20], i, j, k, m, q0, ih;
     __float64 z, fw, f[20], fq[20], q[20];
@@ -197,7 +195,7 @@ recompute:
     }
 
     /* compute n */
-    z = scalbn64(z, (int)q0); /* actual value of z */
+    z = scalbn64(z, (int)q0);                    /* actual value of z */
     z -= _F_64(8.0) * floor64(z * _F_64(0.125)); /* trim off integer >= 8 */
     n = (__int32_t)z;
     z -= (__float64)n;

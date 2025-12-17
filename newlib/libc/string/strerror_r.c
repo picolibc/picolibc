@@ -2,18 +2,18 @@
 /* GNU variant of strerror_r. */
 /*
 FUNCTION
-	<<strerror_r>>---convert error number to string and copy to buffer
+        <<strerror_r>>---convert error number to string and copy to buffer
 
 INDEX
-	strerror_r
+        strerror_r
 
 SYNOPSIS
-	#include <string.h>
-	#ifdef _GNU_SOURCE
-	char *strerror_r(int <[errnum]>, char *<[buffer]>, size_t <[n]>);
-	#else
-	int strerror_r(int <[errnum]>, char *<[buffer]>, size_t <[n]>);
-	#endif
+        #include <string.h>
+        #ifdef _GNU_SOURCE
+        char *strerror_r(int <[errnum]>, char *<[buffer]>, size_t <[n]>);
+        #else
+        int strerror_r(int <[errnum]>, char *<[buffer]>, size_t <[n]>);
+        #endif
 
 DESCRIPTION
 <<strerror_r>> converts the error number <[errnum]> into a
@@ -67,13 +67,11 @@ a non-empty alternate string without assigning into its third argument.
 /* For backwards-compatible linking, this must be the GNU signature;
    see xpg_strerror_r.c for the POSIX version.  */
 char *
-strerror_r (int errnum,
-	char *buffer,
-	size_t n)
+strerror_r(int errnum, char *buffer, size_t n)
 {
-  char *error = _strerror_r (errnum, 1, NULL);
+    char *error = _strerror_r(errnum, 1, NULL);
 
-  if (strlen (error) >= n)
-    return error;
-  return strcpy (buffer, error);
+    if (strlen(error) >= n)
+        return error;
+    return strcpy(buffer, error);
 }

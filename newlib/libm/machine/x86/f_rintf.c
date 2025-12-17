@@ -1,17 +1,17 @@
 /*
-Copyright (c) 2007 Dave Korn 
+Copyright (c) 2007 Dave Korn
 
 
 x87 FP implementation contributed to Newlib by
 Dave Korn, November 2007.  This file is placed in the
-public domain.  Permission to use, copy, modify, and 
+public domain.  Permission to use, copy, modify, and
 distribute this software is freely granted.
  */
 /*
  * ====================================================
  * x87 FP implementation contributed to Newlib by
  * Dave Korn, November 2007.  This file is placed in the
- * public domain.  Permission to use, copy, modify, and 
+ * public domain.  Permission to use, copy, modify, and
  * distribute this software is freely granted.
  * ====================================================
  */
@@ -31,12 +31,12 @@ distribute this software is freely granted.
  *	Governed by x87 FPCR.
  */
 
-float _f_rintf (float x)
+float
+_f_rintf(float x)
 {
-  float _result;
-  __asm__("frndint" : "=t" (_result) : "0" (x));
-  return _result;
+    float _result;
+    __asm__("frndint" : "=t"(_result) : "0"(x));
+    return _result;
 }
 
-#endif  /* !__GNUC__ || _SOFT_FLOAT */
-
+#endif /* !__GNUC__ || _SOFT_FLOAT */

@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-clog.h"
-#define TEST_FUNC       clog
+#define TEST_VECTORS "test-clog.h"
+#define TEST_FUNC    clog
 
 #include "test-complex-one.h"

@@ -14,17 +14,15 @@
 #include "rand48.h"
 
 double
-_erand48_r (struct _rand48 *r,
-       unsigned short xseed[3])
+_erand48_r(struct _rand48 *r, unsigned short xseed[3])
 {
-  __dorand48(r, xseed);
-  return ldexp((double) xseed[0], -48) +
-    ldexp((double) xseed[1], -32) +
-    ldexp((double) xseed[2], -16);
+    __dorand48(r, xseed);
+    return ldexp((double)xseed[0], -48) + ldexp((double)xseed[1], -32)
+        + ldexp((double)xseed[2], -16);
 }
 
 double
-erand48 (unsigned short xseed[3])
+erand48(unsigned short xseed[3])
 {
-  return _erand48_r (&_rand48, xseed);
+    return _erand48_r(&_rand48, xseed);
 }

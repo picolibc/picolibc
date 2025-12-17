@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/round.h"
 
-double round(double x)
+double
+round(double x)
 {
     return _round(x);
 }

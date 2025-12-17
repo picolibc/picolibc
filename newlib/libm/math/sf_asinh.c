@@ -16,18 +16,18 @@
 #include "fdlibm.h"
 
 static const float one = 1.0000000000e+00, /* 0x3F800000 */
-    ln2 = 6.9314718246e-01, /* 0x3f317218 */
+    ln2 = 6.9314718246e-01,                /* 0x3f317218 */
     huge = 1.0000000000e+30;
 
 float
 asinhf(float x)
 {
-    float t, w;
+    float     t, w;
     __int32_t hx, ix;
     GET_FLOAT_WORD(hx, x);
     ix = hx & 0x7fffffff;
     if (!FLT_UWORD_IS_FINITE(ix))
-        return x + x; /* x is inf or NaN */
+        return x + x;      /* x is inf or NaN */
     if (ix < 0x31800000) { /* |x|<2**-28 */
         if (huge + x > one)
             return x; /* return x inexact except 0 */

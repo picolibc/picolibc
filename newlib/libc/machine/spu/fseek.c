@@ -36,28 +36,24 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  int fp;
-  unsigned int pad0[ 3 ];
-  long offset;
-  unsigned int pad1[ 3 ];
-  int whence;
+typedef struct {
+    int          fp;
+    unsigned int pad0[3];
+    long         offset;
+    unsigned int pad1[3];
+    int          whence;
 } c99_fseek_t;
 
-
 int
-fseek (register FILE *fp,
-     long offset,
-     int whence)
+fseek(register FILE *fp, long offset, int whence)
 {
-  c99_fseek_t args;
+    c99_fseek_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.fp = fp->_fp;
-  args.offset = offset;
-  args.whence = whence;
+    args.fp = fp->_fp;
+    args.offset = offset;
+    args.whence = whence;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSEEK, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FSEEK, &args);
 }

@@ -39,17 +39,15 @@
 int
 sys_semihost_rename(const char *old_pathname, const char *new_pathname)
 {
-	struct {
-		sh_param_t	field1;
-		sh_param_t	field2;
-		sh_param_t	field3;
-		sh_param_t	field4;
-	} arg = {
-		.field1 = (sh_param_t) (uintptr_t) old_pathname,
-		.field2 = strlen(old_pathname),
-		.field3 = (sh_param_t) (uintptr_t) new_pathname,
-		.field4 = strlen(new_pathname)
-	};
+    struct {
+        sh_param_t field1;
+        sh_param_t field2;
+        sh_param_t field3;
+        sh_param_t field4;
+    } arg = { .field1 = (sh_param_t)(uintptr_t)old_pathname,
+              .field2 = strlen(old_pathname),
+              .field3 = (sh_param_t)(uintptr_t)new_pathname,
+              .field4 = strlen(new_pathname) };
 
-	return (int) sys_semihost(SYS_RENAME, (uintptr_t) &arg);
+    return (int)sys_semihost(SYS_RENAME, (uintptr_t)&arg);
 }

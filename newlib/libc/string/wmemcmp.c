@@ -1,26 +1,26 @@
 /*
 FUNCTION
-	<<wmemcmp>>---compare wide characters in memory 
+        <<wmemcmp>>---compare wide characters in memory
 
 SYNOPSIS
-	#include <wchar.h>
-	int wmemcmp(const wchar_t *<[s1]>, const wchar_t *<[s2]>, size_t <[n]>);
+        #include <wchar.h>
+        int wmemcmp(const wchar_t *<[s1]>, const wchar_t *<[s2]>, size_t <[n]>);
 
 DESCRIPTION
-	The <<wmemcmp>> function compares the first <[n]> wide characters of the
-	object pointed to by <[s1]> to the first <[n]> wide characters of the
-	object pointed to by <[s2]>. This function is not affected by locale
-	and all wchar_t values are treated identically. The null wide character
-	and wchar_t values not corresponding to valid characters are not treated
-	specially.
+        The <<wmemcmp>> function compares the first <[n]> wide characters of the
+        object pointed to by <[s1]> to the first <[n]> wide characters of the
+        object pointed to by <[s2]>. This function is not affected by locale
+        and all wchar_t values are treated identically. The null wide character
+        and wchar_t values not corresponding to valid characters are not treated
+        specially.
 
-	If <[n]> is zero, <[s1]> and <[s2]> must be a valid pointers and the
-	function behaves as if the two objects compare equal. 
+        If <[n]> is zero, <[s1]> and <[s2]> must be a valid pointers and the
+        function behaves as if the two objects compare equal.
 
 RETURNS
-	The <<wmemcmp>> function returns an integer greater than, equal to,
-	or less than zero, accordingly as the object pointed to by <[s1]> is
-	greater than, equal to, or less than the object pointed to by <[s2]>.
+        The <<wmemcmp>> function returns an integer greater than, equal to,
+        or less than zero, accordingly as the object pointed to by <[s1]> is
+        greater than, equal to, or less than the object pointed to by <[s2]>.
 
 PORTABILITY
 <<wmemcmp>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -61,21 +61,17 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 int
-wmemcmp (const wchar_t * s1,
-	const wchar_t * s2,
-	size_t n)
+wmemcmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < n; i++)
-    {
-      if (*s1 != *s2)
-	{
-	  /* wchar might be unsigned */
-	  return *s1 > *s2 ? 1 : -1;
-	}
-      s1++;
-      s2++;
+    for (i = 0; i < n; i++) {
+        if (*s1 != *s2) {
+            /* wchar might be unsigned */
+            return *s1 > *s2 ? 1 : -1;
+        }
+        s1++;
+        s2++;
     }
-  return 0;
+    return 0;
 }

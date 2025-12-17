@@ -36,16 +36,15 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-
 int
-fileno (FILE *fp)
+fileno(FILE *fp)
 
 {
-  int ret;
+    int ret;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  ret = fp->_fp;
+    ret = fp->_fp;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FILENO, &ret);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FILENO, &ret);
 }

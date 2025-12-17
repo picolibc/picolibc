@@ -40,20 +40,19 @@
 int
 main(void)
 {
-	char	*expect = COMMAND_LINE;
-	char	e;
-	int	ch;
-	int	i = 0;
+    char *expect = COMMAND_LINE;
+    char  e;
+    int   ch;
+    int   i = 0;
 
-	while ((e = *expect++) != '\0') {
-		ch = sys_semihost_getc(stdin);
-		printf("got %c expect %c\n", ch, e);
-		if ((int) (uint8_t) e != ch) {
-			printf("got %02x instead of %02x at %d\n",
-			       (uint8_t) e, ch, i);
-			exit(1);
-		}
-		i++;
-	}
-	exit(0);
+    while ((e = *expect++) != '\0') {
+        ch = sys_semihost_getc(stdin);
+        printf("got %c expect %c\n", ch, e);
+        if ((int)(uint8_t)e != ch) {
+            printf("got %02x instead of %02x at %d\n", (uint8_t)e, ch, i);
+            exit(1);
+        }
+        i++;
+    }
+    exit(0);
 }

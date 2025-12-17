@@ -34,9 +34,9 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* On platforms where long double is as wide as double.  */
 long double
-copysignl (long double x, long double y)
+copysignl(long double x, long double y)
 {
-  return __builtin_copysignl(x, y);
+    return __builtin_copysignl(x, y);
 }
 
 #endif

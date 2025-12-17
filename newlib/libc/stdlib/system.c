@@ -7,15 +7,15 @@ FUNCTION
 <<system>>---execute command string
 
 INDEX
-	system
+        system
 INDEX
-	_system_r
+        _system_r
 
 SYNOPSIS
-	#include <stdlib.h>
-	int system(char *<[s]>);
+        #include <stdlib.h>
+        int system(char *<[s]>);
 
-	int _system_r(void *<[reent]>, char *<[s]>);
+        int _system_r(void *<[reent]>, char *<[s]>);
 
 DESCRIPTION
 
@@ -54,45 +54,43 @@ Supporting OS subroutines required: <<_exit>>, <<_execve>>, <<_fork_r>>,
 #include <unistd.h>
 #include <sys/wait.h>
 
-#if defined (unix) || defined (__CYGWIN__)
-static int do_system (const char *s);
+#if defined(unix) || defined(__CYGWIN__)
+static int do_system(const char *s);
 #endif
 
-
 int
-system (const char *s)
+system(const char *s)
 {
 #if defined(HAVE_SYSTEM)
-  return _system (s);
+    return _system(s);
 #elif defined(NO_EXEC)
-  if (s == NULL)
-    return 0;
-  errno = ENOSYS;
-  return -1;
+    if (s == NULL)
+        return 0;
+    errno = ENOSYS;
+    return -1;
 #else
 
-  /* ??? How to handle (s == NULL) here is not exactly clear.
-     If _fork_r fails, that's not really a justification for returning 0.
-     For now we always return 0 and leave it to each target to explicitly
-     handle otherwise (this can always be relaxed in the future).  */
+    /* ??? How to handle (s == NULL) here is not exactly clear.
+       If _fork_r fails, that's not really a justification for returning 0.
+       For now we always return 0 and leave it to each target to explicitly
+       handle otherwise (this can always be relaxed in the future).  */
 
-#if defined (unix) || defined (__CYGWIN__)
-  if (s == NULL)
-    return 1;
-  return do_system (s);
+#if defined(unix) || defined(__CYGWIN__)
+    if (s == NULL)
+        return 1;
+    return do_system(s);
 #else
-  if (s == NULL)
-    return 0;
-  errno = ENOSYS;
-  return -1;
+    if (s == NULL)
+        return 0;
+    errno = ENOSYS;
+    return -1;
 #endif
 
 #endif
 }
 
-
-#if defined (unix) && !defined (__CYGWIN__) && !defined(__rtems__)
-extern char **environ;
+#if defined(unix) && !defined(__CYGWIN__) && !defined(__rtems__)
+extern char  **environ;
 
 /* Only deal with a pointer to environ, to work around subtle bugs with shared
    libraries and/or small data systems where the user declares his own
@@ -100,31 +98,27 @@ extern char **environ;
 static char ***p_environ = &environ;
 
 static int
-do_system (const char *s)
+do_system(const char *s)
 {
-  char *argv[4];
-  int pid, status;
+    char *argv[4];
+    int   pid, status;
 
-  argv[0] = "sh";
-  argv[1] = "-c";
-  argv[2] = (char *) s;
-  argv[3] = NULL;
+    argv[0] = "sh";
+    argv[1] = "-c";
+    argv[2] = (char *)s;
+    argv[3] = NULL;
 
-  if ((pid = fork ()) == 0)
-    {
-      execve ("/bin/sh", argv, *p_environ);
-      exit (100);
-    }
-  else if (pid == -1)
-    return -1;
-  else
-    {
-      int rc = wait (&status);
-      if (rc == -1)
-	return -1;
-      status = (status >> 8) & 0xff;
-      return status;
+    if ((pid = fork()) == 0) {
+        execve("/bin/sh", argv, *p_environ);
+        exit(100);
+    } else if (pid == -1)
+        return -1;
+    else {
+        int rc = wait(&status);
+        if (rc == -1)
+            return -1;
+        status = (status >> 8) & 0xff;
+        return status;
     }
 }
 #endif
-

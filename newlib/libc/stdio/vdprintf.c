@@ -35,13 +35,14 @@
 
 #include "stdio_private.h"
 
-#define DPRINT_BUFSIZ   32
+#define DPRINT_BUFSIZ 32
 
 int
 vdprintf(int fd, const char *fmt, va_list ap)
 {
     char                buf[DPRINT_BUFSIZ];
-    struct __file_bufio bf = FDEV_SETUP_BUFIO(fd, buf, sizeof(buf), NULL, write, NULL, NULL, __SWR, 0);
+    struct __file_bufio bf
+        = FDEV_SETUP_BUFIO(fd, buf, sizeof(buf), NULL, write, NULL, NULL, __SWR, 0);
 
     int printf_ret = vfprintf(&bf.xfile.cfile.file, fmt, ap);
     int flush_ret = __bufio_flush(&bf.xfile.cfile.file);

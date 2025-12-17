@@ -1,26 +1,26 @@
 /*
 FUNCTION
-	<<wcsncat>>---concatenate part of two wide-character strings 
+        <<wcsncat>>---concatenate part of two wide-character strings
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcsncat(wchar_t *__restrict <[s1]>,
-			const wchar_t *__restrict <[s2]>, size_t <[n]>);
+        #include <wchar.h>
+        wchar_t *wcsncat(wchar_t *__restrict <[s1]>,
+                        const wchar_t *__restrict <[s2]>, size_t <[n]>);
 
 DESCRIPTION
-	The <<wcsncat>> function appends not more than <[n]> wide-character
-	codes (a null wide-character code and wide-character codes that follow
-	it are not appended) from the array pointed to by <[s2]> to the end of
-	the wide-character string pointed to by <[s1]>. The initial
-	wide-character code of <[s2]> overwrites the null wide-character code
-	at the end of <[s1]>.
-	A terminating null wide-character code is always appended to the result.
-	If copying takes place between objects that overlap, the behaviour is
-	undefined.
+        The <<wcsncat>> function appends not more than <[n]> wide-character
+        codes (a null wide-character code and wide-character codes that follow
+        it are not appended) from the array pointed to by <[s2]> to the end of
+        the wide-character string pointed to by <[s1]>. The initial
+        wide-character code of <[s2]> overwrites the null wide-character code
+        at the end of <[s1]>.
+        A terminating null wide-character code is always appended to the result.
+        If copying takes place between objects that overlap, the behaviour is
+        undefined.
 
 RETURNS
-	The <<wcsncat>> function returns <[s1]>; no return value is reserved to
-	indicate an error.
+        The <<wcsncat>> function returns <[s1]>; no return value is reserved to
+        indicate an error.
 
 PORTABILITY
 <<wcsncat>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -61,24 +61,21 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wcsncat (wchar_t *__restrict s1,
-	const wchar_t *__restrict s2,
-	size_t n)
+wcsncat(wchar_t * __restrict s1, const wchar_t * __restrict s2, size_t n)
 {
-  wchar_t *p;
-  wchar_t *q;
-  const wchar_t *r;
+    wchar_t       *p;
+    wchar_t       *q;
+    const wchar_t *r;
 
-  p = s1;
-  while (*p)
-    p++;
-  q = p;
-  r = s2;
-  while (*r && n)
-    {
-      *q++ = *r++;
-      n--;
+    p = s1;
+    while (*p)
+        p++;
+    q = p;
+    r = s2;
+    while (*r && n) {
+        *q++ = *r++;
+        n--;
     }
-  *q = '\0';
-  return s1;
+    *q = '\0';
+    return s1;
 }

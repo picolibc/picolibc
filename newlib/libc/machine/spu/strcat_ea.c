@@ -36,22 +36,22 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (strcat_ea);
+COMPAT_EA_ALIAS(strcat_ea);
 
 /*
  * Maybe not the fastest thing ever since it reads through the data once on
  * strlen and once on memcpy, but it should work.
  */
 __ea char *
-strcat_ea (__ea char *dest, __ea const char *src)
+strcat_ea(__ea char *dest, __ea const char *src)
 {
-  size_ea_t length_src;
-  size_ea_t length_dest;
-  __ea char *new_dest;
+    size_ea_t  length_src;
+    size_ea_t  length_dest;
+    __ea char *new_dest;
 
-  length_src = strlen_ea (src);
-  length_dest = strlen_ea (dest);
-  new_dest = dest + length_dest;
-  memcpy_ea ((__ea void *) new_dest, (__ea void *) src, length_src + 1);
-  return dest;
+    length_src = strlen_ea(src);
+    length_dest = strlen_ea(dest);
+    new_dest = dest + length_dest;
+    memcpy_ea((__ea void *)new_dest, (__ea void *)src, length_src + 1);
+    return dest;
 }

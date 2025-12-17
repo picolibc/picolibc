@@ -7,12 +7,12 @@ FUNCTION
    <<atof>>, <<atoff>>---string to double or float
 
 INDEX
-	atof
+        atof
 INDEX
-	atoff
+        atoff
 
 SYNOPSIS
-	#include <stdlib.h>
+        #include <stdlib.h>
         double atof(const char *<[s]>);
         float atoff(const char *<[s]>);
 
@@ -56,11 +56,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-
 #include <stdlib.h>
 
 double
-atof (const char *s)
+atof(const char *s)
 {
-  return strtod (s, NULL);
+    return strtod(s, NULL);
 }

@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/trunc.h"
 
-double trunc(double x)
+double
+trunc(double x)
 {
     return _trunc(x);
 }

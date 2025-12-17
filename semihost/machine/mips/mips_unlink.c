@@ -39,7 +39,7 @@
 int
 unlink(const char *pathname)
 {
-    int ret = mips_semihost1(SYS_SEMIHOST_unlink, (uintptr_t) pathname);
+    int ret = mips_semihost1(SYS_SEMIHOST_unlink, (uintptr_t)pathname);
 
     return ret;
 }

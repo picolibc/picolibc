@@ -34,17 +34,17 @@
 int
 fclose(FILE *f)
 {
-        struct __file_close *cf = (struct __file_close *) f;
+    struct __file_close *cf = (struct __file_close *)f;
 
 #ifdef __STDIO_LOCKING
-        fflush(f);
-	__flockfile_close(f);
+    fflush(f);
+    __flockfile_close(f);
 #endif
-        if ((f->flags & __SCLOSE) && cf->close) {
-		/*
-		 * File has 'close' function, call it
-		 */
-		return (*cf->close)(f);
-	}
-	return 0;
+    if ((f->flags & __SCLOSE) && cf->close) {
+        /*
+         * File has 'close' function, call it
+         */
+        return (*cf->close)(f);
+    }
+    return 0;
 }

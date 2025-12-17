@@ -15,11 +15,10 @@ IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
-
 #include <picolibc.h>
 
 long
 __negsi2(long x)
 {
-  return ~x+1;
+    return ~x + 1;
 }

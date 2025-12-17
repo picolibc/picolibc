@@ -38,24 +38,18 @@
 
 #include "jis_charsets.h"
 
-#define INVALID_JIS     __euc_jp_invalid_jis
+#define INVALID_JIS __euc_jp_invalid_jis
 
-uint32_t
-__unicode_to_euc_jp(wchar_t unicode);
+uint32_t __unicode_to_euc_jp(wchar_t unicode);
 
-wint_t
-__euc_jp_to_unicode(uint32_t euc_jp);
+wint_t   __euc_jp_to_unicode(uint32_t euc_jp);
 
-uint16_t
-__unicode_to_shift_jis(wchar_t unicode);
+uint16_t __unicode_to_shift_jis(wchar_t unicode);
 
-wint_t
-__shift_jis_to_unicode(uint16_t shift_jis);
+wint_t   __shift_jis_to_unicode(uint16_t shift_jis);
 
-uint16_t
-__unicode_to_jis(wchar_t unicode);
+uint16_t __unicode_to_jis(wchar_t unicode);
 
-wint_t
-__jis_to_unicode(uint16_t jis);
+wint_t   __jis_to_unicode(uint16_t jis);
 
 #endif /* _JIS_H_ */

@@ -37,31 +37,27 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <spu_cache.h>
 
-COMPAT_EA_ALIAS (strspn_ea);
+COMPAT_EA_ALIAS(strspn_ea);
 
 size_ea_t
-strspn_ea (__ea const char *s, const char *accept)
+strspn_ea(__ea const char *s, const char *accept)
 {
-  __ea void *curr_s = (__ea void *) s;
-  char *local_s;
-  size_ea_t length_of_string = 0;
-  size_ea_t s_len;
-  int i;
+    __ea void *curr_s = (__ea void *)s;
+    char      *local_s;
+    size_ea_t  length_of_string = 0;
+    size_ea_t  s_len;
+    int        i;
 
-  s_len = strlen_ea (s);
+    s_len = strlen_ea(s);
 
-  for (i = 0; i < s_len; i++)
-    {
-      local_s = (char *) __cache_fetch (curr_s);
-      if (!strchr (accept, local_s[0]))
-	{
-	  return length_of_string;
-	}
-      else
-	{
-	  length_of_string++;
-	  curr_s++;
-	}
+    for (i = 0; i < s_len; i++) {
+        local_s = (char *)__cache_fetch(curr_s);
+        if (!strchr(accept, local_s[0])) {
+            return length_of_string;
+        } else {
+            length_of_string++;
+            curr_s++;
+        }
     }
-  return length_of_string;
+    return length_of_string;
 }

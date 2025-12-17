@@ -36,11 +36,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (msync_ea);
+COMPAT_EA_ALIAS(msync_ea);
 
 int
-msync_ea (__ea void *start, size_ea_t length, int flags)
+msync_ea(__ea void *start, size_ea_t length, int flags)
 {
-  return msync_eaddr ((unsigned long long) (size_ea_t) start, length,
-		      flags);
+    return msync_eaddr((unsigned long long)(size_ea_t)start, length, flags);
 }

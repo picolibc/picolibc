@@ -39,22 +39,22 @@
 int
 main(void)
 {
-	uint64_t	start = sys_semihost_elapsed();
-	uint64_t	stop;
-	uint64_t	loop;
+    uint64_t start = sys_semihost_elapsed();
+    uint64_t stop;
+    uint64_t loop;
 
-	for (loop = 0; loop < 10000000; loop++) {
-		stop = sys_semihost_elapsed();
-		if (stop != start) {
-			if (stop < start) {
-				printf("semihost-elapsed: elapsed went backwards\n");
-				exit(2);
-			}
-			printf("start %lld stop %lld diff %lld\n",
-			       (long long) start, (long long) stop, (long long) (stop - start));
-			exit(0);
-		}
-	}
-	printf("semihost-elapsed: elapsed never changed\n");
-	exit(1);
+    for (loop = 0; loop < 10000000; loop++) {
+        stop = sys_semihost_elapsed();
+        if (stop != start) {
+            if (stop < start) {
+                printf("semihost-elapsed: elapsed went backwards\n");
+                exit(2);
+            }
+            printf("start %lld stop %lld diff %lld\n", (long long)start, (long long)stop,
+                   (long long)(stop - start));
+            exit(0);
+        }
+    }
+    printf("semihost-elapsed: elapsed never changed\n");
+    exit(1);
 }

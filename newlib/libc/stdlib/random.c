@@ -4,15 +4,15 @@ FUNCTION
 <<random>>, <<srandom>>---pseudo-random numbers
 
 INDEX
-	random
+        random
 INDEX
-	srandom
+        srandom
 
 SYNOPSIS
-	#define _XOPEN_SOURCE 500
-	#include <stdlib.h>
-	long int random(void);
-	void srandom(unsigned int <[seed]>);
+        #define _XOPEN_SOURCE 500
+        #include <stdlib.h>
+        long int random(void);
+        void srandom(unsigned int <[seed]>);
 
 
 
@@ -59,11 +59,11 @@ algorithm as <<rand>>.
 __THREAD_LOCAL uint64_t _rand_next = 1;
 
 long int
-random (void)
+random(void)
 {
-  /* This multiplier was obtained from Knuth, D.E., "The Art of
-     Computer Programming," Vol 2, Seminumerical Algorithms, Third
-     Edition, Addison-Wesley, 1998, p. 106 (line 26) & p. 108 */
-  _rand_next = _rand_next * 6364136223846793005ULL + 1;
-  return (long int)((_rand_next >> 32) & 0x7fffffffL);
+    /* This multiplier was obtained from Knuth, D.E., "The Art of
+       Computer Programming," Vol 2, Seminumerical Algorithms, Third
+       Edition, Addison-Wesley, 1998, p. 106 (line 26) & p. 108 */
+    _rand_next = _rand_next * 6364136223846793005ULL + 1;
+    return (long int)((_rand_next >> 32) & 0x7fffffffL);
 }

@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/frexpf.h"
 
-float frexpf(float x, int *pexp)
+float
+frexpf(float x, int *pexp)
 {
     return _frexpf(x, pexp);
 }

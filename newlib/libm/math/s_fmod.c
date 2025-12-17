@@ -21,21 +21,19 @@
 
 #ifdef _NEED_FLOAT64
 
-static const __float64
-    one = _F_64(1.0),
-    Zero[] = { _F_64(0.0), _F_64(-0.0) };
+static const __float64 one = _F_64(1.0), Zero[] = { _F_64(0.0), _F_64(-0.0) };
 
 __float64
 fmod64(__float64 x, __float64 y)
 {
-    __int32_t n, hx, hy, hz, ix, iy, sx, i;
+    __int32_t  n, hx, hy, hz, ix, iy, sx, i;
     __uint32_t lx, ly, lz;
 
     EXTRACT_WORDS(hx, lx, x);
     EXTRACT_WORDS(hy, ly, y);
     sx = hx & 0x80000000; /* sign of x */
-    hx ^= sx; /* |x| */
-    hy &= 0x7fffffff; /* |y| */
+    hx ^= sx;             /* |x| */
+    hy &= 0x7fffffff;     /* |y| */
 
     /* purge off exception values */
     if (isnan(x) || isnan(y)) /* x or y nan, return nan */

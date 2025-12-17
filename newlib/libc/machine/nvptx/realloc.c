@@ -18,17 +18,16 @@
 #include <stdlib.h>
 
 void *
-realloc (void *old_ptr, size_t new_size)
+realloc(void *old_ptr, size_t new_size)
 {
-  void *new_ptr = malloc (new_size);
+    void *new_ptr = malloc(new_size);
 
-  if (old_ptr && new_ptr)
-    {
-      size_t old_size = *(size_t *)((long long *)old_ptr - 1);
-      size_t copy_size = old_size > new_size ? new_size : old_size;
-      __builtin_memcpy (new_ptr, old_ptr, copy_size);
-      free (old_ptr);
+    if (old_ptr && new_ptr) {
+        size_t old_size = *(size_t *)((long long *)old_ptr - 1);
+        size_t copy_size = old_size > new_size ? new_size : old_size;
+        __builtin_memcpy(new_ptr, old_ptr, copy_size);
+        free(old_ptr);
     }
 
-  return new_ptr;
+    return new_ptr;
 }

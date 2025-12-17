@@ -39,8 +39,8 @@
 int
 main(void)
 {
-	if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED))
-		sys_semihost_exit_extended(1);
-	printf("SYS_EXIT_EXTENDED not supported, skipping\n");
-	exit(77);
+    if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED))
+        sys_semihost_exit_extended(1);
+    printf("SYS_EXIT_EXTENDED not supported, skipping\n");
+    exit(77);
 }

@@ -35,7 +35,8 @@
 #include <stdio.h>
 #include <string.h>
 
-int main(void)
+int
+main(void)
 {
     char generate[2][L_tmpnam];
 
@@ -44,14 +45,11 @@ int main(void)
     tmpnam(generate[1]);
 
     // Check if the two file names are the same
-    if (strcmp(tmpnam(generate[0]), generate[1]) == 0)
-    {
+    if (strcmp(tmpnam(generate[0]), generate[1]) == 0) {
         // The same file name
         printf("tmpnam returns identical names \"%s\"\n", generate[0]);
         return -1;
-    }
-    else
-    {
+    } else {
         // Different file names
         printf("tmpnames generated \"%s\" and \"%s\"\n", generate[0], generate[1]);
         return 0;

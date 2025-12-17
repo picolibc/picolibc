@@ -38,11 +38,11 @@
 #include <langinfo.h>
 
 char *
-nl_langinfo_l (nl_item item, locale_t locale)
+nl_langinfo_l(nl_item item, locale_t locale)
 {
     switch (item) {
     case CODESET:
-        return (char *) __locale_name(locale);
+        return (char *)__locale_name(locale);
     case D_T_FMT:
         return TIME_C_FMT;
     case D_FMT:
@@ -52,9 +52,9 @@ nl_langinfo_l (nl_item item, locale_t locale)
     case T_FMT_AMPM:
         return TIME_AMPM_FMT;
     case AM_STR:
-        return (char *) TIME_AM_PM[0];
+        return (char *)TIME_AM_PM[0];
     case PM_STR:
-        return (char *) TIME_AM_PM[1];
+        return (char *)TIME_AM_PM[1];
     case DAY_1:
     case DAY_2:
     case DAY_3:
@@ -62,7 +62,7 @@ nl_langinfo_l (nl_item item, locale_t locale)
     case DAY_5:
     case DAY_6:
     case DAY_7:
-        return (char *) TIME_WEEKDAY[item-DAY_1];
+        return (char *)TIME_WEEKDAY[item - DAY_1];
     case ABDAY_1:
     case ABDAY_2:
     case ABDAY_3:
@@ -70,7 +70,7 @@ nl_langinfo_l (nl_item item, locale_t locale)
     case ABDAY_5:
     case ABDAY_6:
     case ABDAY_7:
-        return (char *) TIME_WDAY[item-ABDAY_1];
+        return (char *)TIME_WDAY[item - ABDAY_1];
     case MON_1:
     case MON_2:
     case MON_3:
@@ -83,7 +83,7 @@ nl_langinfo_l (nl_item item, locale_t locale)
     case MON_10:
     case MON_11:
     case MON_12:
-        return (char *) TIME_MONTH[item-MON_1];
+        return (char *)TIME_MONTH[item - MON_1];
     case ABMON_1:
     case ABMON_2:
     case ABMON_3:
@@ -96,7 +96,7 @@ nl_langinfo_l (nl_item item, locale_t locale)
     case ABMON_10:
     case ABMON_11:
     case ABMON_12:
-        return (char *) TIME_MON[item-ABMON_1];
+        return (char *)TIME_MON[item - ABMON_1];
     case ERA:
         return TIME_ERA;
     case ERA_D_FMT:
@@ -123,7 +123,7 @@ nl_langinfo_l (nl_item item, locale_t locale)
 }
 
 char *
-nl_langinfo (nl_item item)
+nl_langinfo(nl_item item)
 {
-    return nl_langinfo_l (item, __get_current_locale());
+    return nl_langinfo_l(item, __get_current_locale());
 }

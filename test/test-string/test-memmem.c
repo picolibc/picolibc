@@ -40,17 +40,17 @@
 #include <inttypes.h>
 
 #ifdef __MSP430__
-#define HAY_MAX         256
-#define NEEDLE_MAX      16
+#define HAY_MAX    256
+#define NEEDLE_MAX 16
 #else
-#define HAY_MAX         2048
-#define NEEDLE_MAX      256
+#define HAY_MAX    2048
+#define NEEDLE_MAX 256
 #endif
 
-#define SEED            42
+#define SEED 42
 
-static uint8_t  hay[HAY_MAX];
-static uint8_t  needle[NEEDLE_MAX];
+static uint8_t hay[HAY_MAX];
+static uint8_t needle[NEEDLE_MAX];
 
 /* Generate random uint8_t */
 static uint8_t
@@ -63,11 +63,11 @@ rand_byte(void)
 static size_t
 rand_size_t(void)
 {
-    size_t      r = 0;
-    size_t      i;
+    size_t r = 0;
+    size_t i;
 
     for (i = 0; i < SIZE_WIDTH; i += 8) {
-        r |= (size_t) rand_byte() << i;
+        r |= (size_t)rand_byte() << i;
     }
     return r;
 }
@@ -76,8 +76,8 @@ rand_size_t(void)
 static size_t
 rand_range(size_t max)
 {
-    size_t      mask = ~(size_t)0;
-    size_t      ret;
+    size_t mask = ~(size_t)0;
+    size_t ret;
 
     if (max == 0)
         return 0;
@@ -109,14 +109,14 @@ rand_pos(size_t max)
 static size_t
 rand_elt(size_t max)
 {
-    return rand_range(max-1);
+    return rand_range(max - 1);
 }
 
 #ifdef __MSP430__
 /* MSP430 emulator is rather slow */
-#define LOOPS   4
+#define LOOPS 4
 #else
-#define LOOPS   10
+#define LOOPS 10
 #endif
 
 static void
@@ -131,8 +131,8 @@ generate_hay(uint8_t *dst, size_t size)
 static void
 fixup_hay(uint8_t *hay, size_t hay_size, uint8_t *needle, size_t needle_size)
 {
-    uint8_t     *fix_pos = &needle[rand_elt(needle_size)];
-    uint8_t     fix = *fix_pos;
+    uint8_t *fix_pos = &needle[rand_elt(needle_size)];
+    uint8_t  fix = *fix_pos;
 
     while (hay_size) {
         if (*hay == fix)
@@ -149,14 +149,15 @@ fixup_hay(uint8_t *hay, size_t hay_size, uint8_t *needle, size_t needle_size)
     }
 }
 
-int main(void)
+int
+main(void)
 {
-    static size_t       hay_start, hay_size;
-    static size_t       needle_start, needle_size;
-    static size_t       needle_pos;
-    int                 ret = 0;
-    int                 hay_size_loop, needle_size_loop;
-    int                 needle_pos_loop;
+    static size_t hay_start, hay_size;
+    static size_t needle_start, needle_size;
+    static size_t needle_pos;
+    int           ret = 0;
+    int           hay_size_loop, needle_size_loop;
+    int           needle_pos_loop;
 
     srand(SEED);
 
@@ -209,9 +210,10 @@ int main(void)
                         result = memmem(hay_cur, hay_size, needle_cur, needle_size);
 
                         if (result != hay_cur + needle_pos) {
-                            printf("expected needle at %zu got %zu\n",
-                                   needle_pos, result - hay_cur);
-                            printf("hay_start %zu hay_size %zu needle_start %zu needle_size %zu needle_pos %zu\n",
+                            printf("expected needle at %zu got %zu\n", needle_pos,
+                                   result - hay_cur);
+                            printf("hay_start %zu hay_size %zu needle_start %zu needle_size %zu "
+                                   "needle_pos %zu\n",
                                    hay_start, hay_size, needle_start, needle_size, needle_pos);
                             ret = 1;
                         }
@@ -227,7 +229,8 @@ int main(void)
 
                         if (result != NULL) {
                             printf("expected no needle, got %zu\n", result - hay_cur);
-                            printf("hay_start %zu hay_size %zu needle_start %zu needle_size %zu needle_pos %zu\n",
+                            printf("hay_start %zu hay_size %zu needle_start %zu needle_size %zu "
+                                   "needle_pos %zu\n",
                                    hay_start, hay_size, needle_start, needle_size, needle_pos);
                             ret = 1;
                         }

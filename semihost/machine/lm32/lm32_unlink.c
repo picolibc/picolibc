@@ -36,14 +36,15 @@
 #include <unistd.h>
 #include "lm32_semihost.h"
 
-int unlink(const char *pathname)
+int
+unlink(const char *pathname)
 {
     struct lm32_scall_args args = {
         .r8 = TARGET_NEWLIB_SYS_unlink,
-        .r1 = (uint32_t) (uintptr_t) pathname,
+        .r1 = (uint32_t)(uintptr_t)pathname,
     };
     struct lm32_scall_ret ret;
 
     lm32_scall(&args, &ret);
-    return (int) ret.r1;
+    return (int)ret.r1;
 }

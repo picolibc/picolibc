@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fmod.h"
 
-double fmod(double x, double y)
+double
+fmod(double x, double y)
 {
     return _fmod(x, y);
 }

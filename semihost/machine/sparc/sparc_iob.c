@@ -35,13 +35,13 @@
 
 #include "sparc-semihost.h"
 
-typedef volatile uint8_t vuint8_t;
+typedef volatile uint8_t  vuint8_t;
 typedef volatile uint32_t vuint32_t;
 
 struct apbuart {
-    vuint32_t   data;
-    vuint32_t   status;
-    vuint32_t   control;
+    vuint32_t data;
+    vuint32_t status;
+    vuint32_t control;
 };
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
@@ -52,32 +52,32 @@ struct apbuart {
 #endif
 
 /* leon3 serial port */
-#define uart    (*((struct apbuart *) 0x80000100))
+#define uart (*((struct apbuart *)0x80000100))
 
 /* UART status register fields */
-#define UART_DATA_READY           (1 <<  0)
-#define UART_TRANSMIT_SHIFT_EMPTY (1 <<  1)
-#define UART_TRANSMIT_FIFO_EMPTY  (1 <<  2)
-#define UART_BREAK_RECEIVED       (1 <<  3)
-#define UART_OVERRUN              (1 <<  4)
-#define UART_PARITY_ERROR         (1 <<  5)
-#define UART_FRAMING_ERROR        (1 <<  6)
-#define UART_TRANSMIT_FIFO_HALF   (1 <<  7)
-#define UART_RECEIVE_FIFO_HALF    (1 <<  8)
-#define UART_TRANSMIT_FIFO_FULL   (1 <<  9)
+#define UART_DATA_READY           (1 << 0)
+#define UART_TRANSMIT_SHIFT_EMPTY (1 << 1)
+#define UART_TRANSMIT_FIFO_EMPTY  (1 << 2)
+#define UART_BREAK_RECEIVED       (1 << 3)
+#define UART_OVERRUN              (1 << 4)
+#define UART_PARITY_ERROR         (1 << 5)
+#define UART_FRAMING_ERROR        (1 << 6)
+#define UART_TRANSMIT_FIFO_HALF   (1 << 7)
+#define UART_RECEIVE_FIFO_HALF    (1 << 8)
+#define UART_TRANSMIT_FIFO_FULL   (1 << 9)
 #define UART_RECEIVE_FIFO_FULL    (1 << 10)
 
 /* UART control register fields */
-#define UART_RECEIVE_ENABLE          (1 <<  0)
-#define UART_TRANSMIT_ENABLE         (1 <<  1)
-#define UART_RECEIVE_INTERRUPT       (1 <<  2)
-#define UART_TRANSMIT_INTERRUPT      (1 <<  3)
-#define UART_PARITY_SELECT           (1 <<  4)
-#define UART_PARITY_ENABLE           (1 <<  5)
-#define UART_FLOW_CONTROL            (1 <<  6)
-#define UART_LOOPBACK                (1 <<  7)
-#define UART_EXTERNAL_CLOCK          (1 <<  8)
-#define UART_RECEIVE_FIFO_INTERRUPT  (1 <<  9)
+#define UART_RECEIVE_ENABLE          (1 << 0)
+#define UART_TRANSMIT_ENABLE         (1 << 1)
+#define UART_RECEIVE_INTERRUPT       (1 << 2)
+#define UART_TRANSMIT_INTERRUPT      (1 << 3)
+#define UART_PARITY_SELECT           (1 << 4)
+#define UART_PARITY_ENABLE           (1 << 5)
+#define UART_FLOW_CONTROL            (1 << 6)
+#define UART_LOOPBACK                (1 << 7)
+#define UART_EXTERNAL_CLOCK          (1 << 8)
+#define UART_RECEIVE_FIFO_INTERRUPT  (1 << 9)
 #define UART_TRANSMIT_FIFO_INTERRUPT (1 << 10)
 #define UART_FIFO_DEBUG_MODE         (1 << 11)
 #define UART_OUTPUT_ENABLE           (1 << 12)
@@ -86,22 +86,22 @@ struct apbuart {
 int
 sparc_putc(char c, FILE *file)
 {
-	(void) file;
-        uart.control |= UART_TRANSMIT_ENABLE;
-        while ((uart.status & UART_TRANSMIT_FIFO_FULL) != 0)
-               ;
-        uart.data = (uint8_t) c;
-	return (unsigned char) c;
+    (void)file;
+    uart.control |= UART_TRANSMIT_ENABLE;
+    while ((uart.status & UART_TRANSMIT_FIFO_FULL) != 0)
+        ;
+    uart.data = (uint8_t)c;
+    return (unsigned char)c;
 }
 
 static int
 sparc_getc(FILE *file)
 {
-	(void) file;
-        uart.control |= UART_RECEIVE_ENABLE;
-        while ((uart.status & UART_DATA_READY) == 0)
-            ;
-        return (unsigned char) uart.data;
+    (void)file;
+    uart.control |= UART_RECEIVE_ENABLE;
+    while ((uart.status & UART_DATA_READY) == 0)
+        ;
+    return (unsigned char)uart.data;
 }
 
 static FILE __stdio = FDEV_SETUP_STREAM(sparc_putc, sparc_getc, NULL, _FDEV_SETUP_RW);
@@ -109,9 +109,9 @@ static FILE __stdio = FDEV_SETUP_STREAM(sparc_putc, sparc_getc, NULL, _FDEV_SETU
 #ifdef __strong_reference
 #define STDIO_ALIAS(x) __strong_reference(stdin, x);
 #else
-#define STDIO_ALIAS(x) FILE *const x = &__stdio;
+#define STDIO_ALIAS(x) FILE * const x = &__stdio;
 #endif
 
-FILE *const stdin = &__stdio;
+FILE * const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);

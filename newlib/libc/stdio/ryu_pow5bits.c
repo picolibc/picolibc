@@ -17,12 +17,13 @@
 
 #include "ryu/common.h"
 
-int32_t __pow5bits(const int32_t e) {
-  // This approximation works up to the point that the multiplication overflows at e = 3529.
-  // If the multiplication were done in 64 bits, it would fail at 5^4004 which is just greater
-  // than 2^9297.
-  assert(e >= 0);
-  assert(e <= 3528);
-  return (int32_t) (((((uint32_t) e) * 1217359) >> 19) + 1);
+int32_t
+__pow5bits(const int32_t e)
+{
+    // This approximation works up to the point that the multiplication overflows at e = 3529.
+    // If the multiplication were done in 64 bits, it would fail at 5^4004 which is just greater
+    // than 2^9297.
+    assert(e >= 0);
+    assert(e <= 3528);
+    return (int32_t)(((((uint32_t)e) * 1217359) >> 19) + 1);
 }
-

@@ -36,34 +36,28 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  int fp;
-  unsigned int pad0[ 3 ];
-  char *buf;
-  unsigned int pad1[ 3 ];
-  int mode;
-  unsigned int pad2[ 3 ];
-  size_t size;
-  unsigned int pad3[ 3 ];
+typedef struct {
+    int          fp;
+    unsigned int pad0[3];
+    char        *buf;
+    unsigned int pad1[3];
+    int          mode;
+    unsigned int pad2[3];
+    size_t       size;
+    unsigned int pad3[3];
 } c99_setvbuf_t;
 
-
 int
-setvbuf (FILE * fp,
-	char *buf,
-	int mode,
-	size_t size)
+setvbuf(FILE *fp, char *buf, int mode, size_t size)
 {
-  c99_setvbuf_t args;
+    c99_setvbuf_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.fp = fp->_fp;
-  args.buf = buf;
-  args.mode = mode;
-  args.size = size;
+    args.fp = fp->_fp;
+    args.buf = buf;
+    args.mode = mode;
+    args.size = size;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETVBUF, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETVBUF, &args);
 }
-

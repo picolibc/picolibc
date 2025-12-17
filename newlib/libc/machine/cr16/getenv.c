@@ -13,14 +13,14 @@
  * they apply.
  */
 
-/* getenv() is implemented as a low-level function, 
+/* getenv() is implemented as a low-level function,
    thus we only invoke here the system call.  */
 #include <picolibc.h>
 
-char * getenv (const char *name)
+char *
+getenv(const char *name)
 {
-  char *_getenv(const char *);
+    char *_getenv(const char *);
 
-  return (_getenv (name));
+    return (_getenv(name));
 }
-

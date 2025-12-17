@@ -38,26 +38,26 @@
 int
 main(void)
 {
-	char	copy[128] = {"hello"};
-	int	len;
-	char	*a;
+    char  copy[128] = { "hello" };
+    int   len;
+    char *a;
 
-	asprintf(&a,"string %p", main);
+    asprintf(&a, "string %p", main);
 
-	/*
-	 * get_str returns a struct with two values, a char * and an
-	 * int.  on ILP32 machines (32-bit ints and pointers, but
-	 * 64-bit registers), this will be returned in a single
-	 * register. We then want to turn around and pass that
-	 * register, unmodified, to a function expecting a pointer.
-	 * The compiler will 'optimize' this by leaving the whole
-	 * return value in the register, including the 'int' field in
-	 * the upper 32 bits. An incorrect strcpy implementation will
-	 * not clear those bits before using the register causing
-	 * an invalid memory access.
-	 */
-	strcpy(get_str(copy).base, a);
-	len = strlen(copy);
-	printf("copy %s len %d\n", copy, len);
-	exit(0);
+    /*
+     * get_str returns a struct with two values, a char * and an
+     * int.  on ILP32 machines (32-bit ints and pointers, but
+     * 64-bit registers), this will be returned in a single
+     * register. We then want to turn around and pass that
+     * register, unmodified, to a function expecting a pointer.
+     * The compiler will 'optimize' this by leaving the whole
+     * return value in the register, including the 'int' field in
+     * the upper 32 bits. An incorrect strcpy implementation will
+     * not clear those bits before using the register causing
+     * an invalid memory access.
+     */
+    strcpy(get_str(copy).base, a);
+    len = strlen(copy);
+    printf("copy %s len %d\n", copy, len);
+    exit(0);
 }

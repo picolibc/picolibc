@@ -28,11 +28,11 @@
 #include <math.h>
 
 double
-fma (double x, double y, double z)
+fma(double x, double y, double z)
 {
-  double result;
-  __asm__("fmadd\t%d0, %d1, %d2, %d3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
-  return result;
+    double result;
+    __asm__("fmadd\t%d0, %d1, %d2, %d3" : "=w"(result) : "w"(x), "w"(y), "w"(z));
+    return result;
 }
 
 #else

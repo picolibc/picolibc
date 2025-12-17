@@ -41,7 +41,7 @@
 #ifdef __SPU__
 
 #ifndef _LOG2F4_H_
-#define _LOG2F4_H_	1
+#define _LOG2F4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -50,13 +50,13 @@
  *	vector float _log2f4(vector float x)
  *
  * DESCRIPTION
- *	The _log2f4 function computes log (base 2) on a vector if inputs 
+ *	The _log2f4 function computes log (base 2) on a vector if inputs
  *      values x. The _log2f4 function is approximated as a polynomial of
  *      order 8 (C. Hastings, Jr, 1955).
  *
  *                   __8__
  *		     \
- *		      \ 
+ *		      \
  *	log2f(1+x) =  /     Ci*x^i
  *                   /____
  *                    i=1
@@ -75,49 +75,50 @@
  *	This function assumes that x is a non-zero positive value.
  *
  */
-static __inline vector float _log2f4(vector float x)
+static __inline vector float
+_log2f4(vector float x)
 {
-  vector signed int exponent;
-  vector float result;
-  vector float x2, x4;
-  vector float hi, lo;
+    vector signed int exponent;
+    vector float      result;
+    vector float      x2, x4;
+    vector float      hi, lo;
 
-  /* Extract the exponent from the input X. 
-   */
-  exponent = (vector signed int)spu_and(spu_rlmask((vector unsigned int)(x), -23), 0xFF);
-  exponent = spu_add(exponent, -127);
+    /* Extract the exponent from the input X.
+     */
+    exponent = (vector signed int)spu_and(spu_rlmask((vector unsigned int)(x), -23), 0xFF);
+    exponent = spu_add(exponent, -127);
 
-  /* Compute the remainder after removing the exponent.
-   */
-  x = (vector float)spu_sub((vector signed int)(x), spu_sl(exponent, 23));
+    /* Compute the remainder after removing the exponent.
+     */
+    x = (vector float)spu_sub((vector signed int)(x), spu_sl(exponent, 23));
 
-  /* Calculate the log2 of the remainder using the polynomial
-   * approximation.
-   */
-  x = spu_sub(x, spu_splats(1.0f));
+    /* Calculate the log2 of the remainder using the polynomial
+     * approximation.
+     */
+    x = spu_sub(x, spu_splats(1.0f));
 
-  /* Instruction counts can be reduced if the polynomial was
-   * computed entirely from nested (dependent) fma's. However, 
-   * to reduce the number of pipeline stalls, the polygon is evaluated 
-   * in two halves (hi amd lo). 
-   */
-  x2 = spu_mul(x, x);
-  x4 = spu_mul(x2, x2);
+    /* Instruction counts can be reduced if the polynomial was
+     * computed entirely from nested (dependent) fma's. However,
+     * to reduce the number of pipeline stalls, the polygon is evaluated
+     * in two halves (hi amd lo).
+     */
+    x2 = spu_mul(x, x);
+    x4 = spu_mul(x2, x2);
 
-  hi = spu_madd(x, spu_splats(-0.0093104962134977f), spu_splats(0.052064690894143f));
-  hi = spu_madd(x, hi, spu_splats(-0.13753123777116f));
-  hi = spu_madd(x, hi, spu_splats( 0.24187369696082f));
-  hi = spu_madd(x, hi, spu_splats(-0.34730547155299f));
-  lo = spu_madd(x, spu_splats(0.47868480909345f), spu_splats(-0.72116591947498f));
-  lo = spu_madd(x, lo, spu_splats(1.4426898816672f));
-  lo = spu_mul(x, lo);
-  result = spu_madd(x4, hi, lo);
+    hi = spu_madd(x, spu_splats(-0.0093104962134977f), spu_splats(0.052064690894143f));
+    hi = spu_madd(x, hi, spu_splats(-0.13753123777116f));
+    hi = spu_madd(x, hi, spu_splats(0.24187369696082f));
+    hi = spu_madd(x, hi, spu_splats(-0.34730547155299f));
+    lo = spu_madd(x, spu_splats(0.47868480909345f), spu_splats(-0.72116591947498f));
+    lo = spu_madd(x, lo, spu_splats(1.4426898816672f));
+    lo = spu_mul(x, lo);
+    result = spu_madd(x4, hi, lo);
 
-  /* Add the exponent back into the result.
-   */
-  result = spu_add(result, spu_convtf(exponent, 0));
-  
-  return (result);
+    /* Add the exponent back into the result.
+     */
+    result = spu_add(result, spu_convtf(exponent, 0));
+
+    return (result);
 }
 
 #endif /* _LOG2F4_H_ */

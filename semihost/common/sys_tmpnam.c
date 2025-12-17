@@ -38,6 +38,5 @@
 int
 sys_semihost_tmpnam(char *pathname, int identifier, int maxpath)
 {
-    return (int)sys_semihost3(SYS_TMPNAM, (sh_param_t)(uintptr_t)pathname,
-                              identifier, maxpath);
+    return (int)sys_semihost3(SYS_TMPNAM, (sh_param_t)(uintptr_t)pathname, identifier, maxpath);
 }

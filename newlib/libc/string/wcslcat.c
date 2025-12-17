@@ -1,27 +1,27 @@
 /*
 FUNCTION
-	<<wcslcat>>---concatenate wide-character strings to specified length
+        <<wcslcat>>---concatenate wide-character strings to specified length
 
 SYNOPSIS
-	#include <wchar.h>
-	size_t wcslcat(wchar_t *<[dst]>, const wchar_t *<[src]>, size_t <[siz]>);
+        #include <wchar.h>
+        size_t wcslcat(wchar_t *<[dst]>, const wchar_t *<[src]>, size_t <[siz]>);
 
 DESCRIPTION
-	The <<wcslcat>> function appends wide characters from <[src]> to
-	end of the <[dst]> wide-character string so that the resultant
-	wide-character string is not more than <[siz]> wide characters
-	including the terminating null wide-character code.  A terminating
-	null wide character is always added unless <[siz]> is 0.  Thus,
-	the maximum number of wide characters that can be appended from
-	<[src]> is <[siz]> - 1. If copying takes place between objects
-	that overlap, the behaviour is undefined.
+        The <<wcslcat>> function appends wide characters from <[src]> to
+        end of the <[dst]> wide-character string so that the resultant
+        wide-character string is not more than <[siz]> wide characters
+        including the terminating null wide-character code.  A terminating
+        null wide character is always added unless <[siz]> is 0.  Thus,
+        the maximum number of wide characters that can be appended from
+        <[src]> is <[siz]> - 1. If copying takes place between objects
+        that overlap, the behaviour is undefined.
 
 RETURNS
-	Wide-character string length of initial <[dst]> plus the
-	wide-character string length of <[src]> (does not include
-	terminating null wide-characters).  If the return value is
-	greater than or equal to <[siz]>, then truncation occurred and
-	not all wide characters from <[src]> were appended.
+        Wide-character string length of initial <[dst]> plus the
+        wide-character string length of <[src]> (does not include
+        terminating null wide-characters).  If the return value is
+        greater than or equal to <[siz]>, then truncation occurred and
+        not all wide characters from <[src]> were appended.
 
 PORTABILITY
 No supporting OS subroutines are required.
@@ -56,31 +56,29 @@ No supporting OS subroutines are required.
  * If retval >= siz, truncation occurred.
  */
 size_t
-wcslcat (wchar_t *dst,
-        const wchar_t *src,
-        size_t dsize)
+wcslcat(wchar_t *dst, const wchar_t *src, size_t dsize)
 {
-        const wchar_t *odst = dst;
-        const wchar_t *osrc = src;
-        size_t n = dsize;
-        size_t dlen;
+    const wchar_t *odst = dst;
+    const wchar_t *osrc = src;
+    size_t         n = dsize;
+    size_t         dlen;
 
-        /* Find the end of dst and adjust bytes left but don't go past end. */
-        while (n-- != 0 && *dst != L'\0')
-                dst++;
-        dlen = dst - odst;
-        n = dsize - dlen;
+    /* Find the end of dst and adjust bytes left but don't go past end. */
+    while (n-- != 0 && *dst != L'\0')
+        dst++;
+    dlen = dst - odst;
+    n = dsize - dlen;
 
-        if (n-- == 0)
-                return(dlen + wcslen(src));
-        while (*src != L'\0') {
-                if (n != 0) {
-                        *dst++ = *src;
-                        n--;
-                }
-                src++;
+    if (n-- == 0)
+        return (dlen + wcslen(src));
+    while (*src != L'\0') {
+        if (n != 0) {
+            *dst++ = *src;
+            n--;
         }
-        *dst = L'\0';
+        src++;
+    }
+    *dst = L'\0';
 
-        return(dlen + (src - osrc));    /* count does not include NUL */
+    return (dlen + (src - osrc)); /* count does not include NUL */
 }

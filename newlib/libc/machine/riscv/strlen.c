@@ -15,43 +15,44 @@
 #include <stdint.h>
 #include "rv_strcpy.h"
 
-size_t strlen(const char *str)
+size_t
+strlen(const char *str)
 {
-  const char *start = str;
+    const char *start = str;
 
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
-  while (*str++)
-    ;
-  return str - start - 1;
+    while (*str++)
+        ;
+    return str - start - 1;
 #else
-  if (__builtin_expect ((uintxlen_t)str & (sizeof (uintxlen_t) - 1), 0)) do
-    {
-      char ch = *str;
-      str++;
-      if (!ch)
-      return str - start - 1;
-    } while ((uintxlen_t)str & (sizeof (uintxlen_t) - 1));
+    if (__builtin_expect((uintxlen_t)str & (sizeof(uintxlen_t) - 1), 0))
+        do {
+            char ch = *str;
+            str++;
+            if (!ch)
+                return str - start - 1;
+        } while ((uintxlen_t)str & (sizeof(uintxlen_t) - 1));
 
-  uintxlen_t *ps = (uintxlen_t *)str;
-  uintxlen_t psval;
+    uintxlen_t *ps = (uintxlen_t *)str;
+    uintxlen_t  psval;
 
-  while (!__libc_detect_null ((psval = *ps)))
-      ps++;
-  __asm__ volatile ("" : "+r"(ps)); /* prevent "optimization" */
+    while (!__libc_detect_null((psval = *ps)))
+        ps++;
+    __asm__ volatile("" : "+r"(ps)); /* prevent "optimization" */
 
-  str = (const char *)ps;
+    str = (const char *)ps;
 
-  #if defined(__LIBC_RISCV_ZBB_ORC_B) && defined(__LIBC_RISCV_ZBB_CNT_Z)
+#if defined(__LIBC_RISCV_ZBB_ORC_B) && defined(__LIBC_RISCV_ZBB_CNT_Z)
     psval = ~__LIBC_RISCV_ZBB_ORC_B(psval);
     psval = __LIBC_RISCV_ZBB_CNT_Z(psval);
 
     str += (psval >> 3);
-  #else
+#else
     while (psval & 0xff) {
         psval >>= 8;
         str++;
     }
-  #endif
+#endif
     return str - start;
 #endif /* not PREFER_SIZE_OVER_SPEED */
 }

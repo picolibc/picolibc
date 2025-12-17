@@ -36,12 +36,11 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-
-char *
-gets (buf)
-     char *buf;
+char       *
+gets(buf)
+char *buf;
 {
-  /* The return value gets written over buf
-   */
-  return (char*) __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETS, &buf);
+    /* The return value gets written over buf
+     */
+    return (char *)__send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETS, &buf);
 }

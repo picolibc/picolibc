@@ -47,12 +47,12 @@
 #define MAX_MB  16
 
 const struct {
-    char8_t     c8[MAX_C8];
-    char        mb[MAX_MB];
-    unsigned    err;
+    char8_t  c8[MAX_C8];
+    char     mb[MAX_MB];
+    unsigned err;
 } test_c8[] = {
-    { .c8 = {0x61}, .mb = "a" },
-    { .c8 = {0x0}, .mb = "" },
+    { .c8 = { 0x61 }, .mb = "a" },
+    { .c8 = { 0x0 }, .mb = "" },
 #if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .c8 = "\xF4\x8F\xBF\xBF", .mb = "\xF4\x8F\xBF\xBF" },
 
@@ -61,7 +61,7 @@ const struct {
     { .c8 = "\xC2\x80", .mb = "\xC2\x80" },
 
     /* overlong two-byte encoding */
-    { .c8= "\xC0\x80", .mb = "\xC0\x80", .err = 0 + 1 },
+    { .c8 = "\xC0\x80", .mb = "\xC0\x80", .err = 0 + 1 },
     /* overlong three-byte encoding */
     { .c8 = "\xE0\x9F\xBF", .mb = "\xE0\x9F\xBF", .err = 1 + 1 },
     /* overlong four-byte encoding */
@@ -86,21 +86,21 @@ const struct {
 #endif
 };
 
-#define NTEST_C8 sizeof(test_c8)/sizeof(test_c8[0])
+#define NTEST_C8 sizeof(test_c8) / sizeof(test_c8[0])
 
 const struct {
-    char16_t    c16[MAX_C16];
-    char        mb[MAX_MB];
-    unsigned    err;
+    char16_t c16[MAX_C16];
+    char     mb[MAX_MB];
+    unsigned err;
 } test_c16[] = {
     { .c16 = { 0x0061 }, .mb = "a" },
     { .c16 = { 0x0000 }, .mb = "" },
 #if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .c16 = { 0x3330 }, .mb = "㌰" },
-    { .c16 = { 0xd83d, 0xde80 }, .mb = "🚀" },                   /* 0x01f680 */
-    { .c16 = { 0xdbc2, 0xdd7f }, .mb = "\xf4\x80\xa5\xbf" },     /* 0x10097f */
-    { .c16 = { 0xd800, 0xdc00 }, .mb = "\xf0\x90\x80\x80" },     /* 0x010000 */
-    { .c16 = { 0xdbff, 0xdfff }, .mb = "\xf4\x8f\xbf\xbf" },     /* 0x10ffff */
+    { .c16 = { 0xd83d, 0xde80 }, .mb = "🚀" }, /* 0x01f680 */
+    { .c16 = { 0xdbc2, 0xdd7f }, .mb = "\xf4\x80\xa5\xbf" }, /* 0x10097f */
+    { .c16 = { 0xd800, 0xdc00 }, .mb = "\xf0\x90\x80\x80" }, /* 0x010000 */
+    { .c16 = { 0xdbff, 0xdfff }, .mb = "\xf4\x8f\xbf\xbf" }, /* 0x10ffff */
 
     /* Missing low surrogate */
     { .c16 = { 0xd83d, 0x0000 }, .mb = "", .err = 1 + 1 },
@@ -116,12 +116,12 @@ const struct {
 #endif
 };
 
-#define NTEST_C16 sizeof(test_c16)/sizeof(test_c16[0])
+#define NTEST_C16 sizeof(test_c16) / sizeof(test_c16[0])
 
 const struct {
-    char32_t    c32[MAX_C32];
-    char        mb[MAX_MB];
-    unsigned    err;
+    char32_t c32[MAX_C32];
+    char     mb[MAX_MB];
+    unsigned err;
 } test_c32[] = {
     { .c32 = { 0x00000061 }, .mb = "a" },
     { .c32 = { 0x00000000 }, .mb = "" },
@@ -147,14 +147,15 @@ const struct {
 #endif
 };
 
-#define NTEST_C32 sizeof(test_c32)/sizeof(test_c32[0])
+#define NTEST_C32 sizeof(test_c32) / sizeof(test_c32[0])
 
-int main(void)
+int
+main(void)
 {
-    unsigned i;
-    unsigned j;
-    unsigned k;
-    int status = 0;
+    unsigned  i;
+    unsigned  j;
+    unsigned  k;
+    int       status = 0;
     mbstate_t mbstate;
 
 #if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
@@ -166,16 +167,16 @@ int main(void)
 
     /* utf-8 tests */
     for (i = 0; i < NTEST_C8; i++) {
-        char    mb[MAX_MB];
-        size_t  ret;
-        size_t  off;
+        char   mb[MAX_MB];
+        size_t ret;
+        size_t off;
 
         off = 0;
         memset(mb, 0, sizeof(mb));
         memset(&mbstate, 0, sizeof(mbstate));
-        for (j = 0; ; j++) {
+        for (j = 0;; j++) {
             ret = c8rtomb(mb + off, test_c8[i].c8[j], &mbstate);
-            if (ret == (size_t) -1) {
+            if (ret == (size_t)-1) {
                 if (test_c8[i].err != 0 && test_c8[i].err == j + 1)
                     break;
                 printf("c8rtomb %d failed at byte %d\n", i, j);
@@ -206,8 +207,7 @@ int main(void)
         memset(&mbstate, 0, sizeof(mbstate));
         while (test_c8[i].mb[j] != 0 || ret) {
             ret = mbrtoc8(c8 + off, &test_c8[i].mb[j], 1, &mbstate);
-            if (ret == (size_t) -1)
-            {
+            if (ret == (size_t)-1) {
                 if (test_c8[i].err <= j + 1)
                     break;
                 printf("mbrtoc8 %d failed at byte %d\n", i, j);
@@ -215,10 +215,10 @@ int main(void)
                 break;
             }
             switch (ret) {
-            case (size_t) -2:
+            case (size_t)-2:
                 j++;
                 break;
-            case (size_t) -3:
+            case (size_t)-3:
                 off++;
                 break;
             default:
@@ -230,12 +230,12 @@ int main(void)
         if (test_c8[i].err == 0) {
             for (j = 0; j < MAX_C8; j++) {
                 if (c8[j] != test_c8[i].c8[j]) {
-                    printf("mbrtoc8 %d[%d]: expected 0x%x got 0x%x\n",
-                           i, j, test_c8[i].c8[j], c8[j]);
+                    printf("mbrtoc8 %d[%d]: expected 0x%x got 0x%x\n", i, j, test_c8[i].c8[j],
+                           c8[j]);
                     status = 1;
                 }
             }
-        } else if (ret != (size_t) -1) {
+        } else if (ret != (size_t)-1) {
 #ifdef __PICOLIBC__
             printf("mbrtoc8 %d unexpected success\n", i);
             status = 1;
@@ -245,14 +245,14 @@ int main(void)
 
     /* utf-16 tests */
     for (i = 0; i < NTEST_C16; i++) {
-        char    mb[MAX_MB];
-        size_t  ret;
-        size_t  off = 0;
+        char   mb[MAX_MB];
+        size_t ret;
+        size_t off = 0;
         memset(mb, 0, sizeof(mb));
         memset(&mbstate, 0, sizeof(mbstate));
         for (j = 0; test_c16[i].c16[j] != 0; j++) {
             ret = c16rtomb(mb + off, test_c16[i].c16[j], &mbstate);
-            if (ret == (size_t) -1) {
+            if (ret == (size_t)-1) {
                 if (test_c16[i].err != 0 && test_c16[i].err == j + 1)
                     break;
                 printf("c16rtomb %d failed at byte %d\n", i, j);
@@ -285,17 +285,16 @@ int main(void)
         if (test_c16[i].err == 0) {
             while (test_c16[i].mb[j] != 0 || ret) {
                 ret = mbrtoc16(c16 + off, &test_c16[i].mb[j], 1, &mbstate);
-                if (ret == (size_t) -1)
-                {
+                if (ret == (size_t)-1) {
                     printf("mbrtoc16 %d failed at byte %d\n", i, j);
                     status = 1;
                     break;
                 }
                 switch (ret) {
-                case (size_t) -2:
+                case (size_t)-2:
                     j++;
                     break;
-                case (size_t) -3:
+                case (size_t)-3:
                     off++;
                     break;
                 default:
@@ -306,29 +305,30 @@ int main(void)
             }
             for (j = 0; j < MAX_C16; j++) {
                 if (c16[j] != test_c16[i].c16[j]) {
-                    printf("mbrtoc16 %d[%d]: expected 0x%x got 0x%x\n",
-                           i, j, test_c16[i].c16[j], c16[j]);
+                    printf("mbrtoc16 %d[%d]: expected 0x%x got 0x%x\n", i, j, test_c16[i].c16[j],
+                           c16[j]);
                     status = 1;
                 }
             }
         }
     }
     for (i = 0; i < NTEST_C32; i++) {
-        char    mb[MAX_MB];
-        size_t  ret;
-        size_t  off = 0;
+        char   mb[MAX_MB];
+        size_t ret;
+        size_t off = 0;
         memset(mb, 0, sizeof(mb));
         memset(&mbstate, 0, sizeof(mbstate));
         for (j = 0; test_c32[i].c32[j] != 0; j++) {
             ret = c32rtomb(mb + off, test_c32[i].c32[j], &mbstate);
-            if (ret == (size_t) -1) {
+            if (ret == (size_t)-1) {
                 if (test_c32[i].err != 0 && test_c32[i].err == j + 1)
                     break;
                 printf("c32rtomb %d failed at byte %d\n", i, j);
                 status = 1;
                 break;
             } else if (test_c32[i].err == j + 1) {
-                printf("c32rtomb %d unexpected success c32[%u] is %#08lx\n", i, j, (unsigned long) test_c32[i].c32[j]);
+                printf("c32rtomb %d unexpected success c32[%u] is %#08lx\n", i, j,
+                       (unsigned long)test_c32[i].c32[j]);
                 status = 1;
                 break;
             }
@@ -351,17 +351,16 @@ int main(void)
         if (test_c32[i].err == 0) {
             while (test_c32[i].mb[j] != 0 || ret) {
                 ret = mbrtoc32(c32 + off, &test_c32[i].mb[j], 1, &mbstate);
-                if (ret == (size_t) -1)
-                {
+                if (ret == (size_t)-1) {
                     printf("mbrtoc32 %d failed at byte %d\n", i, j);
                     status = 1;
                     break;
                 }
                 switch (ret) {
-                case (size_t) -2:
+                case (size_t)-2:
                     j++;
                     break;
-                case (size_t) -3:
+                case (size_t)-3:
                     off++;
                     break;
                 default:
@@ -372,8 +371,8 @@ int main(void)
             }
             for (j = 0; j < MAX_C32; j++) {
                 if (c32[j] != test_c32[i].c32[j]) {
-                    printf("mbrtoc32 %d[%d]: expected 0x%08lx got 0x%08lx\n",
-                           i, j, (unsigned long) test_c32[i].c32[j], (unsigned long) c32[j]);
+                    printf("mbrtoc32 %d[%d]: expected 0x%08lx got 0x%08lx\n", i, j,
+                           (unsigned long)test_c32[i].c32[j], (unsigned long)c32[j]);
                     status = 1;
                 }
             }

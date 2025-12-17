@@ -37,7 +37,7 @@
 
         if (x_s < 0) {
             /* Use unsigned in case x_s is the largest negative value */
-            x_s = (ultoa_signed_t) -(ultoa_unsigned_t) x_s;
+            x_s = (ultoa_signed_t) - (ultoa_unsigned_t)x_s;
             flags |= FL_NEGATIVE;
         }
 
@@ -48,9 +48,9 @@
             buf_len = 0;
         else
 #endif
-            buf_len = __ultoa_invert (x_s, u.buf, 10) - u.buf;
+            buf_len = __ultoa_invert(x_s, u.buf, 10) - u.buf;
     } else {
-        int base;
+        int              base;
         ultoa_unsigned_t x;
 
         if (c == 'u') {
@@ -90,7 +90,7 @@
             buf_len = 0;
         else
 #endif
-            buf_len = __ultoa_invert (x, u.buf, base) - u.buf;
+            buf_len = __ultoa_invert(x, u.buf, base) - u.buf;
     }
 
 #ifndef _NEED_IO_SHRINK
@@ -137,7 +137,7 @@
             }
         }
         while (len < width) {
-            my_putc (' ', stream);
+            my_putc(' ', stream);
             len++;
         }
     }
@@ -147,31 +147,33 @@
 
     /* Output leading characters */
     if (flags & FL_ALT) {
-        my_putc ('0', stream);
+        my_putc('0', stream);
         if (c != '\0')
-            my_putc (c, stream);
+            my_putc(c, stream);
     } else if (flags & (FL_NEGATIVE | FL_PLUS | FL_SPACE)) {
         unsigned char z = ' ';
-        if (flags & FL_PLUS) z = '+';
-        if (flags & FL_NEGATIVE) z = '-';
-        my_putc (z, stream);
+        if (flags & FL_PLUS)
+            z = '+';
+        if (flags & FL_NEGATIVE)
+            z = '-';
+        my_putc(z, stream);
     }
 
     /* Output leading zeros */
     while (prec > buf_len) {
-        my_putc ('0', stream);
+        my_putc('0', stream);
         prec--;
     }
 #else
     if (flags & FL_ALT) {
-        my_putc ('0', stream);
+        my_putc('0', stream);
         if (c != '\0')
-            my_putc (c, stream);
+            my_putc(c, stream);
     } else if (flags & FL_NEGATIVE)
         my_putc('-', stream);
 #endif
 
     /* Output value */
     while (buf_len)
-        my_putc (u.buf[--buf_len], stream);
+        my_putc(u.buf[--buf_len], stream);
 }

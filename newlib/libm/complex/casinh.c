@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -50,13 +50,13 @@ SYNOPSIS
 DESCRIPTION
         @ifnottex
         These functions compute the complex arc hyperbolic sine of <[z]>,
-        with branch cuts outside the interval [-i, +i] along the 
-        imaginary axis.        
+        with branch cuts outside the interval [-i, +i] along the
+        imaginary axis.
         @end ifnottex
         @tex
         These functions compute the complex arc hyperbolic sine of <[z]>,
-        with branch cuts outside the interval [$-i$, $+i$] along the 
-        imaginary axis.        
+        with branch cuts outside the interval [$-i$, $+i$] along the
+        imaginary axis.
         @end tex
 
         <<casinhf>> is identical to <<casinh>>, except that it performs
@@ -64,15 +64,15 @@ DESCRIPTION
 
 RETURNS
         @ifnottex
-        These functions return the complex arc hyperbolic sine value, 
-        in the range of a strip mathematically unbounded along the 
-        real axis and in the interval [-i*p/2, +i*p/2] along the 
+        These functions return the complex arc hyperbolic sine value,
+        in the range of a strip mathematically unbounded along the
+        real axis and in the interval [-i*p/2, +i*p/2] along the
         imaginary axis.
         @end ifnottex
         @tex
-        These functions return the complex arc hyperbolic sine value, 
-        in the range of a strip mathematically unbounded along the 
-        real axis and in the interval [$-i\pi/2$, $+i\pi/2$] along the 
+        These functions return the complex arc hyperbolic sine value,
+        in the range of a strip mathematically unbounded along the
+        real axis and in the interval [$-i\pi/2$, $+i\pi/2$] along the
         imaginary axis.
         @end tex
 
@@ -84,14 +84,13 @@ QUICKREF
 
 */
 
-
 #include <complex.h>
 
 double complex
 casinh(double complex z)
 {
-	double complex w;
+    double complex w;
 
-	w = -1.0 * (double complex) I * casin(z * (double complex) I);
-	return w;
+    w = -1.0 * (double complex)I * casin(z * (double complex)I);
+    return w;
 }

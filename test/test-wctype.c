@@ -43,43 +43,43 @@
 
 static struct {
     char n;
-    int (*f)(int);
+    int  (*f)(int);
 } funcs[] = {
-    { .n = 'n', isalnum },
-    { .n = 'a', isalpha },
-    { .n = 'b', isblank },
-    { .n = 'c', iscntrl },
-    { .n = 'd', isdigit },
-    { .n = 'g', isgraph },
-    { .n = 'l', islower },
-    { .n = 'p', isprint },
-    { .n = 'c', ispunct },
-    { .n = 's', isspace },
-    { .n = 'u', isupper },
+    { .n = 'n', isalnum  },
+    { .n = 'a', isalpha  },
+    { .n = 'b', isblank  },
+    { .n = 'c', iscntrl  },
+    { .n = 'd', isdigit  },
+    { .n = 'g', isgraph  },
+    { .n = 'l', islower  },
+    { .n = 'p', isprint  },
+    { .n = 'c', ispunct  },
+    { .n = 's', isspace  },
+    { .n = 'u', isupper  },
     { .n = 'x', isxdigit },
 };
 
-#define NFUNC sizeof(funcs)/sizeof(funcs[0])
+#define NFUNC sizeof(funcs) / sizeof(funcs[0])
 
 static struct {
     char n;
-    int (*f)(wint_t);
+    int  (*f)(wint_t);
 } wfuncs[] = {
-    { .n = 'N', iswalnum },
-    { .n = 'A', iswalpha },
-    { .n = 'B', iswblank },
-    { .n = 'C', iswcntrl },
-    { .n = 'D', iswdigit },
-    { .n = 'G', iswgraph },
-    { .n = 'L', iswlower },
-    { .n = 'P', iswprint },
-    { .n = 'C', iswpunct },
-    { .n = 'S', iswspace },
-    { .n = 'U', iswupper },
+    { .n = 'N', iswalnum  },
+    { .n = 'A', iswalpha  },
+    { .n = 'B', iswblank  },
+    { .n = 'C', iswcntrl  },
+    { .n = 'D', iswdigit  },
+    { .n = 'G', iswgraph  },
+    { .n = 'L', iswlower  },
+    { .n = 'P', iswprint  },
+    { .n = 'C', iswpunct  },
+    { .n = 'S', iswspace  },
+    { .n = 'U', iswupper  },
     { .n = 'X', iswxdigit },
 };
 
-#define NWFUNC sizeof(wfuncs)/sizeof(wfuncs[0])
+#define NWFUNC sizeof(wfuncs) / sizeof(wfuncs[0])
 
 static const char *locales[] = {
     "C",
@@ -105,10 +105,30 @@ static const char *locales[] = {
     "C.ISO-8859-16",
 #endif
 #ifdef HAVE_WINDOWS_CHARSETS
-    "C.GEORGIAN-PS", "C.PT154", "C.KOI8-T", "C.CP437", "C.CP737", "C.CP775",
-    "C.CP850", "C.CP852", "C.CP855", "C.CP857", "C.CP858", "C.CP862", "C.CP866",
-    "C.CP874", "C.CP1125", "C.CP1250", "C.CP1251", "C.CP1252", "C.CP1253",
-    "C.CP1254", "C.CP1256", "C.CP1257", "C.KOI8-R", "C.KOI8-U",
+    "C.GEORGIAN-PS",
+    "C.PT154",
+    "C.KOI8-T",
+    "C.CP437",
+    "C.CP737",
+    "C.CP775",
+    "C.CP850",
+    "C.CP852",
+    "C.CP855",
+    "C.CP857",
+    "C.CP858",
+    "C.CP862",
+    "C.CP866",
+    "C.CP874",
+    "C.CP1125",
+    "C.CP1250",
+    "C.CP1251",
+    "C.CP1252",
+    "C.CP1253",
+    "C.CP1254",
+    "C.CP1256",
+    "C.CP1257",
+    "C.KOI8-R",
+    "C.KOI8-U",
 #endif
 #ifdef HAVE_JIS_CHARSETS
     "C.SHIFT-JIS",
@@ -116,7 +136,7 @@ static const char *locales[] = {
 #endif
 };
 
-#define NUM_LOCALE sizeof(locales)/sizeof(locales[0])
+#define NUM_LOCALE sizeof(locales) / sizeof(locales[0])
 
 #if __SIZEOF_WCHAR_T__ == 2
 #define LAST_CHAR 0xffff
@@ -124,13 +144,14 @@ static const char *locales[] = {
 #define LAST_CHAR 0xe01ef
 #endif
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     wchar_t     c;
     unsigned    f;
-    FILE        *out = stdout;
+    FILE       *out = stdout;
     unsigned    i;
-    const char  *encode;
+    const char *encode;
     unsigned    prev_mask;
     unsigned    this_mask;
 
@@ -149,19 +170,18 @@ int main(int argc, char **argv)
         }
         encode = locales[i];
         prev_mask = ~0;
-        for (c = 0x0000; ; c++) {
+        for (c = 0x0000;; c++) {
             this_mask = 0;
-            if (c < 0x100)
-            {
+            if (c < 0x100) {
                 for (f = 0; f < NFUNC; f++)
-                    if (funcs[f].f((unsigned char) c))
+                    if (funcs[f].f((unsigned char)c))
                         this_mask |= (1 << f);
             }
             for (f = 0; f < NWFUNC; f++)
                 if (wfuncs[f].f(c))
                     this_mask |= (1 << (f + NFUNC));
             if (this_mask != prev_mask) {
-                fprintf(out, "%-12s 0x%05lx ", encode, (unsigned long) c);
+                fprintf(out, "%-12s 0x%05lx ", encode, (unsigned long)c);
                 for (f = 0; f < NFUNC; f++)
                     fprintf(out, "%c", (this_mask & (1 << f)) ? funcs[f].n : '.');
                 for (f = 0; f < NWFUNC; f++)

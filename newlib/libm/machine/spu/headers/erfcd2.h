@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _ERFCD2_H_
-#define _ERFCD2_H_	1
+#define _ERFCD2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -67,59 +67,60 @@
  *
  */
 
-static __inline vector double _erfcd2(vector double x)
+static __inline vector double
+_erfcd2(vector double x)
 {
-  vec_uchar16 dup_even  = ((vec_uchar16) { 0,1,2,3, 0,1,2,3, 8,9,10,11, 8,9,10,11 });
-  vec_double2 onehalfd  = spu_splats(0.5);
-  vec_double2 zerod     = spu_splats(0.0);
-  vec_double2 oned      = spu_splats(1.0);
-  vec_double2 twod      = spu_splats(2.0);
-  vec_double2 sign_mask = spu_splats(-0.0);
+    vec_uchar16 dup_even = ((vec_uchar16) { 0, 1, 2, 3, 0, 1, 2, 3, 8, 9, 10, 11, 8, 9, 10, 11 });
+    vec_double2 onehalfd = spu_splats(0.5);
+    vec_double2 zerod = spu_splats(0.0);
+    vec_double2 oned = spu_splats(1.0);
+    vec_double2 twod = spu_splats(2.0);
+    vec_double2 sign_mask = spu_splats(-0.0);
 
-  /* This is where we switch from near zero approx. */
-  vec_float4 approx_point = spu_splats(1.71f);
+    /* This is where we switch from near zero approx. */
+    vec_float4  approx_point = spu_splats(1.71f);
 
-  vec_double2 xabs, xsqu, xsign;
-  vec_uint4 isneg;
-  vec_double2 tresult, presult, result;
+    vec_double2 xabs, xsqu, xsign;
+    vec_uint4   isneg;
+    vec_double2 tresult, presult, result;
 
-  xsign = spu_and(x, sign_mask);
-  xabs = spu_andc(x, sign_mask);
-  xsqu = spu_mul(x, x);
+    xsign = spu_and(x, sign_mask);
+    xabs = spu_andc(x, sign_mask);
+    xsqu = spu_mul(x, x);
 
-  /*
-   * Use Taylor Series for x near 0
-   * Preserve sign of x in result, since erf(-x) = -erf(x)
-   * This approximation is for erf, so adjust for erfc.
-   */
-  TAYLOR_ERF(xabs, xsqu, tresult);
-  tresult = spu_or(tresult, xsign);
-  tresult = spu_sub(oned, tresult);
+    /*
+     * Use Taylor Series for x near 0
+     * Preserve sign of x in result, since erf(-x) = -erf(x)
+     * This approximation is for erf, so adjust for erfc.
+     */
+    TAYLOR_ERF(xabs, xsqu, tresult);
+    tresult = spu_or(tresult, xsign);
+    tresult = spu_sub(oned, tresult);
 
-  /*
-   * Now, use the Continued Fractions approximation away
-   * from 0. If x < 0, use erfc(-x) = 2 - erfc(x)
-   */
-  CONTFRAC_ERFC(xabs, xsqu, presult);
-  isneg = (vec_uint4)spu_shuffle(x, x, dup_even);
-  isneg = spu_rlmaska(isneg, -32);
-  presult = spu_sel(presult, spu_sub(twod, presult), (vec_ullong2)isneg);
+    /*
+     * Now, use the Continued Fractions approximation away
+     * from 0. If x < 0, use erfc(-x) = 2 - erfc(x)
+     */
+    CONTFRAC_ERFC(xabs, xsqu, presult);
+    isneg = (vec_uint4)spu_shuffle(x, x, dup_even);
+    isneg = spu_rlmaska(isneg, -32);
+    presult = spu_sel(presult, spu_sub(twod, presult), (vec_ullong2)isneg);
 
-  /*
-   * Select the appropriate approximation.
-   */
-  vec_float4 xf = spu_roundtf(xabs);
-  xf = spu_shuffle(xf, xf, dup_even);
-  result = spu_sel(tresult, presult, (vec_ullong2)spu_cmpgt(xf, approx_point));
+    /*
+     * Select the appropriate approximation.
+     */
+    vec_float4 xf = spu_roundtf(xabs);
+    xf = spu_shuffle(xf, xf, dup_even);
+    result = spu_sel(tresult, presult, (vec_ullong2)spu_cmpgt(xf, approx_point));
 
-  /*
-   * Special cases
-   */
-  result = spu_sel(result,  twod, spu_testsv(x, SPU_SV_NEG_INFINITY));
-  result = spu_sel(result, zerod, spu_testsv(x, SPU_SV_POS_INFINITY));
-  result = spu_sel(result,     x, spu_testsv(x, SPU_SV_NEG_DENORM | SPU_SV_POS_DENORM));
+    /*
+     * Special cases
+     */
+    result = spu_sel(result, twod, spu_testsv(x, SPU_SV_NEG_INFINITY));
+    result = spu_sel(result, zerod, spu_testsv(x, SPU_SV_POS_INFINITY));
+    result = spu_sel(result, x, spu_testsv(x, SPU_SV_NEG_DENORM | SPU_SV_POS_DENORM));
 
-  return result;
+    return result;
 }
 
 #endif /* _ERFCD2_H_ */

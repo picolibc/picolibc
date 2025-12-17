@@ -37,10 +37,11 @@
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 
-int finitef(float x)
+int
+finitef(float x)
 {
-	long fclass = _fclass_f (x);
-	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
+    long fclass = _fclass_f(x);
+    return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
 #ifdef __strong_reference
@@ -54,8 +55,7 @@ __finitef(float x)
 }
 #endif
 
-_MATH_ALIAS_i_f(finite)
-_MATH_ALIAS_i_f(__finite)
+_MATH_ALIAS_i_f(finite) _MATH_ALIAS_i_f(__finite)
 
 #else
 #include "../../common/sf_finite.c"

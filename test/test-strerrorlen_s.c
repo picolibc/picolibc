@@ -44,20 +44,19 @@
 char handler_msg[MAX_ERROR_MSG] = "";
 
 static void
-custom_constraint_handler(const char *restrict msg, void *restrict ptr,
-                          errno_t error)
+custom_constraint_handler(const char * restrict msg, void * restrict ptr, errno_t error)
 {
     (void)ptr;
     (void)error;
     strcpy(handler_msg, msg);
 }
 
-#define TEST_RES(cond, msg, handler_res, test_id)                              \
-    if ((!(cond)) || (handler_res == 1)) {                                     \
-        printf("Test %d Failed: %s\n", test_id, msg);                          \
-        return 1;                                                              \
-    } else {                                                                   \
-        printf("Test %d Passed: %s\n", test_id, msg);                          \
+#define TEST_RES(cond, msg, handler_res, test_id)     \
+    if ((!(cond)) || (handler_res == 1)) {            \
+        printf("Test %d Failed: %s\n", test_id, msg); \
+        return 1;                                     \
+    } else {                                          \
+        printf("Test %d Passed: %s\n", test_id, msg); \
     }
 
 static int
@@ -67,8 +66,7 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
     if (handler_called == 0) {
         (void)expected_msg;
         if (handler_msg[0] != '\0') {
-            printf(
-                "ERROR: Custom constraint handler called without error detiction!\n");
+            printf("ERROR: Custom constraint handler called without error detiction!\n");
             printf("Test %d Failed: Error msg is incorrect\n", test_id);
             ret = 1;
         }
@@ -80,16 +78,13 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
             ret = 1;
         } else {
             if (strcmp(expected_msg, handler_msg) != 0) {
-                printf(
-                    "ERROR: Custom constraint handler called with incorrect msg: %s\n",
-                    handler_msg);
+                printf("ERROR: Custom constraint handler called with incorrect msg: %s\n",
+                       handler_msg);
                 printf("Test %d Failed: Error msg is incorrect\n", test_id);
                 ret = 1;
             } else {
                 (void)expected_msg;
-                printf(
-                    "Custom constraint handler called with correct msg: %s\n",
-                    handler_msg);
+                printf("Custom constraint handler called with correct msg: %s\n", handler_msg);
                 handler_msg[0] = '\0';
                 ret = 0;
             }
@@ -102,8 +97,8 @@ int
 main(void)
 {
     size_t length;
-    int test_id = 0;
-    int handler_res = 0;
+    int    test_id = 0;
+    int    handler_res = 0;
 
     set_constraint_handler_s(custom_constraint_handler);
 
@@ -111,8 +106,8 @@ main(void)
     test_id++;
     length = strerrorlen_s(EINVAL);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == strlen("Invalid argument"), "Normal error code length",
-             handler_res, test_id);
+    TEST_RES(length == strlen("Invalid argument"), "Normal error code length", handler_res,
+             test_id);
 
     // Test case 2: Unknown error code
     test_id++;

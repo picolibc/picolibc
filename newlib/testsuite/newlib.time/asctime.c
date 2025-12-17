@@ -40,9 +40,9 @@
 #include <string.h>
 
 static const struct {
-    struct tm   tm;
-    char        *result;
-    int         _errno;
+    struct tm tm;
+    char     *result;
+    int       _errno;
 } tests[] = {
     {
         .tm = {
@@ -138,33 +138,33 @@ static const struct {
 #endif
 };
 
-static int mylen(const char *s)
+static int
+mylen(const char *s)
 {
     if (s == NULL)
         return -1;
     return strlen(s);
 }
 
-int main(void)
+int
+main(void)
 {
     unsigned n;
-    int err = 0;
-    char buf[26];
+    int      err = 0;
+    char     buf[26];
 
-    (void) tests;
-    for (n = 0; n < sizeof(tests)/sizeof(tests[0]); n++)
-    {
+    (void)tests;
+    for (n = 0; n < sizeof(tests) / sizeof(tests[0]); n++) {
         const char *result = asctime_r(&tests[n].tm, buf);
 
         if (tests[n].result == NULL && result == NULL)
             continue;
 
-        if (tests[n].result != NULL && result != NULL &&
-            strcmp(tests[n].result, result) == 0)
-        {
+        if (tests[n].result != NULL && result != NULL && strcmp(tests[n].result, result) == 0) {
             continue;
         }
-        printf("expect \"%s\"(%d) result \"%s\"(%d)\n", tests[n].result, mylen(tests[n].result), result, mylen(result));
+        printf("expect \"%s\"(%d) result \"%s\"(%d)\n", tests[n].result, mylen(tests[n].result),
+               result, mylen(result));
         err = 1;
     }
     return err;

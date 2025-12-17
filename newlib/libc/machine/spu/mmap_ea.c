@@ -37,32 +37,31 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (mmap_ea);
+COMPAT_EA_ALIAS(mmap_ea);
 
-__ea void *mmap_ea (__ea void *start, size_ea_t length, int prot, int
-             flags, int fd, off_t offset)
+__ea void *
+mmap_ea(__ea void *start, size_ea_t length, int prot, int flags, int fd, off_t offset)
 {
 #ifdef __EA64__
-  if (length > 0xffffffffULL) {
-    errno = ENOMEM;
-    return MAP_FAILED_EADDR;
-  } else {
-    return (__ea void *) mmap_eaddr ((unsigned long long) start,
-                                     (size_t) length, prot, flags, fd, offset);
-  }
+    if (length > 0xffffffffULL) {
+        errno = ENOMEM;
+        return MAP_FAILED_EADDR;
+    } else {
+        return (__ea void *)mmap_eaddr((unsigned long long)start, (size_t)length, prot, flags, fd,
+                                       offset);
+    }
 #else /* __EA32__ */
-  unsigned long long res;
-  /*
-   * mmap_eaddr returns 64 bits. For ea32, only the lower 32 bits can be
-   * returned.
-   */
-  res = mmap_eaddr ((unsigned long long) (unsigned int) start, length,
-                    prot, flags, fd, offset);
-  if (res != MAP_FAILED_EADDR && res > 0xffffffffULL) {
-    munmap_eaddr (res, length);
-    errno = ENOMEM;
-    res = MAP_FAILED_EADDR;
-  }
-  return (__ea void *) (int) res;
+    unsigned long long res;
+    /*
+     * mmap_eaddr returns 64 bits. For ea32, only the lower 32 bits can be
+     * returned.
+     */
+    res = mmap_eaddr((unsigned long long)(unsigned int)start, length, prot, flags, fd, offset);
+    if (res != MAP_FAILED_EADDR && res > 0xffffffffULL) {
+        munmap_eaddr(res, length);
+        errno = ENOMEM;
+        res = MAP_FAILED_EADDR;
+    }
+    return (__ea void *)(int)res;
 #endif
 }

@@ -39,8 +39,8 @@ static const __float64 one = _F_64(1.0);
 __float64
 atanh64(__float64 x)
 {
-    __float64 t;
-    __int32_t hx, ix;
+    __float64  t;
+    __int32_t  hx, ix;
     __uint32_t lx;
     EXTRACT_WORDS(hx, lx, x);
     ix = hx & 0x7fffffff;

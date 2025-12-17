@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _ILOGBF_H_
-#define _ILOGBF_H_	1
+#define _ILOGBF_H_ 1
 
 #include <spu_intrinsics.h>
 #include <limits.h>
@@ -41,13 +41,14 @@
 /* Single precision floats do not support infinities and NANs, and
  * denorms are treated as zero.
  */
-static __inline int _ilogbf(float x)
+static __inline int
+_ilogbf(float x)
 {
-  vec_uint4 v, exp;
+    vec_uint4 v, exp;
 
-  v = (vec_uint4)spu_promote(x, 0);
-  exp = spu_and(spu_rlmask(v, -23), 0xFF);
-  exp = spu_sel(spu_add(exp, -127), VEC_SPLAT_U32(FP_ILOGB0), spu_cmpeq(exp, 0));
-  return (spu_extract((vec_int4)(exp), 0));
+    v = (vec_uint4)spu_promote(x, 0);
+    exp = spu_and(spu_rlmask(v, -23), 0xFF);
+    exp = spu_sel(spu_add(exp, -127), VEC_SPLAT_U32(FP_ILOGB0), spu_cmpeq(exp, 0));
+    return (spu_extract((vec_int4)(exp), 0));
 }
 #endif /* _ILOGBF_H_ */

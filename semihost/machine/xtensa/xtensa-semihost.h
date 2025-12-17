@@ -45,15 +45,13 @@
 #include <sys/stat.h>
 #include "simcall.h"
 
-int
-xtensa_putc(char c, FILE *file);
+int xtensa_putc(char c, FILE *file);
 
 struct _simcall_ret {
-    intptr_t    code;
-    intptr_t    error;
+    intptr_t code;
+    intptr_t error;
 };
 
-struct _simcall_ret
-_simcall(intptr_t request, ...);
+struct _simcall_ret _simcall(intptr_t request, ...);
 
 #endif /* _XTENSA_SEMIHOST_H_ */

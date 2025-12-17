@@ -70,7 +70,7 @@ __euc_jp_to_unicode(uint32_t euc_jp)
         case 0x8e:
             /* Half-width Katakana */
             if (0xa1 <= byte2 && byte2 <= 0xdf)
-                return (uint16_t) byte2 - 0xa1U + 0xff61U;
+                return (uint16_t)byte2 - 0xa1U + 0xff61U;
             return WEOF;
         default:
             codes = __euc_jp_jis_x0208_codes;

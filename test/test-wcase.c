@@ -54,14 +54,15 @@ static const char *locales[] = {
 #endif
 };
 
-#define NUM_LOCALE sizeof(locales)/sizeof(locales[0])
+#define NUM_LOCALE sizeof(locales) / sizeof(locales[0])
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
-    wint_t      c;
-    unsigned    i;
-    int         error = 0;
-    FILE        *out = stdout;
+    wint_t   c;
+    unsigned i;
+    int      error = 0;
+    FILE    *out = stdout;
 
     if (argc > 1) {
         out = fopen(argv[1], "w");
@@ -77,13 +78,13 @@ int main(int argc, char **argv)
             error = 1;
             continue;
         }
-        for (c = 0x0000; ; c++) {
-            wint_t  u, l;
+        for (c = 0x0000;; c++) {
+            wint_t u, l;
 
             u = towupper(c);
             l = towlower(c);
             if (c != u || c != l)
-                fprintf (out, "%s: %#x %#x %#x\n", locales[i], c, towupper(c), towlower(c));
+                fprintf(out, "%s: %#x %#x %#x\n", locales[i], c, towupper(c), towlower(c));
             if (c == LAST_CHAR)
                 break;
         }

@@ -36,26 +36,22 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <stdarg.h>
 
 #ifdef INTEGER_ONLY
-#  define vprintf viprintf
+#define vprintf viprintf
 #endif
 
-typedef struct
-{
-  const char* fmt;
-  unsigned int pad0[ 3 ];
-  va_list ap;
+typedef struct {
+    const char  *fmt;
+    unsigned int pad0[3];
+    va_list      ap;
 } c99_vprintf_t;
 
-
 int
-vprintf (const char *fmt,
-     va_list ap)
+vprintf(const char *fmt, va_list ap)
 {
-  c99_vprintf_t args;
+    c99_vprintf_t args;
 
-  args.fmt = fmt;
-  va_copy(args.ap,ap);
+    args.fmt = fmt;
+    va_copy(args.ap, ap);
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VPRINTF, &args);
 }
-

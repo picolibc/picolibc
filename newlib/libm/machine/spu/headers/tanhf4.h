@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _TANHF4_H_
-#define _TANHF4_H_	1
+#define _TANHF4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -52,7 +52,7 @@
  *
  * DESCRIPTION
  *	The _tanhf4 function computes the hyperbolic tangent for each
- *	element of the input vector. 
+ *	element of the input vector.
  *
  *	We use the following to approximate tanh:
  *
@@ -66,18 +66,19 @@
  *
  */
 
-static __inline vector float _tanhf4(vector float x)
+static __inline vector float
+_tanhf4(vector float x)
 {
-    vector float signbit = spu_splats(-0.0f);
-    vector float onef    = spu_splats(1.0f);
-    vector float twof    = spu_splats(2.0f);
-    vector float xabs;
-    vector float x2;
+    vector float        signbit = spu_splats(-0.0f);
+    vector float        onef = spu_splats(1.0f);
+    vector float        twof = spu_splats(2.0f);
+    vector float        xabs;
+    vector float        x2;
     vector unsigned int gttaylor;
-    vector float e;
-    vector float tresult;
-    vector float eresult;
-    vector float result;
+    vector float        e;
+    vector float        tresult;
+    vector float        eresult;
+    vector float        result;
 
     xabs = spu_andc(x, signbit);
 
@@ -87,11 +88,10 @@ static __inline vector float _tanhf4(vector float x)
      */
     gttaylor = spu_cmpgt(xabs, spu_splats(0.25f));
 
-
     /*
      * Taylor Series Approximation
      */
-    x2 = spu_mul(x,x);
+    x2 = spu_mul(x, x);
     tresult = spu_madd(x2, spu_splats((float)TANH_TAY06), spu_splats((float)TANH_TAY05));
     tresult = spu_madd(x2, tresult, spu_splats((float)TANH_TAY04));
     tresult = spu_madd(x2, tresult, spu_splats((float)TANH_TAY03));
@@ -99,15 +99,13 @@ static __inline vector float _tanhf4(vector float x)
     tresult = spu_madd(x2, tresult, spu_splats((float)TANH_TAY01));
     tresult = spu_mul(xabs, tresult);
 
-
     /*
      * Exponential Formula
-     * Our expf4 function gives a more accurate result in general 
+     * Our expf4 function gives a more accurate result in general
      * with xabs instead of x for x<0. We correct for sign later.
      */
     e = _expf4(spu_mul(xabs, twof));
     eresult = _divf4(spu_sub(e, onef), spu_add(e, onef));
-
 
     /*
      * Select Taylor or exp result.
@@ -115,9 +113,9 @@ static __inline vector float _tanhf4(vector float x)
     result = spu_sel(tresult, eresult, gttaylor);
 
     /*
-     * Correct for accumulated truncation error when 
+     * Correct for accumulated truncation error when
      * tanh(x) should return 1.
-     * Note that this also handles the special case of 
+     * Note that this also handles the special case of
      * x = +/- infinity.
      */
     result = spu_sel(result, onef, spu_cmpgt(xabs, spu_splats(9.125f)));

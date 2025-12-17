@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -39,17 +39,17 @@
 float complex
 ctanf(float complex z)
 {
-	float d;
+    float d;
 
-	d = cosf(2.0f * crealf(z)) + coshf(2.0f * cimagf(z));
+    d = cosf(2.0f * crealf(z)) + coshf(2.0f * cimagf(z));
 
-	if (fabsf(d) < 0.25f)
-		d = _ctansf(z);
+    if (fabsf(d) < 0.25f)
+        d = _ctansf(z);
 
-	if (d == 0.0f) {
-		/* mtherr ("ctan", OVERFLOW); */
-		return HUGE_VALF + HUGE_VALF * I;
-	}
+    if (d == 0.0f) {
+        /* mtherr ("ctan", OVERFLOW); */
+        return HUGE_VALF + HUGE_VALF * I;
+    }
 
-	return (float complex) (sinf(2.0f * crealf(z)) / d) + (sinhf(2.0f * cimagf(z)) / d) * I;
+    return (float complex)(sinf(2.0f * crealf(z)) / d) + (sinhf(2.0f * cimagf(z)) / d) * I;
 }

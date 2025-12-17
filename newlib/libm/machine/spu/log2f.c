@@ -34,7 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "headers/log2f.h"
 
 #undef log2f
-float log2f(float x)
+float
+log2f(float x)
 {
     return _log2f(x);
 }

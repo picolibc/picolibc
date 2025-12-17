@@ -14,16 +14,16 @@
 
 /*
 FUNCTION
-	<<log2>>, <<log2f>>---base 2 logarithm
+        <<log2>>, <<log2f>>---base 2 logarithm
 INDEX
-	log2
+        log2
 INDEX
-	log2f
+        log2f
 
 SYNOPSIS
-	#include <math.h>
-	double log2(double <[x]>);
-	float log2f(float <[x]>);
+        #include <math.h>
+        double log2(double <[x]>);
+        float log2f(float <[x]>);
 
 DESCRIPTION
 The <<log2>> functions compute the base-2 logarithm of <[x]>.  A domain error
@@ -69,7 +69,7 @@ C99, POSIX, System V Interface Definition (Issue 6).
 #ifdef _NEED_FLOAT64
 
 __float64
-log264(__float64 x)		/* wrapper log2 */
+log264(__float64 x) /* wrapper log2 */
 {
     return (log64(x) / _F_64(_M_LN2));
 }

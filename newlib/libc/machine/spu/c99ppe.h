@@ -35,11 +35,11 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include <sys/syscall.h>
 #endif /* !__ASSEMBLER__ */
 
-#define SPE_C99_SIGNALCODE 0x2100
+#define SPE_C99_SIGNALCODE  0x2100
 
-#define SPE_C99_OP_SHIFT    	24
-#define SPE_C99_OP_MASK	    	0xff
-#define SPE_C99_DATA_MASK   	0xffffff
+#define SPE_C99_OP_SHIFT    24
+#define SPE_C99_OP_MASK     0xff
+#define SPE_C99_DATA_MASK   0xffffff
 
 #define SPE_C99_CLEARERR    1
 #define SPE_C99_FCLOSE      2
@@ -50,7 +50,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #define SPE_C99_FGETPOS     7
 #define SPE_C99_FGETS       8
 #define SPE_C99_FILENO      9
-#define SPE_C99_FOPEN       10 //implemented
+#define SPE_C99_FOPEN       10 // implemented
 #define SPE_C99_FPUTC       11
 #define SPE_C99_FPUTS       12
 #define SPE_C99_FREAD       13
@@ -71,7 +71,7 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #define SPE_C99_REWIND      28
 #define SPE_C99_SETBUF      29
 #define SPE_C99_SETVBUF     30
-#define SPE_C99_SYSTEM      31 //not yet implemented in newlib
+#define SPE_C99_SYSTEM      31 // not yet implemented in newlib
 #define SPE_C99_TMPFILE     32
 #define SPE_C99_TMPNAM      33
 #define SPE_C99_UNGETC      34
@@ -84,32 +84,30 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #define SPE_C99_VSSCANF     41
 #define SPE_C99_LAST_OPCODE 42
 
-#define SPE_C99_NR_OPCODES 	((SPE_C99_LAST_OPCODE - SPE_C99_CLEARERR) + 1)
+#define SPE_C99_NR_OPCODES  ((SPE_C99_LAST_OPCODE - SPE_C99_CLEARERR) + 1)
 
-#define SPE_STDIN                   1
-#define SPE_STDOUT                  2
-#define SPE_STDERR                  3
-#define SPE_FOPEN_MAX               FOPEN_MAX
+#define SPE_STDIN           1
+#define SPE_STDOUT          2
+#define SPE_STDERR          3
+#define SPE_FOPEN_MAX       FOPEN_MAX
 
 #ifdef __ASSEMBLER__
-#define SPE_STACK_REGS      72 /* Number of registers preserved in stack
-                                  in case of variable argument API. */
-#else /* !__ASSEMBLER__ */
-struct spe_reg128{
-  unsigned int slot[4];
+#define SPE_STACK_REGS                           \
+    72 /* Number of registers preserved in stack \
+          in case of variable argument API. */
+#else  /* !__ASSEMBLER__ */
+struct spe_reg128 {
+    unsigned int slot[4];
 };
 
-void __sinit (struct _reent *);
-FILE  *__sfp (struct _reent *);
-#define __sfp_free(fp) ( (fp)->_fp = 0 )
+void  __sinit(struct _reent *);
+FILE *__sfp(struct _reent *);
+#define __sfp_free(fp) ((fp)->_fp = 0)
 
-#define CHECK_INIT(ptr) \
-  do						\
-    {						\
-      if (!_REENT_IS_NULL(ptr) &&		\
-	  !_REENT_CLEANUP(ptr))			\
-	__sinit (ptr);				\
-    }						\
-  while (0)
+#define CHECK_INIT(ptr)                                   \
+    do {                                                  \
+        if (!_REENT_IS_NULL(ptr) && !_REENT_CLEANUP(ptr)) \
+            __sinit(ptr);                                 \
+    } while (0)
 #define CHECK_STR_INIT(ptr) /* currently, do nothing */
-#endif /* __ASSEMBLER__ */
+#endif                      /* __ASSEMBLER__ */

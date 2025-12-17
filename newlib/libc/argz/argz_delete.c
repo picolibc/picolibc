@@ -11,30 +11,26 @@
 #include <stdlib.h>
 
 error_t
-argz_delete (char **argz,
-       size_t *argz_len,
-       char *entry)
+argz_delete(char **argz, size_t *argz_len, char *entry)
 {
-  int len = 0;
-  char *moveto = entry;
+    int   len = 0;
+    char *moveto = entry;
 
-  if (entry)
-    {
-      len = strlen(entry) + 1;
-      entry += len;
-      
-      memmove(moveto, entry, *argz + *argz_len - entry);
+    if (entry) {
+        len = strlen(entry) + 1;
+        entry += len;
 
-      *argz_len -= len;
+        memmove(moveto, entry, *argz + *argz_len - entry);
 
-      if(!(*argz = (char *)realloc(*argz, *argz_len)))
-        return ENOMEM;
+        *argz_len -= len;
 
-      if (*argz_len <= 0)
-        {
-          free(*argz);
-          *argz = NULL;
+        if (!(*argz = (char *)realloc(*argz, *argz_len)))
+            return ENOMEM;
+
+        if (*argz_len <= 0) {
+            free(*argz);
+            *argz = NULL;
         }
     }
-  return 0;
+    return 0;
 }

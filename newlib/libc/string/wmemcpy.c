@@ -1,24 +1,24 @@
 /*
 FUNCTION
-	<<wmemcpy>>---copy wide characters in memory 
+        <<wmemcpy>>---copy wide characters in memory
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wmemcpy(wchar_t *__restrict <[d]>,
-			 const wchar_t *__restrict <[s]>, size_t <[n]>);
+        #include <wchar.h>
+        wchar_t *wmemcpy(wchar_t *__restrict <[d]>,
+                         const wchar_t *__restrict <[s]>, size_t <[n]>);
 
 DESCRIPTION
-	The <<wmemcpy>> function copies <[n]> wide characters from the object
-	pointed to by <[s]> to the object pointed to be <[d]>. This function
-	is not affected by locale and all wchar_t values are treated
-	identically.  The null wide character and wchar_t values not
-	corresponding to valid characters are not treated specially.
+        The <<wmemcpy>> function copies <[n]> wide characters from the object
+        pointed to by <[s]> to the object pointed to be <[d]>. This function
+        is not affected by locale and all wchar_t values are treated
+        identically.  The null wide character and wchar_t values not
+        corresponding to valid characters are not treated specially.
 
-	If <[n]> is zero, <[d]> and <[s]> must be a valid pointers, and the
-	function copies zero wide characters. 
+        If <[n]> is zero, <[d]> and <[s]> must be a valid pointers, and the
+        function copies zero wide characters.
 
 RETURNS
-	The <<wmemcpy>> function returns the value of <[d]>.
+        The <<wmemcpy>> function returns the value of <[d]>.
 
 PORTABILITY
 <<wmemcpy>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -60,10 +60,8 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wmemcpy (wchar_t *__restrict d,
-	const wchar_t *__restrict s,
-	size_t n)
+wmemcpy(wchar_t * __restrict d, const wchar_t * __restrict s, size_t n)
 {
 
-  return (wchar_t *) memcpy (d, s, n * sizeof (wchar_t));
+    return (wchar_t *)memcpy(d, s, n * sizeof(wchar_t));
 }

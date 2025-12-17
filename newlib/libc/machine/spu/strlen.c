@@ -39,32 +39,33 @@
  * Calculates the length of the string s, not including the terminating
  * \0 character.
  */
-size_t strlen(const char *s)
+size_t
+strlen(const char *s)
 {
-  unsigned int cnt, cmp, skip, mask;
-  vec_uchar16 *ptr, data;
+    unsigned int cnt, cmp, skip, mask;
+    vec_uchar16 *ptr, data;
 
-  /*
-   * Compensate for initial mis-aligned string.
-   */
-  ptr = (vec_uchar16 *)s; /* implicit 16 byte alignment when dereferenced */
-  skip = (unsigned int)(ptr) & 15;
-  mask = 0xFFFF >> skip;
+    /*
+     * Compensate for initial mis-aligned string.
+     */
+    ptr = (vec_uchar16 *)s; /* implicit 16 byte alignment when dereferenced */
+    skip = (unsigned int)(ptr) & 15;
+    mask = 0xFFFF >> skip;
 
-  data = *ptr;
-  cmp = spu_extract(spu_gather(spu_cmpeq(data, 0)), 0);
-  cmp &= mask;
+    data = *ptr;
+    cmp = spu_extract(spu_gather(spu_cmpeq(data, 0)), 0);
+    cmp &= mask;
 
-  cnt = spu_extract(spu_cntlz(spu_promote(cmp, 0)), 0);
+    cnt = spu_extract(spu_cntlz(spu_promote(cmp, 0)), 0);
 
-  while (cnt == 32) {
-    data = *++ptr;
-    cnt = spu_extract(spu_cntlz(spu_gather(spu_cmpeq(data, 0))), 0);
-  }
+    while (cnt == 32) {
+        data = *++ptr;
+        cnt = spu_extract(spu_cntlz(spu_gather(spu_cmpeq(data, 0))), 0);
+    }
 
-  /*
-   * The length is ptr aligned down to a 16 byte boundary, plus the offset
-   * to the zero byte, minus the starting address s.
-   */
-  return ((((int) ptr & ~0xf) + (cnt - 16)) - (int) s);
+    /*
+     * The length is ptr aligned down to a 16 byte boundary, plus the offset
+     * to the zero byte, minus the starting address s.
+     */
+    return ((((int)ptr & ~0xf) + (cnt - 16)) - (int)s);
 }

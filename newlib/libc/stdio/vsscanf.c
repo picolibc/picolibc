@@ -32,7 +32,7 @@
 int
 vsscanf(const char *s, const char *fmt, va_list ap)
 {
-	struct __file_str f = FDEV_SETUP_STRING_READ(s);
+    struct __file_str f = FDEV_SETUP_STRING_READ(s);
 
-	return vfscanf(&f.file, fmt, ap);
+    return vfscanf(&f.file, fmt, ap);
 }

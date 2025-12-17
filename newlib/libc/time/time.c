@@ -19,11 +19,11 @@ FUNCTION
 <<time>>---get current calendar time (as single number)
 
 INDEX
-	time
+        time
 
 SYNOPSIS
-	#include <time.h>
-	time_t time(time_t *<[t]>);
+        #include <time.h>
+        time_t time(time_t *<[t]>);
 
 DESCRIPTION
 <<time>> looks up the best available representation of the current
@@ -47,14 +47,14 @@ Supporting OS subroutine required: Some implementations require
 #include <sys/time.h>
 
 time_t
-time (time_t * t)
+time(time_t *t)
 {
-  struct timeval now;
+    struct timeval now;
 
-  if (gettimeofday (&now, NULL) < 0)
-    now.tv_sec = (time_t) -1;
+    if (gettimeofday(&now, NULL) < 0)
+        now.tv_sec = (time_t)-1;
 
-  if (t)
-    *t = now.tv_sec;
-  return now.tv_sec;
+    if (t)
+        *t = now.tv_sec;
+    return now.tv_sec;
 }

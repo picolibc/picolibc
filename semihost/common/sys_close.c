@@ -38,5 +38,5 @@
 int
 sys_semihost_close(int fd)
 {
-	return (int) sys_semihost1(SYS_CLOSE, fd);
+    return (int)sys_semihost1(SYS_CLOSE, fd);
 }

@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isalpha>>, <<isalpha_l>>---alphabetic character predicate
+        <<isalpha>>, <<isalpha_l>>---alphabetic character predicate
 
 INDEX
-	isalpha
+        isalpha
 
 INDEX
-	isalpha_l
+        isalpha_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isalpha(int <[c]>);
+        #include <ctype.h>
+        int isalpha(int <[c]>);
 
-	#include <ctype.h>
-	int isalpha_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isalpha_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isalpha>> is a macro which classifies singlebyte charset values by table
@@ -70,11 +70,11 @@ No supporting OS subroutines are required.
 
 #undef isalpha
 int
-isalpha (int c)
+isalpha(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return isupper(c) || islower(c);
 #else
-    return __CTYPE_PTR[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER);
+    return __CTYPE_PTR[c + 1] & (__CTYPE_UPPER | __CTYPE_LOWER);
 #endif
 }

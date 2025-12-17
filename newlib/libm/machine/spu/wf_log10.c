@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/log10f.h"
 
-float log10f(float x)
+float
+log10f(float x)
 {
     return _log10f(x);
 }

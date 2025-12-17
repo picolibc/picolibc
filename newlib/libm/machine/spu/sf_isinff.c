@@ -35,7 +35,7 @@
  * On the SPU __isinff(x) always returns 0.
  */
 int
-__isinff (float x)
+__isinff(float x)
 {
-	return 0;
+    return 0;
 }

@@ -45,27 +45,29 @@
 #define TEST_FILE_NAME "DPRINTF.TXT"
 #endif
 
-#define check(condition, message) do {                  \
-        if (!(condition)) {                             \
-            printf("%s: %s\n", message, #condition);    \
-            (void) remove(TEST_FILE_NAME);              \
-            exit(1);                                    \
-        }                                               \
-    } while(0)
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            (void)remove(TEST_FILE_NAME);            \
+            exit(1);                                 \
+        }                                            \
+    } while (0)
 
-#define TEST_DATA       "test dprintf\n"
+#define TEST_DATA "test dprintf\n"
 
-int main(void)
+int
+main(void)
 {
     /* Create test file */
-    int fd = open(TEST_FILE_NAME, O_CREAT|O_WRONLY|O_TRUNC, 0666);
+    int fd = open(TEST_FILE_NAME, O_CREAT | O_WRONLY | O_TRUNC, 0666);
     check(fd >= 0, "create file failed");
 
     /* Write test data using dprintf */
     int ret = dprintf(fd, "%s", TEST_DATA);
 
     /* Verify that dprint returns expected value */
-    check(ret >= 0 && (size_t) ret == strlen(TEST_DATA), "dprint failed");
+    check(ret >= 0 && (size_t)ret == strlen(TEST_DATA), "dprint failed");
 
     /* Close the test file, re-open using fopen */
     close(fd);
@@ -75,8 +77,8 @@ int main(void)
     check(f != NULL, "re-open file");
 
     /* Read test data using fread */
-    ret = fread(buf, sizeof(char), sizeof(buf)/sizeof(buf[0]), f);
-    check(ret >= 0 && (size_t) ret == strlen(TEST_DATA), "fread failed");
+    ret = fread(buf, sizeof(char), sizeof(buf) / sizeof(buf[0]), f);
+    check(ret >= 0 && (size_t)ret == strlen(TEST_DATA), "fread failed");
     buf[ret] = '\0';
 
     /* Verify file contains expected data */

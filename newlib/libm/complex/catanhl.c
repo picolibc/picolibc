@@ -36,10 +36,10 @@
 long double complex
 catanhl(long double complex z)
 {
-	long double complex w;
+    long double complex w;
 
-	w = -1.0L * (long double complex) I * catanl(z * (long double complex) I);
-	return w;
+    w = -1.0L * (long double complex)I * catanl(z * (long double complex)I);
+    return w;
 }
 
 #endif

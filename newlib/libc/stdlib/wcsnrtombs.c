@@ -4,35 +4,35 @@ FUNCTION
 <<wcsrtombs>>, <<wcsnrtombs>>---convert a wide-character string to a character string
 
 INDEX
-	wcsrtombs
+        wcsrtombs
 INDEX
-	_wcsrtombs_r
+        _wcsrtombs_r
 INDEX
-	wcsnrtombs
+        wcsnrtombs
 INDEX
-	_wcsnrtombs_r
+        _wcsnrtombs_r
 
 SYNOPSIS
-	#include <wchar.h>
-	size_t wcsrtombs(char *__restrict <[dst]>,
-			 const wchar_t **__restrict <[src]>, size_t <[len]>,
-			 mbstate_t *__restrict <[ps]>);
+        #include <wchar.h>
+        size_t wcsrtombs(char *__restrict <[dst]>,
+                         const wchar_t **__restrict <[src]>, size_t <[len]>,
+                         mbstate_t *__restrict <[ps]>);
 
-	#include <wchar.h>
-	size_t _wcsrtombs_r(struct _reent *<[ptr]>, char *<[dst]>,
-			    const wchar_t **<[src]>, size_t <[len]>,
-			    mbstate_t *<[ps]>);
+        #include <wchar.h>
+        size_t _wcsrtombs_r(struct _reent *<[ptr]>, char *<[dst]>,
+                            const wchar_t **<[src]>, size_t <[len]>,
+                            mbstate_t *<[ps]>);
 
-	#include <wchar.h>
-	size_t wcsnrtombs(char *__restrict <[dst]>,
-			  const wchar_t **__restrict <[src]>,
-			  size_t <[nwc]>, size_t <[len]>,
-			  mbstate_t *__restrict <[ps]>);
+        #include <wchar.h>
+        size_t wcsnrtombs(char *__restrict <[dst]>,
+                          const wchar_t **__restrict <[src]>,
+                          size_t <[nwc]>, size_t <[len]>,
+                          mbstate_t *__restrict <[ps]>);
 
-	#include <wchar.h>
-	size_t _wcsnrtombs_r(struct _reent *<[ptr]>, char *<[dst]>,
-			     const wchar_t **<[src]>, size_t <[nwc]>,
-			     size_t <[len]>, mbstate_t *<[ps]>);
+        #include <wchar.h>
+        size_t _wcsnrtombs_r(struct _reent *<[ptr]>, char *<[dst]>,
+                             const wchar_t **<[src]>, size_t <[nwc]>,
+                             size_t <[len]>, mbstate_t *<[ps]>);
 
 DESCRIPTION
 The <<wcsrtombs>> function converts a string of wide characters indirectly
@@ -73,77 +73,64 @@ PORTABILITY
 #include "local.h"
 
 size_t
-_wcsnrtombs_l (char *dst, const wchar_t **src, size_t nwc,
-	       size_t len, mbstate_t *ps, locale_t loc)
+_wcsnrtombs_l(char *dst, const wchar_t **src, size_t nwc, size_t len, mbstate_t *ps, locale_t loc)
 {
-  char *ptr = dst;
-  char buff[10];
-  wchar_t *pwcs;
-  size_t n;
-  int i;
+    char    *ptr = dst;
+    char     buff[10];
+    wchar_t *pwcs;
+    size_t   n;
+    int      i;
 
 #ifdef __MB_CAPABLE
-  if (ps == NULL)
-    {
-      static mbstate_t _wcsrtombs_state;
-      ps = &_wcsrtombs_state;
+    if (ps == NULL) {
+        static mbstate_t _wcsrtombs_state;
+        ps = &_wcsrtombs_state;
     }
 #endif
 
-  /* If no dst pointer, treat len as maximum possible value. */
-  if (dst == NULL)
-    len = (size_t)-1;
+    /* If no dst pointer, treat len as maximum possible value. */
+    if (dst == NULL)
+        len = (size_t)-1;
 
-  n = 0;
-  pwcs = (wchar_t *)(*src);
+    n = 0;
+    pwcs = (wchar_t *)(*src);
 
-  while (n < len && nwc-- > 0)
-    {
-      int count = ps->__count;
-      wint_t wch = ps->__value.__wch;
-      int bytes = __WCTOMB_L(loc) (buff, *pwcs, ps);
-      if (bytes == -1)
-	{
-	  errno = EILSEQ;
-	  ps->__count = 0;
-	  return (size_t)-1;
-	}
-      if (n + bytes <= len)
-	{
-          n += bytes;
-	  if (dst)
-	    {
-	      for (i = 0; i < bytes; ++i)
-	        *ptr++ = buff[i];
-	      ++(*src);
-	    }
-	  if (*pwcs++ == 0x00)
-	    {
-	      if (dst)
-	        *src = NULL;
-	      ps->__count = 0;
-	      return n - 1;
-	    }
-	}
-      else
-	{
-	  /* not enough room, we must back up state to before __WCTOMB call */
-	  ps->__count = count;
-	  ps->__value.__wch = wch;
-          len = 0;
-	}
+    while (n < len && nwc-- > 0) {
+        int    count = ps->__count;
+        wint_t wch = ps->__value.__wch;
+        int    bytes = __WCTOMB_L(loc)(buff, *pwcs, ps);
+        if (bytes == -1) {
+            errno = EILSEQ;
+            ps->__count = 0;
+            return (size_t)-1;
+        }
+        if (n + bytes <= len) {
+            n += bytes;
+            if (dst) {
+                for (i = 0; i < bytes; ++i)
+                    *ptr++ = buff[i];
+                ++(*src);
+            }
+            if (*pwcs++ == 0x00) {
+                if (dst)
+                    *src = NULL;
+                ps->__count = 0;
+                return n - 1;
+            }
+        } else {
+            /* not enough room, we must back up state to before __WCTOMB call */
+            ps->__count = count;
+            ps->__value.__wch = wch;
+            len = 0;
+        }
     }
 
-  return n;
+    return n;
 }
 
 size_t
-wcsnrtombs (char *__restrict dst,
-	const wchar_t **__restrict src,
-	size_t nwc,
-	size_t len,
-	mbstate_t *__restrict ps)
+wcsnrtombs(char * __restrict dst, const wchar_t ** __restrict src, size_t nwc, size_t len,
+           mbstate_t * __restrict ps)
 {
-  return _wcsnrtombs_l (dst, src, nwc, len, ps,
-			__get_current_locale ());
+    return _wcsnrtombs_l(dst, src, nwc, len, ps, __get_current_locale());
 }

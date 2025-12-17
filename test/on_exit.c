@@ -41,26 +41,27 @@
 static void
 fail(int code, void *param)
 {
-        (void) code;
-        (void) param;
-	printf("on_exit failure\n");
-	_exit(2);
+    (void)code;
+    (void)param;
+    printf("on_exit failure\n");
+    _exit(2);
 }
 
 static void
 success(int code, void *param)
 {
-        (void) code;
-        (void) param;
-	_exit(0);
+    (void)code;
+    (void)param;
+    _exit(0);
 }
 
-int main(void)
+int
+main(void)
 {
-	on_exit(fail, NULL);
-	on_exit(success, NULL);
-	/* Need to call exit explicitly so that native
-	 * tests (which use glibc crt0) get picolibc exit
-	 */
-	exit(1);
+    on_exit(fail, NULL);
+    on_exit(success, NULL);
+    /* Need to call exit explicitly so that native
+     * tests (which use glibc crt0) get picolibc exit
+     */
+    exit(1);
 }

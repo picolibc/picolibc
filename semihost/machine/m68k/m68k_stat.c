@@ -41,11 +41,11 @@
 #include <stdarg.h>
 
 int
-stat(const char *pathname, struct stat *restrict statbuf)
+stat(const char *pathname, struct stat * restrict statbuf)
 {
     struct m68k_stat m68k_stat;
 
-    int ret = m68k_semihost2(HOSTED_STAT, (uintptr_t) pathname, (uintptr_t) &m68k_stat);
+    int              ret = m68k_semihost2(HOSTED_STAT, (uintptr_t)pathname, (uintptr_t)&m68k_stat);
     if (ret >= 0)
         copy_stat(statbuf, &m68k_stat);
     return ret;

@@ -41,7 +41,7 @@
 #ifdef __SPU__
 
 #ifndef _LDEXPF4_H_
-#define _LDEXPF4_H_	1
+#define _LDEXPF4_H_ 1
 
 #include <spu_intrinsics.h>
 #include "scalbnf4.h"
@@ -51,21 +51,22 @@
  *	vector float _ldexpf4(vector float x, vector signed int exp)
  *
  * DESCRIPTION
- *      The _ldexpf4 function returns a vector containing each element of x 
- *      multiplied by 2^exp computed efficiently.  This function is computed 
+ *      The _ldexpf4 function returns a vector containing each element of x
+ *      multiplied by 2^exp computed efficiently.  This function is computed
  *      without the assistance of any floating point operations and as such
  *      does not set any floating point exceptions.
  *
- *  RETURNS 
- *	 - if the exponent of x is 0, then x is either 0 or a subnormal, 
+ *  RETURNS
+ *	 - if the exponent of x is 0, then x is either 0 or a subnormal,
  *         and the result will be returned as 0.
  *       - if the result if underflows, it will be returned as 0.
  *       - if the result overflows, it will be returned as FLT_MAX.
  *
  */
-static __inline vector float _ldexpf4(vector float x, vector signed int exp)
+static __inline vector float
+_ldexpf4(vector float x, vector signed int exp)
 {
-  return _scalbnf4(x, exp);
+    return _scalbnf4(x, exp);
 }
 
 #endif /* _LDEXPF4_H_ */

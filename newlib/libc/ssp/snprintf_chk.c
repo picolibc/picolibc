@@ -41,20 +41,20 @@
 /*ARGSUSED*/
 int
 __snprintf_chk(char * __restrict buf, size_t len, int flags, size_t slen,
-    const char * __restrict fmt, ...)
+               const char * __restrict fmt, ...)
 {
-	va_list ap;
-	int rv;
+    va_list ap;
+    int     rv;
 
-        (void) flags;
-	if (len > slen)
-		__chk_fail();
+    (void)flags;
+    if (len > slen)
+        __chk_fail();
 
-	va_start(ap, fmt);
-	rv = vsnprintf(buf, len, fmt, ap);
-	va_end(ap);
+    va_start(ap, fmt);
+    rv = vsnprintf(buf, len, fmt, ap);
+    va_end(ap);
 
-	return rv;
+    return rv;
 }
 
 #ifdef _LONG_DOUBLE_IEEE128__

@@ -46,13 +46,13 @@ FUNCTION
 <<bsearch>>---binary search
 
 INDEX
-	bsearch
+        bsearch
 
 SYNOPSIS
-	#include <stdlib.h>
-	void *bsearch(const void *<[key]>, const void *<[base]>,
-		size_t <[nmemb]>, size_t <[size]>,
-		int (*<[compar]>)(const void *, const void *));
+        #include <stdlib.h>
+        void *bsearch(const void *<[key]>, const void *<[base]>,
+                size_t <[nmemb]>, size_t <[size]>,
+                int (*<[compar]>)(const void *, const void *));
 
 DESCRIPTION
 <<bsearch>> searches an array beginning at <[base]> for any element
@@ -84,36 +84,31 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 
 void *
-bsearch (const void *key,
-	const void *base,
-	size_t nmemb,
-	size_t size,
-	int (*compar) (const void *, const void *))
+bsearch(const void *key, const void *base, size_t nmemb, size_t size,
+        int (*compar)(const void *, const void *))
 {
-  void *current;
-  size_t lower = 0;
-  size_t upper = nmemb;
-  size_t index;
-  int result;
+    void  *current;
+    size_t lower = 0;
+    size_t upper = nmemb;
+    size_t index;
+    int    result;
 
-  if (nmemb == 0 || size == 0)
-    return NULL;
+    if (nmemb == 0 || size == 0)
+        return NULL;
 
-  while (lower < upper)
-    {
-      index = (lower + upper) / 2;
-      current = (void *) (((char *) base) + (index * size));
+    while (lower < upper) {
+        index = (lower + upper) / 2;
+        current = (void *)(((char *)base) + (index * size));
 
-      result = compar (key, current);
+        result = compar(key, current);
 
-      if (result < 0)
-        upper = index;
-      else if (result > 0)
-        lower = index + 1;
-      else
-	return current;
+        if (result < 0)
+            upper = index;
+        else if (result > 0)
+            lower = index + 1;
+        else
+            return current;
     }
 
-  return NULL;
+    return NULL;
 }
-

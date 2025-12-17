@@ -13,67 +13,71 @@
 #include <picolibc.h>
 #include <ieeefp.h>
 
-#if defined(__riscv_flen) || defined (__riscv_zfinx)
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
 static void
 fssr(unsigned value)
 {
-  __asm__ volatile ("fscsr %0" :: "r"(value));
+    __asm__ volatile("fscsr %0" ::"r"(value));
 }
 
 static unsigned
 frsr(void)
 {
-  unsigned value;
-  __asm__ volatile ("frcsr %0" : "=r" (value));
-  return value;
+    unsigned value;
+    __asm__ volatile("frcsr %0" : "=r"(value));
+    return value;
 }
 
 static fp_rnd
-frm_fp_rnd (unsigned frm)
+frm_fp_rnd(unsigned frm)
 {
-  switch (frm)
-    {
-    case 0: return FP_RN;
-    case 1: return FP_RZ;
-    case 2: return FP_RM;
-    case 3: return FP_RP;
+    switch (frm) {
+    case 0:
+        return FP_RN;
+    case 1:
+        return FP_RZ;
+    case 2:
+        return FP_RM;
+    case 3:
+        return FP_RP;
     /* 4 ~ 7 is invalid value, so just retun FP_RP.  */
-    default:return FP_RP;
+    default:
+        return FP_RP;
     }
 }
 
 static fp_except
-frm_fp_except (unsigned except)
+frm_fp_except(unsigned except)
 {
-  fp_except fp = 0;
-  if (except & (1 << 0))
-    fp |= FP_X_IMP;
-  if (except & (1 << 1))
-    fp |= FP_X_UFL;
-  if (except & (1 << 2))
-    fp |= FP_X_OFL;
-  if (except & (1 << 3))
-    fp |= FP_X_DX;
-  if (except & (1 << 4))
-    fp |= FP_X_INV;
-  return fp;
+    fp_except fp = 0;
+    if (except & (1 << 0))
+        fp |= FP_X_IMP;
+    if (except & (1 << 1))
+        fp |= FP_X_UFL;
+    if (except & (1 << 2))
+        fp |= FP_X_OFL;
+    if (except & (1 << 3))
+        fp |= FP_X_DX;
+    if (except & (1 << 4))
+        fp |= FP_X_INV;
+    return fp;
 }
 
 static unsigned
 frm_except(fp_except fp)
 {
-  unsigned except = 0;
-  if (fp & FP_X_IMP)
-    except |= (1 << 0);
-  if (fp & FP_X_UFL)
-    except |= (1 << 1);
-  if (fp & FP_X_OFL)
-    except |= (1 << 2);
-  if (fp & FP_X_DX)
-    except |= (1 << 3);
-  if (fp & FP_X_INV)
-    except |= (1 << 4);
-  return except;
+    unsigned except = 0;
+    if (fp & FP_X_IMP)
+        except |= (1 << 0);
+    if (fp & FP_X_UFL)
+        except |= (1 << 1);
+    if (fp & FP_X_OFL)
+        except |= (1 << 2);
+    if (fp & FP_X_DX)
+        except |= (1 << 3);
+    if (fp & FP_X_INV)
+        except |= (1 << 4);
+    return except;
 }
 
 #endif /* __riscv_flen */
@@ -81,80 +85,90 @@ frm_except(fp_except fp)
 fp_except
 fpgetmask(void)
 {
-  return 0;
+    return 0;
 }
 
 fp_rnd
 fpgetround(void)
 {
-#if defined(__riscv_flen) || defined (__riscv_zfinx)
-  unsigned rm = (frsr () >> 5) & 0x7;
-  return frm_fp_rnd (rm);
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
+    unsigned rm = (frsr() >> 5) & 0x7;
+    return frm_fp_rnd(rm);
 #else
-  return FP_RZ;
+    return FP_RZ;
 #endif /* __riscv_flen */
 }
 
 fp_except
 fpgetsticky(void)
 {
-#if defined(__riscv_flen) || defined (__riscv_zfinx)
-  return frm_fp_except(frsr ());
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
+    return frm_fp_except(frsr());
 #else
-  return 0;
+    return 0;
 #endif /* __riscv_flen */
 }
 
 fp_except
 fpsetmask(fp_except mask)
 {
-  (void) mask;
-  return -1;
+    (void)mask;
+    return -1;
 }
 
 fp_rnd
 fpsetround(fp_rnd rnd_dir)
 {
-#if defined(__riscv_flen) || defined (__riscv_zfinx)
-  unsigned fsr = frsr ();
-  unsigned rm = (fsr >> 5) & 0x7;
-  unsigned new_rm;
-  switch (rnd_dir)
-    {
-    case FP_RN: new_rm = 0; break;
-    case FP_RZ: new_rm = 1; break;
-    case FP_RM: new_rm = 2; break;
-    case FP_RP: new_rm = 3; break;
-    default:    return -1;
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
+    unsigned fsr = frsr();
+    unsigned rm = (fsr >> 5) & 0x7;
+    unsigned new_rm;
+    switch (rnd_dir) {
+    case FP_RN:
+        new_rm = 0;
+        break;
+    case FP_RZ:
+        new_rm = 1;
+        break;
+    case FP_RM:
+        new_rm = 2;
+        break;
+    case FP_RP:
+        new_rm = 3;
+        break;
+    default:
+        return -1;
     }
-  fssr (new_rm << 5 | (fsr & 0x1f));
-  return frm_fp_rnd (rm);
+    fssr(new_rm << 5 | (fsr & 0x1f));
+    return frm_fp_rnd(rm);
 #else
-  (void) rnd_dir;
-  return -1;
+    (void)rnd_dir;
+    return -1;
 #endif /* __riscv_flen */
 }
 
 fp_except
 fpsetsticky(fp_except sticky)
 {
-#if defined(__riscv_flen) || defined (__riscv_zfinx)
-  unsigned fsr = frsr ();
-  fssr (frm_except(sticky) | (fsr & ~0x1f));
-  return frm_fp_except(fsr);
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
+    unsigned fsr = frsr();
+    fssr(frm_except(sticky) | (fsr & ~0x1f));
+    return frm_fp_except(fsr);
 #else
-  (void) sticky;
-  return -1;
+    (void)sticky;
+    return -1;
 #endif /* __riscv_flen */
 }
 
-fp_rdi fpgetroundtoi (void)
+fp_rdi
+fpgetroundtoi(void)
 {
-  return 0;
+    return 0;
 }
 
-fp_rdi fpsetroundtoi (fp_rdi rdi)
+fp_rdi
+fpsetroundtoi(fp_rdi rdi)
 {
-  (void) rdi;
-  return -1;
+    (void)rdi;
+    return -1;
 }

@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-catanh.h"
-#define TEST_FUNC       catanh
+#define TEST_VECTORS "test-catanh.h"
+#define TEST_FUNC    catanh
 
 #include "test-complex-one.h"

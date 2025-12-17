@@ -39,5 +39,5 @@
 int
 main(void)
 {
-	exit(!!sys_semihost_system("false"));
+    exit(!!sys_semihost_system("false"));
 }

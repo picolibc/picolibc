@@ -38,5 +38,5 @@
 void
 sys_semihost_write0(const char *string)
 {
-	(void) sys_semihost(SYS_WRITE0, (uintptr_t) string);
+    (void)sys_semihost(SYS_WRITE0, (uintptr_t)string);
 }

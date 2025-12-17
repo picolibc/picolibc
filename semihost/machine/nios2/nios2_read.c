@@ -50,7 +50,7 @@ read(int fd, void *buf, size_t count)
      * spin waiting for input.
      */
     do {
-        ret = nios2_semihost3(HOSTED_READ, fd, (uintptr_t) buf, count);
+        ret = nios2_semihost3(HOSTED_READ, fd, (uintptr_t)buf, count);
     } while (fd == 0 && ret == 0);
     return ret;
 }

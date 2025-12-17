@@ -36,11 +36,11 @@
 #define _ISOC23_SOURCE
 #include <string.h>
 
-void
-*memset_explicit(void *dest, int ch, size_t count)
+void *
+memset_explicit(void *dest, int ch, size_t count)
 {
     memset(dest, ch, count);
     /* Compiler barrier.  */
-    __asm__ __volatile__ ("" ::"r" (dest): "memory");
+    __asm__ __volatile__("" ::"r"(dest) : "memory");
     return dest;
 }

@@ -8,11 +8,11 @@ FUNCTION
 <<signbit>>---Does floating-point number have negative sign?
 
 INDEX
-	signbit
+        signbit
 
 SYNOPSIS
-	#include <math.h>
-	int signbit(real-floating <[x]>);
+        #include <math.h>
+        int signbit(real-floating <[x]>);
 
 DESCRIPTION
 The <<signbit>> macro determines whether the sign of its argument value is
@@ -41,11 +41,11 @@ C99, POSIX.
 int
 __signbit64(__float64 x)
 {
-  __uint32_t msw;
+    __uint32_t msw;
 
-  GET_HIGH_WORD(msw, x);
+    GET_HIGH_WORD(msw, x);
 
-  return (msw & 0x80000000) != 0;
+    return (msw & 0x80000000) != 0;
 }
 
 _MATH_ALIAS_i_d(__signbit)

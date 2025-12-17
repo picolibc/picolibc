@@ -39,26 +39,22 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include <stdarg.h>
 
 #ifdef INTEGER_ONLY
-#  define vscanf viscanf
+#define vscanf viscanf
 #endif
 
-typedef struct
-{
-  char* fmt;
-  unsigned int pad0[ 3 ];
-  va_list ap;
+typedef struct {
+    char        *fmt;
+    unsigned int pad0[3];
+    va_list      ap;
 } c99_vscanf_t;
 
-
 int
-vscanf (const char *fmt,
-     va_list ap)
+vscanf(const char *fmt, va_list ap)
 {
-  c99_vscanf_t args;
+    c99_vscanf_t args;
 
-  args.fmt = (char*) fmt;
-  va_copy(args.ap,ap);
+    args.fmt = (char *)fmt;
+    va_copy(args.ap, ap);
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSCANF, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VSCANF, &args);
 }
-

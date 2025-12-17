@@ -40,4 +40,3 @@ __locale_mb_cur_max(void)
 {
     return __locale_mb_cur_max_l(__get_current_locale());
 }
-

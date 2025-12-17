@@ -38,8 +38,8 @@ static const __float64 one = _F_64(1.0);
 __float64
 sinh64(__float64 x)
 {
-    __float64 t, w, h;
-    __int32_t ix, jx;
+    __float64  t, w, h;
+    __int32_t  ix, jx;
     __uint32_t lx;
 
     /* High word of |x|. */
@@ -54,8 +54,8 @@ sinh64(__float64 x)
     if (jx < 0)
         h = -h;
     /* |x| in [0,22], return sign(x)*0.5*(E+E/(E+1))) */
-    if (ix < 0x40360000) { /* |x|<22 */
-        if (ix < 0x3e300000) /* |x|<2**-28 */
+    if (ix < 0x40360000) {              /* |x|<22 */
+        if (ix < 0x3e300000)            /* |x|<2**-28 */
             return __math_inexact64(x); /* sinh(tiny) = tiny with inexact */
         t = expm164(fabs64(x));
         if (ix < 0x3ff00000)

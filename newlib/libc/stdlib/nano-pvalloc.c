@@ -31,8 +31,7 @@
 void *
 pvalloc(size_t s)
 {
-    if (s > MALLOC_MAXSIZE - MALLOC_PAGE_ALIGN)
-    {
+    if (s > MALLOC_MAXSIZE - MALLOC_PAGE_ALIGN) {
         errno = ENOMEM;
         return NULL;
     }

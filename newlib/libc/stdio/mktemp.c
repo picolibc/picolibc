@@ -26,18 +26,18 @@ FUNCTION
 <<mkostemps>>---generate unused file name
 
 INDEX
-	mktemp
+        mktemp
 INDEX
-	mkstemp
+        mkstemp
 INDEX
-	mkstemps
+        mkstemps
 INDEX
-	mkostemps
+        mkostemps
 
 SYNOPSIS
-	#include <stdlib.h>
-	char *mktemp(char *<[path]>);
-	int mkstemp(char *<[path]>);
+        #include <stdlib.h>
+        char *mktemp(char *<[path]>);
+        int mkstemp(char *<[path]>);
         int mkstemps(char *<[path]>, int suffixlen);
         int mkostemps(char *<[path]>, int suffixlen, int flags);
 
@@ -93,99 +93,91 @@ Supporting OS subroutines required: <<open>>
 #include "stdio_private.h"
 
 /* Our names are six characters from [0-9a-z] */
-#define NUM_NAMES       (36UL * 36UL * 36UL * 36UL * 36UL * 36UL)
+#define NUM_NAMES (36UL * 36UL * 36UL * 36UL * 36UL * 36UL)
 
 /* Attempts */
-#define NUM_ATTEMPT     (36UL * 36UL * 36UL)
+#define NUM_ATTEMPT (36UL * 36UL * 36UL)
 
 static int
-_gettemp (char *path,
-          int suffixlen,
-          int *doopen,
-          int flags)
+_gettemp(char *path, int suffixlen, int *doopen, int flags)
 {
-  char *start, *trv;
-  char *end;
-  uint32_t attempt;
+    char    *start, *trv;
+    char    *end;
+    uint32_t attempt;
 
-  end = path + strlen(path) - suffixlen;
-  trv = end;
+    end = path + strlen(path) - suffixlen;
+    trv = end;
 
-  /* Replace 'X' with 'a' */
-  while (path < trv && *--trv == 'X')
-    *trv = 'a';
+    /* Replace 'X' with 'a' */
+    while (path < trv && *--trv == 'X')
+        *trv = 'a';
 
-  /* Make sure we got six Xs */
-  if (end - trv < 6)
-    {
-      errno = EINVAL;
-      return 0;
+    /* Make sure we got six Xs */
+    if (end - trv < 6) {
+        errno = EINVAL;
+        return 0;
     }
 
-  start = trv + 1;
+    start = trv + 1;
 
-  for (attempt = 0; attempt < NUM_ATTEMPT; attempt++)
-    {
-      /* Generate a random filename index */
-      long filename = random() % NUM_NAMES;
-      size_t i;
+    for (attempt = 0; attempt < NUM_ATTEMPT; attempt++) {
+        /* Generate a random filename index */
+        long   filename = random() % NUM_NAMES;
+        size_t i;
 
-      /* Convert the random index into characters */
-      for (i = 0; i < 6; i++)
-        {
-          char c = filename % 36;
-          filename /= 36;
+        /* Convert the random index into characters */
+        for (i = 0; i < 6; i++) {
+            char c = filename % 36;
+            filename /= 36;
 
-          if (c < 10)
-            c += '0';
-          else
-            c += 'a' - 10;
+            if (c < 10)
+                c += '0';
+            else
+                c += 'a' - 10;
 
-          start[i] = c;
+            start[i] = c;
         }
 
-      /*
-       * Use open to check if the file exists to avoid depending on
-       * stat or access. Don't rely on O_EXCL working, although if it
-       * doesn't, this introduces a race condition
-       */
-      int fd = open(path, O_RDONLY);
-      if (fd < 0) {
-        if (errno != EACCES) {
-          if (errno != ENOENT)
-            return 0;
-          if (doopen)
-          {
-            fd = open (path, flags | O_CREAT | O_EXCL | O_RDWR,
-                       0600);
-            if (fd >= 0) {
-              *doopen = fd;
-              return 1;
+        /*
+         * Use open to check if the file exists to avoid depending on
+         * stat or access. Don't rely on O_EXCL working, although if it
+         * doesn't, this introduces a race condition
+         */
+        int fd = open(path, O_RDONLY);
+        if (fd < 0) {
+            if (errno != EACCES) {
+                if (errno != ENOENT)
+                    return 0;
+                if (doopen) {
+                    fd = open(path, flags | O_CREAT | O_EXCL | O_RDWR, 0600);
+                    if (fd >= 0) {
+                        *doopen = fd;
+                        return 1;
+                    }
+                    if (errno != EEXIST)
+                        return 0;
+                } else {
+                    return 1;
+                }
             }
-            if (errno != EEXIST)
-              return 0;
-          } else {
-            return 1;
-          }
-        }
-      } else
-        close(fd);
+        } else
+            close(fd);
     }
-  return 0;
+    return 0;
 }
 
 int
-mkstemp (char *template)
+mkstemp(char *template)
 {
-  int fd;
+    int fd;
 
-  return (_gettemp (template, 0, &fd, 0) ? fd : -1);
+    return (_gettemp(template, 0, &fd, 0) ? fd : -1);
 }
 
 char *
-mktemp (char *template)
+mktemp(char *template)
 {
-  return (_gettemp (template, 0, (int *) NULL, 0) ? template : (char *) NULL);
+    return (_gettemp(template, 0, (int *)NULL, 0) ? template : (char *)NULL);
 }
 
 #ifndef O_BINARY
@@ -198,16 +190,16 @@ mktemp (char *template)
 int
 mkstemps(char *template, int suffixlen)
 {
-  int fd;
+    int fd;
 
-  return (_gettemp (template, suffixlen, &fd, O_BINARY) ? fd : -1);
+    return (_gettemp(template, suffixlen, &fd, O_BINARY) ? fd : -1);
 }
 
 int
 mkostemps(char *template, int suffixlen, int flags)
 {
-  int fd;
+    int fd;
 
-  flags &= (O_APPEND | O_CLOEXEC | O_SYNC | O_BINARY | O_TEXT);
-  return (_gettemp (template, suffixlen, &fd, flags) ? fd : -1);
+    flags &= (O_APPEND | O_CLOEXEC | O_SYNC | O_BINARY | O_TEXT);
+    return (_gettemp(template, suffixlen, &fd, flags) ? fd : -1);
 }

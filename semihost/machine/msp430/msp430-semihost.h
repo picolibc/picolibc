@@ -43,12 +43,11 @@
 
 static inline msp430_semihost_1(int op, int p1)
 {
-        register int r_p1 __asm__("r13") = p1;
-        register int r_op __asm__("r12") = op;
-        __asm__("mov.b #1, r3" : : "r"(r_op), "r"(r_p1));
+    register int r_p1 __asm__("r13") = p1;
+    register int r_op __asm__("r12") = op;
+    __asm__("mov.b #1, r3" : : "r"(r_op), "r"(r_p1));
 }
 
-int
-msp430_putc(char c, FILE *file);
+int msp430_putc(char c, FILE *file);
 
 #endif /* _MSP430_SEMIHOST_H_ */

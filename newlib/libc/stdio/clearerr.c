@@ -37,7 +37,7 @@
 void
 __STDIO_UNLOCKED(clearerr)(FILE *stream)
 {
-	stream->flags &= ~(__SERR | __SEOF);
+    stream->flags &= ~(__SERR | __SEOF);
 }
 
 #if defined(__STDIO_LOCKING)
@@ -52,6 +52,10 @@ clearerr(FILE *stream)
 #ifdef __strong_reference
 __strong_reference(clearerr, clearerr_unlocked);
 #else
-void clearerr_unlocked(FILE *stream) { return clearerr(stream); }
+void
+clearerr_unlocked(FILE *stream)
+{
+    return clearerr(stream);
+}
 #endif
 #endif

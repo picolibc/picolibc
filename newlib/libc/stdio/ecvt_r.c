@@ -40,21 +40,16 @@
 #include "dtoa.h"
 
 int
-ecvt_r (double invalue,
-        int ndigit,
-        int *decpt,
-        int *sign,
-        char *buf,
-        size_t len)
+ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
 {
     struct dtoa dtoa;
-    char *digits = dtoa.digits;
-    int ngot;
+    char       *digits = dtoa.digits;
+    int         ngot;
 
     if (ndigit < 0)
         ndigit = 0;
 
-    if ((size_t) ndigit > len - 1)
+    if ((size_t)ndigit > len - 1)
         return -1;
 
     if (!isfinite(invalue)) {
@@ -84,12 +79,7 @@ ecvt_r (double invalue,
 #include "stdio_private.h"
 
 int
-ecvt_r (double invalue,
-        int ndigit,
-        int *decpt,
-        int *sign,
-        char *buf,
-        size_t len)
+ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
 {
     return ecvtf_r(invalue, ndigit, decpt, sign, buf, len);
 }

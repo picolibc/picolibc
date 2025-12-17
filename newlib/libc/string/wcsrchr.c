@@ -1,23 +1,23 @@
 /*
 FUNCTION
-	<<wcsrchr>>---wide-character string scanning operation 
+        <<wcsrchr>>---wide-character string scanning operation
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcsrchr(const wchar_t *<[s]>, wchar_t <[c]>);
+        #include <wchar.h>
+        wchar_t *wcsrchr(const wchar_t *<[s]>, wchar_t <[c]>);
 
 DESCRIPTION
-	The <<wcsrchr>> function locates the last occurrence of <[c]> in the
-	wide-character string pointed to by <[s]>. The value of <[c]> must be a
-	character representable as a type wchar_t and must be a wide-character
-	code corresponding to a valid character in the current locale.
-	The terminating null wide-character code is considered to be part of
-	the wide-character string. 
+        The <<wcsrchr>> function locates the last occurrence of <[c]> in the
+        wide-character string pointed to by <[s]>. The value of <[c]> must be a
+        character representable as a type wchar_t and must be a wide-character
+        code corresponding to a valid character in the current locale.
+        The terminating null wide-character code is considered to be part of
+        the wide-character string.
 
 RETURNS
-	Upon successful completion, <<wcsrchr>> returns a pointer to the
-	wide-character code or a null pointer if <[c]> does not occur in the
-	wide-character string.
+        Upon successful completion, <<wcsrchr>> returns a pointer to the
+        wide-character code or a null pointer if <[c]> does not occur in the
+        wide-character string.
 
 PORTABILITY
 <<wcsrchr>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -59,22 +59,19 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wcsrchr (const wchar_t * s,
-	wchar_t c)
+wcsrchr(const wchar_t *s, wchar_t c)
 {
-  const wchar_t *p;
+    const wchar_t *p;
 
-  p = s;
-  while (*p)
-    p++;
-  while (s <= p)
-    {
-      if (*p == c)
-	{
-	  /* LINTED interface specification */
-	  return (wchar_t *) p;
-	}
-      p--;
+    p = s;
+    while (*p)
+        p++;
+    while (s <= p) {
+        if (*p == c) {
+            /* LINTED interface specification */
+            return (wchar_t *)p;
+        }
+        p--;
     }
-  return NULL;
+    return NULL;
 }

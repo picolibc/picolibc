@@ -30,10 +30,10 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define strtoi_type intmax_t
+#define strtoi_type  intmax_t
 #define strtoi_utype uintmax_t
-#define strtoi_max INTMAX_MAX
-#define strtoi_min INTMAX_MIN
+#define strtoi_max   INTMAX_MAX
+#define strtoi_min   INTMAX_MIN
 #define strtoi_signed
 #ifdef WIDE_CHARS
 #define strtoi wcstoimax

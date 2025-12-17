@@ -47,70 +47,69 @@ _BEGIN_STD_C
  * _N:    element number, no suffix for element 0.
  */
 
-#define FE_OVERFLOW_SNGL	0x08000000
-#define FE_UNDERFLOW_SNGL	0x04000000
-#define FE_DIFF_SNGL		0x02000000
-#define FE_DIVBYZERO_SNGL	0x00000040
+#define FE_OVERFLOW_SNGL    0x08000000
+#define FE_UNDERFLOW_SNGL   0x04000000
+#define FE_DIFF_SNGL        0x02000000
+#define FE_DIVBYZERO_SNGL   0x00000040
 
-#define FE_OVERFLOW_SNGL_1	0x00040000
-#define FE_UNDERFLOW_SNGL_1	0x00020000
-#define FE_DIFF_SNGL_1		0x00010000
-#define FE_DIVBYZERO_SNGL_1	0x00000020
+#define FE_OVERFLOW_SNGL_1  0x00040000
+#define FE_UNDERFLOW_SNGL_1 0x00020000
+#define FE_DIFF_SNGL_1      0x00010000
+#define FE_DIVBYZERO_SNGL_1 0x00000020
 
-#define FE_OVERFLOW_SNGL_2	0x00000200
-#define FE_UNDERFLOW_SNGL_2	0x00000100
-#define FE_DIFF_SNGL_2		0x00000080
-#define FE_DIVBYZERO_SNGL_2	0x00000010
+#define FE_OVERFLOW_SNGL_2  0x00000200
+#define FE_UNDERFLOW_SNGL_2 0x00000100
+#define FE_DIFF_SNGL_2      0x00000080
+#define FE_DIVBYZERO_SNGL_2 0x00000010
 
-#define FE_OVERFLOW_SNGL_3	0x00000004
-#define FE_UNDERFLOW_SNGL_3	0x00000002
-#define FE_DIFF_SNGL_3		0x00000001
-#define FE_DIVBYZERO_SNGL_3	0x00000008
+#define FE_OVERFLOW_SNGL_3  0x00000004
+#define FE_UNDERFLOW_SNGL_3 0x00000002
+#define FE_DIFF_SNGL_3      0x00000001
+#define FE_DIVBYZERO_SNGL_3 0x00000008
 
-#define FE_ALL_EXCEPT_SNGL	(FE_OVERFLOW_SNGL | FE_UNDERFLOW_SNGL \
-				| FE_DIFF_SNGL | FE_DIVBYZERO_SNGL)
-#define FE_ALL_EXCEPT_SNGL_1	(FE_OVERFLOW_SNGL_1 | FE_UNDERFLOW_SNGL_1 \
-				| FE_DIFF_SNGL_1 | FE_DIVBYZERO_SNGL_1)
-#define FE_ALL_EXCEPT_SNGL_2	(FE_OVERFLOW_SNGL_2 | FE_UNDERFLOW_SNGL_2 \
-				| FE_DIFF_SNGL_2 | FE_DIVBYZERO_SNGL_2)
-#define FE_ALL_EXCEPT_SNGL_3	(FE_OVERFLOW_SNGL_3 | FE_UNDERFLOW_SNGL_3 \
-				| FE_DIFF_SNGL_3 | FE_DIVBYZERO_SNGL_3)
+#define FE_ALL_EXCEPT_SNGL  (FE_OVERFLOW_SNGL | FE_UNDERFLOW_SNGL | FE_DIFF_SNGL | FE_DIVBYZERO_SNGL)
+#define FE_ALL_EXCEPT_SNGL_1                                                          \
+    (FE_OVERFLOW_SNGL_1 | FE_UNDERFLOW_SNGL_1 | FE_DIFF_SNGL_1 | FE_DIVBYZERO_SNGL_1)
+#define FE_ALL_EXCEPT_SNGL_2                                                          \
+    (FE_OVERFLOW_SNGL_2 | FE_UNDERFLOW_SNGL_2 | FE_DIFF_SNGL_2 | FE_DIVBYZERO_SNGL_2)
+#define FE_ALL_EXCEPT_SNGL_3                                                          \
+    (FE_OVERFLOW_SNGL_3 | FE_UNDERFLOW_SNGL_3 | FE_DIFF_SNGL_3 | FE_DIVBYZERO_SNGL_3)
 
-#define FE_OVERFLOW_DBL		0x01000000
-#define FE_UNDERFLOW_DBL	0x00800000
-#define FE_INEXACT_DBL		0x00400000
-#define FE_INVALID_DBL		0x00200000
-#define FE_NC_NAN_DBL 		0x00100000
-#define FE_NC_DENORM_DBL	0x00080000
+#define FE_OVERFLOW_DBL    0x01000000
+#define FE_UNDERFLOW_DBL   0x00800000
+#define FE_INEXACT_DBL     0x00400000
+#define FE_INVALID_DBL     0x00200000
+#define FE_NC_NAN_DBL      0x00100000
+#define FE_NC_DENORM_DBL   0x00080000
 
-#define FE_OVERFLOW_DBL_1	0x00008000
-#define FE_UNDERFLOW_DBL_1	0x00004000
-#define FE_INEXACT_DBL_1	0x00002000
-#define FE_INVALID_DBL_1	0x00001000
-#define FE_NC_NAN_DBL_1 	0x00000800
-#define FE_NC_DENORM_DBL_1 	0x00000400
+#define FE_OVERFLOW_DBL_1  0x00008000
+#define FE_UNDERFLOW_DBL_1 0x00004000
+#define FE_INEXACT_DBL_1   0x00002000
+#define FE_INVALID_DBL_1   0x00001000
+#define FE_NC_NAN_DBL_1    0x00000800
+#define FE_NC_DENORM_DBL_1 0x00000400
 
-#define FE_ALL_EXCEPT_DBL	(FE_OVERFLOW_DBL | FE_UNDERFLOW_DBL | \
-				FE_INEXACT_DBL | FE_INVALID_DBL | \
-				FE_NC_NAN_DBL | FE_NC_DENORM_DBL)
-#define FE_ALL_EXCEPT_DBL_1	(FE_OVERFLOW_DBL_1 | FE_UNDERFLOW_DBL_1 | \
-				FE_INEXACT_DBL_1 | FE_INVALID_DBL_1 | \
-				FE_NC_NAN_DBL_1 | FE_NC_DENORM_DBL_1)
+#define FE_ALL_EXCEPT_DBL                                                                 \
+    (FE_OVERFLOW_DBL | FE_UNDERFLOW_DBL | FE_INEXACT_DBL | FE_INVALID_DBL | FE_NC_NAN_DBL \
+     | FE_NC_DENORM_DBL)
+#define FE_ALL_EXCEPT_DBL_1                                                       \
+    (FE_OVERFLOW_DBL_1 | FE_UNDERFLOW_DBL_1 | FE_INEXACT_DBL_1 | FE_INVALID_DBL_1 \
+     | FE_NC_NAN_DBL_1 | FE_NC_DENORM_DBL_1)
 
-#define FE_ALL_EXCEPT	        (FE_ALL_EXCEPT_SNGL | FE_ALL_EXCEPT_SNGL_1 | \
-				FE_ALL_EXCEPT_SNGL_2 | FE_ALL_EXCEPT_SNGL_3 | \
-				FE_ALL_EXCEPT_DBL | FE_ALL_EXCEPT_DBL_1)
+#define FE_ALL_EXCEPT                                                                        \
+    (FE_ALL_EXCEPT_SNGL | FE_ALL_EXCEPT_SNGL_1 | FE_ALL_EXCEPT_SNGL_2 | FE_ALL_EXCEPT_SNGL_3 \
+     | FE_ALL_EXCEPT_DBL | FE_ALL_EXCEPT_DBL_1)
 
 /*
  * Warning: some of these are single and some double precision only,
  * because of the hardware implementation.
  */
-#define FE_DIVBYZERO		(FE_DIVBYZERO_SNGL | FE_DIVBYZERO_SNGL_1 | \
-				FE_DIVBYZERO_SNGL_2 | FE_DIVBYZERO_SNGL_3)
-#define FE_INEXACT		(FE_INEXACT_DBL | FE_INEXACT_DBL_1)
-#define FE_INVALID		(FE_INVALID_DBL | FE_INVALID_DBL_1)
-#define FE_NC_NAN		(FE_NC_NAN_DBL | FE_NC_NAN_DBL_1)
-#define FE_NC_DENORM		(FE_NC_DENORM_DBL | FE_NC_DENORM_DBL_1)
+#define FE_DIVBYZERO                                                                      \
+    (FE_DIVBYZERO_SNGL | FE_DIVBYZERO_SNGL_1 | FE_DIVBYZERO_SNGL_2 | FE_DIVBYZERO_SNGL_3)
+#define FE_INEXACT   (FE_INEXACT_DBL | FE_INEXACT_DBL_1)
+#define FE_INVALID   (FE_INVALID_DBL | FE_INVALID_DBL_1)
+#define FE_NC_NAN    (FE_NC_NAN_DBL | FE_NC_NAN_DBL_1)
+#define FE_NC_DENORM (FE_NC_DENORM_DBL | FE_NC_DENORM_DBL_1)
 
 /*
  * __FE_ROUND_ELE_n values are set so that they can easily be used as a
@@ -118,26 +117,26 @@ _BEGIN_STD_C
  * round mode for a specific element (double precision floating point
  * only, so there are only two elements).
  */
-#define __FE_ROUND_ELE_0	0xc00
-#define __FE_ROUND_ELE_1	0x300
+#define __FE_ROUND_ELE_0 0xc00
+#define __FE_ROUND_ELE_1 0x300
 
 /*
  * The following map directly to round values in the fpscr.
  */
-#define __FE_SPU_TONEAREST	0
-#define __FE_SPU_TOWARDZERO	1
-#define __FE_SPU_UPWARD		2
-#define __FE_SPU_DOWNWARD	3
+#define __FE_SPU_TONEAREST  0
+#define __FE_SPU_TOWARDZERO 1
+#define __FE_SPU_UPWARD     2
+#define __FE_SPU_DOWNWARD   3
 
-#define FE_TONEAREST	(__FE_ROUND_ELE_0 | (__FE_SPU_TONEAREST << 2))
-#define FE_TOWARDZERO	(__FE_ROUND_ELE_0 | (__FE_SPU_TOWARDZERO << 2))
-#define FE_UPWARD	(__FE_ROUND_ELE_0 | (__FE_SPU_UPWARD << 2))
-#define FE_DOWNWARD	(__FE_ROUND_ELE_0 | (__FE_SPU_DOWNWARD << 2))
+#define FE_TONEAREST        (__FE_ROUND_ELE_0 | (__FE_SPU_TONEAREST << 2))
+#define FE_TOWARDZERO       (__FE_ROUND_ELE_0 | (__FE_SPU_TOWARDZERO << 2))
+#define FE_UPWARD           (__FE_ROUND_ELE_0 | (__FE_SPU_UPWARD << 2))
+#define FE_DOWNWARD         (__FE_ROUND_ELE_0 | (__FE_SPU_DOWNWARD << 2))
 
-#define FE_TONEAREST_1	(__FE_ROUND_ELE_1 | __FE_SPU_TONEAREST)
-#define FE_TOWARDZERO_1	(__FE_ROUND_ELE_1 | __FE_SPU_TOWARDZERO)
-#define FE_UPWARD_1	(__FE_ROUND_ELE_1 | __FE_SPU_UPWARD)
-#define FE_DOWNWARD_1	(__FE_ROUND_ELE_1 | __FE_SPU_DOWNWARD)
+#define FE_TONEAREST_1      (__FE_ROUND_ELE_1 | __FE_SPU_TONEAREST)
+#define FE_TOWARDZERO_1     (__FE_ROUND_ELE_1 | __FE_SPU_TOWARDZERO)
+#define FE_UPWARD_1         (__FE_ROUND_ELE_1 | __FE_SPU_UPWARD)
+#define FE_DOWNWARD_1       (__FE_ROUND_ELE_1 | __FE_SPU_DOWNWARD)
 
 typedef unsigned int fexcept_t;
 typedef unsigned int fenv_t;

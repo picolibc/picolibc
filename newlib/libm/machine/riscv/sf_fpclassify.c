@@ -37,22 +37,21 @@
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 
-
 int
-__fpclassifyf (float x)
+__fpclassifyf(float x)
 {
-  long fclass = _fclass_f (x);
+    long fclass = _fclass_f(x);
 
-  if (fclass & FCLASS_ZERO)
-    return FP_ZERO;
-  else if (fclass & FCLASS_NORMAL)
-    return FP_NORMAL;
-  else if (fclass & FCLASS_SUBNORMAL)
-    return FP_SUBNORMAL;
-  else if (fclass & FCLASS_INF)
-    return FP_INFINITE;
-  else
-    return FP_NAN;
+    if (fclass & FCLASS_ZERO)
+        return FP_ZERO;
+    else if (fclass & FCLASS_NORMAL)
+        return FP_NORMAL;
+    else if (fclass & FCLASS_SUBNORMAL)
+        return FP_SUBNORMAL;
+    else if (fclass & FCLASS_INF)
+        return FP_INFINITE;
+    else
+        return FP_NAN;
 }
 
 _MATH_ALIAS_i_f(__fpclassify)

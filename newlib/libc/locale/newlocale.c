@@ -41,7 +41,7 @@
 #ifdef __HAVE_POSIX_LOCALE_API
 
 locale_t
-newlocale (int category_mask, const char *name, locale_t base)
+newlocale(int category_mask, const char *name, locale_t base)
 {
     enum locale_id locale;
 
@@ -52,10 +52,8 @@ newlocale (int category_mask, const char *name, locale_t base)
      * specifies a known locale value and that base is not
      * LC_GLOBAL_LOCALE
      */
-    if ((category_mask & ~LC_ALL_MASK) != 0 ||
-        locale == locale_INVALID ||
-        base == LC_GLOBAL_LOCALE)
-    {
+    if ((category_mask & ~LC_ALL_MASK) != 0 || locale == locale_INVALID
+        || base == LC_GLOBAL_LOCALE) {
         errno = EINVAL;
         return 0;
     }

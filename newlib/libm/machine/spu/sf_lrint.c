@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/lrintf.h"
 
-long int lrintf(float x)
+long int
+lrintf(float x)
 {
     return _lrintf(x);
 }

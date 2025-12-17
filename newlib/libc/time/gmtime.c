@@ -29,14 +29,14 @@ FUNCTION
 <<gmtime>>---convert time to UTC traditional form
 
 INDEX
-	gmtime
+        gmtime
 INDEX
-	gmtime_r
+        gmtime_r
 
 SYNOPSIS
-	#include <time.h>
-	struct tm *gmtime(const time_t *<[clock]>);
-	struct tm *gmtime_r(const time_t *<[clock]>, struct tm *<[res]>);
+        #include <time.h>
+        struct tm *gmtime(const time_t *<[clock]>);
+        struct tm *gmtime_r(const time_t *<[clock]>, struct tm *<[res]>);
 
 DESCRIPTION
 <<gmtime>> takes the time at <[clock]> representing the number
@@ -65,7 +65,7 @@ ANSI C requires <<gmtime>>.
 extern __THREAD_LOCAL struct tm _localtime_buf;
 
 struct tm *
-gmtime (const time_t * tim_p)
+gmtime(const time_t *tim_p)
 {
-  return gmtime_r (tim_p, &_localtime_buf);
+    return gmtime_r(tim_p, &_localtime_buf);
 }

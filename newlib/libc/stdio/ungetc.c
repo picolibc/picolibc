@@ -34,20 +34,20 @@
 int
 ungetc(int c, FILE *stream)
 {
-        __flockfile(stream);
-	/*
-	 * Streams that are not readable, or streams that already had
-	 * had an ungetc() before will cause an error.
-	 *
-	 * ungetc(EOF, ...) causes an error per definitionem.
-	 */
-	if ((stream->flags & __SRD) == 0 || c == EOF)
-                __funlock_return(stream, EOF);
+    __flockfile(stream);
+    /*
+     * Streams that are not readable, or streams that already had
+     * had an ungetc() before will cause an error.
+     *
+     * ungetc(EOF, ...) causes an error per definitionem.
+     */
+    if ((stream->flags & __SRD) == 0 || c == EOF)
+        __funlock_return(stream, EOF);
 
-	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t) (unsigned char) c + 1 ))
-                __funlock_return(stream, EOF);
+    if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t)(unsigned char)c + 1))
+        __funlock_return(stream, EOF);
 
-        stream->flags &= ~__SEOF;
+    stream->flags &= ~__SEOF;
 
-        __funlock_return(stream, (unsigned char) c);
+    __funlock_return(stream, (unsigned char)c);
 }

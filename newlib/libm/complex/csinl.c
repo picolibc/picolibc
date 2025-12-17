@@ -38,10 +38,11 @@
 long double complex
 csinl(long double complex z)
 {
-	long double ch, sh;
+    long double ch, sh;
 
-	_cchshl(cimagl(z), &ch, &sh);
-	return (long double complex) (sinl(creall(z)) * ch) + (cosl(creall(z)) * sh) * (long double complex) I;
+    _cchshl(cimagl(z), &ch, &sh);
+    return (long double complex)(sinl(creall(z)) * ch)
+        + (cosl(creall(z)) * sh) * (long double complex)I;
 }
 
 #endif

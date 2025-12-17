@@ -7,14 +7,14 @@ FUNCTION
 <<wcstombs>>---minimal wide char string to multibyte string converter
 
 INDEX
-	wcstombs
+        wcstombs
 
 SYNOPSIS
-	#include <stdlib.h>
-	size_t wcstombs(char *restrict <[s]>, const wchar_t *restrict <[pwc]>, size_t <[n]>);
+        #include <stdlib.h>
+        size_t wcstombs(char *restrict <[s]>, const wchar_t *restrict <[pwc]>, size_t <[n]>);
 
 DESCRIPTION
-When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming
 implementation of <<wcstombs>>.  In this case,
 all wide-characters are expected to represent single bytes and so
 are converted simply by casting to char.
@@ -25,7 +25,7 @@ setting which may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<wcstombs>> returns <<0>> if
-<[s]> is <<NULL>> or is the empty string; 
+<[s]> is <<NULL>> or is the empty string;
 it returns <<-1>> if __MB_CAPABLE and one of the
 wide-char characters does not represent a valid multi-byte character;
 otherwise it returns the minimum of: <<n>> or the
@@ -49,60 +49,53 @@ effects vary with the locale.
 #include "local.h"
 
 size_t
-wcstombs (char          *__restrict s,
-        const wchar_t *__restrict pwcs,
-        size_t         n)
+wcstombs(char * __restrict s, const wchar_t * __restrict pwcs, size_t n)
 {
 #ifdef __MB_CAPABLE
-  mbstate_t state;
-  state.__count = 0;
+    mbstate_t state;
+    state.__count = 0;
 
-  char *ptr = s;
-  size_t max = n;
-  char buff[8];
-  int i, bytes, num_to_copy;
+    char  *ptr = s;
+    size_t max = n;
+    char   buff[8];
+    int    i, bytes, num_to_copy;
 
-  if (s == NULL)
-    {
-      size_t num_bytes = 0;
-      while (*pwcs != 0)
-	{
-	  bytes = __WCTOMB (buff, *pwcs++, &state);
-	  if (bytes == -1)
-	    return -1;
-	  num_bytes += bytes;
-	}
-      return num_bytes;
-    }
-  else
-    {
-      while (n > 0)
-        {
-          bytes = __WCTOMB (buff, *pwcs, &state);
-          if (bytes == -1)
-            return -1;
-          num_to_copy = (n > (size_t) bytes ? bytes : (int)n);
-          for (i = 0; i < num_to_copy; ++i)
-            *ptr++ = buff[i];
-
-          if (*pwcs == 0x00)
-            return ptr - s - (n >= (size_t) bytes);
-          ++pwcs;
-          n -= num_to_copy;
+    if (s == NULL) {
+        size_t num_bytes = 0;
+        while (*pwcs != 0) {
+            bytes = __WCTOMB(buff, *pwcs++, &state);
+            if (bytes == -1)
+                return -1;
+            num_bytes += bytes;
         }
-      return max;
+        return num_bytes;
+    } else {
+        while (n > 0) {
+            bytes = __WCTOMB(buff, *pwcs, &state);
+            if (bytes == -1)
+                return -1;
+            num_to_copy = (n > (size_t)bytes ? bytes : (int)n);
+            for (i = 0; i < num_to_copy; ++i)
+                *ptr++ = buff[i];
+
+            if (*pwcs == 0x00)
+                return ptr - s - (n >= (size_t)bytes);
+            ++pwcs;
+            n -= num_to_copy;
+        }
+        return max;
     }
-#else /* not __MB_CAPABLE */
-  int count = 0;
-  
-  if (n != 0) {
-    do {
-      if ((*s++ = (char) *pwcs++) == 0)
-	break;
-      count++;
-    } while (--n != 0);
-  }
-  
-  return count;
+#else  /* not __MB_CAPABLE */
+    int count = 0;
+
+    if (n != 0) {
+        do {
+            if ((*s++ = (char)*pwcs++) == 0)
+                break;
+            count++;
+        } while (--n != 0);
+    }
+
+    return count;
 #endif /* not __MB_CAPABLE */
 }

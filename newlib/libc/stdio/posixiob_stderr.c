@@ -39,21 +39,22 @@
 #define __PICOLIBC_STDERR_BUFSIZ 1
 #endif
 
-static char write_buf[__PICOLIBC_STDERR_BUFSIZ];
+static char                write_buf[__PICOLIBC_STDERR_BUFSIZ];
 
-static struct __file_bufio __stderr = FDEV_SETUP_POSIX(2, write_buf, __PICOLIBC_STDERR_BUFSIZ, __SWR, __BLBF);
+static struct __file_bufio __stderr
+    = FDEV_SETUP_POSIX(2, write_buf, __PICOLIBC_STDERR_BUFSIZ, __SWR, __BLBF);
 
-FILE *const __posix_stderr = &__stderr.xfile.cfile.file;
+FILE * const __posix_stderr = &__stderr.xfile.cfile.file;
 
-__weak_reference(__posix_stderr,stderr);
+__weak_reference(__posix_stderr, stderr);
 
 #if __PICOLIBC_STDERR_BUFSIZE > 1
 /*
  * Add a destructor function to get stderr flushed on
  * exit
  */
-__attribute__((destructor (101)))
-static void posix_exit(void)
+__attribute__((destructor(101))) static void
+posix_exit(void)
 {
     fflush(stderr);
 }

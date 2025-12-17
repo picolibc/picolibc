@@ -43,7 +43,7 @@ lgamma64(__float64 x)
     return lgamma64_r(x, &__signgam);
 }
 
-#  ifdef __strong_reference
+#ifdef __strong_reference
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
@@ -59,7 +59,6 @@ gamma64(__float64 x)
 }
 #endif
 
-_MATH_ALIAS_d_d(lgamma)
-_MATH_ALIAS_d_d(gamma)
+_MATH_ALIAS_d_d(lgamma) _MATH_ALIAS_d_d(gamma)
 
 #endif /* _NEED_FLOAT64 */

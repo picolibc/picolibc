@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/truncf.h"
 
-float truncf(float x)
+float
+truncf(float x)
 {
     return _truncf(x);
 }

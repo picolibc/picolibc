@@ -28,20 +28,22 @@
 #include <math.h>
 
 long int
-lrintf (float x)
+lrintf(float x)
 {
-  long int result;
-  float temp;
-  if (sizeof (result) == 8) {
-      __asm__("frintx\t%s1, %s2\n\t"
-              "fcvtzs\t%x0, %s1"
-              : "=r" (result), "=w" (temp) : "w" (x));
-  } else {
-      __asm__("frintx\t%s1, %s2\n\t"
-              "fcvtzs\t%w0, %s1"
-              : "=r" (result), "=w" (temp) : "w" (x));
-  }
-  return result;
+    long int result;
+    float    temp;
+    if (sizeof(result) == 8) {
+        __asm__("frintx\t%s1, %s2\n\t"
+                "fcvtzs\t%x0, %s1"
+                : "=r"(result), "=w"(temp)
+                : "w"(x));
+    } else {
+        __asm__("frintx\t%s1, %s2\n\t"
+                "fcvtzs\t%w0, %s1"
+                : "=r"(result), "=w"(temp)
+                : "w"(x));
+    }
+    return result;
 }
 #else
 #include "../../common/sf_lrint.c"

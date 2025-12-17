@@ -44,7 +44,8 @@
 /* No requirement for re-entrancy for this variable */
 static char _tmpnam[L_tmpnam];
 
-char *tmpnam(char *s)
+char *
+tmpnam(char *s)
 {
     if (!s)
         s = _tmpnam;

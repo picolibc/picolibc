@@ -43,10 +43,10 @@
 #undef isnan
 
 int
-isnan (double x)
+isnan(double x)
 {
-	long fclass = _fclass_d (x);
-	return (fclass & FCLASS_NAN);
+    long fclass = _fclass_d(x);
+    return (fclass & FCLASS_NAN);
 }
 
 #ifdef __strong_reference
@@ -59,8 +59,7 @@ __isnan64(float x)
 }
 #endif
 
-_MATH_ALIAS_i_d(isnan)
-_MATH_ALIAS_i_d(__isnan)
+_MATH_ALIAS_i_d(isnan) _MATH_ALIAS_i_d(__isnan)
 
 #else
 #include "../../common/s_isnan.c"

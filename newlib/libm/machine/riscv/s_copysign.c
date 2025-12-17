@@ -38,11 +38,11 @@
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
 __float64
-copysign64 (__float64 x, __float64 y)
+copysign64(__float64 x, __float64 y)
 {
-  __float64 result;
-  __asm__("fsgnj.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
-  return result;
+    __float64 result;
+    __asm__("fsgnj.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+    return result;
 }
 
 _MATH_ALIAS_d_dd(copysign)

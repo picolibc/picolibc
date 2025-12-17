@@ -28,11 +28,11 @@
 #include <math.h>
 
 double
-fmax (double x, double y)
+fmax(double x, double y)
 {
-  double result;
-  __asm__("fmaxnm\t%d0, %d1, %d2" : "=w" (result) : "w" (x), "w" (y));
-  return result;
+    double result;
+    __asm__("fmaxnm\t%d0, %d1, %d2" : "=w"(result) : "w"(x), "w"(y));
+    return result;
 }
 
 #else

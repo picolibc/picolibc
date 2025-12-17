@@ -36,16 +36,10 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_cfi_bad_type(void *_data,
-                            void *vtable,
-                            void *valid_vtable,
-                            void *opts)
+__ubsan_handle_cfi_bad_type(void *_data, void *vtable, void *valid_vtable, void *opts)
 {
     struct cfi_check_fail_data *data = _data;
     __ubsan_error(&data->location, "cfi_bad_type", "(%s) %p valid %p opts %p %s\n",
-                  data->type->type_name,
-                  vtable,
-                  valid_vtable,
-                  opts,
+                  data->type->type_name, vtable, valid_vtable, opts,
                   __ubsan_cfi_type_check_to_string(data->cfi_type_check_kind));
 }

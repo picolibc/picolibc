@@ -16,16 +16,15 @@
 
 #include "fdlibm.h"
 
-static const float tiny = 1.0e-30, zero = 0.0,
-                   pi_o_4 = 7.8539818525e-01, /* 0x3f490fdb */
-    pi_o_2 = 1.5707963705e+00, /* 0x3fc90fdb */
-    pi = 3.1415927410e+00, /* 0x40490fdb */
-    pi_lo = -8.7422776573e-08; /* 0xb3bbbd2e */
+static const float tiny = 1.0e-30, zero = 0.0, pi_o_4 = 7.8539818525e-01, /* 0x3f490fdb */
+    pi_o_2 = 1.5707963705e+00,                                            /* 0x3fc90fdb */
+    pi = 3.1415927410e+00,                                                /* 0x40490fdb */
+    pi_lo = -8.7422776573e-08;                                            /* 0xb3bbbd2e */
 
 float
 atan2f(float y, float x)
 {
-    float z;
+    float     z;
     __int32_t k, m, hx, hy, ix, iy;
 
     GET_FLOAT_WORD(hx, x);
@@ -35,7 +34,7 @@ atan2f(float y, float x)
     if (FLT_UWORD_IS_NAN(ix) || FLT_UWORD_IS_NAN(iy)) /* x or y is NaN */
         return x + y;
     if (hx == 0x3f800000)
-        return atanf(y); /* x=1.0 */
+        return atanf(y);                     /* x=1.0 */
     m = ((hy >> 31) & 1) | ((hx >> 30) & 2); /* 2*sign(x)+sign(y) */
 
     /* when y = 0 */
@@ -103,7 +102,7 @@ atan2f(float y, float x)
         return z; /* atan(-,+) */
     case 2:
         return pi - (z - pi_lo); /* atan(+,-) */
-    default: /* case 3 */
+    default:                     /* case 3 */
         return (z - pi_lo) - pi; /* atan(-,-) */
     }
 }

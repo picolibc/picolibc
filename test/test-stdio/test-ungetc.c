@@ -39,17 +39,17 @@
 int
 main(void)
 {
-	int ret;
+    int ret;
 
-	ret = ungetc('u', stdin);
-	if (ret != 'u') {
-		printf("ungetc unexpectedly returned %d instead of %d\n", ret, 'u');
-		return 1;
-	}
-	ret = getc(stdin);
-	if (ret != 'u') {
-		printf("getc unexpectedly returned %d instead of %d\n", ret, 'u');
-		return 1;
-	}
-	return 0;
+    ret = ungetc('u', stdin);
+    if (ret != 'u') {
+        printf("ungetc unexpectedly returned %d instead of %d\n", ret, 'u');
+        return 1;
+    }
+    ret = getc(stdin);
+    if (ret != 'u') {
+        printf("getc unexpectedly returned %d instead of %d\n", ret, 'u');
+        return 1;
+    }
+    return 0;
 }

@@ -39,8 +39,8 @@
 #include <limits.h>
 
 long
-fpathconf (int fd, int name)
+fpathconf(int fd, int name)
 {
-    (void) fd;
+    (void)fd;
     return pathconf(".", name);
 }

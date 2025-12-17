@@ -38,8 +38,8 @@
 
 extern void *__tls;
 
-void _set_tls(void *);
+void         _set_tls(void *);
 
-void *__m68k_read_tp(void);
+void        *__m68k_read_tp(void);
 
 #endif /* _TLS_LOCAL_H_ */

@@ -46,12 +46,12 @@ int
 open(const char *pathname, int flags, ...)
 {
     va_list ap;
-    int ret;
+    int     ret;
 
-    va_start(ap,flags);
+    va_start(ap, flags);
     uintptr_t mode = va_arg(ap, uintptr_t);
     va_end(ap);
-    ret = arc_semihost3(SYS_SEMIHOST_open, (uintptr_t) pathname, flags, mode);
+    ret = arc_semihost3(SYS_SEMIHOST_open, (uintptr_t)pathname, flags, mode);
 
     if (ret < 0)
         arc_semihost_errno(EINVAL);

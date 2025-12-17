@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/ilogb.h"
 
-int ilogb(double x)
+int
+ilogb(double x)
 {
     return _ilogb(x);
 }

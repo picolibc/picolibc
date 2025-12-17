@@ -35,30 +35,30 @@
 wint_t
 __STDIO_UNLOCKED(getwc)(FILE *stream)
 {
-        union {
-                wchar_t wc;
-                char c[sizeof(wchar_t)];
-        } u;
-        unsigned i;
-        int sc;
-        __ungetc_t unget;
-        
-        stream->flags |= __SWIDE;
+    union {
+        wchar_t wc;
+        char    c[sizeof(wchar_t)];
+    } u;
+    unsigned   i;
+    int        sc;
+    __ungetc_t unget;
 
-	if ((stream->flags & __SRD) == 0)
-		return WEOF;
+    stream->flags |= __SWIDE;
 
-	if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
-		return (wint_t) (unget - 1);
+    if ((stream->flags & __SRD) == 0)
+        return WEOF;
 
-        for (i = 0; i < sizeof(wchar_t); i++) {
-                sc = stream->get(stream);
-                if (sc < 0)
-                        return WEOF;
-                u.c[i] = (char) sc;
-        }
+    if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
+        return (wint_t)(unget - 1);
 
-	return (wint_t) u.wc;
+    for (i = 0; i < sizeof(wchar_t); i++) {
+        sc = stream->get(stream);
+        if (sc < 0)
+            return WEOF;
+        u.c[i] = (char)sc;
+    }
+
+    return (wint_t)u.wc;
 }
 
 #ifdef __STDIO_LOCKING
@@ -75,12 +75,20 @@ getwc(FILE *stream)
 #ifdef __strong_reference
 __strong_reference(getwc, getwc_unlocked);
 #else
-wint_t getwc_unlocked(FILE *stream) { return getwc(stream); }
+wint_t
+getwc_unlocked(FILE *stream)
+{
+    return getwc(stream);
+}
 #endif
 #endif
 
 #ifdef __strong_reference
 __strong_reference(getwc, fgetwc);
 #else
-wint_t fgetwc(FILE *stream) { return getwc(stream); }
+wint_t
+fgetwc(FILE *stream)
+{
+    return getwc(stream);
+}
 #endif

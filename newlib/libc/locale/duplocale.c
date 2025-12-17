@@ -37,7 +37,7 @@
 #include "locale_private.h"
 
 locale_t
-duplocale (locale_t locale)
+duplocale(locale_t locale)
 {
     if (locale == LC_GLOBAL_LOCALE)
         locale = __global_locale;

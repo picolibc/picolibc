@@ -44,10 +44,7 @@
 static __THREAD_LOCAL char fcvt_buf[FCVTL_MAXDIG];
 
 char *
-fcvtl (long double invalue,
-       int ndigit,
-       int *decpt,
-       int *sign)
+fcvtl(long double invalue, int ndigit, int *decpt, int *sign)
 {
     if (fcvtl_r(invalue, ndigit, decpt, sign, fcvt_buf, sizeof(fcvt_buf)) < 0)
         return NULL;
@@ -59,12 +56,9 @@ fcvtl (long double invalue,
 #include "stdio_private.h"
 
 char *
-fcvtl (long double invalue,
-       int ndecimal,
-       int *decpt,
-       int *sign)
+fcvtl(long double invalue, int ndecimal, int *decpt, int *sign)
 {
-    return fcvtf((float) invalue, ndecimal, decpt, sign);
+    return fcvtf((float)invalue, ndecimal, decpt, sign);
 }
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
@@ -72,12 +66,9 @@ fcvtl (long double invalue,
 #include "stdio_private.h"
 
 char *
-fcvtl (long double invalue,
-       int ndecimal,
-       int *decpt,
-       int *sign)
+fcvtl(long double invalue, int ndecimal, int *decpt, int *sign)
 {
-    return fcvt((double) invalue, ndecimal, decpt, sign);
+    return fcvt((double)invalue, ndecimal, decpt, sign);
 }
 
 #endif

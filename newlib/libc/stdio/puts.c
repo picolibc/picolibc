@@ -34,30 +34,30 @@
 int
 puts(const char *str)
 {
-        int (*put)(char, struct __file *);
-	char c;
-	int ret = EOF;
-        FILE *out = stdout;
+    int   (*put)(char, struct __file *);
+    char  c;
+    int   ret = EOF;
+    FILE *out = stdout;
 
-	__flockfile(out);
+    __flockfile(out);
 
-	if ((out->flags & __SWR) == 0)
-		goto exit;
+    if ((out->flags & __SWR) == 0)
+        goto exit;
 
-        put = out->put;
-	while ((c = *str++) != '\0')
-		if (put(c, out) < 0)
-			goto flag_exit;
+    put = out->put;
+    while ((c = *str++) != '\0')
+        if (put(c, out) < 0)
+            goto flag_exit;
 
-	if (put('\n', out) < 0)
-		goto flag_exit;
+    if (put('\n', out) < 0)
+        goto flag_exit;
 
-	ret = 0;
-	goto exit;
+    ret = 0;
+    goto exit;
 
 flag_exit:
-	out->flags |= __SERR;
+    out->flags |= __SERR;
 exit:
-	__funlockfile(out);
-	return ret;
+    __funlockfile(out);
+    return ret;
 }

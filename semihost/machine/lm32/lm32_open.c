@@ -38,15 +38,17 @@
 #include <stdarg.h>
 #include "lm32_semihost.h"
 
-#define SIM_O_RDONLY  0
-#define SIM_O_WRONLY  1
-#define SIM_O_RDWR    2
-#define SIM_O_APPEND  0x008
-#define SIM_O_CREAT   0x200
-#define SIM_O_TRUNC   0x400
-#define SIM_O_EXCL    0x800
+#define SIM_O_RDONLY 0
+#define SIM_O_WRONLY 1
+#define SIM_O_RDWR   2
+#define SIM_O_APPEND 0x008
+#define SIM_O_CREAT  0x200
+#define SIM_O_TRUNC  0x400
+#define SIM_O_EXCL   0x800
 
-static int sim_flags(int flags) {
+static int
+sim_flags(int flags)
+{
     int sim = 0;
 
     sim = flags & 3;
@@ -63,7 +65,8 @@ static int sim_flags(int flags) {
     return sim;
 }
 
-int open(const char *pathname, int flags, ...)
+int
+open(const char *pathname, int flags, ...)
 {
     va_list ap;
     va_start(ap, flags);
@@ -72,12 +75,12 @@ int open(const char *pathname, int flags, ...)
 
     struct lm32_scall_args args = {
         .r8 = TARGET_NEWLIB_SYS_open,
-        .r1 = (uint32_t) (uintptr_t) pathname,
-        .r2 = (uint32_t) sim_flags(flags),
-        .r3 = (uint32_t) mode,
+        .r1 = (uint32_t)(uintptr_t)pathname,
+        .r2 = (uint32_t)sim_flags(flags),
+        .r3 = (uint32_t)mode,
     };
     struct lm32_scall_ret ret;
 
     lm32_scall(&args, &ret);
-    return (int) ret.r1;
+    return (int)ret.r1;
 }

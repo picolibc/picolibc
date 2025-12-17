@@ -38,16 +38,13 @@
 #ifdef WIDE_CHARS
 #include <wctype.h>
 #define strtoull_l wcstoull_l
-#define strtoull wcstoull
-#define char wchar_t
+#define strtoull   wcstoull
+#define char       wchar_t
 #endif
 
 unsigned long long
-strtoull_l (const char *__restrict s,
-          char **__restrict ptr,
-          int base,
-          locale_t loc)
+strtoull_l(const char * __restrict s, char ** __restrict ptr, int base, locale_t loc)
 {
-    (void) loc;
+    (void)loc;
     return strtoull(s, ptr, base);
 }

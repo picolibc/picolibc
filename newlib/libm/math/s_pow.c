@@ -97,10 +97,10 @@ ivln2_l  =  _F_64(1.92596299112661746887e-08); /* 0x3E54AE0B, 0xF85DDF44 =1/ln2 
 __float64
 pow64(__float64 x, __float64 y)
 {
-    __float64 z, ax, z_h, z_l, p_h, p_l;
-    __float64 y1, t1, t2, r, s, t, u, v, w;
-    __int32_t i, j, k, yisint, n;
-    __int32_t hx, hy, ix, iy;
+    __float64  z, ax, z_h, z_l, p_h, p_l;
+    __float64  y1, t1, t2, r, s, t, u, v, w;
+    __int32_t  i, j, k, yisint, n;
+    __int32_t  hx, hy, ix, iy;
     __uint32_t lx, ly;
 
     EXTRACT_WORDS(hx, lx, x);
@@ -116,9 +116,9 @@ pow64(__float64 x, __float64 y)
     }
 
     /* x|y==NaN return NaN unless x==1 then return 1 */
-    if (ix > 0x7ff00000 || ((ix == 0x7ff00000) && (lx != 0)) ||
-        iy > 0x7ff00000 || ((iy == 0x7ff00000) && (ly != 0))) {
-        if ((((__uint32_t) hx - 0x3ff00000) | lx) == 0 && !issignaling64_inline(y))
+    if (ix > 0x7ff00000 || ((ix == 0x7ff00000) && (lx != 0)) || iy > 0x7ff00000
+        || ((iy == 0x7ff00000) && (ly != 0))) {
+        if ((((__uint32_t)hx - 0x3ff00000) | lx) == 0 && !issignaling64_inline(y))
             return one;
         else
             return x + y;
@@ -150,8 +150,8 @@ pow64(__float64 x, __float64 y)
     /* special value of y */
     if (ly == 0) {
         if (iy == 0x7ff00000) { /* y is +-inf */
-            if ((((__uint32_t) ix - 0x3ff00000) | lx) == 0)
-                return one; /* +-1**+-inf = 1 */
+            if ((((__uint32_t)ix - 0x3ff00000) | lx) == 0)
+                return one;            /* +-1**+-inf = 1 */
             else if (ix >= 0x3ff00000) /* (|x|>1)**+-inf = inf,0 */
                 return (hy >= 0) ? y : zero;
             else /* (|x|<1)**-,+inf = inf,0 */
@@ -166,9 +166,9 @@ pow64(__float64 x, __float64 y)
                 return x;
         }
         if (hy == 0x40000000 && ix < 0x5ff00000 && ix > 0x1e500000)
-            return x * x; /* y is  2 */
+            return x * x;       /* y is  2 */
         if (hy == 0x3fe00000) { /* y is  0.5 */
-            if (hx >= 0) /* x >= +0 */
+            if (hx >= 0)        /* x >= +0 */
                 return sqrt64(x);
         }
     }
@@ -181,7 +181,7 @@ pow64(__float64 x, __float64 y)
             if (hy < 0)
                 z = one / z; /* z = (1/|x|) */
             if (hx < 0) {
-                if ((((__uint32_t) ix - 0x3ff00000) | yisint) == 0) {
+                if ((((__uint32_t)ix - 0x3ff00000) | yisint) == 0) {
                     return __math_invalid(x); /* (-1)**non-int is NaN */
                 } else if (yisint == 1)
                     z = -z; /* (x<0)**odd = -(|x|**odd) */
@@ -200,14 +200,14 @@ pow64(__float64 x, __float64 y)
 
     /* (x<0)**(non-int) is NaN */
     /* REDHAT LOCAL: This used to be
-	if((((hx>>31)+1)|yisint)==0) return __math_invalid(x);
+        if((((hx>>31)+1)|yisint)==0) return __math_invalid(x);
        but ANSI C says a right shift of a signed negative quantity is
        implementation defined.  */
     if (((((__uint32_t)hx >> 31) - 1) | yisint) == 0)
         return __math_invalid(x);
 
     /* |y| is huge */
-    if (iy > 0x42000000) { /* if |y| > ~2**33 */
+    if (iy > 0x42000000) {     /* if |y| > ~2**33 */
         if (iy > 0x43f00000) { /* if |y| > ~2**64, must o/uflow */
             if (ix <= 0x3fefffff)
                 return (hy < 0) ? __math_oflow(0) : __math_uflow(0);
@@ -216,15 +216,15 @@ pow64(__float64 x, __float64 y)
         }
         /* over/underflow if x is not close to one */
         if (ix < 0x3fefffff) {
-            int sign = yisint & ((__uint32_t)hx>>31);
+            int sign = yisint & ((__uint32_t)hx >> 31);
             return (hy < 0) ? __math_oflow(sign) : __math_uflow(sign);
         }
         if (ix > 0x3ff00000) {
-            int sign = yisint & ((__uint32_t)hx>>31);
+            int sign = yisint & ((__uint32_t)hx >> 31);
             return (hy > 0) ? __math_oflow(sign) : __math_uflow(sign);
         }
         /* now |1-x| is tiny <= 2**-20, suffice to compute
-	   log(x) by x-x^2/2+x^3/3-x^4/4 */
+           log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1; /* t has 20 trailing zeros */
         w = (t * t) * (_F_64(0.5) - t * (_F_64(0.3333333333333333333333) - t * _F_64(0.25)));
         u = ivln2_h * t; /* ivln2_h has 21 sig. bits */
@@ -269,8 +269,7 @@ pow64(__float64 x, __float64 y)
         s_l = v * ((u - s_h * t_h) - s_h * t_l);
         /* compute log(ax) */
         s2 = s * s;
-        r = s2 * s2 *
-            (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
+        r = s2 * s2 * (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
         r += s_l * (s_h + s);
         s2 = s_h * s_h;
         t_h = _F_64(3.0) + s2 + r;
@@ -303,16 +302,16 @@ pow64(__float64 x, __float64 y)
     p_h = y1 * t1;
     z = p_l + p_h;
     EXTRACT_WORDS(j, i, z);
-    if (j >= 0x40900000) { /* z >= 1024 */
+    if (j >= 0x40900000) {               /* z >= 1024 */
         if (((j - 0x40900000) | i) != 0) /* if z > 1024 */
-            return __math_oflow(s < 0); /* overflow */
+            return __math_oflow(s < 0);  /* overflow */
         else {
             if (p_l + ovt > z - p_h)
                 return __math_oflow(s < 0); /* overflow */
         }
     } else if ((j & 0x7fffffff) >= 0x4090cc00) { /* z <= -1075 */
-        if (((j - 0xc090cc00) | i) != 0) /* z < -1075 */
-            return __math_uflow(s < 0); /* underflow */
+        if (((j - 0xc090cc00) | i) != 0)         /* z < -1075 */
+            return __math_uflow(s < 0);          /* underflow */
         else {
             if (p_l <= z - p_h)
                 return __math_uflow(s < 0); /* underflow */

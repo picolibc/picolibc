@@ -37,50 +37,49 @@ Author: Kazunori Asayama <asayama@sm.sony.co.jp>
 
 #include "c99ppe.h"
 
-
 static FILE __fp[SPE_FOPEN_MAX];
 
 FILE *
-__sfp (struct _reent *d)
+__sfp(struct _reent *d)
 {
-  int i;
-  for (i = 0; i < SPE_FOPEN_MAX; i++) {
-    if (!__fp[i]._fp) {
-      return &__fp[i];
+    int i;
+    for (i = 0; i < SPE_FOPEN_MAX; i++) {
+        if (!__fp[i]._fp) {
+            return &__fp[i];
+        }
     }
-  }
-  errno = EMFILE;
-  return NULL;
+    errno = EMFILE;
+    return NULL;
 }
 
 static void
-__cleanup (struct _reent *s)
+__cleanup(struct _reent *s)
 {
-  int i;
-  for (i = 0; i < SPE_FOPEN_MAX; i++) {
-    if (__fp[i]._fp) {
-      fclose(&__fp[i]);
+    int i;
+    for (i = 0; i < SPE_FOPEN_MAX; i++) {
+        if (__fp[i]._fp) {
+            fclose(&__fp[i]);
+        }
     }
-  }
 }
 
 void
-__sinit (struct _reent *s)
+__sinit(struct _reent *s)
 {
-  _REENT_CLEANUP(s) = __cleanup;
+    _REENT_CLEANUP(s) = __cleanup;
 
-  _REENT_STDIN(s) = &s->__sf[0];
-  _REENT_STDIN(s)->_fp = SPE_STDIN;
+    _REENT_STDIN(s) = &s->__sf[0];
+    _REENT_STDIN(s)->_fp = SPE_STDIN;
 
-  _REENT_STDOUT(s) = &s->__sf[1];
-  _REENT_STDOUT(s)->_fp = SPE_STDOUT;
+    _REENT_STDOUT(s) = &s->__sf[1];
+    _REENT_STDOUT(s)->_fp = SPE_STDOUT;
 
-  _REENT_STDERR(s) = &s->__sf[2];
-  _REENT_STDERR(s)->_fp = SPE_STDERR;
+    _REENT_STDERR(s) = &s->__sf[2];
+    _REENT_STDERR(s)->_fp = SPE_STDERR;
 }
 
 void
-__check_init (void)
+__check_init(void)
 {
     CHECK_INIT(_REENT);
 }

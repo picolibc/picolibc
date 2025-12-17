@@ -17,13 +17,13 @@
 
 #include <stdarg.h>
 
-extern int vprintf (const char *, va_list);
+extern int vprintf(const char *, va_list);
 
 int
-puts (const char *str)
+puts(const char *str)
 {
-  void *valist[1];
+    void *valist[1];
 
-  valist[0] = str;
-  return vprintf ("%s\n", valist);
+    valist[0] = str;
+    return vprintf("%s\n", valist);
 }

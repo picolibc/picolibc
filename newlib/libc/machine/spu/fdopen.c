@@ -35,9 +35,8 @@ POSSIBILITY OF SUCH DAMAGE.
 
 /* Just a stub for now.  */
 FILE *
-fdopen (int fd,
-        const char *mode)
+fdopen(int fd, const char *mode)
 {
-  errno = ENOSYS;
-  return NULL;
+    errno = ENOSYS;
+    return NULL;
 }

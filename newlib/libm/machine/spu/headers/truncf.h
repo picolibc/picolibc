@@ -31,34 +31,35 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _TRUNCF_H_
-#define _TRUNCF_H_	1
+#define _TRUNCF_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
-static __inline float _truncf(float x)
+static __inline float
+_truncf(float x)
 {
-  vec_int4 exp;
-  vec_uint4 or_mask, and_mask, mask;
-  vec_float4 in, out;
+    vec_int4   exp;
+    vec_uint4  or_mask, and_mask, mask;
+    vec_float4 in, out;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Construct a mask to remove the fraction bits. The mask
-   * depends on the exponent of the floating point
-   * input value.
-   */
-  exp = spu_sub(127, spu_and(spu_rlmask((vec_int4)in, -23), 0xFF));
+    /* Construct a mask to remove the fraction bits. The mask
+     * depends on the exponent of the floating point
+     * input value.
+     */
+    exp = spu_sub(127, spu_and(spu_rlmask((vec_int4)in, -23), 0xFF));
 
-  or_mask = spu_cmpgt(exp, 0);
-  and_mask = spu_rlmask(VEC_SPLAT_U32(0x7FFFFF), exp);
+    or_mask = spu_cmpgt(exp, 0);
+    and_mask = spu_rlmask(VEC_SPLAT_U32(0x7FFFFF), exp);
 
-  mask = spu_or(spu_and(and_mask, spu_cmpgt(exp, -31)), or_mask);
+    mask = spu_or(spu_and(and_mask, spu_cmpgt(exp, -31)), or_mask);
 
-  /* Apply the mask and return the result.
-   */
-  out = spu_andc(in, (vec_float4)(mask));
+    /* Apply the mask and return the result.
+     */
+    out = spu_andc(in, (vec_float4)(mask));
 
-  return (spu_extract(out, 0));
+    return (spu_extract(out, 0));
 }
 #endif /* _TRUNCF_H_ */

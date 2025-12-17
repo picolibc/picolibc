@@ -13,35 +13,32 @@
 #include <stddef.h>
 
 error_t
-argz_insert (char **argz,
-       size_t *argz_len,
-       char *before,
-       const char *entry)
+argz_insert(char **argz, size_t *argz_len, char *before, const char *entry)
 {
-  int len = 0;
-  ptrdiff_t delta;
+    int       len = 0;
+    ptrdiff_t delta;
 
-  if (before == NULL)
-    return argz_add(argz, argz_len, entry);
+    if (before == NULL)
+        return argz_add(argz, argz_len, entry);
 
-  if (before < *argz || before >= *argz + *argz_len)
-    return EINVAL;
+    if (before < *argz || before >= *argz + *argz_len)
+        return EINVAL;
 
-  while (before != *argz && before[-1])
-    before--;
+    while (before != *argz && before[-1])
+        before--;
 
-  /* delta will always be non-negative, and < *argz_len */
-  delta = before - *argz;
+    /* delta will always be non-negative, and < *argz_len */
+    delta = before - *argz;
 
-  len = strlen(entry) + 1;
+    len = strlen(entry) + 1;
 
-  if(!(*argz = (char *)realloc(*argz, *argz_len + len)))
-    return ENOMEM;
-  
-  memmove(*argz + delta + len, *argz + delta,  *argz_len - delta);
-  memcpy(*argz + delta, entry, len);
+    if (!(*argz = (char *)realloc(*argz, *argz_len + len)))
+        return ENOMEM;
 
-  *argz_len += len;
+    memmove(*argz + delta + len, *argz + delta, *argz_len - delta);
+    memcpy(*argz + delta, entry, len);
 
-  return 0;
+    *argz_len += len;
+
+    return 0;
 }

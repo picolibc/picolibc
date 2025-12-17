@@ -44,7 +44,7 @@ fmax64(__float64 x, __float64 y)
     if (issignaling(x) || issignaling(y))
         return x + y;
 
-    __asm__("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+    __asm__("fmax.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
     return result;
 }
 

@@ -28,187 +28,172 @@
  * $FreeBSD$
  */
 
-__declare_fenv_inline(int)
-feclearexcept(int excepts)
+__declare_fenv_inline(int) feclearexcept(int excepts)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	excepts &= FE_ALL_EXCEPT;
-	__cfc1(fcsr);
-	fcsr &= ~(excepts | (excepts << _FCSR_CAUSE_SHIFT));
-	__ctc1(fcsr);
+    excepts &= FE_ALL_EXCEPT;
+    __cfc1(fcsr);
+    fcsr &= ~(excepts | (excepts << _FCSR_CAUSE_SHIFT));
+    __ctc1(fcsr);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fegetexceptflag(fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	excepts &= FE_ALL_EXCEPT;
-	__cfc1(fcsr);
-	*flagp = fcsr & excepts;
+    excepts &= FE_ALL_EXCEPT;
+    __cfc1(fcsr);
+    *flagp = fcsr & excepts;
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetexceptflag(const fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	excepts &= FE_ALL_EXCEPT;
-	__cfc1(fcsr);
-	fcsr &= ~excepts;
-	fcsr |= *flagp & excepts;
-	__ctc1(fcsr);
+    excepts &= FE_ALL_EXCEPT;
+    __cfc1(fcsr);
+    fcsr &= ~excepts;
+    fcsr |= *flagp & excepts;
+    __ctc1(fcsr);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feraiseexcept(int excepts)
+__declare_fenv_inline(int) feraiseexcept(int excepts)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	excepts &= FE_ALL_EXCEPT;
-	__cfc1(fcsr);
-	fcsr |= excepts | (excepts << _FCSR_CAUSE_SHIFT);
-	__ctc1(fcsr);
+    excepts &= FE_ALL_EXCEPT;
+    __cfc1(fcsr);
+    fcsr |= excepts | (excepts << _FCSR_CAUSE_SHIFT);
+    __ctc1(fcsr);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetexcept(int excepts)
+__declare_fenv_inline(int) fesetexcept(int excepts)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	excepts &= FE_ALL_EXCEPT;
-	__cfc1(fcsr);
-	fcsr |= excepts | (excepts << _FCSR_CAUSE_SHIFT);
-	__ctc1(fcsr);
+    excepts &= FE_ALL_EXCEPT;
+    __cfc1(fcsr);
+    fcsr |= excepts | (excepts << _FCSR_CAUSE_SHIFT);
+    __ctc1(fcsr);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fetestexcept(int excepts)
+__declare_fenv_inline(int) fetestexcept(int excepts)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	excepts &= FE_ALL_EXCEPT;
-	__cfc1(fcsr);
+    excepts &= FE_ALL_EXCEPT;
+    __cfc1(fcsr);
 
-	return (fcsr & excepts);
+    return (fcsr & excepts);
 }
 
-__declare_fenv_inline(int)
-fegetround(void)
+__declare_fenv_inline(int) fegetround(void)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	__cfc1(fcsr);
+    __cfc1(fcsr);
 
-	return (fcsr & _ROUND_MASK);
+    return (fcsr & _ROUND_MASK);
 }
 
-__declare_fenv_inline(int)
-fesetround(int rounding_mode)
+__declare_fenv_inline(int) fesetround(int rounding_mode)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	if (rounding_mode & ~_ROUND_MASK)
-		return (-1);
+    if (rounding_mode & ~_ROUND_MASK)
+        return (-1);
 
-	__cfc1(fcsr);
-	fcsr &= ~_ROUND_MASK;
-	fcsr |= rounding_mode;
-	__ctc1(fcsr);
+    __cfc1(fcsr);
+    fcsr &= ~_ROUND_MASK;
+    fcsr |= rounding_mode;
+    __ctc1(fcsr);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fegetenv(fenv_t *envp)
+__declare_fenv_inline(int) fegetenv(fenv_t *envp)
 {
 
-	__cfc1(*envp);
+    __cfc1(*envp);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feholdexcept(fenv_t *envp)
+__declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	__cfc1(fcsr);
-	*envp = fcsr;
-	fcsr &= ~(FE_ALL_EXCEPT | _FCSR_ENABLE_MASK);
-	__ctc1(fcsr);
+    __cfc1(fcsr);
+    *envp = fcsr;
+    fcsr &= ~(FE_ALL_EXCEPT | _FCSR_ENABLE_MASK);
+    __ctc1(fcsr);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetenv(const fenv_t *envp)
+__declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
 
-	__ctc1(*envp);
+    __ctc1(*envp);
 
-	return (0);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feupdateenv(const fenv_t *envp)
+__declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	__cfc1(fcsr);
-	fesetenv(envp);
-	feraiseexcept(fcsr);
+    __cfc1(fcsr);
+    fesetenv(envp);
+    feraiseexcept(fcsr);
 
-	return (0);
+    return (0);
 }
 
 #if __BSD_VISIBLE
 
 /* We currently provide no external definitions of the functions below. */
 
-__declare_fenv_inline(int)
-feenableexcept(int __mask)
+__declare_fenv_inline(int) feenableexcept(int __mask)
 {
-	fenv_t __old_fcsr, __new_fcsr;
+    fenv_t __old_fcsr, __new_fcsr;
 
-	__cfc1(__old_fcsr);
-	__new_fcsr = __old_fcsr | (__mask & FE_ALL_EXCEPT) << _FCSR_ENABLE_SHIFT;
-	__ctc1(__new_fcsr);
+    __cfc1(__old_fcsr);
+    __new_fcsr = __old_fcsr | (__mask & FE_ALL_EXCEPT) << _FCSR_ENABLE_SHIFT;
+    __ctc1(__new_fcsr);
 
-	return ((__old_fcsr >> _FCSR_ENABLE_SHIFT) & FE_ALL_EXCEPT);
+    return ((__old_fcsr >> _FCSR_ENABLE_SHIFT) & FE_ALL_EXCEPT);
 }
 
-__declare_fenv_inline(int)
-fedisableexcept(int __mask)
+__declare_fenv_inline(int) fedisableexcept(int __mask)
 {
-	fenv_t __old_fcsr, __new_fcsr;
+    fenv_t __old_fcsr, __new_fcsr;
 
-	__cfc1(__old_fcsr);
-	__new_fcsr = __old_fcsr & ~((__mask & FE_ALL_EXCEPT) << _FCSR_ENABLE_SHIFT);
-	__ctc1(__new_fcsr);
+    __cfc1(__old_fcsr);
+    __new_fcsr = __old_fcsr & ~((__mask & FE_ALL_EXCEPT) << _FCSR_ENABLE_SHIFT);
+    __ctc1(__new_fcsr);
 
-	return ((__old_fcsr >> _FCSR_ENABLE_SHIFT) & FE_ALL_EXCEPT);
+    return ((__old_fcsr >> _FCSR_ENABLE_SHIFT) & FE_ALL_EXCEPT);
 }
 
-__declare_fenv_inline(int)
-fegetexcept(void)
+__declare_fenv_inline(int) fegetexcept(void)
 {
-	fexcept_t fcsr;
+    fexcept_t fcsr;
 
-	__cfc1(fcsr);
+    __cfc1(fcsr);
 
-	return ((fcsr & _FCSR_ENABLE_MASK) >> _FCSR_ENABLE_SHIFT);
+    return ((fcsr & _FCSR_ENABLE_MASK) >> _FCSR_ENABLE_SHIFT);
 }
 
 #endif /* __BSD_VISIBLE */

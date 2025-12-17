@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/atanf.h"
 
-float atanf(float x)
+float
+atanf(float x)
 {
     return _atanf(x);
 }

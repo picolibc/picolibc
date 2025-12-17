@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-csqrt.h"
-#define TEST_FUNC       csqrt
+#define TEST_VECTORS "test-csqrt.h"
+#define TEST_FUNC    csqrt
 
 #include "test-complex-one.h"

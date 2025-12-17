@@ -52,7 +52,7 @@ read(int fd, void *buf, size_t count)
      * appear.
      */
     do {
-        ret = arc_semihost3(SYS_SEMIHOST_read, fd, (uintptr_t) buf, count);
+        ret = arc_semihost3(SYS_SEMIHOST_read, fd, (uintptr_t)buf, count);
         if (ret < 0)
             arc_semihost_errno(EINVAL);
     } while (ret < 0 && fd == 0);

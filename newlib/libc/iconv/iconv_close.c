@@ -36,9 +36,9 @@
 #include "iconv_private.h"
 
 int
-iconv_close (iconv_t ic)
+iconv_close(iconv_t ic)
 {
-    if (ic == (iconv_t) -1) {
+    if (ic == (iconv_t)-1) {
         errno = EINVAL;
         return -1;
     }

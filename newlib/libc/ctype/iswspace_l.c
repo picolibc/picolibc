@@ -39,28 +39,28 @@
 #include "local.h"
 
 int
-iswspace_l (wint_t c, locale_t locale)
+iswspace_l(wint_t c, locale_t locale)
 {
-  (void) locale;
+    (void)locale;
 #ifdef __MB_CAPABLE
-  /*
-   * This is used by scanf, so avoid the table
-   * to save space
-   */
-  if (!__locale_is_C(locale)) {
-      switch (c) {
-      case 0x01680:
-      case 0x02028:
-      case 0x02029:
-      case 0x0205f:
-      case 0x03000:
-          return 1;
-      default:
-          if (0x2000 <= c && c <= 0x200a && c != 0x2007)
-              return 1;
-          break;
-      }
-  }
+    /*
+     * This is used by scanf, so avoid the table
+     * to save space
+     */
+    if (!__locale_is_C(locale)) {
+        switch (c) {
+        case 0x01680:
+        case 0x02028:
+        case 0x02029:
+        case 0x0205f:
+        case 0x03000:
+            return 1;
+        default:
+            if (0x2000 <= c && c <= 0x200a && c != 0x2007)
+                return 1;
+            break;
+        }
+    }
 #endif /* __MB_CAPABLE */
-  return c < 0x100 ? isspace (c) : 0;
+    return c < 0x100 ? isspace(c) : 0;
 }

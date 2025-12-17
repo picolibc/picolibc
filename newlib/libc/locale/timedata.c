@@ -36,50 +36,30 @@
 #define _DEFAULT_SOURCE
 #include "locale_private.h"
 
-const char *const __time_wday[7] = {
-    "Sun", "Mon", "Tue", "Wed",
-    "Thu", "Fri", "Sat"
-};
+const char * const __time_wday[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 
-const char *const __time_weekday[7] = {
-    "Sunday", "Monday", "Tuesday", "Wednesday",
-    "Thursday", "Friday", "Saturday"
-};
+const char * const __time_weekday[7]
+    = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday" };
 
-const char *const __time_mon[12] = {
-    "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-};
+const char * const __time_mon[12]
+    = { "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec" };
 
-const char *const __time_month[12] = {
-    "January", "February", "March", "April", "May", "June",
-    "July", "August", "September", "October", "November", "December"
-};
+const char * const __time_month[12]
+    = { "January", "February", "March",     "April",   "May",      "June",
+        "July",    "August",   "September", "October", "November", "December" };
 
-const char *const __time_am_pm[2] = {
-    "AM", "PM"
-};
+const char * const    __time_am_pm[2] = { "AM", "PM" };
 
-const wchar_t *const __wtime_wday[7] = {
-    L"Sun", L"Mon", L"Tue", L"Wed",
-    L"Thu", L"Fri", L"Sat"
-};
+const wchar_t * const __wtime_wday[7] = { L"Sun", L"Mon", L"Tue", L"Wed", L"Thu", L"Fri", L"Sat" };
 
-const wchar_t *const __wtime_weekday[7] = {
-    L"Sunday", L"Monday", L"Tuesday", L"Wednesday",
-    L"Thursday", L"Friday", L"Saturday"
-};
+const wchar_t * const __wtime_weekday[7]
+    = { L"Sunday", L"Monday", L"Tuesday", L"Wednesday", L"Thursday", L"Friday", L"Saturday" };
 
-const wchar_t *const __wtime_mon[12] = {
-    L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
-    L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec"
-};
+const wchar_t * const __wtime_mon[12] = { L"Jan", L"Feb", L"Mar", L"Apr", L"May", L"Jun",
+                                          L"Jul", L"Aug", L"Sep", L"Oct", L"Nov", L"Dec" };
 
-const wchar_t *const __wtime_month[12] = {
-    L"January", L"February", L"March", L"April", L"May", L"June",
-    L"July", L"August", L"September", L"October", L"November", L"December"
-};
+const wchar_t * const __wtime_month[12]
+    = { L"January", L"February", L"March",     L"April",   L"May",      L"June",
+        L"July",    L"August",   L"September", L"October", L"November", L"December" };
 
-const wchar_t *const __wtime_am_pm[2] = {
-    L"AM", L"PM"
-};
+const wchar_t * const __wtime_am_pm[2] = { L"AM", L"PM" };

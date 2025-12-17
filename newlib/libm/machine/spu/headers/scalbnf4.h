@@ -40,7 +40,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _SCALBNF4_H_
-#define _SCALBNF4_H_	1
+#define _SCALBNF4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -49,9 +49,9 @@
  *	vector float _scalbnf4(vector float x, vector signed int exp)
  *
  * DESCRIPTION
- *      The _scalbnf4 function returns a vector containing each element of x 
- *      multiplied by 2^n computed efficiently.  This function is computed 
- *      without the assistance of any floating point operations and as such 
+ *      The _scalbnf4 function returns a vector containing each element of x
+ *      multiplied by 2^n computed efficiently.  This function is computed
+ *      without the assistance of any floating point operations and as such
  *      does not set any floating point exceptions.
  *
  *      Special Cases:
@@ -61,40 +61,41 @@
  *        - if the result overflows, it will be returned as FLT_MAX.
  *
  */
-static __inline vector float _scalbnf4(vector float x, vector signed int exp)
+static __inline vector float
+_scalbnf4(vector float x, vector signed int exp)
 {
-  vec_int4 x_exp;
-  vec_uint4 zero;
-  vec_uint4 overflow;
-  vec_uint4 exp_mask = (vec_uint4)spu_splats(0x7F800000);
-  vec_float4 out;
+    vec_int4   x_exp;
+    vec_uint4  zero;
+    vec_uint4  overflow;
+    vec_uint4  exp_mask = (vec_uint4)spu_splats(0x7F800000);
+    vec_float4 out;
 
-  /* Extract exponent from x. If the exponent is 0, then
-   * x is either 0 or a denorm and x*2^exp is a zero.
-   */
-  x_exp = spu_and(spu_rlmask((vec_int4)x, -23), 0xFF);
-  zero = spu_cmpeq(x_exp, 0);
+    /* Extract exponent from x. If the exponent is 0, then
+     * x is either 0 or a denorm and x*2^exp is a zero.
+     */
+    x_exp = spu_and(spu_rlmask((vec_int4)x, -23), 0xFF);
+    zero = spu_cmpeq(x_exp, 0);
 
-  /* Compute the expected exponent and determine if the 
-   * result is within range.
-   */
-  x_exp = spu_add(exp, x_exp);
+    /* Compute the expected exponent and determine if the
+     * result is within range.
+     */
+    x_exp = spu_add(exp, x_exp);
 
-  /* Check for zero or overflow of result.
-   * Note: set high bit of flags = 0, since we have to
-   * return -0 when x = -0
-   */
-  zero     = spu_rlmask(spu_orc(zero, spu_cmpgt(x_exp, 0)), -1);
-  overflow = spu_rlmask(spu_cmpgt(x_exp, 255), -1);
+    /* Check for zero or overflow of result.
+     * Note: set high bit of flags = 0, since we have to
+     * return -0 when x = -0
+     */
+    zero = spu_rlmask(spu_orc(zero, spu_cmpgt(x_exp, 0)), -1);
+    overflow = spu_rlmask(spu_cmpgt(x_exp, 255), -1);
 
-  /* Merge the expect exponent with x's mantissa. Zero the
-   * result if underflow and force to max if overflow.
-   */
-  out = spu_sel(x, (vec_float4)spu_rl(x_exp, 23), exp_mask);
-  out = spu_andc(out, (vec_float4)zero);
-  out = spu_or(out, (vec_float4)overflow);
+    /* Merge the expect exponent with x's mantissa. Zero the
+     * result if underflow and force to max if overflow.
+     */
+    out = spu_sel(x, (vec_float4)spu_rl(x_exp, 23), exp_mask);
+    out = spu_andc(out, (vec_float4)zero);
+    out = spu_or(out, (vec_float4)overflow);
 
-  return out;
+    return out;
 }
 
 #endif /* _SCALBNF4_H_ */

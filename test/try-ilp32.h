@@ -39,8 +39,8 @@
 #include <stdlib.h>
 
 struct strdesc {
-	char 	*base;
-	int	len;
+    char *base;
+    int   len;
 };
 
 struct strdesc get_str(char *sample);

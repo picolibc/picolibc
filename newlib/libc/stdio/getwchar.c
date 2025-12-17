@@ -35,5 +35,5 @@ wint_t
 getwchar(void)
 {
 
-	return getwc(stdin);
+    return getwc(stdin);
 }

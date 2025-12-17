@@ -37,10 +37,11 @@
 #include <stdlib.h>
 #include <setjmp.h>
 
-static void func(jmp_buf env, int param)
+static void
+func(jmp_buf env, int param)
 {
-	printf("func param %d\n", param);
-	longjmp(env, param);
+    printf("func param %d\n", param);
+    longjmp(env, param);
 }
 
 static volatile int been_here;
@@ -48,27 +49,27 @@ static volatile int been_here;
 int
 main(void)
 {
-	int ret;
-	jmp_buf env;
+    int     ret;
+    jmp_buf env;
 
-	ret = setjmp(env);
-	printf("setjmp 1 returns %d\n", ret);
-	if (!ret) {
-		func(env, 1);
-		printf("func returned\n");
-		return 1;
-	}
-	ret = setjmp(env);
-	printf("setjmp 2 returns %d\n", ret);
-	if (!ret) {
-		if (been_here) {
-			printf("already been here (longjmp(env, 0) returned 0?)\n");
-			return 2;
-		}
-		been_here++;
-		func(env, 0);
-		printf("func returned\n");
-		return 1;
-	}
-	return 0;
+    ret = setjmp(env);
+    printf("setjmp 1 returns %d\n", ret);
+    if (!ret) {
+        func(env, 1);
+        printf("func returned\n");
+        return 1;
+    }
+    ret = setjmp(env);
+    printf("setjmp 2 returns %d\n", ret);
+    if (!ret) {
+        if (been_here) {
+            printf("already been here (longjmp(env, 0) returned 0?)\n");
+            return 2;
+        }
+        been_here++;
+        func(env, 0);
+        printf("func returned\n");
+        return 1;
+    }
+    return 0;
 }

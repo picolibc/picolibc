@@ -38,13 +38,13 @@
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
 __float64
-fmin (__float64 x, __float64 y)
+fmin(__float64 x, __float64 y)
 {
     __float64 result;
     if (issignaling(x) || issignaling(y))
         return x + y;
 
-    __asm__("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+    __asm__("fmin.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
     return result;
 }
 

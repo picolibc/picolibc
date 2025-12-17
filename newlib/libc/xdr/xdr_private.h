@@ -29,33 +29,32 @@
 #include <sys/param.h>
 #include <sys/types.h>
 
-typedef void (*xdr_vprintf_t) (const char *, va_list);
+typedef void  (*xdr_vprintf_t)(const char *, va_list);
 
-xdr_vprintf_t xdr_set_vprintf (xdr_vprintf_t);
+xdr_vprintf_t xdr_set_vprintf(xdr_vprintf_t);
 
-void xdr_vwarnx (const char *, va_list)
-    __picolibc_format(__printf__, 1, 0);
+void          xdr_vwarnx(const char *, va_list) __picolibc_format(__printf__, 1, 0);
 
-void xdr_warnx (const char *, ...)
-    __picolibc_format(__printf__, 1, 2);
+void          xdr_warnx(const char *, ...) __picolibc_format(__printf__, 1, 2);
 
 /* endian issues */
 #include <machine/endian.h>
 
 /* byteswap and ntohl stuff; platform may provide optimzed version
  * of this, but we don't have access to that here.*/
-__elidable_inline uint32_t xdr_ntohl (uint32_t x)
+__elidable_inline uint32_t
+xdr_ntohl(uint32_t x)
 {
 #if _BYTE_ORDER == _BIG_ENDIAN
-  return x;
+    return x;
 #elif _BYTE_ORDER == _LITTLE_ENDIAN
-  u_char *s = (u_char *)&x;
-  return (uint32_t)((uint32_t) s[0] << 24 | (uint32_t) s[1] << 16 | (uint32_t) s[2] << 8 | (uint32_t) s[3]);
+    u_char *s = (u_char *)&x;
+    return (uint32_t)((uint32_t)s[0] << 24 | (uint32_t)s[1] << 16 | (uint32_t)s[2] << 8
+                      | (uint32_t)s[3]);
 #else
-# error Unsupported endian type
+#error Unsupported endian type
 #endif
 }
 #define xdr_htonl(x) xdr_ntohl(x)
 
 #endif /* _XDR_PRIVATE_H */
-

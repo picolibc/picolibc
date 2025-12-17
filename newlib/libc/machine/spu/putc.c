@@ -36,27 +36,24 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  int ch;
-  unsigned int pad0[ 3 ];
-  int fp;
-  unsigned int pad1[ 3 ];
+typedef struct {
+    int          ch;
+    unsigned int pad0[3];
+    int          fp;
+    unsigned int pad1[3];
 } c99_putc_t;
 
-
 int
-putc (c, fp)
-     int c;
-     register FILE *fp;
+               putc(c, fp)
+int            c;
+register FILE *fp;
 {
-  c99_putc_t args;
+    c99_putc_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.ch = c;
-  args.fp = fp->_fp;
+    args.ch = c;
+    args.fp = fp->_fp;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTC, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTC, &args);
 }
-

@@ -45,7 +45,7 @@ off_t
 lseek(int fd, off_t offset, int whence)
 {
     off_t ret = arc_semihost3(SYS_SEMIHOST_lseek, fd, offset, whence);
-    if (ret == (off_t) -1)
+    if (ret == (off_t)-1)
         arc_semihost_errno(EBADF);
     return ret;
 }

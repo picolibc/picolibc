@@ -32,7 +32,7 @@
 int
 vswscanf(const wchar_t *s, const wchar_t *fmt, va_list ap)
 {
-	struct __file_str f = FDEV_SETUP_WSTRING_READ(s);
+    struct __file_str f = FDEV_SETUP_WSTRING_READ(s);
 
-	return vfwscanf(&f.file, fmt, ap);
+    return vfwscanf(&f.file, fmt, ap);
 }

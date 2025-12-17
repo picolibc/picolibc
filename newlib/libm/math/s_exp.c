@@ -101,13 +101,13 @@ static const __float64
 __float64
 exp64(__float64 x) /* default IEEE double exp */
 {
-    __float64 y, hi, lo, c, t;
-    __int32_t k = 0, xsb;
+    __float64  y, hi, lo, c, t;
+    __int32_t  k = 0, xsb;
     __uint32_t hx;
 
     GET_HIGH_WORD(hx, x);
     xsb = (hx >> 31) & 1; /* sign bit of x */
-    hx &= 0x7fffffff; /* high word of |x| */
+    hx &= 0x7fffffff;     /* high word of |x| */
 
     /* filter out non-finite argument */
     if (hx >= 0x40862E42) { /* if |x|>=709.78... */
@@ -126,7 +126,7 @@ exp64(__float64 x) /* default IEEE double exp */
     }
 
     /* argument reduction */
-    if (hx > 0x3fd62e42) { /* if  |x| > 0.5 ln2 */
+    if (hx > 0x3fd62e42) {     /* if  |x| > 0.5 ln2 */
         if (hx < 0x3FF0A2B2) { /* and |x| < 1.5 ln2 */
             hi = x - ln2HI[xsb];
             lo = ln2LO[xsb];

@@ -73,7 +73,7 @@ hypot64(__float64 x, __float64 y)
         return a + b;
     } /* x/y > 2**60 */
     k = 0;
-    if (ha > 0x5f300000) { /* a>2**500 */
+    if (ha > 0x5f300000) {      /* a>2**500 */
         if (ha >= 0x7ff00000) { /* Inf or NaN */
             __uint32_t low;
             w = a + b; /* for sNaN */
@@ -92,7 +92,7 @@ hypot64(__float64 x, __float64 y)
         SET_HIGH_WORD(a, ha);
         SET_HIGH_WORD(b, hb);
     }
-    if (hb < 0x20b00000) { /* b < 2**-500 */
+    if (hb < 0x20b00000) {      /* b < 2**-500 */
         if (hb <= 0x000fffff) { /* subnormal b or 0 */
             __uint32_t low;
             GET_LOW_WORD(low, b);
@@ -103,7 +103,7 @@ hypot64(__float64 x, __float64 y)
             b *= t1;
             a *= t1;
             k -= 1022;
-        } else { /* scale a and b by 2^600 */
+        } else {              /* scale a and b by 2^600 */
             ha += 0x25800000; /* a *= 2^600 */
             hb += 0x25800000; /* b *= 2^600 */
             k -= 600;

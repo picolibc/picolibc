@@ -36,10 +36,10 @@
 #include <stdint.h>
 #include "tls-local.h"
 
-#define TP_OFFSET       0x7000
+#define TP_OFFSET 0x7000
 
 void
 _set_tls(void *tls)
 {
-    __tls = (uint8_t *) tls + TP_OFFSET;
+    __tls = (uint8_t *)tls + TP_OFFSET;
 }

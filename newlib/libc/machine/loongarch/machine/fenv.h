@@ -73,36 +73,35 @@ typedef unsigned int fexcept_t;
  * 11 - rounding (down) toward minus infinity (RM)
  */
 
-
 /* Masks for interrupts.  */
-#define _FCSR_CAUSE_LSHIFT 8
+#define _FCSR_CAUSE_LSHIFT  8
 #define _FCSR_ENABLE_RSHIFT 16
-#define FE_INEXACT    0x010000
-#define FE_UNDERFLOW  0x020000
-#define FE_OVERFLOW   0x040000
-#define FE_DIVBYZERO  0x080000
-#define FE_INVALID    0x100000
+#define FE_INEXACT          0x010000
+#define FE_UNDERFLOW        0x020000
+#define FE_OVERFLOW         0x040000
+#define FE_DIVBYZERO        0x080000
+#define FE_INVALID          0x100000
 
 /* Flush denormalized numbers to zero.  */
-#define FE_ALL_EXCEPT (FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW|FE_UNDERFLOW|FE_INEXACT)
+#define FE_ALL_EXCEPT (FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW | FE_INEXACT)
 
 /* Rounding control.  */
-#define FE_TONEAREST  0x000
-#define FE_TOWARDZERO 0x100
-#define FE_UPWARD     0x200
-#define FE_DOWNWARD   0x300
+#define FE_TONEAREST    0x000
+#define FE_TOWARDZERO   0x100
+#define FE_UPWARD       0x200
+#define FE_DOWNWARD     0x300
 
-#define FE_RMODE_MASK 0x300
+#define FE_RMODE_MASK   0x300
 
-#define _movfcsr2gr(cw) __asm__ volatile ("movfcsr2gr %0,$fcsr0" : "=r"(cw))
-#define _movgr2fcsr(cw) __asm__ volatile ("movgr2fcsr $fcsr0,%0" : : "r"(cw))
+#define _movfcsr2gr(cw) __asm__ volatile("movfcsr2gr %0,$fcsr0" : "=r"(cw))
+#define _movgr2fcsr(cw) __asm__ volatile("movgr2fcsr $fcsr0,%0" : : "r"(cw))
 
 #else
-#define FE_TONEAREST	0
+#define FE_TONEAREST 0
 #endif
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
-#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#define __declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline

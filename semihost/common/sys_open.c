@@ -39,6 +39,6 @@
 int
 sys_semihost_open(const char *pathname, int semiflags)
 {
-    return (int)sys_semihost3(SYS_OPEN, (sh_param_t)(uintptr_t)pathname,
-                              semiflags, strlen(pathname));
+    return (int)sys_semihost3(SYS_OPEN, (sh_param_t)(uintptr_t)pathname, semiflags,
+                              strlen(pathname));
 }

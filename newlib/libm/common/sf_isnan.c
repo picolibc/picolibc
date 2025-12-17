@@ -7,7 +7,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -26,12 +26,12 @@
 #undef isnanf
 
 int
-isnanf (float x)
+isnanf(float x)
 {
-	__int32_t ix;
-	GET_FLOAT_WORD(ix,x);
-	ix &= 0x7fffffff;
-	return FLT_UWORD_IS_NAN(ix);
+    __int32_t ix;
+    GET_FLOAT_WORD(ix, x);
+    ix &= 0x7fffffff;
+    return FLT_UWORD_IS_NAN(ix);
 }
 
 #ifdef __strong_reference
@@ -44,5 +44,4 @@ __isnanf(float x)
 }
 #endif
 
-_MATH_ALIAS_i_f(isnan)
-_MATH_ALIAS_i_f(__isnan)
+_MATH_ALIAS_i_f(isnan) _MATH_ALIAS_i_f(__isnan)

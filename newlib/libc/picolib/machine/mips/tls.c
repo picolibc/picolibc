@@ -48,6 +48,6 @@ _set_tls(void *tls)
 #endif
             "mtc0 %z0, $4, %1\n"
             ".set pop"
-            : : "Jr" (tls),
-              "i" (2));
+            :
+            : "Jr"(tls), "i"(2));
 }

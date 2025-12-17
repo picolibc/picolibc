@@ -24,26 +24,26 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
 FUNCTION
-	<<iswalpha>>, <<iswalpha_l>>---alphabetic wide character test
+        <<iswalpha>>, <<iswalpha_l>>---alphabetic wide character test
 
 INDEX
-	iswalpha
+        iswalpha
 
 INDEX
-	iswalpha_l
+        iswalpha_l
 
 SYNOPSIS
-	#include <wctype.h>
-	int iswalpha(wint_t <[c]>);
+        #include <wctype.h>
+        int iswalpha(wint_t <[c]>);
 
-	#include <wctype.h>
-	int iswalpha_l(wint_t <[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        int iswalpha_l(wint_t <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<iswalpha>> is a function which classifies wide-character values that
@@ -68,11 +68,11 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-iswalpha (wint_t c)
+iswalpha(wint_t c)
 {
 #ifdef __MB_CAPABLE
-    return iswalpha_l (c, 0);
+    return iswalpha_l(c, 0);
 #else
-    return c < (wint_t)0x100 ? isalpha (c) : 0;
+    return c < (wint_t)0x100 ? isalpha(c) : 0;
 #endif
 }

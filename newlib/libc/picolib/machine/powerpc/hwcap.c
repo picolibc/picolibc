@@ -33,10 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-void
-__parse_hwcap_and_convert_at_platform (void);
+void __parse_hwcap_and_convert_at_platform(void);
 
 void
-__parse_hwcap_and_convert_at_platform (void)
+__parse_hwcap_and_convert_at_platform(void)
 {
 }

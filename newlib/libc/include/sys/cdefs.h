@@ -39,14 +39,14 @@
  * $FreeBSD$
  */
 
-#ifndef	_SYS_CDEFS_H_
-#define	_SYS_CDEFS_H_
+#ifndef _SYS_CDEFS_H_
+#define _SYS_CDEFS_H_
 
 #include <sys/config.h>
 #include <machine/_default_types.h>
 
-#define __PMT(args)	args
-#define __DOTS    	, ...
+#define __PMT(args) args
+#define __DOTS      , ...
 #ifdef __cplusplus
 #define __THROW throw()
 #else
@@ -54,32 +54,32 @@
 #endif
 
 #ifdef __GNUC__
-# define __ASMNAME(cname)  __XSTRING (__USER_LABEL_PREFIX__) cname
-# define _ASMNAME(cname)   __asm__(__ASMNAME(cname))
+#define __ASMNAME(cname) __XSTRING(__USER_LABEL_PREFIX__) cname
+#define _ASMNAME(cname)  __asm__(__ASMNAME(cname))
 #else
-# define _ASMNAME(cname)
+#define _ASMNAME(cname)
 #endif
 
-#define __ptr_t void *
-#define __long_double_t  long double
+#define __ptr_t         void *
+#define __long_double_t long double
 
 #ifndef __BOUNDED_POINTERS__
-# define __bounded      /* nothing */
-# define __unbounded    /* nothing */
-# define __ptrvalue     /* nothing */
+#define __bounded   /* nothing */
+#define __unbounded /* nothing */
+#define __ptrvalue  /* nothing */
 #endif
 
 /*
  * Compiler feature checks.
  */
-#ifndef	__has_attribute
-#define	__has_attribute(x)	0
+#ifndef __has_attribute
+#define __has_attribute(x) 0
 #endif
-#ifndef	__has_feature
-#define	__has_feature(x)	0
+#ifndef __has_feature
+#define __has_feature(x) 0
 #endif
-#ifndef	__has_builtin
-#define	__has_builtin(x)	0
+#ifndef __has_builtin
+#define __has_builtin(x) 0
 #endif
 
 /*
@@ -90,109 +90,109 @@
  */
 
 #if __has_attribute(__pure__)
-# define __pure __attribute__((__pure__))
+#define __pure __attribute__((__pure__))
 #else
-# define __pure
+#define __pure
 #endif
 
 #if __has_attribute(__format__)
-# define __picolibc_format(a,b,c) __attribute__((__format__(a,b,c)))
+#define __picolibc_format(a, b, c) __attribute__((__format__(a, b, c)))
 #else
-# define __picolibc_format(a,b,c)
+#define __picolibc_format(a, b, c)
 #endif
 
 #if __has_attribute(__nonnull__)
-# define __nonnull(params) __attribute__((__nonnull__ params))
+#define __nonnull(params) __attribute__((__nonnull__ params))
 #else
-# define __nonnull(params)
+#define __nonnull(params)
 #endif
 
 #if __has_attribute(__returns_nonnull__)
-# define __returns_nonnull __attribute__((__returns_nonnull__))
+#define __returns_nonnull __attribute__((__returns_nonnull__))
 #else
-# define __returns_nonnull
+#define __returns_nonnull
 #endif
 
 #if __has_attribute(__alloc_size__)
-# define __alloc_size(a) __attribute__ ((__alloc_size__(a)))
-# define __alloc_size2(a,b) __attribute__ ((__alloc_size__(a,b)))
+#define __alloc_size(a)     __attribute__((__alloc_size__(a)))
+#define __alloc_size2(a, b) __attribute__((__alloc_size__(a, b)))
 #else
-# define __alloc_size(a)
-# define __alloc_size2(a,b)
+#define __alloc_size(a)
+#define __alloc_size2(a, b)
 #endif
 
 #if __has_attribute(__alloc_align__)
-# define __alloc_align(param) __attribute__ ((__alloc_align__(param)))
+#define __alloc_align(param) __attribute__((__alloc_align__(param)))
 #else
-# define __alloc_align(param)
+#define __alloc_align(param)
 #endif
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
-# define __noreturn [[noreturn]]
+#define __noreturn [[noreturn]]
 #elif __has_attribute(__noreturn__)
-# define __noreturn __attribute__((__noreturn__))
+#define __noreturn __attribute__((__noreturn__))
 #else
-# define __noreturn
+#define __noreturn
 #endif
 
 #if __has_attribute(__const__)
-# define __const __attribute__((__const__))
+#define __const __attribute__((__const__))
 #else
-# define __const
+#define __const
 #endif
 
 #if __has_attribute(__unused__)
-# define __unused __attribute__((__unused__))
+#define __unused __attribute__((__unused__))
 #else
-# define __unused
+#define __unused
 #endif
 
 #if __has_attribute(__used__)
-# define __used __attribute__((__used__))
+#define __used __attribute__((__used__))
 #else
-# define __used
+#define __used
 #endif
 
 #if __has_attribute(__packed__)
-# define __packed __attribute__((__packed__))
+#define __packed __attribute__((__packed__))
 #else
-# define __packed
+#define __packed
 #endif
 
 #if __has_attribute(__aligned__)
-# define __aligned(x) __attribute__((__aligned__(x)))
+#define __aligned(x) __attribute__((__aligned__(x)))
 #else
-# define __aligned(x)
+#define __aligned(x)
 #endif
 
 #if __has_attribute(__section__)
-# define __section(x) __attribute__((__section__(x)))
+#define __section(x) __attribute__((__section__(x)))
 #else
-# define __section(x)
+#define __section(x)
 #endif
 
 #if __has_attribute(__naked__)
-# define __naked __attribute__((__naked__))
+#define __naked __attribute__((__naked__))
 #else
-# define __naked
+#define __naked
 #endif
 
 #if __has_attribute(__noinline__)
-# define __noinline __attribute__((__noinline__))
+#define __noinline __attribute__((__noinline__))
 #else
-# define __noinline
+#define __noinline
 #endif
 
 #if __has_attribute(__always_inline__)
-# define __always_inline __inline __attribute__((__always_inline__))
+#define __always_inline __inline __attribute__((__always_inline__))
 #else
-# define __always_inline
+#define __always_inline
 #endif
 
 #if __has_attribute(__warn_unused_result__)
-# define __warn_unused_result __attribute__((__warn_unused_result__))
+#define __warn_unused_result __attribute__((__warn_unused_result__))
 #else
-# define __warn_unused_result
+#define __warn_unused_result
 #endif
 
 #if __has_attribute(__weak__)
@@ -231,39 +231,41 @@
 #define __disable_sanitizer_instrumentation
 #endif
 
-#define __disable_sanitizer __no_sanitize_address __no_sanitize_undefined __disable_sanitizer_instrumentation __no_sanitize("undefined")
+#define __disable_sanitizer                                                           \
+    __no_sanitize_address __no_sanitize_undefined __disable_sanitizer_instrumentation \
+        __no_sanitize("undefined")
 
 #if __has_attribute(__deprecated__)
-# if __GNUC_PREREQ__(4,5) || defined(__clang__)
-#  define __deprecated_m(m) __attribute__((__deprecated__(m)))
-# else
-#  define __deprecated_m(m) __attribute__((__deprecated__))
-# endif
-# define __deprecated __attribute__((__deprecated__))
+#if __GNUC_PREREQ__(4, 5) || defined(__clang__)
+#define __deprecated_m(m) __attribute__((__deprecated__(m)))
 #else
-# define __deprecated_m(m)
-# define __deprecated
+#define __deprecated_m(m) __attribute__((__deprecated__))
+#endif
+#define __deprecated __attribute__((__deprecated__))
+#else
+#define __deprecated_m(m)
+#define __deprecated
 #endif
 
 #if __has_attribute(__no_builtin__)
-# define __no_builtin  __attribute__((__no_builtin__))
+#define __no_builtin __attribute__((__no_builtin__))
 #elif defined(__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
-# define __no_builtin __attribute__ ((__optimize__ ("-fno-tree-loop-distribute-patterns")))
+#define __no_builtin __attribute__((__optimize__("-fno-tree-loop-distribute-patterns")))
 #else
-# define __no_builtin
+#define __no_builtin
 #endif
 
 #if __has_attribute(__malloc__)
-# if __GNUC_PREREQ__(11, 0)
-#  define       __malloc_like_with_free(_f,_a) __attribute__((__malloc__, __malloc__(_f,_a)))
-# else
-#  define       __malloc_like_with_free(_f,_a) __attribute__((__malloc__))
-# endif
+#if __GNUC_PREREQ__(11, 0)
+#define __malloc_like_with_free(_f, _a) __attribute__((__malloc__, __malloc__(_f, _a)))
 #else
-# define __malloc_like_with_free(free,free_arg)
+#define __malloc_like_with_free(_f, _a) __attribute__((__malloc__))
+#endif
+#else
+#define __malloc_like_with_free(free, free_arg)
 #endif
 
-#define	__malloc_like __malloc_like_with_free(free, 1)
+#define __malloc_like __malloc_like_with_free(free, 1)
 
 #if __has_attribute(always_inline) && __has_attribute(gnu_inline)
 /*
@@ -273,20 +275,20 @@
 #endif
 
 #if __has_attribute(__alias__)
-# define __strong_reference(sym,aliassym) \
-    extern __typeof (sym) aliassym __attribute__ ((__alias__ (__STRING(sym))))
-# define __strong_reference_dup(sym,aliassym)	\
-    extern __typeof (aliassym) aliassym __attribute__ ((__alias__ (__STRING(sym))))
-# if __has_attribute(__weak__)
-#  define __weak_reference(sym,aliassym)	\
-    extern __typeof (sym) aliassym __attribute__ ((__weak__, __alias__ (__STRING(sym))))
-# endif
+#define __strong_reference(sym, aliassym)                                   \
+    extern __typeof(sym) aliassym __attribute__((__alias__(__STRING(sym))))
+#define __strong_reference_dup(sym, aliassym)                                    \
+    extern __typeof(aliassym) aliassym __attribute__((__alias__(__STRING(sym))))
+#if __has_attribute(__weak__)
+#define __weak_reference(sym, aliassym)                                               \
+    extern __typeof(sym) aliassym __attribute__((__weak__, __alias__(__STRING(sym))))
+#endif
 #endif
 
 #if __has_attribute(__returns_twice__)
-# define __returns_twice __attribute__((__returns_twice__))
+#define __returns_twice __attribute__((__returns_twice__))
 #else
-# define __returns_twice
+#define __returns_twice
 #endif
 
 /*
@@ -361,19 +363,17 @@
 /* Alignment builtins for better type checking and improved code generation. */
 /* Provide fallback versions for other compilers (GCC/Clang < 10): */
 #if !__has_builtin(__builtin_is_aligned)
-#define __builtin_is_aligned(x, align)	\
-	(((__uintptr_t)x & ((align) - 1)) == 0)
+#define __builtin_is_aligned(x, align) (((__uintptr_t)x & ((align) - 1)) == 0)
 #endif
 #if !__has_builtin(__builtin_align_up)
-#define __builtin_align_up(x, align)	\
-	((__typeof__(x))(((__uintptr_t)(x)+((align)-1))&(~((align)-1))))
+#define __builtin_align_up(x, align)                                         \
+    ((__typeof__(x))(((__uintptr_t)(x) + ((align) - 1)) & (~((align) - 1))))
 #endif
 #if !__has_builtin(__builtin_align_down)
-#define __builtin_align_down(x, align)	\
-	((__typeof__(x))((x)&(~((align)-1))))
+#define __builtin_align_down(x, align) ((__typeof__(x))((x) & (~((align) - 1))))
 #endif
 
-#define __align_up(x, y) __builtin_align_up(x, y)
+#define __align_up(x, y)   __builtin_align_up(x, y)
 #define __align_down(x, y) __builtin_align_down(x, y)
 #define __is_aligned(x, y) __builtin_is_aligned(x, y)
 
@@ -390,24 +390,28 @@
 
 #ifdef __cplusplus
 #ifdef __HAVE_STD_CXX
-#define _BEGIN_STD_C namespace std { extern "C" {
-#define _END_STD_C  } }
+#define _BEGIN_STD_C \
+    namespace std {  \
+    extern "C" {
+#define _END_STD_C \
+    }              \
+    }
 #else
 #define _BEGIN_STD_C extern "C" {
-#define _END_STD_C  }
+#define _END_STD_C   }
 #endif
 #else
 #define _BEGIN_STD_C
 #define _END_STD_C
 #endif
 
-#if __GNUC_PREREQ (4, 2) || defined(__clang__)
+#if __GNUC_PREREQ(4, 2) || defined(__clang__)
 #define __GNUCLIKE_PRAGMA_DIAGNOSTIC 1
 #endif
 
 #if defined(__cplusplus)
-#define	__inline	inline		/* convert to C++ keyword */
-#endif /* !__cplusplus */
+#define __inline inline /* convert to C++ keyword */
+#endif                  /* !__cplusplus */
 
 /*
  * The __CONCAT macro is used to concatenate parts of symbol names, e.g.
@@ -422,17 +426,23 @@
  * first.  It is only available with ANSI C.
  */
 #if defined(__STDC__) || defined(__cplusplus)
-#define	__CONCAT1(x,y)	x ## y
-#define	__CONCAT(x,y)	__CONCAT1(x,y)
-#define	__STRING(x)	#x		/* stringify without expanding x */
-#else	/* !(__STDC__ || __cplusplus) */
-#define	__CONCAT(x,y)	x/**/y
-#define	__STRING(x)	"x"
-#endif	/* !(__STDC__ || __cplusplus) */
-#define	__XSTRING(x)	__STRING(x)	/* expand x, then stringify */
+#define __CONCAT1(x, y) x##y
+#define __CONCAT(x, y)  __CONCAT1(x, y)
+#define __STRING(x)     #x /* stringify without expanding x */
+#else                      /* !(__STDC__ || __cplusplus) */
+#define __CONCAT(x, y) x /**/ y
+#define __STRING(x)    "x"
+#endif                           /* !(__STDC__ || __cplusplus) */
+#define __XSTRING(x) __STRING(x) /* expand x, then stringify */
 
 #if !__GNUC_PREREQ__(2, 95)
-#define	__alignof(x)	__offsetof(struct { char __a; x __b; }, __b)
+#define __alignof(x)  \
+    __offsetof(       \
+        struct {      \
+            char __a; \
+            x    __b; \
+        },            \
+        __b)
 #endif
 
 /*
@@ -442,43 +452,43 @@
 #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L
 
 #if !__has_feature(c_alignas)
-#if (defined(__cplusplus) && __cplusplus >= 201103L) || \
-    __has_feature(cxx_alignas)
-#define	_Alignas(x)		alignas(x)
+#if (defined(__cplusplus) && __cplusplus >= 201103L) || __has_feature(cxx_alignas)
+#define _Alignas(x) alignas(x)
 #else
 /* XXX: Only emulates _Alignas(constant-expression); not _Alignas(type-name). */
-#define	_Alignas(x)		__aligned(x)
+#define _Alignas(x) __aligned(x)
 #endif
 #endif
 
 #if defined(__cplusplus) && __cplusplus >= 201103L
-#define	_Alignof(x)		alignof(x)
+#define _Alignof(x) alignof(x)
 #else
-#define	_Alignof(x)		__alignof(x)
+#define _Alignof(x) __alignof(x)
 #endif
 
-#if !defined(__cplusplus) && !__has_feature(c_atomic) && \
-	!__has_feature(cxx_atomic) && !__GNUC_PREREQ__(4, 7)
+#if !defined(__cplusplus) && !__has_feature(c_atomic) && !__has_feature(cxx_atomic) \
+    && !__GNUC_PREREQ__(4, 7)
 /*
  * No native support for _Atomic(). Place object in structure to prevent
  * most forms of direct non-atomic access.
  */
-#define	_Atomic(T)		struct { T volatile __val; }
+#define _Atomic(T)        \
+    struct {              \
+        T volatile __val; \
+    }
 #endif
 
 #if !__has_feature(c_static_assert)
-#if (defined(__cplusplus) && __cplusplus >= 201103L) || \
-    __has_feature(cxx_static_assert)
-#define	_Static_assert(x, y)	static_assert(x, y)
-#elif __GNUC_PREREQ__(4,6) && !defined(__cplusplus)
+#if (defined(__cplusplus) && __cplusplus >= 201103L) || __has_feature(cxx_static_assert)
+#define _Static_assert(x, y) static_assert(x, y)
+#elif __GNUC_PREREQ__(4, 6) && !defined(__cplusplus)
 /* Nothing, gcc 4.6 and higher has _Static_assert built-in */
 #elif defined(__COUNTER__)
-#define	_Static_assert(x, y)	__Static_assert(x, __COUNTER__)
-#define	__Static_assert(x, y)	___Static_assert(x, y)
-#define	___Static_assert(x, y)	typedef char __assert_ ## y[(x) ? 1 : -1] \
-				__unused
+#define _Static_assert(x, y)   __Static_assert(x, __COUNTER__)
+#define __Static_assert(x, y)  ___Static_assert(x, y)
+#define ___Static_assert(x, y) typedef char __assert_##y[(x) ? 1 : -1] __unused
 #else
-#define	_Static_assert(x, y)	struct __hack
+#define _Static_assert(x, y) struct __hack
 #endif
 #endif
 
@@ -496,14 +506,12 @@
  * order to match _Generic().
  */
 
-#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) || \
-    __has_feature(c_generic_selections)
-#define	__generic(expr, t, yes, no)					\
-	_Generic(expr, t: yes, default: no)
+#if (defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L) \
+    || __has_feature(c_generic_selections)
+#define __generic(expr, t, yes, no) _Generic(expr, t: yes, default: no)
 #elif __GNUC_PREREQ__(3, 1) && !defined(__cplusplus)
-#define	__generic(expr, t, yes, no)					\
-	__builtin_choose_expr(						\
-	    __builtin_types_compatible_p(__typeof((0, (expr))), t), yes, no)
+#define __generic(expr, t, yes, no)                                                        \
+    __builtin_choose_expr(__builtin_types_compatible_p(__typeof((0, (expr))), t), yes, no)
 #endif
 
 /*
@@ -513,17 +521,16 @@
  * headers using it can be compiled in either language.  Use like this:
  * void bar(int myArray[__min_size(10)]);
  */
-#if !defined(__cplusplus) && \
-    (defined(__clang__) || __GNUC_PREREQ__(4, 6)) && \
-    (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
-#define __min_size(x)	static (x)
+#if !defined(__cplusplus) && (defined(__clang__) || __GNUC_PREREQ__(4, 6)) \
+    && (!defined(__STDC_VERSION__) || (__STDC_VERSION__ >= 199901))
+#define __min_size(x) static(x)
 #else
-#define __min_size(x)	(x)
+#define __min_size(x) (x)
 #endif
 
 /* XXX: should use `#if __STDC_VERSION__ < 199901'. */
 #if !__GNUC_PREREQ__(2, 7) && !defined(__COMPCERT__)
-#define	__func__	NULL
+#define __func__ NULL
 #endif
 
 /*
@@ -533,9 +540,9 @@
  * restricted pointers in other language modes.
  */
 #if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 199901
-#define	__restrict	restrict
+#define __restrict restrict
 #elif !__GNUC_PREREQ__(2, 95)
-#define	__restrict
+#define __restrict
 #endif
 
 /*
@@ -543,14 +550,13 @@
  * non-overlapping per C99.  It's not allowed in C++.
  */
 #if defined __STDC_VERSION__ && __STDC_VERSION__ >= 199901L && !defined(__cplusplus)
-#define __restrict_arr       restrict
+#define __restrict_arr restrict
 #else
 #define __restrict_arr
 #endif
 
-#define __offsetof(type, field)	offsetof(type, field)
-#define	__rangeof(type, start, end) \
-	(__offsetof(type, end) - __offsetof(type, start))
+#define __offsetof(type, field)     offsetof(type, field)
+#define __rangeof(type, start, end) (__offsetof(type, end) - __offsetof(type, start))
 
 /*
  * Given the pointer x to the member m of the struct s, return
@@ -559,26 +565,26 @@
  * compatible with member m.
  */
 #if __GNUC_PREREQ__(3, 1)
-#define	__containerof(x, s, m) ({					\
-	const volatile __typeof(((s *)0)->m) *__x = (x);		\
-	((s *) (uintptr_t) ((const volatile char *)__x - __offsetof(s, m))); \
-})
+#define __containerof(x, s, m)                                             \
+    ({                                                                     \
+        const volatile __typeof(((s *)0)->m) *__x = (x);                   \
+        ((s *)(uintptr_t)((const volatile char *)__x - __offsetof(s, m))); \
+    })
 #else
-#define	__containerof(x, s, m)						\
-        ((s *)(uintptr_t) ((const volatile char *)(x) - __offsetof(s, m)))
+#define __containerof(x, s, m) ((s *)(uintptr_t)((const volatile char *)(x) - __offsetof(s, m)))
 #endif
 
 #if defined(__GNUC__)
 #ifndef __weak_reference
 #ifdef __ELF__
 #ifdef __STDC__
-#define	__weak_reference(sym,alias)	\
-	__asm__(".weak " #alias);	\
-	__asm__(".equ "  #alias ", " #sym)
+#define __weak_reference(sym, alias)  \
+    __asm__(".weak " #alias);         \
+    __asm__(".equ " #alias ", " #sym)
 #else
-#define	__weak_reference(sym,alias)	\
-	__asm__(".weak alias");		\
-	__asm__(".equ alias, sym")
+#define __weak_reference(sym, alias) \
+    __asm__(".weak alias");          \
+    __asm__(".equ alias, sym")
 #endif
 #elif __clang__
 #ifdef __MACH__
@@ -588,46 +594,48 @@
  * is weak but aliases a strong symbol. A workaround is to make the original
  * symbol weak and the alias symbol will automatically become weak too. */
 /* Hint: use `nm -m obj.o` to check the symbols weak/strong on Mac */
-#define __weak_reference(sym,alias) \
-	__asm__(".weak_definition _" #sym); \
-	__asm__(".globl _" #alias); \
-	__asm__(".set _" #alias ", _" #sym)
+#define __weak_reference(sym, alias)    \
+    __asm__(".weak_definition _" #sym); \
+    __asm__(".globl _" #alias);         \
+    __asm__(".set _" #alias ", _" #sym)
 #elif defined(__STDC__)
-#define __weak_reference(sym,alias) \
-	__asm__(".weak_reference " #alias); \
-	__asm__(".globl " #alias); \
-	__asm__(".set " #alias ", " #sym)
+#define __weak_reference(sym, alias)    \
+    __asm__(".weak_reference " #alias); \
+    __asm__(".globl " #alias);          \
+    __asm__(".set " #alias ", " #sym)
 #else
-#define __weak_reference(sym,alias) \
-	__asm__(".weak_reference alias");\
-	__asm__(".set alias, sym")
+#define __weak_reference(sym, alias)  \
+    __asm__(".weak_reference alias"); \
+    __asm__(".set alias, sym")
 #endif
-#else	/* !__ELF__ && !__clang__ */
+#else /* !__ELF__ && !__clang__ */
 #ifdef __STDC__
-#define	__weak_reference(sym,alias)	\
-	__asm__(".stabs \"_" #alias "\",11,0,0,0");	\
-	__asm__(".stabs \"_" #sym "\",1,0,0,0")
+#define __weak_reference(sym, alias)            \
+    __asm__(".stabs \"_" #alias "\",11,0,0,0"); \
+    __asm__(".stabs \"_" #sym "\",1,0,0,0")
 #else
-#define	__weak_reference(sym,alias)	\
-	__asm__(".stabs \"_/**/alias\",11,0,0,0");	\
-	__asm__(".stabs \"_/**/sym\",1,0,0,0")
+#define __weak_reference(sym, alias)           \
+    __asm__(".stabs \"_/**/alias\",11,0,0,0"); \
+    __asm__(".stabs \"_/**/sym\",1,0,0,0")
 #endif
 #endif
 #endif
 
-#endif	/* __GNUC__ */
+#endif /* __GNUC__ */
 
 /*
  * fall-through case statement annotations
  */
 #if __cplusplus >= 201703L || __STDC_VERSION__ > 201710L
 /* Standard C++17/C23 attribute */
-# define __fallthrough [[fallthrough]]
+#define __fallthrough [[fallthrough]]
 #elif __has_attribute(__fallthrough__)
 /* Non-standard but supported by at least gcc and clang */
-# define __fallthrough __attribute__((__fallthrough__))
+#define __fallthrough __attribute__((__fallthrough__))
 #else
-# define __fallthrough do { } while(0)
+#define __fallthrough \
+    do {              \
+    } while (0)
 #endif
 
 /*  The traditional meaning of 'extern inline' for GCC is not

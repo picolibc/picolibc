@@ -41,20 +41,24 @@
 
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
-int finite64(__float64 x)
+int
+finite64(__float64 x)
 {
-	long fclass = _fclass_d (x);
-	return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
+    long fclass = _fclass_d(x);
+    return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
 #ifdef __strong_reference
 __strong_reference(finite64, __finite64);
 #else
-int __finite64(__float64 x) { return finite64(x); }
+int
+__finite64(__float64 x)
+{
+    return finite64(x);
+}
 #endif
 
-_MATH_ALIAS_i_d(finite)
-_MATH_ALIAS_i_d(__finite)
+_MATH_ALIAS_i_d(finite) _MATH_ALIAS_i_d(__finite)
 
 #else
 #include "../../common/s_finite.c"

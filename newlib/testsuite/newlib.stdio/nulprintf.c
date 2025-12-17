@@ -9,12 +9,13 @@
 #include <string.h>
 #include "check.h"
 
-const char m[8] = {'M','M','M','M','M','M','M','M'};
+const char m[8] = { 'M', 'M', 'M', 'M', 'M', 'M', 'M', 'M' };
 
-int main(void)
+int
+main(void)
 {
-  char buf[20];
-  sprintf (buf, "%.*s\n", 8, m);
-  CHECK(strcmp(buf, "MMMMMMMM\n") == 0);
-  exit (0);
+    char buf[20];
+    sprintf(buf, "%.*s\n", 8, m);
+    CHECK(strcmp(buf, "MMMMMMMM\n") == 0);
+    exit(0);
 }

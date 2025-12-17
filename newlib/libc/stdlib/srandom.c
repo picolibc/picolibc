@@ -4,15 +4,15 @@ FUNCTION
 <<random>>, <<srandom>>---pseudo-random numbers
 
 INDEX
-	random
+        random
 INDEX
-	srandom
+        srandom
 
 SYNOPSIS
-	#define _XOPEN_SOURCE 500
-	#include <stdlib.h>
-	long int random(void);
-	void srandom(unsigned int <[seed]>);
+        #define _XOPEN_SOURCE 500
+        #include <stdlib.h>
+        long int random(void);
+        void srandom(unsigned int <[seed]>);
 
 
 
@@ -58,7 +58,7 @@ algorithm as <<rand>>.
 extern __THREAD_LOCAL long long _rand_next;
 
 void
-srandom (unsigned int seed)
+srandom(unsigned int seed)
 {
-	_rand_next = seed;
+    _rand_next = seed;
 }

@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#if __SIZEOF_LONG_DOUBLE__ >8
+#if __SIZEOF_LONG_DOUBLE__ > 8
 
 #define _NEED_IO_LONG_DOUBLE
 
@@ -42,28 +42,21 @@
 static __THREAD_LOCAL char ecvt_buf[LDTOA_MAX_DIG + 1];
 
 char *
-ecvtl (long double invalue,
-       int ndigit,
-       int *decpt,
-       int *sign)
+ecvtl(long double invalue, int ndigit, int *decpt, int *sign)
 {
     if (ecvtl_r(invalue, ndigit, decpt, sign, ecvt_buf, sizeof(ecvt_buf)) < 0)
         return NULL;
     return ecvt_buf;
 }
 
-
 #elif __SIZEOF_LONG_DOUBLE__ == 4
 
 #include "stdio_private.h"
 
 char *
-ecvtl (long double invalue,
-       int ndigit,
-       int *decpt,
-       int *sign)
+ecvtl(long double invalue, int ndigit, int *decpt, int *sign)
 {
-    return ecvtf((float) invalue, ndigit, decpt, sign);
+    return ecvtf((float)invalue, ndigit, decpt, sign);
 }
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
@@ -71,13 +64,9 @@ ecvtl (long double invalue,
 #include "stdio_private.h"
 
 char *
-ecvtl (long double invalue,
-       int ndigit,
-       int *decpt,
-       int *sign)
+ecvtl(long double invalue, int ndigit, int *decpt, int *sign)
 {
-    return ecvt((double) invalue, ndigit, decpt, sign);
+    return ecvt((double)invalue, ndigit, decpt, sign);
 }
 
 #endif
-

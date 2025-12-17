@@ -34,7 +34,7 @@ SUCH DAMAGE.
 #include <sys/cdefs.h>
 #include <sys/lock.h>
 
-#define ENV_LOCK __LIBC_LOCK()
+#define ENV_LOCK   __LIBC_LOCK()
 #define ENV_UNLOCK __LIBC_UNLOCK()
 
 #endif /* _INCLUDE_ENVLOCK_H_ */

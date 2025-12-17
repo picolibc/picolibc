@@ -37,26 +37,25 @@
 
 void aarch64_halt_vector(void);
 
-void __section(".init")
-aarch64_halt_vector(void)
+void __section(".init") aarch64_halt_vector(void)
 {
-	/* Loop forever. */
-        for(;;);
+    /* Loop forever. */
+    for (;;)
+        ;
 }
 
 void aarch64_ignore_vector(void);
 
-void __section(".init")
-aarch64_ignore_vector(void)
+void __section(".init") aarch64_ignore_vector(void)
 {
-	/* Ignore the interrupt by returning */
+    /* Ignore the interrupt by returning */
 }
 
-#define vector(name) \
-	void  aarch64_ ## name ## _vector(void) __attribute__ ((weak, alias("aarch64_ignore_vector")))
+#define vector(name)                                                                         \
+    void aarch64_##name##_vector(void) __attribute__((weak, alias("aarch64_ignore_vector")))
 
-#define vector_halt(name) \
-	void  aarch64_ ## name ## _vector(void) __attribute__ ((weak, alias("aarch64_halt_vector")))
+#define vector_halt(name)                                                                  \
+    void aarch64_##name##_vector(void) __attribute__((weak, alias("aarch64_halt_vector")))
 
 vector_halt(sync);
 vector_halt(serror);

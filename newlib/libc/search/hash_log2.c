@@ -43,13 +43,12 @@ static char sccsid[] = "@(#)hash_log2.c	8.2 (Berkeley) 5/31/94";
 #include "extern.h"
 
 __uint32_t
-__log2(
-	__uint32_t num
-)
+__log2(__uint32_t num)
 {
-	__uint32_t i, limit;
+    __uint32_t i, limit;
 
-	limit = 1;
-	for (i = 0; limit < num; limit = limit << 1, i++);
-	return (i);
+    limit = 1;
+    for (i = 0; limit < num; limit = limit << 1, i++)
+        ;
+    return (i);
 }

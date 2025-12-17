@@ -38,10 +38,11 @@
 long double complex
 ccosl(long double complex z)
 {
-	long double ch, sh;
+    long double ch, sh;
 
-	_cchshl(cimagl(z), &ch, &sh);
-	return (long double complex) (cosl(creall(z)) * ch) - (sinl(creall(z)) * sh) * (long double complex) I;
+    _cchshl(cimagl(z), &ch, &sh);
+    return (long double complex)(cosl(creall(z)) * ch)
+        - (sinl(creall(z)) * sh) * (long double complex)I;
 }
 
 #endif

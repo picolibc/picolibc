@@ -24,18 +24,19 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-#if __ARM_ARCH >= 8 && (__ARM_FP & 0x8) 
+#if __ARM_ARCH >= 8 && (__ARM_FP & 0x8)
 #include "math_config.h"
 
 double
-nearbyint (double x)
+nearbyint(double x)
 {
-    if (isnan(x)) return x + x;
+    if (isnan(x))
+        return x + x;
 #if defined(FE_INEXACT)
     fenv_t env;
     fegetenv(&env);
 #endif
-    __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (x) : "w" (x));
+    __asm__ volatile("vrintr.f64\t%P0, %P1" : "=w"(x) : "w"(x));
 #if defined(FE_INEXACT)
     fesetenv(&env);
 #endif

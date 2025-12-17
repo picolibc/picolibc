@@ -40,10 +40,9 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _LOG10D2_H_
-#define _LOG10D2_H_	1
+#define _LOG10D2_H_ 1
 
 #include <spu_intrinsics.h>
-
 
 #include "log2d2.h"
 
@@ -55,12 +54,13 @@
  *	_log10d2 computes log (base 10) for each of the double word
  *      elements the input vector x. log10_v
  *	is computed using log2d2 as follows:
- *	
+ *
  *	   log10d2(x) = log2d2(x) / log2d2(10);
  */
-static __inline vector double _log10d2(vector double x)
+static __inline vector double
+_log10d2(vector double x)
 {
-  return (spu_mul(_log2d2(x), spu_splats(0.301029995663981195213)));
+    return (spu_mul(_log2d2(x), spu_splats(0.301029995663981195213)));
 }
 
 #endif /* _LOG10D2_H_ */

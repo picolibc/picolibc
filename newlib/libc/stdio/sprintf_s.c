@@ -40,12 +40,12 @@
 #include "../stdlib/local_s.h"
 
 int
-sprintf_s(char *__restrict s, rsize_t bufsize, const char *__restrict fmt, ...)
+sprintf_s(char * __restrict s, rsize_t bufsize, const char * __restrict fmt, ...)
 {
-    bool write_null = true;
+    bool        write_null = true;
     const char *msg = "";
-    va_list args;
-    int rc;
+    va_list     args;
+    int         rc;
 
     if (s == NULL) {
         write_null = false;

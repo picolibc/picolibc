@@ -34,12 +34,12 @@
 int
 vsprintf(char *s, const char *fmt, va_list ap)
 {
-        struct __file_str f = FDEV_SETUP_STRING_WRITE(s, NULL);
-	int i;
+    struct __file_str f = FDEV_SETUP_STRING_WRITE(s, NULL);
+    int               i;
 
-	i = vfprintf(&f.file, fmt, ap);
-	if (i >= 0)
-		s[i] = 0;
+    i = vfprintf(&f.file, fmt, ap);
+    if (i >= 0)
+        s[i] = 0;
 
-	return i;
+    return i;
 }

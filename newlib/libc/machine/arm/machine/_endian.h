@@ -28,12 +28,12 @@
 #error "must be included via <machine/endian.h>"
 #endif /* !__MACHINE_ENDIAN_H__ */
 
-#define	_LITTLE_ENDIAN	1234
-#define	_BIG_ENDIAN	4321
-#define	_PDP_ENDIAN	3412
+#define _LITTLE_ENDIAN 1234
+#define _BIG_ENDIAN    4321
+#define _PDP_ENDIAN    3412
 
 #ifdef __ARMEB__
-#define	_BYTE_ORDER	_BIG_ENDIAN
+#define _BYTE_ORDER _BIG_ENDIAN
 #else
-#define	_BYTE_ORDER	_LITTLE_ENDIAN
+#define _BYTE_ORDER _LITTLE_ENDIAN
 #endif

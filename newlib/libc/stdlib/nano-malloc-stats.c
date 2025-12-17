@@ -34,12 +34,8 @@ malloc_stats(void)
     struct mallinfo current_mallinfo;
 
     current_mallinfo = mallinfo();
-    fprintf(stderr, "max system bytes = %10lu\n",
-            (long) current_mallinfo.arena);
-    fprintf(stderr, "system bytes     = %10lu\n",
-            (long) current_mallinfo.arena);
-    fprintf(stderr, "in use bytes     = %10lu\n",
-            (long) current_mallinfo.uordblks);
-    fprintf(stderr, "free blocks      = %10lu\n",
-	    (long) current_mallinfo.ordblks);
+    fprintf(stderr, "max system bytes = %10lu\n", (long)current_mallinfo.arena);
+    fprintf(stderr, "system bytes     = %10lu\n", (long)current_mallinfo.arena);
+    fprintf(stderr, "in use bytes     = %10lu\n", (long)current_mallinfo.uordblks);
+    fprintf(stderr, "free blocks      = %10lu\n", (long)current_mallinfo.ordblks);
 }

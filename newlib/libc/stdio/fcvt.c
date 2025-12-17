@@ -46,10 +46,7 @@
 static __THREAD_LOCAL char fcvt_buf[FCVT_MAXDIG];
 
 char *
-fcvt (double invalue,
-      int ndigit,
-      int *decpt,
-      int *sign)
+fcvt(double invalue, int ndigit, int *decpt, int *sign)
 {
     if (fcvt_r(invalue, ndigit, decpt, sign, fcvt_buf, sizeof(fcvt_buf)) < 0)
         return NULL;
@@ -59,12 +56,9 @@ fcvt (double invalue,
 #elif __SIZEOF_DOUBLE__ == 4
 
 char *
-fcvt (double invalue,
-      int ndigit,
-      int *decpt,
-      int *sign)
+fcvt(double invalue, int ndigit, int *decpt, int *sign)
 {
-    return fcvtf((float) invalue, ndigit, decpt, sign);
+    return fcvtf((float)invalue, ndigit, decpt, sign);
 }
 
 #endif

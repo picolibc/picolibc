@@ -40,17 +40,15 @@
 #ifdef WIDE_CHARS
 #include <wctype.h>
 #define strtold_l wcstold_l
-#define strtold wcstold
-#define char wchar_t
+#define strtold   wcstold
+#define char      wchar_t
 #endif
 
 long double
-strtold_l (const char *__restrict s00,
-	  char **__restrict se,
-	  locale_t loc)
+strtold_l(const char * __restrict s00, char ** __restrict se, locale_t loc)
 {
-        (void) loc;
-	return strtold (s00, se);
+    (void)loc;
+    return strtold(s00, se);
 }
 
 #endif

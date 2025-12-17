@@ -33,23 +33,23 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _M68K_EXCEPT_SHIFT      6
+#define _M68K_EXCEPT_SHIFT 6
 
 __declare_fenv_inline(int) feclearexcept(int excepts)
 {
-  /* Mask excepts to be sure only supported flag bits are set */
+    /* Mask excepts to be sure only supported flag bits are set */
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  /* Clear the requested flags */
+    /* Clear the requested flags */
 
-  fexcept_t fpsr;
+    fexcept_t fpsr;
 
-  __asm__ volatile("fmove.l %%fpsr, %0" : "=d" (fpsr));
-  fpsr &= ~excepts;
-  __asm__ volatile("fmove.l %0, %%fpsr" : : "d" (fpsr));
+    __asm__ volatile("fmove.l %%fpsr, %0" : "=d"(fpsr));
+    fpsr &= ~excepts;
+    __asm__ volatile("fmove.l %0, %%fpsr" : : "d"(fpsr));
 
-  return 0;
+    return 0;
 }
 
 __declare_fenv_inline(int) fegetenv(fenv_t *envp)
@@ -57,11 +57,11 @@ __declare_fenv_inline(int) fegetenv(fenv_t *envp)
 
     /* Get the current fpcr and fpsr */
 
-    fenv_t fpcr;
+    fenv_t    fpcr;
     fexcept_t fpsr;
 
-    __asm__ volatile ("fmove.l %%fpcr, %0" : "=d"(fpcr));
-    __asm__ volatile ("fmove.l %%fpsr, %0" : "=d"(fpsr));
+    __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
+    __asm__ volatile("fmove.l %%fpsr, %0" : "=d"(fpsr));
 
     /* Mix the exceptions and rounding mode together */
 
@@ -98,7 +98,7 @@ __declare_fenv_inline(int) fegetround(void)
 
 __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
-    fenv_t fpcr;
+    fenv_t    fpcr;
     fexcept_t fpsr;
 
     __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
@@ -149,11 +149,11 @@ __declare_fenv_inline(int) fesetexcept(int excepts)
 
 __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
-    fenv_t env = *envp;
+    fenv_t    env = *envp;
 
     /* Get current fpcr and fpsr */
 
-    fenv_t fpcr;
+    fenv_t    fpcr;
     fexcept_t fpsr;
 
     __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
@@ -163,11 +163,11 @@ __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 
     fpcr = (fpcr & ~(0x3 << 4)) | (env & 3);
 
-     /* Set the exception enables */
+    /* Set the exception enables */
 
     fpcr = (fpcr & 0xff) | (env & 0xff00);
 
-   /* Set the exceptions */
+    /* Set the exceptions */
 
     fpsr = (fpsr & ~0xf8) | (env & 0xf8);
 
@@ -177,7 +177,6 @@ __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
     __asm__ volatile("fmove.l %0, %%fpsr" : : "d"(fpsr));
 
     return 0;
-
 }
 
 __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
@@ -214,26 +213,26 @@ __declare_fenv_inline(int) fesetround(int rounding_mode)
 
 __declare_fenv_inline(int) fetestexcept(int excepts)
 {
-  /* Mask excepts to be sure only supported flag bits are set */
+    /* Mask excepts to be sure only supported flag bits are set */
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  /* Read the current fpsr */
+    /* Read the current fpsr */
 
-  fexcept_t fpsr;
+    fexcept_t fpsr;
 
-  __asm__ volatile ("fmove.l %%fpsr, %0" : "=d"(fpsr));
+    __asm__ volatile("fmove.l %%fpsr, %0" : "=d"(fpsr));
 
-  return (fpsr & excepts);
+    return (fpsr & excepts);
 }
 
 __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
-    fenv_t env = *envp;
+    fenv_t    env = *envp;
 
     /* Get current fpcr and fpsr */
 
-    fenv_t fpcr;
+    fenv_t    fpcr;
     fexcept_t fpsr;
 
     __asm__ volatile("fmove.l %%fpcr, %0" : "=d"(fpcr));
@@ -257,7 +256,6 @@ __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
     __asm__ volatile("fmove.l %0, %%fpsr" : : "d"(fpsr));
 
     return 0;
-
 }
 
 __declare_fenv_inline(int) feenableexcept(int excepts)

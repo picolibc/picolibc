@@ -16,22 +16,22 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /*
 FUNCTION
-	<<strcspn>>---count characters not in string
+        <<strcspn>>---count characters not in string
 
 INDEX
-	strcspn
+        strcspn
 
 SYNOPSIS
-	size_t strcspn(const char *<[s1]>, const char *<[s2]>);
+        size_t strcspn(const char *<[s1]>, const char *<[s2]>);
 
 DESCRIPTION
-	This function computes the length of the initial part of
-	the string pointed to by <[s1]> which consists entirely of
-	characters <[NOT]> from the string pointed to by <[s2]>
-	(excluding the terminating null character).
+        This function computes the length of the initial part of
+        the string pointed to by <[s1]> which consists entirely of
+        characters <[NOT]> from the string pointed to by <[s2]>
+        (excluding the terminating null character).
 
 RETURNS
-	<<strcspn>> returns the length of the substring found.
+        <<strcspn>> returns the length of the substring found.
 
 PORTABILITY
 <<strcspn>> is ANSI C.
@@ -42,21 +42,18 @@ PORTABILITY
 #include <string.h>
 
 size_t
-strcspn (const char *s1,
-	const char *s2)
+strcspn(const char *s1, const char *s2)
 {
-  const char *s = s1;
-  const char *c;
+    const char *s = s1;
+    const char *c;
 
-  while (*s1)
-    {
-      for (c = s2; *c; c++)
-	{
-	  if (*s1 == *c)
-	    goto end;
-	}
-      s1++;
+    while (*s1) {
+        for (c = s2; *c; c++) {
+            if (*s1 == *c)
+                goto end;
+        }
+        s1++;
     }
 end:
-  return s1 - s;
+    return s1 - s;
 }

@@ -36,13 +36,9 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_alignment_assumption(void *_data,
-                                    void *ptr,
-                                    void *align,
-                                    void *offset)
+__ubsan_handle_alignment_assumption(void *_data, void *ptr, void *align, void *offset)
 {
     struct alignment_assumption_data *data = _data;
     __ubsan_error(&data->location, "alignment_assumption", "(%s) %p align %p offset %p\n",
                   data->type->type_name, ptr, align, offset);
-
 }

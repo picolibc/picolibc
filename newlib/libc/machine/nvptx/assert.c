@@ -22,21 +22,16 @@
 #ifndef __HAVE_ASSERT_FUNC
 /* func can be NULL, in which case no function information is given.  */
 void
-__assert_func (const char *file,
-	int line,
-	const char *func,
-	const char *failedexpr)
+__assert_func(const char *file, int line, const char *func, const char *failedexpr)
 {
-  abort();
-  /* NOTREACHED */
+    abort();
+    /* NOTREACHED */
 }
 #endif /* __HAVE_ASSERT_FUNC */
 
 void
-__assert (const char *file,
-	int line,
-	const char *failedexpr)
+__assert(const char *file, int line, const char *failedexpr)
 {
-   __assert_func (file, line, NULL, failedexpr);
-  /* NOTREACHED */
+    __assert_func(file, line, NULL, failedexpr);
+    /* NOTREACHED */
 }

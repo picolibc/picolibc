@@ -41,10 +41,10 @@ void
 exit(int code)
 {
 #ifdef __INIT_FINI_ARRAY
-	__libc_fini_array();
+    __libc_fini_array();
 #else
-        if (__call_exitprocs)
-            __call_exitprocs(code, NULL);
+    if (__call_exitprocs)
+        __call_exitprocs(code, NULL);
 #endif
-	_exit(code);
+    _exit(code);
 }

@@ -27,30 +27,28 @@
 static xdr_vprintf_t xdr_vprintf = NULL;
 
 xdr_vprintf_t
-xdr_set_vprintf (xdr_vprintf_t fnptr)
+xdr_set_vprintf(xdr_vprintf_t fnptr)
 {
-  xdr_vprintf_t tmp = xdr_vprintf;
-  xdr_vprintf = fnptr;
-  return tmp;
+    xdr_vprintf_t tmp = xdr_vprintf;
+    xdr_vprintf = fnptr;
+    return tmp;
 }
 
 void
-xdr_vwarnx (const char *format,
-	va_list ap)
+xdr_vwarnx(const char *format, va_list ap)
 {
-  if (xdr_vprintf)
-    {
-      (*xdr_vprintf)(format, ap);
-      return;
+    if (xdr_vprintf) {
+        (*xdr_vprintf)(format, ap);
+        return;
     }
-  /* otherwise, do nothing */
+    /* otherwise, do nothing */
 }
 
 void
-xdr_warnx (const char *fmt, ...)
+xdr_warnx(const char *fmt, ...)
 {
-  va_list ap;
-  va_start (ap, fmt);
-  xdr_vwarnx (fmt, ap);
-  va_end (ap);
+    va_list ap;
+    va_start(ap, fmt);
+    xdr_vwarnx(fmt, ap);
+    va_end(ap);
 }

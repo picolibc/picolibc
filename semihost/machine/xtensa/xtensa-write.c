@@ -40,8 +40,8 @@ write(int fd, const void *buf, size_t count)
 {
     struct _simcall_ret ret;
 
-    ret = _simcall(SYS_write, fd, (intptr_t) buf, (intptr_t) count);
+    ret = _simcall(SYS_write, fd, (intptr_t)buf, (intptr_t)count);
     if (ret.code < 0)
         errno = ret.error;
-    return (ssize_t) ret.code;
+    return (ssize_t)ret.code;
 }

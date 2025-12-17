@@ -13,7 +13,7 @@
  * they apply.
  */
 
-#ifndef	_LIBH
+#ifndef _LIBH
 #define _LIBH
 
 /* These are the first 16 entries of the default dispatch table as defined
@@ -42,10 +42,10 @@
 extern void (* const _dispatch_table[])(void);
 
 /* Function prototypes */
-void svc_handler(void);
-void dvz_handler(void);
-void flg_handler(void);
-void und_handler(void);
-void iad_handler(void);
+void        svc_handler(void);
+void        dvz_handler(void);
+void        flg_handler(void);
+void        und_handler(void);
+void        iad_handler(void);
 
-#endif  /* _LIBH */
+#endif /* _LIBH */

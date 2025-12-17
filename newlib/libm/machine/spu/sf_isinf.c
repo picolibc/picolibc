@@ -37,7 +37,7 @@
  * isinff is an extension declared in <math.h>.
  */
 int
-isinff (float x)
+isinff(float x)
 {
-	return 0;
+    return 0;
 }

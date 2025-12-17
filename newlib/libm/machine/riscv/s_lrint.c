@@ -38,19 +38,21 @@
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 64
 
 long int
-lrint64 (__float64 x)
+lrint64(__float64 x)
 {
-  long result;
-  __asm__(
+    long result;
+    __asm__(
 #if __riscv_xlen == 32
-       "fcvt.w.d"
+        "fcvt.w.d"
 #elif __riscv_xlen == 64
-       "fcvt.l.d"
+        "fcvt.l.d"
 #else
 #error Unsupported XLEN
 #endif
-       "\t%0, %1" : "=r"(result) : "f"(x));
-  return result;
+        "\t%0, %1"
+        : "=r"(result)
+        : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_j_d(lrint)

@@ -28,11 +28,11 @@
 #include <math.h>
 
 float
-ceilf (float x)
+ceilf(float x)
 {
-  float result;
-  __asm__( "frintp\t%s0, %s1" : "=w" (result) : "w" (x) );
-  return result;
+    float result;
+    __asm__("frintp\t%s0, %s1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

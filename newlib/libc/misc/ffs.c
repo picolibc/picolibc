@@ -28,14 +28,14 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<ffs>>---find first bit set in a word
+        <<ffs>>---find first bit set in a word
 
 INDEX
-	ffs
+        ffs
 
 SYNOPSIS
-	#include <strings.h>
-	int ffs(int <[word]>);
+        #include <strings.h>
+        int ffs(int <[word]>);
 
 DESCRIPTION
 
@@ -66,23 +66,22 @@ int
 ffs(int i)
 {
 #if __HAVE_BUILTIN_FFS
-	return (__builtin_ffs(i));
+    return (__builtin_ffs(i));
 #elif __HAVE_BUILTIN_CTZ
-	if (i == 0)
-		return 0;
-	return __builtin_ctz((unsigned int)i) + 1;
+    if (i == 0)
+        return 0;
+    return __builtin_ctz((unsigned int)i) + 1;
 #else
-  int r;
+    int r;
 
-  if (!i)
-    return 0;
+    if (!i)
+        return 0;
 
-  r = 0;
-  for (;;)
-    {
-      if (((1 << r++) & i) != 0)
-	break;
+    r = 0;
+    for (;;) {
+        if (((1 << r++) & i) != 0)
+            break;
     }
-  return r;
+    return r;
 #endif
 }

@@ -28,24 +28,24 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<iscntrl>>, <<iscntrl_l>>---control character predicate
+        <<iscntrl>>, <<iscntrl_l>>---control character predicate
 
 INDEX
-	iscntrl
+        iscntrl
 
 INDEX
-	iscntrl_l
+        iscntrl_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int iscntrl(int <[c]>);
+        #include <ctype.h>
+        int iscntrl(int <[c]>);
 
-	#include <ctype.h>
-	int iscntrl_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int iscntrl_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<iscntrl>> is a macro which classifies singlebyte charset values by table
-lookup.  It is a predicate returning non-zero for control characters, and 0 
+lookup.  It is a predicate returning non-zero for control characters, and 0
 for other characters.  It is defined only if <[c]> is representable as an
 unsigned char or if <[c]> is EOF.
 
@@ -71,11 +71,11 @@ No supporting OS subroutines are required.
 
 #undef iscntrl
 int
-iscntrl (int c)
+iscntrl(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return (0x00 <= c && c <= 0x1f) || c == 0x7f;
 #else
-    return(__CTYPE_PTR[c+1] & __CTYPE_CNTRL);
+    return (__CTYPE_PTR[c + 1] & __CTYPE_CNTRL);
 #endif
 }

@@ -36,5 +36,5 @@
 int
 __issignalingl(long double x)
 {
-	return issignalingl_inline(x);
+    return issignalingl_inline(x);
 }

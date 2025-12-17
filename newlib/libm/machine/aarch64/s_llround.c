@@ -28,11 +28,11 @@
 #include <math.h>
 
 long long int
-llround (double x)
+llround(double x)
 {
-  long long int result;
-  __asm__("fcvtas\t%x0, %d1" : "=r" (result) : "w" (x));
-  return result;
+    long long int result;
+    __asm__("fcvtas\t%x0, %d1" : "=r"(result) : "w"(x));
+    return result;
 }
 
 #else

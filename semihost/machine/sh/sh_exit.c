@@ -42,14 +42,15 @@ __noreturn void
 _exit(int code)
 {
 #ifdef SH_QEMU
-        char buf[15];
-        int n;
-        /* Can't use printf because stdout has already been cleaned up */
-        n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
-        write(1, buf, n);
-	while(1);
+    char buf[15];
+    int  n;
+    /* Can't use printf because stdout has already been cleaned up */
+    n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
+    write(1, buf, n);
+    while (1)
+        ;
 #else
-        sh_syscall(TARGET_NEWLIB_SH_SYS_exit, code, 0, 0);
+    sh_syscall(TARGET_NEWLIB_SH_SYS_exit, code, 0, 0);
 #endif
-        __builtin_unreachable();
+    __builtin_unreachable();
 }

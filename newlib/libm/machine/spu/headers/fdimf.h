@@ -31,19 +31,19 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FDIMF_H_
-#define _FDIMF_H_	1
+#define _FDIMF_H_ 1
 
 #include <spu_intrinsics.h>
 
 /* fdim - compute the positive difference of x and y.
  */
-static __inline float _fdimf(float x, float y)
+static __inline float
+_fdimf(float x, float y)
 {
-  vec_float4 vx, vy;
+    vec_float4 vx, vy;
 
-  vx = spu_promote(x, 0);
-  vy = spu_promote(y, 0);
-  return (spu_extract(spu_and(spu_sub(vx, vy),
-                              (vec_float4)spu_cmpgt(vx, vy)), 0));
+    vx = spu_promote(x, 0);
+    vy = spu_promote(y, 0);
+    return (spu_extract(spu_and(spu_sub(vx, vy), (vec_float4)spu_cmpgt(vx, vy)), 0));
 }
 #endif /* _FDIMF_H_ */

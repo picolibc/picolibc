@@ -20,7 +20,7 @@ static const float one = 1.0, two = 2.0;
 float
 tanhf(float x)
 {
-    float t, z;
+    float     t, z;
     __int32_t jx, ix;
 
     GET_FLOAT_WORD(jx, x);
@@ -35,10 +35,10 @@ tanhf(float x)
     }
 
     /* |x| < 22 */
-    if (ix < 0x41b00000) { /* |x|<22 */
-        if (ix < 0x24000000) /* |x|<2**-55 */
+    if (ix < 0x41b00000) {        /* |x|<22 */
+        if (ix < 0x24000000)      /* |x|<2**-55 */
             return x * (one + x); /* tanh(small) = small */
-        if (ix >= 0x3f800000) { /* |x|>=1  */
+        if (ix >= 0x3f800000) {   /* |x|>=1  */
             t = expm1f(two * fabsf(x));
             z = one - two / (t + two);
         } else {

@@ -40,7 +40,7 @@
 #ifdef __HAVE_POSIX_LOCALE_API
 
 locale_t
-uselocale (locale_t locale)
+uselocale(locale_t locale)
 {
     locale_t current = _locale;
 

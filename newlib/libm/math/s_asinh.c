@@ -13,17 +13,17 @@
 
 /*
 FUNCTION
-	<<asinh>>, <<asinhf>>---inverse hyperbolic sine
+        <<asinh>>, <<asinhf>>---inverse hyperbolic sine
 
 INDEX
-	asinh
+        asinh
 INDEX
-	asinhf
+        asinhf
 
 SYNOPSIS
-	#include <math.h>
-	double asinh(double <[x]>);
-	float asinhf(float <[x]>);
+        #include <math.h>
+        double asinh(double <[x]>);
+        float asinhf(float <[x]>);
 
 DESCRIPTION
 <<asinh>> calculates the inverse hyperbolic sine of <[x]>.
@@ -60,9 +60,8 @@ Neither <<asinh>> nor <<asinhf>> are ANSI C.
 
 #ifdef _NEED_FLOAT64
 
-static const __float64
-    one = _F_64(1.00000000000000000000e+00), /* 0x3FF00000, 0x00000000 */
-    ln2 = _F_64(6.93147180559945286227e-01), /* 0x3FE62E42, 0xFEFA39EF */
+static const __float64 one = _F_64(1.00000000000000000000e+00), /* 0x3FF00000, 0x00000000 */
+    ln2 = _F_64(6.93147180559945286227e-01),                    /* 0x3FE62E42, 0xFEFA39EF */
     huge = _F_64(1.00000000000000000000e+300);
 
 __float64
@@ -73,7 +72,7 @@ asinh64(__float64 x)
     GET_HIGH_WORD(hx, x);
     ix = hx & 0x7fffffff;
     if (ix >= 0x7ff00000)
-        return x + x; /* x is inf or NaN */
+        return x + x;      /* x is inf or NaN */
     if (ix < 0x3e300000) { /* |x|<2**-28 */
         if (huge + x > one)
             return x; /* return x inexact except 0 */

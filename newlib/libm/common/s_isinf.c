@@ -29,12 +29,12 @@ is preserved.
 int
 isinf64(__float64 x)
 {
-	__uint32_t hx,lx;
-	EXTRACT_WORDS(hx,lx,x);
-	hx &= 0x7fffffff;
-	hx |= (__uint32_t)(lx|(-lx))>>31;
-	hx = 0x7ff00000 - hx;
-	return 1 - (int)((__uint32_t)(hx|(-hx))>>31);
+    __uint32_t hx, lx;
+    EXTRACT_WORDS(hx, lx, x);
+    hx &= 0x7fffffff;
+    hx |= (__uint32_t)(lx | (-lx)) >> 31;
+    hx = 0x7ff00000 - hx;
+    return 1 - (int)((__uint32_t)(hx | (-hx)) >> 31);
 }
 
 #ifdef __strong_reference
@@ -47,7 +47,6 @@ __isinf64(float x)
 }
 #endif
 
-_MATH_ALIAS_i_d(isinf)
-_MATH_ALIAS_i_d(__isinf)
+_MATH_ALIAS_i_d(isinf) _MATH_ALIAS_i_d(__isinf)
 
 #endif /* _NEED_FLOAT64 */

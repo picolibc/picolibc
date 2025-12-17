@@ -40,29 +40,30 @@
 #include <unistd.h>
 #include <errno.h>
 
-off_t lseek(int fd, off_t offset, int whence)
+off_t
+lseek(int fd, off_t offset, int whence)
 {
-	if (whence == SEEK_CUR && offset == 0)
-		return 0;
+    if (whence == SEEK_CUR && offset == 0)
+        return 0;
 
-	if (whence == SEEK_END) {
-		int flen = sys_semihost_flen(fd);
-		if (flen != -1) {
-			whence = SEEK_SET;
-			offset += flen;
-		}
-	}
+    if (whence == SEEK_END) {
+        int flen = sys_semihost_flen(fd);
+        if (flen != -1) {
+            whence = SEEK_SET;
+            offset += flen;
+        }
+    }
 
-        fd = _map_stdio(fd);
+    fd = _map_stdio(fd);
 
-	if (whence != SEEK_SET || fd < 0) {
-		errno = EINVAL;
-		return (off_t) -1;
-	}
+    if (whence != SEEK_SET || fd < 0) {
+        errno = EINVAL;
+        return (off_t)-1;
+    }
 
-	uintptr_t ret = sys_semihost2(SYS_SEEK, fd, offset);
-	if (ret == 0)
-		return offset;
-	errno = sys_semihost_errno();
-	return -1;
+    uintptr_t ret = sys_semihost2(SYS_SEEK, fd, offset);
+    if (ret == 0)
+        return offset;
+    errno = sys_semihost_errno();
+    return -1;
 }

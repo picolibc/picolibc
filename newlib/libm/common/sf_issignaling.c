@@ -37,7 +37,7 @@
 int
 __issignalingf(float x)
 {
-	return issignalingf_inline(x);
+    return issignalingf_inline(x);
 }
 
 _MATH_ALIAS_i_f(__issignaling)

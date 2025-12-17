@@ -38,11 +38,10 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #undef getchar
 
-
 int
-getchar ()
+getchar()
 {
-  int ret;
+    int ret;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETCHAR, &ret);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETCHAR, &ret);
 }

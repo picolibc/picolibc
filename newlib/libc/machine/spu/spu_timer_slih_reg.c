@@ -28,16 +28,14 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 /* Services for SLIH registration.  */
 #include <picolibc.h>
 
 #include <spu_intrinsics.h>
 #include <spu_timer.h>
 
-#define SPU_EVENT_ID(_mask) \
-    (spu_extract(spu_cntlz(spu_promote(_mask, 0)), 0))
-typedef unsigned (*spu_slih_t) (unsigned);
+#define SPU_EVENT_ID(_mask) (spu_extract(spu_cntlz(spu_promote(_mask, 0)), 0))
+typedef unsigned  (*spu_slih_t)(unsigned);
 
 extern spu_slih_t __spu_slih_handlers[];
 
@@ -46,14 +44,14 @@ extern spu_slih_t __spu_slih_handlers[];
    zeros the most significant event bit indicating that the event was processed
    (when in reality, it was discarded).  */
 unsigned
-__spu_default_slih (unsigned events)
+__spu_default_slih(unsigned events)
 {
-  unsigned int mse;
+    unsigned int mse;
 
-  mse = 0x80000000 >> SPU_EVENT_ID (events);
-  events &= ~mse;
+    mse = 0x80000000 >> SPU_EVENT_ID(events);
+    events &= ~mse;
 
-  return (events);
+    return (events);
 }
 
 /* Registers a SPU second level interrupt handler for the events specified by
@@ -61,14 +59,13 @@ __spu_default_slih (unsigned events)
    status bits (see channel 0 description). A mask containing multiple  1 bits
     will set the second level event handler for each of the events.  */
 void
-spu_slih_register (unsigned mask, spu_slih_t func)
+spu_slih_register(unsigned mask, spu_slih_t func)
 {
-  unsigned int id;
+    unsigned int id;
 
-  while (mask)
-    {
-      id = SPU_EVENT_ID (mask);
-      __spu_slih_handlers[id] = (func) ? func : __spu_default_slih;
-      mask &= ~(0x80000000 >> id);
+    while (mask) {
+        id = SPU_EVENT_ID(mask);
+        __spu_slih_handlers[id] = (func) ? func : __spu_default_slih;
+        mask &= ~(0x80000000 >> id);
     }
 }

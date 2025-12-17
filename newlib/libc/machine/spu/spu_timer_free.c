@@ -34,7 +34,6 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <spu_timer.h>
 #include "spu_timer_internal.h"
 
-
 /* Frees an allocated timer. The timer must be in the stopped state for this
    to succeed. Maybe be called:
     * after allocated, before it's started
@@ -44,45 +43,42 @@ POSSIBILITY OF SUCH DAMAGE.
     * SPU_TIMER_ERR_FREE - id in free state
     * SPU_TIMER_ERR_ACTIVE - id in handled or active state  */
 int
-spu_timer_free (int id)
+spu_timer_free(int id)
 {
-  spu_timer_t *t, **pn;
-  unsigned was_enabled;
+    spu_timer_t *t, **pn;
+    unsigned     was_enabled;
 
-  if (id < 0 || id >= SPU_TIMER_NTIMERS)
-    return SPU_TIMER_ERR_INVALID_ID;
+    if (id < 0 || id >= SPU_TIMER_NTIMERS)
+        return SPU_TIMER_ERR_INVALID_ID;
 
-  if (__spu_timers[id].state == SPU_TIMER_STOPPED)
-    {
+    if (__spu_timers[id].state == SPU_TIMER_STOPPED) {
 
-      was_enabled = spu_readch (SPU_RdMachStat) & 0x1;
-      spu_idisable ();
+        was_enabled = spu_readch(SPU_RdMachStat) & 0x1;
+        spu_idisable();
 
-      t = __spu_timers_stopped;
-      pn = &__spu_timers_stopped;
+        t = __spu_timers_stopped;
+        pn = &__spu_timers_stopped;
 
-      while (t && (t->id != id))
-	{
-	  pn = &t->next;
-	  t = t->next;
-	}
+        while (t && (t->id != id)) {
+            pn = &t->next;
+            t = t->next;
+        }
 #ifdef SPU_TIMER_DEBUG
-      if (!t)
-	ABORT ();
+        if (!t)
+            ABORT();
 #endif
-      *pn = t->next;
+        *pn = t->next;
 
-      /* Add timer back to free list (mask).  */
-      __spu_timers_avail |= (1 << (id));
-      __spu_timers[id].state = SPU_TIMER_FREE;
+        /* Add timer back to free list (mask).  */
+        __spu_timers_avail |= (1 << (id));
+        __spu_timers[id].state = SPU_TIMER_FREE;
 
-      if (__likely (was_enabled))
-	spu_ienable ();
+        if (__likely(was_enabled))
+            spu_ienable();
 
-      return 0;
+        return 0;
     }
 
-  /* Handle invalid states.  */
-  return (__spu_timers[id].state == SPU_TIMER_FREE) ?
-	  SPU_TIMER_ERR_FREE : SPU_TIMER_ERR_ACTIVE;
+    /* Handle invalid states.  */
+    return (__spu_timers[id].state == SPU_TIMER_FREE) ? SPU_TIMER_ERR_FREE : SPU_TIMER_ERR_ACTIVE;
 }

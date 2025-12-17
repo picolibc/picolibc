@@ -36,18 +36,18 @@
 #include <stdlib.h>
 #include <semihost.h>
 
-#define NOT_BEFORE	1603853032
+#define NOT_BEFORE 1603853032
 
 int
 main(void)
 {
-	uintptr_t	now = sys_semihost_time();
+    uintptr_t now = sys_semihost_time();
 
-	if (now < NOT_BEFORE) {
-		printf("time %ld is too old\n", (long) now);
-		if (sizeof(uintptr_t) > 4)
-			exit(1);
-		printf("could be 2038 wrap, ignoring (sigh)\n");
-	}
-	exit(0);
+    if (now < NOT_BEFORE) {
+        printf("time %ld is too old\n", (long)now);
+        if (sizeof(uintptr_t) > 4)
+            exit(1);
+        printf("could be 2038 wrap, ignoring (sigh)\n");
+    }
+    exit(0);
 }

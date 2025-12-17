@@ -28,11 +28,11 @@
 #include <math.h>
 
 double
-round (double x)
+round(double x)
 {
-  double result;
-  __asm__("frinta\t%d0, %d1" : "=w" (result) : "w" (x));
-  return result;
+    double result;
+    __asm__("frinta\t%d0, %d1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

@@ -44,26 +44,25 @@ static const char *expect_argv[] = { "program-name", "hello", "world" };
 int
 main(int argc, char **argv)
 {
-        unsigned c;
-        int errors = 0;
+    unsigned c;
+    int      errors = 0;
 
-        if (argc == 0) {
-                printf("argv not supported\n");
-                exit(77);
-        }
+    if (argc == 0) {
+        printf("argv not supported\n");
+        exit(77);
+    }
 
-        if (argc != EXPECT_NARG) {
-                printf("argc is %d expect %d\n", argc, (int) EXPECT_NARG);
+    if (argc != EXPECT_NARG) {
+        printf("argc is %d expect %d\n", argc, (int)EXPECT_NARG);
+        errors = 1;
+    }
+    for (c = 0; (int)c < argc; c++) {
+        if (c < EXPECT_NARG) {
+            if (strcmp(argv[c], expect_argv[c]) != 0) {
+                printf("argv[%d] is '%s' expect '%s'\n", c, argv[c], expect_argv[c]);
                 errors = 1;
+            }
         }
-        for (c = 0; (int) c < argc; c++) {
-                if (c < EXPECT_NARG) {
-                        if (strcmp(argv[c], expect_argv[c]) != 0) {
-                                printf("argv[%d] is '%s' expect '%s'\n",
-                                       c, argv[c], expect_argv[c]);
-                                errors = 1;
-                        }
-                }
-        }
-        return errors;
+    }
+    return errors;
 }

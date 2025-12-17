@@ -55,28 +55,27 @@ typedef int fexcept_t;
 #endif
 
 /* Exception flags */
-#define	FE_INVALID	0x0040
-#define	FE_DIVBYZERO	0x0020
+#define FE_INVALID   0x0040
+#define FE_DIVBYZERO 0x0020
 #if defined(__SH2E__)
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INVALID)
+#define FE_ALL_EXCEPT (FE_DIVBYZERO | FE_INVALID)
 #else
-#define	FE_OVERFLOW	0x0010
-#define	FE_UNDERFLOW	0x0008
-#define	FE_INEXACT	0x0004
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
-    FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
+#define FE_OVERFLOW   0x0010
+#define FE_UNDERFLOW  0x0008
+#define FE_INEXACT    0x0004
+#define FE_ALL_EXCEPT (FE_DIVBYZERO | FE_INEXACT | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
 #endif
 
 /* Rounding modes */
-#define	FE_TONEAREST		0x0000
-#define	FE_TOWARDZERO		0x0001
+#define FE_TONEAREST  0x0000
+#define FE_TOWARDZERO 0x0001
 
 #else
-#define	FE_TONEAREST		0x0000
+#define FE_TONEAREST 0x0000
 #endif
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
-#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#define __declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline
@@ -89,4 +88,4 @@ typedef int fexcept_t;
 
 _END_STD_C
 
-#endif	/* _MACHINE_FENV_H_ */ 
+#endif /* _MACHINE_FENV_H_ */

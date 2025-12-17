@@ -46,5 +46,6 @@ _exit(int code)
     struct lm32_scall_ret ret;
 
     lm32_scall(&args, &ret);
-    for(;;);
+    for (;;)
+        ;
 }

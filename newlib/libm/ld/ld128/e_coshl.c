@@ -47,55 +47,53 @@
  */
 
 static const long double one = 1.0L, half = 0.5L, huge = 1.0e4900L,
-ovf_thresh = 1.1357216553474703894801348310092223067821E4L;
+                         ovf_thresh = 1.1357216553474703894801348310092223067821E4L;
 
 long double
 coshl(long double x)
 {
-  long double t, w;
-  int32_t ex;
-  ieee_quad_shape_type u;
+    long double          t, w;
+    int32_t              ex;
+    ieee_quad_shape_type u;
 
-  u.value = x;
-  ex = u.parts32.mswhi & 0x7fffffff;
+    u.value = x;
+    ex = u.parts32.mswhi & 0x7fffffff;
 
-  /* Absolute value of x.  */
-  u.parts32.mswhi = ex;
+    /* Absolute value of x.  */
+    u.parts32.mswhi = ex;
 
-  /* x is INF or NaN */
-  if (ex >= 0x7fff0000)
-    return x * x;
+    /* x is INF or NaN */
+    if (ex >= 0x7fff0000)
+        return x * x;
 
-  /* |x| in [0,0.5*ln2], return 1+expm1l(|x|)^2/(2*expl(|x|)) */
-  if (ex < 0x3ffd62e4) /* 0.3465728759765625 */
+    /* |x| in [0,0.5*ln2], return 1+expm1l(|x|)^2/(2*expl(|x|)) */
+    if (ex < 0x3ffd62e4) /* 0.3465728759765625 */
     {
-      if (ex < 0x3fb80000) /* |x| < 2^-116 */
-	return one;		/* cosh(tiny) = 1 */
-      t = expm1l (u.value);
-      w = one + t;
+        if (ex < 0x3fb80000) /* |x| < 2^-116 */
+            return one;      /* cosh(tiny) = 1 */
+        t = expm1l(u.value);
+        w = one + t;
 
-      return one + (t * t) / (w + w);
+        return one + (t * t) / (w + w);
     }
 
-  /* |x| in [0.5*ln2,40], return (exp(|x|)+1/exp(|x|)/2; */
-  if (ex < 0x40044000)
-    {
-      t = expl (u.value);
-      return half * t + half / t;
+    /* |x| in [0.5*ln2,40], return (exp(|x|)+1/exp(|x|)/2; */
+    if (ex < 0x40044000) {
+        t = expl(u.value);
+        return half * t + half / t;
     }
 
-  /* |x| in [22, ln(maxdouble)] return half*exp(|x|) */
-  if (ex <= 0x400c62e3) /* 11356.375 */
-    return half * expl (u.value);
+    /* |x| in [22, ln(maxdouble)] return half*exp(|x|) */
+    if (ex <= 0x400c62e3) /* 11356.375 */
+        return half * expl(u.value);
 
-  /* |x| in [log(maxdouble), overflowthresold] */
-  if (u.value <= ovf_thresh)
-    {
-      w = expl (half * u.value);
-      t = half * w;
-      return t * w;
+    /* |x| in [log(maxdouble), overflowthresold] */
+    if (u.value <= ovf_thresh) {
+        w = expl(half * u.value);
+        t = half * w;
+        return t * w;
     }
 
-  /* |x| > overflowthresold, cosh(x) overflow */
-  return __math_oflowl(0);
+    /* |x| > overflowthresold, cosh(x) overflow */
+    return __math_oflowl(0);
 }

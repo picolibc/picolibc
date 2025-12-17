@@ -40,21 +40,21 @@
 
 #ifdef __PICOLIBC__
 
-# define IO_T ssize_t
-# define BUF_T void
-# define SEEK_T __off_t
+#define IO_T   ssize_t
+#define BUF_T  void
+#define SEEK_T __off_t
 
-static char test_buf[1024];
+static char   test_buf[1024];
 static SEEK_T test_pos;
 static SEEK_T test_end;
 
-#define min(a, b)  ((SEEK_T) (a) < (SEEK_T) (b) ? (SEEK_T) (a) : (SEEK_T) (b))
-#define max(a, b)  ((SEEK_T) (a) > (SEEK_T) (b) ? (SEEK_T) (a) : (SEEK_T) (b))
+#define min(a, b) ((SEEK_T)(a) < (SEEK_T)(b) ? (SEEK_T)(a) : (SEEK_T)(b))
+#define max(a, b) ((SEEK_T)(a) > (SEEK_T)(b) ? (SEEK_T)(a) : (SEEK_T)(b))
 
 static IO_T
 test_read(void *cookie, BUF_T *buf, size_t n)
 {
-    (void) cookie;
+    (void)cookie;
     n = min(n, test_end - test_pos);
     memcpy(buf, test_buf + test_pos, n);
     test_pos += n;
@@ -64,7 +64,7 @@ test_read(void *cookie, BUF_T *buf, size_t n)
 static IO_T
 test_write(void *cookie, const BUF_T *buf, size_t n)
 {
-    (void) cookie;
+    (void)cookie;
     n = min(n, sizeof(test_buf) - test_pos);
     memcpy(test_buf + test_pos, buf, n);
     test_pos += n;
@@ -76,7 +76,7 @@ static SEEK_T
 test_seek(void *cookie, SEEK_T off, int whence)
 {
     SEEK_T new_pos = test_pos;
-    (void) cookie;
+    (void)cookie;
     switch (whence) {
     case SEEK_CUR:
         new_pos = test_pos + off;
@@ -95,24 +95,26 @@ test_seek(void *cookie, SEEK_T off, int whence)
 static int
 test_close(void *cookie)
 {
-    (void) cookie;
+    (void)cookie;
     return 0;
 }
 
-#define check(condition, message) do {                  \
-        if (!(condition)) {                             \
-            printf("%s: %s\n", message, #condition);    \
-            exit(1);                                    \
-        }                                               \
-    } while(0)
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            exit(1);                                 \
+        }                                            \
+    } while (0)
 
 #define MESSAGE "hello, world"
 
-int main(void)
+int
+main(void)
 {
-    FILE        *fp = funopen(NULL, test_read, test_write, test_seek, test_close);
-    char        buf[sizeof(MESSAGE)];
-    size_t      ret;
+    FILE  *fp = funopen(NULL, test_read, test_write, test_seek, test_close);
+    char   buf[sizeof(MESSAGE)];
+    size_t ret;
 
     fprintf(fp, "%s", MESSAGE);
     fflush(fp);
@@ -126,7 +128,8 @@ int main(void)
 }
 
 #else
-int main(void)
+int
+main(void)
 {
     printf("funopen only available on picolibc\n");
     return 77;
