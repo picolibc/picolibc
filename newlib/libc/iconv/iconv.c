@@ -144,7 +144,7 @@ fail:
     (void) ic;
 
     tocopy = inbytes;
-    if (tocopy < outbytes)
+    if (tocopy > outbytes)
         tocopy = outbytes;
     memcpy(out, in, tocopy);
     in += tocopy;
