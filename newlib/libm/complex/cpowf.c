@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -38,22 +38,22 @@
 float complex
 cpowf(float complex a, float complex z)
 {
-	float complex w;
-	float x, y, r, theta, absa, arga;
+    float complex w;
+    float         x, y, r, theta, absa, arga;
 
-	x = crealf(z);
-	y = cimagf(z);
-	absa = cabsf(a);
-	if (absa == 0.0f) {
-		return (0.0f + 0.0f * I);
-	}
-	arga = cargf(a);
-	r = powf(absa, x);
-	theta = x * arga;
-	if (y != 0.0f) {
-		r = r * expf(-y * arga);
-		theta = theta + y * logf(absa);
-	}
-	w = r * cosf(theta) + (r * sinf(theta)) * I;
-	return w;
+    x = crealf(z);
+    y = cimagf(z);
+    absa = cabsf(a);
+    if (absa == 0.0f) {
+        return (0.0f + 0.0f * I);
+    }
+    arga = cargf(a);
+    r = powf(absa, x);
+    theta = x * arga;
+    if (y != 0.0f) {
+        r = r * expf(-y * arga);
+        theta = theta + y * logf(absa);
+    }
+    w = r * cosf(theta) + (r * sinf(theta)) * I;
+    return w;
 }

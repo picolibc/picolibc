@@ -33,7 +33,7 @@
  */
 
 #ifndef _DIRENT_H_
-#define	_DIRENT_H_
+#define _DIRENT_H_
 
 #include <sys/cdefs.h>
 #include <sys/dirent.h>
@@ -44,44 +44,40 @@
 
 _BEGIN_STD_C
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 700
-int	 alphasort(const struct dirent **, const struct dirent **);
-int	 dirfd(DIR *);
+int alphasort(const struct dirent **, const struct dirent **);
+int dirfd(DIR *);
 #endif
 #if __BSD_VISIBLE
-int	 fdclosedir(DIR *);
+int fdclosedir(DIR *);
 #endif
-DIR	*opendir(const char *);
-DIR	*fdopendir(int);
-struct dirent *
-	 readdir(DIR *);
+DIR           *opendir(const char *);
+DIR           *fdopendir(int);
+struct dirent *readdir(DIR *);
 #if __POSIX_VISIBLE >= 199506 || __XSI_VISIBLE >= 500
-int	 readdir_r(DIR *__restrict, struct dirent *__restrict,
-	    struct dirent **__restrict);
+int readdir_r(DIR * __restrict, struct dirent * __restrict, struct dirent ** __restrict);
 #endif
-void	 rewinddir(DIR *);
+void rewinddir(DIR *);
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 700
-int	 scandir(const char *, struct dirent ***,
-	    int (*)(const struct dirent *), int (*)(const struct dirent **,
-	    const struct dirent **));
+int scandir(const char *, struct dirent ***, int (*)(const struct dirent *),
+            int (*)(const struct dirent **, const struct dirent **));
 #endif
 #ifdef _LIBC
-void	 _seekdir(DIR *, long);
+void _seekdir(DIR *, long);
 #endif
 #if __MISC_VISIBLE || __XSI_VISIBLE
 #ifndef __INSIDE_CYGWIN__
-void	 seekdir(DIR *, long);
-long	 telldir(DIR *);
+void seekdir(DIR *, long);
+long telldir(DIR *);
 #endif
 #endif
-int	 closedir(DIR *);
+int closedir(DIR *);
 #if __GNU_VISIBLE
-int	 scandirat(int, const char *, struct dirent ***,
-	    int (*) (const struct dirent *), int (*) (const struct dirent **,
-	    const struct dirent **));
-int	 versionsort(const struct dirent **, const struct dirent **);
+int scandirat(int, const char *, struct dirent ***, int (*)(const struct dirent *),
+              int (*)(const struct dirent **, const struct dirent **));
+int versionsort(const struct dirent **, const struct dirent **);
 #endif
 #if __POSIX_VISIBLE >= 202405
-ssize_t	posix_getdents(int, void *, size_t, int);
+ssize_t posix_getdents(int, void *, size_t, int);
 #endif /* __POSIX_VISIBLE >= 202405 */
 _END_STD_C
 

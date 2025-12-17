@@ -40,22 +40,22 @@
 #define TEST_FILE_NAME "FGETC.TXT"
 #endif
 
-#define check(condition, message) do {                  \
-        if (!(condition)) {                             \
-            printf("%s: %s\n", message, #condition);    \
-            if (f)                                      \
-                fclose(f);                              \
-            (void) remove(TEST_FILE_NAME);              \
-            exit(1);                                    \
-        }                                               \
-    } while(0)
-
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            if (f)                                   \
+                fclose(f);                           \
+            (void)remove(TEST_FILE_NAME);            \
+            exit(1);                                 \
+        }                                            \
+    } while (0)
 
 int
 main(void)
 {
     FILE *f;
-    int ch;
+    int   ch;
 
     /* Make sure we can create a file */
     f = fopen(TEST_FILE_NAME, "w");
@@ -69,12 +69,13 @@ main(void)
     check(ch == EOF, "fgetc returns non EOF");
 
     // Get error indicator after reading
-    check(ferror(f) != 0, "After reading from non readable stream, the error flag of straem f is not set");
+    check(ferror(f) != 0,
+          "After reading from non readable stream, the error flag of straem f is not set");
 
     // Close the file
     fclose(f);
 
-    (void) remove(TEST_FILE_NAME);
+    (void)remove(TEST_FILE_NAME);
 
     exit(0);
 }

@@ -8,29 +8,29 @@
 #include "../../fenv/fenv.c"
 #else
 
-#define _GNU_SOURCE        // for FE_NOMASK_ENV
+#define _GNU_SOURCE // for FE_NOMASK_ENV
 #define __STDC_WANT_IEC_60559_BFP_EXT__
 
 #include <fenv.h>
 #include <errno.h>
-#include <string.h>        // for memcpy 
+#include <string.h> // for memcpy
 #include <stdbool.h>
 
 /*  x87 supports subnormal numbers so we need it below. */
-#define __FE_DENORM	(1 << 1)
+#define __FE_DENORM              (1 << 1)
 /* mask (= 0x3f) to disable all exceptions at initialization */
-#define __FE_ALL_EXCEPT_X86 (FE_ALL_EXCEPT | __FE_DENORM)
+#define __FE_ALL_EXCEPT_X86      (FE_ALL_EXCEPT | __FE_DENORM)
 
 /*  Mask and shift amount for rounding bits.  */
-#define FE_CW_ROUND_MASK	(0x0c00)
-#define FE_CW_ROUND_SHIFT	(10)
+#define FE_CW_ROUND_MASK         (0x0c00)
+#define FE_CW_ROUND_SHIFT        (10)
 /*  Same, for SSE MXCSR.  */
-#define FE_MXCSR_ROUND_MASK	(0x6000)
-#define FE_MXCSR_ROUND_SHIFT	(13)
+#define FE_MXCSR_ROUND_MASK      (0x6000)
+#define FE_MXCSR_ROUND_SHIFT     (13)
 
 /*  Mask and shift amount for precision bits.  */
-#define FE_CW_PREC_MASK		(0x0300)
-#define FE_CW_PREC_SHIFT	(8)
+#define FE_CW_PREC_MASK          (0x0300)
+#define FE_CW_PREC_SHIFT         (8)
 
 /*  In x87, exception status bits and mask bits occupy
    corresponding bit positions in the status and control
@@ -41,10 +41,10 @@
 #define FE_SSE_EXCEPT_MASK_SHIFT (7)
 
 /* These are writable so we can initialise them at startup.  */
-static fenv_t fe_nomask_env;
+static fenv_t        fe_nomask_env;
 
 /* These pointers provide the outside world with read-only access to them.  */
-const fenv_t *const _fe_nomask_env = &fe_nomask_env;
+const fenv_t * const _fe_nomask_env = &fe_nomask_env;
 
 /* Assume i686 or above (hence SSE available) these days, with the
    compiler feels free to use it (depending on compile- time flags of
@@ -54,22 +54,23 @@ const fenv_t *const _fe_nomask_env = &fe_nomask_env;
    If we didn't do this, all applications run on older machines would bomb
    out with an invalid instruction exception right at startup; let's not
    be *that* WJM!  */
-static inline bool use_sse(void)
+static inline bool
+use_sse(void)
 {
-  unsigned int edx, eax;
+    unsigned int edx, eax;
 
-  /* Check for presence of SSE: invoke CPUID #1, check EDX bit 25.  */
-  eax = 1;
-  __asm__ volatile ("cpuid" : "=d" (edx), "+a" (eax) :: "%ecx", "%ebx");
-  /* If this flag isn't set we'll avoid trying to execute any SSE.  */
-  if ((edx & (1 << 25)) != 0)
-    return true;
+    /* Check for presence of SSE: invoke CPUID #1, check EDX bit 25.  */
+    eax = 1;
+    __asm__ volatile("cpuid" : "=d"(edx), "+a"(eax)::"%ecx", "%ebx");
+    /* If this flag isn't set we'll avoid trying to execute any SSE.  */
+    if ((edx & (1 << 25)) != 0)
+        return true;
 
-  return false;
+    return false;
 }
 
 /* forward declaration */
-static void _feinitialise (void);
+static void _feinitialise(void);
 
 /*  This function enables traps for each of the exceptions as indicated
    by the parameter except. The individual exceptions are described in
@@ -78,33 +79,33 @@ static void _feinitialise (void);
     The function returns the previous enabled exceptions in case the
    operation was successful, -1 otherwise.  */
 int
-feenableexcept (int excepts)
+feenableexcept(int excepts)
 {
-  unsigned short cw, old_cw;
-  unsigned int mxcsr = 0;
+    unsigned short cw, old_cw;
+    unsigned int   mxcsr = 0;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return -1;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return -1;
 
-  /* Get control words.  */
-  __asm__ volatile ("fnstcw %0" : "=m" (old_cw) : );
-  if (use_sse())
-    __asm__ volatile ("stmxcsr %0" : "=m" (mxcsr) : );
+    /* Get control words.  */
+    __asm__ volatile("fnstcw %0" : "=m"(old_cw) :);
+    if (use_sse())
+        __asm__ volatile("stmxcsr %0" : "=m"(mxcsr) :);
 
-  /* Enable exceptions by clearing mask bits.  */
-  cw = old_cw & ~excepts;
-  mxcsr &= ~(excepts << FE_SSE_EXCEPT_MASK_SHIFT);
+    /* Enable exceptions by clearing mask bits.  */
+    cw = old_cw & ~excepts;
+    mxcsr &= ~(excepts << FE_SSE_EXCEPT_MASK_SHIFT);
 
-  /* Store updated control words.  */
-  __asm__ volatile ("fldcw %0" :: "m" (cw));
-  if (use_sse())
-    __asm__ volatile ("ldmxcsr %0" :: "m" (mxcsr));
+    /* Store updated control words.  */
+    __asm__ volatile("fldcw %0" ::"m"(cw));
+    if (use_sse())
+        __asm__ volatile("ldmxcsr %0" ::"m"(mxcsr));
 
-  /* Return old value.  We assume SSE and x87 stay in sync.  Note that
-     we are returning a mask of enabled exceptions, which is the opposite
-     of the flags in the register, which are set to disable (mask) their
-     related exceptions.  */
-  return (~old_cw) & FE_ALL_EXCEPT;
+    /* Return old value.  We assume SSE and x87 stay in sync.  Note that
+       we are returning a mask of enabled exceptions, which is the opposite
+       of the flags in the register, which are set to disable (mask) their
+       related exceptions.  */
+    return (~old_cw) & FE_ALL_EXCEPT;
 }
 
 /*  This function disables traps for each of the exceptions as indicated
@@ -114,63 +115,64 @@ feenableexcept (int excepts)
     The function returns the previous enabled exceptions in case the
    operation was successful, -1 otherwise.  */
 int
-fedisableexcept (int excepts)
+fedisableexcept(int excepts)
 {
-  unsigned short cw, old_cw;
-  unsigned int mxcsr = 0;
+    unsigned short cw, old_cw;
+    unsigned int   mxcsr = 0;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return -1;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return -1;
 
-  /* Get control words.  */
-  __asm__ volatile ("fnstcw %0" : "=m" (old_cw) : );
-  if (use_sse())
-    __asm__ volatile ("stmxcsr %0" : "=m" (mxcsr) : );
+    /* Get control words.  */
+    __asm__ volatile("fnstcw %0" : "=m"(old_cw) :);
+    if (use_sse())
+        __asm__ volatile("stmxcsr %0" : "=m"(mxcsr) :);
 
-  /* Disable exceptions by setting mask bits.  */
-  cw = old_cw | excepts;
-  mxcsr |= (excepts << FE_SSE_EXCEPT_MASK_SHIFT);
+    /* Disable exceptions by setting mask bits.  */
+    cw = old_cw | excepts;
+    mxcsr |= (excepts << FE_SSE_EXCEPT_MASK_SHIFT);
 
-  /* Store updated control words.  */
-  __asm__ volatile ("fldcw %0" :: "m" (cw));
-  if (use_sse())
-    __asm__ volatile ("ldmxcsr %0" :: "m" (mxcsr));
+    /* Store updated control words.  */
+    __asm__ volatile("fldcw %0" ::"m"(cw));
+    if (use_sse())
+        __asm__ volatile("ldmxcsr %0" ::"m"(mxcsr));
 
-  /* Return old value.  We assume SSE and x87 stay in sync.  Note that
-     we are returning a mask of enabled exceptions, which is the opposite
-     of the flags in the register, which are set to disable (mask) their
-     related exceptions.  */
-  return (~old_cw) & FE_ALL_EXCEPT;
+    /* Return old value.  We assume SSE and x87 stay in sync.  Note that
+       we are returning a mask of enabled exceptions, which is the opposite
+       of the flags in the register, which are set to disable (mask) their
+       related exceptions.  */
+    return (~old_cw) & FE_ALL_EXCEPT;
 }
 
 /*  This function returns a bitmask of all currently enabled exceptions. It
    returns -1 in case of failure.  */
 int
-fegetexcept (void)
+fegetexcept(void)
 {
-  unsigned short cw;
+    unsigned short cw;
 
-  /* Get control word.  We assume SSE and x87 stay in sync.  */
-  __asm__ volatile ("fnstcw %0" : "=m" (cw) : );
+    /* Get control word.  We assume SSE and x87 stay in sync.  */
+    __asm__ volatile("fnstcw %0" : "=m"(cw) :);
 
-  /* Exception is *dis*abled when mask bit is set.  */
-  return (~cw) & FE_ALL_EXCEPT;
+    /* Exception is *dis*abled when mask bit is set.  */
+    return (~cw) & FE_ALL_EXCEPT;
 }
 
 /*  Store the floating-point environment in the variable pointed to by envp.
    The function returns zero in case the operation was successful, a non-zero
    value otherwise.  */
 int
-fegetenv (fenv_t *envp)
+fegetenv(fenv_t *envp)
 {
-  /* fnstenv disables all exceptions in the x87 FPU; as this is not what is
-     desired here, reload the cfg saved from the x87 FPU, back to the FPU */
-  __asm__ volatile ("fnstenv %0\n\
+    /* fnstenv disables all exceptions in the x87 FPU; as this is not what is
+       desired here, reload the cfg saved from the x87 FPU, back to the FPU */
+    __asm__ volatile("fnstenv %0\n\
                      fldenv %0"
-		    : "=m" (envp->_fpu) : );
-  if (use_sse())
-    __asm__ volatile ("stmxcsr %0" : "=m" (envp->_sse_mxcsr) : );
-  return 0;
+                     : "=m"(envp->_fpu)
+                     :);
+    if (use_sse())
+        __asm__ volatile("stmxcsr %0" : "=m"(envp->_sse_mxcsr) :);
+    return 0;
 }
 
 /*  Store the current floating-point environment in the object pointed to
@@ -179,32 +181,31 @@ fegetenv (fenv_t *envp)
    cannot set this mode, it returns nonzero value.  If it succeeds, it
    returns zero.  */
 int
-feholdexcept (fenv_t *envp)
+feholdexcept(fenv_t *envp)
 {
-  unsigned int mxcsr;
-  fegetenv (envp);
-  mxcsr = envp->_sse_mxcsr & ~FE_ALL_EXCEPT;
-  if (use_sse())
-    __asm__ volatile ("ldmxcsr %0" :: "m" (mxcsr));
-  __asm__ volatile ("fnclex");
-  fedisableexcept (FE_ALL_EXCEPT);
-  return 0;
+    unsigned int mxcsr;
+    fegetenv(envp);
+    mxcsr = envp->_sse_mxcsr & ~FE_ALL_EXCEPT;
+    if (use_sse())
+        __asm__ volatile("ldmxcsr %0" ::"m"(mxcsr));
+    __asm__ volatile("fnclex");
+    fedisableexcept(FE_ALL_EXCEPT);
+    return 0;
 }
 
 /*  Set the floating-point environment to that described by envp.  The
    function returns zero in case the operation was successful, a non-zero
    value otherwise.  */
 int
-fesetenv (const fenv_t *envp)
+fesetenv(const fenv_t *envp)
 {
-   if ((envp == FE_DFL_ENV || envp == FE_NOMASK_ENV) &&
-       envp->_fpu._fpu_cw == 0)
-     _feinitialise ();
+    if ((envp == FE_DFL_ENV || envp == FE_NOMASK_ENV) && envp->_fpu._fpu_cw == 0)
+        _feinitialise();
 
-  __asm__ volatile ("fldenv %0" :: "m" (envp->_fpu) );
-  if (use_sse())
-    __asm__ volatile ("ldmxcsr %0" :: "m" (envp->_sse_mxcsr));
-  return 0;
+    __asm__ volatile("fldenv %0" ::"m"(envp->_fpu));
+    if (use_sse())
+        __asm__ volatile("ldmxcsr %0" ::"m"(envp->_sse_mxcsr));
+    return 0;
 }
 
 /*  Like fesetenv, this function sets the floating-point environment to
@@ -215,44 +216,44 @@ fesetenv (const fenv_t *envp)
    in envp.  The function returns zero in case the operation was successful,
    a non-zero value otherwise.  */
 int
-feupdateenv (const fenv_t *envp)
+feupdateenv(const fenv_t *envp)
 {
-  fenv_t envcopy;
-  unsigned int mxcsr = 0;
-  unsigned short sw;
+    fenv_t         envcopy;
+    unsigned int   mxcsr = 0;
+    unsigned short sw;
 
-  /* Don't want to modify *envp, but want to update environment atomically,
-     so take a copy and merge the existing exceptions into it.  */
-  memcpy (&envcopy, envp, sizeof *envp);
-  __asm__ volatile ("fnstsw %0" : "=m" (sw) : );
-  if (use_sse())
-    __asm__ volatile ("stmxcsr %0" : "=m" (mxcsr) : );
-  envcopy._fpu._fpu_sw |= (sw & FE_ALL_EXCEPT);
-  envcopy._sse_mxcsr |= (mxcsr & FE_ALL_EXCEPT);
+    /* Don't want to modify *envp, but want to update environment atomically,
+       so take a copy and merge the existing exceptions into it.  */
+    memcpy(&envcopy, envp, sizeof *envp);
+    __asm__ volatile("fnstsw %0" : "=m"(sw) :);
+    if (use_sse())
+        __asm__ volatile("stmxcsr %0" : "=m"(mxcsr) :);
+    envcopy._fpu._fpu_sw |= (sw & FE_ALL_EXCEPT);
+    envcopy._sse_mxcsr |= (mxcsr & FE_ALL_EXCEPT);
 
-  return fesetenv (&envcopy);
+    return fesetenv(&envcopy);
 }
 
 /*  This function clears all of the supported exception flags indicated by
    excepts.  The function returns zero in case the operation was successful,
    a non-zero value otherwise.  */
 int
-feclearexcept (int excepts)
+feclearexcept(int excepts)
 {
-  fenv_t fenv;
+    fenv_t fenv;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return EINVAL;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return EINVAL;
 
-  /* Need to save/restore whole environment to modify status word.  */
-  fegetenv (&fenv);
+    /* Need to save/restore whole environment to modify status word.  */
+    fegetenv(&fenv);
 
-  /* Mask undesired bits out.  */
-  fenv._fpu._fpu_sw &= ~excepts;
-  fenv._sse_mxcsr &= ~excepts;
+    /* Mask undesired bits out.  */
+    fenv._fpu._fpu_sw &= ~excepts;
+    fenv._sse_mxcsr &= ~excepts;
 
-  /* Set back into FPU state.  */
-  return fesetenv (&fenv);
+    /* Set back into FPU state.  */
+    return fesetenv(&fenv);
 }
 
 /*  This function raises the supported exceptions indicated by
@@ -263,129 +264,129 @@ feclearexcept (int excepts)
    is also raised is also implementation dependent.  The function returns
    zero in case the operation was successful, a non-zero value otherwise.  */
 int
-feraiseexcept (int excepts)
+feraiseexcept(int excepts)
 {
-  fenv_t fenv;
+    fenv_t fenv;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return EINVAL;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return EINVAL;
 
-  /* Need to save/restore whole environment to modify status word.  */
-  __asm__ volatile ("fnstenv %0" : "=m" (fenv) : );
+    /* Need to save/restore whole environment to modify status word.  */
+    __asm__ volatile("fnstenv %0" : "=m"(fenv) :);
 
-  /* Set desired exception bits.  */
-  fenv._fpu._fpu_sw |= excepts;
+    /* Set desired exception bits.  */
+    fenv._fpu._fpu_sw |= excepts;
 
-  /* Set back into FPU state.  */
-  __asm__ volatile ("fldenv %0" :: "m" (fenv));
+    /* Set back into FPU state.  */
+    __asm__ volatile("fldenv %0" ::"m"(fenv));
 
-  /* And trigger them - whichever are unmasked.  */
-  __asm__ volatile ("fwait");
+    /* And trigger them - whichever are unmasked.  */
+    __asm__ volatile("fwait");
 
-  return 0;
+    return 0;
 }
 
 /*  This function sets the supported exceptions indicated by
    excepts.  The function returns
    zero in case the operation was successful, a non-zero value otherwise.  */
 int
-fesetexcept (int excepts)
+fesetexcept(int excepts)
 {
-  fenv_t fenv;
+    fenv_t fenv;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return EINVAL;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return EINVAL;
 
-  /* Need to save/restore whole environment to modify status word.  */
-  __asm__ volatile ("fnstenv %0" : "=m" (fenv) : );
+    /* Need to save/restore whole environment to modify status word.  */
+    __asm__ volatile("fnstenv %0" : "=m"(fenv) :);
 
-  /* Set desired exception bits.  */
-  fenv._fpu._fpu_sw |= excepts;
+    /* Set desired exception bits.  */
+    fenv._fpu._fpu_sw |= excepts;
 
-  /* Set back into FPU state.  */
-  __asm__ volatile ("fldenv %0" :: "m" (fenv));
+    /* Set back into FPU state.  */
+    __asm__ volatile("fldenv %0" ::"m"(fenv));
 
-  return 0;
+    return 0;
 }
 
 /*  Test whether the exception flags indicated by the parameter except
    are currently set. If any of them are, a nonzero value is returned
    which specifies which exceptions are set. Otherwise the result is zero.  */
 int
-fetestexcept (int excepts)
+fetestexcept(int excepts)
 {
-  unsigned short sw;
-  unsigned int mxcsr = 0;
+    unsigned short sw;
+    unsigned int   mxcsr = 0;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return EINVAL;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return EINVAL;
 
-  /* Get status registers.  */
-  __asm__ volatile ("fnstsw %0" : "=m" (sw) : );
-  if (use_sse())
-    __asm__ volatile ("stmxcsr %0" : "=m" (mxcsr) : );
+    /* Get status registers.  */
+    __asm__ volatile("fnstsw %0" : "=m"(sw) :);
+    if (use_sse())
+        __asm__ volatile("stmxcsr %0" : "=m"(mxcsr) :);
 
-  /* Mask undesired bits out and return result.  */
-  return (sw | mxcsr) & excepts;
+    /* Mask undesired bits out and return result.  */
+    return (sw | mxcsr) & excepts;
 }
 /*  This function stores in the variable pointed to by flagp an
    implementation-defined value representing the current setting of the
    exception flags indicated by excepts.  The function returns zero in
    case the operation was successful, a non-zero value otherwise.  */
 int
-fegetexceptflag (fexcept_t *flagp, int excepts)
+fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-  unsigned short sw;
-  unsigned int mxcsr = 0;
+    unsigned short sw;
+    unsigned int   mxcsr = 0;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return EINVAL;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return EINVAL;
 
-  /* Get status registers.  */
-  __asm__ volatile ("fnstsw %0" : "=m" (sw) : );
-  if (use_sse())
-    __asm__ volatile ("stmxcsr %0" : "=m" (mxcsr) : );
+    /* Get status registers.  */
+    __asm__ volatile("fnstsw %0" : "=m"(sw) :);
+    if (use_sse())
+        __asm__ volatile("stmxcsr %0" : "=m"(mxcsr) :);
 
-  /* Mask undesired bits out and set result.  */
-  *flagp = (sw | mxcsr) & excepts;
+    /* Mask undesired bits out and set result.  */
+    *flagp = (sw | mxcsr) & excepts;
 
-  return 0;
+    return 0;
 }
 
 /*  This function restores the flags for the exceptions indicated by
    excepts to the values stored in the variable pointed to by flagp.  */
 int
-fesetexceptflag (const fexcept_t *flagp, int excepts)
+fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-  fenv_t fenv;
+    fenv_t fenv;
 
-  if (excepts & ~FE_ALL_EXCEPT)
-    return EINVAL;
+    if (excepts & ~FE_ALL_EXCEPT)
+        return EINVAL;
 
-  /* Need to save/restore whole environment to modify status word.  */
-  fegetenv (&fenv);
+    /* Need to save/restore whole environment to modify status word.  */
+    fegetenv(&fenv);
 
-  /* Set/Clear desired exception bits.  */
-  fenv._fpu._fpu_sw &= ~excepts;
-  fenv._fpu._fpu_sw |= excepts & *flagp;
-  fenv._sse_mxcsr &= ~excepts;
-  fenv._sse_mxcsr |= excepts & *flagp;
+    /* Set/Clear desired exception bits.  */
+    fenv._fpu._fpu_sw &= ~excepts;
+    fenv._fpu._fpu_sw |= excepts & *flagp;
+    fenv._sse_mxcsr &= ~excepts;
+    fenv._sse_mxcsr |= excepts & *flagp;
 
-  /* Set back into FPU state.  */
-  return fesetenv (&fenv);
+    /* Set back into FPU state.  */
+    return fesetenv(&fenv);
 }
 
 /*  Returns the currently selected rounding mode, represented by one of the
    values of the defined rounding mode macros.  */
 int
-fegetround (void)
+fegetround(void)
 {
-  unsigned short cw;
+    unsigned short cw;
 
-  /* Get control word.  We assume SSE and x87 stay in sync.  */
-  __asm__ volatile ("fnstcw %0" : "=m" (cw) : );
+    /* Get control word.  We assume SSE and x87 stay in sync.  */
+    __asm__ volatile("fnstcw %0" : "=m"(cw) :);
 
-  return (cw & FE_CW_ROUND_MASK) >> FE_CW_ROUND_SHIFT;
+    return (cw & FE_CW_ROUND_MASK) >> FE_CW_ROUND_SHIFT;
 }
 
 /*  Changes the currently selected rounding mode to round. If round does
@@ -393,60 +394,59 @@ fegetround (void)
    fesetround returns zero if it changed the rounding mode, a nonzero value
    if the mode is not supported.  */
 int
-fesetround (int round)
+fesetround(int round)
 {
-  unsigned short cw;
-  unsigned int mxcsr = 0;
+    unsigned short cw;
+    unsigned int   mxcsr = 0;
 
-  /* Will succeed for any valid value of the input parameter.  */
-  if (round < FE_TONEAREST || round > FE_TOWARDZERO)
-    return EINVAL;
+    /* Will succeed for any valid value of the input parameter.  */
+    if (round < FE_TONEAREST || round > FE_TOWARDZERO)
+        return EINVAL;
 
-  /* Get control words.  */
-  __asm__ volatile ("fnstcw %0" : "=m" (cw) : );
-  if (use_sse())
-    __asm__ volatile ("stmxcsr %0" : "=m" (mxcsr) : );
+    /* Get control words.  */
+    __asm__ volatile("fnstcw %0" : "=m"(cw) :);
+    if (use_sse())
+        __asm__ volatile("stmxcsr %0" : "=m"(mxcsr) :);
 
-  /* Twiddle bits.  */
-  cw &= ~FE_CW_ROUND_MASK;
-  cw |= (round << FE_CW_ROUND_SHIFT);
-  mxcsr &= ~FE_MXCSR_ROUND_MASK;
-  mxcsr |= (round << FE_MXCSR_ROUND_SHIFT);
+    /* Twiddle bits.  */
+    cw &= ~FE_CW_ROUND_MASK;
+    cw |= (round << FE_CW_ROUND_SHIFT);
+    mxcsr &= ~FE_MXCSR_ROUND_MASK;
+    mxcsr |= (round << FE_MXCSR_ROUND_SHIFT);
 
-  /* Set back into FPU state.  */
-  __asm__ volatile ("fldcw %0" :: "m" (cw));
-  if (use_sse())
-    __asm__ volatile ("ldmxcsr %0" :: "m" (mxcsr));
+    /* Set back into FPU state.  */
+    __asm__ volatile("fldcw %0" ::"m"(cw));
+    if (use_sse())
+        __asm__ volatile("ldmxcsr %0" ::"m"(mxcsr));
 
-  /* Indicate success.  */
-  return 0;
+    /* Indicate success.  */
+    return 0;
 }
-
 
 /*  Set up the FPU and SSE environment at the start of execution.  */
 static void
-_feinitialise (void)
+_feinitialise(void)
 {
-  /* Reset FPU: extended prec, all exceptions cleared and masked off.  */
-  __asm__ volatile ("fninit");
-  /* The default cw value, 0x37f, is rounding mode zero.  The MXCSR has
-     no precision control, so the only thing to do is set the exception
-     mask bits.  */
+    /* Reset FPU: extended prec, all exceptions cleared and masked off.  */
+    __asm__ volatile("fninit");
+    /* The default cw value, 0x37f, is rounding mode zero.  The MXCSR has
+       no precision control, so the only thing to do is set the exception
+       mask bits.  */
 
-  /* initialize the MXCSR register: mask all exceptions */
-  unsigned int mxcsr = __FE_ALL_EXCEPT_X86 << FE_SSE_EXCEPT_MASK_SHIFT;
-  if (use_sse())
-    __asm__ volatile ("ldmxcsr %0" :: "m" (mxcsr));
+    /* initialize the MXCSR register: mask all exceptions */
+    unsigned int mxcsr = __FE_ALL_EXCEPT_X86 << FE_SSE_EXCEPT_MASK_SHIFT;
+    if (use_sse())
+        __asm__ volatile("ldmxcsr %0" ::"m"(mxcsr));
 
-  /* Setup unmasked environment, but leave __FE_DENORM masked.  */
-  feenableexcept (FE_ALL_EXCEPT);
-  fegetenv (&fe_nomask_env);
+    /* Setup unmasked environment, but leave __FE_DENORM masked.  */
+    feenableexcept(FE_ALL_EXCEPT);
+    fegetenv(&fe_nomask_env);
 
-  /* Restore default exception masking (all masked).  */
-  fedisableexcept (FE_ALL_EXCEPT);
+    /* Restore default exception masking (all masked).  */
+    fedisableexcept(FE_ALL_EXCEPT);
 
-  /* Finally cache state as default environment. */
-  fegetenv (&_fe_dfl_env);
+    /* Finally cache state as default environment. */
+    fegetenv(&_fe_dfl_env);
 }
 
 #endif /* _SOFT_FLOAT */

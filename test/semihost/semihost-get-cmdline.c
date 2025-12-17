@@ -42,16 +42,16 @@
 int
 main(void)
 {
-	char	buf[PATH_MAX];
-	int	ret;
-	ret = sys_semihost_get_cmdline(buf, PATH_MAX);
-	if (ret != 0) {
-		printf("get_cmdline failed %d %d\n", ret, sys_semihost_errno());
-		exit(1);
-	}
-	if (strcmp(buf, COMMAND_LINE) != 0) {
-		printf("cmdline %s (expected %s)\n", buf, COMMAND_LINE);
-		exit(2);
-	}
-	exit(0);
+    char buf[PATH_MAX];
+    int  ret;
+    ret = sys_semihost_get_cmdline(buf, PATH_MAX);
+    if (ret != 0) {
+        printf("get_cmdline failed %d %d\n", ret, sys_semihost_errno());
+        exit(1);
+    }
+    if (strcmp(buf, COMMAND_LINE) != 0) {
+        printf("cmdline %s (expected %s)\n", buf, COMMAND_LINE);
+        exit(2);
+    }
+    exit(0);
 }

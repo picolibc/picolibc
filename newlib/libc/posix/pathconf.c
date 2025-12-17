@@ -39,9 +39,9 @@
 #include <limits.h>
 
 long
-pathconf (const char *path, int name)
+pathconf(const char *path, int name)
 {
-    (void) path;
+    (void)path;
     switch (name) {
     case _PC_LINK_MAX:
         return _POSIX_LINK_MAX;

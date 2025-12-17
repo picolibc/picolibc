@@ -36,10 +36,10 @@
 #include "stdio_private.h"
 
 void
-perror (const char *msg)
+perror(const char *msg)
 {
-	int err = errno;
-	if (msg && *msg)
-		fprintf(stderr, "%s: ", msg);
-	fprintf(stderr, "%s\n", strerror(err));
+    int err = errno;
+    if (msg && *msg)
+        fprintf(stderr, "%s: ", msg);
+    fprintf(stderr, "%s\n", strerror(err));
 }

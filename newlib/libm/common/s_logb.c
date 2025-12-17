@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -14,12 +14,12 @@
 FUNCTION
        <<logb>>, <<logbf>>---get exponent of floating-point number
 INDEX
-	logb
+        logb
 INDEX
-	logbf
+        logbf
 
 SYNOPSIS
-	#include <math.h>
+        #include <math.h>
         double logb(double <[x]>);
         float logbf(float <[x]>);
 
@@ -78,26 +78,29 @@ frexp, ilogb
 __float64
 logb64(__float64 x)
 {
-	__int32_t hx,lx,ix;
+    __int32_t hx, lx, ix;
 
-	EXTRACT_WORDS(hx,lx,x);
-	hx &= 0x7fffffff;		/* high |x| */
-	if(hx<0x00100000) {		/* 0 or subnormal */
-	    if((hx|lx)==0)  {
-		/* arg==0:  return -inf and raise divide-by-zero exception */
-		return -1./fabs64(x);	/* logb(0) = -inf */
-		}
-	    else			/* subnormal x */
-		if(hx==0) {
-		    for (ix = -1043; lx>0; lx = lsl(lx, 1)) ix -=1;
-		} else {
-		    for (ix = -1022, hx = lsl(hx, 11); hx>0; hx = lsl(hx, 1)) ix -=1;
-		}
-	    return (__float64) ix;
-	}
-	else if (hx<0x7ff00000) return (hx>>20)-1023;	/* normal # */
-	else if (hx>0x7ff00000 || lx)  return x+x;	/* x==NaN */
-	else  return HUGE_VAL;	/* x==inf (+ or -) */
+    EXTRACT_WORDS(hx, lx, x);
+    hx &= 0x7fffffff;      /* high |x| */
+    if (hx < 0x00100000) { /* 0 or subnormal */
+        if ((hx | lx) == 0) {
+            /* arg==0:  return -inf and raise divide-by-zero exception */
+            return -1. / fabs64(x); /* logb(0) = -inf */
+        } else                      /* subnormal x */
+            if (hx == 0) {
+                for (ix = -1043; lx > 0; lx = lsl(lx, 1))
+                    ix -= 1;
+            } else {
+                for (ix = -1022, hx = lsl(hx, 11); hx > 0; hx = lsl(hx, 1))
+                    ix -= 1;
+            }
+        return (__float64)ix;
+    } else if (hx < 0x7ff00000)
+        return (hx >> 20) - 1023; /* normal # */
+    else if (hx > 0x7ff00000 || lx)
+        return x + x; /* x==NaN */
+    else
+        return HUGE_VAL; /* x==inf (+ or -) */
 }
 
 _MATH_ALIAS_d_d(logb)

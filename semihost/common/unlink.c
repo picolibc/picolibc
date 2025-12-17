@@ -44,9 +44,8 @@
 int
 unlink(const char *pathname)
 {
-	int ret = sys_semihost_remove(pathname);
-	if (ret == -1)
-		errno = sys_semihost_errno();
-	return ret;
+    int ret = sys_semihost_remove(pathname);
+    if (ret == -1)
+        errno = sys_semihost_errno();
+    return ret;
 }
-

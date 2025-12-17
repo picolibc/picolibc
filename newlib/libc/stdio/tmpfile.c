@@ -35,11 +35,12 @@
 
 #include "stdio_private.h"
 
-FILE *tmpfile(void)
+FILE *
+tmpfile(void)
 {
-    char        tmpnam[L_tmpnam];
-    int         fd;
-    FILE        *f;
+    char  tmpnam[L_tmpnam];
+    int   fd;
+    FILE *f;
 
     strcpy(tmpnam, "TXXXXXX");
     fd = mkstemp(tmpnam);

@@ -28,12 +28,10 @@
    POSSIBILITY OF SUCH DAMAGE.
 */
 
-
 #include <picolibc.h>
 
-#if defined (__OPTIMIZE_SIZE__) || defined (__PREFER_SIZE_OVER_SPEED) \
-  || defined (__ARC_RF16__)
-# include "../../string/memcmp.c"
+#if defined(__OPTIMIZE_SIZE__) || defined(__PREFER_SIZE_OVER_SPEED) || defined(__ARC_RF16__)
+#include "../../string/memcmp.c"
 #else
 /* See memcmp-*.S.  */
 #endif

@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isxdigit>>, <<isxdigit_l>>---hexadecimal digit predicate
+        <<isxdigit>>, <<isxdigit_l>>---hexadecimal digit predicate
 
 INDEX
-	isxdigit
+        isxdigit
 
 INDEX
-	isxdigit_l
+        isxdigit_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isxdigit(int <[c]>);
+        #include <ctype.h>
+        int isxdigit(int <[c]>);
 
-	#include <ctype.h>
-	int isxdigit_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isxdigit_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isxdigit>> is a macro which classifies singlebyte charset values by table
@@ -70,13 +70,11 @@ No supporting OS subroutines are required.
 
 #undef isxdigit
 int
-isxdigit (int c)
+isxdigit(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
-    return (isdigit(c) ||
-            ('A' <= c && c <= 'F') ||
-            ('a' <= c && c <= 'f'));
+    return (isdigit(c) || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'));
 #else
-    return __CTYPE_PTR[c+1] & ((__CTYPE_HEX)|(__CTYPE_DIGIT));
+    return __CTYPE_PTR[c + 1] & ((__CTYPE_HEX) | (__CTYPE_DIGIT));
 #endif
 }

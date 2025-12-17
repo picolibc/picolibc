@@ -36,7 +36,7 @@
 #include <sys/cdefs.h>
 
 #define _GNU_SOURCE
-#define	__declare_fenv_inline(type) type
+#define __declare_fenv_inline(type) type
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"

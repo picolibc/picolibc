@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -16,9 +16,9 @@ FUNCTION
        <<nextafter>>, <<nextafterf>>---get next number
 
 INDEX
-	nextafter
+        nextafter
 INDEX
-	nextafterf
+        nextafterf
 
 SYNOPSIS
        #include <math.h>
@@ -37,8 +37,8 @@ Returns the next closest number to <[val]> in the direction toward
 <[dir]>.
 
 PORTABILITY
-	Neither <<nextafter>> nor <<nextafterf>> is required by ANSI C
-	or by the System V Interface Definition (Issue 2).
+        Neither <<nextafter>> nor <<nextafterf>> is required by ANSI C
+        or by the System V Interface Definition (Issue 2).
 */
 
 /* IEEE functions
@@ -55,47 +55,52 @@ PORTABILITY
 __float64
 nextafter64(__float64 x, __float64 y)
 {
-	__int32_t	hx,hy,ix,iy;
-	__uint32_t lx,ly;
+    __int32_t  hx, hy, ix, iy;
+    __uint32_t lx, ly;
 
-	EXTRACT_WORDS(hx,lx,x);
-	EXTRACT_WORDS(hy,ly,y);
-	ix = hx&0x7fffffff;		/* |x| */
-	iy = hy&0x7fffffff;		/* |y| */
+    EXTRACT_WORDS(hx, lx, x);
+    EXTRACT_WORDS(hy, ly, y);
+    ix = hx & 0x7fffffff; /* |x| */
+    iy = hy & 0x7fffffff; /* |y| */
 
-	if(((ix>=0x7ff00000)&&((ix-0x7ff00000)|lx)!=0) ||   /* x is nan */ 
-	   ((iy>=0x7ff00000)&&((iy-0x7ff00000)|ly)!=0))     /* y is nan */ 
-	   return x+y;				
-	if(x==y) return y;		/* x=y, return y */
-	if((ix|lx)==0) {			/* x == 0 */
-	    INSERT_WORDS(x,hy&0x80000000,1);	/* return +-minsubnormal */
-            force_eval_float64(opt_barrier_float64(x)*x);
-            return x;
-	} 
-	if(hx>=0) {				/* x > 0 */
-	    if(hx>hy||((hx==hy)&&(lx>ly))) {	/* x > y, x -= ulp */
-		if(lx==0) hx -= 1;
-		lx -= 1;
-	    } else {				/* x < y, x += ulp */
-		lx += 1;
-		if(lx==0) hx += 1;
-	    }
-	} else {				/* x < 0 */
-	    if(hy>=0||hx>hy||((hx==hy)&&(lx>ly))){/* x < y, x -= ulp */
-		if(lx==0) hx -= 1;
-		lx -= 1;
-	    } else {				/* x > y, x += ulp */
-		lx += 1;
-		if(lx==0) hx += 1;
-	    }
-	}
-	hy = hx&0x7ff00000;
-	if(hy>=0x7ff00000)
-            return __math_oflow(hx<0);	/* overflow  */
-	INSERT_WORDS(x,hx,lx);
-	if(hy<0x00100000)		/* underflow */
-            return __math_denorm(x);
-	return (x);
+    if (((ix >= 0x7ff00000) && ((ix - 0x7ff00000) | lx) != 0) || /* x is nan */
+        ((iy >= 0x7ff00000) && ((iy - 0x7ff00000) | ly) != 0))   /* y is nan */
+        return x + y;
+    if (x == y)
+        return y;                            /* x=y, return y */
+    if ((ix | lx) == 0) {                    /* x == 0 */
+        INSERT_WORDS(x, hy & 0x80000000, 1); /* return +-minsubnormal */
+        force_eval_float64(opt_barrier_float64(x) * x);
+        return x;
+    }
+    if (hx >= 0) {                                  /* x > 0 */
+        if (hx > hy || ((hx == hy) && (lx > ly))) { /* x > y, x -= ulp */
+            if (lx == 0)
+                hx -= 1;
+            lx -= 1;
+        } else { /* x < y, x += ulp */
+            lx += 1;
+            if (lx == 0)
+                hx += 1;
+        }
+    } else {                                                   /* x < 0 */
+        if (hy >= 0 || hx > hy || ((hx == hy) && (lx > ly))) { /* x < y, x -= ulp */
+            if (lx == 0)
+                hx -= 1;
+            lx -= 1;
+        } else { /* x > y, x += ulp */
+            lx += 1;
+            if (lx == 0)
+                hx += 1;
+        }
+    }
+    hy = hx & 0x7ff00000;
+    if (hy >= 0x7ff00000)
+        return __math_oflow(hx < 0); /* overflow  */
+    INSERT_WORDS(x, hx, lx);
+    if (hy < 0x00100000) /* underflow */
+        return __math_denorm(x);
+    return (x);
 }
 
 _MATH_ALIAS_d_dd(nextafter)

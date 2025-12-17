@@ -36,7 +36,7 @@
 #include "uchar-local.h"
 
 size_t
-c16rtomb (char *s, char16_t c16, mbstate_t *ps)
+c16rtomb(char *s, char16_t c16, mbstate_t *ps)
 {
     static mbstate_t local_state;
 
@@ -44,9 +44,9 @@ c16rtomb (char *s, char16_t c16, mbstate_t *ps)
         ps = &local_state;
 
 #if __SIZEOF_WCHAR_T__ == 2
-    return wcrtomb(s, (wchar_t) c16, ps);
+    return wcrtomb(s, (wchar_t)c16, ps);
 #elif __SIZEOF_WCHAR_T__ == 4
-    char32_t    c32;
+    char32_t c32;
 
     if (ps->__count == -1) {
         ps->__count = 0;
@@ -55,17 +55,17 @@ c16rtomb (char *s, char16_t c16, mbstate_t *ps)
             c32 = ps->__value.__ucs | (c16 & 0x3ff);
         } else {
             errno = EILSEQ;
-            return (size_t) -1;
+            return (size_t)-1;
         }
     } else if (char16_is_high_surrogate(c16)) {
         /* High surrogate */
-        ps->__value.__ucs = ((char32_t) (c16 & 0x3ff) << 10) + 0x10000;
+        ps->__value.__ucs = ((char32_t)(c16 & 0x3ff) << 10) + 0x10000;
         ps->__count = -1;
         return 0;
     } else {
         c32 = c16;
     }
-    return wcrtomb(s, (wchar_t) c32, ps);
+    return wcrtomb(s, (wchar_t)c32, ps);
 #else
 #error wchar_t size unknown
 #endif

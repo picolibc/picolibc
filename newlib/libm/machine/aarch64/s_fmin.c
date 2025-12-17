@@ -28,11 +28,11 @@
 #include <math.h>
 
 double
-fmin (double x, double y)
+fmin(double x, double y)
 {
-  double result;
-  __asm__("fminnm\t%d0, %d1, %d2" : "=w" (result) : "w" (x), "w" (y));
-  return result;
+    double result;
+    __asm__("fminnm\t%d0, %d1, %d2" : "=w"(result) : "w"(x), "w"(y));
+    return result;
 }
 
 #else

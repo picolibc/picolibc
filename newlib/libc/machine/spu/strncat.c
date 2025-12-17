@@ -40,9 +40,9 @@
  * /0 character at the end of dest. The strings may not overlap and
  * the dest string must have enough space for the result.
  */
-char * strncat(char * __restrict__ dest, const char * __restrict__ src,
-               size_t n)
+char *
+strncat(char * __restrict__ dest, const char * __restrict__ src, size_t n)
 {
-  _strncpy(_straddr(dest), src, n, 1, 1);
-  return dest;
+    _strncpy(_straddr(dest), src, n, 1, 1);
+    return dest;
 }

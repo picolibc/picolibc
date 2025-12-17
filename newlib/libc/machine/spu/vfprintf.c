@@ -39,32 +39,27 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include <stdarg.h>
 
 #ifdef INTEGER_ONLY
-#  define vfprintf vfiprintf
+#define vfprintf vfiprintf
 #endif
 
-typedef struct
-{
-  int fp;
-  unsigned int pad0[ 3 ];
-  char* fmt;
-  unsigned int pad1[ 3 ];
-  va_list ap;
+typedef struct {
+    int          fp;
+    unsigned int pad0[3];
+    char        *fmt;
+    unsigned int pad1[3];
+    va_list      ap;
 } c99_vfprintf_t;
 
-
 int
-vfprintf (FILE *__restrict fp,
-	const char *__restrict fmt0,
-	va_list ap)
+vfprintf(FILE * __restrict fp, const char * __restrict fmt0, va_list ap)
 {
-  c99_vfprintf_t args;
+    c99_vfprintf_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.fp = fp->_fp;
-  args.fmt = (char*) fmt0;
-  va_copy(args.ap,ap);
+    args.fp = fp->_fp;
+    args.fmt = (char *)fmt0;
+    va_copy(args.ap, ap);
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFPRINTF, &args);
 }
-

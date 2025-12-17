@@ -28,11 +28,11 @@
 #include <math.h>
 
 float
-roundf (float x)
+roundf(float x)
 {
-  float result;
-  __asm__("frinta\t%s0, %s1" : "=w" (result) : "w" (x));
-  return result;
+    float result;
+    __asm__("frinta\t%s0, %s1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

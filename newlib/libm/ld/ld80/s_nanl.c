@@ -29,13 +29,13 @@
 long double
 nanl(const char *s)
 {
-	union {
-		union IEEEl2bits ieee;
-		uint32_t bits[3];
-	} u;
+    union {
+        union IEEEl2bits ieee;
+        uint32_t         bits[3];
+    } u;
 
-	__scan_nan(u.bits, 3, s);
-	u.ieee.bits.exp = 0x7fff;
-	u.ieee.bits.manh |= 0xc0000000;	/* make it a quiet NaN */
-	return (u.ieee.e);
+    __scan_nan(u.bits, 3, s);
+    u.ieee.bits.exp = 0x7fff;
+    u.ieee.bits.manh |= 0xc0000000; /* make it a quiet NaN */
+    return (u.ieee.e);
 }

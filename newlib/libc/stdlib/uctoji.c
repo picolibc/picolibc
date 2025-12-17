@@ -43,7 +43,7 @@
 uint16_t
 __unicode_to_jis(wchar_t jis)
 {
-    uint32_t euc_jp = __unicode_to_euc_jp((uint16_t) jis);
+    uint32_t euc_jp = __unicode_to_euc_jp((uint16_t)jis);
 
     /* JIS encoding doesn't support JIS X0213 yet */
     if (euc_jp > 0xffff)

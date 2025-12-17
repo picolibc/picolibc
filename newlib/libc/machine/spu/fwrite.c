@@ -36,32 +36,27 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-
-typedef struct
-{
-  const char* buf;
-  unsigned int pad0[ 3 ];
-  size_t size;
-  unsigned int pad1[ 3 ];
-  size_t count;
-  unsigned int pad2[ 3 ];
-  int fp;
+typedef struct {
+    const char  *buf;
+    unsigned int pad0[3];
+    size_t       size;
+    unsigned int pad1[3];
+    size_t       count;
+    unsigned int pad2[3];
+    int          fp;
 } c99_fwrite_t;
 
 size_t
-fwrite (const void *__restrict buf,
-	size_t size,
-	size_t count,
-	FILE * fp)
+fwrite(const void * __restrict buf, size_t size, size_t count, FILE *fp)
 {
-  c99_fwrite_t args;
+    c99_fwrite_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.buf = buf;
-  args.size = size;
-  args.count = count;
-  args.fp = fp->_fp;
+    args.buf = buf;
+    args.size = size;
+    args.count = count;
+    args.fp = fp->_fp;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FWRITE, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FWRITE, &args);
 }

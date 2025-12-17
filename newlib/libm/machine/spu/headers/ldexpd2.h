@@ -41,7 +41,7 @@
 #ifdef __SPU__
 
 #ifndef _LDEXPD2_H_
-#define _LDEXPD2_H_	1
+#define _LDEXPD2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -50,48 +50,48 @@
  *      vector double _ldexpd2(vector double x, vector signed long long exp)
  *
  * DESCRIPTION
- *      The _ldexpd2 function Computes x * 2^exp for each of the two elements 
+ *      The _ldexpd2 function Computes x * 2^exp for each of the two elements
  *      of x using the corresponding elements of exp.
  *
  */
-static __inline vector double _ldexpd2(vector double x, vector signed long long llexp)
+static __inline vector double
+_ldexpd2(vector double x, vector signed long long llexp)
 {
-  vec_uchar16 odd_to_even = ((vec_uchar16) { 4,5,6,7,     0x80,0x80,0x80,0x80, 
-                                             12,13,14,15, 0x80,0x80,0x80,0x80 });
-  vec_int4 exp;
-  vec_int4 e1, e2;
-  vec_int4 min = spu_splats(-2044);
-  vec_int4 max = spu_splats(2046);
-  vec_uint4 cmp_min, cmp_max;
-  vec_uint4 shift = (vec_uint4) { 20, 32, 20, 32 };
-  vec_double2 f1, f2;
-  vec_double2 out;
+    vec_uchar16 odd_to_even = ((vec_uchar16) { 4, 5, 6, 7, 0x80, 0x80, 0x80, 0x80, 12, 13, 14, 15,
+                                               0x80, 0x80, 0x80, 0x80 });
+    vec_int4    exp;
+    vec_int4    e1, e2;
+    vec_int4    min = spu_splats(-2044);
+    vec_int4    max = spu_splats(2046);
+    vec_uint4   cmp_min, cmp_max;
+    vec_uint4   shift = (vec_uint4) { 20, 32, 20, 32 };
+    vec_double2 f1, f2;
+    vec_double2 out;
 
-  exp = (vec_int4)spu_shuffle(llexp, llexp, odd_to_even);
+    exp = (vec_int4)spu_shuffle(llexp, llexp, odd_to_even);
 
-  /* Clamp the specified exponent to the range -2044 to 2046.
-   */
+    /* Clamp the specified exponent to the range -2044 to 2046.
+     */
 
-  cmp_min = spu_cmpgt(exp, min);
-  cmp_max = spu_cmpgt(exp, max);
-  exp = spu_sel(min, exp, cmp_min);
-  exp = spu_sel(exp, max, cmp_max);
+    cmp_min = spu_cmpgt(exp, min);
+    cmp_max = spu_cmpgt(exp, max);
+    exp = spu_sel(min, exp, cmp_min);
+    exp = spu_sel(exp, max, cmp_max);
 
-  /* Generate the factors f1 = 2^e1 and f2 = 2^e2
-   */
-  e1 = spu_rlmaska(exp, -1);
-  e2 = spu_sub(exp, e1);
+    /* Generate the factors f1 = 2^e1 and f2 = 2^e2
+     */
+    e1 = spu_rlmaska(exp, -1);
+    e2 = spu_sub(exp, e1);
 
-  f1 = (vec_double2)spu_sl(spu_add(e1, 1023), shift);
-  f2 = (vec_double2)spu_sl(spu_add(e2, 1023), shift);
+    f1 = (vec_double2)spu_sl(spu_add(e1, 1023), shift);
+    f2 = (vec_double2)spu_sl(spu_add(e2, 1023), shift);
 
-  /* Compute the product x * 2^e1 * 2^e2
-   */
-  out = spu_mul(spu_mul(x, f1), f2);
+    /* Compute the product x * 2^e1 * 2^e2
+     */
+    out = spu_mul(spu_mul(x, f1), f2);
 
-  return (out);
+    return (out);
 }
 
 #endif /* _LDEXPD2_H_ */
 #endif /* __SPU__ */
-

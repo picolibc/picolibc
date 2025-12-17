@@ -37,39 +37,35 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <spu_cache.h>
 
-COMPAT_EA_ALIAS (memchr_ea);
+COMPAT_EA_ALIAS(memchr_ea);
 
 __ea void *
-memchr_ea (__ea const void *s, int c, size_ea_t n)
+memchr_ea(__ea const void *s, int c, size_ea_t n)
 {
-  __ea void *curr_s = (__ea void *) s;
-  void *local_s;
-  size_ea_t left_in_cacheline;
-  size_ea_t search_size;
-  void *where;
-  size_ea_t ret;
+    __ea void *curr_s = (__ea void *)s;
+    void      *local_s;
+    size_ea_t  left_in_cacheline;
+    size_ea_t  search_size;
+    void      *where;
+    size_ea_t  ret;
 
-  while (n)
-    {
-      left_in_cacheline = ROUND_UP_NEXT_128 ((size_ea_t) curr_s) -
-	(size_ea_t) curr_s;
-      search_size = left_in_cacheline < n ? left_in_cacheline : n;
+    while (n) {
+        left_in_cacheline = ROUND_UP_NEXT_128((size_ea_t)curr_s) - (size_ea_t)curr_s;
+        search_size = left_in_cacheline < n ? left_in_cacheline : n;
 
-      local_s = __cache_fetch (curr_s);
-      where = memchr (local_s, c, search_size);
+        local_s = __cache_fetch(curr_s);
+        where = memchr(local_s, c, search_size);
 
-      if (where)
-	{
-	  ret = (size_ea_t) curr_s +
-	    ((size_ea_t) (int) where - (size_ea_t) (int) local_s);
-	  return (__ea void *) ret;
-	}
+        if (where) {
+            ret = (size_ea_t)curr_s + ((size_ea_t)(int)where - (size_ea_t)(int)local_s);
+            return (__ea void *)ret;
+        }
 
-      /* update values to take into account what we copied */
-      curr_s += search_size;
-      n -= search_size;
+        /* update values to take into account what we copied */
+        curr_s += search_size;
+        n -= search_size;
     }
 
-  /* if we got here n was initially 0 */
-  return NULL;
+    /* if we got here n was initially 0 */
+    return NULL;
 }

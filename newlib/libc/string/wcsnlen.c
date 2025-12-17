@@ -1,7 +1,7 @@
-/* 
+/*
 FUNCTION
         <<wcsnlen>>---get fixed-size wide-character string length
-    
+
 INDEX
         wcsnlen
 
@@ -52,17 +52,13 @@ PORTABILITY
 #include <wchar.h>
 
 size_t
-wcsnlen (const wchar_t *s,
-                 size_t maxlen)
+wcsnlen(const wchar_t *s, size_t maxlen)
 {
-  const wchar_t *p;
+    const wchar_t *p;
 
-  p = s;
-  while (*p && maxlen-- > 0)
-    p++;
+    p = s;
+    while (*p && maxlen-- > 0)
+        p++;
 
-  return (size_t)(p - s);
+    return (size_t)(p - s);
 }
-
-
-

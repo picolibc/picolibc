@@ -28,7 +28,7 @@
  * f = function call to test (or any expression)
  * x = expected result
  * m = message to print on failure (with formats for r & x)
-**/
+ **/
 
 #if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -38,121 +38,127 @@
 #pragma GCC diagnostic ignored "-Wstringop-truncation"
 #endif
 
-#define TEST(r, f, x, m) do {                                           \
-        (r) = (f);                                                      \
-        if ((r) != (x)) {                                               \
-            printf("%s:%d: %s failed (" m ")\n", __FILE__, __LINE__, #f, r, x ); \
-            err++;                                                      \
-        }                                                               \
-    } while(0)
+#define TEST(r, f, x, m)                                                        \
+    do {                                                                        \
+        (r) = (f);                                                              \
+        if ((r) != (x)) {                                                       \
+            printf("%s:%d: %s failed (" m ")\n", __FILE__, __LINE__, #f, r, x); \
+            err++;                                                              \
+        }                                                                       \
+    } while (0)
 
-#define TEST_S(s, x, m) do {                                            \
-        if (s == NULL || strcmp((s),(x)) != 0) {                        \
+#define TEST_S(s, x, m)                                                     \
+    do {                                                                    \
+        if (s == NULL || strcmp((s), (x)) != 0) {                           \
             printf(__FILE__ ":%d: [%s] != [%s] (%s)\n", __LINE__, s, x, m); \
-            err++;                                                      \
-        }                                                               \
-    } while(0)
+            err++;                                                          \
+        }                                                                   \
+    } while (0)
 
-
-static int test_string(void)
+static int
+test_string(void)
 {
-        char b[32] = {0};
-        char c[32] = {0};
-	char *s = NULL;
-	int i;
-	int err=0;
+    char  b[32] = { 0 };
+    char  c[32] = { 0 };
+    char *s = NULL;
+    int   i;
+    int   err = 0;
 
-	c[0]='a'; c[1]='b'; c[2]='c'; c[3]=0;
-	TEST(s, strcpy(b, c), b, "wrong return %p != %p");
-	TEST_S(s, "abc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+1, c), b+1, "wrong return %p != %p");
-	TEST_S(s, "abc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+2, c), b+2, "wrong return %p != %p");
-	TEST_S(s, "abc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+3, c), b+3, "wrong return %p != %p");
-	TEST_S(s, "abc", "strcpy gave incorrect string");
+    c[0] = 'a';
+    c[1] = 'b';
+    c[2] = 'c';
+    c[3] = 0;
+    TEST(s, strcpy(b, c), b, "wrong return %p != %p");
+    TEST_S(s, "abc", "strcpy gave incorrect string");
+    TEST(s, strcpy(b + 1, c), b + 1, "wrong return %p != %p");
+    TEST_S(s, "abc", "strcpy gave incorrect string");
+    TEST(s, strcpy(b + 2, c), b + 2, "wrong return %p != %p");
+    TEST_S(s, "abc", "strcpy gave incorrect string");
+    TEST(s, strcpy(b + 3, c), b + 3, "wrong return %p != %p");
+    TEST_S(s, "abc", "strcpy gave incorrect string");
 
-	TEST(s, strcpy(b+1, c+1), b+1, "wrong return %p != %p");
-	TEST_S(s, "bc", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+2, c+2), b+2, "wrong return %p != %p");
-	TEST_S(s, "c", "strcpy gave incorrect string");
-	TEST(s, strcpy(b+3, c+3), b+3, "wrong return %p != %p");
-	TEST_S(s, "", "strcpy gave incorrect string");
+    TEST(s, strcpy(b + 1, c + 1), b + 1, "wrong return %p != %p");
+    TEST_S(s, "bc", "strcpy gave incorrect string");
+    TEST(s, strcpy(b + 2, c + 2), b + 2, "wrong return %p != %p");
+    TEST_S(s, "c", "strcpy gave incorrect string");
+    TEST(s, strcpy(b + 3, c + 3), b + 3, "wrong return %p != %p");
+    TEST_S(s, "", "strcpy gave incorrect string");
 
-	TEST(s, memset(b, 'x', sizeof b), b, "wrong return %p != %p");
-	TEST(s, strncpy(b, "abc", sizeof b - 1), b, "wrong return %p != %p");
-	TEST(i, memcmp(b, "abc\0\0\0\0", 8), 0, "strncpy fails to zero-pad dest");
-	TEST(i, b[sizeof b - 1], 'x', "strncpy overruns buffer when n > strlen(src)");
+    TEST(s, memset(b, 'x', sizeof b), b, "wrong return %p != %p");
+    TEST(s, strncpy(b, "abc", sizeof b - 1), b, "wrong return %p != %p");
+    TEST(i, memcmp(b, "abc\0\0\0\0", 8), 0, "strncpy fails to zero-pad dest");
+    TEST(i, b[sizeof b - 1], 'x', "strncpy overruns buffer when n > strlen(src)");
 
-	b[3] = 'x'; b[4] = 0;
-	strncpy(b, "abc", 3);
-	TEST(i, b[2], 'c', "strncpy fails to copy last byte: %hhu != %hhu");
-	TEST(i, b[3], 'x', "strncpy overruns buffer to null-terminate: %hhu != %hhu");
+    b[3] = 'x';
+    b[4] = 0;
+    strncpy(b, "abc", 3);
+    TEST(i, b[2], 'c', "strncpy fails to copy last byte: %hhu != %hhu");
+    TEST(i, b[3], 'x', "strncpy overruns buffer to null-terminate: %hhu != %hhu");
 
-	TEST(i, !strncmp("abcd", "abce", 3), 1, "strncmp compares past n");
-	TEST(i, !!strncmp("abc", "abd", 3), 1, "strncmp fails to compare n-1st byte");
+    TEST(i, !strncmp("abcd", "abce", 3), 1, "strncmp compares past n");
+    TEST(i, !!strncmp("abc", "abd", 3), 1, "strncmp fails to compare n-1st byte");
 
-	strcpy(b, "abc");
-	TEST(s, strncat(b, "123456", 3), b, "%p != %p");
-	TEST(i, b[6], 0, "strncat failed to null-terminate (%d)");
-	TEST_S(s, "abc123", "strncat gave incorrect string");
+    strcpy(b, "abc");
+    TEST(s, strncat(b, "123456", 3), b, "%p != %p");
+    TEST(i, b[6], 0, "strncat failed to null-terminate (%d)");
+    TEST_S(s, "abc123", "strncat gave incorrect string");
 
-	strcpy(b, "aaababccdd0001122223");
-	TEST(s, strchr(b, 'b'), b+3, "%p != %p");
-	TEST(s, strrchr(b, 'b'), b+5, "%p != %p");
-	TEST(i, strspn(b, "abcd"), 10, "%d != %d");
-	TEST(i, strcspn(b, "0123"), 10, "%d != %d");
-	TEST(s, strpbrk(b, "0123"), b+10, "%p != %p");
+    strcpy(b, "aaababccdd0001122223");
+    TEST(s, strchr(b, 'b'), b + 3, "%p != %p");
+    TEST(s, strrchr(b, 'b'), b + 5, "%p != %p");
+    TEST(i, strspn(b, "abcd"), 10, "%d != %d");
+    TEST(i, strcspn(b, "0123"), 10, "%d != %d");
+    TEST(s, strpbrk(b, "0123"), b + 10, "%p != %p");
 
-	strcpy(b, "abc   123; xyz; foo");
-	TEST(s, strtok(b, " "), b, "%p != %p");
-	TEST_S(s, "abc", "strtok result");
+    strcpy(b, "abc   123; xyz; foo");
+    TEST(s, strtok(b, " "), b, "%p != %p");
+    TEST_S(s, "abc", "strtok result");
 
-	TEST(s, strtok(NULL, ";"), b+4, "%p != %p");
-	TEST_S(s, "  123", "strtok result");
+    TEST(s, strtok(NULL, ";"), b + 4, "%p != %p");
+    TEST_S(s, "  123", "strtok result");
 
-	TEST(s, strtok(NULL, " ;"), b+11, "%p != %p");
-	TEST_S(s, "xyz", "strtok result");
+    TEST(s, strtok(NULL, " ;"), b + 11, "%p != %p");
+    TEST_S(s, "xyz", "strtok result");
 
-	TEST(s, strtok(NULL, " ;"), b+16, "%p != %p");
-	TEST_S(s, "foo", "strtok result");
+    TEST(s, strtok(NULL, " ;"), b + 16, "%p != %p");
+    TEST_S(s, "foo", "strtok result");
 
 #ifdef HAVE_BSD_STRL
-	memset(b, 'x', sizeof b);
-	TEST(i, strlcpy(b, "abc", sizeof b - 1), 3, "length %d != %d");
-	TEST(i, b[3], 0, "strlcpy did not null-terminate short string (%d)");
-	TEST(i, b[4], 'x', "strlcpy wrote extra bytes (%d)");
+    memset(b, 'x', sizeof b);
+    TEST(i, strlcpy(b, "abc", sizeof b - 1), 3, "length %d != %d");
+    TEST(i, b[3], 0, "strlcpy did not null-terminate short string (%d)");
+    TEST(i, b[4], 'x', "strlcpy wrote extra bytes (%d)");
 
-	memset(b, 'x', sizeof b);
-	TEST(i, strlcpy(b, "abc", 2), 3, "length %d != %d");
-	TEST(i, b[0], 'a', "strlcpy did not copy character %d");
-	TEST(i, b[1], 0, "strlcpy did not null-terminate long string (%d)");
+    memset(b, 'x', sizeof b);
+    TEST(i, strlcpy(b, "abc", 2), 3, "length %d != %d");
+    TEST(i, b[0], 'a', "strlcpy did not copy character %d");
+    TEST(i, b[1], 0, "strlcpy did not null-terminate long string (%d)");
 
-	memset(b, 'x', sizeof b);
-	TEST(i, strlcpy(b, "abc", 3), 3, "length %d != %d");
-	TEST(i, b[2], 0, "strlcpy did not null-terminate l-length string (%d)");
+    memset(b, 'x', sizeof b);
+    TEST(i, strlcpy(b, "abc", 3), 3, "length %d != %d");
+    TEST(i, b[2], 0, "strlcpy did not null-terminate l-length string (%d)");
 
-	TEST(i, strlcpy(NULL, "abc", 0), 3, "length %d != %d");
+    TEST(i, strlcpy(NULL, "abc", 0), 3, "length %d != %d");
 
-	memcpy(b, "abc\0\0\0x\0", 8);
-	TEST(i, strlcat(b, "123", sizeof b), 6, "length %d != %d");
-	TEST_S(b, "abc123", "strlcat result");
+    memcpy(b, "abc\0\0\0x\0", 8);
+    TEST(i, strlcat(b, "123", sizeof b), 6, "length %d != %d");
+    TEST_S(b, "abc123", "strlcat result");
 
-	memcpy(b, "abc\0\0\0x\0", 8);
-	TEST(i, strlcat(b, "123", 6), 6, "length %d != %d");
-	TEST_S(b, "abc12", "strlcat result");
-	TEST(i, b[6], 'x', "strlcat wrote past string %d != %d");
+    memcpy(b, "abc\0\0\0x\0", 8);
+    TEST(i, strlcat(b, "123", 6), 6, "length %d != %d");
+    TEST_S(b, "abc12", "strlcat result");
+    TEST(i, b[6], 'x', "strlcat wrote past string %d != %d");
 
-	memcpy(b, "abc\0\0\0x\0", 8);
-	TEST(i, strlcat(b, "123", 4), 6, "length %d != %d");
-	TEST_S(b, "abc", "strlcat result");
+    memcpy(b, "abc\0\0\0x\0", 8);
+    TEST(i, strlcat(b, "123", 4), 6, "length %d != %d");
+    TEST_S(b, "abc", "strlcat result");
 
-	memcpy(b, "abc\0\0\0x\0", 8);
-	TEST(i, strlcat(b, "123", 3), 6, "length %d != %d");
-	TEST_S(b, "abc", "strlcat result");
+    memcpy(b, "abc\0\0\0x\0", 8);
+    TEST(i, strlcat(b, "123", 3), 6, "length %d != %d");
+    TEST_S(b, "abc", "strlcat result");
 #endif
 
-	return err;
+    return err;
 }
 
 #define TEST_NAME string

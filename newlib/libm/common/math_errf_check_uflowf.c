@@ -31,7 +31,7 @@
 /* Check result and set errno if necessary.  */
 
 HIDDEN float
-__math_check_uflowf (float y)
+__math_check_uflowf(float y)
 {
-  return y == 0.0f ? __math_with_errnof (y, ERANGE) : y;
+    return y == 0.0f ? __math_with_errnof(y, ERANGE) : y;
 }

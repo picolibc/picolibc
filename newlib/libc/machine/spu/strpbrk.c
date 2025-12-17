@@ -40,59 +40,64 @@
  * any character in the string pointed to by s2. A null pointer
  * is returned if no character in s2 occurs in s1.
  */
-char * strpbrk(const char *s1, const char *s2)
+char *
+strpbrk(const char *s1, const char *s2)
 {
-  unsigned int offset;
-  vec_uint4 cnt;
-  vec_uchar16 shuffle, match, initial_splat, splat, eos;
-  vec_uchar16 data1, data2, dataA, dataB, *ptr1, *ptr2;
+    unsigned int offset;
+    vec_uint4    cnt;
+    vec_uchar16  shuffle, match, initial_splat, splat, eos;
+    vec_uchar16  data1, data2, dataA, dataB, *ptr1, *ptr2;
 
-  ptr1 = (vec_uchar16 *)s1;
+    ptr1 = (vec_uchar16 *)s1;
 
-  offset = (unsigned int)(s1) & 15;
-  shuffle = (vec_uchar16)spu_add((vec_uint4)spu_splats((unsigned char) offset),
-				 VEC_LITERAL(vec_uint4, 0x0010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F));
+    offset = (unsigned int)(s1) & 15;
+    shuffle = (vec_uchar16)spu_add(
+        (vec_uint4)spu_splats((unsigned char)offset),
+        VEC_LITERAL(vec_uint4, 0x0010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F));
 
-  dataA = *ptr1++;
-  dataB = *ptr1++;
-
-  initial_splat = spu_splats((unsigned char)((unsigned int)(s2) & 0xF));
-
-  /* For each quadword of the string s1.
-   */
-  do {
-    data1 = spu_shuffle(dataA, dataB, shuffle);
-
-    eos = match = spu_cmpeq(data1, 0);
-
-    ptr2 = (vec_uchar16 *)s2;
-    data2 = *ptr2;
-    data2 = spu_shuffle(data2, data2, initial_splat);
-    ptr2 = (vec_uchar16 *)((unsigned int)(ptr2) + 1);
-    splat = initial_splat;
-
-    /* For each character of s2, compare agains a quadword of s1,
-     * accumulating match success in the variable match.
-     */
-    while (spu_extract((vec_uint4)data2, 0)) {
-      match = spu_or(match, spu_cmpeq(data1, data2));
-
-      splat = spu_and((vec_uchar16)(spu_add((vec_uint4)splat, VEC_SPLAT_U32(0x01010101))), 0xF);
-
-      data2 = *ptr2;
-      data2 = spu_shuffle(data2, data2, splat);
-      ptr2 = (vec_uchar16 *)((unsigned int)(ptr2) + 1);
-    }
-
-    cnt = spu_cntlz(spu_gather(match));
-
-    dataA = dataB;
+    dataA = *ptr1++;
     dataB = *ptr1++;
-  } while (spu_extract(cnt, 0) == 32);
 
-  /* Compute the first match pointer, zeroing it (NIL) if it is the end of
-   * string.
-   */
-  return ((char *)spu_extract(spu_andc(spu_add(spu_add(spu_promote((unsigned int)(ptr1), 0), -64), cnt),
-				       spu_cmpeq(cnt, spu_cntlz(spu_gather(eos)))), 0));
+    initial_splat = spu_splats((unsigned char)((unsigned int)(s2) & 0xF));
+
+    /* For each quadword of the string s1.
+     */
+    do {
+        data1 = spu_shuffle(dataA, dataB, shuffle);
+
+        eos = match = spu_cmpeq(data1, 0);
+
+        ptr2 = (vec_uchar16 *)s2;
+        data2 = *ptr2;
+        data2 = spu_shuffle(data2, data2, initial_splat);
+        ptr2 = (vec_uchar16 *)((unsigned int)(ptr2) + 1);
+        splat = initial_splat;
+
+        /* For each character of s2, compare agains a quadword of s1,
+         * accumulating match success in the variable match.
+         */
+        while (spu_extract((vec_uint4)data2, 0)) {
+            match = spu_or(match, spu_cmpeq(data1, data2));
+
+            splat
+                = spu_and((vec_uchar16)(spu_add((vec_uint4)splat, VEC_SPLAT_U32(0x01010101))), 0xF);
+
+            data2 = *ptr2;
+            data2 = spu_shuffle(data2, data2, splat);
+            ptr2 = (vec_uchar16 *)((unsigned int)(ptr2) + 1);
+        }
+
+        cnt = spu_cntlz(spu_gather(match));
+
+        dataA = dataB;
+        dataB = *ptr1++;
+    } while (spu_extract(cnt, 0) == 32);
+
+    /* Compute the first match pointer, zeroing it (NIL) if it is the end of
+     * string.
+     */
+    return ((char *)spu_extract(
+        spu_andc(spu_add(spu_add(spu_promote((unsigned int)(ptr1), 0), -64), cnt),
+                 spu_cmpeq(cnt, spu_cntlz(spu_gather(eos)))),
+        0));
 }

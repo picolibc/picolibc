@@ -40,14 +40,13 @@
 char *__stpncpy_chk(char * __restrict, const char * __restrict, size_t, size_t);
 
 char *
-__stpncpy_chk(char * __restrict dst, const char * __restrict src, size_t len,
-    size_t slen)
+__stpncpy_chk(char * __restrict dst, const char * __restrict src, size_t len, size_t slen)
 {
-	if (len > slen)
-		__chk_fail();
+    if (len > slen)
+        __chk_fail();
 
-	if (__ssp_overlap(src, dst, len))
-		__chk_fail();
+    if (__ssp_overlap(src, dst, len))
+        __chk_fail();
 
-	return stpncpy(dst, src, len);
+    return stpncpy(dst, src, len);
 }

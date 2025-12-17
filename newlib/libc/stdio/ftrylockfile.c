@@ -43,9 +43,9 @@
  * we're stuck just blocking.
  */
 int
-ftrylockfile (FILE *f)
+ftrylockfile(FILE *f)
 {
-    (void) f;
+    (void)f;
     __LIBC_LOCK();
     return 0;
 }

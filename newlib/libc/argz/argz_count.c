@@ -9,16 +9,14 @@
 #include <sys/types.h>
 
 size_t
-argz_count (const char *argz,
-       size_t argz_len)
+argz_count(const char *argz, size_t argz_len)
 {
-  size_t i;
-  size_t count = 0;
+    size_t i;
+    size_t count = 0;
 
-  for (i = 0; i < argz_len; i++)
-    {
-      if (argz[i] == '\0')
-        count++;
+    for (i = 0; i < argz_len; i++) {
+        if (argz[i] == '\0')
+            count++;
     }
-  return count;
+    return count;
 }

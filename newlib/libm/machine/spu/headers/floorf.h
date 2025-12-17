@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FLOORF_H_
-#define _FLOORF_H_	1
+#define _FLOORF_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -55,69 +55,69 @@
  *	signed integer range. Values outside this range get clamped.
  */
 
-static __inline float _floorf(float value)
+static __inline float
+_floorf(float value)
 {
 #ifdef FLOOR_INTEGER_RANGE
-  /* 32-BIT INTEGER DYNAMIC RANGE
-   */
-  union {
-    float f;
-    signed int i;
-    unsigned int ui;
-  } bias;
+    /* 32-BIT INTEGER DYNAMIC RANGE
+     */
+    union {
+        float        f;
+        signed int   i;
+        unsigned int ui;
+    } bias;
 
-  bias.f = value;
+    bias.f = value;
 
-  /* If positive, bias the input value to truncate towards
-   * positive infinity, instead of zero.
-   */
-  bias.ui = (unsigned int)(bias.i >> 31) & 0x3F7FFFFF;
-  value -= bias.f;
+    /* If positive, bias the input value to truncate towards
+     * positive infinity, instead of zero.
+     */
+    bias.ui = (unsigned int)(bias.i >> 31) & 0x3F7FFFFF;
+    value -= bias.f;
 
-  /* Remove fraction bits by casting to an integer and back
-   * to a floating-point value.
-   */
-  return ((float)((int)value));
+    /* Remove fraction bits by casting to an integer and back
+     * to a floating-point value.
+     */
+    return ((float)((int)value));
 
-#else /* !FLOOR_INTEGER_RANGE */
-  /* FULL FLOATING-POINT RANGE
-   */
-  vec_int4 exp, shift;
-  vec_uint4 mask, frac_mask, addend, insert, pos;
-  vec_float4 in, out;
+#else  /* !FLOOR_INTEGER_RANGE */
+    /* FULL FLOATING-POINT RANGE
+     */
+    vec_int4   exp, shift;
+    vec_uint4  mask, frac_mask, addend, insert, pos;
+    vec_float4 in, out;
 
-  in = spu_promote(value, 0);
+    in = spu_promote(value, 0);
 
-  /* This function generates the following component
-   * based upon the inputs.
-   *
-   *   mask = bits of the input that need to be replaced.
-   *   insert = value of the bits that need to be replaced
-   *   addend = value to be added to perform function.
-   *
-   * These are applied as follows:.
-   *
-   *   out = ((in & mask) | insert) + addend
-   */
-  pos = spu_cmpgt((vec_int4)in, -1);
-  exp = spu_and(spu_rlmask((vec_int4)in, -23), 0xFF);
+    /* This function generates the following component
+     * based upon the inputs.
+     *
+     *   mask = bits of the input that need to be replaced.
+     *   insert = value of the bits that need to be replaced
+     *   addend = value to be added to perform function.
+     *
+     * These are applied as follows:.
+     *
+     *   out = ((in & mask) | insert) + addend
+     */
+    pos = spu_cmpgt((vec_int4)in, -1);
+    exp = spu_and(spu_rlmask((vec_int4)in, -23), 0xFF);
 
-  shift = spu_sub(127, exp);
+    shift = spu_sub(127, exp);
 
-  frac_mask = spu_and(spu_rlmask(VEC_SPLAT_U32(0x7FFFFF), shift),
-                      spu_cmpgt((vec_int4)shift, -31));
+    frac_mask
+        = spu_and(spu_rlmask(VEC_SPLAT_U32(0x7FFFFF), shift), spu_cmpgt((vec_int4)shift, -31));
 
-  mask = spu_orc(frac_mask, spu_cmpgt(exp, 126));
+    mask = spu_orc(frac_mask, spu_cmpgt(exp, 126));
 
-  addend = spu_andc(spu_andc(spu_add(mask, 1), pos),
-                    spu_cmpeq(spu_and((vec_uint4)in, mask), 0));
+    addend = spu_andc(spu_andc(spu_add(mask, 1), pos), spu_cmpeq(spu_and((vec_uint4)in, mask), 0));
 
-  insert = spu_andc(spu_andc(VEC_SPLAT_U32(0xBF800000), pos),
-                    spu_cmpgt((vec_uint4)spu_add(exp, -1), 126));
+    insert = spu_andc(spu_andc(VEC_SPLAT_U32(0xBF800000), pos),
+                      spu_cmpgt((vec_uint4)spu_add(exp, -1), 126));
 
-  out = (vec_float4)spu_add(spu_sel((vec_uint4)in, insert, mask), addend);
+    out = (vec_float4)spu_add(spu_sel((vec_uint4)in, insert, mask), addend);
 
-  return (spu_extract(out, 0));
+    return (spu_extract(out, 0));
 #endif /* FLOOR_INTEGER_RANGE */
 }
 #endif /* _FLOORF_H_ */

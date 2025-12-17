@@ -42,26 +42,27 @@
 #define TEST_FILE_NAME "FIO.TXT"
 #endif
 
-#define check(condition, message) do {                  \
-        if (!(condition)) {                             \
-            printf("%s: %s\n", message, #condition);    \
-            exit(1);                                    \
-        }                                               \
-    } while(0)
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            exit(1);                                 \
+        }                                            \
+    } while (0)
 
-#define RAND_MUL        1664525UL
-#define RAND_ADD        1013904223UL
+#define RAND_MUL 1664525UL
+#define RAND_ADD 1013904223UL
 
 static inline unsigned long
 my_permute(long input)
 {
-    return (unsigned long) input * RAND_MUL + RAND_ADD;
+    return (unsigned long)input * RAND_MUL + RAND_ADD;
 }
 
 static inline uint8_t
 test_value(long offset, int generation)
 {
-    return (uint8_t) my_permute(offset * (generation + 1));
+    return (uint8_t)my_permute(offset * (generation + 1));
 }
 
 static void
@@ -85,12 +86,12 @@ check_buf(long offset, int generation, void *b, size_t len)
     return -1L;
 }
 
-#define BUF_SIZE        2048
+#define BUF_SIZE 2048
 
 static uint8_t out[BUF_SIZE];
 static uint8_t in[BUF_SIZE];
 
-static long offsets[BUF_SIZE];
+static long    offsets[BUF_SIZE];
 
 static void
 random_offsets(int generation, int num_ops, size_t per_op)
@@ -111,19 +112,19 @@ random_offsets(int generation, int num_ops, size_t per_op)
 int
 main(int argc, char **argv)
 {
-    FILE *f;
-    int generation = 0;
+    FILE  *f;
+    int    generation = 0;
     size_t ret;
     size_t size;
     size_t nmemb, per_op;
-    off_t offset;
-    char *file_name = TEST_FILE_NAME;
-    int order;
-    int num_ops;
-    int op;
-    int status = 0;
-    int repeat = 10000;
-    long failed;
+    off_t  offset;
+    char  *file_name = TEST_FILE_NAME;
+    int    order;
+    int    num_ops;
+    int    op;
+    int    status = 0;
+    int    repeat = 10000;
+    long   failed;
 
     if (argc > 1) {
         repeat = atoi(argv[1]);
@@ -174,7 +175,7 @@ main(int argc, char **argv)
                         check(ret == per_op, "fread ordered");
                     }
                 } else {
-                    random_offsets((unsigned int) generation * 1146533039UL, num_ops, per_op);
+                    random_offsets((unsigned int)generation * 1146533039UL, num_ops, per_op);
                     offset = 0;
                     for (op = 0; op < num_ops; op++) {
                         fseek(f, size * offsets[op] - offset, SEEK_CUR);
@@ -187,8 +188,8 @@ main(int argc, char **argv)
                 fclose(f);
                 failed = check_buf(0, generation, in, BUF_SIZE);
                 if (failed != -1L) {
-                    printf("check failed at offset %ld size %zd order %d per_op %zd\n",
-                           failed, size, order, per_op);
+                    printf("check failed at offset %ld size %zd order %d per_op %zd\n", failed,
+                           size, order, per_op);
                     status = 1;
                 }
                 generation++;
@@ -219,7 +220,7 @@ main(int argc, char **argv)
             fseek(f, write_offset, SEEK_SET);
 
             ret = fwrite(out + write_offset, 1, write_len, f);
-            check(ret == (size_t) write_len, "fwrite mixed");
+            check(ret == (size_t)write_len, "fwrite mixed");
         } else {
             long read_offset, read_len, i;
             read_offset = random() % BUF_SIZE;
@@ -234,22 +235,22 @@ main(int argc, char **argv)
             }
 
             ret = fread(in + read_offset, 1, read_len, f);
-            check(ret == (size_t) read_len, "fread mixed");
+            check(ret == (size_t)read_len, "fread mixed");
 
             for (i = 0; i < read_len; i++) {
                 uint8_t expect = out[read_offset + i];
                 if (generation % 10 == 9 && i == 0)
                     expect++;
                 if (in[read_offset + i] != expect) {
-                    printf("mixed check failed at offset %ld generation %d\n",
-                           read_offset + i, generation);
+                    printf("mixed check failed at offset %ld generation %d\n", read_offset + i,
+                           generation);
                     status = 1;
                 }
             }
         }
     }
 
-    (void) remove(file_name);
+    (void)remove(file_name);
 
     exit(status);
 }

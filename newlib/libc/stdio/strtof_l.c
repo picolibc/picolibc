@@ -38,15 +38,13 @@
 #ifdef WIDE_CHARS
 #include <wctype.h>
 #define strtof_l wcstof_l
-#define strtof wcstof
-#define char wchar_t
+#define strtof   wcstof
+#define char     wchar_t
 #endif
 
 float
-strtof_l (const char *__restrict s00,
-	  char **__restrict se,
-	  locale_t loc)
+strtof_l(const char * __restrict s00, char ** __restrict se, locale_t loc)
 {
-        (void) loc;
-	return strtof (s00, se);
+    (void)loc;
+    return strtof(s00, se);
 }

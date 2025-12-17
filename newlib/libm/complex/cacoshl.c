@@ -36,14 +36,14 @@
 long double complex
 cacoshl(long double complex z)
 {
-	long double complex w;
+    long double complex w;
 
 #if 0 /* does not give the principal value */
 	w = (double complex) I * cacosl(z);
 #else
-	w = clogl(z + csqrtl(z + 1) * csqrtl(z - 1));
+    w = clogl(z + csqrtl(z + 1) * csqrtl(z - 1));
 #endif
-	return w;
+    return w;
 }
 
 #endif

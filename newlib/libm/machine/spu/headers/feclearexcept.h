@@ -31,21 +31,22 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FECLEAREXCEPT_H_
-#define _FECLEAREXCEPT_H_	1
+#define _FECLEAREXCEPT_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline void _feclearexcept(int excepts)
+static __inline void
+_feclearexcept(int excepts)
 {
-  vec_uint4 fpscr, fpscr_mask;
+    vec_uint4 fpscr, fpscr_mask;
 
-  fpscr = spu_mffpscr();
-  excepts = ~(excepts & FE_ALL_EXCEPT);
-  fpscr_mask = __unpack_fpscr((fenv_t) excepts);
-  fpscr = spu_and(fpscr, fpscr_mask);
-  spu_mtfpscr(fpscr);
+    fpscr = spu_mffpscr();
+    excepts = ~(excepts & FE_ALL_EXCEPT);
+    fpscr_mask = __unpack_fpscr((fenv_t)excepts);
+    fpscr = spu_and(fpscr, fpscr_mask);
+    spu_mtfpscr(fpscr);
 }
 
 #endif /* _FECLEAREXCEPT_H_ */

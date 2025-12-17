@@ -51,19 +51,20 @@
  * call to __errno) is faster than this current code.
  */
 
-static __inline void dom_chkd_negone_one (vector double vx)
+static __inline void
+dom_chkd_negone_one(vector double vx)
 {
-  vector unsigned long long domain;
-  vector signed int verrno;
-  vector double ones = { 1.0, 1.0 };
-  vector signed int fail = { EDOM, EDOM, EDOM, EDOM };
+    vector unsigned long long domain;
+    vector signed int         verrno;
+    vector double             ones = { 1.0, 1.0 };
+    vector signed int         fail = { EDOM, EDOM, EDOM, EDOM };
 
-  domain = spu_cmpabsgt(vx, ones);
-  verrno = spu_splats(errno);
-  /*
-   * domain is 2 long longs, but they have the same value. Even so, no
-   * special code is needed to extract the scalar errno (we have all ones
-   * or all zeroes for the preferred scalar slot).
-   */
-  errno = spu_extract(spu_sel(verrno, fail, (vector unsigned int) domain), 0);
+    domain = spu_cmpabsgt(vx, ones);
+    verrno = spu_splats(errno);
+    /*
+     * domain is 2 long longs, but they have the same value. Even so, no
+     * special code is needed to extract the scalar errno (we have all ones
+     * or all zeroes for the preferred scalar slot).
+     */
+    errno = spu_extract(spu_sel(verrno, fail, (vector unsigned int)domain), 0);
 }

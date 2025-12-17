@@ -3,13 +3,13 @@ FUNCTION
 <<getenv>>---look up environment variable
 
 INDEX
-	getenv
+        getenv
 INDEX
-	environ
+        environ
 
 SYNOPSIS
-	#include <stdlib.h>
-	char *getenv(const char *<[name]>);
+        #include <stdlib.h>
+        char *getenv(const char *<[name]>);
 
 DESCRIPTION
 <<getenv>> searches the list of environment variable names and values
@@ -57,9 +57,9 @@ variables vary from one system to another.
  */
 
 char *
-getenv (const char *name)
+getenv(const char *name)
 {
-  int offset;
+    int offset;
 
-  return _findenv (name, &offset);
+    return _findenv(name, &offset);
 }

@@ -36,10 +36,8 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_pointer_overflow(void *_data,
-                                void *val, void *result)
+__ubsan_handle_pointer_overflow(void *_data, void *val, void *result)
 {
     struct pointer_overflow_data *data = _data;
-    __ubsan_error(&data->location, "pointer_overflow", "%p -> %p\n",
-                  val, result);
+    __ubsan_error(&data->location, "pointer_overflow", "%p -> %p\n", val, result);
 }

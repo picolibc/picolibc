@@ -41,5 +41,5 @@
 void
 _set_tls(void *tls)
 {
-	__asm__("mv tp, %0" : : "r" (tls));
+    __asm__("mv tp, %0" : : "r"(tls));
 }

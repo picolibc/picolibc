@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fabsf.h"
 
-float fabsf(float value)
+float
+fabsf(float value)
 {
     return _fabsf(value);
 }

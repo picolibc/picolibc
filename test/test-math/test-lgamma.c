@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-lgamma.h"
-#define TEST_FUNC       lgamma
+#define TEST_VECTORS "test-lgamma.h"
+#define TEST_FUNC    lgamma
 
 #include "test-real-one.h"

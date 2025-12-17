@@ -44,11 +44,11 @@
  */
 extern char __tls_head_size[] __weak;
 
-#define TP_OFFSET       0x7000
+#define TP_OFFSET 0x7000
 
 void
 _set_tls(void *tls)
 {
-    tls = (uint8_t *) tls + TP_OFFSET + (uintptr_t) __tls_head_size;
-    __asm__("mr 13, %0" : : "r" (tls));
+    tls = (uint8_t *)tls + TP_OFFSET + (uintptr_t)__tls_head_size;
+    __asm__("mr 13, %0" : : "r"(tls));
 }

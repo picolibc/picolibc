@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FMAX_H_
-#define _FMAX_H_	1
+#define _FMAX_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -45,31 +45,32 @@
  *    equal thereby making the following true for two denorm inputs
  *    fmax(a, b) != fmax(b, a);
  */
-static __inline double _fmax(double x, double y)
+static __inline double
+_fmax(double x, double y)
 {
-  vec_uint4 nan_x, selector, abs_x, gt, eq;
-  vec_uint4 sign = VEC_LITERAL(vec_uint4, 0x80000000, 0, 0x80000000, 0);
-  vec_uint4 infinity = VEC_LITERAL(vec_uint4, 0x7FF00000, 0, 0x7FF00000, 0);
-  vec_double2 vx, vy, diff, max;
+    vec_uint4   nan_x, selector, abs_x, gt, eq;
+    vec_uint4   sign = VEC_LITERAL(vec_uint4, 0x80000000, 0, 0x80000000, 0);
+    vec_uint4   infinity = VEC_LITERAL(vec_uint4, 0x7FF00000, 0, 0x7FF00000, 0);
+    vec_double2 vx, vy, diff, max;
 
-  vx = spu_promote(x, 0);
-  vy = spu_promote(y, 0);
+    vx = spu_promote(x, 0);
+    vy = spu_promote(y, 0);
 
-  /* If x is a NaN, then select y as max
-   */
-  abs_x = spu_andc((vec_uint4)vx, sign);
-  gt = spu_cmpgt(abs_x, infinity);
-  eq = spu_cmpeq(abs_x, infinity);
+    /* If x is a NaN, then select y as max
+     */
+    abs_x = spu_andc((vec_uint4)vx, sign);
+    gt = spu_cmpgt(abs_x, infinity);
+    eq = spu_cmpeq(abs_x, infinity);
 
-  nan_x = spu_or(gt, spu_and(eq, spu_rlqwbyte(gt, 4)));
+    nan_x = spu_or(gt, spu_and(eq, spu_rlqwbyte(gt, 4)));
 
-  diff = spu_sub(vx, vy);
-  selector = spu_orc(nan_x, spu_cmpgt((vec_int4)diff, -1));
-  selector = spu_maskw(spu_extract(selector, 0));
+    diff = spu_sub(vx, vy);
+    selector = spu_orc(nan_x, spu_cmpgt((vec_int4)diff, -1));
+    selector = spu_maskw(spu_extract(selector, 0));
 
-  max = spu_sel(vx, vy, (vec_ullong2)selector);
+    max = spu_sel(vx, vy, (vec_ullong2)selector);
 
-  return (spu_extract(max, 0));
+    return (spu_extract(max, 0));
 }
 
 #endif /* _FMAX_H_ */

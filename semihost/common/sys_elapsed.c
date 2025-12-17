@@ -38,18 +38,18 @@
 uint64_t
 sys_semihost_elapsed(void)
 {
-	if (sizeof(sh_param_t) == 8) {
-		struct {
-			sh_param_t	field1;
-		} arg;
-		sys_semihost(SYS_ELAPSED, (uintptr_t) &arg);
-		return (uint64_t) arg.field1;
-	} else {
-		struct {
-			sh_param_t	field1;
-			sh_param_t	field2;
-		} arg;
-		sys_semihost(SYS_ELAPSED, (uintptr_t) &arg);
-		return (((uint64_t) arg.field2) << 32) | ((uint32_t) arg.field1);
-	}
+    if (sizeof(sh_param_t) == 8) {
+        struct {
+            sh_param_t field1;
+        } arg;
+        sys_semihost(SYS_ELAPSED, (uintptr_t)&arg);
+        return (uint64_t)arg.field1;
+    } else {
+        struct {
+            sh_param_t field1;
+            sh_param_t field2;
+        } arg;
+        sys_semihost(SYS_ELAPSED, (uintptr_t)&arg);
+        return (((uint64_t)arg.field2) << 32) | ((uint32_t)arg.field1);
+    }
 }

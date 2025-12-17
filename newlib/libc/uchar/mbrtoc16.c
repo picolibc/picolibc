@@ -45,23 +45,23 @@ mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n,
         ps = &local_state;
 
 #if __SIZEOF_WCHAR_T__ == 2
-    return mbrtowc((wchar_t *) pc16, s, n, ps);
+    return mbrtowc((wchar_t *)pc16, s, n, ps);
 #elif __SIZEOF_WCHAR_T__ == 4
     wchar_t wc;
-    size_t ret;
+    size_t  ret;
 
     if (ps->__count == -1) {
         *pc16 = (ps->__value.__ucs & 0x3ff) + LOW_SURROGATE_FIRST;
         ps->__count = 0;
         ps->__value.__ucs = 0;
-        return (size_t) -3;
+        return (size_t)-3;
     }
     ret = mbrtowc(&wc, s, n, ps);
 
     switch (ret) {
-    case (size_t) -2:       /* wc not stored */
+    case (size_t)-2: /* wc not stored */
         return ret;
-    case (size_t) -1:       /* error */
+    case (size_t)-1: /* error */
         return ret;
     default:
         break;

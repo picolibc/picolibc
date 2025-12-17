@@ -71,22 +71,22 @@
 #endif
 
 long double
-strtold (const CHAR * nptr, CHAR ** endptr)
+strtold(const CHAR *nptr, CHAR **endptr)
 {
-    int len = 0;
+    int         len = 0;
     long double flt;
-    UCHAR ret;
+    UCHAR       ret;
 
     while (ISSPACE(nptr[len]))
         len++;
 
     ret = conv_flt(nptr, &len, INT_MAX, &flt, FL_LONG);
     if (!ret) {
-        flt = (long double) 0.0;
+        flt = (long double)0.0;
         len = 0;
     }
     if (endptr)
-        *endptr = (CHAR *) nptr + len;
+        *endptr = (CHAR *)nptr + len;
     return flt;
 }
 

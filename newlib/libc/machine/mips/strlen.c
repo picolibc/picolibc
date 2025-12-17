@@ -24,53 +24,53 @@
 
 #if defined(__mips16)
 size_t
-strlen (const char *str)
+strlen(const char *str)
 {
-  const char *start = str;
+    const char *start = str;
 
-  while (*str++ != '\0')
-    ;
+    while (*str++ != '\0')
+        ;
 
-  return str - start - 1;
+    return str - start - 1;
 }
 #elif defined(__mips64)
-__asm__(""			/* 64-bit MIPS targets */
-	"	.set	noreorder\n"
-	"	.set	nomacro\n"
-	"	.globl	strlen\n"
-	"	.ent	strlen\n"
-	"strlen:\n"
-	"	daddiu	$2,$4,1\n"
-	"\n"
-	"1:	lbu	$3,0($4)\n"
-	"	bnez	$3,1b\n"
-	"	daddiu	$4,$4,1\n"
-	"\n"
-	"	jr	$31\n"
-	"	dsubu	$2,$4,$2\n"
-	"	.end	strlen\n"
-	"	.set	macro\n"
-	"	.set	reorder\n");
+__asm__("" /* 64-bit MIPS targets */
+        "	.set	noreorder\n"
+        "	.set	nomacro\n"
+        "	.globl	strlen\n"
+        "	.ent	strlen\n"
+        "strlen:\n"
+        "	daddiu	$2,$4,1\n"
+        "\n"
+        "1:	lbu	$3,0($4)\n"
+        "	bnez	$3,1b\n"
+        "	daddiu	$4,$4,1\n"
+        "\n"
+        "	jr	$31\n"
+        "	dsubu	$2,$4,$2\n"
+        "	.end	strlen\n"
+        "	.set	macro\n"
+        "	.set	reorder\n");
 
 #else
-__asm__(""			/* 32-bit MIPS targets */
-	"	.set	noreorder\n"
-	"	.set	nomacro\n"
-	"	.globl	strlen\n"
-	"	.ent	strlen\n"
-	"strlen:\n"
-	"	addiu	$2,$4,1\n"
-	"\n"
-	"1:	lbu	$3,0($4)\n"
+__asm__("" /* 32-bit MIPS targets */
+        "	.set	noreorder\n"
+        "	.set	nomacro\n"
+        "	.globl	strlen\n"
+        "	.ent	strlen\n"
+        "strlen:\n"
+        "	addiu	$2,$4,1\n"
+        "\n"
+        "1:	lbu	$3,0($4)\n"
 #if defined(_R3000)
-	"	nop	\n"
+        "	nop	\n"
 #endif
-	"	bnez	$3,1b\n"
-	"	addiu	$4,$4,1\n"
-	"\n"
-	"	jr	$31\n"
-	"	subu	$2,$4,$2\n"
-	"	.end	strlen\n"
-	"	.set	macro\n"
-	"	.set	reorder\n");
+        "	bnez	$3,1b\n"
+        "	addiu	$4,$4,1\n"
+        "\n"
+        "	jr	$31\n"
+        "	subu	$2,$4,$2\n"
+        "	.end	strlen\n"
+        "	.set	macro\n"
+        "	.set	reorder\n");
 #endif

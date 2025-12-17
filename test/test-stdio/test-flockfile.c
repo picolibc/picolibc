@@ -41,12 +41,13 @@
 #include <unistd.h>
 #include <fcntl.h>
 
-#define check(condition, message) do {                  \
-        if (!(condition)) {                             \
-            printf("%s: %s\n", message, #condition);    \
-            exit(1);                                    \
-        }                                               \
-    } while(0)
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            exit(1);                                 \
+        }                                            \
+    } while (0)
 
 #ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME "FLOCK.TXT"
@@ -54,7 +55,7 @@
 
 /* When __STDIO_LOCKING isn't defined, use flockfile/funlockfile */
 #if defined(__PICOLIBC__) && !defined(__STDIO_LOCKING)
-#define LOCK(out) flockfile(out)
+#define LOCK(out)   flockfile(out)
 #define UNLOCK(out) funlockfile(out)
 #else
 #define LOCK(out)
@@ -63,22 +64,23 @@
 
 static FILE *out;
 
-static void *write_func(void *arg)
+static void *
+write_func(void *arg)
 {
     char *val = arg;
     char *v;
-    int i;
-    for(i = 0; i < 10; i++) {
+    int   i;
+    for (i = 0; i < 10; i++) {
         LOCK(out);
         fprintf(out, "%s", val);
         UNLOCK(out);
     }
-    for(i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++) {
         LOCK(out);
         fputs(val, out);
         UNLOCK(out);
     }
-    for(i = 0; i < 10; i++) {
+    for (i = 0; i < 10; i++) {
         flockfile(out);
         v = val;
         while (*v) {
@@ -90,13 +92,11 @@ static void *write_func(void *arg)
     return NULL;
 }
 
-#define STRING  "hello, world\n"
+#define STRING "hello, world\n"
 
-int
-start_thread(void *(*func)(void *), void *arg);
+int start_thread(void *(*func)(void *), void *arg);
 
-int
-stop_thread(void);
+int stop_thread(void);
 
 #ifdef NO_NEWLIB
 #include <pthread.h>
@@ -106,13 +106,13 @@ static pthread_t thread;
 int
 start_thread(void *(*func)(void *), void *arg)
 {
-        return pthread_create(&thread, NULL, func, arg);
+    return pthread_create(&thread, NULL, func, arg);
 }
 
 int
 stop_thread(void)
 {
-        return pthread_join(thread, NULL);
+    return pthread_join(thread, NULL);
 }
 #endif
 
@@ -120,26 +120,29 @@ stop_thread(void)
 
 static int fd;
 
-static int myput(char c, FILE *file)
+static int
+myput(char c, FILE *file)
 {
-    (void) file;
+    (void)file;
     write(fd, &c, 1);
     usleep(rand() & 31);
-    return (unsigned char) c;
+    return (unsigned char)c;
 }
 
-static int myget(FILE *file)
+static int
+myget(FILE *file)
 {
-    (void) file;
+    (void)file;
     uint8_t c;
     if (read(fd, &c, 1) <= 0)
         return _FDEV_EOF;
     return c;
 }
 
-static int myclose(FILE *file)
+static int
+myclose(FILE *file)
 {
-    (void) file;
+    (void)file;
     close(fd);
     fd = -1;
     return 0;
@@ -151,14 +154,14 @@ static struct __file_close myout = FDEV_SETUP_CLOSE(myput, myget, NULL, myclose,
 int
 main(void)
 {
-    int ret;
-    int status = 0;
-    char buf[1024];
+    int   ret;
+    int   status = 0;
+    char  buf[1024];
     FILE *in;
 
 #ifdef __SINGLE_THREAD
     printf("Single thread mode, test skipped\n");
-    return(77);
+    return (77);
 #endif
 
 #ifdef __PICOLIBC__

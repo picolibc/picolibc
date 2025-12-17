@@ -30,8 +30,8 @@
 
 #include <picolibc.h>
 
-#if defined (__ARC64_ARCH32__)
-# include "../../string/memcmp.c"
+#if defined(__ARC64_ARCH32__)
+#include "../../string/memcmp.c"
 #else
 /* See memcpy.S.  */
 #endif

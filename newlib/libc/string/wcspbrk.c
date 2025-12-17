@@ -1,20 +1,20 @@
 /*
 FUNCTION
-	<<wcspbrk>>----scan wide-character string for a wide-character code
+        <<wcspbrk>>----scan wide-character string for a wide-character code
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcspbrk(const wchar_t *<[s]>, const wchar_t *<[set]>);
+        #include <wchar.h>
+        wchar_t *wcspbrk(const wchar_t *<[s]>, const wchar_t *<[set]>);
 
 DESCRIPTION
-	The <<wcspbrk>> function locates the first occurrence in the
-	wide-character string pointed to by <[s]> of any wide-character code
-	from the wide-character string pointed to by <[set]>. 
+        The <<wcspbrk>> function locates the first occurrence in the
+        wide-character string pointed to by <[s]> of any wide-character code
+        from the wide-character string pointed to by <[set]>.
 
 RETURNS
-	Upon successful completion, <<wcspbrk>> returns a pointer to the
-	wide-character code or a null pointer if no wide-character code from
-	<[set]> occurs in <[s]>.
+        Upon successful completion, <<wcspbrk>> returns a pointer to the
+        wide-character code or a null pointer if no wide-character code from
+        <[set]> occurs in <[s]>.
 
 PORTABILITY
 <<wcspbrk>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -56,26 +56,22 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wcspbrk (const wchar_t * s,
-	const wchar_t * set)
+wcspbrk(const wchar_t *s, const wchar_t *set)
 {
-  const wchar_t *p;
-  const wchar_t *q;
+    const wchar_t *p;
+    const wchar_t *q;
 
-  p = s;
-  while (*p)
-    {
-      q = set;
-      while (*q)
-	{
-	  if (*p == *q)
-	    {
-	      /* LINTED interface specification */
-	      return (wchar_t *) p;
-	    }
-	  q++;
-	}
-      p++;
+    p = s;
+    while (*p) {
+        q = set;
+        while (*q) {
+            if (*p == *q) {
+                /* LINTED interface specification */
+                return (wchar_t *)p;
+            }
+            q++;
+        }
+        p++;
     }
-  return NULL;
+    return NULL;
 }

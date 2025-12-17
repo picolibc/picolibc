@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-atanh.h"
-#define TEST_FUNC       atanh
+#define TEST_VECTORS "test-atanh.h"
+#define TEST_FUNC    atanh
 
 #include "test-real-one.h"

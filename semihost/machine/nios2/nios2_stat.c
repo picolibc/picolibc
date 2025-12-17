@@ -41,11 +41,11 @@
 #include <stdarg.h>
 
 int
-stat(const char *pathname, struct stat *restrict statbuf)
+stat(const char *pathname, struct stat * restrict statbuf)
 {
     struct nios2_stat nios2_stat;
 
-    int ret = nios2_semihost2(HOSTED_STAT, (uintptr_t) pathname, (uintptr_t) &nios2_stat);
+    int ret = nios2_semihost2(HOSTED_STAT, (uintptr_t)pathname, (uintptr_t)&nios2_stat);
     if (ret >= 0)
         copy_stat(statbuf, &nios2_stat);
     return ret;

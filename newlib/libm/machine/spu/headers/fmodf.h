@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FMODF_H_
-#define _FMODF_H_	1
+#define _FMODF_H_ 1
 
 #include <errno.h>
 #include <spu_intrinsics.h>
@@ -57,114 +57,112 @@
  *	signed integer range. Values outside this range get clamped.
  */
 
-static __inline float _fmodf(float x, float y)
+static __inline float
+_fmodf(float x, float y)
 {
 #ifdef FMODF_INTEGER_RANGE
-  /* 32-BIT INTEGER DYNAMIC RANGE
-   */
-  float abs_y;
-  float quotient;
+    /* 32-BIT INTEGER DYNAMIC RANGE
+     */
+    float abs_y;
+    float quotient;
 
-  abs_y = _fabsf(y);
-  quotient = x/abs_y;
+    abs_y = _fabsf(y);
+    quotient = x / abs_y;
 
-  return (abs_y*(quotient - ((float)((int)quotient))));
+    return (abs_y * (quotient - ((float)((int)quotient))));
 
 #else /* !FMODF_INTEGER_RANGE */
-  /* FULL FLOATING-POINT RANGE
-   */
-  int n;
-  vec_uint4 vx, vy, z;
-  vec_uint4 abs_x, abs_y;
-  vec_uint4 exp_x, exp_y;
-  vec_uint4 zero_x, zero_y;
-  vec_uint4 logb_x, logb_y;
-  vec_uint4 mant_x, mant_y;
-  vec_uint4 result, result0, resultx, cnt, sign;
-  vec_uint4 sign_mask = VEC_SPLAT_U32(0x80000000);
-  vec_uint4 implied_1 = VEC_SPLAT_U32(0x00800000);
-  vec_uint4 mant_mask = VEC_SPLAT_U32(0x007FFFFF);
-  vec_uint4 domain;
-  vec_int4 verrno;
-  vec_float4 vc = { 0.0, 0.0, 0.0, 0.0 };
-  vec_int4 fail = { EDOM, EDOM, EDOM, EDOM };
+    /* FULL FLOATING-POINT RANGE
+     */
+    int        n;
+    vec_uint4  vx, vy, z;
+    vec_uint4  abs_x, abs_y;
+    vec_uint4  exp_x, exp_y;
+    vec_uint4  zero_x, zero_y;
+    vec_uint4  logb_x, logb_y;
+    vec_uint4  mant_x, mant_y;
+    vec_uint4  result, result0, resultx, cnt, sign;
+    vec_uint4  sign_mask = VEC_SPLAT_U32(0x80000000);
+    vec_uint4  implied_1 = VEC_SPLAT_U32(0x00800000);
+    vec_uint4  mant_mask = VEC_SPLAT_U32(0x007FFFFF);
+    vec_uint4  domain;
+    vec_int4   verrno;
+    vec_float4 vc = { 0.0, 0.0, 0.0, 0.0 };
+    vec_int4   fail = { EDOM, EDOM, EDOM, EDOM };
 
-  vx = (vec_uint4)spu_promote(x, 0);
-  vy = (vec_uint4)spu_promote(y, 0);
+    vx = (vec_uint4)spu_promote(x, 0);
+    vy = (vec_uint4)spu_promote(y, 0);
 
-  abs_x = spu_andc(vx, sign_mask);
-  abs_y = spu_andc(vy, sign_mask);
+    abs_x = spu_andc(vx, sign_mask);
+    abs_y = spu_andc(vy, sign_mask);
 
-  sign = spu_and(vx, sign_mask);
+    sign = spu_and(vx, sign_mask);
 
-  /* Determine ilogb of abs_x and abs_y and
-   * extract the mantissas (mant_x, mant_y)
-   */
-  exp_x  = spu_rlmask(abs_x, -23);
-  exp_y  = spu_rlmask(abs_y, -23);
+    /* Determine ilogb of abs_x and abs_y and
+     * extract the mantissas (mant_x, mant_y)
+     */
+    exp_x = spu_rlmask(abs_x, -23);
+    exp_y = spu_rlmask(abs_y, -23);
 
-  resultx = spu_cmpgt(abs_y, abs_x);
+    resultx = spu_cmpgt(abs_y, abs_x);
 
-  zero_x = spu_cmpeq(exp_x, 0);
-  zero_y = spu_cmpeq(exp_y, 0);
+    zero_x = spu_cmpeq(exp_x, 0);
+    zero_y = spu_cmpeq(exp_y, 0);
 
-  logb_x = spu_add(exp_x, -127);
-  logb_y = spu_add(exp_y, -127);
+    logb_x = spu_add(exp_x, -127);
+    logb_y = spu_add(exp_y, -127);
 
-  mant_x = spu_andc(spu_sel(implied_1, abs_x, mant_mask), zero_x);
-  mant_y = spu_andc(spu_sel(implied_1, abs_y, mant_mask), zero_y);
+    mant_x = spu_andc(spu_sel(implied_1, abs_x, mant_mask), zero_x);
+    mant_y = spu_andc(spu_sel(implied_1, abs_y, mant_mask), zero_y);
 
-  /* Compute fixed point fmod of mant_x and mant_y. Set the flag,
-   * result0, to all ones if we detect that the final result is
-   * ever 0.
-   */
-  result0 = spu_or(zero_x, zero_y);
+    /* Compute fixed point fmod of mant_x and mant_y. Set the flag,
+     * result0, to all ones if we detect that the final result is
+     * ever 0.
+     */
+    result0 = spu_or(zero_x, zero_y);
 
-  n = spu_extract(spu_sub(logb_x, logb_y), 0);
+    n = spu_extract(spu_sub(logb_x, logb_y), 0);
 
-  while (n-- > 0) {
+    while (n-- > 0) {
+        z = spu_sub(mant_x, mant_y);
+
+        result0 = spu_or(spu_cmpeq(z, 0), result0);
+
+        mant_x = spu_sel(spu_add(mant_x, mant_x), spu_add(z, z), spu_cmpgt((vec_int4)z, -1));
+    }
+
     z = spu_sub(mant_x, mant_y);
+    mant_x = spu_sel(mant_x, z, spu_cmpgt((vec_int4)z, -1));
 
-    result0 = spu_or(spu_cmpeq(z, 0), result0);
+    result0 = spu_or(spu_cmpeq(mant_x, 0), result0);
 
-    mant_x = spu_sel(spu_add(mant_x, mant_x), spu_add(z, z),
-                     spu_cmpgt((vec_int4)z, -1));
-  }
+    /* Convert the result back to floating point and restore
+     * the sign. If we flagged the result to be zero (result0),
+     * zero it. If we flagged the result to equal its input x,
+     * (resultx) then return x.
+     */
+    cnt = spu_add(spu_cntlz(mant_x), -8);
 
-  z = spu_sub(mant_x, mant_y);
-  mant_x = spu_sel(mant_x, z, spu_cmpgt((vec_int4)z, -1));
+    mant_x = spu_rl(spu_andc(mant_x, implied_1), (vec_int4)cnt);
 
-  result0 = spu_or(spu_cmpeq(mant_x, 0), result0);
+    exp_y = spu_sub(exp_y, cnt);
+    result0 = spu_orc(result0, spu_cmpgt((vec_int4)exp_y, 0)); /* zero denorm results */
+    exp_y = spu_rl(exp_y, 23);
 
-  /* Convert the result back to floating point and restore
-   * the sign. If we flagged the result to be zero (result0),
-   * zero it. If we flagged the result to equal its input x,
-   * (resultx) then return x.
-   */
-  cnt = spu_add(spu_cntlz(mant_x), -8);
+    result = spu_sel(exp_y, spu_or(sign, mant_x), VEC_SPLAT_U32(0x807FFFFF));
 
-  mant_x = spu_rl(spu_andc(mant_x, implied_1), (vec_int4)cnt);
-
-  exp_y = spu_sub(exp_y, cnt);
-  result0 = spu_orc(result0, spu_cmpgt((vec_int4)exp_y, 0)); /* zero denorm results */
-  exp_y = spu_rl(exp_y, 23);
-
-
-  result = spu_sel(exp_y, spu_or(sign, mant_x), VEC_SPLAT_U32(0x807FFFFF));
-
-  result = spu_sel(spu_andc(result, spu_rlmask(result0, -1)), vx,
-                   resultx);
+    result = spu_sel(spu_andc(result, spu_rlmask(result0, -1)), vx, resultx);
 
 #ifndef __IEEE_LIBM
-  /*
-   * If y is zero, set errno to EDOM
-   */
-  domain = spu_cmpeq(vc, (vec_float4) vy);
-  verrno = spu_splats(errno);
-  errno = spu_extract(spu_sel(verrno, fail, (vector unsigned int) domain), 0);
+    /*
+     * If y is zero, set errno to EDOM
+     */
+    domain = spu_cmpeq(vc, (vec_float4)vy);
+    verrno = spu_splats(errno);
+    errno = spu_extract(spu_sel(verrno, fail, (vector unsigned int)domain), 0);
 #endif
 
-  return (spu_extract((vec_float4)result, 0));
+    return (spu_extract((vec_float4)result, 0));
 #endif /* FMODF_INTEGER_RANGE */
 }
 #endif /* _FMODF_H_ */

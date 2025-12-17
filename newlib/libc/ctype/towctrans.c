@@ -24,26 +24,26 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
 FUNCTION
-	<<towctrans>>, <<towctrans_l>>---extensible wide-character translation
+        <<towctrans>>, <<towctrans_l>>---extensible wide-character translation
 
 INDEX
-	towctrans
+        towctrans
 
 INDEX
-	towctrans_l
+        towctrans_l
 
 SYNOPSIS
-	#include <wctype.h>
-	wint_t towctrans(wint_t <[c]>, wctrans_t <[w]>);
+        #include <wctype.h>
+        wint_t towctrans(wint_t <[c]>, wctrans_t <[w]>);
 
-	#include <wctype.h>
-	wint_t towctrans_l(wint_t <[c]>, wctrans_t <[w]>, locale_t <[locale]>);
+        #include <wctype.h>
+        wint_t towctrans_l(wint_t <[c]>, wctrans_t <[w]>, locale_t <[locale]>);
 
 
 DESCRIPTION
@@ -73,8 +73,7 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wint_t
-towctrans (wint_t c,
-	wctrans_t w)
+towctrans(wint_t c, wctrans_t w)
 {
-  return towctrans_l (c, w, 0);
+    return towctrans_l(c, w, 0);
 }

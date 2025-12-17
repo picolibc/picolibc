@@ -31,13 +31,13 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FMAF_H_
-#define _FMAF_H_	1
+#define _FMAF_H_ 1
 
 #include <spu_intrinsics.h>
 
-static __inline float _fmaf(float x, float y, float z)
+static __inline float
+_fmaf(float x, float y, float z)
 {
-  return (spu_extract(spu_madd(spu_promote(x, 0), spu_promote(y, 0),
-                               spu_promote(z, 0)), 0));
+    return (spu_extract(spu_madd(spu_promote(x, 0), spu_promote(y, 0), spu_promote(z, 0)), 0));
 }
 #endif /* _FMAF_H_ */

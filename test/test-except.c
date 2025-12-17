@@ -86,5 +86,4 @@ main(void)
     printf("ERROR: invalid instruction worked\n");
     return 0;
 #endif
-
 }

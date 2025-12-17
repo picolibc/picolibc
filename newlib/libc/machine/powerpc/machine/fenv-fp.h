@@ -28,174 +28,158 @@
  * $FreeBSD$
  */
 
-__declare_fenv_inline(int)
-feclearexcept(int excepts)
+__declare_fenv_inline(int) feclearexcept(int excepts)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	if (excepts & FE_INVALID)
-		excepts |= FE_ALL_INVALID;
-	__mffs(&__r);
-	__r.__bits.__reg &= ~excepts;
-	__mtfsf(__r);
-	return (0);
+    if (excepts & FE_INVALID)
+        excepts |= FE_ALL_INVALID;
+    __mffs(&__r);
+    __r.__bits.__reg &= ~excepts;
+    __mtfsf(__r);
+    return (0);
 }
 
-
-__declare_fenv_inline(int)
-fegetexceptflag(fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__mffs(&__r);
-	*flagp = __r.__bits.__reg & excepts;
-	return (0);
+    __mffs(&__r);
+    *flagp = __r.__bits.__reg & excepts;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetexceptflag(const fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	if (excepts & FE_INVALID)
-		excepts |= FE_ALL_EXCEPT;
-	__mffs(&__r);
-	__r.__bits.__reg &= ~excepts;
-	__r.__bits.__reg |= *flagp & excepts;
-	__mtfsf(__r);
-	return (0);
+    if (excepts & FE_INVALID)
+        excepts |= FE_ALL_EXCEPT;
+    __mffs(&__r);
+    __r.__bits.__reg &= ~excepts;
+    __r.__bits.__reg |= *flagp & excepts;
+    __mtfsf(__r);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feraiseexcept(int excepts)
+__declare_fenv_inline(int) feraiseexcept(int excepts)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	if (excepts & FE_INVALID)
-		excepts |= FE_VXSOFT;
-	__mffs(&__r);
-	__r.__bits.__reg |= excepts;
-	__mtfsf(__r);
-	return (0);
+    if (excepts & FE_INVALID)
+        excepts |= FE_VXSOFT;
+    __mffs(&__r);
+    __r.__bits.__reg |= excepts;
+    __mtfsf(__r);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetexcept(int excepts)
+__declare_fenv_inline(int) fesetexcept(int excepts)
 {
-        return feraiseexcept(excepts);
+    return feraiseexcept(excepts);
 }
 
-__declare_fenv_inline(int)
-fetestexcept(int excepts)
+__declare_fenv_inline(int) fetestexcept(int excepts)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__mffs(&__r);
-	return (__r.__bits.__reg & excepts);
+    __mffs(&__r);
+    return (__r.__bits.__reg & excepts);
 }
 
-__declare_fenv_inline(int)
-fegetround(void)
+__declare_fenv_inline(int) fegetround(void)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__mffs(&__r);
-	return (__r.__bits.__reg & _ROUND_MASK);
+    __mffs(&__r);
+    return (__r.__bits.__reg & _ROUND_MASK);
 }
 
-__declare_fenv_inline(int)
-fesetround(int rounding_mode)
+__declare_fenv_inline(int) fesetround(int rounding_mode)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	if (rounding_mode & ~_ROUND_MASK)
-		return (-1);
-	__mffs(&__r);
-	__r.__bits.__reg &= ~_ROUND_MASK;
-	__r.__bits.__reg |= rounding_mode;
-	__mtfsf(__r);
-	return (0);
+    if (rounding_mode & ~_ROUND_MASK)
+        return (-1);
+    __mffs(&__r);
+    __r.__bits.__reg &= ~_ROUND_MASK;
+    __r.__bits.__reg |= rounding_mode;
+    __mtfsf(__r);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fegetenv(fenv_t *envp)
+__declare_fenv_inline(int) fegetenv(fenv_t *envp)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__mffs(&__r);
-	*envp = __r.__bits.__reg;
-	return (0);
+    __mffs(&__r);
+    *envp = __r.__bits.__reg;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feholdexcept(fenv_t *envp)
+__declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__mffs(&__r);
-	*envp = __r.__bits.__reg;
-	__r.__bits.__reg &= ~(FE_ALL_EXCEPT | _ENABLE_MASK);
-	__mtfsf(__r);
-	return (0);
+    __mffs(&__r);
+    *envp = __r.__bits.__reg;
+    __r.__bits.__reg &= ~(FE_ALL_EXCEPT | _ENABLE_MASK);
+    __mtfsf(__r);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetenv(const fenv_t *envp)
+__declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__r.__bits.__reg = *envp;
-	__mtfsf(__r);
-	return (0);
+    __r.__bits.__reg = *envp;
+    __mtfsf(__r);
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feupdateenv(const fenv_t *envp)
+__declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__mffs(&__r);
-	__r.__bits.__reg &= FE_ALL_EXCEPT;
-	__r.__bits.__reg |= *envp;
-	__mtfsf(__r);
-	return (0);
+    __mffs(&__r);
+    __r.__bits.__reg &= FE_ALL_EXCEPT;
+    __r.__bits.__reg |= *envp;
+    __mtfsf(__r);
+    return (0);
 }
 
 #if __BSD_VISIBLE
 
-__declare_fenv_inline(int)
-feenableexcept(int __mask)
+__declare_fenv_inline(int) feenableexcept(int __mask)
 {
-	union __fpscr __r;
-	fenv_t __oldmask;
+    union __fpscr __r;
+    fenv_t        __oldmask;
 
-	__mffs(&__r);
-	__oldmask = __r.__bits.__reg;
-	__r.__bits.__reg |= (__mask & FE_ALL_EXCEPT) >> _FPUSW_SHIFT;
-	__mtfsf(__r);
-	return ((__oldmask & _ENABLE_MASK) << _FPUSW_SHIFT);
+    __mffs(&__r);
+    __oldmask = __r.__bits.__reg;
+    __r.__bits.__reg |= (__mask & FE_ALL_EXCEPT) >> _FPUSW_SHIFT;
+    __mtfsf(__r);
+    return ((__oldmask & _ENABLE_MASK) << _FPUSW_SHIFT);
 }
 
-__declare_fenv_inline(int)
-fedisableexcept(int __mask)
+__declare_fenv_inline(int) fedisableexcept(int __mask)
 {
-	union __fpscr __r;
-	fenv_t __oldmask;
+    union __fpscr __r;
+    fenv_t        __oldmask;
 
-	__mffs(&__r);
-	__oldmask = __r.__bits.__reg;
-	__r.__bits.__reg &= ~((__mask & FE_ALL_EXCEPT) >> _FPUSW_SHIFT);
-	__mtfsf(__r);
-	return ((__oldmask & _ENABLE_MASK) << _FPUSW_SHIFT);
+    __mffs(&__r);
+    __oldmask = __r.__bits.__reg;
+    __r.__bits.__reg &= ~((__mask & FE_ALL_EXCEPT) >> _FPUSW_SHIFT);
+    __mtfsf(__r);
+    return ((__oldmask & _ENABLE_MASK) << _FPUSW_SHIFT);
 }
 
-__declare_fenv_inline(int)
-fegetexcept(void)
+__declare_fenv_inline(int) fegetexcept(void)
 {
-	union __fpscr __r;
+    union __fpscr __r;
 
-	__mffs(&__r);
-	return ((__r.__bits.__reg & _ENABLE_MASK) << _FPUSW_SHIFT);
+    __mffs(&__r);
+    return ((__r.__bits.__reg & _ENABLE_MASK) << _FPUSW_SHIFT);
 }
 
 #endif /* __BSD_VISIBLE */

@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _ATANHD2_H_
-#define _ATANHD2_H_	1
+#define _ATANHD2_H_ 1
 
 #include <spu_intrinsics.h>
 #include "logd2.h"
@@ -65,7 +65,7 @@
  */
 
 /*
- * Maclaurin Series Coefficients 
+ * Maclaurin Series Coefficients
  * for x near 0.
  */
 #define SMD_DP_ATANH_MAC01 1.000000000000000000000000000000E0
@@ -91,19 +91,20 @@
 #define SMD_DP_ATANH_MAC39 2.564102564102564102564102564103E-2
 #endif
 
-
-static __inline vector double _atanhd2(vector double x)
+static __inline vector double
+_atanhd2(vector double x)
 {
-    vec_uchar16 dup_even  = ((vec_uchar16) { 0,1,2,3,  0,1,2,3, 8,9,10,11, 8,9,10,11 });
+    vec_uchar16 dup_even = ((vec_uchar16) { 0, 1, 2, 3, 0, 1, 2, 3, 8, 9, 10, 11, 8, 9, 10, 11 });
     vec_double2 sign_mask = spu_splats(-0.0);
-    vec_double2 oned      = spu_splats(1.0);
-    vec_double2 onehalfd  = spu_splats(0.5);
+    vec_double2 oned = spu_splats(1.0);
+    vec_double2 onehalfd = spu_splats(0.5);
     vec_double2 xabs, xsqu;
     /* Where we switch from maclaurin to formula */
     vec_float4  switch_approx = spu_splats(0.125f);
     vec_uint4   use_form;
     vec_float4  xf;
-    vec_double2 result, fresult, mresult;;
+    vec_double2 result, fresult, mresult;
+    ;
 
     xabs = spu_andc(x, sign_mask);
     xsqu = spu_mul(x, x);
@@ -118,7 +119,6 @@ static __inline vector double _atanhd2(vector double x)
     fresult = spu_sub(_logd2(spu_add(oned, xabs)), _logd2(spu_sub(oned, xabs)));
     fresult = spu_mul(fresult, onehalfd);
 
-
     /*
      * Taylor Series
      */
@@ -131,7 +131,6 @@ static __inline vector double _atanhd2(vector double x)
     mresult = spu_madd(xsqu, mresult, spu_splats(SMD_DP_ATANH_MAC03));
     mresult = spu_madd(xsqu, mresult, spu_splats(SMD_DP_ATANH_MAC01));
     mresult = spu_mul(xabs, mresult);
-
 
     /*
      * Choose between series and formula

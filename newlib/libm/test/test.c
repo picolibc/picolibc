@@ -16,452 +16,381 @@
  */
 #include <stdlib.h>
 #include <signal.h>
-#include  "test.h"
+#include "test.h"
 #include <math.h>
 #include <string.h>
 #include <stdint.h>
 #include <malloc.h>
-int verbose;
+int        verbose;
 static int count;
-int inacc;
+int        inacc;
 
-int redo = 0;
+int        redo = 0;
 extern int calc;
 
 #ifdef MALLOC_DEBUG
 extern char **environ;
-extern int _malloc_test_fail;
+extern int    _malloc_test_fail;
 #endif
 
 int
-main (int ac,
-      char **av)
+main(int ac, char **av)
 {
 #ifdef MALLOC_DEBUG
-  environ = en;
+    environ = en;
 #endif
-  int i;
-  int math2 = 1;
-  int string= 1;
-  int is = 1;
-  int math= 1;
-  int cvt = 1;
+    int i;
+    int math2 = 1;
+    int string = 1;
+    int is = 1;
+    int math = 1;
+    int cvt = 1;
 #ifdef __IEEEFP_FUNCS
-  int ieee= 1;
+    int ieee = 1;
 #endif
-  int vector=0;
-  for (i = 1; i < ac; i++) 
-  {
-    if (strcmp(av[i],"-v")==0) 
-     verbose ++;
-    if (strcmp(av[i],"-nomath2") == 0)
-     math2 = 0;
-    (void) math2;
-    if (strcmp(av[i],"-nostrin") == 0)
-     string= 0;
-    (void) string;
-    if (strcmp(av[i],"-nois") == 0)
-     is = 0;
-    (void) is;
-    if (strcmp(av[i],"-nomath") == 0)
-     math= 0;
-    (void) math;
-    if (strcmp(av[i],"-nocvt") == 0)
-     cvt = 0;
+    int vector = 0;
+    for (i = 1; i < ac; i++) {
+        if (strcmp(av[i], "-v") == 0)
+            verbose++;
+        if (strcmp(av[i], "-nomath2") == 0)
+            math2 = 0;
+        (void)math2;
+        if (strcmp(av[i], "-nostrin") == 0)
+            string = 0;
+        (void)string;
+        if (strcmp(av[i], "-nois") == 0)
+            is = 0;
+        (void)is;
+        if (strcmp(av[i], "-nomath") == 0)
+            math = 0;
+        (void)math;
+        if (strcmp(av[i], "-nocvt") == 0)
+            cvt = 0;
 #ifdef __IEEEFP_FUNCS
-    if (strcmp(av[i],"-noiee") == 0)
-     ieee= 0;
-  (void) ieee;
+        if (strcmp(av[i], "-noiee") == 0)
+            ieee = 0;
+        (void)ieee;
 #endif
-    if (strcmp(av[i],"-generate") == 0) {
-     vector = 1;
-     calc = 1;
+        if (strcmp(av[i], "-generate") == 0) {
+            vector = 1;
+            calc = 1;
+        }
     }
-  }
-  if (sizeof (double) < 8) {
-      printf("Skipping math tests on target without 64-bit double\n");
-      exit(77);
-  }
-  if (cvt)
-   test_cvt();
+    if (sizeof(double) < 8) {
+        printf("Skipping math tests on target without 64-bit double\n");
+        exit(77);
+    }
+    if (cvt)
+        test_cvt();
 
 #if TEST_PART == 0 || TEST_PART == -1
-  if (math2)
-   test_math2();
-  if (string)
-   test_string();
+    if (math2)
+        test_math2();
+    if (string)
+        test_string();
 #endif
-  if (math)
-   test_math(vector);
+    if (math)
+        test_math(vector);
 #if TEST_PART == 0 || TEST_PART == -1
-  if (is)
-   test_is();
+    if (is)
+        test_is();
 #ifdef __IEEEFP_FUNCS
-  if (ieee)
-   test_ieee();
+    if (ieee)
+        test_ieee();
 #endif
 #endif
-  printf("Tested %d functions, %d errors detected\n", count, inacc);
+    printf("Tested %d functions, %d errors detected\n", count, inacc);
 #ifdef __RX__
-  if (inacc != 0) {
-    printf("Expected failure on RX target, ignoring\n");
-    exit(77);
-  }
+    if (inacc != 0) {
+        printf("Expected failure on RX target, ignoring\n");
+        exit(77);
+    }
 #endif
-  exit(inacc != 0);
+    exit(inacc != 0);
 }
 
 static const char *iname;
-void newfunc (const char *string)
+void
+newfunc(const char *string)
 {
-  if (!iname || strcmp(iname, string)) 
-  {
+    if (!iname || strcmp(iname, string)) {
 #ifdef MALLOC_DEBUG
-    char *memcheck = getenv("CHECK_NAME");
-    if (memcheck && !strcmp(string, memcheck))
-      _malloc_test_fail = atoi(getenv("CHECK_COUNT"));
-    if (memcheck && iname && !strcmp(iname, memcheck)) {
-      if (_malloc_test_fail) {
-	printf("malloc test fail remain %d\n", _malloc_test_fail);
-	_malloc_test_fail = 0;
-      }
-    }
+        char *memcheck = getenv("CHECK_NAME");
+        if (memcheck && !strcmp(string, memcheck))
+            _malloc_test_fail = atoi(getenv("CHECK_COUNT"));
+        if (memcheck && iname && !strcmp(iname, memcheck)) {
+            if (_malloc_test_fail) {
+                printf("malloc test fail remain %d\n", _malloc_test_fail);
+                _malloc_test_fail = 0;
+            }
+        }
 #endif
-    printf("testing %s\n", string);
-    fflush(stdout);
-    iname = string;
-  }
-  
+        printf("testing %s\n", string);
+        fflush(stdout);
+        iname = string;
+    }
 }
-
 
 static int theline;
 
-void line(int li)
+void
+line(int li)
 {
-  if (verbose)  
-  {
-    printf("  %d\n", li);
-  }
-  theline = li;
-  
-  count++;
+    if (verbose) {
+        printf("  %d\n", li);
+    }
+    theline = li;
+
+    count++;
 }
-
-
 
 int reduce = 0;
 
 int strtod_vector = 0;
 
-static int 
-bigger (__ieee_double_shape_type *a,
-	   __ieee_double_shape_type *b)
+static int
+bigger(__ieee_double_shape_type *a, __ieee_double_shape_type *b)
 {
 
-  if (a->parts.msw > b->parts.msw) 
-    {
+    if (a->parts.msw > b->parts.msw) {
 
-      return 1;
-    } 
-  else if (a->parts.msw == b->parts.msw) 
-    {
-      if (a->parts.lsw > b->parts.lsw) 
-	{
-	  return 1;
-	}
+        return 1;
+    } else if (a->parts.msw == b->parts.msw) {
+        if (a->parts.lsw > b->parts.lsw) {
+            return 1;
+        }
     }
-  return 0;
+    return 0;
 }
 
-static int 
-fbigger (__ieee_float_shape_type *a,
-	   __ieee_float_shape_type *b)
+static int
+fbigger(__ieee_float_shape_type *a, __ieee_float_shape_type *b)
 {
 
-  if (a->p1 > b->p1)
-    {
-      return 1;
+    if (a->p1 > b->p1) {
+        return 1;
     }
-  return 0;
-}
-
-
-
-/* Return the first bit different between two double numbers */
-int 
-mag_of_error (double is,
-       double shouldbe)
-{
-  __ieee_double_shape_type a = {},b = {};
-  int i;
-  int a_big;
-  uint32_t mask;
-  uint32_t __x;
-  uint32_t msw, lsw;
-  a.value = is;
-  
-  b.value = shouldbe;
-  
-  if (a.parts.msw == b.parts.msw 
-      && a.parts.lsw== b.parts.lsw) return 64;
-
-
-  /* Subtract the larger from the smaller number */
-
-  a_big = bigger(&a, &b);
-
-  if (!a_big) {
-    uint32_t t;
-    t = a.parts.msw;
-    a.parts.msw = b.parts.msw;
-    b.parts.msw = t;
-
-    t = a.parts.lsw;
-    a.parts.lsw = b.parts.lsw;
-    b.parts.lsw = t;
-  }
-
-
-
-  __x = (a.parts.lsw) - (b.parts.lsw);							
-  msw = (a.parts.msw) - (b.parts.msw) - (__x > (a.parts.lsw));
-  lsw = __x;								
-
-  
-
-
-  /* Find out which bit the difference is in */
-  mask = 0x80000000UL;
-  for (i = 0; i < 32; i++)
-  {
-    if (((msw) & mask)!=0) return i;
-    mask >>=1;
-  }
-  
-  mask = 0x80000000UL;
-  for (i = 0; i < 32; i++)
-  {
-    
-    if (((lsw) & mask)!=0) return i+32;
-    mask >>=1;
-  }
-  
-  return 64;
-  
+    return 0;
 }
 
 /* Return the first bit different between two double numbers */
-int 
-fmag_of_error (float is,
-       float shouldbe)
+int
+mag_of_error(double is, double shouldbe)
 {
-  __ieee_float_shape_type a,b;
-  int i;
-  int a_big;
-  uint32_t mask;
-  uint32_t sw;
+    __ieee_double_shape_type a = {}, b = {};
+    int                      i;
+    int                      a_big;
+    uint32_t                 mask;
+    uint32_t                 __x;
+    uint32_t                 msw, lsw;
+    a.value = is;
 
-  a.value = is;
-  b.value = shouldbe;
+    b.value = shouldbe;
 
-  if (a.p1 == b.p1) return 32;
+    if (a.parts.msw == b.parts.msw && a.parts.lsw == b.parts.lsw)
+        return 64;
 
-  /* Subtract the larger from the smaller number */
+    /* Subtract the larger from the smaller number */
 
-  a_big = fbigger(&a, &b);
+    a_big = bigger(&a, &b);
 
-  if (!a_big) {
-    uint32_t t;
-    t = a.p1;
-    a.p1 = b.p1;
-    b.p1 = t;
-  }
+    if (!a_big) {
+        uint32_t t;
+        t = a.parts.msw;
+        a.parts.msw = b.parts.msw;
+        b.parts.msw = t;
 
-  sw = (uint32_t) (a.p1) - (uint32_t) (b.p1);
+        t = a.parts.lsw;
+        a.parts.lsw = b.parts.lsw;
+        b.parts.lsw = t;
+    }
 
-  mask = 0x80000000UL;
-  for (i = 0; i < 32; i++)
-  {
-	  if (((sw) & mask)!=0) return i;
-	  mask >>=1;
-  }
-  return 32;
+    __x = (a.parts.lsw) - (b.parts.lsw);
+    msw = (a.parts.msw) - (b.parts.msw) - (__x > (a.parts.lsw));
+    lsw = __x;
+
+    /* Find out which bit the difference is in */
+    mask = 0x80000000UL;
+    for (i = 0; i < 32; i++) {
+        if (((msw)&mask) != 0)
+            return i;
+        mask >>= 1;
+    }
+
+    mask = 0x80000000UL;
+    for (i = 0; i < 32; i++) {
+
+        if (((lsw)&mask) != 0)
+            return i + 32;
+        mask >>= 1;
+    }
+
+    return 64;
 }
 
- int ok_mag;
+/* Return the first bit different between two double numbers */
+int
+fmag_of_error(float is, float shouldbe)
+{
+    __ieee_float_shape_type a, b;
+    int                     i;
+    int                     a_big;
+    uint32_t                mask;
+    uint32_t                sw;
 
+    a.value = is;
+    b.value = shouldbe;
 
+    if (a.p1 == b.p1)
+        return 32;
+
+    /* Subtract the larger from the smaller number */
+
+    a_big = fbigger(&a, &b);
+
+    if (!a_big) {
+        uint32_t t;
+        t = a.p1;
+        a.p1 = b.p1;
+        b.p1 = t;
+    }
+
+    sw = (uint32_t)(a.p1) - (uint32_t)(b.p1);
+
+    mask = 0x80000000UL;
+    for (i = 0; i < 32; i++) {
+        if (((sw)&mask) != 0)
+            return i;
+        mask >>= 1;
+    }
+    return 32;
+}
+
+int ok_mag;
 
 void
-test_sok (char *is,
-       char *shouldbe)
+test_sok(char *is, char *shouldbe)
 {
-  if (strcmp(is,shouldbe))
-    {
-    printf("%s:%d, inacurate answer: (%s should be %s)\n",
-	   iname, 
-	   theline,
-	   is, shouldbe);
-    inacc++;
-  }
+    if (strcmp(is, shouldbe)) {
+        printf("%s:%d, inacurate answer: (%s should be %s)\n", iname, theline, is, shouldbe);
+        inacc++;
+    }
 }
 void
-test_iok (int is,
-       int shouldbe)
+test_iok(int is, int shouldbe)
 {
-  if (is != shouldbe){
-    printf("%s:%d, inacurate answer: (%08x should be %08x)\n",
-	   iname, 
-	   theline,
-	   is, shouldbe);
-    inacc++;
-  }
+    if (is != shouldbe) {
+        printf("%s:%d, inacurate answer: (%08x should be %08x)\n", iname, theline, is, shouldbe);
+        inacc++;
+    }
 }
-
 
 /* Compare counted strings upto a certain length - useful to test single
    prec float conversions against double results
 */
-void 
-test_scok (char *is,
-       char *shouldbe,
-       int count)
+void
+test_scok(char *is, char *shouldbe, int count)
 {
-  if (strncmp(is,shouldbe, count))
-    {
-    printf("%s:%d, inacurate answer: (%s should be %s)\n",
-	   iname, 
-	   theline,
-	   is, shouldbe);
-    inacc++;
-  }
+    if (strncmp(is, shouldbe, count)) {
+        printf("%s:%d, inacurate answer: (%s should be %s)\n", iname, theline, is, shouldbe);
+        inacc++;
+    }
 }
 
 /* Compare counted strings upto a certain length, allowing two forms - useful to test single
    prec float conversions against double results
 */
-void 
-test_scok2 (char *is,
-       char *maybe1,
-       char *maybe2,
-       int count)
+void
+test_scok2(char *is, char *maybe1, char *maybe2, int count)
 {
-  if (strncmp(is,maybe1, count) && (maybe2 == NULL || strncmp(is,maybe2,count)))
-    {
-    printf("%s:%d, inacurate answer: (%s may be %s or %s)\n",
-	   iname, 
-	   theline,
-	   is, maybe1, maybe2 ? maybe2 : "(nothing)");
-    inacc++;
-  }
+    if (strncmp(is, maybe1, count) && (maybe2 == NULL || strncmp(is, maybe2, count))) {
+        printf("%s:%d, inacurate answer: (%s may be %s or %s)\n", iname, theline, is, maybe1,
+               maybe2 ? maybe2 : "(nothing)");
+        inacc++;
+    }
 }
 
 void
-test_eok (int is,
-       int shouldbe)
+test_eok(int is, int shouldbe)
 {
-  if (is != shouldbe){
-    printf("%s:%d, bad errno answer: (%d should be %d)\n",
-	   iname, 
-	   theline,
-	   is, shouldbe);
-    inacc++;
-  }
+    if (is != shouldbe) {
+        printf("%s:%d, bad errno answer: (%d should be %d)\n", iname, theline, is, shouldbe);
+        inacc++;
+    }
 }
 
 void
-test_mok (double value,
-       double shouldbe,
-       int okmag)
+test_mok(double value, double shouldbe, int okmag)
 {
-  __ieee_double_shape_type a = {},b = {};
-  int mag = mag_of_error(value, shouldbe);
-  if (mag == 0) 
-  {
-    /* error in the first bit is ok if the numbers are both 0 */
-    if (value == 0.0 && shouldbe == 0.0)
-     return;
-    
-  }
+    __ieee_double_shape_type a = {}, b = {};
+    int                      mag = mag_of_error(value, shouldbe);
+    if (mag == 0) {
+        /* error in the first bit is ok if the numbers are both 0 */
+        if (value == 0.0 && shouldbe == 0.0)
+            return;
+    }
 #ifdef __RX__
-  /* RX doesn't support nan or inf at all */
-  if (isnan(shouldbe) || isinf(shouldbe))
-      mag = 64;
+    /* RX doesn't support nan or inf at all */
+    if (isnan(shouldbe) || isinf(shouldbe))
+        mag = 64;
 #endif
 
-  a.value = shouldbe;
-  b.value = value;
-  
-  if (mag < okmag) 
-  {
-    printf("%s:%d, wrong answer: bit %d ",
-	   iname, 
-	   theline,
-	   mag);
-     printf("%08lx%08lx %08lx%08lx) ",
-	    (unsigned long) a.parts.msw,	     (unsigned long) a.parts.lsw,
-	    (unsigned long) b.parts.msw,	     (unsigned long) b.parts.lsw);
-    printf("(%g %g)\n",   a.value, b.value);
-    inacc++;
-  }
+    a.value = shouldbe;
+    b.value = value;
+
+    if (mag < okmag) {
+        printf("%s:%d, wrong answer: bit %d ", iname, theline, mag);
+        printf("%08lx%08lx %08lx%08lx) ", (unsigned long)a.parts.msw, (unsigned long)a.parts.lsw,
+               (unsigned long)b.parts.msw, (unsigned long)b.parts.lsw);
+        printf("(%g %g)\n", a.value, b.value);
+        inacc++;
+    }
 }
 
 void
-test_mfok (float value,
-	   float shouldbe,
-	   int okmag)
+test_mfok(float value, float shouldbe, int okmag)
 {
-  __ieee_float_shape_type a,b;
-  int mag = fmag_of_error(value, shouldbe);
-  if (mag == 0) 
-  {
-    /* error in the first bit is ok if the numbers are both 0 */
-    if (value == 0.0f && shouldbe == 0.0f)
-     return;
-    
-  }
+    __ieee_float_shape_type a, b;
+    int                     mag = fmag_of_error(value, shouldbe);
+    if (mag == 0) {
+        /* error in the first bit is ok if the numbers are both 0 */
+        if (value == 0.0f && shouldbe == 0.0f)
+            return;
+    }
 #ifdef __RX__
-  /* RX doesn't support nan or inf at all */
-  if (isnan(shouldbe) || isinf(shouldbe))
-      mag = 32;
+    /* RX doesn't support nan or inf at all */
+    if (isnan(shouldbe) || isinf(shouldbe))
+        mag = 32;
 #endif
 #ifdef __sh__
-  /* SuperH has a different canonical representation for nans */
-  if (!!isnan(shouldbe) == !!isnan(value) &&
-      !!__issignalingf(shouldbe) == !!__issignalingf(value))
-      mag = 32;
+    /* SuperH has a different canonical representation for nans */
+    if (!!isnan(shouldbe) == !!isnan(value)
+        && !!__issignalingf(shouldbe) == !!__issignalingf(value))
+        mag = 32;
 #endif
 
-  /* NAN bits can be different for some platforms, like Hexagon
-   * so instead of comparing all the bits, just ensure that
-   * both NAN values are of same kind (signaling/quiet)
-   */
-  if (isnan(value) && isnan(shouldbe) &&
-      (__issignalingf(value) == __issignalingf(shouldbe))) {
-      mag = 32;
-  }
+    /* NAN bits can be different for some platforms, like Hexagon
+     * so instead of comparing all the bits, just ensure that
+     * both NAN values are of same kind (signaling/quiet)
+     */
+    if (isnan(value) && isnan(shouldbe) && (__issignalingf(value) == __issignalingf(shouldbe))) {
+        mag = 32;
+    }
 
-  a.value = shouldbe;
-  b.value = value;
-  
-  if (mag < okmag) 
-  {
-    printf("%s:%d, wrong answer: bit %d ",
-	   iname, 
-	   theline,
-	   mag);
-     printf("%08lx %08lx) ",
-	    (unsigned long) a.p1,
-	    (unsigned long) b.p1);
-     printf("(%g %g)\n",   (double) a.value, (double) b.value);
-    inacc++;
-  }
+    a.value = shouldbe;
+    b.value = value;
+
+    if (mag < okmag) {
+        printf("%s:%d, wrong answer: bit %d ", iname, theline, mag);
+        printf("%08lx %08lx) ", (unsigned long)a.p1, (unsigned long)b.p1);
+        printf("(%g %g)\n", (double)a.value, (double)b.value);
+        inacc++;
+    }
 }
 
 #ifdef __PCCNECV70__
-kill() {}
-getpid() {}
+kill() { }
+getpid() { }
 #endif
 
 #if 0

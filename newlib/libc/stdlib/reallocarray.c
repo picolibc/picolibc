@@ -25,12 +25,11 @@
 void *
 reallocarray(void *optr, size_t nmemb, size_t size)
 {
-	size_t bytes;
+    size_t bytes;
 
-	if (mul_overflow (nmemb, size, &bytes))
-	{
-		errno = ENOMEM;
-		return NULL;
-	}
-	return realloc(optr, bytes);
+    if (mul_overflow(nmemb, size, &bytes)) {
+        errno = ENOMEM;
+        return NULL;
+    }
+    return realloc(optr, bytes);
 }

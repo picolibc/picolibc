@@ -26,9 +26,9 @@ scalbf(float x, float fn)
         if ((x == 0.0f && fn > 0.0f) || (isinf(x) && fn < 0.0f))
             return __math_invalidf(fn);
         if (fn > 0.0f)
-            return fn*x;
+            return fn * x;
         else
-            return x/(-fn);
+            return x / (-fn);
     }
 
     if (rintf(fn) != fn)

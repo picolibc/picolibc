@@ -34,16 +34,16 @@
 int
 fputws(const wchar_t *str, FILE *stream)
 {
-	wchar_t c;
-	int rv = 0;
+    wchar_t c;
+    int     rv = 0;
 
-        __flockfile(stream);
-	if ((stream->flags & __SWR) == 0)
-		__funlock_return(stream, EOF);
+    __flockfile(stream);
+    if ((stream->flags & __SWR) == 0)
+        __funlock_return(stream, EOF);
 
-	while ((c = *str++) != L'\0')
-		if (putwc_unlocked(c, stream) == WEOF)
-                        rv = EOF;
+    while ((c = *str++) != L'\0')
+        if (putwc_unlocked(c, stream) == WEOF)
+            rv = EOF;
 
-	__funlock_return(stream, rv);
+    __funlock_return(stream, rv);
 }

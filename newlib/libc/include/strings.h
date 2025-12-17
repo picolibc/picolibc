@@ -27,7 +27,7 @@
  */
 
 #ifndef _STRINGS_H_
-#define	_STRINGS_H_
+#define _STRINGS_H_
 
 #include <sys/cdefs.h>
 #include <sys/_types.h>
@@ -39,11 +39,11 @@
 // As per the GCC source, _SIZE_T_DECLARD is FreeBSD 5
 // So: Also check for _SIZE_T
 #if !defined(_SIZE_T_DECLARED) && !defined(_SIZE_T)
-typedef	__size_t	size_t;
+typedef __size_t size_t;
 #endif
 
 #ifndef _SIZE_T_DECLARED
-#define	_SIZE_T_DECLARED
+#define _SIZE_T_DECLARED
 #endif
 
 #ifndef _SIZE_T
@@ -52,33 +52,33 @@ typedef	__size_t	size_t;
 
 _BEGIN_STD_C
 #if __BSD_VISIBLE || __POSIX_VISIBLE <= 200112
-int	 bcmp(const void *, const void *, size_t) __pure;	/* LEGACY */
-void	 bcopy(const void *, void *, size_t);			/* LEGACY */
-void	 bzero(void *, size_t);					/* LEGACY */
+int  bcmp(const void *, const void *, size_t) __pure; /* LEGACY */
+void bcopy(const void *, void *, size_t);             /* LEGACY */
+void bzero(void *, size_t);                           /* LEGACY */
 #endif
 #if __BSD_VISIBLE
-void	 explicit_bzero(void *, size_t);
+void explicit_bzero(void *, size_t);
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE < 200809 || __XSI_VISIBLE >= 700
-int	 ffs(int) __const;
+int ffs(int) __const;
 #endif
 #if __BSD_VISIBLE
-int	 ffsl(long) __const;
-int	 ffsll(long long) __const;
-int	 fls(int) __const;
-int	 flsl(long) __const;
-int	 flsll(long long) __const;
+int ffsl(long) __const;
+int ffsll(long long) __const;
+int fls(int) __const;
+int flsl(long) __const;
+int flsll(long long) __const;
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE <= 200112
-char	*index(const char *, int) __pure;			/* LEGACY */
-char	*rindex(const char *, int) __pure;			/* LEGACY */
+char *index(const char *, int) __pure;  /* LEGACY */
+char *rindex(const char *, int) __pure; /* LEGACY */
 #endif
-int	 strcasecmp(const char *, const char *) __pure;
-int	 strncasecmp(const char *, const char *, size_t) __pure;
+int strcasecmp(const char *, const char *) __pure;
+int strncasecmp(const char *, const char *, size_t) __pure;
 
 #if __POSIX_VISIBLE >= 200809
-int	 strcasecmp_l (const char *, const char *, locale_t);
-int	 strncasecmp_l (const char *, const char *, size_t, locale_t);
+int strcasecmp_l(const char *, const char *, locale_t);
+int strncasecmp_l(const char *, const char *, size_t, locale_t);
 #endif
 _END_STD_C
 

@@ -1,19 +1,19 @@
 /*
 FUNCTION
-	<<wcslen>>---get wide-character string length 
+        <<wcslen>>---get wide-character string length
 
 SYNOPSIS
-	#include <wchar.h>
-	size_t wcslen(const wchar_t *<[s]>);
+        #include <wchar.h>
+        size_t wcslen(const wchar_t *<[s]>);
 
 DESCRIPTION
-	The <<wcslen>> function computes the number of wide-character codes
-	in the wide-character string to which <[s]> points, not including the
-	terminating null wide-character code.
+        The <<wcslen>> function computes the number of wide-character codes
+        in the wide-character string to which <[s]> points, not including the
+        terminating null wide-character code.
 
 RETURNS
-	The <<wcslen>> function returns the length of <[s]>; no return value is
-	reserved to indicate an error.
+        The <<wcslen>> function returns the length of <[s]>; no return value is
+        reserved to indicate an error.
 
 PORTABILITY
 <<wcslen>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -54,13 +54,13 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 size_t
-wcslen (const wchar_t * s)
+wcslen(const wchar_t *s)
 {
-  const wchar_t *p;
+    const wchar_t *p;
 
-  p = s;
-  while (*p)
-    p++;
+    p = s;
+    while (*p)
+        p++;
 
-  return p - s;
+    return p - s;
 }

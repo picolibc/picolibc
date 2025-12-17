@@ -40,13 +40,9 @@
 #include <inttypes.h>
 
 void
-__ubsan_message(struct source_location *source,
-                const char *msg,
-                const char *fail,
-                const char *fmt,
+__ubsan_message(struct source_location *source, const char *msg, const char *fail, const char *fmt,
                 va_list ap)
 {
-    fprintf(stderr, "UBSAN: %s %s %s:%u ", msg,
-            fail, source->file_name, source->line);
+    fprintf(stderr, "UBSAN: %s %s %s:%u ", msg, fail, source->file_name, source->line);
     vfprintf(stderr, fmt, ap);
 }

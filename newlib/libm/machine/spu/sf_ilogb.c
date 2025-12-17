@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/ilogbf.h"
 
-int ilogbf(float x)
+int
+ilogbf(float x)
 {
     return _ilogbf(x);
 }

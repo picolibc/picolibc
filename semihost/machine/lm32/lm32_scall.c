@@ -36,8 +36,7 @@
 #include "lm32_semihost.h"
 
 void
-lm32_scall(const struct lm32_scall_args *args,
-           struct lm32_scall_ret *ret)
+lm32_scall(const struct lm32_scall_args *args, struct lm32_scall_ret *ret)
 {
     register uint32_t r8 __asm__("r8") = args->r8;
     register uint32_t r1 __asm__("r1") = args->r1;
@@ -45,12 +44,11 @@ lm32_scall(const struct lm32_scall_args *args,
     register uint32_t r3 __asm__("r3") = args->r3;
     register uint32_t r4 __asm__("r4") = args->r4;
 
-    __asm__("scall" : "=r" (r1), "=r" (r2), "=r" (r3) :
-            "r" (r8), "r" (r1), "r" (r2), "r" (r3), "r" (r4));
+    __asm__("scall" : "=r"(r1), "=r"(r2), "=r"(r3) : "r"(r8), "r"(r1), "r"(r2), "r"(r3), "r"(r4));
 
     ret->r1 = r1;
     ret->r2 = r2;
     ret->r3 = r3;
-    if ((int) ret->r1 < 0)
+    if ((int)ret->r1 < 0)
         lm32_errno(ret->r3);
 }

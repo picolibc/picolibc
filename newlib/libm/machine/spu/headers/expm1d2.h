@@ -38,7 +38,7 @@
 #ifdef __SPU__
 
 #ifndef _EXPM1D2_H_
-#define _EXPM1D2_H_	1
+#define _EXPM1D2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -79,56 +79,57 @@
  *
  */
 
-static __inline vector double _expm1d2(vector double x) 
+static __inline vector double
+_expm1d2(vector double x)
 {
-  vector double oned  = spu_splats(1.0);
-  vector double range = spu_splats(1.0625);
-  vector unsigned long long use_exp;
-  vector double pr, qr;
-  vector double eresult;
-  vector double rresult;
-  vector double result;
+    vector double             oned = spu_splats(1.0);
+    vector double             range = spu_splats(1.0625);
+    vector unsigned long long use_exp;
+    vector double             pr, qr;
+    vector double             eresult;
+    vector double             rresult;
+    vector double             result;
 
-  /* Compiler Bug. Replace xbug with x when spu_cmp*() doesn't 
-   * modify it's arguments! */
-  volatile vector double xbug = x;
-  use_exp = spu_cmpabsgt(xbug, range);
+    /* Compiler Bug. Replace xbug with x when spu_cmp*() doesn't
+     * modify it's arguments! */
+    volatile vector double    xbug = x;
+    use_exp = spu_cmpabsgt(xbug, range);
 
-  /*
-   * Calculate directly using exp(x) - 1
-   */
-  eresult = spu_sub(_expd2(x), oned);
+    /*
+     * Calculate directly using exp(x) - 1
+     */
+    eresult = spu_sub(_expd2(x), oned);
 
-  /*
-   * For x in [-1.0625,1.0625], use a rational approximation.
-   * The madd's are interleaved to reduce dependency stalls. Looks
-   * like gcc is smart enough to do this on it's own... but why
-   * take the chance.
-   */
-  pr = spu_madd(x, spu_splats(EXPM1_P8), spu_splats(EXPM1_P7));
-  qr = spu_madd(x, spu_splats(EXPM1_Q8), spu_splats(EXPM1_Q7));
-  pr = spu_madd(pr, x, spu_splats(EXPM1_P6));
-  qr = spu_madd(qr, x, spu_splats(EXPM1_Q6));
-  pr = spu_madd(pr, x, spu_splats(EXPM1_P5));
-  qr = spu_madd(qr, x, spu_splats(EXPM1_Q5));
-  pr = spu_madd(pr, x, spu_splats(EXPM1_P4));
-  qr = spu_madd(qr, x, spu_splats(EXPM1_Q4));
-  pr = spu_madd(pr, x, spu_splats(EXPM1_P3));
-  qr = spu_madd(qr, x, spu_splats(EXPM1_Q3));
-  pr = spu_madd(pr, x, spu_splats(EXPM1_P2));
-  qr = spu_madd(qr, x, spu_splats(EXPM1_Q2));
-  pr = spu_madd(pr, x, spu_splats(EXPM1_P1));
-  qr = spu_madd(qr, x, spu_splats(EXPM1_Q1));
-  pr = spu_madd(pr, x, spu_splats(EXPM1_P0));
-  qr = spu_madd(qr, x, spu_splats(EXPM1_Q0));
-  rresult = _divd2(pr, qr);
+    /*
+     * For x in [-1.0625,1.0625], use a rational approximation.
+     * The madd's are interleaved to reduce dependency stalls. Looks
+     * like gcc is smart enough to do this on it's own... but why
+     * take the chance.
+     */
+    pr = spu_madd(x, spu_splats(EXPM1_P8), spu_splats(EXPM1_P7));
+    qr = spu_madd(x, spu_splats(EXPM1_Q8), spu_splats(EXPM1_Q7));
+    pr = spu_madd(pr, x, spu_splats(EXPM1_P6));
+    qr = spu_madd(qr, x, spu_splats(EXPM1_Q6));
+    pr = spu_madd(pr, x, spu_splats(EXPM1_P5));
+    qr = spu_madd(qr, x, spu_splats(EXPM1_Q5));
+    pr = spu_madd(pr, x, spu_splats(EXPM1_P4));
+    qr = spu_madd(qr, x, spu_splats(EXPM1_Q4));
+    pr = spu_madd(pr, x, spu_splats(EXPM1_P3));
+    qr = spu_madd(qr, x, spu_splats(EXPM1_Q3));
+    pr = spu_madd(pr, x, spu_splats(EXPM1_P2));
+    qr = spu_madd(qr, x, spu_splats(EXPM1_Q2));
+    pr = spu_madd(pr, x, spu_splats(EXPM1_P1));
+    qr = spu_madd(qr, x, spu_splats(EXPM1_Q1));
+    pr = spu_madd(pr, x, spu_splats(EXPM1_P0));
+    qr = spu_madd(qr, x, spu_splats(EXPM1_Q0));
+    rresult = _divd2(pr, qr);
 
-  /*
-   * Select either direct calculation or rational approximation.
-   */
-  result = spu_sel(rresult, eresult, use_exp);
+    /*
+     * Select either direct calculation or rational approximation.
+     */
+    result = spu_sel(rresult, eresult, use_exp);
 
-  return result;
+    return result;
 }
 
 #endif /* _EXPM1D2_H_ */

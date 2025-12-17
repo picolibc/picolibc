@@ -37,5 +37,5 @@
 int
 __isnanf(float x)
 {
-	return 0;
+    return 0;
 }

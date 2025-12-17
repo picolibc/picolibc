@@ -20,9 +20,9 @@ static const float zero = 0.0;
 float
 remainderf(float x, float p)
 {
-    __int32_t hx, hp;
+    __int32_t  hx, hp;
     __uint32_t sx;
-    float p_half;
+    float      p_half;
 
     GET_FLOAT_WORD(hx, x);
     GET_FLOAT_WORD(hp, p);

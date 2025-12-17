@@ -12,13 +12,13 @@
  * supported, base on the common f_fpclassify.c.
  */
 int
-__fpclassifyf (float x)
+__fpclassifyf(float x)
 {
-  __uint32_t w;
+    __uint32_t w;
 
-  GET_FLOAT_WORD(w,x);
+    GET_FLOAT_WORD(w, x);
 
-  if (w == 0x00000000 || w == 0x80000000)
-    return FP_ZERO;
-  return FP_NORMAL;
+    if (w == 0x00000000 || w == 0x80000000)
+        return FP_ZERO;
+    return FP_NORMAL;
 }

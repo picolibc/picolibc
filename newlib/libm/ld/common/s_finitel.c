@@ -29,16 +29,17 @@
 int
 finitel(long double e)
 {
-	union IEEEl2bits u;
+    union IEEEl2bits u;
 
-	u.e = e;
-	return (u.bits.exp != LDBL_INF_NAN_EXP);
+    u.e = e;
+    return (u.bits.exp != LDBL_INF_NAN_EXP);
 }
 
 #ifdef __strong_reference
 __strong_reference_dup(finitel, __finitel);
 #else
-int __finitel(long double x)
+int
+__finitel(long double x)
 {
     return finitel(x);
 }

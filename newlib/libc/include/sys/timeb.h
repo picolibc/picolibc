@@ -43,19 +43,18 @@ SUCH DAMAGE.
 _BEGIN_STD_C
 
 #ifndef _TIME_T_DECLARED
-typedef	_TIME_T_	time_t;
-#define	_TIME_T_DECLARED
+typedef _TIME_T_ time_t;
+#define _TIME_T_DECLARED
 #endif
 
-struct timeb
-{
-  time_t time;
-  unsigned short millitm;
-  short timezone;
-  short dstflag;
+struct timeb {
+    time_t         time;
+    unsigned short millitm;
+    short          timezone;
+    short          dstflag;
 };
 
-extern int ftime (struct timeb *);
+extern int ftime(struct timeb *);
 
 _END_STD_C
 

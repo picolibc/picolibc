@@ -31,11 +31,11 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _EXP2F_H_
-#define _EXP2F_H_	1
+#define _EXP2F_H_ 1
 
 #ifndef M_LN2
-#define M_LN2	0.69314718055994530942	/* ln(2) */
-#endif /* M_LN2 */
+#define M_LN2 0.69314718055994530942 /* ln(2) */
+#endif                               /* M_LN2 */
 
 /*
  * FUNCTION
@@ -72,53 +72,52 @@
  *	C7 = -0.0001413161
  *
  */
-static __inline float _exp2f(float x)
+static __inline float
+_exp2f(float x)
 {
-  union {
-    float f;
-    unsigned int ui;
-  } bias, exp_int, exp_frac;
-  unsigned int overflow, underflow;
-  int ix;
-  float frac, frac2, frac4;
-  float hi, lo;
+    union {
+        float        f;
+        unsigned int ui;
+    } bias, exp_int, exp_frac;
+    unsigned int overflow, underflow;
+    int          ix;
+    float        frac, frac2, frac4;
+    float        hi, lo;
 
-  /* Break in the input x into two parts ceil(x), x - ceil(x).
-   */
-  bias.f = x;
-  bias.ui = ~(unsigned int)((signed)(bias.ui) >> 31) & 0x3F7FFFFF;
-  ix = (int)(x + bias.f);
-  frac = (float)ix - x;
-  frac *= (float)(M_LN2);
+    /* Break in the input x into two parts ceil(x), x - ceil(x).
+     */
+    bias.f = x;
+    bias.ui = ~(unsigned int)((signed)(bias.ui) >> 31) & 0x3F7FFFFF;
+    ix = (int)(x + bias.f);
+    frac = (float)ix - x;
+    frac *= (float)(M_LN2);
 
-  exp_int.ui  = (ix + 127) << 23;
+    exp_int.ui = (ix + 127) << 23;
 
-  overflow  = (ix > 128)  ? 0x7FFFFFFF : 0x0;
-  underflow = (ix < -127) ? 0xFFFFFFFF : 0x0;
+    overflow = (ix > 128) ? 0x7FFFFFFF : 0x0;
+    underflow = (ix < -127) ? 0xFFFFFFFF : 0x0;
 
-  /* Instruction counts can be reduced if the polynomial was
-   * computed entirely from nested (dependent) fma's. However,
-   * to reduce the number of pipeline stalls, the polygon is evaluated
-   * in two halves (hi amd lo).
-   */
-  frac2 = frac  * frac;
-  frac4 = frac2 * frac2;
-  hi = -0.0001413161f * frac + 0.0013298820f;
-  hi =             hi * frac - 0.0083013598f;
-  hi =             hi * frac + 0.0416573475f;
-  lo = -0.1666653019f * frac + 0.4999999206f;
-  lo =             lo * frac - 0.9999999995f;
-  lo =             lo * frac + 1.0f;
-  exp_frac.f =     hi * frac4 + lo;
+    /* Instruction counts can be reduced if the polynomial was
+     * computed entirely from nested (dependent) fma's. However,
+     * to reduce the number of pipeline stalls, the polygon is evaluated
+     * in two halves (hi amd lo).
+     */
+    frac2 = frac * frac;
+    frac4 = frac2 * frac2;
+    hi = -0.0001413161f * frac + 0.0013298820f;
+    hi = hi * frac - 0.0083013598f;
+    hi = hi * frac + 0.0416573475f;
+    lo = -0.1666653019f * frac + 0.4999999206f;
+    lo = lo * frac - 0.9999999995f;
+    lo = lo * frac + 1.0f;
+    exp_frac.f = hi * frac4 + lo;
 
-  ix += exp_frac.ui >> 23;
-  exp_frac.f *= exp_int.f;
+    ix += exp_frac.ui >> 23;
+    exp_frac.f *= exp_int.f;
 
-  exp_frac.ui = (exp_frac.ui | overflow) & ~underflow;
+    exp_frac.ui = (exp_frac.ui | overflow) & ~underflow;
 
-  return (exp_frac.f);
+    return (exp_frac.f);
 }
 
 #endif /* _EXP2F_H_ */
-
-

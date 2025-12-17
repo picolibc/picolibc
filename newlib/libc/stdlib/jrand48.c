@@ -14,17 +14,16 @@
 #include "rand48.h"
 
 long
-_jrand48_r (struct _rand48 *r,
-       unsigned short xseed[3])
+_jrand48_r(struct _rand48 *r, unsigned short xseed[3])
 {
-  int32_t i;
-  __dorand48(r, xseed);
-  i = (int32_t) ((uint32_t) (xseed[2]) << 16 | (uint32_t) (xseed[1]));
-  return i;
+    int32_t i;
+    __dorand48(r, xseed);
+    i = (int32_t)((uint32_t)(xseed[2]) << 16 | (uint32_t)(xseed[1]));
+    return i;
 }
 
 long
-jrand48 (unsigned short xseed[3])
+jrand48(unsigned short xseed[3])
 {
-  return _jrand48_r (&_rand48, xseed);
+    return _jrand48_r(&_rand48, xseed);
 }

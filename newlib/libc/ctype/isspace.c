@@ -28,25 +28,26 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isspace>>, <<isspace_l>>---whitespace character predicate
+        <<isspace>>, <<isspace_l>>---whitespace character predicate
 
 INDEX
-	isspace
+        isspace
 
 INDEX
-	isspace_l
+        isspace_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isspace(int <[c]>);
+        #include <ctype.h>
+        int isspace(int <[c]>);
 
-	#include <ctype.h>
-	int isspace_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isspace_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isspace>> is a macro which classifies singlebyte charset values by table
 lookup.  It is a predicate returning non-zero for whitespace
-characters, and 0 for other characters.  It is defined only when <<isascii>>(<[c]>) is true or <[c]> is EOF.
+characters, and 0 for other characters.  It is defined only when <<isascii>>(<[c]>) is true or <[c]>
+is EOF.
 
 <<isspace_l>> is like <<isspace>> but performs the check based on the
 locale specified by the locale object locale.  If <[locale]> is
@@ -70,11 +71,11 @@ No supporting OS subroutines are required.
 
 #undef isspace
 int
-isspace (int c)
+isspace(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return c == ' ' || ('\t' <= c && c <= '\r');
 #else
-    return(__CTYPE_PTR[c+1] & __CTYPE_SPACE);
+    return (__CTYPE_PTR[c + 1] & __CTYPE_SPACE);
 #endif
 }

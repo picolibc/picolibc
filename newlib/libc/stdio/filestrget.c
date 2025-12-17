@@ -38,12 +38,12 @@
 int
 __file_str_get(FILE *stream)
 {
-	struct __file_str *sstream = (struct __file_str *) stream;
-	int rv;
+    struct __file_str *sstream = (struct __file_str *)stream;
+    int                rv;
 
-	rv = (unsigned char) *sstream->pos;
-	if (rv == '\0')
-		return _FDEV_EOF;
-	sstream->pos++;
-	return rv;
+    rv = (unsigned char)*sstream->pos;
+    if (rv == '\0')
+        return _FDEV_EOF;
+    sstream->pos++;
+    return rv;
 }

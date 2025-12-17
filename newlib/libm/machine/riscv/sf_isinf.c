@@ -43,10 +43,10 @@
 #undef isinff
 
 int
-isinff (float x)
+isinff(float x)
 {
-	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_INF);
+    long fclass = _fclass_f(x);
+    return (fclass & FCLASS_INF);
 }
 
 #ifdef __strong_reference
@@ -59,8 +59,7 @@ __isinff(float x)
 }
 #endif
 
-_MATH_ALIAS_i_f(isinf)
-_MATH_ALIAS_i_f(__isinf)
+_MATH_ALIAS_i_f(isinf) _MATH_ALIAS_i_f(__isinf)
 
 #else
 #include "../../common/sf_isinf.c"

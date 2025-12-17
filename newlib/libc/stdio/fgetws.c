@@ -32,21 +32,21 @@
 wchar_t *
 __STDIO_UNLOCKED(fgetws)(wchar_t *str, int size, FILE *stream)
 {
-	wchar_t *cp;
-	wint_t c;
+    wchar_t *cp;
+    wint_t   c;
 
-	if ((stream->flags & __SRD) == 0 || size <= 0)
-		return NULL;
+    if ((stream->flags & __SRD) == 0 || size <= 0)
+        return NULL;
 
-	size--;
-	for (c = 0, cp = str; c != L'\n' && size > 0; size--, cp++) {
-		if ((c = __STDIO_UNLOCKED(getwc)(stream)) == WEOF)
-			return NULL;
-		*cp = (wchar_t)c;
-	}
-	*cp = L'\0';
+    size--;
+    for (c = 0, cp = str; c != L'\n' && size > 0; size--, cp++) {
+        if ((c = __STDIO_UNLOCKED(getwc)(stream)) == WEOF)
+            return NULL;
+        *cp = (wchar_t)c;
+    }
+    *cp = L'\0';
 
-	return str;
+    return str;
 }
 
 #if defined(__STDIO_LOCKING) && !defined(_FILE_INCLUDED)

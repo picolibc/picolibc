@@ -28,15 +28,15 @@
 #include "fdlibm.h"
 
 double
-sqrt (double x)
+sqrt(double x)
 {
-  double result;
+    double result;
 #ifdef __MATH_ERRNO
-  if (isless(x, 0.0))
-      return __math_invalid(x);
+    if (isless(x, 0.0))
+        return __math_invalid(x);
 #endif
-  __asm__("fsqrt\t%d0, %d1" : "=w" (result) : "w" (x));
-  return result;
+    __asm__("fsqrt\t%d0, %d1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

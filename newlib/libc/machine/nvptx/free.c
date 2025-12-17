@@ -18,11 +18,12 @@
 #include <stdlib.h>
 
 /* The CUDA-provided free.  */
-void sys_free (void *) __asm__ ("free");
+void sys_free(void *) __asm__("free");
 
 /* The user-visible free (renamed by compiler).  */
-void free (void *ptr)
+void
+free(void *ptr)
 {
-  if (ptr)
-    sys_free ((long long *)ptr - 1);
+    if (ptr)
+        sys_free((long long *)ptr - 1);
 }

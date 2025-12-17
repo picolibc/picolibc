@@ -37,29 +37,28 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <spu_cache.h>
 
-COMPAT_EA_ALIAS (strcspn_ea);
+COMPAT_EA_ALIAS(strcspn_ea);
 
 size_ea_t
-strcspn_ea (__ea const char *s, const char *reject)
+strcspn_ea(__ea const char *s, const char *reject)
 {
-  size_ea_t s_length;
-  size_ea_t found_length;
-  __ea void *found_it;
-  size_ea_t ret;
-  size_t i;
-  size_t rej_length;
+    size_ea_t  s_length;
+    size_ea_t  found_length;
+    __ea void *found_it;
+    size_ea_t  ret;
+    size_t     i;
+    size_t     rej_length;
 
-  s_length = strlen_ea (s);
-  rej_length = strlen (reject);
-  ret = s_length;
+    s_length = strlen_ea(s);
+    rej_length = strlen(reject);
+    ret = s_length;
 
-  for (i = 0; i < rej_length; i++)
-    {
-      found_it = memchr_ea (s, reject[i], s_length);
-      found_length = (size_ea_t) found_it - (size_ea_t) s;
-      if (found_length < ret)
-	ret = found_length;
+    for (i = 0; i < rej_length; i++) {
+        found_it = memchr_ea(s, reject[i], s_length);
+        found_length = (size_ea_t)found_it - (size_ea_t)s;
+        if (found_length < ret)
+            ret = found_length;
     }
 
-  return ret;
+    return ret;
 }

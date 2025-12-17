@@ -7,13 +7,13 @@
  * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
-*/
+ */
 
 void
-sincosl( long double x, long double * s, long double * c )
+sincosl(long double x, long double *s, long double *c)
 {
-    *s = _sinl( x );
-    *c = _cosl( x );
+    *s = _sinl(x);
+    *c = _cosl(x);
 }
 
 #if __LDBL_MANT_DIG__ == 113

@@ -40,14 +40,14 @@
 
 /* Make this a weak reference to avoid pulling in malloc.  */
 #ifndef MALLOC_PROVIDED
-void * malloc(size_t) __weak;
+void *malloc(size_t) __weak;
 #endif
 
 /* As __call_exitprocs is weak reference in lite exit, make a
    non-weak reference to it here.  */
-const void * __atexit_dummy = &__call_exitprocs;
+const void                           *__atexit_dummy = &__call_exitprocs;
 
-__THREAD_LOCAL_ATEXIT struct _atexit _atexit0;
+__THREAD_LOCAL_ATEXIT struct _atexit  _atexit0;
 __THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
 
 /*
@@ -55,49 +55,42 @@ __THREAD_LOCAL_ATEXIT struct _atexit *_atexit;
  */
 
 int
-__register_exitproc (int type,
-	void (*fn) (void),
-	void *arg,
-	void *d)
+__register_exitproc(int type, void (*fn)(void), void *arg, void *d)
 {
-  struct _on_exit_args * args;
-  register struct _atexit *p;
+    struct _on_exit_args    *args;
+    register struct _atexit *p;
 
-  __LIBC_LOCK();
+    __LIBC_LOCK();
 
-  p = _atexit;
-  if (p == NULL)
-    {
-      _atexit = p = &_atexit0;
+    p = _atexit;
+    if (p == NULL) {
+        _atexit = p = &_atexit0;
     }
-  if (p->_ind >= _ATEXIT_SIZE)
-    {
-#if !defined (_ATEXIT_DYNAMIC_ALLOC) || !defined (MALLOC_PROVIDED)
-      __LIBC_UNLOCK();
-      return -1;
+    if (p->_ind >= _ATEXIT_SIZE) {
+#if !defined(_ATEXIT_DYNAMIC_ALLOC) || !defined(MALLOC_PROVIDED)
+        __LIBC_UNLOCK();
+        return -1;
 #else
-      p = (struct _atexit *) malloc (sizeof *p);
-      if (p == NULL)
-	{
-	  __LIBC_UNLOCK();
-	  return -1;
-	}
-      p->_ind = 0;
-      p->_next = _atexit;
-      _atexit = p;
+        p = (struct _atexit *)malloc(sizeof *p);
+        if (p == NULL) {
+            __LIBC_UNLOCK();
+            return -1;
+        }
+        p->_ind = 0;
+        p->_next = _atexit;
+        _atexit = p;
 #endif
     }
 
-  if (type != __et_atexit)
-    {
-      args = &p->_on_exit_args;
-      args->_fnargs[p->_ind] = arg;
-      args->_fntypes |= (1 << p->_ind);
-      args->_dso_handle[p->_ind] = d;
-      if (type == __et_cxa)
-	args->_is_cxa |= (1 << p->_ind);
+    if (type != __et_atexit) {
+        args = &p->_on_exit_args;
+        args->_fnargs[p->_ind] = arg;
+        args->_fntypes |= (1 << p->_ind);
+        args->_dso_handle[p->_ind] = d;
+        if (type == __et_cxa)
+            args->_is_cxa |= (1 << p->_ind);
     }
-  p->_fns[p->_ind++] = fn;
-  __LIBC_UNLOCK();
-  return 0;
+    p->_fns[p->_ind++] = fn;
+    __LIBC_UNLOCK();
+    return 0;
 }

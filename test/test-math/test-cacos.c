@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-cacos.h"
-#define TEST_FUNC       cacos
+#define TEST_VECTORS "test-cacos.h"
+#define TEST_FUNC    cacos
 
 #include "test-complex-one.h"

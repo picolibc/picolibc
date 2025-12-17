@@ -18,7 +18,7 @@
 /* In the float version, the input parameter x contains 8 bit
    integers, not 24 bit integers.  113 bit precision is not supported.  */
 
-static const int init_jk[] = { 4, 7, 9 }; /* initial value for jk */
+static const int   init_jk[] = { 4, 7, 9 }; /* initial value for jk */
 
 static const float PIo2[] = {
     1.5703125000e+00, /* 0x3fc90000 */
@@ -34,9 +34,8 @@ static const float PIo2[] = {
     6.3331015649e-25, /* 0x17440000 */
 };
 
-static const float zero = 0.0, one = 1.0,
-                   two8 = 2.5600000000e+02, /* 0x43800000 */
-    twon8 = 3.9062500000e-03; /* 0x3b800000 */
+static const float zero = 0.0, one = 1.0, two8 = 2.5600000000e+02, /* 0x43800000 */
+    twon8 = 3.9062500000e-03;                                      /* 0x3b800000 */
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -47,11 +46,10 @@ static const float zero = 0.0, one = 1.0,
 #endif
 
 int
-__kernel_rem_pio2f(float *x, float *y, int e0, int nx, int prec,
-                   const __int32_t *ipio2)
+__kernel_rem_pio2f(float *x, float *y, int e0, int nx, int prec, const __int32_t *ipio2)
 {
     __int32_t jz, jx, jv, jp, jk, carry, n, iq[20], i, j, k, m, q0, ih;
-    float z, fw, f[20], fq[20], q[20];
+    float     z, fw, f[20], fq[20], q[20];
 
     /* initialize jk*/
     jk = init_jk[prec];
@@ -87,7 +85,7 @@ recompute:
     }
 
     /* compute n */
-    z = scalbnf(z, (int)q0); /* actual value of z */
+    z = scalbnf(z, (int)q0);                    /* actual value of z */
     z -= (float)8.0 * floorf(z * (float)0.125); /* trim off integer >= 8 */
     n = (__int32_t)z;
     z -= (float)n;

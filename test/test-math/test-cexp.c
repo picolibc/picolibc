@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-cexp.h"
-#define TEST_FUNC       cexp
+#define TEST_VECTORS "test-cexp.h"
+#define TEST_FUNC    cexp
 
 #include "test-complex-one.h"

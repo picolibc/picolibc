@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/expf.h"
 
-float expf(float x)
+float
+expf(float x)
 {
     return _expf(x);
 }

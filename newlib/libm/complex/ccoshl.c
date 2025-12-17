@@ -44,11 +44,11 @@
 long double complex
 ccoshl(long double complex z)
 {
-	long double x, y;
+    long double x, y;
 
-	x = creall(z);
-	y = cimagl(z);
-	return CMPLXL(coshl(x) * cosl(y), sinhl(x) * sinl(y));
+    x = creall(z);
+    y = cimagl(z);
+    return CMPLXL(coshl(x) * cosl(y), sinhl(x) * sinl(y));
 }
 
 #endif

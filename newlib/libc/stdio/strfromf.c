@@ -35,8 +35,8 @@
 
 #include "stdio_private.h"
 
-int strfromf(char *restrict str, size_t n,
-	     const char *restrict format, float fp)
+int
+strfromf(char * restrict str, size_t n, const char * restrict format, float fp)
 {
-	return __f_snprintf(str, n, format, __printf_float(fp));
+    return __f_snprintf(str, n, format, __printf_float(fp));
 }

@@ -24,15 +24,15 @@
    NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. */
 
-#if __ARM_ARCH >= 8 && (__ARM_FP & 0x4) 
+#if __ARM_ARCH >= 8 && (__ARM_FP & 0x4)
 #include <math.h>
 
 float
-floorf (float x)
+floorf(float x)
 {
-  float result;
-  __asm__ volatile ( "vrintm.f32\t%0, %1" : "=t" (result) : "t" (x) );
-  return result;
+    float result;
+    __asm__ volatile("vrintm.f32\t%0, %1" : "=t"(result) : "t"(x));
+    return result;
 }
 
 #else

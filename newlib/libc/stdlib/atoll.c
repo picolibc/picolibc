@@ -13,9 +13,9 @@ SYNOPSIS
         long long _atoll_r(struct _reent *<[ptr]>, const char *<[str]>);
 
 DESCRIPTION
-The function <<atoll>> converts the initial portion of the string 
+The function <<atoll>> converts the initial portion of the string
 pointed to by <<*<[str]>>> to a type <<long long>>.  A call to
-atoll(str) in this implementation is equivalent to 
+atoll(str) in this implementation is equivalent to
 strtoll(str, (char **)NULL, 10) including behavior on error.
 
 The alternate function <<_atoll_r>> is a reentrant version.  The
@@ -64,7 +64,7 @@ No supporting OS subroutines are required.
 #include <stddef.h>
 
 long long
-atoll (const char *str)
+atoll(const char *str)
 {
-	return strtoll(str, (char **)NULL, 10);
+    return strtoll(str, (char **)NULL, 10);
 }

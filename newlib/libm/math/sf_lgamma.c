@@ -23,7 +23,7 @@ lgammaf(float x)
     return lgammaf_r(x, &__signgam);
 }
 
-#  ifdef __strong_reference
+#ifdef __strong_reference
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
@@ -39,5 +39,4 @@ gammaf(float x)
 }
 #endif
 
-_MATH_ALIAS_f_f(lgamma)
-_MATH_ALIAS_f_f(gamma)
+_MATH_ALIAS_f_f(lgamma) _MATH_ALIAS_f_f(gamma)

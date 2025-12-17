@@ -36,16 +36,14 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-
-
 long
-ftell (FILE * fp)
+ftell(FILE *fp)
 {
-  long ret;
+    long ret;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  ret = fp->_fp;
+    ret = fp->_fp;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FTELL, &ret);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FTELL, &ret);
 }

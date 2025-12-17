@@ -121,7 +121,7 @@ setjmp(jmp_buf buf)
 
                          /* Clobber.  */
                          : "r9", "memory");
-#else /* not PIC */
+#else  /* not PIC */
     __asm__ __volatile__("moveq 1,$r9							\n"
                          "movem $sp,[%1+1*4]						\n"
                          "move.d 0f,$r9							\n"
@@ -189,7 +189,7 @@ longjmp(jmp_buf buf, int val)
                          : "r"(buf), "r"(val)
                          : "r13", "memory");
 
-#else /* not __arch_common_v10_v32 or __arch_v32 */
+#else  /* not __arch_common_v10_v32 or __arch_v32 */
     __asm__ __volatile__("move [%0+17*4],$ccr						\n"
                          "move [%0+16*4],$srp						\n"
                          "test.d %1							\n"

@@ -9,7 +9,7 @@ All rights reserved.
 
 #include <stdint.h>
 
-char *	_gcvt (double , int , char *, char, int);
+char *_gcvt(double, int, char *, char, int);
 
 #include "locale_private.h"
 
@@ -43,7 +43,6 @@ extern const uint16_t __cp_max[27];
 
 #endif
 
-size_t _wcsnrtombs_l (char *, const wchar_t **,
-                      size_t, size_t, mbstate_t *, locale_t);
+size_t _wcsnrtombs_l(char *, const wchar_t **, size_t, size_t, mbstate_t *, locale_t);
 
 #endif

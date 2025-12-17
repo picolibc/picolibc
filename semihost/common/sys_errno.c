@@ -38,5 +38,5 @@
 int
 sys_semihost_errno(void)
 {
-	return sys_semihost(SYS_ERRNO, 0);
+    return sys_semihost(SYS_ERRNO, 0);
 }

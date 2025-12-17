@@ -36,30 +36,27 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-
 FILE *
-tmpfile (void)
+tmpfile(void)
 {
-  int ret;
-  FILE* fp;
-  struct _reent *ptr = _REENT;
+    int            ret;
+    FILE          *fp;
+    struct _reent *ptr = _REENT;
 
-  CHECK_INIT(ptr);
+    CHECK_INIT(ptr);
 
-  fp = __sfp(ptr);
-  if (!fp) {
-    return NULL;
-  }
+    fp = __sfp(ptr);
+    if (!fp) {
+        return NULL;
+    }
 
-  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_TMPFILE, &ret);
+    ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_TMPFILE, &ret);
 
-  if (ret) {
-    fp->_fp = ret;
-    return fp;
-  }
-  else {
-    __sfp_free(fp);
-    return NULL;
-  }
+    if (ret) {
+        fp->_fp = ret;
+        return fp;
+    } else {
+        __sfp_free(fp);
+        return NULL;
+    }
 }
-

@@ -18,7 +18,7 @@
 
 /* Iterate over all the init routines.  */
 void
-__libc_init_array (void)
+__libc_init_array(void)
 {
     void (**fn)(void);
     void (**fn_end)(void);
@@ -27,15 +27,15 @@ __libc_init_array (void)
     fn = __preinit_array_start;
     fn_end = __preinit_array_end;
     while (fn != fn_end)
-        (*fn++) ();
+        (*fn++)();
 
     if (_init)
-        _init ();
+        _init();
 
     fn = __init_array_start;
     fn_end = __init_array_end;
     while (fn != fn_end)
-        (*fn++) ();
+        (*fn++)();
 #else
     /*
      * The init array immediately follows the preinit array,

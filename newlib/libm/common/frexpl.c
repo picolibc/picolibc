@@ -31,147 +31,147 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "math_config.h"
 
 #if defined(_NEED_FLOAT_HUGE) && !defined(__HAVE_LONG_DOUBLE_MATH)
-# if (LDBL_MANT_DIG == 53) /* 64-bit long double */
+#if (LDBL_MANT_DIG == 53) /* 64-bit long double */
 static const long double scale = 0x1p54;
 
 union ldbl {
-  long double x;
-  struct {
-#  ifdef __IEEE_LITTLE_ENDIAN /* for Intel CPU */
-    __uint32_t fracl;
-    __uint32_t frach:20;
-    __uint32_t exp:11;
-    __uint32_t sign:1;
-#  endif
-#  ifdef __IEEE_BIG_ENDIAN
-    __uint32_t sign:1;
-    __uint32_t exp:11;
-    __uint32_t frach:20;
-#   ifndef ___IEEE_BYTES_LITTLE_ENDIAN
-#   else /* ARMEL without __VFP_FP__ */
-    __uint32_t frach:20;
-    __uint32_t exp:11;
-    __uint32_t sign:1;
-#   endif
-    __uint32_t fracl;
-#  endif
-  } u32;
+    long double x;
+    struct {
+#ifdef __IEEE_LITTLE_ENDIAN /* for Intel CPU */
+        __uint32_t fracl;
+        __uint32_t frach : 20;
+        __uint32_t exp   : 11;
+        __uint32_t sign  : 1;
+#endif
+#ifdef __IEEE_BIG_ENDIAN
+        __uint32_t sign  : 1;
+        __uint32_t exp   : 11;
+        __uint32_t frach : 20;
+#ifndef ___IEEE_BYTES_LITTLE_ENDIAN
+#else /* ARMEL without __VFP_FP__ */
+        __uint32_t frach : 20;
+        __uint32_t exp   : 11;
+        __uint32_t sign  : 1;
+#endif
+        __uint32_t fracl;
+#endif
+    } u32;
 };
-# elif (LDBL_MANT_DIG == 64) /* 80-bit long double */
+#elif (LDBL_MANT_DIG == 64) /* 80-bit long double */
 static const double scale = 0x1p65;
 
 union ldbl {
-  long double x;
-  struct {
-#  ifdef __IEEE_LITTLE_ENDIAN /* for Intel CPU */
-    __uint32_t fracl;
-    __uint32_t frach;
-    __uint32_t exp:15;
-    __uint32_t sign:1;
-    __uint32_t pad:16;
-#  endif
-#  ifdef __IEEE_BIG_ENDIAN
-#   ifndef ___IEEE_BYTES_LITTLE_ENDIAN /* for m86k */
-    __uint32_t sign:1;
-    __uint32_t exp:15;
-    __uint32_t pad:16;
-#   else /* ARM FPA10 math copprocessor */
-    __uint32_t exp:15;
-    __uint32_t pad:16;
-    __uint32_t sign:1;
-#   endif
-    __uint32_t frach;
-    __uint32_t fracl;
-#  endif
-  } u32;
+    long double x;
+    struct {
+#ifdef __IEEE_LITTLE_ENDIAN /* for Intel CPU */
+        __uint32_t fracl;
+        __uint32_t frach;
+        __uint32_t exp  : 15;
+        __uint32_t sign : 1;
+        __uint32_t pad  : 16;
+#endif
+#ifdef __IEEE_BIG_ENDIAN
+#ifndef ___IEEE_BYTES_LITTLE_ENDIAN /* for m86k */
+        __uint32_t sign : 1;
+        __uint32_t exp  : 15;
+        __uint32_t pad  : 16;
+#else                               /* ARM FPA10 math copprocessor */
+        __uint32_t exp  : 15;
+        __uint32_t pad  : 16;
+        __uint32_t sign : 1;
+#endif
+        __uint32_t frach;
+        __uint32_t fracl;
+#endif
+    } u32;
 };
-# elif (LDBL_MANT_DIG == 106) /* 128-bit double double */
+#elif (LDBL_MANT_DIG == 106) /* 128-bit double double */
 static const long double scale = 0x1p107l;
 
 #define EXP_EXTRA_BIAS 100
 
 union ldbl {
-  long double x;
-  struct {
-#  ifdef __IEEE_LITTLE_ENDIAN
-    __uint32_t frachm;
-    __uint32_t frach:20;
-    __uint32_t exp:11;
-    __uint32_t sign:1;
-    __uint32_t fracl;
-    __uint32_t fraclm:20;
-    __uint32_t exp_extra:11;
-    __uint32_t sign_extra:1;
-#  endif
-#  ifdef __IEEE_BIG_ENDIAN
-    __uint32_t sign:1;
-    __uint32_t exp:11;
-    __uint32_t frach:20;
-    __uint32_t frachm;
-    __uint32_t sign_extra:1;
-    __uint32_t exp_extra:11;
-    __uint32_t fraclm:20;
-    __uint32_t fracl;
-#  endif
-  } u32;
+    long double x;
+    struct {
+#ifdef __IEEE_LITTLE_ENDIAN
+        __uint32_t frachm;
+        __uint32_t frach : 20;
+        __uint32_t exp   : 11;
+        __uint32_t sign  : 1;
+        __uint32_t fracl;
+        __uint32_t fraclm     : 20;
+        __uint32_t exp_extra  : 11;
+        __uint32_t sign_extra : 1;
+#endif
+#ifdef __IEEE_BIG_ENDIAN
+        __uint32_t sign  : 1;
+        __uint32_t exp   : 11;
+        __uint32_t frach : 20;
+        __uint32_t frachm;
+        __uint32_t sign_extra : 1;
+        __uint32_t exp_extra  : 11;
+        __uint32_t fraclm     : 20;
+        __uint32_t fracl;
+#endif
+    } u32;
 };
-# elif (LDBL_MANT_DIG == 113) /* 128-bit long double */
+#elif (LDBL_MANT_DIG == 113) /* 128-bit long double */
 static const long double scale = 0x1p114l;
 
 union ldbl {
-  long double x;
-  struct {
-#  ifdef __IEEE_LITTLE_ENDIAN
-    __uint32_t fracl;
-    __uint32_t fraclm;
-    __uint32_t frachm;
-    __uint32_t frach:16;
-    __uint32_t exp:15;
-    __uint32_t sign:1;
-#  endif
-#  ifdef __IEEE_BIG_ENDIAN
-#   ifndef ___IEEE_BYTES_LITTLE_ENDIAN
-    __uint32_t sign:1;
-    __uint32_t exp:15;
-    __uint32_t frach:16;
-#   else /* ARMEL without __VFP_FP__ */
-    __uint32_t frach:16;
-    __uint32_t exp:15;
-    __uint32_t sign:1;
-#   endif
-    __uint32_t frachm;
-    __uint32_t fraclm;
-    __uint32_t fracl;
-#  endif
-  } u32;
+    long double x;
+    struct {
+#ifdef __IEEE_LITTLE_ENDIAN
+        __uint32_t fracl;
+        __uint32_t fraclm;
+        __uint32_t frachm;
+        __uint32_t frach : 16;
+        __uint32_t exp   : 15;
+        __uint32_t sign  : 1;
+#endif
+#ifdef __IEEE_BIG_ENDIAN
+#ifndef ___IEEE_BYTES_LITTLE_ENDIAN
+        __uint32_t sign  : 1;
+        __uint32_t exp   : 15;
+        __uint32_t frach : 16;
+#else /* ARMEL without __VFP_FP__ */
+        __uint32_t frach : 16;
+        __uint32_t exp   : 15;
+        __uint32_t sign  : 1;
+#endif
+        __uint32_t frachm;
+        __uint32_t fraclm;
+        __uint32_t fracl;
+#endif
+    } u32;
 };
-# else
-#  error Unsupported long double format.
-# endif
+#else
+#error Unsupported long double format.
+#endif
 
 static const int scale_exp = LDBL_MANT_DIG + 1;
 
 long double
-frexpl (long double x, int *eptr)
+frexpl(long double x, int *eptr)
 {
-  union ldbl u;
-  u.x = x;
-  int e = u.u32.exp;
-  *eptr = 0;
-  if (e == (LDBL_MAX_EXP*2 - 1) || x == 0)
-    return x; /* inf,nan,0 */
-  if (e == 0) /* subnormal */
+    union ldbl u;
+    u.x = x;
+    int e = u.u32.exp;
+    *eptr = 0;
+    if (e == (LDBL_MAX_EXP * 2 - 1) || x == 0)
+        return x; /* inf,nan,0 */
+    if (e == 0)   /* subnormal */
     {
-      u.x *= (long double) scale;
-      e = u.u32.exp;
-      *eptr -= scale_exp;
+        u.x *= (long double)scale;
+        e = u.u32.exp;
+        *eptr -= scale_exp;
     }
-  *eptr += e - (LDBL_MAX_EXP - 2);
-  u.u32.exp = LDBL_MAX_EXP - 2; /* -1 */
+    *eptr += e - (LDBL_MAX_EXP - 2);
+    u.u32.exp = LDBL_MAX_EXP - 2; /* -1 */
 #ifdef EXP_EXTRA_BIAS
-  if (u.u32.exp_extra != 0)
-    u.u32.exp_extra = u.u32.exp - EXP_EXTRA_BIAS;
+    if (u.u32.exp_extra != 0)
+        u.u32.exp_extra = u.u32.exp - EXP_EXTRA_BIAS;
 #endif
-  return u.x;
+    return u.x;
 }
 #endif /* _NEED_FLOAT_HUGE */

@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -38,19 +38,19 @@
 float complex
 cacoshf(float complex z)
 {
-	float complex w;
-	float x = crealf(z);
-	float y = cimagf(z);
+    float complex w;
+    float         x = crealf(z);
+    float         y = cimagf(z);
 
-	if (y == 0.0f && x >= 1.0f) {
-		float w = acoshf(x);
-		return CMPLXF(w, 0.0f);
-	}
+    if (y == 0.0f && x >= 1.0f) {
+        float w = acoshf(x);
+        return CMPLXF(w, 0.0f);
+    }
 
 #if 0 /* does not give the principal value */
 	w = I * cacosf(z);
 #else
-	w = clogf(z + csqrtf(z + 1) * csqrtf(z - 1));
+    w = clogf(z + csqrtf(z + 1) * csqrtf(z - 1));
 #endif
-	return w;
+    return w;
 }

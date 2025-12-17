@@ -7,17 +7,17 @@ FUNCTION
 <<wctomb>>---minimal wide char to multibyte converter
 
 INDEX
-	wctomb
+        wctomb
 
 SYNOPSIS
-	#include <stdlib.h>
-	int wctomb(char *<[s]>, wchar_t <[wchar]>);
+        #include <stdlib.h>
+        int wctomb(char *<[s]>, wchar_t <[wchar]>);
 
 DESCRIPTION
-When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming
 implementation of <<wctomb>>.  The
 only ``wide characters'' recognized are single bytes,
-and they are ``converted'' to themselves.  
+and they are ``converted'' to themselves.
 
 When __MB_CAPABLE is defined, this routine calls <<_wctomb_r>> to perform
 the conversion, passing a state variable to allow state dependent
@@ -54,17 +54,16 @@ static mbstate_t _mbtowc_state;
 #endif
 
 int
-wctomb (char *s,
-        wchar_t wchar)
+wctomb(char *s, wchar_t wchar)
 {
-        int retval;
+    int retval;
 
-        retval = __WCTOMB (s, wchar, ps);
-        if (retval == -1) {
+    retval = __WCTOMB(s, wchar, ps);
+    if (retval == -1) {
 #ifdef __MB_CAPABLE
-                _mbtowc_state.__count = 0;
+        _mbtowc_state.__count = 0;
 #endif
-                errno = EILSEQ;
-        }
-        return retval;
+        errno = EILSEQ;
+    }
+    return retval;
 }

@@ -33,9 +33,9 @@
 /* Check result and set errno if necessary.  */
 
 HIDDEN __float64
-__math_check_uflow (__float64 y)
+__math_check_uflow(__float64 y)
 {
-  return y == 0.0 ? __math_with_errno (y, ERANGE) : y;
+    return y == 0.0 ? __math_with_errno(y, ERANGE) : y;
 }
 
 #endif /* _NEED_FLOAT64 */

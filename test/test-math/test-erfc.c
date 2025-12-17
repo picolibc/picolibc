@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-erfc.h"
-#define TEST_FUNC       erfc
+#define TEST_VECTORS "test-erfc.h"
+#define TEST_FUNC    erfc
 
 #include "test-real-one.h"

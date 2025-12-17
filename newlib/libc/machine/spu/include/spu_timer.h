@@ -36,45 +36,44 @@ POSSIBILITY OF SUCH DAMAGE.
 _BEGIN_STD_C
 
 /* Clock services.  */
-extern void spu_clock_start (void);
-extern int spu_clock_stop (void);
-extern uint64_t spu_clock_read (void);
+extern void     spu_clock_start(void);
+extern int      spu_clock_stop(void);
+extern uint64_t spu_clock_read(void);
 
 /* Timer services.  */
-extern int spu_timer_alloc (int interval, void (*func) (int));
-extern int spu_timer_free (int id);
-extern int spu_timer_start (int id);
-extern int spu_timer_stop (int id);
-extern unsigned spu_timebase (void);
+extern int      spu_timer_alloc(int interval, void (*func)(int));
+extern int      spu_timer_free(int id);
+extern int      spu_timer_start(int id);
+extern int      spu_timer_stop(int id);
+extern unsigned spu_timebase(void);
 
 /* Interrupt services.  */
-extern void spu_slih_register (unsigned event_mask,
-			       unsigned (*slih) (unsigned));
-extern unsigned spu_clock_slih (unsigned event_mask);
+extern void     spu_slih_register(unsigned event_mask, unsigned (*slih)(unsigned));
+extern unsigned spu_clock_slih(unsigned event_mask);
 
 /* Number of supported timers.  */
-#define SPU_TIMER_NTIMERS               4
+#define SPU_TIMER_NTIMERS 4
 
 /* Recommended minimun spu timer interval time from (cat /proc/cpuinfo)
-    * QS20       100/14318000  = 6.98 usec
-    * QS21/QS22  100/26666666  = 3.75 usec
-    * PS3        100/79800000  = 1.25 usec  */
-#define SPU_TIMER_MIN_INTERVAL          100
+ * QS20       100/14318000  = 6.98 usec
+ * QS21/QS22  100/26666666  = 3.75 usec
+ * PS3        100/79800000  = 1.25 usec  */
+#define SPU_TIMER_MIN_INTERVAL 100
 
 /* Clock error codes.  */
-#define SPU_CLOCK_ERR_NOT_RUNNING       -2
-#define SPU_CLOCK_ERR_STILL_RUNNING     -3
-#define SPU_CLOCK_ERR_TIMERS_ACTIVE     -4
+#define SPU_CLOCK_ERR_NOT_RUNNING   -2
+#define SPU_CLOCK_ERR_STILL_RUNNING -3
+#define SPU_CLOCK_ERR_TIMERS_ACTIVE -4
 
 /* Timer error codes.  */
-#define SPU_TIMER_ERR_INVALID_PARM      -10
-#define SPU_TIMER_ERR_NONE_FREE         -11
-#define SPU_TIMER_ERR_INVALID_ID        -12
-#define SPU_TIMER_ERR_ACTIVE            -13
-#define SPU_TIMER_ERR_NOT_ACTIVE        -14
-#define SPU_TIMER_ERR_NOCLOCK           -15
-#define SPU_TIMER_ERR_FREE              -16
-#define SPU_TIMER_ERR_NOT_STOPPED       -17
+#define SPU_TIMER_ERR_INVALID_PARM -10
+#define SPU_TIMER_ERR_NONE_FREE    -11
+#define SPU_TIMER_ERR_INVALID_ID   -12
+#define SPU_TIMER_ERR_ACTIVE       -13
+#define SPU_TIMER_ERR_NOT_ACTIVE   -14
+#define SPU_TIMER_ERR_NOCLOCK      -15
+#define SPU_TIMER_ERR_FREE         -16
+#define SPU_TIMER_ERR_NOT_STOPPED  -17
 
 _END_STD_C
 

@@ -39,28 +39,36 @@
 #if defined(_MSC_VER)
 #include <intrin.h>
 
-static inline uint32_t floor_log2(const uint64_t value) {
-  long index;
-  return _BitScanReverse64(&index, value) ? index : 64;
+static inline uint32_t
+floor_log2(const uint64_t value)
+{
+    long index;
+    return _BitScanReverse64(&index, value) ? index : 64;
 }
 
 #else
 
-static inline uint32_t floor_log2(const uint64_t value) {
-  return 63 - __builtin_clzll(value);
+static inline uint32_t
+floor_log2(const uint64_t value)
+{
+    return 63 - __builtin_clzll(value);
 }
 
 #endif
 
 // The max function is already defined on Windows.
-static inline int32_t max32(int32_t a, int32_t b) {
-  return a < b ? b : a;
+static inline int32_t
+max32(int32_t a, int32_t b)
+{
+    return a < b ? b : a;
 }
 
-static inline FLOAT64 int64Bits2Double(uint64_t bits) {
-  FLOAT64 f;
-  memcpy(&f, &bits, sizeof(FLOAT64));
-  return f;
+static inline FLOAT64
+int64Bits2Double(uint64_t bits)
+{
+    FLOAT64 f;
+    memcpy(&f, &bits, sizeof(FLOAT64));
+    return f;
 }
 
 FLOAT64
@@ -76,51 +84,51 @@ __atod_engine(uint64_t m10, int e10)
 
     // Convert to binary float m2 * 2^e2, while retaining information about whether the conversion
     // was exact (trailingZeros).
-    int32_t e2;
+    int32_t  e2;
     uint64_t m2;
-    bool trailingZeros;
+    bool     trailingZeros;
     if (e10 >= 0) {
-	// The length of m * 10^e in bits is:
-	//   log2(m10 * 10^e10) = log2(m10) + e10 log2(10) = log2(m10) + e10 + e10 * log2(5)
-	//
-	// We want to compute the DOUBLE_MANTISSA_BITS + 1 top-most bits (+1 for the implicit leading
-	// one in IEEE format). We therefore choose a binary output exponent of
-	//   log2(m10 * 10^e10) - (DOUBLE_MANTISSA_BITS + 1).
-	//
-	// We use floor(log2(5^e10)) so that we get at least this many bits; better to
-	// have an additional bit than to not have enough bits.
-	e2 = floor_log2(m10) + e10 + log2pow5(e10) - (DOUBLE_MANTISSA_BITS + 1);
+        // The length of m * 10^e in bits is:
+        //   log2(m10 * 10^e10) = log2(m10) + e10 log2(10) = log2(m10) + e10 + e10 * log2(5)
+        //
+        // We want to compute the DOUBLE_MANTISSA_BITS + 1 top-most bits (+1 for the implicit
+        // leading one in IEEE format). We therefore choose a binary output exponent of
+        //   log2(m10 * 10^e10) - (DOUBLE_MANTISSA_BITS + 1).
+        //
+        // We use floor(log2(5^e10)) so that we get at least this many bits; better to
+        // have an additional bit than to not have enough bits.
+        e2 = floor_log2(m10) + e10 + log2pow5(e10) - (DOUBLE_MANTISSA_BITS + 1);
 
-	// We now compute [m10 * 10^e10 / 2^e2] = [m10 * 5^e10 / 2^(e2-e10)].
-	// To that end, we use the DOUBLE_POW5_SPLIT table.
-	int j = e2 - e10 - ceil_log2pow5(e10) + DOUBLE_POW5_BITCOUNT;
-	assert(j >= 0);
+        // We now compute [m10 * 10^e10 / 2^e2] = [m10 * 5^e10 / 2^(e2-e10)].
+        // To that end, we use the DOUBLE_POW5_SPLIT table.
+        int j = e2 - e10 - ceil_log2pow5(e10) + DOUBLE_POW5_BITCOUNT;
+        assert(j >= 0);
 #if defined(RYU_OPTIMIZE_SIZE)
-	uint64_t pow5[2];
-	__double_computePow5(e10, pow5);
-	m2 = mulShift64(m10, pow5, j);
+        uint64_t pow5[2];
+        __double_computePow5(e10, pow5);
+        m2 = mulShift64(m10, pow5, j);
 #else
-	assert(e10 < DOUBLE_POW5_TABLE_SIZE);
-	m2 = mulShift64(m10, DOUBLE_POW5_SPLIT[e10], j);
+        assert(e10 < DOUBLE_POW5_TABLE_SIZE);
+        m2 = mulShift64(m10, DOUBLE_POW5_SPLIT[e10], j);
 #endif
-	// We also compute if the result is exact, i.e.,
-	//   [m10 * 10^e10 / 2^e2] == m10 * 10^e10 / 2^e2.
-	// This can only be the case if 2^e2 divides m10 * 10^e10, which in turn requires that the
-	// largest power of 2 that divides m10 + e10 is greater than e2. If e2 is less than e10, then
-	// the result must be exact. Otherwise we use the existing multipleOfPowerOf2 function.
-	trailingZeros = e2 < e10 || (e2 - e10 < 64 && multipleOfPowerOf2(m10, e2 - e10));
+        // We also compute if the result is exact, i.e.,
+        //   [m10 * 10^e10 / 2^e2] == m10 * 10^e10 / 2^e2.
+        // This can only be the case if 2^e2 divides m10 * 10^e10, which in turn requires that the
+        // largest power of 2 that divides m10 + e10 is greater than e2. If e2 is less than e10,
+        // then the result must be exact. Otherwise we use the existing multipleOfPowerOf2 function.
+        trailingZeros = e2 < e10 || (e2 - e10 < 64 && multipleOfPowerOf2(m10, e2 - e10));
     } else {
-	e2 = floor_log2(m10) + e10 - ceil_log2pow5(-e10) - (DOUBLE_MANTISSA_BITS + 1);
-	int j = e2 - e10 + ceil_log2pow5(-e10) - 1 + DOUBLE_POW5_INV_BITCOUNT;
+        e2 = floor_log2(m10) + e10 - ceil_log2pow5(-e10) - (DOUBLE_MANTISSA_BITS + 1);
+        int j = e2 - e10 + ceil_log2pow5(-e10) - 1 + DOUBLE_POW5_INV_BITCOUNT;
 #if defined(RYU_OPTIMIZE_SIZE)
-	uint64_t pow5[2];
-	__double_computeInvPow5(-e10, pow5);
-	m2 = mulShift64(m10, pow5, j);
+        uint64_t pow5[2];
+        __double_computeInvPow5(-e10, pow5);
+        m2 = mulShift64(m10, pow5, j);
 #else
-	assert(-e10 < DOUBLE_POW5_INV_TABLE_SIZE);
-	m2 = mulShift64(m10, DOUBLE_POW5_INV_SPLIT[-e10], j);
+        assert(-e10 < DOUBLE_POW5_INV_TABLE_SIZE);
+        m2 = mulShift64(m10, DOUBLE_POW5_INV_SPLIT[-e10], j);
 #endif
-	trailingZeros = multipleOfPowerOf5(m10, -e10);
+        trailingZeros = multipleOfPowerOf5(m10, -e10);
     }
 
 #ifdef RYU_DEBUG
@@ -128,12 +136,13 @@ __atod_engine(uint64_t m10, int e10)
 #endif
 
     // Compute the final IEEE exponent.
-    uint32_t ieee_e2 = (uint32_t) max32(0, e2 + DOUBLE_EXPONENT_BIAS + floor_log2(m2));
+    uint32_t ieee_e2 = (uint32_t)max32(0, e2 + DOUBLE_EXPONENT_BIAS + floor_log2(m2));
 
     if (ieee_e2 > 0x7fe) {
-	// Final IEEE exponent is larger than the maximum representable; return +/-Infinity.
-	uint64_t ieee = (((uint64_t) signedM) << (DOUBLE_EXPONENT_BITS + DOUBLE_MANTISSA_BITS)) | (0x7ffull << DOUBLE_MANTISSA_BITS);
-	return int64Bits2Double(ieee);
+        // Final IEEE exponent is larger than the maximum representable; return +/-Infinity.
+        uint64_t ieee = (((uint64_t)signedM) << (DOUBLE_EXPONENT_BITS + DOUBLE_MANTISSA_BITS))
+            | (0x7ffull << DOUBLE_MANTISSA_BITS);
+        return int64Bits2Double(ieee);
     }
 
     // We need to figure out how much we need to shift m2. The tricky part is that we need to take
@@ -153,7 +162,7 @@ __atod_engine(uint64_t m10, int e10)
     // We need to update trailingZeros given that we have the exact output exponent ieee_e2 now.
     trailingZeros &= (m2 & ((1ull << (shift - 1)) - 1)) == 0;
     uint64_t lastRemovedBit = (m2 >> (shift - 1)) & 1;
-    bool roundUp = (lastRemovedBit != 0) && (!trailingZeros || (((m2 >> shift) & 1) != 0));
+    bool     roundUp = (lastRemovedBit != 0) && (!trailingZeros || (((m2 >> shift) & 1) != 0));
 
 #ifdef RYU_DEBUG
     printf("roundUp = %d\n", roundUp);
@@ -163,11 +172,13 @@ __atod_engine(uint64_t m10, int e10)
     assert(ieee_m2 <= (1ull << (DOUBLE_MANTISSA_BITS + 1)));
     ieee_m2 &= (1ull << DOUBLE_MANTISSA_BITS) - 1;
     if (ieee_m2 == 0 && roundUp) {
-	// Due to how the IEEE represents +/-Infinity, we don't need to check for overflow here.
-	ieee_e2++;
+        // Due to how the IEEE represents +/-Infinity, we don't need to check for overflow here.
+        ieee_e2++;
     }
 
-    uint64_t ieee = (((((uint64_t) signedM) << DOUBLE_EXPONENT_BITS) | (uint64_t)ieee_e2) << DOUBLE_MANTISSA_BITS) | ieee_m2;
+    uint64_t ieee = (((((uint64_t)signedM) << DOUBLE_EXPONENT_BITS) | (uint64_t)ieee_e2)
+                     << DOUBLE_MANTISSA_BITS)
+        | ieee_m2;
     return int64Bits2Double(ieee);
 }
 

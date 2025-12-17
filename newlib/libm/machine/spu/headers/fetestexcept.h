@@ -31,19 +31,20 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FETESTEXCEPT_H_
-#define _FETESTEXCEPT_H_	1
+#define _FETESTEXCEPT_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline int _fetestexcept(int excepts)
+static __inline int
+_fetestexcept(int excepts)
 {
-  vec_uint4 fpscr;
+    vec_uint4 fpscr;
 
-  excepts &= FE_ALL_EXCEPT;
-  fpscr = spu_mffpscr();
-  return (__pack_fpscr(fpscr) & excepts);
+    excepts &= FE_ALL_EXCEPT;
+    fpscr = spu_mffpscr();
+    return (__pack_fpscr(fpscr) & excepts);
 }
 
 #endif /* _FETESTEXCEPT_H_ */

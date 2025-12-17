@@ -133,15 +133,19 @@ static bool
 __match_charset(const char *str, const char *name)
 {
     for (;;) {
-        char    sc, nc;
+        char sc, nc;
 
-        while (__skip_char(nc = *name++));
-        while (__skip_char(sc = *str++) && nc);
+        while (__skip_char(nc = *name++))
+            ;
+        while (__skip_char(sc = *str++) && nc)
+            ;
         /* discard trailing / bits -- those are for iconv modes */
         if (sc == '/')
             sc = '\0';
-        if (LOCALE_ISUPPER(sc)) sc = LOCALE_TOLOWER(sc);
-        if (LOCALE_ISUPPER(nc)) nc = LOCALE_TOLOWER(nc);
+        if (LOCALE_ISUPPER(sc))
+            sc = LOCALE_TOLOWER(sc);
+        if (LOCALE_ISUPPER(nc))
+            nc = LOCALE_TOLOWER(nc);
         if (sc != nc)
             return false;
         if (!sc)
@@ -158,8 +162,7 @@ __find_charset(const char *charset)
 {
     enum locale_id id;
 
-    if (__match_charset(charset, "ascii") ||
-        __match_charset(charset, "us_ascii"))
+    if (__match_charset(charset, "ascii") || __match_charset(charset, "us_ascii"))
         return locale_C;
 
 #ifdef __MB_CAPABLE
@@ -176,9 +179,9 @@ __find_charset(const char *charset)
 }
 
 #ifdef __MB_CAPABLE
-#define LOCALE_DEFAULT  locale_UTF_8
+#define LOCALE_DEFAULT locale_UTF_8
 #else
-#define LOCALE_DEFAULT  locale_C
+#define LOCALE_DEFAULT locale_C
 #endif
 
 /*
@@ -188,8 +191,8 @@ __find_charset(const char *charset)
 enum locale_id
 __find_locale(const char *name)
 {
-    enum locale_id     id = LOCALE_DEFAULT;
-    const char          *lang_end;
+    enum locale_id id = LOCALE_DEFAULT;
+    const char    *lang_end;
 
     if (!name)
         return locale_INVALID;

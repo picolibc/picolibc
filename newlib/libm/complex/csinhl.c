@@ -37,11 +37,12 @@
 long double complex
 csinhl(long double complex z)
 {
-	long double x, y;
+    long double x, y;
 
-	x = creall(z);
-	y = cimagl(z);
-	return (long double complex) (sinhl(x) * cosl(y)) + (coshl(x) * sinl(y)) * (long double complex) I;
+    x = creall(z);
+    y = cimagl(z);
+    return (long double complex)(sinhl(x) * cosl(y))
+        + (coshl(x) * sinl(y)) * (long double complex)I;
 }
 
 #endif

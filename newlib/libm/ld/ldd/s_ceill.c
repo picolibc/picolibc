@@ -37,7 +37,7 @@ long double
 ceill(long double x)
 {
     union IEEEl2bits u;
-    double dh, dl;
+    double           dh, dl;
 
     u.e = x;
     if (u.bits.exp == LDBL_INF_NAN_EXP)
@@ -47,5 +47,5 @@ ceill(long double x)
         dl = 0;
     else
         dl = ceil(u.dbits.dl);
-    return (long double) dh + (long double) dl;
+    return (long double)dh + (long double)dl;
 }

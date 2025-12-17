@@ -33,20 +33,19 @@ SUCH DAMAGE.
 
 _BEGIN_STD_C
 
-#define	RUSAGE_SELF	0		/* calling process */
-#define	RUSAGE_CHILDREN	-1		/* terminated child processes */
+#define RUSAGE_SELF     0  /* calling process */
+#define RUSAGE_CHILDREN -1 /* terminated child processes */
 #if __GNU_VISIBLE
-#define	RUSAGE_THREAD	1
+#define RUSAGE_THREAD 1
 #endif
 
 struct rusage {
-  	struct timeval ru_utime;	/* user time used */
-	struct timeval ru_stime;	/* system time used */
+    struct timeval ru_utime; /* user time used */
+    struct timeval ru_stime; /* system time used */
 };
 
-int	getrusage (int, struct rusage*);
+int getrusage(int, struct rusage *);
 
 _END_STD_C
 
 #endif /* !_SYS_RESOURCE_H_ */
-

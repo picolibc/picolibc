@@ -37,9 +37,7 @@
 #include <stdio.h>
 
 void
-__ubsan_val_to_string(char str[static VAL_STR_LEN],
-                      struct type_descriptor *type,
-                      void *value)
+__ubsan_val_to_string(char str[static VAL_STR_LEN], struct type_descriptor *type, void *value)
 {
     int width;
 
@@ -47,22 +45,22 @@ __ubsan_val_to_string(char str[static VAL_STR_LEN],
     case type_kind_int:
         width = type_int_width(type);
         if (type_is_signed(type)) {
-            snprintf(str, VAL_STR_LEN, "%" PRIdMAX "(s%d)",
-                     __ubsan_val_to_imax(type, value, 0), width);
+            snprintf(str, VAL_STR_LEN, "%" PRIdMAX "(s%d)", __ubsan_val_to_imax(type, value, 0),
+                     width);
         } else {
-            snprintf(str, VAL_STR_LEN, "%" PRIuMAX "(u%d)",
-                     __ubsan_val_to_umax(type, value, 0), width);
+            snprintf(str, VAL_STR_LEN, "%" PRIuMAX "(u%d)", __ubsan_val_to_umax(type, value, 0),
+                     width);
         }
         break;
     case type_kind_float:
         width = type_float_width(type);
         if (width == sizeof(float) * 8) {
-            snprintf(str, VAL_STR_LEN, "%af", (double) *(float *) value);
+            snprintf(str, VAL_STR_LEN, "%af", (double)*(float *)value);
         } else if (width == sizeof(double) * 8) {
-            snprintf(str, VAL_STR_LEN, "%a", *(double *) value);
+            snprintf(str, VAL_STR_LEN, "%a", *(double *)value);
 #ifdef __SIZEOF_LONG_DOUBLE__
         } else if (width == sizeof(long double) * 8) {
-            snprintf(str, VAL_STR_LEN, "%Lal", *(long double *) value);
+            snprintf(str, VAL_STR_LEN, "%Lal", *(long double *)value);
 #endif
         } else {
             snprintf(str, VAL_STR_LEN, "float %d bits", width);

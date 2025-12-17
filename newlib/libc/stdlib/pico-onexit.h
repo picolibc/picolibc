@@ -46,22 +46,19 @@ enum pico_onexit_kind {
 };
 
 union on_exit_func {
-    void        (*on_exit)(int, void *);
-    void        (*atexit)(void);
-    void        (*cxa_atexit)(void *);
+    void (*on_exit)(int, void *);
+    void (*atexit)(void);
+    void (*cxa_atexit)(void *);
 };
 
-int
-_on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg);
+int  _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg);
 
-int
-__cxa_atexit (void (*func) (void *), void *arg, void *d);
+int  __cxa_atexit(void (*func)(void *), void *arg, void *d);
 
 void __libc_fini_array(void);
 
 #ifndef __INIT_FINI_ARRAY
-void
-__call_exitprocs(int code, void *param) __weak;
+void __call_exitprocs(int code, void *param) __weak;
 #endif
 
 #endif /* _PICO_ONEXIT_H_ */

@@ -24,26 +24,26 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
 FUNCTION
-	<<towupper>>, <<towupper_l>>---translate wide characters to uppercase
+        <<towupper>>, <<towupper_l>>---translate wide characters to uppercase
 
 INDEX
-	towupper
+        towupper
 
 INDEX
-	towupper_l
+        towupper_l
 
 SYNOPSIS
-	#include <wctype.h>
-	wint_t towupper(wint_t <[c]>);
+        #include <wctype.h>
+        wint_t towupper(wint_t <[c]>);
 
-	#include <wctype.h>
-	wint_t towupper_l(wint_t <[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        wint_t towupper_l(wint_t <[c]>, locale_t <[locale]>);
 
 
 DESCRIPTION
@@ -72,11 +72,11 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wint_t
-towupper (wint_t c)
+towupper(wint_t c)
 {
 #ifdef __MB_CAPABLE
-  return towupper_l(c, 0);
+    return towupper_l(c, 0);
 #else
-  return c < 0x00ff ? (wint_t)(toupper ((int)c)) : c;
+    return c < 0x00ff ? (wint_t)(toupper((int)c)) : c;
 #endif /* __MB_CAPABLE */
 }

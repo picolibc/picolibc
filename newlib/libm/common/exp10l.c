@@ -39,7 +39,7 @@
 #if defined(__HAVE_LONG_DOUBLE_MATH) && defined(_NEED_FLOAT_HUGE)
 
 long double
-exp10l (long double x)
+exp10l(long double x)
 {
     return _powl(10.0l, x);
 }
@@ -52,7 +52,7 @@ __strong_reference(exp10l, pow10l);
 #else
 
 long double
-pow10l (long double x)
+pow10l(long double x)
 {
     return exp10l(x);
 }

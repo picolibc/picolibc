@@ -287,16 +287,15 @@ Author: Ken Werner <ken.werner@de.ibm.com>
 
 /* System callbacks from the SPU. See kernel source file
    arch/powerpc/include/asm/spu.h.  */
-struct spu_syscall_block
-{
-  unsigned long long nr_ret;	/* System call nr and return value.  */
-  unsigned long long parm[6];	/* System call arguments.  */
+struct spu_syscall_block {
+    unsigned long long nr_ret;  /* System call nr and return value.  */
+    unsigned long long parm[6]; /* System call arguments.  */
 };
 
 _BEGIN_STD_C
 
 /* Issues a Linux system call.  */
-int __linux_syscall (struct spu_syscall_block *s);
+int   __linux_syscall(struct spu_syscall_block *s);
 
 /* Linux system calls.  */
 pid_t linux_getpid(void);

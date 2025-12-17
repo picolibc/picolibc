@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isgraph>>, <<isgraph_l>>---printable character predicates
+        <<isgraph>>, <<isgraph_l>>---printable character predicates
 
 INDEX
-	isgraph
+        isgraph
 
 INDEX
-	isgraph_l
+        isgraph_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isgraph(int <[c]>);
+        #include <ctype.h>
+        int isgraph(int <[c]>);
 
-	#include <ctype.h>
-	int isgraph_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isgraph_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isgraph>> behaves identically to <<isprint>>, except that space characters
@@ -70,11 +70,11 @@ No supporting OS subroutines are required.
 
 #undef isgraph
 int
-isgraph (int c)
+isgraph(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return '!' <= c && c <= '~';
 #else
-    return __CTYPE_PTR[c+1]&(__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT);
+    return __CTYPE_PTR[c + 1] & (__CTYPE_PUNCT | __CTYPE_UPPER | __CTYPE_LOWER | __CTYPE_DIGIT);
 #endif
 }

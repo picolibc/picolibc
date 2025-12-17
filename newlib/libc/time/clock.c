@@ -39,11 +39,11 @@ FUNCTION
 <<clock>>---cumulative processor time
 
 INDEX
-	clock
+        clock
 
 SYNOPSIS
-	#include <time.h>
-	clock_t clock(void);
+        #include <time.h>
+        clock_t clock(void);
 
 DESCRIPTION
 Calculates the best available approximation of the cumulative amount
@@ -64,17 +64,16 @@ Supporting OS subroutine required: <<times>>.
 #include <time.h>
 #include <sys/times.h>
 
-clock_t 
-clock (void)
+clock_t
+clock(void)
 {
-  struct tms tim_s;
-  clock_t res;
+    struct tms tim_s;
+    clock_t    res;
 
-  if ((res = (clock_t) times (&tim_s)) != (clock_t) -1)
-    res = (clock_t) (tim_s.tms_utime + tim_s.tms_stime +
-		     tim_s.tms_cutime + tim_s.tms_cstime);
+    if ((res = (clock_t)times(&tim_s)) != (clock_t)-1)
+        res = (clock_t)(tim_s.tms_utime + tim_s.tms_stime + tim_s.tms_cutime + tim_s.tms_cstime);
 
-  return res;
+    return res;
 }
 
 #endif /* CLOCK_PROVIDED */

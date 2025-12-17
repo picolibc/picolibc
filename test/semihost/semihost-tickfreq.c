@@ -39,13 +39,13 @@
 int
 main(void)
 {
-	uintptr_t	tickfreq;
+    uintptr_t tickfreq;
 
-	tickfreq = sys_semihost_tickfreq();
-	if (tickfreq == 0) {
-		printf("invalid tickfreq %lld\n", (long long) tickfreq);
-		exit(1);
-	}
-	printf("tickfreq %lld\n", (long long) tickfreq);
-	exit(0);
+    tickfreq = sys_semihost_tickfreq();
+    if (tickfreq == 0) {
+        printf("invalid tickfreq %lld\n", (long long)tickfreq);
+        exit(1);
+    }
+    printf("tickfreq %lld\n", (long long)tickfreq);
+    exit(0);
 }

@@ -33,26 +33,24 @@
  * or by calling malloc/memcpy
  */
 void *
-realloc(void * ptr, size_t size)
+realloc(void *ptr, size_t size)
 {
-    void * mem;
+    void *mem;
 
     if (ptr == NULL)
-	return malloc(size);
+        return malloc(size);
 
-    if (size == 0)
-    {
+    if (size == 0) {
         free(ptr);
         return NULL;
     }
 
-    if (size > MALLOC_MAXSIZE)
-    {
+    if (size > MALLOC_MAXSIZE) {
         errno = ENOMEM;
         return NULL;
     }
 
-    size_t new_size = chunk_size(size);
+    size_t   new_size = chunk_size(size);
     chunk_t *p_to_realloc = ptr_to_chunk(ptr);
 
 #if MALLOC_DEBUG
@@ -64,67 +62,60 @@ realloc(void * ptr, size_t size)
     /* See if we can avoid allocating new memory
      * when increasing the size
      */
-    if (new_size > old_size)
-    {
-	void *chunk_e = chunk_end(p_to_realloc);
+    if (new_size > old_size) {
+        void *chunk_e = chunk_end(p_to_realloc);
 
-	MALLOC_LOCK;
+        MALLOC_LOCK;
 
-	if (__malloc_grow_chunk(p_to_realloc, new_size))
-	{
-	    /* clear new memory */
-	    memset(chunk_e, '\0', new_size - old_size);
-	    /* adjust chunk_t size */
-	    old_size = new_size;
-	}
-	else
-	{
-	    chunk_t **p, *r;
+        if (__malloc_grow_chunk(p_to_realloc, new_size)) {
+            /* clear new memory */
+            memset(chunk_e, '\0', new_size - old_size);
+            /* adjust chunk_t size */
+            old_size = new_size;
+        } else {
+            chunk_t **p, *r;
 
-	    /* Check to see if there's a chunk_t of free space just past
-	     * the current block, merge it in in case that's useful
-	     */
-	    for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next)
-	    {
-		if (r == chunk_e)
-		{
-		    size_t r_size = _size(r);
+            /* Check to see if there's a chunk_t of free space just past
+             * the current block, merge it in in case that's useful
+             */
+            for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
+                if (r == chunk_e) {
+                    size_t r_size = _size(r);
 
-		    /* remove R from the free list */
-		    *p = r->next;
+                    /* remove R from the free list */
+                    *p = r->next;
 
-		    /* clear the memory from r */
-		    memset(r, '\0', r_size);
+                    /* clear the memory from r */
+                    memset(r, '\0', r_size);
 
-		    /* add it's size to our block */
-		    old_size += r_size;
-		    _set_size(p_to_realloc, old_size);
-		    break;
-		}
-		if (p_to_realloc < r)
-		    break;
-	    }
-	}
+                    /* add it's size to our block */
+                    old_size += r_size;
+                    _set_size(p_to_realloc, old_size);
+                    break;
+                }
+                if (p_to_realloc < r)
+                    break;
+            }
+        }
 
-	MALLOC_UNLOCK;
+        MALLOC_UNLOCK;
     }
 
-    if (new_size <= old_size)
-    {
-	size_t extra = old_size - new_size;
+    if (new_size <= old_size) {
+        size_t extra = old_size - new_size;
 
 #ifdef __NANO_MALLOC_CLEAR_FREED
         if (extra > MALLOC_HEAD)
-            memset((char *) ptr + new_size, 0, extra - MALLOC_HEAD);
+            memset((char *)ptr + new_size, 0, extra - MALLOC_HEAD);
 #endif
-	/* If there's enough space left over, split it out
-	 * and free it
-	 */
-	if (extra >= MALLOC_MINSIZE) {
-	    _set_size(p_to_realloc, new_size);
-	    make_free_chunk(chunk_after(p_to_realloc), extra);
-	}
-	return ptr;
+        /* If there's enough space left over, split it out
+         * and free it
+         */
+        if (extra >= MALLOC_MINSIZE) {
+            _set_size(p_to_realloc, new_size);
+            make_free_chunk(chunk_after(p_to_realloc), extra);
+        }
+        return ptr;
     }
 
     /* No short cuts, allocate new memory and copy */

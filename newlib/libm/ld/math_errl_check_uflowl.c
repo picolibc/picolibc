@@ -33,9 +33,9 @@
 /* Check result and set errno if necessary.  */
 
 HIDDEN long double
-__math_check_uflowl (long double y)
+__math_check_uflowl(long double y)
 {
-  return y == 0.0L ? __math_with_errnol (y, ERANGE) : y;
+    return y == 0.0L ? __math_with_errnol(y, ERANGE) : y;
 }
 
 #endif /* _NEED_FLOAT64 */

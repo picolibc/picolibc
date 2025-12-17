@@ -10,7 +10,7 @@
 /*
  * Guess on types by examining *_MIN / *_MAX defines.
  */
-#if defined(__INT_MAX__) && defined(__LONG_MAX__) && defined (__SCHAR_MAX__) && defined (__SHRT_MAX__)
+#if defined(__INT_MAX__) && defined(__LONG_MAX__) && defined(__SCHAR_MAX__) && defined(__SHRT_MAX__)
 /* GCC >= 3.3.0 has __<val>__ implicitly defined. */
 #define __EXP(x) __##x##__
 #else
@@ -21,8 +21,8 @@
 
 /* Check if "long long" is 64bit wide */
 /* Modern GCCs provide __LONG_LONG_MAX__, SUSv3 wants LLONG_MAX */
-#if ( defined(__LONG_LONG_MAX__) && (__LONG_LONG_MAX__ > 0x7fffffff) ) \
-  || ( defined(LLONG_MAX) && (LLONG_MAX > 0x7fffffff) )
+#if (defined(__LONG_LONG_MAX__) && (__LONG_LONG_MAX__ > 0x7fffffff)) \
+    || (defined(LLONG_MAX) && (LLONG_MAX > 0x7fffffff))
 #define __have_longlong64 1
 #endif
 
@@ -197,7 +197,7 @@ extern "C" {
 #define __UINT64_TYPE__ unsigned __INT64_TYPE__
 #endif
 
-#if defined(__GNUC__) && !__GNUC_PREREQ (4, 5)
+#if defined(__GNUC__) && !__GNUC_PREREQ(4, 5)
 #ifndef __INTPTR_TYPE__
 #define __INTPTR_TYPE__ long int
 #endif
@@ -251,19 +251,19 @@ typedef unsigned __INT_LEAST8_TYPE__ __uint_least8_t;
 #endif
 #define ___int_least8_t_defined 1
 #elif defined(___int8_t_defined)
-typedef __int8_t __int_least8_t;
+typedef __int8_t  __int_least8_t;
 typedef __uint8_t __uint_least8_t;
 #define ___int_least8_t_defined 1
 #elif defined(___int16_t_defined)
-typedef __int16_t __int_least8_t;
+typedef __int16_t  __int_least8_t;
 typedef __uint16_t __uint_least8_t;
 #define ___int_least8_t_defined 1
 #elif defined(___int32_t_defined)
-typedef __int32_t __int_least8_t;
+typedef __int32_t  __int_least8_t;
 typedef __uint32_t __uint_least8_t;
 #define ___int_least8_t_defined 1
 #elif defined(___int64_t_defined)
-typedef __int64_t __int_least8_t;
+typedef __int64_t  __int_least8_t;
 typedef __uint64_t __uint_least8_t;
 #define ___int_least8_t_defined 1
 #endif
@@ -277,15 +277,15 @@ typedef unsigned __INT_LEAST16_TYPE__ __uint_least16_t;
 #endif
 #define ___int_least16_t_defined 1
 #elif defined(___int16_t_defined)
-typedef __int16_t __int_least16_t;
+typedef __int16_t  __int_least16_t;
 typedef __uint16_t __uint_least16_t;
 #define ___int_least16_t_defined 1
 #elif defined(___int32_t_defined)
-typedef __int32_t __int_least16_t;
+typedef __int32_t  __int_least16_t;
 typedef __uint32_t __uint_least16_t;
 #define ___int_least16_t_defined 1
 #elif defined(___int64_t_defined)
-typedef __int64_t __int_least16_t;
+typedef __int64_t  __int_least16_t;
 typedef __uint64_t __uint_least16_t;
 #define ___int_least16_t_defined 1
 #endif
@@ -299,11 +299,11 @@ typedef unsigned __INT_LEAST32_TYPE__ __uint_least32_t;
 #endif
 #define ___int_least32_t_defined 1
 #elif defined(___int32_t_defined)
-typedef __int32_t __int_least32_t;
+typedef __int32_t  __int_least32_t;
 typedef __uint32_t __uint_least32_t;
 #define ___int_least32_t_defined 1
 #elif defined(___int64_t_defined)
-typedef __int64_t __int_least32_t;
+typedef __int64_t  __int_least32_t;
 typedef __uint64_t __uint_least32_t;
 #define ___int_least32_t_defined 1
 #endif
@@ -317,7 +317,7 @@ typedef unsigned __INT_LEAST64_TYPE__ __uint_least64_t;
 #endif
 #define ___int_least64_t_defined 1
 #elif defined(___int64_t_defined)
-typedef __int64_t __int_least64_t;
+typedef __int64_t  __int_least64_t;
 typedef __uint64_t __uint_least64_t;
 #define ___int_least64_t_defined 1
 #endif
@@ -346,10 +346,10 @@ typedef __UINTPTR_TYPE__ __uintptr_t;
 typedef unsigned __INTPTR_TYPE__ __uintptr_t;
 #endif
 #elif defined(__PTRDIFF_TYPE__)
-typedef __PTRDIFF_TYPE__ __intptr_t;
+typedef __PTRDIFF_TYPE__          __intptr_t;
 typedef unsigned __PTRDIFF_TYPE__ __uintptr_t;
 #else
-typedef long __intptr_t;
+typedef long          __intptr_t;
 typedef unsigned long __uintptr_t;
 #endif
 

@@ -15,28 +15,27 @@
 
 #include "fdlibm.h"
 
-static float ponef(float), qonef(float);
+static float       ponef(float), qonef(float);
 
-static const float one = 1.0,
-                   invsqrtpi = 5.6418961287e-01, /* 0x3f106ebb */
-    tpi = 6.3661974669e-01, /* 0x3f22f983 */
+static const float one = 1.0, invsqrtpi = 5.6418961287e-01, /* 0x3f106ebb */
+    tpi = 6.3661974669e-01,                                 /* 0x3f22f983 */
     /* R0/S0 on [0,2] */
     r00 = -6.2500000000e-02, /* 0xbd800000 */
-    r01 = 1.4070566976e-03, /* 0x3ab86cfd */
+    r01 = 1.4070566976e-03,  /* 0x3ab86cfd */
     r02 = -1.5995563444e-05, /* 0xb7862e36 */
-    r03 = 4.9672799207e-08, /* 0x335557d2 */
-    s01 = 1.9153760746e-02, /* 0x3c9ce859 */
-    s02 = 1.8594678841e-04, /* 0x3942fab6 */
-    s03 = 1.1771846857e-06, /* 0x359dffc2 */
-    s04 = 5.0463624390e-09, /* 0x31ad6446 */
-    s05 = 1.2354227016e-11; /* 0x2d59567e */
+    r03 = 4.9672799207e-08,  /* 0x335557d2 */
+    s01 = 1.9153760746e-02,  /* 0x3c9ce859 */
+    s02 = 1.8594678841e-04,  /* 0x3942fab6 */
+    s03 = 1.1771846857e-06,  /* 0x359dffc2 */
+    s04 = 5.0463624390e-09,  /* 0x31ad6446 */
+    s05 = 1.2354227016e-11;  /* 0x2d59567e */
 
 static const float zero = 0.0;
 
 float
 j1f(float x)
 {
-    float z, s, c, ss, cc, r, u, v, y;
+    float     z, s, c, ss, cc, r, u, v, y;
     __int32_t hx, ix;
 
     if (isnan(x))
@@ -62,9 +61,9 @@ j1f(float x)
                 ss = z / cc;
         }
         /*
-	 * j1(x) = 1/sqrt(pi) * (P(1,x)*cc - Q(1,x)*ss) / sqrt(x)
-	 * y1(x) = 1/sqrt(pi) * (P(1,x)*ss + Q(1,x)*cc) / sqrt(x)
-	 */
+         * j1(x) = 1/sqrt(pi) * (P(1,x)*cc - Q(1,x)*ss) / sqrt(x)
+         * y1(x) = 1/sqrt(pi) * (P(1,x)*ss + Q(1,x)*cc) / sqrt(x)
+         */
         if (ix > 0x5c000000)
             z = (invsqrtpi * cc) / sqrtf(y);
         else {
@@ -91,9 +90,9 @@ j1f(float x)
 
 static const float U0[5] = {
     -1.9605709612e-01, /* 0xbe48c331 */
-    5.0443872809e-02, /* 0x3d4e9e3c */
+    5.0443872809e-02,  /* 0x3d4e9e3c */
     -1.9125689287e-03, /* 0xbafaaf2a */
-    2.3525259166e-05, /* 0x37c5581c */
+    2.3525259166e-05,  /* 0x37c5581c */
     -9.1909917899e-08, /* 0xb3c56003 */
 };
 static const float V0[5] = {
@@ -107,7 +106,7 @@ static const float V0[5] = {
 float
 y1f(float x)
 {
-    float z, s, c, ss, cc, u, v;
+    float     z, s, c, ss, cc, u, v;
     __int32_t hx, ix;
 
     GET_FLOAT_WORD(hx, x);
@@ -117,7 +116,7 @@ y1f(float x)
         return __math_divzerof(1);
 
     if (ix > 0x7f800000)
-        return x+x;
+        return x + x;
 
     if (hx < 0)
         return __math_invalidf(x);
@@ -247,8 +246,8 @@ static float
 ponef(float x)
 {
     const float *p, *q;
-    float z, r, s;
-    __int32_t ix;
+    float        z, r, s;
+    __int32_t    ix;
     GET_FLOAT_WORD(ix, x);
     ix &= 0x7fffffff;
     if (ix >= 0x41000000) {
@@ -282,7 +281,7 @@ ponef(float x)
 
 static const float qr8[6] = {
     /* for x in [inf, 8]=1/[0,0.125] */
-    0.0000000000e+00, /* 0x00000000 */
+    0.0000000000e+00,  /* 0x00000000 */
     -1.0253906250e-01, /* 0xbdd20000 */
     -1.6271753311e+01, /* 0xc1822c8d */
     -7.5960174561e+02, /* 0xc43de683 */
@@ -290,11 +289,11 @@ static const float qr8[6] = {
     -4.8438511719e+04, /* 0xc73d3683 */
 };
 static const float qs8[6] = {
-    1.6139537048e+02, /* 0x43216537 */
-    7.8253862305e+03, /* 0x45f48b17 */
-    1.3387534375e+05, /* 0x4802bcd6 */
-    7.1965775000e+05, /* 0x492fb29c */
-    6.6660125000e+05, /* 0x4922be94 */
+    1.6139537048e+02,  /* 0x43216537 */
+    7.8253862305e+03,  /* 0x45f48b17 */
+    1.3387534375e+05,  /* 0x4802bcd6 */
+    7.1965775000e+05,  /* 0x492fb29c */
+    6.6660125000e+05,  /* 0x4922be94 */
     -2.9449025000e+05, /* 0xc88fcb48 */
 };
 
@@ -308,11 +307,11 @@ static const float qr5[6] = {
     -2.6124443359e+03, /* 0xc523471c */
 };
 static const float qs5[6] = {
-    8.1276550293e+01, /* 0x42a28d98 */
-    1.9917987061e+03, /* 0x44f8f98f */
-    1.7468484375e+04, /* 0x468878f8 */
-    4.9851425781e+04, /* 0x4742bb6d */
-    2.7948074219e+04, /* 0x46da5826 */
+    8.1276550293e+01,  /* 0x42a28d98 */
+    1.9917987061e+03,  /* 0x44f8f98f */
+    1.7468484375e+04,  /* 0x468878f8 */
+    4.9851425781e+04,  /* 0x4742bb6d */
+    2.7948074219e+04,  /* 0x46da5826 */
     -4.7191835938e+03, /* 0xc5937978 */
 };
 
@@ -325,11 +324,11 @@ static const float qr3[6] = {
     -2.1921012878e+02, /* 0xc35b35cb */
 };
 static const float qs3[6] = {
-    4.7665153503e+01, /* 0x423ea91e */
-    6.7386511230e+02, /* 0x4428775e */
-    3.3801528320e+03, /* 0x45534272 */
-    5.5477290039e+03, /* 0x45ad5dd5 */
-    1.9031191406e+03, /* 0x44ede3d0 */
+    4.7665153503e+01,  /* 0x423ea91e */
+    6.7386511230e+02,  /* 0x4428775e */
+    3.3801528320e+03,  /* 0x45534272 */
+    5.5477290039e+03,  /* 0x45ad5dd5 */
+    1.9031191406e+03,  /* 0x44ede3d0 */
     -1.3520118713e+02, /* 0xc3073381 */
 };
 
@@ -343,11 +342,11 @@ static const float qr2[6] = {
     -2.1371921539e+01, /* 0xc1aaf9b2 */
 };
 static const float qs2[6] = {
-    2.9533363342e+01, /* 0x41ec4454 */
-    2.5298155212e+02, /* 0x437cfb47 */
-    7.5750280762e+02, /* 0x443d602e */
-    7.3939318848e+02, /* 0x4438d92a */
-    1.5594900513e+02, /* 0x431bf2f2 */
+    2.9533363342e+01,  /* 0x41ec4454 */
+    2.5298155212e+02,  /* 0x437cfb47 */
+    7.5750280762e+02,  /* 0x443d602e */
+    7.3939318848e+02,  /* 0x4438d92a */
+    1.5594900513e+02,  /* 0x431bf2f2 */
     -4.9594988823e+00, /* 0xc09eb437 */
 };
 
@@ -355,8 +354,8 @@ static float
 qonef(float x)
 {
     const float *p, *q;
-    float s, r, z;
-    __int32_t ix;
+    float        s, r, z;
+    __int32_t    ix;
     GET_FLOAT_WORD(ix, x);
     ix &= 0x7fffffff;
     if (ix >= 0x40200000) {
@@ -374,12 +373,10 @@ qonef(float x)
     }
     z = one / (x * x);
     r = p[0] + z * (p[1] + z * (p[2] + z * (p[3] + z * (p[4] + z * p[5]))));
-    s = one +
-        z * (q[0] +
-             z * (q[1] + z * (q[2] + z * (q[3] + z * (q[4] + z * q[5])))));
+    s = one + z * (q[0] + z * (q[1] + z * (q[2] + z * (q[3] + z * (q[4] + z * q[5])))));
     return ((float).375 + r / s) / x;
 }
 
 _MATH_ALIAS_f_f(j1)
 
-_MATH_ALIAS_f_f(y1)
+    _MATH_ALIAS_f_f(y1)

@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fmax.h"
 
-double fmax(double x, double y)
+double
+fmax(double x, double y)
 {
     return _fmax(x, y);
 }

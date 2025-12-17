@@ -36,27 +36,26 @@
 #include "ubsan.h"
 
 intmax_t
-__ubsan_val_to_imax(struct type_descriptor *type,
-                    void *value, intmax_t def)
+__ubsan_val_to_imax(struct type_descriptor *type, void *value, intmax_t def)
 {
     switch (type_int_width(type)) {
     case 8:
-        return (int8_t) (intptr_t) value;
+        return (int8_t)(intptr_t)value;
     case 16:
-        return (int16_t) (intptr_t) value;
+        return (int16_t)(intptr_t)value;
     case 32:
         if (sizeof(value) >= sizeof(int32_t))
-            return (int32_t) (intptr_t) value;
+            return (int32_t)(intptr_t)value;
         else
-            return *(int32_t *) value;
+            return *(int32_t *)value;
     case 64:
         if (sizeof(value) >= sizeof(int64_t))
-            return (int64_t) (intptr_t) value;
+            return (int64_t)(intptr_t)value;
         else
-            return *(int64_t *) value;
+            return *(int64_t *)value;
 #ifdef __SIZEOF_INT128__
     case 128:
-        return *(__int128_t *) value;
+        return *(__int128_t *)value;
 #endif
     default:
         return def;

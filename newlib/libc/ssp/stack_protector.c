@@ -19,43 +19,42 @@ uintptr_t __stack_chk_guard = 0x00000aff; /* 0, 0, '\n', 255  */
 uintptr_t __stack_chk_guard = 0;
 #endif
 
-int     getentropy (void *, size_t) __weak;
+int  getentropy(void *, size_t) __weak;
 
-void __stack_chk_init (void) __attribute__((__constructor__));
+void __stack_chk_init(void) __attribute__((__constructor__));
 
-void
-__attribute__((__constructor__))
-__stack_chk_init (void)
+void __attribute__((__constructor__))
+__stack_chk_init(void)
 {
-  if (__stack_chk_guard != 0)
-    return;
+    if (__stack_chk_guard != 0)
+        return;
 
-  if (getentropy) {
-    /* Use getentropy if available */
-    getentropy(&__stack_chk_guard, sizeof(__stack_chk_guard));
-  } else {
-    /* If getentropy is not available, use the "terminator canary". */
-    ((unsigned char *)&__stack_chk_guard)[0] = 0;
-    ((unsigned char *)&__stack_chk_guard)[1] = 0;
+    if (getentropy) {
+        /* Use getentropy if available */
+        getentropy(&__stack_chk_guard, sizeof(__stack_chk_guard));
+    } else {
+        /* If getentropy is not available, use the "terminator canary". */
+        ((unsigned char *)&__stack_chk_guard)[0] = 0;
+        ((unsigned char *)&__stack_chk_guard)[1] = 0;
 #if __SIZEOF_POINTER__ > 2
-    ((unsigned char *)&__stack_chk_guard)[2] = '\n';
-    ((unsigned char *)&__stack_chk_guard)[3] = 255;
+        ((unsigned char *)&__stack_chk_guard)[2] = '\n';
+        ((unsigned char *)&__stack_chk_guard)[3] = 255;
 #endif
-  }
+    }
 }
 #endif
 
-__noreturn void __stack_chk_fail (void);
+__noreturn void __stack_chk_fail(void);
 
 #define STACK_CHK_MSG "*** stack smashing detected ***: terminated"
 
 __typeof(__stack_chk_fail) __stack_chk_fail_weak;
 
 __noreturn void
-__stack_chk_fail_weak (void)
+__stack_chk_fail_weak(void)
 {
-  puts(STACK_CHK_MSG);
-  abort();
+    puts(STACK_CHK_MSG);
+    abort();
 }
 __weak_reference(__stack_chk_fail_weak, __stack_chk_fail);
 
@@ -63,10 +62,9 @@ __weak_reference(__stack_chk_fail_weak, __stack_chk_fail);
 
 __typeof(__stack_chk_fail) __stack_chk_fail_local;
 
-void
-__attribute__((visibility ("hidden")))
-__stack_chk_fail_local (void)
+void __attribute__((visibility("hidden")))
+__stack_chk_fail_local(void)
 {
-	__stack_chk_fail();
+    __stack_chk_fail();
 }
 #endif

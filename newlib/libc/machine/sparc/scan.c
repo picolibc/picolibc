@@ -23,11 +23,11 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #ifdef __sparclet__
 
 int
-scan (int a, int b)
+scan(int a, int b)
 {
-  int res;
-  __asm__ ("scan %1,%2,%0" : "=r" (res) : "r" (a), "r" (b));
-  return res;
+    int res;
+    __asm__("scan %1,%2,%0" : "=r"(res) : "r"(a), "r"(b));
+    return res;
 }
 
 #endif

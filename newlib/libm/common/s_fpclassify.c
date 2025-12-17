@@ -11,24 +11,24 @@
 #ifdef _NEED_FLOAT64
 
 int
-__fpclassify64 (__float64 x)
+__fpclassify64(__float64 x)
 {
-  __uint32_t msw, lsw;
+    __uint32_t msw, lsw;
 
-  EXTRACT_WORDS(msw,lsw,x);
+    EXTRACT_WORDS(msw, lsw, x);
 
-  msw &= 0x7fffffff;
-  if (msw == 0x00000000 && lsw == 0x00000000)
-    return FP_ZERO;
-  else if (msw <= 0x000fffff)
-    /* zero is already handled above */
-    return FP_SUBNORMAL;
-  else if (msw <= 0x7fefffff)
-    return FP_NORMAL;
-  else if (msw == 0x7ff00000 && lsw == 0x00000000)
-    return FP_INFINITE;
-  else
-    return FP_NAN;
+    msw &= 0x7fffffff;
+    if (msw == 0x00000000 && lsw == 0x00000000)
+        return FP_ZERO;
+    else if (msw <= 0x000fffff)
+        /* zero is already handled above */
+        return FP_SUBNORMAL;
+    else if (msw <= 0x7fefffff)
+        return FP_NORMAL;
+    else if (msw == 0x7ff00000 && lsw == 0x00000000)
+        return FP_INFINITE;
+    else
+        return FP_NAN;
 }
 
 _MATH_ALIAS_i_d(__fpclassify)

@@ -24,26 +24,26 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
 FUNCTION
-	<<towlower>>, <<towlower_l>>---translate wide characters to lowercase
+        <<towlower>>, <<towlower_l>>---translate wide characters to lowercase
 
 INDEX
-	towlower
+        towlower
 
 INDEX
-	towlower_l
+        towlower_l
 
 SYNOPSIS
-	#include <wctype.h>
-	wint_t towlower(wint_t <[c]>);
+        #include <wctype.h>
+        wint_t towlower(wint_t <[c]>);
 
-	#include <wctype.h>
-	wint_t towlower_l(wint_t <[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        wint_t towlower_l(wint_t <[c]>, locale_t <[locale]>);
 
 
 DESCRIPTION
@@ -71,11 +71,11 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wint_t
-towlower (wint_t c)
+towlower(wint_t c)
 {
 #ifdef __MB_CAPABLE
-  return towlower_l(c, 0);
+    return towlower_l(c, 0);
 #else
-  return c < 0x00ff ? (wint_t)(tolower ((int)c)) : c;
+    return c < 0x00ff ? (wint_t)(tolower((int)c)) : c;
 #endif /* __MB_CAPABLE */
 }

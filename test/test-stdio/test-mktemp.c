@@ -37,38 +37,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define check(condition, message) do {                  \
-        if (!(condition)) {                             \
-            printf("%s: %s\n", message, #condition);    \
-            if (f)                                      \
-                fclose(f);                              \
-            (void) remove(template);                    \
-            exit(1);                                    \
-        }                                               \
-    } while(0)
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            if (f)                                   \
+                fclose(f);                           \
+            (void)remove(template);                  \
+            exit(1);                                 \
+        }                                            \
+    } while (0)
 
 static const char NAME_TEMPLATE[] = "foo-XXXXXX";
 
 static const char NAME_TEMPLATE_EXT[] = "foo-XXXXXX.txt";
 
-#define EXT_LEN                 4
+#define EXT_LEN 4
 
 #define MESSAGE "hello, world\n"
 
 static void
-check_contents(char *template,int repeats)
+check_contents(char *template, int repeats)
 {
     FILE *f;
     char *s;
-    int r;
-    int c;
+    int   r;
+    int   c;
 
     f = fopen(template, "r");
     check(f != NULL, "fopen r");
     for (r = 0; r < repeats; r++) {
         for (s = MESSAGE; *s; s++) {
             c = getc(f);
-            check((char) c == *s, "contents");
+            check((char)c == *s, "contents");
         }
     }
     c = getc(f);
@@ -88,10 +89,10 @@ check_contents(char *template,int repeats)
 int
 main(void)
 {
-    char        template[sizeof(NAME_TEMPLATE_EXT)];
-    char        *s_ret;
-    FILE        *f = NULL;
-    int         i_ret;
+    char  template[sizeof(NAME_TEMPLATE_EXT)];
+    char *s_ret;
+    FILE *f = NULL;
+    int   i_ret;
 
     /* Create temp file */
     strcpy(template, NAME_TEMPLATE);
@@ -105,7 +106,7 @@ main(void)
     fclose(f);
     f = NULL;
     check_contents(template, 1);
-    (void) remove(template);
+    (void)remove(template);
 
     /* Create temp file */
     strcpy(template, NAME_TEMPLATE);
@@ -119,7 +120,7 @@ main(void)
     fclose(f);
     f = NULL;
     check_contents(template, 1);
-    (void) remove(template);
+    (void)remove(template);
 
     /* Create temp file with extension */
     strcpy(template, NAME_TEMPLATE_EXT);
@@ -128,13 +129,15 @@ main(void)
 
     /* Make sure the name still ends with the extension */
     check(strcmp(template + sizeof(NAME_TEMPLATE_EXT) - EXT_LEN,
-                 NAME_TEMPLATE_EXT + sizeof(NAME_TEMPLATE_EXT) - EXT_LEN) == 0, "extension");
+                 NAME_TEMPLATE_EXT + sizeof(NAME_TEMPLATE_EXT) - EXT_LEN)
+              == 0,
+          "extension");
     f = fdopen(i_ret, "w");
     check(f != NULL, "fopen w");
     fputs(MESSAGE, f);
     fclose(f);
     check_contents(template, 1);
-    (void) remove(template);
+    (void)remove(template);
 
     exit(0);
 }

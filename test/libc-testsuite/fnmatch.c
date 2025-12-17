@@ -34,35 +34,38 @@
  * http://www.liacs.nl/~wichert/strace/
  */
 
-#define FLAG(f)	{ f, #f }
+#define FLAG(f) { f, #f }
 
 const struct xlat {
-  int val;
-  char *str;
+    int   val;
+    char *str;
 } fnmatch_flags[] = {
-  FLAG(FNM_NOESCAPE),
-  FLAG(FNM_PATHNAME),
-  FLAG(FNM_PERIOD),
-  {0,            NULL},
+    FLAG(FNM_NOESCAPE),
+    FLAG(FNM_PATHNAME),
+    FLAG(FNM_PERIOD),
+    { 0, NULL },
 };
 
-static void printflags(const struct xlat *map, int flags) {
-  char * sep;
+static void
+printflags(const struct xlat *map, int flags)
+{
+    char *sep;
 
-  if (! flags) {
-    printf("0");
-    return;
-  }
-
-  sep = "";
-  for (; map->str; map++) {
-    if (map->val && (flags & map->val) == map->val) {
-      printf("%s%s", sep, map->str);
-      sep = "|";
-      flags &= ~(map->val);
+    if (!flags) {
+        printf("0");
+        return;
     }
-  }
-  if (flags) printf("%sunknown=%#x", sep, flags);
+
+    sep = "";
+    for (; map->str; map++) {
+        if (map->val && (flags & map->val) == map->val) {
+            printf("%s%s", sep, map->str);
+            sep = "|";
+            flags &= ~(map->val);
+        }
+    }
+    if (flags)
+        printf("%sunknown=%#x", sep, flags);
 }
 
 /*
@@ -71,119 +74,120 @@ static void printflags(const struct xlat *map, int flags) {
 const struct {
     const char *pattern;
     const char *string;
-    int flags;
-    int expected;
+    int         flags;
+    int         expected;
 } tests[] = {
     /* begin dietlibc tests */
-    { "*.c", "foo.c", 0, 0 },
-    { "*.c", ".c", 0, 0 },
-    { "*.a", "foo.c", 0, FNM_NOMATCH },
-    { "*.c", ".foo.c", 0, 0 },
-    { "*.c", ".foo.c", FNM_PERIOD, FNM_NOMATCH },
-    { "*.c", "foo.c", FNM_PERIOD, 0 },
-    { "a\\*.c", "a*.c", FNM_NOESCAPE, FNM_NOMATCH },
-    { "a\\*.c", "ax.c", 0, FNM_NOMATCH },
-    { "a[xy].c", "ax.c", 0, 0 },
-    { "a[!y].c", "ax.c", 0, 0 },
-    { "a[a/z]*.c", "a/x.c", FNM_PATHNAME, FNM_NOMATCH },
-    { "a/*.c", "a/x.c", FNM_PATHNAME, 0 },
-    { "a*.c", "a/x.c", FNM_PATHNAME, FNM_NOMATCH },
-    { "*/foo", "/foo", FNM_PATHNAME, 0 },
-    { "-O[01]", "-O1", 0, 0 },
-    { "[[?*\\\\]", "\\", 0, 0 },
-    { "[]?*\\\\]", "]", 0, 0 },
+    { "*.c",                                   "foo.c",                 0,                         0            },
+    { "*.c",                                   ".c",                    0,                         0            },
+    { "*.a",                                   "foo.c",                 0,                         FNM_NOMATCH  },
+    { "*.c",                                   ".foo.c",                0,                         0            },
+    { "*.c",                                   ".foo.c",                FNM_PERIOD,                FNM_NOMATCH  },
+    { "*.c",                                   "foo.c",                 FNM_PERIOD,                0            },
+    { "a\\*.c",                                "a*.c",                  FNM_NOESCAPE,              FNM_NOMATCH  },
+    { "a\\*.c",                                "ax.c",                  0,                         FNM_NOMATCH  },
+    { "a[xy].c",                               "ax.c",                  0,                         0            },
+    { "a[!y].c",                               "ax.c",                  0,                         0            },
+    { "a[a/z]*.c",                             "a/x.c",                 FNM_PATHNAME,              FNM_NOMATCH  },
+    { "a/*.c",                                 "a/x.c",                 FNM_PATHNAME,              0            },
+    { "a*.c",                                  "a/x.c",                 FNM_PATHNAME,              FNM_NOMATCH  },
+    { "*/foo",                                 "/foo",                  FNM_PATHNAME,              0            },
+    { "-O[01]",                                "-O1",                   0,                         0            },
+    { "[[?*\\\\]",                             "\\",                    0,                         0            },
+    { "[]?*\\\\]",                             "]",                     0,                         0            },
     /* initial right-bracket tests */
-    { "[!]a-]", "b", 0, 0 },
-    { "[]-_]", "^", 0, 0 },   /* range: ']', '^', '_' */
-    { "[!]-_]", "X", 0, 0 },
-    { "??", "-", 0, FNM_NOMATCH },
+    { "[!]a-]",                                "b",                     0,                         0            },
+    { "[]-_]",                                 "^",                     0,                         0            }, /* range: ']', '^', '_' */
+    { "[!]-_]",                                "X",                     0,                         0            },
+    { "??",                                    "-",                     0,                         FNM_NOMATCH  },
     /* begin glibc tests */
-    { "*LIB*", "lib", FNM_PERIOD, FNM_NOMATCH },
-    { "a[/]b", "a/b", 0, 0 },
-    { "a[/]b", "a/b", FNM_PATHNAME, FNM_NOMATCH },
-    { "[a-z]/[a-z]", "a/b", 0, 0 },
-    { "*", "a/b", FNM_PATHNAME, FNM_NOMATCH },
-    { "*[/]b", "a/b", FNM_PATHNAME, FNM_NOMATCH },
-    { "*[b]", "a/b", FNM_PATHNAME, FNM_NOMATCH },
-    { "[*]/b", "a/b", 0, FNM_NOMATCH },
-    { "[*]/b", "*/b", 0, 0 },
-    { "[?]/b", "a/b", 0, FNM_NOMATCH },
-    { "[?]/b", "?/b", 0, 0 },
-    { "[[a]/b", "a/b", 0, 0 },
-    { "[[a]/b", "[/b", 0, 0 },
-    { "\\*/b", "a/b", 0, FNM_NOMATCH },
-    { "\\*/b", "*/b", 0, 0 },
-    { "\\?/b", "a/b", 0, FNM_NOMATCH },
-    { "\\?/b", "?/b", 0, 0 },
-    { "[/b", "[/b", 0, 0 },
-    { "\\[/b", "[/b", 0, 0 },
-    { "??""/b", "aa/b", 0, 0 },
-    { "???b", "aa/b", 0, 0 },
-    { "???b", "aa/b", FNM_PATHNAME, FNM_NOMATCH },
-    { "?a/b", ".a/b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
-    { "a/?b", "a/.b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
-    { "*a/b", ".a/b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
-    { "a/*b", "a/.b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
-    { "[.]a/b", ".a/b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
-    { "a/[.]b", "a/.b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
-    { "*/?", "a/b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { "?/*", "a/b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { ".*/?", ".a/b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { "*/.?", "a/.b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { "*/*", "a/.b", FNM_PATHNAME|FNM_PERIOD, FNM_NOMATCH },
-    { "*?*/*", "a/.b", FNM_PERIOD, 0 },
-    { "*[.]/b", "a./b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { "*[[:alpha:]]/*[[:alnum:]]", "a/b", FNM_PATHNAME, 0 },
-    { "*[![:digit:]]*/[![:d-d]", "a/b", FNM_PATHNAME, 0 },
-    { "*[![:digit:]]*/[[:d-d]", "a/[", FNM_PATHNAME, 0 },
-    { "*[![:digit:]]*/[![:d-d]", "a/[", FNM_PATHNAME, -FNM_NOMATCH },
-    { "a?b", "a.b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { "a*b", "a.b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { "a[.]b", "a.b", FNM_PATHNAME|FNM_PERIOD, 0 },
-    { "[[=a=]]", "a", 0, 0 },
-    { "[[=a=]][[=b=]]", "ab", 0, 0 },
-    { "[[=a=]][[=c=]]", "ab", 0, FNM_NOMATCH },
-    { "[[.foo.]]", "f", 0, -FNM_NOMATCH },
-    { "[[.a.]]", "a", 0, 0 },
+    { "*LIB*",                                 "lib",                   FNM_PERIOD,                FNM_NOMATCH  },
+    { "a[/]b",                                 "a/b",                   0,                         0            },
+    { "a[/]b",                                 "a/b",                   FNM_PATHNAME,              FNM_NOMATCH  },
+    { "[a-z]/[a-z]",                           "a/b",                   0,                         0            },
+    { "*",                                     "a/b",                   FNM_PATHNAME,              FNM_NOMATCH  },
+    { "*[/]b",                                 "a/b",                   FNM_PATHNAME,              FNM_NOMATCH  },
+    { "*[b]",                                  "a/b",                   FNM_PATHNAME,              FNM_NOMATCH  },
+    { "[*]/b",                                 "a/b",                   0,                         FNM_NOMATCH  },
+    { "[*]/b",                                 "*/b",                   0,                         0            },
+    { "[?]/b",                                 "a/b",                   0,                         FNM_NOMATCH  },
+    { "[?]/b",                                 "?/b",                   0,                         0            },
+    { "[[a]/b",                                "a/b",                   0,                         0            },
+    { "[[a]/b",                                "[/b",                   0,                         0            },
+    { "\\*/b",                                 "a/b",                   0,                         FNM_NOMATCH  },
+    { "\\*/b",                                 "*/b",                   0,                         0            },
+    { "\\?/b",                                 "a/b",                   0,                         FNM_NOMATCH  },
+    { "\\?/b",                                 "?/b",                   0,                         0            },
+    { "[/b",                                   "[/b",                   0,                         0            },
+    { "\\[/b",                                 "[/b",                   0,                         0            },
+    { "??"
+      "/b",                               "aa/b",                  0,                         0            },
+    { "???b",                                  "aa/b",                  0,                         0            },
+    { "???b",                                  "aa/b",                  FNM_PATHNAME,              FNM_NOMATCH  },
+    { "?a/b",                                  ".a/b",                  FNM_PATHNAME | FNM_PERIOD, FNM_NOMATCH  },
+    { "a/?b",                                  "a/.b",                  FNM_PATHNAME | FNM_PERIOD, FNM_NOMATCH  },
+    { "*a/b",                                  ".a/b",                  FNM_PATHNAME | FNM_PERIOD, FNM_NOMATCH  },
+    { "a/*b",                                  "a/.b",                  FNM_PATHNAME | FNM_PERIOD, FNM_NOMATCH  },
+    { "[.]a/b",                                ".a/b",                  FNM_PATHNAME | FNM_PERIOD, FNM_NOMATCH  },
+    { "a/[.]b",                                "a/.b",                  FNM_PATHNAME | FNM_PERIOD, FNM_NOMATCH  },
+    { "*/?",                                   "a/b",                   FNM_PATHNAME | FNM_PERIOD, 0            },
+    { "?/*",                                   "a/b",                   FNM_PATHNAME | FNM_PERIOD, 0            },
+    { ".*/?",                                  ".a/b",                  FNM_PATHNAME | FNM_PERIOD, 0            },
+    { "*/.?",                                  "a/.b",                  FNM_PATHNAME | FNM_PERIOD, 0            },
+    { "*/*",                                   "a/.b",                  FNM_PATHNAME | FNM_PERIOD, FNM_NOMATCH  },
+    { "*?*/*",                                 "a/.b",                  FNM_PERIOD,                0            },
+    { "*[.]/b",                                "a./b",                  FNM_PATHNAME | FNM_PERIOD, 0            },
+    { "*[[:alpha:]]/*[[:alnum:]]",             "a/b",                   FNM_PATHNAME,              0            },
+    { "*[![:digit:]]*/[![:d-d]",               "a/b",                   FNM_PATHNAME,              0            },
+    { "*[![:digit:]]*/[[:d-d]",                "a/[",                   FNM_PATHNAME,              0            },
+    { "*[![:digit:]]*/[![:d-d]",               "a/[",                   FNM_PATHNAME,              -FNM_NOMATCH },
+    { "a?b",                                   "a.b",                   FNM_PATHNAME | FNM_PERIOD, 0            },
+    { "a*b",                                   "a.b",                   FNM_PATHNAME | FNM_PERIOD, 0            },
+    { "a[.]b",                                 "a.b",                   FNM_PATHNAME | FNM_PERIOD, 0            },
+    { "[[=a=]]",                               "a",                     0,                         0            },
+    { "[[=a=]][[=b=]]",                        "ab",                    0,                         0            },
+    { "[[=a=]][[=c=]]",                        "ab",                    0,                         FNM_NOMATCH  },
+    { "[[.foo.]]",                             "f",                     0,                         -FNM_NOMATCH },
+    { "[[.a.]]",                               "a",                     0,                         0            },
     { "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
       "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
       "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a"
-      "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a",
+      "*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a*a", "aaaaaaaaaaaaaaaa"
       "aaaaaaaaaaaaaaaa"
       "aaaaaaaaaaaaaaaa"
-      "aaaaaaaaaaaaaaaa"
-      "aaaaaaaaaaaaaaaa",
-      0,
+      "aaaaaaaaaaaaaaaa", 0,
 #ifdef __PICOLIBC__
-      -FNM_NOMATCH
+     -FNM_NOMATCH
 #else
       0
 #endif
     },
 };
 
-#define zassert_equal(x, v) do {                                        \
-        int __val = (x);                                                \
-        if (__val != (v)) {                                             \
-            printf("Test %d failed: got %d want %d. %s\n",              \
-                   __LINE__, __val, (v), #x);                           \
-            ret = 0;                                                    \
-        }                                                               \
-    } while(0)
+#define zassert_equal(x, v)                                                           \
+    do {                                                                              \
+        int __val = (x);                                                              \
+        if (__val != (v)) {                                                           \
+            printf("Test %d failed: got %d want %d. %s\n", __LINE__, __val, (v), #x); \
+            ret = 0;                                                                  \
+        }                                                                             \
+    } while (0)
 
-#define zassert_not_equal(x, v) do {                                    \
-        int __val = (x);                                                \
-        if (__val == (v)) {                                             \
-            printf("Test %d failed: unexpectedly got %d. %s\n",         \
-                   __LINE__, __val, #x);                                \
-            ret = 0;                                                    \
-        }                                                               \
-    } while(0)
+#define zassert_not_equal(x, v)                                                       \
+    do {                                                                              \
+        int __val = (x);                                                              \
+        if (__val == (v)) {                                                           \
+            printf("Test %d failed: unexpectedly got %d. %s\n", __LINE__, __val, #x); \
+            ret = 0;                                                                  \
+        }                                                                             \
+    } while (0)
 
 #define zassert_ok(x) zassert_equal(x, 0)
 
 /* Adopt Zephyr fnmatch tests for picolibc test suite */
-static int zephyr_test_fnmatch(void) {
+static int
+zephyr_test_fnmatch(void)
+{
     int ret = 1;
     zassert_ok(fnmatch("*.c", "foo.c", 0));
     zassert_ok(fnmatch("*.c", ".c", 0));
@@ -200,12 +204,14 @@ static int zephyr_test_fnmatch(void) {
     zassert_equal(fnmatch("a*.c", "a/x.c", FNM_PATHNAME), FNM_NOMATCH);
     zassert_ok(fnmatch("*/foo", "/foo", FNM_PATHNAME));
     zassert_ok(fnmatch("-O[01]", "-O1", 0));
-    zassert_equal(fnmatch("[[?*\\]", "\\", 0), FNM_NOMATCH);    /* \\ escapes ], no bracket expr, no match */
-    zassert_ok(fnmatch("[[?*\\]", "\\", FNM_NOESCAPE));         /* \\ unescaped, match */
-    zassert_ok(fnmatch("[[?*\\\\]", "\\", 0));                  /* \\ escapes \\, match */
-    zassert_equal(fnmatch("[]?*\\]", "]", 0), FNM_NOMATCH);     /* \\ escapes ], no bracket expr, no match */
-    zassert_ok(fnmatch("[]?*\\]", "]", FNM_NOESCAPE));          /* \\ unescaped, match */
-    zassert_ok(fnmatch("[]?*\\\\]", "]", 0));                   /* \\ escapes \\, match */
+    zassert_equal(fnmatch("[[?*\\]", "\\", 0),
+                  FNM_NOMATCH); /* \\ escapes ], no bracket expr, no match */
+    zassert_ok(fnmatch("[[?*\\]", "\\", FNM_NOESCAPE)); /* \\ unescaped, match */
+    zassert_ok(fnmatch("[[?*\\\\]", "\\", 0));          /* \\ escapes \\, match */
+    zassert_equal(fnmatch("[]?*\\]", "]", 0),
+                  FNM_NOMATCH);                        /* \\ escapes ], no bracket expr, no match */
+    zassert_ok(fnmatch("[]?*\\]", "]", FNM_NOESCAPE)); /* \\ unescaped, match */
+    zassert_ok(fnmatch("[]?*\\\\]", "]", 0));          /* \\ escapes \\, match */
     zassert_ok(fnmatch("[!]a-]", "b", 0));
     zassert_ok(fnmatch("[]-_]", "^", 0));
     zassert_ok(fnmatch("[!]-_]", "X", 0));
@@ -247,7 +253,9 @@ static int zephyr_test_fnmatch(void) {
     zassert_equal(fnmatch("*/*", "a/.b", FNM_PATHNAME | FNM_PERIOD), FNM_NOMATCH);
     zassert_ok(fnmatch("*?*/*", "a/.b", FNM_PERIOD));
     zassert_ok(fnmatch("*[.]/b", "a./b", FNM_PATHNAME | FNM_PERIOD));
-    zassert_ok(fnmatch("*[[:alpha:]]/""*[[:alnum:]]", "a/b", FNM_PATHNAME));
+    zassert_ok(fnmatch("*[[:alpha:]]/"
+                       "*[[:alnum:]]",
+                       "a/b", FNM_PATHNAME));
     zassert_ok(fnmatch("*[![:digit:]]*/[![:d-d]", "a/b", FNM_PATHNAME));
     zassert_ok(fnmatch("*[![:digit:]]*/[[:d-d]", "a/[", FNM_PATHNAME));
     zassert_not_equal(fnmatch("*[![:digit:]]*/[![:d-d]", "a/[", FNM_PATHNAME), 0);
@@ -257,8 +265,10 @@ static int zephyr_test_fnmatch(void) {
     return ret;
 }
 
-static int test_fnmatch(void) {
-    int i;
+static int
+test_fnmatch(void)
+{
+    int          i;
     unsigned int failed = 0;
 
     if (!zephyr_test_fnmatch())
@@ -268,14 +278,13 @@ static int test_fnmatch(void) {
         int r, x;
 
         r = fnmatch(tests[i].pattern, tests[i].string, tests[i].flags);
-	x = tests[i].expected;
-	if (r != x && (r != FNM_NOMATCH || x != -FNM_NOMATCH)) {
+        x = tests[i].expected;
+        if (r != x && (r != FNM_NOMATCH || x != -FNM_NOMATCH)) {
             failed++;
-            printf("fail - fnmatch(\"%s\", \"%s\", ",
-                    tests[i].pattern, tests[i].string);
+            printf("fail - fnmatch(\"%s\", \"%s\", ", tests[i].pattern, tests[i].string);
             printflags(fnmatch_flags, tests[i].flags);
             printf(") => %d (expected %d)\n", r, tests[i].expected);
-	}
+        }
     }
 
     return failed;

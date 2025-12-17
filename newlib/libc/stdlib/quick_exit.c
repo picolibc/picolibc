@@ -37,8 +37,8 @@
  * DSO-specific cleanups.
  */
 struct quick_exit_handler {
-	struct quick_exit_handler *next;
-	void (*cleanup)(void);
+    struct quick_exit_handler *next;
+    void                       (*cleanup)(void);
 };
 
 /**
@@ -49,30 +49,30 @@ static struct quick_exit_handler *handlers;
 int
 at_quick_exit(void (*func)(void))
 {
-	struct quick_exit_handler *h;
+    struct quick_exit_handler *h;
 
-	h = malloc(sizeof(*h));
+    h = malloc(sizeof(*h));
 
-	if (NULL == h)
-		return (1);
-	h->cleanup = func;
-	__LIBC_LOCK();
-	h->next = handlers;
-	handlers = h;
-	__LIBC_UNLOCK();
-	return (0);
+    if (NULL == h)
+        return (1);
+    h->cleanup = func;
+    __LIBC_LOCK();
+    h->next = handlers;
+    handlers = h;
+    __LIBC_UNLOCK();
+    return (0);
 }
 
 void
 quick_exit(int status)
 {
-	struct quick_exit_handler *h;
+    struct quick_exit_handler *h;
 
-	/*
-	 * XXX: The C++ spec requires us to call std::terminate if there is an
-	 * exception here.
-	 */
-	for (h = handlers; NULL != h; h = h->next)
-		h->cleanup();
-	_exit(status);
+    /*
+     * XXX: The C++ spec requires us to call std::terminate if there is an
+     * exception here.
+     */
+    for (h = handlers; NULL != h; h = h->next)
+        h->cleanup();
+    _exit(status);
 }

@@ -37,8 +37,7 @@
 #include "posix-local.h"
 
 ssize_t
-strfmon(char *__restrict buf, size_t size,
-        const char *__restrict format, ...)
+strfmon(char * __restrict buf, size_t size, const char * __restrict format, ...)
 {
     va_list ap;
     ssize_t ret;

@@ -31,18 +31,19 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FEGETENV_H_
-#define _FEGETENV_H_	1
+#define _FEGETENV_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline void _fegetenv(fenv_t *envp)
+static __inline void
+_fegetenv(fenv_t *envp)
 {
-  vec_uint4 fpscr;
+    vec_uint4 fpscr;
 
-  fpscr = spu_mffpscr();
-  *envp = __pack_fpscr(fpscr);
+    fpscr = spu_mffpscr();
+    *envp = __pack_fpscr(fpscr);
 }
 
 #endif /* _FEGETENV_H_ */

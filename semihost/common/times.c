@@ -41,5 +41,5 @@ clock_t
 times(struct tms *buf)
 {
     buf->tms_stime = buf->tms_cstime = buf->tms_cutime = 0;
-    return buf->tms_utime = (clock_t) sys_semihost_elapsed();
+    return buf->tms_utime = (clock_t)sys_semihost_elapsed();
 }

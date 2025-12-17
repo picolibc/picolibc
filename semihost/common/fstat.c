@@ -46,55 +46,57 @@
 struct timeval __semihost_write_time, __semihost_creat_time;
 
 int
-fstat (int fd, struct stat *sbuf )
+fstat(int fd, struct stat *sbuf)
 {
-        fd = _map_stdio(fd);
+    fd = _map_stdio(fd);
 
-	int size;
+    int size;
 
-        if (fd > 0)
-                size = sys_semihost_flen(fd);
-        else
-                size = -1;
+    if (fd > 0)
+        size = sys_semihost_flen(fd);
+    else
+        size = -1;
 
-	if (size > 0) {
-		sbuf->st_size = size;
-		sbuf->st_blksize = 4096;
-		sbuf->st_mode = S_IFREG;
-	} else {
-		sbuf->st_size = 0;
-		sbuf->st_blksize = 0;
-		sbuf->st_mode = S_IFCHR;
-	}
-        sbuf->st_ctime = __semihost_creat_time.tv_sec > __semihost_write_time.tv_sec ?
-            __semihost_creat_time.tv_sec : __semihost_write_time.tv_sec;
-        sbuf->st_mtime = __semihost_write_time.tv_sec;
-	return 0;
+    if (size > 0) {
+        sbuf->st_size = size;
+        sbuf->st_blksize = 4096;
+        sbuf->st_mode = S_IFREG;
+    } else {
+        sbuf->st_size = 0;
+        sbuf->st_blksize = 0;
+        sbuf->st_mode = S_IFCHR;
+    }
+    sbuf->st_ctime = __semihost_creat_time.tv_sec > __semihost_write_time.tv_sec
+        ? __semihost_creat_time.tv_sec
+        : __semihost_write_time.tv_sec;
+    sbuf->st_mtime = __semihost_write_time.tv_sec;
+    return 0;
 }
 
 int
-fstat64 (int fd, struct stat64 *sbuf )
+fstat64(int fd, struct stat64 *sbuf)
 {
-        fd = _map_stdio(fd);
+    fd = _map_stdio(fd);
 
-	int size;
+    int size;
 
-        if (fd > 0)
-                size = sys_semihost_flen(fd);
-        else
-                size = -1;
+    if (fd > 0)
+        size = sys_semihost_flen(fd);
+    else
+        size = -1;
 
-	if (size > 0) {
-		sbuf->st_size = size;
-		sbuf->st_blksize = 4096;
-		sbuf->st_mode = S_IFREG;
-	} else {
-		sbuf->st_size = 0;
-		sbuf->st_blksize = 0;
-		sbuf->st_mode = S_IFCHR;
-	}
-        sbuf->st_ctime = __semihost_creat_time.tv_sec > __semihost_write_time.tv_sec ?
-            __semihost_creat_time.tv_sec : __semihost_write_time.tv_sec;
-        sbuf->st_mtime = __semihost_write_time.tv_sec;
-	return 0;
+    if (size > 0) {
+        sbuf->st_size = size;
+        sbuf->st_blksize = 4096;
+        sbuf->st_mode = S_IFREG;
+    } else {
+        sbuf->st_size = 0;
+        sbuf->st_blksize = 0;
+        sbuf->st_mode = S_IFCHR;
+    }
+    sbuf->st_ctime = __semihost_creat_time.tv_sec > __semihost_write_time.tv_sec
+        ? __semihost_creat_time.tv_sec
+        : __semihost_write_time.tv_sec;
+    sbuf->st_mtime = __semihost_write_time.tv_sec;
+    return 0;
 }

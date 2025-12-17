@@ -31,100 +31,101 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _CBRTF_H_
-#define _CBRTF_H_	1
+#define _CBRTF_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
 static double cbrt_factors[5] = {
-  0.629960524947436484311,      /* 2^(-2/3)  */
-  0.793700525984099680699,      /* 2^(-1/3)  */
-  1.0,                          /* 2^(0)     */
-  1.259921049894873164666,      /* 2^(1/3)   */
-  1.587401051968199583441       /* 2^(2/3)   */
+    0.629960524947436484311, /* 2^(-2/3)  */
+    0.793700525984099680699, /* 2^(-1/3)  */
+    1.0,                     /* 2^(0)     */
+    1.259921049894873164666, /* 2^(1/3)   */
+    1.587401051968199583441  /* 2^(2/3)   */
 };
 
 /* Compute the cube root of the floating point input x.
  */
 
-static __inline float _cbrtf(float x)
+static __inline float
+_cbrtf(float x)
 {
-  vec_int4 exp, bias;
-  vec_uint4 mask, e_div_3, e_mod_3;
-  vec_uint4 mant_mask = VEC_SPLAT_U32(0x7FFFFF);
-  vec_float4 in;
-  vec_float4 half = VEC_SPLAT_F32(0.5f);
-  vec_float4 onef = VEC_SPLAT_F32(1.0f);
-  vec_float4 out, mant, ym, bf, inv_bf;
-  vec_double2 two = VEC_SPLAT_F64(2.0);
-  /* Polynomial coefficients */
-  vec_double2 c2 = VEC_SPLAT_F64(0.191502161678719066);
-  vec_double2 c1 = VEC_SPLAT_F64(0.697570460207922770);
-  vec_double2 c0 = VEC_SPLAT_F64(0.492659620528969547);
-  vec_double2 a0, b0, inv_b0, ym0;
-  vec_double2 mant0, u0, u0_3, factor0;
+    vec_int4    exp, bias;
+    vec_uint4   mask, e_div_3, e_mod_3;
+    vec_uint4   mant_mask = VEC_SPLAT_U32(0x7FFFFF);
+    vec_float4  in;
+    vec_float4  half = VEC_SPLAT_F32(0.5f);
+    vec_float4  onef = VEC_SPLAT_F32(1.0f);
+    vec_float4  out, mant, ym, bf, inv_bf;
+    vec_double2 two = VEC_SPLAT_F64(2.0);
+    /* Polynomial coefficients */
+    vec_double2 c2 = VEC_SPLAT_F64(0.191502161678719066);
+    vec_double2 c1 = VEC_SPLAT_F64(0.697570460207922770);
+    vec_double2 c0 = VEC_SPLAT_F64(0.492659620528969547);
+    vec_double2 a0, b0, inv_b0, ym0;
+    vec_double2 mant0, u0, u0_3, factor0;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Normalize the mantissa (fraction part) into the range [0.5, 1.0) and
-   * extract the exponent.
-   */
-  mant = spu_sel(half, in, mant_mask);
-  exp = spu_and(spu_rlmask((vec_int4)in, -23), 0xFF);
+    /* Normalize the mantissa (fraction part) into the range [0.5, 1.0) and
+     * extract the exponent.
+     */
+    mant = spu_sel(half, in, mant_mask);
+    exp = spu_and(spu_rlmask((vec_int4)in, -23), 0xFF);
 
-  /* Generate mask used to zero result if the exponent is zero (ie, in is either
-   * zero or a denorm
-   */
-  mask = spu_cmpeq(exp, 0);
-  exp = spu_add(exp, -126);
+    /* Generate mask used to zero result if the exponent is zero (ie, in is either
+     * zero or a denorm
+     */
+    mask = spu_cmpeq(exp, 0);
+    exp = spu_add(exp, -126);
 
-  mant0 = spu_extend(mant);
+    mant0 = spu_extend(mant);
 
-  u0 = spu_madd(mant0, spu_nmsub(mant0, c2, c1), c0);
-  u0_3 = spu_mul(spu_mul(u0, u0), u0);
+    u0 = spu_madd(mant0, spu_nmsub(mant0, c2, c1), c0);
+    u0_3 = spu_mul(spu_mul(u0, u0), u0);
 
-  /* Compute: e_div_3 = exp/3
-   *
-   * Fetch:   factor = factor[2+exp%3]
-   *
-   * The factors array contains 5 values: 2^(-2/3), 2^(-1/3), 2^0, 2^(1/3), 2^(2/3), 2^1.
-   */
-  bias = spu_rlmask(spu_rlmaska(exp, -15), -16);
-  e_div_3 = (vec_uint4)spu_rlmaska(spu_madd((vec_short8)exp, VEC_SPLAT_S16(0x5556), bias), -16);
+    /* Compute: e_div_3 = exp/3
+     *
+     * Fetch:   factor = factor[2+exp%3]
+     *
+     * The factors array contains 5 values: 2^(-2/3), 2^(-1/3), 2^0, 2^(1/3), 2^(2/3), 2^1.
+     */
+    bias = spu_rlmask(spu_rlmaska(exp, -15), -16);
+    e_div_3 = (vec_uint4)spu_rlmaska(spu_madd((vec_short8)exp, VEC_SPLAT_S16(0x5556), bias), -16);
 
-  e_mod_3 = (vec_uint4)spu_sub((vec_int4)(exp), spu_mulo((vec_short8)e_div_3, VEC_SPLAT_S16(3)));
+    e_mod_3 = (vec_uint4)spu_sub((vec_int4)(exp), spu_mulo((vec_short8)e_div_3, VEC_SPLAT_S16(3)));
 
-  e_mod_3 = spu_add(e_mod_3, 2);
+    e_mod_3 = spu_add(e_mod_3, 2);
 
-  factor0 = spu_promote(cbrt_factors[spu_extract(e_mod_3, 0)], 0);
+    factor0 = spu_promote(cbrt_factors[spu_extract(e_mod_3, 0)], 0);
 
-  /* Compute the estimated mantissa cube root (ym) equals:
-   *       ym = (u * factor * (2.0 * mant + u3)) / (2.0 * u3 + mant);
-   */
-  a0 = spu_mul(spu_mul(factor0, u0), spu_madd(two, mant0, u0_3));
-  b0 = spu_madd(two, u0_3, mant0);
+    /* Compute the estimated mantissa cube root (ym) equals:
+     *       ym = (u * factor * (2.0 * mant + u3)) / (2.0 * u3 + mant);
+     */
+    a0 = spu_mul(spu_mul(factor0, u0), spu_madd(two, mant0, u0_3));
+    b0 = spu_madd(two, u0_3, mant0);
 
-  bf = spu_roundtf(b0);
+    bf = spu_roundtf(b0);
 
-  inv_bf = spu_re(bf);
-  inv_bf = spu_madd(spu_nmsub(bf, inv_bf, onef), inv_bf, inv_bf);
+    inv_bf = spu_re(bf);
+    inv_bf = spu_madd(spu_nmsub(bf, inv_bf, onef), inv_bf, inv_bf);
 
-  inv_b0 = spu_extend(inv_bf);
+    inv_b0 = spu_extend(inv_bf);
 
-  ym0 = spu_mul(a0, inv_b0);
-  ym0 = spu_madd(spu_nmsub(b0, ym0, a0), inv_b0, ym0);
+    ym0 = spu_mul(a0, inv_b0);
+    ym0 = spu_madd(spu_nmsub(b0, ym0, a0), inv_b0, ym0);
 
-  ym = spu_roundtf(ym0);
+    ym = spu_roundtf(ym0);
 
-  /* Merge sign, computed exponent, and computed mantissa.
-   */
-  exp = spu_rl(spu_add((vec_int4)e_div_3, 127), 23);
-  out = spu_sel((vec_float4)exp, in, VEC_SPLAT_U32(0x80000000));
-  out = spu_mul(out, ym);
+    /* Merge sign, computed exponent, and computed mantissa.
+     */
+    exp = spu_rl(spu_add((vec_int4)e_div_3, 127), 23);
+    out = spu_sel((vec_float4)exp, in, VEC_SPLAT_U32(0x80000000));
+    out = spu_mul(out, ym);
 
-  out = spu_andc(out, (vec_float4)mask);
+    out = spu_andc(out, (vec_float4)mask);
 
-  return (spu_extract(out, 0));
+    return (spu_extract(out, 0));
 }
 
 #endif /* _CBRTF_H_ */

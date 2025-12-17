@@ -1,23 +1,23 @@
 /*
 FUNCTION
-	<<wcslcpy>>---copy a wide-character string to specified length
+        <<wcslcpy>>---copy a wide-character string to specified length
 
 SYNOPSIS
-	#include <wchar.h>
-	size_t wcslcpy(wchar_t *<[dst]>, const wchar_t *<[src]>, size_t <[siz]>);
+        #include <wchar.h>
+        size_t wcslcpy(wchar_t *<[dst]>, const wchar_t *<[src]>, size_t <[siz]>);
 
 DESCRIPTION
-	<<wcslcpy>> copies wide characters from <[src]> to <[dst]>
-	such that up to <[siz]> - 1 characters are copied.  A
-	terminating null is appended to the result, unless <[siz]>
-	is zero.
+        <<wcslcpy>> copies wide characters from <[src]> to <[dst]>
+        such that up to <[siz]> - 1 characters are copied.  A
+        terminating null is appended to the result, unless <[siz]>
+        is zero.
 
 RETURNS
-	<<wcslcpy>> returns the number of wide characters in <[src]>,
-	not including the terminating null wide character.  If the
-	return value is greater than or equal to <[siz]>, then
-	not all wide characters were copied from <[src]> and truncation
-	occurred.
+        <<wcslcpy>> returns the number of wide characters in <[src]>,
+        not including the terminating null wide character.  If the
+        return value is greater than or equal to <[siz]>, then
+        not all wide characters were copied from <[src]> and truncation
+        occurred.
 
 PORTABILITY
 No supporting OS subroutines are required.
@@ -50,28 +50,26 @@ No supporting OS subroutines are required.
  * Returns wcslen(src); if retval >= dsize, truncation occurred.
  */
 size_t
-wcslcpy (wchar_t *dst,
-        const wchar_t *src,
-        size_t dsize)
+wcslcpy(wchar_t *dst, const wchar_t *src, size_t dsize)
 {
-        const wchar_t *osrc = src;
-        size_t nleft = dsize;
+    const wchar_t *osrc = src;
+    size_t         nleft = dsize;
 
-        /* Copy as many bytes as will fit. */
-        if (nleft != 0) {
-                while (--nleft != 0) {
-                        if ((*dst++ = *src++) == L'\0')
-                                break;
-                }
+    /* Copy as many bytes as will fit. */
+    if (nleft != 0) {
+        while (--nleft != 0) {
+            if ((*dst++ = *src++) == L'\0')
+                break;
         }
+    }
 
-        /* Not enough room in dst, add NUL and traverse rest of src. */
-        if (nleft == 0) {
-                if (dsize != 0)
-                        *dst = L'\0';           /* NUL-terminate dst */
-                while (*src++)
-                        ;
-        }
+    /* Not enough room in dst, add NUL and traverse rest of src. */
+    if (nleft == 0) {
+        if (dsize != 0)
+            *dst = L'\0'; /* NUL-terminate dst */
+        while (*src++)
+            ;
+    }
 
-        return(src - osrc - 1); /* count does not include NUL */
+    return (src - osrc - 1); /* count does not include NUL */
 }

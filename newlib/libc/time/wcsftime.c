@@ -12,31 +12,31 @@ FUNCTION
 <<wcsftime>>---convert date and time to a formatted wide-character string
 
 INDEX
-	wcsftime
+        wcsftime
 
 SYNOPSIS
-	#include <time.h>
-	#include <wchar.h>
-	size_t wcsftime(wchar_t *<[s]>, size_t <[maxsize]>,
-			const wchar_t *<[format]>, const struct tm *<[timp]>);
+        #include <time.h>
+        #include <wchar.h>
+        size_t wcsftime(wchar_t *<[s]>, size_t <[maxsize]>,
+                        const wchar_t *<[format]>, const struct tm *<[timp]>);
 
 DESCRIPTION
 <<wcsftime>> is equivalent to <<strftime>>, except that:
- 
+
 O+
 o The argument s points to the initial element of an array of wide characters
 into which the generated output is to be placed.
- 
+
 o The argument maxsize indicates the limiting number of wide characters.
- 
+
 o The argument format is a wide-character string and the conversion specifiers
 are replaced by corresponding sequences of wide characters.
- 
+
 o The return value indicates the number of wide characters.
 O-
 (The difference in all of the above being wide characters versus regular
 characters.)
- 
+
 See <<strftime>> for the details of the format specifiers.
 
 RETURNS

@@ -25,20 +25,19 @@ static const char s_testFmt[] = "1234567890"
                                 "1234567890"
                                 "1234567890"
                                 "%s";
-static
-void Test5 ( unsigned loops )
+static void
+Test5(unsigned loops)
 {
-  assert( strlen( s_testData ) == 100 );
-  assert( strlen( s_testFmt  ) == 102 );
+    assert(strlen(s_testData) == 100);
+    assert(strlen(s_testFmt) == 102);
 
-  // Compile this code with -fno-builtin.
+    // Compile this code with -fno-builtin.
 
-  char buffer[300];
+    char buffer[300];
 
-  for ( unsigned i = 0; i < loops; ++i )
-  {
-    sprintf( buffer, s_testFmt, s_testData );
-  }
+    for (unsigned i = 0; i < loops; ++i) {
+        sprintf(buffer, s_testFmt, s_testData);
+    }
 }
 
 int

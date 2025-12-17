@@ -28,28 +28,28 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isprint>>, <<isgraph>>, <<isprint_l>>, <<isgraph_l>>---printable character predicates
+        <<isprint>>, <<isgraph>>, <<isprint_l>>, <<isgraph_l>>---printable character predicates
 
 INDEX
-	isprint
+        isprint
 
 INDEX
-	isgraph
+        isgraph
 
 INDEX
-	isprint_l
+        isprint_l
 
 INDEX
-	isgraph_l
+        isgraph_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isprint(int <[c]>);
-	int isgraph(int <[c]>);
+        #include <ctype.h>
+        int isprint(int <[c]>);
+        int isgraph(int <[c]>);
 
-	#include <ctype.h>
-	int isprint_l(int <[c]>, locale_t <[locale]>);
-	int isgraph_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isprint_l(int <[c]>, locale_t <[locale]>);
+        int isgraph_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isprint>> is a macro which classifies singlebyte charset values by table
@@ -84,11 +84,12 @@ No supporting OS subroutines are required.
 
 #undef isprint
 int
-isprint (int c)
+isprint(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return ' ' <= c && c <= '~';
 #else
-    return __CTYPE_PTR[c+1] & (__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT|__CTYPE_BLANK);
+    return __CTYPE_PTR[c + 1]
+        & (__CTYPE_PUNCT | __CTYPE_UPPER | __CTYPE_LOWER | __CTYPE_DIGIT | __CTYPE_BLANK);
 #endif
 }

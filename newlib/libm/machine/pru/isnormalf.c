@@ -30,7 +30,8 @@
    builtin will produce code that uses simple ops only.  In order to support
    linking against TI CLPRU objects, though, provide the function mandated
    by TI ABI.  */
-int __pruabi_isnormalf(float a)
+int
+__pruabi_isnormalf(float a)
 {
-  return isnormal(a);
+    return isnormal(a);
 }

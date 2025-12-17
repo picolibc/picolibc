@@ -12,30 +12,25 @@
 #include <envz.h>
 
 void
-envz_strip (char **envz,
-       size_t *envz_len)
+envz_strip(char **envz, size_t *envz_len)
 {
-  char *entry = 0;
-  int len = 0;
-  int null_found = 0;
+    char *entry = 0;
+    int   len = 0;
+    int   null_found = 0;
 
-  while((entry = argz_next(*envz, *envz_len, entry)))
-    {
-      if(!strchr(entry, '='))
-        {
-          null_found = 1;
-          len = strlen(entry) + 1;
-          /* Make sure this is not the last entry in envz. If it is, it
-           will be chopped off by the realloc anyway.*/
-          if(*envz + *envz_len != entry + len - 1)
-            {
-              memmove(entry, entry + len, *envz + *envz_len - entry - len);
+    while ((entry = argz_next(*envz, *envz_len, entry))) {
+        if (!strchr(entry, '=')) {
+            null_found = 1;
+            len = strlen(entry) + 1;
+            /* Make sure this is not the last entry in envz. If it is, it
+             will be chopped off by the realloc anyway.*/
+            if (*envz + *envz_len != entry + len - 1) {
+                memmove(entry, entry + len, *envz + *envz_len - entry - len);
             }
-          *envz_len -= len;
+            *envz_len -= len;
         }
     }
-  if(null_found)
-    {
-      *envz = (char *)realloc(*envz, *envz_len);
+    if (null_found) {
+        *envz = (char *)realloc(*envz, *envz_len);
     }
 }

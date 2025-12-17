@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -38,9 +38,9 @@
 float complex
 ccoshf(float complex z)
 {
-	float x, y;
+    float x, y;
 
-	x = crealf(z);
-	y = cimagf(z);
-	return (float complex) (coshf(x) * cosf(y)) + (sinhf(x) * sinf(y)) * I;
+    x = crealf(z);
+    y = cimagf(z);
+    return (float complex)(coshf(x) * cosf(y)) + (sinhf(x) * sinf(y)) * I;
 }

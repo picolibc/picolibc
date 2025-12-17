@@ -28,11 +28,11 @@
 #include <math.h>
 
 float
-floorf (float x)
+floorf(float x)
 {
-  float result;
-  __asm__( "frintm\t%s0, %s1" : "=w" (result) : "w" (x) );
-  return result;
+    float result;
+    __asm__("frintm\t%s0, %s1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

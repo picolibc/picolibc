@@ -10,11 +10,11 @@ FUNCTION
 <<atexit>>---request execution of functions at program exit
 
 INDEX
-	atexit
+        atexit
 
 SYNOPSIS
-	#include <stdlib.h>
-	int atexit (void (*<[function]>)(void));
+        #include <stdlib.h>
+        int atexit (void (*<[function]>)(void));
 
 DESCRIPTION
 You can use <<atexit>> to enroll functions in a list of functions that
@@ -53,7 +53,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
  */
 
 int
-atexit (void (*fn) (void))
+atexit(void (*fn)(void))
 {
-  return __register_exitproc (__et_atexit, fn, NULL, NULL);
+    return __register_exitproc(__et_atexit, fn, NULL, NULL);
 }

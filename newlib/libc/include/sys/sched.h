@@ -17,7 +17,6 @@
  *  $Id$
  */
 
-
 #ifndef _SYS_SCHED_H_
 #define _SYS_SCHED_H_
 
@@ -29,38 +28,38 @@ _BEGIN_STD_C
 
 /* Scheduling Policies */
 /* Open Group Specifications Issue 6 */
-#define SCHED_OTHER    0
+#define SCHED_OTHER 0
 
-#define SCHED_FIFO     1
-#define SCHED_RR       2
+#define SCHED_FIFO  1
+#define SCHED_RR    2
 
 #if defined(_POSIX_SPORADIC_SERVER)
 #define SCHED_SPORADIC 4
 #endif
 
 #if __GNU_VISIBLE
-#define SCHED_IDLE     5
-#define SCHED_BATCH    6
+#define SCHED_IDLE  5
+#define SCHED_BATCH 6
 
 /* Flag to drop realtime policies and negative nice values on fork(). */
-#define SCHED_RESET_ON_FORK     0x40000000
+#define SCHED_RESET_ON_FORK 0x40000000
 #endif
 
 /* Scheduling Parameters */
 /* Open Group Specifications Issue 6 */
 
 struct sched_param {
-  int sched_priority;           /* Process execution scheduling priority */
+    int sched_priority; /* Process execution scheduling priority */
 
 #if defined(_POSIX_SPORADIC_SERVER) || defined(_POSIX_THREAD_SPORADIC_SERVER)
-  int sched_ss_low_priority;    /* Low scheduling priority for sporadic */
-                                /*   server */
-  struct timespec sched_ss_repl_period;
-                                /* Replenishment period for sporadic server */
-  struct timespec sched_ss_init_budget;
-                               /* Initial budget for sporadic server */
-  int sched_ss_max_repl;       /* Maximum pending replenishments for */
-                               /* sporadic server */
+    int             sched_ss_low_priority; /* Low scheduling priority for sporadic */
+                                           /*   server */
+    struct timespec sched_ss_repl_period;
+    /* Replenishment period for sporadic server */
+    struct timespec sched_ss_init_budget;
+    /* Initial budget for sporadic server */
+    int             sched_ss_max_repl; /* Maximum pending replenishments for */
+                                       /* sporadic server */
 #endif
 };
 
@@ -68,4 +67,3 @@ _END_STD_C
 
 #endif
 /* end of include file */
-

@@ -48,14 +48,14 @@
 
 #define __HAVE_POSIX_LOCALE_API
 
-#define NUMCAT  ((_LC_MESSAGES - LC_ALL) + 1)
+#define NUMCAT ((_LC_MESSAGES - LC_ALL) + 1)
 
 /*
  * This operates like _tolower on upper case letters, but also works
  * correctly on lower case letters.
  */
-#define LOCALE_ISUPPER(c)      ('A' <= (c) && (c) <= 'Z')
-#define LOCALE_TOLOWER(c)      ((c) | ('a' - 'A'))
+#define LOCALE_ISUPPER(c) ('A' <= (c) && (c) <= 'Z')
+#define LOCALE_TOLOWER(c) ((c) | ('a' - 'A'))
 
 enum locale_id {
     locale_INVALID,
@@ -136,22 +136,21 @@ enum locale_id {
     locale_END,
 };
 
-typedef int             wctomb_f (char *, wchar_t, mbstate_t *);
-typedef wctomb_f        *wctomb_p;
+typedef int       wctomb_f(char *, wchar_t, mbstate_t *);
+typedef wctomb_f *wctomb_p;
 
-typedef int             mbtowc_f (wchar_t *, const char *, size_t,
-                                  mbstate_t *);
-typedef mbtowc_f        *mbtowc_p;
+typedef int       mbtowc_f(wchar_t *, const char *, size_t, mbstate_t *);
+typedef mbtowc_f *mbtowc_p;
 
 #ifndef _DEFAULT_LOCALE
-#define _DEFAULT_LOCALE  locale_C
+#define _DEFAULT_LOCALE locale_C
 #endif
 
-extern const char       * const __locale_names[];
-extern locale_t         __global_locale;
+extern const char * const __locale_names[];
+extern locale_t           __global_locale;
 
 #ifdef __HAVE_POSIX_LOCALE_API
-extern __THREAD_LOCAL locale_t    _locale;
+extern __THREAD_LOCAL locale_t _locale;
 #endif
 
 #ifdef __MB_CAPABLE
@@ -159,30 +158,31 @@ extern __THREAD_LOCAL locale_t    _locale;
 extern const wctomb_p __wctomb[locale_END - locale_BASE];
 extern const mbtowc_p __mbtowc[locale_END - locale_BASE];
 
-#define __get_wctomb(id)        __wctomb[(id) - locale_BASE]
-#define __get_mbtowc(id)        __mbtowc[(id) - locale_BASE]
+#define __get_wctomb(id) __wctomb[(id) - locale_BASE]
+#define __get_mbtowc(id) __mbtowc[(id) - locale_BASE]
 
 #ifdef __HAVE_POSIX_LOCALE_API
-#define __WCTOMB_L(l)   (__get_wctomb(l))
-#define __MBTOWC_L(l)   (__get_mbtowc(l))
-#define __WCTOMB        (__WCTOMB_L(__get_current_locale()))
-#define __MBTOWC        (__MBTOWC_L(__get_current_locale()))
+#define __WCTOMB_L(l) (__get_wctomb(l))
+#define __MBTOWC_L(l) (__get_mbtowc(l))
+#define __WCTOMB      (__WCTOMB_L(__get_current_locale()))
+#define __MBTOWC      (__MBTOWC_L(__get_current_locale()))
 #else
-#define __WCTOMB        (__get_wctomb(__global_locale))
-#define __MBTOWC        (__get_mbtowc(__global_locale))
+#define __WCTOMB (__get_wctomb(__global_locale))
+#define __MBTOWC (__get_mbtowc(__global_locale))
 #endif
 
 #else
 
-#define __WCTOMB        __ascii_wctomb
-#define __MBTOWC        __ascii_mbtowc
-#define __WCTOMB_L(l)   ((void) (l), __ascii_wctomb)
-#define __MBTOWC_L(l)   ((void) (l), __ascii_mbtowc)
+#define __WCTOMB      __ascii_wctomb
+#define __MBTOWC      __ascii_mbtowc
+#define __WCTOMB_L(l) ((void)(l), __ascii_wctomb)
+#define __MBTOWC_L(l) ((void)(l), __ascii_mbtowc)
 
 #endif
 
 static inline locale_t
-__get_current_locale(void) {
+__get_current_locale(void)
+{
 #ifdef __HAVE_POSIX_LOCALE_API
     if (_locale)
         return _locale;
@@ -191,82 +191,81 @@ __get_current_locale(void) {
 }
 
 static inline const char *
-__locale_name(locale_t id) {
+__locale_name(locale_t id)
+{
     return __locale_names[id - locale_BASE];
 }
 
-enum locale_id
-__find_charset(const char *name);
+enum locale_id __find_charset(const char *name);
 
-enum locale_id
-__find_locale(const char *name);
+enum locale_id __find_locale(const char *name);
 
 /* LC_NUMERIC data */
-#define DECIMAL_POINT           "."
-#define DECIMAL_POINT_L(l)      ((void) (l), DECIMAL_POINT)
-#define THOUSANDS_SEP           ""
-#define THOUSANDS_SEP_L(l)      ((void) (l), THOUSANDS_SEP)
-#define NUMERIC_GROUPING        ""
-#define NUMERIC_GROUPING_L(l)   ((void) (l), "")
-#define WDECIMAL_POINT          L"."
-#define WDECIMAL_POINT_L(l)     ((void) (l), DECIMAL_POINT)
-#define WTHOUSANDS_SEP          L""
-#define WTHOUSANDS_SEP_L(l)     ((void) (l), THOUSANDS_SEP)
+#define DECIMAL_POINT         "."
+#define DECIMAL_POINT_L(l)    ((void)(l), DECIMAL_POINT)
+#define THOUSANDS_SEP         ""
+#define THOUSANDS_SEP_L(l)    ((void)(l), THOUSANDS_SEP)
+#define NUMERIC_GROUPING      ""
+#define NUMERIC_GROUPING_L(l) ((void)(l), "")
+#define WDECIMAL_POINT        L"."
+#define WDECIMAL_POINT_L(l)   ((void)(l), DECIMAL_POINT)
+#define WTHOUSANDS_SEP        L""
+#define WTHOUSANDS_SEP_L(l)   ((void)(l), THOUSANDS_SEP)
 
 /* LC_TIME data */
 
-#define TIME_ERA                ""
-#define TIME_ERA_D_T_FMT_L(l)   ((void) (l), "")
-#define TIME_ERA_D_T_FMT        ""
-#define TIME_ERA_D_FMT_L(l)     ((void) (l), "")
-#define TIME_ERA_D_FMT          ""
-#define TIME_ERA_T_FMT_L(l)     ((void) (l), "")
-#define TIME_ERA_T_FMT          ""
-#define TIME_ALT_DIGITS         ""
-#define TIME_WDAY               __time_wday
-#define TIME_WDAY_NUM           7
-#define TIME_WEEKDAY            __time_weekday
-#define TIME_WEEKDAY_NUM        7
-#define TIME_MON                __time_mon
-#define TIME_MON_NUM            12
-#define TIME_MONTH              __time_month
-#define TIME_MONTH_NUM          12
-#define TIME_AM_PM              __time_am_pm
-#define TIME_AM_PM_NUM          2
-#define TIME_C_FMT              "%a %b %e %H:%M:%S %Y"
-#define TIME_X_FMT              "%m/%d/%y"
-#define TIME_UX_FMT             "%H:%M:%S"
-#define TIME_AMPM_FMT           "%I:%M:%S %p"
+#define TIME_ERA              ""
+#define TIME_ERA_D_T_FMT_L(l) ((void)(l), "")
+#define TIME_ERA_D_T_FMT      ""
+#define TIME_ERA_D_FMT_L(l)   ((void)(l), "")
+#define TIME_ERA_D_FMT        ""
+#define TIME_ERA_T_FMT_L(l)   ((void)(l), "")
+#define TIME_ERA_T_FMT        ""
+#define TIME_ALT_DIGITS       ""
+#define TIME_WDAY             __time_wday
+#define TIME_WDAY_NUM         7
+#define TIME_WEEKDAY          __time_weekday
+#define TIME_WEEKDAY_NUM      7
+#define TIME_MON              __time_mon
+#define TIME_MON_NUM          12
+#define TIME_MONTH            __time_month
+#define TIME_MONTH_NUM        12
+#define TIME_AM_PM            __time_am_pm
+#define TIME_AM_PM_NUM        2
+#define TIME_C_FMT            "%a %b %e %H:%M:%S %Y"
+#define TIME_X_FMT            "%m/%d/%y"
+#define TIME_UX_FMT           "%H:%M:%S"
+#define TIME_AMPM_FMT         "%I:%M:%S %p"
 
-extern const char *const __time_wday[TIME_WDAY_NUM];
-extern const char *const __time_weekday[TIME_WEEKDAY_NUM];
-extern const char *const __time_mon[TIME_MON_NUM];
-extern const char *const __time_month[TIME_MONTH_NUM];
-extern const char *const __time_am_pm[TIME_AM_PM_NUM];
-extern const wchar_t *const __wtime_wday[TIME_WDAY_NUM];
-extern const wchar_t *const __wtime_weekday[TIME_WEEKDAY_NUM];
-extern const wchar_t *const __wtime_mon[TIME_MON_NUM];
-extern const wchar_t *const __wtime_month[TIME_MONTH_NUM];
-extern const wchar_t *const __wtime_am_pm[TIME_AM_PM_NUM];
+extern const char * const    __time_wday[TIME_WDAY_NUM];
+extern const char * const    __time_weekday[TIME_WEEKDAY_NUM];
+extern const char * const    __time_mon[TIME_MON_NUM];
+extern const char * const    __time_month[TIME_MONTH_NUM];
+extern const char * const    __time_am_pm[TIME_AM_PM_NUM];
+extern const wchar_t * const __wtime_wday[TIME_WDAY_NUM];
+extern const wchar_t * const __wtime_weekday[TIME_WEEKDAY_NUM];
+extern const wchar_t * const __wtime_mon[TIME_MON_NUM];
+extern const wchar_t * const __wtime_month[TIME_MONTH_NUM];
+extern const wchar_t * const __wtime_am_pm[TIME_AM_PM_NUM];
 
-#define WTIME_ERA               L""
-#define WTIME_ERA_D_T_FMT_L(l)  ((void) (l), L"")
-#define WTIME_ERA_D_T_FMT       L""
-#define WTIME_ERA_D_FMT_L(l)    ((void) (l), L"")
-#define WTIME_ERA_D_FMT         L""
-#define WTIME_ERA_T_FMT_L(l)    ((void) (l), L"")
-#define WTIME_ERA_T_FMT         L""
-#define WTIME_ALT_DIGITS_L(l)   ((void) (l), L"")
-#define WTIME_ALT_DIGITS        L""
-#define WTIME_WDAY              __wtime_wday
-#define WTIME_WEEKDAY           __wtime_weekday
-#define WTIME_MON               __wtime_mon
-#define WTIME_MONTH             __wtime_month
-#define WTIME_AM_PM             __wtime_am_pm
-#define WTIME_C_FMT             L"%a %b %e %H:%M:%S %Y"
-#define WTIME_X_FMT             L"%m/%d/%y"
-#define WTIME_UX_FMT            L"%H:%M:%S"
-#define WTIME_AMPM_FMT          L"%I:%M:%S %p"
+#define WTIME_ERA              L""
+#define WTIME_ERA_D_T_FMT_L(l) ((void)(l), L"")
+#define WTIME_ERA_D_T_FMT      L""
+#define WTIME_ERA_D_FMT_L(l)   ((void)(l), L"")
+#define WTIME_ERA_D_FMT        L""
+#define WTIME_ERA_T_FMT_L(l)   ((void)(l), L"")
+#define WTIME_ERA_T_FMT        L""
+#define WTIME_ALT_DIGITS_L(l)  ((void)(l), L"")
+#define WTIME_ALT_DIGITS       L""
+#define WTIME_WDAY             __wtime_wday
+#define WTIME_WEEKDAY          __wtime_weekday
+#define WTIME_MON              __wtime_mon
+#define WTIME_MONTH            __wtime_month
+#define WTIME_AM_PM            __wtime_am_pm
+#define WTIME_C_FMT            L"%a %b %e %H:%M:%S %Y"
+#define WTIME_X_FMT            L"%m/%d/%y"
+#define WTIME_UX_FMT           L"%H:%M:%S"
+#define WTIME_AMPM_FMT         L"%I:%M:%S %p"
 
 static inline bool
 __locale_is_C(locale_t locale)
@@ -276,7 +275,7 @@ __locale_is_C(locale_t locale)
         locale = __get_current_locale();
     return locale == locale_C;
 #else
-    (void) locale;
+    (void)locale;
     return true;
 #endif
 }

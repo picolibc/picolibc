@@ -45,15 +45,15 @@ __unicode_to_shift_jis(wchar_t unicode)
 {
     /* Deviations from EUC-JP */
     switch (unicode) {
-    case 0xa5:          /* ¥ */
+    case 0xa5: /* ¥ */
         return 0x5c;
-    case 0x203e:        /* ‾ */
+    case 0x203e: /* ‾ */
         return 0x7e;
-    case 0xffe0:        /* ￠ -> ¢ */
+    case 0xffe0: /* ￠ -> ¢ */
         return 0x8191;
-    case 0xffe1:        /* ￡ -> £ */
+    case 0xffe1: /* ￡ -> £ */
         return 0x8192;
-    case 0xffe2:        /* ￢ -> ¬ */
+    case 0xffe2: /* ￢ -> ¬ */
         return 0x81ca;
     default:
         break;
@@ -98,7 +98,7 @@ __unicode_to_shift_jis(wchar_t unicode)
     else
         s2 = j2 + 126;
 
-    return ((uint16_t) s1 << 8) | s2;
+    return ((uint16_t)s1 << 8) | s2;
 }
 
 #endif /* __MB_EXTENDED_CHARSETS_JIS */

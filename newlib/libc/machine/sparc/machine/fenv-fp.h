@@ -25,31 +25,28 @@
  */
 
 /* Load floating-point state register (32bits) */
-#define	__ldfsr(__r)	__asm__	__volatile__		\
-	("ld %0, %%fsr" : : "m" (__r))
+#define __ldfsr(__r) __asm__ __volatile__("ld %0, %%fsr" : : "m"(__r))
 
 /* Save floating-point state register (32bits) */
-#define	__stfsr(__r)	__asm__	__volatile__		\
-	("st %%fsr, %0" : "=m" (*(__r)))
+#define __stfsr(__r) __asm__ __volatile__("st %%fsr, %0" : "=m"(*(__r)))
 
 /*
  * The feclearexcept() function clears the supported floating-point exceptions
  * represented by `excepts'.
  */
-__declare_fenv_inline(int)
-feclearexcept(int excepts)
+__declare_fenv_inline(int) feclearexcept(int excepts)
 {
-	fexcept_t r;
-	int ex;
+    fexcept_t r;
+    int       ex;
 
-	ex = excepts & FE_ALL_EXCEPT;
+    ex = excepts & FE_ALL_EXCEPT;
 
-	__stfsr(&r);
-	r &= ~ex;
-	__ldfsr(r);
+    __stfsr(&r);
+    r &= ~ex;
+    __ldfsr(r);
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
 
 /*
@@ -57,50 +54,46 @@ feclearexcept(int excepts)
  * representation of the states of the floating-point status flags indicated
  * by the argument excepts in the object pointed to by the argument flagp.
  */
-__declare_fenv_inline(int)
-fegetexceptflag(fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-	fexcept_t r;
-	int ex;
+    fexcept_t r;
+    int       ex;
 
-	ex = excepts & FE_ALL_EXCEPT;
+    ex = excepts & FE_ALL_EXCEPT;
 
-	__stfsr(&r);
-	*flagp = r & ex;
+    __stfsr(&r);
+    *flagp = r & ex;
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
-
 
 /*
  * This function sets the floating-point status flags indicated by the argument
  * `excepts' to the states stored in the object pointed to by `flagp'. It does
  * NOT raise any floating-point exceptions, but only sets the state of the flags.
  */
-__declare_fenv_inline(int)
-fesetexceptflag(const fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-	fexcept_t r;
-	int ex;
+    fexcept_t r;
+    int       ex;
 
-	ex = excepts & FE_ALL_EXCEPT;
+    ex = excepts & FE_ALL_EXCEPT;
 
-	__stfsr(&r);
-	r &= ~ex;
-	r |= *flagp & ex;
-	__ldfsr(r);
+    __stfsr(&r);
+    r &= ~ex;
+    r |= *flagp & ex;
+    __ldfsr(r);
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
 
-__declare_fenv_inline(int)
-fesetexcept(int excepts)
+__declare_fenv_inline(int) fesetexcept(int excepts)
 {
-	fexcept_t __ex = excepts;
+    fexcept_t __ex = excepts;
 
-	return fesetexceptflag(&__ex, excepts);
+    return fesetexceptflag(&__ex, excepts);
 }
 
 /*
@@ -110,43 +103,42 @@ fesetexcept(int excepts)
  * The order in which these floating-point exceptions are raised is unspecified
  * (by the standard).
  */
-__declare_fenv_inline(int)
-feraiseexcept(int excepts)
+__declare_fenv_inline(int) feraiseexcept(int excepts)
 {
-	volatile double d;
-	int ex;
+    volatile double d;
+    int             ex;
 
-	ex = excepts & FE_ALL_EXCEPT;
+    ex = excepts & FE_ALL_EXCEPT;
 
-	/*
-	 * With a compiler that supports the FENV_ACCESS pragma properly, simple
-	 * expressions like '0.0 / 0.0' should be sufficient to generate traps.
-	 * Unfortunately, we need to bring a volatile variable into the equation
-	 * to prevent incorrect optimizations.
-	 */
-	if (ex & FE_INVALID) {
-		d = 0.0;
-		d = 0.0 / d;
-	}
-	if (ex & FE_DIVBYZERO) {
-		d = 0.0;
-		d = 1.0 / d;
-	}
-	if (ex & FE_OVERFLOW) {
-		d = 0x1.ffp1023;
-		d *= 2.0;
-	}
-	if (ex & FE_UNDERFLOW) {
-		d = 0x1p-1022;
-		d /= 0x1p1023;
-	}
-	if (ex & FE_INEXACT) {
-		d = 0x1p-1022;
-		d += 1.0;
-	}
+    /*
+     * With a compiler that supports the FENV_ACCESS pragma properly, simple
+     * expressions like '0.0 / 0.0' should be sufficient to generate traps.
+     * Unfortunately, we need to bring a volatile variable into the equation
+     * to prevent incorrect optimizations.
+     */
+    if (ex & FE_INVALID) {
+        d = 0.0;
+        d = 0.0 / d;
+    }
+    if (ex & FE_DIVBYZERO) {
+        d = 0.0;
+        d = 1.0 / d;
+    }
+    if (ex & FE_OVERFLOW) {
+        d = 0x1.ffp1023;
+        d *= 2.0;
+    }
+    if (ex & FE_UNDERFLOW) {
+        d = 0x1p-1022;
+        d /= 0x1p1023;
+    }
+    if (ex & FE_INEXACT) {
+        d = 0x1p-1022;
+        d += 1.0;
+    }
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
 
 /*
@@ -154,27 +146,25 @@ feraiseexcept(int excepts)
  * floating-point exception flags are currently set. The `excepts' argument
  * specifies the floating-point status flags to be queried.
  */
-__declare_fenv_inline(int)
-fetestexcept(int excepts)
+__declare_fenv_inline(int) fetestexcept(int excepts)
 {
-	fexcept_t r;
+    fexcept_t r;
 
-	__stfsr(&r);
+    __stfsr(&r);
 
-	return r & (excepts & FE_ALL_EXCEPT);
+    return r & (excepts & FE_ALL_EXCEPT);
 }
 
 /*
  * The fegetround() function gets the current rounding direction.
  */
-__declare_fenv_inline(int)
-fegetround(void)
+__declare_fenv_inline(int) fegetround(void)
 {
-	fenv_t r;
+    fenv_t r;
 
-	__stfsr(&r);
+    __stfsr(&r);
 
-	return (r >> _ROUND_SHIFT) & _ROUND_MASK;
+    return (r >> _ROUND_SHIFT) & _ROUND_MASK;
 }
 
 /*
@@ -182,36 +172,33 @@ fegetround(void)
  * its argument `round'. If the argument is not equal to the value of a rounding
  * direction macro, the rounding direction is not changed.
  */
-__declare_fenv_inline(int)
-fesetround(int round)
+__declare_fenv_inline(int) fesetround(int round)
 {
-	fenv_t r;
+    fenv_t r;
 
-	if (round & ~_ROUND_MASK)
-		return -1;
+    if (round & ~_ROUND_MASK)
+        return -1;
 
-	__stfsr(&r);
-	r &= ~(_ROUND_MASK << _ROUND_SHIFT);
-	r |= round << _ROUND_SHIFT;
-	__ldfsr(r);
+    __stfsr(&r);
+    r &= ~(_ROUND_MASK << _ROUND_SHIFT);
+    r |= round << _ROUND_SHIFT;
+    __ldfsr(r);
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
 
 /*
  * The fegetenv() function attempts to store the current floating-point
  * environment in the object pointed to by envp.
  */
-__declare_fenv_inline(int)
-fegetenv(fenv_t *envp)
+__declare_fenv_inline(int) fegetenv(fenv_t *envp)
 {
-	__stfsr(envp);
+    __stfsr(envp);
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
-
 
 /*
  * The feholdexcept() function saves the current floating-point environment
@@ -219,18 +206,17 @@ fegetenv(fenv_t *envp)
  * then installs a non-stop (continue on floating-point exceptions) mode, if
  * available, for all floating-point exceptions.
  */
-__declare_fenv_inline(int)
-feholdexcept(fenv_t *envp)
+__declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
-	fenv_t r;
+    fenv_t r;
 
-	__stfsr(&r);
-	*envp = r;
-	r &= ~(FE_ALL_EXCEPT | _ENABLE_MASK);
-	__ldfsr(r);
+    __stfsr(&r);
+    *envp = r;
+    r &= ~(FE_ALL_EXCEPT | _ENABLE_MASK);
+    __ldfsr(r);
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
 
 /*
@@ -241,15 +227,13 @@ feholdexcept(fenv_t *envp)
  * floating-point exceptions, but only installs the state of the floating-point
  * status flags represented through its argument.
  */
-__declare_fenv_inline(int)
-fesetenv(const fenv_t *envp)
+__declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
-	__ldfsr(*envp);
+    __ldfsr(*envp);
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
-
 
 /*
  * The feupdateenv() function saves the currently raised floating-point
@@ -259,52 +243,48 @@ fesetenv(const fenv_t *envp)
  * by a call to feholdexcept() or fegetenv(), or equal a floating-point
  * environment macro.
  */
-__declare_fenv_inline(int)
-feupdateenv(const fenv_t *envp)
+__declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
-	fexcept_t r;
+    fexcept_t r;
 
-	__stfsr(&r);
-	__ldfsr(*envp);
+    __stfsr(&r);
+    __ldfsr(*envp);
 
-	feraiseexcept(r & FE_ALL_EXCEPT);
+    feraiseexcept(r & FE_ALL_EXCEPT);
 
-	/* Success */
-	return 0;
+    /* Success */
+    return 0;
 }
 
 /*
  * The following functions are extentions to the standard
  */
-__declare_fenv_inline(int)
-feenableexcept(int mask)
+__declare_fenv_inline(int) feenableexcept(int mask)
 {
-	fenv_t old_r, new_r;
+    fenv_t old_r, new_r;
 
-	__stfsr(&old_r);
-	new_r = old_r | ((mask & FE_ALL_EXCEPT) << _FPUSW_SHIFT);
-	__ldfsr(new_r);
+    __stfsr(&old_r);
+    new_r = old_r | ((mask & FE_ALL_EXCEPT) << _FPUSW_SHIFT);
+    __ldfsr(new_r);
 
-	return (old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT;
+    return (old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT;
 }
 
-__declare_fenv_inline(int)
-fedisableexcept(int mask)
+__declare_fenv_inline(int) fedisableexcept(int mask)
 {
-	fenv_t old_r, new_r;
+    fenv_t old_r, new_r;
 
-	__stfsr(&old_r);
-	new_r = old_r & ~((mask & FE_ALL_EXCEPT) << _FPUSW_SHIFT);
-	__ldfsr(new_r);
+    __stfsr(&old_r);
+    new_r = old_r & ~((mask & FE_ALL_EXCEPT) << _FPUSW_SHIFT);
+    __ldfsr(new_r);
 
-	return (old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT;
+    return (old_r >> _FPUSW_SHIFT) & FE_ALL_EXCEPT;
 }
 
-__declare_fenv_inline(int)
-fegetexcept(void)
+__declare_fenv_inline(int) fegetexcept(void)
 {
-	fenv_t r;
+    fenv_t r;
 
-	__stfsr(&r);
-	return (r & _ENABLE_MASK) >> _FPUSW_SHIFT;
+    __stfsr(&r);
+    return (r & _ENABLE_MASK) >> _FPUSW_SHIFT;
 }

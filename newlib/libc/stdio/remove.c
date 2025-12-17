@@ -35,7 +35,8 @@
 
 #include "stdio_private.h"
 
-int remove(const char *pathname)
+int
+remove(const char *pathname)
 {
     return unlink(pathname);
 }

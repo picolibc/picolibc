@@ -38,31 +38,28 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ea.h>
 #include "../../string/local.h"
 
-COMPAT_EA_ALIAS (memset_ea);
+COMPAT_EA_ALIAS(memset_ea);
 
-__ea void *
-__no_builtin
-memset_ea (__ea void *dest, int c, size_ea_t n)
+__ea void *__no_builtin
+memset_ea(__ea void *dest, int c, size_ea_t n)
 {
-  __ea void *curr_dest = dest;
-  void *l_dest;
-  size_ea_t local_n;
-  size_ea_t dst_n;
+    __ea void *curr_dest = dest;
+    void      *l_dest;
+    size_ea_t  local_n;
+    size_ea_t  dst_n;
 
-  while (n)
-    {
-      dst_n =
-	ROUND_UP_NEXT_128 ((size_ea_t) curr_dest) - (size_ea_t) curr_dest;
-      local_n = dst_n < n ? dst_n : n;
+    while (n) {
+        dst_n = ROUND_UP_NEXT_128((size_ea_t)curr_dest) - (size_ea_t)curr_dest;
+        local_n = dst_n < n ? dst_n : n;
 
-      l_dest = __cache_fetch_dirty (curr_dest, local_n);
+        l_dest = __cache_fetch_dirty(curr_dest, local_n);
 
-      memset (l_dest, c, local_n);
+        memset(l_dest, c, local_n);
 
-      /* update values to take into account what we copied */
-      curr_dest += local_n;
-      n -= local_n;
+        /* update values to take into account what we copied */
+        curr_dest += local_n;
+        n -= local_n;
     }
 
-  return dest;
+    return dest;
 }

@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _LRINTF_H_
-#define _LRINTF_H_	1
+#define _LRINTF_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -39,8 +39,9 @@
  * rounding mode. No special handling is performed when values are
  * outside the 32-bit range.
  */
-static __inline long int _lrintf(float x)
+static __inline long int
+_lrintf(float x)
 {
-  return ((long int)spu_extract(spu_convts(spu_promote(x, 0), 0), 0));
+    return ((long int)spu_extract(spu_convts(spu_promote(x, 0), 0), 0));
 }
 #endif /* _LRINTF_H_ */

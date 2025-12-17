@@ -70,20 +70,19 @@
  * You might as well do this up front.
  */
 
-#define	PAIRSIZE(K,D)	(2*sizeof(__uint16_t) + (K)->size + (D)->size)
-#define BIGOVERHEAD	(4*sizeof(__uint16_t))
-#define KEYSIZE(K)	(4*sizeof(__uint16_t) + (K)->size);
-#define OVFLSIZE	(2*sizeof(__uint16_t))
-#define FREESPACE(P)	((P)[(P)[0]+1])
-#define	OFFSET(P)	((P)[(P)[0]+2])
-#define PAIRFITS(P,K,D) \
-	(((P)[2] >= REAL_KEY) && \
-	    (PAIRSIZE((K),(D)) + OVFLSIZE) <= FREESPACE((P)))
-#define PAGE_META(N)	(((N)+3) * sizeof(__uint16_t))
+#define PAIRSIZE(K, D) (2 * sizeof(__uint16_t) + (K)->size + (D)->size)
+#define BIGOVERHEAD    (4 * sizeof(__uint16_t))
+#define KEYSIZE(K)     (4 * sizeof(__uint16_t) + (K)->size);
+#define OVFLSIZE       (2 * sizeof(__uint16_t))
+#define FREESPACE(P)   ((P)[(P)[0] + 1])
+#define OFFSET(P)      ((P)[(P)[0] + 2])
+#define PAIRFITS(P, K, D)                                                       \
+    (((P)[2] >= REAL_KEY) && (PAIRSIZE((K), (D)) + OVFLSIZE) <= FREESPACE((P)))
+#define PAGE_META(N) (((N) + 3) * sizeof(__uint16_t))
 
 typedef struct {
-	BUFHEAD *newp;
-	BUFHEAD *oldp;
-	BUFHEAD *nextp;
-	__uint16_t next_addr;
-}       SPLIT_RETURN;
+    BUFHEAD   *newp;
+    BUFHEAD   *oldp;
+    BUFHEAD   *nextp;
+    __uint16_t next_addr;
+} SPLIT_RETURN;

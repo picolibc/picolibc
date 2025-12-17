@@ -30,15 +30,15 @@
 
 #ifdef _NEED_FLOAT_HUGE
 
-static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except((long double) 0.0, (long double) NAN);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except((long double)0.0, (long double)NAN);
 
 HIDDEN long double
-__math_invalidl (long double x)
+__math_invalidl(long double x)
 {
     if (isnanl_inline(x))
         return pick_long_double_except(x + x, VAL);
     x = pick_long_double_except(VAL / VAL, VAL);
-    return __math_with_errnol (x, EDOM);
+    return __math_with_errnol(x, EDOM);
 }
 
 #ifndef __math_set_invalidl

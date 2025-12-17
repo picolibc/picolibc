@@ -1,20 +1,20 @@
 /*
-Copyright (c) 2001, 2009 Xilinx, Inc.  All rights reserved. 
+Copyright (c) 2001, 2009 Xilinx, Inc.  All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
 met:
 
 1.  Redistributions source code must retain the above copyright notice,
-this list of conditions and the following disclaimer. 
+this list of conditions and the following disclaimer.
 
 2.  Redistributions in binary form must reproduce the above copyright
 notice, this list of conditions and the following disclaimer in the
-documentation and/or other materials provided with the distribution. 
+documentation and/or other materials provided with the distribution.
 
 3.  Neither the name of Xilinx nor the names of its contributors may be
 used to endorse or promote products derived from this software without
-specific prior written permission. 
+specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDER AND CONTRIBUTORS "AS
 IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
@@ -45,11 +45,11 @@ FUNCTION
 <<abort>>---abnormal termination of a program
 
 INDEX
-	abort
+        abort
 
 SYNOPSIS
-	#include <stdlib.h>
-	void abort(void);
+        #include <stdlib.h>
+        void abort(void);
 
 DESCRIPTION
 Use <<abort>> to signal that your program has detected a condition it
@@ -79,15 +79,14 @@ Supporting OS subroutines required: <<_exit>> and optionally, <<write>>.
 #include <signal.h>
 
 void
-abort (void)
+abort(void)
 {
 #ifdef ABORT_MESSAGE
-  write (2, "Abort called\n", sizeof ("Abort called\n")-1);
+    write(2, "Abort called\n", sizeof("Abort called\n") - 1);
 #endif
 
-  while (1)
-    {
-      exit(1);
+    while (1) {
+        exit(1);
     }
 }
 #endif

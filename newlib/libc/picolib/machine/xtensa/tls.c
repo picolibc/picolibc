@@ -37,8 +37,8 @@
 #include <string.h>
 #include <stdint.h>
 
-#define _REG(n) # n
-#define REG(n) _REG(n)
+#define _REG(n) #n
+#define REG(n)  _REG(n)
 
 extern char __arm32_tls_tcb_offset;
 #define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
@@ -46,6 +46,6 @@ extern char __arm32_tls_tcb_offset;
 void
 _set_tls(void *tls)
 {
-    uintptr_t   u = (uintptr_t) tls - TP_OFFSET;
-    __asm__("wur %0," REG(THREADPTR) : : "r" (u));
+    uintptr_t u = (uintptr_t)tls - TP_OFFSET;
+    __asm__("wur %0," REG(THREADPTR) : : "r"(u));
 }

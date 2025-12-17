@@ -37,9 +37,9 @@
 #include <float.h>
 
 #if __LDBL_MAX_10_EXP__ >= 4096
-#define NPOW_10	13
+#define NPOW_10 13
 #elif __LDBL_MAX_10_EXP__ >= 2048
-#define NPOW_10	12
+#define NPOW_10 12
 #elif __LDBL_MAX_10_EXP__ >= 1024
 #define NPOW_10 11
 #elif __LDBL_MAX_10_EXP__ >= 512
@@ -56,61 +56,59 @@
 #error __LDBL_MAX_10_EXP__ too small
 #endif
 
-static const long double pwr_p10 [NPOW_10] = {
-    1e+1L, 1e+2L, 1e+4L, 1e+8L, 1e+16L, 1e+32L,
+static const long double pwr_p10[NPOW_10] = { 1e+1L,    1e+2L, 1e+4L, 1e+8L, 1e+16L, 1e+32L,
 #if NPOW_10 >= 7
-    1e+64L,
+                                              1e+64L,
 #endif
 #if NPOW_10 >= 8
-    1e+128L,
-    #endif
+                                              1e+128L,
+#endif
 #if NPOW_10 >= 9
-    1e+256L,
+                                              1e+256L,
 #endif
 #if NPOW_10 >= 10
-    1e+512L,
+                                              1e+512L,
 #endif
 #if NPOW_10 >= 11
-    1e+1024L,
+                                              1e+1024L,
 #endif
 #if NPOW_10 >= 12
-    1e+2048L,
+                                              1e+2048L,
 #endif
 #if NPOW_10 >= 13
-    1e+4096L
+                                              1e+4096L
 #endif
 };
 
-static const long double pwr_m10 [NPOW_10] = {
-    1e-1L, 1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L,
+static const long double pwr_m10[NPOW_10] = { 1e-1L,    1e-2L, 1e-4L, 1e-8L, 1e-16L, 1e-32L,
 #if NPOW_10 >= 7
-    1e-64L,
+                                              1e-64L,
 #endif
 #if NPOW_10 >= 8
-    1e-128L,
+                                              1e-128L,
 #endif
 #if NPOW_10 >= 9
-    1e-256L,
+                                              1e-256L,
 #endif
 #if NPOW_10 >= 10
-    1e-512L,
+                                              1e-512L,
 #endif
 #if NPOW_10 >= 11
-    1e-1024L,
+                                              1e-1024L,
 #endif
 #if NPOW_10 >= 12
-    1e-2048L,
+                                              1e-2048L,
 #endif
 #if NPOW_10 >= 13
-    1e-4096L
+                                              1e-4096L
 #endif
 };
 
 long double
 __atold_engine(_u128 m10, int e10)
 {
-    long double flt = _u128_to_ld(m10);
-    int pwr;
+    long double        flt = _u128_to_ld(m10);
+    int                pwr;
     const long double *pptr;
 
     if (e10 < 0) {

@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fmodf.h"
 
-float fmodf(float x, float y)
+float
+fmodf(float x, float y)
 {
     return _fmodf(x, y);
 }

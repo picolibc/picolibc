@@ -33,16 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#if (__ARM_FP & 0x8) 
+#if (__ARM_FP & 0x8)
 #include "fdlibm.h"
 
 double
 fabs(double x)
 {
-	double result;
-	__asm__("vabs.f64 %P0, %P1" : "=w" (result) : "w" (x));
-	return result;
+    double result;
+    __asm__("vabs.f64 %P0, %P1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 _MATH_ALIAS_d_d(fabs)

@@ -17,17 +17,17 @@
 
 #include <stdarg.h>
 
-extern int vprintf (const char *, va_list);
+extern int vprintf(const char *, va_list);
 
 int
-putchar (int c)
+putchar(int c)
 {
-  unsigned valist[1];
+    unsigned valist[1];
 
-  c = (unsigned char)c;
-  valist[0] = c;
-  int ret = vprintf ("%c", valist);
-  if (ret < 0)
-    c = -1;
-  return c;
+    c = (unsigned char)c;
+    valist[0] = c;
+    int ret = vprintf("%c", valist);
+    if (ret < 0)
+        c = -1;
+    return c;
 }

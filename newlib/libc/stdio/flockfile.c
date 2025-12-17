@@ -35,12 +35,13 @@
 
 #include "stdio_private.h"
 
-void flockfile(FILE *f)
+void
+flockfile(FILE *f)
 {
 #ifdef __STDIO_LOCKING
     __flockfile(f);
 #else
-    (void) f;
+    (void)f;
     __LIBC_LOCK();
 #endif
 }

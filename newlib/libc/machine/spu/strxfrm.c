@@ -36,7 +36,7 @@
 #include <stddef.h>
 #include <string.h>
 
-#define min(a, b)  (a) < (b) ? (a) : (b)
+#define min(a, b) (a) < (b) ? (a) : (b)
 
 /* The strxfrm() function transforms the src string into a form such that
  * the result of strcmp() on two strings that have been transformed with
@@ -52,12 +52,13 @@
  * transformation is performed.
  */
 
-size_t strxfrm(char * __restrict__ dest, const char * __restrict__ src, size_t n)
+size_t
+strxfrm(char * __restrict__ dest, const char * __restrict__ src, size_t n)
 {
-  size_t len;
+    size_t len;
 
-  len = strlen(src);
-  (void)memcpy((void *)dest, (void *)src, min(n,len + 1));
+    len = strlen(src);
+    (void)memcpy((void *)dest, (void *)src, min(n, len + 1));
 
-  return len;
+    return len;
 }

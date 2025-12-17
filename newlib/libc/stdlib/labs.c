@@ -7,11 +7,11 @@ FUNCTION
 <<labs>>---long integer absolute value
 
 INDEX
-	labs
+        labs
 
 SYNOPSIS
-	#include <stdlib.h>
-	long labs(long <[i]>);
+        #include <stdlib.h>
+        long labs(long <[i]>);
 
 DESCRIPTION
 <<labs>> returns
@@ -37,11 +37,10 @@ No supporting OS subroutine calls are required.
 #include <stdlib.h>
 
 long
-labs (long x)
+labs(long x)
 {
-  if (x < 0)
-    {
-      x = -x;
+    if (x < 0) {
+        x = -x;
     }
-  return x;
+    return x;
 }

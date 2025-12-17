@@ -39,15 +39,17 @@
 long long int
 llround64(__float64 x)
 {
-  long long result;
-  __asm__(
+    long long result;
+    __asm__(
 #if __riscv_xlen == 64
-       "fcvt.l.d"
+        "fcvt.l.d"
 #else
 #error Unsupported XLEN
 #endif
-       "\t%0, %1, rmm" : "=r"(result) : "f"(x));
-  return result;
+        "\t%0, %1, rmm"
+        : "=r"(result)
+        : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_k_d(llround)

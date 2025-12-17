@@ -38,24 +38,24 @@
 int __disable_sanitizer
 asprintf(char **strp, const char *fmt, ...)
 {
-	va_list ap;
-	struct __file_str f = FDEV_SETUP_STRING_ALLOC();
-	int i;
+    va_list           ap;
+    struct __file_str f = FDEV_SETUP_STRING_ALLOC();
+    int               i;
 
-	va_start(ap, fmt);
-	i = vfprintf(&f.file, fmt, ap);
-	va_end(ap);
-        char *buf = POINTER_MINUS(f.end, f.size);
-	if (i >= 0) {
-		char *s = realloc(buf, i+1);
-		if (s) {
-			s[i] = 0;
-			*strp = s;
-		} else {
-			i = EOF;
-		}
-	}
-        if (i < 0)
-                free(buf);
-	return i;
+    va_start(ap, fmt);
+    i = vfprintf(&f.file, fmt, ap);
+    va_end(ap);
+    char *buf = POINTER_MINUS(f.end, f.size);
+    if (i >= 0) {
+        char *s = realloc(buf, i + 1);
+        if (s) {
+            s[i] = 0;
+            *strp = s;
+        } else {
+            i = EOF;
+        }
+    }
+    if (i < 0)
+        free(buf);
+    return i;
 }

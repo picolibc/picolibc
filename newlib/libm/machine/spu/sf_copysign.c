@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/copysignf.h"
 
-float copysignf(float x, float y)
+float
+copysignf(float x, float y)
 {
     return _copysignf(x, y);
 }

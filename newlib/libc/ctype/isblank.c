@@ -1,20 +1,20 @@
 /* Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com> */
 /*
 FUNCTION
-	<<isblank>>, <<isblank_l>>---blank character predicate
+        <<isblank>>, <<isblank_l>>---blank character predicate
 
 INDEX
-	isblank
+        isblank
 
 INDEX
-	isblank_l
+        isblank_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isblank(int <[c]>);
+        #include <ctype.h>
+        int isblank(int <[c]>);
 
-	#include <ctype.h>
-	int isblank_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isblank_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isblank>> is a function which classifies singlebyte charset values by table
@@ -40,11 +40,11 @@ No supporting OS subroutines are required.
 
 #undef isblank
 int
-isblank (int c)
+isblank(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return c == ' ' || c == '\t';
 #else
-    return(__CTYPE_PTR[c+1] & __CTYPE_BLANK) || c == '\t';
+    return (__CTYPE_PTR[c + 1] & __CTYPE_BLANK) || c == '\t';
 #endif
 }

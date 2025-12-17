@@ -38,15 +38,15 @@
 #if defined(__riscv_fsqrt) && __riscv_flen >= 32
 
 float
-sqrtf (float x)
+sqrtf(float x)
 {
-	float result;
+    float result;
 #ifdef __MATH_ERRNO
-        if (isless(x, 0.0f))
-            return __math_invalidf(x);
+    if (isless(x, 0.0f))
+        return __math_invalidf(x);
 #endif
-	__asm__("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
-	return result;
+    __asm__("fsqrt.s %0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_f_f(sqrt)

@@ -41,51 +41,53 @@
 char *suboptarg;
 
 int
-getsubopt(char **optionp, char * const * tokens, char **valuep)
+getsubopt(char **optionp, char * const *tokens, char **valuep)
 {
-	int cnt;
-	char *p;
+    int   cnt;
+    char *p;
 
-	suboptarg = *valuep = NULL;
+    suboptarg = *valuep = NULL;
 
-	if (!optionp || !*optionp)
-		return(-1);
+    if (!optionp || !*optionp)
+        return (-1);
 
-	/* skip leading white-space, commas */
-	for (p = *optionp; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
+    /* skip leading white-space, commas */
+    for (p = *optionp; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p)
+        ;
 
-	if (!*p) {
-		*optionp = p;
-		return(-1);
-	}
+    if (!*p) {
+        *optionp = p;
+        return (-1);
+    }
 
-	/* save the start of the token, and skip the rest of the token. */
-	for (suboptarg = p;
-	    *++p && *p != ',' && *p != '=' && *p != ' ' && *p != '\t';);
+    /* save the start of the token, and skip the rest of the token. */
+    for (suboptarg = p; *++p && *p != ',' && *p != '=' && *p != ' ' && *p != '\t';)
+        ;
 
-	if (*p) {
-		/*
-		 * If there's an equals sign, set the value pointer, and
-		 * skip over the value part of the token.  Terminate the
-		 * token.
-		 */
-		if (*p == '=') {
-			*p = '\0';
-			for (*valuep = ++p;
-			    *p && *p != ',' && *p != ' ' && *p != '\t'; ++p);
-			if (*p)
-				*p++ = '\0';
-		} else
-			*p++ = '\0';
-		/* Skip any whitespace or commas after this token. */
-		for (; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p);
-	}
+    if (*p) {
+        /*
+         * If there's an equals sign, set the value pointer, and
+         * skip over the value part of the token.  Terminate the
+         * token.
+         */
+        if (*p == '=') {
+            *p = '\0';
+            for (*valuep = ++p; *p && *p != ',' && *p != ' ' && *p != '\t'; ++p)
+                ;
+            if (*p)
+                *p++ = '\0';
+        } else
+            *p++ = '\0';
+        /* Skip any whitespace or commas after this token. */
+        for (; *p && (*p == ',' || *p == ' ' || *p == '\t'); ++p)
+            ;
+    }
 
-	/* set optionp for next round. */
-	*optionp = p;
+    /* set optionp for next round. */
+    *optionp = p;
 
-	for (cnt = 0; *tokens; ++tokens, ++cnt)
-		if (!strcmp(suboptarg, *tokens))
-			return(cnt);
-	return(-1);
+    for (cnt = 0; *tokens; ++tokens, ++cnt)
+        if (!strcmp(suboptarg, *tokens))
+            return (cnt);
+    return (-1);
 }

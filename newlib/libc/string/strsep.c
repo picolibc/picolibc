@@ -7,8 +7,7 @@
 #include "strtok_r.h"
 
 char *
-strsep (register char **source_ptr,
-	register const char *delim)
+strsep(register char **source_ptr, register const char *delim)
 {
-	return __strtok_r (*source_ptr, delim, source_ptr, 0);
+    return __strtok_r(*source_ptr, delim, source_ptr, 0);
 }

@@ -39,10 +39,10 @@
 #if __HAVE_FAST_FMAF
 
 float
-fmaf (float x, float y, float z)
+fmaf(float x, float y, float z)
 {
-  __asm__("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
-  return z;
+    __asm__("vfma.f32 %0, %1, %2" : "+t"(z) : "t"(x), "t"(y));
+    return z;
 }
 
 #endif

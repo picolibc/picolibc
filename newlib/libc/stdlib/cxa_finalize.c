@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2004 Paul Brook <paul@codesourcery.com> 
+Copyright (c) 2004 Paul Brook <paul@codesourcery.com>
 
 Common routine to implement atexit-like functionality.
 
@@ -37,7 +37,6 @@ LITE_EXIT.
  * Implementation if __cxa_finalize.
  */
 
-
 #include <stdlib.h>
 #include "atexit.h"
 
@@ -46,8 +45,8 @@ LITE_EXIT.
  * otherwise only the handlers from that DSO are called.
  */
 
-void 
-__cxa_finalize (void * d)
+void
+__cxa_finalize(void *d)
 {
-  __call_exitprocs (0, d);
+    __call_exitprocs(0, d);
 }

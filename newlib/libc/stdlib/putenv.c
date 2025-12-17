@@ -21,25 +21,24 @@
 #include <string.h>
 
 int
-putenv (char *str)
+putenv(char *str)
 {
-  register char *p, *equal;
-  int rval;
+    register char *p, *equal;
+    int            rval;
 
-  p = strdup (str);
+    p = strdup(str);
 
-  if (!p)
-    return 1;
+    if (!p)
+        return 1;
 
-  if (!(equal = strchr (p, '=')))
-    {
-      (void) free (p);
-      return 1;
+    if (!(equal = strchr(p, '='))) {
+        (void)free(p);
+        return 1;
     }
 
-  *equal = '\0';
-  rval = setenv (p, equal + 1, 1);
-  (void) free (p);
+    *equal = '\0';
+    rval = setenv(p, equal + 1, 1);
+    (void)free(p);
 
-  return rval;
+    return rval;
 }

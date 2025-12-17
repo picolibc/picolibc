@@ -28,11 +28,11 @@
 #include <math.h>
 
 float
-rintf (float x)
+rintf(float x)
 {
-  float result;
-  __asm__("frintx\t%s0, %s1" : "=w" (result) : "w" (x));
-  return result;
+    float result;
+    __asm__("frintx\t%s0, %s1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

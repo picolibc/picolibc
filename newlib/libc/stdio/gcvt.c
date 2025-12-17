@@ -36,10 +36,8 @@
 #include "stdio_private.h"
 
 char *
-gcvt (double invalue,
-      int ndigit,
-      char *buf)
+gcvt(double invalue, int ndigit, char *buf)
 {
-	__d_sprintf(buf, "%.*g", ndigit, invalue);
-	return buf;
+    __d_sprintf(buf, "%.*g", ndigit, invalue);
+    return buf;
 }

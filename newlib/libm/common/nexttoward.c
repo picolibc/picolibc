@@ -29,11 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if defined(_NEED_FLOAT64) && !defined(_NEED_FLOAT_HUGE) && defined(__HAVE_LONG_DOUBLE)
 __float64
-nexttoward64 (__float64 x, long double y)
+nexttoward64(__float64 x, long double y)
 {
     return nextafter64(x, y);
 }
 
 _MATH_ALIAS_d_dl(nexttoward)
 #endif
-

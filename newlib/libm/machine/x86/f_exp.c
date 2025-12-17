@@ -23,24 +23,23 @@ Function computes e ** x.  The following special cases exist:
 There is no error checking or setting of errno.
 */
 
-
 #include <math.h>
 #include "f_math.h"
 
-double _f_exp (double x)
+double
+_f_exp(double x)
 {
-   if (check_finite(x))
-     {
-       double result;
-       __asm__("fldl2e; fmulp; fld %%st; frndint; fsub %%st,%%st(1); fxch;" \
-          "fchs; f2xm1; fld1; faddp; fxch; fld1; fscale; fstp %%st(1); fmulp" :
-          "=t"(result) : "0"(x));
-       return result;
-     }
-   else if (x == -infinity())
-     return 0.0;
+    if (check_finite(x)) {
+        double result;
+        __asm__("fldl2e; fmulp; fld %%st; frndint; fsub %%st,%%st(1); fxch;"
+                "fchs; f2xm1; fld1; faddp; fxch; fld1; fscale; fstp %%st(1); fmulp"
+                : "=t"(result)
+                : "0"(x));
+        return result;
+    } else if (x == -infinity())
+        return 0.0;
 
-   return x;
+    return x;
 }
 
 #endif

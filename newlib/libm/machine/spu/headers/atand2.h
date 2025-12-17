@@ -39,7 +39,7 @@
 #ifdef __SPU__
 
 #ifndef _ATAND2_H_
-#define _ATAND2_H_	1
+#define _ATAND2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -64,17 +64,18 @@
  *
  */
 
-static __inline vector double _atand2(vector double x)
+static __inline vector double
+_atand2(vector double x)
 {
-    vector double signbit = spu_splats(-0.0);
-    vector double oned    = spu_splats(1.0);
-    vector double pi2     = spu_splats(SM_PI_2);
-    vector double xabs, x1;
-    vector double result;
+    vector double             signbit = spu_splats(-0.0);
+    vector double             oned = spu_splats(1.0);
+    vector double             pi2 = spu_splats(SM_PI_2);
+    vector double             xabs, x1;
+    vector double             result;
     vector unsigned long long gt1;
 
     xabs = spu_andc(x, signbit);
-    gt1  = spu_cmpgt(xabs, oned);
+    gt1 = spu_cmpgt(xabs, oned);
 
     /*
      * For x > 1, use the relation:

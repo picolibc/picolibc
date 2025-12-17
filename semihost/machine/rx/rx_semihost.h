@@ -46,7 +46,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-int
-rx_putc(char c, FILE *file);
+int rx_putc(char c, FILE *file);
 
 #endif /* _RX_SEMIHOST_H_ */

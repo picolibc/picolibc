@@ -38,11 +38,11 @@
 char *
 asnprintf(char *str, size_t *lenp, const char *fmt, ...)
 {
-        va_list ap;
-        char    *ret;
+    va_list ap;
+    char   *ret;
 
-        va_start(ap, fmt);
-	ret = vasnprintf(str, lenp, fmt, ap);
-        va_end(ap);
-        return ret;
+    va_start(ap, fmt);
+    ret = vasnprintf(str, lenp, fmt, ap);
+    va_end(ap);
+    return ret;
 }

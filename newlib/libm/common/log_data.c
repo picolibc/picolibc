@@ -335,7 +335,7 @@ that logc + poly(z/c - 1) has small error, however near x == 1 when
 },
 #if !__HAVE_FAST_FMA
 .tab2 = {
-# if N == 64
+#if N == 64
 {0x1.61ffff94c4fecp-1, -0x1.9fe4fc998f325p-56},
 {0x1.66000020377ddp-1, 0x1.e804c7a9519f2p-55},
 {0x1.6a00004c41678p-1, 0x1.902c675d9ecfep-55},
@@ -400,7 +400,7 @@ that logc + poly(z/c - 1) has small error, however near x == 1 when
 {0x1.560000e342455p+0, 0x1.3fb7fac8ac151p-55},
 {0x1.59ffffc39676fp+0, 0x1.4fe7dd6659cc2p-55},
 {0x1.5dfffff10ef42p+0, -0x1.48154cb592bcbp-54},
-# elif N == 128
+#elif N == 128
 {0x1.61000014fb66bp-1, 0x1.e026c91425b3cp-56},
 {0x1.63000034db495p-1, 0x1.dbfea48005d41p-55},
 {0x1.650000d94d478p-1, 0x1.e7fa786d6a5b7p-55},

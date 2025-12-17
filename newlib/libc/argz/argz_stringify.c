@@ -9,17 +9,14 @@
 #include <sys/types.h>
 
 void
-argz_stringify (char *argz,
-       size_t argz_len,
-       int sep)
+argz_stringify(char *argz, size_t argz_len, int sep)
 {
-  size_t i;
+    size_t i;
 
-  /* len includes trailing \0, which we don't want to replace. */
-  if (argz_len > 1)
-    for (i = 0; i < argz_len - 1; i++)
-      {
-	if (argz[i] == '\0')
-          argz[i] = (char) sep;
-      }
+    /* len includes trailing \0, which we don't want to replace. */
+    if (argz_len > 1)
+        for (i = 0; i < argz_len - 1; i++) {
+            if (argz[i] == '\0')
+                argz[i] = (char)sep;
+        }
 }

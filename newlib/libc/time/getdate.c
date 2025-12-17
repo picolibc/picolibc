@@ -39,10 +39,11 @@
 
 int getdate_err;
 
-struct tm *getdate(const char *string)
+struct tm *
+getdate(const char *string)
 {
     static struct tm static_tm;
-    int ret;
+    int              ret;
 
     ret = getdate_r(string, &static_tm);
     if (ret != 0) {

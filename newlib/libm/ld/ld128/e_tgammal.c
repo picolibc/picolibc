@@ -16,28 +16,26 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
-
 long double
 tgammal(long double x)
 {
-	int64_t i0,i1;
-        int sign;
-        long double y, z;
+    int64_t     i0, i1;
+    int         sign;
+    long double y, z;
 
-	GET_LDOUBLE_WORDS64(i0,i1,x);
-	if (((i0&0x7fffffffffffffffLL)|i1) == 0)
-                return __math_divzerol(i0 < 0);
+    GET_LDOUBLE_WORDS64(i0, i1, x);
+    if (((i0 & 0x7fffffffffffffffLL) | i1) == 0)
+        return __math_divzerol(i0 < 0);
 
-	if (i0<0 && (u_int64_t)i0<0xffff000000000000ULL && rintl(x)==x)
-		return __math_invalidl(x);
+    if (i0 < 0 && (u_int64_t)i0 < 0xffff000000000000ULL && rintl(x) == x)
+        return __math_invalidl(x);
 
-	if ((uint64_t) i0==0xffff000000000000ULL && i1==0)
-		return __math_invalidl(x);
+    if ((uint64_t)i0 == 0xffff000000000000ULL && i1 == 0)
+        return __math_invalidl(x);
 
-        y = lgammal_r(x, &sign);
-        z = expl(y);
-        if (sign < 0)
-            z = -z;
-        return z;
+    y = lgammal_r(x, &sign);
+    z = expl(y);
+    if (sign < 0)
+        z = -z;
+    return z;
 }

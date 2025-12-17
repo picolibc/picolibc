@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/ldexp.h"
 
-double ldexp(double x, int exp)
+double
+ldexp(double x, int exp)
 {
     return _ldexp(x, exp);
 }

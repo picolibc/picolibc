@@ -43,20 +43,15 @@ const char haystack_mid[] = "hello world";
 char haystack[BALE];
 
 static int
-check (void *(*func)(const void *, int, size_t),
-       const char *name,
-       int off,
-       int len,
-       int needle,
-       int expect)
+check(void *(*func)(const void *, int, size_t), const char *name, int off, int len, int needle,
+      int expect)
 {
     char *ptr = func(haystack + off, needle, len);
-    int result = -1;
+    int   result = -1;
     if (ptr)
         result = ptr - (haystack + off);
     if (result != expect) {
-        printf("%s(%s, 0x%x). Got %d expect %d\n",
-               name, haystack, needle, result, expect);
+        printf("%s(%s, 0x%x). Got %d expect %d\n", name, haystack, needle, result, expect);
         return 1;
     }
     return 0;

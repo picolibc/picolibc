@@ -40,7 +40,7 @@
 __ungetc_t
 __picolibc_non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
-	return __non_atomic_exchange_ungetc(p, v);
+    return __non_atomic_exchange_ungetc(p, v);
 }
 
 __weak_reference(__picolibc_non_atomic_exchange_ungetc, __atomic_exchange_ungetc);

@@ -37,7 +37,7 @@
  */
 
 #ifndef _SYS_TIME_H_
-#define	_SYS_TIME_H_
+#define _SYS_TIME_H_
 
 #include <sys/cdefs.h>
 #include <sys/_types.h>
@@ -48,158 +48,155 @@
 _BEGIN_STD_C
 
 #ifndef _SUSECONDS_T_DECLARED
-typedef	__suseconds_t	suseconds_t;
-#define	_SUSECONDS_T_DECLARED
+typedef __suseconds_t suseconds_t;
+#define _SUSECONDS_T_DECLARED
 #endif
 
 /*
  * Names of the interval timers, and structure
  * defining a timer setting.
  */
-#define	ITIMER_REAL	0
-#define	ITIMER_VIRTUAL	1
-#define	ITIMER_PROF	2
+#define ITIMER_REAL    0
+#define ITIMER_VIRTUAL 1
+#define ITIMER_PROF    2
 
 struct itimerval {
-	struct	timeval it_interval;	/* timer interval */
-	struct	timeval it_value;	/* current value */
+    struct timeval it_interval; /* timer interval */
+    struct timeval it_value;    /* current value */
 };
 
-int getitimer (int __which, struct itimerval *__value);
-int gettimeofday (struct timeval *__restrict __p,
-			  void *__restrict __tz);
-int setitimer (int __which, const struct itimerval *__restrict __value,
-					struct itimerval *__restrict __ovalue);
-int utimes (const char *, const struct timeval [2]);
+int getitimer(int __which, struct itimerval *__value);
+int gettimeofday(struct timeval * __restrict __p, void * __restrict __tz);
+int setitimer(int __which, const struct itimerval * __restrict __value,
+              struct itimerval * __restrict __ovalue);
+int utimes(const char *, const struct timeval[2]);
 
 #if __BSD_VISIBLE
 
 struct timezone {
-	int	tz_minuteswest;	/* minutes west of Greenwich */
-	int	tz_dsttime;	/* type of dst correction */
+    int tz_minuteswest; /* minutes west of Greenwich */
+    int tz_dsttime;     /* type of dst correction */
 };
 
-int adjtime (const struct timeval *, struct timeval *);
-int futimes (int, const struct timeval [2]);
-int lutimes (const char *, const struct timeval [2]);
-int settimeofday (const struct timeval *, const struct timezone *);
+int adjtime(const struct timeval *, struct timeval *);
+int futimes(int, const struct timeval[2]);
+int lutimes(const char *, const struct timeval[2]);
+int settimeofday(const struct timeval *, const struct timezone *);
 
-#define	DST_NONE	0	/* not on dst */
-#define	DST_USA		1	/* USA style dst */
-#define	DST_AUST	2	/* Australian style dst */
-#define	DST_WET		3	/* Western European dst */
-#define	DST_MET		4	/* Middle European dst */
-#define	DST_EET		5	/* Eastern European dst */
-#define	DST_CAN		6	/* Canada */
+#define DST_NONE 0 /* not on dst */
+#define DST_USA  1 /* USA style dst */
+#define DST_AUST 2 /* Australian style dst */
+#define DST_WET  3 /* Western European dst */
+#define DST_MET  4 /* Middle European dst */
+#define DST_EET  5 /* Eastern European dst */
+#define DST_CAN  6 /* Canada */
 
 #ifndef _SBINTIME_T_DECLARED
-typedef	__int64_t	sbintime_t;
+typedef __int64_t sbintime_t;
 #define _SBINTIME_T_DECLARED
 #endif
 
 struct bintime {
-	time_t	sec;
-	__uint64_t frac;
+    time_t     sec;
+    __uint64_t frac;
 };
 
 static __inline void
 bintime_addx(struct bintime *_bt, __uint64_t _x)
 {
-	__uint64_t _u;
+    __uint64_t _u;
 
-	_u = _bt->frac;
-	_bt->frac += _x;
-	if (_u > _bt->frac)
-		_bt->sec++;
+    _u = _bt->frac;
+    _bt->frac += _x;
+    if (_u > _bt->frac)
+        _bt->sec++;
 }
 
 static __inline void
 bintime_add(struct bintime *_bt, const struct bintime *_bt2)
 {
-	__uint64_t _u;
+    __uint64_t _u;
 
-	_u = _bt->frac;
-	_bt->frac += _bt2->frac;
-	if (_u > _bt->frac)
-		_bt->sec++;
-	_bt->sec += _bt2->sec;
+    _u = _bt->frac;
+    _bt->frac += _bt2->frac;
+    if (_u > _bt->frac)
+        _bt->sec++;
+    _bt->sec += _bt2->sec;
 }
 
 static __inline void
 bintime_sub(struct bintime *_bt, const struct bintime *_bt2)
 {
-	__uint64_t _u;
+    __uint64_t _u;
 
-	_u = _bt->frac;
-	_bt->frac -= _bt2->frac;
-	if (_u < _bt->frac)
-		_bt->sec--;
-	_bt->sec -= _bt2->sec;
+    _u = _bt->frac;
+    _bt->frac -= _bt2->frac;
+    if (_u < _bt->frac)
+        _bt->sec--;
+    _bt->sec -= _bt2->sec;
 }
 
 static __inline void
 bintime_mul(struct bintime *_bt, unsigned int _x)
 {
-	__uint64_t _p1, _p2;
+    __uint64_t _p1, _p2;
 
-	_p1 = (_bt->frac & 0xffffffffull) * _x;
-	_p2 = (_bt->frac >> 32) * _x + (_p1 >> 32);
-	_bt->sec *= _x;
-	_bt->sec += (_p2 >> 32);
-	_bt->frac = (_p2 << 32) | (_p1 & 0xffffffffull);
+    _p1 = (_bt->frac & 0xffffffffull) * _x;
+    _p2 = (_bt->frac >> 32) * _x + (_p1 >> 32);
+    _bt->sec *= _x;
+    _bt->sec += (_p2 >> 32);
+    _bt->frac = (_p2 << 32) | (_p1 & 0xffffffffull);
 }
 
 static __inline void
 bintime_shift(struct bintime *_bt, int _exp)
 {
 
-	if (_exp > 0) {
-		_bt->sec <<= _exp;
-		_bt->sec |= _bt->frac >> (64 - _exp);
-		_bt->frac <<= _exp;
-	} else if (_exp < 0) {
-		_bt->frac >>= -_exp;
-		_bt->frac |= (__uint64_t)_bt->sec << (64 + _exp);
-		_bt->sec >>= -_exp;
-	}
+    if (_exp > 0) {
+        _bt->sec <<= _exp;
+        _bt->sec |= _bt->frac >> (64 - _exp);
+        _bt->frac <<= _exp;
+    } else if (_exp < 0) {
+        _bt->frac >>= -_exp;
+        _bt->frac |= (__uint64_t)_bt->sec << (64 + _exp);
+        _bt->sec >>= -_exp;
+    }
 }
 
-#define	bintime_clear(a)	((a)->sec = (a)->frac = 0)
-#define	bintime_isset(a)	((a)->sec || (a)->frac)
-#define	bintime_cmp(a, b, cmp)						\
-	(((a)->sec == (b)->sec) ?					\
-	    ((a)->frac cmp (b)->frac) :					\
-	    ((a)->sec cmp (b)->sec))
+#define bintime_clear(a) ((a)->sec = (a)->frac = 0)
+#define bintime_isset(a) ((a)->sec || (a)->frac)
+#define bintime_cmp(a, b, cmp)                                                   \
+    (((a)->sec == (b)->sec) ? ((a)->frac cmp(b)->frac) : ((a)->sec cmp(b)->sec))
 
-#define	SBT_1S	((sbintime_t)1 << 32)
-#define	SBT_1M	(SBT_1S * 60)
-#define	SBT_1MS	(SBT_1S / 1000)
-#define	SBT_1US	(SBT_1S / 1000000)
-#define	SBT_1NS	(SBT_1S / 1000000000) /* beware rounding, see nstosbt() */
-#define	SBT_MAX	0x7fffffffffffffffLL
+#define SBT_1S  ((sbintime_t)1 << 32)
+#define SBT_1M  (SBT_1S * 60)
+#define SBT_1MS (SBT_1S / 1000)
+#define SBT_1US (SBT_1S / 1000000)
+#define SBT_1NS (SBT_1S / 1000000000) /* beware rounding, see nstosbt() */
+#define SBT_MAX 0x7fffffffffffffffLL
 
 static __inline int
 sbintime_getsec(sbintime_t _sbt)
 {
 
-	return (_sbt >> 32);
+    return (_sbt >> 32);
 }
 
 static __inline sbintime_t
 bttosbt(const struct bintime _bt)
 {
 
-	return (((sbintime_t)_bt.sec << 32) + (_bt.frac >> 32));
+    return (((sbintime_t)_bt.sec << 32) + (_bt.frac >> 32));
 }
 
 static __inline struct bintime
 sbttobt(sbintime_t _sbt)
 {
-	struct bintime _bt;
+    struct bintime _bt;
 
-	_bt.sec = _sbt >> 32;
-	_bt.frac = _sbt << 32;
-	return (_bt);
+    _bt.sec = _sbt >> 32;
+    _bt.frac = _sbt << 32;
+    return (_bt);
 }
 
 /*
@@ -226,71 +223,71 @@ sbttobt(sbintime_t _sbt)
 static __inline __int64_t
 sbttons(sbintime_t _sbt)
 {
-	__uint64_t ns;
+    __uint64_t ns;
 
-	ns = _sbt;
-	if (ns >= SBT_1S)
-		ns = (ns >> 32) * 1000000000;
-	else
-		ns = 0;
+    ns = _sbt;
+    if (ns >= SBT_1S)
+        ns = (ns >> 32) * 1000000000;
+    else
+        ns = 0;
 
-	return (ns + (1000000000 * (_sbt & 0xffffffffu) >> 32));
+    return (ns + (1000000000 * (_sbt & 0xffffffffu) >> 32));
 }
 
 static __inline sbintime_t
 nstosbt(__int64_t _ns)
 {
-	sbintime_t sb = 0;
+    sbintime_t sb = 0;
 
-	if (_ns >= SBT_1S) {
-		sb = (_ns / 1000000000) * SBT_1S;
-		_ns = _ns % 1000000000;
-	}
-	/* 9223372037 = ceil(2^63 / 1000000000) */
-	sb += ((_ns * 9223372037ull) + 0x7fffffff) >> 31;
-	return (sb);
+    if (_ns >= SBT_1S) {
+        sb = (_ns / 1000000000) * SBT_1S;
+        _ns = _ns % 1000000000;
+    }
+    /* 9223372037 = ceil(2^63 / 1000000000) */
+    sb += ((_ns * 9223372037ull) + 0x7fffffff) >> 31;
+    return (sb);
 }
 
 static __inline __int64_t
 sbttous(sbintime_t _sbt)
 {
 
-	return ((1000000 * _sbt) >> 32);
+    return ((1000000 * _sbt) >> 32);
 }
 
 static __inline sbintime_t
 ustosbt(__int64_t _us)
 {
-	sbintime_t sb = 0;
+    sbintime_t sb = 0;
 
-	if (_us >= SBT_1S) {
-		sb = (_us / 1000000) * SBT_1S;
-		_us = _us % 1000000;
-	}
-	/* 9223372036855 = ceil(2^63 / 1000000) */
-	sb += ((_us * 9223372036855ull) + 0x7fffffff) >> 31;
-	return (sb);
+    if (_us >= SBT_1S) {
+        sb = (_us / 1000000) * SBT_1S;
+        _us = _us % 1000000;
+    }
+    /* 9223372036855 = ceil(2^63 / 1000000) */
+    sb += ((_us * 9223372036855ull) + 0x7fffffff) >> 31;
+    return (sb);
 }
 
 static __inline __int64_t
 sbttoms(sbintime_t _sbt)
 {
 
-	return ((1000 * _sbt) >> 32);
+    return ((1000 * _sbt) >> 32);
 }
 
 static __inline sbintime_t
 mstosbt(__int64_t _ms)
 {
-	sbintime_t sb = 0;
+    sbintime_t sb = 0;
 
-	if (_ms >= SBT_1S) {
-		sb = (_ms / 1000) * SBT_1S;
-		_ms = _ms % 1000;
-	}
-	/* 9223372036854776 = ceil(2^63 / 1000) */
-	sb += ((_ms * 9223372036854776ull) + 0x7fffffff) >> 31;
-	return (sb);
+    if (_ms >= SBT_1S) {
+        sb = (_ms / 1000) * SBT_1S;
+        _ms = _ms % 1000;
+    }
+    /* 9223372036854776 = ceil(2^63 / 1000) */
+    sb += ((_ms * 9223372036854776ull) + 0x7fffffff) >> 31;
+    return (sb);
 }
 
 /*-
@@ -311,127 +308,124 @@ static __inline void
 bintime2timespec(const struct bintime *_bt, struct timespec *_ts)
 {
 
-	_ts->tv_sec = _bt->sec;
-	_ts->tv_nsec = ((__uint64_t)1000000000 *
-	    (__uint32_t)(_bt->frac >> 32)) >> 32;
+    _ts->tv_sec = _bt->sec;
+    _ts->tv_nsec = ((__uint64_t)1000000000 * (__uint32_t)(_bt->frac >> 32)) >> 32;
 }
 
 static __inline void
 timespec2bintime(const struct timespec *_ts, struct bintime *_bt)
 {
 
-	_bt->sec = _ts->tv_sec;
-	/* 18446744073 = int(2^64 / 1000000000) */
-	_bt->frac = _ts->tv_nsec * (__uint64_t)18446744073LL;
+    _bt->sec = _ts->tv_sec;
+    /* 18446744073 = int(2^64 / 1000000000) */
+    _bt->frac = _ts->tv_nsec * (__uint64_t)18446744073LL;
 }
 
 static __inline void
 bintime2timeval(const struct bintime *_bt, struct timeval *_tv)
 {
 
-	_tv->tv_sec = _bt->sec;
-	_tv->tv_usec = ((__uint64_t)1000000 * (__uint32_t)(_bt->frac >> 32)) >> 32;
+    _tv->tv_sec = _bt->sec;
+    _tv->tv_usec = ((__uint64_t)1000000 * (__uint32_t)(_bt->frac >> 32)) >> 32;
 }
 
 static __inline void
 timeval2bintime(const struct timeval *_tv, struct bintime *_bt)
 {
 
-	_bt->sec = _tv->tv_sec;
-	/* 18446744073709 = int(2^64 / 1000000) */
-	_bt->frac = _tv->tv_usec * (__uint64_t)18446744073709LL;
+    _bt->sec = _tv->tv_sec;
+    /* 18446744073709 = int(2^64 / 1000000) */
+    _bt->frac = _tv->tv_usec * (__uint64_t)18446744073709LL;
 }
 
 static __inline struct timespec
 sbttots(sbintime_t _sbt)
 {
-	struct timespec _ts;
+    struct timespec _ts;
 
-	_ts.tv_sec = _sbt >> 32;
-	_ts.tv_nsec = sbttons((__uint32_t)_sbt);
-	return (_ts);
+    _ts.tv_sec = _sbt >> 32;
+    _ts.tv_nsec = sbttons((__uint32_t)_sbt);
+    return (_ts);
 }
 
 static __inline sbintime_t
 tstosbt(struct timespec _ts)
 {
 
-	return (((sbintime_t)_ts.tv_sec << 32) + nstosbt(_ts.tv_nsec));
+    return (((sbintime_t)_ts.tv_sec << 32) + nstosbt(_ts.tv_nsec));
 }
 
 static __inline struct timeval
 sbttotv(sbintime_t _sbt)
 {
-	struct timeval _tv;
+    struct timeval _tv;
 
-	_tv.tv_sec = _sbt >> 32;
-	_tv.tv_usec = sbttous((__uint32_t)_sbt);
-	return (_tv);
+    _tv.tv_sec = _sbt >> 32;
+    _tv.tv_usec = sbttous((__uint32_t)_sbt);
+    return (_tv);
 }
 
 static __inline sbintime_t
 tvtosbt(struct timeval _tv)
 {
 
-	return (((sbintime_t)_tv.tv_sec << 32) + ustosbt(_tv.tv_usec));
+    return (((sbintime_t)_tv.tv_sec << 32) + ustosbt(_tv.tv_usec));
 }
 
 /* Operations on timespecs */
-#define	timespecclear(tvp)	((tvp)->tv_sec = (tvp)->tv_nsec = 0)
-#define	timespecisset(tvp)	((tvp)->tv_sec || (tvp)->tv_nsec)
-#define	timespeccmp(tvp, uvp, cmp)					\
-	(((tvp)->tv_sec == (uvp)->tv_sec) ?				\
-	    ((tvp)->tv_nsec cmp (uvp)->tv_nsec) :			\
-	    ((tvp)->tv_sec cmp (uvp)->tv_sec))
+#define timespecclear(tvp) ((tvp)->tv_sec = (tvp)->tv_nsec = 0)
+#define timespecisset(tvp) ((tvp)->tv_sec || (tvp)->tv_nsec)
+#define timespeccmp(tvp, uvp, cmp)                                         \
+    (((tvp)->tv_sec == (uvp)->tv_sec) ? ((tvp)->tv_nsec cmp(uvp)->tv_nsec) \
+                                      : ((tvp)->tv_sec cmp(uvp)->tv_sec))
 
-#define	timespecadd(tsp, usp, vsp)					\
-	do {								\
-		(vsp)->tv_sec = (tsp)->tv_sec + (usp)->tv_sec;		\
-		(vsp)->tv_nsec = (tsp)->tv_nsec + (usp)->tv_nsec;	\
-		if ((vsp)->tv_nsec >= 1000000000L) {			\
-			(vsp)->tv_sec++;				\
-			(vsp)->tv_nsec -= 1000000000L;			\
-		}							\
-	} while (0)
-#define	timespecsub(tsp, usp, vsp)					\
-	do {								\
-		(vsp)->tv_sec = (tsp)->tv_sec - (usp)->tv_sec;		\
-		(vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec;	\
-		if ((vsp)->tv_nsec < 0) {				\
-			(vsp)->tv_sec--;				\
-			(vsp)->tv_nsec += 1000000000L;			\
-		}							\
-	} while (0)
+#define timespecadd(tsp, usp, vsp)                        \
+    do {                                                  \
+        (vsp)->tv_sec = (tsp)->tv_sec + (usp)->tv_sec;    \
+        (vsp)->tv_nsec = (tsp)->tv_nsec + (usp)->tv_nsec; \
+        if ((vsp)->tv_nsec >= 1000000000L) {              \
+            (vsp)->tv_sec++;                              \
+            (vsp)->tv_nsec -= 1000000000L;                \
+        }                                                 \
+    } while (0)
+#define timespecsub(tsp, usp, vsp)                        \
+    do {                                                  \
+        (vsp)->tv_sec = (tsp)->tv_sec - (usp)->tv_sec;    \
+        (vsp)->tv_nsec = (tsp)->tv_nsec - (usp)->tv_nsec; \
+        if ((vsp)->tv_nsec < 0) {                         \
+            (vsp)->tv_sec--;                              \
+            (vsp)->tv_nsec += 1000000000L;                \
+        }                                                 \
+    } while (0)
 
-#define	timerclear(tvp)		((tvp)->tv_sec = (tvp)->tv_usec = 0)
-#define	timerisset(tvp)		((tvp)->tv_sec || (tvp)->tv_usec)
-#define	timercmp(tvp, uvp, cmp)					\
-	(((tvp)->tv_sec == (uvp)->tv_sec) ?				\
-	    ((tvp)->tv_usec cmp (uvp)->tv_usec) :			\
-	    ((tvp)->tv_sec cmp (uvp)->tv_sec))
-#define	timeradd(tvp, uvp, vvp)						\
-	do {								\
-		(vvp)->tv_sec = (tvp)->tv_sec + (uvp)->tv_sec;		\
-		(vvp)->tv_usec = (tvp)->tv_usec + (uvp)->tv_usec;	\
-		if ((vvp)->tv_usec >= 1000000) {			\
-			(vvp)->tv_sec++;				\
-			(vvp)->tv_usec -= 1000000;			\
-		}							\
-	} while (0)
-#define	timersub(tvp, uvp, vvp)						\
-	do {								\
-		(vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;		\
-		(vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec;	\
-		if ((vvp)->tv_usec < 0) {				\
-			(vvp)->tv_sec--;				\
-			(vvp)->tv_usec += 1000000;			\
-		}							\
-	} while (0)
+#define timerclear(tvp) ((tvp)->tv_sec = (tvp)->tv_usec = 0)
+#define timerisset(tvp) ((tvp)->tv_sec || (tvp)->tv_usec)
+#define timercmp(tvp, uvp, cmp)                                            \
+    (((tvp)->tv_sec == (uvp)->tv_sec) ? ((tvp)->tv_usec cmp(uvp)->tv_usec) \
+                                      : ((tvp)->tv_sec cmp(uvp)->tv_sec))
+#define timeradd(tvp, uvp, vvp)                           \
+    do {                                                  \
+        (vvp)->tv_sec = (tvp)->tv_sec + (uvp)->tv_sec;    \
+        (vvp)->tv_usec = (tvp)->tv_usec + (uvp)->tv_usec; \
+        if ((vvp)->tv_usec >= 1000000) {                  \
+            (vvp)->tv_sec++;                              \
+            (vvp)->tv_usec -= 1000000;                    \
+        }                                                 \
+    } while (0)
+#define timersub(tvp, uvp, vvp)                           \
+    do {                                                  \
+        (vvp)->tv_sec = (tvp)->tv_sec - (uvp)->tv_sec;    \
+        (vvp)->tv_usec = (tvp)->tv_usec - (uvp)->tv_usec; \
+        if ((vvp)->tv_usec < 0) {                         \
+            (vvp)->tv_sec--;                              \
+            (vvp)->tv_usec += 1000000;                    \
+        }                                                 \
+    } while (0)
 
 #endif /* __BSD_VISIBLE */
 
 #if __GNU_VISIBLE
-int futimesat (int, const char *, const struct timeval [2]);
+int futimesat(int, const char *, const struct timeval[2]);
 #endif
 
 #include <machine/_time.h>

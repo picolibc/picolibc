@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/sqrt.h"
 
-double sqrt(double in)
+double
+sqrt(double in)
 {
     return _sqrt(in);
 }

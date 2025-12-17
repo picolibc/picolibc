@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _COPYSIGN_H_
-#define _COPYSIGN_H_	1
+#define _COPYSIGN_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -39,10 +39,11 @@
 /* copysign - produces a value with the magnitude of x and the
  * sign of y.
  */
-static __inline double _copysign(double x, double y)
+static __inline double
+_copysign(double x, double y)
 {
-  return (spu_extract(spu_sel(spu_promote(x, 0), spu_promote(y, 0),
-                              VEC_SPLAT_U64(0x8000000000000000ULL)), 0));
+    return (spu_extract(
+        spu_sel(spu_promote(x, 0), spu_promote(y, 0), VEC_SPLAT_U64(0x8000000000000000ULL)), 0));
 }
 
 #endif /* _COPYSIGN_H_ */

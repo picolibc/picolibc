@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-cosh.h"
-#define TEST_FUNC       cosh
+#define TEST_VECTORS "test-cosh.h"
+#define TEST_FUNC    cosh
 
 #include "test-real-one.h"

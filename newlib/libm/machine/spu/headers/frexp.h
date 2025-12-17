@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FREXP_H_
-#define _FREXP_H_	1
+#define _FREXP_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -41,34 +41,35 @@
  * fraction and 0 exponent. The results are undefined for infinities
  * and NaNs (double precision only).
  */
-static __inline double _frexp(double x, int *pexp)
+static __inline double
+_frexp(double x, int *pexp)
 {
-  vec_int4 exp;
-  vec_uint4 denorm, mask;
-  vec_double2 in, mant;
-  vec_double2 half = VEC_SPLAT_F64(0.5);
-  vec_ullong2 exp_mask = VEC_SPLAT_U64(0x7FF0000000000000ULL);
+    vec_int4    exp;
+    vec_uint4   denorm, mask;
+    vec_double2 in, mant;
+    vec_double2 half = VEC_SPLAT_F64(0.5);
+    vec_ullong2 exp_mask = VEC_SPLAT_U64(0x7FF0000000000000ULL);
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Normalize the mantissa (fraction part).
-   */
-  mant = spu_sel(in, half, exp_mask);
+    /* Normalize the mantissa (fraction part).
+     */
+    mant = spu_sel(in, half, exp_mask);
 
-  /* Zero the mantissa if the input is a denorm or zero
-   */
-  exp = spu_and(spu_rlmask((vec_int4)in, -20), 0x7FF);
-  denorm = spu_cmpeq(exp, 0);
-  mask = spu_shuffle(denorm, denorm, VEC_SPLAT_U8(0));
-  mant = spu_andc(mant, (vec_double2)mask);
+    /* Zero the mantissa if the input is a denorm or zero
+     */
+    exp = spu_and(spu_rlmask((vec_int4)in, -20), 0x7FF);
+    denorm = spu_cmpeq(exp, 0);
+    mask = spu_shuffle(denorm, denorm, VEC_SPLAT_U8(0));
+    mant = spu_andc(mant, (vec_double2)mask);
 
-  /* Zero exponent if zero or denorm input. Otherwise, compute
-   * exponent by removing the bias.
-   */
-  exp = spu_andc(spu_add(exp, -1022), (vec_int4)mask);
+    /* Zero exponent if zero or denorm input. Otherwise, compute
+     * exponent by removing the bias.
+     */
+    exp = spu_andc(spu_add(exp, -1022), (vec_int4)mask);
 
-  *pexp = spu_extract(exp, 0);
+    *pexp = spu_extract(exp, 0);
 
-  return (spu_extract(mant, 0));
+    return (spu_extract(mant, 0));
 }
 #endif /* _FREXPF_H_ */

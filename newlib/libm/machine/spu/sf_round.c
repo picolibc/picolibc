@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/roundf.h"
 
-float roundf(float x)
+float
+roundf(float x)
 {
     return _roundf(x);
 }

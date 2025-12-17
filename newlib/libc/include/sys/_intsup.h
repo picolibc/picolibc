@@ -11,7 +11,7 @@
 
 #include <sys/features.h>
 
-#if __GNUC_PREREQ (3, 2)
+#if __GNUC_PREREQ(3, 2)
 /* gcc > 3.2 implicitly defines the values we are interested */
 #define __STDINT_EXP(x) __##x##__
 #else
@@ -32,7 +32,7 @@
    ?(signed|unsigned) long long == 8
    ?(signed|unsigned) long long int == 10
  */
-#if __GNUC_PREREQ (4, 4)
+#if __GNUC_PREREQ(4, 4)
 #pragma push_macro("signed")
 #pragma push_macro("unsigned")
 #pragma push_macro("char")
@@ -50,14 +50,14 @@
 #undef __int20
 #undef __int20__
 #undef long
-#define signed +0
-#define unsigned +0
-#define char +0
-#define short +1
-#define __int20 +2
+#define signed    +0
+#define unsigned  +0
+#define char      +0
+#define short     +1
+#define __int20   +2
 #define __int20__ +2
-#define int +2
-#define long +4
+#define int       +2
+#define long      +4
 #if (__INTPTR_TYPE__ == 8 || __INTPTR_TYPE__ == 10)
 #define _INTPTR_EQ_LONGLONG
 #elif (__INTPTR_TYPE__ == 4 || __INTPTR_TYPE__ == 6)
@@ -189,7 +189,7 @@
 #undef short
 #undef int
 #undef long
-#if __GNUC_PREREQ (4, 4)
+#if __GNUC_PREREQ(4, 4)
 #pragma pop_macro("signed")
 #pragma pop_macro("unsigned")
 #pragma pop_macro("char")

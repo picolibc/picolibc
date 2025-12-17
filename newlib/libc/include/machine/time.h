@@ -9,8 +9,8 @@ duplicated in all such forms.
 This file is distributed WITHOUT ANY WARRANTY; without even the implied
 warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  */
-#ifndef	_MACHTIME_H_
-#define	_MACHTIME_H_
+#ifndef _MACHTIME_H_
+#define _MACHTIME_H_
 
 #if defined(__rtems__) || defined(__VISIUM__) || defined(__riscv)
 #define _CLOCKS_PER_SEC_ 1000000
@@ -20,7 +20,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __SPU__
 #include <sys/_timespec.h>
-int nanosleep (const struct timespec *, struct timespec *);
+int nanosleep(const struct timespec *, struct timespec *);
 #endif
 
-#endif	/* _MACHTIME_H_ */
+#endif /* _MACHTIME_H_ */

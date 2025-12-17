@@ -43,68 +43,80 @@
 #include <errno.h>
 #include <stdint.h>
 
-#define HIGH_SURROGATE_FIRST    0xd800
-#define HIGH_SURROGATE_LAST     0xdbff
-#define LOW_SURROGATE_FIRST     0xdc00
-#define LOW_SURROGATE_LAST      0xdfff
+#define HIGH_SURROGATE_FIRST 0xd800
+#define HIGH_SURROGATE_LAST  0xdbff
+#define LOW_SURROGATE_FIRST  0xdc00
+#define LOW_SURROGATE_LAST   0xdfff
 
-static inline bool char8_is_one_byte(char8_t c)
+static inline bool
+char8_is_one_byte(char8_t c)
 {
     return c <= 0x7f;
 }
 
-static inline bool char8_is_first_byte(char8_t c)
+static inline bool
+char8_is_first_byte(char8_t c)
 {
     /* don't need to check for <= 0xff because of char8_t range */
     return 0xc0 <= c;
 }
 
-static inline bool char8_is_continuation_byte(char8_t c)
+static inline bool
+char8_is_continuation_byte(char8_t c)
 {
     return 0x80 <= c && c <= 0xbf;
 }
 
-static inline bool char16_is_surrogate(char16_t c)
+static inline bool
+char16_is_surrogate(char16_t c)
 {
     return HIGH_SURROGATE_FIRST <= c && c <= LOW_SURROGATE_LAST;
 }
 
-static inline bool char16_is_high_surrogate(char16_t c)
+static inline bool
+char16_is_high_surrogate(char16_t c)
 {
     return HIGH_SURROGATE_FIRST <= c && c <= HIGH_SURROGATE_LAST;
 }
 
-static inline bool char16_is_low_surrogate(char16_t c)
+static inline bool
+char16_is_low_surrogate(char16_t c)
 {
     return LOW_SURROGATE_FIRST <= c && c <= LOW_SURROGATE_LAST;
 }
 
-static inline bool char32_is_one_byte(char32_t c)
+static inline bool
+char32_is_one_byte(char32_t c)
 {
     return c <= 0x7f;
 }
 
-static inline bool char32_is_surrogate(char32_t c)
+static inline bool
+char32_is_surrogate(char32_t c)
 {
     return HIGH_SURROGATE_FIRST <= c && c <= LOW_SURROGATE_LAST;
 }
 
-static inline bool char32_needs_surrogates(char32_t c)
+static inline bool
+char32_needs_surrogates(char32_t c)
 {
     return 0x10000 <= c;
 }
 
-static inline bool char32_is_high_surrogate(char32_t c)
+static inline bool
+char32_is_high_surrogate(char32_t c)
 {
     return HIGH_SURROGATE_FIRST <= c && c <= HIGH_SURROGATE_LAST;
 }
 
-static inline bool char32_is_low_surrogate(char32_t c)
+static inline bool
+char32_is_low_surrogate(char32_t c)
 {
     return LOW_SURROGATE_FIRST <= c && c <= LOW_SURROGATE_LAST;
 }
 
-static inline bool char32_is_valid(char32_t c)
+static inline bool
+char32_is_valid(char32_t c)
 {
     return c <= 0x10ffff && !char32_is_surrogate(c);
 }

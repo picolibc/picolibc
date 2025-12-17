@@ -37,13 +37,12 @@
 #include "posix-local.h"
 
 ssize_t
-strfmon_l(char *__restrict buf, size_t size, locale_t locale,
-          const char *__restrict format, ...)
+strfmon_l(char * __restrict buf, size_t size, locale_t locale, const char * __restrict format, ...)
 {
     va_list ap;
     ssize_t ret;
 
-    (void) locale;
+    (void)locale;
     va_start(ap, format);
     ret = __vstrfmon(buf, size, format, ap);
     va_end(ap);

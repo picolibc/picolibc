@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<islower>>, <<islower_l>>---lowercase character predicate
+        <<islower>>, <<islower_l>>---lowercase character predicate
 
 INDEX
-	islower
+        islower
 
 INDEX
-	islower_l
+        islower_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int islower(int <[c]>);
+        #include <ctype.h>
+        int islower(int <[c]>);
 
-	#include <ctype.h>
-	int islower_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int islower_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<islower>> is a macro which classifies singlebyte charset values by table
@@ -70,11 +70,11 @@ No supporting OS subroutines are required.
 
 #undef islower
 int
-islower (int c)
+islower(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return 'a' <= c && c <= 'z';
 #else
-    return ((__CTYPE_PTR[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER)) == __CTYPE_LOWER);
+    return ((__CTYPE_PTR[c + 1] & (__CTYPE_UPPER | __CTYPE_LOWER)) == __CTYPE_LOWER);
 #endif
 }

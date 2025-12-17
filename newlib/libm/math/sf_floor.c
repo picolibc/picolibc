@@ -27,7 +27,7 @@
 float
 floorf(float x)
 {
-    __int32_t i0, j0;
+    __int32_t  i0, j0;
     __uint32_t i, ix;
     GET_FLOAT_WORD(i0, x);
     ix = (i0 & 0x7fffffff);

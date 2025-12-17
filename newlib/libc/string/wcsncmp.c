@@ -1,26 +1,26 @@
 /*
 FUNCTION
-	<<wcsncmp>>---compare part of two wide-character strings 
+        <<wcsncmp>>---compare part of two wide-character strings
 
 SYNOPSIS
-	#include <wchar.h>
-	int wcsncmp(const wchar_t *<[s1]>, const wchar_t *<[s2]>, size_t <[n]>);
+        #include <wchar.h>
+        int wcsncmp(const wchar_t *<[s1]>, const wchar_t *<[s2]>, size_t <[n]>);
 
 DESCRIPTION
-	The <<wcsncmp>> function compares not more than <[n]> wide-character
-	codes (wide-character codes that follow a null wide-character code are
-	not compared) from the array pointed to by <[s1]> to the array pointed
-	to by <[s2]>.
+        The <<wcsncmp>> function compares not more than <[n]> wide-character
+        codes (wide-character codes that follow a null wide-character code are
+        not compared) from the array pointed to by <[s1]> to the array pointed
+        to by <[s2]>.
 
-	The sign of a non-zero return value is determined by the sign of the
-	difference between the values of the first pair of wide-character codes
-	that differ in the objects being compared. 
+        The sign of a non-zero return value is determined by the sign of the
+        difference between the values of the first pair of wide-character codes
+        that differ in the objects being compared.
 
 RETURNS
-	Upon successful completion, <<wcsncmp>> returns an integer greater than,
-	equal to or less than 0, if the possibly null-terminated array pointed
-	to by <[s1]> is greater than, equal to or less than the possibly
-	null-terminated array pointed to by <[s2]> respectively. 
+        Upon successful completion, <<wcsncmp>> returns an integer greater than,
+        equal to or less than 0, if the possibly null-terminated array pointed
+        to by <[s1]> is greater than, equal to or less than the possibly
+        null-terminated array pointed to by <[s2]> respectively.
 
 PORTABILITY
 <<wcsncmp>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -62,22 +62,17 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 int
-wcsncmp (const wchar_t * s1,
-	const wchar_t * s2,
-	size_t n)
+wcsncmp(const wchar_t *s1, const wchar_t *s2, size_t n)
 {
 
-  if (n == 0)
+    if (n == 0)
+        return (0);
+    do {
+        if (*s1 != *s2++) {
+            return (*s1 < *--s2 ? -1 : 1);
+        }
+        if (*s1++ == 0)
+            break;
+    } while (--n != 0);
     return (0);
-  do
-    {
-      if (*s1 != *s2++)
-	{
-          return (*s1 < *--s2 ? -1 : 1);
-	}
-      if (*s1++ == 0)
-	break;
-    }
-  while (--n != 0);
-  return (0);
 }

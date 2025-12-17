@@ -37,12 +37,12 @@
 
 #ifdef _NEED_FLOAT_HUGE
 
-#define type		long double
-#define	roundit		roundl
-#define dtype		long
-#define	DTYPE_MIN	LONG_MIN
-#define	DTYPE_MAX	LONG_MAX
-#define	fn		lroundl
+#define type      long double
+#define roundit   roundl
+#define dtype     long
+#define DTYPE_MIN LONG_MIN
+#define DTYPE_MAX LONG_MAX
+#define fn        lroundl
 
 #include "common/s_lround.c"
 

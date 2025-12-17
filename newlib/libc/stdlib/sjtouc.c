@@ -84,7 +84,7 @@ __shift_jis_to_unicode(uint16_t shift_jis)
         return WEOF;
     }
 
-    return __euc_jp_to_unicode(((uint16_t) byte1 << 8) | byte2);
+    return __euc_jp_to_unicode(((uint16_t)byte1 << 8) | byte2);
 }
 
 #endif /* __MB_EXTENDED_CHARSETS_JIS */

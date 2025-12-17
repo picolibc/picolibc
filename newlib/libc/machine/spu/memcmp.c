@@ -38,8 +38,9 @@
  * than, equal to, or greater than zero if s1 is found, respectively,
  * to be less than, to match, or be greater than s2.
  */
-int memcmp(const void *s1, const void *s2, size_t n)
+int
+memcmp(const void *s1, const void *s2, size_t n)
 {
-  vec_uint4 end_v;
-  return _strncmp_internal (s1, s2, n, &end_v, 0 /* no zero check */);
+    vec_uint4 end_v;
+    return _strncmp_internal(s1, s2, n, &end_v, 0 /* no zero check */);
 }

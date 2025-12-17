@@ -44,5 +44,5 @@
 ssize_t
 write(int fd, const void *buf, size_t count)
 {
-    return m68k_semihost3(HOSTED_WRITE, fd, (uintptr_t) buf, count);
+    return m68k_semihost3(HOSTED_WRITE, fd, (uintptr_t)buf, count);
 }

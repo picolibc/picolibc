@@ -35,16 +35,16 @@
 
 #include "fdlibm.h"
 
-float getpayloadf(const float *x)
+float
+getpayloadf(const float *x)
 {
     __int32_t ix;
     GET_FLOAT_WORD(ix, *x);
 
-    if ((ix & 0x7f800000) != 0x7f800000 ||
-        ((ix & 0x7fffff) == 0))
+    if ((ix & 0x7f800000) != 0x7f800000 || ((ix & 0x7fffff) == 0))
         return -1;
     ix &= 0x3fffff;
-    return (float) ix;
+    return (float)ix;
 }
 
 _MATH_ALIAS_f_F(getpayload)

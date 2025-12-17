@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -38,10 +38,10 @@
 float complex
 clogf(float complex z)
 {
-	float p, rr;
+    float p, rr;
 
-	rr = cabsf(z);
-	p = logf(rr);
-	rr = atan2f(cimagf(z), crealf(z));
-	return (float complex) p + rr * I;
+    rr = cabsf(z);
+    p = logf(rr);
+    rr = atan2f(cimagf(z), crealf(z));
+    return (float complex)p + rr * I;
 }

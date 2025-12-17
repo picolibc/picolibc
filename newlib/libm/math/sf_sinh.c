@@ -20,7 +20,7 @@ static const float one = 1.0;
 float
 sinhf(float x)
 {
-    float t, w, h;
+    float     t, w, h;
     __int32_t ix, jx;
 
     GET_FLOAT_WORD(jx, x);
@@ -34,8 +34,8 @@ sinhf(float x)
     if (jx < 0)
         h = -h;
     /* |x| in [0,22], return sign(x)*0.5*(E+E/(E+1))) */
-    if (ix < 0x41b00000) { /* |x|<22 */
-        if (ix < 0x31800000) /* |x|<2**-28 */
+    if (ix < 0x41b00000) {             /* |x|<22 */
+        if (ix < 0x31800000)           /* |x|<2**-28 */
             return __math_inexactf(x); /* sinh(tiny) = tiny with inexact */
         t = expm1f(fabsf(x));
         if (ix < 0x3f800000)

@@ -39,10 +39,7 @@
 #include <stdlib.h>
 
 void
-__ubsan_warning(struct source_location *source,
-                const char *fail,
-                const char *fmt,
-                ...)
+__ubsan_warning(struct source_location *source, const char *fail, const char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);

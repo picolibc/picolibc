@@ -15,13 +15,13 @@
 #include "rand48.h"
 
 double
-_drand48_r (struct _rand48 *r)
+_drand48_r(struct _rand48 *r)
 {
-  return _erand48_r(r, r->_seed);
+    return _erand48_r(r, r->_seed);
 }
 
 double
-drand48 (void)
+drand48(void)
 {
-  return _drand48_r (&_rand48);
+    return _drand48_r(&_rand48);
 }

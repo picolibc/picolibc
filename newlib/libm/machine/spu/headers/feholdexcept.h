@@ -31,22 +31,23 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FEHOLDEXCEPT_H_
-#define _FEHOLDEXCEPT_H_	1
+#define _FEHOLDEXCEPT_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline int _feholdexcept(fenv_t *envp)
+static __inline int
+_feholdexcept(fenv_t *envp)
 {
-  vec_uint4 fpscr;
-  fenv_t env;
+    vec_uint4 fpscr;
+    fenv_t    env;
 
-  fpscr = spu_mffpscr();
-  *envp = __pack_fpscr(fpscr);
-  env = *envp & ~FE_ALL_EXCEPT;
-  spu_mtfpscr(__unpack_fpscr(env));
-  return (0);
+    fpscr = spu_mffpscr();
+    *envp = __pack_fpscr(fpscr);
+    env = *envp & ~FE_ALL_EXCEPT;
+    spu_mtfpscr(__unpack_fpscr(env));
+    return (0);
 }
 
 #endif /* _FEHOLDEXCEPT_H_ */

@@ -21,7 +21,7 @@ static const float one = 1.0;
 float
 atanhf(float x)
 {
-    float t;
+    float     t;
     __int32_t hx, ix;
     GET_FLOAT_WORD(hx, x);
     ix = hx & 0x7fffffff;

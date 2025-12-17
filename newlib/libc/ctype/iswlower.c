@@ -25,25 +25,25 @@ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<iswlower>>, <<iswlower_l>>---lowercase wide character test
+        <<iswlower>>, <<iswlower_l>>---lowercase wide character test
 
 INDEX
-	iswlower
+        iswlower
 
 INDEX
-	iswlower_l
+        iswlower_l
 
 SYNOPSIS
-	#include <wctype.h>
-	int iswlower(wint_t <[c]>);
+        #include <wctype.h>
+        int iswlower(wint_t <[c]>);
 
-	#include <wctype.h>
-	int iswlower_l(wint_t <[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        int iswlower_l(wint_t <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<iswlower>> is a function which classifies wide-character values that
@@ -67,11 +67,11 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-iswlower (wint_t c)
+iswlower(wint_t c)
 {
 #ifdef __MB_CAPABLE
-  return iswlower_l (c, 0);
+    return iswlower_l(c, 0);
 #else
-  return c < (wint_t)0x100 ? islower (c) : 0;
+    return c < (wint_t)0x100 ? islower(c) : 0;
 #endif
 }

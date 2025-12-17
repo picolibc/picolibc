@@ -36,38 +36,33 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  const char *file;
-  unsigned int pad0[ 3 ];
-  const char *mode;
-  unsigned int pad1[ 3 ];
-  int fp;
+typedef struct {
+    const char  *file;
+    unsigned int pad0[3];
+    const char  *mode;
+    unsigned int pad1[3];
+    int          fp;
 } c99_freopen_t;
 
-
 FILE *
-freopen (const char *__restrict file,
-	const char *__restrict mode,
-	FILE *__restrict fp)
+freopen(const char * __restrict file, const char * __restrict mode, FILE * __restrict fp)
 {
-  int ret;
-  c99_freopen_t args;
+    int           ret;
+    c99_freopen_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.file = file;
-  args.mode = mode;
-  args.fp = fp->_fp;
+    args.file = file;
+    args.mode = mode;
+    args.fp = fp->_fp;
 
-  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREOPEN, &args);
+    ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FREOPEN, &args);
 
-  if (ret) {
-    fp->_fp = ret;
-    return fp;
-  }
-  else {
-    __sfp_free(fp);
-    return NULL;
-  }
+    if (ret) {
+        fp->_fp = ret;
+        return fp;
+    } else {
+        __sfp_free(fp);
+        return NULL;
+    }
 }

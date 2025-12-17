@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/ldexpf.h"
 
-float ldexpf(float x, int exp)
+float
+ldexpf(float x, int exp)
 {
     return _ldexpf(x, exp);
 }

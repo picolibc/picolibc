@@ -40,5 +40,5 @@
 void
 _set_tls(void *tls)
 {
-    __asm__("or $tp,%0,$r0" : : "r" (tls));
+    __asm__("or $tp,%0,$r0" : : "r"(tls));
 }

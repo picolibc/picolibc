@@ -38,49 +38,45 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <spu_cache.h>
 
 static __ea char *
-similie_ls_to_ea (char *l1, __ea char *ea1, char *l2)
+similie_ls_to_ea(char *l1, __ea char *ea1, char *l2)
 {
-  return (__ea char *) ((size_ea_t) ea1 +
-			((size_ea_t) (int) l2 - (size_ea_t) (int) l1));
+    return (__ea char *)((size_ea_t)ea1 + ((size_ea_t)(int)l2 - (size_ea_t)(int)l1));
 }
 
-COMPAT_EA_ALIAS (strrchr_ea);
+COMPAT_EA_ALIAS(strrchr_ea);
 
 __ea char *
-strrchr_ea (__ea const char *s, int c)
+strrchr_ea(__ea const char *s, int c)
 {
-  size_ea_t string_length;
-  char *curr_ptr;
-  __ea char *string_start_local;
-  __ea char *end_of_string_ea;
-  __ea char *start_of_cacheline_ea;
-  char *start_of_cachline_local;
+    size_ea_t  string_length;
+    char      *curr_ptr;
+    __ea char *string_start_local;
+    __ea char *end_of_string_ea;
+    __ea char *start_of_cacheline_ea;
+    char      *start_of_cachline_local;
 
-  string_start_local = __cache_fetch ((__ea char *) s);
-  string_length = strlen_ea (s);
-  end_of_string_ea = (__ea char *) s + string_length;
+    string_start_local = __cache_fetch((__ea char *)s);
+    string_length = strlen_ea(s);
+    end_of_string_ea = (__ea char *)s + string_length;
 
-  start_of_cacheline_ea = round_down_128_ea (end_of_string_ea - 1);
-  start_of_cachline_local = __cache_fetch (start_of_cacheline_ea);
-  /*this next line should be the same cacheline, just the end of the string */
-  curr_ptr = __cache_fetch (end_of_string_ea - 1);
+    start_of_cacheline_ea = round_down_128_ea(end_of_string_ea - 1);
+    start_of_cachline_local = __cache_fetch(start_of_cacheline_ea);
+    /*this next line should be the same cacheline, just the end of the string */
+    curr_ptr = __cache_fetch(end_of_string_ea - 1);
 
-  while (1)
-    {
-      /*search backwards through this cachline */
-      while (curr_ptr >= start_of_cachline_local)
-	{
-	  if (*curr_ptr == (char) c)
-	    return similie_ls_to_ea (start_of_cachline_local,
-				     start_of_cacheline_ea, curr_ptr);
-	  curr_ptr--;
-	  if (curr_ptr < string_start_local)
-	    return NULL;
-	}
+    while (1) {
+        /*search backwards through this cachline */
+        while (curr_ptr >= start_of_cachline_local) {
+            if (*curr_ptr == (char)c)
+                return similie_ls_to_ea(start_of_cachline_local, start_of_cacheline_ea, curr_ptr);
+            curr_ptr--;
+            if (curr_ptr < string_start_local)
+                return NULL;
+        }
 
-      /* iterate cacheline backwards */
-      start_of_cacheline_ea -= 128;
-      start_of_cachline_local = __cache_fetch (start_of_cacheline_ea);
-      curr_ptr = __cache_fetch (start_of_cacheline_ea + 128);
+        /* iterate cacheline backwards */
+        start_of_cacheline_ea -= 128;
+        start_of_cachline_local = __cache_fetch(start_of_cacheline_ea);
+        curr_ptr = __cache_fetch(start_of_cacheline_ea + 128);
     }
 }

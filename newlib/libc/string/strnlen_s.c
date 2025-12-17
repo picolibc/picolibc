@@ -41,7 +41,7 @@ size_t
 strnlen_s(const char *s, size_t maxsize)
 {
     const void *s_end;
-    size_t rtn = 0;
+    size_t      rtn = 0;
 
     if (s == NULL) {
         rtn = 0;
@@ -52,7 +52,7 @@ strnlen_s(const char *s, size_t maxsize)
             rtn = maxsize;
         } else {
             ptrdiff_t s_size;
-            s_size = (const char *) s_end - s;
+            s_size = (const char *)s_end - s;
             rtn = (size_t)s_size;
         }
     }

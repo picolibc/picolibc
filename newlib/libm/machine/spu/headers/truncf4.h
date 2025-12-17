@@ -38,12 +38,12 @@
 /* EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              */
 /* --------------------------------------------------------------  */
 /* PROLOG END TAG zYx                                              */
-#ifdef __SPU__    
+#ifdef __SPU__
 #ifndef _TRUNCF4_H_
-#define _TRUNCF4_H_	1
-    
+#define _TRUNCF4_H_ 1
+
 #include <spu_intrinsics.h>
-    
+
 /*
  * FUNCTION
  *      vector float _truncf4(vector float x)
@@ -53,27 +53,28 @@
  *      downwards (towards zero) to the nearest integer.
  *
  */
-static __inline vector float _truncf4(vector float x) 
+static __inline vector float
+_truncf4(vector float x)
 {
-  vec_int4 exp;
-  vec_uint4 or_mask, and_mask, mask;
-  vec_float4 out;
-    
-  // Construct a mask to remove the fraction bits. The mask
-  // depends on the exponent of the floating point
-  // input value.
-  exp = spu_sub(127, spu_and(spu_rlmask((vec_int4) x, -23), 0xFF));
+    vec_int4   exp;
+    vec_uint4  or_mask, and_mask, mask;
+    vec_float4 out;
 
-  // Be sure to always preserve the sign bit
-  or_mask = spu_rlmask(spu_cmpgt(exp, 0),-1);
+    // Construct a mask to remove the fraction bits. The mask
+    // depends on the exponent of the floating point
+    // input value.
+    exp = spu_sub(127, spu_and(spu_rlmask((vec_int4)x, -23), 0xFF));
 
-  and_mask = spu_rlmask(spu_splats((unsigned int)0x7FFFFF), exp);
-  mask = spu_or(spu_and(and_mask, spu_cmpgt(exp, -31)), or_mask);
-    
-  // Apply the mask and return the result.
-    
-  out = spu_andc(x, (vec_float4) (mask));
-  return (out);
+    // Be sure to always preserve the sign bit
+    or_mask = spu_rlmask(spu_cmpgt(exp, 0), -1);
+
+    and_mask = spu_rlmask(spu_splats((unsigned int)0x7FFFFF), exp);
+    mask = spu_or(spu_and(and_mask, spu_cmpgt(exp, -31)), or_mask);
+
+    // Apply the mask and return the result.
+
+    out = spu_andc(x, (vec_float4)(mask));
+    return (out);
 }
 #endif /* _TRUNCF4_H_ */
 #endif /* __SPU__ */

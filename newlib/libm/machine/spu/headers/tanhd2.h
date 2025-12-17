@@ -44,28 +44,26 @@
 #include "expd2.h"
 #include "divd2.h"
 
-
 /*
  * Taylor coefficients for tanh
  */
-#define TANH_TAY01   1.000000000000000000000000000000E0
-#define TANH_TAY02  -3.333333333333333333333333333333E-1
-#define TANH_TAY03   1.333333333333333333333333333333E-1
-#define TANH_TAY04  -5.396825396825396825396825396825E-2
-#define TANH_TAY05   2.186948853615520282186948853616E-2
-#define TANH_TAY06  -8.863235529902196568863235529902E-3
-#define TANH_TAY07   3.592128036572481016925461369906E-3
-#define TANH_TAY08  -1.455834387051318268249485180702E-3
-#define TANH_TAY09   5.900274409455859813780759937000E-4
-#define TANH_TAY10  -2.391291142435524814857314588851E-4
-#define TANH_TAY11   9.691537956929450325595875000389E-5
-#define TANH_TAY12  -3.927832388331683405337080809312E-5
-#define TANH_TAY13   1.591890506932896474074427981657E-5
-#define TANH_TAY14  -6.451689215655430763190842315303E-6
-#define TANH_TAY15   2.614771151290754554263594256410E-6
-#define TANH_TAY16  -1.059726832010465435091355394125E-6
-#define TANH_TAY17   4.294911078273805854820351280397E-7
-
+#define TANH_TAY01 1.000000000000000000000000000000E0
+#define TANH_TAY02 -3.333333333333333333333333333333E-1
+#define TANH_TAY03 1.333333333333333333333333333333E-1
+#define TANH_TAY04 -5.396825396825396825396825396825E-2
+#define TANH_TAY05 2.186948853615520282186948853616E-2
+#define TANH_TAY06 -8.863235529902196568863235529902E-3
+#define TANH_TAY07 3.592128036572481016925461369906E-3
+#define TANH_TAY08 -1.455834387051318268249485180702E-3
+#define TANH_TAY09 5.900274409455859813780759937000E-4
+#define TANH_TAY10 -2.391291142435524814857314588851E-4
+#define TANH_TAY11 9.691537956929450325595875000389E-5
+#define TANH_TAY12 -3.927832388331683405337080809312E-5
+#define TANH_TAY13 1.591890506932896474074427981657E-5
+#define TANH_TAY14 -6.451689215655430763190842315303E-6
+#define TANH_TAY15 2.614771151290754554263594256410E-6
+#define TANH_TAY16 -1.059726832010465435091355394125E-6
+#define TANH_TAY17 4.294911078273805854820351280397E-7
 
 /*
  * FUNCTION
@@ -73,7 +71,7 @@
  *
  * DESCRIPTION
  *	The _tanhd2 function computes the hyperbolic tangent for each
- *	element of the input vector. 
+ *	element of the input vector.
  *
  *	We use the following to approximate tanh:
  *
@@ -88,19 +86,20 @@
  *
  */
 
-static __inline vector double _tanhd2(vector double x)
+static __inline vector double
+_tanhd2(vector double x)
 {
-    vector double signbit = spu_splats(-0.0);
-    vector double oned    = spu_splats(1.0);
-    vector double twod    = spu_splats(2.0);
-    vector double infd  = (vector double)spu_splats(0x7FF0000000000000ull);
-    vector double xabs;
-    vector double x2;
+    vector double             signbit = spu_splats(-0.0);
+    vector double             oned = spu_splats(1.0);
+    vector double             twod = spu_splats(2.0);
+    vector double             infd = (vector double)spu_splats(0x7FF0000000000000ull);
+    vector double             xabs;
+    vector double             x2;
     vector unsigned long long gttaylor;
-    vector double e;
-    vector double tresult;
-    vector double eresult;
-    vector double result;
+    vector double             e;
+    vector double             tresult;
+    vector double             eresult;
+    vector double             result;
 
     xabs = spu_andc(x, signbit);
 
@@ -110,11 +109,10 @@ static __inline vector double _tanhd2(vector double x)
      */
     gttaylor = spu_cmpgt(xabs, spu_splats(0.25));
 
-
     /*
      * Taylor Series Approximation
      */
-    x2 = spu_mul(x,x);
+    x2 = spu_mul(x, x);
     tresult = spu_madd(x2, spu_splats(TANH_TAY11), spu_splats(TANH_TAY10));
     tresult = spu_madd(x2, tresult, spu_splats(TANH_TAY09));
     tresult = spu_madd(x2, tresult, spu_splats(TANH_TAY08));
@@ -127,15 +125,13 @@ static __inline vector double _tanhd2(vector double x)
     tresult = spu_madd(x2, tresult, spu_splats(TANH_TAY01));
     tresult = spu_mul(xabs, tresult);
 
-
     /*
      * Exponential Formula
-     * Our expd2 function gives a more accurate result in general 
+     * Our expd2 function gives a more accurate result in general
      * with xabs instead of x for x<0. We correct for sign later.
      */
     e = _expd2(spu_mul(xabs, twod));
     eresult = _divd2(spu_sub(e, oned), spu_add(e, oned));
-
 
     /*
      * Select Taylor or exp result.

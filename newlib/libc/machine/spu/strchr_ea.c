@@ -37,13 +37,13 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <spu_cache.h>
 
-COMPAT_EA_ALIAS (strchr_ea);
+COMPAT_EA_ALIAS(strchr_ea);
 
 __ea char *
-strchr_ea (__ea const char *s, int c)
+strchr_ea(__ea const char *s, int c)
 {
-  size_ea_t size;
+    size_ea_t size;
 
-  size = strlen_ea (s);
-  return (char *) memchr_ea (s, c, size);
+    size = strlen_ea(s);
+    return (char *)memchr_ea(s, c, size);
 }

@@ -36,18 +36,16 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-
 void
-rewind (FILE * fp)
+rewind(FILE *fp)
 {
-  int ret;
+    int ret;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  ret = fp->_fp;
+    ret = fp->_fp;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_REWIND, &ret);
+    __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_REWIND, &ret);
 
-  return;
+    return;
 }
-

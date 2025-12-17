@@ -38,13 +38,13 @@
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32
 
 float
-fmaxf (float x, float y)
+fmaxf(float x, float y)
 {
     float result;
     if (issignaling(x) || issignaling(y))
         return x + y;
 
-    __asm__("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
+    __asm__("fmax.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
     return result;
 }
 

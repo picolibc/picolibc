@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fabs.h"
 
-double fabs(double x)
+double
+fabs(double x)
 {
     return _fabs(x);
 }

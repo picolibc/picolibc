@@ -21,10 +21,11 @@
 
 #include "fdlibm.h"
 
-static const float one = 1.0, Zero[] = {
-    0.0,
-    -0.0,
-};
+static const float one = 1.0,
+                   Zero[] = {
+                       0.0,
+                       -0.0,
+                   };
 
 float
 fmodf(float x, float y)
@@ -34,8 +35,8 @@ fmodf(float x, float y)
     GET_FLOAT_WORD(hx, x);
     GET_FLOAT_WORD(hy, y);
     sx = hx & 0x80000000; /* sign of x */
-    hx ^= sx; /* |x| */
-    hy &= 0x7fffffff; /* |y| */
+    hx ^= sx;             /* |x| */
+    hy &= 0x7fffffff;     /* |y| */
 
     /* purge off exception values */
     if (isnan(x) || isnan(y)) /* x or y nan, return nan */
@@ -111,7 +112,7 @@ fmodf(float x, float y)
         SET_FLOAT_WORD(x, hx | sx);
     } else { /* subnormal output */
         /* If denormals are not supported, this code will generate a
-	       zero representation.  */
+               zero representation.  */
         n = -126 - iy;
         hx >>= n;
         SET_FLOAT_WORD(x, hx | sx);

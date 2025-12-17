@@ -31,7 +31,7 @@
 */
 
 #define strtoi_type uintmax_t
-#define strtoi_max UINTMAX_MAX
+#define strtoi_max  UINTMAX_MAX
 #undef strtoi_signed
 #ifdef WIDE_CHARS
 #define strtoi wcstoumax

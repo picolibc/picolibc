@@ -38,5 +38,5 @@
 float
 nanf(const char *unused)
 {
-	return 0;
+    return 0;
 }

@@ -35,13 +35,11 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #undef putchar
 
-
 int
-putchar (c)
-     int c;
+    putchar(c)
+int c;
 {
-  /* c gets overwritten before return */
+    /* c gets overwritten before return */
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTCHAR, &c);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_PUTCHAR, &c);
 }
-

@@ -42,10 +42,7 @@
 static __THREAD_LOCAL char fcvtf_buf[FCVTF_MAXDIG];
 
 char *
-fcvtf (float invalue,
-       int ndecimal,
-       int *decpt,
-       int *sign)
+fcvtf(float invalue, int ndecimal, int *decpt, int *sign)
 {
     if (fcvtf_r(invalue, ndecimal, decpt, sign, fcvtf_buf, sizeof(fcvtf_buf)) < 0)
         return NULL;

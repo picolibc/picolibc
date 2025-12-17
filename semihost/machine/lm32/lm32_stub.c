@@ -38,17 +38,16 @@
 #include <sys/stat.h>
 
 int
-fstat (int fd, struct stat *sbuf)
+fstat(int fd, struct stat *sbuf)
 {
-        (void) fd;
-        (void) sbuf;
-	return -1;
+    (void)fd;
+    (void)sbuf;
+    return -1;
 }
 
 int
-isatty (int fd)
+isatty(int fd)
 {
-        (void) fd;
-	return 1;
+    (void)fd;
+    return 1;
 }
-

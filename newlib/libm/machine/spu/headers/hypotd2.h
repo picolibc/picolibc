@@ -38,7 +38,7 @@
 #ifdef __SPU__
 
 #ifndef _HYPOTD2_H_
-#define _HYPOTD2_H_	1
+#define _HYPOTD2_H_ 1
 
 #include <spu_intrinsics.h>
 #include "sqrtd2.h"
@@ -48,14 +48,14 @@
  *       vector double hypotd2(vector double x, vector double y)
  *
  * DESCRIPTION
- *     The function hypotd2 returns a double vector in which each element is 
- *     the square root of the sum of the squares of the corresponding 
- *     elements of x and y. 
- *  
+ *     The function hypotd2 returns a double vector in which each element is
+ *     the square root of the sum of the squares of the corresponding
+ *     elements of x and y.
+ *
  *     The purpose of this function is to avoid overflow during
- *     intermediate calculations, and therefore it is slower than 
+ *     intermediate calculations, and therefore it is slower than
  *     simply calcualting sqrt(x^2 + y^2).
- *  
+ *
  *     This function is performed by factoring out the larger of the 2
  *     input exponents and moving this factor outside of the sqrt calculation.
  *     This will minimize the possibility of over/underflow when the square
@@ -68,27 +68,28 @@
  *	- hypot(+/- infinity, NaN)    returns +infinity
  *
  */
-static __inline vector double _hypotd2(vector double x, vector double y)
+static __inline vector double
+_hypotd2(vector double x, vector double y)
 {
     vector unsigned long long emask = spu_splats(0x7FF0000000000000ull);
     vector unsigned long long mmask = spu_splats(0x000FFFFFFFFFFFFFull);
-    vector signed   long long bias  = spu_splats(0x3FF0000000000000ll);
-    vector double oned = spu_splats(1.0);
-    vector double sbit = spu_splats(-0.0);
-    vector double inf  = (vector double)spu_splats(0x7FF0000000000000ull);
-    vector double max, max_e, max_m;
-    vector double min, min_e, min_m;
+    vector signed long long   bias = spu_splats(0x3FF0000000000000ll);
+    vector double             oned = spu_splats(1.0);
+    vector double             sbit = spu_splats(-0.0);
+    vector double             inf = (vector double)spu_splats(0x7FF0000000000000ull);
+    vector double             max, max_e, max_m;
+    vector double             min, min_e, min_m;
     vector unsigned long long xgty;
-    vector double sum;
-    vector double result;
+    vector double             sum;
+    vector double             result;
 
     /* Only need absolute values for this function */
     x = spu_andc(x, sbit);
     y = spu_andc(y, sbit);
-    xgty = spu_cmpgt(x,y);
+    xgty = spu_cmpgt(x, y);
 
-    max  = spu_sel(y,x,xgty);
-    min  = spu_sel(x,y,xgty);
+    max = spu_sel(y, x, xgty);
+    min = spu_sel(x, y, xgty);
 
     /* Extract the exponents and mantissas */
     max_e = (vec_double2)spu_and((vec_ullong2)max, emask);

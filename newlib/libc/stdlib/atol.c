@@ -9,7 +9,7 @@ All rights reserved.
 #include <stdlib.h>
 
 long
-atol (const char *s)
+atol(const char *s)
 {
-  return strtol (s, NULL, 10);
+    return strtol(s, NULL, 10);
 }

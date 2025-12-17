@@ -36,7 +36,7 @@ _BEGIN_STD_C
 #ifdef _SOFT_FLOAT
 typedef int fenv_t;
 typedef int fexcept_t;
-#define FE_TONEAREST	(0)
+#define FE_TONEAREST (0)
 #else
 
 /* Primary sources:
@@ -72,18 +72,17 @@ typedef int fexcept_t;
    uses SSE for a lot of floating-point operations.  (Cygwin assumes i686
    or above these days, as does the compiler.)  */
 
-typedef struct _fenv_t
-{
-  struct _fpu_env_info {
-    unsigned int _fpu_cw;	/* low 16 bits only. */
-    unsigned int _fpu_sw;	/* low 16 bits only. */
-    unsigned int _fpu_tagw;	/* low 16 bits only. */
-    unsigned int _fpu_ipoff;
-    unsigned int _fpu_ipsel;
-    unsigned int _fpu_opoff;
-    unsigned int _fpu_opsel;	/* low 16 bits only. */
-  } _fpu;
-  unsigned int _sse_mxcsr;
+typedef struct _fenv_t {
+    struct _fpu_env_info {
+        unsigned int _fpu_cw;   /* low 16 bits only. */
+        unsigned int _fpu_sw;   /* low 16 bits only. */
+        unsigned int _fpu_tagw; /* low 16 bits only. */
+        unsigned int _fpu_ipoff;
+        unsigned int _fpu_ipsel;
+        unsigned int _fpu_opoff;
+        unsigned int _fpu_opsel; /* low 16 bits only. */
+    } _fpu;
+    unsigned int _sse_mxcsr;
 } fenv_t;
 
 /*  Represents the floating-point status flags collectively, including
@@ -104,19 +103,18 @@ typedef __uint32_t fexcept_t;
    an integer constant expression with values such that bitwise-inclusive
    ORs of all combinations of the constants result in distinct values.  */
 
-#define FE_DIVBYZERO	(1 << 2)
-#define FE_INEXACT	(1 << 5)
-#define FE_INVALID	(1 << 0)
-#define FE_OVERFLOW	(1 << 3)
-#define FE_UNDERFLOW	(1 << 4)
+#define FE_DIVBYZERO  (1 << 2)
+#define FE_INEXACT    (1 << 5)
+#define FE_INVALID    (1 << 0)
+#define FE_OVERFLOW   (1 << 3)
+#define FE_UNDERFLOW  (1 << 4)
 
 /*  The <fenv.h> header shall define the following constant, which is
    simply the bitwise-inclusive OR of all floating-point exception
    constants defined above:  */
 
 /* in agreement w/ Linux the subnormal exception will always be masked */
-#define FE_ALL_EXCEPT \
-  (FE_INEXACT | FE_UNDERFLOW | FE_OVERFLOW | FE_DIVBYZERO | FE_INVALID)
+#define FE_ALL_EXCEPT (FE_INEXACT | FE_UNDERFLOW | FE_OVERFLOW | FE_DIVBYZERO | FE_INVALID)
 
 /*  The <fenv.h> header shall define the following constants if and only
    if the implementation supports getting and setting the represented
@@ -124,18 +122,18 @@ typedef __uint32_t fexcept_t;
    functions. Each expands to an integer constant expression whose values
    are distinct non-negative vales.  */
 
-#define FE_DOWNWARD	(1)
-#define FE_TONEAREST	(0)
-#define FE_TOWARDZERO	(3)
-#define FE_UPWARD	(2)
+#define FE_DOWNWARD   (1)
+#define FE_TONEAREST  (0)
+#define FE_TOWARDZERO (3)
+#define FE_UPWARD     (2)
 
 /* Only Solaris and QNX implement fegetprec/fesetprec.  As Solaris, use the
    values defined by http://www.open-std.org/jtc1/sc22//WG14/www/docs/n752.htm
    QNX defines different values. */
 #if __MISC_VISIBLE
-#define FE_FLTPREC	(0)
-#define FE_DBLPREC	(2)
-#define FE_LDBLPREC	(3)
+#define FE_FLTPREC  (0)
+#define FE_DBLPREC  (2)
+#define FE_LDBLPREC (3)
 #endif
 /*  Additional implementation-defined environments, with macro
    definitions beginning with FE_ and an uppercase letter,and having
@@ -147,17 +145,16 @@ typedef __uint32_t fexcept_t;
    represents an environment where every exception raised causes a trap
    to occur. You can test for this macro using #ifdef. It is only defined
    if _GNU_SOURCE is defined.  */
-extern const fenv_t *const _fe_nomask_env;
+extern const fenv_t * const _fe_nomask_env;
 #define FE_NOMASK_ENV (_fe_nomask_env)
 #endif
-
 
 #endif /* !_SOFT_FLOAT */
 
 #ifdef _SOFT_FLOAT
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
-#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#define __declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline

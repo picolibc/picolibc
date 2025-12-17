@@ -39,46 +39,47 @@
  * returns a pointer to the first occurance of c. If
  * c is not found, then NULL is returned.
  */
-char *strchr(const char *s, int c)
+char *
+strchr(const char *s, int c)
 {
-  unsigned int cmp, skip;
-  vec_uchar16 *ptr, data, vc;
-  vec_uint4 cmp_c, cmp_0;
-  vec_uint4 result;
-  vec_uint4 mask;
-  vec_uint4 one = spu_splats(0xffffU);
-  /* Scan memory array a quadword at a time. Skip leading
-   * mis-aligned bytes.
-   */
-  ptr = (vec_uchar16 *)s;
+    unsigned int cmp, skip;
+    vec_uchar16 *ptr, data, vc;
+    vec_uint4    cmp_c, cmp_0;
+    vec_uint4    result;
+    vec_uint4    mask;
+    vec_uint4    one = spu_splats(0xffffU);
+    /* Scan memory array a quadword at a time. Skip leading
+     * mis-aligned bytes.
+     */
+    ptr = (vec_uchar16 *)s;
 
-  skip = (unsigned int)(ptr) & 15;
-  mask = spu_rlmask(one, -skip);
+    skip = (unsigned int)(ptr) & 15;
+    mask = spu_rlmask(one, -skip);
 
-  vc = spu_splats((unsigned char)(c));
+    vc = spu_splats((unsigned char)(c));
 
-  data = *ptr++;
-
-  cmp_c = spu_and(spu_gather(spu_cmpeq(data, vc)), mask);
-  cmp_0 = spu_and(spu_gather(spu_cmpeq(data, 0)), mask);
-
-  cmp = spu_extract(spu_or(cmp_c, cmp_0), 0);
-
-  while (cmp == 0) {
     data = *ptr++;
-    cmp_c = spu_gather(spu_cmpeq(data, vc));
-    cmp_0 = spu_gather(spu_cmpeq(data, 0));
+
+    cmp_c = spu_and(spu_gather(spu_cmpeq(data, vc)), mask);
+    cmp_0 = spu_and(spu_gather(spu_cmpeq(data, 0)), mask);
 
     cmp = spu_extract(spu_or(cmp_c, cmp_0), 0);
-  }
 
-  /* Compute the location of the first character. If it is beyond
-   * the end of the string, then return NULL.
-   */
-  result = spu_add(spu_promote((unsigned int)ptr - (skip+32), 0),
-		   spu_cntlz(spu_promote(cmp, 0)));
+    while (cmp == 0) {
+        data = *ptr++;
+        cmp_c = spu_gather(spu_cmpeq(data, vc));
+        cmp_0 = spu_gather(spu_cmpeq(data, 0));
 
-  result = spu_andc(result, spu_cmpgt(cmp_0, cmp_c));
+        cmp = spu_extract(spu_or(cmp_c, cmp_0), 0);
+    }
 
-  return ((char *)spu_extract(result, 0));
+    /* Compute the location of the first character. If it is beyond
+     * the end of the string, then return NULL.
+     */
+    result
+        = spu_add(spu_promote((unsigned int)ptr - (skip + 32), 0), spu_cntlz(spu_promote(cmp, 0)));
+
+    result = spu_andc(result, spu_cmpgt(cmp_0, cmp_c));
+
+    return ((char *)spu_extract(result, 0));
 }

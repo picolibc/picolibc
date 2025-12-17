@@ -7,48 +7,53 @@ is freely granted, provided that this notice is preserved.
 #include <stdlib.h>
 #include <stdio.h>
 
-void a(void);
-void b(void);
-void c(int, void *);
+void        a(void);
+void        b(void);
+void        c(int, void *);
 static void newline(void);
 
-void a (void)
+void
+a(void)
 {
-  printf("a");
+    printf("a");
 }
 
-void b (void)
+void
+b(void)
 {
-  printf("b");
+    printf("b");
 }
 
-void c (int code, void *k)
+void
+c(int code, void *k)
 {
-  char *x = (char *)k;
-  printf("%d%c",code,x[0]);
+    char *x = (char *)k;
+    printf("%d%c", code, x[0]);
 }
 
-static void newline (void)
+static void
+newline(void)
 {
-  printf("\n");
+    printf("\n");
 }
 
-int main(void)
+int
+main(void)
 {
-  if (atexit(newline) != 0)
-    abort();
+    if (atexit(newline) != 0)
+        abort();
 
-  if (atexit(a) != 0)
-    abort();
+    if (atexit(a) != 0)
+        abort();
 
-  if (atexit(b) != 0)
-    abort();
+    if (atexit(b) != 0)
+        abort();
 
-  if (on_exit(c,(void *)"c") != 0)
-    abort();
+    if (on_exit(c, (void *)"c") != 0)
+        abort();
 
-  if (atexit(a) != 0)
-    abort();
+    if (atexit(a) != 0)
+        abort();
 
-  exit(0);
+    exit(0);
 }

@@ -38,5 +38,5 @@
 uintptr_t
 sys_semihost_time(void)
 {
-	return sys_semihost(SYS_TIME, 0);
+    return sys_semihost(SYS_TIME, 0);
 }

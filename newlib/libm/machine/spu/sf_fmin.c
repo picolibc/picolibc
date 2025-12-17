@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fminf.h"
 
-float fminf(float x, float y)
+float
+fminf(float x, float y)
 {
     return _fminf(x, y);
 }

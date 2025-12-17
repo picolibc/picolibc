@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -49,13 +49,13 @@ SYNOPSIS
 
 DESCRIPTION
         @ifnottex
-        The cpow functions compute the complex power function x^y 
-        power, with a branch cut for the first parameter along the 
+        The cpow functions compute the complex power function x^y
+        power, with a branch cut for the first parameter along the
         negative real axis.
         @end ifnottex
         @tex
-        The cpow functions compute the complex power function $x^y$ 
-        power, with a branch cut for the first parameter along the 
+        The cpow functions compute the complex power function $x^y$
+        power, with a branch cut for the first parameter along the
         negative real axis.
         @end tex
 
@@ -73,29 +73,28 @@ QUICKREF
 
 */
 
-
 #include <complex.h>
 #include <math.h>
 
 double complex
 cpow(double complex a, double complex z)
 {
-	double complex w;
-	double x, y, r, theta, absa, arga;
+    double complex w;
+    double         x, y, r, theta, absa, arga;
 
-	x = creal(z);
-	y = cimag(z);
-	absa = cabs(a);
-	if (absa == 0.0) {
-		return (0.0 + 0.0 * (double complex) I);
-	}
-	arga = carg(a);
-	r = pow(absa, x);
-	theta = x * arga;
-	if (y != 0.0) {
-		r = r * exp(-y * arga);
-		theta = theta + y * log(absa);
-	}
-	w = r * cos(theta) + (r * sin(theta)) * (double complex) I;
-	return w;
+    x = creal(z);
+    y = cimag(z);
+    absa = cabs(a);
+    if (absa == 0.0) {
+        return (0.0 + 0.0 * (double complex)I);
+    }
+    arga = carg(a);
+    r = pow(absa, x);
+    theta = x * arga;
+    if (y != 0.0) {
+        r = r * exp(-y * arga);
+        theta = theta + y * log(absa);
+    }
+    w = r * cos(theta) + (r * sin(theta)) * (double complex)I;
+    return w;
 }

@@ -36,10 +36,11 @@
 #include <sys/auxv.h>
 #include <errno.h>
 
-unsigned long getauxval(unsigned long type)
+unsigned long
+getauxval(unsigned long type)
 {
-	(void) type;
-	errno = EINVAL;
-	return 0;
+    (void)type;
+    errno = EINVAL;
+    return 0;
 }
 __weak_reference(getauxval, __getauxval);

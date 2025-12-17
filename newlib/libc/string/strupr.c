@@ -16,21 +16,21 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /*
 FUNCTION
-	<<strupr>>---force string to uppercase
-	
+        <<strupr>>---force string to uppercase
+
 INDEX
-	strupr
+        strupr
 
 SYNOPSIS
-	#include <string.h>
-	char *strupr(char *<[a]>);
+        #include <string.h>
+        char *strupr(char *<[a]>);
 
 DESCRIPTION
-	<<strupr>> converts each character in the string at <[a]> to
-	uppercase.
+        <<strupr>> converts each character in the string at <[a]> to
+        uppercase.
 
 RETURNS
-	<<strupr>> returns its argument, <[a]>.
+        <<strupr>> returns its argument, <[a]>.
 
 PORTABILITY
 <<strupr>> is not widely portable.
@@ -38,7 +38,7 @@ PORTABILITY
 <<strupr>> requires no supporting OS subroutines.
 
 QUICKREF
-	strupr
+        strupr
 */
 
 #define _DEFAULT_SOURCE
@@ -46,12 +46,11 @@ QUICKREF
 #include <ctype.h>
 
 char *
-strupr (char *s)
+strupr(char *s)
 {
-  unsigned char *ucs = (unsigned char *) s;
-  for ( ; *ucs != '\0'; ucs++)
-    {
-      *ucs = toupper(*ucs);
+    unsigned char *ucs = (unsigned char *)s;
+    for (; *ucs != '\0'; ucs++) {
+        *ucs = toupper(*ucs);
     }
-  return s;
+    return s;
 }

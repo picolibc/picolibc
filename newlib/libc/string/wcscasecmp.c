@@ -1,27 +1,27 @@
 /* Copyright (c) 2009 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
-	<<wcscasecmp>>---case-insensitive wide character string compare
-	
+        <<wcscasecmp>>---case-insensitive wide character string compare
+
 INDEX
-	wcscasecmp
+        wcscasecmp
 
 SYNOPSIS
-	#include <wchar.h>
-	int wcscasecmp(const wchar_t *<[a]>, const wchar_t *<[b]>);
+        #include <wchar.h>
+        int wcscasecmp(const wchar_t *<[a]>, const wchar_t *<[b]>);
 
 DESCRIPTION
-	<<wcscasecmp>> compares the wide character string at <[a]> to
-	the wide character string at <[b]> in a case-insensitive manner.
+        <<wcscasecmp>> compares the wide character string at <[a]> to
+        the wide character string at <[b]> in a case-insensitive manner.
 
-RETURNS 
+RETURNS
 
-	If <<*<[a]>>> sorts lexicographically after <<*<[b]>>> (after
-	both are converted to uppercase), <<wcscasecmp>> returns a
-	number greater than zero.  If the two strings match,
-	<<wcscasecmp>> returns zero.  If <<*<[a]>>> sorts
-	lexicographically before <<*<[b]>>>, <<wcscasecmp>> returns a
-	number less than zero.
+        If <<*<[a]>>> sorts lexicographically after <<*<[b]>>> (after
+        both are converted to uppercase), <<wcscasecmp>> returns a
+        number greater than zero.  If the two strings match,
+        <<wcscasecmp>> returns zero.  If <<*<[a]>>> sorts
+        lexicographically before <<*<[b]>>>, <<wcscasecmp>> returns a
+        number less than zero.
 
 PORTABILITY
 POSIX-1.2008
@@ -30,7 +30,7 @@ POSIX-1.2008
 tolower() from elsewhere in this library.
 
 QUICKREF
-	wcscasecmp 
+        wcscasecmp
 */
 
 #define _DEFAULT_SOURCE
@@ -38,16 +38,14 @@ QUICKREF
 #include <wctype.h>
 
 int
-wcscasecmp (const wchar_t *s1,
-	const wchar_t *s2)
+wcscasecmp(const wchar_t *s1, const wchar_t *s2)
 {
-  int d = 0;
-  for ( ; ; )
-    {
-      const int c1 = towlower (*s1++);
-      const int c2 = towlower (*s2++);
-      if (((d = c1 - c2) != 0) || (c2 == '\0'))
-        break;
+    int d = 0;
+    for (;;) {
+        const int c1 = towlower(*s1++);
+        const int c2 = towlower(*s2++);
+        if (((d = c1 - c2) != 0) || (c2 == '\0'))
+            break;
     }
-  return d;
+    return d;
 }

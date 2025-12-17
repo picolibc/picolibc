@@ -7,14 +7,14 @@
 FUNCTION
 <<fmax>>, <<fmaxf>>---maximum
 INDEX
-	fmax
+        fmax
 INDEX
-	fmaxf
+        fmaxf
 
 SYNOPSIS
-	#include <math.h>
-	double fmax(double <[x]>, double <[y]>);
-	float fmaxf(float <[x]>, float <[y]>);
+        #include <math.h>
+        double fmax(double <[x]>, double <[y]>);
+        float fmaxf(float <[x]>, float <[y]>);
 
 DESCRIPTION
 The <<fmax>> functions determine the maximum numeric value of their arguments.

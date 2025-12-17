@@ -38,42 +38,42 @@
 FILE *
 freopen(const char *pathname, const char *mode, FILE *stream)
 {
-	FILE *ret = NULL;
-	struct __file_bufio *pf = (struct __file_bufio *) stream;
-	int fd;
-	int stdio_flags;
-	int open_flags;
+    FILE                *ret = NULL;
+    struct __file_bufio *pf = (struct __file_bufio *)stream;
+    int                  fd;
+    int                  stdio_flags;
+    int                  open_flags;
 
-	__flockfile(stream);
-	/* Can't reopen FILEs which aren't buffered */
-	if (!(stream->flags & __SBUF))
-		goto exit;
+    __flockfile(stream);
+    /* Can't reopen FILEs which aren't buffered */
+    if (!(stream->flags & __SBUF))
+        goto exit;
 
-	stdio_flags = __stdio_flags(mode, &open_flags);
-	if (stdio_flags == 0)
-		goto exit;
+    stdio_flags = __stdio_flags(mode, &open_flags);
+    if (stdio_flags == 0)
+        goto exit;
 
-	fd = open(pathname, open_flags, 0666);
-	if (fd < 0)
-		goto exit;
+    fd = open(pathname, open_flags, 0666);
+    if (fd < 0)
+        goto exit;
 
-        fflush(stream);
+    fflush(stream);
 
-        __bufio_lock(stream);
-        close((int)(intptr_t) (pf->ptr));
-        (void) __atomic_exchange_ungetc(&stream->unget, 0);
-        stream->flags = (stream->flags & ~(__SRD|__SWR|__SERR|__SEOF)) | stdio_flags;
-        pf->pos = 0;
-        pf->ptr = (void *) (intptr_t) (fd);
+    __bufio_lock(stream);
+    close((int)(intptr_t)(pf->ptr));
+    (void)__atomic_exchange_ungetc(&stream->unget, 0);
+    stream->flags = (stream->flags & ~(__SRD | __SWR | __SERR | __SEOF)) | stdio_flags;
+    pf->pos = 0;
+    pf->ptr = (void *)(intptr_t)(fd);
 
-        /* Switch to POSIX backend */
-        pf->read_int = read;
-        pf->write_int = write;
-        pf->lseek_int = lseek;
-        pf->close_int = close;
+    /* Switch to POSIX backend */
+    pf->read_int = read;
+    pf->write_int = write;
+    pf->lseek_int = lseek;
+    pf->close_int = close;
 
-        ret = stream;
-	__bufio_unlock(stream);
+    ret = stream;
+    __bufio_unlock(stream);
 exit:
-	__funlock_return(stream, ret);
+    __funlock_return(stream, ret);
 }

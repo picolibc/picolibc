@@ -24,25 +24,25 @@
  * SUCH DAMAGE.
  */
 
-#if (__ARM_FP & 0x4) 
+#if (__ARM_FP & 0x4)
 #include "fdlibm.h"
 #include <stdio.h>
 
 float
 sqrtf(float x)
 {
-	float result;
+    float result;
 #ifdef __MATH_ERRNO
-        if (isless(x, 0.0f))
-            errno = EDOM;
+    if (isless(x, 0.0f))
+        errno = EDOM;
 #endif
 #if __ARM_ARCH >= 6
-	__asm__("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
+    __asm__("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
 #else
-	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	__asm__("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x));
+    /* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
+    __asm__("vsqrt.f32 %0, %1" : "=&w"(result) : "w"(x));
 #endif
-	return result;
+    return result;
 }
 
 #else

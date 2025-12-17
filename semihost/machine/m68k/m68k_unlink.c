@@ -39,5 +39,5 @@
 int
 unlink(const char *pathname)
 {
-    return m68k_semihost1(HOSTED_UNLINK, (uintptr_t) pathname);
+    return m68k_semihost1(HOSTED_UNLINK, (uintptr_t)pathname);
 }

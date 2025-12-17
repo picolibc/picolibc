@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fdim.h"
 
-double fdim(double x, double y)
+double
+fdim(double x, double y)
 {
     return _fdim(x, y);
 }

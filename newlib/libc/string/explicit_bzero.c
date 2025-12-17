@@ -13,5 +13,5 @@
 void
 explicit_bzero(void *p, size_t n)
 {
-	bzero(p, n);
+    bzero(p, n);
 }

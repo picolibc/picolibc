@@ -48,7 +48,7 @@ _BEGIN_STD_C
  */
 #include <sys/ioccom.h>
 
-#define SOCKCLOSE    _IO('D', 1)    /* socket close */
+#define SOCKCLOSE _IO('D', 1) /* socket close */
 #endif
 
 /*
@@ -60,13 +60,8 @@ _BEGIN_STD_C
  *   + application must define _POSIX_26_C_SOURCE to use posix_devctl().
  *   + posix_devctl() is prototyped in <devctl.h>
  */
-int posix_devctl(
-  int              fd,
-  int              dcmd,
-  void *__restrict dev_data_ptr,
-  size_t           nbyte,
-  int *__restrict  dev_info_ptr
-);
+int posix_devctl(int fd, int dcmd, void * __restrict dev_data_ptr, size_t nbyte,
+                 int * __restrict dev_info_ptr);
 
 _END_STD_C
 

@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/cbrt.h"
 
-double cbrt(double x)
+double
+cbrt(double x)
 {
     return _cbrt(x);
 }

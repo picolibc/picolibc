@@ -35,8 +35,8 @@
 
 #include "stdio_private.h"
 
-int strfromd(char *restrict str, size_t n,
-	     const char *restrict format, double fp)
+int
+strfromd(char * restrict str, size_t n, const char * restrict format, double fp)
 {
     return __d_snprintf(str, n, format, fp);
 }

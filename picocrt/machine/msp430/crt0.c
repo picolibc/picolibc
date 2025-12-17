@@ -43,19 +43,18 @@
 
 extern char __stack[];
 
-static void  __used
+static void __used
 _cstart(void)
 {
     __start();
 }
 
-void __section(".text.init.enter") __used
-_start(void)
+void __section(".text.init.enter") __used _start(void)
 {
     /* Generate a reference to __interrupt_vector so we get one loaded */
     __asm__(".equ __my_interrupt_vector, __interrupt_vector");
     /* Initialize stack pointer */
-    __asm__(MOV " %0, sp" : : "i" (__stack));
+    __asm__(MOV " %0, sp" : : "i"(__stack));
     /* Branch to C code */
     __asm__("jmp _cstart");
 }

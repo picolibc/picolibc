@@ -40,9 +40,9 @@
 __float64
 fabs64(__float64 x)
 {
-  __float64 result;
-  __asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
-  return result;
+    __float64 result;
+    __asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_d_d(fabs)

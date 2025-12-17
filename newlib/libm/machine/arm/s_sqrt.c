@@ -24,24 +24,24 @@
  * SUCH DAMAGE.
  */
 
-#if (__ARM_FP & 0x8) 
+#if (__ARM_FP & 0x8)
 #include "fdlibm.h"
 
 double
 sqrt(double x)
 {
-	double result;
+    double result;
 #ifdef __MATH_ERRNO
-        if (isless(x, 0.0))
-            return __math_invalid(x);
+    if (isless(x, 0.0))
+        return __math_invalid(x);
 #endif
 #if __ARM_ARCH >= 6
-	__asm__("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
+    __asm__("vsqrt.f64 %P0, %P1" : "=w"(result) : "w"(x));
 #else
-	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	__asm__("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
+    /* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
+    __asm__("vsqrt.f64 %P0, %P1" : "=&w"(result) : "w"(x));
 #endif
-	return result;
+    return result;
 }
 
 _MATH_ALIAS_d_d(sqrt)

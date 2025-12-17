@@ -35,19 +35,19 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  * Test bytes using CPU32+ loop mode if possible.
  */
 size_t
-strlen (const char *str)
+strlen(const char *str)
 {
-	unsigned int n = ~0;
-	const char *cp = str;
+    unsigned int n = ~0;
+    const char  *cp = str;
 
-	__asm__ volatile ("1:\n"
-	     "\ttst.b (%0)+\n"
+    __asm__ volatile("1:\n"
+                     "\ttst.b (%0)+\n"
 #if defined(__mcpu32__)
-	     "\tdbeq %1,1b\n"
+                     "\tdbeq %1,1b\n"
 #endif
-	     "\tbne.b 1b\n" :
-		"=a" (cp), "=d" (n) :
-		 "0" (cp),  "1" (n) :
-		 "cc");
-	return (cp - str) - 1;
+                     "\tbne.b 1b\n"
+                     : "=a"(cp), "=d"(n)
+                     : "0"(cp), "1"(n)
+                     : "cc");
+    return (cp - str) - 1;
 }

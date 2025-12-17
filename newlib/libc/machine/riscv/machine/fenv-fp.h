@@ -44,33 +44,33 @@
 __declare_fenv_inline(int) feclearexcept(int excepts)
 {
 
-  /* Mask excepts to be sure only supported flag bits are set */
+    /* Mask excepts to be sure only supported flag bits are set */
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
-   * Version 2.1":
-   *
-   * "The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads
-   * the value of the CSR, zeroextends the value to XLEN bits, and
-   * writes it to integer register rd. The initial value in integer
-   * register rs1 is treated as a bit mask that specifies bit
-   * positions to be cleared in the CSR. Any bit that is high in rs1
-   * will cause the corresponding bit to be cleared in the CSR, if
-   * that CSR bit is writable. Other bits in the CSR are unaffected."
-   */
+    /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
+     * Version 2.1":
+     *
+     * "The CSRRC (Atomic Read and Clear Bits in CSR) instruction reads
+     * the value of the CSR, zeroextends the value to XLEN bits, and
+     * writes it to integer register rd. The initial value in integer
+     * register rs1 is treated as a bit mask that specifies bit
+     * positions to be cleared in the CSR. Any bit that is high in rs1
+     * will cause the corresponding bit to be cleared in the CSR, if
+     * that CSR bit is writable. Other bits in the CSR are unaffected."
+     */
 
-  /* Clear the requested flags */
+    /* Clear the requested flags */
 
-  __asm__ volatile("csrrc zero, fflags, %0" : : "r"(excepts));
+    __asm__ volatile("csrrc zero, fflags, %0" : : "r"(excepts));
 
-  /* Per 'feclearexcept.html
-   * "If the argument is zero or if all the specified exceptions were
-   * successfully cleared, feclearexcept() shall return zero. Otherwise,
-   * it shall return a non-zero value."
-   */
+    /* Per 'feclearexcept.html
+     * "If the argument is zero or if all the specified exceptions were
+     * successfully cleared, feclearexcept() shall return zero. Otherwise,
+     * it shall return a non-zero value."
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -87,22 +87,22 @@ __declare_fenv_inline(int) feclearexcept(int excepts)
 __declare_fenv_inline(int) fegetenv(fenv_t *envp)
 {
 
-  /* Get the current environment (FCSR) */
+    /* Get the current environment (FCSR) */
 
-  fenv_t fcsr;
-  __asm__ volatile("frcsr %0" : "=r"(fcsr));
+    fenv_t fcsr;
+    __asm__ volatile("frcsr %0" : "=r"(fcsr));
 
-  /* Store FCSR in envp */
+    /* Store FCSR in envp */
 
-  *envp = fcsr;
+    *envp = fcsr;
 
-  /* Per 'fegetenv.html:
-   *
-   * "If the representation was successfully stored, fegetenv() shall
-   * return zero. Otherwise, it shall return a non-zero value.
-   */
+    /* Per 'fegetenv.html:
+     *
+     * "If the representation was successfully stored, fegetenv() shall
+     * return zero. Otherwise, it shall return a non-zero value.
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -120,27 +120,27 @@ __declare_fenv_inline(int) fegetenv(fenv_t *envp)
 __declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 {
 
-  /* Mask excepts to be sure only supported flag bits are set */
+    /* Mask excepts to be sure only supported flag bits are set */
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  /* Get current exception flags */
+    /* Get current exception flags */
 
-  fexcept_t flags;
-  __asm__ volatile("frflags %0" : "=r"(flags));
+    fexcept_t flags;
+    __asm__ volatile("frflags %0" : "=r"(flags));
 
-  /* Return the requested flags in flagp */
+    /* Return the requested flags in flagp */
 
-  *flagp = flags & excepts;
+    *flagp = flags & excepts;
 
-  /* Per 'fegetexceptflag.html:
-   *
-   * "If the representation was successfully stored, fegetexceptflag()
-   * shall return zero. Otherwise, it shall return a non-zero
-   * value."
-   */
+    /* Per 'fegetexceptflag.html:
+     *
+     * "If the representation was successfully stored, fegetexceptflag()
+     * shall return zero. Otherwise, it shall return a non-zero
+     * value."
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -155,23 +155,22 @@ __declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 __declare_fenv_inline(int) fegetround(void)
 {
 
-  /* Get current rounding mode */
+    /* Get current rounding mode */
 
-  fenv_t frm;
-  __asm__ volatile("frrm %0" : "=r"(frm));
+    fenv_t frm;
+    __asm__ volatile("frrm %0" : "=r"(frm));
 
-  /* Per 'fegetround.html:
-   *
-   * "The fegetround() function shall return the value of the rounding
-   * direction macro representing the current rounding direction or a
-   * negative value if there is no such rounding direction macro or
-   * the current rounding direction is not determinable."
-   */
+    /* Per 'fegetround.html:
+     *
+     * "The fegetround() function shall return the value of the rounding
+     * direction macro representing the current rounding direction or a
+     * negative value if there is no such rounding direction macro or
+     * the current rounding direction is not determinable."
+     */
 
-  /* Return the rounding mode */
+    /* Return the rounding mode */
 
-  return frm;
-
+    return frm;
 }
 
 /* This implementation is intended to comply with the following
@@ -190,26 +189,26 @@ __declare_fenv_inline(int) fegetround(void)
 __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
 
-  /* Store the current FP environment in envp*/
+    /* Store the current FP environment in envp*/
 
-  fenv_t fcsr;
-  __asm__ volatile("frcsr %0" : "=r"(fcsr));
-  *envp = fcsr;
+    fenv_t fcsr;
+    __asm__ volatile("frcsr %0" : "=r"(fcsr));
+    *envp = fcsr;
 
-  /* Clear all flags */
+    /* Clear all flags */
 
-  __asm__ volatile("csrrc zero, fflags, %0" : : "r"(FE_ALL_EXCEPT));
+    __asm__ volatile("csrrc zero, fflags, %0" : : "r"(FE_ALL_EXCEPT));
 
-  /* RISC-V does not raise FP traps so it is always in a "non-stop" mode */
+    /* RISC-V does not raise FP traps so it is always in a "non-stop" mode */
 
-  /* Per 'feholdexcept.html:
-   *
-   * "The feholdexcept() function shall return zero if and only if
-   * non-stop floating-point exception handling was successfully
-   * installed."
-   */
+    /* Per 'feholdexcept.html:
+     *
+     * "The feholdexcept() function shall return zero if and only if
+     * non-stop floating-point exception handling was successfully
+     * installed."
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -233,30 +232,30 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 __declare_fenv_inline(int) feraiseexcept(int excepts)
 {
 
-  /* Mask excepts to be sure only supported flag bits are set */
+    /* Mask excepts to be sure only supported flag bits are set */
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  /* Set the requested exception flags */
+    /* Set the requested exception flags */
 
-  __asm__ volatile("csrs fflags, %0" : : "r"(excepts));
+    __asm__ volatile("csrs fflags, %0" : : "r"(excepts));
 
-  /* Per 'feraiseexcept.html:
-   * "If the argument is zero or if all the specified exceptions were
-   * successfully raised, feraiseexcept() shall return
-   * zero. Otherwise, it shall return a non-zero value."
-   */
+    /* Per 'feraiseexcept.html:
+     * "If the argument is zero or if all the specified exceptions were
+     * successfully raised, feraiseexcept() shall return
+     * zero. Otherwise, it shall return a non-zero value."
+     */
 
-  /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
-   * Version 2.1":
-   *
-   * "As allowed by the standard, we do not support traps on
-   * floating-point exceptions in the base ISA, but instead require
-   * explicit checks of the flags in software."
-   *
-   */
+    /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
+     * Version 2.1":
+     *
+     * "As allowed by the standard, we do not support traps on
+     * floating-point exceptions in the base ISA, but instead require
+     * explicit checks of the flags in software."
+     *
+     */
 
-  return 0;
+    return 0;
 }
 
 __declare_fenv_inline(int) fesetexcept(int excepts)
@@ -285,18 +284,18 @@ __declare_fenv_inline(int) fesetexcept(int excepts)
 __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
 
-  /* Set environment (FCSR) */
+    /* Set environment (FCSR) */
 
-  fenv_t fcsr = *envp;
-  __asm__ volatile("fscsr %0" : : "r"(fcsr));
+    fenv_t fcsr = *envp;
+    __asm__ volatile("fscsr %0" : : "r"(fcsr));
 
-  /* Per 'fegetenv.html:
-   *
-   * "If the environment was successfully established, fesetenv()
-   * shall return zero. Otherwise, it shall return a non-zero value.
-   */
+    /* Per 'fegetenv.html:
+     *
+     * "If the environment was successfully established, fesetenv()
+     * shall return zero. Otherwise, it shall return a non-zero value.
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -319,27 +318,27 @@ __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
 
-  /* Mask excepts to be sure only supported flag bits are set */
+    /* Mask excepts to be sure only supported flag bits are set */
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  /* Set the requested flags */
+    /* Set the requested flags */
 
-  fexcept_t flags = *flagp & FE_ALL_EXCEPT;
+    fexcept_t flags = *flagp & FE_ALL_EXCEPT;
 
-  /* Set new the flags */
+    /* Set new the flags */
 
-  __asm__ volatile("csrc fflags, %0" : : "r"(excepts));
-  __asm__ volatile("csrs fflags, %0" : : "r"(flags & excepts));
+    __asm__ volatile("csrc fflags, %0" : : "r"(excepts));
+    __asm__ volatile("csrs fflags, %0" : : "r"(flags & excepts));
 
-  /* Per 'fesetexceptflag.html:
-   *
-   * "If the excepts argument is zero or if all the specified
-   * exceptions were successfully set, fesetexceptflag() shall return
-   * zero. Otherwise, it shall return a non-zero value."
-   */
+    /* Per 'fesetexceptflag.html:
+     *
+     * "If the excepts argument is zero or if all the specified
+     * exceptions were successfully set, fesetexceptflag() shall return
+     * zero. Otherwise, it shall return a non-zero value."
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -356,41 +355,40 @@ __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 
 __declare_fenv_inline(int) fesetround(int round)
 {
-int status = 1;
+    int status = 1;
 
-  switch (round)
-  {
+    switch (round) {
     case FE_TONEAREST_MM:
-      /* Intentional fall-through */
+        /* Intentional fall-through */
 
     case FE_UPWARD:
-      /* Intentional fall-through */
+        /* Intentional fall-through */
 
     case FE_DOWNWARD:
-      /* Intentional fall-through */
+        /* Intentional fall-through */
 
     case FE_TOWARDZERO:
-      /* Intentional fall-through */
+        /* Intentional fall-through */
 
     case FE_TONEAREST:
-      /* Set the rounding mode */
-      __asm__ volatile("fsrm %0" : : "r"(round));
+        /* Set the rounding mode */
+        __asm__ volatile("fsrm %0" : : "r"(round));
 
-      /* status 0 to indicate successful processing of rounding mode */
-      status = 0;
-      break;
+        /* status 0 to indicate successful processing of rounding mode */
+        status = 0;
+        break;
 
     default:
-      break;
-  }
+        break;
+    }
 
-  /* Per 'fesetround.html:
-   *
-   * "The fesetround() function shall return a zero value if and only
-   * if the requested rounding direction was established."
-   */
+    /* Per 'fesetround.html:
+     *
+     * "The fesetround() function shall return a zero value if and only
+     * if the requested rounding direction was established."
+     */
 
-  return status;
+    return status;
 }
 
 /* This implementation is intended to comply with the following
@@ -407,22 +405,22 @@ int status = 1;
 __declare_fenv_inline(int) fetestexcept(int excepts)
 {
 
-  /* Mask excepts to be sure only supported flag bits are set */
+    /* Mask excepts to be sure only supported flag bits are set */
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  /* Read the current flags */
+    /* Read the current flags */
 
-  fexcept_t flags;
-  __asm__ volatile("frflags %0" : "=r"(flags));
+    fexcept_t flags;
+    __asm__ volatile("frflags %0" : "=r"(flags));
 
-  /* "The fetestexcept() function shall return the value of the
-   * bitwise-inclusive OR of the floating-point exception macros
-   * corresponding to the currently set floating-point exceptions
-   * included in excepts."
-   */
+    /* "The fetestexcept() function shall return the value of the
+     * bitwise-inclusive OR of the floating-point exception macros
+     * corresponding to the currently set floating-point exceptions
+     * included in excepts."
+     */
 
-  return (flags & excepts);
+    return (flags & excepts);
 }
 
 /* This implementation is intended to comply with the following
@@ -442,26 +440,25 @@ __declare_fenv_inline(int) fetestexcept(int excepts)
 __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
 
-  /* Get current exception flags */
+    /* Get current exception flags */
 
-  fexcept_t flags;
-  __asm__ volatile("frflags %0" : "=r"(flags));
+    fexcept_t flags;
+    __asm__ volatile("frflags %0" : "=r"(flags));
 
-  /* Set the environment as requested */
+    /* Set the environment as requested */
 
-  fenv_t fcsr = *envp; /* Environment to install */
-  __asm__ volatile("fscsr %0" : : "r"(fcsr)); /* Install environment */
+    fenv_t fcsr = *envp;                        /* Environment to install */
+    __asm__ volatile("fscsr %0" : : "r"(fcsr)); /* Install environment */
 
-  /* OR in the saved exception flags */
+    /* OR in the saved exception flags */
 
-  __asm__ volatile("csrs fflags, %0" : : "r"(flags));
+    __asm__ volatile("csrs fflags, %0" : : "r"(flags));
 
-  /* "The feupdateenv() function shall return a zero value if and only
-   * if all the required actions were successfully carried out."
-   */
+    /* "The feupdateenv() function shall return a zero value if and only
+     * if all the required actions were successfully carried out."
+     */
 
-  return 0;
-
+    return 0;
 }
 
 __declare_fenv_inline(int) feenableexcept(int excepts)
@@ -471,7 +468,7 @@ __declare_fenv_inline(int) feenableexcept(int excepts)
 
 __declare_fenv_inline(int) fedisableexcept(int excepts)
 {
-    (void) excepts;
+    (void)excepts;
     return excepts == 0 ? 0 : -1;
 }
 

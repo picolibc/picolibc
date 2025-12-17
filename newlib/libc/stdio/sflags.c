@@ -26,44 +26,41 @@
  */
 
 int
-__stdio_flags (const char *mode, int *optr)
+__stdio_flags(const char *mode, int *optr)
 {
-  int ret;
-  int o;
+    int ret;
+    int o;
 
-  switch (mode[0])
-    {
-    case 'r':			/* open for reading */
-      ret = __SRD;
-      o = O_RDONLY;
-      break;
+    switch (mode[0]) {
+    case 'r': /* open for reading */
+        ret = __SRD;
+        o = O_RDONLY;
+        break;
 
-    case 'w':			/* open for writing */
-      ret = __SWR;
-      o = O_WRONLY | O_CREAT | O_TRUNC;
-      break;
+    case 'w': /* open for writing */
+        ret = __SWR;
+        o = O_WRONLY | O_CREAT | O_TRUNC;
+        break;
 
-    case 'a':			/* open for appending */
-      ret = __SWR;
-      o = O_WRONLY | O_CREAT | O_APPEND;
-      break;
+    case 'a': /* open for appending */
+        ret = __SWR;
+        o = O_WRONLY | O_CREAT | O_APPEND;
+        break;
 
-    default:			/* illegal mode */
-      errno = EINVAL;
-      return (0);
+    default: /* illegal mode */
+        errno = EINVAL;
+        return (0);
     }
-  while (*++mode)
-    {
-      switch (*mode)
-	{
-	case '+':
-	  ret |= (__SRD | __SWR);
-	  o = (o & ~O_ACCMODE) | O_RDWR;
-	  break;
-	default:
-	  break;
-	}
+    while (*++mode) {
+        switch (*mode) {
+        case '+':
+            ret |= (__SRD | __SWR);
+            o = (o & ~O_ACCMODE) | O_RDWR;
+            break;
+        default:
+            break;
+        }
     }
-  *optr = o;
-  return ret;
+    *optr = o;
+    return ret;
 }

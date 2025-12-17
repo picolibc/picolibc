@@ -24,20 +24,19 @@
  * SUCH DAMAGE.
  */
 
-
 #include <limits.h>
 
 long double
-scalblnl (long double x, long n)
+scalblnl(long double x, long n)
 {
-	int in;
+    int in;
 
-	in = (int)n;
-	if (in != n) {
-		if (n > 0)
-			in = INT_MAX;
-		else
-			in = INT_MIN;
-	}
-	return (scalbnl(x, in));
+    in = (int)n;
+    if (in != n) {
+        if (n > 0)
+            in = INT_MAX;
+        else
+            in = INT_MIN;
+    }
+    return (scalbnl(x, in));
 }

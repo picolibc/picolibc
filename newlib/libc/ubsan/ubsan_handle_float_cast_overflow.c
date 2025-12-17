@@ -36,13 +36,11 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_float_cast_overflow(void *_data,
-                                   void *from)
+__ubsan_handle_float_cast_overflow(void *_data, void *from)
 {
     struct float_cast_overflow_data *data = _data;
-    char from_str[VAL_STR_LEN];
+    char                             from_str[VAL_STR_LEN];
     __ubsan_val_to_string(from_str, data->from_type, from);
-    __ubsan_error(&data->location, "float_cast_overflow", "(%s) %s\n",
-                    data->to_type->type_name, from_str);
+    __ubsan_error(&data->location, "float_cast_overflow", "(%s) %s\n", data->to_type->type_name,
+                  from_str);
 }
-

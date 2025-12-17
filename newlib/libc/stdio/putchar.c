@@ -36,7 +36,7 @@
 int
 putchar(int c)
 {
-	return putc(c, stdout);
+    return putc(c, stdout);
 }
 
 #undef putchar_unlocked
@@ -45,12 +45,16 @@ putchar(int c)
 int
 putchar_unlocked(int c)
 {
-        return putc_unlocked(c, stdout);
+    return putc_unlocked(c, stdout);
 }
 #else
 #ifdef __strong_reference
 __strong_reference(putchar, putchar_unlocked);
 #else
-int putchar_unlocked(int c) { return putchar(c); }
+int
+putchar_unlocked(int c)
+{
+    return putchar(c);
+}
 #endif
 #endif

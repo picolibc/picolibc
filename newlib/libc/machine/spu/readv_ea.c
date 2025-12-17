@@ -37,35 +37,27 @@ Author: Ken Werner <ken.werner@de.ibm.com>
 #include <spu_cache.h>
 #include "sys/linux_syscalls.h"
 
-extern void __cache_flush (void) __weak;
+extern void __cache_flush(void) __weak;
 
-COMPAT_EA_ALIAS (readv_ea);
+COMPAT_EA_ALIAS(readv_ea);
 
 ssize_ea_t
-readv_ea (int fd, struct iovec_ea *vector, int count)
+readv_ea(int fd, struct iovec_ea *vector, int count)
 {
 #ifdef __EA32__
-  int i;
+    int i;
 #endif
-  struct spu_syscall_block s = {
-    __NR_readv,
-    {
-     fd,
-     (size_ea_t) (__ea void *) vector,
-     count,
-     0,
-     0,
-     0}
-  };
+    struct spu_syscall_block s = {
+        __NR_readv, { fd, (size_ea_t)(__ea void *)vector, count, 0, 0, 0 }
+    };
 #ifdef __EA32__
-  for (i = 0; i < count; ++i)
-    {
-      vector[i].__pad1 = 0x0;	/* 32 bit padding */
-      vector[i].__pad2 = 0x0;	/* 32 bit padding */
+    for (i = 0; i < count; ++i) {
+        vector[i].__pad1 = 0x0; /* 32 bit padding */
+        vector[i].__pad2 = 0x0; /* 32 bit padding */
     }
 #endif
-  /* Flush cache only if the application really uses the software cache.  */
-  if (__cache_flush)
-    __cache_flush ();
-  return __linux_syscall (&s);
+    /* Flush cache only if the application really uses the software cache.  */
+    if (__cache_flush)
+        __cache_flush();
+    return __linux_syscall(&s);
 }

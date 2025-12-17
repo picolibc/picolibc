@@ -28,11 +28,11 @@
 #include <math.h>
 
 float
-fmaf (float x, float y, float z)
+fmaf(float x, float y, float z)
 {
-  float result;
-  __asm__("fmadd\t%s0, %s1, %s2, %s3" : "=w" (result) : "w" (x), "w" (y), "w" (z));
-  return result;
+    float result;
+    __asm__("fmadd\t%s0, %s1, %s2, %s3" : "=w"(result) : "w"(x), "w"(y), "w"(z));
+    return result;
 }
 
 #else

@@ -56,8 +56,8 @@ ivln2_l  =  7.0526075433e-06; /* 0x36eca570 =1/ln2 tail*/
 float
 powf(float x, float y)
 {
-    float z, ax, z_h, z_l, p_h, p_l;
-    float y1, t1, t2, r, s, t, u, v, w;
+    float     z, ax, z_h, z_l, p_h, p_l;
+    float     y1, t1, t2, r, s, t, u, v, w;
     __int32_t i, j, k, yisint, n;
     __int32_t hx, hy, ix, iy, is;
 
@@ -101,7 +101,7 @@ powf(float x, float y)
     /* special value of y */
     if (FLT_UWORD_IS_INFINITE(iy)) { /* y is +-inf */
         if (ix == 0x3f800000)
-            return one; /* +-1**+-inf = 1 */
+            return one;           /* +-1**+-inf = 1 */
         else if (ix > 0x3f800000) /* (|x|>1)**+-inf = inf,0 */
             return (hy >= 0) ? y : zero;
         else /* (|x|<1)**-,+inf = inf,0 */
@@ -116,9 +116,9 @@ powf(float x, float y)
             return x;
     }
     if (hy == 0x40000000 && ix < 0x5f800000 && ix > 0x1a000000)
-        return x * x; /* y is  2 */
+        return x * x;       /* y is  2 */
     if (hy == 0x3f000000) { /* y is  0.5 */
-        if (hx >= 0) /* x >= +0 */
+        if (hx >= 0)        /* x >= +0 */
             return sqrtf(x);
     }
 
@@ -157,10 +157,9 @@ powf(float x, float y)
         if (ix > 0x3f800007)
             return (hy > 0) ? __math_oflowf(0) : __math_uflowf(0);
         /* now |1-x| is tiny <= 2**-20, suffice to compute
-	   log(x) by x-x^2/2+x^3/3-x^4/4 */
+           log(x) by x-x^2/2+x^3/3-x^4/4 */
         t = ax - 1; /* t has 20 trailing zeros */
-        w = (t * t) *
-            ((float)0.5 - t * ((float)0.333333333333 - t * (float)0.25));
+        w = (t * t) * ((float)0.5 - t * ((float)0.333333333333 - t * (float)0.25));
         u = ivln2_h * t; /* ivln2_h has 16 sig. bits */
         v = t * ivln2_l - w * ivln2;
         t1 = u + v;
@@ -205,8 +204,7 @@ powf(float x, float y)
         s_l = v * ((u - s_h * t_h) - s_h * t_l);
         /* compute log(ax) */
         s2 = s * s;
-        r = s2 * s2 *
-            (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
+        r = s2 * s2 * (L1 + s2 * (L2 + s2 * (L3 + s2 * (L4 + s2 * (L5 + s2 * L6)))));
         r += s_l * (s_h + s);
         s2 = s_h * s_h;
         t_h = (float)3.0 + s2 + r;

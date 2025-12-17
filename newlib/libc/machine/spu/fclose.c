@@ -37,17 +37,17 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include "c99ppe.h"
 
 int
-fclose (FILE * fp)
+fclose(FILE *fp)
 {
-  int ret;
+    int ret;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  ret = fp->_fp;
+    ret = fp->_fp;
 
-  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FCLOSE, &ret);
+    ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FCLOSE, &ret);
 
-  __sfp_free(fp);
+    __sfp_free(fp);
 
-  return ret;
+    return ret;
 }

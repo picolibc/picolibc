@@ -18,9 +18,9 @@
 #include <stdlib.h>
 
 int
-atexit (void (*function)(void))
+atexit(void (*function)(void))
 {
-  /* Fail here.  */
-  abort ();
-  return 1;
+    /* Fail here.  */
+    abort();
+    return 1;
 }

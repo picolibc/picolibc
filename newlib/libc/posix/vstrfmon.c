@@ -74,44 +74,45 @@
  */
 
 ssize_t
-__vstrfmon(char *__restrict buf, size_t size,
-           const char *__restrict format, va_list ap)
+__vstrfmon(char * __restrict buf, size_t size, const char * __restrict format, va_list ap)
 {
-    size_t      pos = 0;
+    size_t pos = 0;
 
-#define output(c)       do {                    \
-        if (pos == size) {                      \
-            errno = E2BIG;                      \
-            return -1;                          \
-        }                                       \
-        buf[pos++] = (c);                       \
+#define output(c)          \
+    do {                   \
+        if (pos == size) { \
+            errno = E2BIG; \
+            return -1;     \
+        }                  \
+        buf[pos++] = (c);  \
     } while (0)
 
-#define decimal(v) do {                         \
-        (v) = c - '0';                          \
-        for (;;) {                              \
-            c = *format++;                      \
-            if (!isdigit(c))                    \
-                break;                          \
-            (v) = (v) * 10 + c - '0';           \
-        }                                       \
+#define decimal(v)                    \
+    do {                              \
+        (v) = c - '0';                \
+        for (;;) {                    \
+            c = *format++;            \
+            if (!isdigit(c))          \
+                break;                \
+            (v) = (v) * 10 + c - '0'; \
+        }                             \
     } while (0)
 
     for (;;) {
         double val;
-        char *val_pos;
-        char c;
-        char left_fill = ' ';
-        bool sign_paren = false;
-        bool left_justify = false;
-        int field_width = -1;
-        int left_precision = -1;
-        int right_precision = -1;
-        int val_width;
-        int left_width;
-        int total_width;
+        char  *val_pos;
+        char   c;
+        char   left_fill = ' ';
+        bool   sign_paren = false;
+        bool   left_justify = false;
+        int    field_width = -1;
+        int    left_precision = -1;
+        int    right_precision = -1;
+        int    val_width;
+        int    left_width;
+        int    total_width;
         size_t val_size;
-        bool negative;
+        bool   negative;
 
         /* Find the % */
         for (;;) {
@@ -185,7 +186,7 @@ __vstrfmon(char *__restrict buf, size_t size,
             val = va_arg(ap, double);
             negative = signbit(val) != 0;
             if (negative)
-                val =-val;
+                val = -val;
 
             /* Write the value into the provided buffer */
             val_pos = buf + pos;
@@ -193,16 +194,16 @@ __vstrfmon(char *__restrict buf, size_t size,
             val_width = __d_snprintf(val_pos, val_size, "%.*f", right_precision, val);
 
             /* Check to see if it fit */
-            if (val_width < 0 || (size_t) val_width > val_size) {
+            if (val_width < 0 || (size_t)val_width > val_size) {
                 errno = E2BIG;
                 return -1;
             }
 
             /* Trim trailing zeros */
-            while (val_pos[val_width-1] == '0')
+            while (val_pos[val_width - 1] == '0')
                 val_width--;
 
-            if (val_pos[val_width-1] == '.')
+            if (val_pos[val_width - 1] == '.')
                 val_width--;
 
             /* Compute width of integer portion (left) */
@@ -253,8 +254,7 @@ __vstrfmon(char *__restrict buf, size_t size,
                     output('(');
                 else
                     output('-');
-            }
-            else if (left_precision >= 0) {
+            } else if (left_precision >= 0) {
                 output(' ');
             }
 

@@ -39,9 +39,9 @@
 #ifdef __HAVE_POSIX_LOCALE_API
 
 void
-freelocale (locale_t locale)
+freelocale(locale_t locale)
 {
-    (void) locale;
+    (void)locale;
 }
 
 #endif

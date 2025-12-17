@@ -27,5 +27,4 @@
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
    THE POSSIBILITY OF SUCH DAMAGE.  */
 
-void *
-memset (void *s, int c, size_t n);
+void *memset(void *s, int c, size_t n);

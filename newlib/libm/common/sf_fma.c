@@ -13,24 +13,24 @@
 float
 fmaf(float x, float y, float z)
 {
-    return (float) fmal((long double) x, (long double) y, (long double) z);
+    return (float)fmal((long double)x, (long double)y, (long double)z);
 }
 
 #else
 
 typedef float FLOAT_T;
 
-#define FMA fmaf
-#define NEXTAFTER nextafterf
-#define LDEXP ldexpf
-#define FREXP frexpf
-#define SCALBN scalbnf
-#define SPLIT (0x1p12f + 1.0f)
-#define COPYSIGN copysignf
-#define FLOAT_MANT_DIG        __FLT_MANT_DIG__
-#define FLOAT_MAX_EXP         __FLT_MAX_EXP__
-#define FLOAT_MIN             __FLT_MIN__
-#define ILOGB    ilogbf
+#define FMA            fmaf
+#define NEXTAFTER      nextafterf
+#define LDEXP          ldexpf
+#define FREXP          frexpf
+#define SCALBN         scalbnf
+#define SPLIT          (0x1p12f + 1.0f)
+#define COPYSIGN       copysignf
+#define FLOAT_MANT_DIG __FLT_MANT_DIG__
+#define FLOAT_MAX_EXP  __FLT_MAX_EXP__
+#define FLOAT_MIN      __FLT_MIN__
+#define ILOGB          ilogbf
 
 static inline int
 odd_mant(FLOAT_T x)

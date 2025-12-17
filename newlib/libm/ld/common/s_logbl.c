@@ -10,40 +10,39 @@
  * ====================================================
  */
 
-
 long double
 logbl(long double x)
 {
-	union IEEEl2bits u;
-	uint64_t m;
-	int b;
+    union IEEEl2bits u;
+    uint64_t         m;
+    int              b;
 
-	u.e = x;
-	if (u.bits.exp == 0) {
-		if ((u.bits.manl | u.bits.manh) == 0) {	/* x == 0 */
-			u.bits.sign = 1;
-			return (1.0L / u.e);
-		}
-		/* denormalized */
+    u.e = x;
+    if (u.bits.exp == 0) {
+        if ((u.bits.manl | u.bits.manh) == 0) { /* x == 0 */
+            u.bits.sign = 1;
+            return (1.0L / u.e);
+        }
+        /* denormalized */
 #ifdef LDBL_MANL_SIZE
-		if (u.bits.manh == 0) {
-			m = 1llu << (LDBL_MANL_SIZE - 1);
-			for (b = LDBL_MANH_SIZE; !(u.bits.manl & m); m >>= 1)
-				b++;
-		} else
+        if (u.bits.manh == 0) {
+            m = 1llu << (LDBL_MANL_SIZE - 1);
+            for (b = LDBL_MANH_SIZE; !(u.bits.manl & m); m >>= 1)
+                b++;
+        } else
 #endif
-                {
-			m = 1llu << (LDBL_MANH_SIZE - 1);
-			for (b = 0; !(u.bits.manh & m); m >>= 1)
-				b++;
-		}
+        {
+            m = 1llu << (LDBL_MANH_SIZE - 1);
+            for (b = 0; !(u.bits.manh & m); m >>= 1)
+                b++;
+        }
 #ifdef LDBL_IMPLICIT_NBIT
-		b++;
+        b++;
 #endif
-		return ((long double)(LDBL_MIN_EXP - b - 1));
-	}
-	if (u.bits.exp < (LDBL_MAX_EXP << 1) - 1)	/* normal */
-		return ((long double)(u.bits.exp - LDBL_MAX_EXP + 1));
-	else						/* +/- inf or nan */
-		return (x * x);
+        return ((long double)(LDBL_MIN_EXP - b - 1));
+    }
+    if (u.bits.exp < (LDBL_MAX_EXP << 1) - 1) /* normal */
+        return ((long double)(u.bits.exp - LDBL_MAX_EXP + 1));
+    else /* +/- inf or nan */
+        return (x * x);
 }

@@ -18,8 +18,8 @@
 #include <stdlib.h>
 
 void __noreturn
-abort (void)
+abort(void)
 {
-  for (;;)
-    __builtin_trap ();
+    for (;;)
+        __builtin_trap();
 }

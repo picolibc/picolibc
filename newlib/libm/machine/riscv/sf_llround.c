@@ -38,17 +38,19 @@
 #if defined(__RISCV_HARD_FLOAT) && __RISCV_HARD_FLOAT >= 32 && __riscv_xlen >= 64
 
 long long int
-llroundf (float x)
+llroundf(float x)
 {
-  long long result;
-  __asm__(
+    long long result;
+    __asm__(
 #if __riscv_xlen == 64
-       "fcvt.l.s"
+        "fcvt.l.s"
 #else
 #error Unsupported XLEN
 #endif
-       "\t%0, %1, rmm" : "=r"(result) : "f"(x));
-  return result;
+        "\t%0, %1, rmm"
+        : "=r"(result)
+        : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_k_f(llround)

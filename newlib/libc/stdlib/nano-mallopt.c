@@ -31,7 +31,7 @@
 int
 mallopt(int parameter_number, int parameter_value)
 {
-    (void) parameter_number;
-    (void) parameter_value;
+    (void)parameter_number;
+    (void)parameter_value;
     return 0;
 }

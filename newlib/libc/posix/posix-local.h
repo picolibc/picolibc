@@ -36,6 +36,4 @@
 #include <stdarg.h>
 #include <monetary.h>
 
-ssize_t
-__vstrfmon(char *__restrict buf, size_t size,
-           const char *__restrict format, va_list ap);
+ssize_t __vstrfmon(char * __restrict buf, size_t size, const char * __restrict format, va_list ap);

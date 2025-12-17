@@ -26,133 +26,126 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#ifndef	_DTOA_H_
-#define	_DTOA_H_
+#ifndef _DTOA_H_
+#define _DTOA_H_
 
 #include "stdio_private.h"
 #include "../../libm/common/math_config.h"
 
-#define	DTOA_MINUS	1
-#define	DTOA_ZERO	2
-#define	DTOA_INF	4
-#define	DTOA_NAN	8
+#define DTOA_MINUS 1
+#define DTOA_ZERO  2
+#define DTOA_INF   4
+#define DTOA_NAN   8
 
 #if __LDBL_MANT_DIG__ == 113
-#define LDTOA_MAX_DIG    34
+#define LDTOA_MAX_DIG 34
 #elif __LDBL_MANT_DIG__ == 106
-#define LDTOA_MAX_DIG    32
+#define LDTOA_MAX_DIG 32
 #elif __LDBL_MANT_DIG__ == 64
-#define LDTOA_MAX_DIG    20
+#define LDTOA_MAX_DIG 20
 #endif
 
-#define DTOA_MAX_DIG            17
-#define DTOA_MAX_10_EXP         308
-#define DTOA_MIN_10_EXP         (-307)
-#define DTOA_SCALE_UP_NUM       9
-#define DTOA_ROUND_NUM          (DTOA_MAX_DIG + 1)
-#define DTOA_MAX_EXP            1024
+#define DTOA_MAX_DIG      17
+#define DTOA_MAX_10_EXP   308
+#define DTOA_MIN_10_EXP   (-307)
+#define DTOA_SCALE_UP_NUM 9
+#define DTOA_ROUND_NUM    (DTOA_MAX_DIG + 1)
+#define DTOA_MAX_EXP      1024
 
-#define FTOA_MAX_10_EXP         38
-#define FTOA_MIN_10_EXP         (-37)
-#define FTOA_MAX_DIG	        9
-#define FTOA_SCALE_UP_NUM       6
-#define FTOA_ROUND_NUM          (FTOA_MAX_DIG + 1)
+#define FTOA_MAX_10_EXP   38
+#define FTOA_MIN_10_EXP   (-37)
+#define FTOA_MAX_DIG      9
+#define FTOA_SCALE_UP_NUM 6
+#define FTOA_ROUND_NUM    (FTOA_MAX_DIG + 1)
 
 #ifdef _NEED_IO_LONG_DOUBLE
-# if __SIZEOF_LONG_DOUBLE__ == 4
-#  define _NEED_IO_FLOAT32
-#  define LONG_FLOAT_MAX_DIG    FTOA_MAX_DIG
-#  define __lfloat_d_engine     __ftoa_engine
-#  define __lfloat_x_engine     __ftox_engine
-#  define PRINTF_LONG_DOUBLE_ARG(ap)  (asuint(va_arg(ap, long double)))
-#  define PRINTF_LONG_DOUBLE_TYPE      uint32_t
-# elif __SIZEOF_LONG_DOUBLE__ == 8
-#  define _NEED_IO_FLOAT64
-#  define LONG_FLOAT_MAX_DIG    DTOA_MAX_DIG
-#  define __lfloat_d_engine     __dtoa_engine
-#  define __lfloat_x_engine     __dtox_engine
-#  define PRINTF_LONG_DOUBLE_ARG(ap)  (asuint64(va_arg(ap, long double)))
-#  define PRINTF_LONG_DOUBLE_TYPE      uint64_t
-# elif __SIZEOF_LONG_DOUBLE__ > 8
-#  define _NEED_IO_FLOAT_LARGE
-#  define LONG_FLOAT_MAX_DIG    LDTOA_MAX_DIG
-#  define __lfloat_d_engine     __ldtoa_engine
-#  define __lfloat_x_engine     __ldtox_engine
-#  define PRINTF_LONG_DOUBLE_ARG(ap)  va_arg(ap, long double)
-#  define PRINTF_LONG_DOUBLE_TYPE      long double
-# endif
+#if __SIZEOF_LONG_DOUBLE__ == 4
+#define _NEED_IO_FLOAT32
+#define LONG_FLOAT_MAX_DIG         FTOA_MAX_DIG
+#define __lfloat_d_engine          __ftoa_engine
+#define __lfloat_x_engine          __ftox_engine
+#define PRINTF_LONG_DOUBLE_ARG(ap) (asuint(va_arg(ap, long double)))
+#define PRINTF_LONG_DOUBLE_TYPE    uint32_t
+#elif __SIZEOF_LONG_DOUBLE__ == 8
+#define _NEED_IO_FLOAT64
+#define LONG_FLOAT_MAX_DIG         DTOA_MAX_DIG
+#define __lfloat_d_engine          __dtoa_engine
+#define __lfloat_x_engine          __dtox_engine
+#define PRINTF_LONG_DOUBLE_ARG(ap) (asuint64(va_arg(ap, long double)))
+#define PRINTF_LONG_DOUBLE_TYPE    uint64_t
+#elif __SIZEOF_LONG_DOUBLE__ > 8
+#define _NEED_IO_FLOAT_LARGE
+#define LONG_FLOAT_MAX_DIG         LDTOA_MAX_DIG
+#define __lfloat_d_engine          __ldtoa_engine
+#define __lfloat_x_engine          __ldtox_engine
+#define PRINTF_LONG_DOUBLE_ARG(ap) va_arg(ap, long double)
+#define PRINTF_LONG_DOUBLE_TYPE    long double
+#endif
 #endif
 
 #ifdef _NEED_IO_DOUBLE
-# if __SIZEOF_DOUBLE__ == 4
-#  define _NEED_IO_FLOAT32
-#  define FLOAT_MAX_DIG         FTOA_MAX_DIG
-#  define __float_d_engine      __ftoa_engine
-#  define __float_x_engine      __ftox_engine
-#  define PRINTF_FLOAT_ARG(ap)  (asuint(va_arg(ap, double)))
-# elif __SIZEOF_DOUBLE__ == 8
-#  define _NEED_IO_FLOAT64
-#  define FLOAT_MAX_DIG         DTOA_MAX_DIG
-#  define __float_d_engine      __dtoa_engine
-#  define __float_x_engine      __dtox_engine
-#  define PRINTF_FLOAT_ARG(ap)  (asuint64(va_arg(ap, double)))
-# endif
+#if __SIZEOF_DOUBLE__ == 4
+#define _NEED_IO_FLOAT32
+#define FLOAT_MAX_DIG        FTOA_MAX_DIG
+#define __float_d_engine     __ftoa_engine
+#define __float_x_engine     __ftox_engine
+#define PRINTF_FLOAT_ARG(ap) (asuint(va_arg(ap, double)))
+#elif __SIZEOF_DOUBLE__ == 8
+#define _NEED_IO_FLOAT64
+#define FLOAT_MAX_DIG        DTOA_MAX_DIG
+#define __float_d_engine     __dtoa_engine
+#define __float_x_engine     __dtox_engine
+#define PRINTF_FLOAT_ARG(ap) (asuint64(va_arg(ap, double)))
+#endif
 #endif
 
 #ifdef _NEED_IO_FLOAT
-# define _NEED_IO_FLOAT32
-# define PRINTF_FLOAT_ARG(ap) (va_arg(ap, uint32_t))
-# define FLOAT_MAX_DIG   FTOA_MAX_DIG
-# define __float_d_engine __ftoa_engine
-# define __float_x_engine __ftox_engine
+#define _NEED_IO_FLOAT32
+#define PRINTF_FLOAT_ARG(ap) (va_arg(ap, uint32_t))
+#define FLOAT_MAX_DIG        FTOA_MAX_DIG
+#define __float_d_engine     __ftoa_engine
+#define __float_x_engine     __ftox_engine
 #endif
 
 #ifdef _NEED_IO_FLOAT_LARGE
-#define DTOA_DIGITS     LDTOA_MAX_DIG
+#define DTOA_DIGITS LDTOA_MAX_DIG
 #elif defined(_NEED_IO_FLOAT64)
-#define DTOA_DIGITS     DTOA_MAX_DIG
+#define DTOA_DIGITS DTOA_MAX_DIG
 #elif defined(_NEED_IO_FLOAT32)
-#define DTOA_DIGITS     FTOA_MAX_DIG
+#define DTOA_DIGITS FTOA_MAX_DIG
 #else
 #error No float requirement set
 #endif
 
 struct dtoa {
-    int32_t     exp;
-    uint8_t     flags;
-    char        digits[DTOA_DIGITS];
+    int32_t exp;
+    uint8_t flags;
+    char    digits[DTOA_DIGITS];
 };
 
 #ifdef _NEED_IO_FLOAT_LARGE
-int
-__ldtoa_engine(long double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals);
+int __ldtoa_engine(long double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals);
 
-int
-__ldtox_engine(long double x, struct dtoa *dtoa, int prec, unsigned char case_convert);
+int __ldtox_engine(long double x, struct dtoa *dtoa, int prec, unsigned char case_convert);
 
-long double
-__atold_engine(_u128 m10, int e10);
+long double __atold_engine(_u128 m10, int e10);
 #endif
 
 #ifdef _NEED_IO_FLOAT64
-int
-__dtoa_engine(uint64_t x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals);
+int __dtoa_engine(uint64_t x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals);
 
-int
-__dtox_engine(uint64_t x, struct dtoa *dtoa, int prec, unsigned char case_convert);
+int __dtox_engine(uint64_t x, struct dtoa *dtoa, int prec, unsigned char case_convert);
 
 FLOAT64
 __atod_engine(uint64_t m10, int e10);
 #endif
 
 #ifdef _NEED_IO_FLOAT32
-int __ftoa_engine (uint32_t val, struct dtoa *ftoa, int max_digits, bool fmode, int max_decimals);
+int   __ftoa_engine(uint32_t val, struct dtoa *ftoa, int max_digits, bool fmode, int max_decimals);
 
-int
-__ftox_engine(uint32_t x, struct dtoa *dtoa, int prec, unsigned char case_convert);
+int   __ftox_engine(uint32_t x, struct dtoa *dtoa, int prec, unsigned char case_convert);
 
-float
-__atof_engine(uint32_t m10, int e10);
+float __atof_engine(uint32_t m10, int e10);
 #endif
 
-#endif	/* !_DTOA_H_ */
+#endif /* !_DTOA_H_ */

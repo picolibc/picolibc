@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -16,14 +16,14 @@ FUNCTION
 <<copysign>>, <<copysignf>>---sign of <[y]>, magnitude of <[x]>
 
 INDEX
-	copysign
+        copysign
 INDEX
-	copysignf
+        copysignf
 
 SYNOPSIS
-	#include <math.h>
-	double copysign (double <[x]>, double <[y]>);
-	float copysignf (float <[x]>, float <[y]>);
+        #include <math.h>
+        double copysign (double <[x]>, double <[y]>);
+        float copysignf (float <[x]>, float <[y]>);
 
 DESCRIPTION
 <<copysign>> constructs a number with the magnitude (absolute value)
@@ -58,11 +58,11 @@ Definition (Issue 2).
 __float64
 copysign64(__float64 x, __float64 y)
 {
-	__uint32_t hx,hy;
-	GET_HIGH_WORD(hx,x);
-	GET_HIGH_WORD(hy,y);
-	SET_HIGH_WORD(x,(hx&0x7fffffff)|(hy&0x80000000));
-        return x;
+    __uint32_t hx, hy;
+    GET_HIGH_WORD(hx, x);
+    GET_HIGH_WORD(hy, y);
+    SET_HIGH_WORD(x, (hx & 0x7fffffff) | (hy & 0x80000000));
+    return x;
 }
 
 _MATH_ALIAS_d_dd(copysign)

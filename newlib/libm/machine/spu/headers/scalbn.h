@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _SCALBN_H_
-#define _SCALBN_H_	1
+#define _SCALBN_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -45,38 +45,39 @@
  *      e2 = exp - e1;
  *      x * 2^e1 * 2^e2
  */
-static __inline double _scalbn(double x, int exp)
+static __inline double
+_scalbn(double x, int exp)
 {
-  vec_int4 e, e1, e2;
-  vec_int4 min = VEC_SPLAT_S32(-2044);
-  vec_int4 max = VEC_SPLAT_S32(2046);
-  vec_uint4 cmp_min, cmp_max;
-  vec_uint4 shift = VEC_LITERAL(vec_uint4, 20, 32, 20, 32);
-  vec_double2 f1, f2;
-  vec_double2 in, out;
+    vec_int4    e, e1, e2;
+    vec_int4    min = VEC_SPLAT_S32(-2044);
+    vec_int4    max = VEC_SPLAT_S32(2046);
+    vec_uint4   cmp_min, cmp_max;
+    vec_uint4   shift = VEC_LITERAL(vec_uint4, 20, 32, 20, 32);
+    vec_double2 f1, f2;
+    vec_double2 in, out;
 
-  in = spu_promote(x, 0);
-  e = spu_promote(exp, 0);
+    in = spu_promote(x, 0);
+    e = spu_promote(exp, 0);
 
-  /* Clamp the specified exponent to the range -2044 to 2046.
-   */
-  cmp_min = spu_cmpgt(e, min);
-  cmp_max = spu_cmpgt(e, max);
-  e = spu_sel(min, e, cmp_min);
-  e = spu_sel(e, max, cmp_max);
+    /* Clamp the specified exponent to the range -2044 to 2046.
+     */
+    cmp_min = spu_cmpgt(e, min);
+    cmp_max = spu_cmpgt(e, max);
+    e = spu_sel(min, e, cmp_min);
+    e = spu_sel(e, max, cmp_max);
 
-  /* Generate the factors f1 = 2^e1 and f2 = 2^e2
-   */
-  e1 = spu_rlmaska(e, -1);
-  e2 = spu_sub(e, e1);
+    /* Generate the factors f1 = 2^e1 and f2 = 2^e2
+     */
+    e1 = spu_rlmaska(e, -1);
+    e2 = spu_sub(e, e1);
 
-  f1 = (vec_double2)spu_sl(spu_add(e1, 1023), shift);
-  f2 = (vec_double2)spu_sl(spu_add(e2, 1023), shift);
+    f1 = (vec_double2)spu_sl(spu_add(e1, 1023), shift);
+    f2 = (vec_double2)spu_sl(spu_add(e2, 1023), shift);
 
-  /* Compute the product x * 2^e1 * 2^e2
-   */
-  out = spu_mul(spu_mul(in, f1), f2);
+    /* Compute the product x * 2^e1 * 2^e2
+     */
+    out = spu_mul(spu_mul(in, f1), f2);
 
-  return (spu_extract(out, 0));
+    return (spu_extract(out, 0));
 }
 #endif /* _SCALBN_H_ */

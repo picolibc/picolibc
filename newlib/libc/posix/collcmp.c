@@ -35,21 +35,22 @@
  * "[a-z]"-type ranges with national characters.
  */
 
-int __collate_range_cmp (int c1, int c2)
+int
+__collate_range_cmp(int c1, int c2)
 {
-	char s1[2], s2[2];
-	int ret;
+    char s1[2], s2[2];
+    int  ret;
 
-	c1 &= UCHAR_MAX;
-	c2 &= UCHAR_MAX;
-	if (c1 == c2)
-		return (0);
-	s1[0] = c1;
-        s1[1] = 0;
-	s2[0] = c2;
-        s2[1] = 0;
-	if ((ret = strcoll(s1, s2)) != 0)
-		return (ret);
-	return (c1 - c2);
+    c1 &= UCHAR_MAX;
+    c2 &= UCHAR_MAX;
+    if (c1 == c2)
+        return (0);
+    s1[0] = c1;
+    s1[1] = 0;
+    s2[0] = c2;
+    s2[1] = 0;
+    if ((ret = strcoll(s1, s2)) != 0)
+        return (ret);
+    return (c1 - c2);
 }
 #endif

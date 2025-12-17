@@ -38,8 +38,8 @@
 #ifndef _MACHINE_MATH_H_
 #define _MACHINE_MATH_H_
 
-# if (__ARM_FEATURE_FMA && (__ARM_FP & 8))
-#define __HAVE_FAST_FMA  1
+#if (__ARM_FEATURE_FMA && (__ARM_FP & 8))
+#define __HAVE_FAST_FMA 1
 #endif
 
 #if (__ARM_FEATURE_FMA && (__ARM_FP & 4))
@@ -58,95 +58,87 @@
  * Double precision routines
  */
 
-__declare_extern_inline(double)
-sqrt(double x)
-{
-	double result;
-#ifdef __MATH_ERRNO
-        if (isless(x, 0.0))
-            errno = EDOM;
-#endif
-#if __ARM_ARCH >= 6
-	__asm__ volatile ("vsqrt.f64 %P0, %P1" : "=w" (result) : "w" (x));
-#else
-	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-        __asm__ volatile ("vsqrt.f64 %P0, %P1" : "=&w" (result) : "w" (x));
-#endif
-	return result;
-}
-
-__declare_extern_inline(double)
-fabs(double x)
+__declare_extern_inline(double) sqrt(double x)
 {
     double result;
-    __asm__ ("vabs.f64\t%P0, %P1" : "=w" (result) : "w" (x));
+#ifdef __MATH_ERRNO
+    if (isless(x, 0.0))
+        errno = EDOM;
+#endif
+#if __ARM_ARCH >= 6
+    __asm__ volatile("vsqrt.f64 %P0, %P1" : "=w"(result) : "w"(x));
+#else
+    /* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
+    __asm__ volatile("vsqrt.f64 %P0, %P1" : "=&w"(result) : "w"(x));
+#endif
+    return result;
+}
+
+__declare_extern_inline(double) fabs(double x)
+{
+    double result;
+    __asm__("vabs.f64\t%P0, %P1" : "=w"(result) : "w"(x));
     return result;
 }
 
 #if __ARM_ARCH >= 8
-__declare_extern_inline(double)
-ceil (double x)
+__declare_extern_inline(double) ceil(double x)
 {
-  double result;
-  __asm__ volatile ( "vrintp.f64\t%P0, %P1" : "=w" (result) : "w" (x) );
-  return result;
+    double result;
+    __asm__ volatile("vrintp.f64\t%P0, %P1" : "=w"(result) : "w"(x));
+    return result;
 }
 
-__declare_extern_inline(double)
-floor (double x)
+__declare_extern_inline(double) floor(double x)
 {
-  double result;
-  __asm__ volatile ("vrintm.f64\t%P0, %P1" : "=w" (result) : "w" (x));
-  return result;
+    double result;
+    __asm__ volatile("vrintm.f64\t%P0, %P1" : "=w"(result) : "w"(x));
+    return result;
 }
 
-__declare_extern_inline(double)
-nearbyint (double x)
+__declare_extern_inline(double) nearbyint(double x)
 {
-    if (isnan(x)) return x + x;
+    if (isnan(x))
+        return x + x;
 #if defined(FE_INEXACT)
     fenv_t env;
     fegetenv(&env);
 #endif
-    __asm__ volatile ("vrintr.f64\t%P0, %P1" : "=w" (x) : "w" (x));
+    __asm__ volatile("vrintr.f64\t%P0, %P1" : "=w"(x) : "w"(x));
 #if defined(FE_INEXACT)
     fesetenv(&env);
 #endif
     return x;
 }
 
-__declare_extern_inline(double)
-rint (double x)
+__declare_extern_inline(double) rint(double x)
 {
-  double result;
-  __asm__ volatile ("vrintx.f64\t%P0, %P1" : "=w" (result) : "w" (x));
-  return result;
+    double result;
+    __asm__ volatile("vrintx.f64\t%P0, %P1" : "=w"(result) : "w"(x));
+    return result;
 }
 
-__declare_extern_inline(double)
-round (double x)
+__declare_extern_inline(double) round(double x)
 {
-  double result;
-  __asm__ volatile ("vrinta.f64\t%P0, %P1" : "=w" (result) : "w" (x));
-  return result;
+    double result;
+    __asm__ volatile("vrinta.f64\t%P0, %P1" : "=w"(result) : "w"(x));
+    return result;
 }
 
-__declare_extern_inline(double)
-trunc (double x)
+__declare_extern_inline(double) trunc(double x)
 {
-  double result;
-  __asm__ volatile ("vrintz.f64\t%P0, %P1" : "=w" (result) : "w" (x));
-  return result;
+    double result;
+    __asm__ volatile("vrintz.f64\t%P0, %P1" : "=w"(result) : "w"(x));
+    return result;
 }
 #endif /* __ARM_ARCH >= 8 */
 
 #if __HAVE_FAST_FMA
 
-__declare_extern_inline(double)
-fma (double x, double y, double z)
+__declare_extern_inline(double) fma(double x, double y, double z)
 {
-  __asm__ volatile ("vfma.f64 %P0, %P1, %P2" : "+w" (z) : "w" (x), "w" (y));
-  return z;
+    __asm__ volatile("vfma.f64 %P0, %P1, %P2" : "+w"(z) : "w"(x), "w"(y));
+    return z;
 }
 
 #endif
@@ -159,95 +151,87 @@ fma (double x, double y, double z)
  * Single precision functions
  */
 
-__declare_extern_inline(float)
-sqrtf(float x)
-{
-	float result;
-#ifdef __MATH_ERRNO
-        if (isless(x, 0.0f))
-            errno = EDOM;
-#endif
-#if __ARM_ARCH >= 6
-	__asm__ volatile ("vsqrt.f32 %0, %1" : "=w" (result) : "w" (x));
-#else
-	/* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
-	__asm__ volatile ("vsqrt.f32 %0, %1" : "=&w" (result) : "w" (x) : "cc", "memory");
-#endif
-	return result;
-}
-
-__declare_extern_inline(float)
-fabsf(float x)
+__declare_extern_inline(float) sqrtf(float x)
 {
     float result;
-    __asm__ ("vabs.f32\t%0, %1" : "=t" (result) : "t" (x));
+#ifdef __MATH_ERRNO
+    if (isless(x, 0.0f))
+        errno = EDOM;
+#endif
+#if __ARM_ARCH >= 6
+    __asm__ volatile("vsqrt.f32 %0, %1" : "=w"(result) : "w"(x));
+#else
+    /* VFP9 Erratum 760019, see GCC sources "gcc/config/arm/vfp.md" */
+    __asm__ volatile("vsqrt.f32 %0, %1" : "=&w"(result) : "w"(x) : "cc", "memory");
+#endif
+    return result;
+}
+
+__declare_extern_inline(float) fabsf(float x)
+{
+    float result;
+    __asm__("vabs.f32\t%0, %1" : "=t"(result) : "t"(x));
     return result;
 }
 
 #if __ARM_ARCH >= 8
-__declare_extern_inline(float)
-ceilf (float x)
+__declare_extern_inline(float) ceilf(float x)
 {
-  float result;
-  __asm__ volatile ( "vrintp.f32\t%0, %1" : "=t" (result) : "t" (x) );
-  return result;
+    float result;
+    __asm__ volatile("vrintp.f32\t%0, %1" : "=t"(result) : "t"(x));
+    return result;
 }
 
-__declare_extern_inline(float)
-floorf (float x)
+__declare_extern_inline(float) floorf(float x)
 {
-  float result;
-  __asm__ volatile ( "vrintm.f32\t%0, %1" : "=t" (result) : "t" (x) );
-  return result;
+    float result;
+    __asm__ volatile("vrintm.f32\t%0, %1" : "=t"(result) : "t"(x));
+    return result;
 }
 
-__declare_extern_inline(float)
-nearbyintf (float x)
+__declare_extern_inline(float) nearbyintf(float x)
 {
-    if (isnan(x)) return x + x;
+    if (isnan(x))
+        return x + x;
 #if defined(FE_INEXACT)
     fenv_t env;
     fegetenv(&env);
 #endif
-    __asm__ volatile ("vrintr.f32\t%0, %1" : "=t" (x) : "t" (x));
+    __asm__ volatile("vrintr.f32\t%0, %1" : "=t"(x) : "t"(x));
 #if defined(FE_INEXACT)
     fesetenv(&env);
 #endif
     return x;
 }
 
-__declare_extern_inline(float)
-rintf (float x)
+__declare_extern_inline(float) rintf(float x)
 {
-  float result;
-  __asm__ volatile ("vrintx.f32\t%0, %1" : "=t" (result) : "t" (x));
-  return result;
+    float result;
+    __asm__ volatile("vrintx.f32\t%0, %1" : "=t"(result) : "t"(x));
+    return result;
 }
 
-__declare_extern_inline(float)
-roundf (float x)
+__declare_extern_inline(float) roundf(float x)
 {
-  float result;
-  __asm__ volatile ("vrinta.f32\t%0, %1" : "=t" (result) : "t" (x));
-  return result;
+    float result;
+    __asm__ volatile("vrinta.f32\t%0, %1" : "=t"(result) : "t"(x));
+    return result;
 }
 
-__declare_extern_inline(float)
-truncf (float x)
+__declare_extern_inline(float) truncf(float x)
 {
-  float result;
-  __asm__ volatile ("vrintz.f32\t%0, %1" : "=t" (result) : "t" (x));
-  return result;
+    float result;
+    __asm__ volatile("vrintz.f32\t%0, %1" : "=t"(result) : "t"(x));
+    return result;
 }
 #endif /* __ARM_ARCH >= 8 */
 
 #if __HAVE_FAST_FMAF
 
-__declare_extern_inline(float)
-fmaf (float x, float y, float z)
+__declare_extern_inline(float) fmaf(float x, float y, float z)
 {
-  __asm__ volatile ("vfma.f32 %0, %1, %2" : "+t" (z) : "t" (x), "t" (y));
-  return z;
+    __asm__ volatile("vfma.f32 %0, %1, %2" : "+t"(z) : "t"(x), "t"(y));
+    return z;
 }
 
 #endif

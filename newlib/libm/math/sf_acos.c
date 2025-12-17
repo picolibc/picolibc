@@ -16,24 +16,24 @@
 #include "fdlibm.h"
 
 static const float one = 1.0000000000e+00, /* 0x3F800000 */
-    pi = 3.1415925026e+00, /* 0x40490fda */
-    pio2_hi = 1.5707962513e+00, /* 0x3fc90fda */
-    pio2_lo = 7.5497894159e-08, /* 0x33a22168 */
-    pS0 = 1.6666667163e-01, /* 0x3e2aaaab */
-    pS1 = -3.2556581497e-01, /* 0xbea6b090 */
-    pS2 = 2.0121252537e-01, /* 0x3e4e0aa8 */
-    pS3 = -4.0055535734e-02, /* 0xbd241146 */
-    pS4 = 7.9153501429e-04, /* 0x3a4f7f04 */
-    pS5 = 3.4793309169e-05, /* 0x3811ef08 */
-    qS1 = -2.4033949375e+00, /* 0xc019d139 */
-    qS2 = 2.0209457874e+00, /* 0x4001572d */
-    qS3 = -6.8828397989e-01, /* 0xbf303361 */
-    qS4 = 7.7038154006e-02; /* 0x3d9dc62e */
+    pi = 3.1415925026e+00,                 /* 0x40490fda */
+    pio2_hi = 1.5707962513e+00,            /* 0x3fc90fda */
+    pio2_lo = 7.5497894159e-08,            /* 0x33a22168 */
+    pS0 = 1.6666667163e-01,                /* 0x3e2aaaab */
+    pS1 = -3.2556581497e-01,               /* 0xbea6b090 */
+    pS2 = 2.0121252537e-01,                /* 0x3e4e0aa8 */
+    pS3 = -4.0055535734e-02,               /* 0xbd241146 */
+    pS4 = 7.9153501429e-04,                /* 0x3a4f7f04 */
+    pS5 = 3.4793309169e-05,                /* 0x3811ef08 */
+    qS1 = -2.4033949375e+00,               /* 0xc019d139 */
+    qS2 = 2.0209457874e+00,                /* 0x4001572d */
+    qS3 = -6.8828397989e-01,               /* 0xbf303361 */
+    qS4 = 7.7038154006e-02;                /* 0x3d9dc62e */
 
 float
 acosf(float x)
 {
-    float z, p, q, r, w, s, c, df;
+    float     z, p, q, r, w, s, c, df;
     __int32_t hx, ix;
     GET_FLOAT_WORD(hx, x);
     ix = hx & 0x7fffffff;
@@ -42,8 +42,8 @@ acosf(float x)
             return 0.0; /* acos(1) = 0  */
         else
             return pi + (float)2.0 * pio2_lo; /* acos(-1)= pi */
-    } else if (ix > 0x3f800000) { /* |x| >= 1 */
-        return __math_invalidf(x); /* acos(|x|>1) is NaN */
+    } else if (ix > 0x3f800000) {             /* |x| >= 1 */
+        return __math_invalidf(x);            /* acos(|x|>1) is NaN */
     }
     if (ix < 0x3f000000) { /* |x| < 0.5 */
         if (ix <= 0x23000000)

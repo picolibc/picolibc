@@ -24,7 +24,6 @@
  * SUCH DAMAGE.
  */
 
-
 /*
  * Denorms usually have an exponent biased by 1 so that they flow
  * smoothly into the smallest normal value with an exponent of
@@ -34,7 +33,7 @@
  */
 
 #ifndef FLOAT_DENORM_BIAS
-#define FLOAT_DENORM_BIAS   1
+#define FLOAT_DENORM_BIAS 1
 #endif
 
 /*
@@ -43,8 +42,8 @@
  * bits of the result.
  */
 struct dd {
-	FLOAT_T hi;
-	FLOAT_T lo;
+    FLOAT_T hi;
+    FLOAT_T lo;
 };
 
 /*
@@ -55,13 +54,13 @@ struct dd {
 static inline struct dd
 dd_add(FLOAT_T a, FLOAT_T b)
 {
-	struct dd ret;
-	FLOAT_T s;
+    struct dd ret;
+    FLOAT_T   s;
 
-	ret.hi = a + b;
-	s = ret.hi - a;
-	ret.lo = (a - (ret.hi - s)) + (b - s);
-	return (ret);
+    ret.hi = a + b;
+    s = ret.hi - a;
+    ret.lo = (a - (ret.hi - s)) + (b - s);
+    return (ret);
 }
 
 /*
@@ -78,14 +77,14 @@ dd_add(FLOAT_T a, FLOAT_T b)
 static inline FLOAT_T
 add_adjusted(FLOAT_T a, FLOAT_T b)
 {
-	struct dd sum;
+    struct dd sum;
 
-	sum = dd_add(a, b);
-	if (sum.lo != 0) {
-		if (!odd_mant(sum.hi))
-			sum.hi = NEXTAFTER(sum.hi, (FLOAT_T)INFINITY * sum.lo);
-	}
-	return (sum.hi);
+    sum = dd_add(a, b);
+    if (sum.lo != 0) {
+        if (!odd_mant(sum.hi))
+            sum.hi = NEXTAFTER(sum.hi, (FLOAT_T)INFINITY * sum.lo);
+    }
+    return (sum.hi);
 }
 
 /*
@@ -96,27 +95,27 @@ add_adjusted(FLOAT_T a, FLOAT_T b)
 static inline FLOAT_T
 add_and_denormalize(FLOAT_T a, FLOAT_T b, int scale)
 {
-	struct dd sum;
-	int bits_lost;
+    struct dd sum;
+    int       bits_lost;
 
-	sum = dd_add(a, b);
+    sum = dd_add(a, b);
 
-	/*
-	 * If we are losing at least two bits of accuracy to denormalization,
-	 * then the first lost bit becomes a round bit, and we adjust the
-	 * lowest bit of sum.hi to make it a sticky bit summarizing all the
-	 * bits in sum.lo. With the sticky bit adjusted, the hardware will
-	 * break any ties in the correct direction.
-	 *
-	 * If we are losing only one bit to denormalization, however, we must
-	 * break the ties manually.
-	 */
-	if (sum.lo != 0) {
-		bits_lost = -EXPONENT(sum.hi) - scale + FLOAT_DENORM_BIAS;
-		if ((bits_lost != 1) ^ (int)odd_mant(sum.hi))
-                        sum.hi = NEXTAFTER(sum.hi, (FLOAT_T)INFINITY * sum.lo);
-	}
-	return (LDEXP(sum.hi, scale));
+    /*
+     * If we are losing at least two bits of accuracy to denormalization,
+     * then the first lost bit becomes a round bit, and we adjust the
+     * lowest bit of sum.hi to make it a sticky bit summarizing all the
+     * bits in sum.lo. With the sticky bit adjusted, the hardware will
+     * break any ties in the correct direction.
+     *
+     * If we are losing only one bit to denormalization, however, we must
+     * break the ties manually.
+     */
+    if (sum.lo != 0) {
+        bits_lost = -EXPONENT(sum.hi) - scale + FLOAT_DENORM_BIAS;
+        if ((bits_lost != 1) ^ (int)odd_mant(sum.hi))
+            sum.hi = NEXTAFTER(sum.hi, (FLOAT_T)INFINITY * sum.lo);
+    }
+    return (LDEXP(sum.hi, scale));
 }
 
 /*
@@ -127,39 +126,39 @@ add_and_denormalize(FLOAT_T a, FLOAT_T b, int scale)
 static inline struct dd
 dd_mul(FLOAT_T a, FLOAT_T b)
 {
-	static const FLOAT_T split = SPLIT;
-	struct dd ret;
-	FLOAT_T ha, hb, la, lb, p, q;
+    static const FLOAT_T split = SPLIT;
+    struct dd            ret;
+    FLOAT_T              ha, hb, la, lb, p, q;
 
-	p = a * split;
-	ha = a - p;
-	ha += p;
-	la = a - ha;
+    p = a * split;
+    ha = a - p;
+    ha += p;
+    la = a - ha;
 
-	p = b * split;
-	hb = b - p;
-	hb += p;
-	lb = b - hb;
+    p = b * split;
+    hb = b - p;
+    hb += p;
+    lb = b - hb;
 
-	p = ha * hb;
-	q = ha * lb + la * hb;
+    p = ha * hb;
+    q = ha * lb + la * hb;
 
-	ret.hi = p + q;
-	ret.lo = p - ret.hi + q + la * lb;
-	return (ret);
+    ret.hi = p + q;
+    ret.lo = p - ret.hi + q + la * lb;
+    return (ret);
 }
 
 #ifdef __MATH_ERRNO
 static FLOAT_T
 _scalbn_no_errno(FLOAT_T x, int n)
 {
-        int save_errno = errno;
-        x = SCALBN(x, n);
-        errno = save_errno;
-        return x;
+    int save_errno = errno;
+    x = SCALBN(x, n);
+    errno = save_errno;
+    return x;
 }
 #else
-#define _scalbn_no_errno(a,b) SCALBN(a,b)
+#define _scalbn_no_errno(a, b) SCALBN(a, b)
 #endif
 
 #ifdef __clang__
@@ -182,123 +181,123 @@ _scalbn_no_errno(FLOAT_T x, int n)
 FLOAT_T
 FMA(FLOAT_T x, FLOAT_T y, FLOAT_T z)
 {
-	FLOAT_T xs, ys, zs, adj;
-	struct dd xy, r;
-	int ex, ey, ez;
-	int spread;
+    FLOAT_T   xs, ys, zs, adj;
+    struct dd xy, r;
+    int       ex, ey, ez;
+    int       spread;
 
-	/*
-	 * Handle special cases. The order of operations and the particular
-	 * return values here are crucial in handling special cases involving
-	 * infinities, NaNs, overflows, and signed zeroes correctly.
-	 */
-        if (!isfinite(z) && isfinite(x) && isfinite(y))
-                return z + z;
-	if (!isfinite(x) || !isfinite(y) || !isfinite(z))
-		return (x * y + z);
-	if (x == (FLOAT_T) 0.0 || y == (FLOAT_T) 0.0)
-		return (x * y + z);
-	if (z == (FLOAT_T) 0.0)
-		return (x * y);
+    /*
+     * Handle special cases. The order of operations and the particular
+     * return values here are crucial in handling special cases involving
+     * infinities, NaNs, overflows, and signed zeroes correctly.
+     */
+    if (!isfinite(z) && isfinite(x) && isfinite(y))
+        return z + z;
+    if (!isfinite(x) || !isfinite(y) || !isfinite(z))
+        return (x * y + z);
+    if (x == (FLOAT_T)0.0 || y == (FLOAT_T)0.0)
+        return (x * y + z);
+    if (z == (FLOAT_T)0.0)
+        return (x * y);
 
-	xs = FREXP(x, &ex);
-	ys = FREXP(y, &ey);
-	zs = FREXP(z, &ez);
+    xs = FREXP(x, &ex);
+    ys = FREXP(y, &ey);
+    zs = FREXP(z, &ez);
 #ifdef HAS_ROUNDING
-	int oround = fegetround();
+    int oround = fegetround();
 #endif
-	spread = ex + ey - ez;
+    spread = ex + ey - ez;
 
-	/*
-	 * If x * y and z are many orders of magnitude apart, the scaling
-	 * will overflow, so we handle these cases specially.  Rounding
-	 * modes other than FE_TONEAREST are painful.
-	 */
-	if (spread < -FLOAT_MANT_DIG) {
+    /*
+     * If x * y and z are many orders of magnitude apart, the scaling
+     * will overflow, so we handle these cases specially.  Rounding
+     * modes other than FE_TONEAREST are painful.
+     */
+    if (spread < -FLOAT_MANT_DIG) {
 #ifdef FE_INEXACT
-		feraiseexcept(FE_INEXACT);
+        feraiseexcept(FE_INEXACT);
 #endif
 #ifdef FE_UNDERFLOW
-		if (!isnormal(z))
-			feraiseexcept(FE_UNDERFLOW);
+        if (!isnormal(z))
+            feraiseexcept(FE_UNDERFLOW);
 #endif
 #ifdef HAS_ROUNDING
-		switch (oround) {
-		default:
-                        break;
+        switch (oround) {
+        default:
+            break;
 #ifdef FE_TOWARDZERO
-		case FE_TOWARDZERO:
-			if ((x > (FLOAT_T) 0.0) ^ (y < (FLOAT_T) 0.0) ^ (z < (FLOAT_T) 0.0))
-				break;
-			else
-				return (NEXTAFTER(z, 0));
+        case FE_TOWARDZERO:
+            if ((x > (FLOAT_T)0.0) ^ (y < (FLOAT_T)0.0) ^ (z < (FLOAT_T)0.0))
+                break;
+            else
+                return (NEXTAFTER(z, 0));
 #endif
 #ifdef FE_DOWNWARD
-		case FE_DOWNWARD:
-			if ((x > (FLOAT_T) 0.0) ^ (y < (FLOAT_T) 0.0))
-				break;
-			else
-				return (NEXTAFTER(z, -(FLOAT_T)INFINITY));
+        case FE_DOWNWARD:
+            if ((x > (FLOAT_T)0.0) ^ (y < (FLOAT_T)0.0))
+                break;
+            else
+                return (NEXTAFTER(z, -(FLOAT_T)INFINITY));
 #endif
 #ifdef FE_UPWARD
-                case FE_UPWARD:
-			if ((x > (FLOAT_T) 0.0) ^ (y < (FLOAT_T) 0.0))
-				return (NEXTAFTER(z, (FLOAT_T)INFINITY));
-                        break;
+        case FE_UPWARD:
+            if ((x > (FLOAT_T)0.0) ^ (y < (FLOAT_T)0.0))
+                return (NEXTAFTER(z, (FLOAT_T)INFINITY));
+            break;
 #endif
-		}
+        }
 #endif
-                return (z);
-	}
-	if (spread <= FLOAT_MANT_DIG * 2)
-		zs = _scalbn_no_errno(zs, -spread);
-	else
-		zs = COPYSIGN(FLOAT_MIN, zs);
+        return (z);
+    }
+    if (spread <= FLOAT_MANT_DIG * 2)
+        zs = _scalbn_no_errno(zs, -spread);
+    else
+        zs = COPYSIGN(FLOAT_MIN, zs);
 
 #ifdef HAS_ROUNDING
-	fesetround(FE_TONEAREST);
+    fesetround(FE_TONEAREST);
 #endif
 
-	/*
-	 * Basic approach for round-to-nearest:
-	 *
-	 *     (xy.hi, xy.lo) = x * y		(exact)
-	 *     (r.hi, r.lo)   = xy.hi + z	(exact)
-	 *     adj = xy.lo + r.lo		(inexact; low bit is sticky)
-	 *     result = r.hi + adj		(correctly rounded)
-	 */
-	xy = dd_mul(xs, ys);
-	r = dd_add(xy.hi, zs);
+    /*
+     * Basic approach for round-to-nearest:
+     *
+     *     (xy.hi, xy.lo) = x * y		(exact)
+     *     (r.hi, r.lo)   = xy.hi + z	(exact)
+     *     adj = xy.lo + r.lo		(inexact; low bit is sticky)
+     *     result = r.hi + adj		(correctly rounded)
+     */
+    xy = dd_mul(xs, ys);
+    r = dd_add(xy.hi, zs);
 
-	spread = ex + ey;
+    spread = ex + ey;
 
-	if (r.hi == (FLOAT_T) 0.0) {
-		/*
-		 * When the addends cancel to 0, ensure that the result has
-		 * the correct sign.
-		 */
+    if (r.hi == (FLOAT_T)0.0) {
+        /*
+         * When the addends cancel to 0, ensure that the result has
+         * the correct sign.
+         */
 #ifdef HAS_ROUNDING
-		fesetround(oround);
+        fesetround(oround);
 #endif
-		volatile FLOAT_T vzs = zs; /* XXX gcc CSE bug workaround */
-		return (xy.hi + vzs + _scalbn_no_errno(xy.lo, spread));
-	}
+        volatile FLOAT_T vzs = zs; /* XXX gcc CSE bug workaround */
+        return (xy.hi + vzs + _scalbn_no_errno(xy.lo, spread));
+    }
 
 #ifdef HAS_ROUNDING
-	if (oround != FE_TONEAREST) {
-		/*
-		 * There is no need to worry about double rounding in directed
-		 * rounding modes.
-		 */
-		fesetround(oround);
-		adj = r.lo + xy.lo;
-		return (_scalbn_no_errno(r.hi + adj, spread));
-	}
+    if (oround != FE_TONEAREST) {
+        /*
+         * There is no need to worry about double rounding in directed
+         * rounding modes.
+         */
+        fesetround(oround);
+        adj = r.lo + xy.lo;
+        return (_scalbn_no_errno(r.hi + adj, spread));
+    }
 #endif
 
-	adj = add_adjusted(r.lo, xy.lo);
-	if (spread + ILOGB(r.hi) > -(FLOAT_MAX_EXP - FLOAT_DENORM_BIAS))
-		return (_scalbn_no_errno(r.hi + adj, spread));
-	else
-		return (add_and_denormalize(r.hi, adj, spread));
+    adj = add_adjusted(r.lo, xy.lo);
+    if (spread + ILOGB(r.hi) > -(FLOAT_MAX_EXP - FLOAT_DENORM_BIAS))
+        return (_scalbn_no_errno(r.hi + adj, spread));
+    else
+        return (add_and_denormalize(r.hi, adj, spread));
 }

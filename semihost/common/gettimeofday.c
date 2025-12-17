@@ -37,27 +37,27 @@
 #include "semihost.h"
 
 int
-gettimeofday(struct timeval *restrict tv, void *restrict tz)
+gettimeofday(struct timeval * restrict tv, void * restrict tz)
 {
-    uint64_t ticks;
-    uint64_t elapsed;
-    static uint64_t start_elapsed;
-    static uint64_t start_ticks;
+    uint64_t         ticks;
+    uint64_t         elapsed;
+    static uint64_t  start_elapsed;
+    static uint64_t  start_ticks;
     static uintptr_t tick_freq;
-    static int been_here;
+    static int       been_here;
 
-    (void) tz;
+    (void)tz;
     elapsed = sys_semihost_elapsed();
     if (!been_here) {
         start_elapsed = elapsed;
         tick_freq = sys_semihost_tickfreq();
-        start_ticks = (uint64_t) sys_semihost_time() * tick_freq;
+        start_ticks = (uint64_t)sys_semihost_time() * tick_freq;
         been_here = 1;
     }
 
     ticks = start_ticks + (elapsed - start_elapsed);
 
-    tv->tv_sec = (time_t) (ticks / tick_freq);
-    tv->tv_usec = (suseconds_t) ((ticks % tick_freq) * 1000000 / tick_freq);
+    tv->tv_sec = (time_t)(ticks / tick_freq);
+    tv->tv_usec = (suseconds_t)((ticks % tick_freq) * 1000000 / tick_freq);
     return 0;
 }

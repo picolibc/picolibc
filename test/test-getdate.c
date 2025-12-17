@@ -50,11 +50,11 @@
 #endif
 
 struct date {
-    int         line;
-    struct tm   tm;
-    int64_t     time;
-    char        * const string;
-    char        * const format;
+    int          line;
+    struct tm    tm;
+    int64_t      time;
+    char * const string;
+    char * const format;
 };
 
 #define TIME_TM_YEAR_BASE 1900
@@ -214,7 +214,7 @@ const struct date dates[] = {
     },
 };
 
-#define NUM_DATES (sizeof(dates)/sizeof(dates[0]))
+#define NUM_DATES (sizeof(dates) / sizeof(dates[0]))
 
 static bool
 tm_eq(const struct tm *a, const struct tm *b)
@@ -236,19 +236,19 @@ tm_eq(const struct tm *a, const struct tm *b)
     if (a->tm_yday != b->tm_yday)
         return false;
     /* these functions can't compute this field */
-/*
-    if (a->tm_isdst != b->tm_isdst)
-        return false;
-*/
+    /*
+        if (a->tm_isdst != b->tm_isdst)
+            return false;
+    */
     return true;
 }
 
-#define TIME_STR        128
+#define TIME_STR 128
 
 static bool
 asctime_trim(const struct tm *tm, char buf[TIME_STR])
 {
-    char        *a = buf;
+    char *a = buf;
 
     if (!strftime(buf, TIME_STR, "%a %b %e %H:%M:%S %Y wday %w yday %j", tm))
         return false;
@@ -267,8 +267,8 @@ static int
 test_getdate(const struct date *date)
 {
     struct tm *got;
-    char        gotbuf[TIME_STR], expectbuf[TIME_STR];
-    int         ret = 0;
+    char       gotbuf[TIME_STR], expectbuf[TIME_STR];
+    int        ret = 0;
 
 #ifndef TESTS_ENABLE_POSIX_IO
     return 1;
@@ -284,22 +284,22 @@ test_getdate(const struct date *date)
             strcpy(gotbuf, "invalid");
         if (!asctime_trim(&date->tm, expectbuf))
             strcpy(expectbuf, "invalid");
-        printf("%s:%d: getdate(\"%s\") = '%s' expect '%s'\n",
-               __FILE__, date->line, date->string, gotbuf, expectbuf);
+        printf("%s:%d: getdate(\"%s\") = '%s' expect '%s'\n", __FILE__, date->line, date->string,
+               gotbuf, expectbuf);
     }
     if (got)
-        memset(got, 0, sizeof (struct tm));
+        memset(got, 0, sizeof(struct tm));
     return ret;
 }
 
 static int
 test_strptime(const struct date *date)
 {
-    struct tm   got;
-    char        gotbuf[TIME_STR], expectbuf[TIME_STR];
-    char        *ret;
+    struct tm got;
+    char      gotbuf[TIME_STR], expectbuf[TIME_STR];
+    char     *ret;
 
-    memset(&got, 0, sizeof (struct tm));
+    memset(&got, 0, sizeof(struct tm));
     ret = strptime(date->string, date->format, &got);
     if (!ret)
         printf("strptime error\n");
@@ -308,8 +308,8 @@ test_strptime(const struct date *date)
             strcpy(gotbuf, "invalid");
         if (!asctime_trim(&date->tm, expectbuf))
             strcpy(expectbuf, "invalid");
-        printf("%s:%d: strptime(\"%s\", \"%s\") = '%s' expect '%s'\n",
-               __FILE__, date->line, date->string, date->format, gotbuf, expectbuf);
+        printf("%s:%d: strptime(\"%s\", \"%s\") = '%s' expect '%s'\n", __FILE__, date->line,
+               date->string, date->format, gotbuf, expectbuf);
         return 0;
     }
     return 1;
@@ -318,17 +318,17 @@ test_strptime(const struct date *date)
 static int
 test_strftime(const struct date *date)
 {
-    struct tm   got;
-    char        gotbuf[TIME_STR], expectbuf[TIME_STR];
-    size_t      ret;
+    struct tm got;
+    char      gotbuf[TIME_STR], expectbuf[TIME_STR];
+    size_t    ret;
 
-    memset(&got, 0, sizeof (struct tm));
+    memset(&got, 0, sizeof(struct tm));
     ret = strftime(gotbuf, TIME_STR, date->format, &date->tm);
-    if (ret != strlen (date->string) || strcmp (gotbuf, date->string) != 0) {
+    if (ret != strlen(date->string) || strcmp(gotbuf, date->string) != 0) {
         if (!asctime_trim(&date->tm, expectbuf))
             strcpy(expectbuf, "invalid");
-        printf("%s:%d: strftime(%s, %s) = '%s' expect '%s'\n",
-               __FILE__, date->line, expectbuf, date->format, gotbuf, date->string);
+        printf("%s:%d: strftime(%s, %s) = '%s' expect '%s'\n", __FILE__, date->line, expectbuf,
+               date->format, gotbuf, date->string);
         return 0;
     }
     return 1;
@@ -337,14 +337,14 @@ test_strftime(const struct date *date)
 int
 main(void)
 {
-    size_t      i;
-    int         ret = 0;
+    size_t i;
+    int    ret = 0;
 
-    (void) setlocale(LC_ALL, "C.UTF-8");
+    (void)setlocale(LC_ALL, "C.UTF-8");
 
 #ifdef TESTS_ENABLE_POSIX_IO
-    char        *datemsk_name = TEST_FILE_NAME;
-    FILE        *datemsk;
+    char *datemsk_name = TEST_FILE_NAME;
+    FILE *datemsk;
     datemsk = fopen(datemsk_name, "w");
     if (!datemsk) {
         perror(datemsk_name);
@@ -368,7 +368,7 @@ main(void)
 #endif
 
     for (i = 0; i < NUM_DATES; i++) {
-        if (sizeof(time_t) == 4 && dates[i].time > (int64_t) 0x7fffffff)
+        if (sizeof(time_t) == 4 && dates[i].time > (int64_t)0x7fffffff)
             continue;
         if (!test_getdate(&dates[i]))
             ret = 1;

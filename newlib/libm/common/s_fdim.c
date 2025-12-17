@@ -7,25 +7,25 @@
 FUNCTION
 <<fdim>>, <<fdimf>>---positive difference
 INDEX
-	fdim
+        fdim
 INDEX
-	fdimf
+        fdimf
 
 SYNOPSIS
-	#include <math.h>
-	double fdim(double <[x]>, double <[y]>);
-	float fdimf(float <[x]>, float <[y]>);
+        #include <math.h>
+        double fdim(double <[x]>, double <[y]>);
+        float fdimf(float <[x]>, float <[y]>);
 
 DESCRIPTION
 The <<fdim>> functions determine the positive difference between their
 arguments, returning:
 .	<[x]> - <[y]>	if <[x]> > <[y]>, or
-	@ifnottex
+        @ifnottex
 .	+0	if <[x]> <= <[y]>, or
-	@end ifnottex
-	@tex
+        @end ifnottex
+        @tex
 .	+0	if <[x]> $\leq$ <[y]>, or
-	@end tex
+        @end tex
 .	NAN	if either argument is NAN.
 A range error may occur.
 
@@ -44,12 +44,13 @@ ANSI C, POSIX.
 __float64
 fdim64(__float64 x, __float64 y)
 {
-  if (isnan(x) || isnan(y)) return(x+y);
+    if (isnan(x) || isnan(y))
+        return (x + y);
 
-  __float64 z = x > y ? x - y : _F_64(0.0);
-  if (!isinf(x) && !isinf(y))
-    z = check_oflow(z);
-  return z;
+    __float64 z = x > y ? x - y : _F_64(0.0);
+    if (!isinf(x) && !isinf(y))
+        z = check_oflow(z);
+    return z;
 }
 
 _MATH_ALIAS_d_dd(fdim)

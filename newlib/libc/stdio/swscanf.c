@@ -32,12 +32,12 @@
 int
 swscanf(const wchar_t *s, const wchar_t *fmt, ...)
 {
-	va_list ap;
-	int i;
-	struct __file_str f = FDEV_SETUP_WSTRING_READ(s);
-	va_start(ap, fmt);
-	i = vfwscanf(&f.file, fmt, ap);
-	va_end(ap);
+    va_list           ap;
+    int               i;
+    struct __file_str f = FDEV_SETUP_WSTRING_READ(s);
+    va_start(ap, fmt);
+    i = vfwscanf(&f.file, fmt, ap);
+    va_end(ap);
 
-	return i;
+    return i;
 }

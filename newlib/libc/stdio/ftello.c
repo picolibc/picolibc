@@ -34,6 +34,6 @@
  */
 
 #define FTELL_TYPE __off_t
-#define FTELL ftello
+#define FTELL      ftello
 
 #include "ftell.c"

@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-casinh.h"
-#define TEST_FUNC       casinh
+#define TEST_VECTORS "test-casinh.h"
+#define TEST_FUNC    casinh
 
 #include "test-complex-one.h"

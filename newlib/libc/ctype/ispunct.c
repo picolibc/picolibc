@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<ispunct>>, <<ispunct_l>>---punctuation character predicate
+        <<ispunct>>, <<ispunct_l>>---punctuation character predicate
 
 INDEX
-	ispunct
+        ispunct
 
 INDEX
-	ispunct_l
+        ispunct_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int ispunct(int <[c]>);
+        #include <ctype.h>
+        int ispunct(int <[c]>);
 
-	#include <ctype.h>
-	int ispunct_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int ispunct_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<ispunct>> is a macro which classifies singlebyte charset values by table
@@ -71,14 +71,12 @@ No supporting OS subroutines are required.
 
 #undef ispunct
 int
-ispunct (int c)
+ispunct(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
-    return (('!' <= c && c <= '/') ||
-            (':' <= c && c <= '@') ||
-            ('[' <= c && c <= '`') ||
-            ('{' <= c && c <= '~'));
+    return (('!' <= c && c <= '/') || (':' <= c && c <= '@') || ('[' <= c && c <= '`')
+            || ('{' <= c && c <= '~'));
 #else
-    return(__CTYPE_PTR[c+1] & __CTYPE_PUNCT);
+    return (__CTYPE_PTR[c + 1] & __CTYPE_PUNCT);
 #endif
 }

@@ -40,8 +40,8 @@ P5   =  4.1381369442e-08; /* 0x3331bb4c */
 float
 expf(float x) /* default IEEE double exp */
 {
-    float y, hi, lo, c, t;
-    __int32_t k = 0, xsb, sx;
+    float      y, hi, lo, c, t;
+    __int32_t  k = 0, xsb, sx;
     __uint32_t hx;
 
     GET_FLOAT_WORD(sx, x);
@@ -59,7 +59,7 @@ expf(float x) /* default IEEE double exp */
         return __math_uflowf(0); /* underflow */
 
     /* argument reduction */
-    if (hx > 0x3eb17218) { /* if  |x| > 0.5 ln2 */
+    if (hx > 0x3eb17218) {     /* if  |x| > 0.5 ln2 */
         if (hx < 0x3F851592) { /* and |x| < 1.5 ln2 */
             hi = x - ln2HI[xsb];
             lo = ln2LO[xsb];

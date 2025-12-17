@@ -36,28 +36,24 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  int fp;
-  unsigned int pad0[ 3 ];
-  char *buf;
-  unsigned int pad1[ 3 ];
+typedef struct {
+    int          fp;
+    unsigned int pad0[3];
+    char        *buf;
+    unsigned int pad1[3];
 } c99_setbuf_t;
 
-
 void
-setbuf (FILE *__restrict fp,
-	char *__restrict buf)
+setbuf(FILE * __restrict fp, char * __restrict buf)
 {
-  c99_setbuf_t args;
+    c99_setbuf_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.fp = fp->_fp;
-  args.buf = buf;
+    args.fp = fp->_fp;
+    args.buf = buf;
 
-  __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETBUF, &args);
+    __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_SETBUF, &args);
 
-  return;
+    return;
 }
-

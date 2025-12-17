@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/remainder.h"
 
-double remainder(double x, double y)
+double
+remainder(double x, double y)
 {
     return _remainder(x, y);
 }

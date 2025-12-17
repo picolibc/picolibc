@@ -39,7 +39,8 @@
 
 /* By default, the only state we carry is the rounding mode */
 
-int fegetmode(femode_t *modep)
+int
+fegetmode(femode_t *modep)
 {
     modep->round = fegetround();
     modep->except = fegetexcept();

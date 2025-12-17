@@ -39,22 +39,24 @@
 
 void arc_halt_vector(void);
 
-void arc_halt_vector(void)
+void
+arc_halt_vector(void)
 {
-	for(;;);
+    for (;;)
+        ;
 }
 
 void arc_ignore_vector(void);
 
-void arc_ignore_vector(void)
+void
+arc_ignore_vector(void)
 {
 }
 
-#define isr(name) \
-	void  arc_ ## name ## _vector(void) __attribute__ ((weak, alias("arc_ignore_vector")));
+#define isr(name) void arc_##name##_vector(void) __attribute__((weak, alias("arc_ignore_vector")));
 
-#define isr_halt(name) \
-	void  arc_ ## name ## _vector(void) __attribute__ ((weak, alias("arc_halt_vector")));
+#define isr_halt(name)                                                              \
+    void arc_##name##_vector(void) __attribute__((weak, alias("arc_halt_vector")));
 
 isr_halt(memory_error);
 isr_halt(instruction_error);
@@ -71,26 +73,17 @@ isr(div_zero);
 isr(dc_error);
 isr(maligned);
 
-void _start(void);
+void           _start(void);
 extern uint8_t __stack[];
 
-#define i(addr,name)	[(addr)/4] = (void(*)(void)) arc_ ## name ## _vector
+#define i(addr, name) [(addr) / 4] = (void (*)(void))arc_##name##_vector
 
-__section(".data.init.enter")
-void (* const __weak_vector_table[])(void) __attribute((aligned(128))) = {
-    [0] = (void *) _start,
-    i(0x04, memory_error),
-    i(0x08, instruction_error),
-    i(0x0c, machine_check),
-    i(0x10, tlb_miss_i),
-    i(0x14, tlb_miss_d),
-    i(0x18, prot_v),
-    i(0x1c, privilege_v),
-    i(0x20, swi),
-    i(0x24, trap),
-    i(0x28, extension),
-    i(0x2c, div_zero),
-    i(0x30, dc_error),
-    i(0x34, maligned),
-};
+__section(".data.init.enter") void (* const __weak_vector_table[])(void) __attribute((aligned(128)))
+= {
+      [0] = (void *)_start,   i(0x04, memory_error), i(0x08, instruction_error),
+      i(0x0c, machine_check), i(0x10, tlb_miss_i),   i(0x14, tlb_miss_d),
+      i(0x18, prot_v),        i(0x1c, privilege_v),  i(0x20, swi),
+      i(0x24, trap),          i(0x28, extension),    i(0x2c, div_zero),
+      i(0x30, dc_error),      i(0x34, maligned),
+  };
 __weak_reference(__weak_vector_table, __vector_table);

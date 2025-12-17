@@ -31,19 +31,20 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FEGETEXCEPTFLAG_H_
-#define _FEGETEXCEPTFLAG_H_	1
+#define _FEGETEXCEPTFLAG_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline void _fegetexceptflag(fexcept_t *flagp, int excepts)
+static __inline void
+_fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-  vec_uint4 fpscr;
+    vec_uint4 fpscr;
 
-  excepts &= FE_ALL_EXCEPT;
-  fpscr = spu_mffpscr();
-  *flagp = __pack_fpscr(fpscr) & excepts;
+    excepts &= FE_ALL_EXCEPT;
+    fpscr = spu_mffpscr();
+    *flagp = __pack_fpscr(fpscr) & excepts;
 }
 
 #endif /* _FEGETEXCEPTFLAG_H_ */

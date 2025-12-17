@@ -37,7 +37,7 @@
 
 #if defined(_NEED_FLOAT_HUGE) && __HAVE_BUILTIN_ISSIGNALINGL
 int
-__issignalingl (long double x)
+__issignalingl(long double x)
 {
     return __builtin_issignalingl(x);
 }

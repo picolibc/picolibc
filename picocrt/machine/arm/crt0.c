@@ -45,7 +45,7 @@
 
 extern const void *__interrupt_vector[];
 
-#define CPACR	((volatile uint32_t *) (0xE000ED88))
+#define CPACR ((volatile uint32_t *)(0xE000ED88))
 
 #ifdef __clang__
 const void *__interrupt_reference = __interrupt_vector;
@@ -54,43 +54,43 @@ const void *__interrupt_reference = __interrupt_vector;
 void __disable_sanitizer
 _start(void)
 {
-	/* Generate a reference to __interrupt_vector so we get one loaded */
-	__asm__(".equ __my_interrupt_vector, __interrupt_vector");
+    /* Generate a reference to __interrupt_vector so we get one loaded */
+    __asm__(".equ __my_interrupt_vector, __interrupt_vector");
     /* Access to the coprocessor has to be enabled in CPACR, if either FPU or
      * MVE is used. This is described in "Arm v8-M Architecture Reference
      * Manual". */
 #if defined __ARM_FP || defined __ARM_FEATURE_MVE
-	/* Enable FPU */
-	*CPACR |= 0xf << 20;
-	/*
-	 * Wait for the write enabling FPU to reach memory before
-	 * executing the instruction accessing the status register
-	 */
-	__asm__("dsb");
-	__asm__("isb");
+    /* Enable FPU */
+    *CPACR |= 0xf << 20;
+    /*
+     * Wait for the write enabling FPU to reach memory before
+     * executing the instruction accessing the status register
+     */
+    __asm__("dsb");
+    __asm__("isb");
 
-        /* Clear FPU status register. 0x40000 will initialize FPSCR.LTPSIZE to
-         * a valid value for 8.1-m low overhead loops. */
+    /* Clear FPU status register. 0x40000 will initialize FPSCR.LTPSIZE to
+     * a valid value for 8.1-m low overhead loops. */
 #if __ARM_ARCH >= 8 && __ARM_ARCH_PROFILE == 'M'
 #define INIT_FPSCR 0x40000
 #else
 #define INIT_FPSCR 0x0
 #endif
-	__asm__("vmsr fpscr, %0" : : "r" (INIT_FPSCR));
+    __asm__("vmsr fpscr, %0" : : "r"(INIT_FPSCR));
 #endif
 
 #if defined(__ARM_FEATURE_PAC_DEFAULT) || defined(__ARM_FEATURE_BTI_DEFAULT)
-        uint32_t        control;
-        __asm__("mrs %0, CONTROL" : "=r" (control));
+    uint32_t control;
+    __asm__("mrs %0, CONTROL" : "=r"(control));
 #ifdef __ARM_FEATURE_PAC_DEFAULT
-        control |= (3 << 6);
+    control |= (3 << 6);
 #endif
 #ifdef __ARM_FEATURE_BTI_DEFAULT
-        control |= (3 << 4);
+    control |= (3 << 4);
 #endif
-        __asm__("msr CONTROL, %0" : : "r" (control));
+    __asm__("msr CONTROL, %0" : : "r"(control));
 #endif
-	__start();
+    __start();
 }
 
 #else /*  __ARM_ARCH_PROFILE == 'M' */
@@ -104,23 +104,23 @@ _start(void)
  * which runs from 0x00000000 to 0x7fffffff along with the usual
  * Device space which runs from 0x80000000 to 0xffffffff.
  */
-#define MMU_NORMAL_COUNT 2048
-#define MMU_DEVICE_COUNT 2048
+#define MMU_NORMAL_COUNT        2048
+#define MMU_DEVICE_COUNT        2048
 extern uint32_t __identity_page_table[MMU_NORMAL_COUNT + MMU_DEVICE_COUNT];
 
 /* Bits within a short-form section PTE (1MB mapping) */
-#define MMU_NS_BIT      19
-#define MMU_NG_BIT      17
-#define MMU_S_BIT       16
-#define MMU_AP2_BIT     15
-#define MMU_TEX_BIT     12
-#define MMU_AP0_BIT     10
-#define MMU_XN_BIT      4
-#define MMU_BC_BIT      2
-#define MMU_PXN_BIT     0
+#define MMU_NS_BIT              19
+#define MMU_NG_BIT              17
+#define MMU_S_BIT               16
+#define MMU_AP2_BIT             15
+#define MMU_TEX_BIT             12
+#define MMU_AP0_BIT             10
+#define MMU_XN_BIT              4
+#define MMU_BC_BIT              2
+#define MMU_PXN_BIT             0
 
-#define MMU_TYPE_1MB    (0x2 << 0)
-#define MMU_RW          (0x3 << MMU_AP0_BIT)
+#define MMU_TYPE_1MB            (0x2 << 0)
+#define MMU_RW                  (0x3 << MMU_AP0_BIT)
 
 /* Memory attributes when TEX[2] == 0 */
 #define MMU_STRONGLY_ORDERED    ((0 << MMU_TEX_BIT) | (0 << MMU_BC_BIT))
@@ -154,17 +154,35 @@ __asm__(
     ".balign 16384\n"
     "__identity_page_table:\n"
     ".set _i, 0\n"
-    ".rept " __XSTRING(MMU_NORMAL_COUNT) "\n"
-    "  .4byte (_i << 20) |" __XSTRING(MMU_NORMAL_FLAGS) "\n"
-    "  .set _i, _i + 1\n"
-    ".endr\n"
-    ".set _i, 0\n"
-    ".rept " __XSTRING(MMU_DEVICE_COUNT) "\n"
-    "  .4byte (1 << 31) | (_i << 20) |" __XSTRING(MMU_DEVICE_FLAGS) "\n"
-    "  .set _i, _i + 1\n"
-    ".endr\n"
-    ".size __identity_page_table, " __XSTRING((MMU_NORMAL_COUNT + MMU_DEVICE_COUNT) * 4) "\n"
-);
+    ".rept " __XSTRING(
+        MMU_NORMAL_COUNT) "\n"
+                          "  .4byte (_i << 20) |" __XSTRING(
+                              MMU_NORMAL_FLAGS) "\n"
+                                                "  .set _i, _i + 1\n"
+                                                ".endr\n"
+                                                ".set _i, 0\n"
+                                                ".rept " __XSTRING(
+                                                    MMU_DEVICE_COUNT) "\n"
+                                                                      "  .4byte (1 << 31) | (_i << "
+                                                                      "20) |" __XSTRING(
+                                                                          MMU_DEVICE_FLAGS) "\n"
+                                                                                            "  "
+                                                                                            ".set "
+                                                                                            "_i, "
+                                                                                            "_i + "
+                                                                                            "1\n"
+                                                                                            ".endr"
+                                                                                            "\n"
+                                                                                            ".size "
+                                                                                            "__"
+                                                                                            "identi"
+                                                                                            "ty_"
+                                                                                            "page_"
+                                                                                            "table,"
+                                                                                            " " __XSTRING(
+                                                                                                (MMU_NORMAL_COUNT
+                                                                                                 + MMU_DEVICE_COUNT)
+                                                                                                * 4) "\n");
 #endif
 
 #endif /* __PICOCRT_ENABLE_MMU */
@@ -176,51 +194,49 @@ __asm__(
 
 extern char __stack[];
 
-#define MODE_USR        (0x10)
-#define MODE_FIQ        (0x11)
-#define MODE_IRQ        (0x12)
-#define MODE_SVC        (0x13)
-#define MODE_MON        (0x16)
-#define MODE_ABT        (0x17)
-#define MODE_HYP        (0x1a)
-#define MODE_UND        (0x1b)
-#define MODE_SYS        (0x1f)
-#define I_BIT           (1 << 7)
-#define F_BIT           (1 << 6)
+#define MODE_USR          (0x10)
+#define MODE_FIQ          (0x11)
+#define MODE_IRQ          (0x12)
+#define MODE_SVC          (0x13)
+#define MODE_MON          (0x16)
+#define MODE_ABT          (0x17)
+#define MODE_HYP          (0x1a)
+#define MODE_UND          (0x1b)
+#define MODE_SYS          (0x1f)
+#define I_BIT             (1 << 7)
+#define F_BIT             (1 << 6)
 
 #define SHADOW_STACK_SIZE 0x10
-#define STACK_IRQ (__stack - SHADOW_STACK_SIZE * 0)
-#define STACK_ABT (__stack - SHADOW_STACK_SIZE * 1)
-#define STACK_UND (__stack - SHADOW_STACK_SIZE * 2)
-#define STACK_FIQ (__stack - SHADOW_STACK_SIZE * 3)
-#define STACK_SYS (__stack - SHADOW_STACK_SIZE * 4)
-#define STACK_SVC (__stack - SHADOW_STACK_SIZE * 5)
+#define STACK_IRQ         (__stack - SHADOW_STACK_SIZE * 0)
+#define STACK_ABT         (__stack - SHADOW_STACK_SIZE * 1)
+#define STACK_UND         (__stack - SHADOW_STACK_SIZE * 2)
+#define STACK_FIQ         (__stack - SHADOW_STACK_SIZE * 3)
+#define STACK_SYS         (__stack - SHADOW_STACK_SIZE * 4)
+#define STACK_SVC         (__stack - SHADOW_STACK_SIZE * 5)
 
-#define SET_MODE(mode)                                                          \
-    __asm__("mov r0, %0\nmsr cpsr_c, r0" :: "I" (mode | I_BIT | F_BIT) : "r0"); \
+#define SET_MODE(mode)    __asm__("mov r0, %0\nmsr cpsr_c, r0" ::"I"(mode | I_BIT | F_BIT) : "r0");
 
-#define SET_SP(mode, address)                   \
-    SET_MODE(mode);                             \
-    __asm__("mov sp, %0" : : "r" (address))
+#define SET_SP(mode, address)              \
+    SET_MODE(mode);                        \
+    __asm__("mov sp, %0" : : "r"(address))
 
-#define SET_SPS()                               \
-        SET_SP(MODE_IRQ, STACK_IRQ);            \
-        SET_SP(MODE_ABT, STACK_ABT);            \
-        SET_SP(MODE_UND, STACK_UND);            \
-        SET_SP(MODE_FIQ, STACK_FIQ);            \
-        SET_SP(MODE_SYS, STACK_SYS);            \
-        SET_MODE(MODE_SVC);
+#define SET_SPS()                \
+    SET_SP(MODE_IRQ, STACK_IRQ); \
+    SET_SP(MODE_ABT, STACK_ABT); \
+    SET_SP(MODE_UND, STACK_UND); \
+    SET_SP(MODE_FIQ, STACK_FIQ); \
+    SET_SP(MODE_SYS, STACK_SYS); \
+    SET_MODE(MODE_SVC);
 
 #if __ARM_ARCH_ISA_THUMB == 1
-static __noinline __attribute__((target("arm"))) __disable_sanitizer
-void 
+static __noinline __attribute__((target("arm"))) __disable_sanitizer void
 _set_stacks(void)
 {
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif /* __GNUC__ */
-        SET_SPS();
+    SET_SPS();
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic pop
 #endif /* __GNUC__ */
@@ -233,30 +249,28 @@ _set_stacks(void)
  * and then branches here.
  */
 
-extern void __vector_table(void);
+extern void              __vector_table(void);
 
-static __noreturn __used __section(".init") __disable_sanitizer
-void
-_cstart(void)
+static __noreturn __used __section(".init") __disable_sanitizer void _cstart(void)
 {
 #if __ARM_ARCH_ISA_THUMB == 1
-        _set_stacks();
+    _set_stacks();
 #endif
 
 #ifdef __thumb2__
-	/* Make exceptions run in Thumb mode */
-	uint32_t sctlr;
-	__asm__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
-	sctlr |= (1 << 30);
-	__asm__("mcr p15, 0, %0, c1, c0, 0" : : "r" (sctlr));
+    /* Make exceptions run in Thumb mode */
+    uint32_t sctlr;
+    __asm__("mrc p15, 0, %0, c1, c0, 0" : "=r"(sctlr));
+    sctlr |= (1 << 30);
+    __asm__("mcr p15, 0, %0, c1, c0, 0" : : "r"(sctlr));
 #endif
 #if defined __ARM_FP || defined __ARM_FEATURE_MVE
 #if __ARM_ARCH > 6
-	/* Set CPACR for access to CP10 and 11 */
-	__asm__("mcr p15, 0, %0, c1, c0, 2" : : "r" (0xf << 20));
+    /* Set CPACR for access to CP10 and 11 */
+    __asm__("mcr p15, 0, %0, c1, c0, 2" : : "r"(0xf << 20));
 #endif
-	/* Enable FPU */
-	__asm__("vmsr fpexc, %0" : : "r" (0x40000000));
+    /* Enable FPU */
+    __asm__("vmsr fpexc, %0" : : "r"(0x40000000));
 #endif
 
 /* Set up exception table base address (register VBAR_ELx).
@@ -269,85 +283,81 @@ _cstart(void)
 
 #if __ARM_ARCH >= 7 && __ARM_ARCH_PROFILE != 'R'
 
-#define SCTLR_MMU (1 << 0)
-#define SCTLR_DATA_L2 (1 << 2)
+#define SCTLR_MMU         (1 << 0)
+#define SCTLR_DATA_L2     (1 << 2)
 #define SCTLR_BRANCH_PRED (1 << 11)
-#define SCTLR_ICACHE (1 << 12)
-#define SCTLR_TRE       (1 << 28)
-#define SCTLR_A (1 << 1)
-#define SCTLR_U (1 << 22)
+#define SCTLR_ICACHE      (1 << 12)
+#define SCTLR_TRE         (1 << 28)
+#define SCTLR_A           (1 << 1)
+#define SCTLR_U           (1 << 22)
 
-        uint32_t        mmfr0;
-        __asm__("mrc p15, 0, %0, c0, c1, 4" : "=r" (mmfr0));
+    uint32_t mmfr0;
+    __asm__("mrc p15, 0, %0, c0, c1, 4" : "=r"(mmfr0));
 
-        /* Check to see if the processor supports VMSAv7 or better */
-        if ((mmfr0 & 0xf) >= 3)
-        {
-                /* We have to set up an identity map and enable the MMU for caches.
-                 * Additionally, all page table entries are set to Domain 0, so set up DACR
-                 * so that Domain zero has permission checks enabled rather than "deny all".
-                 */
+    /* Check to see if the processor supports VMSAv7 or better */
+    if ((mmfr0 & 0xf) >= 3) {
+        /* We have to set up an identity map and enable the MMU for caches.
+         * Additionally, all page table entries are set to Domain 0, so set up DACR
+         * so that Domain zero has permission checks enabled rather than "deny all".
+         */
 
-                /* Set DACR Domain 0 permissions checked */
-                __asm__("mcr p15, 0, %0, c3, c0, 0\n" :: "r" (1));
+        /* Set DACR Domain 0 permissions checked */
+        __asm__("mcr p15, 0, %0, c3, c0, 0\n" ::"r"(1));
 
-                /*
-                 * Write TTBR
-                 *
-                 * No DSB since tables are statically initialized and dcache is off.
-                 * We or __identity_page_table with 0x3 to set the cacheable flag bits.
-                 */
-                __asm__("mcr p15, 0, %0, c2, c0, 0\n"
-                        :: "r" ((uintptr_t)__identity_page_table | 0x3));
+        /*
+         * Write TTBR
+         *
+         * No DSB since tables are statically initialized and dcache is off.
+         * We or __identity_page_table with 0x3 to set the cacheable flag bits.
+         */
+        __asm__("mcr p15, 0, %0, c2, c0, 0\n" ::"r"((uintptr_t)__identity_page_table | 0x3));
 
-                /* Note: we assume Data+L2 cache has been invalidated by reset. */
-                __asm__("mcr p15, 0, %0, c7, c5, 0\n" :: "r" (0)); /* ICIALLU: invalidate instruction cache */
-                __asm__("mcr p15, 0, %0, c8, c7, 0\n" :: "r" (0)); /* TLBIALL: invalidate TLB */
-                __asm__("mcr p15, 0, %0, c7, c5, 6\n" :: "r" (0)); /* BPIALL: invalidate branch predictor */
-                __asm__("isb\n");
+        /* Note: we assume Data+L2 cache has been invalidated by reset. */
+        __asm__("mcr p15, 0, %0, c7, c5, 0\n" ::"r"(0)); /* ICIALLU: invalidate instruction cache */
+        __asm__("mcr p15, 0, %0, c8, c7, 0\n" ::"r"(0)); /* TLBIALL: invalidate TLB */
+        __asm__("mcr p15, 0, %0, c7, c5, 6\n" ::"r"(0)); /* BPIALL: invalidate branch predictor */
+        __asm__("isb\n");
 
-                /* Enable caches, branch prediction and the MMU. Disable TRE */
-                uint32_t sctlr;
-                __asm__ __volatile__("mrc p15, 0, %0, c1, c0, 0" : "=r" (sctlr));
-                sctlr |= SCTLR_ICACHE | SCTLR_BRANCH_PRED | SCTLR_DATA_L2 | SCTLR_MMU;
-                #ifndef __ARM_FEATURE_UNALIGNED
-                    sctlr |= SCTLR_A;
-                    sctlr &= ~SCTLR_U;
-                #endif
-                sctlr &= ~SCTLR_TRE;
-                __asm__("mcr p15, 0, %0, c1, c0, 0\n" :: "r" (sctlr));
-                __asm__("isb\n");
-        }
+        /* Enable caches, branch prediction and the MMU. Disable TRE */
+        uint32_t sctlr;
+        __asm__ __volatile__("mrc p15, 0, %0, c1, c0, 0" : "=r"(sctlr));
+        sctlr |= SCTLR_ICACHE | SCTLR_BRANCH_PRED | SCTLR_DATA_L2 | SCTLR_MMU;
+#ifndef __ARM_FEATURE_UNALIGNED
+        sctlr |= SCTLR_A;
+        sctlr &= ~SCTLR_U;
+#endif
+        sctlr &= ~SCTLR_TRE;
+        __asm__("mcr p15, 0, %0, c1, c0, 0\n" ::"r"(sctlr));
+        __asm__("isb\n");
+    }
 #endif
 
 #endif /* __PICOCRT_ENABLE_MMU */
 
-	__start();
+    __start();
 }
 
-void
-__naked __section(".init") __used __disable_sanitizer
-_start(void)
+void __naked __section(".init") __used __disable_sanitizer _start(void)
 {
-	/* Generate a reference to __vector_table so we get one loaded */
-	__asm__(".equ __my_vector_table, __vector_table");
+    /* Generate a reference to __vector_table so we get one loaded */
+    __asm__(".equ __my_vector_table, __vector_table");
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Warray-bounds"
 #endif /* __GNUC__ */
-        __asm__("mov sp, %0" : : "r" (STACK_SVC));
+    __asm__("mov sp, %0" : : "r"(STACK_SVC));
 
 #if __ARM_ARCH_ISA_THUMB != 1
-        SET_SPS();
+    SET_SPS();
 #endif /* __ARM_ARCH_ISA_THUMB != 1 */
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic pop
 #endif /* __GNUC__ */
 
-        /* Branch to C code */
-	__asm__("b _cstart");
+    /* Branch to C code */
+    __asm__("b _cstart");
 }
 
 #endif
@@ -363,7 +373,7 @@ _start(void)
 #include <stdio.h>
 
 #define _REASON(r) #r
-#define REASON(r) _REASON(r)
+#define REASON(r)  _REASON(r)
 
 static void
 arm_fault_write_reg(const char *prefix, unsigned reg)
@@ -371,8 +381,8 @@ arm_fault_write_reg(const char *prefix, unsigned reg)
     fputs(prefix, stdout);
 
     for (unsigned i = 0; i < 8; i++) {
-        unsigned digitval = 0xF & (reg >> (28 - 4*i));
-        char digitchr = '0' + digitval + (digitval >= 10 ? 'a'-'0'-10 : 0);
+        unsigned digitval = 0xF & (reg >> (28 - 4 * i));
+        char     digitchr = '0' + digitval + (digitval >= 10 ? 'a' - '0' - 10 : 0);
         putchar(digitchr);
     }
 
@@ -381,30 +391,28 @@ arm_fault_write_reg(const char *prefix, unsigned reg)
 
 #if __ARM_ARCH_PROFILE == 'M'
 
-#define GET_SP  struct fault *sp; __asm__ ("mov %0, sp" : "=r" (sp))
+#define GET_SP                       \
+    struct fault *sp;                \
+    __asm__("mov %0, sp" : "=r"(sp))
 
 struct fault {
-    unsigned int        r0;
-    unsigned int        r1;
-    unsigned int        r2;
-    unsigned int        r3;
-    unsigned int        r12;
-    unsigned int        lr;
-    unsigned int        pc;
-    unsigned int        xpsr;
+    unsigned int r0;
+    unsigned int r1;
+    unsigned int r2;
+    unsigned int r3;
+    unsigned int r12;
+    unsigned int lr;
+    unsigned int pc;
+    unsigned int xpsr;
 };
 
-static const char *const reasons[] = {
-    "hardfault\n",
-    "memmanage\n",
-    "busfault\n",
-    "usagefault\n"
-};
+static const char * const reasons[]
+    = { "hardfault\n", "memmanage\n", "busfault\n", "usagefault\n" };
 
-#define REASON_HARDFAULT        0
-#define REASON_MEMMANAGE        1
-#define REASON_BUSFAULT         2
-#define REASON_USAGE            3
+#define REASON_HARDFAULT 0
+#define REASON_MEMMANAGE 1
+#define REASON_BUSFAULT  2
+#define REASON_USAGE     3
 
 static void __used
 arm_fault(struct fault *f, int reason)
@@ -457,21 +465,16 @@ arm_usagefault_isr(void)
 #else /* __ARM_ARCH_PROFILE == 'M' */
 
 struct fault {
-    unsigned int        r[7];
-    unsigned int        pc;
+    unsigned int r[7];
+    unsigned int pc;
 };
 
-static const char *const reasons[] = {
-    "undef\n",
-    "svc\n",
-    "prefetch_abort\n",
-    "data_abort\n"
-};
+static const char * const reasons[] = { "undef\n", "svc\n", "prefetch_abort\n", "data_abort\n" };
 
-#define REASON_UNDEF            0
-#define REASON_SVC              1
-#define REASON_PREFETCH_ABORT   2
-#define REASON_DATA_ABORT       3
+#define REASON_UNDEF          0
+#define REASON_SVC            1
+#define REASON_PREFETCH_ABORT 2
+#define REASON_DATA_ABORT     3
 
 static void __used
 arm_fault(struct fault *f, int reason)
@@ -481,36 +484,33 @@ arm_fault(struct fault *f, int reason)
     fputs(reasons[reason], stdout);
     char prefix[] = "\tR#:   0x";
     for (r = 0; r <= 6; r++) {
-        prefix[2] = '0' + r;    /* overwrite # with register number */
+        prefix[2] = '0' + r; /* overwrite # with register number */
         arm_fault_write_reg(prefix, f->r[r]);
     }
     arm_fault_write_reg("\tPC:   0x", f->pc);
     _exit(1);
 }
 
-#define VECTOR_COMMON \
-    __asm__("push {lr}");                               \
-    __asm__("push {r0-r6}");                            \
+#define VECTOR_COMMON        \
+    __asm__("push {lr}");    \
+    __asm__("push {r0-r6}"); \
     __asm__("mov r0, sp")
 
-void __naked __section(".init")  __disable_sanitizer
-arm_undef_vector(void)
+void __naked __section(".init") __disable_sanitizer arm_undef_vector(void)
 {
     VECTOR_COMMON;
     __asm__("movs r1, #" REASON(REASON_UNDEF));
     __asm__("bl  arm_fault");
 }
 
-void __naked __section(".init")  __disable_sanitizer
-arm_prefetch_abort_vector(void)
+void __naked __section(".init") __disable_sanitizer arm_prefetch_abort_vector(void)
 {
     VECTOR_COMMON;
     __asm__("movs r1, #" REASON(REASON_PREFETCH_ABORT));
     __asm__("bl  arm_fault");
 }
 
-void __naked __section(".init")  __disable_sanitizer
-arm_data_abort_vector(void)
+void __naked __section(".init") __disable_sanitizer arm_data_abort_vector(void)
 {
     VECTOR_COMMON;
     __asm__("movs r1, #" REASON(REASON_DATA_ABORT));

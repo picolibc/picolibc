@@ -3,13 +3,13 @@ FUNCTION
 <<_getenv_r>>---look up environment variable
 
 INDEX
-	_getenv_r
+        _getenv_r
 INDEX
-	environ
+        environ
 
 SYNOPSIS
-	#include <stdlib.h>
-	char *_getenv_r(struct _reent *<[reent_ptr]>, const char *<[name]>);
+        #include <stdlib.h>
+        char *_getenv_r(struct _reent *<[reent_ptr]>, const char *<[name]>);
 
 DESCRIPTION
 <<_getenv_r>> searches the list of environment variable names and values
@@ -57,7 +57,7 @@ permit '=' to be in identifiers.
 #include <string.h>
 #include "envlock.h"
 
-extern char **environ;
+extern char  **environ;
 
 /* Only deal with a pointer to environ, to work around subtle bugs with shared
    libraries and/or small data systems where the user declares his own
@@ -74,40 +74,36 @@ static char ***p_environ = &environ;
  */
 
 char *
-_findenv (
-	register const char *name,
-	int *offset)
+_findenv(register const char *name, int *offset)
 {
-  register int len;
-  register char **p;
-  const char *c;
+    register int    len;
+    register char **p;
+    const char     *c;
 
-  ENV_LOCK;
+    ENV_LOCK;
 
-  /* In some embedded systems, this does not get set.  This protects
-     newlib from dereferencing a bad pointer.  */
-  if (!*p_environ)
-    {
-      ENV_UNLOCK;
-      return NULL;
+    /* In some embedded systems, this does not get set.  This protects
+       newlib from dereferencing a bad pointer.  */
+    if (!*p_environ) {
+        ENV_UNLOCK;
+        return NULL;
     }
 
-  c = name;
-  while (*c && *c != '=')  c++;
- 
-  /* Identifiers may not contain an '=', so cannot match if does */
-  if(*c != '=')
-    {
-    len = c - name;
-    for (p = *p_environ; *p; ++p)
-      if (!strncmp (*p, name, len))
-        if (*(c = *p + len) == '=')
-	{
-	  *offset = p - *p_environ;
-	  ENV_UNLOCK;
-	  return (char *) (++c);
-	}
+    c = name;
+    while (*c && *c != '=')
+        c++;
+
+    /* Identifiers may not contain an '=', so cannot match if does */
+    if (*c != '=') {
+        len = c - name;
+        for (p = *p_environ; *p; ++p)
+            if (!strncmp(*p, name, len))
+                if (*(c = *p + len) == '=') {
+                    *offset = p - *p_environ;
+                    ENV_UNLOCK;
+                    return (char *)(++c);
+                }
     }
-  ENV_UNLOCK;
-  return NULL;
+    ENV_UNLOCK;
+    return NULL;
 }

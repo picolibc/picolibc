@@ -8,7 +8,8 @@
  * This is only implemented for size_t, so in case mallocr.c's INTERNAL_SIZE_T
  *  is non default, mallocr.c throws an #error.
  */
-static int mul_overflow_size_t(size_t a, size_t b, size_t *res)
+static int
+mul_overflow_size_t(size_t a, size_t b, size_t *res)
 {
     // always fill the result (gcc doesn't define what happens here)
     if (res)
@@ -19,16 +20,16 @@ static int mul_overflow_size_t(size_t a, size_t b, size_t *res)
         return 0;
 
 #ifdef __MSP430__
-    volatile uint32_t ia = (uint32_t) a;
-    volatile uint32_t ib = (uint32_t) b;
+    volatile uint32_t ia = (uint32_t)a;
+    volatile uint32_t ib = (uint32_t)b;
 
     // check if overflow would happen:
-    if ( (ia > SIZE_MAX / ib) || (ib > SIZE_MAX / ia)) {
+    if ((ia > SIZE_MAX / ib) || (ib > SIZE_MAX / ia)) {
         return 1;
     }
 #else
     // check if overflow would happen:
-    if ( (a > SIZE_MAX / b) || (b > SIZE_MAX / a)) {
+    if ((a > SIZE_MAX / b) || (b > SIZE_MAX / a)) {
         return 1;
     }
 #endif

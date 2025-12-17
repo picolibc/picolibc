@@ -46,7 +46,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-int
-aarch64_putc(char c, FILE *file);
+int aarch64_putc(char c, FILE *file);
 
 #endif /* _AARCH64_SEMIHOST_H_ */

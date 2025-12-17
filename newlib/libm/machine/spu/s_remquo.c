@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/remquo.h"
 
-double remquo(double x, double y, int *quo)
+double
+remquo(double x, double y, int *quo)
 {
     return _remquo(x, y, quo);
 }

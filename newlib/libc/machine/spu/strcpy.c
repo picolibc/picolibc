@@ -37,7 +37,8 @@
  * character) into the array pointed to by dest. If copy between
  * two arrays that overlap, then behavior is undefined.
  */
-char * strcpy(char * __restrict__ dest, const char * __restrict__ src)
+char *
+strcpy(char * __restrict__ dest, const char * __restrict__ src)
 {
-  return _strncpy(dest, src, 0, 0, 0);
+    return _strncpy(dest, src, 0, 0, 0);
 }

@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-cos.h"
-#define TEST_FUNC       cos
+#define TEST_VECTORS "test-cos.h"
+#define TEST_FUNC    cos
 
 #include "test-real-one.h"

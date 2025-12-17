@@ -39,51 +39,50 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "strncmp.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (strncmp_ea);
+COMPAT_EA_ALIAS(strncmp_ea);
 
 int
-strncmp_ea (__ea void *s1, __ea const void *s2, size_ea_t n3)
+strncmp_ea(__ea void *s1, __ea const void *s2, size_ea_t n3)
 {
-  __ea void *curr_s1 = (__ea void *) s1;
-  __ea void *curr_s2 = (__ea void *) s2;
-  void *l_s1;
-  void *l_s2;
-  int min;
-  size_ea_t s2_n;
-  size_ea_t s1_n;
-  int ret;
-  vec_uint4 end_v;
+    __ea void *curr_s1 = (__ea void *)s1;
+    __ea void *curr_s2 = (__ea void *)s2;
+    void      *l_s1;
+    void      *l_s2;
+    int        min;
+    size_ea_t  s2_n;
+    size_ea_t  s1_n;
+    int        ret;
+    vec_uint4  end_v;
 
-  ret = 0;			/* in case n3 is 0 */
-  while (n3)
-    {
-      l_s2 = __cache_fetch (curr_s2);
-      l_s1 = __cache_fetch (curr_s1);
+    ret = 0; /* in case n3 is 0 */
+    while (n3) {
+        l_s2 = __cache_fetch(curr_s2);
+        l_s1 = __cache_fetch(curr_s1);
 
-      /*
-       * Use the smaller of the size left to compare (n3), the space left in
-       * s2 cacheline (s2_n), or the space left in the s1 cacheline (s1_n)
-       */
-      s2_n = ROUND_UP_NEXT_128 ((size_ea_t) curr_s2) - (size_ea_t) curr_s2;
-      s1_n = ROUND_UP_NEXT_128 ((size_ea_t) curr_s1) - (size_ea_t) curr_s1;
-      min = three_way_min (s2_n, s1_n, n3);
+        /*
+         * Use the smaller of the size left to compare (n3), the space left in
+         * s2 cacheline (s2_n), or the space left in the s1 cacheline (s1_n)
+         */
+        s2_n = ROUND_UP_NEXT_128((size_ea_t)curr_s2) - (size_ea_t)curr_s2;
+        s1_n = ROUND_UP_NEXT_128((size_ea_t)curr_s1) - (size_ea_t)curr_s1;
+        min = three_way_min(s2_n, s1_n, n3);
 
-      ret = _strncmp_internal (l_s1, l_s2, min, &end_v, 1);
-      /*
-       * Only the first slot of end_v is set.
-       */
-      /* if (ret || spu_extract(spu_cmpeq(end_v, 0), 0)) { */
-      /* if (ret || spu_extract(spu_gather(spu_cmpeq(end_v, 0)), 0)) { */
-      if (ret || spu_extract (end_v, 0))
-	/*
-	 * If any NUL values were seen (end_v values of zero) we still have
-	 * to return ret, as it might not be zero.
-	 */
-	return ret;
+        ret = _strncmp_internal(l_s1, l_s2, min, &end_v, 1);
+        /*
+         * Only the first slot of end_v is set.
+         */
+        /* if (ret || spu_extract(spu_cmpeq(end_v, 0), 0)) { */
+        /* if (ret || spu_extract(spu_gather(spu_cmpeq(end_v, 0)), 0)) { */
+        if (ret || spu_extract(end_v, 0))
+            /*
+             * If any NUL values were seen (end_v values of zero) we still have
+             * to return ret, as it might not be zero.
+             */
+            return ret;
 
-      curr_s2 += min;
-      curr_s1 += min;
-      n3 -= min;
+        curr_s2 += min;
+        curr_s1 += min;
+        n3 -= min;
     }
-  return ret;
+    return ret;
 }

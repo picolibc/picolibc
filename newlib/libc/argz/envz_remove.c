@@ -12,25 +12,21 @@
 #include <envz.h>
 
 void
-envz_remove (char **envz,
-       size_t *envz_len,
-       const char *name)
+envz_remove(char **envz, size_t *envz_len, const char *name)
 {
-  char *entry = NULL;
-  size_t len = 0;
-  entry = envz_entry (*envz, *envz_len, name);
+    char  *entry = NULL;
+    size_t len = 0;
+    entry = envz_entry(*envz, *envz_len, name);
 
-  if (entry)
-    {
-      len = strlen(entry) + 1;
+    if (entry) {
+        len = strlen(entry) + 1;
 
-      /* Not the last entry. */
-      if (*envz + *envz_len != entry + len - 1)
-        {
-          memmove(entry, entry + len, *envz + *envz_len - entry - len);
+        /* Not the last entry. */
+        if (*envz + *envz_len != entry + len - 1) {
+            memmove(entry, entry + len, *envz + *envz_len - entry - len);
         }
 
-      *envz = (char *)realloc(*envz, *envz_len - len);
-      *envz_len -= len;
+        *envz = (char *)realloc(*envz, *envz_len - len);
+        *envz_len -= len;
     }
 }

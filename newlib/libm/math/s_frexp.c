@@ -15,22 +15,22 @@
 FUNCTION
        <<frexp>>, <<frexpf>>---split floating-point number
 INDEX
-	frexp
+        frexp
 INDEX
-	frexpf
+        frexpf
 
 SYNOPSIS
-	#include <math.h>
+        #include <math.h>
         double frexp(double <[val]>, int *<[exp]>);
         float frexpf(float <[val]>, int *<[exp]>);
 
 DESCRIPTION
-	All nonzero, normal numbers can be described as <[m]> * 2**<[p]>.
-	<<frexp>> represents the double <[val]> as a mantissa <[m]>
-	and a power of two <[p]>. The resulting mantissa will always
-	be greater than or equal to <<0.5>>, and less than <<1.0>> (as
-	long as <[val]> is nonzero). The power of two will be stored
-	in <<*>><[exp]>.
+        All nonzero, normal numbers can be described as <[m]> * 2**<[p]>.
+        <<frexp>> represents the double <[val]> as a mantissa <[m]>
+        and a power of two <[p]>. The resulting mantissa will always
+        be greater than or equal to <<0.5>>, and less than <<1.0>> (as
+        long as <[val]> is nonzero). The power of two will be stored
+        in <<*>><[exp]>.
 
 @ifnottex
 <[m]> and <[p]> are calculated so that
@@ -69,8 +69,7 @@ PORTABILITY
 
 #ifdef _NEED_FLOAT64
 
-static const double two54 =
-    _F_64(1.80143985094819840000e+16); /* 0x43500000, 0x00000000 */
+static const double two54 = _F_64(1.80143985094819840000e+16); /* 0x43500000, 0x00000000 */
 
 __float64
 frexp64(__float64 x, int *eptr)
@@ -80,7 +79,7 @@ frexp64(__float64 x, int *eptr)
     ix = 0x7fffffff & hx;
     *eptr = 0;
     if (ix >= 0x7ff00000 || ((ix | lx) == 0))
-        return x + x; /* 0,inf,nan */
+        return x + x;      /* 0,inf,nan */
     if (ix < 0x00100000) { /* subnormal */
         x *= two54;
         GET_HIGH_WORD(hx, x);

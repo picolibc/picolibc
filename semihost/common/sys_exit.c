@@ -39,10 +39,9 @@
 __noreturn void
 sys_semihost_exit(uintptr_t exception, uintptr_t subcode)
 {
-	if (sizeof(sh_param_t) == 8) {
-		(void) sys_semihost2(SYS_EXIT, exception, subcode);
-	}
-	else
-		(void) sys_semihost(SYS_EXIT, exception);
-	__builtin_unreachable();
+    if (sizeof(sh_param_t) == 8) {
+        (void)sys_semihost2(SYS_EXIT, exception, subcode);
+    } else
+        (void)sys_semihost(SYS_EXIT, exception);
+    __builtin_unreachable();
 }

@@ -42,7 +42,6 @@
 #include <limits.h>
 #include <string.h>
 
-
 static const char *locales[] = {
     "C",
 #ifdef HAVE_ISO_CHARSETS
@@ -63,19 +62,39 @@ static const char *locales[] = {
     "C.ISO-8859-16",
 #endif
 #ifdef HAVE_WINDOWS_CHARSETS
-    "C.GEORGIAN-PS", "C.PT154", "C.KOI8-T", "C.CP437", "C.CP737", "C.CP775",
-    "C.CP850", "C.CP852", "C.CP855", "C.CP857", "C.CP858", "C.CP862", "C.CP866",
-    "C.CP874", "C.CP1125", "C.CP1250", "C.CP1251", "C.CP1252", "C.CP1253",
-    "C.CP1254", "C.CP1256", "C.CP1257", "C.KOI8-R", "C.KOI8-U",
+    "C.GEORGIAN-PS",
+    "C.PT154",
+    "C.KOI8-T",
+    "C.CP437",
+    "C.CP737",
+    "C.CP775",
+    "C.CP850",
+    "C.CP852",
+    "C.CP855",
+    "C.CP857",
+    "C.CP858",
+    "C.CP862",
+    "C.CP866",
+    "C.CP874",
+    "C.CP1125",
+    "C.CP1250",
+    "C.CP1251",
+    "C.CP1252",
+    "C.CP1253",
+    "C.CP1254",
+    "C.CP1256",
+    "C.CP1257",
+    "C.KOI8-R",
+    "C.KOI8-U",
 #endif
 #ifdef HAVE_JIS_CHARSETS
-#define JIS_START       (NUM_LOCALE-2)
+#define JIS_START (NUM_LOCALE - 2)
     "C.EUC-JP",
     "C.SHIFT-JIS",
 #endif
 };
 
-#define NUM_LOCALE sizeof(locales)/sizeof(locales[0])
+#define NUM_LOCALE sizeof(locales) / sizeof(locales[0])
 
 #if __SIZEOF_WCHAR_T__ == 2
 #define LAST_CHAR 0xffff
@@ -83,20 +102,21 @@ static const char *locales[] = {
 #define LAST_CHAR 0xdffff
 #endif
 
-int main(int argc, char **argv)
+int
+main(int argc, char **argv)
 {
     int         error = 0;
     int         c, lastc;
     size_t      mb_cur_max;
-    char        mb[MB_LEN_MAX+1];
+    char        mb[MB_LEN_MAX + 1];
     char        byte2[2];
     int         nbyte2;
     int         i2;
     size_t      mb_ret;
     wchar_t     wc;
-    FILE        *out = stdout;
+    FILE       *out = stdout;
     unsigned    i;
-    const char  *encode;
+    const char *encode;
 
     if (argc > 1) {
         out = fopen(argv[1], "w");
@@ -141,8 +161,8 @@ int main(int argc, char **argv)
         }
         for (i2 = 0; i2 < nbyte2; i2++) {
             for (c = 0; c <= lastc; c++) {
-                mbstate_t   ps;
-                size_t      nc;
+                mbstate_t ps;
+                size_t    nc;
                 memset(&ps, 0, sizeof(ps));
 
                 if (byte2[i2] != 0) {
@@ -160,7 +180,8 @@ int main(int argc, char **argv)
                         nc = 2;
                     }
                 }
-                unsigned long this_c = (unsigned long) (unsigned) c + (unsigned long) (unsigned char) byte2[i2] * 256UL * 256UL;
+                unsigned long this_c = (unsigned long)(unsigned)c
+                    + (unsigned long)(unsigned char)byte2[i2] * 256UL * 256UL;
                 wc = 0xfffff;
                 mb_ret = mbrtowc(&wc, mb, nc, &ps);
                 if (mb_ret == 1 && this_c >= 0x100)
@@ -169,13 +190,13 @@ int main(int argc, char **argv)
                     continue;
                 if (wc == 0xfffff)
                     printf("missing %#08lx in %s ret %zd\n", this_c, encode, mb_ret);
-                fprintf(out, "%-12s->wc %#08lx %#08lx\n", encode, this_c, (unsigned long) wc);
+                fprintf(out, "%-12s->wc %#08lx %#08lx\n", encode, this_c, (unsigned long)wc);
             }
         }
 
-        for (wc = 1; ; wc++) {
-            mbstate_t   ps;
-            size_t      s;
+        for (wc = 1;; wc++) {
+            mbstate_t ps;
+            size_t    s;
             memset(&ps, 0, sizeof(ps));
 
             mb_ret = wcrtomb(mb, wc, &ps);
@@ -183,9 +204,9 @@ int main(int argc, char **argv)
                 break;
             if (mb_ret == (size_t)-1)
                 continue;
-            fprintf(out, "wc->%-12s %#07lx", encode, (unsigned long) wc);
+            fprintf(out, "wc->%-12s %#07lx", encode, (unsigned long)wc);
             for (s = 0; s < mb_ret; s++)
-                fprintf(out, " %02x", (unsigned char) mb[s]);
+                fprintf(out, " %02x", (unsigned char)mb[s]);
             fprintf(out, "\n");
         }
     }

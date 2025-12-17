@@ -37,5 +37,5 @@
 void
 _start(void)
 {
-	__start();
+    __start();
 }

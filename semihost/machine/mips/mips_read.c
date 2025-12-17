@@ -52,7 +52,7 @@ read(int fd, void *buf, size_t count)
      * appear.
      */
     do {
-        ret = mips_semihost3(SYS_SEMIHOST_read, fd, (uintptr_t) buf, count);
+        ret = mips_semihost3(SYS_SEMIHOST_read, fd, (uintptr_t)buf, count);
     } while (ret == 0 && fd == 0);
 
     return ret;

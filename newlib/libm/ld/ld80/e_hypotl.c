@@ -42,83 +42,96 @@
  * 	than 1 ulps (units in the last place)
  */
 
-
-
 long double
 hypotl(long double x, long double y)
 {
-	long double a,b,t1,t2,yy1,y2,w;
-	u_int32_t j,k,ea,eb;
+    long double a, b, t1, t2, yy1, y2, w;
+    u_int32_t   j, k, ea, eb;
 
-	GET_LDOUBLE_EXP(ea,x);
-	ea &= 0x7fff;
-	GET_LDOUBLE_EXP(eb,y);
-	eb &= 0x7fff;
-	if(eb > ea) {a=y;b=x;j=ea; ea=eb;eb=j;} else {a=x;b=y;}
-	SET_LDOUBLE_EXP(a,ea);	/* a <- |a| */
-	SET_LDOUBLE_EXP(b,eb);	/* b <- |b| */
-	if((ea-eb)>0x46) {return a+b;} /* x/y > 2**70 */
-	k=0;
-	if(ea > 0x5f3f) {	/* a>2**8000 */
-	   if(ea == 0x7fff) {	/* Inf or NaN */
-	       u_int32_t es,high,low;
-	       w = a+b;			/* for sNaN */
-	       GET_LDOUBLE_WORDS(es,high,low,a);
-               (void) es;
-	       if(((high&0x7fffffff)|low)==0 && !issignalingl_inline(b))
-                   w = a;
-	       GET_LDOUBLE_WORDS(es,high,low,b);
-	       if(((eb^0x7fff)|(high&0x7fffffff)|low)==0 && !issignalingl_inline(a))
-                   w = b;
-	       return w;
-	   }
-	   /* scale a and b by 2**-9600 */
-	   ea -= 0x2580; eb -= 0x2580;	k += 9600;
-	   SET_LDOUBLE_EXP(a,ea);
-	   SET_LDOUBLE_EXP(b,eb);
-	}
-	if(eb < 0x20bf) {	/* b < 2**-8000 */
-	    if(eb == 0) {	/* subnormal b or 0 */
-		u_int32_t es,high,low;
-		GET_LDOUBLE_WORDS(es,high,low,b);
-                (void) es;
-		if((high|low)==0) return a;
-		SET_LDOUBLE_WORDS(t1, 0x7ffd, 0, 0);	/* t1=2^16382 */
-		b *= t1;
-		a *= t1;
-		k -= 16382;
-	    } else {		/* scale a and b by 2^9600 */
-		ea += 0x2580;	/* a *= 2^9600 */
-		eb += 0x2580;	/* b *= 2^9600 */
-		k -= 9600;
-		SET_LDOUBLE_EXP(a,ea);
-		SET_LDOUBLE_EXP(b,eb);
-	    }
-	}
+    GET_LDOUBLE_EXP(ea, x);
+    ea &= 0x7fff;
+    GET_LDOUBLE_EXP(eb, y);
+    eb &= 0x7fff;
+    if (eb > ea) {
+        a = y;
+        b = x;
+        j = ea;
+        ea = eb;
+        eb = j;
+    } else {
+        a = x;
+        b = y;
+    }
+    SET_LDOUBLE_EXP(a, ea); /* a <- |a| */
+    SET_LDOUBLE_EXP(b, eb); /* b <- |b| */
+    if ((ea - eb) > 0x46) {
+        return a + b;
+    } /* x/y > 2**70 */
+    k = 0;
+    if (ea > 0x5f3f) {      /* a>2**8000 */
+        if (ea == 0x7fff) { /* Inf or NaN */
+            u_int32_t es, high, low;
+            w = a + b; /* for sNaN */
+            GET_LDOUBLE_WORDS(es, high, low, a);
+            (void)es;
+            if (((high & 0x7fffffff) | low) == 0 && !issignalingl_inline(b))
+                w = a;
+            GET_LDOUBLE_WORDS(es, high, low, b);
+            if (((eb ^ 0x7fff) | (high & 0x7fffffff) | low) == 0 && !issignalingl_inline(a))
+                w = b;
+            return w;
+        }
+        /* scale a and b by 2**-9600 */
+        ea -= 0x2580;
+        eb -= 0x2580;
+        k += 9600;
+        SET_LDOUBLE_EXP(a, ea);
+        SET_LDOUBLE_EXP(b, eb);
+    }
+    if (eb < 0x20bf) { /* b < 2**-8000 */
+        if (eb == 0) { /* subnormal b or 0 */
+            u_int32_t es, high, low;
+            GET_LDOUBLE_WORDS(es, high, low, b);
+            (void)es;
+            if ((high | low) == 0)
+                return a;
+            SET_LDOUBLE_WORDS(t1, 0x7ffd, 0, 0); /* t1=2^16382 */
+            b *= t1;
+            a *= t1;
+            k -= 16382;
+        } else {          /* scale a and b by 2^9600 */
+            ea += 0x2580; /* a *= 2^9600 */
+            eb += 0x2580; /* b *= 2^9600 */
+            k -= 9600;
+            SET_LDOUBLE_EXP(a, ea);
+            SET_LDOUBLE_EXP(b, eb);
+        }
+    }
     /* medium size a and b */
-	w = a-b;
-	if (w>b) {
-	    u_int32_t high;
-	    GET_LDOUBLE_MSW(high,a);
-	    SET_LDOUBLE_WORDS(t1,ea,high,0);
-	    t2 = a-t1;
-	    w  = sqrtl(t1*t1-(b*(-b)-t2*(a+t1)));
-	} else {
-	    u_int32_t high;
-	    GET_LDOUBLE_MSW(high,b);
-	    a  = a+a;
-	    SET_LDOUBLE_WORDS(yy1,eb,high,0);
-	    y2 = b - yy1;
-	    GET_LDOUBLE_MSW(high,a);
-	    SET_LDOUBLE_WORDS(t1,ea+1,high,0);
-	    t2 = a - t1;
-	    w  = sqrtl(t1*yy1-(w*(-w)-(t1*y2+t2*b)));
-	}
-	if(k!=0) {
-	    u_int32_t es;
-	    t1 = 1.0L;
-	    GET_LDOUBLE_EXP(es,t1);
-	    SET_LDOUBLE_EXP(t1,es+k);
-	    return check_oflowl(t1*w);
-	} else return w;
+    w = a - b;
+    if (w > b) {
+        u_int32_t high;
+        GET_LDOUBLE_MSW(high, a);
+        SET_LDOUBLE_WORDS(t1, ea, high, 0);
+        t2 = a - t1;
+        w = sqrtl(t1 * t1 - (b * (-b) - t2 * (a + t1)));
+    } else {
+        u_int32_t high;
+        GET_LDOUBLE_MSW(high, b);
+        a = a + a;
+        SET_LDOUBLE_WORDS(yy1, eb, high, 0);
+        y2 = b - yy1;
+        GET_LDOUBLE_MSW(high, a);
+        SET_LDOUBLE_WORDS(t1, ea + 1, high, 0);
+        t2 = a - t1;
+        w = sqrtl(t1 * yy1 - (w * (-w) - (t1 * y2 + t2 * b)));
+    }
+    if (k != 0) {
+        u_int32_t es;
+        t1 = 1.0L;
+        GET_LDOUBLE_EXP(es, t1);
+        SET_LDOUBLE_EXP(t1, es + k);
+        return check_oflowl(t1 * w);
+    } else
+        return w;
 }

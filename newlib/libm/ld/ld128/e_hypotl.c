@@ -42,81 +42,93 @@
  * 	than 1 ulps (units in the last place)
  */
 
-
-
 long double
 hypotl(long double x, long double y)
 {
-	long double a,b,t1,t2,yy1,y2,w;
-	int64_t j,k,ha,hb;
+    long double a, b, t1, t2, yy1, y2, w;
+    int64_t     j, k, ha, hb;
 
-	GET_LDOUBLE_MSW64(ha,x);
-	ha &= 0x7fffffffffffffffLL;
-	GET_LDOUBLE_MSW64(hb,y);
-	hb &= 0x7fffffffffffffffLL;
-	if(hb > ha) {a=y;b=x;j=ha; ha=hb;hb=j;} else {a=x;b=y;}
-	SET_LDOUBLE_MSW64(a,ha);	/* a <- |a| */
-	SET_LDOUBLE_MSW64(b,hb);	/* b <- |b| */
-	if((ha-hb)>0x78000000000000LL) {return a+b;} /* x/y > 2**120 */
-	k=0;
-	if(ha > 0x5f3f000000000000LL) {	/* a>2**8000 */
-	   if(ha >= 0x7fff000000000000LL) {	/* Inf or NaN */
-	       u_int64_t low;
-	       w = a+b;			/* for sNaN */
-	       GET_LDOUBLE_LSW64(low,a);
-	       if(((ha&0xffffffffffffLL)|low)==0 && !issignalingl_inline(b))
-                   w = a;
-	       GET_LDOUBLE_LSW64(low,b);
-	       if(((hb^0x7fff000000000000LL)|low)==0 && !issignalingl_inline(a))
-                   w = b;
-	       return w;
-	   }
-	   /* scale a and b by 2**-9600 */
-	   ha -= 0x2580000000000000LL;
-	   hb -= 0x2580000000000000LL;	k += 9600;
-	   SET_LDOUBLE_MSW64(a,ha);
-	   SET_LDOUBLE_MSW64(b,hb);
-	}
-	if(hb < 0x20bf000000000000LL) {	/* b < 2**-8000 */
-	    if(hb <= 0x0000ffffffffffffLL) {	/* subnormal b or 0 */
-		u_int64_t low;
-		GET_LDOUBLE_LSW64(low,b);
-		if((hb|low)==0) return a;
-		t1=0;
-		SET_LDOUBLE_MSW64(t1,0x7ffd000000000000LL); /* t1=2^16382 */
-		b *= t1;
-		a *= t1;
-		k -= 16382;
-	    } else {		/* scale a and b by 2^9600 */
-		ha += 0x2580000000000000LL;	/* a *= 2^9600 */
-		hb += 0x2580000000000000LL;	/* b *= 2^9600 */
-		k -= 9600;
-		SET_LDOUBLE_MSW64(a,ha);
-		SET_LDOUBLE_MSW64(b,hb);
-	    }
-	}
+    GET_LDOUBLE_MSW64(ha, x);
+    ha &= 0x7fffffffffffffffLL;
+    GET_LDOUBLE_MSW64(hb, y);
+    hb &= 0x7fffffffffffffffLL;
+    if (hb > ha) {
+        a = y;
+        b = x;
+        j = ha;
+        ha = hb;
+        hb = j;
+    } else {
+        a = x;
+        b = y;
+    }
+    SET_LDOUBLE_MSW64(a, ha); /* a <- |a| */
+    SET_LDOUBLE_MSW64(b, hb); /* b <- |b| */
+    if ((ha - hb) > 0x78000000000000LL) {
+        return a + b;
+    } /* x/y > 2**120 */
+    k = 0;
+    if (ha > 0x5f3f000000000000LL) {      /* a>2**8000 */
+        if (ha >= 0x7fff000000000000LL) { /* Inf or NaN */
+            u_int64_t low;
+            w = a + b; /* for sNaN */
+            GET_LDOUBLE_LSW64(low, a);
+            if (((ha & 0xffffffffffffLL) | low) == 0 && !issignalingl_inline(b))
+                w = a;
+            GET_LDOUBLE_LSW64(low, b);
+            if (((hb ^ 0x7fff000000000000LL) | low) == 0 && !issignalingl_inline(a))
+                w = b;
+            return w;
+        }
+        /* scale a and b by 2**-9600 */
+        ha -= 0x2580000000000000LL;
+        hb -= 0x2580000000000000LL;
+        k += 9600;
+        SET_LDOUBLE_MSW64(a, ha);
+        SET_LDOUBLE_MSW64(b, hb);
+    }
+    if (hb < 0x20bf000000000000LL) {      /* b < 2**-8000 */
+        if (hb <= 0x0000ffffffffffffLL) { /* subnormal b or 0 */
+            u_int64_t low;
+            GET_LDOUBLE_LSW64(low, b);
+            if ((hb | low) == 0)
+                return a;
+            t1 = 0;
+            SET_LDOUBLE_MSW64(t1, 0x7ffd000000000000LL); /* t1=2^16382 */
+            b *= t1;
+            a *= t1;
+            k -= 16382;
+        } else {                        /* scale a and b by 2^9600 */
+            ha += 0x2580000000000000LL; /* a *= 2^9600 */
+            hb += 0x2580000000000000LL; /* b *= 2^9600 */
+            k -= 9600;
+            SET_LDOUBLE_MSW64(a, ha);
+            SET_LDOUBLE_MSW64(b, hb);
+        }
+    }
     /* medium size a and b */
-	w = a-b;
-	if (w>b) {
-	    t1 = 0;
-	    SET_LDOUBLE_MSW64(t1,ha);
-	    t2 = a-t1;
-	    w  = sqrtl(t1*t1-(b*(-b)-t2*(a+t1)));
-	} else {
-	    a  = a+a;
-	    yy1 = 0;
-	    SET_LDOUBLE_MSW64(yy1,hb);
-	    y2 = b - yy1;
-	    t1 = 0;
-	    SET_LDOUBLE_MSW64(t1,ha+0x0001000000000000LL);
-	    t2 = a - t1;
-	    w  = sqrtl(t1*yy1-(w*(-w)-(t1*y2+t2*b)));
-	}
-	if(k!=0) {
-	    u_int64_t high;
-	    t1 = 1.0L;
-	    GET_LDOUBLE_MSW64(high,t1);
-	    SET_LDOUBLE_MSW64(t1,high+lsl(k, 48));
-	    return check_oflowl(t1*w);
-	} else return w;
+    w = a - b;
+    if (w > b) {
+        t1 = 0;
+        SET_LDOUBLE_MSW64(t1, ha);
+        t2 = a - t1;
+        w = sqrtl(t1 * t1 - (b * (-b) - t2 * (a + t1)));
+    } else {
+        a = a + a;
+        yy1 = 0;
+        SET_LDOUBLE_MSW64(yy1, hb);
+        y2 = b - yy1;
+        t1 = 0;
+        SET_LDOUBLE_MSW64(t1, ha + 0x0001000000000000LL);
+        t2 = a - t1;
+        w = sqrtl(t1 * yy1 - (w * (-w) - (t1 * y2 + t2 * b)));
+    }
+    if (k != 0) {
+        u_int64_t high;
+        t1 = 1.0L;
+        GET_LDOUBLE_MSW64(high, t1);
+        SET_LDOUBLE_MSW64(t1, high + lsl(k, 48));
+        return check_oflowl(t1 * w);
+    } else
+        return w;
 }

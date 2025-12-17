@@ -35,24 +35,24 @@
 wint_t
 __STDIO_UNLOCKED(putwc)(wchar_t c, FILE *stream)
 {
-        union {
-                wchar_t wc;
-                char c[sizeof(wchar_t)];
-        } u;
-        unsigned i;
-        
-        __flockfile(stream);
-        stream->flags |= __SWIDE;
+    union {
+        wchar_t wc;
+        char    c[sizeof(wchar_t)];
+    } u;
+    unsigned i;
 
-	if ((stream->flags & __SWR) == 0)
-		__funlock_return(stream, WEOF);
+    __flockfile(stream);
+    stream->flags |= __SWIDE;
 
-        u.wc = c;
-        for (i = 0; i < sizeof(wchar_t); i++)
-                if (stream->put(u.c[i], stream) < 0)
-                        __funlock_return(stream, WEOF);
+    if ((stream->flags & __SWR) == 0)
+        __funlock_return(stream, WEOF);
 
-	__funlock_return(stream, (wint_t) c);
+    u.wc = c;
+    for (i = 0; i < sizeof(wchar_t); i++)
+        if (stream->put(u.c[i], stream) < 0)
+            __funlock_return(stream, WEOF);
+
+    __funlock_return(stream, (wint_t)c);
 }
 
 #ifdef __STDIO_LOCKING
@@ -69,12 +69,20 @@ putwc(wchar_t c, FILE *stream)
 #ifdef __strong_reference
 __strong_reference(putwc, putwc_unlocked);
 #else
-wint_t putwc_unlocked(wchar_t c, FILE *stream) { return putwc(c, stream); }
+wint_t
+putwc_unlocked(wchar_t c, FILE *stream)
+{
+    return putwc(c, stream);
+}
 #endif
 #endif
 
 #ifdef __strong_reference
 __strong_reference(putwc, fputwc);
 #else
-wint_t fputwc(wchar_t c, FILE *stream) { return putwc(c, stream); }
+wint_t
+fputwc(wchar_t c, FILE *stream)
+{
+    return putwc(c, stream);
+}
 #endif

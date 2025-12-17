@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -39,8 +39,8 @@
 float complex
 cacosf(float complex z)
 {
-	float complex w;
+    float complex w;
 
-	w = casinf(z);
-	return (float complex) ((float)M_PI_2 - crealf(w)) - cimagf(w) * I;
+    w = casinf(z);
+    return (float complex)((float)M_PI_2 - crealf(w)) - cimagf(w) * I;
 }

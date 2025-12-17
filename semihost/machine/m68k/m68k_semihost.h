@@ -42,81 +42,82 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define HOSTED_EXIT  0
-#define HOSTED_INIT_SIM 1
-#define HOSTED_OPEN 2
-#define HOSTED_CLOSE 3
-#define HOSTED_READ 4
-#define HOSTED_WRITE 5
-#define HOSTED_LSEEK 6
-#define HOSTED_RENAME 7
-#define HOSTED_UNLINK 8
-#define HOSTED_STAT 9
-#define HOSTED_FSTAT 10
+#define HOSTED_EXIT         0
+#define HOSTED_INIT_SIM     1
+#define HOSTED_OPEN         2
+#define HOSTED_CLOSE        3
+#define HOSTED_READ         4
+#define HOSTED_WRITE        5
+#define HOSTED_LSEEK        6
+#define HOSTED_RENAME       7
+#define HOSTED_UNLINK       8
+#define HOSTED_STAT         9
+#define HOSTED_FSTAT        10
 #define HOSTED_GETTIMEOFDAY 11
-#define HOSTED_ISATTY 12
-#define HOSTED_SYSTEM 13
+#define HOSTED_ISATTY       12
+#define HOSTED_SYSTEM       13
 
-#define GDB_O_RDONLY  0
-#define GDB_O_WRONLY  1
-#define GDB_O_RDWR    2
-#define GDB_O_APPEND  8
-#define GDB_O_CREAT   0x200
-#define GDB_O_TRUNC   0x400
-#define GDB_O_EXCL    0x800
+#define GDB_O_RDONLY        0
+#define GDB_O_WRONLY        1
+#define GDB_O_RDWR          2
+#define GDB_O_APPEND        8
+#define GDB_O_CREAT         0x200
+#define GDB_O_TRUNC         0x400
+#define GDB_O_EXCL          0x800
 
 typedef uint32_t my_mode_t;
 typedef uint32_t my_time_t;
 
-struct m68k_stat
-{
-    uint32_t   my_dev;     /* device */
-    uint32_t   my_ino;     /* inode */
-    my_mode_t  my_mode;    /* protection */
-    uint32_t   my_nlink;   /* number of hard links */
-    uint32_t   my_uid;     /* user ID of owner */
-    uint32_t   my_gid;     /* group ID of owner */
-    uint32_t   my_rdev;    /* device type (if inode device) */
-    uint64_t   my_size;    /* total size, in bytes */
-    uint64_t   my_blksize; /* blocksize for filesystem I/O */
-    uint64_t   my_blocks;  /* number of blocks allocated */
-    my_time_t  my_atime;   /* time of last access */
-    my_time_t  my_mtime;   /* time of last modification */
-    my_time_t  my_ctime;   /* time of last change */
+struct m68k_stat {
+    uint32_t  my_dev;     /* device */
+    uint32_t  my_ino;     /* inode */
+    my_mode_t my_mode;    /* protection */
+    uint32_t  my_nlink;   /* number of hard links */
+    uint32_t  my_uid;     /* user ID of owner */
+    uint32_t  my_gid;     /* group ID of owner */
+    uint32_t  my_rdev;    /* device type (if inode device) */
+    uint64_t  my_size;    /* total size, in bytes */
+    uint64_t  my_blksize; /* blocksize for filesystem I/O */
+    uint64_t  my_blocks;  /* number of blocks allocated */
+    my_time_t my_atime;   /* time of last access */
+    my_time_t my_mtime;   /* time of last modification */
+    my_time_t my_ctime;   /* time of last change */
 };
 
-static inline
-copy_stat(struct stat *restrict statbuf, struct m68k_stat *m68k_stat)
+static inline copy_stat(struct stat * restrict statbuf, struct m68k_stat *m68k_stat)
 {
-        statbuf->st_dev = be32toh(m68k_stat->my_dev);
-        statbuf->st_ino = be32toh(m68k_stat->my_ino);
-        statbuf->st_mode = be32toh(m68k_stat->my_mode);
-        statbuf->st_nlink = be32toh(m68k_stat->my_nlink);
-        statbuf->st_uid = be32toh(m68k_stat->my_uid);
-        statbuf->st_gid = be32toh(m68k_stat->my_gid);
-        statbuf->st_rdev = be32toh(m68k_stat->my_rdev);
-        statbuf->st_size = be32toh(m68k_stat->my_size);
-        statbuf->st_blksize = be32toh(m68k_stat->my_blksize);
-        statbuf->st_blocks = be32toh(m68k_stat->my_blocks);
-        statbuf->st_atime = be32toh(m68k_stat->my_atime);
-        statbuf->st_mtime = be32toh(m68k_stat->my_mtime);
-        statbuf->st_ctime = be32toh(m68k_stat->my_ctime);
+    statbuf->st_dev = be32toh(m68k_stat->my_dev);
+    statbuf->st_ino = be32toh(m68k_stat->my_ino);
+    statbuf->st_mode = be32toh(m68k_stat->my_mode);
+    statbuf->st_nlink = be32toh(m68k_stat->my_nlink);
+    statbuf->st_uid = be32toh(m68k_stat->my_uid);
+    statbuf->st_gid = be32toh(m68k_stat->my_gid);
+    statbuf->st_rdev = be32toh(m68k_stat->my_rdev);
+    statbuf->st_size = be32toh(m68k_stat->my_size);
+    statbuf->st_blksize = be32toh(m68k_stat->my_blksize);
+    statbuf->st_blocks = be32toh(m68k_stat->my_blocks);
+    statbuf->st_atime = be32toh(m68k_stat->my_atime);
+    statbuf->st_mtime = be32toh(m68k_stat->my_mtime);
+    statbuf->st_ctime = be32toh(m68k_stat->my_ctime);
 }
 
 struct m68k_semihost {
-    uintptr_t   args[4];
+    uintptr_t args[4];
 };
 
-intptr_t
-m68k_semihost(int func, struct m68k_semihost *args);
+intptr_t m68k_semihost(int func, struct m68k_semihost *args);
 
-static inline intptr_t m68k_semihost1_immediate(int func, uintptr_t arg0) {
-    return m68k_semihost(func, (struct m68k_semihost *) arg0);
+static inline intptr_t
+m68k_semihost1_immediate(int func, uintptr_t arg0)
+{
+    return m68k_semihost(func, (struct m68k_semihost *)arg0);
 };
 
-static inline intptr_t m68k_semihost1(int func, uintptr_t arg0) {
+static inline intptr_t
+m68k_semihost1(int func, uintptr_t arg0)
+{
     struct m68k_semihost args;
-    intptr_t ret;
+    intptr_t             ret;
 
     args.args[0] = arg0;
     m68k_semihost(func, &args);
@@ -126,9 +127,11 @@ static inline intptr_t m68k_semihost1(int func, uintptr_t arg0) {
     return ret;
 };
 
-static inline intptr_t m68k_semihost2(int func, uintptr_t arg0, uintptr_t arg1) {
+static inline intptr_t
+m68k_semihost2(int func, uintptr_t arg0, uintptr_t arg1)
+{
     struct m68k_semihost args;
-    intptr_t ret;
+    intptr_t             ret;
 
     args.args[0] = arg0;
     args.args[1] = arg1;
@@ -139,9 +142,11 @@ static inline intptr_t m68k_semihost2(int func, uintptr_t arg0, uintptr_t arg1) 
     return ret;
 };
 
-static inline intptr_t m68k_semihost3(int func, uintptr_t arg0, uintptr_t arg1, uintptr_t arg2) {
+static inline intptr_t
+m68k_semihost3(int func, uintptr_t arg0, uintptr_t arg1, uintptr_t arg2)
+{
     struct m68k_semihost args;
-    intptr_t ret;
+    intptr_t             ret;
 
     args.args[0] = arg0;
     args.args[1] = arg1;
@@ -153,24 +158,28 @@ static inline intptr_t m68k_semihost3(int func, uintptr_t arg0, uintptr_t arg1, 
     return ret;
 };
 
-static inline uint64_t m68k_semihost4_64(int func, uintptr_t arg0, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3) {
+static inline uint64_t
+m68k_semihost4_64(int func, uintptr_t arg0, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3)
+{
     struct m68k_semihost args;
-    uint64_t ret;
+    uint64_t             ret;
 
     args.args[0] = arg0;
     args.args[1] = arg1;
     args.args[2] = arg2;
     args.args[3] = arg3;
     m68k_semihost(func, &args);
-    ret = ((uint64_t) args.args[0] << 32) | args.args[1];
-    if ((int64_t) ret < 0)
+    ret = ((uint64_t)args.args[0] << 32) | args.args[1];
+    if ((int64_t)ret < 0)
         errno = args.args[2];
     return ret;
 };
 
-static inline intptr_t m68k_semihost4(int func, uintptr_t arg0, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3) {
+static inline intptr_t
+m68k_semihost4(int func, uintptr_t arg0, uintptr_t arg1, uintptr_t arg2, uintptr_t arg3)
+{
     struct m68k_semihost args;
-    intptr_t ret;
+    intptr_t             ret;
 
     args.args[0] = arg0;
     args.args[1] = arg1;

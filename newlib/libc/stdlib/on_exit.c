@@ -12,11 +12,11 @@ FUNCTION
 <<on_exit>>---request execution of function with argument at program exit
 
 INDEX
-	on_exit
+        on_exit
 
 SYNOPSIS
-	#include <stdlib.h>
-	int on_exit (void (*<[function]>)(int, void *), void *<[arg]>);
+        #include <stdlib.h>
+        int on_exit (void (*<[function]>)(int, void *), void *<[arg]>);
 
 DESCRIPTION
 You can use <<on_exit>> to enroll functions in a list of functions that
@@ -27,13 +27,13 @@ pointer to void.  The function must not return a result.  The value
 of <[arg]> is registered and passed as the argument to <[function]>.
 
 The functions are kept in a LIFO stack; that is, the last function
-enrolled by <<atexit>> or <<on_exit>> will be the first to execute when 
+enrolled by <<atexit>> or <<on_exit>> will be the first to execute when
 your program exits.  You can intermix functions using <<atexit>> and
 <<on_exit>>.
 
 There is no built-in limit to the number of functions you can enroll
 in this list; however, after every group of 32 functions is enrolled,
-<<atexit>>/<<on_exit>> will call <<malloc>> to get space for the next part 
+<<atexit>>/<<on_exit>> will call <<malloc>> to get space for the next part
 of the list.   The initial list of 32 functions is statically allocated, so
 you can always count on at least that many slots available.
 
@@ -58,8 +58,7 @@ Supporting OS subroutines required: None
  */
 
 int
-on_exit (void (*fn) (int, void *),
-        void *arg)
+on_exit(void (*fn)(int, void *), void *arg)
 {
-  return __register_exitproc (__et_onexit, (void (*)(void)) fn, arg, NULL);
+    return __register_exitproc(__et_onexit, (void (*)(void))fn, arg, NULL);
 }

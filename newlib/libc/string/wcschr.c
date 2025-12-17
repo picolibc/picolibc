@@ -1,21 +1,21 @@
 /*
 FUNCTION
-	<<wcschr>>---wide-character string scanning operation
+        <<wcschr>>---wide-character string scanning operation
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcschr(const wchar_t *<[s]>, wchar_t <[c]>);
+        #include <wchar.h>
+        wchar_t *wcschr(const wchar_t *<[s]>, wchar_t <[c]>);
 
 DESCRIPTION
-	The <<wcschr>> function locates the first occurrence of <[c]> in the
-	wide-character string pointed to by <[s]>. The value of <[c]> must be a
-	character representable as a type wchar_t and must be a wide-character
-	code corresponding to a valid character in the current locale.
-	The terminating null wide-character string.
+        The <<wcschr>> function locates the first occurrence of <[c]> in the
+        wide-character string pointed to by <[s]>. The value of <[c]> must be a
+        character representable as a type wchar_t and must be a wide-character
+        code corresponding to a valid character in the current locale.
+        The terminating null wide-character string.
 
 RETURNS
-	Upon completion, <<wcschr>> returns a pointer to the wide-character
-	code, or a null pointer if the wide-character code is not found. 
+        Upon completion, <<wcschr>> returns a pointer to the wide-character
+        code, or a null pointer if the wide-character code is not found.
 
 PORTABILITY
 <<wcschr>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -57,19 +57,16 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wcschr (const wchar_t * s,
-	wchar_t c)
+wcschr(const wchar_t *s, wchar_t c)
 {
-  const wchar_t *p;
+    const wchar_t *p;
 
-  p = s;
-  do
-    {
-      if (*p == c)
-	{
-	  /* LINTED interface specification */
-	  return (wchar_t *) p;
-	}
+    p = s;
+    do {
+        if (*p == c) {
+            /* LINTED interface specification */
+            return (wchar_t *)p;
+        }
     } while (*p++);
-  return NULL;
+    return NULL;
 }

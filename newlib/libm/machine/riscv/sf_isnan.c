@@ -43,10 +43,10 @@
 #undef isnanf
 
 int
-isnanf (float x)
+isnanf(float x)
 {
-	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_NAN);
+    long fclass = _fclass_f(x);
+    return (fclass & FCLASS_NAN);
 }
 
 #ifdef __strong_reference
@@ -59,8 +59,7 @@ __isnanf(float x)
 }
 #endif
 
-_MATH_ALIAS_i_f(isnan)
-_MATH_ALIAS_i_f(__isnan)
+_MATH_ALIAS_i_f(isnan) _MATH_ALIAS_i_f(__isnan)
 
 #else
 #include "../../common/sf_isnan.c"

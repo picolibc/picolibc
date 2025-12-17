@@ -49,7 +49,7 @@ main(int argc, char **argv)
 {
 #if defined(__HEXAGON_ARCH__)
     unsigned i;
-    int errors = 0;
+    int      errors = 0;
 
     if (argc != EXPECT_NARG) {
         printf("argc is %d expect %d\n", argc, (int)EXPECT_NARG);

@@ -37,43 +37,41 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ea.h>
 #include <string.h>
 
-COMPAT_EA_ALIAS (memmove_ea);
+COMPAT_EA_ALIAS(memmove_ea);
 
 __ea void *
-memmove_ea (__ea void *dest, __ea const void *src, size_ea_t n)
+memmove_ea(__ea void *dest, __ea const void *src, size_ea_t n)
 {
-  __ea void *curr_dest = dest;
-  __ea void *curr_src;
-  void *l_dest;
-  void *l_src;
-  size_ea_t local_n;
-  size_ea_t src_n;
-  size_ea_t dst_n;
+    __ea void *curr_dest = dest;
+    __ea void *curr_src;
+    void      *l_dest;
+    void      *l_src;
+    size_ea_t  local_n;
+    size_ea_t  src_n;
+    size_ea_t  dst_n;
 
-  curr_src = (__ea void *) src;
-  while (n)
-    {
-      l_src = __cache_fetch (curr_src);
+    curr_src = (__ea void *)src;
+    while (n) {
+        l_src = __cache_fetch(curr_src);
 
-      /*
-       * use the smaller of the size left to copy (n), the space left in the
-       * src cacheline (src_n), or the space left in the destination
-       * cacheline (dst_n).
-       */
-      src_n = ROUND_UP_NEXT_128 ((size_ea_t) curr_src) - (size_ea_t) curr_src;
-      dst_n =
-	ROUND_UP_NEXT_128 ((size_ea_t) curr_dest) - (size_ea_t) curr_dest;
-      local_n = three_way_min (src_n, dst_n, n);
+        /*
+         * use the smaller of the size left to copy (n), the space left in the
+         * src cacheline (src_n), or the space left in the destination
+         * cacheline (dst_n).
+         */
+        src_n = ROUND_UP_NEXT_128((size_ea_t)curr_src) - (size_ea_t)curr_src;
+        dst_n = ROUND_UP_NEXT_128((size_ea_t)curr_dest) - (size_ea_t)curr_dest;
+        local_n = three_way_min(src_n, dst_n, n);
 
-      l_dest = __cache_fetch_dirty (curr_dest, local_n);
+        l_dest = __cache_fetch_dirty(curr_dest, local_n);
 
-      memmove (l_dest, l_src, local_n);
+        memmove(l_dest, l_src, local_n);
 
-      /* update values to take into account what we copied */
-      curr_src += local_n;
-      curr_dest += local_n;
-      n -= local_n;
+        /* update values to take into account what we copied */
+        curr_src += local_n;
+        curr_dest += local_n;
+        n -= local_n;
     }
 
-  return dest;
+    return dest;
 }

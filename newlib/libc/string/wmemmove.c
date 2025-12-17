@@ -1,29 +1,29 @@
 /*
 FUNCTION
-	<<wmemmove>>---copy wide characters in memory with overlapping areas 
+        <<wmemmove>>---copy wide characters in memory with overlapping areas
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wmemmove(wchar_t *<[d]>, const wchar_t *<[s]>, size_t <[n]>);
+        #include <wchar.h>
+        wchar_t *wmemmove(wchar_t *<[d]>, const wchar_t *<[s]>, size_t <[n]>);
 
 DESCRIPTION
-	The <<wmemmove>> function copies <[n]> wide characters from the object
-	pointed to by <[s]> to the object pointed to by <[d]>. Copying takes
-	place as if the <[n]> wide characters from the object pointed to by
-	<[s]> are first copied into a temporary array of <[n]> wide characters
-	that does not overlap the objects pointed to by <[d]> or <[s]>, and then
-	the <[n]> wide characters from the temporary array are copied into the
-	object pointed to by <[d]>.
+        The <<wmemmove>> function copies <[n]> wide characters from the object
+        pointed to by <[s]> to the object pointed to by <[d]>. Copying takes
+        place as if the <[n]> wide characters from the object pointed to by
+        <[s]> are first copied into a temporary array of <[n]> wide characters
+        that does not overlap the objects pointed to by <[d]> or <[s]>, and then
+        the <[n]> wide characters from the temporary array are copied into the
+        object pointed to by <[d]>.
 
-	This function is not affected by locale and all wchar_t values are
-	treated identically. The null wide character and wchar_t values not
-	corresponding to valid characters are not treated specially.
+        This function is not affected by locale and all wchar_t values are
+        treated identically. The null wide character and wchar_t values not
+        corresponding to valid characters are not treated specially.
 
-	If <[n]> is zero, <[d]> and <[s]> must be a valid pointers, and the
-	function copies zero wide characters. 
+        If <[n]> is zero, <[d]> and <[s]> must be a valid pointers, and the
+        function copies zero wide characters.
 
 RETURNS
-	The <<wmemmove>> function returns the value of <[d]>.
+        The <<wmemmove>> function returns the value of <[d]>.
 
 PORTABILITY
 <<wmemmove>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -65,10 +65,8 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wmemmove (wchar_t * d,
-	const wchar_t * s,
-	size_t n)
+wmemmove(wchar_t *d, const wchar_t *s, size_t n)
 {
 
-  return (wchar_t *) memmove (d, s, n * sizeof (wchar_t));
+    return (wchar_t *)memmove(d, s, n * sizeof(wchar_t));
 }

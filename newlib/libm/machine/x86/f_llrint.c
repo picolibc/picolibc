@@ -3,7 +3,7 @@
  * ====================================================
  * x87 FP implementation contributed to Newlib by
  * Dave Korn, November 2007.  This file is placed in the
- * public domain.  Permission to use, copy, modify, and 
+ * public domain.  Permission to use, copy, modify, and
  * distribute this software is freely granted.
  * ====================================================
  */
@@ -18,22 +18,22 @@
 FUNCTION
 <<llrint>>, <<llrintf>>, <<llrintl>>---round and convert to long long integer
 INDEX
-	llrint
+        llrint
 INDEX
-	llrintf
+        llrintf
 INDEX
-	llrintl
+        llrintl
 
 SYNOPSIS
-	#include <math.h>
-	long long int llrint(double x);
+        #include <math.h>
+        long long int llrint(double x);
         long long int llrintf(float x);
         long long int llrintl(long double x);
 
 DESCRIPTION
 The <<llrint>>, <<llrintf>> and <<llrintl>> functions round <[x]> to the nearest integer value,
 according to the current rounding direction. If the rounded value is outside the
-range of the return type, the numeric result is unspecified. A range error may 
+range of the return type, the numeric result is unspecified. A range error may
 occur if the magnitude of <[x]> is too large.
 
 RETURNS
@@ -58,11 +58,12 @@ and when compiling with GCC.
  *	Governed by x87 FPCR.
  */
 
-long long int _f_llrint (double x)
+long long int
+_f_llrint(double x)
 {
-  long long int _result;
-  __asm__("fistpll %0" : "=m" (_result) : "t" (x) : "st");
-  return _result;
+    long long int _result;
+    __asm__("fistpll %0" : "=m"(_result) : "t"(x) : "st");
+    return _result;
 }
 
 #endif /* !_SOFT_FLOAT */

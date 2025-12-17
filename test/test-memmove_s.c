@@ -44,20 +44,19 @@
 char handler_msg[MAX_ERROR_MSG] = "";
 
 static void
-custom_constraint_handler(const char *restrict msg, void *restrict ptr,
-                          errno_t error)
+custom_constraint_handler(const char * restrict msg, void * restrict ptr, errno_t error)
 {
     (void)ptr;
     (void)error;
     strcpy(handler_msg, msg);
 }
 
-#define TEST_RES(cond, msg, handler_res, test_id)                              \
-    if ((!(cond)) || (handler_res == 1)) {                                     \
-        printf("Test %d Failed: %s\n", test_id, msg);                          \
-        return 1;                                                              \
-    } else {                                                                   \
-        printf("Test %d Passed: %s\n", test_id, msg);                          \
+#define TEST_RES(cond, msg, handler_res, test_id)     \
+    if ((!(cond)) || (handler_res == 1)) {            \
+        printf("Test %d Failed: %s\n", test_id, msg); \
+        return 1;                                     \
+    } else {                                          \
+        printf("Test %d Passed: %s\n", test_id, msg); \
     }
 
 static int
@@ -67,8 +66,7 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
     if (handler_called == 0) {
         (void)expected_msg;
         if (handler_msg[0] != '\0') {
-            printf(
-                "ERROR: Custom constraint handler called without error detiction!\n");
+            printf("ERROR: Custom constraint handler called without error detiction!\n");
             printf("Test %d Failed: Error msg is incorrect\n", test_id);
             ret = 1;
         }
@@ -80,16 +78,13 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
             ret = 1;
         } else {
             if (strcmp(expected_msg, handler_msg) != 0) {
-                printf(
-                    "ERROR: Custom constraint handler called with incorrect msg: %s\n",
-                    handler_msg);
+                printf("ERROR: Custom constraint handler called with incorrect msg: %s\n",
+                       handler_msg);
                 printf("Test %d Failed: Error msg is incorrect\n", test_id);
                 ret = 1;
             } else {
                 (void)expected_msg;
-                printf(
-                    "Custom constraint handler called with correct msg: %s\n",
-                    handler_msg);
+                printf("Custom constraint handler called with correct msg: %s\n", handler_msg);
                 handler_msg[0] = '\0';
                 ret = 0;
             }
@@ -101,9 +96,9 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
 int
 main(void)
 {
-    char buf[50] = "Hello, world!";
-    int test_id = 0;
-    int handler_res = 0;
+    char    buf[50] = "Hello, world!";
+    int     test_id = 0;
+    int     handler_res = 0;
     errno_t res;
 
     set_constraint_handler_s(custom_constraint_handler);
@@ -113,16 +108,14 @@ main(void)
     res = memmove_s(buf + 7, sizeof(buf) - 7, buf, strlen(buf) + 1);
     handler_res = test_handler_called(0, "", test_id);
     TEST_RES(res == 0, "Normal move", handler_res, test_id);
-    TEST_RES(strcmp(buf, "Hello, Hello, world!") == 0, "Normal move Contents",
-             handler_res, test_id);
+    TEST_RES(strcmp(buf, "Hello, Hello, world!") == 0, "Normal move Contents", handler_res,
+             test_id);
 
     // Test case 2: Move with insufficient destination size
     test_id++;
     res = memmove_s(buf + 7, 5, buf, strlen(buf) + 1);
-    handler_res = test_handler_called(
-        1, "memmove_s: copy count exceeds buffer size", test_id);
-    TEST_RES(res != 0, "Move with insufficient destination size", handler_res,
-             test_id);
+    handler_res = test_handler_called(1, "memmove_s: copy count exceeds buffer size", test_id);
+    TEST_RES(res != 0, "Move with insufficient destination size", handler_res, test_id);
 
     // Test case 3: Move with Null destination
     test_id++;
@@ -142,8 +135,7 @@ main(void)
     res = memmove_s(buf, sizeof(buf), buf, 0);
     handler_res = test_handler_called(0, "", test_id);
     TEST_RES(res == 0, "Move with zero length", handler_res, test_id);
-    TEST_RES(buf[0] == '\0', "Move with zero length Contents", handler_res,
-             test_id);
+    TEST_RES(buf[0] == '\0', "Move with zero length Contents", handler_res, test_id);
 
     printf("All memmove_s tests passed!\n");
     return 0;

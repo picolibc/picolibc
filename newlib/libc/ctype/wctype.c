@@ -23,26 +23,26 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
 FUNCTION
-	<<wctype>>, <<wctype_l>>---get wide-character classification type
+        <<wctype>>, <<wctype_l>>---get wide-character classification type
 
 INDEX
-	wctype
+        wctype
 
 INDEX
-	wctype_l
+        wctype_l
 
 SYNOPSIS
-	#include <wctype.h>
-	wctype_t wctype(const char *<[c]>);
+        #include <wctype.h>
+        wctype_t wctype(const char *<[c]>);
 
-	#include <wctype.h>
-	wctype_t wctype_l(const char *<[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        wctype_t wctype_l(const char *<[c]>, locale_t <[locale]>);
 
 
 DESCRIPTION
@@ -72,57 +72,56 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 wctype_t
-wctype (const char *c)
+wctype(const char *c)
 {
-  switch (*c)
-    {
+    switch (*c) {
     case 'a':
-      if (!strcmp (c, "alnum"))
-        return WC_ALNUM; 
-      else if (!strcmp (c, "alpha"))
-        return WC_ALPHA;
-      break;
+        if (!strcmp(c, "alnum"))
+            return WC_ALNUM;
+        else if (!strcmp(c, "alpha"))
+            return WC_ALPHA;
+        break;
     case 'b':
-      if (!strcmp (c, "blank"))
-        return WC_BLANK;
-      break;
+        if (!strcmp(c, "blank"))
+            return WC_BLANK;
+        break;
     case 'c':
-      if (!strcmp (c, "cntrl"))
-        return WC_CNTRL;
-      break;
+        if (!strcmp(c, "cntrl"))
+            return WC_CNTRL;
+        break;
     case 'd':
-      if (!strcmp (c, "digit"))
-        return WC_DIGIT;
-      break;
+        if (!strcmp(c, "digit"))
+            return WC_DIGIT;
+        break;
     case 'g':
-      if (!strcmp (c, "graph"))
-        return WC_GRAPH;
-      break;
+        if (!strcmp(c, "graph"))
+            return WC_GRAPH;
+        break;
     case 'l':
-      if (!strcmp (c, "lower"))
-        return WC_LOWER;
-      break;
+        if (!strcmp(c, "lower"))
+            return WC_LOWER;
+        break;
     case 'p':
-      if (!strcmp (c, "print"))
-        return WC_PRINT;
-      else if (!strcmp (c, "punct"))
-        return WC_PUNCT;
-      break;
+        if (!strcmp(c, "print"))
+            return WC_PRINT;
+        else if (!strcmp(c, "punct"))
+            return WC_PUNCT;
+        break;
     case 's':
-      if (!strcmp (c, "space"))
-        return WC_SPACE;
-      break;
+        if (!strcmp(c, "space"))
+            return WC_SPACE;
+        break;
     case 'u':
-      if (!strcmp (c, "upper"))
-        return WC_UPPER;
-      break;
+        if (!strcmp(c, "upper"))
+            return WC_UPPER;
+        break;
     case 'x':
-      if (!strcmp (c, "xdigit"))
-        return WC_XDIGIT;
-      break;
+        if (!strcmp(c, "xdigit"))
+            return WC_XDIGIT;
+        break;
     }
 
-  /* otherwise invalid */
-  errno = EINVAL;
-  return 0;
+    /* otherwise invalid */
+    errno = EINVAL;
+    return 0;
 }

@@ -16,38 +16,39 @@
 #ifndef _AMDGCN_EXIT_VALUE_H_
 #define _AMDGCN_EXIT_VALUE_H_
 
-static inline void  __noreturn
-exit_with_int (int val)
+static inline void __noreturn
+exit_with_int(int val)
 {
-  /* Write the exit value to the conventional place.  */
-  int *return_value;
+    /* Write the exit value to the conventional place.  */
+    int *return_value;
 #if defined(__has_builtin) && __has_builtin(__builtin_gcn_kernarg_ptr)
-  __asm__ ("s_load_dwordx2	%0, %1, 16 glc\n\t"
-       "s_waitcnt	0"
-       : "=Sg"(return_value) : "r"(__builtin_gcn_kernarg_ptr()));
+    __asm__("s_load_dwordx2	%0, %1, 16 glc\n\t"
+            "s_waitcnt	0"
+            : "=Sg"(return_value)
+            : "r"(__builtin_gcn_kernarg_ptr()));
 #else
-  __asm__ ("s_load_dwordx2	%0, s[8:9], 16 glc\n\t"
-       "s_waitcnt	0" : "=Sg"(return_value));
+    __asm__("s_load_dwordx2	%0, s[8:9], 16 glc\n\t"
+            "s_waitcnt	0"
+            : "=Sg"(return_value));
 #endif
-  *return_value = val;
+    *return_value = val;
 
-  /* Terminate the current kernel.  */
-  __asm__ ("s_endpgm");
-  __builtin_unreachable ();
+    /* Terminate the current kernel.  */
+    __asm__("s_endpgm");
+    __builtin_unreachable();
 }
 
-static inline void  __noreturn
-exit_with_status_and_signal (int val, int signal)
+static inline void __noreturn
+exit_with_status_and_signal(int val, int signal)
 {
-  if (signal == 0)
-    val = val & 0xff;
-  else
-    {
-      val = (128 + signal) & 0xff;
-      signal = signal & 0xff;
+    if (signal == 0)
+        val = val & 0xff;
+    else {
+        val = (128 + signal) & 0xff;
+        signal = signal & 0xff;
     }
 
-  exit_with_int ((0xffff << 16) | (signal << 8) | val);
+    exit_with_int((0xffff << 16) | (signal << 8) | val);
 }
 
 #endif

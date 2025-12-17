@@ -34,7 +34,7 @@
  */
 
 #define _DEFAULT_SOURCE
-#define TEST_VECTORS    "test-hypot.h"
-#define TEST_FUNC       hypot
+#define TEST_VECTORS "test-hypot.h"
+#define TEST_FUNC    hypot
 
 #include "test-real-real.h"

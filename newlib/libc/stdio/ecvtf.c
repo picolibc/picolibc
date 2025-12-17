@@ -42,10 +42,7 @@
 static __THREAD_LOCAL char ecvtf_buf[FTOA_MAX_DIG + 1];
 
 char *
-ecvtf (float invalue,
-       int ndigit,
-       int *decpt,
-       int *sign)
+ecvtf(float invalue, int ndigit, int *decpt, int *sign)
 {
     if (ecvtf_r(invalue, ndigit, decpt, sign, ecvtf_buf, sizeof(ecvtf_buf)) < 0)
         return NULL;

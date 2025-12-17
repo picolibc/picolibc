@@ -12,14 +12,14 @@
 FUNCTION
 <<nearbyint>>, <<nearbyintf>>---round to integer
 INDEX
-	nearbyint
+        nearbyint
 INDEX
-	nearbyintf
+        nearbyintf
 
 SYNOPSIS
-	#include <math.h>
-	double nearbyint(double <[x]>);
-	float nearbyintf(float <[x]>);
+        #include <math.h>
+        double nearbyint(double <[x]>);
+        float nearbyintf(float <[x]>);
 
 DESCRIPTION
 The <<nearbyint>> functions round their argument to an integer value in
@@ -54,7 +54,8 @@ SEEALSO
 __float64
 nearbyint64(__float64 x)
 {
-    if (isnan(x)) return x + x;
+    if (isnan(x))
+        return x + x;
 #if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
     fenv_t env;
     fegetenv(&env);

@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de> 
+Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de>
 Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 
@@ -8,12 +8,13 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isgraph_l
 int
-isgraph_l (int c, locale_t locale)
+isgraph_l(int c, locale_t locale)
 {
 #if _PICOLIBC_CTYPE_SMALL
-    (void) locale;
+    (void)locale;
     return isgraph(c);
 #else
-    return __CTYPE_PTR_L (locale)[c+1] & (__CTYPE_PUNCT|__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT);
+    return __CTYPE_PTR_L(locale)[c + 1]
+        & (__CTYPE_PUNCT | __CTYPE_UPPER | __CTYPE_LOWER | __CTYPE_DIGIT);
 #endif
 }

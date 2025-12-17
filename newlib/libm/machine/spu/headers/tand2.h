@@ -40,7 +40,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _TAND2_H_
-#define _TAND2_H_	1
+#define _TAND2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -52,53 +52,53 @@
  *	vector double _tand2(vector double angle)
  *
  * DESCRIPTION
- *	The _tand2 function computes the tangent of a vector of "angle"s 
- *      (expressed in radians) to an accuracy of double precision floating 
+ *	The _tand2 function computes the tangent of a vector of "angle"s
+ *      (expressed in radians) to an accuracy of double precision floating
  *      point.
  *
  */
-static __inline vector double _tand2(vector double angle)
+static __inline vector double
+_tand2(vector double angle)
 {
-  vec_int4    octant;
-  vec_ullong2 select;
-  vec_double2 cos, sin;
-  vec_double2 num, den;
-  vec_double2 toggle_sign, answer;
+    vec_int4    octant;
+    vec_ullong2 select;
+    vec_double2 cos, sin;
+    vec_double2 num, den;
+    vec_double2 toggle_sign, answer;
 
-  /* Range reduce the input angle x into the range -PI/4 to PI/4
-   * by performing simple modulus.
-   */
-  MOD_PI_OVER_FOUR(angle, octant);
+    /* Range reduce the input angle x into the range -PI/4 to PI/4
+     * by performing simple modulus.
+     */
+    MOD_PI_OVER_FOUR(angle, octant);
 
-  /* Compute the cosine and sine of the range reduced input.
-   */
-  COMPUTE_COS_SIN(angle, cos, sin);
+    /* Compute the cosine and sine of the range reduced input.
+     */
+    COMPUTE_COS_SIN(angle, cos, sin);
 
-  /* For each SIMD element, select the numerator, denominator, and sign
-   * correction depending upon the octant of the original angle.
-   *
-   *   octants      angles     numerator denominator sign toggle 
-   *   -------   ------------  --------- ----------- -----------
-   *     0          0 to 45      sin        cos          no      
-   *    1,2        45 to 135     cos        sin         no,yes
-   *    3,4       135 to 225     sin        cos         yes,no
-   *    5,6       225 to 315     cos        sin         no,yes
-   *     7        315 to 360     sin        cos          yes
-   */ 
-  octant = spu_shuffle(octant, octant, ((vec_uchar16) {
-					  0,1, 2, 3, 0,1, 2, 3,
-					    8,9,10,11, 8,9,10,11 }));
+    /* For each SIMD element, select the numerator, denominator, and sign
+     * correction depending upon the octant of the original angle.
+     *
+     *   octants      angles     numerator denominator sign toggle
+     *   -------   ------------  --------- ----------- -----------
+     *     0          0 to 45      sin        cos          no
+     *    1,2        45 to 135     cos        sin         no,yes
+     *    3,4       135 to 225     sin        cos         yes,no
+     *    5,6       225 to 315     cos        sin         no,yes
+     *     7        315 to 360     sin        cos          yes
+     */
+    octant = spu_shuffle(octant, octant,
+                         ((vec_uchar16) { 0, 1, 2, 3, 0, 1, 2, 3, 8, 9, 10, 11, 8, 9, 10, 11 }));
 
-  toggle_sign = spu_and((vec_double2)spu_sl(octant, 30),
-    (vec_double2) spu_splats(0x8000000000000000ULL));
+    toggle_sign
+        = spu_and((vec_double2)spu_sl(octant, 30), (vec_double2)spu_splats(0x8000000000000000ULL));
 
-  select = (vec_ullong2)spu_cmpeq(spu_and(octant, 2), 0);
-  num = spu_sel(cos, sin, select);
-  den = spu_sel(sin, cos, select);
+    select = (vec_ullong2)spu_cmpeq(spu_and(octant, 2), 0);
+    num = spu_sel(cos, sin, select);
+    den = spu_sel(sin, cos, select);
 
-  answer = spu_xor(_divd2(num, den), toggle_sign);
+    answer = spu_xor(_divd2(num, den), toggle_sign);
 
-  return (answer);
+    return (answer);
 }
 
 #endif /* _TAND2_H_ */

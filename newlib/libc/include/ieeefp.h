@@ -45,36 +45,36 @@ _BEGIN_STD_C
 /* FLOATING ROUNDING */
 
 typedef int fp_rnd;
-#define FP_RN 0 	/* Round to nearest 		*/
-#define FP_RM 1		/* Round down 			*/
-#define FP_RP 2		/* Round up 			*/
-#define FP_RZ 3		/* Round to zero (trunate) 	*/
+#define FP_RN 0 /* Round to nearest 		*/
+#define FP_RM 1 /* Round down 			*/
+#define FP_RP 2 /* Round up 			*/
+#define FP_RZ 3 /* Round to zero (trunate) 	*/
 
-fp_rnd fpgetround (void);
-fp_rnd fpsetround (fp_rnd);
+fp_rnd      fpgetround(void);
+fp_rnd      fpsetround(fp_rnd);
 
 /* EXCEPTIONS */
 
 typedef int fp_except;
-#define FP_X_INV 0x10	/* Invalid operation 		*/
-#define FP_X_DX  0x80	/* Divide by zero		*/
-#define FP_X_OFL 0x04	/* Overflow exception		*/
-#define FP_X_UFL 0x02	/* Underflow exception		*/
-#define FP_X_IMP 0x01	/* imprecise exception		*/
+#define FP_X_INV 0x10 /* Invalid operation 		*/
+#define FP_X_DX  0x80 /* Divide by zero		*/
+#define FP_X_OFL 0x04 /* Overflow exception		*/
+#define FP_X_UFL 0x02 /* Underflow exception		*/
+#define FP_X_IMP 0x01 /* imprecise exception		*/
 
-fp_except fpgetmask (void);
-fp_except fpsetmask (fp_except);
-fp_except fpgetsticky (void);
-fp_except fpsetsticky (fp_except);
+fp_except   fpgetmask(void);
+fp_except   fpsetmask(fp_except);
+fp_except   fpgetsticky(void);
+fp_except   fpsetsticky(fp_except);
 
 /* INTEGER ROUNDING */
 
 typedef int fp_rdi;
-#define FP_RDI_TOZ 0	/* Round to Zero 		*/
-#define FP_RDI_RD  1	/* Follow float mode		*/
+#define FP_RDI_TOZ 0 /* Round to Zero 		*/
+#define FP_RDI_RD  1 /* Follow float mode		*/
 
-fp_rdi fpgetroundtoi (void);
-fp_rdi fpsetroundtoi (fp_rdi);
+fp_rdi fpgetroundtoi(void);
+fp_rdi fpsetroundtoi(fp_rdi);
 
 #endif /* __BSD_VISIBLE */
 

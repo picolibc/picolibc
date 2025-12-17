@@ -58,11 +58,11 @@ enum hexagon_system_call_code {
 #define SWI "trap0 (#0)"
 
 /* Hexagon semihosting calls */
-int flen(int fd);
-int hexagon_ftell(int fd);
-int sys_semihost_get_cmdline(char *buffer, int count);
+int  flen(int fd);
+int  hexagon_ftell(int fd);
+int  sys_semihost_get_cmdline(char *buffer, int count);
 
-int hexagon_semihost(enum hexagon_system_call_code code, int *args);
+int  hexagon_semihost(enum hexagon_system_call_code code, int *args);
 
 void hexagon_semihost_errno(int err);
 enum {

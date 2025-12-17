@@ -26,8 +26,9 @@
 
 #include <picolibc.h>
 
-#if (defined (__OPTIMIZE_SIZE__) || defined (__PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__) || !defined(__ARM_NEON)
-# include "../../string/memchr.c"
+#if (defined(__OPTIMIZE_SIZE__) || defined(__PREFER_SIZE_OVER_SPEED)) || !defined(__LP64__) \
+    || !defined(__ARM_NEON)
+#include "../../string/memchr.c"
 #else
 /* See memchr.S  */
 #endif

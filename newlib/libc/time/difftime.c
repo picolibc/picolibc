@@ -24,11 +24,11 @@ FUNCTION
 <<difftime>>---subtract two times
 
 INDEX
-	difftime
+        difftime
 
 SYNOPSIS
-	#include <time.h>
-	double difftime(time_t <[tim1]>, time_t <[tim2]>);
+        #include <time.h>
+        double difftime(time_t <[tim1]>, time_t <[tim2]>);
 
 DESCRIPTION
 Subtracts the two times in the arguments: `<<<[tim1]> - <[tim2]>>>'.
@@ -46,8 +46,7 @@ in all implementations.
 #include <time.h>
 
 double
-difftime (time_t tim1,
-	time_t tim2)
+difftime(time_t tim1, time_t tim2)
 {
-  return (double)(tim1 - tim2);
+    return (double)(tim1 - tim2);
 }

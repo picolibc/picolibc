@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-pow.h"
-#define TEST_FUNC       pow
+#define TEST_VECTORS "test-pow.h"
+#define TEST_FUNC    pow
 
 #include "test-real-real.h"

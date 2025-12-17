@@ -38,18 +38,17 @@
 int
 swprintf(wchar_t *s, size_t n, const wchar_t *fmt, ...)
 {
-	va_list ap;
-	int i;
-        struct __file_str f = FDEV_SETUP_STRING_WRITE((char *) s,
-                                                      (char *) FDEV_STRING_WRITE_END(s, n));
-        f.file.flags |= __SWIDE;
+    va_list           ap;
+    int               i;
+    struct __file_str f = FDEV_SETUP_STRING_WRITE((char *)s, (char *)FDEV_STRING_WRITE_END(s, n));
+    f.file.flags |= __SWIDE;
 
-	va_start(ap, fmt);
-	i = vfwprintf(&f.file, fmt, ap);
-	va_end(ap);
+    va_start(ap, fmt);
+    i = vfwprintf(&f.file, fmt, ap);
+    va_end(ap);
 
-	if (n)
-            memset(f.pos, 0, sizeof(wchar_t));
+    if (n)
+        memset(f.pos, 0, sizeof(wchar_t));
 
-        return i;
+    return i;
 }

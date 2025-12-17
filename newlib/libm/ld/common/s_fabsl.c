@@ -28,16 +28,15 @@
  * $FreeBSD: src/lib/msun/src/s_fabsl.c,v 1.2 2003/10/25 19:53:28 des Exp $
  */
 
-
 long double
 fabsl(long double x)
 {
-	union IEEEl2bits u;
+    union IEEEl2bits u;
 
-	u.e = x;
+    u.e = x;
 #ifdef _DOUBLE_DOUBLE_FLOAT
-        u.bits.signl ^= u.bits.sign;
+    u.bits.signl ^= u.bits.sign;
 #endif
-	u.bits.sign = 0;
-	return (u.e);
+    u.bits.sign = 0;
+    return (u.e);
 }

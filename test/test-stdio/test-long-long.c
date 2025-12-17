@@ -122,10 +122,10 @@ naive_ltoa(char *buf, long long v)
 static int
 check(long long x)
 {
-    long long   scanned, uscanned, u;
-    char        buf[64], naive_buf[64];
-    char        *naive;
-    int         ret = 0;
+    long long scanned, uscanned, u;
+    char      buf[64], naive_buf[64];
+    char     *naive;
+    int       ret = 0;
 
     sprintf(buf, "%lld", x);
     naive = naive_ltoa(naive_buf, x);
@@ -139,7 +139,7 @@ check(long long x)
         ret = 1;
     }
 
-    u = (unsigned long long) x;
+    u = (unsigned long long)x;
     sprintf(buf, "%llu", u);
     naive = naive_utoa(naive_buf, u);
     sscanf(naive, "%llu", &uscanned);
@@ -157,36 +157,37 @@ check(long long x)
 static long long
 randval(void)
 {
-    unsigned long        a, b, c;
+    unsigned long a, b, c;
 
     a = random();
     b = random();
     c = random();
-    return ((unsigned long long) a << 33) ^ ((unsigned long long) b << 15) ^ ((unsigned long long) c);
+    return ((unsigned long long)a << 33) ^ ((unsigned long long)b << 15) ^ ((unsigned long long)c);
 }
 
 #ifdef __MSP430__
 #define RAND_LOOPS 1000ll
-#define SMALL_MIN -1024ll
-#define SMALL_MAX 1024ll
+#define SMALL_MIN  -1024ll
+#define SMALL_MAX  1024ll
 #define SMALL_STEP 1
 #elif defined(__arc__)
 #define RAND_LOOPS 1000ll
-#define SMALL_MIN -65536
-#define SMALL_MAX 65536
+#define SMALL_MIN  -65536
+#define SMALL_MAX  65536
 #define SMALL_STEP 7
 #else
 #define RAND_LOOPS 100000ll
-#define SMALL_MIN -65536
-#define SMALL_MAX 65536
+#define SMALL_MIN  -65536
+#define SMALL_MAX  65536
 #define SMALL_STEP 1
 #endif
 
-int main(void)
+int
+main(void)
 {
-    long long   x;
-    int         ret = 0;
-    long long   t;
+    long long x;
+    int       ret = 0;
+    long long t;
 
     for (x = SMALL_MIN; x <= SMALL_MAX; x += SMALL_STEP)
         ret |= check(x);
@@ -200,7 +201,8 @@ int main(void)
 
 #else
 
-int main(void)
+int
+main(void)
 {
     printf("skipping long long I/O test\n");
     return 77;

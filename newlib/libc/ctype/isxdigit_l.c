@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de> 
+Copyright (c) 2016 Corinna Vinschen <corinna@vinschen.de>
 Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 
@@ -8,13 +8,12 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
 
 #undef isxdigit_l
 int
-isxdigit_l (int c, locale_t locale)
+isxdigit_l(int c, locale_t locale)
 {
-    (void) locale;
+    (void)locale;
 #if _PICOLIBC_CTYPE_SMALL
     return isxdigit(c);
 #else
-    return __CTYPE_PTR_L (locale)[c+1] & ((__CTYPE_HEX)|(__CTYPE_DIGIT));
+    return __CTYPE_PTR_L(locale)[c + 1] & ((__CTYPE_HEX) | (__CTYPE_DIGIT));
 #endif
 }
-

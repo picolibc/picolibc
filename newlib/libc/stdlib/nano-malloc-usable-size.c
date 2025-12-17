@@ -29,7 +29,7 @@
 #include "nano-malloc.h"
 
 size_t
-malloc_usable_size(void * ptr)
+malloc_usable_size(void *ptr)
 {
     return chunk_usable(ptr_to_chunk(ptr));
 }

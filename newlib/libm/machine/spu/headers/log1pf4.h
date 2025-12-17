@@ -38,7 +38,7 @@
 
 #ifdef __SPU__
 #ifndef _LOG1PF4_H_
-#define _LOG1PF4_H_	1
+#define _LOG1PF4_H_ 1
 
 #include <spu_intrinsics.h>
 #include "simdmath.h"
@@ -51,7 +51,7 @@
  *	vector float _log1pf4(vector float x)
  *
  * DESCRIPTION
- *	The function _log1pf4 computes the natural logarithm of x + 1 
+ *	The function _log1pf4 computes the natural logarithm of x + 1
  *	for each of the float word elements of x.
  *
  *
@@ -69,43 +69,43 @@
 #define LOG1PF4_Q3 2.4040413392943396631018516e-01f
 #define LOG1PF4_Q4 1.0637426466449625625521058e-02f
 
-
-static __inline vector float _log1pf4(vector float x) 
+static __inline vector float
+_log1pf4(vector float x)
 {
-  vector float onef  = spu_splats(1.0f);
-  vector float range = spu_splats(0.35f);
-  vector unsigned int use_log;
-  vector float pr, qr;
-  vector float eresult;
-  vector float rresult;
-  vector float result;
+    vector float        onef = spu_splats(1.0f);
+    vector float        range = spu_splats(0.35f);
+    vector unsigned int use_log;
+    vector float        pr, qr;
+    vector float        eresult;
+    vector float        rresult;
+    vector float        result;
 
-  use_log = spu_cmpabsgt(x, range);
+    use_log = spu_cmpabsgt(x, range);
 
-  /*
-   * Calculate directly using log(x+1)
-   */
-  eresult = _logf4(spu_add(x, onef));
+    /*
+     * Calculate directly using log(x+1)
+     */
+    eresult = _logf4(spu_add(x, onef));
 
-  /*
-   * For x in [-0.35,0.35], use a rational approximation.
-   */
-  pr = spu_madd(x, spu_splats((float)LOG1PF4_P4), spu_splats((float)LOG1PF4_P3));
-  qr = spu_madd(x, spu_splats((float)LOG1PF4_Q4), spu_splats((float)LOG1PF4_Q3));
-  pr = spu_madd(pr, x, spu_splats((float)LOG1PF4_P2));
-  qr = spu_madd(qr, x, spu_splats((float)LOG1PF4_Q2));
-  pr = spu_madd(pr, x, spu_splats((float)LOG1PF4_P1));
-  qr = spu_madd(qr, x, spu_splats((float)LOG1PF4_Q1));
-  pr = spu_madd(pr, x, spu_splats((float)LOG1PF4_P0));
-  qr = spu_madd(qr, x, spu_splats((float)LOG1PF4_Q0));
-  rresult = _divf4(pr, qr);
+    /*
+     * For x in [-0.35,0.35], use a rational approximation.
+     */
+    pr = spu_madd(x, spu_splats((float)LOG1PF4_P4), spu_splats((float)LOG1PF4_P3));
+    qr = spu_madd(x, spu_splats((float)LOG1PF4_Q4), spu_splats((float)LOG1PF4_Q3));
+    pr = spu_madd(pr, x, spu_splats((float)LOG1PF4_P2));
+    qr = spu_madd(qr, x, spu_splats((float)LOG1PF4_Q2));
+    pr = spu_madd(pr, x, spu_splats((float)LOG1PF4_P1));
+    qr = spu_madd(qr, x, spu_splats((float)LOG1PF4_Q1));
+    pr = spu_madd(pr, x, spu_splats((float)LOG1PF4_P0));
+    qr = spu_madd(qr, x, spu_splats((float)LOG1PF4_Q0));
+    rresult = _divf4(pr, qr);
 
-  /*
-   * Select either direct calculation or rational approximation.
-   */
-  result = spu_sel(rresult, eresult, use_log);
+    /*
+     * Select either direct calculation or rational approximation.
+     */
+    result = spu_sel(rresult, eresult, use_log);
 
-  return result;
+    return result;
 }
 
 #endif /* _LOG1PF4_H_ */

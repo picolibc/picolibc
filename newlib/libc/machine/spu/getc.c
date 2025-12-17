@@ -39,16 +39,15 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
  * A subroutine version of the macro getc.
  */
 
-
 int
-getc (fp)
-     FILE *fp;
+      getc(fp)
+FILE *fp;
 {
-  int ret;
+    int ret;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  ret = fp->_fp;
+    ret = fp->_fp;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETC, &ret);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_GETC, &ret);
 }

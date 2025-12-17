@@ -37,53 +37,53 @@
 #include <stdbool.h>
 #include <string.h>
 
-#define SH_EXT_NUM_BYTES	((SH_EXT_NUM + 7) >> 3)
+#define SH_EXT_NUM_BYTES ((SH_EXT_NUM + 7) >> 3)
 
-static bool got_feature_bytes;
-static uint8_t feature_bytes[SH_EXT_NUM_BYTES];
+static bool          got_feature_bytes;
+static uint8_t       feature_bytes[SH_EXT_NUM_BYTES];
 
 static const uint8_t fb_magic[4] = {
-	SHFB_MAGIC_0,
-	SHFB_MAGIC_1,
-	SHFB_MAGIC_2,
-	SHFB_MAGIC_3,
+    SHFB_MAGIC_0,
+    SHFB_MAGIC_1,
+    SHFB_MAGIC_2,
+    SHFB_MAGIC_3,
 };
 
 static void
 get_features(void)
 {
-	if (got_feature_bytes)
-		return;
-	got_feature_bytes = true;
+    if (got_feature_bytes)
+        return;
+    got_feature_bytes = true;
 
-	int fd = sys_semihost_open(":semihosting-features", 0);
-	if (fd == -1)
-		return;
+    int fd = sys_semihost_open(":semihosting-features", 0);
+    if (fd == -1)
+        return;
 
-	int len = sys_semihost_flen(fd);
-	if (len < (int) sizeof(fb_magic))
-		goto do_close;
+    int len = sys_semihost_flen(fd);
+    if (len < (int)sizeof(fb_magic))
+        goto do_close;
 
-	uint8_t magic[sizeof (fb_magic)];
-	if (sys_semihost_read(fd, magic, sizeof (fb_magic)) != 0)
-		goto do_close;
-	if (memcmp(magic, fb_magic, sizeof (fb_magic)) != 0)
-		goto do_close;
+    uint8_t magic[sizeof(fb_magic)];
+    if (sys_semihost_read(fd, magic, sizeof(fb_magic)) != 0)
+        goto do_close;
+    if (memcmp(magic, fb_magic, sizeof(fb_magic)) != 0)
+        goto do_close;
 
-	int to_read = len - sizeof(fb_magic);
-	if (to_read > (int) sizeof(feature_bytes))
-		to_read = sizeof(feature_bytes);
+    int to_read = len - sizeof(fb_magic);
+    if (to_read > (int)sizeof(feature_bytes))
+        to_read = sizeof(feature_bytes);
 
-	(void) sys_semihost_read(fd, feature_bytes, to_read);
+    (void)sys_semihost_read(fd, feature_bytes, to_read);
 do_close:
-	sys_semihost_close(fd);
+    sys_semihost_close(fd);
 }
 
 bool
 sys_semihost_feature(uint8_t feature)
 {
-	get_features();
-	uint8_t byte = (feature >> 3);
-	uint8_t bit = (feature & 7);
-	return (feature_bytes[byte] & (1 << bit)) != 0;
+    get_features();
+    uint8_t byte = (feature >> 3);
+    uint8_t bit = (feature & 7);
+    return (feature_bytes[byte] & (1 << bit)) != 0;
 }

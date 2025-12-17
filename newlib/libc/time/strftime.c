@@ -20,20 +20,20 @@ FUNCTION
 <<strftime>>, <<strftime_l>>---convert date and time to a formatted string
 
 INDEX
-	strftime
+        strftime
 
 INDEX
-	strftime_l
+        strftime_l
 
 SYNOPSIS
-	#include <time.h>
-	size_t strftime(char *restrict <[s]>, size_t <[maxsize]>,
-			const char *restrict <[format]>,
+        #include <time.h>
+        size_t strftime(char *restrict <[s]>, size_t <[maxsize]>,
+                        const char *restrict <[format]>,
                         const struct tm *restrict <[timp]>);
-	size_t strftime_l(char *restrict <[s]>, size_t <[maxsize]>,
-			  const char *restrict <[format]>,
-			  const struct tm *restrict <[timp]>,
-			  locale_t <[locale]>);
+        size_t strftime_l(char *restrict <[s]>, size_t <[maxsize]>,
+                          const char *restrict <[format]>,
+                          const struct tm *restrict <[timp]>,
+                          locale_t <[locale]>);
 
 DESCRIPTION
 <<strftime>> converts a <<struct tm>> representation of the time (at
@@ -301,1174 +301,1065 @@ locale, hard-coding the "C" locale settings.
  * string literals or wide-character constants and wide-character-string
  * literals, as appropriate.  */
 #if !defined(MAKE_WCSFTIME)
-#  define CHAR		char		/* string type basis */
-#  define CQ(a)		a		/* character constant qualifier */
-#  define t_snprintf	__d_snprintf	/* char equivalent function name */
-#  define t_strncmp	strncmp		/* char equivalent function name */
-#  define SFLG				/* %s flag (null for normal char) */
-#  define _ctloc(x)     (ctloclen = strlen (ctloc = x))
-#  define TOLOWER(c)	tolower((int)(unsigned char)(c))
-#  define STRTOUL(c,p,b) strtoul((c),(p),(b))
-#  define STRCPY(a,b)	strcpy((a),(b))
-#  define STRCHR(a,b)	strchr((a),(b))
-#  define STRLEN(a)	strlen(a)
-# else
-#  define strftime	wcsftime	/* Alternate function name */
-#  define strftime_l	wcsftime_l	/* Alternate function name */
-#  define CHAR		wchar_t		/* string type basis */
-#  define CQ(a)		L##a		/* character constant qualifier */
-#  define t_snprintf	__d_swprintf	/* wide-char equivalent function name */
-#  define t_strncmp	wcsncmp		/* wide-char equivalent function name */
-#  define TOLOWER(c)	towlower((wint_t)(c))
-#  define STRTOUL(c,p,b) wcstoul((c),(p),(b))
-#  define STRCPY(a,b)	wcscpy((a),(b))
-#  define STRCHR(a,b)	wcschr((a),(b))
-#  define STRLEN(a)	wcslen(a)
-#  define SFLG		"l"		/* %s flag (l for wide char) */
-#  ifdef WTIME_WDAY
-#   define _ctloc(x)    (ctloclen = wcslen (ctloc = W ## x))
-#  else
-#   define CTLOCBUFLEN   256		/* Arbitrary big buffer size */
-    static const wchar_t *
-    __ctloc (wchar_t *buf, const char *elem, size_t *len_ret)
-    {
-      buf[CTLOCBUFLEN - 1] = L'\0';
-      *len_ret = mbstowcs (buf, elem, CTLOCBUFLEN - 1);
-      if (*len_ret == (size_t) -1 )
-	*len_ret = 0;
-      return buf;
-    }
-#   define _ctloc(x)    (ctloc = __ctloc (ctlocbuf, x, \
-					  &ctloclen))
-#  endif
-#endif  /* MAKE_WCSFTIME */
+#define CHAR             char         /* string type basis */
+#define CQ(a)            a            /* character constant qualifier */
+#define t_snprintf       __d_snprintf /* char equivalent function name */
+#define t_strncmp        strncmp      /* char equivalent function name */
+#define SFLG                          /* %s flag (null for normal char) */
+#define _ctloc(x)        (ctloclen = strlen(ctloc = x))
+#define TOLOWER(c)       tolower((int)(unsigned char)(c))
+#define STRTOUL(c, p, b) strtoul((c), (p), (b))
+#define STRCPY(a, b)     strcpy((a), (b))
+#define STRCHR(a, b)     strchr((a), (b))
+#define STRLEN(a)        strlen(a)
+#else
+#define strftime         wcsftime     /* Alternate function name */
+#define strftime_l       wcsftime_l   /* Alternate function name */
+#define CHAR             wchar_t      /* string type basis */
+#define CQ(a)            L##a         /* character constant qualifier */
+#define t_snprintf       __d_swprintf /* wide-char equivalent function name */
+#define t_strncmp        wcsncmp      /* wide-char equivalent function name */
+#define TOLOWER(c)       towlower((wint_t)(c))
+#define STRTOUL(c, p, b) wcstoul((c), (p), (b))
+#define STRCPY(a, b)     wcscpy((a), (b))
+#define STRCHR(a, b)     wcschr((a), (b))
+#define STRLEN(a)        wcslen(a)
+#define SFLG             "l" /* %s flag (l for wide char) */
+#ifdef WTIME_WDAY
+#define _ctloc(x) (ctloclen = wcslen(ctloc = W##x))
+#else
+#define CTLOCBUFLEN 256 /* Arbitrary big buffer size */
+static const wchar_t *
+__ctloc(wchar_t *buf, const char *elem, size_t *len_ret)
+{
+    buf[CTLOCBUFLEN - 1] = L'\0';
+    *len_ret = mbstowcs(buf, elem, CTLOCBUFLEN - 1);
+    if (*len_ret == (size_t)-1)
+        *len_ret = 0;
+    return buf;
+}
+#define _ctloc(x)   (ctloc = __ctloc(ctlocbuf, x, &ctloclen))
+#endif
+#endif /* MAKE_WCSFTIME */
 
-#define CHECK_LENGTH()	if (len < 0 || (count += len) >= maxsize) \
-			  return 0
+#define CHECK_LENGTH()                        \
+    if (len < 0 || (count += len) >= maxsize) \
+    return 0
 
 /* Enforce the coding assumptions that YEAR_BASE is positive.  (%C, %Y, etc.) */
 #if YEAR_BASE < 0
-#  error "YEAR_BASE < 0"
+#error "YEAR_BASE < 0"
 #endif
 
 /* Using the tm_year, tm_wday, and tm_yday components of TIM_P, return
    -1, 0, or 1 as the adjustment to add to the year for the ISO week
    numbering used in "%g%G%V", avoiding overflow.  */
 static int
-iso_year_adjust (const struct tm *tim_p)
+iso_year_adjust(const struct tm *tim_p)
 {
-  /* Account for fact that tm_year==0 is year 1900.  */
-  int leap = isleap (tim_p->tm_year + (YEAR_BASE
-				       - (tim_p->tm_year < 0 ? 0 : 2000)));
+    /* Account for fact that tm_year==0 is year 1900.  */
+    int leap = isleap(tim_p->tm_year + (YEAR_BASE - (tim_p->tm_year < 0 ? 0 : 2000)));
 
-  /* Pack the yday, wday, and leap year into a single int since there are so
-     many disparate cases.  */
+    /* Pack the yday, wday, and leap year into a single int since there are so
+       many disparate cases.  */
 #define PACK(yd, wd, lp) (((yd) << 4) + (wd << 1) + (lp))
-  switch (PACK (tim_p->tm_yday, tim_p->tm_wday, leap))
-    {
-    case PACK (0, 5, 0): /* Jan 1 is Fri, not leap.  */
-    case PACK (0, 6, 0): /* Jan 1 is Sat, not leap.  */
-    case PACK (0, 0, 0): /* Jan 1 is Sun, not leap.  */
-    case PACK (0, 5, 1): /* Jan 1 is Fri, leap year.  */
-    case PACK (0, 6, 1): /* Jan 1 is Sat, leap year.  */
-    case PACK (0, 0, 1): /* Jan 1 is Sun, leap year.  */
-    case PACK (1, 6, 0): /* Jan 2 is Sat, not leap.  */
-    case PACK (1, 0, 0): /* Jan 2 is Sun, not leap.  */
-    case PACK (1, 6, 1): /* Jan 2 is Sat, leap year.  */
-    case PACK (1, 0, 1): /* Jan 2 is Sun, leap year.  */
-    case PACK (2, 0, 0): /* Jan 3 is Sun, not leap.  */
-    case PACK (2, 0, 1): /* Jan 3 is Sun, leap year.  */
-      return -1; /* Belongs to last week of previous year.  */
-    case PACK (362, 1, 0): /* Dec 29 is Mon, not leap.  */
-    case PACK (363, 1, 1): /* Dec 29 is Mon, leap year.  */
-    case PACK (363, 1, 0): /* Dec 30 is Mon, not leap.  */
-    case PACK (363, 2, 0): /* Dec 30 is Tue, not leap.  */
-    case PACK (364, 1, 1): /* Dec 30 is Mon, leap year.  */
-    case PACK (364, 2, 1): /* Dec 30 is Tue, leap year.  */
-    case PACK (364, 1, 0): /* Dec 31 is Mon, not leap.  */
-    case PACK (364, 2, 0): /* Dec 31 is Tue, not leap.  */
-    case PACK (364, 3, 0): /* Dec 31 is Wed, not leap.  */
-    case PACK (365, 1, 1): /* Dec 31 is Mon, leap year.  */
-    case PACK (365, 2, 1): /* Dec 31 is Tue, leap year.  */
-    case PACK (365, 3, 1): /* Dec 31 is Wed, leap year.  */
-      return 1; /* Belongs to first week of next year.  */
+    switch (PACK(tim_p->tm_yday, tim_p->tm_wday, leap)) {
+    case PACK(0, 5, 0):   /* Jan 1 is Fri, not leap.  */
+    case PACK(0, 6, 0):   /* Jan 1 is Sat, not leap.  */
+    case PACK(0, 0, 0):   /* Jan 1 is Sun, not leap.  */
+    case PACK(0, 5, 1):   /* Jan 1 is Fri, leap year.  */
+    case PACK(0, 6, 1):   /* Jan 1 is Sat, leap year.  */
+    case PACK(0, 0, 1):   /* Jan 1 is Sun, leap year.  */
+    case PACK(1, 6, 0):   /* Jan 2 is Sat, not leap.  */
+    case PACK(1, 0, 0):   /* Jan 2 is Sun, not leap.  */
+    case PACK(1, 6, 1):   /* Jan 2 is Sat, leap year.  */
+    case PACK(1, 0, 1):   /* Jan 2 is Sun, leap year.  */
+    case PACK(2, 0, 0):   /* Jan 3 is Sun, not leap.  */
+    case PACK(2, 0, 1):   /* Jan 3 is Sun, leap year.  */
+        return -1;        /* Belongs to last week of previous year.  */
+    case PACK(362, 1, 0): /* Dec 29 is Mon, not leap.  */
+    case PACK(363, 1, 1): /* Dec 29 is Mon, leap year.  */
+    case PACK(363, 1, 0): /* Dec 30 is Mon, not leap.  */
+    case PACK(363, 2, 0): /* Dec 30 is Tue, not leap.  */
+    case PACK(364, 1, 1): /* Dec 30 is Mon, leap year.  */
+    case PACK(364, 2, 1): /* Dec 30 is Tue, leap year.  */
+    case PACK(364, 1, 0): /* Dec 31 is Mon, not leap.  */
+    case PACK(364, 2, 0): /* Dec 31 is Tue, not leap.  */
+    case PACK(364, 3, 0): /* Dec 31 is Wed, not leap.  */
+    case PACK(365, 1, 1): /* Dec 31 is Mon, leap year.  */
+    case PACK(365, 2, 1): /* Dec 31 is Tue, leap year.  */
+    case PACK(365, 3, 1): /* Dec 31 is Wed, leap year.  */
+        return 1;         /* Belongs to first week of next year.  */
     }
-  return 0; /* Belongs to specified year.  */
+    return 0; /* Belongs to specified year.  */
 #undef PACK
 }
 
 #ifdef _WANT_C99_TIME_FORMATS
 typedef struct {
-  int   year;
-  CHAR *era_C;
-  CHAR *era_Y;
+    int   year;
+    CHAR *era_C;
+    CHAR *era_Y;
 } era_info_t;
 
 static era_info_t *
-#if defined (MAKE_WCSFTIME) && defined (WTIME_ERA)
-get_era_info (const struct tm *tim_p, const wchar_t *era)
+#if defined(MAKE_WCSFTIME) && defined(WTIME_ERA)
+get_era_info(const struct tm *tim_p, const wchar_t *era)
 #else
-get_era_info (const struct tm *tim_p, const char *era)
+get_era_info(const struct tm *tim_p, const char *era)
 #endif
 {
-#if defined (MAKE_WCSFTIME) && defined (WTIME_ERA)
-  wchar_t *c;
-  const wchar_t *dir;
-# define ERA_STRCHR(a,b)	wcschr((a),(b))
-# define ERA_STRNCPY(a,b,c)	wcsncpy((a),(b),(c))
-# define ERA_STRTOL(a,b,c)	wcstol((a),(b),(c))
+#if defined(MAKE_WCSFTIME) && defined(WTIME_ERA)
+    wchar_t       *c;
+    const wchar_t *dir;
+#define ERA_STRCHR(a, b)     wcschr((a), (b))
+#define ERA_STRNCPY(a, b, c) wcsncpy((a), (b), (c))
+#define ERA_STRTOL(a, b, c)  wcstol((a), (b), (c))
 #else
-  char *c;
-  const char *dir;
-# define ERA_STRCHR(a,b)	strchr((a),(b))
-# define ERA_STRNCPY(a,b,c)	strncpy((a),(b),(c))
-# define ERA_STRTOL(a,b,c)	strtol((a),(b),(c))
+    char       *c;
+    const char *dir;
+#define ERA_STRCHR(a, b)     strchr((a), (b))
+#define ERA_STRNCPY(a, b, c) strncpy((a), (b), (c))
+#define ERA_STRTOL(a, b, c)  strtol((a), (b), (c))
 #endif
-  long offset;
-  struct tm stm, etm;
-  era_info_t *ei;
+    long        offset;
+    struct tm   stm, etm;
+    era_info_t *ei;
 
-  ei = (era_info_t *) calloc (1, sizeof (era_info_t));
-  if (!ei)
-    return NULL;
+    ei = (era_info_t *)calloc(1, sizeof(era_info_t));
+    if (!ei)
+        return NULL;
 
-  stm.tm_isdst = etm.tm_isdst = 0;
-  while (era)
-    {
-      dir = era;
-      era += 2;
-      offset = ERA_STRTOL (era, &c, 10);
-      era = c + 1;
-      stm.tm_year = ERA_STRTOL (era, &c, 10) - YEAR_BASE;
-      /* Adjust offset for negative gregorian dates. */
-      if (stm.tm_year <= -YEAR_BASE)
-      	++stm.tm_year;
-      stm.tm_mon = ERA_STRTOL (c + 1, &c, 10) - 1;
-      stm.tm_mday = ERA_STRTOL (c + 1, &c, 10);
-      stm.tm_hour = stm.tm_min = stm.tm_sec = 0;
-      era = c + 1;
-      if (era[0] == '-' && era[1] == '*')
-      	{
-	  etm = stm;
-	  stm.tm_year = INT_MIN;
-	  stm.tm_mon = stm.tm_mday = stm.tm_hour = stm.tm_min = stm.tm_sec = 0;
-	  era += 3;
-	}
-      else if (era[0] == '+' && era[1] == '*')
-	{
-	  etm.tm_year = INT_MAX;
-	  etm.tm_mon = 11;
-	  etm.tm_mday = 31;
-	  etm.tm_hour = 23;
-	  etm.tm_min = etm.tm_sec = 59;
-	  era += 3;
-	}
-      else
-      	{
-	  etm.tm_year = ERA_STRTOL (era, &c, 10) - YEAR_BASE;
-	  /* Adjust offset for negative gregorian dates. */
-	  if (etm.tm_year <= -YEAR_BASE)
-	    ++etm.tm_year;
-	  etm.tm_mon = ERA_STRTOL (c + 1, &c, 10) - 1;
-	  etm.tm_mday = ERA_STRTOL (c + 1, &c, 10);
-	  etm.tm_mday = 31;
-	  etm.tm_hour = 23;
-	  etm.tm_min = etm.tm_sec = 59;
-	  era = c + 1;
-	}
-      if ((tim_p->tm_year > stm.tm_year
-	   || (tim_p->tm_year == stm.tm_year
-	       && (tim_p->tm_mon > stm.tm_mon
-		   || (tim_p->tm_mon == stm.tm_mon
-		       && tim_p->tm_mday >= stm.tm_mday))))
-	  && (tim_p->tm_year < etm.tm_year
-	      || (tim_p->tm_year == etm.tm_year
-		  && (tim_p->tm_mon < etm.tm_mon
-		      || (tim_p->tm_mon == etm.tm_mon
-			  && tim_p->tm_mday <= etm.tm_mday)))))
-	{
-	  /* Gotcha */
-	  size_t len;
+    stm.tm_isdst = etm.tm_isdst = 0;
+    while (era) {
+        dir = era;
+        era += 2;
+        offset = ERA_STRTOL(era, &c, 10);
+        era = c + 1;
+        stm.tm_year = ERA_STRTOL(era, &c, 10) - YEAR_BASE;
+        /* Adjust offset for negative gregorian dates. */
+        if (stm.tm_year <= -YEAR_BASE)
+            ++stm.tm_year;
+        stm.tm_mon = ERA_STRTOL(c + 1, &c, 10) - 1;
+        stm.tm_mday = ERA_STRTOL(c + 1, &c, 10);
+        stm.tm_hour = stm.tm_min = stm.tm_sec = 0;
+        era = c + 1;
+        if (era[0] == '-' && era[1] == '*') {
+            etm = stm;
+            stm.tm_year = INT_MIN;
+            stm.tm_mon = stm.tm_mday = stm.tm_hour = stm.tm_min = stm.tm_sec = 0;
+            era += 3;
+        } else if (era[0] == '+' && era[1] == '*') {
+            etm.tm_year = INT_MAX;
+            etm.tm_mon = 11;
+            etm.tm_mday = 31;
+            etm.tm_hour = 23;
+            etm.tm_min = etm.tm_sec = 59;
+            era += 3;
+        } else {
+            etm.tm_year = ERA_STRTOL(era, &c, 10) - YEAR_BASE;
+            /* Adjust offset for negative gregorian dates. */
+            if (etm.tm_year <= -YEAR_BASE)
+                ++etm.tm_year;
+            etm.tm_mon = ERA_STRTOL(c + 1, &c, 10) - 1;
+            etm.tm_mday = ERA_STRTOL(c + 1, &c, 10);
+            etm.tm_mday = 31;
+            etm.tm_hour = 23;
+            etm.tm_min = etm.tm_sec = 59;
+            era = c + 1;
+        }
+        if ((tim_p->tm_year > stm.tm_year
+             || (tim_p->tm_year == stm.tm_year
+                 && (tim_p->tm_mon > stm.tm_mon
+                     || (tim_p->tm_mon == stm.tm_mon && tim_p->tm_mday >= stm.tm_mday))))
+            && (tim_p->tm_year < etm.tm_year
+                || (tim_p->tm_year == etm.tm_year
+                    && (tim_p->tm_mon < etm.tm_mon
+                        || (tim_p->tm_mon == etm.tm_mon && tim_p->tm_mday <= etm.tm_mday))))) {
+            /* Gotcha */
+            size_t len;
 
-	  /* year */
-	  if (*dir == '+' && stm.tm_year != INT_MIN)
-	    ei->year = tim_p->tm_year - stm.tm_year + offset;
-	  else
-	    ei->year = etm.tm_year - tim_p->tm_year + offset;
-	  /* era_C */
-	  c = ERA_STRCHR (era, ':');
-#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
-	  len = mbsnrtowcs (NULL, &era, c - era, 0, NULL);
-	  if (len == (size_t) -1)
-	    {
-	      free (ei);
-	      return NULL;
-	    }
+            /* year */
+            if (*dir == '+' && stm.tm_year != INT_MIN)
+                ei->year = tim_p->tm_year - stm.tm_year + offset;
+            else
+                ei->year = etm.tm_year - tim_p->tm_year + offset;
+            /* era_C */
+            c = ERA_STRCHR(era, ':');
+#if defined(MAKE_WCSFTIME) && !defined(WTIME_ERA)
+            len = mbsnrtowcs(NULL, &era, c - era, 0, NULL);
+            if (len == (size_t)-1) {
+                free(ei);
+                return NULL;
+            }
 #else
-	  len = c - era;
+            len = c - era;
 #endif
-	  ei->era_C = (CHAR *) malloc ((len + 1) * sizeof (CHAR));
-	  if (!ei->era_C)
-	    {
-	      free (ei);
-	      return NULL;
-	    }
-#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
-	  len = mbsnrtowcs (ei->era_C, &era, c - era, len + 1, NULL);
+            ei->era_C = (CHAR *)malloc((len + 1) * sizeof(CHAR));
+            if (!ei->era_C) {
+                free(ei);
+                return NULL;
+            }
+#if defined(MAKE_WCSFTIME) && !defined(WTIME_ERA)
+            len = mbsnrtowcs(ei->era_C, &era, c - era, len + 1, NULL);
 #else
-	  ERA_STRNCPY (ei->era_C, era, len);
-	  era += len;
+            ERA_STRNCPY(ei->era_C, era, len);
+            era += len;
 #endif
-	  ei->era_C[len] = CQ('\0');
-	  /* era_Y */
-	  ++era;
-	  c = ERA_STRCHR (era, ';');
-	  if (!c)
-	    c = ERA_STRCHR (era, '\0');
-#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
-	  len = mbsnrtowcs (NULL, &era, c - era, 0, NULL);
-	  if (len == (size_t) -1)
-	    {
-	      free (ei->era_C);
-	      free (ei);
-	      return NULL;
-	    }
+            ei->era_C[len] = CQ('\0');
+            /* era_Y */
+            ++era;
+            c = ERA_STRCHR(era, ';');
+            if (!c)
+                c = ERA_STRCHR(era, '\0');
+#if defined(MAKE_WCSFTIME) && !defined(WTIME_ERA)
+            len = mbsnrtowcs(NULL, &era, c - era, 0, NULL);
+            if (len == (size_t)-1) {
+                free(ei->era_C);
+                free(ei);
+                return NULL;
+            }
 #else
-	  len = c - era;
+            len = c - era;
 #endif
-	  ei->era_Y = (CHAR *) malloc ((len + 1) * sizeof (CHAR));
-	  if (!ei->era_Y)
-	    {
-	      free (ei->era_C);
-	      free (ei);
-	      return NULL;
-	    }
-#if defined (MAKE_WCSFTIME) && !defined (WTIME_ERA)
-	  len = mbsnrtowcs (ei->era_Y, &era, c - era, len + 1, NULL);
+            ei->era_Y = (CHAR *)malloc((len + 1) * sizeof(CHAR));
+            if (!ei->era_Y) {
+                free(ei->era_C);
+                free(ei);
+                return NULL;
+            }
+#if defined(MAKE_WCSFTIME) && !defined(WTIME_ERA)
+            len = mbsnrtowcs(ei->era_Y, &era, c - era, len + 1, NULL);
 #else
-	  ERA_STRNCPY (ei->era_Y, era, len);
-	  era += len;
+            ERA_STRNCPY(ei->era_Y, era, len);
+            era += len;
 #endif
-	  ei->era_Y[len] = CQ('\0');
-	  return ei;
-	}
-      else
-	era = ERA_STRCHR (era, ';');
-      if (era)
-	++era;
+            ei->era_Y[len] = CQ('\0');
+            return ei;
+        } else
+            era = ERA_STRCHR(era, ';');
+        if (era)
+            ++era;
     }
-  return NULL;
+    return NULL;
 }
 
 static void
-free_era_info (era_info_t *ei)
+free_era_info(era_info_t *ei)
 {
-  free (ei->era_C);
-  free (ei->era_Y);
-  free (ei);
+    free(ei->era_C);
+    free(ei->era_Y);
+    free(ei);
 }
 
 typedef struct {
-  size_t num;
-  CHAR **digit;
-  CHAR *buffer;
+    size_t num;
+    CHAR **digit;
+    CHAR  *buffer;
 } alt_digits_t;
 
 static alt_digits_t *
-#if defined (MAKE_WCSFTIME) && defined (WTIME_ALT_DIGITS)
-get_alt_digits (const wchar_t *alt_digits)
+#if defined(MAKE_WCSFTIME) && defined(WTIME_ALT_DIGITS)
+get_alt_digits(const wchar_t *alt_digits)
 #else
-get_alt_digits (const char *alt_digits)
+get_alt_digits(const char *alt_digits)
 #endif
 {
-  alt_digits_t *adi;
-#if defined (MAKE_WCSFTIME) && defined (WTIME_ALT_DIGITS)
-  const wchar_t *a, *e;
-# define ALT_STRCHR(a,b)	wcschr((a),(b))
-# define ALT_STRCPY(a,b)	wcscpy((a),(b))
-# define ALT_STRLEN(a)		wcslen(a)
+    alt_digits_t *adi;
+#if defined(MAKE_WCSFTIME) && defined(WTIME_ALT_DIGITS)
+    const wchar_t *a, *e;
+#define ALT_STRCHR(a, b) wcschr((a), (b))
+#define ALT_STRCPY(a, b) wcscpy((a), (b))
+#define ALT_STRLEN(a)    wcslen(a)
 #else
-  const char *a, *e;
-# define ALT_STRCHR(a,b)	strchr((a),(b))
-# define ALT_STRCPY(a,b)	strcpy((a),(b))
-# define ALT_STRLEN(a)		strlen(a)
+    const char *a, *e;
+#define ALT_STRCHR(a, b) strchr((a), (b))
+#define ALT_STRCPY(a, b) strcpy((a), (b))
+#define ALT_STRLEN(a)    strlen(a)
 #endif
-  CHAR *aa, *ae;
-  size_t len;
+    CHAR  *aa, *ae;
+    size_t len;
 
-  adi = (alt_digits_t *) calloc (1, sizeof (alt_digits_t));
-  if (!adi)
-    return NULL;
+    adi = (alt_digits_t *)calloc(1, sizeof(alt_digits_t));
+    if (!adi)
+        return NULL;
 
-  /* Compute number of alt_digits. */
-  adi->num = 1;
-  for (a = alt_digits; (e = ALT_STRCHR (a, ';')) != NULL; a = e + 1)
-      ++adi->num;
-  /* Allocate the `digit' array, which is an array of `num' pointers into
-     `buffer'. */
-  adi->digit = (CHAR **) calloc (adi->num, sizeof (CHAR *));
-  if (!adi->digit)
-    {
-      free (adi);
-      return NULL;
+    /* Compute number of alt_digits. */
+    adi->num = 1;
+    for (a = alt_digits; (e = ALT_STRCHR(a, ';')) != NULL; a = e + 1)
+        ++adi->num;
+    /* Allocate the `digit' array, which is an array of `num' pointers into
+       `buffer'. */
+    adi->digit = (CHAR **)calloc(adi->num, sizeof(CHAR *));
+    if (!adi->digit) {
+        free(adi);
+        return NULL;
     }
-  /* Compute memory required for `buffer'. */
-#if defined (MAKE_WCSFTIME) && !defined (WTIME_ALT_DIGITS)
-  len = mbstowcs (NULL, alt_digits, 0);
-  if (len == (size_t) -1)
-    {
-      free (adi->digit);
-      free (adi);
-      return NULL;
+    /* Compute memory required for `buffer'. */
+#if defined(MAKE_WCSFTIME) && !defined(WTIME_ALT_DIGITS)
+    len = mbstowcs(NULL, alt_digits, 0);
+    if (len == (size_t)-1) {
+        free(adi->digit);
+        free(adi);
+        return NULL;
     }
 #else
-  len = ALT_STRLEN (alt_digits);
+    len = ALT_STRLEN(alt_digits);
 #endif
-  /* Allocate it. */
-  adi->buffer = (CHAR *) malloc ((len + 1) * sizeof (CHAR));
-  if (!adi->buffer)
-    {
-      free (adi->digit);
-      free (adi);
-      return NULL;
+    /* Allocate it. */
+    adi->buffer = (CHAR *)malloc((len + 1) * sizeof(CHAR));
+    if (!adi->buffer) {
+        free(adi->digit);
+        free(adi);
+        return NULL;
     }
-  /* Store digits in it. */
-#if defined (MAKE_WCSFTIME) && !defined (WTIME_ALT_DIGITS)
-  mbstowcs (adi->buffer, alt_digits, len + 1);
+    /* Store digits in it. */
+#if defined(MAKE_WCSFTIME) && !defined(WTIME_ALT_DIGITS)
+    mbstowcs(adi->buffer, alt_digits, len + 1);
 #else
-  ALT_STRCPY (adi->buffer, alt_digits);
+    ALT_STRCPY(adi->buffer, alt_digits);
 #endif
-  /* Store the pointers into `buffer' into the appropriate `digit' slot. */
-  for (len = 0, aa = adi->buffer; (ae = STRCHR (aa, CQ(';'))) != NULL;
-       ++len, aa = ae + 1)
-    {
-      *ae = '\0';
-      adi->digit[len] = aa;
+    /* Store the pointers into `buffer' into the appropriate `digit' slot. */
+    for (len = 0, aa = adi->buffer; (ae = STRCHR(aa, CQ(';'))) != NULL; ++len, aa = ae + 1) {
+        *ae = '\0';
+        adi->digit[len] = aa;
     }
-  adi->digit[len] = aa;
-  return adi;
+    adi->digit[len] = aa;
+    return adi;
 }
 
 static void
-free_alt_digits (alt_digits_t *adi)
+free_alt_digits(alt_digits_t *adi)
 {
-  free (adi->digit);
-  free (adi->buffer);
-  free (adi);
+    free(adi->digit);
+    free(adi->buffer);
+    free(adi);
 }
 
 /* Return 0 if no alt_digit is available for a number.
    Return -1 if buffer size isn't sufficient to hold alternative digit.
    Return length of new digit otherwise. */
 static int
-conv_to_alt_digits (CHAR *buf, size_t bufsiz, unsigned num, alt_digits_t *adi)
+conv_to_alt_digits(CHAR *buf, size_t bufsiz, unsigned num, alt_digits_t *adi)
 {
-  if (num < adi->num)
-    {
-      size_t len = STRLEN (adi->digit[num]);
-      if (bufsiz < len)
-      	return -1;
-      STRCPY (buf, adi->digit[num]);
-      return (int) len;
+    if (num < adi->num) {
+        size_t len = STRLEN(adi->digit[num]);
+        if (bufsiz < len)
+            return -1;
+        STRCPY(buf, adi->digit[num]);
+        return (int)len;
     }
-  return 0;
+    return 0;
 }
 
 static size_t
-__strftime (CHAR *s, size_t maxsize, const CHAR *format,
-	    const struct tm *tim_p, locale_t locale,
-	    era_info_t **era_info, alt_digits_t **alt_digits)
+__strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, locale_t locale,
+           era_info_t **era_info, alt_digits_t **alt_digits)
 #else /* !_WANT_C99_TIME_FORMATS */
 static size_t
-__strftime (CHAR *s, size_t maxsize, const CHAR *format,
-	    const struct tm *tim_p, locale_t locale)
+__strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, locale_t locale)
 
-#define __strftime(s,m,f,t,l,e,a)	__strftime((s),(m),(f),(t),(l))
+#define __strftime(s, m, f, t, l, e, a) __strftime((s), (m), (f), (t), (l))
 #endif /* !_WANT_C99_TIME_FORMATS */
 {
-  size_t count = 0;
-  int len = 0;
-  const CHAR *ctloc;
-#if defined (MAKE_WCSFTIME) && !defined (WTIME_WDAY)
-  CHAR ctlocbuf[CTLOCBUFLEN];
+    size_t      count = 0;
+    int         len = 0;
+    const CHAR *ctloc;
+#if defined(MAKE_WCSFTIME) && !defined(WTIME_WDAY)
+    CHAR ctlocbuf[CTLOCBUFLEN];
 #endif
-  size_t i, ctloclen;
-  CHAR alt;
-  CHAR pad;
-  unsigned long width;
-  int tzset_called = 0;
+    size_t        i, ctloclen;
+    CHAR          alt;
+    CHAR          pad;
+    unsigned long width;
+    int           tzset_called = 0;
 
-  for (;;)
-    {
-      while (*format && *format != CQ('%'))
-	{
-	  if (count < maxsize - 1)
-	    s[count++] = *format++;
-	  else
-	    return 0;
-	}
-      if (*format == CQ('\0'))
-	break;
-      format++;
-      pad = '\0';
-      width = 0;
+    for (;;) {
+        while (*format && *format != CQ('%')) {
+            if (count < maxsize - 1)
+                s[count++] = *format++;
+            else
+                return 0;
+        }
+        if (*format == CQ('\0'))
+            break;
+        format++;
+        pad = '\0';
+        width = 0;
 
-      /* POSIX-1.2008 feature: '0' and '+' modifiers require 0-padding with
-         slightly different semantics. */
-      if (*format == CQ('0') || *format == CQ('+'))
-	pad = *format++;
+        /* POSIX-1.2008 feature: '0' and '+' modifiers require 0-padding with
+           slightly different semantics. */
+        if (*format == CQ('0') || *format == CQ('+'))
+            pad = *format++;
 
-      /* POSIX-1.2008 feature: A minimum field width can be specified. */
-      if (*format >= CQ('1') && *format <= CQ('9'))
-      	{
-	  CHAR *fp;
-	  width = STRTOUL (format, &fp, 10);
-	  format = fp;
-	}
+        /* POSIX-1.2008 feature: A minimum field width can be specified. */
+        if (*format >= CQ('1') && *format <= CQ('9')) {
+            CHAR *fp;
+            width = STRTOUL(format, &fp, 10);
+            format = fp;
+        }
 
-      alt = CQ('\0');
-      if (*format == CQ('E'))
-	{
-	  alt = *format++;
+        alt = CQ('\0');
+        if (*format == CQ('E')) {
+            alt = *format++;
 #ifdef _WANT_C99_TIME_FORMATS
-#if defined (MAKE_WCSFTIME) && defined (TIME_WERA)
-	  if (!*era_info && *TIME_WERA)
-	    *era_info = get_era_info (tim_p, TIME_WERA);
+#if defined(MAKE_WCSFTIME) && defined(TIME_WERA)
+            if (!*era_info && *TIME_WERA)
+                *era_info = get_era_info(tim_p, TIME_WERA);
 #else
-          if (!*era_info && *TIME_ERA)
-	    *era_info = get_era_info (tim_p, TIME_ERA);
+            if (!*era_info && *TIME_ERA)
+                *era_info = get_era_info(tim_p, TIME_ERA);
 #endif
 #endif /* _WANT_C99_TIME_FORMATS */
-	}
-      else if (*format == CQ('O'))
-	{
-	  alt = *format++;
+        } else if (*format == CQ('O')) {
+            alt = *format++;
 #ifdef _WANT_C99_TIME_FORMATS
-#if defined (MAKE_WCSFTIME) && defined (TIME_WALT_DIGITS)
-	  if (!*alt_digits && *TIME_WALT_DIGITS)
-            *alt_digits = get_alt_digits (TIME_WALT_DIGITS);
+#if defined(MAKE_WCSFTIME) && defined(TIME_WALT_DIGITS)
+            if (!*alt_digits && *TIME_WALT_DIGITS)
+                *alt_digits = get_alt_digits(TIME_WALT_DIGITS);
 #else
-	  if (!*alt_digits && *TIME_ALT_DIGITS)
-	    *alt_digits = get_alt_digits (TIME_ALT_DIGITS);
+            if (!*alt_digits && *TIME_ALT_DIGITS)
+                *alt_digits = get_alt_digits(TIME_ALT_DIGITS);
 #endif
 #endif /* _WANT_C99_TIME_FORMATS */
-	}
+        }
 
-      switch (*format)
-	{
-	case CQ('a'):
-	  _ctloc (TIME_WDAY[tim_p->tm_wday]);
-	  for (i = 0; i < ctloclen; i++)
-	    {
-	      if (count < maxsize - 1)
-		s[count++] = ctloc[i];
-	      else
-		return 0;
-	    }
-	  break;
-	case CQ('A'):
-	  _ctloc (TIME_WEEKDAY[tim_p->tm_wday]);
-	  for (i = 0; i < ctloclen; i++)
-	    {
-	      if (count < maxsize - 1)
-		s[count++] = ctloc[i];
-	      else
-		return 0;
-	    }
-	  break;
-	case CQ('b'):
-	case CQ('h'):
-	  _ctloc (TIME_MON[tim_p->tm_mon]);
-	  for (i = 0; i < ctloclen; i++)
-	    {
-	      if (count < maxsize - 1)
-		s[count++] = ctloc[i];
-	      else
-		return 0;
-	    }
-	  break;
-	case CQ('B'):
-	  _ctloc (TIME_MONTH[tim_p->tm_mon]);
-	  for (i = 0; i < ctloclen; i++)
-	    {
-	      if (count < maxsize - 1)
-		s[count++] = ctloc[i];
-	      else
-		return 0;
-	    }
-	  break;
-	case CQ('c'):
+        switch (*format) {
+        case CQ('a'):
+            _ctloc(TIME_WDAY[tim_p->tm_wday]);
+            for (i = 0; i < ctloclen; i++) {
+                if (count < maxsize - 1)
+                    s[count++] = ctloc[i];
+                else
+                    return 0;
+            }
+            break;
+        case CQ('A'):
+            _ctloc(TIME_WEEKDAY[tim_p->tm_wday]);
+            for (i = 0; i < ctloclen; i++) {
+                if (count < maxsize - 1)
+                    s[count++] = ctloc[i];
+                else
+                    return 0;
+            }
+            break;
+        case CQ('b'):
+        case CQ('h'):
+            _ctloc(TIME_MON[tim_p->tm_mon]);
+            for (i = 0; i < ctloclen; i++) {
+                if (count < maxsize - 1)
+                    s[count++] = ctloc[i];
+                else
+                    return 0;
+            }
+            break;
+        case CQ('B'):
+            _ctloc(TIME_MONTH[tim_p->tm_mon]);
+            for (i = 0; i < ctloclen; i++) {
+                if (count < maxsize - 1)
+                    s[count++] = ctloc[i];
+                else
+                    return 0;
+            }
+            break;
+        case CQ('c'):
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == 'E' && *era_info && *TIME_ERA_D_T_FMT)
-	    _ctloc (TIME_ERA_E_T_FMT);
-	  else
+            if (alt == 'E' && *era_info && *TIME_ERA_D_T_FMT)
+                _ctloc(TIME_ERA_E_T_FMT);
+            else
 #endif /* _WANT_C99_TIME_FORMATS */
-	    _ctloc (TIME_C_FMT);
-	  goto recurse;
-	case CQ('r'):
-	  _ctloc (TIME_AMPM_FMT);
-	  goto recurse;
-	case CQ('x'):
+                _ctloc(TIME_C_FMT);
+            goto recurse;
+        case CQ('r'):
+            _ctloc(TIME_AMPM_FMT);
+            goto recurse;
+        case CQ('x'):
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == 'E' && *era_info && *TIME_ERA_D_FMT)
-	    _ctloc (TIME_ERA_D_FMT);
-	  else
+            if (alt == 'E' && *era_info && *TIME_ERA_D_FMT)
+                _ctloc(TIME_ERA_D_FMT);
+            else
 #endif /* _WANT_C99_TIME_FORMATS */
-	    _ctloc (TIME_X_FMT);
-	  goto recurse;
-	case CQ('X'):
+                _ctloc(TIME_X_FMT);
+            goto recurse;
+        case CQ('X'):
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == 'E' && *era_info && *TIME_ERA_T_FMT)
-	    _ctloc (TIME_ERA_T_FMT)
-	  else
+            if (alt == 'E' && *era_info && *TIME_ERA_T_FMT)
+                _ctloc(TIME_ERA_T_FMT) else
 #endif /* _WANT_C99_TIME_FORMATS */
-	    _ctloc (TIME_UX_FMT);
-recurse:
-	  if (*ctloc)
-	    {
-	      /* Recurse to avoid need to replicate %Y formation. */
-	      len = __strftime (&s[count], maxsize - count, ctloc, tim_p,
-				locale, era_info, alt_digits);
-	      if (len > 0)
-		count += len;
-	      else
-		return 0;
-	    }
-	  break;
-	case CQ('C'):
-	  {
-	    /* Examples of (tm_year + YEAR_BASE) that show how %Y == %C%y
-	       with 32-bit int.
-	       %Y		%C		%y
-	       2147485547	21474855	47
-	       10000		100		00
-	       9999		99		99
-	       0999		9		99
-	       0099		0		99
-	       0001		0		01
-	       0000		0		00
-	       -001		-1		99
-	       -099		-1		01
-	       -999		-10		01
-	       -1000		-11		00
-	       -10000		-101		00
-	       -2147481748	-21474818	52
+                    _ctloc(TIME_UX_FMT);
+        recurse:
+            if (*ctloc) {
+                /* Recurse to avoid need to replicate %Y formation. */
+                len = __strftime(&s[count], maxsize - count, ctloc, tim_p, locale, era_info,
+                                 alt_digits);
+                if (len > 0)
+                    count += len;
+                else
+                    return 0;
+            }
+            break;
+        case CQ('C'): {
+            /* Examples of (tm_year + YEAR_BASE) that show how %Y == %C%y
+               with 32-bit int.
+               %Y		%C		%y
+               2147485547	21474855	47
+               10000		100		00
+               9999		99		99
+               0999		9		99
+               0099		0		99
+               0001		0		01
+               0000		0		00
+               -001		-1		99
+               -099		-1		01
+               -999		-10		01
+               -1000		-11		00
+               -10000		-101		00
+               -2147481748	-21474818	52
 
-	       Be careful of both overflow and sign adjustment due to the
-	       asymmetric range of years.
-	    */
+               Be careful of both overflow and sign adjustment due to the
+               asymmetric range of years.
+            */
 #ifdef _WANT_C99_TIME_FORMATS
-	    if (alt == 'E' && *era_info)
-	      len = t_snprintf (&s[count], maxsize - count, CQ("%" SFLG "s"),
-			      (*era_info)->era_C);
-	    else
+            if (alt == 'E' && *era_info)
+                len = t_snprintf(&s[count], maxsize - count, CQ("%" SFLG "s"), (*era_info)->era_C);
+            else
 #endif /* _WANT_C99_TIME_FORMATS */
-	      {
-		char *pos = "";
-                int year = tim_p->tm_year + YEAR_BASE;
-		int century = year / 100 - (year % 100 < 0);
-		if (pad) /* '0' or '+' */
-		  {
-		    if (century >= 100 && pad == CQ('+'))
-		      pos = "+";
-		  }
+            {
+                char *pos = "";
+                int   year = tim_p->tm_year + YEAR_BASE;
+                int   century = year / 100 - (year % 100 < 0);
+                if (pad) /* '0' or '+' */
+                {
+                    if (century >= 100 && pad == CQ('+'))
+                        pos = "+";
+                }
                 if (width < 1)
                     width = 1;
-		len = t_snprintf (&s[count], maxsize - count, CQ("%s%.*d"),
-                                  pos, (int) width, century);
-	      }
-            CHECK_LENGTH ();
-	  }
-	  break;
-	case CQ('d'):
-	case CQ('e'):
-#ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == CQ('O') && *alt_digits)
-	    {
-	      if (tim_p->tm_mday < 10)
-	      	{
-		  if (*format == CQ('d'))
-		    {
-		      if (maxsize - count < 2) return 0;
-		      len = conv_to_alt_digits (&s[count], maxsize - count,
-						0, *alt_digits);
-		      CHECK_LENGTH ();
-		    }
-		  if (*format == CQ('e') || len == 0)
-		    s[count++] = CQ(' ');
-		}
-	      len = conv_to_alt_digits (&s[count], maxsize - count,
-					tim_p->tm_mday, *alt_digits);
-	      CHECK_LENGTH ();
-	      if (len > 0)
-		break;
-	    }
-#endif /* _WANT_C99_TIME_FORMATS */
-	  len = t_snprintf (&s[count], maxsize - count,
-			  *format == CQ('d') ? CQ("%.2d") : CQ("%2d"),
-			  tim_p->tm_mday);
-	  CHECK_LENGTH ();
-	  break;
-	case CQ('D'):
-	  /* %m/%d/%y */
-          {
-            len = __strftime(&s[count], maxsize - count, CQ("%m/%d/%y"), tim_p,
-			      locale, era_info, alt_digits);
-	    if (len > 0)
-	      count += len;
-	    else
-	      return 0;
-	  }
-	  break;
-	case CQ('F'):
-	  { /* %F is equivalent to "%Y-%m-%d", flags and width can change
-	       that.  Recurse to avoid need to replicate %Y formation. */
-	    len = __strftime (&s[count], maxsize - count, CQ("%Y-%m-%d"), tim_p,
-			      locale, era_info, alt_digits);
-	    if (len > 0)
-	      count += len;
-	    else
-	      return 0;
-	  }
-          break;
-	case CQ('g'):
-	  /* Be careful of both overflow and negative years, thanks to
-		 the asymmetric range of years.  */
-	  {
-	    int adjust = iso_year_adjust (tim_p);
-	    int year = tim_p->tm_year >= 0 ? tim_p->tm_year % 100
-		: abs (tim_p->tm_year + YEAR_BASE) % 100;
-	    if (adjust < 0 && tim_p->tm_year <= -YEAR_BASE)
-		adjust = 1;
-	    else if (adjust > 0 && tim_p->tm_year < -YEAR_BASE)
-		adjust = -1;
-	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
-			    ((year + adjust) % 100 + 100) % 100);
-            CHECK_LENGTH ();
-	  }
-          break;
-	case CQ('G'):
-	  {
-	    /* See the comments for 'C' and 'Y'; this is a variable length
-	       field.  Although there is no requirement for a minimum number
-	       of digits, we use 4 for consistency with 'Y'.  */
-	    int sign = tim_p->tm_year < -YEAR_BASE;
-	    int adjust = iso_year_adjust (tim_p);
-	    int century = tim_p->tm_year >= 0
-	      ? tim_p->tm_year / 100 + YEAR_BASE / 100
-	      : abs (tim_p->tm_year + YEAR_BASE) / 100;
-	    int year = tim_p->tm_year >= 0 ? tim_p->tm_year % 100
-	      : abs (tim_p->tm_year + YEAR_BASE) % 100;
-	    if (adjust < 0 && tim_p->tm_year <= -YEAR_BASE)
-	      sign = adjust = 1;
-	    else if (adjust > 0 && sign)
-	      adjust = -1;
-	    year += adjust;
-	    if (year == -1)
-	      {
-		year = 99;
-		--century;
-	      }
-	    else if (year == 100)
-	      {
-		year = 0;
-		++century;
-	      }
-	    CHAR fmtbuf[10], *fmt = fmtbuf;
-	    /* int potentially overflows, so use unsigned instead.  */
-	    unsigned p_year = century * 100 + year;
-	    if (sign)
-	      *fmt++ = CQ('-');
-	    else if (pad == CQ('+') && p_year >= 10000)
-	      {
-		*fmt++ = CQ('+');
-		sign = 1;
-	      }
-	    if (width && sign)
-	      --width;
-	    *fmt++ = CQ('%');
-	    if (pad)
-	      *fmt++ = CQ('0');
-	    STRCPY (fmt, CQ(".*u"));
-	    len = t_snprintf (&s[count], maxsize - count, fmtbuf, (int) width, p_year);
-            if (len < 0  ||  (count+=len) >= maxsize)
-              return 0;
-	  }
-          break;
-	case CQ('H'):
-#ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == CQ('O') && *alt_digits)
-	    {
-	      len = conv_to_alt_digits (&s[count], maxsize - count,
-					tim_p->tm_hour, *alt_digits);
-	      CHECK_LENGTH ();
-	      if (len > 0)
-		break;
-	    }
-#endif /* _WANT_C99_TIME_FORMATS */
-	  __fallthrough;
-	case CQ('k'):	/* newlib extension */
-	  len = t_snprintf (&s[count], maxsize - count,
-			  *format == CQ('k') ? CQ("%2d") : CQ("%.2d"),
-			  tim_p->tm_hour);
-          CHECK_LENGTH ();
-	  break;
-	case CQ('l'):	/* newlib extension */
-	  if (alt == CQ('O'))
-	    alt = CQ('\0');
-	  __fallthrough;
-	case CQ('I'):
-	  {
-	    register int  h12;
-	    h12 = (tim_p->tm_hour == 0 || tim_p->tm_hour == 12)  ?
-						12  :  tim_p->tm_hour % 12;
-#ifdef _WANT_C99_TIME_FORMATS
-	    if (alt != CQ('O') || !*alt_digits
-		|| !(len = conv_to_alt_digits (&s[count], maxsize - count,
-					       h12, *alt_digits)))
-#endif /* _WANT_C99_TIME_FORMATS */
-	      len = t_snprintf (&s[count], maxsize - count,
-			      *format == CQ('I') ? CQ("%.2d") : CQ("%2d"), h12);
-	    CHECK_LENGTH ();
-	  }
-	  break;
-	case CQ('j'):
-	  len = t_snprintf (&s[count], maxsize - count, CQ("%.3d"),
-			  tim_p->tm_yday + 1);
-          CHECK_LENGTH ();
-	  break;
-	case CQ('m'):
-#ifdef _WANT_C99_TIME_FORMATS
-	  if (alt != CQ('O') || !*alt_digits
-	      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
-					     tim_p->tm_mon + 1, *alt_digits)))
-#endif /* _WANT_C99_TIME_FORMATS */
-	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
-			    tim_p->tm_mon + 1);
-          CHECK_LENGTH ();
-	  break;
-	case CQ('M'):
-#ifdef _WANT_C99_TIME_FORMATS
-	  if (alt != CQ('O') || !*alt_digits
-	      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
-					     tim_p->tm_min, *alt_digits)))
-#endif /* _WANT_C99_TIME_FORMATS */
-	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
-			    tim_p->tm_min);
-          CHECK_LENGTH ();
-	  break;
-	case CQ('n'):
-	  if (count < maxsize - 1)
-	    s[count++] = CQ('\n');
-	  else
-	    return 0;
-	  break;
-	case CQ('p'):
-	case CQ('P'):
-	  _ctloc (TIME_AM_PM[tim_p->tm_hour < 12 ? 0 : 1]);
-	  for (i = 0; i < ctloclen; i++)
-	    {
-	      if (count < maxsize - 1)
-                s[count++] = (*format == CQ('P') ? (CHAR) TOLOWER (ctloc[i])
-						 : ctloc[i]);
-	      else
-		return 0;
-	    }
-	  break;
-	case CQ('q'):	/* GNU quarter year */
-	  len = t_snprintf (&s[count], maxsize - count, CQ("%.1d"),
-			  tim_p->tm_mon / 3 + 1);
-	  CHECK_LENGTH ();
-	  break;
-	case CQ('R'):
-          len = t_snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d"),
-			  tim_p->tm_hour, tim_p->tm_min);
-          CHECK_LENGTH ();
-          break;
-	case CQ('s'):
-/*
- * From:
- * The Open Group Base Specifications Issue 7
- * IEEE Std 1003.1, 2013 Edition
- * Copyright (c) 2001-2013 The IEEE and The Open Group
- * XBD Base Definitions
- * 4. General Concepts
- * 4.15 Seconds Since the Epoch
- * A value that approximates the number of seconds that have elapsed since the
- * Epoch. A Coordinated Universal Time name (specified in terms of seconds
- * (tm_sec), minutes (tm_min), hours (tm_hour), days since January 1 of the year
- * (tm_yday), and calendar year minus 1900 (tm_year)) is related to a time
- * represented as seconds since the Epoch, according to the expression below.
- * If the year is <1970 or the value is negative, the relationship is undefined.
- * If the year is >=1970 and the value is non-negative, the value is related to a
- * Coordinated Universal Time name according to the C-language expression, where
- * tm_sec, tm_min, tm_hour, tm_yday, and tm_year are all integer types:
- * tm_sec + tm_min*60 + tm_hour*3600 + tm_yday*86400 +
- *     (tm_year-70)*31536000 + ((tm_year-69)/4)*86400 -
- *     ((tm_year-1)/100)*86400 + ((tm_year+299)/400)*86400
- * OR
- * ((((tm_year-69)/4 - (tm_year-1)/100 + (tm_year+299)/400 +
- *         (tm_year-70)*365 + tm_yday)*24 + tm_hour)*60 + tm_min)*60 + tm_sec
- */
-/* modified from %z case by hoisting offset outside if block and initializing */
-	  {
-	    long offset = 0;	/* offset < 0 => W of GMT, > 0 => E of GMT:
-				   subtract to get UTC */
-
-	    if (tim_p->tm_isdst >= 0)
-	      {
-		TZ_LOCK;
-		if (!tzset_called)
-		  {
-		    _tzset_unlocked ();
-		    tzset_called = 1;
-		  }
-
-#if   defined (__TM_GMTOFF)
-		offset = tim_p->__TM_GMTOFF;
-#else
-		__tzinfo_type *tz = __gettzinfo ();
-		/* The sign of this is exactly opposite the envvar TZ.  We
-		   could directly use the global _timezone for tm_isdst==0,
-		   but have to use __tzrule for daylight savings.  */
-		offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
-#endif
-		TZ_UNLOCK;
-	      }
-	    len = t_snprintf (&s[count], maxsize - count, CQ("%lld"),
-			    (((((long long)tim_p->tm_year - 69)/4
-				- (tim_p->tm_year - 1)/100
-				+ (tim_p->tm_year + 299)/400
-				+ (tim_p->tm_year - 70)*365 + tim_p->tm_yday)*24
-			      + tim_p->tm_hour)*60 + tim_p->tm_min)*60
-			    + tim_p->tm_sec - offset);
-	    CHECK_LENGTH ();
-	  }
-          break;
-	case CQ('S'):
-#ifdef _WANT_C99_TIME_FORMATS
-	  if (alt != CQ('O') || !*alt_digits
-	      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
-					     tim_p->tm_sec, *alt_digits)))
-#endif /* _WANT_C99_TIME_FORMATS */
-	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
-			    tim_p->tm_sec);
-          CHECK_LENGTH ();
-	  break;
-	case CQ('t'):
-	  if (count < maxsize - 1)
-	    s[count++] = CQ('\t');
-	  else
-	    return 0;
-	  break;
-	case CQ('T'):
-          len = t_snprintf (&s[count], maxsize - count, CQ("%.2d:%.2d:%.2d"),
-			  tim_p->tm_hour, tim_p->tm_min, tim_p->tm_sec);
-          CHECK_LENGTH ();
-          break;
-	case CQ('u'):
-#ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == CQ('O') && *alt_digits)
-	    {
-	      len = conv_to_alt_digits (&s[count], maxsize - count,
-					tim_p->tm_wday == 0 ? 7
-							    : tim_p->tm_wday,
-					*alt_digits);
-	      CHECK_LENGTH ();
-	      if (len > 0)
-		break;
-	    }
-#endif /* _WANT_C99_TIME_FORMATS */
-          if (count < maxsize - 1)
-            {
-              if (tim_p->tm_wday == 0)
-                s[count++] = CQ('7');
-              else
-                s[count++] = CQ('0') + tim_p->tm_wday;
+                len = t_snprintf(&s[count], maxsize - count, CQ("%s%.*d"), pos, (int)width,
+                                 century);
             }
-          else
-            return 0;
-          break;
-	case CQ('U'):
+            CHECK_LENGTH();
+        } break;
+        case CQ('d'):
+        case CQ('e'):
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt != CQ('O') || !*alt_digits
-	      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
-					     (tim_p->tm_yday + 7 -
-					      tim_p->tm_wday) / 7,
-					     *alt_digits)))
+            if (alt == CQ('O') && *alt_digits) {
+                if (tim_p->tm_mday < 10) {
+                    if (*format == CQ('d')) {
+                        if (maxsize - count < 2)
+                            return 0;
+                        len = conv_to_alt_digits(&s[count], maxsize - count, 0, *alt_digits);
+                        CHECK_LENGTH();
+                    }
+                    if (*format == CQ('e') || len == 0)
+                        s[count++] = CQ(' ');
+                }
+                len = conv_to_alt_digits(&s[count], maxsize - count, tim_p->tm_mday, *alt_digits);
+                CHECK_LENGTH();
+                if (len > 0)
+                    break;
+            }
 #endif /* _WANT_C99_TIME_FORMATS */
-	    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
-			 (tim_p->tm_yday + 7 -
-			  tim_p->tm_wday) / 7);
-          CHECK_LENGTH ();
-	  break;
-	case CQ('V'):
-	  {
-	    int adjust = iso_year_adjust (tim_p);
-	    int wday = (tim_p->tm_wday) ? tim_p->tm_wday - 1 : 6;
-	    int week = (tim_p->tm_yday + 10 - wday) / 7;
-	    if (adjust > 0)
-		week = 1;
-	    else if (adjust < 0)
-		/* Previous year has 53 weeks if current year starts on
-		   Fri, and also if current year starts on Sat and
-		   previous year was leap year.  */
-		week = 52 + (4 >= (wday - tim_p->tm_yday
-				   - isleap (tim_p->tm_year
-					     + (YEAR_BASE - 1
-						- (tim_p->tm_year < 0
-						   ? 0 : 2000)))));
+            len = t_snprintf(&s[count], maxsize - count,
+                             *format == CQ('d') ? CQ("%.2d") : CQ("%2d"), tim_p->tm_mday);
+            CHECK_LENGTH();
+            break;
+        case CQ('D'):
+            /* %m/%d/%y */
+            {
+                len = __strftime(&s[count], maxsize - count, CQ("%m/%d/%y"), tim_p, locale,
+                                 era_info, alt_digits);
+                if (len > 0)
+                    count += len;
+                else
+                    return 0;
+            }
+            break;
+        case CQ('F'): { /* %F is equivalent to "%Y-%m-%d", flags and width can change
+                           that.  Recurse to avoid need to replicate %Y formation. */
+            len = __strftime(&s[count], maxsize - count, CQ("%Y-%m-%d"), tim_p, locale, era_info,
+                             alt_digits);
+            if (len > 0)
+                count += len;
+            else
+                return 0;
+        } break;
+        case CQ('g'):
+            /* Be careful of both overflow and negative years, thanks to
+                   the asymmetric range of years.  */
+            {
+                int adjust = iso_year_adjust(tim_p);
+                int year = tim_p->tm_year >= 0 ? tim_p->tm_year % 100
+                                               : abs(tim_p->tm_year + YEAR_BASE) % 100;
+                if (adjust < 0 && tim_p->tm_year <= -YEAR_BASE)
+                    adjust = 1;
+                else if (adjust > 0 && tim_p->tm_year < -YEAR_BASE)
+                    adjust = -1;
+                len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"),
+                                 ((year + adjust) % 100 + 100) % 100);
+                CHECK_LENGTH();
+            }
+            break;
+        case CQ('G'): {
+            /* See the comments for 'C' and 'Y'; this is a variable length
+               field.  Although there is no requirement for a minimum number
+               of digits, we use 4 for consistency with 'Y'.  */
+            int sign = tim_p->tm_year < -YEAR_BASE;
+            int adjust = iso_year_adjust(tim_p);
+            int century = tim_p->tm_year >= 0 ? tim_p->tm_year / 100 + YEAR_BASE / 100
+                                              : abs(tim_p->tm_year + YEAR_BASE) / 100;
+            int year = tim_p->tm_year >= 0 ? tim_p->tm_year % 100
+                                           : abs(tim_p->tm_year + YEAR_BASE) % 100;
+            if (adjust < 0 && tim_p->tm_year <= -YEAR_BASE)
+                sign = adjust = 1;
+            else if (adjust > 0 && sign)
+                adjust = -1;
+            year += adjust;
+            if (year == -1) {
+                year = 99;
+                --century;
+            } else if (year == 100) {
+                year = 0;
+                ++century;
+            }
+            CHAR     fmtbuf[10], *fmt = fmtbuf;
+            /* int potentially overflows, so use unsigned instead.  */
+            unsigned p_year = century * 100 + year;
+            if (sign)
+                *fmt++ = CQ('-');
+            else if (pad == CQ('+') && p_year >= 10000) {
+                *fmt++ = CQ('+');
+                sign = 1;
+            }
+            if (width && sign)
+                --width;
+            *fmt++ = CQ('%');
+            if (pad)
+                *fmt++ = CQ('0');
+            STRCPY(fmt, CQ(".*u"));
+            len = t_snprintf(&s[count], maxsize - count, fmtbuf, (int)width, p_year);
+            if (len < 0 || (count += len) >= maxsize)
+                return 0;
+        } break;
+        case CQ('H'):
 #ifdef _WANT_C99_TIME_FORMATS
-	    if (alt != CQ('O') || !*alt_digits
-		|| !(len = conv_to_alt_digits (&s[count], maxsize - count,
-					       week, *alt_digits)))
+            if (alt == CQ('O') && *alt_digits) {
+                len = conv_to_alt_digits(&s[count], maxsize - count, tim_p->tm_hour, *alt_digits);
+                CHECK_LENGTH();
+                if (len > 0)
+                    break;
+            }
 #endif /* _WANT_C99_TIME_FORMATS */
-	      len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"), week);
-            CHECK_LENGTH ();
-	  }
-          break;
-	case CQ('v'):	/* BSD/OSX/Ruby extension VMS/Oracle date format
-			   from Arnold Robbins strftime version 3.0 */
-	  { /* %v is equivalent to "%e-%b-%Y", flags and width can change year
-	       format. Recurse to avoid need to replicate %b and %Y formation. */
-	    CHAR fmtbuf[32], *fmt = fmtbuf;
-	    STRCPY (fmt, CQ("%e-%b-%"));
-	    fmt += STRLEN (fmt);
-	    if (pad) /* '0' or '+' */
-	      *fmt++ = pad;
-	    else
-	      *fmt++ = '+';
-	    if (!pad)
-	      width = 10;
-	    if (width < 6)
-	      width = 6;
-	    width -= 6;
-	    if (width)
-	      {
-		len = t_snprintf (fmt, fmtbuf + 32 - fmt, CQ("%lu"), width);
-		if (len > 0)
-		  fmt += len;
-	      }
-	    STRCPY (fmt, CQ("Y"));
-	    len = __strftime (&s[count], maxsize - count, fmtbuf, tim_p,
-			      locale, era_info, alt_digits);
-	    if (len > 0)
-	      count += len;
-	    else
-	      return 0;
-	  }
-	  break;
-	case CQ('w'):
+            __fallthrough;
+        case CQ('k'): /* newlib extension */
+            len = t_snprintf(&s[count], maxsize - count,
+                             *format == CQ('k') ? CQ("%2d") : CQ("%.2d"), tim_p->tm_hour);
+            CHECK_LENGTH();
+            break;
+        case CQ('l'): /* newlib extension */
+            if (alt == CQ('O'))
+                alt = CQ('\0');
+            __fallthrough;
+        case CQ('I'): {
+            register int h12;
+            h12 = (tim_p->tm_hour == 0 || tim_p->tm_hour == 12) ? 12 : tim_p->tm_hour % 12;
 #ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == CQ('O') && *alt_digits)
-	    {
-	      len = conv_to_alt_digits (&s[count], maxsize - count,
-					tim_p->tm_wday, *alt_digits);
-	      CHECK_LENGTH ();
-	      if (len > 0)
-		break;
-	    }
+            if (alt != CQ('O') || !*alt_digits
+                || !(len = conv_to_alt_digits(&s[count], maxsize - count, h12, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	  if (count < maxsize - 1)
-            s[count++] = CQ('0') + tim_p->tm_wday;
-	  else
-	    return 0;
-	  break;
-	case CQ('W'):
-	  {
-	    int wday = (tim_p->tm_wday) ? tim_p->tm_wday - 1 : 6;
-	    wday = (tim_p->tm_yday + 7 - wday) / 7;
+                len = t_snprintf(&s[count], maxsize - count,
+                                 *format == CQ('I') ? CQ("%.2d") : CQ("%2d"), h12);
+            CHECK_LENGTH();
+        } break;
+        case CQ('j'):
+            len = t_snprintf(&s[count], maxsize - count, CQ("%.3d"), tim_p->tm_yday + 1);
+            CHECK_LENGTH();
+            break;
+        case CQ('m'):
 #ifdef _WANT_C99_TIME_FORMATS
-	    if (alt != CQ('O') || !*alt_digits
-		|| !(len = conv_to_alt_digits (&s[count], maxsize - count,
-					       wday, *alt_digits)))
+            if (alt != CQ('O') || !*alt_digits
+                || !(len = conv_to_alt_digits(&s[count], maxsize - count, tim_p->tm_mon + 1,
+                                              *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-	      len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"), wday);
-            CHECK_LENGTH ();
-	  }
-	  break;
-	case CQ('y'):
-	    {
+                len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"), tim_p->tm_mon + 1);
+            CHECK_LENGTH();
+            break;
+        case CQ('M'):
 #ifdef _WANT_C99_TIME_FORMATS
-	      if (alt == 'E' && *era_info)
-		len = t_snprintf (&s[count], maxsize - count, CQ("%d"),
-				(*era_info)->year);
-	      else
+            if (alt != CQ('O') || !*alt_digits
+                || !(len
+                     = conv_to_alt_digits(&s[count], maxsize - count, tim_p->tm_min, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-		{
-		  /* Be careful of both overflow and negative years, thanks to
-		     the asymmetric range of years.  */
-                  int year = tim_p->tm_year % 100;
-                  if (year < 0)
+                len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"), tim_p->tm_min);
+            CHECK_LENGTH();
+            break;
+        case CQ('n'):
+            if (count < maxsize - 1)
+                s[count++] = CQ('\n');
+            else
+                return 0;
+            break;
+        case CQ('p'):
+        case CQ('P'):
+            _ctloc(TIME_AM_PM[tim_p->tm_hour < 12 ? 0 : 1]);
+            for (i = 0; i < ctloclen; i++) {
+                if (count < maxsize - 1)
+                    s[count++] = (*format == CQ('P') ? (CHAR)TOLOWER(ctloc[i]) : ctloc[i]);
+                else
+                    return 0;
+            }
+            break;
+        case CQ('q'): /* GNU quarter year */
+            len = t_snprintf(&s[count], maxsize - count, CQ("%.1d"), tim_p->tm_mon / 3 + 1);
+            CHECK_LENGTH();
+            break;
+        case CQ('R'):
+            len = t_snprintf(&s[count], maxsize - count, CQ("%.2d:%.2d"), tim_p->tm_hour,
+                             tim_p->tm_min);
+            CHECK_LENGTH();
+            break;
+        case CQ('s'):
+            /*
+             * From:
+             * The Open Group Base Specifications Issue 7
+             * IEEE Std 1003.1, 2013 Edition
+             * Copyright (c) 2001-2013 The IEEE and The Open Group
+             * XBD Base Definitions
+             * 4. General Concepts
+             * 4.15 Seconds Since the Epoch
+             * A value that approximates the number of seconds that have elapsed since the
+             * Epoch. A Coordinated Universal Time name (specified in terms of seconds
+             * (tm_sec), minutes (tm_min), hours (tm_hour), days since January 1 of the year
+             * (tm_yday), and calendar year minus 1900 (tm_year)) is related to a time
+             * represented as seconds since the Epoch, according to the expression below.
+             * If the year is <1970 or the value is negative, the relationship is undefined.
+             * If the year is >=1970 and the value is non-negative, the value is related to a
+             * Coordinated Universal Time name according to the C-language expression, where
+             * tm_sec, tm_min, tm_hour, tm_yday, and tm_year are all integer types:
+             * tm_sec + tm_min*60 + tm_hour*3600 + tm_yday*86400 +
+             *     (tm_year-70)*31536000 + ((tm_year-69)/4)*86400 -
+             *     ((tm_year-1)/100)*86400 + ((tm_year+299)/400)*86400
+             * OR
+             * ((((tm_year-69)/4 - (tm_year-1)/100 + (tm_year+299)/400 +
+             *         (tm_year-70)*365 + tm_yday)*24 + tm_hour)*60 + tm_min)*60 + tm_sec
+             */
+            /* modified from %z case by hoisting offset outside if block and initializing */
+            {
+                long offset = 0; /* offset < 0 => W of GMT, > 0 => E of GMT:
+                                    subtract to get UTC */
+
+                if (tim_p->tm_isdst >= 0) {
+                    TZ_LOCK;
+                    if (!tzset_called) {
+                        _tzset_unlocked();
+                        tzset_called = 1;
+                    }
+
+#if defined(__TM_GMTOFF)
+                    offset = tim_p->__TM_GMTOFF;
+#else
+                    __tzinfo_type *tz = __gettzinfo();
+                    /* The sign of this is exactly opposite the envvar TZ.  We
+                       could directly use the global _timezone for tm_isdst==0,
+                       but have to use __tzrule for daylight savings.  */
+                    offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
+#endif
+                    TZ_UNLOCK;
+                }
+                len = t_snprintf(&s[count], maxsize - count, CQ("%lld"),
+                                 (((((long long)tim_p->tm_year - 69) / 4
+                                    - (tim_p->tm_year - 1) / 100 + (tim_p->tm_year + 299) / 400
+                                    + (tim_p->tm_year - 70) * 365 + tim_p->tm_yday)
+                                       * 24
+                                   + tim_p->tm_hour)
+                                      * 60
+                                  + tim_p->tm_min)
+                                         * 60
+                                     + tim_p->tm_sec - offset);
+                CHECK_LENGTH();
+            }
+            break;
+        case CQ('S'):
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt != CQ('O') || !*alt_digits
+                || !(len
+                     = conv_to_alt_digits(&s[count], maxsize - count, tim_p->tm_sec, *alt_digits)))
+#endif /* _WANT_C99_TIME_FORMATS */
+                len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"), tim_p->tm_sec);
+            CHECK_LENGTH();
+            break;
+        case CQ('t'):
+            if (count < maxsize - 1)
+                s[count++] = CQ('\t');
+            else
+                return 0;
+            break;
+        case CQ('T'):
+            len = t_snprintf(&s[count], maxsize - count, CQ("%.2d:%.2d:%.2d"), tim_p->tm_hour,
+                             tim_p->tm_min, tim_p->tm_sec);
+            CHECK_LENGTH();
+            break;
+        case CQ('u'):
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt == CQ('O') && *alt_digits) {
+                len = conv_to_alt_digits(&s[count], maxsize - count,
+                                         tim_p->tm_wday == 0 ? 7 : tim_p->tm_wday, *alt_digits);
+                CHECK_LENGTH();
+                if (len > 0)
+                    break;
+            }
+#endif /* _WANT_C99_TIME_FORMATS */
+            if (count < maxsize - 1) {
+                if (tim_p->tm_wday == 0)
+                    s[count++] = CQ('7');
+                else
+                    s[count++] = CQ('0') + tim_p->tm_wday;
+            } else
+                return 0;
+            break;
+        case CQ('U'):
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt != CQ('O') || !*alt_digits
+                || !(len
+                     = conv_to_alt_digits(&s[count], maxsize - count,
+                                          (tim_p->tm_yday + 7 - tim_p->tm_wday) / 7, *alt_digits)))
+#endif /* _WANT_C99_TIME_FORMATS */
+                len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"),
+                                 (tim_p->tm_yday + 7 - tim_p->tm_wday) / 7);
+            CHECK_LENGTH();
+            break;
+        case CQ('V'): {
+            int adjust = iso_year_adjust(tim_p);
+            int wday = (tim_p->tm_wday) ? tim_p->tm_wday - 1 : 6;
+            int week = (tim_p->tm_yday + 10 - wday) / 7;
+            if (adjust > 0)
+                week = 1;
+            else if (adjust < 0)
+                /* Previous year has 53 weeks if current year starts on
+                   Fri, and also if current year starts on Sat and
+                   previous year was leap year.  */
+                week = 52
+                    + (4 >= (wday - tim_p->tm_yday
+                             - isleap(tim_p->tm_year
+                                      + (YEAR_BASE - 1 - (tim_p->tm_year < 0 ? 0 : 2000)))));
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt != CQ('O') || !*alt_digits
+                || !(len = conv_to_alt_digits(&s[count], maxsize - count, week, *alt_digits)))
+#endif /* _WANT_C99_TIME_FORMATS */
+                len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"), week);
+            CHECK_LENGTH();
+        } break;
+        case CQ('v'): /* BSD/OSX/Ruby extension VMS/Oracle date format
+                         from Arnold Robbins strftime version 3.0 */
+        {             /* %v is equivalent to "%e-%b-%Y", flags and width can change year
+                         format. Recurse to avoid need to replicate %b and %Y formation. */
+            CHAR fmtbuf[32], *fmt = fmtbuf;
+            STRCPY(fmt, CQ("%e-%b-%"));
+            fmt += STRLEN(fmt);
+            if (pad) /* '0' or '+' */
+                *fmt++ = pad;
+            else
+                *fmt++ = '+';
+            if (!pad)
+                width = 10;
+            if (width < 6)
+                width = 6;
+            width -= 6;
+            if (width) {
+                len = t_snprintf(fmt, fmtbuf + 32 - fmt, CQ("%lu"), width);
+                if (len > 0)
+                    fmt += len;
+            }
+            STRCPY(fmt, CQ("Y"));
+            len = __strftime(&s[count], maxsize - count, fmtbuf, tim_p, locale, era_info,
+                             alt_digits);
+            if (len > 0)
+                count += len;
+            else
+                return 0;
+        } break;
+        case CQ('w'):
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt == CQ('O') && *alt_digits) {
+                len = conv_to_alt_digits(&s[count], maxsize - count, tim_p->tm_wday, *alt_digits);
+                CHECK_LENGTH();
+                if (len > 0)
+                    break;
+            }
+#endif /* _WANT_C99_TIME_FORMATS */
+            if (count < maxsize - 1)
+                s[count++] = CQ('0') + tim_p->tm_wday;
+            else
+                return 0;
+            break;
+        case CQ('W'): {
+            int wday = (tim_p->tm_wday) ? tim_p->tm_wday - 1 : 6;
+            wday = (tim_p->tm_yday + 7 - wday) / 7;
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt != CQ('O') || !*alt_digits
+                || !(len = conv_to_alt_digits(&s[count], maxsize - count, wday, *alt_digits)))
+#endif /* _WANT_C99_TIME_FORMATS */
+                len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"), wday);
+            CHECK_LENGTH();
+        } break;
+        case CQ('y'): {
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt == 'E' && *era_info)
+                len = t_snprintf(&s[count], maxsize - count, CQ("%d"), (*era_info)->year);
+            else
+#endif /* _WANT_C99_TIME_FORMATS */
+            {
+                /* Be careful of both overflow and negative years, thanks to
+                   the asymmetric range of years.  */
+                int year = tim_p->tm_year % 100;
+                if (year < 0)
                     year += 100;
 #ifdef _WANT_C99_TIME_FORMATS
-		  if (alt != CQ('O') || !*alt_digits
-		      || !(len = conv_to_alt_digits (&s[count], maxsize - count,
-						     year, *alt_digits)))
+                if (alt != CQ('O') || !*alt_digits
+                    || !(len = conv_to_alt_digits(&s[count], maxsize - count, year, *alt_digits)))
 #endif /* _WANT_C99_TIME_FORMATS */
-		    len = t_snprintf (&s[count], maxsize - count, CQ("%.2d"),
-				    year);
-		}
-              CHECK_LENGTH ();
-	    }
-	  break;
-	case CQ('Y'):
-#ifdef _WANT_C99_TIME_FORMATS
-	  if (alt == 'E' && *era_info)
-	    {
-	      ctloc = (*era_info)->era_Y;
-	      goto recurse;
-	    }
-	  else
-#endif /* _WANT_C99_TIME_FORMATS */
-	    {
-	      CHAR fmtbuf[10], *fmt = fmtbuf;
-	      int sign = tim_p->tm_year < -YEAR_BASE;
-	      /* int potentially overflows, so use unsigned instead.  */
-	      register unsigned year = (unsigned) tim_p->tm_year
-				       + (unsigned) YEAR_BASE;
-	      if (sign)
-		{
-		  *fmt++ = CQ('-');
-		  year = UINT_MAX - year + 1;
-		}
-	      else if (pad == CQ('+') && year >= 10000)
-		{
-		  *fmt++ = CQ('+');
-		  sign = 1;
-		}
-	      if (width && sign)
-		--width;
-	      *fmt++ = CQ('%');
-	      if (pad)
-		*fmt++ = CQ('0');
-	      STRCPY (fmt, CQ(".*u"));
-	      len = t_snprintf (&s[count], maxsize - count, fmtbuf, (int) width,
-			      year);
-	      CHECK_LENGTH ();
-	    }
-	  break;
-	case CQ('z'):
-          if (tim_p->tm_isdst >= 0)
-            {
-	      long offset;
-
-	      TZ_LOCK;
-	      if (!tzset_called)
-		{
-		  _tzset_unlocked ();
-		  tzset_called = 1;
-		}
-
-#if   defined (__TM_GMTOFF)
-	      offset = tim_p->__TM_GMTOFF;
-#else
-	      __tzinfo_type *tz = __gettzinfo ();
-	      /* The sign of this is exactly opposite the envvar TZ.  We
-		 could directly use the global _timezone for tm_isdst==0,
-		 but have to use __tzrule for daylight savings.  */
-	      offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
-#endif
-	      TZ_UNLOCK;
-	      len = t_snprintf (&s[count], maxsize - count, CQ("%+03ld%.2ld"),
-			      offset / SECSPERHOUR,
-			      labs (offset / SECSPERMIN) % 60L);
-              CHECK_LENGTH ();
+                    len = t_snprintf(&s[count], maxsize - count, CQ("%.2d"), year);
             }
-          break;
-	case CQ('Z'):
-	  if (tim_p->tm_isdst >= 0)
-	    {
-	      size_t size;
-	      const char *tznam = NULL;
+            CHECK_LENGTH();
+        } break;
+        case CQ('Y'):
+#ifdef _WANT_C99_TIME_FORMATS
+            if (alt == 'E' && *era_info) {
+                ctloc = (*era_info)->era_Y;
+                goto recurse;
+            } else
+#endif /* _WANT_C99_TIME_FORMATS */
+            {
+                CHAR              fmtbuf[10], *fmt = fmtbuf;
+                int               sign = tim_p->tm_year < -YEAR_BASE;
+                /* int potentially overflows, so use unsigned instead.  */
+                register unsigned year = (unsigned)tim_p->tm_year + (unsigned)YEAR_BASE;
+                if (sign) {
+                    *fmt++ = CQ('-');
+                    year = UINT_MAX - year + 1;
+                } else if (pad == CQ('+') && year >= 10000) {
+                    *fmt++ = CQ('+');
+                    sign = 1;
+                }
+                if (width && sign)
+                    --width;
+                *fmt++ = CQ('%');
+                if (pad)
+                    *fmt++ = CQ('0');
+                STRCPY(fmt, CQ(".*u"));
+                len = t_snprintf(&s[count], maxsize - count, fmtbuf, (int)width, year);
+                CHECK_LENGTH();
+            }
+            break;
+        case CQ('z'):
+            if (tim_p->tm_isdst >= 0) {
+                long offset;
 
-	      TZ_LOCK;
-	      if (!tzset_called)
-		{
-		  _tzset_unlocked ();
-		  tzset_called = 1;
-		}
-#if   defined (__TM_ZONE)
-	      tznam = tim_p->__TM_ZONE;
+                TZ_LOCK;
+                if (!tzset_called) {
+                    _tzset_unlocked();
+                    tzset_called = 1;
+                }
+
+#if defined(__TM_GMTOFF)
+                offset = tim_p->__TM_GMTOFF;
+#else
+                __tzinfo_type *tz = __gettzinfo();
+                /* The sign of this is exactly opposite the envvar TZ.  We
+                   could directly use the global _timezone for tm_isdst==0,
+                   but have to use __tzrule for daylight savings.  */
+                offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
 #endif
-	      if (!tznam)
-		tznam = tzname[tim_p->tm_isdst > 0];
-	      /* Note that in case of wcsftime this loop only works for
-	         timezone abbreviations using the portable codeset (aka ASCII).
-		 This seems to be the case, but if that ever changes, this
-		 loop needs revisiting. */
-	      size = strlen (tznam);
-	      for (i = 0; i < size; i++)
-		{
-		  if (count < maxsize - 1)
-		    s[count++] = tznam[i];
-		  else
-		    {
-		      TZ_UNLOCK;
-		      return 0;
-		    }
-		}
-	      TZ_UNLOCK;
-	    }
-	  break;
-	case CQ('%'):
-	  if (count < maxsize - 1)
-	    s[count++] = CQ('%');
-	  else
-	    return 0;
-	  break;
-	default:
-	  return 0;
-	}
-      if (*format)
-	format++;
-      else
-	break;
+                TZ_UNLOCK;
+                len = t_snprintf(&s[count], maxsize - count, CQ("%+03ld%.2ld"),
+                                 offset / SECSPERHOUR, labs(offset / SECSPERMIN) % 60L);
+                CHECK_LENGTH();
+            }
+            break;
+        case CQ('Z'):
+            if (tim_p->tm_isdst >= 0) {
+                size_t      size;
+                const char *tznam = NULL;
+
+                TZ_LOCK;
+                if (!tzset_called) {
+                    _tzset_unlocked();
+                    tzset_called = 1;
+                }
+#if defined(__TM_ZONE)
+                tznam = tim_p->__TM_ZONE;
+#endif
+                if (!tznam)
+                    tznam = tzname[tim_p->tm_isdst > 0];
+                /* Note that in case of wcsftime this loop only works for
+                   timezone abbreviations using the portable codeset (aka ASCII).
+                   This seems to be the case, but if that ever changes, this
+                   loop needs revisiting. */
+                size = strlen(tznam);
+                for (i = 0; i < size; i++) {
+                    if (count < maxsize - 1)
+                        s[count++] = tznam[i];
+                    else {
+                        TZ_UNLOCK;
+                        return 0;
+                    }
+                }
+                TZ_UNLOCK;
+            }
+            break;
+        case CQ('%'):
+            if (count < maxsize - 1)
+                s[count++] = CQ('%');
+            else
+                return 0;
+            break;
+        default:
+            return 0;
+        }
+        if (*format)
+            format++;
+        else
+            break;
     }
-  if (maxsize)
-    s[count] = CQ('\0');
+    if (maxsize)
+        s[count] = CQ('\0');
 
-  return count;
+    return count;
 }
 
 size_t
-strftime (CHAR *__restrict s,
-	size_t maxsize,
-	const CHAR *__restrict format,
-	const struct tm *__restrict tim_p)
+strftime(CHAR * __restrict s, size_t maxsize, const CHAR * __restrict format,
+         const struct tm * __restrict tim_p)
 {
 #ifdef _WANT_C99_TIME_FORMATS
-  era_info_t *era_info = NULL;
-  alt_digits_t *alt_digits = NULL;
-  size_t ret = __strftime (s, maxsize, format, tim_p, __get_current_locale (),
-			   &era_info, &alt_digits);
-  if (era_info)
-    free_era_info (era_info);
-  if (alt_digits)
-    free_alt_digits (alt_digits);
-  return ret;
-#else /* !_WANT_C99_TIME_FORMATS */
-  return __strftime (s, maxsize, format, tim_p, __get_current_locale (),
-		     NULL, NULL);
+    era_info_t   *era_info = NULL;
+    alt_digits_t *alt_digits = NULL;
+    size_t        ret
+        = __strftime(s, maxsize, format, tim_p, __get_current_locale(), &era_info, &alt_digits);
+    if (era_info)
+        free_era_info(era_info);
+    if (alt_digits)
+        free_alt_digits(alt_digits);
+    return ret;
+#else  /* !_WANT_C99_TIME_FORMATS */
+    return __strftime(s, maxsize, format, tim_p, __get_current_locale(), NULL, NULL);
 #endif /* !_WANT_C99_TIME_FORMATS */
 }
 
 size_t
-strftime_l (CHAR *__restrict s, size_t maxsize, const CHAR *__restrict format,
-	    const struct tm *__restrict tim_p, locale_t locale)
+strftime_l(CHAR * __restrict s, size_t                  maxsize, const CHAR                  *__restrict format,
+           const struct tm * __restrict tim_p, locale_t locale)
 {
 #ifdef _WANT_C99_TIME_FORMATS
-  era_info_t *era_info = NULL;
-  alt_digits_t *alt_digits = NULL;
-  size_t ret = __strftime (s, maxsize, format, tim_p, locale,
-			   &era_info, &alt_digits);
-  if (era_info)
-    free_era_info (era_info);
-  if (alt_digits)
-    free_alt_digits (alt_digits);
-  return ret;
-#else /* !_WANT_C99_TIME_FORMATS */
-  return __strftime (s, maxsize, format, tim_p, locale, NULL, NULL);
+    era_info_t   *era_info = NULL;
+    alt_digits_t *alt_digits = NULL;
+    size_t        ret = __strftime(s, maxsize, format, tim_p, locale, &era_info, &alt_digits);
+    if (era_info)
+        free_era_info(era_info);
+    if (alt_digits)
+        free_alt_digits(alt_digits);
+    return ret;
+#else  /* !_WANT_C99_TIME_FORMATS */
+    return __strftime(s, maxsize, format, tim_p, locale, NULL, NULL);
 #endif /* !_WANT_C99_TIME_FORMATS */
 }
-

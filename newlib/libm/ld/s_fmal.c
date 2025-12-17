@@ -39,27 +39,27 @@
 
 typedef long double FLOAT_T;
 
-#define FMA fmal
+#define FMA       fmal
 #define NEXTAFTER nextafterl
-#define LDEXP ldexpl
-#define FREXP frexpl
-#define SCALBN scalbnl
-#define ILOGB    ilogbl
-#define COPYSIGN copysignl
+#define LDEXP     ldexpl
+#define FREXP     frexpl
+#define SCALBN    scalbnl
+#define ILOGB     ilogbl
+#define COPYSIGN  copysignl
 
 #if LDBL_MANT_DIG == 64
 #define SPLIT (0x1p32L + 1.0L)
 #if __LDBL_MIN_EXP__ == -16382
-#define FLOAT_DENORM_BIAS       0
+#define FLOAT_DENORM_BIAS 0
 #endif
 #endif
 #if LDBL_MANT_DIG == 113
 #define SPLIT (0x1p57L + 1.0L)
 #endif
 
-#define FLOAT_MANT_DIG        __LDBL_MANT_DIG__
-#define FLOAT_MAX_EXP         __LDBL_MAX_EXP__
-#define FLOAT_MIN             __LDBL_MIN__
+#define FLOAT_MANT_DIG __LDBL_MANT_DIG__
+#define FLOAT_MAX_EXP  __LDBL_MAX_EXP__
+#define FLOAT_MIN      __LDBL_MIN__
 
 static inline int
 odd_mant(FLOAT_T x)
@@ -80,7 +80,7 @@ EXPONENT(FLOAT_T x)
 }
 
 #ifdef __LONG_DOUBLE_NOEXCEPT
-#define feraiseexcept(x) ((void) (x))
+#define feraiseexcept(x) ((void)(x))
 #endif
 
 #include "fma_inc.h"

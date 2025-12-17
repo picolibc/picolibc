@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-csin.h"
-#define TEST_FUNC       csin
+#define TEST_VECTORS "test-csin.h"
+#define TEST_FUNC    csin
 
 #include "test-complex-one.h"

@@ -24,11 +24,10 @@
  * SUCH DAMAGE.
  */
 
-
 #include <limits.h>
 
 long double
-scalbl (long double x, long double fn)
+scalbl(long double x, long double fn)
 {
     if (isnanl_inline(fn) || isnanl_inline(x))
         return x + fn;
@@ -37,9 +36,9 @@ scalbl (long double x, long double fn)
         if ((x == 0.0L && fn > 0.0L) || (isinf(x) && fn < 0.0L))
             return __math_invalidl(fn);
         if (fn > 0.0L)
-            return fn*x;
+            return fn * x;
         else
-            return x/(-fn);
+            return x / (-fn);
     }
 
     if (floorl(fn) != fn)

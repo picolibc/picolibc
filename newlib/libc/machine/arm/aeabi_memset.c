@@ -40,13 +40,14 @@
 
 #undef memset
 
-void __used __weak __aeabi_memset (void *dest, size_t n, int c);
+void __used __weak __aeabi_memset(void *dest, size_t n, int c);
 
-void __aeabi_memset (void *dest, size_t n, int c)
+void
+__aeabi_memset(void *dest, size_t n, int c)
 {
-  /*Note that relative to ANSI memset, __aeabi_memset hase the order
-    of its second and third arguments reversed.  */
-  memset (dest, c, n);
+    /*Note that relative to ANSI memset, __aeabi_memset hase the order
+      of its second and third arguments reversed.  */
+    memset(dest, c, n);
 }
 
 /* Support the alias for the __aeabi_memset which may

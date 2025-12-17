@@ -28,27 +28,27 @@
 
 /*
 FUNCTION
-	<<memmem>>---find memory segment
+        <<memmem>>---find memory segment
 
 INDEX
-	memmem
+        memmem
 
 SYNOPSIS
-	#include <string.h>
-	void *memmem(const void *<[s1]>, size_t <[l1]>, const void *<[s2]>,
-		     size_t <[l2]>);
+        #include <string.h>
+        void *memmem(const void *<[s1]>, size_t <[l1]>, const void *<[s2]>,
+                     size_t <[l2]>);
 
 DESCRIPTION
 
-	Locates the first occurrence in the memory region pointed to
-	by <[s1]> with length <[l1]> of the sequence of bytes pointed
-	to by <[s2]> of length <[l2]>.  If you already know the
-	lengths of your haystack and needle, <<memmem>> is much faster
-	than <<strstr>>.
+        Locates the first occurrence in the memory region pointed to
+        by <[s1]> with length <[l1]> of the sequence of bytes pointed
+        to by <[s2]> of length <[l2]>.  If you already know the
+        lengths of your haystack and needle, <<memmem>> is much faster
+        than <<strstr>>.
 
 RETURNS
-	Returns a pointer to the located segment, or a null pointer if
-	<[s2]> is not found. If <[l2]> is 0, <[s1]> is returned.
+        Returns a pointer to the located segment, or a null pointer if
+        <[s2]> is not found. If <[l2]> is 0, <[s1]> is returned.
 
 PORTABILITY
 <<memmem>> is a newlib extension.
@@ -56,7 +56,7 @@ PORTABILITY
 <<memmem>> requires no supporting OS subroutines.
 
 QUICKREF
-	memmem pure
+        memmem pure
 */
 
 #define _GNU_SOURCE
@@ -67,38 +67,37 @@ QUICKREF
 
 /* Small and efficient memmem implementation (quadratic worst-case).  */
 void *
-memmem (const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
+memmem(const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
 {
-  const char *hs = haystack;
-  const char *ne = needle;
+    const char *hs = haystack;
+    const char *ne = needle;
 
-  if (ne_len == 0)
-    return (void *)hs;
-  int i;
-  int c = ne[0];
-  const char *end = hs + hs_len - ne_len;
+    if (ne_len == 0)
+        return (void *)hs;
+    int         i;
+    int         c = ne[0];
+    const char *end = hs + hs_len - ne_len;
 
-  for ( ; hs <= end; hs++)
-  {
-    if (hs[0] != c)
-      continue;
-    for (i = ne_len - 1; i != 0; i--)
-      if (hs[i] != ne[i])
-	break;
-    if (i == 0)
-      return (void *)hs;
-  }
+    for (; hs <= end; hs++) {
+        if (hs[0] != c)
+            continue;
+        for (i = ne_len - 1; i != 0; i--)
+            if (hs[i] != ne[i])
+                break;
+        if (i == 0)
+            return (void *)hs;
+    }
 
-  return NULL;
+    return NULL;
 }
 
 #else
 
-# define RETURN_TYPE void *
-# define AVAILABLE(h, h_l, j, n_l) ((j) <= (h_l) - (n_l))
-# include "str-two-way.h"
+#define RETURN_TYPE               void *
+#define AVAILABLE(h, h_l, j, n_l) ((j) <= (h_l) - (n_l))
+#include "str-two-way.h"
 
-#define hash2(p) (((size_t)(p)[0] - ((size_t)(p)[-1] << 3)) % sizeof (shift))
+#define hash2(p) (((size_t)(p)[0] - ((size_t)(p)[-1] << 3)) % sizeof(shift))
 
 /* Fast memmem algorithm with guaranteed linear-time performance.
    Small needles up to size 2 use a dedicated linear search.  Longer needles
@@ -112,78 +111,72 @@ memmem (const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
    The limit also implies worst-case performance is linear.
    Needles larger than 256 characters use the linear-time Two-Way algorithm.  */
 void *
-memmem (const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
+memmem(const void *haystack, size_t hs_len, const void *needle, size_t ne_len)
 {
-  const unsigned char *hs = haystack;
-  const unsigned char *ne = needle;
+    const unsigned char *hs = haystack;
+    const unsigned char *ne = needle;
 
-  if (ne_len == 0)
-    return (void *) hs;
-  if (ne_len == 1)
-    return (void *) memchr (hs, ne[0], hs_len);
+    if (ne_len == 0)
+        return (void *)hs;
+    if (ne_len == 1)
+        return (void *)memchr(hs, ne[0], hs_len);
 
-  /* Ensure haystack length is >= needle length.  */
-  if (hs_len < ne_len)
+    /* Ensure haystack length is >= needle length.  */
+    if (hs_len < ne_len)
+        return NULL;
+
+    const unsigned char *end = hs + hs_len - ne_len;
+
+    if (ne_len == 2) {
+        uint32_t nw = ((uint32_t)ne[0] << 16) | ne[1], hw = ((uint32_t)hs[0] << 16) | hs[1];
+        for (hs++; hs <= end && hw != nw;)
+            hw = hw << 16 | *++hs;
+        return hw == nw ? (void *)(hs - 1) : NULL;
+    }
+
+    /* Use Two-Way algorithm for very long needles.  */
+    if (__builtin_expect(ne_len > 256, 0))
+        return two_way_long_needle(hs, hs_len, ne, ne_len);
+
+    uint8_t shift[256];
+    size_t  tmp, shift1;
+    size_t  m1 = ne_len - 1;
+    size_t  offset = 0;
+    size_t  i;
+
+    /* Initialize bad character shift hash table.  */
+    memset(shift, 0, sizeof(shift));
+    for (i = 1; i < m1; i++)
+        shift[hash2(ne + i)] = i;
+    shift1 = m1 - shift[hash2(ne + m1)];
+    shift[hash2(ne + m1)] = m1;
+
+    for (; hs <= end;) {
+        /* Skip past character pairs not in the needle.  */
+        do {
+            hs += m1;
+            tmp = shift[hash2(hs)];
+        } while (hs <= end && tmp == 0);
+
+        /* If the match is not at the end of the needle, shift to the end
+           and continue until we match the last 2 characters.  */
+        hs -= tmp;
+        if (tmp < m1)
+            continue;
+
+        /* The last 2 characters match.  If the needle is long, check a
+           fixed number of characters first to quickly filter out mismatches.  */
+        if (m1 <= 15 || memcmp(hs + offset, ne + offset, sizeof(long)) == 0) {
+            if (memcmp(hs, ne, m1) == 0)
+                return (void *)hs;
+
+            /* Adjust filter offset when it doesn't find the mismatch.  */
+            offset = (offset >= sizeof(long) ? offset : m1) - sizeof(long);
+        }
+
+        /* Skip based on matching the last 2 characters.  */
+        hs += shift1;
+    }
     return NULL;
-
-  const unsigned char *end = hs + hs_len - ne_len;
-
-  if (ne_len == 2)
-    {
-      uint32_t nw = ((uint32_t)ne[0] << 16) | ne[1],
-			   hw = ((uint32_t)hs[0] << 16) | hs[1];
-      for (hs++; hs <= end && hw != nw; )
-	hw = hw << 16 | *++hs;
-      return hw == nw ? (void *)(hs - 1) : NULL;
-    }
-
-  /* Use Two-Way algorithm for very long needles.  */
-  if (__builtin_expect (ne_len > 256, 0))
-    return two_way_long_needle (hs, hs_len, ne, ne_len);
-
-  uint8_t shift[256];
-  size_t tmp, shift1;
-  size_t m1 = ne_len - 1;
-  size_t offset = 0;
-  size_t i;
-
-  /* Initialize bad character shift hash table.  */
-  memset (shift, 0, sizeof (shift));
-  for (i = 1; i < m1; i++)
-    shift[hash2 (ne + i)] = i;
-  shift1 = m1 - shift[hash2 (ne + m1)];
-  shift[hash2 (ne + m1)] = m1;
-
-  for ( ; hs <= end; )
-    {
-      /* Skip past character pairs not in the needle.  */
-      do
-	{
-	  hs += m1;
-	  tmp = shift[hash2 (hs)];
-	}
-      while (hs <= end && tmp == 0);
-
-      /* If the match is not at the end of the needle, shift to the end
-	 and continue until we match the last 2 characters.  */
-      hs -= tmp;
-      if (tmp < m1)
-	continue;
-
-      /* The last 2 characters match.  If the needle is long, check a
-	 fixed number of characters first to quickly filter out mismatches.  */
-      if (m1 <= 15 || memcmp (hs + offset, ne + offset, sizeof (long)) == 0)
-	{
-	  if (memcmp (hs, ne, m1) == 0)
-	    return (void *) hs;
-
-	  /* Adjust filter offset when it doesn't find the mismatch.  */
-	  offset = (offset >= sizeof (long) ? offset : m1) - sizeof (long);
-	}
-
-      /* Skip based on matching the last 2 characters.  */
-      hs += shift1;
-    }
-  return NULL;
 }
 #endif /* Compilation for speed.  */

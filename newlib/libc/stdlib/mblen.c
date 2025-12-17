@@ -7,14 +7,14 @@ FUNCTION
 <<mblen>>---minimal multibyte length function
 
 INDEX
-	mblen
+        mblen
 
 SYNOPSIS
-	#include <stdlib.h>
-	int mblen(const char *<[s]>, size_t <[n]>);
+        #include <stdlib.h>
+        int mblen(const char *<[s]>, size_t <[n]>);
 
 DESCRIPTION
-When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming
 implementation of <<mblen>>.  In this case, the
 only ``multi-byte character sequences'' recognized are single bytes,
 and thus <<1>> is returned unless <[s]> is the null pointer or
@@ -44,22 +44,20 @@ effects vary with the locale.
 #include "local.h"
 
 int
-mblen (const char *s, size_t n)
+mblen(const char *s, size_t n)
 {
 #ifdef __MB_CAPABLE
-    int retval = 0;
+    int               retval = 0;
     static _mbstate_t _mblen_state;
 
-    retval = __MBTOWC (NULL, s, n, &_mblen_state);
-    if (retval < 0)
-    {
+    retval = __MBTOWC(NULL, s, n, &_mblen_state);
+    if (retval < 0) {
         _mblen_state.__count = 0;
         return -1;
-    }
-    else
+    } else
         return retval;
 
-#else /* not __MB_CAPABLE */
+#else  /* not __MB_CAPABLE */
     if (s == NULL || *s == '\0')
         return 0;
     if (n == 0)

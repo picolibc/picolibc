@@ -38,11 +38,11 @@
 #include "string_private.h"
 
 __errno_t
-strncat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2, rsize_t n)
+strncat_s(char * __restrict s1, rsize_t s1max, const char * __restrict s2, rsize_t n)
 {
     const char *msg = "";
-    size_t s1_len = 0;
-    bool write_null = true;
+    size_t      s1_len = 0;
+    bool        write_null = true;
 
     s1_len = strnlen_s(s1, s1max);
 
@@ -80,7 +80,7 @@ strncat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2, rsize_t
         // compute chars available in s1
         uint32_t m = (s1max - s1_len);
         uint32_t i = 0;
-        char *s1cp = s1;
+        char    *s1cp = s1;
 
         for (i = 0u; i < s1_len; i++) {
             s1cp++;
@@ -91,7 +91,7 @@ strncat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2, rsize_t
         // perhaps not since overlap check needs to be over entire s1 vs. s2?
 
         const char *overlap_point;
-        bool check_s1_for_overlap;
+        bool        check_s1_for_overlap;
         const char *s2cp = s2;
 
         if (s1 <= s2) {
@@ -110,7 +110,7 @@ strncat_s(char *__restrict s1, rsize_t s1max, const char *__restrict s2, rsize_t
         }
 
         uint32_t written = 0;
-        char c = '.';
+        char     c = '.';
 
         while ((written < m) && (written < n)) {
             if (check_s1_for_overlap == true) {

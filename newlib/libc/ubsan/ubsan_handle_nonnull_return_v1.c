@@ -36,11 +36,10 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_nonnull_return_v1(void *_data,
-                                 void *_location)
+__ubsan_handle_nonnull_return_v1(void *_data, void *_location)
 {
     struct nonnull_return_data *data = _data;
-    struct source_location *location = _location;
-    __ubsan_error(&data->location, "nonnull_return_v1", "source %s:%u\n",
-                  location->file_name, location->line);
+    struct source_location     *location = _location;
+    __ubsan_error(&data->location, "nonnull_return_v1", "source %s:%u\n", location->file_name,
+                  location->line);
 }

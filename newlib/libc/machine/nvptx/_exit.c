@@ -23,21 +23,19 @@
    (for instance in offloading).  You probably shouldn't be calling
    'exit' in an offloaded region anyway, but that'd be a runtime
    error, not a link error.  */
-int *__attribute((weak)) __exitval_ptr;
+int * __attribute((weak)) __exitval_ptr;
 
 void __noreturn
-_exit (int status)
+_exit(int status)
 {
-  if (__exitval_ptr)
+    if (__exitval_ptr) {
+        *__exitval_ptr = status;
+        for (;;)
+            asm("exit;" ::: "memory");
+    } else /* offloading */
     {
-      *__exitval_ptr = status;
-      for (;;)
-	asm ("exit;" ::: "memory");
-    }
-  else /* offloading */
-    {
-      /* Map to 'abort'; see <https://gcc.gnu.org/PR85463>
-	 '[nvptx] "exit" in offloaded region doesn't terminate process'.  */
-      abort ();
+        /* Map to 'abort'; see <https://gcc.gnu.org/PR85463>
+           '[nvptx] "exit" in offloaded region doesn't terminate process'.  */
+        abort();
     }
 }

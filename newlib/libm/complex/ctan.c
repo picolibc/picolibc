@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -64,7 +64,6 @@ QUICKREF
 
 */
 
-
 #include <complex.h>
 #include <math.h>
 #include "cephes_subr.h"
@@ -72,17 +71,18 @@ QUICKREF
 double complex
 ctan(double complex z)
 {
-	double d;
+    double d;
 
-	d = cos(2.0 * creal(z)) + cosh(2.0 * cimag(z));
+    d = cos(2.0 * creal(z)) + cosh(2.0 * cimag(z));
 
-	if (fabs(d) < 0.25)
-		d = _ctans(z);
+    if (fabs(d) < 0.25)
+        d = _ctans(z);
 
-	if (d == 0.0) {
-		/* mtherr ("ctan", OVERFLOW); */
-		return HUGE_VAL + HUGE_VAL * (double complex) I;
-	}
+    if (d == 0.0) {
+        /* mtherr ("ctan", OVERFLOW); */
+        return HUGE_VAL + HUGE_VAL * (double complex)I;
+    }
 
-	return (double complex) (sin(2.0 * creal(z)) / d) + (sinh(2.0 * cimag(z)) / d) * (double complex) I;
+    return (double complex)(sin(2.0 * creal(z)) / d)
+        + (sinh(2.0 * cimag(z)) / d) * (double complex)I;
 }

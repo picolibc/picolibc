@@ -37,7 +37,7 @@ long double
 truncl(long double x)
 {
     union IEEEl2bits u;
-    double dh, dl;
+    double           dh, dl;
 
     u.e = x;
     if (u.bits.exp == LDBL_INF_NAN_EXP)
@@ -47,5 +47,5 @@ truncl(long double x)
         dl = 0;
     else
         dl = dh > 0 ? floor(u.dbits.dl) : ceil(u.dbits.dl);
-    return (long double) dh + (long double) dl;
+    return (long double)dh + (long double)dl;
 }

@@ -40,8 +40,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _EXP2F4_H_
-#define _EXP2F4_H_	1
-
+#define _EXP2F4_H_ 1
 
 #include <spu_intrinsics.h>
 #include "simdmath.h"
@@ -51,10 +50,10 @@
  *	vector float _exp2f4(vector float x)
  *
  * DESCRIPTION
- *	The _exp2f4 function computes 2 raised to the input vector x. 
+ *	The _exp2f4 function computes 2 raised to the input vector x.
  *      Computation is performed by observing the 2^(a+b) = 2^a * 2^b.
  *	We decompose x into a and b (above) by letting.
- *	a = ceil(x), b = x - a; 
+ *	a = ceil(x), b = x - a;
  *
  *	2^a is easilty computed by placing a into the exponent
  *	or a floating point number whose mantissa is all zeros.
@@ -64,7 +63,7 @@
  *
  *                __7__
  *		  \
- *		   \ 
+ *		   \
  *	2^(-x) =   /     Ci*x^i
  *                /____
  *                 i=1
@@ -81,53 +80,54 @@
  *	C7 = -0.0001413161
  *
  */
-static __inline vector float _exp2f4(vector float x)
+static __inline vector float
+_exp2f4(vector float x)
 {
-  vector signed int ix;
-  vector unsigned int overflow, underflow;
-  vector float frac, frac2, frac4;
-  vector float exp_int, exp_frac;
-  vector float result;
-  vector float hi, lo;
+    vector signed int   ix;
+    vector unsigned int overflow, underflow;
+    vector float        frac, frac2, frac4;
+    vector float        exp_int, exp_frac;
+    vector float        result;
+    vector float        hi, lo;
 
-  vector float bias;
-  /* Break in the input x into two parts ceil(x), x - ceil(x).
-   */
-  bias = (vector float)(spu_rlmaska((vector signed int)(x), -31));
-  bias = (vector float)(spu_andc(spu_splats((unsigned int)0x3F7FFFFF), (vector unsigned int)bias));
-  ix = spu_convts(spu_add(x, bias), 0);
-  frac = spu_sub(spu_convtf(ix, 0), x);
-  frac = spu_mul(frac, spu_splats((float)SM_LN2));
+    vector float        bias;
+    /* Break in the input x into two parts ceil(x), x - ceil(x).
+     */
+    bias = (vector float)(spu_rlmaska((vector signed int)(x), -31));
+    bias
+        = (vector float)(spu_andc(spu_splats((unsigned int)0x3F7FFFFF), (vector unsigned int)bias));
+    ix = spu_convts(spu_add(x, bias), 0);
+    frac = spu_sub(spu_convtf(ix, 0), x);
+    frac = spu_mul(frac, spu_splats((float)SM_LN2));
 
-  overflow = spu_rlmask(spu_cmpgt(ix, 128), -1);
-  underflow = spu_cmpgt(ix, -128);
+    overflow = spu_rlmask(spu_cmpgt(ix, 128), -1);
+    underflow = spu_cmpgt(ix, -128);
 
-  exp_int = (vector float)spu_and((vector unsigned int)spu_sl(spu_add(ix, 127), 23), underflow);
+    exp_int = (vector float)spu_and((vector unsigned int)spu_sl(spu_add(ix, 127), 23), underflow);
 
-  /* Instruction counts can be reduced if the polynomial was
-   * computed entirely from nested (dependent) fma's. However, 
-   * to reduce the number of pipeline stalls, the polygon is evaluated 
-   * in two halves (hi amd lo). 
-   */
-  frac2 = spu_mul(frac, frac);
-  frac4 = spu_mul(frac2, frac2);
+    /* Instruction counts can be reduced if the polynomial was
+     * computed entirely from nested (dependent) fma's. However,
+     * to reduce the number of pipeline stalls, the polygon is evaluated
+     * in two halves (hi amd lo).
+     */
+    frac2 = spu_mul(frac, frac);
+    frac4 = spu_mul(frac2, frac2);
 
-  hi = spu_madd(frac, spu_splats(-0.0001413161f), spu_splats(0.0013298820f));
-  hi = spu_madd(frac, hi, spu_splats(-0.0083013598f));
-  hi = spu_madd(frac, hi, spu_splats(0.0416573475f));
-  lo = spu_madd(frac, spu_splats(-0.1666653019f), spu_splats(0.4999999206f));
-  lo = spu_madd(frac, lo, spu_splats(-0.9999999995f));
-  lo = spu_madd(frac, lo, spu_splats(1.0f));
+    hi = spu_madd(frac, spu_splats(-0.0001413161f), spu_splats(0.0013298820f));
+    hi = spu_madd(frac, hi, spu_splats(-0.0083013598f));
+    hi = spu_madd(frac, hi, spu_splats(0.0416573475f));
+    lo = spu_madd(frac, spu_splats(-0.1666653019f), spu_splats(0.4999999206f));
+    lo = spu_madd(frac, lo, spu_splats(-0.9999999995f));
+    lo = spu_madd(frac, lo, spu_splats(1.0f));
 
-  exp_frac = spu_madd(frac4, hi, lo);
-  ix = spu_add(ix, spu_rlmask((vector signed int)(exp_frac), -23));
-  result = spu_mul(exp_frac, exp_int);
+    exp_frac = spu_madd(frac4, hi, lo);
+    ix = spu_add(ix, spu_rlmask((vector signed int)(exp_frac), -23));
+    result = spu_mul(exp_frac, exp_int);
 
-  /* Handle overflow */
-  result = spu_or(result, (vector float)overflow);
+    /* Handle overflow */
+    result = spu_or(result, (vector float)overflow);
 
-  return (result);
-
+    return (result);
 }
 
 #endif /* _EXP2F4_H_ */

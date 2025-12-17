@@ -24,11 +24,10 @@
  * SUCH DAMAGE.
  */
 
-
 #include <limits.h>
 #ifndef dtype
-#define dtype long
-#define fn lrintl
+#define dtype     long
+#define fn        lrintl
 #define DTYPE_MIN LONG_MIN
 #define DTYPE_MAX LONG_MAX
 #endif
@@ -43,15 +42,15 @@
 dtype
 fn(long double x)
 {
-	x = rintl(x);
+    x = rintl(x);
 
-        /*
-         * Bounds check to ensure the operation is defined and
-         * to prevent an exception from being raised
-         */
-        if (!(DTYPE_MIN <= x && x <= DTYPE_MAX)) {
-            __math_set_invalidl();
-            return signbit(x) ? DTYPE_MIN : DTYPE_MAX;
-        }
-	return (dtype) x;
+    /*
+     * Bounds check to ensure the operation is defined and
+     * to prevent an exception from being raised
+     */
+    if (!(DTYPE_MIN <= x && x <= DTYPE_MAX)) {
+        __math_set_invalidl();
+        return signbit(x) ? DTYPE_MIN : DTYPE_MAX;
+    }
+    return (dtype)x;
 }

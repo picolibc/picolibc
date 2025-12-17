@@ -41,16 +41,16 @@
 int
 msp430_putc(char c, FILE *file)
 {
-        (void) file;
-        msp430_semihost_1(MSP430_SEMIHOST_PUTCHAR, c);
-        return (unsigned char) c;
+    (void)file;
+    msp430_semihost_1(MSP430_SEMIHOST_PUTCHAR, c);
+    return (unsigned char)c;
 }
 
 static int
 msp430_getc(FILE *file)
 {
-	(void) file;
-	return EOF;
+    (void)file;
+    return EOF;
 }
 
 static FILE __stdio = FDEV_SETUP_STREAM(msp430_putc, msp430_getc, NULL, _FDEV_SETUP_RW);
@@ -58,9 +58,9 @@ static FILE __stdio = FDEV_SETUP_STREAM(msp430_putc, msp430_getc, NULL, _FDEV_SE
 #ifdef __strong_reference
 #define STDIO_ALIAS(x) __strong_reference(stdin, x);
 #else
-#define STDIO_ALIAS(x) FILE *const x = &__stdio;
+#define STDIO_ALIAS(x) FILE * const x = &__stdio;
 #endif
 
-FILE *const stdin = &__stdio;
+FILE * const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);

@@ -36,14 +36,14 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (malloc_ea);
+COMPAT_EA_ALIAS(malloc_ea);
 
 __ea void *
-malloc_ea (size_ea_t size)
+malloc_ea(size_ea_t size)
 {
-  unsigned long long sz;
+    unsigned long long sz;
 
-  sz = (unsigned long long) size;
-  __send_to_ppe (JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_MALLOC, &sz);
-  return ull_to_eavoid (sz);
+    sz = (unsigned long long)size;
+    __send_to_ppe(JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_MALLOC, &sz);
+    return ull_to_eavoid(sz);
 }

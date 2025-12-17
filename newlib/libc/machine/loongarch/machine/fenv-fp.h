@@ -43,24 +43,24 @@
  */
 
 #define _FPU_DEFAULT 0x0
-#define _FPU_IEEE 0x1F
+#define _FPU_IEEE    0x1F
 
 __declare_fenv_inline(int) feclearexcept(int excepts)
 {
-  int fcsr;
+    int fcsr;
 
-  excepts &= FE_ALL_EXCEPT;
-  _movfcsr2gr(fcsr);
-  fcsr &= ~(excepts | (excepts << _FCSR_CAUSE_LSHIFT));
-  _movgr2fcsr(fcsr);
+    excepts &= FE_ALL_EXCEPT;
+    _movfcsr2gr(fcsr);
+    fcsr &= ~(excepts | (excepts << _FCSR_CAUSE_LSHIFT));
+    _movgr2fcsr(fcsr);
 
-  /* Per 'feclearexcept.html
-   * "If the argument is zero or if all the specified exceptions were
-   * successfully cleared, feclearexcept() shall return zero. Otherwise,
-   * it shall return a non-zero value."
-   */
+    /* Per 'feclearexcept.html
+     * "If the argument is zero or if all the specified exceptions were
+     * successfully cleared, feclearexcept() shall return zero. Otherwise,
+     * it shall return a non-zero value."
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -77,19 +77,19 @@ __declare_fenv_inline(int) feclearexcept(int excepts)
 __declare_fenv_inline(int) fegetenv(fenv_t *envp)
 {
 
-  /* Get the current environment (FCSR) */
-  int fcsr;
+    /* Get the current environment (FCSR) */
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
-  *envp = fcsr;
+    _movfcsr2gr(fcsr);
+    *envp = fcsr;
 
-  /* Per 'fegetenv.html:
-   *
-   * "If the representation was successfully stored, fegetenv() shall
-   * return zero. Otherwise, it shall return a non-zero value.
-   */
+    /* Per 'fegetenv.html:
+     *
+     * "If the representation was successfully stored, fegetenv() shall
+     * return zero. Otherwise, it shall return a non-zero value.
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -107,20 +107,20 @@ __declare_fenv_inline(int) fegetenv(fenv_t *envp)
 __declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 {
 
-  int fcsr;
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
+    _movfcsr2gr(fcsr);
 
-  *flagp = fcsr & excepts & FE_ALL_EXCEPT;
+    *flagp = fcsr & excepts & FE_ALL_EXCEPT;
 
-  /* Per 'fegetexceptflag.html:
-   *
-   * "If the representation was successfully stored, fegetexceptflag()
-   * shall return zero. Otherwise, it shall return a non-zero
-   * value."
-   */
+    /* Per 'fegetexceptflag.html:
+     *
+     * "If the representation was successfully stored, fegetexceptflag()
+     * shall return zero. Otherwise, it shall return a non-zero
+     * value."
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -135,23 +135,22 @@ __declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 __declare_fenv_inline(int) fegetround(void)
 {
 
-  /* Get current rounding mode */
-  int fcsr;
+    /* Get current rounding mode */
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
+    _movfcsr2gr(fcsr);
 
-  /* Per 'fegetround.html:
-   *
-   * "The fegetround() function shall return the value of the rounding
-   * direction macro representing the current rounding direction or a
-   * negative value if there is no such rounding direction macro or
-   * the current rounding direction is not determinable."
-   */
+    /* Per 'fegetround.html:
+     *
+     * "The fegetround() function shall return the value of the rounding
+     * direction macro representing the current rounding direction or a
+     * negative value if there is no such rounding direction macro or
+     * the current rounding direction is not determinable."
+     */
 
-  /* Return the rounding mode */
+    /* Return the rounding mode */
 
-  return fcsr & FE_RMODE_MASK;
-
+    return fcsr & FE_RMODE_MASK;
 }
 
 /* This implementation is intended to comply with the following
@@ -170,25 +169,24 @@ __declare_fenv_inline(int) fegetround(void)
 __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
 
-  /* Store the current FP environment in envp*/
-  int fcsr;
+    /* Store the current FP environment in envp*/
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
-  *envp = fcsr;
+    _movfcsr2gr(fcsr);
+    *envp = fcsr;
 
-  /* Clear all exception enable bits and flags.  */
-  fcsr &= ~(FE_ALL_EXCEPT >> _FCSR_ENABLE_RSHIFT | FE_ALL_EXCEPT);
-  _movgr2fcsr(fcsr);
+    /* Clear all exception enable bits and flags.  */
+    fcsr &= ~(FE_ALL_EXCEPT >> _FCSR_ENABLE_RSHIFT | FE_ALL_EXCEPT);
+    _movgr2fcsr(fcsr);
 
+    /* Per 'feholdexcept.html:
+     *
+     * "The feholdexcept() function shall return zero if and only if
+     * non-stop floating-point exception handling was successfully
+     * installed."
+     */
 
-  /* Per 'feholdexcept.html:
-   *
-   * "The feholdexcept() function shall return zero if and only if
-   * non-stop floating-point exception handling was successfully
-   * installed."
-   */
-
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -211,62 +209,47 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 
 __declare_fenv_inline(int) feraiseexcept(int excepts)
 {
-  const float fp_zero = 0.0f;
-  const float fp_one = 1.0f;
-  const float fp_max = __FLT_MAX__;
-  const float fp_min = __FLT_MIN__;
-  const float fp_1e32 = 1.0e32f;
-  const float fp_two = 2.0f;
-  const float fp_three = 3.0f;
+    const float fp_zero = 0.0f;
+    const float fp_one = 1.0f;
+    const float fp_max = __FLT_MAX__;
+    const float fp_min = __FLT_MIN__;
+    const float fp_1e32 = 1.0e32f;
+    const float fp_two = 2.0f;
+    const float fp_three = 3.0f;
 
-  if (FE_INVALID & excepts)
-    __asm__ __volatile__("fdiv.s $f0,%0,%0\n\t"
-			 :
-			 : "f"(fp_zero)
-			 : "$f0");
+    if (FE_INVALID & excepts)
+        __asm__ __volatile__("fdiv.s $f0,%0,%0\n\t" : : "f"(fp_zero) : "$f0");
 
-  if (FE_DIVBYZERO & excepts)
-    __asm__ __volatile__("fdiv.s $f0,%0,%1\n\t"
-			 :
-			 : "f"(fp_one), "f"(fp_zero)
-			 : "$f0");
+    if (FE_DIVBYZERO & excepts)
+        __asm__ __volatile__("fdiv.s $f0,%0,%1\n\t" : : "f"(fp_one), "f"(fp_zero) : "$f0");
 
-  if (FE_OVERFLOW & excepts)
-    __asm__ __volatile__("fadd.s $f0,%0,%1\n\t"
-			 :
-			 : "f"(fp_max), "f"(fp_1e32)
-			 : "$f0");
+    if (FE_OVERFLOW & excepts)
+        __asm__ __volatile__("fadd.s $f0,%0,%1\n\t" : : "f"(fp_max), "f"(fp_1e32) : "$f0");
 
-  if (FE_UNDERFLOW & excepts)
-    __asm__ __volatile__("fdiv.s $f0,%0,%1\n\t"
-			 :
-			 : "f"(fp_min), "f"(fp_three)
-			 : "$f0");
+    if (FE_UNDERFLOW & excepts)
+        __asm__ __volatile__("fdiv.s $f0,%0,%1\n\t" : : "f"(fp_min), "f"(fp_three) : "$f0");
 
-  if (FE_INEXACT & excepts)
-    __asm__ __volatile__("fdiv.s $f0, %0, %1\n\t"
-			 :
-			 : "f"(fp_two), "f"(fp_three)
-			 : "$f0");
+    if (FE_INEXACT & excepts)
+        __asm__ __volatile__("fdiv.s $f0, %0, %1\n\t" : : "f"(fp_two), "f"(fp_three) : "$f0");
 
-  /* Per 'feraiseexcept.html:
-   * "If the argument is zero or if all the specified exceptions were
-   * successfully raised, feraiseexcept() shall return
-   * zero. Otherwise, it shall return a non-zero value."
-   */
+    /* Per 'feraiseexcept.html:
+     * "If the argument is zero or if all the specified exceptions were
+     * successfully raised, feraiseexcept() shall return
+     * zero. Otherwise, it shall return a non-zero value."
+     */
 
-  return 0;
+    return 0;
 }
 
 __declare_fenv_inline(int) fesetexcept(int excepts)
 {
-  int fcsr;
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
-  fcsr |= excepts & FE_ALL_EXCEPT;
-  _movgr2fcsr(fcsr);
+    _movfcsr2gr(fcsr);
+    fcsr |= excepts & FE_ALL_EXCEPT;
+    _movgr2fcsr(fcsr);
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -290,23 +273,22 @@ __declare_fenv_inline(int) fesetexcept(int excepts)
 __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
 
-  /* Set environment (FCSR) */
+    /* Set environment (FCSR) */
 
-  fenv_t fcsr;
-  
-  /* Hazard handling */
-  _movfcsr2gr(fcsr);
-  fcsr = *envp;
-  _movgr2fcsr(fcsr);
+    fenv_t fcsr;
 
+    /* Hazard handling */
+    _movfcsr2gr(fcsr);
+    fcsr = *envp;
+    _movgr2fcsr(fcsr);
 
-  /* Per 'fegetenv.html:
-   *
-   * "If the environment was successfully established, fesetenv()
-   * shall return zero. Otherwise, it shall return a non-zero value.
-   */
+    /* Per 'fegetenv.html:
+     *
+     * "If the environment was successfully established, fesetenv()
+     * shall return zero. Otherwise, it shall return a non-zero value.
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -328,23 +310,23 @@ __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 
 __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-  int fcsr;
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
+    _movfcsr2gr(fcsr);
 
-  excepts &= FE_ALL_EXCEPT;
-  fcsr = (fcsr & ~excepts) | (*flagp & excepts);
+    excepts &= FE_ALL_EXCEPT;
+    fcsr = (fcsr & ~excepts) | (*flagp & excepts);
 
-  _movgr2fcsr(fcsr);
+    _movgr2fcsr(fcsr);
 
-  /* Per 'fesetexceptflag.html:
-   *
-   * "If the excepts argument is zero or if all the specified
-   * exceptions were successfully set, fesetexceptflag() shall return
-   * zero. Otherwise, it shall return a non-zero value."
-   */
+    /* Per 'fesetexceptflag.html:
+     *
+     * "If the excepts argument is zero or if all the specified
+     * exceptions were successfully set, fesetexceptflag() shall return
+     * zero. Otherwise, it shall return a non-zero value."
+     */
 
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -362,24 +344,23 @@ __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 __declare_fenv_inline(int) fesetround(int round)
 {
 
-  int fcsr;
+    int fcsr;
 
-  if ((round & ~FE_RMODE_MASK) != 0)
-    return -1;
+    if ((round & ~FE_RMODE_MASK) != 0)
+        return -1;
 
-  _movfcsr2gr(fcsr);
-  fcsr &= ~FE_RMODE_MASK;
-  fcsr |= round;
-  _movgr2fcsr(fcsr);
+    _movfcsr2gr(fcsr);
+    fcsr &= ~FE_RMODE_MASK;
+    fcsr |= round;
+    _movgr2fcsr(fcsr);
 
+    /* Per 'fesetround.html:
+     *
+     * "The fesetround() function shall return a zero value if and only
+     * if the requested rounding direction was established."
+     */
 
-  /* Per 'fesetround.html:
-   *
-   * "The fesetround() function shall return a zero value if and only
-   * if the requested rounding direction was established."
-   */
-
-  return 0;
+    return 0;
 }
 
 /* This implementation is intended to comply with the following
@@ -395,17 +376,17 @@ __declare_fenv_inline(int) fesetround(int round)
 
 __declare_fenv_inline(int) fetestexcept(int excepts)
 {
-  int fcsr;
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
+    _movfcsr2gr(fcsr);
 
-  /* "The fetestexcept() function shall return the value of the
-   * bitwise-inclusive OR of the floating-point exception macros
-   * corresponding to the currently set floating-point exceptions
-   * included in excepts."
-   */
+    /* "The fetestexcept() function shall return the value of the
+     * bitwise-inclusive OR of the floating-point exception macros
+     * corresponding to the currently set floating-point exceptions
+     * included in excepts."
+     */
 
-  return (fcsr & excepts & FE_ALL_EXCEPT);
+    return (fcsr & excepts & FE_ALL_EXCEPT);
 }
 
 /* This implementation is intended to comply with the following
@@ -424,58 +405,57 @@ __declare_fenv_inline(int) fetestexcept(int excepts)
 
 __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
-  int fcsr;
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
+    _movfcsr2gr(fcsr);
 
-  fesetenv(envp);
+    fesetenv(envp);
 
-  feraiseexcept(fcsr & FE_ALL_EXCEPT);
+    feraiseexcept(fcsr & FE_ALL_EXCEPT);
 
-  /* "The feupdateenv() function shall return a zero value if and only
-   * if all the required actions were successfully carried out."
-   */
+    /* "The feupdateenv() function shall return a zero value if and only
+     * if all the required actions were successfully carried out."
+     */
 
-  return 0;
-
+    return 0;
 }
 
 __declare_fenv_inline(int) feenableexcept(int excepts)
 {
-  int fcsr, old_excepts;
+    int fcsr, old_excepts;
 
-  _movfcsr2gr(fcsr);
+    _movfcsr2gr(fcsr);
 
-  old_excepts = (fcsr << _FCSR_ENABLE_RSHIFT) & FE_ALL_EXCEPT;
+    old_excepts = (fcsr << _FCSR_ENABLE_RSHIFT) & FE_ALL_EXCEPT;
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  fcsr |= excepts >> _FCSR_ENABLE_RSHIFT;
-  _movgr2fcsr(fcsr);
+    fcsr |= excepts >> _FCSR_ENABLE_RSHIFT;
+    _movgr2fcsr(fcsr);
 
-  return old_excepts;
+    return old_excepts;
 }
 
 __declare_fenv_inline(int) fedisableexcept(int excepts)
 {
-  int fcsr, old_excepts;
+    int fcsr, old_excepts;
 
-  _movfcsr2gr(fcsr);
+    _movfcsr2gr(fcsr);
 
-  old_excepts = (fcsr << _FCSR_ENABLE_RSHIFT) & FE_ALL_EXCEPT;
+    old_excepts = (fcsr << _FCSR_ENABLE_RSHIFT) & FE_ALL_EXCEPT;
 
-  excepts &= FE_ALL_EXCEPT;
+    excepts &= FE_ALL_EXCEPT;
 
-  fcsr &= ~(excepts >> _FCSR_ENABLE_RSHIFT);
-  _movgr2fcsr(fcsr);
+    fcsr &= ~(excepts >> _FCSR_ENABLE_RSHIFT);
+    _movgr2fcsr(fcsr);
 
-  return old_excepts;
+    return old_excepts;
 }
 
 __declare_fenv_inline(int) fegetexcept(void)
 {
-  int fcsr;
+    int fcsr;
 
-  _movfcsr2gr(fcsr);
-  return (fcsr << _FCSR_ENABLE_RSHIFT) & FE_ALL_EXCEPT;
+    _movfcsr2gr(fcsr);
+    return (fcsr << _FCSR_ENABLE_RSHIFT) & FE_ALL_EXCEPT;
 }

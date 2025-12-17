@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _RINT_H_
-#define _RINT_H_	1
+#define _RINT_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -39,21 +39,21 @@
 /* Round the input to the nearest integer according to the current
  * rounding mode.
  */
-static __inline double _rint(double x)
+static __inline double
+_rint(double x)
 {
-  vec_ullong2 sign = VEC_SPLAT_U64(0x8000000000000000ULL);
-  vec_double2 in, out, addend;
+    vec_ullong2 sign = VEC_SPLAT_U64(0x8000000000000000ULL);
+    vec_double2 in, out, addend;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Add 2^53 and then subtract 2^53 to affect a round to be performed by the
-   * hardware. Also preserve the input sign so that negative inputs that
-   * round to zero generate a -0.0.
-   */
-  addend = spu_sel((vec_double2)(VEC_SPLAT_U64(0x4330000000000000ULL)),
-                   in, sign);
-  out = spu_sel(spu_sub(spu_add(in, addend), addend), in, sign);
+    /* Add 2^53 and then subtract 2^53 to affect a round to be performed by the
+     * hardware. Also preserve the input sign so that negative inputs that
+     * round to zero generate a -0.0.
+     */
+    addend = spu_sel((vec_double2)(VEC_SPLAT_U64(0x4330000000000000ULL)), in, sign);
+    out = spu_sel(spu_sub(spu_add(in, addend), addend), in, sign);
 
-  return (spu_extract(out, 0));
+    return (spu_extract(out, 0));
 }
 #endif /* _RINT_H_ */

@@ -6,7 +6,8 @@
 
 #include "fdlibm.h"
 
-float fminf(float x, float y)
+float
+fminf(float x, float y)
 {
     if (issignaling(x) || issignaling(y))
         return x + y;

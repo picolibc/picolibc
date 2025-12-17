@@ -33,10 +33,10 @@
 
 #include <sys/cdefs.h>
 
-#define unctrl(c)		__unctrl[(c) & 0xff]
-#define unctrllen(ch)		__unctrllen[(ch) & 0xff]
+#define unctrl(c)     __unctrl[(c) & 0xff]
+#define unctrllen(ch) __unctrllen[(ch) & 0xff]
 
-extern const char * const __unctrl[256];	/* Control strings. */
-extern const char __unctrllen[256];	        /* Control strings length. */
+extern const char * const __unctrl[256];    /* Control strings. */
+extern const char         __unctrllen[256]; /* Control strings length. */
 
 #endif /* _UNCTRL_H_ */

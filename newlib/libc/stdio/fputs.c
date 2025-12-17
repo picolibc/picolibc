@@ -34,23 +34,23 @@
 int
 fputs(const char *str, FILE *stream)
 {
-        int (*put)(char, struct __file *);
-	char c;
-	int ret = EOF;
+    int  (*put)(char, struct __file *);
+    char c;
+    int  ret = EOF;
 
-	__flockfile(stream);
-	if ((stream->flags & __SWR) == 0)
-		goto fail;
+    __flockfile(stream);
+    if ((stream->flags & __SWR) == 0)
+        goto fail;
 
-        put = stream->put;
+    put = stream->put;
 
-	while ((c = *str++) != '\0')
-                if (put(c, stream) < 0) {
-                        stream->flags |= __SERR;
-			goto fail;
-                }
+    while ((c = *str++) != '\0')
+        if (put(c, stream) < 0) {
+            stream->flags |= __SERR;
+            goto fail;
+        }
 
-	ret = 0;
+    ret = 0;
 fail:
-	__funlock_return(stream, ret);
+    __funlock_return(stream, ret);
 }

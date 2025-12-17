@@ -36,33 +36,31 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-typedef struct
-{
-  unsigned int memptr;
-  unsigned int pad0[3];
-  unsigned long long align;
-  unsigned int pad1[2];
-  unsigned long long size;
-  unsigned int pad2[2];
+typedef struct {
+    unsigned int       memptr;
+    unsigned int       pad0[3];
+    unsigned long long align;
+    unsigned int       pad1[2];
+    unsigned long long size;
+    unsigned int       pad2[2];
 } memalign_ea_t;
 
-COMPAT_EA_ALIAS (posix_memalign_ea);
+COMPAT_EA_ALIAS(posix_memalign_ea);
 
 int
-posix_memalign_ea (__ea void **memptr, size_ea_t align, size_ea_t size)
+posix_memalign_ea(__ea void **memptr, size_ea_t align, size_ea_t size)
 {
-  memalign_ea_t arg;
+    memalign_ea_t arg;
 
-  /*
-   * Note that memptr is an LS address that will store an EA address. So,
-   * it fits in 32 bits.
-   *
-   * The assist call will store 32 or 64 bits, depending on whether it's
-   * 32 or 64 bit ppu code.
-   */
-  arg.memptr = (unsigned int) memptr;
-  arg.align = (unsigned long long) align;
-  arg.size = (unsigned long long) size;
-  return __send_to_ppe (JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_POSIX_MEMALIGN,
-			&arg);
+    /*
+     * Note that memptr is an LS address that will store an EA address. So,
+     * it fits in 32 bits.
+     *
+     * The assist call will store 32 or 64 bits, depending on whether it's
+     * 32 or 64 bit ppu code.
+     */
+    arg.memptr = (unsigned int)memptr;
+    arg.align = (unsigned long long)align;
+    arg.size = (unsigned long long)size;
+    return __send_to_ppe(JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_POSIX_MEMALIGN, &arg);
 }

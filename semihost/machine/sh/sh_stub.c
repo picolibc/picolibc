@@ -45,71 +45,73 @@
 ssize_t
 read(int fd, void *buf, size_t count)
 {
-        char *b = buf;
-        (void) fd;
-        (void) count;
-        *b = sh_getc(NULL);
-	return 1;
+    char *b = buf;
+    (void)fd;
+    (void)count;
+    *b = sh_getc(NULL);
+    return 1;
 }
 
 ssize_t
 write(int fd, const void *buf, size_t count)
 {
-	const char *b = buf;
-	size_t c = count;
+    const char *b = buf;
+    size_t      c = count;
 
-        (void) fd;
-	while (c--)
-                sh_putc(*b++, NULL);
-	return count;
+    (void)fd;
+    while (c--)
+        sh_putc(*b++, NULL);
+    return count;
 }
 
 int
 open(const char *pathname, int flags, ...)
 {
-        (void) pathname;
-        (void) flags;
-	return -1;
+    (void)pathname;
+    (void)flags;
+    return -1;
 }
 
 int
 close(int fd)
 {
-        (void) fd;
-	return 0;
+    (void)fd;
+    return 0;
 }
 
-off_t lseek(int fd, off_t offset, int whence)
+off_t
+lseek(int fd, off_t offset, int whence)
 {
-        (void) fd;
-        (void) offset;
-        (void) whence;
-	return (off_t) -1;
+    (void)fd;
+    (void)offset;
+    (void)whence;
+    return (off_t)-1;
 }
 
-_off64_t lseek64(int fd, _off64_t offset, int whence)
+_off64_t
+lseek64(int fd, _off64_t offset, int whence)
 {
-	return (_off64_t) lseek(fd, (off_t) offset, whence);
+    return (_off64_t)lseek(fd, (off_t)offset, whence);
 }
 
 int
 unlink(const char *pathname)
 {
-        (void) pathname;
-	return 0;
+    (void)pathname;
+    return 0;
 }
 
 int
-fstat (int fd, struct stat *sbuf)
+fstat(int fd, struct stat *sbuf)
 {
-        (void) fd;
-        (void) sbuf;
-	return -1;
+    (void)fd;
+    (void)sbuf;
+    return -1;
 }
 
 int
-isatty (int fd)
+isatty(int fd)
 {
-        (void) fd;
-	return 1;
+    (void)fd;
+    return 1;
 }

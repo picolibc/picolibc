@@ -14,34 +14,34 @@
 
 /*
 FUNCTION
-	<<pow10>>, <<pow10f>>---base 10 power functions
+        <<pow10>>, <<pow10f>>---base 10 power functions
 INDEX
-	pow10
+        pow10
 INDEX
-	pow10f
+        pow10f
 
 SYNOPSIS
-	#include <math.h>
-	double pow10(double <[x]>);
-	float pow10f(float <[x]>);
+        #include <math.h>
+        double pow10(double <[x]>);
+        float pow10f(float <[x]>);
 
 DESCRIPTION
-	<<pow10>> and <<pow10f>> calculate 10 ^ <[x]>, that is, 
-	@ifnottex
-	10 raised to the power <[x]>.
-	@end ifnottex
-	@tex
-	$10^x$
-	@end tex
+        <<pow10>> and <<pow10f>> calculate 10 ^ <[x]>, that is,
+        @ifnottex
+        10 raised to the power <[x]>.
+        @end ifnottex
+        @tex
+        $10^x$
+        @end tex
 
 RETURNS
-	On success, <<pow10>> and <<pow10f>> return the calculated value.
-	If the result underflows, the returned value is <<0>>.  If the
-	result overflows, the returned value is <<HUGE_VAL>>.  In
-	either case, <<errno>> is set to <<ERANGE>>.
+        On success, <<pow10>> and <<pow10f>> return the calculated value.
+        If the result underflows, the returned value is <<0>>.  If the
+        result overflows, the returned value is <<HUGE_VAL>>.  In
+        either case, <<errno>> is set to <<ERANGE>>.
 
 PORTABILITY
-	<<pow10>> and <<pow10f>> are GNU extensions.
+        <<pow10>> and <<pow10f>> are GNU extensions.
 */
 
 /*
@@ -56,9 +56,10 @@ PORTABILITY
 
 #ifdef _NEED_FLOAT64
 
-__float64 pow1064(__float64 x)		/* wrapper pow10 */
+__float64
+pow1064(__float64 x) /* wrapper pow10 */
 {
-  return _pow64(_F_64(10.0), x);
+    return _pow64(_F_64(10.0), x);
 }
 
 _MATH_ALIAS_d_d(pow10)

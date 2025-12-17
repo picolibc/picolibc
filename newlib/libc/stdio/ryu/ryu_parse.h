@@ -25,17 +25,12 @@
 // This implementation does not currently support -DRYU_OPTIMIZE_SIZE and always
 // compiles against the large lookup tables.
 
-enum Status {
-  SUCCESS,
-  INPUT_TOO_SHORT,
-  INPUT_TOO_LONG,
-  MALFORMED_INPUT
-};
+enum Status { SUCCESS, INPUT_TOO_SHORT, INPUT_TOO_LONG, MALFORMED_INPUT };
 
-enum Status s2d_n(const char * buffer, const int len, double * result);
-enum Status s2d(const char * buffer, double * result);
+enum Status s2d_n(const char *buffer, const int len, double *result);
+enum Status s2d(const char *buffer, double *result);
 
-enum Status s2f_n(const char * buffer, const int len, float * result);
-enum Status s2f(const char * buffer, float * result);
+enum Status s2f_n(const char *buffer, const int len, float *result);
+enum Status s2f(const char *buffer, float *result);
 
 #endif // RYU_PARSE_H

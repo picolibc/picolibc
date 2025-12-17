@@ -36,22 +36,19 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  const char *old;
-  unsigned int pad0[ 3 ];
-  const char *new;
-  unsigned int pad1[ 3 ];
+typedef struct {
+    const char  *old;
+    unsigned int pad0[3];
+    const char  *new;
+    unsigned int pad1[3];
 } c99_rename_t;
 
-int
-rename (old, new)
-     const char *old;
-     const char *new;
+int         rename(old, new) const char *old;
+const char *new;
 {
-  c99_rename_t args;
-  args.old = old;
-  args.new = new;
+    c99_rename_t args;
+    args.old = old;
+    args.new = new;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_RENAME, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_RENAME, &args);
 }

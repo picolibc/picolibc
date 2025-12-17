@@ -23,10 +23,9 @@ _BEGIN_STD_C
    sure here. */
 #undef basename
 #define basename __xpg_basename
-char      *basename (char *) __asm__(__ASMNAME("basename"));
-char      *dirname (char *);
+char *basename(char *) __asm__(__ASMNAME("basename"));
+char *dirname(char *);
 
 _END_STD_C
 
 #endif /* _LIBGEN_H_ */
-

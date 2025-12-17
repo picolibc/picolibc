@@ -37,10 +37,9 @@ SUCH DAMAGE.
 
 _BEGIN_STD_C
 
-struct utimbuf 
-{
-  time_t actime;
-  time_t modtime; 
+struct utimbuf {
+    time_t actime;
+    time_t modtime;
 };
 
 _END_STD_C

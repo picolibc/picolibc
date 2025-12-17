@@ -1,23 +1,23 @@
 /* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
-/* 
+/*
 FUNCTION
-	<<strnlen>>---character string length
-	
+        <<strnlen>>---character string length
+
 INDEX
-	strnlen
+        strnlen
 
 SYNOPSIS
-	#include <string.h>
-	size_t strnlen(const char *<[str]>, size_t <[n]>);
+        #include <string.h>
+        size_t strnlen(const char *<[str]>, size_t <[n]>);
 
 DESCRIPTION
-	The <<strnlen>> function works out the length of the string
-	starting at <<*<[str]>>> by counting chararacters until it
-	reaches a NUL character or the maximum: <[n]> number of
+        The <<strnlen>> function works out the length of the string
+        starting at <<*<[str]>>> by counting chararacters until it
+        reaches a NUL character or the maximum: <[n]> number of
         characters have been inspected.
 
 RETURNS
-	<<strnlen>> returns the character count or <[n]>.
+        <<strnlen>> returns the character count or <[n]>.
 
 PORTABILITY
 <<strnlen>> is a GNU extension.
@@ -30,13 +30,12 @@ PORTABILITY
 #include <string.h>
 
 size_t
-strnlen (const char *str,
-	size_t n)
+strnlen(const char *str, size_t n)
 {
-  const char *start = str;
+    const char *start = str;
 
-  while (n-- > 0 && *str)
-    str++;
+    while (n-- > 0 && *str)
+        str++;
 
-  return str - start;
+    return str - start;
 }

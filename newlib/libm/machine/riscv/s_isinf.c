@@ -45,8 +45,8 @@
 int
 isinf64(__float64 x)
 {
-	long fclass = _fclass_d (x);
-	return (fclass & FCLASS_INF);
+    long fclass = _fclass_d(x);
+    return (fclass & FCLASS_INF);
 }
 
 #ifdef __strong_reference
@@ -59,8 +59,7 @@ __isinf64(float x)
 }
 #endif
 
-_MATH_ALIAS_i_d(isinf)
-_MATH_ALIAS_i_d(__isinf)
+_MATH_ALIAS_i_d(isinf) _MATH_ALIAS_i_d(__isinf)
 
 #else
 #include "../../common/s_isinf.c"

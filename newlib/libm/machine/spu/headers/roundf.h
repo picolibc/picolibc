@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _ROUNDF_H_
-#define _ROUNDF_H_	1
+#define _ROUNDF_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -39,34 +39,34 @@
 /* Round the input to the nearest integer, rounding halfway
  * cases away from zero.
  */
-static __inline float _roundf(float x)
+static __inline float
+_roundf(float x)
 {
-  vec_int4 exp;
-  vec_uint4 or_mask, and_mask, mask, addend;
-  vec_float4 in, out;
+    vec_int4   exp;
+    vec_uint4  or_mask, and_mask, mask, addend;
+    vec_float4 in, out;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Add 0.5 (fixed precision to eliminate rounding issues)
-   */
-  exp = spu_sub(125, spu_and(spu_rlmask((vec_int4)in, -23), 0xFF));
+    /* Add 0.5 (fixed precision to eliminate rounding issues)
+     */
+    exp = spu_sub(125, spu_and(spu_rlmask((vec_int4)in, -23), 0xFF));
 
-  addend = spu_and(spu_rlmask(VEC_SPLAT_U32(0x1000000), exp),
-                   spu_cmpgt((vec_uint4)exp, -31));
+    addend = spu_and(spu_rlmask(VEC_SPLAT_U32(0x1000000), exp), spu_cmpgt((vec_uint4)exp, -31));
 
-  in = (vec_float4)spu_add((vec_uint4)in, addend);
+    in = (vec_float4)spu_add((vec_uint4)in, addend);
 
-  /* Truncate the result.
-   */
-  exp = spu_sub(127, spu_and(spu_rlmask((vec_int4)in, -23), 0xFF));
+    /* Truncate the result.
+     */
+    exp = spu_sub(127, spu_and(spu_rlmask((vec_int4)in, -23), 0xFF));
 
-  or_mask = spu_cmpgt(exp, 0);
-  and_mask = spu_rlmask(VEC_SPLAT_U32(0x7FFFFF), exp);
+    or_mask = spu_cmpgt(exp, 0);
+    and_mask = spu_rlmask(VEC_SPLAT_U32(0x7FFFFF), exp);
 
-  mask = spu_or(spu_and(and_mask, spu_cmpgt(exp, -31)), or_mask);
+    mask = spu_or(spu_and(and_mask, spu_cmpgt(exp, -31)), or_mask);
 
-  out = spu_andc(in, (vec_float4)(mask));
+    out = spu_andc(in, (vec_float4)(mask));
 
-  return (spu_extract(out, 0));
+    return (spu_extract(out, 0));
 }
 #endif /* _ROUNDF_H_ */

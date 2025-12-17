@@ -38,7 +38,8 @@
  * dest. The memory areas may not overlap. The strncpy subroutine returns
  * a pointer to dest.
  */
-char * strncpy(char * __restrict__ dest, const char * __restrict__ src, size_t n)
+char *
+strncpy(char * __restrict__ dest, const char * __restrict__ src, size_t n)
 {
-  return _strncpy(dest, src, n, 1, 0);
+    return _strncpy(dest, src, n, 1, 0);
 }

@@ -38,7 +38,7 @@
 int
 sys_semihost_putc(char c, FILE *file)
 {
-	(void) file;
-	sys_semihost(SYS_WRITEC, (uintptr_t) &c);
-	return (unsigned char) c;
+    (void)file;
+    sys_semihost(SYS_WRITEC, (uintptr_t)&c);
+    return (unsigned char)c;
 }

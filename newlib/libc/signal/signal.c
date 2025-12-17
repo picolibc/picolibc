@@ -19,11 +19,11 @@ FUNCTION
 <<signal>>---specify handler subroutine for a signal
 
 INDEX
-	signal
+        signal
 
 SYNOPSIS
-	#include <signal.h>
-	void (*signal(int <[sig]>, void(*<[func]>)(int))) (int);
+        #include <signal.h>
+        void (*signal(int <[sig]>, void(*<[func]>)(int))) (int);
 
 DESCRIPTION
 <<signal>> provides a simple signal-handling implementation for embedded
@@ -106,53 +106,49 @@ static _sig_func_ptr _sig_func[_NSIG];
 #endif
 
 _sig_func_ptr
-signal (int sig, _sig_func_ptr func)
+signal(int sig, _sig_func_ptr func)
 {
-  if (sig < 0 || sig >= _NSIG)
-    {
-      errno = EINVAL;
-      return SIG_ERR;
+    if (sig < 0 || sig >= _NSIG) {
+        errno = EINVAL;
+        return SIG_ERR;
     }
 
 #ifdef _USE_ATOMIC_SIGNAL
-  return (_sig_func_ptr) atomic_exchange(&_sig_func[sig], func);
+    return (_sig_func_ptr)atomic_exchange(&_sig_func[sig], func);
 #else
-  _sig_func_ptr old = _sig_func[sig];
-  _sig_func[sig] = func;
-  return old;
+    _sig_func_ptr old = _sig_func[sig];
+    _sig_func[sig] = func;
+    return old;
 #endif
 }
 
 int
-raise (int sig)
+raise(int sig)
 {
-  if (sig < 0 || sig >= _NSIG)
-    {
-      errno = EINVAL;
-      return -1;
+    if (sig < 0 || sig >= _NSIG) {
+        errno = EINVAL;
+        return -1;
     }
 
-  for (;;) {
-    _sig_func_ptr func;
+    for (;;) {
+        _sig_func_ptr func;
 #ifdef _USE_ATOMIC_SIGNAL
-    func = (_sig_func_ptr) atomic_load(&_sig_func[sig]);
+        func = (_sig_func_ptr)atomic_load(&_sig_func[sig]);
 #else
-    func = _sig_func[sig];
+        func = _sig_func[sig];
 #endif
-    if (func == SIG_IGN)
-      return 0;
-    else if (func == SIG_DFL)
-      _exit(128 + sig);
+        if (func == SIG_IGN)
+            return 0;
+        else if (func == SIG_DFL)
+            _exit(128 + sig);
 #ifdef _USE_ATOMIC_SIGNAL
-    /* make sure it hasn't changed in the meantime */
-    if (!atomic_compare_exchange_strong(&_sig_func[sig],
-                                        &func,
-                                        SIG_DFL))
-      continue;
+        /* make sure it hasn't changed in the meantime */
+        if (!atomic_compare_exchange_strong(&_sig_func[sig], &func, SIG_DFL))
+            continue;
 #else
-    _sig_func[sig] = SIG_DFL;
+        _sig_func[sig] = SIG_DFL;
 #endif
-    (*func)(sig);
-    return 0;
-  }
+        (*func)(sig);
+        return 0;
+    }
 }

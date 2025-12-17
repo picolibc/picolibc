@@ -38,9 +38,9 @@
 int
 fflush(FILE *stream)
 {
-        int ret = 0;
-        __flockfile(stream);
-	if (stream->flush)
-		ret = (stream->flush)(stream);
-	__funlock_return(stream, ret);
+    int ret = 0;
+    __flockfile(stream);
+    if (stream->flush)
+        ret = (stream->flush)(stream);
+    __funlock_return(stream, ret);
 }

@@ -67,9 +67,9 @@
 #endif
 
 float
-strtof (const CHAR * nptr, CHAR ** endptr)
+strtof(const CHAR *nptr, CHAR **endptr)
 {
-    int len = 0;
+    int   len = 0;
     float flt;
     UCHAR ret;
 
@@ -82,6 +82,6 @@ strtof (const CHAR * nptr, CHAR ** endptr)
         len = 0;
     }
     if (endptr)
-        *endptr = (CHAR *) nptr + len;
+        *endptr = (CHAR *)nptr + len;
     return flt;
 }

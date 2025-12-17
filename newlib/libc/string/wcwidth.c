@@ -1,28 +1,28 @@
 /* Copyright (c) 2003 Corinna Vinschen <corinna@vinschen.de> */
 /*
 FUNCTION
-	<<wcwidth>>---number of column positions of a wide-character code
-	
+        <<wcwidth>>---number of column positions of a wide-character code
+
 INDEX
-	wcwidth
+        wcwidth
 
 SYNOPSIS
-	#include <wchar.h>
-	int wcwidth(const wchar_t <[wc]>);
+        #include <wchar.h>
+        int wcwidth(const wchar_t <[wc]>);
 
 DESCRIPTION
-	The <<wcwidth>> function shall determine the number of column
-	positions required for the wide character <[wc]>. The application
-	shall ensure that the value of <[wc]> is a character representable
-	as a wint_t (combining Unicode surrogate pairs into single 21-bit
-	Unicode code points), and is a wide-character code corresponding to a
-	valid character in the current locale.
+        The <<wcwidth>> function shall determine the number of column
+        positions required for the wide character <[wc]>. The application
+        shall ensure that the value of <[wc]> is a character representable
+        as a wint_t (combining Unicode surrogate pairs into single 21-bit
+        Unicode code points), and is a wide-character code corresponding to a
+        valid character in the current locale.
 
 RETURNS
-	The <<wcwidth>> function shall either return 0 (if <[wc]> is a null
-	wide-character code), or return the number of column positions to
-	be occupied by the wide-character code <[wc]>, or return -1 (if <[wc]>
-	does not correspond to a printable wide-character code).
+        The <<wcwidth>> function shall either return 0 (if <[wc]> is a null
+        wide-character code), or return the number of column positions to
+        be occupied by the wide-character code <[wc]>, or return -1 (if <[wc]>
+        does not correspond to a printable wide-character code).
 
 PORTABILITY
 <<wcwidth>> has been introduced in the Single UNIX Specification Volume 2.
@@ -98,33 +98,31 @@ PORTABILITY
 #include "local.h"
 
 #ifdef __MB_CAPABLE
-struct interval
-{
-  uint32_t first;
-  uint32_t last;
+struct interval {
+    uint32_t first;
+    uint32_t last;
 };
 
 /* auxiliary function for binary search in interval table */
 static int
 bisearch(uint32_t ucs, const struct interval *table, int max)
 {
-  int min = 0;
-  int mid;
+    int min = 0;
+    int mid;
 
-  if (ucs < table[0].first || ucs > table[max].last)
-    return 0;
-  while (max >= min)
-    {
-      mid = (min + max) / 2;
-      if (ucs > table[mid].last)
-	min = mid + 1;
-      else if (ucs < table[mid].first)
-	max = mid - 1;
-      else
-	return 1;
+    if (ucs < table[0].first || ucs > table[max].last)
+        return 0;
+    while (max >= min) {
+        mid = (min + max) / 2;
+        if (ucs > table[mid].last)
+            min = mid + 1;
+        else if (ucs < table[mid].first)
+            max = mid - 1;
+        else
+            return 1;
     }
 
-  return 0;
+    return 0;
 }
 #endif /* __MB_CAPABLE */
 
@@ -166,76 +164,70 @@ bisearch(uint32_t ucs, const struct interval *table, int max)
  */
 
 int
-__wcwidth (const wint_t _ucs)
+__wcwidth(const wint_t _ucs)
 {
-  uint32_t ucs = (uint32_t) _ucs;
+    uint32_t ucs = (uint32_t)_ucs;
 #ifdef __MB_CAPABLE
-  /* sorted list of non-overlapping intervals of East Asian Ambiguous chars */
-  static const struct interval ambiguous[] =
+    /* sorted list of non-overlapping intervals of East Asian Ambiguous chars */
+    static const struct interval ambiguous[] =
 #include "ambiguous.t"
 
-  /* sorted list of non-overlapping intervals of non-spacing characters */
-  static const struct interval combining[] =
+        /* sorted list of non-overlapping intervals of non-spacing characters */
+        static const struct interval combining[] =
 #include "combining.t"
 
-  /* sorted list of non-overlapping intervals of wide characters,
-     ranges extended to Blocks where possible
-   */
-  static const struct interval wide[] =
+            /* sorted list of non-overlapping intervals of wide characters,
+               ranges extended to Blocks where possible
+             */
+        static const struct interval wide[] =
 #include "wide.t"
 
-  /* Test for NUL character */
-  if (ucs == 0)
-    return 0;
+            /* Test for NUL character */
+        if (ucs == 0) return 0;
 
-  /* Test for printable ASCII characters */
-  if (ucs >= 0x20 && ucs < 0x7f)
-    return 1;
+    /* Test for printable ASCII characters */
+    if (ucs >= 0x20 && ucs < 0x7f)
+        return 1;
 
-  /* Test for control characters */
-  if (ucs < 0xa0)
+    /* Test for control characters */
+    if (ucs < 0xa0)
+        return -1;
+
+    /* Test for surrogate pair values. */
+    if (ucs >= (uint32_t)0xd800 && ucs <= (uint32_t)0xdfff)
+        return -1;
+
+    /* check CJK width mode (1: ambiguous-wide, 0: normal, -1: disabled) */
+    int cjk_lang = __locale_cjk_lang();
+
+    /* binary search in table of ambiguous characters */
+    if (cjk_lang > 0 && bisearch(ucs, ambiguous, sizeof(ambiguous) / sizeof(struct interval) - 1))
+        return 2;
+
+    /* binary search in table of non-spacing characters */
+    if (bisearch(ucs, combining, sizeof(combining) / sizeof(struct interval) - 1))
+        return 0;
+
+    /* if we arrive here, ucs is not a combining or C0/C1 control character */
+
+    /* binary search in table of wide character codes */
+    if (cjk_lang >= 0 && bisearch(ucs, wide, sizeof(wide) / sizeof(struct interval) - 1))
+        return 2;
+    else
+        return 1;
+#else  /* !__MB_CAPABLE */
+    if (iswprint(ucs))
+        return 1;
+    if (iswcntrl(ucs) || ucs == L'\0')
+        return 0;
     return -1;
-
-  /* Test for surrogate pair values. */
-  if (ucs >= (uint32_t) 0xd800 && ucs <= (uint32_t) 0xdfff)
-    return -1;
-
-  /* check CJK width mode (1: ambiguous-wide, 0: normal, -1: disabled) */
-  int cjk_lang = __locale_cjk_lang ();
-
-  /* binary search in table of ambiguous characters */
-  if (cjk_lang > 0
-      && bisearch(ucs, ambiguous,
-		  sizeof(ambiguous) / sizeof(struct interval) - 1))
-    return 2;
-
-  /* binary search in table of non-spacing characters */
-  if (bisearch(ucs, combining,
-	       sizeof(combining) / sizeof(struct interval) - 1))
-    return 0;
-
-  /* if we arrive here, ucs is not a combining or C0/C1 control character */
-
-  /* binary search in table of wide character codes */
-  if (cjk_lang >= 0
-      && bisearch(ucs, wide,
-	       sizeof(wide) / sizeof(struct interval) - 1))
-    return 2;
-  else
-    return 1;
-#else /* !__MB_CAPABLE */
-  if (iswprint (ucs))
-    return 1;
-  if (iswcntrl (ucs) || ucs == L'\0')
-    return 0;
-  return -1;
 #endif /* __MB_CAPABLE */
 }
 
 int
-wcwidth (const wchar_t wc)
+wcwidth(const wchar_t wc)
 {
-  wint_t wi = wc;
+    wint_t wi = wc;
 
-  return __wcwidth (wi);
+    return __wcwidth(wi);
 }

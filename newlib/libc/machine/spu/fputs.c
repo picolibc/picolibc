@@ -36,25 +36,22 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  const char* s;
-  unsigned int pad0[ 3 ];
-  int fp;
-  unsigned int pad1[ 3 ];
+typedef struct {
+    const char  *s;
+    unsigned int pad0[3];
+    int          fp;
+    unsigned int pad1[3];
 } c99_fputs_t;
 
-
 int
-fputs (char const *__restrict s,
-	FILE *__restrict fp)
+fputs(char const * __restrict s, FILE * __restrict fp)
 {
-  c99_fputs_t args;
+    c99_fputs_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.s = s;
-  args.fp = fp->_fp;
+    args.s = s;
+    args.fp = fp->_fp;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTS, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FPUTS, &args);
 }

@@ -1,13 +1,13 @@
 /*
 FUNCTION
-	<<strsignal>>---convert signal number to string
+        <<strsignal>>---convert signal number to string
 
 INDEX
-	strsignal
+        strsignal
 
 SYNOPSIS
-	#include <string.h>
-	char *strsignal(int <[signal]>);
+        #include <string.h>
+        char *strsignal(int <[signal]>);
 
 DESCRIPTION
 <<strsignal>> converts the signal number <[signal]> into a
@@ -26,7 +26,7 @@ for each signal number.
 <<strsignal>> requires no supporting OS subroutines.
 
 QUICKREF
-	strsignal pure
+        strsignal pure
 */
 
 /*
@@ -53,193 +53,193 @@ QUICKREF
 #include <stdlib.h>
 
 char *
-strsignal (int signal)
+strsignal(int signal)
 {
-  char *buffer;
-  static __THREAD_LOCAL char _signal_buf[24];
+    char                      *buffer;
+    static __THREAD_LOCAL char _signal_buf[24];
 
-  buffer = _signal_buf;
+    buffer = _signal_buf;
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
-  if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
-    sprintf (buffer, "Real-time signal %d", signal - SIGRTMIN);
-    return buffer;
-  }
+    if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
+        sprintf(buffer, "Real-time signal %d", signal - SIGRTMIN);
+        return buffer;
+    }
 #endif
 
-  switch (signal) {
+    switch (signal) {
 #ifdef SIGHUP
     case SIGHUP:
-      buffer = "Hangup";
-      break;
+        buffer = "Hangup";
+        break;
 #endif
 #ifdef SIGINT
     case SIGINT:
-      buffer = "Interrupt";
-      break;
+        buffer = "Interrupt";
+        break;
 #endif
 #ifdef SIGQUIT
     case SIGQUIT:
-      buffer = "Quit";
-      break;
+        buffer = "Quit";
+        break;
 #endif
 #ifdef SIGILL
     case SIGILL:
-      buffer = "Illegal instruction";
-      break;
+        buffer = "Illegal instruction";
+        break;
 #endif
 #ifdef SIGTRAP
     case SIGTRAP:
-      buffer = "Trace/breakpoint trap";
-      break;
+        buffer = "Trace/breakpoint trap";
+        break;
 #endif
 #ifdef SIGIOT
-  #if  defined(SIGABRT) && (SIGIOT != SIGABRT)
+#if defined(SIGABRT) && (SIGIOT != SIGABRT)
     case SIGABRT:
-  #endif
+#endif
     case SIGIOT:
-      buffer = "IOT trap";
-      break;
+        buffer = "IOT trap";
+        break;
 #endif
 #ifdef SIGEMT
     case SIGEMT:
-      buffer = "EMT trap";
-      break;
+        buffer = "EMT trap";
+        break;
 #endif
 #ifdef SIGFPE
     case SIGFPE:
-      buffer = "Floating point exception";
-      break;
+        buffer = "Floating point exception";
+        break;
 #endif
 #ifdef SIGKILL
     case SIGKILL:
-      buffer = "Killed";
-      break;
+        buffer = "Killed";
+        break;
 #endif
 #ifdef SIGBUS
     case SIGBUS:
-      buffer = "Bus error";
-      break;
+        buffer = "Bus error";
+        break;
 #endif
 #ifdef SIGSEGV
     case SIGSEGV:
-      buffer = "Segmentation fault";
-      break;
+        buffer = "Segmentation fault";
+        break;
 #endif
 #ifdef SIGSYS
     case SIGSYS:
-      buffer = "Bad system call";
-      break;
+        buffer = "Bad system call";
+        break;
 #endif
 #ifdef SIGPIPE
     case SIGPIPE:
-      buffer = "Broken pipe";
-      break;
+        buffer = "Broken pipe";
+        break;
 #endif
 #ifdef SIGALRM
     case SIGALRM:
-      buffer = "Alarm clock";
-      break;
+        buffer = "Alarm clock";
+        break;
 #endif
 #ifdef SIGTERM
     case SIGTERM:
-      buffer = "Terminated";
-      break;
+        buffer = "Terminated";
+        break;
 #endif
 #ifdef SIGURG
     case SIGURG:
-      buffer = "Urgent I/O condition";
-      break;
+        buffer = "Urgent I/O condition";
+        break;
 #endif
 #ifdef SIGSTOP
     case SIGSTOP:
-      buffer = "Stopped (signal)";
-      break;
+        buffer = "Stopped (signal)";
+        break;
 #endif
 #ifdef SIGTSTP
     case SIGTSTP:
-      buffer = "Stopped";
-      break;
+        buffer = "Stopped";
+        break;
 #endif
 #ifdef SIGCONT
     case SIGCONT:
-      buffer = "Continued";
-      break;
+        buffer = "Continued";
+        break;
 #endif
 #ifdef SIGCHLD
-  #if  defined(SIGCLD) && (SIGCHLD != SIGCLD)
+#if defined(SIGCLD) && (SIGCHLD != SIGCLD)
     case SIGCLD:
-  #endif
+#endif
     case SIGCHLD:
-      buffer = "Child exited";
-      break;
+        buffer = "Child exited";
+        break;
 #endif
 #ifdef SIGTTIN
     case SIGTTIN:
-      buffer = "Stopped (tty input)";
-      break;
+        buffer = "Stopped (tty input)";
+        break;
 #endif
 #ifdef SIGTTOUT
     case SIGTTOUT:
-      buffer = "Stopped (tty output)";
-      break;
+        buffer = "Stopped (tty output)";
+        break;
 #endif
 #ifdef SIGIO
-  #if  defined(SIGPOLL) && (SIGIO != SIGPOLL)
+#if defined(SIGPOLL) && (SIGIO != SIGPOLL)
     case SIGPOLL:
-  #endif
+#endif
     case SIGIO:
-      buffer = "I/O possible";
-      break;
+        buffer = "I/O possible";
+        break;
 #endif
 #ifdef SIGWINCH
     case SIGWINCH:
-      buffer = "Window changed";
-      break;
+        buffer = "Window changed";
+        break;
 #endif
 #ifdef SIGUSR1
     case SIGUSR1:
-      buffer = "User defined signal 1";
-      break;
+        buffer = "User defined signal 1";
+        break;
 #endif
 #ifdef SIGUSR2
     case SIGUSR2:
-      buffer = "User defined signal 2";
-      break;
+        buffer = "User defined signal 2";
+        break;
 #endif
 #ifdef SIGPWR
     case SIGPWR:
-      buffer = "Power Failure";
-      break;
+        buffer = "Power Failure";
+        break;
 #endif
 #ifdef SIGXCPU
     case SIGXCPU:
-      buffer = "CPU time limit exceeded";
-      break;
+        buffer = "CPU time limit exceeded";
+        break;
 #endif
 #ifdef SIGXFSZ
     case SIGXFSZ:
-      buffer = "File size limit exceeded";
-      break;
+        buffer = "File size limit exceeded";
+        break;
 #endif
-#ifdef SIGVTALRM 
-    case SIGVTALRM :
-      buffer = "Virtual timer expired";
-      break;
+#ifdef SIGVTALRM
+    case SIGVTALRM:
+        buffer = "Virtual timer expired";
+        break;
 #endif
 #ifdef SIGPROF
     case SIGPROF:
-      buffer = "Profiling timer expired";
-      break;
+        buffer = "Profiling timer expired";
+        break;
 #endif
 #if defined(SIGLOST) && SIGLOST != SIGPWR
     case SIGLOST:
-      buffer = "Resource lost";
-      break;
+        buffer = "Resource lost";
+        break;
 #endif
     default:
-      sprintf (buffer, "Unknown signal %d", signal);
-      break;
-  }
+        sprintf(buffer, "Unknown signal %d", signal);
+        break;
+    }
 
-  return buffer;
+    return buffer;
 }

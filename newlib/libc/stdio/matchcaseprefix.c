@@ -39,13 +39,14 @@ const char __match_inf[] = "INF";
 const char __match_inity[] = "INITY";
 const char __match_nan[] = "NAN";
 
-bool __matchcaseprefix(const char *input, const char *pattern)
+bool
+__matchcaseprefix(const char *input, const char *pattern)
 {
-	char p;
-	while ((p = *pattern++)) {
-		char i = *input++ & ~('a' - 'A');
-		if (i != p)
-			return false;
-	}
-	return true;
+    char p;
+    while ((p = *pattern++)) {
+        char i = *input++ & ~('a' - 'A');
+        if (i != p)
+            return false;
+    }
+    return true;
 }

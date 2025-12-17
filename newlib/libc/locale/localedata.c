@@ -37,8 +37,8 @@
 #include "../ctype/ctype_.h"
 #include "../stdlib/local.h"
 
-locale_t        __global_locale = locale_C;
+locale_t __global_locale = locale_C;
 
 #ifdef __HAVE_POSIX_LOCALE_API
-__THREAD_LOCAL locale_t    _locale;
+__THREAD_LOCAL locale_t _locale;
 #endif

@@ -37,9 +37,9 @@ static CONST_FORCE_FLOAT64 VAL = _FLOAT64_MIN;
 #endif
 
 HIDDEN __float64
-__math_denorm (__float64 x)
+__math_denorm(__float64 x)
 {
-    (void) pick_float64_except(force_eval_float64(VAL*VAL), 0.0);
+    (void)pick_float64_except(force_eval_float64(VAL * VAL), 0.0);
     return __math_with_errno(x, ERANGE);
 }
 

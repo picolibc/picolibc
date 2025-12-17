@@ -24,7 +24,7 @@
 
 /* Run all the cleanup routines.  */
 void
-__libc_fini_array (void)
+__libc_fini_array(void)
 {
     void (**fn)(void);
     void (**fn_start)(void);
@@ -36,7 +36,7 @@ __libc_fini_array (void)
 
 #ifdef __INIT_FINI_FUNCS
     if (_fini)
-        _fini ();
+        _fini();
 #endif
 }
 #endif

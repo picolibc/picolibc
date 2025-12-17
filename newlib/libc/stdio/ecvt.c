@@ -44,25 +44,18 @@
 static __THREAD_LOCAL char ecvt_buf[DTOA_MAX_DIG + 1];
 
 char *
-ecvt (double invalue,
-      int ndigit,
-      int *decpt,
-      int *sign)
+ecvt(double invalue, int ndigit, int *decpt, int *sign)
 {
     if (ecvt_r(invalue, ndigit, decpt, sign, ecvt_buf, sizeof(ecvt_buf)) < 0)
         return NULL;
     return ecvt_buf;
 }
 
-
 #elif __SIZEOF_DOUBLE__ == 4
 char *
-ecvt (double invalue,
-      int ndigit,
-      int *decpt,
-      int *sign)
+ecvt(double invalue, int ndigit, int *decpt, int *sign)
 {
-    return ecvtf((float) invalue, ndigit, decpt, sign);
+    return ecvtf((float)invalue, ndigit, decpt, sign);
 }
 
 #endif

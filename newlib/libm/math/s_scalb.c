@@ -31,9 +31,9 @@ scalb64(__float64 x, __float64 fn)
         if ((x == 0.0 && fn > 0.0) || (isinf(x) && fn < 0.0))
             return __math_invalid(fn);
         if (fn > 0.0)
-            return fn*x;
+            return fn * x;
         else
-            return x/(-fn);
+            return x / (-fn);
     }
 
     if (rint64(fn) != fn)

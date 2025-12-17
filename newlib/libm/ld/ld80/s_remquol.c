@@ -5,15 +5,12 @@
  *
  * Developed at SunSoft, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
-
-
-
-#define	BIAS (LDBL_MAX_EXP - 1)
+#define BIAS (LDBL_MAX_EXP - 1)
 
 /*
  * These macros add and remove an explicit integer bit in front of the
@@ -21,16 +18,16 @@
  * default already.
  */
 #ifdef LDBL_IMPLICIT_NBIT
-#define	SET_NBIT(hx)	((hx) | (1ULL << LDBL_MANH_SIZE))
-#define	HFRAC_BITS	LDBL_MANH_SIZE
+#define SET_NBIT(hx) ((hx) | (1ULL << LDBL_MANH_SIZE))
+#define HFRAC_BITS   LDBL_MANH_SIZE
 #else
-#define	SET_NBIT(hx)	(hx)
-#define	HFRAC_BITS	(LDBL_MANH_SIZE - 1)
+#define SET_NBIT(hx) (hx)
+#define HFRAC_BITS   (LDBL_MANH_SIZE - 1)
 #endif
 
-#define	MANL_SHIFT	(LDBL_MANL_SIZE - 1)
+#define MANL_SHIFT (LDBL_MANL_SIZE - 1)
 
-static const long double Zero[] = {0.0L, -0.0L};
+static const long double Zero[] = { 0.0L, -0.0L };
 
 /*
  * Return the IEEE remainder and set *quo to the last n bits of the
@@ -48,113 +45,126 @@ static const long double Zero[] = {0.0L, -0.0L};
 long double
 remquol(long double x, long double y, int *quo)
 {
-	int64_t hx,hz;	/* We need a carry bit even if LDBL_MANH_SIZE is 32. */
-	uint32_t hy;
-	uint32_t lx,ly,lz;
-	uint32_t esx, esy;
-	int ix,iy,n,q,sx,sxy;
+    int64_t  hx, hz; /* We need a carry bit even if LDBL_MANH_SIZE is 32. */
+    uint32_t hy;
+    uint32_t lx, ly, lz;
+    uint32_t esx, esy;
+    int      ix, iy, n, q, sx, sxy;
 
-	GET_LDOUBLE_WORDS(esx,hx,lx,x);
-	GET_LDOUBLE_WORDS(esy,hy,ly,y);
-	sx = esx & 0x8000;
-	sxy = sx ^ (esy & 0x8000);
-	esx &= 0x7fff;				/* |x| */
-	esy &= 0x7fff;				/* |y| */
-	SET_LDOUBLE_EXP(x,esx);
-	SET_LDOUBLE_EXP(y,esy);
+    GET_LDOUBLE_WORDS(esx, hx, lx, x);
+    GET_LDOUBLE_WORDS(esy, hy, ly, y);
+    sx = esx & 0x8000;
+    sxy = sx ^ (esy & 0x8000);
+    esx &= 0x7fff; /* |x| */
+    esy &= 0x7fff; /* |y| */
+    SET_LDOUBLE_EXP(x, esx);
+    SET_LDOUBLE_EXP(y, esy);
 
     /* purge off exception values */
-	if((esy|hy|ly)==0 ||			/* y=0 */
-	   (esx == BIAS + LDBL_MAX_EXP) ||	/* or x not finite */
-	   (esy == BIAS + LDBL_MAX_EXP &&
-	    ((hy&~LDBL_NBIT)|ly)!=0)) {		/* or y is NaN */
-            *quo = 0;
-	    return (x*y)/(x*y);
+    if ((esy | hy | ly) == 0 ||                                          /* y=0 */
+        (esx == BIAS + LDBL_MAX_EXP) ||                                  /* or x not finite */
+        (esy == BIAS + LDBL_MAX_EXP && ((hy & ~LDBL_NBIT) | ly) != 0)) { /* or y is NaN */
+        *quo = 0;
+        return (x * y) / (x * y);
+    }
+    if (esx <= esy) {
+        if ((esx < esy) || (hx <= hy && (hx < hy || lx < ly))) {
+            q = 0;
+            goto fixup; /* |x|<|y| return x or x-y */
         }
-	if(esx<=esy) {
-	    if((esx<esy) ||
-	       (hx<=hy &&
-		(hx<hy ||
-		 lx<ly))) {
-		q = 0;
-		goto fixup;			/* |x|<|y| return x or x-y */
-	    }
-	    if(hx==hy && lx==ly) {
-		*quo = 1;
-		return Zero[sx!=0];		/* |x|=|y| return x*0*/
-	    }
-	}
+        if (hx == hy && lx == ly) {
+            *quo = 1;
+            return Zero[sx != 0]; /* |x|=|y| return x*0*/
+        }
+    }
 
     /* determine ix = ilogb(x) */
-	if(esx == 0) {				/* subnormal x */
-	    x *= 0x1.0p512L;
-	    GET_LDOUBLE_WORDS(esx,hx,lx,x);
-	    ix = esx - (BIAS + 512);
-	} else {
-	    ix = esx - BIAS;
-	}
+    if (esx == 0) { /* subnormal x */
+        x *= 0x1.0p512L;
+        GET_LDOUBLE_WORDS(esx, hx, lx, x);
+        ix = esx - (BIAS + 512);
+    } else {
+        ix = esx - BIAS;
+    }
 
     /* determine iy = ilogb(y) */
-	if(esy == 0) {				/* subnormal y */
-	    y *= 0x1.0p512L;
-	    GET_LDOUBLE_WORDS(esy,hy,ly,y);
-	    iy = esy - (BIAS + 512);
-	} else {
-	    iy = esy - BIAS;
-	}
+    if (esy == 0) { /* subnormal y */
+        y *= 0x1.0p512L;
+        GET_LDOUBLE_WORDS(esy, hy, ly, y);
+        iy = esy - (BIAS + 512);
+    } else {
+        iy = esy - BIAS;
+    }
 
     /* set up {hx,lx}, {hy,ly} and align y to x */
-	hx = SET_NBIT(hx);
-	lx = SET_NBIT(lx);
+    hx = SET_NBIT(hx);
+    lx = SET_NBIT(lx);
 
     /* fix point fmod */
-	n = ix - iy;
-	q = 0;
+    n = ix - iy;
+    q = 0;
 
-	while(n--) {
-	    hz=hx-hy;lz=lx-ly; if(lx<ly) hz -= 1;
-	    if(hz<0){hx = hx+hx+(lx>>MANL_SHIFT); lx = lx+lx;}
-	    else {hx = hz+hz+(lz>>MANL_SHIFT); lx = lz+lz; q++;}
-	    q <<= 1;
-	}
-	hz=hx-hy;lz=lx-ly; if(lx<ly) hz -= 1;
-	if(hz>=0) {hx=hz;lx=lz;q++;}
+    while (n--) {
+        hz = hx - hy;
+        lz = lx - ly;
+        if (lx < ly)
+            hz -= 1;
+        if (hz < 0) {
+            hx = hx + hx + (lx >> MANL_SHIFT);
+            lx = lx + lx;
+        } else {
+            hx = hz + hz + (lz >> MANL_SHIFT);
+            lx = lz + lz;
+            q++;
+        }
+        q <<= 1;
+    }
+    hz = hx - hy;
+    lz = lx - ly;
+    if (lx < ly)
+        hz -= 1;
+    if (hz >= 0) {
+        hx = hz;
+        lx = lz;
+        q++;
+    }
 
     /* convert back to floating value and restore the sign */
-	if((hx|lx)==0) {			/* return sign(x)*0 */
-	    *quo = (sxy ? -q : q);
-	    return Zero[sx!=0];
-	}
-	while(hx<(1LL<<HFRAC_BITS)) {	/* normalize x */
-	    hx = hx+hx+(lx>>MANL_SHIFT); lx = lx+lx;
-	    iy -= 1;
-	}
-	if (iy < LDBL_MIN_EXP) {
-	    esx = (iy + BIAS + 512) & 0x7fff;
-	    SET_LDOUBLE_WORDS(x,esx,hx,lx);
-	    x *= 0x1p-512L;
-	    GET_LDOUBLE_WORDS(esx,hx,lx,x);
-	} else {
-	    esx = (iy + BIAS) & 0x7fff;
-	}
-	SET_LDOUBLE_WORDS(x,esx,hx,lx);
+    if ((hx | lx) == 0) { /* return sign(x)*0 */
+        *quo = (sxy ? -q : q);
+        return Zero[sx != 0];
+    }
+    while (hx < (1LL << HFRAC_BITS)) { /* normalize x */
+        hx = hx + hx + (lx >> MANL_SHIFT);
+        lx = lx + lx;
+        iy -= 1;
+    }
+    if (iy < LDBL_MIN_EXP) {
+        esx = (iy + BIAS + 512) & 0x7fff;
+        SET_LDOUBLE_WORDS(x, esx, hx, lx);
+        x *= 0x1p-512L;
+        GET_LDOUBLE_WORDS(esx, hx, lx, x);
+    } else {
+        esx = (iy + BIAS) & 0x7fff;
+    }
+    SET_LDOUBLE_WORDS(x, esx, hx, lx);
 fixup:
-	y = fabsl(y);
-	if (y < LDBL_MIN * 2) {
-	    if (x+x>y || (x+x==y && (q & 1))) {
-		q++;
-		x-=y;
-	    }
-	} else if (x>0.5L*y || (x==0.5L*y && (q & 1))) {
-	    q++;
-	    x-=y;
-	}
+    y = fabsl(y);
+    if (y < LDBL_MIN * 2) {
+        if (x + x > y || (x + x == y && (q & 1))) {
+            q++;
+            x -= y;
+        }
+    } else if (x > 0.5L * y || (x == 0.5L * y && (q & 1))) {
+        q++;
+        x -= y;
+    }
 
-	GET_LDOUBLE_EXP(esx,x);
-	esx ^= sx;
-	SET_LDOUBLE_EXP(x,esx);
+    GET_LDOUBLE_EXP(esx, x);
+    esx ^= sx;
+    SET_LDOUBLE_EXP(x, esx);
 
-	q &= 0x7fffffff;
-	*quo = (sxy ? -q : q);
-	return x;
+    q &= 0x7fffffff;
+    *quo = (sxy ? -q : q);
+    return x;
 }

@@ -39,20 +39,20 @@
 int
 main(void)
 {
-	uintptr_t	start = sys_semihost_clock();
-	uintptr_t	stop;
-	uintptr_t	loop;
+    uintptr_t start = sys_semihost_clock();
+    uintptr_t stop;
+    uintptr_t loop;
 
-	for (loop = 0; loop < 10000000; loop++) {
-		stop = sys_semihost_clock();
-		if (stop != start) {
-			if (stop < start) {
-				printf("semihost-clock: clock went backwards\n");
-				exit(2);
-			}
-			exit(0);
-		}
-	}
-	printf("semihost-clock: clock never changed\n");
-	exit(1);
+    for (loop = 0; loop < 10000000; loop++) {
+        stop = sys_semihost_clock();
+        if (stop != start) {
+            if (stop < start) {
+                printf("semihost-clock: clock went backwards\n");
+                exit(2);
+            }
+            exit(0);
+        }
+    }
+    printf("semihost-clock: clock never changed\n");
+    exit(1);
 }

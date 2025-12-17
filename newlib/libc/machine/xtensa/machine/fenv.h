@@ -25,7 +25,6 @@
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
    OF THE POSSIBILITY OF SUCH DAMAGE.  */
 
-
 #ifndef _MACHINE_FENV_H
 #define _MACHINE_FENV_H
 
@@ -40,38 +39,34 @@ typedef unsigned long fexcept_t;
 
 #if XCHAL_HAVE_FP || XCHAL_HAVE_DFP
 
-#define FE_DIVBYZERO   0x08
-#define FE_INEXACT     0x01
-#define FE_INVALID     0x10
-#define FE_OVERFLOW    0x04
-#define FE_UNDERFLOW   0x02
+#define FE_DIVBYZERO                0x08
+#define FE_INEXACT                  0x01
+#define FE_INVALID                  0x10
+#define FE_OVERFLOW                 0x04
+#define FE_UNDERFLOW                0x02
 
-#define FE_ALL_EXCEPT \
-  (FE_DIVBYZERO  |		      \
-   FE_INEXACT    |		      \
-   FE_INVALID    |		      \
-   FE_OVERFLOW   |		      \
-   FE_UNDERFLOW)
+#define FE_ALL_EXCEPT               (FE_DIVBYZERO | FE_INEXACT | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
 
-#define FE_DOWNWARD   0x3
-#define FE_TONEAREST  0x0
-#define FE_TOWARDZERO 0x1
-#define FE_UPWARD     0x2
+#define FE_DOWNWARD                 0x3
+#define FE_TONEAREST                0x0
+#define FE_TOWARDZERO               0x1
+#define FE_UPWARD                   0x2
 
-#define _FE_EXCEPTION_FLAGS_OFFSET 7
-#define _FE_EXCEPTION_FLAG_MASK (FE_ALL_EXCEPT << _FE_EXCEPTION_FLAGS_OFFSET)
+#define _FE_EXCEPTION_FLAGS_OFFSET  7
+#define _FE_EXCEPTION_FLAG_MASK     (FE_ALL_EXCEPT << _FE_EXCEPTION_FLAGS_OFFSET)
 #define _FE_EXCEPTION_ENABLE_OFFSET 2
-#define _FE_EXCEPTION_ENABLE_MASK (FE_ALL_EXCEPT << _FE_EXCEPTION_ENABLE_OFFSET)
-#define _FE_ROUND_MODE_OFFSET 0
-#define _FE_ROUND_MODE_MASK (0x3 << _FE_ROUND_MODE_OFFSET)
-#define _FE_FLOATING_ENV_MASK (_FE_EXCEPTION_FLAG_MASK | _FE_EXCEPTION_ENABLE_MASK | _FE_ROUND_MODE_MASK)
+#define _FE_EXCEPTION_ENABLE_MASK   (FE_ALL_EXCEPT << _FE_EXCEPTION_ENABLE_OFFSET)
+#define _FE_ROUND_MODE_OFFSET       0
+#define _FE_ROUND_MODE_MASK         (0x3 << _FE_ROUND_MODE_OFFSET)
+#define _FE_FLOATING_ENV_MASK                                                   \
+    (_FE_EXCEPTION_FLAG_MASK | _FE_EXCEPTION_ENABLE_MASK | _FE_ROUND_MODE_MASK)
 
 #else
-#define FE_TONEAREST  0x0
+#define FE_TONEAREST 0x0
 #endif
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
-#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#define __declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline

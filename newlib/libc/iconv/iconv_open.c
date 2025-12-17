@@ -37,30 +37,30 @@
 #include "iconv_private.h"
 
 iconv_t
-iconv_open (const char *tocode, const char *fromcode)
+iconv_open(const char *tocode, const char *fromcode)
 {
     if (!tocode || !fromcode)
         goto fail;
 
-    enum locale_id      toid = __find_charset(tocode);
-    enum locale_id      fromid = __find_charset(fromcode);
+    enum locale_id toid = __find_charset(tocode);
+    enum locale_id fromid = __find_charset(fromcode);
 
     if (toid == locale_INVALID || fromid == locale_INVALID)
         goto fail;
 
 #ifdef __MB_CAPABLE
     iconv_t     ic;
-    const char  *mode_name;
+    const char *mode_name;
     static const struct {
-        const char              *name;
-        enum __iconv_mode       mode;
+        const char       *name;
+        enum __iconv_mode mode;
     } modes[] = {
-        { .name = "IGNORE", .mode = iconv_ignore },
-        { .name = "NON_IDENTICAL_DISCARD", .mode = iconv_discard },
-        { .name = "TRANSLIT", .mode = iconv_translit },
+        { .name = "IGNORE",                .mode = iconv_ignore   },
+        { .name = "NON_IDENTICAL_DISCARD", .mode = iconv_discard  },
+        { .name = "TRANSLIT",              .mode = iconv_translit },
     };
-#define NMODE (sizeof(modes)/sizeof(modes[0]))
-    size_t      m;
+#define NMODE (sizeof(modes) / sizeof(modes[0]))
+    size_t            m;
     enum __iconv_mode mode = iconv_default;
 
     mode_name = strchr(tocode, '/');

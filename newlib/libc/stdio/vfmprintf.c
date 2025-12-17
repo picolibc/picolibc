@@ -31,6 +31,6 @@
 */
 
 #define PRINTF_VARIANT __IO_VARIANT_MINIMAL
-#define PRINTF_NAME __m_vfprintf
+#define PRINTF_NAME    __m_vfprintf
 
 #include "vfprintf.c"

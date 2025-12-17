@@ -28,21 +28,15 @@
 
 #include <picolibc.h>
 
-typedef void (*vfnp) (void);
+typedef void (*vfnp)(void);
 
 /* The guts of the _Libctors and _Libdtors is "optimized" away into
    empty functions when the definition is visible as well.  Simplest
    solution is to emit the definitions as asm.  We have no .previous
    directive in a.out, so we rely on the fact that everything in this
    file goes into the .text section.  */
-__asm__
-(
- ".text\n\t.global .$global.lib.ctors\n.$global.lib.ctors:\n\t.dword 0"
-);
-__asm__
-(
- ".text\n\t.global .$global.lib.dtors\n.$global.lib.dtors:\n\t.dword 0"
-);
+__asm__(".text\n\t.global .$global.lib.ctors\n.$global.lib.ctors:\n\t.dword 0");
+__asm__(".text\n\t.global .$global.lib.dtors\n.$global.lib.dtors:\n\t.dword 0");
 
 extern vfnp * const _Ctors __asm__(".$global.lib.ctors");
 extern vfnp * const _Dtors __asm__(".$global.lib.dtors");
@@ -53,41 +47,38 @@ extern vfnp * const _Dtors __asm__(".$global.lib.dtors");
    thinks it can remove defaultors, so we need to artificially mark it
    as used.  FIXME: Perhaps a GCC bug.  */
 
-static vfnp const defaultors[] __used = {0, 0};
+static vfnp const   defaultors[] __used = { 0, 0 };
 
-extern vfnp * __CTOR_LIST__ __attribute__ ((weak, alias ("defaultors")));
-extern vfnp * __DTOR_LIST__ __attribute__ ((weak, alias ("defaultors")));
+extern vfnp        *__CTOR_LIST__ __attribute__((weak, alias("defaultors")));
+extern vfnp        *__DTOR_LIST__ __attribute__((weak, alias("defaultors")));
 
 void
-_Libctors (void)
+_Libctors(void)
 {
-  const vfnp *firstor = _Ctors;
-  const vfnp *ctors;
+    const vfnp *firstor = _Ctors;
+    const vfnp *ctors;
 
-  /* Have to find the last ctor; they will run in opposite order as in
-     the table. */
-  if (firstor != 0 && *firstor != 0)
-    {
-      for (ctors = firstor; *ctors != 0; ctors++)
-	;
+    /* Have to find the last ctor; they will run in opposite order as in
+       the table. */
+    if (firstor != 0 && *firstor != 0) {
+        for (ctors = firstor; *ctors != 0; ctors++)
+            ;
 
-      while (--ctors != firstor)
-	{
-	  (**ctors)();
-	}
+        while (--ctors != firstor) {
+            (**ctors)();
+        }
 
-      (**ctors)();
+        (**ctors)();
     }
 }
 
 void
 _Libdtors(void)
 {
-  const vfnp *dtors = _Dtors;
+    const vfnp *dtors = _Dtors;
 
-  if (dtors)
-    while (*dtors != 0)
-      {
-	(**dtors++) ();
-      }
+    if (dtors)
+        while (*dtors != 0) {
+            (**dtors++)();
+        }
 }

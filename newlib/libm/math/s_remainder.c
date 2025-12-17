@@ -29,9 +29,9 @@ static const __float64 zero = _F_64(0.0);
 __float64
 remainder64(__float64 x, __float64 p)
 {
-    __int32_t hx, hp;
+    __int32_t  hx, hp;
     __uint32_t sx, lx, lp;
-    __float64 p_half;
+    __float64  p_half;
 
     EXTRACT_WORDS(hx, lx, x);
     EXTRACT_WORDS(hp, lp, p);

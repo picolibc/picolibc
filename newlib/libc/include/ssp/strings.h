@@ -36,19 +36,16 @@
 #if __SSP_FORTIFY_LEVEL > 0
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE <= 200112
-#define bcopy(src, dst, len) \
-    (__ssp_bos_known(dst) ? \
-    __builtin___memmove_chk(dst, src, len, __ssp_bos0(dst)) : \
-    __memmove_ichk(dst, src, len))
-#define bzero(dst, len) \
-    (__ssp_bos_known(dst) ? \
-    __builtin___memset_chk(dst, 0, len, __ssp_bos0(dst)) : \
-    __memset_ichk(dst, 0, len))
+#define bcopy(src, dst, len)                                                        \
+    (__ssp_bos_known(dst) ? __builtin___memmove_chk(dst, src, len, __ssp_bos0(dst)) \
+                          : __memmove_ichk(dst, src, len))
+#define bzero(dst, len)                                                          \
+    (__ssp_bos_known(dst) ? __builtin___memset_chk(dst, 0, len, __ssp_bos0(dst)) \
+                          : __memset_ichk(dst, 0, len))
 #endif
 
 #if __BSD_VISIBLE
-__ssp_redirect0(void, explicit_bzero, (void *__buf, size_t __len), \
-    (__buf, __len));
+__ssp_redirect0(void, explicit_bzero, (void *__buf, size_t __len), (__buf, __len));
 #endif
 
 #endif /* __SSP_FORTIFY_LEVEL > 0 */

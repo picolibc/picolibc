@@ -34,7 +34,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #ifdef _NEED_FLOAT_HUGE
 
 long double
-fabsl (long double x)
+fabsl(long double x)
 {
     if (x == 0.0l)
         return 0.0l;
@@ -44,4 +44,3 @@ fabsl (long double x)
 }
 
 #endif
-

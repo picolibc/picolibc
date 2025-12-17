@@ -50,10 +50,10 @@ static const char * const type_check_kinds[] = {
     [type_check_dynamic_operation_on] = "dynamic_operation_on",
 };
 
-const char*
+const char *
 __ubsan_type_check_to_string(unsigned char type_check_kind)
 {
-    if (type_check_kind < sizeof(type_check_kinds)/sizeof(type_check_kinds[0]))
+    if (type_check_kind < sizeof(type_check_kinds) / sizeof(type_check_kinds[0]))
         return type_check_kinds[type_check_kind];
     return "unknown";
 }

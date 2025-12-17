@@ -48,4 +48,3 @@
 #include "ldd/s_truncl.c"
 
 #endif
-

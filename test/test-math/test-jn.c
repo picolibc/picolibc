@@ -41,7 +41,7 @@
 #define SKIP_BINARY128
 #endif
 
-#define TEST_VECTORS    "test-jn.h"
-#define TEST_FUNC       jn
+#define TEST_VECTORS "test-jn.h"
+#define TEST_FUNC    jn
 
 #include "test-int-real.h"

@@ -34,10 +34,10 @@
  */
 
 int
-__fpclassifyl (long double x)
+__fpclassifyl(long double x)
 {
     union IEEEl2bits u;
-    int ret;
+    int              ret;
 
     u.e = x;
     ret = __fpclassifyd(u.dbits.dh);

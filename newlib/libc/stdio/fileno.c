@@ -38,10 +38,10 @@
 int
 fileno(FILE *stream)
 {
-        __flockfile(stream);
-        if (stream->flags & __SBUF) {
-                struct __file_bufio *pf = (struct __file_bufio *) stream;
-                __funlock_return(stream, (int)(intptr_t)(pf->ptr));
-        }
-	__funlock_return(stream, -1);
+    __flockfile(stream);
+    if (stream->flags & __SBUF) {
+        struct __file_bufio *pf = (struct __file_bufio *)stream;
+        __funlock_return(stream, (int)(intptr_t)(pf->ptr));
+    }
+    __funlock_return(stream, -1);
 }

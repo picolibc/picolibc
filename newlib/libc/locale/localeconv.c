@@ -35,19 +35,19 @@
 
 #include "locale_private.h"
 
-static const char decimal[] = ".";
-static const char empty[] = "";
+static const char         decimal[] = ".";
+static const char         empty[] = "";
 
 static const struct lconv lconv = {
-    .decimal_point = (char *) decimal,
-    .thousands_sep = (char *) empty,
-    .grouping = (char *) empty,
-    .mon_decimal_point = (char *) empty,
-    .mon_thousands_sep = (char *) empty,
-    .mon_grouping = (char *) empty,
-    .positive_sign = (char *) empty,
-    .negative_sign = (char *) empty,
-    .currency_symbol = (char *) empty,
+    .decimal_point = (char *)decimal,
+    .thousands_sep = (char *)empty,
+    .grouping = (char *)empty,
+    .mon_decimal_point = (char *)empty,
+    .mon_thousands_sep = (char *)empty,
+    .mon_grouping = (char *)empty,
+    .positive_sign = (char *)empty,
+    .negative_sign = (char *)empty,
+    .currency_symbol = (char *)empty,
     .frac_digits = CHAR_MAX,
     .p_cs_precedes = CHAR_MAX,
     .n_cs_precedes = CHAR_MAX,
@@ -55,7 +55,7 @@ static const struct lconv lconv = {
     .n_sep_by_space = CHAR_MAX,
     .p_sign_posn = CHAR_MAX,
     .n_sign_posn = CHAR_MAX,
-    .int_curr_symbol = (char *) empty,
+    .int_curr_symbol = (char *)empty,
     .int_frac_digits = CHAR_MAX,
     .int_p_cs_precedes = CHAR_MAX,
     .int_n_cs_precedes = CHAR_MAX,
@@ -68,5 +68,5 @@ static const struct lconv lconv = {
 struct lconv *
 localeconv(void)
 {
-    return (struct lconv *) &lconv;
+    return (struct lconv *)&lconv;
 }

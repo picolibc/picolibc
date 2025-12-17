@@ -36,8 +36,7 @@
 #include "uchar-local.h"
 
 size_t
-mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n,
-        mbstate_t * __restrict ps)
+mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n, mbstate_t * __restrict ps)
 {
     static mbstate_t local_state;
 
@@ -48,29 +47,29 @@ mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n,
         int count = -ps->__count;
 
         count--;
-        *pc8 = 0x80 | ((ps->__value.__ucs >> (6*count)) & 0x3f);
+        *pc8 = 0x80 | ((ps->__value.__ucs >> (6 * count)) & 0x3f);
         ps->__count = -count;
-        return (size_t) -3;
+        return (size_t)-3;
     }
 
-    char32_t    c32;
-    size_t      ret;
+    char32_t c32;
+    size_t   ret;
 
     ret = mbrtoc32(&c32, s, n, ps);
     switch (ret) {
-    case (size_t) -2:
-    case (size_t) -1:
+    case (size_t)-2:
+    case (size_t)-1:
         return ret;
     default:
         break;
     }
 
     if (!char32_is_one_byte(c32)) {
-        int count = 1;
+        int     count = 1;
         char8_t c8;
 
         c8 = 0xc0;
-        while (c32 >= ((char32_t) 1 << (6*count + (6 - count)))) {
+        while (c32 >= ((char32_t)1 << (6 * count + (6 - count)))) {
             c8 |= (1 << (6 - count));
             count++;
         }
@@ -79,7 +78,7 @@ mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n,
         ps->__value.__ucs = c32;
         *pc8 = c8;
     } else {
-        *pc8 = (char8_t) c32;
+        *pc8 = (char8_t)c32;
     }
     return ret;
 }

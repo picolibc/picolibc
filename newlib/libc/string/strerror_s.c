@@ -42,7 +42,7 @@
 __errno_t
 strerror_s(char *buf, rsize_t buflen, __errno_t errnum)
 {
-    int32_t result = 0;
+    int32_t     result = 0;
     const char *msg = "";
 
     if (buf == NULL) {
@@ -56,7 +56,7 @@ strerror_s(char *buf, rsize_t buflen, __errno_t errnum)
     }
 
     const char *cp = _strerror_r(errnum, 0, NULL);
-    uint32_t len = strnlen_s(cp, MAX_ERROR_MSG);
+    uint32_t    len = strnlen_s(cp, MAX_ERROR_MSG);
 
     if (len < buflen) {
         (void)strncpy(buf, cp, MAX_ERROR_MSG);

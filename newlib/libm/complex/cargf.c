@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Written by Matthias Drochner <drochner@NetBSD.org>.
  * Public domain.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -40,5 +40,5 @@ float
 cargf(float complex z)
 {
 
-	return atan2f( cimagf(z), crealf(z) );
+    return atan2f(cimagf(z), crealf(z));
 }

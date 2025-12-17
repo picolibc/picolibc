@@ -36,15 +36,12 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_mul_overflow(void *_data,
-                            void *lhs,
-                            void *rhs)
+__ubsan_handle_mul_overflow(void *_data, void *lhs, void *rhs)
 {
     struct overflow_data *data = _data;
-    char lhs_str[VAL_STR_LEN];
-    char rhs_str[VAL_STR_LEN];
+    char                  lhs_str[VAL_STR_LEN];
+    char                  rhs_str[VAL_STR_LEN];
     __ubsan_val_to_string(lhs_str, data->type, lhs);
     __ubsan_val_to_string(rhs_str, data->type, rhs);
     __ubsan_error(&data->location, "mul_overflow", "%s * %s\n", lhs_str, rhs_str);
 }
-

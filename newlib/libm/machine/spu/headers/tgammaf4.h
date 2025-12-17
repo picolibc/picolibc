@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _TGAMMAF4_H_
-#define _TGAMMAF4_H_	1
+#define _TGAMMAF4_H_ 1
 
 #include <spu_intrinsics.h>
 #include "simdmath.h"
@@ -56,13 +56,13 @@
  *  vector float _tgammaf4(vector float x)
  *
  * DESCRIPTION
- *  The tgammaf4 function returns a vector containing tgamma for each 
- *  element of x 
+ *  The tgammaf4 function returns a vector containing tgamma for each
+ *  element of x
  *
  *	We take a fairly standard approach - break the domain into 5 separate regions:
  *
  *	1. [-infinity, 0)  - use gamma(x) = pi/(x*gamma(-x)*sin(x*pi))
- *	2. [0, 1)          - push x into [1,2), then adjust the 
+ *	2. [0, 1)          - push x into [1,2), then adjust the
  *	                     result.
  *	3. [1, 2)          - use a rational approximation.
  *	4. [2, 10)         - pull back into [1, 2), then adjust
@@ -79,45 +79,45 @@
  */
 
 /*
- * Coefficients for Stirling's Series for Gamma() are defined in 
+ * Coefficients for Stirling's Series for Gamma() are defined in
  * tgammad2.h
  */
 
 /*
- * Rational Approximation Coefficients for the 
+ * Rational Approximation Coefficients for the
  * domain [1, 2) are defined in tgammad2.h
  */
 
-
-static __inline vector float _tgammaf4(vector float x)
+static __inline vector float
+_tgammaf4(vector float x)
 {
-    vector float signbit = spu_splats(-0.0f);
-    vector float zerof   = spu_splats(0.0f);
-    vector float halff   = spu_splats(0.5f);
-    vector float onef    = spu_splats(1.0f);
-    vector float ninep9f = (vector float)spu_splats(0x411FFFFF); /* Next closest to 10.0 */
-    vector float t38f    = spu_splats(38.0f);
-    vector float pi      = spu_splats((float)SM_PI);
-    vector float sqrt2pi = spu_splats(2.506628274631000502415765284811f);
-    vector float inf     = (vec_float4)spu_splats(0x7F800000);
-    vector float nan     = (vec_float4)spu_splats(0x7FFFFFFF);
+    vector float        signbit = spu_splats(-0.0f);
+    vector float        zerof = spu_splats(0.0f);
+    vector float        halff = spu_splats(0.5f);
+    vector float        onef = spu_splats(1.0f);
+    vector float        ninep9f = (vector float)spu_splats(0x411FFFFF); /* Next closest to 10.0 */
+    vector float        t38f = spu_splats(38.0f);
+    vector float        pi = spu_splats((float)SM_PI);
+    vector float        sqrt2pi = spu_splats(2.506628274631000502415765284811f);
+    vector float        inf = (vec_float4)spu_splats(0x7F800000);
+    vector float        nan = (vec_float4)spu_splats(0x7FFFFFFF);
 
-    vector float xabs;
-    vector float xscaled;
-    vector float xtrunc;
-    vector float xinv;
-    vector float nresult; /* Negative x result */
-    vector float rresult; /* Rational Approx result */
-    vector float sresult; /* Stirling's result */
-    vector float result;
-    vector float pr,qr;
+    vector float        xabs;
+    vector float        xscaled;
+    vector float        xtrunc;
+    vector float        xinv;
+    vector float        nresult; /* Negative x result */
+    vector float        rresult; /* Rational Approx result */
+    vector float        sresult; /* Stirling's result */
+    vector float        result;
+    vector float        pr, qr;
 
-    vector unsigned int gt0   = spu_cmpgt(x, zerof);
-    vector unsigned int gt1   = spu_cmpgt(x, onef);
+    vector unsigned int gt0 = spu_cmpgt(x, zerof);
+    vector unsigned int gt1 = spu_cmpgt(x, onef);
     vector unsigned int gt9p9 = spu_cmpgt(x, ninep9f);
-    vector unsigned int gt38  = spu_cmpgt(x, t38f);
+    vector unsigned int gt38 = spu_cmpgt(x, t38f);
 
-    xabs    = spu_andc(x, signbit);
+    xabs = spu_andc(x, signbit);
 
     /*
      * For x in [0, 1], add 1 to x, use rational
@@ -128,7 +128,6 @@ static __inline vector float _tgammaf4(vector float x)
      */
     xabs = spu_sel(spu_add(xabs, onef), xabs, gt1);
     xtrunc = _truncf4(xabs);
-
 
     /*
      * For x in [2, 10):
@@ -177,12 +176,11 @@ static __inline vector float _tgammaf4(vector float x)
     xscaled = spu_add(xscaled, onef);
     rresult = spu_sel(rresult, spu_mul(rresult, xscaled), spu_cmpgt(x, xscaled)); /* [9,10) */
 
-
     /*
      * For x >= 10, we use Stirling's Approximation
      */
     vector float sum;
-    xinv    = _recipf4(xabs);            
+    xinv = _recipf4(xabs);
     sum = spu_madd(xinv, spu_splats((float)STIRLING_16), spu_splats((float)STIRLING_15));
     sum = spu_madd(sum, xinv, spu_splats((float)STIRLING_14));
     sum = spu_madd(sum, xinv, spu_splats((float)STIRLING_13));

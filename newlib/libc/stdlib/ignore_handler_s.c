@@ -36,7 +36,7 @@
 #include <stdlib.h>
 
 void
-ignore_handler_s(const char *__restrict msg, void *__restrict ptr, __errno_t error)
+ignore_handler_s(const char * __restrict msg, void * __restrict ptr, __errno_t error)
 {
     (void)msg;
     (void)ptr;

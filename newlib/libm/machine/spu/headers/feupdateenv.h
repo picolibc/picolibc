@@ -31,18 +31,19 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FEUPDATEENV_H_
-#define _FEUPDATEENV_H_	1
+#define _FEUPDATEENV_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline void _feupdateenv(const fenv_t *envp)
+static __inline void
+_feupdateenv(const fenv_t *envp)
 {
-  vec_uint4 fpscr;
+    vec_uint4 fpscr;
 
-  fpscr = __unpack_fpscr(*envp);
-  spu_mtfpscr(fpscr);
+    fpscr = __unpack_fpscr(*envp);
+    spu_mtfpscr(fpscr);
 }
 
 #endif /* _FEUPDATEENV_H_ */

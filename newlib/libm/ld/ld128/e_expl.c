@@ -72,26 +72,19 @@
 
 /*	Exponential function	*/
 
-
-
 /* Pade' coefficients for exp(x) - 1
    Theoretical peak relative error = 2.2e-37,
    relative peak error spread = 9.2e-38
  */
-static const long double P[5] = {
- 3.279723985560247033712687707263393506266E-10L,
- 6.141506007208645008909088812338454698548E-7L,
- 2.708775201978218837374512615596512792224E-4L,
- 3.508710990737834361215404761139478627390E-2L,
- 9.999999999999999999999999999999999998502E-1L
-};
+static const long double P[5] = { 3.279723985560247033712687707263393506266E-10L,
+                                  6.141506007208645008909088812338454698548E-7L,
+                                  2.708775201978218837374512615596512792224E-4L,
+                                  3.508710990737834361215404761139478627390E-2L,
+                                  9.999999999999999999999999999999999998502E-1L };
 static const long double Q[6] = {
- 2.980756652081995192255342779918052538681E-12L,
- 1.771372078166251484503904874657985291164E-8L,
- 1.504792651814944826817779302637284053660E-5L,
- 3.611828913847589925056132680618007270344E-3L,
- 2.368408864814233538909747618894558968880E-1L,
- 2.000000000000000000000000000000000000150E0L
+    2.980756652081995192255342779918052538681E-12L, 1.771372078166251484503904874657985291164E-8L,
+    1.504792651814944826817779302637284053660E-5L,  3.611828913847589925056132680618007270344E-3L,
+    2.368408864814233538909747618894558968880E-1L,  2.000000000000000000000000000000000000150E0L
 };
 /* C1 + C2 = ln 2 */
 static const long double C1 = -6.93145751953125E-1L;
@@ -110,41 +103,41 @@ static const volatile long double twom10000 = 0x1p-10000L;
 long double
 expl(long double x)
 {
-long double px, xx;
-int n;
+    long double px, xx;
+    int         n;
 
-if( isnan(x) )
-	return(x + x);
-if( x > MAXLOGL) {
+    if (isnan(x))
+        return (x + x);
+    if (x > MAXLOGL) {
         if (isinf(x))
-                return x;
+            return x;
         return __math_oflowl(0);
-}
+    }
 
-if( x < MINLOGL ) {
+    if (x < MINLOGL) {
         if (isinf(x))
-                return 0.0L;
-	return __math_uflowl(0);
-}
+            return 0.0L;
+        return __math_uflowl(0);
+    }
 
-/* Express e**x = e**g 2**n
- *   = e**g e**( n loge(2) )
- *   = e**( g + n loge(2) )
- */
-px = floorl( LOG2EL * x + 0.5L ); /* floor() truncates toward -infinity. */
-n = px;
-x += px * C1;
-x += px * C2;
-/* rational approximation for exponential
- * of the fractional part:
- * e**x =  1 + 2x P(x**2)/( Q(x**2) - P(x**2) )
- */
-xx = x * x;
-px = x * __polevll( xx, P, 4 );
-xx = __polevll( xx, Q, 5 );
-x =  px/( xx - px );
-x = 1.0L + x + x;
+    /* Express e**x = e**g 2**n
+     *   = e**g e**( n loge(2) )
+     *   = e**( g + n loge(2) )
+     */
+    px = floorl(LOG2EL * x + 0.5L); /* floor() truncates toward -infinity. */
+    n = px;
+    x += px * C1;
+    x += px * C2;
+    /* rational approximation for exponential
+     * of the fractional part:
+     * e**x =  1 + 2x P(x**2)/( Q(x**2) - P(x**2) )
+     */
+    xx = x * x;
+    px = x * __polevll(xx, P, 4);
+    xx = __polevll(xx, Q, 5);
+    x = px / (xx - px);
+    x = 1.0L + x + x;
 
-x = ldexpl( x, n );
-return(x);
+    x = ldexpl(x, n);
+    return (x);
 }

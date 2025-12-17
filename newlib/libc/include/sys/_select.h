@@ -32,7 +32,7 @@ SUCH DAMAGE.
 
 _BEGIN_STD_C
 
-#  define _SYS_TYPES_FD_SET
+#define _SYS_TYPES_FD_SET
 /*
  * Select uses bit masks of file descriptors in longs.
  * These macros manipulate such bit fields (the filesystem macros use chars).
@@ -40,44 +40,45 @@ _BEGIN_STD_C
  * should be enough for most uses.
  */
 #ifndef FD_SETSIZE
-# if   defined(__rtems__)
-#  define FD_SETSIZE	256
-# else
-#  define FD_SETSIZE	64
-# endif
+#if defined(__rtems__)
+#define FD_SETSIZE 256
+#else
+#define FD_SETSIZE 64
+#endif
 #endif
 
-typedef unsigned long	__fd_mask;
+typedef unsigned long __fd_mask;
 #if __BSD_VISIBLE
-typedef __fd_mask	fd_mask;
+typedef __fd_mask fd_mask;
 #endif
 
-#define __NFDBITS	((int)sizeof(__fd_mask) * 8) /* bits per mask */
+#define __NFDBITS       ((int)sizeof(__fd_mask) * 8) /* bits per mask */
 #define __FD_ARRAY_SIZE ((FD_SETSIZE + __NFDBITS - 1) / __NFDBITS)
 #if __BSD_VISIBLE
-#define NFDBITS		__NFDBITS
+#define NFDBITS __NFDBITS
 #endif
 
-typedef	struct fd_set {
-        __fd_mask	__fds_bits[__FD_ARRAY_SIZE];
+typedef struct fd_set {
+    __fd_mask __fds_bits[__FD_ARRAY_SIZE];
 } fd_set;
 
-#define __fdset_mask(n)	((__fd_mask)1 << ((n) % __NFDBITS))
-#define FD_CLR(n, p)	((p)->__fds_bits[(n)/__NFDBITS] &= ~__fdset_mask(n))
+#define __fdset_mask(n) ((__fd_mask)1 << ((n) % __NFDBITS))
+#define FD_CLR(n, p)    ((p)->__fds_bits[(n) / __NFDBITS] &= ~__fdset_mask(n))
 #if __BSD_VISIBLE
-#define FD_COPY(f, t)	(void)(*(t) = *(f))
+#define FD_COPY(f, t) (void)(*(t) = *(f))
 #endif
-#define FD_ISSET(n, p)	(((p)->__fds_bits[(n)/__NFDBITS] & __fdset_mask(n)) != 0)
-#define FD_SET(n, p)	((p)->__fds_bits[(n)/__NFDBITS] |= __fdset_mask(n))
-#define FD_ZERO(p) do {                                                 \
-                fd_set *__p = (p);                                      \
-                __size_t __i;                                           \
-                for (__i = 0; __i < __FD_ARRAY_SIZE; __i++)             \
-                        __p->__fds_bits[__i] = 0;                       \
-        } while (0)
+#define FD_ISSET(n, p) (((p)->__fds_bits[(n) / __NFDBITS] & __fdset_mask(n)) != 0)
+#define FD_SET(n, p)   ((p)->__fds_bits[(n) / __NFDBITS] |= __fdset_mask(n))
+#define FD_ZERO(p)                                  \
+    do {                                            \
+        fd_set  *__p = (p);                         \
+        __size_t __i;                               \
+        for (__i = 0; __i < __FD_ARRAY_SIZE; __i++) \
+            __p->__fds_bits[__i] = 0;               \
+    } while (0)
 
-int select (int __n, fd_set *__readfds, fd_set *__writefds,
-            fd_set *__exceptfds, struct timeval *__timeout);
+int select(int __n, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds,
+           struct timeval *__timeout);
 
 _END_STD_C
 

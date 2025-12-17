@@ -40,10 +40,9 @@
 
 #ifdef _NEED_FLOAT64
 
-static const __float64
-    invsqrtpi = _F_64(5.64189583547756279280e-01), /* 0x3FE20DD7, 0x50429B6D */
-    two = _F_64(2.00000000000000000000e+00), /* 0x40000000, 0x00000000 */
-    one = _F_64(1.00000000000000000000e+00); /* 0x3FF00000, 0x00000000 */
+static const __float64 invsqrtpi = _F_64(5.64189583547756279280e-01), /* 0x3FE20DD7, 0x50429B6D */
+    two = _F_64(2.00000000000000000000e+00),                          /* 0x40000000, 0x00000000 */
+    one = _F_64(1.00000000000000000000e+00);                          /* 0x3FF00000, 0x00000000 */
 
 static const __float64 zero = _F_64(0.00000000000000000000e+00);
 
@@ -83,18 +82,18 @@ jn64(int n, __float64 x)
         /* Safe to use J(n+1,x)=2n/x *J(n,x)-J(n-1,x) */
         if (ix >= 0x52D00000) { /* x > 2**302 */
             /* (x >> n**2)
-     *	    Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-     *	    Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-     *	    Let s=sin(x), c=cos(x),
-     *		xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
-     *
-     *		   n	sin(xn)*sqt2	cos(xn)*sqt2
-     *		----------------------------------
-     *		   0	 s-c		 c+s
-     *		   1	-s-c 		-c+s
-     *		   2	-s+c		-c-s
-     *		   3	 s+c		 c-s
-     */
+             *	    Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+             *	    Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+             *	    Let s=sin(x), c=cos(x),
+             *		xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
+             *
+             *		   n	sin(xn)*sqt2	cos(xn)*sqt2
+             *		----------------------------------
+             *		   0	 s-c		 c+s
+             *		   1	-s-c 		-c+s
+             *		   2	-s+c		-c-s
+             *		   3	 s+c		 c-s
+             */
             switch (n & 3) {
             case 0:
             default:
@@ -123,8 +122,8 @@ jn64(int n, __float64 x)
     } else {
         if (ix < 0x3e100000) { /* x < 2**-29 */
             /* x is tiny, return the first Taylor expansion of J(n,x)
-     * J(n,x) = 1/n!*(x/2)^n  - ...
-     */
+             * J(n,x) = 1/n!*(x/2)^n  - ...
+             */
             if (n > 33) /* underflow */
                 b = zero;
             else {
@@ -132,39 +131,39 @@ jn64(int n, __float64 x)
                 b = temp;
                 for (a = one, i = 2; i <= n; i++) {
                     a *= (__float64)i; /* a = n! */
-                    b *= temp; /* b = (x/2)^n */
+                    b *= temp;         /* b = (x/2)^n */
                 }
                 b = b / a;
             }
         } else {
             /* use backward recurrence */
             /* 			x      x^2      x^2
-		 *  J(n,x)/J(n-1,x) =  ----   ------   ------   .....
-		 *			2n  - 2(n+1) - 2(n+2)
-		 *
-		 * 			1      1        1
-		 *  (for large x)   =  ----  ------   ------   .....
-		 *			2n   2(n+1)   2(n+2)
-		 *			-- - ------ - ------ -
-		 *			 x     x         x
-		 *
-		 * Let w = 2n/x and h=2/x, then the above quotient
-		 * is equal to the continued fraction:
-		 *		    1
-		 *	= -----------------------
-		 *		       1
-		 *	   w - -----------------
-		 *			  1
-		 * 	        w+h - ---------
-		 *		       w+2h - ...
-		 *
-		 * To determine how many terms needed, let
-		 * Q(0) = w, Q(1) = w(w+h) - 1,
-		 * Q(k) = (w+k*h)*Q(k-1) - Q(k-2),
-		 * When Q(k) > 1e4	good for single
-		 * When Q(k) > 1e9	good for double
-		 * When Q(k) > 1e17	good for quadruple
-		 */
+             *  J(n,x)/J(n-1,x) =  ----   ------   ------   .....
+             *			2n  - 2(n+1) - 2(n+2)
+             *
+             * 			1      1        1
+             *  (for large x)   =  ----  ------   ------   .....
+             *			2n   2(n+1)   2(n+2)
+             *			-- - ------ - ------ -
+             *			 x     x         x
+             *
+             * Let w = 2n/x and h=2/x, then the above quotient
+             * is equal to the continued fraction:
+             *		    1
+             *	= -----------------------
+             *		       1
+             *	   w - -----------------
+             *			  1
+             * 	        w+h - ---------
+             *		       w+2h - ...
+             *
+             * To determine how many terms needed, let
+             * Q(0) = w, Q(1) = w(w+h) - 1,
+             * Q(k) = (w+k*h)*Q(k-1) - Q(k-2),
+             * When Q(k) > 1e4	good for single
+             * When Q(k) > 1e9	good for double
+             * When Q(k) > 1e17	good for quadruple
+             */
             /* determine k */
             __float64 t, v;
             __float64 q0, q1, h, tmp;
@@ -188,13 +187,13 @@ jn64(int n, __float64 x)
             a = t;
             b = one;
             /*  estimate log((2/x)^n*n!) = n*log(2/x)+n*ln(n)
-		 *  Hence, if n*(log(2n/x)) > ...
-		 *  single 8.8722839355e+01
-		 *  double 7.09782712893383973096e+02
-		 *  long double 1.1356523406294143949491931077970765006170e+04
-		 *  then recurrent value may overflow and the result is
-		 *  likely underflow to zero
-		 */
+             *  Hence, if n*(log(2n/x)) > ...
+             *  single 8.8722839355e+01
+             *  double 7.09782712893383973096e+02
+             *  long double 1.1356523406294143949491931077970765006170e+04
+             *  then recurrent value may overflow and the result is
+             *  likely underflow to zero
+             */
             tmp = n;
             v = two / x;
             tmp = tmp * log64(fabs64(v * tmp));
@@ -232,8 +231,7 @@ jn64(int n, __float64 x)
 
 _MATH_ALIAS_d_id(jn)
 
-__float64
-yn64(int n, __float64 x)
+    __float64 yn64(int n, __float64 x)
 {
     __int32_t i, hx, ix, lx;
     __int32_t sign;
@@ -267,18 +265,18 @@ yn64(int n, __float64 x)
 
     if (ix >= 0x52D00000) { /* x > 2**302 */
         /* (x >> n**2)
-     *	    Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-     *	    Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
-     *	    Let s=sin(x), c=cos(x),
-     *		xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
-     *
-     *		   n	sin(xn)*sqt2	cos(xn)*sqt2
-     *		----------------------------------
-     *		   0	 s-c		 c+s
-     *		   1	-s-c 		-c+s
-     *		   2	-s+c		-c-s
-     *		   3	 s+c		 c-s
-     */
+         *	    Jn(x) = cos(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+         *	    Yn(x) = sin(x-(2n+1)*pi/4)*sqrt(2/x*pi)
+         *	    Let s=sin(x), c=cos(x),
+         *		xn=x-(2n+1)*pi/4, sqt2 = sqrt(2),then
+         *
+         *		   n	sin(xn)*sqt2	cos(xn)*sqt2
+         *		----------------------------------
+         *		   0	 s-c		 c+s
+         *		   1	-s-c 		-c+s
+         *		   2	-s+c		-c-s
+         *		   3	 s+c		 c-s
+         */
         switch (n & 3) {
         case 0:
         default:

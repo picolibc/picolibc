@@ -43,29 +43,28 @@
 
 #ifdef _NEED_FLOAT64
 
-static const __float64
-    tiny = _F_64(1.0e-300), zero = _F_64(0.0),
-    pi_o_4 = _F_64(7.8539816339744827900E-01), /* 0x3FE921FB, 0x54442D18 */
-    pi_o_2 = _F_64(1.5707963267948965580E+00), /* 0x3FF921FB, 0x54442D18 */
-    pi = _F_64(3.1415926535897931160E+00), /* 0x400921FB, 0x54442D18 */
-    pi_lo = _F_64(1.2246467991473531772E-16); /* 0x3CA1A626, 0x33145C07 */
+static const __float64 tiny = _F_64(1.0e-300), zero = _F_64(0.0),
+                       pi_o_4 = _F_64(7.8539816339744827900E-01), /* 0x3FE921FB, 0x54442D18 */
+    pi_o_2 = _F_64(1.5707963267948965580E+00),                    /* 0x3FF921FB, 0x54442D18 */
+    pi = _F_64(3.1415926535897931160E+00),                        /* 0x400921FB, 0x54442D18 */
+    pi_lo = _F_64(1.2246467991473531772E-16);                     /* 0x3CA1A626, 0x33145C07 */
 
 __float64
 atan264(__float64 y, __float64 x)
 {
-    __float64 z;
-    __int32_t k, m, hx, hy, ix, iy;
+    __float64  z;
+    __int32_t  k, m, hx, hy, ix, iy;
     __uint32_t lx, ly;
 
     EXTRACT_WORDS(hx, lx, x);
     ix = hx & 0x7fffffff;
     EXTRACT_WORDS(hy, ly, y);
     iy = hy & 0x7fffffff;
-    if (((ix | ((lx | -lx) >> 31)) > 0x7ff00000) ||
-        ((iy | ((ly | -ly) >> 31)) > 0x7ff00000)) /* x or y is NaN */
+    if (((ix | ((lx | -lx) >> 31)) > 0x7ff00000)
+        || ((iy | ((ly | -ly) >> 31)) > 0x7ff00000)) /* x or y is NaN */
         return x + y;
-    if ((((__uint32_t) hx - 0x3ff00000) | lx) == 0)
-        return atan64(y); /* x=1.0 */
+    if ((((__uint32_t)hx - 0x3ff00000) | lx) == 0)
+        return atan64(y);                    /* x=1.0 */
     m = ((hy >> 31) & 1) | ((hx >> 30) & 2); /* 2*sign(x)+sign(y) */
 
     /* when y = 0 */
@@ -133,7 +132,7 @@ atan264(__float64 y, __float64 x)
         return z; /* atan(-,+) */
     case 2:
         return pi - (z - pi_lo); /* atan(+,-) */
-    default: /* case 3 */
+    default:                     /* case 3 */
         return (z - pi_lo) - pi; /* atan(-,-) */
     }
 }

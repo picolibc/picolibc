@@ -28,24 +28,23 @@
  * $FreeBSD$
  */
 
-#ifndef	_MACHINE_FENV_H_
-#define	_MACHINE_FENV_H_
-
+#ifndef _MACHINE_FENV_H_
+#define _MACHINE_FENV_H_
 
 _BEGIN_STD_C
 
 #ifdef _SOFT_FLOAT
 typedef int fenv_t;
 typedef int fexcept_t;
-#define	FE_TONEAREST	0	/* round to nearest representable number */
+#define FE_TONEAREST 0 /* round to nearest representable number */
 #else
 
 #ifdef __arch64__
-typedef	__UINT64_TYPE__	fenv_t;
-typedef	__UINT64_TYPE__	fexcept_t;
+typedef __UINT64_TYPE__ fenv_t;
+typedef __UINT64_TYPE__ fexcept_t;
 #else
-typedef	__UINT32_TYPE__	fenv_t;
-typedef	__UINT32_TYPE__	fexcept_t;
+typedef __UINT32_TYPE__ fenv_t;
+typedef __UINT32_TYPE__ fexcept_t;
 #endif
 
 /*
@@ -54,14 +53,13 @@ typedef	__UINT32_TYPE__	fexcept_t;
  * Symbols are defined in such a way, to correspond to the accrued
  * exception bits (aexc) fields of FSR.
  */
-#define	FE_INEXACT      0x00000020	/* 0000100000 */
-#define	FE_DIVBYZERO    0x00000040	/* 0001000000 */
-#define	FE_UNDERFLOW    0x00000080	/* 0010000000 */
-#define	FE_OVERFLOW     0x00000100	/* 0100000000 */
-#define	FE_INVALID	0x00000200	/* 1000000000 */
+#define FE_INEXACT    0x00000020 /* 0000100000 */
+#define FE_DIVBYZERO  0x00000040 /* 0001000000 */
+#define FE_UNDERFLOW  0x00000080 /* 0010000000 */
+#define FE_OVERFLOW   0x00000100 /* 0100000000 */
+#define FE_INVALID    0x00000200 /* 1000000000 */
 
-#define	FE_ALL_EXCEPT	(FE_DIVBYZERO | FE_INEXACT | \
-    FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
+#define FE_ALL_EXCEPT (FE_DIVBYZERO | FE_INEXACT | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
 
 /*
  * Rounding modes
@@ -69,22 +67,21 @@ typedef	__UINT32_TYPE__	fexcept_t;
  * We can't just use the hardware bit values here, because that would
  * make FE_UPWARD and FE_DOWNWARD negative, which is not allowed.
  */
-#define	FE_TONEAREST	0	/* round to nearest representable number */
-#define	FE_TOWARDZERO	1	/* round to zero (truncate) */
-#define	FE_UPWARD	2	/* round toward positive infinity */
-#define	FE_DOWNWARD	3	/* round toward negative infinity */
-#define	_ROUND_MASK	(FE_TONEAREST | FE_DOWNWARD | \
-    FE_UPWARD | FE_TOWARDZERO)
-#define	_ROUND_SHIFT	30
+#define FE_TONEAREST  0 /* round to nearest representable number */
+#define FE_TOWARDZERO 1 /* round to zero (truncate) */
+#define FE_UPWARD     2 /* round toward positive infinity */
+#define FE_DOWNWARD   3 /* round toward negative infinity */
+#define _ROUND_MASK   (FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
+#define _ROUND_SHIFT  30
 
 /* We need to be able to map status flag positions to mask flag positions */
-#define	_FPUSW_SHIFT	18
-#define	_ENABLE_MASK	(FE_ALL_EXCEPT << _FPUSW_SHIFT)
+#define _FPUSW_SHIFT  18
+#define _ENABLE_MASK  (FE_ALL_EXCEPT << _FPUSW_SHIFT)
 
-#endif  /* !_SOFT_FLOAT */
+#endif /* !_SOFT_FLOAT */
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
-#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#define __declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline
@@ -97,4 +94,4 @@ typedef	__UINT32_TYPE__	fexcept_t;
 
 _END_STD_C
 
-#endif	/* !_MACHINE_FENV_H_ */
+#endif /* !_MACHINE_FENV_H_ */

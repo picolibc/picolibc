@@ -28,14 +28,15 @@
 #include <math.h>
 
 double
-nearbyint (double x)
+nearbyint(double x)
 {
-    if (isnan(x)) return x + x;
+    if (isnan(x))
+        return x + x;
 #if defined(FE_INEXACT)
     fenv_t env;
     fegetenv(&env);
 #endif
-    __asm__("frinti\t%d0, %d1" : "=w" (x) : "w" (x));
+    __asm__("frinti\t%d0, %d1" : "=w"(x) : "w"(x));
 #if defined(FE_INEXACT)
     fesetenv(&env);
 #endif

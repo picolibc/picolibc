@@ -31,6 +31,6 @@
 */
 
 #define vfwfprintf __d_vfwprintf
-#define swprintf __d_swprintf
+#define swprintf   __d_swprintf
 
 #include "swprintf.c"

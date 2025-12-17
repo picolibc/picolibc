@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -48,16 +48,16 @@ SYNOPSIS
 
 
 DESCRIPTION
-        These functions compute the complex natural (base-<[e]>) logarithm 
-        of <[z]>, with a branch cut along the negative real axis. 
+        These functions compute the complex natural (base-<[e]>) logarithm
+        of <[z]>, with a branch cut along the negative real axis.
 
         <<clogf>> is identical to <<clog>>, except that it performs
         its calculations on <<floats complex>>.
 
 RETURNS
         @ifnottex
-        The clog functions return the complex natural logarithm value, in 
-        the range of a strip mathematically unbounded along the real axis 
+        The clog functions return the complex natural logarithm value, in
+        the range of a strip mathematically unbounded along the real axis
         and in the interval [-i*pi , +i*pi] along the imaginary axis.
         @end ifnottex
         @tex
@@ -80,10 +80,10 @@ QUICKREF
 double complex
 clog(double complex z)
 {
-	double p, rr;
+    double p, rr;
 
-	rr = cabs(z);
-	p = log(rr);
-	rr = atan2(cimag(z), creal(z));
-	return (double complex) p + rr * (double complex) I;
+    rr = cabs(z);
+    p = log(rr);
+    rr = atan2(cimag(z), creal(z));
+    return (double complex)p + rr * (double complex)I;
 }

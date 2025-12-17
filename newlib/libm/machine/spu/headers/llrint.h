@@ -31,55 +31,56 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _LLRINT_H_
-#define _LLRINT_H_	1
+#define _LLRINT_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
-static __inline long long int _llrint(double x)
+static __inline long long int
+_llrint(double x)
 {
-  int shift;
-  vec_int4 exp;
-  vec_uint4 mant, sign, mask, borrow;
-  vec_double2 in, bias;
+    int         shift;
+    vec_int4    exp;
+    vec_uint4   mant, sign, mask, borrow;
+    vec_double2 in, bias;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Round the input according to the current rounding mode.
-   */
-  bias = spu_sel((vec_double2)(VEC_SPLAT_U64(0x4330000000000000ULL)), in,
-                 VEC_SPLAT_U64(0x8000000000000000ULL));
-  mant = (vec_uint4)(spu_sub(spu_add(in, bias), bias));
+    /* Round the input according to the current rounding mode.
+     */
+    bias = spu_sel((vec_double2)(VEC_SPLAT_U64(0x4330000000000000ULL)), in,
+                   VEC_SPLAT_U64(0x8000000000000000ULL));
+    mant = (vec_uint4)(spu_sub(spu_add(in, bias), bias));
 
-  /* Determine how many bits to shift the mantissa to correctly
-   * align it into long long element 0.
-   */
-  exp = spu_and(spu_rlmask((vec_int4)mant, -20), 0x7FF);
-  exp = spu_add(exp, -1011);
-  shift = spu_extract(exp, 0);
+    /* Determine how many bits to shift the mantissa to correctly
+     * align it into long long element 0.
+     */
+    exp = spu_and(spu_rlmask((vec_int4)mant, -20), 0x7FF);
+    exp = spu_add(exp, -1011);
+    shift = spu_extract(exp, 0);
 
-  mask = spu_cmpgt(exp, 0);
-  mask = (vec_uint4)spu_maskw(spu_extract(mask, 0));
+    mask = spu_cmpgt(exp, 0);
+    mask = (vec_uint4)spu_maskw(spu_extract(mask, 0));
 
-  /* Algn mantissa bits
-   */
-  mant = spu_sel(spu_rlmaskqwbyte(mant, -8), VEC_SPLAT_U32(0x00100000),
-                 VEC_LITERAL(vec_uint4, 0,0,0xFFF00000,0));
+    /* Algn mantissa bits
+     */
+    mant = spu_sel(spu_rlmaskqwbyte(mant, -8), VEC_SPLAT_U32(0x00100000),
+                   VEC_LITERAL(vec_uint4, 0, 0, 0xFFF00000, 0));
 
-  mant = spu_and(spu_slqwbytebc(spu_slqw(mant, shift), shift), mask);
+    mant = spu_and(spu_slqwbytebc(spu_slqw(mant, shift), shift), mask);
 
-  /* Compute the two's complement of the mantissa if the
-   * input is negative.
-   */
-  sign = spu_maskw(spu_extract(spu_rlmaska((vec_int4)in, -31), 0));
+    /* Compute the two's complement of the mantissa if the
+     * input is negative.
+     */
+    sign = spu_maskw(spu_extract(spu_rlmaska((vec_int4)in, -31), 0));
 
-  mant = spu_xor(mant, sign);
-  borrow = spu_genb(mant, sign);
-  borrow = spu_shuffle(borrow, borrow,
-                       VEC_LITERAL(vec_uchar16, 4,5,6,7, 192,192,192,192,
-                                   4,5,6,7, 192,192,192,192));
-  mant = spu_subx(mant, sign, borrow);
+    mant = spu_xor(mant, sign);
+    borrow = spu_genb(mant, sign);
+    borrow = spu_shuffle(
+        borrow, borrow,
+        VEC_LITERAL(vec_uchar16, 4, 5, 6, 7, 192, 192, 192, 192, 4, 5, 6, 7, 192, 192, 192, 192));
+    mant = spu_subx(mant, sign, borrow);
 
-  return (spu_extract((vec_llong2)(mant), 0));
+    return (spu_extract((vec_llong2)(mant), 0));
 }
 #endif /* _LLRINT_H_ */

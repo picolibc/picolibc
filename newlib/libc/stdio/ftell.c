@@ -36,21 +36,21 @@
 #include "stdio_private.h"
 
 #ifndef FTELL
-#define FTELL ftell
+#define FTELL      ftell
 #define FTELL_TYPE long
 #endif
 
 FTELL_TYPE
 FTELL(FILE *stream)
 {
-        struct __file_ext *xf = (struct __file_ext *) stream;
-        __flockfile(stream);
-        if ((stream->flags & __SEXT) && xf->seek) {
-                FTELL_TYPE ret = (FTELL_TYPE) (xf->seek) (stream, 0, SEEK_CUR);
-                if (__atomic_load_ungetc(&stream->unget) != 0)
-                    ret--;
-                __funlock_return(stream, ret);
-        }
-        errno = ESPIPE;
-	__funlock_return(stream, -1);
+    struct __file_ext *xf = (struct __file_ext *)stream;
+    __flockfile(stream);
+    if ((stream->flags & __SEXT) && xf->seek) {
+        FTELL_TYPE ret = (FTELL_TYPE)(xf->seek)(stream, 0, SEEK_CUR);
+        if (__atomic_load_ungetc(&stream->unget) != 0)
+            ret--;
+        __funlock_return(stream, ret);
+    }
+    errno = ESPIPE;
+    __funlock_return(stream, -1);
 }

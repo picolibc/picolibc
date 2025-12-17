@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-sinh.h"
-#define TEST_FUNC       sinh
+#define TEST_VECTORS "test-sinh.h"
+#define TEST_FUNC    sinh
 
 #include "test-real-one.h"

@@ -30,13 +30,13 @@
 
 #ifdef _NEED_FLOAT64
 
-static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MAX, (__float64) INFINITY);
+static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MAX, (__float64)INFINITY);
 
 HIDDEN __float64
-__math_oflow (uint32_t sign)
+__math_oflow(uint32_t sign)
 {
     __float64 y = pick_float64_except((sign ? -VAL : VAL) * VAL, sign ? -VAL : VAL);
-    return __math_with_errno (y, ERANGE);
+    return __math_with_errno(y, ERANGE);
 }
 
 #endif

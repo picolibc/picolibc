@@ -38,7 +38,8 @@
 static void
 m68k_halt_isr(void)
 {
-    for(;;);
+    for (;;)
+        ;
 }
 
 static void
@@ -46,15 +47,13 @@ m68k_ignore_isr(void)
 {
 }
 
-void _start(void);
+void        _start(void);
 
 extern char __stack[];
 
-#define isr(name) \
-	void  m68k_ ## name ## _isr(void) __attribute__ ((weak, alias("m68k_ignore_isr")));
+#define isr(name)      void m68k_##name##_isr(void) __attribute__((weak, alias("m68k_ignore_isr")));
 
-#define isr_halt(name) \
-	void  m68k_ ## name ## _isr(void) __attribute__ ((weak, alias("m68k_halt_isr")));
+#define isr_halt(name) void m68k_##name##_isr(void) __attribute__((weak, alias("m68k_halt_isr")));
 
 isr_halt(access_fault);
 isr_halt(address_error);
@@ -73,10 +72,9 @@ isr_halt(fp_overflow);
 isr_halt(fp_signaling_nan);
 isr_halt(fp_unimplemented_data);
 
-#define i(id,name)	[id] = m68k_ ## name ## _isr
+#define i(id, name) [id] = m68k_##name##_isr
 
-__section(".data.init.enter")
-void * const __exception_vector[] = {
+__section(".data.init.enter") void * const __exception_vector[] = {
     [0] = __stack,
     [1] = _start,
     i(2, access_fault),

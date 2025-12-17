@@ -42,8 +42,7 @@
 #include <errno.h>
 #include <stdarg.h>
 
-struct arc_stat
-{
+struct arc_stat {
     uint16_t my_dev;
     uint16_t my___pad1;
     uint32_t my_ino;
@@ -67,11 +66,11 @@ struct arc_stat
 };
 
 int
-fstat(int fd, struct stat *restrict statbuf)
+fstat(int fd, struct stat * restrict statbuf)
 {
     struct arc_stat arc_stat;
 
-    int ret = arc_semihost2(SYS_SEMIHOST_fstat, fd, (uintptr_t) &arc_stat);
+    int             ret = arc_semihost2(SYS_SEMIHOST_fstat, fd, (uintptr_t)&arc_stat);
     if (ret < 0) {
         arc_semihost_errno(EBADF);
     } else {

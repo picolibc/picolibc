@@ -37,22 +37,20 @@
 #include <unistd.h>
 #include "lm32_semihost.h"
 
-off_t lseek(int fd, off_t offset, int whence)
+off_t
+lseek(int fd, off_t offset, int whence)
 {
     struct lm32_scall_args args = {
-        .r8 = TARGET_NEWLIB_SYS_lseek,
-        .r1 = fd,
-        .r2 = (uint32_t) offset,
-        .r3 = (uint32_t) whence
+        .r8 = TARGET_NEWLIB_SYS_lseek, .r1 = fd, .r2 = (uint32_t)offset, .r3 = (uint32_t)whence
     };
     struct lm32_scall_ret ret;
 
     lm32_scall(&args, &ret);
-    return (off_t) ret.r1;
+    return (off_t)ret.r1;
 }
 
-_off64_t lseek64(int fd, _off64_t offset, int whence)
+_off64_t
+lseek64(int fd, _off64_t offset, int whence)
 {
-	return (_off64_t) lseek(fd, (off_t) offset, whence);
+    return (_off64_t)lseek(fd, (off_t)offset, whence);
 }
-

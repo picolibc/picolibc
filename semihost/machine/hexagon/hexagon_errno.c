@@ -36,9 +36,9 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "hexagon_semihost.h"
 #include <errno.h>
 
-#define E(N)                                                                   \
-    case HEX_E##N:                                                             \
-        errno = E##N;                                                          \
+#define E(N)          \
+    case HEX_E##N:    \
+        errno = E##N; \
         break
 
 void

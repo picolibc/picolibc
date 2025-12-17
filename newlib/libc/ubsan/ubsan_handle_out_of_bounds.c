@@ -36,14 +36,11 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_out_of_bounds(void *_data,
-                             void *index)
+__ubsan_handle_out_of_bounds(void *_data, void *index)
 {
     struct out_of_bounds_data *data = _data;
-    char index_str[VAL_STR_LEN];
+    char                       index_str[VAL_STR_LEN];
     __ubsan_val_to_string(index_str, data->index_type, index);
-    __ubsan_error(&data->location, "out_of_bounds", "(%s) [%s]\n",
-                  data->array_type->type_name,
+    __ubsan_error(&data->location, "out_of_bounds", "(%s) [%s]\n", data->array_type->type_name,
                   index_str);
 }
-

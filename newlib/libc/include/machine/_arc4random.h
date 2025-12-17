@@ -19,5 +19,4 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 /* Use default implementation, see arc4random.h */

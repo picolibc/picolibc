@@ -38,7 +38,7 @@ SUCH DAMAGE.
  */
 
 #ifndef _STRING_H_
-#define	_STRING_H_
+#define _STRING_H_
 
 #include <sys/cdefs.h>
 
@@ -68,143 +68,148 @@ _BEGIN_STD_C
    this also implies that the POSIX version is used in this case.  That's made
    sure here. */
 #if __GNU_VISIBLE && !defined(basename)
-# ifdef __ASMNAME
-#  define basename basename
-char *__nonnull ((1))
-         basename (const char *) _ASMNAME("__gnu_basename");
-# else
-#  define basename(s) (__gnu_basename(s))
-# endif
+#ifdef __ASMNAME
+#define basename basename
+char *__nonnull((1)) basename(const char *) _ASMNAME("__gnu_basename");
+#else
+#define basename(s) (__gnu_basename(s))
+#endif
 #endif
 
 #if __MISC_VISIBLE || __POSIX_VISIBLE
-void    *memccpy (void *__restrict, const void *__restrict, int, size_t);
+void *memccpy(void * __restrict, const void * __restrict, int, size_t);
 #endif
-void    *memchr (const void *, int, size_t);
-int 	 memcmp (const void *, const void *, size_t);
-void    *memcpy (void *__restrict, const void *__restrict, size_t);
+void *memchr(const void *, int, size_t);
+int   memcmp(const void *, const void *, size_t);
+void *memcpy(void * __restrict, const void * __restrict, size_t);
 #if __GNU_VISIBLE
-void    *memmem (const void *, size_t, const void *, size_t);
+void *memmem(const void *, size_t, const void *, size_t);
 #endif
-void    *memmove (void *, const void *, size_t);
+void *memmove(void *, const void *, size_t);
 #if __GNU_VISIBLE
-void    *mempcpy (void *, const void *, size_t);
-void    *memrchr (const void *, int, size_t);
+void *mempcpy(void *, const void *, size_t);
+void *memrchr(const void *, int, size_t);
 #endif
-void    *memset (void *, int, size_t);
+void *memset(void *, int, size_t);
 #if __ISO_C_VISIBLE >= 2023
-void    *memset_explicit(void *, int, size_t);
+void *memset_explicit(void *, int, size_t);
 #endif
 #if __GNU_VISIBLE
-void    *rawmemchr (const void *, int);
+void *rawmemchr(const void *, int);
 #endif
 #if __POSIX_VISIBLE >= 200809
-char 	*stpcpy (char *__restrict, const char *__restrict);
-char 	*stpncpy (char *__restrict, const char *__restrict, size_t);
+char *stpcpy(char * __restrict, const char * __restrict);
+char *stpncpy(char * __restrict, const char * __restrict, size_t);
 #endif
 #if __GNU_VISIBLE
-char	*strcasestr (const char *, const char *);
+char *strcasestr(const char *, const char *);
 #endif
-char 	*strcat (char *__restrict, const char *__restrict);
-char 	*strchr (const char *, int);
+char *strcat(char * __restrict, const char * __restrict);
+char *strchr(const char *, int);
 #if __GNU_VISIBLE
-char 	*strchrnul (const char *, int);
+char *strchrnul(const char *, int);
 #endif
-int	 strcmp (const char *, const char *);
-int	 strcoll (const char *, const char *);
+int strcmp(const char *, const char *);
+int strcoll(const char *, const char *);
 #if __POSIX_VISIBLE >= 200809
-int	 strcoll_l (const char *, const char *, locale_t);
+int strcoll_l(const char *, const char *, locale_t);
 #endif
-char 	*strcpy (char *__restrict, const char *__restrict);
-size_t	 strcspn (const char *, const char *);
+char  *strcpy(char  *__restrict, const char  *__restrict);
+size_t strcspn(const char *, const char *);
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
-void	free (void *) __nothrow; /* for __malloc_like */
-char 	*strdup (const char *) __malloc_like __warn_unused_result;
+void  free(void *) __nothrow; /* for __malloc_like */
+char *strdup(const char *) __malloc_like __warn_unused_result;
 #endif
 #if __GNU_VISIBLE && defined(__GNUC__)
-#define strdupa(__s) \
-	(__extension__ ({const char *__sin = (__s); \
-			 size_t __len = strlen (__sin) + 1; \
-			 char * __sout = (char *) __builtin_alloca (__len); \
-			 (char *) memcpy (__sout, __sin, __len);}))
-#define strndupa(__s, __n) \
-	(__extension__ ({const char *__sin = (__s); \
-			 size_t __len = strnlen (__sin, (__n)) + 1; \
-			 char *__sout = (char *) __builtin_alloca (__len); \
-			 __sout[__len-1] = '\0'; \
-			 (char *) memcpy (__sout, __sin, __len-1);}))
+#define strdupa(__s)                                          \
+    (__extension__({                                          \
+        const char *__sin = (__s);                            \
+        size_t      __len = strlen(__sin) + 1;                \
+        char       *__sout = (char *)__builtin_alloca(__len); \
+        (char *)memcpy(__sout, __sin, __len);                 \
+    }))
+#define strndupa(__s, __n)                                    \
+    (__extension__({                                          \
+        const char *__sin = (__s);                            \
+        size_t      __len = strnlen(__sin, (__n)) + 1;        \
+        char       *__sout = (char *)__builtin_alloca(__len); \
+        __sout[__len - 1] = '\0';                             \
+        (char *)memcpy(__sout, __sin, __len - 1);             \
+    }))
 #endif /* __GNU_VISIBLE && __GNUC__ */
-char 	*strerror (int);
+char *strerror(int);
 #if __POSIX_VISIBLE >= 200809
-char	*strerror_l (int, locale_t);
+char *strerror_l(int, locale_t);
 #endif
 /* There are two common strerror_r variants.  If you request
    _GNU_SOURCE, you get the GNU version; otherwise you get the POSIX
    version.  POSIX requires that #undef strerror_r will still let you
    invoke the underlying function, but that requires gcc support.  */
 #if __GNU_VISIBLE
-char    *strerror_r (int, char *, size_t);
+char *strerror_r(int, char *, size_t);
 #elif __POSIX_VISIBLE >= 200112
-# ifdef __GNUC__
-int	 strerror_r (int, char *, size_t) _ASMNAME("__xpg_strerror_r");
-# else
-int	__xpg_strerror_r (int, char *, size_t);
-#  define strerror_r __xpg_strerror_r
-# endif
+#ifdef __GNUC__
+int strerror_r(int, char *, size_t) _ASMNAME("__xpg_strerror_r");
+#else
+int __xpg_strerror_r(int, char *, size_t);
+#define strerror_r __xpg_strerror_r
+#endif
 #endif
 #if __GNU_VISIBLE
 const char *strerrorname_np(int errnum);
 const char *strerrordesc_np(int errnum);
 #endif
 #if __BSD_VISIBLE
-size_t   strlcat (char *, const char *, size_t);
+size_t strlcat(char *, const char *, size_t);
 #endif
-size_t	 strlen (const char *);
+size_t strlen(const char *);
 #if __BSD_VISIBLE
-size_t   strlcpy (char *, const char *, size_t);
+size_t strlcpy(char *, const char *, size_t);
 #endif
 #if __MISC_VISIBLE
-char	*strlwr (char *);
+char *strlwr(char *);
 #endif
-char 	*strncat (char *__restrict, const char *__restrict, size_t);
-int	 strncmp (const char *, const char *, size_t);
-char 	*strncpy (char *__restrict, const char *__restrict, size_t);
+char *strncat(char * __restrict, const char * __restrict, size_t);
+int   strncmp(const char *, const char *, size_t);
+char *strncpy(char * __restrict, const char * __restrict, size_t);
 #if __POSIX_VISIBLE >= 200809
-char 	*strndup (const char *, size_t) __malloc_like __warn_unused_result;
+char               *
+strndup(const char *, size_t)
+__malloc_like __warn_unused_result;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __ZEPHYR_VISIBLE
-size_t	 strnlen (const char *, size_t);
+size_t strnlen(const char *, size_t);
 #endif
 #if __BSD_VISIBLE
-char    *strnstr(const char *, const char *, size_t) __pure;
+char *strnstr(const char *, const char *, size_t) __pure;
 #endif
-char 	*strpbrk (const char *, const char *);
-char 	*strrchr (const char *, int);
+char *strpbrk(const char *, const char *);
+char *strrchr(const char *, int);
 #if __BSD_VISIBLE
-char 	*strsep (char **, const char *);
+char *strsep(char **, const char *);
 #endif
 #if __POSIX_VISIBLE >= 200809
-char	*strsignal (int __signo);
+char *strsignal(int __signo);
 #endif
-size_t	 strspn (const char *, const char *);
-char 	*strstr (const char *, const char *);
-char 	*strtok (char *__restrict, const char *__restrict);
+size_t strspn(const char *, const char *);
+char  *strstr(const char *, const char *);
+char  *strtok(char  *__restrict, const char  *__restrict);
 #if __MISC_VISIBLE || __POSIX_VISIBLE || __ZEPHYR_VISIBLE
-char 	*strtok_r (char *__restrict, const char *__restrict, char **__restrict);
+char *strtok_r(char * __restrict, const char * __restrict, char ** __restrict);
 #endif
 #if __MISC_VISIBLE
-char	*strupr (char *);
+char *strupr(char *);
 #endif
 #if __GNU_VISIBLE
-int	 strverscmp (const char *, const char *);
+int strverscmp(const char *, const char *);
 #endif
-size_t	 strxfrm (char *__restrict, const char *__restrict, size_t);
+size_t strxfrm(char * __restrict, const char * __restrict, size_t);
 #if __POSIX_VISIBLE >= 200809
-size_t	 strxfrm_l (char *__restrict, const char *__restrict, size_t, locale_t);
+size_t strxfrm_l(char * __restrict, const char * __restrict, size_t, locale_t);
 #endif
 #if __BSD_VISIBLE
-int	 timingsafe_bcmp (const void *, const void *, size_t);
-int	 timingsafe_memcmp (const void *, const void *, size_t);
+int timingsafe_bcmp(const void *, const void *, size_t);
+int timingsafe_memcmp(const void *, const void *, size_t);
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1
@@ -224,16 +229,16 @@ typedef __rsize_t rsize_t;
 #define _RSIZE_T_DEFINED
 #endif
 
-errno_t memcpy_s(void *__restrict, rsize_t, const void *__restrict, rsize_t);
+errno_t memcpy_s(void * __restrict, rsize_t, const void * __restrict, rsize_t);
 errno_t memset_s(void *, rsize_t, int, rsize_t);
 errno_t memmove_s(void *, rsize_t, const void *, rsize_t);
-errno_t strcpy_s(char *__restrict, rsize_t, const char *__restrict);
-errno_t strcat_s(char *__restrict, rsize_t, const char *__restrict);
-errno_t strncpy_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
-errno_t strncat_s(char *__restrict, rsize_t, const char *__restrict, rsize_t);
-size_t strnlen_s(const char *, size_t);
+errno_t strcpy_s(char * __restrict, rsize_t, const char * __restrict);
+errno_t strcat_s(char * __restrict, rsize_t, const char * __restrict);
+errno_t strncpy_s(char * __restrict, rsize_t, const char * __restrict, rsize_t);
+errno_t strncat_s(char * __restrict, rsize_t, const char * __restrict, rsize_t);
+size_t  strnlen_s(const char *, size_t);
 errno_t strerror_s(char *, rsize_t, errno_t);
-size_t strerrorlen_s(errno_t);
+size_t  strerrorlen_s(errno_t);
 #endif
 
 #include <sys/string.h>

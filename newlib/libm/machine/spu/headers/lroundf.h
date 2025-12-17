@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _LROUNDF_H_
-#define _LROUNDF_H_	1
+#define _LROUNDF_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -40,17 +40,18 @@
  * away from zero. No special handling is performed when values are
  * outside the 32-bit range.
  */
-static __inline long int _lroundf(float x)
+static __inline long int
+_lroundf(float x)
 {
-  vec_int4 out;
-  vec_float4 in, addend;
+    vec_int4   out;
+    vec_float4 in, addend;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Add signed 0.5 */
-  addend = spu_sel(VEC_SPLAT_F32(0.5f), in, VEC_SPLAT_U32(0x80000000));
-  out = spu_convts(spu_add(in, addend), 0);
+    /* Add signed 0.5 */
+    addend = spu_sel(VEC_SPLAT_F32(0.5f), in, VEC_SPLAT_U32(0x80000000));
+    out = spu_convts(spu_add(in, addend), 0);
 
-  return ((long int)spu_extract(out, 0));
+    return ((long int)spu_extract(out, 0));
 }
 #endif /* _LROUNDF_H_ */

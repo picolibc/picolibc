@@ -43,44 +43,44 @@
 
 #if DTOX_SIZE == 8
 
-#define DTOA_MAX_DIG            17
-#define DTOA_MAX_10_EXP         308
-#define DTOA_MIN_10_EXP         (-307)
-#define DTOA_SCALE_UP_NUM       9
-#define DTOA_ROUND_NUM          (DTOA_MAX_DIG + 1)
+#define DTOA_MAX_DIG      17
+#define DTOA_MAX_10_EXP   308
+#define DTOA_MIN_10_EXP   (-307)
+#define DTOA_SCALE_UP_NUM 9
+#define DTOA_ROUND_NUM    (DTOA_MAX_DIG + 1)
 
-#define DTOX_UINT       uint64_t
-#define DTOX_INT        int64_t
-#define DTOX_ASUINT(x)  asuint64(x)
+#define DTOX_UINT         uint64_t
+#define DTOX_INT          int64_t
+#define DTOX_ASUINT(x)    asuint64(x)
 
-#define EXP_SHIFT       52
-#define EXP_MASK        0x7ff
-#define SIG_SHIFT       0
-#define SIG_MASK        0xfffffffffffffLL
-#define SIG_MSB         0x10000000000000LL
-#define EXP_BIAS        1023
-#define ASUINT(x)       asuint64(x)
-#define DTOX_NDIGS      14
+#define EXP_SHIFT         52
+#define EXP_MASK          0x7ff
+#define SIG_SHIFT         0
+#define SIG_MASK          0xfffffffffffffLL
+#define SIG_MSB           0x10000000000000LL
+#define EXP_BIAS          1023
+#define ASUINT(x)         asuint64(x)
+#define DTOX_NDIGS        14
 
 #define _NEED_IO_FLOAT64
 
 #elif DTOX_SIZE == 4
 
 #define _NEED_IO_FLOAT32
-#define __dtox_engine __ftox_engine
+#define __dtox_engine  __ftox_engine
 
-#define DTOX_UINT       uint32_t
-#define DTOX_INT        int32_t
-#define DTOX_ASUINT(x)  asuint(x)
+#define DTOX_UINT      uint32_t
+#define DTOX_INT       int32_t
+#define DTOX_ASUINT(x) asuint(x)
 
-#define EXP_SHIFT       23
-#define EXP_MASK        0xff
-#define SIG_SHIFT       1
-#define SIG_MASK        0x7fffff
-#define SIG_MSB         0x800000
-#define EXP_BIAS        127
-#define ASUINT(x)       asuint(x)
-#define DTOX_NDIGS 7
+#define EXP_SHIFT      23
+#define EXP_MASK       0xff
+#define SIG_SHIFT      1
+#define SIG_MASK       0x7fffff
+#define SIG_MSB        0x800000
+#define EXP_BIAS       127
+#define ASUINT(x)      asuint(x)
+#define DTOX_NDIGS     7
 #endif
 
 #include "dtoa.h"
@@ -99,14 +99,14 @@
  * this file.
  */
 
-#define TOCASE(c)       ((c) - case_convert)
+#define TOCASE(c) ((c) - case_convert)
 
 int
-__dtox_engine (DTOX_UINT ufi, struct dtoa *dtoa, int prec, unsigned char case_convert)
+__dtox_engine(DTOX_UINT ufi, struct dtoa *dtoa, int prec, unsigned char case_convert)
 {
-    DTOX_INT fi = (DTOX_INT) ufi;
+    DTOX_INT fi = (DTOX_INT)ufi;
     DTOX_INT s;
-    int exp, d;
+    int      exp, d;
 
     dtoa->flags = 0;
     if (fi < 0)
@@ -136,9 +136,9 @@ __dtox_engine (DTOX_UINT ufi, struct dtoa *dtoa, int prec, unsigned char case_co
     else if (prec >= (DTOX_NDIGS - 1))
         prec = DTOX_NDIGS - 1;
     else {
-        int                 bits = ((DTOX_NDIGS - 1) - prec) << 2;
-        DTOX_INT            half = ((DTOX_INT) 1) << (bits - 1);
-        DTOX_INT            mask = ~((half << 1) - 1);
+        int      bits = ((DTOX_NDIGS - 1) - prec) << 2;
+        DTOX_INT half = ((DTOX_INT)1) << (bits - 1);
+        DTOX_INT mask = ~((half << 1) - 1);
 
         /* round even */
         if ((s & ~mask) > half || ((s >> bits) & 1) != 0)

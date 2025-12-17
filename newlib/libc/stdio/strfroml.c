@@ -35,18 +35,18 @@
 
 #include "stdio_private.h"
 
-int strfroml(char *restrict str, size_t n,
-	     const char *restrict format, long double fp)
+int
+strfroml(char * restrict str, size_t n, const char * restrict format, long double fp)
 {
-    char nformat[32];
+    char        nformat[32];
     const char *f;
-    bool found_percent;
-    bool inserted_L;
-    char *nf;
+    bool        found_percent;
+    bool        inserted_L;
+    char       *nf;
 
     /* if there's not space for a replacement format, just bail */
     if (strlen(format) > sizeof(nformat) - 2)
-        return __d_snprintf(str, n, format, (double) fp);
+        return __d_snprintf(str, n, format, (double)fp);
     nf = nformat;
     f = format;
     found_percent = false;
@@ -57,10 +57,14 @@ int strfroml(char *restrict str, size_t n,
         case '%':
             found_percent = true;
             break;
-        case 'e': case 'E':
-        case 'f': case 'F':
-        case 'g': case 'G':
-        case 'a': case 'A':
+        case 'e':
+        case 'E':
+        case 'f':
+        case 'F':
+        case 'g':
+        case 'G':
+        case 'a':
+        case 'A':
             if (found_percent && !inserted_L) {
                 *nf++ = 'L';
                 inserted_L = true;

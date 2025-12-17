@@ -52,7 +52,7 @@
  */
 struct __stack_chk_guard {
     uintptr_t v[2];
-}  __stack_chk_guard __section(".stack_chk");
+} __stack_chk_guard __section(".stack_chk");
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -64,6 +64,6 @@ struct __stack_chk_guard {
 
 extern _Thread_local char __tls_first[];
 
-#define __stack_chk_guard       (((struct __stack_chk_guard *) __tls_first)[-1].v[0])
+#define __stack_chk_guard (((struct __stack_chk_guard *)__tls_first)[-1].v[0])
 
 #endif

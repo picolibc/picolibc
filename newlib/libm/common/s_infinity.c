@@ -3,7 +3,7 @@ Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
 
 Developed at SunPro, a Sun Microsystems, Inc. business.
 Permission to use, copy, modify, and distribute this
-software is freely granted, provided that this notice 
+software is freely granted, provided that this notice
 is preserved.
  */
 /*
@@ -13,22 +13,22 @@ is preserved.
 
 /*
 FUNCTION
-	<<infinity>>, <<infinityf>>---representation of infinity
+        <<infinity>>, <<infinityf>>---representation of infinity
 
 INDEX
-	infinity
+        infinity
 INDEX
-	infinityf
+        infinityf
 
 SYNOPSIS
-	#include <math.h>
-	double infinity(void);
-	float infinityf(void);
+        #include <math.h>
+        double infinity(void);
+        float infinityf(void);
 
 DESCRIPTION
-	<<infinity>> and <<infinityf>> return the special number IEEE
-	infinity in double- and single-precision arithmetic
-	respectively.
+        <<infinity>> and <<infinityf>> return the special number IEEE
+        infinity in double- and single-precision arithmetic
+        respectively.
 
 PORTABILITY
 <<infinity>> and <<infinityf>> are neither standard C nor POSIX.  C and
@@ -38,7 +38,7 @@ and infinityf() functions in floating-point implementations which do have
 infinities.
 
 QUICKREF
-	infinity - pure
+        infinity - pure
 
 */
 
@@ -49,10 +49,10 @@ QUICKREF
 __float64
 infinity64(void)
 {
-	__float64 x;
+    __float64 x;
 
-	INSERT_WORDS(x,0x7ff00000,0);
-	return x;
+    INSERT_WORDS(x, 0x7ff00000, 0);
+    return x;
 }
 
 _MATH_ALIAS_d(infinity)

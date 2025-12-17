@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fmaxf.h"
 
-float fmaxf(float x, float y)
+float
+fmaxf(float x, float y)
 {
     return _fmaxf(x, y);
 }

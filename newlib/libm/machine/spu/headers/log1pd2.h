@@ -38,15 +38,13 @@
 
 #ifdef __SPU__
 #ifndef _LOG1PD2_H_
-#define _LOG1PD2_H_	1
+#define _LOG1PD2_H_ 1
 
 #include <spu_intrinsics.h>
 #include "simdmath.h"
 
 #include "logd2.h"
 #include "divd2.h"
-
-
 
 #define LOG1PD2_P0 0.0000000000000000000000000e+00
 #define LOG1PD2_P1 1.0000000000000000000000000e+00
@@ -64,61 +62,61 @@
 #define LOG1PD2_Q5 3.2620075387969869884496887e-02
 #define LOG1PD2_Q6 6.8047193336239690346356479e-04
 
-
 /*
  * FUNCTION
  *	vector double _log1pd2(vector double x)
  *
  * DESCRIPTION
- *	The function _log1pd2 computes the natural logarithm of x + 1 
+ *	The function _log1pd2 computes the natural logarithm of x + 1
  *	for each of the double word elements of x.
  *
  */
 
-static __inline vector double _log1pd2(vector double x) 
+static __inline vector double
+_log1pd2(vector double x)
 {
-  vector double oned  = spu_splats(1.0);
-  vector double rangehi = spu_splats(0.35);
-  vector double rangelo = spu_splats(0.0);
-  vector unsigned long long use_log;
-  vector double pr, qr;
-  vector double eresult;
-  vector double rresult;
-  vector double result;
+    vector double             oned = spu_splats(1.0);
+    vector double             rangehi = spu_splats(0.35);
+    vector double             rangelo = spu_splats(0.0);
+    vector unsigned long long use_log;
+    vector double             pr, qr;
+    vector double             eresult;
+    vector double             rresult;
+    vector double             result;
 
-  /* Compiler Bug. Replace xbug with x when spu_cmp*() doesn't 
-   * modify it's arguments! */
-  volatile vector double xbug = x;
-  use_log = spu_or(spu_cmpgt(xbug, rangehi), spu_cmpgt(rangelo, xbug));
+    /* Compiler Bug. Replace xbug with x when spu_cmp*() doesn't
+     * modify it's arguments! */
+    volatile vector double    xbug = x;
+    use_log = spu_or(spu_cmpgt(xbug, rangehi), spu_cmpgt(rangelo, xbug));
 
-  /*
-   * Calculate directly using log(x+1)
-   */
-  eresult = _logd2(spu_add(x, oned));
+    /*
+     * Calculate directly using log(x+1)
+     */
+    eresult = _logd2(spu_add(x, oned));
 
-  /*
-   * For x in [0.0,0.35], use a rational approximation.
-   */
-  pr = spu_madd(x, spu_splats(LOG1PD2_P6), spu_splats(LOG1PD2_P5));
-  qr = spu_madd(x, spu_splats(LOG1PD2_Q6), spu_splats(LOG1PD2_Q5));
-  pr = spu_madd(pr, x, spu_splats(LOG1PD2_P4));
-  qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q4));
-  pr = spu_madd(pr, x, spu_splats(LOG1PD2_P3));
-  qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q3));
-  pr = spu_madd(pr, x, spu_splats(LOG1PD2_P2));
-  qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q2));
-  pr = spu_madd(pr, x, spu_splats(LOG1PD2_P1));
-  qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q1));
-  pr = spu_madd(pr, x, spu_splats(LOG1PD2_P0));
-  qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q0));
-  rresult = _divd2(pr, qr);
+    /*
+     * For x in [0.0,0.35], use a rational approximation.
+     */
+    pr = spu_madd(x, spu_splats(LOG1PD2_P6), spu_splats(LOG1PD2_P5));
+    qr = spu_madd(x, spu_splats(LOG1PD2_Q6), spu_splats(LOG1PD2_Q5));
+    pr = spu_madd(pr, x, spu_splats(LOG1PD2_P4));
+    qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q4));
+    pr = spu_madd(pr, x, spu_splats(LOG1PD2_P3));
+    qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q3));
+    pr = spu_madd(pr, x, spu_splats(LOG1PD2_P2));
+    qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q2));
+    pr = spu_madd(pr, x, spu_splats(LOG1PD2_P1));
+    qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q1));
+    pr = spu_madd(pr, x, spu_splats(LOG1PD2_P0));
+    qr = spu_madd(qr, x, spu_splats(LOG1PD2_Q0));
+    rresult = _divd2(pr, qr);
 
-  /*
-   * Select either direct calculation or rational approximation.
-   */
-  result = spu_sel(rresult, eresult, use_log);
+    /*
+     * Select either direct calculation or rational approximation.
+     */
+    result = spu_sel(rresult, eresult, use_log);
 
-  return result;
+    return result;
 }
 
 #endif /* _LOG1PD2_H_ */

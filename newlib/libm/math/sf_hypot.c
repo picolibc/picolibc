@@ -18,7 +18,7 @@
 float
 hypotf(float x, float y)
 {
-    float a = x, b = y, t1, t2, y1, y2, w;
+    float     a = x, b = y, t1, t2, y1, y2, w;
     __int32_t j, k, ha, hb;
 
     GET_FLOAT_WORD(ha, x);
@@ -36,9 +36,9 @@ hypotf(float x, float y)
         return a + b;
     } /* x/y > 2**30 */
     k = 0;
-    if (ha > 0x58800000L) { /* a>2**50 */
+    if (ha > 0x58800000L) {             /* a>2**50 */
         if (!FLT_UWORD_IS_FINITE(ha)) { /* Inf or NaN */
-            w = a + b; /* for sNaN */
+            w = a + b;                  /* for sNaN */
             if (FLT_UWORD_IS_INFINITE(ha) && !issignaling(b))
                 w = a;
             if (FLT_UWORD_IS_INFINITE(hb) && !issignaling(a))
@@ -60,7 +60,7 @@ hypotf(float x, float y)
             b *= t1;
             a *= t1;
             k -= 126;
-        } else { /* scale a and b by 2^68 */
+        } else {              /* scale a and b by 2^68 */
             ha += 0x22000000; /* a *= 2^68 */
             hb += 0x22000000; /* b *= 2^68 */
             k -= 68;

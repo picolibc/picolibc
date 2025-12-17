@@ -41,25 +41,25 @@
 char *
 __gets_chk(char * __restrict str, size_t slen)
 {
-	char *cp = str;
+    char *cp = str;
 
-        for (;;) {
-                int c = getchar();
-                switch (c) {
-                case EOF:
-                        if (ferror(stdin) || cp == str)
-                                return NULL;
-                        __fallthrough;
-                case '\n':
-                        if (slen == 0)
-                                __chk_fail();
-                        *cp = '\0';
-                        return str;
-                default:
-                        if (slen == 0)
-                                __chk_fail();
-                        slen--;
-                        *cp++ = (char)c;
-                }
-	}
+    for (;;) {
+        int c = getchar();
+        switch (c) {
+        case EOF:
+            if (ferror(stdin) || cp == str)
+                return NULL;
+            __fallthrough;
+        case '\n':
+            if (slen == 0)
+                __chk_fail();
+            *cp = '\0';
+            return str;
+        default:
+            if (slen == 0)
+                __chk_fail();
+            slen--;
+            *cp++ = (char)c;
+        }
+    }
 }

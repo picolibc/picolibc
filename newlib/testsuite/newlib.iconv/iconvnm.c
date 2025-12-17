@@ -30,69 +30,81 @@
 #include "check.h"
 
 static const char * const good_names[] = {
-    "us_ascii", "US_ASCII", "us-ASCII", "US-ASCII",
+    "us_ascii",   "US_ASCII",   "us-ASCII",   "US-ASCII",
 #ifdef __MB_CAPABLE
-    "utf_8", "UTF_8", "uTf-8", "UTF-8",
+    "utf_8",      "UTF_8",      "uTf-8",      "UTF-8",
 #endif
 #ifdef MB_EXTENDED_CHARSETS_ISO
     "iso_8859_5", "iso-8859-5", "iso-8859_5", "IsO-8859_5",
 #endif
 #ifdef __MB_EXTENDED_CHARSETS_JIS
-    "euc-jp", "EUC_JP", "euc-JP", "EUC-JP",
+    "euc-jp",     "EUC_JP",     "euc-JP",     "EUC-JP",
 #endif
 };
 
-static const char * const bad_names[] =
-{" ", "iso", "8", "iso_8859_5 ", " iso_8859_5", "csisolatincyrillic ",
- " csisolatincyrillic", "euc-", "p", "euc_jp ", "euc-jp-",
- "us_as", "us_", "us_ascii ", " us_ascii",
- "CCCP", "", "-1", "-", "_", "---", "___", "-_-_-", "_-_-_", NULL};
+static const char * const bad_names[] = { " ",
+                                          "iso",
+                                          "8",
+                                          "iso_8859_5 ",
+                                          " iso_8859_5",
+                                          "csisolatincyrillic ",
+                                          " csisolatincyrillic",
+                                          "euc-",
+                                          "p",
+                                          "euc_jp ",
+                                          "euc-jp-",
+                                          "us_as",
+                                          "us_",
+                                          "us_ascii ",
+                                          " us_ascii",
+                                          "CCCP",
+                                          "",
+                                          "-1",
+                                          "-",
+                                          "_",
+                                          "---",
+                                          "___",
+                                          "-_-_-",
+                                          "_-_-_",
+                                          NULL };
 
-
-int main(void)
+int
+main(void)
 {
     unsigned i, failed = 0;
-    iconv_t cd;
+    iconv_t  cd;
 
     puts("iconv names test");
 
-    for (i = 0; i < sizeof(good_names)/sizeof(char *); i++)
-    {
+    for (i = 0; i < sizeof(good_names) / sizeof(char *); i++) {
         printf("Trying iconv(%s, %s)", good_names[0], good_names[i]);
         fflush(stdout);
 
         cd = iconv_open(good_names[0], good_names[i]);
 
-        if (cd == (iconv_t)-1)
-        {
+        if (cd == (iconv_t)-1) {
             puts(" ... FAILED");
             failed += 1;
-        }
-        else
-        {
+        } else {
             puts(" ... PASSED");
             CHECK(iconv_close(cd) != -1);
         }
     }
 
-    for (i = 0; i < sizeof(bad_names)/sizeof(char *); i++)
-    {
+    for (i = 0; i < sizeof(bad_names) / sizeof(char *); i++) {
         printf("Trying iconv(%s, \"%s\")", good_names[0], bad_names[i]);
         fflush(stdout);
 
         cd = iconv_open(good_names[0], bad_names[i]);
 
-        if (cd != (iconv_t)-1)
-        {
+        if (cd != (iconv_t)-1) {
             puts(" ... FAILED");
             failed += 1;
-        }
-        else
+        } else
             puts(" ... PASSED");
     }
 
-    if (failed)
-    {
+    if (failed) {
         printf("%d FAILTURES\n", failed);
         abort();
     }

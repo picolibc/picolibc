@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/lrint.h"
 
-long int lrint(double x)
+long int
+lrint(double x)
 {
     return _lrint(x);
 }

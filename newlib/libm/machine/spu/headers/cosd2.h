@@ -41,7 +41,7 @@
 #ifdef __SPU__
 
 #ifndef _COSD2_H_
-#define _COSD2_H_	1
+#define _COSD2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -52,45 +52,48 @@
  *	vector double _cosd2(vector double angle)
  *
  * DESCRIPTION
- *	_cosd2 computes the cosine of a vector of angles (expressed 
+ *	_cosd2 computes the cosine of a vector of angles (expressed
  *	in radians) to an accuracy of a double precision floating point.
  */
-static __inline vector double _cosd2(vector double angle)
+static __inline vector double
+_cosd2(vector double angle)
 {
-  vec_int4    octant;
-  vec_ullong2 select;
-  vec_double2 cos, sin;
-  vec_double2 toggle_sign, answer;
+    vec_int4    octant;
+    vec_ullong2 select;
+    vec_double2 cos, sin;
+    vec_double2 toggle_sign, answer;
 
-  /* Range reduce the input angle x into the range -PI/4 to PI/4
-   * by performing simple modulus.
-   */
-  MOD_PI_OVER_FOUR(angle, octant);
+    /* Range reduce the input angle x into the range -PI/4 to PI/4
+     * by performing simple modulus.
+     */
+    MOD_PI_OVER_FOUR(angle, octant);
 
-  /* Compute the cosine and sine of the range reduced input.
-   */
-  COMPUTE_COS_SIN(angle, cos, sin);
+    /* Compute the cosine and sine of the range reduced input.
+     */
+    COMPUTE_COS_SIN(angle, cos, sin);
 
-  /* For each SIMD element, select which result (cos or sin) to use
-   * with a sign correction depending upon the octant of the original
-   * angle (Maclaurin series).
-   *
-   *   octants      angles     select  sign toggle 
-   *   -------   ------------  ------  -----------
-   *     0          0 to 45     cos        no      
-   *    1,2        45 to 135    sin        yes
-   *    3,4       135 to 225    cos        yes
-   *    5,6       225 to 315    sin        no
-   *     7        315 to 360    cos        no
-   */ 
-  octant = spu_shuffle(octant, octant, ((vec_uchar16) { 0,1, 2, 3, 0,1, 2, 3, 8,9,10,11, 8,9,10,11 }));
+    /* For each SIMD element, select which result (cos or sin) to use
+     * with a sign correction depending upon the octant of the original
+     * angle (Maclaurin series).
+     *
+     *   octants      angles     select  sign toggle
+     *   -------   ------------  ------  -----------
+     *     0          0 to 45     cos        no
+     *    1,2        45 to 135    sin        yes
+     *    3,4       135 to 225    cos        yes
+     *    5,6       225 to 315    sin        no
+     *     7        315 to 360    cos        no
+     */
+    octant = spu_shuffle(octant, octant,
+                         ((vec_uchar16) { 0, 1, 2, 3, 0, 1, 2, 3, 8, 9, 10, 11, 8, 9, 10, 11 }));
 
-  toggle_sign = (vec_double2)spu_sl(spu_and(spu_add(octant, 2), 4), ((vec_uint4) { 29,32,29,32 }));
-  select = (vec_ullong2)spu_cmpeq(spu_and(octant, 2), 0);
+    toggle_sign
+        = (vec_double2)spu_sl(spu_and(spu_add(octant, 2), 4), ((vec_uint4) { 29, 32, 29, 32 }));
+    select = (vec_ullong2)spu_cmpeq(spu_and(octant, 2), 0);
 
-  answer = spu_xor(spu_sel(sin, cos, select), toggle_sign);
+    answer = spu_xor(spu_sel(sin, cos, select), toggle_sign);
 
-  return (answer);
+    return (answer);
 }
 
 #endif /* _COSD2_H_ */

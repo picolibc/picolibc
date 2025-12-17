@@ -72,18 +72,16 @@
 
 /*	Exponential function	*/
 
-
-
 static const long double P[3] = {
- 1.2617719307481059087798E-4L,
- 3.0299440770744196129956E-2L,
- 9.9999999999999999991025E-1L,
+    1.2617719307481059087798E-4L,
+    3.0299440770744196129956E-2L,
+    9.9999999999999999991025E-1L,
 };
 static const long double Q[4] = {
- 3.0019850513866445504159E-6L,
- 2.5244834034968410419224E-3L,
- 2.2726554820815502876593E-1L,
- 2.0000000000000000000897E0L,
+    3.0019850513866445504159E-6L,
+    2.5244834034968410419224E-3L,
+    2.2726554820815502876593E-1L,
+    2.0000000000000000000897E0L,
 };
 static const long double C1 = 6.9314575195312500000000E-1L;
 static const long double C2 = 1.4286068203094172321215E-6L;
@@ -94,42 +92,41 @@ static const long double LOG2EL = 1.4426950408889634073599E0L;
 long double
 expl(long double x)
 {
-long double px, xx;
-int n;
+    long double px, xx;
+    int         n;
 
-if( isnan(x) )
-	return(x + x);
-if( x > MAXLOGL) {
+    if (isnan(x))
+        return (x + x);
+    if (x > MAXLOGL) {
         if (isinf(x))
-                return x;
+            return x;
         return __math_oflowl(0);
-}
+    }
 
-if( x < MINLOGL ) {
+    if (x < MINLOGL) {
         if (isinf(x))
-                return 0.0L;
-	return __math_uflowl(0);
-}
+            return 0.0L;
+        return __math_uflowl(0);
+    }
 
-/* Express e**x = e**g 2**n
- *   = e**g e**( n loge(2) )
- *   = e**( g + n loge(2) )
- */
-px = floorl( LOG2EL * x + 0.5L ); /* floor() truncates toward -infinity. */
-n = px;
-x -= px * C1;
-x -= px * C2;
+    /* Express e**x = e**g 2**n
+     *   = e**g e**( n loge(2) )
+     *   = e**( g + n loge(2) )
+     */
+    px = floorl(LOG2EL * x + 0.5L); /* floor() truncates toward -infinity. */
+    n = px;
+    x -= px * C1;
+    x -= px * C2;
 
+    /* rational approximation for exponential
+     * of the fractional part:
+     * e**x =  1 + 2x P(x**2)/( Q(x**2) - P(x**2) )
+     */
+    xx = x * x;
+    px = x * __polevll(xx, P, 2);
+    x = px / (__polevll(xx, Q, 3) - px);
+    x = 1.0L + ldexpl(x, 1);
 
-/* rational approximation for exponential
- * of the fractional part:
- * e**x =  1 + 2x P(x**2)/( Q(x**2) - P(x**2) )
- */
-xx = x * x;
-px = x * __polevll( xx, P, 2 );
-x =  px/( __polevll( xx, Q, 3 ) - px );
-x = 1.0L + ldexpl( x, 1 );
-
-x = ldexpl( x, n );
-return(x);
+    x = ldexpl(x, n);
+    return (x);
 }

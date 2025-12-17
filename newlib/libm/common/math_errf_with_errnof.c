@@ -32,10 +32,9 @@
 #if WANT_ERRNO
 #include <errno.h>
 HIDDEN float
-__math_with_errnof (float y, int e)
+__math_with_errnof(float y, int e)
 {
-  errno = e;
-  return y;
+    errno = e;
+    return y;
 }
 #endif
-

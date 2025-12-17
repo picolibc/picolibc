@@ -36,8 +36,8 @@
 long double
 getpayloadl(const long double *x)
 {
-    u_int64_t hx,lx,hxm;
-    GET_LDOUBLE_WORDS64(hx,lx,*x);
+    u_int64_t hx, lx, hxm;
+    GET_LDOUBLE_WORDS64(hx, lx, *x);
 
     hxm = hx & 0xffffffffffffULL;
     hx &= 0x7fff000000000000ULL;
@@ -45,5 +45,5 @@ getpayloadl(const long double *x)
         return -1;
     /* mask off q/s nan bit */
     hxm &= ~0x0000800000000000ULL;
-    return ldexpl(hxm, 64) + (long double) lx;
+    return ldexpl(hxm, 64) + (long double)lx;
 }

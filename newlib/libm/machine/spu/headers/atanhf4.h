@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _ATANHF4_H_
-#define _ATANHF4_H_	1
+#define _ATANHF4_H_ 1
 
 #include <spu_intrinsics.h>
 #include <math.h>
@@ -66,7 +66,7 @@
  */
 
 /*
- * Maclaurin Series Coefficients 
+ * Maclaurin Series Coefficients
  * for x near 0.
  */
 #define SDM_SP_ATANH_MAC01 1.000000000000000000000000000000E0
@@ -80,19 +80,20 @@
 #define SDM_SP_ATANH_MAC15 6.666666666666666666666666666667E-2
 #endif
 
-
-static __inline vector float _atanhf4(vector float x)
+static __inline vector float
+_atanhf4(vector float x)
 {
     vec_uint4  one = spu_splats(1u);
     vec_float4 sign_mask = spu_splats(-0.0f);
-    vec_float4 onef      = spu_splats(1.0f);
-    vec_float4 onehalff  = spu_splats(0.5f);
-    vec_float4 huge      = spu_splats(HUGE_VALF);
-    vec_float4 result, fresult, mresult;;
+    vec_float4 onef = spu_splats(1.0f);
+    vec_float4 onehalff = spu_splats(0.5f);
+    vec_float4 huge = spu_splats(HUGE_VALF);
+    vec_float4 result, fresult, mresult;
+    ;
     vec_float4 xabs, xsqu;
     /* Where we switch from maclaurin to formula */
-    vec_float4  switch_approx = spu_splats(0.165f);
-    vec_uint4   use_form;
+    vec_float4 switch_approx = spu_splats(0.165f);
+    vec_uint4  use_form;
 
     xabs = spu_andc(x, sign_mask);
     xsqu = spu_mul(x, x);
@@ -104,11 +105,11 @@ static __inline vector float _atanhf4(vector float x)
     fresult = spu_sub(_logf4(spu_add(onef, xabs)), _logf4(spu_sub(onef, xabs)));
     fresult = spu_mul(fresult, onehalff);
 
-
     /*
      * Taylor Series
      */
-    mresult = spu_madd(xsqu, spu_splats((float)SDM_SP_ATANH_MAC07), spu_splats((float)SDM_SP_ATANH_MAC05));
+    mresult = spu_madd(xsqu, spu_splats((float)SDM_SP_ATANH_MAC07),
+                       spu_splats((float)SDM_SP_ATANH_MAC05));
     mresult = spu_madd(xsqu, mresult, spu_splats((float)SDM_SP_ATANH_MAC03));
     mresult = spu_madd(xsqu, mresult, spu_splats((float)SDM_SP_ATANH_MAC01));
     mresult = spu_mul(xabs, mresult);
@@ -123,8 +124,10 @@ static __inline vector float _atanhf4(vector float x)
      * Correct for accumulated truncation error. Currently reduces rms of
      * absolute error by about 50%
      */
-    result = (vec_float4)spu_add((vec_uint4)result, spu_and(one, spu_cmpgt(xabs, spu_splats(0.0f))));
-    result = (vec_float4)spu_add((vec_uint4)result, spu_and(one, spu_cmpgt(xabs, spu_splats(0.25f))));
+    result
+        = (vec_float4)spu_add((vec_uint4)result, spu_and(one, spu_cmpgt(xabs, spu_splats(0.0f))));
+    result
+        = (vec_float4)spu_add((vec_uint4)result, spu_and(one, spu_cmpgt(xabs, spu_splats(0.25f))));
 
     /*
      * Check Boundary Conditions

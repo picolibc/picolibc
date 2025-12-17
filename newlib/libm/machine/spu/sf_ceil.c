@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/ceilf.h"
 
-float ceilf(float value)
+float
+ceilf(float value)
 {
     return _ceilf(value);
 }

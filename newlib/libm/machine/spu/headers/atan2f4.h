@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _ATAN2F4_H_
-#define _ATAN2F4_H_	1
+#define _ATAN2F4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -59,18 +59,19 @@
  *  defined by the signs of sin and cos on this domain.
  *
  *  Special Cases:
- *	- If the corresponding elements of x and y are zero, the 
+ *	- If the corresponding elements of x and y are zero, the
  *    resulting element is undefined.
  *
  */
 
-static __inline vector float _atan2f4(vector float y, vector float x)
+static __inline vector float
+_atan2f4(vector float y, vector float x)
 {
-    vector float pi   = spu_splats((float)SM_PI);
-    vector float zero = spu_splats(0.0f);
+    vector float        pi = spu_splats((float)SM_PI);
+    vector float        zero = spu_splats(0.0f);
     vector unsigned int quad1;
     vector unsigned int quad4;
-    vector float result;
+    vector float        result;
 
     vector unsigned int xlt0;
     vector unsigned int yge0;
@@ -83,7 +84,7 @@ static __inline vector float _atan2f4(vector float y, vector float x)
     quad1 = spu_and(ylt0, xlt0);
     quad4 = spu_and(yge0, xlt0);
 
-    result = _atanf4(_divf4(y,x));
+    result = _atanf4(_divf4(y, x));
     result = spu_sel(result, spu_sub(result, pi), quad1);
     result = spu_sel(result, spu_add(result, pi), quad4);
 

@@ -37,25 +37,25 @@
 int
 __STDIO_UNLOCKED(getc)(FILE *stream)
 {
-	int rv;
-	__ungetc_t unget;
+    int        rv;
+    __ungetc_t unget;
 
-	if ((stream->flags & __SRD) == 0) {
-		stream->flags |= __SERR;
-		return EOF;
-	}
+    if ((stream->flags & __SRD) == 0) {
+        stream->flags |= __SERR;
+        return EOF;
+    }
 
-	if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
-                return (unsigned char) (unget - 1);
+    if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0)
+        return (unsigned char)(unget - 1);
 
-	rv = stream->get(stream);
-	if (rv < 0) {
-		/* if != _FDEV_ERR, assume it's _FDEV_EOF */
-		stream->flags |= (rv == _FDEV_ERR)? __SERR: __SEOF;
-		return EOF;
-	}
+    rv = stream->get(stream);
+    if (rv < 0) {
+        /* if != _FDEV_ERR, assume it's _FDEV_EOF */
+        stream->flags |= (rv == _FDEV_ERR) ? __SERR : __SEOF;
+        return EOF;
+    }
 
-	return (unsigned char)rv;
+    return (unsigned char)rv;
 }
 
 #ifdef __STDIO_LOCKING
@@ -72,12 +72,20 @@ getc(FILE *stream)
 #ifdef __strong_reference
 __strong_reference(getc, getc_unlocked);
 #else
-int getc_unlocked(FILE *stream) { return getc(stream); }
+int
+getc_unlocked(FILE *stream)
+{
+    return getc(stream);
+}
 #endif
 #endif
 
 #ifdef __strong_reference
 __strong_reference(getc, fgetc);
 #else
-int fgetc(FILE *stream) { return getc(stream); }
+int
+fgetc(FILE *stream)
+{
+    return getc(stream);
+}
 #endif

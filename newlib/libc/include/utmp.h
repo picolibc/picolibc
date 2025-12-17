@@ -38,4 +38,3 @@ _BEGIN_STD_C
 #include <sys/utmp.h>
 
 _END_STD_C
-

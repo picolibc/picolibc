@@ -49,11 +49,11 @@ __atof_engine(uint32_t u32, int exp)
     float flt = u32;
 
     while (exp < 0) {
-        flt *= (float) 1e-1f;
+        flt *= (float)1e-1f;
         exp++;
     }
     while (exp > 0) {
-        flt *= (float) 1e1f;
+        flt *= (float)1e1f;
         exp--;
     }
     return flt;

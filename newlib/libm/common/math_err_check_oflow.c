@@ -33,9 +33,9 @@
 /* Check result and set errno if necessary.  */
 
 HIDDEN __float64
-__math_check_oflow (__float64 y)
+__math_check_oflow(__float64 y)
 {
-    return isinf (y) ? __math_with_errno (y, ERANGE) : y;
+    return isinf(y) ? __math_with_errno(y, ERANGE) : y;
 }
 
 #endif /* _NEED_FLOAT64 */

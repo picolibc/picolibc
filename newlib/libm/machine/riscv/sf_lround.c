@@ -40,17 +40,19 @@
 long int
 lroundf(float x)
 {
-  long result;
-  __asm__(
+    long result;
+    __asm__(
 #if __riscv_xlen == 32
-       "fcvt.w.s"
+        "fcvt.w.s"
 #elif __riscv_xlen == 64
-       "fcvt.l.s"
+        "fcvt.l.s"
 #else
 #error Unsupported XLEN
 #endif
-       "\t%0, %1, rmm" : "=r"(result) : "f"(x));
-  return result;
+        "\t%0, %1, rmm"
+        : "=r"(result)
+        : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_j_f(lround)

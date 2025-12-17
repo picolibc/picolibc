@@ -31,7 +31,7 @@
 */
 
 #define strtoi_type unsigned long long
-#define strtoi_max ULLONG_MAX
+#define strtoi_max  ULLONG_MAX
 #undef strtoi_signed
 #ifdef WIDE_CHARS
 #define strtoi wcstoull

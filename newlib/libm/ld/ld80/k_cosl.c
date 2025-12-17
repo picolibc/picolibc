@@ -6,16 +6,14 @@
  *
  * Developed at SunSoft, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
-
 /*
  * ld80 version of k_cos.c.  See ../src/k_cos.c for most comments.
  */
-
 
 /*
  * Domain [-0.7854, 0.7854], range ~[-2.43e-23, 2.425e-23]:
@@ -43,31 +41,38 @@
 
 #if defined(__amd64__) || defined(__i386__)
 /* Long double constants are slow on these arches, and broken on i386. */
-static const volatile double
-C1hi = 0.041666666666666664,		/*  0x15555555555555.0p-57 */
-C1lo = 2.2598839032744733e-18;		/*  0x14d80000000000.0p-111 */
-#define	C1	((long double)C1hi + (long double) C1lo)
+static const volatile double C1hi = 0.041666666666666664, /*  0x15555555555555.0p-57 */
+    C1lo = 2.2598839032744733e-18;                        /*  0x14d80000000000.0p-111 */
+#define C1 ((long double)C1hi + (long double)C1lo)
 #else
-static const long double
-C1 =  0.0416666666666666666136L;	/*  0xaaaaaaaaaaaaaa9b.0p-68 */
+static const long double C1 = 0.0416666666666666666136L; /*  0xaaaaaaaaaaaaaa9b.0p-68 */
 #endif
 
-static const double
-C2 = -0.0013888888888888874,		/* -0x16c16c16c16c10.0p-62 */
-C3 =  0.000024801587301571716,		/*  0x1a01a01a018e22.0p-68 */
-C4 = -0.00000027557319215507120,	/* -0x127e4fb7602f22.0p-74 */
-C5 =  0.0000000020876754400407278,	/*  0x11eed8caaeccf1.0p-81 */
-C6 = -1.1470297442401303e-11,		/* -0x19393412bd1529.0p-89 */
-C7 =  4.7383039476436467e-14;		/*  0x1aac9d9af5c43e.0p-97 */
+static const double C2 = -0.0013888888888888874, /* -0x16c16c16c16c10.0p-62 */
+    C3 = 0.000024801587301571716,                /*  0x1a01a01a018e22.0p-68 */
+    C4 = -0.00000027557319215507120,             /* -0x127e4fb7602f22.0p-74 */
+    C5 = 0.0000000020876754400407278,            /*  0x11eed8caaeccf1.0p-81 */
+    C6 = -1.1470297442401303e-11,                /* -0x19393412bd1529.0p-89 */
+    C7 = 4.7383039476436467e-14;                 /*  0x1aac9d9af5c43e.0p-97 */
 
 long double
 __kernel_cosl(long double x, long double y)
 {
-	long double hz,z,r,w;
+    long double hz, z, r, w;
 
-	z  = x*x;
-	r  = z*(C1+z*((long double) C2+z*((long double) C3+z*((long double) C4+z*((long double) C5+z*((long double) C6+z*(long double) C7))))));
-	hz = 0.5l*z;
-	w  = 1.0l-hz;
-	return w + (((1.0l-w)-hz) + (z*r-x*y));
+    z = x * x;
+    r = z
+        * (C1
+           + z
+               * ((long double)C2
+                  + z
+                      * ((long double)C3
+                         + z
+                             * ((long double)C4
+                                + z
+                                    * ((long double)C5
+                                       + z * ((long double)C6 + z * (long double)C7))))));
+    hz = 0.5l * z;
+    w = 1.0l - hz;
+    return w + (((1.0l - w) - hz) + (z * r - x * y));
 }

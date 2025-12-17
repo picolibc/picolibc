@@ -35,16 +35,16 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "spu_timer_internal.h"
 
 /* The software managed timebase value.  */
-volatile uint64_t __spu_tb_val __aligned(16);
+volatile uint64_t __spu_tb_val         __aligned(16);
 
 /* Timeout value of the current interval.  */
-volatile int __spu_tb_timeout __aligned(16);
+volatile int __spu_tb_timeout          __aligned(16);
 
 /* Clock start count (clock is running if >0).  */
 volatile unsigned __spu_clock_startcnt __aligned(16);
 
 /* Saved interrupt state from clock_start.  */
-volatile unsigned __spu_clock_state_was_enabled;
+volatile unsigned                      __spu_clock_state_was_enabled;
 
 /* Initializes the software managed timebase, enables the decrementer event,
    starts the decrementer and enables interrupts. Must be called before
@@ -52,44 +52,44 @@ volatile unsigned __spu_clock_state_was_enabled;
    code (not from an interrupt/timer handler).
    Returns with interrupts ENABLED.  */
 void
-spu_clock_start (void)
+spu_clock_start(void)
 {
-  /* Increment clock start and return if it was already running.  */
-  if (++__spu_clock_startcnt > 1)
+    /* Increment clock start and return if it was already running.  */
+    if (++__spu_clock_startcnt > 1)
+        return;
+
+    __spu_clock_state_was_enabled = spu_readch(SPU_RdMachStat) & 0x1;
+
+    spu_idisable();
+    __spu_tb_timeout = CLOCK_START_VALUE;
+    __spu_tb_val = 0;
+
+    /* Disable, write, enable the decrementer.  */
+    __enable_spu_decr(__spu_tb_timeout, __disable_spu_decr());
+
+    spu_ienable();
+
     return;
-
-  __spu_clock_state_was_enabled = spu_readch (SPU_RdMachStat) & 0x1;
-
-  spu_idisable ();
-  __spu_tb_timeout = CLOCK_START_VALUE;
-  __spu_tb_val = 0;
-
-  /* Disable, write, enable the decrementer.  */
-  __enable_spu_decr (__spu_tb_timeout, __disable_spu_decr ());
-
-  spu_ienable ();
-
-  return;
 }
 
 /* Returns a monotonically increasing, 64-bit counter, in timebase units,
    relative to the last call to spu_clock_start().  */
 uint64_t
-spu_clock_read (void)
+spu_clock_read(void)
 {
-  int64_t time;
-  unsigned was_enabled;
+    int64_t  time;
+    unsigned was_enabled;
 
-  /* Return 0 if clock is off.  */
-  if (__spu_clock_startcnt == 0)
-    return 0LL;
+    /* Return 0 if clock is off.  */
+    if (__spu_clock_startcnt == 0)
+        return 0LL;
 
-  was_enabled = spu_readch (SPU_RdMachStat) & 0x1;
-  spu_idisable ();
+    was_enabled = spu_readch(SPU_RdMachStat) & 0x1;
+    spu_idisable();
 
-  time = __spu_tb_val + (__spu_tb_timeout - spu_readch (SPU_RdDec));
+    time = __spu_tb_val + (__spu_tb_timeout - spu_readch(SPU_RdDec));
 
-  if (__likely (was_enabled))
-    spu_ienable ();
-  return time;
+    if (__likely(was_enabled))
+        spu_ienable();
+    return time;
 }

@@ -7,17 +7,17 @@ FUNCTION
 <<rand>>, <<srand>>---pseudo-random numbers
 
 INDEX
-	rand
+        rand
 INDEX
-	srand
+        srand
 INDEX
-	rand_r
+        rand_r
 
 SYNOPSIS
-	#include <stdlib.h>
-	int rand(void);
-	void srand(unsigned int <[seed]>);
-	int rand_r(unsigned int *<[seed]>);
+        #include <stdlib.h>
+        int rand(void);
+        void srand(unsigned int <[seed]>);
+        int rand_r(unsigned int *<[seed]>);
 
 DESCRIPTION
 <<rand>> returns a different integer each time it is called; each
@@ -57,13 +57,11 @@ on two different systems.
 <<rand>> requires no supporting OS subroutines.
 */
 
-
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
 
 int
-rand (void)
+rand(void)
 {
-  return (int) (random() & RAND_MAX);
+    return (int)(random() & RAND_MAX);
 }
-

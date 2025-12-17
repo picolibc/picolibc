@@ -33,6 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define DTOX_SIZE       4
+#define DTOX_SIZE 4
 
 #include "dtox_engine.c"

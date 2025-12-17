@@ -35,20 +35,21 @@
 
 #include "or1k_semihost.h"
 
-#define sifive_test     (*((volatile uint32_t*) 0x96000000))
-#define FINISHER_FAIL   0x3333
-#define FINISHER_PASS   0x5555
-#define FINISHER_RESET  0x7777
+#define sifive_test    (*((volatile uint32_t *)0x96000000))
+#define FINISHER_FAIL  0x3333
+#define FINISHER_PASS  0x5555
+#define FINISHER_RESET 0x7777
 
 __noreturn void
 _exit(int code)
 {
-        uint32_t        val;
+    uint32_t val;
 
-        if (code == 0)
-                val = FINISHER_PASS;
-        else
-                val = FINISHER_FAIL | (code << 16);
-        sifive_test = val;
-        while (1);
+    if (code == 0)
+        val = FINISHER_PASS;
+    else
+        val = FINISHER_FAIL | (code << 16);
+    sifive_test = val;
+    while (1)
+        ;
 }

@@ -36,7 +36,7 @@
 #include <iconv.h>
 
 /* Iconv data path environment variable name */
-#define NLS_ENVVAR_NAME  "NLSPATH"
+#define NLS_ENVVAR_NAME "NLSPATH"
 /* Default NLSPATH value */
 #ifndef ICONV_DEFAULT_NLSPATH
 #define ICONV_DEFAULT_NLSPATH "/usr/locale"
@@ -45,34 +45,21 @@
 #define ICONV_NLS_FROM 0
 #define ICONV_NLS_TO   1
 
-void
-_iconv_nls_get_state (iconv_t cd, mbstate_t *ps, int direction);
+void        _iconv_nls_get_state(iconv_t cd, mbstate_t *ps, int direction);
 
-int
-_iconv_nls_set_state (iconv_t cd, mbstate_t *ps, int direction);
+int         _iconv_nls_set_state(iconv_t cd, mbstate_t *ps, int direction);
 
-int
-_iconv_nls_is_stateful (iconv_t cd, int direction);
+int         _iconv_nls_is_stateful(iconv_t cd, int direction);
 
-int
-_iconv_nls_get_mb_cur_max (iconv_t cd, int direction);
+int         _iconv_nls_get_mb_cur_max(iconv_t cd, int direction);
 
-size_t
-_iconv_nls_conv (iconv_t cd,
-                        const char **inbuf, size_t *inbytesleft,
-                        char **outbuf, size_t *outbytesleft);
+size_t      _iconv_nls_conv(iconv_t cd, const char **inbuf, size_t *inbytesleft, char **outbuf,
+                            size_t *outbytesleft);
 
-const char *
-_iconv_nls_construct_filename (const char *file,
-                                      const char *dir, const char *ext);
+const char *_iconv_nls_construct_filename(const char *file, const char *dir, const char *ext);
 
+int         _iconv_nls_open(const char *encoding, iconv_t *towc, iconv_t *fromwc, int flag);
 
-int
-_iconv_nls_open (const char *encoding,
-                        iconv_t *towc, iconv_t *fromwc, int flag);
-
-char *
-_iconv_resolve_encoding_name (const char *ca);
+char       *_iconv_resolve_encoding_name(const char *ca);
 
 #endif /* __SYS_ICONVNLS_H__ */
-

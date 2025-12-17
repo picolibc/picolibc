@@ -43,26 +43,25 @@
 #error
 #endif
 
-typedef struct
-{
-	/* Self-pointer per ABI (https://akkadia.org/drepper/tls.pdf). */
-	void *__tcb;
+typedef struct {
+    /* Self-pointer per ABI (https://akkadia.org/drepper/tls.pdf). */
+    void *__tcb;
 #ifdef __THREAD_LOCAL_STORAGE_STACK_GUARD
-	/*
-	 * If we are configured to use a TLS stack protection canary, then
-	 * GCC expects the canary to be located at the same offset into the
-	 * TCB as implemented in GNU libc's Native POSIX Thread Library
-	 * (NPTL) component.  So declare some additional NPTL-compatible TCB
-	 * fields here.
-	 */
-	void *__dtv;
-	void *__self;
-	int32_t __multiple_threads;
+    /*
+     * If we are configured to use a TLS stack protection canary, then
+     * GCC expects the canary to be located at the same offset into the
+     * TCB as implemented in GNU libc's Native POSIX Thread Library
+     * (NPTL) component.  So declare some additional NPTL-compatible TCB
+     * fields here.
+     */
+    void   *__dtv;
+    void   *__self;
+    int32_t __multiple_threads;
 #ifdef __x86_64
-	int32_t __gscope_flag;
+    int32_t __gscope_flag;
 #endif
-	uintptr_t __sysinfo;
-	uintptr_t __stack_guard;
+    uintptr_t __sysinfo;
+    uintptr_t __stack_guard;
 #endif
 } __tcb_head_t;
 

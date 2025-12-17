@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fmaf.h"
 
-float fmaf(float x, float y, float z)
+float
+fmaf(float x, float y, float z)
 {
     return _fmaf(x, y, z);
 }

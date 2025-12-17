@@ -37,7 +37,7 @@
 int
 __STDIO_UNLOCKED(ferror)(FILE *stream)
 {
-	return stream->flags & __SERR;
+    return stream->flags & __SERR;
 }
 
 #ifdef __STDIO_LOCKING

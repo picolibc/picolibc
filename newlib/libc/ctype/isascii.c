@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isascii>>, <<isascii_l>>---ASCII character predicate
+        <<isascii>>, <<isascii_l>>---ASCII character predicate
 
 INDEX
-	isascii
+        isascii
 
 INDEX
-	isascii_l
+        isascii_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isascii(int <[c]>);
+        #include <ctype.h>
+        int isascii(int <[c]>);
 
-	#include <ctype.h>
-	int isascii_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isascii_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isascii>> is a macro which returns non-zero when <[c]> is an ASCII
@@ -69,7 +69,7 @@ No supporting OS subroutines are required.
 
 #undef isascii
 int
-isascii (int c)
+isascii(int c)
 {
-    return (unsigned) c <= 0177;
+    return (unsigned)c <= 0177;
 }

@@ -38,16 +38,15 @@ SUCH DAMAGE.
 #include <sys/_select.h>
 
 #if !defined(_SIGSET_T_DECLARED)
-#define	_SIGSET_T_DECLARED
-typedef	__sigset_t	sigset_t;
+#define _SIGSET_T_DECLARED
+typedef __sigset_t sigset_t;
 #endif
 
 _BEGIN_STD_C
 
 #if __POSIX_VISIBLE >= 200112
-int pselect (int __n, fd_set *__readfds, fd_set *__writefds,
-             fd_set *__exceptfds, const struct timespec *__timeout,
-             const sigset_t *__set);
+int pselect(int __n, fd_set *__readfds, fd_set *__writefds, fd_set *__exceptfds,
+            const struct timespec *__timeout, const sigset_t *__set);
 #endif
 
 _END_STD_C

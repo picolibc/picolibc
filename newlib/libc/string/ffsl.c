@@ -31,23 +31,22 @@ int
 ffsl(long i)
 {
 #if __HAVE_BUILTIN_FFSL
-	return (__builtin_ffsl(i));
+    return (__builtin_ffsl(i));
 #elif __HAVE_BUILTIN_CTZL
-	if (i == 0)
-		return 0;
-	return __builtin_ctzl((unsigned long)i) + 1;
+    if (i == 0)
+        return 0;
+    return __builtin_ctzl((unsigned long)i) + 1;
 #else
-  int r;
+    int r;
 
-  if (!i)
-    return 0;
+    if (!i)
+        return 0;
 
-  r = 0;
-  for (;;)
-    {
-      if (((1L << r++) & i) != 0)
-       return r;
+    r = 0;
+    for (;;) {
+        if (((1L << r++) & i) != 0)
+            return r;
     }
-  return 0;
+    return 0;
 #endif
 }

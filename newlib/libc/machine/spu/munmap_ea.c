@@ -36,10 +36,10 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (munmap_ea);
+COMPAT_EA_ALIAS(munmap_ea);
 
 int
-munmap_ea (__ea void *start, size_ea_t length)
+munmap_ea(__ea void *start, size_ea_t length)
 {
-  return munmap_eaddr ((unsigned long long) (size_ea_t) start, length);
+    return munmap_eaddr((unsigned long long)(size_ea_t)start, length);
 }

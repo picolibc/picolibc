@@ -41,7 +41,8 @@
 #define RETVAL 0
 #endif
 
-int main(void)
+int
+main(void)
 {
-	return RETVAL;
+    return RETVAL;
 }

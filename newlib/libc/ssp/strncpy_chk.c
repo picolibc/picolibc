@@ -36,18 +36,16 @@
 
 #undef strncpy
 
-char *__strncpy_chk(char * __restrict, const char * __restrict, size_t,
-    size_t);
+char *__strncpy_chk(char * __restrict, const char * __restrict, size_t, size_t);
 
 char *
-__strncpy_chk(char * __restrict dst, const char * __restrict src, size_t len,
-    size_t slen)
+__strncpy_chk(char * __restrict dst, const char * __restrict src, size_t len, size_t slen)
 {
-	if (len > slen)
-		__chk_fail();
+    if (len > slen)
+        __chk_fail();
 
-	if (__ssp_overlap(src, dst, len))
-		__chk_fail();
+    if (__ssp_overlap(src, dst, len))
+        __chk_fail();
 
-	return strncpy(dst, src, len);
+    return strncpy(dst, src, len);
 }

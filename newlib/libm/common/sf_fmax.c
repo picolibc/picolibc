@@ -6,7 +6,8 @@
 
 #include "fdlibm.h"
 
-float fmaxf(float x, float y)
+float
+fmaxf(float x, float y)
 {
     if (issignaling(x) || issignaling(y))
         return x + y;

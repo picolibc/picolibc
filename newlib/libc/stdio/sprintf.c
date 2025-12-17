@@ -34,17 +34,17 @@
 int
 sprintf(char *s, const char *fmt, ...)
 {
-	va_list ap;
-	struct __file_str f = FDEV_SETUP_STRING_WRITE(s, NULL);
-	int i;
+    va_list           ap;
+    struct __file_str f = FDEV_SETUP_STRING_WRITE(s, NULL);
+    int               i;
 
-	va_start(ap, fmt);
-	i = vfprintf(&f.file, fmt, ap);
-	va_end(ap);
-	if (i >= 0)
-		s[i] = 0;
+    va_start(ap, fmt);
+    i = vfprintf(&f.file, fmt, ap);
+    va_end(ap);
+    if (i >= 0)
+        s[i] = 0;
 
-	return i;
+    return i;
 }
 
 __ieee128_reference(sprintf, __sprintfieee128);

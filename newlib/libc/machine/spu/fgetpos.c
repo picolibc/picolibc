@@ -36,24 +36,21 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  int fp;
-  unsigned int pad0[ 3 ];
-  _fpos_t * pos;
+typedef struct {
+    int          fp;
+    unsigned int pad0[3];
+    _fpos_t     *pos;
 } c99_fgetpos_t;
 
-
 int
-fgetpos (FILE *__restrict fp,
-	_fpos_t *__restrict pos)
+fgetpos(FILE * __restrict fp, _fpos_t * __restrict pos)
 {
-  c99_fgetpos_t arg;
+    c99_fgetpos_t arg;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  arg.fp = fp->_fp;
-  arg.pos = pos;
+    arg.fp = fp->_fp;
+    arg.pos = pos;
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETPOS, &arg);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FGETPOS, &arg);
 }

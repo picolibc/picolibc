@@ -25,25 +25,25 @@ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<iswxdigit>>, <<iswxdigit_l>>---hexadecimal digit wide character test
+        <<iswxdigit>>, <<iswxdigit_l>>---hexadecimal digit wide character test
 
 INDEX
-	iswxdigit
+        iswxdigit
 
 INDEX
-	iswxdigit_l
+        iswxdigit_l
 
 SYNOPSIS
-	#include <wctype.h>
-	int iswxdigit(wint_t <[c]>);
+        #include <wctype.h>
+        int iswxdigit(wint_t <[c]>);
 
-	#include <wctype.h>
-	int iswxdigit_l(wint_t <[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        int iswxdigit_l(wint_t <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<iswxdigit>> is a function which classifies wide character values that
@@ -65,9 +65,8 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-iswxdigit (wint_t c)
+iswxdigit(wint_t c)
 {
-  return (c >= (wint_t)'0' && c <= (wint_t)'9')
-      || (c >= (wint_t)'a' && c <= (wint_t)'f')
-      || (c >= (wint_t)'A' && c <= (wint_t)'F');
+    return (c >= (wint_t)'0' && c <= (wint_t)'9') || (c >= (wint_t)'a' && c <= (wint_t)'f')
+        || (c >= (wint_t)'A' && c <= (wint_t)'F');
 }

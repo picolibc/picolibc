@@ -4,11 +4,11 @@ FUNCTION
 <<_Exit>>---end program execution with no cleanup processing
 
 INDEX
-	_Exit
+        _Exit
 
 SYNOPSIS
-	#include <stdlib.h>
-	void _Exit(int <[code]>);
+        #include <stdlib.h>
+        void _Exit(int <[code]>);
 
 DESCRIPTION
 Use <<_Exit>> to return control from a program to the host operating
@@ -31,10 +31,10 @@ Supporting OS subroutines required: <<_exit>>.
 */
 
 #include <stdlib.h>
-#include <unistd.h>	/* for _exit() declaration */
+#include <unistd.h> /* for _exit() declaration */
 
-void 
-_Exit (int code)
+void
+_Exit(int code)
 {
-  _exit (code);
+    _exit(code);
 }

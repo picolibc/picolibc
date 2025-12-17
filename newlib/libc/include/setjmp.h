@@ -32,8 +32,8 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
  */
 /*
-	setjmp.h
-	stubs for future use.
+        setjmp.h
+        stubs for future use.
 */
 
 #ifndef _SETJMP_H_
@@ -44,8 +44,8 @@ SUCH DAMAGE.
 
 _BEGIN_STD_C
 
-__noreturn void	longjmp (jmp_buf __jmpb, int __retval);
-__returns_twice int setjmp (jmp_buf __jmpb);
+__noreturn void     longjmp(jmp_buf __jmpb, int __retval);
+__returns_twice int setjmp(jmp_buf __jmpb);
 
 _END_STD_C
 

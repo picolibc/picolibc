@@ -38,15 +38,15 @@
 int
 __file_str_put(char c, FILE *stream)
 {
-	struct __file_str *sstream = (struct __file_str *) stream;
+    struct __file_str *sstream = (struct __file_str *)stream;
 
-        /* The sprintf family doesn't return an error on buffer
-         * overflow, instead it returns the total number of characters
-         * processed but truncates the result to fit within the target
-         * buffer. As a result, this function simply stops writing
-         * when it reaches the end of the buffer
-         */
-	if (sstream->pos != sstream->end)
-            *sstream->pos++ = c;
-	return (unsigned char) c;
+    /* The sprintf family doesn't return an error on buffer
+     * overflow, instead it returns the total number of characters
+     * processed but truncates the result to fit within the target
+     * buffer. As a result, this function simply stops writing
+     * when it reaches the end of the buffer
+     */
+    if (sstream->pos != sstream->end)
+        *sstream->pos++ = c;
+    return (unsigned char)c;
 }

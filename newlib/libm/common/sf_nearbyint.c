@@ -9,13 +9,14 @@
  * ====================================================
  */
 
-
 #include <math.h>
 #include "fdlibm.h"
 
-float nearbyintf(float x)
+float
+nearbyintf(float x)
 {
-    if (isnan(x)) return x + x;
+    if (isnan(x))
+        return x + x;
 #if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
     fenv_t env;
     fegetenv(&env);

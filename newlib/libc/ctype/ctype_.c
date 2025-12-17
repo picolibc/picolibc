@@ -34,74 +34,34 @@
 #include "locale_private.h"
 #include "../stdlib/local.h"
 
-const char _ctype_b[128 + 256] = {
-	_CTYPE_DATA_128_255,
-	_CTYPE_DATA_0_127,
-	_CTYPE_DATA_128_255
-};
+const char _ctype_b[128 + 256] = { _CTYPE_DATA_128_255, _CTYPE_DATA_0_127, _CTYPE_DATA_128_255 };
 
 #ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
 
 #include "ctype_extended.h"
 
-#define __CTYPE(base) [locale_ ## base - locale_EXTENDED_BASE] = { \
-        _CTYPE_ ## base ## _128_254,        \
-        0,                                  \
-        _CTYPE_DATA_0_127,                  \
-        _CTYPE_ ## base ## _128_254,        \
-        _CTYPE_ ## base ## _255             \
-        }
+#define __CTYPE(base)                                                                         \
+    [locale_##base - locale_EXTENDED_BASE] = { _CTYPE_##base##_128_254, 0, _CTYPE_DATA_0_127, \
+                                               _CTYPE_##base##_128_254, _CTYPE_##base##_255 }
 
 const char __ctype[locale_END - locale_EXTENDED_BASE][_CTYPE_OFFSET + 1 + 256] = {
 #ifdef __MB_EXTENDED_CHARSETS_ISO
-    __CTYPE(ISO_8859_1),
-    __CTYPE(ISO_8859_2),
-    __CTYPE(ISO_8859_3),
-    __CTYPE(ISO_8859_4),
-    __CTYPE(ISO_8859_5),
-    __CTYPE(ISO_8859_6),
-    __CTYPE(ISO_8859_7),
-    __CTYPE(ISO_8859_8),
-    __CTYPE(ISO_8859_9),
-    __CTYPE(ISO_8859_10),
-    __CTYPE(ISO_8859_11),
-    __CTYPE(ISO_8859_13),
-    __CTYPE(ISO_8859_14),
-    __CTYPE(ISO_8859_15),
-    __CTYPE(ISO_8859_16),
+    __CTYPE(ISO_8859_1),  __CTYPE(ISO_8859_2),  __CTYPE(ISO_8859_3),  __CTYPE(ISO_8859_4),
+    __CTYPE(ISO_8859_5),  __CTYPE(ISO_8859_6),  __CTYPE(ISO_8859_7),  __CTYPE(ISO_8859_8),
+    __CTYPE(ISO_8859_9),  __CTYPE(ISO_8859_10), __CTYPE(ISO_8859_11), __CTYPE(ISO_8859_13),
+    __CTYPE(ISO_8859_14), __CTYPE(ISO_8859_15), __CTYPE(ISO_8859_16),
 #endif
 #ifdef __MB_EXTENDED_CHARSETS_WINDOWS
-    __CTYPE(CP437),
-    __CTYPE(CP720),
-    __CTYPE(CP737),
-    __CTYPE(CP775),
-    __CTYPE(CP850),
-    __CTYPE(CP852),
-    __CTYPE(CP855),
-    __CTYPE(CP857),
-    __CTYPE(CP858),
-    __CTYPE(CP862),
-    __CTYPE(CP866),
-    __CTYPE(CP874),
-    __CTYPE(CP1125),
-    __CTYPE(CP1250),
-    __CTYPE(CP1251),
-    __CTYPE(CP1252),
-    __CTYPE(CP1253),
-    __CTYPE(CP1254),
-    __CTYPE(CP1255),
-    __CTYPE(CP1256),
-    __CTYPE(CP1257),
-    __CTYPE(CP1258),
-    __CTYPE(KOI8_R),
-    __CTYPE(KOI8_U),
-    __CTYPE(GEORGIAN_PS),
-    __CTYPE(PT154),
-    __CTYPE(KOI8_T),
+    __CTYPE(CP437),       __CTYPE(CP720),       __CTYPE(CP737),       __CTYPE(CP775),
+    __CTYPE(CP850),       __CTYPE(CP852),       __CTYPE(CP855),       __CTYPE(CP857),
+    __CTYPE(CP858),       __CTYPE(CP862),       __CTYPE(CP866),       __CTYPE(CP874),
+    __CTYPE(CP1125),      __CTYPE(CP1250),      __CTYPE(CP1251),      __CTYPE(CP1252),
+    __CTYPE(CP1253),      __CTYPE(CP1254),      __CTYPE(CP1255),      __CTYPE(CP1256),
+    __CTYPE(CP1257),      __CTYPE(CP1258),      __CTYPE(KOI8_R),      __CTYPE(KOI8_U),
+    __CTYPE(GEORGIAN_PS), __CTYPE(PT154),       __CTYPE(KOI8_T),
 #endif
 #ifdef __MB_EXTENDED_CHARSETS_JIS
-    __CTYPE(EUCJP),
-    __CTYPE(SJIS),
+    __CTYPE(EUCJP),       __CTYPE(SJIS),
 #endif
 };
 

@@ -39,7 +39,8 @@
 
 /* By default, the only state we carry is the rounding mode */
 
-int fesetmode(femode_t *modep)
+int
+fesetmode(femode_t *modep)
 {
     int round = FE_TONEAREST, except = 0;
     if (modep) {
@@ -49,8 +50,8 @@ int fesetmode(femode_t *modep)
     /* assume any failure indicates that there isn't hw support,
      * so we wouldn't be affecting anything
      */
-    (void) fesetround(round);
-    (void) fedisableexcept(FE_ALL_EXCEPT & ~except);
-    (void) feenableexcept(except);
+    (void)fesetround(round);
+    (void)fedisableexcept(FE_ALL_EXCEPT & ~except);
+    (void)feenableexcept(except);
     return 0;
 }

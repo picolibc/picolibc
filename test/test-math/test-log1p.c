@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-log1p.h"
-#define TEST_FUNC       log1p
+#define TEST_VECTORS "test-log1p.h"
+#define TEST_FUNC    log1p
 
 #include "test-real-one.h"

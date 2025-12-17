@@ -26,7 +26,6 @@
  * $FreeBSD: src/lib/msun/src/s_frexpl.c,v 1.1 2005/03/07 04:54:51 das Exp $
  */
 
-
 #if LDBL_MAX_EXP != 0x4000
 #error "Unsupported long double format"
 #endif
@@ -34,25 +33,25 @@
 long double
 frexpl(long double x, int *ex)
 {
-	union IEEEl2bits u;
+    union IEEEl2bits u;
 
-	u.e = x;
-	switch (u.bits.exp) {
-	case 0:		/* 0 or subnormal */
-		if ((u.bits.manl | u.bits.manh) == 0) {
-			*ex = 0;
-		} else {
-			u.e *= 0x1.0p514L;
-			*ex = u.bits.exp - 0x4200;
-			u.bits.exp = 0x3ffe;
-		}
-		break;
-	case 0x7fff:	/* infinity or NaN; value of *ex is unspecified */
-                return x + x;
-	default:	/* normal */
-		*ex = u.bits.exp - 0x3ffe;
-		u.bits.exp = 0x3ffe;
-		break;
-	}
-	return (u.e);
+    u.e = x;
+    switch (u.bits.exp) {
+    case 0: /* 0 or subnormal */
+        if ((u.bits.manl | u.bits.manh) == 0) {
+            *ex = 0;
+        } else {
+            u.e *= 0x1.0p514L;
+            *ex = u.bits.exp - 0x4200;
+            u.bits.exp = 0x3ffe;
+        }
+        break;
+    case 0x7fff: /* infinity or NaN; value of *ex is unspecified */
+        return x + x;
+    default: /* normal */
+        *ex = u.bits.exp - 0x3ffe;
+        u.bits.exp = 0x3ffe;
+        break;
+    }
+    return (u.e);
 }

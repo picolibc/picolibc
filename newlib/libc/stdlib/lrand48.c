@@ -14,15 +14,14 @@
 #include "rand48.h"
 
 long
-_lrand48_r (struct _rand48 *r)
+_lrand48_r(struct _rand48 *r)
 {
-  __dorand48(r, r->_seed);
-  return (long)((unsigned long) r->_seed[2] << 15) +
-    ((unsigned long) r->_seed[1] >> 1);
+    __dorand48(r, r->_seed);
+    return (long)((unsigned long)r->_seed[2] << 15) + ((unsigned long)r->_seed[1] >> 1);
 }
 
 long
-lrand48 (void)
+lrand48(void)
 {
-  return _lrand48_r (&_rand48);
+    return _lrand48_r(&_rand48);
 }

@@ -24,62 +24,74 @@
 extern int errno;
 
 int
-close(int fd) {
-  return -1;
+close(int fd)
+{
+    return -1;
 }
 
 int
-fstat (int fd, struct stat *buf) {
-  return -1;
+fstat(int fd, struct stat *buf)
+{
+    return -1;
 }
 
 int
-gettimeofday (struct timeval *tv, void *tz) {
-  return -1;
+gettimeofday(struct timeval *tv, void *tz)
+{
+    return -1;
 }
 
 int
-getpid (void) {
-  return 0;
+getpid(void)
+{
+    return 0;
 }
 
 int
-isatty (int fd) {
-  return fd == 1;
+isatty(int fd)
+{
+    return fd == 1;
 }
 
 int
-kill (int pid, int sig) {
-  errno = ESRCH;
-  return -1;
+kill(int pid, int sig)
+{
+    errno = ESRCH;
+    return -1;
 }
 
 off_t
-lseek(int fd, off_t offset, int whence) {
-  return 0;
+lseek(int fd, off_t offset, int whence)
+{
+    return 0;
 }
 
 int
-open (const char *pathname, int flags, ...) {
-  return -1;
+open(const char *pathname, int flags, ...)
+{
+    return -1;
 }
 
 int
-read(int fd, void *buf, size_t count) {
-  return 0;
+read(int fd, void *buf, size_t count)
+{
+    return 0;
 }
 
 int
-stat (const char *file, struct stat *pstat) {
-  errno = EACCES;
-  return -1;
+stat(const char *file, struct stat *pstat)
+{
+    errno = EACCES;
+    return -1;
 }
 
 void
-sync (void) {
+sync(void)
+{
 }
 
 int
-unlink (const char *pathname) {
-  return -1;
+unlink(const char *pathname)
+{
+    return -1;
 }

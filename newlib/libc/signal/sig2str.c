@@ -69,234 +69,229 @@ Otherwise, it returns <<-1>>.
 #define NUM_OF_SIGS (sizeof(sig_array) / sizeof(sig_name_and_num))
 
 typedef struct sig_name_and_num {
-  const char sig_name[8];
-  const int  sig_num;
+    const char sig_name[8];
+    const int  sig_num;
 } sig_name_and_num;
 
 static const sig_name_and_num sig_array[] = {
-      { "EXIT", 0 },
-    #ifdef SIGHUP
-      { "HUP", SIGHUP },
-    #endif
-    #ifdef SIGINT
-      { "INT", SIGINT },
-    #endif
-    #ifdef SIGQUIT
-      { "QUIT", SIGQUIT },
-    #endif
-    #ifdef SIGILL
-      { "ILL", SIGILL },
-    #endif
-    #ifdef SIGTRAP
-      { "TRAP", SIGTRAP },
-    #endif
-    #ifdef SIGABRT
-      { "ABRT", SIGABRT },
-    #endif
-    #ifdef SIGIOT
-      { "IOT", SIGIOT},
-    #endif
-    #ifdef SIGEMT
-      { "EMT", SIGEMT },
-    #endif
-    #ifdef SIGFPE
-      { "FPE", SIGFPE },
-    #endif
-    #ifdef SIGKILL
-      { "KILL", SIGKILL },
-    #endif
-    #ifdef SIGBUS
-      { "BUS", SIGBUS },
-    #endif
-    #ifdef SIGSEGV
-      { "SEGV", SIGSEGV },
-    #endif
-    #ifdef SIGSYS
-      { "SYS", SIGSYS },
-    #endif
-    #ifdef SIGPIPE
-      { "PIPE", SIGPIPE },
-    #endif
-    #ifdef SIGALRM
-      { "ALRM", SIGALRM },
-    #endif
-    #ifdef SIGTERM
-      { "TERM", SIGTERM },
-    #endif
-    #ifdef SIGURG
-      { "URG", SIGURG },
-    #endif
-    #ifdef SIGSTOP
-      { "STOP", SIGSTOP },
-    #endif
-    #ifdef SIGTSTP
-      { "TSTP", SIGTSTP },
-    #endif
-    #ifdef SIGCONT
-      { "CONT", SIGCONT },
-    #endif
-    #ifdef SIGCHLD
-      { "CHLD", SIGCHLD },
-    #endif
-    #ifdef SIGCLD
-      { "CLD", SIGCLD },
-    #endif
-    #ifdef SIGTTIN
-      { "TTIN", SIGTTIN },
-    #endif
-    #ifdef SIGTTOU
-      { "TTOU", SIGTTOU },
-    #endif
-    #ifdef SIGIO
-      { "IO", SIGIO },
-    #endif
-    #ifdef SIGPOLL
-      { "POLL", SIGPOLL },
-    #endif
-    #ifdef SIGWINCH
-      { "WINCH", SIGWINCH },
-    #endif
-    #ifdef SIGUSR1
-      { "USR1", SIGUSR1 },
-    #endif
-    #ifdef SIGUSR2
-      { "USR2", SIGUSR2 },
-    #endif
-    #ifdef SIGPWR
-      { "PWR", SIGPWR },
-    #endif
-    #ifdef SIGXCPU
-      { "XCPU", SIGXCPU },
-    #endif
-    #ifdef SIGXFSZ
-      { "XFSZ", SIGXFSZ },
-    #endif
-    #ifdef SIGVTALRM
-      { "VTALRM", SIGVTALRM },
-    #endif
-    #ifdef SIGPROF
-      { "PROF", SIGPROF },
-    #endif
-    #ifdef SIGLOST
-      { "LOST", SIGLOST },
-    #endif
-    /* The Issue 8 standard requires that SIGRTMIN and SIGRTMAX be included
-     * as valid results to be saved from calls to sig2str/str2sig.  */
-    #ifdef SIGRTMIN
-      { "RTMIN", SIGRTMIN },
-    #endif
-    #ifdef SIGRTMAX
-      { "RTMAX", SIGRTMAX }
-    #endif
+    { "EXIT",   0         },
+#ifdef SIGHUP
+    { "HUP",    SIGHUP    },
+#endif
+#ifdef SIGINT
+    { "INT",    SIGINT    },
+#endif
+#ifdef SIGQUIT
+    { "QUIT",   SIGQUIT   },
+#endif
+#ifdef SIGILL
+    { "ILL",    SIGILL    },
+#endif
+#ifdef SIGTRAP
+    { "TRAP",   SIGTRAP   },
+#endif
+#ifdef SIGABRT
+    { "ABRT",   SIGABRT   },
+#endif
+#ifdef SIGIOT
+    { "IOT",    SIGIOT    },
+#endif
+#ifdef SIGEMT
+    { "EMT",    SIGEMT    },
+#endif
+#ifdef SIGFPE
+    { "FPE",    SIGFPE    },
+#endif
+#ifdef SIGKILL
+    { "KILL",   SIGKILL   },
+#endif
+#ifdef SIGBUS
+    { "BUS",    SIGBUS    },
+#endif
+#ifdef SIGSEGV
+    { "SEGV",   SIGSEGV   },
+#endif
+#ifdef SIGSYS
+    { "SYS",    SIGSYS    },
+#endif
+#ifdef SIGPIPE
+    { "PIPE",   SIGPIPE   },
+#endif
+#ifdef SIGALRM
+    { "ALRM",   SIGALRM   },
+#endif
+#ifdef SIGTERM
+    { "TERM",   SIGTERM   },
+#endif
+#ifdef SIGURG
+    { "URG",    SIGURG    },
+#endif
+#ifdef SIGSTOP
+    { "STOP",   SIGSTOP   },
+#endif
+#ifdef SIGTSTP
+    { "TSTP",   SIGTSTP   },
+#endif
+#ifdef SIGCONT
+    { "CONT",   SIGCONT   },
+#endif
+#ifdef SIGCHLD
+    { "CHLD",   SIGCHLD   },
+#endif
+#ifdef SIGCLD
+    { "CLD",    SIGCLD    },
+#endif
+#ifdef SIGTTIN
+    { "TTIN",   SIGTTIN   },
+#endif
+#ifdef SIGTTOU
+    { "TTOU",   SIGTTOU   },
+#endif
+#ifdef SIGIO
+    { "IO",     SIGIO     },
+#endif
+#ifdef SIGPOLL
+    { "POLL",   SIGPOLL   },
+#endif
+#ifdef SIGWINCH
+    { "WINCH",  SIGWINCH  },
+#endif
+#ifdef SIGUSR1
+    { "USR1",   SIGUSR1   },
+#endif
+#ifdef SIGUSR2
+    { "USR2",   SIGUSR2   },
+#endif
+#ifdef SIGPWR
+    { "PWR",    SIGPWR    },
+#endif
+#ifdef SIGXCPU
+    { "XCPU",   SIGXCPU   },
+#endif
+#ifdef SIGXFSZ
+    { "XFSZ",   SIGXFSZ   },
+#endif
+#ifdef SIGVTALRM
+    { "VTALRM", SIGVTALRM },
+#endif
+#ifdef SIGPROF
+    { "PROF",   SIGPROF   },
+#endif
+#ifdef SIGLOST
+    { "LOST",   SIGLOST   },
+#endif
+/* The Issue 8 standard requires that SIGRTMIN and SIGRTMAX be included
+ * as valid results to be saved from calls to sig2str/str2sig.  */
+#ifdef SIGRTMIN
+    { "RTMIN",  SIGRTMIN  },
+#endif
+#ifdef SIGRTMAX
+    { "RTMAX",  SIGRTMAX  }
+#endif
 };
 
 int
 sig2str(int signum, char *str)
 {
-  const sig_name_and_num *sptr;
+    const sig_name_and_num *sptr;
 
-#if defined (SIGRTMIN) && defined (SIGRTMAX)
-  /* If signum falls in lower half of the real time signals range, define
-   * the saved str value as "RTMIN+n" according to the Issue 8 standard */
-  if ((SIGRTMIN + 1) <= signum &&
-      signum <= (SIGRTMIN + SIGRTMAX) / 2) {
-    sprintf(str, "RTMIN+%d", (signum-SIGRTMIN));
-    return 0;
-  }
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    /* If signum falls in lower half of the real time signals range, define
+     * the saved str value as "RTMIN+n" according to the Issue 8 standard */
+    if ((SIGRTMIN + 1) <= signum && signum <= (SIGRTMIN + SIGRTMAX) / 2) {
+        sprintf(str, "RTMIN+%d", (signum - SIGRTMIN));
+        return 0;
+    }
 
-  /* If signum falls in upper half of the real time signals range, define
-   * the saved str value as "RTMAX-m" according to the Issue 8 standard */
-  if ((((SIGRTMIN + SIGRTMAX) / 2) + 1) <= signum &&
-         signum <= (SIGRTMAX - 1)) {
-    sprintf(str, "RTMAX-%d", (SIGRTMAX - signum));
-    return 0;
-  }
+    /* If signum falls in upper half of the real time signals range, define
+     * the saved str value as "RTMAX-m" according to the Issue 8 standard */
+    if ((((SIGRTMIN + SIGRTMAX) / 2) + 1) <= signum && signum <= (SIGRTMAX - 1)) {
+        sprintf(str, "RTMAX-%d", (SIGRTMAX - signum));
+        return 0;
+    }
 #endif
 
-  /* Otherwise, search for signal matching signum in sig_array. If found,
-   * save its string value in str. */
-  for (sptr = sig_array; sptr < &sig_array[NUM_OF_SIGS]; sptr++) {
-    if (sptr->sig_num == signum) {
-      strcpy(str, sptr->sig_name);
-      return 0;
+    /* Otherwise, search for signal matching signum in sig_array. If found,
+     * save its string value in str. */
+    for (sptr = sig_array; sptr < &sig_array[NUM_OF_SIGS]; sptr++) {
+        if (sptr->sig_num == signum) {
+            strcpy(str, sptr->sig_name);
+            return 0;
+        }
     }
-  }
 
-  /* If signum is not a recognized signal number, return -1 */
-  return -1;
+    /* If signum is not a recognized signal number, return -1 */
+    return -1;
 }
 
 int
-str2sig(const char *__restrict str, int *__restrict pnum)
+str2sig(const char * __restrict str, int * __restrict pnum)
 {
-  char *endp;
-  const sig_name_and_num *sptr;
-  unsigned long is_valid_decimal;
+    char                   *endp;
+    const sig_name_and_num *sptr;
+    unsigned long           is_valid_decimal;
 
-#if defined (SIGRTMIN) && defined (SIGRTMAX)
-  /* i686 Cygwin only supports one RT signal. For this case, skip checks
-   * for "RTMIN+n" and "RTMAX-m". */
-  if (SIGRTMIN != SIGRTMAX) {
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    /* i686 Cygwin only supports one RT signal. For this case, skip checks
+     * for "RTMIN+n" and "RTMAX-m". */
+    if (SIGRTMIN != SIGRTMAX) {
 
-    /* If str is in RT signal range, get number of of RT signal, save it as an
-    * integer. */
-    if (strncmp(str, "RTMIN+", SPACES_TO_N) == 0) {
-      unsigned long j = strtoul(&str[SPACES_TO_N], &endp, 10);
+        /* If str is in RT signal range, get number of of RT signal, save it as an
+         * integer. */
+        if (strncmp(str, "RTMIN+", SPACES_TO_N) == 0) {
+            unsigned long j = strtoul(&str[SPACES_TO_N], &endp, 10);
 
-      /* If number is valid, save it in pnum. */
-      if (*endp == '\0') {
-        if (1 <= j &&
-            j <= ((SIGRTMAX - SIGRTMIN)-1)) {
-          *pnum = (SIGRTMIN + j);
-          return 0;
+            /* If number is valid, save it in pnum. */
+            if (*endp == '\0') {
+                if (1 <= j && j <= ((SIGRTMAX - SIGRTMIN) - 1)) {
+                    *pnum = (SIGRTMIN + j);
+                    return 0;
+                }
+                return -1;
+            }
+            return -1;
         }
-        return -1;
-      }
-      return -1;
-    }
 
-    /* If str is in RT signal range, get number of of RT signal, save it as an
-    * integer. */
-    if (strncmp(str, "RTMAX-", SPACES_TO_N) == 0) {
-      unsigned long j = strtoul(&str[SPACES_TO_N], &endp, 10); // and endptr null check
+        /* If str is in RT signal range, get number of of RT signal, save it as an
+         * integer. */
+        if (strncmp(str, "RTMAX-", SPACES_TO_N) == 0) {
+            unsigned long j = strtoul(&str[SPACES_TO_N], &endp, 10); // and endptr null check
 
-      /* If number is valid, save it in pnum. */
-      if (*endp == '\0') {
-        if (1 <= j &&
-            j <= ((SIGRTMAX - SIGRTMIN)-1)) {
-          *pnum = (SIGRTMAX - j);
-          return 0;
+            /* If number is valid, save it in pnum. */
+            if (*endp == '\0') {
+                if (1 <= j && j <= ((SIGRTMAX - SIGRTMIN) - 1)) {
+                    *pnum = (SIGRTMAX - j);
+                    return 0;
+                }
+                return -1;
+            }
+            return -1;
         }
-        return -1;
-      }
-      return -1;
     }
-  }
 #endif
 
-  /*If str is a valid signal name, save its corresponding number in pnum. */
-  for (sptr = sig_array; sptr < &sig_array[NUM_OF_SIGS]; sptr++) {
-    if (strcmp(sptr->sig_name, str) == 0) {
-      *pnum = sptr->sig_num;
-      return 0;
+    /*If str is a valid signal name, save its corresponding number in pnum. */
+    for (sptr = sig_array; sptr < &sig_array[NUM_OF_SIGS]; sptr++) {
+        if (strcmp(sptr->sig_name, str) == 0) {
+            *pnum = sptr->sig_num;
+            return 0;
+        }
     }
-  }
 
-  /* str was not found in sig_array. Check whether str is a string
-   * representation of a valid integer. */
-  is_valid_decimal = strtoul(str, &endp, 10);
+    /* str was not found in sig_array. Check whether str is a string
+     * representation of a valid integer. */
+    is_valid_decimal = strtoul(str, &endp, 10);
 
-  if (*endp != '\0') {
+    if (*endp != '\0') {
+        return -1;
+    }
+
+    /* If str is a representation of a decimal value, save its integer value
+     * in pnum. */
+    if (1 <= is_valid_decimal && is_valid_decimal <= (_NSIG - 1)) {
+        *pnum = is_valid_decimal;
+        return 0;
+    }
+
     return -1;
-  }
-
-  /* If str is a representation of a decimal value, save its integer value
-   * in pnum. */
-  if (1 <= is_valid_decimal &&
-      is_valid_decimal <= (_NSIG - 1)) {
-    *pnum = is_valid_decimal;
-    return 0;
-  }
-
-  return -1;
 }

@@ -39,5 +39,5 @@
 int
 main(void)
 {
-	sys_semihost_exit(ADP_Stopped_RunTimeErrorUnknown, 1);
+    sys_semihost_exit(ADP_Stopped_RunTimeErrorUnknown, 1);
 }

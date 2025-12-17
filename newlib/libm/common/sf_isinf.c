@@ -3,7 +3,7 @@ Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
 
 Developed at SunPro, a Sun Microsystems, Inc. business.
 Permission to use, copy, modify, and distribute this
-software is freely granted, provided that this notice 
+software is freely granted, provided that this notice
 is preserved.
  */
 /*
@@ -23,12 +23,12 @@ is preserved.
 #undef isinff
 
 int
-isinff (float x)
+isinff(float x)
 {
-	__int32_t ix;
-	GET_FLOAT_WORD(ix,x);
-	ix &= 0x7fffffff;
-	return FLT_UWORD_IS_INFINITE(ix);
+    __int32_t ix;
+    GET_FLOAT_WORD(ix, x);
+    ix &= 0x7fffffff;
+    return FLT_UWORD_IS_INFINITE(ix);
 }
 
 #ifdef __strong_reference
@@ -41,5 +41,4 @@ __isinff(float x)
 }
 #endif
 
-_MATH_ALIAS_i_f(isinf)
-_MATH_ALIAS_i_f(__isinf)
+_MATH_ALIAS_i_f(isinf) _MATH_ALIAS_i_f(__isinf)

@@ -39,43 +39,47 @@
 
 _BEGIN_STD_C
 
-typedef int pthread_once_t;
+typedef int          pthread_once_t;
 typedef unsigned int pthread_key_t;
 
 /* This must be layout-compatible with the linuxthreads type.  */
-typedef struct
-{
-  int a, b;
-  void *c;
-  int d;
-  struct { long int e; int f; } g;
+typedef struct {
+    int   a, b;
+    void *c;
+    int   d;
+    struct {
+        long int e;
+        int      f;
+    } g;
 } pthread_mutex_t;
 
 /* This give bits equal to the linuxthreads initializer.  */
 #define PTHREAD_MUTEX_INITIALIZER \
-  {0, 0, 0, 0, {0, 0}}
+    {                             \
+        0, 0, 0, 0, { 0, 0 }      \
+}
 
 #define PTHREAD_ONCE_INIT 0
 
 /* This isn't the right prototype, but it let's us get away with not
    defining a lot of datatypes.  */
-extern int pthread_create (void) __THROW;
+extern int   pthread_create(void) __THROW;
 
-extern int pthread_once (pthread_once_t *, void (*) (void)) __THROW;
+extern int   pthread_once(pthread_once_t *, void (*)(void)) __THROW;
 
-extern int pthread_key_create (pthread_key_t *, void (*) (void *)) __THROW;
+extern int   pthread_key_create(pthread_key_t *, void (*)(void *)) __THROW;
 
-extern int pthread_setspecific (pthread_key_t, const void *) __THROW;
+extern int   pthread_setspecific(pthread_key_t, const void *) __THROW;
 
-extern void *pthread_getspecific (pthread_key_t) __THROW;
+extern void *pthread_getspecific(pthread_key_t) __THROW;
 
-extern int pthread_mutex_lock (pthread_mutex_t *) __THROW;
+extern int   pthread_mutex_lock(pthread_mutex_t *) __THROW;
 
-extern int pthread_key_delete (pthread_key_t) __THROW;
+extern int   pthread_key_delete(pthread_key_t) __THROW;
 
-extern int pthread_mutex_trylock (pthread_mutex_t *) __THROW;
+extern int   pthread_mutex_trylock(pthread_mutex_t *) __THROW;
 
-extern int pthread_mutex_unlock (pthread_mutex_t *) __THROW;
+extern int   pthread_mutex_unlock(pthread_mutex_t *) __THROW;
 
 _END_STD_C
 

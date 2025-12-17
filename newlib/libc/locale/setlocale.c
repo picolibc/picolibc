@@ -41,17 +41,16 @@
 char *
 setlocale(int category, const char *name)
 {
-    enum locale_id      locale;
+    enum locale_id locale;
 
-    if (category < LC_ALL || category >= _LC_LAST)
-    {
+    if (category < LC_ALL || category >= _LC_LAST) {
         errno = EINVAL;
         return NULL;
     }
 
     /* Return current locale value */
     if (name == NULL)
-        return (char *) __locale_name(__global_locale);
+        return (char *)__locale_name(__global_locale);
 
     /* Set the global locale */
     locale = __find_locale(name);
@@ -67,5 +66,5 @@ setlocale(int category, const char *name)
         break;
     }
 
-    return (char *) __locale_name(__global_locale);
+    return (char *)__locale_name(__global_locale);
 }

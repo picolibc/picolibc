@@ -32,111 +32,92 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #include "local.h"
 
 struct tm *
-localtime_r (const time_t *__restrict tim_p,
-	struct tm *__restrict res)
+localtime_r(const time_t * __restrict tim_p, struct tm * __restrict res)
 {
-  long offset;
-  int hours, mins, secs;
-  int year;
-  __tzinfo_type *const tz = __gettzinfo ();
-  const uint8_t *ip;
+    long                  offset;
+    int                   hours, mins, secs;
+    int                   year;
+    __tzinfo_type * const tz = __gettzinfo();
+    const uint8_t        *ip;
 
-  res = gmtime_r (tim_p, res);
+    res = gmtime_r(tim_p, res);
 
-  year = res->tm_year + YEAR_BASE;
-  ip = __month_lengths[isleap(year)];
+    year = res->tm_year + YEAR_BASE;
+    ip = __month_lengths[isleap(year)];
 
-  TZ_LOCK;
-  _tzset_unlocked ();
-  if (_daylight)
-    {
-      if (year == tz->__tzyear || __tzcalc_limits (year))
-	res->tm_isdst = (tz->__tznorth
-	  ? (*tim_p >= tz->__tzrule[0].change
-	  && *tim_p < tz->__tzrule[1].change)
-	  : (*tim_p >= tz->__tzrule[0].change
-	  || *tim_p < tz->__tzrule[1].change));
-      else
-	res->tm_isdst = -1;
+    TZ_LOCK;
+    _tzset_unlocked();
+    if (_daylight) {
+        if (year == tz->__tzyear || __tzcalc_limits(year))
+            res->tm_isdst
+                = (tz->__tznorth
+                       ? (*tim_p >= tz->__tzrule[0].change && *tim_p < tz->__tzrule[1].change)
+                       : (*tim_p >= tz->__tzrule[0].change || *tim_p < tz->__tzrule[1].change));
+        else
+            res->tm_isdst = -1;
+    } else
+        res->tm_isdst = 0;
+
+    offset = (res->tm_isdst == 1 ? tz->__tzrule[1].offset : tz->__tzrule[0].offset);
+
+    hours = (int)(offset / SECSPERHOUR);
+    offset = offset % SECSPERHOUR;
+
+    mins = (int)(offset / SECSPERMIN);
+    secs = (int)(offset % SECSPERMIN);
+
+    res->tm_sec -= secs;
+    res->tm_min -= mins;
+    res->tm_hour -= hours;
+
+    if (res->tm_sec >= SECSPERMIN) {
+        res->tm_min += 1;
+        res->tm_sec -= SECSPERMIN;
+    } else if (res->tm_sec < 0) {
+        res->tm_min -= 1;
+        res->tm_sec += SECSPERMIN;
     }
-  else
-    res->tm_isdst = 0;
-
-  offset = (res->tm_isdst == 1
-    ? tz->__tzrule[1].offset
-    : tz->__tzrule[0].offset);
-
-  hours = (int) (offset / SECSPERHOUR);
-  offset = offset % SECSPERHOUR;
-
-  mins = (int) (offset / SECSPERMIN);
-  secs = (int) (offset % SECSPERMIN);
-
-  res->tm_sec -= secs;
-  res->tm_min -= mins;
-  res->tm_hour -= hours;
-
-  if (res->tm_sec >= SECSPERMIN)
-    {
-      res->tm_min += 1;
-      res->tm_sec -= SECSPERMIN;
+    if (res->tm_min >= MINSPERHOUR) {
+        res->tm_hour += 1;
+        res->tm_min -= MINSPERHOUR;
+    } else if (res->tm_min < 0) {
+        res->tm_hour -= 1;
+        res->tm_min += MINSPERHOUR;
     }
-  else if (res->tm_sec < 0)
-    {
-      res->tm_min -= 1;
-      res->tm_sec += SECSPERMIN;
+    if (res->tm_hour >= HOURSPERDAY) {
+        ++res->tm_yday;
+        ++res->tm_wday;
+        if (res->tm_wday > 6)
+            res->tm_wday = 0;
+        ++res->tm_mday;
+        res->tm_hour -= HOURSPERDAY;
+        if (res->tm_mday > ip[res->tm_mon]) {
+            res->tm_mday -= ip[res->tm_mon];
+            res->tm_mon += 1;
+            if (res->tm_mon == 12) {
+                res->tm_mon = 0;
+                res->tm_year += 1;
+                res->tm_yday = 0;
+            }
+        }
+    } else if (res->tm_hour < 0) {
+        res->tm_yday -= 1;
+        res->tm_wday -= 1;
+        if (res->tm_wday < 0)
+            res->tm_wday = 6;
+        res->tm_mday -= 1;
+        res->tm_hour += 24;
+        if (res->tm_mday == 0) {
+            res->tm_mon -= 1;
+            if (res->tm_mon < 0) {
+                res->tm_mon = 11;
+                res->tm_year -= 1;
+                res->tm_yday = 364 + isleap(res->tm_year + YEAR_BASE);
+            }
+            res->tm_mday = ip[res->tm_mon];
+        }
     }
-  if (res->tm_min >= MINSPERHOUR)
-    {
-      res->tm_hour += 1;
-      res->tm_min -= MINSPERHOUR;
-    }
-  else if (res->tm_min < 0)
-    {
-      res->tm_hour -= 1;
-      res->tm_min += MINSPERHOUR;
-    }
-  if (res->tm_hour >= HOURSPERDAY)
-    {
-      ++res->tm_yday;
-      ++res->tm_wday;
-      if (res->tm_wday > 6)
-	res->tm_wday = 0;
-      ++res->tm_mday;
-      res->tm_hour -= HOURSPERDAY;
-      if (res->tm_mday > ip[res->tm_mon])
-	{
-	  res->tm_mday -= ip[res->tm_mon];
-	  res->tm_mon += 1;
-	  if (res->tm_mon == 12)
-	    {
-	      res->tm_mon = 0;
-	      res->tm_year += 1;
-	      res->tm_yday = 0;
-	    }
-	}
-    }
-  else if (res->tm_hour < 0)
-    {
-      res->tm_yday -= 1;
-      res->tm_wday -= 1;
-      if (res->tm_wday < 0)
-	res->tm_wday = 6;
-      res->tm_mday -= 1;
-      res->tm_hour += 24;
-      if (res->tm_mday == 0)
-	{
-	  res->tm_mon -= 1;
-	  if (res->tm_mon < 0)
-	    {
-	      res->tm_mon = 11;
-	      res->tm_year -= 1;
-	      res->tm_yday = 364 + isleap(res->tm_year + YEAR_BASE);
-	    }
-	  res->tm_mday = ip[res->tm_mon];
-	}
-    }
-  TZ_UNLOCK;
+    TZ_UNLOCK;
 
-  return (res);
+    return (res);
 }

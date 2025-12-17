@@ -41,7 +41,7 @@ void *__memset_chk(void * __restrict, int, size_t, size_t);
 void *
 __memset_chk(void * __restrict dst, int val, size_t len, size_t slen)
 {
-	if (len > slen)
-		__chk_fail();
-	return memset(dst, val, len);
+    if (len > slen)
+        __chk_fail();
+    return memset(dst, val, len);
 }

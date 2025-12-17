@@ -33,43 +33,44 @@
 
 /*
  * Supply the inline _straddr for use by strncpy and strncat.
-*
-* _straddr: search the string s, and return the address of the first byte
-* containing zero.
-*/
-static inline char *_straddr(const char *s)
+ *
+ * _straddr: search the string s, and return the address of the first byte
+ * containing zero.
+ */
+static inline char *
+_straddr(const char *s)
 {
-  unsigned int cnt, cmp, skip, mask;
-  vec_uchar16 *ptr, data;
+    unsigned int cnt, cmp, skip, mask;
+    vec_uchar16 *ptr, data;
 
-  /*
-   * Compensate for unaligned strings.
-   */
-  ptr = (vec_uchar16 *)s; /* implicit (s & ~0xf) */
-  skip = (unsigned int)(ptr) & 0xf;
-  /*
-   * skip the first skip bytes starting at (s & ~0xf).
-   */
-  mask = 0xFFFF >> skip;
-
-  data = *ptr;
-  cmp = spu_extract(spu_gather(spu_cmpeq(data, 0)), 0);
-  cmp &= mask;
-
-  cnt = spu_extract(spu_cntlz(spu_promote(cmp, 0)), 0);
-
-  while (cnt == 32) {
-    data = *++ptr;
-    cnt = spu_extract(spu_cntlz(spu_gather(spu_cmpeq(data, 0))), 0);
     /*
-     * The first 16 bits for gather on a byte vector are zero, so if cnt
-     * is 32, none of the 16 bytes in data was zero. And, there are (cnt -
-     * 16) non-zero bytes in data.
+     * Compensate for unaligned strings.
      */
-  }
-  /*
-   * The first non-zero byte is at ptr aligned down plus the number of
-   * non-zero bytes seen.
-   */
-  return ((char*) (((int) ptr & ~0xf) + (cnt - 16)));
+    ptr = (vec_uchar16 *)s; /* implicit (s & ~0xf) */
+    skip = (unsigned int)(ptr) & 0xf;
+    /*
+     * skip the first skip bytes starting at (s & ~0xf).
+     */
+    mask = 0xFFFF >> skip;
+
+    data = *ptr;
+    cmp = spu_extract(spu_gather(spu_cmpeq(data, 0)), 0);
+    cmp &= mask;
+
+    cnt = spu_extract(spu_cntlz(spu_promote(cmp, 0)), 0);
+
+    while (cnt == 32) {
+        data = *++ptr;
+        cnt = spu_extract(spu_cntlz(spu_gather(spu_cmpeq(data, 0))), 0);
+        /*
+         * The first 16 bits for gather on a byte vector are zero, so if cnt
+         * is 32, none of the 16 bytes in data was zero. And, there are (cnt -
+         * 16) non-zero bytes in data.
+         */
+    }
+    /*
+     * The first non-zero byte is at ptr aligned down plus the number of
+     * non-zero bytes seen.
+     */
+    return ((char *)(((int)ptr & ~0xf) + (cnt - 16)));
 }

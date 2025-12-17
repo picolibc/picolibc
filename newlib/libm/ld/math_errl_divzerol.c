@@ -28,11 +28,11 @@
 
 #include "math_ld.h"
 
-static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(0.0L, (long double) INFINITY);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(0.0L, (long double)INFINITY);
 
 HIDDEN long double
-__math_divzerol (uint32_t sign)
+__math_divzerol(uint32_t sign)
 {
     long double y = pick_long_double_except((sign ? -1.0L : 1.0L) / VAL, sign ? -VAL : VAL);
-    return __math_with_errnol (y, ERANGE);
+    return __math_with_errnol(y, ERANGE);
 }

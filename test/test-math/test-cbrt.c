@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-cbrt.h"
-#define TEST_FUNC       cbrt
+#define TEST_VECTORS "test-cbrt.h"
+#define TEST_FUNC    cbrt
 
 #include "test-real-one.h"

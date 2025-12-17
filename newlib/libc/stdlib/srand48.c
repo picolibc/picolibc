@@ -14,20 +14,19 @@
 #include "rand48.h"
 
 void
-_srand48_r (struct _rand48 *r,
-       long seed)
+_srand48_r(struct _rand48 *r, long seed)
 {
-  r->_seed[0] = _RAND48_SEED_0;
-  r->_seed[1] = (unsigned short) seed;
-  r->_seed[2] = (unsigned short) ((unsigned long)seed >> 16);
-  r->_mult[0] = _RAND48_MULT_0;
-  r->_mult[1] = _RAND48_MULT_1;
-  r->_mult[2] = _RAND48_MULT_2;
-  r->_add = _RAND48_ADD;
+    r->_seed[0] = _RAND48_SEED_0;
+    r->_seed[1] = (unsigned short)seed;
+    r->_seed[2] = (unsigned short)((unsigned long)seed >> 16);
+    r->_mult[0] = _RAND48_MULT_0;
+    r->_mult[1] = _RAND48_MULT_1;
+    r->_mult[2] = _RAND48_MULT_2;
+    r->_add = _RAND48_ADD;
 }
 
 void
-srand48 (long seed)
+srand48(long seed)
 {
-  _srand48_r (&_rand48, seed);
+    _srand48_r(&_rand48, seed);
 }

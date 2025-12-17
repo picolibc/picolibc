@@ -45,11 +45,11 @@
 #define TLS_REGNO 26
 #endif
 
-#define _REG(n) "r" # n
-#define REG(n) _REG(n)
+#define _REG(n) "r" #n
+#define REG(n)  _REG(n)
 
 void
 _set_tls(void *tls)
 {
-    __asm__("mov " REG(TLS_REGNO) ", %0" : : "r" (tls));
+    __asm__("mov " REG(TLS_REGNO) ", %0" : : "r"(tls));
 }

@@ -38,10 +38,10 @@
 long double complex
 cacosl(long double complex z)
 {
-	long double complex w;
+    long double complex w;
 
-	w = casinl(z);
-	return (long double complex) (M_PI_2L - creall(w)) - cimagl(w) * (long double complex) I;
+    w = casinl(z);
+    return (long double complex)(M_PI_2L - creall(w)) - cimagl(w) * (long double complex)I;
 }
 
 #endif

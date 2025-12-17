@@ -37,10 +37,9 @@
 #include "locale_private.h"
 
 const char *
-getlocalename_l (int category, locale_t locale)
+getlocalename_l(int category, locale_t locale)
 {
-    if (category < LC_ALL || category >= _LC_LAST)
-    {
+    if (category < LC_ALL || category >= _LC_LAST) {
         errno = EINVAL;
         return NULL;
     }

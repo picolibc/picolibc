@@ -36,5 +36,5 @@
 wint_t
 putwchar(wchar_t c)
 {
-	return putwc(c, stdout);
+    return putwc(c, stdout);
 }

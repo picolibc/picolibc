@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-ccosh.h"
-#define TEST_FUNC       ccosh
+#define TEST_VECTORS "test-ccosh.h"
+#define TEST_FUNC    ccosh
 
 #include "test-complex-one.h"

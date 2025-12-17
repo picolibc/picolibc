@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2004 Paul Brook <paul@codesourcery.com> 
+Copyright (c) 2004 Paul Brook <paul@codesourcery.com>
 
 Common routine to implement atexit-like functionality.
 
@@ -37,7 +37,6 @@ LITE_EXIT.
  * COmmon routine to call call registered atexit-like routines.
  */
 
-
 #include <stdlib.h>
 #include <sys/lock.h>
 #include "atexit.h"
@@ -68,21 +67,20 @@ extern char __libc_fini __weak;
 /* Register the application finalization function with atexit.  These
    finalizers should run last.  Therefore, we want to call atexit as
    soon as possible.  */
-static void 
-register_fini(void) __attribute__((constructor (0)));
+static void             register_fini(void) __attribute__((constructor(0)));
 
-static void 
+static void
 register_fini(void)
 {
-  if (&__libc_fini) {
+    if (&__libc_fini) {
 #ifdef __INIT_FINI_ARRAY
-    extern void __libc_fini_array (void);
-    atexit (__libc_fini_array);
+        extern void __libc_fini_array(void);
+        atexit(__libc_fini_array);
 #else
-    extern void _fini (void);
-    atexit (_fini);
+        extern void _fini(void);
+        atexit(_fini);
 #endif
-  }
+    }
 }
 
 #endif /* _WANT_REGISTER_FINI  */
@@ -92,82 +90,76 @@ register_fini(void)
  * otherwise only the handlers from that DSO are called.
  */
 
-void 
-__call_exitprocs (int code, void *d)
+void
+__call_exitprocs(int code, void *d)
 {
-  register struct _atexit *p;
-  struct _atexit **lastp;
-  register struct _on_exit_args * args;
-  register int n;
-  int i;
-  void (*fn) (void);
+    register struct _atexit       *p;
+    struct _atexit               **lastp;
+    register struct _on_exit_args *args;
+    register int                   n;
+    int                            i;
+    void                           (*fn)(void);
 
+    __LIBC_LOCK();
 
-  __LIBC_LOCK();
+restart:
 
- restart:
+    p = _atexit;
+    lastp = &_atexit;
+    while (p) {
+        args = &p->_on_exit_args;
+        for (n = p->_ind - 1; n >= 0; n--) {
+            int ind;
 
-  p = _atexit;
-  lastp = &_atexit;
-  while (p)
-    {
-      args = &p->_on_exit_args;
-      for (n = p->_ind - 1; n >= 0; n--)
-	{
-	  int ind;
+            i = 1 << n;
 
-	  i = 1 << n;
+            /* Skip functions not from this dso.  */
+            if (d && (!args || args->_dso_handle[n] != d))
+                continue;
 
-	  /* Skip functions not from this dso.  */
-	  if (d && (!args || args->_dso_handle[n] != d))
-	    continue;
+            /* Remove the function now to protect against the
+               function calling exit recursively.  */
+            fn = p->_fns[n];
+            if (n == p->_ind - 1)
+                p->_ind--;
+            else
+                p->_fns[n] = NULL;
 
-	  /* Remove the function now to protect against the
-	     function calling exit recursively.  */
-	  fn = p->_fns[n];
-	  if (n == p->_ind - 1)
-	    p->_ind--;
-	  else
-	    p->_fns[n] = NULL;
+            /* Skip functions that have already been called.  */
+            if (!fn)
+                continue;
 
-	  /* Skip functions that have already been called.  */
-	  if (!fn)
-	    continue;
+            ind = p->_ind;
 
-	  ind = p->_ind;
+            /* Call the function.  */
+            if (!args || (args->_fntypes & i) == 0)
+                fn();
+            else if ((args->_is_cxa & i) == 0)
+                (*((void (*)(int, void *))fn))(code, args->_fnargs[n]);
+            else
+                (*((void (*)(void *))fn))(args->_fnargs[n]);
 
-	  /* Call the function.  */
-	  if (!args || (args->_fntypes & i) == 0)
-	    fn ();
-	  else if ((args->_is_cxa & i) == 0)
-	    (*((void (*)(int, void *)) fn))(code, args->_fnargs[n]);
-	  else
-	    (*((void (*)(void *)) fn))(args->_fnargs[n]);
+            /* The function we called call atexit and registered another
+               function (or functions).  Call these new functions before
+               continuing with the already registered functions.  */
+            if (ind != p->_ind || *lastp != p)
+                goto restart;
+        }
 
-	  /* The function we called call atexit and registered another
-	     function (or functions).  Call these new functions before
-	     continuing with the already registered functions.  */
-	  if (ind != p->_ind || *lastp != p)
-	    goto restart;
-	}
-
-#if !defined (_ATEXIT_DYNAMIC_ALLOC) || !defined (MALLOC_PROVIDED)
-      break;
+#if !defined(_ATEXIT_DYNAMIC_ALLOC) || !defined(MALLOC_PROVIDED)
+        break;
 #else
-      /* Move to the next block.  Free empty blocks except the last one,
-	 which is _atexit0.  */
-      if (p->_ind == 0 && p->_next)
-	{
-	  /* Remove empty block from the list.  */
-	  *lastp = p->_next;
-	  free (p);
-	  p = *lastp;
-	}
-      else
-	{
-	  lastp = &p->_next;
-	  p = p->_next;
-	}
+        /* Move to the next block.  Free empty blocks except the last one,
+           which is _atexit0.  */
+        if (p->_ind == 0 && p->_next) {
+            /* Remove empty block from the list.  */
+            *lastp = p->_next;
+            free(p);
+            p = *lastp;
+        } else {
+            lastp = &p->_next;
+            p = p->_next;
+        }
 #endif
     }
     __LIBC_UNLOCK();

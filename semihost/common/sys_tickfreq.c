@@ -38,5 +38,5 @@
 uintptr_t
 sys_semihost_tickfreq(void)
 {
-	return sys_semihost(SYS_TICKFREQ, 0);
+    return sys_semihost(SYS_TICKFREQ, 0);
 }

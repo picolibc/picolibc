@@ -17,9 +17,8 @@ they apply.
 #include <errno.h>
 
 _sig_func_ptr
-signal (int sig,
-	_sig_func_ptr func)
+signal(int sig, _sig_func_ptr func)
 {
-  errno = EINVAL;
-  return NULL;
+    errno = EINVAL;
+    return NULL;
 }

@@ -30,10 +30,7 @@
 #ifndef _STRTOK_R_H_
 #define _STRTOK_R_H_
 
-char *
-__strtok_r (register char *s,
-            register const char *delim,
-            char **lasts,
-            int skip_leading_delim);
+char *__strtok_r(register char *s, register const char *delim, char **lasts,
+                 int skip_leading_delim);
 
 #endif /* _STRTOK_R_H_ */

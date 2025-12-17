@@ -41,10 +41,9 @@
 void *__memmove_chk(void *, const void *src, size_t, size_t);
 
 void *
-__memmove_chk(void *dst, const void *src, size_t len,
-    size_t slen)
+__memmove_chk(void *dst, const void *src, size_t len, size_t slen)
 {
-	if (len > slen)
-		__chk_fail();
-	return memmove(dst, src, len);
+    if (len > slen)
+        __chk_fail();
+    return memmove(dst, src, len);
 }

@@ -36,11 +36,11 @@
 #include "uchar-local.h"
 
 size_t
-c8rtomb (char *s, char8_t c8, mbstate_t *ps)
+c8rtomb(char *s, char8_t c8, mbstate_t *ps)
 {
     static mbstate_t _state;
-    char32_t    c32;
-    int count;
+    char32_t         c32;
+    int              count;
 
     if (ps == NULL)
         ps = &_state;
@@ -51,7 +51,7 @@ c8rtomb (char *s, char8_t c8, mbstate_t *ps)
     if (char8_is_one_byte(c8)) {
         if (ps->__count != 0) {
             errno = EILSEQ;
-            return (size_t) -1;
+            return (size_t)-1;
         }
         c32 = c8;
     } else if (char8_is_first_byte(c8)) {
@@ -62,21 +62,20 @@ c8rtomb (char *s, char8_t c8, mbstate_t *ps)
          */
         if (ps->__count != 0 || c8 <= 0xc1) {
             errno = EILSEQ;
-            return (size_t) -1;
+            return (size_t)-1;
         }
         count = 1;
         while ((c8 & (1 << (6 - count))) != 0) {
             if (count > 4) {
                 errno = EILSEQ;
-                return (size_t) -1;
+                return (size_t)-1;
             }
             count++;
         }
-        c32 = (char32_t) (c8 & ((1 << (6-count)) - 1)) << (6 * count);
-        if (!char32_is_valid(c32))
-        {
+        c32 = (char32_t)(c8 & ((1 << (6 - count)) - 1)) << (6 * count);
+        if (!char32_is_valid(c32)) {
             errno = EILSEQ;
-            return (size_t) -1;
+            return (size_t)-1;
         }
         ps->__value.__ucs = c32;
         ps->__count = -count;
@@ -84,17 +83,15 @@ c8rtomb (char *s, char8_t c8, mbstate_t *ps)
     } else {
         count = -ps->__count;
         c8 &= 0x3f;
-        if (count == 0 || (ps->__value.__ucs == 0 && c8 < (0x80 >> count)))
-        {
+        if (count == 0 || (ps->__value.__ucs == 0 && c8 < (0x80 >> count))) {
             errno = EILSEQ;
-            return (size_t) -1;
+            return (size_t)-1;
         }
         count--;
-        c32 = ps->__value.__ucs | ((char32_t) c8 << (6 * count));
-        if (!char32_is_valid(c32))
-        {
+        c32 = ps->__value.__ucs | ((char32_t)c8 << (6 * count));
+        if (!char32_is_valid(c32)) {
             errno = EILSEQ;
-            return (size_t) -1;
+            return (size_t)-1;
         }
         ps->__count = -count;
         if (count != 0) {
@@ -104,9 +101,9 @@ c8rtomb (char *s, char8_t c8, mbstate_t *ps)
     }
 
 #if __SIZEOF_WCHAR_T__ == 2
-    return c32rtomb (s, c32, ps);
+    return c32rtomb(s, c32, ps);
 #elif __SIZEOF_WCHAR_T__ == 4
-    return wcrtomb(s, (wchar_t) c32, ps);
+    return wcrtomb(s, (wchar_t)c32, ps);
 #else
 #error wchar_t size unknown
 #endif

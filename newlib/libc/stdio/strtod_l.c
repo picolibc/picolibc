@@ -37,30 +37,27 @@
 
 #ifdef WIDE_CHARS
 #include <wctype.h>
-#define strtod_l wcstod_l
-#define strtod wcstod
+#define strtod_l  wcstod_l
+#define strtod    wcstod
 #define strtold_l wcstold_l
-#define char wchar_t
+#define char      wchar_t
 #endif
 
 double
-strtod_l (const char *__restrict s00,
-	  char **__restrict se,
-	  locale_t loc)
+strtod_l(const char * __restrict s00, char ** __restrict se, locale_t loc)
 {
-        (void) loc;
-	return strtod (s00, se);
+    (void)loc;
+    return strtod(s00, se);
 }
-
 
 #if defined(__HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
 #ifdef __strong_reference
 __strong_reference_dup(strtod_l, strtold_l);
 #else
 long double
-strtold_l (const char * nptr, char ** endptr, locale_t loc)
+strtold_l(const char *nptr, char **endptr, locale_t loc)
 {
-	return (long double) strtod_l(nptr, endptr, loc);
+    return (long double)strtod_l(nptr, endptr, loc);
 }
 #endif
 #endif

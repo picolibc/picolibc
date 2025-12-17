@@ -39,6 +39,6 @@
 int
 main(void)
 {
-	printf("hello, world\n");
-	exit(0);
+    printf("hello, world\n");
+    exit(0);
 }

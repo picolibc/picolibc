@@ -33,16 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
-#if (__ARM_FP & 0x4) 
+#if (__ARM_FP & 0x4)
 #include "fdlibm.h"
 
 float
 fabsf(float x)
 {
-	float result;
-	__asm__("vabs.f32 %0, %1" : "=t" (result) : "t" (x));
-	return result;
+    float result;
+    __asm__("vabs.f32 %0, %1" : "=t"(result) : "t"(x));
+    return result;
 }
 
 _MATH_ALIAS_f_f(fabs)

@@ -33,22 +33,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define paste(a,b) a##b
-#define str(a) #a
+#define paste(a, b) a##b
+#define str(a)      #a
 
-#define RUN_TEST(a) {                                                   \
-        extern int paste(test_, a) (void);                              \
-        int e = paste(test_, a) ();                                     \
-        if (e) printf("%s test failed, %d error(s)\n", str(a), e);      \
-        else   printf("%s test passed\n", str(a));                      \
-        err += e;                                                       \
+#define RUN_TEST(a)                                             \
+    {                                                           \
+        extern int paste(test_, a)(void);                       \
+        int        e = paste(test_, a)();                       \
+        if (e)                                                  \
+            printf("%s test failed, %d error(s)\n", str(a), e); \
+        else                                                    \
+            printf("%s test passed\n", str(a));                 \
+        err += e;                                               \
     }
 
 #define expand(a) a
 
-int main(void)
+int
+main(void)
 {
-    int err=0;
+    int err = 0;
     RUN_TEST(TEST_NAME);
     return !!err;
 }

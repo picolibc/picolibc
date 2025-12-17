@@ -21,38 +21,44 @@
 #include "common.h"
 
 #define FLOAT_POW5_INV_BITCOUNT (DOUBLE_POW5_INV_BITCOUNT - 64)
-#define FLOAT_POW5_BITCOUNT (DOUBLE_POW5_BITCOUNT - 64)
+#define FLOAT_POW5_BITCOUNT     (DOUBLE_POW5_BITCOUNT - 64)
 
-static inline uint32_t pow5factor_32(uint32_t value) {
-  uint32_t count = 0;
-  for (;;) {
-    assert(value != 0);
-    const uint32_t q = value / 5;
-    const uint32_t r = value % 5;
-    if (r != 0) {
-      break;
+static inline uint32_t
+pow5factor_32(uint32_t value)
+{
+    uint32_t count = 0;
+    for (;;) {
+        assert(value != 0);
+        const uint32_t q = value / 5;
+        const uint32_t r = value % 5;
+        if (r != 0) {
+            break;
+        }
+        value = q;
+        ++count;
     }
-    value = q;
-    ++count;
-  }
-  return count;
+    return count;
 }
 
 // Returns true if value is divisible by 5^p.
-static inline bool multipleOfPowerOf5_32(const uint32_t value, const uint32_t p) {
-  return pow5factor_32(value) >= p;
+static inline bool
+multipleOfPowerOf5_32(const uint32_t value, const uint32_t p)
+{
+    return pow5factor_32(value) >= p;
 }
 
 // Returns true if value is divisible by 2^p.
-static inline bool multipleOfPowerOf2_32(const uint32_t value, const uint32_t p) {
-  // __builtin_ctz doesn't appear to be faster here.
-  return (value & ((1ul << p) - 1)) == 0;
+static inline bool
+multipleOfPowerOf2_32(const uint32_t value, const uint32_t p)
+{
+    // __builtin_ctz doesn't appear to be faster here.
+    return (value & ((1ul << p) - 1)) == 0;
 }
 
 uint32_t __mulPow5InvDivPow2(const uint32_t m, const uint32_t q, const int32_t j);
-#define mulPow5InvDivPow2(m,q,j) __mulPow5InvDivPow2(m,q,j)
+#define mulPow5InvDivPow2(m, q, j) __mulPow5InvDivPow2(m, q, j)
 
 uint32_t __mulPow5divPow2(const uint32_t m, const uint32_t i, const int32_t j);
-#define mulPow5divPow2(m,i,j) __mulPow5divPow2(m,i,j)
+#define mulPow5divPow2(m, i, j) __mulPow5divPow2(m, i, j)
 
 #endif // RYU_F2S_INTRINSICS_H

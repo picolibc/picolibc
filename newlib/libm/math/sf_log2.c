@@ -24,7 +24,7 @@
 #undef log2
 #undef log2f
 
-static const float log2_inv = 1.0f / (float) M_LN2;
+static const float log2_inv = 1.0f / (float)M_LN2;
 
 float
 log2f(float x) /* wrapper log2f */

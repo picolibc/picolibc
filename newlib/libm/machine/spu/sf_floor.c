@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/floorf.h"
 
-float floorf(float value)
+float
+floorf(float value)
 {
     return _floorf(value);
 }

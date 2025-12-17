@@ -41,11 +41,11 @@
 int
 getentropy(void *buffer, size_t length)
 {
-    uint8_t     *b = buffer;
+    uint8_t *b = buffer;
 
     while (length) {
         uintptr_t bits = sys_semihost_time();
-        size_t this_time = sizeof (uintptr_t);
+        size_t    this_time = sizeof(uintptr_t);
         if (this_time > length)
             this_time = length;
         memcpy(b, &bits, this_time);

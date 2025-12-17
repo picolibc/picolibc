@@ -44,26 +44,25 @@ POSSIBILITY OF SUCH DAMAGE.
     * SPU_CLOCK_ERR_STILL_RUNNING - start count was decremented but clock was
       not stopped  */
 int
-spu_clock_stop (void)
+spu_clock_stop(void)
 {
-  if (__spu_clock_startcnt == 0)
-    return SPU_CLOCK_ERR_NOT_RUNNING;
+    if (__spu_clock_startcnt == 0)
+        return SPU_CLOCK_ERR_NOT_RUNNING;
 
-  if (__spu_clock_startcnt == 1 && (__spu_timers_active || __spu_timers_handled))
-    return SPU_CLOCK_ERR_TIMERS_ACTIVE;
+    if (__spu_clock_startcnt == 1 && (__spu_timers_active || __spu_timers_handled))
+        return SPU_CLOCK_ERR_TIMERS_ACTIVE;
 
-  /* Don't stop clock if the clock is still in use.  */
-  if (--__spu_clock_startcnt != 0)
-    return SPU_CLOCK_ERR_STILL_RUNNING;
+    /* Don't stop clock if the clock is still in use.  */
+    if (--__spu_clock_startcnt != 0)
+        return SPU_CLOCK_ERR_STILL_RUNNING;
 
-  /* Clock stopped, stop decrementer.  */
-  __disable_spu_decr ();
+    /* Clock stopped, stop decrementer.  */
+    __disable_spu_decr();
 
-  /* Clock is enabled on clock start - restore to original state (saved at start).  */
-  if (__likely (!__spu_clock_state_was_enabled))
-    {
-      spu_idisable ();
+    /* Clock is enabled on clock start - restore to original state (saved at start).  */
+    if (__likely(!__spu_clock_state_was_enabled)) {
+        spu_idisable();
     }
 
-  return 0;
+    return 0;
 }

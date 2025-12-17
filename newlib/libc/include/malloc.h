@@ -49,56 +49,61 @@ _BEGIN_STD_C
    libc/stdlib/mallocr.c.  */
 
 struct mallinfo {
-  size_t arena;    /* total space allocated from system */
-  size_t ordblks;  /* number of non-inuse chunks */
-  size_t smblks;   /* unused -- always zero */
-  size_t hblks;    /* number of mmapped regions */
-  size_t hblkhd;   /* total space in mmapped regions */
-  size_t usmblks;  /* unused -- always zero */
-  size_t fsmblks;  /* unused -- always zero */
-  size_t uordblks; /* total allocated space */
-  size_t fordblks; /* total non-inuse space */
-  size_t keepcost; /* top-most, releasable (via malloc_trim) space */
-};	
+    size_t arena;    /* total space allocated from system */
+    size_t ordblks;  /* number of non-inuse chunks */
+    size_t smblks;   /* unused -- always zero */
+    size_t hblks;    /* number of mmapped regions */
+    size_t hblkhd;   /* total space in mmapped regions */
+    size_t usmblks;  /* unused -- always zero */
+    size_t fsmblks;  /* unused -- always zero */
+    size_t uordblks; /* total allocated space */
+    size_t fordblks; /* total non-inuse space */
+    size_t keepcost; /* top-most, releasable (via malloc_trim) space */
+};
 
 /* The routines.  */
 
-void	free (void *) __nothrow;
-void	*malloc(size_t) __malloc_like __warn_unused_result __alloc_size(1) __nothrow;
-void	*calloc(size_t, size_t) __malloc_like __warn_unused_result
-    __alloc_size2(1, 2) __nothrow;
-void	*realloc(void *, size_t) __warn_unused_result __alloc_size(2) __nothrow;
-void    *memalign (size_t __alignment, size_t __size)  __malloc_like
-    __warn_unused_result __alloc_size(2) __nothrow;
+void free(void *) __nothrow;
+void                                    *
+malloc(size_t)
+__malloc_like __warn_unused_result __alloc_size(1) __nothrow;
+void                                    *
+calloc(size_t, size_t)
+__malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow;
+void                      *
+realloc(void *, size_t)
+__warn_unused_result __alloc_size(2) __nothrow;
+void                *memalign(size_t __alignment, size_t __size) __malloc_like __warn_unused_result
+    __alloc_size(2) __nothrow;
 
-struct mallinfo mallinfo (void);
-void malloc_stats (void);
-int mallopt (int, int);
-size_t malloc_usable_size (void *);
+struct mallinfo mallinfo(void);
+void            malloc_stats(void);
+int             mallopt(int, int);
+size_t          malloc_usable_size(void *);
 /* These aren't too useful on an embedded system, but we define them
    anyhow.  */
 
-void *pvalloc (size_t);
-int malloc_trim (size_t);
-void __malloc_lock(void);
-void __malloc_unlock(void);
+void           *pvalloc(size_t);
+int             malloc_trim(size_t);
+void            __malloc_lock(void);
+void            __malloc_unlock(void);
 
 /* SVID2/XPG mallopt options */
 
-#define M_MXFAST  1    /* UNUSED in this malloc */
-#define M_NLBLKS  2    /* UNUSED in this malloc */
-#define M_GRAIN   3    /* UNUSED in this malloc */
-#define M_KEEP    4    /* UNUSED in this malloc */
+#define M_MXFAST 1 /* UNUSED in this malloc */
+#define M_NLBLKS 2 /* UNUSED in this malloc */
+#define M_GRAIN  3 /* UNUSED in this malloc */
+#define M_KEEP   4 /* UNUSED in this malloc */
 
 /* mallopt options that actually do something */
-  
-#define M_TRIM_THRESHOLD    -1
-#define M_TOP_PAD           -2
-#define M_MMAP_THRESHOLD    -3 
-#define M_MMAP_MAX          -4
+
+#define M_TRIM_THRESHOLD -1
+#define M_TOP_PAD        -2
+#define M_MMAP_THRESHOLD -3
+#define M_MMAP_MAX       -4
 
 /* Some systems provide this, so do too for compatibility.  */
-void cfree (void *);
+void cfree(void *);
 
 _END_STD_C
 

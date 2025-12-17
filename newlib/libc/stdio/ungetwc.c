@@ -32,20 +32,20 @@
 wint_t
 ungetwc(wint_t c, FILE *stream)
 {
-        __flockfile(stream);
-	/*
-	 * Streams that are not readable, or streams that already had
-	 * had an ungetc() before will cause an error.
-	 *
-	 * ungetwc(WEOF, ...) causes an error per definition.
-	 */
-	if ((stream->flags & __SRD) == 0 || c == WEOF)
-		__funlock_return(stream, WEOF);
+    __flockfile(stream);
+    /*
+     * Streams that are not readable, or streams that already had
+     * had an ungetc() before will cause an error.
+     *
+     * ungetwc(WEOF, ...) causes an error per definition.
+     */
+    if ((stream->flags & __SRD) == 0 || c == WEOF)
+        __funlock_return(stream, WEOF);
 
-	if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t) c + 1))
-		__funlock_return(stream, WEOF);
+    if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t)c + 1))
+        __funlock_return(stream, WEOF);
 
-        stream->flags &= ~__SEOF;
+    stream->flags &= ~__SEOF;
 
-	__funlock_return(stream, c);
+    __funlock_return(stream, c);
 }

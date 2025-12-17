@@ -8,12 +8,12 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
-/* 
+/*
  * wrapper pow10f(x)
  */
 
@@ -24,9 +24,9 @@
 #include <math.h>
 
 float
-pow10f(float x)		/* wrapper pow10f */
+pow10f(float x) /* wrapper pow10f */
 {
-  return _powf(10.0, x);
+    return _powf(10.0, x);
 }
 
 #undef pow10

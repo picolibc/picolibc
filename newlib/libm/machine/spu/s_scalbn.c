@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/scalbn.h"
 
-double scalbn(double x, int exp)
+double
+scalbn(double x, int exp)
 {
     return _scalbn(x, exp);
 }

@@ -24,7 +24,8 @@ gamma function.
 matching a newer, better definition.  */
 /*
 FUNCTION
-        <<gamma>>, <<gammaf>>, <<lgamma>>, <<lgammaf>>, <<gamma_r>>, <<gammaf_r>>, <<lgamma_r>>, <<lgammaf_r>>, <<tgamma>>, and <<tgammaf>>---logarithmic and plain gamma functions
+        <<gamma>>, <<gammaf>>, <<lgamma>>, <<lgammaf>>, <<gamma_r>>, <<gammaf_r>>, <<lgamma_r>>,
+<<lgammaf_r>>, <<tgamma>>, and <<tgammaf>>---logarithmic and plain gamma functions
 
 INDEX
 gamma

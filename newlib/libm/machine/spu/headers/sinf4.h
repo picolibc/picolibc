@@ -40,7 +40,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _SINF4_H_
-#define _SINF4_H_	1
+#define _SINF4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -51,44 +51,45 @@
  *	vector float _sind2(vector float angle)
  *
  * DESCRIPTION
- *	The _sinf4 function computes the sine of a vector of angles (expressed 
+ *	The _sinf4 function computes the sine of a vector of angles (expressed
  *	in radians) to an accuracy of a single precision floating point.
  *
  */
-static __inline vector float _sinf4(vector float angle)
+static __inline vector float
+_sinf4(vector float angle)
 {
-  vec_int4   octant;
-  vec_uint4  select;
-  vec_float4 cos, sin;
-  vec_float4 toggle_sign, answer;
+    vec_int4   octant;
+    vec_uint4  select;
+    vec_float4 cos, sin;
+    vec_float4 toggle_sign, answer;
 
-  /* Range reduce the input angle x into the range -PI/4 to PI/4
-   * by performing simple modulus.
-   */
-  MOD_PI_OVER_FOUR_F(angle, octant);
+    /* Range reduce the input angle x into the range -PI/4 to PI/4
+     * by performing simple modulus.
+     */
+    MOD_PI_OVER_FOUR_F(angle, octant);
 
-  /* Compute the cosine and sine of the range reduced input.
-   */
-  COMPUTE_COS_SIN_F(angle, cos, sin);
+    /* Compute the cosine and sine of the range reduced input.
+     */
+    COMPUTE_COS_SIN_F(angle, cos, sin);
 
-  /* For each SIMD element, select which result (cos or sin) to use
-   * with a sign correction depending upon the octant of the original
-   * angle (Maclaurin series).
-   *
-   *   octants      angles     select  sign toggle 
-   *   -------   ------------  ------  -----------
-   *     0          0 to 45     sin        no      
-   *    1,2        45 to 135    cos        no
-   *    3,4       135 to 225    sin        yes
-   *    5,6       225 to 315    cos        yes
-   *     7        315 to 360    sin        no
-   */ 
-  toggle_sign = (vec_float4)spu_sl(spu_and(octant, 4), 29);
-  select = spu_cmpeq(spu_and(octant, 2), 0);
+    /* For each SIMD element, select which result (cos or sin) to use
+     * with a sign correction depending upon the octant of the original
+     * angle (Maclaurin series).
+     *
+     *   octants      angles     select  sign toggle
+     *   -------   ------------  ------  -----------
+     *     0          0 to 45     sin        no
+     *    1,2        45 to 135    cos        no
+     *    3,4       135 to 225    sin        yes
+     *    5,6       225 to 315    cos        yes
+     *     7        315 to 360    sin        no
+     */
+    toggle_sign = (vec_float4)spu_sl(spu_and(octant, 4), 29);
+    select = spu_cmpeq(spu_and(octant, 2), 0);
 
-  answer = spu_xor(spu_sel(cos, sin, select), toggle_sign);
+    answer = spu_xor(spu_sel(cos, sin, select), toggle_sign);
 
-  return (answer);
+    return (answer);
 }
 
 #endif /* _SINF4_H_ */

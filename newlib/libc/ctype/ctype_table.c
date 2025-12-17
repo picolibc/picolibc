@@ -42,26 +42,26 @@
 #ifdef __MB_CAPABLE
 
 static const struct {
-    wchar_t             code;
-    uint16_t            category;
+    wchar_t  code;
+    uint16_t category;
 } ctype_table[] = {
 #include "ctype_table.h"
 };
 
-#define N_CAT_TABLE     (sizeof(ctype_table) / sizeof(ctype_table[0]))
+#define N_CAT_TABLE (sizeof(ctype_table) / sizeof(ctype_table[0]))
 
 uint16_t
 __ctype_table_lookup(wint_t ic, locale_t locale)
 {
-    size_t      low = 0;
-    size_t      high = N_CAT_TABLE - 1;
-    size_t      mid;
-    wchar_t     c;
+    size_t  low = 0;
+    size_t  high = N_CAT_TABLE - 1;
+    size_t  mid;
+    wchar_t c;
 
     if (ic == WEOF)
         return CLASS_none;
 
-    c = (wchar_t) ic;
+    c = (wchar_t)ic;
 
     /* Be compatible with glibc where the C locale has no classes outside of ASCII */
     if (c >= 0x80 && __locale_is_C(locale))
@@ -71,7 +71,7 @@ __ctype_table_lookup(wint_t ic, locale_t locale)
         mid = (low + high) >> 1;
         if (c < ctype_table[mid].code) {
             high = mid - 1;
-        } else if (mid >= N_CAT_TABLE || c >= ctype_table[mid+1].code) {
+        } else if (mid >= N_CAT_TABLE || c >= ctype_table[mid + 1].code) {
             low = mid + 1;
         } else {
             high = mid;

@@ -35,26 +35,24 @@
 
 #include "../../crt0.h"
 
-static void __used __section(".init")
-_cstart(void)
+static void __used __section(".init") _cstart(void)
 {
-	__start();
+    __start();
 }
 
 extern char __stack[];
 extern char _gp[];
 
-void __section(".init") __used
-_start(void)
+void        __section(".init") __used _start(void)
 {
-	/* Initialize stack pointer */
-	__asm__("movhi sp,%%hiadj(%0)" : : "i" (__stack));
-	__asm__("addi  sp,sp,%%lo(%0)" : : "i" (__stack));
+    /* Initialize stack pointer */
+    __asm__("movhi sp,%%hiadj(%0)" : : "i"(__stack));
+    __asm__("addi  sp,sp,%%lo(%0)" : : "i"(__stack));
 
-        /* Initialize GP */
-        __asm__("movhi gp,%%hiadj(%0)" : : "i" (_gp));
-        __asm__("addi gp,gp,%%lo(%0)" : : "i" (_gp));
+    /* Initialize GP */
+    __asm__("movhi gp,%%hiadj(%0)" : : "i"(_gp));
+    __asm__("addi gp,gp,%%lo(%0)" : : "i"(_gp));
 
-	/* Branch to C code */
-	__asm__("br _cstart");
+    /* Branch to C code */
+    __asm__("br _cstart");
 }

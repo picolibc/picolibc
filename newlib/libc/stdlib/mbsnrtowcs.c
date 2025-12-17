@@ -4,25 +4,25 @@ FUNCTION
 <<mbsrtowcs>>, <<mbsnrtowcs>>---convert a character string to a wide-character string
 
 INDEX
-	mbsrtowcs
+        mbsrtowcs
 INDEX
-	_mbsrtowcs_r
+        _mbsrtowcs_r
 INDEX
-	mbsnrtowcs
+        mbsnrtowcs
 INDEX
-	_mbsnrtowcs_r
+        _mbsnrtowcs_r
 
 SYNOPSIS
-	#include <wchar.h>
-	size_t mbsrtowcs(wchar_t *__restrict <[dst]>,
-			 const char **__restrict <[src]>,
-			 size_t <[len]>,
-			 mbstate_t *__restrict <[ps]>);
+        #include <wchar.h>
+        size_t mbsrtowcs(wchar_t *__restrict <[dst]>,
+                         const char **__restrict <[src]>,
+                         size_t <[len]>,
+                         mbstate_t *__restrict <[ps]>);
 
-	#include <wchar.h>
-	size_t mbsnrtowcs(wchar_t *__ restrict <[dst]>,
-			  const char **__restrict <[src]>, size_t <[nms]>,
-			  size_t <[len]>, mbstate_t *__restrict <[ps]>);
+        #include <wchar.h>
+        size_t mbsnrtowcs(wchar_t *__ restrict <[dst]>,
+                          const char **__restrict <[src]>, size_t <[nms]>,
+                          size_t <[len]>, mbstate_t *__restrict <[ps]>);
 
 
 DESCRIPTION
@@ -62,65 +62,50 @@ PORTABILITY
 #include <errno.h>
 
 size_t
-mbsnrtowcs (
-	wchar_t *dst,
-	const char **src,
-	size_t nms,
-	size_t len,
-	mbstate_t *ps)
+mbsnrtowcs(wchar_t *dst, const char **src, size_t nms, size_t len, mbstate_t *ps)
 {
-  wchar_t *ptr = dst;
-  const char *tmp_src;
-  size_t max;
-  size_t count = 0;
-  int bytes;
+    wchar_t    *ptr = dst;
+    const char *tmp_src;
+    size_t      max;
+    size_t      count = 0;
+    int         bytes;
 
 #ifdef __MB_CAPABLE
-  if (ps == NULL)
-    {
-      static mbstate_t _mbsrtowcs_state;
-      ps = &_mbsrtowcs_state;
+    if (ps == NULL) {
+        static mbstate_t _mbsrtowcs_state;
+        ps = &_mbsrtowcs_state;
     }
 #endif
 
-  if (dst == NULL)
-    {
-      /* Ignore original len value and do not alter src pointer if the
-         dst pointer is NULL.  */
-      len = (size_t)-1;
-      tmp_src = *src;
-      src = &tmp_src;
+    if (dst == NULL) {
+        /* Ignore original len value and do not alter src pointer if the
+           dst pointer is NULL.  */
+        len = (size_t)-1;
+        tmp_src = *src;
+        src = &tmp_src;
     }
 
-  max = len;
-  while (len > 0)
-    {
-      bytes = mbrtowc (ptr, *src, nms, ps);
-      if (bytes > 0)
-	{
-	  *src += bytes;
-	  nms -= bytes;
-	  ++count;
-	  ptr = (dst == NULL) ? NULL : ptr + 1;
-	  --len;
-	}
-      else if (bytes == -2)
-	{
-	  *src += nms;
-	  return count;
-	}
-      else if (bytes == 0)
-	{
-	  *src = NULL;
-	  return count;
-	}
-      else
-	{
-	  ps->__count = 0;
-	  errno = EILSEQ;
-	  return (size_t)-1;
-	}
+    max = len;
+    while (len > 0) {
+        bytes = mbrtowc(ptr, *src, nms, ps);
+        if (bytes > 0) {
+            *src += bytes;
+            nms -= bytes;
+            ++count;
+            ptr = (dst == NULL) ? NULL : ptr + 1;
+            --len;
+        } else if (bytes == -2) {
+            *src += nms;
+            return count;
+        } else if (bytes == 0) {
+            *src = NULL;
+            return count;
+        } else {
+            ps->__count = 0;
+            errno = EILSEQ;
+            return (size_t)-1;
+        }
     }
 
-  return (size_t)max;
+    return (size_t)max;
 }

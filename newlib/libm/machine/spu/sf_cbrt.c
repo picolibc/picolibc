@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/cbrtf.h"
 
-float cbrtf(float x)
+float
+cbrtf(float x)
 {
     return _cbrtf(x);
 }

@@ -29,13 +29,13 @@
  * NX            Inexact
  */
 
-#define FE_INVALID   0x00000010
-#define FE_DIVBYZERO 0x00000008
-#define FE_OVERFLOW  0x00000004
-#define FE_UNDERFLOW 0x00000002
-#define FE_INEXACT   0x00000001
+#define FE_INVALID    0x00000010
+#define FE_DIVBYZERO  0x00000008
+#define FE_OVERFLOW   0x00000004
+#define FE_UNDERFLOW  0x00000002
+#define FE_INEXACT    0x00000001
 
-#define FE_ALL_EXCEPT (FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW|FE_UNDERFLOW|FE_INEXACT)
+#define FE_ALL_EXCEPT (FE_INVALID | FE_DIVBYZERO | FE_OVERFLOW | FE_UNDERFLOW | FE_INEXACT)
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1", Section 8.2, "Floating-Point Control and Status
@@ -55,14 +55,14 @@
  */
 
 #define FE_TONEAREST_MM 0x00000004
-#define FE_UPWARD     	0x00000003
-#define FE_DOWNWARD   	0x00000002
-#define FE_TOWARDZERO 	0x00000001
-#define FE_TONEAREST  	0x00000000
+#define FE_UPWARD       0x00000003
+#define FE_DOWNWARD     0x00000002
+#define FE_TOWARDZERO   0x00000001
+#define FE_TONEAREST    0x00000000
 
 #define FE_RMODE_MASK   0x7
 #else
-#define FE_TONEAREST	0
+#define FE_TONEAREST 0
 #endif
 
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
@@ -78,7 +78,7 @@ typedef size_t fenv_t;
 typedef size_t fexcept_t;
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
-#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#define __declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline

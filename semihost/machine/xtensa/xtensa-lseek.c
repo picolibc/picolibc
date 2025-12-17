@@ -35,12 +35,13 @@
 
 #include "xtensa-semihost.h"
 
-off_t lseek(int fd, off_t offset, int whence)
+off_t
+lseek(int fd, off_t offset, int whence)
 {
     struct _simcall_ret ret;
 
     ret = _simcall(SYS_lseek, fd, offset, whence);
     if (ret.code < 0)
         errno = ret.error;
-    return (off_t) ret.code;
+    return (off_t)ret.code;
 }

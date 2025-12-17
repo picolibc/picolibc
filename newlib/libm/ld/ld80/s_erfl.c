@@ -98,9 +98,6 @@
  *		erfc/erf(NaN) is NaN
  */
 
-
-
-
 static const long double
 tiny = 1e-4931L,
   half = 0.5L,
@@ -246,183 +243,219 @@ tiny = 1e-4931L,
 long double
 erfl(long double x)
 {
-  long double R, S, P, Q, s, y, z, r;
-  int32_t ix, i;
-  u_int32_t se, i0, i1;
+    long double R, S, P, Q, s, y, z, r;
+    int32_t     ix, i;
+    u_int32_t   se, i0, i1;
 
-  GET_LDOUBLE_WORDS (se, i0, i1, x);
-  ix = se & 0x7fff;
+    GET_LDOUBLE_WORDS(se, i0, i1, x);
+    ix = se & 0x7fff;
 
-  if (ix >= 0x7fff)
-    {				/* erf(nan)=nan */
-      i = ((se & 0xffff) >> 15) << 1;
-      return (long double) (1 - i) + one / x;	/* erf(+-inf)=+-1 */
+    if (ix >= 0x7fff) { /* erf(nan)=nan */
+        i = ((se & 0xffff) >> 15) << 1;
+        return (long double)(1 - i) + one / x; /* erf(+-inf)=+-1 */
     }
 
-  ix = (ix << 16) | (i0 >> 16);
-  if (ix < 0x3ffed800) /* |x|<0.84375 */
+    ix = (ix << 16) | (i0 >> 16);
+    if (ix < 0x3ffed800) /* |x|<0.84375 */
     {
-      if (ix < 0x3fde8000) /* |x|<2**-33 */
-	{
-	  if (ix < 0x00080000)
-	    return 0.125L * (8.0L * x + efx8 * x);	/*avoid underflow */
-	  return x + efx * x;
-	}
-      z = x * x;
-      r = pp[0] + z * (pp[1]
-	+ z * (pp[2] + z * (pp[3] + z * (pp[4] + z * pp[5]))));
-      s = qq[0] + z * (qq[1]
-	+ z * (qq[2] + z * (qq[3] + z * (qq[4] + z * (qq[5] + z)))));
-      y = r / s;
-      return x + x * y;
+        if (ix < 0x3fde8000) /* |x|<2**-33 */
+        {
+            if (ix < 0x00080000)
+                return 0.125L * (8.0L * x + efx8 * x); /*avoid underflow */
+            return x + efx * x;
+        }
+        z = x * x;
+        r = pp[0] + z * (pp[1] + z * (pp[2] + z * (pp[3] + z * (pp[4] + z * pp[5]))));
+        s = qq[0] + z * (qq[1] + z * (qq[2] + z * (qq[3] + z * (qq[4] + z * (qq[5] + z)))));
+        y = r / s;
+        return x + x * y;
     }
-  if (ix < 0x3fffa000) /* 1.25 */
-    {				/* 0.84375 <= |x| < 1.25 */
-      s = fabsl (x) - one;
-      P = pa[0] + s * (pa[1] + s * (pa[2]
-	+ s * (pa[3] + s * (pa[4] + s * (pa[5] + s * (pa[6] + s * pa[7]))))));
-      Q = qa[0] + s * (qa[1] + s * (qa[2]
-	+ s * (qa[3] + s * (qa[4] + s * (qa[5] + s * (qa[6] + s))))));
-      if ((se & 0x8000) == 0)
-	return erx + P / Q;
-      else
-	return -erx - P / Q;
+    if (ix < 0x3fffa000) /* 1.25 */
+    {                    /* 0.84375 <= |x| < 1.25 */
+        s = fabsl(x) - one;
+        P = pa[0]
+            + s
+                * (pa[1]
+                   + s
+                       * (pa[2]
+                          + s * (pa[3] + s * (pa[4] + s * (pa[5] + s * (pa[6] + s * pa[7]))))));
+        Q = qa[0]
+            + s * (qa[1] + s * (qa[2] + s * (qa[3] + s * (qa[4] + s * (qa[5] + s * (qa[6] + s))))));
+        if ((se & 0x8000) == 0)
+            return erx + P / Q;
+        else
+            return -erx - P / Q;
     }
-  if (ix >= 0x4001d555) /* 6.6666259765625 */
-    {				/* inf>|x|>=6.666 */
-      if ((se & 0x8000) == 0)
-	return one - tiny;
-      else
-	return tiny - one;
+    if (ix >= 0x4001d555) /* 6.6666259765625 */
+    {                     /* inf>|x|>=6.666 */
+        if ((se & 0x8000) == 0)
+            return one - tiny;
+        else
+            return tiny - one;
     }
-  x = fabsl (x);
-  s = one / (x * x);
-  if (ix < 0x4000b6db) /* 2.85711669921875 */
+    x = fabsl(x);
+    s = one / (x * x);
+    if (ix < 0x4000b6db) /* 2.85711669921875 */
     {
-      R = ra[0] + s * (ra[1] + s * (ra[2] + s * (ra[3] + s * (ra[4] +
-	s * (ra[5] + s * (ra[6] + s * (ra[7] + s * ra[8])))))));
-      S = sa[0] + s * (sa[1] + s * (sa[2] + s * (sa[3] + s * (sa[4] +
-	s * (sa[5] + s * (sa[6] + s * (sa[7] + s * (sa[8] + s))))))));
+        R = ra[0]
+            + s
+                * (ra[1]
+                   + s
+                       * (ra[2]
+                          + s
+                              * (ra[3]
+                                 + s
+                                     * (ra[4]
+                                        + s * (ra[5] + s * (ra[6] + s * (ra[7] + s * ra[8])))))));
+        S = sa[0]
+            + s
+                * (sa[1]
+                   + s
+                       * (sa[2]
+                          + s
+                              * (sa[3]
+                                 + s
+                                     * (sa[4]
+                                        + s
+                                            * (sa[5]
+                                               + s * (sa[6] + s * (sa[7] + s * (sa[8] + s))))))));
+    } else { /* |x| >= 1/0.35 */
+        R = rb[0]
+            + s
+                * (rb[1]
+                   + s
+                       * (rb[2]
+                          + s * (rb[3] + s * (rb[4] + s * (rb[5] + s * (rb[6] + s * rb[7]))))));
+        S = sb[0]
+            + s * (sb[1] + s * (sb[2] + s * (sb[3] + s * (sb[4] + s * (sb[5] + s * (sb[6] + s))))));
     }
-  else
-    {				/* |x| >= 1/0.35 */
-      R = rb[0] + s * (rb[1] + s * (rb[2] + s * (rb[3] + s * (rb[4] +
-	s * (rb[5] + s * (rb[6] + s * rb[7]))))));
-      S = sb[0] + s * (sb[1] + s * (sb[2] + s * (sb[3] + s * (sb[4] +
-	s * (sb[5] + s * (sb[6] + s))))));
-    }
-  z = x;
-  GET_LDOUBLE_WORDS (i, i0, i1, z);
-  i1 = 0;
-  SET_LDOUBLE_WORDS (z, i, i0, i1);
-  r =
-    expl (-z * z - 0.5625L) * expl ((z - x) * (z + x) + R / S);
-  if ((se & 0x8000) == 0)
-    return one - r / x;
-  else
-    return r / x - one;
+    z = x;
+    GET_LDOUBLE_WORDS(i, i0, i1, z);
+    i1 = 0;
+    SET_LDOUBLE_WORDS(z, i, i0, i1);
+    r = expl(-z * z - 0.5625L) * expl((z - x) * (z + x) + R / S);
+    if ((se & 0x8000) == 0)
+        return one - r / x;
+    else
+        return r / x - one;
 }
 
 long double
 erfcl(long double x)
 {
-  int32_t hx, ix;
-  long double R, S, P, Q, s, y, z, r;
-  u_int32_t se, i0, i1;
+    int32_t     hx, ix;
+    long double R, S, P, Q, s, y, z, r;
+    u_int32_t   se, i0, i1;
 
-  GET_LDOUBLE_WORDS (se, i0, i1, x);
-  ix = se & 0x7fff;
-  if (ix >= 0x7fff)
-    {				/* erfc(nan)=nan */
-      /* erfc(+-inf)=0,2 */
-      return (long double) (((se & 0xffff) >> 15) << 1) + one / x;
+    GET_LDOUBLE_WORDS(se, i0, i1, x);
+    ix = se & 0x7fff;
+    if (ix >= 0x7fff) { /* erfc(nan)=nan */
+        /* erfc(+-inf)=0,2 */
+        return (long double)(((se & 0xffff) >> 15) << 1) + one / x;
     }
 
-  ix = (ix << 16) | (i0 >> 16);
-  if (ix < 0x3ffed800) /* |x|<0.84375 */
+    ix = (ix << 16) | (i0 >> 16);
+    if (ix < 0x3ffed800) /* |x|<0.84375 */
     {
-      if (ix < 0x3fbe0000) /* |x|<2**-65 */
-	return one - x;
-      z = x * x;
-      r = pp[0] + z * (pp[1]
-	+ z * (pp[2] + z * (pp[3] + z * (pp[4] + z * pp[5]))));
-      s = qq[0] + z * (qq[1]
-	+ z * (qq[2] + z * (qq[3] + z * (qq[4] + z * (qq[5] + z)))));
-      y = r / s;
-      if (ix < 0x3ffd8000) /* x<1/4 */
-	{
-	  return one - (x + x * y);
-	}
-      else
-	{
-	  r = x * y;
-	  r += (x - half);
-	  return half - r;
-	}
+        if (ix < 0x3fbe0000) /* |x|<2**-65 */
+            return one - x;
+        z = x * x;
+        r = pp[0] + z * (pp[1] + z * (pp[2] + z * (pp[3] + z * (pp[4] + z * pp[5]))));
+        s = qq[0] + z * (qq[1] + z * (qq[2] + z * (qq[3] + z * (qq[4] + z * (qq[5] + z)))));
+        y = r / s;
+        if (ix < 0x3ffd8000) /* x<1/4 */
+        {
+            return one - (x + x * y);
+        } else {
+            r = x * y;
+            r += (x - half);
+            return half - r;
+        }
     }
-  if (ix < 0x3fffa000) /* 1.25 */
-    {				/* 0.84375 <= |x| < 1.25 */
-      s = fabsl (x) - one;
-      P = pa[0] + s * (pa[1] + s * (pa[2]
-	+ s * (pa[3] + s * (pa[4] + s * (pa[5] + s * (pa[6] + s * pa[7]))))));
-      Q = qa[0] + s * (qa[1] + s * (qa[2]
-	+ s * (qa[3] + s * (qa[4] + s * (qa[5] + s * (qa[6] + s))))));
-      if ((se & 0x8000) == 0)
-	{
-	  z = one - erx;
-	  return z - P / Q;
-	}
-      else
-	{
-	  z = erx + P / Q;
-	  return one + z;
-	}
+    if (ix < 0x3fffa000) /* 1.25 */
+    {                    /* 0.84375 <= |x| < 1.25 */
+        s = fabsl(x) - one;
+        P = pa[0]
+            + s
+                * (pa[1]
+                   + s
+                       * (pa[2]
+                          + s * (pa[3] + s * (pa[4] + s * (pa[5] + s * (pa[6] + s * pa[7]))))));
+        Q = qa[0]
+            + s * (qa[1] + s * (qa[2] + s * (qa[3] + s * (qa[4] + s * (qa[5] + s * (qa[6] + s))))));
+        if ((se & 0x8000) == 0) {
+            z = one - erx;
+            return z - P / Q;
+        } else {
+            z = erx + P / Q;
+            return one + z;
+        }
     }
-  if (ix < 0x4005d600) /* 107 */
-    {				/* |x|<107 */
-      x = fabsl (x);
-      s = one / (x * x);
-      if (ix < 0x4000b6db) /* 2.85711669921875 */
-	{			/* |x| < 1/.35 ~ 2.857143 */
-	  R = ra[0] + s * (ra[1] + s * (ra[2] + s * (ra[3] + s * (ra[4] +
-	    s * (ra[5] + s * (ra[6] + s * (ra[7] + s * ra[8])))))));
-	  S = sa[0] + s * (sa[1] + s * (sa[2] + s * (sa[3] + s * (sa[4] +
-	    s * (sa[5] + s * (sa[6] + s * (sa[7] + s * (sa[8] + s))))))));
-	}
-      else if (ix < 0x4001d555) /* 6.6666259765625 */
-	{			/* 6.666 > |x| >= 1/.35 ~ 2.857143 */
-	  R = rb[0] + s * (rb[1] + s * (rb[2] + s * (rb[3] + s * (rb[4] +
-	    s * (rb[5] + s * (rb[6] + s * rb[7]))))));
-	  S = sb[0] + s * (sb[1] + s * (sb[2] + s * (sb[3] + s * (sb[4] +
-	    s * (sb[5] + s * (sb[6] + s))))));
-	}
-      else
-	{			/* |x| >= 6.666 */
-	  if (se & 0x8000)
-	    return two - tiny;	/* x < -6.666 */
+    if (ix < 0x4005d600) /* 107 */
+    {                    /* |x|<107 */
+        x = fabsl(x);
+        s = one / (x * x);
+        if (ix < 0x4000b6db) /* 2.85711669921875 */
+        {                    /* |x| < 1/.35 ~ 2.857143 */
+            R = ra[0]
+                + s
+                    * (ra[1]
+                       + s
+                           * (ra[2]
+                              + s
+                                  * (ra[3]
+                                     + s
+                                         * (ra[4]
+                                            + s
+                                                * (ra[5]
+                                                   + s * (ra[6] + s * (ra[7] + s * ra[8])))))));
+            S = sa[0]
+                + s
+                    * (sa[1]
+                       + s
+                           * (sa[2]
+                              + s
+                                  * (sa[3]
+                                     + s
+                                         * (sa[4]
+                                            + s
+                                                * (sa[5]
+                                                   + s
+                                                       * (sa[6]
+                                                          + s * (sa[7] + s * (sa[8] + s))))))));
+        } else if (ix < 0x4001d555) /* 6.6666259765625 */
+        {                           /* 6.666 > |x| >= 1/.35 ~ 2.857143 */
+            R = rb[0]
+                + s
+                    * (rb[1]
+                       + s
+                           * (rb[2]
+                              + s * (rb[3] + s * (rb[4] + s * (rb[5] + s * (rb[6] + s * rb[7]))))));
+            S = sb[0]
+                + s
+                    * (sb[1]
+                       + s * (sb[2] + s * (sb[3] + s * (sb[4] + s * (sb[5] + s * (sb[6] + s))))));
+        } else { /* |x| >= 6.666 */
+            if (se & 0x8000)
+                return two - tiny; /* x < -6.666 */
 
-	  R = rc[0] + s * (rc[1] + s * (rc[2] + s * (rc[3] +
-						    s * (rc[4] + s * rc[5]))));
-	  S = sc[0] + s * (sc[1] + s * (sc[2] + s * (sc[3] +
-						    s * (sc[4] + s))));
-	}
-      z = x;
-      GET_LDOUBLE_WORDS (hx, i0, i1, z);
-      i1 = 0;
-      i0 &= 0xffffff00;
-      SET_LDOUBLE_WORDS (z, hx, i0, i1);
-      r = expl (-z * z - 0.5625L) *
-	expl ((z - x) * (z + x) + R / S);
-      if ((se & 0x8000) == 0)
-	return r / x;
-      else
-	return two - r / x;
-    }
-  else
-    {
-      if ((se & 0x8000) == 0)
-        return __math_uflowl(0);
-      else
-	return two - tiny;
+            R = rc[0] + s * (rc[1] + s * (rc[2] + s * (rc[3] + s * (rc[4] + s * rc[5]))));
+            S = sc[0] + s * (sc[1] + s * (sc[2] + s * (sc[3] + s * (sc[4] + s))));
+        }
+        z = x;
+        GET_LDOUBLE_WORDS(hx, i0, i1, z);
+        i1 = 0;
+        i0 &= 0xffffff00;
+        SET_LDOUBLE_WORDS(z, hx, i0, i1);
+        r = expl(-z * z - 0.5625L) * expl((z - x) * (z + x) + R / S);
+        if ((se & 0x8000) == 0)
+            return r / x;
+        else
+            return two - r / x;
+    } else {
+        if ((se & 0x8000) == 0)
+            return __math_uflowl(0);
+        else
+            return two - tiny;
     }
 }

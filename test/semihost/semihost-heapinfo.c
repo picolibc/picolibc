@@ -39,30 +39,28 @@
 int
 main(void)
 {
-	struct sys_semihost_block block;
+    struct sys_semihost_block block;
 
-	/* Initialize to invalid values */
-	block.heap_base = (void *) (uintptr_t) 4;
-	block.heap_limit = (void *) (uintptr_t) 3;
-	block.stack_limit = (void *) (uintptr_t) 2;
-	block.stack_base = (void *) (uintptr_t) 1;
+    /* Initialize to invalid values */
+    block.heap_base = (void *)(uintptr_t)4;
+    block.heap_limit = (void *)(uintptr_t)3;
+    block.stack_limit = (void *)(uintptr_t)2;
+    block.stack_base = (void *)(uintptr_t)1;
 
-	sys_semihost_heapinfo(&block);
-	if (block.heap_base != NULL && block.heap_limit != NULL) {
-		/* Error if heap base is above limit */
-		if ((uintptr_t) block.heap_base >= (uintptr_t) block.heap_limit) {
-			printf("heap base %p >= heap_limit %p\n",
-			       block.heap_base, block.heap_limit);
-			exit(1);
-		}
-	}
-	if (block.stack_base != NULL && block.stack_limit != NULL) {
-		/* Error if stack base is below limit */
-		if ((uintptr_t) block.stack_base < (uintptr_t) block.stack_limit) {
-			printf("stack base %p < stack_limit %p\n",
-			       block.stack_base, block.stack_limit);
-			exit(2);
-		}
-	}
-	exit(0);
+    sys_semihost_heapinfo(&block);
+    if (block.heap_base != NULL && block.heap_limit != NULL) {
+        /* Error if heap base is above limit */
+        if ((uintptr_t)block.heap_base >= (uintptr_t)block.heap_limit) {
+            printf("heap base %p >= heap_limit %p\n", block.heap_base, block.heap_limit);
+            exit(1);
+        }
+    }
+    if (block.stack_base != NULL && block.stack_limit != NULL) {
+        /* Error if stack base is below limit */
+        if ((uintptr_t)block.stack_base < (uintptr_t)block.stack_limit) {
+            printf("stack base %p < stack_limit %p\n", block.stack_base, block.stack_limit);
+            exit(2);
+        }
+    }
+    exit(0);
 }

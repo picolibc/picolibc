@@ -36,11 +36,9 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_function_type_mismatch(void *_data,
-                                      void *ptr)
+__ubsan_handle_function_type_mismatch(void *_data, void *ptr)
 {
     struct function_type_mismatch_data *data = _data;
-    __ubsan_error(&data->location, "function_type_mismatch", "(%s) %p\n",
-                  data->type->type_name, ptr);
+    __ubsan_error(&data->location, "function_type_mismatch", "(%s) %p\n", data->type->type_name,
+                  ptr);
 }
-

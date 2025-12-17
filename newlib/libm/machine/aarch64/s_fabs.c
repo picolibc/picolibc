@@ -28,11 +28,11 @@
 #include <math.h>
 
 double
-fabs (double x)
+fabs(double x)
 {
-  double result;
-  __asm__("fabs\t%d0, %d1" : "=w" (result) : "w" (x));
-  return result;
+    double result;
+    __asm__("fabs\t%d0, %d1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

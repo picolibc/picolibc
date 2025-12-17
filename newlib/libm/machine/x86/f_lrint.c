@@ -1,17 +1,17 @@
 /*
-Copyright (c) 2007 Dave Korn 
+Copyright (c) 2007 Dave Korn
 
 
 x87 FP implementation contributed to Newlib by
 Dave Korn, November 2007.  This file is placed in the
-public domain.  Permission to use, copy, modify, and 
+public domain.  Permission to use, copy, modify, and
 distribute this software is freely granted.
  */
 /*
  * ====================================================
  * x87 FP implementation contributed to Newlib by
  * Dave Korn, November 2007.  This file is placed in the
- * public domain.  Permission to use, copy, modify, and 
+ * public domain.  Permission to use, copy, modify, and
  * distribute this software is freely granted.
  * ====================================================
  */
@@ -25,22 +25,22 @@ distribute this software is freely granted.
 FUNCTION
 <<lrint>>, <<lrintf>>, <<lrintl>>---round and convert to long integer
 INDEX
-	lrint
+        lrint
 INDEX
-	lrintf
+        lrintf
 INDEX
-	lrintl
+        lrintl
 
 SYNOPSIS
-	#include <math.h>
-	long int lrint(double x);
+        #include <math.h>
+        long int lrint(double x);
         long int lrintf(float x);
         long int lrintl(long double x);
 
 DESCRIPTION
 The <<lrint>>, <<lrintf>> and <<lrintl>> functions round <[x]> to the nearest integer value,
 according to the current rounding direction. If the rounded value is outside the
-range of the return type, the numeric result is unspecified. A range error may 
+range of the return type, the numeric result is unspecified. A range error may
 occur if the magnitude of <[x]> is too large.
 
 RETURNS
@@ -50,7 +50,7 @@ These functions return the rounded integer value of <[x]>.
 PORTABILITY
 <<lrint>>, <<lrintf>>, and <<lrintl>> are ANSI.
 <<lrint>> and <<lrintf>> are available on all platforms.
-<<lrintl>> is only available on i386 platforms when hardware 
+<<lrintl>> is only available on i386 platforms when hardware
 floating point support is available and when compiling with GCC.
 
 */
@@ -65,12 +65,12 @@ floating point support is available and when compiling with GCC.
  *	Governed by x87 FPCR.
  */
 
-long int _f_lrint (double x)
+long int
+_f_lrint(double x)
 {
-  long int _result;
-  __asm__("fistpl %0" : "=m" (_result) : "t" (x) : "st");
-  return _result;
+    long int _result;
+    __asm__("fistpl %0" : "=m"(_result) : "t"(x) : "st");
+    return _result;
 }
 
-#endif  /* !__GNUC__ || _SOFT_FLOAT */
-
+#endif /* !__GNUC__ || _SOFT_FLOAT */

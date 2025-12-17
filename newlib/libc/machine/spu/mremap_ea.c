@@ -37,28 +37,24 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (mremap_ea);
+COMPAT_EA_ALIAS(mremap_ea);
 
 __ea void *
-mremap_ea (__ea void *old_address, size_ea_t old_size,
-	   size_ea_t new_size, unsigned long flags)
+mremap_ea(__ea void *old_address, size_ea_t old_size, size_ea_t new_size, unsigned long flags)
 {
 #ifdef __EA64__
-  return (__ea void *) mremap_eaddr ((unsigned long long) old_address,
-				     old_size, new_size, flags);
+    return (__ea void *)mremap_eaddr((unsigned long long)old_address, old_size, new_size, flags);
 #else /* __EA32__ */
-  unsigned long long res;
-  res = mremap_eaddr ((unsigned long long) (unsigned int) old_address,
-		      old_size, new_size, flags);
-  if (res != MAP_FAILED_EADDR && res > 0xffffffffULL)
-    {
-      /*
-       * We cannot reliably undo the successful remap, so unmap the address.
-       */
-      munmap_eaddr (res, new_size);
-      errno = ENOMEM;
-      res = MAP_FAILED_EADDR;
+    unsigned long long res;
+    res = mremap_eaddr((unsigned long long)(unsigned int)old_address, old_size, new_size, flags);
+    if (res != MAP_FAILED_EADDR && res > 0xffffffffULL) {
+        /*
+         * We cannot reliably undo the successful remap, so unmap the address.
+         */
+        munmap_eaddr(res, new_size);
+        errno = ENOMEM;
+        res = MAP_FAILED_EADDR;
     }
-  return (__ea void *) (int) res;
+    return (__ea void *)(int)res;
 #endif
 }

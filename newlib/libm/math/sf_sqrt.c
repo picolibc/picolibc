@@ -18,9 +18,9 @@
 float
 sqrtf(float x)
 {
-    float z;
+    float      z;
     __uint32_t r, hx;
-    __int32_t ix, s, q, m, t, i;
+    __int32_t  ix, s, q, m, t, i;
 
     GET_FLOAT_WORD(ix, x);
     hx = ix & 0x7fffffff;
@@ -29,7 +29,7 @@ sqrtf(float x)
     if (!FLT_UWORD_IS_FINITE(hx)) {
         if (ix < 0 && !isnanf(x))
             return __math_invalidf(x); /* sqrt(-inf)=sNaN */
-        return x + x; /* sqrt(NaN)=NaN, sqrt(+inf)=+inf */
+        return x + x;                  /* sqrt(NaN)=NaN, sqrt(+inf)=+inf */
     }
 
     /* take care of zero and -ves */
@@ -53,7 +53,7 @@ sqrtf(float x)
 
     /* generate sqrt(x) bit by bit */
     ix += ix;
-    q = s = 0; /* q = sqrt(x) */
+    q = s = 0;       /* q = sqrt(x) */
     r = 0x01000000L; /* r = moving bit from right to left */
 
     while (r != 0) {

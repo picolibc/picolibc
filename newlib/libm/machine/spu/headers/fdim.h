@@ -31,22 +31,23 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FDIM_H_
-#define _FDIM_H_	1
+#define _FDIM_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
 /* fdim - compute the positive difference of x and y.
  */
-static __inline double _fdim(double x, double y)
+static __inline double
+_fdim(double x, double y)
 {
-  vec_double2 v;
-  vec_uint4 mask;
+    vec_double2 v;
+    vec_uint4   mask;
 
-  v = spu_promote(x - y, 0);
-  mask = (vec_uint4)spu_shuffle(v, v, VEC_SPLAT_U8(0));
-  v = spu_andc(v, (vec_double2)spu_rlmaska(mask, -31));
+    v = spu_promote(x - y, 0);
+    mask = (vec_uint4)spu_shuffle(v, v, VEC_SPLAT_U8(0));
+    v = spu_andc(v, (vec_double2)spu_rlmaska(mask, -31));
 
-  return (spu_extract(v, 0));
+    return (spu_extract(v, 0));
 }
 #endif /* _FDIM_H_ */

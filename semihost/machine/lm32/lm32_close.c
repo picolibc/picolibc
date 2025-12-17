@@ -36,7 +36,8 @@
 #include <unistd.h>
 #include "lm32_semihost.h"
 
-int close(int fd)
+int
+close(int fd)
 {
     struct lm32_scall_args args = {
         .r8 = TARGET_NEWLIB_SYS_close,
@@ -45,5 +46,5 @@ int close(int fd)
     struct lm32_scall_ret ret;
 
     lm32_scall(&args, &ret);
-    return (int) ret.r1;
+    return (int)ret.r1;
 }

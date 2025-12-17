@@ -38,7 +38,7 @@
 int
 sys_semihost_getc(FILE *file)
 {
-	(void) file;
-	uint8_t ch = sys_semihost(SYS_READC, 0);
-	return ch;
+    (void)file;
+    uint8_t ch = sys_semihost(SYS_READC, 0);
+    return ch;
 }

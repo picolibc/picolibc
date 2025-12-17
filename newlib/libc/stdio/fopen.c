@@ -38,22 +38,22 @@
 FILE *
 fopen(const char *pathname, const char *mode)
 {
-	FILE *ret;
-	int fd;
-	int stdio_flags;
-	int open_flags;
+    FILE *ret;
+    int   fd;
+    int   stdio_flags;
+    int   open_flags;
 
-	stdio_flags = __stdio_flags(mode, &open_flags);
-	if (stdio_flags == 0)
-		return NULL;
+    stdio_flags = __stdio_flags(mode, &open_flags);
+    if (stdio_flags == 0)
+        return NULL;
 
-	fd = open(pathname, open_flags, 0666);
-	if (fd < 0)
-		return NULL;
+    fd = open(pathname, open_flags, 0666);
+    if (fd < 0)
+        return NULL;
 
-	ret = fdopen(fd, mode);
-	if (ret == NULL)
-		close(fd);
+    ret = fdopen(fd, mode);
+    if (ret == NULL)
+        close(fd);
 
-	return ret;
+    return ret;
 }

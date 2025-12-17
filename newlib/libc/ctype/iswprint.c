@@ -24,26 +24,26 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
 FUNCTION
-	<<iswprint>>, <<iswprint_l>>---printable wide character test
+        <<iswprint>>, <<iswprint_l>>---printable wide character test
 
 INDEX
-	iswprint
+        iswprint
 
 INDEX
-	iswprint_l
+        iswprint_l
 
 SYNOPSIS
-	#include <wctype.h>
-	int iswprint(wint_t <[c]>);
+        #include <wctype.h>
+        int iswprint(wint_t <[c]>);
 
-	#include <wctype.h>
-	int iswprint_l(wint_t <[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        int iswprint_l(wint_t <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<iswprint>> is a function which classifies wide-character values that
@@ -67,11 +67,11 @@ No supporting OS subroutines are required.
 #include <wctype.h>
 
 int
-iswprint (wint_t c)
+iswprint(wint_t c)
 {
 #ifdef __MB_CAPABLE
-  return iswprint_l (c, 0);
+    return iswprint_l(c, 0);
 #else
-  return c < (wint_t)0x100 ? isprint (c) : 0;
+    return c < (wint_t)0x100 ? isprint(c) : 0;
 #endif
 }

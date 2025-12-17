@@ -32,12 +32,12 @@
 int
 wscanf(const wchar_t *fmt, ...)
 {
-	va_list ap;
-	int i;
+    va_list ap;
+    int     i;
 
-	va_start(ap, fmt);
-	i = vfwscanf(stdin, fmt, ap);
-	va_end(ap);
+    va_start(ap, fmt);
+    i = vfwscanf(stdin, fmt, ap);
+    va_end(ap);
 
-	return i;
+    return i;
 }

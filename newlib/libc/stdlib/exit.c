@@ -10,11 +10,11 @@ FUNCTION
 <<exit>>---end program execution
 
 INDEX
-	exit
+        exit
 
 SYNOPSIS
-	#include <stdlib.h>
-	void exit(int <[code]>);
+        #include <stdlib.h>
+        void exit(int <[code]>);
 
 DESCRIPTION
 Use <<exit>> to return control from a program to the host operating
@@ -42,7 +42,7 @@ Supporting OS subroutines required: <<_exit>>.
 
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
-#include <unistd.h>	/* for _exit() declaration */
+#include <unistd.h> /* for _exit() declaration */
 #include "atexit.h"
 
 /*
@@ -50,11 +50,11 @@ Supporting OS subroutines required: <<_exit>>.
  */
 
 void
-exit (int code)
+exit(int code)
 {
-  /* Refer to comments in __atexit.c and pico-onexit.c for why this is weak */
-  void __call_exitprocs (int, void *) __weak;
-  if (__call_exitprocs)
-    __call_exitprocs (code, NULL);
-  _exit (code);
+    /* Refer to comments in __atexit.c and pico-onexit.c for why this is weak */
+    void __call_exitprocs(int, void *) __weak;
+    if (__call_exitprocs)
+        __call_exitprocs(code, NULL);
+    _exit(code);
 }

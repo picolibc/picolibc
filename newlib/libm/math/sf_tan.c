@@ -18,7 +18,7 @@
 float
 tanf(float x)
 {
-    float y[2], z = 0.0;
+    float     y[2], z = 0.0;
     __int32_t n, ix;
 
     GET_FLOAT_WORD(ix, x);
@@ -36,7 +36,7 @@ tanf(float x)
     else {
         n = __rem_pio2f(x, y);
         return __kernel_tanf(y[0], y[1], 1 - ((n & 1) << 1)); /*   1 -- n even
-							      -1 -- n odd */
+                                                              -1 -- n odd */
     }
 }
 

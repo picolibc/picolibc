@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/ceil.h"
 
-double ceil(double x)
+double
+ceil(double x)
 {
     return _ceil(x);
 }

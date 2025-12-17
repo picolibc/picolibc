@@ -28,11 +28,11 @@
 #include <math.h>
 
 float
-fminf (float x, float y)
+fminf(float x, float y)
 {
-  float result;
-  __asm__("fminnm\t%s0, %s1, %s2" : "=w" (result) : "w" (x), "w" (y));
-  return result;
+    float result;
+    __asm__("fminnm\t%s0, %s1, %s2" : "=w"(result) : "w"(x), "w"(y));
+    return result;
 }
 
 #else

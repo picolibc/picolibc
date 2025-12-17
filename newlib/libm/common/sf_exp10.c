@@ -8,12 +8,12 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
 
-/* 
+/*
  * wrapper exp10f(x)
  */
 
@@ -23,9 +23,10 @@
 #include <errno.h>
 #include <math.h>
 
-float exp10f(float x)		/* wrapper exp10f */
+float
+exp10f(float x) /* wrapper exp10f */
 {
-  return _powf(10.0, x);
+    return _powf(10.0, x);
 }
 
 _MATH_ALIAS_f_f(exp10)

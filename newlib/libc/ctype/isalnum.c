@@ -27,20 +27,20 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
  */
 /*
-FUNCTION 
-	<<isalnum>>, <<isalnum_l>>---alphanumeric character predicate
+FUNCTION
+        <<isalnum>>, <<isalnum_l>>---alphanumeric character predicate
 
 INDEX
-	isalnum
+        isalnum
 INDEX
-	isalnum_l
+        isalnum_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isalnum(int <[c]>);
+        #include <ctype.h>
+        int isalnum(int <[c]>);
 
-	#include <ctype.h>
-	int isalnum_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isalnum_l(int <[c]>, locale_t <[locale]>);
 
 
 DESCRIPTION
@@ -70,11 +70,11 @@ No OS subroutines are required.
 
 #undef isalnum
 int
-isalnum (int c)
+isalnum(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return isalpha(c) || isdigit(c);
 #else
-    return __CTYPE_PTR[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER|__CTYPE_DIGIT);
+    return __CTYPE_PTR[c + 1] & (__CTYPE_UPPER | __CTYPE_LOWER | __CTYPE_DIGIT);
 #endif
 }
