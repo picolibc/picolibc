@@ -40,14 +40,22 @@
 #include "../ctype/ctype_.h"
 #include <iconv.h>
 
+enum __iconv_mode {
+    iconv_default,
+    iconv_ignore,
+    iconv_discard,
+    iconv_translit
+};
+
 struct __iconv_t {
     mbtowc_p    in_mbtowc;
     wctomb_p    out_wctomb;
     mbstate_t   in_state;
     mbstate_t   out_state;
-    char        buf[MB_LEN_MAX];
     size_t      buf_len;
     size_t      buf_off;
+    enum __iconv_mode   mode;
+    char        buf[MB_LEN_MAX];
 };
 
 #endif /* _ICONV_PRIVATE_H_ */

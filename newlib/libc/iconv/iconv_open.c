@@ -50,6 +50,33 @@ iconv_open (const char *tocode, const char *fromcode)
 
 #ifdef __MB_CAPABLE
     iconv_t     ic;
+    const char  *mode_name;
+    static const struct {
+        const char              *name;
+        enum __iconv_mode       mode;
+    } modes[] = {
+        { .name = "IGNORE", .mode = iconv_ignore },
+        { .name = "NON_IDENTICAL_DISCARD", .mode = iconv_discard },
+        { .name = "TRANSLIT", .mode = iconv_translit },
+    };
+#define NMODE (sizeof(modes)/sizeof(modes[0]))
+    size_t      m;
+    enum __iconv_mode mode = iconv_default;
+
+    mode_name = strchr(tocode, '/');
+    if (mode_name) {
+        if (mode_name[1] != '/')
+            goto fail;
+        mode_name = mode_name + 2;
+        for (m = 0; m < NMODE; m++) {
+            if (strcmp(modes[m].name, mode_name) == 0) {
+                mode = modes[m].mode;
+                break;
+            }
+        }
+        if (m == NMODE)
+            goto fail;
+    }
 
     ic = calloc(1, sizeof(*ic));
     if (!ic)
@@ -57,6 +84,7 @@ iconv_open (const char *tocode, const char *fromcode)
 
     ic->in_mbtowc = __get_mbtowc(fromid);
     ic->out_wctomb = __get_wctomb(toid);
+    ic->mode = mode;
     return ic;
 #else
     return NULL;

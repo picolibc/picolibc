@@ -54,20 +54,21 @@ iconv (iconv_t ic,
     size_t      outbytes = *outbytesleft;
     size_t      tocopy;
 #ifdef __MB_CAPABLE
+    char        *wc_out;
     int         ret;
     wchar_t     wc;
-    size_t      char_count = 0;
+    size_t      inexact_count = 0;
 
-    for (;;) {
-        if (outbytes && ic->buf_len) {
-            tocopy = ic->buf_len;
+    while (outbytes) {
+        if (ic->buf_len) {
+            tocopy = ic->buf_len - ic->buf_off;
             if (tocopy > outbytes)
                 tocopy = outbytes;
             memcpy(out, ic->buf + ic->buf_off, tocopy);
             out += tocopy;
+            outbytes -= tocopy;
             ic->buf_off += tocopy;
             if (ic->buf_off == ic->buf_len) {
-                char_count++;
                 ic->buf_off = ic->buf_len = 0;
             }
         } else if (inbytes && ic->buf_len == 0) {
@@ -79,8 +80,18 @@ iconv (iconv_t ic,
                 inbytes = 0;
                 break;
             case -1:
-                goto fail;
+                switch(ic->mode) {
+                case iconv_ignore:
+                    in += 1;
+                    inbytes--;
+                    break;
+                default:
+                    goto fail;
+                }
+                break;
             case -2:
+                in += inbytes;
+                inbytes = 0;
                 goto done;
             default:
                 in += ret;
@@ -88,15 +99,30 @@ iconv (iconv_t ic,
                 break;
             }
             if (outbytes >= MB_LEN_MAX) {
-                ret = ic->out_wctomb(out, wc, &ic->out_state);
-                if (ret == -1)
+                wc_out = out;
+            } else {
+                wc_out = ic->buf;
+            }
+            ret = ic->out_wctomb(wc_out, wc, &ic->out_state);
+            if (ret == -1) {
+                switch (ic->mode) {
+                default:
                     goto fail;
+                case iconv_translit:
+                    ret = ic->out_wctomb(wc_out, L'?', &ic->out_state);
+                    if (ret == -1)
+                        goto fail;
+                    __fallthrough;
+                case iconv_ignore:
+                case iconv_discard:
+                    inexact_count++;
+                    break;
+                }
+            }
+            if (outbytes >= MB_LEN_MAX) {
                 out += ret;
                 outbytes -= ret;
             } else {
-                ret = ic->out_wctomb(ic->buf, wc, &ic->out_state);
-                if (ret == -1)
-                    goto fail;
                 ic->buf_len = ret;
             }
         } else {
@@ -108,7 +134,7 @@ done:
     *inbytesleft = inbytes;
     *outbuf = out;
     *outbytesleft = outbytes;
-    return char_count;
+    return inexact_count;
 fail:
     *inbuf = in;
     *inbytesleft = inbytes;
@@ -129,6 +155,6 @@ fail:
     *inbytesleft = inbytes;
     *outbuf = out;
     *outbytesleft = outbytes;
-    return tocopy;
+    return 0;
 #endif
 }

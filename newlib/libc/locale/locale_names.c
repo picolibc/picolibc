@@ -137,6 +137,9 @@ __match_charset(const char *str, const char *name)
 
         while (__skip_char(nc = *name++));
         while (__skip_char(sc = *str++) && nc);
+        /* discard trailing / bits -- those are for iconv modes */
+        if (sc == '/')
+            sc = '\0';
         if (LOCALE_ISUPPER(sc)) sc = LOCALE_TOLOWER(sc);
         if (LOCALE_ISUPPER(nc)) nc = LOCALE_TOLOWER(nc);
         if (sc != nc)
