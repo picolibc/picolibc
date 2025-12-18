@@ -830,9 +830,11 @@ int     pOSIx_mEMALIGn(void **, size_t, size_t);
  * call to free.
  */
 #ifdef __strong_reference
-extern __typeof(free) __malloc_free;
+extern void __malloc_free(void *);
+extern void *__malloc_malloc(size_t);
 #else
 #define __malloc_free(x) fREe(x)
+#define __malloc_malloc(x) mALLOc(x)
 #endif
 
 
@@ -2157,6 +2159,16 @@ void* mALLOc(size_t bytes)
 
 #endif /* MALLOC_PROVIDED */
 }
+#ifdef __strong_reference
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(mALLOc, __malloc_malloc);
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
+#pragma GCC diagnostic pop
+#endif
+#endif
 
 #endif /* DEFINE_MALLOC */
 
@@ -2291,7 +2303,7 @@ fREe(void* mem)
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-__strong_reference(free, __malloc_free);
+__strong_reference(fREe, __malloc_free);
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic pop
 #endif
@@ -2372,7 +2384,7 @@ rEALLOc(void* oldmem, size_t bytes)
 
 
   /* realloc of null is supposed to be same as malloc */
-  if (oldmem == 0) return mALLOc(bytes);
+  if (oldmem == 0) return __malloc_malloc(bytes);
 
   MALLOC_LOCK;
 
@@ -2407,7 +2419,7 @@ rEALLOc(void* oldmem, size_t bytes)
       return oldmem; /* do nothing */
     }
     /* Must alloc, copy, free. */
-    newmem = mALLOc(bytes);
+    newmem = __malloc_malloc(bytes);
     if (newmem == 0)
     {
       MALLOC_UNLOCK;
@@ -2516,7 +2528,7 @@ rEALLOc(void* oldmem, size_t bytes)
 
     /* Must allocate */
 
-    newmem = mALLOc (bytes);
+    newmem = __malloc_malloc (bytes);
 
     if (newmem == 0)  /* propagate failure */
     {
@@ -2604,7 +2616,7 @@ void* mEMALIGn(size_t alignment, size_t bytes)
 
   /* If need less alignment than we give anyway, just relay to malloc */
 
-  if (alignment <= MALLOC_ALIGNMENT) return mALLOc(bytes);
+  if (alignment <= MALLOC_ALIGNMENT) return __malloc_malloc(bytes);
 
   /* Otherwise, ensure that it is at least a minimum chunk size */
 
@@ -2621,7 +2633,7 @@ void* mEMALIGn(size_t alignment, size_t bytes)
     return 0;
   }
 
-  m  = (char*)(mALLOc(nb + alignment + MINSIZE));
+  m  = (char*)(__malloc_malloc(nb + alignment + MINSIZE));
 
   if (m == 0) return 0; /* propagate failure */
 
@@ -2771,7 +2783,7 @@ void* cALLOc(size_t n, size_t elem_size)
   oldtopsize = chunksize(top);
 #endif
 
-  mem = mALLOc (sz);
+  mem = __malloc_malloc (sz);
 
   if (mem == 0)
   {
