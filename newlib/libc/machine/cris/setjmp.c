@@ -59,156 +59,151 @@
 #include <setjmp.h>
 
 int
-setjmp (jmp_buf buf)
+setjmp(jmp_buf buf)
 {
-  int ret;
-#if defined (__arch_common_v10_v32) || defined (__arch_v32)
-  /* No offsets in the compatibility mode.  Also, movem saves in
-     different order on v10 than on v32, so we use single move
-     instructions instead, this not being a speed-prioritized operation.
-     And we don't save CCR or CCS; since long unuseful.  */
-  __asm__ __volatile__
-    ("move.d %1,$r13							\n\
-      move 0f,$mof							\n\
-      move $mof,[$r13+]							\n\
-      move.d $sp,[$r13+]						\n\
-      clear.d [$r13+]							\n\
-      move.d $r12,[$r13+]						\n\
-      move.d $r11,[$r13+]						\n\
-      move.d $r10,[$r13+]						\n\
-      moveq 1,$r9							\n\
-      move.d $r9,[$r13+]						\n\
-      move.d $r8,[$r13+]						\n\
-      move.d $r7,[$r13+]						\n\
-      move.d $r6,[$r13+]						\n\
-      move.d $r5,[$r13+]						\n\
-      move.d $r4,[$r13+]						\n\
-      move.d $r3,[$r13+]						\n\
-      move.d $r2,[$r13+]						\n\
-      move.d $r1,[$r13+]						\n\
-      move.d $r0,[$r13+]						\n\
-      move $srp,[$r13+]							\n\
-      clear.d [$r13+]							\n\
-      clear.d $r9							\n\
-0:									\n\
-      move.d $r9,%0"
+    int ret;
+#if defined(__arch_common_v10_v32) || defined(__arch_v32)
+    /* No offsets in the compatibility mode.  Also, movem saves in
+       different order on v10 than on v32, so we use single move
+       instructions instead, this not being a speed-prioritized operation.
+       And we don't save CCR or CCS; since long unuseful.  */
+    __asm__ __volatile__("move.d %1,$r13						\n"
+                         "move 0f,$mof							\n"
+                         "move $mof,[$r13+]						\n"
+                         "move.d $sp,[$r13+]						\n"
+                         "clear.d [$r13+]						\n"
+                         "move.d $r12,[$r13+]						\n"
+                         "move.d $r11,[$r13+]						\n"
+                         "move.d $r10,[$r13+]						\n"
+                         "moveq 1,$r9							\n"
+                         "move.d $r9,[$r13+]						\n"
+                         "move.d $r8,[$r13+]						\n"
+                         "move.d $r7,[$r13+]						\n"
+                         "move.d $r6,[$r13+]						\n"
+                         "move.d $r5,[$r13+]						\n"
+                         "move.d $r4,[$r13+]						\n"
+                         "move.d $r3,[$r13+]						\n"
+                         "move.d $r2,[$r13+]						\n"
+                         "move.d $r1,[$r13+]						\n"
+                         "move.d $r0,[$r13+]						\n"
+                         "move $srp,[$r13+]						\n"
+                         "clear.d [$r13+]						\n"
+                         "clear.d $r9							\n"
+                         "0:								\n"
+                         "move.d $r9,%0"
 
-     /* Output.  */
-     : "=&r" (ret)
+                         /* Output.  */
+                         : "=&r"(ret)
 
-     /* Input.  */
-     : "r" (buf)
+                         /* Input.  */
+                         : "r"(buf)
 
-     /* Clobber.  */
-     : "r9", "r13", "memory");
+                         /* Clobber.  */
+                         : "r9", "r13", "memory");
 #else /* not __arch_common_v10_v32 or __arch_v32 */
 #ifdef __PIC__
-  __asm__ __volatile__
-    ("moveq 1,$r9							\n\
-      movem $sp,[%1+1*4]						\n\
-      move.d $pc,$r9							\n\
-      addq 0f-.,$r9							\n\
-      move.d $r9,[%1]							\n\
-      move $srp,[%1+16*4]						\n\
-      move $ccr,[%1+17*4]						\n\
-      clear.d $r9							\n\
-0:									\n\
-      move.d $r9,%0"
+    __asm__ __volatile__("moveq 1,$r9							\n"
+                         "movem $sp,[%1+1*4]						\n"
+                         "move.d $pc,$r9						\n"
+                         "addq 0f-.,$r9							\n"
+                         "move.d $r9,[%1]						\n"
+                         "move $srp,[%1+16*4]						\n"
+                         "move $ccr,[%1+17*4]						\n"
+                         "clear.d $r9							\n"
+                         "0:								\n"
+                         "move.d $r9,%0"
 
-     /* Output.  */
-     : "=&r" (ret)
+                         /* Output.  */
+                         : "=&r"(ret)
 
-     /* Input.  */
-     : "r" (buf)
+                         /* Input.  */
+                         : "r"(buf)
 
-     /* Clobber.  */
-     : "r9", "memory");
-#else  /* not PIC */
-  __asm__ __volatile__
-    ("moveq 1,$r9							\n\
-      movem $sp,[%1+1*4]						\n\
-      move.d 0f,$r9							\n\
-      move.d $r9,[%1]							\n\
-      move $srp,[%1+16*4]						\n\
-      move $ccr,[%1+17*4]						\n\
-      clear.d $r9							\n\
-0:									\n\
-      move.d $r9,%0"
+                         /* Clobber.  */
+                         : "r9", "memory");
+#else /* not PIC */
+    __asm__ __volatile__("moveq 1,$r9							\n"
+                         "movem $sp,[%1+1*4]						\n"
+                         "move.d 0f,$r9							\n"
+                         "move.d $r9,[%1]						\n"
+                         "move $srp,[%1+16*4]						\n"
+                         "move $ccr,[%1+17*4]						\n"
+                         "clear.d $r9							\n"
+                         "0:								\n"
+                         "move.d $r9,%0"
 
-     /* Output.  */
-     : "=&r" (ret)
+                         /* Output.  */
+                         : "=&r"(ret)
 
-     /* Input.  */
-     : "r" (buf)
+                         /* Input.  */
+                         : "r"(buf)
 
-     /* Clobber.  */
-     : "r9");
+                         /* Clobber.  */
+                         : "r9");
 #endif /* not PIC */
 #endif /* not __arch_common_v10_v32 or __arch_v32 */
-  return ret;
+    return ret;
 }
 
 void
 longjmp(jmp_buf buf, int val)
 {
-#if defined (__arch_common_v10_v32) || defined (__arch_v32)
-  __asm__ __volatile__
-    ("cmpq 0,%1								\n\
-      beq 0f								\n\
-      move.d %0,$r13	; In delay-slot.				\n\
-      addq 6*4,$r13							\n\
-      move.d %1,[$r13]							\n\
-      subq 6*4,$r13							\n\
-0:\n"
+#if defined(__arch_common_v10_v32) || defined(__arch_v32)
+    __asm__ __volatile__("cmpq 0,%1							\n"
+                         "beq 0f							\n"
+                         "move.d %0,$r13	; In delay-slot.			\n"
+                         "addq 6*4,$r13							\n"
+                         "move.d %1,[$r13]						\n"
+                         "subq 6*4,$r13							\n"
+                         "0:\n"
 #ifdef __arch_common_v10_v32
-     /* Cater to branch offset difference between v32 and v10.  We
-	assume the branch above is 8-bit.  */
-"     setf\n"
+                         /* Cater to branch offset difference between v32 and v10.  We
+                            assume the branch above is 8-bit.  */
+                         "setf\n"
 #endif
-"     move [$r13+],$mof							\n\
-      move.d [$r13+],$sp						\n\
-      addq 4,$r13							\n\
-      move.d [$r13+],$r12						\n\
-      move.d [$r13+],$r11						\n\
-      move.d [$r13+],$r10						\n\
-      move.d [$r13+],$r9						\n\
-      move.d [$r13+],$r8						\n\
-      move.d [$r13+],$r7						\n\
-      move.d [$r13+],$r6						\n\
-      move.d [$r13+],$r5						\n\
-      move.d [$r13+],$r4						\n\
-      move.d [$r13+],$r3						\n\
-      move.d [$r13+],$r2						\n\
-      move.d [$r13+],$r1						\n\
-      move.d [$r13+],$r0						\n\
-      move [$r13+],$srp							\n\
-      move $mof,$r13							\n\
-      jump $r13								\n\
-      setf"
+                         "move [$r13+],$mof						\n"
+                         "move.d [$r13+],$sp						\n"
+                         "addq 4,$r13							\n"
+                         "move.d [$r13+],$r12						\n"
+                         "move.d [$r13+],$r11						\n"
+                         "move.d [$r13+],$r10						\n"
+                         "move.d [$r13+],$r9						\n"
+                         "move.d [$r13+],$r8						\n"
+                         "move.d [$r13+],$r7						\n"
+                         "move.d [$r13+],$r6						\n"
+                         "move.d [$r13+],$r5						\n"
+                         "move.d [$r13+],$r4						\n"
+                         "move.d [$r13+],$r3						\n"
+                         "move.d [$r13+],$r2						\n"
+                         "move.d [$r13+],$r1						\n"
+                         "move.d [$r13+],$r0						\n"
+                         "move [$r13+],$srp						\n"
+                         "move $mof,$r13						\n"
+                         "jump $r13							\n"
+                         "setf"
 
-     /* No outputs.  */
-     :
+                         /* No outputs.  */
+                         :
 
-     /* Inputs.  */
-     : "r" (buf), "r" (val)
-     : "r13", "memory");
+                         /* Inputs.  */
+                         : "r"(buf), "r"(val)
+                         : "r13", "memory");
 
 #else /* not __arch_common_v10_v32 or __arch_v32 */
-  __asm__ __volatile__
-    ("move [%0+17*4],$ccr						\n\
-      move [%0+16*4],$srp						\n\
-      test.d %1								\n\
-      beq 0f								\n\
-      nop								\n\
-      move.d %1,[%0+6*4]	; Offset for r9.			\n\
-0:									\n\
-      movem [%0],$pc"
+    __asm__ __volatile__("move [%0+17*4],$ccr						\n"
+                         "move [%0+16*4],$srp						\n"
+                         "test.d %1							\n"
+                         "beq 0f							\n"
+                         "nop								\n"
+                         "move.d %1,[%0+6*4]	; Offset for r9.			\n"
+                         "0:								\n"
+                         "movem [%0],$pc"
 
-     /* No outputs.  */
-     :
+                         /* No outputs.  */
+                         :
 
-     /* Inputs.  */
-     : "r" (buf), "r" (val)
-     : "memory");
+                         /* Inputs.  */
+                         : "r"(buf), "r"(val)
+                         : "memory");
 #endif /* not __arch_common_v10_v32 or __arch_v32 */
 }
