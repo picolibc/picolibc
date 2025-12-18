@@ -45,7 +45,7 @@ MEMORY
 	flash (rx!w) :
 		ORIGIN = DEFINED(@PREFIX@__flash) ? @PREFIX@__flash : @DEFAULT_FLASH_ADDR@,
 		LENGTH = DEFINED(@PREFIX@__flash_size) ? @PREFIX@__flash_size : @DEFAULT_FLASH_SIZE@
-	ram (w!rx) :
+	ram (@RAM_MODE@) :
 		ORIGIN = DEFINED(@PREFIX@__ram) ? @PREFIX@__ram : @DEFAULT_RAM_ADDR@,
 		LENGTH = DEFINED(@PREFIX@__ram_size) ? @PREFIX@__ram_size : @DEFAULT_RAM_SIZE@
 }
@@ -98,7 +98,7 @@ SECTIONS
 		KEEP (*(.fini_array*))
 		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
 
-	} >flash AT>flash :text
+	} >@TEXT_MEM@ AT>@TEXT_MEM@ :@TEXT_PHDR@
 
 	.rodata : {
 
@@ -113,7 +113,8 @@ SECTIONS
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
 
-	} >flash AT>flash :text
+	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
+
 	PROVIDE(@PREFIX@_pid_base = ADDR(.rodata));
 
 	.data.rel.ro : {
@@ -121,7 +122,7 @@ SECTIONS
 		/* data that needs relocating */
 		*(.data.rel.ro .data.rel.ro.*)
 
-	} >flash AT>flash :text
+	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 @INITTLS@	/* TLS data when stored in separately allocate tls_space section */
 @INITTLS@	.tdata :
@@ -130,7 +131,7 @@ SECTIONS
 @INITTLS@		PROVIDE( @PREFIX@__tls_first = . );
 @INITTLS@		*(.tdata .tdata.* .gnu.linkonce.td.*)
 @INITTLS@		PROVIDE( @PREFIX@__tdata_end = . );
-@INITTLS@	} >flash :@TLS_INIT_SEG@ :text
+@INITTLS@	} >@RODATA_MEM@ :@TLS_INIT_PHDR@ :@RODATA_PHDR@
 @INITTLS@
 @INITTLS@	/* lld allocates flash space for this section; it would
 @INITTLS@	 * be nice to fix that. */
@@ -139,7 +140,7 @@ SECTIONS
 @INITTLS@		*(.tcommon)
 @INITTLS@		PROVIDE( @PREFIX@__tls_end = . );
 @INITTLS@		PROVIDE( @PREFIX@__tbss_end = . );
-@INITTLS@	} >flash :tls :text
+@INITTLS@	} >@RODATA_MEM@ :tls :@RODATA_PHDR@
 @INITTLS@
 @INITTLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
 @INITTLS@	PROVIDE( @PREFIX@__tls_space_size = @PREFIX@__tls_end - @PREFIX@__tls_start );
@@ -153,7 +154,7 @@ SECTIONS
 @BFD@	.plt : {
 @BFD@		*(.rela.iplt)
 @BFD@		*(.rela.*)
-@BFD@	} >flash AT>flash :text
+@BFD@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 @BFD@
 @BFD@	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
 @BFD@	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
@@ -166,7 +167,7 @@ SECTIONS
 	.got : {
 		*(.got.plt)
 		*(.got)
-	} >flash AT>flash :text
+	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 	.toc : {
 		*(.toc .toc.*)
@@ -176,23 +177,23 @@ SECTIONS
 		 * stick them in :ram
 		 */
 		*(.iplt .iplt.*)
-	} >flash AT>flash :text
+	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 @CPP@	/* additional sections when compiling with C++ exception support */
 @CPP@	.except_ordered : {
 @CPP@		*(.gcc_except_table *.gcc_except_table.*)
 @CPP@		*(.ARM.extab* .gnu.linkonce.armextab.*)
-@CPP@	} >flash AT>flash :text
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 @CPP@	.eh_frame_hdr : {
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
 @CPP@		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
-@CPP@	} >flash AT>flash :text
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 @CPP@	.eh_frame : {
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
 @CPP@		KEEP (*(.eh_frame .eh_frame.*))
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
-@CPP@	} >flash AT>flash :text
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 @CPP@
 @CPP@	.except_unordered : {
 @CPP@		. = ALIGN(@DEFAULT_ALIGNMENT@);
@@ -200,7 +201,7 @@ SECTIONS
 @CPP@		PROVIDE(@PREFIX@__exidx_start = .);
 @CPP@		*(.ARM.exidx*)
 @CPP@		PROVIDE(@PREFIX@__exidx_end = .);
-@CPP@	} >flash AT>flash :text
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 	/*
 	 * Data values which are preserved across reset
@@ -210,11 +211,13 @@ SECTIONS
 		KEEP(*(SORT_BY_NAME(.preserve.*)))
 		KEEP(*(.preserve))
 		PROVIDE(@PREFIX@__preserve_end__ = .);
-	} >ram AT>ram :ram
+	} >@BSS_MEM@ AT>@BSS_AT@ :@BSS_PHDR@
 
+@INITTLS@       PROVIDE( @PREFIX@__tls_align = MAX(ALIGNOF(.tdata), ALIGNOF(.tbss)) );
 @INITTLS@	/* Pre-allocate space for an initial TLS area */
-@INITTLS@	.tls_space (NOLOAD) : {
-@INITTLS@
+@INITTLS@	.tls_space (NOLOAD) :
+@INITTLS@ @LLD@		ALIGN(__tls_align)
+@INITTLS@        {
 @INITTLS@		PROVIDE( @PREFIX@__tls_head_start = .);
 @INITTLS@		KEEP (*(.stack_chk .stack_chk.*))
 @INITTLS@		PROVIDE( @PREFIX@__tls_head_end = .);
@@ -228,7 +231,7 @@ SECTIONS
 @INITTLS@		KEEP (*(.tls_tail_extra .tls_tail_extra.*))
 @INITTLS@		PROVIDE( @PREFIX@__tls_tail_end = . );
 @INITTLS@
-@INITTLS@	} >ram AT>ram :ram
+@INITTLS@	} >@BSS_MEM@ AT>@BSS_AT@ :@BSS_PHDR@
 
 	.data :
 @BFD@		ALIGN_WITH_INPUT
@@ -258,7 +261,8 @@ SECTIONS
 
 @INITTLS@		PROVIDE( @PREFIX@__data_end = . );
 
-	} >ram AT>flash :ram_init
+	} >@DATA_MEM@ AT>@DATA_AT@ :@DATA_INIT_PHDR@
+
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
 	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
 	PROVIDE(@PREFIX@__x86_gdt_ro = DEFINED(@PREFIX@__x86_gdt) ? @PREFIX@__x86_gdt - @PREFIX@__data_start + @PREFIX@__data_source : 0);
@@ -283,14 +287,14 @@ SECTIONS
 @DATATLS@		*(.tdata .tdata.* .gnu.linkonce.td.*)
 @DATATLS@		PROVIDE( @PREFIX@__data_end = . );
 @DATATLS@		PROVIDE( @PREFIX@__tdata_end = . );
-@DATATLS@	} >ram AT>flash :@TLS_INIT_SEG@ :ram_init
+@DATATLS@	} >@DATA_MEM@ AT>@DATA_AT@ :@TLS_INIT_PHDR@ :@DATA_INIT_PHDR@
 @DATATLS@
 @DATATLS@	.tbss (NOLOAD) : {
 @DATATLS@		*(.tbss .tbss.* .gnu.linkonce.tb.*)
 @DATATLS@		*(.tcommon)
 @DATATLS@		PROVIDE( @PREFIX@__tls_end = . );
 @DATATLS@		PROVIDE( @PREFIX@__tbss_end = . );
-@DATATLS@	} >ram AT>ram :tls :ram
+@DATATLS@	} >@BSS_MEM@ AT>@BSS_MEM@ :@TLS_PHDR@ :@BSS_PHDR@
 @DATATLS@
 @DATATLS@ @BFD@	/*
 @DATATLS@ @BFD@	 * Unlike ld.lld, ld.bfd does not advance the location counter for
@@ -302,7 +306,7 @@ SECTIONS
 @DATATLS@ @BFD@	.tbss_space (NOLOAD) : {
 @DATATLS@ @BFD@		. = ADDR(.tbss);
 @DATATLS@ @BFD@		. = . + SIZEOF(.tbss);
-@DATATLS@ @BFD@	} >ram AT>ram :ram
+@DATATLS@ @BFD@	} >@BSS_MEM@ AT>@BSS_AT@ :@BSS_PHDR@
 @DATATLS@
 @DATATLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
 
@@ -393,10 +397,10 @@ SECTIONS
 	PROVIDE( @PREFIX@__heap_end = @PREFIX@@STACK@ - (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@) );
 	PROVIDE( @PREFIX@__heap_size = @PREFIX@__heap_end - @PREFIX@__heap_start );
 
-        /* Allow a minimum heap size to be specified */
-        .heap (NOLOAD) : {
-                . += (DEFINED(@PREFIX@__heap_size_min) ? @PREFIX@__heap_size_min : 0);
-        } >ram :ram
+	/* Allow a minimum heap size to be specified */
+	.heap (NOLOAD) : {
+		. += (DEFINED(@PREFIX@__heap_size_min) ? @PREFIX@__heap_size_min : 0);
+	} >ram :ram
 
 	/* Define a stack region to make sure it fits in memory */
 	.stack (NOLOAD) : {
@@ -465,4 +469,4 @@ SECTIONS
  * padding, so that a single memcpy() of __data_size copies the correct bytes.
  */
 ASSERT( @PREFIX@__data_size == @PREFIX@__data_source_size,
-	"ERROR: .data/.tdata flash size does not match RAM size");
+    "ERROR: .data/.tdata flash size does not match RAM size");
