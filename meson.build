@@ -978,6 +978,19 @@ default_target = {
 
 ld_comment = '#'
 
+# Templates for various linker script fragments
+
+init_memory_template = '''
+	@0@ (rx!w) :
+		ORIGIN = DEFINED(__@0@) ? __@0@ : @1@,
+		LENGTH = DEFINED(__@0@_size) ? __@0@_size : @2@'''
+init_phdr_template = '''
+	text_@0@ PT_LOAD;'''
+init_section_template = '''
+	.@0@ : {@1@
+	} >@2@ AT>@2@ :@3@
+'''
+
 foreach params : [default_target] + targets
   
   target = params['name']
@@ -1003,16 +1016,128 @@ foreach params : [default_target] + targets
 
   if target == 'default-target' or custom_mem_config != ''
 
-    picolibc_linker_type_data = configuration_data()
+    # Figure out all of the file and variable names
+    
+    if target == 'default-target'
+      picolibc_ld_file = 'picolibc.ld'
+      picolibc_ld_variable = 'picolibc_ld'
+      picolibc_ld_config_variable = 'picolibc_ld_config'
+
+      picolibc_noflash_ld_file = 'picolibc_noflash.ld'
+      picolibc_noflash_ld_variable = 'picolibc_noflash_ld'
+      picolibc_noflash_ld_config_variable = 'picolibc_noflash_ld_config'
+
+      picolibcpp_ld_file = 'picolibcpp.ld'
+      picolibcpp_ld_variable = 'picolibcpp_ld'
+      picolibcpp_ld_config_variable = 'picolibcpp_ld_config'
+
+      picolibcpp_noflash_ld_file = 'picolibcpp_noflash.ld'
+      picolibcpp_noflash_ld_variable = 'picolibcpp_noflash_ld'
+      picolibcpp_noflash_ld_config_variable = 'picolibcpp_noflash_ld_config'
+
+      picolibc_ld_install = true
+
+      if thread_local_storage
+        picolibc_inittls_ld_file = 'picolibc_inittls.ld'
+        picolibc_inittls_ld_variable = 'picolibc_inittls_ld'
+        picolibc_inittls_ld_config_variable = 'picolibc_inittls_ld_config'
+      endif
+    else
+      picolibc_ld_file = 'picolibc_' + custom_mem_config + '.ld'
+      picolibc_ld_variable = 'picolibc' + target + '_ld'
+      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + '_ld_config'
+
+      picolibc_noflash_ld_file = 'picolibc_' + custom_mem_config + '_noflash.ld'
+      picolibc_noflash_ld_variable = 'picolibc' + target + '_noflash_ld'
+      picolibc_noflash_ld_config_variable = 'picolibc_' + custom_mem_config + '_noflash_ld_config'
+
+      picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
+      picolibcpp_ld_variable = 'picolibcpp' + target + '_ld'
+      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_ld_config'
+
+      picolibcpp_noflash_ld_file = 'picolibcpp_' + custom_mem_config + '_noflash.ld'
+      picolibcpp_noflash_ld_variable = 'picolibcpp_' + target.underscorify() + '_noflash_ld'
+      picolibcpp_noflash_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_noflash_ld_config'
+
+      if thread_local_storage
+        picolibc_inittls_ld_file = 'picolibc_inittls_' + custom_mem_config + '.ld'
+        picolibc_inittls_ld_variable = 'picolibc_inittls_' + target + '_ld'
+        picolibc_inittls_ld_config_variable = 'picolibc_inittls_' + custom_mem_config + '_ld_config'
+      endif
+
+      picolibc_ld_install = false
+    endif
+
+    # Compute settings for the default linker script
+
+    picolibc_ld_data = configuration_data()
+
+    picolibc_ld_data.set('BFD', '')
+    picolibc_ld_data.set('LLD', ld_comment)
+    picolibc_ld_data.set('TLS_PHDRS', '''tls_init PT_TLS;
+        tls PT_TLS;''')
+    picolibc_ld_data.set('TLS_INIT_PHDR', 'tls_init')
+
+    # place some defaults here to make other sections a bit shorter
+    picolibc_ld_data.set('CPP', ld_comment)
+    picolibc_ld_data.set('C', '')
+    picolibc_ld_data.set('PREFIX', global_prefix)
+    picolibc_ld_data.set('INITTLS', ld_comment)
+    picolibc_ld_data.set('DATATLS', '')
+
+    # non-exec mode for ram PHDR
+    picolibc_ld_data.set('RAM_MODE', 'w!rx')
+
+    # attributes for regular executable sections
+    picolibc_ld_data.set('TEXT_MEM', 'flash')
+    picolibc_ld_data.set('TEXT_AT', 'flash')
+    picolibc_ld_data.set('TEXT_PHDR', 'text')
+
+    # attributes for read-only data sections
+    picolibc_ld_data.set('RODATA_MEM', 'flash')
+    picolibc_ld_data.set('RODATA_AT', 'flash')
+    picolibc_ld_data.set('RODATA_PHDR', 'text')
+
+    # attributes for data-initialized read-write data sections
+    picolibc_ld_data.set('DATA_MEM', 'ram')
+    picolibc_ld_data.set('DATA_AT', 'flash')
+    picolibc_ld_data.set('DATA_PHDR', 'ram')
+    picolibc_ld_data.set('DATA_INIT_PHDR', 'ram_init')
+
+    # attributes for zero-initialized read-write data sections
+    picolibc_ld_data.set('BSS_MEM', 'ram')
+    picolibc_ld_data.set('BSS_AT', 'ram')
+    picolibc_ld_data.set('BSS_PHDR', 'ram')
+
+    # phdrs for tls
+    picolibc_ld_data.set('TLS_PHDR', 'tls')
+    picolibc_ld_data.set('TLS_INIT_PHDR', 'tls_init')
+
+    picolibc_ld_data.set('STACK', stack_symbol)
+
+    picolibc_ld_data.set('EXTRA_TEXT_SECTIONS',
+                                  meson.get_cross_property('extra_text_sections', ''))
+    picolibc_ld_data.set('EXTRA_RODATA_SECTIONS',
+                                  meson.get_cross_property('extra_rodata_sections', ''))
+    picolibc_ld_data.set('EXTRA_DATA_SECTIONS',
+                                  meson.get_cross_property('extra_data_sections', ''))
+    picolibc_ld_data.set('EXTRA_SDATA_SECTIONS',
+                                  meson.get_cross_property('extra_sdata_sections', ''))
+    picolibc_ld_data.set('EXTRA_BSS_SECTIONS',
+                                  meson.get_cross_property('extra_bss_sections', ''))
+    picolibc_ld_data.set('EXTRA_SBSS_SECTIONS',
+                                  meson.get_cross_property('extra_sbss_sections', ''))
+
     # We need to use different alignment flags for .tdata/.tbss for ld.bfd
     # (ALIGN_WITH_INPUT, which is not supported by ld.lld) and ld.lld
     # (ALIGN(__tls_align), which is rejected as non-constant by ld.bfd), so we use
     # the {BFD,LLD}_{START,END} templates to comment out the incompatible flag.
+
     if cc.get_linker_id() == 'ld.lld'
-      picolibc_linker_type_data.set('BFD', ld_comment)
-      picolibc_linker_type_data.set('LLD', '')
-      picolibc_linker_type_data.set('TLS_PHDRS', 'tls PT_TLS;')
-      picolibc_linker_type_data.set('TLS_INIT_SEG', 'tls')
+      picolibc_ld_data.set('BFD', ld_comment)
+      picolibc_ld_data.set('LLD', '')
+      picolibc_ld_data.set('TLS_PHDRS', 'tls PT_TLS;')
+      picolibc_ld_data.set('TLS_INIT_PHDR', 'tls')
       if host_cpu_family == 'riscv'
         # ld.lld before version 15 did not support linker relaxations, disable
         # them if we are using an older version.
@@ -1024,24 +1149,8 @@ foreach params : [default_target] + targets
           c_args += ['-mno-relax']
         endif
       endif
-    else
-      picolibc_linker_type_data.set('BFD', '')
-      picolibc_linker_type_data.set('LLD', ld_comment)
-      picolibc_linker_type_data.set('TLS_PHDRS', '''tls_init PT_TLS;
-        tls PT_TLS;''')
-      picolibc_linker_type_data.set('TLS_INIT_SEG', 'tls_init')
     endif
 
-    init_memory_template = '''
-	@0@ (rx!w) :
-		ORIGIN = DEFINED(__@0@) ? __@0@ : @1@,
-		LENGTH = DEFINED(__@0@_size) ? __@0@_size : @2@'''
-    init_phdr_template = '''
-	text_@0@ PT_LOAD;'''
-    init_section_template = '''
-	.@0@ : {@1@
-	} >@2@ AT>@2@ :@3@
-'''
     default_init_section_template = init_section_template.format('@0@', '''
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
@@ -1053,6 +1162,10 @@ foreach params : [default_target] + targets
 
     fallback_flash_addr = '0x10000000'
     fallback_flash_size = '0x00010000'
+    fallback_ram_addr = '0x20000000'
+    fallback_ram_size = '0x00008000'
+    fallback_stack_size = '0x00001000'
+    fallback_alignment = '8'
 
     if meson.get_cross_property('separate_boot_flash_' + custom_mem_config,
                                 meson.get_cross_property('separate_boot_flash', false))
@@ -1110,110 +1223,75 @@ foreach params : [default_target] + targets
         init_sections += section['contents']
       endforeach
     else
-      init_memory = ''
+      # Default init sections map to flash in the primary script; no option gating
       init_sections = default_init_section_template.format('init', 'flash', 'text')
     endif
 
-    picolibc_linker_type_data.set('INIT_MEMORY', init_memory)
-    picolibc_linker_type_data.set('INIT_PHDRS', init_phdrs)
-    picolibc_linker_type_data.set('INIT_SECTIONS', init_sections)
+    picolibc_ld_data.set('INIT_MEMORY', init_memory)
+    picolibc_ld_data.set('INIT_PHDRS', init_phdrs)
+    picolibc_ld_data.set('INIT_SECTIONS', init_sections)
 
-    picolibc_linker_type_data.set(
-      'DEFAULT_FLASH_ADDR', meson.get_cross_property(
-        'default_flash_addr_' + custom_mem_config,
-        meson.get_cross_property(
-          'default_flash_addr',
-          fallback_flash_addr)))
+    # Get default memory configuration values
 
-    picolibc_linker_type_data.set(
-      'DEFAULT_FLASH_SIZE', meson.get_cross_property(
-        'default_flash_size_' + custom_mem_config,
-        meson.get_cross_property(
-          'default_flash_size',
-          fallback_flash_size)))
+    _default_flash_addr =  meson.get_cross_property('default_flash_addr_' + custom_mem_config,
+                                                    meson.get_cross_property(
+                                                      'default_flash_addr',
+                                                      fallback_flash_addr))
 
-    picolibc_linker_type_data.set(
-      'DEFAULT_RAM_ADDR',
-      meson.get_cross_property('default_ram_addr_' + custom_mem_config,
-                               meson.get_cross_property('default_ram_addr',
-                                                        '0x20000000')))
+    _default_flash_size =  meson.get_cross_property('default_flash_size_' + custom_mem_config,
+                                                    meson.get_cross_property(
+                                                      'default_flash_size',
+                                                      fallback_flash_size))
 
-    picolibc_linker_type_data.set(
-      'DEFAULT_RAM_SIZE',
-      meson.get_cross_property('default_ram_size_' + custom_mem_config,
-                               meson.get_cross_property('default_ram_size',
-                                                        '0x00008000')))
+    _default_ram_addr =  meson.get_cross_property('default_ram_addr_' + custom_mem_config,
+                                                  meson.get_cross_property(
+                                                    'default_ram_addr',
+                                                    fallback_ram_addr))
 
-    picolibc_linker_type_data.set(
-      'DEFAULT_STACK_SIZE',
-      meson.get_cross_property('default_stack_size_' + custom_mem_config,
-                               meson.get_cross_property('default_stack_size',
-                                                        '0x00001000')))
+    _default_ram_size =  meson.get_cross_property('default_ram_size_' + custom_mem_config,
+                                                  meson.get_cross_property(
+                                                    'default_ram_size', fallback_ram_size))
 
-    picolibc_linker_type_data.set(
-      'DEFAULT_ALIGNMENT',
-      meson.get_cross_property('default_alignment_' + custom_mem_config,
-                               meson.get_cross_property('default_alignment',
-                                                        '8')))
-    picolibc_linker_type_data.set('STACK', stack_symbol)
+    _default_stack_size = meson.get_cross_property('default_stack_size_' + custom_mem_config,
+                                                   meson.get_cross_property(
+                                                     'default_stack_size', fallback_stack_size))
 
-    picolibc_linker_type_data.set('EXTRA_TEXT_SECTIONS',
-                                  meson.get_cross_property('extra_text_sections', ''))
-    picolibc_linker_type_data.set('EXTRA_RODATA_SECTIONS',
-                                  meson.get_cross_property('extra_rodata_sections', ''))
-    picolibc_linker_type_data.set('EXTRA_DATA_SECTIONS',
-                                  meson.get_cross_property('extra_data_sections', ''))
-    picolibc_linker_type_data.set('EXTRA_SDATA_SECTIONS',
-                                  meson.get_cross_property('extra_sdata_sections', ''))
-    picolibc_linker_type_data.set('EXTRA_BSS_SECTIONS',
-                                  meson.get_cross_property('extra_bss_sections', ''))
-    picolibc_linker_type_data.set('EXTRA_SBSS_SECTIONS',
-                                  meson.get_cross_property('extra_sbss_sections', ''))
+    _default_alignment = meson.get_cross_property('default_alignment_' + custom_mem_config,
+                                                  meson.get_cross_property(
+                                                    'default_alignment', fallback_alignment))
 
-    picolibc_ld_data = configuration_data()
-    picolibc_ld_data.merge_from(picolibc_linker_type_data)
-    picolibc_ld_data.set('CPP', ld_comment)
-    picolibc_ld_data.set('C', '')
-    picolibc_ld_data.set('PREFIX', global_prefix)
-    picolibc_ld_data.set('INITTLS', ld_comment)
-    picolibc_ld_data.set('DATATLS', '')
-    if cc.get_linker_id() == 'ld.lld'
-      picolibc_ld_data.set('BFD', ld_comment)
-    else
-      picolibc_ld_data.set('BFD', '')
-    endif
+    _default_noflash_flash_addr = meson.get_cross_property(
+      'default_noflash_flash_addr_' + custom_mem_config,
+      meson.get_cross_property('default_noflash_flash_addr', _default_flash_addr))
 
-    if target == 'default-target'
-      picolibc_ld_file = 'picolibc.ld'
-      picolibc_ld_variable = 'picolibc_ld'
-      picolibc_ld_config_variable = 'picolibc_ld_config'
-      picolibcpp_ld_file = 'picolibcpp.ld'
-      picolibcpp_ld_variable = 'picolibcpp_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_ld_config'
-      picolibc_ld_install = true
+    _default_noflash_flash_size = meson.get_cross_property(
+      'default_noflash_flash_size_' + custom_mem_config,
+      meson.get_cross_property('default_noflash_flash_size', _default_flash_size))
 
-      if thread_local_storage
-        picolibc_inittls_ld_file = 'picolibc_inittls.ld'
-        picolibc_inittls_ld_variable = 'picolibc_inittls_ld'
-        picolibc_inittls_ld_config_variable = 'picolibc_inittls_ld_config'
-      endif
-    else
-      picolibc_ld_file = 'picolibc_' + custom_mem_config + '.ld'
-      picolibc_ld_variable = 'picolibc_' + target + '_ld'
-      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + '_ld_config'
-      picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
-      picolibcpp_ld_variable = 'picolibcpp_' + target + '_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_ld_config'
+    _default_noflash_ram_addr = meson.get_cross_property(
+      'default_noflash_ram_addr_' + custom_mem_config,
+      meson.get_cross_property('default_noflash_ram_addr', _default_ram_addr))
 
+    _default_noflash_ram_size = meson.get_cross_property(
+      'default_noflash_ram_size_' + custom_mem_config,
+      meson.get_cross_property('default_noflash_ram_size', _default_ram_size))
 
-      if thread_local_storage
-        picolibc_inittls_ld_file = 'picolibc_inittls_' + custom_mem_config + '.ld'
-        picolibc_inittls_ld_variable = 'picolibc_inittls_' + target + '_ld'
-        picolibc_inittls_ld_config_variable = 'picolibc_inittls_' + custom_mem_config + '_ld_config'
-      endif
+    _default_noflash_stack_size = meson.get_cross_property(
+      'default_noflash_stack_size_' + custom_mem_config,
+      meson.get_cross_property('default_noflash_stack_size', _default_stack_size))
 
-      picolibc_ld_install = false
-    endif
+    _default_noflash_alignment = meson.get_cross_property(
+      'default_noflash_alignment_' + custom_mem_config,
+      meson.get_cross_property('default_noflash_alignment', _default_alignment))
+
+    picolibc_ld_data.set('DEFAULT_FLASH_ADDR', _default_flash_addr)
+    picolibc_ld_data.set('DEFAULT_FLASH_SIZE', _default_flash_size)
+    picolibc_ld_data.set('DEFAULT_RAM_ADDR', _default_ram_addr)
+    picolibc_ld_data.set('DEFAULT_RAM_SIZE', _default_ram_size)
+    picolibc_ld_data.set('DEFAULT_STACK_SIZE', _default_stack_size)
+    picolibc_ld_data.set('DEFAULT_ALIGNMENT', _default_alignment)
+
+    # Generate the default linker script
 
     if not is_variable(picolibc_ld_config_variable)
       set_variable(picolibc_ld_config_variable,
@@ -1226,18 +1304,13 @@ foreach params : [default_target] + targets
 
     set_variable(picolibc_ld_variable, get_variable(picolibc_ld_config_variable))
 
+    # Generate C++ linker script
     picolibcpp_ld_data = configuration_data()
-    picolibcpp_ld_data.merge_from(picolibc_linker_type_data)
+    picolibcpp_ld_data.merge_from(picolibc_ld_data)
+
+    # Almost the same as C, just flip CPP and C bits
     picolibcpp_ld_data.set('CPP', '')
     picolibcpp_ld_data.set('C', ld_comment)
-    picolibcpp_ld_data.set('PREFIX', global_prefix)
-    picolibcpp_ld_data.set('INITTLS', ld_comment)
-    picolibcpp_ld_data.set('DATATLS', '')
-    if cc.get_linker_id() == 'ld.lld'
-      picolibcpp_ld_data.set('BFD', ld_comment)
-    else
-      picolibcpp_ld_data.set('BFD', '')
-    endif
 
     if not is_variable(picolibcpp_ld_config_variable)
       set_variable(picolibcpp_ld_config_variable,
@@ -1250,19 +1323,15 @@ foreach params : [default_target] + targets
                    
     set_variable(picolibcpp_ld_variable, get_variable(picolibcpp_ld_config_variable))
 
+    # Generate a linker script with separate TLS data
+
     if thread_local_storage
       picolibc_inittls_ld_data = configuration_data()
-      picolibc_inittls_ld_data.merge_from(picolibc_linker_type_data)
-      picolibc_inittls_ld_data.set('CPP', ld_comment)
-      picolibc_inittls_ld_data.set('C', '')
-      picolibc_inittls_ld_data.set('PREFIX', global_prefix)
+      picolibc_inittls_ld_data.merge_from(picolibc_ld_data)
+
+      # Take the C data and flip DATATLS for INITTLS bits
       picolibc_inittls_ld_data.set('INITTLS', '')
       picolibc_inittls_ld_data.set('DATATLS', ld_comment)
-      if cc.get_linker_id() == 'ld.lld'
-        picolibc_inittls_ld_data.set('BFD', ld_comment)
-      else
-        picolibc_inittls_ld_data.set('BFD', '')
-      endif
 
       if not is_variable(picolibc_inittls_ld_config_variable)
         set_variable(picolibc_inittls_ld_config_variable,
@@ -1275,6 +1344,69 @@ foreach params : [default_target] + targets
       
       set_variable(picolibc_inittls_ld_variable, get_variable(picolibc_inittls_ld_config_variable))
     endif
+
+    # Generate and install noflash C and C++ linker scripts
+
+    picolibc_noflash_ld_data = configuration_data()
+    # start with the regular C bits
+    picolibc_noflash_ld_data.merge_from(picolibc_ld_data)
+    # noflash also needs inittls
+    picolibc_noflash_ld_data.set('INITTLS', '')
+    picolibc_noflash_ld_data.set('DATATLS', ld_comment)
+
+    # place all remaining sections in ram
+
+    # attributes for regular executable sections
+    picolibc_noflash_ld_data.set('TEXT_MEM', 'ram')
+    picolibc_noflash_ld_data.set('TEXT_AT', 'ram')
+    picolibc_noflash_ld_data.set('TEXT_PHDR', 'ram')
+
+    # attributes for read-only data sections
+    picolibc_noflash_ld_data.set('RODATA_MEM', 'ram')
+    picolibc_noflash_ld_data.set('RODATA_AT', 'ram')
+    picolibc_noflash_ld_data.set('RODATA_PHDR', 'ram')
+
+    picolibc_noflash_ld_data.set('DATA_AT', 'ram')
+    picolibc_noflash_ld_data.set('DATA_INIT_PHDR', 'ram')
+
+    # mark the ram section rwx
+    picolibc_noflash_ld_data.set('RAM_MODE', 'rwx')
+
+    # set up default memory layout
+    picolibc_noflash_ld_data.set('DEFAULT_FLASH_ADDR', _default_noflash_flash_addr)
+    picolibc_noflash_ld_data.set('DEFAULT_FLASH_SIZE', _default_noflash_flash_size)
+    picolibc_noflash_ld_data.set('DEFAULT_RAM_ADDR', _default_noflash_ram_addr)
+    picolibc_noflash_ld_data.set('DEFAULT_RAM_SIZE', _default_noflash_ram_size)
+    picolibc_noflash_ld_data.set('DEFAULT_STACK_SIZE', _default_noflash_stack_size)
+    picolibc_noflash_ld_data.set('DEFAULT_ALIGNMENT', _default_noflash_alignment)
+
+    if not is_variable(picolibc_noflash_ld_config_variable)
+      set_variable(picolibc_noflash_ld_config_variable,
+                   configure_file(input: 'picolibc.ld.in',
+                                  output: picolibc_noflash_ld_file,
+                                  configuration: picolibc_noflash_ld_data,
+                                  install: picolibc_ld_install and really_install,
+                                  install_dir: lib_dir))
+    endif
+
+    set_variable(picolibc_noflash_ld_variable, get_variable(picolibc_noflash_ld_config_variable))
+
+    # no flash C++ version is just the noflash version with CPP and C swapped
+    picolibcpp_noflash_ld_data = configuration_data()
+    picolibcpp_noflash_ld_data.merge_from(picolibc_noflash_ld_data)
+    picolibcpp_noflash_ld_data.set('CPP', '')
+    picolibcpp_noflash_ld_data.set('C', ld_comment)
+
+    if not is_variable(picolibcpp_noflash_ld_config_variable)
+      set_variable(picolibcpp_noflash_ld_config_variable,
+                   configure_file(input: 'picolibc.ld.in',
+                                  output: picolibcpp_noflash_ld_file,
+                                  configuration: picolibcpp_noflash_ld_data,
+                                  install: picolibc_ld_install and really_install,
+                                  install_dir: lib_dir))
+    endif
+
+    set_variable(picolibcpp_noflash_ld_variable, get_variable(picolibcpp_noflash_ld_config_variable))
 
   endif
 endforeach
@@ -1616,8 +1748,10 @@ if has_semihost
     target_c_args = params['c_args']
     if target == 'default-target'
       test_link_args_variable = 'test_link_args'
+      test_link_args_noflash_variable = 'test_link_args_noflash'
       test_linker_files_variable = 'test_linker_files'
       test_link_depends_variable = 'test_link_depends'
+      test_link_depends_noflash_variable = 'test_link_depends_noflash'
       picolibc_ld_value = picolibc_ld
 
       if thread_local_storage
@@ -1629,9 +1763,11 @@ if has_semihost
 
     else
       test_link_args_variable = 'test_link_args' + target
+      test_link_args_noflash_variable = 'test_link_args_noflash' + target
       test_linker_files_variable = 'test_linker_files_' + target
       test_link_depends_variable = 'test_link_depends' + target
-      picolibc_ld_value = get_variable('picolibc_' + target + '_ld', picolibc_ld)
+      test_link_depends_noflash_variable = 'test_link_depends_noflash' + target
+      picolibc_ld_value = get_variable('picolibc' + target + '_ld', picolibc_ld)
 
       if thread_local_storage
         test_inittls_link_args_variable = 'test_inittls_link_args' + target
@@ -1675,6 +1811,22 @@ if has_semihost
       # Make sure all of the tests get re-linked if the linker scripts change.
       set_variable(test_inittls_link_depends_variable, [picolibc_inittls_ld_value])
     endif
+    # Prepare no-flash link args and depends using the noflash script
+    if target == 'default-target'
+      picolibc_noflash_ld_value = picolibc_noflash_ld
+    else
+      picolibc_noflash_ld_value = get_variable('picolibc' + target + '_noflash_ld', picolibc_noflash_ld)
+    endif
+    if meson.version().version_compare('>=1.4.0')
+      picolibc_noflash_ld_string = picolibc_noflash_ld_value.full_path()
+    else
+      picolibc_noflash_ld_string = '@0@'.format(picolibc_noflash_ld_value)
+    endif
+    set_variable(test_link_args_noflash_variable,
+                 additional_libs_list +
+                 test_link_args_base +
+                 ['-nostdlib', '-T', picolibc_noflash_ld_string])
+    set_variable(test_link_depends_noflash_variable, [picolibc_noflash_ld_value])
   endforeach
 else
   test_link_args = test_link_args_base

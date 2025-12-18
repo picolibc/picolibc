@@ -38,10 +38,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+/* Build-time control to skip initializing .data from FLASH.
+ * Define NO_FLASH to build no-flash variants of crt0. */
+
+#ifndef NO_FLASH
 extern char __data_source[];
 extern char __data_start[];
 extern char __data_end[];
 extern char __data_size[];
+#endif
 extern char __bss_start[];
 extern char __bss_end[];
 extern char __bss_size[];
@@ -89,18 +94,22 @@ int sys_semihost_get_cmdline(char *buf, int size);
 static __noreturn __always_inline void
 __start(void)
 {
+#ifndef NO_FLASH
+    /* Initialize .data from FLASH when enabled */
     memcpy(__data_start, __data_source, (uintptr_t)__data_size);
+#endif
     memset(__bss_start, '\0', (uintptr_t)__bss_size);
 #ifdef POST_MEMORY_SETUP
     POST_MEMORY_SETUP();
 #endif
 
+#ifdef __THREAD_LOCAL_STORAGE
 #ifdef INIT_TLS
     _init_tls(__tls_base);
 #endif
-#ifdef __THREAD_LOCAL_STORAGE
     _set_tls(__tls_base);
 #endif
+
 #if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
     __libc_init_array();
 #endif
