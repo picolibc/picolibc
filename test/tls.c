@@ -216,6 +216,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
     check_inside_tls_region(&overaligned_bss_var, tls_region);
 
 #ifndef INIT_TLS
+#ifndef NO_FLASH
     /*
      * We allow for up to OVERALIGN_NON_TLS_BSS -1 bytes of padding after
      * the end of .tbss and the start of aligned .bss since in theory the
@@ -231,6 +232,7 @@ check_tls(char *where, bool check_addr, void *tls_region)
                __non_tls_bss_start, tdata_end, non_tls_bss_start_latest);
         result++;
     }
+#endif
 #endif
 #endif
     return result;

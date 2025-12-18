@@ -136,60 +136,118 @@ foreach params : targets
     _cpp_args = target_c_args + get_variable('test_cpp_args_' + target, test_cpp_args)
   endif
 
+  if get_option('test-no-flash')
+    _link_args_no_flash = target_c_args + _lib_files + get_variable('test_link_args_noflash' + target, test_link_args_noflash)
+    _link_depends_no_flash = get_variable('test_link_depends_noflash' + target, test_link_depends_noflash) + _libs
+    _objs_no_flash = get_variable('crt0_noflash_semihost' + target, get_variable('crt0_noflash_semihost' + target))
+  endif
+
   t1 = 'try-ilp32'
 
   test(t1 + target,
        executable(t1 + target, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
-		  c_args: _c_args,
-		  link_args: _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: _c_args,
+                  link_args: _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env)
+  if get_option('test-no-flash')
+    test(t1 + '-no-flash' + target,
+         executable(t1 + '-no-flash' + target, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
+                    c_args: _c_args,
+                    link_args: _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
+  endif
 
   t1 = 'hosted-exit'
   t1_fail = t1 + '-fail'
 
   test(t1 + target,
        executable(t1 + target, ['hosted-exit.c', 'lock-valid.c'],
-		  c_args: _c_args,
-		  link_args:  _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: _c_args,
+                  link_args:  _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env)
+  if get_option('test-no-flash')
+    test(t1 + '-no-flash' + target,
+         executable(t1 + '-no-flash' + target, ['hosted-exit.c', 'lock-valid.c'],
+                    c_args: _c_args,
+                    link_args:  _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
+  endif
 
   test(t1_fail + target,
        executable(t1_fail + target, ['hosted-exit.c', 'lock-valid.c'],
-		  c_args: _c_args + ['-DRETVAL=1'],
-		  link_args:  _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: _c_args + ['-DRETVAL=1'],
+                  link_args:  _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env,
        should_fail: true
       )
+  if get_option('test-no-flash')
+    test(t1_fail + '-no-flash' + target,
+         executable(t1_fail + '-no-flash' + target, ['hosted-exit.c', 'lock-valid.c'],
+                    c_args: _c_args + ['-DRETVAL=1'],
+                    link_args:  _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env,
+         should_fail: true
+        )
+  endif
 
   t1 = 'abort'
 
   test(t1 + target,
        executable(t1 + target, ['abort.c', 'lock-valid.c'],
-		  c_args: _c_args,
-		  link_args:  _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: _c_args,
+                  link_args:  _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env,
        should_fail: true
       )
+  if get_option('test-no-flash')
+    test(t1 + '-no-flash' + target,
+         executable(t1 + '-no-flash' + target, ['abort.c', 'lock-valid.c'],
+                    c_args: _c_args,
+                    link_args:  _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env,
+         should_fail: true
+        )
+  endif
 
   # POSIX console code requires a constructor to run, so
   # it is incompatible with the minimal crt0 when using stdout
@@ -233,59 +291,111 @@ foreach params : targets
 
   test(t1 + target,
        executable(t1 + target, ['math_errhandling.c'],
-		  c_args: arg_fnobuiltin + _c_args,
-		  link_args: _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: arg_fnobuiltin + _c_args,
+                  link_args: _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env)
+  if get_option('test-no-flash')
+    test(t1 + '-no-flash' + target,
+         executable(t1 + '-no-flash' + target, ['math_errhandling.c'],
+                    c_args: arg_fnobuiltin + _c_args,
+                    link_args: _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
+  endif
 
   t1 = 'rounding-mode'
 
   test(t1 + target,
        executable(t1 + target, ['rounding-mode.c', 'rounding-mode-sub.c'],
-		  c_args: arg_fnobuiltin + _c_args,
-		  link_args: _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: arg_fnobuiltin + _c_args,
+                  link_args: _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env)
+  if get_option('test-no-flash')
+    test(t1 + '-no-flash' + target,
+         executable(t1 + '-no-flash' + target, ['rounding-mode.c', 'rounding-mode-sub.c'],
+                    c_args: arg_fnobuiltin + _c_args,
+                    link_args: _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
+  endif
 
   t1 = 'test-except'
   t1_src = t1 + '.c'
 
   test(t1 + target,
        executable(t1 + target, [t1_src, 'lock-valid.c'],
-		  c_args: printf_compile_args_d + arg_fnobuiltin + _c_args,
-		  link_args: printf_link_args_d + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: printf_compile_args_d + arg_fnobuiltin + _c_args,
+                  link_args: printf_link_args_d + _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env,
        should_fail: true
       )
+  if get_option('test-no-flash')
+    test(t1 + '-no-flash' + target,
+         executable(t1 + '-no-flash' + target, [t1_src, 'lock-valid.c'],
+                    c_args: printf_compile_args_d + arg_fnobuiltin + _c_args,
+                    link_args: printf_link_args_d + _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env,
+         should_fail: true
+        )
+  endif
 
   t1 = 'long_double'
   t1_src = t1 + '.c'
 
   test(t1 + target,
        executable(t1 + target, t1_src,
-		  c_args: printf_compile_args_d + _c_args,
-		  link_args: printf_link_args_d + _link_args,
-		  objects: _objs,
-		  link_depends:  _link_depends,
-		  include_directories: inc),
+                  c_args: printf_compile_args_d + _c_args,
+                  link_args: printf_link_args_d + _link_args,
+                  objects: _objs,
+                  link_depends:  _link_depends,
+                  include_directories: inc),
        depends: bios_bin,
        suite: 'test',
        env: test_env,
        timeout: 90,
       )
+  if get_option('test-no-flash')
+    test(t1 + '-no-flash' + target,
+         executable(t1 + '-no-flash' + target, t1_src,
+                    c_args: printf_compile_args_d + _c_args,
+                    link_args: printf_link_args_d + _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env,
+         timeout: 90,
+        )
+  endif
 
   if is_variable('lib_semihost_raw' + target) and test_machine == 'qemu'
 
@@ -310,16 +420,34 @@ foreach params : targets
     t1_src = 'test-hello.c'
     test(t1 + target,
          executable(t1 + target, t1_src,
-		    c_args: printf_compile_args_d + _c_args,
-		    link_args: printf_link_args_d + _link_raw_args,
-		    objects: _objs_raw,
-		    link_depends:  _link_raw_depends,
-		    include_directories: inc),
+                    c_args: printf_compile_args_d + _c_args,
+                    link_args: printf_link_args_d + _link_raw_args,
+                    objects: _objs_raw,
+                    link_depends:  _link_raw_depends,
+                    include_directories: inc),
          depends: bios_bin,
          suite: 'test',
          env: test_env,
          timeout: 90,
         )
+    if get_option('test-no-flash')
+      # Build raw no-flash using hosted crt0 noflash variant and raw libs
+      _link_raw_args_no_flash = target_c_args + _lib_raw_files + get_variable('test_link_args_noflash' + target, test_link_args_noflash)
+      _link_raw_depends_no_flash = get_variable('test_link_depends_noflash' + target, test_link_depends_noflash) + _libs_raw
+      _objs_raw_noflash = [get_variable('crt0_noflash_hosted' + target)]
+      test(t1 + '-no-flash' + target,
+           executable(t1 + '-no-flash' + target, t1_src,
+                      c_args: printf_compile_args_d + _c_args,
+                      link_args: printf_compile_args_d + _link_raw_args_no_flash,
+                      objects: _objs_raw_noflash,
+                      link_depends:  _link_raw_depends_no_flash,
+                      include_directories: inc),
+           depends: bios_bin,
+           suite: 'test',
+           env: test_env,
+           timeout: 90,
+          )
+    endif
   endif
 
   if c_sanitize_flags != []
@@ -332,22 +460,37 @@ foreach params : targets
     endif
 
     test(t1 + target,
-	 executable(t1 + target, t1_src,
-		    c_args: c_sanitize_flags + _c_args + test_ubsan_flags,
-		    link_args: _link_args,
-		    objects: _objs,
-		    link_depends:  _link_depends,
-		    include_directories: inc),
-	 depends: bios_bin,
+         executable(t1 + target, t1_src,
+                    c_args: c_sanitize_flags + _c_args + test_ubsan_flags,
+                    link_args: _link_args,
+                    objects: _objs,
+                    link_depends:  _link_depends,
+                    include_directories: inc),
+         depends: bios_bin,
          suite: 'test',
-	 env: test_env,
-	 should_fail: sanitize_trap_on_error
-	)
+         env: test_env,
+         should_fail: sanitize_trap_on_error
+        )
+    if get_option('test-no-flash')
+      test(t1 + '-no-flash' + target,
+           executable(t1 + '-no-flash' + target, t1_src,
+                      c_args: c_sanitize_flags + _c_args + test_ubsan_flags,
+                      link_args: _link_args_no_flash,
+                      objects: _objs_no_flash,
+                      link_depends:  _link_depends_no_flash,
+                      include_directories: inc),
+           depends: bios_bin,
+           suite: 'test',
+           env: test_env,
+           should_fail: sanitize_trap_on_error
+          )
+    endif
   endif
 
   foreach t1 : plain_tests
     t1_src = t1 + '.c'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
+    test_file_name_arg_no_flash=['-DTEST_FILE_NAME="' + t1 + '_no_flash_' + target + '.txt"']
 
     test(t1 + target,
 	 executable(t1 + target, [t1_src, 'lock-valid.c'],
@@ -360,6 +503,18 @@ foreach params : targets
 	 timeout: 60,
          suite: 'test',
 	 env: test_env)
+    if get_option('test-no-flash') #and t1 == 'tls'
+      test(t1 + '-no-flash' + target,
+           executable(t1 + '-no-flash' + target, [t1_src, 'lock-valid.c'],
+                    c_args: printf_compile_args_d + test_file_name_arg_no_flash + _c_args + ['-DNO_FLASH'],
+                    link_args: printf_link_args_d + _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+           depends: bios_bin,
+           suite: 'test',
+           env: test_env)
+    endif
   endforeach
 
   # Generic argv test source skips when not Hexagon
@@ -375,6 +530,20 @@ foreach params : targets
        depends: bios_bin,
        suite: 'test',
        env: test_env)
+  if get_option('test-no-flash')
+    test('test-argv-no-flash' + target,
+         executable('test-argv-no-flash' + target,
+                    ['test-argv.c', 'lock-valid.c'],
+                    c_args: printf_compile_args_d + _c_args,
+                    link_args: printf_link_args_d + _link_args_no_flash,
+                    objects: _objs_no_flash,
+                    link_depends:  _link_depends_no_flash,
+                    include_directories: inc),
+         args: ['--args', 'hello world'],
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
+  endif
 
   if have_cplusplus
     t1 = 'test-cplusplus'
@@ -382,13 +551,25 @@ foreach params : targets
     test(t1 + target,
          executable(t1 + target, t1_src,
                     cpp_args: _cpp_args,
-		    link_args: _cpp_args + _link_args,
-		    objects: _objs,
-		    link_depends:  _link_depends,
+                    link_args: _cpp_args + _link_args,
+                    objects: _objs,
+                    link_depends:  _link_depends,
                     include_directories: inc),
          depends: bios_bin,
          suite: 'test',
          env: test_env)
+    if get_option('test-no-flash')
+      test(t1 + '-no-flash' + target,
+           executable(t1 + '-no-flash' + target, t1_src,
+                      cpp_args: _cpp_args,
+                      link_args: _cpp_args + _link_args_no_flash,
+                      objects: _objs_no_flash,
+                      link_depends:  _link_depends_no_flash,
+                      include_directories: inc),
+           depends: bios_bin,
+           suite: 'test',
+           env: test_env)
+    endif
   endif
 endforeach
 

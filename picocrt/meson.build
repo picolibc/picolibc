@@ -111,7 +111,7 @@ picocrt_variants = [
   {
     'name': 'noflash-hosted',
     'suffix': '-noflash-hosted',
-    'c_args': ['-DNO_FLASH', '-DCRT0_EXIT'],
+    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT'],
     'src': src_picocrt,
   },
 ]

@@ -132,9 +132,17 @@ foreach params : targets
   _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
+
+  # Prepare no-flash link args and crt0 objects
+  if get_option('test-no-flash')
+    _link_args_no_flash = target_c_args + _lib_files + get_variable('test_link_args_noflash' + target, test_link_args_noflash)
+    _link_depends_no_flash = get_variable('test_link_depends_noflash' + target, test_link_depends_noflash) + _libs
+    _objs_no_flash = [get_variable('crt0_noflash_semihost' + target)]
+  endif
   foreach t1 : tests
     t1_src = t1 + '.c'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
+    test_file_name_arg_no_flash=['-DTEST_FILE_NAME="' + t1 + '_no_flash_' + target + '.txt"']
 
     test(t1 + target,
 	 executable(t1 + target, [t1_src],
@@ -146,7 +154,20 @@ foreach params : targets
          depends: bios_bin,
 	 timeout: 60,
          suite: 'test-math',
-	 env: test_env)
+         env: test_env)
+    if get_option('test-no-flash')
+      test(t1 + '-no-flash' + target,
+           executable(t1 + '-no-flash' + target, [t1_src],
+                      c_args: printf_compile_args_d + test_file_name_arg_no_flash + _c_args,
+                      link_args: printf_link_args_d + _link_args_no_flash,
+                      objects: _objs_no_flash,
+                      link_depends:  _link_depends_no_flash,
+                      include_directories: inc),
+           depends: bios_bin,
+           timeout: 60,
+           suite: 'test-math',
+           env: test_env)
+    endif
   endforeach
 
   if enable_exhaustive_math_tests
