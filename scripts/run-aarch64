@@ -85,7 +85,7 @@ if nm "$elf" | grep -q aarch64_putc; then
         -cpu max \
         -nic none \
         -nographic \
-        -kernel "$elf"
+        -kernel "$elf" "$@"
 else
     echo "$stdin" | $qemu -chardev $chardev \
                           -semihosting-config "$semi" \
@@ -95,5 +95,5 @@ else
                           -cpu cortex-a57 \
                           -nic none \
                           -nographic \
-                          -kernel "$elf"
+                          -kernel "$elf" "$@"
 fi
