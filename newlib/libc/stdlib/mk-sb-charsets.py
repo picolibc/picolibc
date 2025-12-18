@@ -367,6 +367,7 @@ def dump_table():
  */
 
 /* This file is auto-generated from mk-sb-charsets.py */
+/* clang-format off */
 ''')   
     max_ucode_iso = {}
     print('''#ifdef __MB_EXTENDED_CHARSETS_ISO

@@ -34,6 +34,7 @@
  */
 
 /* This file is auto-generated from mk-sb-charsets.py */
+/* clang-format off */
 
 #ifdef __MB_EXTENDED_CHARSETS_ISO
 /* Tables for the ISO-8859-x to UTF conversion.  The first index into the
