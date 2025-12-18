@@ -67,14 +67,17 @@ TEST_FILES = \
 	$(REAL_TRIG) $(REAL_EXP) $(REAL_OTHER) \
 	$(COMPLEX_TRIG) $(COMPLEX_EXP) $(COMPLEX_OTHER)
 
-all: $(TEST_FILES)
+all: $(TEST_FILES) .clang-format-ignore
 
-$(TEST_FILES): test-complex.5c test-float.5c
+$(TEST_FILES): test-complex.5c test-float.5c math-test-copyright
 
 .DELETE_ON_ERROR:
 
 .5c.h:
 	($(NICKLE) $< && cat math-test-copyright) > $@
+
+.clang-format-ignore: Makefile
+	for i in '!**/*.[ch]' $(TEST_FILES); do echo "$$i"; done > $@
 
 clean:
 	rm -f $(TEST_FILES)
