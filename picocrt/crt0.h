@@ -38,10 +38,15 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+/* Build-time control to skip initializing .data from FLASH.
+ * Define NO_FLASH to build no-flash variants of crt0. */
+
+#ifndef NO_FLASH
 extern char __data_source[];
 extern char __data_start[];
 extern char __data_end[];
 extern char __data_size[];
+#endif
 extern char __bss_start[];
 extern char __bss_end[];
 extern char __bss_size[];
@@ -50,8 +55,10 @@ extern char __tdata_end[];
 extern char __tls_end[];
 
 #ifdef __PICOCRT_RUNTIME_SIZE
+#ifndef NO_FLASH
 #define __data_size (__data_end - __data_start)
 #define __bss_size  (__bss_end - __bss_start)
+#endif
 #endif
 
 /* These two functions must be defined in the architecture-specific
@@ -89,16 +96,19 @@ int sys_semihost_get_cmdline(char *buf, int size);
 static __noreturn __always_inline void
 __start(void)
 {
+    /* Initialize .data from FLASH when enabled */
+#ifndef NO_FLASH
     memcpy(__data_start, __data_source, (uintptr_t)__data_size);
+#endif
     memset(__bss_start, '\0', (uintptr_t)__bss_size);
 #ifdef POST_MEMORY_SETUP
     POST_MEMORY_SETUP();
 #endif
 
+#ifdef __THREAD_LOCAL_STORAGE
 #ifdef INIT_TLS
     _init_tls(__tls_base);
 #endif
-#ifdef __THREAD_LOCAL_STORAGE
     _set_tls(__tls_base);
 #endif
 #if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS

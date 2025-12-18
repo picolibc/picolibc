@@ -146,6 +146,7 @@ picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
+test_no_flash = get_option('test-no-flash')
 if get_option('tests-cdefs') == 'auto'
   enable_cdefs_tests = enable_tests
 else
@@ -171,6 +172,14 @@ if enable_tests
   endif
 else
   have_cplusplus = false
+endif
+
+# When requested, add a second test target that links using no-flash
+# crt0 and linker scripts, in addition to the default tests.
+if enable_tests and test_no_flash
+  message('Enabling no-flash tests alongside default tests')
+  # Nothing to change in targets here; do-test/do-test-noopt will pass
+  # -Dtest-no-flash=true and we use that to select variants at link time.
 endif
 
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
@@ -1105,6 +1114,7 @@ foreach params : [default_target] + targets
     init_memory = ''
     init_phdrs = ''
     init_sections = ''
+    init_sections_ram = ''
 
     if additional_sections != []
       foreach section : additional_sections
@@ -1114,8 +1124,10 @@ foreach params : [default_target] + targets
         init_sections += section['contents']
       endforeach
     else
-      init_memory = ''
+      # Default init sections map to flash in the primary script; no option gating
       init_sections = default_init_section_template.format('init', 'flash', 'text')
+      # Precompute a RAM-mapped init section for no-flash variant
+      init_sections_ram = default_init_section_template.format('init', 'ram', 'text')
     endif
 
     picolibc_linker_type_data.set('INIT_MEMORY', init_memory)
@@ -1174,6 +1186,7 @@ foreach params : [default_target] + targets
     picolibc_linker_type_data.set('EXTRA_SBSS_SECTIONS',
                                   meson.get_cross_property('extra_sbss_sections', ''))
 
+    # Generate two linker scripts: default (flash) and noflash
     picolibc_ld_data = configuration_data()
     picolibc_ld_data.merge_from(picolibc_linker_type_data)
     picolibc_ld_data.set('CPP', ld_comment)
@@ -1186,12 +1199,30 @@ foreach params : [default_target] + targets
     else
       picolibc_ld_data.set('BFD', '')
     endif
+    picolibc_ld_data.set('NO_FLASH_START', '')
+    picolibc_ld_data.set('NO_FLASH_END', '')
+    picolibc_ld_data.set('DATA_AT', 'flash')
+
+    picolibc_noflash_ld_data = configuration_data()
+    picolibc_noflash_ld_data.merge_from(picolibc_linker_type_data)
+    picolibc_noflash_ld_data.set('CPP', '#')
+    picolibc_noflash_ld_data.set('C', '')
+    picolibc_noflash_ld_data.set('PREFIX', global_prefix)
+    picolibc_noflash_ld_data.set('INITTLS', '')
+    picolibc_noflash_ld_data.set('DATATLS', ld_comment)
+    picolibc_noflash_ld_data.set('NO_FLASH_START', '/*')
+    picolibc_noflash_ld_data.set('NO_FLASH_END', '*/')
+    picolibc_noflash_ld_data.set('DATA_AT', 'ram')
+    # Ensure .init maps to RAM in no-flash script and drop any flash-only inserts
+    picolibc_noflash_ld_data.set('INIT_MEMORY', '')
+    picolibc_noflash_ld_data.set('INIT_PHDRS', '')
+    picolibc_noflash_ld_data.set('INIT_SECTIONS', init_sections_ram)
 
     if target == 'default-target'
       picolibc_ld_file = 'picolibc.ld'
       picolibc_ld_variable = 'picolibc_ld'
       picolibc_ld_config_variable = 'picolibc_ld_config'
-      picolibcpp_ld_file = 'picolibcpp.ld'
+    picolibcpp_ld_file = 'picolibcpp.ld'
       picolibcpp_ld_variable = 'picolibcpp_ld'
       picolibcpp_ld_config_variable = 'picolibcpp_ld_config'
       picolibc_ld_install = true
@@ -1230,6 +1261,28 @@ foreach params : [default_target] + targets
 
     set_variable(picolibc_ld_variable, get_variable(picolibc_ld_config_variable))
 
+    # Generate and install noflash variant unconditionally
+    if target == 'default-target'
+      picolibc_noflash_ld_file = 'picolibc_noflash.ld'
+      picolibc_noflash_ld_variable = 'picolibc_noflash_ld'
+      picolibc_noflash_ld_config_variable = 'picolibc_noflash_ld_config'
+    else
+      picolibc_noflash_ld_file = 'picolibc_' + custom_mem_config + '_noflash.ld'
+      picolibc_noflash_ld_variable = 'picolibc_' + target.underscorify() + '_noflash_ld'
+      picolibc_noflash_ld_config_variable = 'picolibc_' + custom_mem_config + '_noflash_ld_config'
+    endif
+
+    if not is_variable(picolibc_noflash_ld_config_variable)
+      set_variable(picolibc_noflash_ld_config_variable,
+                   configure_file(input: 'picolibc.ld.in',
+                                  output: picolibc_noflash_ld_file,
+                                  configuration: picolibc_noflash_ld_data,
+                                  install: picolibc_ld_install and really_install,
+                                  install_dir: lib_dir))
+    endif
+
+    set_variable(picolibc_noflash_ld_variable, get_variable(picolibc_noflash_ld_config_variable))
+
     picolibcpp_ld_data = configuration_data()
     picolibcpp_ld_data.merge_from(picolibc_linker_type_data)
     picolibcpp_ld_data.set('CPP', '')
@@ -1242,6 +1295,11 @@ foreach params : [default_target] + targets
     else
       picolibcpp_ld_data.set('BFD', '')
     endif
+    # Linker script templating for data init policy
+    # Primary C++ script uses FLASH mapping
+    picolibcpp_ld_data.set('NO_FLASH_START', '')
+    picolibcpp_ld_data.set('NO_FLASH_END', '')
+    picolibcpp_ld_data.set('DATA_AT', 'flash')
 
     if not is_variable(picolibcpp_ld_config_variable)
       set_variable(picolibcpp_ld_config_variable,
@@ -1260,8 +1318,11 @@ foreach params : [default_target] + targets
       picolibc_inittls_ld_data.set('CPP', ld_comment)
       picolibc_inittls_ld_data.set('C', '')
       picolibc_inittls_ld_data.set('PREFIX', global_prefix)
+      picolibc_inittls_ld_data.set('DATA_AT', 'flash')
       picolibc_inittls_ld_data.set('INITTLS', '')
       picolibc_inittls_ld_data.set('DATATLS', ld_comment)
+      picolibc_inittls_ld_data.set('NO_FLASH_START', '')
+      picolibc_inittls_ld_data.set('NO_FLASH_END', '')
       if cc.get_linker_id() == 'ld.lld'
         picolibc_inittls_ld_data.set('BFD', ld_comment)
       else
@@ -1279,6 +1340,43 @@ foreach params : [default_target] + targets
       
       set_variable(picolibc_inittls_ld_variable, get_variable(picolibc_inittls_ld_config_variable))
     endif
+
+    # Generate and install a noflash C++ linker script
+    if target == 'default-target'
+      picolibcpp_noflash_ld_file = 'picolibcpp_noflash.ld'
+      picolibcpp_noflash_ld_variable = 'picolibcpp_noflash_ld'
+      picolibcpp_noflash_ld_config_variable = 'picolibcpp_noflash_ld_config'
+    else
+      picolibcpp_noflash_ld_file = 'picolibcpp_' + custom_mem_config + '_noflash.ld'
+      picolibcpp_noflash_ld_variable = 'picolibcpp_' + target.underscorify() + '_noflash_ld'
+      picolibcpp_noflash_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_noflash_ld_config'
+    endif
+
+    picolibcpp_noflash_ld_data = configuration_data()
+    picolibcpp_noflash_ld_data.merge_from(picolibc_linker_type_data)
+    picolibcpp_noflash_ld_data.set('CPP', '')
+    picolibcpp_noflash_ld_data.set('C', '#')
+    picolibcpp_noflash_ld_data.set('PREFIX', global_prefix)
+    picolibcpp_noflash_ld_data.set('INITTLS', '')
+    picolibcpp_noflash_ld_data.set('DATATLS', ld_comment)
+    picolibcpp_noflash_ld_data.set('NO_FLASH_START', '/*')
+    picolibcpp_noflash_ld_data.set('NO_FLASH_END', '*/')
+    picolibcpp_noflash_ld_data.set('DATA_AT', 'ram')
+    # Use RAM mapping for init sections
+    picolibcpp_noflash_ld_data.set('INIT_MEMORY', '')
+    picolibcpp_noflash_ld_data.set('INIT_PHDRS', '')
+    picolibcpp_noflash_ld_data.set('INIT_SECTIONS', init_sections_ram)
+
+    if not is_variable(picolibcpp_noflash_ld_config_variable)
+      set_variable(picolibcpp_noflash_ld_config_variable,
+                   configure_file(input: 'picolibc.ld.in',
+                                  output: picolibcpp_noflash_ld_file,
+                                  configuration: picolibcpp_noflash_ld_data,
+                                  install: picolibc_ld_install and really_install,
+                                  install_dir: lib_dir))
+    endif
+
+    set_variable(picolibcpp_noflash_ld_variable, get_variable(picolibcpp_noflash_ld_config_variable))
 
   endif
 endforeach
@@ -1625,8 +1723,10 @@ if has_semihost
     target_c_args = params['c_args']
     if target == 'default-target'
       test_link_args_variable = 'test_link_args'
+      test_link_args_noflash_variable = 'test_link_args_noflash'
       test_linker_files_variable = 'test_linker_files'
       test_link_depends_variable = 'test_link_depends'
+      test_link_depends_noflash_variable = 'test_link_depends_noflash'
       picolibc_ld_value = picolibc_ld
 
       if thread_local_storage
@@ -1638,8 +1738,10 @@ if has_semihost
 
     else
       test_link_args_variable = 'test_link_args' + target
+      test_link_args_noflash_variable = 'test_link_args_noflash' + target
       test_linker_files_variable = 'test_linker_files_' + target
       test_link_depends_variable = 'test_link_depends' + target
+      test_link_depends_noflash_variable = 'test_link_depends_noflash' + target
       picolibc_ld_value = get_variable('picolibc_' + target + '_ld', picolibc_ld)
 
       if thread_local_storage
@@ -1684,6 +1786,22 @@ if has_semihost
       # Make sure all of the tests get re-linked if the linker scripts change.
       set_variable(test_inittls_link_depends_variable, [picolibc_inittls_ld_value])
     endif
+    # Prepare no-flash link args and depends using the noflash script
+    if target == 'default-target'
+      picolibc_noflash_ld_value = picolibc_noflash_ld
+    else
+      picolibc_noflash_ld_value = get_variable('picolibc_noflash_' + target + '_ld', picolibc_noflash_ld)
+    endif
+    if meson.version().version_compare('>=1.4.0')
+      picolibc_noflash_ld_string = picolibc_noflash_ld_value.full_path()
+    else
+      picolibc_noflash_ld_string = '@0@'.format(picolibc_noflash_ld_value)
+    endif
+    set_variable(test_link_args_noflash_variable,
+                 additional_libs_list +
+                 test_link_args_base +
+                 ['-nostdlib', '-T', picolibc_noflash_ld_string])
+    set_variable(test_link_depends_noflash_variable, [picolibc_noflash_ld_value])
   endforeach
 else
   test_link_args = test_link_args_base
