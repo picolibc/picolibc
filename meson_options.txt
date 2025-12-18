@@ -85,6 +85,8 @@ option('force-install', type: 'boolean', value: false,
 
 option('tests', type: 'boolean', value: false,
        description: 'Enable tests')
+option('test-no-flash', type: 'boolean', value: false,
+       description: 'Run tests using no-flash crt0 + linker alongside flash tests')
 option('tests-cdefs', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
        description: 'Enable test of sys/cdefs.h. If set to auto, enable when tests are enabled')
 option('tests-enable-stack-protector', type: 'boolean', value: true,
