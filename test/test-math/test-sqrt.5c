@@ -35,7 +35,7 @@
 
 load "test-float.5c"
 
-real[] test_values = {
+real[...] test_values = {
 };
 
 void
