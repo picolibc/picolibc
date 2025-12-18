@@ -44,17 +44,13 @@ freopen(const char *pathname, const char *mode, FILE *stream)
 	int stdio_flags;
 	int open_flags;
 
-        __flockfile(stream);
-        /* Can't reopen FILEs which aren't buffered */
-        if (!(stream->flags & __SBUF))
-            __funlock_return(stream, NULL);
+	__flockfile(stream);
+	/* Can't reopen FILEs which aren't buffered */
+	if (!(stream->flags & __SBUF))
+		goto exit;
 
 	stdio_flags = __stdio_flags(mode, &open_flags);
 	if (stdio_flags == 0)
-		__funlock_return(stream, NULL);
-
-	/* Can't reopen FILEs which aren't buffered */
-	if (!(stream->flags & __SBUF))
 		goto exit;
 
 	fd = open(pathname, open_flags, 0666);
