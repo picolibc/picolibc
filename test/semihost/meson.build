@@ -95,6 +95,9 @@ foreach params : targets
   _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
   _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
+  _link_args_no_flash = target_c_args + get_variable('test_link_args_noflash' + target, test_link_args_noflash)
+  _link_depends_no_flash = get_variable('test_link_depends_noflash' + target, test_link_depends_noflash)
+  _objs_no_flash = [get_variable('crt0_noflash_semihost' + target)]
 
   foreach semihost_test : semihost_tests
     semihost_test_src = semihost_test + '.c'
@@ -106,35 +109,64 @@ foreach params : targets
     _cmd_arg += test_file_name_arg
 
     test(semihost_test + target,
-	 executable(semihost_test + target, [semihost_test_src],
-		    c_args: printf_compile_args_d + _c_args + _cmd_arg,
-		    link_args: printf_link_args_d + _link_args,
-		    objects: _objs,
-		    link_with: _libs,
-		    link_depends:  _link_depends,
-		    include_directories: inc),
-	 args: test_args,
+         executable(semihost_test + target, [semihost_test_src],
+                    c_args: printf_compile_args_d + _c_args + _cmd_arg,
+                    link_args: printf_link_args_d + _link_args,
+                    objects: _objs,
+                    link_with: _libs,
+                    link_depends:  _link_depends,
+                    include_directories: inc),
+         args: test_args,
          depends: bios_bin,
          suite: 'semihost',
-	 env: test_env)
+         env: test_env)
+    if get_option('test-no-flash')
+      test(semihost_test + '-no-flash' + target,
+           executable(semihost_test + '-no-flash' + target, [semihost_test_src],
+                      c_args: printf_compile_args_d + _c_args + _cmd_arg,
+                      link_args: printf_link_args_d + _link_args_no_flash,
+                      objects: _objs_no_flash,
+                      link_with: _libs,
+                      link_depends:  _link_depends_no_flash,
+                      include_directories: inc),
+           args: test_args,
+           depends: bios_bin,
+           suite: 'semihost',
+           env: test_env)
+    endif
   endforeach
 
   foreach semihost_fail_test : semihost_fail_tests
     semihost_fail_test_src = semihost_fail_test + '.c'
 
     test(semihost_fail_test + target,
-	 executable(semihost_fail_test + target, [semihost_fail_test_src],
-		    c_args: _c_args + _cmd_arg,
-		    link_args: _link_args,
-		    objects: _objs,
-		    link_with: _libs,
-		    link_depends:  _link_depends,
-		    include_directories: inc),
-	 args: test_args,
+         executable(semihost_fail_test + target, [semihost_fail_test_src],
+                    c_args: _c_args + _cmd_arg,
+                    link_args: _link_args,
+                    objects: _objs,
+                    link_with: _libs,
+                    link_depends:  _link_depends,
+                    include_directories: inc),
+         args: test_args,
          depends: bios_bin,
          suite: 'semihost',
-	 env: test_env,
-	 should_fail: true)
+         env: test_env,
+         should_fail: true)
+    if get_option('test-no-flash')
+      test(semihost_fail_test + '-no-flash' + target,
+           executable(semihost_fail_test + '-no-flash' + target, [semihost_fail_test_src],
+                      c_args: _c_args + _cmd_arg,
+                      link_args: _link_args_no_flash,
+                      objects: _objs_no_flash,
+                      link_with: _libs,
+                      link_depends:  _link_depends_no_flash,
+                      include_directories: inc),
+           args: test_args,
+           depends: bios_bin,
+           suite: 'semihost',
+           env: test_env,
+           should_fail: true)
+    endif
   endforeach
   
   if has_semihost_args
@@ -142,16 +174,29 @@ foreach params : targets
       semihost_test_src = semihost_test + '.c'
 
       test(semihost_test + target,
-	   executable(semihost_test + target, [semihost_test_src],
-		      c_args: printf_compile_args_d + _c_args + _cmd_arg,
-		      link_args: printf_link_args_d + _link_args,
-		      objects: _objs,
-		      link_with: _libs,
-		      link_depends:  test_link_depends,
-		      include_directories: inc),
+           executable(semihost_test + target, [semihost_test_src],
+                      c_args: printf_compile_args_d + _c_args + _cmd_arg,
+                      link_args: printf_link_args_d + _link_args,
+                      objects: _objs,
+                      link_with: _libs,
+                      link_depends:  test_link_depends,
+                      include_directories: inc),
            depends: bios_bin,
            suite: 'semihost',
-	   env: test_env)
+           env: test_env)
+      if get_option('test-no-flash')
+        test(semihost_test + '-no-flash' + target,
+             executable(semihost_test + '-no-flash' + target, [semihost_test_src],
+                        c_args: printf_compile_args_d + _c_args + _cmd_arg,
+                        link_args: printf_link_args_d + _link_args_no_flash,
+                        objects: _objs_no_flash,
+                        link_with: _libs,
+                        link_depends:  _link_depends_no_flash,
+                        include_directories: inc),
+             depends: bios_bin,
+             suite: 'semihost',
+             env: test_env)
+      endif
     endforeach
   endif
 
