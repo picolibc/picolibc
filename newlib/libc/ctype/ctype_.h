@@ -27,6 +27,7 @@ __get_ctype(enum locale_id id)
 #define _B __CTYPE_BLANK
 #define _T __CTYPE_TAB
 
+/* clang-format off */
 #define _CTYPE_DATA_0_127 \
 	_C,	_C,	_C,	_C,	_C,	_C,	_C,	_C, \
 	_C,	_C|_S, _C|_S, _C|_S,	_C|_S,	_C|_S,	_C,	_C, \

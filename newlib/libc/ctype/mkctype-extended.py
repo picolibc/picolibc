@@ -615,6 +615,7 @@ def dump_table():
  */
 
 /* This file is auto-generated from mkctype-extended.py */
+/* clang-format off */
 ''')   
 #    for val in (10,):
 #        encoding = 'iso8859-%d' % val

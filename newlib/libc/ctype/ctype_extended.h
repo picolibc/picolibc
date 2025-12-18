@@ -34,6 +34,7 @@
  */
 
 /* This file is auto-generated from mkctype-extended.py */
+/* clang-format off */
 
 #define _CTYPE_ISO_8859_1_128_254 \
         _C,      _C,      _C,      _C,      _C,      _C,      _C,      _C, \
