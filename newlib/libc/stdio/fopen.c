@@ -38,6 +38,7 @@
 FILE *
 fopen(const char *pathname, const char *mode)
 {
+	FILE *ret;
 	int fd;
 	int stdio_flags;
 	int open_flags;
@@ -50,5 +51,9 @@ fopen(const char *pathname, const char *mode)
 	if (fd < 0)
 		return NULL;
 
-	return fdopen(fd, mode);
+	ret = fdopen(fd, mode);
+	if (ret == NULL)
+		close(fd);
+
+	return ret;
 }

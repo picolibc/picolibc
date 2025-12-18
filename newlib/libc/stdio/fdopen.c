@@ -50,10 +50,9 @@ fdopen(int fd, const char *mode)
 	/* Allocate file structure and necessary buffers */
 	bf = calloc(1, sizeof(struct __file_bufio) + BUFSIZ);
 
-	if (bf == NULL) {
-		close(fd);
+	if (bf == NULL)
 		return NULL;
-	}
+
         buf = (char *) (bf + 1);
 
         *bf = (struct __file_bufio)
