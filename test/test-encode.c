@@ -77,13 +77,21 @@ static const char *locales[] = {
 
 #define NUM_LOCALE sizeof(locales)/sizeof(locales[0])
 
+#if __SIZEOF_WCHAR_T__ == 2
+#define LAST_CHAR 0xffff
+#else
+#define LAST_CHAR 0xdffff
+#endif
 
 int main(int argc, char **argv)
 {
     int         error = 0;
     int         c, lastc;
     size_t      mb_cur_max;
-    char        mb[4];
+    char        mb[MB_LEN_MAX+1];
+    char        byte2[2];
+    int         nbyte2;
+    int         i2;
     size_t      mb_ret;
     wchar_t     wc;
     FILE        *out = stdout;
@@ -106,15 +114,24 @@ int main(int argc, char **argv)
             continue;
         }
         mb_cur_max = 1;
+        byte2[0] = 0;
+        nbyte2 = 1;
 #ifdef JIS_START
-        if (i >= JIS_START)
+        if (i >= JIS_START) {
             mb_cur_max = 2;
+            if (i == JIS_START) {
+                mb_cur_max = 3;
+                byte2[1] = 0x8f;
+                nbyte2 = 2;
+            }
+        }
 #endif
         switch (mb_cur_max) {
         case 1:
             lastc = 0xff;
             break;
         case 2:
+        case 3:
             lastc = 0xffff;
             break;
         default:
@@ -122,28 +139,54 @@ int main(int argc, char **argv)
             error = 1;
             continue;
         }
-        for (c = 0; c <= lastc; c++) {
+        for (i2 = 0; i2 < nbyte2; i2++) {
+            for (c = 0; c <= lastc; c++) {
+                mbstate_t   ps;
+                size_t      nc;
+                memset(&ps, 0, sizeof(ps));
+
+                if (byte2[i2] != 0) {
+                    mb[0] = byte2[i2];
+                    mb[1] = c >> 8;
+                    mb[2] = c;
+                    nc = 3;
+                } else {
+                    if (c < 0x100) {
+                        mb[0] = c;
+                        nc = 1;
+                    } else {
+                        mb[0] = c >> 8;
+                        mb[1] = c;
+                        nc = 2;
+                    }
+                }
+                unsigned long this_c = (unsigned long) (unsigned) c + (unsigned long) (unsigned char) byte2[i2] * 256UL * 256UL;
+                wc = 0xfffff;
+                mb_ret = mbrtowc(&wc, mb, nc, &ps);
+                if (mb_ret == 1 && this_c >= 0x100)
+                    continue;
+                if (mb_ret > mb_cur_max)
+                    continue;
+                if (wc == 0xfffff)
+                    printf("missing %#08lx in %s ret %zd\n", this_c, encode, mb_ret);
+                fprintf(out, "%-12s->wc %#08lx %#08lx\n", encode, this_c, (unsigned long) wc);
+            }
+        }
+
+        for (wc = 1; ; wc++) {
             mbstate_t   ps;
-            size_t      nc;
+            size_t      s;
             memset(&ps, 0, sizeof(ps));
 
-            if (c < 0x100) {
-                mb[0] = c;
-                nc = 1;
-            } else {
-                mb[0] = c >> 8;
-                mb[1] = c;
-                nc = 2;
-            }
-            wc = 0xfffff;
-            mb_ret = mbrtowc(&wc, mb, nc, &ps);
-            if (mb_ret == 1 && c >= 0x100)
+            mb_ret = wcrtomb(mb, wc, &ps);
+            if (wc == LAST_CHAR)
+                break;
+            if (mb_ret == (size_t)-1)
                 continue;
-            if (mb_ret > mb_cur_max)
-                continue;
-            if (wc == 0xfffff)
-                printf("missing %#04x in %s ret %zd\n", c, encode, mb_ret);
-            fprintf(out, "%-12s %#04x %#05lx\n", encode, c, (unsigned long) wc);
+            fprintf(out, "wc->%-12s %#07lx", encode, (unsigned long) wc);
+            for (s = 0; s < mb_ret; s++)
+                fprintf(out, " %02x", (unsigned char) mb[s]);
+            fprintf(out, "\n");
         }
     }
     fflush(out);
