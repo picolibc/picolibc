@@ -89,7 +89,6 @@ srcs_ctype = [
     'iswxdigit_l.c',
     'isxdigit.c',
     'isxdigit_l.c',
-    'jp2uc.c',
     'toascii.c',
     'toascii_l.c',
     'tolower.c',

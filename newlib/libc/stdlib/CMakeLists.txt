@@ -50,6 +50,7 @@ picolibc_sources(
   btowc.c
   div.c
   drand48.c
+  ejtouc.c
   environ.c
   eprintf.c
   erand48.c
@@ -61,6 +62,7 @@ picolibc_sources(
   imaxabs.c
   imaxdiv.c
   itoa.c
+  jitouc.c
   jrand48.c
   l64a.c
   labs.c
@@ -91,10 +93,14 @@ picolibc_sources(
   sb_charsets.c
   seed48.c
   setenv.c
+  sjtouc.c
   srand.c
   srand48.c
   srandom.c
   system.c
+  uctoji.c
+  uctoej.c
+  uctosj.c
   utoa.c
   wcrtomb.c
   wcsnrtombs.c

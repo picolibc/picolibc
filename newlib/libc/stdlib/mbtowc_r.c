@@ -706,6 +706,9 @@ __cp_103_mbtowc (wchar_t *pwc, const char *s, size_t n,
 
 #ifdef __MB_EXTENDED_CHARSETS_JIS
 
+#include "jis.h"
+
+/* clang-format off */
 typedef enum __packed { ESCAPE, DOLLAR, BRACKET, AT, B, J,
                NUL, JIS_CHAR, OTHER, JIS_C_NUM } JIS_CHAR_TYPE;
 typedef enum __packed { ASCII, JIS, A_ESC, A_ESC_DL, JIS_1, J_ESC, J_ESC_BR,
@@ -740,283 +743,231 @@ static const JIS_ACTION JIS_action_table[JIS_S_NUM][JIS_C_NUM] = {
 /* J_ESC */   { ERROR,   ERROR,    NOOP,     ERROR,   ERROR,   ERROR,   ERROR,   ERROR,   ERROR },
 /* J_ESC_BR */{ ERROR,   ERROR,    ERROR,    ERROR,   MAKE_A,  MAKE_A,  ERROR,   ERROR,   ERROR },
 };
+/* clang-format on */
 
 static int
-__sjis_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__sjis_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  wchar_t dummy;
-  wint_t jischar, uchar;
-  unsigned char *t = (unsigned char *)s;
-  int ch;
-  int i = 0;
+    wchar_t  dummy;
+    wint_t   jischar = 0, uchar;
+    uint8_t *t = (uint8_t *)s;
+    uint8_t *wchb;
+    uint8_t  ch;
+    int      i = 0;
 
-  if (pwc == NULL)
-    pwc = &dummy;
+    if (pwc == NULL)
+        pwc = &dummy;
 
-  if (s == NULL)
-    return 0;  /* not state-dependent */
+    if (s == NULL)
+        return 0; /* not state-dependent */
 
-  if (n == 0)
-    return -2;
+    if (n == 0)
+        return -2;
 
-  ch = t[i++];
-  if (state->__count == 0)
-    {
-      if (_issjis1 (ch))
-	{
-	  state->__value.__wchb[0] = ch;
-	  state->__count = 1;
-	  if (n <= 1)
-	    return -2;
-	  ch = t[i++];
-	}
-      else if (!_issjis1b(ch))
-        {
-          return -1;
+    wchb = state->__value.__wchb;
+    ch = t[i++];
+    if (state->__count == 0) {
+        if (_issjis1(ch)) {
+            wchb[0] = ch;
+            state->__count = 1;
+            if (n <= 1)
+                return -2;
+            ch = t[i++];
+        } else {
+            if (!_issjis1b(ch))
+                return -1;
+            if (ch == '\0') {
+                *pwc = L'\0';
+                return 0;
+            }
+            jischar = ch;
         }
     }
-  if (state->__count == 1)
-    {
-      if (_issjis2 (ch))
-	{
-          jischar = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
-          uchar = __jp2uc(jischar, JP_SJIS);
-	  state->__count = 0;
-          if (uchar == WEOF)
-            {
-              return -1;
-            }
-          *pwc = (wchar_t) uchar;
-	  return i;
-	}
-      else
-	{
-	  return -1;
-	}
+    if (state->__count == 1) {
+        if (!_issjis2(ch))
+            return -1;
+        jischar = ((uint16_t)wchb[0] << 8) | ch;
     }
 
-  uchar = __jp2uc((wint_t) *t, JP_SJIS);
-  if (uchar == WEOF)
-    {
-      return -1;
-    }
+    uchar = __shift_jis_to_unicode(jischar);
+    state->__count = 0;
+    if (uchar == WEOF)
+        return -1;
 
-  *pwc = uchar;
-  if (*t == '\0')
-    return 0;
+    *pwc = (wchar_t) uchar;
 
-  return 1;
+    return i;
 }
 
 static int
-__eucjp_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__eucjp_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  wchar_t dummy;
-  wint_t jischar, uchar;
-  unsigned char *t = (unsigned char *)s;
-  int ch;
-  int i = 0;
+    wchar_t        dummy;
+    uint32_t       jischar = 0;
+    wint_t         uchar;
+    const uint8_t *t = (const uint8_t *)s;
+    uint8_t        ch;
+    uint8_t       *wchb;
+    int            i = 0;
 
-  if (pwc == NULL)
-    pwc = &dummy;
+    if (pwc == NULL)
+        pwc = &dummy;
 
-  if (s == NULL)
-    return 0;
+    if (s == NULL)
+        return 0; /* not state-dependent */
 
-  if (n == 0)
-    return -2;
+    if (n == 0)
+        return -2;
 
-  ch = t[i++];
-  if (state->__count == 0)
-    {
-      if (_iseucjp1 (ch))
-	{
-	  state->__value.__wchb[0] = ch;
-	  state->__count = 1;
-	  if (n <= 1)
-	    return -2;
-	  ch = t[i++];
-	}
-    }
-  if (state->__count == 1)
-    {
-      if (_iseucjp2 (ch))
-	{
-	  if (state->__value.__wchb[0] == 0x8f)
-	    {
-	      state->__value.__wchb[1] = ch;
-	      state->__count = 2;
-	      if (n <= (size_t) i)
-		return -2;
-	      ch = t[i++];
-	    }
-	  else
-	    {
-	      jischar = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)ch;
-              uchar = __jp2uc(jischar, JP_EUCJP);
-	      state->__count = 0;
-              if (uchar == WEOF)
-                {
-                  return -1;
-                }
-              *pwc = (wchar_t) uchar;
-	      return i;
-	    }
-	}
-      else
-	{
-	  return -1;
-	}
-    }
-  if (state->__count == 2)
-    {
-      if (_iseucjp2 (ch))
-	{
-	  jischar = (((wchar_t)state->__value.__wchb[1]) << 8)
-            + (wchar_t)(ch & 0x7f);
-          uchar = __jp2uc(jischar, JP_EUCJP);
-	  state->__count = 0;
-          if (uchar == WEOF)
-            {
-              return -1;
+    wchb = state->__value.__wchb;
+    ch = t[i++];
+    if (state->__count == 0) {
+        if (_iseucjp1(ch)) {
+            wchb[0] = ch;
+            state->__count = 1;
+            if (n <= (size_t)i)
+                return -2;
+            ch = t[i++];
+        } else {
+            if (ch == '\0') {
+                *pwc = L'\0';
+                return 0;
             }
-          *pwc = (wchar_t) uchar;
-	  return i;
-	}
-      else
-	{
-	  return -1;
-	}
+            jischar = ch;
+        }
+    }
+    if (state->__count == 1) {
+        if (_iseucjp2(ch)) {
+            if (wchb[0] == 0x8f) {
+                wchb[1] = ch;
+                state->__count = 2;
+                if (n <= (size_t)i)
+                    return -2;
+                ch = t[i++];
+            } else {
+                jischar = ((uint32_t)wchb[0] << 8) | ch;
+            }
+        } else {
+            return -1;
+        }
+    }
+    if (state->__count == 2) {
+        if (_iseucjp2(ch)) {
+            jischar = ((uint32_t)wchb[0] << 16) | ((uint32_t)wchb[1] << 8) | ch;
+        } else {
+            return -1;
+        }
     }
 
-  uchar = __jp2uc((wint_t)(wchar_t) *t, JP_EUCJP);
+    uchar = __euc_jp_to_unicode(jischar);
 
-  if (uchar == WEOF)
-    {
-      return -1;
-    }
-  *pwc = (wchar_t) uchar;
+    state->__count = 0;
+    if (uchar == WEOF)
+        return -1;
 
-  if (*t == '\0')
-    return 0;
+    *pwc = (wchar_t)uchar;
 
-  return 1;
+    return i;
 }
 
 static int
-__jis_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__jis_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  wchar_t dummy;
-  wint_t jischar, uchar;
-  unsigned char *t = (unsigned char *)s;
-  JIS_STATE curr_state;
-  JIS_ACTION action;
-  JIS_CHAR_TYPE ch;
-  unsigned char *ptr;
-  unsigned int i;
-  int curr_ch;
+    wchar_t        dummy;
+    wint_t         jischar, uchar;
+    const uint8_t *t = (const uint8_t *)s;
+    JIS_STATE      curr_state;
+    JIS_ACTION     action;
+    JIS_CHAR_TYPE  ch;
+    const uint8_t *ptr;
+    size_t         i;
+    uint8_t       *wchb;
+    uint8_t        curr_ch;
 
-  if (pwc == NULL)
-    pwc = &dummy;
+    if (pwc == NULL)
+        pwc = &dummy;
 
-  if (s == NULL)
-    {
-      state->__state = ASCII;
-      return 1;  /* state-dependent */
+    if (s == NULL) {
+        state->__state = ASCII;
+        return 1; /* state-dependent */
     }
 
-  if (n == 0)
-    return -2;
+    if (n == 0)
+        return -2;
 
-  curr_state = state->__state;
-  ptr = t;
+    wchb = state->__value.__wchb;
+    curr_state = state->__state;
+    ptr = t;
 
-  for (i = 0; i < n; ++i)
-    {
-      curr_ch = t[i];
-      switch (curr_ch)
-	{
-	case ESC_CHAR:
-	  ch = ESCAPE;
-	  break;
-	case '$':
-	  ch = DOLLAR;
-	  break;
-	case '@':
-	  ch = AT;
-	  break;
-	case '(':
-	  ch = BRACKET;
-	  break;
-	case 'B':
-	  ch = B;
-	  break;
-	case 'J':
-	  ch = J;
-	  break;
-	case '\0':
-	  ch = NUL;
-	  break;
-	default:
-	  if (_isjis (curr_ch))
-	    ch = JIS_CHAR;
-	  else
-	    ch = OTHER;
-	}
+    for (i = 0; i < n; ++i) {
+        curr_ch = t[i];
+        switch (curr_ch) {
+        case ESC_CHAR:
+            ch = ESCAPE;
+            break;
+        case '$':
+            ch = DOLLAR;
+            break;
+        case '@':
+            ch = AT;
+            break;
+        case '(':
+            ch = BRACKET;
+            break;
+        case 'B':
+            ch = B;
+            break;
+        case 'J':
+            ch = J;
+            break;
+        case '\0':
+            ch = NUL;
+            break;
+        default:
+            if (_isjis(curr_ch))
+                ch = JIS_CHAR;
+            else
+                ch = OTHER;
+        }
 
-      action = JIS_action_table[curr_state][ch];
-      curr_state = JIS_state_table[curr_state][ch];
+        action = JIS_action_table[curr_state][ch];
+        curr_state = JIS_state_table[curr_state][ch];
 
-      switch (action)
-	{
-	case NOOP:
-	  break;
-	case EMPTY:
-	  state->__state = ASCII;
-	  *pwc = (wchar_t)0;
-	  return 0;
-	case COPY_A:
-	  state->__state = ASCII;
-	  *pwc = (wchar_t)*ptr;
-	  return (i + 1);
-	case COPY_J1:
-	  state->__value.__wchb[0] = t[i];
-	  break;
-	case COPY_J2:
-	  state->__state = JIS;
-	  jischar = (((wchar_t)state->__value.__wchb[0]) << 8) + (wchar_t)(t[i]);
-          uchar = __jp2uc(jischar, JP_JIS);
-          if (uchar == WEOF)
-            {
-              return -1;
-            }
-          *pwc = uchar;
-	  return (i + 1);
-	case MAKE_A:
-	  ptr = (unsigned char *)(t + i + 1);
-	  break;
-	case ERROR:
-	default:
-	  return -1;
-	}
-
+        switch (action) {
+        case NOOP:
+            break;
+        case EMPTY:
+            state->__state = ASCII;
+            *pwc = L'\0';
+            return 0;
+        case COPY_A:
+            state->__state = ASCII;
+            *pwc = (wchar_t)*ptr;
+            return i + 1;
+        case COPY_J1:
+            wchb[0] = t[i];
+            break;
+        case COPY_J2:
+            state->__state = JIS;
+            jischar = ((uint16_t)wchb[0] << 8) | t[i];
+            uchar = __jis_to_unicode(jischar);
+            if (uchar == WEOF)
+                return -1;
+            *pwc = uchar;
+            return i + 1;
+        case MAKE_A:
+            ptr = (uint8_t *)(t + i + 1);
+            break;
+        case ERROR:
+        default:
+            return -1;
+        }
     }
 
-  state->__state = curr_state;
-  return -2;  /* n < bytes needed */
+    state->__state = curr_state;
+    return -2; /* n < bytes needed */
 }
+
 #endif /* __MB_EXTENDED_CHARSETS_JIS */
 
 const mbtowc_p __mbtowc[locale_END - locale_BASE] = {

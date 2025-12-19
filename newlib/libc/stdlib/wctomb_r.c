@@ -208,136 +208,114 @@ __ucs4swap_wctomb (
 #endif /* __MB_EXTENDED_CHARSETS_UCS */
 
 #ifdef __MB_EXTENDED_CHARSETS_JIS
+#include "jis.h"
 
 static int
-__sjis_wctomb (
-        char          *s,
-        wchar_t        _wchar,
-        mbstate_t     *state)
+__sjis_wctomb(char *s, wchar_t wchar, mbstate_t *state)
 {
-  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_SJIS);
+    (void)state;
+    if (s == NULL)
+        return 0; /* not state-dependent */
 
-  unsigned char char2 = (unsigned char)jischar;
-  unsigned char char1 = (unsigned char)(jischar >> 8);
+    uint16_t jischar = __unicode_to_shift_jis(wchar);
 
-  (void) state;
-  if (s == NULL)
-    return 0;  /* not state-dependent */
+    if (jischar == INVALID_JIS)
+        return -1;
 
-  if (char1 != 0x00)
-    {
-    /* first byte is non-zero..validate multi-byte char */
-      if (_issjis1(char1) && _issjis2(char2))
-	{
-	  *s++ = (char)char1;
-	  *s = (char)char2;
-	  return 2;
-	}
-      else
-	{
-	  return -1;
-	}
+    uint8_t  char2 = (uint8_t)jischar;
+    uint8_t  char1 = (uint8_t)(jischar >> 8);
+
+    if (char1 != 0x00) {
+        s[0] = (char) char1;
+        s[1] = (char) char2;
+        return 2;
+    } else {
+        s[0] = (char) char2;
+        return 1;
     }
-  *s = (char) jischar;
-  return 1;
 }
 
 static int
-__eucjp_wctomb (
-        char          *s,
-        wchar_t        _wchar,
-        mbstate_t     *state)
+__eucjp_wctomb(char *s, wchar_t wchar, mbstate_t *state)
 {
-  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_EUCJP);
+    (void)state;
+    if (s == NULL)
+        return 0; /* not state-dependent */
 
-  unsigned char char2 = (unsigned char)jischar;
-  unsigned char char1 = (unsigned char)(jischar >> 8);
+    uint32_t jischar = __unicode_to_euc_jp(wchar);
 
-  (void) state;
-  if (s == NULL)
-    return 0;  /* not state-dependent */
+    if (jischar == INVALID_JIS)
+        return -1;
 
-  if (char1 != 0x00)
-    {
-    /* first byte is non-zero..validate multi-byte char */
-      if (_iseucjp1 (char1) && _iseucjp2 (char2))
-	{
-	  *s++ = (char)char1;
-	  *s = (char)char2;
-	  return 2;
-	}
-      else if (_iseucjp2 (char1) && _iseucjp2 (char2 | 0x80))
-	{
-	  *s++ = (char)0x8f;
-	  *s++ = (char)char1;
-	  *s = (char)(char2 | 0x80);
-	  return 3;
-	}
-      else
-	{
-	  return -1;
-	}
+    uint8_t char2 = (uint8_t)jischar;
+    uint8_t char1 = (uint8_t)(jischar >> 8);
+    uint8_t char0 = (uint8_t)(jischar >> 16);
+
+    if (char0 != 0x00) {
+        s[0] = (char) char0;
+        s[1] = (char) char1;
+        s[2] = (char) char2;
+        return 3;
+    } else if (char1 != 0x00) {
+        s[0] = (char) char1;
+        s[1] = (char) char2;
+        return 2;
+    } else {
+        s[0] = (char) char2;
+        return 1;
     }
-  *s = (char) jischar;
-  return 1;
 }
 
 static int
-__jis_wctomb (
-        char          *s,
-        wchar_t        _wchar,
-        mbstate_t     *state)
+__jis_wctomb(char *s, wchar_t wchar, mbstate_t *state)
 {
-  uint16_t jischar = __uc2jp((wint_t) _wchar, JP_JIS);
-  unsigned char char2 = (unsigned char)jischar;
-  unsigned char char1 = (unsigned char)(jischar >> 8);
-  int cnt = 0;
+    if (s == NULL)
+        return 1; /* state-dependent */
 
-  if (s == NULL)
-    return 1;  /* state-dependent */
+    uint16_t      jischar = __unicode_to_jis(wchar);
 
-  if (char1 != 0x00)
-    {
-    /* first byte is non-zero..validate multi-byte char */
-      if (_isjis (char1) && _isjis (char2))
-	{
-	  if (state->__state == 0)
-	    {
-	      /* must switch from ASCII to JIS state */
-	      state->__state = 1;
-	      *s++ = ESC_CHAR;
-	      *s++ = '$';
-	      *s++ = 'B';
-	      cnt = 3;
-	    }
-	  *s++ = (char)char1;
-	  *s = (char)char2;
-	  return cnt + 2;
-	}
-      return -1;
+    if (jischar == INVALID_JIS)
+        return -1;
+
+    uint8_t char2 = (uint8_t)jischar;
+    uint8_t char1 = (uint8_t)(jischar >> 8);
+    int     cnt = 0;
+
+    if (char1 != 0x00) {
+        /* first byte is non-zero; multi-byte char */
+        if (state->__state == 0) {
+            /* must switch from ASCII to JIS state */
+            state->__state = 1;
+            *s++ = ESC_CHAR;
+            *s++ = '$';
+            *s++ = 'B';
+            cnt = 3;
+        }
+        s[0] = (char) char1;
+        s[1] = (char) char2;
+        return cnt + 2;
+    } else {
+        /* first byte zero; single-byte char */
+        if (state->__state != 0) {
+            /* must switch from JIS to ASCII state */
+            state->__state = 0;
+            *s++ = ESC_CHAR;
+            *s++ = '(';
+            *s++ = 'B';
+            cnt = 3;
+        }
+        s[0] = (char) char2;
+        return cnt + 1;
     }
-  if (state->__state != 0)
-    {
-      /* must switch from JIS to ASCII state */
-      state->__state = 0;
-      *s++ = ESC_CHAR;
-      *s++ = '(';
-      *s++ = 'B';
-      cnt = 3;
-    }
-  *s = (char)char2;
-  return cnt + 1;
 }
 #endif /* __MB_EXTENDED_CHARSETS_JIS */
 
 #ifdef __MB_EXTENDED_CHARSETS_ISO
 
 static int
-___iso_wctomb (char *s, wchar_t _wchar, enum locale_id id,
+___iso_wctomb (char *s, wchar_t wchar, enum locale_id id,
 	       mbstate_t *state)
 {
-  wint_t wchar = _wchar;
-
   (void) state;
   if (s == NULL)
     return 0;
@@ -359,7 +337,7 @@ ___iso_wctomb (char *s, wchar_t _wchar, enum locale_id id,
         return -1;
     }
 
-  if ((size_t)wchar >= 0x100)
+  if (wchar >= 0x100)
     {
       return -1;
     }
@@ -482,11 +460,9 @@ static int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
 #endif
 
 static int
-___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
+___cp_wctomb (char *s, wchar_t wchar, int cp_idx,
 	      mbstate_t *state)
 {
-  wint_t wchar = _wchar;
-
   (void) state;
   if (s == NULL)
     return 0;
@@ -510,7 +486,7 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
         }
     }
 
-  if ((size_t)wchar >= 0x100)
+  if (wchar >= 0x100)
     {
       return -1;
     }
