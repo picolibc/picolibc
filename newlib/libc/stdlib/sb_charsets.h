@@ -225,6 +225,22 @@ const uint16_t __iso_8859_conv[14][0x60] = {
     0x111, 0x144, 0xf2, 0xf3, 0xf4, 0x151, 0xf6, 0x15b,
     0x171, 0xf9, 0xfa, 0xfb, 0xfc, 0x119, 0x21b, 0xff },
 };
+const uint16_t __iso_8859_max[14] = {
+    [locale_ISO_8859_2 - locale_ISO_8859_2] = 0x2dd,
+    [locale_ISO_8859_3 - locale_ISO_8859_2] = 0x2d9,
+    [locale_ISO_8859_4 - locale_ISO_8859_2] = 0x2db,
+    [locale_ISO_8859_5 - locale_ISO_8859_2] = 0x2116,
+    [locale_ISO_8859_6 - locale_ISO_8859_2] = 0x652,
+    [locale_ISO_8859_7 - locale_ISO_8859_2] = 0x20af,
+    [locale_ISO_8859_8 - locale_ISO_8859_2] = 0x2017,
+    [locale_ISO_8859_9 - locale_ISO_8859_2] = 0x15f,
+    [locale_ISO_8859_10 - locale_ISO_8859_2] = 0x2015,
+    [locale_ISO_8859_11 - locale_ISO_8859_2] = 0xe5b,
+    [locale_ISO_8859_13 - locale_ISO_8859_2] = 0x201e,
+    [locale_ISO_8859_14 - locale_ISO_8859_2] = 0x1ef3,
+    [locale_ISO_8859_15 - locale_ISO_8859_2] = 0x20ac,
+    [locale_ISO_8859_16 - locale_ISO_8859_2] = 0x20ac,
+};
 #endif /* __MB_EXTENDED_CHARSETS_ISO */
 
 #ifdef __MB_EXTENDED_CHARSETS_WINDOWS
@@ -693,6 +709,35 @@ const uint16_t __cp_conv[27][0x80] = {
     0x425, 0x418, 0x419, 0x41a, 0x41b, 0x41c, 0x41d, 0x41e,
     0x41f, 0x42f, 0x420, 0x421, 0x422, 0x423, 0x416, 0x412,
     0x42c, 0x42b, 0x417, 0x428, 0x42d, 0x429, 0x427, 0x42a },
+};
+const uint16_t __cp_max[27] = {
+    [locale_CP437 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP720 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP737 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP775 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP850 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP852 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP855 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP857 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP858 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP862 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP866 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP874 - locale_WINDOWS_BASE] = 0x20ac,
+    [locale_CP1125 - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_CP1250 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1251 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1252 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1253 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1254 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1255 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1256 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1257 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_CP1258 - locale_WINDOWS_BASE] = 0x2122,
+    [locale_KOI8_R - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_KOI8_U - locale_WINDOWS_BASE] = 0x25a0,
+    [locale_GEORGIAN_PS - locale_WINDOWS_BASE] = 0x2122,
+    [locale_PT154 - locale_WINDOWS_BASE] = 0x2116,
+    [locale_KOI8_T - locale_WINDOWS_BASE] = 0x2122,
 };
 #endif /* __MB_EXTENDED_CHARSETS_WINDOWS */
 

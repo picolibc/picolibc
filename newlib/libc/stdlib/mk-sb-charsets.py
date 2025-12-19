@@ -313,6 +313,7 @@ def dump_range(encoding, base, start, end):
     name = encoding.replace('-', '_')
     print("  [ locale_%s - locale_%s ] = " % (name, base.replace('-', '_')))
     print("  { ", end="")
+    max_ucode = 0
     for code in range(start, end + 1):
         if code == end:
             e = ' },\n'
@@ -325,6 +326,9 @@ def dump_range(encoding, base, start, end):
             print("%d" % ucode, end = e)
         else:
             print("%#x" % ucode, end = e)
+        if ucode > max_ucode:
+            max_ucode = ucode
+    return max_ucode
 
 def dump_table():
     print('''/*
@@ -364,6 +368,7 @@ def dump_table():
 
 /* This file is auto-generated from mk-sb-charsets.py */
 ''')   
+    max_ucode_iso = {}
     print('''#ifdef __MB_EXTENDED_CHARSETS_ISO
 /* Tables for the ISO-8859-x to UTF conversion.  The first index into the
    table is a value computed from locale id - locale_ISO_8859-2 (ISO-8859-1
@@ -373,10 +378,17 @@ def dump_table():
 const uint16_t __iso_8859_conv[14][0x60] = {''')
     for val in (2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 14, 15, 16):
         encoding = 'ISO-8859-%d' % val
-        dump_range(encoding, 'ISO_8859_2', 0xa0, 0xff)
+        max = dump_range(encoding, 'ISO_8859_2', 0xa0, 0xff)
+        max_ucode_iso['locale_%s - locale_%s' % (encoding.replace('-','_'), 'ISO_8859_2')] = max
+    print('};')
+    print('const uint16_t __iso_8859_max[14] = {')
+    for max in max_ucode_iso:
+        print("    [%s] = %#x," % (max, max_ucode_iso[max]))
     print('};')
     print('#endif /* __MB_EXTENDED_CHARSETS_ISO */')
     print('')
+    
+    max_ucode_cp = {}
     print('''#ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 /* Tables for the Windows default singlebyte ANSI codepage conversion.
    The first index into the table is a value computed from locale id
@@ -408,7 +420,12 @@ const uint16_t __cp_conv[27][0x80] = {''')
         else:
             name = cp
                 
-        dump_range(encoding, 'WINDOWS_BASE', 0x80, 0xff)
+        max = dump_range(encoding, 'WINDOWS_BASE', 0x80, 0xff)
+        max_ucode_cp['locale_%s - locale_%s' % (encoding.replace('-','_'), 'WINDOWS_BASE')] = max
+    print('};')
+    print('const uint16_t __cp_max[27] = {')
+    for max in max_ucode_cp:
+        print("    [%s] = %#x," % (max, max_ucode_cp[max]))
     print('};')
     print('#endif /* __MB_EXTENDED_CHARSETS_WINDOWS */')
     print('')

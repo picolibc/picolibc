@@ -27,10 +27,12 @@ wctomb_f __utf8_wctomb;
 
 #ifdef __MB_EXTENDED_CHARSETS_ISO
 extern const uint16_t __iso_8859_conv[14][0x60];
+extern const uint16_t __iso_8859_max[14];
 #endif
 
 #ifdef __MB_EXTENDED_CHARSETS_WINDOWS
-extern const uint16_t __cp_conv[][0x80];
+extern const uint16_t __cp_conv[27][0x80];
+extern const uint16_t __cp_max[27];
 #endif
 
 #endif

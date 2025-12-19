@@ -347,6 +347,9 @@ ___iso_wctomb (char *s, wchar_t _wchar, enum locale_id id,
     {
         unsigned char mb;
 
+        if (wchar > __iso_8859_max[id - locale_ISO_8859_2])
+            return -1;
+
         for (mb = 0; mb < 0x60; ++mb)
 	    if (__iso_8859_conv[id - locale_ISO_8859_2][mb] == _wchar)
               {
@@ -484,6 +487,9 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
       if (cp_idx >= 0)
 	{
 	  unsigned char mb;
+
+          if (wchar > __cp_max[cp_idx])
+            return -1;
 
 	  for (mb = 0; mb < 0x80; ++mb)
 	    if (__cp_conv[cp_idx][mb] == _wchar)
