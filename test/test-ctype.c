@@ -181,7 +181,7 @@ int main(void) {
                     continue;
                 }
                 if (mb_ret == (size_t) -2) {
-                    if (!strcmp(locales[l], "C.SJIS"))
+                    if (!strcmp(locales[l], "C.SHIFT-JIS") || !strcmp(locales[l], "C.EUC-JP"))
                         continue;
                 }
                 if (mb_ret == 0 && c == 0)
