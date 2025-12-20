@@ -51,10 +51,18 @@ __ssp_redirect_wc(wchar_t *, wmemset, \
     (wchar_t *__buf, wchar_t __src, size_t __wlen), \
     (__buf, __src, __wlen), 1, __ssp_bos0)
 
+#ifndef __MB_LEN_MAX
+# ifdef __MB_CAPABLE
+#  define __MB_LEN_MAX   8
+# else
+#  define __MB_LEN_MAX   1
+# endif
+#endif
+
 __ssp_decl(size_t, wcrtomb, (char *__buf, wchar_t __src, mbstate_t *__ps))
 {
   if (__buf != NULL && __src != L'\0')
-    __ssp_check(__buf, sizeof(wchar_t), __ssp_bos);
+    __ssp_check(__buf, __MB_LEN_MAX, __ssp_bos);
   return __ssp_real_wcrtomb (__buf, __src, __ps);
 }
 
