@@ -154,7 +154,7 @@ __utf8_mbtowc (
           |    ((wchar_t)(state->__value.__wchb[1] & 0x3f) << 6)
 	|     (wchar_t)(ch & 0x3f);
       /* Check for surrogates */
-      if (0xd800 <= tmp && tmp <= 0xdfff)
+      if (0xd800 <= (uwchar_t) tmp && (uwchar_t) tmp <= 0xdfff)
         {
           return -1;
         }

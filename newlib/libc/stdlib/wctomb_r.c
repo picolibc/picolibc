@@ -55,7 +55,7 @@ __utf8_wctomb (
     {
       state->__count = 0;
       /* Check for low surrogate */
-      if (0xdc00 <= wchar && wchar <= 0xdfff)
+      if (0xdc00 <= (uwchar_t)wchar && (uwchar_t)wchar <= 0xdfff)
         {
             uint32_t tmp;
             /* Second half of a surrogate pair.  Reconstruct the full
@@ -85,14 +85,14 @@ __utf8_wctomb (
     }
   if (wchar >= 0x800
 #if __SIZEOF_WCHAR_T__ > 2
-      && wchar <= 0xffff
+      && (uwchar_t)wchar <= 0xffff
 #endif
       )
     {
-      if (wchar >= 0xd800 && wchar <= 0xdfff)
+      if ((uwchar_t) wchar >= 0xd800 && (uwchar_t) wchar <= 0xdfff)
 	{
 #if __SIZEOF_WCHAR_T__ == 2
-          if (wchar <= 0xdbff)
+          if ((uwchar_t) wchar <= 0xdbff)
             {
               /* First half of a surrogate pair.  Store the state and
                  return 0. */
@@ -110,7 +110,7 @@ __utf8_wctomb (
       return 3;
     }
 #if __SIZEOF_WCHAR_T__ == 4
-  if (wchar >= (wchar_t) 0x10000 && wchar <= (wchar_t) 0x10ffff)
+  if ((uwchar_t)wchar >= (uwchar_t) 0x10000 && (uwchar_t) wchar <= (uwchar_t) 0x10ffff)
     {
       *s++ = 0xf0 | ((wchar & 0x1c0000) >> 18);
       *s++ = 0x80 | ((wchar &  0x3f000) >> 12);
@@ -147,7 +147,7 @@ __ucs2_wctomb (
 
     (void) state;
     /* Surrogates are invalid in UCS-2 */
-    if (wchar >= 0xd800 && wchar <= 0xdfff)
+    if ((uwchar_t) wchar >= 0xd800 && (uwchar_t) wchar <= 0xdfff)
         return -1;
 
     memcpy((void *) s, &uchar, 2);
@@ -164,7 +164,7 @@ __ucs2swap_wctomb (
 
     (void) state;
     /* Surrogates are invalid in UCS-2 */
-    if (wchar >= 0xd800 && wchar <= 0xdfff)
+    if ((uwchar_t)wchar >= 0xd800 && (uwchar_t)wchar <= 0xdfff)
         return -1;
 
     memcpy((void *) s, &uchar, 2);
@@ -181,7 +181,7 @@ __ucs4_wctomb (
 
     (void) state;
     /* Surrogates are invalid in UCS-4 */
-    if (wchar >= 0xd800 && wchar <= 0xdfff)
+    if ((uwchar_t)wchar >= 0xd800 && (uwchar_t)wchar <= 0xdfff)
         return -1;
 
     memcpy((void *) s, &uchar, 4);
@@ -198,7 +198,7 @@ __ucs4swap_wctomb (
 
     (void) state;
     /* Surrogates are invalid in UCS-4 */
-    if (wchar >= 0xd800 && wchar <= 0xdfff)
+    if ((uwchar_t)wchar >= 0xd800 && (uwchar_t)wchar <= 0xdfff)
         return -1;
 
     memcpy((void *) s, &uchar, 4);
@@ -347,11 +347,11 @@ ___iso_wctomb (char *s, wchar_t _wchar, enum locale_id id,
     {
         unsigned char mb;
 
-        if (wchar > __iso_8859_max[id - locale_ISO_8859_2])
+        if ((uwchar_t) wchar > __iso_8859_max[id - locale_ISO_8859_2])
             return -1;
 
         for (mb = 0; mb < 0x60; ++mb)
-	    if (__iso_8859_conv[id - locale_ISO_8859_2][mb] == _wchar)
+	    if (__iso_8859_conv[id - locale_ISO_8859_2][mb] == (uwchar_t) wchar)
               {
 		*s = (char) (mb + 0xa0);
 		return 1;
@@ -472,6 +472,15 @@ static int __iso_8859_16_wctomb (char *s, wchar_t _wchar,
 
 #ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 
+#ifdef __AVR__
+/* The avr compiler gets confused by the use of __cp_conv below */
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#endif
+#endif
+
 static int
 ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 	      mbstate_t *state)
@@ -488,17 +497,17 @@ ___cp_wctomb (char *s, wchar_t _wchar, int cp_idx,
 	{
 	  unsigned char mb;
 
-          if (wchar > __cp_max[cp_idx])
+          if ((uwchar_t) wchar > __cp_max[cp_idx])
             return -1;
 
 	  for (mb = 0; mb < 0x80; ++mb)
-	    if (__cp_conv[cp_idx][mb] == _wchar)
+            if (__cp_conv[cp_idx][mb] == (uwchar_t) wchar)
 	      {
 		*s = (char) (mb + 0x80);
 		return 1;
 	      }
 	  return -1;
-	}
+        }
     }
 
   if ((size_t)wchar >= 0x100)

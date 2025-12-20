@@ -17,6 +17,12 @@ char *	_gcvt (double , int , char *, char, int);
 #include <wchar.h>
 #endif
 
+#ifdef __AVR__
+typedef unsigned int uwchar_t;
+#else
+typedef wchar_t uwchar_t;
+#endif
+
 mbtowc_f __ascii_mbtowc;
 wctomb_f __ascii_wctomb;
 
