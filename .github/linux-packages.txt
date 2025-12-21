@@ -31,6 +31,7 @@ libc6-dev-i386
 lib32stdc++-15-dev
 lld
 clang
+llvm-libunwind1
 qemu-system-x86
 qemu-system-arm
 qemu-system-misc
