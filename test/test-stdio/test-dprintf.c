@@ -54,39 +54,52 @@
         }                                            \
     } while (0)
 
-#define TEST_DATA "test dprintf\n"
+#define STRING_PART                                      \
+    " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLM"    \
+    "NOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+
+static const char *strings[] = {
+    "test dprintf\n",
+    STRING_PART STRING_PART STRING_PART STRING_PART,
+};
+
+#define NSTRING (sizeof(strings) / sizeof(strings[0]))
 
 int
 main(void)
 {
-    /* Create test file */
-    int fd = open(TEST_FILE_NAME, O_CREAT | O_WRONLY | O_TRUNC, 0666);
-    check(fd >= 0, "create file failed");
+    size_t s;
 
-    /* Write test data using dprintf */
-    int ret = dprintf(fd, "%s", TEST_DATA);
+    for (s = 0; s < NSTRING; s++) {
+        /* Create test file */
+        int fd = open(TEST_FILE_NAME, O_CREAT | O_WRONLY | O_TRUNC, 0666);
+        check(fd >= 0, "create file failed");
 
-    /* Verify that dprint returns expected value */
-    check(ret >= 0 && (size_t)ret == strlen(TEST_DATA), "dprint failed");
+        /* Write test data using dprintf */
+        int ret = dprintf(fd, "%s", strings[s]);
 
-    /* Close the test file, re-open using fopen */
-    close(fd);
-    FILE *f = fopen(TEST_FILE_NAME, "r");
+        /* Verify that dprint returns expected value */
+        check(ret >= 0 && (size_t)ret == strlen(strings[s]), "dprint failed");
 
-    char  buf[512];
-    check(f != NULL, "re-open file");
+        /* Close the test file, re-open using fopen */
+        close(fd);
+        FILE       *f = fopen(TEST_FILE_NAME, "r");
 
-    /* Read test data using fread */
-    ret = fread(buf, sizeof(char), sizeof(buf) / sizeof(buf[0]), f);
-    check(ret >= 0 && (size_t)ret == strlen(TEST_DATA), "fread failed");
-    buf[ret] = '\0';
+        static char buf[512];
+        check(f != NULL, "re-open file");
 
-    /* Verify file contains expected data */
-    check(strcmp(buf, TEST_DATA) == 0, "fread contents incorrect");
+        /* Read test data using fread */
+        ret = fread(buf, sizeof(char), sizeof(buf) / sizeof(buf[0]), f);
+        check(ret >= 0 && (size_t)ret == strlen(strings[s]), "fread failed");
+        buf[ret] = '\0';
 
-    /* Clean up */
-    fclose(f);
-    remove(TEST_FILE_NAME);
+        /* Verify file contains expected data */
+        check(strcmp(buf, strings[s]) == 0, "fread contents incorrect");
+
+        /* Clean up */
+        fclose(f);
+        remove(TEST_FILE_NAME);
+    }
     printf("test-dprintf success\n");
     return 0;
 }
