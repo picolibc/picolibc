@@ -224,16 +224,14 @@ int fmag_of_error (float, float);
       fprintf(f," one_line_type %s_vec[] = {\n", x);\
 }
 
-#define VECCLOSE(f,name,args)\
-{\
-  fprintf(f,"0,};\n");      \
-   fprintf(f,"test_%s(int m)   {run_vector_1(m,%s_vec,(char *)(%s),\"%s\",\"%s\");   }	\n",\
-	   name,\
-	   name,name,name,args);\
-	    fclose(f);\
-}
-
-
+#define VECCLOSE(f,name,args) do {                              \
+        fprintf(f,"0,};\n");                                    \
+        fprintf(f,"test_%s(int m)   {run_vector_1(m,%s_vec,"    \
+                "(char *)(%s),\"%s\",\"%s\");   }	\n",    \
+                name,                                           \
+                name,name,name,args);                           \
+        fclose(f);                                              \
+    } while(0)
 
 typedef TEST_CONST struct 
 {
