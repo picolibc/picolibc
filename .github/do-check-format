@@ -1,0 +1,3 @@
+#!/bin/sh
+git config --global --add safe.directory /picolibc
+git ls-files | xargs clang-format -n --Werror
