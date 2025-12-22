@@ -101,7 +101,19 @@ picocrt_variants = [
     'suffix': '-semihost',
     'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
     'src': src_picocrt,
-  }
+  },
+  {
+    'name': 'noflash-semihost',
+    'suffix': '-noflash-semihost',
+    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'noflash-hosted',
+    'suffix': '-noflash-hosted',
+    'c_args': ['-DNO_FLASH', '-DCRT0_EXIT'],
+    'src': src_picocrt,
+  },
 ]
 
 # Use the semihost version of crt0 for testing as that
