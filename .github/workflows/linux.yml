@@ -85,8 +85,7 @@ jobs:
           docker images -a $IMAGE
       - name: CMake test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE bash --login -c "${{ matrix.test }} ${{ matrix.cmake_flags }}"
-
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
   minsize-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -121,8 +120,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE bash --login -c "${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize"
-
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   release-linux:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -157,5 +155,4 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE bash --login -c "${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release"
-
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
