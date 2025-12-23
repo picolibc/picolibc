@@ -113,6 +113,7 @@ struct stat {
 #endif
     off_t st_size;
 #if defined(__linux)
+#define _STAT_HAS_ST_BLKSIZE
     blksize_t       st_blksize;
     blkcnt_t        st_blocks;
     struct timespec st_atim;
@@ -129,6 +130,7 @@ struct stat {
     struct timespec st_atim;
     struct timespec st_mtim;
     struct timespec st_ctim;
+#define _STAT_HAS_ST_BLKSIZE
     blksize_t       st_blksize;
     blkcnt_t        st_blocks;
 #else
@@ -141,6 +143,7 @@ struct stat {
     struct timespec st_atim;
     struct timespec st_mtim;
     struct timespec st_ctim;
+#define _STAT_HAS_ST_BLKSIZE
     blksize_t       st_blksize;
     blkcnt_t        st_blocks;
 #if !defined(__rtems__)
@@ -175,6 +178,7 @@ struct stat64 {
     unsigned int __pad2;
     __off64_t    st_size; /* Size of file, in bytes.  */
 #endif
+#define _STAT64_HAS_ST_BLKSIZE
     __blksize_t  st_blksize; /* Optimal block size for I/O.  */
     __blkcnt64_t st_blocks;  /* Nr. 512-byte blocks allocated.  */
 #if defined(__svr4__) && !defined(__PPC__) && !defined(__sun__)

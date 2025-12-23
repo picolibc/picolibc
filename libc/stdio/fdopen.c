@@ -42,20 +42,23 @@ fdopen(int fd, const char *mode)
     int                  open_flags;
     struct __file_bufio *bf;
     char                *buf;
+    size_t               buf_size;
 
     stdio_flags = __stdio_flags(mode, &open_flags);
     if (stdio_flags == 0)
         return NULL;
 
+    buf_size = bufio_get_buf_size(fd);
+
     /* Allocate file structure and necessary buffers */
-    bf = calloc(1, sizeof(struct __file_bufio) + BUFSIZ);
+    bf = calloc(1, sizeof(struct __file_bufio) + buf_size);
 
     if (bf == NULL)
         return NULL;
 
     buf = (char *)(bf + 1);
 
-    *bf = (struct __file_bufio)FDEV_SETUP_POSIX(fd, buf, BUFSIZ, stdio_flags, __BFALL);
+    *bf = (struct __file_bufio)FDEV_SETUP_POSIX(fd, buf, buf_size, stdio_flags, __BFALL);
 
     if (open_flags & O_APPEND)
         (void)fseeko(&(bf->xfile.cfile.file), 0, SEEK_END);

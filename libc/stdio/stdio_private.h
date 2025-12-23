@@ -48,6 +48,9 @@
 #include <limits.h>
 #include <stdio-bufio.h>
 #include <sys/lock.h>
+#ifdef __FSTAT_BUFSIZ
+#include <sys/stat.h>
+#endif
 
 struct __file_str {
     struct __file file;  /* main file struct */
@@ -200,6 +203,20 @@ bufio_close(struct __file_bufio *bf)
 
 #define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)                        \
     FDEV_SETUP_BUFIO(fd, buf, size, read, write, lseek, close, rwflags, bflags)
+
+#if defined(__FSTAT_BUFSIZ) && defined(_STAT_HAS_ST_BLKSIZE)
+static inline size_t
+bufio_get_buf_size(int fd)
+{
+    struct stat stat;
+    if (fstat(fd, &stat) == 0 && stat.st_blksize > 0) {
+        return stat.st_blksize;
+    }
+    return BUFSIZ;
+}
+#else
+#define bufio_get_buf_size(fd) (BUFSIZ)
+#endif
 
 int __stdio_flags(const char *mode, int *optr);
 

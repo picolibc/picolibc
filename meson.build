@@ -1504,6 +1504,7 @@ conf_data.set('__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL',
 conf_data.set('__IO_LONG_LONG', io_long_long)
 conf_data.set('__IO_MINIMAL_LONG_LONG', minimal_io_long_long)
 conf_data.set('__FAST_BUFIO', fast_bufio)
+conf_data.set('__FSTAT_BUFSIZ', get_option('fstat-bufsiz'))
 conf_data.set('__IO_POS_ARGS', io_pos_args)
 conf_data.set('__IO_C99_FORMATS', io_c99_formats)
 conf_data.set('__IO_FLOAT_EXACT', io_float_exact)
