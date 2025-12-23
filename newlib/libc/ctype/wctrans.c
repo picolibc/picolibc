@@ -23,26 +23,26 @@
    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
    LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
    ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
    SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /*
 FUNCTION
-	<<wctrans>>, <<wctrans_l>>---get wide-character translation type
+        <<wctrans>>, <<wctrans_l>>---get wide-character translation type
 
 INDEX
-	wctrans
+        wctrans
 
 INDEX
-	wctrans_l
+        wctrans_l
 
 SYNOPSIS
-	#include <wctype.h>
-	wctrans_t wctrans(const char *<[c]>);
+        #include <wctype.h>
+        wctrans_t wctrans(const char *<[c]>);
 
-	#include <wctype.h>
-	wctrans_t wctrans_l(const char *<[c]>, locale_t <[locale]>);
+        #include <wctype.h>
+        wctrans_t wctrans_l(const char *<[c]>, locale_t <[locale]>);
 
 
 DESCRIPTION
@@ -73,15 +73,14 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 wctrans_t
-wctrans (const char *c)
+wctrans(const char *c)
 {
-  if (!strcmp (c, "tolower"))
-    return WCT_TOLOWER;
-  else if (!strcmp (c, "toupper"))
-    return WCT_TOUPPER;
-  else
-    {
-      errno = EINVAL;
-      return 0;
+    if (!strcmp(c, "tolower"))
+        return WCT_TOLOWER;
+    else if (!strcmp(c, "toupper"))
+        return WCT_TOUPPER;
+    else {
+        errno = EINVAL;
+        return 0;
     }
 }

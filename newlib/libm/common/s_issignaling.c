@@ -40,7 +40,7 @@
 int
 __issignaling64(__float64 x)
 {
-	return issignaling64_inline(x);
+    return issignaling64_inline(x);
 }
 
 _MATH_ALIAS_i_d(__issignaling)

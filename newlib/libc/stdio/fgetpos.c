@@ -20,14 +20,14 @@ FUNCTION
 <<fgetpos>>---record position in a stream or file
 
 INDEX
-	fgetpos
+        fgetpos
 INDEX
-	_fgetpos_r
+        _fgetpos_r
 
 SYNOPSIS
-	#include <stdio.h>
-	int fgetpos(FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
-	int fgetpos( FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
+        #include <stdio.h>
+        int fgetpos(FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
+        int fgetpos( FILE *restrict <[fp]>, fpos_t *restrict <[pos]>);
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much
@@ -63,15 +63,12 @@ No supporting OS subroutines are required.
 #include <stdio_private.h>
 
 int
-fgetpos (
-       FILE *__restrict fp,
-       _fpos_t *__restrict pos)
+fgetpos(FILE * __restrict fp, _fpos_t * __restrict pos)
 {
-  *pos = ftell ( fp);
+    *pos = ftell(fp);
 
-  if (*pos != -1)
-    {
-      return 0;
+    if (*pos != -1) {
+        return 0;
     }
-  return 1;
+    return 1;
 }

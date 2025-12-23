@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -56,15 +56,15 @@ DESCRIPTION
 
 RETURNS
         @ifnottex
-        These functions return the complex arc hyperbolic cosine value, 
-        in the range of a half-strip of non-negative values along the 
-        real axis and in the interval [-i * pi, +i * pi] along the 
+        These functions return the complex arc hyperbolic cosine value,
+        in the range of a half-strip of non-negative values along the
+        real axis and in the interval [-i * pi, +i * pi] along the
         imaginary axis.
         @end ifnottex
         @tex
-        These functions return the complex arc hyperbolic cosine value, 
-        in the range of a half-strip of non-negative values along the 
-        real axis and in the interval [$-i\pi$, $+i\pi$] along the 
+        These functions return the complex arc hyperbolic cosine value,
+        in the range of a half-strip of non-negative values along the
+        real axis and in the interval [$-i\pi$, $+i\pi$] along the
         imaginary axis.
         @end tex
 
@@ -76,18 +76,17 @@ QUICKREF
 
 */
 
-
 #include <complex.h>
 
 double complex
 cacosh(double complex z)
 {
-	double complex w;
+    double complex w;
 
 #if 0 /* does not give the principal value */
 	w = (double complex) I * cacos(z);
 #else
-	w = clog(z + csqrt(z + 1) * csqrt(z - 1));
+    w = clog(z + csqrt(z + 1) * csqrt(z - 1));
 #endif
-	return w;
+    return w;
 }

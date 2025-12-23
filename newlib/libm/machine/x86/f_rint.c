@@ -1,17 +1,17 @@
 /*
-Copyright (c) 2007 Dave Korn 
+Copyright (c) 2007 Dave Korn
 
 
 x87 FP implementation contributed to Newlib by
 Dave Korn, November 2007.  This file is placed in the
-public domain.  Permission to use, copy, modify, and 
+public domain.  Permission to use, copy, modify, and
 distribute this software is freely granted.
  */
 /*
  * ====================================================
  * x87 FP implementation contributed to Newlib by
  * Dave Korn, November 2007.  This file is placed in the
- * public domain.  Permission to use, copy, modify, and 
+ * public domain.  Permission to use, copy, modify, and
  * distribute this software is freely granted.
  * ====================================================
  */
@@ -25,15 +25,15 @@ distribute this software is freely granted.
 FUNCTION
 <<rint>>, <<rintf>>, <<rintl>>---round to integer
 INDEX
-	rint
+        rint
 INDEX
-	rintf
+        rintf
 INDEX
-	rintl
+        rintl
 
 SYNOPSIS
-	#include <math.h>
-	double rint(double x);
+        #include <math.h>
+        double rint(double x);
         float rintf(float x);
         long double rintl(long double x);
 
@@ -48,7 +48,7 @@ These functions return the rounded integer value of <[x]>.
 PORTABILITY
 <<rint>>, <<rintf>> and <<rintl>> are ANSI.
 <<rint>> and <<rintf>> are available on all platforms.
-<<rintl>> is only available on i386 platforms when hardware 
+<<rintl>> is only available on i386 platforms when hardware
 floating point support is available and when compiling with GCC.
 
 */
@@ -63,12 +63,12 @@ floating point support is available and when compiling with GCC.
  *	Governed by x87 FPCR.
  */
 
-double _f_rint (double x)
+double
+_f_rint(double x)
 {
-  double _result;
-  __asm__("frndint" : "=t" (_result) : "0" (x));
-  return _result;
+    double _result;
+    __asm__("frndint" : "=t"(_result) : "0"(x));
+    return _result;
 }
 
-#endif  /* !__GNUC__ || _SOFT_FLOAT */
-
+#endif /* !__GNUC__ || _SOFT_FLOAT */

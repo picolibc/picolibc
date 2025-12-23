@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fmin.h"
 
-double fmin(double x, double y)
+double
+fmin(double x, double y)
 {
     return _fmin(x, y);
 }

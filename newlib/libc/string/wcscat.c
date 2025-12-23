@@ -1,25 +1,25 @@
 /*
 FUNCTION
-	<<wcscat>>---concatenate two wide-character strings
+        <<wcscat>>---concatenate two wide-character strings
 INDEX
-	wcscat
+        wcscat
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcscat(wchar_t *__restrict <[s1]>,
-			const wchar_t *__restrict <[s2]>);
+        #include <wchar.h>
+        wchar_t *wcscat(wchar_t *__restrict <[s1]>,
+                        const wchar_t *__restrict <[s2]>);
 
 DESCRIPTION
-	The <<wcscat>> function appends a copy of the wide-character string
-	pointed to by <[s2]> (including the terminating null wide-character
-	code) to the end of the wide-character string pointed to by <[s1]>.
-	The initial wide-character code of <[s2]> overwrites the null
-	wide-character code at the end of <[s1]>. If copying takes place between
-	objects that overlap, the behaviour is undefined. 
+        The <<wcscat>> function appends a copy of the wide-character string
+        pointed to by <[s2]> (including the terminating null wide-character
+        code) to the end of the wide-character string pointed to by <[s1]>.
+        The initial wide-character code of <[s2]> overwrites the null
+        wide-character code at the end of <[s1]>. If copying takes place between
+        objects that overlap, the behaviour is undefined.
 
 RETURNS
-	The <<wcscat>> function returns <[s1]>;
-	no return value is reserved to indicate an error. 
+        The <<wcscat>> function returns <[s1]>;
+        no return value is reserved to indicate an error.
 
 PORTABILITY
 <<wcscat>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -60,20 +60,19 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wcscat (wchar_t *__restrict s1,
-	const wchar_t *__restrict s2)
+wcscat(wchar_t * __restrict s1, const wchar_t * __restrict s2)
 {
-  wchar_t *p;
-  wchar_t *q;
-  const wchar_t *r;
+    wchar_t       *p;
+    wchar_t       *q;
+    const wchar_t *r;
 
-  p = s1;
-  while (*p)
-    p++;
-  q = p;
-  r = s2;
-  while (*r)
-    *q++ = *r++;
-  *q = '\0';
-  return s1;
+    p = s1;
+    while (*p)
+        p++;
+    q = p;
+    r = s2;
+    while (*r)
+        *q++ = *r++;
+    *q = '\0';
+    return s1;
 }

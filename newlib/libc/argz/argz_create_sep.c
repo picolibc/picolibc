@@ -12,58 +12,52 @@
 #include <stdlib.h>
 
 error_t
-argz_create_sep (const char *string,
-       int sep,
-       char **argz,
-       size_t *argz_len)
+argz_create_sep(const char *string, int sep, char **argz, size_t *argz_len)
 {
-  size_t len = 0;
-  int i = 0;
-  int num_strings = 0;
-  char delim[2];
-  char *running = 0;
-  char *old_running = 0;
-  char *token = 0;
-  char *iter = 0;
+    size_t len = 0;
+    int    i = 0;
+    int    num_strings = 0;
+    char   delim[2];
+    char  *running = 0;
+    char  *old_running = 0;
+    char  *token = 0;
+    char  *iter = 0;
 
-  *argz_len = 0;
+    *argz_len = 0;
 
-  if (!string || string[0] == '\0')
-    {
-      *argz= NULL;
-      return 0;
+    if (!string || string[0] == '\0') {
+        *argz = NULL;
+        return 0;
     }
 
-  delim[0] = (char) sep;
-  delim[1] = '\0';
+    delim[0] = (char)sep;
+    delim[1] = '\0';
 
-  running = strdup(string);
-  old_running = running;
+    running = strdup(string);
+    old_running = running;
 
-  while ((token = strsep(&running, delim)))
-    {
-      len = strlen(token);
-      *argz_len += (len + 1);
-      num_strings++;
+    while ((token = strsep(&running, delim))) {
+        len = strlen(token);
+        *argz_len += (len + 1);
+        num_strings++;
     }
 
-  free(old_running);
+    free(old_running);
 
-  if(!(*argz = (char *)malloc(*argz_len)))
-    return ENOMEM;
+    if (!(*argz = (char *)malloc(*argz_len)))
+        return ENOMEM;
 
-  running = strdup(string);
-  old_running = running;
+    running = strdup(string);
+    old_running = running;
 
-  iter = *argz;
-  for (i = 0; i < num_strings; i++)
-    {
-      token = strsep(&running, delim);
-      len = strlen(token) + 1;
-      memcpy(iter, token, len);
-      iter += len;
+    iter = *argz;
+    for (i = 0; i < num_strings; i++) {
+        token = strsep(&running, delim);
+        len = strlen(token) + 1;
+        memcpy(iter, token, len);
+        iter += len;
     }
 
-  free(old_running);
-  return 0;
+    free(old_running);
+    return 0;
 }

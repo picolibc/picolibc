@@ -10,7 +10,7 @@ SYNOPSIS
         long long llabs(long long <[j]>);
 
 DESCRIPTION
-The <<llabs>> function computes the absolute value of the long long integer 
+The <<llabs>> function computes the absolute value of the long long integer
 argument <[j]> (also called the magnitude of <[j]>).
 
 The similar function <<labs>> uses and returns <<long>> rather than
@@ -54,7 +54,7 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 
 long long
-llabs (long long j)
+llabs(long long j)
 {
-	return (j < 0 ? -j : j);
+    return (j < 0 ? -j : j);
 }

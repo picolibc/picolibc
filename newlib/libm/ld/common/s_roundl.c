@@ -24,26 +24,25 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 #include "../math_ld.h"
 
 long double
 roundl(long double x)
 {
-	long double t;
+    long double t;
 
-	if (!isfinite(x))
-		return (x + x);
+    if (!isfinite(x))
+        return (x + x);
 
-	if (x >= 0.0L) {
-		t = floorl(x);
-		if (t - x <= -0.5L)
-			t += 1.0L;
-		return (t);
-	} else {
-		t = floorl(-x);
-		if (t + x <= -0.5L)
-			t += 1.0L;
-		return (-t);
-	}
+    if (x >= 0.0L) {
+        t = floorl(x);
+        if (t - x <= -0.5L)
+            t += 1.0L;
+        return (t);
+    } else {
+        t = floorl(-x);
+        if (t + x <= -0.5L)
+            t += 1.0L;
+        return (-t);
+    }
 }

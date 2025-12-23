@@ -20,8 +20,8 @@
 #include "exit-value.h"
 
 void __noreturn
-abort (void)
+abort(void)
 {
-  write (2, "GCN Kernel Aborted\n", 19);
-  exit_with_status_and_signal (0, SIGABRT);
+    write(2, "GCN Kernel Aborted\n", 19);
+    exit_with_status_and_signal(0, SIGABRT);
 }

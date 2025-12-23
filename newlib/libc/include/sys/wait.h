@@ -36,8 +36,8 @@ _BEGIN_STD_C
 #include <sys/types.h>
 #include <sys/_wait.h>
 
-pid_t wait (int *);
-pid_t waitpid (pid_t, int *, int);
+pid_t wait(int *);
+pid_t waitpid(pid_t, int *, int);
 
 _END_STD_C
 

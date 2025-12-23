@@ -3,7 +3,7 @@ Copyright (C) 1993 by Sun Microsystems, Inc. All rights reserved.
 
 Developed at SunPro, a Sun Microsystems, Inc. business.
 Permission to use, copy, modify, and distribute this
-software is freely granted, provided that this notice 
+software is freely granted, provided that this notice
 is preserved.
  */
 /* isgreater.c:  This file contains no source code, but rather only the
@@ -11,28 +11,22 @@ is preserved.
  * defined in math.h (q.v.).  */
 /*
 FUNCTION
-<<isgreater>>, <<isgreaterequal>>, <<isless>>, <<islessequal>>, <<islessgreater>>, and <<isunordered>>---comparison macros
+<<isgreater>>, <<isgreaterequal>>, <<isless>>, <<islessequal>>, <<islessgreater>>, and
+<<isunordered>>---comparison macros INDEX isgreater INDEX isgreaterequal INDEX isless INDEX
+        islessequal
 INDEX
-	isgreater
+        islessgreater
 INDEX
-	isgreaterequal
-INDEX
-	isless
-INDEX
-	islessequal
-INDEX
-	islessgreater
-INDEX
-	isunordered
+        isunordered
 
 SYNOPSIS
-	#include <math.h>
-	int isgreater(real-floating <[x]>, real-floating <[y]>);
-	int isgreaterequal(real-floating <[x]>, real-floating <[y]>);
-	int isless(real-floating <[x]>, real-floating <[y]>);
-	int islessequal(real-floating <[x]>, real-floating <[y]>);
-	int islessgreater(real-floating <[x]>, real-floating <[y]>);
-	int isunordered(real-floating <[x]>, real-floating <[y]>);
+        #include <math.h>
+        int isgreater(real-floating <[x]>, real-floating <[y]>);
+        int isgreaterequal(real-floating <[x]>, real-floating <[y]>);
+        int isless(real-floating <[x]>, real-floating <[y]>);
+        int islessequal(real-floating <[x]>, real-floating <[y]>);
+        int islessgreater(real-floating <[x]>, real-floating <[y]>);
+        int isunordered(real-floating <[x]>, real-floating <[y]>);
 
 DESCRIPTION
 <<isgreater>>, <<isgreaterequal>>, <<isless>>, <<islessequal>>,
@@ -59,11 +53,11 @@ is certainly possible to give them an expression which causes an exception.
 For example:
 o+
 o	NaN < 1.0
-		causes an "invalid" exception,
+                causes an "invalid" exception,
 o	isless(NaN, 1.0)
-		does not, and
+                does not, and
 o	isless(NaN*0., 1.0)
-		causes an exception due to the "NaN*0.", but not from the
+                causes an exception due to the "NaN*0.", but not from the
 resultant reduced comparison of isless(NaN, 1.0).
 o-
 

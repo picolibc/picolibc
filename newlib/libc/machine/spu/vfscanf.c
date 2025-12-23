@@ -39,32 +39,27 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 #include <stdarg.h>
 
 #ifdef INTEGER_ONLY
-#  define vfscanf vfiscanf
+#define vfscanf vfiscanf
 #endif
 
-typedef struct
-{
-  int fp;
-  unsigned int pad0[ 3 ];
-  char* fmt;
-  unsigned int pad1[ 3 ];
-  va_list ap;
+typedef struct {
+    int          fp;
+    unsigned int pad0[3];
+    char        *fmt;
+    unsigned int pad1[3];
+    va_list      ap;
 } c99_vfscanf_t;
 
-
 int
-vfscanf (FILE *__restrict fp,
-    const char *__restrict fmt,
-    va_list ap)
+vfscanf(FILE * __restrict fp, const char * __restrict fmt, va_list ap)
 {
-  c99_vfscanf_t args;
+    c99_vfscanf_t args;
 
-  CHECK_INIT(_REENT);
+    CHECK_INIT(_REENT);
 
-  args.fp = fp->_fp;
-  args.fmt = (char*) fmt;
-  va_copy(args.ap,ap);
+    args.fp = fp->_fp;
+    args.fmt = (char *)fmt;
+    va_copy(args.ap, ap);
 
-  return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFSCANF, &args);
+    return __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_VFSCANF, &args);
 }
-

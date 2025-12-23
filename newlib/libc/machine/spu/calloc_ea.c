@@ -36,23 +36,22 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-typedef struct
-{
-  unsigned long long nmemb;
-  unsigned int pad0[2];
-  unsigned long long length;
-  unsigned int pad1[2];
+typedef struct {
+    unsigned long long nmemb;
+    unsigned int       pad0[2];
+    unsigned long long length;
+    unsigned int       pad1[2];
 } calloc_ea_t;
 
-COMPAT_EA_ALIAS (calloc_ea);
+COMPAT_EA_ALIAS(calloc_ea);
 
 __ea void *
-calloc_ea (size_ea_t nmemb, size_ea_t length)
+calloc_ea(size_ea_t nmemb, size_ea_t length)
 {
-  calloc_ea_t args;
+    calloc_ea_t args;
 
-  args.nmemb = (unsigned long long) nmemb;
-  args.length = (unsigned long long) length;
-  __send_to_ppe (JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_CALLOC, &args);
-  return ull_to_eavoid (args.nmemb);
+    args.nmemb = (unsigned long long)nmemb;
+    args.length = (unsigned long long)length;
+    __send_to_ppe(JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_CALLOC, &args);
+    return ull_to_eavoid(args.nmemb);
 }

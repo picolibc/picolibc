@@ -31,6 +31,6 @@
 */
 
 #define PRINTF_VARIANT __IO_VARIANT_LLONG
-#define PRINTF_NAME __l_vfprintf
+#define PRINTF_NAME    __l_vfprintf
 
 #include "vfprintf.c"

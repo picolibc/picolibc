@@ -34,12 +34,6 @@
  */
 
 uintptr_t
-xtensa_simcall(uintptr_t request,
-               uintptr_t *ret_code,
-               uintptr_t a3,
-               uintptr_t a4,
-               uintptr_t a5,
-               uintptr_t a6,
-               uintptr_t a7)
+xtensa_simcall(uintptr_t request, uintptr_t *ret_code, uintptr_t a3, uintptr_t a4, uintptr_t a5,
+               uintptr_t a6, uintptr_t a7)
 {
-    

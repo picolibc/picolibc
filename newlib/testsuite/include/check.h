@@ -8,12 +8,12 @@ is freely granted, provided that this notice is preserved.
 #include <stdlib.h>
 #include <errno.h>
 
-#define CHECK(a) { \
-  if (!(a)) \
-    { \
-      int err = errno; \
-      printf ("Failed " #a " in <%s> at line %d\n", __FILE__, __LINE__); \
-      fflush(stdout); \
-      exit(err == ENOMEM ? 77 : 1); \
-    } \
-}
+#define CHECK(a)                                                              \
+    {                                                                         \
+        if (!(a)) {                                                           \
+            int err = errno;                                                  \
+            printf("Failed " #a " in <%s> at line %d\n", __FILE__, __LINE__); \
+            fflush(stdout);                                                   \
+            exit(err == ENOMEM ? 77 : 1);                                     \
+        }                                                                     \
+    }

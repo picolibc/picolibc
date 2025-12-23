@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -70,9 +70,9 @@ QUICKREF
 double complex
 csinh(double complex z)
 {
-	double x, y;
+    double x, y;
 
-	x = creal(z);
-	y = cimag(z);
-	return (double complex) (sinh(x) * cos(y)) + (cosh(x) * sin(y)) * (double complex) I;
+    x = creal(z);
+    y = cimag(z);
+    return (double complex)(sinh(x) * cos(y)) + (cosh(x) * sin(y)) * (double complex)I;
 }

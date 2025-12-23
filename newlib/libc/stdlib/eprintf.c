@@ -19,9 +19,9 @@ All rights reserved.
 #include <stdio.h>
 
 void
-__eprintf (const char *format, const char *file, unsigned int line, const char *expression)
+__eprintf(const char *format, const char *file, unsigned int line, const char *expression)
 {
-  (void) fprintf (stderr, format, file, line, expression);
-  abort ();
-  /*NOTREACHED*/
+    (void)fprintf(stderr, format, file, line, expression);
+    abort();
+    /*NOTREACHED*/
 }

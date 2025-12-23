@@ -40,7 +40,7 @@
 int
 main(void)
 {
-    char buf[4];
+    char  buf[4];
     char *ret;
     ret = gets(buf);
     if (ret != buf) {

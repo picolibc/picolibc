@@ -12,37 +12,37 @@ is freely granted, provided that this notice is preserved.
 #include <fcntl.h>
 #include "check.h"
 
-int main()
+int
+main()
 {
-  int fd;
-  char *x;
-  FILE *fp;
-  char buf[40];
+    int   fd;
+    char *x;
+    FILE *fp;
+    char  buf[40];
 
-  fd = open("my.file", O_CREAT | O_TRUNC | O_RDWR, 0644);
+    fd = open("my.file", O_CREAT | O_TRUNC | O_RDWR, 0644);
 
-  CHECK (fd != -1);
+    CHECK(fd != -1);
 
-  CHECK (write (fd, "abcdefgh", 8) == 8); 
- 
-  x = (char *)mmap (0, 20, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
+    CHECK(write(fd, "abcdefgh", 8) == 8);
 
-  CHECK (x != MAP_FAILED);
+    x = (char *)mmap(0, 20, PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 
-  x[3] = 'j';
+    CHECK(x != MAP_FAILED);
 
-  CHECK (munmap (x, 20) == 0);
+    x[3] = 'j';
 
-  CHECK (close(fd) != -1);
+    CHECK(munmap(x, 20) == 0);
 
-  fp = fopen("my.file","r");
+    CHECK(close(fd) != -1);
 
-  CHECK (fp != NULL);
+    fp = fopen("my.file", "r");
 
-  CHECK (fread(buf, 1, 20, fp) == 8);
+    CHECK(fp != NULL);
 
-  CHECK (strncmp (buf, "abcjefgh", 8) == 0);
+    CHECK(fread(buf, 1, 20, fp) == 8);
 
-  exit (0);
+    CHECK(strncmp(buf, "abcjefgh", 8) == 0);
+
+    exit(0);
 }
-

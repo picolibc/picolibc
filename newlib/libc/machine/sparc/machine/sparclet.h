@@ -26,21 +26,21 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 /* sparclet scan instruction */
 
 extern __inline int
-scan (int a, int b)
+scan(int a, int b)
 {
-  int res;
-  __asm__ ("scan %1,%2,%0" : "=r" (res) : "r" (a), "r" (b));
-  return res;
+    int res;
+    __asm__("scan %1,%2,%0" : "=r"(res) : "r"(a), "r"(b));
+    return res;
 }
 
 /* sparclet shuffle instruction */
 
 extern __inline int
-shuffle (int a, int b)
+shuffle(int a, int b)
 {
-  int res;
-  __asm__ ("shuffle %1,%2,%0" : "=r" (res) : "r" (a), "r" (b));
-  return res;
+    int res;
+    __asm__("shuffle %1,%2,%0" : "=r"(res) : "r"(a), "r"(b));
+    return res;
 }
 
 #endif /* __sparclet__ */

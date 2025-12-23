@@ -33,9 +33,9 @@
 /* Check result and set errno if necessary.  */
 
 HIDDEN long double
-__math_check_oflowl (long double y)
+__math_check_oflowl(long double y)
 {
-    return isinf (y) ? __math_with_errnol (y, ERANGE) : y;
+    return isinf(y) ? __math_with_errnol(y, ERANGE) : y;
 }
 
 #endif /* _NEED_FLOAT_HUGE */

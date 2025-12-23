@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _SIGNBITD2_H_
-#define _SIGNBITD2_H_	1
+#define _SIGNBITD2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -46,29 +46,30 @@
  *	vector unsigned long long _signbitd2(vector double x)
  *
  * DESCRIPTION
- *      The signbitd2 function returns a vector which contains either all ones 
- *      or all zeros, depending on the sign of the corresponding input vector 
+ *      The signbitd2 function returns a vector which contains either all ones
+ *      or all zeros, depending on the sign of the corresponding input vector
  *      element.
  *
- *      Note that the signbit functions are not logically equivalent to 
+ *      Note that the signbit functions are not logically equivalent to
  *      x < 0.0.  IEEE 754 floating point rules include a signed zero, so if
  *      the input value is –0.0, signbit will return non-zero, but the naive
  *      implementation will not.
- * 
+ *
  * RETURNS
  *      The function signbitf4 returns an unsigned int vector in which each
  *      element is defined as:
  *
- *        - ULLONG_MAX (0xFFFFFFFFFFFFFFFF)   if the sign bit is set for the 
+ *        - ULLONG_MAX (0xFFFFFFFFFFFFFFFF)   if the sign bit is set for the
  *                                            corresponding element of x
  *        - 0          (0x0000000000000000)   otherwise.
  *
  */
-static __inline vector unsigned long long _signbitd2(vector double x)
+static __inline vector unsigned long long
+_signbitd2(vector double x)
 {
-  vec_uchar16 shuf = ((vec_uchar16){0, 1, 2, 3,  0, 1, 2, 3,  8, 9, 10, 11,  8, 9, 10, 11});
-  vec_uint4 r = spu_rlmaska((vec_uint4)x,-31);
-  return (vec_ullong2)spu_shuffle(r,r,shuf);
+    vec_uchar16 shuf = ((vec_uchar16) { 0, 1, 2, 3, 0, 1, 2, 3, 8, 9, 10, 11, 8, 9, 10, 11 });
+    vec_uint4   r = spu_rlmaska((vec_uint4)x, -31);
+    return (vec_ullong2)spu_shuffle(r, r, shuf);
 }
 #endif /* _SIGNBITD2_H_ */
 #endif /* __SPU__ */

@@ -40,11 +40,11 @@
 
 int
 __vsnprintf_chk(char * __restrict buf, size_t len, int flags, size_t slen,
-    const char * __restrict fmt, va_list ap)
+                const char * __restrict fmt, va_list ap)
 {
-	if (len > slen)
-		__chk_fail();
+    if (len > slen)
+        __chk_fail();
 
-        (void) flags;
-	return vsnprintf(buf, len, fmt, ap);
+    (void)flags;
+    return vsnprintf(buf, len, fmt, ap);
 }

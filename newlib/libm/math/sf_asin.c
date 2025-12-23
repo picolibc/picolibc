@@ -16,41 +16,39 @@
 #include "fdlibm.h"
 
 static const float one = 1.0000000000e+00, /* 0x3F800000 */
-    huge = 1.000e+30, pio2_hi = 1.57079637050628662109375f,
-                   pio2_lo = -4.37113900018624283e-8f,
+    huge = 1.000e+30, pio2_hi = 1.57079637050628662109375f, pio2_lo = -4.37113900018624283e-8f,
                    pio4_hi = 0.785398185253143310546875f,
                    /* coefficient for R(x^2) */
-    pS0 = 1.6666667163e-01, /* 0x3e2aaaab */
+    pS0 = 1.6666667163e-01,  /* 0x3e2aaaab */
     pS1 = -3.2556581497e-01, /* 0xbea6b090 */
-    pS2 = 2.0121252537e-01, /* 0x3e4e0aa8 */
+    pS2 = 2.0121252537e-01,  /* 0x3e4e0aa8 */
     pS3 = -4.0055535734e-02, /* 0xbd241146 */
-    pS4 = 7.9153501429e-04, /* 0x3a4f7f04 */
-    pS5 = 3.4793309169e-05, /* 0x3811ef08 */
+    pS4 = 7.9153501429e-04,  /* 0x3a4f7f04 */
+    pS5 = 3.4793309169e-05,  /* 0x3811ef08 */
     qS1 = -2.4033949375e+00, /* 0xc019d139 */
-    qS2 = 2.0209457874e+00, /* 0x4001572d */
+    qS2 = 2.0209457874e+00,  /* 0x4001572d */
     qS3 = -6.8828397989e-01, /* 0xbf303361 */
-    qS4 = 7.7038154006e-02; /* 0x3d9dc62e */
+    qS4 = 7.7038154006e-02;  /* 0x3d9dc62e */
 
 float
 asinf(float x)
 {
-    float t, w, p, q, c, r, s;
+    float     t, w, p, q, c, r, s;
     __int32_t hx, ix;
     GET_FLOAT_WORD(hx, x);
     ix = hx & 0x7fffffff;
     if (ix == 0x3f800000) {
         /* asin(1)=+-pi/2 with inexact */
         return x * pio2_hi + x * pio2_lo;
-    } else if (ix > 0x3f800000) { /* |x|>= 1 */
+    } else if (ix > 0x3f800000) {  /* |x|>= 1 */
         return __math_invalidf(x); /* asin(|x|>1) is NaN */
-    } else if (ix < 0x3f000000) { /* |x|<0.5 */
-        if (ix < 0x32000000) { /* if |x| < 2**-27 */
+    } else if (ix < 0x3f000000) {  /* |x|<0.5 */
+        if (ix < 0x32000000) {     /* if |x| < 2**-27 */
             if (huge + x > one)
                 return x; /* return x with inexact if x!=0*/
         } else {
             t = x * x;
-            p = t *
-                (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));
+            p = t * (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));
             q = one + t * (qS1 + t * (qS2 + t * (qS3 + t * qS4)));
             w = p / q;
             return x + x * w;

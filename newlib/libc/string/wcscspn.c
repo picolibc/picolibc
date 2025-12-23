@@ -1,20 +1,20 @@
 /*
 FUNCTION
-	<<wcscspn>>---get length of a complementary wide substring 
+        <<wcscspn>>---get length of a complementary wide substring
 
 SYNOPSIS
-	#include <wchar.h>
-	size_t wcscspn(const wchar_t *<[s]>, wchar_t *<[set]>);
+        #include <wchar.h>
+        size_t wcscspn(const wchar_t *<[s]>, wchar_t *<[set]>);
 
 DESCRIPTION
-	The <<wcscspn>> function computes the length of the maximum initial
-	segment of the wide-character string pointed to by <[s]> which consists
-	entirely of wide-character codes not from the wide-character string
-	pointed to by <[set]>. 
+        The <<wcscspn>> function computes the length of the maximum initial
+        segment of the wide-character string pointed to by <[s]> which consists
+        entirely of wide-character codes not from the wide-character string
+        pointed to by <[set]>.
 
 RETURNS
-	The <<wcscspn>> function returns the length of the initial substring of
-	<[s1]>; no return value is reserved to indicate an error.
+        The <<wcscspn>> function returns the length of the initial substring of
+        <[s1]>; no return value is reserved to indicate an error.
 
 PORTABILITY
 <<wcscspn>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -55,25 +55,22 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 size_t
-wcscspn (const wchar_t * s,
-	const wchar_t * set)
+wcscspn(const wchar_t *s, const wchar_t *set)
 {
-  const wchar_t *p;
-  const wchar_t *q;
+    const wchar_t *p;
+    const wchar_t *q;
 
-  p = s;
-  while (*p)
-    {
-      q = set;
-      while (*q)
-	{
-	  if (*p == *q)
-	    goto done;
-	  q++;
-	}
-      p++;
+    p = s;
+    while (*p) {
+        q = set;
+        while (*q) {
+            if (*p == *q)
+                goto done;
+            q++;
+        }
+        p++;
     }
 
 done:
-  return (p - s);
+    return (p - s);
 }

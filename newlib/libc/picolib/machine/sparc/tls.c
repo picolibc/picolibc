@@ -41,7 +41,7 @@ extern char __tls_size[];
 void
 _set_tls(void *tls)
 {
-        char *ctls = tls;
+    char *ctls = tls;
 
-        __asm__("mov %0, %%g7" : : "r" (ctls + (uintptr_t) __tls_size));
+    __asm__("mov %0, %%g7" : : "r"(ctls + (uintptr_t)__tls_size));
 }

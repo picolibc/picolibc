@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/floor.h"
 
-double floor(double x)
+double
+floor(double x)
 {
     return _floor(x);
 }

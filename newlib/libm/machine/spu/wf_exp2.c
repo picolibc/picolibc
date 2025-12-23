@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/exp2f.h"
 
-float exp2f(float x)
+float
+exp2f(float x)
 {
     return _exp2f(x);
 }

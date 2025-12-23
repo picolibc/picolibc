@@ -50,54 +50,45 @@
  *      only tanhl(0)=0 is exact for finite argument.
  */
 
-
-
 static const long double one = 1.0L, two = 2.0L, tiny = 1.0e-4900L;
 
 long double
 tanhl(long double x)
 {
-  long double t, z;
-  u_int32_t jx, ix;
-  ieee_quad_shape_type u;
+    long double          t, z;
+    u_int32_t            jx, ix;
+    ieee_quad_shape_type u;
 
-  /* Words of |x|. */
-  u.value = x;
-  jx = u.parts32.mswhi;
-  ix = jx & 0x7fffffff;
-  /* x is INF or NaN */
-  if (ix >= 0x7fff0000)
-    {
-      /* for NaN it's not important which branch: tanhl(NaN) = NaN */
-      if (jx & 0x80000000)
-	return one / x - one;	/* tanhl(-inf)= -1; */
-      else
-	return one / x + one;	/* tanhl(+inf)=+1 */
+    /* Words of |x|. */
+    u.value = x;
+    jx = u.parts32.mswhi;
+    ix = jx & 0x7fffffff;
+    /* x is INF or NaN */
+    if (ix >= 0x7fff0000) {
+        /* for NaN it's not important which branch: tanhl(NaN) = NaN */
+        if (jx & 0x80000000)
+            return one / x - one; /* tanhl(-inf)= -1; */
+        else
+            return one / x + one; /* tanhl(+inf)=+1 */
     }
 
-  /* |x| < 40 */
-  if (ix < 0x40044000)
-    {
-      if (u.value == 0)
-	return x;		/* x == +- 0 */
-      if (ix < 0x3fc60000)	/* |x| < 2^-57 */
-	return x * (one + tiny); /* tanh(small) = small */
-      u.parts32.mswhi = ix;	/* Absolute value of x.  */
-      if (ix >= 0x3fff0000)
-	{			/* |x| >= 1  */
-	  t = expm1l (two * u.value);
-	  z = one - two / (t + two);
-	}
-      else
-	{
-	  t = expm1l (-two * u.value);
-	  z = -t / (t + two);
-	}
-      /* |x| > 40, return +-1 */
+    /* |x| < 40 */
+    if (ix < 0x40044000) {
+        if (u.value == 0)
+            return x;                /* x == +- 0 */
+        if (ix < 0x3fc60000)         /* |x| < 2^-57 */
+            return x * (one + tiny); /* tanh(small) = small */
+        u.parts32.mswhi = ix;        /* Absolute value of x.  */
+        if (ix >= 0x3fff0000) {      /* |x| >= 1  */
+            t = expm1l(two * u.value);
+            z = one - two / (t + two);
+        } else {
+            t = expm1l(-two * u.value);
+            z = -t / (t + two);
+        }
+        /* |x| > 40, return +-1 */
+    } else {
+        z = one - tiny; /* raised inexact flag */
     }
-  else
-    {
-      z = one - tiny;		/* raised inexact flag */
-    }
-  return (jx & 0x80000000) ? -z : z;
+    return (jx & 0x80000000) ? -z : z;
 }

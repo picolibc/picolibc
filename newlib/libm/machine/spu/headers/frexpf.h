@@ -31,39 +31,40 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FREXPF_H_
-#define _FREXPF_H_	1
+#define _FREXPF_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
 /* Return the normalized fraction and exponent to the number x.
  */
-static __inline float _frexpf(float x, int *pexp)
+static __inline float
+_frexpf(float x, int *pexp)
 {
-  vec_int4 exp;
-  vec_uint4 mask;
-  vec_uint4 exp_mask = VEC_SPLAT_U32(0x7F800000);
-  vec_float4 half = VEC_SPLAT_F32(0.5f);
-  vec_float4 in, mant;
+    vec_int4   exp;
+    vec_uint4  mask;
+    vec_uint4  exp_mask = VEC_SPLAT_U32(0x7F800000);
+    vec_float4 half = VEC_SPLAT_F32(0.5f);
+    vec_float4 in, mant;
 
-  in = spu_promote(x, 0);
+    in = spu_promote(x, 0);
 
-  /* Normalize the mantissa (fraction part).
-   */
-  mant = spu_sel(in, half, exp_mask);
+    /* Normalize the mantissa (fraction part).
+     */
+    mant = spu_sel(in, half, exp_mask);
 
-  /* Zero the mantissa if the input is a denorm or zero
-   */
-  exp = spu_and(spu_rlmask((vec_int4)in, -23), 0xFF);
-  mask = spu_cmpeq(exp, 0);
-  mant = spu_andc(mant, (vec_float4)mask);
+    /* Zero the mantissa if the input is a denorm or zero
+     */
+    exp = spu_and(spu_rlmask((vec_int4)in, -23), 0xFF);
+    mask = spu_cmpeq(exp, 0);
+    mant = spu_andc(mant, (vec_float4)mask);
 
-  /* Zero exponent if zero or denorm input. Otherwise, compute
-   * exponent by removing the bias.
-   */
-  exp = spu_andc(spu_add(exp, -126), (vec_int4)mask);
-  *pexp = spu_extract(exp, 0);
+    /* Zero exponent if zero or denorm input. Otherwise, compute
+     * exponent by removing the bias.
+     */
+    exp = spu_andc(spu_add(exp, -126), (vec_int4)mask);
+    *pexp = spu_extract(exp, 0);
 
-  return (spu_extract(mant, 0));
+    return (spu_extract(mant, 0));
 }
 #endif /* _FREXPF_H_ */

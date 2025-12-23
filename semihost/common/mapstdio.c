@@ -42,25 +42,25 @@
 #include <errno.h>
 #include <stdbool.h>
 
-static int fd_stdout, fd_stderr;
+static int  fd_stdout, fd_stderr;
 static bool _check_done;
 
 int
 _map_stdio(int fd)
 {
-	if (!_check_done) {
-		_check_done = true;
-		fd_stdout = sys_semihost_open(":tt", 4);
-		fd_stderr = sys_semihost_open(":tt", 8);
-	}
-	switch (fd) {
-        case 0:
-                return -1;
-	case 1:
-		return fd_stdout;
-	case 2:
-		return fd_stderr;
-	default:
-		return fd;
-	}
+    if (!_check_done) {
+        _check_done = true;
+        fd_stdout = sys_semihost_open(":tt", 4);
+        fd_stderr = sys_semihost_open(":tt", 8);
+    }
+    switch (fd) {
+    case 0:
+        return -1;
+    case 1:
+        return fd_stdout;
+    case 2:
+        return fd_stderr;
+    default:
+        return fd;
+    }
 }

@@ -7,13 +7,12 @@ Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com>
 #include <string.h>
 
 char *
-strdup (const char *str)
+strdup(const char *str)
 {
-  size_t len = strlen (str) + 1;
-  char *copy = malloc (len);
-  if (copy)
-    {
-      memcpy (copy, str, len);
+    size_t len = strlen(str) + 1;
+    char  *copy = malloc(len);
+    if (copy) {
+        memcpy(copy, str, len);
     }
-  return copy;
+    return copy;
 }

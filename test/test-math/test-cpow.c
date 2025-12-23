@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-cpow.h"
-#define TEST_FUNC       cpow
+#define TEST_VECTORS "test-cpow.h"
+#define TEST_FUNC    cpow
 
 #include "test-complex-complex.h"

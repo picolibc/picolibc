@@ -13,239 +13,214 @@ All rights reserved.
 #include "../ctype/local.h"
 
 int
-__ascii_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__ascii_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  wchar_t dummy;
-  unsigned char *t = (unsigned char *)s;
-  unsigned char c;
+    wchar_t        dummy;
+    unsigned char *t = (unsigned char *)s;
+    unsigned char  c;
 
-  (void) state;
-  if (pwc == NULL)
-    pwc = &dummy;
+    (void)state;
+    if (pwc == NULL)
+        pwc = &dummy;
 
-  if (s == NULL)
-    return 0;
+    if (s == NULL)
+        return 0;
 
-  if (n == 0)
-    return -2;
+    if (n == 0)
+        return -2;
 
-  c = *t;
+    c = *t;
 
-  if (c >= 0x80)
-    return -1;
+    if (c >= 0x80)
+        return -1;
 
-  *pwc = (wchar_t)c;
+    *pwc = (wchar_t)c;
 
-  if (*t == '\0')
-    return 0;
+    if (*t == '\0')
+        return 0;
 
-  return 1;
+    return 1;
 }
 
 #ifdef __MB_CAPABLE
 
-/* we override the mbstate_t __count field for more complex encodings and use it store a state value */
+/* we override the mbstate_t __count field for more complex encodings and use it store a state value
+ */
 #define __state __count
 
 int
-__utf8_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__utf8_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  wchar_t dummy;
-  unsigned char *t = (unsigned char *)s;
-  int ch;
-  int i = 0;
+    wchar_t        dummy;
+    unsigned char *t = (unsigned char *)s;
+    int            ch;
+    int            i = 0;
 
-  if (pwc == NULL)
-    pwc = &dummy;
+    if (pwc == NULL)
+        pwc = &dummy;
 
-  if (s == NULL)
-    return 0;
+    if (s == NULL)
+        return 0;
 
-  if (n == 0)
-    return -2;
+    if (n == 0)
+        return -2;
 
-  if (state->__count == 0)
-    ch = t[i++];
-  else
-    ch = state->__value.__wchb[0];
+    if (state->__count == 0)
+        ch = t[i++];
+    else
+        ch = state->__value.__wchb[0];
 
-  if (ch == '\0')
-    {
-      *pwc = 0;
-      state->__count = 0;
-      return 0; /* s points to the null character */
+    if (ch == '\0') {
+        *pwc = 0;
+        state->__count = 0;
+        return 0; /* s points to the null character */
     }
 
-  if (ch <= 0x7f)
-    {
-      /* single-byte sequence */
-      state->__count = 0;
-      *pwc = ch;
-      return 1;
+    if (ch <= 0x7f) {
+        /* single-byte sequence */
+        state->__count = 0;
+        *pwc = ch;
+        return 1;
     }
-  if (ch >= 0xc0 && ch <= 0xdf)
-    {
-      if (ch == 0xc0)
-        return -1;
-      /* two-byte sequence */
-      state->__value.__wchb[0] = ch;
-      if (state->__count == 0)
-	state->__count = 1;
-      else if (n < (size_t)-1)
-	++n;
-      if (n < 2)
-	return -2;
-      ch = t[i++];
-      if (ch < 0x80 || ch > 0xbf)
-        return -1;
-      if (state->__value.__wchb[0] < 0xc2)
-	{
-	  /* overlong UTF-8 sequence */
-	  return -1;
-	}
-      state->__count = 0;
-      *pwc = ((wchar_t)(state->__value.__wchb[0] & 0x1f) << 6)
-          |    (wchar_t)(ch & 0x3f);
-      return i;
-    }
-  if (ch >= 0xe0 && ch <= 0xef)
-    {
-      /* three-byte sequence */
-      wchar_t tmp;
-      state->__value.__wchb[0] = ch;
-      if (state->__count == 0)
-	state->__count = 1;
-      else if (n < (size_t)-1)
-	++n;
-      if (n < 2)
-	return -2;
-      ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
-      if (state->__value.__wchb[0] == 0xe0 && ch < 0xa0)
-	{
-	  /* overlong UTF-8 sequence */
-	  return -1;
-	}
-      if (ch < 0x80 || ch > 0xbf)
-	{
-	  return -1;
-	}
-      state->__value.__wchb[1] = ch;
-      if (state->__count == 1)
-	state->__count = 2;
-      else if (n < (size_t)-1)
-	++n;
-      if (n < 3)
-	return -2;
-      ch = t[i++];
-      if (ch < 0x80 || ch > 0xbf)
-	{
-	  return -1;
-	}
-      state->__count = 0;
-      tmp = ((wchar_t)(state->__value.__wchb[0] & 0x0f) << 12)
-          |    ((wchar_t)(state->__value.__wchb[1] & 0x3f) << 6)
-	|     (wchar_t)(ch & 0x3f);
-      /* Check for surrogates */
-      if (0xd800 <= (uwchar_t) tmp && (uwchar_t) tmp <= 0xdfff)
-        {
-          return -1;
+    if (ch >= 0xc0 && ch <= 0xdf) {
+        if (ch == 0xc0)
+            return -1;
+        /* two-byte sequence */
+        state->__value.__wchb[0] = ch;
+        if (state->__count == 0)
+            state->__count = 1;
+        else if (n < (size_t)-1)
+            ++n;
+        if (n < 2)
+            return -2;
+        ch = t[i++];
+        if (ch < 0x80 || ch > 0xbf)
+            return -1;
+        if (state->__value.__wchb[0] < 0xc2) {
+            /* overlong UTF-8 sequence */
+            return -1;
         }
-      *pwc = tmp;
-      return i;
+        state->__count = 0;
+        *pwc = ((wchar_t)(state->__value.__wchb[0] & 0x1f) << 6) | (wchar_t)(ch & 0x3f);
+        return i;
     }
-  if (ch >= 0xf0 && ch <= 0xf4)
-    {
-      /* four-byte sequence */
-      uint32_t tmp;
-      state->__value.__wchb[0] = ch;
-      if (state->__count == 0)
-	state->__count = 1;
-      else if (n < (size_t)-1)
-	++n;
-      if (n < 2)
-	return -2;
-      ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
-      if ((state->__value.__wchb[0] == 0xf0 && ch < 0x90)
-	  || (state->__value.__wchb[0] == 0xf4 && ch >= 0x90))
-	{
-	  /* overlong UTF-8 sequence or result is > 0x10ffff */
-	  return -1;
-	}
-      if (ch < 0x80 || ch > 0xbf)
-	{
-	  return -1;
-	}
-      state->__value.__wchb[1] = ch;
-      if (state->__count == 1)
-	state->__count = 2;
-      else if (n < (size_t)-1)
-	++n;
-      if (n < 3)
-	return -2;
-      ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
-      if (ch < 0x80 || ch > 0xbf)
-	{
-	  return -1;
-	}
-      state->__value.__wchb[2] = ch;
-      if (state->__count == 2)
-	state->__count = 3;
-      else if (n < (size_t)-1)
-	++n;
+    if (ch >= 0xe0 && ch <= 0xef) {
+        /* three-byte sequence */
+        wchar_t tmp;
+        state->__value.__wchb[0] = ch;
+        if (state->__count == 0)
+            state->__count = 1;
+        else if (n < (size_t)-1)
+            ++n;
+        if (n < 2)
+            return -2;
+        ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
+        if (state->__value.__wchb[0] == 0xe0 && ch < 0xa0) {
+            /* overlong UTF-8 sequence */
+            return -1;
+        }
+        if (ch < 0x80 || ch > 0xbf) {
+            return -1;
+        }
+        state->__value.__wchb[1] = ch;
+        if (state->__count == 1)
+            state->__count = 2;
+        else if (n < (size_t)-1)
+            ++n;
+        if (n < 3)
+            return -2;
+        ch = t[i++];
+        if (ch < 0x80 || ch > 0xbf) {
+            return -1;
+        }
+        state->__count = 0;
+        tmp = ((wchar_t)(state->__value.__wchb[0] & 0x0f) << 12)
+            | ((wchar_t)(state->__value.__wchb[1] & 0x3f) << 6) | (wchar_t)(ch & 0x3f);
+        /* Check for surrogates */
+        if (0xd800 <= (uwchar_t)tmp && (uwchar_t)tmp <= 0xdfff) {
+            return -1;
+        }
+        *pwc = tmp;
+        return i;
+    }
+    if (ch >= 0xf0 && ch <= 0xf4) {
+        /* four-byte sequence */
+        uint32_t tmp;
+        state->__value.__wchb[0] = ch;
+        if (state->__count == 0)
+            state->__count = 1;
+        else if (n < (size_t)-1)
+            ++n;
+        if (n < 2)
+            return -2;
+        ch = (state->__count == 1) ? t[i++] : state->__value.__wchb[1];
+        if ((state->__value.__wchb[0] == 0xf0 && ch < 0x90)
+            || (state->__value.__wchb[0] == 0xf4 && ch >= 0x90)) {
+            /* overlong UTF-8 sequence or result is > 0x10ffff */
+            return -1;
+        }
+        if (ch < 0x80 || ch > 0xbf) {
+            return -1;
+        }
+        state->__value.__wchb[1] = ch;
+        if (state->__count == 1)
+            state->__count = 2;
+        else if (n < (size_t)-1)
+            ++n;
+        if (n < 3)
+            return -2;
+        ch = (state->__count == 2) ? t[i++] : state->__value.__wchb[2];
+        if (ch < 0x80 || ch > 0xbf) {
+            return -1;
+        }
+        state->__value.__wchb[2] = ch;
+        if (state->__count == 2)
+            state->__count = 3;
+        else if (n < (size_t)-1)
+            ++n;
 #if __SIZEOF_WCHAR_T__ == 2
-      if (state->__count == 3)
-	{
-	  /* On systems which have wchar_t being UTF-16 values, the value
-	     doesn't fit into a single wchar_t in this case.  So what we
-	     do here is to store the state with a special value of __count
-	     and return the first half of a surrogate pair.  The first
-	     three bytes of a UTF-8 sequence are enough to generate the
-	     first half of a UTF-16 surrogate pair.  As return value we
-	     choose to return the number of bytes actually read up to
-	     here.
-	     The second half of the surrogate pair is returned in case we
-	     recognize the special __count value of four, and the next
-	     byte is actually a valid value.  See below. */
-            tmp = (uint32_t)((state->__value.__wchb[0] & (uint32_t) 0x07) << 18)
-                |   (uint32_t)((state->__value.__wchb[1] & (uint32_t) 0x3f) << 12)
-                |   (uint32_t)((state->__value.__wchb[2] & (uint32_t) 0x3f) << 6);
-	  state->__count = 4;
-	  *pwc = 0xd800 | ((tmp - 0x10000) >> 10);
-	  return i;
-	}
+        if (state->__count == 3) {
+            /* On systems which have wchar_t being UTF-16 values, the value
+               doesn't fit into a single wchar_t in this case.  So what we
+               do here is to store the state with a special value of __count
+               and return the first half of a surrogate pair.  The first
+               three bytes of a UTF-8 sequence are enough to generate the
+               first half of a UTF-16 surrogate pair.  As return value we
+               choose to return the number of bytes actually read up to
+               here.
+               The second half of the surrogate pair is returned in case we
+               recognize the special __count value of four, and the next
+               byte is actually a valid value.  See below. */
+            tmp = (uint32_t)((state->__value.__wchb[0] & (uint32_t)0x07) << 18)
+                | (uint32_t)((state->__value.__wchb[1] & (uint32_t)0x3f) << 12)
+                | (uint32_t)((state->__value.__wchb[2] & (uint32_t)0x3f) << 6);
+            state->__count = 4;
+            *pwc = 0xd800 | ((tmp - 0x10000) >> 10);
+            return i;
+        }
 #endif
-      if (n < 4)
-	return -2;
-      ch = t[i++];
-      if (ch < 0x80 || ch > 0xbf)
-	{
-	  return -1;
-	}
-      tmp = (((uint32_t)state->__value.__wchb[0] & 0x07) << 18)
-        |   (((uint32_t)state->__value.__wchb[1] & 0x3f) << 12)
-        |   (((uint32_t)state->__value.__wchb[2] & 0x3f) << 6)
-        |   ((uint32_t)ch & 0x3f);
+        if (n < 4)
+            return -2;
+        ch = t[i++];
+        if (ch < 0x80 || ch > 0xbf) {
+            return -1;
+        }
+        tmp = (((uint32_t)state->__value.__wchb[0] & 0x07) << 18)
+            | (((uint32_t)state->__value.__wchb[1] & 0x3f) << 12)
+            | (((uint32_t)state->__value.__wchb[2] & 0x3f) << 6) | ((uint32_t)ch & 0x3f);
 #if __SIZEOF_WCHAR_T__ == 2
-      if (state->__count == 4)
-	/* Create the second half of the surrogate pair for systems with
-	   wchar_t == UTF-16 . */
-	*pwc = 0xdc00 | (tmp & 0x3ff);
-      else
+        if (state->__count == 4)
+            /* Create the second half of the surrogate pair for systems with
+               wchar_t == UTF-16 . */
+            *pwc = 0xdc00 | (tmp & 0x3ff);
+        else
 #endif
-	*pwc = tmp;
-      state->__count = 0;
-      return i;
+            *pwc = tmp;
+        state->__count = 0;
+        return i;
     }
 
-  return -1;
+    return -1;
 }
 
 #ifdef __MB_EXTENDED_CHARSETS_UCS
@@ -263,15 +238,11 @@ __utf8_mbtowc (
 #endif
 
 static int
-__ucs2_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__ucs2_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-    uint16_t    uchar;
+    uint16_t uchar;
 
-    (void) state;
+    (void)state;
     if (n < 2)
         return -1;
     memcpy(&uchar, s, 2);
@@ -280,15 +251,11 @@ __ucs2_mbtowc (
 }
 
 static int
-__ucs2swap_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__ucs2swap_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-    uint16_t    uchar;
+    uint16_t uchar;
 
-    (void) state;
+    (void)state;
     if (n < 2)
         return -1;
     memcpy(&uchar, s, 2);
@@ -297,15 +264,11 @@ __ucs2swap_mbtowc (
 }
 
 static int
-__ucs4_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__ucs4_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-    uint32_t    uchar;
+    uint32_t uchar;
 
-    (void) state;
+    (void)state;
     if (n < 4)
         return -1;
     memcpy(&uchar, s, 4);
@@ -314,15 +277,11 @@ __ucs4_mbtowc (
 }
 
 static int
-__ucs4swap_mbtowc (
-        wchar_t       *pwc,
-        const char    *s,
-        size_t         n,
-        mbstate_t      *state)
+__ucs4swap_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-    uint32_t    uchar;
+    uint32_t uchar;
 
-    (void) state;
+    (void)state;
     if (n < 4)
         return -1;
     memcpy(&uchar, s, 4);
@@ -334,146 +293,128 @@ __ucs4swap_mbtowc (
 
 #ifdef __MB_EXTENDED_CHARSETS_ISO
 static int
-___iso_mbtowc (wchar_t *pwc, const char *s, size_t n,
-	       enum locale_id id, mbstate_t *state)
+___iso_mbtowc(wchar_t *pwc, const char *s, size_t n, enum locale_id id, mbstate_t *state)
 {
-  wchar_t dummy;
-  unsigned char *t = (unsigned char *)s;
+    wchar_t        dummy;
+    unsigned char *t = (unsigned char *)s;
 
-  (void) state;
-  if (pwc == NULL)
-    pwc = &dummy;
+    (void)state;
+    if (pwc == NULL)
+        pwc = &dummy;
 
-  if (s == NULL)
-    return 0;
+    if (s == NULL)
+        return 0;
 
-  if (n == 0)
-    return -2;
+    if (n == 0)
+        return -2;
 
-  if (*t >= 0xa0)
-    {
-      if (id > locale_ISO_8859_1)
-	{
-	  *pwc = __iso_8859_conv[id - locale_ISO_8859_2][*t - 0xa0];
-	  if (*pwc == 0) /* Invalid character */
-	    {
-	      return -1;
-	    }
-	  return 1;
-	}
+    if (*t >= 0xa0) {
+        if (id > locale_ISO_8859_1) {
+            *pwc = __iso_8859_conv[id - locale_ISO_8859_2][*t - 0xa0];
+            if (*pwc == 0) /* Invalid character */
+            {
+                return -1;
+            }
+            return 1;
+        }
     }
 
-  *pwc = (wchar_t) *t;
+    *pwc = (wchar_t)*t;
 
-  if (*t == '\0')
-    return 0;
+    if (*t == '\0')
+        return 0;
 
-  return 1;
+    return 1;
 }
 
 static int
-__iso_8859_1_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_1_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_1, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_1, state);
 }
 
 static int
-__iso_8859_2_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_2_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_2, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_2, state);
 }
 
 static int
-__iso_8859_3_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_3_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_3, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_3, state);
 }
 
 static int
-__iso_8859_4_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_4_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_4, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_4, state);
 }
 
 static int
-__iso_8859_5_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_5_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_5, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_5, state);
 }
 
 static int
-__iso_8859_6_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_6_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_6, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_6, state);
 }
 
 static int
-__iso_8859_7_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_7_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_7, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_7, state);
 }
 
 static int
-__iso_8859_8_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_8_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_8, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_8, state);
 }
 
 static int
-__iso_8859_9_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		     mbstate_t *state)
+__iso_8859_9_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_9, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_9, state);
 }
 
 static int
-__iso_8859_10_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		      mbstate_t *state)
+__iso_8859_10_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_10, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_10, state);
 }
 
 static int
-__iso_8859_11_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		      mbstate_t *state)
+__iso_8859_11_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_11, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_11, state);
 }
 
 static int
-__iso_8859_13_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		      mbstate_t *state)
+__iso_8859_13_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_13, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_13, state);
 }
 
 static int
-__iso_8859_14_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		      mbstate_t *state)
+__iso_8859_14_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_14, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_14, state);
 }
 
 static int
-__iso_8859_15_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		      mbstate_t *state)
+__iso_8859_15_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_15, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_15, state);
 }
 
 static int
-__iso_8859_16_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		      mbstate_t *state)
+__iso_8859_16_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___iso_mbtowc (pwc, s, n, locale_ISO_8859_16, state);
+    return ___iso_mbtowc(pwc, s, n, locale_ISO_8859_16, state);
 }
 
 #endif /* __MB_EXTENDED_CHARSETS_ISO */
@@ -481,225 +422,196 @@ __iso_8859_16_mbtowc (wchar_t *pwc, const char *s, size_t n,
 #ifdef __MB_EXTENDED_CHARSETS_WINDOWS
 
 static int
-___cp_mbtowc (wchar_t *pwc, const char *s, size_t n,
-	      enum locale_id id, mbstate_t *state)
+___cp_mbtowc(wchar_t *pwc, const char *s, size_t n, enum locale_id id, mbstate_t *state)
 {
-  wchar_t dummy;
-  unsigned char *t = (unsigned char *)s;
+    wchar_t        dummy;
+    unsigned char *t = (unsigned char *)s;
 
-  (void) state;
-  if (pwc == NULL)
-    pwc = &dummy;
+    (void)state;
+    if (pwc == NULL)
+        pwc = &dummy;
 
-  if (s == NULL)
-    return 0;
+    if (s == NULL)
+        return 0;
 
-  if (n == 0)
-    return -2;
+    if (n == 0)
+        return -2;
 
-  if (*t >= 0x80)
-    {
+    if (*t >= 0x80) {
         *pwc = __cp_conv[id - locale_WINDOWS_BASE][*t - 0x80];
         if (*pwc == 0) /* Invalid character */
             return -1;
         return 1;
     }
 
-  *pwc = (wchar_t)*t;
+    *pwc = (wchar_t)*t;
 
-  if (*t == '\0')
-    return 0;
+    if (*t == '\0')
+        return 0;
 
-  return 1;
+    return 1;
 }
 
 static int
-__cp_437_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_437_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP437, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP437, state);
 }
 
 static int
-__cp_720_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_720_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP720, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP720, state);
 }
 
 static int
-__cp_737_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_737_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP737, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP737, state);
 }
 
 static int
-__cp_775_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_775_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP775, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP775, state);
 }
 
 static int
-__cp_850_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_850_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP850, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP850, state);
 }
 
 static int
-__cp_852_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_852_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP852, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP852, state);
 }
 
 static int
-__cp_855_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_855_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP855, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP855, state);
 }
 
 static int
-__cp_857_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_857_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP857, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP857, state);
 }
 
 static int
-__cp_858_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_858_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP858, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP858, state);
 }
 
 static int
-__cp_862_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_862_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP862, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP862, state);
 }
 
 static int
-__cp_866_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_866_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP866, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP866, state);
 }
 
 static int
-__cp_874_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_874_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP874, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP874, state);
 }
 
 static int
-__cp_1125_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1125_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1125, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1125, state);
 }
 
 static int
-__cp_1250_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1250_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1250, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1250, state);
 }
 
 static int
-__cp_1251_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1251_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1251, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1251, state);
 }
 
 static int
-__cp_1252_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1252_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1252, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1252, state);
 }
 
 static int
-__cp_1253_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1253_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1253, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1253, state);
 }
 
 static int
-__cp_1254_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1254_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1254, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1254, state);
 }
 
 static int
-__cp_1255_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1255_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1255, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1255, state);
 }
 
 static int
-__cp_1256_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1256_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1256, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1256, state);
 }
 
 static int
-__cp_1257_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1257_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1257, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1257, state);
 }
 
 static int
-__cp_1258_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		  mbstate_t *state)
+__cp_1258_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_CP1258, state);
+    return ___cp_mbtowc(pwc, s, n, locale_CP1258, state);
 }
 
 static int
-__cp_20866_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		   mbstate_t *state)
+__cp_20866_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_KOI8_R, state);
+    return ___cp_mbtowc(pwc, s, n, locale_KOI8_R, state);
 }
 
 static int
-__cp_21866_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		   mbstate_t *state)
+__cp_21866_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_KOI8_U, state);
+    return ___cp_mbtowc(pwc, s, n, locale_KOI8_U, state);
 }
 
 static int
-__cp_101_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_101_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_GEORGIAN_PS, state);
+    return ___cp_mbtowc(pwc, s, n, locale_GEORGIAN_PS, state);
 }
 
 static int
-__cp_102_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_102_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_PT154, state);
+    return ___cp_mbtowc(pwc, s, n, locale_PT154, state);
 }
 
 static int
-__cp_103_mbtowc (wchar_t *pwc, const char *s, size_t n,
-		 mbstate_t *state)
+__cp_103_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
 {
-  return ___cp_mbtowc (pwc, s, n, locale_KOI8_T, state);
+    return ___cp_mbtowc(pwc, s, n, locale_KOI8_T, state);
 }
 
 #endif /* __MB_EXTENDED_CHARSETS_WINDOWS */
@@ -794,7 +706,7 @@ __sjis_mbtowc(wchar_t *pwc, const char *s, size_t n, mbstate_t *state)
     if (uchar == WEOF)
         return -1;
 
-    *pwc = (wchar_t) uchar;
+    *pwc = (wchar_t)uchar;
 
     return i;
 }

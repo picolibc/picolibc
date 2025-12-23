@@ -37,17 +37,18 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ea.h>
 #include <spu_cache.h>
 
-extern void __cache_flush (void) __weak;
+extern void __cache_flush(void) __weak;
 
-COMPAT_EA_ALIAS (free_ea);
+COMPAT_EA_ALIAS(free_ea);
 
-void free_ea(__ea void *ptr)
+void
+free_ea(__ea void *ptr)
 {
-  unsigned long long ptr_arg;
-  ptr_arg = (unsigned long long) (size_ea_t) ptr;
-  /* Flush cache only if the application really uses the software cache.  */
-  if (__cache_flush)
-    __cache_flush ();
-  __send_to_ppe(JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_FREE , &ptr_arg);
-  return;
+    unsigned long long ptr_arg;
+    ptr_arg = (unsigned long long)(size_ea_t)ptr;
+    /* Flush cache only if the application really uses the software cache.  */
+    if (__cache_flush)
+        __cache_flush();
+    __send_to_ppe(JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_FREE, &ptr_arg);
+    return;
 }

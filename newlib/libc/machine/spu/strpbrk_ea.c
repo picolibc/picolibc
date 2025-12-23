@@ -37,13 +37,13 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <spu_cache.h>
 
-COMPAT_EA_ALIAS (strpbrk_ea);
+COMPAT_EA_ALIAS(strpbrk_ea);
 
 __ea char *
-strpbrk_ea (__ea const char *s, const char *accept)
+strpbrk_ea(__ea const char *s, const char *accept)
 {
-  size_ea_t where;
+    size_ea_t where;
 
-  where = strcspn_ea (s, accept);
-  return (__ea char *) ((size_ea_t) s + where);
+    where = strcspn_ea(s, accept);
+    return (__ea char *)((size_ea_t)s + where);
 }

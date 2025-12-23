@@ -7,18 +7,18 @@ FUNCTION
    <<atoi>>, <<atol>>---string to integer
 
 INDEX
-	atoi
+        atoi
 INDEX
-	atol
+        atol
 INDEX
-	_atoi_r
+        _atoi_r
 INDEX
-	_atol_r
+        _atol_r
 
 SYNOPSIS
-	#include <stdlib.h>
+        #include <stdlib.h>
         int atoi(const char *<[s]>);
-	long atol(const char *<[s]>);
+        long atol(const char *<[s]>);
         int _atoi_r(struct _reent *<[ptr]>, const char *<[s]>);
         long _atol_r(struct _reent *<[ptr]>, const char *<[s]>);
 
@@ -49,7 +49,7 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 
 int
-atoi (const char *s)
+atoi(const char *s)
 {
-  return (int) strtol (s, NULL, 10);
+    return (int)strtol(s, NULL, 10);
 }

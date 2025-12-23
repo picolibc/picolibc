@@ -41,11 +41,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 
-enum {
-    type_kind_int = 0,
-    type_kind_float = 1,
-    type_unknown = 0xffff
-};
+enum { type_kind_int = 0, type_kind_float = 1, type_unknown = 0xffff };
 
 enum {
     type_check_load_of,
@@ -89,7 +85,7 @@ enum {
 struct type_descriptor {
     uint16_t type_kind;
     uint16_t type_info;
-    char type_name[];
+    char     type_name[];
 };
 
 static inline bool
@@ -111,13 +107,13 @@ type_float_width(struct type_descriptor *type)
 }
 
 struct source_location {
-    const char *file_name;
+    const char  *file_name;
     unsigned int line;
     unsigned int column;
 };
 
 struct overflow_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *type;
 };
 
@@ -126,48 +122,48 @@ struct pointer_overflow_data {
 };
 
 struct float_cast_overflow_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *from_type;
     struct type_descriptor *to_type;
 };
 
 struct dynamic_type_cache_miss_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *type;
-    void *type_info;
-    unsigned char type_check_kind;
+    void                   *type_info;
+    unsigned char           type_check_kind;
 };
 
 struct type_mismatch_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *type;
-    unsigned long alignment;
-    unsigned char type_check_kind;
+    unsigned long           alignment;
+    unsigned char           type_check_kind;
 };
 
 struct type_mismatch_data_v1 {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *type;
-    unsigned char log_alignment;
-    unsigned char type_check_kind;
+    unsigned char           log_alignment;
+    unsigned char           type_check_kind;
 };
 
 struct function_type_mismatch_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *type;
 };
 
 struct type_mismatch_data_common {
     struct source_location *location;
     struct type_descriptor *type;
-    unsigned long alignment;
-    unsigned char type_check_kind;
+    unsigned long           alignment;
+    unsigned char           type_check_kind;
 };
 
 struct nonnull_arg_data {
     struct source_location location;
     struct source_location attr_location;
-    int arg_index;
+    int                    arg_index;
 };
 
 struct nonnull_return_data {
@@ -175,24 +171,24 @@ struct nonnull_return_data {
 };
 
 struct out_of_bounds_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *array_type;
     struct type_descriptor *index_type;
 };
 
 struct shift_out_of_bounds_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *lhs_type;
     struct type_descriptor *rhs_type;
 };
 
 struct invalid_builtin_data {
     struct source_location location;
-    unsigned char kind;
+    unsigned char          kind;
 };
 
 struct invalid_objc_cast_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *expected_type;
 };
 
@@ -201,198 +197,113 @@ struct unreachable_data {
 };
 
 struct implicit_conversion_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *from_type;
     struct type_descriptor *to_type;
-    unsigned char kind;
+    unsigned char           kind;
 };
 
 struct invalid_value_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *type;
 };
 
 struct alignment_assumption_data {
-    struct source_location location;
-    struct source_location assumption_location;
+    struct source_location  location;
+    struct source_location  assumption_location;
     struct type_descriptor *type;
 };
 
 struct cfi_check_fail_data {
-    unsigned char cfi_type_check_kind;
-    struct source_location location;
+    unsigned char           cfi_type_check_kind;
+    struct source_location  location;
     struct type_descriptor *type;
 };
 
 struct vla_bound_data {
-    struct source_location location;
+    struct source_location  location;
     struct type_descriptor *type;
 };
 
-void
-__ubsan_handle_add_overflow(void *data,
-                            void *lhs,
-                            void *rhs);
+void __ubsan_handle_add_overflow(void *data, void *lhs, void *rhs);
 
-void
-__ubsan_handle_alignment_assumption(void *data,
-                                    void *ptr,
-                                    void *align,
-                                    void *offset);
+void __ubsan_handle_alignment_assumption(void *data, void *ptr, void *align, void *offset);
 
-void
-__ubsan_handle_builtin_unreachable(void *data);
+void __ubsan_handle_builtin_unreachable(void *data);
 
-void
-__ubsan_handle_cfi_bad_type(void *data,
-                            void *vtable,
-                            void *valid_vtable,
-                            void *opts);
+void __ubsan_handle_cfi_bad_type(void *data, void *vtable, void *valid_vtable, void *opts);
 
+void __ubsan_handle_cfi_check_fail(void *data, void *function, void *vtable_is_valid);
 
-void
-__ubsan_handle_cfi_check_fail(void *data,
-                              void *function,
-                              void *vtable_is_valid);
+void __ubsan_handle_divrem_overflow(void *data, void *lhs, void *rhs);
 
-void
-__ubsan_handle_divrem_overflow(void *data,
-                               void *lhs,
-                               void *rhs);
+void __ubsan_handle_dynamic_type_cache_miss(void *data, void *pointer, void *hash);
 
-void
-__ubsan_handle_dynamic_type_cache_miss(void *data,
-                                       void *pointer,
-                                       void *hash);
+void __ubsan_handle_float_cast_overflow(void *data, void *from);
 
-void
-__ubsan_handle_float_cast_overflow(void *data,
-                                   void *from);
+void __ubsan_handle_function_type_mismatch(void *data, void *ptr);
 
-void
-__ubsan_handle_function_type_mismatch(void *data,
-                                      void *ptr);
+void __ubsan_handle_implicit_conversion(void *data, void *src, void *dst);
 
-void
-__ubsan_handle_implicit_conversion(void *data,
-                                   void *src,
-                                   void *dst);
+void __ubsan_handle_invalid_builtin(void *data);
 
-void
-__ubsan_handle_invalid_builtin(void *data);
+void __ubsan_handle_invalid_objc_cast(void *data, void *pointer);
 
-void
-__ubsan_handle_invalid_objc_cast(void *data,
-                                 void *pointer);
+void __ubsan_handle_load_invalid_value(void *data, void *val);
 
-void
-__ubsan_handle_load_invalid_value(void *data,
-                                  void *val);
+void __ubsan_handle_local_out_of_bounds();
 
-void
-__ubsan_handle_local_out_of_bounds(
-    );
+void __ubsan_handle_missing_return(void *data);
 
-void
-__ubsan_handle_missing_return(void *data);
+void __ubsan_handle_mul_overflow(void *data, void *lhs, void *rhs);
 
-void
-__ubsan_handle_mul_overflow(void *data,
-                            void *lhs,
-                            void *rhs);
+void __ubsan_handle_negate_overflow(void *data, void *val);
 
-void
-__ubsan_handle_negate_overflow(void *data,
-                               void *val);
+void __ubsan_handle_nonnull_arg(void *data);
 
-void
-__ubsan_handle_nonnull_arg(void *data);
+void __ubsan_handle_nonnull_return(void *data);
 
-void
-__ubsan_handle_nonnull_return(void *data);
+void __ubsan_handle_nonnull_return_v1(void *data, void *location);
 
-void
-__ubsan_handle_nonnull_return_v1(void *data,
-                                 void *location);
+void __ubsan_handle_nullability_arg(void *data);
 
-void
-__ubsan_handle_nullability_arg(void *data);
+void __ubsan_handle_nullability_return(void *data);
 
-void
-__ubsan_handle_nullability_return(void *data);
+void __ubsan_handle_nullability_return_v1(void *data, void *location);
 
-void
-__ubsan_handle_nullability_return_v1(void *data,
-                                     void *location);
+void __ubsan_handle_out_of_bounds(void *data, void *index);
 
-void
-__ubsan_handle_out_of_bounds(void *data,
-                             void *index);
+void __ubsan_handle_pointer_overflow(void *data, void *val, void *result);
 
-void
-__ubsan_handle_pointer_overflow(void *data,
-                                void *val, void *result);
+void __ubsan_handle_shift_out_of_bounds(void *data, void *lhs, void *rhs);
 
-void
-__ubsan_handle_shift_out_of_bounds(void *data,
-                                   void *lhs,
-                                   void *rhs);
+void __ubsan_handle_sub_overflow(void *data, void *lhs, void *rhs);
 
-void
-__ubsan_handle_sub_overflow(void *data,
-                            void *lhs,
-                            void *rhs);
+void __ubsan_handle_type_mismatch(void *data, void *ptr);
 
-void
-__ubsan_handle_type_mismatch(void *data,
-                             void *ptr);
+void __ubsan_handle_type_mismatch_v1(void *data, void *ptr);
 
-void
-__ubsan_handle_type_mismatch_v1(void *data,
-                                void *ptr);
-
-void
-__ubsan_handle_vla_bound_not_positive(void *data,
-                                      void *bound);
+void __ubsan_handle_vla_bound_not_positive(void *data, void *bound);
 
 void __noreturn __picolibc_format(printf, 3, 4)
-__ubsan_error(struct source_location *source,
-                const char *fail,
-                const char *fmt,
-                ...);
+    __ubsan_error(struct source_location *source, const char *fail, const char *fmt, ...);
 
 void __picolibc_format(printf, 3, 4)
-__ubsan_warning(struct source_location *source,
-                const char *fail,
-                const char *fmt,
-                ...);
+    __ubsan_warning(struct source_location *source, const char *fail, const char *fmt, ...);
 
-void
-__ubsan_message(struct source_location *source,
-                const char *msg,
-                const char *fail,
-                const char *fmt,
-                va_list ap);
+void __ubsan_message(struct source_location *source, const char *msg, const char *fail,
+                     const char *fmt, va_list ap);
 
-#define VAL_STR_LEN     32
+#define VAL_STR_LEN 32
 
-void
-__ubsan_val_to_string(char str[static VAL_STR_LEN],
-                      struct type_descriptor *type,
-                      void *value);
+void __ubsan_val_to_string(char str[static VAL_STR_LEN], struct type_descriptor *type, void *value);
 
-intmax_t
-__ubsan_val_to_imax(struct type_descriptor *type,
-                    void *value, intmax_t def);
+intmax_t    __ubsan_val_to_imax(struct type_descriptor *type, void *value, intmax_t def);
 
-uintmax_t
-__ubsan_val_to_umax(struct type_descriptor *type,
-                    void *value, uintmax_t def);
+uintmax_t   __ubsan_val_to_umax(struct type_descriptor *type, void *value, uintmax_t def);
 
-const char*
-__ubsan_type_check_to_string(unsigned char type_check_kind);
+const char *__ubsan_type_check_to_string(unsigned char type_check_kind);
 
-const char*
-__ubsan_cfi_type_check_to_string(unsigned char cfi_type_check_kind);
+const char *__ubsan_cfi_type_check_to_string(unsigned char cfi_type_check_kind);
 
 #endif /* _UBSAN_H_ */

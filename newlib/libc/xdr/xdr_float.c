@@ -60,73 +60,68 @@
 #if defined(__IEEE_LITTLE_ENDIAN) || defined(__IEEE_BIG_ENDIAN)
 
 bool_t
-xdr_float (XDR * xdrs,
-       float *fp)
+xdr_float(XDR *xdrs, float *fp)
 {
-  switch (xdrs->x_op)
-    {
+    switch (xdrs->x_op) {
 
     case XDR_ENCODE:
-      return (XDR_PUTINT32 (xdrs, (int32_t *) fp));
+        return (XDR_PUTINT32(xdrs, (int32_t *)fp));
 
     case XDR_DECODE:
-      return (XDR_GETINT32 (xdrs, (int32_t *) fp));
+        return (XDR_GETINT32(xdrs, (int32_t *)fp));
 
     case XDR_FREE:
-      return TRUE;
+        return TRUE;
     }
-  return FALSE;
+    return FALSE;
 }
 
 #if !defined(_DOUBLE_IS_32BITS)
 bool_t
-xdr_double (XDR * xdrs,
-	double *dp)
+xdr_double(XDR *xdrs, double *dp)
 {
-  int32_t *i32p;
-  bool_t rv;
+    int32_t *i32p;
+    bool_t   rv;
 
-  switch (xdrs->x_op)
-    {
+    switch (xdrs->x_op) {
 
     case XDR_ENCODE:
-      i32p = (int32_t *) (void *) dp;
+        i32p = (int32_t *)(void *)dp;
 #if defined(__IEEE_BIG_ENDIAN)
-      rv = XDR_PUTINT32 (xdrs, i32p);
-      if (!rv)
-        return (rv);
-      rv = XDR_PUTINT32 (xdrs, i32p + 1);
-#else /* must be __IEEE_LITTLE_ENDIAN */
-      rv = XDR_PUTINT32 (xdrs, i32p + 1);
-      if (!rv)
-        return (rv);
-      rv = XDR_PUTINT32 (xdrs, i32p);
+        rv = XDR_PUTINT32(xdrs, i32p);
+        if (!rv)
+            return (rv);
+        rv = XDR_PUTINT32(xdrs, i32p + 1);
+#else  /* must be __IEEE_LITTLE_ENDIAN */
+        rv = XDR_PUTINT32(xdrs, i32p + 1);
+        if (!rv)
+            return (rv);
+        rv = XDR_PUTINT32(xdrs, i32p);
 #endif /* __IEEE_LITTLE_ENDIAN */
-      return (rv);
+        return (rv);
 
     case XDR_DECODE:
-      i32p = (int32_t *) (void *) dp;
+        i32p = (int32_t *)(void *)dp;
 #if defined(__IEEE_BIG_ENDIAN)
-      rv = XDR_GETINT32 (xdrs, i32p);
-      if (!rv)
-        return (rv);
-      rv = XDR_GETINT32 (xdrs, i32p + 1);
-#else /* must be __IEEE_LITTLE_ENDIAN */
-      rv = XDR_GETINT32 (xdrs, i32p + 1);
-      if (!rv)
-        return (rv);
-      rv = XDR_GETINT32 (xdrs, i32p);
+        rv = XDR_GETINT32(xdrs, i32p);
+        if (!rv)
+            return (rv);
+        rv = XDR_GETINT32(xdrs, i32p + 1);
+#else  /* must be __IEEE_LITTLE_ENDIAN */
+        rv = XDR_GETINT32(xdrs, i32p + 1);
+        if (!rv)
+            return (rv);
+        rv = XDR_GETINT32(xdrs, i32p);
 #endif /* __IEEE_LITTLE_ENDIAN */
-      return (rv);
+        return (rv);
 
     case XDR_FREE:
-      return TRUE;
+        return TRUE;
     }
-  return FALSE;
+    return FALSE;
 }
 #endif /* !_DOUBLE_IS_32BITS */
 
 #elif defined(__vax__)
 #include "xdr_float_vax.c"
 #endif
-

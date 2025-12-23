@@ -43,19 +43,22 @@
 
 const char *str = "This is a string";
 
-int main(void) {
+int
+main(void)
+{
 
     FILE *file;
-    char first;
-    long position, start;
+    char  first;
+    long  position, start;
 
-    file = fopen( TEST_FILE_NAME, "wb" );
-    if( file == NULL ) return 1;
+    file = fopen(TEST_FILE_NAME, "wb");
+    if (file == NULL)
+        return 1;
     fputs(str, file);
     fclose(file);
 
-    file = fopen( TEST_FILE_NAME, "rb" );
-    if(file == NULL) {
+    file = fopen(TEST_FILE_NAME, "rb");
+    if (file == NULL) {
         unlink(TEST_FILE_NAME);
         return 1;
     }
@@ -66,9 +69,10 @@ int main(void) {
     start = ftell(file);
     printf("Position before ungetc: %ld\n", start);
 
-    ungetc(first, file);  // Use ungetc to put the character back
+    ungetc(first, file); // Use ungetc to put the character back
 
-    position = ftell(file);  // Check ftell position (should be 0 after ungetc if first character was read)
+    position = ftell(
+        file); // Check ftell position (should be 0 after ungetc if first character was read)
     printf("Position after ungetc: %ld\n", position);
 
     fclose(file);

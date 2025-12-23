@@ -39,7 +39,7 @@ void
 rewind(FILE *stream)
 {
     __flockfile(stream);
-    (void) fseek(stream, 0L, SEEK_SET);
+    (void)fseek(stream, 0L, SEEK_SET);
     clearerr(stream);
     __funlockfile(stream);
 }

@@ -38,19 +38,19 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 #undef strcpy
 
 char *
-strcpy (char *to, const char *from)
+strcpy(char *to, const char *from)
 {
-	char *pto = to;
-	unsigned int n = 0xFFFF;
+    char        *pto = to;
+    unsigned int n = 0xFFFF;
 
-	__asm__ volatile ("1:\n"
-	     "\tmove.b (%0)+,(%1)+\n"
+    __asm__ volatile("1:\n"
+                     "\tmove.b (%0)+,(%1)+\n"
 #if defined(__mcpu32__)
-	     "\tdbeq %2,1b\n"
+                     "\tdbeq %2,1b\n"
 #endif
-	     "\tbne.b 1b\n" :
-		"=a" (from), "=a" (pto), "=d" (n) :
-		 "0" (from),  "1" (pto), "2" (n) :
-		 "cc", "memory");
-	return to;
+                     "\tbne.b 1b\n"
+                     : "=a"(from), "=a"(pto), "=d"(n)
+                     : "0"(from), "1"(pto), "2"(n)
+                     : "cc", "memory");
+    return to;
 }

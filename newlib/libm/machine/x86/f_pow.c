@@ -25,22 +25,24 @@ set errno as normal.
 #include <math.h>
 #include "f_math.h"
 
-double _f_pow (double x, double y)
+double
+_f_pow(double x, double y)
 {
-  /* following sequence handles the majority of cases for pow() */
-  if (x > 0.0 && check_finite(y))
-    {
-      double result;
-      /* calculate x ** y as 2 ** (y log2(x)).  On Intel, can only
-         raise 2 to an integer or a small fraction, thus, we have
-         to perform two steps 2**integer portion * 2**fraction. */
-      __asm__("fyl2x; fld %%st; frndint; fsub %%st,%%st(1);"\
-           "fxch; fchs; f2xm1; fld1; faddp; fxch; fld1; fscale; fstp %%st(1);"\
-           "fmulp" : "=t" (result) : "0" (x), "u" (y) : "st(1)" );
-      return result;
-    }
-  else /* all other strange cases, defer to normal pow() */
-    return pow (x,y);
+    /* following sequence handles the majority of cases for pow() */
+    if (x > 0.0 && check_finite(y)) {
+        double result;
+        /* calculate x ** y as 2 ** (y log2(x)).  On Intel, can only
+           raise 2 to an integer or a small fraction, thus, we have
+           to perform two steps 2**integer portion * 2**fraction. */
+        __asm__("fyl2x; fld %%st; frndint; fsub %%st,%%st(1);"
+                "fxch; fchs; f2xm1; fld1; faddp; fxch; fld1; fscale; fstp %%st(1);"
+                "fmulp"
+                : "=t"(result)
+                : "0"(x), "u"(y)
+                : "st(1)");
+        return result;
+    } else /* all other strange cases, defer to normal pow() */
+        return pow(x, y);
 }
 
 #endif

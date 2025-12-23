@@ -33,65 +33,65 @@
  * $FreeBSD: src/include/runetype.h,v 1.5 2002/03/26 01:35:05 bde Exp $
  */
 
-#ifndef	_RUNETYPE_H_
-#define	_RUNETYPE_H_
+#ifndef _RUNETYPE_H_
+#define _RUNETYPE_H_
 
 #include <stddef.h>
 #include <machine/ansi.h>
 
-#ifdef	_BSD_RUNE_T_
-typedef	_BSD_RUNE_T_	rune_t;
-#undef	_BSD_RUNE_T_
+#ifdef _BSD_RUNE_T_
+typedef _BSD_RUNE_T_ rune_t;
+#undef _BSD_RUNE_T_
 #else
 typedef int rune_t;
 #endif
 
-#define	_CACHED_RUNES	(1 <<8 )	/* Must be a power of 2 */
-#define	_CRMASK		(~(_CACHED_RUNES - 1))
+#define _CACHED_RUNES (1 << 8) /* Must be a power of 2 */
+#define _CRMASK       (~(_CACHED_RUNES - 1))
 
 /*
  * The lower 8 bits of runetype[] contain the digit value of the rune.
  */
 typedef struct {
-	rune_t		min;		/* First rune of the range */
-	rune_t		max;		/* Last rune (inclusive) of the range */
-	rune_t		map;		/* What first maps to in maps */
-	unsigned long	*types;		/* Array of types in range */
+    rune_t         min;   /* First rune of the range */
+    rune_t         max;   /* Last rune (inclusive) of the range */
+    rune_t         map;   /* What first maps to in maps */
+    unsigned long *types; /* Array of types in range */
 } _RuneEntry;
 
 typedef struct {
-	int		nranges;	/* Number of ranges stored */
-	_RuneEntry	*ranges;	/* Pointer to the ranges */
+    int         nranges; /* Number of ranges stored */
+    _RuneEntry *ranges;  /* Pointer to the ranges */
 } _RuneRange;
 
 typedef struct {
-	char		magic[8];	/* Magic saying what version we are */
-	char		encoding[32];	/* ASCII name of this encoding */
+    char          magic[8];     /* Magic saying what version we are */
+    char          encoding[32]; /* ASCII name of this encoding */
 
-	rune_t		(*sgetrune)(const char *, size_t, char const **);
-	int		(*sputrune)(rune_t, char *, size_t, char **);
-	rune_t		invalid_rune;
+    rune_t        (*sgetrune)(const char *, size_t, char const **);
+    int           (*sputrune)(rune_t, char *, size_t, char **);
+    rune_t        invalid_rune;
 
-	unsigned long	runetype[_CACHED_RUNES];
-	rune_t		maplower[_CACHED_RUNES];
-	rune_t		mapupper[_CACHED_RUNES];
+    unsigned long runetype[_CACHED_RUNES];
+    rune_t        maplower[_CACHED_RUNES];
+    rune_t        mapupper[_CACHED_RUNES];
 
-	/*
-	 * The following are to deal with Runes larger than _CACHED_RUNES - 1.
-	 * Their data is actually contiguous with this structure so as to make
-	 * it easier to read/write from/to disk.
-	 */
-	_RuneRange	runetype_ext;
-	_RuneRange	maplower_ext;
-	_RuneRange	mapupper_ext;
+    /*
+     * The following are to deal with Runes larger than _CACHED_RUNES - 1.
+     * Their data is actually contiguous with this structure so as to make
+     * it easier to read/write from/to disk.
+     */
+    _RuneRange    runetype_ext;
+    _RuneRange    maplower_ext;
+    _RuneRange    mapupper_ext;
 
-	void		*variable;	/* Data which depends on the encoding */
-	int		variable_len;	/* how long that data is */
+    void         *variable;     /* Data which depends on the encoding */
+    int           variable_len; /* how long that data is */
 } _RuneLocale;
 
-#define	_RUNE_MAGIC_1	"RuneMagi"	/* Indicates version 0 of RuneLocale */
+#define _RUNE_MAGIC_1 "RuneMagi" /* Indicates version 0 of RuneLocale */
 
-extern _RuneLocale _DefaultRuneLocale;
+extern _RuneLocale  _DefaultRuneLocale;
 extern _RuneLocale *_CurrentRuneLocale;
 
-#endif	/* !_RUNETYPE_H_ */
+#endif /* !_RUNETYPE_H_ */

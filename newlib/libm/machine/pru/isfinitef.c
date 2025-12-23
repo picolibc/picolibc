@@ -30,7 +30,8 @@
    builtin will produce code that uses simple ops only.  In order to support
    linking against TI CLPRU objects, though, provide the function mandated
    by TI ABI.  */
-int __pruabi_isfinitef(float a)
+int
+__pruabi_isfinitef(float a)
 {
-  return isfinite(a);
+    return isfinite(a);
 }

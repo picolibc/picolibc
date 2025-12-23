@@ -61,9 +61,9 @@
 #endif
 
 #ifdef __MB_CAPABLE
-#define MID_CODE        "UTF-8"
+#define MID_CODE "UTF-8"
 #else
-#define MID_CODE        "ASCII"
+#define MID_CODE "ASCII"
 #endif
 
 static const char *encodings[] = {
@@ -71,70 +71,39 @@ static const char *encodings[] = {
 #ifdef __MB_CAPABLE
     "UTF-8",
 #ifdef __MB_EXTENDED_CHARSETS_ISO
-    "ISO-8859-1",
-    "ISO-8859-2",
-    "ISO-8859-3",
-    "ISO-8859-4",
-    "ISO-8859-5",
-    "ISO-8859-6",
-    "ISO-8859-7",
-    "ISO-8859-8",
-    "ISO-8859-9",
-    "ISO-8859-10",
-    "ISO-8859-11",
-    "ISO-8859-13",
-    "ISO-8859-14",
-    "ISO-8859-15",
-    "ISO-8859-16",
+    "ISO-8859-1",  "ISO-8859-2",  "ISO-8859-3",  "ISO-8859-4",  "ISO-8859-5",  "ISO-8859-6",
+    "ISO-8859-7",  "ISO-8859-8",  "ISO-8859-9",  "ISO-8859-10", "ISO-8859-11", "ISO-8859-13",
+    "ISO-8859-14", "ISO-8859-15", "ISO-8859-16",
 #endif
 #ifdef __MB_EXTENDED_CHARSETS_WINDOWS
     "CP437",
 #ifndef __GLIBC__
     "CP720",
 #endif
-    "CP737",
-    "CP775",
-    "CP850",
-    "CP852",
-    "CP855",
-    "CP857",
-    "CP858",
-    "CP862",
-    "CP866",
-    "CP874",
-    "CP1125",
-    "CP1250",
-    "CP1251",
-    "CP1252",
-    "CP1253",
-    "CP1254",
+    "CP737",       "CP775",       "CP850",       "CP852",       "CP855",       "CP857",
+    "CP858",       "CP862",       "CP866",       "CP874",       "CP1125",      "CP1250",
+    "CP1251",      "CP1252",      "CP1253",      "CP1254",
 #ifndef __GLIBC__
     "CP1255",
 #endif
-    "CP1256",
-    "CP1257",
+    "CP1256",      "CP1257",
 #ifndef __GLIBC__
     "CP1258",
 #endif
-    "KOI8-R",
-    "KOI8-U",
-    "GEORGIAN-PS",
-    "PT154",
-    "KOI8-T",
+    "KOI8-R",      "KOI8-U",      "GEORGIAN-PS", "PT154",       "KOI8-T",
 #endif
 #ifdef __MB_EXTENDED_CHARSETS_JIS
-    "EUC-JP",
-    "SHIFT-JIS",
+    "EUC-JP",      "SHIFT-JIS",
 #endif
 #endif
 };
 
-#define NENCODING       (sizeof(encodings)/sizeof(encodings[0]))
+#define NENCODING (sizeof(encodings) / sizeof(encodings[0]))
 
 #ifdef __MSP430__
-#define INBUF_SIZE      512
+#define INBUF_SIZE 512
 #else
-#define INBUF_SIZE      1024
+#define INBUF_SIZE 1024
 #endif
 
 #if __SIZEOF_WCHAR_T__ == 2
@@ -155,13 +124,13 @@ test_iconv_valid(void)
 {
     size_t      e;
     char        locale[64];
-    char        *locale_ret;
+    char       *locale_ret;
     static char inbuf[INBUF_SIZE];
     static char utf8buf[INBUF_SIZE * MB_LEN_MAX];
     static char outbuf[INBUF_SIZE * MB_LEN_MAX];
-    char        *inptr;
-    char        *utf8ptr;
-    char        *outptr;
+    char       *inptr;
+    char       *utf8ptr;
+    char       *outptr;
     int         err = 0;
     int         wctomb_ret;
     size_t      incount;
@@ -203,15 +172,17 @@ test_iconv_valid(void)
 
         /* Create the two iconv contexts */
         to_utf = iconv_open(MID_CODE, encodings[e]);
-        if (to_utf == (iconv_t) -1) {
-            printf("iconv_open(\"%s\", \"%s\") failed: %s\n", MID_CODE, encodings[e], strerror(errno));
+        if (to_utf == (iconv_t)-1) {
+            printf("iconv_open(\"%s\", \"%s\") failed: %s\n", MID_CODE, encodings[e],
+                   strerror(errno));
             err = 1;
             continue;
         }
 
         from_utf = iconv_open(encodings[e], MID_CODE);
-        if (from_utf == (iconv_t) -1) {
-            printf("iconv_open(\"%s\", \"%s\") failed: %s\n", encodings[e], MID_CODE, strerror(errno));
+        if (from_utf == (iconv_t)-1) {
+            printf("iconv_open(\"%s\", \"%s\") failed: %s\n", encodings[e], MID_CODE,
+                   strerror(errno));
             iconv_close(to_utf);
             err = 1;
             continue;
@@ -221,7 +192,7 @@ test_iconv_valid(void)
         wc_start = 0;
 
         /* Fill a buffer in the target encoding with valid chars */
-        for (wc = 1; ; wc++) {
+        for (wc = 1;; wc++) {
             wctomb_ret = wctomb(&inbuf[incount], wc);
             if (wctomb_ret <= 0) {
                 if (wc != LAST_CHAR)
@@ -242,7 +213,7 @@ test_iconv_valid(void)
 
                 /* Reset the conversion state */
                 to_utf_ret = iconv(to_utf, NULL, NULL, NULL, NULL);
-                if (to_utf_ret == (size_t) -1) {
+                if (to_utf_ret == (size_t)-1) {
                     printf("iconv reset failed: %s\n", strerror(errno));
                     err = 1;
                     break;
@@ -273,23 +244,25 @@ test_iconv_valid(void)
                     outbytes_left = outbytes_thistime;
                     to_utf_ret = iconv(to_utf, &inptr, &inbytes_left, &utf8ptr, &outbytes_left);
                     /*
-                     * When we get an error without converting any input, check to see if we need to extend
-                     * the input to build a complete character
+                     * When we get an error without converting any input, check to see if we need to
+                     * extend the input to build a complete character
                      */
-                    if (to_utf_ret == (size_t) -1 && inbytes_left == inbytes_thistime && outbytes_left == outbytes_thistime) {
+                    if (to_utf_ret == (size_t)-1 && inbytes_left == inbytes_thistime
+                        && outbytes_left == outbytes_thistime) {
                         if (errno == EINVAL || errno == EILSEQ) {
-                            if (inbytes_thistime < (incount - tocount) && inbytes_extra < MB_LEN_MAX) {
+                            if (inbytes_thistime < (incount - tocount)
+                                && inbytes_extra < MB_LEN_MAX) {
                                 inbytes_thistime++;
                                 inbytes_extra++;
                                 goto retry_to_utf;
                             }
                         }
-                        printf("encoding %s(%zu) start %lx. iconv to %s failed: %s\n",
-                               encodings[e], e, (unsigned long) wc_start, MID_CODE, strerror(errno));
+                        printf("encoding %s(%zu) start %lx. iconv to %s failed: %s\n", encodings[e],
+                               e, (unsigned long)wc_start, MID_CODE, strerror(errno));
                         err = 1;
                         break;
                     }
-                    if (to_utf_ret != (size_t) -1)
+                    if (to_utf_ret != (size_t)-1)
                         inexact_to_utf += to_utf_ret;
                     tocount = tocount + (inbytes_thistime - inbytes_left);
                     utf8count = utf8count + (outbytes_thistime - outbytes_left);
@@ -298,7 +271,7 @@ test_iconv_valid(void)
                 outbytes_left = MB_LEN_MAX;
                 inbytes_left = 0;
                 to_utf_ret = iconv(to_utf, &inptr, &inbytes_left, &utf8ptr, &outbytes_left);
-                if (to_utf_ret == (size_t) -1) {
+                if (to_utf_ret == (size_t)-1) {
                     printf("iconv to %s failed: %s\n", MID_CODE, strerror(errno));
                     err = 1;
                 } else {
@@ -307,7 +280,7 @@ test_iconv_valid(void)
                 }
                 if (inexact_to_utf != 0) {
                     printf("encoding %s(%zu) start %lx. %zd chars inexactly converted to %s\n",
-                           encodings[e], e, (unsigned long) wc_start, inexact_to_utf, MID_CODE);
+                           encodings[e], e, (unsigned long)wc_start, inexact_to_utf, MID_CODE);
                     err = 1;
                 }
 #endif
@@ -319,7 +292,7 @@ test_iconv_valid(void)
                 outptr = outbuf;
                 utf8ptr = utf8buf;
                 from_utf_ret = iconv(from_utf, NULL, NULL, NULL, NULL);
-                if (from_utf_ret == (size_t) -1) {
+                if (from_utf_ret == (size_t)-1) {
                     printf("iconv reset failed: %s\n", strerror(errno));
                     err = 1;
                     break;
@@ -342,26 +315,29 @@ test_iconv_valid(void)
                     /* Perform the conversion */
                     inbytes_left = inbytes_thistime;
                     outbytes_left = outbytes_thistime;
-                    from_utf_ret = iconv(from_utf, &utf8ptr, &inbytes_left, &outptr, &outbytes_left);
+                    from_utf_ret
+                        = iconv(from_utf, &utf8ptr, &inbytes_left, &outptr, &outbytes_left);
 
                     /*
-                     * When we get an error without converting any input, check to see if we need to extend
-                     * the input to build a complete character
+                     * When we get an error without converting any input, check to see if we need to
+                     * extend the input to build a complete character
                      */
-                    if (from_utf_ret == (size_t) -1 && inbytes_left == inbytes_thistime && outbytes_left == outbytes_thistime) {
+                    if (from_utf_ret == (size_t)-1 && inbytes_left == inbytes_thistime
+                        && outbytes_left == outbytes_thistime) {
                         if (errno == EINVAL || errno == EILSEQ) {
-                            if (inbytes_thistime < utftotal - utf8count && inbytes_extra < MB_LEN_MAX) {
+                            if (inbytes_thistime < utftotal - utf8count
+                                && inbytes_extra < MB_LEN_MAX) {
                                 inbytes_thistime++;
                                 inbytes_extra++;
                                 goto retry_from_utf;
                             }
                         }
                         printf("encoding %s(%zu) start %lx. iconv from %s failed: %s\n",
-                               encodings[e], e, (unsigned long) wc_start, MID_CODE, strerror(errno));
+                               encodings[e], e, (unsigned long)wc_start, MID_CODE, strerror(errno));
                         err = 1;
                         break;
                     }
-                    if (from_utf_ret != (size_t) -1)
+                    if (from_utf_ret != (size_t)-1)
                         inexact_from_utf += from_utf_ret;
                     fromcount = fromcount + (outbytes_thistime - outbytes_left);
                     utf8count = utf8count + (inbytes_thistime - inbytes_left);
@@ -372,7 +348,7 @@ test_iconv_valid(void)
                 inbytes_left = 0;
                 outbytes_left = MB_LEN_MAX;
                 from_utf_ret = iconv(from_utf, &utf8ptr, &inbytes_left, &outptr, &outbytes_left);
-                if (from_utf_ret == (size_t) -1) {
+                if (from_utf_ret == (size_t)-1) {
                     printf("iconv from %s failed: %s\n", MID_CODE, strerror(errno));
                     err = 1;
                 } else {
@@ -381,23 +357,25 @@ test_iconv_valid(void)
                 }
                 if (inexact_from_utf != 0) {
                     printf("encoding %s(%zu) start %lx. %zd chars inexactly converted from %s\n",
-                           encodings[e], e, (unsigned long) wc_start, inexact_from_utf, MID_CODE);
+                           encodings[e], e, (unsigned long)wc_start, inexact_from_utf, MID_CODE);
                     err = 1;
                 }
 #endif
 
                 /* Make sure the round trip is successful */
                 if (tocount != fromcount) {
-                    printf("encoding %s(%zu) start %lx. converted %zd encoded to %zd %s to %zd encoded\n",
-                           encodings[e], e, (unsigned long) wc_start, tocount, utf8count, MID_CODE, fromcount);
+                    printf("encoding %s(%zu) start %lx. converted %zd encoded to %zd %s to %zd "
+                           "encoded\n",
+                           encodings[e], e, (unsigned long)wc_start, tocount, utf8count, MID_CODE,
+                           fromcount);
                     err = 1;
                 }
-                size_t      o;
+                size_t o;
                 for (o = 0; o < tocount && o < fromcount; o++) {
                     if (inbuf[o] != outbuf[o]) {
                         printf("encoding %s(%zu) start %lx. at %zd, input %02x != output %02x\n",
-                               encodings[e], e, (unsigned long) wc_start, o,
-                               (unsigned char) inbuf[o], (unsigned char) outbuf[o]);
+                               encodings[e], e, (unsigned long)wc_start, o, (unsigned char)inbuf[o],
+                               (unsigned char)outbuf[o]);
                         err = 1;
                     }
                 }
@@ -413,7 +391,8 @@ test_iconv_valid(void)
     return err;
 }
 
-int main(void)
+int
+main(void)
 {
     if (test_iconv_valid())
         return 1;

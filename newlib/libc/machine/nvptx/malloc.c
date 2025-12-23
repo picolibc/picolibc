@@ -18,14 +18,15 @@
 #include <stdlib.h>
 
 /* The CUDA-provided malloc.  */
-void *sys_malloc (size_t) __asm__ ("malloc");
+void *sys_malloc(size_t) __asm__("malloc");
 
 /* The user-visible malloc (renamed by compiler).  */
-void *malloc (size_t size)
+void *
+malloc(size_t size)
 {
-  long long *ptr = sys_malloc (size + sizeof (long long));
-  if (ptr)
-    *(size_t *)ptr++ = size;
+    long long *ptr = sys_malloc(size + sizeof(long long));
+    if (ptr)
+        *(size_t *)ptr++ = size;
 
-  return ptr;
+    return ptr;
 }

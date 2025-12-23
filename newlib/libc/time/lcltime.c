@@ -23,14 +23,14 @@ FUNCTION
 <<localtime>>---convert time to local representation
 
 INDEX
-	localtime
+        localtime
 INDEX
-	localtime_r
+        localtime_r
 
 SYNOPSIS
-	#include <time.h>
-	struct tm *localtime(time_t *<[clock]>);
-	struct tm *localtime_r(time_t *<[clock]>, struct tm *<[res]>);
+        #include <time.h>
+        struct tm *localtime(time_t *<[clock]>);
+        struct tm *localtime_r(time_t *<[clock]>, struct tm *<[res]>);
 
 DESCRIPTION
 <<localtime>> converts the time at <[clock]> into local time, then
@@ -59,7 +59,7 @@ ANSI C requires <<localtime>>.
 extern __THREAD_LOCAL struct tm _localtime_buf;
 
 struct tm *
-localtime (const time_t * tim_p)
+localtime(const time_t *tim_p)
 {
-  return localtime_r (tim_p, &_localtime_buf);
+    return localtime_r(tim_p, &_localtime_buf);
 }

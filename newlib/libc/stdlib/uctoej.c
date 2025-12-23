@@ -103,7 +103,7 @@ __unicode_to_euc_jp(wchar_t unicode)
 
     /* Map JIS X213 values */
     if ((jis & 0x8000) == 0 && (jis & 0x80) != 0)
-        return (uint32_t) jis | (uint32_t) 0x8f8000U;
+        return (uint32_t)jis | (uint32_t)0x8f8000U;
 
     return jis;
 }

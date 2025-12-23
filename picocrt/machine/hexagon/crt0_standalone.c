@@ -37,16 +37,16 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "../../crt0.h"
 
-#define DECL_HEXAGON_REG(R)                                                    \
-    static inline uint32_t hexagon_read_##R()                                  \
-    {                                                                          \
-        uint32_t x;                                                            \
-        __asm __volatile("%0=" #R : "=r"(x));                                  \
-        return x;                                                              \
-    }                                                                          \
-    static inline void hexagon_write_##R(uint32_t x)                           \
-    {                                                                          \
-        __asm __volatile(#R "=%0" : : "r"(x));                                 \
+#define DECL_HEXAGON_REG(R)                          \
+    static inline uint32_t hexagon_read_##R()        \
+    {                                                \
+        uint32_t x;                                  \
+        __asm __volatile("%0=" #R : "=r"(x));        \
+        return x;                                    \
+    }                                                \
+    static inline void hexagon_write_##R(uint32_t x) \
+    {                                                \
+        __asm __volatile(#R "=%0" : : "r"(x));       \
     }
 
 // Monitor mode registers.
@@ -143,12 +143,12 @@ enable_l2cache()
 static void
 enable_l1cache()
 {
-    hexagon_write_SYSCFG((hexagon_read_SYSCFG() & ~(1 << 2)) | 1 << 1 |
-                         1 << 23);
+    hexagon_write_SYSCFG((hexagon_read_SYSCFG() & ~(1 << 2)) | 1 << 1 | 1 << 23);
     isync();
 }
 
-void __attribute__((noreturn)) hexagon_start_init1()
+void __attribute__((noreturn))
+hexagon_start_init1()
 {
     // SFD = 0, IE = 0, UM = 0, EX = 0, ASID = 0.
     hexagon_write_SSR(0);
@@ -167,10 +167,10 @@ void __attribute__((noreturn)) hexagon_start_init1()
     __start();
 }
 
-void __attribute__((noreturn)) coredump()
+void __attribute__((noreturn))
+coredump()
 {
-    hexagon_write_SSR(hexagon_read_SSR() &
-                      ~(1 << 16 | 1 << 17)); // UM = 0, EX = 0.
+    hexagon_write_SSR(hexagon_read_SSR() & ~(1 << 16 | 1 << 17)); // UM = 0, EX = 0.
     isync();
     register uint32_t r0 __asm__("r0") = 0xcd;
     __asm__ __volatile__("trap0(#0)" : "=r"(r0) : "r"(r0));

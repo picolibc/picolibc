@@ -12,8 +12,8 @@
  */
 #include <picolibc.h>
 
-void putchar (int c)
+void
+putchar(int c)
 {
-  __asm__("trap #1");
+    __asm__("trap #1");
 }
-

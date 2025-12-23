@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fma.h"
 
-double fma(double x, double y, double z)
+double
+fma(double x, double y, double z)
 {
     return _fma(x, y, z);
 }

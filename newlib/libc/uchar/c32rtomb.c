@@ -36,7 +36,7 @@
 #include "uchar-local.h"
 
 size_t
-c32rtomb (char *s, char32_t c32, mbstate_t *ps)
+c32rtomb(char *s, char32_t c32, mbstate_t *ps)
 {
     static mbstate_t local_state;
 
@@ -45,7 +45,7 @@ c32rtomb (char *s, char32_t c32, mbstate_t *ps)
 
     if (!char32_is_valid(c32)) {
         errno = EILSEQ;
-        return (size_t) -1;
+        return (size_t)-1;
     }
 
 #if __SIZEOF_WCHAR_T__ == 2
@@ -58,5 +58,5 @@ c32rtomb (char *s, char32_t c32, mbstate_t *ps)
         return wcsnrtombs(s, &wcp, 2, SIZE_MAX, ps);
     }
 #endif
-    return wcrtomb(s, (wchar_t) c32, ps);
+    return wcrtomb(s, (wchar_t)c32, ps);
 }

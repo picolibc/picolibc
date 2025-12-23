@@ -38,38 +38,37 @@
 #include "powerpc_crt.h"
 
 struct function_descriptor {
-    void        *entry;
-    void        *toc;
+    void *entry;
+    void *toc;
 };
 
 struct plt {
     struct function_descriptor *iplt;
-    uint64_t    unknown;
+    uint64_t                    unknown;
     struct function_descriptor *desc;
 };
 
 static __always_inline void
 post_memory_setup(void)
 {
-        struct plt          *plt = (void *) __plt_start;
-        size_t              plt_count = ((size_t) (uintptr_t) __plt_size) / sizeof (struct plt);
-        size_t              i;
+    struct plt *plt = (void *)__plt_start;
+    size_t      plt_count = ((size_t)(uintptr_t)__plt_size) / sizeof(struct plt);
+    size_t      i;
 
-        for (i = 0; i < plt_count; i++)
-                *plt[i].iplt = *plt[i].desc;
+    for (i = 0; i < plt_count; i++)
+        *plt[i].iplt = *plt[i].desc;
 }
 
 #define POST_MEMORY_SETUP() post_memory_setup()
 
 #include "../../crt0.h"
 
-void *__opal_base __attribute__((section(".preserve")));
-void *__opal_entry __attribute__((section(".preserve")));
+void       *__opal_base __attribute__((section(".preserve")));
+void       *__opal_entry __attribute__((section(".preserve")));
 
-void __used __section(".init")
-_cstart(void *opal_base, void *opal_entry)
+void __used __section(".init") _cstart(void *opal_base, void *opal_entry)
 {
-        __opal_base = opal_base;
-        __opal_entry = opal_entry;
-	__start();
+    __opal_base = opal_base;
+    __opal_entry = opal_entry;
+    __start();
 }

@@ -31,6 +31,6 @@
 */
 
 #define SCANF_VARIANT __IO_VARIANT_MINIMAL
-#define SCANF_NAME __m_vfscanf
+#define SCANF_NAME    __m_vfscanf
 
 #include "vfscanf.c"

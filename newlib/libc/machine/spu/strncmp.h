@@ -44,112 +44,109 @@
  * to complete, *end_v is modified only if check_zeroes is set.
  */
 static inline int
-_strncmp_internal(const char *s1, const char *s2, size_t n, vec_uint4
-                  *end_v, int check_zeroes)
+_strncmp_internal(const char *s1, const char *s2, size_t n, vec_uint4 *end_v, int check_zeroes)
 {
-  unsigned int offset1, offset2;
-  vec_int4 n_v;
-  vec_uint4 cnt1_v, cnt2_v, max_cnt_v;
-  vec_uint4 gt_v, lt_v, mask_v, end1_v, end2_v, neq_v, tmp1_v;
-  vec_uint4 shift_n_v, shift_eos_v, max_shift_v;
-  vec_uchar16 shuffle1, shuffle2;
-  vec_uchar16 data1A, data1B, data1, data2A, data2B, data2;
-  vec_uchar16 *ptr1, *ptr2;
+    unsigned int offset1, offset2;
+    vec_int4     n_v;
+    vec_uint4    cnt1_v, cnt2_v, max_cnt_v;
+    vec_uint4    gt_v, lt_v, mask_v, end1_v, end2_v, neq_v, tmp1_v;
+    vec_uint4    shift_n_v, shift_eos_v, max_shift_v;
+    vec_uchar16  shuffle1, shuffle2;
+    vec_uchar16  data1A, data1B, data1, data2A, data2B, data2;
+    vec_uchar16 *ptr1, *ptr2;
 
-  data1 = data2 = spu_splats((unsigned char)0);
+    data1 = data2 = spu_splats((unsigned char)0);
 
-  ptr1 = (vec_uchar16 *)s1;
-  ptr2 = (vec_uchar16 *)s2;
+    ptr1 = (vec_uchar16 *)s1;
+    ptr2 = (vec_uchar16 *)s2;
 
-  offset1 = (unsigned int)(ptr1) & 15;
-  offset2 = (unsigned int)(ptr2) & 15;
+    offset1 = (unsigned int)(ptr1) & 15;
+    offset2 = (unsigned int)(ptr2) & 15;
 
-  shuffle1 = (vec_uchar16)
-    spu_add((vec_uint4)spu_splats((unsigned char)offset1),
-    ((vec_uint4) {0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F}));
-  shuffle2 = (vec_uchar16)
-    spu_add((vec_uint4)spu_splats((unsigned char)offset2),
-    ((vec_uint4) {0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F}));
-  data1A = *ptr1++;
-  data2A = *ptr2++;
+    shuffle1
+        = (vec_uchar16)spu_add((vec_uint4)spu_splats((unsigned char)offset1),
+                               ((vec_uint4) { 0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F }));
+    shuffle2
+        = (vec_uchar16)spu_add((vec_uint4)spu_splats((unsigned char)offset2),
+                               ((vec_uint4) { 0x00010203, 0x04050607, 0x08090A0B, 0x0C0D0E0F }));
+    data1A = *ptr1++;
+    data2A = *ptr2++;
 
-  n_v = spu_promote((int)n, 0);
+    n_v = spu_promote((int)n, 0);
 
-  do {
-    data1B = *ptr1++;
-    data2B = *ptr2++;
+    do {
+        data1B = *ptr1++;
+        data2B = *ptr2++;
+
+        /*
+         * Quadword align each of the input strings so that we operate on full
+         * quadwords.
+         */
+        data1 = spu_shuffle(data1A, data1B, shuffle1);
+        data2 = spu_shuffle(data2A, data2B, shuffle2);
+
+        data1A = data1B;
+        data2A = data2B;
+
+        neq_v = spu_gather(spu_xor(spu_cmpeq(data1, data2), -1));
+
+        if (check_zeroes) {
+            end1_v = spu_gather(spu_cmpeq(data1, 0));
+            end2_v = spu_gather(spu_cmpeq(data2, 0));
+            *end_v = spu_or(end1_v, end2_v);
+        }
+
+        n_v = spu_add(n_v, -16);
+
+        /*
+         * Repeat until either
+         * 1) the character count expired
+         * 2) check_zeroes is set and a null character is discovered in one of
+         *    the input strings
+         * 3) the strings do not compare equal
+         */
+        if (check_zeroes) {
+            tmp1_v = spu_or(*end_v, neq_v);
+            tmp1_v = spu_cmpeq(tmp1_v, 0);
+        } else {
+            tmp1_v = spu_cmpeq(neq_v, 0);
+        }
+        tmp1_v = spu_and(tmp1_v, spu_cmpgt(n_v, 0));
+    } while (spu_extract(tmp1_v, 0));
 
     /*
-     * Quadword align each of the input strings so that we operate on full
-     * quadwords.
+     * Construct a mask to eliminate characters that are not of interest
+     * in the comparison.
      */
-    data1 = spu_shuffle(data1A, data1B, shuffle1);
-    data2 = spu_shuffle(data2A, data2B, shuffle2);
-
-    data1A = data1B;
-    data2A = data2B;
-
-    neq_v = spu_gather(spu_xor(spu_cmpeq(data1, data2), -1));
-
+    mask_v = spu_splats((unsigned int)0xFFFF);
+    shift_n_v = spu_andc((__vector unsigned int)spu_sub(0, n_v), spu_cmpgt(n_v, -1));
     if (check_zeroes) {
-      end1_v = spu_gather(spu_cmpeq(data1, 0));
-      end2_v = spu_gather(spu_cmpeq(data2, 0));
-      *end_v = spu_or(end1_v, end2_v);
-    }
-
-    n_v = spu_add(n_v, -16);
-
-    /*
-     * Repeat until either
-     * 1) the character count expired
-     * 2) check_zeroes is set and a null character is discovered in one of
-     *    the input strings
-     * 3) the strings do not compare equal
-     */
-    if (check_zeroes) {
-      tmp1_v = spu_or(*end_v, neq_v);
-      tmp1_v = spu_cmpeq(tmp1_v, 0);
+        cnt1_v = spu_cntlz(end1_v);
+        cnt2_v = spu_cntlz(end2_v);
+        max_cnt_v = spu_sel(cnt1_v, cnt2_v, spu_cmpgt(cnt2_v, cnt1_v));
+        shift_eos_v = spu_sub(32, max_cnt_v);
+        max_shift_v = spu_sel(shift_n_v, shift_eos_v, spu_cmpgt(shift_eos_v, shift_n_v));
+        mask_v = spu_and(spu_sl(mask_v, spu_extract(max_shift_v, 0)), mask_v);
     } else {
-      tmp1_v = spu_cmpeq(neq_v, 0);
+        mask_v = spu_and(spu_sl(mask_v, spu_extract(shift_n_v, 0)), mask_v);
     }
-    tmp1_v = spu_and(tmp1_v, spu_cmpgt(n_v, 0));
-  } while (spu_extract(tmp1_v, 0));
 
-  /*
-   * Construct a mask to eliminate characters that are not of interest
-   * in the comparison.
-   */
-  mask_v = spu_splats((unsigned int)0xFFFF);
-  shift_n_v =
-	  spu_andc((__vector unsigned int)spu_sub(0, n_v), spu_cmpgt(n_v, -1));
-  if (check_zeroes) {
-    cnt1_v = spu_cntlz(end1_v);
-    cnt2_v = spu_cntlz(end2_v);
-    max_cnt_v = spu_sel(cnt1_v, cnt2_v, spu_cmpgt(cnt2_v, cnt1_v));
-    shift_eos_v = spu_sub(32, max_cnt_v);
-    max_shift_v =
-      spu_sel(shift_n_v, shift_eos_v, spu_cmpgt(shift_eos_v, shift_n_v));
-    mask_v = spu_and(spu_sl(mask_v, spu_extract(max_shift_v, 0)), mask_v);
-  } else {
-    mask_v = spu_and(spu_sl(mask_v, spu_extract(shift_n_v, 0)), mask_v);
-  }
+    /*
+     * Determine if greater then or less then in the case that they are
+     * not equal. gt_v is either 1 (in the case s1 is greater then s2), or
+     * -1 (in the case that s2 is greater then s1).
+     *
+     * There are no byte vector math instructions, so we can't subtract
+     * data1 from data2.
+     */
+    gt_v = spu_gather(spu_cmpgt(data1, data2));
+    lt_v = spu_gather(spu_cmpgt(data2, data1));
+    gt_v = spu_sub(-1, spu_sl(spu_cmpgt(gt_v, lt_v), 1));
 
-  /*
-   * Determine if greater then or less then in the case that they are
-   * not equal. gt_v is either 1 (in the case s1 is greater then s2), or
-   * -1 (in the case that s2 is greater then s1).
-   *
-   * There are no byte vector math instructions, so we can't subtract
-   * data1 from data2.
-   */
-  gt_v = spu_gather(spu_cmpgt(data1, data2));
-  lt_v = spu_gather(spu_cmpgt(data2, data1));
-  gt_v = spu_sub(-1, spu_sl(spu_cmpgt(gt_v, lt_v), 1));
-
-  /*
-   * Construct a mask to be applied to gt_v if the strings are discovered
-   * to be equal.
-   */
-  mask_v = spu_cmpeq(spu_and(neq_v, mask_v), 0);
-  return (spu_extract(spu_andc(gt_v, mask_v), 0));
+    /*
+     * Construct a mask to be applied to gt_v if the strings are discovered
+     * to be equal.
+     */
+    mask_v = spu_cmpeq(spu_and(neq_v, mask_v), 0);
+    return (spu_extract(spu_andc(gt_v, mask_v), 0));
 }

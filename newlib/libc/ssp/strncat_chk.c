@@ -35,37 +35,35 @@
 #include <string.h>
 #include <stdio.h>
 
-char *__strncat_chk(char * __restrict, const char * __restrict, size_t,
-    size_t);
+char *__strncat_chk(char * __restrict, const char * __restrict, size_t, size_t);
 
 char *
-__strncat_chk(char * __restrict dst, const char * __restrict src, size_t len,
-    size_t slen)
+__strncat_chk(char * __restrict dst, const char * __restrict src, size_t len, size_t slen)
 {
-	char *d;
+    char *d;
 
-	if (len == 0)
-		return dst;
+    if (len == 0)
+        return dst;
 
-	if (len > slen)
-		__chk_fail();
+    if (len > slen)
+        __chk_fail();
 
-	for (d = dst; *d; d++) {
-		if (slen-- == 0)
-			__chk_fail();
-	}
+    for (d = dst; *d; d++) {
+        if (slen-- == 0)
+            __chk_fail();
+    }
 
-	do {
-		if ((*d = *src++) == '\0')
-			break;
-		if (slen-- == 0)
-			__chk_fail();
-		d++;
-	} while (--len != 0);
+    do {
+        if ((*d = *src++) == '\0')
+            break;
+        if (slen-- == 0)
+            __chk_fail();
+        d++;
+    } while (--len != 0);
 
-	if (slen-- == 0)
-		__chk_fail();
+    if (slen-- == 0)
+        __chk_fail();
 
-	*d = '\0';
-	return dst;
+    *d = '\0';
+    return dst;
 }

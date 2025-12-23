@@ -36,10 +36,9 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_invalid_objc_cast(void *_data,
-                                void *src)
+__ubsan_handle_invalid_objc_cast(void *_data, void *src)
 {
     struct invalid_objc_cast_data *data = _data;
-    __ubsan_error(&data->location, "invalid_objc_cast", "(%s) %p\n",
-                  data->expected_type->type_name, src);
+    __ubsan_error(&data->location, "invalid_objc_cast", "(%s) %p\n", data->expected_type->type_name,
+                  src);
 }

@@ -36,7 +36,7 @@
  */
 
 #ifndef _SYS__SIGSET_H_
-#define	_SYS__SIGSET_H_
+#define _SYS__SIGSET_H_
 
 typedef unsigned long __sigset_t;
 

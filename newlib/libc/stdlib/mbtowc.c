@@ -7,14 +7,14 @@ FUNCTION
 <<mbtowc>>---minimal multibyte to wide char converter
 
 INDEX
-	mbtowc
+        mbtowc
 
 SYNOPSIS
-	#include <stdlib.h>
-	int mbtowc(wchar_t *restrict <[pwc]>, const char *restrict <[s]>, size_t <[n]>);
+        #include <stdlib.h>
+        int mbtowc(wchar_t *restrict <[pwc]>, const char *restrict <[s]>, size_t <[n]>);
 
 DESCRIPTION
-When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming 
+When __MB_CAPABLE is not defined, this is a minimal ANSI-conforming
 implementation of <<mbtowc>>.  In this case,
 only ``multi-byte character sequences'' recognized are single bytes,
 and they are ``converted'' to themselves.
@@ -28,10 +28,10 @@ setting which may be restricted to a defined set of locales.
 
 RETURNS
 This implementation of <<mbtowc>> returns <<0>> if
-<[s]> is <<NULL>> or is the empty string; 
+<[s]> is <<NULL>> or is the empty string;
 it returns <<1>> if not __MB_CAPABLE or
 the character is a single-byte character; it returns <<-1>>
-if n is <<0>> or the multi-byte character is invalid; 
+if n is <<0>> or the multi-byte character is invalid;
 otherwise it returns the number of bytes in the multibyte character.
 If the return value is -1, no changes are made to the <<pwc>>
 output string.  If the input is the empty string, a wchar_t nul
@@ -57,19 +57,17 @@ static mbstate_t _mbtowc_state;
 #endif
 
 int
-mbtowc (wchar_t *__restrict pwc,
-        const char *__restrict s,
-        size_t n)
+mbtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n)
 {
-        int retval;
+    int retval;
 
-        retval = __MBTOWC (pwc, s, n, ps);
-        if (retval < 0) {
+    retval = __MBTOWC(pwc, s, n, ps);
+    if (retval < 0) {
 #ifdef __MB_CAPABLE
-                _mbtowc_state.__count = 0;
+        _mbtowc_state.__count = 0;
 #endif
-                errno = EILSEQ;
-                retval = -1;
-        }
-        return retval;
+        errno = EILSEQ;
+        retval = -1;
+    }
+    return retval;
 }

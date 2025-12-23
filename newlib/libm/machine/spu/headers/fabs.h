@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FABS_H_
-#define _FABS_H_	1
+#define _FABS_H_ 1
 
 /*
  * FUNCTION
@@ -46,13 +46,14 @@
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
 
-static __inline double _fabs(double x)
+static __inline double
+_fabs(double x)
 {
-  vec_ullong2 vx;
+    vec_ullong2 vx;
 
-  vx = (vec_ullong2)spu_promote(x, 0);
-  vx = spu_andc(vx, VEC_SPLAT_U64(0x8000000000000000ULL));
+    vx = (vec_ullong2)spu_promote(x, 0);
+    vx = spu_andc(vx, VEC_SPLAT_U64(0x8000000000000000ULL));
 
-  return (spu_extract((vec_double2)vx, 0));
+    return (spu_extract((vec_double2)vx, 0));
 }
 #endif /*  _FABS_H_ */

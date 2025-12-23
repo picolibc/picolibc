@@ -40,14 +40,14 @@ int
 open(const char *pathname, int flags, ...)
 {
     struct _simcall_ret ret;
-    va_list ap;
+    va_list             ap;
 
     va_start(ap, flags);
     intptr_t mode = va_arg(ap, intptr_t);
     va_end(ap);
 
-    ret = _simcall(SYS_open, (intptr_t) pathname, flags, mode);
+    ret = _simcall(SYS_open, (intptr_t)pathname, flags, mode);
     if (ret.code < 0)
         errno = ret.error;
-    return (int) ret.code;
+    return (int)ret.code;
 }

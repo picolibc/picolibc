@@ -46,11 +46,12 @@
 static void __attribute__((constructor(101)))
 crt_startup(void)
 {
-	_exit(CONSTRUCTOR_RET);
+    _exit(CONSTRUCTOR_RET);
 }
 
-int main(void)
+int
+main(void)
 {
-	/* Must use exit as this test is linked with minimal crt0 */
-	exit(REGULAR_RET);
+    /* Must use exit as this test is linked with minimal crt0 */
+    exit(REGULAR_RET);
 }

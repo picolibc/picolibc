@@ -9,34 +9,28 @@ Copyright (c) 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 #include "local.h"
 
 size_t
-mbrtowc (wchar_t *__restrict pwc,
-	const char *__restrict s,
-	size_t n,
-	mbstate_t *__restrict ps)
+mbrtowc(wchar_t * __restrict pwc, const char * __restrict s, size_t n, mbstate_t * __restrict ps)
 {
-  int retval = 0;
+    int retval = 0;
 
 #ifdef __MB_CAPABLE
-  if (ps == NULL)
-    {
-      static mbstate_t _mbrtowc_state;
-      ps = &_mbrtowc_state;
+    if (ps == NULL) {
+        static mbstate_t _mbrtowc_state;
+        ps = &_mbrtowc_state;
     }
 #endif
 
-  if (s == NULL)
-    retval = __MBTOWC (NULL, "", 1, ps);
-  else
-    retval = __MBTOWC (pwc, s, n, ps);
+    if (s == NULL)
+        retval = __MBTOWC(NULL, "", 1, ps);
+    else
+        retval = __MBTOWC(pwc, s, n, ps);
 
-  if (retval == -1)
-    {
+    if (retval == -1) {
 #ifdef __MB_CAPABLE
-      ps->__count = 0;
+        ps->__count = 0;
 #endif
-      errno = EILSEQ;
-      return (size_t)(-1);
-    }
-  else
-    return (size_t)retval;
+        errno = EILSEQ;
+        return (size_t)(-1);
+    } else
+        return (size_t)retval;
 }

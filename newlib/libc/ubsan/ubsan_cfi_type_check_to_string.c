@@ -35,7 +35,7 @@
 
 #include "ubsan.h"
 
-static const char *const cfi_type_check_kinds[] = {
+static const char * const cfi_type_check_kinds[] = {
     [cfi_type_check_v_call] = "cfi_type_check_v_call",
     [cfi_type_check_nv_call] = "cfi_type_check_nv_call",
     [cfi_type_check_derived_cast] = "cfi_type_check_derived_cast",
@@ -45,10 +45,10 @@ static const char *const cfi_type_check_kinds[] = {
     [cfi_type_check_vmf_call] = "cfi_type_check_vmf_call",
 };
 
-const char*
+const char *
 __ubsan_cfi_type_check_to_string(unsigned char cfi_type_check_kind)
 {
-    if (cfi_type_check_kind < sizeof(cfi_type_check_kinds)/sizeof(cfi_type_check_kinds[0]))
+    if (cfi_type_check_kind < sizeof(cfi_type_check_kinds) / sizeof(cfi_type_check_kinds[0]))
         return cfi_type_check_kinds[cfi_type_check_kind];
     return "unknown";
 }

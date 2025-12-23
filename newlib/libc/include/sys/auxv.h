@@ -42,8 +42,8 @@ _BEGIN_STD_C
 
 unsigned long getauxval(unsigned long type);
 
-#define AT_HWCAP	16
-#define AT_HWCAP2	26
+#define AT_HWCAP  16
+#define AT_HWCAP2 26
 
 _END_STD_C
 

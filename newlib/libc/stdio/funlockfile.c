@@ -36,12 +36,12 @@
 #include "stdio_private.h"
 
 void
-funlockfile (FILE *f)
+funlockfile(FILE *f)
 {
 #ifdef __STDIO_LOCKING
     __funlockfile(f);
 #else
-    (void) f;
+    (void)f;
     __LIBC_UNLOCK();
 #endif
 }

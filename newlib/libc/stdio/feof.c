@@ -37,7 +37,7 @@
 int
 __STDIO_UNLOCKED(feof)(FILE *stream)
 {
-	return stream->flags & __SEOF;
+    return stream->flags & __SEOF;
 }
 
 #ifdef __STDIO_LOCKING
@@ -54,6 +54,10 @@ feof(FILE *stream)
 #ifdef __strong_reference
 __strong_reference(feof, feof_unlocked);
 #else
-int feof_unlocked(FILE *stream) { return feof(stream); }
+int
+feof_unlocked(FILE *stream)
+{
+    return feof(stream);
+}
 #endif
 #endif

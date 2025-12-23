@@ -34,8 +34,8 @@ POSSIBILITY OF SUCH DAMAGE.
 /* On platforms where long double is as wide as double.  */
 #if defined(_NEED_FLOAT_HUGE) && __HAVE_BUILTIN_NANL
 long double
-nanl (const char *tagp)
+nanl(const char *tagp)
 {
-  return __builtin_nanl("");
+    return __builtin_nanl("");
 }
 #endif

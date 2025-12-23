@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _ILOGB_H_
-#define _ILOGB_H_	1
+#define _ILOGB_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/vec_literal.h"
@@ -49,38 +49,40 @@
  *      else	signed exponent
  */
 
-static __inline int _ilogb(double x)
+static __inline int
+_ilogb(double x)
 {
-  vec_uint4 v, exp, exp_0, mant, mask, count;
-  vec_uint4 flg_exp_0, flg_exp_max;
+    vec_uint4 v, exp, exp_0, mant, mask, count;
+    vec_uint4 flg_exp_0, flg_exp_max;
 
-  mask = VEC_SPLAT_U32(0x7FF);
+    mask = VEC_SPLAT_U32(0x7FF);
 
-  /* Extract the exponent and mantissa.
-   */
-  v = (vec_uint4)spu_promote(x, 0);
+    /* Extract the exponent and mantissa.
+     */
+    v = (vec_uint4)spu_promote(x, 0);
 
-  exp = spu_and(spu_rlmask(v, -20), mask);
+    exp = spu_and(spu_rlmask(v, -20), mask);
 
-  mant = spu_and(v, VEC_LITERAL(vec_uint4, 0x000FFFFF, 0xFFFFFFFF, 0, 0));
+    mant = spu_and(v, VEC_LITERAL(vec_uint4, 0x000FFFFF, 0xFFFFFFFF, 0, 0));
 
-  /* Count the leading zeros in the mantissa for denorm handling
-   * and zero identification.
-   */
-  count = spu_cntlz(mant);
-  count = spu_add(count, spu_and(spu_rlqwbyte(count, 4), spu_cmpeq(count, 32)));
+    /* Count the leading zeros in the mantissa for denorm handling
+     * and zero identification.
+     */
+    count = spu_cntlz(mant);
+    count = spu_add(count, spu_and(spu_rlqwbyte(count, 4), spu_cmpeq(count, 32)));
 
-  flg_exp_0 = spu_cmpeq(exp, 0);
-  flg_exp_max = spu_cmpeq(exp, mask);
+    flg_exp_0 = spu_cmpeq(exp, 0);
+    flg_exp_max = spu_cmpeq(exp, mask);
 
-  exp = spu_add(exp, -1023);
+    exp = spu_add(exp, -1023);
 
-  /* Determine the exponent if the input is a denorm or zero.
-   */
-  exp_0 = spu_sel(spu_sub(spu_add(exp, 12), count), VEC_SPLAT_U32(FP_ILOGB0), spu_cmpeq(count, 64));
+    /* Determine the exponent if the input is a denorm or zero.
+     */
+    exp_0
+        = spu_sel(spu_sub(spu_add(exp, 12), count), VEC_SPLAT_U32(FP_ILOGB0), spu_cmpeq(count, 64));
 
-  exp = spu_sel(spu_sel(exp, VEC_SPLAT_U32(FP_ILOGBNAN), flg_exp_max), exp_0, flg_exp_0);
+    exp = spu_sel(spu_sel(exp, VEC_SPLAT_U32(FP_ILOGBNAN), flg_exp_max), exp_0, flg_exp_0);
 
-  return (spu_extract((vec_int4)(exp), 0));
+    return (spu_extract((vec_int4)(exp), 0));
 }
 #endif /* _ILOGB_H_ */

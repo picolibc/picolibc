@@ -28,11 +28,11 @@
 #include <math.h>
 
 double
-floor (double x)
+floor(double x)
 {
-  double result;
-  __asm__("frintm\t%d0, %d1" : "=w" (result) : "w" (x));
-  return result;
+    double result;
+    __asm__("frintm\t%d0, %d1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

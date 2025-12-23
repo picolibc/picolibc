@@ -38,9 +38,9 @@
 intptr_t
 nios2_semihost(int func, struct nios2_semihost *args)
 {
-    register int r_op __asm__("r4") = func;
+    register int                    r_op __asm__("r4") = func;
     register struct nios2_semihost *r_args __asm__("r5") = args;
-    register int r_ret __asm__("r2");
-    __asm__("break 1" : "=r" (r_ret): "r" (r_op), "r" (r_args));
+    register int                    r_ret __asm__("r2");
+    __asm__("break 1" : "=r"(r_ret) : "r"(r_op), "r"(r_args));
     return r_ret;
 }

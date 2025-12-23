@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isupper>>, <<isupper_l>>---uppercase character predicate
+        <<isupper>>, <<isupper_l>>---uppercase character predicate
 
 INDEX
-	isupper
+        isupper
 
 INDEX
-	isupper_l
+        isupper_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isupper(int <[c]>);
+        #include <ctype.h>
+        int isupper(int <[c]>);
 
-	#include <ctype.h>
-	int isupper_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isupper_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isupper>> is a macro which classifies singlebyte charset values by table
@@ -68,11 +68,11 @@ No supporting OS subroutines are required.
 
 #undef isupper
 int
-isupper (int c)
+isupper(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return 'A' <= c && c <= 'Z';
 #else
-    return ((__CTYPE_PTR[c+1] & (__CTYPE_UPPER|__CTYPE_LOWER)) == __CTYPE_UPPER);
+    return ((__CTYPE_PTR[c + 1] & (__CTYPE_UPPER | __CTYPE_LOWER)) == __CTYPE_UPPER);
 #endif
 }

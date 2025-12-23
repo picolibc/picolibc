@@ -35,30 +35,28 @@
 
 #include "../../crt0.h"
 
-static void __used __section(".init")
-_cstart(void)
+static void __used __section(".init") _cstart(void)
 {
-	__start();
+    __start();
 }
 
 extern char __stack[];
 extern char __interrupt_vector[];
 
-void __section(".init") __used
-_start(void)
+void        __section(".init") __used _start(void)
 {
-        /* Initialize trap base register */
-        __asm__("wr %0, %%tbr" : : "r" (__interrupt_vector));
+    /* Initialize trap base register */
+    __asm__("wr %0, %%tbr" : : "r"(__interrupt_vector));
 
-	/* Initialize stack pointer */
-	__asm__("sethi %%hi(%0), %%sp" : : "i" (__stack));
-	__asm__("or  %%sp, %%lo(%0), %%sp" : : "i" (__stack));
+    /* Initialize stack pointer */
+    __asm__("sethi %%hi(%0), %%sp" : : "i"(__stack));
+    __asm__("or  %%sp, %%lo(%0), %%sp" : : "i"(__stack));
 
-        /* Enable interrupts */
-        __asm__("wr %g0, 2, %wim");
-        __asm__("wr %g0, 0xfe0, %psr");
+    /* Enable interrupts */
+    __asm__("wr %g0, 2, %wim");
+    __asm__("wr %g0, 0xfe0, %psr");
 
-	/* Branch to C code */
-        __asm__("jmp %0" : : "r" (_cstart));
-        __asm__("nop");
+    /* Branch to C code */
+    __asm__("jmp %0" : : "r"(_cstart));
+    __asm__("nop");
 }

@@ -36,27 +36,27 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "ea_internal.h"
 #include <ea.h>
 
-COMPAT_EA_ALIAS (strncat_ea);
+COMPAT_EA_ALIAS(strncat_ea);
 
 /*
  * Not the fastest thing ever since it reads through the data once on
  * strlen and once on memcpy.
  */
 __ea char *
-strncat_ea (__ea char *dest, __ea const char *src, size_ea_t n)
+strncat_ea(__ea char *dest, __ea const char *src, size_ea_t n)
 {
-  size_ea_t length_src;
-  size_ea_t length_dest;
-  __ea char *new_dest;
-  size_ea_t smaller_length;
+    size_ea_t  length_src;
+    size_ea_t  length_dest;
+    __ea char *new_dest;
+    size_ea_t  smaller_length;
 
-  length_src = strlen_ea (src);
-  length_dest = strlen_ea (dest);
-  new_dest = dest + length_dest;
-  smaller_length = length_src < n ? length_src : n;
-  memcpy_ea ((__ea void *) new_dest, (__ea void *) src, smaller_length);
-  /* null out last character */
-  memset_ea ((__ea void *) (new_dest + smaller_length), 0, 1);
+    length_src = strlen_ea(src);
+    length_dest = strlen_ea(dest);
+    new_dest = dest + length_dest;
+    smaller_length = length_src < n ? length_src : n;
+    memcpy_ea((__ea void *)new_dest, (__ea void *)src, smaller_length);
+    /* null out last character */
+    memset_ea((__ea void *)(new_dest + smaller_length), 0, 1);
 
-  return dest;
+    return dest;
 }

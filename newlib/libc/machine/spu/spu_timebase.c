@@ -36,18 +36,16 @@ POSSIBILITY OF SUCH DAMAGE.
 /* This function queries /proc/cpuinfo and returns the SPU time base in
    Hertz.  */
 unsigned int
-spu_timebase (void)
+spu_timebase(void)
 {
-  FILE *f;
-  unsigned tb = 0;
-  char line[64];
-  if ((f = fopen ("/proc/cpuinfo", "r")))
-    {
-      while (fgets (line, sizeof (line), f))
-        if (sscanf (line, "timebase : %u", &tb))
-          break;
-      fclose (f);
+    FILE    *f;
+    unsigned tb = 0;
+    char     line[64];
+    if ((f = fopen("/proc/cpuinfo", "r"))) {
+        while (fgets(line, sizeof(line), f))
+            if (sscanf(line, "timebase : %u", &tb))
+                break;
+        fclose(f);
     }
-  return (tb);
+    return (tb);
 }
-

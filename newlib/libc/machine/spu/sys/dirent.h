@@ -37,19 +37,19 @@
 
 _BEGIN_STD_C
 
-#define MAXNAMLEN	255
+#define MAXNAMLEN 255
 
 struct dirent {
-  ino_t  d_ino;
-  char   d_name[MAXNAMLEN + 1];
+    ino_t d_ino;
+    char  d_name[MAXNAMLEN + 1];
 };
 
 typedef struct {
-  unsigned long long ppc_dir;
-  /*
-   * Allow one readdir for each opendir, and store the data here.
-   */
-  struct dirent dirent;
+    unsigned long long ppc_dir;
+    /*
+     * Allow one readdir for each opendir, and store the data here.
+     */
+    struct dirent      dirent;
 } DIR;
 
 _END_STD_C

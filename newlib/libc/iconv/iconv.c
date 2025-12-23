@@ -36,28 +36,27 @@
 #include "iconv_private.h"
 
 size_t
-iconv (iconv_t ic,
-       char **__restrict inbuf, size_t *__restrict inbytesleft,
-       char **__restrict outbuf, size_t *__restrict outbytesleft)
+iconv(iconv_t ic, char ** __restrict inbuf, size_t * __restrict inbytesleft,
+      char ** __restrict outbuf, size_t * __restrict outbytesleft)
 {
-    if (ic == (iconv_t) -1) {
+    if (ic == (iconv_t)-1) {
         errno = EINVAL;
-        return (size_t) -1;
+        return (size_t)-1;
     }
 
     if (!inbuf || !inbytesleft)
         return 0;
 
-    char        *in = *inbuf;
-    char        *out = *outbuf;
-    size_t      inbytes = *inbytesleft;
-    size_t      outbytes = *outbytesleft;
-    size_t      tocopy;
+    char  *in = *inbuf;
+    char  *out = *outbuf;
+    size_t inbytes = *inbytesleft;
+    size_t outbytes = *outbytesleft;
+    size_t tocopy;
 #ifdef __MB_CAPABLE
-    char        *wc_out;
-    int         ret;
-    wchar_t     wc;
-    size_t      inexact_count = 0;
+    char   *wc_out;
+    int     ret;
+    wchar_t wc;
+    size_t  inexact_count = 0;
 
     while (outbytes) {
         if (ic->buf_len) {
@@ -80,7 +79,7 @@ iconv (iconv_t ic,
                 inbytes = 0;
                 break;
             case -1:
-                switch(ic->mode) {
+                switch (ic->mode) {
                 case iconv_ignore:
                     in += 1;
                     inbytes--;
@@ -139,9 +138,9 @@ fail:
     *inbuf = in;
     *inbytesleft = inbytes;
     errno = EILSEQ;
-    return (size_t) -1;
+    return (size_t)-1;
 #else
-    (void) ic;
+    (void)ic;
 
     tocopy = inbytes;
     if (tocopy > outbytes)

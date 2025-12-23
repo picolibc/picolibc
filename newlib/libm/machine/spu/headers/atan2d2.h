@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _ATAN2D2_H_
-#define _ATAN2D2_H_	1
+#define _ATAN2D2_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -59,32 +59,33 @@
  *  defined by the signs of sin and cos on this domain.
  *
  *  Special Cases:
- *	- If the corresponding elements of x and y are zero, the 
+ *	- If the corresponding elements of x and y are zero, the
  *    resulting element is undefined.
  *
  */
 
-static __inline vector double _atan2d2(vector double y, vector double x)
+static __inline vector double
+_atan2d2(vector double y, vector double x)
 {
-    vec_uchar16 dup_even  = ((vec_uchar16) { 0,1,2,3,  0,1,2,3, 8,9,10,11, 8,9,10,11 });
-    vector double pi   = spu_splats(SM_PI);
+    vec_uchar16   dup_even = ((vec_uchar16) { 0, 1, 2, 3, 0, 1, 2, 3, 8, 9, 10, 11, 8, 9, 10, 11 });
+    vector double pi = spu_splats(SM_PI);
     vector unsigned long long ones = spu_splats(0xFFFFFFFFFFFFFFFFull);
     vector unsigned long long quad1;
     vector unsigned long long quad4;
-    vector double result;
+    vector double             result;
 
     vector unsigned long long xlt0;
     vector unsigned long long yge0;
     vector unsigned long long ylt0;
 
-    xlt0 = (vec_ullong2)spu_rlmaska((vec_int4)spu_shuffle(x,x,dup_even), 31);
-    ylt0 = (vec_ullong2)spu_rlmaska((vec_int4)spu_shuffle(y,y,dup_even), 31);
+    xlt0 = (vec_ullong2)spu_rlmaska((vec_int4)spu_shuffle(x, x, dup_even), 31);
+    ylt0 = (vec_ullong2)spu_rlmaska((vec_int4)spu_shuffle(y, y, dup_even), 31);
     yge0 = spu_xor(ylt0, ones);
 
     quad1 = spu_and(ylt0, xlt0);
     quad4 = spu_and(yge0, xlt0);
 
-    result = _atand2(_divd2(y,x));
+    result = _atand2(_divd2(y, x));
 
     result = spu_sel(result, spu_sub(result, pi), quad1);
     result = spu_sel(result, spu_add(result, pi), quad4);

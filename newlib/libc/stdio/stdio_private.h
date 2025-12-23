@@ -50,24 +50,20 @@
 #include <sys/lock.h>
 
 struct __file_str {
-	struct __file file;	/* main file struct */
-        char	*pos;		/* current buffer position */
-        char    *end;           /* end of buffer */
-        size_t  size;           /* size of allocated storage */
-        bool    alloc;          /* current storage was allocated */
+    struct __file file;  /* main file struct */
+    char         *pos;   /* current buffer position */
+    char         *end;   /* end of buffer */
+    size_t        size;  /* size of allocated storage */
+    bool          alloc; /* current storage was allocated */
 };
 
-int
-__file_str_get(FILE *stream);
+int               __file_str_get(FILE *stream);
 
-int
-__file_wstr_get(FILE *stream);
+int               __file_wstr_get(FILE *stream);
 
-int
-__file_str_put(char c, FILE *stream);
+int               __file_str_put(char c, FILE *stream);
 
-int
-__file_str_put_alloc(char c, FILE *stream);
+int               __file_str_put_alloc(char c, FILE *stream);
 
 extern const char __match_inf[];
 extern const char __match_inity[];
@@ -76,7 +72,7 @@ extern const char __match_nan[];
 /* Returns 'true' if prefix of input matches pattern, independent of
  * case. pattern is only upper case letters.
  */
-bool __matchcaseprefix(const char *input, const char *pattern);
+bool              __matchcaseprefix(const char *input, const char *pattern);
 
 /*
  * It is OK to discard the "const" qualifier here.  f.buf is
@@ -86,65 +82,49 @@ bool __matchcaseprefix(const char *input, const char *pattern);
  * be discarded upon exiting sscanf(), nobody will ever get
  * a chance to get write access to it again.
  */
-#define FDEV_SETUP_STRING_READ(_s) {		\
-		.file = {			\
-			.flags = __SRD,		\
-                        .get = __file_str_get,  \
-                        __LOCK_INIT_NONE        \
-		},				\
-		.pos = (char *) (_s)		\
-	}
+#define FDEV_SETUP_STRING_READ(_s)                                                               \
+    {                                                                                            \
+        .file = { .flags = __SRD, .get = __file_str_get, __LOCK_INIT_NONE }, \
+          .pos = (char *)(_s) \
+}
 
-#define FDEV_SETUP_WSTRING_READ(_s) {		\
-		.file = {			\
-			.flags = __SRD,		\
-			.get = __file_wstr_get,	\
-                        __LOCK_INIT_NONE        \
-		},				\
-                .pos = (char *) (_s),           \
-                .end = (char *) (_s)            \
-	}
+#define FDEV_SETUP_WSTRING_READ(_s)                                           \
+    {                                                                         \
+        .file = { .flags = __SRD, .get = __file_wstr_get, __LOCK_INIT_NONE }, \
+        .pos = (char *)(_s),                                                  \
+        .end = (char *)(_s)                                                   \
+    }
 
-#define FDEV_STRING_WRITE_END(_s, _n) \
-    (((int) (_n) < 0) ? NULL : ((_n) ? (_s) + (_n)-1 : (_s)))
+#define FDEV_STRING_WRITE_END(_s, _n) (((int)(_n) < 0) ? NULL : ((_n) ? (_s) + (_n) - 1 : (_s)))
 
-#define FDEV_SETUP_STRING_WRITE(_s, _end) {	\
-		.file = {			\
-			.flags = __SWR,		\
-			.put = __file_str_put,	\
-                        __LOCK_INIT_NONE        \
-		},				\
-		.pos = (_s),			\
-                .end = (_end),                  \
-	}
+#define FDEV_SETUP_STRING_WRITE(_s, _end)                                    \
+    {                                                                        \
+        .file = { .flags = __SWR, .put = __file_str_put, __LOCK_INIT_NONE }, \
+        .pos = (_s),                                                         \
+        .end = (_end),                                                       \
+    }
 
-#define FDEV_SETUP_STRING_ALLOC() {  \
-		.file = {			\
-			.flags = __SWR,		\
-			.put = __file_str_put_alloc,	\
-                        __LOCK_INIT_NONE        \
-		},				\
-		.pos = NULL,			\
-                .end = NULL,                    \
-                .size = 0,                      \
-                .alloc = false,                 \
-	}
+#define FDEV_SETUP_STRING_ALLOC()                                                  \
+    {                                                                              \
+        .file = { .flags = __SWR, .put = __file_str_put_alloc, __LOCK_INIT_NONE }, \
+        .pos = NULL,                                                               \
+        .end = NULL,                                                               \
+        .size = 0,                                                                 \
+        .alloc = false,                                                            \
+    }
 
-#define FDEV_SETUP_STRING_ALLOC_BUF(_buf, _size) {  \
-		.file = {			\
-			.flags = __SWR,		\
-			.put = __file_str_put_alloc,	\
-                        __LOCK_INIT_NONE        \
-		},				\
-		.pos = _buf,			\
-                .end = (char *) (_buf) + (_size), \
-                .size = _size,                  \
-                .alloc = false,                 \
-	}
+#define FDEV_SETUP_STRING_ALLOC_BUF(_buf, _size)                                   \
+    {                                                                              \
+        .file = { .flags = __SWR, .put = __file_str_put_alloc, __LOCK_INIT_NONE }, \
+        .pos = _buf,                                                               \
+        .end = (char *)(_buf) + (_size),                                           \
+        .size = _size,                                                             \
+        .alloc = false,                                                            \
+    }
 
-#define _FDEV_BUFIO_FD(bf) ((int)((intptr_t) (bf)->ptr))
+#define _FDEV_BUFIO_FD(bf)     ((int)((intptr_t)(bf)->ptr))
 
-#define IO_VARIANT_IS_FLOAT(v)        ((v) == __IO_VARIANT_FLOAT || (v) == __IO_VARIANT_DOUBLE)
+#define IO_VARIANT_IS_FLOAT(v) ((v) == __IO_VARIANT_FLOAT || (v) == __IO_VARIANT_DOUBLE)
 
 /*
  * While there are notionally two different ways to invoke the
@@ -152,7 +132,8 @@ bool __matchcaseprefix(const char *input, const char *pattern);
  * functionally identical on many architectures. Check for that and
  * skip the extra code.
  */
-#if __SIZEOF_POINTER__ == __SIZEOF_INT__ || defined(__x86_64) || defined(__arm__) || defined(__riscv)
+#if __SIZEOF_POINTER__ == __SIZEOF_INT__ || defined(__x86_64) || defined(__arm__) \
+    || defined(__riscv)
 #define BUFIO_ABI_MATCHES
 #endif
 
@@ -164,25 +145,28 @@ bool __matchcaseprefix(const char *input, const char *pattern);
 
 /* Buffered I/O routines */
 
-static inline ssize_t bufio_read(struct __file_bufio *bf, void *buf, size_t count)
+static inline ssize_t
+bufio_read(struct __file_bufio *bf, void *buf, size_t count)
 {
 #ifndef BUFIO_ABI_MATCHES
     if (!(bf->bflags & __BFPTR))
         return (bf->read_int)(_FDEV_BUFIO_FD(bf), buf, count);
 #endif
-    return (bf->read_ptr)((void *) bf->ptr, buf, count);
+    return (bf->read_ptr)((void *)bf->ptr, buf, count);
 }
 
-static inline ssize_t bufio_write(struct __file_bufio *bf, const void *buf, size_t count)
+static inline ssize_t
+bufio_write(struct __file_bufio *bf, const void *buf, size_t count)
 {
 #ifndef BUFIO_ABI_MATCHES
     if (!(bf->bflags & __BFPTR))
         return (bf->write_int)(_FDEV_BUFIO_FD(bf), buf, count);
 #endif
-    return (bf->write_ptr)((void *) bf->ptr, buf, count);
+    return (bf->write_ptr)((void *)bf->ptr, buf, count);
 }
 
-static inline __off_t bufio_lseek(struct __file_bufio *bf, __off_t offset, int whence)
+static inline __off_t
+bufio_lseek(struct __file_bufio *bf, __off_t offset, int whence)
 {
 #ifndef BUFIO_ABI_MATCHES
     if (!(bf->bflags & __BFPTR)) {
@@ -192,12 +176,13 @@ static inline __off_t bufio_lseek(struct __file_bufio *bf, __off_t offset, int w
 #endif
     {
         if (bf->lseek_ptr)
-            return (bf->lseek_ptr)((void *) bf->ptr, offset, whence);
+            return (bf->lseek_ptr)((void *)bf->ptr, offset, whence);
     }
     return _FDEV_ERR;
 }
 
-static inline int bufio_close(struct __file_bufio *bf)
+static inline int
+bufio_close(struct __file_bufio *bf)
 {
     int ret = 0;
 #ifndef BUFIO_ABI_MATCHES
@@ -208,100 +193,112 @@ static inline int bufio_close(struct __file_bufio *bf)
 #endif
     {
         if (bf->close_ptr)
-            ret = (bf->close_ptr)((void *) bf->ptr);
+            ret = (bf->close_ptr)((void *)bf->ptr);
     }
     return ret;
 }
 
-#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)      \
-        FDEV_SETUP_BUFIO(fd, buf, size,                       \
-                         read, write,                         \
-                         lseek, close, rwflags, bflags)
+#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)                        \
+    FDEV_SETUP_BUFIO(fd, buf, size, read, write, lseek, close, rwflags, bflags)
 
-int
-__stdio_flags (const char *mode, int *optr);
+int __stdio_flags(const char *mode, int *optr);
 
 #ifdef __STDIO_LOCKING
 void __flockfile_init(FILE *f);
-#define __LOCK_NONE     ((_LOCK_RECURSIVE_T) (uintptr_t) 1)
-#define __LOCK_INIT_NONE        .lock = __LOCK_NONE
+#define __LOCK_NONE      ((_LOCK_RECURSIVE_T)(uintptr_t)1)
+#define __LOCK_INIT_NONE .lock = __LOCK_NONE
 #else
 #define __LOCK_INIT_NONE
 #endif
 
-#define __funlock_return(f, v) do { __funlockfile(f); return (v); } while(0)
+#define __funlock_return(f, v) \
+    do {                       \
+        __funlockfile(f);      \
+        return (v);            \
+    } while (0)
 
-static inline void __flockfile(FILE *f) {
-	(void) f;
+static inline void
+__flockfile(FILE *f)
+{
+    (void)f;
 #ifdef __STDIO_LOCKING
-	if (!f->lock)
-            __flockfile_init(f);
-        if (f->lock != __LOCK_NONE)
-            __lock_acquire_recursive(f->lock);
+    if (!f->lock)
+        __flockfile_init(f);
+    if (f->lock != __LOCK_NONE)
+        __lock_acquire_recursive(f->lock);
 #endif
 }
 
-static inline void __funlockfile(FILE *f) {
-	(void) f;
+static inline void
+__funlockfile(FILE *f)
+{
+    (void)f;
 #ifdef __STDIO_LOCKING
-        if (f->lock != __LOCK_NONE)
-            __lock_release_recursive(f->lock);
+    if (f->lock != __LOCK_NONE)
+        __lock_release_recursive(f->lock);
 #endif
 }
 
-static inline void __flockfile_close(FILE *f) {
-	(void) f;
+static inline void
+__flockfile_close(FILE *f)
+{
+    (void)f;
 #ifdef __STDIO_LOCKING
-        if (f->lock && f->lock != __LOCK_NONE)
-            __lock_close(f->lock);
+    if (f->lock && f->lock != __LOCK_NONE)
+        __lock_close(f->lock);
 #endif
 }
 
 /* Silence santizer errors when adding/subtracting 0 to a NULL pointer */
 #ifdef __clang__
-#define POINTER_MINUS(a,b)     ((__typeof(a)) ((uintptr_t) (a) - (b) * sizeof((*a))))
-#define POINTER_PLUS(a,b)      ((__typeof(a)) ((uintptr_t) (a) + (b) * sizeof((*a))))
+#define POINTER_MINUS(a, b) ((__typeof(a))((uintptr_t)(a) - (b) * sizeof((*a))))
+#define POINTER_PLUS(a, b)  ((__typeof(a))((uintptr_t)(a) + (b) * sizeof((*a))))
 #else
-#define POINTER_MINUS(a,b)     ((a) - (b))
-#define POINTER_PLUS(a,b)      ((a) + (b))
+#define POINTER_MINUS(a, b) ((a) - (b))
+#define POINTER_PLUS(a, b)  ((a) + (b))
 #endif
 
-int	__d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__i_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__l_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__m_vfprintf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __i_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __l_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __m_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
-int	__d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__i_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__l_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int	__m_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __i_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __l_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __m_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
 
-int	__d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int	__f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int	__i_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int	__l_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int	__m_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __i_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __l_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __m_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
 
-int	__d_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int	__f_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int	__i_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int	__l_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int	__m_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __d_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __f_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __i_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __l_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __m_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 
-int      __d_swprintf(wchar_t *__restrict, size_t, const wchar_t *__restrict, ...);
+int __d_swprintf(wchar_t * __restrict, size_t, const wchar_t * __restrict, ...);
 
 #if __SIZEOF_DOUBLE__ == 8
-#define FLOAT64 double
+#define FLOAT64      double
 #define _asdouble(x) _asfloat64(x)
 #elif __SIZEOF_LONG_DOUBLE__ == 8
 #define FLOAT64 long double
 #endif
 
 #if __SIZEOF_DOUBLE__ == 4
-#define FLOAT32 double
-#define _asdouble(x) ((double) _asfloat(x))
+#define FLOAT32      double
+#define _asdouble(x) ((double)_asfloat(x))
 #elif __SIZEOF_FLOAT__ == 4
 #define FLOAT32 float
 #elif __SIZEOF_LONG_DOUBLE__ == 4
@@ -313,57 +310,59 @@ FLOAT64
 __atod_engine(uint64_t m10, int e10);
 #endif
 
-float
-__atof_engine(uint32_t m10, int e10);
+float __atof_engine(uint32_t m10, int e10);
 
 #ifdef __SIZEOF_INT128__
 typedef __uint128_t _u128;
-typedef __int128_t _i128;
-#define to_u128(x)              (x)
-#define from_u128(x)            (x)
-#define _u128_to_ld(a)          ((long double) (a))
-#define _u128_is_zero(a)        ((a) == 0)
-#define _i128_lt_zero(a)        ((_i128) (a) < 0)
-#define _u128_plus_64(a,b) ((a) + (b))
-#define _u128_plus(a,b) ((a) + (b))
-#define _u128_minus(a,b) ((a) - (b))
-#define _u128_minus_64(a,b) ((a) - (b))
-#define _u128_times_10(a) ((a) * 10)
-#define _u128_times_base(a,b)   ((a) * (b))
-#define _u128_to_ld(a) ((long double) (a))
-#define _u128_oflow(a)	((a) >= (((((_u128) 0xffffffffffffffffULL) << 64) | 0xffffffffffffffffULL) - 9 / 10))
-#define _u128_zero	(_u128) 0
-#define _u128_lshift(a,b)       ((_u128) (a) << (b))
-#define _u128_lshift_64(a,b)    ((_u128) (a) << (b))
-#define _u128_rshift(a,b)       ((a) >> (b))
-#define _i128_rshift(a,b)       ((_i128) (a) >> (b))
-#define _u128_or_64(a,b)        ((a) | (_u128) (b))
-#define _u128_and_64(a,b)       ((uint64_t) (a) & (b))
-#define _u128_or(a,b)           ((a) | (b))
-#define _u128_and(a,b)          ((a) & (b))
-#define _u128_eq(a,b)           ((a) == (b))
-#define _u128_ge(a,b)           ((a) >= (b))
-#define _i128_ge(a,b)           ((_i128)(a) >= (_i128)(b))
-#define _u128_lt(a,b)           ((a) < (b))
-#define _i128_lt(a,b)           ((_i128)(a) < (_i128)(b))
-#define _u128_not(a)            (~(a))
+typedef __int128_t  _i128;
+#define to_u128(x)             (x)
+#define from_u128(x)           (x)
+#define _u128_to_ld(a)         ((long double)(a))
+#define _u128_is_zero(a)       ((a) == 0)
+#define _i128_lt_zero(a)       ((_i128)(a) < 0)
+#define _u128_plus_64(a, b)    ((a) + (b))
+#define _u128_plus(a, b)       ((a) + (b))
+#define _u128_minus(a, b)      ((a) - (b))
+#define _u128_minus_64(a, b)   ((a) - (b))
+#define _u128_times_10(a)      ((a) * 10)
+#define _u128_times_base(a, b) ((a) * (b))
+#define _u128_to_ld(a)         ((long double)(a))
+#define _u128_oflow(a)                                                                   \
+    ((a) >= (((((_u128)0xffffffffffffffffULL) << 64) | 0xffffffffffffffffULL) - 9 / 10))
+#define _u128_zero            (_u128)0
+#define _u128_lshift(a, b)    ((_u128)(a) << (b))
+#define _u128_lshift_64(a, b) ((_u128)(a) << (b))
+#define _u128_rshift(a, b)    ((a) >> (b))
+#define _i128_rshift(a, b)    ((_i128)(a) >> (b))
+#define _u128_or_64(a, b)     ((a) | (_u128)(b))
+#define _u128_and_64(a, b)    ((uint64_t)(a) & (b))
+#define _u128_or(a, b)        ((a) | (b))
+#define _u128_and(a, b)       ((a) & (b))
+#define _u128_eq(a, b)        ((a) == (b))
+#define _u128_ge(a, b)        ((a) >= (b))
+#define _i128_ge(a, b)        ((_i128)(a) >= (_i128)(b))
+#define _u128_lt(a, b)        ((a) < (b))
+#define _i128_lt(a, b)        ((_i128)(a) < (_i128)(b))
+#define _u128_not(a)          (~(a))
 #else
 typedef struct {
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    uint64_t	lo, hi;
+    uint64_t lo, hi;
 #else
-    uint64_t	hi, lo;
+    uint64_t hi, lo;
 #endif
 } _u128;
-#define _u128_zero	(_u128) { 0, 0 }
+#define _u128_zero (_u128) { 0, 0 }
 
-static inline _u128 to_u128(uint64_t x)
+static inline _u128
+to_u128(uint64_t x)
 {
     _u128 a = { .hi = 0, .lo = x };
     return a;
 }
 
-static inline uint64_t from_u128(_u128 a)
+static inline uint64_t
+from_u128(_u128 a)
 {
     return a.lo;
 }
@@ -371,7 +370,8 @@ static inline uint64_t from_u128(_u128 a)
 static inline long double
 _u128_to_ld(_u128 a)
 {
-    return (long double) a.hi * ((long double) (1LL << 32) * (long double) (1LL << 32)) + (long double) a.lo;
+    return (long double)a.hi * ((long double)(1LL << 32) * (long double)(1LL << 32))
+        + (long double)a.lo;
 }
 
 static inline bool
@@ -383,7 +383,7 @@ _u128_is_zero(_u128 a)
 static inline bool
 _i128_lt_zero(_u128 a)
 {
-    return (int64_t) a.hi < 0;
+    return (int64_t)a.hi < 0;
 }
 
 static inline bool
@@ -404,12 +404,12 @@ static inline bool
 _i128_lt(_u128 a, _u128 b)
 {
     if (a.hi == b.hi) {
-        if ((int64_t) a.hi < 0)
+        if ((int64_t)a.hi < 0)
             return a.lo > b.lo;
         else
             return a.lo < b.lo;
     }
-    return (int64_t) a.hi < (int64_t) b.hi;
+    return (int64_t)a.hi < (int64_t)b.hi;
 }
 
 static inline bool
@@ -424,12 +424,12 @@ static inline bool
 _i128_ge(_u128 a, _u128 b)
 {
     if (a.hi == b.hi) {
-        if ((int64_t) a.hi < 0)
+        if ((int64_t)a.hi < 0)
             return a.lo <= b.lo;
         else
             return a.lo >= b.lo;
     }
-    return (int64_t) a.hi >= (int64_t) b.hi;
+    return (int64_t)a.hi >= (int64_t)b.hi;
 }
 
 static inline _u128
@@ -440,7 +440,7 @@ _u128_plus_64(_u128 a, uint64_t b)
     v.lo = a.lo + b;
     v.hi = a.hi;
     if (v.lo < a.lo)
-	v.hi++;
+        v.hi++;
     return v;
 }
 
@@ -452,7 +452,7 @@ _u128_plus(_u128 a, _u128 b)
     v.lo = a.lo + b.lo;
     v.hi = a.hi + b.hi;
     if (v.lo < a.lo)
-	v.hi++;
+        v.hi++;
     return v;
 }
 
@@ -464,7 +464,7 @@ _u128_minus_64(_u128 a, uint64_t b)
     v.lo = a.lo - b;
     v.hi = a.hi;
     if (v.lo > a.lo)
-	v.hi--;
+        v.hi--;
     return v;
 }
 
@@ -476,14 +476,14 @@ _u128_minus(_u128 a, _u128 b)
     v.lo = a.lo - b.lo;
     v.hi = a.hi - b.hi;
     if (v.lo > a.lo)
-	v.hi--;
+        v.hi--;
     return v;
 }
 
 static inline _u128
 _u128_lshift(_u128 a, int amt)
 {
-    _u128	v;
+    _u128 v;
 
     if (amt == 0) {
         v = a;
@@ -500,7 +500,7 @@ _u128_lshift(_u128 a, int amt)
 static inline _u128
 _u128_lshift_64(uint64_t a, int amt)
 {
-    _u128	v;
+    _u128 v;
 
     if (amt == 0) {
         v.lo = a;
@@ -518,7 +518,7 @@ _u128_lshift_64(uint64_t a, int amt)
 static inline _u128
 _u128_rshift(_u128 a, int amt)
 {
-    _u128	v;
+    _u128 v;
 
     if (amt == 0) {
         v = a;
@@ -535,7 +535,7 @@ _u128_rshift(_u128 a, int amt)
 static inline _u128
 _u128_and(_u128 a, _u128 b)
 {
-    _u128       v;
+    _u128 v;
 
     v.hi = a.hi & b.hi;
     v.lo = a.lo & b.lo;
@@ -551,7 +551,7 @@ _u128_and_64(_u128 a, uint64_t b)
 static inline _u128
 _u128_or(_u128 a, _u128 b)
 {
-    _u128       v;
+    _u128 v;
 
     v.lo = a.lo | b.lo;
     v.hi = a.hi | b.hi;
@@ -561,7 +561,7 @@ _u128_or(_u128 a, _u128 b)
 static inline _u128
 _u128_or_64(_u128 a, uint64_t b)
 {
-    _u128       v;
+    _u128 v;
 
     v.lo = a.lo | b;
     v.hi = a.hi;
@@ -571,7 +571,7 @@ _u128_or_64(_u128 a, uint64_t b)
 static inline _u128
 _u128_not(_u128 a)
 {
-    _u128       v;
+    _u128 v;
 
     v.lo = ~a.lo;
     v.hi = ~a.hi;
@@ -604,10 +604,10 @@ static inline _u128
 asuintld(long double f)
 {
     union {
-        long double     f;
-        _u128           i;
+        long double f;
+        _u128       i;
     } v;
-    _u128       i;
+    _u128 i;
 
     v.f = f;
     i = v.i;
@@ -621,8 +621,8 @@ static inline long double
 aslongdouble(_u128 i)
 {
     union {
-        long double     f;
-        _u128           i;
+        long double f;
+        _u128       i;
     } v;
 
 #if defined(__IEEE_BIG_ENDIAN) && __SIZEOF_LONG_DOUBLE__ != 16
@@ -636,8 +636,8 @@ static inline uint64_t
 asuintld(long double f)
 {
     union {
-        long double     f;
-        uint64_t        i;
+        long double f;
+        uint64_t    i;
     } v;
 
     v.f = f;
@@ -648,8 +648,8 @@ static inline long double
 aslongdouble(uint64_t i)
 {
     union {
-        long double     f;
-        uint64_t        i;
+        long double f;
+        uint64_t    i;
     } v;
 
     v.i = i;
@@ -660,8 +660,8 @@ static inline uint32_t
 asuintld(long double f)
 {
     union {
-        long double     f;
-        uint32_t        i;
+        long double f;
+        uint32_t    i;
     } v;
 
     v.f = f;
@@ -672,8 +672,8 @@ static inline long double
 aslongdouble(uint32_t i)
 {
     union {
-        long double     f;
-        uint32_t        i;
+        long double f;
+        uint32_t    i;
     } v;
 
     v.i = i;
@@ -687,48 +687,47 @@ _u128_gt(_u128 a, _u128 b)
     return _u128_lt(b, a);
 }
 
-long double
-__atold_engine(_u128 m10, int e10);
+long double __atold_engine(_u128 m10, int e10);
 
 static inline __ungetc_t
 __non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
-	__ungetc_t e = *p;
-	*p = v;
-	return e;
+    __ungetc_t e = *p;
+    *p = v;
+    return e;
 }
 
 static inline bool
 __non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 {
-	if (*p != d)
-		return false;
-	*p = v;
-	return true;
+    if (*p != d)
+        return false;
+    *p = v;
+    return true;
 }
 
 static inline __ungetc_t
 __non_atomic_load_ungetc(const volatile __ungetc_t *p)
 {
-        return *p;
+    return *p;
 }
 
 #if defined(__LONG_DOUBLE_128__) && defined(__strong_reference)
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-#define __ieee128_reference(a,b) __strong_reference(a,b)
+#define __ieee128_reference(a, b) __strong_reference(a, b)
 #else
-#define __ieee128_reference(a,b)
+#define __ieee128_reference(a, b)
 #endif
 
 #ifdef __ATOMIC_UNGETC
 
-#if __PICOLIBC_UNGETC_SIZE == 4 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
+#if __PICOLIBC_UNGETC_SIZE == 4 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
 #define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
 #endif
 
-#if __PICOLIBC_UNGETC_SIZE == 2 && defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
+#if __PICOLIBC_UNGETC_SIZE == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
 #define PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP
 #endif
 
@@ -739,53 +738,46 @@ __non_atomic_load_ungetc(const volatile __ungetc_t *p)
 static inline bool
 __atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v)
 {
-	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
-        return atomic_compare_exchange_strong(pa, &d, v);
+    _Atomic __ungetc_t *pa = (_Atomic __ungetc_t *)p;
+    return atomic_compare_exchange_strong(pa, &d, v);
 }
 
 static inline __ungetc_t
 __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v)
 {
-	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
-	return atomic_exchange_explicit(pa, v, memory_order_relaxed);
+    _Atomic __ungetc_t *pa = (_Atomic __ungetc_t *)p;
+    return atomic_exchange_explicit(pa, v, memory_order_relaxed);
 }
 
 static inline __ungetc_t
 __atomic_load_ungetc(const volatile __ungetc_t *p)
 {
-	_Atomic __ungetc_t *pa = (_Atomic __ungetc_t *) p;
-        return atomic_load(pa);
+    _Atomic __ungetc_t *pa = (_Atomic __ungetc_t *)p;
+    return atomic_load(pa);
 }
 #else
 
-bool
-__atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
+bool       __atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
 
-__ungetc_t
-__atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
+__ungetc_t __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
-__ungetc_t
-__atomic_load_ungetc(const volatile __ungetc_t *p);
+__ungetc_t __atomic_load_ungetc(const volatile __ungetc_t *p);
 
-__ungetc_t
-__picolibc_non_atomic_load_ungetc(const volatile __ungetc_t *p);
+__ungetc_t __picolibc_non_atomic_load_ungetc(const volatile __ungetc_t *p);
 
-__ungetc_t
-__picolibc_non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
+__ungetc_t __picolibc_non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
-bool
-__picolibc_non_atomic_compare_exchange_ungetc(__ungetc_t *p,
-                                              __ungetc_t d, __ungetc_t v);
+bool       __picolibc_non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
 
 #endif /* PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP */
 
 #else
 
-#define __atomic_compare_exchange_ungetc(p,d,v) __non_atomic_compare_exchange_ungetc(p,d,v)
+#define __atomic_compare_exchange_ungetc(p, d, v) __non_atomic_compare_exchange_ungetc(p, d, v)
 
-#define __atomic_exchange_ungetc(p,v) __non_atomic_exchange_ungetc(p,v)
+#define __atomic_exchange_ungetc(p, v)            __non_atomic_exchange_ungetc(p, v)
 
-#define __atomic_load_ungetc(p) (*(p))
+#define __atomic_load_ungetc(p)                   (*(p))
 
 #endif /* __ATOMIC_UNGETC */
 
@@ -793,7 +785,7 @@ __picolibc_non_atomic_compare_exchange_ungetc(__ungetc_t *p,
  * This operates like _tolower on upper case letters, but also works
  * correctly on lower case letters.
  */
-#define TOLOWER(c)      ((c) | ('a' - 'A'))
+#define TOLOWER(c) ((c) | ('a' - 'A'))
 
 /*
  * Convert a single character to the value of the digit for any
@@ -849,7 +841,7 @@ digit_to_val(unsigned int c)
          * code (c -= '0') below, avoiding an else clause.
          */
 
-        c = TOLOWER(c-1) + ('0' - 'a' + 11);
+        c = TOLOWER(c - 1) + ('0' - 'a' + 11);
     }
 
     /*

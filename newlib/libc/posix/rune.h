@@ -33,31 +33,31 @@
  * $FreeBSD: src/include/rune.h,v 1.2 2002/03/23 17:24:53 imp Exp $
  */
 
-#ifndef	_RUNE_H_
-#define	_RUNE_H_
+#ifndef _RUNE_H_
+#define _RUNE_H_
 
 #include "runetype.h"
 #include <stdio.h>
 
-#define	_PATH_LOCALE	"/usr/share/locale"
+#define _PATH_LOCALE         "/usr/share/locale"
 
-#define _INVALID_RUNE   _CurrentRuneLocale->invalid_rune
+#define _INVALID_RUNE        _CurrentRuneLocale->invalid_rune
 
-#define __sgetrune      _CurrentRuneLocale->sgetrune
-#define __sputrune      _CurrentRuneLocale->sputrune
+#define __sgetrune           _CurrentRuneLocale->sgetrune
+#define __sputrune           _CurrentRuneLocale->sputrune
 
-#define sgetrune(s, n, r)       (*__sgetrune)((s), (n), (r))
-#define sputrune(c, s, n, r)    (*__sputrune)((c), (s), (n), (r))
+#define sgetrune(s, n, r)    (*__sgetrune)((s), (n), (r))
+#define sputrune(c, s, n, r) (*__sputrune)((c), (s), (n), (r))
 
 _BEGIN_STD_C
-char	*mbrune(const char *, rune_t);
-char	*mbrrune(const char *, rune_t);
-char	*mbmb(const char *, char *);
-long	 fgetrune(FILE *);
-int	 fputrune(rune_t, FILE *);
-int	 fungetrune(rune_t, FILE *);
-int	 setrunelocale(char *);
-void	 setinvalidrune(rune_t);
+char *mbrune(const char *, rune_t);
+char *mbrrune(const char *, rune_t);
+char *mbmb(const char *, char *);
+long  fgetrune(FILE *);
+int   fputrune(rune_t, FILE *);
+int   fungetrune(rune_t, FILE *);
+int   setrunelocale(char *);
+void  setinvalidrune(rune_t);
 _END_STD_C
 
-#endif	/*! _RUNE_H_ */
+#endif /*! _RUNE_H_ */

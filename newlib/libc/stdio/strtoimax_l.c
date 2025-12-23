@@ -39,16 +39,13 @@
 #ifdef WIDE_CHARS
 #include <wctype.h>
 #define strtoimax_l wcstoimax_l
-#define strtoimax wcstoimax
-#define char wchar_t
+#define strtoimax   wcstoimax
+#define char        wchar_t
 #endif
 
 intmax_t
-strtoimax_l (const char *__restrict s,
-          char **__restrict ptr,
-          int base,
-          locale_t loc)
+strtoimax_l(const char * __restrict s, char ** __restrict ptr, int base, locale_t loc)
 {
-    (void) loc;
+    (void)loc;
     return strtoimax(s, ptr, base);
 }

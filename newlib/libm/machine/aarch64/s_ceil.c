@@ -28,11 +28,11 @@
 #include <math.h>
 
 double
-ceil (double x)
+ceil(double x)
 {
-  double result;
-  __asm__( "frintp\t%d0, %d1" : "=w" (result) : "w" (x) );
-  return result;
+    double result;
+    __asm__("frintp\t%d0, %d1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

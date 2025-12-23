@@ -23,36 +23,42 @@
  * for scalbn(), so we don't use this routine.
  */
 
-
 #if LDBL_MAX_EXP == 0x4000
 
 long double
-scalbnl (long double x, int n)
+scalbnl(long double x, int n)
 {
-	union IEEEl2bits u;
-	__int32_t k;
-	u.e = x;
-        k = u.bits.exp;				/* extract exponent */
-        if (k==0) {				/* 0 or subnormal x */
-            if ((u.bits.manh|u.bits.manl)==0) return x;	/* +-0 */
-	    u.e *= 0x1p+128L;
-	    k = u.bits.exp - 128;
-            if (n< -50000) return __math_uflowl(u.bits.sign);
-	    }
-        if (k==0x7fff) return x+x;		/* NaN or Inf */
+    union IEEEl2bits u;
+    __int32_t        k;
+    u.e = x;
+    k = u.bits.exp; /* extract exponent */
+    if (k == 0) {   /* 0 or subnormal x */
+        if ((u.bits.manh | u.bits.manl) == 0)
+            return x; /* +-0 */
+        u.e *= 0x1p+128L;
+        k = u.bits.exp - 128;
+        if (n < -50000)
+            return __math_uflowl(u.bits.sign);
+    }
+    if (k == 0x7fff)
+        return x + x; /* NaN or Inf */
 #if __SIZEOF_INT__ > 2
-        if (n > 50000) 	/* in case integer overflow in n+k */
-            return __math_oflowl(u.bits.sign);	/*overflow*/
+    if (n > 50000)                         /* in case integer overflow in n+k */
+        return __math_oflowl(u.bits.sign); /*overflow*/
 #endif
-        k = k+n;
-        if (k >= 0x7fff) return __math_oflowl(u.bits.sign); /* overflow  */
-        if (k > 0) 				/* normal result */
-	    {u.bits.exp = k; return u.e;}
-        if (k <= -128)
-	    return __math_uflowl(u.bits.sign); 	/*underflow*/
-	k += 128;				/* subnormal result */
-	u.bits.exp = k;
-        return check_uflowl(u.e*0x1p-128L);
+    k = k + n;
+    if (k >= 0x7fff)
+        return __math_oflowl(u.bits.sign); /* overflow  */
+    if (k > 0)                             /* normal result */
+    {
+        u.bits.exp = k;
+        return u.e;
+    }
+    if (k <= -128)
+        return __math_uflowl(u.bits.sign); /*underflow*/
+    k += 128;                              /* subnormal result */
+    u.bits.exp = k;
+    return check_uflowl(u.e * 0x1p-128L);
 }
 
 #elif defined(_DOUBLE_DOUBLE_FLOAT)
@@ -60,13 +66,13 @@ scalbnl (long double x, int n)
 long double
 scalbnl(long double x, int n)
 {
-	union IEEEl2bits u;
-        double dh, dl;
+    union IEEEl2bits u;
+    double           dh, dl;
 
-        u.e = x;
-        dh = scalbn(u.dbits.dh, n);
-        dl = scalbn(u.dbits.dl, n);
-        return (long double) dh + (long double) dl;
+    u.e = x;
+    dh = scalbn(u.dbits.dh, n);
+    dl = scalbn(u.dbits.dl, n);
+    return (long double)dh + (long double)dl;
 }
 
 #endif

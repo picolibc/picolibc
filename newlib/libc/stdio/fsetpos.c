@@ -20,15 +20,15 @@ FUNCTION
 <<fsetpos>>---restore position of a stream or file
 
 INDEX
-	fsetpos
+        fsetpos
 INDEX
-	_fsetpos_r
+        _fsetpos_r
 
 SYNOPSIS
-	#include <stdio.h>
-	int fsetpos(FILE *<[fp]>, const fpos_t *<[pos]>);
-	int fsetpos( FILE *<[fp]>,
-	               const fpos_t *<[pos]>);
+        #include <stdio.h>
+        int fsetpos(FILE *<[fp]>, const fpos_t *<[pos]>);
+        int fsetpos( FILE *<[fp]>,
+                       const fpos_t *<[pos]>);
 
 DESCRIPTION
 Objects of type <<FILE>> can have a ``position'' that records how much
@@ -57,13 +57,11 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <stdio_private.h>
 
 int
-fsetpos (
-       FILE * iop,
-       const _fpos_t * pos)
+fsetpos(FILE *iop, const _fpos_t *pos)
 {
-  int x = fseek ( iop, *pos, SEEK_SET);
+    int x = fseek(iop, *pos, SEEK_SET);
 
-  if (x != 0)
-    return 1;
-  return 0;
+    if (x != 0)
+        return 1;
+    return 0;
 }

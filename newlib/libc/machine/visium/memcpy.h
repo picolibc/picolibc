@@ -27,5 +27,4 @@
    ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
    THE POSSIBILITY OF SUCH DAMAGE.  */
 
-void *
-memcpy (void *__restrict s1, const void *__restrict s2, size_t n);
+void *memcpy(void * __restrict s1, const void * __restrict s2, size_t n);

@@ -51,19 +51,17 @@ extern char __tls_end[];
 
 #ifdef __PICOCRT_RUNTIME_SIZE
 #define __data_size (__data_end - __data_start)
-#define __bss_size (__bss_end - __bss_start)
+#define __bss_size  (__bss_end - __bss_start)
 #endif
 
 /* These two functions must be defined in the architecture-specific
  * code
  */
 
-void
-_start(void);
+void _start(void);
 
 /* This is the application entry point */
-int
-main(int, char **);
+int  main(int, char **);
 
 #ifdef __INIT_FINI_ARRAY
 extern void __libc_init_array(void);
@@ -91,58 +89,56 @@ int sys_semihost_get_cmdline(char *buf, int size);
 static __noreturn __always_inline void
 __start(void)
 {
-	memcpy(__data_start, __data_source, (uintptr_t) __data_size);
-	memset(__bss_start, '\0', (uintptr_t) __bss_size);
+    memcpy(__data_start, __data_source, (uintptr_t)__data_size);
+    memset(__bss_start, '\0', (uintptr_t)__bss_size);
 #ifdef POST_MEMORY_SETUP
-        POST_MEMORY_SETUP();
+    POST_MEMORY_SETUP();
 #endif
 
 #ifdef INIT_TLS
-        _init_tls(__tls_base);
+    _init_tls(__tls_base);
 #endif
 #ifdef __THREAD_LOCAL_STORAGE
-	_set_tls(__tls_base);
+    _set_tls(__tls_base);
 #endif
 #if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
-	__libc_init_array();
+    __libc_init_array();
 #endif
 
-#if defined(CRT0_SEMIHOST) &&                                                  \
-    (defined(__ARM_SEMIHOST) || defined(__HEXAGON_ARCH__))
-#define CMDLINE_LEN     1024
-#define ARGV_LEN        64
-        static char cmdline[CMDLINE_LEN];
-        static char *argv[ARGV_LEN];
-        int argc = 0;
+#if defined(CRT0_SEMIHOST) && (defined(__ARM_SEMIHOST) || defined(__HEXAGON_ARCH__))
+#define CMDLINE_LEN 1024
+#define ARGV_LEN    64
+    static char  cmdline[CMDLINE_LEN];
+    static char *argv[ARGV_LEN];
+    int          argc = 0;
 
-        if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0 &&
-            cmdline[0])
-        {
-            char *c = cmdline;
+    if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0 && cmdline[0]) {
+        char *c = cmdline;
 
-            while (*c && argc < ARGV_LEN - 1) {
-                argv[argc++] = c;
-                while (*c && *c != ' ')
-                    c++;
-                if (!*c)
-                    break;
-                *c = '\0';
-                while (*++c == ' ')
-                    ;
-            }
-        } else
-            argv[argc++] = "program-name";
-        argv[argc] = NULL;
+        while (*c && argc < ARGV_LEN - 1) {
+            argv[argc++] = c;
+            while (*c && *c != ' ')
+                c++;
+            if (!*c)
+                break;
+            *c = '\0';
+            while (*++c == ' ')
+                ;
+        }
+    } else
+        argv[argc++] = "program-name";
+    argv[argc] = NULL;
 #else
 #define argv NULL
 #define argc 0
 #endif
 
-	int ret = main(argc, argv);
+    int ret = main(argc, argv);
 #ifdef CRT0_EXIT
-	exit(ret);
+    exit(ret);
 #else
-	(void) ret;
-	for(;;);
+    (void)ret;
+    for (;;)
+        ;
 #endif
 }

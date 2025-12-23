@@ -17,16 +17,16 @@
 
 #include <stdarg.h>
 
-extern int vprintf (const char *, va_list);
+extern int vprintf(const char *, va_list);
 
 int
-printf (const char *fmt, ...)
+printf(const char *fmt, ...)
 {
-  va_list args;
-  int res;
+    va_list args;
+    int     res;
 
-  va_start (args, fmt);
-  res = vprintf (fmt, args);
-  va_end (args);
-  return res;
+    va_start(args, fmt);
+    res = vprintf(fmt, args);
+    va_end(args);
+    return res;
 }

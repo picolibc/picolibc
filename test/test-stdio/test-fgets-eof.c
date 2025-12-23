@@ -43,44 +43,46 @@
 
 const char *string = "123456789";
 
-int main(void)
+int
+main(void)
 {
     char *pchar;
-    char line[12];
-    int compare_result;
+    char  line[12];
+    int   compare_result;
     FILE *file;
-    int ret = 0;
+    int   ret = 0;
 
-    file = fopen( TEST_FILE_NAME, "w" );
-    if(file == NULL) return 1;
+    file = fopen(TEST_FILE_NAME, "w");
+    if (file == NULL)
+        return 1;
     fputs(string, file);
     fclose(file);
 
-    file = fopen( TEST_FILE_NAME, "r" );
-    if(file == NULL) {
-        unlink( TEST_FILE_NAME );
+    file = fopen(TEST_FILE_NAME, "r");
+    if (file == NULL) {
+        unlink(TEST_FILE_NAME);
         return 1;
     }
 
     /*Calling fgets to reach EOF and check on the returned value*/
-    pchar = fgets( line, 12, file);
-    if(pchar == line)
+    pchar = fgets(line, 12, file);
+    if (pchar == line)
         printf("fgets return is correct\n");
     else {
         printf("fgets return is wrong!!\n");
         ret = 1;
     }
 
-    compare_result = strcmp( line, string );
-    if(compare_result == 0)
+    compare_result = strcmp(line, string);
+    if (compare_result == 0)
         printf("compare results passed\n");
     else {
         printf("compare results failed!!\n");
         ret = 1;
     }
 
-    fclose( file );
-    unlink( TEST_FILE_NAME );
+    fclose(file);
+    unlink(TEST_FILE_NAME);
 
     return ret;
 }

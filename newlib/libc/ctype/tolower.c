@@ -28,24 +28,24 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<tolower>>, <<tolower_l>>---translate characters to lowercase
+        <<tolower>>, <<tolower_l>>---translate characters to lowercase
 
 INDEX
-	tolower
+        tolower
 
 INDEX
-	tolower_l
+        tolower_l
 
 INDEX
-	_tolower
+        _tolower
 
 SYNOPSIS
-	#include <ctype.h>
-	int tolower(int <[c]>);
-	int _tolower(int <[c]>);
+        #include <ctype.h>
+        int tolower(int <[c]>);
+        int _tolower(int <[c]>);
 
-	#include <ctype.h>
-	int tolower_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int tolower_l(int <[c]>, locale_t <[locale]>);
 
 
 DESCRIPTION
@@ -76,10 +76,10 @@ PORTABILITY
 <<tolower_l>> is POSIX-1.2008.
 
 No supporting OS subroutines are required.
-*/ 
+*/
 
 #include <ctype.h>
-#if defined (__MB_EXTENDED_CHARSETS_ISO) || defined (__MB_EXTENDED_CHARSETS_WINDOWS)
+#if defined(__MB_EXTENDED_CHARSETS_ISO) || defined(__MB_EXTENDED_CHARSETS_WINDOWS)
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -89,21 +89,19 @@ No supporting OS subroutines are required.
 
 #undef tolower
 int
-tolower (int c)
+tolower(int c)
 {
-#if defined (__MB_EXTENDED_CHARSETS_ISO) || defined (__MB_EXTENDED_CHARSETS_WINDOWS)
-  if ((unsigned char) c <= 0x7f) 
-    return isupper (c) ? c - 'A' + 'a' : c;
-  else if (c != EOF && MB_CUR_MAX == 1 && isupper (c))
-    {
-      char s[MB_LEN_MAX] = { c, '\0' };
-      wchar_t wc;
-      if (mbtowc (&wc, s, 1) >= 0
-	  && wctomb (s, (wchar_t) towlower ((wint_t) wc)) == 1)
-	c = (unsigned char) s[0];
+#if defined(__MB_EXTENDED_CHARSETS_ISO) || defined(__MB_EXTENDED_CHARSETS_WINDOWS)
+    if ((unsigned char)c <= 0x7f)
+        return isupper(c) ? c - 'A' + 'a' : c;
+    else if (c != EOF && MB_CUR_MAX == 1 && isupper(c)) {
+        char    s[MB_LEN_MAX] = { c, '\0' };
+        wchar_t wc;
+        if (mbtowc(&wc, s, 1) >= 0 && wctomb(s, (wchar_t)towlower((wint_t)wc)) == 1)
+            c = (unsigned char)s[0];
     }
-  return c;
+    return c;
 #else
-  return isupper(c) ? (c) - 'A' + 'a' : c;
+    return isupper(c) ? (c) - 'A' + 'a' : c;
 #endif
 }

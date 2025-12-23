@@ -30,13 +30,13 @@
 
 #ifdef _NEED_FLOAT_HUGE
 
-static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MAX, (long double) INFINITY);
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MAX, (long double)INFINITY);
 
 HIDDEN long double
-__math_oflowl (uint32_t sign)
+__math_oflowl(uint32_t sign)
 {
     long double y = pick_long_double_except((sign ? -VAL : VAL) * VAL, sign ? -VAL : VAL);
-    return __math_with_errnol (y, ERANGE);
+    return __math_with_errnol(y, ERANGE);
 }
 
 #endif /* _NEED_FLOAT_HUGE */

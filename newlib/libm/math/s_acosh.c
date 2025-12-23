@@ -30,26 +30,25 @@
 
 #ifdef _NEED_FLOAT64
 
-static const __float64
-    one = _F_64(1.0),
-    ln2 = _F_64(6.93147180559945286227e-01); /* 0x3FE62E42, 0xFEFA39EF */
+static const __float64 one = _F_64(1.0),
+                       ln2 = _F_64(6.93147180559945286227e-01); /* 0x3FE62E42, 0xFEFA39EF */
 
 __float64
 acosh64(__float64 x)
 {
-    __float64 t;
-    __int32_t hx;
+    __float64  t;
+    __int32_t  hx;
     __uint32_t lx;
     EXTRACT_WORDS(hx, lx, x);
     if (hx < 0x3ff00000) { /* x < 1 */
         return __math_invalid(x);
     } else if (hx >= 0x41b00000) { /* x > 2**28 */
-        if (hx >= 0x7ff00000) { /* x is inf of NaN */
+        if (hx >= 0x7ff00000) {    /* x is inf of NaN */
             return x + x;
         } else
             return log64(x) + ln2; /* acosh(huge)=log(2x) */
-    } else if ((((__uint32_t) hx - 0x3ff00000) | lx) == 0) {
-        return _F_64(0.0); /* acosh(1) = 0 */
+    } else if ((((__uint32_t)hx - 0x3ff00000) | lx) == 0) {
+        return _F_64(0.0);        /* acosh(1) = 0 */
     } else if (hx > 0x40000000) { /* 2**28 > x > 2 */
         t = x * x;
         return log64(_F_64(2.0) * x - one / (x + sqrt64(t - one)));

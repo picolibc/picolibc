@@ -31,17 +31,17 @@ static const float atanlo[] = {
 };
 
 static const float aT[] = {
-    3.3333334327e-01, /* 0x3eaaaaaa */
+    3.3333334327e-01,  /* 0x3eaaaaaa */
     -2.0000000298e-01, /* 0xbe4ccccd */
-    1.4285714924e-01, /* 0x3e124925 */
+    1.4285714924e-01,  /* 0x3e124925 */
     -1.1111110449e-01, /* 0xbde38e38 */
-    9.0908870101e-02, /* 0x3dba2e6e */
+    9.0908870101e-02,  /* 0x3dba2e6e */
     -7.6918758452e-02, /* 0xbd9d8795 */
-    6.6610731184e-02, /* 0x3d886b35 */
+    6.6610731184e-02,  /* 0x3d886b35 */
     -5.8335702866e-02, /* 0xbd6ef16b */
-    4.9768779427e-02, /* 0x3d4bda59 */
+    4.9768779427e-02,  /* 0x3d4bda59 */
     -3.6531571299e-02, /* 0xbd15a221 */
-    1.6285819933e-02, /* 0x3c8569d7 */
+    1.6285819933e-02,  /* 0x3c8569d7 */
 };
 
 static const float one = 1.0;
@@ -49,7 +49,7 @@ static const float one = 1.0;
 float
 atanf(float x)
 {
-    float w, s1, s2, z;
+    float     w, s1, s2, z;
     __int32_t ix, hx, id;
 
     GET_FLOAT_WORD(hx, x);
@@ -62,13 +62,13 @@ atanf(float x)
         else
             return -atanhi[3] - atanlo[3];
     }
-    if (ix < 0x3ee00000) { /* |x| < 0.4375 */
+    if (ix < 0x3ee00000) {   /* |x| < 0.4375 */
         if (ix < 0x31000000) /* |x| < 2^-29 */
             return __math_inexactf(x);
         id = -1;
     } else {
         x = fabsf(x);
-        if (ix < 0x3f980000) { /* |x| < 1.1875 */
+        if (ix < 0x3f980000) {     /* |x| < 1.1875 */
             if (ix < 0x3f300000) { /* 7/16 <=|x|<11/16 */
                 id = 0;
                 x = ((float)2.0 * x - one) / ((float)2.0 + x);
@@ -90,9 +90,7 @@ atanf(float x)
     z = x * x;
     w = z * z;
     /* break sum from i=0 to 10 aT[i]z**(i+1) into odd and even poly */
-    s1 = z *
-         (aT[0] +
-          w * (aT[2] + w * (aT[4] + w * (aT[6] + w * (aT[8] + w * aT[10])))));
+    s1 = z * (aT[0] + w * (aT[2] + w * (aT[4] + w * (aT[6] + w * (aT[8] + w * aT[10])))));
     s2 = w * (aT[1] + w * (aT[3] + w * (aT[5] + w * (aT[7] + w * aT[9]))));
     if (id < 0)
         return x - x * (s1 + s2);

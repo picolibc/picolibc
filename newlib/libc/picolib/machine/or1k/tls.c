@@ -44,13 +44,13 @@
  * NB: The actual size before tp also includes padding
  * to align up to the alignment of .tdata/.tbss.
  */
-#define TCB_SIZE        16
+#define TCB_SIZE 16
 extern char __or1k_tls_tcb_offset;
 #define TP_OFFSET ((size_t)&__or1k_tls_tcb_offset - TCB_SIZE)
 
 void
 _set_tls(void *tls)
 {
-        tls = (uint8_t *) tls - TP_OFFSET;
-	__asm__("l.or r10, %0, %0" : : "r" (tls));
+    tls = (uint8_t *)tls - TP_OFFSET;
+    __asm__("l.or r10, %0, %0" : : "r"(tls));
 }

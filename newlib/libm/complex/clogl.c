@@ -37,12 +37,12 @@
 long double complex
 clogl(long double complex z)
 {
-	long double p, rr;
+    long double p, rr;
 
-	rr = cabsl(z);
-	p = logl(rr);
-	rr = atan2l(cimagl(z), creall(z));
-	return (long double complex) p + rr * (long double complex) I;
+    rr = cabsl(z);
+    p = logl(rr);
+    rr = atan2l(cimagl(z), creall(z));
+    return (long double complex)p + rr * (long double complex)I;
 }
 
 #endif

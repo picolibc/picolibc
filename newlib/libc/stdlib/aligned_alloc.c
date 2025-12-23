@@ -31,8 +31,8 @@
 
 #ifndef __strong_reference
 void *
-aligned_alloc (size_t align, size_t size)
+aligned_alloc(size_t align, size_t size)
 {
-  return memalign (align, size);
+    return memalign(align, size);
 }
 #endif

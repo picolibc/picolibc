@@ -40,22 +40,23 @@
 static void
 fail(void)
 {
-	printf("atexit failure\n");
-	_exit(2);
+    printf("atexit failure\n");
+    _exit(2);
 }
 
 static void
 success(void)
 {
-	_exit(0);
+    _exit(0);
 }
 
-int main(void)
+int
+main(void)
 {
-	atexit(fail);
-	atexit(success);
-	/* Need to call exit explicitly so that native
-	 * tests (which use glibc crt0) get picolibc exit
-	 */
-	exit(1);
+    atexit(fail);
+    atexit(success);
+    /* Need to call exit explicitly so that native
+     * tests (which use glibc crt0) get picolibc exit
+     */
+    exit(1);
 }

@@ -36,9 +36,7 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_shift_out_of_bounds(void *_data,
-                                   void *lhs,
-                                   void *rhs)
+__ubsan_handle_shift_out_of_bounds(void *_data, void *lhs, void *rhs)
 {
     struct shift_out_of_bounds_data *data = _data;
 #if 0
@@ -69,4 +67,3 @@ __ubsan_handle_shift_out_of_bounds(void *_data,
     __ubsan_val_to_string(rhs_str, data->rhs_type, rhs);
     __ubsan_error(&data->location, "shift_out_of_bounds", "%s <> %s\n", lhs_str, rhs_str);
 }
-

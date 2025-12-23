@@ -98,7 +98,7 @@ static const char * const rounding_names[] = {
 #endif
 };
 
-#define NROUND  (sizeof(roundings)/sizeof(roundings[0]))
+#define NROUND (sizeof(roundings) / sizeof(roundings[0]))
 
 #ifdef __DOUBLE_NOEXCEPT
 /*
@@ -109,32 +109,32 @@ static const char * const rounding_names[] = {
 #endif
 
 #ifdef SKIP_ROUNDINGS_FLOAT
-#define NROUND_FLOAT    1
+#define NROUND_FLOAT 1
 #else
 #define NROUND_FLOAT NROUND
 #endif
 
 #define nanf __builtin_nanf("")
 #define inff INFINITY
-#define nan __builtin_nan("")
-#define inf ((double) INFINITY)
+#define nan  __builtin_nan("")
+#define inf  ((double)INFINITY)
 #define nanl __builtin_nanl("")
-#define infl ((long double) INFINITY)
+#define infl ((long double)INFINITY)
 
 struct fmaf_vec {
-    float       x, y, z;
-    float       r[4];
+    float x, y, z;
+    float r[4];
 };
 
 struct fma_vec {
-    double      x, y, z;
-    double      r[4];
+    double x, y, z;
+    double r[4];
 };
 
 #if LDBL_MANT_DIG != 0
 struct fmal_vec {
-    long double      x, y, z;
-    long double      r[4];
+    long double x, y, z;
+    long double r[4];
 };
 #endif
 
@@ -146,9 +146,9 @@ struct fmal_vec {
 
 #include "fma_vec.h"
 
-#define NUM_FMAF_VEC (sizeof(fmaf_vec)/sizeof(fmaf_vec[0]))
-#define NUM_FMA_VEC (sizeof(fma_vec)/sizeof(fma_vec[0]))
-#define NUM_FMAL_VEC (sizeof(fmal_vec)/sizeof(fmal_vec[0]))
+#define NUM_FMAF_VEC (sizeof(fmaf_vec) / sizeof(fmaf_vec[0]))
+#define NUM_FMA_VEC  (sizeof(fma_vec) / sizeof(fma_vec[0]))
+#define NUM_FMAL_VEC (sizeof(fmal_vec) / sizeof(fmal_vec[0]))
 
 #endif
 
@@ -165,10 +165,10 @@ equalf(float x, float y)
 static int
 test_fmaf(void)
 {
-    char        xs[20], ys[20], zs[20], rs[20], ss[20];
-    int ret = 0;
+    char         xs[20], ys[20], zs[20], rs[20], ss[20];
+    int          ret = 0;
     unsigned int ro;
-    int defround = fegetround();
+    int          defround = fegetround();
     unsigned int t;
 
     printf("float\n");
@@ -178,20 +178,19 @@ test_fmaf(void)
         else
             fesetround(roundings[ro]);
         for (t = 0; t < NUM_FMAF_VEC; t++) {
-            float x = fmaf_vec[t].x;
-            float y = fmaf_vec[t].y;
-            float z = fmaf_vec[t].z;
+            float          x = fmaf_vec[t].x;
+            float          y = fmaf_vec[t].y;
+            float          z = fmaf_vec[t].z;
             volatile float r = fmaf(x, y, z);
-            float s = fmaf_vec[t].r[rounding_map[ro]];
+            float          s = fmaf_vec[t].r[rounding_map[ro]];
             if (!equalf(r, s)) {
                 strfromf(xs, sizeof(xs), "%a", x);
                 strfromf(ys, sizeof(xs), "%a", y);
                 strfromf(zs, sizeof(xs), "%a", z);
                 strfromf(rs, sizeof(xs), "%a", r);
                 strfromf(ss, sizeof(xs), "%a", s);
-                printf("%u: round %s %s %s %s -> got %s want %s\n",
-                       t, rounding_names[ro],
-                       xs, ys, zs, rs, ss);
+                printf("%u: round %s %s %s %s -> got %s want %s\n", t, rounding_names[ro], xs, ys,
+                       zs, rs, ss);
                 ret = 1;
             }
         }
@@ -214,7 +213,7 @@ test_fmaf(void)
 #endif
 
 #ifdef SKIP_ROUNDINGS_DOUBLE
-#define NROUND_DOUBLE    1
+#define NROUND_DOUBLE 1
 #else
 #define NROUND_DOUBLE NROUND
 #endif
@@ -230,9 +229,9 @@ equal(double x, double y)
 static int
 test_fma(void)
 {
-    int ret = 0;
+    int          ret = 0;
     unsigned int ro;
-    int defround = fegetround();
+    int          defround = fegetround();
     unsigned int t;
 
     printf("double\n");
@@ -242,15 +241,14 @@ test_fma(void)
         else
             fesetround(roundings[ro]);
         for (t = 0; t < NUM_FMA_VEC; t++) {
-            double x = fma_vec[t].x;
-            double y = fma_vec[t].y;
-            double z = fma_vec[t].z;
+            double          x = fma_vec[t].x;
+            double          y = fma_vec[t].y;
+            double          z = fma_vec[t].z;
             volatile double r = fma(x, y, z);
-            double s = fma_vec[t].r[rounding_map[ro]];
+            double          s = fma_vec[t].r[rounding_map[ro]];
             if (!equal(r, s)) {
-                printf("%u: round %s %a * %a + %a -> got %a want %a\n",
-                       t, rounding_names[ro],
-                       x, y, z, r, s);
+                printf("%u: round %s %a * %a + %a -> got %a want %a\n", t, rounding_names[ro], x, y,
+                       z, r, s);
                 ret = 1;
             }
         }
@@ -262,7 +260,7 @@ test_fma(void)
 #define test_fma() 0
 #endif
 
-#if defined (_TEST_LONG_DOUBLE) && defined(HAVE_LONG_DOUBLE_FMA_VEC)
+#if defined(_TEST_LONG_DOUBLE) && defined(HAVE_LONG_DOUBLE_FMA_VEC)
 
 #ifdef __LONG_DOUBLE_NOEXCEPT
 /*
@@ -273,7 +271,7 @@ test_fma(void)
 #endif
 
 #ifdef SKIP_ROUNDINGS_LONG_DOUBLE
-#define NROUND_LONG_DOUBLE    1
+#define NROUND_LONG_DOUBLE 1
 #else
 #define NROUND_LONG_DOUBLE NROUND
 #endif
@@ -289,9 +287,9 @@ equall(long double x, long double y)
 static int
 test_fmal(void)
 {
-    int ret = 0;
+    int          ret = 0;
     unsigned int ro;
-    int defround = fegetround();
+    int          defround = fegetround();
     unsigned int t;
 
     printf("long double\n");
@@ -309,8 +307,7 @@ test_fmal(void)
             long double r = fmal(x, y, z);
             long double s = fmal_vec[t].r[rounding_map[ro]];
             if (!equall(r, s)) {
-                printf("%u: round %s %La * %La + %La -> got %La want %La\n",
-                       t, rounding_names[ro],
+                printf("%u: round %s %La * %La + %La -> got %La want %La\n", t, rounding_names[ro],
                        x, y, z, r, s);
                 ret = 1;
             }
@@ -339,8 +336,8 @@ main(void)
     printf("GDB simulator doesn't support FMA. Skipping\n");
     return 77;
 #endif
-    (void) rounding_names;
-    (void) roundings;
+    (void)rounding_names;
+    (void)roundings;
     int ret = 0;
     ret |= test_fmaf();
     ret |= test_fma();

@@ -28,23 +28,24 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<toascii>>, <<toascii_l>>---force integers to ASCII range
+        <<toascii>>, <<toascii_l>>---force integers to ASCII range
 
 INDEX
-	toascii
+        toascii
 
 INDEX
-	toascii_l
+        toascii_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int toascii(int <[c]>);
+        #include <ctype.h>
+        int toascii(int <[c]>);
 
-	#include <ctype.h>
-	int toascii_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int toascii_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
-<<toascii>> is a macro which coerces integers to the ASCII range (0--127) by zeroing any higher-order bits.
+<<toascii>> is a macro which coerces integers to the ASCII range (0--127) by zeroing any
+higher-order bits.
 
 <<toascii_l>> is like <<toascii>> but performs the function based on the
 locale specified by the locale object locale.  If <[locale]> is
@@ -69,8 +70,7 @@ No supporting OS subroutines are required.
 #undef toascii
 
 int
-toascii (int c)
+toascii(int c)
 {
-  return (c)&0177;
+    return (c) & 0177;
 }
-

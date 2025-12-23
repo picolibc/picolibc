@@ -39,5 +39,5 @@
 int
 main(void)
 {
-	sys_semihost_exit(ADP_Stopped_ApplicationExit, 0);
+    sys_semihost_exit(ADP_Stopped_ApplicationExit, 0);
 }

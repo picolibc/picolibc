@@ -40,7 +40,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _LOGF4_H_
-#define _LOGF4_H_	1
+#define _LOGF4_H_ 1
 
 #include "log2f4.h"
 
@@ -51,13 +51,14 @@
  * DESCRIPTION
  *	The _logf4 function computes the natural log (base e) of the input
  *      vector of values x. logf4 is computed using log2f4 as follows:
- *	
+ *
  *	   logf4(x) = log2f4(x) / log2f4(e);
  *
  */
-static __inline vector float _logf4(vector float x)
+static __inline vector float
+_logf4(vector float x)
 {
-  return (spu_mul(_log2f4(x), spu_splats(0.69314718055995f)));
+    return (spu_mul(_log2f4(x), spu_splats(0.69314718055995f)));
 }
 
 #endif /* _LOGF4_H_ */

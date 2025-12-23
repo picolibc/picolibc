@@ -28,14 +28,15 @@
 #include <math.h>
 
 long long int
-llrintf (float x)
+llrintf(float x)
 {
-  long long int result;
-  float temp;
-  __asm__("frintx\t%s1, %s2\n\t"
-       "fcvtzs\t%x0, %s1"
-       : "=r" (result), "=w" (temp) : "w" (x));
-  return result;
+    long long int result;
+    float         temp;
+    __asm__("frintx\t%s1, %s2\n\t"
+            "fcvtzs\t%x0, %s1"
+            : "=r"(result), "=w"(temp)
+            : "w"(x));
+    return result;
 }
 
 #else

@@ -39,15 +39,19 @@
 
 #ifdef _NEED_IO_FLOAT_LARGE
 
-#define max(a, b) ({\
-		__typeof(a) _a = a;\
-		__typeof(b) _b = b;\
-		_a > _b ? _a : _b; })
+#define max(a, b)           \
+    ({                      \
+        __typeof(a) _a = a; \
+        __typeof(b) _b = b; \
+        _a > _b ? _a : _b;  \
+    })
 
-#define min(a, b) ({\
-		__typeof(a) _a = a;\
-		__typeof(b) _b = b;\
-		_a < _b ? _a : _b; })
+#define min(a, b)           \
+    ({                      \
+        __typeof(a) _a = a; \
+        __typeof(b) _b = b; \
+        _a < _b ? _a : _b;  \
+    })
 
 int
 __ldtoa_engine(long double x, struct dtoa *dtoa, int max_digits, bool fmode, int max_decimals)
@@ -120,7 +124,7 @@ __ldtoa_engine(long double x, struct dtoa *dtoa, int max_digits, bool fmode, int
     if (fmode)
         max_digits = min(max_digits, max(1, max_decimals + decexp + 1));
 
-    int decimals = max_digits;
+    int         decimals = max_digits;
 
     long double round = 0.5l;
     while (decimals--) {
@@ -137,7 +141,7 @@ __ldtoa_engine(long double x, struct dtoa *dtoa, int max_digits, bool fmode, int
     /* convert to decimal */
 
     for (i = 0; i < max_digits; i++) {
-        int digit = (int) x;
+        int digit = (int)x;
         dtoa->digits[i] = '0' + digit;
         x -= digit;
         x *= 10.0l;

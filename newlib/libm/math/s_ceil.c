@@ -27,7 +27,7 @@
 __float64
 ceil64(__float64 x)
 {
-    __int32_t i0, i1, j0, j;
+    __int32_t  i0, i1, j0, j;
     __uint32_t i;
     EXTRACT_WORDS(i0, i1, x);
     j0 = ((i0 >> 20) & 0x7ff) - 0x3ff;
@@ -62,8 +62,8 @@ ceil64(__float64 x)
             if (j0 == 20)
                 i0 += 1;
             else {
-                j = i1 + ((__uint32_t) 1 << (52 - j0));
-                if ((__uint32_t) j < (__uint32_t) i1)
+                j = i1 + ((__uint32_t)1 << (52 - j0));
+                if ((__uint32_t)j < (__uint32_t)i1)
                     i0 += 1; /* got a carry */
                 i1 = j;
             }

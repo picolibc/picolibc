@@ -35,17 +35,18 @@
 
 #include "uchar-local.h"
 
-size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
-                _mbstate_t * __restrict ps)
+size_t
+mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
+         _mbstate_t * __restrict ps)
 {
     static mbstate_t local_state;
 
     if (ps == NULL)
         ps = &local_state;
 
-    char32_t    c32;
-    wchar_t     wc;
-    size_t      ret;
+    char32_t c32;
+    wchar_t  wc;
+    size_t   ret;
 
 #if __SIZEOF_WCHAR_T__ == 2
 
@@ -62,9 +63,9 @@ size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
     ret = mbrtowc(&wc, s, n, ps);
 
     switch (ret) {
-    case (size_t) -2:       /* wc not stored */
+    case (size_t)-2: /* wc not stored */
         return ret;
-    case (size_t) -1:       /* error */
+    case (size_t)-1: /* error */
         return ret;
     default:
         break;
@@ -75,7 +76,7 @@ size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
     s += ret;
     n -= ret;
 
-    char16_t    c16 = (char16_t) wc;
+    char16_t c16 = (char16_t)wc;
 
     /* Check for high surrogate */
     if (char16_is_high_surrogate(c16)) {
@@ -83,14 +84,14 @@ size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
         /* See if the low surrogate is ready yet */
         r = mbrtowc(&wc, s, n, ps);
         switch (r) {
-        case (size_t) -2:       /* wc not stored */
+        case (size_t)-2: /* wc not stored */
             return r;
-        case (size_t) -1:       /* error */
+        case (size_t)-1: /* error */
             return r;
         default:
             break;
         }
-        c16 = (char16_t) wc;
+        c16 = (char16_t)wc;
         ret += r;
     }
 
@@ -100,17 +101,16 @@ size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
          * The first three bytes are left in the buffer, go fetch them
          * and add in the low six bits in the low surrogate
          */
-        c32 = ((((char32_t)ps->__value.__wchb[0] & 0x07) << 18) |
-               (((char32_t)ps->__value.__wchb[1] & 0x3f) << 12) |
-               (((char32_t)ps->__value.__wchb[2] & 0x3f) << 6) |
-               ((char32_t)c16 & 0x3f));
+        c32 = ((((char32_t)ps->__value.__wchb[0] & 0x07) << 18)
+               | (((char32_t)ps->__value.__wchb[1] & 0x3f) << 12)
+               | (((char32_t)ps->__value.__wchb[2] & 0x3f) << 6) | ((char32_t)c16 & 0x3f));
     } else {
-        c32 = (char32_t) c16;
+        c32 = (char32_t)c16;
     }
 
 #elif __SIZEOF_WCHAR_T__ == 4
 
-    c32 = (char32_t) wc;
+    c32 = (char32_t)wc;
 
 #else
 #error wchar_t size unknown
@@ -118,12 +118,12 @@ size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
 
     if (!char32_is_valid(c32)) {
         errno = EILSEQ;
-        return (size_t) -1;
+        return (size_t)-1;
     }
 
     /* Ignore parameter pc32 if s is a null pointer */
-    if(s != NULL) *pc32 = c32;
+    if (s != NULL)
+        *pc32 = c32;
 
     return ret;
-
 }

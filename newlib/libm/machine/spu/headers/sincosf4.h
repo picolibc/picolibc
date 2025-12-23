@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _SINCOSF4_H_
-#define _SINCOSF4_H_	1
+#define _SINCOSF4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -48,15 +48,14 @@
  *  vector void _sincosf4(vector float angle, vector float *sx, vector float *cx)
  *
  * DESCRIPTION
- *  The _sincosf4 function computes the sine and cosine of a vector of 
+ *  The _sincosf4 function computes the sine and cosine of a vector of
  *	angles (expressed in radians) to an accuracy of a single precision
  *	floating point.
  *
  */
 
-static __inline void _sincosf4(vector float angle, 
-                               vector float *sinx, 
-                               vector float *cosx)
+static __inline void
+_sincosf4(vector float angle, vector float *sinx, vector float *cosx)
 {
 
     vec_int4   octant;

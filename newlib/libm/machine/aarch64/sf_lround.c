@@ -28,15 +28,15 @@
 #include <math.h>
 
 long int
-lroundf (float x)
+lroundf(float x)
 {
-  long int result;
-  if (sizeof (result) == 8) {
-      __asm__("fcvtas\t%x0, %s1" : "=r" (result) : "w" (x));
-  } else {
-      __asm__("fcvtas\t%w0, %s1" : "=r" (result) : "w" (x));
-  }
-  return result;
+    long int result;
+    if (sizeof(result) == 8) {
+        __asm__("fcvtas\t%x0, %s1" : "=r"(result) : "w"(x));
+    } else {
+        __asm__("fcvtas\t%w0, %s1" : "=r"(result) : "w"(x));
+    }
+    return result;
 }
 
 #else

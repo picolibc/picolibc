@@ -37,7 +37,7 @@ long double
 nearbyintl(long double x)
 {
     union IEEEl2bits u;
-    double dh, dl, frac;
+    double           dh, dl, frac;
 
     u.e = x;
     if (u.bits.exp == LDBL_INF_NAN_EXP)
@@ -48,12 +48,12 @@ nearbyintl(long double x)
         /* Adjust rounding when upper fraction is 0.5 */
         if (u.dbits.dl > 0 && frac == 0.5)
             dh += 1.0;
-        else if(u.dbits.dl < 0 && frac == -0.5)
+        else if (u.dbits.dl < 0 && frac == -0.5)
             dh -= 1.0;
         dl = 0;
     } else
         dl = nearbyint(u.dbits.dl);
-    return (long double) dh + (long double) dl;
+    return (long double)dh + (long double)dl;
 }
 
 long double

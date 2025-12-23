@@ -58,22 +58,22 @@ typedef u_int32_t rpcvers_t;
 typedef u_int32_t rpcproc_t;
 typedef u_int32_t rpcprot_t;
 typedef u_int32_t rpcport_t;
-typedef   int32_t rpc_inline_t;
+typedef int32_t   rpc_inline_t;
 
 #define __dontcare__ -1
 
 #ifndef FALSE
-# define FALSE 0
+#define FALSE 0
 #endif
 #ifndef TRUE
-# define TRUE 1
+#define TRUE 1
 #endif
 
 #ifndef mem_alloc
-#define mem_alloc(bsize)        calloc(1, bsize)
+#define mem_alloc(bsize) calloc(1, bsize)
 #endif
 #ifndef mem_free
-#define mem_free(ptr, bsize)    free(ptr)
+#define mem_free(ptr, bsize) free(ptr)
 #endif
 
 _END_STD_C

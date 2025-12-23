@@ -31,18 +31,19 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FMAXF_H_
-#define _FMAXF_H_	1
+#define _FMAXF_H_ 1
 
 #include <spu_intrinsics.h>
 
 /* Return the maximum numeric value of their arguments.
  */
-static __inline float _fmaxf(float x, float y)
+static __inline float
+_fmaxf(float x, float y)
 {
-  vec_float4 vx, vy;
+    vec_float4 vx, vy;
 
-  vx = spu_promote(x, 0);
-  vy = spu_promote(y, 0);
-  return (spu_extract(spu_sel(vx, vy, spu_cmpgt(vy, vx)), 0));
+    vx = spu_promote(x, 0);
+    vy = spu_promote(y, 0);
+    return (spu_extract(spu_sel(vx, vy, spu_cmpgt(vy, vx)), 0));
 }
 #endif /* _FMAXF_H_ */

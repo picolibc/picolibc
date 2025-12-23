@@ -40,18 +40,13 @@
 #include "dtoa.h"
 
 int
-fcvtl_r (long double invalue,
-        int ndecimal,
-        int *decpt,
-        int *sign,
-        char *buf,
-        size_t len)
+fcvtl_r(long double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)
 {
     struct dtoa dtoa;
-    int ntrailing;      /* number of zeros to add after the value */
-    int ndigit;         /* numer of generated digits */
-    int dtoa_decimal = ndecimal;
-    char *digits = dtoa.digits;
+    int         ntrailing; /* number of zeros to add after the value */
+    int         ndigit;    /* numer of generated digits */
+    int         dtoa_decimal = ndecimal;
+    char       *digits = dtoa.digits;
 
     if (!isfinite(invalue)) {
         ndigit = 3;
@@ -72,9 +67,9 @@ fcvtl_r (long double invalue,
 #ifdef _NEED_IO_FLOAT_LARGE
         ndigit = __ldtoa_engine(invalue, &dtoa, LDTOA_MAX_DIG, true, ndecimal);
 #elif __SIZEOF_LONG_DOUBLE__ == 8
-        ndigit = __dtoa_engine((FLOAT64) invalue, &dtoa, DTOA_MAX_DIG, true, ndecimal);
+        ndigit = __dtoa_engine((FLOAT64)invalue, &dtoa, DTOA_MAX_DIG, true, ndecimal);
 #elif __SIZEOF_LONG_DOUBLE__ == 4
-        ndigit = __ftoa_engine ((float) invalue, &dtoa, FTOA_MAX_DIG, true, ndecimal);
+        ndigit = __ftoa_engine((float)invalue, &dtoa, FTOA_MAX_DIG, true, ndecimal);
 #endif
         *sign = !!(dtoa.flags & DTOA_MINUS);
 
@@ -122,7 +117,7 @@ fcvtl_r (long double invalue,
     /* If we can't fit the whole value in the provided space,
      * return an error
      */
-    if ((size_t) (ndigit + ntrailing) >= len)
+    if ((size_t)(ndigit + ntrailing) >= len)
         return -1;
 
     /* Value */
@@ -143,14 +138,9 @@ fcvtl_r (long double invalue,
 #include "stdio_private.h"
 
 int
-fcvtl_r (long double invalue,
-         int ndecimal,
-         int *decpt,
-         int *sign,
-         char *buf,
-         size_t len)
+fcvtl_r(long double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)
 {
-    return fcvtf_r((float) invalue, ndecimal, decpt, sign, buf, len);
+    return fcvtf_r((float)invalue, ndecimal, decpt, sign, buf, len);
 }
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
@@ -158,14 +148,9 @@ fcvtl_r (long double invalue,
 #include "stdio_private.h"
 
 int
-fcvtl_r (long double invalue,
-         int ndecimal,
-         int *decpt,
-         int *sign,
-         char *buf,
-         size_t len)
+fcvtl_r(long double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)
 {
-    return fcvt_r((double) invalue, ndecimal, decpt, sign, buf, len);
+    return fcvt_r((double)invalue, ndecimal, decpt, sign, buf, len);
 }
 
 #endif

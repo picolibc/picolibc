@@ -48,4 +48,3 @@
 #endif
 
 #endif /* __HAVE_BUILTIN_COPYSIGNL */
-

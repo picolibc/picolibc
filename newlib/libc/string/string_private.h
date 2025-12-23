@@ -41,4 +41,4 @@
 
 char *_strerror_r(int errnum, int internal, int *errptr);
 
-#endif //STRING_PRIVATE_H_
+#endif // STRING_PRIVATE_H_

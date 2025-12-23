@@ -42,7 +42,7 @@
 #include <errno.h>
 
 extern struct timeval __semihost_creat_time __weak;
-extern int gettimeofday(struct timeval *restrict tv, void *restrict tz) __weak;
+extern int gettimeofday(struct timeval * restrict tv, void * restrict tz) __weak;
 
 /*
  * note: binary mode has been chosen below because otherwise
@@ -54,37 +54,36 @@ extern int gettimeofday(struct timeval *restrict tv, void *restrict tz) __weak;
 int
 open(const char *pathname, int flags, ...)
 {
-	int semiflags = 0;
+    int semiflags = 0;
 
-	switch (flags & (O_RDONLY|O_WRONLY|O_RDWR)) {
-	case O_RDONLY:
-		semiflags = SH_OPEN_R_B;		/* 'rb' */
-		break;
-	case O_WRONLY:
-		if (flags & O_TRUNC)
-			semiflags = SH_OPEN_W_B;	/* 'wb' */
-		else
-			semiflags = SH_OPEN_A_B;	/* 'ab' */
-		break;
-	default:
-		if (flags & O_TRUNC)
-			semiflags = SH_OPEN_W_PLUS_B;	/* 'wb+' */
-		else
-			semiflags = SH_OPEN_A_PLUS_B;	/* 'ab+' */
-		break;
-	}
+    switch (flags & (O_RDONLY | O_WRONLY | O_RDWR)) {
+    case O_RDONLY:
+        semiflags = SH_OPEN_R_B; /* 'rb' */
+        break;
+    case O_WRONLY:
+        if (flags & O_TRUNC)
+            semiflags = SH_OPEN_W_B; /* 'wb' */
+        else
+            semiflags = SH_OPEN_A_B; /* 'ab' */
+        break;
+    default:
+        if (flags & O_TRUNC)
+            semiflags = SH_OPEN_W_PLUS_B; /* 'wb+' */
+        else
+            semiflags = SH_OPEN_A_PLUS_B; /* 'ab+' */
+        break;
+    }
 
-        /* Make sure any stdout/stderr fds are allocated first */
-        (void) _map_stdio(0);
-	int ret;
-	do {
-		ret = sys_semihost_open(pathname, semiflags);
-	}
-	while (0 <= ret && ret <= 2);
-	if (ret == -1)
-		errno = sys_semihost_errno();
-        else if (&__semihost_creat_time && gettimeofday)
-                gettimeofday(&__semihost_creat_time, NULL);
+    /* Make sure any stdout/stderr fds are allocated first */
+    (void)_map_stdio(0);
+    int ret;
+    do {
+        ret = sys_semihost_open(pathname, semiflags);
+    } while (0 <= ret && ret <= 2);
+    if (ret == -1)
+        errno = sys_semihost_errno();
+    else if (&__semihost_creat_time && gettimeofday)
+        gettimeofday(&__semihost_creat_time, NULL);
 
-	return ret;
+    return ret;
 }

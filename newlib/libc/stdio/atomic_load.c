@@ -40,7 +40,7 @@
 __ungetc_t
 __picolibc_non_atomic_load_ungetc(const volatile __ungetc_t *p)
 {
-	return __non_atomic_load_ungetc(p);
+    return __non_atomic_load_ungetc(p);
 }
 
 __weak_reference(__picolibc_non_atomic_load_ungetc, __atomic_load_ungetc);

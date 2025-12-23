@@ -44,60 +44,56 @@
  *      only sinhl(0)=0 is exact for finite x.
  */
 
-
-
 static const long double one = 1.0L, shuge = 1.0e4931L,
-ovf_thresh = 1.1357216553474703894801348310092223067821E4L;
+                         ovf_thresh = 1.1357216553474703894801348310092223067821E4L;
 
 long double
 sinhl(long double x)
 {
-  long double t, w, h;
-  int32_t jx;
-  u_int32_t ix;
-  ieee_quad_shape_type u;
+    long double          t, w, h;
+    int32_t              jx;
+    u_int32_t            ix;
+    ieee_quad_shape_type u;
 
-  /* Words of |x|. */
-  u.value = x;
-  jx = u.parts32.mswhi;
-  ix = jx & 0x7fffffff;
+    /* Words of |x|. */
+    u.value = x;
+    jx = u.parts32.mswhi;
+    ix = jx & 0x7fffffff;
 
-  /* x is INF or NaN */
-  if (ix >= 0x7fff0000)
-    return x + x;
+    /* x is INF or NaN */
+    if (ix >= 0x7fff0000)
+        return x + x;
 
-  h = 0.5L;
-  if (jx < 0)
-    h = -h;
+    h = 0.5L;
+    if (jx < 0)
+        h = -h;
 
-  /* Absolute value of x.  */
-  u.parts32.mswhi = ix;
+    /* Absolute value of x.  */
+    u.parts32.mswhi = ix;
 
-  /* |x| in [0,40], return sign(x)*0.5*(E+E/(E+1))) */
-  if (ix <= 0x40044000)
-    {
-      if (ix < 0x3fc60000) /* |x| < 2^-57 */
-	if (shuge + x > one)
-	  return x;		/* sinh(tiny) = tiny with inexact */
-      t = expm1l (u.value);
-      if (ix < 0x3fff0000)
-	return h * (2.0L * t - t * t / (t + one));
-      return h * (t + t / (t + one));
+    /* |x| in [0,40], return sign(x)*0.5*(E+E/(E+1))) */
+    if (ix <= 0x40044000) {
+        if (ix < 0x3fc60000) /* |x| < 2^-57 */
+            if (shuge + x > one)
+                return x; /* sinh(tiny) = tiny with inexact */
+        t = expm1l(u.value);
+        if (ix < 0x3fff0000)
+            return h * (2.0L * t - t * t / (t + one));
+        return h * (t + t / (t + one));
     }
 
-  /* |x| in [40, log(maxdouble)] return 0.5*exp(|x|) */
-  if (ix <= 0x400c62e3) /* 11356.375 */
-    return h * expl (u.value);
+    /* |x| in [40, log(maxdouble)] return 0.5*exp(|x|) */
+    if (ix <= 0x400c62e3) /* 11356.375 */
+        return h * expl(u.value);
 
-  /* |x| in [log(maxdouble), overflowthreshold]
-     Overflow threshold is log(2 * maxdouble).  */
-  if (u.value <= ovf_thresh)
-    {
-      w = expl (0.5L * u.value);
-      t = h * w;
-      return t * w;
+    /* |x| in [log(maxdouble), overflowthreshold]
+       Overflow threshold is log(2 * maxdouble).  */
+    if (u.value <= ovf_thresh) {
+        w = expl(0.5L * u.value);
+        t = h * w;
+        return t * w;
     }
 
-  /* |x| > overflowthreshold, sinhl(x) overflow */
-  return __math_oflowl(jx < 0);
+    /* |x| > overflowthreshold, sinhl(x) overflow */
+    return __math_oflowl(jx < 0);
 }

@@ -31,28 +31,29 @@
 struct mallinfo
 mallinfo(void)
 {
-    char * sbrk_now;
-    chunk_t *pf;
-    size_t free_size = 0;
-    size_t total_size;
-    size_t ordblks = 0;
+    char           *sbrk_now;
+    chunk_t        *pf;
+    size_t          free_size = 0;
+    size_t          total_size;
+    size_t          ordblks = 0;
     struct mallinfo current_mallinfo;
     memset(&current_mallinfo, 0, sizeof(current_mallinfo));
 
     MALLOC_LOCK;
 
-    if (__malloc_sbrk_start == NULL) total_size = 0;
+    if (__malloc_sbrk_start == NULL)
+        total_size = 0;
     else {
         sbrk_now = __malloc_sbrk_top;
 
         if (sbrk_now == NULL)
             total_size = (size_t)-1;
         else
-            total_size = (size_t) (sbrk_now - __malloc_sbrk_start);
+            total_size = (size_t)(sbrk_now - __malloc_sbrk_start);
     }
 
     for (pf = __malloc_free_list; pf; pf = pf->next) {
-	ordblks++;
+        ordblks++;
         free_size += _size(pf);
     }
 

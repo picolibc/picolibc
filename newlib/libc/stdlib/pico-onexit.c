@@ -38,7 +38,7 @@
 #include "pico-onexit.h"
 
 int
-on_exit (void (*func)(int, void *),void *arg)
+on_exit(void (*func)(int, void *), void *arg)
 {
     union on_exit_func func_u = { .on_exit = func };
     return _on_exit(PICO_ONEXIT_ONEXIT, func_u, arg);

@@ -28,20 +28,20 @@ SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<isdigit>>, <<isdigit_l>>---decimal digit predicate
+        <<isdigit>>, <<isdigit_l>>---decimal digit predicate
 
 INDEX
-	isdigit
+        isdigit
 
 INDEX
-	isdigit_l
+        isdigit_l
 
 SYNOPSIS
-	#include <ctype.h>
-	int isdigit(int <[c]>);
+        #include <ctype.h>
+        int isdigit(int <[c]>);
 
-	#include <ctype.h>
-	int isdigit_l(int <[c]>, locale_t <[locale]>);
+        #include <ctype.h>
+        int isdigit_l(int <[c]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<isdigit>> is a macro which classifies singlebyte charset values by table
@@ -71,11 +71,11 @@ No supporting OS subroutines are required.
 
 #undef isdigit
 int
-isdigit (int c)
+isdigit(int c)
 {
 #if _PICOLIBC_CTYPE_SMALL
     return '0' <= c && c <= '9';
 #else
-    return __CTYPE_PTR[c+1] & __CTYPE_DIGIT;
+    return __CTYPE_PTR[c + 1] & __CTYPE_DIGIT;
 #endif
 }

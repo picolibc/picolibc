@@ -14,16 +14,16 @@
 #include "rand48.h"
 
 long
-_mrand48_r (struct _rand48 *r)
+_mrand48_r(struct _rand48 *r)
 {
-  int32_t i;
-  __dorand48(r, r->_seed);
-  i = (int32_t) ((uint32_t) (r->_seed[2]) << 16 | (uint32_t) (r->_seed[1]));
-  return (long) i;
+    int32_t i;
+    __dorand48(r, r->_seed);
+    i = (int32_t)((uint32_t)(r->_seed[2]) << 16 | (uint32_t)(r->_seed[1]));
+    return (long)i;
 }
 
 long
-mrand48 (void)
+mrand48(void)
 {
-  return _mrand48_r (&_rand48);
+    return _mrand48_r(&_rand48);
 }

@@ -30,15 +30,15 @@
 
 #ifdef _NEED_FLOAT64
 
-static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64) NAN);
+static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_F_64(0.0), (__float64)NAN);
 
 HIDDEN __float64
-__math_invalid (__float64 x)
+__math_invalid(__float64 x)
 {
     if (isnan(x))
         return pick_float64_except(x + x, VAL);
     x = pick_float64_except(VAL / VAL, VAL);
-    return __math_with_errno (x, EDOM);
+    return __math_with_errno(x, EDOM);
 }
 
 #ifndef __math_set_invalid

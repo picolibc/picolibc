@@ -45,69 +45,70 @@
 static const char file_name[] = TEST_FILE_NAME;
 static const char test_string[] = "hello, world\n";
 
-static void test_cleanup(void)
+static void
+test_cleanup(void)
 {
-	remove(file_name);
+    remove(file_name);
 }
 
 static int
 test_cmp(FILE *f, const char *t)
 {
-        int c;
-	while ((c = getc(f)) != EOF) {
-		if ((char) c != *t) {
-			printf("read incorrect byte %c != %c\n", c, *t);
-			return 1;
-		}
-		t++;
-	}
-        return 0;
+    int c;
+    while ((c = getc(f)) != EOF) {
+        if ((char)c != *t) {
+            printf("read incorrect byte %c != %c\n", c, *t);
+            return 1;
+        }
+        t++;
+    }
+    return 0;
 }
 int
 main(void)
 {
-	FILE		*f;
+    FILE *f;
 
-	atexit(test_cleanup);
-	f = fopen(file_name, "w+");
-	if (!f) {
-		printf("failed to open \"%s\" for writing\n", file_name);
-		return 1;
-	}
+    atexit(test_cleanup);
+    f = fopen(file_name, "w+");
+    if (!f) {
+        printf("failed to open \"%s\" for writing\n", file_name);
+        return 1;
+    }
 
-	if ((size_t) fprintf(f, "%s", test_string) != strlen(test_string)) {
-		printf("failed to fprintf test string %s\n", test_string);
-		return 1;
-	}
+    if ((size_t)fprintf(f, "%s", test_string) != strlen(test_string)) {
+        printf("failed to fprintf test string %s\n", test_string);
+        return 1;
+    }
 
-        if (fseeko(f, -3, SEEK_CUR) < 0) {
-                printf("failed to seek back 3 bytes\n");
-                return 1;
-        }
-        if (test_cmp(f, test_string + sizeof(test_string) - 4))
-                return 1;
+    if (fseeko(f, -3, SEEK_CUR) < 0) {
+        printf("failed to seek back 3 bytes\n");
+        return 1;
+    }
+    if (test_cmp(f, test_string + sizeof(test_string) - 4))
+        return 1;
 
-        if (fseek(f, 2, SEEK_SET)) {
-                printf("failed to seek to 2 bytes\n");
-                return 1;
-        }
-        if (test_cmp(f, test_string + 2))
-                return 1;
+    if (fseek(f, 2, SEEK_SET)) {
+        printf("failed to seek to 2 bytes\n");
+        return 1;
+    }
+    if (test_cmp(f, test_string + 2))
+        return 1;
 
-	if (fclose(f) != 0) {
-		printf("fclose failed\n");
-		return 1;
-	}
+    if (fclose(f) != 0) {
+        printf("fclose failed\n");
+        return 1;
+    }
 
-	f = fopen(file_name, "r");
-	if (!f) {
-		printf("failed to open \"%s\" for reading\n", file_name);
-		return 1;
-	}
+    f = fopen(file_name, "r");
+    if (!f) {
+        printf("failed to open \"%s\" for reading\n", file_name);
+        return 1;
+    }
 
-        if (test_cmp(f, test_string))
-                return 1;
+    if (test_cmp(f, test_string))
+        return 1;
 
-	printf("success\n");
-        exit(0);
+    printf("success\n");
+    exit(0);
 }

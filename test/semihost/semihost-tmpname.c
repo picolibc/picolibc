@@ -39,30 +39,30 @@
 int
 main(void)
 {
-	int	ret;
-	char	pathname[MAXPATHLEN];
-	int	identifier;
-	int	fd;
+    int  ret;
+    char pathname[MAXPATHLEN];
+    int  identifier;
+    int  fd;
 
-	ret = sys_semihost_tmpnam(pathname, 0, MAXPATHLEN);
-	if (ret != 0) {
-		printf("tmpnam fails, ret %d, errno %d\n", ret, sys_semihost_errno());
-		exit(1);
-	}
-	fd = sys_semihost_open(pathname, 4);
-	if (fd < -1) {
-		printf("open fails, ret %d errno %d\n", fd, sys_semihost_errno());
-		exit(2);
-	}
-	ret = sys_semihost_close(fd);
-	if (ret != 0) {
-		printf("close fails, ret %d errno %d\n", ret, sys_semihost_errno());
-		exit(3);
-	}
-	ret = sys_semihost_remove(pathname);
-	if (ret != 0) {
-		printf("remove fails, ret %d, errno %d\n", ret, sys_semihost_errno());
-		exit(4);
-	}
-	exit(0);
+    ret = sys_semihost_tmpnam(pathname, 0, MAXPATHLEN);
+    if (ret != 0) {
+        printf("tmpnam fails, ret %d, errno %d\n", ret, sys_semihost_errno());
+        exit(1);
+    }
+    fd = sys_semihost_open(pathname, 4);
+    if (fd < -1) {
+        printf("open fails, ret %d errno %d\n", fd, sys_semihost_errno());
+        exit(2);
+    }
+    ret = sys_semihost_close(fd);
+    if (ret != 0) {
+        printf("close fails, ret %d errno %d\n", ret, sys_semihost_errno());
+        exit(3);
+    }
+    ret = sys_semihost_remove(pathname);
+    if (ret != 0) {
+        printf("remove fails, ret %d, errno %d\n", ret, sys_semihost_errno());
+        exit(4);
+    }
+    exit(0);
 }

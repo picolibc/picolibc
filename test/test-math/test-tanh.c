@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-tanh.h"
-#define TEST_FUNC       tanh
+#define TEST_VECTORS "test-tanh.h"
+#define TEST_FUNC    tanh
 
 #include "test-real-one.h"

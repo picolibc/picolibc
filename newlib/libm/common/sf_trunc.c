@@ -14,9 +14,9 @@
 float
 truncf(float x)
 {
-    int32_t ix = _asint32 (x);
+    int32_t ix = _asint32(x);
     int32_t mask;
-    int exp;
+    int     exp;
 
     exp = _exponent32(ix) - 127;
 

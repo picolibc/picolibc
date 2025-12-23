@@ -40,7 +40,6 @@
 __noreturn void
 _exit(int code)
 {
-        (void) code;
-	while(1) {
-        }
+    (void)code;
+    while (1) { }
 }

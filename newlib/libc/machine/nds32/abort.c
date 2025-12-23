@@ -32,11 +32,11 @@ FUNCTION
 <<abort>>---abnormal termination of a program
 
 INDEX
-	abort
+        abort
 
 SYNOPSIS
-	#include <stdlib.h>
-	void abort(void);
+        #include <stdlib.h>
+        void abort(void);
 
 DESCRIPTION
 Use <<abort>> to signal that your program has detected a condition it
@@ -60,10 +60,9 @@ Supporting OS subroutines required: <<_exit>>.
 #include <unistd.h>
 
 void
-abort (void)
+abort(void)
 {
-  while (1)
-    {
-      _exit (1);
+    while (1) {
+        _exit(1);
     }
 }

@@ -42,286 +42,265 @@
 #include <stdio.h>
 #include "collate.h"
 
-#define	EOS	'\0'
+#define EOS           '\0'
 
-#define RANGE_MATCH     1
-#define RANGE_NOMATCH   0
-#define RANGE_ERROR     (-1)
+#define RANGE_MATCH   1
+#define RANGE_NOMATCH 0
+#define RANGE_ERROR   (-1)
 
 static int rangematch(const char *, char, int, char **);
 
 static int
 _fnmatch(const char *pattern, const char *string, int flags, int level)
 {
-	const char *stringstart;
-	char *newp;
-	char c, test;
+    const char *stringstart;
+    char       *newp;
+    char        c, test;
 
-	for (stringstart = string;;)
-		switch (c = *pattern++) {
-		case EOS:
-			if ((flags & FNM_LEADING_DIR) && *string == '/')
-				return (0);
-			return (*string == EOS ? 0 : FNM_NOMATCH);
-		case '?':
-			if (*string == EOS)
-				return (FNM_NOMATCH);
-			if (*string == '/' && (flags & FNM_PATHNAME))
-				return (FNM_NOMATCH);
-			if (*string == '.' && (flags & FNM_PERIOD) &&
-			    (string == stringstart ||
-			    ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
-				return (FNM_NOMATCH);
-			++string;
-			break;
-		case '*':
-			c = *pattern;
-			/* Collapse multiple stars. */
-			while (c == '*')
-				c = *++pattern;
+    for (stringstart = string;;)
+        switch (c = *pattern++) {
+        case EOS:
+            if ((flags & FNM_LEADING_DIR) && *string == '/')
+                return (0);
+            return (*string == EOS ? 0 : FNM_NOMATCH);
+        case '?':
+            if (*string == EOS)
+                return (FNM_NOMATCH);
+            if (*string == '/' && (flags & FNM_PATHNAME))
+                return (FNM_NOMATCH);
+            if (*string == '.' && (flags & FNM_PERIOD)
+                && (string == stringstart || ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
+                return (FNM_NOMATCH);
+            ++string;
+            break;
+        case '*':
+            c = *pattern;
+            /* Collapse multiple stars. */
+            while (c == '*')
+                c = *++pattern;
 
-			if (*string == '.' && (flags & FNM_PERIOD) &&
-			    (string == stringstart ||
-			    ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
-				return (FNM_NOMATCH);
+            if (*string == '.' && (flags & FNM_PERIOD)
+                && (string == stringstart || ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
+                return (FNM_NOMATCH);
 
-			/* Optimize for pattern with * at end or before /. */
-			if (c == EOS)
-				if (flags & FNM_PATHNAME)
-					return ((flags & FNM_LEADING_DIR) ||
-					    strchr(string, '/') == NULL ?
-					    0 : FNM_NOMATCH);
-				else
-					return (0);
-			else if (c == '/' && flags & FNM_PATHNAME) {
-				if ((string = strchr(string, '/')) == NULL)
-					return (FNM_NOMATCH);
-				break;
-			}
+            /* Optimize for pattern with * at end or before /. */
+            if (c == EOS)
+                if (flags & FNM_PATHNAME)
+                    return ((flags & FNM_LEADING_DIR) || strchr(string, '/') == NULL ? 0
+                                                                                     : FNM_NOMATCH);
+                else
+                    return (0);
+            else if (c == '/' && flags & FNM_PATHNAME) {
+                if ((string = strchr(string, '/')) == NULL)
+                    return (FNM_NOMATCH);
+                break;
+            }
 
-                        if (level == 0)
-                                return (-FNM_NOMATCH);
+            if (level == 0)
+                return (-FNM_NOMATCH);
 
-			/* General case, use recursion. */
-			while ((test = *string) != EOS) {
-                                switch (_fnmatch(pattern, string, flags & ~FNM_PERIOD, level-1)) {
-                                case 0:
-                                        return (0);
-                                case -FNM_NOMATCH:
-                                        return -FNM_NOMATCH;
-                                default:
-                                        break;
-                                }
-                                if (test == '/' && flags & FNM_PATHNAME)
-                                        break;
-                                ++string;
-			}
-			return (FNM_NOMATCH);
-		case '[':
-			if (*string == EOS)
-				return (FNM_NOMATCH);
-			if (*string == '/' && (flags & FNM_PATHNAME))
-				return (FNM_NOMATCH);
-			if (*string == '.' && (flags & FNM_PERIOD) &&
-			    (string == stringstart ||
-			    ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
-				return (FNM_NOMATCH);
+            /* General case, use recursion. */
+            while ((test = *string) != EOS) {
+                switch (_fnmatch(pattern, string, flags & ~FNM_PERIOD, level - 1)) {
+                case 0:
+                    return (0);
+                case -FNM_NOMATCH:
+                    return -FNM_NOMATCH;
+                default:
+                    break;
+                }
+                if (test == '/' && flags & FNM_PATHNAME)
+                    break;
+                ++string;
+            }
+            return (FNM_NOMATCH);
+        case '[':
+            if (*string == EOS)
+                return (FNM_NOMATCH);
+            if (*string == '/' && (flags & FNM_PATHNAME))
+                return (FNM_NOMATCH);
+            if (*string == '.' && (flags & FNM_PERIOD)
+                && (string == stringstart || ((flags & FNM_PATHNAME) && *(string - 1) == '/')))
+                return (FNM_NOMATCH);
 
-			switch (rangematch(pattern, *string, flags, &newp)) {
-			case RANGE_ERROR:
-				goto norm;
-			case RANGE_MATCH:
-				pattern = newp;
-				break;
-			case RANGE_NOMATCH:
-				return (FNM_NOMATCH);
-			}
-			++string;
-			break;
-		case '\\':
-			if (!(flags & FNM_NOESCAPE)) {
-				if ((c = *pattern++) == EOS) {
-					c = '\\';
-					--pattern;
-				}
-			}
-			__fallthrough;
-		default:
-		norm:
-			if (c == *string)
-				;
-			else if ((flags & FNM_CASEFOLD) &&
-				 (tolower((unsigned char)c) ==
-				  tolower((unsigned char)*string)))
-				;
-			else
-				return (FNM_NOMATCH);
-			string++;
-			break;
-		}
-	/* NOTREACHED */
+            switch (rangematch(pattern, *string, flags, &newp)) {
+            case RANGE_ERROR:
+                goto norm;
+            case RANGE_MATCH:
+                pattern = newp;
+                break;
+            case RANGE_NOMATCH:
+                return (FNM_NOMATCH);
+            }
+            ++string;
+            break;
+        case '\\':
+            if (!(flags & FNM_NOESCAPE)) {
+                if ((c = *pattern++) == EOS) {
+                    c = '\\';
+                    --pattern;
+                }
+            }
+            __fallthrough;
+        default:
+        norm:
+            if (c == *string)
+                ;
+            else if ((flags & FNM_CASEFOLD)
+                     && (tolower((unsigned char)c) == tolower((unsigned char)*string)))
+                ;
+            else
+                return (FNM_NOMATCH);
+            string++;
+            break;
+        }
+    /* NOTREACHED */
 }
 
 /* Limit recursion to 16 levels to avoid stack overflow */
 int
 fnmatch(const char *pattern, const char *string, int flags)
 {
-        return _fnmatch(pattern, string, flags, 16);
+    return _fnmatch(pattern, string, flags, 16);
 }
 
 static const struct {
-        const char      *name;
-        int             (*func)(int);
+    const char *name;
+    int         (*func)(int);
 } classes[] = {
-        { .name = "alnum", .func = isalnum },
-        { .name = "alpha", .func = isalpha },
-        { .name = "blank", .func = isblank },
-        { .name = "cntrl", .func = iscntrl },
-        { .name = "digit", .func = isdigit },
-        { .name = "graph", .func = isgraph },
-        { .name = "lower", .func = islower },
-        { .name = "print", .func = isprint },
-        { .name = "punct", .func = ispunct },
-        { .name = "space", .func = isspace },
-        { .name = "upper", .func = isupper },
-        { .name = "xdigit", .func = isxdigit },
+    { .name = "alnum",  .func = isalnum  },
+    { .name = "alpha",  .func = isalpha  },
+    { .name = "blank",  .func = isblank  },
+    { .name = "cntrl",  .func = iscntrl  },
+    { .name = "digit",  .func = isdigit  },
+    { .name = "graph",  .func = isgraph  },
+    { .name = "lower",  .func = islower  },
+    { .name = "print",  .func = isprint  },
+    { .name = "punct",  .func = ispunct  },
+    { .name = "space",  .func = isspace  },
+    { .name = "upper",  .func = isupper  },
+    { .name = "xdigit", .func = isxdigit },
 };
 
-#define NUM_CLASSES (sizeof(classes)/sizeof(classes[0]))
+#define NUM_CLASSES (sizeof(classes) / sizeof(classes[0]))
 
 static int
-rangematch(
-	const char *pattern,
-	char test,
-	int flags,
-	char **newp
-)
+rangematch(const char *pattern, char test, int flags, char **newp)
 {
-	int negate, ok;
-	char c, c2;
+    int  negate, ok;
+    char c, c2;
 
-	/*
-	 * A bracket expression starting with an unquoted circumflex
-	 * character produces unspecified results (IEEE 1003.2-1992,
-	 * 3.13.2).  This implementation treats it like '!', for
-	 * consistency with the regular expression syntax.
-	 * J.T. Conklin (conklin@ngai.kaleida.com)
-	 */
-	if ( (negate = (*pattern == '!' || *pattern == '^')) )
-		++pattern;
+    /*
+     * A bracket expression starting with an unquoted circumflex
+     * character produces unspecified results (IEEE 1003.2-1992,
+     * 3.13.2).  This implementation treats it like '!', for
+     * consistency with the regular expression syntax.
+     * J.T. Conklin (conklin@ngai.kaleida.com)
+     */
+    if ((negate = (*pattern == '!' || *pattern == '^')))
+        ++pattern;
 
-	if (flags & FNM_CASEFOLD)
-		test = tolower((unsigned char)test);
+    if (flags & FNM_CASEFOLD)
+        test = tolower((unsigned char)test);
 
-	/*
-	 * A right bracket shall lose its special meaning and represent
-	 * itself in a bracket expression if it occurs first in the list.
-	 * -- POSIX.2 2.8.3.2
-	 */
-	ok = 0;
-	c = *pattern++;
-	do {
-		if (c == '\\' && !(flags & FNM_NOESCAPE))
-			c = *pattern++;
-		if (c == EOS)
-			return (RANGE_ERROR);
+    /*
+     * A right bracket shall lose its special meaning and represent
+     * itself in a bracket expression if it occurs first in the list.
+     * -- POSIX.2 2.8.3.2
+     */
+    ok = 0;
+    c = *pattern++;
+    do {
+        if (c == '\\' && !(flags & FNM_NOESCAPE))
+            c = *pattern++;
+        if (c == EOS)
+            return (RANGE_ERROR);
 
-		if (c == '/' && (flags & FNM_PATHNAME))
-			return (RANGE_NOMATCH);
+        if (c == '/' && (flags & FNM_PATHNAME))
+            return (RANGE_NOMATCH);
 
-                /* Equivalence classes -- [=class=] */
-                if (c == '[' &&
-                    pattern[0] == '=' &&
-                    pattern[1] != EOS &&
-                    pattern[2] == '=' &&
-                    pattern[3] == ']')
-                {
-                        c = pattern[1];
-                        pattern += 4;
+        /* Equivalence classes -- [=class=] */
+        if (c == '[' && pattern[0] == '=' && pattern[1] != EOS && pattern[2] == '='
+            && pattern[3] == ']') {
+            c = pattern[1];
+            pattern += 4;
+        }
+
+        /* Collating sequences -- [.symbol.] */
+        if (c == '[' && pattern[0] == '.' && pattern[1] != EOS) {
+            size_t col_len = 1;
+
+            /* Find the end of any potential collating symbol */
+            while (pattern[1 + col_len] != EOS) {
+                if (pattern[1 + col_len] == '.' && pattern[1 + col_len + 1] == ']') {
+                    /* Found a collating symbol. */
+                    if (col_len > 1) {
+                        /* We have no collating symbols longer than 1 char */
+                        return (RANGE_ERROR);
+                    }
+                    /* Extract collating symbol */
+                    c = pattern[1];
+                    /* Skip [. and .] */
+                    pattern += 2 + 2;
+                    break;
+                }
+                col_len++;
+            }
+        }
+
+        /* Character class -- [:class:] */
+        if (c == '[' && pattern[0] == ':') {
+            size_t name_len = 0;
+
+            while (islower(pattern[1 + name_len]))
+                name_len++;
+
+            if (pattern[1 + name_len] == ':' && pattern[1 + name_len + 1] == ']') {
+
+                size_t class;
+
+                /* Found a valid class pattern, now see if it's one we know */
+
+                for (class = 0; class < NUM_CLASSES; class++) {
+                    if (name_len == strlen(classes[class].name)
+                        && strncmp(&pattern[1], classes[class].name, name_len) == 0) {
+                        if (classes[class].func(test))
+                            ok = 1;
+                        break;
+                    }
                 }
 
-                /* Collating sequences -- [.symbol.] */
-                if (c == '[' &&
-                    pattern[0] == '.' &&
-                    pattern[1] != EOS)
-                {
-                        size_t  col_len = 1;
+                /* Skip over the pattern and continue evaluating the expression */
+                pattern = pattern + 1 + name_len + 2;
+                continue;
+            }
+        }
 
-                        /* Find the end of any potential collating symbol */
-                        while (pattern[1+col_len] != EOS) {
-                                if (pattern[1+col_len] == '.' && pattern[1+col_len+1] == ']')
-                                {
-                                        /* Found a collating symbol. */
-                                        if (col_len > 1) {
-                                                /* We have no collating symbols longer than 1 char */
-                                                return (RANGE_ERROR);
-                                        }
-                                        /* Extract collating symbol */
-                                        c = pattern[1];
-                                        /* Skip [. and .] */
-                                        pattern += 2 + 2;
-                                        break;
-                                }
-                                col_len++;
-                        }
-                }
+        if (flags & FNM_CASEFOLD)
+            c = tolower((unsigned char)c);
 
-                /* Character class -- [:class:] */
-                if (c == '[' && pattern[0] == ':') {
-                        size_t  name_len = 0;
+        if (*pattern == '-' && (c2 = *(pattern + 1)) != EOS && c2 != ']') {
+            pattern += 2;
+            if (c2 == '\\' && !(flags & FNM_NOESCAPE))
+                c2 = *pattern++;
+            if (c2 == EOS)
+                return (RANGE_ERROR);
 
-                        while (islower(pattern[1 + name_len]))
-                                name_len++;
+            if (flags & FNM_CASEFOLD)
+                c2 = tolower((unsigned char)c2);
 
-                        if (pattern[1 + name_len] == ':' && pattern[1 + name_len + 1] == ']') {
-
-                                size_t class;
-
-                                /* Found a valid class pattern, now see if it's one we know */
-
-                                for (class = 0; class < NUM_CLASSES; class++) {
-                                        if (name_len == strlen(classes[class].name) &&
-                                            strncmp(&pattern[1], classes[class].name, name_len) == 0)
-                                        {
-                                                if (classes[class].func(test))
-                                                        ok = 1;
-                                                break;
-                                        }
-                                }
-
-                                /* Skip over the pattern and continue evaluating the expression */
-                                pattern = pattern + 1 + name_len + 2;
-                                continue;
-                        }
-                }
-
-		if (flags & FNM_CASEFOLD)
-			c = tolower((unsigned char)c);
-
-		if (*pattern == '-'
-		    && (c2 = *(pattern+1)) != EOS && c2 != ']') {
-			pattern += 2;
-			if (c2 == '\\' && !(flags & FNM_NOESCAPE))
-				c2 = *pattern++;
-			if (c2 == EOS)
-				return (RANGE_ERROR);
-
-			if (flags & FNM_CASEFOLD)
-				c2 = tolower((unsigned char)c2);
-
-			if (
+            if (
 #ifdef __HAVE_REAL_STRCOLL
-                            __collate_range_cmp(c, test) <= 0
-			    && __collate_range_cmp(test, c2) <= 0
+                __collate_range_cmp(c, test) <= 0 && __collate_range_cmp(test, c2) <= 0
 #else
-                            c <= test && test <= c2
+                c <= test && test <= c2
 #endif
-                            )
-				ok = 1;
-		} else if (c == test)
-			ok = 1;
-	} while ((c = *pattern++) != ']');
+            )
+                ok = 1;
+        } else if (c == test)
+            ok = 1;
+    } while ((c = *pattern++) != ']');
 
-	*newp = (char *)pattern;
-	return (ok == negate ? RANGE_NOMATCH : RANGE_MATCH);
+    *newp = (char *)pattern;
+    return (ok == negate ? RANGE_NOMATCH : RANGE_MATCH);
 }

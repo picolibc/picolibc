@@ -70,14 +70,12 @@
 /* anything with a 64-bit FPU has FMA */
 #define __HAVE_FAST_FMA 1
 
-#define _fclass_d(_x) (__extension__(                                   \
-                               {                                        \
-                                       long __fclass;                   \
-                                       __asm__("fclass.d %0, %1" :      \
-                                               "=r" (__fclass) :        \
-                                               "f" (_x));               \
-                                       __fclass;                        \
-                               }))
+#define _fclass_d(_x)                                          \
+    (__extension__({                                           \
+        long __fclass;                                         \
+        __asm__("fclass.d %0, %1" : "=r"(__fclass) : "f"(_x)); \
+        __fclass;                                              \
+    }))
 
 #endif
 
@@ -86,123 +84,109 @@
 /* anything with a 32-bit FPU has FMAF */
 #define __HAVE_FAST_FMAF 1
 
-#define _fclass_f(_x) (__extension__(                                   \
-                               {                                        \
-                                       long __fclass;                   \
-                                       __asm__("fclass.s %0, %1" :      \
-                                               "=r" (__fclass) :        \
-                                               "f" (_x));               \
-                                       __fclass;                        \
-                               }))
+#define _fclass_f(_x)                                          \
+    (__extension__({                                           \
+        long __fclass;                                         \
+        __asm__("fclass.s %0, %1" : "=r"(__fclass) : "f"(_x)); \
+        __fclass;                                              \
+    }))
 
 #endif
-
 
 #ifdef __declare_extern_inline
 
 #if __RISCV_HARD_FLOAT >= 64
 
 /* Double-precision functions */
-__declare_extern_inline(double)
-copysign(double x, double y)
+__declare_extern_inline(double) copysign(double x, double y)
 {
-	double result;
-	__asm__("fsgnj.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
+    double result;
+    __asm__("fsgnj.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+    return result;
 }
 
-__declare_extern_inline(double)
-fabs(double x)
+__declare_extern_inline(double) fabs(double x)
 {
-	double result;
-	__asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
-	return result;
+    double result;
+    __asm__("fabs.d\t%0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
-__declare_extern_inline(double)
-fmax (double x, double y)
+__declare_extern_inline(double) fmax(double x, double y)
 {
-	double result;
-        if (issignaling(x) || issignaling(y))
-            return x + y;
+    double result;
+    if (issignaling(x) || issignaling(y))
+        return x + y;
 
-	__asm__ volatile("fmax.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
+    __asm__ volatile("fmax.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+    return result;
 }
 
-__declare_extern_inline(double)
-fmin (double x, double y)
+__declare_extern_inline(double) fmin(double x, double y)
 {
-	double result;
-        if (issignaling(x) || issignaling(y))
-            return x + y;
+    double result;
+    if (issignaling(x) || issignaling(y))
+        return x + y;
 
-	__asm__ volatile("fmin.d\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
+    __asm__ volatile("fmin.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+    return result;
 }
 
-__declare_extern_inline(int)
-__finite(double x)
+__declare_extern_inline(int) __finite(double x)
 {
-	long fclass = _fclass_d (x);
-	return (fclass & (FCLASS_INF|FCLASS_NAN)) == 0;
+    long fclass = _fclass_d(x);
+    return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
-__declare_extern_inline(int)
-finite(double x)
+__declare_extern_inline(int) finite(double x)
 {
-        return __finite(x);
+    return __finite(x);
 }
 
-__declare_extern_inline(int)
-__isinfd(double x)
+__declare_extern_inline(int) __isinfd(double x)
 {
-	long fclass = _fclass_d (x);
-	return (fclass & FCLASS_INF) != 0;
+    long fclass = _fclass_d(x);
+    return (fclass & FCLASS_INF) != 0;
 }
 
-__declare_extern_inline(int)
-__isnand(double x)
+__declare_extern_inline(int) __isnand(double x)
 {
-	long fclass = _fclass_d (x);
-	return (fclass & FCLASS_NAN) != 0;
+    long fclass = _fclass_d(x);
+    return (fclass & FCLASS_NAN) != 0;
 }
 
-__declare_extern_inline(int)
-__fpclassifyd (double x)
+__declare_extern_inline(int) __fpclassifyd(double x)
 {
-  long fclass = _fclass_d (x);
+    long fclass = _fclass_d(x);
 
-  if (fclass & FCLASS_ZERO)
-    return FP_ZERO;
-  else if (fclass & FCLASS_NORMAL)
-    return FP_NORMAL;
-  else if (fclass & FCLASS_SUBNORMAL)
-    return FP_SUBNORMAL;
-  else if (fclass & FCLASS_INF)
-    return FP_INFINITE;
-  else
-    return FP_NAN;
+    if (fclass & FCLASS_ZERO)
+        return FP_ZERO;
+    else if (fclass & FCLASS_NORMAL)
+        return FP_NORMAL;
+    else if (fclass & FCLASS_SUBNORMAL)
+        return FP_SUBNORMAL;
+    else if (fclass & FCLASS_INF)
+        return FP_INFINITE;
+    else
+        return FP_NAN;
 }
 
-__declare_extern_inline(double)
-sqrt (double x)
+__declare_extern_inline(double) sqrt(double x)
 {
-	double result;
+    double result;
 #ifdef __MATH_ERRNO
-        if (isless(x, 0.0))
-            errno = EDOM;
+    if (isless(x, 0.0))
+        errno = EDOM;
 #endif
-	__asm__ volatile("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
-	return result;
+    __asm__ volatile("fsqrt.d %0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
-__declare_extern_inline(double)
-fma (double x, double y, double z)
+__declare_extern_inline(double) fma(double x, double y, double z)
 {
-	double result;
-	__asm__ volatile("fmadd.d %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
-	return result;
+    double result;
+    __asm__ volatile("fmadd.d %0, %1, %2, %3" : "=f"(result) : "f"(x), "f"(y), "f"(z));
+    return result;
 }
 
 #endif /* __RISCV_HARD_FLOAT >= 64 */
@@ -210,106 +194,95 @@ fma (double x, double y, double z)
 #if __RISCV_HARD_FLOAT >= 32
 
 /* Single-precision functions */
-__declare_extern_inline(float)
-copysignf(float x, float y)
+__declare_extern_inline(float) copysignf(float x, float y)
 {
-	float result;
-	__asm__("fsgnj.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
+    float result;
+    __asm__("fsgnj.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+    return result;
 }
 
-__declare_extern_inline(float)
-fabsf (float x)
+__declare_extern_inline(float) fabsf(float x)
 {
-	float result;
-	__asm__("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
-	return result;
+    float result;
+    __asm__("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
-__declare_extern_inline(float)
-fmaxf (float x, float y)
+__declare_extern_inline(float) fmaxf(float x, float y)
 {
-	float result;
-        if (issignaling(x) || issignaling(y))
-            return x + y;
+    float result;
+    if (issignaling(x) || issignaling(y))
+        return x + y;
 
-	__asm__ volatile("fmax.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
+    __asm__ volatile("fmax.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+    return result;
 }
 
-__declare_extern_inline(float)
-fminf (float x, float y)
+__declare_extern_inline(float) fminf(float x, float y)
 {
-	float result;
-        if (issignaling(x) || issignaling(y))
-            return x + y;
+    float result;
+    if (issignaling(x) || issignaling(y))
+        return x + y;
 
-	__asm__ volatile("fmin.s\t%0, %1, %2" : "=f" (result) : "f" (x), "f" (y));
-	return result;
+    __asm__ volatile("fmin.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
+    return result;
 }
 
-__declare_extern_inline(int)
-__finitef(float x)
+__declare_extern_inline(int) __finitef(float x)
 {
-	long fclass = _fclass_f (x);
-	return (fclass & (FCLASS_INF|FCLASS_NAN)) == 0;
+    long fclass = _fclass_f(x);
+    return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
-__declare_extern_inline(int)
-finitef(float x)
+__declare_extern_inline(int) finitef(float x)
 {
-        return __finitef(x);
+    return __finitef(x);
 }
 
-__declare_extern_inline(int)
-__isinff(float x)
+__declare_extern_inline(int) __isinff(float x)
 {
-	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_INF) != 0;
+    long fclass = _fclass_f(x);
+    return (fclass & FCLASS_INF) != 0;
 }
 
-__declare_extern_inline(int)
-__isnanf(float x)
+__declare_extern_inline(int) __isnanf(float x)
 {
-	long fclass = _fclass_f (x);
-	return (fclass & FCLASS_NAN) != 0;
+    long fclass = _fclass_f(x);
+    return (fclass & FCLASS_NAN) != 0;
 }
 
-__declare_extern_inline(int)
-__fpclassifyf (float x)
+__declare_extern_inline(int) __fpclassifyf(float x)
 {
-  long fclass = _fclass_f (x);
+    long fclass = _fclass_f(x);
 
-  if (fclass & FCLASS_ZERO)
-    return FP_ZERO;
-  else if (fclass & FCLASS_NORMAL)
-    return FP_NORMAL;
-  else if (fclass & FCLASS_SUBNORMAL)
-    return FP_SUBNORMAL;
-  else if (fclass & FCLASS_INF)
-    return FP_INFINITE;
-  else
-    return FP_NAN;
+    if (fclass & FCLASS_ZERO)
+        return FP_ZERO;
+    else if (fclass & FCLASS_NORMAL)
+        return FP_NORMAL;
+    else if (fclass & FCLASS_SUBNORMAL)
+        return FP_SUBNORMAL;
+    else if (fclass & FCLASS_INF)
+        return FP_INFINITE;
+    else
+        return FP_NAN;
 }
 
-__declare_extern_inline(float)
-sqrtf (float x)
+__declare_extern_inline(float) sqrtf(float x)
 {
-	float result;
+    float result;
 #ifdef __MATH_ERRNO
-        if (isless(x, 0.0f))
-            errno = EDOM;
+    if (isless(x, 0.0f))
+        errno = EDOM;
 #endif
-	__asm__ volatile("fsqrt.s %0, %1" : "=f" (result) : "f" (x));
-	return result;
+    __asm__ volatile("fsqrt.s %0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
-__declare_extern_inline(float)
-fmaf (float x, float y, float z)
+__declare_extern_inline(float) fmaf(float x, float y, float z)
 {
-	float result;
-	__asm__ volatile("fmadd.s %0, %1, %2, %3" : "=f" (result) : "f" (x), "f" (y), "f" (z));
-	return result;
+    float result;
+    __asm__ volatile("fmadd.s %0, %1, %2, %3" : "=f"(result) : "f"(x), "f"(y), "f"(z));
+    return result;
 }
 
 #endif /* __RISCV_HARD_FLOAT >= 32 */

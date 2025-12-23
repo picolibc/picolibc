@@ -12,12 +12,12 @@
  */
 #include <picolibc.h>
 
-int puts(const char *s)
-{         /*  Print string Function   */
-                                                                                
+int
+puts(const char *s)
+{ /*  Print string Function   */
+
     int a;
     while ((a = *s++))
         putchar(a);
     return putchar('\n');
 }
-

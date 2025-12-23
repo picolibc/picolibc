@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _NEXTAFTERF4_H_
-#define _NEXTAFTERF4_H_	1
+#define _NEXTAFTERF4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -48,24 +48,25 @@
  * DESCRIPTION
  *  The nextafterf4 function returns a vector containing the next representable
  *  floating-point number after the element of x, in the direction of the
- *  corresponding element y. 
+ *  corresponding element y.
  *
  *  Special Cases:
  *	- Infinity and NaN are not supported in single-precision on SPU. They are treated
  *	  as normal numbers.
  *	- x != y, and result = 0 is considered an underflow.
- *	  
+ *
  *
  */
 
-static __inline vector float _nextafterf4(vector float x, vector float y)
+static __inline vector float
+_nextafterf4(vector float x, vector float y)
 {
     vec_float4 n1ulp = (vec_float4)spu_splats(0x80000001);
     vec_float4 zerof = spu_splats(0.0f);
-    vec_int4  one    = spu_splats(1);
-    vec_uint4 xlt0, xgty, xeqy, xeq0;
-    vec_int4  xint;
-    vec_int4  delta, deltap1;
+    vec_int4   one = spu_splats(1);
+    vec_uint4  xlt0, xgty, xeqy, xeq0;
+    vec_int4   xint;
+    vec_int4   delta, deltap1;
     vec_float4 result;
 
     /*
@@ -85,7 +86,7 @@ static __inline vector float _nextafterf4(vector float x, vector float y)
 
     /* Determine value to add to x */
     delta = (vec_int4)spu_xor(xgty, xlt0);
-    deltap1 = spu_add(delta,one);
+    deltap1 = spu_add(delta, one);
     delta = spu_sel(deltap1, delta, (vec_uint4)delta);
 
     xint = spu_add(xint, delta);
@@ -93,7 +94,7 @@ static __inline vector float _nextafterf4(vector float x, vector float y)
     /* Fix the case of x = 0, and answer should be -1 ulp */
     result = spu_sel((vec_float4)xint, n1ulp, spu_and((vec_uint4)delta, xeq0));
 
-    /* 
+    /*
      * Special Cases
      */
 
@@ -101,7 +102,6 @@ static __inline vector float _nextafterf4(vector float x, vector float y)
     result = spu_sel(result, y, xeqy);
 
     return result;
-
 }
 
 #endif /* _NEXTAFTERF4_H_ */

@@ -1,21 +1,21 @@
 /*
 FUNCTION
-	<<wcscpy>>---copy a wide-character string 
+        <<wcscpy>>---copy a wide-character string
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t *wcscpy(wchar_t *__restrict <[s1]>,
-			const wchar_t *__restrict <[s2]>);
+        #include <wchar.h>
+        wchar_t *wcscpy(wchar_t *__restrict <[s1]>,
+                        const wchar_t *__restrict <[s2]>);
 
 DESCRIPTION
-	The <<wcscpy>> function copies the wide-character string pointed to by
-	<[s2]> (including the terminating null wide-character code) into the
-	array pointed to by <[s1]>. If copying takes place between objects that
-	overlap, the behaviour is undefined. 
+        The <<wcscpy>> function copies the wide-character string pointed to by
+        <[s2]> (including the terminating null wide-character code) into the
+        array pointed to by <[s1]>. If copying takes place between objects that
+        overlap, the behaviour is undefined.
 
 RETURNS
-	The <<wcscpy>> function returns <[s1]>; no return value is reserved to
-	indicate an error. 
+        The <<wcscpy>> function returns <[s1]>; no return value is reserved to
+        indicate an error.
 
 PORTABILITY
 <<wcscpy>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -56,18 +56,17 @@ No supporting OS subroutines are required.
 #include <wchar.h>
 
 wchar_t *
-wcscpy (wchar_t *__restrict s1,
-	const wchar_t *__restrict s2)
+wcscpy(wchar_t * __restrict s1, const wchar_t * __restrict s2)
 {
-  wchar_t *p;
-  const wchar_t *q;
+    wchar_t       *p;
+    const wchar_t *q;
 
-  *s1 = '\0';
-  p = s1;
-  q = s2;
-  while (*q)
-    *p++ = *q++;
-  *p = '\0';
+    *s1 = '\0';
+    p = s1;
+    q = s2;
+    while (*q)
+        *p++ = *q++;
+    *p = '\0';
 
-  return s1;
+    return s1;
 }

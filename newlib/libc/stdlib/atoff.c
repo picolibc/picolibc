@@ -6,7 +6,7 @@ All rights reserved.
 #include <stdlib.h>
 
 float
-atoff (const char *s)
+atoff(const char *s)
 {
-  return strtof (s, NULL);
+    return strtof(s, NULL);
 }

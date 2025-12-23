@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -50,12 +50,12 @@ SYNOPSIS
 DESCRIPTION
         @ifnottex
         These functions compute the complex arc tangent of <[z]>,
-        with branch cuts outside the interval [-i, +i] along the 
+        with branch cuts outside the interval [-i, +i] along the
         imaginary axis.
         @end ifnottex
         @tex
         These functions compute the complex arc tangent of <[z]>,
-        with branch cuts outside the interval [$-i$, $+i$] along the 
+        with branch cuts outside the interval [$-i$, $+i$] along the
         imaginary axis.
         @end tex
 
@@ -82,7 +82,6 @@ QUICKREF
 
 */
 
-
 #include <complex.h>
 #include <math.h>
 #include "cephes_subr.h"
@@ -91,38 +90,37 @@ QUICKREF
 __weak_alias(catan, _catan)
 #endif
 
-double complex
-catan(double complex z)
+    double complex catan(double complex z)
 {
-	double complex w;
-	double a, t, x, x2, y;
+    double complex w;
+    double         a, t, x, x2, y;
 
-	x = creal(z);
-	y = cimag(z);
+    x = creal(z);
+    y = cimag(z);
 
-	if ((x == 0.0) && (y > 1.0))
-		goto ovrf;
+    if ((x == 0.0) && (y > 1.0))
+        goto ovrf;
 
-	x2 = x * x;
-	a = 1.0 - x2 - (y * y);
+    x2 = x * x;
+    a = 1.0 - x2 - (y * y);
 
-	t = 0.5 * atan2(2.0 * x, a);
-	w = _redupi(t);
+    t = 0.5 * atan2(2.0 * x, a);
+    w = _redupi(t);
 
-	t = y - 1.0;
-	a = x2 + (t * t);
-	if (a == 0.0)
-		goto ovrf;
+    t = y - 1.0;
+    a = x2 + (t * t);
+    if (a == 0.0)
+        goto ovrf;
 
-	t = y + 1.0;
-	a = (x2 + (t * t))/a;
-	w = w + (0.25 * log(a)) * (double complex) I;
-	return w;
+    t = y + 1.0;
+    a = (x2 + (t * t)) / a;
+    w = w + (0.25 * log(a)) * (double complex)I;
+    return w;
 
 ovrf:
 #if 0
 	mtherr ("catan", OVERFLOW);
 #endif
-	w = HUGE_VAL + HUGE_VAL * (double complex) I;
-	return w;
+    w = HUGE_VAL + HUGE_VAL * (double complex)I;
+    return w;
 }

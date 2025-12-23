@@ -30,7 +30,7 @@
  */
 
 #ifndef _PWD_H_
-#define	_PWD_H_
+#define _PWD_H_
 
 #include <sys/cdefs.h>
 #include <sys/types.h>
@@ -38,41 +38,39 @@
 _BEGIN_STD_C
 
 #if __BSD_VISIBLE
-#define	_PATH_PASSWD		"/etc/passwd"
+#define _PATH_PASSWD  "/etc/passwd"
 
-#define	_PASSWORD_LEN		128	/* max length, not counting NULL */
+#define _PASSWORD_LEN 128 /* max length, not counting NULL */
 #endif
 
 struct passwd {
-	char	*pw_name;		/* user name */
-	char	*pw_passwd;		/* encrypted password */
-	uid_t	pw_uid;			/* user uid */
-	gid_t	pw_gid;			/* user gid */
-	char	*pw_comment;		/* comment */
-	char	*pw_gecos;		/* Honeywell login info */
-	char	*pw_dir;		/* home directory */
-	char	*pw_shell;		/* default shell */
+    char *pw_name;    /* user name */
+    char *pw_passwd;  /* encrypted password */
+    uid_t pw_uid;     /* user uid */
+    gid_t pw_gid;     /* user gid */
+    char *pw_comment; /* comment */
+    char *pw_gecos;   /* Honeywell login info */
+    char *pw_dir;     /* home directory */
+    char *pw_shell;   /* default shell */
 };
 
-struct passwd	*getpwuid (uid_t);
-struct passwd	*getpwnam (const char *);
+struct passwd *getpwuid(uid_t);
+struct passwd *getpwnam(const char *);
 
 #ifndef __INSIDE_CYGWIN__
 #if __MISC_VISIBLE || __POSIX_VISIBLE
-int 		 getpwnam_r (const char *, struct passwd *,
-			char *, size_t , struct passwd **);
-int		 getpwuid_r (uid_t, struct passwd *, char *,
-			size_t, struct passwd **);
+int getpwnam_r(const char *, struct passwd *, char *, size_t, struct passwd **);
+int getpwuid_r(uid_t, struct passwd *, char *, size_t, struct passwd **);
 #endif
 
 #if __MISC_VISIBLE || __XSI_VISIBLE >= 4
-struct passwd	*getpwent (void);
-void		 setpwent (void);
-void		 endpwent (void);
+struct passwd *getpwent(void);
+void           setpwent(void);
+void           endpwent(void);
 #endif
 
 #if __BSD_VISIBLE
-int		 setpassent (int);
+int setpassent(int);
 #endif
 #endif /*!__INSIDE_CYGWIN__*/
 

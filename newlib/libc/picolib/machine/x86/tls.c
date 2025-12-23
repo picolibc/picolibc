@@ -44,9 +44,9 @@ extern char __x86_tls_tcb_offset[];
 void
 _set_tls(void *tls)
 {
-	__set_tcb((char *)tls + TP_OFFSET);
+    __set_tcb((char *)tls + TP_OFFSET);
 }
 
 /* Reserve space for a TCB. */
-__attribute__((__section__(".tls_tail_extra"), __aligned__(1), __used__))
-static char __tcb_space[sizeof(__tcb_head_t)];
+__attribute__((__section__(".tls_tail_extra"), __aligned__(1),
+               __used__)) static char __tcb_space[sizeof(__tcb_head_t)];

@@ -17,132 +17,140 @@
 #include "xlenint.h"
 
 #if __riscv_zbb
-  // Determine which intrinsics to use based on XLEN and endianness
-  #if __riscv_xlen == 64
-    #if __has_builtin(__builtin_riscv_orc_b_64)
-      #define __LIBC_RISCV_ZBB_ORC_B(x)       __builtin_riscv_orc_b_64 (x)
-    #endif
-
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-      #if __has_builtin(__builtin_riscv_ctz_64)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_ctz_64(x)
-      #endif
-    #else
-      #if __has_builtin(__builtin_riscv_clz_64)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_clz_64(x)
-      #endif
-    #endif
-  #else
-    #if __has_builtin(__builtin_riscv_orc_b_32)
-      #define __LIBC_RISCV_ZBB_ORC_B(x)       __builtin_riscv_orc_b_32(x)
-    #endif
-
-    #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-      #if __has_builtin(__builtin_riscv_ctz_32)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_ctz_32(x)
-      #endif
-    #else
-      #if __has_builtin(__builtin_riscv_clz_32)
-        #define __LIBC_RISCV_ZBB_CNT_Z(x)     __builtin_riscv_clz_32(x)
-      #endif
-    #endif
-  #endif
+// Determine which intrinsics to use based on XLEN and endianness
+#if __riscv_xlen == 64
+#if __has_builtin(__builtin_riscv_orc_b_64)
+#define __LIBC_RISCV_ZBB_ORC_B(x) __builtin_riscv_orc_b_64(x)
 #endif
 
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#if __has_builtin(__builtin_riscv_ctz_64)
+#define __LIBC_RISCV_ZBB_CNT_Z(x) __builtin_riscv_ctz_64(x)
+#endif
+#else
+#if __has_builtin(__builtin_riscv_clz_64)
+#define __LIBC_RISCV_ZBB_CNT_Z(x) __builtin_riscv_clz_64(x)
+#endif
+#endif
+#else
+#if __has_builtin(__builtin_riscv_orc_b_32)
+#define __LIBC_RISCV_ZBB_ORC_B(x) __builtin_riscv_orc_b_32(x)
+#endif
 
-static __inline uintxlen_t __libc_detect_null(uintxlen_t w)
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+#if __has_builtin(__builtin_riscv_ctz_32)
+#define __LIBC_RISCV_ZBB_CNT_Z(x) __builtin_riscv_ctz_32(x)
+#endif
+#else
+#if __has_builtin(__builtin_riscv_clz_32)
+#define __LIBC_RISCV_ZBB_CNT_Z(x) __builtin_riscv_clz_32(x)
+#endif
+#endif
+#endif
+#endif
+
+static __inline uintxlen_t
+__libc_detect_null(uintxlen_t w)
 {
 #ifdef __LIBC_RISCV_ZBB_ORC_B
-  /*
-    If there are any zeros in each byte of the register, all bits will
-    be unset for that byte value, otherwise, all bits will be set.
-    If the value is -1, all bits are set, meaning no null byte was found.
-  */
-  return __LIBC_RISCV_ZBB_ORC_B(w) != (uintxlen_t) -1;
+    /*
+      If there are any zeros in each byte of the register, all bits will
+      be unset for that byte value, otherwise, all bits will be set.
+      If the value is -1, all bits are set, meaning no null byte was found.
+    */
+    return __LIBC_RISCV_ZBB_ORC_B(w) != (uintxlen_t)-1;
 #else
-  uintxlen_t mask = 0x7f7f7f7f;
-  #if __riscv_xlen == 64
+    uintxlen_t mask = 0x7f7f7f7f;
+#if __riscv_xlen == 64
     mask = ((mask << 16) << 16) | mask;
-  #endif
-  return ~(((w & mask) + mask) | w | mask);
+#endif
+    return ~(((w & mask) + mask) | w | mask);
 #endif
 }
-
 
 static __inline
 #if __riscv_misaligned_slow || __riscv_misaligned_fast
-__disable_sanitizer
+    __disable_sanitizer
 #endif
-char *__libc_strcpy(char *dst, const char *src, bool ret_start)
+    char *
+    __libc_strcpy(char *dst, const char *src, bool ret_start)
 {
-  char *dst0 = dst;
+    char *dst0 = dst;
 
 #if !defined(PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
 #if !(__riscv_misaligned_slow || __riscv_misaligned_fast)
-  int misaligned = ((uintxlen_t)dst | (uintxlen_t)src) & (sizeof (uintxlen_t) - 1);
-  if (__builtin_expect(!misaligned, 1))
+    int misaligned = ((uintxlen_t)dst | (uintxlen_t)src) & (sizeof(uintxlen_t) - 1);
+    if (__builtin_expect(!misaligned, 1))
 #endif
     {
-      uintxlen_t *pdst = (uintxlen_t *)dst;
-      const uintxlen_t *psrc = (const uintxlen_t *)src;
-      uintxlen_t s;
+        uintxlen_t       *pdst = (uintxlen_t *)dst;
+        const uintxlen_t *psrc = (const uintxlen_t *)src;
+        uintxlen_t        s;
 
-      while (!__libc_detect_null(s = *psrc))
-        {
-          *pdst++ = s;
-          psrc++;
+        while (!__libc_detect_null(s = *psrc)) {
+            *pdst++ = s;
+            psrc++;
         }
 
-      dst = (char *)pdst;
+        dst = (char *)pdst;
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-#define SBYTE(s, i)        ((char) ((s) >> ((i) * 8)))
+#define SBYTE(s, i) ((char)((s) >> ((i) * 8)))
 #else
-#define SBYTE(s, i)        ((char) ((s) >> ((sizeof(s) - 1 - (i)) * 8)))
+#define SBYTE(s, i) ((char)((s) >> ((sizeof(s) - 1 - (i)) * 8)))
 #endif
 
-      if (ret_start)
-        {
-          if (!(*dst++ = SBYTE(s, 0))) return dst0;
-          if (!(*dst++ = SBYTE(s, 1))) return dst0;
-          if (!(*dst++ = SBYTE(s, 2))) return dst0;
+        if (ret_start) {
+            if (!(*dst++ = SBYTE(s, 0)))
+                return dst0;
+            if (!(*dst++ = SBYTE(s, 1)))
+                return dst0;
+            if (!(*dst++ = SBYTE(s, 2)))
+                return dst0;
 #if __riscv_xlen == 64
-          if (!(*dst++ = SBYTE(s, 3))) return dst0;
-          if (!(*dst++ = SBYTE(s, 4))) return dst0;
-          if (!(*dst++ = SBYTE(s, 5))) return dst0;
-          if (!(*dst++ = SBYTE(s, 6))) return dst0;
+            if (!(*dst++ = SBYTE(s, 3)))
+                return dst0;
+            if (!(*dst++ = SBYTE(s, 4)))
+                return dst0;
+            if (!(*dst++ = SBYTE(s, 5)))
+                return dst0;
+            if (!(*dst++ = SBYTE(s, 6)))
+                return dst0;
 #endif
-        }
-      else
-        {
-          if (!(*dst++ = SBYTE(s, 0))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 1))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 2))) return dst - 1;
+        } else {
+            if (!(*dst++ = SBYTE(s, 0)))
+                return dst - 1;
+            if (!(*dst++ = SBYTE(s, 1)))
+                return dst - 1;
+            if (!(*dst++ = SBYTE(s, 2)))
+                return dst - 1;
 #if __riscv_xlen == 64
-          if (!(*dst++ = SBYTE(s, 3))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 4))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 5))) return dst - 1;
-          if (!(*dst++ = SBYTE(s, 6))) return dst - 1;
+            if (!(*dst++ = SBYTE(s, 3)))
+                return dst - 1;
+            if (!(*dst++ = SBYTE(s, 4)))
+                return dst - 1;
+            if (!(*dst++ = SBYTE(s, 5)))
+                return dst - 1;
+            if (!(*dst++ = SBYTE(s, 6)))
+                return dst - 1;
 #endif
-          dst0 = dst;
+            dst0 = dst;
         }
 
-      *dst = 0;
-      return dst0;
+        *dst = 0;
+        return dst0;
     }
 #endif /* not PREFER_SIZE_OVER_SPEED */
 
-  char ch;
-  do
-    {
-      ch = *src;
-      src++;
-      dst++;
-      *(dst - 1) = ch;
+    char ch;
+    do {
+        ch = *src;
+        src++;
+        dst++;
+        *(dst - 1) = ch;
     } while (ch);
 
-  return ret_start ? dst0 : dst - 1;
+    return ret_start ? dst0 : dst - 1;
 }
-
 
 #endif /* _RV_STRCPY_H */

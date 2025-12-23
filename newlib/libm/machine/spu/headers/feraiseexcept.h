@@ -31,21 +31,22 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FERAISEEXCEPT_H_
-#define _FERAISEEXCEPT_H_	1
+#define _FERAISEEXCEPT_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline void _feraiseexcept(int excepts)
+static __inline void
+_feraiseexcept(int excepts)
 {
-  vec_uint4 fpscr, big_except;
+    vec_uint4 fpscr, big_except;
 
-  fpscr = spu_mffpscr();
-  excepts = excepts & FE_ALL_EXCEPT;
-  big_except = __unpack_fpscr(excepts);
-  fpscr = spu_or(fpscr, big_except);
-  spu_mtfpscr(fpscr);
+    fpscr = spu_mffpscr();
+    excepts = excepts & FE_ALL_EXCEPT;
+    big_except = __unpack_fpscr(excepts);
+    fpscr = spu_or(fpscr, big_except);
+    spu_mtfpscr(fpscr);
 }
 
 #endif /* _FERAISEEXCEPT_H_ */

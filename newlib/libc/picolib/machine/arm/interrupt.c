@@ -46,7 +46,8 @@ void arm_halt_isr(void);
 void __disable_sanitizer
 arm_halt_isr(void)
 {
-	for(;;);
+    for (;;)
+        ;
 }
 
 void arm_ignore_isr(void);
@@ -56,11 +57,9 @@ arm_ignore_isr(void)
 {
 }
 
-#define isr(name) \
-	void  arm_ ## name ## _isr(void) __attribute__ ((weak, alias("arm_ignore_isr")));
+#define isr(name)      void arm_##name##_isr(void) __attribute__((weak, alias("arm_ignore_isr")));
 
-#define isr_halt(name) \
-	void  arm_ ## name ## _isr(void) __attribute__ ((weak, alias("arm_halt_isr")));
+#define isr_halt(name) void arm_##name##_isr(void) __attribute__((weak, alias("arm_halt_isr")));
 
 isr(nmi);
 isr_halt(hardfault);
@@ -72,52 +71,49 @@ isr(debugmon);
 isr(pendsv);
 isr(systick);
 
-void _start(void);
+void           _start(void);
 extern uint8_t __stack[];
 
-#define i(addr,name)	[(addr)/4] = (void(*)(void)) arm_ ## name ## _isr
+#define i(addr, name) [(addr) / 4] = (void (*)(void))arm_##name##_isr
 
-__section(".data.init.enter")
-void (* const __weak_interrupt_vector[])(void) __attribute((aligned(128))) = {
-	[0] = (void(*)(void))__stack,
-	[1] = _start,
-	i(0x08, nmi),
-	i(0x0c, hardfault),
-	i(0x10, memmanage),
-	i(0x14, busfault),
-	i(0x18, usagefault),
-	i(0x2c, svc),
-	i(0x30, debugmon),
-	i(0x38, pendsv),
-	i(0x3c, systick),
-};
+__section(".data.init.enter") void (* const __weak_interrupt_vector[])(void)
+    __attribute((aligned(128)))
+    = {
+          [0] = (void (*)(void))__stack,
+          [1] = _start,
+          i(0x08, nmi),
+          i(0x0c, hardfault),
+          i(0x10, memmanage),
+          i(0x14, busfault),
+          i(0x18, usagefault),
+          i(0x2c, svc),
+          i(0x30, debugmon),
+          i(0x38, pendsv),
+          i(0x3c, systick),
+      };
 __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 #else
 
-void arm_halt_vector(void);
+void         arm_halt_vector(void);
 
-void __naked __section(".init") __disable_sanitizer
-arm_halt_vector(void)
+void __naked __section(".init") __disable_sanitizer arm_halt_vector(void)
 {
-	/* Loop forever. */
-	__asm__("1: b 1b");
+    /* Loop forever. */
+    __asm__("1: b 1b");
 }
 
-void arm_ignore_vector(void);
+void         arm_ignore_vector(void);
 
-void __naked __section(".init") __disable_sanitizer
-arm_ignore_vector(void)
+void __naked __section(".init") __disable_sanitizer arm_ignore_vector(void)
 {
-	/* Ignore the interrupt by returning */
-	__asm__("bx lr");
+    /* Ignore the interrupt by returning */
+    __asm__("bx lr");
 }
 
-#define vector(name) \
-    __weak_reference(arm_ignore_vector, arm_ ## name ## _vector)
+#define vector(name)      __weak_reference(arm_ignore_vector, arm_##name##_vector)
 
-#define vector_halt(name) \
-    __weak_reference(arm_halt_vector, arm_ ## name ## _vector)
+#define vector_halt(name) __weak_reference(arm_halt_vector, arm_##name##_vector)
 
 vector_halt(undef);
 vector_halt(svc);
@@ -127,39 +123,37 @@ vector(not_used);
 vector(irq);
 vector(fiq);
 
-void
-__weak_vector_table(void);
+void         __weak_vector_table(void);
 
-void __naked __section(".text.init.enter") __disable_sanitizer
-__weak_vector_table(void)
+void __naked __section(".text.init.enter") __disable_sanitizer __weak_vector_table(void)
 {
-	/*
-	 * Exception vector that lives at the
-	 * start of program text (usually 0x0)
-	 */
+    /*
+     * Exception vector that lives at the
+     * start of program text (usually 0x0)
+     */
 #ifdef __thumb2__
-	/* Thumb 2 processors start in thumb mode */
-	__asm__(".thumb\n"
-                ".syntax unified\n"
-                "b.w _start\n"
-                "b.w arm_undef_vector\n"
-                "b.w arm_svc_vector\n"
-                "b.w arm_prefetch_abort_vector\n"
-                "b.w arm_data_abort_vector\n"
-                "b.w arm_not_used_vector\n"
-                "b.w arm_irq_vector\n"
-                "b.w arm_fiq_vector");
+    /* Thumb 2 processors start in thumb mode */
+    __asm__(".thumb\n"
+            ".syntax unified\n"
+            "b.w _start\n"
+            "b.w arm_undef_vector\n"
+            "b.w arm_svc_vector\n"
+            "b.w arm_prefetch_abort_vector\n"
+            "b.w arm_data_abort_vector\n"
+            "b.w arm_not_used_vector\n"
+            "b.w arm_irq_vector\n"
+            "b.w arm_fiq_vector");
 #else
-	/* Thumb 1 and arm processors start in arm mode */
-        __asm__(".arm\n"
-                "b _start\n"
-                "b arm_undef_vector\n"
-                "b arm_svc_vector\n"
-                "b arm_prefetch_abort_vector\n"
-                "b arm_data_abort_vector\n"
-                "b arm_not_used_vector\n"
-                "b arm_irq_vector\n"
-                "b arm_fiq_vector");
+    /* Thumb 1 and arm processors start in arm mode */
+    __asm__(".arm\n"
+            "b _start\n"
+            "b arm_undef_vector\n"
+            "b arm_svc_vector\n"
+            "b arm_prefetch_abort_vector\n"
+            "b arm_data_abort_vector\n"
+            "b arm_not_used_vector\n"
+            "b arm_irq_vector\n"
+            "b arm_fiq_vector");
 #endif
 }
 

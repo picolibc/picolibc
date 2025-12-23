@@ -34,7 +34,7 @@
  */
 
 #define _DEFAULT_SOURCE
-#define TEST_VECTORS    "test-atan2.h"
-#define TEST_FUNC       atan2
+#define TEST_VECTORS "test-atan2.h"
+#define TEST_FUNC    atan2
 
 #include "test-real-real.h"

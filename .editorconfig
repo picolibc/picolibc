@@ -9,3 +9,6 @@ indent_style = space
 
 [meson*]
 indent_style = space
+
+[*.yml]
+indent_sytle = space

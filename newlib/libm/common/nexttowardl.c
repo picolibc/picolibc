@@ -30,9 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef _LDBL_EQ_DBL
 long double
-nexttowardl (long double x, long double y)
+nexttowardl(long double x, long double y)
 {
-  return nextafter(x, y);
+    return nextafter(x, y);
 }
 #endif
-

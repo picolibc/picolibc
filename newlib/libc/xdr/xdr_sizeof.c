@@ -44,40 +44,36 @@
 
 /* ARGSUSED */
 static bool_t
-x_putlong (XDR * xdrs,
-	const long *longp)
+x_putlong(XDR *xdrs, const long *longp)
 {
-  (void) longp;
-  xdrs->x_handy += BYTES_PER_XDR_UNIT;
-  return TRUE;
+    (void)longp;
+    xdrs->x_handy += BYTES_PER_XDR_UNIT;
+    return TRUE;
 }
 
 /* ARGSUSED */
 static bool_t
-x_putbytes (XDR * xdrs,
-	const char *bp,
-	u_int len)
+x_putbytes(XDR *xdrs, const char *bp, u_int len)
 {
-  (void) bp;
-  xdrs->x_handy += len;
-  return TRUE;
+    (void)bp;
+    xdrs->x_handy += len;
+    return TRUE;
 }
 
 static u_int
-x_getpostn (XDR * xdrs)
+x_getpostn(XDR *xdrs)
 {
-  return xdrs->x_handy;
+    return xdrs->x_handy;
 }
 
 /* ARGSUSED */
 static bool_t
-x_setpostn (XDR * xdrs,
-	u_int pos)
+x_setpostn(XDR *xdrs, u_int pos)
 {
-  (void) xdrs;
-  (void) pos;
-  /* This is not allowed */
-  return FALSE;
+    (void)xdrs;
+    (void)pos;
+    /* This is not allowed */
+    return FALSE;
 }
 
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
@@ -88,99 +84,89 @@ x_setpostn (XDR * xdrs,
 #endif
 
 static int32_t *
-x_inline (XDR * xdrs,
-	u_int len)
+x_inline(XDR *xdrs, u_int len)
 {
-  if (len == 0)
-    return NULL;
-  if (xdrs->x_op != XDR_ENCODE)
-    return NULL;
-  if (len < (u_int) (uintptr_t) xdrs->x_base)
-    {
-      /* x_private was already allocated */
-      xdrs->x_handy += len;
-      return (int32_t *) xdrs->x_private;
-    }
-  else
-    {
-      /* Free the earlier space and allocate new area */
-      if (xdrs->x_private)
-        mem_free (xdrs->x_private, sizeof (xdrs->x_private));
-      if ((xdrs->x_private = (caddr_t) mem_alloc (len)) == NULL)
-        {
-          xdrs->x_base = 0;
-          return NULL;
+    if (len == 0)
+        return NULL;
+    if (xdrs->x_op != XDR_ENCODE)
+        return NULL;
+    if (len < (u_int)(uintptr_t)xdrs->x_base) {
+        /* x_private was already allocated */
+        xdrs->x_handy += len;
+        return (int32_t *)xdrs->x_private;
+    } else {
+        /* Free the earlier space and allocate new area */
+        if (xdrs->x_private)
+            mem_free(xdrs->x_private, sizeof(xdrs->x_private));
+        if ((xdrs->x_private = (caddr_t)mem_alloc(len)) == NULL) {
+            xdrs->x_base = 0;
+            return NULL;
         }
-      xdrs->x_base = (caddr_t) (intptr_t) len;
-      xdrs->x_handy += len;
-      return (int32_t *) xdrs->x_private;
+        xdrs->x_base = (caddr_t)(intptr_t)len;
+        xdrs->x_handy += len;
+        return (int32_t *)xdrs->x_private;
     }
 }
 
 static int
-harmless (void)
+harmless(void)
 {
-  /* Always return FALSE/NULL, as the case may be */
-  return 0;
+    /* Always return FALSE/NULL, as the case may be */
+    return 0;
 }
 
 static void
-x_destroy (XDR * xdrs)
+x_destroy(XDR *xdrs)
 {
-  xdrs->x_handy = 0;
-  xdrs->x_base = 0;
-  if (xdrs->x_private)
-    {
-      mem_free (xdrs->x_private, sizeof (xdrs->x_private));
-      xdrs->x_private = NULL;
+    xdrs->x_handy = 0;
+    xdrs->x_base = 0;
+    if (xdrs->x_private) {
+        mem_free(xdrs->x_private, sizeof(xdrs->x_private));
+        xdrs->x_private = NULL;
     }
-  return;
+    return;
 }
 
 static bool_t
-x_putint32 (XDR *xdrs,
-	const int32_t *int32p)
+x_putint32(XDR *xdrs, const int32_t *int32p)
 {
-  (void) int32p;
-  xdrs->x_handy += BYTES_PER_XDR_UNIT;
-  return TRUE;
+    (void)int32p;
+    xdrs->x_handy += BYTES_PER_XDR_UNIT;
+    return TRUE;
 }
-
 
 unsigned long
-xdr_sizeof (xdrproc_t func,
-	void *data)
+xdr_sizeof(xdrproc_t func, void *data)
 {
-  XDR x;
-  struct xdr_ops ops;
-  bool_t stat;
-  /* to stop ANSI-C compiler from complaining */
-  typedef bool_t (*dummyfunc1) (XDR *, long *);
-  typedef bool_t (*dummyfunc2) (XDR *, caddr_t, u_int);
-  typedef bool_t (*dummyfunc3) (XDR *, int32_t *);
+    XDR            x;
+    struct xdr_ops ops;
+    bool_t         stat;
+    /* to stop ANSI-C compiler from complaining */
+    typedef bool_t (*dummyfunc1)(XDR *, long *);
+    typedef bool_t (*dummyfunc2)(XDR *, caddr_t, u_int);
+    typedef bool_t (*dummyfunc3)(XDR *, int32_t *);
 
-  ops.x_putlong = x_putlong;
-  ops.x_putbytes = x_putbytes;
-  ops.x_inline = x_inline;
-  ops.x_getpostn = x_getpostn;
-  ops.x_setpostn = x_setpostn;
-  ops.x_destroy = x_destroy;
-  ops.x_putint32 = x_putint32;
+    ops.x_putlong = x_putlong;
+    ops.x_putbytes = x_putbytes;
+    ops.x_inline = x_inline;
+    ops.x_getpostn = x_getpostn;
+    ops.x_setpostn = x_setpostn;
+    ops.x_destroy = x_destroy;
+    ops.x_putint32 = x_putint32;
 
-  /* the other harmless ones */
-  ops.x_getlong = (dummyfunc1) (void *) harmless;
-  ops.x_getbytes = (dummyfunc2) (void *) harmless;
-  ops.x_getint32 = (dummyfunc3) (void *) harmless;
+    /* the other harmless ones */
+    ops.x_getlong = (dummyfunc1)(void *)harmless;
+    ops.x_getbytes = (dummyfunc2)(void *)harmless;
+    ops.x_getint32 = (dummyfunc3)(void *)harmless;
 
-  x.x_op = XDR_ENCODE;
-  x.x_ops = &ops;
-  x.x_handy = 0;
-  x.x_private = (caddr_t) NULL;
-  x.x_base = (caddr_t) 0;
+    x.x_op = XDR_ENCODE;
+    x.x_ops = &ops;
+    x.x_handy = 0;
+    x.x_private = (caddr_t)NULL;
+    x.x_base = (caddr_t)0;
 
-  stat = func (&x, data);
-  if (x.x_private)
-    mem_free (x.x_private, sizeof (x.x_private));
-  return (stat == TRUE ? x.x_handy : 0);
+    stat = func(&x, data);
+    if (x.x_private)
+        mem_free(x.x_private, sizeof(x.x_private));
+    return (stat == TRUE ? x.x_handy : 0);
 }
-

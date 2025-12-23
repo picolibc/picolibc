@@ -41,6 +41,7 @@
 __noreturn void
 _exit(int code)
 {
-        msp430_semihost_1(MSP430_SEMIHOST_EXIT, code);
-	while(1);
+    msp430_semihost_1(MSP430_SEMIHOST_EXIT, code);
+    while (1)
+        ;
 }

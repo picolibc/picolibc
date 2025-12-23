@@ -33,8 +33,4 @@
 #include "ctype_.h"
 #include "locale_private.h"
 
-const short _ctype_wide[1 + 256] = {
-	0,
-	_CTYPE_DATA_0_127_WIDE,
-	_CTYPE_DATA_128_255
-};
+const short _ctype_wide[1 + 256] = { 0, _CTYPE_DATA_0_127_WIDE, _CTYPE_DATA_128_255 };

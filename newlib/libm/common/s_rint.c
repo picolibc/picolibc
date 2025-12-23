@@ -6,7 +6,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -14,25 +14,25 @@
 FUNCTION
 <<rint>>, <<rintf>>---round to integer
 INDEX
-	rint
+        rint
 INDEX
-	rintf
+        rintf
 
 SYNOPSIS
-	#include <math.h>
-	double rint(double <[x]>);
-	float rintf(float <[x]>);
+        #include <math.h>
+        double rint(double <[x]>);
+        float rintf(float <[x]>);
 
 DESCRIPTION
-	The <<rint>> functions round their argument to an integer value in
-	floating-point format, using the current rounding direction.  They
-	raise the "inexact" floating-point exception if the result differs
-	in value from the argument.  See the <<nearbyint>> functions for the
-	same function with the "inexact" floating-point exception never being
-	raised.  Newlib does not directly support floating-point exceptions.
-	The <<rint>> functions are written so that the "inexact" exception is
-	raised in hardware implementations that support it, even though Newlib
-	does not provide access.
+        The <<rint>> functions round their argument to an integer value in
+        floating-point format, using the current rounding direction.  They
+        raise the "inexact" floating-point exception if the result differs
+        in value from the argument.  See the <<nearbyint>> functions for the
+        same function with the "inexact" floating-point exception never being
+        raised.  Newlib does not directly support floating-point exceptions.
+        The <<rint>> functions are written so that the "inexact" exception is
+        raised in hardware implementations that support it, even though Newlib
+        does not provide access.
 
 RETURNS
 <[x]> rounded to an integral value, using the current rounding direction.
@@ -69,62 +69,68 @@ SEEALSO
 
 #ifdef _NEED_FLOAT64
 
-static const __float64
-TWO52[2]={
-    _F_64(4.50359962737049600000e+15), /* 0x43300000, 0x00000000 */
+static const __float64 TWO52[2] = {
+    _F_64(4.50359962737049600000e+15),  /* 0x43300000, 0x00000000 */
     _F_64(-4.50359962737049600000e+15), /* 0xC3300000, 0x00000000 */
 };
 
 __float64
 rint64(__float64 x)
 {
-	__int32_t i0,j0,sx;
-	__uint32_t i,i1;
-	__float64 t;
-	volatile __float64 w;
-	EXTRACT_WORDS(i0,i1,x);
-	sx = (i0>>31)&1;		/* sign */
-	j0 = ((i0>>20)&0x7ff)-0x3ff;	/* exponent */
-	if(j0<20) {			/* no integral bits in LS part */
-	    if(j0<0) { 			/* x is fractional or 0 */
-		if(((i0&0x7fffffff)|i1)==0) return x;	/* x == 0 */
-		i1 |= (i0&0x0fffff);
-		i0 &= 0xfffe0000;
-		i0 |= ((i1|-i1)>>12)&0x80000;
-		SET_HIGH_WORD(x,i0);
-	        w = TWO52[sx]+x;
-	        t =  w-TWO52[sx];
-		GET_HIGH_WORD(i0,t);
-		SET_HIGH_WORD(t,(i0&0x7fffffff)|lsl(sx, 31));
-	        return t;
-	    } else {			/* x has integer and maybe fraction */
-		i = (0x000fffff)>>j0;
-		if(((i0&i)|i1)==0) return x; /* x is integral */
-		i>>=1;
-		if(((i0&i)|i1)!=0) {
-		    /* 2nd or any later bit after radix is set */
-		    if(j0==19) i1 = 0x80000000; else i1 = 0;
-		    i0 = (i0&(~i))|((0x40000)>>j0);
-		}
-	    }
-	} else if (j0>51) {
-            /*
-             * Use barrier to avoid overflow on clang which would
-             * otherwise always do this add on arm and use a
-             * conditional move instead of a branch for the if
-             */
-            if (j0 == 0x400)
-                return opt_barrier_double(x+x);
-            return x;
-	} else {
-	    i = ((__uint32_t)(0xffffffff))>>(j0-20);
-	    if((i1&i)==0) return x;	/* x is integral */
-	    i>>=1;
-	    if((i1&i)!=0) i1 = (i1&(~i))|((0x40000000)>>(j0-20));
-	}
-	INSERT_WORDS(x,i0,i1);
-	w = TWO52[sx]+x;
-	return w-TWO52[sx];
+    __int32_t          i0, j0, sx;
+    __uint32_t         i, i1;
+    __float64          t;
+    volatile __float64 w;
+    EXTRACT_WORDS(i0, i1, x);
+    sx = (i0 >> 31) & 1;               /* sign */
+    j0 = ((i0 >> 20) & 0x7ff) - 0x3ff; /* exponent */
+    if (j0 < 20) {                     /* no integral bits in LS part */
+        if (j0 < 0) {                  /* x is fractional or 0 */
+            if (((i0 & 0x7fffffff) | i1) == 0)
+                return x; /* x == 0 */
+            i1 |= (i0 & 0x0fffff);
+            i0 &= 0xfffe0000;
+            i0 |= ((i1 | -i1) >> 12) & 0x80000;
+            SET_HIGH_WORD(x, i0);
+            w = TWO52[sx] + x;
+            t = w - TWO52[sx];
+            GET_HIGH_WORD(i0, t);
+            SET_HIGH_WORD(t, (i0 & 0x7fffffff) | lsl(sx, 31));
+            return t;
+        } else { /* x has integer and maybe fraction */
+            i = (0x000fffff) >> j0;
+            if (((i0 & i) | i1) == 0)
+                return x; /* x is integral */
+            i >>= 1;
+            if (((i0 & i) | i1) != 0) {
+                /* 2nd or any later bit after radix is set */
+                if (j0 == 19)
+                    i1 = 0x80000000;
+                else
+                    i1 = 0;
+                i0 = (i0 & (~i)) | ((0x40000) >> j0);
+            }
+        }
+    } else if (j0 > 51) {
+        /*
+         * Use barrier to avoid overflow on clang which would
+         * otherwise always do this add on arm and use a
+         * conditional move instead of a branch for the if
+         */
+        if (j0 == 0x400)
+            return opt_barrier_double(x + x);
+        return x;
+    } else {
+        i = ((__uint32_t)(0xffffffff)) >> (j0 - 20);
+        if ((i1 & i) == 0)
+            return x; /* x is integral */
+        i >>= 1;
+        if ((i1 & i) != 0)
+            i1 = (i1 & (~i)) | ((0x40000000) >> (j0 - 20));
+    }
+    INSERT_WORDS(x, i0, i1);
+    w = TWO52[sx] + x;
+    return w - TWO52[sx];
 }
 
 _MATH_ALIAS_d_d(rint)

@@ -17,67 +17,70 @@
  *   Special cases:
  */
 
-
-
 long double
 nextafterl(long double x, long double y)
 {
-	u_int32_t hx,hy,ix,iy;
-	u_int32_t lx,ly;
-        int32_t esx,esy;
+    u_int32_t hx, hy, ix, iy;
+    u_int32_t lx, ly;
+    int32_t   esx, esy;
 
-	GET_LDOUBLE_WORDS(esx,hx,lx,x);
-	GET_LDOUBLE_WORDS(esy,hy,ly,y);
-	ix = esx&0x7fff;		/* |x| */
-	iy = esy&0x7fff;		/* |y| */
+    GET_LDOUBLE_WORDS(esx, hx, lx, x);
+    GET_LDOUBLE_WORDS(esy, hy, ly, y);
+    ix = esx & 0x7fff; /* |x| */
+    iy = esy & 0x7fff; /* |y| */
 
-	if (((ix==0x7fff)&&(((hx&0x7fffffff)|lx)!=0)) ||   /* x is nan */
-	    ((iy==0x7fff)&&(((hy&0x7fffffff)|ly)!=0)))     /* y is nan */
-	   return x+y;
-	if(x==y) return y;		/* x=y, return y */
-	if((ix|hx|lx)==0) {			/* x == 0 */
-            SET_LDOUBLE_WORDS(x,esy & 0x8000,hx,1);
-            force_eval_long_double(opt_barrier_long_double(x)*x);
-            return x;
-	}
-	if(esx>=0) {			/* x > 0 */
-	    if(esy<0||(ix>iy||((ix==iy) && (hx>hy||((hx==hy)&&(lx>ly)))))) {
-	      /* x > y, x -= ulp */
-		if(lx==0) {
-		    if ((hx&0x7fffffff)==0) esx -= 1;
-		    hx = (hx - 1) | (hx & 0x80000000);
-		}
-		lx -= 1;
-	    } else {				/* x < y, x += ulp */
-		lx += 1;
-		if(lx==0) {
-		    hx = (hx + 1) | (hx & 0x80000000);
-		    if ((hx&0x7fffffff)==0) esx += 1;
-		}
-	    }
-	} else {				/* x < 0 */
-	    if(esy>=0||(ix>iy||((ix==iy)&&(hx>hy||((hx==hy)&&(lx>ly)))))){
-	      /* x < y, x -= ulp */
-		if(lx==0) {
-		    if ((hx&0x7fffffff)==0) esx -= 1;
-		    hx = (hx - 1) | (hx & 0x80000000);
-		}
-		lx -= 1;
-	    } else {				/* x > y, x += ulp */
-		lx += 1;
-		if(lx==0) {
-		    hx = (hx + 1) | (hx & 0x80000000);
-		    if ((hx&0x7fffffff)==0) esx += 1;
-		}
-	    }
-	}
-	esy = esx&0x7fff;
-	if(esy==0x7fff)
-            return __math_oflowl(esx & 0x8000);		/* overflow  */
-	SET_LDOUBLE_WORDS(x,esx,hx,lx);
-	if(esy==0)
-            return __math_denorml(x);
-	return x;
+    if (((ix == 0x7fff) && (((hx & 0x7fffffff) | lx) != 0)) || /* x is nan */
+        ((iy == 0x7fff) && (((hy & 0x7fffffff) | ly) != 0)))   /* y is nan */
+        return x + y;
+    if (x == y)
+        return y;              /* x=y, return y */
+    if ((ix | hx | lx) == 0) { /* x == 0 */
+        SET_LDOUBLE_WORDS(x, esy & 0x8000, hx, 1);
+        force_eval_long_double(opt_barrier_long_double(x) * x);
+        return x;
+    }
+    if (esx >= 0) { /* x > 0 */
+        if (esy < 0 || (ix > iy || ((ix == iy) && (hx > hy || ((hx == hy) && (lx > ly)))))) {
+            /* x > y, x -= ulp */
+            if (lx == 0) {
+                if ((hx & 0x7fffffff) == 0)
+                    esx -= 1;
+                hx = (hx - 1) | (hx & 0x80000000);
+            }
+            lx -= 1;
+        } else { /* x < y, x += ulp */
+            lx += 1;
+            if (lx == 0) {
+                hx = (hx + 1) | (hx & 0x80000000);
+                if ((hx & 0x7fffffff) == 0)
+                    esx += 1;
+            }
+        }
+    } else { /* x < 0 */
+        if (esy >= 0 || (ix > iy || ((ix == iy) && (hx > hy || ((hx == hy) && (lx > ly)))))) {
+            /* x < y, x -= ulp */
+            if (lx == 0) {
+                if ((hx & 0x7fffffff) == 0)
+                    esx -= 1;
+                hx = (hx - 1) | (hx & 0x80000000);
+            }
+            lx -= 1;
+        } else { /* x > y, x += ulp */
+            lx += 1;
+            if (lx == 0) {
+                hx = (hx + 1) | (hx & 0x80000000);
+                if ((hx & 0x7fffffff) == 0)
+                    esx += 1;
+            }
+        }
+    }
+    esy = esx & 0x7fff;
+    if (esy == 0x7fff)
+        return __math_oflowl(esx & 0x8000); /* overflow  */
+    SET_LDOUBLE_WORDS(x, esx, hx, lx);
+    if (esy == 0)
+        return __math_denorml(x);
+    return x;
 }
 
 #ifdef __strong_reference

@@ -40,15 +40,16 @@
 #define TEST_FILE_NAME "FOPEN.TXT"
 #endif
 
-#define check(condition, message) do {                  \
-        if (!(condition)) {                             \
-            printf("%s: %s\n", message, #condition);    \
-            if (f)                                      \
-                fclose(f);                              \
-            (void) remove(TEST_FILE_NAME);              \
-            exit(1);                                    \
-        }                                               \
-    } while(0)
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            if (f)                                   \
+                fclose(f);                           \
+            (void)remove(TEST_FILE_NAME);            \
+            exit(1);                                 \
+        }                                            \
+    } while (0)
 
 #define MESSAGE "hello, world\n"
 
@@ -57,15 +58,15 @@ check_contents(int repeats)
 {
     FILE *f;
     char *s;
-    int r;
-    int c;
+    int   r;
+    int   c;
 
     f = fopen(TEST_FILE_NAME, "r");
     check(f != NULL, "fopen r");
     for (r = 0; r < repeats; r++) {
         for (s = MESSAGE; *s; s++) {
             c = getc(f);
-            check((char) c == *s, "contents");
+            check((char)c == *s, "contents");
         }
     }
     c = getc(f);
@@ -100,7 +101,7 @@ main(void)
     fclose(f);
     check_contents(0);
 
-    (void) remove(TEST_FILE_NAME);
+    (void)remove(TEST_FILE_NAME);
 
     exit(0);
 }

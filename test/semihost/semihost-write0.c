@@ -40,6 +40,6 @@
 int
 main(void)
 {
-	sys_semihost_write0(COMMAND_LINE "\n");
-	exit(0);
+    sys_semihost_write0(COMMAND_LINE "\n");
+    exit(0);
 }

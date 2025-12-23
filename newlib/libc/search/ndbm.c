@@ -47,7 +47,7 @@
 #include <ndbm.h>
 #include "hash.h"
 
-#define __DBINTERFACE_PRIVATE        /* activate prototypes from db_local.h */
+#define __DBINTERFACE_PRIVATE /* activate prototypes from db_local.h */
 #include "db_local.h"
 
 /*
@@ -58,29 +58,29 @@
 extern DBM *
 dbm_open(const char *file, int flags, mode_t mode)
 {
-	HASHINFO info;
-	char path[MAXPATHLEN];
+    HASHINFO info;
+    char     path[MAXPATHLEN];
 
-	info.bsize = 4096;
-	info.ffactor = 40;
-	info.nelem = 1;
-	info.cachesize = 0;
-	info.hash = NULL;
-	info.lorder = 0;
+    info.bsize = 4096;
+    info.ffactor = 40;
+    info.nelem = 1;
+    info.cachesize = 0;
+    info.hash = NULL;
+    info.lorder = 0;
 
-	if( strlen(file) >= sizeof(path) - strlen(DBM_SUFFIX)) {
-		errno = ENAMETOOLONG;
-		return(NULL);
-	}
-	(void)strcpy(path, file);
-	(void)strcat(path, DBM_SUFFIX);
-	return ((DBM *)__hash_open(path, flags, mode, 0, &info));
+    if (strlen(file) >= sizeof(path) - strlen(DBM_SUFFIX)) {
+        errno = ENAMETOOLONG;
+        return (NULL);
+    }
+    (void)strcpy(path, file);
+    (void)strcat(path, DBM_SUFFIX);
+    return ((DBM *)__hash_open(path, flags, mode, 0, &info));
 }
 
 extern void
 dbm_close(DBM *db)
 {
-	(void)(db->close)(db);
+    (void)(db->close)(db);
 }
 
 /*
@@ -91,20 +91,20 @@ dbm_close(DBM *db)
 extern datum
 dbm_fetch(DBM *db, datum key)
 {
-	datum retdata;
-	int status;
-	DBT dbtkey, dbtretdata;
+    datum retdata;
+    int   status;
+    DBT   dbtkey, dbtretdata;
 
-	dbtkey.data = key.dptr;
-	dbtkey.size = key.dsize;
-	status = (db->get)(db, &dbtkey, &dbtretdata, 0);
-	if (status) {
-		dbtretdata.data = NULL;
-		dbtretdata.size = 0;
-	}
-	retdata.dptr = dbtretdata.data;
-	retdata.dsize = dbtretdata.size;
-	return (retdata);
+    dbtkey.data = key.dptr;
+    dbtkey.size = key.dsize;
+    status = (db->get)(db, &dbtkey, &dbtretdata, 0);
+    if (status) {
+        dbtretdata.data = NULL;
+        dbtretdata.size = 0;
+    }
+    retdata.dptr = dbtretdata.data;
+    retdata.dsize = dbtretdata.size;
+    return (retdata);
 }
 
 /*
@@ -115,16 +115,16 @@ dbm_fetch(DBM *db, datum key)
 extern datum
 dbm_firstkey(DBM *db)
 {
-	int status;
-	datum retkey;
-	DBT dbtretkey, dbtretdata;
+    int   status;
+    datum retkey;
+    DBT   dbtretkey, dbtretdata;
 
-	status = (db->seq)(db, &dbtretkey, &dbtretdata, R_FIRST);
-	if (status)
-		dbtretkey.data = NULL;
-	retkey.dptr = dbtretkey.data;
-	retkey.dsize = dbtretkey.size;
-	return (retkey);
+    status = (db->seq)(db, &dbtretkey, &dbtretdata, R_FIRST);
+    if (status)
+        dbtretkey.data = NULL;
+    retkey.dptr = dbtretkey.data;
+    retkey.dsize = dbtretkey.size;
+    return (retkey);
 }
 
 /*
@@ -135,16 +135,16 @@ dbm_firstkey(DBM *db)
 extern datum
 dbm_nextkey(DBM *db)
 {
-	int status;
-	datum retkey;
-	DBT dbtretkey, dbtretdata;
+    int   status;
+    datum retkey;
+    DBT   dbtretkey, dbtretdata;
 
-	status = (db->seq)(db, &dbtretkey, &dbtretdata, R_NEXT);
-	if (status)
-		dbtretkey.data = NULL;
-	retkey.dptr = dbtretkey.data;
-	retkey.dsize = dbtretkey.size;
-	return (retkey);
+    status = (db->seq)(db, &dbtretkey, &dbtretdata, R_NEXT);
+    if (status)
+        dbtretkey.data = NULL;
+    retkey.dptr = dbtretkey.data;
+    retkey.dsize = dbtretkey.size;
+    return (retkey);
 }
 
 /*
@@ -155,16 +155,16 @@ dbm_nextkey(DBM *db)
 extern int
 dbm_delete(DBM *db, datum key)
 {
-	int status;
-	DBT dbtkey;
+    int status;
+    DBT dbtkey;
 
-	dbtkey.data = key.dptr;
-	dbtkey.size = key.dsize;
-	status = (db->del)(db, &dbtkey, 0);
-	if (status)
-		return (-1);
-	else
-		return (0);
+    dbtkey.data = key.dptr;
+    dbtkey.size = key.dsize;
+    status = (db->del)(db, &dbtkey, 0);
+    if (status)
+        return (-1);
+    else
+        return (0);
 }
 
 /*
@@ -176,37 +176,36 @@ dbm_delete(DBM *db, datum key)
 extern int
 dbm_store(DBM *db, datum key, datum data, int flags)
 {
-	DBT dbtkey, dbtdata;
+    DBT dbtkey, dbtdata;
 
-	dbtkey.data = key.dptr;
-	dbtkey.size = key.dsize;
-	dbtdata.data = data.dptr;
-	dbtdata.size = data.dsize;
-	return ((db->put)(db, &dbtkey, &dbtdata,
-	    (flags == DBM_INSERT) ? R_NOOVERWRITE : 0));
+    dbtkey.data = key.dptr;
+    dbtkey.size = key.dsize;
+    dbtdata.data = data.dptr;
+    dbtdata.size = data.dsize;
+    return ((db->put)(db, &dbtkey, &dbtdata, (flags == DBM_INSERT) ? R_NOOVERWRITE : 0));
 }
 
 extern int
 dbm_error(DBM *db)
 {
-	HTAB *hp;
+    HTAB *hp;
 
-	hp = (HTAB *)db->internal;
-	return (hp->error);
+    hp = (HTAB *)db->internal;
+    return (hp->error);
 }
 
 extern int
 dbm_clearerr(DBM *db)
 {
-	HTAB *hp;
+    HTAB *hp;
 
-	hp = (HTAB *)db->internal;
-	hp->error = 0;
-	return (0);
+    hp = (HTAB *)db->internal;
+    hp->error = 0;
+    return (0);
 }
 
 extern int
 dbm_dirfno(DBM *db)
 {
-	return(((HTAB *)db->internal)->fp);
+    return (((HTAB *)db->internal)->fp);
 }

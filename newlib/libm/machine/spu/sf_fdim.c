@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/fdimf.h"
 
-float fdimf(float x, float y)
+float
+fdimf(float x, float y)
 {
     return _fdimf(x, y);
 }

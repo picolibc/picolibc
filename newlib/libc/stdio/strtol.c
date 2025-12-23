@@ -30,10 +30,10 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define strtoi_type long
+#define strtoi_type  long
 #define strtoi_utype unsigned long
-#define strtoi_max LONG_MAX
-#define strtoi_min LONG_MIN
+#define strtoi_max   LONG_MAX
+#define strtoi_min   LONG_MIN
 #define strtoi_signed
 #ifdef WIDE_CHARS
 #define strtoi wcstol

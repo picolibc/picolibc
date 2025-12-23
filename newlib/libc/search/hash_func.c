@@ -56,8 +56,8 @@ static __uint32_t hash3(const void *, size_t);
  * This came from ejb's hsearch.
  */
 
-#define PRIME1		37
-#define PRIME2		1048583
+#define PRIME1 37
+#define PRIME2 1048583
 
 #if 0
 static __uint32_t
@@ -79,7 +79,7 @@ hash1(keyarg, len)
 /*
  * Phong's linear congruential hash
  */
-#define dcharhash(h, c)	((h) = 0x63c63cd9*(h) + 0x9c39c33d + (c))
+#define dcharhash(h, c) ((h) = 0x63c63cd9 * (h) + 0x9c39c33d + (c))
 
 #if 0
 static __uint32_t
@@ -122,7 +122,7 @@ hash3(keyarg, len)
 	size_t loop;
 	__uint32_t h;
 
-#define HASHC   h = *key++ + 65599 * h
+#define HASHC h = *key++ + 65599 * h
 
 	h = 0;
 	key = keyarg;
@@ -163,22 +163,19 @@ hash3(keyarg, len)
 
 /* Hash function from Chris Torek. */
 __uint32_t
-__default_hash(
-	const void *keyarg,
-	size_t len
-)
+__default_hash(const void *keyarg, size_t len)
 {
-	const u_char *key;
-	__uint32_t h;
+    const u_char *key;
+    __uint32_t    h;
 
-#define HASH4a   h = (h << 5) - h + *key++;
-#define HASH4b   h = (h << 5) + h + *key++;
-#define HASH4 HASH4b
+#define HASH4a h = (h << 5) - h + *key++;
+#define HASH4b h = (h << 5) + h + *key++;
+#define HASH4  HASH4b
 
-	h = 0;
-	key = keyarg;
-	while (len--) {
-		HASH4;
-	}
-	return (h);
+    h = 0;
+    key = keyarg;
+    while (len--) {
+        HASH4;
+    }
+    return (h);
 }

@@ -40,9 +40,9 @@
 float
 fabsf(float x)
 {
-  float result;
-  __asm__("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
-  return result;
+    float result;
+    __asm__("fabs.s\t%0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_f_f(fabs)

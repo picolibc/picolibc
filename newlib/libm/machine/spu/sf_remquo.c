@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/remquof.h"
 
-float remquof(float x, float y, int *quo)
+float
+remquof(float x, float y, int *quo)
 {
     return _remquof(x, y, quo);
 }

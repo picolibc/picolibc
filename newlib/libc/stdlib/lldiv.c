@@ -17,7 +17,7 @@ $n/d$,
 @ifnottex
 <[n]>/<[d]>,
 @end ifnottex
-returning quotient and remainder as two long long integers in a structure 
+returning quotient and remainder as two long long integers in a structure
 <<lldiv_t>>.
 
 RETURNS
@@ -94,16 +94,15 @@ No supporting OS subroutines are required.
  * subtract denom from r.rem.
  */
 lldiv_t
-lldiv (long long numer, long long denom)
+lldiv(long long numer, long long denom)
 {
-	lldiv_t retval;
+    lldiv_t retval;
 
-	retval.quot = numer / denom;
-	retval.rem = numer % denom;
-	if (numer >= 0 && retval.rem < 0) {
-		retval.quot++;
-		retval.rem -= denom;
-	}
-	return (retval);
+    retval.quot = numer / denom;
+    retval.rem = numer % denom;
+    if (numer >= 0 && retval.rem < 0) {
+        retval.quot++;
+        retval.rem -= denom;
+    }
+    return (retval);
 }
-

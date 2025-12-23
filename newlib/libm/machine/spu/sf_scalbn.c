@@ -33,7 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <math.h>
 #include "headers/scalbnf.h"
 
-float scalbnf(float x, int exp)
+float
+scalbnf(float x, int exp)
 {
     return _scalbnf(x, exp);
 }

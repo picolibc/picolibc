@@ -27,37 +27,40 @@
 #include <libgen.h>
 #include <stdlib.h>
 
-#define TEST(p, b) do {                                                 \
-        tmp = strdup((p));                                              \
-        s = dirname (tmp);                                              \
-        if (strcmp((b),s)) {                                            \
-            printf(__FILE__ ":%d: dirname(\"%s\") returned \"%s\"; expected \"%s\"\n", \
-                   __LINE__, (p), s, (b));                              \
-            err++;                                                      \
-        }                                                               \
-        free(tmp);                                                      \
+#define TEST(p, b)                                                                               \
+    do {                                                                                         \
+        tmp = strdup((p));                                                                       \
+        s = dirname(tmp);                                                                        \
+        if (strcmp((b), s)) {                                                                    \
+            printf(__FILE__ ":%d: dirname(\"%s\") returned \"%s\"; expected \"%s\"\n", __LINE__, \
+                   (p), s, (b));                                                                 \
+            err++;                                                                               \
+        }                                                                                        \
+        free(tmp);                                                                               \
     } while (0)
 
-static int test_dirname(void)
+static int
+test_dirname(void)
 {
-	char *tmp, *s;
-	int err=0;
+    char *tmp, *s;
+    int   err = 0;
 
-	if (strcmp(dirname(NULL), ".")) {
-		printf(__FILE__ ":%d: dirname(NULL) returned \"%s\"; "
-			"expected \".\"\n", __LINE__, dirname(NULL));
-		err++;
-	}
-	TEST("", ".");
-	TEST("/usr/lib", "/usr");
-	TEST("/usr/", "/");
-	TEST("usr", ".");
-	TEST("/", "/");
-	TEST("///", "/");
-	TEST(".", ".");
-	TEST("..", ".");
+    if (strcmp(dirname(NULL), ".")) {
+        printf(__FILE__ ":%d: dirname(NULL) returned \"%s\"; "
+                        "expected \".\"\n",
+               __LINE__, dirname(NULL));
+        err++;
+    }
+    TEST("", ".");
+    TEST("/usr/lib", "/usr");
+    TEST("/usr/", "/");
+    TEST("usr", ".");
+    TEST("/", "/");
+    TEST("///", "/");
+    TEST(".", ".");
+    TEST("..", ".");
 
-	return err;
+    return err;
 }
 
 #undef dirname

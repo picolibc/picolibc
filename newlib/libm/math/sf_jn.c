@@ -16,7 +16,7 @@
 #include "fdlibm.h"
 
 static const float two = 2.0000000000e+00, /* 0x40000000 */
-    one = 1.0000000000e+00; /* 0x3F800000 */
+    one = 1.0000000000e+00;                /* 0x3F800000 */
 
 static const float zero = 0.0000000000e+00;
 
@@ -24,8 +24,8 @@ float
 jnf(int n, float x)
 {
     __int32_t i, hx, ix, sgn;
-    float a, b, temp, di;
-    float z, w;
+    float     a, b, temp, di;
+    float     z, w;
 
     /* J(-n,x) = (-1)^n * J(n, x), J(n, -x) = (-1)^n * J(n, x)
      * Thus, J(-n,x) = J(n,-x)
@@ -60,8 +60,8 @@ jnf(int n, float x)
     } else {
         if (ix < 0x30800000) { /* x < 2**-29 */
             /* x is tiny, return the first Taylor expansion of J(n,x)
-     * J(n,x) = 1/n!*(x/2)^n  - ...
-     */
+             * J(n,x) = 1/n!*(x/2)^n  - ...
+             */
             if (n > 33) /* underflow */
                 b = zero;
             else {
@@ -69,42 +69,42 @@ jnf(int n, float x)
                 b = temp;
                 for (a = one, i = 2; i <= n; i++) {
                     a *= (float)i; /* a = n! */
-                    b *= temp; /* b = (x/2)^n */
+                    b *= temp;     /* b = (x/2)^n */
                 }
                 b = b / a;
             }
         } else {
             /* use backward recurrence */
             /* 			x      x^2      x^2
-		 *  J(n,x)/J(n-1,x) =  ----   ------   ------   .....
-		 *			2n  - 2(n+1) - 2(n+2)
-		 *
-		 * 			1      1        1
-		 *  (for large x)   =  ----  ------   ------   .....
-		 *			2n   2(n+1)   2(n+2)
-		 *			-- - ------ - ------ -
-		 *			 x     x         x
-		 *
-		 * Let w = 2n/x and h=2/x, then the above quotient
-		 * is equal to the continued fraction:
-		 *		    1
-		 *	= -----------------------
-		 *		       1
-		 *	   w - -----------------
-		 *			  1
-		 * 	        w+h - ---------
-		 *		       w+2h - ...
-		 *
-		 * To determine how many terms needed, let
-		 * Q(0) = w, Q(1) = w(w+h) - 1,
-		 * Q(k) = (w+k*h)*Q(k-1) - Q(k-2),
-		 * When Q(k) > 1e4	good for single
-		 * When Q(k) > 1e9	good for double
-		 * When Q(k) > 1e17	good for quadruple
-		 */
+             *  J(n,x)/J(n-1,x) =  ----   ------   ------   .....
+             *			2n  - 2(n+1) - 2(n+2)
+             *
+             * 			1      1        1
+             *  (for large x)   =  ----  ------   ------   .....
+             *			2n   2(n+1)   2(n+2)
+             *			-- - ------ - ------ -
+             *			 x     x         x
+             *
+             * Let w = 2n/x and h=2/x, then the above quotient
+             * is equal to the continued fraction:
+             *		    1
+             *	= -----------------------
+             *		       1
+             *	   w - -----------------
+             *			  1
+             * 	        w+h - ---------
+             *		       w+2h - ...
+             *
+             * To determine how many terms needed, let
+             * Q(0) = w, Q(1) = w(w+h) - 1,
+             * Q(k) = (w+k*h)*Q(k-1) - Q(k-2),
+             * When Q(k) > 1e4	good for single
+             * When Q(k) > 1e9	good for double
+             * When Q(k) > 1e17	good for quadruple
+             */
             /* determine k */
-            float t, v;
-            float q0, q1, h, tmp;
+            float     t, v;
+            float     q0, q1, h, tmp;
             __int32_t k, m;
             w = (n + n) / (float)x;
             h = (float)2.0 / (float)x;
@@ -125,13 +125,13 @@ jnf(int n, float x)
             a = t;
             b = one;
             /*  estimate log((2/x)^n*n!) = n*log(2/x)+n*ln(n)
-		 *  Hence, if n*(log(2n/x)) > ...
-		 *  single 8.8722839355e+01
-		 *  double 7.09782712893383973096e+02
-		 *  long double 1.1356523406294143949491931077970765006170e+04
-		 *  then recurrent value may overflow and the result is
-		 *  likely underflow to zero
-		 */
+             *  Hence, if n*(log(2n/x)) > ...
+             *  single 8.8722839355e+01
+             *  double 7.09782712893383973096e+02
+             *  long double 1.1356523406294143949491931077970765006170e+04
+             *  then recurrent value may overflow and the result is
+             *  likely underflow to zero
+             */
             tmp = n;
             v = two / x;
             tmp = tmp * logf(fabsf(v * tmp));
@@ -172,7 +172,7 @@ ynf(int n, float x)
 {
     __int32_t i, hx, ix, ib;
     __int32_t sign;
-    float a, b, temp;
+    float     a, b, temp;
 
     GET_FLOAT_WORD(hx, x);
     ix = 0x7fffffff & hx;
@@ -181,7 +181,7 @@ ynf(int n, float x)
         return __math_divzerof(1);
 
     if (ix > 0x7f800000)
-        return x+x;
+        return x + x;
 
     if (hx < 0)
         return __math_invalidf(x);
@@ -217,4 +217,4 @@ ynf(int n, float x)
 
 _MATH_ALIAS_f_if(jn)
 
-_MATH_ALIAS_f_if(yn)
+    _MATH_ALIAS_f_if(yn)

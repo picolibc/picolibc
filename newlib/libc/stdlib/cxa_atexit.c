@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2004 Paul Brook <paul@codesourcery.com> 
+Copyright (c) 2004 Paul Brook <paul@codesourcery.com>
 
 Common routine to implement atexit-like functionality.
 
@@ -47,18 +47,15 @@ LITE_EXIT.
  */
 
 int
-__cxa_atexit (void (*fn) (void *),
-	void *arg,
-	void *d)
+__cxa_atexit(void (*fn)(void *), void *arg, void *d)
 {
 #ifdef _LITE_EXIT
-  /* Refer to comments in __atexit.c for more details of lite exit.  */
-  int __register_exitproc (int, void (*fn) (void), void *, void *)
-      __weak;
+    /* Refer to comments in __atexit.c for more details of lite exit.  */
+    int __register_exitproc(int, void (*fn)(void), void *, void *) __weak;
 
-  if (!__register_exitproc)
-    return 0;
-  else
+    if (!__register_exitproc)
+        return 0;
+    else
 #endif
-    return __register_exitproc (__et_cxa, (void (*)(void)) fn, arg, d);
+        return __register_exitproc(__et_cxa, (void (*)(void))fn, arg, d);
 }

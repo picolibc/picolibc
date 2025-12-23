@@ -41,14 +41,15 @@
 #include <string.h>
 #include <errno.h>
 
-off_t lseek(int fd, off_t offset, int whence)
+off_t
+lseek(int fd, off_t offset, int whence)
 {
-	return (off_t) lseek64(fd, (_off64_t) offset, whence);
+    return (off_t)lseek64(fd, (_off64_t)offset, whence);
 }
 
 int
-isatty (int fd)
+isatty(int fd)
 {
-        (void) fd;
-	return 1;
+    (void)fd;
+    return 1;
 }

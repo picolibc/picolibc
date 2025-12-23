@@ -31,7 +31,7 @@
 /* Check result and set errno if necessary.  */
 
 HIDDEN float
-__math_check_oflowf (float y)
+__math_check_oflowf(float y)
 {
-  return isinf (y) ? __math_with_errnof (y, ERANGE) : y;
+    return isinf(y) ? __math_with_errnof(y, ERANGE) : y;
 }

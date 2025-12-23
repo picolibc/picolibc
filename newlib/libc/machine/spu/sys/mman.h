@@ -37,49 +37,47 @@ POSSIBILITY OF SUCH DAMAGE.
 /*
  * Prots to 'mmap'.
  */
-#define PROT_READ       0x1
-#define PROT_WRITE      0x2
-#define PROT_EXEC       0x4
-#define PROT_NONE       0x0
+#define PROT_READ  0x1
+#define PROT_WRITE 0x2
+#define PROT_EXEC  0x4
+#define PROT_NONE  0x0
 /*
  * Flags to 'mmap'.
  */
-#define MAP_SHARED      0x001
-#define MAP_PRIVATE     0x002
-#define MAP_FIXED       0x010
-#define MAP_FILE        0x000
-#define MAP_ANONYMOUS   0x020
-#define MAP_ANON        MAP_ANONYMOUS
-#define MAP_GROWSDOWN   0x0100
-#define MAP_DENYWRITE   0x0800
-#define MAP_EXECUTABLE  0x1000
-#define MAP_LOCKED      0x0080
-#define MAP_NORESERVE   0x0040
+#define MAP_SHARED     0x001
+#define MAP_PRIVATE    0x002
+#define MAP_FIXED      0x010
+#define MAP_FILE       0x000
+#define MAP_ANONYMOUS  0x020
+#define MAP_ANON       MAP_ANONYMOUS
+#define MAP_GROWSDOWN  0x0100
+#define MAP_DENYWRITE  0x0800
+#define MAP_EXECUTABLE 0x1000
+#define MAP_LOCKED     0x0080
+#define MAP_NORESERVE  0x0040
 /*
  * Failed flag from 'mmap'.
  */
-#define MAP_FAILED_EADDR  ((unsigned long long) (-1LL))
+#define MAP_FAILED_EADDR ((unsigned long long)(-1LL))
 /*
  * Flags to 'mremap'.
  */
-#define MREMAP_MAYMOVE  1
+#define MREMAP_MAYMOVE 1
 /*
  * Flags to 'msync'.
  */
-#define MS_ASYNC        1
-#define MS_SYNC         4
-#define MS_INVALIDATE   2
+#define MS_ASYNC      1
+#define MS_SYNC       4
+#define MS_INVALIDATE 2
 
+extern int         shm_open(const char *name, int oflag, mode_t mode);
+extern int         shm_unlink(const char *name);
 
-extern int shm_open(const char *name, int oflag, mode_t mode);
-extern int shm_unlink(const char * name);
-
-unsigned long long mmap_eaddr(unsigned long long start, size_t length, int
-                              prot, int flags, int fd, off_t offset);
-unsigned long long mremap_eaddr(unsigned long long old_addr, size_t
-                                old_size, size_t new_size, int flags);
-unsigned long long msync_eaddr(unsigned long long start, size_t length,
-                               int flags);
+unsigned long long mmap_eaddr(unsigned long long start, size_t length, int prot, int flags, int fd,
+                              off_t offset);
+unsigned long long mremap_eaddr(unsigned long long old_addr, size_t old_size, size_t new_size,
+                                int flags);
+unsigned long long msync_eaddr(unsigned long long start, size_t length, int flags);
 unsigned long long munmap_eaddr(unsigned long long start, size_t length);
 
 #endif /* _MMAN_H_ */

@@ -44,7 +44,7 @@
 static inline void
 __scan_nan(uint32_t *bits, int len, const char *s)
 {
-    (void) s;
+    (void)s;
     memset(bits, 0, sizeof(*bits) * len);
 }
 
@@ -63,4 +63,3 @@ __scan_nan(uint32_t *bits, int len, const char *s)
 #include "ldd/s_nanl.c"
 
 #endif
-

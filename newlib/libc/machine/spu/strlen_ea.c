@@ -37,33 +37,29 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <spu_cache.h>
 
-COMPAT_EA_ALIAS (strlen_ea);
+COMPAT_EA_ALIAS(strlen_ea);
 
 size_ea_t
-strlen_ea (__ea const char *s)
+strlen_ea(__ea const char *s)
 {
-  __ea void *curr_s = (__ea void *) s;
-  void *local_s;
-  size_ea_t left_in_cacheline;
-  void *where_null;
-  size_ea_t length_of_string = 0;
+    __ea void *curr_s = (__ea void *)s;
+    void      *local_s;
+    size_ea_t  left_in_cacheline;
+    void      *where_null;
+    size_ea_t  length_of_string = 0;
 
-  while (1)
-    {
-      left_in_cacheline =
-	ROUND_UP_NEXT_128 ((size_ea_t) curr_s) - (size_ea_t) curr_s;
-      local_s = __cache_fetch (curr_s);
-      where_null = memchr (local_s, '\0', left_in_cacheline);
+    while (1) {
+        left_in_cacheline = ROUND_UP_NEXT_128((size_ea_t)curr_s) - (size_ea_t)curr_s;
+        local_s = __cache_fetch(curr_s);
+        where_null = memchr(local_s, '\0', left_in_cacheline);
 
-      if (where_null)
-	{
-	  length_of_string += ((size_ea_t) (int) where_null - (size_ea_t)
-			       (int) local_s);
-	  return length_of_string;
-	}
+        if (where_null) {
+            length_of_string += ((size_ea_t)(int)where_null - (size_ea_t)(int)local_s);
+            return length_of_string;
+        }
 
-      /* update values to take into account what we copied */
-      curr_s += left_in_cacheline;
-      length_of_string += left_in_cacheline;
+        /* update values to take into account what we copied */
+        curr_s += left_in_cacheline;
+        length_of_string += left_in_cacheline;
     }
 }

@@ -39,12 +39,12 @@ PORTABILITY
 long double complex
 clog10l(long double complex z)
 {
-	long double p, rr;
+    long double p, rr;
 
-	rr = cabsl(z);
-	p = log10l(rr);
-	rr = atan2l(cimagl(z), creall(z)) * _M_IVLN10L;
-	return (long double complex) p + rr * (long double complex) I;
+    rr = cabsl(z);
+    p = log10l(rr);
+    rr = atan2l(cimagl(z), creall(z)) * _M_IVLN10L;
+    return (long double complex)p + rr * (long double complex)I;
 }
 
 #endif

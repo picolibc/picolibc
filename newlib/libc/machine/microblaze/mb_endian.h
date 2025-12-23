@@ -7,10 +7,10 @@
  * load/store reverse instructions to do the trick on little-endian systems.
  */
 #ifdef __LITTLE_ENDIAN__
-#define LOAD4BYTES(rD,rA,rB)   "\tlwr\t" rD ", " rA ", " rB "\n"
-#define STORE4BYTES(rD,rA,rB)  "\tswr\t" rD ", " rA ", " rB "\n"
+#define LOAD4BYTES(rD, rA, rB)  "\tlwr\t" rD ", " rA ", " rB "\n"
+#define STORE4BYTES(rD, rA, rB) "\tswr\t" rD ", " rA ", " rB "\n"
 #else
-#define LOAD4BYTES(rD,rA,rB)   "\tlw\t" rD ", " rA ", " rB "\n"
-#define STORE4BYTES(rD,rA,rB)  "\tsw\t" rD ", " rA ", " rB "\n"
+#define LOAD4BYTES(rD, rA, rB)  "\tlw\t" rD ", " rA ", " rB "\n"
+#define STORE4BYTES(rD, rA, rB) "\tsw\t" rD ", " rA ", " rB "\n"
 #endif
 #endif

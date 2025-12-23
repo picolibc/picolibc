@@ -36,41 +36,38 @@ Author: Joel Schopp <jschopp@austin.ibm.com>
 
 #include "c99ppe.h"
 
-typedef struct
-{
-  const char* file;
-  unsigned int pad0[ 3 ];
-  const char* mode;
-  unsigned int pad1[ 3 ];
+typedef struct {
+    const char  *file;
+    unsigned int pad0[3];
+    const char  *mode;
+    unsigned int pad1[3];
 } c99_fopen_t;
 
 FILE *
-fopen (const char *__restrict file,
-	const char *__restrict mode)
+fopen(const char * __restrict file, const char * __restrict mode)
 {
-  int ret;
-  c99_fopen_t args;
-  FILE *fp;
-  struct _reent *ptr = _REENT;
+    int            ret;
+    c99_fopen_t    args;
+    FILE          *fp;
+    struct _reent *ptr = _REENT;
 
-  CHECK_INIT(ptr);
+    CHECK_INIT(ptr);
 
-  fp = __sfp(ptr);
-  if (!fp) {
-    return NULL;
-  }
+    fp = __sfp(ptr);
+    if (!fp) {
+        return NULL;
+    }
 
-  args.file = file;
-  args.mode = mode;
+    args.file = file;
+    args.mode = mode;
 
-  ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FOPEN, &args);
+    ret = __send_to_ppe(SPE_C99_SIGNALCODE, SPE_C99_FOPEN, &args);
 
-  if (ret) {
-    fp->_fp = ret;
-    return fp;
-  }
-  else {
-    __sfp_free(fp);
-    return NULL;
-  }
+    if (ret) {
+        fp->_fp = ret;
+        return fp;
+    } else {
+        __sfp_free(fp);
+        return NULL;
+    }
 }

@@ -35,95 +35,93 @@
 #include "../stdlib/mul_overflow.h"
 #endif
 
-extern FILE *const stdin __weak;
-extern FILE *const stdout __weak;
+extern FILE * const stdin  __weak;
+extern FILE * const stdout __weak;
 
 size_t
 fread(void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
-	size_t i, j;
-	uint8_t *cp = (uint8_t *) ptr;
-	int c;
+    size_t   i, j;
+    uint8_t *cp = (uint8_t *)ptr;
+    int      c;
 
-        __flockfile(stream);
-	if ((stream->flags & __SRD) == 0 || size == 0)
-		__funlock_return(stream, 0);
+    __flockfile(stream);
+    if ((stream->flags & __SRD) == 0 || size == 0)
+        __funlock_return(stream, 0);
 
 #ifdef __FAST_BUFIO
-        size_t bytes;
-        if ((stream->flags & __SBUF) != 0 &&
-            !mul_overflow(size, nmemb, &bytes) && bytes > 0)
-        {
-                struct __file_bufio *bf = (struct __file_bufio *) stream;
-                __ungetc_t unget;
-                bool flushed = false;
+    size_t bytes;
+    if ((stream->flags & __SBUF) != 0 && !mul_overflow(size, nmemb, &bytes) && bytes > 0) {
+        struct __file_bufio *bf = (struct __file_bufio *)stream;
+        __ungetc_t           unget;
+        bool                 flushed = false;
 
-        again:
-                __bufio_lock(stream);
-                __bufio_setdir_locked(stream, __SRD);
+    again:
+        __bufio_lock(stream);
+        __bufio_setdir_locked(stream, __SRD);
 
-                /* Deal with any pending unget */
-                if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0) {
-                        *cp++ = (unget - 1);
-                        bytes--;
-                }
-
-                while (bytes) {
-                        int this_time = bf->len - bf->off;
-
-                        if (this_time) {
-                                /* Drain any buffered data */
-                                if (bytes < (size_t) this_time)
-                                        this_time = bytes;
-                                memcpy(cp, bf->buf + bf->off, this_time);
-                                bf->off += this_time;
-                                cp += this_time;
-                                bytes -= this_time;
-                        } else {
-                                /* Flush stdout if reading from stdin */
-                                if (!flushed) {
-                                        flushed = true;
-                                        if (&stdin != NULL && &stdout != NULL && stream == stdin) {
-                                                __bufio_unlock(stream);
-                                                fflush(stdout);
-                                                goto again;
-                                        }
-                                }
-                                if (bytes < (size_t) bf->size) {
-                                        /* Small reads go through the buffer */
-                                        int ret = __bufio_fill_locked(stream);
-                                        if (ret) {
-                                                stream->flags |= (ret == _FDEV_ERR)? __SERR: __SEOF; 
-                                                break;
-                                        }
-                                } else {
-                                        /* Flush any buffered data */
-                                        bf->len = 0;
-                                        bf->off = 0;
-
-                                        /* Large reads go directly to the destination */
-                                        ssize_t len = bufio_read(bf, cp, bytes);
-                                        if (len <= 0) {
-                                                stream->flags |= (len < 0) ? __SERR : __SEOF;
-                                                break;
-                                        }
-                                        cp += len;
-                                        bytes -= len;
-                                        bf->pos += len;
-                                }
-                        }
-                }
-                __bufio_unlock(stream);
-                __funlock_return(stream, (cp - (uint8_t *) ptr) / size);
+        /* Deal with any pending unget */
+        if ((unget = __atomic_exchange_ungetc(&stream->unget, 0)) != 0) {
+            *cp++ = (unget - 1);
+            bytes--;
         }
-#endif
-	for (i = 0; i < nmemb; i++)
-		for (j = 0; j < size; j++) {
-			c = getc_unlocked(stream);
-			if (c == EOF)
-				__funlock_return(stream, i);
-			*cp++ = (uint8_t)c;
-		}
 
-	__funlock_return(stream, i);
+        while (bytes) {
+            int this_time = bf->len - bf->off;
+
+            if (this_time) {
+                /* Drain any buffered data */
+                if (bytes < (size_t)this_time)
+                    this_time = bytes;
+                memcpy(cp, bf->buf + bf->off, this_time);
+                bf->off += this_time;
+                cp += this_time;
+                bytes -= this_time;
+            } else {
+                /* Flush stdout if reading from stdin */
+                if (!flushed) {
+                    flushed = true;
+                    if (&stdin != NULL && &stdout != NULL && stream == stdin) {
+                        __bufio_unlock(stream);
+                        fflush(stdout);
+                        goto again;
+                    }
+                }
+                if (bytes < (size_t)bf->size) {
+                    /* Small reads go through the buffer */
+                    int ret = __bufio_fill_locked(stream);
+                    if (ret) {
+                        stream->flags |= (ret == _FDEV_ERR) ? __SERR : __SEOF;
+                        break;
+                    }
+                } else {
+                    /* Flush any buffered data */
+                    bf->len = 0;
+                    bf->off = 0;
+
+                    /* Large reads go directly to the destination */
+                    ssize_t len = bufio_read(bf, cp, bytes);
+                    if (len <= 0) {
+                        stream->flags |= (len < 0) ? __SERR : __SEOF;
+                        break;
+                    }
+                    cp += len;
+                    bytes -= len;
+                    bf->pos += len;
+                }
+            }
+        }
+        __bufio_unlock(stream);
+        __funlock_return(stream, (cp - (uint8_t *)ptr) / size);
+    }
+#endif
+    for (i = 0; i < nmemb; i++)
+        for (j = 0; j < size; j++) {
+            c = getc_unlocked(stream);
+            if (c == EOF)
+                __funlock_return(stream, i);
+            *cp++ = (uint8_t)c;
+        }
+
+    __funlock_return(stream, i);
 }

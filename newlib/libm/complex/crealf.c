@@ -29,7 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Written by Matthias Drochner <drochner@NetBSD.org>.
  * Public domain.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -39,7 +39,7 @@ POSSIBILITY OF SUCH DAMAGE.
 float
 crealf(float complex z)
 {
-	float_complex w = { .z = z };
+    float_complex w = { .z = z };
 
-	return (REAL_PART(w));
+    return (REAL_PART(w));
 }

@@ -16,27 +16,27 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /*
 FUNCTION
-	<<strcasecmp>>---case-insensitive character string compare
-	
+        <<strcasecmp>>---case-insensitive character string compare
+
 INDEX
-	strcasecmp
+        strcasecmp
 
 SYNOPSIS
-	#include <strings.h>
-	int strcasecmp(const char *<[a]>, const char *<[b]>);
+        #include <strings.h>
+        int strcasecmp(const char *<[a]>, const char *<[b]>);
 
 DESCRIPTION
-	<<strcasecmp>> compares the string at <[a]> to
-	the string at <[b]> in a case-insensitive manner.
+        <<strcasecmp>> compares the string at <[a]> to
+        the string at <[b]> in a case-insensitive manner.
 
-RETURNS 
+RETURNS
 
-	If <<*<[a]>>> sorts lexicographically after <<*<[b]>>> (after
-	both are converted to lowercase), <<strcasecmp>> returns a
-	number greater than zero.  If the two strings match,
-	<<strcasecmp>> returns zero.  If <<*<[a]>>> sorts
-	lexicographically before <<*<[b]>>>, <<strcasecmp>> returns a
-	number less than zero.
+        If <<*<[a]>>> sorts lexicographically after <<*<[b]>>> (after
+        both are converted to lowercase), <<strcasecmp>> returns a
+        number greater than zero.  If the two strings match,
+        <<strcasecmp>> returns zero.  If <<*<[a]>>> sorts
+        lexicographically before <<*<[b]>>>, <<strcasecmp>> returns a
+        number less than zero.
 
 PORTABILITY
 <<strcasecmp>> is in the Berkeley Software Distribution.
@@ -45,23 +45,21 @@ PORTABILITY
 tolower() from elsewhere in this library.
 
 QUICKREF
-	strcasecmp
+        strcasecmp
 */
 
 #include <strings.h>
 #include <ctype.h>
 
 int
-strcasecmp (const char *s1,
-	const char *s2)
+strcasecmp(const char *s1, const char *s2)
 {
-  int d = 0;
-  for ( ; ; )
-    {
-      const int c1 = tolower(*(unsigned char *)s1++);
-      const int c2 = tolower(*(unsigned char *)s2++);
-      if (((d = c1 - c2) != 0) || (c2 == '\0'))
-        break;
+    int d = 0;
+    for (;;) {
+        const int c1 = tolower(*(unsigned char *)s1++);
+        const int c2 = tolower(*(unsigned char *)s2++);
+        if (((d = c1 - c2) != 0) || (c2 == '\0'))
+            break;
     }
-  return d;
+    return d;
 }

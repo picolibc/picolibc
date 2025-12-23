@@ -31,18 +31,19 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FMINF_H_
-#define _FMINF_H_	1
+#define _FMINF_H_ 1
 
 #include <spu_intrinsics.h>
 
 /* Return the minimum numeric value of their arguments.
  */
-static __inline float _fminf(float x, float y)
+static __inline float
+_fminf(float x, float y)
 {
-  vec_float4 vx, vy;
+    vec_float4 vx, vy;
 
-  vx = spu_promote(x, 0);
-  vy = spu_promote(y, 0);
-  return (spu_extract(spu_sel(vx, vy, spu_cmpgt(vx, vy)), 0));
+    vx = spu_promote(x, 0);
+    vy = spu_promote(y, 0);
+    return (spu_extract(spu_sel(vx, vy, spu_cmpgt(vx, vy)), 0));
 }
 #endif /* _FMINF_H_ */

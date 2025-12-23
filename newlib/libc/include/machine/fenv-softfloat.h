@@ -51,118 +51,102 @@
  */
 #include <errno.h>
 
-__declare_fenv_inline(int)
-feclearexcept(int excepts)
+__declare_fenv_inline(int) feclearexcept(int excepts)
 {
-        (void) excepts;
-	return (0);
+    (void)excepts;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fegetexceptflag(fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 {
-        (void) excepts;
-        (void) flagp;
-	return (0);
-
+    (void)excepts;
+    (void)flagp;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetexceptflag(const fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-        (void) excepts;
-        (void) flagp;
-	return (0);
+    (void)excepts;
+    (void)flagp;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feraiseexcept(int excepts)
+__declare_fenv_inline(int) feraiseexcept(int excepts)
 {
-	return( excepts != 0 );
+    return (excepts != 0);
 }
 
-__declare_fenv_inline(int)
-fesetexcept(int excepts)
+__declare_fenv_inline(int) fesetexcept(int excepts)
 {
-        return( excepts != 0 );
+    return (excepts != 0);
 }
 
-__declare_fenv_inline(int)
-fetestexcept(int excepts)
+__declare_fenv_inline(int) fetestexcept(int excepts)
 {
-        (void) excepts;
-	return (0);
+    (void)excepts;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fegetround(void)
+__declare_fenv_inline(int) fegetround(void)
 {
-	return FE_TONEAREST;
+    return FE_TONEAREST;
 }
 
-__declare_fenv_inline(int)
-fesetround(int rounding_mode)
+__declare_fenv_inline(int) fesetround(int rounding_mode)
 {
-        if (rounding_mode == FE_TONEAREST)
-                return 0;
-	return 1;
+    if (rounding_mode == FE_TONEAREST)
+        return 0;
+    return 1;
 }
 
-__declare_fenv_inline(int)
-fegetenv(fenv_t *envp)
+__declare_fenv_inline(int) fegetenv(fenv_t *envp)
 {
-        (void) envp;
-	return (0);
+    (void)envp;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feholdexcept(fenv_t *envp)
+__declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
-        (void) envp;
-	return (0);
+    (void)envp;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fesetenv(const fenv_t *envp)
+__declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
-        (void) envp;
-	return (0);
+    (void)envp;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-feupdateenv(const fenv_t *envp)
+__declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
-        (void) envp;
+    (void)envp;
 
 #if defined FE_NOMASK_ENV && FE_ALL_EXCEPT != 0
-	  if (envp == FE_NOMASK_ENV)
-	      return 1;
+    if (envp == FE_NOMASK_ENV)
+        return 1;
 #endif
 
-	return (0);
+    return (0);
 }
 
 #if __BSD_VISIBLE
 
-__declare_fenv_inline(int)
-feenableexcept(int __mask)
+__declare_fenv_inline(int) feenableexcept(int __mask)
 {
-        (void) __mask;
-	return (0);
+    (void)__mask;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fedisableexcept(int __mask)
+__declare_fenv_inline(int) fedisableexcept(int __mask)
 {
-        (void) __mask;
-	return (0);
+    (void)__mask;
+    return (0);
 }
 
-__declare_fenv_inline(int)
-fegetexcept(void)
+__declare_fenv_inline(int) fegetexcept(void)
 {
 
-	return (0);
+    return (0);
 }
 
 #endif /* __BSD_VISIBLE */

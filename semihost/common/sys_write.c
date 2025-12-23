@@ -38,6 +38,5 @@
 uintptr_t
 sys_semihost_write(int fd, const void *buf, size_t count)
 {
-    return sys_semihost3(SYS_WRITE, fd, (sh_param_t)(uintptr_t)buf,
-                         count);
+    return sys_semihost3(SYS_WRITE, fd, (sh_param_t)(uintptr_t)buf, count);
 }

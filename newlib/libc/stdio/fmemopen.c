@@ -40,18 +40,18 @@
 
 struct __file_mem {
     struct __file_ext xfile;
-    char *buf;
-    size_t size; /* Current size. */
-    size_t bufsize; /* Upper limit on size. */
-    size_t pos;
-    uint8_t mflags;
+    char             *buf;
+    size_t            size;    /* Current size. */
+    size_t            bufsize; /* Upper limit on size. */
+    size_t            pos;
+    uint8_t           mflags;
 };
 
 static int
 __fmem_put(char c, FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
-    size_t pos = mf->mflags & __MAPP ? mf->size : mf->pos;
+    size_t             pos = mf->mflags & __MAPP ? mf->size : mf->pos;
     if ((f->flags & __SWR) == 0) {
         return _FDEV_ERR;
     } else if (pos < mf->bufsize) {
@@ -137,11 +137,11 @@ __fmem_close(FILE *f)
 FILE *
 fmemopen(void *buf, size_t size, const char *mode)
 {
-    int stdio_flags;
-    int open_flags;
-    uint8_t mflags = 0;
-    size_t initial_pos = 0;
-    size_t initial_size;
+    int                stdio_flags;
+    int                open_flags;
+    uint8_t            mflags = 0;
+    size_t             initial_pos = 0;
+    size_t             initial_size;
     struct __file_mem *mf;
 
     stdio_flags = __stdio_flags(mode, &open_flags);
@@ -191,9 +191,9 @@ fmemopen(void *buf, size_t size, const char *mode)
         initial_size = size;
     }
 
-    *mf = (struct __file_mem){
-        .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush,
-                                __fmem_close, __fmem_seek, NULL, stdio_flags),
+    *mf = (struct __file_mem) {
+        .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush, __fmem_close, __fmem_seek,
+                                NULL, stdio_flags),
         .buf = buf,
         .size = initial_size,
         .bufsize = size,

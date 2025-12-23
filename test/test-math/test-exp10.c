@@ -34,7 +34,7 @@
  */
 
 #define _GNU_SOURCE
-#define TEST_VECTORS    "test-exp10.h"
-#define TEST_FUNC       exp10
+#define TEST_VECTORS "test-exp10.h"
+#define TEST_FUNC    exp10
 
 #include "test-real-one.h"

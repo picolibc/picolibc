@@ -44,9 +44,9 @@
 void *__aeabi_memset(void *dest, size_t n, int c);
 void *__aeabi_memset4(void *dest, size_t n, int c);
 void *__aeabi_memset8(void *dest, size_t n, int c);
-void __aeabi_memclr(void *dest, size_t n);
-void __aeabi_memclr4(void *dest, size_t n);
-void __aeabi_memclr8(void *dest, size_t n);
+void  __aeabi_memclr(void *dest, size_t n);
+void  __aeabi_memclr4(void *dest, size_t n);
+void  __aeabi_memclr8(void *dest, size_t n);
 #endif
 
 static uint8_t crc_table[256];
@@ -69,30 +69,30 @@ init_crc(void)
 {
     int i;
     for (i = 0; i < 256; i++)
-        crc_table[i] = crc8((uint8_t) i);
+        crc_table[i] = crc8((uint8_t)i);
 }
 
 static char
 expect(size_t _pos)
 {
 #ifdef __MSP430__
-    uint32_t pos = (uint32_t) _pos;
+    uint32_t pos = (uint32_t)_pos;
 #else
     size_t pos = _pos;
 #endif
     unsigned int i;
-    uint8_t     c = 0xff;
+    uint8_t      c = 0xff;
     for (i = 0; i < sizeof(size_t); i++)
-        c ^= crc_table[(uint8_t) (pos >> (i * 8))];
-    return (char) c;
+        c ^= crc_table[(uint8_t)(pos >> (i * 8))];
+    return (char)c;
 }
 
 static size_t
 check(char *label, void *buf, size_t size, size_t start, size_t end, int c)
 {
-    size_t      p;
-    size_t      error = 0;
-    char        *b = buf;
+    size_t p;
+    size_t error = 0;
+    char  *b = buf;
 
     for (p = 0; p < size; p++) {
         char g = b[p];
@@ -100,8 +100,8 @@ check(char *label, void *buf, size_t size, size_t start, size_t end, int c)
         if (p < start || end <= p)
             e = expect(p);
         if (g != e) {
-            fprintf(stderr, "%s(%zu, %zu):%zu expect 0x%02x got 0x%02x\n",
-                    label, start, end, p, (uint8_t) e, (uint8_t) g);
+            fprintf(stderr, "%s(%zu, %zu):%zu expect 0x%02x got 0x%02x\n", label, start, end, p,
+                    (uint8_t)e, (uint8_t)g);
             error++;
         }
     }
@@ -111,8 +111,8 @@ check(char *label, void *buf, size_t size, size_t start, size_t end, int c)
 static size_t
 randrange(size_t max)
 {
-    size_t      pot;
-    size_t      rnd;
+    size_t pot;
+    size_t rnd;
 
     for (pot = 1; pot && pot < max; pot <<= 1)
         ;
@@ -124,18 +124,17 @@ randrange(size_t max)
     }
 }
 
+#define MAX_BUF 1024
 
-#define MAX_BUF         1024
-
-#define NEND            64
-#define NSTART          64
+#define NEND    64
+#define NSTART  64
 
 static char buf[MAX_BUF];
 
 static void
 fill(void)
 {
-    size_t      p;
+    size_t p;
 
     for (p = 0; p < MAX_BUF; p++)
         buf[p] = expect(p);
@@ -145,7 +144,7 @@ static size_t
 test(size_t start, size_t end, int c)
 {
     size_t error = 0;
-    char *b = buf;
+    char  *b = buf;
     fill();
     memset(b + start, c, end - start);
     error += check("memset", buf, MAX_BUF, start, end, c);
@@ -187,19 +186,18 @@ test(size_t start, size_t end, int c)
 #endif
 
     return error;
-
 }
 
 int
 main(void)
 {
-    size_t      error;
-    size_t      end;
-    size_t      start;
+    size_t error;
+    size_t end;
+    size_t start;
 
-    int         nend;
-    int         nstart;
-    int         ret = 0;
+    int    nend;
+    int    nstart;
+    int    ret = 0;
 
     init_crc();
     for (nend = 0; nend < NEND; nend++) {

@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _LOG2F_H_
-#define _LOG2F_H_	1
+#define _LOG2F_H_ 1
 
 #include <spu_intrinsics.h>
 #include "headers/dom_chkf_less_than.h"
@@ -66,59 +66,60 @@
  *	This function assumes that x is a non-zero positive value.
  */
 
-static __inline float _log2f(float x)
+static __inline float
+_log2f(float x)
 {
-  union {
-    unsigned int ui;
-    float f;
-  } in;
-  int exponent;
-  float result;
-  float x2, x4;
-  float hi, lo;
-  vector float vx;
-  vector float vc = { 0.0, 0.0, 0.0, 0.0 };
+    union {
+        unsigned int ui;
+        float        f;
+    } in;
+    int          exponent;
+    float        result;
+    float        x2, x4;
+    float        hi, lo;
+    vector float vx;
+    vector float vc = { 0.0, 0.0, 0.0, 0.0 };
 
-  in.f = x;
+    in.f = x;
 
-  /* Extract the exponent from the input X.
-   */
-  exponent = (signed)((in.ui >> 23) & 0xFF) - 127;
+    /* Extract the exponent from the input X.
+     */
+    exponent = (signed)((in.ui >> 23) & 0xFF) - 127;
 
-  /* Compute the remainder after removing the exponent.
-   */
-  in.ui -= exponent << 23;
+    /* Compute the remainder after removing the exponent.
+     */
+    in.ui -= exponent << 23;
 
-  /* Calculate the log2 of the remainder using the polynomial
-   * approximation.
-   */
-  x = in.f - 1.0f;
+    /* Calculate the log2 of the remainder using the polynomial
+     * approximation.
+     */
+    x = in.f - 1.0f;
 
-  /* Instruction counts can be reduced if the polynomial was
-   * computed entirely from nested (dependent) fma's. However,
-   * to reduce the number of pipeline stalls, the polygon is evaluated
-   * in two halves (hi amd lo).
-   */
-  x2 = x * x;
-  x4 = x2 * x2;
-  hi = -0.0093104962134977f*x + 0.052064690894143f;
-  hi =                   hi*x - 0.13753123777116f;
-  hi =                   hi*x + 0.24187369696082f;
-  hi =                   hi*x - 0.34730547155299f;
-  lo =  0.47868480909345f  *x - 0.72116591947498f;
-  lo =                   lo*x + 1.4426898816672f;
-  lo =                   lo*x;
-  result = hi*x4 + lo;
+    /* Instruction counts can be reduced if the polynomial was
+     * computed entirely from nested (dependent) fma's. However,
+     * to reduce the number of pipeline stalls, the polygon is evaluated
+     * in two halves (hi amd lo).
+     */
+    x2 = x * x;
+    x4 = x2 * x2;
+    hi = -0.0093104962134977f * x + 0.052064690894143f;
+    hi = hi * x - 0.13753123777116f;
+    hi = hi * x + 0.24187369696082f;
+    hi = hi * x - 0.34730547155299f;
+    lo = 0.47868480909345f * x - 0.72116591947498f;
+    lo = lo * x + 1.4426898816672f;
+    lo = lo * x;
+    result = hi * x4 + lo;
 
-  /* Add the exponent back into the result.
-   */
-  result += (float)(exponent);
+    /* Add the exponent back into the result.
+     */
+    result += (float)(exponent);
 
 #ifndef __IEEE_LIBM
-  vx = spu_promote(x, 0);
-  dom_chkf_less_than(vx, vc);
+    vx = spu_promote(x, 0);
+    dom_chkf_less_than(vx, vc);
 #endif
-  return (result);
+    return (result);
 }
 
 #endif /* _LOG2F_H_ */

@@ -42,75 +42,68 @@
 #define MEMMOVE_BY_BLOCK_THRESHOLD (44 * 2)
 
 /* No name ambiguities in this file.  */
-__asm__ (".syntax no_register_prefix");
+__asm__(".syntax no_register_prefix");
 
 void *
 memmove(void *pdst, const void *psrc, size_t pn)
 {
-  /* Now we want the parameters put in special registers.
-     Make sure the compiler is able to make something useful of this.
-     As it is now: r10 -> r13; r11 -> r11 (nop); r12 -> r12 (nop).
+    /* Now we want the parameters put in special registers.
+       Make sure the compiler is able to make something useful of this.
+       As it is now: r10 -> r13; r11 -> r11 (nop); r12 -> r12 (nop).
 
-     If gcc was allright, it really would need no temporaries, and no
-     stack space to save stuff on.  */
+       If gcc was allright, it really would need no temporaries, and no
+       stack space to save stuff on.  */
 
-  register void *return_dst __asm__ ("r10") = pdst;
-  register unsigned char *dst __asm__ ("r13") = pdst;
-  register unsigned const char *src __asm__ ("r11") = psrc;
-  register int n __asm__ ("r12") = pn;
+    register void                *return_dst __asm__("r10") = pdst;
+    register unsigned char       *dst __asm__("r13") = pdst;
+    register unsigned const char *src __asm__("r11") = psrc;
+    register int                  n __asm__("r12") = pn;
 
-  /* Check and handle overlap.  */
-  if (src < dst && dst < src + n)
-    {
-      /* Destructive overlap.  We could optimize this, but we don't (for
-	 the moment).  */
-      src += n;
-      dst += n;
-      while (n--)
-	{
-	  *--dst = *--src;
-	}
+    /* Check and handle overlap.  */
+    if (src < dst && dst < src + n) {
+        /* Destructive overlap.  We could optimize this, but we don't (for
+           the moment).  */
+        src += n;
+        dst += n;
+        while (n--) {
+            *--dst = *--src;
+        }
 
-      return return_dst;
+        return return_dst;
     }
-  /* Whew, no overlap.  Proceed as with memcpy.  We could call it instead
-     of having a copy here.  That would spoil some of the optimization, so
-     we take the trouble with having two copies.  */
+    /* Whew, no overlap.  Proceed as with memcpy.  We could call it instead
+       of having a copy here.  That would spoil some of the optimization, so
+       we take the trouble with having two copies.  */
 
-  /* When src is aligned but not dst, this makes a few extra needless
-     cycles.  I believe it would take as many to check that the
-     re-alignment was unnecessary.  */
-  if (((unsigned long) dst & 3) != 0
-      /* Don't align if we wouldn't copy more than a few bytes; so we
-	 don't have to check further for overflows.  */
-      && n >= 3)
-  {
-    if ((unsigned long) dst & 1)
-      {
-	n--;
-	*dst = *src;
-	src++;
-	dst++;
-      }
+    /* When src is aligned but not dst, this makes a few extra needless
+       cycles.  I believe it would take as many to check that the
+       re-alignment was unnecessary.  */
+    if (((unsigned long)dst & 3) != 0
+        /* Don't align if we wouldn't copy more than a few bytes; so we
+           don't have to check further for overflows.  */
+        && n >= 3) {
+        if ((unsigned long)dst & 1) {
+            n--;
+            *dst = *src;
+            src++;
+            dst++;
+        }
 
-    if ((unsigned long) dst & 2)
-      {
-	n -= 2;
-	*(short *) dst = *(short *) src;
-	src += 2;
-	dst += 2;
-      }
-  }
+        if ((unsigned long)dst & 2) {
+            n -= 2;
+            *(short *)dst = *(short *)src;
+            src += 2;
+            dst += 2;
+        }
+    }
 
-  /* Decide which copying method to use.  */
-  if (n >= MEMMOVE_BY_BLOCK_THRESHOLD)
-    {
-      /* It is not optimal to tell the compiler about clobbering any
-	 registers; that will move the saving/restoring of those registers
-	 to the function prologue/epilogue, and make non-movem sizes
-	 suboptimal.  */
-      __asm__ volatile
-	("\
+    /* Decide which copying method to use.  */
+    if (n >= MEMMOVE_BY_BLOCK_THRESHOLD) {
+        /* It is not optimal to tell the compiler about clobbering any
+           registers; that will move the saving/restoring of those registers
+           to the function prologue/epilogue, and make non-movem sizes
+           suboptimal.  */
+        __asm__ volatile("\
 	 ;; GCC does promise correct register allocations, but let's	\n\
 	 ;; make sure it keeps its promises.				\n\
 	 .ifnc %0-%1-%2,$r13-$r11-$r12					\n\
@@ -132,11 +125,11 @@ memmove(void *pdst, const void *psrc, size_t pn)
 0:									\n\
 "
 #ifdef __arch_common_v10_v32
-	 /* Cater to branch offset difference between v32 and v10.  We
-	    assume the branch below has an 8-bit offset.  */
-"	 setf\n"
+                         /* Cater to branch offset difference between v32 and v10.  We
+                            assume the branch below has an 8-bit offset.  */
+                         "	 setf\n"
 #endif
-"	 movem	[r11+],r10						\n\
+                         "	 movem	[r11+],r10						\n\
 	 subq	44,r12							\n\
 	 bge	 0b							\n\
 	 movem	r10,[r13+]						\n\
@@ -147,113 +140,169 @@ memmove(void *pdst, const void *psrc, size_t pn)
 	 ;; Restore registers from stack.				\n\
 	 movem [sp+],r10"
 
-	 /* Outputs.  */
-	 : "=r" (dst), "=r" (src), "=r" (n)
+                         /* Outputs.  */
+                         : "=r"(dst), "=r"(src), "=r"(n)
 
-	 /* Inputs.  */
-	 : "0" (dst), "1" (src), "2" (n));
+                         /* Inputs.  */
+                         : "0"(dst), "1"(src), "2"(n));
     }
 
-  while (n >= 16)
-    {
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
+    while (n >= 16) {
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
 
-      n -= 16;
+        n -= 16;
     }
 
-  switch (n)
-    {
+    switch (n) {
     case 0:
-      break;
+        break;
 
     case 1:
-      *dst = *src;
-      break;
+        *dst = *src;
+        break;
 
     case 2:
-      *(short *) dst = *(short *) src;
-      break;
+        *(short *)dst = *(short *)src;
+        break;
 
     case 3:
-      *(short *) dst = *(short *) src; dst += 2; src += 2;
-      *dst = *src;
-      break;
+        *(short *)dst = *(short *)src;
+        dst += 2;
+        src += 2;
+        *dst = *src;
+        break;
 
     case 4:
-      *(long *) dst = *(long *) src;
-      break;
+        *(long *)dst = *(long *)src;
+        break;
 
     case 5:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *dst = *src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *dst = *src;
+        break;
 
     case 6:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(short *) dst = *(short *) src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(short *)dst = *(short *)src;
+        break;
 
     case 7:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(short *) dst = *(short *) src; dst += 2; src += 2;
-      *dst = *src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(short *)dst = *(short *)src;
+        dst += 2;
+        src += 2;
+        *dst = *src;
+        break;
 
     case 8:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        break;
 
     case 9:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *dst = *src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *dst = *src;
+        break;
 
     case 10:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(short *) dst = *(short *) src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(short *)dst = *(short *)src;
+        break;
 
     case 11:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(short *) dst = *(short *) src; dst += 2; src += 2;
-      *dst = *src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(short *)dst = *(short *)src;
+        dst += 2;
+        src += 2;
+        *dst = *src;
+        break;
 
     case 12:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        break;
 
     case 13:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *dst = *src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *dst = *src;
+        break;
 
     case 14:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(short *) dst = *(short *) src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(short *)dst = *(short *)src;
+        break;
 
     case 15:
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(long *) dst = *(long *) src; dst += 4; src += 4;
-      *(short *) dst = *(short *) src; dst += 2; src += 2;
-      *dst = *src;
-      break;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(long *)dst = *(long *)src;
+        dst += 4;
+        src += 4;
+        *(short *)dst = *(short *)src;
+        dst += 2;
+        src += 2;
+        *dst = *src;
+        break;
     }
 
-  return return_dst;
+    return return_dst;
 }

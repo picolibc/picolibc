@@ -10,11 +10,11 @@
 #ifdef __HAVE_LONG_DOUBLE
 
 long double
-creall (long double complex z)
+creall(long double complex z)
 {
-  long_double_complex w = { .z = z };
+    long_double_complex w = { .z = z };
 
-  return (REAL_PART(w));
+    return (REAL_PART(w));
 }
 
 #endif /* __HAVE_LONG_DOUBLE */

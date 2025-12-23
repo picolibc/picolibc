@@ -28,11 +28,11 @@
 #include <math.h>
 
 float
-truncf (float x)
+truncf(float x)
 {
-  float result;
-  __asm__("frintz\t%s0, %s1" : "=w" (result) : "w" (x));
-  return result;
+    float result;
+    __asm__("frintz\t%s0, %s1" : "=w"(result) : "w"(x));
+    return result;
 }
 
 #else

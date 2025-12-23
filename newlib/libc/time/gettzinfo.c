@@ -6,7 +6,7 @@
 static __tzinfo_type tzinfo;
 
 __tzinfo_type *
-__gettzinfo (void)
+__gettzinfo(void)
 {
-  return &tzinfo;
+    return &tzinfo;
 }

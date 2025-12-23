@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _ISNANF4_H_
-#define _ISNANF4_H_	1
+#define _ISNANF4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -46,10 +46,10 @@
  *	vector unsigned int _isnanf4(vector float x)
  *
  * DESCRIPTION
- *      The _isnanf4 function returns a vector in which each element indicates 
+ *      The _isnanf4 function returns a vector in which each element indicates
  *      if the corresponding element of x is NaN.
  *
- *      On the SPU, this function always returns 0, since NaNs are not 
+ *      On the SPU, this function always returns 0, since NaNs are not
  *      supported.
  *
  * RETURNS
@@ -57,9 +57,10 @@
  *      0        (0x00000000)  otherwise (always on the SPU)
  *
  */
-static __inline vector unsigned int _isnanf4(vector float __unusedx)
+static __inline vector unsigned int
+_isnanf4(vector float __unusedx)
 {
-  return spu_splats((unsigned int)0);	
+    return spu_splats((unsigned int)0);
 }
 
 #endif // _ISNANF4_H_

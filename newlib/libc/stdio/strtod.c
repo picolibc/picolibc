@@ -30,7 +30,6 @@
 
 /* $Id: strtod.c 2191 2010-11-05 13:45:57Z arcanum $ */
 
-
 /**  The strtod() function converts the initial portion of the string pointed
      to by \a nptr to double representation.
 
@@ -64,16 +63,16 @@
 #include "conv_flt.c"
 
 #ifdef WIDE_CHARS
-#define strtod wcstod
+#define strtod  wcstod
 #define strtold wcstold
 #endif
 
 double
-strtod (const CHAR * nptr, CHAR ** endptr)
+strtod(const CHAR *nptr, CHAR **endptr)
 {
-    int len = 0;
+    int    len = 0;
     double flt;
-    UCHAR ret;
+    UCHAR  ret;
 
     while (ISSPACE(nptr[len]))
         len++;
@@ -84,7 +83,7 @@ strtod (const CHAR * nptr, CHAR ** endptr)
         len = 0;
     }
     if (endptr)
-        *endptr = (CHAR *) nptr + len;
+        *endptr = (CHAR *)nptr + len;
     return flt;
 }
 
@@ -93,9 +92,9 @@ strtod (const CHAR * nptr, CHAR ** endptr)
 __strong_reference_dup(strtod, strtold);
 #else
 long double
-strtold (const CHAR * nptr, CHAR ** endptr)
+strtold(const CHAR *nptr, CHAR **endptr)
 {
-	return (long double) strtod(nptr, endptr);
+    return (long double)strtod(nptr, endptr);
 }
 #endif
 #endif

@@ -32,7 +32,7 @@ int
 posix_memalign(void **memptr, size_t align, size_t size)
 {
     /* Return EINVAL if align isn't power of 2 or not a multiple of a pointer size */
-    if ((align & (align-1)) != 0 || align % sizeof(void*) != 0 || align == 0)
+    if ((align & (align - 1)) != 0 || align % sizeof(void *) != 0 || align == 0)
         return EINVAL;
 
     void *mem = memalign(align, size);

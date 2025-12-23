@@ -38,7 +38,7 @@
 #ifdef __SPU__
 
 #ifndef _LOGBF4_H_
-#define _LOGBF4_H_	1
+#define _LOGBF4_H_ 1
 
 #include <spu_intrinsics.h>
 #include <vec_types.h>
@@ -59,38 +59,35 @@
  *    x = infinity, +infinity is returned.
  *
  */
-static __inline vector float _logbf4(vector float x)
+static __inline vector float
+_logbf4(vector float x)
 {
-  vec_uint4 lzero     = (vector unsigned int) {0, 0, 0, 0};
-  vec_uint4 exp_mask  = (vector unsigned int) {0xFF, 0xFF, 0xFF, 0xFF};
-  vec_int4  exp_shift = (vector signed int) { -23,  -23,  -23,  -23};
-  vec_int4  exp_bias  = (vector signed int) {-127, -127, -127, -127};
-  vec_uint4 sign_mask = (vector unsigned int) {0x80000000, 0x80000000,
-		                                       0x80000000, 0x80000000};
-  vec_uint4 linf      = (vector unsigned int) {0x7F800000, 0x7F800000,
-		                                       0x7F800000, 0x7F800000};
-  vec_uint4 lminf     = (vector unsigned int) {0xFF800000, 0xFF800000,
-		                                       0xFF800000, 0xFF800000};
-  vec_uint4 exp;
-  vec_uint4 xabs;
-  vec_float4 exp_unbias;
+    vec_uint4  lzero = (vector unsigned int) { 0, 0, 0, 0 };
+    vec_uint4  exp_mask = (vector unsigned int) { 0xFF, 0xFF, 0xFF, 0xFF };
+    vec_int4   exp_shift = (vector signed int) { -23, -23, -23, -23 };
+    vec_int4   exp_bias = (vector signed int) { -127, -127, -127, -127 };
+    vec_uint4  sign_mask = (vector unsigned int) { 0x80000000, 0x80000000, 0x80000000, 0x80000000 };
+    vec_uint4  linf = (vector unsigned int) { 0x7F800000, 0x7F800000, 0x7F800000, 0x7F800000 };
+    vec_uint4  lminf = (vector unsigned int) { 0xFF800000, 0xFF800000, 0xFF800000, 0xFF800000 };
+    vec_uint4  exp;
+    vec_uint4  xabs;
+    vec_float4 exp_unbias;
 
+    xabs = spu_andc((vec_uint4)x, sign_mask);
 
-  xabs = spu_andc((vec_uint4)x, sign_mask);
+    exp = spu_and(spu_rlmask((vec_uint4)x, exp_shift), exp_mask);
+    exp_unbias = spu_convtf(spu_add((vec_int4)exp, exp_bias), 0);
 
-  exp  = spu_and(spu_rlmask((vec_uint4)x, exp_shift), exp_mask);
-  exp_unbias = spu_convtf(spu_add((vec_int4)exp, exp_bias), 0);
+    /* Zero */
+    exp_unbias = spu_sel(exp_unbias, (vec_float4)lminf, (vec_uint4)spu_cmpeq(xabs, lzero));
 
-  /* Zero */
-  exp_unbias = spu_sel(exp_unbias, (vec_float4)lminf, (vec_uint4)spu_cmpeq(xabs, lzero));
+    /* NaN */
+    exp_unbias = spu_sel(exp_unbias, x, (vec_uint4)spu_cmpgt(xabs, linf));
 
-  /* NaN */
-  exp_unbias = spu_sel(exp_unbias, x, (vec_uint4)spu_cmpgt(xabs, linf));
+    /* Infinite */
+    exp_unbias = spu_sel(exp_unbias, (vec_float4)linf, (vec_uint4)spu_cmpeq(xabs, linf));
 
-  /* Infinite */
-  exp_unbias = spu_sel(exp_unbias, (vec_float4)linf, (vec_uint4)spu_cmpeq(xabs, linf));
-
-  return (exp_unbias);
+    return (exp_unbias);
 }
 
 #endif /* _LOGBF4_H_ */

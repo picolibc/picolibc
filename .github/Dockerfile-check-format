@@ -1,0 +1,25 @@
+FROM debian:sid
+
+COPY .github/check-format-packages.txt /
+
+COPY .github/check-format-files.txt /
+
+RUN (apt-get update || apt-get update || apt-get update) && \
+    (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
+    (xargs -a check-format-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a check-format-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a check-format-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a check-format-packages.txt apt-get install -y --no-install-recommends) && \
+    apt-get clean && \
+    mkdir -p /opt && \
+    (cd /opt && \
+     for file in `cat /check-format-files.txt`; do \
+	echo "Fetching $file"; \
+	wget -nv "$file" || exit 1; \
+	echo "Unpacking $file"; \
+	tar xf `basename "$file"`; \
+	echo "Removing $file"; \
+	rm `basename "$file"`; \
+     done) && \
+    rm -rf /var/lib/apt/lists/*
+

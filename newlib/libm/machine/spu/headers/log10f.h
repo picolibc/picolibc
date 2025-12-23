@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _LOG10F_H_
-#define _LOG10F_H_	1
+#define _LOG10F_H_ 1
 
 #include "log2f.h"
 
@@ -46,9 +46,10 @@
  *	   log10f(x) = log2(x) / log2(10);
  */
 
-static __inline float _log10f(float x)
+static __inline float
+_log10f(float x)
 {
-  return (_log2f(x) * 0.30102999566398f);
+    return (_log2f(x) * 0.30102999566398f);
 }
 
 #endif /* _LOG10F_H_ */

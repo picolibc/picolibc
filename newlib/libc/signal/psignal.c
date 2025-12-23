@@ -4,11 +4,11 @@ FUNCTION
 <<psignal>>---print a signal message on standard error
 
 INDEX
-	psignal
+        psignal
 
 SYNOPSIS
-	#include <stdio.h>
-	void psignal(int <[signal]>, const char *<[prefix]>);
+        #include <stdio.h>
+        void psignal(int <[signal]>, const char *<[prefix]>);
 
 DESCRIPTION
 Use <<psignal>> to print (on standard error) a signal message
@@ -36,11 +36,10 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <signal.h>
 
 void
-psignal (int sig,
-       const char *s)
+psignal(int sig, const char *s)
 {
-  fflush (stderr);
-  if (s != NULL && *s != '\0')
-      fprintf(stderr, "%s: ", s);
-  fprintf(stderr, "%s\n", strsignal(sig));
+    fflush(stderr);
+    if (s != NULL && *s != '\0')
+        fprintf(stderr, "%s: ", s);
+    fprintf(stderr, "%s\n", strsignal(sig));
 }

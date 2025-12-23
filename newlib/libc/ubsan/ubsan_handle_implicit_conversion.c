@@ -40,26 +40,23 @@ static const char * const implicit_conversion_kinds[] = {
     [implicit_conversion_unsigned_integer_truncation] = "unsigned integer truncation",
     [implicit_conversion_signed_integer_truncation] = "signed integer truncation",
     [implicit_conversion_integer_sign_change] = "integer sign change",
-    [implicit_conversion_signed_integer_truncation_or_sign_change] = "signed integer truncation or sign change",
+    [implicit_conversion_signed_integer_truncation_or_sign_change]
+    = "signed integer truncation or sign change",
 };
 
 void
-__ubsan_handle_implicit_conversion(void *_data,
-                                   void *src,
-                                   void *dst)
+__ubsan_handle_implicit_conversion(void *_data, void *src, void *dst)
 {
     struct implicit_conversion_data *data = _data;
-    char src_str[VAL_STR_LEN];
-    char dst_str[VAL_STR_LEN];
-    const char *kind;
+    char                             src_str[VAL_STR_LEN];
+    char                             dst_str[VAL_STR_LEN];
+    const char                      *kind;
     __ubsan_val_to_string(src_str, data->from_type, src);
     __ubsan_val_to_string(dst_str, data->to_type, dst);
     if (data->kind < sizeof(implicit_conversion_kinds) / sizeof(implicit_conversion_kinds[0]))
         kind = implicit_conversion_kinds[data->kind];
     else
         kind = "unknown conversion kind";
-    __ubsan_error(&data->location, "implicit_conversion", "%s: (%s) %s -> (%s) %s\n",
-                  kind,
-                  data->from_type->type_name, src_str,
-                  data->to_type->type_name, dst_str);
+    __ubsan_error(&data->location, "implicit_conversion", "%s: (%s) %s -> (%s) %s\n", kind,
+                  data->from_type->type_name, src_str, data->to_type->type_name, dst_str);
 }

@@ -14,14 +14,14 @@ static void (*fortify_handler)(int sig);
 __noreturn void
 __chk_fail(void)
 {
-  puts(CHK_FAIL_MSG);
-  if (fortify_handler)
-      (*fortify_handler)(SIGABRT);
-  abort();
+    puts(CHK_FAIL_MSG);
+    if (fortify_handler)
+        (*fortify_handler)(SIGABRT);
+    abort();
 }
 
 void
-set_fortify_handler (void (*handler) (int sig))
+set_fortify_handler(void (*handler)(int sig))
 {
     fortify_handler = handler;
 }

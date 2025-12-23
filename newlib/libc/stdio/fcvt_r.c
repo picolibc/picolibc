@@ -40,18 +40,13 @@
 #include "dtoa.h"
 
 int
-fcvt_r (double invalue,
-        int ndecimal,
-        int *decpt,
-        int *sign,
-        char *buf,
-        size_t len)
+fcvt_r(double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)
 {
     struct dtoa dtoa;
-    int ntrailing;      /* number of zeros to add after the value */
-    int ndigit;         /* numer of generated digits */
-    int dtoa_decimal = ndecimal;
-    char *digits = dtoa.digits;
+    int         ntrailing; /* number of zeros to add after the value */
+    int         ndigit;    /* numer of generated digits */
+    int         dtoa_decimal = ndecimal;
+    char       *digits = dtoa.digits;
 
     if (!isfinite(invalue)) {
         ndigit = 3;
@@ -116,7 +111,7 @@ fcvt_r (double invalue,
     /* If we can't fit the whole value in the provided space,
      * return an error
      */
-    if ((size_t) (ndigit + ntrailing) >= len)
+    if ((size_t)(ndigit + ntrailing) >= len)
         return -1;
 
     /* Value */
@@ -137,14 +132,9 @@ fcvt_r (double invalue,
 #include "stdio_private.h"
 
 int
-fcvt_r (double invalue,
-        int ndecimal,
-        int *decpt,
-        int *sign,
-        char *buf,
-        size_t len)
+fcvt_r(double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)
 {
-    return fcvtf_r((float) invalue, ndecimal, decpt, sign, buf, len);
+    return fcvtf_r((float)invalue, ndecimal, decpt, sign, buf, len);
 }
 
 #endif

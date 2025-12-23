@@ -31,7 +31,7 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FABSF_H_
-#define _FABSF_H_	1
+#define _FABSF_H_ 1
 
 /*
  * FUNCTION
@@ -43,18 +43,17 @@
  *	 significant bit (ie, the sign	bit) of the floating-point value.
  */
 
-static __inline float _fabsf(float value)
+static __inline float
+_fabsf(float value)
 {
-  union {
-    unsigned int ui;
-    float f;
-  } in;
+    union {
+        unsigned int ui;
+        float        f;
+    } in;
 
-  in.f = value;
-  in.ui = (in.ui << 1) >> 1;
+    in.f = value;
+    in.ui = (in.ui << 1) >> 1;
 
-  return (in.f);
+    return (in.f);
 }
 #endif /* _FABSF_H_ */
-
-

@@ -44,15 +44,13 @@
 
 #ifndef _SSIZE_T_DECLARED
 typedef _ssize_t ssize_t;
-#define	_SSIZE_T_DECLARED
+#define _SSIZE_T_DECLARED
 #endif
 
 _BEGIN_STD_C
 
-ssize_t  strfmon(char *__restrict, size_t,
-                 const char *__restrict, ...);
-ssize_t  strfmon_l(char *__restrict, size_t, locale_t,
-                   const char *__restrict, ...);
+ssize_t strfmon(char * __restrict, size_t, const char * __restrict, ...);
+ssize_t strfmon_l(char * __restrict, size_t, locale_t, const char * __restrict, ...);
 
 _END_STD_C
 

@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -64,17 +64,16 @@ QUICKREF
 
 */
 
-
 #include <complex.h>
 #include <math.h>
 
 double complex
 cexp(double complex z)
 {
-	double r, x, y;
+    double r, x, y;
 
-	x = creal(z);
-	y = cimag(z);
-	r = exp(x);
-	return (double complex) (r * cos(y)) + r * sin(y) * (double complex) I;
+    x = creal(z);
+    y = cimag(z);
+    r = exp(x);
+    return (double complex)(r * cos(y)) + r * sin(y) * (double complex)I;
 }

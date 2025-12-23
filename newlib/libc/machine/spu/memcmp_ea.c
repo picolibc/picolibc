@@ -37,44 +37,42 @@ POSSIBILITY OF SUCH DAMAGE.
 #include <ea.h>
 #include <spu_cache.h>
 
-COMPAT_EA_ALIAS (memcmp_ea);
+COMPAT_EA_ALIAS(memcmp_ea);
 
 int
-memcmp_ea (__ea void *s1, __ea const void *s2, size_ea_t n)
+memcmp_ea(__ea void *s1, __ea const void *s2, size_ea_t n)
 {
-  __ea void *curr_s1 = s1;
-  __ea void *curr_s2 = (__ea void *) s2;
-  void *l_s1;
-  void *l_s2;
-  size_ea_t local_n;
-  size_ea_t s2_n;
-  size_ea_t s1_n;
-  int ret;
+    __ea void *curr_s1 = s1;
+    __ea void *curr_s2 = (__ea void *)s2;
+    void      *l_s1;
+    void      *l_s2;
+    size_ea_t  local_n;
+    size_ea_t  s2_n;
+    size_ea_t  s1_n;
+    int        ret;
 
-  ret = 0;
-  while (n)
-    {
-      l_s2 = __cache_fetch (curr_s2);
-      l_s1 = __cache_fetch (curr_s1);
+    ret = 0;
+    while (n) {
+        l_s2 = __cache_fetch(curr_s2);
+        l_s1 = __cache_fetch(curr_s1);
 
-      /*
-       * Use the smaller of the size left to compare (n), the space left in
-       * s2 cacheline (s2_n), or the space left in the s1 cacheline (s1_n).
-       */
-      s2_n = ROUND_UP_NEXT_128 ((size_ea_t) curr_s2) - (size_ea_t) curr_s2;
-      s1_n = ROUND_UP_NEXT_128 ((size_ea_t) curr_s1) - (size_ea_t) curr_s1;
-      local_n = three_way_min (s2_n, s1_n, n);
+        /*
+         * Use the smaller of the size left to compare (n), the space left in
+         * s2 cacheline (s2_n), or the space left in the s1 cacheline (s1_n).
+         */
+        s2_n = ROUND_UP_NEXT_128((size_ea_t)curr_s2) - (size_ea_t)curr_s2;
+        s1_n = ROUND_UP_NEXT_128((size_ea_t)curr_s1) - (size_ea_t)curr_s1;
+        local_n = three_way_min(s2_n, s1_n, n);
 
-      ret = memcmp (l_s1, l_s2, local_n);
-      if (ret)
-	return ret;
+        ret = memcmp(l_s1, l_s2, local_n);
+        if (ret)
+            return ret;
 
-      /* update values to take into account what we copied */
-      curr_s2 += local_n;
-      curr_s1 += local_n;
-      n -= local_n;
-
+        /* update values to take into account what we copied */
+        curr_s2 += local_n;
+        curr_s1 += local_n;
+        n -= local_n;
     }
 
-  return ret;
+    return ret;
 }

@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -64,16 +64,15 @@ QUICKREF
 
 */
 
-
 #include <complex.h>
 #include <math.h>
 
 double complex
 ccosh(double complex z)
 {
-	double x, y;
+    double x, y;
 
-	x = creal(z);
-	y = cimag(z);
-	return cosh(x) * cos(y) * (double complex) 1.0 + (sinh(x) * sin(y)) * (double complex) I;
+    x = creal(z);
+    y = cimag(z);
+    return cosh(x) * cos(y) * (double complex)1.0 + (sinh(x) * sin(y)) * (double complex)I;
 }

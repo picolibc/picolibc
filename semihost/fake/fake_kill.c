@@ -39,6 +39,17 @@
 #include <unistd.h>
 #include <errno.h>
 
-pid_t getpid(void) { return 1; }
+pid_t
+getpid(void)
+{
+    return 1;
+}
 
-int kill(pid_t pid, int sig) { if (pid == 1) _exit(128 + sig); errno = ESRCH; return -1; }
+int
+kill(pid_t pid, int sig)
+{
+    if (pid == 1)
+        _exit(128 + sig);
+    errno = ESRCH;
+    return -1;
+}

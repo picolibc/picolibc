@@ -31,10 +31,10 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _ATANF_H_
-#define _ATANF_H_	1
+#define _ATANF_H_ 1
 
 #ifndef M_PI_2
-#define M_PI_2		1.5707963267949f
+#define M_PI_2 1.5707963267949f
 #endif /* M_PI_2 */
 
 /*
@@ -63,50 +63,48 @@
  *	[-infinity, -1] : -PI/2 + atanf(-1/x)
  */
 
-static __inline float _atanf(float x)
+static __inline float
+_atanf(float x)
 {
-  float xabs;
-  float bias;
-  float x2, x3, x4, x8, x9;
-  float hi, lo;
-  float result;
+    float xabs;
+    float bias;
+    float x2, x3, x4, x8, x9;
+    float hi, lo;
+    float result;
 
-  bias = 0.0f;
-  xabs = (x < 0.0f) ? -x : x;
+    bias = 0.0f;
+    xabs = (x < 0.0f) ? -x : x;
 
-  if (xabs >= 1.0f) {
-    bias = M_PI_2;
-    if (x < 0.0f) {
-      bias = -bias;
+    if (xabs >= 1.0f) {
+        bias = M_PI_2;
+        if (x < 0.0f) {
+            bias = -bias;
+        }
+        x = -1.0f / x;
     }
-    x = -1.0f / x;
-  }
-  /* Instruction counts can be reduced if the polynomial was
-   * computed entirely from nested (dependent) fma's. However,
-   * to reduce the number of pipeline stalls, the polygon is evaluated
-   * in two halves(hi and lo).
-   */
-  bias += x;
+    /* Instruction counts can be reduced if the polynomial was
+     * computed entirely from nested (dependent) fma's. However,
+     * to reduce the number of pipeline stalls, the polygon is evaluated
+     * in two halves(hi and lo).
+     */
+    bias += x;
 
-  x2 = x * x;
-  x3 = x2 * x;
-  x4 = x2 * x2;
-  x8 = x4 * x4;
-  x9 = x8 * x;
-  hi =  0.0028662257f * x2 - 0.0161657367f;
-  hi =             hi * x2 + 0.0429096138f;
-  hi =             hi * x2 - 0.0752896400f;
-  hi =             hi * x2 + 0.1065626393f;
-  lo = -0.1420889944f * x2 + 0.1999355085f;
-  lo =             lo * x2 - 0.3333314528f;
-  lo =             lo * x3 + bias;
+    x2 = x * x;
+    x3 = x2 * x;
+    x4 = x2 * x2;
+    x8 = x4 * x4;
+    x9 = x8 * x;
+    hi = 0.0028662257f * x2 - 0.0161657367f;
+    hi = hi * x2 + 0.0429096138f;
+    hi = hi * x2 - 0.0752896400f;
+    hi = hi * x2 + 0.1065626393f;
+    lo = -0.1420889944f * x2 + 0.1999355085f;
+    lo = lo * x2 - 0.3333314528f;
+    lo = lo * x3 + bias;
 
-  result = hi * x9 + lo;
+    result = hi * x9 + lo;
 
-  return (result);
+    return (result);
 }
 
 #endif /* _ATANF_H_ */
-
-
-

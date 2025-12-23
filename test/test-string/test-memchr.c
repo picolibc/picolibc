@@ -39,10 +39,10 @@
 #include <stdlib.h>
 #include <inttypes.h>
 
-#define SEED            42
-#define HAY_MAX         2048
+#define SEED    42
+#define HAY_MAX 2048
 
-static uint8_t  hay[HAY_MAX];
+static uint8_t hay[HAY_MAX];
 
 /* Generate random uint8_t */
 static uint8_t
@@ -54,24 +54,24 @@ rand_byte(void)
 static int
 rand_int(void)
 {
-    int i;
+    int      i;
     unsigned r = 0;
 
     for (i = 0; i < __INT_WIDTH__; i += 8) {
-        r |= (unsigned) rand_byte() << i;
+        r |= (unsigned)rand_byte() << i;
     }
-    return (int) r;
+    return (int)r;
 }
 
 /* Generate random size_t */
 static size_t
 rand_size_t(void)
 {
-    size_t      r = 0;
-    size_t      i;
+    size_t r = 0;
+    size_t i;
 
     for (i = 0; i < SIZE_WIDTH; i += 8) {
-        r |= (size_t) rand_byte() << i;
+        r |= (size_t)rand_byte() << i;
     }
     return r;
 }
@@ -80,8 +80,8 @@ rand_size_t(void)
 static size_t
 rand_range(size_t max)
 {
-    size_t      mask = ~(size_t)0;
-    size_t      ret;
+    size_t mask = ~(size_t)0;
+    size_t ret;
 
     if (max == 0)
         return 0;
@@ -112,9 +112,9 @@ rand_pos(size_t max)
 
 #ifdef __MSP430__
 /* MSP430 emulator is rather slow */
-#define LOOPS   4
+#define LOOPS 4
 #else
-#define LOOPS   32
+#define LOOPS 32
 #endif
 
 static void
@@ -137,13 +137,14 @@ fixup_hay(uint8_t *hay, size_t hay_size, uint8_t needle)
     }
 }
 
-int main(void)
+int
+main(void)
 {
-    static size_t       hay_start, hay_size;
-    int                 ret = 0;
-    int                 hay_size_loop;
-    int                 needle_pos_loop;
-    size_t              needle_pos_1, needle_pos_2;
+    static size_t hay_start, hay_size;
+    int           ret = 0;
+    int           hay_size_loop;
+    int           needle_pos_loop;
+    size_t        needle_pos_1, needle_pos_2;
 
     srand(SEED);
 
@@ -159,8 +160,8 @@ int main(void)
             for (needle_pos_loop = 0; needle_pos_loop < LOOPS; needle_pos_loop++) {
                 needle_pos_1 = rand_pos(hay_size - 1);
                 needle_pos_2 = rand_pos(hay_size - 1);
-                uint8_t     *hay_cur = &hay[hay_start];
-                int         needle = rand_int();
+                uint8_t *hay_cur = &hay[hay_start];
+                int      needle = rand_int();
 
                 if (needle_pos_2 < needle_pos_1) {
                     size_t t = needle_pos_1;
@@ -180,11 +181,11 @@ int main(void)
                  * Make sure the needle doesn't already exist in hay by
                  * adjusting both
                  */
-                fixup_hay(hay_cur, hay_size, (uint8_t) needle);
+                fixup_hay(hay_cur, hay_size, (uint8_t)needle);
 
                 /* Place the needle in the haystack */
-                hay_cur[needle_pos_1] = (uint8_t) needle;
-                hay_cur[needle_pos_2] = (uint8_t) needle;
+                hay_cur[needle_pos_1] = (uint8_t)needle;
+                hay_cur[needle_pos_2] = (uint8_t)needle;
 
                 uint8_t *result;
 
@@ -192,12 +193,12 @@ int main(void)
 
                 if (result != hay_cur + needle_pos_1) {
                     if (!result)
-                        printf("memchr expected needle at %zu got NULL\n",
-                               needle_pos_1);
+                        printf("memchr expected needle at %zu got NULL\n", needle_pos_1);
                     else
-                        printf("memchr expected needle at %zu got %zu\n",
-                               needle_pos_1, result - hay_cur);
-                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu needle %d\n",
+                        printf("memchr expected needle at %zu got %zu\n", needle_pos_1,
+                               result - hay_cur);
+                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu "
+                           "needle %d\n",
                            hay_start, hay_size, needle_pos_1, needle_pos_2, needle);
                     ret = 1;
                 }
@@ -206,12 +207,12 @@ int main(void)
 
                 if (result != hay_cur + needle_pos_2) {
                     if (!result)
-                        printf("memrchr expected needle at %zu got NULL\n",
-                               needle_pos_2);
+                        printf("memrchr expected needle at %zu got NULL\n", needle_pos_2);
                     else
-                        printf("memrchr expected needle at %zu got %zu\n",
-                               needle_pos_2, result - hay_cur);
-                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu needle %d\n",
+                        printf("memrchr expected needle at %zu got %zu\n", needle_pos_2,
+                               result - hay_cur);
+                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu "
+                           "needle %d\n",
                            hay_start, hay_size, needle_pos_1, needle_pos_2, needle);
                     ret = 1;
                 }
@@ -227,7 +228,8 @@ int main(void)
 
                 if (result != NULL) {
                     printf("memchr expected no needle, got %zu\n", result - hay_cur);
-                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu needle %d\n",
+                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu "
+                           "needle %d\n",
                            hay_start, hay_size, needle_pos_1, needle_pos_2, needle);
                     ret = 1;
                 }
@@ -236,7 +238,8 @@ int main(void)
 
                 if (result != NULL) {
                     printf("memrchr expected no needle, got %zu\n", result - hay_cur);
-                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu needle %d\n",
+                    printf("    hay_start %zu hay_size %zu needle_pos_1 %zu needle_pos_2 %zu "
+                           "needle %d\n",
                            hay_start, hay_size, needle_pos_1, needle_pos_2, needle);
                     ret = 1;
                 }

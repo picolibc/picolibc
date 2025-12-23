@@ -1,0 +1,32 @@
+#!/bin/bash
+#
+# Usage: checkpatch 0001-diff.patch ...
+#
+ret=0
+declare -a failed
+failed=()
+for patch in "$@"; do
+    clang-format-diff -p1 < "$patch"
+    case "$?" in
+	0)
+	    ;;
+	*)
+	    ret="$?"
+	    failed+=("$patch")
+	    ;;
+    esac
+done
+case "$ret" in
+    0)
+	echo "All patches appear to be formatted correctly"
+	;;
+    *)
+	echo
+	echo "**************"
+	for f in "${failed[@]}"; do
+	    echo "$f: patch formatted incorrrectly"
+	done
+	echo "**************"
+	;;
+esac
+exit "$ret"

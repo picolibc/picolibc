@@ -93,10 +93,10 @@ tanh64(__float64 x)
     }
 
     /* |x| < 22 */
-    if (ix < 0x40360000) { /* |x|<22 */
-        if (ix < 0x3c800000) /* |x|<2**-55 */
+    if (ix < 0x40360000) {        /* |x|<22 */
+        if (ix < 0x3c800000)      /* |x|<2**-55 */
             return x * (one + x); /* tanh(small) = small */
-        if (ix >= 0x3ff00000) { /* |x|>=1  */
+        if (ix >= 0x3ff00000) {   /* |x|>=1  */
             t = expm164(two * fabs64(x));
             z = one - two / (t + two);
         } else {

@@ -29,8 +29,8 @@
 #ifndef __SYS_CONFIG_H__
 #define __SYS_CONFIG_H__
 
-#include <machine/ieeefp.h>  /* floating point macros */
-#include <sys/features.h>	/* POSIX defs */
+#include <machine/ieeefp.h> /* floating point macros */
+#include <sys/features.h>   /* POSIX defs */
 
 #ifdef __aarch64__
 #define MALLOC_ALIGNMENT 16
@@ -45,40 +45,41 @@
 #endif
 
 /* 16 bit integer machines */
-#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8500__) || defined(__W65__) || defined (__mn10200__) || defined (__AVR__) || defined (__MSP430__)
+#if defined(__Z8001__) || defined(__Z8002__) || defined(__H8500__) || defined(__W65__) \
+    || defined(__mn10200__) || defined(__AVR__) || defined(__MSP430__)
 
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX 32767
+#define INT_MAX  32767
 #define UINT_MAX 65535
 #endif
 
-#if defined (__H8300__) || defined (__H8300H__) || defined(__H8300S__) || defined (__H8300SX__)
+#if defined(__H8300__) || defined(__H8300H__) || defined(__H8300S__) || defined(__H8300SX__)
 #define __SMALL_BITFIELDS
 #define H8300 1
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX __INT_MAX__
+#define INT_MAX  __INT_MAX__
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
 #endif
 
-#if (defined(__CR16__) || defined(__CR16C__) ||defined(__CR16CP__))
+#if (defined(__CR16__) || defined(__CR16C__) || defined(__CR16CP__))
 #ifndef __INT32__
-#define __SMALL_BITFIELDS      
+#define __SMALL_BITFIELDS
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX 32767
+#define INT_MAX  32767
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
 #else /* INT32 */
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX 2147483647
+#define INT_MAX  2147483647
 #define UINT_MAX (__INT_MAX__ * 2U + 1)
 #endif /* INT32 */
 
 #endif /* CR16C */
 
-#if defined (__xc16x__) || defined (__xc16xL__) || defined (__xc16xS__)
+#if defined(__xc16x__) || defined(__xc16xL__) || defined(__xc16xS__)
 #define __SMALL_BITFIELDS
 #endif
 
@@ -90,16 +91,16 @@
 #define __SMALL_BITFIELDS
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#define INT_MAX      __INT_MAX__
+#define UINT_MAX     (__INT_MAX__ * 2U + 1)
 #define _POINTER_INT short
 #endif
 
 #if defined(__mc68hc11__) || defined(__mc68hc12__) || defined(__mc68hc1x__)
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#define INT_MAX      __INT_MAX__
+#define UINT_MAX     (__INT_MAX__ * 2U + 1)
 #define _POINTER_INT short
 #endif
 
@@ -124,7 +125,7 @@
 #define _POINTER_INT short
 #endif
 
-#if defined (__MICROBLAZE__) && !defined(__rtems__)
+#if defined(__MICROBLAZE__) && !defined(__rtems__)
 /* Xilinx XMK uses Unix98 mutex */
 #ifdef __XMK__
 #define _UNIX98_THREAD_MUTEX_ATTRIBUTES
@@ -135,11 +136,11 @@
 #define __SMALL_BITFIELDS
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#define INT_MAX          __INT_MAX__
+#define UINT_MAX         (__INT_MAX__ * 2U + 1)
 #define MALLOC_ALIGNMENT 8
-#define _POINTER_INT short
-#define __BUFSIZ__ 16
+#define _POINTER_INT     short
+#define __BUFSIZ__       16
 #endif
 
 #if defined __MSP430__
@@ -158,8 +159,8 @@
 #define __SMALL_BITFIELDS
 #undef INT_MAX
 #undef UINT_MAX
-#define INT_MAX __INT_MAX__
-#define UINT_MAX (__INT_MAX__ * 2U + 1)
+#define INT_MAX          __INT_MAX__
+#define UINT_MAX         (__INT_MAX__ * 2U + 1)
 #define MALLOC_ALIGNMENT 8
 #if defined(__r8c_cpu__) || defined(__m16c_cpu__)
 #define _POINTER_INT short
@@ -180,24 +181,23 @@
    the correct widths when deciding how to define __int32_t and
    __int64_t.  */
 #ifndef __INT_MAX__
-# ifdef INT_MAX
-#  define __INT_MAX__ INT_MAX
-# else
-#  define __INT_MAX__ 2147483647
-# endif
+#ifdef INT_MAX
+#define __INT_MAX__ INT_MAX
+#else
+#define __INT_MAX__ 2147483647
+#endif
 #endif
 
 #ifndef __LONG_MAX__
-# ifdef LONG_MAX
-#  define __LONG_MAX__ LONG_MAX
-# else
-#  if defined (__alpha__) || (defined (__sparc__) && defined(__arch64__)) \
-    || defined (__sparcv9)
-#   define __LONG_MAX__ 9223372036854775807L
-#  else
-#   define __LONG_MAX__ 2147483647L
-#  endif /* __alpha__ || sparc64 */
-# endif
+#ifdef LONG_MAX
+#define __LONG_MAX__ LONG_MAX
+#else
+#if defined(__alpha__) || (defined(__sparc__) && defined(__arch64__)) || defined(__sparcv9)
+#define __LONG_MAX__ 9223372036854775807L
+#else
+#define __LONG_MAX__ 2147483647L
+#endif /* __alpha__ || sparc64 */
+#endif
 #endif
 /* End of block that should be kept in sync with GCC's limits.h.  */
 
@@ -212,20 +212,19 @@
 #define __RAND_MAX 0x7fffffff
 #endif
 
-
 #if defined(__rtems__)
 #define __FILENAME_MAX__ 255
 #endif
 
 #ifndef __WCHAR_MAX__
-#if __INT_MAX__ == 32767 || defined (_WIN32)
+#if __INT_MAX__ == 32767 || defined(_WIN32)
 #define __WCHAR_MAX__ 0xffffu
 #endif
 #endif
 
 #ifdef __THREAD_LOCAL_STORAGE
-#if (defined(__cplusplus) && (__cplusplus) >= 201103L) ||               \
-    (defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 202311L)
+#if (defined(__cplusplus) && (__cplusplus) >= 201103L)              \
+    || (defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 202311L)
 #define __THREAD_LOCAL thread_local
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION__) >= 201112L
 #define __THREAD_LOCAL _Thread_local
@@ -250,20 +249,18 @@
    charsets.  The extended charsets add a few functions and a couple
    of tables of a few K each. */
 #ifdef __MB_EXTENDED_CHARSETS_ALL
-#define __MB_EXTENDED_CHARSETS_UCS 1
-#define __MB_EXTENDED_CHARSETS_ISO 1
+#define __MB_EXTENDED_CHARSETS_UCS     1
+#define __MB_EXTENDED_CHARSETS_ISO     1
 #define __MB_EXTENDED_CHARSETS_WINDOWS 1
-#define __MB_EXTENDED_CHARSETS_JIS 1
+#define __MB_EXTENDED_CHARSETS_JIS     1
 #endif
 
-#if defined(__MB_EXTENDED_CHARSETS_ISO) ||       \
-    defined(__MB_EXTENDED_CHARSETS_WINDOWS) ||   \
-    defined(__MB_EXTENDED_CHARSETS_JIS)
+#if defined(__MB_EXTENDED_CHARSETS_ISO) || defined(__MB_EXTENDED_CHARSETS_WINDOWS) \
+    || defined(__MB_EXTENDED_CHARSETS_JIS)
 #define __MB_EXTENDED_CHARSETS_NON_UNICODE
 #endif
 
-#if defined(__MB_EXTENDED_CHARSETS_UCS) ||       \
-    defined(__MB_EXTENDED_CHARSETS_NON_UNICODE)
+#if defined(__MB_EXTENDED_CHARSETS_UCS) || defined(__MB_EXTENDED_CHARSETS_NON_UNICODE)
 #define __MB_EXTENDED_CHARSETS_ANY
 #endif
 
@@ -277,7 +274,9 @@
    simply call the double functions.  On Cygwin the long double functions
    are implemented independently from newlib to be able to use optimized
    assembler functions despite using the Microsoft x86_64 ABI. */
-#if defined (_LDBL_EQ_DBL) || defined (__CYGWIN__) || (defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) || (__LDBL_MANT_DIG__ == 64 || __LDBL_MANT_DIG__ == 113)
+#if defined(_LDBL_EQ_DBL) || defined(__CYGWIN__)                    \
+    || (defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) \
+    || (__LDBL_MANT_DIG__ == 64 || __LDBL_MANT_DIG__ == 113)
 #define __HAVE_LONG_DOUBLE_MATH
 #endif
 

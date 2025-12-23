@@ -19,7 +19,7 @@ _BEGIN_STD_C
 #include <machine/fenv.h>
 
 #ifndef FE_ALL_EXCEPT
-#define FE_ALL_EXCEPT	0
+#define FE_ALL_EXCEPT 0
 #endif
 
 /* Exception */
@@ -56,13 +56,15 @@ int fegetexcept(void);
  *       FE_DFL_ENV is are implementation specific.
  */
 extern fenv_t _fe_dfl_env;
-#define FE_DFL_ENV ((const fenv_t *) &_fe_dfl_env)
+#define FE_DFL_ENV ((const fenv_t *)&_fe_dfl_env)
 
 #ifdef __STDC_WANT_IEC_60559_BFP_EXT__
 
 #ifndef FE_DFL_MODE
-typedef struct { int round, except; } femode_t;
-#define FE_DFL_MODE     ((femode_t *) 0)
+typedef struct {
+    int round, except;
+} femode_t;
+#define FE_DFL_MODE ((femode_t *)0)
 #endif
 
 int fegetmode(femode_t *modep);

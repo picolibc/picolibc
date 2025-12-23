@@ -1,26 +1,26 @@
 /*
 FUNCTION
-	<<wmemchr>>---find a wide character in memory
- 
+        <<wmemchr>>---find a wide character in memory
+
 
 SYNOPSIS
-	#include <wchar.h>
-	wchar_t	*wmemchr(const wchar_t *<[s]>, wchar_t <[c]>, size_t <[n]>);
+        #include <wchar.h>
+        wchar_t	*wmemchr(const wchar_t *<[s]>, wchar_t <[c]>, size_t <[n]>);
 
 DESCRIPTION
-	The <<wmemchr>> function locates the first occurrence of <[c]> in the
-	initial <[n]> wide characters of the object pointed to be <[s]>. This
-	function is not affected by locale and all wchar_t values are treated
-	identically.  The null wide character and wchar_t values not
-	corresponding to valid characters are not treated specially.
+        The <<wmemchr>> function locates the first occurrence of <[c]> in the
+        initial <[n]> wide characters of the object pointed to be <[s]>. This
+        function is not affected by locale and all wchar_t values are treated
+        identically.  The null wide character and wchar_t values not
+        corresponding to valid characters are not treated specially.
 
-	If <[n]> is zero, <[s]> must be a valid pointer and the function
-	behaves as if no valid occurrence of <[c]> is found. 
+        If <[n]> is zero, <[s]> must be a valid pointer and the function
+        behaves as if no valid occurrence of <[c]> is found.
 
 RETURNS
-	The <<wmemchr>> function returns a pointer to the located
-	wide character, or a null pointer if the wide character does not occur
-	in the object. 
+        The <<wmemchr>> function returns a pointer to the located
+        wide character, or a null pointer if the wide character does not occur
+        in the object.
 
 PORTABILITY
 <<wmemchr>> is ISO/IEC 9899/AMD1:1995 (ISO C).
@@ -58,24 +58,19 @@ No supporting OS subroutines are required.
  *	citrus Id: wmemchr.c,v 1.2 2000/12/20 14:08:31 itojun Exp
  */
 
-
 #include <wchar.h>
 
 wchar_t *
-wmemchr (const wchar_t * s,
-	wchar_t c,
-	size_t n)
+wmemchr(const wchar_t *s, wchar_t c, size_t n)
 {
-  size_t i;
+    size_t i;
 
-  for (i = 0; i < n; i++)
-    {
-      if (*s == c)
-	{
-	  /* LINTED const castaway */
-	  return (wchar_t *) s;
-	}
-      s++;
+    for (i = 0; i < n; i++) {
+        if (*s == c) {
+            /* LINTED const castaway */
+            return (wchar_t *)s;
+        }
+        s++;
     }
-  return NULL;
+    return NULL;
 }

@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-expm1.h"
-#define TEST_FUNC       expm1
+#define TEST_VECTORS "test-expm1.h"
+#define TEST_FUNC    expm1
 
 #include "test-real-one.h"

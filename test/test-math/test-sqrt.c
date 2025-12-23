@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS    "test-sqrt.h"
-#define TEST_FUNC       sqrt
+#define TEST_VECTORS "test-sqrt.h"
+#define TEST_FUNC    sqrt
 
 #include "test-real-one.h"

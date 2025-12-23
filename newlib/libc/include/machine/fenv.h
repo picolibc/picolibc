@@ -85,7 +85,7 @@ _BEGIN_STD_C
  * Other implementation-specific rounding modes may be defined, and must start
  * with FE_ followed by a capital letter.
  */
-#define FE_TONEAREST  	0
+#define FE_TONEAREST 0
 /*
 #define FE_DOWNWARD   	1
 #define FE_TOWARDZERO 	2
@@ -106,7 +106,7 @@ typedef int fexcept_t;
 _END_STD_C
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
-#define	__declare_fenv_inline(type) __declare_extern_inline(type)
+#define __declare_fenv_inline(type) __declare_extern_inline(type)
 #endif
 
 #ifdef __declare_fenv_inline

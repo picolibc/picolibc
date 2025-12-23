@@ -37,7 +37,7 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _HYPOTF4_H_
-#define _HYPOTF4_H_	1
+#define _HYPOTF4_H_ 1
 
 #include <spu_intrinsics.h>
 
@@ -48,14 +48,14 @@
  *  vector float _hypotf4(vector float x, vector float y)
  *
  * DESCRIPTION
- *     The function hypotf4 returns a float vector in which each element is 
- *     the square root of the sum of the squares of the corresponding 
+ *     The function hypotf4 returns a float vector in which each element is
+ *     the square root of the sum of the squares of the corresponding
  *     elements of x and y. In other words, each element is sqrt(x^2 + y^2).
  *
  *     The purpose of this function is to avoid overflow during
- *     intermediate calculations, and therefore it is slower than 
+ *     intermediate calculations, and therefore it is slower than
  *     simply calcualting sqrt(x^2 + y^2).
- *  
+ *
  *     This function is performed by factoring out the larger of the 2
  *     input exponents and moving this factor outside of the sqrt calculation.
  *     This will minimize the possibility of over/underflow when the square
@@ -70,28 +70,28 @@
  *
  */
 
-
-static __inline vector float _hypotf4(vector float x, vector float y)
+static __inline vector float
+_hypotf4(vector float x, vector float y)
 {
     vector unsigned int emask = spu_splats(0x7F800000u);
     vector unsigned int mmask = spu_splats(0x007FFFFFu);
-    vector signed int bias  = spu_splats(0x3F800000);
-    vector float inf  = (vec_float4)spu_splats(0x7F800000);
-    vector float onef = spu_splats(1.0f);
-    vector float sbit = spu_splats(-0.0f);
-    vector float max, max_e, max_m;
-    vector float min, min_e, min_m;
+    vector signed int   bias = spu_splats(0x3F800000);
+    vector float        inf = (vec_float4)spu_splats(0x7F800000);
+    vector float        onef = spu_splats(1.0f);
+    vector float        sbit = spu_splats(-0.0f);
+    vector float        max, max_e, max_m;
+    vector float        min, min_e, min_m;
     vector unsigned int xgty;
-    vector float sum;
-    vector float result;
+    vector float        sum;
+    vector float        result;
 
     /* Only need absolute values for this function */
     x = spu_andc(x, sbit);
     y = spu_andc(y, sbit);
-    xgty = spu_cmpgt(x,y);
+    xgty = spu_cmpgt(x, y);
 
-    max  = spu_sel(y,x,xgty);
-    min  = spu_sel(x,y,xgty);
+    max = spu_sel(y, x, xgty);
+    min = spu_sel(x, y, xgty);
 
     /* Extract exponents and mantissas */
     max_e = (vec_float4)spu_and((vec_uint4)max, emask);
@@ -100,7 +100,7 @@ static __inline vector float _hypotf4(vector float x, vector float y)
     min_m = (vec_float4)spu_and((vec_uint4)min, mmask);
 
     /* Adjust the exponent of the smaller of the 2 input values by
-     * subtracting max_exp from min_exp. 
+     * subtracting max_exp from min_exp.
      */
     vec_int4 min_e_int = spu_sub((vec_int4)min_e, (vec_int4)max_e);
     min_e = (vec_float4)spu_add(min_e_int, bias);

@@ -39,13 +39,13 @@
 __float64
 sqrt64(__float64 x)
 {
-	__float64 result;
+    __float64 result;
 #ifdef __MATH_ERRNO
-        if (isless(x, 0.0))
-            return __math_invalid(x);
+    if (isless(x, 0.0))
+        return __math_invalid(x);
 #endif
-	__asm__("fsqrt.d %0, %1" : "=f" (result) : "f" (x));
-	return result;
+    __asm__("fsqrt.d %0, %1" : "=f"(result) : "f"(x));
+    return result;
 }
 
 _MATH_ALIAS_d_d(sqrt)

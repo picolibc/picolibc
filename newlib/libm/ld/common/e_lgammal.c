@@ -5,7 +5,7 @@
  *
  * Developed at SunSoft, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  *
@@ -14,10 +14,10 @@
 long double
 lgammal(long double x)
 {
-	return (lgammal_r(x, &__signgam));
+    return (lgammal_r(x, &__signgam));
 }
 
-#  ifdef __strong_reference
+#ifdef __strong_reference
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"

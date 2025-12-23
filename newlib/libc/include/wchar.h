@@ -39,7 +39,7 @@ SUCH DAMAGE.
 #include <stdarg.h>
 
 #ifndef WEOF
-# define WEOF ((wint_t)-1)
+#define WEOF ((wint_t) - 1)
 #endif
 
 /* This must match definition in <stdint.h> */
@@ -72,7 +72,7 @@ _BEGIN_STD_C
 
 #ifndef ___FILE_DECLARED
 typedef struct __file __FILE;
-# define ___FILE_DECLARED
+#define ___FILE_DECLARED
 #endif
 
 #if __POSIX_VISIBLE >= 200809 || _XSI_VISIBLE
@@ -97,208 +97,180 @@ typedef _mbstate_t mbstate_t;
 #define _MBSTATE_DECLARED
 #endif
 
-wint_t   btowc (int);
-wint_t   fgetwc (__FILE *);
+wint_t btowc(int);
+wint_t fgetwc(__FILE *);
 #if __GNU_VISIBLE
-wint_t   fgetwc_unlocked (__FILE *);
+wint_t fgetwc_unlocked(__FILE *);
 #endif
-wchar_t *fgetws (wchar_t *__restrict, int, __FILE *__restrict);
+wchar_t *fgetws(wchar_t * __restrict, int, __FILE * __restrict);
 #if __GNU_VISIBLE
-wchar_t *fgetws_unlocked (wchar_t *__restrict, int, __FILE *__restrict);
+wchar_t *fgetws_unlocked(wchar_t * __restrict, int, __FILE * __restrict);
 #endif
-wint_t   fputwc (wchar_t, __FILE *);
+wint_t fputwc(wchar_t, __FILE *);
 #if __GNU_VISIBLE
-wint_t   fputwc_unlocked (wchar_t, __FILE *);
+wint_t fputwc_unlocked(wchar_t, __FILE *);
 #endif
-int      fputws (const wchar_t *__restrict, __FILE *__restrict);
+int fputws(const wchar_t * __restrict, __FILE * __restrict);
 #if __GNU_VISIBLE
-int      fputws_unlocked (const wchar_t *__restrict, __FILE *__restrict);
+int fputws_unlocked(const wchar_t * __restrict, __FILE * __restrict);
 #endif
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
-int      fwide (__FILE *, int);
+int fwide(__FILE *, int);
 #endif
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
-int      fwprintf (__FILE *__restrict, const wchar_t *__restrict, ...);
-int      fwscanf (__FILE *__restrict, const wchar_t *__restrict, ...);
+int fwprintf(__FILE * __restrict, const wchar_t * __restrict, ...);
+int fwscanf(__FILE * __restrict, const wchar_t * __restrict, ...);
 #endif
-wint_t   getwc (__FILE *);
+wint_t getwc(__FILE *);
 #if __GNU_VISIBLE
-wint_t   getwc_unlocked (__FILE *);
+wint_t getwc_unlocked(__FILE *);
 #endif
-wint_t   getwchar (void);
+wint_t getwchar(void);
 #if __GNU_VISIBLE
-wint_t   getwchar_unlocked (void);
+wint_t getwchar_unlocked(void);
 #endif
-size_t   mbrlen (const char *__restrict, size_t, mbstate_t *__restrict);
-size_t   mbrtowc (wchar_t *__restrict, const char *__restrict, size_t,
-                                                mbstate_t *__restrict);
-int      mbsinit (const mbstate_t *);
+size_t mbrlen(const char * __restrict, size_t, mbstate_t * __restrict);
+size_t mbrtowc(wchar_t * __restrict, const char * __restrict, size_t, mbstate_t * __restrict);
+int    mbsinit(const mbstate_t *);
 #if __POSIX_VISIBLE >= 200809
-size_t   mbsnrtowcs (wchar_t *__restrict, const char **__restrict,
-                                size_t, size_t, mbstate_t *__restrict);
+size_t mbsnrtowcs(wchar_t * __restrict, const char ** __restrict, size_t, size_t,
+                  mbstate_t * __restrict);
 #endif
-size_t   mbsrtowcs (wchar_t *__restrict, const char **__restrict, size_t,
-                                mbstate_t *__restrict);
+size_t mbsrtowcs(wchar_t * __restrict, const char ** __restrict, size_t, mbstate_t * __restrict);
 #if __POSIX_VISIBLE >= 200809
-__FILE  *open_wmemstream (wchar_t **, size_t *);
+__FILE *open_wmemstream(wchar_t **, size_t *);
 #endif
-wint_t   putwc (wchar_t, __FILE *);
+wint_t putwc(wchar_t, __FILE *);
 #if __GNU_VISIBLE
-wint_t   putwc_unlocked (wchar_t, __FILE *);
+wint_t putwc_unlocked(wchar_t, __FILE *);
 #endif
-wint_t   putwchar (wchar_t);
+wint_t putwchar(wchar_t);
 #if __GNU_VISIBLE
-wint_t   putwchar_unlocked (wchar_t);
+wint_t putwchar_unlocked(wchar_t);
 #endif
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
-int      swprintf (wchar_t *__restrict, size_t,
-                   const wchar_t *__restrict, ...);
-int      swscanf (const wchar_t *__restrict,
-                  const wchar_t *__restrict, ...);
+int swprintf(wchar_t * __restrict, size_t, const wchar_t * __restrict, ...);
+int swscanf(const wchar_t * __restrict, const wchar_t * __restrict, ...);
 #endif
-wint_t   ungetwc (wint_t wc, __FILE *);
+wint_t ungetwc(wint_t wc, __FILE *);
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
-int      vfwprintf (__FILE *__restrict, const wchar_t *__restrict,
-                    __gnuc_va_list);
-int      vfwscanf (__FILE *__restrict, const wchar_t *__restrict,
-                   __gnuc_va_list);
-int      vswprintf (wchar_t *__restrict, size_t,
-                    const wchar_t *__restrict, __gnuc_va_list);
-int      vswscanf (const wchar_t *__restrict, const wchar_t *__restrict,
-                   __gnuc_va_list);
-int      vwprintf (const wchar_t *__restrict, __gnuc_va_list);
-int      vwscanf (const wchar_t *__restrict, __gnuc_va_list);
+int vfwprintf(__FILE * __restrict, const wchar_t * __restrict, __gnuc_va_list);
+int vfwscanf(__FILE * __restrict, const wchar_t * __restrict, __gnuc_va_list);
+int vswprintf(wchar_t * __restrict, size_t, const wchar_t * __restrict, __gnuc_va_list);
+int vswscanf(const wchar_t * __restrict, const wchar_t * __restrict, __gnuc_va_list);
+int vwprintf(const wchar_t * __restrict, __gnuc_va_list);
+int vwscanf(const wchar_t * __restrict, __gnuc_va_list);
 #endif
 #if __POSIX_VISIBLE >= 200809
-wchar_t *wcpcpy (wchar_t *__restrict,
-                                 const wchar_t *__restrict);
-wchar_t *wcpncpy (wchar_t *__restrict,
-                                 const wchar_t *__restrict, size_t);
+wchar_t *wcpcpy(wchar_t * __restrict, const wchar_t * __restrict);
+wchar_t *wcpncpy(wchar_t * __restrict, const wchar_t * __restrict, size_t);
 #endif
-size_t   wcrtomb (char *__restrict, wchar_t, mbstate_t *__restrict);
+size_t wcrtomb(char * __restrict, wchar_t, mbstate_t * __restrict);
 #if __POSIX_VISIBLE >= 200809
-int      wcscasecmp (const wchar_t *, const wchar_t *);
-int      wcscasecmp_l (const wchar_t *, const wchar_t *, locale_t);
+int wcscasecmp(const wchar_t *, const wchar_t *);
+int wcscasecmp_l(const wchar_t *, const wchar_t *, locale_t);
 #endif
-wchar_t *wcscat (wchar_t *__restrict, const wchar_t *__restrict);
-wchar_t *wcschr (const wchar_t *, wchar_t);
-int      wcscmp (const wchar_t *, const wchar_t *);
-int      wcscoll (const wchar_t *, const wchar_t *);
+wchar_t *wcscat(wchar_t * __restrict, const wchar_t * __restrict);
+wchar_t *wcschr(const wchar_t *, wchar_t);
+int      wcscmp(const wchar_t *, const wchar_t *);
+int      wcscoll(const wchar_t *, const wchar_t *);
 #if __POSIX_VISIBLE >= 200809
-int      wcscoll_l (const wchar_t *, const wchar_t *, locale_t);
+int wcscoll_l(const wchar_t *, const wchar_t *, locale_t);
 #endif
-wchar_t *wcscpy (wchar_t *__restrict, const wchar_t *__restrict);
-size_t   wcscspn (const wchar_t *, const wchar_t *);
+wchar_t *wcscpy(wchar_t * __restrict, const wchar_t * __restrict);
+size_t   wcscspn(const wchar_t *, const wchar_t *);
 
 #if __POSIX_VISIBLE >= 200809
-void     free (void *) __nothrow;
-wchar_t *wcsdup (const wchar_t *) __malloc_like __warn_unused_result;
+void     free(void *) __nothrow;
+wchar_t *wcsdup(const wchar_t *) __malloc_like __warn_unused_result;
 #endif
-size_t   wcsftime (wchar_t *__restrict, size_t,
-                  const wchar_t *__restrict, const struct tm *__restrict);
+size_t wcsftime(wchar_t * __restrict, size_t, const wchar_t * __restrict,
+                const struct tm * __restrict);
 #if __GNU_VISIBLE
-size_t   wcsftime_l (wchar_t *__restrict, size_t, const wchar_t *__restrict,
-                     const struct tm *__restrict, locale_t);
+size_t wcsftime_l(wchar_t * __restrict, size_t, const wchar_t * __restrict,
+                  const struct tm * __restrict, locale_t);
 #endif
 #if __BSD_VISIBLE
-size_t   wcslcat (wchar_t *, const wchar_t *, size_t);
-size_t   wcslcpy (wchar_t *, const wchar_t *, size_t);
+size_t wcslcat(wchar_t *, const wchar_t *, size_t);
+size_t wcslcpy(wchar_t *, const wchar_t *, size_t);
 #endif
-size_t   wcslen (const wchar_t *);
+size_t wcslen(const wchar_t *);
 #if __POSIX_VISIBLE >= 200809
-int      wcsncasecmp (const wchar_t *, const wchar_t *, size_t);
-int      wcsncasecmp_l (const wchar_t *, const wchar_t *, size_t, locale_t);
+int wcsncasecmp(const wchar_t *, const wchar_t *, size_t);
+int wcsncasecmp_l(const wchar_t *, const wchar_t *, size_t, locale_t);
 #endif
-wchar_t *wcsncat (wchar_t *__restrict, const wchar_t *__restrict, size_t);
-int      wcsncmp (const wchar_t *, const wchar_t *, size_t);
-wchar_t *wcsncpy (wchar_t *__restrict,
-                  const wchar_t *__restrict, size_t);
+wchar_t *wcsncat(wchar_t * __restrict, const wchar_t * __restrict, size_t);
+int      wcsncmp(const wchar_t *, const wchar_t *, size_t);
+wchar_t *wcsncpy(wchar_t * __restrict, const wchar_t * __restrict, size_t);
 #if __POSIX_VISIBLE >= 200809
-size_t   wcsnlen (const wchar_t *, size_t);
-size_t   wcsnrtombs (char *__restrict, const wchar_t **__restrict,
-                     size_t, size_t, mbstate_t *__restrict);
+size_t wcsnlen(const wchar_t *, size_t);
+size_t wcsnrtombs(char * __restrict, const wchar_t ** __restrict, size_t, size_t,
+                  mbstate_t * __restrict);
 #endif
-wchar_t *wcspbrk (const wchar_t *, const wchar_t *);
-wchar_t *wcsrchr (const wchar_t *, wchar_t);
-size_t   wcsrtombs (char *__restrict, const wchar_t **__restrict,
-                    size_t, mbstate_t *__restrict);
-size_t   wcsspn (const wchar_t *, const wchar_t *);
-wchar_t *wcsstr (const wchar_t *__restrict,
-                 const wchar_t *__restrict);
-double   wcstod (const wchar_t *__restrict, wchar_t **__restrict);
+wchar_t *wcspbrk(const wchar_t *, const wchar_t *);
+wchar_t *wcsrchr(const wchar_t *, wchar_t);
+size_t   wcsrtombs(char   *__restrict, const wchar_t   **__restrict, size_t, mbstate_t   *__restrict);
+size_t   wcsspn(const wchar_t *, const wchar_t *);
+wchar_t *wcsstr(const wchar_t * __restrict, const wchar_t * __restrict);
+double   wcstod(const wchar_t   *__restrict, wchar_t   **__restrict);
 #if __GNU_VISIBLE
-double   wcstod_l (const wchar_t *, wchar_t **, locale_t);
+double wcstod_l(const wchar_t *, wchar_t **, locale_t);
 #endif
 #if __ISO_C_VISIBLE >= 1999
-float    wcstof (const wchar_t *__restrict, wchar_t **__restrict);
+float wcstof(const wchar_t * __restrict, wchar_t ** __restrict);
 #endif
 #if __GNU_VISIBLE
-float    wcstof_l (const wchar_t *, wchar_t **, locale_t);
+float wcstof_l(const wchar_t *, wchar_t **, locale_t);
 #endif
-wchar_t *wcstok (wchar_t *__restrict, const wchar_t *__restrict,
-                                 wchar_t **__restrict);
-long     wcstol (const wchar_t *__restrict, wchar_t **__restrict, int);
+wchar_t *wcstok(wchar_t * __restrict, const wchar_t * __restrict, wchar_t ** __restrict);
+long     wcstol(const wchar_t     *__restrict, wchar_t     **__restrict, int);
 #if __GNU_VISIBLE
-long     wcstol_l (const wchar_t *__restrict, wchar_t **__restrict, int, locale_t);
+long wcstol_l(const wchar_t * __restrict, wchar_t ** __restrict, int, locale_t);
 #endif
 #if __ISO_C_VISIBLE >= 1999 && defined(__HAVE_LONG_DOUBLE)
-long double
-         wcstold (const wchar_t *, wchar_t **);
+long double wcstold(const wchar_t *, wchar_t **);
 #endif
 #if __GNU_VISIBLE && defined(__HAVE_LONG_DOUBLE)
-long double
-         wcstold_l (const wchar_t *, wchar_t **, locale_t);
+long double wcstold_l(const wchar_t *, wchar_t **, locale_t);
 #endif
 #if __ISO_C_VISIBLE >= 1999
-long long
-         wcstoll (const wchar_t *__restrict, wchar_t **__restrict, int);
+long long wcstoll(const wchar_t * __restrict, wchar_t ** __restrict, int);
 #endif
 #if __GNU_VISIBLE
-long long
-         wcstoll_l (const wchar_t *__restrict, wchar_t **__restrict, int,
-                    locale_t);
+long long wcstoll_l(const wchar_t * __restrict, wchar_t ** __restrict, int, locale_t);
 #endif
-unsigned long
-         wcstoul (const wchar_t *__restrict, wchar_t **__restrict, int);
+unsigned long wcstoul(const wchar_t * __restrict, wchar_t ** __restrict, int);
 #if __GNU_VISIBLE
-unsigned long
-         wcstoul_l (const wchar_t *__restrict, wchar_t **__restrict, int,
-                    locale_t);
+unsigned long wcstoul_l(const wchar_t * __restrict, wchar_t ** __restrict, int, locale_t);
 #endif
 #if __ISO_C_VISIBLE >= 1999
-unsigned long long
-         wcstoull (const wchar_t *__restrict, wchar_t **__restrict, int);
+unsigned long long wcstoull(const wchar_t * __restrict, wchar_t ** __restrict, int);
 #endif
 #if __GNU_VISIBLE
-unsigned long long
-         wcstoull_l (const wchar_t *__restrict, wchar_t **__restrict,
-                     int, locale_t);
+unsigned long long wcstoull_l(const wchar_t * __restrict, wchar_t ** __restrict, int, locale_t);
 #endif
 #if __XSI_VISIBLE
-int      wcswidth (const wchar_t *, size_t);
+int wcswidth(const wchar_t *, size_t);
 #endif
-size_t   wcsxfrm (wchar_t *__restrict, const wchar_t *__restrict, size_t);
+size_t wcsxfrm(wchar_t * __restrict, const wchar_t * __restrict, size_t);
 #if __POSIX_VISIBLE >= 200809
-size_t   wcsxfrm_l (wchar_t *__restrict, const wchar_t *__restrict, size_t,
-                    locale_t);
+size_t wcsxfrm_l(wchar_t * __restrict, const wchar_t * __restrict, size_t, locale_t);
 #endif
-int      wctob (wint_t);
+int wctob(wint_t);
 #if __XSI_VISIBLE
-int      wcwidth (const wchar_t);
+int wcwidth(const wchar_t);
 #endif
-wchar_t *wmemchr (const wchar_t *, wchar_t, size_t);
-int      wmemcmp (const wchar_t *, const wchar_t *, size_t);
-wchar_t *wmemcpy (wchar_t *__restrict, const wchar_t *__restrict,
-                                 size_t);
-wchar_t *wmemmove (wchar_t *, const wchar_t *, size_t);
+wchar_t *wmemchr(const wchar_t *, wchar_t, size_t);
+int      wmemcmp(const wchar_t *, const wchar_t *, size_t);
+wchar_t *wmemcpy(wchar_t * __restrict, const wchar_t * __restrict, size_t);
+wchar_t *wmemmove(wchar_t *, const wchar_t *, size_t);
 #if __GNU_VISIBLE
-wchar_t *wmempcpy (wchar_t *__restrict, const wchar_t *__restrict,
-                                 size_t);
+wchar_t *wmempcpy(wchar_t * __restrict, const wchar_t * __restrict, size_t);
 #endif
-wchar_t *wmemset (wchar_t *, wchar_t, size_t);
+wchar_t *wmemset(wchar_t *, wchar_t, size_t);
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
-int      wprintf (const wchar_t *__restrict, ...);
-int      wscanf (const wchar_t *__restrict, ...);
+int wprintf(const wchar_t * __restrict, ...);
+int wscanf(const wchar_t * __restrict, ...);
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1

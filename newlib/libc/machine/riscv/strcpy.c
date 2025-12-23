@@ -14,7 +14,8 @@
 
 #undef strcpy
 
-char *strcpy(char *dst, const char *src)
+char *
+strcpy(char *dst, const char *src)
 {
-  return __libc_strcpy(dst, src, true);
+    return __libc_strcpy(dst, src, true);
 }

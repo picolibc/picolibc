@@ -31,27 +31,26 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <picolibc.h>
 
-#include<stddef.h>
-#include<sys/syscall.h>
-#include"ea_internal.h"
-#include<ea.h>
+#include <stddef.h>
+#include <sys/syscall.h>
+#include "ea_internal.h"
+#include <ea.h>
 
-typedef struct
-{
-  unsigned long long ptr;
-  unsigned int pad0[2];
-  unsigned long long size;
-  unsigned int pad1[2];
+typedef struct {
+    unsigned long long ptr;
+    unsigned int       pad0[2];
+    unsigned long long size;
+    unsigned int       pad1[2];
 } realloc_ea_t;
 
-COMPAT_EA_ALIAS (realloc_ea);
+COMPAT_EA_ALIAS(realloc_ea);
 
 __ea void *
-realloc_ea (__ea void *ptr, size_ea_t size)
+realloc_ea(__ea void *ptr, size_ea_t size)
 {
-  realloc_ea_t args;
-  args.ptr = (unsigned long long) (size_ea_t) ptr;
-  args.size = (unsigned long long) size;
-  __send_to_ppe (JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_REALLOC, &args);
-  return ull_to_eavoid (args.ptr);
+    realloc_ea_t args;
+    args.ptr = (unsigned long long)(size_ea_t)ptr;
+    args.size = (unsigned long long)size;
+    __send_to_ppe(JSRE_LIBEA_SIGNALCODE, SPE_LIBEA_REALLOC, &args);
+    return ull_to_eavoid(args.ptr);
 }

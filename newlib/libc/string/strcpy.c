@@ -16,22 +16,22 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 /*
 FUNCTION
-	<<strcpy>>---copy string
+        <<strcpy>>---copy string
 
 INDEX
-	strcpy
+        strcpy
 
 SYNOPSIS
-	#include <string.h>
-	char *strcpy(char *<[dst]>, const char *<[src]>);
+        #include <string.h>
+        char *strcpy(char *<[dst]>, const char *<[src]>);
 
 DESCRIPTION
-	<<strcpy>> copies the string pointed to by <[src]>
-	(including the terminating null character) to the array
-	pointed to by <[dst]>.
+        <<strcpy>> copies the string pointed to by <[src]>
+        (including the terminating null character) to the array
+        pointed to by <[dst]>.
 
 RETURNS
-	This function returns the initial value of <[dst]>.
+        This function returns the initial value of <[dst]>.
 
 PORTABILITY
 <<strcpy>> is ANSI C.
@@ -39,7 +39,7 @@ PORTABILITY
 <<strcpy>> requires no supporting OS subroutines.
 
 QUICKREF
-	strcpy ansi pure
+        strcpy ansi pure
 */
 
 #include <string.h>
@@ -51,43 +51,40 @@ QUICKREF
 
 #undef strcpy
 
-char*
-strcpy (char *dst0,
-	const char *src0)
+char *
+strcpy(char *dst0, const char *src0)
 {
-#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) || \
-    defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
-  char *s = dst0;
+#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__) \
+    || defined(_PICOLIBC_NO_OUT_OF_BOUNDS_READS)
+    char *s = dst0;
 
-  while ((*dst0++ = *src0++))
-    ;
+    while ((*dst0++ = *src0++))
+        ;
 
-  return s;
+    return s;
 #else
-  char *dst = dst0;
-  const char *src = src0;
-  long *aligned_dst;
-  const long *aligned_src;
+    char       *dst = dst0;
+    const char *src = src0;
+    long       *aligned_dst;
+    const long *aligned_src;
 
-  /* If SRC or DEST is unaligned, then copy bytes.  */
-  if (!UNALIGNED_X_Y(src, dst))
-    {
-      aligned_dst = (long*)dst;
-      aligned_src = (long*)src;
+    /* If SRC or DEST is unaligned, then copy bytes.  */
+    if (!UNALIGNED_X_Y(src, dst)) {
+        aligned_dst = (long *)dst;
+        aligned_src = (long *)src;
 
-      /* SRC and DEST are both "long int" aligned, try to do "long int"
-         sized copies.  */
-      while (!DETECT_NULL(*aligned_src))
-        {
-          *aligned_dst++ = *aligned_src++;
+        /* SRC and DEST are both "long int" aligned, try to do "long int"
+           sized copies.  */
+        while (!DETECT_NULL(*aligned_src)) {
+            *aligned_dst++ = *aligned_src++;
         }
 
-      dst = (char*)aligned_dst;
-      src = (char*)aligned_src;
+        dst = (char *)aligned_dst;
+        src = (char *)aligned_src;
     }
 
-  while ((*dst++ = *src++))
-    ;
-  return dst0;
+    while ((*dst++ = *src++))
+        ;
+    return dst0;
 #endif /* not __PREFER_SIZE_OVER_SPEED */
 }

@@ -41,61 +41,61 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#define SYS_SEMIHOST_exit		1
-#define SYS_SEMIHOST_open		2
-#define SYS_SEMIHOST_close		3
-#define SYS_SEMIHOST_read		4
-#define SYS_SEMIHOST_write		5
-#define SYS_SEMIHOST_lseek		6
-#define SYS_SEMIHOST_unlink		7
-#define SYS_SEMIHOST_fstat		8
-#define SYS_SEMIHOST_argc		9
-#define SYS_SEMIHOST_argv_sz	10
-#define SYS_SEMIHOST_argv		11
-#define SYS_SEMIHOST_plog		13
-#define SYS_SEMIHOST_assert		14
-#define SYS_SEMIHOST_pread		19
-#define SYS_SEMIHOST_pwrite		20
-#define SYS_SEMIHOST_link		22
+#define SYS_SEMIHOST_exit    1
+#define SYS_SEMIHOST_open    2
+#define SYS_SEMIHOST_close   3
+#define SYS_SEMIHOST_read    4
+#define SYS_SEMIHOST_write   5
+#define SYS_SEMIHOST_lseek   6
+#define SYS_SEMIHOST_unlink  7
+#define SYS_SEMIHOST_fstat   8
+#define SYS_SEMIHOST_argc    9
+#define SYS_SEMIHOST_argv_sz 10
+#define SYS_SEMIHOST_argv    11
+#define SYS_SEMIHOST_plog    13
+#define SYS_SEMIHOST_assert  14
+#define SYS_SEMIHOST_pread   19
+#define SYS_SEMIHOST_pwrite  20
+#define SYS_SEMIHOST_link    22
 
 enum {
-    TARGET_ERRNO_EACCESS		 = 13,
-    TARGET_ERRNO_EAGAIN		  = 11,
-    TARGET_ERRNO_EBADF		   = 9,
-    TARGET_ERRNO_EBADMSG		 = 77,
-    TARGET_ERRNO_EBUSY		   = 16,
-    TARGET_ERRNO_ECONNRESET	  = 104,
-    TARGET_ERRNO_EEXIST		  = 17,
-    TARGET_ERRNO_EFBIG		   = 27,
-    TARGET_ERRNO_EINTR		   = 4,
-    TARGET_ERRNO_EINVAL		  = 22,
-    TARGET_ERRNO_EIO			 = 5,
-    TARGET_ERRNO_EISDIR		  = 21,
-    TARGET_ERRNO_ELOOP		   = 92,
-    TARGET_ERRNO_EMFILE		  = 24,
-    TARGET_ERRNO_EMLINK		  = 31,
-    TARGET_ERRNO_ENAMETOOLONG	= 91,
-    TARGET_ERRNO_ENETDOWN		= 115,
-    TARGET_ERRNO_ENETUNREACH	 = 114,
-    TARGET_ERRNO_ENFILE		  = 23,
-    TARGET_ERRNO_ENOBUFS		 = 105,
-    TARGET_ERRNO_ENOENT		  = 2,
-    TARGET_ERRNO_ENOMEM		  = 12,
-    TARGET_ERRNO_ENOSPC		  = 28,
-    TARGET_ERRNO_ENOSR		   = 63,
-    TARGET_ERRNO_ENOTCONN		= 128,
-    TARGET_ERRNO_ENOTDIR		 = 20,
-    TARGET_ERRNO_ENXIO		   = 6,
-    TARGET_ERRNO_EOVERFLOW	   = 139,
-    TARGET_ERRNO_EPERM		   = 1,
-    TARGET_ERRNO_EPIPE		   = 32,
-    TARGET_ERRNO_ERANGE		  = 34,
-    TARGET_ERRNO_EROFS		   = 30,
-    TARGET_ERRNO_ESPIPE		  = 29,
-    TARGET_ERRNO_ETIMEDOUT	   = 116,
-    TARGET_ERRNO_ETXTBSY		 = 26,
-    TARGET_ERRNO_EWOULDBLOCK	 = 11,
-    TARGET_ERRNO_EXDEV		   = 18,
+    TARGET_ERRNO_EACCESS = 13,
+    TARGET_ERRNO_EAGAIN = 11,
+    TARGET_ERRNO_EBADF = 9,
+    TARGET_ERRNO_EBADMSG = 77,
+    TARGET_ERRNO_EBUSY = 16,
+    TARGET_ERRNO_ECONNRESET = 104,
+    TARGET_ERRNO_EEXIST = 17,
+    TARGET_ERRNO_EFBIG = 27,
+    TARGET_ERRNO_EINTR = 4,
+    TARGET_ERRNO_EINVAL = 22,
+    TARGET_ERRNO_EIO = 5,
+    TARGET_ERRNO_EISDIR = 21,
+    TARGET_ERRNO_ELOOP = 92,
+    TARGET_ERRNO_EMFILE = 24,
+    TARGET_ERRNO_EMLINK = 31,
+    TARGET_ERRNO_ENAMETOOLONG = 91,
+    TARGET_ERRNO_ENETDOWN = 115,
+    TARGET_ERRNO_ENETUNREACH = 114,
+    TARGET_ERRNO_ENFILE = 23,
+    TARGET_ERRNO_ENOBUFS = 105,
+    TARGET_ERRNO_ENOENT = 2,
+    TARGET_ERRNO_ENOMEM = 12,
+    TARGET_ERRNO_ENOSPC = 28,
+    TARGET_ERRNO_ENOSR = 63,
+    TARGET_ERRNO_ENOTCONN = 128,
+    TARGET_ERRNO_ENOTDIR = 20,
+    TARGET_ERRNO_ENXIO = 6,
+    TARGET_ERRNO_EOVERFLOW = 139,
+    TARGET_ERRNO_EPERM = 1,
+    TARGET_ERRNO_EPIPE = 32,
+    TARGET_ERRNO_ERANGE = 34,
+    TARGET_ERRNO_EROFS = 30,
+    TARGET_ERRNO_ESPIPE = 29,
+    TARGET_ERRNO_ETIMEDOUT = 116,
+    TARGET_ERRNO_ETXTBSY = 26,
+    TARGET_ERRNO_EWOULDBLOCK = 11,
+    TARGET_ERRNO_EXDEV = 18,
 };
 
 #define MIPS_O_RDONLY 0x0
@@ -107,13 +107,13 @@ enum {
 #define MIPS_O_EXCL   0x800
 
 struct mips_stat {
-    int16_t my_st_dev;
+    int16_t  my_st_dev;
     uint16_t my_st_ino;
     uint32_t my_st_mode;
     uint16_t my_st_nlink;
     uint16_t my_st_uid;
     uint16_t my_st_gid;
-    int16_t my_st_rdev;
+    int16_t  my_st_rdev;
     uint64_t my_st_size;
     uint64_t my_st_atime;
     uint64_t my_st_spare1;
@@ -126,8 +126,7 @@ struct mips_stat {
     uint64_t my_st_spare4[2];
 };
 
-static inline
-copy_stat(struct stat *restrict statbuf, struct mips_stat *mips_stat)
+static inline copy_stat(struct stat * restrict statbuf, struct mips_stat *mips_stat)
 {
     statbuf->st_dev = mips_stat->my_st_dev;
     statbuf->st_ino = mips_stat->my_st_ino;
@@ -268,8 +267,8 @@ static inline set_errno(long n)
 #define MIPS_ISA_LEVEL "arch=default"
 #endif
 
-#define UHI_CALL_CODE		"1"
-#define UHI_CALL_CODE_RAW	1
+#define UHI_CALL_CODE     "1"
+#define UHI_CALL_CODE_RAW 1
 
 #ifdef __GNUC__
 #pragma GCC diagnostic push
@@ -278,21 +277,21 @@ static inline set_errno(long n)
 #pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
 #endif
 
-static inline long mips_semihost0(long n)
+static inline long
+mips_semihost0(long n)
 {
     register long r2 __asm__("$2");
     register long r25 __asm__("$25") = n;
     register long r3 __asm__("$3");
 
-    __asm__ __volatile__ (
-        ".set	push   \n"
-        ".set	" MIPS_ISA_LEVEL " \n"
-        "addu $2,$0,%2 \n"
-        "sdbbp " UHI_CALL_CODE "   \n"
-        ".set	pop	\n"
-        : "=&r"(r2), "=r"(r3)
-        : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25)
-        : "memory");
+    __asm__ __volatile__(".set	push   \n"
+                         ".set	" MIPS_ISA_LEVEL " \n"
+                         "addu $2,$0,%2 \n"
+                         "sdbbp " UHI_CALL_CODE "   \n"
+                         ".set	pop	\n"
+                         : "=&r"(r2), "=r"(r3)
+                         : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25)
+                         : "memory");
 
     if (r2 == -1)
         set_errno(r3);
@@ -300,22 +299,22 @@ static inline long mips_semihost0(long n)
     return r2;
 }
 
-static inline long mips_semihost1(long n, long a)
+static inline long
+mips_semihost1(long n, long a)
 {
     register long r2 __asm__("$2");
     register long r25 __asm__("$25") = n;
     register long r4 __asm__("$4") = a;
     register long r3 __asm__("$3");
 
-    __asm__ __volatile__ (
-        ".set	push   \n"
-        ".set	" MIPS_ISA_LEVEL " \n"
-        "addu $2,$0,%2 \n"
-        "sdbbp " UHI_CALL_CODE "   \n"
-        ".set	pop	\n"
-        : "=&r"(r2), "=r"(r3)
-        : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4)
-        : "memory");
+    __asm__ __volatile__(".set	push   \n"
+                         ".set	" MIPS_ISA_LEVEL " \n"
+                         "addu $2,$0,%2 \n"
+                         "sdbbp " UHI_CALL_CODE "   \n"
+                         ".set	pop	\n"
+                         : "=&r"(r2), "=r"(r3)
+                         : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4)
+                         : "memory");
 
     if (r2 == -1)
         set_errno(r3);
@@ -323,7 +322,8 @@ static inline long mips_semihost1(long n, long a)
     return r2;
 }
 
-static inline long mips_semihost2(long n, long a, long b)
+static inline long
+mips_semihost2(long n, long a, long b)
 {
     register long r2 __asm__("$2");
     register long r25 __asm__("$25") = n;
@@ -331,15 +331,14 @@ static inline long mips_semihost2(long n, long a, long b)
     register long r5 __asm__("$5") = b;
     register long r3 __asm__("$3");
 
-    __asm__ __volatile__ (
-        ".set	push   \n"
-        ".set	" MIPS_ISA_LEVEL " \n"
-        "addu $2,$0,%2 \n"
-        "sdbbp " UHI_CALL_CODE "   \n"
-        ".set	pop	\n"
-        : "=&r"(r2), "=r"(r3)
-        : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4), "r"(r5)
-        : "memory");
+    __asm__ __volatile__(".set	push   \n"
+                         ".set	" MIPS_ISA_LEVEL " \n"
+                         "addu $2,$0,%2 \n"
+                         "sdbbp " UHI_CALL_CODE "   \n"
+                         ".set	pop	\n"
+                         : "=&r"(r2), "=r"(r3)
+                         : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4), "r"(r5)
+                         : "memory");
 
     if (r2 == -1)
         set_errno(r3);
@@ -347,7 +346,8 @@ static inline long mips_semihost2(long n, long a, long b)
     return r2;
 }
 
-static inline long mips_semihost3(long n, long a, long b, long c)
+static inline long
+mips_semihost3(long n, long a, long b, long c)
 {
     register long r2 __asm__("$2");
     register long r25 __asm__("$25") = n;
@@ -356,15 +356,14 @@ static inline long mips_semihost3(long n, long a, long b, long c)
     register long r6 __asm__("$6") = c;
     register long r3 __asm__("$3");
 
-    __asm__ __volatile__ (
-        ".set	push   \n"
-        ".set	" MIPS_ISA_LEVEL " \n"
-        "addu $2,$0,%2 \n"
-        "sdbbp " UHI_CALL_CODE "   \n"
-        ".set	pop	\n"
-        : "=&r"(r2), "=r"(r3)
-        : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4), "r"(r5), "r"(r6)
-        : "memory");
+    __asm__ __volatile__(".set	push   \n"
+                         ".set	" MIPS_ISA_LEVEL " \n"
+                         "addu $2,$0,%2 \n"
+                         "sdbbp " UHI_CALL_CODE "   \n"
+                         ".set	pop	\n"
+                         : "=&r"(r2), "=r"(r3)
+                         : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4), "r"(r5), "r"(r6)
+                         : "memory");
 
     if (r2 == -1)
         set_errno(r3);
@@ -372,7 +371,8 @@ static inline long mips_semihost3(long n, long a, long b, long c)
     return r2;
 }
 
-static inline long mips_semihost4(long n, long a, long b, long c, long d)
+static inline long
+mips_semihost4(long n, long a, long b, long c, long d)
 {
     register long r2 __asm__("$2");
     register long r25 __asm__("$25") = n;
@@ -382,15 +382,15 @@ static inline long mips_semihost4(long n, long a, long b, long c, long d)
     register long r7 __asm__("$7") = d;
     register long r3 __asm__("$3");
 
-    __asm__ __volatile__ (
-        ".set	push   \n"
-        ".set	" MIPS_ISA_LEVEL " \n"
-        "addu $2,$0,%2 \n"
-        "sdbbp " UHI_CALL_CODE "   \n"
-        ".set	pop	\n"
-        : "=&r"(r2), "=r"(r3)
-        : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4), "r"(r5), "r"(r6), "r"(r7)
-        : "memory");
+    __asm__ __volatile__(".set	push   \n"
+                         ".set	" MIPS_ISA_LEVEL " \n"
+                         "addu $2,$0,%2 \n"
+                         "sdbbp " UHI_CALL_CODE "   \n"
+                         ".set	pop	\n"
+                         : "=&r"(r2), "=r"(r3)
+                         : "ir"(UHI_CALL_CODE_RAW), "0"(r2), "r"(r25), "r"(r4), "r"(r5), "r"(r6),
+                           "r"(r7)
+                         : "memory");
 
     if (r2 == -1)
         set_errno(r3);

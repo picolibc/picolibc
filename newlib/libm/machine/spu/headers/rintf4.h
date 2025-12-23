@@ -38,25 +38,26 @@
 /* EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.              */
 /* --------------------------------------------------------------  */
 /* PROLOG END TAG zYx                                              */
-#ifdef __SPU__    
+#ifdef __SPU__
 #ifndef _RINTF4_H_
-#define _RINTF4_H_	1
-    
+#define _RINTF4_H_ 1
+
 #include "truncf4.h"
-    
+
 /*
  * FUNCTION
  *      vector float _rintf4(vector float x)
  *
  * DESCRIPTION
- *      The SPU doesn't support directed rounding.  Within the simdmath 
+ *      The SPU doesn't support directed rounding.  Within the simdmath
  *      library, rintf4 is aliased to truncf4.  This header merely
  *      provides inlinable compatibility
  *
  */
-static __inline vector float _rintf4(vector float x) 
+static __inline vector float
+_rintf4(vector float x)
 {
-  return _truncf4(x);
+    return _truncf4(x);
 }
 #endif /* _RINTF4_H_ */
 #endif /* __SPU__ */

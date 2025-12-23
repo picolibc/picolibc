@@ -36,14 +36,10 @@
 #include "ubsan.h"
 
 void
-__ubsan_handle_cfi_check_fail(void *_data,
-                              void *function,
-                              void *vtable_is_valid)
+__ubsan_handle_cfi_check_fail(void *_data, void *function, void *vtable_is_valid)
 {
     struct cfi_check_fail_data *data = _data;
-    __ubsan_error(&data->location, "cfi_check_fail", "(%s) %p valid %p %s\n",
-                  data->type->type_name,
-                  function,
-                  vtable_is_valid,
+    __ubsan_error(&data->location, "cfi_check_fail", "(%s) %p valid %p %s\n", data->type->type_name,
+                  function, vtable_is_valid,
                   __ubsan_cfi_type_check_to_string(data->cfi_type_check_kind));
 }

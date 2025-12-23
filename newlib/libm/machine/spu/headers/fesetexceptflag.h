@@ -31,22 +31,23 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FESETEXCEPTFLAG_H_
-#define _FESETEXCEPTFLAG_H_	1
+#define _FESETEXCEPTFLAG_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 #include "headers/fefpscr.h"
 
-static __inline void _fesetexceptflag(const fexcept_t *flagp, int excepts)
+static __inline void
+_fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-  vec_uint4 fpscr;
-  fenv_t mask, pack_fpscr;
+    vec_uint4 fpscr;
+    fenv_t    mask, pack_fpscr;
 
-  fpscr = spu_mffpscr();
-  pack_fpscr = __pack_fpscr(fpscr);
-  mask = excepts & FE_ALL_EXCEPT;
-  fpscr = __unpack_fpscr((pack_fpscr & ~mask) | (*flagp & mask));
-  spu_mtfpscr(fpscr);
+    fpscr = spu_mffpscr();
+    pack_fpscr = __pack_fpscr(fpscr);
+    mask = excepts & FE_ALL_EXCEPT;
+    fpscr = __unpack_fpscr((pack_fpscr & ~mask) | (*flagp & mask));
+    spu_mtfpscr(fpscr);
 }
 
 #endif /* _FESETEXCEPTFLAG_H_ */

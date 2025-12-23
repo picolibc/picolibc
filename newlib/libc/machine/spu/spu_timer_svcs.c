@@ -35,7 +35,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #include "spu_timer_internal.h"
 
 /* The timers.  */
-spu_timer_t __spu_timers[SPU_TIMER_NTIMERS] __aligned(16);
+spu_timer_t  __spu_timers[SPU_TIMER_NTIMERS] __aligned(16);
 
 /* Active timer list.  */
 spu_timer_t *__spu_timers_active;
@@ -47,8 +47,8 @@ spu_timer_t *__spu_timers_stopped;
 spu_timer_t *__spu_timers_handled;
 
 /* Bitmask of available timers.  */
-unsigned __spu_timers_avail =
-  ((1 << (SPU_TIMER_NTIMERS - 1)) + ((1 << (SPU_TIMER_NTIMERS - 1)) - 1));
+unsigned     __spu_timers_avail
+    = ((1 << (SPU_TIMER_NTIMERS - 1)) + ((1 << (SPU_TIMER_NTIMERS - 1)) - 1));
 
 /* Allocates an SPU interval timer and returns the timer ID. Must be called
    before starting a timer. interval specifies the expiration interval in
@@ -57,41 +57,39 @@ unsigned __spu_timers_avail =
     * SPU_TIMER_ERR_NONE_FREE - no free timers to allocate
     * SPU_TIMER_ERR_INVALID_PARM - invalid parm  */
 int
-spu_timer_alloc (int interval, void (*func) (int))
+spu_timer_alloc(int interval, void (*func)(int))
 {
-  unsigned was_enabled;
-  int id;
-  if (interval < MIN_INTVL || interval > MAX_INTVL || func == NULL)
-    return SPU_TIMER_ERR_INVALID_PARM;
+    unsigned was_enabled;
+    int      id;
+    if (interval < MIN_INTVL || interval > MAX_INTVL || func == NULL)
+        return SPU_TIMER_ERR_INVALID_PARM;
 
-  was_enabled = spu_readch (SPU_RdMachStat) & 0x1;
+    was_enabled = spu_readch(SPU_RdMachStat) & 0x1;
 
-  /* Get id of next available timer.  */
-  id = spu_extract ((spu_sub ((unsigned) 31,
-				  spu_cntlz (spu_promote
-					     (__spu_timers_avail, 0)))), 0);
+    /* Get id of next available timer.  */
+    id = spu_extract((spu_sub((unsigned)31, spu_cntlz(spu_promote(__spu_timers_avail, 0)))), 0);
 
-  /* No timers avail.  */
-  if (id == -1)
-    return SPU_TIMER_ERR_NONE_FREE;
+    /* No timers avail.  */
+    if (id == -1)
+        return SPU_TIMER_ERR_NONE_FREE;
 
-  /* Higher order bits represent lower timer ids.  */
-  __spu_timers_avail &= ~(1 << (id));
-  id = (SPU_TIMER_NTIMERS - 1) - id;
+    /* Higher order bits represent lower timer ids.  */
+    __spu_timers_avail &= ~(1 << (id));
+    id = (SPU_TIMER_NTIMERS - 1) - id;
 
-  /* Initialize timer and put it on stopped list.  */
-  (__spu_timers + id)->func = func;
-  (__spu_timers + id)->intvl = interval;
-  (__spu_timers + id)->id = id;
-  (__spu_timers + id)->state = SPU_TIMER_STOPPED;
+    /* Initialize timer and put it on stopped list.  */
+    (__spu_timers + id)->func = func;
+    (__spu_timers + id)->intvl = interval;
+    (__spu_timers + id)->id = id;
+    (__spu_timers + id)->state = SPU_TIMER_STOPPED;
 
-  spu_idisable ();
-  (__spu_timers + id)->next = __spu_timers_stopped;
-  __spu_timers_stopped = &__spu_timers[id];
+    spu_idisable();
+    (__spu_timers + id)->next = __spu_timers_stopped;
+    __spu_timers_stopped = &__spu_timers[id];
 
-  if (__likely (was_enabled))
-    spu_ienable ();
-  return id;
+    if (__likely(was_enabled))
+        spu_ienable();
+    return id;
 }
 
 /* External interface for starting a timer.  See description of
@@ -100,18 +98,18 @@ spu_timer_alloc (int interval, void (*func) (int))
     * SPU_TIMER_ERR_NOCLOCK - clock is off
     * SPU_TIMER_ERR_NOT_STOPPED - timer not in stopped state  */
 int
-spu_timer_start (int id)
+spu_timer_start(int id)
 {
-  if (id < 0 || id >= SPU_TIMER_NTIMERS)
-    return SPU_TIMER_ERR_INVALID_ID;
+    if (id < 0 || id >= SPU_TIMER_NTIMERS)
+        return SPU_TIMER_ERR_INVALID_ID;
 
-  if (__spu_clock_startcnt == 0)
-    return SPU_TIMER_ERR_NOCLOCK;
+    if (__spu_clock_startcnt == 0)
+        return SPU_TIMER_ERR_NOCLOCK;
 
-  if (__spu_timers[id].state != SPU_TIMER_STOPPED)
-    return SPU_TIMER_ERR_NOT_STOPPED;
+    if (__spu_timers[id].state != SPU_TIMER_STOPPED)
+        return SPU_TIMER_ERR_NOT_STOPPED;
 
-  __spu_timer_start (id, 1);
+    __spu_timer_start(id, 1);
 
-  return 0;
+    return 0;
 }

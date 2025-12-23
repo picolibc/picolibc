@@ -28,7 +28,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  *
- * imported and modified include for newlib 2010/10/03 
+ * imported and modified include for newlib 2010/10/03
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
@@ -40,38 +40,37 @@
 __weak_alias(catanf, _catanf)
 #endif
 
-float complex
-catanf(float complex z)
+    float complex catanf(float complex z)
 {
-	float complex w;
-	float a, t, x, x2, y;
+    float complex w;
+    float         a, t, x, x2, y;
 
-	x = crealf(z);
-	y = cimagf(z);
+    x = crealf(z);
+    y = cimagf(z);
 
-	if ((x == 0.0f) && (y > 1.0f))
-		goto ovrf;
+    if ((x == 0.0f) && (y > 1.0f))
+        goto ovrf;
 
-	x2 = x * x;
-	a = 1.0f - x2 - (y * y);
+    x2 = x * x;
+    a = 1.0f - x2 - (y * y);
 
-	t = 0.5f * atan2f(2.0f * x, a);
-	w = _redupif(t);
+    t = 0.5f * atan2f(2.0f * x, a);
+    w = _redupif(t);
 
-	t = y - 1.0f;
-	a = x2 + (t * t);
-	if (a == 0.0f)
-		goto ovrf;
+    t = y - 1.0f;
+    a = x2 + (t * t);
+    if (a == 0.0f)
+        goto ovrf;
 
-	t = y + 1.0f;
-	a = (x2 + (t * t))/a;
-	w = w + (0.25f * logf(a)) * I;
-	return w;
+    t = y + 1.0f;
+    a = (x2 + (t * t)) / a;
+    w = w + (0.25f * logf(a)) * I;
+    return w;
 
 ovrf:
 #if 0
 	mtherr ("catan", OVERFLOW);
 #endif
-	w = HUGE_VALF + HUGE_VALF * I;
-	return w;
+    w = HUGE_VALF + HUGE_VALF * I;
+    return w;
 }

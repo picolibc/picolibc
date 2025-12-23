@@ -43,5 +43,5 @@ close(int fd)
     ret = _simcall(SYS_close, fd);
     if (ret.code < 0)
         errno = ret.error;
-    return (int) ret.code;
+    return (int)ret.code;
 }

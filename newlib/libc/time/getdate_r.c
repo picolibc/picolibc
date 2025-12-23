@@ -40,35 +40,36 @@
 #include <stdlib.h>
 
 /* The  DATEMSK environment variable is not defined, or its value is an empty string. */
-#define GETDATE_DATEMSK       1
+#define GETDATE_DATEMSK 1
 
 /* The template file specified by DATEMSK cannot be opened for reading. */
-#define GETDATE_NOACCESS      2
+#define GETDATE_NOACCESS 2
 
 /* Failed to get file status information. */
-#define GETDATE_NOSTATUS      3
+#define GETDATE_NOSTATUS 3
 
 /* The template file is not a regular file. */
-#define GETDATE_NOTREGULAR    4
+#define GETDATE_NOTREGULAR 4
 
 /* An error was encountered while reading the template file. */
-#define GETDATE_READERROR     5
+#define GETDATE_READERROR 5
 
 /* Memory allocation failed (not enough memory available). */
-#define GETDATE_NOMEMORY      6
+#define GETDATE_NOMEMORY 6
 
 /* There is no line in the file that matches the input. */
-#define GETDATE_NOMATCH       7
+#define GETDATE_NOMATCH 7
 
 /* Invalid input specification. */
 #define GETDATE_INVALID_INPUT 8
 
-int getdate_r(const char *restrict string, struct tm *restrict tm)
+int
+getdate_r(const char * restrict string, struct tm * restrict tm)
 {
     char        line[64];
-    const char  *datemsk_name;
-    FILE        *datemsk;
-    char        *ret = NULL;
+    const char *datemsk_name;
+    FILE       *datemsk;
+    char       *ret = NULL;
 
     datemsk_name = getenv("DATEMSK");
     if (!datemsk_name || datemsk_name[0] == '\0')

@@ -41,8 +41,9 @@
  * than, equal to, or greater than zero if s1 is found, respectively,
  * to be less than, to match, or be greater than s2.
  */
-int strncmp(const char *s1, const char *s2, size_t n)
+int
+strncmp(const char *s1, const char *s2, size_t n)
 {
-  vec_uint4 end_v;
-  return _strncmp_internal (s1, s2, n, &end_v, 1);
+    vec_uint4 end_v;
+    return _strncmp_internal(s1, s2, n, &end_v, 1);
 }

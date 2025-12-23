@@ -342,6 +342,7 @@ def dump_table():
  */
 
 /* This file is auto-generated from mkctype.py */
+/* clang-format off */
 ''')   
     prev_above = 1
 

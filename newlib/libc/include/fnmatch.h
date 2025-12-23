@@ -30,26 +30,26 @@
  *	@(#)fnmatch.h	8.1 (Berkeley) 6/2/93
  */
 
-#ifndef	_FNMATCH_H_
-#define	_FNMATCH_H_
+#ifndef _FNMATCH_H_
+#define _FNMATCH_H_
 
 #include <sys/cdefs.h>
 
-#define	FNM_NOMATCH	1	/* Match failed. */
+#define FNM_NOMATCH  1 /* Match failed. */
 
-#define	FNM_NOESCAPE	0x01	/* Disable backslash escaping. */
-#define	FNM_PATHNAME	0x02	/* Slash must be matched by slash. */
-#define	FNM_PERIOD	0x04	/* Period must be matched by period. */
+#define FNM_NOESCAPE 0x01 /* Disable backslash escaping. */
+#define FNM_PATHNAME 0x02 /* Slash must be matched by slash. */
+#define FNM_PERIOD   0x04 /* Period must be matched by period. */
 
 #if __GNU_VISIBLE
-#define	FNM_LEADING_DIR	0x08	/* Ignore /<tail> after Imatch. */
-#define	FNM_CASEFOLD	0x10	/* Case insensitive search. */
-#define	FNM_IGNORECASE	FNM_CASEFOLD
-#define	FNM_FILE_NAME	FNM_PATHNAME
+#define FNM_LEADING_DIR 0x08 /* Ignore /<tail> after Imatch. */
+#define FNM_CASEFOLD    0x10 /* Case insensitive search. */
+#define FNM_IGNORECASE  FNM_CASEFOLD
+#define FNM_FILE_NAME   FNM_PATHNAME
 #endif
 
 _BEGIN_STD_C
-int	 fnmatch(const char *, const char *, int);
+int fnmatch(const char *, const char *, int);
 _END_STD_C
 
 #endif /* !_FNMATCH_H_ */

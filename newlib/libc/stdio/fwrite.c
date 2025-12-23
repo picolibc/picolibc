@@ -38,66 +38,63 @@
 size_t
 fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
 {
-	size_t i, j;
-	const uint8_t *cp = (const uint8_t *) ptr;
+    size_t         i, j;
+    const uint8_t *cp = (const uint8_t *)ptr;
 
-        __flockfile(stream);
-	if ((stream->flags & __SWR) == 0 || size == 0)
-		__funlock_return(stream, 0);
+    __flockfile(stream);
+    if ((stream->flags & __SWR) == 0 || size == 0)
+        __funlock_return(stream, 0);
 
 #ifdef __FAST_BUFIO
-        size_t bytes;
-        struct __file_bufio *bf = (struct __file_bufio *) stream;
+    size_t               bytes;
+    struct __file_bufio *bf = (struct __file_bufio *)stream;
 
-        if ((stream->flags & __SBUF) != 0 &&
-            (bf->bflags & __BLBF) == 0 &&
-            !mul_overflow(size, nmemb, &bytes) &&
-            bytes > 0)
-        {
-                __bufio_lock(stream);
-                __bufio_setdir_locked(stream, __SWR);
+    if ((stream->flags & __SBUF) != 0 && (bf->bflags & __BLBF) == 0
+        && !mul_overflow(size, nmemb, &bytes) && bytes > 0) {
+        __bufio_lock(stream);
+        __bufio_setdir_locked(stream, __SWR);
 
-                if (bytes < (unsigned) bf->size) {
-                        /* Small writes go through the buffer. */
-                        while (bytes) {
-                                int this_time = bf->size - bf->len;
-                                if (this_time == 0) {
-                                        int ret = __bufio_flush_locked(stream);
-                                        if (ret) {
-                                                stream->flags |= ret;
-                                                break;
-                                        }
-                                }
-                                if ((unsigned) this_time > bytes)
-                                        this_time = bytes;
-                                memcpy(bf->buf + bf->len, cp, this_time);
-                                bf->len += this_time;
-                                cp += this_time;
-                                bytes -= this_time;
-                        }
-                } else {
-                        /* Large writes go direct. */
-                        if (__bufio_flush_locked(stream) >= 0) {
-                                while (bytes) {
-                                        ssize_t len = bufio_write(bf, cp, bytes);
-                                        if (len <= 0) {
-                                                stream->flags |= _FDEV_ERR;
-                                                break;
-                                        }
-                                        bytes -= len;
-                                        cp += len;
-                                        bf->pos += len;
-                                }
-                        }
+        if (bytes < (unsigned)bf->size) {
+            /* Small writes go through the buffer. */
+            while (bytes) {
+                int this_time = bf->size - bf->len;
+                if (this_time == 0) {
+                    int ret = __bufio_flush_locked(stream);
+                    if (ret) {
+                        stream->flags |= ret;
+                        break;
+                    }
                 }
-                __bufio_unlock(stream);
-                __funlock_return(stream, (cp - (uint8_t *) ptr) / size);
+                if ((unsigned)this_time > bytes)
+                    this_time = bytes;
+                memcpy(bf->buf + bf->len, cp, this_time);
+                bf->len += this_time;
+                cp += this_time;
+                bytes -= this_time;
+            }
+        } else {
+            /* Large writes go direct. */
+            if (__bufio_flush_locked(stream) >= 0) {
+                while (bytes) {
+                    ssize_t len = bufio_write(bf, cp, bytes);
+                    if (len <= 0) {
+                        stream->flags |= _FDEV_ERR;
+                        break;
+                    }
+                    bytes -= len;
+                    cp += len;
+                    bf->pos += len;
+                }
+            }
         }
+        __bufio_unlock(stream);
+        __funlock_return(stream, (cp - (uint8_t *)ptr) / size);
+    }
 #endif
-	for (i = 0; i < nmemb; i++)
-		for (j = 0; j < size; j++)
-			if (stream->put(*cp++, stream) < 0)
-				__funlock_return(stream, i);
+    for (i = 0; i < nmemb; i++)
+        for (j = 0; j < size; j++)
+            if (stream->put(*cp++, stream) < 0)
+                __funlock_return(stream, i);
 
-	__funlock_return(stream, i);
+    __funlock_return(stream, i);
 }

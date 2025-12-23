@@ -8,14 +8,14 @@ is freely granted, provided that this notice is preserved.
 FUNCTION
 <<fma>>, <<fmaf>>---floating multiply add
 INDEX
-	fma
+        fma
 INDEX
-	fmaf
+        fmaf
 
 SYNOPSIS
-	#include <math.h>
-	double fma(double <[x]>, double <[y]>, double <[z]>);
-	float fmaf(float <[x]>, float <[y]>, float <[z]>);
+        #include <math.h>
+        double fma(double <[x]>, double <[y]>, double <[z]>);
+        float fmaf(float <[x]>, float <[y]>, float <[z]>);
 
 DESCRIPTION
 The <<fma>> functions compute (<[x]> * <[y]>) + <[z]>, rounded as one ternary
@@ -53,25 +53,25 @@ ANSI C, POSIX.
 __float64
 fma64(__float64 x, __float64 y, __float64 z)
 {
-    return (__float64) fmal((long double) x, (long double) y, (long double) z);
+    return (__float64)fmal((long double)x, (long double)y, (long double)z);
 }
 
 #else
 
 typedef __float64 FLOAT_T;
 
-#define FMA fma64
-#define NEXTAFTER nextafter64
-#define LDEXP ldexp64
-#define FREXP frexp64
-#define SCALBN scalbn64
-#define ILOGB    ilogb64
-#define COPYSIGN copysign64
+#define FMA            fma64
+#define NEXTAFTER      nextafter64
+#define LDEXP          ldexp64
+#define FREXP          frexp64
+#define SCALBN         scalbn64
+#define ILOGB          ilogb64
+#define COPYSIGN       copysign64
 
-#define SPLIT ((FLOAT_T) 0x1p26 + (FLOAT_T) 1.0)
-#define FLOAT_MANT_DIG        _FLOAT64_MANT_DIG
-#define FLOAT_MAX_EXP         _FLOAT64_MAX_EXP
-#define FLOAT_MIN             _FLOAT64_MIN
+#define SPLIT          ((FLOAT_T)0x1p26 + (FLOAT_T)1.0)
+#define FLOAT_MANT_DIG _FLOAT64_MANT_DIG
+#define FLOAT_MAX_EXP  _FLOAT64_MAX_EXP
+#define FLOAT_MIN      _FLOAT64_MIN
 
 static inline int
 odd_mant(FLOAT_T x)
@@ -86,7 +86,7 @@ EXPONENT(FLOAT_T x)
 }
 
 #ifdef __FLOAT64_NOEXCEPT
-#define feraiseexcept(x) ((void) (x))
+#define feraiseexcept(x) ((void)(x))
 #endif
 
 #include "fma_inc.h"

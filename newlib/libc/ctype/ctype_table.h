@@ -34,6 +34,7 @@
  */
 
 /* This file is auto-generated from mkctype.py */
+/* clang-format off */
 
 { 0x0000, CLASS_cntrl },
 { 0x0009, CLASS_blank|CLASS_cntrl|CLASS_space },

@@ -31,16 +31,17 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _FEGETROUND_H_
-#define _FEGETROUND_H_	1
+#define _FEGETROUND_H_ 1
 
 #include <spu_intrinsics.h>
 #include <fenv.h>
 
-#define FE_MASK_ROUND		(__FE_ROUND_ELE_0 | __FE_ROUND_ELE_1)
+#define FE_MASK_ROUND (__FE_ROUND_ELE_0 | __FE_ROUND_ELE_1)
 
-static __inline int _fegetround()
+static __inline int
+_fegetround()
 {
-  return (((spu_extract(spu_mffpscr(), 0) >> 8) & 0xf) | FE_MASK_ROUND);
+    return (((spu_extract(spu_mffpscr(), 0) >> 8) & 0xf) | FE_MASK_ROUND);
 }
 
 #endif /* _FEGETROUND_H_ */

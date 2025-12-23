@@ -38,17 +38,16 @@
 int
 __file_wstr_get(FILE *stream)
 {
-	struct __file_str *sstream = (struct __file_str *) stream;
-	int rv;
+    struct __file_str *sstream = (struct __file_str *)stream;
+    int                rv;
 
-        if (((sstream->pos - sstream->end) & (sizeof(wchar_t) - 1)) == 0)
-        {
-                wchar_t c;
-                memcpy(&c, sstream->pos, sizeof(wchar_t));
-                if (c == L'\0')
-                        return _FDEV_EOF;
-        }
-	rv = (unsigned char) *sstream->pos;
-	sstream->pos++;
-	return rv;
+    if (((sstream->pos - sstream->end) & (sizeof(wchar_t) - 1)) == 0) {
+        wchar_t c;
+        memcpy(&c, sstream->pos, sizeof(wchar_t));
+        if (c == L'\0')
+            return _FDEV_EOF;
+    }
+    rv = (unsigned char)*sstream->pos;
+    sstream->pos++;
+    return rv;
 }

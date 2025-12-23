@@ -46,25 +46,23 @@ void *
 memalign(size_t align, size_t s)
 {
     chunk_t *chunk_p;
-    size_t offset, size_with_padding;
-    char * allocated, * aligned_p;
+    size_t   offset, size_with_padding;
+    char    *allocated, *aligned_p;
 
     /* Return NULL if align isn't power of 2 */
-    if ((align & (align-1)) != 0)
-    {
+    if ((align & (align - 1)) != 0) {
         errno = EINVAL;
         return NULL;
     }
 
     align = MAX(align, MALLOC_MINSIZE);
 
-    if (s > MALLOC_MAXSIZE - align)
-    {
+    if (s > MALLOC_MAXSIZE - align) {
         errno = ENOMEM;
         return NULL;
     }
 
-    s = __align_up(MAX(s,1), MALLOC_CHUNK_ALIGN);
+    s = __align_up(MAX(s, 1), MALLOC_CHUNK_ALIGN);
 
     /* Make sure there's space to align the allocation and split
      * off chunk_t from the front
@@ -72,38 +70,37 @@ memalign(size_t align, size_t s)
     size_with_padding = s + align + MALLOC_MINSIZE;
 
     allocated = __malloc_malloc(size_with_padding);
-    if (allocated == NULL) return NULL;
+    if (allocated == NULL)
+        return NULL;
 
     chunk_p = ptr_to_chunk(allocated);
 
     aligned_p = __align_up(allocated, align);
 
-    offset = (size_t) (aligned_p - allocated);
+    offset = (size_t)(aligned_p - allocated);
 
     /* Split off the front piece if necessary */
-    if (offset)
-    {
-	if (offset < MALLOC_MINSIZE) {
-	    aligned_p += align;
-	    offset += align;
-	}
+    if (offset) {
+        if (offset < MALLOC_MINSIZE) {
+            aligned_p += align;
+            offset += align;
+        }
 
-	chunk_t *new_chunk_p = ptr_to_chunk(aligned_p);
-	_set_size(new_chunk_p, _size(chunk_p) - offset);
+        chunk_t *new_chunk_p = ptr_to_chunk(aligned_p);
+        _set_size(new_chunk_p, _size(chunk_p) - offset);
 
-	make_free_chunk(chunk_p, offset);
+        make_free_chunk(chunk_p, offset);
 
-	chunk_p = new_chunk_p;
+        chunk_p = new_chunk_p;
     }
 
     offset = _size(chunk_p) - chunk_size(s);
 
     /* Split off the back piece if large enough */
-    if (offset >= MALLOC_MINSIZE)
-    {
-	*_size_ref(chunk_p) -= offset;
+    if (offset >= MALLOC_MINSIZE) {
+        *_size_ref(chunk_p) -= offset;
 
-	make_free_chunk(chunk_after(chunk_p), offset);
+        make_free_chunk(chunk_after(chunk_p), offset);
     }
     return aligned_p;
 }

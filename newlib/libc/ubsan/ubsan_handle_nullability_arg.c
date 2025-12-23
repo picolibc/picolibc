@@ -39,8 +39,6 @@ void
 __ubsan_handle_nullability_arg(void *_data)
 {
     struct nonnull_arg_data *data = _data;
-    __ubsan_error(&data->location, "nullability_arg", "arg %d %s:%u\n",
-                  data->arg_index,
-                  data->attr_location.file_name,
-                  data->attr_location.line);
+    __ubsan_error(&data->location, "nullability_arg", "arg %d %s:%u\n", data->arg_index,
+                  data->attr_location.file_name, data->attr_location.line);
 }

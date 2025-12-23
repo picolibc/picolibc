@@ -44,4 +44,3 @@
 #include "ldd/s_nearbyintl.c"
 
 #endif
-

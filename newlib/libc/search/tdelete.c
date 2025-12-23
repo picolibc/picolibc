@@ -49,44 +49,42 @@ SUCH DAMAGE.
 #include <search.h>
 #include <stdlib.h>
 
-
 /* delete node with given key */
 void *
-tdelete (const void *__restrict vkey,	/* key to be deleted */
-	void      **__restrict vrootp,	/* address of the root of tree */
-	int       (*compar)(const void *, const void *))
+tdelete(const void * __restrict vkey, /* key to be deleted */
+        void ** __restrict vrootp,    /* address of the root of tree */
+        int (*compar)(const void *, const void *))
 {
-	node_t **rootp = (node_t **)vrootp;
-	node_t *p, *q, *r;
-	int  cmp;
+    node_t **rootp = (node_t **)vrootp;
+    node_t  *p, *q, *r;
+    int      cmp;
 
-	if (rootp == NULL || (p = *rootp) == NULL)
-		return NULL;
+    if (rootp == NULL || (p = *rootp) == NULL)
+        return NULL;
 
-	while ((cmp = (*compar)(vkey, (*rootp)->key)) != 0) {
-		p = *rootp;
-		rootp = (cmp < 0) ?
-		    &(*rootp)->llink :		/* follow llink branch */
-		    &(*rootp)->rlink;		/* follow rlink branch */
-		if (*rootp == NULL)
-			return NULL;		/* key not found */
-	}
-	r = (*rootp)->rlink;			/* D1: */
-	if ((q = (*rootp)->llink) == NULL)	/* Left NULL? */
-		q = r;
-	else if (r != NULL) {			/* Right link is NULL? */
-		if (r->llink == NULL) {		/* D2: Find successor */
-			r->llink = q;
-			q = r;
-		} else {			/* D3: Find NULL link */
-			for (q = r->llink; q->llink != NULL; q = r->llink)
-				r = q;
-			r->llink = q->rlink;
-			q->llink = (*rootp)->llink;
-			q->rlink = (*rootp)->rlink;
-		}
-	}
-	free(*rootp);				/* D4: Free node */
-	*rootp = q;				/* link parent to new node */
-	return p;
+    while ((cmp = (*compar)(vkey, (*rootp)->key)) != 0) {
+        p = *rootp;
+        rootp = (cmp < 0) ? &(*rootp)->llink : /* follow llink branch */
+            &(*rootp)->rlink;                  /* follow rlink branch */
+        if (*rootp == NULL)
+            return NULL; /* key not found */
+    }
+    r = (*rootp)->rlink;               /* D1: */
+    if ((q = (*rootp)->llink) == NULL) /* Left NULL? */
+        q = r;
+    else if (r != NULL) {       /* Right link is NULL? */
+        if (r->llink == NULL) { /* D2: Find successor */
+            r->llink = q;
+            q = r;
+        } else { /* D3: Find NULL link */
+            for (q = r->llink; q->llink != NULL; q = r->llink)
+                r = q;
+            r->llink = q->rlink;
+            q->llink = (*rootp)->llink;
+            q->rlink = (*rootp)->rlink;
+        }
+    }
+    free(*rootp); /* D4: Free node */
+    *rootp = q;   /* link parent to new node */
+    return p;
 }

@@ -38,8 +38,8 @@
 struct strdesc
 get_str(char *sample)
 {
-	struct strdesc x;
-	x.base = sample;
-	x.len = strlen(sample);
-	return x;
+    struct strdesc x;
+    x.base = sample;
+    x.len = strlen(sample);
+    return x;
 }

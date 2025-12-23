@@ -42,7 +42,9 @@
 #include <errno.h>
 #include <stdarg.h>
 
-static int mips_flags(int flags) {
+static int
+mips_flags(int flags)
+{
     int mips = 0;
 
     if (flags & O_WRONLY)
@@ -65,13 +67,12 @@ int
 open(const char *pathname, int flags, ...)
 {
     va_list ap;
-    int ret;
+    int     ret;
 
-    va_start(ap,flags);
+    va_start(ap, flags);
     uintptr_t mode = va_arg(ap, uintptr_t);
     va_end(ap);
-    ret = mips_semihost3(SYS_SEMIHOST_open, (uintptr_t)pathname,
-                         mips_flags(flags), mode);
+    ret = mips_semihost3(SYS_SEMIHOST_open, (uintptr_t)pathname, mips_flags(flags), mode);
 
     return ret;
 }

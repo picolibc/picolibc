@@ -7,11 +7,11 @@ FUNCTION
 <<abs>>---integer absolute value (magnitude)
 
 INDEX
-	abs
+        abs
 
 SYNOPSIS
-	#include <stdlib.h>
-	int abs(int <[i]>);
+        #include <stdlib.h>
+        int abs(int <[i]>);
 
 DESCRIPTION
 <<abs>> returns
@@ -36,7 +36,7 @@ No supporting OS subroutines are required.
 #include <stdlib.h>
 
 int
-abs (int i)
+abs(int i)
 {
-  return (i < 0) ? -i : i;
+    return (i < 0) ? -i : i;
 }

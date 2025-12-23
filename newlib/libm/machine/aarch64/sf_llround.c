@@ -28,11 +28,11 @@
 #include <math.h>
 
 long long int
-llroundf (float x)
+llroundf(float x)
 {
-  long long int result;
-  __asm__("fcvtas\t%x0, %s1" : "=r" (result) : "w" (x));
-  return result;
+    long long int result;
+    __asm__("fcvtas\t%x0, %s1" : "=r"(result) : "w"(x));
+    return result;
 }
 
 #else

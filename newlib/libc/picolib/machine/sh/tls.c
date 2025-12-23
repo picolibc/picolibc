@@ -52,6 +52,6 @@ extern char __sh32_tls_tcb_offset;
 void
 _set_tls(void *tls)
 {
-    tls = (uint8_t *) tls - TP_OFFSET;
-    __asm__("ldc %0,gbr" : : "r" (tls));
+    tls = (uint8_t *)tls - TP_OFFSET;
+    __asm__("ldc %0,gbr" : : "r"(tls));
 }

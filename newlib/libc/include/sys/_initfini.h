@@ -38,24 +38,22 @@
 #include <stdlib.h>
 
 /* These magic symbols are provided by the linker.  */
-extern void (*__preinit_array_start []) (void) __weak;
-extern void (*__preinit_array_end []) (void) __weak;
-extern void (*__init_array_start []) (void) __weak;
-extern void (*__init_array_end []) (void) __weak;
-extern void (*__bothinit_array_start []) (void) __weak;
-extern void (*__bothinit_array_end []) (void) __weak;
-extern void (*__fini_array_start []) (void) __weak;
-extern void (*__fini_array_end []) (void) __weak;
+extern void (*__preinit_array_start[])(void) __weak;
+extern void (*__preinit_array_end[])(void) __weak;
+extern void (*__init_array_start[])(void) __weak;
+extern void (*__init_array_end[])(void) __weak;
+extern void (*__bothinit_array_start[])(void) __weak;
+extern void (*__bothinit_array_end[])(void) __weak;
+extern void (*__fini_array_start[])(void) __weak;
+extern void (*__fini_array_end[])(void) __weak;
 
 #ifdef __INIT_FINI_FUNCS
-extern void _init (void) __weak;
-extern void _fini (void) __weak;
+extern void _init(void) __weak;
+extern void _fini(void) __weak;
 #endif
 
-void
-__libc_init_array (void);
+void __libc_init_array(void);
 
-void
-__libc_fini_array (void);
+void __libc_fini_array(void);
 
 #endif /* __INITFINI_H_ */

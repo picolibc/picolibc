@@ -18,131 +18,120 @@
 #include "test.h"
 #include <errno.h>
 
-
 static int
-randi (void)
+randi(void)
 {
-  static uint32_t next;
-  next = (next * 1103515245UL) + 12345UL;
-  return ((next >> 16) & 0xffff);
+    static uint32_t next;
+    next = (next * 1103515245UL) + 12345UL;
+    return ((next >> 16) & 0xffff);
 }
 
 #ifndef __FLOAT_WORD_ORDER__
 #define __FLOAT_WORD_ORDER__ __BYTE_ORDER__
 #endif
 
-static double randx (void)
+static double
+randx(void)
 {
-  double res;
+    double res;
 
-  do
-  {
-    union {
-	short parts[4];
-	double res;
-      } u;
+    do {
+        union {
+            short  parts[4];
+            double res;
+        } u;
 
 #if __FLOAT_WORD_ORDER__ == __ORDER_LITTLE_ENDIAN__
-    u.parts[0] = randi();
-    u.parts[1] = randi();
-    u.parts[2] = randi();
-    u.parts[3] = randi();
+        u.parts[0] = randi();
+        u.parts[1] = randi();
+        u.parts[2] = randi();
+        u.parts[3] = randi();
 #else
-    u.parts[3] = randi();
-    u.parts[2] = randi();
-    u.parts[1] = randi();
-    u.parts[0] = randi();
+        u.parts[3] = randi();
+        u.parts[2] = randi();
+        u.parts[1] = randi();
+        u.parts[0] = randi();
 #endif
-    res = u.res;
+        res = u.res;
 
-  } while (!finite(res));
+    } while (!finite(res));
 
-  return res ;
+    return res;
 }
 
 /* Return a random double, but bias for numbers closer to 0 */
-static double randy (void)
+static double
+randy(void)
 {
-  int pow;
-  double r= randx();
-  r = frexp(r, &pow);
-  return ldexp(r, randi() & 0x1f);
+    int    pow;
+    double r = randx();
+    r = frexp(r, &pow);
+    return ldexp(r, randi() & 0x1f);
 }
 
 static void
-test_frexp (void)
+test_frexp(void)
 {
-  int i;
-  double r;
-  int t;
+    int    i;
+    double r;
+    int    t;
 
-  float xf;
-  double gives;
+    float  xf;
+    double gives;
 
-  int pow;
+    int    pow;
 
+    /* Frexp of x return a and n, where a * 2**n == x, so test this with a
+       set of random numbers */
+    for (t = 0; t < 2; t++) {
+        for (i = 0; i < 1000; i++) {
 
-  /* Frexp of x return a and n, where a * 2**n == x, so test this with a
-     set of random numbers */
-  for (t = 0; t < 2; t++)
-  {
-    for (i = 0; i < 1000; i++)
-    {
+            double x = randx();
+            line(i);
+            switch (t) {
+            case 0:
+                newfunc("frexp/ldexp");
+                r = frexp(x, &pow);
+                if (r > 1.0 || r < -1.0) {
+                    /* Answer can never be > 1 or < 1 */
+                    test_iok(0, 1);
+                }
 
-      double x = randx();
-      line(i);
-      switch (t)
-      {
-      case 0:
-	newfunc("frexp/ldexp");
-	r = frexp(x, &pow);
-	if (r > 1.0 || r < -1.0)
-	{
-	  /* Answer can never be > 1 or < 1 */
-	  test_iok(0,1);
-	}
+                gives = ldexp(r, pow);
+                test_mok(gives, x, 62);
+                break;
+            case 1:
+                newfunc("frexpf/ldexpf");
+                if (x > (double)FLT_MIN && x < (double)FLT_MAX) {
+                    /* test floats too, but they have a smaller range so make sure x
+                       isn't too big. Also x can get smaller than a float can
+                       represent to make sure that doesn't happen too */
+                    xf = x;
+                    r = (double)frexpf(xf, &pow);
+                    if (r > 1.0 || r < -1.0) {
+                        /* Answer can never be > 1 or < -1 */
+                        test_iok(0, 1);
+                    }
 
-	gives = ldexp(r ,pow);
-	test_mok(gives,x,62);
-	break;
-      case 1:
-	newfunc("frexpf/ldexpf");
-	if (x > (double) FLT_MIN && x < (double) FLT_MAX)
-	{
-	  /* test floats too, but they have a smaller range so make sure x
-	     isn't too big. Also x can get smaller than a float can
-	     represent to make sure that doesn't happen too */
-	  xf = x;
-	  r = (double) frexpf(xf, &pow);
-	  if (r > 1.0 || r < -1.0)
-	  {
-	    /* Answer can never be > 1 or < -1 */
-	    test_iok(0,1);
-	  }
-
-	  gives = (double) ldexpf(r ,pow);
-	  test_mok(gives,x, 32);
-
-	}
-      }
-
+                    gives = (double)ldexpf(r, pow);
+                    test_mok(gives, x, 32);
+                }
+            }
+        }
     }
 
-  }
+    /* test a few numbers manually to make sure frexp/ldexp are not
+       testing as ok because both are broken */
 
-  /* test a few numbers manually to make sure frexp/ldexp are not
-     testing as ok because both are broken */
+    r = frexp(64.0, &i);
 
-  r = frexp(64.0, &i);
+    test_mok(r, 0.5, 64);
+    test_iok(i, 7);
 
-  test_mok(r, 0.5,64);
-  test_iok(i, 7);
+    r = frexp(96.0, &i);
 
-  r = frexp(96.0, &i);
-
-  test_mok(r, 0.75, 64);
-  test_iok(i, 7);
-
+    test_mok(r, 0.75, 64);
+    test_iok(i, 7);
 }
 
 /* Test mod - this is given a real hammering by the strtod type
@@ -158,102 +147,86 @@ test_frexp (void)
 
 */
 static void
-test_mod (void)
+test_mod(void)
 {
-  int i;
+    int i;
 
-  newfunc("modf");
+    newfunc("modf");
 
-
-  for (i = 0; i < 1000; i++)
-  {
-    double intpart;
-    double n;
-    line(i);
-    n  = randx();
-    if (finite(n) && n != 0.0 )
-    {
-      volatile double r = modf(n, &intpart);
-      line(i);
-      test_mok(intpart + r, n, 63);
+    for (i = 0; i < 1000; i++) {
+        double intpart;
+        double n;
+        line(i);
+        n = randx();
+        if (finite(n) && n != 0.0) {
+            volatile double r = modf(n, &intpart);
+            line(i);
+            test_mok(intpart + r, n, 63);
+        }
     }
+    newfunc("modff");
 
-  }
-  newfunc("modff");
-
-  for (i = 0; i < 1000; i++)
-  {
-    float intpart;
-    double nd;
-    line(i);
-    nd  = randx() ;
-    if (fabs(nd) < (double) FLT_MAX && finitef(nd) && nd != 0.0)
-    {
-      volatile float n = nd;
-      volatile double r = (double) modff(n, &intpart);
-      line(i);
-      test_mok((double) intpart + r, (double) n, 32);
+    for (i = 0; i < 1000; i++) {
+        float  intpart;
+        double nd;
+        line(i);
+        nd = randx();
+        if (fabs(nd) < (double)FLT_MAX && finitef(nd) && nd != 0.0) {
+            volatile float  n = nd;
+            volatile double r = (double)modff(n, &intpart);
+            line(i);
+            test_mok((double)intpart + r, (double)n, 32);
+        }
     }
-  }
-
-
 }
 
 /*
 Test pow by multiplying logs
 */
 static void
-test_pow (void)
+test_pow(void)
 {
-  unsigned int i;
-  newfunc("pow");
+    unsigned int i;
+    newfunc("pow");
 
-  for (i = 0; i < 1000; i++)
-  {
-    double n1;
-    double n2;
-    double res;
-    double shouldbe;
+    for (i = 0; i < 1000; i++) {
+        double n1;
+        double n2;
+        double res;
+        double shouldbe;
 
-    line(i);
-    n1 = fabs(randy());
-    n2 = fabs(randy()/100.0);
-    res = pow(n1, n2);
-    shouldbe = exp(log(n1) * n2);
-    test_mok(shouldbe, res,55);
-  }
+        line(i);
+        n1 = fabs(randy());
+        n2 = fabs(randy() / 100.0);
+        res = pow(n1, n2);
+        shouldbe = exp(log(n1) * n2);
+        test_mok(shouldbe, res, 55);
+    }
 
-  newfunc("powf");
+    newfunc("powf");
 
-  for (i = 0; i < 1000; i++)
-  {
-    float n1;
-    float n2;
-    float res;
-    float shouldbe;
+    for (i = 0; i < 1000; i++) {
+        float n1;
+        float n2;
+        float res;
+        float shouldbe;
 
-    errno = 0;
+        errno = 0;
 
-    line(i);
-    n1 = fabs(randy());
-    n2 = fabs(randy()/100.0);
-    res = powf(n1, n2);
-    shouldbe = expf(logf(n1) * n2);
-    if (!errno)
-      test_mok((double) shouldbe, (double) res,28);
-  }
-
-
-
-
+        line(i);
+        n1 = fabs(randy());
+        n2 = fabs(randy() / 100.0);
+        res = powf(n1, n2);
+        shouldbe = expf(logf(n1) * n2);
+        if (!errno)
+            test_mok((double)shouldbe, (double)res, 28);
+    }
 }
 
-
-
 void
-test_math2 (void)
+test_math2(void)
 {
-  test_mod();
-  test_frexp();
-  test_pow();
+    test_mod();
+    test_frexp();
+    test_pow();
 }

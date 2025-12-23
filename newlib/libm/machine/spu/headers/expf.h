@@ -31,12 +31,12 @@
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef _EXPF_H_
-#define _EXPF_H_		1
+#define _EXPF_H_ 1
 
 #include "exp2f.h"
 
 #ifndef M_LOG2E
-#define M_LOG2E		1.4426950408889634074
+#define M_LOG2E 1.4426950408889634074
 #endif /* M_LOG2E */
 
 /*
@@ -48,11 +48,10 @@
  *	computed using exp2f as e^x = 2^(log2(e)*x)
  */
 
-static __inline float _expf(float x)
+static __inline float
+_expf(float x)
 {
-  return (_exp2f((float)(M_LOG2E) * x));
+    return (_exp2f((float)(M_LOG2E)*x));
 }
 
 #endif /* _EXPF_H_ */
-
-

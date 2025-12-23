@@ -51,23 +51,22 @@ SUCH DAMAGE.
 
 /* find a node, or return 0 */
 void *
-tfind (const void *vkey,		/* key to be found */
-	void **vrootp,		/* address of the tree root */
-	int (*compar)(const void *, const void *))
+tfind(const void *vkey,   /* key to be found */
+      void      **vrootp, /* address of the tree root */
+      int         (*compar)(const void *, const void *))
 {
-	node_t **rootp = (node_t **)vrootp;
+    node_t **rootp = (node_t **)vrootp;
 
-	if (rootp == NULL)
-		return NULL;
+    if (rootp == NULL)
+        return NULL;
 
-	while (*rootp != NULL) {		/* T1: */
-		int r;
+    while (*rootp != NULL) { /* T1: */
+        int r;
 
-		if ((r = (*compar)(vkey, (*rootp)->key)) == 0)	/* T2: */
-			return *rootp;		/* key found */
-		rootp = (r < 0) ?
-		    &(*rootp)->llink :		/* T3: follow left branch */
-		    &(*rootp)->rlink;		/* T4: follow right branch */
-	}
-	return NULL;
+        if ((r = (*compar)(vkey, (*rootp)->key)) == 0) /* T2: */
+            return *rootp;                             /* key found */
+        rootp = (r < 0) ? &(*rootp)->llink :           /* T3: follow left branch */
+            &(*rootp)->rlink;                          /* T4: follow right branch */
+    }
+    return NULL;
 }

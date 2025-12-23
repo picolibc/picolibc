@@ -38,5 +38,6 @@
 int
 opal_console_write(int terminal, size_t len, const char *base)
 {
-    return opal_call((void *) (intptr_t) terminal, (void *) &len, (void *) base, OPAL_CONSOLE_WRITE, __opal_base, __opal_entry);
+    return opal_call((void *)(intptr_t)terminal, (void *)&len, (void *)base, OPAL_CONSOLE_WRITE,
+                     __opal_base, __opal_entry);
 }

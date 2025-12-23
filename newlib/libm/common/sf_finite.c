@@ -8,7 +8,7 @@
  *
  * Developed at SunPro, a Sun Microsystems, Inc. business.
  * Permission to use, copy, modify, and distribute this
- * software is freely granted, provided that this notice 
+ * software is freely granted, provided that this notice
  * is preserved.
  * ====================================================
  */
@@ -20,12 +20,13 @@
 
 #include "fdlibm.h"
 
-int finitef(float x)
+int
+finitef(float x)
 {
-	__int32_t ix;
-	GET_FLOAT_WORD(ix,x);
-	ix &= 0x7fffffff;
-	return (FLT_UWORD_IS_FINITE(ix));
+    __int32_t ix;
+    GET_FLOAT_WORD(ix, x);
+    ix &= 0x7fffffff;
+    return (FLT_UWORD_IS_FINITE(ix));
 }
 
 #ifdef __strong_reference
@@ -38,5 +39,4 @@ __finitef(float x)
 }
 #endif
 
-_MATH_ALIAS_i_f(finite)
-_MATH_ALIAS_i_f(__finite)
+_MATH_ALIAS_i_f(finite) _MATH_ALIAS_i_f(__finite)

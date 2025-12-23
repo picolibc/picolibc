@@ -45,12 +45,11 @@ void
 __ubsan_handle_invalid_builtin(void *_data)
 {
     struct invalid_builtin_data *data = _data;
-    const char *kind;
-    if (data->kind < sizeof(builtin_check_kinds)/sizeof(builtin_check_kinds[0]))
+    const char                  *kind;
+    if (data->kind < sizeof(builtin_check_kinds) / sizeof(builtin_check_kinds[0]))
         kind = builtin_check_kinds[data->kind];
     else
         kind = "unknown";
 
-    __ubsan_error(&data->location, "invalid_builtin", "%s\n",
-                  kind);
+    __ubsan_error(&data->location, "invalid_builtin", "%s\n", kind);
 }

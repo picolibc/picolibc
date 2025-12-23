@@ -29,11 +29,11 @@
 int
 isinfl(long double e)
 {
-	union IEEEl2bits u;
+    union IEEEl2bits u;
 
-	u.e = e;
-	mask_nbit_l(u);
-	return (u.bits.exp == LDBL_INF_NAN_EXP && (u.bits.manl == 0 && u.bits.manh == 0));
+    u.e = e;
+    mask_nbit_l(u);
+    return (u.bits.exp == LDBL_INF_NAN_EXP && (u.bits.manl == 0 && u.bits.manh == 0));
 }
 
 #ifdef __strong_reference

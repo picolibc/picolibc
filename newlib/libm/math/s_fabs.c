@@ -15,12 +15,12 @@
 FUNCTION
        <<fabs>>, <<fabsf>>---absolute value (magnitude)
 INDEX
-	fabs
+        fabs
 INDEX
-	fabsf
+        fabsf
 
 SYNOPSIS
-	#include <math.h>
+        #include <math.h>
        double fabs(double <[x]>);
        float fabsf(float <[x]>);
 

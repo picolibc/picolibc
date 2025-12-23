@@ -38,48 +38,44 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#define HANDLER_NOT_CALLED      0
-#define HANDLER_SUCCESS         1
-#define HANDLER_FAILED          2
+#define HANDLER_NOT_CALLED 0
+#define HANDLER_SUCCESS    1
+#define HANDLER_FAILED     2
 
-static volatile sig_atomic_t     handler_result;
-static volatile sig_atomic_t     handler_sig_expect;
-static volatile sig_atomic_t     handler_sig_received;
+static volatile sig_atomic_t handler_result;
+static volatile sig_atomic_t handler_sig_expect;
+static volatile sig_atomic_t handler_sig_received;
 
 static void
 signal_handler(int sig)
 {
     handler_sig_received = sig;
-    if (sig == (int) handler_sig_expect)
+    if (sig == (int)handler_sig_expect)
         handler_result = HANDLER_SUCCESS;
     else
         handler_result = HANDLER_FAILED;
 }
 
 static const int test_signals[] = {
-    SIGABRT,
-    SIGFPE,
-    SIGILL,
-    SIGINT,
-    SIGSEGV,
-    SIGTERM,
+    SIGABRT, SIGFPE, SIGILL, SIGINT, SIGSEGV, SIGTERM,
 };
 
-#define MODE_IGN        0
-#define MODE_CATCH      1
-#define MODE_MAX        2
+#define MODE_IGN   0
+#define MODE_CATCH 1
+#define MODE_MAX   2
 
-#define NTEST_SIG    (sizeof(test_signals)/sizeof(test_signals[0]))
+#define NTEST_SIG  (sizeof(test_signals) / sizeof(test_signals[0]))
 
-int main(void)
+int
+main(void)
 {
-    void (*old_func)(int);
-    void (*new_func)(int);
-    void (*prev_func)(int);
-    int ret;
+    void     (*old_func)(int);
+    void     (*new_func)(int);
+    void     (*prev_func)(int);
+    int      ret;
     unsigned u;
-    int fail = 0;
-    int mode;
+    int      fail = 0;
+    int      mode;
 
     for (u = 0; u < NTEST_SIG; u++) {
         int sig = test_signals[u];
@@ -97,15 +93,14 @@ int main(void)
             /* Set up the signal handler */
             old_func = signal(sig, new_func);
             if (old_func != SIG_DFL) {
-                printf("signal %d: old_func was %p, not SIG_DFL\n",
-                       sig, old_func);
+                printf("signal %d: old_func was %p, not SIG_DFL\n", sig, old_func);
                 fail = 1;
             }
 
             /* Invoke the handler */
             prev_func = new_func;
             handler_result = HANDLER_NOT_CALLED;
-            handler_sig_expect = (sig_atomic_t) sig;
+            handler_sig_expect = (sig_atomic_t)sig;
 
             ret = raise(sig);
             if (ret != 0) {
@@ -131,8 +126,8 @@ int main(void)
                     prev_func = SIG_DFL;
                     break;
                 case HANDLER_FAILED:
-                    printf("signal %d: handler failed, received signal %d\n",
-                           sig, (int) handler_sig_received);
+                    printf("signal %d: handler failed, received signal %d\n", sig,
+                           (int)handler_sig_received);
                     fail = 1;
                     break;
                 }
@@ -144,8 +139,8 @@ int main(void)
 
             old_func = signal(sig, SIG_DFL);
             if (old_func != prev_func) {
-                printf("signal %d: after test, signal is %p expected %p\n",
-                       sig, old_func, prev_func);
+                printf("signal %d: after test, signal is %p expected %p\n", sig, old_func,
+                       prev_func);
                 fail = 1;
             }
         }

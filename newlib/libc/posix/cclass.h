@@ -34,26 +34,37 @@
  * $FreeBSD: src/lib/libc/regex/cclass.h,v 1.4 2002/03/22 23:41:56 obrien Exp $
  */
 
-
-typedef enum {CALNUM, CALPHA, CBLANK, CCNTRL, CDIGIT, CGRAPH,
-	      CLOWER, CPRINT, CPUNCT, CSPACE, CUPPER, CXDIGIT} citype;
+typedef enum {
+    CALNUM,
+    CALPHA,
+    CBLANK,
+    CCNTRL,
+    CDIGIT,
+    CGRAPH,
+    CLOWER,
+    CPRINT,
+    CPUNCT,
+    CSPACE,
+    CUPPER,
+    CXDIGIT
+} citype;
 
 /* character-class table */
 static const struct cclass {
-	const char *name;
-	citype fidx;
+    const char *name;
+    citype      fidx;
 } cclasses[] = {
-	{"alnum",       CALNUM},
-	{"alpha",       CALPHA},
-	{"blank",       CBLANK},
-	{"cntrl",       CCNTRL},
-	{"digit",       CDIGIT},
-	{"graph",       CGRAPH},
-	{"lower",       CLOWER},
-	{"print",       CPRINT},
-	{"punct",       CPUNCT},
-	{"space",       CSPACE},
-	{"upper",       CUPPER},
-	{"xdigit",      CXDIGIT},
-	{0}
+    { "alnum", CALNUM },
+    { "alpha", CALPHA },
+    { "blank", CBLANK },
+    { "cntrl", CCNTRL },
+    { "digit", CDIGIT },
+    { "graph", CGRAPH },
+    { "lower", CLOWER },
+    { "print", CPRINT },
+    { "punct", CPUNCT },
+    { "space", CSPACE },
+    { "upper", CUPPER },
+    { "xdigit", CXDIGIT },
+    { 0 }
 };

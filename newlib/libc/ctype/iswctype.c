@@ -25,25 +25,25 @@ DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
 INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
 LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
 ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS   
+INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 /*
 FUNCTION
-	<<iswctype>>, <<iswctype_l>>---extensible wide-character test
+        <<iswctype>>, <<iswctype_l>>---extensible wide-character test
 
 INDEX
-	iswctype
+        iswctype
 
 INDEX
-	iswctype_l
+        iswctype_l
 
 SYNOPSIS
-	#include <wctype.h>
-	int iswctype(wint_t <[c]>, wctype_t <[desc]>);
+        #include <wctype.h>
+        int iswctype(wint_t <[c]>, wctype_t <[desc]>);
 
-	#include <wctype.h>
-	int iswctype_l(wint_t <[c]>, wctype_t <[desc]>, locale_t <[locale]>);
+        #include <wctype.h>
+        int iswctype_l(wint_t <[c]>, wctype_t <[desc]>, locale_t <[locale]>);
 
 DESCRIPTION
 <<iswctype>> is a function which classifies wide-character values using the
@@ -69,38 +69,37 @@ No supporting OS subroutines are required.
 #include "local.h"
 
 int
-iswctype (wint_t c, wctype_t desc)
+iswctype(wint_t c, wctype_t desc)
 {
-  switch (desc)
-    {
+    switch (desc) {
     case WC_ALNUM:
-      return iswalnum (c);
+        return iswalnum(c);
     case WC_ALPHA:
-      return iswalpha (c);
+        return iswalpha(c);
     case WC_BLANK:
-      return iswblank (c);
+        return iswblank(c);
     case WC_CNTRL:
-      return iswcntrl (c);
+        return iswcntrl(c);
     case WC_DIGIT:
-      return iswdigit (c);
+        return iswdigit(c);
     case WC_GRAPH:
-      return iswgraph (c);
+        return iswgraph(c);
     case WC_LOWER:
-      return iswlower (c);
+        return iswlower(c);
     case WC_PRINT:
-      return iswprint (c);
+        return iswprint(c);
     case WC_PUNCT:
-      return iswpunct (c);
+        return iswpunct(c);
     case WC_SPACE:
-      return iswspace (c);
+        return iswspace(c);
     case WC_UPPER:
-      return iswupper (c);
+        return iswupper(c);
     case WC_XDIGIT:
-      return iswxdigit (c);
+        return iswxdigit(c);
     default:
-      return 0; /* eliminate warning */
+        return 0; /* eliminate warning */
     }
 
-  /* otherwise unknown */
-  return 0;
+    /* otherwise unknown */
+    return 0;
 }

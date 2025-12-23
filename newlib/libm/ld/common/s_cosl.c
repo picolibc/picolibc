@@ -24,58 +24,56 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-
 /*
  * Limited testing on pseudorandom numbers drawn within [-2e8:4e8] shows
  * an accuracy of <= 0.7412 ULP.
  */
-
 
 #include "e_rem_pio2l.h"
 
 long double
 cosl(long double x)
 {
-	union IEEEl2bits z;
-	int e0;
-	long double y[2];
-	long double hi, lo;
+    union IEEEl2bits z;
+    int              e0;
+    long double      y[2];
+    long double      hi, lo;
 
-	z.e = x;
-	z.bits.sign = 0;
+    z.e = x;
+    z.bits.sign = 0;
 
-	/* If x = NaN or Inf, then cos(x) = NaN. */
-	if (z.bits.exp == 32767)
-                return __math_invalidl(x);
+    /* If x = NaN or Inf, then cos(x) = NaN. */
+    if (z.bits.exp == 32767)
+        return __math_invalidl(x);
 
-	/* If x = +-0, then cos(x) = 1 */
-	if (x == 0)
-		return (1.0L);
+    /* If x = +-0, then cos(x) = 1 */
+    if (x == 0)
+        return (1.0L);
 
-	/* Optimize the case where x is already within range. */
-	if (z.e < _M_PI_4L)
-		return (__kernel_cosl(z.e, 0));
+    /* Optimize the case where x is already within range. */
+    if (z.e < _M_PI_4L)
+        return (__kernel_cosl(z.e, 0));
 
-	e0 = __ieee754_rem_pio2l(x, y);
-	hi = y[0];
-	lo = y[1];
+    e0 = __ieee754_rem_pio2l(x, y);
+    hi = y[0];
+    lo = y[1];
 
-	switch (e0 & 3) {
-	case 0:
-	    hi = __kernel_cosl(hi, lo);
-	    break;
-	case 1:
-	    hi = - __kernel_sinl(hi, lo, 1);
-	    break;
-	case 2:
-	    hi = - __kernel_cosl(hi, lo);
-	    break;
-	case 3:
-	    hi = __kernel_sinl(hi, lo, 1);
-	    break;
-	}
+    switch (e0 & 3) {
+    case 0:
+        hi = __kernel_cosl(hi, lo);
+        break;
+    case 1:
+        hi = -__kernel_sinl(hi, lo, 1);
+        break;
+    case 2:
+        hi = -__kernel_cosl(hi, lo);
+        break;
+    case 3:
+        hi = __kernel_sinl(hi, lo, 1);
+        break;
+    }
 
-	return (hi);
+    return (hi);
 }
 
 #ifdef __strong_reference
@@ -84,4 +82,3 @@ cosl(long double x)
 #endif
 __strong_reference(cosl, _cosl);
 #endif
-

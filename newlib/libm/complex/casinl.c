@@ -37,15 +37,14 @@
 __weak_alias(casinl, _casinl)
 #endif
 
-long double complex
-casinl(long double complex z)
+    long double complex casinl(long double complex z)
 {
-	long double complex w;
-	long double complex ca, ct, zz, z2;
-	long double x, y;
+    long double complex w;
+    long double complex ca, ct, zz, z2;
+    long double         x, y;
 
-	x = creall(z);
-	y = cimagl(z);
+    x = creall(z);
+    y = cimagl(z);
 
 #if 0 /* MD: test is incorrect, casin(>1) is defined */
 	if (y == 0.0L) {
@@ -61,62 +60,61 @@ casinl(long double complex z)
 	}
 #endif
 
-/* Power series expansion */
-/*
-b = cabsl(z);
-if( b < 0.125L )
-{
-z2.r = (x - y) * (x + y);
-z2.i = 2.0L * x * y;
+    /* Power series expansion */
+    /*
+    b = cabsl(z);
+    if( b < 0.125L )
+    {
+    z2.r = (x - y) * (x + y);
+    z2.i = 2.0L * x * y;
 
-cn = 1.0L;
-n = 1.0L;
-ca.r = x;
-ca.i = y;
-sum.r = x;
-sum.i = y;
-do
-	{
-	ct.r = z2.r * ca.r  -  z2.i * ca.i;
-	ct.i = z2.r * ca.i  +  z2.i * ca.r;
-	ca.r = ct.r;
-	ca.i = ct.i;
+    cn = 1.0L;
+    n = 1.0L;
+    ca.r = x;
+    ca.i = y;
+    sum.r = x;
+    sum.i = y;
+    do
+            {
+            ct.r = z2.r * ca.r  -  z2.i * ca.i;
+            ct.i = z2.r * ca.i  +  z2.i * ca.r;
+            ca.r = ct.r;
+            ca.i = ct.i;
 
-	cn *= n;
-	n += 1.0;
-	cn /= n;
-	n += 1.0;
-	b = cn/n;
+            cn *= n;
+            n += 1.0;
+            cn /= n;
+            n += 1.0;
+            b = cn/n;
 
-	ct.r *= b;
-	ct.i *= b;
-	sum.r += ct.r;
-	sum.i += ct.i;
-	b = fabsl(ct.r) + fabsl(ct.i);
-	}
-while( b > MACHEPL );
-w->r = sum.r;
-w->i = sum.i;
-return;
-}
-*/
+            ct.r *= b;
+            ct.i *= b;
+            sum.r += ct.r;
+            sum.i += ct.i;
+            b = fabsl(ct.r) + fabsl(ct.i);
+            }
+    while( b > MACHEPL );
+    w->r = sum.r;
+    w->i = sum.i;
+    return;
+    }
+    */
 
+    ca = x + y * (long double complex)I;
+    ct = ca * (long double complex)I;
+    /* sqrtl( 1 - z*z) */
+    /* cmull( &ca, &ca, &zz ) */
+    /*x * x  -  y * y */
+    zz = (x - y) * (x + y) + (2.0L * x * y) * (long double complex)I;
 
-	ca = x + y * (long double complex) I;
-	ct = ca * (long double complex) I;
-	/* sqrtl( 1 - z*z) */
-	/* cmull( &ca, &ca, &zz ) */
-	/*x * x  -  y * y */
-	zz = (x - y) * (x + y) + (2.0L * x * y) * (long double complex) I;
+    zz = 1.0L - creall(zz) - cimagl(zz) * (long double complex)I;
+    z2 = csqrtl(zz);
 
-	zz = 1.0L - creall(zz) - cimagl(zz) * (long double complex) I;
-	z2 = csqrtl(zz);
-
-	zz = ct + z2;
-	zz = clogl(zz);
-	/* multiply by 1/i = -i */
-	w = zz * (-1.0L * (long double complex) I);
-	return w;
+    zz = ct + z2;
+    zz = clogl(zz);
+    /* multiply by 1/i = -i */
+    w = zz * (-1.0L * (long double complex)I);
+    return w;
 }
 
 #endif

@@ -24,14 +24,14 @@ FUNCTION
 <<ctime>>---convert time to local and format as string
 
 INDEX
-	ctime
+        ctime
 INDEX
-	ctime_r
+        ctime_r
 
 SYNOPSIS
-	#include <time.h>
-	char *ctime(const time_t *<[clock]>);
-	char *ctime_r(const time_t *<[clock]>, char *<[buf]>);
+        #include <time.h>
+        char *ctime(const time_t *<[clock]>);
+        char *ctime_r(const time_t *<[clock]>, char *<[buf]>);
 
 DESCRIPTION
 Convert the time value at <[clock]> to local time (like <<localtime>>)
@@ -51,7 +51,7 @@ ANSI C requires <<ctime>>.
 #include <time.h>
 
 char *
-ctime (const time_t * tim_p)
+ctime(const time_t *tim_p)
 {
-  return asctime (localtime (tim_p));
+    return asctime(localtime(tim_p));
 }

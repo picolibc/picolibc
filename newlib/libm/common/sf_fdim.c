@@ -6,14 +6,16 @@
 
 #include "fdlibm.h"
 
-float fdimf(float x, float y)
+float
+fdimf(float x, float y)
 {
-  if (isnanf(x) || isnanf(y)) return(x+y);
+    if (isnanf(x) || isnanf(y))
+        return (x + y);
 
-  float z = x > y ? x - y : 0.0f;
-  if (!isinf(x) && !isinf(y))
-    z = check_oflowf(z);
-  return z;
+    float z = x > y ? x - y : 0.0f;
+    if (!isinf(x) && !isinf(y))
+        z = check_oflowf(z);
+    return z;
 }
 
 _MATH_ALIAS_f_ff(fdim)

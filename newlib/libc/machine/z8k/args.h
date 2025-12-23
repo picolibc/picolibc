@@ -24,6 +24,6 @@ unsegm
 #endif
 
 #define LARG_0 rr6
-#define ARG_0 r7
+#define ARG_0  r7
 
 #define LARG_1 rr4

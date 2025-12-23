@@ -62,46 +62,50 @@
 #define TEST_CONST const
 #endif
 
-#define count(a)        (sizeof(a)/sizeof(a[0]))
-#define _MATH_CONCAT(a,b)       a ## b
-#define MATH_CONCAT(a,b)        _MATH_CONCAT(a, b)
-#define _MATH_STRING(a)         #a
-#define MATH_STRING(a)          _MATH_STRING(a)
+#define count(a)           (sizeof(a) / sizeof(a[0]))
+#define _MATH_CONCAT(a, b) a##b
+#define MATH_CONCAT(a, b)  _MATH_CONCAT(a, b)
+#define _MATH_STRING(a)    #a
+#define MATH_STRING(a)     _MATH_STRING(a)
 
 #ifdef SKIP_DENORM
-#define MY_ABS(x)               ({ __typeof(x) __tmp__ = (x); __tmp__ < 0 ? -__tmp__ : __tmp__; })
-#define SKIP_DENORM32(x)        (MY_ABS(x) < MIN_BINARY32)
-#define SKIP_DENORM64(x)        (MY_ABS(x) < MIN_BINARY64)
-#define SKIP_DENORM80(x)        (MY_ABS(x) < MIN_BINARY80)
-#define SKIP_DENORM128(x)       (MY_ABS(x) < MIN_BINARY128)
+#define MY_ABS(x)                         \
+    ({                                    \
+        __typeof(x) __tmp__ = (x);        \
+        __tmp__ < 0 ? -__tmp__ : __tmp__; \
+    })
+#define SKIP_DENORM32(x)  (MY_ABS(x) < MIN_BINARY32)
+#define SKIP_DENORM64(x)  (MY_ABS(x) < MIN_BINARY64)
+#define SKIP_DENORM80(x)  (MY_ABS(x) < MIN_BINARY80)
+#define SKIP_DENORM128(x) (MY_ABS(x) < MIN_BINARY128)
 #else
-#define SKIP_DENORM32(x)        0
-#define SKIP_DENORM64(x)        0
-#define SKIP_DENORM80(x)        0
-#define SKIP_DENORM128(x)       0
+#define SKIP_DENORM32(x)  0
+#define SKIP_DENORM64(x)  0
+#define SKIP_DENORM80(x)  0
+#define SKIP_DENORM128(x) 0
 #endif
 
-#define SKIP_CDENORM32(z)       (SKIP_DENORM32(creal32(z)) || SKIP_DENORM32(cimag32(z)))
-#define SKIP_CDENORM64(z)       (SKIP_DENORM64(creal64(z)) || SKIP_DENORM64(cimag64(z)))
-#define SKIP_CDENORM80(z)       (SKIP_DENORM80(creal80(z)) || SKIP_DENORM80(cimag80(z)))
-#define SKIP_CDENORM128(z)       (SKIP_DENORM128(creal128(z)) || SKIP_DENORM128(cimag128(z)))
+#define SKIP_CDENORM32(z)  (SKIP_DENORM32(creal32(z)) || SKIP_DENORM32(cimag32(z)))
+#define SKIP_CDENORM64(z)  (SKIP_DENORM64(creal64(z)) || SKIP_DENORM64(cimag64(z)))
+#define SKIP_CDENORM80(z)  (SKIP_DENORM80(creal80(z)) || SKIP_DENORM80(cimag80(z)))
+#define SKIP_CDENORM128(z) (SKIP_DENORM128(creal128(z)) || SKIP_DENORM128(cimag128(z)))
 
-#define MAX_ULP         9999
-#define INV_ULP         10000
+#define MAX_ULP            9999
+#define INV_ULP            10000
 typedef int32_t ulp_t;
-#define PRIdULP         PRId32
+#define PRIdULP PRId32
 
 typedef const struct {
     const char *name;
-    ulp_t b32;
-    ulp_t b64;
-    ulp_t b80;
-    ulp_t b128;
+    ulp_t       b32;
+    ulp_t       b64;
+    ulp_t       b80;
+    ulp_t       b128;
 } math_ulps_t;
 
 static TEST_CONST math_ulps_t math_ulps[];
 
-ulp_t     max_ulp;
+ulp_t                         max_ulp;
 
 #include "test-ulp.h"
 
@@ -109,7 +113,7 @@ static inline math_ulps_t *
 math_find_ulps(void)
 {
     const char *name = MATH_STRING(TEST_FUNC);
-    for (size_t i = 0; i < sizeof(math_ulps)/sizeof(math_ulps[0]); i++)
+    for (size_t i = 0; i < sizeof(math_ulps) / sizeof(math_ulps[0]); i++)
         if (strcmp(name, math_ulps[i].name) == 0)
             return &math_ulps[i];
     assert(0);
@@ -146,33 +150,33 @@ math_find_ulp_binary128(void)
 
 #if __FLT_MANT_DIG__ == 24 && !defined(SKIP_BINARY32)
 #define HAS_BINARY32
-typedef float binary32;
+typedef float         binary32;
 typedef complex float cbinary32;
-#define CMPLX32(a,b) CMPLXF(a,b)
-#define creal32(a) crealf(a)
-#define cimag32(a) cimagf(a)
-#define carg32(a) cargf(a)
-#define cabs32(a) cabsf(a)
-#define nextafter32(x,y) nextafterf(x,y)
-#define MIN_BINARY32    FLT_MIN
-#define FN32(a) a ## f
-#define TEST_FUNC_32 MATH_CONCAT(TEST_FUNC, f)
-//#define FMT32        "% -14.8e"
-#define FMT32        "% -15.6a"
-#define P32(a)  ((double) (a))
+#define CMPLX32(a, b)     CMPLXF(a, b)
+#define creal32(a)        crealf(a)
+#define cimag32(a)        cimagf(a)
+#define carg32(a)         cargf(a)
+#define cabs32(a)         cabsf(a)
+#define nextafter32(x, y) nextafterf(x, y)
+#define MIN_BINARY32      FLT_MIN
+#define FN32(a)           a##f
+#define TEST_FUNC_32      MATH_CONCAT(TEST_FUNC, f)
+// #define FMT32        "% -14.8e"
+#define FMT32  "% -15.6a"
+#define P32(a) ((double)(a))
 #endif
 
 #ifdef HAS_BINARY32
 typedef struct {
-    binary32    x, y;
+    binary32 x, y;
 } unary32;
 
 typedef struct {
-    cbinary32    x, y;
+    cbinary32 x, y;
 } cunary32;
 
 static inline ulp_t
-ulp32 (binary32 a, binary32 b)
+ulp32(binary32 a, binary32 b)
 {
     if (a == b)
         return 0;
@@ -186,9 +190,9 @@ ulp32 (binary32 a, binary32 b)
         return INV_ULP;
     }
 
-    ulp_t     ulp = 0;
+    ulp_t ulp = 0;
     while (a != b) {
-        a = nextafter32(a,b);
+        a = nextafter32(a, b);
         ulp++;
         if (ulp == MAX_ULP)
             break;
@@ -201,8 +205,8 @@ culp32(cbinary32 a, cbinary32 b)
 {
     if (a == b)
         return 0;
-    binary32    a_r = cabs32(a);
-    binary32    d_r = cabs32(a-b);
+    binary32 a_r = cabs32(a);
+    binary32 d_r = cabs32(a - b);
     return ulp32(a_r + d_r, a_r);
 }
 
@@ -210,46 +214,46 @@ culp32(cbinary32 a, cbinary32 b)
 
 #if __DBL_MANT_DIG__ == 53 && !defined(SKIP_BINARY64)
 #define HAS_BINARY64
-typedef double binary64;
+typedef double         binary64;
 typedef complex double cbinary64;
-#define CMPLX64(a,b) CMPLX(a,b)
-#define creal64(a) creal(a)
-#define cimag64(a) cimag(a)
-#define carg64(a) carg(a)
-#define cabs64(a) cabs(a)
-#define clog64(a) clog(a)
-#define nextafter64(x,y) nextafter(x,y)
-#define TEST_FUNC_64 TEST_FUNC
-#define MIN_BINARY64    DBL_MIN
-#define FN64(a)   a
-#define FMT64   "% -23.13a"
-#define P64(a)  (a)
+#define CMPLX64(a, b)     CMPLX(a, b)
+#define creal64(a)        creal(a)
+#define cimag64(a)        cimag(a)
+#define carg64(a)         carg(a)
+#define cabs64(a)         cabs(a)
+#define clog64(a)         clog(a)
+#define nextafter64(x, y) nextafter(x, y)
+#define TEST_FUNC_64      TEST_FUNC
+#define MIN_BINARY64      DBL_MIN
+#define FN64(a)           a
+#define FMT64             "% -23.13a"
+#define P64(a)            (a)
 #elif __LDBL_MANT_DIG__ == 53 && defined(_TEST_LONG_DOUBLE) && !defined(SKIP_BINARY64)
 #define HAS_BINARY64
-typedef long double binary64;
+typedef long double         binary64;
 typedef complex long double cbinary64;
-#define CMPLX64(a,b) CMPLXL(a,b)
-#define creal64(a) creall(a)
-#define cimag64(a) cimagl(a)
-#define carg64(a) cargl(a)
-#define cabs64(a) cabsl(a)
-#define clog64(a) clogl(a)
-#define nextafter64(x,y) nextafterl(x,y)
-#define TEST_FUNC_64 MATH_CONCAT(TEST_FUNC, l)
-#define MIN_BINARY64    LDBL_MIN
-#define FN64(a)   a ## l
-#define FMT64   "%La"
-#define P64(a)  (a)
+#define CMPLX64(a, b)     CMPLXL(a, b)
+#define creal64(a)        creall(a)
+#define cimag64(a)        cimagl(a)
+#define carg64(a)         cargl(a)
+#define cabs64(a)         cabsl(a)
+#define clog64(a)         clogl(a)
+#define nextafter64(x, y) nextafterl(x, y)
+#define TEST_FUNC_64      MATH_CONCAT(TEST_FUNC, l)
+#define MIN_BINARY64      LDBL_MIN
+#define FN64(a)           a##l
+#define FMT64             "%La"
+#define P64(a)            (a)
 #endif
 
 #ifdef HAS_BINARY64
 
 typedef struct {
-    binary64    x, y;
+    binary64 x, y;
 } unary64;
 
 typedef struct {
-    cbinary64    x, y;
+    cbinary64 x, y;
 } cunary64;
 
 static inline ulp_t
@@ -260,7 +264,7 @@ ulp64(binary64 a, binary64 b)
     if (isnan(a) && isnan(b))
         return 0;
     /* sometimes inf != inf on m68k? */
-    if (isinf(a) && isinf(b) && (a>0) == (b>0))
+    if (isinf(a) && isinf(b) && (a > 0) == (b > 0))
         return 0;
     if (isnan(a) || isnan(b)) {
 #ifdef __RX__
@@ -270,9 +274,9 @@ ulp64(binary64 a, binary64 b)
         return INV_ULP;
     }
 
-    ulp_t     ulp = 0;
+    ulp_t ulp = 0;
     while (a != b) {
-        a = nextafter64(a,b);
+        a = nextafter64(a, b);
         ulp++;
         if (ulp == MAX_ULP)
             break;
@@ -285,8 +289,8 @@ culp64(cbinary64 a, cbinary64 b)
 {
     if (a == b)
         return 0;
-    binary64    a_r = cabs64(a);
-    binary64    d_r = cabs64(a-b);
+    binary64 a_r = cabs64(a);
+    binary64 d_r = cabs64(a - b);
     return ulp64(a_r + d_r, a_r);
 }
 
@@ -294,21 +298,21 @@ culp64(cbinary64 a, cbinary64 b)
 
 #if __LDBL_MANT_DIG__ == 64 && defined(_TEST_LONG_DOUBLE) && !defined(SKIP_BINARY80)
 #define HAS_BINARY80
-typedef long double binary80;
+typedef long double         binary80;
 typedef complex long double cbinary80;
-#define CMPLX80(a,b) CMPLXL(a,b)
-#define creal80(a) creall(a)
-#define cimag80(a) cimagl(a)
-#define carg80(a) cargl(a)
-#define cabs80(a) cabsl(a)
-#define clog80(a) clogl(a)
-#define frexp80(a,e) frexpl(a, e);
-#define nextafter80(x,y) nextafterl(x,y)
-#define TEST_FUNC_80 MATH_CONCAT(TEST_FUNC, l)
-#define MIN_BINARY80    LDBL_MIN
-#define FN80(a)   a ## l
-#define FMT80   "%La"
-#define P80(a)  (a)
+#define CMPLX80(a, b)     CMPLXL(a, b)
+#define creal80(a)        creall(a)
+#define cimag80(a)        cimagl(a)
+#define carg80(a)         cargl(a)
+#define cabs80(a)         cabsl(a)
+#define clog80(a)         clogl(a)
+#define frexp80(a, e)     frexpl(a, e);
+#define nextafter80(x, y) nextafterl(x, y)
+#define TEST_FUNC_80      MATH_CONCAT(TEST_FUNC, l)
+#define MIN_BINARY80      LDBL_MIN
+#define FN80(a)           a##l
+#define FMT80             "%La"
+#define P80(a)            (a)
 #endif
 
 #ifdef HAS_BINARY80
@@ -329,11 +333,11 @@ skip_binary80(void)
 }
 
 typedef struct {
-    binary80    x, y;
+    binary80 x, y;
 } unary80;
 
 typedef struct {
-    cbinary80    x, y;
+    cbinary80 x, y;
 } cunary80;
 
 static inline ulp_t
@@ -346,7 +350,7 @@ ulp80(binary80 a, binary80 b)
     if (isnan(a) || isnan(b))
         return INV_ULP;
 
-    ulp_t     ulp = 0;
+    ulp_t ulp = 0;
     while (a != b) {
         a = nextafterl(a, b);
         ulp++;
@@ -361,8 +365,8 @@ culp80(cbinary80 a, cbinary80 b)
 {
     if (a == b)
         return 0;
-    binary80    a_r = cabs80(a);
-    binary80    d_r = cabs80(a-b);
+    binary80 a_r = cabs80(a);
+    binary80 d_r = cabs80(a - b);
     return ulp80(a_r + d_r, a_r);
 }
 
@@ -371,29 +375,29 @@ culp80(cbinary80 a, cbinary80 b)
 #if __LDBL_MANT_DIG__ == 113 && defined(_TEST_LONG_DOUBLE) && !defined(SKIP_BINARY128)
 
 #define HAS_BINARY128
-typedef long double binary128;
+typedef long double         binary128;
 typedef complex long double cbinary128;
-#define CMPLX128(a,b) CMPLXL(a,b)
-#define creal128(a) creall(a)
-#define cimag128(a) cimagl(a)
-#define carg128(a) cargl(a)
-#define cabs128(a) cabsl(a)
-#define nextafter128(x,y) nextafterl(x,y)
-#define TEST_FUNC_128 MATH_CONCAT(TEST_FUNC, l)
-#define MIN_BINARY128    LDBL_MIN
-#define FN128(a)   a ## l
-#define FMT128   "%La"
-#define P128(a)  (a)
+#define CMPLX128(a, b)     CMPLXL(a, b)
+#define creal128(a)        creall(a)
+#define cimag128(a)        cimagl(a)
+#define carg128(a)         cargl(a)
+#define cabs128(a)         cabsl(a)
+#define nextafter128(x, y) nextafterl(x, y)
+#define TEST_FUNC_128      MATH_CONCAT(TEST_FUNC, l)
+#define MIN_BINARY128      LDBL_MIN
+#define FN128(a)           a##l
+#define FMT128             "%La"
+#define P128(a)            (a)
 #endif
 
 #ifdef HAS_BINARY128
 
 typedef struct {
-    binary128    x, y;
+    binary128 x, y;
 } unary128;
 
 typedef struct {
-    cbinary128    x, y;
+    cbinary128 x, y;
 } cunary128;
 
 static inline ulp_t
@@ -406,9 +410,9 @@ ulp128(binary128 a, binary128 b)
     if (isnan(a) || isnan(b))
         return INV_ULP;
 
-    ulp_t     ulp = 0;
+    ulp_t ulp = 0;
     while (a != b) {
-        a = nextafter128(a,b);
+        a = nextafter128(a, b);
         ulp++;
         if (ulp == MAX_ULP)
             break;
@@ -421,8 +425,8 @@ culp128(cbinary128 a, cbinary128 b)
 {
     if (a == b)
         return 0;
-    binary128   a_r = cabs128(a);
-    binary128   d_r = cabs128(a-b);
+    binary128 a_r = cabs128(a);
+    binary128 d_r = cabs128(a - b);
     return ulp128(a_r + d_r, a_r);
 }
 

@@ -40,12 +40,11 @@
 /* PROLOG END TAG zYx                                              */
 #ifdef __SPU__
 #ifndef _LOGD2_H_
-#define _LOGD2_H_	1
+#define _LOGD2_H_ 1
 
 #include <spu_intrinsics.h>
 #include "simdmath.h"
 #include "log2d2.h"
-
 
 /*
  * FUNCTION
@@ -58,9 +57,10 @@
  *	logd2(x) = log2d2(x) / log2d2(e) = log2d2(x) * logd2(2)
  *
  */
-static __inline vector double _logd2(vector double x)
+static __inline vector double
+_logd2(vector double x)
 {
-  return (spu_mul(_log2d2(x), spu_splats(SM_LN2)));
+    return (spu_mul(_log2d2(x), spu_splats(SM_LN2)));
 }
 
 #endif /* _LOGD2_H_ */

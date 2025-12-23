@@ -38,12 +38,13 @@
  */
 
 void
-free (void * free_p)
+free(void *free_p)
 {
-    chunk_t     *p_to_free;
-    chunk_t     **p, *r;
+    chunk_t  *p_to_free;
+    chunk_t **p, *r;
 
-    if (free_p == NULL) return;
+    if (free_p == NULL)
+        return;
 
     p_to_free = ptr_to_chunk(free_p);
 
@@ -59,30 +60,26 @@ free (void * free_p)
 
     MALLOC_LOCK;
 
-    for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next)
-    {
-	/* Insert in address order */
-	if (p_to_free <= r) {
+    for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
+        /* Insert in address order */
+        if (p_to_free <= r) {
 
             /* Check for double free */
-            if (p_to_free == r)
-            {
+            if (p_to_free == r) {
                 errno = ENOMEM;
                 goto unlock;
             }
 
-	    break;
+            break;
         }
 
-	/* Merge blocks together */
-	if (chunk_after(r) == p_to_free)
-	{
-	    *_size_ref(r) += _size(p_to_free);
-	    p_to_free = r;
-	    r = r->next;
-	    goto no_insert;
-	}
-
+        /* Merge blocks together */
+        if (chunk_after(r) == p_to_free) {
+            *_size_ref(r) += _size(p_to_free);
+            p_to_free = r;
+            r = r->next;
+            goto no_insert;
+        }
     }
 
     p_to_free->next = r;
@@ -91,19 +88,18 @@ free (void * free_p)
 no_insert:
 
     /* Merge blocks together */
-    if (chunk_after(p_to_free) == r)
-    {
+    if (chunk_after(p_to_free) == r) {
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wanalyzer-null-dereference"
 #endif
-	*_size_ref(p_to_free) += _size(r);
+        *_size_ref(p_to_free) += _size(r);
 #ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
 #pragma GCC diagnostic pop
 #endif
-	p_to_free->next = r->next;
+        p_to_free->next = r->next;
     }
 
 unlock:
@@ -117,7 +113,8 @@ unlock:
 __strong_reference(free, __malloc_free);
 __strong_reference(free, cfree);
 #else
-void cfree(void * ptr)
+void
+cfree(void *ptr)
 {
     free(ptr);
 }

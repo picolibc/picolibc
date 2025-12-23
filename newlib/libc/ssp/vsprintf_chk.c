@@ -42,18 +42,18 @@
 
 /*ARGSUSED*/
 int
-__vsprintf_chk(char * __restrict buf, int flags, size_t slen,
-    const char * __restrict fmt, va_list ap)
+__vsprintf_chk(char * __restrict buf, int flags, size_t slen, const char * __restrict fmt,
+               va_list ap)
 {
-	int rv;
+    int rv;
 
-        (void) flags;
-	if (slen > (size_t)INT_MAX)
-		rv = vsprintf(buf, fmt, ap);
-	else {
-		if ((rv = vsnprintf(buf, slen, fmt, ap)) >= 0 && (size_t)rv >= slen)
-			__chk_fail();
-	}
+    (void)flags;
+    if (slen > (size_t)INT_MAX)
+        rv = vsprintf(buf, fmt, ap);
+    else {
+        if ((rv = vsnprintf(buf, slen, fmt, ap)) >= 0 && (size_t)rv >= slen)
+            __chk_fail();
+    }
 
-	return rv;
+    return rv;
 }

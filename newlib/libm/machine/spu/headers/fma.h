@@ -32,18 +32,20 @@
 */
 
 #ifndef _FMA_H_
-#define _FMA_H_		1
+#define _FMA_H_ 1
 
 #include <spu_intrinsics.h>
 
-static __inline double _fma(double x, double y, double z)
+static __inline double
+_fma(double x, double y, double z)
 {
-  vec_double2 vx, vy, vz, vout;;
+    vec_double2 vx, vy, vz, vout;
+    ;
 
-  vx = spu_promote(x, 0);
-  vy = spu_promote(y, 0);
-  vz = spu_promote(z, 0);
-  vout = spu_madd(vx, vy, vz);
-  return (spu_extract(vout, 0));
+    vx = spu_promote(x, 0);
+    vy = spu_promote(y, 0);
+    vz = spu_promote(z, 0);
+    vout = spu_madd(vx, vy, vz);
+    return (spu_extract(vout, 0));
 }
 #endif /* _FMA_H_ */

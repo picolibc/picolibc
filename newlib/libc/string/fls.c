@@ -32,8 +32,8 @@ int
 fls(int i)
 {
 
-	if (i == 0)
-		return 0;
+    if (i == 0)
+        return 0;
 
-	return (sizeof(i) * CHAR_BIT - __builtin_clz(i));
+    return (sizeof(i) * CHAR_BIT - __builtin_clz(i));
 }

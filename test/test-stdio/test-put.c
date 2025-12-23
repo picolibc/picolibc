@@ -62,9 +62,9 @@ check_s(char *label, bool ok, size_t expect, size_t got)
 int
 main(void)
 {
-    int a;
+    int    a;
     size_t s;
-    int ret = 0;
+    int    ret = 0;
 
     a = putc('X', stdout);
     ret += check("putc", a == 'X', 'X', a);
@@ -76,19 +76,19 @@ main(void)
     ret += check("fputc", a == 'Z', 'Z', a);
 
     a = puts("puts");
-    ret += check ("puts", a >= 0, 0, a);
+    ret += check("puts", a >= 0, 0, a);
 
     a = fputs("fputs\n", stdout);
-    ret += check ("fputs", a >= 0, 0, a);
+    ret += check("fputs", a >= 0, 0, a);
 
     s = fwrite("fwrite 1\n", 1, 9, stdout);
-    ret += check_s ("fwrite 1", s == 9, 9, s);
+    ret += check_s("fwrite 1", s == 9, 9, s);
 
     s = fwrite("fwrite 2\n", 0, 9, stdout);
-    ret += check_s ("fwrite 2", s == 0, 0, s);
+    ret += check_s("fwrite 2", s == 0, 0, s);
 
     s = fwrite("fwrite 3\n", 0, 0, stdout);
-    ret += check_s ("fwrite 3", s == 0, 0, s);
+    ret += check_s("fwrite 3", s == 0, 0, s);
 
     return ret;
 }

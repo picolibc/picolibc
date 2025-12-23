@@ -64,18 +64,14 @@ static const int modemap[HEX_SEMIMODE_MODEMAP_LENGTH] = {
     O_RDWR | O_BINARY,
 
     [HEX_SEMIMODE_WRITEONLY_CREATE_TRUNC_TEXT] = O_WRONLY | O_CREAT | O_TRUNC,
-    [HEX_SEMIMODE_WRITEONLY_CREATE_TRUNC_BINARY] =
-        O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
+    [HEX_SEMIMODE_WRITEONLY_CREATE_TRUNC_BINARY] = O_WRONLY | O_CREAT | O_TRUNC | O_BINARY,
     [HEX_SEMIMODE_READWRITE_CREATE_TRUNC_TEXT] = O_RDWR | O_CREAT | O_TRUNC,
-    [HEX_SEMIMODE_READWRITE_CREATE_TRUNC_BINARY] =
-        O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
+    [HEX_SEMIMODE_READWRITE_CREATE_TRUNC_BINARY] = O_RDWR | O_CREAT | O_TRUNC | O_BINARY,
 
     [HEX_SEMIMODE_WRITEONLY_CREATE_APPEND_TEXT] = O_WRONLY | O_CREAT | O_APPEND,
-    [HEX_SEMIMODE_WRITEONLY_CREATE_APPEND_BINARY] =
-        O_WRONLY | O_CREAT | O_APPEND | O_BINARY,
+    [HEX_SEMIMODE_WRITEONLY_CREATE_APPEND_BINARY] = O_WRONLY | O_CREAT | O_APPEND | O_BINARY,
     [HEX_SEMIMODE_READWRITE_CREATE_APPEND_TEXT] = O_RDWR | O_CREAT | O_APPEND,
-    [HEX_SEMIMODE_READWRITE_CREATE_APPEND_BINARY] =
-        O_RDWR | O_CREAT | O_APPEND | O_BINARY,
+    [HEX_SEMIMODE_READWRITE_CREATE_APPEND_BINARY] = O_RDWR | O_CREAT | O_APPEND | O_BINARY,
 
     [HEX_SEMIMODE_READWRITE_CREATE_TEXT] = O_RDWR | O_CREAT,
     [HEX_SEMIMODE_READWRITE_CREATE_EXCL_TEXT] = O_RDWR | O_CREAT | O_EXCL,
@@ -84,8 +80,7 @@ static const int modemap[HEX_SEMIMODE_MODEMAP_LENGTH] = {
 int
 open(const char *name, int mode, ...)
 {
-    mode &= O_RDONLY | O_WRONLY | O_RDWR | O_CREAT | O_TRUNC | O_APPEND |
-            O_EXCL | O_BINARY;
+    mode &= O_RDONLY | O_WRONLY | O_RDWR | O_CREAT | O_TRUNC | O_APPEND | O_EXCL | O_BINARY;
     int semimode = 0;
     for (size_t i = 0; i < HEX_SEMIMODE_MODEMAP_LENGTH; ++i) {
         if (modemap[i] == mode) {
@@ -95,7 +90,7 @@ open(const char *name, int mode, ...)
     }
 
     size_t length = strlen(name);
-    int args[] = { (int)name, semimode, length };
-    int retval = hexagon_semihost(SYS_OPEN, args);
+    int    args[] = { (int)name, semimode, length };
+    int    retval = hexagon_semihost(SYS_OPEN, args);
     return retval;
 }
