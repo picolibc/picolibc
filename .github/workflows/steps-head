@@ -15,23 +15,3 @@
         run: |
           docker load -i $IMAGE_FILE
           docker images -a $IMAGE
-
-      # The docker image contains ccache, but the ccache action uses the ccache
-      # outside docker for statistics, so install the same ccache version.
-      # Install in /usr/bin so the ccache action gets the expected environment.
-      - name: install ccache
-        if: matrix.test == './.github/do-zephyr'
-        run: |
-          wget -nv https://github.com/ccache/ccache/releases/download/v4.8.2/ccache-4.8.2-linux-x86_64.tar.xz
-          sudo tar xf ccache-4.8.2-linux-x86_64.tar.xz -C /usr/bin --strip-components=1 --no-same-owner ccache-4.8.2-linux-x86_64/ccache
-          rm -f ccache-*-linux-x86_64.tar.xz
-
-      # Key on job name and cache size to get separate caches for linux
-      # and zephyr.
-      - name: ccache
-        if: matrix.test == './.github/do-zephyr'
-        uses: hendrikmuhs/ccache-action@v1.2.20
-        with:
-          key: compilation-${{ runner.os }}-${{ github.job }}-${{ matrix.meson_flags }}-${{ env.CCACHE_SIZE }}
-          max-size: ${{ env.CCACHE_SIZE }}
-

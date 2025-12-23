@@ -16,9 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # CCache is disabled for the Linux jobs for now.
-  CCACHE_SIZE: "0M"
-  CCACHE_CMD: true
   DOCKERFILE: picolibc/.github/Dockerfile
   IMAGE_FILE: dockerimg-linux.tar.zst
   IMAGE: picolibc-linux

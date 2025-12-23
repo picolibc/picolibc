@@ -17,8 +17,6 @@ concurrency:
 env:
   # .github/do-coreboot --buildtype release
   # is the largest cache, 429.5M (September 2023).
-  CCACHE_SIZE: "450M"
-  CCACHE_CMD: ccache
   DOCKERFILE: picolibc/.github/Dockerfile-coreboot
   IMAGE_FILE: dockerimg-coreboot.tar.zst
   IMAGE: picolibc
