@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/lock.h>
+#include <sys/stat.h>
 
 #define __BALL  0x0001          /* bufio buf is allocated by stdio */
 #define __BLBF  0x0002          /* bufio is line buffered */
@@ -186,4 +187,10 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size);
 int
 __bufio_close(FILE *f);
 
+#ifdef _STAT_HAS_BLOCKS
+int
+__bufio_get_buf_size(int fd);
+#else
+#define __bufio_get_buf_size(fd) (BUFSIZ)
+#endif
 #endif /* _STDIO_BUFIO_H_ */

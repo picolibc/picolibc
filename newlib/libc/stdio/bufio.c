@@ -326,3 +326,13 @@ __bufio_close(FILE *f)
 	return ret;
 }
 
+#ifdef _STAT_HAS_BLOCKS
+int __bufio_get_buf_size(int fd)
+{
+    struct stat st;
+    if (fstat (fd, &st) == 0 && st.st_blksize > 0)
+        return st.st_blksize;
+    return BUFSIZ;
+}
+#endif
+
