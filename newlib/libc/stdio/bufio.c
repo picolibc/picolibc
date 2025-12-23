@@ -258,10 +258,29 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
         int ret = -1;
 
 	__bufio_lock(f);
+
+        /*
+         * POSIX: "The setvbuf function may be used only after the
+         * stream pointed to by stream has been associated with an open file
+         * and before any other operation (other than an unsuccessful call
+         * to setvbuf) is performed on the stream."
+         *
+         * Reject if stream I/O has already occurred. This is not fully
+         * POSIX-standardized because len and off are reset to 0 after fflush,
+         * but it guarantees that setvbuf called between stream operations
+         * does not corrupt input/output data.
+         */
+        if (bf->len != 0 || bf->off != 0)
+                goto bail;
+
         bf->bflags &= ~__BLBF;
         switch (mode) {
         case _IONBF:
-                buf = NULL;
+                /*
+                 * Use the buf pointer to hold the single byte
+                 * instead of performing a 1-byte allocation.
+                 */
+                buf = (char *)&bf->buf;
                 size = 1;
                 break;
         case _IOLBF:
