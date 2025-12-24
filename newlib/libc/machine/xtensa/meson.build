@@ -49,4 +49,20 @@ conf_data.set('_XTENSA_HAVE_CONFIG_CORE_ISA_H',
 
 subdir('machine')
 
-src_machine = files(srcs_machine)
+foreach params : targets
+  target = params['name']
+  target_c_args = params['c_args']
+
+  _target_args_str = ' '.join(target_c_args)
+  if _target_args_str.contains('mfix-esp32-psram-cache-issue')
+    _esp32_psram_fix_arg = ['-DXTENSA_ESP32_PSRAM_CACHE_FIX=1']
+  else
+    _esp32_psram_fix_arg = []
+  endif
+
+  set_variable('lib_machine' + target,
+    static_library('machine' + target,
+      srcs_machine,
+      include_directories: inc,
+      c_args: target_c_args + c_args + _esp32_psram_fix_arg))
+endforeach
