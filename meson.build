@@ -1497,6 +1497,11 @@ if cc.has_argument('-fno-builtin')
   arg_fnobuiltin = ['-fno-builtin']
 endif
 
+arg_fnolto = []
+if cc.has_argument('-fno-lto')
+  arg_fnolto = ['-fno-lto']
+endif
+
 version_array = meson.project_version().split('.')
 
 if version_array.length() > 2
