@@ -126,7 +126,7 @@ endif
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
-  target_c_args = params['c_args'] + stack_c_args + '-D_LIBC'
+  target_c_args = params['c_args'] + stack_c_args + ['-D_LIBC']
 
   instdir = join_paths(lib_dir, target_dir)
 
