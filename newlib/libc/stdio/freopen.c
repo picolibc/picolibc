@@ -40,9 +40,15 @@ freopen(const char *pathname, const char *mode, FILE *stream)
 {
 	FILE *ret = NULL;
 	struct __file_bufio *pf = (struct __file_bufio *) stream;
+	char *old_buf_to_free = NULL;
+	char *buf;
+	int old_fd;
 	int fd;
 	int stdio_flags;
 	int open_flags;
+	int old_buf_size;
+	int buf_size;
+	uint8_t new_bflags;
 
 	__flockfile(stream);
 	/* Can't reopen FILEs which aren't buffered */
@@ -59,20 +65,51 @@ freopen(const char *pathname, const char *mode, FILE *stream)
 
         fflush(stream);
 
-        __bufio_lock(stream);
-        close((int)(intptr_t) (pf->ptr));
-        (void) __atomic_exchange_ungetc(&stream->unget, 0);
-        stream->flags = (stream->flags & ~(__SRD|__SWR|__SERR|__SEOF)) | stdio_flags;
-        pf->pos = 0;
-        pf->ptr = (void *) (intptr_t) (fd);
+        old_fd = (int)(intptr_t) (pf->ptr);
+        old_buf_size = __bufio_get_buf_size(old_fd);
+        buf_size = __bufio_get_buf_size(fd);
 
-        /* Switch to POSIX backend */
-        pf->read_int = read;
-        pf->write_int = write;
-        pf->lseek_int = lseek;
-        pf->close_int = close;
+        __bufio_lock(stream);
+
+        /*
+         * freopen() should operate as fclose() + fopen():
+         *  - Any custom buffer set via setvbuf() must be released.
+         *  - The I/O buffer must be reallocated to match the new
+         *    file's optimal block size (st_blksize).
+         */
+        new_bflags = pf->bflags;
+        if ((new_bflags & __BFALL) && (buf_size <= old_buf_size)) {
+            /* Preallocated buffer fits, reuse it */
+            if (new_bflags & __BALL)
+                old_buf_to_free = pf->buf;
+            buf = (char *) (pf + 1);
+        } else {
+            buf = realloc(new_bflags & __BALL ? pf->buf : NULL, buf_size);
+        }
+
+        /* Check if buffer allocation failed */
+        if (buf == NULL) {
+            close(fd);
+            goto exit_bufio_lock;
+        }
+
+        /* Set proper __BALL flag for the new buffer */
+        if (buf == (char *)(pf + 1))
+            new_bflags &= ~__BALL;
+        else
+            new_bflags |= __BALL;
+
+        if (old_buf_to_free)
+            free(old_buf_to_free);
+
+        (void) __atomic_exchange_ungetc(&stream->unget, 0);
+        close(old_fd);
+
+        *pf = (struct __file_bufio) FDEV_SETUP_POSIX(fd, buf, buf_size, stdio_flags, new_bflags);
 
         ret = stream;
+
+exit_bufio_lock:
 	__bufio_unlock(stream);
 exit:
 	__funlock_return(stream, ret);
