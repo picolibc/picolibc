@@ -1127,7 +1127,7 @@ foreach params : [default_target] + targets
       # Default init sections map to flash in the primary script; no option gating
       init_sections = default_init_section_template.format('init', 'flash', 'text')
       # Precompute a RAM-mapped init section for no-flash variant
-      init_sections_ram = default_init_section_template.format('init', 'ram', 'text')
+      init_sections_ram = default_init_section_template.format('init', 'ram', 'ram')
     endif
 
     picolibc_linker_type_data.set('INIT_MEMORY', init_memory)
@@ -1202,6 +1202,8 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('NO_FLASH_START', '')
     picolibc_ld_data.set('NO_FLASH_END', '')
     picolibc_ld_data.set('DATA_AT', 'flash')
+    picolibc_ld_data.set('TEXT_PHDR', 'text')
+    picolibc_ld_data.set('RAM_INIT_PHDR', 'ram_init')
 
     picolibc_noflash_ld_data = configuration_data()
     picolibc_noflash_ld_data.merge_from(picolibc_linker_type_data)
@@ -1217,6 +1219,12 @@ foreach params : [default_target] + targets
     picolibc_noflash_ld_data.set('INIT_MEMORY', '')
     picolibc_noflash_ld_data.set('INIT_PHDRS', '')
     picolibc_noflash_ld_data.set('INIT_SECTIONS', init_sections_ram)
+    # Collapse to single PT_LOAD for no-flash
+    picolibc_noflash_ld_data.set('TEXT_PHDR', 'ram')
+    picolibc_noflash_ld_data.set('RAM_INIT_PHDR', 'ram')
+    # Collapse to single PT_TLS for no-flash
+    picolibc_noflash_ld_data.set('TLS_PHDRS', 'tls PT_TLS;')
+    picolibc_noflash_ld_data.set('TLS_INIT_SEG', 'tls')
 
     if target == 'default-target'
       picolibc_ld_file = 'picolibc.ld'
@@ -1300,6 +1308,8 @@ foreach params : [default_target] + targets
     picolibcpp_ld_data.set('NO_FLASH_START', '')
     picolibcpp_ld_data.set('NO_FLASH_END', '')
     picolibcpp_ld_data.set('DATA_AT', 'flash')
+    picolibcpp_ld_data.set('TEXT_PHDR', 'text')
+    picolibcpp_ld_data.set('RAM_INIT_PHDR', 'ram_init')
 
     if not is_variable(picolibcpp_ld_config_variable)
       set_variable(picolibcpp_ld_config_variable,
@@ -1323,6 +1333,8 @@ foreach params : [default_target] + targets
       picolibc_inittls_ld_data.set('DATATLS', ld_comment)
       picolibc_inittls_ld_data.set('NO_FLASH_START', '')
       picolibc_inittls_ld_data.set('NO_FLASH_END', '')
+      picolibc_inittls_ld_data.set('TEXT_PHDR', 'text')
+      picolibc_inittls_ld_data.set('RAM_INIT_PHDR', 'ram_init')
       if cc.get_linker_id() == 'ld.lld'
         picolibc_inittls_ld_data.set('BFD', ld_comment)
       else
@@ -1366,6 +1378,12 @@ foreach params : [default_target] + targets
     picolibcpp_noflash_ld_data.set('INIT_MEMORY', '')
     picolibcpp_noflash_ld_data.set('INIT_PHDRS', '')
     picolibcpp_noflash_ld_data.set('INIT_SECTIONS', init_sections_ram)
+    # Collapse to single PT_LOAD for no-flash
+    picolibcpp_noflash_ld_data.set('TEXT_PHDR', 'ram')
+    picolibcpp_noflash_ld_data.set('RAM_INIT_PHDR', 'ram')
+    # Collapse to single PT_TLS for no-flash
+    picolibcpp_noflash_ld_data.set('TLS_PHDRS', 'tls PT_TLS;')
+    picolibcpp_noflash_ld_data.set('TLS_INIT_SEG', 'tls')
 
     if not is_variable(picolibcpp_noflash_ld_config_variable)
       set_variable(picolibcpp_noflash_ld_config_variable,

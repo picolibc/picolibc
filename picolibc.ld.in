@@ -54,8 +54,10 @@ MEMORY
 
 PHDRS
 {@INIT_PHDRS@
+        @NO_FLASH_START@
 	text PT_LOAD;
 	ram_init PT_LOAD;
+        @NO_FLASH_END@
 	ram PT_LOAD;
 	@TLS_PHDRS@
 }
@@ -100,7 +102,7 @@ SECTIONS
 		KEEP (*(.fini_array*))
 		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
 
-	} >@DATA_AT@ AT>@DATA_AT@ :text
+	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 
 	.rodata : {
 
@@ -115,7 +117,7 @@ SECTIONS
 		*(.srodata.cst2)
 		*(.srodata .srodata.*)
 
-	} >@DATA_AT@ AT>@DATA_AT@ :text
+	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 	PROVIDE(@PREFIX@_pid_base = ADDR(.rodata));
 
 	.data.rel.ro : {
@@ -123,7 +125,7 @@ SECTIONS
 		/* data that needs relocating */
 		*(.data.rel.ro .data.rel.ro.*)
 
-	} >@DATA_AT@ AT>@DATA_AT@ :text
+		} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 
 @INITTLS@	/* TLS data when stored in separately allocate tls_space section */
 @INITTLS@	.tdata :
@@ -132,7 +134,7 @@ SECTIONS
 @INITTLS@		PROVIDE( @PREFIX@__tls_first = . );
 @INITTLS@		*(.tdata .tdata.* .gnu.linkonce.td.*)
 @INITTLS@		PROVIDE( @PREFIX@__tdata_end = . );
-@INITTLS@	} >@DATA_AT@ :@TLS_INIT_SEG@ :text
+@INITTLS@	} >@DATA_AT@ :@TLS_INIT_SEG@ :@TEXT_PHDR@
 @INITTLS@
 @INITTLS@	/* lld allocates flash space for this section; it would
 @INITTLS@	 * be nice to fix that. */
@@ -141,7 +143,7 @@ SECTIONS
 @INITTLS@		*(.tcommon)
 @INITTLS@		PROVIDE( @PREFIX@__tls_end = . );
 @INITTLS@		PROVIDE( @PREFIX@__tbss_end = . );
-@INITTLS@	} >@DATA_AT@ :tls :text
+@INITTLS@	} >@DATA_AT@ :tls :@TEXT_PHDR@
 @INITTLS@
 @INITTLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
 @INITTLS@	PROVIDE( @PREFIX@__tls_space_size = @PREFIX@__tls_end - @PREFIX@__tls_start );
@@ -155,7 +157,7 @@ SECTIONS
 @BFD@	.plt : {
 @BFD@		*(.rela.iplt)
 @BFD@		*(.rela.*)
-@BFD@	} >@DATA_AT@ AT>@DATA_AT@ :text
+@BFD@	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 @BFD@
 @BFD@	PROVIDE( @PREFIX@__plt_start = ADDR(.plt) );
 @BFD@	PROVIDE( @PREFIX@__plt_size = SIZEOF(.plt) );
@@ -168,7 +170,7 @@ SECTIONS
 	.got : {
 		*(.got.plt)
 		*(.got)
-	} >@DATA_AT@ AT>@DATA_AT@ :text
+		} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 
 	.toc : {
 		*(.toc .toc.*)
@@ -178,23 +180,23 @@ SECTIONS
 		 * stick them in :ram
 		 */
 		*(.iplt .iplt.*)
-	} >@DATA_AT@ AT>@DATA_AT@ :text
+	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 
 @CPP@	/* additional sections when compiling with C++ exception support */
 @CPP@	.except_ordered : {
 @CPP@		*(.gcc_except_table *.gcc_except_table.*)
 @CPP@		*(.ARM.extab* .gnu.linkonce.armextab.*)
-@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :text
+@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 @CPP@	.eh_frame_hdr : {
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
 @CPP@		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
-@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :text
+@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 @CPP@	.eh_frame : {
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
 @CPP@		KEEP (*(.eh_frame .eh_frame.*))
 @CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
-@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :text
+@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 @CPP@
 @CPP@	.except_unordered : {
 @CPP@		. = ALIGN(@DEFAULT_ALIGNMENT@);
@@ -202,7 +204,7 @@ SECTIONS
 @CPP@		PROVIDE(@PREFIX@__exidx_start = .);
 @CPP@		*(.ARM.exidx*)
 @CPP@		PROVIDE(@PREFIX@__exidx_end = .);
-@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :text
+@CPP@	} >@DATA_AT@ AT>@DATA_AT@ :@TEXT_PHDR@
 
 	/*
 	 * Data values which are preserved across reset
@@ -259,7 +261,7 @@ SECTIONS
 
 @INITTLS@		PROVIDE( @PREFIX@__data_end = . );
 
-	} >ram AT>@DATA_AT@ :ram_init
+		} >ram AT>@DATA_AT@ :@RAM_INIT_PHDR@
 	PROVIDE(@PREFIX@__data_start = ADDR(.data));
 	PROVIDE(@PREFIX@__data_source = LOADADDR(.data));
 	PROVIDE(@PREFIX@__x86_gdt_ro = DEFINED(@PREFIX@__x86_gdt) ? @PREFIX@__x86_gdt - @PREFIX@__data_start + @PREFIX@__data_source : 0);
@@ -284,7 +286,7 @@ SECTIONS
 @DATATLS@		*(.tdata .tdata.* .gnu.linkonce.td.*)
 @DATATLS@		PROVIDE( @PREFIX@__data_end = . );
 @DATATLS@		PROVIDE( @PREFIX@__tdata_end = . );
-@DATATLS@	} >ram AT>@DATA_AT@ :@TLS_INIT_SEG@ :ram_init
+@DATATLS@	} >ram AT>@DATA_AT@ :@TLS_INIT_SEG@ :@RAM_INIT_PHDR@
 @DATATLS@
 @DATATLS@	.tbss (NOLOAD) : {
 @DATATLS@		*(.tbss .tbss.* .gnu.linkonce.tb.*)
