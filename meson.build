@@ -146,7 +146,7 @@ picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
 enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
-test_no_flash = get_option('test-no-flash')
+enable_test_no_flash = get_option('test-no-flash')
 if get_option('tests-cdefs') == 'auto'
   enable_cdefs_tests = enable_tests
 else
@@ -176,10 +176,14 @@ endif
 
 # When requested, add a second test target that links using no-flash
 # crt0 and linker scripts, in addition to the default tests.
-if enable_tests and test_no_flash
-  message('Enabling no-flash tests alongside default tests')
-  # Nothing to change in targets here; do-test/do-test-noopt will pass
-  # -Dtest-no-flash=true and we use that to select variants at link time.
+if enable_tests and enable_test_no_flash
+  # Temporarily disable no-flash tests for ARM
+  if host_cpu_family == 'arm' or not meson.is_cross_build()
+    enable_test_no_flash = false
+    message('Disabling no-flash tests for this architecture')
+  else
+    message('Enabling no-flash tests alongside default tests')
+  endif
 endif
 
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')

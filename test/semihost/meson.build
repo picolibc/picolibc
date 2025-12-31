@@ -97,7 +97,7 @@ foreach params : targets
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
   # Prepare no-flash link args and crt0 objects
-  if get_option('test-no-flash')
+  if enable_test_no_flash
     _link_args_no_flash = target_c_args + get_variable('test_link_args_noflash' + target, test_link_args_noflash)
     _link_depends_no_flash = get_variable('test_link_depends_noflash' + target, test_link_depends_noflash)
     _objs_no_flash = [get_variable('crt0_noflash_semihost' + target)]
@@ -124,7 +124,7 @@ foreach params : targets
          depends: bios_bin,
          suite: 'semihost',
          env: test_env)
-    if get_option('test-no-flash')
+    if enable_test_no_flash
       test(semihost_test + '-no-flash' + target,
            executable(semihost_test + '-no-flash' + target, [semihost_test_src],
                       c_args: printf_compile_args_d + _c_args + _cmd_arg,
@@ -156,7 +156,7 @@ foreach params : targets
          suite: 'semihost',
          env: test_env,
          should_fail: true)
-    if get_option('test-no-flash')
+    if enable_test_no_flash
       test(semihost_fail_test + '-no-flash' + target,
            executable(semihost_fail_test + '-no-flash' + target, [semihost_fail_test_src],
                       c_args: _c_args + _cmd_arg,
@@ -188,7 +188,7 @@ foreach params : targets
            depends: bios_bin,
            suite: 'semihost',
            env: test_env)
-      if get_option('test-no-flash')
+      if enable_test_no_flash
         test(semihost_test + '-no-flash' + target,
              executable(semihost_test + '-no-flash' + target, [semihost_test_src],
                         c_args: printf_compile_args_d + _c_args + _cmd_arg,
