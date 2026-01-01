@@ -34,6 +34,7 @@
 #
 
 srcs_machine = [
+  'interrupt.S',
   'setjmp.S',
 ]
 

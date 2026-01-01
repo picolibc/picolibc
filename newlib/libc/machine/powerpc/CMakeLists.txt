@@ -36,5 +36,7 @@
 add_subdirectory(machine)
 
 picolibc_sources_flags("-fno-builtin"
+  hwcap.c
   setjmp.S
+  tls.c
   )

@@ -41,6 +41,7 @@ srcs_machine = [
   'strcpy.S',
   'strlen.S',
   'strncpy.S',
+  'tls.c',
 ]
 
 conf_data.set('_XTENSA_HAVE_CONFIG_CORE_ISA_H',

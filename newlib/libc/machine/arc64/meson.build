@@ -46,6 +46,8 @@ srcs_machine = [
   'strcat.S',
   'strcmp.S',
   'strlen.S',
+  'tls.c',
+  'vector_table.c',
 ]
 
 foreach params : targets

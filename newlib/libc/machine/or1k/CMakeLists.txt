@@ -34,4 +34,5 @@
 #
 picolibc_sources_flags("-fno-builtin"
   setjmp.S
+  tls.c
   )

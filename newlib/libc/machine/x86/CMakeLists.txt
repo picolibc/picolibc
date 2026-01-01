@@ -33,19 +33,18 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_sources_flags("-fno-builtin"
+  interrupt.c
+  interrupt.S
+  memchr.S
+  memcmp.S
   memcpy.S
+  memmove.S
   memset.S
   setjmp.S
+  strchr.S
+  strlen.S
+  tcb.S
+  tls.c
   )
-
-if(${CMAKE_SYSTEM_SUB_PROCESSOR} STREQUAL "i686")
-  picolibc_sources(
-    memchr.S
-    memcmp.S
-    memmove.S
-    strchr.S
-    strlen.S
-    )
-endif()
 
 add_subdirectory(machine)

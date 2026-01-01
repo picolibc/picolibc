@@ -34,13 +34,8 @@
 #
 
 picolibc_sources(
+  inittls.c
   picosbrk.c
   dso_handle.c
   getauxval.c
   )
-
-if(${__THREAD_LOCAL_STORAGE_API})
-  picolibc_sources(inittls.c)
-endif()
-
-add_subdirectory(machine)

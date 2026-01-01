@@ -1,7 +1,8 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
+ * Copyright © 2024 Stephen Street
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -32,46 +33,66 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#include <picolibc.h>
 
-#include <picotls.h>
-#include <string.h>
-#include <stdint.h>
+#ifdef __THREAD_LOCAL_STORAGE
 
-#ifdef __THREAD_LOCAL_STORAGE_API
-
+#define _IN_ASM
+#include "arm_tls.h"
 /*
- * The TLS block consists of initialized data immediately followed by
- * zero filled data
- *
- * These addresses must be defined by the loader configuration file
+ * This cannot be a C ABI function as the compiler assumes that it
+ * does not modify anything other than r0 and lr.
  */
+	.syntax unified
+	.section .text.__aeabi_read_tp
+	.align 4
+	.p2align 4,,15
+	.global __aeabi_read_tp
+	.type __aeabi_read_tp,%function
+#ifdef __thumb__
+	.thumb
+#endif
 
-extern char __tdata_source[]; /* Source of TLS initialization data (in ROM) */
+__aeabi_read_tp:
+	.cfi_sections .debug_frame
+	.cfi_startproc
 
-#ifdef __PICOCRT_RUNTIME_SIZE
-extern char __tdata_start[]; /* Start of static tdata area */
-extern char __tdata_end[];   /* End of static tdata area */
-extern char __tbss_start[];  /* Start of static zero-initialized TLS data */
-extern char __tbss_end[];    /* End of static zero-initialized TLS data */
-#define __tdata_size  (__tdata_end - __tdata_start)
-#define __tbss_size   (__tbss_end - __tbss_start)
-#define __tbss_offset (__tbss_start - __tdata_start)
+#ifdef ARM_TLS_CP15
+	mrc p15, 0, r0, c13, c0, 3
+	bx lr
 #else
-extern char __tdata_size[];  /* Size of TLS initized data */
-extern char __tbss_size[];   /* Size of TLS zero-filled data */
-extern char __tbss_offset[]; /* Offset from tdata to tbss */
+
+#ifdef ARM_RP2040
+
+	/*
+	 * Code for RP2040 processor. This is a dual-core cortex-m0
+	 * design. We use the CPUID register, stored at offset zero of
+	 * the Single-cycle IO block at 0xd0000000
+	 */
+
+#define TLS_SIZE	(4 * RP2040_NCORE)
+
+	push {r1,lr}		/* Save R1 (and LR) */
+	ldr r1,=0xd0000000	/* Address of SIO->CPUID */
+	ldr r1,[r1]	   	/* Fetch active core */
+	lsls r1,r1,#2	   	/* Multiply by 4 */
+	ldr r0,=__tls		/* Address of __tls array */
+	ldr r0,[r0,r1]		/* Fetch __tls[CPUID] */
+	pop {r1,pc}		/* Restore R1 and return  */
+
+#else
+
+#define TLS_SIZE	4
+
+	ldr r0,=__tls		/* Load the address of __tls */
+	ldr r0,[r0]		/* Dereference to get the value of __tls */
+	bx lr			/* All done, return to caller */
+
 #endif
 
-void
-_init_tls(void *__tls)
-{
-    char *tls = __tls;
+#endif
 
-    /* Copy tls initialized data */
-    memcpy(tls, __tdata_source, (uintptr_t)__tdata_size);
-
-    /* Clear tls zero data */
-    memset(tls + (uintptr_t)__tbss_offset, '\0', (uintptr_t)__tbss_size);
-}
+	.cfi_endproc
 
 #endif
+

@@ -378,6 +378,8 @@ SECTIONS
 	PROVIDE( @PREFIX@__arm64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
 	PROVIDE( @PREFIX@__or1k_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
 	PROVIDE( @PREFIX@__sh32_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__arc_tls_tcb_offset = MAX(8, @PREFIX@__tls_align) );
+	PROVIDE( @PREFIX@__arc64_tls_tcb_offset = MAX(16, @PREFIX@__tls_align) );
 
 	PROVIDE( @PREFIX@__x86_tls_tcb = @PREFIX@__tls_space + ALIGN( @PREFIX@__tls_head_size + @PREFIX@__tls_space_size, @PREFIX@__tls_align ) );
 	PROVIDE( @PREFIX@__x86_tls_tcb_offset = @PREFIX@__x86_tls_tcb - @PREFIX@__tls_base );

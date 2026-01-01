@@ -34,9 +34,11 @@
 #
 
 srcs_machine = [
+  'interrupt.S',
   'scan.c',
   'setjmp.S',
   'shuffle.c',
+  'tls.c',
 ]
 
 src_machine = files(srcs_machine)

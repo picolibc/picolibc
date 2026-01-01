@@ -47,4 +47,5 @@ picolibc_sources_flags("-fno-builtin"
   strcmp.S
   strcpy.c
   strlen.c
+  tls.c
   )

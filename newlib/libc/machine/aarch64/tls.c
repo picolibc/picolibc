@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -39,39 +39,26 @@
 
 #ifdef __THREAD_LOCAL_STORAGE_API
 
-/*
- * The TLS block consists of initialized data immediately followed by
- * zero filled data
- *
- * These addresses must be defined by the loader configuration file
+/* This code is duplicated in picocrt/machine/aarch/crt0.c */
+/* The size of the thread control block.
+ * TLS relocations are generated relative to
+ * a location this far *before* the first thread
+ * variable (!)
+ * NB: The actual size before tp also includes padding
+ * to align up to the alignment of .tdata/.tbss.
  */
-
-extern char __tdata_source[]; /* Source of TLS initialization data (in ROM) */
-
-#ifdef __PICOCRT_RUNTIME_SIZE
-extern char __tdata_start[]; /* Start of static tdata area */
-extern char __tdata_end[];   /* End of static tdata area */
-extern char __tbss_start[];  /* Start of static zero-initialized TLS data */
-extern char __tbss_end[];    /* End of static zero-initialized TLS data */
-#define __tdata_size  (__tdata_end - __tdata_start)
-#define __tbss_size   (__tbss_end - __tbss_start)
-#define __tbss_offset (__tbss_start - __tdata_start)
+#if __SIZE_WIDTH__ == 32
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
 #else
-extern char __tdata_size[];  /* Size of TLS initized data */
-extern char __tbss_size[];   /* Size of TLS zero-filled data */
-extern char __tbss_offset[]; /* Offset from tdata to tbss */
+extern char __arm64_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm64_tls_tcb_offset)
 #endif
 
 void
-_init_tls(void *__tls)
+_set_tls(void *tls)
 {
-    char *tls = __tls;
-
-    /* Copy tls initialized data */
-    memcpy(tls, __tdata_source, (uintptr_t)__tdata_size);
-
-    /* Clear tls zero data */
-    memset(tls + (uintptr_t)__tbss_offset, '\0', (uintptr_t)__tbss_size);
+    __asm__ volatile("msr tpidr_el0, %0" : : "r"(tls - TP_OFFSET));
 }
 
 #endif

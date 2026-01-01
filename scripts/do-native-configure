@@ -39,6 +39,7 @@ meson setup \
 	--fatal-meson-warnings \
         -Dtls-model=global-dynamic \
 	-Dthread-local-storage=true \
+	-Dthread-local-storage-api=false \
 	-Derrno-function=auto \
         -Dmultilib=false \
         -Dpicolib=false \

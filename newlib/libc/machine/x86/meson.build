@@ -34,6 +34,8 @@
 #
 
 srcs_machine = [
+  'interrupt.c',
+  'interrupt.S',
   'memcpy.S',
   'memset.S',
   'setjmp.S',
@@ -47,6 +49,8 @@ srcs_machine = [
   'memmove.S',
   'strchr.S',
   'strlen.S',
+  'tcb.S',
+  'tls.c',
 ]
 
 subdir('machine')
@@ -60,5 +64,5 @@ foreach params : targets
 			      srcs_machine,
 			      pic: false,
 			      include_directories: inc,
-			      c_args: target_c_args + c_args + arg_fnobuiltin))
+			      c_args: target_c_args + c_args + arg_fnobuiltin + arg_fnolto))
 endforeach

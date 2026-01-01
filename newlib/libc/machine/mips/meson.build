@@ -40,6 +40,7 @@ srcs_machine = [
   'strcmp.S',
   'strlen.c',
   'strncpy.c',
+  'tls.c',
 ]
 
 subdir('machine')

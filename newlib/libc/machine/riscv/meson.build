@@ -44,6 +44,7 @@ srcs_machine = [
   'strcmp.S',
   'strcpy.c',
   'strlen.c',
+  'tls.c',
 ]
 
 ieeefp_funcs = true

@@ -35,6 +35,7 @@
 
 srcs_machine = [
   'setjmp.S',
+  'tls.c',
 ]
 
 src_machine = files(srcs_machine)

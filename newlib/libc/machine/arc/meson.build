@@ -33,43 +33,36 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-arc64 = cc.get_define('__ARC64__')
-
-srcs_arc32 = [
-    'memcmp-bs-norm.S',
-    'memcmp.S',
-    'memcmp-stub.c',
-    'memcpy-archs.S',
-    'memcpy-bs.S',
-    'memcpy.S',
-    'memcpy-stub.c',
-    'memset-archs.S',
-    'memset-bs.S',
-    'memset.S',
-    'memset-stub.c',
-    'strchr-bs-norm.S',
-    'strchr-bs.S',
-    'strchr.S',
-    'strchr-stub.c',
-    'strcmp-archs.S',
-    'strcmp.S',
-    'strcmp-stub.c',
-    'strcpy-bs-arc600.S',
-    'strcpy-bs.S',
-    'strcpy.S',
-    'strcpy-stub.c',
-    'strncpy-bs.S',
-    'strncpy.S',
-    'strncpy-stub.c',
-]
-
 srcs_machine = [
+  'memcmp-bs-norm.S',
+  'memcmp.S',
+  'memcmp-stub.c',
+  'memcpy-archs.S',
+  'memcpy-bs.S',
+  'memcpy.S',
+  'memcpy-stub.c',
+  'memset-archs.S',
+  'memset-bs.S',
+  'memset.S',
+  'memset-stub.c',
   'setjmp.S',
+  'strchr-bs-norm.S',
+  'strchr-bs.S',
+  'strchr.S',
+  'strchr-stub.c',
+  'strcmp-archs.S',
+  'strcmp.S',
+  'strcmp-stub.c',
+  'strcpy-bs-arc600.S',
+  'strcpy-bs.S',
+  'strcpy.S',
+  'strcpy-stub.c',
+  'strncpy-bs.S',
+  'strncpy.S',
+  'strncpy-stub.c',
+  'tls.c',
+  'vector_table.c',
 ]
-
-if arc64 == ''
-  srcs_machine += srcs_arc32
-endif
 
 foreach params : targets
   target = params['name']
@@ -80,5 +73,5 @@ foreach params : targets
 			      srcs_machine,
 			      pic: false,
 			      include_directories: inc,
-			      c_args: target_c_args + c_args + arg_fnobuiltin))
+			      c_args: target_c_args + c_args + arg_fnobuiltin + arg_fnolto))
 endforeach

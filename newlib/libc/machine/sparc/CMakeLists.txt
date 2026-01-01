@@ -36,8 +36,10 @@
 add_subdirectory(machine)
 
 picolibc_sources_flags("-fno-builtin"
+  interrupt.S
   setjmp.S
   scan.c
   shuffle.c
+  tls.c
   )
 

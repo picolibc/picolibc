@@ -38,6 +38,7 @@ srcs_machine = [
   'strcpy.S',
   'aeabi_memset.c',
   'bzero.c',
+  'interrupt.c',
   'memchr.c',
   'memchr.S',
   'memcpy.c',
@@ -45,8 +46,11 @@ srcs_machine = [
   'memmove.c',
   'memset.c',
   'memset.S',
+  'read_tp.S',
+  'set_tls.c',
   'strlen.c',
   'strlen.S',
+  'tls.c',
 ]
 
 subdir('machine')

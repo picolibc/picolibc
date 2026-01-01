@@ -33,11 +33,15 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_machine = [
+  'interrupt.c',
   'memcpy.S',
   'memset.S',
+  'read_tp.S',
+  'set_tls.c',
   'setjmp.S',
   'strcpy.c',
   'strlen.c',
+  'tls.c',
 ]
 
 subdir('machine')
@@ -51,5 +55,5 @@ foreach params : targets
 			srcs_machine,
 			pic: false,
 			include_directories: inc,
-			c_args: target_c_args + c_args + arg_fnobuiltin))
+			c_args: target_c_args + c_args + arg_fnobuiltin + arg_fnolto))
 endforeach

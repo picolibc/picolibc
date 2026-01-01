@@ -35,6 +35,8 @@
 
 picolibc_sources_flags("-fno-builtin"
   setjmp.S
+  vector_table.c
+  tls.c
   )
 
 if(NOT DEFINED CONFIG_ISA_ARCV3)
