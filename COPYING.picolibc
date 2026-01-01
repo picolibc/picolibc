@@ -395,6 +395,7 @@ Files: CMakeLists.txt
  newlib/libc/machine/aarch64/machine/meson.build
  newlib/libc/machine/arc/CMakeLists.txt
  newlib/libc/machine/arc/meson.build
+ newlib/libc/machine/arc/tls.c
  newlib/libc/machine/arc64/CMakeLists.txt
  newlib/libc/machine/arc64/meson.build
  newlib/libc/machine/arm/CMakeLists.txt
@@ -405,6 +406,7 @@ Files: CMakeLists.txt
  newlib/libc/machine/mips/machine/CMakeLists.txt
  newlib/libc/machine/mips/machine/meson.build
  newlib/libc/machine/mips/meson.build
+ newlib/libc/machine/mips/tls.c
  newlib/libc/machine/msp430/meson.build
  newlib/libc/machine/nios2/CMakeLists.txt
  newlib/libc/machine/nios2/meson.build
@@ -421,24 +423,9 @@ Files: CMakeLists.txt
  newlib/libc/machine/x86/machine/CMakeLists.txt
  newlib/libc/machine/xtensa/CMakeLists.txt
  newlib/libc/machine/xtensa/machine/CMakeLists.txt
+ newlib/libc/machine/xtensa/tls.c
  newlib/libc/misc/CMakeLists.txt
  newlib/libc/picolib/CMakeLists.txt
- newlib/libc/picolib/machine/CMakeLists.txt
- newlib/libc/picolib/machine/aarch64/CMakeLists.txt
- newlib/libc/picolib/machine/arc/CMakeLists.txt
- newlib/libc/picolib/machine/arc/tls.c
- newlib/libc/picolib/machine/arc64/CMakeLists.txt
- newlib/libc/picolib/machine/arm/CMakeLists.txt
- newlib/libc/picolib/machine/mips/tls.c
- newlib/libc/picolib/machine/msp430/CMakeLists.txt
- newlib/libc/picolib/machine/or1k/CMakeLists.txt
- newlib/libc/picolib/machine/riscv/CMakeLists.txt
- newlib/libc/picolib/machine/rx/CMakeLists.txt
- newlib/libc/picolib/machine/sh/CMakeLists.txt
- newlib/libc/picolib/machine/sparc/CMakeLists.txt
- newlib/libc/picolib/machine/x86/CMakeLists.txt
- newlib/libc/picolib/machine/xtensa/CMakeLists.txt
- newlib/libc/picolib/machine/xtensa/tls.c
  newlib/libc/posix/CMakeLists.txt
  newlib/libc/search/CMakeLists.txt
  newlib/libc/signal/CMakeLists.txt
@@ -610,14 +597,14 @@ Files: cmake/TC-arm-none-eabi.ld
  newlib/libc/include/machine/math.h
  newlib/libc/include/ssp/meson.build
  newlib/libc/include/sys/auxv.h
+ newlib/libc/machine/aarch64/tls.c
+ newlib/libc/machine/arm/arm_tls.h
  newlib/libc/machine/arm/machine/meson.build
  newlib/libc/machine/csky/meson.build
  newlib/libc/machine/riscv/machine/math.h
  newlib/libc/machine/riscv/machine/meson.build
  newlib/libc/machine/x86/machine/meson.build
  newlib/libc/picolib/getauxval.c
- newlib/libc/picolib/machine/aarch64/tls.c
- newlib/libc/picolib/machine/arm/arm_tls.h
  newlib/libc/posix/meson.build
  newlib/libc/stdio/asnprintf.c
  newlib/libc/stdio/asprintf.c
@@ -746,24 +733,19 @@ Files: cmake/TC-rx.ld
  newlib/libc/locale/setlocale.c
  newlib/libc/locale/timedata.c
  newlib/libc/locale/uselocale.c
+ newlib/libc/machine/aarch64/interrupt_vector.S
+ newlib/libc/machine/loongarch/tls.c
+ newlib/libc/machine/m68k/read_tp.S
+ newlib/libc/machine/m68k/set_tls.c
+ newlib/libc/machine/m68k/tls-local.h
+ newlib/libc/machine/m68k/tls.c
+ newlib/libc/machine/or1k/tls.c
+ newlib/libc/machine/powerpc/hwcap.c
  newlib/libc/machine/powerpc/machine/_ssp_tls.h
- newlib/libc/picolib/machine/aarch64/interrupt_vector.S
- newlib/libc/picolib/machine/loongarch/CMakeLists.txt
- newlib/libc/picolib/machine/loongarch/tls.c
- newlib/libc/picolib/machine/m68k/meson.build
- newlib/libc/picolib/machine/m68k/read_tp.s
- newlib/libc/picolib/machine/m68k/set_tls.c
- newlib/libc/picolib/machine/m68k/tls-local.h
- newlib/libc/picolib/machine/m68k/tls.c
- newlib/libc/picolib/machine/or1k/meson.build
- newlib/libc/picolib/machine/or1k/tls.c
- newlib/libc/picolib/machine/powerpc/CMakeLists.txt
- newlib/libc/picolib/machine/powerpc/hwcap.c
- newlib/libc/picolib/machine/powerpc/meson.build
- newlib/libc/picolib/machine/powerpc/tls.c
- newlib/libc/picolib/machine/sh/tls.c
- newlib/libc/picolib/machine/x86/interrupt.S
- newlib/libc/picolib/machine/x86/interrupt.c
+ newlib/libc/machine/powerpc/tls.c
+ newlib/libc/machine/sh/tls.c
+ newlib/libc/machine/x86/interrupt.S
+ newlib/libc/machine/x86/interrupt.c
  newlib/libc/posix/posix-local.h
  newlib/libc/posix/strfmon.c
  newlib/libc/posix/strfmon_l.c
@@ -789,8 +771,17 @@ Files: cmake/TC-rx.ld
  newlib/libc/stdio/wcstoull_l.c
  newlib/libc/stdio/wcstoumax.c
  newlib/libc/stdio/wcstoumax_l.c
+ newlib/libc/stdlib/ejtouc.c
+ newlib/libc/stdlib/jis.h
+ newlib/libc/stdlib/jis_charsets.h
+ newlib/libc/stdlib/jitouc.c
+ newlib/libc/stdlib/mk-jis-charsets.py
  newlib/libc/stdlib/mk-sb-charsets.py
  newlib/libc/stdlib/sb_charsets.h
+ newlib/libc/stdlib/sjtouc.c
+ newlib/libc/stdlib/uctoej.c
+ newlib/libc/stdlib/uctoji.c
+ newlib/libc/stdlib/uctosj.c
  newlib/libc/time/getdate.c
  newlib/libc/time/getdate_r.c
  newlib/libc/ubsan/CMakeLists.txt
@@ -845,6 +836,8 @@ Files: cmake/TC-rx.ld
  semihost/machine/sh/sh_syscall.c
  test/test-getdate.c
  test/test-hello.c
+ test/test-iconv/meson.build
+ test/test-iconv/test-iconv.c
  test/test-math/CMakeLists.txt
  test/test-math/meson.build
  test/test-math/test-acos.5c
@@ -1104,18 +1097,18 @@ Files: hello-world/Makefile
  newlib/libc/include/newlib.h
  newlib/libc/include/picotls.h
  newlib/libc/include/sys/meson.build
+ newlib/libc/machine/aarch64/interrupt.c
+ newlib/libc/machine/arm/interrupt.c
  newlib/libc/machine/arm/meson.build
  newlib/libc/machine/riscv/meson.build
+ newlib/libc/machine/riscv/tls.c
+ newlib/libc/machine/sparc/interrupt.S
+ newlib/libc/machine/sparc/tls.c
  newlib/libc/machine/x86/meson.build
  newlib/libc/meson.build
  newlib/libc/misc/meson.build
  newlib/libc/picolib/dso_handle.c
  newlib/libc/picolib/inittls.c
- newlib/libc/picolib/machine/aarch64/interrupt.c
- newlib/libc/picolib/machine/arm/interrupt.c
- newlib/libc/picolib/machine/riscv/tls.c
- newlib/libc/picolib/machine/sparc/interrupt.S
- newlib/libc/picolib/machine/sparc/tls.c
  newlib/libc/picolib/meson.build
  newlib/libc/picolib/picosbrk.c
  newlib/libc/search/meson.build
@@ -1307,18 +1300,6 @@ License: BSD3-1
 Files: newlib/empty.c
  newlib/libc/machine/arm/memmove.c
  newlib/libc/machine/xtensa/machine/meson.build
- newlib/libc/picolib/machine/aarch64/meson.build
- newlib/libc/picolib/machine/arc/meson.build
- newlib/libc/picolib/machine/arc64/meson.build
- newlib/libc/picolib/machine/arm/meson.build
- newlib/libc/picolib/machine/loongarch/meson.build
- newlib/libc/picolib/machine/mips/meson.build
- newlib/libc/picolib/machine/msp430/meson.build
- newlib/libc/picolib/machine/riscv/meson.build
- newlib/libc/picolib/machine/sh/meson.build
- newlib/libc/picolib/machine/sparc/meson.build
- newlib/libc/picolib/machine/x86/meson.build
- newlib/libc/picolib/machine/xtensa/meson.build
  newlib/libc/stdio/atold_engine.c
  newlib/libc/stdio/ldtoa_engine.c
  newlib/libc/stdio/matchcaseprefix.c
@@ -1432,13 +1413,13 @@ Files: newlib/libc/ctype/ctype_extended.h
  newlib/libc/include/stdnoreturn.h
  newlib/libc/include/sys/_initfini.h
  newlib/libc/include/uchar.h
+ newlib/libc/machine/arc/vector_table.c
+ newlib/libc/machine/m68k/interrupt.c
  newlib/libc/machine/m68k/machine/meson.build
  newlib/libc/machine/rx/CMakeLists.txt
  newlib/libc/machine/sh/CMakeLists.txt
  newlib/libc/machine/sh/machine/CMakeLists.txt
  newlib/libc/machine/sh/machine/meson.build
- newlib/libc/picolib/machine/arc/vector_table.c
- newlib/libc/picolib/machine/m68k/interrupt.c
  newlib/libc/posix/fpathconf.c
  newlib/libc/posix/pathconf.c
  newlib/libc/stdio/atomic_load.c
@@ -1501,10 +1482,29 @@ Copyright: 2019 Keith Packard,
  2020 Anthony Anderson
 License: BSD3-1
 
+Files: newlib/libc/machine/arc64/tls.c
+ newlib/libc/machine/arc64/vector_table.c
+ newlib/libc/machine/loongarch/CMakeLists.txt
+ newlib/libc/machine/loongarch/machine/CMakeLists.txt
+ newlib/libc/machine/msp430/CMakeLists.txt
+Copyright: 2026 Keith Packard
+License: BSD3-1
+
 Files: newlib/libc/machine/arm/machine/math.h
 Copyright: 2020 Keith Packard
  2017 embedded brains GmbH.
  2011, 2012 ARM Ltd.
+License: BSD3-1
+
+Files: newlib/libc/machine/arm/read_tp.S
+Copyright: 2020 Keith Packard
+ 2024 Stephen Street
+License: BSD3-1
+
+Files: newlib/libc/machine/arm/set_tls.c
+ newlib/libc/machine/arm/tls.c
+Copyright: 2019 Keith Packard
+ 2024 Stephen Street
 License: BSD3-1
 
 Files: newlib/libc/machine/lm32/meson.build
@@ -1552,9 +1552,8 @@ Files: newlib/libc/machine/powerpc/meson.build
 Copyright: 2019 Ash Logan, Keith Packard
 License: BSD3-1
 
-Files: newlib/libc/machine/rx/meson.build
- newlib/libc/picolib/machine/rx/interrupt.c
- newlib/libc/picolib/machine/rx/meson.build
+Files: newlib/libc/machine/rx/interrupt.c
+ newlib/libc/machine/rx/meson.build
  picocrt/machine/rx/CMakeLists.txt
  picocrt/machine/rx/meson.build
  scripts/do-rx-zephyr-elf-configure
@@ -1568,25 +1567,14 @@ License: BSD3-1
 
 Files: newlib/libc/machine/x86/machine/_ssp_tls.h
  newlib/libc/machine/x86/machine/_tls.h
- newlib/libc/picolib/machine/x86/tcb-32.S
- newlib/libc/picolib/machine/x86/tcb-64.S
- newlib/libc/picolib/machine/x86/tls.c
+ newlib/libc/machine/x86/tcb-32.S
+ newlib/libc/machine/x86/tcb-64.S
+ newlib/libc/machine/x86/tls.c
 Copyright: 2025 TK Chia
 License: BSD3-1
 
 Files: newlib/libc/machine/xtensa/meson.build
 Copyright: 2019 Jonathan McDowell
-License: BSD3-1
-
-Files: newlib/libc/picolib/machine/arm/read_tp.S
-Copyright: 2020 Keith Packard
- 2024 Stephen Street
-License: BSD3-1
-
-Files: newlib/libc/picolib/machine/arm/set_tls.c
- newlib/libc/picolib/machine/arm/tls.c
-Copyright: 2019 Keith Packard
- 2024 Stephen Street
 License: BSD3-1
 
 Files: newlib/libc/stdio/sprintf_s.c
@@ -1883,8 +1871,6 @@ Files: newlib/libc/ctype/iswalnum.c
  newlib/libc/ctype/iswspace.c
  newlib/libc/ctype/iswupper.c
  newlib/libc/ctype/iswxdigit.c
- newlib/libc/ctype/jp2uc.c
- newlib/libc/ctype/jp2uc.h
  newlib/libc/ctype/local.h
  newlib/libc/ctype/towctrans.c
  newlib/libc/ctype/towlower.c
@@ -3069,6 +3055,7 @@ Files: .clang-format
  .editorconfig
  .gitattributes
  .github/Dockerfile
+ .github/Dockerfile-check-format
  .github/Dockerfile-coreboot
  .github/Dockerfile-zephyr
  .github/do-build
@@ -3081,6 +3068,7 @@ Files: .clang-format
  .github/linux-files.txt
  .github/linux-packages.txt
  .github/workflows/Makefile
+ .github/workflows/check-format.yml
  .github/workflows/head
  .github/workflows/head-coreboot
  .github/workflows/head-native
@@ -3104,6 +3092,8 @@ Files: .clang-format
  cmake/TC-rx.cmake
  cmake/TC-thumbv6m.cmake
  cmake/TC-thumbv7m.cmake
+ cmake/have-bitfields-in-packed-structs.c
+ cmake/have-cc-inhibit-loop-to-libcall.c
  cross.tmpl
  doc/build.md
  doc/ctype.md
@@ -3154,6 +3144,7 @@ Files: .clang-format
  picolibc.h.in
  picolibc.ld.in
  picolibc.specs.in
+ scripts/checkpatch
  scripts/cross-aarch64-linux-gnu.txt
  scripts/cross-aarch64-zephyr-elf.txt
  scripts/cross-arc-zephyr-elf.txt
@@ -3255,6 +3246,7 @@ Files: .clang-format
  test/long_double_vec.h
  test/test-argv.c
  test/test-atomic.c
+ test/test-math/.clang-format-ignore
  test/test-math/Makefile
  test/test-math/math-test-copyright
  test/test-math/test-complex.5c
