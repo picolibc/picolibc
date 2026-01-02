@@ -1152,8 +1152,16 @@ foreach params : [default_target] + targets
           'default_flash_size',
           fallback_flash_size)))
 
+    # For no-flash, we want to run at the flash base. Introduce RAM_ORIGIN_DEFAULT
+    # so we can choose RAM origin per variant: default uses DEFAULT_RAM_ADDR,
+    # no-flash uses DEFAULT_FLASH_ADDR.
     picolibc_linker_type_data.set(
       'DEFAULT_RAM_ADDR',
+      meson.get_cross_property('default_ram_addr_' + custom_mem_config,
+                               meson.get_cross_property('default_ram_addr',
+                                                        '0x20000000')))
+    picolibc_linker_type_data.set(
+      'RAM_ORIGIN_DEFAULT',
       meson.get_cross_property('default_ram_addr_' + custom_mem_config,
                                meson.get_cross_property('default_ram_addr',
                                                         '0x20000000')))
@@ -1219,6 +1227,13 @@ foreach params : [default_target] + targets
     picolibc_noflash_ld_data.set('NO_FLASH_START', '/*')
     picolibc_noflash_ld_data.set('NO_FLASH_END', '*/')
     picolibc_noflash_ld_data.set('DATA_AT', 'ram')
+    # For no-flash variants, keep RAM origin at the actual RAM base.
+    # VMA/LMA already match because sections are placed AT>ram.
+    picolibc_noflash_ld_data.set(
+      'RAM_ORIGIN_DEFAULT',
+      meson.get_cross_property('default_flash_addr_' + custom_mem_config,
+                               meson.get_cross_property('default_flash_addr',
+                                                        '0x20000000')))
     # Ensure .init maps to RAM in no-flash script and drop any flash-only inserts
     picolibc_noflash_ld_data.set('INIT_MEMORY', '')
     picolibc_noflash_ld_data.set('INIT_PHDRS', '')
@@ -1312,6 +1327,11 @@ foreach params : [default_target] + targets
     picolibcpp_ld_data.set('NO_FLASH_START', '')
     picolibcpp_ld_data.set('NO_FLASH_END', '')
     picolibcpp_ld_data.set('DATA_AT', 'flash')
+    picolibcpp_ld_data.set(
+      'RAM_ORIGIN_DEFAULT',
+      meson.get_cross_property('default_ram_addr_' + custom_mem_config,
+                               meson.get_cross_property('default_ram_addr',
+                                                        '0x20000000')))
     picolibcpp_ld_data.set('TEXT_PHDR', 'text')
     picolibcpp_ld_data.set('RAM_INIT_PHDR', 'ram_init')
 
@@ -1378,6 +1398,11 @@ foreach params : [default_target] + targets
     picolibcpp_noflash_ld_data.set('NO_FLASH_START', '/*')
     picolibcpp_noflash_ld_data.set('NO_FLASH_END', '*/')
     picolibcpp_noflash_ld_data.set('DATA_AT', 'ram')
+    picolibcpp_noflash_ld_data.set(
+      'RAM_ORIGIN_DEFAULT',
+      meson.get_cross_property('default_flash_addr_' + custom_mem_config,
+                               meson.get_cross_property('default_flash_addr',
+                                                        '0x20000000')))
     # Use RAM mapping for init sections
     picolibcpp_noflash_ld_data.set('INIT_MEMORY', '')
     picolibcpp_noflash_ld_data.set('INIT_PHDRS', '')

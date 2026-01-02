@@ -48,7 +48,7 @@ MEMORY
 		LENGTH = DEFINED(@PREFIX@__flash_size) ? @PREFIX@__flash_size : @DEFAULT_FLASH_SIZE@
         @NO_FLASH_END@
 	ram (w!rx) :
-		ORIGIN = DEFINED(@PREFIX@__ram) ? @PREFIX@__ram : @DEFAULT_RAM_ADDR@,
+		ORIGIN = DEFINED(@PREFIX@__ram) ? @PREFIX@__ram : @RAM_ORIGIN_DEFAULT@,
 		LENGTH = DEFINED(@PREFIX@__ram_size) ? @PREFIX@__ram_size : @DEFAULT_RAM_SIZE@
 }
 
