@@ -34,8 +34,8 @@
 #
 
 libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
-           'misc', 'picolib', 'posix', 'search', 'signal',
-           'ssp', 'stdio', 'stdlib', 'string', 'time', 'xdr',
+           'misc', 'posix', 'search', 'signal', 'ssp',
+           'stdio', 'stdlib', 'string', 'time', 'xdr',
            'uchar', 'ubsan']
 
 libnames = libdirs

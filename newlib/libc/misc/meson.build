@@ -33,11 +33,15 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 srcs_misc = [
-    'ffs.c',
-    'fini.c',
-    'init.c',
-    'lock.c',
-    'unctrl.c',
+  'dso_handle.c',
+  'getauxval.c',
+  'ffs.c',
+  'fini.c',
+  'init.c',
+  'inittls.c',
+  'lock.c',
+  'picosbrk.c',
+  'unctrl.c',
 ]
 
 srcs_misc_use = []

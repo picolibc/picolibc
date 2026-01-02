@@ -33,9 +33,13 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_sources(
+  dso_handle.c
+  getauxval.c
   ffs.c
   fini.c
   init.c
+  inittls.c
   lock.c
+  picosbrk.c
   unctrl.c
   )
