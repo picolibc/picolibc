@@ -4,7 +4,6 @@ HERE=`dirname "$0"`
 "$HERE"/do-test clang-hexagon "$@"
 "$HERE"/do-test clang-aarch64 "$@"
 "$HERE"/do-test clang-aarch64-fvp "$@"
-"$HERE"/do-test clang-arm "$@"
 "$HERE"/do-test-noopt clang-riscv "$@"
 "$HERE"/do-test-noopt clang-rv32imafdc "$@"
 "$HERE"/do-test-noopt clang-x86_64 "$@"
@@ -34,3 +33,4 @@ HERE=`dirname "$0"`
 "$HERE"/do-test power9-fp128 "$@"
 "$HERE"/do-test-noopt riscv "$@"
 "$HERE"/do-test-noopt rv32imac "$@"
+"$HERE"/do-test clang-arm "$@"
