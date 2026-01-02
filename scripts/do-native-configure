@@ -40,9 +40,9 @@ meson setup \
         -Dtls-model=global-dynamic \
 	-Dthread-local-storage=true \
 	-Dthread-local-storage-api=false \
+	-Dinternal-heap=8388608 \
 	-Derrno-function=auto \
         -Dmultilib=false \
-        -Dpicolib=false \
 	-Dpicocrt=false \
 	-Dsemihost=false \
 	-Dposix-console=true \

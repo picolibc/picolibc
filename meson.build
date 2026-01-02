@@ -177,6 +177,7 @@ newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 enable_malloc = get_option('enable-malloc')
 newlib_nano_malloc = get_option('newlib-nano-malloc')
 nano_malloc_clear_freed = get_option('nano-malloc-clear-freed')
+internal_heap = get_option('internal-heap')
 
 c_args = core_c_args
 native_common_args = ['-DNO_NEWLIB']
@@ -1380,6 +1381,9 @@ conf_data.set('__SINGLE_THREAD', get_option('single-thread'), description: 'Disa
 conf_data.set('__HAVE_FCNTL', get_option('have-fcntl'), description: 'System provides fcntl function')
 conf_data.set('__NANO_MALLOC', newlib_nano_malloc, description: 'Provide smaller malloc implementation')
 conf_data.set('__NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
+if internal_heap != 0
+  conf_data.set('__INTERNAL_HEAP', internal_heap)
+endif
 conf_data.set('__IEEE_LIBM', not get_option('want-math-errno'), description: 'math library does not set errno (offering only ieee semantics)')
 conf_data.set('__MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('__PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')

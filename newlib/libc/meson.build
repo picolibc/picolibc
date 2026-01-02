@@ -34,13 +34,9 @@
 #
 
 libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
-           'misc', 'posix', 'search', 'signal', 'ssp',
-           'stdio', 'stdlib', 'string', 'time', 'xdr',
+           'misc', 'picolib', 'posix', 'search', 'signal',
+           'ssp', 'stdio', 'stdlib', 'string', 'time', 'xdr',
            'uchar', 'ubsan']
-
-if enable_picolib
-  libdirs += 'picolib'
-endif
 
 libnames = libdirs
 

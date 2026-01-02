@@ -37,8 +37,13 @@
 #include <errno.h>
 #include <stdint.h>
 
-extern char  __heap_start[];
-extern char  __heap_end[];
+#if __INTERNAL_HEAP > 0
+char __heap_start[__INTERNAL_HEAP] __aligned(sizeof(double));
+#define __heap_end (&__heap_start[__INTERNAL_HEAP])
+#else
+extern char __heap_start[];
+extern char __heap_end[];
+#endif
 
 static char *__brk = __heap_start;
 
