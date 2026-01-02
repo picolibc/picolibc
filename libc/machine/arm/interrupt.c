@@ -95,17 +95,19 @@ __weak_reference(__weak_interrupt_vector, __interrupt_vector);
 
 #else
 
-void         arm_halt_vector(void);
+void arm_halt_vector(void);
 
-void __naked __section(".init") __disable_sanitizer arm_halt_vector(void)
+void __naked __disable_sanitizer
+arm_halt_vector(void)
 {
     /* Loop forever. */
     __asm__("1: b 1b");
 }
 
-void         arm_ignore_vector(void);
+void arm_ignore_vector(void);
 
-void __naked __section(".init") __disable_sanitizer arm_ignore_vector(void)
+void __naked __disable_sanitizer
+arm_ignore_vector(void)
 {
     /* Ignore the interrupt by returning */
     __asm__("bx lr");

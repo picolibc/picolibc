@@ -249,9 +249,10 @@ _set_stacks(void)
  * and then branches here.
  */
 
-extern void              __vector_table(void);
+extern void __vector_table(void);
 
-static __noreturn __used __section(".init") __disable_sanitizer void _cstart(void)
+static __noreturn __used __disable_sanitizer void
+_cstart(void)
 {
 #if __ARM_ARCH_ISA_THUMB == 1
     _set_stacks();
@@ -337,7 +338,8 @@ static __noreturn __used __section(".init") __disable_sanitizer void _cstart(voi
     __start();
 }
 
-void __naked __section(".init") __used __disable_sanitizer _start(void)
+void __naked __used __disable_sanitizer
+_start(void)
 {
     /* Generate a reference to __vector_table so we get one loaded */
     __asm__(".equ __my_vector_table, __vector_table");
@@ -496,21 +498,24 @@ arm_fault(struct fault *f, int reason)
     __asm__("push {r0-r6}"); \
     __asm__("mov r0, sp")
 
-void __naked __section(".init") __disable_sanitizer arm_undef_vector(void)
+void __naked __disable_sanitizer
+arm_undef_vector(void)
 {
     VECTOR_COMMON;
     __asm__("movs r1, #" REASON(REASON_UNDEF));
     __asm__("bl  arm_fault");
 }
 
-void __naked __section(".init") __disable_sanitizer arm_prefetch_abort_vector(void)
+void __naked __disable_sanitizer
+arm_prefetch_abort_vector(void)
 {
     VECTOR_COMMON;
     __asm__("movs r1, #" REASON(REASON_PREFETCH_ABORT));
     __asm__("bl  arm_fault");
 }
 
-void __naked __section(".init") __disable_sanitizer arm_data_abort_vector(void)
+void __naked __disable_sanitizer
+arm_data_abort_vector(void)
 {
     VECTOR_COMMON;
     __asm__("movs r1, #" REASON(REASON_DATA_ABORT));
