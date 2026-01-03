@@ -65,7 +65,7 @@ but no integrated testing available for additional architectures:
 
 Supporting architectures that already have Newlib code requires:
 
- 1. newlib/libc/machine/_architecture_/meson.build to build the
+ 1. libc/machine/_architecture_/meson.build to build the
     architecture-specific libc bits. This should at least include
     setjmp/longjmp support as these cannot be performed in
     architecture independent code and are needed by libstdc++.
@@ -75,9 +75,9 @@ Supporting architectures that already have Newlib code requires:
     environment. By default, it stores them in 16-bit values, but
     some architectures only have 32-bit atomics. To avoid ABI
     issues, the size selected isn't detected automatically, instead
-    it must be configured in newlib/libc/tinystdio/stdio.h.
+    it must be configured in libc/tinystdio/stdio.h.
 
- 3. newlib/libm/machine/_architecture_/meson.build to build any
+ 3. libm/machine/_architecture_/meson.build to build any
     architecture-specific libm bits
 
  4. picocrt/machine/_architecture_ source code and build bits
@@ -91,7 +91,7 @@ Supporting architectures that already have Newlib code requires:
  6. do-_architecture_-configure to make testing the cross-compilation
     setup easier.
 
- 7. newlib/libc/picolib support. This should include whatever startup
+ 7. libc/picolib support. This should include whatever startup
     helpers are required (like ARM interrupt vector) and TLS support
     (if your compiler includes this).
 
@@ -1426,7 +1426,7 @@ A minor update from 1.0, this release includes:
     how to us picolibc when installed for ARM and RISC-V embedded
     processors. The resulting executables can be run under qemu.
 
- 5. Remove newlib/libm/mathfp directory. This experimental code never
+ 5. Remove libm/mathfp directory. This experimental code never
     worked correctly anyways.
 
 ### Picolibc version 1.0

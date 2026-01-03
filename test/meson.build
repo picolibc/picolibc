@@ -570,6 +570,7 @@ subdir('test-math')
 subdir('test-string')
 subdir('test-monetary')
 subdir('test-stdio')
+subdir('testsuite')
 
 if has_arm_semihost
   subdir('semihost')

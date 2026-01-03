@@ -125,7 +125,7 @@ cpu_family_aliases = {
 host_cpu_family = cpu_family_aliases.get(host_machine.cpu_family(), host_machine.cpu_family())
 
 # Make sure we have meson build support for the machine-specific files
-if not fs.is_file('newlib/libc/machine' / host_cpu_family / 'meson.build')
+if not fs.is_file('libc/machine' / host_cpu_family / 'meson.build')
   message = '''
 
 Unsupported architecture: "@0@"
@@ -273,9 +273,9 @@ else
   mb_jis_charsets = mb_capable and get_option('mb-jis-charsets') == 'true'
 endif
 
-newlib_obsolete_math = get_option('newlib-obsolete-math')
-newlib_obsolete_math_float = get_option('newlib-obsolete-math-float')
-newlib_obsolete_math_double = get_option('newlib-obsolete-math-double')
+obsolete_math = get_option('newlib-obsolete-math')
+obsolete_math_float = get_option('newlib-obsolete-math-float')
+obsolete_math_double = get_option('newlib-obsolete-math-double')
 
 sysroot_install = get_option('sysroot-install')
 system_libc = get_option('system-libc')
@@ -435,7 +435,7 @@ endif
 tls_model_spec = ''
 thread_local_storage = false
 thread_local_storage_option = get_option('thread-local-storage')
-have_picolibc_tls_api = get_option('thread-local-storage-api') and fs.is_file('newlib/libc/machine' / host_cpu_family / 'tls.c')
+have_picolibc_tls_api = get_option('thread-local-storage-api') and fs.is_file('libc/machine' / host_cpu_family / 'tls.c')
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if thread_local_storage_option == 'auto' or have_picolibc_tls_api
@@ -458,7 +458,7 @@ else
     prefer_tls_stack_guard = true
   endif
 endif
-have_tls_stack_guard = fs.is_file('newlib/libc/machine' / host_cpu_family / 'machine/_ssp_tls.h')
+have_tls_stack_guard = fs.is_file('libc/machine' / host_cpu_family / 'machine/_ssp_tls.h')
 if have_tls_stack_guard
   c_stack_guard_tls_flags = cc.get_supported_arguments(['-mstack-protector-guard=tls'])
   if c_stack_guard_tls_flags == []
@@ -1466,27 +1466,27 @@ if errno_function != 'false'
   conf_data.set('__PICOLIBC_ERRNO_FUNCTION', errno_function)
 endif
 
-if newlib_obsolete_math == 'auto'
+if obsolete_math == 'auto'
   obsolete_math_value = false
-elif newlib_obsolete_math == 'true'
+elif obsolete_math == 'true'
   obsolete_math_value = 1
-elif newlib_obsolete_math == 'false'
+elif obsolete_math == 'false'
   obsolete_math_value = 0
 endif
 
-if newlib_obsolete_math_float == 'auto'
+if obsolete_math_float == 'auto'
   obsolete_math_float_value = false
-elif newlib_obsolete_math_float == 'true'
+elif obsolete_math_float == 'true'
   obsolete_math_float_value = 1
-elif newlib_obsolete_math_float == 'false'
+elif obsolete_math_float == 'false'
   obsolete_math_float_value = 0
 endif
 
-if newlib_obsolete_math_double == 'auto'
+if obsolete_math_double == 'auto'
   obsolete_math_double_value = false
-elif newlib_obsolete_math_double == 'true'
+elif obsolete_math_double == 'true'
   obsolete_math_double_value = 1
-elif newlib_obsolete_math_double == 'false'
+elif obsolete_math_double == 'false'
   obsolete_math_double_value = 0
 endif
 
@@ -1526,9 +1526,9 @@ conf_data.set('__NEWLIB__', NEWLIB_MAJOR_VERSION, description: 'The newlib major
 conf_data.set('__NEWLIB_MINOR__', NEWLIB_MINOR_VERSION, description: 'The newlib minor version number.')
 conf_data.set('__NEWLIB_PATCHLEVEL__', NEWLIB_PATCHLEVEL_VERSION, description: 'The newlib patch level.')
 
-inc_dirs = ['newlib/libc/stdio', 'newlib/libc/locale', '.', 'newlib/libc/include']
+inc_dirs = ['libc/stdio', 'libc/locale', '.', 'libc/include']
 
-machine_dir = 'newlib/libc/machine' / host_cpu_family
+machine_dir = 'libc/machine' / host_cpu_family
 if fs.is_dir(machine_dir)
   machine_inc_dir = machine_dir / 'include'
   if fs.is_dir(machine_inc_dir)
@@ -1698,11 +1698,84 @@ endif
 if enable_picocrt
   subdir('picocrt')
 endif
-subdir('newlib')
+
+# Build the C library
+
+subdir('libc')
+subdir('libm')
+
+libnames = ['cpart', 'mpart']
+
+libsrcs = []
+
+foreach libname : libnames
+  libsrcs += get_variable('src_' + libname, [])
+endforeach
+
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+
+  libobjs = []
+  libsrcs_target = libsrcs
+
+  foreach libname : libnames
+    if is_variable('lib_' + libname + target)
+      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
+    endif
+    libsrcs_target += get_variable('src_' + libname + target, [])
+  endforeach
+
+  instdir = join_paths(lib_dir, target_dir)
+
+  libc_name = 'c'
+  libg_name = 'g'
+  libm_name = 'm'
+  libnosys_name = 'nosys'
+
+  if meson.version().version_compare('>=1.10')
+    local_lib_c_target = static_library(libc_name,
+				        libsrcs_target,
+                                        build_subdir : target_dir,
+				        install : really_install,
+				        install_dir : instdir,
+				        pic: false,
+				        objects : libobjs,
+				        include_directories: inc,
+				        c_args: target_c_args + c_args)
+
+  else
+    target_lib_prefix = params['lib_prefix']
+
+    local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
+				        libsrcs_target,
+				        install : really_install,
+				        install_dir : instdir,
+				        pic: false,
+				        objects : libobjs,
+				        include_directories: inc,
+				        c_args: target_c_args + c_args)
+  endif
+
+  set_variable('lib_c' + target, local_lib_c_target)
+
+  if check_duplicate_names
+    custom_target('libc_duplicates' + target,
+		  build_by_default: true,
+		  input: local_lib_c_target,
+		  output: 'libc_duplicates' + target,
+		  command: [duplicate_names, nm, '@INPUT@', '@OUTPUT@'],
+		  install: false)
+  endif
+endforeach
 
 if enable_tests
   subdir('test')
+  subdir('libm/test')
 endif
+
+subdir('empty-libs')
 
 conf_data.set('__IEEEFP_FUNCS', ieeefp_funcs, description: 'IEEE fp funcs available')
 

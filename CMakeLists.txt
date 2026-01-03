@@ -354,7 +354,8 @@ define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
   BRIEF_DOCS "Installed header files"
   FULL_DOCS "These are names of header files which are to be installed.")
 
-add_subdirectory(newlib)
+add_subdirectory(libc)
+add_subdirectory(libm)
 
 install(TARGETS c
   LIBRARY DESTINATION lib
