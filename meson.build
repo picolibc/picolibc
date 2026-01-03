@@ -1224,7 +1224,8 @@ foreach params : [default_target] + targets
       endforeach
     else
       # Default init sections map to flash in the primary script; no option gating
-      init_sections = default_init_section_template.format('init', 'flash', 'text')
+      init_section_name = meson.get_cross_property('init_section_name', 'init')
+      init_sections = default_init_section_template.format(init_section_name, 'flash', 'text')
     endif
 
     picolibc_ld_data.set('INIT_MEMORY', init_memory)
