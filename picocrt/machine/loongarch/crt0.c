@@ -36,7 +36,8 @@
 #include <stddef.h>
 #include "../../crt0.h"
 
-static void __used __section(".init") _cstart(void)
+static void __used
+_cstart(void)
 {
     __start();
 }
@@ -74,7 +75,8 @@ static const char * const names[NUM_REG] = {
     "fp",   "s0", "s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8",
 };
 
-static void __used __section(".init") _ctrap(struct fault *fault)
+static void __used
+_ctrap(struct fault *fault)
 {
     int r;
     printf("LoongArch fault\n");
@@ -93,7 +95,8 @@ static void __used __section(".init") _ctrap(struct fault *fault)
 #define _PASTE(r) #r
 #define PASTE(r)  _PASTE(r)
 
-void __section(".init") __used __attribute((aligned(0x40))) _trap(void)
+void __used __attribute((aligned(0x40)))
+     _trap(void)
 {
     /* Build a known-working C environment */
     __asm__("csrwr          $sp, 0x30\n" /* Save sp to ksave0 */
@@ -191,6 +194,6 @@ void __section(".text.init.enter") __used _start(void)
     __asm__("la.abs         $t0, _trap");
     __asm__("csrwr          $t0, 0xc");
 #endif
-    __asm__("la.pcrel      $t0, _cstart\n"
+    __asm__("la.abs        $t0, _cstart\n"
             "jirl          $ra, $t0, 0\n");
 }
