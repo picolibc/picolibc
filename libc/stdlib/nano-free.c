@@ -38,7 +38,7 @@
  */
 
 void
-free(void *free_p)
+__malloc_free(void *free_p)
 {
     chunk_t  *p_to_free;
     chunk_t **p, *r;
@@ -110,8 +110,8 @@ unlock:
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
-__strong_reference(free, __malloc_free);
-__strong_reference(free, cfree);
+__strong_reference(__malloc_free, free);
+__strong_reference(__malloc_free, cfree);
 #else
 void
 cfree(void *ptr)
