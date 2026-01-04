@@ -173,7 +173,6 @@ else
   have_cplusplus = false
 endif
 
-newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 enable_malloc = get_option('enable-malloc')
 malloc_clear_freed = get_option('malloc-clear-freed')
 internal_heap = get_option('internal-heap')
@@ -291,9 +290,6 @@ endif
 if enable_cdefs_tests
   validate_cdefs = find_program ('scripts/validate-cdefs', required : true)
 endif
-
-# Select exit code
-picoexit = get_option('picoexit')
 
 # Shared stdio options
 io_long_long = get_option('io-long-long')
@@ -1403,13 +1399,6 @@ if mb_capable
   conf_data.set('__MB_EXTENDED_CHARSETS_ISO', mb_iso_charsets)
   conf_data.set('__MB_EXTENDED_CHARSETS_WINDOWS', mb_windows_charsets)
   conf_data.set('__MB_EXTENDED_CHARSETS_JIS', mb_jis_charsets)
-endif
-
-conf_data.set('__PICO_EXIT', picoexit)
-if not picoexit
-  conf_data.set('_ATEXIT_DYNAMIC_ALLOC', newlib_atexit_dynamic_alloc)
-  conf_data.set('_GLOBAL_ATEXIT', get_option('newlib-global-atexit'))
-  conf_data.set('_WANT_REGISTER_FINI', get_option('newlib-register-fini'))
 endif
 
 conf_data.set('__TINY_STDIO', true, description: 'Picolibc stdio comes from the avr C library')

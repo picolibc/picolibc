@@ -109,11 +109,11 @@ picolibc_sources(
   wctob.c
   wctomb.c
   wctomb_r.c
-  pico-atexit.c
-  pico-exit.c
-  pico-exitprocs.c
-  pico-onexit.c
-  pico-cxa-atexit.c
+  atexit.c
+  exit.c
+  exitprocs.c
+  onexit.c
+  cxa-atexit.c
   set_constraint_handler_s.c
   ignore_handler_s.c
   )

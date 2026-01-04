@@ -38,7 +38,7 @@
 #include <string.h>
 #include <sys/lock.h>
 #include <limits.h>
-#include "pico-onexit.h"
+#include "local-onexit.h"
 
 struct on_exit {
     union on_exit_func    func;

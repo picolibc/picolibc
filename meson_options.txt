@@ -186,25 +186,12 @@ option('picocrt-enable-mmu', type: 'boolean', value: true,
        description: 'Enable memory management unit in picocrt startup')
 option('picocrt-lib', type: 'boolean', value: true,
        description: 'Include pico crt bits in lib form')
-option('picoexit', type: 'boolean', value: true,
-       description: 'Smaller exit/atexit/onexit code')
 option('initfini-array', type: 'boolean', value: true,
        description: 'compiler supports INIT_ARRAY section types')
 option('initfini', type: 'boolean', value: false,
        description: 'Supports _init() and _fini()')
 option('crt-runtime-size', type: 'boolean', value: false,
        description: 'compute crt memory space sizes at runtime')
-
-#
-# Legacy (non-picoexit) startup/shutdown options
-#
-
-option('newlib-atexit-dynamic-alloc', type: 'boolean', value: false,
-       description: 'enable dynamic allocation of atexit entries')
-option('newlib-global-atexit', type: 'boolean', value: false,
-       description: 'make legacy atexit data structure global instead of thread-local')
-option('newlib-register-fini', type: 'boolean', value: false,
-       description: 'enable finalization function registration using atexit')
 
 #
 # Malloc options

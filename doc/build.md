@@ -143,22 +143,9 @@ at startup and shutdown times.
 | picocrt                     | true    | Build crt0.o (C startup function)                                                    |
 | picocrt-enable-mmu          | true    | Enable memory management unit in picocrt where supported by the hardware             |
 | picocrt-lib                 | true    | Also wrap crt0.o into a library -lcrt0, which is easier to find via the library path |
-| picoexit                    | true    | Use smaller implementation that allows only 32 init and fini handlers                |
 | initfini-array              | true    | Use .init_array and .fini_array sections in picocrt                                  |
 | initfini                    | false   | Support _init() and _fini() functions in picocrt                                    |
 | crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime. <br> This option exists for targets where the linker can't handle a symbol that is the difference between two other symbols |
-
-### Legacy (non-picoexit) startup/shutdown options
-
-These options cover the (non-default) legacy exit handler support when
-picoexit is disabled.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-atexit-dynamic-alloc | false   | Allocate additional space for handlers as necessary                                  |
-| newlib-global-atexit        | false   | Place exit handlers in global variables instead of thread-local ones                 |
-| newlib-register-fini        | false   | Register function that invokes destructors using atexit                              |
-| newlib-register-fini        | false   | Register 
 
 ### Malloc options
 

@@ -33,18 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <stdlib.h>
-#include <unistd.h>
-#include "pico-onexit.h"
+#include "local-onexit.h"
 
-void
-exit(int code)
+int
+__cxa_atexit(void (*func)(void *), void *arg, void *d)
 {
-#ifdef __INIT_FINI_ARRAY
-    __libc_fini_array();
-#else
-    if (__call_exitprocs)
-        __call_exitprocs(code, NULL);
-#endif
-    _exit(code);
+    union on_exit_func func_u = { .cxa_atexit = func };
+    (void)d;
+    return _on_exit(PICO_ONEXIT_CXA_ATEXIT, func_u, arg);
 }

@@ -48,25 +48,6 @@ malloc_srcs_stdlib = [
   'valloc.c',
 ]
 
-pico_exit_srcs_stdlib = [
-  'pico-atexit.c',
-  'pico-exit.c',
-  'pico-onexit.c',
-  'pico-cxa-atexit.c',
-  'pico-exitprocs.c',
-]
-
-newlib_exit_srcs_stdlib = [
-  '__atexit.c',
-  '__call_atexit.c',
-  'atexit.c',
-  'cxa_atexit.c',
-  'cxa_finalize.c',
-  'exit.c',
-  'on_exit.c',
-  'quick_exit.c',
-]
-
 srcs_stdlib = [
     'a64l.c',
     'abort.c',
@@ -77,18 +58,22 @@ srcs_stdlib = [
     'assert.c',
     'assert_func.c',
     'assert_no_arg.c',
+    'atexit.c',
     'atof.c',
     'atoff.c',
     'atoi.c',
     'atol.c',
     'atoll.c',
     'btowc.c',
+    'cxa-atexit.c',
     'div.c',
     'drand48.c',
     'ejtouc.c',
     'environ.c',
     'eprintf.c',
     'erand48.c',
+    'exit.c',
+    'exitprocs.c',
     '_Exit.c',
     'getenv.c',
     'getenv_r.c',
@@ -117,6 +102,7 @@ srcs_stdlib = [
     'mbtowc_r.c',
     'mrand48.c',
     'nrand48.c',
+    'onexit.c',
     'putenv.c',
     'rand48.c',
     'rand.c',
@@ -147,12 +133,6 @@ srcs_stdlib = [
     'set_constraint_handler_s.c',
     'ignore_handler_s.c',
 ]
-
-if picoexit
-  srcs_stdlib += pico_exit_srcs_stdlib
-else
-  srcs_stdlib += newlib_exit_srcs_stdlib
-endif
 
 if enable_malloc
   srcs_stdlib += malloc_srcs_stdlib

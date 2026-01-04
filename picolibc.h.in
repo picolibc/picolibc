@@ -102,8 +102,6 @@
 /* The newlib version in string format. */
 #define _NEWLIB_VERSION "@NEWLIB_VERSION@"
 
-#cmakedefine __PICO_EXIT
-
 /* The Picolibc minor version number. */
 #define _PICOLIBC_MINOR__ @PROJECT_VERSION_MINOR@
 
