@@ -39,6 +39,7 @@ plain_tests_common = ['regex',
                       'setjmp',
                       'atexit',
                       'on_exit',
+                      'malloc_stress',
 	              'timegm',
                       'test-atomic',
                       'test-hello',
@@ -75,9 +76,6 @@ if have_complex
   math_tests_common += 'complex-funcs'
 endif
 
-if newlib_nano_malloc or tests_enable_full_malloc_stress
-  math_tests_common += 'malloc_stress'
-endif
 
 math_tests = math_tests_common + [
   'math-funcs',

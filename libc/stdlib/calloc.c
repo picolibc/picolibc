@@ -26,15 +26,22 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nano-malloc.h"
+#include "local-malloc.h"
+#include "mul_overflow.h"
+
+/*
+ * Implement calloc by multiplying sizes (with overflow check) and
+ * calling malloc (which already sets to zero)
+ */
 
 void *
-pvalloc(size_t s)
+calloc(size_t n, size_t elem)
 {
-    if (s > MALLOC_MAXSIZE - MALLOC_PAGE_ALIGN) {
+    size_t bytes;
+
+    if (mul_overflow(n, elem, &bytes)) {
         errno = ENOMEM;
         return NULL;
     }
-
-    return valloc(__align_up(s, MALLOC_PAGE_ALIGN));
+    return malloc(bytes);
 }

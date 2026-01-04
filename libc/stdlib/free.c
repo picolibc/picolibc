@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nano-malloc.h"
+#include "local-malloc.h"
 
 /*
  * Algorithm:
@@ -48,7 +48,7 @@ __malloc_free(void *free_p)
 
     p_to_free = ptr_to_chunk(free_p);
 
-#ifdef __NANO_MALLOC_CLEAR_FREED
+#ifdef __MALLOC_CLEAR_FREED
     memset(p_to_free, 0, chunk_usable(p_to_free));
 #else
     p_to_free->next = NULL;

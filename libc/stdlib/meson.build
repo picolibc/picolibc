@@ -32,36 +32,20 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-nano_malloc_srcs_stdlib = [
-  'nano-calloc.c',
-  'nano-free.c',
-  'nano-getpagesize.c',
-  'nano-mallinfo.c',
-  'nano-malloc.c',
-  'nano-malloc-stats.c',
-  'nano-malloc-usable-size.c',
-  'nano-mallopt.c',
-  'nano-memalign.c',
-  'nano-posix-memalign.c',
-  'nano-pvalloc.c',
-  'nano-realloc.c',
-  'nano-valloc.c',
-]
-
-std_malloc_srcs_stdlib = [
-  'malloc-calloc.c',
-  'malloc-cfree.c',
-  'malloc-free.c',
-  'malloc-mallinfo.c',
-  'malloc-malloc.c',
-  'malloc-malloc_stats.c',
-  'malloc-malloc_usable_size.c',
-  'malloc-mallopt.c',
-  'malloc-memalign.c',
-  'malloc-posix_memalign.c',
-  'malloc-pvalloc.c',
-  'malloc-realloc.c',
-  'malloc-valloc.c',
+malloc_srcs_stdlib = [
+  'calloc.c',
+  'free.c',
+  'getpagesize.c',
+  'mallinfo.c',
+  'malloc.c',
+  'malloc-stats.c',
+  'malloc-usable-size.c',
+  'mallopt.c',
+  'memalign.c',
+  'posix-memalign.c',
+  'pvalloc.c',
+  'realloc.c',
+  'valloc.c',
 ]
 
 pico_exit_srcs_stdlib = [
@@ -170,18 +154,9 @@ else
   srcs_stdlib += newlib_exit_srcs_stdlib
 endif
 
-hdrs_stdlib = [
-    'arc4random.h',
-    'atexit.h',
-    'chacha_private.h',
-    'gd_qnan.h',
-    'gdtoa.h',
-    'local.h',
-    'mbctype.h',
-    'mprec.h',
-    'rand48.h',
-    'std.h',
-]
+if enable_malloc
+  srcs_stdlib += malloc_srcs_stdlib
+endif
 
 srcs_stdlib_use = []
 foreach file : srcs_stdlib
@@ -196,49 +171,3 @@ foreach file : srcs_stdlib
 endforeach
 
 src_stdlib = files(srcs_stdlib_use)
-
-if enable_malloc
-  # Work around compiler optimizing calls involving malloc/free
-
-  c_args_malloc = []
-  if cc.has_argument('-fno-builtin-malloc')
-    c_args_malloc += ['-fno-builtin-malloc']
-  endif
-
-  if cc.has_argument('-fno-builtin-free')
-    c_args_malloc += ['-fno-builtin-free']
-  endif
-
-  if newlib_nano_malloc
-    srcs_stdlib_malloc = nano_malloc_srcs_stdlib
-  else
-    srcs_stdlib_malloc = std_malloc_srcs_stdlib
-  endif
-
-  srcs_stdlib_malloc_use = []
-  foreach file : srcs_stdlib_malloc
-    s_file = fs.replace_suffix(file, '.S')
-    if file in srcs_machine
-      message('libc/stdlib/' + file + ': machine overrides generic')
-    elif s_file in srcs_machine
-      message('libc/stdlib/' + s_file + ': machine overrides generic')
-    else
-      srcs_stdlib_malloc_use += file
-    endif
-  endforeach
-
-  foreach params : targets
-    target = params['name']
-    target_dir = params['dir']
-    target_c_args = params['c_args']
-
-    # Have to build a sub-library to get custom c_args for malloc
-    set_variable('lib_stdlib' + target,
-	         static_library('stdlib_malloc' + target,
-			        srcs_stdlib_malloc_use,
-			        pic: false,
-			        include_directories: inc,
-			        c_args: target_c_args + c_args + c_args_malloc))
-
-  endforeach
-endif

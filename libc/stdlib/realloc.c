@@ -26,7 +26,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nano-malloc.h"
+#include "local-malloc.h"
 
 /*
  * Implement either by merging adjacent free memory
@@ -104,7 +104,7 @@ realloc(void *ptr, size_t size)
     if (new_size <= old_size) {
         size_t extra = old_size - new_size;
 
-#ifdef __NANO_MALLOC_CLEAR_FREED
+#ifdef __MALLOC_CLEAR_FREED
         if (extra > MALLOC_HEAD)
             memset((char *)ptr + new_size, 0, extra - MALLOC_HEAD);
 #endif

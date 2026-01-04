@@ -26,10 +26,16 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nano-malloc.h"
+#include "local-malloc.h"
 
-size_t
-malloc_usable_size(void *ptr)
+void
+malloc_stats(void)
 {
-    return chunk_usable(ptr_to_chunk(ptr));
+    struct mallinfo current_mallinfo;
+
+    current_mallinfo = mallinfo();
+    fprintf(stderr, "max system bytes = %10lu\n", (long)current_mallinfo.arena);
+    fprintf(stderr, "system bytes     = %10lu\n", (long)current_mallinfo.arena);
+    fprintf(stderr, "in use bytes     = %10lu\n", (long)current_mallinfo.uordblks);
+    fprintf(stderr, "free blocks      = %10lu\n", (long)current_mallinfo.ordblks);
 }

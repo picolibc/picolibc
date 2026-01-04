@@ -26,20 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nano-malloc.h"
+#include "local-malloc.h"
 
-int
-posix_memalign(void **memptr, size_t align, size_t size)
+size_t
+malloc_usable_size(void *ptr)
 {
-    /* Return EINVAL if align isn't power of 2 or not a multiple of a pointer size */
-    if ((align & (align - 1)) != 0 || align % sizeof(void *) != 0 || align == 0)
-        return EINVAL;
-
-    void *mem = memalign(align, size);
-
-    if (!mem)
-        return ENOMEM;
-
-    *memptr = mem;
-    return 0;
+    return chunk_usable(ptr_to_chunk(ptr));
 }

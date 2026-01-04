@@ -26,22 +26,20 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nano-malloc.h"
-#include "mul_overflow.h"
+#include "local-malloc.h"
 
-/*
- * Implement calloc by multiplying sizes (with overflow check) and
- * calling malloc (which already sets to zero)
- */
-
-void *
-calloc(size_t n, size_t elem)
+int
+posix_memalign(void **memptr, size_t align, size_t size)
 {
-    size_t bytes;
+    /* Return EINVAL if align isn't power of 2 or not a multiple of a pointer size */
+    if ((align & (align - 1)) != 0 || align % sizeof(void *) != 0 || align == 0)
+        return EINVAL;
 
-    if (mul_overflow(n, elem, &bytes)) {
-        errno = ENOMEM;
-        return NULL;
-    }
-    return malloc(bytes);
+    void *mem = memalign(align, size);
+
+    if (!mem)
+        return ENOMEM;
+
+    *memptr = mem;
+    return 0;
 }

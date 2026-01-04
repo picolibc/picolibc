@@ -1245,19 +1245,6 @@ Files: hello-world/Makefile
  libc/stdio/setbuf.c
  libc/stdio/setbuffer.c
  libc/stdio/setlinebuf.c
- libc/stdlib/malloc-calloc.c
- libc/stdlib/malloc-cfree.c
- libc/stdlib/malloc-free.c
- libc/stdlib/malloc-mallinfo.c
- libc/stdlib/malloc-malloc.c
- libc/stdlib/malloc-malloc_stats.c
- libc/stdlib/malloc-malloc_usable_size.c
- libc/stdlib/malloc-mallopt.c
- libc/stdlib/malloc-memalign.c
- libc/stdlib/malloc-posix_memalign.c
- libc/stdlib/malloc-pvalloc.c
- libc/stdlib/malloc-realloc.c
- libc/stdlib/malloc-valloc.c
  libc/stdlib/meson.build
  libc/string/meson.build
  libc/time/meson.build
@@ -2221,20 +2208,20 @@ Files: libc/machine/arm/strlen.c
 Copyright: 2008-2015 ARM Ltd
 License: BSD3-9
 
-Files: libc/stdlib/nano-calloc.c
- libc/stdlib/nano-free.c
- libc/stdlib/nano-getpagesize.c
- libc/stdlib/nano-mallinfo.c
- libc/stdlib/nano-malloc-stats.c
- libc/stdlib/nano-malloc-usable-size.c
- libc/stdlib/nano-malloc.c
- libc/stdlib/nano-malloc.h
- libc/stdlib/nano-mallopt.c
- libc/stdlib/nano-memalign.c
- libc/stdlib/nano-posix-memalign.c
- libc/stdlib/nano-pvalloc.c
- libc/stdlib/nano-realloc.c
- libc/stdlib/nano-valloc.c
+Files: libc/stdlib/calloc.c
+ libc/stdlib/free.c
+ libc/stdlib/getpagesize.c
+ libc/stdlib/local-malloc.h
+ libc/stdlib/mallinfo.c
+ libc/stdlib/malloc-stats.c
+ libc/stdlib/malloc-usable-size.c
+ libc/stdlib/malloc.c
+ libc/stdlib/mallopt.c
+ libc/stdlib/memalign.c
+ libc/stdlib/posix-memalign.c
+ libc/stdlib/pvalloc.c
+ libc/stdlib/realloc.c
+ libc/stdlib/valloc.c
 Copyright: 2012, 2013 ARM Ltd
 License: BSD3-9
 
@@ -3578,7 +3565,6 @@ Files: libc/stdlib/abort.c
  libc/stdlib/exit.c
  libc/stdlib/labs.c
  libc/stdlib/local.h
- libc/stdlib/mallocr.c
  libc/stdlib/mbctype.h
  libc/stdlib/mblen.c
  libc/stdlib/mbstowcs.c

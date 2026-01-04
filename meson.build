@@ -175,8 +175,7 @@ endif
 
 newlib_atexit_dynamic_alloc = get_option('newlib-atexit-dynamic-alloc')
 enable_malloc = get_option('enable-malloc')
-newlib_nano_malloc = get_option('newlib-nano-malloc')
-nano_malloc_clear_freed = get_option('nano-malloc-clear-freed')
+malloc_clear_freed = get_option('malloc-clear-freed')
 internal_heap = get_option('internal-heap')
 
 c_args = core_c_args
@@ -1379,8 +1378,7 @@ conf_data.set('__IO_WCHAR', io_wchar)
 conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'), description: 'assert() is verbose by default')
 conf_data.set('__SINGLE_THREAD', get_option('single-thread'), description: 'Disable multi-thread support')
 conf_data.set('__HAVE_FCNTL', get_option('have-fcntl'), description: 'System provides fcntl function')
-conf_data.set('__NANO_MALLOC', newlib_nano_malloc, description: 'Provide smaller malloc implementation')
-conf_data.set('__NANO_MALLOC_CLEAR_FREED', nano_malloc_clear_freed and newlib_nano_malloc)
+conf_data.set('__MALLOC_CLEAR_FREED', malloc_clear_freed)
 if internal_heap != 0
   conf_data.set('__INTERNAL_HEAP', internal_heap)
 endif

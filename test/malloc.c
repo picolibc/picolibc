@@ -189,7 +189,7 @@ main(void)
     if (fzero) {
         for (pow = 0; pow < 128; pow++)
             fzero[pow] = pow + 2;
-#ifndef __NANO_MALLOC_CLEAR_FREED
+#ifndef __MALLOC_CLEAR_FREED
 #ifdef __GLIBC__
         explicit_bzero(fzero, 128);
 #else
@@ -213,7 +213,7 @@ main(void)
     if (rzero) {
         for (pow = 0; pow < 128; pow++)
             rzero[pow] = pow + 2;
-#ifndef __NANO_MALLOC_CLEAR_FREED
+#ifndef __MALLOC_CLEAR_FREED
 #ifdef __GLIBC__
         explicit_bzero(rzero + 16, 128 - 16);
 #else

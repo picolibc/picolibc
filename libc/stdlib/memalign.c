@@ -27,7 +27,7 @@
  */
 
 #define _GNU_SOURCE
-#include "nano-malloc.h"
+#include "local-malloc.h"
 
 /*
  * Allocate memory block aligned at specific boundary.

@@ -26,12 +26,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "nano-malloc.h"
+#include "local-malloc.h"
 
-int
-mallopt(int parameter_number, int parameter_value)
+void *
+valloc(size_t s)
 {
-    (void)parameter_number;
-    (void)parameter_value;
-    return 0;
+    return memalign(MALLOC_PAGE_ALIGN, s);
 }

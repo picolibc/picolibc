@@ -212,10 +212,8 @@ option('newlib-register-fini', type: 'boolean', value: false,
 
 option('enable-malloc', type: 'boolean', value: true,
        description: 'provide malloc family of functions based on sbrk')
-option('newlib-nano-malloc', type: 'boolean', value: true,
-       description: 'use small-footprint nano-malloc implementation')
-option('nano-malloc-clear-freed', type: 'boolean', value: false,
-       description: 'nano version erases memory on free/realloc')
+option('malloc-clear-freed', type: 'boolean', value: false,
+       description: 'Erase memory on free/realloc')
 option('internal-heap', type: 'integer', value: 0,
        description: 'provide internal static heap')
 
