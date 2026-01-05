@@ -12,7 +12,7 @@
  * is preserved.
  * ====================================================
  */
-
+#define _GNU_SOURCE
 #include "fdlibm.h"
 
 static float       pzerof(float), qzerof(float);
@@ -47,8 +47,7 @@ j0f(float x)
     ix = hx & 0x7fffffff;
     x = fabsf(x);
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
-        s = sinf(x);
-        c = cosf(x);
+        sincosf(x, &s, &c);
         ss = s - c;
         cc = s + c;
         if (ix <= FLT_UWORD_HALF_MAX) { /* make sure x+x not overflow */
@@ -135,8 +134,7 @@ y0f(float x)
          *              sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
          * to compute the worse one.
          */
-        s = sinf(x);
-        c = cosf(x);
+        sincosf(x, &s, &c);
         ss = s - c;
         cc = s + c;
         /*

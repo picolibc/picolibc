@@ -56,6 +56,7 @@
  *	3. Special cases: y0(0)=-inf, y0(x<0)=NaN, y0(inf)=0.
  */
 
+#define _GNU_SOURCE
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64
@@ -94,8 +95,7 @@ j064(__float64 x)
     ix = hx & 0x7fffffff;
     x = fabs64(x);
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
-        s = sin64(x);
-        c = cos64(x);
+        sincos64(x, &s, &c);
         ss = s - c;
         cc = s + c;
         if (ix < 0x7fe00000) { /* make sure x+x not overflow */
@@ -185,8 +185,7 @@ y064(__float64 x)
          *              sin(x) +- cos(x) = -cos(2x)/(sin(x) -+ cos(x))
          * to compute the worse one.
          */
-        s = sin64(x);
-        c = cos64(x);
+        sincos64(x, &s, &c);
         ss = s - c;
         cc = s + c;
         /*

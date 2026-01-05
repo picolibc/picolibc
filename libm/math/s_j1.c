@@ -55,7 +55,7 @@
  * 	   where x1 = x-3*pi/4. It is better to compute sin(x1),cos(x1)
  *	   by method mentioned above.
  */
-
+#define _GNU_SOURCE
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64
@@ -95,8 +95,7 @@ j164(__float64 x)
     ix = hx & 0x7fffffff;
     y = fabs64(x);
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
-        s = sin64(y);
-        c = cos64(y);
+        sincos64(y, &s, &c);
         ss = -s - c;
         cc = s - c;
         if (ix < 0x7fe00000) { /* make sure y+y not overflow */
@@ -175,8 +174,7 @@ y164(__float64 x)
         return _F_64(0.0);
 
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
-        s = sin64(x);
-        c = cos64(x);
+        sincos64(x, &s, &c);
         ss = -s - c;
         cc = s - c;
         if (ix < 0x7fe00000) { /* make sure x+x not overflow */

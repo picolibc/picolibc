@@ -12,7 +12,7 @@
  * is preserved.
  * ====================================================
  */
-
+#define _GNU_SOURCE
 #include "fdlibm.h"
 
 static float       ponef(float), qonef(float);
@@ -49,8 +49,7 @@ j1f(float x)
 
     y = fabsf(x);
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
-        s = sinf(y);
-        c = cosf(y);
+        sincosf(y, &s, &c);
         ss = -s - c;
         cc = s - c;
         if (ix <= FLT_UWORD_HALF_MAX) { /* make sure y+y not overflow */
@@ -125,8 +124,7 @@ y1f(float x)
         return zero;
 
     if (ix >= 0x40000000) { /* |x| >= 2.0 */
-        s = sinf(x);
-        c = cosf(x);
+        sincosf(x, &s, &c);
         ss = -s - c;
         cc = s - c;
         if (ix <= FLT_UWORD_HALF_MAX) { /* make sure x+x not overflow */
