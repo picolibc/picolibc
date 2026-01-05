@@ -34,6 +34,7 @@
 srcs_machine = [
   'setjmp.S',
   'longjmp.S',
+  'tls.c',
 ]
 
 foreach params : targets
