@@ -34,3 +34,4 @@ HERE=`dirname "$0"`
 "$HERE"/do-test power9-fp128 "$@"
 "$HERE"/do-test-noopt riscv "$@"
 "$HERE"/do-test-noopt rv32imac "$@"
+"$HERE"/do-test-noopt native "$@"

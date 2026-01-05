@@ -65,7 +65,7 @@ jobs:
           "-Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true -Dstdio-locking=true",
         ]
         test: [
-          "./.github/do-native",
+          "./.github/do-native-math",
         ]
     steps:
       - name: Clone picolibc
@@ -100,7 +100,7 @@ jobs:
           "-Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true -Dstdio-locking=true",
         ]
         test: [
-          "./.github/do-native",
+          "./.github/do-native-math",
         ]
     steps:
       - name: Clone picolibc
