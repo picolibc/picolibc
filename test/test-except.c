@@ -73,6 +73,10 @@ main(void)
     /* 0x4afc is reserved for customer use to take an illegal instruction trap */
     __asm__(".word 0x4afc");
 
+#elif defined(__loongarch__)
+
+    __asm__(".word 0x00000000");
+
 #else
 
 #define NO_INVALID
