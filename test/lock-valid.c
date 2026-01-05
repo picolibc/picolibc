@@ -34,6 +34,7 @@
  */
 
 #define _DEFAULT_SOURCE
+#define __ASSERT_QUIET
 #include <stdint.h>
 #include <assert.h>
 #include <stdlib.h>
