@@ -44,6 +44,8 @@ tests_real_trig = [
   'test-cos',
   'test-cosh',
   'test-sin',
+  'test-sincos-cos',
+  'test-sincos-sin',
   'test-sinh',
   'test-tan',
   'test-tanh'
@@ -105,7 +107,7 @@ tests += tests_complex_trig + tests_complex_exp + tests_complex_other
 functions = [ 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atanh',
               'cbrt', 'cos', 'cosh', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
               'expm1', 'j0', 'j1', 'lgamma', 'log', 'log10', 'log1p', 'log2',
-              'sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tgamma', 'y0', 'y1',
+              'sin', 'sincos_cos', 'sincos_sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tgamma', 'y0', 'y1',
             ]
 
 foreach params : targets

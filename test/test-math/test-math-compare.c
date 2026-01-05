@@ -38,7 +38,7 @@
 #endif
 
 #define _GNU_SOURCE
-#include "../test-math/test-math.h"
+#include "test-math.h"
 
 #define FNAME MATH_STRING(TEST_FUNC)
 

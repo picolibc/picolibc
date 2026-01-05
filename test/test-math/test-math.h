@@ -33,6 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _TEST_MATH_H_
+#define _TEST_MATH_H_
+
 #ifndef _DEFAULT_SOURCE
 #define _DEFAULT_SOURCE
 #endif
@@ -431,3 +434,120 @@ culp128(cbinary128 a, cbinary128 b)
 }
 
 #endif
+
+#define sincos_sin 1
+#define sincos_cos 2
+
+#if TEST_FUNC == sincos_sin
+#define TEST_FUNC_SINCOS_SIN
+#elif TEST_FUNC == sincos_cos
+#define TEST_FUNC_SINCOS_COS
+#endif
+
+#undef sincos_sin
+#undef sincos_cos
+
+#ifdef TEST_FUNC_SINCOS_SIN
+#ifdef TEST_FUNC_32
+binary32 TEST_FUNC_32(binary32 x);
+
+binary32
+TEST_FUNC_32(binary32 x)
+{
+    binary32 s, c;
+    FN32(sincos)(x, &s, &c);
+    return s;
+}
+#endif
+
+#ifdef HAS_BINARY64
+binary64 TEST_FUNC_64(binary64 x);
+
+binary64
+TEST_FUNC_64(binary64 x)
+{
+    binary64 s, c;
+    FN64(sincos)(x, &s, &c);
+    return s;
+}
+#endif
+
+#ifdef HAS_BINARY80
+binary80 TEST_FUNC_80(binary80 x);
+
+binary80
+TEST_FUNC_80(binary80 x)
+{
+    binary80 s, c;
+    FN80(sincos)(x, &s, &c);
+    return s;
+}
+#endif
+
+#ifdef HAS_BINARY128
+binary128 TEST_FUNC_128(binary128 x);
+
+binary128
+TEST_FUNC_128(binary128 x)
+{
+    binary128 s, c;
+    FN128(sincos)(x, &s, &c);
+    return s;
+}
+#endif
+
+#endif /* TEST_FUNC_SINCOS_SIN */
+
+#ifdef TEST_FUNC_SINCOS_COS
+
+#ifdef TEST_FUNC_32
+binary32 TEST_FUNC_32(binary32 x);
+
+binary32
+TEST_FUNC_32(binary32 x)
+{
+    binary32 s, c;
+    FN32(sincos)(x, &s, &c);
+    return c;
+}
+#endif
+
+#ifdef HAS_BINARY64
+binary64 TEST_FUNC_64(binary64 x);
+
+binary64
+TEST_FUNC_64(binary64 x)
+{
+    binary64 s, c;
+    FN64(sincos)(x, &s, &c);
+    return c;
+}
+#endif
+
+#ifdef HAS_BINARY80
+binary80 TEST_FUNC_80(binary80 x);
+
+binary80
+TEST_FUNC_80(binary80 x)
+{
+    binary80 s, c;
+    FN80(sincos)(x, &s, &c);
+    return c;
+}
+#endif
+
+#ifdef HAS_BINARY128
+binary128 TEST_FUNC_128(binary128 x);
+
+binary128
+TEST_FUNC_128(binary128 x)
+{
+    binary128 s, c;
+    FN128(sincos)(x, &s, &c);
+    return c;
+}
+#endif
+
+#endif /* TEST_FUNC_SINCOS_COS */
+
+#endif /* _TEST_MATH_H_ */

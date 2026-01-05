@@ -44,6 +44,8 @@ set(tests_real_trig
   test-cos
   test-cosh
   test-sin
+  test-sincos-cos
+  test-sincos-sin
   test-sinh
   test-tan
   test-tanh
