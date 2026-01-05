@@ -49,7 +49,7 @@
 __float64
 cos64(__float64 x)
 {
-    __float64 y[2], z = 0.0;
+    __float64 y[2], z = _F_64(0.0);
     __int32_t n, ix;
 
     /* High word of x. */
