@@ -109,11 +109,6 @@ Files: libc/stdlib/imaxabs.c
 Copyright: 2001 Mike Barcroft <mike@FreeBSD.org>
 License: BSD2-1
 
-Files: libc/stdlib/quick_exit.c
-Copyright: 2011 David Chisnall
- 2015 embedded brains GmbH
-License: BSD2-1
-
 Files: libc/stdlib/reallocf.c
 Copyright: 1998, M. Warner Losh <imp@freebsd.org>
 License: BSD2-1
@@ -1086,12 +1081,12 @@ Files: empty-libs/empty.c
  libc/stdio/strfromd.c
  libc/stdio/strfromf.c
  libc/stdio/strfroml.c
- libc/stdlib/pico-atexit.c
- libc/stdlib/pico-cxa-atexit.c
- libc/stdlib/pico-exit.c
- libc/stdlib/pico-exitprocs.c
- libc/stdlib/pico-onexit.c
- libc/stdlib/pico-onexit.h
+ libc/stdlib/atexit.c
+ libc/stdlib/cxa-atexit.c
+ libc/stdlib/exit.c
+ libc/stdlib/exitprocs.c
+ libc/stdlib/local-onexit.h
+ libc/stdlib/onexit.c
  libm/common/exp10l.c
  libm/common/math_inexact.c
  libm/common/math_inexactf.c
@@ -3543,26 +3538,17 @@ Files: libc/ssp/chk_fail.c
 Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
 License: Default-1
 
-Files: libc/stdlib/__atexit.c
- libc/stdlib/__call_atexit.c
- libc/stdlib/cxa_atexit.c
- libc/stdlib/cxa_finalize.c
-Copyright: 2004 Paul Brook <paul@codesourcery.com>
-License: Default-1
-
 Files: libc/stdlib/abort.c
  libc/stdlib/abs.c
  libc/stdlib/assert.c
  libc/stdlib/assert_func.c
  libc/stdlib/assert_no_arg.c
- libc/stdlib/atexit.c
  libc/stdlib/atexit.h
  libc/stdlib/atof.c
  libc/stdlib/atoff.c
  libc/stdlib/atoi.c
  libc/stdlib/atol.c
  libc/stdlib/eprintf.c
- libc/stdlib/exit.c
  libc/stdlib/labs.c
  libc/stdlib/local.h
  libc/stdlib/mbctype.h
@@ -3570,7 +3556,6 @@ Files: libc/stdlib/abort.c
  libc/stdlib/mbstowcs.c
  libc/stdlib/mbtowc.c
  libc/stdlib/mbtowc_r.c
- libc/stdlib/on_exit.c
  libc/stdlib/rand.c
  libc/stdlib/rand_r.c
  libc/stdlib/srand.c
