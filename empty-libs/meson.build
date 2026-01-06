@@ -43,6 +43,7 @@ foreach params : targets
   target_dir = params['dir']
   target_c_args = params['c_args']
 
+  instdir = join_paths(lib_dir, target_dir)
 
   foreach lib_name : empty_lib_names
     if meson.version().version_compare('>=1.10')

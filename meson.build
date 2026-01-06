@@ -1872,9 +1872,6 @@ foreach params : targets
   instdir = join_paths(lib_dir, target_dir)
 
   libc_name = 'c'
-  libg_name = 'g'
-  libm_name = 'm'
-  libnosys_name = 'nosys'
 
   if meson.version().version_compare('>=1.10')
     local_lib_c_target = static_library(libc_name,
