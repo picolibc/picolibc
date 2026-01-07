@@ -37,9 +37,13 @@
 #include <stdlib.h>
 #include "local-onexit.h"
 
+#ifdef ENABLE_PICOLIBC_EXIT
+
 int
 atexit(void (*func)(void))
 {
     union on_exit_func func_u = { .atexit = func };
     return _on_exit(PICO_ONEXIT_ATEXIT, func_u, NULL);
 }
+
+#endif

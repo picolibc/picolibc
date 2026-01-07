@@ -75,7 +75,8 @@ endforeach
 # to be a working C library on the system.
 
 core_c_args = []
-if not get_option('use-stdlib')
+use_stdlib = get_option('use-stdlib')
+if not use_stdlib
   core_c_args += cc.get_supported_arguments(['-nostdlib'])
 endif
 
@@ -180,8 +181,10 @@ internal_heap = get_option('internal-heap')
 c_args = core_c_args
 native_common_args = ['-DNO_NEWLIB']
 
-if get_option('profile')
+profile = get_option('profile')
+if profile
   c_args += ['-pg', '-no-pie']
+  native_common_args += ['-pg']
 endif
 
 if get_option('freestanding')
@@ -358,7 +361,13 @@ link_test_args += runtime_lib
 
 test_link_args_base = runtime_lib
 
-foreach ld : ['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments']
+test_link_args_extra = ['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments']
+
+if profile
+  test_link_args_extra += ['-pg']
+endif
+
+foreach ld : test_link_args_extra
   if cc.has_multi_link_arguments(link_test_args + [ld])
     test_link_args_base += [ld]
   endif
@@ -1561,6 +1570,13 @@ if enable_picocrt
   conf_data.set('__PICOCRT_RUNTIME_SIZE',
 	        get_option('crt-runtime-size'),
 	        description: 'Compute static memory area sizes at runtime instead of link time')
+endif
+
+if use_stdlib
+  conf_data.set('__USE_SYSTEM_LIBC', true)
+endif
+if profile
+  conf_data.set('__ENABLE_PROFILING', true)
 endif
 
 errno_function=get_option('errno-function')
