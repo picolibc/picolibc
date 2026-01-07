@@ -204,8 +204,8 @@ extern FILE * const stderr;
     }
 
 FILE *fdevopen(int (*__put)(char, FILE *), int (*__get)(FILE *), int (*__flush)(FILE *));
-int   fclose(FILE *__stream);
-int   fflush(FILE *stream);
+int   fclose(FILE *__stream) __nonnull((1));
+int   fflush(FILE *stream) __nonnull((1));
 
 #define fdev_close(f) (fflush(f))
 
@@ -263,16 +263,17 @@ int   fflush(FILE *stream);
 #define __PRINTF_ATTRIBUTE__(__s, __f) __FORMAT_ATTRIBUTE__(printf, __s, __f)
 #define __SCANF_ATTRIBUTE__(__s, _f)   __FORMAT_ATTRIBUTE__(scanf, __s, __f)
 
-int fputc(int __c, FILE *__stream);
-int putc(int __c, FILE *__stream);
+int fputc(int __c, FILE *__stream) __nonnull((2));
+int putc(int __c, FILE *__stream) __nonnull((2));
 int putchar(int __c);
 #define putc(__c, __stream) fputc(__c, __stream)
 #define putchar(__c)        fputc(__c, stdout)
 
 int printf(const char *__fmt, ...) __PRINTF_ATTRIBUTE__(1, 2);
-int fprintf(FILE *__stream, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
+int fprintf(FILE *__stream, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3) __nonnull((1));
 int vprintf(const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(1, 0);
-int vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(2, 0);
+int vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(2, 0)
+    __nonnull((1));
 int sprintf(char *__s, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
 int snprintf(char *__s, size_t __n, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(3, 4);
 int vsprintf(char *__s, const char *__fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
@@ -280,38 +281,39 @@ int vsnprintf(char *__s, size_t __n, const char *__fmt, __gnuc_va_list ap)
     __PRINTF_ATTRIBUTE__(3, 0);
 int   asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
 char *asnprintf(char *str, size_t *lenp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(3, 4);
-int   vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
+int vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
 char *vasnprintf(char *str, size_t *lenp, const char *fmt, __gnuc_va_list ap)
     __PRINTF_ATTRIBUTE__(3, 0);
 
-int    fputs(const char *__str, FILE *__stream);
+int    fputs(const char *__str, FILE *__stream) __nonnull((2));
 int    puts(const char *__str);
-size_t fwrite(const void *__ptr, size_t __size, size_t __nmemb, FILE *__stream);
+size_t fwrite(const void *__ptr, size_t __size, size_t __nmemb, FILE *__stream) __nonnull((4));
 
-int    fgetc(FILE *__stream);
-int    getc(FILE *__stream);
+int    fgetc(FILE *__stream) __nonnull((1));
+int    getc(FILE *__stream) __nonnull((1));
 int    getchar(void);
 #define getchar() getc(stdin)
-int ungetc(int __c, FILE *__stream);
+int ungetc(int __c, FILE *__stream) __nonnull((2));
 
 int scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
-int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
+int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3)
+    __nonnull((1));
 int vscanf(const char *__fmt, __gnuc_va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
 int vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __nonnull((1));
 int sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
 int vsscanf(const char *__buf, const char *__fmt, __gnuc_va_list ap)
     __FORMAT_ATTRIBUTE__(scanf, 2, 0);
 
-char *fgets(char *__str, int __size, FILE *__stream);
+char *fgets(char *__str, int __size, FILE *__stream) __nonnull((3));
 #ifdef _PICOLIBC_USE_DEPRECATED_GETS
 char *gets(char *str);
 #endif
-size_t fread(void *__ptr, size_t __size, size_t __nmemb, FILE *__stream);
+size_t fread(void *__ptr, size_t __size, size_t __nmemb, FILE *__stream) __nonnull((4));
 
-void   clearerr(FILE *__stream);
-int    ferror(FILE *__stream);
-int    feof(FILE *__stream);
+void   clearerr(FILE *__stream) __nonnull((1));
+int    ferror(FILE *__stream) __nonnull((1));
+int    feof(FILE *__stream) __nonnull((1));
 
 /* fast inlined versions */
 #define __clearerr_unlocked(s) ((s)->flags &= ~(__SERR | __SEOF))
@@ -327,9 +329,9 @@ int    feof(FILE *__stream);
 
 /* Expose the unlocked symbols when requested */
 #ifdef __MISC_VISIBLE
-void clearerr_unlocked(FILE *__stream);
-int  ferror_unlocked(FILE *__stream);
-int  feof_unlocked(FILE *__stream);
+void clearerr_unlocked(FILE *__stream) __nonnull((1));
+int  ferror_unlocked(FILE *__stream) __nonnull((1));
+int  feof_unlocked(FILE *__stream) __nonnull((1));
 #define clearerr_unlocked(s) __clearerr_unlocked(s)
 #define ferror_unlocked(s)   __ferror_unlocked(s)
 #define feof_unlocked(s)     __feof_unlocked(s)
@@ -403,30 +405,31 @@ int vdprintf(int fd, const char * __restrict fmt, va_list ap);
 
 #endif
 
-int      fgetpos(FILE      *__restrict stream, fpos_t      *__restrict pos);
-FILE    *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
-FILE    *freopen(const char *path, const char *mode, FILE *stream);
-FILE    *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
-FILE    *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
-int      fseek(FILE *stream, long offset, int whence);
-int      fseeko(FILE *stream, __off_t offset, int whence);
-int      fsetpos(FILE *stream, const fpos_t *pos);
-long     ftell(FILE *stream);
-__off_t  ftello(FILE *stream);
-int      fileno(FILE *);
+int   fgetpos(FILE   *__restrict stream, fpos_t   *__restrict pos) __nonnull((1));
+FILE *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
+FILE *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3));
+FILE *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
+FILE *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
+int      fseek(FILE *stream, long offset, int whence) __nonnull((1));
+int      fseeko(FILE *stream, __off_t offset, int whence) __nonnull((1));
+int      fsetpos(FILE *stream, const fpos_t *pos) __nonnull((1));
+long     ftell(FILE *stream) __nonnull((1));
+__off_t  ftello(FILE *stream) __nonnull((1));
+int      fileno(FILE *stream) __nonnull((1));
 void     perror(const char *s);
 int      remove(const char *pathname);
 int      rename(const char *oldpath, const char *newpath);
-void     rewind(FILE *stream);
-void     setbuf(FILE *stream, char *buf);
-void     setbuffer(FILE *stream, char *buf, size_t size);
-void     setlinebuf(FILE *stream);
-int      setvbuf(FILE *stream, char *buf, int mode, size_t size);
+void     rewind(FILE *stream) __nonnull((1));
+void     setbuf(FILE *stream, char *buf) __nonnull((1));
+void     setbuffer(FILE *stream, char *buf, size_t size) __nonnull((1));
+void     setlinebuf(FILE *stream) __nonnull((1));
+int      setvbuf(FILE *stream, char *buf, int mode, size_t size) __nonnull((1));
 FILE    *tmpfile(void);
 char    *tmpnam(char *s);
-_ssize_t getline(char ** __restrict lineptr, size_t * __restrict n, FILE * __restrict stream);
+_ssize_t getline(char ** __restrict lineptr, size_t * __restrict n, FILE * __restrict stream)
+    __nonnull((3));
 _ssize_t getdelim(char ** __restrict lineptr, size_t * __restrict n, int delim,
-                  FILE * __restrict stream);
+                  FILE * __restrict stream) __nonnull((4));
 
 #if __BSD_VISIBLE
 FILE *funopen(const void *cookie, _ssize_t (*readfn)(void *cookie, void *buf, size_t n),
@@ -438,12 +441,12 @@ FILE *funopen(const void *cookie, _ssize_t (*readfn)(void *cookie, void *buf, si
 #endif /*__BSD_VISIBLE */
 
 #if __POSIX_VISIBLE >= 199309L
-int  getc_unlocked(FILE *);
+int  getc_unlocked(FILE *) __nonnull((1));
 int  getchar_unlocked(void);
-void flockfile(FILE *);
-int  ftrylockfile(FILE *);
-void funlockfile(FILE *);
-int  putc_unlocked(int, FILE *);
+void flockfile(FILE *) __nonnull((1));
+int  ftrylockfile(FILE *) __nonnull((1));
+void funlockfile(FILE *) __nonnull((1));
+int  putc_unlocked(int, FILE *) __nonnull((2));
 int  putchar_unlocked(int);
 #ifndef __STDIO_LOCKING
 #define getc_unlocked(f)       getc(f)
