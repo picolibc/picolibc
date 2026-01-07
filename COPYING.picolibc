@@ -817,6 +817,8 @@ Files: cmake/TC-rx.ld
  libc/ubsan/ubsan_val_to_string.c
  libc/ubsan/ubsan_val_to_umax.c
  libc/ubsan/ubsan_warning.c
+ libm/math/s_sincos.c
+ libm/math/sf_sincos.c
  picocrt/machine/lm32/crt0.S
  picocrt/machine/or1k/crt0.S
  picocrt/machine/or1k/crt0.c
@@ -970,6 +972,8 @@ Files: cmake/TC-rx.ld
  test/test-math/test-sin.5c
  test/test-math/test-sin.c
  test/test-math/test-sin.h
+ test/test-math/test-sincos-cos.c
+ test/test-math/test-sincos-sin.c
  test/test-math/test-sinh.5c
  test/test-math/test-sinh.c
  test/test-math/test-sinh.h
@@ -3290,8 +3294,6 @@ Files: libc/ctype/isblank.c
  libc/stdlib/wcrtomb.c
  libc/stdlib/wcsrtombs.c
  libc/stdlib/wctob.c
- libm/math/s_sincos.c
- libm/math/sf_sincos.c
 Copyright: 2002 Thomas Fitzsimmons <fitzsim@redhat.com>
 License: Default-1
 
