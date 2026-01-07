@@ -37,6 +37,8 @@
 #include <unistd.h>
 #include "local-onexit.h"
 
+#ifdef ENABLE_PICOLIBC_EXIT
+
 void
 exit(int code)
 {
@@ -48,3 +50,5 @@ exit(int code)
 #endif
     _exit(code);
 }
+
+#endif

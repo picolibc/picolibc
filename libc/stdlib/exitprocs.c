@@ -40,6 +40,8 @@
 #include <limits.h>
 #include "local-onexit.h"
 
+#ifdef ENABLE_PICOLIBC_EXIT
+
 struct on_exit {
     union on_exit_func    func;
     void                 *arg;
@@ -117,4 +119,6 @@ __call_exitprocs(int code, void *param)
 
 #ifdef __INIT_FINI_ARRAY
 static const void *__call_exitprocs_ref __section(".fini_array_onexit") __used = __call_exitprocs;
+#endif
+
 #endif

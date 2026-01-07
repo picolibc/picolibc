@@ -38,6 +38,10 @@
 
 #include <stdlib.h>
 
+#if !defined(__USE_SYSTEM_LIBC) || !defined(__ENABLE_PROFILING)
+
+#define ENABLE_PICOLIBC_EXIT
+
 enum pico_onexit_kind {
     PICO_ONEXIT_EMPTY,
     PICO_ONEXIT_ONEXIT,
@@ -59,6 +63,8 @@ void __libc_fini_array(void);
 
 #ifndef __INIT_FINI_ARRAY
 void __call_exitprocs(int code, void *param) __weak;
+#endif
+
 #endif
 
 #endif /* _PICO_ONEXIT_H_ */
