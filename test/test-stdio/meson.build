@@ -34,6 +34,7 @@
 #
 
 tests = [
+  'test-fdevopen',
   'test-fmemopen',
   'test-funopen',
   'test-put',
