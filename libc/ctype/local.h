@@ -39,22 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "locale_private.h"
 
 /* valid values for wctrans_t */
-#define WCT_TOLOWER 1
-#define WCT_TOUPPER 2
-
-/* valid values for wctype_t */
-#define WC_ALNUM     1
-#define WC_ALPHA     2
-#define WC_BLANK     3
-#define WC_CNTRL     4
-#define WC_DIGIT     5
-#define WC_GRAPH     6
-#define WC_LOWER     7
-#define WC_PRINT     8
-#define WC_PUNCT     9
-#define WC_SPACE     10
-#define WC_UPPER     11
-#define WC_XDIGIT    12
+#define WCT_TOLOWER  1
+#define WCT_TOUPPER  2
 
 #define CLASS_none   0
 #define CLASS_alnum  (1 << 0)
@@ -63,24 +49,29 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define CLASS_cntrl  (1 << 3)
 #define CLASS_digit  (1 << 4)
 #define CLASS_graph  (1 << 5)
-#define CLASS_print  (1 << 6)
-#define CLASS_punct  (1 << 7)
-#define CLASS_space  (1 << 8)
-#define CLASS_case   (1 << 9)
-#define CLASS_lower  (1 << 10)
-#define CLASS_upper  (1 << 11)
-#define CLASS_xdigit (1 << 12)
+#define CLASS_lower  (1 << 6)
+#define CLASS_print  (1 << 7)
+#define CLASS_punct  (1 << 8)
+#define CLASS_space  (1 << 9)
+#define CLASS_upper  (1 << 10)
+#define CLASS_xdigit (1 << 11)
+#define CLASS_case   (1 << 12)
+#define CLASS_all    ((1 << 13) - 1)
 
-uint16_t __ctype_table_lookup(wint_t ic, locale_t locale);
+extern const wctype_t _ctype_class[];
 
-/* Japanese encoding types supported */
-#define JP_JIS   1
-#define JP_SJIS  2
-#define JP_EUCJP 3
-
-wint_t __jp2uc(wint_t c, int type);
-
-wint_t __uc2jp(wint_t c, int type);
+#ifdef __MB_CAPABLE
+wctype_t __ctype_table_lookup(wint_t ic, locale_t locale, wctype_t mask);
+#else
+static inline wctype_t
+__ctype_table_lookup(wint_t ic, locale_t locale, wctype_t mask)
+{
+    (void)locale;
+    if (ic >= (wint_t)0x100)
+        return 0;
+    return (_ctype_class + 1)[(int)(ic)] & mask;
+}
+#endif
 
 /*
    struct caseconv_entry describes the case conversion behaviour

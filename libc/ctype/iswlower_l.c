@@ -13,10 +13,7 @@ iswlower_l(wint_t c, locale_t locale)
 {
     (void)locale;
 #ifdef __MB_CAPABLE
-    // The wide-character class "lower" contains at least those characters wc
-    // which are equal to towlower(wc) and different from towupper(wc).
-    uint16_t cat = __ctype_table_lookup(c, locale);
-    return (cat & CLASS_lower) || ((cat & CLASS_case) && towupper_l(c, locale) != c);
+    return __ctype_table_lookup(c, locale, CLASS_lower);
 #else
     return c < 0x100 ? islower(c) : 0;
 #endif /* __MB_CAPABLE */

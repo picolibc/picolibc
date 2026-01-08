@@ -65,12 +65,13 @@ No supporting OS subroutines are required.
 #define _DEFAULT_SOURCE
 #include <ctype.h>
 #include <wctype.h>
+#include "local.h"
 
 int
 iswgraph(wint_t c)
 {
 #ifdef __MB_CAPABLE
-    return iswgraph_l(c, 0);
+    return __ctype_table_lookup(c, 0, CLASS_graph);
 #else
     return c < (wint_t)0x100 ? isgraph(c) : 0;
 #endif

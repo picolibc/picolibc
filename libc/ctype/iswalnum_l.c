@@ -13,8 +13,7 @@ iswalnum_l(wint_t c, locale_t locale)
 {
     (void)locale;
 #ifdef __MB_CAPABLE
-    uint16_t cat = __ctype_table_lookup(c, locale);
-    return cat & CLASS_alnum;
+    return __ctype_table_lookup(c, locale, CLASS_alnum);
 #else
     return c < (wint_t)0x100 ? isalnum(c) : 0;
 #endif /* __MB_CAPABLE */

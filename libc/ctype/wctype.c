@@ -77,51 +77,51 @@ wctype(const char *c)
     switch (*c) {
     case 'a':
         if (!strcmp(c, "alnum"))
-            return WC_ALNUM;
+            return CLASS_alnum;
         else if (!strcmp(c, "alpha"))
-            return WC_ALPHA;
+            return CLASS_alpha;
         break;
     case 'b':
         if (!strcmp(c, "blank"))
-            return WC_BLANK;
+            return CLASS_blank;
         break;
     case 'c':
         if (!strcmp(c, "cntrl"))
-            return WC_CNTRL;
+            return CLASS_cntrl;
         break;
     case 'd':
         if (!strcmp(c, "digit"))
-            return WC_DIGIT;
+            return CLASS_digit;
         break;
     case 'g':
         if (!strcmp(c, "graph"))
-            return WC_GRAPH;
+            return CLASS_graph;
         break;
     case 'l':
         if (!strcmp(c, "lower"))
-            return WC_LOWER;
+            return CLASS_lower;
         break;
     case 'p':
         if (!strcmp(c, "print"))
-            return WC_PRINT;
+            return CLASS_print;
         else if (!strcmp(c, "punct"))
-            return WC_PUNCT;
+            return CLASS_punct;
         break;
     case 's':
         if (!strcmp(c, "space"))
-            return WC_SPACE;
+            return CLASS_space;
         break;
     case 'u':
         if (!strcmp(c, "upper"))
-            return WC_UPPER;
+            return CLASS_upper;
         break;
     case 'x':
         if (!strcmp(c, "xdigit"))
-            return WC_XDIGIT;
+            return CLASS_xdigit;
         break;
     }
 
     /* otherwise invalid */
     errno = EINVAL;
-    return 0;
+    return CLASS_none;
 }

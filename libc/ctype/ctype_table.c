@@ -43,15 +43,15 @@
 
 static const struct {
     wchar_t  code;
-    uint16_t category;
+    wctype_t category;
 } ctype_table[] = {
 #include "ctype_table.h"
 };
 
 #define N_CAT_TABLE (sizeof(ctype_table) / sizeof(ctype_table[0]))
 
-uint16_t
-__ctype_table_lookup(wint_t ic, locale_t locale)
+wctype_t
+__ctype_table_lookup(wint_t ic, locale_t locale, wctype_t mask)
 {
     size_t  low = 0;
     size_t  high = N_CAT_TABLE - 1;
@@ -78,6 +78,46 @@ __ctype_table_lookup(wint_t ic, locale_t locale)
             break;
         }
     }
-    return ctype_table[high].category;
+
+    wctype_t ret = ctype_table[high].category;
+
+    /* Map CLASS_case to either CLASS_lower or CLASS_upper */
+    if ((mask & (CLASS_lower | CLASS_upper)) && (ret & CLASS_case)) {
+        const struct caseconv_entry *cce = __caseconv_lookup(ic, locale);
+        if (cce) {
+            switch (cce->mode) {
+            case TO1:
+                switch (cce->delta) {
+                case EVENCAP:
+                    if (!(c & 1))
+                        ret |= CLASS_upper;
+                    else
+                        ret |= CLASS_lower;
+                    break;
+                case ODDCAP:
+                    if (c & 1)
+                        ret |= CLASS_upper;
+                    else
+                        ret |= CLASS_lower;
+                    break;
+                default:
+                    break;
+                }
+                break;
+            case TOLO:
+                ret |= CLASS_upper;
+                break;
+            case TOUP:
+                ret |= CLASS_lower;
+                break;
+            case TOBOTH:
+                ret |= CLASS_upper | CLASS_lower;
+                break;
+            default:
+                break;
+            }
+        }
+    }
+    return ret & mask;
 }
 #endif /* __MB_CAPABLE */

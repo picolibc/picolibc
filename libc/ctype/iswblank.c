@@ -65,12 +65,13 @@ No supporting OS subroutines are required.
 #define _DEFAULT_SOURCE
 #include <ctype.h>
 #include <wctype.h>
+#include "local.h"
 
 int
 iswblank(wint_t c)
 {
 #ifdef __MB_CAPABLE
-    return iswblank_l(c, 0);
+    return __ctype_table_lookup(c, 0, CLASS_blank);
 #else
     return c < (wint_t)0x100 ? isblank(c) : 0;
 #endif

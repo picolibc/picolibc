@@ -83,7 +83,7 @@ typedef __FILE FILE;
 #endif
 
 #ifndef _WCTYPE_DECLARED
-typedef int wctype_t;
+typedef __wctype_t wctype_t;
 #define _WCTYPE_DECLARED
 #endif
 

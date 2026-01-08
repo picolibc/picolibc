@@ -35,6 +35,7 @@
 srcs_ctype = [
     'caseconv.c',
     'ctype_.c',
+    'ctype_class.c',
     'ctype_table.c',
     'ctype_wide.c',
     'isalnum.c',

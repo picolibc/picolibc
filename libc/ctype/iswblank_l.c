@@ -13,8 +13,7 @@ iswblank_l(wint_t c, locale_t locale)
 {
     (void)locale;
 #ifdef __MB_CAPABLE
-    uint16_t cat = __ctype_table_lookup(c, locale);
-    return cat & CLASS_blank;
+    return __ctype_table_lookup(c, locale, CLASS_blank);
 #else
     return c < 0x100 ? isblank(c) : 0;
 #endif /* __MB_CAPABLE */

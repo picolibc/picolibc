@@ -65,12 +65,13 @@ No supporting OS subroutines are required.
 #define _DEFAULT_SOURCE
 #include <ctype.h>
 #include <wctype.h>
+#include "local.h"
 
 int
 iswpunct(wint_t c)
 {
 #ifdef __MB_CAPABLE
-    return iswpunct_l(c, 0);
+    return __ctype_table_lookup(c, 0, CLASS_punct);
 #else
     return c < (wint_t)0x100 ? ispunct(c) : 0;
 #endif

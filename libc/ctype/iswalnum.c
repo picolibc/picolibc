@@ -66,12 +66,13 @@ No supporting OS subroutines are required.
 #define _DEFAULT_SOURCE
 #include <ctype.h>
 #include <wctype.h>
+#include "local.h"
 
 int
 iswalnum(wint_t c)
 {
 #ifdef __MB_CAPABLE
-    return iswalnum_l(c, 0);
+    return __ctype_table_lookup(c, 0, CLASS_alnum);
 #else
     return c < (wint_t)0x100 ? isalnum(c) : 0;
 #endif

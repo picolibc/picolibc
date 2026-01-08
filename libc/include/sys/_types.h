@@ -277,4 +277,6 @@ typedef int    __errno_t;
 #endif
 #endif
 
+typedef __uint16_t __wctype_t;
+
 #endif /* _SYS__TYPES_H */
