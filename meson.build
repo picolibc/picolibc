@@ -1151,6 +1151,11 @@ foreach params : [default_target] + targets
       endif
     endif
 
+    if cc.get_linker_id() == 'ld.eld'
+      picolibc_ld_data.set('TLS_PHDRS', 'tls PT_TLS;')
+      picolibc_ld_data.set('TLS_INIT_PHDR', 'tls')
+    endif
+
     default_init_section_template = init_section_template.format('@0@', '''
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
