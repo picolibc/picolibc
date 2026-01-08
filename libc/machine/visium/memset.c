@@ -647,7 +647,7 @@ __byte_memset(void * __restrict s1, int val, size_t n)
 
 /* Exposed interface.  */
 
-void *__no_builtin
+void * __no_builtin
 memset(void *s, int c, size_t n)
 {
     void *result = s;

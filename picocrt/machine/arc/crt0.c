@@ -35,7 +35,8 @@
 
 #include "../../crt0.h"
 
-static void __used __section(".init") _cstart(void)
+static void __used __section(".init")
+_cstart(void)
 {
     __start();
 }
@@ -55,7 +56,8 @@ typedef uint64_t reg_t;
 typedef uint32_t reg_t;
 #endif
 
-void __naked __section(".init") __used _start(void)
+void __naked __section(".init") __used
+_start(void)
 {
     /* Set up the stack pointer */
     __asm__("mov_s sp, %0" : : "r"(__stack));
@@ -161,91 +163,104 @@ arc_fault(struct fault *f, int reason)
     __asm__(LRR " r0, [0x400]\n " PUSH " r0");                          \
     __asm__("mov_s r0, sp")
 
-void __naked __section(".init") arc_memory_error_vector(void)
+void __naked __section(".init")
+arc_memory_error_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_MEMORY_ERROR));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_instruction_error_vector(void)
+void __naked __section(".init")
+arc_instruction_error_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_INSTRUCTION_ERROR));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_machine_check_vector(void)
+void __naked __section(".init")
+arc_machine_check_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_MACHINE_CHECK));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_tlb_miss_i_vector(void)
+void __naked __section(".init")
+arc_tlb_miss_i_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_TLB_MISS_I));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_tlb_miss_d_vector(void)
+void __naked __section(".init")
+arc_tlb_miss_d_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_TLB_MISS_D));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_prot_v_vector(void)
+void __naked __section(".init")
+arc_prot_v_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_PROT_V));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_privilege_v_vector(void)
+void __naked __section(".init")
+arc_privilege_v_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_PRIVILEGE_V));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_swi_vector(void)
+void __naked __section(".init")
+arc_swi_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_SWI));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_trap_vector(void)
+void __naked __section(".init")
+arc_trap_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_TRAP));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_extension_vector(void)
+void __naked __section(".init")
+arc_extension_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_EXTENSION));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_div_zero_vector(void)
+void __naked __section(".init")
+arc_div_zero_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_DIV_ZERO));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_dc_error_vector(void)
+void __naked __section(".init")
+arc_dc_error_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_DC_ERROR));
     __asm__("j arc_fault");
 }
 
-void __naked __section(".init") arc_maligned_vector(void)
+void __naked __section(".init")
+arc_maligned_vector(void)
 {
     VECTOR_COMMON;
     __asm__("mov_s r1, " REASON(REASON_MALIGNED));

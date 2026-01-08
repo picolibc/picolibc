@@ -842,7 +842,7 @@ __byte_memcpy(void * __restrict s1, const void * __restrict s2, size_t n)
 
 /* Exposed interface.  */
 
-void *__no_builtin
+void * __no_builtin
 memcpy(void * __restrict s1, const void * __restrict s2, size_t n)
 {
     void *result = s1;

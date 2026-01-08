@@ -51,12 +51,12 @@ typedef enum spu_timer_state {
 } spu_timer_state_t;
 
 typedef struct spu_timer {
-    int tmout               __aligned(16); /* Time until expiration (tb).  */
-    int intvl               __aligned(16); /* Interval.  */
-    int id                  __aligned(16);
+    int               tmout __aligned(16); /* Time until expiration (tb).  */
+    int               intvl __aligned(16); /* Interval.  */
+    int               id __aligned(16);
     spu_timer_state_t state __aligned(16);
-    void                    (*func)(int) __aligned(16); /* Handler.  */
-    struct spu_timer *next  __aligned(16);
+    void              (*func)(int) __aligned(16); /* Handler.  */
+    struct spu_timer *next __aligned(16);
 } spu_timer_t;
 
 /* Max decrementer value.  */

@@ -281,7 +281,7 @@ int vsnprintf(char *__s, size_t __n, const char *__fmt, __gnuc_va_list ap)
     __PRINTF_ATTRIBUTE__(3, 0);
 int   asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
 char *asnprintf(char *str, size_t *lenp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(3, 4);
-int vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
+int   vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
 char *vasnprintf(char *str, size_t *lenp, const char *fmt, __gnuc_va_list ap)
     __PRINTF_ATTRIBUTE__(3, 0);
 
@@ -296,8 +296,7 @@ int    getchar(void);
 int ungetc(int __c, FILE *__stream) __nonnull((2));
 
 int scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
-int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3)
-    __nonnull((1));
+int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3) __nonnull((1));
 int vscanf(const char *__fmt, __gnuc_va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
 int vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
     __FORMAT_ATTRIBUTE__(scanf, 2, 0) __nonnull((1));
@@ -405,11 +404,11 @@ int vdprintf(int fd, const char * __restrict fmt, va_list ap);
 
 #endif
 
-int   fgetpos(FILE   *__restrict stream, fpos_t   *__restrict pos) __nonnull((1));
-FILE *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
-FILE *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3));
-FILE *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
-FILE *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
+int      fgetpos(FILE      *__restrict stream, fpos_t      *__restrict pos) __nonnull((1));
+FILE    *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
+FILE    *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3));
+FILE    *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
+FILE    *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
 int      fseek(FILE *stream, long offset, int whence) __nonnull((1));
 int      fseeko(FILE *stream, __off_t offset, int whence) __nonnull((1));
 int      fsetpos(FILE *stream, const fpos_t *pos) __nonnull((1));

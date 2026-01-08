@@ -42,7 +42,7 @@
 #include <errno.h>
 
 extern struct timeval __semihost_write_time __weak;
-int gettimeofday(struct timeval * restrict tv, void * restrict tz) __weak;
+int                   gettimeofday(struct timeval                   *restrict tv, void                   *restrict tz) __weak;
 
 ssize_t
 write(int fd, const void *buf, size_t count)

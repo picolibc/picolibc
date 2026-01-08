@@ -127,10 +127,10 @@ long long atoll(const char *__nptr);
 #endif
 void *bsearch(const void *__key, const void *__base, size_t __nmemb, size_t __size,
               __compar_fn_t _compar);
-void                                    *
+void *
 calloc(size_t, size_t)
 __malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow;
-div_t                              div(int __numer, int __denom);
+div_t div(int __numer, int __denom);
 #if __SVID_VISIBLE || __XSI_VISIBLE
 struct _rand48;
 double drand48(void);
@@ -175,12 +175,12 @@ lldiv_t   lldiv(long long __numer, long long __denom);
 long lrand48(void);
 long _lrand48_r(struct _rand48 *);
 #endif
-void                                    *
+void *
 malloc(size_t)
 __malloc_like __warn_unused_result __alloc_size(1) __nothrow;
-int                                mblen(const char *, size_t);
-size_t                             mbstowcs(wchar_t                             *__restrict, const char                             *__restrict, size_t);
-int                                mbtowc(wchar_t                                *__restrict, const char                                *__restrict, size_t);
+int    mblen(const char *, size_t);
+size_t mbstowcs(wchar_t * __restrict, const char * __restrict, size_t);
+int    mbtowc(wchar_t    *__restrict, const char    *__restrict, size_t);
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 char *mkdtemp(char *);
 #endif
@@ -238,14 +238,14 @@ int rand_r(unsigned *__seed);
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4 || __BSD_VISIBLE
 long random(void);
 #endif
-void                      *
+void *
 realloc(void *, size_t)
 __warn_unused_result __alloc_size(2) __nothrow;
 #if __BSD_VISIBLE
-void                      *
+void *
 reallocarray(void *, size_t, size_t)
 __warn_unused_result __alloc_size2(2, 3);
-void                      *
+void *
 reallocf(void *, size_t)
 __warn_unused_result __alloc_size(2);
 #endif
@@ -325,7 +325,7 @@ int unsetenv(const char *__string);
 #endif
 size_t wcstombs(char * __restrict, const wchar_t * __restrict, size_t);
 int    wctomb(char *, wchar_t);
-void                                    *
+void *
 valloc(size_t)
 __malloc_like __warn_unused_result __alloc_size(1) __nothrow;
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4

@@ -35,7 +35,7 @@
 
 #include "stdio_private.h"
 
-char *__disable_sanitizer
+char * __disable_sanitizer
 vasnprintf(char *str, size_t *lenp, const char *fmt, va_list ap)
 {
     struct __file_str f = FDEV_SETUP_STRING_ALLOC_BUF(str, *lenp);

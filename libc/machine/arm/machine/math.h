@@ -58,7 +58,8 @@
  * Double precision routines
  */
 
-__declare_extern_inline(double) sqrt(double x)
+__declare_extern_inline(double)
+sqrt(double x)
 {
     double result;
 #ifdef __MATH_ERRNO
@@ -74,7 +75,8 @@ __declare_extern_inline(double) sqrt(double x)
     return result;
 }
 
-__declare_extern_inline(double) fabs(double x)
+__declare_extern_inline(double)
+fabs(double x)
 {
     double result;
     __asm__("vabs.f64\t%P0, %P1" : "=w"(result) : "w"(x));
@@ -82,21 +84,24 @@ __declare_extern_inline(double) fabs(double x)
 }
 
 #if __ARM_ARCH >= 8
-__declare_extern_inline(double) ceil(double x)
+__declare_extern_inline(double)
+ceil(double x)
 {
     double result;
     __asm__ volatile("vrintp.f64\t%P0, %P1" : "=w"(result) : "w"(x));
     return result;
 }
 
-__declare_extern_inline(double) floor(double x)
+__declare_extern_inline(double)
+floor(double x)
 {
     double result;
     __asm__ volatile("vrintm.f64\t%P0, %P1" : "=w"(result) : "w"(x));
     return result;
 }
 
-__declare_extern_inline(double) nearbyint(double x)
+__declare_extern_inline(double)
+nearbyint(double x)
 {
     if (isnan(x))
         return x + x;
@@ -111,21 +116,24 @@ __declare_extern_inline(double) nearbyint(double x)
     return x;
 }
 
-__declare_extern_inline(double) rint(double x)
+__declare_extern_inline(double)
+rint(double x)
 {
     double result;
     __asm__ volatile("vrintx.f64\t%P0, %P1" : "=w"(result) : "w"(x));
     return result;
 }
 
-__declare_extern_inline(double) round(double x)
+__declare_extern_inline(double)
+round(double x)
 {
     double result;
     __asm__ volatile("vrinta.f64\t%P0, %P1" : "=w"(result) : "w"(x));
     return result;
 }
 
-__declare_extern_inline(double) trunc(double x)
+__declare_extern_inline(double)
+trunc(double x)
 {
     double result;
     __asm__ volatile("vrintz.f64\t%P0, %P1" : "=w"(result) : "w"(x));
@@ -135,7 +143,8 @@ __declare_extern_inline(double) trunc(double x)
 
 #if __HAVE_FAST_FMA
 
-__declare_extern_inline(double) fma(double x, double y, double z)
+__declare_extern_inline(double)
+fma(double x, double y, double z)
 {
     __asm__ volatile("vfma.f64 %P0, %P1, %P2" : "+w"(z) : "w"(x), "w"(y));
     return z;
@@ -151,7 +160,8 @@ __declare_extern_inline(double) fma(double x, double y, double z)
  * Single precision functions
  */
 
-__declare_extern_inline(float) sqrtf(float x)
+__declare_extern_inline(float)
+sqrtf(float x)
 {
     float result;
 #ifdef __MATH_ERRNO
@@ -167,7 +177,8 @@ __declare_extern_inline(float) sqrtf(float x)
     return result;
 }
 
-__declare_extern_inline(float) fabsf(float x)
+__declare_extern_inline(float)
+fabsf(float x)
 {
     float result;
     __asm__("vabs.f32\t%0, %1" : "=t"(result) : "t"(x));
@@ -175,21 +186,24 @@ __declare_extern_inline(float) fabsf(float x)
 }
 
 #if __ARM_ARCH >= 8
-__declare_extern_inline(float) ceilf(float x)
+__declare_extern_inline(float)
+ceilf(float x)
 {
     float result;
     __asm__ volatile("vrintp.f32\t%0, %1" : "=t"(result) : "t"(x));
     return result;
 }
 
-__declare_extern_inline(float) floorf(float x)
+__declare_extern_inline(float)
+floorf(float x)
 {
     float result;
     __asm__ volatile("vrintm.f32\t%0, %1" : "=t"(result) : "t"(x));
     return result;
 }
 
-__declare_extern_inline(float) nearbyintf(float x)
+__declare_extern_inline(float)
+nearbyintf(float x)
 {
     if (isnan(x))
         return x + x;
@@ -204,21 +218,24 @@ __declare_extern_inline(float) nearbyintf(float x)
     return x;
 }
 
-__declare_extern_inline(float) rintf(float x)
+__declare_extern_inline(float)
+rintf(float x)
 {
     float result;
     __asm__ volatile("vrintx.f32\t%0, %1" : "=t"(result) : "t"(x));
     return result;
 }
 
-__declare_extern_inline(float) roundf(float x)
+__declare_extern_inline(float)
+roundf(float x)
 {
     float result;
     __asm__ volatile("vrinta.f32\t%0, %1" : "=t"(result) : "t"(x));
     return result;
 }
 
-__declare_extern_inline(float) truncf(float x)
+__declare_extern_inline(float)
+truncf(float x)
 {
     float result;
     __asm__ volatile("vrintz.f32\t%0, %1" : "=t"(result) : "t"(x));
@@ -228,7 +245,8 @@ __declare_extern_inline(float) truncf(float x)
 
 #if __HAVE_FAST_FMAF
 
-__declare_extern_inline(float) fmaf(float x, float y, float z)
+__declare_extern_inline(float)
+fmaf(float x, float y, float z)
 {
     __asm__ volatile("vfma.f32 %0, %1, %2" : "+t"(z) : "t"(x), "t"(y));
     return z;

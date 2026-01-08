@@ -35,7 +35,8 @@
 
 #include "../../crt0.h"
 
-static void __used __section(".init") _cstart(void)
+static void __used __section(".init")
+_cstart(void)
 {
     __start();
 }
@@ -43,7 +44,8 @@ static void __used __section(".init") _cstart(void)
 extern char __stack[];
 extern char __interrupt_vector[];
 
-void        __section(".init") __used _start(void)
+void __section(".init") __used
+_start(void)
 {
     /* Initialize trap base register */
     __asm__("wr %0, %%tbr" : : "r"(__interrupt_vector));

@@ -20,11 +20,11 @@
 
 #undef memcpy
 
-void *__no_builtin
+void * __no_builtin
 #if __riscv_misaligned_slow || __riscv_misaligned_fast
-    __disable_sanitizer
+__disable_sanitizer
 #endif
-    memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
+memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
 {
 #define BODY(a, b, t)  \
     {                  \

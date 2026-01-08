@@ -36,7 +36,8 @@
 #include <picolibc.h>
 #include "../../crt0.h"
 
-void __section(".text.startup") _cstart(void)
+void __section(".text.startup")
+_cstart(void)
 {
     __start();
 }

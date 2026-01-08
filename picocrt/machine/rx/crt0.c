@@ -54,7 +54,8 @@ extern char        _gp[];
 #endif
 #endif
 
-void __section(".text.startup") __used _start(void)
+void __section(".text.startup") __used
+_start(void)
 {
     __asm__("mov %0, r0" : : "i"(__stack));
     /* Not present in RXv1 */

@@ -19,6 +19,38 @@ AlignTrailingComments:
   Kind: Always
   OverEmptyLines: 0
 AllowShortFunctionsOnASingleLine: Inline
+AttributeMacros:
+  - '__pure'
+  - '__picolibc_format'
+  - '__nonnull'
+  - '__returns_nonnull'
+  - '__alloc_size'
+  - '__alloc_size2'
+  - '__alooc_align'
+  - '__noreturn'
+  - '__const'
+  - '__unused'
+  - '__used'
+  - '__packed'
+  - '__aligned'
+  - '__section'
+  - '__naked'
+  - '__noinline'
+  - '__always_inline'
+  - '__warn_unused_result'
+  - '__weak'
+  - '__nothrow'
+  - '__no_sanitize_address'
+  - '__no_sanitize'
+  - '__no_sanitize_undefined'
+  - '__disable_sanitizer_instrumentation'
+  - '__disable_sanitizer'
+  - '__deprecated_m'
+  - '__deprecated'
+  - '__no_builtin'
+  - '__malloc_like_with_free'
+  - '__malloc_like'
+  - '__returns_twice'
 BreakAfterReturnType: AllDefinitions
 ColumnLimit: 100
 PointerAlignment: Right
@@ -33,4 +65,8 @@ StatementMacros:
   - '__ssp_bos_wicheck3'
   - '__ssp_bos_wicheck3_restrict'
   - '__ssp_bos_wicheck2_restrict'
+TypenameMacros:
+  - '__declare_extern_inline'
+  - '__strong_reference'
+  - '__weak_reference'
 ...

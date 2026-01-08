@@ -49,7 +49,7 @@ QUICKREF
 
 #undef memcpy
 
-void *__no_builtin
+void * __no_builtin
 memcpy(void * __restrict dst0, const void * __restrict src0, size_t len0)
 {
     char       *dst = dst0;

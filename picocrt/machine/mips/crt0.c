@@ -35,7 +35,8 @@
 
 #include "../../crt0.h"
 
-static void __used __section(".init") _cstart(void)
+static void __used __section(".init")
+_cstart(void)
 {
     __start();
 }
@@ -50,7 +51,8 @@ extern char __stack[];
 #error unknown mips target
 #endif
 
-void __section(".init") __used _start(void)
+void __section(".init") __used
+_start(void)
 {
     /* Initialize stack pointer */
     __asm__(LA " $sp,%0" : : "i"(__stack));

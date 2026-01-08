@@ -36,7 +36,8 @@
 #include <stddef.h>
 #include "../../crt0.h"
 
-static void __used __section(".init") _cstart(void)
+static void __used __section(".init")
+_cstart(void)
 {
     __start();
 }
@@ -76,7 +77,8 @@ static const char * const names[NUM_REG] = {
 #endif
 };
 
-static void __used __section(".init") _ctrap(struct fault *fault)
+static void __used __section(".init")
+_ctrap(struct fault *fault)
 {
     int r;
     printf("RISCV fault\n");
@@ -91,7 +93,8 @@ static void __used __section(".init") _ctrap(struct fault *fault)
 #define _PASTE(r) #r
 #define PASTE(r)  _PASTE(r)
 
-void __naked __section(".init") __used __attribute((aligned(4))) _trap(void)
+void __naked __section(".init") __used __attribute((aligned(4)))
+_trap(void)
 {
 #ifndef __clang__
     __asm__(".option	nopic");
@@ -187,7 +190,8 @@ void __naked __section(".init") __used __attribute((aligned(4))) _trap(void)
 }
 #endif
 
-void __naked __section(".text.init.enter") __used _start(void)
+void __naked __section(".text.init.enter") __used
+_start(void)
 {
 
     /**

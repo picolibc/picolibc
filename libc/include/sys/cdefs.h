@@ -233,7 +233,7 @@
 
 #define __disable_sanitizer                                                           \
     __no_sanitize_address __no_sanitize_undefined __disable_sanitizer_instrumentation \
-        __no_sanitize("undefined")
+    __no_sanitize("undefined")
 
 #if __has_attribute(__deprecated__)
 #if __GNUC_PREREQ__(4, 5) || defined(__clang__)

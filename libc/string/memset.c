@@ -48,7 +48,7 @@ QUICKREF
 
 #undef memset
 
-void *__no_builtin
+void * __no_builtin
 memset(void *m, int c, size_t n)
 {
     char *s = (char *)m;

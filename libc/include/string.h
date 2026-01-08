@@ -70,7 +70,7 @@ _BEGIN_STD_C
 #if __GNU_VISIBLE && !defined(basename)
 #ifdef __ASMNAME
 #define basename basename
-char *__nonnull((1)) basename(const char *) _ASMNAME("__gnu_basename");
+char * __nonnull((1)) basename(const char *) _ASMNAME("__gnu_basename");
 #else
 #define basename(s) (__gnu_basename(s))
 #endif
@@ -173,7 +173,7 @@ char *strncat(char * __restrict, const char * __restrict, size_t);
 int   strncmp(const char *, const char *, size_t);
 char *strncpy(char * __restrict, const char * __restrict, size_t);
 #if __POSIX_VISIBLE >= 200809
-char               *
+char *
 strndup(const char *, size_t)
 __malloc_like __warn_unused_result;
 #endif

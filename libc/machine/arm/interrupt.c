@@ -125,9 +125,10 @@ vector(not_used);
 vector(irq);
 vector(fiq);
 
-void         __weak_vector_table(void);
+void __weak_vector_table(void);
 
-void __naked __section(".text.init.enter") __disable_sanitizer __weak_vector_table(void)
+void __naked __section(".text.init.enter") __disable_sanitizer
+__weak_vector_table(void)
 {
     /*
      * Exception vector that lives at the

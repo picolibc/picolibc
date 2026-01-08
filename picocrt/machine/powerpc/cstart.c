@@ -63,10 +63,11 @@ post_memory_setup(void)
 
 #include "../../crt0.h"
 
-void       *__opal_base __attribute__((section(".preserve")));
-void       *__opal_entry __attribute__((section(".preserve")));
+void *__opal_base __attribute__((section(".preserve")));
+void *__opal_entry __attribute__((section(".preserve")));
 
-void __used __section(".init") _cstart(void *opal_base, void *opal_entry)
+void __used __section(".init")
+_cstart(void *opal_base, void *opal_entry)
 {
     __opal_base = opal_base;
     __opal_entry = opal_entry;

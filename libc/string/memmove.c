@@ -53,7 +53,7 @@ QUICKREF
 #undef memmove
 
 /*SUPPRESS 20*/
-void *__no_builtin
+void * __no_builtin
 memmove(void *dst_void, const void *src_void, size_t length)
 {
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)

@@ -58,8 +58,8 @@ _END_STD_C
 
 #define __ssp_bos_icheck3_restrict(fun, type1, type2)                                          \
     __declare_extern_inline(type1) __##fun##_ichk(type1 __restrict, type2 __restrict, size_t); \
-    __declare_extern_inline(type1)                                                             \
-        __##fun##_ichk(type1 __restrict dst, type2 __restrict src, size_t len)                 \
+    __declare_extern_inline(type1) __##fun##_ichk(type1 __restrict dst, type2 __restrict src,  \
+                                                  size_t len)                                  \
     {                                                                                          \
         return __builtin___##fun##_chk(dst, src, len, __ssp_bos0(dst));                        \
     }

@@ -96,7 +96,7 @@ _ctrap(struct fault *fault)
 #define PASTE(r)  _PASTE(r)
 
 void __used __attribute((aligned(0x40)))
-     _trap(void)
+_trap(void)
 {
     /* Build a known-working C environment */
     __asm__("csrwr          $sp, 0x30\n" /* Save sp to ksave0 */
@@ -181,7 +181,8 @@ void __used __attribute((aligned(0x40)))
 }
 #endif
 
-void __section(".text.init.enter") __used _start(void)
+void __section(".text.init.enter") __used
+_start(void)
 {
     __asm__("la.abs         $sp, __stack\n");
 

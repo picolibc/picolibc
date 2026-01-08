@@ -42,7 +42,7 @@
 #include <errno.h>
 
 extern struct timeval __semihost_creat_time __weak;
-extern int gettimeofday(struct timeval * restrict tv, void * restrict tz) __weak;
+extern int            gettimeofday(struct timeval            *restrict tv, void            *restrict tz) __weak;
 
 /*
  * note: binary mode has been chosen below because otherwise

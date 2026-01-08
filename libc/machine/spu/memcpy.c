@@ -45,7 +45,7 @@
  * either with prior knowledge of the alignment or special
  * casing specific optimal alignments.
  */
-void *__no_builtin
+void * __no_builtin
 memcpy(void * __restrict__ dest, const void * __restrict__ src, size_t n)
 {
     int          adjust, delta;

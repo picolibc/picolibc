@@ -37,7 +37,8 @@
 
 void aarch64_halt_vector(void);
 
-void __section(".init") aarch64_halt_vector(void)
+void __section(".init")
+aarch64_halt_vector(void)
 {
     /* Loop forever. */
     for (;;)
@@ -46,7 +47,8 @@ void __section(".init") aarch64_halt_vector(void)
 
 void aarch64_ignore_vector(void);
 
-void __section(".init") aarch64_ignore_vector(void)
+void __section(".init")
+aarch64_ignore_vector(void)
 {
     /* Ignore the interrupt by returning */
 }

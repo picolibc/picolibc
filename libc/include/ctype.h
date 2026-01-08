@@ -118,75 +118,89 @@ int toascii_l(int c, locale_t l);
 
 #ifdef __declare_extern_inline
 
-__declare_extern_inline(int) isblank(int c)
+__declare_extern_inline(int)
+isblank(int c)
 {
     return c == ' ' || c == '\t';
 }
 
-__declare_extern_inline(int) iscntrl(int c)
+__declare_extern_inline(int)
+iscntrl(int c)
 {
     return (0x00 <= c && c <= 0x1f) || c == 0x7f;
 }
 
-__declare_extern_inline(int) isdigit(int c)
+__declare_extern_inline(int)
+isdigit(int c)
 {
     return '0' <= c && c <= '9';
 }
 
-__declare_extern_inline(int) isgraph(int c)
+__declare_extern_inline(int)
+isgraph(int c)
 {
     return '!' <= c && c <= '~';
 }
 
-__declare_extern_inline(int) islower(int c)
+__declare_extern_inline(int)
+islower(int c)
 {
     return 'a' <= c && c <= 'z';
 }
 
-__declare_extern_inline(int) isprint(int c)
+__declare_extern_inline(int)
+isprint(int c)
 {
     return ' ' <= c && c <= '~';
 }
 
-__declare_extern_inline(int) ispunct(int c)
+__declare_extern_inline(int)
+ispunct(int c)
 {
     return (('!' <= c && c <= '/') || (':' <= c && c <= '@') || ('[' <= c && c <= '`')
             || ('{' <= c && c <= '~'));
 }
 
-__declare_extern_inline(int) isspace(int c)
+__declare_extern_inline(int)
+isspace(int c)
 {
     return c == ' ' || ('\t' <= c && c <= '\r');
 }
 
-__declare_extern_inline(int) isupper(int c)
+__declare_extern_inline(int)
+isupper(int c)
 {
     return 'A' <= c && c <= 'Z';
 }
 
-__declare_extern_inline(int) isxdigit(int c)
+__declare_extern_inline(int)
+isxdigit(int c)
 {
     return (isdigit(c) || ('A' <= c && c <= 'F') || ('a' <= c && c <= 'f'));
 }
 
-__declare_extern_inline(int) isalpha(int c)
+__declare_extern_inline(int)
+isalpha(int c)
 {
     return isupper(c) || islower(c);
 }
 
-__declare_extern_inline(int) isalnum(int c)
+__declare_extern_inline(int)
+isalnum(int c)
 {
     return isalpha(c) || isdigit(c);
 }
 
-__declare_extern_inline(int) tolower(int c)
+__declare_extern_inline(int)
+tolower(int c)
 {
     if (isupper(c))
         c = c - 'A' + 'a';
     return c;
 }
 
-__declare_extern_inline(int) toupper(int c)
+__declare_extern_inline(int)
+toupper(int c)
 {
     if (islower(c))
         c = c - 'a' + 'A';
@@ -194,72 +208,86 @@ __declare_extern_inline(int) toupper(int c)
 }
 
 #if __POSIX_VISIBLE >= 200809
-__declare_extern_inline(int) isalnum_l(int c, locale_t l)
+__declare_extern_inline(int)
+isalnum_l(int c, locale_t l)
 {
     (void)l;
     return isalnum(c);
 }
-__declare_extern_inline(int) isalpha_l(int c, locale_t l)
+__declare_extern_inline(int)
+isalpha_l(int c, locale_t l)
 {
     (void)l;
     return isalpha(c);
 }
-__declare_extern_inline(int) isblank_l(int c, locale_t l)
+__declare_extern_inline(int)
+isblank_l(int c, locale_t l)
 {
     (void)l;
     return isblank(c);
 }
-__declare_extern_inline(int) iscntrl_l(int c, locale_t l)
+__declare_extern_inline(int)
+iscntrl_l(int c, locale_t l)
 {
     (void)l;
     return iscntrl(c);
 }
-__declare_extern_inline(int) isdigit_l(int c, locale_t l)
+__declare_extern_inline(int)
+isdigit_l(int c, locale_t l)
 {
     (void)l;
     return isdigit(c);
 }
-__declare_extern_inline(int) isgraph_l(int c, locale_t l)
+__declare_extern_inline(int)
+isgraph_l(int c, locale_t l)
 {
     (void)l;
     return isgraph(c);
 }
-__declare_extern_inline(int) islower_l(int c, locale_t l)
+__declare_extern_inline(int)
+islower_l(int c, locale_t l)
 {
     (void)l;
     return islower(c);
 }
-__declare_extern_inline(int) isprint_l(int c, locale_t l)
+__declare_extern_inline(int)
+isprint_l(int c, locale_t l)
 {
     (void)l;
     return isprint(c);
 }
-__declare_extern_inline(int) ispunct_l(int c, locale_t l)
+__declare_extern_inline(int)
+ispunct_l(int c, locale_t l)
 {
     (void)l;
     return ispunct(c);
 }
-__declare_extern_inline(int) isspace_l(int c, locale_t l)
+__declare_extern_inline(int)
+isspace_l(int c, locale_t l)
 {
     (void)l;
     return isspace(c);
 }
-__declare_extern_inline(int) isupper_l(int c, locale_t l)
+__declare_extern_inline(int)
+isupper_l(int c, locale_t l)
 {
     (void)l;
     return isupper(c);
 }
-__declare_extern_inline(int) isxdigit_l(int c, locale_t l)
+__declare_extern_inline(int)
+isxdigit_l(int c, locale_t l)
 {
     (void)l;
     return isxdigit(c);
 }
-__declare_extern_inline(int) tolower_l(int c, locale_t l)
+__declare_extern_inline(int)
+tolower_l(int c, locale_t l)
 {
     (void)l;
     return tolower(c);
 }
-__declare_extern_inline(int) toupper_l(int c, locale_t l)
+__declare_extern_inline(int)
+toupper_l(int c, locale_t l)
 {
     (void)l;
     return toupper(c);
@@ -326,7 +354,8 @@ const char *__locale_ctype_ptr(void);
 #define iscntrl(__c) (__ctype_lookup(__c) & __CTYPE_CNTRL)
 
 #if __ISO_C_VISIBLE >= 1999 && defined(__declare_extern_inline)
-__declare_extern_inline(int) isblank(int c)
+__declare_extern_inline(int)
+isblank(int c)
 {
     return c == '\t' || __ctype_lookup(c) & __CTYPE_BLANK;
 }
@@ -362,7 +391,8 @@ const char *__locale_ctype_ptr_l(locale_t);
 #define iscntrl_l(__c, __l) (__ctype_lookup_l(__c, __l) & __CTYPE_CNTRL)
 
 #ifdef __declare_extern_inline
-__declare_extern_inline(int) isblank_l(int c, locale_t l)
+__declare_extern_inline(int)
+isblank_l(int c, locale_t l)
 {
     return c == '\t' || (__ctype_lookup_l(c, l) & __CTYPE_BLANK);
 }

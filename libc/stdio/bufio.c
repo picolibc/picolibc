@@ -159,7 +159,7 @@ bail:
     return ret;
 }
 
-extern FILE * const stdin  __weak;
+extern FILE * const stdin __weak;
 extern FILE * const stdout __weak;
 
 int

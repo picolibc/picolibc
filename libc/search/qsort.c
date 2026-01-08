@@ -146,7 +146,7 @@ static __inline char *
 med3(char *a, char *b, char *c, cmp_t *cmp,
      void *thunk
 #if !defined(I_AM_QSORT_R) && !defined(I_AM_GNU_QSORT_R)
-         __unused
+     __unused
 #endif
 )
 {

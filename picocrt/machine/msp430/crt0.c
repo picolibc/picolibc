@@ -49,7 +49,8 @@ _cstart(void)
     __start();
 }
 
-void __section(".text.init.enter") __used _start(void)
+void __section(".text.init.enter") __used
+_start(void)
 {
     /* Generate a reference to __interrupt_vector so we get one loaded */
     __asm__(".equ __my_interrupt_vector, __interrupt_vector");

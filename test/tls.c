@@ -50,11 +50,11 @@
 
 #define TLS_ALIGN             (OVERALIGN_DATA > OVERALIGN_BSS ? OVERALIGN_DATA : OVERALIGN_BSS)
 
-__THREAD_LOCAL volatile int32_t data_var = DATA_VAL;
-__THREAD_LOCAL volatile int32_t bss_var;
+__THREAD_LOCAL volatile int32_t                           data_var = DATA_VAL;
+__THREAD_LOCAL volatile int32_t                           bss_var;
 __aligned(OVERALIGN_DATA) __THREAD_LOCAL volatile int32_t overaligned_data_var = DATA_VAL2;
-__aligned(OVERALIGN_BSS) __THREAD_LOCAL volatile int32_t overaligned_bss_var;
-__aligned(OVERALIGN_NON_TLS_BSS) volatile int32_t overaligned_non_tls_bss_var;
+__aligned(OVERALIGN_BSS) __THREAD_LOCAL volatile int32_t  overaligned_bss_var;
+__aligned(OVERALIGN_NON_TLS_BSS) volatile int32_t         overaligned_non_tls_bss_var;
 
 volatile int32_t * volatile data_addr;
 volatile int32_t * volatile overaligned_data_addr;

@@ -286,10 +286,10 @@ void __ubsan_handle_type_mismatch_v1(void *data, void *ptr);
 void __ubsan_handle_vla_bound_not_positive(void *data, void *bound);
 
 void __noreturn __picolibc_format(printf, 3, 4)
-    __ubsan_error(struct source_location *source, const char *fail, const char *fmt, ...);
+__ubsan_error(struct source_location *source, const char *fail, const char *fmt, ...);
 
-void __picolibc_format(printf, 3, 4)
-    __ubsan_warning(struct source_location *source, const char *fail, const char *fmt, ...);
+void __picolibc_format(printf, 3, 4) __ubsan_warning(struct source_location *source,
+                                                     const char *fail, const char *fmt, ...);
 
 void __ubsan_message(struct source_location *source, const char *msg, const char *fail,
                      const char *fmt, va_list ap);

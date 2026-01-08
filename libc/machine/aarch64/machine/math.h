@@ -52,7 +52,8 @@
 
 #if __ARM_FP & 0x8
 
-__declare_extern_inline(double) sqrt(double x)
+__declare_extern_inline(double)
+sqrt(double x)
 {
     double result;
 #ifdef __MATH_ERRNO
@@ -63,7 +64,8 @@ __declare_extern_inline(double) sqrt(double x)
     return result;
 }
 
-__declare_extern_inline(double) fma(double x, double y, double z)
+__declare_extern_inline(double)
+fma(double x, double y, double z)
 {
     double result;
     __asm__ __volatile__("fmadd\t%d0, %d1, %d2, %d3" : "=w"(result) : "w"(x), "w"(y), "w"(z));
@@ -73,7 +75,8 @@ __declare_extern_inline(double) fma(double x, double y, double z)
 #endif /* __ARM_FP & 0x8 */
 
 #if __ARM_FP & 0x4
-__declare_extern_inline(float) sqrtf(float x)
+__declare_extern_inline(float)
+sqrtf(float x)
 {
     float result;
 #ifdef __MATH_ERRNO
@@ -84,7 +87,8 @@ __declare_extern_inline(float) sqrtf(float x)
     return result;
 }
 
-__declare_extern_inline(float) fmaf(float x, float y, float z)
+__declare_extern_inline(float)
+fmaf(float x, float y, float z)
 {
     float result;
     __asm__ __volatile__("fmadd\t%s0, %s1, %s2, %s3" : "=w"(result) : "w"(x), "w"(y), "w"(z));

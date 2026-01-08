@@ -37,7 +37,8 @@
 
 extern char __stack[];
 
-void        __section(".init") __used _start(void)
+void __section(".init") __used
+_start(void)
 {
     /* Generate a reference to __exception_vector so we get one loaded */
     __asm__(".equ __my_exception_vector, __exception_vector");

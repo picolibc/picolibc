@@ -35,7 +35,8 @@
 
 #include "../../crt0.h"
 
-void __section(".init") _cstart(void)
+void __section(".init")
+_cstart(void)
 {
     __start();
 }
