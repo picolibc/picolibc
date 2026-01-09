@@ -1,10 +1,6 @@
 # Copyright 2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
 
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['clang', '-target', 'aarch64-none-elf', '-nostdlib']
 cpp = ['clang', '-target', 'aarch64-none-elf', '-nostdlib']
 ar = 'llvm-ar'
@@ -12,7 +8,7 @@ as = 'clang'
 nm = 'llvm-nm'
 strip = 'llvm-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-aarch64-fvp "$@"', 'run-aarch64-fvp']
+exe_wrapper = ['env', 'run-aarch64-fvp']
 
 [host_machine]
 system = 'none'

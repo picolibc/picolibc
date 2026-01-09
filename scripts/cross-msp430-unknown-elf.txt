@@ -1,15 +1,11 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['msp430-unknown-elf-gcc', '-nostdlib', '-mlarge', '-mdata-region=none']
 cpp = ['msp430-unknown-elf-g++', '-nostdlib', '-mlarge', '-mdata-region=none']
 ar = 'msp430-unknown-elf-ar'
 as = 'msp430-unknown-elf-as'
 nm = 'msp430-unknown-elf-nm'
 strip = 'msp430-unknown-elf-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-msp430 "$@"', 'run-msp430']
+exe_wrapper = ['env', 'run-msp430']
 
 [host_machine]
 system = 'zephyr'

@@ -1748,18 +1748,7 @@ if get_option('test-long-double')
   native_c_args += ['-D_TEST_LONG_DOUBLE']
 endif
 
-# Meson version 0.53.2 doesn't check for the skip_sanity_check value
-# before attempting to run test fragments during configuration. That
-# means the exe_wrapper value needs to handle being run at that
-# point. To support this, the exe_wrapper becomes a script which
-# checks for a environment variable (PICOLIBC_TEST) and exits
-# indicating success if that is not present.
-#
-# This was fixed in meson version 0.54.2, so this can be removed from
-# here and the sample cross scripts once picolibc requires a version
-# of meson newer than that.
-
-test_env = environment({'PICOLIBC_TEST' : '1'})
+test_env = environment()
 test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
 if has_semihost

@@ -1,8 +1,4 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['arm-eabi-gcc', '-nostdlib', '-mabi=aapcs', '-mfp16-format=ieee', '-mno-unaligned-access' ]
 cpp = ['arm-eabi-g++', '-nostdlib', '-mabi=aapcs', '-mfp16-format=ieee', '-mno-unaligned-access' ]
 ar = 'arm-eabi-ar'
@@ -10,7 +6,7 @@ as = 'arm-eabi-as'
 nm = 'arm-eabi-nm'
 strip = 'arm-eabi-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-arm "$@"', 'run-arm']
+exe_wrapper = ['env', 'run-arm']
 
 [host_machine]
 system = 'none'

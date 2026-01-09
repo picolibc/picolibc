@@ -1,8 +1,4 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['clang', '-target', 'x86_64-none-elf', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
 cpp = ['clang', '-target', 'x86_64-none-elf', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
 c_ld = 'lld'
@@ -13,7 +9,7 @@ nm = 'nm'
 strip = 'strip'
 objcopy = 'objcopy'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-x86 "$@"', 'run-x86']
+exe_wrapper = ['env', 'run-x86']
 
 [host_machine]
 system='linux'

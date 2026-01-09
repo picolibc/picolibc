@@ -4,7 +4,7 @@ ar = 'xtensa-dc233c_zephyr-elf-ar'
 as = 'xtensa-dc233c_zephyr-elf-as'
 nm = 'xtensa-dc233c_zephyr-elf-nm'
 strip = 'xtensa-dc233c_zephyr-elf-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-xtensa-dc233c "$@"', 'run-xtensa-dc233c']
+exe_wrapper = ['env', 'run-xtensa-dc233c']
 
 [host_machine]
 system = 'unknown'

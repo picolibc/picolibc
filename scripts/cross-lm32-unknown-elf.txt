@@ -1,8 +1,4 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['lm32-unknown-elf-gcc', '-nostdlib']
 cpp = ['lm32-unknown-elf-g++', '-nostdlib']
 ar = 'lm32-unknown-elf-ar'
@@ -10,7 +6,7 @@ as = 'lm32-unknown-elf-as'
 nm = 'lm32-unknown-elf-nm'
 strip = 'lm32-unknown-elf-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-lm32 "$@"', 'run-lm32']
+exe_wrapper = ['env', 'run-lm32']
 
 [host_machine]
 system = 'unknown'
