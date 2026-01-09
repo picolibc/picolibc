@@ -1105,7 +1105,7 @@ foreach params : [default_target] + targets
     # attributes for read-only data sections
     picolibc_ld_data.set('RODATA_MEM', 'flash')
     picolibc_ld_data.set('RODATA_AT', 'flash')
-    picolibc_ld_data.set('RODATA_PHDR', 'text')
+    picolibc_ld_data.set('RODATA_PHDR', 'rodata')
 
     # attributes for data-initialized read-write data sections
     picolibc_ld_data.set('DATA_MEM', 'ram')
