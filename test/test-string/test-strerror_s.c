@@ -39,6 +39,8 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef __STDC_LIB_EXT1__
+
 #define MAX_ERROR_MSG 100
 
 char handler_msg[MAX_ERROR_MSG] = "";
@@ -96,52 +98,57 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
 int
 main(void)
 {
-    char        dest[50];
-    const char *src = "Hello, world!";
-    int         test_id = 0;
-    int         handler_res = 0;
-    errno_t     res;
+    char    buf[100];
+    int     test_id = 0;
+    int     handler_res = 0;
+    errno_t res;
 
     set_constraint_handler_s(custom_constraint_handler);
 
-    // Test case 1: Normal copy
+    // Test case 1: Normal error message
     test_id++;
-    res = strcpy_s(dest, sizeof(dest), src);
+    res = strerror_s(buf, sizeof(buf), EINVAL);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Normal Copy", handler_res, test_id);
-    TEST_RES(strcmp(dest, "Hello, world!") == 0, "Normal Copy Contents", handler_res, test_id);
+    TEST_RES(res == 0, "Normal error message", handler_res, test_id);
+    TEST_RES(strcmp(buf, "Invalid argument") == 0, "Normal error message Contents", handler_res,
+             test_id);
 
-    // Test case 2: Copy with insufficient buffer
+    // Test case 2: Buffer too small
     test_id++;
-    res = strcpy_s(dest, 5, src);
+    res = strerror_s(buf, 10, EINVAL);
+    handler_res = test_handler_called(0, "", test_id);
+    TEST_RES(res == ERANGE, "Buffer too small", handler_res, test_id);
+
+    // Test case 3: Null Destination Pointer
+    test_id++;
+    res = strerror_s(NULL, sizeof(buf), EINVAL);
+    handler_res = test_handler_called(1, "strerror_s: dest is NULL", test_id);
+    TEST_RES(res != 0, "Null Destination Pointer", handler_res, test_id);
+
+    // Test case 4: Zero-length Buffer
+    test_id++;
+    res = strerror_s(buf, 0, EINVAL);
     handler_res
-        = test_handler_called(1, "strcpy_s: dest buffer size insufficent to copy string", test_id);
-    TEST_RES(res != 0, "Copy with insufficient buffer", handler_res, test_id);
+        = test_handler_called(1, "strerror_s: dest buffer size is 0 or exceeds RSIZE_MAX", test_id);
+    TEST_RES(res != 0, "Zero-length Buffer", handler_res, test_id);
 
-    // Test case 3: Null pointers
+    // Test case 5: Unknown error code
     test_id++;
-    res = strcpy_s(NULL, sizeof(dest), src);
-    handler_res = test_handler_called(1, "strcpy_s: dest is NULL", test_id);
-    TEST_RES(res != 0, "NULL Destination Pointer", handler_res, test_id);
-    res = strcpy_s(dest, sizeof(dest), NULL);
-    handler_res = test_handler_called(1, "strcpy_s: source is NULL", test_id);
-    TEST_RES(res != 0, "NULL Source Pointer", handler_res, test_id);
-
-    // Test case 4: Copy of empty string
-    test_id++;
-    res = strcpy_s(dest, sizeof(dest), "");
+    res = strerror_s(buf, sizeof(buf), 12345);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Copy of empty string", handler_res, test_id);
-    TEST_RES(strcmp(dest, "") == 0, "Copy of empty string Contents", handler_res, test_id);
+    TEST_RES(res == 0, "Unknown error code", handler_res, test_id);
 
-    // Test case 5: Copy to empty buffer
-    test_id++;
-    char buf2[50] = "";
-    res = strcpy_s(buf2, sizeof(buf2), "world");
-    handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Copy to empty buffer", handler_res, test_id);
-    TEST_RES(strcmp(buf2, "world") == 0, "Copy to empty buffer Contents", handler_res, test_id);
-
-    printf("All strcpy_s tests passed!\n");
+    printf("All strerror_s tests passed!\n");
     return 0;
 }
+
+#else
+
+int
+main(void)
+{
+    printf("C library does not support __STDC_LIB_EXT1__, skipping\n");
+    return 77;
+}
+
+#endif

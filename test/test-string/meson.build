@@ -34,8 +34,22 @@
 #
 
 tests_mem = [
-  'test-memmem',
   'test-memchr',
+  'test-memchr-simple',
+  'test-memcpy_s',
+  'test-memmem',
+  'test-memmove_s',
+  'test-memset',
+  'test-memset_s',
+  'test-strcat_s',
+  'test-strchr',
+  'test-strcpy_s',
+  'test-strerrorlen_s',
+  'test-strerror_s',
+  'test-strncat_s',
+  'test-strncpy',
+  'test-strncpy_s',
+  'test-strnlen_s',
   ]
 
 tests_string = tests_mem

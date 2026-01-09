@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,64 +32,25 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
 set(tests
-  rand
-  regex
-  fenv
-  long_double
-  math_errhandling
-  malloc
-  tls
-  ffs
-  setjmp
-  atexit
-  on_exit
-  math-funcs
-  timegm
-  time-tests
-  test-getdate
-  test-strtod
-  test-efcvt
-  test-fma
-  malloc_stress
-  test-uchar
-  test-wcsftime
+  test-memchr
+  test-memchr-simple
+  test-memmem
+  test-memset
+  test-strchr
+  test-strncpy
+  test-memcpy_s
+  test-memset_s
+  test-memmove_s
+  test-strcat_s
+  test-strcpy_s
+  test-strerror_s
+  test-strerrorlen_s
+  test-strncat_s
+  test-strncpy_s
+  test-strnlen_s
   )
-
-set(tests_fail
-  test-except
-  )
-  
-function(picolibc_test test)
-  add_executable(${test} ${test}.c ${ARGN})
-
-  target_link_libraries(${test} LINK_PUBLIC ${PICOLIBC_TEST_LINK_LIBRARIES})
-
-  target_compile_options(${test} PRIVATE -fno-builtin ${PICOLIBC_COMPILE_OPTIONS} -D_TEST_LONG_DOUBLE)
-
-  target_link_options(${test} PRIVATE ${TARGET_COMPILE_OPTIONS})
-
-  add_test(
-    NAME ${test}
-    COMMAND "${PICOLIBC_SCRIPTS}/${TEST_RUNNER}" $<TARGET_FILE:${test}>
-    )
-  set_tests_properties(${test} PROPERTIES SKIP_RETURN_CODE 77)
-endfunction()
 
 foreach(test IN LISTS tests)
   picolibc_test(${test})
 endforeach()
-
-foreach(test IN LISTS tests_fail)
-  picolibc_test(${test})
-  set_tests_properties(${test} PROPERTIES WILL_FAIL ON)
-endforeach()
-
-picolibc_test(rounding-mode rounding-mode-sub.c)
-
-add_subdirectory(test-ctype)
-add_subdirectory(test-math)
-add_subdirectory(test-monetary)
-add_subdirectory(test-stdio)
-add_subdirectory(test-string)

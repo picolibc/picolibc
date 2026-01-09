@@ -39,6 +39,8 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef __STDC_LIB_EXT1__
+
 #define MAX_ERROR_MSG 100
 
 char handler_msg[MAX_ERROR_MSG] = "";
@@ -96,69 +98,36 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
 int
 main(void)
 {
-    char        dest[50] = "Hello";
-    const char *src = ", world!";
-    int         test_id = 0;
-    int         handler_res = 0;
-    errno_t     res;
+    size_t length;
+    int    test_id = 0;
+    int    handler_res = 0;
 
     set_constraint_handler_s(custom_constraint_handler);
 
-    // Test case 1: Normal Concatenation
+    // Test case 1: Normal error code
     test_id++;
-    strcpy(dest, "Hello");
-    res = strncat_s(dest, sizeof(dest), src, 8);
+    length = strerrorlen_s(EINVAL);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Normal Concatenation", handler_res, test_id);
-    TEST_RES(strcmp(dest, "Hello, world!") == 0, "Normal Concatenation Contents", handler_res,
+    TEST_RES(length == strlen("Invalid argument"), "Normal error code length", handler_res,
              test_id);
 
-    // Test case 2: Concatenation with insufficient buffer
+    // Test case 2: Unknown error code
     test_id++;
-    strcpy(dest, "Hello");
-    res = strncat_s(dest, 10, src, 8);
-    handler_res
-        = test_handler_called(1, "strncat_s: dest buffer size insufficent to copy string", test_id);
-    TEST_RES(res != 0, "Concatenation with insufficient buffer", handler_res, test_id);
-
-    // Test case 3: Null pointers
-    test_id++;
-    res = strncat_s(NULL, sizeof(dest), src, 8);
-    handler_res = test_handler_called(1, "strncat_s: dest is NULL", test_id);
-    TEST_RES(res != 0, "NULL Destination Pointer", handler_res, test_id);
-    res = strncat_s(dest, sizeof(dest), NULL, 8);
-    handler_res = test_handler_called(1, "strncat_s: source is NULL", test_id);
-    TEST_RES(res != 0, "NULL Source Pointer", handler_res, test_id);
-
-    // Test case 4: Concatenation of empty source string
-    test_id++;
-    strcpy(dest, "Hello");
-    res = strncat_s(dest, sizeof(dest), "", 0);
+    length = strerrorlen_s(12345);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Concatenation of empty source string", handler_res, test_id);
-    TEST_RES(strcmp(dest, "Hello") == 0, "Concatenation of empty source string Contents",
-             handler_res, test_id);
+    TEST_RES(length == 0, "Unknown error code length", handler_res, test_id);
 
-    // Test case 5: Concatenation with empty destination string
-    test_id++;
-    char buf2[50] = "";
-    res = strncat_s(buf2, sizeof(buf2), src, 8);
-    handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Concatenation of non-empty source to empty destination", handler_res,
-             test_id);
-    TEST_RES(strcmp(buf2, ", world!") == 0,
-             "Concatenation of non-empty source to empty destination Contents", handler_res,
-             test_id);
-
-    // Test case 6: Concatenation with Zero Characters
-    test_id++;
-    strcpy(dest, "Hello");
-    res = strncat_s(dest, sizeof(dest), src, 0);
-    handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Concatenation with Zero Characters", handler_res, test_id);
-    TEST_RES(strcmp(dest, "Hello") == 0, "Concatenation with Zero Characters Contents", handler_res,
-             test_id);
-
-    printf("All strncat_s tests passed!\n");
+    printf("All strerrorlen_s tests passed!\n");
     return 0;
 }
+
+#else
+
+int
+main(void)
+{
+    printf("C library does not support __STDC_LIB_EXT1__, skipping\n");
+    return 77;
+}
+
+#endif

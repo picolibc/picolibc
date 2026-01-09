@@ -39,6 +39,8 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef __STDC_LIB_EXT1__
+
 #define MAX_ERROR_MSG 100
 
 char handler_msg[MAX_ERROR_MSG] = "";
@@ -96,48 +98,68 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
 int
 main(void)
 {
-    size_t length;
-    int    test_id = 0;
-    int    handler_res = 0;
+    char    dest[50] = "Hello";
+    char    src[] = ", world!";
+    int     test_id = 0;
+    int     handler_res = 0;
+    errno_t res;
 
     set_constraint_handler_s(custom_constraint_handler);
 
-    // Test case 1: Normal length
+    // Test case 1: Normal Concatenation
     test_id++;
-    length = strnlen_s("Hello, world!", 50);
+    res = strcat_s(dest, sizeof(dest), src);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == 13, "Normal length", handler_res, test_id);
+    TEST_RES(res == 0, "Normal Concatenation", handler_res, test_id);
+    TEST_RES(strcmp(dest, "Hello, world!") == 0, "Normal Concatenation Contents", handler_res,
+             test_id);
 
-    // Test case 2: Length with exact buffer size
+    // Test case 2: Concatenation with insufficient buffer
     test_id++;
-    length = strnlen_s("Hello, world!", 13);
-    handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == 13, "Length with exact buffer size", handler_res, test_id);
+    res = strcat_s(dest, 10, src);
+    handler_res = test_handler_called(1, "strcat_s: string 1 length exceeds buffer size", test_id);
+    TEST_RES(res != 0, "Concatenation with insufficient buffer", handler_res, test_id);
 
-    // Test case 3: Length with insufficient buffer
+    // Test case 3: Null pointers
     test_id++;
-    length = strnlen_s("Hello, world!", 5);
-    handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == 5, "Length with insufficient buffer", handler_res, test_id);
+    res = strcat_s(NULL, sizeof(dest), src);
+    handler_res = test_handler_called(1, "strcat_s: dest is NULL", test_id);
+    TEST_RES(res != 0, "NULL Destination Pointer", handler_res, test_id);
+    res = strcat_s(dest, sizeof(dest), NULL);
+    handler_res = test_handler_called(1, "strcat_s: source is NULL", test_id);
+    TEST_RES(res != 0, "NULL Source Pointer", handler_res, test_id);
 
-    // Test case 4: Length of empty string
+    // Test case 4: Concatenation of empty source string
     test_id++;
-    length = strnlen_s("", 50);
+    strcpy(dest, "Hello");
+    res = strcat_s(dest, sizeof(dest), "");
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == 0, "Length of empty string", handler_res, test_id);
+    TEST_RES(res == 0, "Concatenation of empty source string", handler_res, test_id);
+    TEST_RES(strcmp(dest, "Hello") == 0, "Concatenation of empty source string Contents",
+             handler_res, test_id);
 
-    // Test case 5: Length with Null string
+    // Test case 5: Concatenation with empty destination string
     test_id++;
-    length = strnlen_s(NULL, 50);
+    char dest2[50] = "";
+    res = strcat_s(dest2, sizeof(dest2), ", World!");
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == 0, "Length with Null string", handler_res, test_id);
+    TEST_RES(res == 0, "Concatenation of non-empty source to empty destination", handler_res,
+             test_id);
+    TEST_RES(strcmp(dest2, ", World!") == 0,
+             "Concatenation of non-empty source to empty destination Contents", handler_res,
+             test_id);
 
-    // Test case 6: Length with zero buffer size
-    test_id++;
-    length = strnlen_s("Hello, world!", 0);
-    handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == 0, "Length with zero buffer size", handler_res, test_id);
-
-    printf("All strnlen_s tests passed!\n");
+    printf("All strcat_s tests passed!\n");
     return 0;
 }
+
+#else
+
+int
+main(void)
+{
+    printf("C library does not support __STDC_LIB_EXT1__, skipping\n");
+    return 77;
+}
+
+#endif

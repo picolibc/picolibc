@@ -39,6 +39,8 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef __STDC_LIB_EXT1__
+
 #define MAX_ERROR_MSG 100
 
 char handler_msg[MAX_ERROR_MSG] = "";
@@ -96,51 +98,80 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
 int
 main(void)
 {
-    char        dest[50];
-    const char *src = "Hello, world!";
+    char        dest[50] = "Hello";
+    const char *src = ", world!";
     int         test_id = 0;
     int         handler_res = 0;
     errno_t     res;
 
     set_constraint_handler_s(custom_constraint_handler);
 
-    // Test case 1: Normal copy
+    // Test case 1: Normal Concatenation
     test_id++;
-    res = strncpy_s(dest, sizeof(dest), src, 13);
+    strcpy(dest, "Hello");
+    res = strncat_s(dest, sizeof(dest), src, 8);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Normal Copy", handler_res, test_id);
-    TEST_RES(strcmp(dest, "Hello, world!") == 0, "Normal Copy Contents", handler_res, test_id);
+    TEST_RES(res == 0, "Normal Concatenation", handler_res, test_id);
+    TEST_RES(strcmp(dest, "Hello, world!") == 0, "Normal Concatenation Contents", handler_res,
+             test_id);
 
-    // Test case 2: Copy with insufficient buffer
+    // Test case 2: Concatenation with insufficient buffer
     test_id++;
-    res = strncpy_s(dest, 5, src, 13);
+    strcpy(dest, "Hello");
+    res = strncat_s(dest, 10, src, 8);
     handler_res
-        = test_handler_called(1, "strncpy_s: dest buffer size insufficent to copy string", test_id);
-    TEST_RES(res != 0, "Copy with insufficient buffer", handler_res, test_id);
+        = test_handler_called(1, "strncat_s: dest buffer size insufficent to copy string", test_id);
+    TEST_RES(res != 0, "Concatenation with insufficient buffer", handler_res, test_id);
 
     // Test case 3: Null pointers
     test_id++;
-    res = strncpy_s(NULL, sizeof(dest), src, 13);
-    handler_res = test_handler_called(1, "strncpy_s: dest is NULL", test_id);
+    res = strncat_s(NULL, sizeof(dest), src, 8);
+    handler_res = test_handler_called(1, "strncat_s: dest is NULL", test_id);
     TEST_RES(res != 0, "NULL Destination Pointer", handler_res, test_id);
-    res = strncpy_s(dest, sizeof(dest), NULL, 13);
-    handler_res = test_handler_called(1, "strncpy_s: source is NULL", test_id);
+    res = strncat_s(dest, sizeof(dest), NULL, 8);
+    handler_res = test_handler_called(1, "strncat_s: source is NULL", test_id);
     TEST_RES(res != 0, "NULL Source Pointer", handler_res, test_id);
 
-    // Test case 4: Copy of empty string
+    // Test case 4: Concatenation of empty source string
     test_id++;
-    res = strncpy_s(dest, sizeof(dest), "", 0);
+    strcpy(dest, "Hello");
+    res = strncat_s(dest, sizeof(dest), "", 0);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Copy of empty string", handler_res, test_id);
-    TEST_RES(strcmp(dest, "") == 0, "Copy of empty string Contents", handler_res, test_id);
+    TEST_RES(res == 0, "Concatenation of empty source string", handler_res, test_id);
+    TEST_RES(strcmp(dest, "Hello") == 0, "Concatenation of empty source string Contents",
+             handler_res, test_id);
 
-    // Test case 5: Copy with zero Characters
+    // Test case 5: Concatenation with empty destination string
     test_id++;
-    res = strncpy_s(dest, sizeof(dest), "Hello, world!", 0);
+    char buf2[50] = "";
+    res = strncat_s(buf2, sizeof(buf2), src, 8);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Copy with zero Characters", handler_res, test_id);
-    TEST_RES(strcmp(dest, "") == 0, "Copy with zero Characters Contents", handler_res, test_id);
+    TEST_RES(res == 0, "Concatenation of non-empty source to empty destination", handler_res,
+             test_id);
+    TEST_RES(strcmp(buf2, ", world!") == 0,
+             "Concatenation of non-empty source to empty destination Contents", handler_res,
+             test_id);
 
-    printf("All strncpy_s tests passed!\n");
+    // Test case 6: Concatenation with Zero Characters
+    test_id++;
+    strcpy(dest, "Hello");
+    res = strncat_s(dest, sizeof(dest), src, 0);
+    handler_res = test_handler_called(0, "", test_id);
+    TEST_RES(res == 0, "Concatenation with Zero Characters", handler_res, test_id);
+    TEST_RES(strcmp(dest, "Hello") == 0, "Concatenation with Zero Characters Contents", handler_res,
+             test_id);
+
+    printf("All strncat_s tests passed!\n");
     return 0;
 }
+
+#else
+
+int
+main(void)
+{
+    printf("C library does not support __STDC_LIB_EXT1__, skipping\n");
+    return 77;
+}
+
+#endif

@@ -43,16 +43,11 @@ plain_tests_common = ['regex',
 	              'timegm',
                       'test-atomic',
                       'test-hello',
-                      'test-strchr',
-                      'test-memchr',
-	              'test-memset',
 	              'test-raise',
-                      'test-ctype',
                       'test-uchar',
                       'test-wctomb',
                       'test-scmpu',
                       'test-strftime',
-                      'test-strncpy',
                       'time-tests',
                       'test-time',
                       'test-getdate',
@@ -86,18 +81,6 @@ plain_tests = plain_tests_common
 plain_tests += math_tests + [
   'tls',
 ]
-
-plain_tests += ['test-memcpy_s',
-                'test-memset_s',
-                'test-memmove_s',
-                'test-strcat_s',
-                'test-strcpy_s',
-                'test-strerror_s',
-                'test-strerrorlen_s',
-                'test-strncat_s',
-                'test-strncpy_s',
-                'test-strnlen_s',
-               ]
 
 if tests_enable_stack_protector
   plain_tests += 'stack-smash'
@@ -606,19 +589,21 @@ if enable_native_math_tests
 	 executable('long_double-native', 'long_double.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
-		    dependencies: native_lib_m))
+		    dependencies: native_lib_m),
+        suite: 'test-math')
     test('math_errhandling-native',
 	 executable('math_errhandling-native', 'math_errhandling.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
-		    dependencies: native_lib_m))
+		    dependencies: native_lib_m),
+        suite: 'test-math')
     test('rounding-mode-native',
 	 executable('rounding-mode-native',
 		    ['rounding-mode.c', 'rounding-mode-sub.c'],
 		    c_args: native_c_args,
 		    link_args: native_c_args,
-		    dependencies: native_lib_m))
-
+		    dependencies: native_lib_m),
+        suite: 'test-math')
     foreach t1 : math_tests_native
       t1_src = t1 + '.c'
 
@@ -626,7 +611,8 @@ if enable_native_math_tests
 	   executable(t1 + '-native', t1_src,
 		      c_args: native_c_args,
 		      link_args: native_c_args,
-                      dependencies: native_lib_m))
+                      dependencies: native_lib_m),
+          suite: 'test-math')
     endforeach
 
   endif
@@ -636,72 +622,6 @@ endif
 
 if enable_native_tests
 
-  localedef = find_program('localedef', required: false)
-
-  ctype_c_args = []
-
-  locales=[]
-  # need meson 0.57 so we can use 'env' in custom_target
-  if localedef.found() and meson.version().version_compare('>=0.57')
-    if mb_capable
-      locale = 'fr_FR.UTF-8'
-      locales += [custom_target(locale, output: locale,
-                                command: [localedef, '--no-warnings=ascii',
-                                          '-f', 'UTF-8', '-i', 'fr_FR', '.' / '@OUTPUT@'])]
-      locale = 'C.UTF-8'
-      locales += [custom_target(locale, output: locale,
-                                command: [localedef, '--no-warnings=ascii',
-                                          '-f', 'UTF-8', '-i', 'C', '.' / '@OUTPUT@'])]
-      ctype_c_args += ['-DHAVE_UTF_CHARSETS']
-    endif
-    if mb_extended_charsets
-      # CP720 doesn't have any Linux support.
-      # JIS doesn't make any sense to me.
-      # CP1255 and CP1258 seem to be broken in Linux
-      foreach ctype : ['ISO-8859-1', 'ISO-8859-2', 'ISO-8859-3', 'ISO-8859-4',
-                       'ISO-8859-5', 'ISO-8859-6', 'ISO-8859-7', 'ISO-8859-8',
-                       'ISO-8859-9', 'ISO-8859-10', 'ISO-8859-11', 'ISO-8859-13',
-                       'ISO-8859-14', 'ISO-8859-15', 'ISO-8859-16',
-
-                       'GEORGIAN-PS', 'PT154', 'KOI8-T', 'CP437', 'CP737', 'CP775',
-                       'CP850', 'CP852', 'CP855', 'CP857', 'CP858', 'CP862', 'CP866',
-                       'CP874', 'CP1125', 'CP1250', 'CP1251', 'CP1252', 'CP1253',
-                       'CP1254', 'CP1256', 'CP1257', 'KOI8-R', 'KOI8-U',
-
-                       'SHIFT-JIS', 'EUC-JP']
-        locale = 'C.' + ctype
-        if ctype == 'SHIFT-JIS'
-          ctype = 'SHIFT_JIS'
-        elif ctype == 'CP437'
-          ctype = 'IBM437'
-        elif ctype == 'CP850'
-          ctype = 'IBM850'
-        elif ctype == 'CP852'
-          ctype = 'IBM852'
-        elif ctype == 'CP855'
-          ctype = 'IBM855'
-        elif ctype == 'CP857'
-          ctype = 'IBM857'
-        elif ctype == 'CP858'
-          ctype = 'IBM858'
-        elif ctype == 'CP862'
-          ctype = 'IBM862'
-        elif ctype == 'CP866'
-          ctype = 'IBM866'
-        elif ctype == 'CP874'
-          ctype = 'IBM874'
-        endif
-        locales += [custom_target(locale, output: locale,
-                                  command: [localedef, '--no-warnings=ascii',
-                                            '-f', ctype, '-i', 'C', '.' / '@OUTPUT@'])]
-      endforeach
-      ctype_c_args += ['-DHAVE_ISO_CHARSETS',
-                       '-DHAVE_WINDOWS_CHARSETS',
-                       '-DHAVE_JIS_CHARSETS'
-                      ]
-    endif
-  endif
-
   native_lib = static_library('native-lib',
                               ['native-locks.c'],
                               c_args: native_c_args)
@@ -710,7 +630,9 @@ if enable_native_tests
     test('test-cplusplus-native',
          executable('test-cplusplus-native', 'test-cplusplus.cpp',
                     cpp_args: native_cpp_args,
-		    link_args: native_cpp_args))
+		    link_args: native_cpp_args),
+         suite: 'test'
+        )
   endif
 
   foreach t1 : plain_tests_native
@@ -720,54 +642,15 @@ if enable_native_tests
 
     test(t1_name,
 	 executable(t1_name, t1_src,
-		    c_args: native_c_args + ctype_c_args,
+		    c_args: native_c_args,
 		    link_args: native_c_args),
-         env: ['LOCPATH=' + meson.current_build_dir()])
+         suite: 'test'
+        )
   endforeach
-
-  diff = find_program('diff', required: false)
-
-  if diff.found()
-    diff_tests = ['test-wctype', 'test-encode', 'test-wcase']
-
-    foreach t : diff_tests
-      src = t + '.c'
-      n = t + '-native'
-      o = t + '-out'
-      no = n + '-out'
-
-      test = t + '-compare'
-
-      e = executable(t, src, 
-                 c_args: printf_compile_args_d + _c_args + ctype_c_args,
-                 link_args: printf_link_args_d + _link_args,
-                 objects: _objs,
-                 link_depends: _link_depends,
-                 include_directories: inc)
-
-      out = custom_target (o, output: o,
-                           command: [e, '@OUTPUT@'])
-
-      ne = executable(n, src, 
-                      c_args: native_c_args + ctype_c_args,
-                      link_args: native_c_args)
-
-      if locales != [] and meson.version().version_compare('>=0.57')
-        native_out = custom_target (no, output: no,
-                                    depends: locales,
-                                    env: ['LOCPATH=' + meson.current_build_dir()],
-                                    command: [ne, '@OUTPUT@'])
-      else
-        native_out = custom_target (no, output: no,
-                                    command: [ne, '@OUTPUT@'])
-      endif
-
-      test(test, diff, args: ['-u', out, native_out])
-    endforeach
-  endif
 endif
 
 subdir('libc-testsuite')
+subdir('test-ctype')
 subdir('test-iconv')
 subdir('test-math')
 subdir('test-string')

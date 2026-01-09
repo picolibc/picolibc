@@ -39,6 +39,8 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef __STDC_LIB_EXT1__
+
 #define MAX_ERROR_MSG 100
 
 char handler_msg[MAX_ERROR_MSG] = "";
@@ -96,47 +98,58 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
 int
 main(void)
 {
-    char    src[] = "Hello, world!";
-    char    dest[50];
+    char    buf[50] = "Hello, world!";
     int     test_id = 0;
     int     handler_res = 0;
     errno_t res;
 
     set_constraint_handler_s(custom_constraint_handler);
 
-    // Test case 1: Normal copy
+    // Test case 1: Normal move
     test_id++;
-    res = memcpy_s(dest, sizeof(dest), src, strlen(src) + 1);
+    res = memmove_s(buf + 7, sizeof(buf) - 7, buf, strlen(buf) + 1);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Normal Copy", handler_res, test_id);
-    TEST_RES(strcmp(dest, "Hello, world!") == 0, "Normal Copy Contents", handler_res, test_id);
+    TEST_RES(res == 0, "Normal move", handler_res, test_id);
+    TEST_RES(strcmp(buf, "Hello, Hello, world!") == 0, "Normal move Contents", handler_res,
+             test_id);
 
-    // Test case 2: Copy with insufficient destination size
+    // Test case 2: Move with insufficient destination size
     test_id++;
-    res = memcpy_s(dest, 5, src, strlen(src) + 1);
-    handler_res = test_handler_called(1, "memcpy_s: copy count exceeds buffer size", test_id);
-    TEST_RES(res != 0, "Copy with insufficient destination size", handler_res, test_id);
+    res = memmove_s(buf + 7, 5, buf, strlen(buf) + 1);
+    handler_res = test_handler_called(1, "memmove_s: copy count exceeds buffer size", test_id);
+    TEST_RES(res != 0, "Move with insufficient destination size", handler_res, test_id);
 
-    // Test case 3: Copy with Null destination
+    // Test case 3: Move with Null destination
     test_id++;
-    res = memcpy_s(NULL, sizeof(dest), src, strlen(src) + 1);
-    handler_res = test_handler_called(1, "memcpy_s: dest is NULL", test_id);
-    TEST_RES(res != 0, "Copy with Null destination", handler_res, test_id);
+    res = memmove_s(NULL, sizeof(buf), buf, strlen(buf) + 1);
+    handler_res = test_handler_called(1, "memmove_s: dest is NULL", test_id);
+    TEST_RES(res != 0, "Move with Null destination", handler_res, test_id);
 
-    // Test case 4: Copy with Null source
+    // Test case 4: Move with Null source
     test_id++;
-    res = memcpy_s(dest, sizeof(dest), NULL, strlen(src) + 1);
-    handler_res = test_handler_called(1, "memcpy_s: source is NULL", test_id);
-    TEST_RES(res != 0, "Copy with Null source", handler_res, test_id);
+    res = memmove_s(buf, sizeof(buf), NULL, strlen(buf) + 1);
+    handler_res = test_handler_called(1, "memmove_s: source is NULL", test_id);
+    TEST_RES(res != 0, "Move with Null source", handler_res, test_id);
 
-    // Test case 5: Copy with zero length
+    // Test case 5: Move with zero length
     test_id++;
-    strcpy(dest, "");
-    res = memcpy_s(dest, sizeof(dest), src, 0);
+    strcpy(buf, "");
+    res = memmove_s(buf, sizeof(buf), buf, 0);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Copy with zero length", handler_res, test_id);
-    TEST_RES(dest[0] == '\0', "Copy with zero length Contents", handler_res, test_id);
+    TEST_RES(res == 0, "Move with zero length", handler_res, test_id);
+    TEST_RES(buf[0] == '\0', "Move with zero length Contents", handler_res, test_id);
 
-    printf("All memcpy_s tests passed!\n");
+    printf("All memmove_s tests passed!\n");
     return 0;
 }
+
+#else
+
+int
+main(void)
+{
+    printf("C library does not support __STDC_LIB_EXT1__, skipping\n");
+    return 77;
+}
+
+#endif

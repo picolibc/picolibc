@@ -39,6 +39,8 @@
 #include <string.h>
 #include <errno.h>
 
+#ifdef __STDC_LIB_EXT1__
+
 #define MAX_ERROR_MSG 100
 
 char handler_msg[MAX_ERROR_MSG] = "";
@@ -96,47 +98,59 @@ test_handler_called(int handler_called, char *expected_msg, int test_id)
 int
 main(void)
 {
-    char    buf[50] = "Hello, world!";
-    int     test_id = 0;
-    int     handler_res = 0;
-    errno_t res;
+    size_t length;
+    int    test_id = 0;
+    int    handler_res = 0;
 
     set_constraint_handler_s(custom_constraint_handler);
 
-    // Test case 1: Normal move
+    // Test case 1: Normal length
     test_id++;
-    res = memmove_s(buf + 7, sizeof(buf) - 7, buf, strlen(buf) + 1);
+    length = strnlen_s("Hello, world!", 50);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Normal move", handler_res, test_id);
-    TEST_RES(strcmp(buf, "Hello, Hello, world!") == 0, "Normal move Contents", handler_res,
-             test_id);
+    TEST_RES(length == 13, "Normal length", handler_res, test_id);
 
-    // Test case 2: Move with insufficient destination size
+    // Test case 2: Length with exact buffer size
     test_id++;
-    res = memmove_s(buf + 7, 5, buf, strlen(buf) + 1);
-    handler_res = test_handler_called(1, "memmove_s: copy count exceeds buffer size", test_id);
-    TEST_RES(res != 0, "Move with insufficient destination size", handler_res, test_id);
-
-    // Test case 3: Move with Null destination
-    test_id++;
-    res = memmove_s(NULL, sizeof(buf), buf, strlen(buf) + 1);
-    handler_res = test_handler_called(1, "memmove_s: dest is NULL", test_id);
-    TEST_RES(res != 0, "Move with Null destination", handler_res, test_id);
-
-    // Test case 4: Move with Null source
-    test_id++;
-    res = memmove_s(buf, sizeof(buf), NULL, strlen(buf) + 1);
-    handler_res = test_handler_called(1, "memmove_s: source is NULL", test_id);
-    TEST_RES(res != 0, "Move with Null source", handler_res, test_id);
-
-    // Test case 5: Move with zero length
-    test_id++;
-    strcpy(buf, "");
-    res = memmove_s(buf, sizeof(buf), buf, 0);
+    length = strnlen_s("Hello, world!", 13);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(res == 0, "Move with zero length", handler_res, test_id);
-    TEST_RES(buf[0] == '\0', "Move with zero length Contents", handler_res, test_id);
+    TEST_RES(length == 13, "Length with exact buffer size", handler_res, test_id);
 
-    printf("All memmove_s tests passed!\n");
+    // Test case 3: Length with insufficient buffer
+    test_id++;
+    length = strnlen_s("Hello, world!", 5);
+    handler_res = test_handler_called(0, "", test_id);
+    TEST_RES(length == 5, "Length with insufficient buffer", handler_res, test_id);
+
+    // Test case 4: Length of empty string
+    test_id++;
+    length = strnlen_s("", 50);
+    handler_res = test_handler_called(0, "", test_id);
+    TEST_RES(length == 0, "Length of empty string", handler_res, test_id);
+
+    // Test case 5: Length with Null string
+    test_id++;
+    length = strnlen_s(NULL, 50);
+    handler_res = test_handler_called(0, "", test_id);
+    TEST_RES(length == 0, "Length with Null string", handler_res, test_id);
+
+    // Test case 6: Length with zero buffer size
+    test_id++;
+    length = strnlen_s("Hello, world!", 0);
+    handler_res = test_handler_called(0, "", test_id);
+    TEST_RES(length == 0, "Length with zero buffer size", handler_res, test_id);
+
+    printf("All strnlen_s tests passed!\n");
     return 0;
 }
+
+#else
+
+int
+main(void)
+{
+    printf("C library does not support __STDC_LIB_EXT1__, skipping\n");
+    return 77;
+}
+
+#endif
