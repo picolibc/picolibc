@@ -6,7 +6,7 @@ doesn't include the built-in multilib support. Picolibc uses the meson
 build system, which is a slightly quirky build system designed to
 replace autotools with a single language.
 
-Picolibc requires meson version 0.50 or newer. If your operating
+Picolibc requires meson version 0.61 or newer. If your operating
 system provides an older version, you can get the latest using
 pip. For example, on a Debian or Ubuntu system, you would do:
 

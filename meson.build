@@ -41,7 +41,7 @@ project('picolibc', 'c',
           'warning_level=2',
 	],
 	license : 'BSD',
-	meson_version : '>= 0.53',
+	meson_version : '>= 0.61',
 	version: '1.8.10'
        )
 
@@ -61,12 +61,8 @@ cc = meson.get_compiler('c')
 cc_install_dir = ''
 foreach _line : run_command(cc.cmd_array() + ['-print-search-dirs'], check : false).stdout().split('\n')
   if _line.startswith('install: ')
-    if meson.version().version_compare('>=0.56')
-      # trim off the leading 'install: '
-      cc_install_dir = _line.substring(9)
-    else
-      cc_install_dir = run_command(['expr', _line, ':', 'install: *\(.*\)'], check : false).stdout().split('\n')[0]
-    endif
+    # trim off the leading 'install: '
+    cc_install_dir = _line.substring(9)
   endif
 endforeach
 
@@ -166,7 +162,7 @@ tests_enable_posix_io = get_option('tests-enable-posix-io')
 
 # C++ is only used in tests, so only check for it when tests are enabled
 if enable_tests
-  have_cplusplus = add_languages('cpp', required: false)
+  have_cplusplus = add_languages('cpp', required: false, native: false)
   if have_cplusplus
     cpp = meson.get_compiler('cpp')
   endif
@@ -322,8 +318,8 @@ foreach start : ['start', '_start', '__start', '___start']
   endif
 endforeach
 
-has_link_defsym = meson.get_cross_property('has_link_defsym', has_link_defsym)
-has_link_alias = meson.get_cross_property('has_link_alias', has_link_alias)
+has_link_defsym = meson.get_external_property('has_link_defsym', has_link_defsym)
+has_link_alias = meson.get_external_property('has_link_alias', has_link_alias)
 
 # If an empty linker command line doesn't work, then pass the alias
 # argument computed above when performing compiler tests involving
@@ -341,7 +337,7 @@ endif
 
 # Find the compiler support library
 
-runtime_lib = [meson.get_cross_property('librt', meson.get_cross_property('libgcc', false))]
+runtime_lib = [meson.get_external_property('librt', meson.get_external_property('libgcc', false))]
 
 if runtime_lib == [false]
   runtime_lib = []
@@ -373,7 +369,7 @@ foreach ld : test_link_args_extra
   endif
 endforeach
 
-stack_symbol = meson.get_cross_property('stack_symbol', '__stack')
+stack_symbol = meson.get_external_property('stack_symbol', '__stack')
 
 # stdio options
 posix_console = get_option('posix-console')
@@ -381,11 +377,7 @@ io_float_exact = get_option('io-float-exact')
 atomic_ungetc = get_option('atomic-ungetc')
 _line = get_option('format-default')
 # Pick off just the leading character
-if meson.version().version_compare('>=0.56')
-  format_default = _line.substring(0, 1)
-else
-  format_default = run_command(['expr', 'substr', _line, '1', '1'], check : false).stdout().split('\n')[0]
-endif
+format_default = _line.substring(0, 1)
 
 printf_aliases = get_option('printf-aliases')
 io_percent_b = get_option('io-percent-b')
@@ -554,7 +546,7 @@ else
 endif
 
 # Let targets add more support libraries 
-additional_libs_list = meson.get_cross_property('additional_libs', [])
+additional_libs_list = meson.get_external_property('additional_libs', [])
 
 compiler_id = cc.get_id()
 if compiler_id == 'ccomp'
@@ -573,7 +565,7 @@ if compiler_id == 'gcc' and target_machine.cpu_family() == 'msp430'
 endif
 
 specs_extra = ''
-specs_extra_list = meson.get_cross_property('specs_extra', [])
+specs_extra_list = meson.get_external_property('specs_extra', [])
 if specs_extra_list != []
   specs_extra = '\n' + '\n'.join(specs_extra_list)
 endif
@@ -740,9 +732,9 @@ specs_data.set('SPECS_LIBPATH', specs_libpath)
 specs_data.set('SPECS_STARTFILE', specs_startfile)
 specs_data.set('TLSMODEL', tls_model_spec)
 specs_data.set('STACKGUARD', stack_guard_spec)
-specs_data.set('LINK_SPEC', meson.get_cross_property('link_spec', ''))
-specs_data.set('CC1_SPEC', meson.get_cross_property('cc1_spec', ''))
-specs_data.set('CC1PLUS_SPEC', meson.get_cross_property('cc1plus_spec', ''))
+specs_data.set('LINK_SPEC', meson.get_external_property('link_spec', ''))
+specs_data.set('CC1_SPEC', meson.get_external_property('cc1_spec', ''))
+specs_data.set('CC1PLUS_SPEC', meson.get_external_property('cc1plus_spec', ''))
 specs_data.set('ADDITIONAL_LIBS', additional_libs)
 specs_data.set('SPECS_EXTRA', specs_extra)
 specs_data.set('SPECS_PRINTF', specs_printf)
@@ -949,7 +941,7 @@ if enable_multilib
       endif
 
       # Add any extra flags for this target from the cross file
-      flags += meson.get_cross_property('c_args_' + name.strip('_'), [])
+      flags += meson.get_external_property('c_args_' + name.strip('_'), [])
 
       targets += {
                   'name': name,
@@ -1013,15 +1005,15 @@ foreach params : [default_target] + targets
     foreach part : target.split('_')
       if part != ''
         target_part += '_' + part
-        custom_mem_config = meson.get_cross_property('custom_mem_config' + target_part, custom_mem_config)
+        custom_mem_config = meson.get_external_property('custom_mem_config' + target_part, custom_mem_config)
       endif
     endforeach
 
     target_head = target_dir.split('_')[0].underscorify()
-    custom_mem_config = meson.get_cross_property('custom_mem_config_' + target_head, custom_mem_config)
+    custom_mem_config = meson.get_external_property('custom_mem_config_' + target_head, custom_mem_config)
   endif
 
-  custom_mem_config = meson.get_cross_property('custom_mem_config' + target, custom_mem_config)
+  custom_mem_config = meson.get_external_property('custom_mem_config' + target, custom_mem_config)
 
   if target == 'default-target' or custom_mem_config != ''
 
@@ -1125,17 +1117,17 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('STACK', stack_symbol)
 
     picolibc_ld_data.set('EXTRA_TEXT_SECTIONS',
-                                  meson.get_cross_property('extra_text_sections', ''))
+                                  meson.get_external_property('extra_text_sections', ''))
     picolibc_ld_data.set('EXTRA_RODATA_SECTIONS',
-                                  meson.get_cross_property('extra_rodata_sections', ''))
+                                  meson.get_external_property('extra_rodata_sections', ''))
     picolibc_ld_data.set('EXTRA_DATA_SECTIONS',
-                                  meson.get_cross_property('extra_data_sections', ''))
+                                  meson.get_external_property('extra_data_sections', ''))
     picolibc_ld_data.set('EXTRA_SDATA_SECTIONS',
-                                  meson.get_cross_property('extra_sdata_sections', ''))
+                                  meson.get_external_property('extra_sdata_sections', ''))
     picolibc_ld_data.set('EXTRA_BSS_SECTIONS',
-                                  meson.get_cross_property('extra_bss_sections', ''))
+                                  meson.get_external_property('extra_bss_sections', ''))
     picolibc_ld_data.set('EXTRA_SBSS_SECTIONS',
-                                  meson.get_cross_property('extra_sbss_sections', ''))
+                                  meson.get_external_property('extra_sbss_sections', ''))
 
     # We need to use different alignment flags for .tdata/.tbss for ld.bfd
     # (ALIGN_WITH_INPUT, which is not supported by ld.lld) and ld.lld
@@ -1181,16 +1173,16 @@ foreach params : [default_target] + targets
     fallback_stack_size = '0x00001000'
     fallback_alignment = '8'
 
-    if meson.get_cross_property('separate_boot_flash_' + custom_mem_config,
-                                meson.get_cross_property('separate_boot_flash', false))
-      boot_flash_addr = meson.get_cross_property(
+    if meson.get_external_property('separate_boot_flash_' + custom_mem_config,
+                                meson.get_external_property('separate_boot_flash', false))
+      boot_flash_addr = meson.get_external_property(
         'default_boot_flash_addr_' + custom_mem_config,
-        meson.get_cross_property(
+        meson.get_external_property(
           'default_boot_flash_addr',
           '0x10000000'))
-      boot_flash_size = meson.get_cross_property(
+      boot_flash_size = meson.get_external_property(
         'default_boot_flash_size_' + custom_mem_config,
-        meson.get_cross_property(
+        meson.get_external_property(
           'default_boot_flash_size',
           '0x00000400'))
       additional_sections = [
@@ -1203,12 +1195,12 @@ foreach params : [default_target] + targets
       fallback_flash_addr = '0x10000400'
       fallback_flash_size = '0x0000fc00'
     else
-      additional_section_names = meson.get_cross_property('additional_sections_' + custom_mem_config,
-                                                     meson.get_cross_property('additional_sections', []))
+      additional_section_names = meson.get_external_property('additional_sections_' + custom_mem_config,
+                                                     meson.get_external_property('additional_sections', []))
       if additional_section_names != []
         foreach section_name : additional_section_names
           default_content_list =  ['*.(.' + section_name + ')', '*.(.' + section_name + '.*)']
-          content_list = meson.get_cross_property('default_' + section_name + '_contents', default_content_list)
+          content_list = meson.get_external_property('default_' + section_name + '_contents', default_content_list)
           contents = ''
           foreach content : content_list
             contents += '''
@@ -1217,8 +1209,8 @@ foreach params : [default_target] + targets
           additional_sections += [
             {
               'name' : section_name,
-              'addr' : meson.get_cross_property('default_' + section_name + '_addr'),
-              'size' : meson.get_cross_property('default_' + section_name + '_size'),
+              'addr' : meson.get_external_property('default_' + section_name + '_addr'),
+              'size' : meson.get_external_property('default_' + section_name + '_size'),
               'contents' : init_section_template.format(section_name, contents, section_name, 'text_' + section_name)
             }]
         endforeach
@@ -1238,7 +1230,7 @@ foreach params : [default_target] + targets
       endforeach
     else
       # Default init sections map to flash in the primary script; no option gating
-      init_section_name = meson.get_cross_property('init_section_name', 'init')
+      init_section_name = meson.get_external_property('init_section_name', 'init')
       init_sections = default_init_section_template.format(init_section_name, 'flash', 'text')
     endif
 
@@ -1248,56 +1240,56 @@ foreach params : [default_target] + targets
 
     # Get default memory configuration values
 
-    _default_flash_addr =  meson.get_cross_property('default_flash_addr_' + custom_mem_config,
-                                                    meson.get_cross_property(
+    _default_flash_addr =  meson.get_external_property('default_flash_addr_' + custom_mem_config,
+                                                    meson.get_external_property(
                                                       'default_flash_addr',
                                                       fallback_flash_addr))
 
-    _default_flash_size =  meson.get_cross_property('default_flash_size_' + custom_mem_config,
-                                                    meson.get_cross_property(
+    _default_flash_size =  meson.get_external_property('default_flash_size_' + custom_mem_config,
+                                                    meson.get_external_property(
                                                       'default_flash_size',
                                                       fallback_flash_size))
 
-    _default_ram_addr =  meson.get_cross_property('default_ram_addr_' + custom_mem_config,
-                                                  meson.get_cross_property(
+    _default_ram_addr =  meson.get_external_property('default_ram_addr_' + custom_mem_config,
+                                                  meson.get_external_property(
                                                     'default_ram_addr',
                                                     fallback_ram_addr))
 
-    _default_ram_size =  meson.get_cross_property('default_ram_size_' + custom_mem_config,
-                                                  meson.get_cross_property(
+    _default_ram_size =  meson.get_external_property('default_ram_size_' + custom_mem_config,
+                                                  meson.get_external_property(
                                                     'default_ram_size', fallback_ram_size))
 
-    _default_stack_size = meson.get_cross_property('default_stack_size_' + custom_mem_config,
-                                                   meson.get_cross_property(
+    _default_stack_size = meson.get_external_property('default_stack_size_' + custom_mem_config,
+                                                   meson.get_external_property(
                                                      'default_stack_size', fallback_stack_size))
 
-    _default_alignment = meson.get_cross_property('default_alignment_' + custom_mem_config,
-                                                  meson.get_cross_property(
+    _default_alignment = meson.get_external_property('default_alignment_' + custom_mem_config,
+                                                  meson.get_external_property(
                                                     'default_alignment', fallback_alignment))
 
-    _default_noflash_flash_addr = meson.get_cross_property(
+    _default_noflash_flash_addr = meson.get_external_property(
       'default_noflash_flash_addr_' + custom_mem_config,
-      meson.get_cross_property('default_noflash_flash_addr', _default_flash_addr))
+      meson.get_external_property('default_noflash_flash_addr', _default_flash_addr))
 
-    _default_noflash_flash_size = meson.get_cross_property(
+    _default_noflash_flash_size = meson.get_external_property(
       'default_noflash_flash_size_' + custom_mem_config,
-      meson.get_cross_property('default_noflash_flash_size', _default_flash_size))
+      meson.get_external_property('default_noflash_flash_size', _default_flash_size))
 
-    _default_noflash_ram_addr = meson.get_cross_property(
+    _default_noflash_ram_addr = meson.get_external_property(
       'default_noflash_ram_addr_' + custom_mem_config,
-      meson.get_cross_property('default_noflash_ram_addr', _default_ram_addr))
+      meson.get_external_property('default_noflash_ram_addr', _default_ram_addr))
 
-    _default_noflash_ram_size = meson.get_cross_property(
+    _default_noflash_ram_size = meson.get_external_property(
       'default_noflash_ram_size_' + custom_mem_config,
-      meson.get_cross_property('default_noflash_ram_size', _default_ram_size))
+      meson.get_external_property('default_noflash_ram_size', _default_ram_size))
 
-    _default_noflash_stack_size = meson.get_cross_property(
+    _default_noflash_stack_size = meson.get_external_property(
       'default_noflash_stack_size_' + custom_mem_config,
-      meson.get_cross_property('default_noflash_stack_size', _default_stack_size))
+      meson.get_external_property('default_noflash_stack_size', _default_stack_size))
 
-    _default_noflash_alignment = meson.get_cross_property(
+    _default_noflash_alignment = meson.get_external_property(
       'default_noflash_alignment_' + custom_mem_config,
-      meson.get_cross_property('default_noflash_alignment', _default_alignment))
+      meson.get_external_property('default_noflash_alignment', _default_alignment))
 
     picolibc_ld_data.set('DEFAULT_FLASH_ADDR', _default_flash_addr)
     picolibc_ld_data.set('DEFAULT_FLASH_SIZE', _default_flash_size)

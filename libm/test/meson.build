@@ -146,7 +146,7 @@ endif
 
 #  'dcvt.c',
 
-skip_math_test = meson.get_cross_property('skip_math_test', [])
+skip_math_test = meson.get_external_property('skip_math_test', [])
 
 foreach params : targets
   target = params['name']

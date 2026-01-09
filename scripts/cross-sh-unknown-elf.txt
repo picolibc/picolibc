@@ -9,8 +9,8 @@ exe_wrapper = ['env', 'run-sh']
 
 [host_machine]
 system = 'none'
-cpu_family = 'env'
-cpu = 'env'
+cpu_family = 'sh'
+cpu = 'sh'
 endian = 'little'
 
 [properties]
