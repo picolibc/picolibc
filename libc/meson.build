@@ -80,11 +80,13 @@ foreach params : targets
 
   set_variable('src_cpart_' + target, libsrcs_target)
 
-  local_lib_cpart_target = static_library('cpart' + target,
-				          pic: false,
-				          objects : libobjs,
-					  include_directories: inc,
-					  c_args: target_c_args + c_args)
+  if libobjs != []
+    local_lib_cpart_target = static_library('cpart' + target,
+				            pic: false,
+				            objects : libobjs,
+					    include_directories: inc,
+					    c_args: target_c_args + c_args)
 
-  set_variable('lib_cpart' + target, local_lib_cpart_target)
+    set_variable('lib_cpart' + target, local_lib_cpart_target)
+  endif
 endforeach
