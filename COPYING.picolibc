@@ -829,6 +829,7 @@ Files: cmake/TC-rx.ld
  semihost/machine/rx/rx_iob.c
  semihost/machine/rx/rx_semihost.h
  semihost/machine/sh/sh_syscall.c
+ test/test-ctype/test-wcase.c
  test/test-getdate.c
  test/test-hello.c
  test/test-iconv/meson.build
@@ -999,7 +1000,6 @@ Files: cmake/TC-rx.ld
  test/test-string/test-memchr.c
  test/test-string/test-memmem.c
  test/test-time.c
- test/test-wcase.c
  test/test-wctomb.c
 Copyright: 2025 Keith Packard
 License: BSD3-1
@@ -1175,21 +1175,27 @@ Files: empty-libs/empty.c
  test/rounding-mode-sub.c
  test/rounding-mode.c
  test/rounding-mode.h
- test/test-memchr.c
- test/test-memset.c
  test/test-stdio/test-put.c
- test/test-strchr.c
+ test/test-string/test-memchr-simple.c
+ test/test-string/test-memset.c
+ test/test-string/test-strchr.c
  test/timegm.c
  test/timegm.h
 Copyright: 2021 Keith Packard
 License: BSD3-1
 
 Files: empty-libs/meson.build
+ libc/ctype/ctype_class.h
  libc/machine/arc64/tls.c
  libc/machine/arc64/vector_table.c
  libc/machine/loongarch/CMakeLists.txt
  libc/machine/loongarch/machine/CMakeLists.txt
  libc/machine/msp430/CMakeLists.txt
+ test/test-ctype/CMakeLists.txt
+ test/test-ctype/meson.build
+ test/test-ctype/test-iswctype.c
+ test/test-stdio/test-fdevopen.c
+ test/test-string/CMakeLists.txt
 Copyright: 2026 Keith Packard
 License: BSD3-1
 
@@ -1277,6 +1283,7 @@ Files: hello-world/Makefile
  picocrt/meson.build
  picocrt/shared/crt0.c
  scripts/do-aarch64-configure
+ scripts/do-aarch64-none-elf-configure
  scripts/do-aarch64-zephyr-configure
  scripts/do-aarch64-zephyr-elf-configure
  scripts/do-arc-configure
@@ -1397,6 +1404,7 @@ Files: libc/ctype/ctype_extended.h
  libc/ctype/ctype_table.c
  libc/ctype/ctype_table.h
  libc/ctype/mkctype.py
+ libc/ctype/mkctype_class.py
  libc/include/stdnoreturn.h
  libc/include/sys/_initfini.h
  libc/include/uchar.h
@@ -1454,12 +1462,12 @@ Files: libc/ctype/ctype_extended.h
  semihost/machine/xtensa/xtensa-unlink.c
  semihost/machine/xtensa/xtensa-write.c
  test/test-cplusplus.cpp
- test/test-ctype.c
- test/test-encode.c
+ test/test-ctype/test-ctype.c
+ test/test-ctype/test-encode.c
+ test/test-ctype/test-wctype.c
  test/test-stdio/test-flockfile.c
  test/test-stdio/test-funopen.c
  test/test-uchar.c
- test/test-wctype.c
 Copyright: 2024 Keith Packard
 License: BSD3-1
 
@@ -1573,21 +1581,21 @@ Files: libc/stdio/sprintf_s.c
  libc/string/strncat_s.c
  libc/string/strncpy_s.c
  libc/string/strnlen_s.c
- test/test-memcpy_s.c
- test/test-memmove_s.c
- test/test-memset_s.c
  test/test-stdio/test-fgetc.c
  test/test-stdio/test-fgets-eof.c
  test/test-stdio/test-sprintf-s.c
  test/test-stdio/test-vfprintf-s.c
  test/test-stdio/test-vsnprintf-s.c
- test/test-strcat_s.c
- test/test-strcpy_s.c
- test/test-strerror_s.c
- test/test-strerrorlen_s.c
- test/test-strncat_s.c
- test/test-strncpy_s.c
- test/test-strnlen_s.c
+ test/test-string/test-memcpy_s.c
+ test/test-string/test-memmove_s.c
+ test/test-string/test-memset_s.c
+ test/test-string/test-strcat_s.c
+ test/test-string/test-strcpy_s.c
+ test/test-string/test-strerror_s.c
+ test/test-string/test-strerrorlen_s.c
+ test/test-string/test-strncat_s.c
+ test/test-string/test-strncpy_s.c
+ test/test-string/test-strnlen_s.c
 Copyright: 2024, Synopsys Inc.
 License: BSD3-1
 
@@ -1709,7 +1717,7 @@ Files: test/test-stdio/test-ungetc-ftell.c
 Copyright: 2024 Hana Ashour
 License: BSD3-1
 
-Files: test/test-strncpy.c
+Files: test/test-string/test-strncpy.c
 Copyright: 2025 Fredrik Gihl
 License: BSD3-1
 
@@ -1718,6 +1726,7 @@ Copyright: 2021 R. Diez
 License: BSD3-1
 
 Files: libc/ctype/ctype_.c
+ libc/ctype/ctype_class.c
  libc/ctype/ctype_wide.c
  libc/ctype/isalnum.c
  libc/ctype/isalpha.c
@@ -3098,6 +3107,7 @@ Files: .clang-format
  libc/machine/hexagon/longjmp.S
  libc/machine/hexagon/meson.build
  libc/machine/hexagon/setjmp.S
+ libc/machine/hexagon/tls.c
  libc/machine/necv70/necv70.tex
  libc/machine/nvptx/clock.c
  libc/machine/riscv/xlenint.h
@@ -3122,6 +3132,7 @@ Files: .clang-format
  picolibc.specs.in
  scripts/checkpatch
  scripts/cross-aarch64-linux-gnu.txt
+ scripts/cross-aarch64-none-elf.txt
  scripts/cross-aarch64-zephyr-elf.txt
  scripts/cross-arc-zephyr-elf.txt
  scripts/cross-arc64-zephyr-elf.txt
