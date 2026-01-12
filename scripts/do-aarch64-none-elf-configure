@@ -33,9 +33,4 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure aarch64-none-elf \
-     --buildtype=release \
-     -Ddebug=true \
-     -Dsystem-libc=true \
-     --prefix=/opt/picolibc \
-     -Dtests=true "$@"
+exec "$(dirname "$0")"/do-configure aarch64-none-elf -Dtests=true "$@"
