@@ -190,7 +190,7 @@ use Picolibc:
 
 ## Releases
 
-### Picolibc release 1.8.next
+### Picolibc release 1.8.11
 
  * Use __math_inexact to generate FE_INEXACT in several math
    functions. Thanks to Gergely Futo.

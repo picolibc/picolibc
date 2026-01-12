@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.61',
-	version: '1.8.10'
+	version: '1.8.11'
        )
 
 # When picolibc is embedded as a subproject you probably don't expect
