@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,13 +35,14 @@
 
 #include "stdio_private.h"
 
-int
-fflush(FILE *stream)
+#if defined(__ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
+
+void
+__picolibc_non_atomic_store_ungetc(__ungetc_t *p, __ungetc_t v)
 {
-    int ret = 0;
-    __flockfile(stream);
-    if (stream->flush)
-        ret = (stream->flush)(stream);
-    __atomic_store_ungetc(&stream->unget, 0);
-    __funlock_return(stream, ret);
+    __non_atomic_store_ungetc(p, v);
 }
+
+__weak_reference(__picolibc_non_atomic_store_ungetc, __atomic_store_ungetc);
+
+#endif

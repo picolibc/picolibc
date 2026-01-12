@@ -729,6 +729,12 @@ __non_atomic_load_ungetc(const volatile __ungetc_t *p)
     return *p;
 }
 
+static inline void
+__non_atomic_store_ungetc(__ungetc_t *p, __ungetc_t v)
+{
+    *p = v;
+}
+
 #if defined(__LONG_DOUBLE_128__) && defined(__strong_reference)
 #if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
@@ -772,6 +778,14 @@ __atomic_load_ungetc(const volatile __ungetc_t *p)
     _Atomic __ungetc_t *pa = (_Atomic __ungetc_t *)p;
     return atomic_load(pa);
 }
+
+static inline void
+__atomic_store_ungetc(__ungetc_t *p, __ungetc_t v)
+{
+    _Atomic __ungetc_t *pa = (_Atomic __ungetc_t *)p;
+    atomic_store(pa, v);
+}
+
 #else
 
 bool       __atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
@@ -780,11 +794,15 @@ __ungetc_t __atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
 __ungetc_t __atomic_load_ungetc(const volatile __ungetc_t *p);
 
+void       __atomic_store_ungetc(__ungetc_t *p, __ungetc_t v);
+
 __ungetc_t __picolibc_non_atomic_load_ungetc(const volatile __ungetc_t *p);
 
 __ungetc_t __picolibc_non_atomic_exchange_ungetc(__ungetc_t *p, __ungetc_t v);
 
 bool       __picolibc_non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc_t d, __ungetc_t v);
+
+void       __picolibc_non_atomic_store_ungetc(__ungetc_t *p, __ungetc_t v);
 
 #endif /* PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP */
 
@@ -795,6 +813,8 @@ bool       __picolibc_non_atomic_compare_exchange_ungetc(__ungetc_t *p, __ungetc
 #define __atomic_exchange_ungetc(p, v)            __non_atomic_exchange_ungetc(p, v)
 
 #define __atomic_load_ungetc(p)                   (*(p))
+
+#define __atomic_store_ungetc(p, v)               (*(p) = (v))
 
 #endif /* __ATOMIC_UNGETC */
 

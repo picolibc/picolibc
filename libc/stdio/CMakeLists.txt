@@ -37,6 +37,7 @@ picolibc_sources(
   asprintf.c
   atold_engine.c
   atomic_load.c
+  atomic_store.c
   bufio.c
   clearerr.c
   compare_exchange.c

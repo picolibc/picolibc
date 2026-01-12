@@ -36,6 +36,7 @@ srcs_stdio = [
   'asnprintf.c',
   'asprintf.c',
   'atomic_load.c',
+  'atomic_store.c',
   'atold_engine.c',
   'bufio.c',
   'clearerr.c',
