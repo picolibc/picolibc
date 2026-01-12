@@ -54,15 +54,20 @@ freopen(const char *pathname, const char *mode, FILE *stream)
     if (stdio_flags == 0)
         goto exit;
 
-    fd = open(pathname, open_flags, 0666);
-    if (fd < 0)
-        goto exit;
+    if (pathname != NULL) {
+        fd = open(pathname, open_flags, 0666);
+        if (fd < 0)
+            goto exit;
+    } else
+        fd = (int)(intptr_t)(pf->ptr);
 
     fflush(stream);
 
     __bufio_lock(stream);
-    close((int)(intptr_t)(pf->ptr));
-    (void)__atomic_exchange_ungetc(&stream->unget, 0);
+
+    if (pathname != NULL)
+        close((int)(intptr_t)(pf->ptr));
+
     stream->flags = (stream->flags & ~(__SRD | __SWR | __SERR | __SEOF)) | stdio_flags;
     pf->pos = 0;
     pf->ptr = (void *)(intptr_t)(fd);
