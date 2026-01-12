@@ -1191,10 +1191,12 @@ Files: empty-libs/meson.build
  libc/machine/loongarch/CMakeLists.txt
  libc/machine/loongarch/machine/CMakeLists.txt
  libc/machine/msp430/CMakeLists.txt
+ libc/stdio/atomic_store.c
  test/test-ctype/CMakeLists.txt
  test/test-ctype/meson.build
  test/test-ctype/test-iswctype.c
  test/test-stdio/test-fdevopen.c
+ test/test-stdio/test-freopen.c
  test/test-string/CMakeLists.txt
 Copyright: 2026 Keith Packard
 License: BSD3-1
