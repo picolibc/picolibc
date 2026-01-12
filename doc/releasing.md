@@ -44,7 +44,7 @@ picolibc:
 
  6. Add release notes to README.md
  
- 7. Update meson.build and CMakeLists.txt with new version number
+ 7. Update meson.build, CMakeLists.txt and README.md with new version number
 
  8. Commit release notes and meson.build
 
