@@ -43,6 +43,7 @@ freopen(const char *pathname, const char *mode, FILE *stream)
     int                  fd;
     int                  stdio_flags;
     int                  open_flags;
+    int                  buf_size;
 
     __flockfile(stream);
     /* Can't reopen FILEs which aren't buffered */
@@ -71,6 +72,11 @@ freopen(const char *pathname, const char *mode, FILE *stream)
     pf->write_int = write;
     pf->lseek_int = lseek;
     pf->close_int = close;
+
+    /* Reset buffer mode and size */
+    buf_size = bufio_get_buf_size(fd);
+    if (buf_size != pf->size || (pf->bflags & __BLBF))
+        pf->xfile.setvbuf(stream, NULL, _IOFBF, buf_size);
 
     ret = stream;
     __bufio_unlock(stream);
