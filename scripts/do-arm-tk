@@ -1,55 +1,93 @@
 #!/bin/bash
 PICOLIBC=$(realpath $(dirname "$0")/..)
-case "$ARM_TK" in
-    "")
-	echo "Need to set ARM_TK before running $0"
+case "$ARM_TK":"$AARCH64_TK" in
+    ?*:?*)
+	;;
+    *)
+	echo "Need to set ARM_TK and AARCH64_TK before running $0"
 	exit 1
 	;;
 esac
-README="$ARM_TK/share/doc/arm-none-eabi/readme.txt"
-if [ ! -f  "$README" ]; then
+README_ARM="$ARM_TK/share/doc/arm-none-eabi/readme.txt"
+README_AARCH64="$AARCH64_TK/share/doc/aarch64-none-elf/readme.txt"
+if [ ! -f  "$README_ARM" ]; then
     echo "ARM_TK '$ARM_TK' doesn't appear valid?"
     exit 1
 fi
-TK_VERSION=$(head -n 1 "$README" | awk '{ print $NF; }')
+if [ ! -f  "$README_AARCH64" ]; then
+    echo "AARCH64_TK '$AARCH64_TK' doesn't appear valid?"
+    exit 1
+fi
+TK_VERSION_ARM=$(head -n 1 "$README_ARM" | awk '{ print $NF; }')
+TK_VERSION_AARCH64=$(head -n 1 "$README_AARCH64" | awk '{ print $NF; }')
 PICOLIBC_VERSION=$(cd "$PICOLIBC" && git describe)
-echo Toolkit "$ARM_TK"
-echo Toolkit version "$TK_VERSION"
+echo Arm Toolkit "$TK_VERSION_ARM"
+echo Aarch64 Toolkit "$TK_VERSION_AARCH64"
 echo Picolibc "$PICOLIBC"
 echo Picolibc version "$PICOLIBC_VERSION"
 
-case "$TK_VERSION" in
+case "$TK_VERSION_ARM" in
     [12]*)
 	;;
     *)
-	echo "Toolkit version '$TK_VERSION' doesn't appear valid?"
+	echo "Arm Toolkit version '$TK_VERSION_ARM' doesn't appear valid?"
 	exit 1
 	;;
 esac
 
-export PATH=$ARM_TK/bin:$PATH
+case "$TK_VERSION_AARCH64" in
+    [12]*)
+	;;
+    *)
+	echo "Aarch64 Toolkit version '$TK_VERSION_AARCH64' doesn't appear valid?"
+	exit 1
+	;;
+esac
 
-MINSIZE_DIR="$PICOLIBC"/builds/build-arm-tk-minsize
-RELEASE_DIR="$PICOLIBC"/builds/build-arm-tk-release
+export PATH=$ARM_TK/bin:$AARCH64_TK/bin:$PATH
+
+MINSIZE_DIR_ARM="$PICOLIBC"/builds/build-arm-tk-minsize
+RELEASE_DIR_ARM="$PICOLIBC"/builds/build-arm-tk-release
+MINSIZE_DIR_AARCH64="$PICOLIBC"/builds/build-aarch64-tk-minsize
+RELEASE_DIR_AARCH64="$PICOLIBC"/builds/build-aarch64-tk-release
 export DESTDIR="$PICOLIBC"/builds/dist
 
-rm -r "$MINSIZE_DIR"
-rm -r "$RELEASE_DIR"
+rm -r "$MINSIZE_DIR_ARM"
+rm -r "$RELEASE_DIR_ARM"
+rm -r "$MINSIZE_DIR_AARCH64"
+rm -r "$RELEASE_DIR_AARCH64"
 rm -r "$DESTDIR"/"$ARM_TK"
+rm -r "$DESTDIR"/"$AARCH64_TK"
 
-mkdir -p "$MINSIZE_DIR" "$RELEASE_DIR" "$DESTDIR"
+mkdir -p "$MINSIZE_DIR_ARM" "$RELEASE_DIR_ARM" "$MINSIZE_DIR_AARCH64" "$RELEASE_DIR_AARCH64" "$DESTDIR"
 
 set -e
 
 
 #build_options=-Dmultilib-exclude=pacbti
-build_options=
+build_options=-Ddebug=true
+
+echo '###################################'
+echo '####' ../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true --buildtype=minsize $build_options
+echo '###################################'
+
+cd "$MINSIZE_DIR_AARCH64"
+../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true --buildtype=minsize $build_options
+ninja test install
+
+echo '###################################'
+echo '####' ../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
+echo '###################################'
+
+cd "$RELEASE_DIR_AARCH64"
+../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
+ninja test install
 
 echo '###################################'
 echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize $build_options
 echo '###################################'
 
-cd "$MINSIZE_DIR"
+cd "$MINSIZE_DIR_ARM"
 ../../scripts/do-arm-configure -Dsysroot-install=true --buildtype=minsize $build_options
 ninja test install
 
@@ -57,14 +95,22 @@ echo '###################################'
 echo '####' ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
 echo '###################################'
 
-cd "$RELEASE_DIR"
+cd "$RELEASE_DIR_ARM"
 ../../scripts/do-arm-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
 ninja test install
 
 cd "$DESTDIR"/"$ARM_TK"
 
-ZIP="$DESTDIR"/picolibc-"$PICOLIBC_VERSION"-"$TK_VERSION".zip
+ZIP_ARM="$DESTDIR"/picolibc-arm-none-eabi-"$PICOLIBC_VERSION"-"$TK_VERSION_ARM".zip
 
-rm -f "$ZIP"
+rm -f "$ZIP_ARM"
 
-zip -r "$ZIP" .
+zip -r "$ZIP_ARM" .
+
+cd "$DESTDIR"/"$AARCH64_TK"
+
+ZIP_AARCH64="$DESTDIR"/picolibc-aarch64-none-elf-"$PICOLIBC_VERSION"-"$TK_VERSION_AARCH64".zip
+
+rm -f "$ZIP_AARCH64"
+
+zip -r "$ZIP_AARCH64" .
