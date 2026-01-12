@@ -161,7 +161,7 @@ if enable_native_tests
 
     test(t1_name,
 	 executable(t1_name, t1_src,
-		    c_args: native_c_args + ctype_c_args,
+		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args),
          suite: 'test-ctype',
          env: ['LOCPATH=' + meson.current_build_dir()])
