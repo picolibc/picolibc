@@ -1,7 +1,6 @@
 #!/bin/sh
+HERE=`dirname "$0"`
 TARGET=$1
-DIR=build-"$TARGET"
-CONFIGURE=do-"$TARGET"-configure
 shift
 
 if [ -d /opt/picolibc-ci ]; then
@@ -45,67 +44,4 @@ esac
 
 OPTIONS="$ANALYZER $CDEFS"
 
-(mkdir "$DIR" || exit 1
- cd "$DIR" || exit 2
- echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $OPTIONS "$@"
- echo '##################################################'
- ../scripts/"$CONFIGURE" -Dwerror=true $OPTIONS "$@"
- case $? in
-     0)
-	 echo 'Configuration succeeded'
-	 ;;
-     77)
-	 echo 'Configuration skipped'
-	 exit 0
-	 ;;
-     *)
-	 exit 3
-	 ;;
- esac
- ninja --quiet || exit 4
- meson test -t 20 || exit 5)
-case $? in
-    0)
-	rm -rf "$DIR"
-	;;
-    1)
-	echo '##################################'
-	echo '############# mkdir' "$DIR" 'failed'
-	echo '##################################'
-	exit 1
-	;;
-    2)
-	echo '##################################'
-	echo '############# cd' "$DIR" 'failed'
-	echo '##################################'
-	exit 1
-	;;
-    3)
-	echo '##################################'
-	echo '############# Configuration failed'
-	echo '##################################'
-	cat "$DIR"/meson-logs/meson-log.txt
-	exit 1
-	;;
-    4)
-	echo '##################################'
-	echo '############# Build failed'
-	echo '##################################'
-	exit 1
-	;;
-    5)
-	echo '##################################'
-	echo '############# Test failed'
-	echo '##################################'
-	cat "$DIR"/meson-logs/testlog.txt
-	exit 1
-	;;
-    *)
-	echo '##################################'
-	echo '############# Unknown failure' "$?"
-	echo '##################################'
-	cat "$DIR"/meson-logs/*
-	exit 1
-	;;
-esac
+"$HERE"/do-run "$TARGET" $OPTIONS "$@"
