@@ -1,3 +1,16 @@
+picolibc (1.8.11-1) unstable; urgency=medium
+
+  * New upstream
+
+  * Build only 'release' versions, expect toolchains to provide
+    -Os/-O2 multilib if desired.
+
+  * Install as default C library now
+
+  * Build for aarch64-none-elf instead of aarch64-linux-gnu.
+
+ -- Keith Packard <keithp@keithp.com>  Mon, 12 Jan 2026 11:35:22 -0800
+
 picolibc (1.8.10-3) unstable; urgency=medium
 
   * Support cross builds.
