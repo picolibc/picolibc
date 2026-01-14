@@ -6,7 +6,11 @@ for build in minsize release; do
     for arch in native; do
 	echo "  $build-$arch:"
 	cat variants
-	cat targets-$arch
+        cat <<EOF
+        test: [
+          "./.github/do-native-math",
+        ]
+EOF
 	cat steps-head
 	cat steps-$build
     done

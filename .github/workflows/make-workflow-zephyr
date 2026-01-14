@@ -6,7 +6,11 @@ for build in minsize release; do
     for arch in zephyr; do
 	echo "  $build-$arch:"
 	cat variants
-	cat targets-$arch
+        cat <<EOF
+        test: [
+          "./.github/do-zephyr",
+        ]
+EOF
 	cat steps-head
 	cat steps-$build
     done

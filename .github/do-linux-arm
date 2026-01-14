@@ -1,0 +1,9 @@
+#!/bin/sh
+set -e
+HERE=`dirname "$0"`
+"$HERE"/do-test-noopt arm "$@"
+"$HERE"/do-test clang-arm "$@"
+"$HERE"/do-test aarch64 "$@"
+"$HERE"/do-test cortex-a9 "$@"
+"$HERE"/do-test clang-aarch64 "$@"
+"$HERE"/do-test clang-aarch64-fvp "$@"
