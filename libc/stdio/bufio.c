@@ -258,6 +258,10 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
     int                  ret = -1;
 
     __bufio_lock(f);
+    if (__bufio_flush_locked(f) < 0) {
+        ret = _FDEV_ERR;
+        goto bail;
+    }
     bf->bflags &= ~__BLBF;
     switch (mode) {
     case _IONBF:
