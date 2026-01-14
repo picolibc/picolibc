@@ -80,6 +80,7 @@ if tests_enable_posix_io
     'test-fopen',
     'test-fread-fwrite',
     'test-mktemp',
+    'test-setvbuf',
     'test-tmpnam',
     'test-ungetc-ftell',
     'test-wchar',
