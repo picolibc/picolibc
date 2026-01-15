@@ -7,10 +7,10 @@ shift
 (mkdir "$DIR" || exit 1
  cd "$DIR" || exit 2
  echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true "$@"
+ echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@"
  echo '##################################################'
  date
- ../scripts/"$CONFIGURE" -Dwerror=true "$@" > config.log 2>&1
+ ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@" > config.log 2>&1
  case $? in
      0)
 	 echo 'Configuration succeeded'
