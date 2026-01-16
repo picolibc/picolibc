@@ -36,12 +36,20 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     .global _start
     .type _start, @function
 _start:
-    jump hexagon_start_init
-    .space _start + 0x180 - .
+#ifdef CRT0_SEMIHOST
+    // Setup event vector base
+    r0 = ##.EventVectors
+    EVB = r0
+#endif
+    // Setup stack pointer
+    r0 = ##__stack
+    sp = and (r0, #-16)
+    jump _cstart
+    .size _start, . - _start
 
+#ifdef CRT0_SEMIHOST
     .text
     .p2align 4
-
     .type event_handle_reset, @function
 event_handle_reset:
     r0 = #0
@@ -155,36 +163,4 @@ event_handle_int:
     jump event_handle_int
     jump event_handle_int  /* Event number 47, Interrupt 31 */
     .size .EventVectors, . - .EventVectors
-
-// TODO: Merge this code with reset vector.
-hexagon_start_init:
-    { r0 = #0
-      r1 = #0 }
-    { r3:2 = r1:0
-      r5:4 = r1:0
-      r7:6 = r1:0
-      r9:8 = r1:0 }
-    { r11:10 = r1:0
-      r13:12 = r1:0
-      r15:14 = r1:0
-      r17:16 = r1:0 }
-    { r19:18 = r1:0
-      r21:20 = r1:0
-      r23:22 = r1:0
-      r25:24 = r1:0 }
-    { r27:26 = r1:0
-      r29:28 = r1:0
-      r31:30 = r1:0 }
-    dckill
-    isync
-    ickill
-    isync
-    r0 = ##.EventVectors
-    EVB = r0
-    r0 = ##__stack
-    sp = and (r0, #-16)
-    r0 = #0
-    framekey = r0
-	fp = #0
-    jump hexagon_start_init1
-    .size .hexagon_start_init, . - .hexagon_start_init
+#endif
