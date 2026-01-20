@@ -7,7 +7,7 @@ ARCH=riscv64-unknown-elf
 case "$1" in
     remove)
 	if which $ARCH-gcc > /dev/null; then
-            for source in /usr/lib/picolibc/$ARCH/*.specs; do
+            for source in /usr/lib/$ARCH/*.specs; do
                 base=`basename "$source"`
 	        target=`$ARCH-gcc -print-search-dirs | sed -n '/^install:/s/^install: //p'`/"$base"
 	        if cmp -s "$target" "$source"; then

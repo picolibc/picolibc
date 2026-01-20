@@ -31,18 +31,18 @@ MESON_RISCV_FLAGS = \
 	-Dtests=true \
 	-Dc_args='$(MESON_SHARED_C_ARGS) -msave-restore' \
 	--cross-file scripts/cross-$(RISCV_ARCH).txt \
-	-Dspecsdir=/usr/lib/$(RISCV_ARCH) \
-	-Dincludedir=lib/$(RISCV_ARCH)/include \
-	-Dlibdir=lib/$(RISCV_ARCH)/lib
+	-Dspecsdir=/usr/$(RISCV_ARCH)/lib \
+	-Dincludedir=$(RISCV_ARCH)/include \
+	-Dlibdir=$(RISCV_ARCH)/lib
 
 MESON_ARM_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
 	-Dtests=true \
 	--cross-file scripts/cross-$(ARM_ARCH).txt \
-	-Dspecsdir=/usr/lib/$(ARM_ARCH) \
-	-Dincludedir=lib/$(ARM_ARCH)/include \
-	-Dlibdir=lib/$(ARM_ARCH)/lib
+	-Dspecsdir=/usr/$(ARM_ARCH)/lib \
+	-Dincludedir=$(ARM_ARCH)/include \
+	-Dlibdir=$(ARM_ARCH)/lib
 
 MESON_LX106_FLAGS = \
 	$(MESON_SHARED_FLAGS) \
@@ -57,9 +57,9 @@ MESON_AARCH64_FLAGS = \
 	-Dc_args='$(MESON_SHARED_C_ARGS)' \
 	-Dtests=true \
 	--cross-file scripts/cross-$(AARCH64_ARCH).txt \
-	-Dspecsdir=/usr/lib/$(AARCH64_ARCH) \
-	-Dincludedir=lib/$(AARCH64_ARCH)/include \
-	-Dlibdir=lib/$(AARCH64_ARCH)/lib
+	-Dspecsdir=/usr/$(AARCH64_ARCH)/lib \
+	-Dincludedir=$(AARCH64_ARCH)/include \
+	-Dlibdir=$(AARCH64_ARCH)/lib
 
 override_dh_autoreconf:
 	echo 'no reconf needed'
