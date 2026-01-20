@@ -6,6 +6,6 @@ Test-Command: arm-none-eabi-gcc -fno-stack-protector --specs=picolibc.specs --cr
 Depends: @, gcc-arm-none-eabi
 Architecture: amd64, i386, ppc64el, arm64, s390x
 
-Test-Command: aarch64-linux-gnu-gcc -fno-stack-protector --specs=picolibc.specs --crt0=semihost --oslib=semihost -o /tmp/touch-aarch64 debian/tests/touch.c -Wl,--no-warn-rwx-segments
-Depends: @, gcc-arm-none-eabi
+Test-Command: aarch64-none-elf-gcc -fno-stack-protector --specs=picolibc.specs --crt0=semihost --oslib=semihost -o /tmp/touch-aarch64 debian/tests/touch.c -Wl,--no-warn-rwx-segments
+Depends: @, gcc-aarch64-none-elf
 Architecture: amd64, i386, ppc64el, arm64, s390x

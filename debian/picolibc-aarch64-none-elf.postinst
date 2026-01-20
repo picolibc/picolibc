@@ -2,13 +2,13 @@
 
 set -e
 
-ARCH=aarch64-linux-gnu
+ARCH=aarch64-none-elf
 
 case "$1" in
     configure|triggered)
 	if which $ARCH-gcc > /dev/null; then
 	    target=`$ARCH-gcc -print-search-dirs | sed -n '/^install:/s/^install: //p'`
-            for source in /usr/lib/picolibc/$ARCH/*.specs; do
+            for source in /usr/lib/$ARCH/*.specs; do
 	        if [ -d "$target" -a -f "$source" ]; then
 		    cp -a "$source" "$target" || true
 	        fi

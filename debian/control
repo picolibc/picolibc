@@ -2,7 +2,7 @@ Source: picolibc
 Priority: optional
 Maintainer: Keith Packard <keithp@keithp.com>
 Build-Depends: debhelper-compat (= 13), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, gcc-xtensa-lx106,
- gcc-aarch64-linux-gnu, meson, ninja-build, qemu-system-arm, qemu-system-misc
+ gcc-aarch64-none-elf, meson, ninja-build, qemu-system-arm, qemu-system-misc
 Standards-Version: 4.7.0
 Rules-Requires-Root: no
 Section: devel
@@ -37,10 +37,10 @@ Description: Smaller embedded C library for ESP8266 development
  for small-RAM embedded systems. This package has binaries for
  ESP8266 processors.
 
-Package: picolibc-aarch64-linux-gnu
+Package: picolibc-aarch64-none-elf
 Architecture: all
 Multi-Arch: foreign
-Depends: ${misc:Depends}, gcc-aarch64-linux-gnu
+Depends: ${misc:Depends}, gcc-aarch64-none-elf
 Description: Smaller embedded C library for 64-bit ARM development
  PicoLibc is a combination of Newlib and AVR libc bits designed
  for small-RAM embedded systems. This package has binaries for
