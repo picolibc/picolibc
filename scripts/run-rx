@@ -85,4 +85,4 @@ cpu=rx62n
   -mon chardev=con,mode=readline \
   -net none \
   -nographic \
-  -device loader,file="$elf"
+  -device loader,file="$elf" "$@"
