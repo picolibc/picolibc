@@ -68,10 +68,10 @@ override_dh_auto_clean:
 	rm -fr debian/$(BUILDDIR)
 
 override_dh_auto_configure:
-	meson . debian/$(BUILDDIR)/$(AARCH64_ARCH) $(MESON_AARCH64_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
-	meson . debian/$(BUILDDIR)/$(ARM_ARCH) $(MESON_ARM_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
-	meson . debian/$(BUILDDIR)/$(LX106_ARCH) $(MESON_LX106_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
-	meson . debian/$(BUILDDIR)/$(RISCV_ARCH) $(MESON_RISCV_FLAGS) 2>&1 | grep -v 'path separator\|This is not supported\|a hard error in the future'
+	meson setup . debian/$(BUILDDIR)/$(AARCH64_ARCH) $(MESON_AARCH64_FLAGS)
+	meson setup . debian/$(BUILDDIR)/$(ARM_ARCH) $(MESON_ARM_FLAGS)
+	meson setup . debian/$(BUILDDIR)/$(LX106_ARCH) $(MESON_LX106_FLAGS)
+	meson setup . debian/$(BUILDDIR)/$(RISCV_ARCH) $(MESON_RISCV_FLAGS)
 
 override_dh_auto_build:
 	cd debian/$(BUILDDIR)/$(AARCH64_ARCH) && ninja -v
