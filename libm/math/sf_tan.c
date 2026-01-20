@@ -19,7 +19,8 @@ float
 tanf(float x)
 {
     float     y[2], z = 0.0;
-    __int32_t n, ix;
+    __int32_t ix;
+    int       n;
 
     GET_FLOAT_WORD(ix, x);
 

@@ -38,7 +38,6 @@ srcs_math = [
     'k_sin.c',
     'k_tan.c',
     'kf_cos.c',
-    'kf_rem_pio2.c',
     'kf_sin.c',
     'kf_tan.c',
     's_acos.c',

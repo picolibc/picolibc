@@ -178,13 +178,12 @@ extern __float64 __kernel_tan(__float64, __float64, int);
 extern int       __kernel_rem_pio2(__float64 *, __float64 *, int, int, int, const __int32_t *);
 #endif
 
-extern __int32_t __rem_pio2f(float, float *);
+extern int   __rem_pio2f(float, float *);
 
 /* float versions of fdlibm kernel functions */
-extern float     __kernel_sinf(float, float, int);
-extern float     __kernel_cosf(float, float);
-extern float     __kernel_tanf(float, float, int);
-extern int       __kernel_rem_pio2f(float *, float *, int, int, int, const __int32_t *);
+extern float __kernel_sinf(float, float, int);
+extern float __kernel_cosf(float, float);
+extern float __kernel_tanf(float, float, int);
 
 /* The original code used statements like
         n0 = ((*(int*)&one)>>29)^1;		* index of high word *

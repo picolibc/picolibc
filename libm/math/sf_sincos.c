@@ -62,10 +62,10 @@ sincosf(float x, float *sinx, float *cosx)
 
     /* argument reduction needed */
     else {
-        float   y[2];
-        int32_t n = __rem_pio2f(x, y);
-        float   s = __kernel_sinf(y[0], y[1], 1);
-        float   c = __kernel_cosf(y[0], y[1]);
+        float y[2];
+        int   n = __rem_pio2f(x, y);
+        float s = __kernel_sinf(y[0], y[1], 1);
+        float c = __kernel_cosf(y[0], y[1]);
 
         switch (n & 3) {
         case 0:
