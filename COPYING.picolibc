@@ -387,6 +387,7 @@ Files: CMakeLists.txt
  libc/machine/aarch64/machine/CMakeLists.txt
  libc/machine/aarch64/machine/math.h
  libc/machine/aarch64/machine/meson.build
+ libc/machine/aarch64/sys/meson.build
  libc/machine/arc/CMakeLists.txt
  libc/machine/arc/meson.build
  libc/machine/arc/tls.c
@@ -394,6 +395,7 @@ Files: CMakeLists.txt
  libc/machine/arc64/meson.build
  libc/machine/arm/CMakeLists.txt
  libc/machine/arm/machine/CMakeLists.txt
+ libc/machine/arm/sys/meson.build
  libc/machine/avr/meson.build
  libc/machine/m68k/machine/CMakeLists.txt
  libc/machine/mips/CMakeLists.txt
@@ -415,6 +417,7 @@ Files: CMakeLists.txt
  libc/machine/sparc/meson.build
  libc/machine/x86/CMakeLists.txt
  libc/machine/x86/machine/CMakeLists.txt
+ libc/machine/x86/sys/meson.build
  libc/machine/xtensa/CMakeLists.txt
  libc/machine/xtensa/machine/CMakeLists.txt
  libc/machine/xtensa/tls.c
@@ -996,6 +999,7 @@ Files: cmake/TC-rx.ld
  test/test-scmpu.c
  test/test-stdio/meson.build
  test/test-stdio/test-dprintf.c
+ test/test-stdio/test-setvbuf.c
  test/test-string/meson.build
  test/test-string/test-memchr.c
  test/test-string/test-memmem.c
@@ -1186,12 +1190,17 @@ License: BSD3-1
 
 Files: empty-libs/meson.build
  libc/ctype/ctype_class.h
+ libc/machine/arc64/sys/meson.build
  libc/machine/arc64/tls.c
  libc/machine/arc64/vector_table.c
  libc/machine/loongarch/CMakeLists.txt
  libc/machine/loongarch/machine/CMakeLists.txt
  libc/machine/msp430/CMakeLists.txt
  libc/stdio/atomic_store.c
+ libc/stdio/bufio_close.c
+ libc/stdio/bufio_close_nf.c
+ libc/stdio/bufio_setvbuf.c
+ libm/math/sf_rem_pio2.c
  test/test-ctype/CMakeLists.txt
  test/test-ctype/meson.build
  test/test-ctype/test-iswctype.c
@@ -3054,8 +3063,9 @@ Files: .clang-format
  .github/Dockerfile-zephyr
  .github/do-build
  .github/do-cmake-test
- .github/do-linux
+ .github/do-linux-misc
  .github/do-many
+ .github/do-run
  .github/do-test
  .github/do-test-noopt
  .github/do-zephyr
@@ -3126,9 +3136,10 @@ Files: .clang-format
  libm/ld/files
  libm/libm.in.xml
  picocrt/machine/aarch64/crt0.S
- picocrt/machine/hexagon/crt0_standalone.S
- picocrt/machine/hexagon/crt0_standalone.c
+ picocrt/machine/hexagon/crt0.S
+ picocrt/machine/hexagon/crt0.c
  picocrt/machine/hexagon/meson.build
+ picolibc-native.specs.in
  picolibc.h.in
  picolibc.ld.in
  picolibc.specs.in
@@ -3681,7 +3692,6 @@ Files: libc/include/fenv.h
  libc/machine/riscv/asm.h
  libc/machine/riscv/ieeefp.c
  libc/machine/riscv/machine/fenv.h
- libc/machine/riscv/memcpy.c
  libc/machine/riscv/memset.S
  libc/machine/riscv/rv_strcpy.h
  libc/machine/riscv/setjmp.S
@@ -3703,6 +3713,11 @@ Files: libc/machine/riscv/memcpy-asm.S
  libc/machine/riscv/memmove.S
  libc/machine/riscv/memmove.c
 Copyright: 2019  SiFive Inc.
+License: FreeBSD-1
+
+Files: libc/machine/riscv/memcpy.c
+Copyright: 2017  SiFive Inc.
+ 2025 Mahmoud Abumandour <ma.mandourr@gmail.com>
 License: FreeBSD-1
 
 Files: libc/machine/riscv/stpcpy.c
@@ -3856,6 +3871,12 @@ License: Other-1
 
 Files: libm/ld/common/s_sincosl.c
 Copyright: 2013 Elliot Saba Developed at the University of Washington
+License: Other-1
+
+Files: libm/ld/ld128/k_tanl.c
+ libm/ld/ld80/k_tanl.c
+Copyright: 2004 Sun Microsystems, Inc.
+ 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
 License: Other-1
 
 Files: test/testsuite/lib/flags.exp
@@ -4494,7 +4515,6 @@ Files: libm/common/fdlibm.h
  libm/math/k_sin.c
  libm/math/k_tan.c
  libm/math/kf_cos.c
- libm/math/kf_rem_pio2.c
  libm/math/kf_sin.c
  libm/math/kf_tan.c
  libm/math/math.tex
@@ -4562,7 +4582,6 @@ Files: libm/common/fdlibm.h
  libm/math/sf_log10.c
  libm/math/sf_log2.c
  libm/math/sf_pow.c
- libm/math/sf_rem_pio2.c
  libm/math/sf_remainder.c
  libm/math/sf_scalb.c
  libm/math/sf_signif.c
@@ -4590,26 +4609,24 @@ Files: libm/common/s_remquo.c
 Copyright: 1993 Sun Microsystems, Inc.
 License: Other-25
 
-Files: libm/ld/common/s_cbrtl.c
-Copyright: 1993 Sun Microsystems, Inc.
-License: Other-26
-
-Files: libm/ld/ld128/e_rem_pio2l.h
- libm/ld/ld80/e_rem_pio2l.h
-Copyright: 1993 Sun Microsystems, Inc.
-License: Other-27
-
 Files: libm/ld/ld128/k_cosl.c
  libm/ld/ld128/k_sinl.c
  libm/ld/ld80/k_cosl.c
  libm/ld/ld80/k_sinl.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-28
+ 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
+License: Other-25
 
-Files: libm/ld/ld128/k_tanl.c
- libm/ld/ld80/k_tanl.c
-Copyright: 2004 Sun Microsystems, Inc.
-License: Other-29
+Files: libm/ld/common/s_cbrtl.c
+Copyright: 1993 Sun Microsystems, Inc.
+ 2009-2011, Bruce D. Evans, Steven G. Kargl, David Schultz.
+License: Other-26
+
+Files: libm/ld/ld128/e_rem_pio2l.h
+ libm/ld/ld80/e_rem_pio2l.h
+Copyright: 1993 Sun Microsystems, Inc.
+ 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
+License: Other-27
 
 Files: libm/machine/x86/f_llrint.c
  libm/machine/x86/f_llrintf.c
@@ -4621,7 +4638,7 @@ Files: libm/machine/x86/f_llrint.c
  libm/machine/x86/f_rintf.c
  libm/machine/x86/f_rintl.c
 Copyright: 2007 Dave Korn
-License: Other-30
+License: Other-28
 
 Files: libc/machine/d10v/setjmp.S
  libc/machine/d30v/setjmp.S
@@ -5066,7 +5083,6 @@ License: BSD3-3
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: BSD3-4
- c) UNIX System Laboratories, Inc.
  All or some portions of this file are derived from material licensed
  to the University of California by American Telephone and Telegraph
  Co. or Unix System Laboratories, Inc. and are reproduced herein with
@@ -5174,7 +5190,6 @@ License: BSD3-7
  POSSIBILITY OF SUCH DAMAGE.
 
 License: BSD3-8
- c) UNIX System Laboratories, Inc.
  All or some portions of this file are derived from material licensed
  to the University of California by American Telephone and Telegraph
  Co. or Unix System Laboratories, Inc. and are reproduced herein with
@@ -6261,8 +6276,6 @@ License: Other-25
  is preserved.
 
 License: Other-26
- Copyright (c) 2009-2011, Bruce D. Evans, Steven G. Kargl, David Schultz.
- .
  Developed at SunPro, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
@@ -6274,8 +6287,6 @@ License: Other-26
  and David A. Schultz.
 
 License: Other-27
- Copyright (c) 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
- .
  Developed at SunSoft, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
@@ -6285,21 +6296,6 @@ License: Other-27
  Optimized by Bruce D. Evans.
 
 License: Other-28
- Copyright (c) 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
- .
- Developed at SunSoft, a Sun Microsystems, Inc. business.
- Permission to use, copy, modify, and distribute this
- software is freely granted, provided that this notice
- is preserved.
-
-License: Other-29
- Copyright (c) 2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
- .
- Permission to use, copy, modify, and distribute this
- software is freely granted, provided that this notice
- is preserved.
-
-License: Other-30
  x87 FP implementation contributed to Newlib by
  Dave Korn, November 2007.  This file is placed in the
  public domain.  Permission to use, copy, modify, and

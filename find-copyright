@@ -60,7 +60,7 @@ right_res = re.compile(r'(.*)[ /*\t]$')
 def clean_copyright(string):
         copyright = []
         have_cpr = False
-        cpr_line = re.compile(r'copyright.*(20[0-2][0-9]|19[7-9][0-9])', re.I)
+        cpr_line = re.compile(r'copyright.*(20[0-5][0-9]|19[7-9][0-9])', re.I)
         upper = re.compile(r'[A-Z]')
         lower = re.compile(r'[a-z]')
         modified = re.compile(r'Modified')
@@ -188,7 +188,7 @@ def pick_split(split,match,use_end):
 
 def get_split(copyright):
         lastcopy = None
-        for lastcopy in re.finditer(r'copyright (\(c\))? *(19[7-9][0-9]|20[0-2][0-9])[^A-Z]*[A-Z][^\n]*', copyright, re.I|re.S):
+        for lastcopy in re.finditer(r'copyright (\(c\))? *(19[7-9][0-9]|20[0-5][0-9])[^A-Z]*[A-Z][^\n]*', copyright, re.I|re.S):
                 pass
         if lastcopy:
                 para = None
@@ -196,12 +196,14 @@ def get_split(copyright):
                         if para.start() >= lastcopy.end():
                                 break
                 all = None
-                for all in re.finditer(r'all rights reserved\.?', copyright, re.I | re.S):
-                        if all.start() >= lastcopy.end():
+                for a in re.finditer(r'all rights reserved\.?', copyright, re.I | re.S):
+                        if a.start() >= lastcopy.end():
+                                all = a
                                 break
         else:
                 para = re.search(r'\n\n', copyright, re.S)
                 all = re.search(r'all rights reserved\.?', copyright, re.I | re.S)
+        allorsome = re.search(r'all or some portions', copyright, re.I | re.S)
         licensed = re.search(r'This ', copyright, re.I | re.S)
         portions = re.search(r'Portions', copyright, re.I | re.S)
         mod = re.search(r'modification', copyright, re.I | re.S)
@@ -212,6 +214,7 @@ def get_split(copyright):
         split = pick_split(split, all, True)
         if not split:
                 split = pick_split(split, para, True)
+        split = pick_split(split, allorsome, False)
         split = pick_split(split, licensed, False)
         split = pick_split(split, portions, False)
         split = pick_split(split, mod, False)
