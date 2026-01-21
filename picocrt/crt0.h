@@ -83,12 +83,17 @@ extern void __libc_init_array(void);
 
 #include <picotls.h>
 #include <stdio.h>
-#if defined(__ARM_SEMIHOST) || defined(__HEXAGON_ARCH__)
+#if defined(__ARM_SEMIHOST)
 int sys_semihost_get_cmdline(char *buf, int size);
 #endif
 
 #ifndef CONSTRUCTORS
 #define CONSTRUCTORS 1
+#endif
+
+#if defined(CRT0_GET_CMDLINE)
+/* Hook for OS to provide command-line */
+int get_cmdline(char *buffer, int size);
 #endif
 
 static __noreturn __always_inline void
@@ -114,14 +119,20 @@ __start(void)
     __libc_init_array();
 #endif
 
-#if defined(CRT0_SEMIHOST) && (defined(__ARM_SEMIHOST) || defined(__HEXAGON_ARCH__))
+#if defined(CRT0_GET_CMDLINE) || (defined(CRT0_SEMIHOST) && defined(__ARM_SEMIHOST))
 #define CMDLINE_LEN 1024
 #define ARGV_LEN    64
     static char  cmdline[CMDLINE_LEN];
     static char *argv[ARGV_LEN];
     int          argc = 0;
+    int          get_cmdline_ret = 0;
 
-    if (sys_semihost_get_cmdline(cmdline, sizeof(cmdline)) == 0 && cmdline[0]) {
+#if defined(CRT0_GET_CMDLINE)
+    get_cmdline_ret = get_cmdline(cmdline, CMDLINE_LEN);
+#else
+    get_cmdline_ret = sys_semihost_get_cmdline(cmdline, CMDLINE_LEN);
+#endif
+    if (get_cmdline_ret == 0 && cmdline[0]) {
         char *c = cmdline;
 
         while (*c && argc < ARGV_LEN - 1) {
