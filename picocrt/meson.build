@@ -81,7 +81,7 @@ picocrt_variants = [
   {
     'name': 'hosted',
     'suffix': '-hosted',
-    'c_args': ['-DCRT0_EXIT'],
+    'c_args': ['-DCRT0_HOSTED', '-DCRT0_EXIT'],
     'src': src_picocrt,
   },
   {
@@ -111,7 +111,7 @@ picocrt_variants = [
   {
     'name': 'noflash-hosted',
     'suffix': '-noflash-hosted',
-    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT'],
+    'c_args': ['-DCRT0_HOSTED', '-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT'],
     'src': src_picocrt,
   },
 ]

@@ -60,7 +60,7 @@ enum hexagon_system_call_code {
 /* Hexagon semihosting calls */
 int  flen(int fd);
 int  hexagon_ftell(int fd);
-int  sys_semihost_get_cmdline(char *buffer, int count);
+int  get_cmdline(char *buffer, int count);
 
 int  hexagon_semihost(enum hexagon_system_call_code code, int *args);
 
