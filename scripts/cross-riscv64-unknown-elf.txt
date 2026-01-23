@@ -19,6 +19,7 @@ endian = 'little'
 c_args = [ '-msave-restore' ]
 # default multilib is 64 bit
 c_args_ = [ '-mcmodel=medany' ]
+c_args_space = [ '-mcmodel=medany' ]
 skip_sanity_check = true
 default_flash_addr = '0x80000000'
 default_flash_size = '0x00400000'
