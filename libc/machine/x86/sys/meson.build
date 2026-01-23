@@ -32,34 +32,10 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-srcs_machine = [
-  'memchr.S',
-  'memcmp.S',
-  'memcmp-stub.c',
-  'memcpy.S',
-  'memcpy-stub.c',
-  'memmove.S',
-  'memset.S',
-  'memset-stub.c',
-  'setjmp.S',
-  'strcat.S',
-  'strcmp.S',
-  'strlen.S',
-  'tls.c',
-  'vector_table.c',
+inc_sys_headers_machine = [
 ]
 
-subdir('sys')
-
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-  set_variable('lib_machine' + target,
-	       static_library('machine' + target,
-			      srcs_machine,
-			      pic: false,
-			      include_directories: inc,
-			      c_args: target_c_args + c_args + arg_fnobuiltin))
-endforeach
+if really_install
+  install_headers(inc_sys_headers_machine,
+                  install_dir: include_dir / 'sys')
+endif
