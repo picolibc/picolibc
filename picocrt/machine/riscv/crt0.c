@@ -94,6 +94,7 @@ _ctrap(struct fault *fault)
 #define PASTE(r)  _PASTE(r)
 
 void __naked __section(".init") __used __attribute((aligned(4)))
+__attribute__((target("arch=+zicsr")))
 _trap(void)
 {
 #ifndef __clang__
@@ -190,7 +191,7 @@ _trap(void)
 }
 #endif
 
-void __naked __section(".text.init.enter") __used
+void __naked __section(".text.init.enter") __used __attribute__((target("arch=+zicsr")))
 _start(void)
 {
 
