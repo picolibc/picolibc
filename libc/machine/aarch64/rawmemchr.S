@@ -51,19 +51,16 @@
 */
 
 def_fn rawmemchr p2align=5
-	.cfi_startproc
 	cbz	w1, L(do_strlen)
 	mov	x2, -1
 	b	memchr
 
 L(do_strlen):
 	mov	x15, x30
-	.cfi_return_column x15
 	mov	x14, x0
 	bl	strlen
 	add	x0, x14, x0
 	ret	x15
-	.cfi_endproc
 
 	.size   rawmemchr, . - rawmemchr
 #endif

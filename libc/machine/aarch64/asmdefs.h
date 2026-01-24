@@ -9,16 +9,29 @@
 #define _ASMDEFS_H
 
 /* Branch Target Identitication support.  */
+#ifdef __ARM_FEATURE_BTI_DEFAULT
 #define BTI_C		hint	34
 #define BTI_J		hint	36
+#define FEATURE_1_BTI   1
+#else
+#define BTI_C
+#define BTI_J
+#define FEATURE_1_BTI   0
+#endif
+
 /* Return address signing support (pac-ret).  */
-#define PACIASP		hint	25; .cfi_window_save
-#define AUTIASP		hint	29; .cfi_window_save
+#ifdef __ARM_FEATURE_PAC_DEFAULT
+#define PACIASP		hint	25;
+#define AUTIASP		hint	29;
+#define FEATURE_1_PAC   2
+#else
+#define PACIASP
+#define AUTIASP
+#define FEATURE_1_PAC   0
+#endif
 
 /* GNU_PROPERTY_AARCH64_* macros from elf.h.  */
 #define FEATURE_1_AND 0xc0000000
-#define FEATURE_1_BTI 1
-#define FEATURE_1_PAC 2
 
 /* Add a NT_GNU_PROPERTY_TYPE_0 note.  */
 #ifdef __ILP32__
@@ -51,7 +64,7 @@
 /* If set then the GNU Property Note section will be added to
    mark objects to support BTI and PAC-RET.  */
 #ifndef WANT_GNU_PROPERTY
-#define WANT_GNU_PROPERTY 1
+#define WANT_GNU_PROPERTY (FEATURE_1_BTI|FEATURE_1_PAC)
 #endif
 
 #if WANT_GNU_PROPERTY
@@ -64,7 +77,6 @@ GNU_PROPERTY (FEATURE_1_AND, FEATURE_1_BTI|FEATURE_1_PAC)
   .type name,%function;	\
   .align alignment;		\
   name:			\
-  .cfi_startproc;	\
   BTI_C;
 
 #define ENTRY(name)	ENTRY_ALIGN(name, 6)
@@ -75,7 +87,6 @@ GNU_PROPERTY (FEATURE_1_AND, FEATURE_1_BTI|FEATURE_1_PAC)
   name:
 
 #define END(name)	\
-  .cfi_endproc;		\
   .size name, .-name;
 
 #define L(l) .L ## l
