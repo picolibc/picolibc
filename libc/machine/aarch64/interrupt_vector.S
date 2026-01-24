@@ -38,7 +38,6 @@
 	.global	__weak_vector_table
 	.type	__weak_vector_table, %function
 __weak_vector_table:
-	.cfi_startproc
 SP_EL0:
 	b aarch64_sync_vector
 	. = SP_EL0 + 0x80
@@ -57,7 +56,6 @@ SP_ELx:
 	. = SP_ELx + 0x180
 	b aarch64_serror_vector
 	. = SP_ELx + 0x200
-	.cfi_endproc
 .LFE2:
 	.size	__weak_vector_table, .-__weak_vector_table
 	.weak	__vector_table
