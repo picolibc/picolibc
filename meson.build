@@ -1080,8 +1080,13 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('TLS_INIT_PHDR', 'tls_init')
 
     # place some defaults here to make other sections a bit shorter
-    picolibc_ld_data.set('CPP', ld_comment)
-    picolibc_ld_data.set('C', '')
+    if get_option('trim-linker-scripts')
+      picolibc_ld_data.set('CPP', ld_comment)
+      picolibc_ld_data.set('C', '')
+    else
+      picolibc_ld_data.set('CPP', '')
+      picolibc_ld_data.set('C', ld_comment)
+    endif
     picolibc_ld_data.set('PREFIX', global_prefix)
     picolibc_ld_data.set('INITTLS', ld_comment)
     picolibc_ld_data.set('DATATLS', '')

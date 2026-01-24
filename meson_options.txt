@@ -78,6 +78,8 @@ option('system-libc', type: 'boolean', value: false,
        description: 'Install as system C library')
 option('force-install', type: 'boolean', value: false,
        description: 'If picolibc is a subproject its targets will not be installed by default, setting this to true forces installation')
+option('trim-linker-scripts', type: 'boolean', value: false,
+       description: 'Picolibc.ld will discard sections needed for C++ exception handling.')
 
 #
 # Testing options
