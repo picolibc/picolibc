@@ -101,6 +101,30 @@ SECTIONS
 
 	} >@TEXT_MEM@ AT>@TEXT_MEM@ :@TEXT_PHDR@
 
+@CPP@	/* additional sections when compiling with C++ exception support */
+@CPP@	.except_ordered : {
+@CPP@		*(.gcc_except_table *.gcc_except_table.*)
+@CPP@		*(.ARM.extab* .gnu.linkonce.armextab.*)
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
+@CPP@	.eh_frame_hdr : {
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
+@CPP@		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
+@CPP@	.eh_frame : {
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
+@CPP@		KEEP (*(.eh_frame .eh_frame.*))
+@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
+@CPP@
+@CPP@	.except_unordered : {
+@CPP@		. = ALIGN(@DEFAULT_ALIGNMENT@);
+@CPP@
+@CPP@		PROVIDE(@PREFIX@__exidx_start = .);
+@CPP@		*(.ARM.exidx*)
+@CPP@		PROVIDE(@PREFIX@__exidx_end = .);
+@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
+
 	.rodata : {
 
 		/* read-only data */
@@ -179,30 +203,6 @@ SECTIONS
 		 */
 		*(.iplt .iplt.*)
 	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
-
-@CPP@	/* additional sections when compiling with C++ exception support */
-@CPP@	.except_ordered : {
-@CPP@		*(.gcc_except_table *.gcc_except_table.*)
-@CPP@		*(.ARM.extab* .gnu.linkonce.armextab.*)
-@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
-@CPP@	.eh_frame_hdr : {
-@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_start = . );
-@CPP@		*(.eh_frame_hdr) *(.eh_frame_entry .eh_frame_entry.*)
-@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_hdr_end = . );
-@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
-@CPP@	.eh_frame : {
-@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_start = . );
-@CPP@		KEEP (*(.eh_frame .eh_frame.*))
-@CPP@		PROVIDE_HIDDEN ( @PREFIX@__eh_frame_end = . );
-@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
-@CPP@
-@CPP@	.except_unordered : {
-@CPP@		. = ALIGN(@DEFAULT_ALIGNMENT@);
-@CPP@
-@CPP@		PROVIDE(@PREFIX@__exidx_start = .);
-@CPP@		*(.ARM.exidx*)
-@CPP@		PROVIDE(@PREFIX@__exidx_end = .);
-@CPP@	} >@RODATA_MEM@ AT>@RODATA_AT@ :@RODATA_PHDR@
 
 	/*
 	 * Data values which are preserved across reset
