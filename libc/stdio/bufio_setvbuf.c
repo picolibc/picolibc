@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,56 +35,57 @@
 
 #include "stdio_private.h"
 
-FILE *
-freopen(const char *pathname, const char *mode, FILE *stream)
+int
+__bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
 {
-    FILE                *ret = NULL;
-    struct __file_bufio *pf = (struct __file_bufio *)stream;
-    int                  fd;
-    int                  stdio_flags;
-    int                  open_flags;
-    int                  buf_size;
+    struct __file_bufio *bf = (struct __file_bufio *)f;
+    int                  ret = -1;
 
-    __flockfile(stream);
-    /* Can't reopen FILEs which aren't buffered */
-    if (!(stream->flags & __SBUF))
-        goto exit;
-
-    stdio_flags = __stdio_flags(mode, &open_flags);
-    if (stdio_flags == 0)
-        goto exit;
-
-    if (pathname != NULL) {
-        fd = open(pathname, open_flags, 0666);
-        if (fd < 0)
-            goto exit;
-    } else
-        fd = (int)(intptr_t)(pf->ptr);
-
-    fflush(stream);
-
-    __bufio_lock(stream);
-
-    if (pathname != NULL)
-        close((int)(intptr_t)(pf->ptr));
-
-    stream->flags = (stream->flags & ~(__SRD | __SWR | __SERR | __SEOF)) | stdio_flags;
-    pf->pos = 0;
-    pf->ptr = (void *)(intptr_t)(fd);
-
-    /* Switch to POSIX backend */
-    pf->read_int = read;
-    pf->write_int = write;
-    pf->lseek_int = lseek;
-    pf->close_int = close;
-
-    /* Reset buffer mode and size */
-    buf_size = bufio_get_buf_size(fd);
-    if (buf_size != pf->size || (pf->bflags & __BLBF))
-        (pf->xfile.setvbuf ? pf->xfile.setvbuf : __bufio_setvbuf)(stream, NULL, _IOFBF, buf_size);
-
-    ret = stream;
-    __bufio_unlock(stream);
-exit:
-    __funlock_return(stream, ret);
+    __bufio_lock(f);
+    if (__bufio_flush_locked(f) < 0) {
+        ret = _FDEV_ERR;
+        goto bail;
+    }
+    bf->bflags &= ~__BLBF;
+    switch (mode) {
+    case _IONBF:
+        buf = NULL;
+        size = 1;
+        break;
+    case _IOLBF:
+        bf->bflags |= __BLBF;
+        break;
+    case _IOFBF:
+        break;
+    default:
+        goto bail;
+    }
+    if (bf->bflags & __BALL) {
+        if (buf) {
+            free(bf->buf);
+            bf->bflags &= ~__BALL;
+        } else {
+            /*
+             * Handling allocation failures here is a bit tricky;
+             * we don't want to lose the existing buffer. Instead,
+             * we try to reallocate it
+             */
+            buf = realloc(bf->buf, size);
+            if (!buf)
+                goto bail;
+        }
+    } else if (!buf) {
+        buf = malloc(size);
+        if (!buf)
+            goto bail;
+        bf->bflags |= __BALL;
+    }
+    if (bf->bflags & __BALL)
+        bf->xfile.cfile.close = __bufio_close;
+    bf->buf = buf;
+    bf->size = size;
+    ret = 0;
+bail:
+    __bufio_unlock(f);
+    return ret;
 }

@@ -39,6 +39,9 @@ picolibc_sources(
   atomic_load.c
   atomic_store.c
   bufio.c
+  bufio_close.c
+  bufio_close_nf.c
+  bufio_setvbuf.c
   clearerr.c
   compare_exchange.c
   dprintf.c
