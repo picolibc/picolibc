@@ -756,19 +756,28 @@ specs_cpp_data.set('PICOLIBC_LD', 'picolibcpp.ld')
 specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
 specs_cpp_data.set('CRTEND', 'crtend%O%s')
 
-picolibc_specs = configure_file(input: 'picolibc.specs.in',
-				output: 'picolibc.specs',
-				configuration: specs_c_data,
-				install_dir: specs_dir,
-				install: specs_install and really_install)
+if specs_install and really_install
 
-picolibc_specs_name = 'picolibc.specs'
+  compiler_picolibc_native = run_command(cc.cmd_array() + ['-v'], check : false).stderr().contains('with-picolibc')
 
-picolibcpp_specs = configure_file(input: 'picolibc.specs.in',
-				  output: 'picolibcpp.specs',
-				  configuration: specs_cpp_data,
-				  install_dir: specs_dir,
-				  install: specs_install and really_install)
+  if compiler_picolibc_native
+    picolibc_specs_in = 'picolibc-native.specs.in'
+  else
+    picolibc_specs_in = 'picolibc.specs.in'
+  endif
+
+  configure_file(input: picolibc_specs_in,
+	         output: 'picolibc.specs',
+	         configuration: specs_c_data,
+	         install_dir: specs_dir,
+	         install: specs_install and really_install)
+
+  configure_file(input: picolibc_specs_in,
+	         output: 'picolibcpp.specs',
+	         configuration: specs_cpp_data,
+	         install_dir: specs_dir,
+	         install: specs_install and really_install)
+endif
 
 # Not all compilers necessarily support all warnings; only use these which are:
 common_warnings = [
