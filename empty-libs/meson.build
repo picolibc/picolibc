@@ -56,6 +56,7 @@ foreach params : targets
                      c_args: target_c_args + c_args,
 		     objects : [])
     else
+      target_lib_prefix = params['lib_prefix']
       static_library(join_paths(target_dir, target_lib_prefix + lib_name),
 		     ['empty.c'],
 		     install : really_install,
