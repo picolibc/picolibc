@@ -38,15 +38,15 @@
 static void __used __section(".init")
 _cstart(void)
 {
-	__start();
+    __start();
 }
 
 extern char __stack[];
 
 #if _MIPS_SZLONG == 32
-#define LA  "la"
+#define LA "la"
 #elif _MIPS_SZLONG == 64
-#define LA  "dla"
+#define LA "dla"
 #else
 #error unknown mips target
 #endif
@@ -54,17 +54,17 @@ extern char __stack[];
 void __section(".init") __used
 _start(void)
 {
-	/* Initialize stack pointer */
-	__asm__(LA " $sp,%0" : : "i" (__stack));
+    /* Initialize stack pointer */
+    __asm__(LA " $sp,%0" : : "i"(__stack));
 
 #ifndef __mips_soft_float
-        /* Enable FPU */
-        uint32_t        cp0_status;
-        __asm__("mfc0 %0,$12" : "=r" (cp0_status));
-        cp0_status |= (1 << 29);
-        __asm__("mtc0 %0,$12" : : "r" (cp0_status));
+    /* Enable FPU */
+    uint32_t cp0_status;
+    __asm__("mfc0 %0,$12" : "=r"(cp0_status));
+    cp0_status |= (1 << 29);
+    __asm__("mtc0 %0,$12" : : "r"(cp0_status));
 #endif
-	/* Branch to C code */
-	__asm__("j _cstart");
-        __asm__("nop");
+    /* Branch to C code */
+    __asm__("j _cstart");
+    __asm__("nop");
 }

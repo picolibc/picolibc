@@ -37,7 +37,7 @@
 #include "../../crt0.h"
 
 void __section(".text.startup")
-_cstart (void)
+_cstart(void)
 {
     __start();
 }

@@ -41,32 +41,30 @@
 int
 sh_putc(char c, FILE *file)
 {
-	(void) file;
+    (void)file;
 #ifdef SH_QEMU
-        sh_serial0.tdr = (unsigned char) c;
+    sh_serial0.tdr = (unsigned char)c;
 #else
-        sh_syscall(TARGET_NEWLIB_SH_SYS_write, 1, (uint32_t) (uintptr_t) &c, 1);
+    sh_syscall(TARGET_NEWLIB_SH_SYS_write, 1, (uint32_t)(uintptr_t)&c, 1);
 #endif
-	return (unsigned char) c;
+    return (unsigned char)c;
 }
 
 int
 sh_getc(FILE *file)
 {
-	(void) file;
-        return EOF;
+    (void)file;
+    return EOF;
 }
 
-#ifdef __TINY_STDIO
 static FILE __stdio = FDEV_SETUP_STREAM(sh_putc, sh_getc, NULL, _FDEV_SETUP_RW);
 
 #ifdef __strong_reference
 #define STDIO_ALIAS(x) __strong_reference(stdin, x);
 #else
-#define STDIO_ALIAS(x) FILE *const x = &__stdio;
+#define STDIO_ALIAS(x) FILE * const x = &__stdio;
 #endif
 
-FILE *const stdin = &__stdio;
+FILE * const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-#endif

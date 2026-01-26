@@ -27,38 +27,40 @@
 #include <libgen.h>
 #include <stdlib.h>
 
-#define TEST(p, b) do {                                                 \
-        tmp = strdup((p));                                              \
-        s = basename(tmp);                                              \
-        if (strcmp((b),s)) {                                            \
-            printf(__FILE__ ":%d: basename(\"%s\") returned \"%s\"; expected \"%s\"\n", \
-                   __LINE__, (p), s, (b));                              \
-            err++;                                                      \
-        }                                                               \
-        free(tmp);                                                      \
+#define TEST(p, b)                                                                                \
+    do {                                                                                          \
+        tmp = strdup((p));                                                                        \
+        s = basename(tmp);                                                                        \
+        if (strcmp((b), s)) {                                                                     \
+            printf(__FILE__ ":%d: basename(\"%s\") returned \"%s\"; expected \"%s\"\n", __LINE__, \
+                   (p), s, (b));                                                                  \
+            err++;                                                                                \
+        }                                                                                         \
+        free(tmp);                                                                                \
     } while (0)
 
-static int test_basename(void)
+static int
+test_basename(void)
 {
-	char *tmp, *s;
-	int err=0;
+    char *tmp, *s;
+    int   err = 0;
 
-	if (strcmp(basename(NULL), ".")) {
-		printf(__FILE__ ":%d: basename(NULL) returned \"%s\"; "
-			"expected \".\"\n", __LINE__, basename(NULL));
-		err++;
-	}
-	TEST("", ".");
-	TEST("/usr/lib", "lib");
-	TEST("/usr/", "usr");
-	TEST("/", "/");
-	TEST("///", "/");
-	TEST("//usr//lib//", "lib");
+    if (strcmp(basename(NULL), ".")) {
+        printf(__FILE__ ":%d: basename(NULL) returned \"%s\"; "
+                        "expected \".\"\n",
+               __LINE__, basename(NULL));
+        err++;
+    }
+    TEST("", ".");
+    TEST("/usr/lib", "lib");
+    TEST("/usr/", "usr");
+    TEST("/", "/");
+    TEST("///", "/");
+    TEST("//usr//lib//", "lib");
 
-	return err;
+    return err;
 }
 
 #undef basename
 #define TEST_NAME basename
 #include "testcase.h"
-

@@ -1,0 +1,166 @@
+/*
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+
+  * Neither the name of Qualcomm Technologies, Inc. nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+    .section .text.init.enter, "awx", @progbits
+    .global _start
+    .type _start, @function
+_start:
+#ifdef CRT0_SEMIHOST
+    // Setup event vector base
+    r0 = ##.EventVectors
+    EVB = r0
+#endif
+    // Setup stack pointer
+    r0 = ##__stack
+    sp = and (r0, #-16)
+    jump _cstart
+    .size _start, . - _start
+
+#ifdef CRT0_SEMIHOST
+    .text
+    .p2align 4
+    .type event_handle_reset, @function
+event_handle_reset:
+    r0 = #0
+    stid = r0
+    jump coredump
+    .size event_handle_reset, . - event_handle_reset
+
+    .type event_handle_nmi, @function
+event_handle_nmi:
+    r0 = #1
+    stid = r0
+    jump coredump
+    .size event_handle_nmi, . - event_handle_nmi
+
+    .type event_handle_error, @function
+event_handle_error:
+    r0 = #2
+    stid = r0
+    jump coredump
+    .size event_handle_error, . - event_handle_error
+
+    .type event_handle_rsvd, @function
+event_handle_rsvd:
+    r0 = ##0xdeadbeef
+    stid = r0
+    jump coredump
+    .size event_handle_rsvd, . - event_handle_rsvd
+
+    .type event_handle_tlbmissx, @function
+event_handle_tlbmissx:
+    r0 = #0
+    stid = r0
+    jump coredump
+    .size event_handle_tlbmissx, . - event_handle_tlbmissx
+
+    .type event_handle_tlbmissrw, @function
+event_handle_tlbmissrw:
+    r0 = #0
+    stid = r0
+    jump coredump
+    .size event_handle_tlbmissrw, . - event_handle_tlbmissrw
+
+    .type event_handle_trap0, @function
+event_handle_trap0:
+    rte
+    .size event_handle_trap0, . - event_handle_trap0
+
+    .type event_handle_trap1, @function
+event_handle_trap1:
+    r0 = #9
+    stid = r0
+    jump coredump
+    .size event_handle_trap1, . - event_handle_trap1
+
+    .type event_handle_int, @function
+event_handle_int:
+    r0 = #2
+    stid = r0
+    jump coredump
+    .size event_handle_int, . - event_handle_int
+
+    .p2align 12, 0
+    .type .EventVectors, %function
+.EventVectors:
+    jump event_handle_reset
+    jump event_handle_nmi
+    jump event_handle_error
+    jump event_handle_rsvd
+    jump event_handle_tlbmissx
+    jump event_handle_rsvd
+    jump event_handle_tlbmissrw
+    jump event_handle_rsvd
+    jump event_handle_trap0
+    jump event_handle_trap1
+    jump event_handle_rsvd /* 10 */
+    jump event_handle_rsvd /* 11 */
+    jump event_handle_rsvd /* 12 */
+    jump event_handle_rsvd /* 13 */
+    jump event_handle_rsvd /* 14 */
+    jump event_handle_rsvd /* 15 */
+    jump event_handle_int  /* Event number 16, Interrupt 0 */
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int
+    jump event_handle_int  /* Event number 47, Interrupt 31 */
+    .size .EventVectors, . - .EventVectors
+#endif

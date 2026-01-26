@@ -36,16 +36,15 @@
 #include <unistd.h>
 #include "lm32_semihost.h"
 
-ssize_t write(int fd, const void *buf, size_t count)
+ssize_t
+write(int fd, const void *buf, size_t count)
 {
-    struct lm32_scall_args args = {
-        .r8 = TARGET_NEWLIB_SYS_write,
-        .r1 = fd,
-        .r2 = (uint32_t) (uintptr_t) buf,
-        .r3 = (uint32_t) count
-    };
-    struct lm32_scall_ret ret;
+    struct lm32_scall_args args = { .r8 = TARGET_NEWLIB_SYS_write,
+                                    .r1 = fd,
+                                    .r2 = (uint32_t)(uintptr_t)buf,
+                                    .r3 = (uint32_t)count };
+    struct lm32_scall_ret  ret;
 
     lm32_scall(&args, &ret);
-    return (ssize_t) ret.r1;
+    return (ssize_t)ret.r1;
 }

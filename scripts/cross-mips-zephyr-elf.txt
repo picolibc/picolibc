@@ -1,8 +1,4 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['mips-zephyr-elf-gcc', '-nostdlib', '-G0']
 cpp = ['mips-zephyr-elf-g++', '-nostdlib', '-G0']
 ar = 'mips-zephyr-elf-ar'
@@ -10,7 +6,7 @@ as = 'mips-zephyr-elf-as'
 nm = 'mips-zephyr-elf-nm'
 strip = 'mips-zephyr-elf-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-mips "$@"', 'run-mips']
+exe_wrapper = ['env', 'run-mips']
 
 [host_machine]
 system = 'zephyr'

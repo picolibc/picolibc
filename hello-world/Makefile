@@ -33,22 +33,16 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-CFLAGS=--oslib=semihost -Os
+CFLAGS=--oslib=semihost --crt0=semihost -O2
 
-CFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv.ld
-CC_RISCV=riscv64-unknown-elf-gcc -specs=picolibc.specs $(CFLAGS_RISCV)
-CXXFLAGS_RISCV=$(CFLAGS) -march=rv32imac -mabi=ilp32 -Triscv-cpp.ld
-CXX_RISCV=riscv64-unknown-elf-g++ -specs=picolibcpp.specs $(CXXFLAGS_RISCV)
+CC_RISCV=riscv64-unknown-elf-gcc $(CFLAGS)
+CXX_RISCV=riscv64-unknown-elf-g++ $(CFLAGS)
 
-CFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm.ld
-CC_ARM=arm-none-eabi-gcc -specs=picolibc.specs $(CFLAGS_ARM)
-CXXFLAGS_ARM=$(CFLAGS) -mcpu=cortex-m3 -Tarm-cpp.ld
-CXX_ARM=arm-none-eabi-g++ -specs=picolibcpp.specs $(CXXFLAGS_ARM)
+CC_ARM=arm-none-eabi-gcc $(CFLAGS)
+CXX_ARM=arm-none-eabi-g++ $(CFLAGS)
 
-CFLAGS_AARCH64=$(CFLAGS) -Taarch64.ld
-CC_AARCH64=aarch64-linux-gnu-gcc -specs=picolibc.specs $(CFLAGS_AARCH64)
-CXXFLAGS_AARCH64=$(CFLAGS) -Taarch64-cpp.ld
-CXX_AARCH64=aarch64-linux-gnu-g++ -specs=picolibcpp.specs $(CXXFLAGS_AARCH64)
+CC_AARCH64=aarch64-none-elf-gcc $(CFLAGS)
+CXX_AARCH64=aarch64-none-elf-g++ $(CFLAGS)
 
 all: \
 	hello-world-arm.elf hello-world-aarch64.elf \

@@ -38,72 +38,71 @@
 #include <semihost.h>
 
 #ifndef TEST_FILE_NAME
-#define TEST_FILE_NAME	"SEMISEEK.TXT"
+#define TEST_FILE_NAME "SEMISEEK.TXT"
 #endif
-#define TEST_STRING	"hello, world"
-#define TEST_STRING_LEN	12
-#define TEST_SEEK_POS	2
+#define TEST_STRING     "hello, world"
+#define TEST_STRING_LEN 12
+#define TEST_SEEK_POS   2
 
 int
 main(void)
 {
-	int		fd;
-	uintptr_t	not_written;
-	int		code = 0;
-	int		ret;
-	uintptr_t	not_read;
-	char		buf[TEST_STRING_LEN + 10];
+    int       fd;
+    uintptr_t not_written;
+    int       code = 0;
+    int       ret;
+    uintptr_t not_read;
+    char      buf[TEST_STRING_LEN + 10];
 
-	fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
-	if (fd < 0) {
-		printf("open %s failed\n", TEST_FILE_NAME);
-		exit(1);
-	}
-	not_written = sys_semihost_write(fd, TEST_STRING, TEST_STRING_LEN);
-	if (not_written != 0) {
-		printf("write failed %ld %d\n", (long) not_written, sys_semihost_errno());
-		code = 2;
-		goto bail1;
-	}
-	ret = sys_semihost_close(fd);
-	fd = -1;
-	if (ret != 0) {
-		printf("close failed %d %d\n", ret, sys_semihost_errno());
-		code = 3;
-		goto bail1;
-	}
+    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
+    if (fd < 0) {
+        printf("open %s failed\n", TEST_FILE_NAME);
+        exit(1);
+    }
+    not_written = sys_semihost_write(fd, TEST_STRING, TEST_STRING_LEN);
+    if (not_written != 0) {
+        printf("write failed %ld %d\n", (long)not_written, sys_semihost_errno());
+        code = 2;
+        goto bail1;
+    }
+    ret = sys_semihost_close(fd);
+    fd = -1;
+    if (ret != 0) {
+        printf("close failed %d %d\n", ret, sys_semihost_errno());
+        code = 3;
+        goto bail1;
+    }
 
-	fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_R);
-	if (fd < 0) {
-		printf("open %s failed\n", TEST_FILE_NAME);
-		code = 4;
-		goto bail1;
-	}
+    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_R);
+    if (fd < 0) {
+        printf("open %s failed\n", TEST_FILE_NAME);
+        code = 4;
+        goto bail1;
+    }
 
-	ret = sys_semihost_seek(fd, TEST_SEEK_POS);
-	if (ret != 0) {
-		printf("seek failed %d %d\n", ret, sys_semihost_errno());
-		code = 5;
-		goto bail1;
-	}
+    ret = sys_semihost_seek(fd, TEST_SEEK_POS);
+    if (ret != 0) {
+        printf("seek failed %d %d\n", ret, sys_semihost_errno());
+        code = 5;
+        goto bail1;
+    }
 
-	not_read = sys_semihost_read(fd, buf, sizeof(buf));
-	if (sizeof (buf) - not_read != TEST_STRING_LEN - TEST_SEEK_POS) {
-		printf("read failed got %ld wanted %ld\n", (long) not_read,
-		       (long) (sizeof(buf) - TEST_STRING_LEN + TEST_SEEK_POS));
-		code = 6;
-		goto bail1;
-	}
-	buf[TEST_STRING_LEN - TEST_SEEK_POS] = '\0';
-	if (memcmp(buf, &TEST_STRING[0] + TEST_SEEK_POS, TEST_STRING_LEN - TEST_SEEK_POS) != 0) {
-		printf("read bad contents got %s wanted %s\n",
-		       buf, &TEST_STRING[0] + TEST_SEEK_POS);
-		code = 7;
-		goto bail1;
-	}
+    not_read = sys_semihost_read(fd, buf, sizeof(buf));
+    if (sizeof(buf) - not_read != TEST_STRING_LEN - TEST_SEEK_POS) {
+        printf("read failed got %ld wanted %ld\n", (long)not_read,
+               (long)(sizeof(buf) - TEST_STRING_LEN + TEST_SEEK_POS));
+        code = 6;
+        goto bail1;
+    }
+    buf[TEST_STRING_LEN - TEST_SEEK_POS] = '\0';
+    if (memcmp(buf, &TEST_STRING[0] + TEST_SEEK_POS, TEST_STRING_LEN - TEST_SEEK_POS) != 0) {
+        printf("read bad contents got %s wanted %s\n", buf, &TEST_STRING[0] + TEST_SEEK_POS);
+        code = 7;
+        goto bail1;
+    }
 bail1:
-	if (fd >= 0)
-		(void) sys_semihost_close(fd);
-	(void) sys_semihost_remove(TEST_FILE_NAME);
-	exit(code);
+    if (fd >= 0)
+        (void)sys_semihost_close(fd);
+    (void)sys_semihost_remove(TEST_FILE_NAME);
+    exit(code);
 }

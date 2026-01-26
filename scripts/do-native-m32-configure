@@ -36,4 +36,5 @@
 DIR="$(dirname "$0")"
 exec "$DIR"/do-native-configure \
      --cross-file "$DIR"/cross-m32.txt \
-     -Dnative-math-tests=false
+     -Dnative-math-tests=false \
+     "$@"

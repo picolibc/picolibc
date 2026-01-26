@@ -38,46 +38,44 @@
 typedef volatile uint8_t vuint8_t;
 
 struct uart_16550 {
-    vuint8_t     data;
-    vuint8_t     ier;
-    vuint8_t     iir;
-    vuint8_t     lcr;
+    vuint8_t data;
+    vuint8_t ier;
+    vuint8_t iir;
+    vuint8_t lcr;
 
-    vuint8_t     mcr;
-    vuint8_t     lsr;
-    vuint8_t     msr;
-    vuint8_t     scr;
+    vuint8_t mcr;
+    vuint8_t lsr;
+    vuint8_t msr;
+    vuint8_t scr;
 };
 
 /* openrisc virt serial port */
-#define uart    (*((struct uart_16550 *) 0x90000000))
+#define uart           (*((struct uart_16550 *)0x90000000))
 
-#define UART_LSR_FIFOE		0x80 /* Fifo error */
-#define UART_LSR_TEMT		0x40 /* Transmitter empty */
-#define UART_LSR_THRE		0x20 /* Transmit-hold-register empty */
-#define UART_LSR_BI		0x10 /* Break interrupt indicator */
-#define UART_LSR_FE		0x08 /* Frame error indicator */
-#define UART_LSR_PE		0x04 /* Parity error indicator */
-#define UART_LSR_OE		0x02 /* Overrun error indicator */
-#define UART_LSR_DR		0x01 /* Receiver data ready */
+#define UART_LSR_FIFOE 0x80 /* Fifo error */
+#define UART_LSR_TEMT  0x40 /* Transmitter empty */
+#define UART_LSR_THRE  0x20 /* Transmit-hold-register empty */
+#define UART_LSR_BI    0x10 /* Break interrupt indicator */
+#define UART_LSR_FE    0x08 /* Frame error indicator */
+#define UART_LSR_PE    0x04 /* Parity error indicator */
+#define UART_LSR_OE    0x02 /* Overrun error indicator */
+#define UART_LSR_DR    0x01 /* Receiver data ready */
 
 int
 or1k_putc(char c, FILE *file)
 {
-	(void) file;
-        while ((uart.lsr & (UART_LSR_TEMT|UART_LSR_THRE)) != (UART_LSR_TEMT|UART_LSR_THRE))
-               ;
-        uart.data = (uint8_t) c;
-	return (unsigned char) c;
+    (void)file;
+    while ((uart.lsr & (UART_LSR_TEMT | UART_LSR_THRE)) != (UART_LSR_TEMT | UART_LSR_THRE))
+        ;
+    uart.data = (uint8_t)c;
+    return (unsigned char)c;
 }
-
-#ifdef __TINY_STDIO
 
 static int
 or1k_getc(FILE *file)
 {
-	(void) file;
-	return EOF;
+    (void)file;
+    return EOF;
 }
 
 static FILE __stdio = FDEV_SETUP_STREAM(or1k_putc, or1k_getc, NULL, _FDEV_SETUP_RW);
@@ -85,11 +83,9 @@ static FILE __stdio = FDEV_SETUP_STREAM(or1k_putc, or1k_getc, NULL, _FDEV_SETUP_
 #ifdef __strong_reference
 #define STDIO_ALIAS(x) __strong_reference(stdin, x);
 #else
-#define STDIO_ALIAS(x) FILE *const x = &__stdio;
+#define STDIO_ALIAS(x) FILE * const x = &__stdio;
 #endif
 
-FILE *const stdin = &__stdio;
+FILE * const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-
-#endif

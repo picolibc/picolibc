@@ -43,6 +43,6 @@
 void
 main(void)
 {
-	printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
-        _Exit(0);
+    printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
+    _Exit(0);
 }

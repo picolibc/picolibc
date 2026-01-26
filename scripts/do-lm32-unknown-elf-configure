@@ -38,4 +38,5 @@ exec "$(dirname "$0")"/do-configure lm32-unknown-elf \
   -Dfortify-source=none \
   -Dposix-console=true \
   -Dtests=true \
+  -Dmultilib-list=".,mbarrel-shift-enabled/mmultiply-enabled/mdivide-enabled/msign-extend-enabled"
   "$@"

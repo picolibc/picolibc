@@ -6,7 +6,7 @@ as = 'riscv64-unknown-elf-as'
 nm = 'riscv64-unknown-elf-nm'
 strip = 'riscv64-unknown-elf-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-riscv "$@"', 'run-riscv']
+exe_wrapper = ['env', 'run-riscv']
 
 [host_machine]
 system = 'unknown'

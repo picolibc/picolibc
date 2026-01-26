@@ -41,34 +41,35 @@
 double
 div_d(double a, double b)
 {
-	return a/b;
+    return a / b;
 }
 
 double
 mul_d(double a, double b)
 {
-	return a * b;
+    return a * b;
 }
 
 double
 sub_d(double a, double b)
 {
-	return a - b;
+    return a - b;
 }
 
 float
-div_f(float a, float b) {
-	return a/b;
+div_f(float a, float b)
+{
+    return a / b;
 }
 
 float
-mul_f(float a, float b) {
-	return a * b;
+mul_f(float a, float b)
+{
+    return a * b;
 }
 
 float
 sub_f(float a, float b)
 {
-	return a - b;
+    return a - b;
 }
-

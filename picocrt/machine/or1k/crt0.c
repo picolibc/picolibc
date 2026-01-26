@@ -38,5 +38,5 @@
 void __section(".init")
 _cstart(void)
 {
-	__start();
+    __start();
 }

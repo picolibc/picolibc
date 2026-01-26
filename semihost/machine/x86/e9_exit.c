@@ -40,11 +40,11 @@
 __noreturn void
 _exit(int code)
 {
-        char buf[15];
-        int n;
-        /* Can't use printf because stdout has already been cleaned up */
-        n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
-        write(1, buf, n);
-	while(1)
-		__asm__("hlt");
+    char buf[15];
+    int  n;
+    /* Can't use printf because stdout has already been cleaned up */
+    n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
+    write(1, buf, n);
+    while (1)
+        __asm__("hlt");
 }

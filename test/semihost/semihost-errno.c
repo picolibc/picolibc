@@ -39,18 +39,18 @@
 int
 main(void)
 {
-	int	err;
-	int 	fd;
+    int err;
+    int fd;
 
-	fd = sys_semihost_open("____no-such-file_____", 0);
-	if (fd != -1) {
-		printf("got valid fd opening non-existent file\n");
-		exit(1);
-	}
-	err = sys_semihost_errno();
-	if (err == 0) {
-		printf("No error when opening non-existent file\n");
-		exit(2);
-	}
-	exit(0);
+    fd = sys_semihost_open("____no-such-file_____", 0);
+    if (fd != -1) {
+        printf("got valid fd opening non-existent file\n");
+        exit(1);
+    }
+    err = sys_semihost_errno();
+    if (err == 0) {
+        printf("No error when opening non-existent file\n");
+        exit(2);
+    }
+    exit(0);
 }

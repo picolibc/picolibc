@@ -34,11 +34,8 @@
 #
 
 set(tests
-  printf_scanf
-  printf-tests
   rand
   regex
-  ungetc
   fenv
   long_double
   math_errhandling
@@ -51,30 +48,13 @@ set(tests
   math-funcs
   timegm
   time-tests
-  test-funopen
+  test-getdate
   test-strtod
-  test-strchr
-  test-memset
-  test-put
   test-efcvt
   test-fma
-  test-sprintf-percent-n
   malloc_stress
-  test-memchr
-  test-memcpy_s
-  test-memset_s
-  test-memmove_s
-  test-strcat_s
-  test-strcpy_s
-  test-strerror_s
-  test-strerrorlen_s
-  test-strncat_s
-  test-strncpy_s
-  test-strnlen_s
-  test-sprintf_s
   test-uchar
-  test-vfprintf_s
-  test-vsnprintf_s
+  test-wcsftime
   )
 
 set(tests_fail
@@ -107,3 +87,9 @@ foreach(test IN LISTS tests_fail)
 endforeach()
 
 picolibc_test(rounding-mode rounding-mode-sub.c)
+
+add_subdirectory(test-ctype)
+add_subdirectory(test-math)
+add_subdirectory(test-monetary)
+add_subdirectory(test-stdio)
+add_subdirectory(test-string)

@@ -43,41 +43,38 @@
 #define SH_QEMU
 #endif
 
-typedef volatile uint8_t vuint8_t;
+typedef volatile uint8_t  vuint8_t;
 typedef volatile uint32_t vuint32_t;
 
 #ifdef SH_QEMU
 
 struct sh_serial {
-    vuint32_t   smr;
-    vuint32_t   brr;
-    vuint32_t   scr;
-    vuint32_t   tdr;
+    vuint32_t smr;
+    vuint32_t brr;
+    vuint32_t scr;
+    vuint32_t tdr;
 };
 
-#define sh_serial0 (*(struct sh_serial *) 0xffe00000)
-#define sh_serial1 (*(struct sh_serial *) 0xffe80000)
+#define sh_serial0 (*(struct sh_serial *)0xffe00000)
+#define sh_serial1 (*(struct sh_serial *)0xffe80000)
 
 #else
 
-#define TARGET_NEWLIB_SH_SYS_exit 1
+#define TARGET_NEWLIB_SH_SYS_exit  1
 #define TARGET_NEWLIB_SH_SYS_write 4
 
 struct sh_syscall_args {
-    uint32_t    r5;
-    uint32_t    r6;
-    uint32_t    r7;
+    uint32_t r5;
+    uint32_t r6;
+    uint32_t r7;
 };
 
-uint32_t
-sh_syscall(uint32_t r4, uint32_t r5, uint32_t r6, uint32_t r7);
+uint32_t sh_syscall(uint32_t r4, uint32_t r5, uint32_t r6, uint32_t r7);
 
 #endif
 
-int
-sh_putc(char c, FILE *file);
+int sh_putc(char c, FILE *file);
 
-int
-sh_getc(FILE *file);
+int sh_getc(FILE *file);
 
 #endif /* _SH_SEMIHOST_H_ */

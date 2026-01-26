@@ -45,7 +45,7 @@
 _off64_t
 lseek64(int fd, _off64_t offset, int whence)
 {
-    uint32_t    a = offset >> 32;
-    uint32_t    b = offset;
+    uint32_t a = offset >> 32;
+    uint32_t b = offset;
     return m68k_semihost4_64(HOSTED_LSEEK, fd, a, b, whence);
 }

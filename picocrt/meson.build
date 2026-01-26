@@ -81,7 +81,7 @@ picocrt_variants = [
   {
     'name': 'hosted',
     'suffix': '-hosted',
-    'c_args': ['-DCRT0_EXIT'],
+    'c_args': ['-DCRT0_HOSTED', '-DCRT0_EXIT'],
     'src': src_picocrt,
   },
   {
@@ -96,23 +96,49 @@ picocrt_variants = [
     'c_args': [],
     'src': src_picocrt_none,
   },
+  {
+    'name': 'semihost',
+    'suffix': '-semihost',
+    'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'noflash-semihost',
+    'suffix': '-noflash-semihost',
+    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  },
+  {
+    'name': 'noflash-hosted',
+    'suffix': '-noflash-hosted',
+    'c_args': ['-DCRT0_HOSTED', '-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT'],
+    'src': src_picocrt,
+  },
 ]
 
-if has_semihost
+# Use the semihost version of crt0 for testing as that
+# will have exception handling
+crt0_test = 'crt0_semihost'
+
+if thread_local_storage
   picocrt_variants += {
-                       'name': 'semihost',
-                       'suffix': '-semihost',
-                       'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+                       'name': 'inittls',
+                       'suffix': '-inittls',
+                       'c_args': ['-DINIT_TLS'],
                        'src': src_picocrt,
                      }
-  crt0_test = 'crt0_semihost'
+  picocrt_variants += {
+    'name': 'inittls-semihost',
+    'suffix': '-inittls-semihost',
+    'c_args': ['-DINIT_TLS', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  }
 endif
 
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
-  target_c_args = params['c_args'] + stack_c_args
-  target_lib_prefix = params['lib_prefix']
+  target_c_args = params['c_args'] + stack_c_args + ['-D_LIBC']
 
   instdir = join_paths(lib_dir, target_dir)
 
@@ -129,13 +155,25 @@ foreach params : targets
       _link_args = target_c_args + ['-r', '-ffreestanding']
       
       # The normal variant does not call 'exit' after return from main (c lingo: freestanding execution environment)
-      _crt = executable(join_paths(target_dir, crt_name),
-                        _src,
-                        include_directories : inc,
-                        install : true,
-                        install_dir : instdir,
-                        c_args : _c_args,
-                        link_args : _link_args)
+
+      if meson.version().version_compare('>=1.10')
+        _crt = executable(crt_name,
+                          _src,
+                          build_subdir : target_dir,
+                          include_directories : inc,
+                          install : really_install,
+                          install_dir : instdir,
+                          c_args : _c_args,
+                          link_args : _link_args)
+      else
+        _crt = executable(join_paths(target_dir, crt_name),
+                          _src,
+                          include_directories : inc,
+                          install : really_install,
+                          install_dir : instdir,
+                          c_args : _c_args,
+                          link_args : _link_args)
+      endif
 
       if machine['name'] == test_machine
         set_variable('crt0' + variant_suffix.underscorify() + target,
@@ -144,14 +182,27 @@ foreach params : targets
       endif
 
       if enable_picocrt_lib
-        static_library(join_paths(target_dir, target_lib_prefix + libcrt_name),
-                       [],
-                       include_directories : inc,
-                       install : true,
-                       install_dir : instdir,
-                       c_args : _c_args,
-                       objects: _crt.extract_objects(_src),
-                       pic: false)
+        if meson.version().version_compare('>=1.10')
+          static_library(libcrt_name,
+                         [],
+                         build_subdir : target_dir,
+                         include_directories : inc,
+                         install : really_install,
+                         install_dir : instdir,
+                         c_args : _c_args,
+                         objects: _crt.extract_objects(_src),
+                         pic: false)
+        else
+          target_lib_prefix = params['lib_prefix']
+          static_library(join_paths(target_dir, target_lib_prefix + libcrt_name),
+                         [],
+                         include_directories : inc,
+                         install : really_install,
+                         install_dir : instdir,
+                         c_args : _c_args,
+                         objects: _crt.extract_objects(_src),
+                         pic: false)
+        endif
       endif
     endforeach
   endforeach

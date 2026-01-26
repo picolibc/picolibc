@@ -46,7 +46,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-int
-sparc_putc(char c, FILE *file);
+int sparc_putc(char c, FILE *file);
 
 #endif /* _SPARC_SEMIHOST_H_ */

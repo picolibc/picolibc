@@ -32,40 +32,17 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-lib_semihost_srcs = [
-  '../arc/arc_close.c',
-  '../arc/arc_errno.c',
-  '../arc/arc_exit.c',
-  '../arc/arc_fstat.c',
-  '../arc/arc_lseek.c',
-  '../arc/arc_open.c',
-  '../arc/arc_read.c',
-  '../arc/arc_stat.c',
-  '../arc/arc_stub.c',
-  '../arc/arc_unlink.c',
-  '../arc/arc_write.c',
-]
 
-has_semihost = true
-
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
-
-  instdir = join_paths(lib_dir, target_dir)
-
-  libsemihost_name = 'semihost'
-
-  local_lib_semihost_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
-				       lib_semihost_srcs,
-				       install : true,
-				       install_dir : instdir,
-				       include_directories : inc,
-				       c_args : target_c_args + c_args,
-				       pic: false)
-
-  set_variable('lib_semihost' + target, local_lib_semihost_target)
-
-endforeach
+src_semihost += files([
+                       '../arc/arc_close.c',
+                       '../arc/arc_errno.c',
+                       '../arc/arc_exit.c',
+                       '../arc/arc_fstat.c',
+                       '../arc/arc_lseek.c',
+                       '../arc/arc_open.c',
+                       '../arc/arc_read.c',
+                       '../arc/arc_stat.c',
+                       '../arc/arc_stub.c',
+                       '../arc/arc_unlink.c',
+                       '../arc/arc_write.c',
+                     ])

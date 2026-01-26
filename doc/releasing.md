@@ -21,7 +21,7 @@ picolibc:
     * ARM 32-bit, almost all targets (qemu)
     * ARM 64-bit
 
- 3. Use glibc test suite for RISC-V and ARM 32-bit:
+ 3. Use glibc test suite for RISC-V and ARM:
 
 	$ ./scripts/test-picolibc
 
@@ -44,7 +44,7 @@ picolibc:
 
  6. Add release notes to README.md
  
- 7. Update meson.build and CMakeLists.txt with new version number
+ 7. Update meson.build, CMakeLists.txt and README.md with new version number
 
  8. Commit release notes and meson.build
 

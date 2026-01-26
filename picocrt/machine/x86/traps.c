@@ -43,15 +43,15 @@
 /* Trap faults, print error message and exit */
 
 struct interrupt_frame {
-    uintptr_t   eip;
-    uintptr_t   cs;
-    uintptr_t   code;
+    uintptr_t eip;
+    uintptr_t cs;
+    uintptr_t code;
 };
 
 #ifdef __x86_64
-#define FMT     "%#016" PRIxPTR
+#define FMT "%#016" PRIxPTR
 #else
-#define FMT     "%#08" PRIxPTR
+#define FMT "%#08" PRIxPTR
 #endif
 
 void

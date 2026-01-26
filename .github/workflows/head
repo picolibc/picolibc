@@ -16,9 +16,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  # CCache is disabled for the Linux jobs for now.
-  CCACHE_SIZE: "0M"
-  CCACHE_CMD: true
   DOCKERFILE: picolibc/.github/Dockerfile
   IMAGE_FILE: dockerimg-linux.tar.zst
   IMAGE: picolibc-linux
@@ -30,13 +27,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: picolibc
 
       - name: Cache the Docker Image
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}

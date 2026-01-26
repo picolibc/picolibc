@@ -1,8 +1,4 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['loongarch64-unknown-elf-gcc', '-nostdlib']
 cpp = ['loongarch64-unknown-elf-g++', '-nostdlib']
 ar = 'loongarch64-unknown-elf-ar'
@@ -10,7 +6,7 @@ as = 'loongarch64-unknown-elf-as'
 strip = 'loongarch64-unknown-elf-strip'
 nm = 'loongarch64-unknown-elf-nm'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-loongarch64 "$@"', 'run-loongarch64']
+exe_wrapper = ['env', 'run-loongarch64']
 
 [host_machine]
 system = 'unknown'
@@ -19,6 +15,7 @@ cpu = 'loongarch'
 endian = 'little'
 
 [properties]
+skip_sanity_check = true
 # Use secondary flash as first is occupied by boot_code
 default_flash_addr = '0x1d000000'
 default_flash_size = '0x01000000'

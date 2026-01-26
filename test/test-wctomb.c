@@ -41,13 +41,13 @@
 #include <locale.h>
 #include <errno.h>
 
-#define MAX_WC  16
-#define MAX_MB  16
+#define MAX_WC 16
+#define MAX_MB 16
 
 const struct {
-    wchar_t     wc[MAX_WC];
-    char        mb[MAX_MB];
-    unsigned    err;
+    wchar_t  wc[MAX_WC];
+    char     mb[MAX_MB];
+    unsigned err;
 } test[] = {
 
 #if __SIZEOF_WCHAR_T__ == 2
@@ -55,10 +55,10 @@ const struct {
     { .wc = { 0x0000 }, .mb = "" },
 #if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     { .wc = { 0x3330 }, .mb = "㌰" },
-    { .wc = { 0xd83d, 0xde80 }, .mb = "🚀" },                   /* 0x01f680 */
-    { .wc = { 0xdbc2, 0xdd7f }, .mb = "\xf4\x80\xa5\xbf" },     /* 0x10097f */
-    { .wc = { 0xd800, 0xdc00 }, .mb = "\xf0\x90\x80\x80" },     /* 0x010000 */
-    { .wc = { 0xdbff, 0xdfff }, .mb = "\xf4\x8f\xbf\xbf" },     /* 0x10ffff */
+    { .wc = { 0xd83d, 0xde80 }, .mb = "🚀" }, /* 0x01f680 */
+    { .wc = { 0xdbc2, 0xdd7f }, .mb = "\xf4\x80\xa5\xbf" }, /* 0x10097f */
+    { .wc = { 0xd800, 0xdc00 }, .mb = "\xf0\x90\x80\x80" }, /* 0x010000 */
+    { .wc = { 0xdbff, 0xdfff }, .mb = "\xf4\x8f\xbf\xbf" }, /* 0x10ffff */
 
     /* Missing low surrogate */
     { .wc = { 0xd83d, 0x0000 }, .mb = "", .err = 1 + 1 },
@@ -96,19 +96,20 @@ const struct {
 
     /* Low surrogate value */
     { .wc = { 0x0000de80 }, .mb = "", .err = 0 + 1 },
-#endif /* !defined(__PICOLIBC__) || defined(__MB_CAPABLE) */
+#endif  /* !defined(__PICOLIBC__) || defined(__MB_CAPABLE) */
 
-#endif /* else __SIZEOF_WCHAR_T__ == 2 */
+#endif  /* else __SIZEOF_WCHAR_T__ == 2 */
 };
 
-#define NTEST (sizeof(test)/sizeof(test[0]))
+#define NTEST (sizeof(test) / sizeof(test[0]))
 
-int main(void)
+int
+main(void)
 {
-    unsigned i;
-    unsigned j;
-    unsigned k;
-    int status = 0;
+    unsigned  i;
+    unsigned  j;
+    unsigned  k;
+    int       status = 0;
     mbstate_t mbstate;
 
 #if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
@@ -119,23 +120,24 @@ int main(void)
 #endif
 
     for (i = 0; i < NTEST; i++) {
-        char    mb[MAX_MB];
-        size_t  ret = 0;
-        size_t  off = 0;
+        char   mb[MAX_MB];
+        size_t ret = 0;
+        size_t off = 0;
         memset(mb, 0, sizeof(mb));
         memset(&mbstate, 0, sizeof(mbstate));
         for (j = 0; test[i].wc[j] != 0; j++) {
             ret = wcrtomb(mb + off, test[i].wc[j], &mbstate);
-            if (ret == (size_t) -1) {
+            if (ret == (size_t)-1) {
                 if (test[i].err != 0 && test[i].err == j + 1)
                     break;
                 printf("wcrtomb %d failed at char %d\n", i, j);
                 status = 1;
                 break;
             } else if (test[i].err == j + 1) {
-                printf("wcrtomb %d unexpected success wc[%u] is %#lx: ", i, j, (unsigned long) test[i].wc[j]);
+                printf("wcrtomb %d unexpected success wc[%u] is %#lx: ", i, j,
+                       (unsigned long)test[i].wc[j]);
                 for (k = 0; test[i].wc[k] != 0; k++)
-                    printf(" 0x%lx", (unsigned long) test[i].wc[k]);
+                    printf(" 0x%lx", (unsigned long)test[i].wc[k]);
                 printf("\n");
                 status = 1;
                 break;
@@ -149,10 +151,10 @@ int main(void)
                 printf("test %d: expected '%s' got '%s'\n", i, test[i].mb, mb);
                 status = 1;
             }
-        } else if (ret == (size_t) -1) {
+        } else if (ret == (size_t)-1) {
             printf("expected wcrtomb error at %d: ", j);
             for (k = 0; test[i].wc[k] != 0; k++)
-                printf(" 0x%lx", (unsigned long) test[i].wc[k]);
+                printf(" 0x%lx", (unsigned long)test[i].wc[k]);
             printf("\n");
         }
 
@@ -165,17 +167,16 @@ int main(void)
         if (test[i].err == 0) {
             while (test[i].mb[j] != 0 || ret) {
                 ret = mbrtowc(wc + off, &test[i].mb[j], 1, &mbstate);
-                if (ret == (size_t) -1)
-                {
+                if (ret == (size_t)-1) {
                     printf("mbrtowc %d failed at byte %d\n", i, j);
                     status = 1;
                     break;
                 }
                 switch (ret) {
-                case (size_t) -2:
+                case (size_t)-2:
                     j++;
                     break;
-                case (size_t) -3:
+                case (size_t)-3:
                     off++;
                     break;
                 default:
@@ -186,8 +187,8 @@ int main(void)
             }
             for (j = 0; j < MAX_WC; j++) {
                 if (wc[j] != test[i].wc[j]) {
-                    printf("mbrtowc %d[%d]: expected 0x%08lx got 0x%08lx\n",
-                           i, j, (unsigned long) test[i].wc[j], (unsigned long) wc[j]);
+                    printf("mbrtowc %d[%d]: expected 0x%08lx got 0x%08lx\n", i, j,
+                           (unsigned long)test[i].wc[j], (unsigned long)wc[j]);
                     status = 1;
                 }
             }

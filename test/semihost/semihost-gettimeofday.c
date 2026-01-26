@@ -40,46 +40,39 @@
 int
 main(void)
 {
-        int             loop;
-        struct timeval  prev, cur;
-        int             ret;
+    int            loop;
+    struct timeval prev, cur;
+    int            ret;
 
-        ret = gettimeofday(&prev, NULL);
+    ret = gettimeofday(&prev, NULL);
+    if (ret < 0) {
+        printf("gettimeofday return %d\n", ret);
+        exit(2);
+    }
+    if (prev.tv_sec < 1600000000LL) {
+        printf("gettimeofday return value before 2020-9-13 %lld\n", (long long)prev.tv_sec);
+        exit(2);
+    }
+    for (loop = 0; loop < 10000; loop++) {
+        ret = gettimeofday(&cur, NULL);
         if (ret < 0) {
-                printf("gettimeofday return %d\n", ret);
-                exit(2);
+            printf("gettimeofday return %d\n", ret);
+            exit(2);
         }
-        if (prev.tv_sec < 1600000000LL) {
-                printf("gettimeofday return value before 2020-9-13 %lld\n",
-                       (long long) prev.tv_sec);
-                exit(2);
+        if (cur.tv_sec > prev.tv_sec + 1000) {
+            printf("gettimeofday: seconds changed by %lld\n",
+                   (long long)(cur.tv_sec - prev.tv_sec));
+            exit(2);
         }
-	for (loop = 0; loop < 10000; loop++) {
-                ret = gettimeofday(&cur, NULL);
-                if (ret < 0) {
-                        printf("gettimeofday return %d\n", ret);
-                        exit(2);
-                }
-                if (cur.tv_sec > prev.tv_sec + 1000) {
-                        printf("gettimeofday: seconds changed by %lld\n",
-                               (long long) (cur.tv_sec - prev.tv_sec));
-                        exit(2);
-                }
-                if (cur.tv_sec > prev.tv_sec ||
-                    (cur.tv_sec == prev.tv_sec &&
-                     cur.tv_usec > prev.tv_usec))
-                {
-                        printf("gettimeofday: ok\n");
-                        exit(0);
-                }
-                if (cur.tv_sec < prev.tv_sec ||
-                    (cur.tv_sec == prev.tv_sec &&
-                     cur.tv_usec < prev.tv_usec))
-                {
-                        printf("gettimeofday: clock went backwards\n");
-                        exit(2);
-		}
-	}
-	printf("gettimeofday: clock never changed\n");
-	exit(1);
+        if (cur.tv_sec > prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec > prev.tv_usec)) {
+            printf("gettimeofday: ok\n");
+            exit(0);
+        }
+        if (cur.tv_sec < prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec < prev.tv_usec)) {
+            printf("gettimeofday: clock went backwards\n");
+            exit(2);
+        }
+    }
+    printf("gettimeofday: clock never changed\n");
+    exit(1);
 }

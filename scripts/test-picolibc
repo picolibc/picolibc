@@ -7,70 +7,51 @@ set -e
 
 #test=echo
 
-options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Db_sanitize=undefined"
-minoptions="$options"
-reloptions="$options --buildtype=release -Ddebug=true -Dbuild-type-subdir=release"
+options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Dsanitize=undefined"
+stdoptions="$options --buildtype=release -Ddebug=true"
 
-for arch in arm riscv; do
+for arch in aarch64 arm riscv; do
 
-    DIR=$PICOLIBC_DIR/builds/build-$arch-minsize
-
-    $test rm -rf $DIR
-    $test mkdir -p $DIR
-    $test cd $DIR
-
-    echo '###################################'
-    echo '####' ../../scripts/do-$arch-configure $options
-    echo '###################################'
-
-    $test ../../scripts/do-$arch-configure $options
-    $test ninja test install
-
-    DIR=$PICOLIBC_DIR/builds/build-$arch-release
+    DIR=$PICOLIBC_DIR/builds/build-$arch
 
     $test rm -rf $DIR
     $test mkdir -p $DIR
     $test cd $DIR
 
+    if [ $arch = aarch64 ]; then
+	conf=$arch-none-elf
+    else
+	conf=$arch
+    fi
+
     echo '###################################'
-    echo '####' ../../scripts/do-$arch-configure $reloptions
+    echo '####' ../../scripts/do-$conf-configure $stdoptions
     echo '###################################'
 
-    $test ../../scripts/do-$arch-configure $reloptions
-    $test ninja test install
+    $test ../../scripts/do-$conf-configure $stdoptions
+
+    $test ninja
+    $test meson test -t 10
+    $test ninja install
 
 done
 
 options="-Dwerror=true"
-minoptions="$options --buildtype=minsize"
-reloptions="$options --buildtype=release -Ddebug=true -Dpicolibc-buildtype=release"
+stdoptions="$options --buildtype=release -Ddebug=true"
 
-for arch in arm riscv; do
+for arch in aarch64 arm riscv; do
 
-    DIR=$GLIBC_DIR/builds/build-$arch-minsize
-
-    $test rm -rf $DIR
-    $test mkdir -p $DIR
-    $test cd $DIR
-
-    echo '###################################'
-    echo '####' ../../picolibc/do-$arch-configure $minoptions
-    echo '###################################'
-
-    $test ../../picolibc/do-$arch-configure $minoptions
-    $test ninja test
-
-    DIR=$GLIBC_DIR/builds/build-$arch-release
+    DIR=$GLIBC_DIR/builds/build-$arch
 
     $test rm -rf $DIR
     $test mkdir -p $DIR
     $test cd $DIR
 
     echo '###################################'
-    echo '####' ../../picolibc/do-$arch-configure $reloptions
+    echo '####' ../../picolibc/do-$arch-configure $stdoptions
     echo '###################################'
 
-    $test ../../picolibc/do-$arch-configure $reloptions
+    $test ../../picolibc/do-$arch-configure $stdoptions
     $test ninja test
 
 done

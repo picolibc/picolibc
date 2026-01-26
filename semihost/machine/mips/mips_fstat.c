@@ -47,10 +47,10 @@
 #include <stdarg.h>
 
 int
-fstat(int fd, struct stat *restrict statbuf)
+fstat(int fd, struct stat * restrict statbuf)
 {
     struct mips_stat mips_stat;
-    int ret;
+    int              ret;
 
     ret = mips_semihost2(SYS_SEMIHOST_fstat, fd, (uintptr_t)&mips_stat);
     if (ret >= 0)

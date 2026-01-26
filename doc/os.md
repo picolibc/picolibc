@@ -2,14 +2,19 @@
 
 Picolibc is designed to be operating-system independent, so it doesn't
 embed any operating system support into libc. Some portions of
-Picolibc need system support, like I/O and task termination.
+Picolibc need system support, like I/O and task termination. Picolibc
+expects these interfaces to conform to POSIX, both as a way to
+simplify integration into POSIX-conforming operating system and as a
+way to provide a well defined interface between picolibc and the
+target system.
 
-## System Interfaces used by Picolibc
+When using picolibc in a non-POSIX environment, applications may
+constrain themselves to portions of picolibc which do not rely upon
+these functions, provide wrapping functions which expose POSIX apis on
+top of their native implementation or replace portions of picolibc
+with code designed atop their interfaces.
 
-Here's the full list of system functions used by Picolibc, split into
-sections based on what libc support they enable
-
-### stdin/stdout/stderr
+## stdin/stdout/stderr
 
 Picolibc stdio splits support for simple console input/output and more
 complex file operations so that a minimal system can easily support
@@ -85,54 +90,157 @@ __strong_reference(stdin, stdout);
 __strong_reference(stdin, stderr);
 ```
 
-### fopen, fdopen
+## Operating System Interfaces used by Picolibc
+
+Here's the full list of external operating system functions used by
+Picolibc and which source files reference them. 
+
+ * int close(int fd)
+
+   + libc/search/hash.c
+   + libc/stdio/fdopen.c
+   + libc/stdio/fopen.c
+   + libc/stdio/freopen.c
+   + libc/stdio/mktemp.c
+   + libc/stdio/tmpfile.c
+
+ * void _exit(int status)
+
+   + libc/signal/signal.c
+   + libc/stdlib/abort.c
+   + libc/stdlib/exit.c
+   + libc/stdlib/_Exit.c
+
+ * int fstat(int fd, struct stat *statbuf)
+
+   + libc/search/hash.c
+
+ * int getentropy(void *buffer, size_t length)
+
+   + libc/ssp/stack/protector.c
+   + libc/stdlib/arc4random.c
+
+ * int gettimeofday(struct timeval *tv, sruct timezone *tz)
+
+   + libc/time/time.c
+
+ * off_t lseek(int fd, off_t offset, int whence)
+
+   + libc/search/hash.c
+   + libc/search/hash_page.c
+   + libc/stdio/fdopen.c
+   + libc/stdio/freopen.c
+   + libc/xdr/xdr_rec.c
+
+ * int open(char *path, int flags, ...)
+
+   + libc/search/hash.c
+   + libc/stdio/fopen.c
+   + libc/stdio/freopen.c
+   + libc/stdio/mktemp.c
+
+ * ssize_t read(int fd, void *buf, size_t count)
+
+   + libc/search/hash.c
+   + libc/search/hash_page.c
+   + libc/stdio/fdopen.c
+   + libc/stdio/freopen.c
+
+ * int sigprocmask(int how, sigset_t *set, sigset_t *oldset)
+
+   + libc/search/hash_page.c
+
+ * int stat(char *path, struct stat *statbuf)
+
+   + libc/search/hash.c
+
+ * clock_t times(struct tms *buf)
+
+   + libc/time/clock.c
+
+ * int unlink(char *path)
+
+   + libc/search/hash_page.c
+   + libc/stdio/remove.c
+   + libc/stdio/tmpfile.c
+
+ * ssize_t write(int fd, void *buf, size_t count)
+
+   + libc/search/hash.c
+   + libc/search/hash_page.c
+   + libc/stdio/fdopen.c
+   + libc/stdio/freopen.c
+   + libc/stdio/vdprintf.c
+
+### fopen, fdopen and freopen
 
 Support for these requires malloc/free along with a handful of
 POSIX-compatible functions:
 
 ```c
-int open (const char *, int, ...);
-int close (int fd);
+int     close (int fd);
+off_t   lseek (int fd, off_t offset, int whence);
+int     open (const char *, int, ...);
 ssize_t read (int fd, void *buf, size_t nbyte);
 ssize_t write (int fd, const void *buf, size_t nbyte);
-off_t lseek (int fd, off_t offset, int whence);
 ```
 
-The code needed for this is built into Picolibc by default, but can be
-disabled by specifying `-Dposix-io=false` in the meson command line.
+### dprintf, vdprintf
 
-### exit
-
-Exit is just a wrapper around _exit that also calls destructors and
-callbacks registered with atexit. To make it work, you'll need to
-implement the `_exit` function:
+These functions directly operate on file descriptors, so they use
+`write`:
 
 ```c
-__noreturn void _exit (int status);
+ssize_t write (int fd, const void *buf, size_t nbyte);
 ```
 
-### malloc and free
+### mktemp, mkstemp, mkostemp, mkstemps, mkostemps, tmpnam and tmpfile
 
-Both versions of malloc in picolibc require sbrk to be supported. The
-smaller version, enabled (by default) with -Dnewlib-nano-malloc=true,
-can handle sbrk returning dis-continuous memory while the larger
-version (enabled with -Dnewlib-nano-malloc=false) requires sbrk return
-contiguous chunks of memory.
+All of these functions share a common implementation which operates on
+file descriptors, so they all need a selection of POSIX functions:
+
+```c
+int close (int fd);
+int open (const char *, int, ...);
+int unlink(char *path)
+```
+
+### exit and _Exit
+
+`_Exit` is a trivial wrapper around `_exit`; `exit` is a wrapper around
+`_exit` that also calls destructors and callbacks registered with `atexit`
+or `on_exit`. To make these work, you'll need to implement the `_exit`
+function:
+
+```c
+void _exit (int status);
+```
+
+### malloc, free (and friends)
+
+Picolibc's `malloc` implementation relies on `sbrk`. Malloc can handle
+sbrk returning dis-continuous memory.
+
+```c
+void *sbrk(intptr_t incr);
+```
 
 ### sbrk
 
 Picolibc includes a simple version of sbrk that can return chunks of
-memory from a pre-defined contiguous heap. To use this function, your
-application linking process needs to define two symbols:
+memory from a pre-defined contiguous heap. You can either specify
+`-Dinternal-heap=<size-in-bytes>` while building picolibc to declare a
+fixed-size pre-allocated heap, or have the linker script define
+symbols that provide the bounds of the heap:
 
- * __heap_start — points at the start of the heap available for sbrk.
- * __heap_end — points at the end of the heap available for sbrk.
+ * `__heap_start` — points at the start of the heap available for sbrk.
+ * `__heap_end` — points at the end of the heap available for sbrk.
 
 The sample linker script provided with picolibc defines these two
 symbols to enclose all RAM which is not otherwise used by the
 application.
 
-## abort
+### abort and raise
 
 Posix says that `abort` sends `SIGABRT` to the calling process as if
 the process called `raise(SIGABRT)`. It also says `abort` shall not
@@ -140,8 +248,58 @@ return. The picolibc implementation of `abort` calls `raise`; if that
 returns, it then calls `_exit`. The picolibc version of `raise` also
 calls `_exit` for uncaught and un-ignored signals.
 
-This means that an application needs to provide an implementation of
-`_exit` to support `abort`.
+```c
+__noreturn void _exit (int status);
+```
+
+### ndbm
+
+Picolibc provides the BSD ndbm APIs and those operate directly via a
+POSIX OS interface, not through stdio. Support for this API set
+require all of the functions required by `fopen` along a few
+additional ones:
+
+```c
+int     close (int fd);
+off_t   lseek (int fd, off_t offset, int whence);
+int     open (const char *, int, ...);
+ssize_t read (int fd, void *buf, size_t nbyte);
+int     sigprocmask(int how, sigset_t *set, sigset_t *oldset);
+int     stat(char *path, struct stat *statbuf);
+int     unlink(char *path);
+ssize_t write (int fd, const void *buf, size_t nbyte);
+```
+
+### xdr
+
+The Sun XDR APIs are generally abstracted away from OS interfaces
+except that when using xdrrec_create. As that interface provides no
+seek interface, the underlying implementation assumes that the
+provided handle actually contains a POSIX file descriptor and directly
+calls lseek for xdr_setpos and xdr_getpos. This provides compatibility
+with glibc which does the same thing.
+
+```c
+off_t lseek(int fd, off_t offset, int whence);
+```
+
+### arc4random, arc4random_buf
+
+To generate secure random numbers, picolibc's arc4random
+implementation is seeded from system entropy:
+
+```c
+int getentropy(void *buffer, size_t length);
+```
+
+### clock
+
+The clock API returns a total of all values returned from the times
+API.
+
+```c
+clock_t times(struct tms *buf);
+```
 
 ## Linking with System Library
 
@@ -191,15 +349,17 @@ picolibc configuration parameters:
 
 ```console
 $ meson \
-	-Dtls-model=global-dynamic \
-	-Derrno-function=auto \
-	-Dmultilib=false \
-	-Dpicolib=false \
+        -Dtls-model=global-dynamic \
+        -Dmultilib=false \
 	-Dpicocrt=false \
 	-Dsemihost=false \
 	-Duse-stdlib=true \
 	-Dposix-console=true \
-	-Dnewlib-global-atexit=true
+	-Dthread-local-storage=true \
+	-Dthread-local-storage-api=false \
+	-Dinternal-heap=8388608 \
+	-Derrno-function=auto \
+	-Dinitfini-array=false\
 	-Dincludedir=lib/picolibc/include \
 	-Dlibdir=lib/picolibc/lib \
 	-Dspecsdir=none \
@@ -210,9 +370,6 @@ $ meson \
 
  * -Dmultilib=false makes picolibc build only a single library for the
    default GCC configuration.
-
- * -Dpicolib=false disables building the TLS and sbrk support built-in
-   to picolibc so that the underlying system support is used instead.
 
  * -Dpicocrt=false disables building the C startup code as that is
    provided by the underlying system.
@@ -226,8 +383,18 @@ $ meson \
  * -Dposix-console=true uses POSIX I/O read/write APIs for stdin,
     stdout and stderr.
 
- * -Dnewlib-global-atexit=true disables the per-thread atexit behavior
-   so that picolibc acts like a regular C library.
+ * -Dthread-local-storage=true and -Dthread-local-storage-api=false
+   set up the library to enable TLS but not attempt to provide the
+   picolibc-specific TLS apis as those don't work with the system C
+   library.
+
+ * -Dinternal-heap=8388608 allocates a stack chunk of memory for use
+   by the picolibc `sbrk` implementation.
+
+ * -Derrno-function=auto detects the native C library errno implementation.
+
+ * -Dinitfini-array=false skips the picolibc constructor bits and lets
+    the native C library do that initialization step.
 
  * -Dincludedir, -Dlibdir and -Dspecsdir set up the installation so it
    doesn't conflict with the native system.

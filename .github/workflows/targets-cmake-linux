@@ -1,4 +1,0 @@
-        test: [
-          "./.github/do-cmake-linux -DCMAKE_BUILD_TYPE=RelWithDebInfo",
-          "./.github/do-cmake-linux -DCMAKE_BUILD_TYPE=MinSizeRel",
-        ]

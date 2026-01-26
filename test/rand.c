@@ -42,85 +42,85 @@
 static bool
 near(double got, double target, double close)
 {
-	if (got < target - close)
-		return false;
-	if (got > target + close)
-		return false;
-	return true;
+    if (got < target - close)
+        return false;
+    if (got > target + close)
+        return false;
+    return true;
 }
 
 static double
 random_double(void)
 {
-    return (double) random() / 0x7fffffffL;
+    return (double)random() / 0x7fffffffL;
 }
 
 static double
 rand_double(void)
 {
-    return (double) rand() / RAND_MAX;
+    return (double)rand() / RAND_MAX;
 }
 
 static const struct {
-        char    *name;
-        double  (*func)(void);
-        double  mean_err;
-        double  stddev_err;
+    char  *name;
+    double (*func)(void);
+    double mean_err;
+    double stddev_err;
 } funcs[] = {
-        {
-                .name = "drand48",
-                .func = drand48,
-                .mean_err = 0.01,
-                .stddev_err = 0.02,
-        },
-        {
-                .name = "random",
-                .func = random_double,
-                .mean_err = 0.01,
-                .stddev_err = 0.02,
-        },
-        {
-                .name = "rand",
-                .func = rand_double,
-                .mean_err = 0.01,
-                .stddev_err = 0.02,
-        },
+    {
+     .name = "drand48",
+     .func = drand48,
+     .mean_err = 0.01,
+     .stddev_err = 0.02,
+     },
+    {
+     .name = "random",
+     .func = random_double,
+     .mean_err = 0.01,
+     .stddev_err = 0.02,
+     },
+    {
+     .name = "rand",
+     .func = rand_double,
+     .mean_err = 0.01,
+     .stddev_err = 0.02,
+     },
 };
 
 int
 main(void)
 {
-	int32_t i;
-	int ret = 0;
-        unsigned f;
+    int32_t  i;
+    int      ret = 0;
+    unsigned f;
 
-        for (f = 0; f < sizeof(funcs) / sizeof(funcs[0]); f++) {
-                double s1 = 0;
-                double s2 = 0;
-                int pass = 1;
-#define N	1000
-                printf ("Testing %s...", funcs[f].name);
-                fflush(stdout);
-                for (i = 0; i < N; i++) {
-                        double d = funcs[f].func();
-                        s1 += d;
-                        s2 += d*d;
-                }
-                double mean = s1 / N;
-                double stddev = sqrt((N * s2 - s1*s1) / ((double) N * ((double) N - 1)));
-                if (!near(mean, .5, funcs[f].mean_err)) {
-                        printf(" bad mean %g", mean);
-                        ret = 1;
-                        pass = 0;
-                }
-                if (!near(stddev, .28, funcs[f].stddev_err)) {
-                        printf(" bad stddev %g", stddev);
-                        ret = 2;
-                        pass = 0;
-                }
-                if (pass)
-                        printf(" pass");
-                printf("\n");
+    for (f = 0; f < sizeof(funcs) / sizeof(funcs[0]); f++) {
+        double s1 = 0;
+        double s2 = 0;
+        int    pass = 1;
+#define N 1000
+        printf("Testing %s...", funcs[f].name);
+        fflush(stdout);
+        for (i = 0; i < N; i++) {
+            double d = funcs[f].func();
+            s1 += d;
+            s2 += d * d;
         }
-	return ret;
+        double mean = s1 / N;
+        double stddev = sqrt((N * s2 - s1 * s1) / ((double)N * ((double)N - 1)));
+        if (!near(mean, .5, funcs[f].mean_err)) {
+            printf(" bad mean %g", mean);
+            ret = 1;
+            pass = 0;
+        }
+        if (!near(stddev, .28, funcs[f].stddev_err)) {
+            printf(" bad stddev %g", stddev);
+            ret = 2;
+            pass = 0;
+        }
+        if (pass)
+            printf(" pass");
+        printf("\n");
+    }
+    return ret;
 }

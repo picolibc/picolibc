@@ -40,8 +40,8 @@ unlink(const char *pathname)
 {
     struct _simcall_ret ret;
 
-    ret = _simcall(SYS_unlink, (intptr_t) pathname);
+    ret = _simcall(SYS_unlink, (intptr_t)pathname);
     if (ret.code < 0)
         errno = ret.error;
-    return (int) ret.code;
+    return (int)ret.code;
 }

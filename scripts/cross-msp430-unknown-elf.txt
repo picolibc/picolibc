@@ -1,15 +1,11 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['msp430-unknown-elf-gcc', '-nostdlib', '-mlarge', '-mdata-region=none']
 cpp = ['msp430-unknown-elf-g++', '-nostdlib', '-mlarge', '-mdata-region=none']
 ar = 'msp430-unknown-elf-ar'
 as = 'msp430-unknown-elf-as'
 nm = 'msp430-unknown-elf-nm'
 strip = 'msp430-unknown-elf-strip'
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-msp430 "$@"', 'run-msp430']
+exe_wrapper = ['env', 'run-msp430']
 
 [host_machine]
 system = 'zephyr'
@@ -19,13 +15,17 @@ endian = 'little'
 
 [properties]
 skip_sanity_check = true
-libgcc = ['-lmul_none', '-lgcc']
+librt = ['-lmul_none', '-lgcc']
 default_alignment = 2
 default_flash_addr  = '0x00010000'
 default_flash_size  = '0x000e0000'
 default_ram_addr    = '0x00001c00'
 default_ram_size    = '0x00004000'
 default_stack_size  = '0x00000400'
+default_noflash_flash_addr = '0x00010000'
+default_noflash_flash_size = '0x00000100'
+default_noflash_ram_addr   = '0x00010100'
+default_noflash_ram_size   = '0x000dff00'
 additional_sections = ['init', 'vector']
 default_init_addr = '0x00005c00'
 default_init_size = '0x0000a3c0'

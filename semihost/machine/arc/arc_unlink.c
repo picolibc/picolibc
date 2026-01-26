@@ -40,7 +40,7 @@ int
 unlink(const char *pathname)
 {
     int ret;
-    ret = arc_semihost1(SYS_SEMIHOST_unlink, (uintptr_t) pathname);
+    ret = arc_semihost1(SYS_SEMIHOST_unlink, (uintptr_t)pathname);
     if (ret < 0)
         arc_semihost_errno(EACCES);
     return ret;

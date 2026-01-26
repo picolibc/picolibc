@@ -42,6 +42,31 @@ qemu="qemu-system-ppc64"
 elf="$1"
 shift
 
+done=0
+while [ $# -gt 0 -a $done -eq 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      done=1
+      ;;
+  esac
+done
+
 base=`basename "$elf" .elf`
 one_elf=`mktemp --suffix=.elf "$base".XXX`
 one_bin=`mktemp --suffix=.bin "$base".XXX`
@@ -67,4 +92,4 @@ mon=none
 	-chardev stdio,id=s1 \
 	-machine powernv9,accel=tcg \
 	-kernel "$one_elf" \
-	-nographic "$@" < /dev/null
+	-nographic

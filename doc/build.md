@@ -6,7 +6,7 @@ doesn't include the built-in multilib support. Picolibc uses the meson
 build system, which is a slightly quirky build system designed to
 replace autotools with a single language.
 
-Picolibc requires meson version 0.50 or newer. If your operating
+Picolibc requires meson version 0.61 or newer. If your operating
 system provides an older version, you can get the latest using
 pip. For example, on a Debian or Ubuntu system, you would do:
 
@@ -86,23 +86,6 @@ testing the library using the host compiler and host C library.
 
 ### Stdio options
 
-These options select which stdio implementation to use along with
-options common to both implementations.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| tinystdio                   | true    | Use tiny stdio from avr libc                                                         |
-| io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
-| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf. For tiny-stdio, this only affects the integer-only versions, the double and float versions always include long long support. |
-| io-pos-args                 | false   | Enable printf-family positional arg support. For tiny-stdio, this only affects the integer-only versions, the double and float versions always include positional argument support. |
-| io-long-double              | false   | Enable long double support in printf/scanf.                                          |
-
-### Tinystdio options
-
-Tinystdio offers a smaller implementation than the legacy code while
-avoiding the use of malloc except when creating new FILE objects. Most
-I/O operations are done one byte at a time.
-
 For stdin/stdout/stderr, the application will need to provide
 `stdin`, `stdout` and `stderr`, which are three pointers to FILE
 structures (which can all reference a single shared FILE structure,
@@ -115,6 +98,10 @@ definitions which use the same POSIX I/O functions.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
+| io-c99-formats              | true    | Enable C99 support in IO functions like printf/scanf                                 |
+| io-long-long                | false   | Enable long long type support in IO functions like printf/scanf. This only affects the integer-only versions, the double and float versions always include long long support. |
+| io-pos-args                 | false   | Enable printf-family positional arg support. This only affects the integer-only versions, the double and float versions always include positional argument support. |
+| io-long-double              | false   | Enable long double support in printf/scanf.                                          |
 | io-float-exact              | true    | Provide round-trip support in float/string conversions                               |
 | atomic-ungetc               | true    | Make getc/ungetc re-entrant using atomic operations                                  |
 | posix-console               | false   | Use POSIX I/O for stdin/stdout/stderr                                                |
@@ -126,26 +113,6 @@ definitions which use the same POSIX I/O functions.
 | minimal-io-long-long        | false   | Support long long values in the minimal ('m') printf and scanf variants              |
 | fast-bufio                  | false   | Improve performance of some I/O operations when using bufio                          |
 | io-wchar                    | false   | Enable wide character support in printf and scanf when mb-capable is not set         |
-
-### Legacy stdio options
-
-Normally, Picolibc is built with the small stdio library adapted from
-avrlibc (tinystdio=true). It still has the original newlib stdio bits
-and those still work (tinystdio=false), but depend on POSIX I/O
-functions from the underlying system, and perform many malloc calls at
-runtime. These options are relevant only in that configuration
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-elix-level           | 4       | Extends stdio API based on level                                                     |
-| newlib-fseek-optimization   | false   | Enable fseek optimization                                                            |
-| newlib-fvwrite-in-streamio  | false   | Enable iov in streamio                                                               |
-| newlib-io-float             | false   | Enable printf/scanf family float support                                             |
-| newlib-nano-formatted-io    | false   | Use nano version formatted IO                                                        |
-| newlib-stdio64              | true    | Include 64-bit APIs                                                                  |
-| newlib-unbuf-stream-opt     | false   | Enable unbuffered stream optimization in streamio                                    |
-| newlib-wide-orient          | false   | Track wide character orientation in streamio                                         |
-| newlib-have-fcntl           | false   | System has fcntl function available                                                  |
 
 ### Internationalization options
 
@@ -176,22 +143,9 @@ at startup and shutdown times.
 | picocrt                     | true    | Build crt0.o (C startup function)                                                    |
 | picocrt-enable-mmu          | true    | Enable memory management unit in picocrt where supported by the hardware             |
 | picocrt-lib                 | true    | Also wrap crt0.o into a library -lcrt0, which is easier to find via the library path |
-| picoexit                    | true    | Use smaller implementation that allows only 32 init and fini handlers                |
 | initfini-array              | true    | Use .init_array and .fini_array sections in picocrt                                  |
 | initfini                    | false   | Support _init() and _fini() functions in picocrt                                    |
 | crt-runtime-size            | false   | Compute .data/.bss sizes at runtime rather than linktime. <br> This option exists for targets where the linker can't handle a symbol that is the difference between two other symbols |
-
-### Legacy (non-picoexit) startup/shutdown options
-
-These options cover the (non-default) legacy exit handler support when
-picoexit is disabled.
-
-| Option                      | Default | Description                                                                          |
-| ------                      | ------- | -----------                                                                          |
-| newlib-atexit-dynamic-alloc | false   | Allocate additional space for handlers as necessary                                  |
-| newlib-global-atexit        | false   | Place exit handlers in global variables instead of thread-local ones                 |
-| newlib-register-fini        | false   | Register function that invokes destructors using atexit                              |
-| newlib-register-fini        | false   | Register 
 
 ### Malloc options
 

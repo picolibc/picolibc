@@ -1,0 +1,198 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+import Complex;
+
+typedef union {
+	complex		c;
+	void		i;
+	void		n;
+} complex_result_t;
+
+complex_result_t complex_nan = { .n = ◊ };
+
+complex_result_t complex_inf = { .i = ◊ };
+
+complex_result_t complex_result(complex z)
+{
+	return (complex_result_t) { .c = z };
+}
+
+complex
+complex32(complex x)
+{
+	return imprecise_arg(x, 24);
+}
+
+complex
+complex64(complex x)
+{
+	return imprecise_arg(x, 53);
+}
+
+complex
+complex80(complex x)
+{
+	return imprecise_arg(x, 64);
+}
+
+complex
+complex128(complex x)
+{
+	return imprecise_arg(x, 113);
+}
+
+complex [](complex) complex_convs = { complex32, complex64, complex80, complex128 };
+
+void
+print_one_complex(complex z, int i)
+{
+	print_one_real(creal(z), i);
+	printf(", ");
+	print_one_real(cimag(z), i);
+}
+
+void
+print_one_complex_result(complex_result_t z, int i)
+{
+	union switch (z) {
+	case c c:
+		print_one_complex(c, i);
+		break;
+	case i:
+		printf("INFINITY, INFINITY");
+		break;
+	case n:
+		printf("NAN, NAN");
+		break;
+	}
+}
+void
+print_complex(complex[4] x, complex_result_t[4] y)
+{
+	printf("{ .x = COMPLEX(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_complex(x[i], i);
+	}
+	printf("), .y = COMPLEX(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_complex_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+compute_complex_one(complex x, complex(complex) f)
+{
+	complex[4]		xp;
+	complex_result_t[4]	yp;
+	for (int i = 0; i < 4; i++) {
+		xp[i] = complex_convs[i](x);
+		try {
+			try {
+				yp[i] = complex_result(complex_convs[i](f(imprecise(xp[i], prec))));
+			} catch divide_by_zero(real x, real y) {
+				if (x == 0)
+					raise nan();
+				raise infinity(x);
+			} catch invalid_argument(string error, int i, poly v) {
+				raise nan();
+			}
+		} catch infinity(real v) {
+			yp[i] = complex_inf;
+		} catch nan() {
+			yp[i] = complex_nan;
+		}
+	}
+	print_complex(xp, yp);
+}
+
+void
+print_complex_complex(complex[4] x1, complex[4] x2, complex_result_t[4] y)
+{
+	printf("{ .x1 = COMPLEX(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_complex(x1[i], i);
+	}
+	printf("), .x2 = COMPLEX(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_complex(x2[i], i);
+	}
+	printf("), .y = COMPLEX(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_complex_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+compute_complex_complex(complex x1, complex x2, complex(complex, complex) f)
+{
+	complex[4]		x1p;
+	complex[4]		x2p;
+	complex_result_t[4]	yp;
+	for (int i = 0; i < 4; i++) {
+		x1p[i] = complex_convs[i](x1);
+		x2p[i] = complex_convs[i](x2);
+		try {
+			try {
+				yp[i] = complex_result(complex_convs[i](f(imprecise(x1p[i], prec),
+									  imprecise(x2p[i], prec))));
+			} catch divide_by_zero(real x, real y) {
+				if (x == 0)
+					raise nan();
+				raise infinity(x);
+			} catch invalid_argument(string error, int i, poly v) {
+				raise nan();
+			}
+		} catch infinity(real v) {
+			yp[i] = complex_inf;
+		} catch nan() {
+			yp[i] = complex_nan;
+		}
+	}
+	print_complex_complex(x1p, x2p, yp);
+}

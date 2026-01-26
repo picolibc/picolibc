@@ -53,18 +53,15 @@
 static void
 abrt_handler(int sig)
 {
-    if (sig == (int) SIGABRT) {
+    if (sig == (int)SIGABRT) {
 #ifdef SANITIZE_TRAP_ON_ERROR
         _Exit(1);
 #else
         _Exit(0);
 #endif
-    }
-    else {
-#ifdef __TINY_STDIO
+    } else {
         printf("unexpected signal %d\n", sig);
         fflush(stdout);
-#endif
 #ifdef SANITIZE_TRAP_ON_ERROR
         _Exit(0);
 #else
@@ -82,10 +79,11 @@ static volatile int ten = 10;
 #pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
 #endif
 
-int main(void)
+int
+main(void)
 {
     int array[10];
-    (void) signal(SIGABRT, abrt_handler);
+    (void)signal(SIGABRT, abrt_handler);
     array[ten] = 10;
     printf("value %d\n", array[ten]);
     printf("ubsan test failed\n");

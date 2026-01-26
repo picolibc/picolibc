@@ -1,0 +1,124 @@
+name: Native
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+# When a PR is updated, cancel the jobs from the previous version. Merges
+# do not define head_ref, so use run_id to never cancel those jobs.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  DOCKERFILE: picolibc/.github/Dockerfile
+  IMAGE_FILE: dockerimg-linux.tar.zst
+  IMAGE: picolibc-linux
+  PACKAGES_FILE: picolibc/.github/linux-packages.txt
+  EXTRA_FILE: picolibc/.github/linux-files.txt
+
+jobs:
+  cache-maker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v6
+        with:
+          path: picolibc
+
+      - name: Cache the Docker Image
+        id: cache
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          lookup-only: true
+
+      - name: Set up Docker Buildx
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build picolibc container
+        if: steps.cache.outputs.cache-hit != 'true'
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64
+          file: .github/Dockerfile
+          tags: ${{ env.IMAGE }}:latest
+          outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
+
+  minsize-native:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true -Dstdio-locking=true -Dfstat-bufsiz=true",
+        ]
+        test: [
+          "./.github/do-native-math",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v6
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+      - name: Minsize test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+  release-native:
+    needs: cache-maker
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        meson_flags: [
+          "",
+
+          # math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
+          "-Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=false -Dfast-bufio=true -Dstdio-locking=true -Dfstat-bufsiz=true",
+        ]
+        test: [
+          "./.github/do-native-math",
+        ]
+    steps:
+      - name: Clone picolibc
+        uses: actions/checkout@v6
+        with:
+          path: picolibc
+
+      - name: Restore the Docker Image
+        uses: actions/cache@v5
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          fail-on-cache-miss: true
+
+      - name: Load and Check the Docker Image
+        run: |
+          docker load -i $IMAGE_FILE
+          docker images -a $IMAGE
+      - name: Release test
+        run: |
+          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release

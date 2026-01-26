@@ -17,21 +17,18 @@ data. That includes:
  * functions using timezones (localtime, et al)
  * legacy stdio globals
 
-Tinystdio (the default stdio) uses per-file locks for the buffered
-POSIX file backend, but it doesn't require any locks for the bulk of
-the implementation. You can enable POSIX-compliant locking in
-tinystdio with -Dstdio-locking-true. That will prevent I/O from stdio
-operations from interleaving between threads.
-
-The legacy stdio implementation is full of locking, and has per-file
-locks for every operation.
+Picolibc uses per-file locks for the buffered POSIX file backend, but
+it doesn't require any locks for the bulk of the implementation. You
+can enable POSIX-compliant locking in stdio with
+-Dstdio-locking-true. That will prevent I/O from stdio operations from
+interleaving between threads.
 
 ## Where Picolibc uses atomics
 
 Picolibc also uses atomics to protect other data structures while
 avoiding the need for locking:
 
- * getc/ungetc in tinystdio
+ * getc/ungetc in stdio
  * signal handling
 
 ## Configuration options controlling locking
@@ -79,7 +76,7 @@ any runtime initialization.
 
 ### `void __retarget_lock_init(_LOCK_T *lock)`
 
-This is used by tinystdio to initialize the lock in a newly allocated
+This is used by stdio to initialize the lock in a newly allocated
 FILE.
 
 ### `void __retarget_lock_acquire(_LOCK_T lock)`
@@ -92,13 +89,14 @@ Release a non-recursive mutex.
 
 ### `void __retarget_lock_close(_LOCK_T lock)`
 
-This is used by tinystdio to de-initialize a lock from a FILE which is
+This is used by stdio to de-initialize a lock from a FILE which is
 being closed.
 
 ### `void __retarget_lock_init_recursive(_LOCK_T *lock)`
 
-This is used by the legacy stdio code to initialize the lock in a
-newly allocated FILE.
+Initialize a recursive mutex. This function isn't currently used by
+picolibc; the only recursive mutex is the global C library one which
+is statically initialized.
 
 ### `void __retarget_lock_acquire_recursive(_LOCK_T lock)`
 

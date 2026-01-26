@@ -38,19 +38,17 @@
 int
 xtensa_putc(char c, FILE *file)
 {
-    (void) file;
-    _simcall(SYS_write, 1, (intptr_t) &c, 1);
+    (void)file;
+    _simcall(SYS_write, 1, (intptr_t)&c, 1);
 }
-
-#ifdef __TINY_STDIO
 
 static int
 xtensa_getc(FILE *file)
 {
-    char        c;
-    (void) file;
-    _simcall(SYS_read, 0, (intptr_t) &c, 1);
-    return (unsigned char) c;
+    char c;
+    (void)file;
+    _simcall(SYS_read, 0, (intptr_t)&c, 1);
+    return (unsigned char)c;
 }
 
 static FILE __stdio = FDEV_SETUP_STREAM(xtensa_putc, xtensa_getc, NULL, _FDEV_SETUP_RW);
@@ -58,11 +56,9 @@ static FILE __stdio = FDEV_SETUP_STREAM(xtensa_putc, xtensa_getc, NULL, _FDEV_SE
 #ifdef __strong_reference
 #define STDIO_ALIAS(x) __strong_reference(stdin, x);
 #else
-#define STDIO_ALIAS(x) FILE *const x = &__stdio;
+#define STDIO_ALIAS(x) FILE * const x = &__stdio;
 #endif
 
-FILE *const stdin = &__stdio;
+FILE * const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);
-
-#endif

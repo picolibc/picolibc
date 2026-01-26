@@ -3,9 +3,12 @@ tab_width = 8
 charset = utf-8
 insert_final_newline = true
 
-[*.{c,h}]
+[*.{c,h,s,S}]
 indent_size = 4
 indent_style = space
 
 [meson*]
+indent_style = space
+
+[*.yml]
 indent_style = space

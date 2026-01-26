@@ -1,0 +1,65 @@
+/*
+FUNCTION
+<<getenv>>---look up environment variable
+
+INDEX
+        getenv
+INDEX
+        environ
+
+SYNOPSIS
+        #include <stdlib.h>
+        char *getenv(const char *<[name]>);
+
+DESCRIPTION
+<<getenv>> searches the list of environment variable names and values
+(using the global pointer ``<<char **environ>>'') for a variable whose
+name matches the string at <[name]>.  If a variable name matches,
+<<getenv>> returns a pointer to the associated value.
+
+RETURNS
+A pointer to the (string) value of the environment variable, or
+<<NULL>> if there is no such environment variable.
+
+PORTABILITY
+<<getenv>> is ANSI, but the rules for properly forming names of environment
+variables vary from one system to another.
+
+<<getenv>> requires a global pointer <<environ>>.
+*/
+
+/*
+ * Copyright (c) 1987, 2000 Regents of the University of California.
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms are permitted
+ * provided that: (1) source distributions retain this entire copyright
+ * notice and comment, and (2) distributions including binaries display
+ * the following acknowledgement:  ``This product includes software
+ * developed by the University of California, Berkeley and its contributors''
+ * in the documentation or other materials provided with the distribution.
+ * Neither the name of the University nor the names of its
+ * contributors may be used to endorse or promote products derived
+ * from this software without specific prior written permission.
+ * THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+ * IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
+
+#define _GNU_SOURCE
+#include <stdlib.h>
+#include <stddef.h>
+#include <string.h>
+
+/*
+ * getenv --
+ *	Returns ptr to value associated with name, if any, else NULL.
+ */
+
+char *
+getenv(const char *name)
+{
+    int offset;
+
+    return _findenv(name, &offset);
+}

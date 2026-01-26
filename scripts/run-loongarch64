@@ -41,6 +41,31 @@ qemu="qemu-system-loongarch64"
 elf="$1"
 shift
 
+done=0
+while [ $# -gt 0 -a $done -eq 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      done=1
+      ;;
+  esac
+done
+
 # Map stdio to a multiplexed character device so we can use it
 # for the monitor and semihosting output
 
@@ -48,35 +73,7 @@ chardev=stdio,mux=on,id=stdio0
 
 # Point the semihosting driver at our new chardev
 
-cmdline="program-name"
-input=""
-done=0
-
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        *)
-            cmdline="$cmdline $1"
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
-done
-
-semi=enable=on,chardev=stdio0,arg="$cmdline"
+semi=enable=on,chardev=stdio0,arg="program-name $args"
 
 # Disable monitor
 
@@ -86,4 +83,4 @@ mon=none
 
 serial=none
 
-echo "$input" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -M virt  -nographic -kernel "$elf" "$@" -nic none
+echo "$stdin" | $qemu -chardev $chardev -semihosting-config "$semi" -monitor "$mon" -serial "$serial" -M virt  -nographic -kernel "$elf" "$@" -nic none

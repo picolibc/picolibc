@@ -1,0 +1,306 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+int prec = 2048;
+
+int arg_prec;
+
+exception nan();
+exception infinity();
+
+complex
+imprecise_arg(complex x, int prec)
+{
+	arg_prec = prec;
+	return imprecise(x, prec);
+}
+
+const real min_binary32 = imprecise(0x1p-126);
+const real min_denorm_binary32 = imprecise(0x1p-149);
+
+real
+real32(real x)
+{
+	int	precision = 24;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary32)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary32)) {
+		precision = exp_x - exponent(min_denorm_binary32) + 1;
+	}
+	return imprecise_arg(x, precision);
+}
+
+const real min_binary64 = imprecise(0x1p-1022);
+const real min_denorm_binary64 = imprecise(0x1p-1074);
+
+real
+real64(real x)
+{
+	int	precision = 53;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary64)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary64)) {
+		precision = exp_x - exponent(min_denorm_binary64) + 1;
+	}
+	return imprecise_arg(x, precision);
+}
+
+const real min_binary80 = imprecise(0x1p-16382);
+const real min_denorm_binary80 = imprecise(0x1p-16445);
+
+real
+real80(real x)
+{
+	int	precision = 64;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary80)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary80)) {
+		precision = exp_x - exponent(min_denorm_binary80) + 1;
+	}
+	return imprecise_arg(x, precision);
+}
+
+const real min_binary128 = imprecise(0x1p-16382);
+const real min_denorm_binary128 = imprecise(0x1p-16494);
+
+real
+real128(real x)
+{
+	int	precision = 113;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary128)) {
+		precision = 1;
+		x = 0;
+	} else if (exp_x < exponent(min_binary128)) {
+		precision = exp_x - exponent(min_denorm_binary128) + 1;
+	}
+	return imprecise_arg(x, precision);
+}
+
+real [](real) real_convs = { real32, real64, real80, real128 };
+
+string[] real_macros = { "FN32", "FN64", "FN80", "FN128" };
+
+typedef union {
+	real	r;
+	void	i;
+	void	n;
+} result_t;
+
+void
+print_one_real(real x, int i)
+{
+	printf("%s(%a)", real_macros[i], x);
+}
+
+void
+print_one_result(result_t y, int i)
+{
+	union switch (y) {
+	case r r:
+		print_one_real(r, i);
+		break;
+	case i:
+		printf("INFINITY");
+		break;
+	case n:
+		printf("NAN");
+		break;
+	}
+}
+
+void
+print_real(real[4] x, result_t[4] y)
+{
+	printf("{ .x = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x[i], i);
+	}
+	printf("), .y = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+print_real(real[4] x, result_t[4] y)
+{
+	printf("{ .x = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x[i], i);
+	}
+	printf("), .y = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+print_int_real(int x1, real[4] x2, result_t[4] y)
+{
+	printf("{ .x1 = %d,", x1);
+	printf(" .x2 = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x2[i], i);
+	}
+	printf("), .y = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+compute_real_one(real x, real(real) f)
+{
+	real[4]	xp;
+	result_t[4] yp;
+	for (int i = 0; i < 4; i++) {
+		xp[i] = real_convs[i](x);
+		try {
+			try {
+				yp[i].r = real_convs[i](f(imprecise(xp[i], prec)));
+			} catch divide_by_zero(real x, real y) {
+				if (x == 0)
+					raise nan();
+				raise infinity();
+			} catch invalid_argument(string error, int i, poly v) {
+				raise nan();
+			}
+		} catch infinity() {
+			yp[i].i = ◊;
+		} catch nan() {
+			yp[i].n = ◊;
+		}
+	}
+	print_real(xp, yp);
+}
+
+void
+compute_int_real(int x1, real x2, real(int, real) f)
+{
+	real[4]	x1p, x2p;
+	result_t[4] yp;
+	for (int i = 0; i < 4; i++) {
+		x2p[i] = real_convs[i](x2);
+		try {
+			try {
+				yp[i].r = real_convs[i](f(x1, imprecise(x2p[i], prec)));
+			} catch divide_by_zero(real x, real y) {
+				if (x == 0)
+					raise nan();
+				raise infinity();
+			} catch invalid_argument(string error, int i, poly v) {
+				raise nan();
+			}
+		} catch infinity() {
+			yp[i].i = ◊;
+		} catch nan() {
+			yp[i].n = ◊;
+		}
+	}
+	print_int_real(x1, x2p, yp);
+}
+
+void
+print_real_real(real[4] x1, real[4] x2, result_t[4] y)
+{
+	printf("{ .x1 = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x1[i], i);
+	}
+	printf("), .x2 = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x2[i], i);
+	}
+	printf("), .y = REAL(");
+	for (int i = 0; i < 4; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+compute_real_real(real x1, real x2, real(real, real) f)
+{
+	real[4]	x1p, x2p;
+	result_t[4] yp;
+	for (int i = 0; i < 4; i++) {
+		x1p[i] = real_convs[i](x1);
+		x2p[i] = real_convs[i](x2);
+		try {
+			try {
+				yp[i].r = real_convs[i](f(imprecise(x1p[i], prec), imprecise(x2p[i], prec)));
+			} catch divide_by_zero(real x, real y) {
+				if (x == 0)
+					raise nan();
+				raise infinity();
+			} catch invalid_argument(string error, int i, poly v) {
+				raise nan();
+			}
+		} catch infinity() {
+			yp[i].i = ◊;
+		} catch nan() {
+			yp[i].n = ◊;
+		}
+	}
+	print_real_real(x1p, x2p, yp);
+}

@@ -1,0 +1,239 @@
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Copyright © 2025 Keith Packard
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+tests = [
+  'test-fdevopen',
+  'test-fmemopen',
+  'test-freopen',
+  'test-funopen',
+  'test-put',
+  'test-sprintf-percent-n',
+  'test-sprintf-s',
+  'test-sprintf-time',
+  'test-vfprintf-s',
+  'test-vfscanf-percent-a',
+  'test-vsnprintf-s',
+  'test-ungetc',
+]
+
+tests_failure = []
+
+tests_printf = [
+  'test-long-long',
+  'test-printf',
+  'test-printf-scanf',
+  ]
+
+test_extra_c_args = {
+  'test-sprintf-time' : arg_fnobuiltin
+}
+
+test_extra_libs = {}
+
+if enable_native_tests
+  tests += [
+    'test-flockfile',
+  ]
+  test_extra_libs = {
+    'test-flockfile' : native_lib
+  }
+endif
+
+if tests_enable_posix_io
+  tests += [
+    'test-posix-io',
+    'test-dprintf',
+    'test-fgetc',
+    'test-fgets-eof',
+    'test-fopen',
+    'test-fread-fwrite',
+    'test-mktemp',
+    'test-setvbuf',
+    'test-tmpnam',
+    'test-ungetc-ftell',
+    'test-wchar',
+  ]
+endif
+
+if get_option('test-stdin')
+  tests += ['test-gets']
+  tests_failure += ['test-gets']
+endif
+
+test_args = {
+  'test-gets': ['--stdin', 'hi'],
+  'test-gets-failure': ['--stdin', 'this is a long string that should overflow the buffer'],
+}
+
+printf_types = [
+  {
+    'ext' : '',
+    'c_args' : printf_compile_args_d,
+    'link_args' : printf_link_args_d,
+  },
+  {
+    'ext' : '-float',
+    'c_args' : printf_compile_args_f,
+    'link_args' : printf_link_args_f,
+  },
+  {
+    'ext' : '-long',
+    'c_args' : printf_compile_args_l,
+    'link_args' : printf_link_args_l,
+  },
+  {
+    'ext' : '-int',
+    'c_args' : printf_compile_args_i,
+    'link_args' : printf_link_args_i,
+  },
+]
+
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+
+  _libs = [get_variable('lib_c' + target)]
+  if is_variable('lib_semihost' + target)
+    _libs += [get_variable('lib_semihost' + target)]
+  endif
+
+  _lib_files=[]
+  foreach _lib : _libs
+    _lib_files += _lib.full_path()
+  endforeach
+
+  if is_variable(crt0_test + target)
+    _objs = [get_variable(crt0_test + target)]
+  else
+    _objs = []
+  endif
+
+  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
+  _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
+  _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
+  foreach t1 : tests
+    t1_src = t1 + '.c'
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
+
+    if test_extra_libs.has_key(t1)
+      lock_source = []
+    else
+      lock_source = ['../lock-valid.c']
+    endif
+
+    test(t1 + target,
+	 executable(t1 + target, [t1_src] + lock_source,
+		    c_args: printf_compile_args_d + test_file_name_arg + test_extra_c_args.get(t1, []) + _c_args,
+		    link_args: printf_link_args_d + _link_args,
+		    objects: _objs,
+		    link_depends:  _link_depends,
+                    link_with: test_extra_libs.get(t1, []),
+		    include_directories: inc),
+         depends: bios_bin,
+         args: test_args.get(t1, []),
+	 timeout: 60,
+         suite: 'test-stdio',
+	 env: test_env)
+  endforeach
+
+  foreach t1 : tests_failure
+    t1_src = t1 + '.c'
+    t1 += '-failure'
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
+
+    if test_extra_libs.has_key(t1)
+      lock_source = []
+    else
+      lock_source = ['../lock-valid.c']
+    endif
+
+    test(t1 + target,
+	 executable(t1 + target, [t1_src] + lock_source,
+		    c_args: printf_compile_args_d + test_file_name_arg + test_extra_c_args.get(t1, []) + _c_args,
+		    link_args: printf_link_args_d + _link_args,
+		    objects: _objs,
+		    link_depends:  _link_depends,
+                    link_with: test_extra_libs.get(t1, []),
+		    include_directories: inc),
+         depends: bios_bin,
+         args: test_args.get(t1, []),
+	 timeout: 60,
+         suite: 'test-stdio',
+	 env: test_env,
+         should_fail: true)
+  endforeach
+
+  foreach printf_type : printf_types
+    _printf_c_args = printf_type['c_args'] + _c_args
+    _printf_link_args = printf_type['link_args'] + _link_args
+    _ext = printf_type['ext']
+    foreach test : tests_printf
+      test_src = test + '.c'
+      test_file_name_arg=['-DTEST_FILE_NAME="' + test + _ext + target + '.txt"']
+
+      test(test + target + _ext,
+	   executable(test + _ext + target, [test_src, '../lock-valid.c'],
+		      c_args: test_file_name_arg + _printf_c_args,
+		      link_args: _printf_link_args,
+		      objects: _objs,
+		      link_depends:  _link_depends,
+		      include_directories: inc),
+           depends: bios_bin,
+	   timeout: 60,
+           suite: 'test-stdio',
+	   env: test_env)
+    endforeach
+  endforeach
+
+endforeach
+
+if enable_native_tests
+
+  foreach t1 : tests + tests_printf
+    t1_src = t1 + '.c'
+    t1_name = t1 + '-native'
+    test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
+
+    test(t1_name,
+	 executable(t1_name, t1_src,
+		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
+		    link_args: native_c_args,
+                    dependencies: native_lib_m),
+         suite: 'test-stdio'
+        )
+  endforeach
+
+endif

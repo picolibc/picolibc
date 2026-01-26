@@ -41,20 +41,21 @@
 #include <string.h>
 #include <errno.h>
 
-_off64_t lseek64(int fd, _off64_t offset, int whence)
+_off64_t
+lseek64(int fd, _off64_t offset, int whence)
 {
-	return (_off64_t) lseek(fd, (off_t) offset, whence);
+    return (_off64_t)lseek(fd, (off_t)offset, whence);
 }
 
 int
-stat(const char *pathname, struct stat *restrict statbuf)
+stat(const char *pathname, struct stat * restrict statbuf)
 {
     int fd, ret;
 
     fd = open(pathname, O_RDONLY);
 
     if (fd < 0)
-    	return fd;
+        return fd;
 
     ret = fstat(fd, statbuf);
     close(fd);
@@ -63,8 +64,8 @@ stat(const char *pathname, struct stat *restrict statbuf)
 }
 
 int
-isatty (int fd)
+isatty(int fd)
 {
-        (void) fd;
-	return 1;
+    (void)fd;
+    return 1;
 }

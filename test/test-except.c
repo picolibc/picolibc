@@ -68,6 +68,15 @@ main(void)
 
     __asm__("ud2");
 
+#elif defined(__m68k__)
+
+    /* 0x4afc is reserved for customer use to take an illegal instruction trap */
+    __asm__(".word 0x4afc");
+
+#elif defined(__loongarch__)
+
+    __asm__(".word 0x00000000");
+
 #else
 
 #define NO_INVALID
@@ -81,5 +90,4 @@ main(void)
     printf("ERROR: invalid instruction worked\n");
     return 0;
 #endif
-
 }

@@ -43,7 +43,6 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
-int
-or1k_putc(char c, FILE *file);
+int or1k_putc(char c, FILE *file);
 
 #endif /* _OR1K_SEMIHOST_H_ */

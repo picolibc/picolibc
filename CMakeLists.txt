@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.8.10 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8.11 LANGUAGES C ASM)
 
 # Set a default build type if none was specified
 set(default_build_type "MinSizeRel")
@@ -44,12 +44,6 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES AND NOT DEFINED ZEPHYR
   message(STATUS "Setting build type to '${default_build_type}' as none was specified.")
   set(CMAKE_BUILD_TYPE "${default_build_type}" CACHE
       STRING "Choose the type of build." FORCE)
-endif()
-
-find_program(CCACHE_PROGRAM ccache)
-if(CCACHE_PROGRAM)
-  message(STATUS "Using ccache: ${CCACHE_PROGRAM}")
-  set(CMAKE_C_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 endif()
 
 if(${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm64")
@@ -101,6 +95,11 @@ if(NOT DEFINED __THREAD_LOCAL_STORAGE_STACK_GUARD)
   option(__THREAD_LOCAL_STORAGE_STACK_GUARD "use thread local storage for stack protection canary" OFF)
 endif()
 
+# enable malloc code
+if(NOT DEFINED ENABLE_MALLOC)
+  option(ENABLE_MALLOC "provide malloc family of functions based on sbrk" ON)
+endif()
+
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed
@@ -114,8 +113,7 @@ if(NOT DEFINED __PREFER_SIZE_OVER_SPEED)
   option(__PREFER_SIZE_OVER_SPEED "Prefer smaller code size" ${default_prefer_size})
 endif()
 
-# Use tiny stdio from gcc avr
-option(__TINY_STDIO "Use tiny stdio from avr libc" ON)
+set(__TINY_STDIO 1)
 
 if(NOT TLS_MODEL)
   set(TLS_MODEL "local-exec")
@@ -145,7 +143,7 @@ set(__IEEEFP_FUNCS 0)
 set(__INIT_FINI_ARRAY 1)
 
 # Support _init() and _fini() functions
-set(__INIT_FINI_FUNCS 1)
+set(__INIT_FINI_FUNCS 0)
 
 # Enable MMU in pico crt startup
 set(__PICOCRT_ENABLE_MMU 1)
@@ -163,8 +161,6 @@ set(__IEEE_LIBM 1)
 if(NOT DEFINED __IO_FLOAT_EXACT)
   option(__IO_FLOAT_EXACT "Provide exact binary/decimal conversion for printf/scanf" ON)
 endif()
-
-set(__PICO_EXIT 1)
 
 if(NOT DEFINED __ASSERT_VERBOSE)
   option(__ASSERT_VERBOSE "Assert provides verbose information" ON)
@@ -279,6 +275,7 @@ set(PICOLIBC_SCRIPTS "${CMAKE_CURRENT_SOURCE_DIR}/scripts")
 
 include(CheckIncludeFile)
 
+set(CMAKE_REQUIRED_QUIET TRUE)
 CHECK_INCLUDE_FILE(xtensa/config/core-isa.h _XTENSA_HAVE_CONFIG_CORE_ISA_H)
 
 configure_file(picolibc.h.in "${PICOLIBC_INCLUDE}/picolibc.h")
@@ -355,7 +352,8 @@ define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
   BRIEF_DOCS "Installed header files"
   FULL_DOCS "These are names of header files which are to be installed.")
 
-add_subdirectory(newlib)
+add_subdirectory(libc)
+add_subdirectory(libm)
 
 install(TARGETS c
   LIBRARY DESTINATION lib

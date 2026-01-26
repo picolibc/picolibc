@@ -40,6 +40,31 @@ dir="$(dirname "$0")"
 elf="$1"
 shift
 
+done=0
+while [ $# -gt 0 -a $done -eq 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      done=1
+      ;;
+  esac
+done
+
 qemu="qemu-system-mips"
 
 if file "$elf" | grep -q LSB; then
@@ -53,37 +78,7 @@ cpu=24Kf
 
 chardev=stdio,mux=on,id=stdio0
 
-# Point the semihosting driver at our new chardev
-
-cmdline="program-name"
-input=""
-done=0
-
-while [ "$done" != "1" ]; do
-    case "$1" in
-        --)
-            shift
-            done=1
-            ;;
-        -s|"")
-            done=1
-            ;;
-        *)
-            cmdline="$cmdline $1"
-            case "$input" in
-                "")
-                    input="$1"
-                    ;;
-                *)
-                    input="$input $1"
-                    ;;
-            esac
-            shift
-            ;;
-    esac
-done
-
-semi=enable=on,chardev=stdio0,arg="$cmdline"
+semi=enable=on,chardev=stdio0,arg="program-name $args"
 
 # Point the monitor at the new chardev too
 
@@ -93,7 +88,7 @@ mon=none
 
 serial=none
 
-echo "$input" | $qemu \
+echo "$stdin" | $qemu \
   -chardev $chardev \
   -semihosting-config "$semi" \
   -machine malta \
@@ -104,4 +99,4 @@ echo "$input" | $qemu \
   -monitor "$mon" \
   -net none \
   -nographic \
-  -kernel "$elf" "$@"
+  -kernel "$elf"

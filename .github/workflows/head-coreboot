@@ -17,8 +17,6 @@ concurrency:
 env:
   # .github/do-coreboot --buildtype release
   # is the largest cache, 429.5M (September 2023).
-  CCACHE_SIZE: "450M"
-  CCACHE_CMD: ccache
   DOCKERFILE: picolibc/.github/Dockerfile-coreboot
   IMAGE_FILE: dockerimg-coreboot.tar.zst
   IMAGE: picolibc
@@ -30,13 +28,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           path: picolibc
 
       - name: Cache the Docker Image
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}

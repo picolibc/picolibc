@@ -42,16 +42,16 @@
 static int
 powerpc_putc(char c, FILE *file)
 {
-        opal_console_write(OPAL_TERMINAL_DEFAULT, 1, &c);
-	(void) file;
-	return (unsigned char) c;
+    opal_console_write(OPAL_TERMINAL_DEFAULT, 1, &c);
+    (void)file;
+    return (unsigned char)c;
 }
 
 static int
 powerpc_getc(FILE *file)
 {
-	(void) file;
-	return EOF;
+    (void)file;
+    return EOF;
 }
 
 static FILE __stdio = FDEV_SETUP_STREAM(powerpc_putc, powerpc_getc, NULL, _FDEV_SETUP_RW);
@@ -59,9 +59,9 @@ static FILE __stdio = FDEV_SETUP_STREAM(powerpc_putc, powerpc_getc, NULL, _FDEV_
 #ifdef __strong_reference
 #define STDIO_ALIAS(x) __strong_reference(stdin, x);
 #else
-#define STDIO_ALIAS(x) FILE *const x = &__stdio;
+#define STDIO_ALIAS(x) FILE * const x = &__stdio;
 #endif
 
-FILE *const stdin = &__stdio;
+FILE * const stdin = &__stdio;
 STDIO_ALIAS(stdout);
 STDIO_ALIAS(stderr);

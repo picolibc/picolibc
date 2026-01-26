@@ -40,11 +40,11 @@
 int
 main(void)
 {
-	char	*s = COMMAND_LINE, c;
+    char *s = COMMAND_LINE, c;
 
-	while ((c = *s++) != '\0')
-		sys_semihost_putc(c, stdout);
-	sys_semihost_putc('\n', stdout);
+    while ((c = *s++) != '\0')
+        sys_semihost_putc(c, stdout);
+    sys_semihost_putc('\n', stdout);
 
-	exit(0);
+    exit(0);
 }

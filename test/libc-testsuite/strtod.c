@@ -30,7 +30,7 @@
  * f = function call to test (or any expression)
  * x = expected result
  * m = message to print on failure (with formats for r & x)
-**/
+ **/
 
 #if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -38,37 +38,35 @@
 #pragma GCC diagnostic ignored "-Wformat-extra-args"
 #endif
 
-#define TEST(r, f, x, m) ( \
-msg = #f, ((r) = (f)) == (x) || \
-(printf(__FILE__ ":%d: %s failed (" m ")\n", __LINE__, #f, r, x, r-x), err++, 0) )
+#define TEST(r, f, x, m)                                                                        \
+    (msg = #f,                                                                                  \
+     ((r) = (f)) == (x)                                                                         \
+         || (printf(__FILE__ ":%d: %s failed (" m ")\n", __LINE__, #f, r, x, r - x), err++, 0))
 
-#define TEST2(r, f, x, m) ( \
-((r) = (f)) == (x) || \
-(printf(__FILE__ ":%d: %s failed (" m ")\n", __LINE__, msg, r, x), err++, 0) )
+#define TEST2(r, f, x, m)                                                             \
+    (((r) = (f)) == (x)                                                               \
+     || (printf(__FILE__ ":%d: %s failed (" m ")\n", __LINE__, msg, r, x), err++, 0))
 
-static int test_strtod(void)
+static int
+test_strtod(void)
 {
-	int i;
-	double d, d2;
-	char buf[1000];
-	char *msg="";
-	int err=0;
+    int    i;
+    double d, d2;
+    char   buf[1000];
+    char  *msg = "";
+    int    err = 0;
 
-        (void) msg;
-	for (i=0; i<100; i++) {
-		d = sin(i);
-		snprintf(buf, sizeof buf, "%.300f", d);
-		TEST(d2, strtod(buf, 0), d, "round trip fail %a != %a (%a)");
-	}
+    (void)msg;
+    for (i = 0; i < 100; i++) {
+        d = sin(i);
+        snprintf(buf, sizeof buf, "%.300f", d);
+        TEST(d2, strtod(buf, 0), d, "round trip fail %a != %a (%a)");
+    }
 
-#if defined(__PICOLIBC__) && !defined(__TINY_STDIO) && __SIZEOF_DOUBLE__ != 8
-        /* skip strtod tests for legacy stdio on systems with atypical doubles */
-#else
-	TEST(d, strtod("0x1p4", 0), 16.0, "hex float %a != %a");
-	TEST(d, strtod("0x1.1p4", 0), 17.0, "hex float %a != %a");
-#endif
+    TEST(d, strtod("0x1p4", 0), 16.0, "hex float %a != %a");
+    TEST(d, strtod("0x1.1p4", 0), 17.0, "hex float %a != %a");
 
-	return err;
+    return err;
 }
 
 #define TEST_NAME strtod

@@ -49,60 +49,60 @@ static void __attribute__((noinline))
 #ifdef __HAVE_CC_INHIBIT_LOOP_TO_LIBCALL
 __attribute((__optimize__("-fno-tree-loop-distribute-patterns")))
 #endif
-    my_strcpy(char *d, char *s)
+my_strcpy(char *d, char *s)
 {
-    while ((*d++ = *s++));
+    while ((*d++ = *s++))
+        ;
 }
 
-static void __attribute__((noinline)) smash_array(char *source, char *dest)
+static void __attribute__((noinline))
+smash_array(char *source, char *dest)
 {
-	char	local[48];
+    char local[48];
 
-	my_strcpy(local, source);
-	local[0]++;
-	my_strcpy(dest, local);
+    my_strcpy(local, source);
+    local[0]++;
+    my_strcpy(dest, local);
 }
 
 void
-__stack_chk_fail (void)
+__stack_chk_fail(void)
 {
-	if (expect_smash) {
-#ifdef __TINY_STDIO
-		puts("caught expected stack smash");
-#endif
-		_exit(0);
-	} else {
-#ifdef __TINY_STDIO
-		puts("caught unexpected stack smash");
-#endif
-		_exit(1);
-	}
+    if (expect_smash) {
+        puts("caught expected stack smash");
+        _exit(0);
+    } else {
+        puts("caught unexpected stack smash");
+        _exit(1);
+    }
 }
 
-int main(void)
+int
+main(void)
 {
-	char	source[64];
-	char	dest[64];
+    char source[64];
+    char dest[64];
 
-	memset(source, 'x', 15);
-	source[15] = '\0';
-	expect_smash = false;
-	smash_array(source, dest);
-	expect_smash = false;
-	printf("short source %s dest %s\n", source, dest);
+    memset(source, 'x', 15);
+    source[15] = '\0';
+    expect_smash = false;
+    smash_array(source, dest);
+    expect_smash = false;
+    printf("short source %s dest %s\n", source, dest);
 
-	memset(source, 'x', 63);
-	source[63] = '\0';
-	expect_smash = true;
-	smash_array(source, dest);
-	expect_smash = false;
-	printf("missed expected stack smash\n");
-	return 1;
+    memset(source, 'x', 63);
+    source[63] = '\0';
+    expect_smash = true;
+    smash_array(source, dest);
+    expect_smash = false;
+    printf("missed expected stack smash\n");
+    return 1;
 }
 #else
-int main(void)
+int
+main(void)
 {
-	printf("stack protector disabled for tests\n");
-	return 0;
+    printf("stack protector disabled for tests\n");
+    return 0;
 }
 #endif

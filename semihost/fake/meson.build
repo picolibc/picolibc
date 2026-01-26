@@ -33,36 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-lib_semihost_srcs = [
-  'fake_exit.c',
-  'fake_kill.c',
-  'fake_stub.c',
-  ]
-
-if tinystdio
-  lib_semihost_srcs += 'fake_io.c'
-endif
-
-has_semihost = true
-
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
-
-  instdir = join_paths(lib_dir, target_dir)
-
-  libsemihost_name = 'semihost'
-
-  local_lib_semihost_target = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
-				       lib_semihost_srcs,
-				       install : true,
-				       install_dir : instdir,
-				       include_directories : inc,
-				       c_args : target_c_args + c_args,
-				       pic: false)
-
-  set_variable('lib_semihost' + target, local_lib_semihost_target)
-
-endforeach
+src_semihost_fake = files([
+                           'fake_exit.c',
+                           'fake_io.c',
+                           'fake_kill.c',
+                           'fake_stub.c',
+                         ])

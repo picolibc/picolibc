@@ -1,0 +1,97 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+
+real
+lgamma(real x)
+{
+	if (x <= 0 && x == floor(x))
+		raise infinity();
+	real y = 0;
+	try {
+		y = log(abs(gamma(x)));
+	} catch invalid_argument(string s, int n, poly v) {
+		raise infinity();
+	}
+	return y;
+}
+
+real[] test_values = {
+	/* values where gamma is close to 1 */
+	-0x1.dfffffffffe5180c18cc09de606e3f138p3,
+	-0x1.c00000000193974a8bd29cebd8ae31eecp3,
+	-0x1.bffffffffe6c68b573c30947c13a22ed8p3,
+	-0x1.a00000001612461380cd07ba37207c6e4p3,
+	-0x1.9fffffffe9edb9ec2ff2f4bff8eafaa9p3,
+	-0x1.800000011eed8ee62acf81e04a1e70f28p3,
+	-0x1.7ffffffee11270e70fbc835987a792f14p3,
+	-0x1.6000000d7322a62bb2cb4dffd481c97d8p3,
+	-0x1.5ffffff28cdd3e366db59a55b7a31a0b4p3,
+	-0x1.40000093f2777324f68bb2bc2a883c064p3,
+	-0x1.3fffff6c0d7bfb9a0c55cef4a0a8f8d38p3,
+	-0x1.200005c7768fb0dadb087fdb86a3bd6f8p3,
+	-0x1.1ffffa3884bd01ff90c9d2ae924b3cfc4p3,
+	-0x1.000034028b3f93ec19679d839d90aecdp3,
+	-0x1.ffff97f8159cf0f2a7a0ad48ac32a74b8p2,
+	-0x1.c0033fdedfe1eb7d120b736e61e0aacap2,
+	-0x1.bffcbf76b86effcf589ad9708ff487dp2,
+	-0x1.8016b25897c8ced81f0b65b458e172e2p2,
+	-0x1.7fe92f591f40d5f753b58b2f4c7b7e388p2,
+	-0x1.4086a57f0b6d90ca9315b9654e537b32p2,
+	-0x1.3f7577a6eeafcd44342a901da62140758p2,
+	-0x1.0284e78599580c30e7c2c3786044ab06p2,
+	-0x1.fa471547c2fe50b86a2b094891b6619p1,
+	-0x1.9260dbc9e59af7dc5f34cd69ecdd32a3p1,
+	-0x1.5fb410a1bd900cbccad25a320f575fa5p1,
+	-0x1.3a7fc9600f86c155f64f98af8d038962p1,
+	/* value which generate the largest errors */
+	0x1.f8a754p-9,
+	-0x1.3a7fcap+1,
+};
+
+void
+main()
+{
+	for (int i = 0; i < dim(test_values); i++)
+		compute_real_one(test_values[i], lgamma);
+	for (real r = 1e-38; r < 1e26; r *= 7) {
+		real ri = imprecise(r, prec);
+		compute_real_one(ri, lgamma);
+		if (r < 1000)
+			compute_real_one(-ri, lgamma);
+	}
+}
+main();

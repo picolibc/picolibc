@@ -69,14 +69,6 @@ esac
 case "$*" in
     *-Dio-long-double=true*)
 	case "$ARCH" in
-	    *rv[36][24]*|*riscv*|*aarch64*|*power9-fp128*|*sparc*|*loongarch*)
-		case "$*" in
-		    *-Dtinystdio=false*)
-			echo "io-long-double for legacy stdio not supported on riscv, aarch64, power-fp128 sparc or loongarch"
-			exit 77
-			;;
-		esac
-		;;
 	    *power*|*avr*)
 		echo "io-long-double not supported on power double double or avr"
 		exit 77

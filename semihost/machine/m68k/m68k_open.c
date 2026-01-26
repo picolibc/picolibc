@@ -42,7 +42,9 @@
 #include <errno.h>
 #include <stdarg.h>
 
-static int gdb_flags(int flags) {
+static int
+gdb_flags(int flags)
+{
     int gdb = 0;
 
     gdb = flags & 3;
@@ -64,10 +66,9 @@ open(const char *pathname, int flags, ...)
 {
     va_list ap;
 
-    va_start(ap,flags);
+    va_start(ap, flags);
     uintptr_t mode = va_arg(ap, uintptr_t);
     va_end(ap);
-    return m68k_semihost4(HOSTED_OPEN, (uintptr_t) pathname,
-                           strlen(pathname) + 1,
-                           gdb_flags(flags), mode);
+    return m68k_semihost4(HOSTED_OPEN, (uintptr_t)pathname, strlen(pathname) + 1, gdb_flags(flags),
+                          mode);
 }

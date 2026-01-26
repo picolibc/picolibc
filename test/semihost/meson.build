@@ -76,13 +76,13 @@ semihost_no_args_tests = [
   'semihost-no-argv',
 ]
 
-test_args = ['hello', 'world']
+cli_args = ['hello', 'world']
+test_args = ['--args', 'hello world']
 
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
-  target_lib_prefix = params['lib_prefix']
 
   _libs = [get_variable('lib_c' + target)]
   _libs += [get_variable('lib_semihost' + target)]
@@ -99,7 +99,7 @@ foreach params : targets
   foreach semihost_test : semihost_tests
     semihost_test_src = semihost_test + '.c'
 
-    _cmd_arg = ['-DCOMMAND_LINE="' + 'program-name' + ' ' + ' '.join(test_args) + '"']
+    _cmd_arg = ['-DCOMMAND_LINE="' + 'program-name' + ' ' + ' '.join(cli_args) + '"']
 
     test_file_name_arg=['-DTEST_FILE_NAME="' + semihost_test + target + '.txt"']
 

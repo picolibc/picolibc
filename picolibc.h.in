@@ -11,9 +11,6 @@
 /* Always optimize strcmp for performance */
 #cmakedefine __FAST_STRCMP
 
-/* Obsoleted. Use regular syscalls */
-#cmakedefine MISSING_SYSCALL_NAMES
-
 /* use global errno variable */
 #cmakedefine __GLOBAL_ERRNO
 
@@ -35,10 +32,6 @@
 /* Optimize for space over speed */
 #cmakedefine __PREFER_SIZE_OVER_SPEED
 
-/* Obsoleted. Reentrant syscalls provided for us */
-#cmakedefine REENTRANT_SYSCALLS_PROVIDED
-
-/* Use tiny stdio from gcc avr */
 #cmakedefine __TINY_STDIO
 
 #cmakedefine _ATEXIT_DYNAMIC_ALLOC
@@ -108,8 +101,6 @@
 
 /* The newlib version in string format. */
 #define _NEWLIB_VERSION "@NEWLIB_VERSION@"
-
-#cmakedefine __PICO_EXIT
 
 /* The Picolibc minor version number. */
 #define _PICOLIBC_MINOR__ @PROJECT_VERSION_MINOR@

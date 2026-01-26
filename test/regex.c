@@ -38,14 +38,14 @@
 #include <regex.h>
 #include <stdbool.h>
 
-#define MAX_MATCH	10
+#define MAX_MATCH 10
 
 struct test {
-	const char	*pattern;
-	const char	*string;
-	int		ret;
-	int		nmatch;
-	regmatch_t matches[MAX_MATCH];
+    const char *pattern;
+    const char *string;
+    int         ret;
+    int         nmatch;
+    regmatch_t  matches[MAX_MATCH];
 };
 
 const struct test tests[] = {
@@ -68,58 +68,54 @@ const struct test tests[] = {
 	},
 };
 
-#define NTEST (sizeof(tests)/sizeof(tests[0]))
+#define NTEST (sizeof(tests) / sizeof(tests[0]))
 
 int
 main(void)
 {
-	unsigned	t;
-	int	m;
-	int	errors = 0;
-	regmatch_t matches[MAX_MATCH];
-	regex_t regex;
-	int	ret;
-	int	run = 0;
+    unsigned   t;
+    int        m;
+    int        errors = 0;
+    regmatch_t matches[MAX_MATCH];
+    regex_t    regex;
+    int        ret;
+    int        run = 0;
 
-	for (t = 0; t < NTEST; t++) {
-		ret = regcomp(&regex, tests[t].pattern, REG_EXTENDED);
-		if (ret != 0) {
-			printf("expression \"%s\" failed to compile: %d\n", tests[t].pattern, ret);
-			errors++;
-			continue;
-		}
-		ret = regexec(&regex, tests[t].string, MAX_MATCH, matches, 0);
-		regfree(&regex);
-		if (ret != tests[t].ret) {
-			printf("match \"%s\" with \"%s\" bad result got %d != expect %d\n",
-			       tests[t].pattern, tests[t].string, ret, tests[t].ret);
-			errors++;
-			continue;
-		}
-		if (ret == 0) {
-			for (m = 0; m < MAX_MATCH; m++) {
-				if (m < tests[t].nmatch) {
-					if (matches[m].rm_so != tests[t].matches[m].rm_so ||
-					    matches[m].rm_eo != tests[t].matches[m].rm_eo) {
-						printf("match %d wrong range got (%td,%td) expect (%td,%td)\n",
-						       m,
-						       matches[m].rm_so,
-						       matches[m].rm_eo,
-						       tests[t].matches[m].rm_so,
-						       tests[t].matches[m].rm_eo);
-						errors++;
-					}
-				} else {
-					if (matches[m].rm_so != -1) {
-						printf("match %d should be unused\n",
-						       m);
-						errors++;
-					}
-				}
-			}
-		}
-		++run;
-	}
-	printf("regex: %d tests %d errors\n", run, errors);
-	return errors;
+    for (t = 0; t < NTEST; t++) {
+        ret = regcomp(&regex, tests[t].pattern, REG_EXTENDED);
+        if (ret != 0) {
+            printf("expression \"%s\" failed to compile: %d\n", tests[t].pattern, ret);
+            errors++;
+            continue;
+        }
+        ret = regexec(&regex, tests[t].string, MAX_MATCH, matches, 0);
+        regfree(&regex);
+        if (ret != tests[t].ret) {
+            printf("match \"%s\" with \"%s\" bad result got %d != expect %d\n", tests[t].pattern,
+                   tests[t].string, ret, tests[t].ret);
+            errors++;
+            continue;
+        }
+        if (ret == 0) {
+            for (m = 0; m < MAX_MATCH; m++) {
+                if (m < tests[t].nmatch) {
+                    if (matches[m].rm_so != tests[t].matches[m].rm_so
+                        || matches[m].rm_eo != tests[t].matches[m].rm_eo) {
+                        printf("match %d wrong range got (%td,%td) expect (%td,%td)\n", m,
+                               matches[m].rm_so, matches[m].rm_eo, tests[t].matches[m].rm_so,
+                               tests[t].matches[m].rm_eo);
+                        errors++;
+                    }
+                } else {
+                    if (matches[m].rm_so != -1) {
+                        printf("match %d should be unused\n", m);
+                        errors++;
+                    }
+                }
+            }
+        }
+        ++run;
+    }
+    printf("regex: %d tests %d errors\n", run, errors);
+    return errors;
 }

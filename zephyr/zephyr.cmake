@@ -101,6 +101,9 @@ if(CONFIG_PICOLIBC_USE_MODULE)
     set(__PICOLIBC_ERRNO_FUNCTION z_errno_wrap)
   endif()
 
+  # Disable malloc functions
+  set(ENABLE_MALLOC 0)
+
   # Fetch zephyr compile flags from interface
   get_property(PICOLIBC_EXTRA_COMPILE_OPTIONS TARGET zephyr_interface PROPERTY INTERFACE_COMPILE_OPTIONS)
 

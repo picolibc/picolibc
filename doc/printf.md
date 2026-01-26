@@ -203,11 +203,11 @@ hence the size) of the library:
    double. This option is disabled by default
 
  * `-Dio-float-exact=true` This option, which is enabled by default,
-   controls whether the tinystdio code uses exact algorithms for
-   printf and scanf. When enabled, printing at least 9 digits
-   (e.g. "%.9g") for 32-bit floats and 17 digits (e.g. "%.17g") for
-   64-bit floats ensures that passing the output back to scanf will
-   exactly re-create the original value.
+   controls whether the stdio code uses exact algorithms for printf
+   and scanf. When enabled, printing at least 9 digits (e.g. "%.9g")
+   for 32-bit floats and 17 digits (e.g. "%.17g") for 64-bit floats
+   ensures that passing the output back to scanf will exactly
+   re-create the original value.
 
  * `-Datomic-ungetc=true` This option, which is enabled by default,
    controls whether getc/ungetc use atomic instruction sequences to

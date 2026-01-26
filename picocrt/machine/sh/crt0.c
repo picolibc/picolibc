@@ -43,23 +43,23 @@ _cstart(void)
 
 extern char __stack[];
 
-#define FPSCR_FR        (1 << 21)
-#define FPSCR_SZ        (1 << 20)
-#define FPSCR_PR        (1 << 19)
-#define FPSCR_DN        (1 << 18)
-#define FPSCR_RN        (0 << 0)
-#define FPSCR_RM        (3 << 0)
+#define FPSCR_FR (1 << 21)
+#define FPSCR_SZ (1 << 20)
+#define FPSCR_PR (1 << 19)
+#define FPSCR_DN (1 << 18)
+#define FPSCR_RN (0 << 0)
+#define FPSCR_RM (3 << 0)
 
 void __section(".init") __used
 _start(void)
 {
     /* Set up the stack pointer */
-    __asm__("mov %0, r15" : : "r" (__stack));
+    __asm__("mov %0, r15" : : "r"(__stack));
 
     /* Initialize the FPU */
 #ifdef __SH_FPU_ANY__
     long fpscr;
-    __asm__("sts fpscr,%0" : "=r" (fpscr));
+    __asm__("sts fpscr,%0" : "=r"(fpscr));
     /* enable denorms */
     fpscr &= ~FPSCR_DN;
     /* set round to nearest */
@@ -70,10 +70,10 @@ _start(void)
 #else
     fpscr &= ~FPSCR_PR;
 #endif
-    __asm__("lds %0,fpscr" : : "r" (fpscr));
+    __asm__("lds %0,fpscr" : : "r"(fpscr));
 #endif
     /* Branch to C code */
-    __asm__("jmp @%0" : : "r" (_cstart));
+    __asm__("jmp @%0" : : "r"(_cstart));
 
     /* Fill in any delay slot */
     __asm__("nop");

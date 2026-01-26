@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cat head-native
+
+for build in minsize release; do
+    for arch in native; do
+	echo "  $build-$arch:"
+	cat variants
+        cat <<EOF
+        test: [
+          "./.github/do-native-math",
+        ]
+EOF
+	cat steps-head
+	cat steps-$build
+    done
+done

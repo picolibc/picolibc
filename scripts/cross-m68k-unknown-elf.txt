@@ -6,7 +6,7 @@ ld = 'm68k-unknown-elf-ld'
 nm = 'm68k-unknown-elf-nm'
 strip = 'm68k-unknown-elf-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-m68k "$@"', 'run-m68k']
+exe_wrapper = ['env', 'run-m68k']
 
 [host_machine]
 system = 'unknown'

@@ -1,8 +1,4 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['mips-linux-gnu-gcc', '-nostdlib', '-Wl,--build-id=none']
 cpp = ['mips-linux-gnu-g++', '-nostdlib', '-Wl,--build-id=none']
 ar = 'mips-linux-gnu-ar'

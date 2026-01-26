@@ -38,20 +38,20 @@ meson setup \
         --buildtype debug \
 	--fatal-meson-warnings \
         -Dtls-model=global-dynamic \
-	-Dthread-local-storage=true \
-	-Derrno-function=auto \
-        -Dmultilib=false \
-        -Dpicolib=false \
 	-Dpicocrt=false \
 	-Dsemihost=false \
+	-Duse-stdlib=true \
 	-Dposix-console=true \
+	-Dthread-local-storage=true \
+	-Dthread-local-storage-api=false \
+	-Dinternal-heap=8388608 \
+	-Derrno-function=auto \
+        -Dmultilib=false \
 	-Dnative-tests=true \
-	-Dnewlib-global-atexit=true\
 	-Dinitfini-array=false\
 	-Dincludedir=lib/picolibc/include \
 	-Dlibdir=lib/picolibc/lib \
 	-Dspecsdir=none \
-	-Duse-stdlib=true \
 	-Dtests=true \
 	-Dsanitize-bounds=true \
 	-Dwerror=true \

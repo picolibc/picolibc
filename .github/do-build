@@ -1,17 +1,37 @@
 #!/bin/sh
+HERE=`dirname "$0"`
 TARGET=$1
-DIR=build-"$TARGET"
-CONFIGURE=do-"$TARGET"-configure
 shift
 
-for p in /opt/*/bin; do
-    PATH="$p":$PATH
-done
+if [ -d /opt/picolibc-ci ]; then
+    TOP=/opt/picolibc-ci
+else
+    TOP=/opt
+fi
+
+# Put only the relevant toolchain in PATH for specific CI targets.
+# Fallback to previous behavior for other targets.
+case "$TARGET" in
+    *clang-hexagon*)
+        for p in "$TOP"/*hexagon*/bin "$TOP"/*/models/*; do
+            [ -d "$p" ] && PATH="$p":$PATH
+        done
+        ;;
+    *clang-arm*|*clang-aarch64*|*clang-thumb*)
+        for p in "$TOP"/LLVM-ET-Arm*/bin "$TOP"/*/models/*; do
+            [ -d "$p" ] && PATH="$p":$PATH
+        done
+        ;;
+    *)
+        for p in "$TOP"/*/bin "$TOP"/*/models/*; do
+            PATH="$p":$PATH
+        done
+        ;;
+esac
 
 ANALYZER="-Danalyzer=true"
 
-CDEFS="-Dtests-cdefs=true"
-TEST="test"
+CDEFS="-Dtests-cdefs=true -Dtests=false"
 
 # Disable analyzer on m68k because the compiler gets very confused
 # about complex values
@@ -22,35 +42,6 @@ case "$TARGET" in
 	;;
 esac
 
-# Disable the analyser when not using tinystdio as the stdio code is
-# full of problems
+OPTIONS="$ANALYZER $CDEFS"
 
-case "$*" in
-    *-Dtinystdio=false*)
-	ANALYZER=""
-	;;
-esac
-
-mkdir "$DIR"
-trap 'rm -rf "$DIR"' 0 1 15
-(cd "$DIR" || exit 1
- echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER $CDEFS "$@"
- echo '##################################################'
- ../scripts/"$CONFIGURE" -Dwerror=true $ANALYZER $CDEFS "$@"
- case $? in
-     0)
-	 echo 'Configuration succeeded'
-	 ;;
-     77)
-	 echo 'Configuration skipped'
-	 exit 0
-	 ;;
-     *)
-	 echo 'Configuration failed with' "$?"
-	 cat meson-logs/*
-	 exit 1
-	 ;;
- esac
- cat meson-logs/*
- ninja $TEST || exit 1) || exit 1
+"$HERE"/do-run "$TARGET" $OPTIONS "$@"

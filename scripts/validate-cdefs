@@ -46,7 +46,7 @@ echo '#include "'$input'"' | ("$@" -E - || exit 0) |
 		if ($1 == "#") {
 			name = $3;
 			gsub(/"/, "", name);
-			if (name ~ "^.*/newlib/libc/include/sys/cdefs.h$") {
+			if (name ~ "^.*/libc/include/sys/cdefs.h$") {
 				if (contents && !cdefs) {
 					printf("%s: contents before cdefs: \"%s\"\n", filename, first_contents);
 					exit(1);

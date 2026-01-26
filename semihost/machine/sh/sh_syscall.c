@@ -40,12 +40,12 @@
 uint32_t
 sh_syscall(uint32_t _r4, uint32_t _r5, uint32_t _r6, uint32_t _r7)
 {
-    register uint32_t   r4 __asm__("r4") = _r4;
-    register uint32_t   r5 __asm__("r5") = _r5;
-    register uint32_t   r6 __asm__("r6") = _r6;
-    register uint32_t   r7 __asm__("r7") = _r7;
-    register uint32_t   r0 __asm__("r0");
-    __asm__("trapa #34" : "=r" (r0) : "r" (r4), "r" (r5), "r" (r6), "r" (r7));
+    register uint32_t r4 __asm__("r4") = _r4;
+    register uint32_t r5 __asm__("r5") = _r5;
+    register uint32_t r6 __asm__("r6") = _r6;
+    register uint32_t r7 __asm__("r7") = _r7;
+    register uint32_t r0 __asm__("r0");
+    __asm__("trapa #34" : "=r"(r0) : "r"(r4), "r"(r5), "r"(r6), "r"(r7));
     return r0;
 }
 

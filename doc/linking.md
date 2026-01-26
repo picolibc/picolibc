@@ -221,3 +221,11 @@ Memory between the end of the cleared ram contents and the stack is
 available for malloc. If you need to ensure that there is at least a
 certain amount of heap space available, you can set the
 `__heap_size_min` value in the linker script.
+
+## Using picolibc_inittls.ld
+
+This is an alternate to picolibc.ld which is used with --crt0=inittls
+and places the TLS variables in a separately allocated chunk of
+memory, rather than in between the data and bss variables. No changes
+to the application are needed, but application initialization now
+includes a call to `_init_tls`.

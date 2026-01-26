@@ -1,10 +1,6 @@
 [binaries]
-# Meson 0.53.2 doesn't use any cflags when doing basic compiler tests,
-# so we have to add -nostdlib to the compiler configuration itself or
-# early compiler tests will fail. This can be removed when picolibc
-# requires at least version 0.54.2 of meson.
 c = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib']
-cpp = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib']
+cpp = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib', '-stdlib=libstdc++']
 c_ld = '/usr/bin/riscv64-unknown-elf-ld'
 cpp_ld = '/usr/bin/riscv64-unknown-elf-ld'
 ar = 'riscv64-unknown-elf-ar'
@@ -12,7 +8,7 @@ as = 'riscv64-unknown-elf-as'
 nm = 'riscv64-unknown-elf-nm'
 strip = 'riscv64-unknown-elf-strip'
 # only needed to run tests
-exe_wrapper = ['sh', '-c', 'test -z "$PICOLIBC_TEST" || run-riscv "$@"', 'run-riscv']
+exe_wrapper = ['env', 'run-riscv']
 
 [host_machine]
 system = 'none'
@@ -22,8 +18,8 @@ endian = 'little'
 
 [properties]
 c_args = ['-Werror=double-promotion', '-fshort-enums']
-c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
-cpp_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
+c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/15.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
+cpp_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/15.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/14.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/13.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.2.0/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/12.1.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
 skip_sanity_check = true
 has_link_defsym = true
 default_flash_addr = '0x80000000'

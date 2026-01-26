@@ -34,3 +34,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_semihost += files('semihost-loongarch.S')
+has_arm_semihost = true
