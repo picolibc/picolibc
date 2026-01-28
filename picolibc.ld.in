@@ -169,6 +169,7 @@ SECTIONS
 @INITTLS@
 @INITTLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
 @INITTLS@	PROVIDE( @PREFIX@__tls_space_size = @PREFIX@__tls_end - @PREFIX@__tls_start );
+@INITTLS@	PROVIDE( @PREFIX@__tls_inittls = 1 );
 
 @BFD@	/*
 @BFD@	 * Procedure linkage table. This ends up
@@ -259,6 +260,7 @@ SECTIONS
 @DATATLS@		PROVIDE( @PREFIX@__tls_head_start = .);
 @DATATLS@		KEEP (*(.stack_chk .stack_chk.*))
 @DATATLS@		PROVIDE( @PREFIX@__tls_head_end = .);
+@DATATLS@	PROVIDE( @PREFIX@__tls_inittls = 0 );
 
 @INITTLS@		PROVIDE( @PREFIX@__data_end = . );
 

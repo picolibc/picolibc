@@ -67,6 +67,7 @@ extern char __tdata_source[], __tdata_source_end[];
 extern char __data_start[], __data_source[];
 extern char __non_tls_bss_start[];
 extern char __tls_base[];
+extern char __tls_inittls[];
 
 static bool
 inside_tls_region(void *ptr, const void *tls)
@@ -215,23 +216,23 @@ check_tls(char *where, bool check_addr, void *tls_region)
     check_inside_tls_region(&bss_var, tls_region);
     check_inside_tls_region(&overaligned_bss_var, tls_region);
 
-#ifndef INIT_TLS
-    /*
-     * We allow for up to OVERALIGN_NON_TLS_BSS -1 bytes of padding after
-     * the end of .tbss and the start of aligned .bss since in theory the
-     * linker could fill this space with smaller .bss variables before the
-     * overaligned value that we define in this file.
-     */
-    char *tdata_end = __tls_base + _tls_size();
-    char *non_tls_bss_start_latest
-        = __align_up(tdata_end + OVERALIGN_NON_TLS_BSS, OVERALIGN_NON_TLS_BSS);
-    if (__non_tls_bss_start < tdata_end || __non_tls_bss_start > non_tls_bss_start_latest) {
-        printf("non-TLS bss data doesn't start shortly after TLS data "
-               "(is %p should be between %p and %p)\n",
-               __non_tls_bss_start, tdata_end, non_tls_bss_start_latest);
-        result++;
+    if (__tls_inittls != (void *)(uintptr_t)1) {
+        /*
+         * We allow for up to OVERALIGN_NON_TLS_BSS -1 bytes of padding after
+         * the end of .tbss and the start of aligned .bss since in theory the
+         * linker could fill this space with smaller .bss variables before the
+         * overaligned value that we define in this file.
+         */
+        char *tdata_end = __tls_base + _tls_size();
+        char *non_tls_bss_start_latest
+            = __align_up(tdata_end + OVERALIGN_NON_TLS_BSS, OVERALIGN_NON_TLS_BSS);
+        if (__non_tls_bss_start < tdata_end || __non_tls_bss_start > non_tls_bss_start_latest) {
+            printf("non-TLS bss data doesn't start shortly after TLS data "
+                   "(is %p should be between %p and %p)\n",
+                   __non_tls_bss_start, tdata_end, non_tls_bss_start_latest);
+            result++;
+        }
     }
-#endif
 #endif
     return result;
 }
