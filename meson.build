@@ -66,16 +66,6 @@ foreach _line : run_command(cc.cmd_array() + ['-print-search-dirs'], check : fal
   endif
 endforeach
 
-# these options are required for all C compiler operations, including
-# detecting many C compiler features, as we cannot expect there
-# to be a working C library on the system.
-
-core_c_args = []
-use_stdlib = get_option('use-stdlib')
-if not use_stdlib
-  core_c_args += cc.get_supported_arguments(['-nostdlib'])
-endif
-
 # Find the picolibc name for the host cpu. Provide
 # for some common aliases
 
@@ -174,133 +164,16 @@ enable_malloc = get_option('enable-malloc')
 malloc_clear_freed = get_option('malloc-clear-freed')
 internal_heap = get_option('internal-heap')
 
-c_args = core_c_args
-native_common_args = ['-DNO_NEWLIB']
+# Figure out what flags the linker supports
 
-profile = get_option('profile')
-if profile
-  c_args += ['-pg', '-no-pie']
-  native_common_args += ['-pg']
-endif
-
-if get_option('freestanding')
-  c_args += ['-ffreestanding']
-endif
-
-if have_cplusplus
-  cpp_args = c_args
-  cpp_flags = cpp.get_supported_arguments(['-fno-common', '-frounding-math', '-fsignaling-nans',
-				           '-Wno-unsupported-floating-point-opt',
-				           '-fno-builtin-copysignl'])
-  cpp_args += cpp_flags
-  native_cpp_args = native_common_args + cpp_flags
-endif
-
-# Disable ssp and fortify source while building picolibc (it's enabled
-# by default by the ubuntu native compiler)
-c_flags = cc.get_supported_arguments(['-fno-common',
-                                      '-frounding-math',
-                                      '-fsignaling-nans',
-                                      '-fstrict-flex-arrays=3',
-                                      '-Wflex-array-member-not-at-end',
-				      '-Wno-unsupported-floating-point-opt',
-				      '-fno-builtin-copysignl'])
-
-c_args += c_flags
-native_c_args = native_common_args + c_flags
-
-sanitize_flag = get_option('sanitize')
-if sanitize_flag == 'none'
-  sanitize_flag = ''
-endif
-
-if get_option('sanitize-bounds')
-  if sanitize_flag == ''
-    sanitize_flag = 'bounds'
-  else
-    sanitize_flag = ','.join(sanitize_flag, 'bounds')
-  endif
-endif
-
-sanitize_trap_on_error = get_option('sanitize-trap-on-error')
-
-if sanitize_flag == ''
-  c_sanitize_flags = []
-else
-  c_sanitize_flags = cc.get_supported_arguments('-fsanitize=' + sanitize_flag)
-  if c_sanitize_flags == [] and not get_option('sanitize-allow-missing')
-    error('not supported: -fsanitize=' + sanitize_flag)
-  endif
-
-  if sanitize_trap_on_error
-    c_sanitize_flags += cc.get_supported_arguments(['-fsanitize-undefined-trap-on-error'])
-  endif
-
-  c_args += c_sanitize_flags
-  native_c_args += c_sanitize_flags
-endif
+has_link_defsym = false
+has_link_alias = false
 
 if cc.symbols_have_underscore_prefix()
   global_prefix = '_'
 else
   global_prefix = ''
 endif
-fast_strcmp = get_option('fast-strcmp')
-
-mb_capable = get_option('mb-capable')
-mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
-if get_option('mb-ucs-charsets') == 'auto'
-  mb_ucs_charsets = mb_extended_charsets
-else
-  mb_ucs_charsets = mb_capable and get_option('mb-ucs-charsets') == 'true'
-endif
-if get_option('mb-iso-charsets') == 'auto'
-  mb_iso_charsets = mb_extended_charsets
-else
-  mb_iso_charsets = mb_capable and get_option('mb-iso-charsets') == 'true'
-endif
-if get_option('mb-windows-charsets') == 'auto'
-  mb_windows_charsets = mb_extended_charsets
-else
-  mb_windows_charsets = mb_capable and get_option('mb-windows-charsets') == 'true'
-endif
-if get_option('mb-jis-charsets') == 'auto'
-  mb_jis_charsets = mb_extended_charsets
-else
-  mb_jis_charsets = mb_capable and get_option('mb-jis-charsets') == 'true'
-endif
-
-obsolete_math = get_option('newlib-obsolete-math')
-obsolete_math_float = get_option('newlib-obsolete-math-float')
-obsolete_math_double = get_option('newlib-obsolete-math-double')
-
-sysroot_install = get_option('sysroot-install')
-system_libc = get_option('system-libc')
-prefix = get_option('prefix')
-
-nm = find_program('nm', required : false)
-
-check_duplicate_names = nm.found()
-
-if nm.found()
-  duplicate_names = find_program('scripts/duplicate-names', required : true)
-endif
-
-if enable_cdefs_tests
-  validate_cdefs = find_program ('scripts/validate-cdefs', required : true)
-endif
-
-# Shared stdio options
-io_long_long = get_option('io-long-long')
-io_c99_formats = get_option('io-c99-formats')
-io_pos_args = get_option('io-pos-args')
-io_long_double = get_option('io-long-double')
-
-# Figure out what flags the linker supports
-
-has_link_defsym = false
-has_link_alias = false
-
 
 # Figure out how to pass aliases on the compiler command line.  Do
 # that by finding a suitable alias for the default entry point.
@@ -353,6 +226,224 @@ endif
 
 link_test_args += runtime_lib
 
+# these options are required for all C compiler operations, including
+# detecting many C compiler features, as we cannot expect there
+# to be a working C library on the system.
+
+c_args = meson.get_external_property('target_c_args', [])
+
+use_stdlib = get_option('use-stdlib')
+if not use_stdlib
+  c_args += cc.get_supported_arguments(['-nostdlib'])
+endif
+
+native_c_args = ['-DNO_NEWLIB']
+
+profile = get_option('profile')
+if profile
+  c_args += ['-pg', '-no-pie']
+  native_c_args += ['-pg']
+endif
+
+if get_option('freestanding')
+  c_args += ['-ffreestanding']
+endif
+
+# We don't need '-fdata-sections' currently as there aren't any
+# files with data used in separate code paths. This works around
+# versions of gcc for RISC-V which have a bug that mis-names
+# initialized read-only data segments when -fdata-sections
+# is defined
+c_args += cc.get_supported_arguments(['-ffunction-sections'])
+
+sanitize_flag = get_option('sanitize')
+if sanitize_flag == 'none'
+  sanitize_flag = ''
+endif
+
+if get_option('sanitize-bounds')
+  if sanitize_flag == ''
+    sanitize_flag = 'bounds'
+  else
+    sanitize_flag = ','.join(sanitize_flag, 'bounds')
+  endif
+endif
+
+sanitize_trap_on_error = get_option('sanitize-trap-on-error')
+
+if sanitize_flag == ''
+  c_sanitize_flags = []
+else
+  c_sanitize_flags = cc.get_supported_arguments('-fsanitize=' + sanitize_flag)
+  if c_sanitize_flags == [] and not get_option('sanitize-allow-missing')
+    error('not supported: -fsanitize=' + sanitize_flag)
+  endif
+
+  if sanitize_trap_on_error
+    c_sanitize_flags += cc.get_supported_arguments(['-fsanitize-undefined-trap-on-error'])
+  endif
+
+  c_args += c_sanitize_flags
+  native_c_args += c_sanitize_flags
+endif
+
+stack_guard_spec = ''
+stack_guard_option = get_option('stack-protector-guard')
+prefer_tls_stack_guard = false
+if stack_guard_option == 'tls'
+  prefer_tls_stack_guard = true
+else
+  if stack_guard_option == 'auto' and host_cpu_family == 'powerpc'
+    prefer_tls_stack_guard = true
+  endif
+endif
+have_tls_stack_guard = fs.is_file('libc/machine' / host_cpu_family / 'machine/_ssp_tls.h')
+if have_tls_stack_guard
+  c_stack_guard_tls_flags = cc.get_supported_arguments(['-mstack-protector-guard=tls'])
+  if c_stack_guard_tls_flags == []
+    have_tls_stack_guard = false
+  endif
+endif
+tls_stack_guard = prefer_tls_stack_guard and have_tls_stack_guard
+if tls_stack_guard
+  stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=tls}'
+  c_args += c_stack_guard_tls_flags
+else
+  if stack_guard_option == 'tls'
+    if not thread_local_storage
+      error('stack-protector-guard=tls option selected, but thread local storage disabled')
+    else
+      error('stack-protector-guard=tls option selected, but not supported for this CPU')
+    endif
+  endif
+  c_stack_guard_global_flags = cc.get_supported_arguments(['-mstack-protector-guard=global'])
+  if c_stack_guard_global_flags != []
+    stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=global}'
+    c_args += c_stack_guard_global_flags
+  endif
+endif
+
+tls_model_spec = ''
+thread_local_storage = false
+thread_local_storage_option = get_option('thread-local-storage')
+have_picolibc_tls_api = get_option('thread-local-storage-api') and fs.is_file('libc/machine' / host_cpu_family / 'tls.c')
+if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
+  # We assume that _set_tls() is defined in the arch specific tls.c
+  if thread_local_storage_option == 'auto' or have_picolibc_tls_api
+    thread_local_storage = not cc.has_function('__emutls_get_address', args: c_args + link_test_args)
+  endif
+else
+  thread_local_storage = get_option('thread-local-storage') == 'true'
+endif
+
+if thread_local_storage
+  tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
+
+  tls_arg = '-ftls-model=' + get_option('tls-model')
+  assert(cc.has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
+  c_args += [tls_arg]
+endif
+
+if get_option('analyzer')
+  c_args += cc.get_supported_arguments(['-fanalyzer'])
+endif
+
+common_options = [
+  '-Werror=vla',
+  '-Warray-bounds',
+  '-Werror=double-promotion',
+  '-Wno-missing-braces',
+  '-Wno-return-type',
+  '-Wno-unused-command-line-argument',
+  '-Wmissing-prototypes',
+  '-Wmissing-declarations',
+  '-Werror=implicit-fallthrough=5',
+  '-Werror=unreachable-code-fallthrough',
+  '-Werror=implicit-function-declaration',
+  '-Wold-style-definition',
+  '-Wno-implicit-int',
+  '-Wflex-array-member-not-at-end',
+  '-fno-common',
+  '-frounding-math',
+  '-fsignaling-nans',
+  '-fstrict-flex-arrays=3',
+  '-Wno-unsupported-floating-point-opt',
+  '-fno-builtin-copysignl',
+  '-fno-stack-protector',
+]
+
+cpp_options = [
+  '-fno-exceptions',
+  '-fno-unwind-tables',
+  ]
+
+werror_c_flag = cc.get_supported_arguments(['-Werror'])
+
+# Split out C++ args at this point to add C and C++ specific args
+if have_cplusplus
+  cpp_args = c_args
+  native_cpp_args = native_c_args
+
+  # We can't use get_supported_arguments because known flags
+  # not supported for the target language generate warnings
+  # not errors, so we need -Werror
+  cpp_flags = []
+  foreach _flag : common_options + cpp_options
+    if cpp.compiles('extern int i;',
+                    args: ['-Werror', _flag],
+                    name: _flag)
+      cpp_flags += [_flag]
+    endif
+  endforeach
+  cpp_args += cpp_flags
+  native_cpp_args += cpp_flags
+endif
+
+c_flags = []
+foreach _flag : common_options
+  if cc.compiles('extern int i;',
+                 args: ['-Werror', _flag],
+                 name: _flag)
+    c_flags += [_flag]
+  endif
+endforeach
+c_args += c_flags
+native_c_args += c_flags
+
+# Make sure _LIBC is not defined when building tests
+test_c_args = c_args
+c_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
+
+if have_cplusplus
+  test_cpp_args = cpp_args
+  cpp_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
+endif
+
+test_flags = []
+# Select a fortify source option
+fortify_source = get_option('fortify-source')
+if fortify_source == 'none'
+  test_flags += ['-U_FORTIFY_SOURCE']
+else
+  test_flags += ['-D_FORTIFY_SOURCE=' + fortify_source]
+endif
+if tests_enable_posix_io
+  test_flags += ['-DTESTS_ENABLE_POSIX_IO']
+endif
+test_c_args += test_flags
+if have_cplusplus
+  test_cpp_args += test_flags
+endif
+
+# All done computing C compiler arguments
+#
+# c_args            target C code
+# cpp_args          target C++ code
+# native_c_args     native C code
+# native_cpp_args   native C++ code
+# test_c_args       target test C code
+# test_cpp_args     target test C++ code
+
 # Get additional flags used for linking tests.
 
 test_link_args_base = runtime_lib
@@ -363,11 +454,64 @@ if profile
   test_link_args_extra += ['-pg']
 endif
 
+test_link_args_extra += test_c_args
+
 foreach ld : test_link_args_extra
   if cc.has_multi_link_arguments(link_test_args + [ld])
     test_link_args_base += [ld]
   endif
 endforeach
+
+fast_strcmp = get_option('fast-strcmp')
+
+mb_capable = get_option('mb-capable')
+mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
+if get_option('mb-ucs-charsets') == 'auto'
+  mb_ucs_charsets = mb_extended_charsets
+else
+  mb_ucs_charsets = mb_capable and get_option('mb-ucs-charsets') == 'true'
+endif
+if get_option('mb-iso-charsets') == 'auto'
+  mb_iso_charsets = mb_extended_charsets
+else
+  mb_iso_charsets = mb_capable and get_option('mb-iso-charsets') == 'true'
+endif
+if get_option('mb-windows-charsets') == 'auto'
+  mb_windows_charsets = mb_extended_charsets
+else
+  mb_windows_charsets = mb_capable and get_option('mb-windows-charsets') == 'true'
+endif
+if get_option('mb-jis-charsets') == 'auto'
+  mb_jis_charsets = mb_extended_charsets
+else
+  mb_jis_charsets = mb_capable and get_option('mb-jis-charsets') == 'true'
+endif
+
+obsolete_math = get_option('newlib-obsolete-math')
+obsolete_math_float = get_option('newlib-obsolete-math-float')
+obsolete_math_double = get_option('newlib-obsolete-math-double')
+
+sysroot_install = get_option('sysroot-install')
+system_libc = get_option('system-libc')
+prefix = get_option('prefix')
+
+nm = find_program('nm', required : false)
+
+check_duplicate_names = nm.found()
+
+if nm.found()
+  duplicate_names = find_program('scripts/duplicate-names', required : true)
+endif
+
+if enable_cdefs_tests
+  validate_cdefs = find_program ('scripts/validate-cdefs', required : true)
+endif
+
+# Shared stdio options
+io_long_long = get_option('io-long-long')
+io_c99_formats = get_option('io-c99-formats')
+io_pos_args = get_option('io-pos-args')
+io_long_double = get_option('io-long-double')
 
 stack_symbol = meson.get_external_property('stack_symbol', '__stack')
 
@@ -428,57 +572,6 @@ if host_cpu_family == ''
   message('Computed host_cpu_family as ' + host_cpu_family)
 endif
 
-tls_model_spec = ''
-thread_local_storage = false
-thread_local_storage_option = get_option('thread-local-storage')
-have_picolibc_tls_api = get_option('thread-local-storage-api') and fs.is_file('libc/machine' / host_cpu_family / 'tls.c')
-if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
-  # We assume that _set_tls() is defined in the arch specific tls.c
-  if thread_local_storage_option == 'auto' or have_picolibc_tls_api
-    thread_local_storage = not cc.has_function('__emutls_get_address', args: core_c_args + link_test_args)
-  endif
-else
-  thread_local_storage = get_option('thread-local-storage') == 'true'
-endif
-if thread_local_storage
-  tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
-endif
-
-stack_guard_spec = ''
-stack_guard_option = get_option('stack-protector-guard')
-prefer_tls_stack_guard = false
-if stack_guard_option == 'tls'
-  prefer_tls_stack_guard = true
-else
-  if stack_guard_option == 'auto' and host_cpu_family == 'powerpc'
-    prefer_tls_stack_guard = true
-  endif
-endif
-have_tls_stack_guard = fs.is_file('libc/machine' / host_cpu_family / 'machine/_ssp_tls.h')
-if have_tls_stack_guard
-  c_stack_guard_tls_flags = cc.get_supported_arguments(['-mstack-protector-guard=tls'])
-  if c_stack_guard_tls_flags == []
-    have_tls_stack_guard = false
-  endif
-endif
-tls_stack_guard = prefer_tls_stack_guard and have_tls_stack_guard
-if tls_stack_guard
-  stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=tls}'
-  c_args += c_stack_guard_tls_flags
-else
-  if stack_guard_option == 'tls'
-    if not thread_local_storage
-      error('stack-protector-guard=tls option selected, but thread local storage disabled')
-    else
-      error('stack-protector-guard=tls option selected, but not supported for this CPU')
-    endif
-  endif
-  c_stack_guard_global_flags = cc.get_supported_arguments(['-mstack-protector-guard=global'])
-  if c_stack_guard_global_flags != []
-    stack_guard_spec = '%{!mstack-protector-guard:-mstack-protector-guard=global}'
-    c_args += c_stack_guard_global_flags
-  endif
-endif
 
 if sysroot_install
   # Get 'sysroot' or 'GCC_EXEC_PREFIX' from GCC output
@@ -545,7 +638,7 @@ else
   specs_install = true
 endif
 
-# Let targets add more support libraries 
+# Let targets add more support libraries
 additional_libs_list = meson.get_external_property('additional_libs', [])
 
 compiler_id = cc.get_id()
@@ -717,7 +810,7 @@ if enable_multilib
   gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
   crt0_gen = gen_format.format(gen_multilib_crt0_path)
 endif
-  
+
 #
 # Construct the *startfile value from the options computed
 # above. As there's only one value, it's either the
@@ -779,74 +872,20 @@ if specs_install and really_install
 	         install: specs_install and really_install)
 endif
 
-# Not all compilers necessarily support all warnings; only use these which are:
-common_warnings = [
-  '-Werror=vla',
-  '-Warray-bounds',
-  '-Werror=double-promotion',
-  '-Wno-missing-braces',
-  '-Wno-return-type',
-  '-Wno-unused-command-line-argument',
-  '-Wmissing-prototypes',
-  '-Wmissing-declarations',
-  '-Werror=implicit-fallthrough=5',
-  '-Werror=unreachable-code-fallthrough',
-]
-if get_option('analyzer')
-  common_warnings += [
-    '-fanalyzer',
-    ]
-endif
-c_warnings = common_warnings + [
-  '-Werror=implicit-function-declaration',
-  '-Wold-style-definition',
-  '-Wno-implicit-int',
-]
-c_flags = cc.get_supported_arguments(c_warnings)
-c_args += c_flags
-native_c_args += c_flags
-
-# Make sure _LIBC is not defined when building tests
-test_c_args = c_args
-c_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
-
-# Select a fortify source option
-fortify_source = get_option('fortify-source')
-if fortify_source == 'none'
-  test_fortify_arg = '-U_FORTIFY_SOURCE'
-else
-  test_fortify_arg = '-D_FORTIFY_SOURCE=' + fortify_source
-endif
-test_c_args += [test_fortify_arg]
-if tests_enable_posix_io
-  test_c_args += ['-DTESTS_ENABLE_POSIX_IO']
-endif
-
-c_args += cc.get_supported_arguments(['-fno-stack-protector'])
-
-if have_cplusplus
-  cpp_warnings = common_warnings
-  cpp_flags = cpp.get_supported_arguments(cpp_warnings)
-  cpp_args += cpp_flags
-  cpp_flags = cpp.get_supported_arguments(['-fno-exceptions', '-fno-unwind-tables', '-fno-stack-protector'])
-  cpp_args += cpp_flags
-  test_cpp_args = cpp_args + [test_fortify_arg]
-endif
-
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
 struct test { int part: 24; } __attribute__((packed));
 unsigned int foobar (const struct test *p) { return p->part; }
 '''
-have_bitfields_in_packed_structs = cc.compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields', args: core_c_args)
+have_bitfields_in_packed_structs = cc.compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields', args: c_args)
 
 # CompCert does not support _Complex
 complex_code = '''
 float _Complex test(float _Complex z) { return z; }
 '''
-have_complex = cc.compiles(complex_code, name : 'supports _Complex', args: core_c_args)
+have_complex = cc.compiles(complex_code, name : 'supports _Complex', args: c_args)
 
-werror_c_args = core_c_args + cc.get_supported_arguments('-Werror')
+werror_c_args = c_args + cc.get_supported_arguments('-Werror')
 
 # CompCert uses the GCC preprocessor, which causes to
 #  > #if __has_attribute(__alloc_size__)
@@ -894,7 +933,8 @@ if enable_multilib
     if matches_exclude
       continue
     endif
-    flags = []
+
+    _c_flags = []
 
     # Let the user specify a subset of the possible multilib
     # configurations to build for
@@ -908,23 +948,23 @@ if enable_multilib
 	      # mode (which breaks libm). We don't need fph2 as that
 	      # doesn't set the single precision constant flag
 	      if flag == 'mcustom-fpu-cfg=60-1'
-		flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
+		_c_flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
 			  '-mcustom-fsubs=254']
 	      elif flag == 'mcustom-fpu-cfg=60-2'
-		flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
+		_c_flags += ['-mcustom-fmuls=252', '-mcustom-fadds=253',
 			  '-mcustom-fsubs=254', '-mcustom-fdivs=255']
 	      elif flag == 'mcustom-fpu-cfg=72-3'
-		flags += ['-mcustom-floatus=243', '-mcustom-fixsi=244',
+		_c_flags += ['-mcustom-floatus=243', '-mcustom-fixsi=244',
 			  '-mcustom-floatis=245','-mcustom-fcmpgts=246',
 			  '-mcustom-fcmples=249', '-mcustom-fcmpeqs=250',
 			  '-mcustom-fcmpnes=251', '-mcustom-fmuls=252',
 			  '-mcustom-fadds=253', '-mcustom-fsubs=254',
 			  '-mcustom-fdivs=255']
 	      else
-		flags += '-' + flag
+		_c_flags += '-' + flag
 	      endif
 	    else
-	      flags += '-' + flag
+	      _c_flags += '-' + flag
 	    endif
 	  endif
 	endforeach
@@ -946,16 +986,16 @@ if enable_multilib
       # rv64 needs to use a non-default mcmodel so that variables can
       # live in a broader range of memory addresses
       if not has_mcmodel and name.strip('_').startswith('rv64')
-	flags += [ '-mcmodel=medany' ]
+	_c_flags += [ '-mcmodel=medany' ]
       endif
 
       # Add any extra flags for this target from the cross file
-      flags += meson.get_external_property('c_args_' + name.strip('_'), [])
+      _c_flags += meson.get_external_property('c_args_' + name.strip('_'), [])
 
       targets += {
                   'name': name,
                   'dir': dir,
-                  'c_args': flags,
+                  'c_args': _c_flags,
                   'lib_prefix': lib_prefix,
                 }
     endif
@@ -1002,7 +1042,7 @@ init_section_template = '''
 '''
 
 foreach params : [default_target] + targets
-  
+
   target = params['name']
   target_dir = params['dir']
   target_c_args = params['c_args']
@@ -1027,7 +1067,7 @@ foreach params : [default_target] + targets
   if target == 'default-target' or custom_mem_config != ''
 
     # Figure out all of the file and variable names
-    
+
     if target == 'default-target'
       picolibc_ld_file = 'picolibc.ld'
       picolibc_ld_variable = 'picolibc_ld'
@@ -1336,7 +1376,7 @@ foreach params : [default_target] + targets
                                 install: picolibc_ld_install and really_install,
                                 install_dir: lib_dir))
     endif
-                   
+
     set_variable(picolibcpp_ld_variable, get_variable(picolibcpp_ld_config_variable))
 
     # Generate a linker script with separate TLS data
@@ -1357,7 +1397,7 @@ foreach params : [default_target] + targets
                                     install: picolibc_ld_install and really_install,
                                     install_dir: lib_dir))
       endif
-      
+
       set_variable(picolibc_inittls_ld_variable, get_variable(picolibc_inittls_ld_config_variable))
     endif
 
@@ -1493,7 +1533,7 @@ unsigned u;
 int main(void) { return foo(@0@); }
 '''
   builtin_code = builtin_template.format(builtin[1], builtin[2])
-  have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: core_c_args)
+  have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: c_args)
   if have_current_builtin
     conf_data.set10('__HAVE_' + builtin[0].to_upper(), have_current_builtin, description: 'The compiler supports __' + builtin[0])
   else
@@ -1687,24 +1727,6 @@ foreach inc_dir : inc_dirs + [meson.current_build_dir()]
   inc_args += '-I' + meson.current_source_dir() / inc_dir
 endforeach
 
-# We don't need '-fdata-sections' currently as there aren't any
-# files with data used in separate code paths. This works around
-# versions of gcc for RISC-V which have a bug that mis-names
-# initialized read-only data segments when -fdata-sections
-# is defined
-arguments = []
-if cc.has_argument('-ffunction-sections')
-  arguments += ['-ffunction-sections']
-endif
-
-if thread_local_storage
-  tls_arg = '-ftls-model=' + get_option('tls-model')
-  assert(cc.has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
-  arguments += [tls_arg]
-endif
-
-add_project_arguments(arguments, language: 'c')
-
 # libc will adjust this if supported
 ieeefp_funcs = false
 
@@ -1756,7 +1778,7 @@ test_env.prepend('PATH', meson.current_source_dir() / 'scripts')
 
 if has_semihost
   foreach params : [default_target] + targets
-    
+
     target = params['name']
     target_dir = params['dir']
     target_c_args = params['c_args']
@@ -1805,7 +1827,7 @@ if has_semihost
     endif
 
     set_variable(test_link_args_variable,
-                 additional_libs_list + 
+                 additional_libs_list +
 		 test_link_args_base +
                  ['-nostdlib', '-T', picolibc_ld_string])
 
@@ -1816,7 +1838,7 @@ if has_semihost
 
     if thread_local_storage
       set_variable(test_inittls_link_args_variable,
-                   additional_libs_list + 
+                   additional_libs_list +
 		   test_link_args_base +
                    ['-nostdlib', '-T', picolibc_inittls_ld_string])
 

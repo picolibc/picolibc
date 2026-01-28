@@ -129,7 +129,7 @@ foreach params : targets
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
   if have_cplusplus
-    _cpp_args = target_c_args + get_variable('test_cpp_args_' + target, test_cpp_args)
+    _cpp_args = target_c_args + get_variable('test_cpp_args' + target, test_cpp_args)
   endif
 
   if test_noflash
