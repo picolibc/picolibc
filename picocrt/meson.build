@@ -117,10 +117,6 @@ picocrt_variants = [
   },
 ]
 
-# Use the semihost version of crt0 for testing as that
-# will have exception handling
-crt0_test = 'crt0_semihost'
-
 if thread_local_storage
   picocrt_variants += {
                        'name': 'inittls',
