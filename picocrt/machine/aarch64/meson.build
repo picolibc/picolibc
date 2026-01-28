@@ -33,6 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_picocrt += files('crt0.c', 'crt0.S')
+has_crt0_linux = true
 
 picocrt_machines += [
   {
