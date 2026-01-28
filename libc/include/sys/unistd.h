@@ -77,7 +77,6 @@ typedef __gid_t gid_t; /* group id */
 typedef __pid_t pid_t; /* process id */
 #define _PID_T_DECLARED
 #endif
-extern char   **environ;
 
 __noreturn void _exit(int __status);
 
