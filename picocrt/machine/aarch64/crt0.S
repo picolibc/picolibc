@@ -1,3 +1,4 @@
+#ifndef CRT0_LINUX
 /************ Page table ************/
 /*
  * The smallest VA we can construct is 8GB, which needs 8 block page table
@@ -95,6 +96,7 @@ __identity_page_table:
 #else
 #error "Unknown machine type"
 #endif
+#endif /* CRT0_LINUX */
 
 
 /************ Entry point ************/
@@ -109,14 +111,24 @@ __identity_page_table:
   .global _start
   .type _start, %function
 _start:
+#ifdef CRT0_LINUX
+        mov x0, sp
+#else
   /* Use EL-banked stack pointer */
 	msr     SPSel, #1
+#endif
 
+#ifdef __pic__
+        adrp x1, :got:__stack
+        ldr  x1, [x1, :got_lo12:__stack]
+#else
 	/* Initialize stack */
 	adrp x1, __stack
 	add  x1, x1, :lo12:__stack
+#endif
 	mov sp, x1
 
+#ifndef CRT0_LINUX
 	/* Enable FPU */
 #if __ARM_FP
 #if defined(MACHINE_qemu)
@@ -135,12 +147,13 @@ _start:
 #error "Unknown machine type"
 #endif
 #endif // __ARM_FP
+#endif
 
 	/* Jump into C code */
 	bl _cstart
   .size _start, .-_start
 
-
+#ifndef CRT0_LINUX
 
 /************ Exception handlers ************/
 #ifdef CRT0_SEMIHOST
@@ -217,3 +230,4 @@ aarch64_\name\()_vector:
   exception_handler serror, 3
 
 #endif // CRT0_SEMIHOST
+#endif // CRT0_LINUX

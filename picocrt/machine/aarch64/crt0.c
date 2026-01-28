@@ -34,6 +34,7 @@
  */
 #include <sys/cdefs.h>
 #include <sys/types.h>
+#include <unistd.h>
 
 /* The size of the thread control block.
  * TLS relocations are generated relative to
@@ -109,9 +110,26 @@ extern const void *__vector_table[];
 #error "Unknown machine type"
 #endif
 
+#ifdef CRT0_LINUX
+char **environ;
+#endif
+
 void
+#ifdef CRT0_LINUX
+_cstart(void *orig_sp)
+#else
 _cstart(void)
+#endif
 {
+#ifdef CRT0_LINUX
+    int    argc;
+    char **argv;
+
+    argc = *(int *)orig_sp;
+    argv = ((char **)orig_sp) + 1;
+    environ = argv + argc + 1;
+    __start(argc, argv);
+#else
     uint64_t sctlr;
 
     /* Invalidate the cache */
@@ -181,6 +199,7 @@ _cstart(void)
     /* Set the vector base address register */
     __asm__("msr    vbar_" BOOT_EL ", %x0" ::"r"(__vector_table));
     __start();
+#endif
 }
 
 #ifdef CRT0_SEMIHOST
