@@ -47,6 +47,7 @@ picocrt_machines = [
   },
 ]
 
+has_crt0_linux = false
 machine_dir = 'machine' / host_cpu_family
 picocrt_march_add=''
 if fs.is_dir(machine_dir)
@@ -131,6 +132,15 @@ if thread_local_storage
     'name': 'inittls-semihost',
     'suffix': '-inittls-semihost',
     'c_args': ['-DINIT_TLS', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt,
+  }
+endif
+
+if has_crt0_linux and get_option('os-linux')
+  picocrt_variants += {
+    'name': 'linux',
+    'suffix': '-linux',
+    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_LINUX'],
     'src': src_picocrt,
   }
 endif
