@@ -62,7 +62,7 @@ test_extra_c_args = {
 
 test_extra_libs = {}
 
-if enable_native_tests
+if enable_native_tests and oslib_test_variant == ''
   tests += [
     'test-flockfile',
   ]
