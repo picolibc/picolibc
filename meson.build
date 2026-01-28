@@ -1717,6 +1717,7 @@ has_semihost = false
 has_arm_semihost = false
 
 crt0_test = 'crt0_hosted'
+oslib_test = 'lib_semihost'
 
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
