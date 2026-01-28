@@ -264,7 +264,7 @@ foreach params : targets
   # it is incompatible with the minimal crt0 when using stdout
   # (which lock-valid.c uses).
 
-  if is_variable('crt0_minimal' + target) and not posix_console
+  if is_variable('crt0_minimal' + target) and not posix_console and crt0_test_variant == 'semihost'
     _objs_minimal = [get_variable('crt0_minimal'+ target)]
     t1 = 'constructor-skip'
 
@@ -280,7 +280,7 @@ foreach params : targets
 	 env: test_env)
   endif
 
-  if is_variable('crt0_inittls_semihost' + target)
+  if is_variable('crt0_inittls_semihost' + target) and oslib_test_variant == 'semihost'
     _link_inittls_args = target_c_args + _lib_files + get_variable('test_inittls_link_args' + target, test_link_args)
     _link_inittls_depends = get_variable('test_inittls_link_depends' + target, test_inittls_link_depends) + _libs
     _objs_inittls = [get_variable('crt0_inittls_semihost'+ target)]
@@ -671,6 +671,6 @@ subdir('test-monetary')
 subdir('test-stdio')
 subdir('testsuite')
 
-if has_arm_semihost
+if has_arm_semihost and oslib_test_variant == 'semihost'
   subdir('semihost')
 endif

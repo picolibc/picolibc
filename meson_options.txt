@@ -121,6 +121,12 @@ option('os-linux', type: 'boolean', value: false,
        description: 'Include libos/linux bits. Enable for native Linux OS support.')
 option('fake-semihost', type: 'boolean', value: true,
        description: 'create fake semihost library to link tests [ignored]')
+option('crt0-test', type: 'string', value: '',
+       description: 'crt0 variant for testing')
+option('oslib-test', type: 'string', value: '',
+       description: 'oslib variant for testing')
+option('linkerscript-test', type: 'string', value: '',
+       description: 'linker script variant for testing')
 
 #
 # Stdio options
