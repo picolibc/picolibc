@@ -34,6 +34,10 @@
  */
 
 #include <picolibc.h>
+#ifdef CRT0_LINUX
+char **environ;
+#endif
+
 #include "../../crt0.h"
 
 #if __ARM_ARCH_PROFILE == 'M'
@@ -90,10 +94,56 @@ _start(void)
 #endif
     __asm__("msr CONTROL, %0" : : "r"(control));
 #endif
+#ifdef CRT0_LINUX
+    __start(0, NULL);
+#else
     __start();
+#endif
 }
 
 #else /*  __ARM_ARCH_PROFILE == 'M' */
+
+#ifdef CRT0_LINUX
+
+char **environ;
+
+static __noreturn __used __disable_sanitizer void
+_cstart(void *sp)
+{
+    int    argc = *((int *)sp);
+    char **argv = ((char **)sp) + 1;
+    environ = argv + argc + 1;
+    __start(argc, argv);
+}
+
+extern char __stack[];
+
+void __naked __used __disable_sanitizer
+_start(void)
+{
+    __asm__("mov r0, sp\n"
+            "ldr r1, 0f\n"
+            "mov sp, r1\n"
+            "b _cstart\n"
+            ".align 2\n"
+            "0: .word __stack-128");
+}
+
+void        _set_tls(void *tls);
+
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
+
+long        syscall(long sys_call, ...);
+
+void
+_set_tls(void *tls)
+{
+    tls = (uint8_t *)tls - TP_OFFSET;
+    syscall(0xf0005, tls);
+}
+
+#else
 
 #ifdef __PICOCRT_ENABLE_MMU
 
@@ -348,8 +398,9 @@ _start(void)
 }
 
 #endif
+#endif
 
-#ifdef CRT0_SEMIHOST
+#if defined(CRT0_SEMIHOST) && defined(__SEMIHOST)
 
 /*
  * Trap faults, print message and exit when running under semihost

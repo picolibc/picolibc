@@ -33,3 +33,4 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 src_picocrt += files('crt0.c')
+has_crt0_linux = true
