@@ -244,7 +244,8 @@ fffcheck(float is, one_line_type *p, char *name, int serrno, int merror)
     return fffcheck_id(is, p, name, serrno, merror, 0);
 }
 
-static volatile_memcpy(volatile void *dest, void *src, size_t len)
+static void
+volatile_memcpy(volatile void *dest, void *src, size_t len)
 {
     volatile uint8_t *d = dest;
     uint8_t          *s = src;
