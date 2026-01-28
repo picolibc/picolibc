@@ -117,6 +117,8 @@ option('picolib', type: 'boolean', value: true,
        description: 'Include pico lib bits. Disable when doing native testing.')
 option('semihost', type: 'boolean', value: true,
        description: 'Include semihost bits. Disable when doing native testing.')
+option('os-linux', type: 'boolean', value: false,
+       description: 'Include libos/linux bits. Enable for native Linux OS support.')
 option('fake-semihost', type: 'boolean', value: true,
        description: 'create fake semihost library to link tests [ignored]')
 

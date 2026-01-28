@@ -1741,6 +1741,9 @@ has_arm_semihost = false
 crt0_test = 'crt0_hosted'
 oslib_test = 'lib_semihost'
 
+# libos/linux support
+has_os_linux = false
+
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
 
@@ -1748,6 +1751,8 @@ bios_bin = []
 if enable_semihost
   subdir('semihost')
 endif
+
+subdir('libos')
 
 conf_data.set('__SEMIHOST', has_semihost, description: 'Semihost APIs supported')
 conf_data.set('__ARM_SEMIHOST', has_arm_semihost, description: 'ARM Semihost APIs supported')
