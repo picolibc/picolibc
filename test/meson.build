@@ -42,7 +42,6 @@ plain_tests_common = ['regex',
                       'malloc_stress',
 	              'timegm',
                       'test-atomic',
-                      'test-hello',
 	              'test-raise',
                       'test-uchar',
                       'test-wctomb',
@@ -151,6 +150,19 @@ foreach params : targets
        depends: bios_bin,
        suite: 'test',
        env: test_env)
+  t1 = 'test-hello'
+
+  test(t1 + target,
+       executable(t1 + target, [t1 + '.c'],
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  objects: _objs,
+		  link_depends:  _link_depends,
+		  include_directories: inc),
+       depends: bios_bin,
+       suite: 'test',
+       env: test_env)
+
   if no_flash_tests.contains(t1)
     test(t1 + '-no-flash' + target,
          executable(t1 + '-no-flash' + target, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
