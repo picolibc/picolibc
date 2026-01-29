@@ -79,6 +79,9 @@ option('system-libc', type: 'boolean', value: false,
 option('force-install', type: 'boolean', value: false,
        description: 'If picolibc is a subproject its targets will not be installed by default, setting this to true forces installation')
 
+option('libgccdir', type: 'string',
+       description: 'path to picolibc libgcc dirictory')
+
 #
 # Testing options
 #

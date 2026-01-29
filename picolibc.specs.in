@@ -1,4 +1,5 @@
 %rename link	picolibc_link
+%rename link_libgcc	picolibc_link_libgcc
 %rename cpp	picolibc_cpp
 %rename cc1	picolibc_cc1
 %rename cc1plus	picolibc_cc1plus
@@ -11,6 +12,9 @@
 
 *cc1plus:
 @SPECS_ISYSTEM@ @TLSMODEL@ @STACKGUARD@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
+
+*link_libgcc:
+@SPECS_LIBGCC_PATH@ %(picolibc_link_libgcc)
 
 *link:
 @SPECS_PRINTF@ @SPECS_LIBPATH@ %{-printf=*:--defsym=@PREFIX@vfprintf=@PREFIX@__%*_vfprintf} %{-scanf=*:--defsym=@PREFIX@vfscanf=@PREFIX@__%*_vfscanf} %{!T:-T@PICOLIBC_LD@} %(picolibc_link) --gc-sections @LINK_SPEC@
