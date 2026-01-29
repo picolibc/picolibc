@@ -42,7 +42,7 @@ plain_tests_common = ['regex',
                       'malloc_stress',
 	              'timegm',
                       'test-atomic',
-                      'test-hello',
+                      'test-environ',
 	              'test-raise',
                       'test-uchar',
                       'test-wctomb',
@@ -110,8 +110,8 @@ foreach params : targets
   target_c_args = params['c_args']
 
   _libs = [get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+  if is_variable(oslib_test + target)
+    _libs += [get_variable(oslib_test + target)]
   endif
 
   _lib_files=[]
@@ -129,7 +129,7 @@ foreach params : targets
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
   if have_cplusplus
-    _cpp_args = target_c_args + get_variable('test_cpp_args_' + target, test_cpp_args)
+    _cpp_args = target_c_args + get_variable('test_cpp_args' + target, test_cpp_args)
   endif
 
   if test_noflash
@@ -151,6 +151,19 @@ foreach params : targets
        depends: bios_bin,
        suite: 'test',
        env: test_env)
+  t1 = 'test-hello'
+
+  test(t1 + target,
+       executable(t1 + target, [t1 + '.c'],
+		  c_args: _c_args,
+		  link_args: _link_args,
+		  objects: _objs,
+		  link_depends:  _link_depends,
+		  include_directories: inc),
+       depends: bios_bin,
+       suite: 'test',
+       env: test_env)
+
   if no_flash_tests.contains(t1)
     test(t1 + '-no-flash' + target,
          executable(t1 + '-no-flash' + target, ['try-ilp32.c', 'try-ilp32-sub.c', 'lock-valid.c'],
