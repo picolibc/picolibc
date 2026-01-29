@@ -65,13 +65,16 @@ while [ $# -gt 0 -a $done -eq 0 ]; do
   esac
 done
 
-case "$elf" in
-    *_32)
-	qemu="qemu-system-i386"
-	;;
-    *)
+machine="$(readelf -h "$elf" | sed -n '/Machine:/s/^ *Machine: *//p')"
+
+case "$machine" in
+    *X86-64*|*80?86*)
 	qemu="qemu-system-x86_64"
 	;;
+    *)
+        echo 'Unknown machine:' "$machine" 1>&2
+        exit 1
+        ;;
 esac
 
 "$dir"/monitor-e9 $qemu \
@@ -82,4 +85,4 @@ esac
 	-debugcon stdio \
 	-nic none \
 	-device loader,file="$elf" \
-	-nographic
+	-nographic "$@"
