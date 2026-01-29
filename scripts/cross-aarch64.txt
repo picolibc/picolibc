@@ -1,0 +1,26 @@
+[binaries]
+c = ['aarch64-linux-gnu-gcc', '-nostdlib', '-Wl,--build-id=none', '-Wl,--no-warn-rwx-segments']
+cpp = ['aarch64-linux-gnu-g++', '-nostdlib', '-Wl,--build-id=none', '-Wl,--no-warn-rwx-segments']
+ar = 'aarch64-linux-gnu-ar'
+as = 'aarch64-linux-gnu-as'
+ld = 'aarch64-linux-gnu-ld'
+nm = 'aarch64-linux-gnu-nm'
+strip = 'aarch64-linux-gnu-strip'
+# only needed to run tests
+exe_wrapper = ['env', 'run-aarch64']
+
+[host_machine]
+system = 'linux'
+cpu_family = 'aarch64'
+cpu = 'aarch64'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
+need_exe_wrapper = true
+link_spec = '--build-id=none --no-warn-rwx-segments'
+specs_extra = ['*libgcc:', '-lgcc']
+default_flash_addr = '0x40000000'
+default_flash_size = '0x00400000'
+default_ram_addr   = '0x40400000'
+default_ram_size   = '0x00200000'
