@@ -34,6 +34,10 @@
  */
 
 #include <picolibc.h>
+#ifdef CRT0_LINUX
+char **environ;
+#endif
+
 #include "../../crt0.h"
 
 #if __ARM_ARCH_PROFILE == 'M'
@@ -90,10 +94,56 @@ _start(void)
 #endif
     __asm__("msr CONTROL, %0" : : "r"(control));
 #endif
+#ifdef CRT0_LINUX
+    __start(0, NULL);
+#else
     __start();
+#endif
 }
 
 #else /*  __ARM_ARCH_PROFILE == 'M' */
+
+#ifdef CRT0_LINUX
+
+char **environ;
+
+static __noreturn __used __disable_sanitizer void
+_cstart(void *sp)
+{
+    int    argc = *((int *)sp);
+    char **argv = ((char **)sp) + 1;
+    environ = argv + argc + 1;
+    __start(argc, argv);
+}
+
+extern char __stack[];
+
+void __naked __used __disable_sanitizer
+_start(void)
+{
+    __asm__("mov r0, sp\n"
+            "ldr r1, 0f\n"
+            "mov sp, r1\n"
+            "b _cstart\n"
+            ".align 2\n"
+            "0: .word __stack-128");
+}
+
+void        _set_tls(void *tls);
+
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
+
+long        syscall(long sys_call, ...);
+
+void
+_set_tls(void *tls)
+{
+    tls = (uint8_t *)tls - TP_OFFSET;
+    syscall(0xf0005, tls);
+}
+
+#else
 
 #ifdef __PICOCRT_ENABLE_MMU
 
@@ -148,41 +198,26 @@ extern uint32_t __identity_page_table[MMU_NORMAL_COUNT + MMU_DEVICE_COUNT];
 #define MMU_NORMAL_FLAGS        (MMU_TYPE_1MB | MMU_RW | MMU_NORMAL_MEMORY)
 #define MMU_DEVICE_FLAGS        (MMU_TYPE_1MB | MMU_RW | MMU_DEVICE_MEMORY)
 
+/* clang-format off */
 __asm__(
     ".section .rodata\n"
     ".global __identity_page_table\n"
     ".balign 16384\n"
     "__identity_page_table:\n"
     ".set _i, 0\n"
-    ".rept " __XSTRING(
-        MMU_NORMAL_COUNT) "\n"
-                          "  .4byte (_i << 20) |" __XSTRING(
-                              MMU_NORMAL_FLAGS) "\n"
-                                                "  .set _i, _i + 1\n"
-                                                ".endr\n"
-                                                ".set _i, 0\n"
-                                                ".rept " __XSTRING(
-                                                    MMU_DEVICE_COUNT) "\n"
-                                                                      "  .4byte (1 << 31) | (_i << "
-                                                                      "20) |" __XSTRING(
-                                                                          MMU_DEVICE_FLAGS) "\n"
-                                                                                            "  "
-                                                                                            ".set "
-                                                                                            "_i, "
-                                                                                            "_i + "
-                                                                                            "1\n"
-                                                                                            ".endr"
-                                                                                            "\n"
-                                                                                            ".size "
-                                                                                            "__"
-                                                                                            "identi"
-                                                                                            "ty_"
-                                                                                            "page_"
-                                                                                            "table,"
-                                                                                            " " __XSTRING(
-                                                                                                (MMU_NORMAL_COUNT
-                                                                                                 + MMU_DEVICE_COUNT)
-                                                                                                * 4) "\n");
+    ".rept " __XSTRING(MMU_NORMAL_COUNT) "\n"
+    "  .4byte (_i << 20) |" __XSTRING(MMU_NORMAL_FLAGS) "\n"
+    "  .set _i, _i + 1\n"
+    ".endr\n"
+    ".set _i, 0\n"
+    ".rept " __XSTRING(MMU_DEVICE_COUNT) "\n"
+    "  .4byte (1 << 31) | (_i << 20) |" __XSTRING(MMU_DEVICE_FLAGS) "\n"
+    ".set _i, _i + 1\n"
+    ".endr\n"
+    ".size __identity_page_table," __XSTRING((MMU_NORMAL_COUNT + MMU_DEVICE_COUNT) * 4) "\n"
+    ".text\n"
+    );
+/* clang-format on */
 #endif
 
 #endif /* __PICOCRT_ENABLE_MMU */
@@ -363,8 +398,9 @@ _start(void)
 }
 
 #endif
+#endif
 
-#ifdef CRT0_SEMIHOST
+#if defined(CRT0_SEMIHOST) && defined(__SEMIHOST)
 
 /*
  * Trap faults, print message and exit when running under semihost
@@ -432,6 +468,8 @@ arm_fault(struct fault *f, int reason)
     _exit(1);
 }
 
+void __naked __disable_sanitizer arm_hardfault_isr(void);
+
 void __naked __disable_sanitizer
 arm_hardfault_isr(void)
 {
@@ -439,6 +477,8 @@ arm_hardfault_isr(void)
     __asm__("movs r1, #" REASON(REASON_HARDFAULT));
     __asm__("bl  arm_fault");
 }
+
+void __naked __disable_sanitizer arm_memmange_isr(void);
 
 void __naked __disable_sanitizer
 arm_memmange_isr(void)
@@ -448,6 +488,8 @@ arm_memmange_isr(void)
     __asm__("bl  arm_fault");
 }
 
+void __naked __disable_sanitizer arm_busfault_isr(void);
+
 void __naked __disable_sanitizer
 arm_busfault_isr(void)
 {
@@ -455,6 +497,8 @@ arm_busfault_isr(void)
     __asm__("movs r1, #" REASON(REASON_BUSFAULT));
     __asm__("bl  arm_fault");
 }
+
+void __naked __disable_sanitizer arm_usagefault_isr(void);
 
 void __naked __disable_sanitizer
 arm_usagefault_isr(void)

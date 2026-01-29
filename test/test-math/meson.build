@@ -116,8 +116,8 @@ foreach params : targets
   target_c_args = params['c_args']
 
   _libs = [get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+  if is_variable(oslib_test + target)
+    _libs += [get_variable(oslib_test + target)]
   endif
 
   _lib_files=[]

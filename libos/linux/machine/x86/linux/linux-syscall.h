@@ -1,0 +1,387 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+#ifndef _LINUX_SYSCALL_H_
+#define _LINUX_SYSCALL_H_
+#define LINUX_SYS_read                   0
+#define LINUX_SYS_write                  1
+#define LINUX_SYS_open                   2
+#define LINUX_SYS_close                  3
+#define LINUX_SYS_stat                   4
+#define LINUX_SYS_fstat                  5
+#define LINUX_SYS_lstat                  6
+#define LINUX_SYS_poll                   7
+#define LINUX_SYS_lseek                  8
+#define LINUX_SYS_mmap                   9
+#define LINUX_SYS_mprotect               10
+#define LINUX_SYS_munmap                 11
+#define LINUX_SYS_brk                    12
+#define LINUX_SYS_rt_sigaction           13
+#define LINUX_SYS_rt_sigprocmask         14
+#define LINUX_SYS_rt_sigreturn           15
+#define LINUX_SYS_ioctl                  16
+#define LINUX_SYS_pread64                17
+#define LINUX_SYS_pwrite64               18
+#define LINUX_SYS_readv                  19
+#define LINUX_SYS_writev                 20
+#define LINUX_SYS_access                 21
+#define LINUX_SYS_pipe                   22
+#define LINUX_SYS_select                 23
+#define LINUX_SYS_sched_yield            24
+#define LINUX_SYS_mremap                 25
+#define LINUX_SYS_msync                  26
+#define LINUX_SYS_mincore                27
+#define LINUX_SYS_madvise                28
+#define LINUX_SYS_shmget                 29
+#define LINUX_SYS_shmat                  30
+#define LINUX_SYS_shmctl                 31
+#define LINUX_SYS_dup                    32
+#define LINUX_SYS_dup2                   33
+#define LINUX_SYS_pause                  34
+#define LINUX_SYS_nanosleep              35
+#define LINUX_SYS_getitimer              36
+#define LINUX_SYS_alarm                  37
+#define LINUX_SYS_setitimer              38
+#define LINUX_SYS_getpid                 39
+#define LINUX_SYS_sendfile               40
+#define LINUX_SYS_socket                 41
+#define LINUX_SYS_connect                42
+#define LINUX_SYS_accept                 43
+#define LINUX_SYS_sendto                 44
+#define LINUX_SYS_recvfrom               45
+#define LINUX_SYS_sendmsg                46
+#define LINUX_SYS_recvmsg                47
+#define LINUX_SYS_shutdown               48
+#define LINUX_SYS_bind                   49
+#define LINUX_SYS_listen                 50
+#define LINUX_SYS_getsockname            51
+#define LINUX_SYS_getpeername            52
+#define LINUX_SYS_socketpair             53
+#define LINUX_SYS_setsockopt             54
+#define LINUX_SYS_getsockopt             55
+#define LINUX_SYS_clone                  56
+#define LINUX_SYS_fork                   57
+#define LINUX_SYS_vfork                  58
+#define LINUX_SYS_execve                 59
+#define LINUX_SYS_exit                   60
+#define LINUX_SYS_wait4                  61
+#define LINUX_SYS_kill                   62
+#define LINUX_SYS_uname                  63
+#define LINUX_SYS_semget                 64
+#define LINUX_SYS_semop                  65
+#define LINUX_SYS_semctl                 66
+#define LINUX_SYS_shmdt                  67
+#define LINUX_SYS_msgget                 68
+#define LINUX_SYS_msgsnd                 69
+#define LINUX_SYS_msgrcv                 70
+#define LINUX_SYS_msgctl                 71
+#define LINUX_SYS_fcntl                  72
+#define LINUX_SYS_flock                  73
+#define LINUX_SYS_fsync                  74
+#define LINUX_SYS_fdatasync              75
+#define LINUX_SYS_truncate               76
+#define LINUX_SYS_ftruncate              77
+#define LINUX_SYS_getdents               78
+#define LINUX_SYS_getcwd                 79
+#define LINUX_SYS_chdir                  80
+#define LINUX_SYS_fchdir                 81
+#define LINUX_SYS_rename                 82
+#define LINUX_SYS_mkdir                  83
+#define LINUX_SYS_rmdir                  84
+#define LINUX_SYS_creat                  85
+#define LINUX_SYS_link                   86
+#define LINUX_SYS_unlink                 87
+#define LINUX_SYS_symlink                88
+#define LINUX_SYS_readlink               89
+#define LINUX_SYS_chmod                  90
+#define LINUX_SYS_fchmod                 91
+#define LINUX_SYS_chown                  92
+#define LINUX_SYS_fchown                 93
+#define LINUX_SYS_lchown                 94
+#define LINUX_SYS_umask                  95
+#define LINUX_SYS_gettimeofday           96
+#define LINUX_SYS_getrlimit              97
+#define LINUX_SYS_getrusage              98
+#define LINUX_SYS_sysinfo                99
+#define LINUX_SYS_times                  100
+#define LINUX_SYS_ptrace                 101
+#define LINUX_SYS_getuid                 102
+#define LINUX_SYS_syslog                 103
+#define LINUX_SYS_getgid                 104
+#define LINUX_SYS_setuid                 105
+#define LINUX_SYS_setgid                 106
+#define LINUX_SYS_geteuid                107
+#define LINUX_SYS_getegid                108
+#define LINUX_SYS_setpgid                109
+#define LINUX_SYS_getppid                110
+#define LINUX_SYS_getpgrp                111
+#define LINUX_SYS_setsid                 112
+#define LINUX_SYS_setreuid               113
+#define LINUX_SYS_setregid               114
+#define LINUX_SYS_getgroups              115
+#define LINUX_SYS_setgroups              116
+#define LINUX_SYS_setresuid              117
+#define LINUX_SYS_getresuid              118
+#define LINUX_SYS_setresgid              119
+#define LINUX_SYS_getresgid              120
+#define LINUX_SYS_getpgid                121
+#define LINUX_SYS_setfsuid               122
+#define LINUX_SYS_setfsgid               123
+#define LINUX_SYS_getsid                 124
+#define LINUX_SYS_capget                 125
+#define LINUX_SYS_capset                 126
+#define LINUX_SYS_rt_sigpending          127
+#define LINUX_SYS_rt_sigtimedwait        128
+#define LINUX_SYS_rt_sigqueueinfo        129
+#define LINUX_SYS_rt_sigsuspend          130
+#define LINUX_SYS_sigaltstack            131
+#define LINUX_SYS_utime                  132
+#define LINUX_SYS_mknod                  133
+#define LINUX_SYS_uselib                 134
+#define LINUX_SYS_personality            135
+#define LINUX_SYS_ustat                  136
+#define LINUX_SYS_statfs                 137
+#define LINUX_SYS_fstatfs                138
+#define LINUX_SYS_sysfs                  139
+#define LINUX_SYS_getpriority            140
+#define LINUX_SYS_setpriority            141
+#define LINUX_SYS_sched_setparam         142
+#define LINUX_SYS_sched_getparam         143
+#define LINUX_SYS_sched_setscheduler     144
+#define LINUX_SYS_sched_getscheduler     145
+#define LINUX_SYS_sched_get_priority_max 146
+#define LINUX_SYS_sched_get_priority_min 147
+#define LINUX_SYS_sched_rr_get_interval  148
+#define LINUX_SYS_mlock                  149
+#define LINUX_SYS_munlock                150
+#define LINUX_SYS_mlockall               151
+#define LINUX_SYS_munlockall             152
+#define LINUX_SYS_vhangup                153
+#define LINUX_SYS_modify_ldt             154
+#define LINUX_SYS_pivot_root             155
+#define LINUX_SYS__sysctl                156
+#define LINUX_SYS_prctl                  157
+#define LINUX_SYS_arch_prctl             158
+#define LINUX_SYS_adjtimex               159
+#define LINUX_SYS_setrlimit              160
+#define LINUX_SYS_chroot                 161
+#define LINUX_SYS_sync                   162
+#define LINUX_SYS_acct                   163
+#define LINUX_SYS_settimeofday           164
+#define LINUX_SYS_mount                  165
+#define LINUX_SYS_umount2                166
+#define LINUX_SYS_swapon                 167
+#define LINUX_SYS_swapoff                168
+#define LINUX_SYS_reboot                 169
+#define LINUX_SYS_sethostname            170
+#define LINUX_SYS_setdomainname          171
+#define LINUX_SYS_iopl                   172
+#define LINUX_SYS_ioperm                 173
+#define LINUX_SYS_create_module          174
+#define LINUX_SYS_init_module            175
+#define LINUX_SYS_delete_module          176
+#define LINUX_SYS_get_kernel_syms        177
+#define LINUX_SYS_query_module           178
+#define LINUX_SYS_quotactl               179
+#define LINUX_SYS_nfsservctl             180
+#define LINUX_SYS_gettid                 186
+#define LINUX_SYS_readahead              187
+#define LINUX_SYS_setxattr               188
+#define LINUX_SYS_lsetxattr              189
+#define LINUX_SYS_fsetxattr              190
+#define LINUX_SYS_getxattr               191
+#define LINUX_SYS_lgetxattr              192
+#define LINUX_SYS_fgetxattr              193
+#define LINUX_SYS_listxattr              194
+#define LINUX_SYS_llistxattr             195
+#define LINUX_SYS_flistxattr             196
+#define LINUX_SYS_removexattr            197
+#define LINUX_SYS_lremovexattr           198
+#define LINUX_SYS_fremovexattr           199
+#define LINUX_SYS_tkill                  200
+#define LINUX_SYS_time                   201
+#define LINUX_SYS_futex                  202
+#define LINUX_SYS_sched_setaffinity      203
+#define LINUX_SYS_sched_getaffinity      204
+#define LINUX_SYS_set_thread_area        205
+#define LINUX_SYS_io_setup               206
+#define LINUX_SYS_io_destroy             207
+#define LINUX_SYS_io_getevents           208
+#define LINUX_SYS_io_submit              209
+#define LINUX_SYS_io_cancel              210
+#define LINUX_SYS_get_thread_area        211
+#define LINUX_SYS_lookup_dcookie         212
+#define LINUX_SYS_epoll_create           213
+#define LINUX_SYS_remap_file_pages       216
+#define LINUX_SYS_getdents64             217
+#define LINUX_SYS_set_tid_address        218
+#define LINUX_SYS_restart_syscall        219
+#define LINUX_SYS_semtimedop             220
+#define LINUX_SYS_fadvise64              221
+#define LINUX_SYS_timer_create           222
+#define LINUX_SYS_timer_settime          223
+#define LINUX_SYS_timer_gettime          224
+#define LINUX_SYS_timer_getoverrun       225
+#define LINUX_SYS_timer_delete           226
+#define LINUX_SYS_clock_settime          227
+#define LINUX_SYS_clock_gettime          228
+#define LINUX_SYS_clock_getres           229
+#define LINUX_SYS_clock_nanosleep        230
+#define LINUX_SYS_exit_group             231
+#define LINUX_SYS_epoll_wait             232
+#define LINUX_SYS_epoll_ctl              233
+#define LINUX_SYS_tgkill                 234
+#define LINUX_SYS_utimes                 235
+#define LINUX_SYS_mbind                  237
+#define LINUX_SYS_set_mempolicy          238
+#define LINUX_SYS_get_mempolicy          239
+#define LINUX_SYS_mq_open                240
+#define LINUX_SYS_mq_unlink              241
+#define LINUX_SYS_mq_timedsend           242
+#define LINUX_SYS_mq_timedreceive        243
+#define LINUX_SYS_mq_notify              244
+#define LINUX_SYS_mq_getsetattr          245
+#define LINUX_SYS_kexec_load             246
+#define LINUX_SYS_waitid                 247
+#define LINUX_SYS_add_key                248
+#define LINUX_SYS_request_key            249
+#define LINUX_SYS_keyctl                 250
+#define LINUX_SYS_ioprio_set             251
+#define LINUX_SYS_ioprio_get             252
+#define LINUX_SYS_inotify_init           253
+#define LINUX_SYS_inotify_add_watch      254
+#define LINUX_SYS_inotify_rm_watch       255
+#define LINUX_SYS_migrate_pages          256
+#define LINUX_SYS_openat                 257
+#define LINUX_SYS_mkdirat                258
+#define LINUX_SYS_mknodat                259
+#define LINUX_SYS_fchownat               260
+#define LINUX_SYS_futimesat              261
+#define LINUX_SYS_newfstatat             262
+#define LINUX_SYS_unlinkat               263
+#define LINUX_SYS_renameat               264
+#define LINUX_SYS_linkat                 265
+#define LINUX_SYS_symlinkat              266
+#define LINUX_SYS_readlinkat             267
+#define LINUX_SYS_fchmodat               268
+#define LINUX_SYS_faccessat              269
+#define LINUX_SYS_pselect6               270
+#define LINUX_SYS_ppoll                  271
+#define LINUX_SYS_unshare                272
+#define LINUX_SYS_set_robust_list        273
+#define LINUX_SYS_get_robust_list        274
+#define LINUX_SYS_splice                 275
+#define LINUX_SYS_tee                    276
+#define LINUX_SYS_sync_file_range        277
+#define LINUX_SYS_vmsplice               278
+#define LINUX_SYS_move_pages             279
+#define LINUX_SYS_utimensat              280
+#define LINUX_SYS_epoll_pwait            281
+#define LINUX_SYS_signalfd               282
+#define LINUX_SYS_timerfd_create         283
+#define LINUX_SYS_eventfd                284
+#define LINUX_SYS_fallocate              285
+#define LINUX_SYS_timerfd_settime        286
+#define LINUX_SYS_timerfd_gettime        287
+#define LINUX_SYS_accept4                288
+#define LINUX_SYS_signalfd4              289
+#define LINUX_SYS_eventfd2               290
+#define LINUX_SYS_epoll_create1          291
+#define LINUX_SYS_dup3                   292
+#define LINUX_SYS_pipe2                  293
+#define LINUX_SYS_inotify_init1          294
+#define LINUX_SYS_preadv                 295
+#define LINUX_SYS_pwritev                296
+#define LINUX_SYS_rt_tgsigqueueinfo      297
+#define LINUX_SYS_perf_event_open        298
+#define LINUX_SYS_recvmmsg               299
+#define LINUX_SYS_fanotify_init          300
+#define LINUX_SYS_fanotify_mark          301
+#define LINUX_SYS_prlimit64              302
+#define LINUX_SYS_name_to_handle_at      303
+#define LINUX_SYS_open_by_handle_at      304
+#define LINUX_SYS_clock_adjtime          305
+#define LINUX_SYS_syncfs                 306
+#define LINUX_SYS_sendmmsg               307
+#define LINUX_SYS_setns                  308
+#define LINUX_SYS_getcpu                 309
+#define LINUX_SYS_process_vm_readv       310
+#define LINUX_SYS_process_vm_writev      311
+#define LINUX_SYS_kcmp                   312
+#define LINUX_SYS_finit_module           313
+#define LINUX_SYS_sched_setattr          314
+#define LINUX_SYS_sched_getattr          315
+#define LINUX_SYS_renameat2              316
+#define LINUX_SYS_seccomp                317
+#define LINUX_SYS_getrandom              318
+#define LINUX_SYS_memfd_create           319
+#define LINUX_SYS_kexec_file_load        320
+#define LINUX_SYS_bpf                    321
+#define LINUX_SYS_execveat               322
+#define LINUX_SYS_userfaultfd            323
+#define LINUX_SYS_membarrier             324
+#define LINUX_SYS_mlock2                 325
+#define LINUX_SYS_copy_file_range        326
+#define LINUX_SYS_preadv2                327
+#define LINUX_SYS_pwritev2               328
+#define LINUX_SYS_pkey_mprotect          329
+#define LINUX_SYS_pkey_alloc             330
+#define LINUX_SYS_pkey_free              331
+#define LINUX_SYS_statx                  332
+#define LINUX_SYS_io_pgetevents          333
+#define LINUX_SYS_rseq                   334
+#define LINUX_SYS_pidfd_send_signal      424
+#define LINUX_SYS_io_uring_setup         425
+#define LINUX_SYS_io_uring_enter         426
+#define LINUX_SYS_io_uring_register      427
+#define LINUX_SYS_open_tree              428
+#define LINUX_SYS_move_mount             429
+#define LINUX_SYS_fsopen                 430
+#define LINUX_SYS_fsconfig               431
+#define LINUX_SYS_fsmount                432
+#define LINUX_SYS_fspick                 433
+#define LINUX_SYS_pidfd_open             434
+#define LINUX_SYS_clone3                 435
+#define LINUX_SYS_close_range            436
+#define LINUX_SYS_openat2                437
+#define LINUX_SYS_pidfd_getfd            438
+#define LINUX_SYS_faccessat2             439
+#define LINUX_SYS_process_madvise        440
+#define LINUX_SYS_epoll_pwait2           441
+#define LINUX_SYS_quotactl_fd            443
+#define LINUX_SYS_landlock_create_rulese 444
+#define LINUX_SYS_landlock_add_rule      445
+#define LINUX_SYS_landlock_restrict_self 446
+#define LINUX_SYS_memfd_secret           447
+#endif /* _LINUX_SYSCALL_H_ */
