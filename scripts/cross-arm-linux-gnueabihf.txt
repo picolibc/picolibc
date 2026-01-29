@@ -1,23 +1,23 @@
 [binaries]
-c = ['x86_64-linux-gnu-gcc']
-cpp = ['x86_64-linux-gnu-g++']
-ar = 'x86_64-linux-gnu-ar'
-as = 'x86_64-linux-gnu-as'
-nm = 'x86_64-linux-gnu-nm'
-strip = 'x86_64-linux-gnu-strip'
-objcopy = 'x86_64-linux-gnu-objcopy'
+c = 'arm-linux-gnueabihf-gcc'
+cpp = 'arm-linux-gnueabihf-g++'
+ar = 'arm-linux-gnueabihf-ar'
+as = 'arm-linux-gnueabihf-as'
+ld = 'arm-linux-gnueabihf-ld'
+nm = 'arm-linux-gnueabihf-nm'
+strip = 'arm-linux-gnueabihf-strip'
 exe_wrapper = 'env'
 
 [host_machine]
-system='linux'
-cpu_family='x86'
-cpu='x86'
-endian='little'
+system = 'linux'
+cpu_family = 'arm'
+cpu = 'arm'
+endian = 'little'
 
 [properties]
-skip_sanity_check = true
 link_spec = '--build-id=none'
 target_c_args = ['-static', '-fno-pic', '-fno-PIE', '-nostdlib', '-nostartfiles', '-Wl,--build-id=none']
+skip_sanity_check = true
 default_flash_addr = '0x00100000'
 default_flash_size = '0x00400000'
 default_ram_addr   = '0x00500000'
