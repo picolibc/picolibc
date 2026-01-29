@@ -33,4 +33,18 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-exec "$(dirname "$0")"/do-configure x86_64-linux-gnu -Dtests=true -Dtests-enable-posix-io=false -Dmultilib=false "$@"
+# Build for Linux OS
+#
+DIR="$(dirname "$0")"
+meson setup \
+        --buildtype minsize \
+	-Ddebug=true \
+	--fatal-meson-warnings \
+	--cross-file "$DIR"/cross-i686-linux-gnu.txt \
+	-Dsemihost=false \
+	-Dos-linux=true \
+	-Dmultilib=false \
+	-Dtests=true \
+	-Dwerror=true \
+	"$@" \
+	"$DIR"/..
