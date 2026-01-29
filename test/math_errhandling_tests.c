@@ -78,8 +78,13 @@ volatile TEST_CONST FLOAT_T makemathname(long_long_max_one)
 #define LROUND_LONG_MAX  LONG_MAX
 #define LROUND_LLONG_MAX LLONG_MAX
 #else
+#if defined(__GLIBC__) && (defined(__aarch64__) || defined(__arm__))
+#define LROUND_LONG_MAX  LONG_MAX
+#define LROUND_LLONG_MAX LLONG_MAX
+#else
 #define LROUND_LONG_MAX  LONG_MIN
 #define LROUND_LLONG_MAX LLONG_MIN
+#endif
 #endif
 
 FLOAT_T makemathname(scalb)(FLOAT_T, FLOAT_T);
@@ -3315,8 +3320,9 @@ TEST_CONST struct {
     TEST(lgamma_r_neg1, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
     TEST(lgamma_r_neg2, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
     TEST(lgamma_r_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
-#if !defined(__PICOLIBC__) && defined(TEST_LONG_DOUBLE) && (defined(__x86_64) || defined(__i386))
-    /* glibc on x86 gets this wrong */
+#if !defined(__PICOLIBC__) && defined(TEST_LONG_DOUBLE)               \
+    && (defined(__x86_64) || defined(__i386) || defined(__aarch64__))
+    /* glibc gets this wrong */
     TEST(lgamma_r_negbig, (FLOAT_T)INFINITY, FE_DIVBYZERO | FE_OVERFLOW | FE_INEXACT, ERANGE),
 #else
     TEST(lgamma_r_negbig, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
