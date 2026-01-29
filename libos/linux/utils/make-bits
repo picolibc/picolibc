@@ -6,18 +6,19 @@ declare -A tools
 
 tools=(['arm']=arm-linux-gnueabihf-gcc)
 tools+=(['aarch64']=aarch64-linux-gnu-gcc)
-tools+=(['x86']=x86_64-linux-gnu-gcc)
+tools+=(['x86_64']=x86_64-linux-gnu-gcc)
+tools+=(['i686']=i686-linux-gnu-gcc)
 
 declare -A run
 
 run=(['arm']=qemu-arm)
 run+=(['aarch64']=qemu-aarch64)
-run+=(['x86']=env)
-
+run+=(['x86_64']=env)
+run+=(['i686']=env)
 
 declare -a arch
 
-arch=(arm aarch64 x86)
+arch=(arm aarch64 x86_64 i686)
 
 declare -a headers
 

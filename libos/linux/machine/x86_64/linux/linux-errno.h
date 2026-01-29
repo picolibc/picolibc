@@ -1,0 +1,419 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+#ifndef _LINUX_ERRNO_H_
+#define _LINUX_ERRNO_H_
+#define LINUX_EPERM           1
+#define LINUX_ENOENT          2
+#define LINUX_ESRCH           3
+#define LINUX_EINTR           4
+#define LINUX_EIO             5
+#define LINUX_ENXIO           6
+#define LINUX_E2BIG           7
+#define LINUX_ENOEXEC         8
+#define LINUX_EBADF           9
+#define LINUX_ECHILD          10
+#define LINUX_EAGAIN          11
+#define LINUX_ENOMEM          12
+#define LINUX_EACCES          13
+#define LINUX_EFAULT          14
+#define LINUX_ENOTBLK         15
+#define LINUX_EBUSY           16
+#define LINUX_EEXIST          17
+#define LINUX_EXDEV           18
+#define LINUX_ENODEV          19
+#define LINUX_ENOTDIR         20
+#define LINUX_EISDIR          21
+#define LINUX_EINVAL          22
+#define LINUX_ENFILE          23
+#define LINUX_EMFILE          24
+#define LINUX_ENOTTY          25
+#define LINUX_ETXTBSY         26
+#define LINUX_EFBIG           27
+#define LINUX_ENOSPC          28
+#define LINUX_ESPIPE          29
+#define LINUX_EROFS           30
+#define LINUX_EMLINK          31
+#define LINUX_EPIPE           32
+#define LINUX_EDOM            33
+#define LINUX_ERANGE          34
+#define LINUX_ENOMSG          42
+#define LINUX_EIDRM           43
+#define LINUX_ECHRNG          44
+#define LINUX_EL2NSYNC        45
+#define LINUX_EL3HLT          46
+#define LINUX_EL3RST          47
+#define LINUX_ELNRNG          48
+#define LINUX_EUNATCH         49
+#define LINUX_ENOCSI          50
+#define LINUX_EL2HLT          51
+#define LINUX_EDEADLK         35
+#define LINUX_ENOLCK          37
+#define LINUX_EBADE           52
+#define LINUX_EBADR           53
+#define LINUX_EXFULL          54
+#define LINUX_ENOANO          55
+#define LINUX_EBADRQC         56
+#define LINUX_EBADSLT         57
+#define LINUX_EBFONT          59
+#define LINUX_ENOSTR          60
+#define LINUX_ENODATA         61
+#define LINUX_ETIME           62
+#define LINUX_ENOSR           63
+#define LINUX_ENONET          64
+#define LINUX_ENOPKG          65
+#define LINUX_EREMOTE         66
+#define LINUX_ENOLINK         67
+#define LINUX_EADV            68
+#define LINUX_ESRMNT          69
+#define LINUX_ECOMM           70
+#define LINUX_EPROTO          71
+#define LINUX_EMULTIHOP       72
+#define LINUX_EDOTDOT         73
+#define LINUX_EBADMSG         74
+#define LINUX_ENOTUNIQ        76
+#define LINUX_EBADFD          77
+#define LINUX_EREMCHG         78
+#define LINUX_ELIBACC         79
+#define LINUX_ELIBBAD         80
+#define LINUX_ELIBSCN         81
+#define LINUX_ELIBMAX         82
+#define LINUX_ELIBEXEC        83
+#define LINUX_ENOSYS          38
+#define LINUX_ENOTEMPTY       39
+#define LINUX_ENAMETOOLONG    36
+#define LINUX_ELOOP           40
+#define LINUX_EOPNOTSUPP      95
+#define LINUX_EPFNOSUPPORT    96
+#define LINUX_ECONNRESET      104
+#define LINUX_ENOBUFS         105
+#define LINUX_EAFNOSUPPORT    97
+#define LINUX_EPROTOTYPE      91
+#define LINUX_ENOTSOCK        88
+#define LINUX_ENOPROTOOPT     92
+#define LINUX_ESHUTDOWN       108
+#define LINUX_ECONNREFUSED    111
+#define LINUX_EADDRINUSE      98
+#define LINUX_ECONNABORTED    103
+#define LINUX_ENETUNREACH     101
+#define LINUX_ENETDOWN        100
+#define LINUX_ETIMEDOUT       110
+#define LINUX_EHOSTDOWN       112
+#define LINUX_EHOSTUNREACH    113
+#define LINUX_EINPROGRESS     115
+#define LINUX_EALREADY        114
+#define LINUX_EDESTADDRREQ    89
+#define LINUX_EMSGSIZE        90
+#define LINUX_EPROTONOSUPPORT 93
+#define LINUX_ESOCKTNOSUPPORT 94
+#define LINUX_EADDRNOTAVAIL   99
+#define LINUX_ENETRESET       102
+#define LINUX_EISCONN         106
+#define LINUX_ENOTCONN        107
+#define LINUX_ETOOMANYREFS    109
+#define LINUX_EUSERS          87
+#define LINUX_EDQUOT          122
+#define LINUX_ESTALE          116
+#define LINUX_ENOMEDIUM       123
+#define LINUX_EILSEQ          84
+#define LINUX_EOVERFLOW       75
+#define LINUX_ECANCELED       125
+#define LINUX_ENOTRECOVERABLE 131
+#define LINUX_EOWNERDEAD      130
+#define LINUX_ESTRPIPE        86
+#define LINUX_EHWPOISON       133
+#define LINUX_EISNAM          120
+#define LINUX_EKEYEXPIRED     127
+#define LINUX_EKEYREJECTED    129
+#define LINUX_EKEYREVOKED     128
+
+enum __errno {
+    __EPERM = EPERM,
+    __ENOENT = ENOENT,
+    __ESRCH = ESRCH,
+    __EINTR = EINTR,
+    __EIO = EIO,
+    __ENXIO = ENXIO,
+    __E2BIG = E2BIG,
+    __ENOEXEC = ENOEXEC,
+    __EBADF = EBADF,
+    __ECHILD = ECHILD,
+    __EAGAIN = EAGAIN,
+    __ENOMEM = ENOMEM,
+    __EACCES = EACCES,
+    __EFAULT = EFAULT,
+    __ENOTBLK = ENOTBLK,
+    __EBUSY = EBUSY,
+    __EEXIST = EEXIST,
+    __EXDEV = EXDEV,
+    __ENODEV = ENODEV,
+    __ENOTDIR = ENOTDIR,
+    __EISDIR = EISDIR,
+    __EINVAL = EINVAL,
+    __ENFILE = ENFILE,
+    __EMFILE = EMFILE,
+    __ENOTTY = ENOTTY,
+    __ETXTBSY = ETXTBSY,
+    __EFBIG = EFBIG,
+    __ENOSPC = ENOSPC,
+    __ESPIPE = ESPIPE,
+    __EROFS = EROFS,
+    __EMLINK = EMLINK,
+    __EPIPE = EPIPE,
+    __EDOM = EDOM,
+    __ERANGE = ERANGE,
+    __ENOMSG = ENOMSG,
+    __EIDRM = EIDRM,
+    __ECHRNG = ECHRNG,
+    __EL2NSYNC = EL2NSYNC,
+    __EL3HLT = EL3HLT,
+    __EL3RST = EL3RST,
+    __ELNRNG = ELNRNG,
+    __EUNATCH = EUNATCH,
+    __ENOCSI = ENOCSI,
+    __EL2HLT = EL2HLT,
+    __EDEADLK = EDEADLK,
+    __ENOLCK = ENOLCK,
+    __EBADE = EBADE,
+    __EBADR = EBADR,
+    __EXFULL = EXFULL,
+    __ENOANO = ENOANO,
+    __EBADRQC = EBADRQC,
+    __EBADSLT = EBADSLT,
+    __EBFONT = EBFONT,
+    __ENOSTR = ENOSTR,
+    __ENODATA = ENODATA,
+    __ETIME = ETIME,
+    __ENOSR = ENOSR,
+    __ENONET = ENONET,
+    __ENOPKG = ENOPKG,
+    __EREMOTE = EREMOTE,
+    __ENOLINK = ENOLINK,
+    __EADV = EADV,
+    __ESRMNT = ESRMNT,
+    __ECOMM = ECOMM,
+    __EPROTO = EPROTO,
+    __EMULTIHOP = EMULTIHOP,
+    __EDOTDOT = EDOTDOT,
+    __EBADMSG = EBADMSG,
+    __ENOTUNIQ = ENOTUNIQ,
+    __EBADFD = EBADFD,
+    __EREMCHG = EREMCHG,
+    __ELIBACC = ELIBACC,
+    __ELIBBAD = ELIBBAD,
+    __ELIBSCN = ELIBSCN,
+    __ELIBMAX = ELIBMAX,
+    __ELIBEXEC = ELIBEXEC,
+    __ENOSYS = ENOSYS,
+    __ENOTEMPTY = ENOTEMPTY,
+    __ENAMETOOLONG = ENAMETOOLONG,
+    __ELOOP = ELOOP,
+    __EOPNOTSUPP = EOPNOTSUPP,
+    __EPFNOSUPPORT = EPFNOSUPPORT,
+    __ECONNRESET = ECONNRESET,
+    __ENOBUFS = ENOBUFS,
+    __EAFNOSUPPORT = EAFNOSUPPORT,
+    __EPROTOTYPE = EPROTOTYPE,
+    __ENOTSOCK = ENOTSOCK,
+    __ENOPROTOOPT = ENOPROTOOPT,
+    __ESHUTDOWN = ESHUTDOWN,
+    __ECONNREFUSED = ECONNREFUSED,
+    __EADDRINUSE = EADDRINUSE,
+    __ECONNABORTED = ECONNABORTED,
+    __ENETUNREACH = ENETUNREACH,
+    __ENETDOWN = ENETDOWN,
+    __ETIMEDOUT = ETIMEDOUT,
+    __EHOSTDOWN = EHOSTDOWN,
+    __EHOSTUNREACH = EHOSTUNREACH,
+    __EINPROGRESS = EINPROGRESS,
+    __EALREADY = EALREADY,
+    __EDESTADDRREQ = EDESTADDRREQ,
+    __EMSGSIZE = EMSGSIZE,
+    __EPROTONOSUPPORT = EPROTONOSUPPORT,
+    __ESOCKTNOSUPPORT = ESOCKTNOSUPPORT,
+    __EADDRNOTAVAIL = EADDRNOTAVAIL,
+    __ENETRESET = ENETRESET,
+    __EISCONN = EISCONN,
+    __ENOTCONN = ENOTCONN,
+    __ETOOMANYREFS = ETOOMANYREFS,
+    __EUSERS = EUSERS,
+    __EDQUOT = EDQUOT,
+    __ESTALE = ESTALE,
+    __ENOMEDIUM = ENOMEDIUM,
+    __EILSEQ = EILSEQ,
+    __EOVERFLOW = EOVERFLOW,
+    __ECANCELED = ECANCELED,
+    __ENOTRECOVERABLE = ENOTRECOVERABLE,
+    __EOWNERDEAD = EOWNERDEAD,
+    __ESTRPIPE = ESTRPIPE,
+    __EHWPOISON = EHWPOISON,
+    __EISNAM = EISNAM,
+    __EKEYEXPIRED = EKEYEXPIRED,
+    __EKEYREJECTED = EKEYREJECTED,
+    __EKEYREVOKED = EKEYREVOKED,
+} __attribute__((packed));
+
+static const enum __errno __errno_map[] = {
+    [LINUX_EPERM] = __EPERM,
+    [LINUX_ENOENT] = __ENOENT,
+    [LINUX_ESRCH] = __ESRCH,
+    [LINUX_EINTR] = __EINTR,
+    [LINUX_EIO] = __EIO,
+    [LINUX_ENXIO] = __ENXIO,
+    [LINUX_E2BIG] = __E2BIG,
+    [LINUX_ENOEXEC] = __ENOEXEC,
+    [LINUX_EBADF] = __EBADF,
+    [LINUX_ECHILD] = __ECHILD,
+    [LINUX_EAGAIN] = __EAGAIN,
+    [LINUX_ENOMEM] = __ENOMEM,
+    [LINUX_EACCES] = __EACCES,
+    [LINUX_EFAULT] = __EFAULT,
+    [LINUX_ENOTBLK] = __ENOTBLK,
+    [LINUX_EBUSY] = __EBUSY,
+    [LINUX_EEXIST] = __EEXIST,
+    [LINUX_EXDEV] = __EXDEV,
+    [LINUX_ENODEV] = __ENODEV,
+    [LINUX_ENOTDIR] = __ENOTDIR,
+    [LINUX_EISDIR] = __EISDIR,
+    [LINUX_EINVAL] = __EINVAL,
+    [LINUX_ENFILE] = __ENFILE,
+    [LINUX_EMFILE] = __EMFILE,
+    [LINUX_ENOTTY] = __ENOTTY,
+    [LINUX_ETXTBSY] = __ETXTBSY,
+    [LINUX_EFBIG] = __EFBIG,
+    [LINUX_ENOSPC] = __ENOSPC,
+    [LINUX_ESPIPE] = __ESPIPE,
+    [LINUX_EROFS] = __EROFS,
+    [LINUX_EMLINK] = __EMLINK,
+    [LINUX_EPIPE] = __EPIPE,
+    [LINUX_EDOM] = __EDOM,
+    [LINUX_ERANGE] = __ERANGE,
+    [LINUX_ENOMSG] = __ENOMSG,
+    [LINUX_EIDRM] = __EIDRM,
+    [LINUX_ECHRNG] = __ECHRNG,
+    [LINUX_EL2NSYNC] = __EL2NSYNC,
+    [LINUX_EL3HLT] = __EL3HLT,
+    [LINUX_EL3RST] = __EL3RST,
+    [LINUX_ELNRNG] = __ELNRNG,
+    [LINUX_EUNATCH] = __EUNATCH,
+    [LINUX_ENOCSI] = __ENOCSI,
+    [LINUX_EL2HLT] = __EL2HLT,
+    [LINUX_EDEADLK] = __EDEADLK,
+    [LINUX_ENOLCK] = __ENOLCK,
+    [LINUX_EBADE] = __EBADE,
+    [LINUX_EBADR] = __EBADR,
+    [LINUX_EXFULL] = __EXFULL,
+    [LINUX_ENOANO] = __ENOANO,
+    [LINUX_EBADRQC] = __EBADRQC,
+    [LINUX_EBADSLT] = __EBADSLT,
+    [LINUX_EBFONT] = __EBFONT,
+    [LINUX_ENOSTR] = __ENOSTR,
+    [LINUX_ENODATA] = __ENODATA,
+    [LINUX_ETIME] = __ETIME,
+    [LINUX_ENOSR] = __ENOSR,
+    [LINUX_ENONET] = __ENONET,
+    [LINUX_ENOPKG] = __ENOPKG,
+    [LINUX_EREMOTE] = __EREMOTE,
+    [LINUX_ENOLINK] = __ENOLINK,
+    [LINUX_EADV] = __EADV,
+    [LINUX_ESRMNT] = __ESRMNT,
+    [LINUX_ECOMM] = __ECOMM,
+    [LINUX_EPROTO] = __EPROTO,
+    [LINUX_EMULTIHOP] = __EMULTIHOP,
+    [LINUX_EDOTDOT] = __EDOTDOT,
+    [LINUX_EBADMSG] = __EBADMSG,
+    [LINUX_ENOTUNIQ] = __ENOTUNIQ,
+    [LINUX_EBADFD] = __EBADFD,
+    [LINUX_EREMCHG] = __EREMCHG,
+    [LINUX_ELIBACC] = __ELIBACC,
+    [LINUX_ELIBBAD] = __ELIBBAD,
+    [LINUX_ELIBSCN] = __ELIBSCN,
+    [LINUX_ELIBMAX] = __ELIBMAX,
+    [LINUX_ELIBEXEC] = __ELIBEXEC,
+    [LINUX_ENOSYS] = __ENOSYS,
+    [LINUX_ENOTEMPTY] = __ENOTEMPTY,
+    [LINUX_ENAMETOOLONG] = __ENAMETOOLONG,
+    [LINUX_ELOOP] = __ELOOP,
+    [LINUX_EOPNOTSUPP] = __EOPNOTSUPP,
+    [LINUX_EPFNOSUPPORT] = __EPFNOSUPPORT,
+    [LINUX_ECONNRESET] = __ECONNRESET,
+    [LINUX_ENOBUFS] = __ENOBUFS,
+    [LINUX_EAFNOSUPPORT] = __EAFNOSUPPORT,
+    [LINUX_EPROTOTYPE] = __EPROTOTYPE,
+    [LINUX_ENOTSOCK] = __ENOTSOCK,
+    [LINUX_ENOPROTOOPT] = __ENOPROTOOPT,
+    [LINUX_ESHUTDOWN] = __ESHUTDOWN,
+    [LINUX_ECONNREFUSED] = __ECONNREFUSED,
+    [LINUX_EADDRINUSE] = __EADDRINUSE,
+    [LINUX_ECONNABORTED] = __ECONNABORTED,
+    [LINUX_ENETUNREACH] = __ENETUNREACH,
+    [LINUX_ENETDOWN] = __ENETDOWN,
+    [LINUX_ETIMEDOUT] = __ETIMEDOUT,
+    [LINUX_EHOSTDOWN] = __EHOSTDOWN,
+    [LINUX_EHOSTUNREACH] = __EHOSTUNREACH,
+    [LINUX_EINPROGRESS] = __EINPROGRESS,
+    [LINUX_EALREADY] = __EALREADY,
+    [LINUX_EDESTADDRREQ] = __EDESTADDRREQ,
+    [LINUX_EMSGSIZE] = __EMSGSIZE,
+    [LINUX_EPROTONOSUPPORT] = __EPROTONOSUPPORT,
+    [LINUX_ESOCKTNOSUPPORT] = __ESOCKTNOSUPPORT,
+    [LINUX_EADDRNOTAVAIL] = __EADDRNOTAVAIL,
+    [LINUX_ENETRESET] = __ENETRESET,
+    [LINUX_EISCONN] = __EISCONN,
+    [LINUX_ENOTCONN] = __ENOTCONN,
+    [LINUX_ETOOMANYREFS] = __ETOOMANYREFS,
+    [LINUX_EUSERS] = __EUSERS,
+    [LINUX_EDQUOT] = __EDQUOT,
+    [LINUX_ESTALE] = __ESTALE,
+    [LINUX_ENOMEDIUM] = __ENOMEDIUM,
+    [LINUX_EILSEQ] = __EILSEQ,
+    [LINUX_EOVERFLOW] = __EOVERFLOW,
+    [LINUX_ECANCELED] = __ECANCELED,
+    [LINUX_ENOTRECOVERABLE] = __ENOTRECOVERABLE,
+    [LINUX_EOWNERDEAD] = __EOWNERDEAD,
+    [LINUX_ESTRPIPE] = __ESTRPIPE,
+    [LINUX_EHWPOISON] = __EHWPOISON,
+    [LINUX_EISNAM] = __EISNAM,
+    [LINUX_EKEYEXPIRED] = __EKEYEXPIRED,
+    [LINUX_EKEYREJECTED] = __EKEYREJECTED,
+    [LINUX_EKEYREVOKED] = __EKEYREVOKED,
+};
+static inline int
+__map_errno(unsigned int linux_errno)
+{
+    if (linux_errno < sizeof(__errno_map) / sizeof(__errno_map[0]))
+        return __errno_map[linux_errno];
+    return EINVAL;
+}
+#endif /* _LINUX_ERRNO_H_ */

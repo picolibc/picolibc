@@ -33,11 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef __x86_64
         .section .text.syscall
         .globl syscall
         .type  syscall, @function
 syscall:
+#ifdef __x86_64
 	movq %rdi, %rax
 	movq %rsi, %rdi
 	movq %rdx, %rsi
@@ -52,6 +52,36 @@ syscall:
 0:      
         movq %rax, %rdi
         jmp  _syscall_error
-        .size syscall, . - syscall
-#endif
+#else
+        pushl %ebp
+        pushl %edi
+        pushl %esi
+        pushl %edx
+        pushl %ecx
+        pushl %ebx
 
+        movl 52(%esp), %ebp
+        movl 48(%esp), %edi
+        movl 44(%esp), %esi
+        movl 40(%esp), %edx
+        movl 36(%esp), %ecx
+        movl 32(%esp), %ebx
+        movl 28(%esp), %eax
+
+        int $0x80
+        
+        popl %ebx
+        popl %ecx
+        popl %edx
+        popl %esi
+        popl %edi
+        popl %ebp
+
+        cmpl $-4095, %eax
+        jae 0f
+        ret
+0:
+        movl %eax,4(%esp)
+        jmp _syscall_error
+#endif
+        .size syscall, . - syscall
