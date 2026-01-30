@@ -37,7 +37,6 @@ DIR="$(dirname "$0")"
 meson setup \
         --buildtype minsize \
 	-Ddebug=true \
-	--fatal-meson-warnings \
 	--cross-file "$DIR"/cross-arm-linux-gnueabihf.txt \
 	-Dsemihost=false \
 	-Dos-linux=true \

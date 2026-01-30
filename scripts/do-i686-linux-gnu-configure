@@ -39,7 +39,6 @@ DIR="$(dirname "$0")"
 meson setup \
         --buildtype minsize \
 	-Ddebug=true \
-	--fatal-meson-warnings \
 	--cross-file "$DIR"/cross-i686-linux-gnu.txt \
 	-Dsemihost=false \
 	-Dos-linux=true \
