@@ -1081,6 +1081,10 @@ foreach params : [default_target] + targets
       picolibc_noflash_ld_variable = 'picolibc_noflash_ld'
       picolibc_noflash_ld_config_variable = 'picolibc_noflash_ld_config'
 
+      picolibc_linux_ld_file = 'picolibc_linux.ld'
+      picolibc_linux_ld_variable = 'picolibc_linux_ld'
+      picolibc_linux_ld_config_variable = 'picolibc_linux_ld_config'
+
       picolibcpp_ld_file = 'picolibcpp.ld'
       picolibcpp_ld_variable = 'picolibcpp_ld'
       picolibcpp_ld_config_variable = 'picolibcpp_ld_config'
@@ -1088,6 +1092,10 @@ foreach params : [default_target] + targets
       picolibcpp_noflash_ld_file = 'picolibcpp_noflash.ld'
       picolibcpp_noflash_ld_variable = 'picolibcpp_noflash_ld'
       picolibcpp_noflash_ld_config_variable = 'picolibcpp_noflash_ld_config'
+
+      picolibcpp_linux_ld_file = 'picolibcpp_linux.ld'
+      picolibcpp_linux_ld_variable = 'picolibcpp_linux_ld'
+      picolibcpp_linux_ld_config_variable = 'picolibcpp_linux_ld_config'
 
       picolibc_ld_install = true
 
@@ -1105,6 +1113,10 @@ foreach params : [default_target] + targets
       picolibc_noflash_ld_variable = 'picolibc' + target + '_noflash_ld'
       picolibc_noflash_ld_config_variable = 'picolibc_' + custom_mem_config + '_noflash_ld_config'
 
+      picolibc_linux_ld_file = 'picolibc_' + custom_mem_config + '_linux.ld'
+      picolibc_linux_ld_variable = 'picolibc' + target + '_linux_ld'
+      picolibc_linux_ld_config_variable = 'picolibc_' + custom_mem_config + '_linux_ld_config'
+
       picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
       picolibcpp_ld_variable = 'picolibcpp' + target + '_ld'
       picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_ld_config'
@@ -1112,6 +1124,10 @@ foreach params : [default_target] + targets
       picolibcpp_noflash_ld_file = 'picolibcpp_' + custom_mem_config + '_noflash.ld'
       picolibcpp_noflash_ld_variable = 'picolibcpp_' + target.underscorify() + '_noflash_ld'
       picolibcpp_noflash_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_noflash_ld_config'
+
+      picolibcpp_linux_ld_file = 'picolibcpp_' + custom_mem_config + '_linux.ld'
+      picolibcpp_linux_ld_variable = 'picolibcpp_' + target.underscorify() + '_linux_ld'
+      picolibcpp_linux_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_linux_ld_config'
 
       if thread_local_storage
         picolibc_inittls_ld_file = 'picolibc_inittls_' + custom_mem_config + '.ld'
@@ -1344,6 +1360,30 @@ foreach params : [default_target] + targets
       'default_noflash_alignment_' + custom_mem_config,
       meson.get_external_property('default_noflash_alignment', _default_alignment))
 
+    _default_linux_flash_addr = meson.get_external_property(
+      'default_linux_flash_addr_' + custom_mem_config,
+      meson.get_external_property('default_linux_flash_addr', _default_flash_addr))
+
+    _default_linux_flash_size = meson.get_external_property(
+      'default_linux_flash_size_' + custom_mem_config,
+      meson.get_external_property('default_linux_flash_size', _default_flash_size))
+
+    _default_linux_ram_addr = meson.get_external_property(
+      'default_linux_ram_addr_' + custom_mem_config,
+      meson.get_external_property('default_linux_ram_addr', _default_ram_addr))
+
+    _default_linux_ram_size = meson.get_external_property(
+      'default_linux_ram_size_' + custom_mem_config,
+      meson.get_external_property('default_linux_ram_size', _default_ram_size))
+
+    _default_linux_stack_size = meson.get_external_property(
+      'default_linux_stack_size_' + custom_mem_config,
+      meson.get_external_property('default_linux_stack_size', _default_stack_size))
+
+    _default_linux_alignment = meson.get_external_property(
+      'default_linux_alignment_' + custom_mem_config,
+      meson.get_external_property('default_linux_alignment', _default_alignment))
+
     picolibc_ld_data.set('DEFAULT_FLASH_ADDR', _default_flash_addr)
     picolibc_ld_data.set('DEFAULT_FLASH_SIZE', _default_flash_size)
     picolibc_ld_data.set('DEFAULT_RAM_ADDR', _default_ram_addr)
@@ -1467,6 +1507,59 @@ foreach params : [default_target] + targets
     endif
 
     set_variable(picolibcpp_noflash_ld_variable, get_variable(picolibcpp_noflash_ld_config_variable))
+
+    # Generate and install linux C and C++ linker scripts
+
+    picolibc_linux_ld_data = configuration_data()
+    # start with the regular C bits
+    picolibc_linux_ld_data.merge_from(picolibc_ld_data)
+    # linux also needs inittls
+    picolibc_linux_ld_data.set('INITTLS', '')
+    picolibc_linux_ld_data.set('DATATLS', ld_comment)
+
+    # attributes for read-only data sections
+    picolibc_linux_ld_data.set('RODATA_MEM', 'ram')
+    picolibc_linux_ld_data.set('RODATA_AT', 'ram')
+    picolibc_linux_ld_data.set('RODATA_PHDR', 'ram')
+
+    picolibc_linux_ld_data.set('DATA_AT', 'ram')
+    picolibc_linux_ld_data.set('DATA_INIT_PHDR', 'ram')
+
+    # set up default memory layout
+    picolibc_linux_ld_data.set('DEFAULT_FLASH_ADDR', _default_linux_flash_addr)
+    picolibc_linux_ld_data.set('DEFAULT_FLASH_SIZE', _default_linux_flash_size)
+    picolibc_linux_ld_data.set('DEFAULT_RAM_ADDR', _default_linux_ram_addr)
+    picolibc_linux_ld_data.set('DEFAULT_RAM_SIZE', _default_linux_ram_size)
+    picolibc_linux_ld_data.set('DEFAULT_STACK_SIZE', _default_linux_stack_size)
+    picolibc_linux_ld_data.set('DEFAULT_ALIGNMENT', _default_linux_alignment)
+
+    if not is_variable(picolibc_linux_ld_config_variable)
+      set_variable(picolibc_linux_ld_config_variable,
+                   configure_file(input: 'picolibc.ld.in',
+                                  output: picolibc_linux_ld_file,
+                                  configuration: picolibc_linux_ld_data,
+                                  install: picolibc_ld_install and really_install,
+                                  install_dir: lib_dir))
+    endif
+
+    set_variable(picolibc_linux_ld_variable, get_variable(picolibc_linux_ld_config_variable))
+
+    # linux C++ version is just the linux version with CPP and C swapped
+    picolibcpp_linux_ld_data = configuration_data()
+    picolibcpp_linux_ld_data.merge_from(picolibc_linux_ld_data)
+    picolibcpp_linux_ld_data.set('CPP', '')
+    picolibcpp_linux_ld_data.set('C', ld_comment)
+
+    if not is_variable(picolibcpp_linux_ld_config_variable)
+      set_variable(picolibcpp_linux_ld_config_variable,
+                   configure_file(input: 'picolibc.ld.in',
+                                  output: picolibcpp_linux_ld_file,
+                                  configuration: picolibcpp_linux_ld_data,
+                                  install: picolibc_ld_install and really_install,
+                                  install_dir: lib_dir))
+    endif
+
+    set_variable(picolibcpp_linux_ld_variable, get_variable(picolibcpp_linux_ld_config_variable))
 
   endif
 endforeach
@@ -1805,7 +1898,7 @@ elif has_os_linux
     oslib_test_variant = 'linux'
   endif
   if linkerscript_test_variant == ''
-    linkerscript_test_variant = 'noflash'
+    linkerscript_test_variant = 'linux'
   endif
 else
   if crt0_test_variant == ''
@@ -1845,9 +1938,11 @@ if oslib_test != ''
     if target == 'default-target'
       test_link_args_variable = 'test_link_args'
       test_link_args_noflash_variable = 'test_link_args_noflash'
+      test_link_args_linux_variable = 'test_link_args_linux'
       test_linker_files_variable = 'test_linker_files'
       test_link_depends_variable = 'test_link_depends'
       test_link_depends_noflash_variable = 'test_link_depends_noflash'
+      test_link_depends_linux_variable = 'test_link_depends_linux'
       picolibc_ld_value = get_variable(linkerscript_test + '_ld')
 
       if thread_local_storage
@@ -1860,9 +1955,11 @@ if oslib_test != ''
     else
       test_link_args_variable = 'test_link_args' + target
       test_link_args_noflash_variable = 'test_link_args_noflash' + target
+      test_link_args_linux_variable = 'test_link_args_linux' + target
       test_linker_files_variable = 'test_linker_files_' + target
       test_link_depends_variable = 'test_link_depends' + target
       test_link_depends_noflash_variable = 'test_link_depends_noflash' + target
+      test_link_depends_linux_variable = 'test_link_depends_linux' + target
       picolibc_ld_value = get_variable(linkerscript_test + target + '_ld',
                                        get_variable(linkerscript_test + '_ld'))
 
@@ -1925,7 +2022,7 @@ if oslib_test != ''
                  ['-nostdlib', '-T', picolibc_noflash_ld_string])
     set_variable(test_link_depends_noflash_variable, [picolibc_noflash_ld_value])
   endforeach
-  test_noflash = linkerscript_test_variant != 'noflash'
+  test_noflash = linkerscript_test_variant == ''
 else
   test_link_args = test_link_args_base
   test_link_depends = []
