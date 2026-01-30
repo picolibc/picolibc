@@ -244,11 +244,15 @@ main(void)
     //        printf("big %p\n", big);
     if (big) {
         memset(big, '1', 1024);
-        void *small = malloc(128);
+        char *small = malloc(128);
         //                printf("small %p\n", small);
         if (small) {
             memset(small, '2', 128);
-            (void)atoi(small);
+            small[127] = '\0';
+            if (atoi(small) == 0) {
+                printf("atoi of '2' string returned 0\n");
+                ++result;
+            }
             free(big);
             char *med = realloc(small, 1024);
             if (med) {
