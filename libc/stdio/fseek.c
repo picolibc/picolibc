@@ -49,7 +49,7 @@ FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
     if ((stream->flags & __SEXT) && xf->seek) {
         if ((xf->seek)(stream, (__off_t)offset, whence) >= 0) {
             stream->flags &= ~__SEOF;
-            (void)__atomic_exchange_ungetc(&stream->unget, 0);
+            __atomic_store_ungetc(&stream->unget, 0);
             __funlock_return(stream, 0);
         }
         __funlock_return(stream, -1);
