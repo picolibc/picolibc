@@ -131,7 +131,6 @@ enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
 picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
-enable_semihost = get_option('semihost')
 enable_tests = get_option('tests')
 if get_option('tests-cdefs') == 'auto'
   enable_cdefs_tests = enable_tests
@@ -1744,10 +1743,7 @@ has_os_linux = false
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
 
-# make sure to include semihost BEFORE picocrt!
-if enable_semihost
-  subdir('semihost')
-endif
+# make sure to include os BEFORE picocrt!
 
 subdir('libos')
 

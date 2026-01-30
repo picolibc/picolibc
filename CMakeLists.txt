@@ -365,7 +365,7 @@ if(TESTS)
   # This could use some generalization, but it's good enough to do
   # semihosting-based tests
 
-  add_subdirectory(semihost)
+  add_subdirectory(libos)
   add_subdirectory(picocrt)
 
   set(PICOCRT_OBJ $<TARGET_OBJECTS:picocrt>)

@@ -35,7 +35,7 @@
 
 machine_dir = 'machine' / host_cpu_family
 
-if get_option('os-linux') and fs.is_dir(machine_dir)
+if fs.is_dir(machine_dir)
 
   has_os_linux = true
 
