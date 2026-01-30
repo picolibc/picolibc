@@ -41,8 +41,14 @@ main(void)
     char generate[2][L_tmpnam];
 
     // Generate two temporary files
-    tmpnam(generate[0]);
-    tmpnam(generate[1]);
+    if (tmpnam(generate[0]) == NULL) {
+        printf("tmpnam(generate[0]) failed\n");
+        return -1;
+    }
+    if (tmpnam(generate[1]) == NULL) {
+        printf("tmpnam(generate[1]) failed\n");
+        return -1;
+    }
 
     // Check if the two file names are the same
     if (strcmp(tmpnam(generate[0]), generate[1]) == 0) {
