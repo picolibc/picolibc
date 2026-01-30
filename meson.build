@@ -54,6 +54,7 @@ really_install = get_option('force-install') or not meson.is_subproject()
 fs = import('fs')
 
 cc = meson.get_compiler('c')
+compiler_id = cc.get_id()
 
 # Find the compiler installation directory by parsing the output of
 # cc -print-search-dirs
@@ -353,7 +354,6 @@ common_options = [
   '-Werror=double-promotion',
   '-Wno-missing-braces',
   '-Wno-return-type',
-  '-Wno-unused-command-line-argument',
   '-Wmissing-prototypes',
   '-Wmissing-declarations',
   '-Werror=implicit-fallthrough=5',
@@ -366,10 +366,16 @@ common_options = [
   '-frounding-math',
   '-fsignaling-nans',
   '-fstrict-flex-arrays=3',
-  '-Wno-unsupported-floating-point-opt',
   '-fno-builtin-copysignl',
   '-fno-stack-protector',
 ]
+
+if compiler_id == 'clang'
+  common_options += [
+  '-Wno-unused-command-line-argument',
+  '-Wno-unsupported-floating-point-opt',
+  ]
+endif
 
 cpp_options = [
   '-fno-exceptions',
@@ -640,7 +646,6 @@ endif
 # Let targets add more support libraries
 additional_libs_list = meson.get_external_property('additional_libs', [])
 
-compiler_id = cc.get_id()
 if compiler_id == 'ccomp'
   # When passing the specs file to CompCert, the libcompcert needs to be included there as well
   additional_libs_list += '-lcompcert'
@@ -1881,7 +1886,6 @@ if oslib_test != ''
       endif
     endif
 
-    message('target ' + target + ' picolibc_ld_string ' + picolibc_ld_string)
     set_variable(test_link_args_variable,
                  additional_libs_list +
 		 test_link_args_base +
