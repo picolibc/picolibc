@@ -34,10 +34,15 @@
  */
 
 #include "local-linux.h"
+#include <linux/linux-errno.h>
 
 long
 _syscall_error(long ret)
 {
-    errno = __map_errno((int)-ret);
+    unsigned long linux_errno = (unsigned long)-ret;
+    if (linux_errno < sizeof(__errno_map) / sizeof(__errno_map[0]))
+        errno = (int)__errno_map[linux_errno];
+    else
+        errno = EINVAL;
     return -1;
 }
