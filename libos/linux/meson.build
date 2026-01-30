@@ -88,7 +88,7 @@ if fs.is_dir(machine_dir)
 			    src_os_linux,
 			    install : really_install,
 			    install_dir : instdir,
-			    include_directories : [linux_inc, _inc],
+			    include_directories : [linux_inc, inc],
 			    c_args : target_c_args + c_args)
     endif
 
