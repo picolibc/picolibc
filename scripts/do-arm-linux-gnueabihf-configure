@@ -33,16 +33,11 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-DIR="$(dirname "$0")"
-meson setup \
-        --buildtype minsize \
-	-Ddebug=true \
-	--cross-file "$DIR"/cross-arm-linux-gnueabihf.txt \
+# Native linux binaries
+#
+exec "$(dirname "$0")"/do-configure arm-linux-gnueabihf \
 	-Dsemihost=false \
 	-Dos-linux=true \
 	-Dnative-tests=true \
-        -Dmultilib=false \
 	-Dtests=true \
-	-Dwerror=true \
-	"$@" \
-	"$DIR"/..
+	"$@"

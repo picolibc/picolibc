@@ -36,17 +36,10 @@
 #
 # Native linux binaries
 #
-DIR="$(dirname "$0")"
-meson setup \
-        --buildtype minsize \
-	-Ddebug=true \
-	--cross-file "$DIR"/cross-x86_64-linux-gnu.txt \
+exec "$(dirname "$0")"/do-configure x86_64-linux-gnu \
 	-Dsemihost=false \
 	-Dos-linux=true \
 	-Dnative-tests=true \
-	-Dmultilib=true \
 	-Dmultilib-exclude=x32 \
 	-Dtests=true \
-	-Dwerror=true \
-	"$@" \
-	"$DIR"/..
+	"$@"
