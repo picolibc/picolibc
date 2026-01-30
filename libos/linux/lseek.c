@@ -34,9 +34,22 @@
  */
 
 #include "local-linux.h"
+#include <stdint.h>
 
 off_t
 lseek(int fd, off_t offset, int whence)
 {
+#if __SIZEOF_LONG__ < 8
+    int64_t       result;
+    unsigned long offset_high = ((uint64_t)offset) >> 32;
+    unsigned long offset_low = (unsigned long)offset;
+    int           ret;
+
+    ret = syscall(LINUX_SYS__llseek, fd, offset_high, offset_low, &result, whence);
+    if (ret < 0)
+        result = ret;
+    return (off_t)result;
+#else
     return syscall(LINUX_SYS_lseek, fd, offset, whence);
+#endif
 }
