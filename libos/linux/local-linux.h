@@ -45,7 +45,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 
-#include <linux/linux-errno.h>
 #include <linux/linux-fcntl.h>
 #include <linux/linux-syscall.h>
 

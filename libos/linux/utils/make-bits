@@ -87,6 +87,7 @@ wrap() {
     fi
     rm "${EXEC}"
     echo "#endif /* ${DEF} */") > $OUT
+    clang-format -i $OUT
 }
 
 headers=(errno fcntl syscall)
