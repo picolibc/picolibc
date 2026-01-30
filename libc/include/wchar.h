@@ -33,7 +33,7 @@ SUCH DAMAGE.
 #define __need_NULL
 #include <stddef.h>
 
-/* For _mbstate_t definition. */
+/* For __mbstate_t definition. */
 #include <sys/_types.h>
 #define __need___va_list
 #include <stdarg.h>
@@ -93,7 +93,7 @@ typedef __wctype_t wctype_t;
 struct tm;
 
 #ifndef _MBSTATE_DECLARED
-typedef _mbstate_t mbstate_t;
+typedef __mbstate_t mbstate_t;
 #define _MBSTATE_DECLARED
 #endif
 

@@ -36,10 +36,10 @@
 #define _GNU_SOURCE
 #include "xtensa-semihost.h"
 
-_off64_t
-lseek64(int fd, _off64_t offset, int whence)
+off64_t
+lseek64(int fd, off64_t offset, int whence)
 {
-    return (_off64_t)lseek(fd, (off_t)offset, whence);
+    return (off64_t)lseek(fd, (off_t)offset, whence);
 }
 
 int

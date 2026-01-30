@@ -32,6 +32,6 @@
 #include <machine/_default_types.h>
 
 #define __machine_ssize_t_defined
-typedef long signed int _ssize_t;
+typedef long signed int __ssize_t;
 
 #endif /* _MACHINE__TYPES_H */

@@ -130,12 +130,12 @@ typedef __blksize_t blksize_t;
 #endif
 
 #ifndef _CLOCK_T_DECLARED
-typedef _CLOCK_T_ clock_t;
+typedef __clock_t clock_t;
 #define _CLOCK_T_DECLARED
 #endif
 
 #ifndef _TIME_T_DECLARED
-typedef _TIME_T_ time_t;
+typedef __time_t time_t;
 #define _TIME_T_DECLARED
 #endif
 
@@ -169,7 +169,7 @@ typedef unsigned long vm_size_t;
 #endif /* __i386__ && (GO32 || __MSDOS__) */
 
 #ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
+typedef __ssize_t ssize_t;
 #define _SSIZE_T_DECLARED
 #endif
 

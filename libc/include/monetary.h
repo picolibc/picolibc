@@ -43,7 +43,7 @@
 #include <sys/_types.h>
 
 #ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
+typedef __ssize_t ssize_t;
 #define _SSIZE_T_DECLARED
 #endif
 

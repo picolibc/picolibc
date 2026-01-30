@@ -47,8 +47,8 @@ int
 mblen(const char *s, size_t n)
 {
 #ifdef __MB_CAPABLE
-    int               retval = 0;
-    static _mbstate_t _mblen_state;
+    int              retval = 0;
+    static mbstate_t _mblen_state;
 
     retval = __MBTOWC(NULL, s, n, &_mblen_state);
     if (retval < 0) {

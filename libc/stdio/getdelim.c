@@ -37,12 +37,12 @@
 
 #define INCR 16
 
-_ssize_t
+__ssize_t
 getdelim(char ** restrict lineptr, size_t * restrict nptr, int delim, FILE * restrict stream)
 {
-    char    *line = *lineptr;
-    size_t   n = *nptr;
-    _ssize_t count = 0;
+    char   *line = *lineptr;
+    size_t  n = *nptr;
+    ssize_t count = 0;
 
     __flockfile(stream);
     for (;;) {
@@ -50,7 +50,7 @@ getdelim(char ** restrict lineptr, size_t * restrict nptr, int delim, FILE * res
         if (c == EOF)
             break;
 
-        if (count >= (_ssize_t)n) {
+        if (count >= (ssize_t)n) {
             size_t newsize = n + INCR;
             char  *newline = realloc(line, newsize);
             if (newline == NULL) {

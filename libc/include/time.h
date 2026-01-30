@@ -62,7 +62,7 @@ _BEGIN_STD_C
 #endif
 
 #ifndef _CLOCK_T_DECLARED
-typedef _CLOCK_T_ clock_t;
+typedef __clock_t clock_t;
 #define _CLOCK_T_DECLARED
 #endif
 

@@ -49,7 +49,7 @@ typedef __intptr_t intptr_t;
 #endif
 
 #ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
+typedef __ssize_t ssize_t;
 #define _SSIZE_T_DECLARED
 #endif
 
@@ -305,18 +305,18 @@ pid_t vfork(void);
 #ifdef _LIBC
 /* Provide prototypes for most of the _<systemcall> names that are
    provided in newlib for some compilers.  */
-int    close(int __fildes);
-pid_t  fork(void);
-pid_t  getpid(void);
-int    isatty(int __fildes);
-int    link(const char *__path1, const char *__path2);
-_off_t lseek(int __fildes, _off_t __offset, int __whence);
-void  *sbrk(ptrdiff_t __incr);
-int    unlink(const char *__path);
+int     close(int __fildes);
+pid_t   fork(void);
+pid_t   getpid(void);
+int     isatty(int __fildes);
+int     link(const char *__path1, const char *__path2);
+__off_t lseek(int __fildes, __off_t __offset, int __whence);
+void   *sbrk(ptrdiff_t __incr);
+int     unlink(const char *__path);
 #endif
 
 #if __LARGEFILE64_VISIBLE
-_off64_t lseek64(int __filedes, _off64_t __offset, int __whence);
+__off64_t lseek64(int __filedes, __off64_t __offset, int __whence);
 #endif
 
 #if !defined(__INSIDE_CYGWIN__)

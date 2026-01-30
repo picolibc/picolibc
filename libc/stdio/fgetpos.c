@@ -63,7 +63,7 @@ No supporting OS subroutines are required.
 #include <stdio_private.h>
 
 int
-fgetpos(FILE * __restrict fp, _fpos_t * __restrict pos)
+fgetpos(FILE * __restrict fp, fpos_t * __restrict pos)
 {
     *pos = ftell(fp);
 

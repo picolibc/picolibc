@@ -44,7 +44,7 @@
 off_t
 lseek(int fd, off_t offset, int whence)
 {
-    return (off_t)lseek64(fd, (_off64_t)offset, whence);
+    return (off_t)lseek64(fd, (off64_t)offset, whence);
 }
 
 int

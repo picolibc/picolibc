@@ -367,7 +367,10 @@ int  feof_unlocked(FILE *__stream) __nonnull((1));
  *
  * size_t comes from stddef.h (included from cdefs.h)
  */
-typedef _fpos_t fpos_t;
+#ifndef _FPOS_T_DECLARED
+typedef __fpos_t fpos_t;
+#define _FPOS_T_DECLARED
+#endif
 
 #if __POSIX_VISIBLE
 /*
@@ -385,7 +388,7 @@ typedef __off64_t off64_t; /* 64-bit file offset */
 #endif
 
 #ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
+typedef __ssize_t ssize_t;
 #define _SSIZE_T_DECLARED
 #endif
 
@@ -404,37 +407,36 @@ int vdprintf(int fd, const char * __restrict fmt, va_list ap);
 
 #endif
 
-int      fgetpos(FILE      *__restrict stream, fpos_t      *__restrict pos) __nonnull((1));
-FILE    *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
-FILE    *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3));
-FILE    *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
-FILE    *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
-int      fseek(FILE *stream, long offset, int whence) __nonnull((1));
-int      fseeko(FILE *stream, __off_t offset, int whence) __nonnull((1));
-int      fsetpos(FILE *stream, const fpos_t *pos) __nonnull((1));
-long     ftell(FILE *stream) __nonnull((1));
-__off_t  ftello(FILE *stream) __nonnull((1));
-int      fileno(FILE *stream) __nonnull((1));
-void     perror(const char *s);
-int      remove(const char *pathname);
-int      rename(const char *oldpath, const char *newpath);
-void     rewind(FILE *stream) __nonnull((1));
-void     setbuf(FILE *stream, char *buf) __nonnull((1));
-void     setbuffer(FILE *stream, char *buf, size_t size) __nonnull((1));
-void     setlinebuf(FILE *stream) __nonnull((1));
-int      setvbuf(FILE *stream, char *buf, int mode, size_t size) __nonnull((1));
-FILE    *tmpfile(void);
-char    *tmpnam(char *s);
-_ssize_t getline(char ** __restrict lineptr, size_t * __restrict n, FILE * __restrict stream)
+int     fgetpos(FILE     *__restrict stream, fpos_t     *__restrict pos) __nonnull((1));
+FILE   *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
+FILE   *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3));
+FILE   *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
+FILE   *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
+int     fseek(FILE *stream, long offset, int whence) __nonnull((1));
+int     fseeko(FILE *stream, off_t offset, int whence) __nonnull((1));
+int     fsetpos(FILE *stream, const fpos_t *pos) __nonnull((1));
+long    ftell(FILE *stream) __nonnull((1));
+off_t   ftello(FILE *stream) __nonnull((1));
+int     fileno(FILE *stream) __nonnull((1));
+void    perror(const char *s);
+int     remove(const char *pathname);
+int     rename(const char *oldpath, const char *newpath);
+void    rewind(FILE *stream) __nonnull((1));
+void    setbuf(FILE *stream, char *buf) __nonnull((1));
+void    setbuffer(FILE *stream, char *buf, size_t size) __nonnull((1));
+void    setlinebuf(FILE *stream) __nonnull((1));
+int     setvbuf(FILE *stream, char *buf, int mode, size_t size) __nonnull((1));
+FILE   *tmpfile(void);
+char   *tmpnam(char *s);
+ssize_t getline(char ** __restrict lineptr, size_t * __restrict n, FILE * __restrict stream)
     __nonnull((3));
-_ssize_t getdelim(char ** __restrict lineptr, size_t * __restrict n, int delim,
-                  FILE * __restrict stream) __nonnull((4));
+ssize_t getdelim(char ** __restrict lineptr, size_t * __restrict n, int delim,
+                 FILE * __restrict stream) __nonnull((4));
 
 #if __BSD_VISIBLE
-FILE *funopen(const void *cookie, _ssize_t (*readfn)(void *cookie, void *buf, size_t n),
-              _ssize_t (*writefn)(void *cookie, const void *buf, size_t n),
-              __off_t  (*seekfn)(void *cookie, __off_t off, int whence),
-              int      (*closefn)(void *cookie));
+FILE *funopen(const void *cookie, ssize_t (*readfn)(void *cookie, void *buf, size_t n),
+              ssize_t (*writefn)(void *cookie, const void *buf, size_t n),
+              off_t (*seekfn)(void *cookie, off_t off, int whence), int (*closefn)(void *cookie));
 #define fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
 #define fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /*__BSD_VISIBLE */
