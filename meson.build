@@ -683,16 +683,18 @@ if printf_aliases
 		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__m_vfscanf}').format(global_prefix)
 endif
 
+crt0_default = meson.get_external_property('crt0_default', 'crt0')
+
 if system_libc
   specs_isystem = ''
   specs_libpath = ''
   # The '%s' here asks gcc to search for this file in the 'usual' library path
-  specs_startfile = '%{-crt0=*:crt0-%*%O%s; :crt0%O%s}'
+  specs_startfile = '%{-crt0=*:crt0-%*%O%s; :@0@%O%s}'.format(crt0_default)
 else
 
 # Note that this value does *not* include the trailing %s which
 # means we have to compute the full path to the file
-crt0_expr = '%{-crt0=*:crt0-%*%O; :crt0%O}'
+crt0_expr = '%{-crt0=*:crt0-%*%O; :@0@%O}'.format(crt0_default)
 
 #
 # Construct path values for specs file
@@ -823,6 +825,12 @@ endif
 specs_startfile = specs_option_format.format(crt0_prefix, crt0_buildtype, crt0_gen)
 endif
 
+oslib_spec='%{-oslib=*:-l%*}'
+oslib_default = meson.get_external_property('oslib_default', '')
+if oslib_default != ''
+  oslib_spec+='%{!-oslib:-l@0@}'.format(oslib_default)
+endif
+
 specs_data = configuration_data()
 specs_data.set('SPECS_ISYSTEM', specs_isystem)
 specs_data.set('SPECS_LIBPATH', specs_libpath)
@@ -830,6 +838,7 @@ specs_data.set('SPECS_STARTFILE', specs_startfile)
 specs_data.set('TLSMODEL', tls_model_spec)
 specs_data.set('STACKGUARD', stack_guard_spec)
 specs_data.set('LINK_SPEC', meson.get_external_property('link_spec', ''))
+specs_data.set('OSLIB_SPEC', oslib_spec)
 specs_data.set('CC1_SPEC', meson.get_external_property('cc1_spec', ''))
 specs_data.set('CC1PLUS_SPEC', meson.get_external_property('cc1plus_spec', ''))
 specs_data.set('ADDITIONAL_LIBS', additional_libs)
@@ -843,13 +852,15 @@ specs_data.set('PREFIX', global_prefix)
 
 specs_c_data = specs_data
 
-specs_c_data.set('PICOLIBC_LD', 'picolibc.ld')
+picolibc_ld = meson.get_external_property('linkerscript_default_c', 'picolibc.ld')
+specs_c_data.set('PICOLIBC_LD', picolibc_ld)
 specs_c_data.set('CRTBEGIN', '')
 specs_c_data.set('CRTEND', '')
 
 specs_cpp_data = specs_data
 
-specs_cpp_data.set('PICOLIBC_LD', 'picolibcpp.ld')
+picolibcpp_ld = meson.get_external_property('linkerscript_default_cpp', 'picolibcpp.ld')
+specs_cpp_data.set('PICOLIBC_LD', picolibcpp_ld)
 specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
 specs_cpp_data.set('CRTEND', 'crtend%O%s')
 
