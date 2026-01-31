@@ -34,26 +34,22 @@
  */
 
 #include "local-linux.h"
-#include "local-time.h"
+#include <limits.h>
+#include <unistd.h>
+#include <stdio.h>
 
 int
-nanosleep(const struct timespec *request, struct timespec *remain)
+ttyname_r(int fd, char *buf, size_t bufsize)
 {
-    struct __kernel_timespec k_request, k_remain, *k_remainp;
-    int                      ret;
+    char    fdpath[sizeof("/proc/self/fd/") + 12];
+    int     iret;
+    ssize_t ssret;
 
-    k_request.tv_sec = request->tv_sec;
-    k_request.tv_nsec = request->tv_nsec;
-    if (remain)
-        k_remainp = &k_remain;
-    else
-        k_remainp = NULL;
-    ret = syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
-    if (ret < 0) {
-        if (remain && errno != EINVAL) {
-            remain->tv_sec = k_remain.tv_sec;
-            remain->tv_nsec = k_remain.tv_nsec;
-        }
-    }
-    return ret;
+    iret = snprintf(fdpath, sizeof(fdpath), "/proc/self/fd/%d", fd);
+    if (iret < 0)
+        return iret;
+    ssret = readlink(fdpath, buf, bufsize);
+    if (ssret < 0)
+        return -1;
+    return 0;
 }

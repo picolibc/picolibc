@@ -150,5 +150,7 @@
 #define LINUX_TCSETSW2  0x402c542c
 #define LINUX_TCSETSF2  0x402c542d
 
+#define LINUX_TCFLSH    0x0000540b
+
 #include <linux/linux-termios-struct.h>
 #endif /* _LINUX_TERMIOS_H_ */

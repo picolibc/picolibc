@@ -37,10 +37,10 @@
 #define _LOCAL_TIME_H_
 #include <time.h>
 
-#define timespec  linux_timespec
-#define timezone  linux_timezone
-#define timeval   linux_timeval
-#define itimerval linux_itimerval
+#define timespec   linux_timespec
+#define timezone   linux_timezone
+#define timeval    linux_timeval
+#define itimerval  linux_itimerval
 #define itimerspec linux_itimerspec
 #include <linux/time.h>
 #undef timespec

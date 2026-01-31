@@ -110,7 +110,8 @@ linux_to_picolibc(short e)
     return r;
 }
 
-int poll(struct pollfd *fds, nfds_t nfds, int timeout)
+int
+poll(struct pollfd *fds, nfds_t nfds, int timeout)
 {
     nfds_t n;
     int    ret;
@@ -126,7 +127,7 @@ int poll(struct pollfd *fds, nfds_t nfds, int timeout)
         fds[n].events = linux_to_picolibc(fds[n].events);
 
     if (ret > 0) {
-        for (n = 0; n < (nfds_t) ret; n++)
+        for (n = 0; n < (nfds_t)ret; n++)
             fds[n].revents = linux_to_picolibc(fds[n].revents);
     }
     return ret;

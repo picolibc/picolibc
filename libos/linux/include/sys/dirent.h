@@ -33,27 +33,34 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include "local-time.h"
+#ifndef _SYS_DIRENT_H_
+#define _SYS_DIRENT_H_
 
-int
-nanosleep(const struct timespec *request, struct timespec *remain)
-{
-    struct __kernel_timespec k_request, k_remain, *k_remainp;
-    int                      ret;
+#include <sys/_types.h>
 
-    k_request.tv_sec = request->tv_sec;
-    k_request.tv_nsec = request->tv_nsec;
-    if (remain)
-        k_remainp = &k_remain;
-    else
-        k_remainp = NULL;
-    ret = syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
-    if (ret < 0) {
-        if (remain && errno != EINVAL) {
-            remain->tv_sec = k_remain.tv_sec;
-            remain->tv_nsec = k_remain.tv_nsec;
-        }
-    }
-    return ret;
-}
+#ifndef _INO_T_DECLARED
+typedef __ino_t ino_t; /* inode number */
+#define _INO_T_DECLARED
+#endif
+
+struct dirent {
+    ino_t          d_ino;       /* Inode number */
+    __off_t        d_off;       /* Not an offset; see below */
+    unsigned short d_reclen;    /* Length of this record */
+    unsigned char  d_type;      /* Type of file; not supported
+                                   by all filesystem types */
+    char           d_name[256]; /* Null-terminated filename */
+};
+
+typedef struct {
+    int           fd;
+    size_t        offset;
+    size_t        count;
+    struct dirent dirent;
+    union {
+        char       buf[512];
+        __uint64_t align;
+    };
+} DIR;
+
+#endif
