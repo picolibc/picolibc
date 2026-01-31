@@ -33,31 +33,55 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#include "local-termios.h"
 
-#define _GNU_SOURCE
+#define MAP_BIT(s, d, sbit, dbit) do {          \
+        if ((s) & (sbit))                       \
+            (d) |= (dbit);                      \
+        else                                    \
+            (d) &= ~(dbit);                     \
+    } while(0)
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
 
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
+#define MAP_4(s, d, sbits, dbits, s0, s1, s2, s3, d0, d1, d2, d3) do {  \
+        (d) &= ~(dbits);                                                \
+        switch ((s) & (sbits)) {                                        \
+        case s0: (d) |= d0; break;                                      \
+        case s1: (d) |= d1; break;                                      \
+        case s2: (d) |= d2; break;                                      \
+        case s3: (d) |= d3; break;                                      \
+        }                                                               \
+    } while(0)
 
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
+#define MAP_CC(i) (ktermios.c_cc[LINUX_ ## i] = termios->c_cc[i])
 
-long syscall(long sys_call, ...);
+int
+tcsetattr(int fd, int actions, const struct termios *termios)
+{
+    struct __kernel_termios ktermios;
+    int ret;
+    long cmd;
 
-long _syscall_error(long ret);
+    switch (actions) {
+    case TCSANOW:
+        cmd = LINUX_TCSETS2;
+        break;
+    case TCSADRAIN:
+        cmd = LINUX_TCSETSW2;
+        break;
+    case TCSAFLUSH:
+        cmd = LINUX_TCSETSF2;
+        break;
+    default:
+        errno = EINVAL;
+        return -1;
+    }
 
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
+    ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios);
+    if (ret < 0)
+        return ret;
 
-#endif /* _LOCAL_LINUX_H_ */
+    MAP_STRUCT;
+
+    return syscall(LINUX_SYS_ioctl, fd, cmd, &ktermios);
+}

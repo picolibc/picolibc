@@ -32,32 +32,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
-
-#define _GNU_SOURCE
-
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
-
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-
-long _syscall_error(long ret);
-
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */
+#ifndef _LINUX_TIME_H_
+#define _LINUX_TIME_H_
+#define LINUX_CLOCK_MONOTONIC          0x00000001
+#define LINUX_CLOCK_PROCESS_CPUTIME_ID 0x00000002
+#define LINUX_CLOCK_REALTIME           0x00000000
+#define LINUX_CLOCK_THREAD_CPUTIME_ID  0x00000003
+#define LINUX_TIMER_ABSTIME            0x00000001
+#endif /* _LINUX_TIME_H_ */

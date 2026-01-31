@@ -40,6 +40,7 @@ if fs.is_dir(machine_dir)
   has_os_linux = true
 
   srcs_os_linux = [
+    'clock_gettime.c',
     'close.c',
     '_exit.c',
     'fstat.c',
@@ -49,21 +50,27 @@ if fs.is_dir(machine_dir)
     'iob_stdin.c',
     'iob_stdout.c',
     'lseek.c',
+    'nanosleep.c',
     'open.c',
+    'poll.c',
     'read.c',
     'stat.c',
     '_statbuf.c',
     '_syscall_error.c',
+    'tcgetattr.c',
+    'tcsetattr.c',
     'times.c',
     'unlink.c',
     'write.c',
   ]
 
+  subdir('include')
+
   subdir(machine_dir)
 
   src_os_linux = files(srcs_os_linux) + src_os_linux_machine
 
-  linux_inc = include_directories(machine_dir)
+  linux_inc = include_directories(machine_dir, 'include')
 
   foreach params : targets
     target = params['name']

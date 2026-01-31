@@ -34,24 +34,15 @@
  */
 
 #include "local-linux.h"
+#include "local-time.h"
 #include <string.h>
-
-#define timespec  linux_timespec
-#define timezone  linux_timezone
-#define timeval   linux_timeval
-#define itimerval linux_itimerval
-#include <linux/time.h>
-#undef timespec
-#undef timezone
-#undef timeval
-#undef itimerval
 
 int
 gettimeofday(struct timeval *tv, void *tz)
 {
     struct __kernel_timespec ts;
 
-    if (syscall(LINUX_SYS_clock_gettime, CLOCK_REALTIME, &ts) < 0)
+    if (syscall(LINUX_SYS_clock_gettime, LINUX_CLOCK_REALTIME, &ts) < 0)
         return -1;
     tv->tv_sec = (time_t)ts.tv_sec;
     tv->tv_usec = ts.tv_nsec / 1000;

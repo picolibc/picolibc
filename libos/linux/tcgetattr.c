@@ -33,31 +33,41 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#include "local-termios.h"
+#include <string.h>
 
-#define _GNU_SOURCE
+#define MAP_BIT(s, d, sbit, dbit) do {          \
+        if ((d) & (dbit))                       \
+            (s) |= (sbit);                      \
+        else                                    \
+            (s) &= ~(sbit);                     \
+    } while(0)
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
 
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
+#define MAP_4(s, d, sbits, dbits, s0, s1, s2, s3, d0, d1, d2, d3) do {  \
+        (s) &= ~(sbits);                                                \
+        switch ((d) & (dbits)) {                                        \
+        case d0: (s) |= s0; break;                                      \
+        case d1: (s) |= s1; break;                                      \
+        case d2: (s) |= s2; break;                                      \
+        case d3: (s) |= s3; break;                                      \
+        }                                                               \
+    } while(0)
 
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
+#define MAP_CC(i) (termios->c_cc[i] = ktermios.c_cc[LINUX_ ## i])
 
-long syscall(long sys_call, ...);
+int
+tcgetattr(int fd, struct termios *termios)
+{
+    struct __kernel_termios ktermios;
+    int ret;
 
-long _syscall_error(long ret);
+    memset(&ktermios, 0, sizeof (ktermios));
+    ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios);
+    if (ret < 0)
+        return ret;
 
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
+    MAP_STRUCT;
 
-#endif /* _LOCAL_LINUX_H_ */
+    return 0;
+}

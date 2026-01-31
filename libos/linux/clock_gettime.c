@@ -33,31 +33,32 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#include "local-linux.h"
+#include "local-time.h"
 
-#define _GNU_SOURCE
+int
+clock_gettime(clockid_t id, struct timespec *ts)
+{
+    struct __kernel_timespec kts;
+    int kid;
+    int ret;
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
-
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-
-long _syscall_error(long ret);
-
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */
+    if (id == CLOCK_MONOTONIC)
+        kid = LINUX_CLOCK_MONOTONIC;
+    else if (id == CLOCK_PROCESS_CPUTIME_ID)
+        kid = LINUX_CLOCK_PROCESS_CPUTIME_ID;
+    else if (id == CLOCK_REALTIME)
+        kid = LINUX_CLOCK_REALTIME;
+    else if (id == CLOCK_THREAD_CPUTIME_ID)
+        kid = LINUX_CLOCK_THREAD_CPUTIME_ID;
+    else {
+        errno = EINVAL;
+        return -1;
+    }
+    ret = syscall(LINUX_SYS_clock_gettime, kid, &kts);
+    if (ret < 0)
+        return ret;
+    ts->tv_sec = kts.tv_sec;
+    ts->tv_nsec = kts.tv_nsec;
+    return 0;
+}

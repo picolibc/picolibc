@@ -33,31 +33,38 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#ifndef _POLL_H_
+#define _POLL_H_
 
-#define _GNU_SOURCE
+struct pollfd {
+    int   fd;
+    short events;
+    short revents;
+};
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
+typedef __size_t nfds_t;
 
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
+#define POLLIN     0x0001
+#define POLLPRI    0x0002
+#define POLLOUT    0x0004
 
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
+#define POLLERR    0x0008
+#define POLLHUP    0x0010
+#define POLLNVAL   0x0020
 
-long syscall(long sys_call, ...);
+#if _XOPEN_SOURCE
+#define POLLRDNORM 0x0040
+#define POLLRDBAND 0x0080
+#define POLLWRNORM 0x0100
+#define POLLWRBAND 0x0200
+#endif
 
-long _syscall_error(long ret);
+#if __GNU_VISIBLE
+#define POLLMSG    0x0400
+#define POLLREMOVE 0x1000
+#define POLLRDHUP  0x2000
+#endif
 
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
+int poll(struct pollfd[], nfds_t, int);
 
-#endif /* _LOCAL_LINUX_H_ */
+#endif /* _POLL_H_ */

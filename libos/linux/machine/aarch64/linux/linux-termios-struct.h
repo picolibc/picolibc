@@ -33,31 +33,24 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#ifndef _LINUX_TERMIOS_STRUCT_H_
+#define _LINUX_TERMIOS_STRUCT_H_
 
-#define _GNU_SOURCE
+#define LINUX_NCCS      19
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
+typedef unsigned char   __kernel_cc_t;
+typedef unsigned int    __kernel_speed_t;
+typedef unsigned int    __kernel_tcflag_t;
 
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
+struct __kernel_termios {
+    __kernel_tcflag_t c_iflag;		/* input mode flags */
+    __kernel_tcflag_t c_oflag;		/* output mode flags */
+    __kernel_tcflag_t c_cflag;		/* control mode flags */
+    __kernel_tcflag_t c_lflag;		/* local mode flags */
+    __kernel_cc_t c_line;			/* line discipline */
+    __kernel_cc_t c_cc[LINUX_NCCS];		/* control characters */
+    __kernel_speed_t c_ispeed;
+    __kernel_speed_t c_ospeed;
+};
 
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-
-long _syscall_error(long ret);
-
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */
+#endif /* _LINUX_TERMIOS_STRUCT_H_ */
