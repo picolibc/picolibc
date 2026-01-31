@@ -36,33 +36,44 @@
 #include "local-termios.h"
 #include <string.h>
 
-#define MAP_BIT(s, d, sbit, dbit) do {          \
-        if ((d) & (dbit))                       \
-            (s) |= (sbit);                      \
-        else                                    \
-            (s) &= ~(sbit);                     \
-    } while(0)
+#define MAP_BIT(s, d, sbit, dbit) \
+    do {                          \
+        if ((d) & (dbit))         \
+            (s) |= (sbit);        \
+        else                      \
+            (s) &= ~(sbit);       \
+    } while (0)
 
+#define MAP_4(s, d, sbits, dbits, s0, s1, s2, s3, d0, d1, d2, d3) \
+    do {                                                          \
+        (s) &= ~(sbits);                                          \
+        switch ((d) & (dbits)) {                                  \
+        case d0:                                                  \
+            (s) |= s0;                                            \
+            break;                                                \
+        case d1:                                                  \
+            (s) |= s1;                                            \
+            break;                                                \
+        case d2:                                                  \
+            (s) |= s2;                                            \
+            break;                                                \
+        case d3:                                                  \
+            (s) |= s3;                                            \
+            break;                                                \
+        }                                                         \
+    } while (0)
 
-#define MAP_4(s, d, sbits, dbits, s0, s1, s2, s3, d0, d1, d2, d3) do {  \
-        (s) &= ~(sbits);                                                \
-        switch ((d) & (dbits)) {                                        \
-        case d0: (s) |= s0; break;                                      \
-        case d1: (s) |= s1; break;                                      \
-        case d2: (s) |= s2; break;                                      \
-        case d3: (s) |= s3; break;                                      \
-        }                                                               \
-    } while(0)
+#define MAP_CC(i)    (termios->c_cc[i] = ktermios.c_cc[LINUX_##i])
 
-#define MAP_CC(i) (termios->c_cc[i] = ktermios.c_cc[LINUX_ ## i])
+#define MAP_SPEED(i) (termios->i = _speed_from_kernel(ktermios.i))
 
 int
 tcgetattr(int fd, struct termios *termios)
 {
     struct __kernel_termios ktermios;
-    int ret;
+    int                     ret;
 
-    memset(&ktermios, 0, sizeof (ktermios));
+    memset(&ktermios, 0, sizeof(ktermios));
     ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios);
     if (ret < 0)
         return ret;

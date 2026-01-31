@@ -37,7 +37,8 @@
 #include <poll.h>
 #include <stdio.h>
 
-int main(void)
+int
+main(void)
 {
 #ifdef POLLIN
     printf("#define LINUX_POLLIN %d\n", POLLIN);

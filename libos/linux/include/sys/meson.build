@@ -34,6 +34,7 @@
 #
 
 inc_linux_sys_headers = [
+  'dirent.h',
   'termios.h',
   ]
 

@@ -156,6 +156,8 @@ main(void)
     printf("#define LINUX_TCSETSW2 0x%08x\n", TCSETSW2);
     printf("#define LINUX_TCSETSF2 0x%08x\n", TCSETSF2);
     printf("\n");
+    printf("#define LINUX_TCFLSH 0x%08x\n", TCFLSH);
+    printf("\n");
     printf("#include <linux/linux-termios-struct.h>\n");
     return 0;
 }

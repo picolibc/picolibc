@@ -40,8 +40,8 @@ int
 clock_gettime(clockid_t id, struct timespec *ts)
 {
     struct __kernel_timespec kts;
-    int kid;
-    int ret;
+    int                      kid;
+    int                      ret;
 
     if (id == CLOCK_MONOTONIC)
         kid = LINUX_CLOCK_MONOTONIC;

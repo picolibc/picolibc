@@ -34,26 +34,43 @@
  */
 
 #include "local-linux.h"
-#include "local-time.h"
+#include <dirent.h>
+#include <stddef.h>
+#include <string.h>
+#include <stdint.h>
 
-int
-nanosleep(const struct timespec *request, struct timespec *remain)
+struct linux_dirent64 {
+    uint64_t       d_ino;    /* 64-bit inode number */
+    int64_t        d_off;    /* Not an offset; see getdents() */
+    unsigned short d_reclen; /* Size of this dirent */
+    unsigned char  d_type;   /* File type */
+    char           d_name[]; /* Filename (null-terminated) */
+};
+
+struct dirent *
+readdir(DIR *dir)
 {
-    struct __kernel_timespec k_request, k_remain, *k_remainp;
-    int                      ret;
+    struct linux_dirent64 *k_dirent;
+    struct dirent         *dirent;
 
-    k_request.tv_sec = request->tv_sec;
-    k_request.tv_nsec = request->tv_nsec;
-    if (remain)
-        k_remainp = &k_remain;
-    else
-        k_remainp = NULL;
-    ret = syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
-    if (ret < 0) {
-        if (remain && errno != EINVAL) {
-            remain->tv_sec = k_remain.tv_sec;
-            remain->tv_nsec = k_remain.tv_nsec;
-        }
+    if (dir->offset == dir->count) {
+        ssize_t ret = syscall(LINUX_SYS_getdents64, dir->fd, dir->buf, sizeof(dir->buf));
+        if (ret <= 0)
+            return NULL;
+        dir->offset = 0;
+        dir->count = (size_t)ret;
     }
-    return ret;
+    k_dirent = (struct linux_dirent64 *)(dir->buf + dir->offset);
+    dir->offset += k_dirent->d_reclen;
+
+    dirent = &dir->dirent;
+    dirent->d_ino = (ino_t)k_dirent->d_ino;
+    dirent->d_off = (__off_t)k_dirent->d_off;
+
+    size_t name_len = strlen(k_dirent->d_name);
+    if (name_len >= sizeof(dirent->d_name))
+        name_len = sizeof(dirent->d_name) - 1;
+    memcpy(dirent->d_name, k_dirent->d_name, name_len);
+    dirent->d_name[name_len] = '\0';
+    return dirent;
 }

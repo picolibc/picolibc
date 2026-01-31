@@ -33,27 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include "local-time.h"
+#include <termios.h>
 
-int
-nanosleep(const struct timespec *request, struct timespec *remain)
+speed_t
+cfgetispeed(const struct termios *termios)
 {
-    struct __kernel_timespec k_request, k_remain, *k_remainp;
-    int                      ret;
-
-    k_request.tv_sec = request->tv_sec;
-    k_request.tv_nsec = request->tv_nsec;
-    if (remain)
-        k_remainp = &k_remain;
-    else
-        k_remainp = NULL;
-    ret = syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
-    if (ret < 0) {
-        if (remain && errno != EINVAL) {
-            remain->tv_sec = k_remain.tv_sec;
-            remain->tv_nsec = k_remain.tv_nsec;
-        }
-    }
-    return ret;
+    return termios->c_ispeed;
 }
