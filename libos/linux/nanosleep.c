@@ -33,31 +33,27 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#include "local-linux.h"
+#include "local-time.h"
 
-#define _GNU_SOURCE
+int nanosleep(const struct timespec *request, struct timespec *remain)
+{
+    struct __kernel_timespec k_request, k_remain, *k_remainp;
+    int                      ret;
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
+    k_request.tv_sec = request->tv_sec;
+    k_request.tv_nsec = request->tv_nsec;
+    if (remain)
+        k_remainp = &k_remain;
+    else
+        k_remainp = NULL;
+    ret = syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
+    if (ret < 0) {
+        if (remain && errno != EINVAL) {
+            remain->tv_sec = k_remain.tv_sec;
+            remain->tv_nsec = k_remain.tv_nsec;
+        }
+    }
+    return ret;
+}
 
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
-
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-
-long _syscall_error(long ret);
-
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */

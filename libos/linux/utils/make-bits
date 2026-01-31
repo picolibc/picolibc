@@ -80,17 +80,20 @@ wrap() {
     DEF="_LINUX_${UP}_H_"
     echo "#ifndef ${DEF}"
     echo "#define ${DEF}"
-    if [ $HEADER = errno ]; then
-	"${RUN}" ./${EXEC} || exit 1
-    else
-	"${RUN}" ./${EXEC} | sort -nk3 || exit 1
-    fi
+    case "$HEADER" in
+	errno|termios)
+	    "${RUN}" ./${EXEC} || exit 1
+	    ;;
+	*)
+	    "${RUN}" ./${EXEC} | sort -nk3 || exit 1
+	    ;;
+    esac
     rm "${EXEC}"
     echo "#endif /* ${DEF} */") > $OUT
     clang-format -i $OUT
 }
 
-headers=(errno fcntl syscall)
+headers=(errno fcntl poll syscall termios time)
 
 for a in "${arch[@]}"; do
     for h in "${headers[@]}"; do

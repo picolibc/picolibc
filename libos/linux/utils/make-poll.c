@@ -33,31 +33,50 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
-
 #define _GNU_SOURCE
+#include <poll.h>
+#include <stdio.h>
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
-
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-
-long _syscall_error(long ret);
-
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */
+int main(void)
+{
+#ifdef POLLIN
+    printf("#define LINUX_POLLIN %d\n", POLLIN);
+#endif
+#ifdef POLLPRI
+    printf("#define LINUX_POLLPRI %d\n", POLLPRI);
+#endif
+#ifdef POLLOUT
+    printf("#define LINUX_POLLOUT %d\n", POLLOUT);
+#endif
+#ifdef POLLERR
+    printf("#define LINUX_POLLERR %d\n", POLLERR);
+#endif
+#ifdef POLLHUP
+    printf("#define LINUX_POLLHUP %d\n", POLLHUP);
+#endif
+#ifdef POLLNVAL
+    printf("#define LINUX_POLLNVAL %d\n", POLLNVAL);
+#endif
+#ifdef POLLRDNORM
+    printf("#define LINUX_POLLRDNORM %d\n", POLLRDNORM);
+#endif
+#ifdef POLLRDBAND
+    printf("#define LINUX_POLLRDBAND %d\n", POLLRDBAND);
+#endif
+#ifdef POLLWRNORM
+    printf("#define LINUX_POLLWRNORM %d\n", POLLWRNORM);
+#endif
+#ifdef POLLWRBAND
+    printf("#define LINUX_POLLWRBAND %d\n", POLLWRBAND);
+#endif
+#ifdef POLLMSG
+    printf("#define LINUX_POLLMSG %d\n", POLLMSG);
+#endif
+#ifdef POLLREMOVE
+    printf("#define LINUX_POLLREMOVE %d\n", POLLREMOVE);
+#endif
+#ifdef POLLRDHUP
+    printf("#define LINUX_POLLRDHUP %d\n", POLLRDHUP);
+#endif
+    return 0;
+}
