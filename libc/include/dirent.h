@@ -77,7 +77,7 @@ int scandirat(int, const char *, struct dirent ***, int (*)(const struct dirent 
 int versionsort(const struct dirent **, const struct dirent **);
 #endif
 #if __POSIX_VISIBLE >= 202405
-ssize_t posix_getdents(int, void *, size_t, int);
+__ssize_t posix_getdents(int, void *, __size_t, int);
 #endif /* __POSIX_VISIBLE >= 202405 */
 _END_STD_C
 
