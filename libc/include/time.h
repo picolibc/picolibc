@@ -151,7 +151,7 @@ typedef __pid_t pid_t; /* process id */
 
 #endif
 
-#if defined(_POSIX_MONOTONIC_CLOCK)
+#if defined(_POSIX_MONOTONIC_CLOCK) || __GNU_VISIBLE
 
 /*  The identifier for the system-wide monotonic clock, which is defined
  *  as a clock whose value cannot be set via clock_settime() and which
