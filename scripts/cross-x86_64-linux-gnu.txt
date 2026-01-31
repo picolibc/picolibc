@@ -17,6 +17,10 @@ endian='little'
 [properties]
 skip_sanity_check = true
 link_spec = '--build-id=none'
+crt0_default = 'crt0-linux'
+oslib_default = 'linux'
+linkerscript_default_c = 'picolibc_linux.ld'
+linkerscript_default_cpp = 'picolibcpp_linux.ld'
 target_c_args = ['-static', '-fno-pic', '-fno-PIE', '-nostdlib', '-nostartfiles', '-Wl,--build-id=none']
 default_flash_addr = '0x00100000'
 default_flash_size = '0x00400000'
