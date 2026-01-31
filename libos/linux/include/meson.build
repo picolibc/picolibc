@@ -37,6 +37,8 @@ inc_linux_headers = [
   'poll.h',
   ]
 
+inc_headers_os += inc_linux_headers
+
 if really_install
   install_headers(inc_linux_headers,
                   install_dir: include_dir)

@@ -33,6 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+inc_headers_os = []
+inc_sys_headers_os = []
+
 if get_option('semihost')
   subdir('semihost')
 endif

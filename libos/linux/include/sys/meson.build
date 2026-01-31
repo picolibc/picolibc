@@ -37,6 +37,8 @@ inc_linux_sys_headers = [
   'termios.h',
   ]
 
+inc_sys_headers_os += inc_linux_sys_headers
+
 if really_install
   install_headers(inc_linux_sys_headers,
                   install_dir: include_dir / 'sys')
