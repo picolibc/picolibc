@@ -43,6 +43,7 @@ srcs_posix = [
   'regerror.c',
   'regexec.c',
   'regfree.c',
+  'sleep.c',
   'strfmon.c',
   'strfmon_l.c',
   'vstrfmon.c',
