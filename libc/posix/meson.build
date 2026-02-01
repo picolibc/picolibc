@@ -38,6 +38,7 @@ srcs_posix = [
   'dirname.c',
   'fnmatch.c',
   'fpathconf.c',
+  'getlogin.c',
   'pathconf.c',
   'regcomp.c',
   'regerror.c',

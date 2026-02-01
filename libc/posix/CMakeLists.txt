@@ -38,6 +38,7 @@ picolibc_sources(
   dirname.c
   fnmatch.c
   fpathconf.c
+  getlogin.c
   pathconf.c
   regcomp.c
   regerror.c
