@@ -45,6 +45,8 @@ foreach file : srcs_signal
     message('libc/signal/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/signal/' + s_file + ': machine overrides generic')
+  elif file in srcs_os
+    message('libc/signal/' + file + ': os overrides generic')
   else
     srcs_signal_use += file
   endif
