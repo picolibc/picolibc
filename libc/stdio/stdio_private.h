@@ -125,7 +125,13 @@ bool              __matchcaseprefix(const char *input, const char *pattern);
         .alloc = false,                                                            \
     }
 
-#define _FDEV_BUFIO_FD(bf)     ((int)((intptr_t)(bf)->ptr))
+#define _FDEV_BUFIO_FD(bf) ((int)((intptr_t)(bf)->ptr))
+
+struct __file_pipe {
+    struct __file_bufio bfile;
+    pid_t               child;
+    int                *wstatus;
+};
 
 #define IO_VARIANT_IS_FLOAT(v) ((v) == __IO_VARIANT_FLOAT || (v) == __IO_VARIANT_DOUBLE)
 
@@ -261,8 +267,10 @@ __flockfile_close(FILE *f)
 {
     (void)f;
 #ifdef __STDIO_LOCKING
-    if (f->lock && f->lock != __LOCK_NONE)
+    if (f->lock && f->lock != __LOCK_NONE) {
+        fflush(f);
         __lock_close(f->lock);
+    }
 #endif
 }
 

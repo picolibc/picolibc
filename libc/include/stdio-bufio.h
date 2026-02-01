@@ -44,6 +44,7 @@
 #define __BLBF  0x0002 /* bufio is line buffered */
 #define __BFALL 0x0004 /* FILE is allocated by stdio */
 #define __BFPTR 0x0008 /* funcs need pointers instead of ints */
+#define __BPIPE 0x0010 /* FILE is opened with popen */
 
 union __file_bufio_cookie {
     int   fd;

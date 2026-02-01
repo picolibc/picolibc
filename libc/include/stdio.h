@@ -434,6 +434,8 @@ ssize_t getline(char ** __restrict lineptr, size_t * __restrict n, FILE * __rest
     __nonnull((3));
 ssize_t getdelim(char ** __restrict lineptr, size_t * __restrict n, int delim,
                  FILE * __restrict stream) __nonnull((4));
+FILE   *popen(const char *command, const char *type);
+int     pclose(FILE *stream);
 #endif
 
 #if __BSD_VISIBLE
