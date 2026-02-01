@@ -35,6 +35,7 @@
 
 inc_headers_os = []
 inc_sys_headers_os = []
+srcs_os = []
 
 if get_option('semihost')
   subdir('semihost')
