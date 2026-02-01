@@ -315,7 +315,7 @@ int    ferror(FILE *__stream) __nonnull((1));
 int    feof(FILE *__stream) __nonnull((1));
 
 /* fast inlined versions */
-#define __clearerr_unlocked(s) ((s)->flags &= ~(__SERR | __SEOF))
+#define __clearerr_unlocked(s) ((s)->flags &= (__uint8_t) ~(__SERR | __SEOF))
 #define __ferror_unlocked(s)   ((s)->flags & __SERR)
 #define __feof_unlocked(s)     ((s)->flags & __SEOF)
 
