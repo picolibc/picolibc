@@ -40,7 +40,7 @@ srcs_misc = [
   'init.c',
   'inittls.c',
   'lock.c',
-  'picosbrk.c',
+  'sbrk.c',
   'unctrl.c',
 ]
 
