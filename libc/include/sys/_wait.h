@@ -33,6 +33,9 @@ SUCH DAMAGE.
 
 #define WNOHANG   1
 #define WUNTRACED 2
+#if (_XOPEN_SOURCE - 0) >= 500
+#define WCONTINUED 4
+#endif
 
 /* A status looks like:
       <1 byte info> <1 byte code>
