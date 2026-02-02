@@ -86,7 +86,7 @@ typedef __off64_t off64_t; /* 64-bit file offset */
 #endif
 
 #ifndef _TIME_T_DECLARED
-typedef _TIME_T_ time_t;
+typedef __time_t time_t;
 #define _TIME_T_DECLARED
 #endif
 
