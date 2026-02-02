@@ -46,7 +46,7 @@ opendir(const char *name)
     dir = calloc(1, sizeof(DIR));
     if (!dir)
         return NULL;
-    fd = syscall(LINUX_SYS_open, name, LINUX_O_DIRECTORY);
+    fd = syscall(LINUX_SYS_openat, LINUX_AT_FDCWD, name, LINUX_O_DIRECTORY);
     if (fd < 0) {
         free(dir);
         return NULL;

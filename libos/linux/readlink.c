@@ -39,5 +39,9 @@
 ssize_t
 readlink(const char *path, char *buf, size_t bufsize)
 {
+#ifdef LINUX_SYS_readlink
     return syscall(LINUX_SYS_readlink, path, buf, bufsize);
+#else
+    return syscall(LINUX_SYS_readlinkat, LINUX_AT_FDCWD, path, buf, bufsize);
+#endif
 }
