@@ -64,9 +64,6 @@ _start:
         leal    8(%esp,%edi,4), %eax            /* environ = sp + argc * 4 + 8 */
         movl    %eax, environ
 
-        /* Initialize the stack */
-	mov	$__stack - 128, %esp
-
 #ifndef NO_FLASH
 	/* Initialize data segment */
         pushl   $__data_size

@@ -34,9 +34,56 @@
  */
 
 #include <picolibc.h>
+
 #ifdef CRT0_LINUX
-char **environ;
+#include <sys/cdefs.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <picotls.h>
+char      **environ;
+extern char __tls_base[];
+void        _set_tls(void *tls);
+
+int         main(int argc, char **argv);
+
+__noreturn __disable_sanitizer void __used
+_start(void)
+{
+    void *sp;
+    __asm__("mov %0, sp" : "=r"(sp));
+    int    argc = (*(int *)sp);
+    char **argv = ((char **)sp) + 1;
+    environ = argv + argc + 1;
+
+#ifdef __THREAD_LOCAL_STORAGE
+#ifdef INIT_TLS
+    _init_tls(__tls_base);
 #endif
+    _set_tls(__tls_base);
+#endif
+#if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
+    __libc_init_array();
+#endif
+
+    int ret;
+
+    ret = main(argc, argv);
+    exit(ret);
+}
+
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
+
+long syscall(long sys_call, ...);
+
+void
+_set_tls(void *tls)
+{
+    tls = (uint8_t *)tls - TP_OFFSET;
+    syscall(0xf0005, tls);
+}
+
+#else
 
 #include "../../crt0.h"
 
@@ -106,42 +153,6 @@ _start(void)
 #ifdef CRT0_LINUX
 
 char **environ;
-
-static __noreturn __used __disable_sanitizer void
-_cstart(void *sp)
-{
-    int    argc = *((int *)sp);
-    char **argv = ((char **)sp) + 1;
-    environ = argv + argc + 1;
-    __start(argc, argv);
-}
-
-extern char __stack[];
-
-void __naked __used __disable_sanitizer
-_start(void)
-{
-    __asm__("mov r0, sp\n"
-            "ldr r1, 0f\n"
-            "mov sp, r1\n"
-            "b _cstart\n"
-            ".align 2\n"
-            "0: .word __stack-128");
-}
-
-void        _set_tls(void *tls);
-
-extern char __arm32_tls_tcb_offset;
-#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
-
-long        syscall(long sys_call, ...);
-
-void
-_set_tls(void *tls)
-{
-    tls = (uint8_t *)tls - TP_OFFSET;
-    syscall(0xf0005, tls);
-}
 
 #else
 
@@ -569,3 +580,5 @@ arm_data_abort_vector(void)
 #endif /* else __ARM_ARCH_PROFILE == 'M' */
 
 #endif /* CRT0_SEMIHOST */
+
+#endif /* CRT0_LINUX */
