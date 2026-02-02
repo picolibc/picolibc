@@ -405,12 +405,12 @@ SECTIONS
 		. += (DEFINED(@PREFIX@__heap_size_min) ? @PREFIX@__heap_size_min : 0);
 	} >ram :ram
 
-	PROVIDE ( @PREFIX@__stack_bottom = ORIGIN(ram) + LENGTH(ram) - (DEFINED(__stack_size) ? __stack_size : 0x00001000) );
-
-	/* Define a stack region to make sure it fits in memory */
-	.stack @PREFIX@__stack_bottom (NOLOAD) : {
-		. += (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@);
-	} >ram :ram
+@LINUX@	PROVIDE ( @PREFIX@__stack_bottom = ORIGIN(ram) + LENGTH(ram) - (DEFINED(__stack_size) ? __stack_size : 0x00001000) );
+@LINUX@
+@LINUX@	/* Define a stack region to make sure it fits in memory */
+@LINUX@	.stack @PREFIX@__stack_bottom (NOLOAD) : {
+@LINUX@		. += (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@);
+@LINUX@	} >ram :ram
 
 @C@	/* Throw away C++ exception handling information */
 @C@
