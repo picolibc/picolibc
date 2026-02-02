@@ -35,6 +35,8 @@
 
 #include "local-linux.h"
 #include <poll.h>
+#include <stdint.h>
+#include "local-time.h"
 
 static inline short
 picolibc_to_linux(short e)
@@ -120,7 +122,13 @@ poll(struct pollfd *fds, nfds_t nfds, int timeout)
     for (n = 0; n < nfds; n++)
         fds[n].events = picolibc_to_linux(fds[n].events);
 
+#ifdef LINUX_SYS_poll
     ret = syscall(LINUX_SYS_poll, fds, nfds, timeout);
+#else
+    struct linux_timespec tmo
+        = { .tv_sec = timeout / 1000, .tv_nsec = ((uint64_t)timeout % 1000) * 1000000UL };
+    ret = syscall(LINUX_SYS_ppoll, fds, nfds, &tmo, NULL);
+#endif
 
     /* revert the events changes */
     for (n = 0; n < nfds; n++)
