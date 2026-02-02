@@ -86,7 +86,7 @@ if tests_enable_stack_protector
   plain_tests += 'stack-smash'
 endif
 
-plain_tests_native = plain_tests_common
+plain_tests_native = plain_tests_common + ['test-hello']
 
 no_flash_tests = []
 if test_noflash
@@ -665,6 +665,7 @@ endif
 subdir('libc-testsuite')
 subdir('test-ctype')
 subdir('test-iconv')
+subdir('test-linux')
 subdir('test-math')
 subdir('test-string')
 subdir('test-monetary')
