@@ -34,23 +34,46 @@
  */
 
 #include <stdlib.h>
-#include <semihost.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
+
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "SEMIISTTY.TXT"
+#endif
 
 int
 main(void)
 {
-    int err;
     int fd;
+    int code = 0;
+    int ret;
 
-    fd = sys_semihost_open("____no-such-file_____", 0);
-    if (fd != -1) {
-        printf("got valid fd opening non-existent file\n");
+    fd = open(TEST_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0) {
+        if (errno == ENOSYS) {
+            printf("open not implemented, skipping test\n");
+            exit(77);
+        }
+        printf("open %s failed: %d\n", TEST_FILE_NAME, errno);
         exit(1);
     }
-    err = sys_semihost_errno();
-    if (err == 0) {
-        printf("No error when opening non-existent file\n");
-        exit(2);
+    errno = 0;
+    ret = isatty(fd);
+    if (ret == 0 && errno == ENOSYS) {
+        printf("isatty not implemented, skipping test\n");
+        close(fd);
+        unlink(TEST_FILE_NAME);
+        exit(77);
     }
-    exit(0);
+    if (ret != 0) {
+        printf("isatty incorrect for test file %d\n", ret);
+        goto bail1;
+    }
+bail1:
+    if (fd >= 0)
+        (void)close(fd);
+    (void)unlink(TEST_FILE_NAME);
+    exit(code);
 }

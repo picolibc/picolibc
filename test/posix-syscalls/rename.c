@@ -34,10 +34,69 @@
  */
 
 #include <stdlib.h>
-#include <semihost.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
+
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "SEMIREN.TXT"
+#endif
+
+#define TEST_FILE_NAME_1 "A" TEST_FILE_NAME
+#define TEST_FILE_NAME_2 "B" TEST_FILE_NAME
 
 int
 main(void)
 {
-    sys_semihost_exit(ADP_Stopped_RunTimeErrorUnknown, 1);
+    int fd;
+    int code = 0;
+    int ret;
+
+    fd = open(TEST_FILE_NAME_1, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0) {
+      if (errno == ENOSYS) {
+        printf("open not implemented, skipping test\n");
+        exit(77);
+      }
+        printf("open %s failed: %d\n", TEST_FILE_NAME_1, errno);
+        exit(1);
+    }
+    ret = close(fd);
+    fd = -1;
+    if (ret != 0) {
+        printf("close failed %d %d\n", ret, errno);
+        code = 2;
+        goto bail1;
+    }
+    ret = rename(TEST_FILE_NAME_1, TEST_FILE_NAME_2);
+    if (ret != 0) {
+        if (errno == ENOSYS) {
+          printf("rename not implemented, skipping test\n");
+          unlink(TEST_FILE_NAME_1);
+          exit(77);
+        }
+        printf("rename %s -> %s failed %d %d\n", TEST_FILE_NAME_1, TEST_FILE_NAME_2, ret,
+               errno);
+        code = 3;
+        goto bail1;
+    }
+    fd = open(TEST_FILE_NAME_1, O_RDONLY);
+    if (fd >= 0) {
+        printf("open %s should have failed\n", TEST_FILE_NAME_1);
+        code = 3;
+        goto bail1;
+    }
+    fd = open(TEST_FILE_NAME_2, O_RDONLY);
+    if (fd < 0) {
+        printf("open %s failed: %d\n", TEST_FILE_NAME_2, errno);
+        code = 3;
+        goto bail1;
+    }
+bail1:
+    if (fd >= 0)
+        (void)close(fd);
+    (void)unlink(TEST_FILE_NAME_1);
+    (void)unlink(TEST_FILE_NAME_2);
+    exit(code);
 }

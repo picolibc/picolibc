@@ -34,29 +34,76 @@
  */
 
 #include <stdlib.h>
-#include <semihost.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
+#include <sys/stat.h>
 
 #ifndef TEST_FILE_NAME
-#define TEST_FILE_NAME "SEMICLOS.TXT"
+#define TEST_FILE_NAME "SEMIFLEN.TXT"
 #endif
+
+#define TEST_STRING     "hello, world"
+#define TEST_STRING_LEN 12
 
 int
 main(void)
 {
-    int fd;
-    int code = 0;
-    int ret;
+    int          fd;
+    ssize_t      written;
+    int          code = 0;
+    int          ret;
+    struct stat  st;
 
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
+    fd = open(TEST_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
+      if (errno == ENOSYS) {
+        printf("open not implemented, skipping test\n");
+        exit(77);
+      }
+        printf("open %s failed: %d\n", TEST_FILE_NAME, errno);
         exit(1);
     }
-    ret = sys_semihost_close(fd);
-    if (ret != 0) {
-        printf("close failed %d %d\n", ret, sys_semihost_errno());
+    written = write(fd, TEST_STRING, TEST_STRING_LEN);
+    if (written != TEST_STRING_LEN) {
+        printf("write failed %ld %d\n", (long)written, errno);
         code = 2;
+        goto bail1;
     }
-    (void)sys_semihost_remove(TEST_FILE_NAME);
+    ret = close(fd);
+    fd = -1;
+    if (ret != 0) {
+        printf("close failed %d %d\n", ret, errno);
+        code = 3;
+        goto bail1;
+    }
+    fd = open(TEST_FILE_NAME, O_RDONLY);
+    if (fd < 0) {
+        printf("open %s failed: %d\n", TEST_FILE_NAME, errno);
+        code = 4;
+        goto bail1;
+    }
+    ret = fstat(fd, &st);
+    if (ret != 0) {
+        if (errno == ENOSYS) {
+          printf("fstat not implemented, skipping test\n");
+          close(fd);
+          unlink(TEST_FILE_NAME);
+          exit(77);
+        }
+        printf("fstat failed %d %d\n", ret, errno);
+        code = 5;
+        goto bail1;
+    }
+    if (st.st_size != TEST_STRING_LEN) {
+        printf("fstat size failed %ld != %d\n", (long)st.st_size, TEST_STRING_LEN);
+        code = 6;
+        goto bail1;
+    }
+bail1:
+    if (fd >= 0)
+        (void)close(fd);
+    (void)unlink(TEST_FILE_NAME);
     exit(code);
 }

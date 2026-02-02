@@ -34,10 +34,16 @@
  */
 
 #include <stdlib.h>
-#include <semihost.h>
+#include <stdio.h>
 
 int
 main(void)
 {
-    exit(!!sys_semihost_system("false"));
+    char *s = COMMAND_LINE, c;
+
+    while ((c = *s++) != '\0')
+        putchar(c);
+    putchar('\n');
+
+    exit(0);
 }

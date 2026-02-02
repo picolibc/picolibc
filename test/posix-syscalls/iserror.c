@@ -32,19 +32,42 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include <stdlib.h>
-#include <semihost.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <errno.h>
+
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "SEMIERR.TXT"
+#endif
 
 int
 main(void)
 {
-    char *s = COMMAND_LINE, c;
+    int fd;
 
-    while ((c = *s++) != '\0')
-        sys_semihost_putc(c, stdout);
-    sys_semihost_putc('\n', stdout);
-
+    (void)unlink(TEST_FILE_NAME);
+    errno = 0;
+    fd = open(TEST_FILE_NAME, O_RDONLY);
+    if (fd >= 0) {
+        printf("open non-existant file for read did not return error\n");
+        exit(1);
+    }
+    if (errno == ENOSYS) {
+        printf("open not implemented, skipping test\n");
+        exit(77);
+    }
+    fd = open(TEST_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0) {
+        if (errno == ENOSYS) {
+            printf("open not implemented, skipping test\n");
+            exit(77);
+        }
+        printf("open new file for write returned error\n");
+        exit(2);
+    }
+    close(fd);
+    (void)unlink(TEST_FILE_NAME);
     exit(0);
 }

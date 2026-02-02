@@ -677,6 +677,7 @@ subdir('test-string')
 subdir('test-monetary')
 subdir('test-stdio')
 subdir('testsuite')
+subdir('posix-syscalls')
 
 if has_arm_semihost and oslib_test_variant == 'semihost'
   subdir('semihost')

@@ -33,46 +33,41 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <sys/time.h>
-#include <stdio.h>
+#include <sys/times.h>
+#include <unistd.h>
 
 int
 main(void)
 {
-    int            loop;
-    struct timeval prev, cur;
-    int            ret;
+    struct tms begin_tms, end_tms;
+    clock_t    begin, end;
+    double     y;
+    double     x;
+    double     seconds;
+    long       ticks_per_second;
 
-    ret = gettimeofday(&prev, NULL);
-    if (ret < 0) {
-        printf("gettimeofday return %d\n", ret);
-        exit(2);
+    errno = 0;
+    begin = end = times(&begin_tms);
+
+    if (begin == (clock_t)-1 && errno == ENOSYS) {
+      printf("times() not implemented, skipping test\n");
+      exit(77);
     }
-    if (prev.tv_sec < 1600000000LL) {
-        printf("gettimeofday return value before 2020-9-13 %lld\n", (long long)prev.tv_sec);
-        exit(2);
+    y = 0.0;
+    for (x = -100; x < 100; x += 0.001) {
+        y += sin(x) * sin(x) + cos(x) * cos(x);
+        end = times(&end_tms);
+        if (end != begin)
+            break;
     }
-    for (loop = 0; loop < 10000; loop++) {
-        ret = gettimeofday(&cur, NULL);
-        if (ret < 0) {
-            printf("gettimeofday return %d\n", ret);
-            exit(2);
-        }
-        if (cur.tv_sec > prev.tv_sec + 1000) {
-            printf("gettimeofday: seconds changed by %lld\n",
-                   (long long)(cur.tv_sec - prev.tv_sec));
-            exit(2);
-        }
-        if (cur.tv_sec > prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec > prev.tv_usec)) {
-            printf("gettimeofday: ok\n");
-            exit(0);
-        }
-        if (cur.tv_sec < prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec < prev.tv_usec)) {
-            printf("gettimeofday: clock went backwards\n");
-            exit(2);
-        }
-    }
-    printf("gettimeofday: clock never changed\n");
-    exit(1);
+    printf("%.17g\n", y);
+    ticks_per_second = sysconf(_SC_CLK_TCK);
+    seconds = ((double)(end - begin)) / (double)ticks_per_second;
+    printf("delta %ld seconds %.17g\n", (long)end - (long)begin, seconds);
+    exit(end == begin);
 }

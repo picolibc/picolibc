@@ -33,19 +33,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <semihost.h>
+#include <time.h>
 
 #define NOT_BEFORE 1603853032
 
 int
 main(void)
 {
-    uintptr_t now = sys_semihost_time();
+  time_t now;
+
+  errno = 0;
+  now = time(NULL);
+
+  if (now == (time_t)-1 && errno == ENOSYS) {
+    printf("time() not implemented, skipping test\n");
+    exit(77);
+  }
 
     if (now < NOT_BEFORE) {
         printf("time %ld is too old\n", (long)now);
-        if (sizeof(uintptr_t) > 4)
+        if (sizeof(time_t) > 4)
             exit(1);
         printf("could be 2038 wrap, ignoring (sigh)\n");
     }

@@ -33,11 +33,22 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <semihost.h>
 
 int
 main(void)
 {
-    exit(sys_semihost_system("true"));
+  int result;
+
+  errno = 0;
+  result = system("true");
+
+  if (result < 0 && errno == ENOSYS) {
+    printf("system() not implemented, skipping test\n");
+    exit(77);
+  }
+
+  exit(result);
 }

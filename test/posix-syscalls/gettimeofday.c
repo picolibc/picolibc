@@ -33,11 +33,52 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <semihost.h>
+#include <sys/time.h>
 
 int
 main(void)
 {
-    sys_semihost_exit(ADP_Stopped_ApplicationExit, 0);
+    int            loop;
+    struct timeval prev, cur;
+    int            ret;
+
+    errno = 0;
+    ret = gettimeofday(&prev, NULL);
+    if (ret < 0) {
+      if (errno == ENOSYS) {
+        printf("gettimeofday() not implemented, skipping test\n");
+        exit(77);
+      }
+        printf("gettimeofday return %d\n", ret);
+        exit(2);
+    }
+    if (prev.tv_sec < 1600000000LL) {
+        printf("gettimeofday return value before 2020-9-13 %lld\n", (long long)prev.tv_sec);
+        exit(2);
+    }
+    for (loop = 0; loop < 10000; loop++) {
+        ret = gettimeofday(&cur, NULL);
+        if (ret < 0) {
+            printf("gettimeofday return %d\n", ret);
+            exit(2);
+        }
+        if (cur.tv_sec > prev.tv_sec + 1000) {
+            printf("gettimeofday: seconds changed by %lld\n",
+                   (long long)(cur.tv_sec - prev.tv_sec));
+            exit(2);
+        }
+        if (cur.tv_sec > prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec > prev.tv_usec)) {
+            printf("gettimeofday: ok\n");
+            exit(0);
+        }
+        if (cur.tv_sec < prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec < prev.tv_usec)) {
+            printf("gettimeofday: clock went backwards\n");
+            exit(2);
+        }
+    }
+    printf("gettimeofday: clock never changed\n");
+    exit(1);
 }

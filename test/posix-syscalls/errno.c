@@ -34,57 +34,25 @@
  */
 
 #include <stdlib.h>
-#include <semihost.h>
-
-#ifndef TEST_FILE_NAME
-#define TEST_FILE_NAME "SEMIFLEN.TXT"
-#endif
-
-#define TEST_STRING     "hello, world"
-#define TEST_STRING_LEN 12
+#include <fcntl.h>
+#include <errno.h>
+#include <stdio.h>
 
 int
 main(void)
 {
-    int       fd;
-    uintptr_t not_written;
-    int       code = 0;
-    int       ret;
-    uintptr_t len;
+    int err;
+    int fd;
 
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
+    fd = open("____no-such-file_____", O_RDONLY);
+    if (fd != -1) {
+        printf("got valid fd opening non-existent file\n");
         exit(1);
     }
-    not_written = sys_semihost_write(fd, TEST_STRING, TEST_STRING_LEN);
-    if (not_written != 0) {
-        printf("write failed %ld %d\n", (long)not_written, sys_semihost_errno());
-        code = 2;
-        goto bail1;
+    err = errno;
+    if (err == 0) {
+        printf("No error when opening non-existent file\n");
+        exit(2);
     }
-    ret = sys_semihost_close(fd);
-    fd = -1;
-    if (ret != 0) {
-        printf("close failed %d %d\n", ret, sys_semihost_errno());
-        code = 3;
-        goto bail1;
-    }
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_R);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
-        code = 4;
-        goto bail1;
-    }
-    len = sys_semihost_flen(fd);
-    if (len != TEST_STRING_LEN) {
-        printf("flen failed %ld != %ld\n", (long)len, (long)TEST_STRING_LEN);
-        code = 5;
-        goto bail1;
-    }
-bail1:
-    if (fd >= 0)
-        (void)sys_semihost_close(fd);
-    (void)sys_semihost_remove(TEST_FILE_NAME);
-    exit(code);
+    exit(0);
 }
