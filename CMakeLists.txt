@@ -100,6 +100,10 @@ if(NOT DEFINED ENABLE_MALLOC)
   option(ENABLE_MALLOC "provide malloc family of functions based on sbrk" ON)
 endif()
 
+if(NOT DEFINED MALLOC_SMALL_BUCKET)
+  option(MALLOC_SMALL_BUCKET "use fixed bucket sizes for allocations no larger than this" 0)
+endif()
+
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed
@@ -191,8 +195,6 @@ if(NOT DEFINED __MB_EXTENDED_CHARSETS_JIS)
 endif()
 
 set(__NANO_FORMATTED_IO OFF)
-
-option(__NANO_MALLOC "Use smaller malloc implementation" ON)
 
 set(_GLOBAL_ATEXIT OFF)
 

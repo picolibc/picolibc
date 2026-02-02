@@ -60,6 +60,19 @@ __malloc_free(void *free_p)
 
     MALLOC_LOCK;
 
+#ifdef MALLOC_MAX_BUCKET
+    size_t s = chunk_usable(p_to_free);
+    if (s <= MALLOC_MAX_BUCKET) {
+        int bucket = BUCKET_NUM(s);
+        if (s == (size_t)BUCKET_SIZE(bucket)) {
+            p = &__malloc_bucket_list[bucket];
+            p_to_free->next = *p;
+            *p = p_to_free;
+            goto unlock;
+        }
+    }
+#endif
+
     for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
         /* Insert in address order */
         if (p_to_free <= r) {

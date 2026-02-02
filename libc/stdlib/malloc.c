@@ -31,9 +31,13 @@
 /* List list header of free blocks */
 chunk_t *__malloc_free_list;
 
+#ifdef MALLOC_MAX_BUCKET
+chunk_t *__malloc_bucket_list[NUM_BUCKET_POT];
+#endif
+
 /* Starting point of memory allocated from system */
-char    *__malloc_sbrk_start;
-char    *__malloc_sbrk_top;
+char *__malloc_sbrk_start;
+char *__malloc_sbrk_top;
 
 /*
  * Algorithm:
@@ -136,39 +140,52 @@ malloc(size_t s)
         return NULL;
     }
 
-    alloc_size = chunk_size(s);
-
     MALLOC_LOCK;
 
-    for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
-        if (_size(r) >= alloc_size) {
-            size_t rem = _size(r) - alloc_size;
+#ifdef MALLOC_MAX_BUCKET
+    /* Small allocations use the bucket allocator */
+    if (s <= MALLOC_MAX_BUCKET) {
+        int bucket = BUCKET_NUM(s);
 
-            if (rem >= MALLOC_MINSIZE) {
-                /* Find a chunk_t that much larger than required size, break
-                 * it into two chunks and return the first one
-                 */
+        alloc_size = chunk_size(BUCKET_SIZE(bucket));
+        p = &__malloc_bucket_list[bucket];
+        if ((r = *p) != NULL)
+            *p = r->next;
+    } else
+#endif
+    {
+        alloc_size = chunk_size(s);
 
-                chunk_t *s = (chunk_t *)((char *)r + alloc_size);
-                _set_size(s, rem);
-                s->next = r->next;
-                *p = s;
+        for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
+            if (_size(r) >= alloc_size) {
+                size_t rem = _size(r) - alloc_size;
 
-                _set_size(r, alloc_size);
-            } else {
-                /* Find a chunk_t that is exactly the size or slightly bigger
-                 * than requested size, just return this chunk_t
+                if (rem >= MALLOC_MINSIZE) {
+                    /* Find a chunk_t that much larger than required size, break
+                     * it into two chunks and return the first one
+                     */
+
+                    chunk_t *s = (chunk_t *)((char *)r + alloc_size);
+                    _set_size(s, rem);
+                    s->next = r->next;
+                    *p = s;
+
+                    _set_size(r, alloc_size);
+                } else {
+                    /* Find a chunk_t that is exactly the size or slightly bigger
+                     * than requested size, just return this chunk_t
+                     */
+                    *p = r->next;
+                }
+                break;
+            }
+            if (!r->next && __malloc_grow_chunk(r, alloc_size)) {
+                /* Grow the last chunk in memory to the requested size,
+                 * just return it
                  */
                 *p = r->next;
+                break;
             }
-            break;
-        }
-        if (!r->next && __malloc_grow_chunk(r, alloc_size)) {
-            /* Grow the last chunk in memory to the requested size,
-             * just return it
-             */
-            *p = r->next;
-            break;
         }
     }
 

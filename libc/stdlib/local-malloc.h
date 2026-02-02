@@ -44,6 +44,29 @@
 #include <sys/param.h>
 #include <stdint.h>
 
+#define _UP_POT(x, val, next) (((x) <= 1UL << (val)) ? (val) : (next))
+#define _UP_POT1024(x)        _UP_POT(x, 10, 0)
+#define _UP_POT512(x)         _UP_POT(x, 9, _UP_POT1024(x))
+#define _UP_POT256(x)         _UP_POT(x, 8, _UP_POT512(x))
+#define _UP_POT128(x)         _UP_POT(x, 7, _UP_POT256(x))
+#define _UP_POT64(x)          _UP_POT(x, 6, _UP_POT128(x))
+#define _UP_POT32(x)          _UP_POT(x, 5, _UP_POT64(x))
+#define _UP_POT16(x)          _UP_POT(x, 4, _UP_POT32(x))
+#define UP_POT(x)             _UP_POT16(x)
+
+/*
+ * Allocations smaller than this will get rounded up to the next power
+ * of two.  When allocations of these sizes are freed, they are placed
+ * in unsorted per-size free lists.
+ */
+
+#if __MALLOC_SMALL_BUCKET
+#define MALLOC_MAX_BUCKET_POT UP_POT(__MALLOC_SMALL_BUCKET)
+#if MALLOC_MAX_BUCKET_POT == 0
+#error __MALLOC_SMALL_BUCKET too large
+#endif
+#endif
+
 #if MALLOC_DEBUG
 void __malloc_validate(void);
 void __malloc_validate_block(chunk_t *r);
@@ -111,9 +134,11 @@ typedef struct malloc_chunk {
  * may be smaller on some targets when size_t is smaller than
  * align_chunk_t.
  */
-#define MALLOC_HEAD_ALIGN _Alignof(head_t)
+#define MALLOC_HEAD_ALIGN  _Alignof(head_t)
 
-#define MALLOC_HEAD       sizeof(head_t)
+#define MALLOC_ALIGN_EXTRA (MALLOC_CHUNK_ALIGN - MALLOC_HEAD_ALIGN)
+
+#define MALLOC_HEAD        sizeof(head_t)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN (0x1000)
@@ -147,8 +172,23 @@ extern chunk_t *__malloc_free_list;
 extern char    *__malloc_sbrk_start;
 extern char    *__malloc_sbrk_top;
 
-#if MALLOC_DEBUG
-#else
+#ifdef MALLOC_MAX_BUCKET_POT
+
+/* Every power-of-two bucket gets padded by this amount */
+
+#define BUCKET_EXTRA        (MALLOC_CHUNK_ALIGN - MALLOC_HEAD_ALIGN)
+
+#define BUCKET_SIZE(bucket) (((size_t)1 << ((bucket) + MIN_BUCKET_POT)) + BUCKET_EXTRA)
+
+#define MALLOC_MAX_BUCKET   (BUCKET_SIZE(MALLOC_MAX_BUCKET_POT - MIN_BUCKET_POT))
+
+#define MIN_BUCKET_POT      (UP_POT(MALLOC_MINSIZE - BUCKET_EXTRA))
+#define MAX_BUCKET_POT      MALLOC_MAX_BUCKET_POT
+#define NUM_BUCKET_POT      (MAX_BUCKET_POT - MIN_BUCKET_POT + 1)
+
+#define BUCKET_NUM(s)       ((s) <= MALLOC_MINSIZE ? 0 : (UP_POT((s) - BUCKET_EXTRA) - MIN_BUCKET_POT))
+
+extern chunk_t *__malloc_bucket_list[NUM_BUCKET_POT];
 #endif
 
 bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
@@ -211,17 +251,16 @@ chunk_after(chunk_t *c)
 static inline size_t
 chunk_size(size_t malloc_size)
 {
+    /* Make sure the requested size is big enough to hold a free chunk */
+    malloc_size = MAX(MALLOC_MINSIZE, malloc_size);
+
     /* Keep all blocks aligned */
-    malloc_size = __align_up(malloc_size, MALLOC_CHUNK_ALIGN);
+    malloc_size
+        = __align_up(malloc_size - MALLOC_ALIGN_EXTRA, MALLOC_CHUNK_ALIGN) + MALLOC_ALIGN_EXTRA;
 
     /* Add space for header */
     malloc_size += MALLOC_HEAD;
 
-    /* fill the gap between chunks */
-    malloc_size += (MALLOC_CHUNK_ALIGN - MALLOC_HEAD_ALIGN);
-
-    /* Make sure the requested size is big enough to hold a free chunk */
-    malloc_size = MAX(MALLOC_MINSIZE, malloc_size);
     return malloc_size;
 }
 

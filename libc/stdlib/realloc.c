@@ -59,10 +59,19 @@ realloc(void *ptr, size_t size)
 
     size_t old_size = _size(p_to_realloc);
 
+#ifdef MALLOC_MAX_BUCKET_POT
+
+    size_t s = chunk_usable(p_to_realloc);
+    bool   is_bucket;
+    is_bucket = (s <= MALLOC_MAX_BUCKET && s == BUCKET_SIZE(BUCKET_NUM(s)));
+#else
+#define is_bucket 0
+#endif
+
     /* See if we can avoid allocating new memory
      * when increasing the size
      */
-    if (new_size > old_size) {
+    if (!is_bucket && new_size > old_size) {
         void *chunk_e = chunk_end(p_to_realloc);
 
         MALLOC_LOCK;
@@ -111,13 +120,12 @@ realloc(void *ptr, size_t size)
         /* If there's enough space left over, split it out
          * and free it
          */
-        if (extra >= MALLOC_MINSIZE) {
+        if (!is_bucket && extra >= MALLOC_MINSIZE) {
             _set_size(p_to_realloc, new_size);
             make_free_chunk(chunk_after(p_to_realloc), extra);
         }
         return ptr;
     }
-
     /* No short cuts, allocate new memory and copy */
 
     mem = malloc(size);

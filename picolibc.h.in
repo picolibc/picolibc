@@ -83,6 +83,8 @@
 
 #cmakedefine _LITE_EXIT
 
+#cmakedefine __MALLOC_SMALL_BUCKET
+
 #cmakedefine __MB_CAPABLE
 
 #cmakedefine __MB_EXTENDED_CHARSETS_ALL

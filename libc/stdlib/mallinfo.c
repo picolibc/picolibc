@@ -56,11 +56,25 @@ mallinfo(void)
         ordblks++;
         free_size += _size(pf);
     }
+#ifdef MALLOC_MAX_BUCKET_POT
+    size_t b;
+    size_t smblks = 0;
+    size_t fsmblks = 0;
+    for (b = 0; b < NUM_BUCKET_POT; b++)
+        for (pf = __malloc_bucket_list[b]; pf; pf = pf->next) {
+            smblks++;
+            fsmblks += _size(pf);
+        }
+    current_mallinfo.smblks = smblks;
+    current_mallinfo.fsmblks = fsmblks;
+#else
+#define fsmblks 0
+#endif
 
     current_mallinfo.ordblks = ordblks;
     current_mallinfo.arena = total_size;
     current_mallinfo.fordblks = free_size;
-    current_mallinfo.uordblks = total_size - free_size;
+    current_mallinfo.uordblks = total_size - free_size - fsmblks;
 
     MALLOC_UNLOCK;
 
