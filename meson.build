@@ -1124,17 +1124,17 @@ foreach params : [default_target] + targets
       picolibc_noflash_ld_variable = 'picolibc' + target + '_noflash_ld'
       picolibc_noflash_ld_config_variable = 'picolibc_' + custom_mem_config + '_noflash_ld_config'
 
-      picolibc_linux_ld_file = 'picolibc_' + custom_mem_config + '_linux.ld'
-      picolibc_linux_ld_variable = 'picolibc' + target + '_linux_ld'
-      picolibc_linux_ld_config_variable = 'picolibc_' + custom_mem_config + '_linux_ld_config'
+      picolibc_linux_ld_file = 'picolibc_linux_' + custom_mem_config + '.ld'
+      picolibc_linux_ld_variable = 'picolibc_linux' + target + '_ld'
+      picolibc_linux_ld_config_variable = 'picolibc_linux_' + custom_mem_config + '_ld_config'
 
       picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
       picolibcpp_ld_variable = 'picolibcpp' + target + '_ld'
       picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_ld_config'
 
-      picolibcpp_noflash_ld_file = 'picolibcpp_' + custom_mem_config + '_noflash.ld'
-      picolibcpp_noflash_ld_variable = 'picolibcpp_' + target.underscorify() + '_noflash_ld'
-      picolibcpp_noflash_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_noflash_ld_config'
+      picolibcpp_noflash_ld_file = 'picolibcpp_noflash_' + custom_mem_config + '.ld'
+      picolibcpp_noflash_ld_variable = 'picolibcpp_noflash' + target.underscorify() + '_ld'
+      picolibcpp_noflash_ld_config_variable = 'picolibcpp_noflash_' + custom_mem_config + '_ld_config'
 
       picolibcpp_linux_ld_file = 'picolibcpp_' + custom_mem_config + '_linux.ld'
       picolibcpp_linux_ld_variable = 'picolibcpp_' + target.underscorify() + '_linux_ld'
@@ -1971,6 +1971,7 @@ if oslib_test != ''
       test_link_depends_variable = 'test_link_depends' + target
       test_link_depends_noflash_variable = 'test_link_depends_noflash' + target
       test_link_depends_linux_variable = 'test_link_depends_linux' + target
+
       picolibc_ld_value = get_variable(linkerscript_test + target + '_ld',
                                        get_variable(linkerscript_test + '_ld'))
 
