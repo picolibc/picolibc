@@ -39,6 +39,8 @@ if fs.is_dir(machine_dir)
 
   has_os_linux = true
 
+  has_os_posix = true
+
   srcs_os_linux = [
     'access.c',
     'alarm.c',

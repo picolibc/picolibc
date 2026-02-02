@@ -665,7 +665,7 @@ endif
 subdir('libc-testsuite')
 subdir('test-ctype')
 subdir('test-iconv')
-subdir('test-linux')
+subdir('test-posix')
 subdir('test-math')
 subdir('test-string')
 subdir('test-monetary')

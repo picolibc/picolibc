@@ -1852,6 +1852,9 @@ has_arm_semihost = false
 # libos/linux support
 has_os_linux = false
 
+# any POSIX support
+has_os_posix = false
+
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
 
