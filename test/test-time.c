@@ -35,9 +35,14 @@
 
 /* Validate contents of time.h */
 
+#define _DEFAULT_SOURCE
 #define _POSIX_C_SOURCE 200809L
 #define _XOPEN_SOURCE   700
 #include <time.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <limits.h>
 
 clock_t          clock_value = CLOCKS_PER_SEC;
 size_t           size_value;
@@ -95,14 +100,476 @@ int             timer_abstime_value = TIMER_ABSTIME;
 
 static locale_t get_global_locale(void);
 
+static const struct {
+    bool      tm_valid;
+    bool      tm_noncanon;
+    struct tm tm;
+    struct tm want_tm;
+    time_t    time;
+} tests[] = {
+    {
+        .tm = {
+            .tm_year = 1,
+            .tm_mon = 11,
+            .tm_mday = 13,
+            .tm_hour = 20,
+            .tm_min = 45,
+            .tm_sec = 52,
+            .tm_wday = 5,
+            .tm_yday = 346,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = -2147483648,
+    },
+    {
+        .tm = {
+            .tm_year = 138,
+            .tm_mon = 0,
+            .tm_mday = 19,
+            .tm_hour = 3,
+            .tm_min = 14,
+            .tm_sec = 07,
+            .tm_wday = 2,
+            .tm_yday = 18,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 2147483647,
+    },
+    {
+        .tm = {
+            .tm_year = -1,
+            .tm_mon = 11,
+            .tm_mday = 31,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 0,
+            .tm_yday = 364,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = -2209075200,
+    },
+    {
+        .tm = {
+            .tm_year = 10001,
+            .tm_mon = 1,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 5,
+            .tm_yday = 31,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 313394745600,
+    },
+    {
+        .tm = {
+            .tm_year = 20001,
+            .tm_mon = 1,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 5,
+            .tm_yday = 31,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 628964265600,
+    },
+    {
+        .tm = {
+            .tm_year = 20071,
+            .tm_mon = 1,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 1,
+            .tm_yday = 31,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 631173254400,
+    },
+    {
+        .tm = {
+            .tm_year = 20070,
+            .tm_mon = 1,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 0,
+            .tm_yday = 31,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 631141718400,
+    },
+    {
+        .tm = {
+            .tm_year = 20069,
+            .tm_mon = 1,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 6,
+            .tm_yday = 31,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 631110182400,
+    },
+#if INT_MAX >= 2147483647
+    {
+        .tm = {
+            .tm_year = 2147483647,
+            .tm_mon = 11,
+            .tm_mday = 31,
+            .tm_hour = 23,
+            .tm_min = 59,
+            .tm_sec = 59,
+            .tm_wday = 3,
+            .tm_yday = 364,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 67768036191676799,
+    },
+    {
+        .tm = {
+            .tm_year = 2147483647,
+            .tm_mon = 11,
+            .tm_mday = 31,
+            .tm_hour = 23,
+            .tm_min = 59,
+            .tm_sec = 60,
+            .tm_wday = 0,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .tm_valid = false,
+        .tm_noncanon = true,
+        .time = 67768036191676800,
+    },
+#endif
+    {
+        .tm = {
+            .tm_year = 32767,
+            .tm_mon = 11,
+            .tm_mday = 31,
+            .tm_hour = 23,
+            .tm_min = 59,
+            .tm_sec = 59,
+            .tm_wday = 2,
+            .tm_yday = 364,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = 1031849193599,
+    },
+    {
+        .tm = {
+            .tm_year = 32767,
+            .tm_mon = 11,
+            .tm_mday = 31,
+            .tm_hour = 23,
+            .tm_min = 59,
+            .tm_sec = 60,
+            .tm_wday = 3,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+#if INT_MAX >= 32768
+        .want_tm = {
+            .tm_year = 32768,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 3,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+#else
+        .tm_valid = false,
+#endif
+        .tm_noncanon = true,
+        .time = 1031849193600,
+    },
+#if INT_MIN <= -2147483648
+    {
+        .tm = {
+            .tm_year = -2147483648,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 4,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = -67768040609740800,
+    },
+    {
+        .tm = {
+            .tm_year = -2147483648,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = -1,
+            .tm_wday = 0,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .tm_valid = false,
+        .tm_noncanon = false,
+        .time = -67768040609740801,
+    },
+    {
+        .tm = {
+            .tm_year = -2147483648,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 1,
+            .tm_sec = -1,
+            .tm_wday = 0,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .want_tm = {
+            .tm_year = -2147483648,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 59,
+            .tm_wday = 4,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = true,
+        .time = -67768040609740741,
+    },
+#endif
+    {
+        .tm = {
+            .tm_year = -32768,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 0,
+            .tm_wday = 5,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = false,
+        .time = -1036267257600,
+    },
+    {
+        .tm = {
+            .tm_year = -32768,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = -1,
+            .tm_wday = 5,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+#if INT_MIN < -32768
+        .want_tm = {
+            .tm_year = -32769,
+            .tm_mon = 11,
+            .tm_mday = 31,
+            .tm_hour = 23,
+            .tm_min = 59,
+            .tm_sec = 59,
+            .tm_wday = 4,
+            .tm_yday = 364,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+#endif
+        .tm_noncanon = true,
+        .time = -1036267257601,
+    },
+    {
+        .tm = {
+            .tm_year = -32768,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 1,
+            .tm_sec = -1,
+            .tm_wday = 6,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .want_tm = {
+            .tm_year = -32768,
+            .tm_mon = 0,
+            .tm_mday = 1,
+            .tm_hour = 0,
+            .tm_min = 0,
+            .tm_sec = 59,
+            .tm_wday = 5,
+            .tm_yday = 0,
+            .tm_isdst = 0,
+        },
+        .tm_valid = true,
+        .tm_noncanon = true,
+        .time = -1036267257541,
+    },
+};
+
+#define NTESTS (sizeof(tests) / sizeof(tests[0]))
+
 int
 main(void)
 {
     char buf[256];
+    int  ret = 0;
+
+    putenv("TZ=UTC");
+    if (sizeof(time_t) > 4) {
+        size_t t;
+
+        for (t = 0; t < NTESTS; t++) {
+            struct tm        local_tm = tests[t].tm;
+            struct tm       *tm = &local_tm;
+            time_t           got_time;
+            time_t           want_time = tests[t].tm_valid ? tests[t].time : (time_t)-1;
+            struct tm       *got_tm;
+            const struct tm *want_tm = tests[t].tm_valid
+                ? (tests[t].tm_noncanon ? &tests[t].want_tm : &tests[t].tm)
+                : NULL;
+
+            /* do this test first so if it breaks tm, we'll find out */
+            got_time = timegm(tm);
+
+#ifdef GENERATE
+            printf("    {\n");
+            printf("        .tm = {\n");
+            printf("            .tm_year = %d,\n", tm->tm_year);
+            printf("            .tm_mon = %d,\n", tm->tm_mon);
+            printf("            .tm_mday = %d,\n", tm->tm_mday);
+            printf("            .tm_hour = %d,\n", tm->tm_hour);
+            printf("            .tm_min = %d,\n", tm->tm_min);
+            printf("            .tm_sec = %d,\n", tm->tm_sec);
+            printf("            .tm_wday = %d,\n", tm->tm_wday);
+            printf("            .tm_yday = %d,\n", tm->tm_yday);
+            printf("            .tm_isdst = %d,\n", tm->tm_isdst);
+            printf("        },\n");
+            if (tests[t].tm_noncanon) {
+                printf("        .want_tm = {\n");
+                printf("            .tm_year = %d,\n", tests[t].want_tm.tm_year);
+                printf("            .tm_mon = %d,\n", tests[t].want_tm.tm_mon);
+                printf("            .tm_mday = %d,\n", tests[t].want_tm.tm_mday);
+                printf("            .tm_hour = %d,\n", tests[t].want_tm.tm_hour);
+                printf("            .tm_min = %d,\n", tests[t].want_tm.tm_min);
+                printf("            .tm_sec = %d,\n", tests[t].want_tm.tm_sec);
+                printf("            .tm_wday = %d,\n", tests[t].want_tm.tm_wday);
+                printf("            .tm_yday = %d,\n", tests[t].want_tm.tm_yday);
+                printf("            .tm_isdst = %d,\n", tests[t].want_tm.tm_isdst);
+                printf("        },\n");
+            }
+            printf("        .tm_valid = %s,\n", tests[t].tm_valid ? "true" : "false");
+            printf("        .tm_noncanon = %s,\n", tests[t].tm_noncanon ? "true" : "false");
+            printf("        .time = %lld,\n", (long long)tests[t].time);
+            printf("    },\n");
+
+            continue;
+#endif
+
+            if (want_tm == &tests[t].tm) {
+                got_tm = tm;
+                if (got_tm->tm_year != want_tm->tm_year || got_tm->tm_mon != want_tm->tm_mon
+                    || got_tm->tm_mday != want_tm->tm_mday || got_tm->tm_hour != want_tm->tm_hour
+                    || got_tm->tm_min != want_tm->tm_min || got_tm->tm_sec != want_tm->tm_sec
+                    || got_tm->tm_wday != want_tm->tm_wday || got_tm->tm_yday != want_tm->tm_yday
+                    || got_tm->tm_isdst != want_tm->tm_isdst) {
+                    printf("timegm mangled tm:\n");
+                    printf("   want %d/%d/%d %02d:%02d:%02d wday %d yday %d isdst %d\n",
+                           want_tm->tm_year, want_tm->tm_mon, want_tm->tm_mday, want_tm->tm_hour,
+                           want_tm->tm_min, want_tm->tm_sec, want_tm->tm_wday, want_tm->tm_yday,
+                           want_tm->tm_isdst);
+                    printf("    got %d/%d/%d %02d:%02d:%02d wday %d yday %d isdst %d\n",
+                           got_tm->tm_year, got_tm->tm_mon, got_tm->tm_mday, got_tm->tm_hour,
+                           got_tm->tm_min, got_tm->tm_sec, got_tm->tm_wday, got_tm->tm_yday,
+                           got_tm->tm_isdst);
+                    ret = 1;
+                }
+            }
+
+            if (got_time != want_time) {
+                printf("timegm %d/%d/%d %02d:%02d:%02d want %lld got %lld\n", tm->tm_year,
+                       tm->tm_mon, tm->tm_mday, tm->tm_hour, tm->tm_min, tm->tm_sec,
+                       (long long)want_time, (long long)got_time);
+                ret = 1;
+            }
+
+            got_tm = gmtime(&tests[t].time);
+
+            if ((got_tm && !want_tm) || (!got_tm && want_tm)
+                || (got_tm && want_tm
+                    && (got_tm->tm_year != want_tm->tm_year || got_tm->tm_mon != want_tm->tm_mon
+                        || got_tm->tm_mday != want_tm->tm_mday
+                        || got_tm->tm_hour != want_tm->tm_hour || got_tm->tm_min != want_tm->tm_min
+                        || got_tm->tm_sec != want_tm->tm_sec || got_tm->tm_wday != want_tm->tm_wday
+                        || got_tm->tm_yday != want_tm->tm_yday
+                        || got_tm->tm_isdst != want_tm->tm_isdst))) {
+                printf("gmtime %lld\n", (long long)tests[t].time);
+                if (want_tm)
+                    printf("   want %d/%d/%d %02d:%02d:%02d wday %d yday %d isdst %d\n",
+                           want_tm->tm_year, want_tm->tm_mon, want_tm->tm_mday, want_tm->tm_hour,
+                           want_tm->tm_min, want_tm->tm_sec, want_tm->tm_wday, want_tm->tm_yday,
+                           want_tm->tm_isdst);
+                else
+                    printf("   want nothing\n");
+                if (got_tm)
+                    printf("    got %d/%d/%d %02d:%02d:%02d wday %d yday %d isdst %d\n",
+                           got_tm->tm_year, got_tm->tm_mon, got_tm->tm_mday, got_tm->tm_hour,
+                           got_tm->tm_min, got_tm->tm_sec, got_tm->tm_wday, got_tm->tm_yday,
+                           got_tm->tm_isdst);
+                else
+                    printf("    got nothing\n");
+                ret = 1;
+            }
+        }
+    }
 
     /* reference every external symbol that time.t is supposed to declare */
 
-    int  getdata_err_ret = getdate_err;
+    int getdata_err_ret = getdate_err;
     (void)getdata_err_ret;
 
     char *asctime_ret = asctime(&tm_value);
@@ -207,7 +674,7 @@ main(void)
 
     tzset();
 
-    return 0;
+    return ret;
 }
 
 #include <locale.h>
