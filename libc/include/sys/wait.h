@@ -35,9 +35,11 @@ _BEGIN_STD_C
 
 #include <sys/types.h>
 #include <sys/_wait.h>
+#include <sys/resource.h>
 
 pid_t wait(int *);
 pid_t waitpid(pid_t, int *, int);
+pid_t wait3(int *, int, struct rusage *);
 
 _END_STD_C
 
