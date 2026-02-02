@@ -41,31 +41,42 @@ if fs.is_dir(machine_dir)
 
   srcs_os_linux = [
     'access.c',
+    'alarm.c',
     'cfgetispeed.c',
     'cfgetospeed.c',
     'chdir.c',
     'clock_gettime.c',
     'close.c',
     'closedir.c',
+    'dup.c',
+    'dup2.c',
+    'execve.c',
     '_exit.c',
+    'fork.c',
     'fstat.c',
     'getcwd.c',
     'getentropy.c',
+    'getpid.c',
     'gettimeofday.c',
     'getwd.c',
     'iob_stderr.c',
     'iob_stdin.c',
     'iob_stdout.c',
     'isatty.c',
+    'kill.c',
     'lseek.c',
     'mkdir.c',
     'nanosleep.c',
     'open.c',
     'opendir.c',
+    'pipe.c',
     'poll.c',
+    'raise.c',
     'read.c',
     'readdir.c',
     'readlink.c',
+    'rename.c',
+    'sbrk.c',
     'signal.c',
     '_signal_from_linux.c',
     '_signal_to_linux.c',
@@ -79,12 +90,15 @@ if fs.is_dir(machine_dir)
     'ttyname.c',
     'ttyname_r.c',
     'unlink.c',
+    'waitpid.c',
     'write.c',
   ]
 
   subdir('include')
 
   subdir(machine_dir)
+
+  srcs_os += srcs_os_linux
 
   src_os_linux = files(srcs_os_linux) + src_os_linux_machine
 
