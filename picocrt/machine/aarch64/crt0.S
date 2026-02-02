@@ -116,7 +116,6 @@ _start:
 #else
   /* Use EL-banked stack pointer */
 	msr     SPSel, #1
-#endif
 
 #ifdef __pic__
         adrp x1, :got:__stack
@@ -127,8 +126,6 @@ _start:
 	add  x1, x1, :lo12:__stack
 #endif
 	mov sp, x1
-
-#ifndef CRT0_LINUX
 	/* Enable FPU */
 #if __ARM_FP
 #if defined(MACHINE_qemu)

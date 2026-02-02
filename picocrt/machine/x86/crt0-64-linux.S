@@ -64,9 +64,6 @@ _start:
         leaq    16(%rsp,%r12,8), %r14           /* environ = sp + argc * 8 + 16 */
         movq    %r14, environ
 
-        /* Initialize the stack */
-	mov	$__stack, %rsp
-
 #ifndef NO_FLASH
 	/* Initialize data segment */
 	mov	$__data_size, %rdx
