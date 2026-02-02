@@ -33,32 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
-
-#define _GNU_SOURCE
-
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
+#include "local-linux.h"
 #include <unistd.h>
 
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
-#include <linux/linux-wait.h>
-
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-long _syscall_error(long ret);
-int  _signal_to_linux(int sig);
-int  _signal_from_linux(int sig);
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */
+int
+dup2(int oldfd, int newfd)
+{
+#ifdef LINUX_SYS_dup2
+    return syscall(LINUX_SYS_dup2, oldfd, newfd);
+#else
+    return syscall(LINUX_SYS_dup3, oldfd, newfd, 0);
+#endif
+}
