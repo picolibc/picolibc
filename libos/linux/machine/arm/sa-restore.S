@@ -33,31 +33,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+        .syntax unified
+        .section .text.__sa_restore
+        .align 4
+        .p2align 4,,15
+        .globl __sa_restore
+        .type __sa_restore,%function
+#ifdef __thumb__
+	.thumb
+#endif
+__sa_restore:
+        mov     r7, #119
+	swi	0x0
+        nop
 
-#define _GNU_SOURCE
-
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
-
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-long _syscall_error(long ret);
-int  _signal_to_linux(int sig);
-int  _signal_from_linux(int sig);
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */
+        .size __sa_restore, . - __sa_restore

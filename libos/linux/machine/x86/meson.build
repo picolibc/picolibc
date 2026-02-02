@@ -37,6 +37,7 @@ subdir('linux')
 subdir('asm')
 
 srcs_os_linux_machine = [
+  'sa-restore.S',
   'syscall.S',
 ]
 

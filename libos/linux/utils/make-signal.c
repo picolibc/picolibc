@@ -61,40 +61,40 @@ reset_has(void)
     memset(has, 0, sizeof(has));
 }
 
-#define PICOLIBC_SIGHUP    1     /* hangup */
-#define PICOLIBC_SIGINT    2     /* interrupt */
-#define PICOLIBC_SIGQUIT   3     /* quit */
-#define PICOLIBC_SIGILL    4     /* illegal instruction (not reset when caught) */
-#define PICOLIBC_SIGTRAP   5     /* trace trap (not reset when caught) */
-#define PICOLIBC_SIGIOT    6     /* IOT instruction */
-#define PICOLIBC_SIGABRT   6     /* used by abort, replace SIGIOT in the future */
-#define PICOLIBC_SIGEMT    7     /* EMT instruction */
-#define PICOLIBC_SIGFPE    8     /* floating point exception */
-#define PICOLIBC_SIGKILL   9     /* kill (cannot be caught or ignored) */
-#define PICOLIBC_SIGBUS    10    /* bus error */
-#define PICOLIBC_SIGSEGV   11    /* segmentation violation */
-#define PICOLIBC_SIGSYS    12    /* bad argument to system call */
-#define PICOLIBC_SIGPIPE   13    /* write on a pipe with no one to read it */
-#define PICOLIBC_SIGALRM   14    /* alarm clock */
-#define PICOLIBC_SIGTERM   15    /* software termination signal from kill */
-#define PICOLIBC_SIGURG    16    /* urgent condition on IO channel */
-#define PICOLIBC_SIGSTOP   17    /* sendable stop signal not from tty */
-#define PICOLIBC_SIGTSTP   18    /* stop signal from tty */
-#define PICOLIBC_SIGCONT   19    /* continue a stopped process */
-#define PICOLIBC_SIGCHLD   20    /* to parent on child stop or exit */
-#define PICOLIBC_SIGCLD    20    /* System V name for SIGCHLD */
-#define PICOLIBC_SIGTTIN   21    /* to readers pgrp upon background tty read */
-#define PICOLIBC_SIGTTOU   22    /* like TTIN for output if (tp->t_local&LTOSTOP) */
-#define PICOLIBC_SIGIO     23    /* input/output possible signal */
+#define PICOLIBC_SIGHUP    1              /* hangup */
+#define PICOLIBC_SIGINT    2              /* interrupt */
+#define PICOLIBC_SIGQUIT   3              /* quit */
+#define PICOLIBC_SIGILL    4              /* illegal instruction (not reset when caught) */
+#define PICOLIBC_SIGTRAP   5              /* trace trap (not reset when caught) */
+#define PICOLIBC_SIGIOT    6              /* IOT instruction */
+#define PICOLIBC_SIGABRT   6              /* used by abort, replace SIGIOT in the future */
+#define PICOLIBC_SIGEMT    7              /* EMT instruction */
+#define PICOLIBC_SIGFPE    8              /* floating point exception */
+#define PICOLIBC_SIGKILL   9              /* kill (cannot be caught or ignored) */
+#define PICOLIBC_SIGBUS    10             /* bus error */
+#define PICOLIBC_SIGSEGV   11             /* segmentation violation */
+#define PICOLIBC_SIGSYS    12             /* bad argument to system call */
+#define PICOLIBC_SIGPIPE   13             /* write on a pipe with no one to read it */
+#define PICOLIBC_SIGALRM   14             /* alarm clock */
+#define PICOLIBC_SIGTERM   15             /* software termination signal from kill */
+#define PICOLIBC_SIGURG    16             /* urgent condition on IO channel */
+#define PICOLIBC_SIGSTOP   17             /* sendable stop signal not from tty */
+#define PICOLIBC_SIGTSTP   18             /* stop signal from tty */
+#define PICOLIBC_SIGCONT   19             /* continue a stopped process */
+#define PICOLIBC_SIGCHLD   20             /* to parent on child stop or exit */
+#define PICOLIBC_SIGCLD    20             /* System V name for SIGCHLD */
+#define PICOLIBC_SIGTTIN   21             /* to readers pgrp upon background tty read */
+#define PICOLIBC_SIGTTOU   22             /* like TTIN for output if (tp->t_local&LTOSTOP) */
+#define PICOLIBC_SIGIO     23             /* input/output possible signal */
 #define PICOLIBC_SIGPOLL   PICOLIBC_SIGIO /* System V name for SIGIO */
-#define PICOLIBC_SIGXCPU   24    /* exceeded CPU time limit */
-#define PICOLIBC_SIGXFSZ   25    /* exceeded file size limit */
-#define PICOLIBC_SIGVTALRM 26    /* virtual time alarm */
-#define PICOLIBC_SIGPROF   27    /* profiling time alarm */
-#define PICOLIBC_SIGWINCH  28    /* window changed */
-#define PICOLIBC_SIGLOST   29    /* resource lost (eg, record-lock lost) */
-#define PICOLIBC_SIGUSR1   30    /* user defined signal 1 */
-#define PICOLIBC_SIGUSR2   31    /* user defined signal 2 */
+#define PICOLIBC_SIGXCPU   24             /* exceeded CPU time limit */
+#define PICOLIBC_SIGXFSZ   25             /* exceeded file size limit */
+#define PICOLIBC_SIGVTALRM 26             /* virtual time alarm */
+#define PICOLIBC_SIGPROF   27             /* profiling time alarm */
+#define PICOLIBC_SIGWINCH  28             /* window changed */
+#define PICOLIBC_SIGLOST   29             /* resource lost (eg, record-lock lost) */
+#define PICOLIBC_SIGUSR1   30             /* user defined signal 1 */
+#define PICOLIBC_SIGUSR2   31             /* user defined signal 2 */
 
 struct {
     int         linux_value;
@@ -214,9 +214,9 @@ main(void)
     int    max_linux_signal = 0, max_picolibc_signal = 0, s;
     size_t i;
 
-    printf("#define LINUX_SIG_DFL ((_sig_func_ptr) %lld)\n", (long long) (uintptr_t) SIG_DFL);
-    printf("#define LINUX_SIG_IGN ((_sig_func_ptr) %lld)\n", (long long) (uintptr_t) SIG_IGN);
-    printf("#define LINUX_SIG_ERR ((_sig_func_ptr) %lld)\n", (long long) (uintptr_t) SIG_ERR);
+    printf("#define LINUX_SIG_DFL ((_sig_func_ptr) %lld)\n", (long long)(uintptr_t)SIG_DFL);
+    printf("#define LINUX_SIG_IGN ((_sig_func_ptr) %lld)\n", (long long)(uintptr_t)SIG_IGN);
+    printf("#define LINUX_SIG_ERR ((_sig_func_ptr) %lld)\n", (long long)(uintptr_t)SIG_ERR);
 
     printf("\n");
 
@@ -227,8 +227,7 @@ main(void)
 
     printf("enum __linux_signal {\n");
     for (i = 0; i < NLINUX_SIGNAL; i++) {
-        printf("    __LINUX_%s = %d,\n",
-               linux_signal[i].name, linux_signal[i].linux_value);
+        printf("    __LINUX_%s = %d,\n", linux_signal[i].name, linux_signal[i].linux_value);
         if (linux_signal[i].linux_value > max_linux_signal)
             max_linux_signal = linux_signal[i].linux_value;
     }
@@ -236,8 +235,7 @@ main(void)
 
     printf("enum __picolibc_signal {\n");
     for (i = 0; i < NLINUX_SIGNAL; i++) {
-        printf("    __PICOLIBC_%s = %s,\n",
-               linux_signal[i].name, linux_signal[i].name);
+        printf("    __PICOLIBC_%s = %s,\n", linux_signal[i].name, linux_signal[i].name);
         if (linux_signal[i].picolibc_value > max_picolibc_signal)
             max_picolibc_signal = linux_signal[i].picolibc_value;
     }
@@ -260,8 +258,8 @@ main(void)
         if (i < NLINUX_SIGNAL) {
             if (check_has(linux_signal[i].linux_value))
                 continue;
-            printf("    [__LINUX_%s] = __PICOLIBC_%s,\n",
-                   linux_signal[i].name, linux_signal[i].name);
+            printf("    [__LINUX_%s] = __PICOLIBC_%s,\n", linux_signal[i].name,
+                   linux_signal[i].name);
         } else
             printf("    [%d] = __PICOLIBC_SIGINT,\n", s);
     }
@@ -287,8 +285,7 @@ main(void)
             if (check_has(linux_signal[i].picolibc_value))
                 continue;
 
-            printf("    [%s] = __LINUX_%s,\n",
-                   linux_signal[i].name, linux_signal[i].name);
+            printf("    [%s] = __LINUX_%s,\n", linux_signal[i].name, linux_signal[i].name);
         } else
             printf("    [%d] = __LINUX_SIGINT,\n", s);
     }
