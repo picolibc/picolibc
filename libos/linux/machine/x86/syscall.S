@@ -38,13 +38,40 @@
         .type  syscall, @function
 syscall:
 #ifdef __x86_64
-	movq %rdi, %rax
-	movq %rsi, %rdi
-	movq %rdx, %rsi
-	movq %rcx, %rdx
-	movq %r8, %r10
-	movq %r9, %r8
-	movq 8(%rsp),%r9
+
+        # x86_64 calling convention
+        #
+        #       rdi     syscall
+        #       rsi     arg0
+        #       rdx     arg1
+        #       rcx     arg2
+        #       r8      arg3
+        #       r9      arg4
+        #       8(rsp)  arg5
+        #
+        # Registers passed to kernel
+        #
+        #       rax     syscall
+        #       rcx     return address (handled by syscall instruction)
+        #       r11     saved rflags (handled by syscall instruction)
+        #       rdi     arg0
+        #       rsi     arg1
+        #       rdx     arg2
+        #       r10     arg3 (can't use rcx because of syscall instruction)
+        #       r8      arg4
+        #       r9      arg5
+        #       (note: r12-r15, rbp, rbx are callee-preserved in C ABI)
+        #
+
+        # Shuffle args to match Linux
+
+	movq %rdi, %rax         # syscall
+	movq %rsi, %rdi         # arg0
+	movq %rdx, %rsi         # arg1
+	movq %rcx, %rdx         # arg2
+	movq %r8, %r10          # arg3
+	movq %r9, %r8           # arg4
+	movq 8(%rsp),%r9        # arg5
         syscall
         cmpq $-4095, %rax
         jae 0f
