@@ -65,499 +65,393 @@ struct {
     int         value;
     const char *name;
 } linux_errno[] = {
-#define declare_error(n) { .value = n, .name = #n },
+#define declare_error(n) { .value = n, .name = #n }
 #ifdef EPERM
-    declare_error(EPERM)
+    declare_error(EPERM),
 #endif
 #ifdef ENOENT
-        declare_error(ENOENT)
+    declare_error(ENOENT),
 #endif
 #ifdef ESRCH
-            declare_error(ESRCH)
+    declare_error(ESRCH),
 #endif
 #ifdef EINTR
-                declare_error(EINTR)
+    declare_error(EINTR),
 #endif
 #ifdef EIO
-                    declare_error(EIO)
+    declare_error(EIO),
 #endif
 #ifdef ENXIO
-                        declare_error(ENXIO)
+    declare_error(ENXIO),
 #endif
 #ifdef E2BIG
-                            declare_error(E2BIG)
+    declare_error(E2BIG),
 #endif
 #ifdef ENOEXEC
-                                declare_error(ENOEXEC)
+    declare_error(ENOEXEC),
 #endif
 #ifdef EBADF
-                                    declare_error(EBADF)
+    declare_error(EBADF),
 #endif
 #ifdef ECHILD
-                                        declare_error(ECHILD)
+    declare_error(ECHILD),
 #endif
 #ifdef EAGAIN
-                                            declare_error(EAGAIN)
+    declare_error(EAGAIN),
 #endif
 #ifdef ENOMEM
-                                                declare_error(ENOMEM)
+    declare_error(ENOMEM),
 #endif
 #ifdef EACCES
-                                                    declare_error(EACCES)
+    declare_error(EACCES),
 #endif
 #ifdef EFAULT
-                                                        declare_error(EFAULT)
+    declare_error(EFAULT),
 #endif
 #ifdef ENOTBLK
-                                                            declare_error(ENOTBLK)
+    declare_error(ENOTBLK),
 #endif
 #ifdef EBUSY
-                                                                declare_error(EBUSY)
+    declare_error(EBUSY),
 #endif
 #ifdef EEXIST
-                                                                    declare_error(EEXIST)
+    declare_error(EEXIST),
 #endif
 #ifdef EXDEV
-                                                                        declare_error(EXDEV)
+    declare_error(EXDEV),
 #endif
 #ifdef ENODEV
-                                                                            declare_error(ENODEV)
+    declare_error(ENODEV),
 #endif
 #ifdef ENOTDIR
-                                                                                declare_error(
-                                                                                    ENOTDIR)
+    declare_error(ENOTDIR),
 #endif
 #ifdef EISDIR
-                                                                                    declare_error(
-                                                                                        EISDIR)
+    declare_error(EISDIR),
 #endif
 #ifdef EINVAL
-                                                                                        declare_error(
-                                                                                            EINVAL)
+    declare_error(EINVAL),
 #endif
 #ifdef ENFILE
-                                                                                            declare_error(
-                                                                                                ENFILE)
+    declare_error(ENFILE),
 #endif
 #ifdef EMFILE
-                                                                                                declare_error(
-                                                                                                    EMFILE)
+    declare_error(EMFILE),
 #endif
 #ifdef ENOTTY
-                                                                                                    declare_error(
-                                                                                                        ENOTTY)
+    declare_error(ENOTTY),
 #endif
 #ifdef ETXTBSY
-                                                                                                        declare_error(
-                                                                                                            ETXTBSY)
+    declare_error(ETXTBSY),
 #endif
 #ifdef EFBIG
-                                                                                                            declare_error(
-                                                                                                                EFBIG)
+    declare_error(EFBIG),
 #endif
 #ifdef ENOSPC
-                                                                                                                declare_error(
-                                                                                                                    ENOSPC)
+    declare_error(ENOSPC),
 #endif
 #ifdef ESPIPE
-                                                                                                                    declare_error(
-                                                                                                                        ESPIPE)
+    declare_error(ESPIPE),
 #endif
 #ifdef EROFS
-                                                                                                                        declare_error(
-                                                                                                                            EROFS)
+    declare_error(EROFS),
 #endif
 #ifdef EMLINK
-                                                                                                                            declare_error(
-                                                                                                                                EMLINK)
+    declare_error(EMLINK),
 #endif
 #ifdef EPIPE
-                                                                                                                                declare_error(
-                                                                                                                                    EPIPE)
+    declare_error(EPIPE),
 #endif
 #ifdef EDOM
-                                                                                                                                    declare_error(
-                                                                                                                                        EDOM)
+    declare_error(EDOM),
 #endif
 #ifdef ERANGE
-                                                                                                                                        declare_error(
-                                                                                                                                            ERANGE)
+    declare_error(ERANGE),
 #endif
 #ifdef ENOMSG
-                                                                                                                                            declare_error(
-                                                                                                                                                ENOMSG)
+    declare_error(ENOMSG),
 #endif
 #ifdef EIDRM
-                                                                                                                                                declare_error(
-                                                                                                                                                    EIDRM)
+    declare_error(EIDRM),
 #endif
 #ifdef ECHRNG
-                                                                                                                                                    declare_error(
-                                                                                                                                                        ECHRNG)
+    declare_error(ECHRNG),
 #endif
 #ifdef EL2NSYNC
-                                                                                                                                                        declare_error(
-                                                                                                                                                            EL2NSYNC)
+    declare_error(EL2NSYNC),
 #endif
 #ifdef EL3HLT
-                                                                                                                                                            declare_error(
-                                                                                                                                                                EL3HLT)
+    declare_error(EL3HLT),
 #endif
 #ifdef EL3RST
-                                                                                                                                                                declare_error(
-                                                                                                                                                                    EL3RST)
+    declare_error(EL3RST),
 #endif
 #ifdef ELNRNG
-                                                                                                                                                                    declare_error(
-                                                                                                                                                                        ELNRNG)
+    declare_error(ELNRNG),
 #endif
 #ifdef EUNATCH
-                                                                                                                                                                        declare_error(
-                                                                                                                                                                            EUNATCH)
+    declare_error(EUNATCH),
 #endif
 #ifdef ENOCSI
-                                                                                                                                                                            declare_error(
-                                                                                                                                                                                ENOCSI)
+    declare_error(ENOCSI),
 #endif
 #ifdef EL2HLT
-                                                                                                                                                                                declare_error(
-                                                                                                                                                                                    EL2HLT)
+    declare_error(EL2HLT),
 #endif
 #ifdef EDEADLK
-                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                        EDEADLK)
+    declare_error(EDEADLK),
 #endif
 #ifdef ENOLCK
-                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                            ENOLCK)
+    declare_error(ENOLCK),
 #endif
 #ifdef EBADE
-                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                EBADE)
+    declare_error(EBADE),
 #endif
 #ifdef EBADR
-                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                    EBADR)
+    declare_error(EBADR),
 #endif
 #ifdef EXFULL
-                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                        EXFULL)
+    declare_error(EXFULL),
 #endif
 #ifdef ENOANO
-                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                            ENOANO)
+    declare_error(ENOANO),
 #endif
 #ifdef EBADRQC
-                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                EBADRQC)
+    declare_error(EBADRQC),
 #endif
 #ifdef EBADSLT
-                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                    EBADSLT)
+    declare_error(EBADSLT),
 #endif
 #ifdef EDEADLOCK
-                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                        EDEADLOCK)
+    declare_error(EDEADLOCK),
 #endif
 #ifdef EBFONT
-                                                                                                                                                                                                                        declare_error(EBFONT)
+    declare_error(EBFONT),
 #endif
 #ifdef ENOSTR
-                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                ENOSTR)
+    declare_error(ENOSTR),
 #endif
 #ifdef ENODATA
-                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                    ENODATA)
+    declare_error(ENODATA),
 #endif
 #ifdef ETIME
-                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                        ETIME)
+    declare_error(ETIME),
 #endif
 #ifdef ENOSR
-                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                            ENOSR)
+    declare_error(ENOSR),
 #endif
 #ifdef ENONET
-                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                ENONET)
+    declare_error(ENONET),
 #endif
 #ifdef ENOPKG
-                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                    ENOPKG)
+    declare_error(ENOPKG),
 #endif
 #ifdef EREMOTE
-                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                        EREMOTE)
+    declare_error(EREMOTE),
 #endif
 #ifdef ENOLINK
-                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                            ENOLINK)
+    declare_error(ENOLINK),
 #endif
 #ifdef EADV
-                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                EADV)
+    declare_error(EADV),
 #endif
 #ifdef ESRMNT
-                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                    ESRMNT)
+    declare_error(ESRMNT),
 #endif
 #ifdef ECOMM
-                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                        ECOMM)
+    declare_error(ECOMM),
 #endif
 #ifdef EPROTO
-                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                            EPROTO)
+    declare_error(EPROTO),
 #endif
 #ifdef EMULTIHOP
-                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                EMULTIHOP)
+    declare_error(EMULTIHOP),
 #endif
 #ifdef ELBIN
-                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                    ELBIN)
+    declare_error(ELBIN),
 #endif
 #ifdef EDOTDOT
-                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                        EDOTDOT)
+    declare_error(EDOTDOT),
 #endif
 #ifdef EBADMSG
-                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                            EBADMSG)
+    declare_error(EBADMSG),
 #endif
 #ifdef EFTYPE
-                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                EFTYPE)
+    declare_error(EFTYPE),
 #endif
 #ifdef ENOTUNIQ
-                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                    ENOTUNIQ)
+    declare_error(ENOTUNIQ),
 #endif
 #ifdef EBADFD
-                                                                                                                                                                                                                                                                                                    declare_error(EBADFD)
+    declare_error(EBADFD),
 #endif
 #ifdef EREMCHG
-                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                            EREMCHG)
+    declare_error(EREMCHG),
 #endif
 #ifdef ELIBACC
-                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                ELIBACC)
+    declare_error(ELIBACC),
 #endif
 #ifdef ELIBBAD
-                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                    ELIBBAD)
+    declare_error(ELIBBAD),
 #endif
 #ifdef ELIBSCN
-                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                        ELIBSCN)
+    declare_error(ELIBSCN),
 #endif
 #ifdef ELIBMAX
-                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                            ELIBMAX)
+    declare_error(ELIBMAX),
 #endif
 #ifdef ELIBEXEC
-                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                ELIBEXEC)
+    declare_error(ELIBEXEC),
 #endif
 #ifdef ENOSYS
-                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                    ENOSYS)
+    declare_error(ENOSYS),
 #endif
 #ifdef ENOTEMPTY
-                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                        ENOTEMPTY)
+    declare_error(ENOTEMPTY),
 #endif
 #ifdef ENAMETOOLONG
-                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                            ENAMETOOLONG)
+    declare_error(ENAMETOOLONG),
 #endif
 #ifdef ELOOP
-                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                ELOOP)
+    declare_error(ELOOP),
 #endif
 #ifdef EOPNOTSUPP
-                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                    EOPNOTSUPP)
+    declare_error(EOPNOTSUPP),
 #endif
 #ifdef EPFNOSUPPORT
-                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                        EPFNOSUPPORT)
+    declare_error(EPFNOSUPPORT),
 #endif
 #ifdef ECONNRESET
-                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                            ECONNRESET)
+    declare_error(ECONNRESET),
 #endif
 #ifdef ENOBUFS
-                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                ENOBUFS)
+    declare_error(ENOBUFS),
 #endif
 #ifdef EAFNOSUPPORT
-                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                    EAFNOSUPPORT)
+    declare_error(EAFNOSUPPORT),
 #endif
 #ifdef EPROTOTYPE
-                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                        EPROTOTYPE)
+    declare_error(EPROTOTYPE),
 #endif
 #ifdef ENOTSOCK
-                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                            ENOTSOCK)
+    declare_error(ENOTSOCK),
 #endif
 #ifdef ENOPROTOOPT
-                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                ENOPROTOOPT)
+    declare_error(ENOPROTOOPT),
 #endif
 #ifdef ESHUTDOWN
-                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                    ESHUTDOWN)
+    declare_error(ESHUTDOWN),
 #endif
 #ifdef ECONNREFUSED
-                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                        ECONNREFUSED)
+    declare_error(ECONNREFUSED),
 #endif
 #ifdef EADDRINUSE
-                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                            EADDRINUSE)
+    declare_error(EADDRINUSE),
 #endif
 #ifdef ECONNABORTED
-                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                ECONNABORTED)
+    declare_error(ECONNABORTED),
 #endif
 #ifdef ENETUNREACH
-                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                    ENETUNREACH)
+    declare_error(ENETUNREACH),
 #endif
 #ifdef ENETDOWN
-                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                        ENETDOWN)
+    declare_error(ENETDOWN),
 #endif
 #ifdef ETIMEDOUT
-                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                            ETIMEDOUT)
+    declare_error(ETIMEDOUT),
 #endif
 #ifdef EHOSTDOWN
-                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                EHOSTDOWN)
+    declare_error(EHOSTDOWN),
 #endif
 #ifdef EHOSTUNREACH
-                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                    EHOSTUNREACH)
+    declare_error(EHOSTUNREACH),
 #endif
 #ifdef EINPROGRESS
-                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                        EINPROGRESS)
+    declare_error(EINPROGRESS),
 #endif
 #ifdef EALREADY
-                                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                            EALREADY)
+    declare_error(EALREADY),
 #endif
 #ifdef EDESTADDRREQ
-                                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                EDESTADDRREQ)
+    declare_error(EDESTADDRREQ),
 #endif
 #ifdef EMSGSIZE
-                                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                    EMSGSIZE)
+    declare_error(EMSGSIZE),
 #endif
 #ifdef EPROTONOSUPPORT
-                                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                        EPROTONOSUPPORT)
+    declare_error(EPROTONOSUPPORT),
 #endif
 #ifdef ESOCKTNOSUPPORT
-                                                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                            ESOCKTNOSUPPORT)
+    declare_error(ESOCKTNOSUPPORT),
 #endif
 #ifdef EADDRNOTAVAIL
-                                                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                EADDRNOTAVAIL)
+    declare_error(EADDRNOTAVAIL),
 #endif
 #ifdef ENETRESET
-                                                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                    ENETRESET)
+    declare_error(ENETRESET),
 #endif
 #ifdef EISCONN
-                                                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        EISCONN)
+    declare_error(EISCONN),
 #endif
 #ifdef ENOTCONN
-                                                                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            ENOTCONN)
+    declare_error(ENOTCONN),
 #endif
 #ifdef ETOOMANYREFS
-                                                                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(ETOOMANYREFS)
+    declare_error(ETOOMANYREFS),
 #endif
 #ifdef EPROCLIM
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    EPROCLIM)
+    declare_error(EPROCLIM),
 #endif
 #ifdef EUSERS
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        EUSERS)
+    declare_error(EUSERS),
 #endif
 #ifdef EDQUOT
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            EDQUOT)
+    declare_error(EDQUOT),
 #endif
 #ifdef ESTALE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ESTALE)
+    declare_error(ESTALE),
 #endif
 #ifdef ENOTSUP
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ENOTSUP)
+    declare_error(ENOTSUP),
 #endif
 #ifdef ENOMEDIUM
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ENOMEDIUM)
+    declare_error(ENOMEDIUM),
 #endif
 #ifdef EILSEQ
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            EILSEQ)
+    declare_error(EILSEQ),
 #endif
 #ifdef EOVERFLOW
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                EOVERFLOW)
+    declare_error(EOVERFLOW),
 #endif
 #ifdef ECANCELED
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ECANCELED)
+    declare_error(ECANCELED),
 #endif
 #ifdef ENOTRECOVERABLE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        ENOTRECOVERABLE)
+    declare_error(ENOTRECOVERABLE),
 #endif
 #ifdef EOWNERDEAD
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(EOWNERDEAD)
+    declare_error(EOWNERDEAD),
 #endif
 #ifdef ESTRPIPE
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                ESTRPIPE)
+    declare_error(ESTRPIPE),
 #endif
 #ifdef EHWPOISON
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    EHWPOISON)
+    declare_error(EHWPOISON),
 #endif
 #ifdef EISNAM
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        EISNAM)
+    declare_error(EISNAM),
 #endif
 #ifdef EKEYEXPIRED
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            EKEYEXPIRED)
+    declare_error(EKEYEXPIRED),
 #endif
 #ifdef EKEYREJECTED
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                EKEYREJECTED)
+    declare_error(EKEYREJECTED),
 #endif
 #ifdef EKEYREVOKED
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    EKEYREVOKED)
+    declare_error(EKEYREVOKED),
 #endif
 #ifdef EWOULDBLOCK
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    declare_error(
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        EWOULDBLOCK)
+    declare_error(EWOULDBLOCK),
 #endif
 };
 

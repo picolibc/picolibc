@@ -1,30 +1,3 @@
-#!/bin/bash
-
-HERE="$(dirname $0)"
-
-declare -A tools
-
-tools=(['arm']=arm-linux-gnueabihf-gcc)
-tools+=(['aarch64']=aarch64-linux-gnu-gcc)
-tools+=(['x86_64']=x86_64-linux-gnu-gcc)
-tools+=(['i686']=i686-linux-gnu-gcc)
-
-declare -A run
-
-run=(['arm']=qemu-arm)
-run+=(['aarch64']=qemu-aarch64)
-run+=(['x86_64']=env)
-run+=(['i686']=env)
-
-declare -a arch
-
-arch=(arm aarch64 x86_64 i686)
-
-declare -a headers
-
-
-copyright() {
-    cat <<\EOF
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
@@ -59,46 +32,18 @@ copyright() {
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-EOF
+
+#include <sys/wait.h>
+#include <stdio.h>
+
+int
+main(void)
+{
+    printf("#define LINUX_WNOHANG 0x%x\n", WNOHANG);
+    printf("#define LINUX_WUNTRACED 0x%x\n", WUNTRACED);
+    printf("#define LINUX_WCONTINUED 0x%x\n", WCONTINUED);
+
+    /* should check status macros somehow */
+
+    return 0;
 }
-
-wrap() {
-    ARCH=$1
-    HEADER=$2
-    OUT=$3
-    DIR=$(dirname ${OUT})
-    mkdir -p $DIR
-    CC="${tools[$ARCH]}"
-    RUN="${run[$ARCH]}"
-    UP=$(echo $HEADER | tr a-z A-Z)
-    SOURCE="${HERE}"/make-${HEADER}.c
-    EXEC=make-${HEADER}-${ARCH}
-    "${CC}" ${SOURCE} -o ${EXEC} || exit 1
-    (
-    copyright
-    
-    DEF="_LINUX_${UP}_H_"
-    echo "#ifndef ${DEF}"
-    echo "#define ${DEF}"
-    case "$HEADER" in
-	errno|termios|signal)
-	    "${RUN}" ./${EXEC} || exit 1
-	    ;;
-	*)
-	    "${RUN}" ./${EXEC} | sort -nk3 || exit 1
-	    ;;
-    esac
-    rm "${EXEC}"
-    echo "#endif /* ${DEF} */") > $OUT
-    clang-format -i $OUT
-}
-
-headers=(errno fcntl poll signal syscall termios time wait)
-
-for a in "${arch[@]}"; do
-    for h in "${headers[@]}"; do
-	OUT="machine/$a/linux/linux-$h.h"
-	wrap $a $h $OUT || exit 1
-    done
-done
-

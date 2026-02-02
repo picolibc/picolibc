@@ -1,0 +1,163 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+#ifndef _LINUX_SIGNAL_H_
+#define _LINUX_SIGNAL_H_
+#define LINUX_SIG_DFL ((_sig_func_ptr)0)
+#define LINUX_SIG_IGN ((_sig_func_ptr)1)
+#define LINUX_SIG_ERR ((_sig_func_ptr) - 1)
+
+enum __linux_signal {
+    __LINUX_SIGHUP = 1,
+    __LINUX_SIGINT = 2,
+    __LINUX_SIGQUIT = 3,
+    __LINUX_SIGILL = 4,
+    __LINUX_SIGTRAP = 5,
+    __LINUX_SIGIOT = 6,
+    __LINUX_SIGABRT = 6,
+    __LINUX_SIGFPE = 8,
+    __LINUX_SIGKILL = 9,
+    __LINUX_SIGBUS = 7,
+    __LINUX_SIGSEGV = 11,
+    __LINUX_SIGSYS = 31,
+    __LINUX_SIGPIPE = 13,
+    __LINUX_SIGALRM = 14,
+    __LINUX_SIGTERM = 15,
+    __LINUX_SIGURG = 23,
+    __LINUX_SIGSTOP = 19,
+    __LINUX_SIGTSTP = 20,
+    __LINUX_SIGCONT = 18,
+    __LINUX_SIGCHLD = 17,
+    __LINUX_SIGCLD = 17,
+    __LINUX_SIGTTIN = 21,
+    __LINUX_SIGTTOU = 22,
+    __LINUX_SIGIO = 29,
+    __LINUX_SIGPOLL = 29,
+    __LINUX_SIGXCPU = 24,
+    __LINUX_SIGXFSZ = 25,
+    __LINUX_SIGVTALRM = 26,
+    __LINUX_SIGPROF = 27,
+    __LINUX_SIGWINCH = 28,
+    __LINUX_SIGUSR1 = 10,
+    __LINUX_SIGUSR2 = 12,
+} __attribute__((packed));
+
+enum __picolibc_signal {
+    __PICOLIBC_SIGHUP = SIGHUP,
+    __PICOLIBC_SIGINT = SIGINT,
+    __PICOLIBC_SIGQUIT = SIGQUIT,
+    __PICOLIBC_SIGILL = SIGILL,
+    __PICOLIBC_SIGTRAP = SIGTRAP,
+    __PICOLIBC_SIGIOT = SIGIOT,
+    __PICOLIBC_SIGABRT = SIGABRT,
+    __PICOLIBC_SIGFPE = SIGFPE,
+    __PICOLIBC_SIGKILL = SIGKILL,
+    __PICOLIBC_SIGBUS = SIGBUS,
+    __PICOLIBC_SIGSEGV = SIGSEGV,
+    __PICOLIBC_SIGSYS = SIGSYS,
+    __PICOLIBC_SIGPIPE = SIGPIPE,
+    __PICOLIBC_SIGALRM = SIGALRM,
+    __PICOLIBC_SIGTERM = SIGTERM,
+    __PICOLIBC_SIGURG = SIGURG,
+    __PICOLIBC_SIGSTOP = SIGSTOP,
+    __PICOLIBC_SIGTSTP = SIGTSTP,
+    __PICOLIBC_SIGCONT = SIGCONT,
+    __PICOLIBC_SIGCHLD = SIGCHLD,
+    __PICOLIBC_SIGCLD = SIGCLD,
+    __PICOLIBC_SIGTTIN = SIGTTIN,
+    __PICOLIBC_SIGTTOU = SIGTTOU,
+    __PICOLIBC_SIGIO = SIGIO,
+    __PICOLIBC_SIGPOLL = SIGPOLL,
+    __PICOLIBC_SIGXCPU = SIGXCPU,
+    __PICOLIBC_SIGXFSZ = SIGXFSZ,
+    __PICOLIBC_SIGVTALRM = SIGVTALRM,
+    __PICOLIBC_SIGPROF = SIGPROF,
+    __PICOLIBC_SIGWINCH = SIGWINCH,
+    __PICOLIBC_SIGUSR1 = SIGUSR1,
+    __PICOLIBC_SIGUSR2 = SIGUSR2,
+} __attribute__((packed));
+
+#ifdef SIGNAL_LINUX_TO_PICOLIBC
+static const enum __picolibc_signal __signal_linux_to_picolibc[] = {
+    [0] = __PICOLIBC_SIGINT,
+    [__LINUX_SIGHUP] = __PICOLIBC_SIGHUP,
+    [__LINUX_SIGINT] = __PICOLIBC_SIGINT,
+    [__LINUX_SIGQUIT] = __PICOLIBC_SIGQUIT,
+    [__LINUX_SIGILL] = __PICOLIBC_SIGILL,
+    [__LINUX_SIGTRAP] = __PICOLIBC_SIGTRAP,
+    [__LINUX_SIGIOT] = __PICOLIBC_SIGIOT,
+    [__LINUX_SIGBUS] = __PICOLIBC_SIGBUS,
+    [__LINUX_SIGFPE] = __PICOLIBC_SIGFPE,
+    [__LINUX_SIGKILL] = __PICOLIBC_SIGKILL,
+    [__LINUX_SIGUSR1] = __PICOLIBC_SIGUSR1,
+    [__LINUX_SIGSEGV] = __PICOLIBC_SIGSEGV,
+    [__LINUX_SIGUSR2] = __PICOLIBC_SIGUSR2,
+    [__LINUX_SIGPIPE] = __PICOLIBC_SIGPIPE,
+    [__LINUX_SIGALRM] = __PICOLIBC_SIGALRM,
+    [__LINUX_SIGTERM] = __PICOLIBC_SIGTERM,
+    [16] = __PICOLIBC_SIGINT,
+    [__LINUX_SIGCHLD] = __PICOLIBC_SIGCHLD,
+    [__LINUX_SIGCONT] = __PICOLIBC_SIGCONT,
+    [__LINUX_SIGSTOP] = __PICOLIBC_SIGSTOP,
+    [__LINUX_SIGTSTP] = __PICOLIBC_SIGTSTP,
+    [__LINUX_SIGTTIN] = __PICOLIBC_SIGTTIN,
+    [__LINUX_SIGTTOU] = __PICOLIBC_SIGTTOU,
+    [__LINUX_SIGURG] = __PICOLIBC_SIGURG,
+    [__LINUX_SIGXCPU] = __PICOLIBC_SIGXCPU,
+    [__LINUX_SIGXFSZ] = __PICOLIBC_SIGXFSZ,
+    [__LINUX_SIGVTALRM] = __PICOLIBC_SIGVTALRM,
+    [__LINUX_SIGPROF] = __PICOLIBC_SIGPROF,
+    [__LINUX_SIGWINCH] = __PICOLIBC_SIGWINCH,
+    [__LINUX_SIGIO] = __PICOLIBC_SIGIO,
+    [30] = __PICOLIBC_SIGINT,
+    [__LINUX_SIGSYS] = __PICOLIBC_SIGSYS,
+};
+#endif
+
+#ifdef SIGNAL_PICOLIBC_TO_LINUX
+static const enum __linux_signal __signal_picolibc_to_linux[] = {
+    [0] = __LINUX_SIGINT,        [SIGHUP] = __LINUX_SIGHUP,     [SIGINT] = __LINUX_SIGINT,
+    [SIGQUIT] = __LINUX_SIGQUIT, [SIGILL] = __LINUX_SIGILL,     [SIGTRAP] = __LINUX_SIGTRAP,
+    [SIGIOT] = __LINUX_SIGIOT,   [7] = __LINUX_SIGINT,          [SIGFPE] = __LINUX_SIGFPE,
+    [SIGKILL] = __LINUX_SIGKILL, [SIGBUS] = __LINUX_SIGBUS,     [SIGSEGV] = __LINUX_SIGSEGV,
+    [SIGSYS] = __LINUX_SIGSYS,   [SIGPIPE] = __LINUX_SIGPIPE,   [SIGALRM] = __LINUX_SIGALRM,
+    [SIGTERM] = __LINUX_SIGTERM, [SIGURG] = __LINUX_SIGURG,     [SIGSTOP] = __LINUX_SIGSTOP,
+    [SIGTSTP] = __LINUX_SIGTSTP, [SIGCONT] = __LINUX_SIGCONT,   [SIGCHLD] = __LINUX_SIGCHLD,
+    [SIGTTIN] = __LINUX_SIGTTIN, [SIGTTOU] = __LINUX_SIGTTOU,   [SIGIO] = __LINUX_SIGIO,
+    [SIGXCPU] = __LINUX_SIGXCPU, [SIGXFSZ] = __LINUX_SIGXFSZ,   [SIGVTALRM] = __LINUX_SIGVTALRM,
+    [SIGPROF] = __LINUX_SIGPROF, [SIGWINCH] = __LINUX_SIGWINCH, [29] = __LINUX_SIGINT,
+    [SIGUSR1] = __LINUX_SIGUSR1, [SIGUSR2] = __LINUX_SIGUSR2,
+};
+#endif
+#endif /* _LINUX_SIGNAL_H_ */

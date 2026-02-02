@@ -35,6 +35,7 @@
 
 #define _GNU_SOURCE
 #include <time.h>
+#include <sys/time.h>
 #include <stdio.h>
 
 int
@@ -55,5 +56,8 @@ main(void)
 #ifdef TIMER_ABSTIME
     printf("#define %-32.32s 0x%08x\n", "LINUX_TIMER_ABSTIME", TIMER_ABSTIME);
 #endif
+    printf("#define %-32.32s 0x%08x\n", "LINUX_ITIMER_REAL", ITIMER_REAL);
+    printf("#define %-32.32s 0x%08x\n", "LINUX_ITIMER_VIRTUAL", ITIMER_VIRTUAL);
+    printf("#define %-32.32s 0x%08x\n", "LINUX_ITIMER_PROF", ITIMER_PROF);
     return 0;
 }
