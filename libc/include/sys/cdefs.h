@@ -377,6 +377,20 @@
 #define __align_down(x, y) __builtin_align_down(x, y)
 #define __is_aligned(x, y) __builtin_is_aligned(x, y)
 
+#ifdef __HAVE_BUILTIN_ADD_OVERFLOW
+#define __picolibc_add_overflow(a, b, c) __builtin_add_overflow(a, b, c)
+#else
+#define __picolibc_add_overflow(a, b, c)                                                \
+    ({                                                                                  \
+        __typeof(a)  __a = (a);                                                         \
+        __typeof(b)  __b = (b);                                                         \
+        __typeof(*c) __c = __a + __b;                                                   \
+        int          __ret = ((__c < 0 && __a > 0 && __b > 0) || (__a < 0 && __b < 0)); \
+        (*c) = __c;                                                                     \
+        __ret;                                                                          \
+    })
+#endif
+
 /*
  * When the address sanitizer is enabled, we must prevent the library
  * from even reading beyond the end of input data. This happens in

@@ -31,6 +31,15 @@ isleap(int y)
     return y % 4 == 0 && (y % 100 != 0 || y % 400 == 0);
 }
 
+static inline int
+isleap2(int y, int y_off)
+{
+    // range reduce to avoid integer overflow
+    if (y_off)
+        y = y % 400 + y_off;
+    return isleap(y);
+}
+
 int                  __tzcalc_limits(int __year);
 
 extern const uint8_t __month_lengths[2][MONSPERYEAR];
