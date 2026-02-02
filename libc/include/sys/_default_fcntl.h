@@ -62,6 +62,7 @@ typedef __off64_t off64_t; /* 64-bit file offset */
 #define O_TRUNC  _FTRUNC
 #define O_EXCL   _FEXCL
 #define O_SYNC   _FSYNC
+#define O_ASYNC  _FASYNC
 /*	O_NDELAY	_FNDELAY 	set in include/fcntl.h */
 /*	O_NDELAY	_FNBIO 		set in include/fcntl.h */
 #define O_NONBLOCK _FNONBLOCK

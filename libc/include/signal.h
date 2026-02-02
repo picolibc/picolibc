@@ -227,7 +227,7 @@ typedef _sig_func_ptr sighandler_t; /* glibc naming */
 #if __POSIX_VISIBLE
 int kill(__pid_t pid, int sig);
 #endif
-#if __XSI_VISIBLE >= 500
+#if __XSI_VISIBLE >= 500 || __GNU_VISIBLE || __BSD_VISIBLE
 int killpg(__pid_t pid, int sig);
 #endif
 #if __POSIX_VISIBLE >= 200809L
