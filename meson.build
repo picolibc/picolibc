@@ -1165,6 +1165,7 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('PREFIX', global_prefix)
     picolibc_ld_data.set('INITTLS', ld_comment)
     picolibc_ld_data.set('DATATLS', '')
+    picolibc_ld_data.set('LINUX', '')
 
     # non-exec mode for ram PHDR
     picolibc_ld_data.set('RAM_MODE', 'w!rx')
@@ -1527,6 +1528,7 @@ foreach params : [default_target] + targets
     # linux also needs inittls
     picolibc_linux_ld_data.set('INITTLS', '')
     picolibc_linux_ld_data.set('DATATLS', ld_comment)
+    picolibc_linux_ld_data.set('LINUX', ld_comment)
 
     # attributes for read-only data sections
     picolibc_linux_ld_data.set('RODATA_MEM', 'ram')
