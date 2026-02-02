@@ -358,7 +358,7 @@ static int
 iso_year_adjust(const struct tm *tim_p)
 {
     /* Account for fact that tm_year==0 is year 1900.  */
-    int leap = isleap(tim_p->tm_year + (YEAR_BASE - (tim_p->tm_year < 0 ? 0 : 2000)));
+    int leap = isleap2(tim_p->tm_year, (YEAR_BASE - (tim_p->tm_year < 0 ? 0 : 2000)));
 
     /* Pack the yday, wday, and leap year into a single int since there are so
        many disparate cases.  */
@@ -1140,8 +1140,8 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                    previous year was leap year.  */
                 week = 52
                     + (4 >= (wday - tim_p->tm_yday
-                             - isleap(tim_p->tm_year
-                                      + (YEAR_BASE - 1 - (tim_p->tm_year < 0 ? 0 : 2000)))));
+                             - isleap2(tim_p->tm_year,
+                                       (YEAR_BASE - 1 - (tim_p->tm_year < 0 ? 0 : 2000)))));
 #ifdef _WANT_C99_TIME_FORMATS
             if (alt != CQ('O') || !*alt_digits
                 || !(len = conv_to_alt_digits(&s[count], maxsize - count, week, *alt_digits)))

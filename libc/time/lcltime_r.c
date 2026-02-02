@@ -41,6 +41,8 @@ localtime_r(const time_t * __restrict tim_p, struct tm * __restrict res)
     const uint8_t        *ip;
 
     res = gmtime_r(tim_p, res);
+    if (res == NULL)
+        return NULL;
 
     year = res->tm_year + YEAR_BASE;
     ip = __month_lengths[isleap(year)];
