@@ -33,31 +33,41 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#ifndef _LINUX_SIGACTION_H_
 
-#define _GNU_SOURCE
+#define __KERNEL_NSIG 64
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
+struct __kernel_sigaction {
+    _sig_func_ptr sa_handler;
+    unsigned long sa_flags;
+    void          (*sa_restorer)(void);
+    unsigned long sa_mask[__KERNEL_NSIG / (sizeof(unsigned long) * 8)];
+};
 
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
+typedef struct __kernel_sigaltstack {
+    void  *ss_sp;
+    int    ss_flags;
+    size_t ss_size;
+} __kernel_stack_t;
 
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
+static inline void
+__kernel_sa_set_mask(struct __kernel_sigaction *sa, int sig)
+{
+    unsigned si = (sig - 1);
+    int      w = si / (sizeof(sa->sa_mask[0]) * 8);
+    int      b = si % (sizeof(sa->sa_mask[0]) * 8);
 
-long syscall(long sys_call, ...);
-long _syscall_error(long ret);
-int  _signal_to_linux(int sig);
-int  _signal_from_linux(int sig);
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
+    sa->sa_mask[w] |= (1UL << b);
+}
 
-#endif /* _LOCAL_LINUX_H_ */
+static inline int
+__kernel_sa_get_mask(struct __kernel_sigaction *sa, int sig)
+{
+    unsigned si = (sig - 1);
+    int      w = si / (sizeof(sa->sa_mask[0]) * 8);
+    int      b = si % (sizeof(sa->sa_mask[0]) * 8);
+
+    return (sa->sa_mask[w] >> b) & 1;
+}
+
+#endif

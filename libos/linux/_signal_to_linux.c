@@ -33,31 +33,17 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_LINUX_H_
-#define _LOCAL_LINUX_H_
+#include "local-linux.h"
+#define SIGNAL_PICOLIBC_TO_LINUX
+#include <signal.h>
+#include <linux/linux-signal.h>
 
-#define _GNU_SOURCE
+#define NSIG (sizeof(__signal_picolibc_to_linux) / sizeof(__signal_picolibc_to_linux[0]))
 
-#include <errno.h>
-#include <sys/stat.h>
-#include <sys/time.h>
-#include <sys/times.h>
-#include <fcntl.h>
-#include <unistd.h>
-
-#include <linux/linux-fcntl.h>
-#include <linux/linux-poll.h>
-#include <linux/linux-syscall.h>
-#include <linux/linux-termios.h>
-#include <linux/linux-time.h>
-
-#define __GLIBC__ 2 /* Avoid getting the defines */
-#include <linux/stat.h>
-
-long syscall(long sys_call, ...);
-long _syscall_error(long ret);
-int  _signal_to_linux(int sig);
-int  _signal_from_linux(int sig);
-int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
-
-#endif /* _LOCAL_LINUX_H_ */
+int
+_signal_to_linux(int sig)
+{
+    if ((unsigned)sig < NSIG)
+        return (int)__signal_picolibc_to_linux[sig];
+    return (int)__LINUX_SIGINT;
+}
