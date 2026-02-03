@@ -60,30 +60,42 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
     default:
         goto bail;
     }
-    if (bf->bflags & __BALL) {
+    if (size == 0) {
         if (buf) {
-            free(bf->buf);
-            bf->bflags &= ~__BALL;
-        } else {
-            /*
-             * Handling allocation failures here is a bit tricky;
-             * we don't want to lose the existing buffer. Instead,
-             * we try to reallocate it
-             */
-            buf = realloc(bf->buf, size);
+            ret = _FDEV_ERR;
+            goto bail;
+        }
+        if (bf->size > 1)
+            size = (size_t)bf->size;
+        else
+            size = BUFSIZ;
+    }
+    if (size != (size_t)bf->size) {
+        if (bf->bflags & __BALL) {
+            if (buf) {
+                free(bf->buf);
+                bf->bflags &= ~__BALL;
+            } else {
+                /*
+                 * Handling allocation failures here is a bit tricky;
+                 * we don't want to lose the existing buffer. Instead,
+                 * we try to reallocate it
+                 */
+                buf = realloc(bf->buf, size);
+                if (!buf)
+                    goto bail;
+            }
+        } else if (!buf) {
+            buf = malloc(size);
             if (!buf)
                 goto bail;
+            bf->bflags |= __BALL;
         }
-    } else if (!buf) {
-        buf = malloc(size);
-        if (!buf)
-            goto bail;
-        bf->bflags |= __BALL;
+        if (bf->bflags & __BALL)
+            bf->xfile.cfile.close = __bufio_close;
+        bf->buf = buf;
+        bf->size = size;
     }
-    if (bf->bflags & __BALL)
-        bf->xfile.cfile.close = __bufio_close;
-    bf->buf = buf;
-    bf->size = size;
     ret = 0;
 bail:
     __bufio_unlock(f);
