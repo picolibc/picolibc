@@ -55,19 +55,19 @@ memalign(size_t align, size_t s)
         return NULL;
     }
 
-    align = MAX(align, MALLOC_MINSIZE);
+    align = MAX(align, UP_POT(MALLOC_CHUNK_MIN));
 
-    if (s > MALLOC_MAXSIZE - align) {
+    if (s > MALLOC_ALLOC_MAX - align) {
         errno = ENOMEM;
         return NULL;
     }
 
-    s = __align_up(MAX(s, 1), MALLOC_CHUNK_ALIGN);
+    s = chunk_size(s);
 
     /* Make sure there's space to align the allocation and split
      * off chunk_t from the front
      */
-    size_with_padding = s + align + MALLOC_MINSIZE;
+    size_with_padding = s + align + MALLOC_CHUNK_MIN;
 
     allocated = __malloc_malloc(size_with_padding);
     if (allocated == NULL)
@@ -81,7 +81,7 @@ memalign(size_t align, size_t s)
 
     /* Split off the front piece if necessary */
     if (offset) {
-        if (offset < MALLOC_MINSIZE) {
+        if (offset < MALLOC_CHUNK_MIN) {
             aligned_p += align;
             offset += align;
         }
@@ -94,15 +94,16 @@ memalign(size_t align, size_t s)
         chunk_p = new_chunk_p;
     }
 
-    offset = _size(chunk_p) - chunk_size(s);
+    offset = _size(chunk_p) - s;
 
     /* Split off the back piece if large enough */
-    if (offset >= MALLOC_MINSIZE) {
+    if (offset >= MALLOC_CHUNK_MIN) {
         *_size_ref(chunk_p) -= offset;
 
         make_free_chunk(chunk_after(chunk_p), offset);
     }
-    return aligned_p;
+
+    return chunk_to_ptr(chunk_p);
 }
 
 #ifdef __strong_reference

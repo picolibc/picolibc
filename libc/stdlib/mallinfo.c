@@ -56,7 +56,7 @@ mallinfo(void)
         ordblks++;
         free_size += _size(pf);
     }
-#ifdef MALLOC_MAX_BUCKET_POT
+#if __MALLOC_SMALL_BUCKET
     size_t b;
     size_t smblks = 0;
     size_t fsmblks = 0;
