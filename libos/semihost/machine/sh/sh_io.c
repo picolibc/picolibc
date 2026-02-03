@@ -38,7 +38,7 @@
 #include <unistd.h>
 #include "sh_semihost.h"
 
-int
+static int
 sh_putc(char c, FILE *file)
 {
     (void)file;

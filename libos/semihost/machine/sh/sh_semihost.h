@@ -74,8 +74,4 @@ uint32_t sh_syscall(uint32_t r4, uint32_t r5, uint32_t r6, uint32_t r7);
 
 #endif
 
-int sh_putc(char c, FILE *file);
-
-int sh_getc(FILE *file);
-
 #endif /* _SH_SEMIHOST_H_ */
