@@ -33,7 +33,17 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <picolibc.h>
 #include "../../crt0.h"
+
+/* Define __ARCEM__ and __ARCHS__ for older GCC for ARC */
+#if defined (__EM__) && !defined (__ARCEM__)
+#define __ARCEM__ 1
+#endif
+
+#if defined (__HS__) && !defined (__ARCHS__)
+#define __ARCHS__ 1
+#endif
 
 static void __used __section(".init")
 _cstart(void)
@@ -42,28 +52,83 @@ _cstart(void)
 }
 
 extern char __stack[];
+extern char __SDATA_BEGIN__[];
+extern char __JLI_TABLE__[];
 extern void(* const __vector_table[]);
 
-#ifdef __ARC64_ARCH64__
-#define SRR  "srl"
-#define LRR  "lrl"
-#define PUSH "pushl"
-typedef uint64_t reg_t;
-#else
 #define SRR  "sr"
 #define LRR  "lr"
 #define PUSH "push"
 typedef uint32_t reg_t;
-#endif
 
 void __naked __section(".init") __used
 _start(void)
 {
+    /**
+     * Set STATUS32.AD bit to enable referencing unaligned
+     * memory addresses for ARC HS
+     */
+#ifdef __ARCHS__
+    __asm__(LRR " r2, [0xA]\n"
+            "bset r2, r2, 19\n"
+            "flag r2");
+#endif
+
+    /* Initialize JLI (Jump and Link Indexed) table */
+#ifdef __ARC_CODE_DENSITY__
+    __asm__(SRR " %0, [jli_base]" : : "r"(__JLI_TABLE__));
+#endif
+
     /* Set up the stack pointer */
-    __asm__("mov_s sp, %0" : : "r"(__stack));
+    __asm__("mov sp, %0" : : "i"(__stack));
+
+    /* Set up the global pointer if it's not occupied by TLS */
+#ifndef __THREAD_LOCAL_STORAGE
+    __asm__("mov gp, %0" : : "i"(__SDATA_BEGIN__));
+#endif
 
     /* Set up the vector table */
-    __asm__(SRR " %0, [0x25]" : : "r"(__vector_table));
+    __asm__(SRR " %0, [0x25]" : : "i"(__vector_table));
+
+    /* Clear the registers except r26 (GP) and r28 (SP) */
+    __asm__("mov_s r0, 0\n"
+            "mov_s r1, 0\n"
+            "mov_s r2, 0\n"
+            "mov_s r3, 0\n"
+#ifndef __ARC_RF16__
+            "mov r4, 0\n"
+            "mov r5, 0\n"
+            "mov r6, 0\n"
+            "mov r7, 0\n"
+            "mov r8, 0\n"
+            "mov r9, 0\n"
+#endif
+            "mov r10, 0\n"
+            "mov r11, 0\n"
+            "mov_s r12, 0\n"
+            "mov_s r13, 0\n"
+            "mov_s r14, 0\n"
+            "mov_s r15, 0\n"
+#ifndef __ARC_RF16__
+            "mov r16, 0\n"
+            "mov r17, 0\n"
+            "mov r18, 0\n"
+            "mov r19, 0\n"
+            "mov r20, 0\n"
+            "mov r21, 0\n"
+            "mov r22, 0\n"
+            "mov r23, 0\n"
+            "mov r24, 0\n"
+            "mov r25, 0\n"
+#endif
+            "mov r27, 0\n"
+#if defined (__ARCEM__) || defined (__ARCHS__)
+            "mov ilink, 0\n"
+            "mov r30, 0\n");
+#else
+            "mov ilink1, 0\n"
+            "mov ilink2, 0\n");
+#endif
 
     /* Branch to C code */
     __asm__("j _cstart");
@@ -147,6 +212,8 @@ arc_fault(struct fault *f, int reason)
     _exit(1);
 }
 
+#ifndef __ARC_RF16__
+
 #define VECTOR_COMMON                                                   \
     __asm__(PUSH "  r31\n " PUSH " r30\n " PUSH " r29\n " PUSH " r28"); \
     __asm__(PUSH "  r27\n " PUSH " r26\n " PUSH " r25\n " PUSH " r24"); \
@@ -162,6 +229,22 @@ arc_fault(struct fault *f, int reason)
     __asm__(LRR " r0, [0x401]\n " PUSH " r0");                          \
     __asm__(LRR " r0, [0x400]\n " PUSH " r0");                          \
     __asm__("mov_s r0, sp")
+
+#else
+
+#define VECTOR_COMMON                                                   \
+    __asm__(PUSH "  r31\n " PUSH " r30\n " PUSH " r29\n " PUSH " r28"); \
+    __asm__(PUSH "  r27\n " PUSH " r26\n " PUSH " r15\n " PUSH " r14"); \
+    __asm__(PUSH "  r13\n " PUSH " r12\n " PUSH " r11\n " PUSH " r10"); \
+    __asm__(PUSH "   r3\n " PUSH "  r2\n " PUSH "  r1\n " PUSH "  r0"); \
+    __asm__(LRR " r0, [0x404]\n " PUSH " r0");                          \
+    __asm__(LRR " r0, [0x403]\n " PUSH " r0");                          \
+    __asm__(LRR " r0, [0x402]\n " PUSH " r0");                          \
+    __asm__(LRR " r0, [0x401]\n " PUSH " r0");                          \
+    __asm__(LRR " r0, [0x400]\n " PUSH " r0");                          \
+    __asm__("mov_s r0, sp")
+
+#endif
 
 void __naked __section(".init")
 arc_memory_error_vector(void)
