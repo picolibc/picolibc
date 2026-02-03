@@ -99,6 +99,10 @@ main(void)
             printf("    got %p\n", old_func);
             if (old_func != SIG_DFL) {
                 printf("signal %d: old_func was %p, not SIG_DFL\n", sig, old_func);
+                if (old_func == (void (*)(int))-1 && errno == EPERM) {
+                    printf("Assuming github seccomp filter is active, ignoring\n");
+                    continue;
+                }
                 fail = 1;
             }
 
