@@ -37,7 +37,11 @@
 
 extern char __stack[];
 
+/* Make sure this function is optimized so that it doesn't use the stack */
 void __section(".init") __used
+#ifndef __OPTIMIZE
+__attribute__((optimize("O2")))
+#endif
 _start(void)
 {
     /* Generate a reference to __exception_vector so we get one loaded */
