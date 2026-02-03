@@ -603,20 +603,23 @@ if enable_native_math_tests
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m),
-        suite: 'test-math')
+         suite: 'test-math',
+         env: test_env)
     test('math_errhandling-native',
 	 executable('math_errhandling-native', 'math_errhandling.c',
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m),
-        suite: 'test-math')
+         suite: 'test-math',
+         env: test_env)
     test('rounding-mode-native',
 	 executable('rounding-mode-native',
 		    ['rounding-mode.c', 'rounding-mode-sub.c'],
 		    c_args: native_c_args,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m),
-        suite: 'test-math')
+         suite: 'test-math',
+         env: test_env)
     foreach t1 : math_tests_native
       t1_src = t1 + '.c'
 
@@ -625,7 +628,8 @@ if enable_native_math_tests
 		      c_args: native_c_args,
 		      link_args: native_c_args,
                       dependencies: native_lib_m),
-          suite: 'test-math')
+           suite: 'test-math',
+           env: test_env)
     endforeach
 
   endif
@@ -644,7 +648,8 @@ if enable_native_tests
          executable('test-cplusplus-native', 'test-cplusplus.cpp',
                     cpp_args: native_cpp_args,
 		    link_args: native_cpp_args),
-         suite: 'test'
+         suite: 'test',
+         env: test_env
         )
   endif
 
@@ -657,7 +662,8 @@ if enable_native_tests
 	 executable(t1_name, t1_src,
 		    c_args: native_c_args + test_file_name_arg,
 		    link_args: native_c_args),
-         suite: 'test'
+         suite: 'test',
+         env: test_env
         )
   endforeach
 endif

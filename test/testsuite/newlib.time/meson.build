@@ -71,12 +71,15 @@ foreach params : targets
 		    link_depends: _link_depends,
 		    include_directories: test_inc),
          depends: bios_bin,
-	 suite: 'newlib.time', env: test_env)
+	 suite: 'newlib.time',
+         env: test_env)
     if enable_native_tests
       test(test_name + '-native',
            executable(test_name + '-native', [src],
                       c_args: native_c_args + _c_args_extra,
-                      link_args: native_c_args))
+                      link_args: native_c_args),
+           suite: 'newlib.time',
+           env: test_env)
     endif
   endforeach
 endforeach

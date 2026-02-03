@@ -37,6 +37,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #define HANDLER_NOT_CALLED 0
 #define HANDLER_SUCCESS    1
@@ -49,6 +50,7 @@ static volatile sig_atomic_t handler_sig_received;
 static void
 signal_handler(int sig)
 {
+    printf("            ******* caught %d *******\n", sig);
     handler_sig_received = sig;
     if (sig == (int)handler_sig_expect)
         handler_result = HANDLER_SUCCESS;
@@ -77,6 +79,7 @@ main(void)
     int      fail = 0;
     int      mode;
 
+    setvbuf(stdout, NULL, _IOLBF, BUFSIZ);
     for (u = 0; u < NTEST_SIG; u++) {
         int sig = test_signals[u];
         prev_func = SIG_DFL;
@@ -91,7 +94,9 @@ main(void)
             }
 
             /* Set up the signal handler */
+            printf("call signal(%d, %p)\n", sig, new_func);
             old_func = signal(sig, new_func);
+            printf("    got %p\n", old_func);
             if (old_func != SIG_DFL) {
                 printf("signal %d: old_func was %p, not SIG_DFL\n", sig, old_func);
                 fail = 1;
@@ -102,7 +107,9 @@ main(void)
             handler_result = HANDLER_NOT_CALLED;
             handler_sig_expect = (sig_atomic_t)sig;
 
+            printf("    call raise(%d)\n", sig);
             ret = raise(sig);
+            printf("        got %d (errno %d)\n", ret, errno);
             if (ret != 0) {
                 printf("signal %d: raise returned %d\n", sig, ret);
                 fail = 1;
@@ -137,7 +144,9 @@ main(void)
                 break;
             }
 
+            printf("    call signal(%d, SIG_DFL)\n", sig);
             old_func = signal(sig, SIG_DFL);
+            printf("        got %p\n", old_func);
             if (old_func != prev_func) {
                 printf("signal %d: after test, signal is %p expected %p\n", sig, old_func,
                        prev_func);

@@ -108,7 +108,8 @@ if enable_native_tests
 	 executable(t1_name, t1_src,
 		    c_args: native_c_args + ctype_c_args,
 		    link_args: native_c_args),
-         suite: 'test-string'
+         suite: 'test-string',
+         env: test_env
         )
   endforeach
 
