@@ -75,7 +75,9 @@ static int
 or1k_getc(FILE *file)
 {
     (void)file;
-    return EOF;
+    while ((uart.lsr & (UART_LSR_DR)) == 0)
+        ;
+    return (unsigned char)uart.data;
 }
 
 static FILE __stdio = FDEV_SETUP_STREAM(or1k_putc, or1k_getc, NULL, _FDEV_SETUP_RW);
