@@ -33,20 +33,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
+
+static char buf[BUFSIZ];
 
 int
 main(void)
 {
-    int ret;
+    int   ret;
+    FILE *f;
 
-    ret = ungetc('u', stdin);
+    f = fmemopen(buf, sizeof(buf), "r");
+    if (!f) {
+        printf("cannot use fmemopen\n");
+        return 1;
+    }
+    ret = ungetc('u', f);
     if (ret != 'u') {
         printf("ungetc unexpectedly returned %d instead of %d\n", ret, 'u');
         return 1;
     }
-    ret = getc(stdin);
+    ret = getc(f);
     if (ret != 'u') {
         printf("getc unexpectedly returned %d instead of %d\n", ret, 'u');
         return 1;
