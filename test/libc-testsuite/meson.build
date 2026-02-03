@@ -116,7 +116,9 @@ if enable_native_tests
 	 executable(t1 + '-native', t1_src,
 		    c_args: native_c_args,
 		    link_args: native_c_args,
-                    dependencies: libc_tests_native_dependencies))
+                    dependencies: libc_tests_native_dependencies),
+         suite: 'libc-testsuite',
+         env: test_env)
   endforeach
 
 endif

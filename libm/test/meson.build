@@ -223,6 +223,8 @@ if enable_native_math_tests
 	 executable('math_test_native', math_test_src,
 		    c_args: native_c_args + defines,
 		    link_args: native_c_args,
-		    dependencies: native_lib_m))
+		    dependencies: native_lib_m),
+         suite: 'math',
+         env: test_env)
   endif
 endif

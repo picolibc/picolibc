@@ -185,7 +185,8 @@ if enable_native_math_tests
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args,
                     dependencies: native_lib_m),
-         suite: 'test-math'
+         suite: 'test-math',
+         env: test_env
         )
   endforeach
 
@@ -200,6 +201,7 @@ if enable_native_math_tests
 		      link_args: native_c_args,
                       dependencies: native_lib_m),
            suite: 'test-math-compare',
+           env: test_env,
            timeout: 7200,
           )
     endforeach

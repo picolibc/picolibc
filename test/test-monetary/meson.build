@@ -91,7 +91,8 @@ if enable_native_tests
 	 executable(t1_name, t1_src,
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args),
-         suite: 'test-monetary'
+         suite: 'test-monetary',
+         env: test_env
         )
   endforeach
 

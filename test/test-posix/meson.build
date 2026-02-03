@@ -94,7 +94,7 @@ foreach params : targets
          depends: bios_bin,
          args: test_args.get(t1, []),
 	 timeout: 60,
-         suite: 'test-stdio',
+         suite: 'test-posix',
 	 env: test_env)
   endforeach
 
@@ -120,7 +120,7 @@ foreach params : targets
          depends: bios_bin,
          args: test_args.get(t1, []),
 	 timeout: 60,
-         suite: 'test-linux',
+         suite: 'test-posix',
 	 env: test_env,
          should_fail: true)
   endforeach
@@ -139,7 +139,8 @@ if enable_native_tests
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args,
                     dependencies: native_lib_m),
-         suite: 'test-linux'
+         suite: 'test-linux',
+         env: test_env
         )
   endforeach
 

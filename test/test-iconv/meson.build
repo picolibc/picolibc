@@ -86,6 +86,9 @@ if enable_native_tests
 
   ctype_c_args = []
 
+  locale_env = test_env
+  locale_env.prepend('LOCPATH', meson.current_build_dir())
+
   locales=[]
   if mb_capable
     locale = 'fr_FR.UTF-8'
@@ -156,7 +159,7 @@ if enable_native_tests
 		    link_args: native_c_args),
          depends: locales,
          suite: 'test-iconv',
-         env: ['LOCPATH=' + meson.current_build_dir()],
+         env: locale_env
         )
   endforeach
 
