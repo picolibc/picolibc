@@ -37,6 +37,8 @@
 #include <signal.h>
 #include <assert.h>
 #include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
 
 static int caught_usr1;
 
@@ -49,8 +51,16 @@ handle_usr1(int sig)
 int
 main(void)
 {
-    signal(SIGUSR1, handle_usr1);
+    void (*old_func)(int);
+    old_func = signal(SIGUSR1, handle_usr1);
+    if (old_func == (void (*)(int))-1 && errno == EPERM) {
+        printf("signal returned EPERM, assuming github CI\n");
+        return 77;
+    }
     kill(getpid(), SIGUSR1);
-    assert(caught_usr1 == SIGUSR1);
+    if (caught_usr1 != SIGUSR1) {
+        printf("caught %d instead of SIGUSR1(%d)\n", caught_usr1, SIGUSR1);
+        return 1;
+    }
     return 0;
 }
