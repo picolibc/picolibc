@@ -612,8 +612,10 @@ main(void)
     double difftime_ret = difftime(time_value, time_value);
     (void)difftime_ret;
 
+#if 0
     struct tm *getdate_ret = getdate(buf);
     (void)getdate_ret;
+#endif
 
     struct tm *gmtime_ret = gmtime(&time_value);
     (void)gmtime_ret;
