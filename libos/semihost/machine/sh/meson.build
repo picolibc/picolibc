@@ -34,8 +34,8 @@
 #
 
 src_semihost += files([
-                       'sh_stub.c',
                        'sh_exit.c',
                        'sh_io.c',
                        'sh_syscall.c',
+                       'sh_write.c',
                      ])

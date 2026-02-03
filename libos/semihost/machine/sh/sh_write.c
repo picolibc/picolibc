@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,85 +33,22 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include <stdlib.h>
 #include <unistd.h>
-#include <string.h>
-#include <errno.h>
 #include "sh_semihost.h"
-
-ssize_t
-read(int fd, void *buf, size_t count)
-{
-    char *b = buf;
-    (void)fd;
-    (void)count;
-    *b = sh_getc(NULL);
-    return 1;
-}
 
 ssize_t
 write(int fd, const void *buf, size_t count)
 {
+#ifdef SH_QEMU
     const char *b = buf;
     size_t      c = count;
 
     (void)fd;
     while (c--)
-        sh_putc(*b++, NULL);
+        sh_serial0.tdr = (unsigned char)*b++;
+#else
+    sh_syscall(TARGET_NEWLIB_SH_SYS_write, fd, (uintptr_t)buf, count);
+#endif
     return count;
-}
-
-int
-open(const char *pathname, int flags, ...)
-{
-    (void)pathname;
-    (void)flags;
-    return -1;
-}
-
-int
-close(int fd)
-{
-    (void)fd;
-    return 0;
-}
-
-off_t
-lseek(int fd, off_t offset, int whence)
-{
-    (void)fd;
-    (void)offset;
-    (void)whence;
-    return (off_t)-1;
-}
-
-off64_t
-lseek64(int fd, off64_t offset, int whence)
-{
-    return (off64_t)lseek(fd, (off_t)offset, whence);
-}
-
-int
-unlink(const char *pathname)
-{
-    (void)pathname;
-    return 0;
-}
-
-int
-fstat(int fd, struct stat *sbuf)
-{
-    (void)fd;
-    (void)sbuf;
-    return -1;
-}
-
-int
-isatty(int fd)
-{
-    (void)fd;
-    return 1;
 }
