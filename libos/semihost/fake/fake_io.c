@@ -45,21 +45,13 @@ fake_putc(char c, FILE *file)
     return c;
 }
 
-static int
-fake_getc(FILE *file)
-{
-    (void)file;
-    return EOF;
-}
-
-static FILE __stdio = FDEV_SETUP_STREAM(fake_putc, fake_getc, NULL, _FDEV_SETUP_RW);
+static FILE __stdio = FDEV_SETUP_STREAM(fake_putc, NULL, NULL, _FDEV_SETUP_RW);
 
 #ifdef __strong_reference
-#define STDIO_ALIAS(x) __strong_reference(stdin, x);
+#define STDIO_ALIAS(x) __strong_reference(stdout, x);
 #else
 #define STDIO_ALIAS(x) FILE * const x = &__stdio;
 #endif
 
-FILE * const stdin = &__stdio;
-STDIO_ALIAS(stdout);
+FILE * const stdout = &__stdio;
 STDIO_ALIAS(stderr);

@@ -61,6 +61,7 @@ struct sh_serial {
 #else
 
 #define TARGET_NEWLIB_SH_SYS_exit  1
+#define TARGET_NEWLIB_SH_SYS_read  3
 #define TARGET_NEWLIB_SH_SYS_write 4
 
 struct sh_syscall_args {
