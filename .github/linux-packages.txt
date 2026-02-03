@@ -36,6 +36,7 @@ qemu-system-x86
 qemu-system-arm
 qemu-system-misc
 qemu-system-ppc64
+qemu-system-riscv
 libdbus-1-dev
 ca-certificates
 wget
