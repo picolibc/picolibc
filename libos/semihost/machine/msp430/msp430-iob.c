@@ -46,7 +46,7 @@ msp430_putc(char c, FILE *file)
     return (unsigned char)c;
 }
 
-static FILE __stdio = FDEV_SETUP_STREAM(msp430_putc, NULL, NULL, _FDEV_SETUP_RW);
+static FILE __stdio = FDEV_SETUP_STREAM(msp430_putc, NULL, NULL, _FDEV_SETUP_WRITE);
 
 #ifdef __strong_reference
 #define STDIO_ALIAS(x) __strong_reference(stdout, x);
