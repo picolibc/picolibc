@@ -70,7 +70,22 @@ while [ $# -gt 0 -a $done -eq 0 ]; do
 done
 
 archstring=""
-readelf="arc-zephyr-elf-readelf"
+
+readelf=
+for candidate in \
+    arc-zephyr-elf-readelf \
+    arc64-zephyr-elf-readelf \
+    arc-gf-elf-readelf \
+    arc-elf32-readelf \
+    arc64-gf-elf-readelf \
+    arc64-elf-readelf
+do
+    if command -v "$candidate" >/dev/null 2>&1; then
+        readelf=$candidate
+        break
+    fi
+done
+
 # If readelf is installed, we can use the attributes
 # in the file to determine the target cpu
 if command -v "$readelf" >/dev/null 2>/dev/null; then
