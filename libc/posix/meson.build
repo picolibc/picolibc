@@ -36,6 +36,8 @@ srcs_posix = [
   'basename.c',
   'collcmp.c',
   'dirname.c',
+  'execvp.c',
+  'execvpe.c',
   'fnmatch.c',
   'fpathconf.c',
   'getlogin.c',
