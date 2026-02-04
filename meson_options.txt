@@ -113,8 +113,6 @@ option('exhaustive-math-tests', type: 'combo', choices: ['true', 'false', 'nativ
        description: 'Run exhaustive binary32 math tests. If set to native, enable when native tests are enabled')
 option('use-stdlib', type: 'boolean', value: false,
        description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
-option('picolib', type: 'boolean', value: true,
-       description: 'Include pico lib bits. Disable when doing native testing.')
 option('semihost', type: 'boolean', value: true,
        description: 'Include semihost bits. Disable when doing native testing.')
 option('os-linux', type: 'boolean', value: false,

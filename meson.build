@@ -127,7 +127,6 @@ endif
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 multilib_exclude = get_option('multilib-exclude')
-enable_picolib = get_option('picolib')
 enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
 picocrt_enable_mmu = get_option('picocrt-enable-mmu')
