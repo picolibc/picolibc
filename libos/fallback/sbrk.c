@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _DEFAULT_SOURCE
 #include <unistd.h>
 #include <errno.h>
 #include <stdint.h>
@@ -47,8 +48,12 @@ extern char __heap_end[];
 
 static char *__brk = __heap_start;
 
+#ifndef __weak_reference
+#define __fallback_sbrk sbrk
+#endif
+
 void *
-sbrk(ptrdiff_t incr)
+__fallback_sbrk(ptrdiff_t incr)
 {
     if (incr < 0) {
         if ((size_t)((uintptr_t)__brk - (uintptr_t)__heap_start) < (size_t)(-incr)) {
@@ -65,3 +70,7 @@ sbrk(ptrdiff_t incr)
     __brk = (char *)((uintptr_t)__brk + incr);
     return ret;
 }
+
+#ifdef __weak_reference
+__weak_reference(__fallback_sbrk, sbrk);
+#endif

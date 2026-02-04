@@ -33,53 +33,25 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
+#include <sys/cdefs.h>
 #include <unistd.h>
 #include <errno.h>
 #include <limits.h>
+#include <stdint.h>
+
+#ifndef __weak_reference
+#define __fallback_pathconf pathconf
+#error
+#endif
 
 long
-pathconf(const char *path, int name)
+__fallback_pathconf(const char *path, int name)
 {
     (void)path;
-    switch (name) {
-    case _PC_LINK_MAX:
-        return _POSIX_LINK_MAX;
-
-    case _PC_MAX_CANON:
-        return _POSIX_MAX_CANON;
-
-    case _PC_MAX_INPUT:
-        return _POSIX_MAX_INPUT;
-
-    case _PC_NAME_MAX:
-        return _POSIX_NAME_MAX;
-
-    case _PC_PATH_MAX:
-        return _POSIX_PATH_MAX;
-
-    case _PC_PIPE_BUF:
-        return _POSIX_PIPE_BUF;
-
-    case _PC_CHOWN_RESTRICTED:
-#ifdef _POSIX_CHOWN_RESTRICTED
-        return _POSIX_CHOWN_RESTRICTED;
-#else
-        return 0;
-#endif
-
-    case _PC_NO_TRUNC:
-#ifdef _POSIX_NO_TRUNC
-        return _POSIX_NO_TRUNC;
-#else
-        return 0;
-#endif
-
-    case _PC_VDISABLE:
-        return 0;
-
-    default:
-        errno = EINVAL;
-        return -1;
-    }
+    return fpathconf(0, name);
 }
+
+#ifdef __weak_reference
+__weak_reference(__fallback_pathconf, pathconf);
+#endif

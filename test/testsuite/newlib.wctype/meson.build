@@ -46,6 +46,10 @@ foreach params : targets
   if is_variable(oslib_test + target)
     _libs += [get_variable(oslib_test + target)]
   endif
+  if is_variable(libfallback_var + target)
+    _libs += [get_variable(libfallback_var + target)]
+  endif
+
   if is_variable(crt0_test + target)
     _objs = [get_variable(crt0_test + target)]
   else

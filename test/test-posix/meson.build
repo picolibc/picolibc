@@ -33,7 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-tests = []
+tests = [
+  'test-pwd',
+  ]
 
 tests_failure = []
 
@@ -46,7 +48,15 @@ if has_os_posix
 endif
 
 test_extra_libs = {}
-test_extra_c_args = {}
+
+arg_posix_io = []
+if tests_enable_posix_io
+  arg_posix_io += ['-DTESTS_ENABLE_POSIX_IO']
+endif
+
+test_extra_c_args = {
+  'test-pwd' : arg_posix_io
+}
 test_args = {}
 
 foreach params : targets
@@ -57,6 +67,9 @@ foreach params : targets
   _libs = [get_variable('lib_c' + target)]
   if is_variable(oslib_test + target)
     _libs += [get_variable(oslib_test + target)]
+  endif
+  if is_variable(libfallback_var + target)
+    _libs += [get_variable(libfallback_var + target)]
   endif
 
   _lib_files=[]

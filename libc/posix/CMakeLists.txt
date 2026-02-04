@@ -44,13 +44,11 @@ picolibc_sources(
   fgetpwent.c
   fgetpwent_r.c
   fnmatch.c
-  fpathconf.c
   getlogin.c
   getpwent.c
   getpwnam.c
   getpwnam_r.c
   getpwuid.c
-  pathconf.c
   getpwuid_r.c
   pwdata.c
   regcomp.c

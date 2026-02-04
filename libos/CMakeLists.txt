@@ -34,3 +34,4 @@
 #
 add_subdirectory(semihost)
 add_subdirectory(dummy)
+add_subdirectory(fallback)

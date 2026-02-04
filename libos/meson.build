@@ -35,7 +35,6 @@
 
 inc_headers_os = []
 inc_sys_headers_os = []
-srcs_os = []
 
 if get_option('semihost')
   subdir('semihost')
@@ -44,5 +43,11 @@ endif
 if get_option('os-linux')
   subdir('linux')
 endif
+
+if os_fallback_option == 'linux'
+  has_os_fallback = has_os_linux
+endif
+
+subdir('fallback')
 
 subdir('dummy')

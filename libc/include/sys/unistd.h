@@ -151,6 +151,7 @@ int fexecve(int __fd, char * const __argv[], char * const __envp[]);
 #endif
 pid_t fork(void);
 long  fpathconf(int __fd, int __name);
+long  __fallback_fpathconf(int __td, int __name);
 int   fsync(int __fd);
 #if __POSIX_VISIBLE >= 199309
 int fdatasync(int __fd);
@@ -227,6 +228,7 @@ off_t lseek(int __fildes, off_t __offset, int __whence);
 int lockf(int __fd, int __cmd, off_t __len);
 #endif
 long pathconf(const char *__path, int __name);
+long __fallback_pathconf(const char *__path, int __name);
 int  pause(void);
 #if __POSIX_VISIBLE >= 199506
 int pthread_atfork(void (*)(void), void (*)(void), void (*)(void));
@@ -250,6 +252,7 @@ int ruserok(const char *rhost, int superuser, const char *ruser, const char *lus
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 void *sbrk(ptrdiff_t __incr);
+void *__fallback_sbrk(ptrdiff_t __incr);
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
 int setegid(gid_t __gid);
@@ -280,6 +283,7 @@ unsigned sleep(unsigned int __seconds);
 void swab(const void * __restrict, void * __restrict, ssize_t);
 #endif
 long  sysconf(int __name);
+long  __fallback_sysconf(int __name);
 pid_t tcgetpgrp(int __fildes);
 int   tcsetpgrp(int __fildes, pid_t __pgrp_id);
 char *ttyname(int __fildes);

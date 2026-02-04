@@ -237,6 +237,7 @@ void psiginfo(const siginfo_t *, const char *);
 void psignal(int, const char *);
 #endif
 int raise(int);
+int __fallback_raise(int);
 #if __MISC_VISIBLE
 int sig2str(int, char *);
 #endif
@@ -259,6 +260,7 @@ int sigismember(const sigset_t *, int);
 #define sigismember(what, sig) (((*(what)) & ((sigset_t)1 << (sig))) != 0)
 #endif
 _sig_func_ptr signal(int, _sig_func_ptr);
+_sig_func_ptr __fallback_signal(int, _sig_func_ptr);
 #if __POSIX_VISIBLE
 int sigpending(sigset_t *);
 int sigprocmask(int, const sigset_t *, sigset_t *);

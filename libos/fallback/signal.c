@@ -105,8 +105,13 @@ static _Atomic _sig_func_ptr _sig_func[_NSIG];
 static _sig_func_ptr _sig_func[_NSIG];
 #endif
 
+#ifndef __weak_reference
+#define __fallback_signal signal
+#define __fallback_raise  raise
+#endif
+
 _sig_func_ptr
-signal(int sig, _sig_func_ptr func)
+__fallback_signal(int sig, _sig_func_ptr func)
 {
     if (sig < 0 || sig >= _NSIG) {
         errno = EINVAL;
@@ -122,8 +127,12 @@ signal(int sig, _sig_func_ptr func)
 #endif
 }
 
+#ifdef __weak_reference
+__weak_reference(__fallback_signal, signal);
+#endif
+
 int
-raise(int sig)
+__fallback_raise(int sig)
 {
     if (sig < 0 || sig >= _NSIG) {
         errno = EINVAL;
@@ -152,3 +161,7 @@ raise(int sig)
         return 0;
     }
 }
+
+#ifdef __weak_reference
+__weak_reference(__fallback_raise, raise);
+#endif

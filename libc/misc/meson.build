@@ -40,7 +40,6 @@ srcs_misc = [
   'init.c',
   'inittls.c',
   'lock.c',
-  'sbrk.c',
   'unctrl.c',
 ]
 
@@ -51,8 +50,6 @@ foreach file : srcs_misc
     message('libc/misc/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/misc/' + s_file + ': machine overrides generic')
-  elif file in srcs_os
-    message('libc/misc/' + s_file + ': os overrides generic')
   else
     srcs_misc_use += file
   endif

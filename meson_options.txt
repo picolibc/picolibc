@@ -125,6 +125,8 @@ option('oslib-test', type: 'string', value: '',
        description: 'oslib variant for testing')
 option('linkerscript-test', type: 'string', value: '',
        description: 'linker script variant for testing')
+option('os-fallback', type: 'combo', choices: ['true', 'false', 'linux'], value: 'linux',
+       description: 'Split some APIs off to a separate os-fallback library')
 
 #
 # Stdio options

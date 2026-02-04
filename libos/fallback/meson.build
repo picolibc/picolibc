@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2020 Keith Packard
+# Copyright © 2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,51 +32,46 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-srcs_posix = [
-  'basename.c',
-  'collcmp.c',
-  'dirname.c',
-  'endpwent.c',
-  'execl.c',
-  'execv.c',
-  'execvp.c',
-  'execvpe.c',
-  'fgetpwent.c',
-  'fgetpwent_r.c',
-  'fnmatch.c',
-  'getlogin.c',
-  'getpwent.c',
-  'getpwnam.c',
-  'getpwnam_r.c',
-  'getpwuid.c',
-  'getpwuid_r.c',
-  'pwdata.c',
-  'regcomp.c',
-  'regerror.c',
-  'regexec.c',
-  'regfree.c',
-  'setpwent.c',
-  'sleep.c',
-  'strfmon.c',
-  'strfmon_l.c',
-  'vstrfmon.c',
-  'wait.c',
-]
 
-srcs_posix_use = []
-foreach file : srcs_posix
-  s_file = fs.replace_suffix(file, '.S')
-  if file in srcs_machine
-    message('libc/posix/' + file + ': machine overrides generic')
-  elif s_file in srcs_machine
-    message('libc/posix/' + s_file + ': machine overrides generic')
-  else
-    srcs_posix_use += file
-  endif
-endforeach
+srcs_os_fallback = [
+  'fpathconf.c',
+  'pathconf.c',
+  'sbrk.c',
+  'signal.c',
+  'sysconf.c',
+  ]
 
-src_posix = files(srcs_posix_use)
-  
-if not has_os_fallback
-  src_posix += src_os_fallback
+src_os_fallback = files(srcs_os_fallback)
+
+if has_os_fallback
+
+  foreach params : targets
+    target = params['name']
+    target_dir = params['dir']
+    target_c_args = params['c_args']
+
+    instdir = join_paths(lib_dir, target_dir)
+
+    if meson.version().version_compare('>=1.10')
+      _lib = static_library(libfallback_name,
+                            src_os_fallback,
+                            build_subdir : target_dir,
+                            install : really_install,
+                            install_dir : instdir,
+                            include_directories : inc,
+                            c_args : target_c_args + c_args)
+    else
+      target_lib_prefix = params['lib_prefix']
+      _lib = static_library(join_paths(target_dir,
+                                       target_lib_prefix + libfallback_name),
+                            src_os_fallback,
+                            install : really_install,
+                            install_dir : instdir,
+                            include_directories : inc,
+                            c_args : target_c_args + c_args)
+    endif
+
+    set_variable(libfallback_var + target, _lib)
+
+  endforeach
 endif

@@ -660,232 +660,6 @@ if compiler_id == 'gcc' and target_machine.cpu_family() == 'msp430'
   additional_libs += hwmult_snippet
 endif
 
-specs_extra = ''
-specs_extra_list = meson.get_external_property('specs_extra', [])
-if specs_extra_list != []
-  specs_extra = '\n' + '\n'.join(specs_extra_list)
-endif
-
-# Handle old-style printf/scanf selection mechanism in the specs file
-
-specs_printf = ''
-if printf_aliases
-  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__d_vfprintf}' +
-		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__d_vfscanf}' +
-                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__f_vfprintf}' +
-		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__f_vfscanf}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__l_vfprintf}' +
-		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__l_vfscanf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__i_vfprintf}' +
-		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__i_vfscanf}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__m_vfprintf}' +
-		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__m_vfscanf}').format(global_prefix)
-endif
-
-crt0_default = meson.get_external_property('crt0_default', 'crt0')
-
-if system_libc
-  specs_isystem = ''
-  specs_libpath = ''
-  # The '%s' here asks gcc to search for this file in the 'usual' library path
-  specs_startfile = '%{-crt0=*:crt0-%*%O%s; :@0@%O%s}'.format(crt0_default)
-else
-
-# Note that this value does *not* include the trailing %s which
-# means we have to compute the full path to the file
-crt0_expr = '%{-crt0=*:crt0-%*%O; :@0@%O}'.format(crt0_default)
-
-#
-# Construct path values for specs file
-#
-# Each of these needs to handle --picolibc-prefix and
-# --picolibc-buildtype options, system-root vs absolute paths and
-# multilib stuff. That makes this all unreasonably complicated.
-#
-# Each option is computed in three parts, the 'prefix' value
-# (corresponding to --picolibc-prefix), the 'buildtype' value
-# (corresponding to --picolibc-buildtype) and the 'gen' value (for
-# when neither of these options is specifed).
-#
-# Because 'getenv' appends a space afterwards in GCC spec files, the
-# entire final path elements must be specified inside the parens;
-# e.g. %:getenv(FOO a/b/c) instead of %:getenv(FOO)/a/b/c. That means
-# we use the specs_prefix_format value computed above to build paths
-# instead of simple concatenation
-#
-
-#
-# How to format each of the three option-selected
-# values
-#
-picolibc_prefix_format = '-picolibc-prefix=*:@0@'
-picolibc_buildtype_format = '-picolibc-buildtype=*:@0@'
-gen_format = '@0@'
-
-#
-# How to glue the three options together
-#
-specs_option_format = '%{@0@; @1@; :@2@}'
-
-#
-# Build the -isystem value
-#
-
-prefix_include_dir = '%*/@0@/'.format(get_option('includedir'))
-isystem_prefix = picolibc_prefix_format.format(prefix_include_dir)
-
-buildtype_include_dir = specs_prefix_format.format(get_option('includedir') / '%*')
-isystem_buildtype = picolibc_buildtype_format.format(buildtype_include_dir)
-
-gen_include_dir = specs_prefix_format.format(get_option('includedir'))
-isystem_gen = gen_format.format(gen_include_dir)
-
-specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_gen)
-
-gcc_dumpmachine = run_command(cc.cmd_array() + ['-dumpmachine'], check : true).stdout().split('\n')[0]
-
-cxxconfig_path_postfix = '..' / gcc_dumpmachine / 'include' / 'c++' / '%(version)' / gcc_dumpmachine / '%M'
-cxxconfig_isystem_prefix = isystem_prefix / cxxconfig_path_postfix
-cxxconfig_isystem_buildtype = isystem_buildtype / cxxconfig_path_postfix
-cxxconfig_isystem_gen = isystem_gen / cxxconfig_path_postfix
-
-specs_isystem = specs_isystem + ' -isystem ' + specs_option_format.format(cxxconfig_isystem_prefix, cxxconfig_isystem_buildtype, cxxconfig_isystem_gen)
-
-#
-# Build the non-multilib -L value
-#
-
-prefix_lib_dir = '%*/@0@'.format(get_option('libdir'))
-lib_prefix = picolibc_prefix_format.format(prefix_lib_dir)
-
-buildtype_lib_dir = specs_prefix_format.format(get_option('libdir') / '%*')
-lib_buildtype = picolibc_buildtype_format.format(buildtype_lib_dir)
-
-gen_lib_dir = specs_prefix_format.format(get_option('libdir'))
-lib_gen = gen_format.format(gen_lib_dir)
-
-specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib_gen)
-
-#
-# Build the non-multilib *startfile options
-#
-
-prefix_crt0_path = '%*/@0@'.format(get_option('libdir')) / crt0_expr
-crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
-
-buildtype_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*' / crt0_expr)
-crt0_buildtype = picolibc_buildtype_format.format(buildtype_crt0_path)
-
-gen_crt0_path = specs_prefix_format.format(get_option('libdir') / crt0_expr)
-crt0_gen = gen_format.format(gen_crt0_path)
-
-#
-# Now build multilib versions of the -L and *startfile values
-#
-if enable_multilib
-
-  #
-  # Build the multilib -L value
-  #
-  prefix_multilib_dir = '%*/@0@'.format(get_option('libdir') / '%M')
-  multilib_prefix = picolibc_prefix_format.format(prefix_multilib_dir)
-
-  buildtype_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%*/%M')
-  multilib_buildtype = picolibc_buildtype_format.format(buildtype_multilib_dir)
-
-  gen_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%M')
-  multilib_gen = gen_format.format(gen_multilib_dir)
-
-  specs_multilibpath = '-L' + specs_option_format.format(multilib_prefix, multilib_buildtype, multilib_gen)
-
-  #
-  # Prepend the multilib -L option to the non-multilib option
-  #
-  specs_libpath = specs_multilibpath + ' ' + specs_libpath
-
-  #
-  # Build the multilib *startfile options
-  #
-  prefix_multilib_crt0_path = '%*/@0@'.format(get_option('libdir')) / '%M' / crt0_expr
-  crt0_prefix = picolibc_prefix_format.format(prefix_multilib_crt0_path)
-
-  buildtype_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*/%M' / crt0_expr)
-  crt0_buildtype = picolibc_buildtype_format.format(buildtype_multilib_crt0_path)
-
-  gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
-  crt0_gen = gen_format.format(gen_multilib_crt0_path)
-endif
-
-#
-# Construct the *startfile value from the options computed
-# above. As there's only one value, it's either the
-# multilib path or the non-multilib path
-#
-specs_startfile = specs_option_format.format(crt0_prefix, crt0_buildtype, crt0_gen)
-endif
-
-oslib_spec='%{-oslib=*:-l%*}'
-oslib_default = meson.get_external_property('oslib_default', '')
-if oslib_default != ''
-  oslib_spec+='%{!-oslib:-l@0@}'.format(oslib_default)
-endif
-
-specs_data = configuration_data()
-specs_data.set('SPECS_ISYSTEM', specs_isystem)
-specs_data.set('SPECS_LIBPATH', specs_libpath)
-specs_data.set('SPECS_STARTFILE', specs_startfile)
-specs_data.set('TLSMODEL', tls_model_spec)
-specs_data.set('STACKGUARD', stack_guard_spec)
-specs_data.set('LINK_SPEC', meson.get_external_property('link_spec', ''))
-specs_data.set('OSLIB_SPEC', oslib_spec)
-specs_data.set('CC1_SPEC', meson.get_external_property('cc1_spec', ''))
-specs_data.set('CC1PLUS_SPEC', meson.get_external_property('cc1plus_spec', ''))
-specs_data.set('ADDITIONAL_LIBS', additional_libs)
-specs_data.set('SPECS_EXTRA', specs_extra)
-specs_data.set('SPECS_PRINTF', specs_printf)
-specs_data.set('PREFIX', global_prefix)
-
-# Create C and C++ specific specs data,
-# that includes setting the correct linker script
-# and adding the C++ startup/shutdown files
-
-specs_c_data = specs_data
-
-picolibc_ld = meson.get_external_property('linkerscript_default_c', 'picolibc.ld')
-specs_c_data.set('PICOLIBC_LD', picolibc_ld)
-specs_c_data.set('CRTBEGIN', '')
-specs_c_data.set('CRTEND', '')
-
-specs_cpp_data = specs_data
-
-picolibcpp_ld = meson.get_external_property('linkerscript_default_cpp', 'picolibcpp.ld')
-specs_cpp_data.set('PICOLIBC_LD', picolibcpp_ld)
-specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
-specs_cpp_data.set('CRTEND', 'crtend%O%s')
-
-if specs_install and really_install
-
-  compiler_picolibc_native = run_command(cc.cmd_array() + ['-v'], check : false).stderr().contains('with-picolibc')
-
-  if compiler_picolibc_native
-    picolibc_specs_in = 'picolibc-native.specs.in'
-  else
-    picolibc_specs_in = 'picolibc.specs.in'
-  endif
-
-  configure_file(input: picolibc_specs_in,
-	         output: 'picolibc.specs',
-	         configuration: specs_c_data,
-	         install_dir: specs_dir,
-	         install: specs_install and really_install)
-
-  configure_file(input: picolibc_specs_in,
-	         output: 'picolibcpp.specs',
-	         configuration: specs_cpp_data,
-	         install_dir: specs_dir,
-	         install: specs_install and really_install)
-endif
-
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
 struct test { int part: 24; } __attribute__((packed));
@@ -1854,6 +1628,19 @@ has_os_linux = false
 # any POSIX support
 has_os_posix = false
 
+# libos/fallback split
+os_fallback_option = get_option('os-fallback')
+
+# leave the computation for libos in the 'linux' case
+if os_fallback_option == 'true'
+  has_os_fallback = true
+elif os_fallback_option == 'false'
+  has_os_fallback = false
+endif
+
+libfallback_name='os-fallback'
+libfallback_var=libfallback_name.underscorify()
+
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
 
@@ -2131,6 +1918,241 @@ configure_file(output : 'picolibc.h',
 	       configuration: conf_data,
 	       install_dir: include_dir,
 	       install: really_install)
+
+#
+# Construct picolibc.specs (and picolibcpp.specs)
+#
+
+specs_extra = ''
+specs_extra_list = meson.get_external_property('specs_extra', [])
+if specs_extra_list != []
+  specs_extra = '\n' + '\n'.join(specs_extra_list)
+endif
+
+# Handle old-style printf/scanf selection mechanism in the specs file
+
+specs_printf = ''
+if printf_aliases
+  specs_printf=('%{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__d_vfprintf}' +
+		' %{DPICOLIBC_DOUBLE_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__d_vfscanf}' +
+                ' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__f_vfprintf}' +
+		' %{DPICOLIBC_FLOAT_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__f_vfscanf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__l_vfprintf}' +
+		' %{DPICOLIBC_LONG_LONG_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__l_vfscanf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__i_vfprintf}' +
+		' %{DPICOLIBC_INTEGER_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__i_vfscanf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfprintf=@0@__m_vfprintf}' +
+		' %{DPICOLIBC_MINIMAL_PRINTF_SCANF:--defsym=@0@vfscanf=@0@__m_vfscanf}').format(global_prefix)
+endif
+
+crt0_default = meson.get_external_property('crt0_default', 'crt0')
+
+if system_libc
+  specs_isystem = ''
+  specs_libpath = ''
+  # The '%s' here asks gcc to search for this file in the 'usual' library path
+  specs_startfile = '%{-crt0=*:crt0-%*%O%s; :@0@%O%s}'.format(crt0_default)
+else
+
+  # Note that this value does *not* include the trailing %s which
+  # means we have to compute the full path to the file
+  crt0_expr = '%{-crt0=*:crt0-%*%O; :@0@%O}'.format(crt0_default)
+
+  #
+  # Construct path values for specs file
+  #
+  # Each of these needs to handle --picolibc-prefix and
+  # --picolibc-buildtype options, system-root vs absolute paths and
+  # multilib stuff. That makes this all unreasonably complicated.
+  #
+  # Each option is computed in three parts, the 'prefix' value
+  # (corresponding to --picolibc-prefix), the 'buildtype' value
+  # (corresponding to --picolibc-buildtype) and the 'gen' value (for
+  # when neither of these options is specifed).
+  #
+  # Because 'getenv' appends a space afterwards in GCC spec files, the
+  # entire final path elements must be specified inside the parens;
+  # e.g. %:getenv(FOO a/b/c) instead of %:getenv(FOO)/a/b/c. That means
+  # we use the specs_prefix_format value computed above to build paths
+  # instead of simple concatenation
+  #
+
+  #
+  # How to format each of the three option-selected
+  # values
+  #
+  picolibc_prefix_format = '-picolibc-prefix=*:@0@'
+  picolibc_buildtype_format = '-picolibc-buildtype=*:@0@'
+  gen_format = '@0@'
+
+  #
+  # How to glue the three options together
+  #
+  specs_option_format = '%{@0@; @1@; :@2@}'
+
+  #
+  # Build the -isystem value
+  #
+
+  prefix_include_dir = '%*/@0@/'.format(get_option('includedir'))
+  isystem_prefix = picolibc_prefix_format.format(prefix_include_dir)
+
+  buildtype_include_dir = specs_prefix_format.format(get_option('includedir') / '%*')
+  isystem_buildtype = picolibc_buildtype_format.format(buildtype_include_dir)
+
+  gen_include_dir = specs_prefix_format.format(get_option('includedir'))
+  isystem_gen = gen_format.format(gen_include_dir)
+
+  specs_isystem = '-isystem ' + specs_option_format.format(isystem_prefix, isystem_buildtype, isystem_gen)
+
+  gcc_dumpmachine = run_command(cc.cmd_array() + ['-dumpmachine'], check : true).stdout().split('\n')[0]
+
+  cxxconfig_path_postfix = '..' / gcc_dumpmachine / 'include' / 'c++' / '%(version)' / gcc_dumpmachine / '%M'
+  cxxconfig_isystem_prefix = isystem_prefix / cxxconfig_path_postfix
+  cxxconfig_isystem_buildtype = isystem_buildtype / cxxconfig_path_postfix
+  cxxconfig_isystem_gen = isystem_gen / cxxconfig_path_postfix
+
+  specs_isystem = specs_isystem + ' -isystem ' + specs_option_format.format(cxxconfig_isystem_prefix, cxxconfig_isystem_buildtype, cxxconfig_isystem_gen)
+
+  #
+  # Build the non-multilib -L value
+  #
+
+  prefix_lib_dir = '%*/@0@'.format(get_option('libdir'))
+  lib_prefix = picolibc_prefix_format.format(prefix_lib_dir)
+
+  buildtype_lib_dir = specs_prefix_format.format(get_option('libdir') / '%*')
+  lib_buildtype = picolibc_buildtype_format.format(buildtype_lib_dir)
+
+  gen_lib_dir = specs_prefix_format.format(get_option('libdir'))
+  lib_gen = gen_format.format(gen_lib_dir)
+
+  specs_libpath = '-L' + specs_option_format.format(lib_prefix, lib_buildtype, lib_gen)
+
+  #
+  # Build the non-multilib *startfile options
+  #
+
+  prefix_crt0_path = '%*/@0@'.format(get_option('libdir')) / crt0_expr
+  crt0_prefix = picolibc_prefix_format.format(prefix_crt0_path)
+
+  buildtype_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*' / crt0_expr)
+  crt0_buildtype = picolibc_buildtype_format.format(buildtype_crt0_path)
+
+  gen_crt0_path = specs_prefix_format.format(get_option('libdir') / crt0_expr)
+  crt0_gen = gen_format.format(gen_crt0_path)
+
+  #
+  # Now build multilib versions of the -L and *startfile values
+  #
+  if enable_multilib
+
+    #
+    # Build the multilib -L value
+    #
+    prefix_multilib_dir = '%*/@0@'.format(get_option('libdir') / '%M')
+    multilib_prefix = picolibc_prefix_format.format(prefix_multilib_dir)
+
+    buildtype_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%*/%M')
+    multilib_buildtype = picolibc_buildtype_format.format(buildtype_multilib_dir)
+
+    gen_multilib_dir = specs_prefix_format.format(get_option('libdir') / '%M')
+    multilib_gen = gen_format.format(gen_multilib_dir)
+
+    specs_multilibpath = '-L' + specs_option_format.format(multilib_prefix, multilib_buildtype, multilib_gen)
+
+    #
+    # Prepend the multilib -L option to the non-multilib option
+    #
+    specs_libpath = specs_multilibpath + ' ' + specs_libpath
+
+    #
+    # Build the multilib *startfile options
+    #
+    prefix_multilib_crt0_path = '%*/@0@'.format(get_option('libdir')) / '%M' / crt0_expr
+    crt0_prefix = picolibc_prefix_format.format(prefix_multilib_crt0_path)
+
+    buildtype_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%*/%M' / crt0_expr)
+    crt0_buildtype = picolibc_buildtype_format.format(buildtype_multilib_crt0_path)
+
+    gen_multilib_crt0_path = specs_prefix_format.format(get_option('libdir') / '%M' / crt0_expr)
+    crt0_gen = gen_format.format(gen_multilib_crt0_path)
+  endif
+
+  #
+  # Construct the *startfile value from the options computed
+  # above. As there's only one value, it's either the
+  # multilib path or the non-multilib path
+  #
+  specs_startfile = specs_option_format.format(crt0_prefix, crt0_buildtype, crt0_gen)
+
+endif
+
+oslib_spec='%{-oslib=*:-l%*}'
+oslib_default = meson.get_external_property('oslib_default', '')
+if oslib_default != ''
+  oslib_spec+='%{!-oslib:-l@0@}'.format(oslib_default)
+endif
+
+if has_os_fallback
+  oslib_spec+=' -l@0@'.format(libfallback_name)
+endif
+
+specs_data = configuration_data()
+specs_data.set('SPECS_ISYSTEM', specs_isystem)
+specs_data.set('SPECS_LIBPATH', specs_libpath)
+specs_data.set('SPECS_STARTFILE', specs_startfile)
+specs_data.set('TLSMODEL', tls_model_spec)
+specs_data.set('STACKGUARD', stack_guard_spec)
+specs_data.set('LINK_SPEC', meson.get_external_property('link_spec', ''))
+specs_data.set('OSLIB_SPEC', oslib_spec)
+specs_data.set('CC1_SPEC', meson.get_external_property('cc1_spec', ''))
+specs_data.set('CC1PLUS_SPEC', meson.get_external_property('cc1plus_spec', ''))
+specs_data.set('ADDITIONAL_LIBS', additional_libs)
+specs_data.set('SPECS_EXTRA', specs_extra)
+specs_data.set('SPECS_PRINTF', specs_printf)
+specs_data.set('PREFIX', global_prefix)
+
+# Create C and C++ specific specs data,
+# that includes setting the correct linker script
+# and adding the C++ startup/shutdown files
+
+specs_c_data = specs_data
+
+picolibc_ld = meson.get_external_property('linkerscript_default_c', 'picolibc.ld')
+specs_c_data.set('PICOLIBC_LD', picolibc_ld)
+specs_c_data.set('CRTBEGIN', '')
+specs_c_data.set('CRTEND', '')
+
+specs_cpp_data = specs_data
+
+picolibcpp_ld = meson.get_external_property('linkerscript_default_cpp', 'picolibcpp.ld')
+specs_cpp_data.set('PICOLIBC_LD', picolibcpp_ld)
+specs_cpp_data.set('CRTBEGIN', 'crtbegin%O%s')
+specs_cpp_data.set('CRTEND', 'crtend%O%s')
+
+if specs_install and really_install
+
+  compiler_picolibc_native = run_command(cc.cmd_array() + ['-v'], check : false).stderr().contains('with-picolibc')
+
+  if compiler_picolibc_native
+    picolibc_specs_in = 'picolibc-native.specs.in'
+  else
+    picolibc_specs_in = 'picolibc.specs.in'
+  endif
+
+  configure_file(input: picolibc_specs_in,
+	         output: 'picolibc.specs',
+	         configuration: specs_c_data,
+	         install_dir: specs_dir,
+	         install: specs_install and really_install)
+
+  configure_file(input: picolibc_specs_in,
+	         output: 'picolibcpp.specs',
+	         configuration: specs_cpp_data,
+	         install_dir: specs_dir,
+	         install: specs_install and really_install)
+endif
 
 # Usage as an embedded subproject:
 # If picolibc is embedded into the source as a subproject,

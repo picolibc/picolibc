@@ -40,6 +40,5 @@ picolibc_sources(
   init.c
   inittls.c
   lock.c
-  sbrk.c
   unctrl.c
   )
