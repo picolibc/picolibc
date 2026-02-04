@@ -73,6 +73,8 @@ endforeach
 cpu_family_aliases = {
 		       # aarch64
 		       'arm64' : 'aarch64',
+		       # ARCv3
+		       'arc32' : 'arc64',
 		       # cris
 		       'crisv32' : 'cris',
            # loongarch
