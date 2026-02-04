@@ -47,6 +47,7 @@ inc_sys_headers_all = [
   'iconvnls.h',
   '_initfini.h',
   '_intsup.h',
+  'ioctl.h',
   '_locale.h',
   'lock.h',
   'param.h',
