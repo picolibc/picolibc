@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2026 MIPS Holding, Inc.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -34,7 +34,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 multilib_list=".,fpus,m128,hs5x,hs58"
-exec "$(dirname "$0")"/do-configure arc64-zephyr-elf \
+exec "$(dirname "$0")"/do-configure arc64-none-elf \
     -Dposix-console=true \
     -Dtests=true \
     -Dmultilib-list="$multilib_list" \
