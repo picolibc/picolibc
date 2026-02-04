@@ -243,18 +243,18 @@ int sig2str(int, char *);
 #if __POSIX_VISIBLE
 int sigaction(int, const struct sigaction * __restrict, struct sigaction * __restrict);
 int sigaddset(sigset_t *, const int);
-#define sigaddset(what, sig) (*(what) |= (1 << (sig)), 0)
+#define sigaddset(what, sig) (*(what) |= (1 << (sig)))
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int sigaltstack(const stack_t * __restrict, stack_t * __restrict);
 #endif
 #if __POSIX_VISIBLE
 int sigdelset(sigset_t *, const int);
-#define sigdelset(what, sig) (*(what) &= ~((sigset_t)1 << (sig)), 0)
+#define sigdelset(what, sig) ((*(what) &= ~((sigset_t)1 << (sig))))
 int sigemptyset(sigset_t *);
-#define sigemptyset(what) (*(what) = (sigset_t)0, 0)
+#define sigemptyset(what) ((*(what) = (sigset_t)0))
 int sigfillset(sigset_t *);
-#define sigfillset(what) (*(what) = ~((sigset_t)0), 0)
+#define sigfillset(what) ((*(what) = ~((sigset_t)0)))
 int sigismember(const sigset_t *, int);
 #define sigismember(what, sig) (((*(what)) & ((sigset_t)1 << (sig))) != 0)
 #endif
