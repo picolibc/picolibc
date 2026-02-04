@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2026 MIPS Holding, Inc.
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -34,4 +34,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 multilib_exclude="em_mini"
-exec "$(dirname "$0")"/do-configure arc-zephyr-elf -Dposix-console=true -Dtests=true -Dthread-local-storage=false -Dmultilib-exclude="$multilib_exclude" "$@"
+exec "$(dirname "$0")"/do-configure arc-none-elf \
+    -Dposix-console=true \
+    -Dtests=true \
+    -Dmultilib-exclude="$multilib_exclude" \
+    -Dthread-local-storage=false "$@"
