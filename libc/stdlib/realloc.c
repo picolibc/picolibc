@@ -60,7 +60,7 @@ realloc(void *ptr, size_t size)
 
     size_t old_size = _size(p_to_realloc);
 
-#if _MALLOC_SMALL_BUCKET
+#if __MALLOC_SMALL_BUCKET
     bool is_bucket;
     is_bucket = (old_size <= MALLOC_MAX_BUCKET && old_size == BUCKET_SIZE(BUCKET_NUM(old_size)));
 #else
