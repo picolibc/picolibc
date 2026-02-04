@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,5 +32,53 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-add_subdirectory(semihost)
-add_subdirectory(dummy)
+
+srcs_os_dummy = [
+  'close.c',
+  '_exit.c',
+  'fstat.c',
+  'getentropy.c',
+  'gettimeofday.c',
+  'iob.c',
+  'lseek.c',
+  'open.c',
+  'read.c',
+  'sigprocmask.c',
+  'stat.c',
+  'times.c',
+  'unlink.c',
+  'write.c',
+  ]
+
+src_os_dummy = files(srcs_os_dummy)
+
+foreach params : targets
+  target = params['name']
+  target_dir = params['dir']
+  target_c_args = params['c_args']
+
+  instdir = join_paths(lib_dir, target_dir)
+
+  libdummy_name = 'dummy'
+
+  if meson.version().version_compare('>=1.10')
+    _lib = static_library(libdummy_name,
+                          src_os_dummy,
+                          build_subdir : target_dir,
+                          install : really_install,
+                          install_dir : instdir,
+                          include_directories : inc,
+                          c_args : target_c_args + c_args)
+  else
+    target_lib_prefix = params['lib_prefix']
+    _lib = static_library(join_paths(target_dir, target_lib_prefix + libdummy_name),
+                          src_os_dummy,
+                          install : really_install,
+                          install_dir : instdir,
+                          include_directories : inc,
+                          c_args : target_c_args + c_args)
+  endif
+
+  set_variable('lib_dummy' + target, _lib)
+
+endforeach

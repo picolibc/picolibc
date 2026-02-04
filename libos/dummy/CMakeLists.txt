@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,5 +32,25 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-add_subdirectory(semihost)
-add_subdirectory(dummy)
+add_library(dummy STATIC)
+
+target_compile_options(dummy PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
+
+target_include_directories(dummy SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
+
+target_sources(dummy PRIVATE
+  close.c
+  _exit.c
+  fstat.c
+  getentropy.c
+  gettimeofday.c
+  iob.c
+  lseek.c
+  open.c
+  read.c
+  sigprocmask.c
+  stat.c
+  times.c
+  unlink.c
+  write.c
+  )
