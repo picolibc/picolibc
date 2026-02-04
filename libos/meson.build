@@ -44,3 +44,5 @@ endif
 if get_option('os-linux')
   subdir('linux')
 endif
+
+subdir('dummy')
