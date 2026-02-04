@@ -35,44 +35,10 @@
 
 #include "local-linux.h"
 #include <fcntl.h>
-#include <stdarg.h>
+#include <sys/stat.h>
 
 int
-fcntl(int fd, int op, ...)
+chmod(const char *path, mode_t mode)
 {
-    va_list ap;
-    int     arg = 0;
-
-    switch (op) {
-    case F_DUPFD:
-        op = LINUX_F_DUPFD;
-        break;
-    case F_DUPFD_CLOEXEC:
-        op = LINUX_F_DUPFD_CLOEXEC;
-        break;
-    case F_GETFD:
-        op = LINUX_F_GETFD;
-        break;
-    case F_SETFD:
-        op = LINUX_F_SETFD;
-        arg = 1;
-        break;
-    case F_GETFL:
-        op = LINUX_F_GETFL;
-        break;
-    case F_SETFL:
-        op = LINUX_F_SETFL;
-        arg = 1;
-        break;
-    case F_SETLK:
-        return 0;
-    default:
-        errno = EINVAL;
-        return -1;
-    }
-    va_start(ap, op);
-    if (arg)
-        arg = va_arg(ap, int);
-    va_end(ap);
-    return syscall(LINUX_SYS_fcntl, fd, op, arg);
+    return syscall(LINUX_SYS_chmod, path, mode);
 }
