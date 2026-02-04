@@ -93,7 +93,7 @@ wrap() {
     clang-format -i $OUT
 }
 
-headers=(errno fcntl poll signal syscall termios time wait)
+headers=(errno fcntl ioctl poll signal syscall sysconf termios time wait)
 
 for a in "${arch[@]}"; do
     for h in "${headers[@]}"; do

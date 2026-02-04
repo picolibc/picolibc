@@ -34,44 +34,34 @@
  */
 
 #include "local-linux.h"
-#include <linux/linux-signal.h>
+#include <sys/wait.h>
 
-int
-sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+pid_t
+wait3(int *wstatus, int options, struct rusage *rusage)
 {
-#ifdef LINUX_SYS_rt_sigprocmask
-    struct __kernel_sigset kset = {}, koldset, *poldset = NULL;
-    int                    sig;
-    int                    ret;
+    int   koptions = 0;
+    pid_t ret;
+    int   kstatus;
+    struct {
+        struct rusage usage;
+        long          space[16];
+    } kusage, *pusage = NULL;
 
-    switch (how) {
-    case SIG_BLOCK:
-        how = LINUX_SIG_BLOCK;
-        break;
-    case SIG_UNBLOCK:
-        how = LINUX_SIG_UNBLOCK;
-        break;
-    case SIG_SETMASK:
-        how = LINUX_SIG_SETMASK;
-        break;
-    default:
-        errno = EINVAL;
-        return -1;
-    }
-    for (sig = 0; sig < _NSIG; sig++)
-        if (sigismember(set, sig))
-            __kernel_sigset_set_mask(&kset, _signal_to_linux(sig));
-    if (oldset)
-        poldset = &koldset;
-    ret = syscall(LINUX_SYS_rt_sigprocmask, how, &kset, poldset, __KERNEL_NSIG_BYTES);
-    if (ret < 0)
-        return ret;
-    if (oldset) {
-        sigemptyset(oldset);
-        for (sig = 0; sig < _NSIG; sig++)
-            if (__kernel_sigset_get_mask(&koldset, _signal_to_linux(sig)))
-                sigaddset(oldset, sig);
+    if (options & WNOHANG)
+        koptions |= LINUX_WNOHANG;
+    if (options & WUNTRACED)
+        koptions |= LINUX_WUNTRACED;
+    if (options & WCONTINUED)
+        koptions |= LINUX_WCONTINUED;
+    if (rusage)
+        pusage = &kusage;
+    ret = syscall(LINUX_SYS_wait4, -1, &kstatus, koptions, pusage);
+    if (ret != (pid_t)-1) {
+        if (WIFSIGNALED(kstatus))
+            kstatus = __W_EXITCODE(0, _signal_from_linux(WTERMSIG(kstatus)));
+        *wstatus = kstatus;
+        if (rusage)
+            *rusage = kusage.usage;
     }
     return ret;
-#endif
 }

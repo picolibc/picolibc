@@ -44,13 +44,16 @@
 #include <sys/times.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <signal.h>
 
 #include <linux/linux-fcntl.h>
+#include <linux/linux-ioctl.h>
 #include <linux/linux-poll.h>
 #include <linux/linux-syscall.h>
 #include <linux/linux-termios.h>
 #include <linux/linux-time.h>
 #include <linux/linux-wait.h>
+#include <linux/linux-sigaction.h>
 
 #define __GLIBC__ 2 /* Avoid getting the defines */
 #include <linux/stat.h>
@@ -60,5 +63,41 @@ long _syscall_error(long ret);
 int  _signal_to_linux(int sig);
 int  _signal_from_linux(int sig);
 int  _statbuf(struct stat *statbuf, const struct statx *statxbuf);
+
+#define __KERNEL_NSIG_WORDS                                                         \
+    ((__KERNEL_NSIG + sizeof(unsigned long) * 8 - 1) / (sizeof(unsigned long) * 8))
+#define __KERNEL_NSIG_BYTES (__KERNEL_NSIG_WORDS * sizeof(unsigned long))
+
+static inline void
+__kernel_sigset_set_mask(struct __kernel_sigset *ss, int sig)
+{
+    unsigned si = (sig - 1);
+    int      w = si / (sizeof(ss->sa_mask[0]) * 8);
+    int      b = si % (sizeof(ss->sa_mask[0]) * 8);
+
+    ss->sa_mask[w] |= (1UL << b);
+}
+
+static inline int
+__kernel_sigset_get_mask(struct __kernel_sigset *ss, int sig)
+{
+    unsigned si = (sig - 1);
+    int      w = si / (sizeof(ss->sa_mask[0]) * 8);
+    int      b = si % (sizeof(ss->sa_mask[0]) * 8);
+
+    return (ss->sa_mask[w] >> b) & 1;
+}
+
+static inline void
+__kernel_sa_set_mask(struct __kernel_sigaction *sa, int sig)
+{
+    __kernel_sigset_set_mask(&sa->sa_mask, sig);
+}
+
+static inline int
+__kernel_sa_get_mask(struct __kernel_sigaction *sa, int sig)
+{
+    return __kernel_sigset_get_mask(&sa->sa_mask, sig);
+}
 
 #endif /* _LOCAL_LINUX_H_ */

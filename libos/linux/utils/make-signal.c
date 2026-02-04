@@ -217,6 +217,9 @@ main(void)
     printf("#define LINUX_SIG_DFL ((_sig_func_ptr) %lld)\n", (long long)(uintptr_t)SIG_DFL);
     printf("#define LINUX_SIG_IGN ((_sig_func_ptr) %lld)\n", (long long)(uintptr_t)SIG_IGN);
     printf("#define LINUX_SIG_ERR ((_sig_func_ptr) %lld)\n", (long long)(uintptr_t)SIG_ERR);
+    printf("#define LINUX_SIG_BLOCK %d\n", SIG_BLOCK);
+    printf("#define LINUX_SIG_UNBLOCK %d\n", SIG_UNBLOCK);
+    printf("#define LINUX_SIG_SETMASK %d\n", SIG_SETMASK);
 
     printf("\n");
 

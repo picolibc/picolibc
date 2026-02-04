@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2026 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,44 +34,14 @@
  */
 
 #include "local-linux.h"
-#include <linux/linux-signal.h>
+#include <unistd.h>
 
 int
-sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+rmdir(const char *path)
 {
-#ifdef LINUX_SYS_rt_sigprocmask
-    struct __kernel_sigset kset = {}, koldset, *poldset = NULL;
-    int                    sig;
-    int                    ret;
-
-    switch (how) {
-    case SIG_BLOCK:
-        how = LINUX_SIG_BLOCK;
-        break;
-    case SIG_UNBLOCK:
-        how = LINUX_SIG_UNBLOCK;
-        break;
-    case SIG_SETMASK:
-        how = LINUX_SIG_SETMASK;
-        break;
-    default:
-        errno = EINVAL;
-        return -1;
-    }
-    for (sig = 0; sig < _NSIG; sig++)
-        if (sigismember(set, sig))
-            __kernel_sigset_set_mask(&kset, _signal_to_linux(sig));
-    if (oldset)
-        poldset = &koldset;
-    ret = syscall(LINUX_SYS_rt_sigprocmask, how, &kset, poldset, __KERNEL_NSIG_BYTES);
-    if (ret < 0)
-        return ret;
-    if (oldset) {
-        sigemptyset(oldset);
-        for (sig = 0; sig < _NSIG; sig++)
-            if (__kernel_sigset_get_mask(&koldset, _signal_to_linux(sig)))
-                sigaddset(oldset, sig);
-    }
-    return ret;
+#ifdef LINUX_SYS_rmdir
+    return syscall(LINUX_SYS_rmdir, path);
+#else
+    return syscall(LINUX_SYS_unlinkat, LINUX_AT_FDCWD, path, LINUX_AT_REMOVEDIR);
 #endif
 }

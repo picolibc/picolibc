@@ -34,14 +34,19 @@
  */
 
 #ifndef _LINUX_SIGACTION_H_
+#define _LINUX_SIGACTION_H_
 
 #define __KERNEL_NSIG 64
 
-struct __kernel_sigaction {
-    _sig_func_ptr sa_handler;
-    unsigned long sa_flags;
-    void          (*sa_restorer)(void);
+struct __kernel_sigset {
     unsigned long sa_mask[__KERNEL_NSIG / (sizeof(unsigned long) * 8)];
+};
+
+struct __kernel_sigaction {
+    _sig_func_ptr          sa_handler;
+    unsigned long          sa_flags;
+    void                   (*sa_restorer)(void);
+    struct __kernel_sigset sa_mask;
 };
 
 typedef struct __kernel_sigaltstack {
@@ -49,25 +54,5 @@ typedef struct __kernel_sigaltstack {
     int    ss_flags;
     size_t ss_size;
 } __kernel_stack_t;
-
-static inline void
-__kernel_sa_set_mask(struct __kernel_sigaction *sa, int sig)
-{
-    unsigned si = (sig - 1);
-    int      w = si / (sizeof(sa->sa_mask[0]) * 8);
-    int      b = si % (sizeof(sa->sa_mask[0]) * 8);
-
-    sa->sa_mask[w] |= (1UL << b);
-}
-
-static inline int
-__kernel_sa_get_mask(struct __kernel_sigaction *sa, int sig)
-{
-    unsigned si = (sig - 1);
-    int      w = si / (sizeof(sa->sa_mask[0]) * 8);
-    int      b = si % (sizeof(sa->sa_mask[0]) * 8);
-
-    return (sa->sa_mask[w] >> b) & 1;
-}
 
 #endif

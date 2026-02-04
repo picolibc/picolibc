@@ -34,44 +34,43 @@
  */
 
 #include "local-linux.h"
-#include <linux/linux-signal.h>
+#include <fcntl.h>
+#include <stdarg.h>
 
 int
-sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+fcntl(int fd, int op, ...)
 {
-#ifdef LINUX_SYS_rt_sigprocmask
-    struct __kernel_sigset kset = {}, koldset, *poldset = NULL;
-    int                    sig;
-    int                    ret;
+    va_list ap;
+    int     arg = 0;
 
-    switch (how) {
-    case SIG_BLOCK:
-        how = LINUX_SIG_BLOCK;
+    switch (op) {
+    case F_DUPFD:
+        op = LINUX_F_DUPFD;
         break;
-    case SIG_UNBLOCK:
-        how = LINUX_SIG_UNBLOCK;
+    case F_DUPFD_CLOEXEC:
+        op = LINUX_F_DUPFD_CLOEXEC;
         break;
-    case SIG_SETMASK:
-        how = LINUX_SIG_SETMASK;
+    case F_GETFD:
+        op = LINUX_F_GETFD;
+        break;
+    case F_SETFD:
+        op = LINUX_F_SETFD;
+        arg = 1;
+        break;
+    case F_GETFL:
+        op = LINUX_F_GETFL;
+        break;
+    case F_SETFL:
+        op = LINUX_F_SETFL;
+        arg = 1;
         break;
     default:
         errno = EINVAL;
         return -1;
     }
-    for (sig = 0; sig < _NSIG; sig++)
-        if (sigismember(set, sig))
-            __kernel_sigset_set_mask(&kset, _signal_to_linux(sig));
-    if (oldset)
-        poldset = &koldset;
-    ret = syscall(LINUX_SYS_rt_sigprocmask, how, &kset, poldset, __KERNEL_NSIG_BYTES);
-    if (ret < 0)
-        return ret;
-    if (oldset) {
-        sigemptyset(oldset);
-        for (sig = 0; sig < _NSIG; sig++)
-            if (__kernel_sigset_get_mask(&koldset, _signal_to_linux(sig)))
-                sigaddset(oldset, sig);
-    }
-    return ret;
-#endif
+    va_start(ap, op);
+    if (arg)
+        arg = va_arg(ap, int);
+    va_end(ap);
+    return syscall(LINUX_SYS_fcntl, fd, op, arg);
 }

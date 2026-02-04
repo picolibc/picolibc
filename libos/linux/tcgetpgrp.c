@@ -34,44 +34,14 @@
  */
 
 #include "local-linux.h"
-#include <linux/linux-signal.h>
+#include <unistd.h>
 
-int
-sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
+pid_t
+tcgetpgrp(int fd)
 {
-#ifdef LINUX_SYS_rt_sigprocmask
-    struct __kernel_sigset kset = {}, koldset, *poldset = NULL;
-    int                    sig;
-    int                    ret;
+    int pgrp;
 
-    switch (how) {
-    case SIG_BLOCK:
-        how = LINUX_SIG_BLOCK;
-        break;
-    case SIG_UNBLOCK:
-        how = LINUX_SIG_UNBLOCK;
-        break;
-    case SIG_SETMASK:
-        how = LINUX_SIG_SETMASK;
-        break;
-    default:
-        errno = EINVAL;
-        return -1;
-    }
-    for (sig = 0; sig < _NSIG; sig++)
-        if (sigismember(set, sig))
-            __kernel_sigset_set_mask(&kset, _signal_to_linux(sig));
-    if (oldset)
-        poldset = &koldset;
-    ret = syscall(LINUX_SYS_rt_sigprocmask, how, &kset, poldset, __KERNEL_NSIG_BYTES);
-    if (ret < 0)
-        return ret;
-    if (oldset) {
-        sigemptyset(oldset);
-        for (sig = 0; sig < _NSIG; sig++)
-            if (__kernel_sigset_get_mask(&koldset, _signal_to_linux(sig)))
-                sigaddset(oldset, sig);
-    }
-    return ret;
-#endif
+    if (syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGPGRP, &pgrp) < 0)
+        return (pid_t)-1;
+    return (pid_t)pgrp;
 }

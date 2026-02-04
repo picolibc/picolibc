@@ -37,6 +37,7 @@
 #include <signal.h>
 #include <linux/linux-signal.h>
 #include <linux/linux-sigaction.h>
+#include <linux/linux-signal.h>
 
 #if __SIZEOF_POINTER__ == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
 #define _USE_ATOMIC_SIGNAL
@@ -80,12 +81,6 @@ extern void __sa_restore(void);
 #ifndef LINUX_SA_RESTART
 #define LINUX_SA_RESTART 0x10000000
 #endif
-#ifndef LINUX_NSIG
-#define LINUX_NSIG 64
-#endif
-#define LINUX_NSIG_WORDS                                                         \
-    ((LINUX_NSIG + sizeof(unsigned long) * 8 - 1) / (sizeof(unsigned long) * 8))
-#define LINUX_NSIG_BYTES (LINUX_NSIG_WORDS * sizeof(unsigned long))
 
 _sig_func_ptr
 signal(int sig, _sig_func_ptr func)
@@ -120,7 +115,7 @@ signal(int sig, _sig_func_ptr func)
 #define SYSCALL LINUX_SYS_rt_sigaction
 #endif
 
-    ret = (_sig_func_ptr)syscall(SYSCALL, ksig, &new_action, NULL, LINUX_NSIG_BYTES);
+    ret = (_sig_func_ptr)syscall(SYSCALL, ksig, &new_action, NULL, __KERNEL_NSIG_BYTES);
     if (ret == LINUX_SIG_ERR)
         return SIG_ERR;
 

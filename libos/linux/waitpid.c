@@ -55,4 +55,5 @@ waitpid(pid_t pid, int *wstatus, int options)
             kstatus = __W_EXITCODE(0, _signal_from_linux(WTERMSIG(kstatus)));
         *wstatus = kstatus;
     }
+    return ret;
 }

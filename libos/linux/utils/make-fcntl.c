@@ -99,6 +99,9 @@ main(void)
 #ifdef AT_EMPTY_PATH
     printf("#define %-32.32s 0x%08x\n", "LINUX_AT_EMPTY_PATH", AT_EMPTY_PATH);
 #endif
+#ifdef AT_REMOVEDIR
+    printf("#define %-32.32s 0x%08x\n", "LINUX_AT_REMOVEDIR", AT_REMOVEDIR);
+#endif
 #ifdef AT_NO_AUTOMOUNT
     printf("#define %-32.32s 0x%08x\n", "LINUX_AT_NO_AUTOMOUNT", AT_NO_AUTOMOUNT);
 #endif
@@ -174,5 +177,34 @@ main(void)
 #ifdef STATX_DIO_READ_ALIGN
     printf("#define %-32.32s 0x%08x\n", "LINUX_STATX_DIO_READ_ALIGN", STATX_DIO_READ_ALIGN);
 #endif
+    printf("#define %-32.32s %d\n", "LINUX_F_DUPFD", F_DUPFD);
+    printf("#define %-32.32s %d\n", "LINUX_F_DUPFD_CLOEXEC", F_DUPFD_CLOEXEC);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETFD", F_GETFD);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETFD", F_SETFD);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETFL", F_GETFL);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETFL", F_SETFL);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETLK", F_SETLK);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETLKW", F_SETLKW);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETLK", F_GETLK);
+    printf("#define %-32.32s %d\n", "LINUX_F_OFD_SETLK", F_OFD_SETLK);
+    printf("#define %-32.32s %d\n", "LINUX_F_OFD_SETLKW", F_OFD_SETLKW);
+    printf("#define %-32.32s %d\n", "LINUX_F_OFD_GETLK", F_OFD_GETLK);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETOWN", F_GETOWN);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETOWN", F_SETOWN);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETOWN_EX", F_GETOWN_EX);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETOWN_EX", F_SETOWN_EX);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETSIG", F_GETSIG);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETSIG", F_SETSIG);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETLEASE", F_SETLEASE);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETLEASE", F_GETLEASE);
+    printf("#define %-32.32s %d\n", "LINUX_F_NOTIFY", F_NOTIFY);
+    printf("#define %-32.32s %d\n", "LINUX_F_SETPIPE_SZ", F_SETPIPE_SZ);
+    printf("#define %-32.32s %d\n", "LINUX_F_GETPIPE_SZ", F_GETPIPE_SZ);
+    printf("#define %-32.32s %d\n", "LINUX_F_ADD_SEALS", F_ADD_SEALS);
+    printf("#define %-32.32s %d\n", "LINUX_F_GET_SEALS", F_GET_SEALS);
+    printf("#define %-32.32s %d\n", "LINUX_F_GET_RW_HINT", F_GET_RW_HINT);
+    printf("#define %-32.32s %d\n", "LINUX_F_SET_RW_HINT", F_SET_RW_HINT);
+    printf("#define %-32.32s %d\n", "LINUX_F_GET_FILE_RW_HINT", F_GET_FILE_RW_HINT);
+    printf("#define %-32.32s %d\n", "LINUX_F_SET_FILE_RW_HINT", F_SET_FILE_RW_HINT);
     return 0;
 }

@@ -34,9 +34,12 @@
  */
 #ifndef _LINUX_SIGNAL_H_
 #define _LINUX_SIGNAL_H_
-#define LINUX_SIG_DFL ((_sig_func_ptr)0)
-#define LINUX_SIG_IGN ((_sig_func_ptr)1)
-#define LINUX_SIG_ERR ((_sig_func_ptr) - 1)
+#define LINUX_SIG_DFL     ((_sig_func_ptr)0)
+#define LINUX_SIG_IGN     ((_sig_func_ptr)1)
+#define LINUX_SIG_ERR     ((_sig_func_ptr) - 1)
+#define LINUX_SIG_BLOCK   0
+#define LINUX_SIG_UNBLOCK 1
+#define LINUX_SIG_SETMASK 2
 
 enum __linux_signal {
     __LINUX_SIGHUP = 1,
