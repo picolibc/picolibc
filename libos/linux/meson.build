@@ -58,6 +58,7 @@ if fs.is_dir(machine_dir)
     '_exit.c',
     'fcntl.c',
     'fork.c',
+    'fpathconf.c',
     'fstat.c',
     'getcwd.c',
     'getegid.c',
@@ -81,6 +82,7 @@ if fs.is_dir(machine_dir)
     'nanosleep.c',
     'open.c',
     'opendir.c',
+    'pathconf.c',
     'pipe.c',
     'poll.c',
     'raise.c',
@@ -122,8 +124,6 @@ if fs.is_dir(machine_dir)
   subdir('include')
 
   subdir(machine_dir)
-
-  srcs_os += srcs_os_linux
 
   src_os_linux = files(srcs_os_linux) + src_os_linux_machine
 

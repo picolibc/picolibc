@@ -34,6 +34,7 @@
  */
 
 #include <asm/termbits.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <stdio.h>
 
@@ -51,6 +52,7 @@ main(void)
     printf("#define LINUX_VSTART %d\n", VSTART);
     printf("#define LINUX_VSTOP %d\n", VSTOP);
     printf("#define LINUX_VSUSP %d\n", VSUSP);
+    printf("#define LINUX_POSIX_VDISABLE %d\n", _POSIX_VDISABLE);
     printf("\n");
     printf("#define LINUX_BRKINT %d\n", BRKINT);
     printf("#define LINUX_ICRNL %d\n", ICRNL);

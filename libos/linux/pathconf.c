@@ -37,10 +37,14 @@
 #include <unistd.h>
 #include <limits.h>
 
-#if 0
 long
-sysconf(int name)
+pathconf(const char *path, int name)
 {
-    return __fallback_sysconf(name);
+    switch (name) {
+    case _PC_2_SYMLINKS:
+        return 1;
+    case _PC_VDISABLE:
+        return LINUX_POSIX_VDISABLE;
+    }
+    return __fallback_pathconf(path, name);
 }
-#endif
