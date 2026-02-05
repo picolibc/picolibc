@@ -27,7 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #undef getwc
 #undef getwc_unlocked

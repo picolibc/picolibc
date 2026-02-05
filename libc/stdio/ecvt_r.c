@@ -76,7 +76,7 @@ ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
 
 #elif __SIZEOF_DOUBLE__ == 4
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)

@@ -288,9 +288,9 @@ locale, hard-coding the "C" locale settings.
 #include <ctype.h>
 #include <wctype.h>
 #include <wchar.h>
+#include <stdio.h>
 #include "local.h"
 #include "locale_private.h"
-#include "stdio_private.h"
 #undef TOLOWER
 
 /* Defines to make the file dual use for either strftime() or wcsftime().

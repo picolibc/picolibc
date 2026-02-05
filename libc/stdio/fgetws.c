@@ -27,7 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 wchar_t *
 __STDIO_UNLOCKED(fgetws)(wchar_t *str, int size, FILE *stream)

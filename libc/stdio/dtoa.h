@@ -29,7 +29,7 @@
 #ifndef _DTOA_H_
 #define _DTOA_H_
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 #include "../../libm/common/math_config.h"
 
 #define DTOA_MINUS 1

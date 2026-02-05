@@ -33,7 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#define _DEFAULT_SOURCE
+#include <stdio-posix.h>
 
 static char                read_buf[BUFSIZ];
 

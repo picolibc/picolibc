@@ -27,7 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-/* $Id: stdio_private.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
+/* $Id: local-stdio.h 847 2005-09-06 18:49:15Z joerg_wunsch $ */
 
 #ifndef _STDIO_PRIVATE_H_
 #define _STDIO_PRIVATE_H_
@@ -41,12 +41,9 @@
 #include <ctype.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <wchar.h>
-#include <float.h>
-#include <math.h>
 #include <limits.h>
-#include <stdio-bufio.h>
+#include <stdio-posix.h>
 #include <sys/lock.h>
 #ifdef __FSTAT_BUFSIZ
 #include <sys/stat.h>
@@ -207,9 +204,6 @@ bufio_close(struct __file_bufio *bf)
     return ret;
 }
 
-#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)                        \
-    FDEV_SETUP_BUFIO(fd, buf, size, read, write, lseek, close, rwflags, bflags)
-
 #if defined(__FSTAT_BUFSIZ) && defined(_STAT_HAS_ST_BLKSIZE)
 static inline size_t
 bufio_get_buf_size(int fd)
@@ -282,37 +276,6 @@ __flockfile_close(FILE *f)
 #define POINTER_MINUS(a, b) ((a) - (b))
 #define POINTER_PLUS(a, b)  ((a) + (b))
 #endif
-
-int __d_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __f_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __i_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __l_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __m_vfprintf(FILE *__stream, const char *__fmt, va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
-
-int __d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __i_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __l_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __m_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-
-int __d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __i_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __l_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __m_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-
-int __d_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int __f_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int __i_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int __l_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-int __m_vfscanf(FILE *__stream, const char *__fmt, va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 2, 0);
-
-int __d_swprintf(wchar_t * __restrict, size_t, const wchar_t * __restrict, ...);
 
 #if __SIZEOF_DOUBLE__ == 8
 #define FLOAT64      double

@@ -135,7 +135,7 @@ fcvtl_r(long double invalue, int ndecimal, int *decpt, int *sign, char *buf, siz
 
 #elif __SIZEOF_LONG_DOUBLE__ == 4
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 fcvtl_r(long double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)
@@ -145,7 +145,7 @@ fcvtl_r(long double invalue, int ndecimal, int *decpt, int *sign, char *buf, siz
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 fcvtl_r(long double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)

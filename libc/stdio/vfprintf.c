@@ -38,7 +38,7 @@
 #define PRINTF_NAME    __d_vfprintf
 #endif
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 #include "../../libm/common/math_config.h"
 #include "../stdlib/local.h"
 

@@ -32,7 +32,7 @@
 
 #define STRTOLD
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #if defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ > __SIZEOF_DOUBLE__
 

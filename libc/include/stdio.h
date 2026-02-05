@@ -336,6 +336,44 @@ int  feof_unlocked(FILE *__stream) __nonnull((1));
 #define feof_unlocked(s)     __feof_unlocked(s)
 #endif
 
+/* Expose printf variants */
+#ifdef __GNU_VISIBLE
+int __d_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __f_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __i_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __l_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __m_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+
+int __d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __i_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __l_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __m_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+
+int __d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __i_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __l_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __m_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+
+int __d_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __f_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __i_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __l_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+int __m_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+
+#endif
+
 #ifndef SEEK_SET
 #define SEEK_SET 0 /* set file offset to offset */
 #endif
@@ -403,7 +441,7 @@ typedef __gnuc_va_list va_list;
 #endif
 
 int dprintf(int fd, const char * __restrict fmt, ...);
-int vdprintf(int fd, const char * __restrict fmt, va_list ap);
+int vdprintf(int fd, const char * __restrict fmt, __gnuc_va_list ap);
 
 #endif
 

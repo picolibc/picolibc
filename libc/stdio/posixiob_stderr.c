@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #ifndef __PICOLIBC_STDERR_BUFSIZ
 #define __PICOLIBC_STDERR_BUFSIZ 1

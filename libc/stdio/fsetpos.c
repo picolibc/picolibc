@@ -54,7 +54,7 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 <<lseek>>, <<read>>, <<sbrk>>, <<write>>.
 */
 
-#include <stdio_private.h>
+#include "local-stdio.h"
 
 int
 fsetpos(FILE *iop, const fpos_t *pos)

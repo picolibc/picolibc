@@ -30,7 +30,7 @@
 /* $Id: gets.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
 #define _PICOLIBC_USE_DEPRECATED_GETS
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 char *
 gets(char *str)

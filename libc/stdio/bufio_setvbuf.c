@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)

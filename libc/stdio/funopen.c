@@ -33,9 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <stdlib.h>
-#include <stdio-bufio.h>
+#include "local-stdio.h"
 
 FILE *
 funopen(const void *cookie, ssize_t (*readfn)(void *cookie, void *buf, size_t n),

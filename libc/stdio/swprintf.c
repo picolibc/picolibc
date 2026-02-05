@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 swprintf(wchar_t *s, size_t n, const wchar_t *fmt, ...)

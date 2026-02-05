@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 #include <unistd.h>
 #include <stdbool.h>
 #include <sys/wait.h>

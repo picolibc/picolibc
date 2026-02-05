@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #if defined(__ATOMIC_UNGETC) && !defined(PICOLIBC_HAVE_SYNC_COMPARE_AND_SWAP)
 

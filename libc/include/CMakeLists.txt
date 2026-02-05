@@ -84,6 +84,7 @@ picolibc_headers(""
   spawn.h
   stdio.h
   stdio-bufio.h
+  stdio-posix.h
   stdint.h
   stdnoreturn.h
   stdlib.h

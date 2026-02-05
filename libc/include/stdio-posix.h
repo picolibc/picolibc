@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,24 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-stdio.h"
+#ifndef _STDIO_POSIX_H_
+#define _STDIO_POSIX_H_
 
-#ifndef FTELL
-#define FTELL      ftell
-#define FTELL_TYPE long
-#endif
+#include <unistd.h>
+#include <stdio-bufio.h>
 
-FTELL_TYPE
-FTELL(FILE *stream)
-{
-    struct __file_ext *xf = (struct __file_ext *)stream;
-    __flockfile(stream);
-    if ((stream->flags & __SEXT) && xf->seek) {
-        FTELL_TYPE ret = (FTELL_TYPE)(xf->seek)(stream, 0, SEEK_CUR);
-        if (__atomic_load_ungetc(&stream->unget) != 0)
-            ret--;
-        __funlock_return(stream, ret);
-    }
-    errno = ESPIPE;
-    __funlock_return(stream, -1);
-}
+#define FDEV_SETUP_POSIX(fd, buf, size, rwflags, bflags)                        \
+    FDEV_SETUP_BUFIO(fd, buf, size, read, write, lseek, close, rwflags, bflags)
+
+#endif /* _STDIO_POSIX_H_ */

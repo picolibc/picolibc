@@ -34,7 +34,7 @@
  */
 
 #define _NEED_IO_FLOAT
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #include "dtoa.h"
 

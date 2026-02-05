@@ -60,7 +60,7 @@ conforming C implementations may return a different result from
 No supporting OS subroutines are required.
 */
 
-#include <stdio_private.h>
+#include "local-stdio.h"
 
 int
 fgetpos(FILE * __restrict fp, fpos_t * __restrict pos)

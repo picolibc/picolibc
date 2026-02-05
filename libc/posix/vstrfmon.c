@@ -42,8 +42,8 @@
 #include <math.h>
 #include <errno.h>
 #include <ctype.h>
+#include <stdio.h>
 #include "posix-local.h"
-#include "stdio_private.h"
 
 /*
  * Shared function for strfmon and strfmon_l

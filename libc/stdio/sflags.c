@@ -16,7 +16,7 @@
  */
 /* No user fns here. Pesch 15apr92 */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 /*
  * Return the (stdio) flags for a given mode. Store the flags to be

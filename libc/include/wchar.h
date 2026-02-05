@@ -152,6 +152,9 @@ wint_t putwchar_unlocked(wchar_t);
 int swprintf(wchar_t * __restrict, size_t, const wchar_t * __restrict, ...);
 int swscanf(const wchar_t * __restrict, const wchar_t * __restrict, ...);
 #endif
+#if __GNU_VISIBLE
+int __d_swprintf(wchar_t * __restrict, size_t, const wchar_t * __restrict, ...);
+#endif
 wint_t ungetwc(wint_t wc, __FILE *);
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
 int vfwprintf(__FILE * __restrict, const wchar_t * __restrict, __gnuc_va_list);

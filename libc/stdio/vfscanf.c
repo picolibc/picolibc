@@ -37,7 +37,7 @@
 #define SCANF_NAME    __d_vfscanf
 #endif
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 #include <wctype.h>
 #include "scanf_private.h"
 #include "../stdlib/local.h"

@@ -90,7 +90,7 @@ requires <<mkstemp>> while deprecating <<mktemp>>.  <<mkstemps>>, and
 Supporting OS subroutines required: <<open>>
 */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 /* Our names are six characters from [0-9a-z] */
 #define NUM_NAMES (36UL * 36UL * 36UL * 36UL * 36UL * 36UL)

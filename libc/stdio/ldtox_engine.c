@@ -45,7 +45,7 @@
  * This code only works with long double type.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #if __SIZEOF_LONG_DOUBLE__ > 8
 

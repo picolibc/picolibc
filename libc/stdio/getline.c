@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 ssize_t
 getline(char ** restrict lineptr, size_t * restrict n, FILE * restrict stream)

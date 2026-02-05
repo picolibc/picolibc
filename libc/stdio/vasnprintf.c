@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 char * __disable_sanitizer
 vasnprintf(char *str, size_t *lenp, const char *fmt, va_list ap)
