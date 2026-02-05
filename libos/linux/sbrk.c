@@ -37,24 +37,34 @@
 #include <unistd.h>
 #include <stdint.h>
 
-static void *current_brk;
+static void *real_brk;
+static void *reported_brk;
+
+#define BRK_CHUNK 4096
+#define BRK_MASK  (BRK_CHUNK - 1)
 
 void *
 sbrk(intptr_t increment)
 {
-    if (current_brk == NULL)
-        current_brk = (void *)syscall(LINUX_SYS_brk, 0);
+    if (real_brk == NULL) {
+        real_brk = (void *)syscall(LINUX_SYS_brk, 0);
+        reported_brk = real_brk;
+    }
 
-    void *new_brk = current_brk + increment;
-    void *old_brk = current_brk;
-    void *ret;
+    void *new_brk = reported_brk + increment;
+    void *old_brk = reported_brk;
 
     if ((uintptr_t)new_brk < (uintptr_t)old_brk)
         return (void *)(uintptr_t)-1;
 
-    ret = (void *)syscall(LINUX_SYS_brk, new_brk);
-    if (ret == old_brk)
-        return (void *)(uintptr_t)-1;
-    current_brk = (void *)ret;
+    if ((uintptr_t)new_brk > (uintptr_t)real_brk) {
+        void *old_real_brk = real_brk;
+        void *new_real_brk = (void *)(((uintptr_t)new_brk + BRK_MASK) & ~(uintptr_t)BRK_MASK);
+        void *ret = (void *)syscall(LINUX_SYS_brk, new_real_brk);
+        if (ret == old_real_brk)
+            return (void *)(uintptr_t)-1;
+        real_brk = (void *)ret;
+    }
+    reported_brk = new_brk;
     return old_brk;
 }
