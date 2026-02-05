@@ -33,16 +33,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
 #include <unistd.h>
-#include <stdlib.h>
-#include <pwd.h>
 
-char *
-getlogin(void)
+extern char **environ;
+
+int
+execv(const char *path, char * const argv[])
 {
-    struct passwd *pwd = getpwuid(getuid());
-    if (!pwd)
-        return NULL;
-    return pwd->pw_name;
+    return execve(path, argv, environ);
 }

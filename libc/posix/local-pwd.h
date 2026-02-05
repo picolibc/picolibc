@@ -33,16 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <unistd.h>
-#include <stdlib.h>
+#ifndef _LOCAL_PWD_H_
+#define _LOCAL_PWD_H_
+#include <stdio.h>
 #include <pwd.h>
 
-char *
-getlogin(void)
-{
-    struct passwd *pwd = getpwuid(getuid());
-    if (!pwd)
-        return NULL;
-    return pwd->pw_name;
-}
+extern char          __passwd_buffer[BUFSIZ];
+extern struct passwd __passwd_data;
+extern FILE         *__passwd_file;
+
+#endif /* _LOCAL_PWD_H_ */

@@ -33,35 +33,47 @@
 #define _PWD_H_
 
 #include <sys/cdefs.h>
-#include <sys/types.h>
+#define __need_size_t
+#include <stddef.h>
 
 _BEGIN_STD_C
 
-#if __BSD_VISIBLE
-#define _PATH_PASSWD  "/etc/passwd"
+#include <sys/_types.h>
+#ifndef ___FILE_DECLARED
+typedef struct __file __FILE;
+#define ___FILE_DECLARED
+#endif
 
-#define _PASSWORD_LEN 128 /* max length, not counting NULL */
+#ifndef _GID_T_DECLARED
+typedef __gid_t gid_t; /* group id */
+#define _GID_T_DECLARED
+#endif
+
+#ifndef _UID_T_DECLARED
+typedef __uid_t uid_t; /* user id */
+#define _UID_T_DECLARED
+#endif
+
+#ifndef __PASSWORD_FILENAME
+#define __PASSWORD_FILENAME "/etc/passwd"
 #endif
 
 struct passwd {
-    char *pw_name;    /* user name */
-    char *pw_passwd;  /* encrypted password */
-    uid_t pw_uid;     /* user uid */
-    gid_t pw_gid;     /* user gid */
-    char *pw_comment; /* comment */
-    char *pw_gecos;   /* Honeywell login info */
-    char *pw_dir;     /* home directory */
-    char *pw_shell;   /* default shell */
+    char *pw_name;  /* user name */
+    uid_t pw_uid;   /* user uid */
+    gid_t pw_gid;   /* user gid */
+    char *pw_dir;   /* home directory */
+    char *pw_shell; /* default shell */
 };
 
-struct passwd *getpwuid(uid_t);
-struct passwd *getpwnam(const char *);
+struct passwd *getpwuid(uid_t uid);
 
-#ifndef __INSIDE_CYGWIN__
-#if __MISC_VISIBLE || __POSIX_VISIBLE
-int getpwnam_r(const char *, struct passwd *, char *, size_t, struct passwd **);
-int getpwuid_r(uid_t, struct passwd *, char *, size_t, struct passwd **);
-#endif
+int getpwuid_r(uid_t uid, struct passwd *pwd, char *buffer, size_t bufsize, struct passwd **result);
+
+struct passwd *getpwnam(const char *name);
+
+int            getpwnam_r(const char *name, struct passwd *pwd, char *buffer, size_t bufsize,
+                          struct passwd **result);
 
 #if __MISC_VISIBLE || __XSI_VISIBLE >= 4
 struct passwd *getpwent(void);
@@ -69,10 +81,11 @@ void           setpwent(void);
 void           endpwent(void);
 #endif
 
-#if __BSD_VISIBLE
-int setpassent(int);
+#if __MISC_VISIBLE || __SVID_VISIBLE
+struct passwd *fgetpwent(__FILE *stream);
+int            fgetpwent_r(__FILE *stream, struct passwd *pwbuf, char *buf, size_t size,
+                           struct passwd **pwbufp);
 #endif
-#endif /*!__INSIDE_CYGWIN__*/
 
 _END_STD_C
 

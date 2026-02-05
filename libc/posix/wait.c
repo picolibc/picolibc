@@ -33,16 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <unistd.h>
-#include <stdlib.h>
-#include <pwd.h>
+#include <sys/wait.h>
 
-char *
-getlogin(void)
+pid_t
+wait(int *status)
 {
-    struct passwd *pwd = getpwuid(getuid());
-    if (!pwd)
-        return NULL;
-    return pwd->pw_name;
+    return waitpid((pid_t)-1, status, 0);
 }

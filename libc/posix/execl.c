@@ -33,16 +33,47 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
 #include <unistd.h>
+#include <stdarg.h>
 #include <stdlib.h>
-#include <pwd.h>
+#include <errno.h>
 
-char *
-getlogin(void)
+extern char **environ;
+
+int
+execl(const char *path, const char *arg, ...)
 {
-    struct passwd *pwd = getpwuid(getuid());
-    if (!pwd)
-        return NULL;
-    return pwd->pw_name;
+    va_list      ap;
+    int          argc = 1;
+    const char **argv;
+    const char  *a;
+    int          ret;
+
+    /* count args */
+    va_start(ap, arg);
+    while (va_arg(ap, const char *) != NULL)
+        argc++;
+    va_end(ap);
+
+    /* allocate argv */
+    argv = calloc(argc + 1, sizeof(char *));
+    if (!argv) {
+        errno = ENOMEM;
+        return -1;
+    }
+
+    /* fill in argv */
+    va_start(ap, arg);
+    argc = 0;
+    argv[argc++] = arg;
+    for (;;) {
+        a = va_arg(ap, const char *);
+        argv[argc++] = a;
+        if (a == NULL)
+            break;
+    }
+    va_end(ap);
+    ret = execve(path, (char * const *)argv, environ);
+    free(argv);
+    return ret;
 }

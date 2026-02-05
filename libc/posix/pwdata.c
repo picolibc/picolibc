@@ -34,15 +34,9 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <unistd.h>
-#include <stdlib.h>
+#include <stdio.h>
 #include <pwd.h>
+#include "local-pwd.h"
 
-char *
-getlogin(void)
-{
-    struct passwd *pwd = getpwuid(getuid());
-    if (!pwd)
-        return NULL;
-    return pwd->pw_name;
-}
+char          __passwd_buffer[BUFSIZ];
+struct passwd __passwd_data;

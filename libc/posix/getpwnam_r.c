@@ -34,15 +34,27 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <unistd.h>
-#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
 #include <pwd.h>
+#include <string.h>
+#include <errno.h>
 
-char *
-getlogin(void)
+int
+getpwnam_r(const char *name, struct passwd *pwbuf, char *buf, size_t size, struct passwd **pwbufp)
 {
-    struct passwd *pwd = getpwuid(getuid());
-    if (!pwd)
-        return NULL;
-    return pwd->pw_name;
+    FILE          *file;
+    struct passwd *pwd;
+    int            ret;
+
+    file = fopen(__PASSWORD_FILENAME, "r");
+    if (!file)
+        return errno;
+    while ((ret = fgetpwent_r(file, pwbuf, buf, size, &pwd)) == 0)
+        if (strcmp(name, pwd->pw_name) == 0)
+            break;
+    fclose(file);
+    if (ret == 0)
+        *pwbufp = pwd;
+    return 0;
 }

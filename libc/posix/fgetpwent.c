@@ -34,15 +34,17 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <unistd.h>
-#include <stdlib.h>
+#include <stdio.h>
+#include <sys/types.h>
 #include <pwd.h>
+#include "local-pwd.h"
 
-char *
-getlogin(void)
+struct passwd *
+fgetpwent(FILE *stream)
 {
-    struct passwd *pwd = getpwuid(getuid());
-    if (!pwd)
-        return NULL;
-    return pwd->pw_name;
+    struct passwd *pwd = NULL;
+
+    if (fgetpwent_r(stream, &__passwd_data, __passwd_buffer, sizeof(__passwd_buffer), &pwd) == 0)
+        return pwd;
+    return NULL;
 }
