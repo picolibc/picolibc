@@ -34,6 +34,7 @@
 #
 picolibc_sources(
   basename.c
+  creat.c
   collcmp.c
   dirname.c
   endpwent.c

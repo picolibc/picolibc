@@ -51,7 +51,6 @@ if fs.is_dir(machine_dir)
     'clock_gettime.c',
     'close.c',
     'closedir.c',
-    'creat.c',
     'dup.c',
     'dup2.c',
     'execve.c',

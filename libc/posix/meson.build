@@ -34,6 +34,7 @@
 #
 srcs_posix = [
   'basename.c',
+  'creat.c',
   'collcmp.c',
   'dirname.c',
   'endpwent.c',
