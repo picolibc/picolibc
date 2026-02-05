@@ -548,6 +548,24 @@ Files: CMakeLists.txt
  libm/machine/riscv/CMakeLists.txt
  libm/machine/x86/CMakeLists.txt
  libm/math/CMakeLists.txt
+ libos/CMakeLists.txt
+ libos/semihost/CMakeLists.txt
+ libos/semihost/common/CMakeLists.txt
+ libos/semihost/common/getentropy.c
+ libos/semihost/fake/fake_exit.c
+ libos/semihost/fake/fake_io.c
+ libos/semihost/fake/fake_kill.c
+ libos/semihost/fake/fake_stub.c
+ libos/semihost/fake/meson.build
+ libos/semihost/machine/arc/CMakeLists.txt
+ libos/semihost/machine/arc64/CMakeLists.txt
+ libos/semihost/machine/arm/CMakeLists.txt
+ libos/semihost/machine/powerpc/opal.h
+ libos/semihost/machine/powerpc/opal_call.S
+ libos/semihost/machine/powerpc/opal_cec_power_down.c
+ libos/semihost/machine/powerpc/opal_console_write.c
+ libos/semihost/machine/sh/sh_io.c
+ libos/semihost/machine/sh/sh_write.c
  picocrt/CMakeLists.txt
  picocrt/machine/arc/CMakeLists.txt
  picocrt/machine/arc64/CMakeLists.txt
@@ -555,22 +573,6 @@ Files: CMakeLists.txt
  picocrt/machine/powerpc/crt0.S
  picocrt/machine/powerpc/powerpc_crt.h
  picocrt/machine/sh/CMakeLists.txt
- semihost/CMakeLists.txt
- semihost/common/CMakeLists.txt
- semihost/common/getentropy.c
- semihost/fake/fake_exit.c
- semihost/fake/fake_io.c
- semihost/fake/fake_kill.c
- semihost/fake/fake_stub.c
- semihost/fake/meson.build
- semihost/machine/arc/CMakeLists.txt
- semihost/machine/arc64/CMakeLists.txt
- semihost/machine/arm/CMakeLists.txt
- semihost/machine/powerpc/opal.h
- semihost/machine/powerpc/opal_call.S
- semihost/machine/powerpc/opal_cec_power_down.c
- semihost/machine/powerpc/opal_console_write.c
- semihost/machine/sh/sh_io.c
  test/CMakeLists.txt
  test/lock-valid.c
  test/long_double.c
@@ -634,6 +636,12 @@ Files: cmake/TC-arm-none-eabi.ld
  libm/machine/riscv/sf_fma.c
  libm/machine/riscv/sf_sqrt.c
  libm/math/s_lgamma.c
+ libos/semihost/common/fstat.c
+ libos/semihost/common/isatty.c
+ libos/semihost/common/mapstdio.c
+ libos/semihost/common/sys_iserror.c
+ libos/semihost/common/sys_system.c
+ libos/semihost/common/sys_tickfreq.c
  scripts/run-aarch64
  scripts/run-arc
  scripts/run-i386
@@ -646,12 +654,6 @@ Files: cmake/TC-arm-none-eabi.ld
  scripts/run-sparc
  scripts/run-x86
  scripts/run-x86_64
- semihost/common/fstat.c
- semihost/common/isatty.c
- semihost/common/mapstdio.c
- semihost/common/sys_iserror.c
- semihost/common/sys_system.c
- semihost/common/sys_tickfreq.c
  test/fenv.c
  test/ffs.c
  test/malloc.c
@@ -742,6 +744,7 @@ Files: cmake/TC-rx.ld
  libc/machine/sh/tls.c
  libc/machine/x86/interrupt.S
  libc/machine/x86/interrupt.c
+ libc/posix/creat.c
  libc/posix/posix-local.h
  libc/posix/strfmon.c
  libc/posix/strfmon_l.c
@@ -822,16 +825,23 @@ Files: cmake/TC-rx.ld
  libc/ubsan/ubsan_warning.c
  libm/math/s_sincos.c
  libm/math/sf_sincos.c
+ libos/linux/_exit.c
+ libos/linux/meson.build
+ libos/linux/open.c
+ libos/linux/read.c
+ libos/linux/rmdir.c
+ libos/linux/unlink.c
+ libos/linux/write.c
+ libos/semihost/machine/lm32/lm32_errno.c
+ libos/semihost/machine/rx/rx_iob.c
+ libos/semihost/machine/rx/rx_semihost.h
+ libos/semihost/machine/sh/sh_syscall.c
  picocrt/machine/lm32/crt0.S
  picocrt/machine/or1k/crt0.S
  picocrt/machine/or1k/crt0.c
  picocrt/machine/rx/crt0.c
  picocrt/machine/x86/traps.S
  picocrt/machine/x86/traps.c
- semihost/machine/lm32/lm32_errno.c
- semihost/machine/rx/rx_iob.c
- semihost/machine/rx/rx_semihost.h
- semihost/machine/sh/sh_syscall.c
  test/test-ctype/test-wcase.c
  test/test-getdate.c
  test/test-hello.c
@@ -996,6 +1006,7 @@ Files: cmake/TC-rx.ld
  test/test-math/test-ulp.h
  test/test-monetary/CMakeLists.txt
  test/test-monetary/meson.build
+ test/test-posix/meson.build
  test/test-scmpu.c
  test/test-stdio/meson.build
  test/test-stdio/test-dprintf.c
@@ -1020,55 +1031,55 @@ Files: doc/printf-sample/Makefile
  libc/stdio/ldtox_engine.c
  libc/stdio/swprintf.c
  libc/stdio/vswprintf.c
+ libos/semihost/machine/aarch64/aarch64-semihost.h
+ libos/semihost/machine/aarch64/aarch64_iob.c
+ libos/semihost/machine/arc/arc_close.c
+ libos/semihost/machine/arc/arc_errno.c
+ libos/semihost/machine/arc/arc_exit.c
+ libos/semihost/machine/arc/arc_fstat.c
+ libos/semihost/machine/arc/arc_lseek.c
+ libos/semihost/machine/arc/arc_open.c
+ libos/semihost/machine/arc/arc_read.c
+ libos/semihost/machine/arc/arc_semihost.h
+ libos/semihost/machine/arc/arc_stat.c
+ libos/semihost/machine/arc/arc_unlink.c
+ libos/semihost/machine/arc/arc_write.c
+ libos/semihost/machine/m68k/m68k_close.c
+ libos/semihost/machine/m68k/m68k_exit.c
+ libos/semihost/machine/m68k/m68k_fstat.c
+ libos/semihost/machine/m68k/m68k_lseek.c
+ libos/semihost/machine/m68k/m68k_open.c
+ libos/semihost/machine/m68k/m68k_read.c
+ libos/semihost/machine/m68k/m68k_semihost.S
+ libos/semihost/machine/m68k/m68k_semihost.h
+ libos/semihost/machine/m68k/m68k_stat.c
+ libos/semihost/machine/m68k/m68k_unlink.c
+ libos/semihost/machine/m68k/m68k_write.c
+ libos/semihost/machine/msp430/msp430-iob.c
+ libos/semihost/machine/msp430/msp430-semihost.h
+ libos/semihost/machine/nios2/nios2_close.c
+ libos/semihost/machine/nios2/nios2_exit.c
+ libos/semihost/machine/nios2/nios2_fstat.c
+ libos/semihost/machine/nios2/nios2_lseek.c
+ libos/semihost/machine/nios2/nios2_open.c
+ libos/semihost/machine/nios2/nios2_read.c
+ libos/semihost/machine/nios2/nios2_semihost.c
+ libos/semihost/machine/nios2/nios2_semihost.h
+ libos/semihost/machine/nios2/nios2_stat.c
+ libos/semihost/machine/nios2/nios2_unlink.c
+ libos/semihost/machine/nios2/nios2_write.c
+ libos/semihost/machine/or1k/or1k_iob.c
+ libos/semihost/machine/or1k/or1k_semihost.h
+ libos/semihost/machine/sh/sh_semihost.h
+ libos/semihost/machine/sparc/sparc-semihost.h
+ libos/semihost/machine/sparc/sparc_iob.c
+ libos/semihost/machine/xtensa/xtensa-iob.c
+ libos/semihost/machine/xtensa/xtensa-semihost.h
  picocrt/machine/m68k/crt0.c
  picocrt/machine/mips/crt0.c
  picocrt/machine/msp430/crt0.c
  picocrt/machine/nios2/crt0.c
  picocrt/machine/sparc/crt0.c
- semihost/machine/aarch64/aarch64-semihost.h
- semihost/machine/aarch64/aarch64_iob.c
- semihost/machine/arc/arc_close.c
- semihost/machine/arc/arc_errno.c
- semihost/machine/arc/arc_exit.c
- semihost/machine/arc/arc_fstat.c
- semihost/machine/arc/arc_lseek.c
- semihost/machine/arc/arc_open.c
- semihost/machine/arc/arc_read.c
- semihost/machine/arc/arc_semihost.h
- semihost/machine/arc/arc_stat.c
- semihost/machine/arc/arc_unlink.c
- semihost/machine/arc/arc_write.c
- semihost/machine/m68k/m68k_close.c
- semihost/machine/m68k/m68k_exit.c
- semihost/machine/m68k/m68k_fstat.c
- semihost/machine/m68k/m68k_lseek.c
- semihost/machine/m68k/m68k_open.c
- semihost/machine/m68k/m68k_read.c
- semihost/machine/m68k/m68k_semihost.S
- semihost/machine/m68k/m68k_semihost.h
- semihost/machine/m68k/m68k_stat.c
- semihost/machine/m68k/m68k_unlink.c
- semihost/machine/m68k/m68k_write.c
- semihost/machine/msp430/msp430-iob.c
- semihost/machine/msp430/msp430-semihost.h
- semihost/machine/nios2/nios2_close.c
- semihost/machine/nios2/nios2_exit.c
- semihost/machine/nios2/nios2_fstat.c
- semihost/machine/nios2/nios2_lseek.c
- semihost/machine/nios2/nios2_open.c
- semihost/machine/nios2/nios2_read.c
- semihost/machine/nios2/nios2_semihost.c
- semihost/machine/nios2/nios2_semihost.h
- semihost/machine/nios2/nios2_stat.c
- semihost/machine/nios2/nios2_unlink.c
- semihost/machine/nios2/nios2_write.c
- semihost/machine/or1k/or1k_iob.c
- semihost/machine/or1k/or1k_semihost.h
- semihost/machine/sh/sh_semihost.h
- semihost/machine/sparc/sparc-semihost.h
- semihost/machine/sparc/sparc_iob.c
- semihost/machine/xtensa/xtensa-iob.c
- semihost/machine/xtensa/xtensa-semihost.h
  test/test-fma.c
  test/test-raise.c
  test/test-stdio/test-fread-fwrite.c
@@ -1106,6 +1117,48 @@ Files: empty-libs/empty.c
  libm/machine/powerpc/meson.build
  libm/test/scalb_vec.c
  libm/test/scalbn_vec.c
+ libos/semihost/common/gettimeofday.c
+ libos/semihost/machine/aarch64/aarch64_exit.c
+ libos/semihost/machine/aarch64/aarch64_stub.c
+ libos/semihost/machine/aarch64/meson.build
+ libos/semihost/machine/arc/arc_stub.c
+ libos/semihost/machine/arc/meson.build
+ libos/semihost/machine/arc64/meson.build
+ libos/semihost/machine/arm/meson.build
+ libos/semihost/machine/m68k/m68k_stub.c
+ libos/semihost/machine/m68k/meson.build
+ libos/semihost/machine/msp430/meson.build
+ libos/semihost/machine/msp430/msp430-exit.c
+ libos/semihost/machine/msp430/msp430-stub.c
+ libos/semihost/machine/nios2/meson.build
+ libos/semihost/machine/nios2/nios2_stub.c
+ libos/semihost/machine/or1k/meson.build
+ libos/semihost/machine/or1k/or1k_exit.c
+ libos/semihost/machine/or1k/or1k_stub.c
+ libos/semihost/machine/powerpc/meson.build
+ libos/semihost/machine/powerpc/powerpc_exit.c
+ libos/semihost/machine/powerpc/powerpc_io.c
+ libos/semihost/machine/powerpc/powerpc_kill.c
+ libos/semihost/machine/powerpc/powerpc_stub.c
+ libos/semihost/machine/riscv/meson.build
+ libos/semihost/machine/rx/CMakeLists.txt
+ libos/semihost/machine/rx/meson.build
+ libos/semihost/machine/rx/rx_exit.c
+ libos/semihost/machine/rx/rx_stub.c
+ libos/semihost/machine/sh/meson.build
+ libos/semihost/machine/sh/sh_exit.c
+ libos/semihost/machine/sparc/meson.build
+ libos/semihost/machine/sparc/sparc_exit.c
+ libos/semihost/machine/sparc/sparc_stub.c
+ libos/semihost/machine/x86/bios.S
+ libos/semihost/machine/x86/e9_exit.c
+ libos/semihost/machine/x86/e9_io.c
+ libos/semihost/machine/x86/e9_kill.c
+ libos/semihost/machine/x86/e9_stub.c
+ libos/semihost/machine/x86/meson.build
+ libos/semihost/machine/xtensa/meson.build
+ libos/semihost/machine/xtensa/xtensa-exit.c
+ libos/semihost/machine/xtensa/xtensa-stub.c
  picocrt/machine/aarch64/meson.build
  picocrt/machine/arc/meson.build
  picocrt/machine/arc64/meson.build
@@ -1126,49 +1179,6 @@ Files: empty-libs/empty.c
  scripts/do-power9-fp128-configure
  scripts/do-powerpc64-configure
  scripts/do-powerpc64le-configure
- semihost/common/gettimeofday.c
- semihost/machine/aarch64/aarch64_exit.c
- semihost/machine/aarch64/aarch64_stub.c
- semihost/machine/aarch64/meson.build
- semihost/machine/arc/arc_stub.c
- semihost/machine/arc/meson.build
- semihost/machine/arc64/meson.build
- semihost/machine/arm/meson.build
- semihost/machine/m68k/m68k_stub.c
- semihost/machine/m68k/meson.build
- semihost/machine/msp430/meson.build
- semihost/machine/msp430/msp430-exit.c
- semihost/machine/msp430/msp430-stub.c
- semihost/machine/nios2/meson.build
- semihost/machine/nios2/nios2_stub.c
- semihost/machine/or1k/meson.build
- semihost/machine/or1k/or1k_exit.c
- semihost/machine/or1k/or1k_stub.c
- semihost/machine/powerpc/meson.build
- semihost/machine/powerpc/powerpc_exit.c
- semihost/machine/powerpc/powerpc_io.c
- semihost/machine/powerpc/powerpc_kill.c
- semihost/machine/powerpc/powerpc_stub.c
- semihost/machine/riscv/meson.build
- semihost/machine/rx/CMakeLists.txt
- semihost/machine/rx/meson.build
- semihost/machine/rx/rx_exit.c
- semihost/machine/rx/rx_stub.c
- semihost/machine/sh/meson.build
- semihost/machine/sh/sh_exit.c
- semihost/machine/sh/sh_stub.c
- semihost/machine/sparc/meson.build
- semihost/machine/sparc/sparc_exit.c
- semihost/machine/sparc/sparc_stub.c
- semihost/machine/x86/bios.S
- semihost/machine/x86/e9_exit.c
- semihost/machine/x86/e9_io.c
- semihost/machine/x86/e9_kill.c
- semihost/machine/x86/e9_stub.c
- semihost/machine/x86/meson.build
- semihost/machine/xtensa/meson.build
- semihost/machine/xtensa/xtensa-exit.c
- semihost/machine/xtensa/xtensa-stub.c
  test/atexit.c
  test/constructor-skip.c
  test/constructor.c
@@ -1190,20 +1200,228 @@ License: BSD3-1
 
 Files: empty-libs/meson.build
  libc/ctype/ctype_class.h
+ libc/include/stdio-posix.h
+ libc/include/sys/ioctl.h
  libc/machine/arc64/sys/meson.build
  libc/machine/arc64/tls.c
  libc/machine/arc64/vector_table.c
  libc/machine/loongarch/CMakeLists.txt
  libc/machine/loongarch/machine/CMakeLists.txt
  libc/machine/msp430/CMakeLists.txt
+ libc/posix/endpwent.c
+ libc/posix/execl.c
+ libc/posix/execv.c
+ libc/posix/execvp.c
+ libc/posix/execvpe.c
+ libc/posix/fgetpwent.c
+ libc/posix/fgetpwent_r.c
+ libc/posix/getlogin.c
+ libc/posix/getpwent.c
+ libc/posix/getpwnam.c
+ libc/posix/getpwnam_r.c
+ libc/posix/getpwuid.c
+ libc/posix/getpwuid_r.c
+ libc/posix/local-pwd.h
+ libc/posix/pwdata.c
+ libc/posix/setpwent.c
+ libc/posix/sleep.c
+ libc/posix/wait.c
  libc/stdio/atomic_store.c
  libc/stdio/bufio_close.c
  libc/stdio/bufio_close_nf.c
  libc/stdio/bufio_setvbuf.c
+ libc/stdio/pclose.c
+ libc/stdio/popen.c
  libm/math/sf_rem_pio2.c
+ libos/dummy/CMakeLists.txt
+ libos/dummy/_exit.c
+ libos/dummy/close.c
+ libos/dummy/fstat.c
+ libos/dummy/getentropy.c
+ libos/dummy/gettimeofday.c
+ libos/dummy/iob.c
+ libos/dummy/lseek.c
+ libos/dummy/meson.build
+ libos/dummy/open.c
+ libos/dummy/read.c
+ libos/dummy/sigprocmask.c
+ libos/dummy/stat.c
+ libos/dummy/times.c
+ libos/dummy/unlink.c
+ libos/dummy/write.c
+ libos/fallback/CMakeLists.txt
+ libos/fallback/meson.build
+ libos/fallback/sysconf.c
+ libos/linux/_signal_from_linux.c
+ libos/linux/_signal_to_linux.c
+ libos/linux/_statbuf.c
+ libos/linux/_syscall_error.c
+ libos/linux/access.c
+ libos/linux/alarm.c
+ libos/linux/cfgetispeed.c
+ libos/linux/cfgetospeed.c
+ libos/linux/chdir.c
+ libos/linux/chmod.c
+ libos/linux/clock_gettime.c
+ libos/linux/close.c
+ libos/linux/closedir.c
+ libos/linux/dup.c
+ libos/linux/dup2.c
+ libos/linux/execve.c
+ libos/linux/fcntl.c
+ libos/linux/fork.c
+ libos/linux/fpathconf.c
+ libos/linux/fstat.c
+ libos/linux/getcwd.c
+ libos/linux/getegid.c
+ libos/linux/getentropy.c
+ libos/linux/geteuid.c
+ libos/linux/getgid.c
+ libos/linux/getgroups.c
+ libos/linux/getpgrp.c
+ libos/linux/getpid.c
+ libos/linux/gettimeofday.c
+ libos/linux/getuid.c
+ libos/linux/getwd.c
+ libos/linux/include/meson.build
+ libos/linux/include/poll.h
+ libos/linux/include/sys/dirent.h
+ libos/linux/include/sys/meson.build
+ libos/linux/include/sys/termios.h
+ libos/linux/isatty.c
+ libos/linux/kill.c
+ libos/linux/killpg.c
+ libos/linux/local-linux.h
+ libos/linux/local-termios.h
+ libos/linux/local-time.h
+ libos/linux/lseek.c
+ libos/linux/machine/aarch64/linux/linux-errno.h
+ libos/linux/machine/aarch64/linux/linux-fcntl.h
+ libos/linux/machine/aarch64/linux/linux-ioctl.h
+ libos/linux/machine/aarch64/linux/linux-poll.h
+ libos/linux/machine/aarch64/linux/linux-sigaction.h
+ libos/linux/machine/aarch64/linux/linux-signal.h
+ libos/linux/machine/aarch64/linux/linux-syscall.h
+ libos/linux/machine/aarch64/linux/linux-sysconf.h
+ libos/linux/machine/aarch64/linux/linux-termios-struct.h
+ libos/linux/machine/aarch64/linux/linux-termios.h
+ libos/linux/machine/aarch64/linux/linux-time.h
+ libos/linux/machine/aarch64/linux/linux-wait.h
+ libos/linux/machine/aarch64/linux/meson.build
+ libos/linux/machine/aarch64/meson.build
+ libos/linux/machine/aarch64/sa-restore.S
+ libos/linux/machine/aarch64/sys/meson.build
+ libos/linux/machine/aarch64/syscall.S
+ libos/linux/machine/arm/linux/linux-errno.h
+ libos/linux/machine/arm/linux/linux-fcntl.h
+ libos/linux/machine/arm/linux/linux-ioctl.h
+ libos/linux/machine/arm/linux/linux-poll.h
+ libos/linux/machine/arm/linux/linux-sigaction.h
+ libos/linux/machine/arm/linux/linux-signal.h
+ libos/linux/machine/arm/linux/linux-syscall.h
+ libos/linux/machine/arm/linux/linux-sysconf.h
+ libos/linux/machine/arm/linux/linux-termios-struct.h
+ libos/linux/machine/arm/linux/linux-termios.h
+ libos/linux/machine/arm/linux/linux-time.h
+ libos/linux/machine/arm/linux/linux-wait.h
+ libos/linux/machine/arm/linux/meson.build
+ libos/linux/machine/arm/meson.build
+ libos/linux/machine/arm/sa-restore.S
+ libos/linux/machine/arm/sys/meson.build
+ libos/linux/machine/arm/syscall.S
+ libos/linux/machine/i686/linux/linux-errno.h
+ libos/linux/machine/i686/linux/linux-fcntl.h
+ libos/linux/machine/i686/linux/linux-ioctl.h
+ libos/linux/machine/i686/linux/linux-poll.h
+ libos/linux/machine/i686/linux/linux-sigaction.h
+ libos/linux/machine/i686/linux/linux-signal.h
+ libos/linux/machine/i686/linux/linux-syscall.h
+ libos/linux/machine/i686/linux/linux-sysconf.h
+ libos/linux/machine/i686/linux/linux-termios.h
+ libos/linux/machine/i686/linux/linux-time.h
+ libos/linux/machine/i686/linux/linux-wait.h
+ libos/linux/machine/x86/asm/ldt.h
+ libos/linux/machine/x86/asm/meson.build
+ libos/linux/machine/x86/linux/linux-errno.h
+ libos/linux/machine/x86/linux/linux-fcntl.h
+ libos/linux/machine/x86/linux/linux-ioctl.h
+ libos/linux/machine/x86/linux/linux-poll.h
+ libos/linux/machine/x86/linux/linux-sigaction.h
+ libos/linux/machine/x86/linux/linux-signal.h
+ libos/linux/machine/x86/linux/linux-syscall.h
+ libos/linux/machine/x86/linux/linux-sysconf.h
+ libos/linux/machine/x86/linux/linux-termios-struct.h
+ libos/linux/machine/x86/linux/linux-termios.h
+ libos/linux/machine/x86/linux/linux-time.h
+ libos/linux/machine/x86/linux/linux-wait.h
+ libos/linux/machine/x86/linux/meson.build
+ libos/linux/machine/x86/meson.build
+ libos/linux/machine/x86/sa-restore.S
+ libos/linux/machine/x86/sa_restore.S
+ libos/linux/machine/x86/sys/meson.build
+ libos/linux/machine/x86/syscall.S
+ libos/linux/machine/x86_64/linux/linux-errno.h
+ libos/linux/machine/x86_64/linux/linux-fcntl.h
+ libos/linux/machine/x86_64/linux/linux-ioctl.h
+ libos/linux/machine/x86_64/linux/linux-poll.h
+ libos/linux/machine/x86_64/linux/linux-sigaction.h
+ libos/linux/machine/x86_64/linux/linux-signal.h
+ libos/linux/machine/x86_64/linux/linux-syscall.h
+ libos/linux/machine/x86_64/linux/linux-sysconf.h
+ libos/linux/machine/x86_64/linux/linux-termios.h
+ libos/linux/machine/x86_64/linux/linux-time.h
+ libos/linux/machine/x86_64/linux/linux-wait.h
+ libos/linux/mkdir.c
+ libos/linux/nanosleep.c
+ libos/linux/opendir.c
+ libos/linux/pathconf.c
+ libos/linux/pipe.c
+ libos/linux/poll.c
+ libos/linux/raise.c
+ libos/linux/readdir.c
+ libos/linux/readlink.c
+ libos/linux/rename.c
+ libos/linux/sbrk.c
+ libos/linux/setegid.c
+ libos/linux/seteuid.c
+ libos/linux/setgid.c
+ libos/linux/setgroups.c
+ libos/linux/setitimer.c
+ libos/linux/setuid.c
+ libos/linux/signal.c
+ libos/linux/sigprocmask.c
+ libos/linux/sigsuspend.c
+ libos/linux/sleep.c
+ libos/linux/stat.c
+ libos/linux/tcflush.c
+ libos/linux/tcgetattr.c
+ libos/linux/tcgetpgrp.c
+ libos/linux/tcsetattr.c
+ libos/linux/times.c
+ libos/linux/ttyname.c
+ libos/linux/ttyname_r.c
+ libos/linux/umask.c
+ libos/linux/utils/make-errno.c
+ libos/linux/utils/make-fcntl.c
+ libos/linux/utils/make-ioctl.c
+ libos/linux/utils/make-poll.c
+ libos/linux/utils/make-signal.c
+ libos/linux/utils/make-syscall.c
+ libos/linux/utils/make-sysconf.c
+ libos/linux/utils/make-termios.c
+ libos/linux/utils/make-time.c
+ libos/linux/utils/make-wait.c
+ libos/linux/wait3.c
+ libos/linux/waitpid.c
+ libos/meson.build
  test/test-ctype/CMakeLists.txt
  test/test-ctype/meson.build
  test/test-ctype/test-iswctype.c
+ test/test-environ.c
+ test/test-posix/test-popen.c
+ test/test-posix/test-pwd.c
+ test/test-posix/test-signal.c
+ test/test-posix/test-system.c
  test/test-stdio/test-fdevopen.c
  test/test-stdio/test-freopen.c
  test/test-string/CMakeLists.txt
@@ -1240,7 +1458,6 @@ Files: hello-world/Makefile
  libc/misc/dso_handle.c
  libc/misc/inittls.c
  libc/misc/meson.build
- libc/misc/picosbrk.c
  libc/search/meson.build
  libc/signal/meson.build
  libc/ssp/meson.build
@@ -1285,6 +1502,51 @@ Files: hello-world/Makefile
  libm/test/modff_vec.c
  libm/test/pow_vec.c
  libm/test/powf_vec.c
+ libos/fallback/sbrk.c
+ libos/linux/iob_stderr.c
+ libos/linux/iob_stdin.c
+ libos/linux/iob_stdout.c
+ libos/semihost/common/close.c
+ libos/semihost/common/exit.c
+ libos/semihost/common/iob.c
+ libos/semihost/common/kill.c
+ libos/semihost/common/lseek.c
+ libos/semihost/common/lseek64.c
+ libos/semihost/common/meson.build
+ libos/semihost/common/open.c
+ libos/semihost/common/read.c
+ libos/semihost/common/semihost-private.h
+ libos/semihost/common/semihost.h
+ libos/semihost/common/sys_clock.c
+ libos/semihost/common/sys_close.c
+ libos/semihost/common/sys_elapsed.c
+ libos/semihost/common/sys_errno.c
+ libos/semihost/common/sys_exit.c
+ libos/semihost/common/sys_exit_extended.c
+ libos/semihost/common/sys_feature.c
+ libos/semihost/common/sys_flen.c
+ libos/semihost/common/sys_get_cmdline.c
+ libos/semihost/common/sys_getc.c
+ libos/semihost/common/sys_heapinfo.c
+ libos/semihost/common/sys_istty.c
+ libos/semihost/common/sys_open.c
+ libos/semihost/common/sys_putc.c
+ libos/semihost/common/sys_read.c
+ libos/semihost/common/sys_remove.c
+ libos/semihost/common/sys_rename.c
+ libos/semihost/common/sys_seek.c
+ libos/semihost/common/sys_time.c
+ libos/semihost/common/sys_tmpnam.c
+ libos/semihost/common/sys_write.c
+ libos/semihost/common/sys_write0.c
+ libos/semihost/common/sysconf.c
+ libos/semihost/common/times.c
+ libos/semihost/common/unlink.c
+ libos/semihost/common/write.c
+ libos/semihost/machine/aarch64/semihost-aarch64.S
+ libos/semihost/machine/arm/semihost-arm.S
+ libos/semihost/machine/riscv/semihost-riscv.S
+ libos/semihost/meson.build
  meson_options.txt
  picocrt/crt0.h
  picocrt/machine/aarch64/crt0.c
@@ -1294,12 +1556,14 @@ Files: hello-world/Makefile
  picocrt/meson.build
  picocrt/shared/crt0.c
  scripts/do-aarch64-configure
+ scripts/do-aarch64-linux-gnu-configure
  scripts/do-aarch64-none-elf-configure
  scripts/do-aarch64-zephyr-configure
  scripts/do-aarch64-zephyr-elf-configure
  scripts/do-arc-configure
  scripts/do-arc64-configure
  scripts/do-arm-configure
+ scripts/do-arm-linux-gnueabihf-configure
  scripts/do-avr-configure
  scripts/do-clang-aarch64-configure
  scripts/do-clang-aarch64-fvp-configure
@@ -1318,6 +1582,8 @@ Files: hello-world/Makefile
  scripts/do-esp32-configure
  scripts/do-freedom-tools-configure
  scripts/do-i386-configure
+ scripts/do-i686-configure
+ scripts/do-i686-linux-gnu-configure
  scripts/do-lx106-configure
  scripts/do-mips-configure
  scripts/do-mips-zephyr-configure
@@ -1337,7 +1603,7 @@ Files: hello-world/Makefile
  scripts/do-thumbv8_1m-configure
  scripts/do-thumbv8m_main_fp-configure
  scripts/do-x86-configure
- scripts/do-x86_64-configure
+ scripts/do-x86_64-linux-gnu-configure
  scripts/do-x86_64-zephyr-configure
  scripts/do-xtensa-dc233c-configure
  scripts/do-xtensa-espressif_esp32-configure
@@ -1353,47 +1619,6 @@ Files: hello-world/Makefile
  scripts/run-arm
  scripts/run-power9
  scripts/run-riscv
- semihost/common/close.c
- semihost/common/exit.c
- semihost/common/iob.c
- semihost/common/kill.c
- semihost/common/lseek.c
- semihost/common/lseek64.c
- semihost/common/meson.build
- semihost/common/open.c
- semihost/common/read.c
- semihost/common/semihost-private.h
- semihost/common/semihost.h
- semihost/common/sys_clock.c
- semihost/common/sys_close.c
- semihost/common/sys_elapsed.c
- semihost/common/sys_errno.c
- semihost/common/sys_exit.c
- semihost/common/sys_exit_extended.c
- semihost/common/sys_feature.c
- semihost/common/sys_flen.c
- semihost/common/sys_get_cmdline.c
- semihost/common/sys_getc.c
- semihost/common/sys_heapinfo.c
- semihost/common/sys_istty.c
- semihost/common/sys_open.c
- semihost/common/sys_putc.c
- semihost/common/sys_read.c
- semihost/common/sys_remove.c
- semihost/common/sys_rename.c
- semihost/common/sys_seek.c
- semihost/common/sys_time.c
- semihost/common/sys_tmpnam.c
- semihost/common/sys_write.c
- semihost/common/sys_write0.c
- semihost/common/sysconf.c
- semihost/common/times.c
- semihost/common/unlink.c
- semihost/common/write.c
- semihost/machine/aarch64/semihost-aarch64.S
- semihost/machine/arm/semihost-arm.S
- semihost/machine/riscv/semihost-riscv.S
- semihost/meson.build
  test/libc-testsuite/meson.build
  test/meson.build
  test/rand.c
@@ -1426,8 +1651,6 @@ Files: libc/ctype/ctype_extended.h
  libc/machine/sh/CMakeLists.txt
  libc/machine/sh/machine/CMakeLists.txt
  libc/machine/sh/machine/meson.build
- libc/posix/fpathconf.c
- libc/posix/pathconf.c
  libc/stdio/atomic_load.c
  libc/stdio/flockfile.c
  libc/stdio/ftrylockfile.c
@@ -1444,6 +1667,28 @@ Files: libc/ctype/ctype_extended.h
  libc/uchar/meson.build
  libc/uchar/uchar-local.h
  libm/fenv/fenv.c
+ libos/fallback/fpathconf.c
+ libos/fallback/pathconf.c
+ libos/semihost/machine/lm32/lm32_close.c
+ libos/semihost/machine/lm32/lm32_exit.c
+ libos/semihost/machine/lm32/lm32_lseek.c
+ libos/semihost/machine/lm32/lm32_open.c
+ libos/semihost/machine/lm32/lm32_read.c
+ libos/semihost/machine/lm32/lm32_scall.c
+ libos/semihost/machine/lm32/lm32_semihost.h
+ libos/semihost/machine/lm32/lm32_stub.c
+ libos/semihost/machine/lm32/lm32_unlink.c
+ libos/semihost/machine/lm32/lm32_write.c
+ libos/semihost/machine/lm32/meson.build
+ libos/semihost/machine/xtensa/simcall.S
+ libos/semihost/machine/xtensa/simcall.c
+ libos/semihost/machine/xtensa/simcall.h
+ libos/semihost/machine/xtensa/xtensa-close.c
+ libos/semihost/machine/xtensa/xtensa-lseek.c
+ libos/semihost/machine/xtensa/xtensa-open.c
+ libos/semihost/machine/xtensa/xtensa-read.c
+ libos/semihost/machine/xtensa/xtensa-unlink.c
+ libos/semihost/machine/xtensa/xtensa-write.c
  picocrt/crt0-none.c
  picocrt/machine/xtensa/crt0.S
  picocrt/machine/xtensa/crt1.c
@@ -1452,26 +1697,6 @@ Files: libc/ctype/ctype_extended.h
  scripts/do-clang-x86_64-configure
  scripts/run-xtensa-dc233c
  scripts/validate-cdefs
- semihost/machine/lm32/lm32_close.c
- semihost/machine/lm32/lm32_exit.c
- semihost/machine/lm32/lm32_lseek.c
- semihost/machine/lm32/lm32_open.c
- semihost/machine/lm32/lm32_read.c
- semihost/machine/lm32/lm32_scall.c
- semihost/machine/lm32/lm32_semihost.h
- semihost/machine/lm32/lm32_stub.c
- semihost/machine/lm32/lm32_unlink.c
- semihost/machine/lm32/lm32_write.c
- semihost/machine/lm32/meson.build
- semihost/machine/xtensa/simcall.S
- semihost/machine/xtensa/simcall.c
- semihost/machine/xtensa/simcall.h
- semihost/machine/xtensa/xtensa-close.c
- semihost/machine/xtensa/xtensa-lseek.c
- semihost/machine/xtensa/xtensa-open.c
- semihost/machine/xtensa/xtensa-read.c
- semihost/machine/xtensa/xtensa-unlink.c
- semihost/machine/xtensa/xtensa-write.c
  test/test-cplusplus.cpp
  test/test-ctype/test-ctype.c
  test/test-ctype/test-encode.c
@@ -1514,7 +1739,7 @@ Copyright: 2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
 License: BSD3-1
 
 Files: libc/machine/loongarch/machine/math.h
- semihost/machine/loongarch/semihost-loongarch.S
+ libos/semihost/machine/loongarch/semihost-loongarch.S
 Copyright: 2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
 License: BSD3-1
 
@@ -1637,6 +1862,30 @@ Files: libm/machine/riscv/s_copysign.c
 Copyright: 2020 Kito Cheng
 License: BSD3-1
 
+Files: libos/semihost/machine/loongarch/meson.build
+ picocrt/machine/loongarch/meson.build
+Copyright: 2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
+ 2021 Keith Packard
+License: BSD3-1
+
+Files: libos/semihost/machine/mips/meson.build
+Copyright: 2021 Keith Packard
+ 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
+License: BSD3-1
+
+Files: libos/semihost/machine/mips/mips_close.c
+ libos/semihost/machine/mips/mips_exit.c
+ libos/semihost/machine/mips/mips_fstat.c
+ libos/semihost/machine/mips/mips_lseek.c
+ libos/semihost/machine/mips/mips_open.c
+ libos/semihost/machine/mips/mips_read.c
+ libos/semihost/machine/mips/mips_semihost.h
+ libos/semihost/machine/mips/mips_stub.c
+ libos/semihost/machine/mips/mips_unlink.c
+ libos/semihost/machine/mips/mips_write.c
+Copyright: 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
+License: BSD3-1
+
 Files: meson.build
 Copyright: 2019-2021 Keith Packard
 License: BSD3-1
@@ -1645,18 +1894,14 @@ Files: picocrt/machine/loongarch/crt0.c
 Copyright: 2024 Jiaxun Yang <<jiaxun.yang@flygoat.com>
 License: BSD3-1
 
-Files: picocrt/machine/loongarch/meson.build
- semihost/machine/loongarch/meson.build
-Copyright: 2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
- 2021 Keith Packard
-License: BSD3-1
-
 Files: picocrt/machine/powerpc/cstart.c
  picocrt/machine/riscv/crt0.c
 Copyright: 2020 Sebastian Meyer
 License: BSD3-1
 
-Files: picocrt/machine/x86/crt0-32.S
+Files: picocrt/machine/x86/crt0-32-linux.S
+ picocrt/machine/x86/crt0-32.S
+ picocrt/machine/x86/crt0-64-linux.S
  picocrt/machine/x86/crt0-64.S
 Copyright: 2021 Mike Haertel and Keith Packard
 License: BSD3-1
@@ -1684,24 +1929,6 @@ License: BSD3-1
 Files: scripts/run-loongarch64
 Copyright: 2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
  2020 Keith Packard
-License: BSD3-1
-
-Files: semihost/machine/mips/meson.build
-Copyright: 2021 Keith Packard
- 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
-License: BSD3-1
-
-Files: semihost/machine/mips/mips_close.c
- semihost/machine/mips/mips_exit.c
- semihost/machine/mips/mips_fstat.c
- semihost/machine/mips/mips_lseek.c
- semihost/machine/mips/mips_open.c
- semihost/machine/mips/mips_read.c
- semihost/machine/mips/mips_semihost.h
- semihost/machine/mips/mips_stub.c
- semihost/machine/mips/mips_unlink.c
- semihost/machine/mips/mips_write.c
-Copyright: 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
 License: BSD3-1
 
 Files: test/test-getopt.c
@@ -2024,7 +2251,7 @@ Files: libc/stdio/clearerr.c
  libc/stdio/feof.c
  libc/stdio/ferror.c
  libc/stdio/fgetc.c
- libc/stdio/stdio_private.h
+ libc/stdio/local-stdio.h
 Copyright: 2002,2005 Joerg Wunsch
 License: BSD3-7
 
@@ -3135,10 +3362,29 @@ Files: .clang-format
  libm/fenv/fenv.tex
  libm/ld/files
  libm/libm.in.xml
+ libos/linux/utils/make-bits
+ libos/semihost/machine/hexagon/hexagon_close.c
+ libos/semihost/machine/hexagon/hexagon_errno.c
+ libos/semihost/machine/hexagon/hexagon_exit.c
+ libos/semihost/machine/hexagon/hexagon_flen.c
+ libos/semihost/machine/hexagon/hexagon_ftell.c
+ libos/semihost/machine/hexagon/hexagon_get_cmdline.c
+ libos/semihost/machine/hexagon/hexagon_isatty.c
+ libos/semihost/machine/hexagon/hexagon_lseek.c
+ libos/semihost/machine/hexagon/hexagon_open.c
+ libos/semihost/machine/hexagon/hexagon_read.c
+ libos/semihost/machine/hexagon/hexagon_semihost.c
+ libos/semihost/machine/hexagon/hexagon_semihost.h
+ libos/semihost/machine/hexagon/hexagon_stub.c
+ libos/semihost/machine/hexagon/hexagon_unlink.c
+ libos/semihost/machine/hexagon/hexagon_write.c
+ libos/semihost/machine/hexagon/meson.build
+ libos/semihost/machine/x86/bios.ld
  picocrt/machine/aarch64/crt0.S
  picocrt/machine/hexagon/crt0.S
  picocrt/machine/hexagon/crt0.c
  picocrt/machine/hexagon/meson.build
+ picocrt/machine/x86/crt0.S
  picolibc-native.specs.in
  picolibc.h.in
  picolibc.ld.in
@@ -3147,8 +3393,10 @@ Files: .clang-format
  scripts/cross-aarch64-linux-gnu.txt
  scripts/cross-aarch64-none-elf.txt
  scripts/cross-aarch64-zephyr-elf.txt
+ scripts/cross-aarch64.txt
  scripts/cross-arc-zephyr-elf.txt
  scripts/cross-arc64-zephyr-elf.txt
+ scripts/cross-arm-linux-gnueabihf.txt
  scripts/cross-arm-none-eabi.txt
  scripts/cross-arm-zephyr-eabi.txt
  scripts/cross-avr.txt
@@ -3175,6 +3423,7 @@ Files: .clang-format
  scripts/cross-coreboot-x86_64-elf.txt
  scripts/cross-cortex-a9-none-eabi.txt
  scripts/cross-i686-linux-gnu.txt
+ scripts/cross-i686-none-elf.txt
  scripts/cross-lm32-unknown-elf.txt
  scripts/cross-loongarch64-unknown-elf.txt
  scripts/cross-m68k-linux-gnu.txt
@@ -3203,7 +3452,7 @@ Files: .clang-format
  scripts/cross-sparc64-linux-gnu.txt
  scripts/cross-thumbv8_1m-none-eabi.txt
  scripts/cross-thumbv8m_main_fp-none-eabi.txt
- scripts/cross-x86-linux-gnu.txt
+ scripts/cross-x86-none-elf.txt
  scripts/cross-x86_64-linux-gnu.txt
  scripts/cross-x86_64-zephyr-elf.txt
  scripts/cross-xtensa-dc233c_zephyr-elf.txt
@@ -3223,23 +3472,6 @@ Files: .clang-format
  scripts/run-hexagon
  scripts/run-lm32
  scripts/test-picolibc
- semihost/machine/hexagon/hexagon_close.c
- semihost/machine/hexagon/hexagon_errno.c
- semihost/machine/hexagon/hexagon_exit.c
- semihost/machine/hexagon/hexagon_flen.c
- semihost/machine/hexagon/hexagon_ftell.c
- semihost/machine/hexagon/hexagon_get_cmdline.c
- semihost/machine/hexagon/hexagon_isatty.c
- semihost/machine/hexagon/hexagon_lseek.c
- semihost/machine/hexagon/hexagon_open.c
- semihost/machine/hexagon/hexagon_read.c
- semihost/machine/hexagon/hexagon_semihost.c
- semihost/machine/hexagon/hexagon_semihost.h
- semihost/machine/hexagon/hexagon_stub.c
- semihost/machine/hexagon/hexagon_unlink.c
- semihost/machine/hexagon/hexagon_write.c
- semihost/machine/hexagon/meson.build
- semihost/machine/x86/bios.ld
  test/CP720
  test/complex-funcs.c
  test/long_double_gen.5c
@@ -4228,8 +4460,7 @@ Files: libc/misc/init.c
 Copyright: 2004 CodeSourcery, LLC
 License: Other-15
 
-Files: libc/signal/signal.c
- libc/signal/signal.tex
+Files: libc/signal/signal.tex
  libc/string/bcmp.c
  libc/string/bcopy.c
  libc/string/bzero.c
@@ -4357,6 +4588,7 @@ Files: libc/signal/signal.c
  libm/test/y1f_vec.c
  libm/test/yn_vec.c
  libm/test/ynf_vec.c
+ libos/fallback/signal.c
 Copyright: 1994 Cygnus Support.
 License: Other-16
 
