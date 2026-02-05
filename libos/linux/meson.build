@@ -105,7 +105,6 @@ if fs.is_dir(machine_dir)
     'stat.c',
     '_statbuf.c',
     '_syscall_error.c',
-    'sysconf.c',
     'tcflush.c',
     'tcgetattr.c',
     'tcgetpgrp.c',
