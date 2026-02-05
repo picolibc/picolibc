@@ -33,9 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <limits.h>
+#define _DEFAULT_SOURCE
 #include <unistd.h>
+#include <limits.h>
 
 static char ttyname_buf[PATH_MAX];
 

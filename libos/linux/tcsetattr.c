@@ -34,7 +34,6 @@
  */
 
 #include "local-termios.h"
-#include <string.h>
 
 #define MAP_BIT(s, d, sbit, dbit) \
     do {                          \
@@ -70,10 +69,8 @@
 int
 tcsetattr(int fd, int actions, const struct termios *termios)
 {
-    struct __kernel_termios ktermios;
+    struct __kernel_termios ktermios = {};
     long                    cmd;
-
-    memset(&ktermios, 0, sizeof(ktermios));
 
     switch (actions) {
     case TCSANOW:

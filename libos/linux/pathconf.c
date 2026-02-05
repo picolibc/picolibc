@@ -35,7 +35,6 @@
 
 #include "local-linux.h"
 #include <unistd.h>
-#include <limits.h>
 
 long
 pathconf(const char *path, int name)

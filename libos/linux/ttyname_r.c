@@ -33,8 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <limits.h>
+#define _DEFAULT_SOURCE
 #include <unistd.h>
 #include <stdio.h>
 

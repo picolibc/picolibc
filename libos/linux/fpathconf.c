@@ -35,7 +35,6 @@
 
 #include "local-linux.h"
 #include <unistd.h>
-#include <limits.h>
 
 long
 fpathconf(int fd, int name)
