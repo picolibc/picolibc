@@ -41,6 +41,9 @@
 #include <string.h>
 #include <errno.h>
 #include "msp430-semihost.h"
+#include <sys/times.h>
+#include <sys/time.h>
+#include <stdio.h>
 
 ssize_t
 read(int fd, void *buf, size_t count)
@@ -68,6 +71,7 @@ open(const char *pathname, int flags, ...)
 {
     (void)pathname;
     (void)flags;
+    errno = ENOSYS;
     return -1;
 }
 
@@ -75,7 +79,8 @@ int
 close(int fd)
 {
     (void)fd;
-    return 0;
+    errno = ENOSYS;
+    return -1;
 }
 
 off_t
@@ -84,6 +89,7 @@ lseek(int fd, off_t offset, int whence)
     (void)fd;
     (void)offset;
     (void)whence;
+    errno = ENOSYS;
     return (off_t)-1;
 }
 
@@ -105,6 +111,7 @@ fstat(int fd, struct stat *sbuf)
 {
     (void)fd;
     (void)sbuf;
+    errno = ENOSYS;
     return -1;
 }
 
@@ -112,5 +119,40 @@ int
 isatty(int fd)
 {
     (void)fd;
-    return 1;
+    errno = ENOSYS;
+    return 0;
+}
+
+clock_t
+times(struct tms *buf)
+{
+    (void)buf;
+    errno = ENOSYS;
+    return (clock_t)-1;
+}
+
+int
+gettimeofday(struct timeval * restrict tv, void * restrict tz)
+{
+    (void)tv;
+    (void)tz;
+    errno = ENOSYS;
+    return -1;
+}
+
+int
+rename(const char *old, const char *new)
+{
+    (void)old;
+    (void)new;
+    errno = ENOSYS;
+    return -1;
+}
+
+long
+sysconf(int name)
+{
+    (void)name;
+    errno = EINVAL;
+    return -1;
 }

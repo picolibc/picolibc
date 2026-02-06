@@ -32,47 +32,42 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
 #include <stdlib.h>
-#include <sys/time.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <stdio.h>
+#include <errno.h>
+
+#ifndef TEST_FILE_NAME
+#define TEST_FILE_NAME "SEMIERR.TXT"
+#endif
 
 int
 main(void)
 {
-    int            loop;
-    struct timeval prev, cur;
-    int            ret;
+    int fd;
 
-    ret = gettimeofday(&prev, NULL);
-    if (ret < 0) {
-        printf("gettimeofday return %d\n", ret);
+    (void)unlink(TEST_FILE_NAME);
+    errno = 0;
+    fd = open(TEST_FILE_NAME, O_RDONLY);
+    if (fd >= 0) {
+        printf("open non-existant file for read did not return error\n");
+        exit(1);
+    }
+    if (errno == ENOSYS) {
+        printf("open not implemented, skipping test\n");
+        exit(77);
+    }
+    fd = open(TEST_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
+    if (fd < 0) {
+        if (errno == ENOSYS) {
+            printf("open not implemented, skipping test\n");
+            exit(77);
+        }
+        printf("open new file for write returned error\n");
         exit(2);
     }
-    if (prev.tv_sec < 1600000000LL) {
-        printf("gettimeofday return value before 2020-9-13 %lld\n", (long long)prev.tv_sec);
-        exit(2);
-    }
-    for (loop = 0; loop < 10000; loop++) {
-        ret = gettimeofday(&cur, NULL);
-        if (ret < 0) {
-            printf("gettimeofday return %d\n", ret);
-            exit(2);
-        }
-        if (cur.tv_sec > prev.tv_sec + 1000) {
-            printf("gettimeofday: seconds changed by %lld\n",
-                   (long long)(cur.tv_sec - prev.tv_sec));
-            exit(2);
-        }
-        if (cur.tv_sec > prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec > prev.tv_usec)) {
-            printf("gettimeofday: ok\n");
-            exit(0);
-        }
-        if (cur.tv_sec < prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec < prev.tv_usec)) {
-            printf("gettimeofday: clock went backwards\n");
-            exit(2);
-        }
-    }
-    printf("gettimeofday: clock never changed\n");
-    exit(1);
+    close(fd);
+    (void)unlink(TEST_FILE_NAME);
+    exit(0);
 }

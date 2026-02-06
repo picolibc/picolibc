@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
+ * Copyright © 2020 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,77 +33,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
+#include <stdlib.h>
 #include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
 #include <errno.h>
-#include <sys/times.h>
-#include <sys/time.h>
 #include <stdio.h>
 
-off64_t
-lseek64(int fd, off64_t offset, int whence)
-{
-    return (off64_t)lseek(fd, (off_t)offset, whence);
-}
-
 int
-stat(const char *pathname, struct stat * restrict statbuf)
+main(void)
 {
-    int fd, ret;
+    int err;
+    int fd;
 
-    fd = open(pathname, O_RDONLY);
-
-    if (fd < 0)
-        return fd;
-
-    ret = fstat(fd, statbuf);
-    close(fd);
-
-    return ret;
-}
-
-int
-isatty(int fd)
-{
-    (void)fd;
-    errno = ENOSYS;
-    return 0;
-}
-
-clock_t
-times(struct tms *buf)
-{
-    (void)buf;
-    errno = ENOSYS;
-    return (clock_t)-1;
-}
-
-int
-gettimeofday(struct timeval * restrict tv, void * restrict tz)
-{
-    (void)tv;
-    (void)tz;
-    errno = ENOSYS;
-    return -1;
-}
-
-int
-rename(const char *old, const char *new)
-{
-    (void)old;
-    (void)new;
-    errno = ENOSYS;
-    return -1;
-}
-
-long
-sysconf(int name)
-{
-    (void)name;
-    errno = EINVAL;
-    return -1;
+    fd = open("____no-such-file_____", O_RDONLY);
+    if (fd != -1) {
+        printf("got valid fd opening non-existent file\n");
+        exit(1);
+    }
+    err = errno;
+    if (err == 0) {
+        printf("No error when opening non-existent file\n");
+        exit(2);
+    }
+    exit(0);
 }

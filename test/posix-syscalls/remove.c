@@ -34,14 +34,14 @@
  */
 
 #include <stdlib.h>
-#include <semihost.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
 
 #ifndef TEST_FILE_NAME
-#define TEST_FILE_NAME "SEMIREN.TXT"
+#define TEST_FILE_NAME "SEMIREMO.TXT"
 #endif
-
-#define TEST_FILE_NAME_1 "A" TEST_FILE_NAME
-#define TEST_FILE_NAME_2 "B" TEST_FILE_NAME
 
 int
 main(void)
@@ -50,41 +50,48 @@ main(void)
     int code = 0;
     int ret;
 
-    fd = sys_semihost_open(TEST_FILE_NAME_1, SH_OPEN_W);
+    fd = open(TEST_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME_1);
+      if (errno == ENOSYS) {
+        printf("open not implemented, skipping test\n");
+        exit(77);
+      }
+        printf("open %s failed: %d\n", TEST_FILE_NAME, errno);
         exit(1);
     }
-    ret = sys_semihost_close(fd);
+    ret = close(fd);
     fd = -1;
     if (ret != 0) {
-        printf("close failed %d %d\n", ret, sys_semihost_errno());
+        printf("close failed %d %d\n", ret, errno);
         code = 2;
         goto bail1;
     }
-    ret = sys_semihost_rename(TEST_FILE_NAME_1, TEST_FILE_NAME_2);
+    ret = unlink(TEST_FILE_NAME);
     if (ret != 0) {
-        printf("rename %s -> %s failed %d %d\n", TEST_FILE_NAME_1, TEST_FILE_NAME_2, ret,
-               sys_semihost_errno());
+        if (errno == ENOSYS) {
+          printf("unlink not implemented, skipping test\n");
+          close(fd);
+          exit(77);
+        }
+        printf("unlink %s failed %d %d\n", TEST_FILE_NAME, ret, errno);
         code = 3;
         goto bail1;
     }
-    fd = sys_semihost_open(TEST_FILE_NAME_1, SH_OPEN_R);
+    fd = open(TEST_FILE_NAME, O_RDONLY);
     if (fd >= 0) {
-        printf("open %s should have failed\n", TEST_FILE_NAME_1);
-        code = 3;
+        printf("open %s should have failed\n", TEST_FILE_NAME);
+        code = 4;
         goto bail1;
     }
-    fd = sys_semihost_open(TEST_FILE_NAME_2, SH_OPEN_R);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME_2);
-        code = 3;
+    ret = unlink(TEST_FILE_NAME);
+    if (ret == 0) {
+        printf("unlink %s should have failed\n", TEST_FILE_NAME);
+        code = 5;
         goto bail1;
     }
 bail1:
     if (fd >= 0)
-        (void)sys_semihost_close(fd);
-    (void)sys_semihost_remove(TEST_FILE_NAME_1);
-    (void)sys_semihost_remove(TEST_FILE_NAME_2);
+        (void)close(fd);
+    (void)unlink(TEST_FILE_NAME);
     exit(code);
 }

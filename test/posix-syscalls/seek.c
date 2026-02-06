@@ -35,7 +35,10 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <semihost.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
+#include <stdio.h>
 
 #ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME "SEMISEEK.TXT"
@@ -48,49 +51,65 @@ int
 main(void)
 {
     int       fd;
-    uintptr_t not_written;
+    ssize_t   written;
     int       code = 0;
     int       ret;
-    uintptr_t not_read;
+    ssize_t   nread;
+    off_t     pos;
     char      buf[TEST_STRING_LEN + 10];
 
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
+    fd = open(TEST_FILE_NAME, O_WRONLY | O_CREAT | O_TRUNC, 0666);
     if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
+      if (errno == ENOSYS) {
+        printf("open not implemented, skipping test\n");
+        exit(77);
+      }
+        printf("open %s failed: %d\n", TEST_FILE_NAME, errno);
         exit(1);
     }
-    not_written = sys_semihost_write(fd, TEST_STRING, TEST_STRING_LEN);
-    if (not_written != 0) {
-        printf("write failed %ld %d\n", (long)not_written, sys_semihost_errno());
+    written = write(fd, TEST_STRING, TEST_STRING_LEN);
+    if (written != TEST_STRING_LEN) {
+        printf("write failed %ld %d\n", (long)written, errno);
         code = 2;
         goto bail1;
     }
-    ret = sys_semihost_close(fd);
+    ret = close(fd);
     fd = -1;
     if (ret != 0) {
-        printf("close failed %d %d\n", ret, sys_semihost_errno());
+        if (errno == ENOSYS) {
+            printf("close not implemented, skipping test\n");
+            unlink(TEST_FILE_NAME);
+            exit(77);
+        }
+        printf("close failed %d %d\n", ret, errno);
         code = 3;
         goto bail1;
     }
 
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_R);
+    fd = open(TEST_FILE_NAME, O_RDONLY);
     if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
+        printf("open %s failed: %d\n", TEST_FILE_NAME, errno);
         code = 4;
         goto bail1;
     }
 
-    ret = sys_semihost_seek(fd, TEST_SEEK_POS);
-    if (ret != 0) {
-        printf("seek failed %d %d\n", ret, sys_semihost_errno());
+    pos = lseek(fd, TEST_SEEK_POS, SEEK_SET);
+    if (pos < 0 && errno == ENOSYS) {
+        printf("lseek not implemented, skipping test\n");
+        close(fd);
+        unlink(TEST_FILE_NAME);
+        exit(77);
+    }
+    if (pos != TEST_SEEK_POS) {
+        printf("seek failed %ld %d\n", (long)pos, errno);
         code = 5;
         goto bail1;
     }
 
-    not_read = sys_semihost_read(fd, buf, sizeof(buf));
-    if (sizeof(buf) - not_read != TEST_STRING_LEN - TEST_SEEK_POS) {
-        printf("read failed got %ld wanted %ld\n", (long)not_read,
-               (long)(sizeof(buf) - TEST_STRING_LEN + TEST_SEEK_POS));
+    nread = read(fd, buf, sizeof(buf));
+    if (nread != TEST_STRING_LEN - TEST_SEEK_POS) {
+        printf("read failed got %ld wanted %d\n", (long)nread,
+               TEST_STRING_LEN - TEST_SEEK_POS);
         code = 6;
         goto bail1;
     }
@@ -102,7 +121,7 @@ main(void)
     }
 bail1:
     if (fd >= 0)
-        (void)sys_semihost_close(fd);
-    (void)sys_semihost_remove(TEST_FILE_NAME);
+        (void)close(fd);
+    (void)unlink(TEST_FILE_NAME);
     exit(code);
 }

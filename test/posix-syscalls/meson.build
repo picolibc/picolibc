@@ -33,30 +33,34 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-# Semihost-specific tests - these tests use semihost-only functions
-# that don't have POSIX equivalents
+# POSIX system call tests - these tests use standard POSIX functions
+# and can work with any OS library that provides them (not just semihost)
 
-semihost_tests = [
-  'semihost-argv',
-  'semihost-exit-extended',
-  'semihost-get-cmdline',
+posix_tests = [
+  'exit',
+  'clock',
+  'close',
+  'errno',
+  'flen',
+  'gettimeofday',
+  'iserror',
+  'istty',
+  'open',
+  'read',
+  'remove',
+  'rename',
+  'seek',
+  'system',
+  'time',
+  'times',
+  'writec',
+  'write0',
+  'write',
 ]
 
-# These tests should pass, but are currently broken under qemu
-semihost_broken = [
-  'semihost-elapsed',
-  'semihost-heapinfo',
-  'semihost-readc',
-  'semihost-tickfreq',
-  'semihost-tmpnam',
-  ]
-
-semihost_fail_tests = [
-  'semihost-exit-extended-failure',
-]
-
-semihost_no_args_tests = [
-  'semihost-no-argv',
+posix_fail_tests = [
+  'exit-failure',
+  'system-failure',
 ]
 
 cli_args = ['hello', 'world']
@@ -79,17 +83,17 @@ foreach params : targets
   _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
-  foreach semihost_test : semihost_tests
-    semihost_test_src = semihost_test + '.c'
+  foreach posix_test : posix_tests
+    posix_test_src = posix_test + '.c'
 
     _cmd_arg = ['-DCOMMAND_LINE="' + 'program-name' + ' ' + ' '.join(cli_args) + '"']
 
-    test_file_name_arg=['-DTEST_FILE_NAME="' + semihost_test + target + '.txt"']
+    test_file_name_arg=['-DTEST_FILE_NAME="' + posix_test + target + '.txt"']
 
     _cmd_arg += test_file_name_arg
 
-    test(semihost_test + target,
-	 executable(semihost_test + target, [semihost_test_src],
+    test(posix_test + target,
+	 executable(posix_test + target, [posix_test_src],
 		    c_args: printf_compile_args_d + _c_args + _cmd_arg,
 		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,
@@ -98,15 +102,15 @@ foreach params : targets
 		    include_directories: inc),
 	 args: test_args,
          depends: bios_bin,
-         suite: 'semihost',
+         suite: 'posix-syscalls',
 	 env: test_env)
   endforeach
 
-  foreach semihost_fail_test : semihost_fail_tests
-    semihost_fail_test_src = semihost_fail_test + '.c'
+  foreach posix_fail_test : posix_fail_tests
+    posix_fail_test_src = posix_fail_test + '.c'
 
-    test(semihost_fail_test + target,
-	 executable(semihost_fail_test + target, [semihost_fail_test_src],
+    test(posix_fail_test + target,
+	 executable(posix_fail_test + target, [posix_fail_test_src],
 		    c_args: _c_args + _cmd_arg,
 		    link_args: _link_args,
 		    objects: _objs,
@@ -115,25 +119,9 @@ foreach params : targets
 		    include_directories: inc),
 	 args: test_args,
          depends: bios_bin,
-         suite: 'semihost',
+         suite: 'posix-syscalls',
 	 env: test_env,
 	 should_fail: true)
-  endforeach
-
-  foreach semihost_test : semihost_no_args_tests
-    semihost_test_src = semihost_test + '.c'
-
-    test(semihost_test + target,
-	   executable(semihost_test + target, [semihost_test_src],
-		      c_args: printf_compile_args_d + _c_args + _cmd_arg,
-		      link_args: printf_link_args_d + _link_args,
-		      objects: _objs,
-		      link_with: _libs,
-		      link_depends:  test_link_depends,
-		      include_directories: inc),
-         depends: bios_bin,
-         suite: 'semihost',
-         env: test_env)
   endforeach
 
 endforeach

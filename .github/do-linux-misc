@@ -8,7 +8,6 @@ HERE=`dirname "$0"`
 "$HERE"/do-build sparc64 "$@"
 "$HERE"/do-test-noopt clang-x86 "$@"
 "$HERE"/do-test-noopt clang-x86_64 "$@"
-"$HERE"/do-test-noopt x86_64-linux-gnu "$@"
 "$HERE"/do-test-noopt x86 "$@"
 "$HERE"/do-test-noopt native "$@"
 "$HERE"/do-test power9 "$@"
@@ -23,3 +22,5 @@ HERE=`dirname "$0"`
 "$HERE"/do-avr-build avr "$@"
 "$HERE"/do-test msp430-unknown-elf "$@"
 "$HERE"/do-test lm32-unknown-elf "$@"
+# move linux testing to last
+"$HERE"/do-test-noopt x86_64-linux-gnu "$@"

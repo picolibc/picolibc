@@ -34,9 +34,12 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #define _GNU_SOURCE
-#include "hexagon_semihost.h"
 #include <unistd.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <sys/times.h>
+#include <sys/time.h>
+#include <stdio.h>
 
 off64_t
 lseek64(int fd, off64_t offset, int whence)
@@ -50,5 +53,34 @@ fstat(int fd, struct stat *sbuf)
     (void)fd;
     (void)sbuf;
     errno = ENOSYS;
+    return -1;
+}
+
+clock_t
+times(struct tms *buf)
+{
+    (void)buf;
+    errno = ENOSYS;
+    return (clock_t)-1;
+}
+int
+gettimeofday(struct timeval * restrict tv, void * restrict tz)
+{
+    (void)tv;
+    (void)tz;
+    errno = ENOSYS;
+    return -1;
+}
+
+int rename(const char *old, const char *new) {
+    (void)old;
+    (void)new;
+    errno = ENOSYS; // Not implemented
+    return -1;
+}
+
+long sysconf(int name) {
+    (void)name;
+    errno = EINVAL;
     return -1;
 }
