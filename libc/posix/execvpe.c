@@ -43,6 +43,9 @@
 int
 execvpe(const char *file, char * const argv[], char * const env[])
 {
+    if (strchr(file, '/'))
+        return execve(file, argv, env);
+
     char        path[PATH_MAX + 1];
     char       *p, *colon;
     size_t      file_len = strlen(file);
