@@ -1302,6 +1302,10 @@ foreach params : [default_target] + targets
     picolibc_linux_ld_data.set('INITTLS', '')
     picolibc_linux_ld_data.set('DATATLS', ld_comment)
     picolibc_linux_ld_data.set('LINUX', ld_comment)
+    # Don't discard frame information as that
+    # is necessary for debugging
+    picolibc_linux_ld_data.set('C', ld_comment)
+    picolibc_linux_ld_data.set('CPP', '')
 
     # attributes for read-only data sections
     picolibc_linux_ld_data.set('RODATA_MEM', 'ram')
