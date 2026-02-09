@@ -39,6 +39,8 @@
 #include <sys/cdefs.h>
 #include <sys/_types.h>
 
+_BEGIN_STD_C
+
 typedef unsigned char cc_t;
 typedef unsigned int  speed_t;
 typedef unsigned int  tcflag_t;
@@ -64,6 +66,11 @@ struct termios {
     cc_t     c_cc[NCCS];
     speed_t  c_ispeed;
     speed_t  c_ospeed;
+};
+
+struct winsize {
+    unsigned short ws_row;
+    unsigned short ws_col;
 };
 
 #define BRKINT    0x0001
@@ -195,7 +202,11 @@ int     tcflow(int, int);
 int     tcflush(int, int);
 int     tcgetattr(int, struct termios *);
 __pid_t tcgetsid(int);
+int     tcgetwinsize(int, struct winsize *);
 int     tcsendbreak(int, int);
 int     tcsetattr(int, int, const struct termios *);
+int     tcsetwinsize(int, const struct winsize *);
+
+_END_STD_C
 
 #endif

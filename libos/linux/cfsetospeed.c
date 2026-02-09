@@ -32,10 +32,11 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _LINUX_IOCTL_H_
-#define _LINUX_IOCTL_H_
-#define LINUX_TCXONC     0x540a
-#define LINUX_TIOCGPGRP  0x540f
-#define LINUX_TIOCGWINSZ 0x5413
-#define LINUX_TIOCSWINSZ 0x5414
-#endif /* _LINUX_IOCTL_H_ */
+
+#include <termios.h>
+
+int
+cfsetospeed(struct termios *termios, speed_t speed)
+{
+    termios->c_ospeed = speed;
+}

@@ -82,6 +82,11 @@ def analyze_struct(s, file=sys.stdout):
 def analyze_type(s, file=sys.stdout):
     name = s['name']
     members = s['members']
+    if 'defines' in s:
+        for d in s['defines']:
+            d_name = d['name']
+            d_value = d['value']
+            print(f"#define {d_name} {d_value}", file=file)
     if 'headers' in s:
         for h in s['headers']:
             print(f"#include <{h}>", file=file)

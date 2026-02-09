@@ -32,10 +32,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _LINUX_IOCTL_H_
-#define _LINUX_IOCTL_H_
-#define LINUX_TCXONC     0x540a
-#define LINUX_TIOCGPGRP  0x540f
-#define LINUX_TIOCGWINSZ 0x5413
-#define LINUX_TIOCSWINSZ 0x5414
-#endif /* _LINUX_IOCTL_H_ */
+
+#include "local-termios.h"
+
+int
+tcsetwinsize(int fd, const struct winsize *winsize)
+{
+    int                     ret;
+    struct __kernel_winsize kws;
+    ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGWINSZ, &kws);
+    if (ret == 0) {
+        MAP_WINSIZE(&kws, winsize);
+        ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCSWINSZ, &kws);
+    }
+    return ret;
+}

@@ -37,7 +37,15 @@
 #define _SYS_IOCTL_H_
 
 #include <sys/cdefs.h>
+#include <sys/_types.h>
 
-#define ioctl(a, b, c) (-1)
+_BEGIN_STD_C
+
+int ioctl(int fd, unsigned long op, void *param);
+
+#define TIOCGWINSZ (('T' << 8) | 1)
+#define TIOCSWINSZ (('T' << 8) | 2)
+
+_END_STD_C
 
 #endif /* _SYS_IOCTL_H_ */

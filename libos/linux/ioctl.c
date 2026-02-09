@@ -32,10 +32,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _LINUX_IOCTL_H_
-#define _LINUX_IOCTL_H_
-#define LINUX_TCXONC     0x540a
-#define LINUX_TIOCGPGRP  0x540f
-#define LINUX_TIOCGWINSZ 0x5413
-#define LINUX_TIOCSWINSZ 0x5414
-#endif /* _LINUX_IOCTL_H_ */
+
+#include <sys/ioctl.h>
+#include <termios.h>
+#include <errno.h>
+
+int
+ioctl(int fd, unsigned long op, void *arg)
+{
+    switch (op) {
+    case TIOCGWINSZ:
+        return tcgetwinsize(fd, arg);
+    case TIOCSWINSZ:
+        return tcsetwinsize(fd, arg);
+    default:
+        errno = EINVAL;
+        return -1;
+    }
+}

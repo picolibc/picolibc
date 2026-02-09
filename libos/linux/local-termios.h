@@ -39,6 +39,7 @@
 #include "local-linux.h"
 #include <linux/linux-statx_timestamp-struct.h>
 #include <linux/linux-termios-struct.h>
+#include <linux/linux-winsize-struct.h>
 #include <linux/linux-termios.h>
 
 #include <termios.h>
@@ -129,6 +130,12 @@
                                                 \
         MAP_SPEED(c_ispeed);                    \
         MAP_SPEED(c_ospeed);                    \
+    } while (0)
+
+#define MAP_WINSIZE(a, b)          \
+    do {                           \
+        (a)->ws_row = (b)->ws_row; \
+        (a)->ws_col = (b)->ws_col; \
     } while (0)
 
 /*

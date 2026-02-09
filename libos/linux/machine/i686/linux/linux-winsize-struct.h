@@ -32,10 +32,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-#ifndef _LINUX_IOCTL_H_
-#define _LINUX_IOCTL_H_
-#define LINUX_TCXONC     0x540a
-#define LINUX_TIOCGPGRP  0x540f
-#define LINUX_TIOCGWINSZ 0x5413
-#define LINUX_TIOCSWINSZ 0x5414
-#endif /* _LINUX_IOCTL_H_ */
+
+#ifndef _LINUX_WINSIZE_STRUCT_H_
+#define _LINUX_WINSIZE_STRUCT_H_
+
+struct __kernel_winsize {
+    __uint16_t ws_row;
+    __uint16_t ws_col;
+    __uint8_t  __adjust_4[4];
+};
+
+#endif /* _LINUX_WINSIZE_STRUCT_H_ */
