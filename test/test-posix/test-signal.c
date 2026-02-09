@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
+#define _GNU_SOURCE
 #include <signal.h>
 #include <assert.h>
 #include <unistd.h>
