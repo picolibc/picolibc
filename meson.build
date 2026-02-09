@@ -1622,11 +1622,34 @@ has_semihost = false
 # arm compatible semihosting, enough to run arm semihost tests
 has_arm_semihost = false
 
+# Have any OS library. This disables
+# adding the fallback library source to libc
+has_os_library = false
+
 # libos/linux support
 has_os_linux = false
 
 # any POSIX support
 has_os_posix = false
+
+# File I/O support
+#
+# close, lseek, open, read, write
+#
+has_os_fileio = false
+
+# Process support
+#
+# execve, fork, waitpid
+#
+has_os_process = false
+
+# uid/gid support
+#
+# getegid, geteuid, getgid, getresgid, getresuid, setegid, seteuid,
+# setgid, setregeid, setresgid, setresuid, setreuid, setuid
+#
+has_os_id = false
 
 # libos/fallback split
 os_fallback_option = get_option('os-fallback')

@@ -39,7 +39,15 @@ if fs.is_dir(machine_dir)
 
   has_os_linux = true
 
+  has_os_library = true
+
   has_os_posix = true
+
+  has_os_fileio = true
+
+  has_os_process = true
+
+  has_os_id = true
 
   srcs_os_linux = [
     'access.c',
