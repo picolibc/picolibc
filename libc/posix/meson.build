@@ -78,6 +78,3 @@ endforeach
 
 src_posix = files(srcs_posix_use)
   
-if not has_os_fallback
-  src_posix += src_os_fallback
-endif

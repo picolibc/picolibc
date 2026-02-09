@@ -62,6 +62,14 @@ foreach libname : libnames
   src_cpart += get_variable('src_' + libname, [])
 endforeach
 
+# If there's no libraries with OS functions, then integrate the
+# fallback OS implementations of signal, sbrk and sysconf into the C
+# library
+
+if not has_os_library
+  src_cpart += src_os_fallback
+endif
+
 subdir('include')
 
 foreach params : targets
