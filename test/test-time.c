@@ -44,6 +44,17 @@
 #include <stdlib.h>
 #include <limits.h>
 
+#if defined(__TIMESIZE) && __TIMESIZE != 64
+
+int
+main(void)
+{
+    printf("__TIMESIZE is only %d bits. Skipping test\n", __TIMESIZE);
+    return 77;
+}
+
+#else
+
 clock_t          clock_value = CLOCKS_PER_SEC;
 size_t           size_value;
 time_t           time_value;
@@ -686,3 +697,5 @@ get_global_locale(void)
 {
     return duplocale(LC_GLOBAL_LOCALE);
 }
+
+#endif
