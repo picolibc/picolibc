@@ -33,34 +33,40 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _SYS_DIRENT_H_
-#define _SYS_DIRENT_H_
+#ifndef _POLL_H_
+#define _POLL_H_
 
-#include <sys/_types.h>
+#include <sys/cdefs.h>
 
-#ifndef _INO_T_DECLARED
-typedef __ino_t ino_t; /* inode number */
-#define _INO_T_DECLARED
-#endif
-
-struct dirent {
-    ino_t          d_ino;       /* Inode number */
-    __off_t        d_off;       /* Not an offset; see below */
-    unsigned short d_reclen;    /* Length of this record */
-    unsigned char  d_type;      /* Type of file; not supported
-                                   by all filesystem types */
-    char           d_name[256]; /* Null-terminated filename */
+struct pollfd {
+    int   fd;
+    short events;
+    short revents;
 };
 
-typedef struct {
-    int           fd;
-    size_t        offset;
-    size_t        count;
-    struct dirent dirent;
-    union {
-        char       buf[512];
-        __uint64_t align;
-    };
-} DIR;
+typedef __size_t nfds_t;
 
+#define POLLIN   0x0001
+#define POLLPRI  0x0002
+#define POLLOUT  0x0004
+
+#define POLLERR  0x0008
+#define POLLHUP  0x0010
+#define POLLNVAL 0x0020
+
+#if _XOPEN_SOURCE
+#define POLLRDNORM 0x0040
+#define POLLRDBAND 0x0080
+#define POLLWRNORM 0x0100
+#define POLLWRBAND 0x0200
 #endif
+
+#if __GNU_VISIBLE
+#define POLLMSG    0x0400
+#define POLLREMOVE 0x1000
+#define POLLRDHUP  0x2000
+#endif
+
+int poll(struct pollfd[], nfds_t, int);
+
+#endif /* _POLL_H_ */

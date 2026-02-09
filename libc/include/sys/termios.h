@@ -36,6 +36,7 @@
 #ifndef _SYS_TERMIOS_H_
 #define _SYS_TERMIOS_H_
 
+#include <sys/cdefs.h>
 #include <sys/_types.h>
 
 typedef unsigned char cc_t;

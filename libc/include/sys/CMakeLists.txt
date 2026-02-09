@@ -60,6 +60,7 @@ picolibc_headers(sys
   _stdint.h
   string.h
   syslimits.h
+  termios.h
   timeb.h
   time.h
   times.h
