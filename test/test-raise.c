@@ -33,29 +33,45 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _GNU_SOURCE
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <errno.h>
 
-#define HANDLER_NOT_CALLED 0
-#define HANDLER_SUCCESS    1
-#define HANDLER_FAILED     2
+#define HANDLER_NOT_CALLED  0
+#define HANDLER_SUCCESS     1
+#define HANDLER_FAILED      2
+#define HANDLER_NOT_BLOCKED 3
+
+#define HANDLER_RECURSE     4
 
 static volatile sig_atomic_t handler_result;
 static volatile sig_atomic_t handler_sig_expect;
 static volatile sig_atomic_t handler_sig_received;
+static volatile sig_atomic_t handler_sig_count;
 
 static void
 signal_handler(int sig)
 {
+    sig_atomic_t entry_sig_count;
+
     printf("            ******* caught %d *******\n", sig);
     handler_sig_received = sig;
-    if (sig == (int)handler_sig_expect)
-        handler_result = HANDLER_SUCCESS;
-    else
+    if (sig != (int)handler_sig_expect) {
         handler_result = HANDLER_FAILED;
+        return;
+    }
+    handler_result = HANDLER_SUCCESS;
+
+    ++handler_sig_count;
+    entry_sig_count = handler_sig_count;
+    if (handler_sig_count < HANDLER_RECURSE)
+        raise(sig);
+    printf("                    recurse %d %d *******\n", sig, handler_sig_count);
+    if (handler_sig_count != entry_sig_count)
+        handler_result = HANDLER_NOT_BLOCKED;
 }
 
 static const int test_signals[] = {
@@ -110,6 +126,7 @@ main(void)
             prev_func = new_func;
             handler_result = HANDLER_NOT_CALLED;
             handler_sig_expect = (sig_atomic_t)sig;
+            handler_sig_count = 0;
 
             printf("    call raise(%d)\n", sig);
             ret = raise(sig);
@@ -134,11 +151,19 @@ main(void)
                     fail = 1;
                     break;
                 case HANDLER_SUCCESS:
-                    prev_func = SIG_DFL;
+                    if (handler_sig_count != HANDLER_RECURSE) {
+                        printf("signal %d: handler didn't recurse %d times (only %d)\n", sig,
+                               HANDLER_RECURSE, (int)handler_sig_count);
+                        fail = 1;
+                    }
                     break;
                 case HANDLER_FAILED:
                     printf("signal %d: handler failed, received signal %d\n", sig,
                            (int)handler_sig_received);
+                    fail = 1;
+                    break;
+                case HANDLER_NOT_BLOCKED:
+                    printf("signal %d: signal not blocked in handler\n", sig);
                     fail = 1;
                     break;
                 }
