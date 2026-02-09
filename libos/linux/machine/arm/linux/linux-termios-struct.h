@@ -36,19 +36,17 @@
 #ifndef _LINUX_TERMIOS_STRUCT_H_
 #define _LINUX_TERMIOS_STRUCT_H_
 
-#define LINUX_NCCS 19
+typedef __uint32_t __kernel_tcflag_t;
+typedef __uint8_t  __kernel_cc_t;
+typedef __uint32_t __kernel_speed_t;
 
-typedef unsigned char __kernel_cc_t;
-typedef unsigned int  __kernel_speed_t;
-typedef unsigned int  __kernel_tcflag_t;
-
-struct __kernel_termios {
-    __kernel_tcflag_t c_iflag;          /* input mode flags */
-    __kernel_tcflag_t c_oflag;          /* output mode flags */
-    __kernel_tcflag_t c_cflag;          /* control mode flags */
-    __kernel_tcflag_t c_lflag;          /* local mode flags */
-    __kernel_cc_t     c_line;           /* line discipline */
-    __kernel_cc_t     c_cc[LINUX_NCCS]; /* control characters */
+struct __kernel_termios2 {
+    __kernel_tcflag_t c_iflag;
+    __kernel_tcflag_t c_oflag;
+    __kernel_tcflag_t c_cflag;
+    __kernel_tcflag_t c_lflag;
+    __kernel_cc_t     c_line;
+    __kernel_cc_t     c_cc[19];
     __kernel_speed_t  c_ispeed;
     __kernel_speed_t  c_ospeed;
 };

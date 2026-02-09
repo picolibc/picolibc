@@ -1,0 +1,12 @@
+{
+    "name": "dirent64",
+    "defines": [ { "name": "_LARGEFILE64_SOURCE", "value": "1" } ],
+    "headers": [ "dirent.h" ],
+    "members": [
+	{ "name": "d_ino" },
+	{ "name": "d_off" },
+	{ "name": "d_reclen" },
+	{ "name": "d_type" },
+	{ "name": "d_name", "array": "true" }
+    ]
+}

@@ -1,0 +1,9 @@
+{
+    "name": "statx_timestamp",
+    "defines": [ { "name": "__GLIBC__", "value": "2" } ],
+    "headers": [ "linux/stat.h" ],
+    "members": [
+	{ "name": "tv_sec" },
+	{ "name": "tv_nsec" }
+    ]
+}

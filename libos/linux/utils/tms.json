@@ -1,0 +1,10 @@
+{
+    "name": "tms",
+    "headers": [ "sys/times.h" ],
+    "members": [
+	{ "name": "tms_utime" },
+	{ "name": "tms_stime" },
+	{ "name": "tms_cutime" },
+	{ "name": "tms_cstime" }
+    ]
+}

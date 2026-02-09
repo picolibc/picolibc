@@ -38,11 +38,13 @@
         .section .text.__sa_restore
         .global __sa_restore
         .type __sa_restore, function
+        .align 8
 __sa_restore:
 #ifdef __x86_64
         movq    $LINUX_SYS_rt_sigreturn, %rax
         syscall
 #else
+        popl    %eax
         movl    $LINUX_SYS_sigreturn, %eax
         int     $0x80
 #endif

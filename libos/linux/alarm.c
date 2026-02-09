@@ -33,18 +33,17 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <unistd.h>
 #include "local-time.h"
+#include <unistd.h>
 
 unsigned int
 alarm(unsigned int seconds)
 {
-#ifdef LINUX_SYS_alarm
+#ifdef LINUX_SYS_alarm_
     return syscall(LINUX_SYS_alarm, seconds);
 #else
-    struct linux_itimerval old, new = { .it_value.tv_sec = (long)seconds };
-    unsigned int           retval;
+    struct __kernel_itimerval old, new = { .it_value.tv_sec = (long)seconds };
+    unsigned int              retval;
 
     if (syscall(LINUX_SYS_setitimer, LINUX_ITIMER_REAL, &new, &old) < 0)
         return 0;

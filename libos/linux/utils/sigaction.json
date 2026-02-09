@@ -1,0 +1,10 @@
+{
+    "name": "sigaction",
+    "headers": ["asm/signal.h"],
+    "members": [
+	{ "name": "sa_handler", "pointer": "true" },
+	{ "name": "sa_flags" },
+	{ "name": "sa_restorer", "pointer": "true" },
+	{ "name": "sa_mask", "signed": "false", "type": "sigset_t" }
+    ]
+}

@@ -70,8 +70,8 @@
 int
 tcgetattr(int fd, struct termios *termios)
 {
-    struct __kernel_termios ktermios;
-    int                     ret;
+    struct __kernel_termios2 ktermios;
+    int                      ret;
 
     memset(&ktermios, 0, sizeof(ktermios));
     ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios);

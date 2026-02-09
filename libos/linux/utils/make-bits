@@ -17,11 +17,16 @@ run+=(['x86_64']=env)
 run+=(['i686']=env)
 
 declare -a arch
+declare -a headers
+declare -a structs
 
 arch=(arm aarch64 x86_64 i686)
+headers=(errno fcntl ioctl poll signal syscall sysconf termios time wait)
+structs=(dirent64 itimerspec itimerval statx statx_timestamp termios timespec timeval timezone tms)
 
-declare -a headers
-
+#arch=(x86_64)
+#headers=()
+#structs=(statx_timestamp)
 
 copyright() {
     cat <<\EOF
@@ -73,7 +78,10 @@ wrap() {
     UP=$(echo $HEADER | tr a-z A-Z)
     SOURCE="${HERE}"/make-${HEADER}.c
     EXEC=make-${HEADER}-${ARCH}
-    "${CC}" ${SOURCE} -o ${EXEC} || exit 1
+
+    echo "Building header $HEADER for $ARCH"
+
+    "${CC}" -g ${SOURCE} -o ${EXEC} || exit 1
     (
     copyright
     
@@ -93,12 +101,83 @@ wrap() {
     clang-format -i $OUT
 }
 
-headers=(errno fcntl ioctl poll signal syscall sysconf termios time wait)
+wrap_struct() {
+    ARCH=$1
+    STRUCT=$2
+    OUT=$3
 
-for a in "${arch[@]}"; do
-    for h in "${headers[@]}"; do
-	OUT="machine/$a/linux/linux-$h.h"
-	wrap $a $h $OUT || exit 1
+    DIR=$(dirname ${OUT})
+    mkdir -p $DIR
+    CC="${tools[$ARCH]}"
+    RUN="${run[$ARCH]}"
+
+    UP=$(echo $STRUCT | tr a-z A-Z)
+    JSON="${STRUCT}".json
+    TYPE_HEADER="type-data.h"
+    TYPE_OUT="type-results.h"
+    TYPE_EXEC=make-type-${STRUCT}-${ARCH}
+    STRUCT_HEADER="struct-data.h"
+    STRUCT_EXEC=make-struct-${STRUCT}-${ARCH}
+
+    echo "Building struct $STRUCT for $ARCH"
+
+#    echo "$HERE"/make-struct "${HERE}"/"$JSON" --type="${TYPE_HEADER}" --struct="${STRUCT_HEADER}"
+    "$HERE"/make-struct "${HERE}"/"$JSON" --type="${TYPE_HEADER}" --struct="${STRUCT_HEADER}" || exit 1
+
+#    echo "${CC}" -g -I"${PWD}" "${HERE}"/type-analyze.c -o ${TYPE_EXEC}
+    "${CC}" -g -I"${PWD}" "${HERE}"/type-analyze.c -o ${TYPE_EXEC} || exit 1
+
+#    echo "${RUN}" ./"${TYPE_EXEC}"
+    "${RUN}" ./"${TYPE_EXEC}" > ${TYPE_OUT}
+
+    rm "${TYPE_EXEC}"
+
+#    echo "${CC}" -g -I"${PWD}" "${HERE}"/struct-analyze.c -o ${STRUCT_EXEC}
+    "${CC}" -g -I"${PWD}" "${HERE}"/struct-analyze.c -o ${STRUCT_EXEC} || exit 1
+    (
+    copyright
+    
+    DEF="_LINUX_${UP}_STRUCT_H_"
+    echo
+    echo "#ifndef ${DEF}"
+    echo "#define ${DEF}"
+    echo
+    "${RUN}" ./${STRUCT_EXEC} ${TYPE_OUT} || exit 1
+    rm "${STRUCT_EXEC}"
+    rm "${TYPE_OUT}"
+    echo
+    echo "#endif /* ${DEF} */") > $OUT
+    clang-format -i $OUT
+}
+
+make_x86() {
+    NAME=$1
+    OUT="machine/x86/linux/$BASE"
+    (
+	copyright
+	echo "#ifdef __x86_64"
+	echo "#include "'"'"../../x86_64/linux/${BASE}"'"'
+	echo "#else"
+	echo "#include "'"'"../../i686/linux/${BASE}"'"'
+	echo "#endif") > "$OUT"
+    clang-format -i "$OUT"
+}
+
+
+for s in "${structs[@]}"; do
+    BASE="linux-$s-struct.h"
+    for a in "${arch[@]}"; do
+	OUT="machine/$a/linux/$BASE"
+	wrap_struct $a $s $OUT || exit 1
     done
+    make_x86 "${BASE}"
 done
 
+for h in "${headers[@]}"; do
+    BASE=linux-$h.h
+    for a in "${arch[@]}"; do
+	OUT="machine/$a/linux/$BASE"
+	wrap $a $h $OUT || exit 1
+    done
+    make_x86 "${BASE}"
+done

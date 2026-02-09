@@ -1,0 +1,137 @@
+#!/usr/bin/env python
+
+import json, sys, argparse
+
+def read_struct(name):
+    with open(name, 'r') as file:
+        return json.load(file)
+
+
+def sign_string(m, val, array=True):
+    signstring = ''
+    if 'signed' in m:
+        s = m['signed']
+        if s == "true":
+            return '1'
+        elif s == "false":
+            return '0'
+        else:
+            raise ValueError(f'invalid signed value {s} for member {m}')
+    elif 'type' in m:
+        return '0'
+    elif array and 'array' in m:
+        return f'((typeof({val}[0]))(-1)) < 0'
+    else:
+        return f'((typeof({val}))(-1)) < 0'
+    
+
+def type_name(type):
+    if type.startswith('struct'):
+        return 'struct __kernel_' + type[7:]
+    else:
+        return '__kernel_' + type
+    
+
+def analyze_member(m, file=sys.stdout):
+    name = m['name']
+    print(f'    {{', file=file)
+    print(f'        .name = "{name}",', file=file)
+    print(f'        .size = sizeof(val.{name}),', file=file)
+    print(f'        .offset = __builtin_offsetof(typeof(val), {name}),', file=file)
+
+    if 'type' in m:
+        type= type_name(m['type'])
+        print(f'        .typename = "{type}",', file=file)
+
+    signstring = sign_string(m, f'val.{name}')
+
+    if 'pointer' in m:
+        print(f'        .flags = 2,', file=file)
+    elif 'array' in m:
+        print(f'        .flags = {signstring},', file=file)
+        print(f'        .nelt = sizeof(val.{name})/sizeof(val.{name}[0]),', file=file)
+    else:
+        print(f'        .flags = {signstring},', file=file)
+    print(f'    }},', file=file)
+
+
+def analyze_struct(s, file=sys.stdout):
+    name = s['name']
+    members = s['members']
+    if 'defines' in s:
+        for d in s['defines']:
+            d_name = d['name']
+            d_value = d['value']
+            print(f"#define {d_name} {d_value}", file=file)
+    if 'headers' in s:
+        for h in s['headers']:
+            print(f"#include <{h}>", file=file)
+
+    print(f'static const char *name = "{name}";', file=file)
+    if 'type' in s:
+        type = type_name(s['type'])
+        print(f'static {type} val;', file=file)
+    else:
+        print(f'static struct {name} val;', file=file)
+
+    print(f"static struct elt {{ const char *name; const char *typename; size_t size; size_t offset; int flags; size_t nelt; }} elts[] = {{", file=file)
+    for m in members:
+        analyze_member(m, file=file)
+    print(f"}};", file=file)
+
+def analyze_type(s, file=sys.stdout):
+    name = s['name']
+    members = s['members']
+    if 'headers' in s:
+        for h in s['headers']:
+            print(f"#include <{h}>", file=file)
+
+    known_types = {}
+    if 'types' in s:
+        for t in s['types']:
+            known_types[t] = True
+    
+    types = dict(known_types)
+
+    for m in members:
+        if 'type' in m and not m['type'] in types:
+            type = m['type']
+            types[type] = True
+            print(f'static {type} val_{type};', file=file)
+
+    types = dict(known_types)
+
+    print(f'static struct type {{ const char *name; size_t size; int flags; }} types[] = {{', file=file)
+    for m in members:
+        if 'type' in m and not m['type'] in types:
+            type = m['type']
+            types[type] = True
+            typename = type_name(type)
+            signstring = sign_string(m, f'val_{type}', array=False)
+            print(f'    {{ .name="{typename}", .size = sizeof(val_{type}), .flags = {signstring} }},', file=file)
+    print(f'    {{ .name = NULL, .size = 0, .flags = 0 }}', file=file)
+    print(f'}};', file=file)
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input", help="input file name")
+    parser.add_argument("--type", help="type output file name")
+    parser.add_argument("--struct", help="struct output file name")
+    args = parser.parse_args()
+    s = read_struct(args.input)
+    if args.type:
+        with open(args.type, 'w') as typefile:
+            analyze_type(s, typefile)
+    else:
+        analyze_type(s, sys.stdout)
+
+    if args.struct:
+        with open(args.struct, 'w') as structfile:
+            analyze_struct(s, structfile)
+    else:
+        analyze_struct(s, sys.stdout)
+            
+
+main()
+

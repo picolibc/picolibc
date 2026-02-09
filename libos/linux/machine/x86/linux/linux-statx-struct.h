@@ -32,34 +32,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef _LINUX_SIGACTION_H_
-#define _LINUX_SIGACTION_H_
-
-struct __kernel_siginfo {
-    int si_signo; /* Signal number */
-};
-
-#define __KERNEL_NSIG 64
-
-struct __kernel_sigset {
-    unsigned long sa_mask[__KERNEL_NSIG / (sizeof(unsigned long) * 8)];
-};
-
-struct __kernel_sigaction {
-    union {
-        _sig_func_ptr sa_handler;
-        void          (*sa_sigaction)(int, struct __kernel_siginfo *, void *);
-    };
-    struct __kernel_sigset sa_mask;
-    unsigned long          sa_flags;
-    void                   (*sa_restorer)(void);
-};
-
-typedef struct __kernel_sigaltstack {
-    void  *ss_sp;
-    int    ss_flags;
-    size_t ss_size;
-} __kernel_stack_t;
-
+#ifdef __x86_64
+#include "../../x86_64/linux/linux-statx-struct.h"
+#else
+#include "../../i686/linux/linux-statx-struct.h"
 #endif

@@ -33,18 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
+#include "local-sigaction.h"
 
 int
 sigsuspend(const sigset_t *mask)
 {
-#ifdef LINUX_SYS_rt_sigsuspend
-    struct __kernel_sigset kmask = {};
-    int                    sig;
+    __kernel_sigset_t kmask = {};
+    int               sig;
 
     for (sig = 0; sig < _NSIG; sig++)
         if (sigismember(mask, sig))
             __kernel_sigset_set_mask(&kmask, _signal_to_linux(sig));
     return syscall(LINUX_SYS_rt_sigsuspend, &kmask);
-#endif
 }

@@ -69,8 +69,8 @@
 int
 tcsetattr(int fd, int actions, const struct termios *termios)
 {
-    struct __kernel_termios ktermios = {};
-    long                    cmd;
+    struct __kernel_termios2 ktermios = {};
+    long                     cmd;
 
     switch (actions) {
     case TCSANOW:

@@ -33,13 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
+#include "local-statx.h"
 
 int
 stat(const char *path, struct stat *statbuf)
 {
-    struct statx statxbuf;
-    int          ret;
+    struct __kernel_statx statxbuf;
+    int                   ret;
 
     ret = syscall(LINUX_SYS_statx, LINUX_AT_FDCWD, path, LINUX_AT_STATX_SYNC_AS_STAT,
                   LINUX_STATX_BASIC_STATS, &statxbuf);

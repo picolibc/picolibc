@@ -73,6 +73,7 @@ if fs.is_dir(machine_dir)
     'geteuid.c',
     'getgid.c',
     'getgroups.c',
+    'getitimer.c',
     'getpgrp.c',
     'getpid.c',
     'gettimeofday.c',
@@ -126,8 +127,6 @@ if fs.is_dir(machine_dir)
     'waitpid.c',
     'write.c',
   ]
-
-  subdir('include')
 
   subdir(machine_dir)
 

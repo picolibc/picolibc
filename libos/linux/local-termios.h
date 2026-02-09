@@ -33,7 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _LOCAL_TERMIOS_H_
+#define _LOCAL_TERMIOS_H_
+
 #include "local-linux.h"
+#include <linux/linux-statx_timestamp-struct.h>
+#include <linux/linux-termios-struct.h>
+#include <linux/linux-termios.h>
+
 #include <termios.h>
 
 #define _CAT(a, b)                   a##b
@@ -139,3 +146,5 @@ _speed_from_kernel(__kernel_speed_t speed)
 {
     return (speed_t)speed;
 }
+
+#endif /* _LOCAL_TERMIOS_H_ */

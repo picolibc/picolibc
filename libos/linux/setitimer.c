@@ -33,12 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <sys/time.h>
+#include "local-time.h"
 
 int
 setitimer(int which, const struct itimerval *new_value, struct itimerval *old_value)
 {
+    struct __kernel_itimerval kit, okit = {}, *pokit = NULL;
+    int                       ret;
+
     switch (which) {
     case ITIMER_REAL:
         which = LINUX_ITIMER_REAL;
@@ -53,5 +55,15 @@ setitimer(int which, const struct itimerval *new_value, struct itimerval *old_va
         errno = EINVAL;
         return -1;
     }
-    return syscall(LINUX_SYS_setitimer, which, new_value, old_value);
+
+    MAP_ITV(&kit, new_value);
+
+    if (old_value)
+        pokit = &okit;
+
+    ret = syscall(LINUX_SYS_setitimer, which, &kit, pokit);
+
+    if (old_value)
+        MAP_ITV(old_value, &okit);
+    return ret;
 }

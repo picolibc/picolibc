@@ -1,0 +1,8 @@
+{
+    "name": "setset",
+    "type": "sigset_t",
+    "headers": ["signal.h"],
+    "members": [
+	{ "name": "sa_mask", "array": "true" }
+    ]
+}

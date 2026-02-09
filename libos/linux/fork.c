@@ -33,9 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <signal.h>
-#include <linux/linux-signal.h>
+#include "local-sigaction.h"
 #include <unistd.h>
 
 pid_t

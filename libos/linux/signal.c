@@ -33,11 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <signal.h>
-#include <linux/linux-signal.h>
-#include <linux/linux-sigaction.h>
-#include <linux/linux-signal.h>
+#include "local-sigaction.h"
 
 #if __SIZEOF_POINTER__ == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
 #define _USE_ATOMIC_SIGNAL
@@ -64,10 +60,9 @@ _signal_handler(int sig)
     sig = _signal_from_linux(sig);
     _sig_func_ptr func;
 #ifdef USE_ATOMIC_SIGNAL
-    func = (_sig_func_ptr)atomic_exchange(&_sig_func[sig], SIG_DFL);
+    func = (_sig_func_ptr)atomic_load(&_sig_func[sig]);
 #else
     func = _sig_func[sig];
-    _sig_func[sig] = SIG_DFL;
 #endif
     (*func)(sig);
 }
@@ -109,13 +104,8 @@ signal(int sig, _sig_func_ptr func)
     new_action.sa_flags = LINUX_SA_RESTART | LINUX_SA_RESTORER;
     new_action.sa_restorer = __sa_restore;
 
-#if defined(LINUX_SYS_sigaction)
-#define SYSCALL LINUX_SYS_sigaction
-#else
-#define SYSCALL LINUX_SYS_rt_sigaction
-#endif
-
-    ret = (_sig_func_ptr)syscall(SYSCALL, ksig, &new_action, NULL, __KERNEL_NSIG_BYTES);
+    ret = (_sig_func_ptr)syscall(LINUX_SYS_rt_sigaction, ksig, &new_action, NULL,
+                                 __KERNEL_NSIG_BYTES);
     if (ret == LINUX_SIG_ERR)
         return SIG_ERR;
 

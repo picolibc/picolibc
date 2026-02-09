@@ -33,8 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <signal.h>
+#include "local-sigaction.h"
 
 int
 kill(pid_t pid, int sig)

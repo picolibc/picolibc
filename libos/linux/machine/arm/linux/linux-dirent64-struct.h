@@ -33,8 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifdef __x86_64
-#include "../../x86_64/linux/linux-sigaction.h"
-#else
-#include "../../i686/linux/linux-sigaction.h"
-#endif
+#ifndef _LINUX_DIRENT64_STRUCT_H_
+#define _LINUX_DIRENT64_STRUCT_H_
+
+struct __kernel_dirent64 {
+    __uint64_t d_ino;
+    __int64_t  d_off;
+    __uint16_t d_reclen;
+    __uint8_t  d_type;
+    __uint8_t  d_name[256];
+    __uint8_t  __adjust_275[5];
+};
+
+#endif /* _LINUX_DIRENT64_STRUCT_H_ */

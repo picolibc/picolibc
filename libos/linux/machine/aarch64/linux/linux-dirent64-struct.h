@@ -33,28 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_SIGACTION_H_
-#define _LINUX_SIGACTION_H_
+#ifndef _LINUX_DIRENT64_STRUCT_H_
+#define _LINUX_DIRENT64_STRUCT_H_
 
-typedef unsigned long __kernel_sigset_t;
-
-#define __KERNEL_NSIG 64
-
-struct __kernel_sigset {
-    unsigned long sa_mask[__KERNEL_NSIG / (sizeof(unsigned long) * 8)];
+struct __kernel_dirent64 {
+    __uint64_t d_ino;
+    __int64_t  d_off;
+    __uint16_t d_reclen;
+    __uint8_t  d_type;
+    __uint8_t  d_name[256];
+    __uint8_t  __adjust_275[5];
 };
 
-struct __kernel_sigaction {
-    _sig_func_ptr          sa_handler;
-    unsigned long          sa_flags;
-    void                   (*sa_restorer)(void);
-    struct __kernel_sigset sa_mask;
-};
-
-typedef struct __kernel_sigaltstack {
-    void  *ss_sp;
-    int    ss_flags;
-    size_t ss_size;
-} __kernel_stack_t;
-
-#endif
+#endif /* _LINUX_DIRENT64_STRUCT_H_ */

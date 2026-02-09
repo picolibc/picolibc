@@ -33,23 +33,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-
-#define tms linux_tms
-#include <linux/times.h>
-#undef tms
+#include "local-times.h"
 
 clock_t
 times(struct tms *buf)
 {
-    struct linux_tms linux_tms;
-    int              ret;
+    struct __kernel_tms ktms;
+    int                 ret;
 
-    ret = syscall(LINUX_SYS_times, &linux_tms);
+    ret = syscall(LINUX_SYS_times, &ktms);
     if ((ret != -1 || errno != EFAULT) && buf) {
-        buf->tms_utime = linux_tms.tms_utime;
-        buf->tms_stime = linux_tms.tms_stime;
-        buf->tms_cutime = linux_tms.tms_cutime;
-        buf->tms_cstime = linux_tms.tms_cstime;
+        buf->tms_utime = ktms.tms_utime;
+        buf->tms_stime = ktms.tms_stime;
+        buf->tms_cutime = ktms.tms_cutime;
+        buf->tms_cstime = ktms.tms_cstime;
     }
 }

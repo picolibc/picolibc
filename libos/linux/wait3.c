@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
+#include "local-sigaction.h"
 #include <sys/wait.h>
 
 pid_t

@@ -33,14 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
+#include "local-statx.h"
 
 int
 fstat(int fd, struct stat *statbuf)
 {
-    struct statx statxbuf;
-    int          ret
-        = syscall(LINUX_SYS_statx, fd, (void *)0, LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
+    struct __kernel_statx statxbuf;
+    int                   ret;
+
+    ret = syscall(LINUX_SYS_statx, fd, (void *)0, LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
                   LINUX_STATX_BASIC_STATS, &statxbuf);
     if (ret < 0)
         return ret;

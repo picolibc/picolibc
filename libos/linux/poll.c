@@ -33,10 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
+#include "local-time.h"
 #include <poll.h>
 #include <stdint.h>
-#include "local-time.h"
 
 static inline short
 picolibc_to_linux(short e)
@@ -125,7 +124,7 @@ poll(struct pollfd *fds, nfds_t nfds, int timeout)
 #ifdef LINUX_SYS_poll
     ret = syscall(LINUX_SYS_poll, fds, nfds, timeout);
 #else
-    struct linux_timespec tmo
+    struct __kernel_timespec tmo
         = { .tv_sec = timeout / 1000, .tv_nsec = ((uint64_t)timeout % 1000) * 1000000UL };
     ret = syscall(LINUX_SYS_ppoll, fds, nfds, &tmo, NULL);
 #endif

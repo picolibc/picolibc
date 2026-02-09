@@ -35,17 +35,22 @@
 
 #ifndef _LOCAL_TIME_H_
 #define _LOCAL_TIME_H_
+
+#include "local-linux.h"
+#include <linux/linux-timeval-struct.h>
+#include <linux/linux-timespec-struct.h>
+#include <linux/linux-itimerspec-struct.h>
+#include <linux/linux-itimerval-struct.h>
+
 #include <time.h>
 
-#define timespec   linux_timespec
-#define timezone   linux_timezone
-#define timeval    linux_timeval
-#define itimerval  linux_itimerval
-#define itimerspec linux_itimerspec
-#include <linux/time.h>
-#undef timespec
-#undef timezone
-#undef timeval
-#undef itimerval
-#undef itimerspec
+/* Copy between kernel and library representations of itimerval */
+#define MAP_ITV(a, b)                                        \
+    do {                                                     \
+        (a)->it_interval.tv_sec = (b)->it_interval.tv_sec;   \
+        (a)->it_interval.tv_usec = (b)->it_interval.tv_usec; \
+        (a)->it_value.tv_sec = (b)->it_value.tv_sec;         \
+        (a)->it_value.tv_usec = (b)->it_value.tv_usec;       \
+    } while (0)
+
 #endif /* _LOCAL_TIME_H_ */

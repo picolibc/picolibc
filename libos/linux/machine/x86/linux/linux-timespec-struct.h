@@ -32,27 +32,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef _LINUX_SIGACTION_H_
-#define _LINUX_SIGACTION_H_
-
-#define __KERNEL_NSIG 64
-
-struct __kernel_sigset {
-    unsigned long sa_mask[__KERNEL_NSIG / (sizeof(unsigned long) * 8)];
-};
-
-struct __kernel_sigaction {
-    _sig_func_ptr          sa_handler;
-    unsigned long          sa_flags;
-    void                   (*sa_restorer)(void);
-    struct __kernel_sigset sa_mask;
-};
-
-typedef struct __kernel_sigaltstack {
-    void  *ss_sp;
-    int    ss_flags;
-    size_t ss_size;
-} __kernel_stack_t;
-
+#ifdef __x86_64
+#include "../../x86_64/linux/linux-timespec-struct.h"
+#else
+#include "../../i686/linux/linux-timespec-struct.h"
 #endif

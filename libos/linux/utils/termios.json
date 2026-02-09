@@ -1,0 +1,14 @@
+{
+    "name": "termios2",
+    "headers": ["asm/termios.h"],
+    "members": [
+	{ "name": "c_iflag", "type": "tcflag_t" },
+	{ "name": "c_oflag", "type": "tcflag_t" },
+	{ "name": "c_cflag", "type": "tcflag_t" },
+	{ "name": "c_lflag", "type": "tcflag_t" },
+	{ "name": "c_cc", "array": "true", "type": "cc_t" },
+	{ "name": "c_line", "type": "cc_t" },
+	{ "name": "c_ispeed", "type": "speed_t" },
+	{ "name": "c_ospeed", "type": "speed_t" }
+	]
+}

@@ -33,28 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_SIGACTION_H_
-#define _LINUX_SIGACTION_H_
+#ifndef _LOCAL_STATX_H_
+#define _LOCAL_STATX_H_
 
-typedef unsigned long __kernel_sigset_t;
+#include "local-linux.h"
+#include <linux/linux-statx_timestamp-struct.h>
+#include <linux/linux-statx-struct.h>
 
-#define __KERNEL_NSIG 64
+#include <sys/stat.h>
 
-struct __kernel_sigset {
-    unsigned long sa_mask[__KERNEL_NSIG / (sizeof(unsigned long) * 8)];
-};
+int _statbuf(struct stat *statbuf, const struct __kernel_statx *statxbuf);
 
-struct __kernel_sigaction {
-    _sig_func_ptr          sa_handler;
-    unsigned long          sa_flags;
-    void                   (*sa_restorer)(void);
-    struct __kernel_sigset sa_mask;
-};
-
-typedef struct __kernel_sigaltstack {
-    void  *ss_sp;
-    int    ss_flags;
-    size_t ss_size;
-} __kernel_stack_t;
-
-#endif
+#endif /* _LOCAL_STATX_H_ */

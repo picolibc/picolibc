@@ -33,12 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
+#include "local-statx.h"
 
 int
-_statbuf(struct stat *statbuf, const struct statx *statxbuf)
+_statbuf(struct stat *statbuf, const struct __kernel_statx *statxbuf)
 {
-
     statbuf->st_dev = (statxbuf->stx_dev_major << 8) | (statxbuf->stx_dev_minor);
     statbuf->st_ino = (ino_t)statxbuf->stx_ino;
     statbuf->st_mode = statxbuf->stx_mode;

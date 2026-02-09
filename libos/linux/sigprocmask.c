@@ -33,16 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <linux/linux-signal.h>
+#include "local-sigaction.h"
 
 int
 sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
-#ifdef LINUX_SYS_rt_sigprocmask
-    struct __kernel_sigset kset = {}, koldset, *poldset = NULL;
-    int                    sig;
-    int                    ret;
+    __kernel_sigset_t kset = {}, koldset, *poldset = NULL;
+    int               sig;
+    int               ret;
 
     switch (how) {
     case SIG_BLOCK:
@@ -73,5 +71,4 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
                 sigaddset(oldset, sig);
     }
     return ret;
-#endif
 }

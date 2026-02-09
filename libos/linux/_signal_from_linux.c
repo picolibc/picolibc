@@ -33,10 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
 #define SIGNAL_LINUX_TO_PICOLIBC
-#include <signal.h>
-#include <linux/linux-signal.h>
+#include "local-sigaction.h"
 
 #define NSIG (sizeof(__signal_linux_to_picolibc) / sizeof(__signal_linux_to_picolibc[0]))
 

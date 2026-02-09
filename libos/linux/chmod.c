@@ -40,5 +40,9 @@
 int
 chmod(const char *path, mode_t mode)
 {
+#ifdef LINUX_SYS_chmod
     return syscall(LINUX_SYS_chmod, path, mode);
+#else
+    return syscall(LINUX_SYS_fchmodat, AT_FDCWD, path, mode);
+#endif
 }
