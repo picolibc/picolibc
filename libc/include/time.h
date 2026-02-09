@@ -163,15 +163,13 @@ typedef __pid_t pid_t; /* process id */
 
 #if __GNU_VISIBLE
 
-#define CLOCK_MONOTONIC_RAW    (5)
-
-#define CLOCK_MONOTONIC_COARSE (6)
-
-#define CLOCK_BOOTTIME         (7)
-
-#define CLOCK_REALTIME_ALARM   (8)
-
-#define CLOCK_BOOTTIME_ALARM   (9)
+#define CLOCK_MONOTONIC_RAW      (5)
+#define CLOCK_MONOTONIC_COARSE   (6)
+#define CLOCK_BOOTTIME           (7)
+#define CLOCK_REALTIME_ALARM     (8)
+#define CLOCK_BOOTTIME_ALARM     (9)
+#define CLOCK_PROCESS_CPUTIME_ID (10)
+#define CLOCK_THREAD_CPUTIME_ID  (11)
 
 #endif
 
