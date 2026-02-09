@@ -1,84 +1,36 @@
 /*
-Copyright (c) 1994 Cygnus Support.
-All rights reserved.
-
-Redistribution and use in source and binary forms are permitted
-provided that the above copyright notice and this paragraph are
-duplicated in all such forms and that any documentation,
-and/or other materials related to such
-distribution and use acknowledge that the software was developed
-at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
-endorse or promote products derived from this software without
-specific prior written permission.
-THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
-IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
-*/
-/*
-FUNCTION
-<<signal>>---specify handler subroutine for a signal
-
-INDEX
-        signal
-
-SYNOPSIS
-        #include <signal.h>
-        void (*signal(int <[sig]>, void(*<[func]>)(int))) (int);
-
-DESCRIPTION
-<<signal>> provides a simple signal-handling implementation for embedded
-targets.
-
-<<signal>> allows you to request changed treatment for a particular
-signal <[sig]>.  You can use one of the predefined macros <<SIG_DFL>>
-(select system default handling) or <<SIG_IGN>> (ignore this signal)
-as the value of <[func]>; otherwise, <[func]> is a function pointer
-that identifies a subroutine in your program as the handler for this signal.
-
-Some of the execution environment for signal handlers is
-unpredictable; notably, the only library function required to work
-correctly from within a signal handler is <<signal>> itself, and
-only when used to redefine the handler for the current signal value.
-
-Static storage is likewise unreliable for signal handlers, with one
-exception: if you declare a static storage location as `<<volatile
-sig_atomic_t>>', then you may use that location in a signal handler to
-store signal values.
-
-If your signal handler terminates using <<return>> (or implicit
-return), your program's execution continues at the point
-where it was when the signal was raised (whether by your program
-itself, or by an external event).  Signal handlers can also
-use functions such as <<exit>> and <<abort>> to avoid returning.
-
-@c FIXME: do we have setjmp.h and assoc fns?
-
-RETURNS
-If your request for a signal handler cannot be honored, the result is
-<<SIG_ERR>>; a specific error number is also recorded in <<errno>>.
-
-Otherwise, the result is the previous handler (a function pointer or
-one of the predefined macros).
-
-PORTABILITY
-ANSI C requires <<signal>>.
-
-No supporting OS subroutines are required to link with <<signal>>, but
-it will not have any useful effects, except for software generated signals,
-without an operating system that can actually raise exceptions.
-*/
-
-/*
- * signal.c
- * Original Author:	G. Haley
+ * SPDX-License-Identifier: BSD-3-Clause
  *
- * signal associates the function pointed to by func with the signal sig. When
- * a signal occurs, the value of func determines the action taken as follows:
- * if func is SIG_DFL, the default handling for that signal will occur; if func
- * is SIG_IGN, the signal will be ignored; otherwise, the default handling for
- * the signal is restored (SIG_DFL), and the function func is called with sig
- * as its argument. Returns the value of func for the previous call to signal
- * for the signal sig, or SIG_ERR if the request fails.
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
 #define _DEFAULT_SOURCE
@@ -86,24 +38,11 @@ without an operating system that can actually raise exceptions.
 #include <signal.h>
 #include <unistd.h>
 
-#if __SIZEOF_POINTER__ == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
-#define _USE_ATOMIC_SIGNAL
-#endif
+#define _NSIG_WORDS ((_NSIG + sizeof(unsigned) * 8 - 1) / (sizeof(unsigned) * 8))
 
-#if __SIZEOF_POINTER__ == 4 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
-#define _USE_ATOMIC_SIGNAL
-#endif
-
-#if __SIZEOF_POINTER__ == 8 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
-#define _USE_ATOMIC_SIGNAL
-#endif
-
-#ifdef _USE_ATOMIC_SIGNAL
-#include <stdatomic.h>
-static _Atomic _sig_func_ptr _sig_func[_NSIG];
-#else
 static _sig_func_ptr _sig_func[_NSIG];
-#endif
+static unsigned      _sig_mask[_NSIG_WORDS];
+static unsigned      _sig_pending[_NSIG_WORDS];
 
 #ifndef __weak_reference
 #define __fallback_signal signal
@@ -118,13 +57,9 @@ __fallback_signal(int sig, _sig_func_ptr func)
         return SIG_ERR;
     }
 
-#ifdef _USE_ATOMIC_SIGNAL
-    return (_sig_func_ptr)atomic_exchange(&_sig_func[sig], func);
-#else
     _sig_func_ptr old = _sig_func[sig];
     _sig_func[sig] = func;
     return old;
-#endif
 }
 
 #ifdef __weak_reference
@@ -139,27 +74,42 @@ __fallback_raise(int sig)
         return -1;
     }
 
-    for (;;) {
-        _sig_func_ptr func;
-#ifdef _USE_ATOMIC_SIGNAL
-        func = (_sig_func_ptr)atomic_load(&_sig_func[sig]);
-#else
-        func = _sig_func[sig];
-#endif
+    int      w;
+    unsigned b;
+
+    w = sig / (sizeof(_sig_mask[0]) * 8);
+    b = 1U << (sig % (sizeof(_sig_mask[0]) * 8));
+
+    /* Mark signal as pending */
+    _sig_pending[w] |= b;
+
+    /* Keep processing until the signal is no longer pending */
+    while (_sig_pending[w] & b) {
+
+        /* If signal is currently blocked, don't deliver it */
+        if (_sig_mask[w] & b)
+            break;
+
+        /* Mark signal as no longer pending */
+        _sig_pending[w] &= ~b;
+
+        _sig_func_ptr func = _sig_func[sig];
+
         if (func == SIG_IGN)
-            return 0;
+            break;
         else if (func == SIG_DFL)
             _exit(128 + sig);
-#ifdef _USE_ATOMIC_SIGNAL
-        /* make sure it hasn't changed in the meantime */
-        if (!atomic_compare_exchange_strong(&_sig_func[sig], &func, SIG_DFL))
-            continue;
-#else
-        _sig_func[sig] = SIG_DFL;
-#endif
+
+        /* Block signal while the handler is active */
+        _sig_mask[w] |= b;
+
+        /* Invoke the handler */
         (*func)(sig);
-        return 0;
+
+        _sig_mask[w] &= ~b;
     }
+
+    return 0;
 }
 
 #ifdef __weak_reference
