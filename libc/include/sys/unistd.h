@@ -78,6 +78,8 @@ typedef __pid_t pid_t; /* process id */
 #define _PID_T_DECLARED
 #endif
 
+#define _POSIX_VERSION 202405L
+
 __noreturn void _exit(int __status);
 
 int             access(const char *__path, int __amode);
