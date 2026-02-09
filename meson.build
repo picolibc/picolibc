@@ -1659,6 +1659,8 @@ if os_fallback_option == 'true'
   has_os_fallback = true
 elif os_fallback_option == 'false'
   has_os_fallback = false
+elif use_stdlib
+  has_os_fallback = false
 endif
 
 libfallback_name='os-fallback'
@@ -1670,6 +1672,10 @@ bios_bin = []
 # make sure to include os BEFORE picocrt!
 
 subdir('libos')
+
+if use_stdlib or has_os_linux or has_os_fallback
+  has_os_library = true
+endif
 
 conf_data.set('__SEMIHOST', has_semihost, description: 'Semihost APIs supported')
 conf_data.set('__ARM_SEMIHOST', has_arm_semihost, description: 'ARM Semihost APIs supported')

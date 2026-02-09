@@ -45,6 +45,8 @@ src_os_fallback = files(srcs_os_fallback)
 
 if has_os_fallback
 
+  has_os_library = true
+
   foreach params : targets
     target = params['name']
     target_dir = params['dir']
