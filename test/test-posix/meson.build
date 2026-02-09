@@ -41,6 +41,7 @@ tests_failure = []
 
 if has_os_posix
   tests += [
+    'test-alarm',
     'test-popen',
     'test-signal',
     'test-system',
