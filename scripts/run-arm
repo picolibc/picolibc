@@ -85,7 +85,7 @@ case "$cpu_arch"/"$cpu_profile" in
     v5TE/|v5T/)
         cpu=arm926
         ;;
-    v6S-M/Microcontroller)
+    v6S-M/Microcontroller|v6-M/Microcontroller)
         cpu=cortex-m0
         ;;
     v7/Application)
