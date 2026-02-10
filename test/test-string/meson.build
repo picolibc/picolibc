@@ -34,6 +34,7 @@
 #
 
 tests_mem = [
+  'test-ffs',
   'test-memchr',
   'test-memchr-simple',
   'test-memcpy_s',

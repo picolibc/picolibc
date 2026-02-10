@@ -210,7 +210,7 @@ typedef CONST struct {
 #define ROUNDL_PREC     0
 #define TRUNCL_PREC     0
 
-#include "long_double_vec.h"
+#include "test-long-double-vec.h"
 
 #if !defined(__PICOLIBC__) || defined(__IO_LONG_DOUBLE)
 #define TEST_IO_LONG_DOUBLE

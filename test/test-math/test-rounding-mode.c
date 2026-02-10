@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <fenv.h>
-#include "rounding-mode.h"
+#include "test-rounding-mode.h"
 
 #ifdef __sh__
 #if !(defined(__SH4__) || defined(__SH4_SINGLE__) || defined(__SH4_SINGLE_ONLY__))

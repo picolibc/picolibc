@@ -98,17 +98,44 @@ tests_complex_exp = [
 ]
 
 tests_complex_other = [
-  'test-csqrt'
+  'test-csqrt',
+  'test-complex-funcs',
 ]
+
+tests_other = [
+  'test-fenv',
+  'test-fma',
+  'test-long-double',
+  'test-math-errhandling',
+  'test-math-funcs',
+  'test-rounding-mode',
+  ]
 
 tests = tests_real_trig + tests_real_exp + tests_real_other
 tests += tests_complex_trig + tests_complex_exp + tests_complex_other
+tests += tests_other
 
 functions = [ 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atanh',
               'cbrt', 'cos', 'cosh', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
               'expm1', 'j0', 'j1', 'lgamma', 'log', 'log10', 'log1p', 'log2',
               'sin', 'sincos_cos', 'sincos_sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tgamma', 'y0', 'y1',
             ]
+
+test_extra_libs = {}
+
+test_extra_src = {
+  'test-rounding-mode': files(['test-rounding-mode-sub.c']),
+  }
+
+test_extra_c_args = {
+  'test-math-errhandling': arg_fnobuiltin,
+  'test-rounding-mode': arg_fnobuiltin
+}
+
+test_args = {}
+
+test_skip_native = [
+]
 
 foreach params : targets
   target = params['name']
@@ -142,11 +169,12 @@ foreach params : targets
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
     test(t1 + target,
-	 executable(t1 + target, [t1_src],
-		    c_args: printf_compile_args_d + test_file_name_arg + _c_args,
+	 executable(t1 + target, [t1_src] + test_extra_src.get(t1, []),
+		    c_args: printf_compile_args_d + test_file_name_arg + test_extra_c_args.get(t1, []) + _c_args,
 		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,
 		    link_depends:  _link_depends,
+                    link_with: test_extra_libs.get(t1, []),
 		    include_directories: inc),
          depends: bios_bin,
 	 timeout: 60,
@@ -160,10 +188,11 @@ foreach params : targets
       test_function_name_arg=['-DTEST_FUNC=' + f]
       test(test_name,
            executable(test_name, 'test-math-compare.c',
-                      c_args: printf_compile_args_d + test_function_name_arg + _c_args,
+                      c_args: printf_compile_args_d + test_function_name_arg + test_extra_c_args.get(test_name, []) + _c_args,
                       link_args: printf_link_args_d + _link_args,
                       objects: _objs,
                       link_depends: _link_depends,
+                      link_with: test_extra_libs.get(test_name, []),
                       include_directories: inc),
            depends: bios_bin,
 	   timeout: 7200,
@@ -176,15 +205,17 @@ endforeach
 
 if enable_native_math_tests
 
-  native_lib_m = cc.find_library('m', required: false)
-
   foreach t1 : tests
+    if t1 in test_skip_native
+      continue
+    endif
+
     t1_src = t1 + '.c'
     t1_name = t1 + '-native'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
 
     test(t1_name,
-	 executable(t1_name, t1_src,
+	 executable(t1_name, [t1_src] + test_extra_src.get(t1, []),
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args,
                     dependencies: native_lib_m),

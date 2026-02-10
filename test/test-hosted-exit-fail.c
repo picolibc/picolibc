@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,43 +33,5 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <math.h>
-#include <fenv.h>
-#include "rounding-mode.h"
-
-double
-div_d(double a, double b)
-{
-    return a / b;
-}
-
-double
-mul_d(double a, double b)
-{
-    return a * b;
-}
-
-double
-sub_d(double a, double b)
-{
-    return a - b;
-}
-
-float
-div_f(float a, float b)
-{
-    return a / b;
-}
-
-float
-mul_f(float a, float b)
-{
-    return a * b;
-}
-
-float
-sub_f(float a, float b)
-{
-    return a - b;
-}
+#define RETVAL 1
+#include "test-hosted-exit.c"

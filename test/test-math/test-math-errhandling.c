@@ -249,7 +249,7 @@ e_to_str(int e)
 #define makemathname(s)   scat(s, l)
 #define makemathname_r(s) scat(s, l_r)
 
-#include "math_errhandling_tests.c"
+#include "test-math-errhandling-tests.c"
 
 #undef BIG
 #undef BIGODD
@@ -304,7 +304,7 @@ e_to_str(int e)
 #define makemathname(s)   s
 #define makemathname_r(s) scat(s, _r)
 
-#include "math_errhandling_tests.c"
+#include "test-math-errhandling-tests.c"
 
 #undef BIG
 #undef BIGODD
@@ -341,7 +341,7 @@ e_to_str(int e)
 #define makemathname_r(s) scat(s, f_r)
 #define PI_VAL            ((float)M_PI)
 
-#include "math_errhandling_tests.c"
+#include "test-math-errhandling-tests.c"
 
 int
 main(void)

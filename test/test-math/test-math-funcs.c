@@ -117,6 +117,7 @@ main(void)
     i1 = isinf(d1);
     i1 = isnan(d1);
 
+#ifdef __PICOLIBC__
     i1 = __isinff(f1);
     i1 = __isinfd(d1);
     i1 = __isnanf(f1);
@@ -125,10 +126,13 @@ main(void)
     i1 = __fpclassifyd(d1);
     i1 = __signbitf(f1);
     i1 = __signbitd(d1);
+#endif
 
     /* Non ANSI double precision functions.  */
 
+#ifdef __PICOLIBC__
     d1 = infinity();
+#endif
     d1 = nan("");
     d1 = copysign(d1, d2);
     d1 = logb(d1);
@@ -214,7 +218,9 @@ main(void)
     f1 = fminf(f1, f2);
     f1 = fmaf(f1, f2, f3);
 
+#ifdef __PICOLIBC__
     f1 = infinityf();
+#endif
     f1 = nanf("");
     f1 = copysignf(f1, f2);
     f1 = logbf(f1);
@@ -304,7 +310,9 @@ main(void)
     f1 = dreml(l1, l2);
     sincosl(l1, &l2, &l3);
     l1 = exp10l(l1);
+#ifdef __PICOLIBC__
     l1 = pow10l(l1);
+#endif
     f1 = nexttowardf(f1, l1);
     d1 = nexttoward(d1, l1);
     l1 = nextafterl(l1, l2);
@@ -334,9 +342,13 @@ main(void)
     sincos(d1, &d2, &d3);
     sincosf(f1, &f2, &f3);
     d1 = exp10(d1);
+#ifdef __PICOLIBC__
     d1 = pow10(d1);
+#endif
     f1 = exp10f(f1);
+#ifdef __PICOLIBC__
     f1 = pow10f(f1);
+#endif
 
 #ifdef __HAVE_COMPLEX
     cd1 = cacos(cd1);

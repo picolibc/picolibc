@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "try-ilp32.h"
+#include "test-ilp32.h"
 
 int
 main(void)

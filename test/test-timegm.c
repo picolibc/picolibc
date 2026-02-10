@@ -45,7 +45,7 @@ const struct _test {
     time_t    time;
 } tests[NUM_TEST] = {
 #ifndef GENERATE
-#include "timegm.h"
+#include "test-timegm.h"
 #endif
 };
 

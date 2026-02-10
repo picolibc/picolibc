@@ -34,30 +34,23 @@
 #
 
 tests = [
-  'test-pwd',
+  'test-atexit',
+  'test-efcvt',
+  'test-malloc',
+  'test-malloc-stress',
+  'test-on_exit',
+  'test-rand',
+  'test-strtod',
   ]
 
-tests_failure = []
-
-if has_os_posix
-  tests += [
-    'test-alarm',
-    'test-popen',
-    'test-signal',
-    'test-system',
+tests_failure = [
+  'test-abort',
   ]
-endif
 
 test_extra_libs = {}
 
-arg_posix_io = []
-if tests_enable_posix_io
-  arg_posix_io += ['-DTESTS_ENABLE_POSIX_IO']
-endif
+test_extra_c_args = {}
 
-test_extra_c_args = {
-  'test-pwd' : arg_posix_io
-}
 test_args = {}
 
 foreach params : targets
@@ -108,7 +101,7 @@ foreach params : targets
          depends: bios_bin,
          args: test_args.get(t1, []),
 	 timeout: 60,
-         suite: 'test-posix',
+         suite: 'test-stdlib',
 	 env: test_env)
   endforeach
 
@@ -134,7 +127,7 @@ foreach params : targets
          depends: bios_bin,
          args: test_args.get(t1, []),
 	 timeout: 60,
-         suite: 'test-posix',
+         suite: 'test-stdlib',
 	 env: test_env,
          should_fail: true)
   endforeach
@@ -153,7 +146,7 @@ if enable_native_tests
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args,
                     dependencies: native_lib_m),
-         suite: 'test-linux',
+         suite: 'test-stdlib',
          env: test_env
         )
   endforeach
@@ -175,4 +168,3 @@ if enable_native_tests
   endforeach
 
 endif
-

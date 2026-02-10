@@ -101,6 +101,15 @@ set(tests_complex_other
   test-csqrt
 )
 
+set(tests_other
+  test-fenv
+  test-fma
+  test-long-double
+  test-math-errhandling
+  test-math-funcs
+  test-rounding-mode
+  )
+
 set(tests
   ${tests_real_trig}
   ${tests_real_exp}
@@ -108,6 +117,7 @@ set(tests
   ${tests_complex_trig}
   ${tests_complex_exp}
   ${tests_complex_other}
+  ${tests_math_other}
   )
 
 foreach(test IN LISTS tests)

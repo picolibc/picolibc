@@ -144,7 +144,7 @@ struct fmal_vec {
 #define TEST_CONST static const
 #endif
 
-#include "fma_vec.h"
+#include "test-fma-vec.h"
 
 #define NUM_FMAF_VEC (sizeof(fmaf_vec) / sizeof(fmaf_vec[0]))
 #define NUM_FMA_VEC  (sizeof(fma_vec) / sizeof(fma_vec[0]))
