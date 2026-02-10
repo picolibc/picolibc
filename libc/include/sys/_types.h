@@ -229,4 +229,6 @@ typedef __size_t   __rsize_t;
 typedef int        __errno_t;
 typedef __uint16_t __wctype_t;
 
+#define __NAME_MAX 255
+
 #endif /* _SYS__TYPES_H */

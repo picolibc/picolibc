@@ -46,12 +46,12 @@
 #define TZNAME_MAX 10    /* max time zone name length */
 
 /* Pathname values */
-#define LINK_MAX  32767 /* max file link count */
-#define MAX_CANON 255   /* max bytes in term canon input line */
-#define MAX_INPUT 255   /* max bytes in terminal input */
-#define NAME_MAX  255   /* max bytes in a file name */
-#define PATH_MAX  1024  /* max bytes in pathname */
-#define PIPE_BUF  512   /* max bytes for atomic pipe writes */
+#define LINK_MAX  32767      /* max file link count */
+#define MAX_CANON 255        /* max bytes in term canon input line */
+#define MAX_INPUT 255        /* max bytes in terminal input */
+#define NAME_MAX  __NAME_MAX /* max bytes in a file name */
+#define PATH_MAX  1024       /* max bytes in pathname */
+#define PIPE_BUF  512        /* max bytes for atomic pipe writes */
 
 /* Runtime increasable values */
 #define COLL_WEIGHTS_MAX                    0    /* max weights for order keyword */

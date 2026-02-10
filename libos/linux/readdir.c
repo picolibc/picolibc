@@ -57,7 +57,6 @@ readdir(DIR *dir)
 
     dirent = &dir->dirent;
     dirent->d_ino = (ino_t)k_dirent->d_ino;
-    dirent->d_off = (__off_t)k_dirent->d_off;
 
     size_t name_len = strlen((char *)k_dirent->d_name);
     if (name_len >= sizeof(dirent->d_name))

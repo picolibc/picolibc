@@ -36,20 +36,34 @@
 #ifndef _SYS_DIRENT_H_
 #define _SYS_DIRENT_H_
 
-#include <sys/_types.h>
+#include <sys/cdefs.h>
+#define __need_size_t
+#include <stddef.h>
+
+_BEGIN_STD_C
 
 #ifndef _INO_T_DECLARED
 typedef __ino_t ino_t; /* inode number */
 #define _INO_T_DECLARED
 #endif
 
+typedef size_t reclen_t;
+
+#ifndef _SSIZE_T_DECLARED
+typedef __ssize_t ssize_t;
+#define _SSIZE_T_DECLARED
+#endif
+
 struct dirent {
-    ino_t          d_ino;       /* Inode number */
-    __off_t        d_off;       /* Not an offset; see below */
-    unsigned short d_reclen;    /* Length of this record */
-    unsigned char  d_type;      /* Type of file; not supported
-                                   by all filesystem types */
-    char           d_name[256]; /* Null-terminated filename */
+    ino_t d_ino;                  /* Inode number */
+    char  d_name[__NAME_MAX + 1]; /* Null-terminated filename */
+};
+
+struct posix_dent {
+    ino_t         d_ino;
+    reclen_t      d_reclen;
+    unsigned char d_type;
+    char          d_name[];
 };
 
 typedef struct {
@@ -62,5 +76,16 @@ typedef struct {
         __uint64_t align;
     };
 } DIR;
+
+#define DT_BLK     1
+#define DT_CHR     2
+#define DT_DIR     3
+#define DT_FIFO    4
+#define DT_LNK     5
+#define DT_REG     6
+#define DT_SOCK    7
+#define DT_UNKNOWN 0
+
+_END_STD_C
 
 #endif
