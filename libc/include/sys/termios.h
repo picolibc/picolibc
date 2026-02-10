@@ -45,6 +45,11 @@ typedef unsigned char cc_t;
 typedef unsigned int  speed_t;
 typedef unsigned int  tcflag_t;
 
+#ifndef _PID_T_DECLARED
+typedef __pid_t pid_t; /* process id */
+#define _PID_T_DECLARED
+#endif
+
 #define VEOF   0
 #define VEOL   1
 #define VERASE 2
