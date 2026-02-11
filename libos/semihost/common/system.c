@@ -33,34 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <sys/times.h>
-#include <sys/time.h>
+#include "semihost-private.h"
 #include <stdlib.h>
-#include <math.h>
-#include <stdio.h>
-#include <unistd.h>
+#include <errno.h>
 
 int
-main(void)
+system(const char *command)
 {
-    struct tms begin_tms, end_tms;
-    clock_t    begin, end;
-    double     y;
-    double     x;
-    double     seconds;
-    long       ticks_per_second;
-
-    begin = end = times(&begin_tms);
-    y = 0.0;
-    for (x = -100; x < 100; x += 0.001) {
-        y += sin(x) * sin(x) + cos(x) * cos(x);
-        end = times(&end_tms);
-        if (end != begin)
-            break;
-    }
-    printf("%.17g\n", y);
-    ticks_per_second = sysconf(_SC_CLK_TCK);
-    seconds = ((double)(end - begin)) / (double)ticks_per_second;
-    printf("delta %ld seconds %.17g\n", (long)end - (long)begin, seconds);
-    exit(end == begin);
+    int ret = sys_semihost_system(command);
+    if (ret == -1)
+        errno = sys_semihost_errno();
+    return ret;
 }

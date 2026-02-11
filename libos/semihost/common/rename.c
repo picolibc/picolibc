@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2019 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,11 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include <semihost.h>
+#include "semihost-private.h"
+#include <stdio.h>
+#include <errno.h>
 
 int
-main(void)
+rename(const char *old, const char *new)
 {
-    sys_semihost_exit(ADP_Stopped_RunTimeErrorUnknown, 1);
+    int ret = sys_semihost_rename(old, new);
+    if (ret == -1)
+        errno = sys_semihost_errno();
+    return ret;
 }

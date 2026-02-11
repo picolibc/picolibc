@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2019 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,13 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include <semihost.h>
-#include <stdio.h>
+#include "semihost-private.h"
+#include <time.h>
 
-int
-main(void)
+clock_t
+clock(void)
 {
-    sys_semihost_write0(COMMAND_LINE "\n");
-    exit(0);
+    return (clock_t)sys_semihost_clock();
 }

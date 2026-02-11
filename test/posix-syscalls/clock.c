@@ -33,53 +33,36 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <semihost.h>
-
-#ifndef TEST_FILE_NAME
-#define TEST_FILE_NAME "SEMIREMO.TXT"
-#endif
+#include <time.h>
 
 int
 main(void)
 {
-    int fd;
-    int code = 0;
-    int ret;
+  clock_t start;
+  clock_t stop;
+  int loop;
 
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
-        exit(1);
+  errno = 0;
+  start = clock();
+
+  if (start == (clock_t)-1 && errno == ENOSYS) {
+    printf("clock() not implemented, skipping test\n");
+    exit(77);
+  }
+
+    for (loop = 0; loop < 10000000; loop++) {
+        stop = clock();
+        if (stop != start) {
+            if (stop < start) {
+                printf("semihost-clock: clock went backwards\n");
+                exit(2);
+            }
+            exit(0);
+        }
     }
-    ret = sys_semihost_close(fd);
-    fd = -1;
-    if (ret != 0) {
-        printf("close failed %d %d\n", ret, sys_semihost_errno());
-        code = 2;
-        goto bail1;
-    }
-    ret = sys_semihost_remove(TEST_FILE_NAME);
-    if (ret != 0) {
-        printf("remove %s failed %d %d\n", TEST_FILE_NAME, ret, sys_semihost_errno());
-        code = 3;
-        goto bail1;
-    }
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_R);
-    if (fd >= 0) {
-        printf("open %s should have failed\n", TEST_FILE_NAME);
-        code = 4;
-        goto bail1;
-    }
-    ret = sys_semihost_remove(TEST_FILE_NAME);
-    if (ret == 0) {
-        printf("remove %s should have failed\n", TEST_FILE_NAME);
-        code = 5;
-        goto bail1;
-    }
-bail1:
-    if (fd >= 0)
-        (void)sys_semihost_close(fd);
-    (void)sys_semihost_remove(TEST_FILE_NAME);
-    exit(code);
+    printf("semihost-clock: clock never changed\n");
+    exit(1);
 }

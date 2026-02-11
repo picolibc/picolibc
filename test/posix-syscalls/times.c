@@ -33,58 +33,41 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <math.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <semihost.h>
-
-#ifndef TEST_FILE_NAME
-#define TEST_FILE_NAME "SEMIFLEN.TXT"
-#endif
-
-#define TEST_STRING     "hello, world"
-#define TEST_STRING_LEN 12
+#include <sys/time.h>
+#include <sys/times.h>
+#include <unistd.h>
 
 int
 main(void)
 {
-    int       fd;
-    uintptr_t not_written;
-    int       code = 0;
-    int       ret;
-    uintptr_t len;
+    struct tms begin_tms, end_tms;
+    clock_t    begin, end;
+    double     y;
+    double     x;
+    double     seconds;
+    long       ticks_per_second;
 
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
-        exit(1);
+    errno = 0;
+    begin = end = times(&begin_tms);
+
+    if (begin == (clock_t)-1 && errno == ENOSYS) {
+      printf("times() not implemented, skipping test\n");
+      exit(77);
     }
-    not_written = sys_semihost_write(fd, TEST_STRING, TEST_STRING_LEN);
-    if (not_written != 0) {
-        printf("write failed %ld %d\n", (long)not_written, sys_semihost_errno());
-        code = 2;
-        goto bail1;
+    y = 0.0;
+    for (x = -100; x < 100; x += 0.001) {
+        y += sin(x) * sin(x) + cos(x) * cos(x);
+        end = times(&end_tms);
+        if (end != begin)
+            break;
     }
-    ret = sys_semihost_close(fd);
-    fd = -1;
-    if (ret != 0) {
-        printf("close failed %d %d\n", ret, sys_semihost_errno());
-        code = 3;
-        goto bail1;
-    }
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_R);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
-        code = 4;
-        goto bail1;
-    }
-    len = sys_semihost_flen(fd);
-    if (len != TEST_STRING_LEN) {
-        printf("flen failed %ld != %ld\n", (long)len, (long)TEST_STRING_LEN);
-        code = 5;
-        goto bail1;
-    }
-bail1:
-    if (fd >= 0)
-        (void)sys_semihost_close(fd);
-    (void)sys_semihost_remove(TEST_FILE_NAME);
-    exit(code);
+    printf("%.17g\n", y);
+    ticks_per_second = sysconf(_SC_CLK_TCK);
+    seconds = ((double)(end - begin)) / (double)ticks_per_second;
+    printf("delta %ld seconds %.17g\n", (long)end - (long)begin, seconds);
+    exit(end == begin);
 }

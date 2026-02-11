@@ -34,6 +34,7 @@
 #
 
 src_semihost += files([
+                       'clock.c',
                        'close.c',
                        'exit.c',
                        'fstat.c',
@@ -47,7 +48,10 @@ src_semihost += files([
                        'mapstdio.c',
                        'open.c',
                        'read.c',
+                       'rename.c',
                        'sysconf.c',
+                       'system.c',
+                       'time.c',
                        'times.c',
                        'unlink.c',
                        'write.c',

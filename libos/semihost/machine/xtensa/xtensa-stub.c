@@ -35,6 +35,12 @@
 
 #define _GNU_SOURCE
 #include "xtensa-semihost.h"
+#include <errno.h>
+#include <sys/times.h>
+#include <sys/time.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <stdio.h>
 
 off64_t
 lseek64(int fd, off64_t offset, int whence)
@@ -47,6 +53,7 @@ fstat(int fd, struct stat *sbuf)
 {
     (void)fd;
     (void)sbuf;
+    errno = ENOSYS;
     return -1;
 }
 
@@ -54,5 +61,40 @@ int
 isatty(int fd)
 {
     (void)fd;
-    return 1;
+    errno = ENOSYS;
+    return 0;
+}
+
+clock_t
+times(struct tms *buf)
+{
+    (void)buf;
+    errno = ENOSYS;
+    return (clock_t)-1;
+}
+
+int
+gettimeofday(struct timeval * restrict tv, void * restrict tz)
+{
+    (void)tv;
+    (void)tz;
+    errno = ENOSYS;
+    return -1;
+}
+
+int
+rename(const char *old, const char *new)
+{
+    (void)old;
+    (void)new;
+    errno = ENOSYS;
+    return -1;
+}
+
+long
+sysconf(int name)
+{
+    (void)name;
+    errno = EINVAL;
+    return -1;
 }

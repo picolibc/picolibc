@@ -33,66 +33,52 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <errno.h>
+#include <stdio.h>
 #include <stdlib.h>
-#include <semihost.h>
-#include <string.h>
-
-#ifndef TEST_FILE_NAME
-#define TEST_FILE_NAME "SEMIWRIT.TXT"
-#endif
-#define TEST_STRING     "hello, world"
-#define TEST_STRING_LEN 12
+#include <sys/time.h>
 
 int
 main(void)
 {
-    int       fd;
-    uintptr_t not_written;
-    uintptr_t not_read;
-    int       code = 0;
-    int       ret;
-    char      buf[TEST_STRING_LEN + 10];
+    int            loop;
+    struct timeval prev, cur;
+    int            ret;
 
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_W);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
-        exit(1);
+    errno = 0;
+    ret = gettimeofday(&prev, NULL);
+    if (ret < 0) {
+      if (errno == ENOSYS) {
+        printf("gettimeofday() not implemented, skipping test\n");
+        exit(77);
+      }
+        printf("gettimeofday return %d\n", ret);
+        exit(2);
     }
-    not_written = sys_semihost_write(fd, TEST_STRING, TEST_STRING_LEN);
-    if (not_written != 0) {
-        printf("write failed %ld %d\n", (long)not_written, sys_semihost_errno());
-        code = 2;
-        goto bail1;
+    if (prev.tv_sec < 1600000000LL) {
+        printf("gettimeofday return value before 2020-9-13 %lld\n", (long long)prev.tv_sec);
+        exit(2);
     }
-    ret = sys_semihost_close(fd);
-    fd = -1;
-    if (ret != 0) {
-        printf("close failed %d %d\n", ret, sys_semihost_errno());
-        code = 3;
-        goto bail1;
+    for (loop = 0; loop < 10000; loop++) {
+        ret = gettimeofday(&cur, NULL);
+        if (ret < 0) {
+            printf("gettimeofday return %d\n", ret);
+            exit(2);
+        }
+        if (cur.tv_sec > prev.tv_sec + 1000) {
+            printf("gettimeofday: seconds changed by %lld\n",
+                   (long long)(cur.tv_sec - prev.tv_sec));
+            exit(2);
+        }
+        if (cur.tv_sec > prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec > prev.tv_usec)) {
+            printf("gettimeofday: ok\n");
+            exit(0);
+        }
+        if (cur.tv_sec < prev.tv_sec || (cur.tv_sec == prev.tv_sec && cur.tv_usec < prev.tv_usec)) {
+            printf("gettimeofday: clock went backwards\n");
+            exit(2);
+        }
     }
-    fd = sys_semihost_open(TEST_FILE_NAME, SH_OPEN_R);
-    if (fd < 0) {
-        printf("open %s failed\n", TEST_FILE_NAME);
-        code = 3;
-        goto bail1;
-    }
-    not_read = sys_semihost_read(fd, buf, sizeof(buf));
-    if (not_read + TEST_STRING_LEN != sizeof(buf)) {
-        printf("read bad result %ld expected %ld\n", (long)not_read,
-               (long)(sizeof(buf) - TEST_STRING_LEN));
-        code = 5;
-        goto bail1;
-    }
-    buf[TEST_STRING_LEN] = '\0';
-    if (memcmp(buf, TEST_STRING, TEST_STRING_LEN) != 0) {
-        printf("read bad contents %s expected %s\n", buf, TEST_STRING);
-        code = 6;
-        goto bail1;
-    }
-bail1:
-    if (fd >= 0)
-        (void)sys_semihost_close(fd);
-    (void)sys_semihost_remove(TEST_FILE_NAME);
-    exit(code);
+    printf("gettimeofday: clock never changed\n");
+    exit(1);
 }

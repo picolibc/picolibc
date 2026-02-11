@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2020 Keith Packard
+ * Copyright © 2019 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,11 +33,14 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdlib.h>
-#include <semihost.h>
+#include "semihost-private.h"
+#include <time.h>
 
-int
-main(void)
+time_t
+time(time_t *t)
 {
-    sys_semihost_exit(ADP_Stopped_ApplicationExit, 0);
+    time_t result = (time_t)sys_semihost_time();
+    if (t)
+        *t = result;
+    return result;
 }
