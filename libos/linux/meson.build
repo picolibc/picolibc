@@ -90,6 +90,7 @@ if fs.is_dir(machine_dir)
     'kill.c',
     'killpg.c',
     'lseek.c',
+    'lstat.c',
     'mkdir.c',
     'nanosleep.c',
     'open.c',
