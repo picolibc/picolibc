@@ -107,71 +107,63 @@ Here's an example program to experiment with these options:
 
 ```c
 #include <stdio.h>
+#include <stdlib.h>
 
 void main(void) {
 	printf(" 2⁶¹ = %lld π ≃ %.17g\n", 1ll << 61, printf_float(3.141592653589793));
+	_Exit(0);
 }
 ```
 
 Now we can build and run it with the double options:
 
-	$ arm-none-eabi-gcc --printf=d -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf.elf printf.c
+	$ arm-none-eabi-gcc --oslib=semihost -march=armv7-m -Os -o printf.elf printf.c
 	$ arm-none-eabi-size printf.elf
 	   text	   data	    bss	    dec	    hex	filename
-           7748	     80	   4104	  11932	   2e9c	printf.elf
-	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf.elf -nographic
+	   7544	     80	   4104	  11728	   2dd0	printf.elf
+	$ qemu-system-arm -semihosting -machine mps2-an385 -nographic -kernel printf.elf
 	 2⁶¹ = 2305843009213693952 π ≃ 3.141592653589793
 
 Switching to float-only reduces the size but lets this still work,
 although the floating point value has reduced precision:
 
-	$ arm-none-eabi-gcc --printf=f -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-float.elf printf.c
+	$ arm-none-eabi-gcc --oslib=semihost -march=armv7-m -Os --printf=f -o printf-float.elf printf.c
 	$ arm-none-eabi-size printf-float.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   6284	     80	   4104	  10468	   28e4	printf-float.elf
-	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-float.elf -nographic
+	   6856	     80	   4104	  11040	   2b20	printf-float.elf
+	$ qemu-system-arm -semihosting -machine mps2-an385 -nographic -kernel printf-float.elf
 	 2⁶¹ = 2305843009213693952 π ≃ 3.1415927
 
 Selecting the long-long variant reduces the size further, but now the
 floating point value is not displayed correctly:
 
-	$ arm-none-eabi-gcc --printf=l -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-long-long.elf printf.c
-	$ arm-none-eabi-size printf-long-long.elf
+	$ arm-none-eabi-gcc --oslib=semihost -march=armv7-m -Os --printf=l -o printf-long.elf printf.c
+	$ arm-none-eabi-size printf-long.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   2188	     80	   4104	   6372	   18e4	printf-long-long.elf
-	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-long-long.elf -nographic
+	   2100	     80	   4104	   6284	   188c	printf-long.elf
+	$ qemu-system-arm -semihosting -machine mps2-an385 -nographic -kernel printf-long.elf
 	 2⁶¹ = 2305843009213693952 π ≃ *float*
 
 Going to integer-only reduces the size even further, but now it
 doesn't output the long long value correctly:
 
-	$ arm-none-eabi-gcc --printf=i -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-int.elf printf.c
+	$ arm-none-eabi-gcc --oslib=semihost -march=armv7-m -Os --printf=i -o printf-int.elf printf.c
 	$ arm-none-eabi-size printf-int.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   2028	     80	   4104	   6212	   1844	printf-int.elf
-	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-int.elf -nographic
+	   1924	     80	   4104	   6108	   17dc	printf-int.elf
+	$ qemu-system-arm -semihosting -machine mps2-an385 -nographic -kernel printf-int.elf
 	 2⁶¹ = 0 π ≃ *float*
 
 To shrink things still further, use the 'minimal' variant. This
 doesn't even look at the %g formatting instruction, so that value
 displays as '%g'.
 
-	$ arm-none-eabi-gcc --printf=m -Os -march=armv7-m --specs=picolibc.specs --oslib=semihost --crt0=hosted -Wl,--defsym=__flash=0 -Wl,--defsym=__flash_size=0x00200000 -Wl,--defsym=__ram=0x20000000 -Wl,--defsym=__ram_size=0x200000 -o printf-min.elf printf.c
+	$ arm-none-eabi-gcc --oslib=semihost -march=armv7-m -Os --printf=m -o printf-min.elf printf.c
 	$ arm-none-eabi-size printf-min.elf
 	   text	   data	    bss	    dec	    hex	filename
-	   1508	     80	   4104	   5692	   163c	printf-min.elf
-	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-min.elf -nographic
+	   1420	     80	   4104	   5604	   15e4	printf-min.elf
+	$ qemu-system-arm -semihosting -machine mps2-an385 -nographic -kernel printf-min.elf
 	 2⁶¹ = 0 π ≃ %g
-
-There's a build-time option available that enables long-long support
-in the minimal printf variant, `-Dminimal-io-long-long=true`. Building with
-that increases the size modestly while fixing the long long output:
-
-	$ arm-none-eabi-size printf-min.elf
-	   text	   data	    bss	    dec	    hex	filename
-	   1632	     80	   4104	   5816	   16b8	printf-min.elf
-	$ qemu-system-arm -chardev stdio,id=stdio0 -semihosting-config enable=on,chardev=stdio0 -monitor none -serial none -machine mps2-an385,accel=tcg -kernel printf-min.elf -nographic
-	 2⁶¹ = 2305843009213693952 π ≃ %g
 
 ## Picolibc build options for stdio
 
