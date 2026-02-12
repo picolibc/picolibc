@@ -50,4 +50,4 @@ endif
 
 subdir('fallback')
 
-subdir('dummy')
+subdir('dummyhost')

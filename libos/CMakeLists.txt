@@ -33,5 +33,5 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 add_subdirectory(semihost)
-add_subdirectory(dummy)
 add_subdirectory(fallback)
+add_subdirectory(dummyhost)

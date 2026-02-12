@@ -33,7 +33,7 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-srcs_os_dummy = [
+srcs_os_dummyhost = [
   'close.c',
   '_exit.c',
   'fstat.c',
@@ -50,7 +50,7 @@ srcs_os_dummy = [
   'write.c',
   ]
 
-src_os_dummy = files(srcs_os_dummy)
+src_os_dummyhost = files(srcs_os_dummyhost)
 
 foreach params : targets
   target = params['name']
@@ -59,11 +59,11 @@ foreach params : targets
 
   instdir = join_paths(lib_dir, target_dir)
 
-  libdummy_name = 'dummy'
+  libdummyhost_name = 'dummyhost'
 
   if meson.version().version_compare('>=1.10')
-    _lib = static_library(libdummy_name,
-                          src_os_dummy,
+    _lib = static_library(libdummyhost_name,
+                          src_os_dummyhost,
                           build_subdir : target_dir,
                           install : really_install,
                           install_dir : instdir,
@@ -71,14 +71,14 @@ foreach params : targets
                           c_args : target_c_args + c_args)
   else
     target_lib_prefix = params['lib_prefix']
-    _lib = static_library(join_paths(target_dir, target_lib_prefix + libdummy_name),
-                          src_os_dummy,
+    _lib = static_library(join_paths(target_dir, target_lib_prefix + libdummyhost_name),
+                          src_os_dummyhost,
                           install : really_install,
                           install_dir : instdir,
                           include_directories : inc,
                           c_args : target_c_args + c_args)
   endif
 
-  set_variable('lib_dummy' + target, _lib)
+  set_variable('lib_dummyhost' + target, _lib)
 
 endforeach

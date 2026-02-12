@@ -32,13 +32,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-add_library(dummy STATIC)
+add_library(dummyhost STATIC)
 
-target_compile_options(dummy PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
+target_compile_options(dummyhost PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
 
-target_include_directories(dummy SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
+target_include_directories(dummyhost SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
 
-target_sources(dummy PRIVATE
+target_sources(dummyhost PRIVATE
   close.c
   _exit.c
   fstat.c
