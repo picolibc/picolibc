@@ -46,6 +46,7 @@ srcs_posix = [
   'fgetpwent_r.c',
   'fnmatch.c',
   'getlogin.c',
+  'getpass.c',
   'getpwent.c',
   'getpwnam.c',
   'getpwnam_r.c',

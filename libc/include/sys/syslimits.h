@@ -44,6 +44,7 @@
 #define IOV_MAX    1024  /* max elements in i/o vector */
 #define OPEN_MAX   64    /* max open files per process */
 #define TZNAME_MAX 10    /* max time zone name length */
+#define PASS_MAX   32    /* max password length for getpass */
 
 /* Pathname values */
 #define LINK_MAX  32767      /* max file link count */
