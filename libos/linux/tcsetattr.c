@@ -72,6 +72,9 @@ tcsetattr(int fd, int actions, const struct termios *termios)
     struct __kernel_termios2 ktermios = {};
     long                     cmd;
 
+    if (syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios) == -1)
+        return -1;
+
     switch (actions) {
     case TCSANOW:
         cmd = LINUX_TCSETS2;
