@@ -1,3 +1,9 @@
+picolibc (1.8.11-2) unstable; urgency=medium
+
+  * Cherry-pick patch to make flash section read-only
+
+ -- keithp <keithp@keithp.com>  Fri, 13 Feb 2026 17:40:14 -0800
+
 picolibc (1.8.11-1) unstable; urgency=medium
 
   * New upstream
