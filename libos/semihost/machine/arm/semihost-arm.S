@@ -48,11 +48,21 @@ sys_semihost:
 #if __ARM_ARCH_PROFILE == 'M'
 	bkpt #0xab
 #else
-#ifdef __thumb__
-	svc #0xab
-#else
-	svc #0x123456
-#endif
+  #if __ARM_ARCH >= 8
+    #ifdef __thumb__
+	hlt #0x3c
+    #else
+        hlt #0xf000
+    #endif
+  #else
+    push  {lr}
+    #ifdef __thumb__
+        svc #0xab
+    #else
+        svc #0x123456
+    #endif
+    pop {pc}
+  #endif
 #endif
 	bx lr
 	.size sys_semihost, . - sys_semihost
