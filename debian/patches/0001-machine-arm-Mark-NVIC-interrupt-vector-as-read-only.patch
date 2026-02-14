@@ -1,0 +1,28 @@
+From: Keith Packard <keithp@keithp.com>
+Date: Wed, 11 Feb 2026 23:04:55 -0800
+Subject: machine/arm: Mark NVIC interrupt vector as read-only
+
+If we use .data.init.enter, then the toolchain marks this section as
+writable even though the vector is declared const. Switch to
+.text.data.enter so the toolchain will stop doing that and avoid
+linker warnings when the interrupt vector is mixed in with the
+executable section.
+
+Signed-off-by: Keith Packard <keithp@keithp.com>
+---
+ libc/machine/arm/interrupt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/libc/machine/arm/interrupt.c b/libc/machine/arm/interrupt.c
+index 3326bda..808a4b3 100644
+--- a/libc/machine/arm/interrupt.c
++++ b/libc/machine/arm/interrupt.c
+@@ -76,7 +76,7 @@ extern uint8_t __stack[];
+ 
+ #define i(addr, name) [(addr) / 4] = (void (*)(void))arm_##name##_isr
+ 
+-__section(".data.init.enter") void (* const __weak_interrupt_vector[])(void)
++__section(".text.init.enter") void (* const __weak_interrupt_vector[])(void)
+     __attribute((aligned(128)))
+     = {
+           [0] = (void (*)(void))__stack,
