@@ -36,12 +36,12 @@
 #define SIGNAL_LINUX_TO_PICOLIBC
 #include "local-sigaction.h"
 
-#define NSIG (sizeof(__signal_linux_to_picolibc) / sizeof(__signal_linux_to_picolibc[0]))
+#define NUM_SIG (sizeof(__signal_linux_to_picolibc) / sizeof(__signal_linux_to_picolibc[0]))
 
 int
 _signal_from_linux(int sig)
 {
-    if ((unsigned)sig < NSIG)
+    if ((unsigned)sig < NUM_SIG)
         return (int)__signal_linux_to_picolibc[sig];
     return SIGINT;
 }

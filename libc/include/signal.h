@@ -207,6 +207,10 @@ struct sigevent {
 #define SIGUSR2   31    /* user defined signal 2 */
 #define _NSIG     32
 
+#ifdef __GNU_VISIBLE
+#define NSIG _NSIG
+#endif
+
 /* Using __MISC_VISIBLE until POSIX Issue 8 is officially released */
 #if __MISC_VISIBLE
 #if __SIZEOF_INT__ >= 4
