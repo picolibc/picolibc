@@ -218,6 +218,47 @@ bufio_get_buf_size(int fd)
 #define bufio_get_buf_size(fd) (BUFSIZ)
 #endif
 
+#ifdef __STDIO_EXIT_FLUSH
+extern FILE *__stdio_file_list;
+extern bool  __stdio_atexit;
+
+void         _bufio_exit_flush(void);
+
+static inline void
+bufio_add_file(FILE *f)
+{
+    struct __file_bufio *bf = (struct __file_bufio *)f;
+
+    __LIBC_LOCK();
+    if (!__stdio_atexit) {
+        __stdio_atexit = true;
+        atexit(_bufio_exit_flush);
+    }
+    bf->next = __stdio_file_list;
+    __stdio_file_list = &(bf->xfile.cfile.file);
+    __LIBC_UNLOCK();
+}
+
+static inline void
+bufio_remove_file(FILE *f)
+{
+    FILE               **prev;
+    struct __file_bufio *bf;
+
+    __LIBC_LOCK();
+    for (prev = &__stdio_file_list; (bf = (struct __file_bufio *)*prev); prev = &bf->next) {
+        if (&(bf->xfile.cfile.file) == f) {
+            *prev = bf->next;
+            break;
+        }
+    }
+    __LIBC_UNLOCK();
+}
+#else
+#define bufio_add_file(f)
+#define bufio_remove_file(f)
+#endif
+
 int __stdio_flags(const char *mode, int *optr);
 
 #ifdef __STDIO_LOCKING

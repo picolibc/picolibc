@@ -41,6 +41,7 @@ srcs_stdio = [
   'bufio.c',
   'bufio_close.c',
   'bufio_close_nf.c',
+  'bufio_exit_flush.c',
   'bufio_setvbuf.c',
   'clearerr.c',
   'compare_exchange.c',

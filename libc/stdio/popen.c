@@ -126,6 +126,7 @@ popen(const char *command, const char *type)
         _exit(1);
     default:
         close(pipe_fd[1 - my_fd]);
+        bufio_add_file(&pf->bfile.xfile.cfile.file);
         return &pf->bfile.xfile.cfile.file;
     }
 bail:

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -35,35 +35,25 @@
 
 #include "local-stdio.h"
 
-FILE *
-fdopen(int fd, const char *mode)
+FILE *__stdio_file_list;
+bool  __stdio_atexit;
+
+#ifdef __STDIO_EXIT_FLUSH
+
+void
+_bufio_exit_flush(void)
 {
-    int                  stdio_flags;
-    int                  open_flags;
-    struct __file_bufio *bf;
-    char                *buf;
-    size_t               buf_size;
-
-    stdio_flags = __stdio_flags(mode, &open_flags);
-    if (stdio_flags == 0)
-        return NULL;
-
-    buf_size = bufio_get_buf_size(fd);
-
-    /* Allocate file structure and necessary buffers */
-    bf = calloc(1, sizeof(struct __file_bufio) + buf_size);
-
-    if (bf == NULL)
-        return NULL;
-
-    buf = (char *)(bf + 1);
-
-    *bf = (struct __file_bufio)FDEV_SETUP_POSIX(fd, buf, buf_size, stdio_flags, __BFALL);
-
-    if (open_flags & O_APPEND)
-        (void)fseeko(&(bf->xfile.cfile.file), 0, SEEK_END);
-
-    bufio_add_file(&(bf->xfile.cfile.file));
-
-    return &(bf->xfile.cfile.file);
+    for (;;) {
+        __LIBC_LOCK();
+        FILE                *f = __stdio_file_list;
+        struct __file_bufio *bf = (struct __file_bufio *)f;
+        if (bf)
+            __stdio_file_list = bf->next;
+        __LIBC_UNLOCK();
+        if (!f)
+            break;
+        fflush(f);
+    }
 }
+
+#endif

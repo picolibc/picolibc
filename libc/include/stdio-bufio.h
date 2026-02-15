@@ -84,6 +84,9 @@ struct __file_bufio {
 #ifdef __STDIO_BUFIO_LOCKING
     _LOCK_T lock;
 #endif
+#ifdef __STDIO_EXIT_FLUSH
+    FILE *next;
+#endif
 };
 
 #define FDEV_SETUP_BUFIO(_fd, _buf, _size, _read, _write, _lseek, _close, _rwflag, _bflags)        \

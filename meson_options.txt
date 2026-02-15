@@ -168,6 +168,8 @@ option('have-fcntl', type: 'boolean', value: false,
        description: 'system provides fcntl function')
 option('fstat-bufsiz', type: 'boolean', value: false,
        description: 'use fstat to detect optimum buffer sizes for stdio')
+option('stdio-exit-flush', type: 'boolean', value: false,
+       description: 'flush all runtime allocated bufio files at exit')
 
 #
 # Internationalization options
