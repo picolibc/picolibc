@@ -52,194 +52,147 @@ QUICKREF
 #include <stdio.h>
 #include <stdlib.h>
 
-char *
-strsignal(int signal)
-{
-    char                      *buffer;
-    static __THREAD_LOCAL char _signal_buf[24];
-
-    buffer = _signal_buf;
-#if defined(SIGRTMIN) && defined(SIGRTMAX)
-    if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
-        sprintf(buffer, "Real-time signal %d", signal - SIGRTMIN);
-        return buffer;
-    }
-#endif
-
-    switch (signal) {
+static const char * const signames[] = {
 #ifdef SIGHUP
-    case SIGHUP:
-        buffer = "Hangup";
-        break;
+    [SIGHUP] = "Hangup",
 #endif
 #ifdef SIGINT
-    case SIGINT:
-        buffer = "Interrupt";
-        break;
+    [SIGINT] = "Interrupt",
 #endif
 #ifdef SIGQUIT
-    case SIGQUIT:
-        buffer = "Quit";
-        break;
+    [SIGQUIT] = "Quit",
 #endif
 #ifdef SIGILL
-    case SIGILL:
-        buffer = "Illegal instruction";
-        break;
+    [SIGILL] = "Illegal instruction",
 #endif
 #ifdef SIGTRAP
-    case SIGTRAP:
-        buffer = "Trace/breakpoint trap";
-        break;
+    [SIGTRAP] = "Trace/breakpoint trap",
 #endif
-#ifdef SIGIOT
-#if defined(SIGABRT) && (SIGIOT != SIGABRT)
-    case SIGABRT:
+#if defined(SIGABRT)
+    [SIGABRT] = "Abort",
 #endif
-    case SIGIOT:
-        buffer = "IOT trap";
-        break;
+#if defined(SIGIOT) && SIGIOT != SIGABRT
+    [SIGIOT] = "IOT trap",
 #endif
 #ifdef SIGEMT
-    case SIGEMT:
-        buffer = "EMT trap";
-        break;
+    [SIGEMT] = "EMT trap",
 #endif
 #ifdef SIGFPE
-    case SIGFPE:
-        buffer = "Floating point exception";
-        break;
+    [SIGFPE] = "Floating point exception",
 #endif
 #ifdef SIGKILL
-    case SIGKILL:
-        buffer = "Killed";
-        break;
+    [SIGKILL] = "Killed",
 #endif
 #ifdef SIGBUS
-    case SIGBUS:
-        buffer = "Bus error";
-        break;
+    [SIGBUS] = "Bus error",
 #endif
 #ifdef SIGSEGV
-    case SIGSEGV:
-        buffer = "Segmentation fault";
-        break;
+    [SIGSEGV] = "Segmentation fault",
 #endif
 #ifdef SIGSYS
-    case SIGSYS:
-        buffer = "Bad system call";
-        break;
+    [SIGSYS] = "Bad system call",
 #endif
 #ifdef SIGPIPE
-    case SIGPIPE:
-        buffer = "Broken pipe";
-        break;
+    [SIGPIPE] = "Broken pipe",
 #endif
 #ifdef SIGALRM
-    case SIGALRM:
-        buffer = "Alarm clock";
-        break;
+    [SIGALRM] = "Alarm clock",
 #endif
 #ifdef SIGTERM
-    case SIGTERM:
-        buffer = "Terminated";
-        break;
+    [SIGTERM] = "Terminated",
 #endif
 #ifdef SIGURG
-    case SIGURG:
-        buffer = "Urgent I/O condition";
-        break;
+    [SIGURG] = "Urgent I/O condition",
 #endif
 #ifdef SIGSTOP
-    case SIGSTOP:
-        buffer = "Stopped (signal)";
-        break;
+    [SIGSTOP] = "Stopped (signal)",
 #endif
 #ifdef SIGTSTP
-    case SIGTSTP:
-        buffer = "Stopped";
-        break;
+    [SIGTSTP] = "Stopped",
 #endif
 #ifdef SIGCONT
-    case SIGCONT:
-        buffer = "Continued";
-        break;
+    [SIGCONT] = "Continued",
 #endif
 #ifdef SIGCHLD
 #if defined(SIGCLD) && (SIGCHLD != SIGCLD)
-    case SIGCLD:
+    [SIGCLD] = "Child exited",
 #endif
-    case SIGCHLD:
-        buffer = "Child exited";
-        break;
+    [SIGCHLD] = "Child exited",
 #endif
 #ifdef SIGTTIN
-    case SIGTTIN:
-        buffer = "Stopped (tty input)";
-        break;
+    [SIGTTIN] = "Stopped (tty input)",
 #endif
 #ifdef SIGTTOUT
-    case SIGTTOUT:
-        buffer = "Stopped (tty output)";
-        break;
+    [SIGTTOUT] = "Stopped (tty output)",
 #endif
 #ifdef SIGIO
 #if defined(SIGPOLL) && (SIGIO != SIGPOLL)
-    case SIGPOLL:
+    [SIGPOLL] = "I/O possible",
 #endif
-    case SIGIO:
-        buffer = "I/O possible";
-        break;
+    [SIGIO] = "I/O possible",
 #endif
 #ifdef SIGWINCH
-    case SIGWINCH:
-        buffer = "Window changed";
-        break;
+    [SIGWINCH] = "Window changed",
 #endif
 #ifdef SIGUSR1
-    case SIGUSR1:
-        buffer = "User defined signal 1";
-        break;
+    [SIGUSR1] = "User defined signal 1",
 #endif
 #ifdef SIGUSR2
-    case SIGUSR2:
-        buffer = "User defined signal 2";
-        break;
+    [SIGUSR2] = "User defined signal 2",
 #endif
 #ifdef SIGPWR
-    case SIGPWR:
-        buffer = "Power Failure";
-        break;
+    [SIGPWR] = "Power Failure",
 #endif
 #ifdef SIGXCPU
-    case SIGXCPU:
-        buffer = "CPU time limit exceeded";
-        break;
+    [SIGXCPU] = "CPU time limit exceeded",
 #endif
 #ifdef SIGXFSZ
-    case SIGXFSZ:
-        buffer = "File size limit exceeded";
-        break;
+    [SIGXFSZ] = "File size limit exceeded",
 #endif
 #ifdef SIGVTALRM
-    case SIGVTALRM:
-        buffer = "Virtual timer expired";
-        break;
+    [SIGVTALRM] = "Virtual timer expired",
 #endif
 #ifdef SIGPROF
-    case SIGPROF:
-        buffer = "Profiling timer expired";
-        break;
+    [SIGPROF] = "Profiling timer expired",
 #endif
 #if defined(SIGLOST) && SIGLOST != SIGPWR
-    case SIGLOST:
-        buffer = "Resource lost";
-        break;
+    [SIGLOST] = "Resource lost",
 #endif
-    default:
-        sprintf(buffer, "Unknown signal %d", signal);
-        break;
-    }
+};
 
-    return buffer;
+#define NSIGNAMES (sizeof(signames) / sizeof(signames[0]))
+
+static __THREAD_LOCAL char _signal_buf[24];
+
+static inline char *
+_intsig(const char *head, int i)
+{
+    char *buf = _signal_buf;
+    buf = stpcpy(buf, head);
+    if (i >= 100) {
+        *buf++ = '?';
+    } else {
+        if (i >= 10) {
+            *buf++ = '0' + i / 10;
+            i %= 10;
+        }
+        *buf++ = '0' + i;
+    }
+    *buf++ = '\0';
+    return _signal_buf;
+}
+
+char *
+strsignal(int signal)
+{
+#if defined(SIGRTMIN) && defined(SIGRTMAX)
+    if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
+        return _intsig("Real-time signal", signal - SIGRTMIN);
+    }
+#endif
+
+    if ((unsigned)signal < NSIGNAMES)
+        return (char *)signames[(unsigned)signal];
+
+    return _intsig("Unknown signal", signal);
 }
