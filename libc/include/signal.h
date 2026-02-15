@@ -84,8 +84,11 @@ typedef struct {
     uid_t        si_uid;    /* Real UID of sending process */
     void        *si_addr;   /* Address of faulting instruction */
     int          si_status; /* Exit value or signal */
+    long         si_band;   /* Band event for SIGPOLL */
     union sigval si_value;  /* Signal value */
 } siginfo_t;
+
+typedef void (*_sig_action_ptr)(int, siginfo_t *, void *);
 
 /*
  * Possible values for sa_flags in sigaction below.
