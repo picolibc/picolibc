@@ -42,4 +42,10 @@ struct __kernel_winsize {
     __uint8_t  __adjust_4[4];
 };
 
+#define SIMPLE_MAP_WINSIZE(_t, _f)   \
+    do {                             \
+        (_t)->ws_row = (_f)->ws_row; \
+        (_t)->ws_col = (_f)->ws_col; \
+    } while (0)
+
 #endif /* _LINUX_WINSIZE_STRUCT_H_ */

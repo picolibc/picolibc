@@ -41,4 +41,10 @@ struct __kernel_timeval {
     __int32_t tv_usec;
 };
 
+#define SIMPLE_MAP_TIMEVAL(_t, _f)     \
+    do {                               \
+        (_t)->tv_sec = (_f)->tv_sec;   \
+        (_t)->tv_usec = (_f)->tv_usec; \
+    } while (0)
+
 #endif /* _LINUX_TIMEVAL_STRUCT_H_ */

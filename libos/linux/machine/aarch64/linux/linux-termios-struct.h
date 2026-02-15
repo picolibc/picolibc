@@ -51,4 +51,8 @@ struct __kernel_termios2 {
     __kernel_speed_t  c_ospeed;
 };
 
+#define SIMPLE_MAP_TERMIOS2(_t, _f) \
+    do {                            \
+    } while (0)
+
 #endif /* _LINUX_TERMIOS_STRUCT_H_ */

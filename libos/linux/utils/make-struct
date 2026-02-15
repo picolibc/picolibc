@@ -28,8 +28,18 @@ def sign_string(m, val, array=True):
 def type_name(type):
     if type.startswith('struct'):
         return 'struct __kernel_' + type[7:]
+    elif type.startswith('union'):
+        return 'union __kernel_' + type[6:]
     else:
         return '__kernel_' + type
+
+def val_name(type):
+    if type.startswith('struct'):
+        return f'val_{type[7:]}'
+    elif type.startswith('union'):
+        return f'val_{type[6:]}'
+    else:
+        return f'val_{type}'
     
 
 def analyze_member(m, file=sys.stdout):
@@ -55,6 +65,11 @@ def analyze_member(m, file=sys.stdout):
     print(f'    }},', file=file)
 
 
+def struct_or_union(s):
+    if 'union' in s:
+        return 'union'
+    return 'struct'
+
 def analyze_struct(s, file=sys.stdout):
     name = s['name']
     members = s['members']
@@ -67,12 +82,18 @@ def analyze_struct(s, file=sys.stdout):
         for h in s['headers']:
             print(f"#include <{h}>", file=file)
 
+    if 'union' in s:
+        print('#define MAKE_UNION', file=file)
+
     print(f'static const char *name = "{name}";', file=file)
-    if 'type' in s:
+    if 'typedef' in s:
+        type = s['typedef']
+        print(f'static {type} val;', file=file)
+    elif 'type' in s:
         type = type_name(s['type'])
         print(f'static {type} val;', file=file)
     else:
-        print(f'static struct {name} val;', file=file)
+        print(f'static {struct_or_union(s)} {name} val;', file=file)
 
     print(f"static struct elt {{ const char *name; const char *typename; size_t size; size_t offset; int flags; size_t nelt; }} elts[] = {{", file=file)
     for m in members:
@@ -102,7 +123,8 @@ def analyze_type(s, file=sys.stdout):
         if 'type' in m and not m['type'] in types:
             type = m['type']
             types[type] = True
-            print(f'static {type} val_{type};', file=file)
+            m_name = val_name(type)
+            print(f'static {type} {m_name};', file=file)
 
     types = dict(known_types)
 
@@ -112,8 +134,9 @@ def analyze_type(s, file=sys.stdout):
             type = m['type']
             types[type] = True
             typename = type_name(type)
-            signstring = sign_string(m, f'val_{type}', array=False)
-            print(f'    {{ .name="{typename}", .size = sizeof(val_{type}), .flags = {signstring} }},', file=file)
+            m_name = val_name(type)
+            signstring = sign_string(m, m_name, array=False)
+            print(f'    {{ .name="{typename}", .size = sizeof({m_name}), .flags = {signstring} }},', file=file)
     print(f'    {{ .name = NULL, .size = 0, .flags = 0 }}', file=file)
     print(f'}};', file=file)
 

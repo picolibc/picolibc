@@ -45,4 +45,13 @@ struct __kernel_dirent64 {
     __uint8_t  __adjust_275[1];
 };
 
+#define SIMPLE_MAP_DIRENT64(_t, _f)      \
+    do {                                 \
+        (_t)->d_ino = (_f)->d_ino;       \
+        (_t)->d_off = (_f)->d_off;       \
+        (_t)->d_reclen = (_f)->d_reclen; \
+        (_t)->d_type = (_f)->d_type;     \
+        (_t)->d_name = (_f)->d_name;     \
+    } while (0)
+
 #endif /* _LINUX_DIRENT64_STRUCT_H_ */

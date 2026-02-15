@@ -49,7 +49,7 @@ main(void)
     printf("#define LINUX_DT_UNKNOWN %d\n", DT_UNKNOWN);
 
     printf("#define MAP_DT(p_dt, l_dt) switch(l_dt) {\\\n");
-    printf("    case LINUX_DT_BLK: p_dt = DT_BLK; break;\\\n "); 
+    printf("    case LINUX_DT_BLK: p_dt = DT_BLK; break;\\\n ");
     printf("    case LINUX_DT_CHR: p_dt = DT_CHR; break;\\\n");
     printf("    case LINUX_DT_DIR: p_dt = DT_DIR; break;\\\n");
     printf("    case LINUX_DT_FIFO: p_dt = DT_FIFO; break;\\\n");

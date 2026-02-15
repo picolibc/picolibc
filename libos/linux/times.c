@@ -42,10 +42,7 @@ times(struct tms *buf)
     int                 ret;
 
     ret = syscall(LINUX_SYS_times, &ktms);
-    if ((ret != -1 || errno != EFAULT) && buf) {
-        buf->tms_utime = ktms.tms_utime;
-        buf->tms_stime = ktms.tms_stime;
-        buf->tms_cutime = ktms.tms_cutime;
-        buf->tms_cstime = ktms.tms_cstime;
-    }
+    if ((ret != -1 || errno != EFAULT) && buf)
+        SIMPLE_MAP_TMS(buf, &ktms);
+    return ret;
 }

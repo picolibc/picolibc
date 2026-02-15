@@ -41,6 +41,7 @@ int
 main(void)
 {
     printf("#define LINUX_TIOCGPGRP 0x%x\n", TIOCGPGRP);
+    printf("#define LINUX_TIOCSPGRP 0x%x\n", TIOCSPGRP);
     printf("#define LINUX_TCXONC 0x%x\n", TCXONC);
     printf("#define LINUX_TIOCGWINSZ 0x%x\n", TIOCGWINSZ);
     printf("#define LINUX_TIOCSWINSZ 0x%x\n", TIOCSWINSZ);

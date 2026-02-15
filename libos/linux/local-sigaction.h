@@ -38,12 +38,16 @@
 
 #include "local-linux.h"
 #include <linux/linux-signal.h>
+#include <linux/linux-sigval-struct.h>
+#include <linux/linux-siginfo-struct.h>
 #include <linux/linux-sigaction-struct.h>
 
 #include <signal.h>
 
-int _signal_to_linux(int sig);
-int _signal_from_linux(int sig);
+int  _signal_to_linux(int sig);
+int  _signal_from_linux(int sig);
+void _sigmask_to_linux(__kernel_sigset_t *kset, const sigset_t *set);
+void _sigmask_from_linux(sigset_t *set, const __kernel_sigset_t *kset);
 
 #define __KERNEL_NSIG_BYTES (sizeof(__kernel_sigset_t))
 
@@ -58,7 +62,7 @@ __kernel_sigset_set_mask(__kernel_sigset_t *ss, int sig)
 }
 
 static inline int
-__kernel_sigset_get_mask(__kernel_sigset_t *ss, int sig)
+__kernel_sigset_get_mask(const __kernel_sigset_t *ss, int sig)
 {
     unsigned si = (sig - 1);
     int      w = si / (sizeof(ss->sa_mask[0]) * 8);

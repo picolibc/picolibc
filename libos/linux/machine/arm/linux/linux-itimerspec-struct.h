@@ -41,4 +41,8 @@ struct __kernel_itimerspec {
     struct __kernel_timespec it_value;
 };
 
+#define SIMPLE_MAP_ITIMERSPEC(_t, _f) \
+    do {                              \
+    } while (0)
+
 #endif /* _LINUX_ITIMERSPEC_STRUCT_H_ */

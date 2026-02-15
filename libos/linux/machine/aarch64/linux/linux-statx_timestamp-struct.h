@@ -42,4 +42,10 @@ struct __kernel_statx_timestamp {
     __uint8_t  __adjust_12[4];
 };
 
+#define SIMPLE_MAP_STATX_TIMESTAMP(_t, _f) \
+    do {                                   \
+        (_t)->tv_sec = (_f)->tv_sec;       \
+        (_t)->tv_nsec = (_f)->tv_nsec;     \
+    } while (0)
+
 #endif /* _LINUX_STATX_TIMESTAMP_STRUCT_H_ */

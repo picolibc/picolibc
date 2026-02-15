@@ -50,11 +50,8 @@ _statbuf(struct stat *statbuf, const struct __kernel_statx *statxbuf)
     statbuf->st_blksize = statxbuf->stx_blksize;
     statbuf->st_blocks = statxbuf->stx_blocks;
 #endif
-    statbuf->st_atim.tv_sec = statxbuf->stx_atime.tv_sec;
-    statbuf->st_atim.tv_nsec = statxbuf->stx_atime.tv_nsec;
-    statbuf->st_mtim.tv_sec = statxbuf->stx_mtime.tv_sec;
-    statbuf->st_mtim.tv_nsec = statxbuf->stx_mtime.tv_nsec;
-    statbuf->st_ctim.tv_sec = statxbuf->stx_ctime.tv_sec;
-    statbuf->st_ctim.tv_nsec = statxbuf->stx_ctime.tv_nsec;
+    SIMPLE_MAP_STATX_TIMESTAMP(&statbuf->st_atim, &statxbuf->stx_atime);
+    SIMPLE_MAP_STATX_TIMESTAMP(&statbuf->st_mtim, &statxbuf->stx_mtime);
+    SIMPLE_MAP_STATX_TIMESTAMP(&statbuf->st_ctim, &statxbuf->stx_ctime);
     return 0;
 }

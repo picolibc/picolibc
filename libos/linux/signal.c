@@ -35,86 +35,21 @@
 
 #include "local-sigaction.h"
 
-#if __SIZEOF_POINTER__ == 2 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_2)
-#define _USE_ATOMIC_SIGNAL
-#endif
-
-#if __SIZEOF_POINTER__ == 4 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
-#define _USE_ATOMIC_SIGNAL
-#endif
-
-#if __SIZEOF_POINTER__ == 8 && defined(__GCC_HAVE_SYNC_COMPARE_AND_SWAP_8)
-#define _USE_ATOMIC_SIGNAL
-#endif
-
-#ifdef _USE_ATOMIC_SIGNAL
-#include <stdatomic.h>
-static _Atomic _sig_func_ptr _sig_func[_NSIG];
-#else
-static _sig_func_ptr _sig_func[_NSIG];
-#endif
-
-static void
-_signal_handler(int sig)
-{
-    sig = _signal_from_linux(sig);
-    _sig_func_ptr func;
-#ifdef USE_ATOMIC_SIGNAL
-    func = (_sig_func_ptr)atomic_load(&_sig_func[sig]);
-#else
-    func = _sig_func[sig];
-#endif
-    (*func)(sig);
-}
-
-extern void __restore_rt(void);
-extern void __sa_restore(void);
-
-#ifndef LINUX_SA_RESTORER
-#define LINUX_SA_RESTORER 0x04000000
-#endif
-#ifndef LINUX_SA_RESTART
-#define LINUX_SA_RESTART 0x10000000
-#endif
-
 _sig_func_ptr
 signal(int sig, _sig_func_ptr func)
 {
-    _sig_func_ptr             old, kfunc;
-    int                       ksig;
-    _sig_func_ptr             ret;
-    struct __kernel_sigaction new_action = {};
+    struct sigaction action, oldaction;
+    int              ret;
 
-    if (sig < 0 || sig >= _NSIG) {
-        errno = EINVAL;
-        return SIG_ERR;
-    }
+    action.sa_handler = func;
+    action.sa_flags = SA_RESTART;
+    sigemptyset(&action.sa_mask);
+    sigaddset(&action.sa_mask, sig);
 
-    ksig = _signal_to_linux(sig);
+    ret = sigaction(sig, &action, &oldaction);
 
-    if (func == SIG_DFL)
-        kfunc = LINUX_SIG_DFL;
-    else if (func == SIG_IGN)
-        kfunc = LINUX_SIG_IGN;
-    else
-        kfunc = _signal_handler;
-
-    new_action.sa_handler = kfunc;
-    __kernel_sa_set_mask(&new_action, ksig);
-    new_action.sa_flags = LINUX_SA_RESTART | LINUX_SA_RESTORER;
-    new_action.sa_restorer = __sa_restore;
-
-    ret = (_sig_func_ptr)syscall(LINUX_SYS_rt_sigaction, ksig, &new_action, NULL,
-                                 __KERNEL_NSIG_BYTES);
-    if (ret == LINUX_SIG_ERR)
+    if (ret < 0)
         return SIG_ERR;
 
-#ifdef _USE_ATOMIC_SIGNAL
-    old = (_sig_func_ptr)atomic_exchange(&_sig_func[sig], func);
-#else
-    old = _sig_func[sig];
-    _sig_func[sig] = func;
-#endif
-
-    return old;
+    return oldaction.sa_handler;
 }

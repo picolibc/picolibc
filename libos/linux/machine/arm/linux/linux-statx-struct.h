@@ -60,4 +60,20 @@ struct __kernel_statx {
     __uint8_t                       __adjust_144[112];
 };
 
+#define SIMPLE_MAP_STATX(_t, _f)                     \
+    do {                                             \
+        (_t)->stx_dev_major = (_f)->stx_dev_major;   \
+        (_t)->stx_dev_minor = (_f)->stx_dev_minor;   \
+        (_t)->stx_ino = (_f)->stx_ino;               \
+        (_t)->stx_mode = (_f)->stx_mode;             \
+        (_t)->stx_nlink = (_f)->stx_nlink;           \
+        (_t)->stx_uid = (_f)->stx_uid;               \
+        (_t)->stx_gid = (_f)->stx_gid;               \
+        (_t)->stx_rdev_major = (_f)->stx_rdev_major; \
+        (_t)->stx_rdev_minor = (_f)->stx_rdev_minor; \
+        (_t)->stx_size = (_f)->stx_size;             \
+        (_t)->stx_blksize = (_f)->stx_blksize;       \
+        (_t)->stx_blocks = (_f)->stx_blocks;         \
+    } while (0)
+
 #endif /* _LINUX_STATX_STRUCT_H_ */

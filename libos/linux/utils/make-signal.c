@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <signal.h>
+#include <asm/signal.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdint.h>
@@ -220,6 +220,18 @@ main(void)
     printf("#define LINUX_SIG_BLOCK %d\n", SIG_BLOCK);
     printf("#define LINUX_SIG_UNBLOCK %d\n", SIG_UNBLOCK);
     printf("#define LINUX_SIG_SETMASK %d\n", SIG_SETMASK);
+
+    printf("#define LINUX_SA_NOCLDSTOP 0x%x\n", SA_NOCLDSTOP);
+    printf("#define LINUX_SA_ONSTACK 0x%x\n", SA_ONSTACK);
+    printf("#define LINUX_SA_RESETHAND 0x%x\n", SA_RESETHAND);
+    printf("#define LINUX_SA_RESTART 0x%x\n", SA_RESTART);
+    printf("#define LINUX_SA_SIGINFO 0x%x\n", SA_SIGINFO);
+    printf("#define LINUX_SA_NOCLDWAIT 0x%x\n", SA_NOCLDWAIT);
+    printf("#define LINUX_SA_NODEFER 0x%x\n", SA_NODEFER);
+
+#ifdef SA_RESTORER
+    printf("#define LINUX_SA_RESTORER 0x%x\n", SA_RESTORER);
+#endif
 
     printf("\n");
 

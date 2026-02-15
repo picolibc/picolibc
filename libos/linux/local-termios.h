@@ -132,11 +132,7 @@
         MAP_SPEED(c_ospeed);                    \
     } while (0)
 
-#define MAP_WINSIZE(a, b)          \
-    do {                           \
-        (a)->ws_row = (b)->ws_row; \
-        (a)->ws_col = (b)->ws_col; \
-    } while (0)
+#define MAP_WINSIZE(a, b) SIMPLE_MAP_WINSIZE(a, b)
 
 /*
  * Linux and picolibc both use the actual baud rate

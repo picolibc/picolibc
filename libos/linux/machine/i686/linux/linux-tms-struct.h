@@ -43,4 +43,12 @@ struct __kernel_tms {
     __int32_t tms_cstime;
 };
 
+#define SIMPLE_MAP_TMS(_t, _f)               \
+    do {                                     \
+        (_t)->tms_utime = (_f)->tms_utime;   \
+        (_t)->tms_stime = (_f)->tms_stime;   \
+        (_t)->tms_cutime = (_f)->tms_cutime; \
+        (_t)->tms_cstime = (_f)->tms_cstime; \
+    } while (0)
+
 #endif /* _LINUX_TMS_STRUCT_H_ */

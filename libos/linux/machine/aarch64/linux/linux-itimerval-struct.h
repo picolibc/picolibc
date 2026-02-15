@@ -41,4 +41,8 @@ struct __kernel_itimerval {
     struct __kernel_timeval it_value;
 };
 
+#define SIMPLE_MAP_ITIMERVAL(_t, _f) \
+    do {                             \
+    } while (0)
+
 #endif /* _LINUX_ITIMERVAL_STRUCT_H_ */

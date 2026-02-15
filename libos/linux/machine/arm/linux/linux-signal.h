@@ -34,12 +34,20 @@
  */
 #ifndef _LINUX_SIGNAL_H_
 #define _LINUX_SIGNAL_H_
-#define LINUX_SIG_DFL     ((_sig_func_ptr)0)
-#define LINUX_SIG_IGN     ((_sig_func_ptr)1)
-#define LINUX_SIG_ERR     ((_sig_func_ptr)4294967295)
-#define LINUX_SIG_BLOCK   0
-#define LINUX_SIG_UNBLOCK 1
-#define LINUX_SIG_SETMASK 2
+#define LINUX_SIG_DFL      ((_sig_func_ptr)0)
+#define LINUX_SIG_IGN      ((_sig_func_ptr)1)
+#define LINUX_SIG_ERR      ((_sig_func_ptr)4294967295)
+#define LINUX_SIG_BLOCK    0
+#define LINUX_SIG_UNBLOCK  1
+#define LINUX_SIG_SETMASK  2
+#define LINUX_SA_NOCLDSTOP 0x1
+#define LINUX_SA_ONSTACK   0x8000000
+#define LINUX_SA_RESETHAND 0x80000000
+#define LINUX_SA_RESTART   0x10000000
+#define LINUX_SA_SIGINFO   0x4
+#define LINUX_SA_NOCLDWAIT 0x2
+#define LINUX_SA_NODEFER   0x40000000
+#define LINUX_SA_RESTORER  0x4000000
 
 enum __linux_signal {
     __LINUX_SIGHUP = 1,
@@ -62,7 +70,6 @@ enum __linux_signal {
     __LINUX_SIGTSTP = 20,
     __LINUX_SIGCONT = 18,
     __LINUX_SIGCHLD = 17,
-    __LINUX_SIGCLD = 17,
     __LINUX_SIGTTIN = 21,
     __LINUX_SIGTTOU = 22,
     __LINUX_SIGIO = 29,
@@ -97,7 +104,6 @@ enum __picolibc_signal {
     __PICOLIBC_SIGTSTP = SIGTSTP,
     __PICOLIBC_SIGCONT = SIGCONT,
     __PICOLIBC_SIGCHLD = SIGCHLD,
-    __PICOLIBC_SIGCLD = SIGCLD,
     __PICOLIBC_SIGTTIN = SIGTTIN,
     __PICOLIBC_SIGTTOU = SIGTTOU,
     __PICOLIBC_SIGIO = SIGIO,

@@ -41,4 +41,10 @@ struct __kernel_timespec {
     __int64_t tv_nsec;
 };
 
+#define SIMPLE_MAP_TIMESPEC(_t, _f)    \
+    do {                               \
+        (_t)->tv_sec = (_f)->tv_sec;   \
+        (_t)->tv_nsec = (_f)->tv_nsec; \
+    } while (0)
+
 #endif /* _LINUX_TIMESPEC_STRUCT_H_ */

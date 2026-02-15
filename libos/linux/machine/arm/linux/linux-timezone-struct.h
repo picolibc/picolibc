@@ -41,4 +41,10 @@ struct __kernel_timezone {
     __int32_t tz_dsttime;
 };
 
+#define SIMPLE_MAP_TIMEZONE(_t, _f)                  \
+    do {                                             \
+        (_t)->tz_minuteswest = (_f)->tz_minuteswest; \
+        (_t)->tz_dsttime = (_f)->tz_dsttime;         \
+    } while (0)
+
 #endif /* _LINUX_TIMEZONE_STRUCT_H_ */

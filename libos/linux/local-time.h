@@ -45,12 +45,10 @@
 #include <time.h>
 
 /* Copy between kernel and library representations of itimerval */
-#define MAP_ITV(a, b)                                        \
-    do {                                                     \
-        (a)->it_interval.tv_sec = (b)->it_interval.tv_sec;   \
-        (a)->it_interval.tv_usec = (b)->it_interval.tv_usec; \
-        (a)->it_value.tv_sec = (b)->it_value.tv_sec;         \
-        (a)->it_value.tv_usec = (b)->it_value.tv_usec;       \
+#define MAP_ITV(a, b)                                             \
+    do {                                                          \
+        SIMPLE_MAP_TIMEVAL(&(a)->it_interval, &(b)->it_interval); \
+        SIMPLE_MAP_TIMEVAL(&(a)->it_value, &(b)->it_value);       \
     } while (0)
 
 #endif /* _LOCAL_TIME_H_ */

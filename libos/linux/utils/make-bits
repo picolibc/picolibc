@@ -22,11 +22,11 @@ declare -a structs
 
 arch=(arm aarch64 x86_64 i686)
 headers=(dirent errno fcntl ioctl poll signal syscall sysconf termios time wait)
-structs=(winsize dirent64 itimerspec itimerval statx statx_timestamp termios timespec timeval timezone tms) 
+structs=(sigval siginfo winsize dirent64 itimerspec itimerval statx statx_timestamp termios timespec timeval timezone tms) 
 
 #arch=(x86_64)
 #headers=()
-#structs=(statx_timestamp)
+#structs=(sigaction)
 
 copyright() {
     cat <<\EOF
