@@ -43,7 +43,7 @@ static void *reported_brk;
 #define BRK_CHUNK 4096
 #define BRK_MASK  (BRK_CHUNK - 1)
 
-void *
+void * __disable_sanitizer
 sbrk(intptr_t increment)
 {
     if (real_brk == NULL) {
