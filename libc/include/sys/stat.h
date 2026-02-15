@@ -300,6 +300,7 @@ mode_t umask(mode_t __mask);
 #if __LARGEFILE64_VISIBLE
 int stat64(const char * __restrict __path, struct stat64 * __restrict __sbuf);
 int fstat64(int __fd, struct stat64 *__sbuf);
+int lstat64(const char * __restrict __path, struct stat64 * __restrict __sbuf);
 #endif
 
 #if defined(__SPU__) || defined(__rtems__) || defined(__CYGWIN__) || __POSIX_VISIBLE >= 200112L \
