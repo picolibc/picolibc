@@ -34,3 +34,12 @@
 #
 src_picocrt += files('crt0.c')
 has_crt0_linux = true
+
+src_picocrt_rp2040 = src_picocrt + files('arm-rp2040-tls.S', 'arm-rp2040-tls.c')
+
+picocrt_variants += {
+  'name': 'rp2040',
+  'suffix': '-rp2040',
+  'c_args': ['-DRP2040'],
+  'src_var': 'src_picocrt_rp2040'
+  }

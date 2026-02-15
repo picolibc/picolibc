@@ -47,6 +47,52 @@ picocrt_machines = [
   },
 ]
 
+# crt0 variants
+picocrt_variants = [
+  {
+    'name': 'default',
+    'suffix': '',
+    'c_args': [],
+    'src_var': 'src_picocrt',
+  },
+  {
+    'name': 'hosted',
+    'suffix': '-hosted',
+    'c_args': ['-DCRT0_HOSTED', '-DCRT0_EXIT'],
+    'src_var': 'src_picocrt',
+  },
+  {
+    'name': 'minimal',
+    'suffix': '-minimal',
+    'c_args': ['-DCONSTRUCTORS=0'],
+    'src_var': 'src_picocrt',
+  },
+  {
+    'name': 'none',
+    'suffix': '-none',
+    'c_args': [],
+    'src_var': 'src_picocrt_none',
+  },
+  {
+    'name': 'semihost',
+    'suffix': '-semihost',
+    'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src_var': 'src_picocrt',
+  },
+  {
+    'name': 'noflash-semihost',
+    'suffix': '-noflash-semihost',
+    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src_var': 'src_picocrt',
+  },
+  {
+    'name': 'noflash-hosted',
+    'suffix': '-noflash-hosted',
+    'c_args': ['-DCRT0_HOSTED', '-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT'],
+    'src_var': 'src_picocrt',
+  },
+]
+
 has_crt0_linux = false
 machine_dir = 'machine' / host_cpu_family
 picocrt_march_add=''
@@ -71,64 +117,18 @@ if stack_symbol != '__stack'
   stack_c_args += ['-D__stack=' + stack_symbol]
 endif
 
-# crt0 variants
-picocrt_variants = [
-  {
-    'name': 'default',
-    'suffix': '',
-    'c_args': [],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'hosted',
-    'suffix': '-hosted',
-    'c_args': ['-DCRT0_HOSTED', '-DCRT0_EXIT'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'minimal',
-    'suffix': '-minimal',
-    'c_args': ['-DCONSTRUCTORS=0'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'none',
-    'suffix': '-none',
-    'c_args': [],
-    'src': src_picocrt_none,
-  },
-  {
-    'name': 'semihost',
-    'suffix': '-semihost',
-    'c_args':  ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'noflash-semihost',
-    'suffix': '-noflash-semihost',
-    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-    'src': src_picocrt,
-  },
-  {
-    'name': 'noflash-hosted',
-    'suffix': '-noflash-hosted',
-    'c_args': ['-DCRT0_HOSTED', '-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT'],
-    'src': src_picocrt,
-  },
-]
-
 if thread_local_storage
   picocrt_variants += {
                        'name': 'inittls',
                        'suffix': '-inittls',
                        'c_args': ['-DINIT_TLS'],
-                       'src': src_picocrt,
+                       'src_var': 'src_picocrt',
                      }
   picocrt_variants += {
     'name': 'inittls-semihost',
     'suffix': '-inittls-semihost',
     'c_args': ['-DINIT_TLS', '-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
-    'src': src_picocrt,
+    'src_var': 'src_picocrt',
   }
 endif
 
@@ -137,7 +137,7 @@ if has_crt0_linux and get_option('os-linux')
     'name': 'linux',
     'suffix': '-linux',
     'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_LINUX'],
-    'src': src_picocrt,
+    'src_var': 'src_picocrt',
   }
 endif
 
@@ -156,7 +156,12 @@ foreach params : targets
       libcrt_name = 'crt0' + variant_suffix + machine_suffix
       crt_name = libcrt_name + '.o'
 
-      _src = variant['src']
+      if 'src_var' in variant
+        _src = get_variable(variant['src_var'])
+      else
+        _src = variant['src']
+      endif
+
       _c_args = target_c_args + arg_fnobuiltin + ['-ffreestanding', '-DMACHINE_' + machine['name']] + variant['c_args']
       _link_args = target_c_args + ['-r', '-ffreestanding']
       
