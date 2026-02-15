@@ -32,7 +32,7 @@
  * Implement either by merging adjacent free memory
  * or by calling malloc/memcpy
  */
-void *
+void * __disable_sanitizer
 realloc(void *ptr, size_t size)
 {
     void *mem;

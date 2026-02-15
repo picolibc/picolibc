@@ -57,7 +57,7 @@ memalign(size_t align, size_t s)
 
     align = MAX(align, UP_POT(MALLOC_CHUNK_MIN));
 
-    if (s > MALLOC_ALLOC_MAX - align) {
+    if (align > MALLOC_ALLOC_MAX || s > MALLOC_ALLOC_MAX - align) {
         errno = ENOMEM;
         return NULL;
     }

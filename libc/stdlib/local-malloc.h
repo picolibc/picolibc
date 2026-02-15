@@ -225,21 +225,21 @@ chunk_to_ptr(chunk_t *c)
 }
 
 /* Convert address of chunk region to chunk pointer */
-static inline chunk_t *
+static inline chunk_t * __disable_sanitizer
 blob_to_chunk(void *blob)
 {
     return (chunk_t *)((char *)blob + MALLOC_HEAD_SIZE);
 }
 
 /* Convert chunk pointer to address of chunk region */
-static inline void *
+static inline void * __disable_sanitizer
 chunk_to_blob(chunk_t *c)
 {
     return (void *)((char *)c - MALLOC_HEAD_SIZE);
 }
 
 /* end of chunk -- address of first byte past chunk storage */
-static inline void *
+static inline void * __disable_sanitizer
 chunk_end(chunk_t *c)
 {
     size_t *s = _size_ref(c);
@@ -247,7 +247,7 @@ chunk_end(chunk_t *c)
 }
 
 /* next chunk in memory -- address of chunk header past this chunk */
-static inline chunk_t *
+static inline __disable_sanitizer chunk_t *
 chunk_after(chunk_t *c)
 {
     return (chunk_t *)((char *)c + _size(c));

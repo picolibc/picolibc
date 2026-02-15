@@ -38,7 +38,7 @@
  *  high.  Then merge with neighbor chunks if adjacent.
  */
 
-void
+void __disable_sanitizer
 __malloc_free(void *free_p)
 {
     chunk_t  *p_to_free;

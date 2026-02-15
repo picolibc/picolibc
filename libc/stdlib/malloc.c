@@ -131,7 +131,7 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
  *   Walk through the free list to find the first match. If fails to find
  *   one, call sbrk to allocate a new chunk_t.
  */
-void *
+void * __disable_sanitizer
 malloc(size_t s)
 {
     chunk_t **p, *c;
