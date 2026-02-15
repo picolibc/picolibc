@@ -21,7 +21,7 @@ declare -a headers
 declare -a structs
 
 arch=(arm aarch64 x86_64 i686)
-headers=(errno fcntl ioctl poll signal syscall sysconf termios time wait)
+headers=(dirent errno fcntl ioctl poll signal syscall sysconf termios time wait)
 structs=(winsize dirent64 itimerspec itimerval statx statx_timestamp termios timespec timeval timezone tms) 
 
 #arch=(x86_64)
@@ -89,7 +89,7 @@ wrap() {
     echo "#ifndef ${DEF}"
     echo "#define ${DEF}"
     case "$HEADER" in
-	errno|termios|signal)
+	errno|termios|signal|dirent)
 	    "${RUN}" ./${EXEC} || exit 1
 	    ;;
 	*)

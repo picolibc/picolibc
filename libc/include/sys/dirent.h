@@ -37,8 +37,7 @@
 #define _SYS_DIRENT_H_
 
 #include <sys/cdefs.h>
-#define __need_size_t
-#include <stddef.h>
+#include <sys/_types.h>
 
 _BEGIN_STD_C
 
@@ -55,8 +54,9 @@ typedef __ssize_t ssize_t;
 #endif
 
 struct dirent {
-    ino_t d_ino;                  /* Inode number */
-    char  d_name[__NAME_MAX + 1]; /* Null-terminated filename */
+    ino_t     d_ino; /* Inode number */
+    __uint8_t d_type;
+    char      d_name[__NAME_MAX + 1]; /* Null-terminated filename */
 };
 
 struct posix_dent {

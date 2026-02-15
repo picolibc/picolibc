@@ -38,6 +38,7 @@
 
 #include "local-linux.h"
 #include <linux/linux-dirent64-struct.h>
+#include <linux/linux-dirent.h>
 #include <dirent.h>
 
 #endif /* _LOCAL_DIRENT_H_ */
