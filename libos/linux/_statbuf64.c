@@ -33,16 +33,28 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_STATX_H_
-#define _LOCAL_STATX_H_
+#include "local-statx.h"
 
-#include "local-linux.h"
-#include <linux/linux-statx_timestamp-struct.h>
-#include <linux/linux-statx-struct.h>
-
-#include <sys/stat.h>
-
-int _statbuf(struct stat *statbuf, const struct __kernel_statx *statxbuf);
-int _statbuf64(struct stat64 *statbuf, const struct __kernel_statx *statxbuf);
-
-#endif /* _LOCAL_STATX_H_ */
+int
+_statbuf64(struct stat64 *statbuf, const struct __kernel_statx *statxbuf)
+{
+    statbuf->st_dev = (statxbuf->stx_dev_major << 8) | (statxbuf->stx_dev_minor);
+    statbuf->st_ino = (ino_t)statxbuf->stx_ino;
+    statbuf->st_mode = statxbuf->stx_mode;
+    statbuf->st_nlink = statxbuf->stx_nlink;
+    statbuf->st_uid = statxbuf->stx_uid;
+    statbuf->st_gid = statxbuf->stx_gid;
+    statbuf->st_rdev = (statxbuf->stx_rdev_major << 8) | (statxbuf->stx_rdev_minor);
+    statbuf->st_size = statxbuf->stx_size;
+#ifdef _STAT_HAS_ST_BLKSIZE
+    statbuf->st_blksize = statxbuf->stx_blksize;
+    statbuf->st_blocks = statxbuf->stx_blocks;
+#endif
+    statbuf->st_atim.tv_sec = statxbuf->stx_atime.tv_sec;
+    statbuf->st_atim.tv_nsec = statxbuf->stx_atime.tv_nsec;
+    statbuf->st_mtim.tv_sec = statxbuf->stx_mtime.tv_sec;
+    statbuf->st_mtim.tv_nsec = statxbuf->stx_mtime.tv_nsec;
+    statbuf->st_ctim.tv_sec = statxbuf->stx_ctime.tv_sec;
+    statbuf->st_ctim.tv_nsec = statxbuf->stx_ctime.tv_nsec;
+    return 0;
+}

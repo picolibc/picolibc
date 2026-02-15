@@ -33,16 +33,17 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LOCAL_STATX_H_
-#define _LOCAL_STATX_H_
+#include "local-statx.h"
 
-#include "local-linux.h"
-#include <linux/linux-statx_timestamp-struct.h>
-#include <linux/linux-statx-struct.h>
+int
+stat64(const char *path, struct stat64 *statbuf)
+{
+    struct __kernel_statx statxbuf;
+    int                   ret;
 
-#include <sys/stat.h>
-
-int _statbuf(struct stat *statbuf, const struct __kernel_statx *statxbuf);
-int _statbuf64(struct stat64 *statbuf, const struct __kernel_statx *statxbuf);
-
-#endif /* _LOCAL_STATX_H_ */
+    ret = syscall(LINUX_SYS_statx, LINUX_AT_FDCWD, path, LINUX_AT_STATX_SYNC_AS_STAT,
+                  LINUX_STATX_BASIC_STATS, &statxbuf);
+    if (ret < 0)
+        return ret;
+    return _statbuf64(statbuf, &statxbuf);
+}
