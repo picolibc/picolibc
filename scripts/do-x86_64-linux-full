@@ -1,0 +1,15 @@
+#!/bin/sh
+#
+# Configure x86_64-linux-gnu will all of the knobs turned
+# to eleven
+#
+exec "$(dirname "$0")"/do-x86_64-linux-gnu-configure \
+	-Dio-long-double=true \
+	-Dmb-capable=true \
+	-Dio-percent-b=true \
+	-Dfast-bufio=true \
+	-Dstdio-exit-flush=true \
+	-Dio-wchar=true \
+	-Dstdio-locking=true \
+	-Dmalloc-small-bucket=1024 \
+	-Dwant-math-errno=true "$@"
