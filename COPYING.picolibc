@@ -575,14 +575,14 @@ Files: CMakeLists.txt
  picocrt/machine/sh/CMakeLists.txt
  test/CMakeLists.txt
  test/lock-valid.c
- test/long_double.c
  test/native-locks.c
- test/test-efcvt.c
  test/test-except.c
+ test/test-math/test-long-double.c
  test/test-stdio/CMakeLists.txt
  test/test-stdio/test-fopen.c
  test/test-stdio/test-mktemp.c
- test/test-strtod.c
+ test/test-stdlib/test-efcvt.c
+ test/test-stdlib/test-strtod.c
  test/testsuite/newlib.time/meson.build
  zephyr/zephyr.cmake
 Copyright: 2022 Keith Packard
@@ -654,13 +654,6 @@ Files: cmake/TC-arm-none-eabi.ld
  scripts/run-sparc
  scripts/run-x86
  scripts/run-x86_64
- test/fenv.c
- test/ffs.c
- test/malloc.c
- test/malloc_stress.c
- test/math_errhandling.c
- test/math_errhandling_tests.c
- test/regex.c
  test/semihost/meson.build
  test/semihost/semihost-argv.c
  test/semihost/semihost-clock.c
@@ -694,12 +687,19 @@ Files: cmake/TC-arm-none-eabi.ld
  test/semihost/semihost-write.c
  test/semihost/semihost-write0.c
  test/semihost/semihost-writec.c
- test/setjmp.c
- test/stack-smash.c
- test/tls.c
- test/try-ilp32-sub.c
- test/try-ilp32.c
- test/try-ilp32.h
+ test/test-ilp32-sub.c
+ test/test-ilp32.c
+ test/test-ilp32.h
+ test/test-math/test-fenv.c
+ test/test-math/test-math-errhandling-tests.c
+ test/test-math/test-math-errhandling.c
+ test/test-regex.c
+ test/test-setjmp.c
+ test/test-stack-smash.c
+ test/test-stdlib/test-malloc-stress.c
+ test/test-stdlib/test-malloc.c
+ test/test-string/test-ffs.c
+ test/test-tls.c
 Copyright: 2020 Keith Packard
 License: BSD3-1
 
@@ -1011,6 +1011,8 @@ Files: cmake/TC-rx.ld
  test/test-stdio/meson.build
  test/test-stdio/test-dprintf.c
  test/test-stdio/test-setvbuf.c
+ test/test-stdlib/CMakeLists.txt
+ test/test-stdlib/meson.build
  test/test-string/meson.build
  test/test-string/test-memchr.c
  test/test-string/test-memmem.c
@@ -1080,7 +1082,7 @@ Files: doc/printf-sample/Makefile
  picocrt/machine/msp430/crt0.c
  picocrt/machine/nios2/crt0.c
  picocrt/machine/sparc/crt0.c
- test/test-fma.c
+ test/test-math/test-fma.c
  test/test-raise.c
  test/test-stdio/test-fread-fwrite.c
  test/test-stdio/test-gets.c
@@ -1179,29 +1181,32 @@ Files: empty-libs/empty.c
  scripts/do-power9-fp128-configure
  scripts/do-powerpc64-configure
  scripts/do-powerpc64le-configure
- test/atexit.c
  test/constructor-skip.c
  test/constructor.c
- test/hosted-exit.c
  test/libc-testsuite/testcase.h
- test/math-funcs.c
- test/on_exit.c
- test/rounding-mode-sub.c
- test/rounding-mode.c
- test/rounding-mode.h
+ test/test-hosted-exit.c
+ test/test-math/test-math-funcs.c
+ test/test-math/test-rounding-mode-sub.c
+ test/test-math/test-rounding-mode.c
+ test/test-math/test-rounding-mode.h
  test/test-stdio/test-put.c
+ test/test-stdlib/test-atexit.c
+ test/test-stdlib/test-on_exit.c
  test/test-string/test-memchr-simple.c
  test/test-string/test-memset.c
  test/test-string/test-strchr.c
- test/timegm.c
- test/timegm.h
+ test/test-timegm.c
+ test/test-timegm.h
 Copyright: 2021 Keith Packard
 License: BSD3-1
 
 Files: empty-libs/meson.build
  libc/ctype/ctype_class.h
+ libc/include/poll.h
  libc/include/stdio-posix.h
+ libc/include/sys/dirent.h
  libc/include/sys/ioctl.h
+ libc/include/sys/termios.h
  libc/machine/arc64/sys/meson.build
  libc/machine/arc64/tls.c
  libc/machine/arc64/vector_table.c
@@ -1216,6 +1221,7 @@ Files: empty-libs/meson.build
  libc/posix/fgetpwent.c
  libc/posix/fgetpwent_r.c
  libc/posix/getlogin.c
+ libc/posix/getpass.c
  libc/posix/getpwent.c
  libc/posix/getpwnam.c
  libc/posix/getpwnam_r.c
@@ -1229,37 +1235,45 @@ Files: empty-libs/meson.build
  libc/stdio/atomic_store.c
  libc/stdio/bufio_close.c
  libc/stdio/bufio_close_nf.c
+ libc/stdio/bufio_exit_flush.c
  libc/stdio/bufio_setvbuf.c
  libc/stdio/pclose.c
  libc/stdio/popen.c
  libm/math/sf_rem_pio2.c
- libos/dummy/CMakeLists.txt
- libos/dummy/_exit.c
- libos/dummy/close.c
- libos/dummy/fstat.c
- libos/dummy/getentropy.c
- libos/dummy/gettimeofday.c
- libos/dummy/iob.c
- libos/dummy/lseek.c
- libos/dummy/meson.build
- libos/dummy/open.c
- libos/dummy/read.c
- libos/dummy/sigprocmask.c
- libos/dummy/stat.c
- libos/dummy/times.c
- libos/dummy/unlink.c
- libos/dummy/write.c
+ libos/dummyhost/CMakeLists.txt
+ libos/dummyhost/_exit.c
+ libos/dummyhost/close.c
+ libos/dummyhost/fstat.c
+ libos/dummyhost/getentropy.c
+ libos/dummyhost/gettimeofday.c
+ libos/dummyhost/iob.c
+ libos/dummyhost/lseek.c
+ libos/dummyhost/meson.build
+ libos/dummyhost/open.c
+ libos/dummyhost/read.c
+ libos/dummyhost/sigprocmask.c
+ libos/dummyhost/stat.c
+ libos/dummyhost/times.c
+ libos/dummyhost/unlink.c
+ libos/dummyhost/write.c
  libos/fallback/CMakeLists.txt
  libos/fallback/meson.build
+ libos/fallback/signal.c
  libos/fallback/sysconf.c
+ libos/linux/_sigmask_from_linux.c
+ libos/linux/_sigmask_to_linux.c
  libos/linux/_signal_from_linux.c
  libos/linux/_signal_to_linux.c
  libos/linux/_statbuf.c
+ libos/linux/_statbuf64.c
  libos/linux/_syscall_error.c
  libos/linux/access.c
  libos/linux/alarm.c
  libos/linux/cfgetispeed.c
  libos/linux/cfgetospeed.c
+ libos/linux/cfsetispeed.c
+ libos/linux/cfsetospeed.c
+ libos/linux/cfsetspeed.c
  libos/linux/chdir.c
  libos/linux/chmod.c
  libos/linux/clock_gettime.c
@@ -1272,105 +1286,174 @@ Files: empty-libs/meson.build
  libos/linux/fork.c
  libos/linux/fpathconf.c
  libos/linux/fstat.c
+ libos/linux/fstat64.c
  libos/linux/getcwd.c
  libos/linux/getegid.c
  libos/linux/getentropy.c
  libos/linux/geteuid.c
  libos/linux/getgid.c
  libos/linux/getgroups.c
+ libos/linux/getitimer.c
  libos/linux/getpgrp.c
  libos/linux/getpid.c
+ libos/linux/getppid.c
  libos/linux/gettimeofday.c
  libos/linux/getuid.c
  libos/linux/getwd.c
- libos/linux/include/meson.build
- libos/linux/include/poll.h
- libos/linux/include/sys/dirent.h
- libos/linux/include/sys/meson.build
- libos/linux/include/sys/termios.h
+ libos/linux/include/linux/linux-sigaction-nsig.h
+ libos/linux/include/linux/linux-sigaction-struct.h
+ libos/linux/ioctl.c
  libos/linux/isatty.c
  libos/linux/kill.c
  libos/linux/killpg.c
+ libos/linux/local-dirent.h
  libos/linux/local-linux.h
+ libos/linux/local-sigaction.h
+ libos/linux/local-statx.h
  libos/linux/local-termios.h
  libos/linux/local-time.h
+ libos/linux/local-times.h
  libos/linux/lseek.c
+ libos/linux/lstat.c
+ libos/linux/lstat64.c
+ libos/linux/machine/aarch64/linux/linux-dirent.h
+ libos/linux/machine/aarch64/linux/linux-dirent64-struct.h
  libos/linux/machine/aarch64/linux/linux-errno.h
  libos/linux/machine/aarch64/linux/linux-fcntl.h
  libos/linux/machine/aarch64/linux/linux-ioctl.h
+ libos/linux/machine/aarch64/linux/linux-itimerspec-struct.h
+ libos/linux/machine/aarch64/linux/linux-itimerval-struct.h
  libos/linux/machine/aarch64/linux/linux-poll.h
- libos/linux/machine/aarch64/linux/linux-sigaction.h
+ libos/linux/machine/aarch64/linux/linux-siginfo-struct.h
  libos/linux/machine/aarch64/linux/linux-signal.h
+ libos/linux/machine/aarch64/linux/linux-sigval-struct.h
+ libos/linux/machine/aarch64/linux/linux-statx-struct.h
+ libos/linux/machine/aarch64/linux/linux-statx_timestamp-struct.h
  libos/linux/machine/aarch64/linux/linux-syscall.h
  libos/linux/machine/aarch64/linux/linux-sysconf.h
  libos/linux/machine/aarch64/linux/linux-termios-struct.h
  libos/linux/machine/aarch64/linux/linux-termios.h
  libos/linux/machine/aarch64/linux/linux-time.h
+ libos/linux/machine/aarch64/linux/linux-timespec-struct.h
+ libos/linux/machine/aarch64/linux/linux-timeval-struct.h
+ libos/linux/machine/aarch64/linux/linux-timezone-struct.h
+ libos/linux/machine/aarch64/linux/linux-tms-struct.h
  libos/linux/machine/aarch64/linux/linux-wait.h
+ libos/linux/machine/aarch64/linux/linux-winsize-struct.h
  libos/linux/machine/aarch64/linux/meson.build
  libos/linux/machine/aarch64/meson.build
  libos/linux/machine/aarch64/sa-restore.S
  libos/linux/machine/aarch64/sys/meson.build
  libos/linux/machine/aarch64/syscall.S
+ libos/linux/machine/arm/linux/linux-dirent.h
+ libos/linux/machine/arm/linux/linux-dirent64-struct.h
  libos/linux/machine/arm/linux/linux-errno.h
  libos/linux/machine/arm/linux/linux-fcntl.h
  libos/linux/machine/arm/linux/linux-ioctl.h
+ libos/linux/machine/arm/linux/linux-itimerspec-struct.h
+ libos/linux/machine/arm/linux/linux-itimerval-struct.h
  libos/linux/machine/arm/linux/linux-poll.h
- libos/linux/machine/arm/linux/linux-sigaction.h
+ libos/linux/machine/arm/linux/linux-siginfo-struct.h
  libos/linux/machine/arm/linux/linux-signal.h
+ libos/linux/machine/arm/linux/linux-sigval-struct.h
+ libos/linux/machine/arm/linux/linux-statx-struct.h
+ libos/linux/machine/arm/linux/linux-statx_timestamp-struct.h
  libos/linux/machine/arm/linux/linux-syscall.h
  libos/linux/machine/arm/linux/linux-sysconf.h
  libos/linux/machine/arm/linux/linux-termios-struct.h
  libos/linux/machine/arm/linux/linux-termios.h
  libos/linux/machine/arm/linux/linux-time.h
+ libos/linux/machine/arm/linux/linux-timespec-struct.h
+ libos/linux/machine/arm/linux/linux-timeval-struct.h
+ libos/linux/machine/arm/linux/linux-timezone-struct.h
+ libos/linux/machine/arm/linux/linux-tms-struct.h
  libos/linux/machine/arm/linux/linux-wait.h
+ libos/linux/machine/arm/linux/linux-winsize-struct.h
  libos/linux/machine/arm/linux/meson.build
  libos/linux/machine/arm/meson.build
  libos/linux/machine/arm/sa-restore.S
  libos/linux/machine/arm/sys/meson.build
  libos/linux/machine/arm/syscall.S
+ libos/linux/machine/i686/linux/linux-dirent.h
+ libos/linux/machine/i686/linux/linux-dirent64-struct.h
  libos/linux/machine/i686/linux/linux-errno.h
  libos/linux/machine/i686/linux/linux-fcntl.h
  libos/linux/machine/i686/linux/linux-ioctl.h
+ libos/linux/machine/i686/linux/linux-itimerspec-struct.h
+ libos/linux/machine/i686/linux/linux-itimerval-struct.h
  libos/linux/machine/i686/linux/linux-poll.h
- libos/linux/machine/i686/linux/linux-sigaction.h
+ libos/linux/machine/i686/linux/linux-siginfo-struct.h
  libos/linux/machine/i686/linux/linux-signal.h
+ libos/linux/machine/i686/linux/linux-sigval-struct.h
+ libos/linux/machine/i686/linux/linux-statx-struct.h
+ libos/linux/machine/i686/linux/linux-statx_timestamp-struct.h
  libos/linux/machine/i686/linux/linux-syscall.h
  libos/linux/machine/i686/linux/linux-sysconf.h
+ libos/linux/machine/i686/linux/linux-termios-struct.h
  libos/linux/machine/i686/linux/linux-termios.h
  libos/linux/machine/i686/linux/linux-time.h
+ libos/linux/machine/i686/linux/linux-timespec-struct.h
+ libos/linux/machine/i686/linux/linux-timeval-struct.h
+ libos/linux/machine/i686/linux/linux-timezone-struct.h
+ libos/linux/machine/i686/linux/linux-tms-struct.h
  libos/linux/machine/i686/linux/linux-wait.h
+ libos/linux/machine/i686/linux/linux-winsize-struct.h
  libos/linux/machine/x86/asm/ldt.h
  libos/linux/machine/x86/asm/meson.build
+ libos/linux/machine/x86/linux/linux-dirent.h
+ libos/linux/machine/x86/linux/linux-dirent64-struct.h
  libos/linux/machine/x86/linux/linux-errno.h
  libos/linux/machine/x86/linux/linux-fcntl.h
  libos/linux/machine/x86/linux/linux-ioctl.h
+ libos/linux/machine/x86/linux/linux-itimerspec-struct.h
+ libos/linux/machine/x86/linux/linux-itimerval-struct.h
  libos/linux/machine/x86/linux/linux-poll.h
- libos/linux/machine/x86/linux/linux-sigaction.h
+ libos/linux/machine/x86/linux/linux-siginfo-struct.h
  libos/linux/machine/x86/linux/linux-signal.h
+ libos/linux/machine/x86/linux/linux-sigval-struct.h
+ libos/linux/machine/x86/linux/linux-statx-struct.h
+ libos/linux/machine/x86/linux/linux-statx_timestamp-struct.h
  libos/linux/machine/x86/linux/linux-syscall.h
  libos/linux/machine/x86/linux/linux-sysconf.h
  libos/linux/machine/x86/linux/linux-termios-struct.h
  libos/linux/machine/x86/linux/linux-termios.h
  libos/linux/machine/x86/linux/linux-time.h
+ libos/linux/machine/x86/linux/linux-timespec-struct.h
+ libos/linux/machine/x86/linux/linux-timeval-struct.h
+ libos/linux/machine/x86/linux/linux-timezone-struct.h
+ libos/linux/machine/x86/linux/linux-tms-struct.h
  libos/linux/machine/x86/linux/linux-wait.h
+ libos/linux/machine/x86/linux/linux-winsize-struct.h
  libos/linux/machine/x86/linux/meson.build
  libos/linux/machine/x86/meson.build
  libos/linux/machine/x86/sa-restore.S
  libos/linux/machine/x86/sa_restore.S
  libos/linux/machine/x86/sys/meson.build
  libos/linux/machine/x86/syscall.S
+ libos/linux/machine/x86_64/linux/linux-dirent.h
+ libos/linux/machine/x86_64/linux/linux-dirent64-struct.h
  libos/linux/machine/x86_64/linux/linux-errno.h
  libos/linux/machine/x86_64/linux/linux-fcntl.h
  libos/linux/machine/x86_64/linux/linux-ioctl.h
+ libos/linux/machine/x86_64/linux/linux-itimerspec-struct.h
+ libos/linux/machine/x86_64/linux/linux-itimerval-struct.h
  libos/linux/machine/x86_64/linux/linux-poll.h
- libos/linux/machine/x86_64/linux/linux-sigaction.h
+ libos/linux/machine/x86_64/linux/linux-siginfo-struct.h
  libos/linux/machine/x86_64/linux/linux-signal.h
+ libos/linux/machine/x86_64/linux/linux-sigval-struct.h
+ libos/linux/machine/x86_64/linux/linux-statx-struct.h
+ libos/linux/machine/x86_64/linux/linux-statx_timestamp-struct.h
  libos/linux/machine/x86_64/linux/linux-syscall.h
  libos/linux/machine/x86_64/linux/linux-sysconf.h
+ libos/linux/machine/x86_64/linux/linux-termios-struct.h
  libos/linux/machine/x86_64/linux/linux-termios.h
  libos/linux/machine/x86_64/linux/linux-time.h
+ libos/linux/machine/x86_64/linux/linux-timespec-struct.h
+ libos/linux/machine/x86_64/linux/linux-timeval-struct.h
+ libos/linux/machine/x86_64/linux/linux-timezone-struct.h
+ libos/linux/machine/x86_64/linux/linux-tms-struct.h
  libos/linux/machine/x86_64/linux/linux-wait.h
+ libos/linux/machine/x86_64/linux/linux-winsize-struct.h
  libos/linux/mkdir.c
  libos/linux/nanosleep.c
  libos/linux/opendir.c
@@ -1387,20 +1470,28 @@ Files: empty-libs/meson.build
  libos/linux/setgid.c
  libos/linux/setgroups.c
  libos/linux/setitimer.c
+ libos/linux/setpgid.c
  libos/linux/setuid.c
+ libos/linux/sigaction.c
  libos/linux/signal.c
  libos/linux/sigprocmask.c
  libos/linux/sigsuspend.c
  libos/linux/sleep.c
  libos/linux/stat.c
+ libos/linux/stat64.c
+ libos/linux/tcflow.c
  libos/linux/tcflush.c
  libos/linux/tcgetattr.c
  libos/linux/tcgetpgrp.c
+ libos/linux/tcgetwinsize.c
  libos/linux/tcsetattr.c
+ libos/linux/tcsetpgrp.c
+ libos/linux/tcsetwinsize.c
  libos/linux/times.c
  libos/linux/ttyname.c
  libos/linux/ttyname_r.c
  libos/linux/umask.c
+ libos/linux/utils/make-dirent.c
  libos/linux/utils/make-errno.c
  libos/linux/utils/make-fcntl.c
  libos/linux/utils/make-ioctl.c
@@ -1411,6 +1502,7 @@ Files: empty-libs/meson.build
  libos/linux/utils/make-termios.c
  libos/linux/utils/make-time.c
  libos/linux/utils/make-wait.c
+ libos/linux/vfork.c
  libos/linux/wait3.c
  libos/linux/waitpid.c
  libos/meson.build
@@ -1418,6 +1510,8 @@ Files: empty-libs/meson.build
  test/test-ctype/meson.build
  test/test-ctype/test-iswctype.c
  test/test-environ.c
+ test/test-hosted-exit-fail.c
+ test/test-posix/test-alarm.c
  test/test-posix/test-popen.c
  test/test-posix/test-pwd.c
  test/test-posix/test-signal.c
@@ -1621,10 +1715,10 @@ Files: hello-world/Makefile
  scripts/run-riscv
  test/libc-testsuite/meson.build
  test/meson.build
- test/rand.c
  test/test-stdio/test-posix-io.c
  test/test-stdio/test-printf-scanf.c
  test/test-stdio/test-ungetc.c
+ test/test-stdlib/test-rand.c
  test/testsuite/meson.build
  test/testsuite/newlib.iconv/meson.build
  test/testsuite/newlib.locale/meson.build
@@ -1959,7 +2053,7 @@ Files: test/test-string/test-strncpy.c
 Copyright: 2025 Fredrik Gihl
 License: BSD3-1
 
-Files: test/time-tests.c
+Files: test/test-time2.c
 Copyright: 2021 R. Diez
 License: BSD3-1
 
@@ -2004,7 +2098,6 @@ Files: libc/include/sys/_select.h
  libc/include/sys/_types.h
  libc/include/sys/_wait.h
  libc/include/sys/config.h
- libc/include/sys/dirent.h
  libc/include/sys/errno.h
  libc/include/sys/fcntl.h
  libc/include/sys/file.h
@@ -3362,7 +3455,16 @@ Files: .clang-format
  libm/fenv/fenv.tex
  libm/ld/files
  libm/libm.in.xml
+ libos/linux/utils/dirent64.json
  libos/linux/utils/make-bits
+ libos/linux/utils/make-struct
+ libos/linux/utils/sigaction.json
+ libos/linux/utils/siginfo.json
+ libos/linux/utils/statx.json
+ libos/linux/utils/struct-analyze.c
+ libos/linux/utils/termios.json
+ libos/linux/utils/tms.json
+ libos/linux/utils/type-analyze.c
  libos/semihost/machine/hexagon/hexagon_close.c
  libos/semihost/machine/hexagon/hexagon_errno.c
  libos/semihost/machine/hexagon/hexagon_exit.c
@@ -3473,16 +3575,16 @@ Files: .clang-format
  scripts/run-lm32
  scripts/test-picolibc
  test/CP720
- test/complex-funcs.c
- test/long_double_gen.5c
- test/long_double_vec.h
  test/test-argv.c
  test/test-atomic.c
  test/test-math/.clang-format-ignore
  test/test-math/Makefile
  test/test-math/math-test-copyright
+ test/test-math/test-complex-funcs.c
  test/test-math/test-complex.5c
  test/test-math/test-float.5c
+ test/test-math/test-long-double-gen.5c
+ test/test-math/test-long-double-vec.h
  test/test-stdio/test-sprintf-time.c
  test/test-strftime.c
  test/test-wcsftime.c
@@ -4588,7 +4690,6 @@ Files: libc/signal/signal.tex
  libm/test/y1f_vec.c
  libm/test/yn_vec.c
  libm/test/ynf_vec.c
- libos/fallback/signal.c
 Copyright: 1994 Cygnus Support.
 License: Other-16
 
