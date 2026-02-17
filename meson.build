@@ -1176,6 +1176,10 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('DEFAULT_STACK_SIZE', _default_stack_size)
     picolibc_ld_data.set('DEFAULT_ALIGNMENT', _default_alignment)
 
+    # Set SDATA_ALIGNMENT if provided by the cross-compilation file, otherwise use DEFAULT_ALIGNMENT
+    _sdata_alignment = meson.get_external_property('sdata_alignment', _default_alignment)
+    picolibc_ld_data.set('SDATA_ALIGNMENT', _sdata_alignment)
+
     # Generate the default linker script
 
     if not is_variable(picolibc_ld_config_variable)
