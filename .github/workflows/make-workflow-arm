@@ -1,0 +1,17 @@
+#!/bin/bash
+
+cat head-arm
+
+for build in minsize release; do
+    for arch in linux-arm; do
+	echo "  $build-$arch:"
+        sed 's/ubuntu-latest/ubuntu-24.04-arm/' variants
+        cat <<EOF
+        test: [
+          "./.github/do-linux-arm-linux",
+        ]
+EOF
+	cat steps-head
+	cat steps-$build
+    done
+done

@@ -1,0 +1,25 @@
+FROM debian:sid
+
+COPY .github/linux-arm-packages.txt /
+
+COPY .github/linux-arm-files.txt /
+
+RUN dpkg --add-architecture armhf && \
+    (apt-get update || apt-get update || apt-get update) && \
+    (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
+    (xargs -a linux-arm-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a linux-arm-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a linux-arm-packages.txt apt-get install -y --no-install-recommends || \
+     xargs -a linux-arm-packages.txt apt-get install -y --no-install-recommends) && \
+    apt-get clean && \
+    (cd /opt && \
+     for file in `cat /linux-arm-files.txt`; do \
+	echo "Fetching $file"; \
+	wget -nv "$file" || exit 1; \
+	echo "Unpacking $file"; \
+	tar xf `basename "$file"`; \
+	echo "Removing $file"; \
+	rm `basename "$file"`; \
+     done) && \
+    rm -rf /var/lib/apt/lists/*
+
