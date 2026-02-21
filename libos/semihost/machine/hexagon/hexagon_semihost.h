@@ -43,15 +43,26 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum hexagon_system_call_code {
     SYS_OPEN = 1,
     SYS_CLOSE = 2,
-    SYS_READ = 6,
+    SYS_WRITEC = 3,
+    SYS_WRITE0 = 4,
     SYS_WRITE = 5,
+    SYS_READ = 6,
     SYS_ISTTY = 9,
-    SYS_SEEK = 10,
+    SYS_SEEK = 0x0a,
     SYS_FLEN = 12,
     SYS_REMOVE = 14,
     SYS_GET_CMDLINE = 21,
     SYS_EXIT = 24,
     SYS_FTELL = 0x100,
+    SYS_FSTAT = 0x101,
+    SYS_STAT = 0x103,
+    SYS_GETCWD = 0x104,
+    SYS_ACCESS = 0x105,
+    SYS_OPENDIR = 0x180,
+    SYS_CLOSEDIR = 0x181,
+    SYS_READDIR = 0x182,
+    SYS_EXEC = 0x185,
+    SYS_FTRUNC = 0x186,
 };
 
 /* Software interrupt */
@@ -99,5 +110,32 @@ enum {
     HEX_ELOOP = 40,
     HEX_EOVERFLOW = 75,
 };
+
+struct __SYS_STAT {
+    uint64_t dev;
+    uint64_t ino;
+    uint32_t mode;
+    uint32_t nlink;
+    uint64_t rdev;
+    uint32_t size;
+    uint32_t __pad1;
+    uint32_t atime;
+    uint32_t mtime;
+    uint32_t ctime;
+    uint32_t __pad2;
+};
+
+#define MAP_STAT(p, h)                        \
+    do {                                      \
+        (p)->st_dev = (h)->dev;               \
+        (p)->st_ino = (h)->ino;               \
+        (p)->st_mode = (h)->mode;             \
+        (p)->st_nlink = (h)->nlink;           \
+        (p)->st_rdev = (h)->rdev;             \
+        (p)->st_size = (h)->size;             \
+        (p)->st_atime = (uint32_t)(h)->atime; \
+        (p)->st_mtime = (uint32_t)(h)->mtime; \
+        (p)->st_ctime = (uint32_t)(h)->ctime; \
+    } while (0)
 
 #endif

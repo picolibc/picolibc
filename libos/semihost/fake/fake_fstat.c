@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,22 +34,18 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <sys/types.h>
-#include <signal.h>
-#include <unistd.h>
+#include <sys/stat.h>
 #include <errno.h>
 
-pid_t
-getpid(void)
-{
-    return 1;
-}
-
 int
-kill(pid_t pid, int sig)
+fstat(int fd, struct stat *sbuf)
 {
-    if (pid == 1)
-        _exit(128 + sig);
-    errno = ESRCH;
+    (void)fd;
+    (void)sbuf;
+    errno = EBADF;
     return -1;
 }
+
+#ifdef __strong_reference
+__strong_reference(fstat, __fake_fstat);
+#endif

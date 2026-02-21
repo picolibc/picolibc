@@ -36,10 +36,23 @@ src_semihost += files('semihost-aarch64.S')
 has_arm_semihost = true
 
 lib_semihost_raw_srcs = [
-  'aarch64_stub.c',
   'aarch64_exit.c',
   'aarch64_iob.c',
   ]
+
+lib_semihost_raw_src = files(lib_semihost_raw_srcs) + [
+  src_semihost_fake_close,
+  src_semihost_fake_fstat,
+  src_semihost_fake_getpid,
+  src_semihost_fake_gettimeofday,
+  src_semihost_fake_isatty,
+  src_semihost_fake_kill,
+  src_semihost_fake_lseek,
+  src_semihost_fake_open,
+  src_semihost_fake_read,
+  src_semihost_fake_unlink,
+  src_semihost_fake_write,
+]
 
 foreach params : targets
   target = params['name']
@@ -52,7 +65,7 @@ foreach params : targets
 
   if meson.version().version_compare('>=1.10')
     _lib = static_library(libsemihost_raw_name,
-			  lib_semihost_raw_srcs,
+			  lib_semihost_raw_src,
                           build_subdir : target_dir,
 			  install : really_install,
 			  install_dir : instdir,

@@ -34,7 +34,16 @@
 #
 
 target_sources(semihost PRIVATE
-  rx_stub.c
   rx_exit.c
   rx_iob.c
+  ../../fake/fake_close.c
+  ../../fake/fake_fstat.c
+  ../../fake/fake_getpid.c
+  ../../fake/fake_isatty.c
+  ../../fake/fake_kill.c
+  ../../fake/fake_lseek.c
+  ../../fake/fake_open.c
+  ../../fake/fake_read.c
+  ../../fake/fake_unlink.c
+  ../../fake/fake_write.c
   )

@@ -33,9 +33,29 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-src_semihost_fake = files([
-                           'fake_exit.c',
-                           'fake_io.c',
-                           'fake_kill.c',
-                           'fake_stub.c',
-                         ])
+srcs_semihost_fake = [
+  'fake_close.c',
+  'fake_exit.c',
+  'fake_fstat.c',
+  'fake_getpid.c',
+  'fake_gettimeofday.c',
+  'fake_io.c',
+  'fake_isatty.c',
+  'fake_kill.c',
+  'fake_lseek.c',
+  'fake_open.c',
+  'fake_read.c',
+  'fake_stat.c',
+  'fake_unlink.c',
+  'fake_write.c',
+]
+
+src_semihost_fake = files(srcs_semihost_fake)
+
+# Create variables for each file so that
+# other semihost implementations can use them
+
+foreach _src : srcs_semihost_fake
+  _head = _src.split('.')[0]
+  set_variable('src_semihost_' + _head, files(_src))
+endforeach

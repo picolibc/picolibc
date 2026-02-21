@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2019 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,23 +34,19 @@
  */
 
 #define _DEFAULT_SOURCE
-#include "semihost-private.h"
-#include <sys/types.h>
-#include <signal.h>
 #include <unistd.h>
 #include <errno.h>
 
-pid_t
-getpid(void)
+off_t
+lseek(int fd, off_t offset, int whence)
 {
-    return 1;
+    (void)fd;
+    (void)offset;
+    (void)whence;
+    errno = ESPIPE;
+    return (off_t)-1;
 }
 
-int
-kill(pid_t pid, int sig)
-{
-    if (pid == 1)
-        _exit(128 + sig);
-    errno = ESRCH;
-    return -1;
-}
+#ifdef __strong_reference
+__strong_reference(lseek, __fake_lseek);
+#endif

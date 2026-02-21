@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,33 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#define _DEFAULT_SOURCE
 #include <unistd.h>
-#include <string.h>
-#include <errno.h>
-
-int
-stat(const char *pathname, struct stat * restrict statbuf)
-{
-    int fd, ret;
-
-    fd = open(pathname, O_RDONLY);
-
-    if (fd < 0)
-        return fd;
-
-    ret = fstat(fd, statbuf);
-    close(fd);
-
-    return ret;
-}
 
 int
 isatty(int fd)
 {
-    (void)fd;
-    return 1;
+    return (unsigned)fd <= 2;
 }
+
+#ifdef __strong_reference
+__strong_reference(isatty, __fake_isatty);
+#endif

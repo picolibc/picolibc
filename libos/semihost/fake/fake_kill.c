@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2019 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,23 +33,21 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
+#define _DEFAULT_SOURCE
 #include <signal.h>
-#include <unistd.h>
 #include <errno.h>
-
-pid_t
-getpid(void)
-{
-    return 1;
-}
 
 int
 kill(pid_t pid, int sig)
 {
-    if (pid == 1)
-        _exit(128 + sig);
+    if (pid == 1) {
+        raise(sig);
+        return 0;
+    }
     errno = ESRCH;
     return -1;
 }
+
+#ifdef __strong_reference
+__strong_reference(kill, __fake_kill);
+#endif

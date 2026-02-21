@@ -57,6 +57,8 @@ fstat(int fd, struct stat *sbuf)
     else
         size = -1;
 
+    memset(sbuf, '\0', sizeof(*sbuf));
+
     if (size > 0) {
         sbuf->st_size = size;
         sbuf->st_blksize = 4096;
@@ -70,5 +72,7 @@ fstat(int fd, struct stat *sbuf)
         ? __semihost_creat_time.tv_sec
         : __semihost_write_time.tv_sec;
     sbuf->st_mtime = __semihost_write_time.tv_sec;
+    sbuf->st_atime = sbuf->st_mtime;
+    sbuf->st_blocks = (size + 511) >> 9;
     return 0;
 }

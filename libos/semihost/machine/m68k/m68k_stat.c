@@ -39,13 +39,15 @@
 #include <string.h>
 #include <errno.h>
 #include <stdarg.h>
+#include <stdio.h>
 
 int
 stat(const char *pathname, struct stat * restrict statbuf)
 {
     struct m68k_stat m68k_stat;
 
-    int              ret = m68k_semihost2(HOSTED_STAT, (uintptr_t)pathname, (uintptr_t)&m68k_stat);
+    printf("stat %p %s statbuf %p\n", pathname, pathname, statbuf);
+    int ret = m68k_semihost3(HOSTED_STAT, (uintptr_t)pathname, 0, (uintptr_t)&m68k_stat);
     if (ret >= 0)
         copy_stat(statbuf, &m68k_stat);
     return ret;

@@ -82,7 +82,7 @@ struct m68k_stat {
     my_time_t my_atime;   /* time of last access */
     my_time_t my_mtime;   /* time of last modification */
     my_time_t my_ctime;   /* time of last change */
-};
+} __packed;
 
 static inline copy_stat(struct stat * restrict statbuf, struct m68k_stat *m68k_stat)
 {

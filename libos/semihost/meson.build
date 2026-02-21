@@ -39,6 +39,8 @@ has_semihost = true
 
 src_semihost = []
 
+subdir('fake')
+
 machine_dir = 'machine' / host_cpu_family
 if fs.is_dir(machine_dir)
   subdir(machine_dir)
@@ -47,8 +49,6 @@ endif
 if has_arm_semihost
   subdir('common')
 endif
-
-subdir('fake')
 
 foreach params : targets
   target = params['name']

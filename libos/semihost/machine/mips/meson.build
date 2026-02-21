@@ -41,7 +41,12 @@ src_semihost += files([
                        'mips_lseek.c',
                        'mips_open.c',
                        'mips_read.c',
-                       'mips_stub.c',
                        'mips_unlink.c',
                        'mips_write.c',
-                     ])
+                     ]) + [
+  src_semihost_fake_getpid,
+  src_semihost_fake_gettimeofday,
+  src_semihost_fake_isatty,
+  src_semihost_fake_kill,
+  src_semihost_fake_stat,
+  ]

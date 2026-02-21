@@ -40,10 +40,20 @@ if cc.get_define('_CALL_ELF') == '1'
                             'opal_console_write.c',
                             'opal_cec_power_down.c',
                             'powerpc_exit.c',
-                            'powerpc_kill.c',
                             'powerpc_io.c',
-                            'powerpc_stub.c',
-                          ])
+                          ]) + [
+    src_semihost_fake_close,
+    src_semihost_fake_fstat,
+    src_semihost_fake_getpid,
+    src_semihost_fake_gettimeofday,
+    src_semihost_fake_isatty,
+    src_semihost_fake_kill,
+    src_semihost_fake_lseek,
+    src_semihost_fake_open,
+    src_semihost_fake_read,
+    src_semihost_fake_unlink,
+    src_semihost_fake_write,
+  ]
 
   foreach params : targets
     target = params['name']

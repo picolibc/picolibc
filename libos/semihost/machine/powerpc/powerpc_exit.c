@@ -41,10 +41,6 @@
 __noreturn void
 _exit(int code)
 {
-    char buf[15];
-    int  n;
-    /* Can't use printf because stdout has already been cleaned up */
-    n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
-    opal_console_write(OPAL_TERMINAL_DEFAULT, n, buf);
+    printf("%cexit %d\n", 0xe9, code);
     opal_cec_power_down(0);
 }

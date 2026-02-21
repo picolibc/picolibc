@@ -41,7 +41,13 @@ src_semihost += files([
                        'lm32_open.c',
                        'lm32_read.c',
                        'lm32_scall.c',
-                       'lm32_stub.c',
                        'lm32_unlink.c',
                        'lm32_write.c',
-                     ])
+                     ]) + [
+  src_semihost_fake_fstat,
+  src_semihost_fake_getpid,
+  src_semihost_fake_gettimeofday,
+  src_semihost_fake_isatty,
+  src_semihost_fake_kill,
+  src_semihost_fake_stat,
+  ]

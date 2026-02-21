@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2023 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,74 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#include "m68k_semihost.h"
 #include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include "opal.h"
-
-ssize_t
-read(int fd, void *buf, size_t count)
-{
-    (void)fd;
-    (void)buf;
-    (void)count;
-    return 0;
-}
-
-ssize_t
-write(int fd, const void *buf, size_t count)
-{
-    (void)fd;
-    opal_console_write(0, count, buf);
-    return count;
-}
 
 int
-open(const char *pathname, int flags, ...)
+rename(const char *oldpath, const char *newpath)
 {
-    (void)pathname;
-    (void)flags;
-    return -1;
-}
-
-int
-close(int fd)
-{
-    (void)fd;
-    return 0;
-}
-
-off_t
-lseek(int fd, off_t offset, int whence)
-{
-    (void)fd;
-    (void)offset;
-    (void)whence;
-    return (off_t)-1;
-}
-
-int
-unlink(const char *pathname)
-{
-    (void)pathname;
-    return 0;
-}
-
-int
-fstat(int fd, struct stat *sbuf)
-{
-    (void)fd;
-    (void)sbuf;
-    return -1;
-}
-
-int
-isatty(int fd)
-{
-    (void)fd;
-    return 1;
+    return m68k_semihost4(HOSTED_RENAME, (uintptr_t)oldpath, 0, (uintptr_t)newpath, 0);
 }

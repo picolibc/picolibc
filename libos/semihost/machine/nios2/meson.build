@@ -42,7 +42,11 @@ src_semihost += files([
                        'nios2_read.c',
                        'nios2_semihost.c',
                        'nios2_stat.c',
-                       'nios2_stub.c',
                        'nios2_unlink.c',
                        'nios2_write.c',
-                     ])
+                     ]) + [
+  src_semihost_fake_getpid,
+  src_semihost_fake_gettimeofday,
+  src_semihost_fake_isatty,
+  src_semihost_fake_kill,
+  ]

@@ -41,7 +41,6 @@ src_semihost += files([
                        'gettimeofday.c',
                        'iob.c',
                        'isatty.c',
-                       'kill.c',
                        'lseek.c',
                        'mapstdio.c',
                        'open.c',
@@ -75,7 +74,11 @@ src_semihost += files([
                        'sys_tmpnam.c',
                        'sys_write.c',
                        'sys_write0.c',
-                     ])
+                     ]) + [
+  src_semihost_fake_getpid,
+  src_semihost_fake_kill,
+  src_semihost_fake_stat,
+  ]
 
 inc_headers = ['semihost.h']
 if really_install

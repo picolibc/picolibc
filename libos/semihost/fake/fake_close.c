@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2024 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,21 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
+#define _DEFAULT_SOURCE
 #include <unistd.h>
-#include <sys/stat.h>
 
 int
-fstat(int fd, struct stat *sbuf)
+close(int fd)
 {
     (void)fd;
-    (void)sbuf;
-    return -1;
+    return 0;
 }
 
-int
-isatty(int fd)
-{
-    (void)fd;
-    return 1;
-}
+#ifdef __strong_reference
+__strong_reference(close, __fake_close);
+#endif

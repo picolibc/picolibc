@@ -40,8 +40,14 @@ src_semihost += files([
                        'xtensa-lseek.c',
                        'xtensa-open.c',
                        'xtensa-read.c',
-                       'xtensa-stub.c',
                        'xtensa-unlink.c',
                        'xtensa-write.c',
                        'simcall.S',
-                     ])
+                     ]) + [
+  src_semihost_fake_fstat,
+  src_semihost_fake_getpid,
+  src_semihost_fake_gettimeofday,
+  src_semihost_fake_isatty,
+  src_semihost_fake_kill,
+  src_semihost_fake_stat,
+  ]

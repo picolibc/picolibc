@@ -33,16 +33,18 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-#define _GNU_SOURCE
 #include "hexagon_semihost.h"
-#include <unistd.h>
 #include <errno.h>
+#include <sys/stat.h>
 
 int
-fstat(int fd, struct stat *sbuf)
+fstat(int fd, struct stat * __restrict statbuf)
 {
-    (void)fd;
-    (void)sbuf;
-    errno = ENOSYS;
-    return -1;
+    struct __SYS_STAT hexstat;
+    int               args[] = { fd, (int)&hexstat };
+    int               retval = hexagon_semihost(SYS_FSTAT, args);
+
+    if (retval >= 0)
+        MAP_STAT(statbuf, &hexstat);
+    return retval;
 }

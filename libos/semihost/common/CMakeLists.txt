@@ -39,7 +39,6 @@ target_sources(semihost PRIVATE
   fstat.c
   gettimeofday.c
   isatty.c
-  kill.c
   lseek.c
   mapstdio.c
   open.c
@@ -72,6 +71,10 @@ target_sources(semihost PRIVATE
   sys_write.c
   sys_write0.c
   iob.c
+  ../fake/fake_getpid.c
+  ../fake/fake_gettimeofday.c
+  ../fake/fake_kill.c
+  ../fake/fake_stat.c
   )
 
 picolibc_headers("" semihost.h)

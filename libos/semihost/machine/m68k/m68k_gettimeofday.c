@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2023 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,17 +33,12 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
+#include "m68k_semihost.h"
+#include <sys/time.h>
 
 int
-isatty(int fd)
+gettimeofday(struct timeval * __restrict tv, void * __restrict __tz)
 {
-    (void)fd;
-    return 1;
+    (void)__tz;
+    return m68k_semihost2(HOSTED_GETTIMEOFDAY, (uintptr_t)tv, (uintptr_t)NULL);
 }

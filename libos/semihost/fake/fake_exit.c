@@ -33,8 +33,6 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <stdio.h>
-#include <stdlib.h>
 #include <unistd.h>
 
 __noreturn void
@@ -43,3 +41,7 @@ _exit(int code)
     (void)code;
     while (1) { }
 }
+
+#ifdef __strong_reference
+__strong_reference(_exit, __fake__exit) __noreturn;
+#endif

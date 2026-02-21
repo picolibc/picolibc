@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2022 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -34,22 +34,17 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <sys/types.h>
-#include <signal.h>
 #include <unistd.h>
-#include <errno.h>
 
-pid_t
-getpid(void)
+ssize_t
+read(int fd, void *buf, size_t count)
 {
-    return 1;
+    (void)fd;
+    (void)buf;
+    (void)count;
+    return 0;
 }
 
-int
-kill(pid_t pid, int sig)
-{
-    if (pid == 1)
-        _exit(128 + sig);
-    errno = ESRCH;
-    return -1;
-}
+#ifdef __strong_reference
+__strong_reference(read, __fake_read);
+#endif

@@ -36,16 +36,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
-#include "sparc-semihost.h"
 
 __noreturn void
 _exit(int code)
 {
-    char buf[15];
-    int  n;
-    /* Can't use printf because stdout has already been cleaned up */
-    n = snprintf(buf, sizeof(buf), "%cexit %d\n", 0xe9, code);
-    write(1, buf, n);
+    printf("%cexit %d\n", 0xe9, code);
     while (1)
         ;
 }

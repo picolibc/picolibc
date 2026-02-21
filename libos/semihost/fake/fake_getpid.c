@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2021 Keith Packard
+ * Copyright © 2019 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,17 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _GNU_SOURCE
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
+#define _DEFAULT_SOURCE
 #include <unistd.h>
-#include <string.h>
-#include <errno.h>
 
-int
-isatty(int fd)
+pid_t
+getpid(void)
 {
-    (void)fd;
     return 1;
 }
+
+#ifdef __strong_reference
+__strong_reference(getpid, __fake_getpid);
+#endif

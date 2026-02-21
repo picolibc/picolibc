@@ -43,4 +43,8 @@ target_sources(semihost PRIVATE
   ../arc/arc_stat.c
   ../arc/arc_unlink.c
   ../arc/arc_write.c
+  ../../fake/fake_getpid.c
+  ../../fake/fake_gettimeofday.c
+  ../../fake/fake_isatty.c
+  ../../fake/fake_kill.c
   )
