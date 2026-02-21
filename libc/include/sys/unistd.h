@@ -214,9 +214,7 @@ int linkat(int __dirfd1, const char *__path1, int __dirfd2, const char *__path2,
 #if __MISC_VISIBLE || __XSI_VISIBLE
 int nice(int __nice_value);
 #endif
-#if !defined(__INSIDE_CYGWIN__)
 off_t lseek(int __fildes, off_t __offset, int __whence);
-#endif
 #if __MISC_VISIBLE || __XSI_VISIBLE >= 4
 #define F_ULOCK 0
 #define F_LOCK  1
@@ -303,26 +301,11 @@ extern int   optreset; /* getopt(3) external variable */
 pid_t vfork(void);
 #endif
 
-#ifdef _LIBC
-/* Provide prototypes for most of the _<systemcall> names that are
-   provided in newlib for some compilers.  */
-int     close(int __fildes);
-pid_t   fork(void);
-pid_t   getpid(void);
-int     isatty(int __fildes);
-int     link(const char *__path1, const char *__path2);
-__off_t lseek(int __fildes, __off_t __offset, int __whence);
-void   *sbrk(ptrdiff_t __incr);
-int     unlink(const char *__path);
-#endif
-
-#if !defined(__INSIDE_CYGWIN__)
 #if __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
 int ftruncate(int __fd, off_t __length);
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
 int truncate(const char *, off_t __length);
-#endif
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE < 200112
@@ -576,8 +559,6 @@ int     unlinkat(int, const char *, int);
  *  confstr values per IEEE Std 1003.1, 2004 Edition
  */
 
-/* Only defined on Cygwin and RTEMS for now. */
-#if defined(__CYGWIN__) || defined(__rtems__)
 #define _CS_PATH                           0
 #define _CS_POSIX_V7_ILP32_OFF32_CFLAGS    1
 #define _CS_POSIX_V6_ILP32_OFF32_CFLAGS    _CS_POSIX_V7_ILP32_OFF32_CFLAGS
@@ -630,7 +611,6 @@ int     unlinkat(int, const char *, int);
 #define _CS_LFS_LDFLAGS                    22
 #define _CS_LFS_LIBS                       23
 #define _CS_LFS_LINTFLAGS                  24
-#endif
 
 _END_STD_C
 
