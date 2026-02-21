@@ -205,7 +205,11 @@ extern FILE * const stderr;
 
 FILE *fdevopen(int (*__put)(char, FILE *), int (*__get)(FILE *), int (*__flush)(FILE *));
 int   fclose(FILE *__stream) __nonnull((1));
-int   fflush(FILE *stream) __nonnull((1));
+int   fflush(FILE *stream)
+#ifndef __STDIO_EXIT_FLUSH
+    __nonnull((1))
+#endif
+    ;
 
 #define fdev_close(f) (fflush(f))
 

@@ -39,6 +39,20 @@ int
 fflush(FILE *stream)
 {
     int ret = 0;
+#ifdef __STDIO_EXIT_FLUSH
+    if (stream == NULL) {
+        void                _bufio_exit_flush(void) __weak;
+        extern FILE * const stdout __weak;
+        extern FILE * const stderr __weak;
+        if (_bufio_exit_flush)
+            _bufio_exit_flush();
+        if (&stdout)
+            fflush(stdout);
+        if (&stderr)
+            fflush(stderr);
+        return 0;
+    }
+#endif
     __flockfile(stream);
     if (stream->flush)
         ret = (stream->flush)(stream);
