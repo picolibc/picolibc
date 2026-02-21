@@ -250,21 +250,67 @@ int sig2str(int, char *);
 #endif
 #if __POSIX_VISIBLE
 int sigaction(int, const struct sigaction * __restrict, struct sigaction * __restrict);
+
 int sigaddset(sigset_t *, const int);
-#define sigaddset(what, sig) (*(what) |= (1 << (sig)))
+
+static inline int
+__sigaddset(sigset_t *what, int sig)
+{
+    *what |= 1 << sig;
+    return 0;
+}
+
+#define sigaddset(what, sig) __sigaddset(what, sig)
+
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
 int sigaltstack(const stack_t * __restrict, stack_t * __restrict);
 #endif
 #if __POSIX_VISIBLE
-int sigdelset(sigset_t *, const int);
-#define sigdelset(what, sig) ((*(what) &= ~((sigset_t)1 << (sig))))
-int sigemptyset(sigset_t *);
-#define sigemptyset(what) ((*(what) = (sigset_t)0))
-int sigfillset(sigset_t *);
-#define sigfillset(what) ((*(what) = ~((sigset_t)0)))
+
+int sigdelset(sigset_t *, const int) __nonnull((1));
+
+static __inline int
+__sigdelset(sigset_t *what, int sig)
+{
+    *what &= ~(sigset_t)1 << sig;
+    return 0;
+}
+
+#define sigdelset(what, sig) __sigdelset(what, sig)
+
+int sigemptyset(sigset_t *) __nonnull((1));
+
+static __inline int
+__sigemptyset(sigset_t *what)
+{
+    *what = 0;
+    return 0;
+}
+
+#define sigemptyset(what) __sigemptyset(what)
+
+int sigfillset(sigset_t *) __nonnull((1));
+
+static __inline int
+__sigfillset(sigset_t *what)
+{
+    *what = ~(sigset_t)0;
+    return 0;
+}
+
+#define sigfillset(what) __sigfillset(what)
+
 int sigismember(const sigset_t *, int);
-#define sigismember(what, sig) (((*(what)) & ((sigset_t)1 << (sig))) != 0)
+
+static __inline int
+__sigismember(const sigset_t *what, int sig)
+{
+    return (*(what) >> sig) & 1;
+}
+
+#define sigismember(what, sig) __sigismember(what, sig)
+
 #endif
 _sig_func_ptr signal(int, _sig_func_ptr);
 _sig_func_ptr __fallback_signal(int, _sig_func_ptr);
