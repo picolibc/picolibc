@@ -123,6 +123,7 @@ if fs.is_dir(machine_dir)
     '_sigmask_to_linux.c',
     '_signal_from_linux.c',
     '_signal_to_linux.c',
+    'sigpending.c',
     'sigprocmask.c',
     'sigsuspend.c',
     'stat.c',
