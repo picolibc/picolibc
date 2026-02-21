@@ -52,6 +52,11 @@ typedef void (*_sig_func_ptr)(int);
 
 #if __POSIX_VISIBLE
 
+#ifndef _PID_T_DECLARED
+typedef __pid_t pid_t; /* process id */
+#define _PID_T_DECLARED
+#endif
+
 #ifndef _UID_T_DECLARED
 typedef __uid_t uid_t; /* user id */
 #define _UID_T_DECLARED
