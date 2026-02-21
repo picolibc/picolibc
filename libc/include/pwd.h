@@ -54,8 +54,8 @@ typedef __uid_t uid_t; /* user id */
 #define _UID_T_DECLARED
 #endif
 
-#ifndef __PASSWORD_FILENAME
-#define __PASSWORD_FILENAME "/etc/passwd"
+#ifdef __BSD_VISIBLE
+#define _PATH_PASSWD "/etc/passwd"
 #endif
 
 struct passwd {
@@ -85,6 +85,10 @@ void           endpwent(void);
 struct passwd *fgetpwent(__FILE *stream);
 int            fgetpwent_r(__FILE *stream, struct passwd *pwbuf, char *buf, size_t size,
                            struct passwd **pwbufp);
+#endif
+
+#if __MISC_VISIBLE || __SVID_VISIBLE || __BSD_VISIBLE
+int getpwent_r(struct passwd *pwbuf, char *buf, size_t size, struct passwd **pwbufp);
 #endif
 
 _END_STD_C

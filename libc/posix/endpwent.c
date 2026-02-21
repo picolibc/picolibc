@@ -35,8 +35,6 @@
 
 #define _DEFAULT_SOURCE
 #include <stdio.h>
-#include <sys/types.h>
-#include <pwd.h>
 #include "local-pwd.h"
 
 void

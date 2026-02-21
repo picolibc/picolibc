@@ -33,11 +33,21 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _DEFAULT_SOURCE
-#include <pwd.h>
+#define _GNU_SOURCE
+#include <stdio.h>
+#include <sys/types.h>
+#include <errno.h>
+#include "local-pwd.h"
 
-void
-setpwent(void)
+int
+getpwent_r(struct passwd *pwbuf, char *buf, size_t size, struct passwd **pwbufp)
 {
-    endpwent();
+    if (!__passwd_file) {
+        __passwd_file = fopen(_PATH_PASSWD, "r");
+        if (!__passwd_file) {
+            *pwbufp = NULL;
+            return errno;
+        }
+    }
+    return fgetpwent_r(__passwd_file, pwbuf, buf, size, pwbufp);
 }

@@ -34,10 +34,7 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <pwd.h>
+#include <stdio.h>
+#include "local-pwd.h"
 
-void
-setpwent(void)
-{
-    endpwent();
-}
+FILE *__passwd_file;

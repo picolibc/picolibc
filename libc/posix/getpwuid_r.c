@@ -47,7 +47,7 @@ getpwuid_r(uid_t uid, struct passwd *pwbuf, char *buf, size_t size, struct passw
     struct passwd *pwd;
     int            ret;
 
-    file = fopen(__PASSWORD_FILENAME, "r");
+    file = fopen(_PATH_PASSWD, "r");
     if (!file)
         return errno;
     while ((ret = fgetpwent_r(file, pwbuf, buf, size, &pwd)) == 0)

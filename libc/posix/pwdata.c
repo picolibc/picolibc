@@ -35,7 +35,6 @@
 
 #define _DEFAULT_SOURCE
 #include <stdio.h>
-#include <pwd.h>
 #include "local-pwd.h"
 
 char          __passwd_buffer[BUFSIZ];

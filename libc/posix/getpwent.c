@@ -34,17 +34,13 @@
  */
 
 #define _DEFAULT_SOURCE
-#include <stdio.h>
-#include <sys/types.h>
-#include <pwd.h>
-
-FILE *__passwd_file;
+#include "local-pwd.h"
 
 struct passwd *
 getpwent(void)
 {
     if (!__passwd_file) {
-        __passwd_file = fopen(__PASSWORD_FILENAME, "r");
+        __passwd_file = fopen(_PATH_PASSWD, "r");
         if (!__passwd_file)
             return NULL;
     }
