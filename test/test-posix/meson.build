@@ -35,6 +35,7 @@
 
 tests = [
   'test-pwd',
+  'test-grp',
   ]
 
 tests_failure = []
