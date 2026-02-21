@@ -34,8 +34,12 @@
 #
 
 tests = [
-  'test-pwd',
+  'test-fnmatch',
+  'test-getdelim',
   'test-grp',
+  'test-pwd',
+  'test-signal',
+  'test-stat',
   ]
 
 tests_failure = []
@@ -43,24 +47,19 @@ tests_failure = []
 if has_os_posix
   tests += [
     'test-alarm',
-    'test-fnmatch',
-    'test-getdelim',
     'test-popen',
-    'test-signal',
     'test-system',
   ]
 endif
 
 test_extra_libs = {}
 
-arg_posix_io = []
+args_test_posix = []
 if tests_enable_posix_io
-  arg_posix_io += ['-DTESTS_ENABLE_POSIX_IO']
+  args_test_posix += ['-DTESTS_ENABLE_POSIX_IO']
 endif
 
-test_extra_c_args = {
-  'test-pwd' : arg_posix_io
-}
+test_extra_c_args = {}
 test_args = {}
 
 foreach params : targets
@@ -87,7 +86,7 @@ foreach params : targets
     _objs = []
   endif
 
-  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
+  _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args) + args_test_posix
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
   foreach t1 : tests
@@ -153,7 +152,7 @@ if enable_native_tests
 
     test(t1_name,
 	 executable(t1_name, t1_src,
-		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
+		    c_args: native_c_args + test_file_name_arg + ctype_c_args + args_test_posix,
 		    link_args: native_c_args,
                     dependencies: native_lib_m),
          suite: 'test-linux',
@@ -168,7 +167,7 @@ if enable_native_tests
 
     test(t1_name,
 	 executable(t1_name, t1_src,
-		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
+		    c_args: native_c_args + test_file_name_arg + ctype_c_args + args_test_posix,
 		    link_args: native_c_args,
                     dependencies: native_lib_m),
          suite: 'test-stdlib',
