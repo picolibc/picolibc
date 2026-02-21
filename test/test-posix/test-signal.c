@@ -57,6 +57,10 @@ main(void)
         printf("signal returned EPERM, assuming github CI\n");
         return 77;
     }
+    if (old_func != SIG_DFL) {
+        printf("signal returned %p instead of SIG_DFL (%p)\n", old_func, SIG_DFL);
+        return 1;
+    }
     kill(getpid(), SIGUSR1);
     if (caught_usr1 != SIGUSR1) {
         printf("caught %d instead of SIGUSR1(%d)\n", caught_usr1, SIGUSR1);
