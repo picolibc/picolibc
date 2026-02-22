@@ -42,6 +42,8 @@ if(DEFINED OS_FALLBACK)
 
   target_sources(os-fallback PRIVATE
     fpathconf.c
+    getpid.c
+    kill.c
     pathconf.c
     sbrk.c
     signal.c
@@ -50,6 +52,8 @@ if(DEFINED OS_FALLBACK)
 else()
   picolibc_sources(
     fpathconf.c
+    getpid.c
+    kill.c
     pathconf.c
     sbrk.c
     signal.c
