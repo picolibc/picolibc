@@ -89,4 +89,4 @@ echo "$stdin" | $qemu \
   -mon chardev=stdio0,mode=readline \
   -net none \
   -nographic \
-  -kernel "$elf"
+  -kernel "$elf" "$@"
