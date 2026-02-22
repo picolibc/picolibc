@@ -93,9 +93,9 @@ static inline copy_stat(struct stat * restrict statbuf, struct nios2_stat *nios2
     statbuf->st_uid = be32toh(nios2_stat->my_uid);
     statbuf->st_gid = be32toh(nios2_stat->my_gid);
     statbuf->st_rdev = be32toh(nios2_stat->my_rdev);
-    statbuf->st_size = be32toh(nios2_stat->my_size);
-    statbuf->st_blksize = be32toh(nios2_stat->my_blksize);
-    statbuf->st_blocks = be32toh(nios2_stat->my_blocks);
+    statbuf->st_size = be64toh(nios2_stat->my_size);
+    statbuf->st_blksize = be64toh(nios2_stat->my_blksize);
+    statbuf->st_blocks = be64toh(nios2_stat->my_blocks);
     statbuf->st_atime = be32toh(nios2_stat->my_atime);
     statbuf->st_mtime = be32toh(nios2_stat->my_mtime);
     statbuf->st_ctime = be32toh(nios2_stat->my_ctime);

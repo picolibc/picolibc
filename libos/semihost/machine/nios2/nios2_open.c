@@ -69,6 +69,5 @@ open(const char *pathname, int flags, ...)
     va_start(ap, flags);
     uintptr_t mode = va_arg(ap, uintptr_t);
     va_end(ap);
-    return nios2_semihost4(HOSTED_OPEN, (uintptr_t)pathname, strlen(pathname) + 1, gdb_flags(flags),
-                           mode);
+    return nios2_semihost4(HOSTED_OPEN, (uintptr_t)pathname, 0, gdb_flags(flags), mode);
 }
