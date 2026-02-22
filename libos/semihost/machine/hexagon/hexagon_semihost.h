@@ -38,6 +38,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <stdint.h>
 #include <sys/stat.h>
+#include <string.h>
 
 /* System call codes */
 enum hexagon_system_call_code {
@@ -127,6 +128,7 @@ struct __SYS_STAT {
 
 #define MAP_STAT(p, h)                        \
     do {                                      \
+        memset((p), 0, sizeof(*(p)));         \
         (p)->st_dev = (h)->dev;               \
         (p)->st_ino = (h)->ino;               \
         (p)->st_mode = (h)->mode;             \
