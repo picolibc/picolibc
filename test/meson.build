@@ -124,6 +124,8 @@ test_skip_lockvalid = [
   'test-hello'
   ]
 
+test_lock_valid = files(['lock-valid.c'])
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
@@ -171,7 +173,7 @@ foreach params : targets
     t1 = 'constructor-skip'
 
     test(t1 + target,
-	 executable(t1 + target, ['constructor-skip.c', 'lock-valid.c'],
+	 executable(t1 + target, ['constructor-skip.c', test_lock_valid],
 		    c_args: _c_args,
 		    link_args:  _link_args,
 		    objects: _objs_minimal,
@@ -191,7 +193,7 @@ foreach params : targets
     t1 = 'test-tls-init'
 
     test(t1 + target,
-	 executable(t1 + target, ['test-tls.c', 'lock-valid.c'],
+	 executable(t1 + target, ['test-tls.c', test_lock_valid],
 		    c_args: _c_args + ['-DINIT_TLS'],
 		    link_args:  _link_inittls_args,
 		    objects: _objs_inittls,
@@ -296,7 +298,7 @@ foreach params : targets
 
     lock_valid_src = []
     if t1 not in test_skip_lockvalid
-      lock_valid_src = ['lock-valid.c']
+      lock_valid_src = [test_lock_valid]
     endif
 
     test(t1 + target,

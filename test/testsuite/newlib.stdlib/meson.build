@@ -67,7 +67,7 @@ foreach params : targets
     src = test + '.c'
 
     test(test_name,
-	 executable(test_name, src,
+	 executable(test_name, [src] + test_lock_valid,
 		    c_args: _c_args,
 		    link_args: _link_args,
 		    objects: _objs,

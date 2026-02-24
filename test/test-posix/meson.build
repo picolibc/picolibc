@@ -96,7 +96,7 @@ foreach params : targets
     if test_extra_libs.has_key(t1)
       lock_source = []
     else
-      lock_source = ['../lock-valid.c']
+      lock_source = test_lock_valid
     endif
 
     test(t1 + target,
@@ -122,7 +122,7 @@ foreach params : targets
     if test_extra_libs.has_key(t1)
       lock_source = []
     else
-      lock_source = ['../lock-valid.c']
+      lock_source = test_lock_valid
     endif
 
     test(t1 + target,

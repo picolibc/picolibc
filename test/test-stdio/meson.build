@@ -154,7 +154,7 @@ foreach params : targets
     if test_extra_libs.has_key(t1)
       lock_source = []
     else
-      lock_source = ['../lock-valid.c']
+      lock_source = test_lock_valid
     endif
 
     test(t1 + target,
@@ -180,7 +180,7 @@ foreach params : targets
     if test_extra_libs.has_key(t1)
       lock_source = []
     else
-      lock_source = ['../lock-valid.c']
+      lock_source = test_lock_valid
     endif
 
     test(t1 + target,
@@ -208,7 +208,7 @@ foreach params : targets
       test_file_name_arg=['-DTEST_FILE_NAME="' + test + _ext + target + '.txt"']
 
       test(test + target + _ext,
-	   executable(test + _ext + target, [test_src, '../lock-valid.c'],
+	   executable(test + _ext + target, [test_src, test_lock_valid],
 		      c_args: test_file_name_arg + _printf_c_args,
 		      link_args: _printf_link_args,
 		      objects: _objs,
