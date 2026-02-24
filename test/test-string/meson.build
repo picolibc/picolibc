@@ -88,7 +88,7 @@ foreach params : targets
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
     test(t1 + target,
-	 executable(t1 + target, [t1_src],
+	 executable(t1 + target, [t1_src] + test_lock_valid,
 		    c_args: printf_compile_args_d + test_file_name_arg + _c_args,
 		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,
