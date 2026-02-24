@@ -104,40 +104,27 @@ Supporting OS subroutine required: None
 #include <string.h>
 #include <sys/types.h>
 #include <limits.h>
+#include <stdbool.h>
 
 #define TZNAME_MIN 3 /* POSIX min TZ abbr size local def */
 
-static char __tzname_std[TZNAME_MAX + 2];
-static char __tzname_dst[TZNAME_MAX + 2];
+static const tzrule_t default_tzrule = { 'J', 0, 0, 0, 0, (time_t)0, 0L };
 
 void
-_tzset_unlocked(void)
+tzset(void)
 {
-    char                               *tzenv;
-    unsigned short                      hh, mm, ss, m, w, d;
-    int                                 sign, n;
-    int                                 i, ch;
-    long                                offset0, offset1;
-    __tzinfo_type                      *tz = __gettzinfo();
-    static const struct __tzrule_struct default_tzrule = { 'J', 0, 0, 0, 0, (time_t)0, 0L };
+    unsigned short hh, mm, ss, m, w, d;
+    int            sign, n;
+    int            i, ch;
+    bool           dst_valid = false;
+    char          *tzenv;
+    char           new_tzname[2][TZNAME_MAX + 2];
+    tzrule_t       new_tzrule[2] = {};
 
-    if ((tzenv = getenv("TZ")) == NULL) {
-        _timezone = 0;
-        _daylight = 0;
-        tzname[0] = "GMT";
-        tzname[1] = "GMT";
-        tz->__tzrule[0] = default_tzrule;
-        tz->__tzrule[1] = default_tzrule;
-        return;
-    }
+    tzenv = getenv("TZ");
 
-    /* default to unnamed UTC in case of error */
-    _timezone = 0;
-    _daylight = 0;
-    tzname[0] = "";
-    tzname[1] = "";
-    tz->__tzrule[0] = default_tzrule;
-    tz->__tzrule[1] = default_tzrule;
+    if (tzenv == NULL)
+        goto bail;
 
     /* ignore implementation-specific format specifier */
     if (*tzenv == ':')
@@ -148,16 +135,16 @@ _tzset_unlocked(void)
         ++tzenv;
 
         /* quit if no items, too few or too many chars, or no close quote '>' */
-        if (sscanf(tzenv, "%11[-+0-9A-Za-z]%n", __tzname_std, &n) <= 0 || n < TZNAME_MIN
+        if (sscanf(tzenv, "%11[-+0-9A-Za-z]%n", new_tzname[0], &n) <= 0 || n < TZNAME_MIN
             || TZNAME_MAX < n || '>' != tzenv[n])
-            return;
+            goto bail;
 
         ++tzenv; /* bump for close quote '>' */
     } else {
         /* allow POSIX unquoted alphabetic tz abbr e.g. MESZ */
-        if (sscanf(tzenv, "%11[A-Za-z]%n", __tzname_std, &n) <= 0 || n < TZNAME_MIN
+        if (sscanf(tzenv, "%11[A-Za-z]%n", new_tzname[0], &n) <= 0 || n < TZNAME_MIN
             || TZNAME_MAX < n)
-            return;
+            goto bail;
     }
 
     tzenv += n;
@@ -173,38 +160,33 @@ _tzset_unlocked(void)
     ss = 0;
 
     if (sscanf(tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) < 1)
-        return;
+        goto bail;
 
-    offset0 = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
+    new_tzrule[0].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
+
     tzenv += n;
+
+    /* Set up dst values */
 
     /* allow POSIX angle bracket < > quoted signed alphanumeric tz abbr e.g. <MESZ+0330> */
     if (*tzenv == '<') {
         ++tzenv;
 
         /* quit if no items, too few or too many chars, or no close quote '>' */
-        if (sscanf(tzenv, "%11[-+0-9A-Za-z]%n", __tzname_dst, &n) <= 0
+        if (sscanf(tzenv, "%11[-+0-9A-Za-z]%n", new_tzname[1], &n) <= 0
             && tzenv[0] == '>') { /* No dst */
-            tzname[0] = __tzname_std;
-            tzname[1] = tzname[0];
-            tz->__tzrule[0].offset = offset0;
-            _timezone = offset0;
-            return;
+            goto done;
         } else if (n < TZNAME_MIN || TZNAME_MAX < n || '>' != tzenv[n]) { /* error */
-            return;
+            goto bail;
         }
 
         ++tzenv; /* bump for close quote '>' */
     } else {
         /* allow POSIX unquoted alphabetic tz abbr e.g. MESZ */
-        if (sscanf(tzenv, "%11[A-Za-z]%n", __tzname_dst, &n) <= 0) { /* No dst */
-            tzname[0] = __tzname_std;
-            tzname[1] = tzname[0];
-            tz->__tzrule[0].offset = offset0;
-            _timezone = offset0;
-            return;
+        if (sscanf(tzenv, "%11[A-Za-z]%n", new_tzname[1], &n) <= 0) { /* No dst */
+            goto done;
         } else if (n < TZNAME_MIN || TZNAME_MAX < n) { /* error */
-            return;
+            goto bail;
         }
     }
 
@@ -224,9 +206,11 @@ _tzset_unlocked(void)
 
     n = 0;
     if (sscanf(tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0)
-        offset1 = offset0 - 3600;
+        new_tzrule[1].offset = new_tzrule[0].offset - 3600;
     else
-        offset1 = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
+        new_tzrule[1].offset = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
+
+    dst_valid = true;
 
     tzenv += n;
 
@@ -236,13 +220,15 @@ _tzset_unlocked(void)
 
         if (*tzenv == 'M') {
             if (sscanf(tzenv, "M%hu%n.%hu%n.%hu%n", &m, &n, &w, &n, &d, &n) != 3 || m < 1 || m > 12
-                || w < 1 || w > 5 || d > 6)
-                return;
+                || w < 1 || w > 5 || d > 6) {
+                /* error in time format */
+                goto bail;
+            }
 
-            tz->__tzrule[i].ch = 'M';
-            tz->__tzrule[i].m = m;
-            tz->__tzrule[i].n = w;
-            tz->__tzrule[i].d = d;
+            new_tzrule[i].ch = 'M';
+            new_tzrule[i].m = m;
+            new_tzrule[i].n = w;
+            new_tzrule[i].d = d;
 
             tzenv += n;
         } else {
@@ -260,19 +246,19 @@ _tzset_unlocked(void)
              * M3.2.0,M11.1.0 (2nd Sunday March through 1st Sunday November)  */
             if (end == tzenv) {
                 if (i == 0) {
-                    tz->__tzrule[0].ch = 'M';
-                    tz->__tzrule[0].m = 3;
-                    tz->__tzrule[0].n = 2;
-                    tz->__tzrule[0].d = 0;
+                    new_tzrule[0].ch = 'M';
+                    new_tzrule[0].m = 3;
+                    new_tzrule[0].n = 2;
+                    new_tzrule[0].d = 0;
                 } else {
-                    tz->__tzrule[1].ch = 'M';
-                    tz->__tzrule[1].m = 11;
-                    tz->__tzrule[1].n = 1;
-                    tz->__tzrule[1].d = 0;
+                    new_tzrule[1].ch = 'M';
+                    new_tzrule[1].m = 11;
+                    new_tzrule[1].n = 1;
+                    new_tzrule[1].d = 0;
                 }
             } else {
-                tz->__tzrule[i].ch = ch;
-                tz->__tzrule[i].d = d;
+                new_tzrule[i].ch = ch;
+                new_tzrule[i].d = d;
             }
 
             tzenv = end;
@@ -286,30 +272,37 @@ _tzset_unlocked(void)
 
         if (*tzenv == '/')
             if (sscanf(tzenv, "/%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0) {
-                /* error in time format, restore tz rules to default and return */
-                tz->__tzrule[0] = default_tzrule;
-                tz->__tzrule[1] = default_tzrule;
-                return;
+                /* error in time format */
+                goto bail;
             }
 
-        tz->__tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR * hh;
+        new_tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR * hh;
 
         tzenv += n;
     }
 
-    tz->__tzrule[0].offset = offset0;
-    tz->__tzrule[1].offset = offset1;
-    tzname[0] = __tzname_std;
-    tzname[1] = __tzname_dst;
-    __tzcalc_limits(tz->__tzyear);
-    _timezone = tz->__tzrule[0].offset;
-    _daylight = tz->__tzrule[0].offset != tz->__tzrule[1].offset;
-}
+done:
+    if (!dst_valid) {
+        if (false) {
+        bail:
+            strcpy(new_tzname[0], "GMT");
+            new_tzrule[0] = default_tzrule;
+        }
+        strcpy(new_tzname[1], new_tzname[0]);
+        new_tzrule[1] = new_tzrule[0];
+    }
+    __LIBC_LOCK();
+    {
+        /* Copy in the new values */
+        strcpy(__tzname_std, new_tzname[0]);
+        strcpy(__tzname_dst, new_tzname[1]);
+        __tzinfo.rule[0] = new_tzrule[0];
+        __tzinfo.rule[1] = new_tzrule[1];
 
-void
-tzset(void)
-{
-    TZ_LOCK;
-    _tzset_unlocked();
-    TZ_UNLOCK;
+        /* Compute the derived values */
+        __tzcalc_limits(__tzinfo.year);
+        timezone = new_tzrule[0].offset;
+        daylight = new_tzrule[0].offset != new_tzrule[1].offset;
+    }
+    __LIBC_UNLOCK();
 }

@@ -2,9 +2,9 @@
 /* local header used by libc/time routines */
 #define _GNU_SOURCE
 #include <time.h>
-#include <sys/_tz_structs.h>
 #include <sys/lock.h>
 #include <stdint.h>
+#include <sys/syslimits.h>
 
 #define SECSPERMIN                     60L
 #define MINSPERHOUR                    60L
@@ -20,6 +20,22 @@
 #define EPOCH_YEARS_SINCE_LEAP         2
 #define EPOCH_YEARS_SINCE_CENTURY      70
 #define EPOCH_YEARS_SINCE_LEAP_CENTURY 370
+
+typedef struct {
+    char   ch;
+    int    m; /* Month of year if ch=M */
+    int    n; /* Week of month if ch=M */
+    int    d; /* Day of week if ch=M, day of year if ch=J or ch=D */
+    int    s; /* Time of day in seconds */
+    time_t change;
+    long   offset; /* Match type of _timezone. */
+} tzrule_t;
+
+typedef struct {
+    int      north;
+    int      year;
+    tzrule_t rule[2];
+} tzinfo_t;
 
 static inline int
 isleap(int y)
@@ -58,9 +74,6 @@ timebase_to_clockid(int base)
 int                  __tzcalc_limits(int __year);
 
 extern const uint8_t __month_lengths[2][MONSPERYEAR];
-
-void                 _tzset_unlocked(void);
-
-/* locks for multi-threading */
-#define TZ_LOCK   __LIBC_LOCK()
-#define TZ_UNLOCK __LIBC_UNLOCK()
+extern char          __tzname_std[TZNAME_MAX + 2];
+extern char          __tzname_dst[TZNAME_MAX + 2];
+extern tzinfo_t      __tzinfo;
