@@ -55,14 +55,8 @@ permit '=' to be in identifiers.
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include "envlock.h"
-
-extern char  **environ;
-
-/* Only deal with a pointer to environ, to work around subtle bugs with shared
-   libraries and/or small data systems where the user declares his own
-   'environ'.  */
-static char ***p_environ = &environ;
+#include <sys/lock.h>
+#include "local.h"
 
 /*
  * _findenv --
@@ -73,37 +67,30 @@ static char ***p_environ = &environ;
  *	This routine *should* be a static; don't use it.
  */
 
+uint32_t __environ_sequence; /* incremented each time env changes */
+
+/* libc lock must be held on entry */
 char *
-_findenv(register const char *name, int *offset)
+__findenv(const char *name, size_t *offset)
 {
-    register int    len;
-    register char **p;
-    const char     *c;
-
-    ENV_LOCK;
-
-    /* In some embedded systems, this does not get set.  This protects
-       newlib from dereferencing a bad pointer.  */
-    if (!*p_environ) {
-        ENV_UNLOCK;
-        return NULL;
-    }
-
-    c = name;
-    while (*c && *c != '=')
-        c++;
+    char **env;
+    char  *entry;
+    size_t name_len;
 
     /* Identifiers may not contain an '=', so cannot match if does */
-    if (*c != '=') {
-        len = c - name;
-        for (p = *p_environ; *p; ++p)
-            if (!strncmp(*p, name, len))
-                if (*(c = *p + len) == '=') {
-                    *offset = p - *p_environ;
-                    ENV_UNLOCK;
-                    return (char *)(++c);
-                }
+    if (strchr(name, '='))
+        return NULL;
+
+    name_len = strlen(name);
+
+    if (!environ)
+        return NULL;
+
+    for (env = environ; (entry = *env) != NULL; ++env) {
+        if (!strncmp(entry, name, name_len) && entry[name_len] == '=') {
+            *offset = env - environ;
+            return entry + name_len + 1;
+        }
     }
-    ENV_UNLOCK;
     return NULL;
 }

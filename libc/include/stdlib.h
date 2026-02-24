@@ -144,9 +144,6 @@ char           *getenv(const char *__string);
 extern char **__argv;
 char         *secure_getenv(const char *__string);
 #endif
-#if __MISC_VISIBLE
-char *_findenv(const char *, int *);
-#endif
 #if __POSIX_VISIBLE >= 200809
 extern char *suboptarg; /* getsubopt(3) external variable */
 int          getsubopt(char **, char          *const *, char **);
