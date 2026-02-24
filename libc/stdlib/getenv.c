@@ -50,6 +50,8 @@ variables vary from one system to another.
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
+#include <sys/lock.h>
+#include "local.h"
 
 /*
  * getenv --
@@ -59,7 +61,11 @@ variables vary from one system to another.
 char *
 getenv(const char *name)
 {
-    int offset;
+    size_t offset;
+    char  *entry;
 
-    return _findenv(name, &offset);
+    __LIBC_LOCK();
+    entry = __findenv(name, &offset);
+    __LIBC_UNLOCK();
+    return entry;
 }

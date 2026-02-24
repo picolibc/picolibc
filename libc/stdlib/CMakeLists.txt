@@ -55,8 +55,8 @@ picolibc_sources(
   eprintf.c
   erand48.c
   _Exit.c
+  _findenv.c
   getenv.c
-  getenv_r.c
   getopt.c
   getsubopt.c
   imaxabs.c
@@ -101,6 +101,7 @@ picolibc_sources(
   uctoji.c
   uctoej.c
   uctosj.c
+  unsetenv.c
   utoa.c
   wcrtomb.c
   wcsnrtombs.c

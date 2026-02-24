@@ -8,8 +8,15 @@ All rights reserved.
 #define _LOCAL_H_
 
 #include <stdint.h>
+#include <stddef.h>
 
-char *_gcvt(double, int, char *, char, int);
+char           *_gcvt(double, int, char *, char, int);
+
+extern char   **environ;
+
+char           *__findenv(const char *name, size_t *offset);
+
+extern uint32_t __environ_sequence;
 
 #include "locale_private.h"
 

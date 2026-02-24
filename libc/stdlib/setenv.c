@@ -21,7 +21,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <errno.h>
-#include <envlock.h>
+#include <stdbool.h>
+#include <stdint.h>
+#include <sys/lock.h>
+#include "local.h"
 
 /*
  * setenv --
@@ -29,108 +32,112 @@
  *	"value".  If rewrite is set, replace any current value.
  */
 
-extern char  **environ;
-
-/* Only deal with a pointer to environ, to work around subtle bugs with shared
-   libraries and/or small data systems where the user declares his own
-   'environ'.  */
-static char ***p_environ = &environ;
+extern char **environ;
+static bool   alloced; /* if allocated space before */
 
 int
 setenv(const char *name, const char *value, int rewrite)
 {
-    static int     alloced; /* if allocated space before */
-    register char *C;
-    size_t         l_value;
-    int            offset;
+    size_t   offset;
+    char    *cur_entry;
+    char   **new_environ;
+    char    *new_entry;
+    uint32_t old_sequence;
+    size_t   l_value, l_name;
 
     /* Name cannot be NULL, empty, or contain an equal sign.  */
     if (name == NULL || name[0] == '\0' || strchr(name, '=')) {
         errno = EINVAL;
         return -1;
     }
-
-    ENV_LOCK;
 
     l_value = strlen(value);
-    if ((C = _findenv(name, &offset))) { /* find if already exists */
-        if (!rewrite) {
-            ENV_UNLOCK;
-            return 0;
-        }
-        if (strlen(C) >= l_value) { /* old larger; copy over */
-            strcpy(C, value);
-            ENV_UNLOCK;
-            return 0;
-        }
-    } else { /* create new slot */
-        register int    cnt;
-        register char **P;
 
-        for (P = *p_environ, cnt = 0; *P; ++P, ++cnt)
-            ;
-        if (alloced) { /* just increase size */
-            *p_environ = (char **)realloc((char *)environ, (size_t)(sizeof(char *) * (cnt + 2)));
-            if (!*p_environ) {
-                ENV_UNLOCK;
+    /*
+     * Loop until we manage to perform all operations without being
+     * interrupted by another thread
+     */
+    for (;;) {
+
+        new_environ = NULL;
+        new_entry = NULL;
+
+        __LIBC_LOCK();
+
+        /* Record current sequence value */
+        old_sequence = __environ_sequence;
+
+        if ((cur_entry = __findenv(name, &offset))) { /* find if already exists */
+            if (!rewrite) {
+                __LIBC_UNLOCK();
+                return 0;
+            }
+            if (strlen(cur_entry) >= l_value) { /* old larger; copy over */
+                strcpy(cur_entry, value);
+                __LIBC_UNLOCK();
+                return 0;
+            }
+        } else { /* create new slot */
+            size_t n_environ = 0;
+            char **env;
+
+            for (env = environ; *env; ++env)
+                n_environ++;
+
+            __LIBC_UNLOCK();
+
+            new_environ = calloc(n_environ + 2, sizeof(char *));
+            if (!new_environ)
                 return -1;
-            }
-        } else {         /* get new space */
-            alloced = 1; /* copy old entries into it */
-            P = (char **)malloc((size_t)(sizeof(char *) * (cnt + 2)));
-            if (!P) {
-                ENV_UNLOCK;
-                return (-1);
-            }
-            memcpy((char *)P, (char *)*p_environ, cnt * sizeof(char *));
-            *p_environ = P;
+
+            __LIBC_LOCK();
+            if (__environ_sequence != old_sequence)
+                goto retry;
+
+            memcpy(new_environ, environ, n_environ * sizeof(char *));
+            new_environ[n_environ + 1] = NULL;
+            offset = n_environ;
         }
-        (*p_environ)[cnt + 1] = NULL;
-        offset = cnt;
-    }
-    for (C = (char *)name; *C && *C != '='; ++C)
-        ; /* no `=' in name */
-    char *E = malloc((size_t)((int)(C - name) + l_value + 2));
-    if (!E) {
-        ENV_UNLOCK;
-        return -1;
-    }
-    (*p_environ)[offset] = E;
-    for (C = E; (*C = *name++) && *C != '='; ++C)
-        ;
-    for (*C++ = '='; (*C++ = *value++) != 0;)
-        ;
 
-    ENV_UNLOCK;
+        __LIBC_UNLOCK();
 
-    return 0;
-}
+        l_name = strlen(name);
 
-/*
- * unsetenv(name) --
- *	Delete environmental variable "name".
- */
-int
-unsetenv(const char *name)
-{
-    register char **P;
-    int             offset;
+        new_entry = malloc(l_name + 1 + l_value + 1);
 
-    /* Name cannot be NULL, empty, or contain an equal sign.  */
-    if (name == NULL || name[0] == '\0' || strchr(name, '=')) {
-        errno = EINVAL;
-        return -1;
+        if (!new_entry) {
+            free(new_environ);
+            return -1;
+        }
+
+        char *eq = stpcpy(new_entry, name);
+        *eq++ = '=';
+        strcpy(eq, value);
+
+        __LIBC_LOCK();
+
+        if (__environ_sequence == old_sequence)
+            break;
+
+    retry:
+        __LIBC_UNLOCK();
+        free(new_environ);
+        free(new_entry);
     }
 
-    ENV_LOCK;
+    /* note change in environment */
+    __environ_sequence++;
 
-    while (_findenv(name, &offset)) /* if set multiple times */
-    {
-        for (P = &(*p_environ)[offset];; ++P)
-            if (!(*P = *(P + 1)))
-                break;
+    if (new_environ) {
+        if (alloced)
+            free(environ);
+        environ = new_environ;
+        alloced = true;
     }
 
-    ENV_UNLOCK;
+    environ[offset] = new_entry;
+
+    __LIBC_UNLOCK();
+
     return 0;
 }

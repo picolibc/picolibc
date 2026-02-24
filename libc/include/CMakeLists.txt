@@ -49,7 +49,6 @@ picolibc_headers(""
   devctl.h
   dirent.h
   endian.h
-  envlock.h
   envz.h
   errno.h
   fastmath.h
