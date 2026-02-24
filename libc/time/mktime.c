@@ -260,11 +260,10 @@ overflow:
 time_t
 mktime(struct tm *tim_p)
 {
-    time_t         days;
-    time_t         tim;
-    int            year;
-    int            isdst = 0;
-    __tzinfo_type *tz;
+    time_t days;
+    time_t tim;
+    int    year;
+    int    isdst = 0;
 
     tim = mktime_utc(tim_p, &days);
 
@@ -273,31 +272,29 @@ mktime(struct tm *tim_p)
 
     year = tim_p->tm_year;
 
-    tz = __gettzinfo();
+    tzset();
 
-    TZ_LOCK;
+    __LIBC_LOCK();
 
-    _tzset_unlocked();
-
-    if (_daylight) {
+    if (daylight) {
         int tm_isdst;
         int y = tim_p->tm_year + YEAR_BASE;
         /* Convert user positive into 1 */
         tm_isdst = tim_p->tm_isdst > 0 ? 1 : tim_p->tm_isdst;
         isdst = tm_isdst;
 
-        if (y == tz->__tzyear || __tzcalc_limits(y)) {
+        if (y == __tzinfo.year || __tzcalc_limits(y)) {
             /* calculate start of dst in dst local time and
                start of std in both std local time and dst local time */
-            time_t startdst_dst = tz->__tzrule[0].change - (time_t)tz->__tzrule[1].offset;
-            time_t startstd_dst = tz->__tzrule[1].change - (time_t)tz->__tzrule[1].offset;
-            time_t startstd_std = tz->__tzrule[1].change - (time_t)tz->__tzrule[0].offset;
+            time_t startdst_dst = __tzinfo.rule[0].change - (time_t)__tzinfo.rule[1].offset;
+            time_t startstd_dst = __tzinfo.rule[1].change - (time_t)__tzinfo.rule[1].offset;
+            time_t startstd_std = __tzinfo.rule[1].change - (time_t)__tzinfo.rule[0].offset;
             /* if the time is in the overlap between dst and std local times */
             if (tim >= startstd_std && tim < startstd_dst)
                 ; /* we let user decide or leave as -1 */
             else {
-                isdst = (tz->__tznorth ? (tim >= startdst_dst && tim < startstd_std)
-                                       : (tim >= startdst_dst || tim < startstd_std));
+                isdst = (__tzinfo.north ? (tim >= startdst_dst && tim < startstd_std)
+                                        : (tim >= startdst_dst || tim < startstd_std));
                 /* if user committed and was wrong, perform correction, but not
                  * if the user has given a negative value (which
                  * asks mktime() to determine if DST is in effect or not) */
@@ -307,7 +304,7 @@ mktime(struct tm *tim_p)
                        wrong. The diff is typically one hour, or 3600 seconds,
                        and should fit in a 16-bit int, even though offset
                        is a long to accomodate 12 hours. */
-                    int diff = (int)(tz->__tzrule[0].offset - tz->__tzrule[1].offset);
+                    int diff = (int)(__tzinfo.rule[0].offset - __tzinfo.rule[1].offset);
                     if (!isdst)
                         diff = -diff;
                     tim_p->tm_sec += diff;
@@ -343,11 +340,11 @@ mktime(struct tm *tim_p)
 
     /* add appropriate offset to put time in gmt format */
     if (isdst == 1)
-        offset = (time_t)tz->__tzrule[1].offset;
+        offset = (time_t)__tzinfo.rule[1].offset;
     else /* otherwise assume std time */
-        offset = (time_t)tz->__tzrule[0].offset;
+        offset = (time_t)__tzinfo.rule[0].offset;
 
-    TZ_UNLOCK;
+    __LIBC_UNLOCK();
 
     if ((offset > 0 && (tim + offset) < tim) || (offset < 0 && (tim + offset) > tim)) {
         errno = EOVERFLOW;

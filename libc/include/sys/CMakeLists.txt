@@ -70,7 +70,6 @@ picolibc_headers(sys
   tree.h
   _types.h
   types.h
-  _tz_structs.h
   unistd.h
   utime.h
   wait.h

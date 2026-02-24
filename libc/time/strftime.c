@@ -1048,22 +1048,17 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                                     subtract to get UTC */
 
                 if (tim_p->tm_isdst >= 0) {
-                    TZ_LOCK;
                     if (!tzset_called) {
-                        _tzset_unlocked();
                         tzset_called = 1;
+                        tzset();
                     }
 
-#if defined(__TM_GMTOFF)
-                    offset = tim_p->__TM_GMTOFF;
-#else
-                    __tzinfo_type *tz = __gettzinfo();
+                    __LIBC_LOCK();
                     /* The sign of this is exactly opposite the envvar TZ.  We
                        could directly use the global _timezone for tm_isdst==0,
                        but have to use __tzrule for daylight savings.  */
-                    offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
-#endif
-                    TZ_UNLOCK;
+                    offset = -__tzinfo.rule[tim_p->tm_isdst > 0].offset;
+                    __LIBC_UNLOCK();
                 }
                 len = t_snprintf(&s[count], maxsize - count, CQ("%lld"),
                                  (((((long long)tim_p->tm_year - 69) / 4
@@ -1254,22 +1249,18 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
             if (tim_p->tm_isdst >= 0) {
                 long offset;
 
-                TZ_LOCK;
                 if (!tzset_called) {
-                    _tzset_unlocked();
+                    tzset();
                     tzset_called = 1;
                 }
 
-#if defined(__TM_GMTOFF)
-                offset = tim_p->__TM_GMTOFF;
-#else
-                __tzinfo_type *tz = __gettzinfo();
+                __LIBC_LOCK();
                 /* The sign of this is exactly opposite the envvar TZ.  We
                    could directly use the global _timezone for tm_isdst==0,
                    but have to use __tzrule for daylight savings.  */
-                offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
-#endif
-                TZ_UNLOCK;
+                offset = -__tzinfo.rule[tim_p->tm_isdst > 0].offset;
+                __LIBC_UNLOCK();
+
                 len = t_snprintf(&s[count], maxsize - count, CQ("%+03ld%.2ld"),
                                  offset / SECSPERHOUR, labs(offset / SECSPERMIN) % 60L);
                 CHECK_LENGTH();
@@ -1280,16 +1271,13 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                 size_t      size;
                 const char *tznam = NULL;
 
-                TZ_LOCK;
                 if (!tzset_called) {
-                    _tzset_unlocked();
+                    tzset();
                     tzset_called = 1;
                 }
-#if defined(__TM_ZONE)
-                tznam = tim_p->__TM_ZONE;
-#endif
-                if (!tznam)
-                    tznam = tzname[tim_p->tm_isdst > 0];
+
+                __LIBC_LOCK();
+                tznam = tzname[tim_p->tm_isdst > 0];
                 /* Note that in case of wcsftime this loop only works for
                    timezone abbreviations using the portable codeset (aka ASCII).
                    This seems to be the case, but if that ever changes, this
@@ -1299,11 +1287,11 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                     if (count < maxsize - 1)
                         s[count++] = tznam[i];
                     else {
-                        TZ_UNLOCK;
+                        __LIBC_UNLOCK();
                         return 0;
                     }
                 }
-                TZ_UNLOCK;
+                __LIBC_UNLOCK();
             }
             break;
         case CQ('%'):

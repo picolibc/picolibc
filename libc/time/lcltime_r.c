@@ -34,11 +34,10 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 struct tm *
 localtime_r(const time_t * __restrict tim_p, struct tm * __restrict res)
 {
-    long                  offset;
-    int                   hours, mins, secs;
-    int                   year;
-    __tzinfo_type * const tz = __gettzinfo();
-    const uint8_t        *ip;
+    long           offset;
+    int            hours, mins, secs;
+    int            year;
+    const uint8_t *ip;
 
     res = gmtime_r(tim_p, res);
     if (res == NULL)
@@ -47,20 +46,22 @@ localtime_r(const time_t * __restrict tim_p, struct tm * __restrict res)
     year = res->tm_year + YEAR_BASE;
     ip = __month_lengths[isleap(year)];
 
-    TZ_LOCK;
-    _tzset_unlocked();
-    if (_daylight) {
-        if (year == tz->__tzyear || __tzcalc_limits(year))
+    tzset();
+
+    __LIBC_LOCK();
+
+    if (daylight) {
+        if (year == __tzinfo.year || __tzcalc_limits(year))
             res->tm_isdst
-                = (tz->__tznorth
-                       ? (*tim_p >= tz->__tzrule[0].change && *tim_p < tz->__tzrule[1].change)
-                       : (*tim_p >= tz->__tzrule[0].change || *tim_p < tz->__tzrule[1].change));
+                = (__tzinfo.north
+                       ? (*tim_p >= __tzinfo.rule[0].change && *tim_p < __tzinfo.rule[1].change)
+                       : (*tim_p >= __tzinfo.rule[0].change || *tim_p < __tzinfo.rule[1].change));
         else
             res->tm_isdst = -1;
     } else
         res->tm_isdst = 0;
 
-    offset = (res->tm_isdst == 1 ? tz->__tzrule[1].offset : tz->__tzrule[0].offset);
+    offset = (res->tm_isdst == 1 ? __tzinfo.rule[1].offset : __tzinfo.rule[0].offset);
 
     hours = (int)(offset / SECSPERHOUR);
     offset = offset % SECSPERHOUR;
@@ -119,7 +120,7 @@ localtime_r(const time_t * __restrict tim_p, struct tm * __restrict res)
             res->tm_mday = ip[res->tm_mon];
         }
     }
-    TZ_UNLOCK;
+    __LIBC_UNLOCK();
 
     return (res);
 }

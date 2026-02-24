@@ -14,14 +14,13 @@
 int
 __tzcalc_limits(int year)
 {
-    int                   days, year_days, years;
-    int                   i, j;
-    __tzinfo_type * const tz = __gettzinfo();
+    int days, year_days, years;
+    int i, j;
 
     if (year < EPOCH_YEAR)
         return 0;
 
-    tz->__tzyear = year;
+    __tzinfo.year = year;
 
     years = (year - EPOCH_YEAR);
 
@@ -30,13 +29,13 @@ __tzcalc_limits(int year)
         + (years - 1 + EPOCH_YEARS_SINCE_LEAP_CENTURY) / 400;
 
     for (i = 0; i < 2; ++i) {
-        if (tz->__tzrule[i].ch == 'J') {
+        if (__tzinfo.rule[i].ch == 'J') {
             /* The Julian day n (1 <= n <= 365). */
-            days = year_days + tz->__tzrule[i].d + (isleap(year) && tz->__tzrule[i].d >= 60);
+            days = year_days + __tzinfo.rule[i].d + (isleap(year) && __tzinfo.rule[i].d >= 60);
             /* Convert to yday */
             --days;
-        } else if (tz->__tzrule[i].ch == 'D')
-            days = year_days + tz->__tzrule[i].d;
+        } else if (__tzinfo.rule[i].ch == 'D')
+            days = year_days + __tzinfo.rule[i].d;
         else {
             const int             yleap = isleap(year);
             int                   m_day, m_wday, wday_diff;
@@ -44,15 +43,15 @@ __tzcalc_limits(int year)
 
             days = year_days;
 
-            for (j = 1; j < tz->__tzrule[i].m; ++j)
+            for (j = 1; j < __tzinfo.rule[i].m; ++j)
                 days += ip[j - 1];
 
             m_wday = (EPOCH_WDAY + days) % DAYSPERWEEK;
 
-            wday_diff = tz->__tzrule[i].d - m_wday;
+            wday_diff = __tzinfo.rule[i].d - m_wday;
             if (wday_diff < 0)
                 wday_diff += DAYSPERWEEK;
-            m_day = (tz->__tzrule[i].n - 1) * DAYSPERWEEK + wday_diff;
+            m_day = (__tzinfo.rule[i].n - 1) * DAYSPERWEEK + wday_diff;
 
             while (m_day >= ip[j - 1])
                 m_day -= DAYSPERWEEK;
@@ -61,11 +60,11 @@ __tzcalc_limits(int year)
         }
 
         /* store the change-over time in GMT form by adding offset */
-        tz->__tzrule[i].change
-            = (time_t)days * SECSPERDAY + tz->__tzrule[i].s + tz->__tzrule[i].offset;
+        __tzinfo.rule[i].change
+            = (time_t)days * SECSPERDAY + __tzinfo.rule[i].s + __tzinfo.rule[i].offset;
     }
 
-    tz->__tznorth = (tz->__tzrule[0].change < tz->__tzrule[1].change);
+    __tzinfo.north = (__tzinfo.rule[0].change < __tzinfo.rule[1].change);
 
     return 1;
 }
