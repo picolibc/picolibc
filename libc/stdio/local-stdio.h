@@ -830,6 +830,16 @@ void       __picolibc_non_atomic_store_ungetc(__ungetc_t *p, __ungetc_t v);
 
 #endif /* __ATOMIC_UNGETC */
 
+static inline int
+__fflush_locked(FILE *stream)
+{
+    int ret = 0;
+    if (stream->flush)
+        ret = (stream->flush)(stream);
+    __atomic_store_ungetc(&stream->unget, 0);
+    return ret;
+}
+
 /*
  * This operates like _tolower on upper case letters, but also works
  * correctly on lower case letters.

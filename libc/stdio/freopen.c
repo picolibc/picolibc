@@ -61,7 +61,7 @@ freopen(const char *pathname, const char *mode, FILE *stream)
     } else
         fd = (int)(intptr_t)(pf->ptr);
 
-    fflush(stream);
+    (void)__fflush_locked(stream);
 
     __bufio_lock(stream);
 

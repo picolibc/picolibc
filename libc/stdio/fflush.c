@@ -54,8 +54,6 @@ fflush(FILE *stream)
     }
 #endif
     __flockfile(stream);
-    if (stream->flush)
-        ret = (stream->flush)(stream);
-    __atomic_store_ungetc(&stream->unget, 0);
+    ret = __fflush_locked(stream);
     __funlock_return(stream, ret);
 }
