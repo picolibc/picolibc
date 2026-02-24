@@ -112,8 +112,8 @@ __retarget_lock_acquire(_LOCK_T lock)
 void
 __retarget_lock_acquire_recursive(_LOCK_T lock)
 {
-    assert(lock->val >= 0);
-    ++(lock->val);
+    assert(lock->val == 0);
+    lock->val = 1;
 }
 
 /* Release non-recursive lock */
@@ -128,8 +128,8 @@ __retarget_lock_release(_LOCK_T lock)
 void
 __retarget_lock_release_recursive(_LOCK_T lock)
 {
-    assert(lock->val > 0);
-    --(lock->val);
+    assert(lock->val == 1);
+    lock->val = 0;
 }
 
 __attribute__((destructor)) static void
