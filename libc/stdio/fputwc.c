@@ -41,18 +41,17 @@ __STDIO_UNLOCKED(putwc)(wchar_t c, FILE *stream)
     } u;
     unsigned i;
 
-    __flockfile(stream);
     stream->flags |= __SWIDE;
 
     if ((stream->flags & __SWR) == 0)
-        __funlock_return(stream, WEOF);
+        return WEOF;
 
     u.wc = c;
     for (i = 0; i < sizeof(wchar_t); i++)
         if (stream->put(u.c[i], stream) < 0)
-            __funlock_return(stream, WEOF);
+            return WEOF;
 
-    __funlock_return(stream, (wint_t)c);
+    return (wint_t)c;
 }
 
 #ifdef __STDIO_LOCKING
