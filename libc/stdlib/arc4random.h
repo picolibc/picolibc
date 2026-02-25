@@ -37,9 +37,6 @@
 #include <sys/lock.h>
 #include <signal.h>
 
-#define _ARC4_LOCK()   __LIBC_LOCK()
-#define _ARC4_UNLOCK() __LIBC_UNLOCK()
-
 #ifdef _ARC4RANDOM_DATA
 _ARC4RANDOM_DATA
 #else
