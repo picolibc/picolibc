@@ -194,16 +194,16 @@ arc4random(void)
 {
     uint32_t val;
 
-    _ARC4_LOCK();
+    __LIBC_LOCK();
     _rs_random_u32(&val);
-    _ARC4_UNLOCK();
+    __LIBC_UNLOCK();
     return val;
 }
 
 void
 arc4random_buf(void *buf, size_t n)
 {
-    _ARC4_LOCK();
+    __LIBC_LOCK();
     _rs_random_buf(buf, n);
-    _ARC4_UNLOCK();
+    __LIBC_UNLOCK();
 }
