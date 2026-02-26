@@ -102,37 +102,15 @@ strcmp:
 .Lmismatch:
   # words don't match, but a2 has no null byte.
   #if __riscv_zbb
-    xor a4, a2, a3              # find differing bits
-
-    # Check system endianness
-    # If little-endian, use Count Trailing Zeros (ctz)
-    # If big-endian, use Count Leading Zeros (clz)
-    # This helps identify the position of the first differing byte between a2 and a3.
-
-    # For example, in little-endian, least significant byte comes first.
-    # So trailing zeros help find which byte position differs.
-
-    # In big-endian, most significant byte comes first, so leading zeros are used.
-    # The position will then be used to extract the differing byte.
-
+    # this is an implementation from  Chapter 29 of
+    # Volume I: RISC-V Unprivileged ISA Specification
     #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
-      ctz a5, a4
-    #else
-      clz a5, a4
+      rev8  a2, a2
+      rev8  a3, a3
     #endif
-
-    andi a5, a5, -8             # find position of bit offset to the start of the byte where the first difference occurs
-
-
-    # Shift a2 and a3 right by a5 bits to bring the target byte to the LSB, and isolate the byte of interest
-    srl a2, a2, a5
-    and a2, a2, 0xff
-
-    srl a3, a3, a5
-    and a3, a3, 0xff
-
-
-    sub a0, a2, a3              # Calculate and return the difference in the isolated bytes
+    sltu a0, a2, a3
+    neg  a0, a0
+    ori  a0, a0, 1
     ret
 
   #else
