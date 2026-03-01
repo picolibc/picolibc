@@ -68,6 +68,13 @@ __malloc_free(void *free_p)
         size_t expect = BUCKET_SIZE(bucket);
         if (s == expect) {
             p = &__malloc_bucket_list[bucket];
+            /* Check for double free in bucket list */
+            for (c = *p; c != NULL; c = c->next) {
+                if (c == p_to_free) {
+                    errno = ENOMEM;
+                    goto unlock;
+                }
+            }
             p_to_free->next = *p;
             *p = p_to_free;
             goto unlock;
