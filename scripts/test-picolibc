@@ -18,17 +18,11 @@ for arch in aarch64 arm riscv; do
     $test mkdir -p $DIR
     $test cd $DIR
 
-    if [ $arch = aarch64 ]; then
-	conf=$arch-none-elf
-    else
-	conf=$arch
-    fi
-
     echo '###################################'
-    echo '####' ../../scripts/do-$conf-configure $stdoptions
+    echo '####' ../../scripts/do-$arch-configure $stdoptions
     echo '###################################'
 
-    $test ../../scripts/do-$conf-configure $stdoptions
+    $test ../../scripts/do-$arch-configure $stdoptions
 
     $test ninja
     $test meson test -t 10
