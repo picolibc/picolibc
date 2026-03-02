@@ -164,8 +164,9 @@ else
   have_cplusplus = false
 endif
 
+# Malloc settings
+
 enable_malloc = get_option('enable-malloc')
-malloc_clear_freed = get_option('malloc-clear-freed')
 internal_heap = get_option('internal-heap')
 
 # Figure out what flags the linker supports
@@ -1460,8 +1461,9 @@ conf_data.set('__STDIO_EXIT_FLUSH', get_option('stdio-exit-flush'))
 conf_data.set('__ASSERT_VERBOSE', get_option('assert-verbose'), description: 'assert() is verbose by default')
 conf_data.set('__SINGLE_THREAD', get_option('single-thread'), description: 'Disable multi-thread support')
 conf_data.set('__HAVE_FCNTL', get_option('have-fcntl'), description: 'System provides fcntl function')
-conf_data.set('__MALLOC_CLEAR_FREED', malloc_clear_freed)
+conf_data.set('__MALLOC_CLEAR_FREED', get_option('malloc-clear-freed'))
 conf_data.set('__MALLOC_SMALL_BUCKET', get_option('malloc-small-bucket'))
+conf_data.set('__MALLOC_ERROR_ABORT', get_option('malloc-error-abort'))
 if internal_heap != 0
   conf_data.set('__INTERNAL_HEAP', internal_heap)
 endif

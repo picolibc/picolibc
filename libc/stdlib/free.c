@@ -27,7 +27,6 @@
  */
 
 #include "local-malloc.h"
-#include <assert.h>
 
 /*
  * Algorithm:
@@ -49,6 +48,9 @@ __malloc_free(void *free_p)
 
     p_to_free = ptr_to_chunk(free_p);
 
+    if (!_check_busy(p_to_free, "free: double free\n"))
+        return;
+
 #ifdef __MALLOC_CLEAR_FREED
     memset(p_to_free, 0, chunk_usable(p_to_free));
 #else
@@ -58,6 +60,8 @@ __malloc_free(void *free_p)
 #if MALLOC_DEBUG
     __malloc_validate_chunk(p_to_free);
 #endif
+
+    _mark_free(p_to_free);
 
     MALLOC_LOCK;
 

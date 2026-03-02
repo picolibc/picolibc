@@ -171,6 +171,7 @@ malloc(size_t s)
                     chunk_t *s = (chunk_t *)((char *)c + alloc_size);
                     _set_size(c, alloc_size);
                     _set_size(s, rem);
+                    _mark_free(s);
 
 #if __MALLOC_SMALL_BUCKET
                     /*
@@ -226,6 +227,8 @@ malloc(size_t s)
 
     MALLOC_UNLOCK;
 
+    _mark_busy(c);
+
     ptr = chunk_to_ptr(c);
 
     memset(ptr, '\0', alloc_size - MALLOC_HEAD_SIZE);
@@ -260,6 +263,7 @@ __malloc_validate(void)
     chunk_t *c;
 
     for (c = __malloc_free_list; c; c = c->next) {
+        assert(_is_free(c));
         __malloc_validate_chunk(c);
 #if __MALLOC_SMALL_BUCKET
         size_t s = _size(c);
@@ -275,6 +279,7 @@ __malloc_validate(void)
 
     for (b = 0; b < NUM_BUCKET_POT; b++) {
         for (c = __malloc_bucket_list[b]; c; c = c->next) {
+            assert(_is_free(c));
             __malloc_validate_chunk(c);
             assert(_size(c) == BUCKET_SIZE(b));
         }

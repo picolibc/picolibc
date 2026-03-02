@@ -50,11 +50,15 @@ realloc(void *ptr, size_t size)
         return NULL;
     }
 
+    if (!_check_busy(ptr, "realloc: already freed\n"))
+        return NULL;
+
     size_t   new_size = chunk_size(size);
 
     chunk_t *p_to_realloc = ptr_to_chunk(ptr);
 
 #if MALLOC_DEBUG
+    assert(!_is_free(p_to_realloc));
     __malloc_validate_chunk(p_to_realloc);
 #endif
 

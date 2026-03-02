@@ -32,6 +32,7 @@
  */
 
 #define _DEFAULT_SOURCE
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -67,7 +68,7 @@
 #endif
 #endif
 
-// #define MALLOC_DEBUG 1
+#define MALLOC_DEBUG 1
 
 #if __STDC_VERSION__ >= 201112L
 typedef max_align_t align_chunk_t;
@@ -142,10 +143,28 @@ _size_ref(chunk_t *chunk)
     return (size_t *)((char *)chunk - MALLOC_HEAD_SIZE);
 }
 
+static inline void
+_mark_free(chunk_t *c)
+{
+    *_size_ref(c) |= 1;
+}
+
+static inline void
+_mark_busy(chunk_t *c)
+{
+    *_size_ref(c) &= ~(size_t)1;
+}
+
+static inline bool
+_is_free(chunk_t *c)
+{
+    return *_size_ref(c) & 1;
+}
+
 static inline size_t
 _size(chunk_t *chunk)
 {
-    return *_size_ref(chunk);
+    return *_size_ref(chunk) & ~(size_t)1;
 }
 
 static inline void
@@ -153,6 +172,15 @@ _set_size(chunk_t *chunk, size_t size)
 {
     *_size_ref(chunk) = size;
 }
+
+#ifdef __MALLOC_ERROR_ABORT
+__noreturn bool __malloc_error(const char *msg);
+#define _check_busy(c, msg) (_is_free(c) ? __malloc_error(msg) : true)
+#define _check_free(c, msg) (!_is_free(c) ? __malloc_error(msg) : true)
+#else
+#define _check_busy(c, msg) (!_is_free(c) ? true : (errno = ENOMEM, false))
+#define _check_free(c, msg) (_is_free(c) ? true : (errno = ENOMEM, false))
+#endif
 
 #if MALLOC_DEBUG
 void __malloc_validate(void);

@@ -38,6 +38,7 @@ malloc_srcs_stdlib = [
   'getpagesize.c',
   'mallinfo.c',
   'malloc.c',
+  'malloc-error.c',
   'malloc-stats.c',
   'malloc-usable-size.c',
   'mallopt.c',

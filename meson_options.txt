@@ -219,6 +219,8 @@ option('internal-heap', type: 'integer', value: 0,
        description: 'provide internal static heap')
 option('malloc-small-bucket', type: 'integer', value: 0,
        description: 'use fixed bucket sizes for allocations no larger than this')
+option('malloc-error-abort', type: 'boolean', value: false,
+       description: 'Abort when malloc usage errors are detected')
 
 #
 # Locking options
