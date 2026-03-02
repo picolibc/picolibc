@@ -306,7 +306,7 @@ __sigfillset(sigset_t *what)
 
 #define sigfillset(what) __sigfillset(what)
 
-int sigismember(const sigset_t *, int);
+int sigismember(const sigset_t *, int) __nonnull((1));
 
 static __inline int
 __sigismember(const sigset_t *what, int sig)
@@ -322,6 +322,7 @@ _sig_func_ptr __fallback_signal(int, _sig_func_ptr);
 #if __POSIX_VISIBLE
 int sigpending(sigset_t *);
 int sigprocmask(int, const sigset_t *, sigset_t *);
+int __fallback_sigprocmask(int, const sigset_t *, sigset_t *);
 #endif
 #if __POSIX_VISIBLE >= 199309L
 int sigqueue(__pid_t, int, const union sigval);
@@ -340,6 +341,53 @@ int sigwaitinfo(const sigset_t *, siginfo_t *);
 #endif
 #if __MISC_VISIBLE
 int str2sig(const char * __restrict, int * __restrict);
+#endif
+
+#if __GNU_VISIBLE
+
+int sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right) __nonnull((1, 2, 3));
+
+static __inline int
+__sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
+{
+    *dest = *left & *right;
+    return 0;
+}
+
+#define sigandset(d, l, r) __sigandset(d, l, r)
+
+int sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right) __nonnull((1, 2, 3));
+
+static __inline int
+__sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
+{
+    *dest = *left | *right;
+    return 0;
+}
+
+#define sigorset(d, l, r) __sigorset(d, l, r)
+
+int signotset(sigset_t *dest, const sigset_t *left) __nonnull((1, 2));
+
+static __inline int
+__signotset(sigset_t *dest, const sigset_t *left)
+{
+    *dest = ~(*left);
+    return 0;
+}
+
+#define signotset(d, l) __signotset(d, l)
+
+int sigisemptyset(const sigset_t *set) __nonnull((1));
+
+static __inline int
+__sigisemptyset(const sigset_t *set)
+{
+    return *set == 0;
+}
+
+#define sigisemptyset(s) __sigisemptyset(s)
+
 #endif
 
 _END_STD_C
