@@ -11,6 +11,101 @@
 
 #include "rv_string.h"
 
+#ifdef _MACHINE_RISCV_MEMMOVE_VECTOR_
+.section .text.memmove
+.global memmove
+.type memmove, @function
+.option push
+.option arch, +zve32x
+memmove:
+  beqz   a2, .Ldone_move          /* n == 0 */
+  beq    a0, a1, .Ldone_move      /* dst == src */
+
+  /* overlap check */
+  bgeu   a1, a0, .Lforward_move   /* src >= dst then forward move */
+  sub    t2, a0, a1               /* t2 = dst - src */
+  bgeu   t2, a2, .Lforward_move   /* no overlap then forward move */
+
+  /* backward move */
+  add    t0, a0, a2               /* running dst_end */
+  add    t1, a1, a2               /* running src_end */
+  /* Align dst_end to SZREG: skip when __riscv_misaligned_fast, else align */
+#ifndef __riscv_misaligned_fast
+  /* process small data directly with vectors, no alignment optimization */
+  li     t3, 32
+  bltu   a2, t3, .Lbackward_loop
+
+#if __riscv_xlen == 64
+  andi   t2, t0, 7                /* misalignment = dst_end & 7 */
+#else
+  andi   t2, t0, 3                /* misalignment = dst_end & 3 */
+#endif
+  beqz   t2, .Lbackward_aligned   /* already aligned */
+  /* copy tail bytes to reach aligned dst_end */
+  vsetvli t3, t2, e8, m8, ta, ma
+  sub    t0, t0, t3
+  sub    t1, t1, t3
+  vle8.v v0, (t1)
+  vse8.v v0, (t0)
+  sub    a2, a2, t3
+.Lbackward_aligned:
+#endif
+.Lbackward_loop:
+  vsetvli t3, a2, e8, m8, ta, ma   /* t3 = vl (bytes) */
+  sub    t0, t0, t3
+  sub    t1, t1, t3
+  vle8.v v0, (t1)
+  vse8.v v0, (t0)
+  sub    a2, a2, t3
+  bnez   a2, .Lbackward_loop
+  ret
+
+  /* forward move, same as memcpy */
+.Lforward_move:
+  mv     t0, a0                   /* running dst */
+  mv     t1, a1                   /* running src */
+  /* Align dst to SZREG: skip when __riscv_misaligned_fast, else align */
+#ifndef __riscv_misaligned_fast
+  /* process small data directly with vectors, no alignment optimization */
+  li     t3, 32
+  bltu   a2, t3, .Lforward_loop
+
+#if __riscv_xlen == 64
+  andi   t2, t0, 7                /* t2 = dst & 7 */
+  beqz   t2, .Lforward_aligned    /* already aligned to 8 bytes */
+  li     t4, 8
+  sub    t2, t4, t2               /* pad = 8 - (dst & 7) */
+#else
+  andi   t2, t0, 3                /* t2 = dst & 3 */
+  beqz   t2, .Lforward_aligned    /* already aligned to 4 bytes */
+  li     t4, 4
+  sub    t2, t4, t2               /* pad = 4 - (dst & 3) */
+#endif
+  /* copy prologue using vectors */
+  vsetvli t3, t2, e8, m8, ta, ma
+  vle8.v v0, (t1)
+  vse8.v v0, (t0)
+  add    t0, t0, t3
+  add    t1, t1, t3
+  sub    a2, a2, t3
+.Lforward_aligned:
+#endif
+.Lforward_loop:
+  vsetvli t3, a2, e8, m8, ta, ma
+  vle8.v v0, (t1)
+  vse8.v v0, (t0)
+  add    t0, t0, t3
+  add    t1, t1, t3
+  sub    a2, a2, t3
+  bnez   a2, .Lforward_loop
+  /* fallthrough */
+
+.Ldone_move:
+  ret
+  .size memmove, .-memmove
+  .option pop
+#endif /* _MACHINE_RISCV_MEMMOVE_VECTOR_ */
+
 #ifdef _MACHINE_RISCV_MEMMOVE_ASM_
 .section .text.memmove
 .global memmove

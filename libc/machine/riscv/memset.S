@@ -60,6 +60,26 @@ memset:
 .Ldone:
   ret
 
+#elif defined(__riscv_vector)
+.option push
+.option arch, +zve32x
+  mv     t0, a0                    /* running dst; keep a0 as return */
+  beqz   a2, .Ldone_set            /* n == 0 then return */
+
+  /* Broadcast fill byte once. */
+  vsetvli t1, zero, e8, m8, ta, ma
+  vmv.v.x v0, a1
+
+.Lbulk_set:
+  vsetvli t1, a2, e8, m8, ta, ma   /* t1 = vl (bytes) */
+  vse8.v v0, (t0)
+  add    t0, t0, t1
+  sub    a2, a2, t1
+  bnez   a2, .Lbulk_set
+.Ldone_set:
+  ret
+.option pop
+
 #else
   li     REG_TABLE, BYTE_TBL_SZ
   mv     a3, a0
