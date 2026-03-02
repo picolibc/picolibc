@@ -62,6 +62,11 @@ lseek(int fd, off_t offset, int whence)
 
     offset += file_offset;
 
+    /* file offset is out of range, only 32bit offsets are supported right now */
+    if (offset > INT32_MAX || offset < INT32_MIN) {
+        errno = EINVAL;
+        return -1;
+    }
     int args[] = { fd, offset };
     int retval = hexagon_semihost(SYS_SEEK, args);
     return retval;
