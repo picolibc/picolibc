@@ -35,29 +35,46 @@
 
 #include "local-signal.h"
 
-#ifndef __weak_reference
-#define __fallback_signal      signal
-#define __fallback_raise       raise
-#define __fallback_sigprocmask sigprocmask
-#endif
-
-_sig_func_ptr _sig_func[_NSIG];
-sigset_t      _sig_mask;
-sigset_t      _sig_pending;
-
-_sig_func_ptr
-__fallback_signal(int sig, _sig_func_ptr func)
+int
+__fallback_raise(int sig)
 {
     if (sig < 0 || sig >= _NSIG) {
         errno = EINVAL;
-        return SIG_ERR;
+        return -1;
     }
 
-    _sig_func_ptr old = _sig_func[sig];
-    _sig_func[sig] = func;
-    return old;
+    /* Mark signal as pending */
+    sigaddset(&_sig_pending, sig);
+
+    /* Keep processing until the signal is no longer pending */
+    while (sigismember(&_sig_pending, sig)) {
+
+        /* If signal is currently blocked, don't deliver it */
+        if (sigismember(&_sig_mask, sig))
+            break;
+
+        /* Mark signal as no longer pending */
+        sigdelset(&_sig_pending, sig);
+
+        _sig_func_ptr func = _sig_func[sig];
+
+        if (func == SIG_IGN)
+            break;
+        else if (func == SIG_DFL)
+            _exit(128 + sig);
+
+        /* Block signal while the handler is active */
+        sigaddset(&_sig_mask, sig);
+
+        /* Invoke the handler */
+        (*func)(sig);
+
+        sigdelset(&_sig_mask, sig);
+    }
+
+    return 0;
 }
 
 #ifdef __weak_reference
-__weak_reference(__fallback_signal, signal);
+__weak_reference(__fallback_raise, raise);
 #endif

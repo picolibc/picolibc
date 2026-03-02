@@ -45,8 +45,10 @@ if(DEFINED OS_FALLBACK)
     getpid.c
     kill.c
     pathconf.c
+    raise.c
     sbrk.c
     signal.c
+    sigprocmask.c
     sysconf.c
     )
 else()
@@ -55,8 +57,10 @@ else()
     getpid.c
     kill.c
     pathconf.c
+    raise.c
     sbrk.c
     signal.c
+    sigprocmask.c
     sysconf.c
     )
 endif()

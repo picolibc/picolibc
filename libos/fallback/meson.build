@@ -38,8 +38,10 @@ srcs_os_fallback = [
   'getpid.c',
   'kill.c',
   'pathconf.c',
+  'raise.c',
   'sbrk.c',
   'signal.c',
+  'sigprocmask.c',
   'sysconf.c',
   ]
 

@@ -33,31 +33,16 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-signal.h"
+#ifndef _LOCAL_SIGNAL_H_
+#define _LOCAL_SIGNAL_H_
 
-#ifndef __weak_reference
-#define __fallback_signal      signal
-#define __fallback_raise       raise
-#define __fallback_sigprocmask sigprocmask
-#endif
+#define _GNU_SOURCE
+#include <errno.h>
+#include <signal.h>
+#include <unistd.h>
 
-_sig_func_ptr _sig_func[_NSIG];
-sigset_t      _sig_mask;
-sigset_t      _sig_pending;
+extern _sig_func_ptr _sig_func[_NSIG];
+extern sigset_t      _sig_mask;
+extern sigset_t      _sig_pending;
 
-_sig_func_ptr
-__fallback_signal(int sig, _sig_func_ptr func)
-{
-    if (sig < 0 || sig >= _NSIG) {
-        errno = EINVAL;
-        return SIG_ERR;
-    }
-
-    _sig_func_ptr old = _sig_func[sig];
-    _sig_func[sig] = func;
-    return old;
-}
-
-#ifdef __weak_reference
-__weak_reference(__fallback_signal, signal);
-#endif
+#endif /* _LOCAL_SIGNAL_H_ */

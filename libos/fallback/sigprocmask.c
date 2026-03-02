@@ -35,29 +35,32 @@
 
 #include "local-signal.h"
 
-#ifndef __weak_reference
-#define __fallback_signal      signal
-#define __fallback_raise       raise
-#define __fallback_sigprocmask sigprocmask
-#endif
-
-_sig_func_ptr _sig_func[_NSIG];
-sigset_t      _sig_mask;
-sigset_t      _sig_pending;
-
-_sig_func_ptr
-__fallback_signal(int sig, _sig_func_ptr func)
+int
+__fallback_sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
 {
-    if (sig < 0 || sig >= _NSIG) {
+    if (oldset != NULL)
+        *oldset = _sig_mask;
+    if (set == NULL)
+        return 0;
+    sigset_t set_inv;
+    switch (how) {
+    case SIG_BLOCK:
+        sigorset(&_sig_mask, &_sig_mask, set);
+        break;
+    case SIG_UNBLOCK:
+        signotset(&set_inv, set);
+        sigandset(&_sig_mask, &_sig_mask, &set_inv);
+        break;
+    case SIG_SETMASK:
+        _sig_mask = *set;
+        break;
+    default:
         errno = EINVAL;
-        return SIG_ERR;
+        return -1;
     }
-
-    _sig_func_ptr old = _sig_func[sig];
-    _sig_func[sig] = func;
-    return old;
+    return 0;
 }
 
 #ifdef __weak_reference
-__weak_reference(__fallback_signal, signal);
+__weak_reference(__fallback_sigprocmask, sigprocmask);
 #endif
