@@ -39,12 +39,24 @@ SUCH DAMAGE.
 #define _SETJMP_H_
 
 #include <sys/cdefs.h>
+#include <sys/_sigset.h>
 #include <machine/setjmp.h>
 
 _BEGIN_STD_C
 
+typedef struct {
+    int        savesigs;
+    __sigset_t sigs;
+    jmp_buf    jmpb;
+} sigjmp_buf[1];
+
 __noreturn void     longjmp(jmp_buf __jmpb, int __retval);
 __returns_twice int setjmp(jmp_buf __jmpb);
+void                __sigjmp_getsigs(sigjmp_buf jmpb, int savesigs);
+void                __sigjmp_setsigs(sigjmp_buf jmpb);
+
+#define sigsetjmp(__e, __s)  (__sigjmp_getsigs((__e), (__s)), setjmp((__e)[0].jmpb))
+#define siglongjmp(__e, __v) (__sigjmp_setsigs((__e)), longjmp((__e)[0].jmpb, (__v)))
 
 _END_STD_C
 
