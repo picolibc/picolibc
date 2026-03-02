@@ -35,6 +35,7 @@
 
 tests = [
   'test-atexit',
+  'test-double-free',
   'test-efcvt',
   'test-malloc',
   'test-malloc-stress',
