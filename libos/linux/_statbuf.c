@@ -46,10 +46,8 @@ _statbuf(struct stat *statbuf, const struct __kernel_statx *statxbuf)
     statbuf->st_gid = statxbuf->stx_gid;
     statbuf->st_rdev = (statxbuf->stx_rdev_major << 8) | (statxbuf->stx_rdev_minor);
     statbuf->st_size = statxbuf->stx_size;
-#ifdef _STAT_HAS_ST_BLKSIZE
     statbuf->st_blksize = statxbuf->stx_blksize;
     statbuf->st_blocks = statxbuf->stx_blocks;
-#endif
     SIMPLE_MAP_STATX_TIMESTAMP(&statbuf->st_atim, &statxbuf->stx_atime);
     SIMPLE_MAP_STATX_TIMESTAMP(&statbuf->st_mtim, &statxbuf->stx_mtime);
     SIMPLE_MAP_STATX_TIMESTAMP(&statbuf->st_ctim, &statxbuf->stx_ctime);
