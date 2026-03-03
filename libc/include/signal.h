@@ -261,7 +261,7 @@ int sigaddset(sigset_t *, const int);
 static inline int
 __sigaddset(sigset_t *what, int sig)
 {
-    *what |= 1 << sig;
+    *what |= (sigset_t)1 << sig;
     return 0;
 }
 
