@@ -29,10 +29,12 @@
 
 #include "local-stdio.h"
 
+#undef ungetwc
+#undef ungetwc_unlocked
+
 wint_t
-ungetwc(wint_t c, FILE *stream)
+__STDIO_UNLOCKED(ungetwc)(wint_t c, FILE *stream)
 {
-    __flockfile(stream);
     /*
      * Streams that are not readable, or streams that already had
      * had an ungetc() before will cause an error.
@@ -40,12 +42,35 @@ ungetwc(wint_t c, FILE *stream)
      * ungetwc(WEOF, ...) causes an error per definition.
      */
     if ((stream->flags & __SRD) == 0 || c == WEOF)
-        __funlock_return(stream, WEOF);
+        return WEOF;
 
     if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t)c + 1))
-        __funlock_return(stream, WEOF);
+        return WEOF;
 
     stream->flags &= ~__SEOF;
 
-    __funlock_return(stream, c);
+    return c;
 }
+
+
+#ifdef __STDIO_LOCKING
+wint_t
+ungetwc(wint_t c, FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = ungetwc_unlocked(c, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#else
+#ifdef __strong_reference
+__strong_reference(ungetwc, ungetwc_unlocked);
+#else
+wint_t
+ungetwc_unlocked(wint_t c, FILE *stream)
+{
+    return ungetwc(c, stream);
+}
+#endif
+#endif

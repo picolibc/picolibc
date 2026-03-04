@@ -101,6 +101,7 @@ wint_t btowc(int);
 wint_t fgetwc(__FILE *);
 #if __GNU_VISIBLE
 wint_t fgetwc_unlocked(__FILE *);
+wint_t ungetwc_unlocked(wint_t, __FILE *);
 #endif
 wchar_t *fgetws(wchar_t * __restrict, int, __FILE * __restrict);
 #if __GNU_VISIBLE
