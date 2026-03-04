@@ -35,12 +35,11 @@
 
 #include "local-stdio.h"
 
-FILE *__stdio_file_list;
-bool  __stdio_atexit;
-
 #ifdef __STDIO_EXIT_FLUSH
 
-void
+FILE *__stdio_file_list;
+
+static void
 _bufio_exit_flush(void)
 {
     for (;;) {
@@ -54,6 +53,12 @@ _bufio_exit_flush(void)
             break;
         fflush(f);
     }
+}
+
+__attribute__((constructor)) static void
+_bufio_exit_register(void)
+{
+    atexit(_bufio_exit_flush);
 }
 
 #endif

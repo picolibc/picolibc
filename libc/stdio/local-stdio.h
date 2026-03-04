@@ -220,9 +220,6 @@ bufio_get_buf_size(int fd)
 
 #ifdef __STDIO_EXIT_FLUSH
 extern FILE *__stdio_file_list;
-extern bool  __stdio_atexit;
-
-void         _bufio_exit_flush(void);
 
 static inline void
 bufio_add_file(FILE *f)
@@ -230,10 +227,6 @@ bufio_add_file(FILE *f)
     struct __file_bufio *bf = (struct __file_bufio *)f;
 
     __LIBC_LOCK();
-    if (!__stdio_atexit) {
-        __stdio_atexit = true;
-        atexit(_bufio_exit_flush);
-    }
     bf->next = __stdio_file_list;
     __stdio_file_list = &(bf->xfile.cfile.file);
     __LIBC_UNLOCK();
