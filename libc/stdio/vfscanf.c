@@ -79,7 +79,7 @@ typedef long          int_scanf_t;
 #define UCHAR uint32_t
 #endif
 #define GETC(s)      getwc_unlocked(s)
-#define UNGETC(c, s) ungetwc(c, s)
+#define UNGETC(c, s) ungetwc_unlocked(c, s)
 #define ISSPACE(c)   iswspace(c)
 #define ISALNUM(c)   iswalnum(c)
 #define IS_EOF(c)    ((c) == WEOF)
@@ -95,7 +95,7 @@ typedef long          int_scanf_t;
 #define CHAR         char
 #define UCHAR        unsigned char
 #define GETC(s)      getc_unlocked(s)
-#define UNGETC(c, s) ungetc(c, s)
+#define UNGETC(c, s) ungetc_unlocked(c, s)
 #define ISSPACE(c)   isspace(c)
 #define ISALNUM(c)   isalnum(c)
 #define STRCHR(s, c) strchr(s, c)
