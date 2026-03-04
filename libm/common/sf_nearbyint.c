@@ -9,6 +9,7 @@
  * ====================================================
  */
 
+#define _GNU_SOURCE
 #include <math.h>
 #include "fdlibm.h"
 
@@ -17,12 +18,13 @@ nearbyintf(float x)
 {
     if (isnan(x))
         return x + x;
-#if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
+#if defined(FE_INEXACT)
     fenv_t env;
     fegetenv(&env);
+    fedisableexcept(FE_INEXACT);
 #endif
     x = rintf(x);
-#if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
+#if defined(FE_INEXACT)
     fesetenv(&env);
 #endif
     return x;
