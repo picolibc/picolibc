@@ -141,6 +141,16 @@ if has_crt0_linux and get_option('os-linux')
   }
 endif
 
+if host_cpu_family == 'riscv'
+  # A CRT0 Semihosting variant with Smrnmi support
+  picocrt_variants += {
+    'name': 'semihost-smrnmi',
+    'suffix': '-semihost-smrnmi',
+    'c_args': ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SMRNMI'],
+    'src': src_picocrt,
+  }
+endif
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
