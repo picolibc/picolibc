@@ -61,7 +61,7 @@ floorl(long double x)
                 if (jj0 == 48)
                     i0 += 1;
                 else {
-                    j = i1 + (1LL << (112 - jj0));
+                    j = i1 + (1ULL << (112 - jj0));
                     if (j < (u_int64_t)i1)
                         i0 += 1; /* got a carry */
                     i1 = j;
