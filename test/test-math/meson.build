@@ -65,13 +65,16 @@ tests_real_exp = [
 
 tests_real_other = [
   'test-cbrt',
+  'test-ceil',
   'test-erf',
   'test-erfc',
+  'test-floor',
   'test-hypot',
   'test-j0',
   'test-j1',
   'test-jn',
   'test-lgamma',
+  'test-round',
   'test-sqrt',
   'test-tgamma'
 ]

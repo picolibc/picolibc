@@ -22,13 +22,16 @@ test-log1p.h
 test-log2.h
 test-pow.h
 test-cbrt.h
+test-ceil.h
 test-erf.h
 test-erfc.h
+test-floor.h
 test-hypot.h
 test-j0.h
 test-j1.h
 test-jn.h
 test-lgamma.h
+test-round.h
 test-sqrt.h
 test-tgamma.h
 test-cacos.h
