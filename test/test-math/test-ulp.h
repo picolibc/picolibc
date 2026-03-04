@@ -72,8 +72,10 @@ static TEST_CONST math_ulps_t math_ulps[] = {
 
     /* Misc functions */
     { .name = "cbrt",       .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
+    { .name = "ceil",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "erf",        .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "erfc",       .b32 = 3,       .b64 = 1,       .b80 = 2,       .b128 = 2       },
+    { .name = "floor",      .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "hypot",      .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "j0",         .b32 = MAX_ULP, .b64 = 42,      .b80 = 0,       .b128 = 0       },
     { .name = "j1",         .b32 = MAX_ULP, .b64 = 1,       .b80 = 0,       .b128 = 0       },
@@ -82,6 +84,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "y1",         .b32 = MAX_ULP, .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "yn",         .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "lgamma",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
+    { .name = "round",      .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
 #if defined(__riscv_float_abi_soft) || defined(__clang__)
     { .name = "sqrt",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 1       },
 #elif defined(__m68k__) && FLT_EVAL_METHOD != 0
@@ -182,9 +185,12 @@ static TEST_CONST math_ulps_t math_ulps[] = {
 
     /* Misc functions */
     { .name = "cbrt", .b32 = 0, .b64 = 2, .b80 = 1, .b128 = 1 },
+    { .name = "ceil", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "erf", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "erfc", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
+    { .name = "floor", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "hypot", .b32 = 0, .b64 = 1, .b80 = 0, .b128 = 1 },
+    { .name = "round", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "j0", .b32 = 9, .b64 = 32, .b80 = 13, .b128 = 25 },
     { .name = "j1", .b32 = 9, .b64 = 1, .b80 = 3, .b128 = 2 },
     { .name = "jn", .b32 = 2, .b64 = 2, .b80 = 3, .b128 = 3 },
