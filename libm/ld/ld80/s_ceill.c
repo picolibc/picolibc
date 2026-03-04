@@ -73,10 +73,16 @@ ceill(long double x)
                 if (jj0 == 31)
                     i0 += 1;
                 else {
-                    j = i1 + (1 << (63 - jj0));
+                    j = i1 + ((u_int32_t)1 << (63 - jj0));
                     if (j < (u_int32_t)i1)
                         i0 += 1; /* got a carry */
                     i1 = j;
+                }
+                /* overflow */
+                if (i0 == 0) {
+                    i0 = (u_int32_t)1 << 31;
+                    se++;
+                    i1 >>= 1;
                 }
             }
             i1 &= (~i);
