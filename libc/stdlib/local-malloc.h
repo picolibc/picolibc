@@ -68,7 +68,7 @@
 #endif
 #endif
 
-#define MALLOC_DEBUG 1
+// #define MALLOC_DEBUG 1
 
 #if __STDC_VERSION__ >= 201112L
 typedef max_align_t align_chunk_t;
