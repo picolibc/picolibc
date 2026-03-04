@@ -1,3 +1,5 @@
+{ .x = REAL(FN32(0x1p-24), FN64(0x1p-24), FN80(0x1p-24), FN128(0x1p-24)), .y = REAL(FN32(0x1.000002p0), FN64(0x1.0000010000008p0), FN80(0x1.0000010000008p0), FN128(0x1.0000010000008000002aaaaab555p0)) },
+{ .x = REAL(FN32(0x1.fefe02p-16), FN64(0x1.fefe02p-16), FN80(0x1.fefe02p-16), FN128(0x1.fefe02p-16)), .y = REAL(FN32(0x1.0001fep0), FN64(0x1.0001fefffffdep0), FN80(0x1.0001fefffffdd954p0), FN128(0x1.0001fefffffdd953027f9648617p0)) },
 { .x = REAL(FN32(0x1.b38fb8p-127), FN64(0x1.b38fb9daa78e4p-127), FN80(0x1.b38fb9daa78e44acp-127), FN128(0x1.b38fb9daa78e44ab2dcf7a6b1921p-127)), .y = REAL(FN32(0x1p0), FN64(0x1p0), FN80(0x1p0), FN128(0x1p0)) },
 { .x = REAL(FN32(-0x1.b38fb8p-127), FN64(-0x1.b38fb9daa78e4p-127), FN80(-0x1.b38fb9daa78e44acp-127), FN128(-0x1.b38fb9daa78e44ab2dcf7a6b1921p-127)), .y = REAL(FN32(0x1p0), FN64(0x1p0), FN80(0x1p0), FN128(0x1p0)) },
 { .x = REAL(FN32(0x1.46abccp-126), FN64(0x1.46abcb63fdaabp-126), FN80(0x1.46abcb63fdaab38p-126), FN128(0x1.46abcb63fdaab380625b9bd052d8p-126)), .y = REAL(FN32(0x1p0), FN64(0x1p0), FN80(0x1p0), FN128(0x1p0)) },
