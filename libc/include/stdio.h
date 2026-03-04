@@ -508,6 +508,13 @@ int  putchar_unlocked(int);
 #endif
 #endif
 
+#if __GNU_VISIBLE
+int ungetc_unlocked(int c, FILE *) __nonnull((2));
+#ifndef __STDIO_LOCKING
+#define ungetc_unlocked(c, f) ungetc(c, f)
+#endif
+#endif
+
 #if __STDC_WANT_LIB_EXT1__ == 1
 #ifndef __STDC_LIB_EXT1__
 #define __STDC_LIB_EXT1__ 1

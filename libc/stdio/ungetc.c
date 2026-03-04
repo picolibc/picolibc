@@ -31,10 +31,12 @@
 
 #include "local-stdio.h"
 
+#undef ungetc
+#undef ungetc_unlocked
+
 int
-ungetc(int c, FILE *stream)
+__STDIO_UNLOCKED(ungetc)(int c, FILE *stream)
 {
-    __flockfile(stream);
     /*
      * Streams that are not readable, or streams that already had
      * had an ungetc() before will cause an error.
@@ -42,12 +44,34 @@ ungetc(int c, FILE *stream)
      * ungetc(EOF, ...) causes an error per definitionem.
      */
     if ((stream->flags & __SRD) == 0 || c == EOF)
-        __funlock_return(stream, EOF);
+        return EOF;
 
     if (!__atomic_compare_exchange_ungetc(&stream->unget, 0, (__ungetc_t)(unsigned char)c + 1))
-        __funlock_return(stream, EOF);
+        return EOF;
 
     stream->flags &= ~__SEOF;
 
-    __funlock_return(stream, (unsigned char)c);
+    return (unsigned char)c;
 }
+
+#ifdef __STDIO_LOCKING
+int
+ungetc(int c, FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = ungetc_unlocked(c, stream);
+    __funlockfile(stream);
+    return ret;
+}
+#else
+#ifdef __strong_reference
+__strong_reference(ungetc, ungetc_unlocked);
+#else
+int
+ungetc_unlocked(int c, FILE *stream)
+{
+    return ungetc(c, stream);
+}
+#endif
+#endif
