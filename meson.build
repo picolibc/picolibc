@@ -1761,7 +1761,7 @@ else
 endif
 
 if crt0_test_variant == 'semihost_smrnmi'
-  test_env.set('QEMU_ADD_SRNMI', 'true')
+  test_env.set('QEMU_ADD_SMRNMI', 'true')
 endif
 
 crt0_test = 'crt0_' + crt0_test_variant
