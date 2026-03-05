@@ -51,7 +51,7 @@ __STDIO_UNLOCKED(ungetc)(int c, FILE *stream)
 
     stream->flags &= ~__SEOF;
 
-    return (unsigned char) c;
+    return (unsigned char)c;
 }
 
 #ifdef __STDIO_LOCKING

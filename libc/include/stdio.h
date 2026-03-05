@@ -509,9 +509,9 @@ int  putchar_unlocked(int);
 #endif
 
 #if __GNU_VISIBLE
-int  ungetc_unlocked(int c, FILE *) __nonnull((2));
+int ungetc_unlocked(int c, FILE *) __nonnull((2));
 #ifndef __STDIO_LOCKING
-#define ungetc_unlocked(c, f)  ungetc(c, f)
+#define ungetc_unlocked(c, f) ungetc(c, f)
 #endif
 #endif
 

@@ -52,7 +52,6 @@ __STDIO_UNLOCKED(ungetwc)(wint_t c, FILE *stream)
     return c;
 }
 
-
 #ifdef __STDIO_LOCKING
 wint_t
 ungetwc(wint_t c, FILE *stream)
