@@ -1758,6 +1758,10 @@ else
   endif
 endif
 
+if crt0_test_variant == 'semihost_smrnmi'
+  test_env.set('QEMU_ADD_SRNMI', 'true')
+endif
+
 crt0_test = 'crt0_' + crt0_test_variant
 
 oslib_test = ''
