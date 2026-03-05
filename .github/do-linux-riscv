@@ -5,4 +5,5 @@ HERE=`dirname "$0"`
 "$HERE"/do-test-noopt clang-riscv "$@"
 "$HERE"/do-test-noopt clang-rv32imafdc "$@"
 "$HERE"/do-test-noopt rv32imac "$@"
+"$HERE"/do-test-noopt rv32imac -Dcrt0-test=semihost_smrnmi "$@"
 "$HERE"/do-test or1k "$@"
