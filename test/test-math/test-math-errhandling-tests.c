@@ -2631,7 +2631,36 @@ makemathname(test_pow_negbig_bigeven)(void)
 {
     return makemathname(pow)(-makemathname(big), makemathname(bigeven));
 }
-
+static FLOAT_T
+makemathname(test_pow_inf_inf)(void)
+{
+    return makemathname(pow)(makemathname(infval), makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_pow_neginf_inf)(void)
+{
+    return makemathname(pow)(-makemathname(infval), makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_pow_inf_neginf)(void)
+{
+    return makemathname(pow)(makemathname(infval), -makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_pow_neginf_neginf)(void)
+{
+    return makemathname(pow)(-makemathname(infval), -makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_pow_inf_big)(void)
+{
+    return makemathname(pow)(makemathname(infval), makemathname(big));
+}
+static FLOAT_T
+makemathname(test_pow_neginf_big)(void)
+{
+    return makemathname(pow)(-makemathname(infval), makemathname(big));
+}
 #ifndef __PICOLIBC__
 #define pow10(x)  exp10(x)
 #define pow10f(x) exp10f(x)
@@ -3436,6 +3465,12 @@ TEST_CONST struct {
     TEST(pow_negbig_bigodd, (FLOAT_T)-INFINITY, FE_OVERFLOW, ERANGE),
     TEST(pow_negsmall_negbigeven, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
     TEST(pow_negbig_bigeven, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+    TEST(pow_inf_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(pow_inf_neginf, (FLOAT_T)0, 0, 0),
+    TEST(pow_neginf_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(pow_neginf_neginf, (FLOAT_T)0, 0, 0),
+    TEST(pow_inf_big, (FLOAT_T)INFINITY, 0, 0),
+    TEST(pow_neginf_big, (FLOAT_T)INFINITY, 0, 0),
 
     TEST(pow10_qnan, (FLOAT_T)NAN, 0, 0),
     TEST(pow10_snan, (FLOAT_T)NAN, FE_INVALID, 0),
