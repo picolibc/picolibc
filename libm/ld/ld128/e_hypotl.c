@@ -93,6 +93,9 @@ hypotl(long double x, long double y)
             GET_LDOUBLE_LSW64(low, b);
             if ((hb | low) == 0)
                 return a;
+            GET_LDOUBLE_LSW64(low, a);
+            if ((ha | low) == 0)
+                return b;
             t1 = 0;
             SET_LDOUBLE_MSW64(t1, 0x7ffd000000000000LL); /* t1=2^16382 */
             b *= t1;
