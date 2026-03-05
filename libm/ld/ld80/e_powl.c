@@ -204,6 +204,30 @@ powl(long double x, long double y)
         }
     }
 
+    if (!isfinite(x)) {
+        if (x > 0) {
+            if (y > 0.0L)
+                return ((long double)INFINITY);
+            return (0.0L);
+        } else {
+            if (y > 0.0L) {
+                if (yoddint)
+                    return (-(long double)INFINITY);
+                return ((long double)INFINITY);
+            }
+            if (y < 0.0L) {
+                if (yoddint)
+                    return (-0.0L);
+                return (0.0L);
+            }
+        }
+    }
+
+    if (x == 1)
+        return (1.0L);
+    if (x == -1 && iyflg)
+        return yoddint ? -1.0L : 1.0L;
+
     /* y >= 2**80, infinity (x > 1) or zero (x < 1) */
     if (y >= 0x1p80L) {
         if (x > 1.0L)
@@ -211,9 +235,9 @@ powl(long double x, long double y)
         if (x > 0.0L && x < 1.0L)
             return (0.0L);
         if (x < -1.0L)
-            return __math_oflowl(1);
+            return __math_oflowl(yoddint);
         if (x > -1.0L && x < 0.0L)
-            return (-0.0L);
+            return yoddint ? -0.0L : 0.0L;
     }
     /* y <= -2**80, zero (x > 1) or infinity (x < 1) */
     if (y <= -0x1p80L) {
@@ -225,24 +249,6 @@ powl(long double x, long double y)
             return (0.0L);
         if (x > -1.0L && x < 0.0L)
             return ((long double)INFINITY);
-    }
-    if (x >= LDBL_MAX) {
-        if (y > 0.0L)
-            return ((long double)INFINITY);
-        return (0.0L);
-    }
-
-    if (x <= -LDBL_MAX) {
-        if (y > 0.0L) {
-            if (yoddint)
-                return (-(long double)INFINITY);
-            return ((long double)INFINITY);
-        }
-        if (y < 0.0L) {
-            if (yoddint)
-                return (-0.0L);
-            return (0.0L);
-        }
     }
 
     if (x <= 0.0L) {
