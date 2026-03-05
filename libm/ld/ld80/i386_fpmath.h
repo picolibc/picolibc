@@ -43,7 +43,6 @@ union IEEEl2bits {
 };
 
 #define LDBL_NBIT      0x80000000
-#define mask_nbit_l(u) ((u).bits.manh &= ~LDBL_NBIT)
 
 #define LDBL_MANH_SIZE 32
 #define LDBL_MANL_SIZE 32

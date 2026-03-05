@@ -34,16 +34,14 @@ fmaxl(long double x, long double y)
     if (issignalingl_inline(y))
         return y + y;
 
-    u[0].e = x;
-    mask_nbit_l(u[0]);
-    u[1].e = y;
-    mask_nbit_l(u[1]);
-
     /* Check for NaNs to avoid raising spurious exceptions. */
-    if (u[0].bits.exp == LDBL_INF_NAN_EXP && (u[0].bits.manh | u[0].bits.manl) != 0)
+    if (isnanl(x))
         return (y);
-    if (u[1].bits.exp == LDBL_INF_NAN_EXP && (u[1].bits.manh | u[1].bits.manl) != 0)
+    if (isnanl(y))
         return (x);
+
+    u[0].e = x;
+    u[1].e = y;
 
     /* Handle comparisons of signed zeroes. */
     if (u[0].bits.sign != u[1].bits.sign)

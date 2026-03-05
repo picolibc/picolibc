@@ -34,8 +34,16 @@ isnanl(long double e)
     union IEEEl2bits u;
 
     u.e = e;
-    mask_nbit_l(u);
-    return (u.bits.exp == LDBL_INF_NAN_EXP && (u.bits.manl != 0 || u.bits.manh != 0));
+#if LDBL_NBIT != 0
+#if LDBL_NBIT_INF == 0
+    /* m68k inf can have either a 1 or 0 explicit one bit */
+    if (u.bits.exp == LDBL_INF_NAN_EXP)
+        u.bits.manh |= LDBL_NBIT;
+#endif
+    if ((u.bits.manh & LDBL_NBIT) == 0 && u.bits.exp != 0)
+        return 1;
+#endif
+    return (u.bits.exp == LDBL_INF_NAN_EXP && (u.bits.manl != 0 || u.bits.manh != LDBL_NBIT));
 }
 
 #ifdef __strong_reference
