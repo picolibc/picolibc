@@ -46,6 +46,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <fenv.h>
 
 #if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -167,6 +168,9 @@ typedef complex float cbinary32;
 // #define FMT32        "% -14.8e"
 #define FMT32  "% -15.6a"
 #define P32(a) ((double)(a))
+#ifdef __FLOAT_NOEXCEPT
+#define BINARY32_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY32
@@ -231,6 +235,9 @@ typedef complex double cbinary64;
 #define FN64(a)           a
 #define FMT64             "% -23.13a"
 #define P64(a)            (a)
+#ifdef __DOUBLE_NOEXCEPT
+#define BINARY64_NOEXCEPT
+#endif
 #elif __LDBL_MANT_DIG__ == 53 && defined(_TEST_LONG_DOUBLE) && !defined(SKIP_BINARY64)
 #define HAS_BINARY64
 typedef long double         binary64;
@@ -247,6 +254,9 @@ typedef complex long double cbinary64;
 #define FN64(a)           a##l
 #define FMT64             "%La"
 #define P64(a)            (a)
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define BINARY64_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY64
@@ -316,6 +326,9 @@ typedef complex long double cbinary80;
 #define FN80(a)           a##l
 #define FMT80             "%La"
 #define P80(a)            (a)
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define BINARY80_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY80
@@ -391,6 +404,9 @@ typedef complex long double cbinary128;
 #define FN128(a)           a##l
 #define FMT128             "%La"
 #define P128(a)            (a)
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define BINARY128_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY128
@@ -437,15 +453,19 @@ culp128(cbinary128 a, cbinary128 b)
 
 #define sincos_sin 1
 #define sincos_cos 2
+#define remquo_quo 3
 
 #if TEST_FUNC == sincos_sin
 #define TEST_FUNC_SINCOS_SIN
 #elif TEST_FUNC == sincos_cos
 #define TEST_FUNC_SINCOS_COS
+#elif TEST_FUNC == remquo_quo
+#define TEST_FUNC_REMQUO_QUO
 #endif
 
 #undef sincos_sin
 #undef sincos_cos
+#undef remquo_quo
 
 #ifdef TEST_FUNC_SINCOS_SIN
 #ifdef TEST_FUNC_32
@@ -549,5 +569,96 @@ TEST_FUNC_128(binary128 x)
 #endif
 
 #endif /* TEST_FUNC_SINCOS_COS */
+
+#ifdef TEST_FUNC_REMQUO_QUO
+
+#define Q_UNSET  ((int)0x3cc3)
+
+#define QUO_MASK 0x7
+static inline int
+fix_quo(int q)
+{
+#if defined(FE_INVALID)
+    if (fetestexcept(FE_INVALID))
+        return QUO_MASK + 1;
+#else
+    if (q == Q_UNSET)
+        return QUO_MASK + 1;
+#endif
+    if (q < 0)
+        return -((-q) & QUO_MASK);
+    else
+        return q & QUO_MASK;
+}
+
+#ifdef TEST_FUNC_32
+int TEST_FUNC_32(binary32 x, binary32 y);
+
+int
+TEST_FUNC_32(binary32 x, binary32 y)
+{
+    int q = Q_UNSET;
+    feclearexcept(FE_ALL_EXCEPT);
+#if !defined(FE_INVALID) || defined(BINARY32_NOEXCEPT)
+    if (isinf(x) || y == 0)
+        return QUO_MASK + 1;
+#endif
+    (void)FN32(remquo)(x, y, &q);
+    return fix_quo(q);
+}
+#endif
+
+#ifdef HAS_BINARY64
+int TEST_FUNC_64(binary64 x, binary64 y);
+
+int
+TEST_FUNC_64(binary64 x, binary64 y)
+{
+    int q = Q_UNSET;
+    feclearexcept(FE_ALL_EXCEPT);
+#if !defined(FE_INVALID) || defined(BINARY64_NOEXCEPT)
+    if (isinf(x) || y == 0)
+        return QUO_MASK + 1;
+#endif
+    (void)FN64(remquo)(x, y, &q);
+    return fix_quo(q);
+}
+#endif
+
+#ifdef HAS_BINARY80
+int TEST_FUNC_80(binary80 x, binary80 y);
+
+int
+TEST_FUNC_80(binary80 x, binary80 y)
+{
+    int q = Q_UNSET;
+    feclearexcept(FE_ALL_EXCEPT);
+#if !defined(FE_INVALID) || defined(BINARY80_NOEXCEPT)
+    if (isinf(x) || y == 0)
+        return QUO_MASK + 1;
+#endif
+    (void)FN80(remquo)(x, y, &q);
+    return fix_quo(q);
+}
+#endif
+
+#ifdef HAS_BINARY128
+int TEST_FUNC_128(binary128 x, binary128 y);
+
+int
+TEST_FUNC_128(binary128 x, binary128 y)
+{
+    int q = Q_UNSET;
+    feclearexcept(FE_ALL_EXCEPT);
+#if !defined(FE_INVALID) || defined(BINARY128_NOEXCEPT)
+    if (isinf(x) || y == 0)
+        return QUO_MASK + 1;
+#endif
+    (void)FN128(remquo)(x, y, &q);
+    return fix_quo(q);
+}
+#endif
+
+#endif /* TEST_FUNC_REMQUO_QUO */
 
 #endif /* _TEST_MATH_H_ */

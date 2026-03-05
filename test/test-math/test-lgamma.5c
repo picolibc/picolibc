@@ -39,12 +39,12 @@ real
 lgamma(real x)
 {
 	if (x <= 0 && x == floor(x))
-		raise infinity();
+		raise infinity(false);
 	real y = 0;
 	try {
 		y = log(abs(gamma(x)));
 	} catch invalid_argument(string s, int n, poly v) {
-		raise infinity();
+		raise infinity(false);
 	}
 	return y;
 }
