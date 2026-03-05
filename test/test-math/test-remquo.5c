@@ -1,0 +1,101 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2025 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+
+typedef struct {
+	real x, y;
+} pair_t;
+
+const int quo_mask = 0x7;
+
+pair_t[] test_values = {
+	{ .x = 0x1.fffffep127, .y = 0x1.fffffep-126 },
+	{ .x = 0x1.fffffffffffffp1023, .y = 0x1.fffffffffffffp-1022 },
+	{ .x = 0x1.fffffffffffffffep16383, .y = 0x1.fffffffffffffffep-16381 },
+	{ .x = 0x1.ffffffffffffffffffffffffffffp16383, .y = 0x1.ffffffffffffffffffffffffffffp-16382 },
+};
+
+real
+quo(real x, real y)
+{
+	real n = 0;
+	if (is_inf(x) || y == 0)
+		return quo_mask+1;
+	try {
+		real quo = floor(x / y + 0.5);
+		if (quo < 0) {
+			n = -((-quo) & quo_mask);
+		} else {
+			n = quo & quo_mask;
+		}
+	} catch invalid_binop_values(string message, poly x, poly y) {
+		return 0;
+	} catch invalid_unop_value(string message, poly x) {
+		return 0;
+	}
+	return n;
+}
+
+void
+compute_signs(real xi, real yi)
+{
+	compute_real_real( xi,  yi, quo);
+	compute_real_real(-xi,  yi, quo);
+	compute_real_real( xi, -yi, quo);
+	compute_real_real(-xi, -yi, quo);
+}
+
+void
+main()
+{
+	for (int i = 0; i < dim(test_values); i++) {
+		real xi = imprecise(test_values[i].x, prec);
+		real yi = imprecise(test_values[i].y, prec);
+		compute_signs(xi, xi);
+		compute_signs(xi, yi);
+		compute_signs(yi, xi);
+		compute_signs(yi, yi);
+	}
+	for (real x = 1e-38; x <= 1e38; x *= 1111) {
+		for (real y = 1e-38; y <= 1e38; y *= 1111) {
+			real xi = imprecise(x, prec);
+			real yi = imprecise(y, prec);
+			compute_signs(xi, yi);
+		}
+	}
+}
+
+main();
