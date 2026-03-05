@@ -126,6 +126,14 @@ for o in $options; do
     esac
 done
 
+if [ -n "$QEMU_ADD_SMRNMI" ]; then
+    case "$qemu_version" in
+        10*)
+            cpu="$cpu,smrnmi=true"
+            ;;
+    esac
+fi
+
 # qemu enables some options by defualt; we need to explicitly
 # disable them when not selected
 enabled_options="i h e g m a f d c s u v zifencei zihintpause"
