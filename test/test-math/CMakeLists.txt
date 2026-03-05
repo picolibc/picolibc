@@ -74,6 +74,8 @@ set(tests_real_other
   test-j1
   test-jn
   test-lgamma
+  test-remainder
+  test-remquo-quo
   test-round
   test-sqrt
   test-tgamma
