@@ -552,10 +552,17 @@ Files: CMakeLists.txt
  libos/semihost/CMakeLists.txt
  libos/semihost/common/CMakeLists.txt
  libos/semihost/common/getentropy.c
+ libos/semihost/fake/fake_close.c
  libos/semihost/fake/fake_exit.c
+ libos/semihost/fake/fake_fstat.c
  libos/semihost/fake/fake_io.c
- libos/semihost/fake/fake_kill.c
- libos/semihost/fake/fake_stub.c
+ libos/semihost/fake/fake_isatty.c
+ libos/semihost/fake/fake_lseek.c
+ libos/semihost/fake/fake_open.c
+ libos/semihost/fake/fake_read.c
+ libos/semihost/fake/fake_stat.c
+ libos/semihost/fake/fake_unlink.c
+ libos/semihost/fake/fake_write.c
  libos/semihost/fake/meson.build
  libos/semihost/machine/arc/CMakeLists.txt
  libos/semihost/machine/arc64/CMakeLists.txt
@@ -897,6 +904,9 @@ Files: cmake/TC-rx.ld
  test/test-math/test-ccosh.5c
  test/test-math/test-ccosh.c
  test/test-math/test-ccosh.h
+ test/test-math/test-ceil.5c
+ test/test-math/test-ceil.c
+ test/test-math/test-ceil.h
  test/test-math/test-cexp.5c
  test/test-math/test-cexp.c
  test/test-math/test-cexp.h
@@ -947,6 +957,9 @@ Files: cmake/TC-rx.ld
  test/test-math/test-expm1.5c
  test/test-math/test-expm1.c
  test/test-math/test-expm1.h
+ test/test-math/test-floor.5c
+ test/test-math/test-floor.c
+ test/test-math/test-floor.h
  test/test-math/test-hypot.5c
  test/test-math/test-hypot.c
  test/test-math/test-hypot.h
@@ -982,7 +995,18 @@ Files: cmake/TC-rx.ld
  test/test-math/test-pow.h
  test/test-math/test-real-int.h
  test/test-math/test-real-one.h
+ test/test-math/test-real-real-int.h
  test/test-math/test-real-real.h
+ test/test-math/test-remainder.5c
+ test/test-math/test-remainder.c
+ test/test-math/test-remainder.h
+ test/test-math/test-remquo-quo.c
+ test/test-math/test-remquo.5c
+ test/test-math/test-remquo.c
+ test/test-math/test-remquo.h
+ test/test-math/test-round.5c
+ test/test-math/test-round.c
+ test/test-math/test-round.h
  test/test-math/test-sin.5c
  test/test-math/test-sin.c
  test/test-math/test-sin.h
@@ -1006,6 +1030,7 @@ Files: cmake/TC-rx.ld
  test/test-math/test-ulp.h
  test/test-monetary/CMakeLists.txt
  test/test-monetary/meson.build
+ test/test-posix/CMakeLists.txt
  test/test-posix/meson.build
  test/test-scmpu.c
  test/test-stdio/meson.build
@@ -1049,9 +1074,11 @@ Files: doc/printf-sample/Makefile
  libos/semihost/machine/m68k/m68k_close.c
  libos/semihost/machine/m68k/m68k_exit.c
  libos/semihost/machine/m68k/m68k_fstat.c
+ libos/semihost/machine/m68k/m68k_gettimeofday.c
  libos/semihost/machine/m68k/m68k_lseek.c
  libos/semihost/machine/m68k/m68k_open.c
  libos/semihost/machine/m68k/m68k_read.c
+ libos/semihost/machine/m68k/m68k_rename.c
  libos/semihost/machine/m68k/m68k_semihost.S
  libos/semihost/machine/m68k/m68k_semihost.h
  libos/semihost/machine/m68k/m68k_stat.c
@@ -1121,42 +1148,30 @@ Files: empty-libs/empty.c
  libm/test/scalbn_vec.c
  libos/semihost/common/gettimeofday.c
  libos/semihost/machine/aarch64/aarch64_exit.c
- libos/semihost/machine/aarch64/aarch64_stub.c
  libos/semihost/machine/aarch64/meson.build
- libos/semihost/machine/arc/arc_stub.c
  libos/semihost/machine/arc/meson.build
  libos/semihost/machine/arc64/meson.build
  libos/semihost/machine/arm/meson.build
- libos/semihost/machine/m68k/m68k_stub.c
  libos/semihost/machine/m68k/meson.build
  libos/semihost/machine/msp430/meson.build
  libos/semihost/machine/msp430/msp430-exit.c
- libos/semihost/machine/msp430/msp430-stub.c
  libos/semihost/machine/nios2/meson.build
- libos/semihost/machine/nios2/nios2_stub.c
  libos/semihost/machine/or1k/meson.build
  libos/semihost/machine/or1k/or1k_exit.c
- libos/semihost/machine/or1k/or1k_stub.c
  libos/semihost/machine/powerpc/meson.build
  libos/semihost/machine/powerpc/powerpc_exit.c
  libos/semihost/machine/powerpc/powerpc_io.c
- libos/semihost/machine/powerpc/powerpc_kill.c
- libos/semihost/machine/powerpc/powerpc_stub.c
  libos/semihost/machine/riscv/meson.build
  libos/semihost/machine/rx/CMakeLists.txt
  libos/semihost/machine/rx/meson.build
  libos/semihost/machine/rx/rx_exit.c
- libos/semihost/machine/rx/rx_stub.c
  libos/semihost/machine/sh/meson.build
  libos/semihost/machine/sh/sh_exit.c
  libos/semihost/machine/sparc/meson.build
  libos/semihost/machine/sparc/sparc_exit.c
- libos/semihost/machine/sparc/sparc_stub.c
  libos/semihost/machine/x86/bios.S
  libos/semihost/machine/x86/e9_exit.c
  libos/semihost/machine/x86/e9_io.c
- libos/semihost/machine/x86/e9_kill.c
- libos/semihost/machine/x86/e9_stub.c
  libos/semihost/machine/x86/meson.build
  libos/semihost/machine/xtensa/meson.build
  libos/semihost/machine/xtensa/xtensa-exit.c
@@ -1222,32 +1237,55 @@ Files: empty-libs/meson.build
  libc/native/native_if.h
  libc/native/stat.c
  libc/native/stat_host.c
+ libc/posix/endgrent.c
  libc/posix/endpwent.c
  libc/posix/execl.c
+ libc/posix/execlp.c
  libc/posix/execv.c
  libc/posix/execvp.c
  libc/posix/execvpe.c
+ libc/posix/fgetgrent.c
+ libc/posix/fgetgrent_r.c
  libc/posix/fgetpwent.c
  libc/posix/fgetpwent_r.c
+ libc/posix/getgrent.c
+ libc/posix/getgrent_r.c
+ libc/posix/getgrgid.c
+ libc/posix/getgrgid_r.c
+ libc/posix/getgrnam.c
+ libc/posix/getgrnam_r.c
  libc/posix/getlogin.c
  libc/posix/getpass.c
  libc/posix/getpwent.c
+ libc/posix/getpwent_r.c
  libc/posix/getpwnam.c
  libc/posix/getpwnam_r.c
  libc/posix/getpwuid.c
  libc/posix/getpwuid_r.c
+ libc/posix/grdata.c
+ libc/posix/grfile.c
+ libc/posix/local-grp.h
  libc/posix/local-pwd.h
  libc/posix/pwdata.c
+ libc/posix/pwfile.c
+ libc/posix/setgrent.c
  libc/posix/setpwent.c
  libc/posix/sleep.c
  libc/posix/wait.c
+ libc/signal/sigjmp_getsigs.c
+ libc/signal/sigjmp_setsigs.c
  libc/stdio/atomic_store.c
  libc/stdio/bufio_close.c
  libc/stdio/bufio_close_nf.c
  libc/stdio/bufio_exit_flush.c
  libc/stdio/bufio_setvbuf.c
+ libc/stdio/fseterr.c
  libc/stdio/pclose.c
  libc/stdio/popen.c
+ libc/stdlib/malloc-error.c
+ libc/string/strerror.c
+ libc/time/timespec_get.c
+ libc/time/timespec_getres.c
  libm/math/sf_rem_pio2.c
  libos/dummyhost/CMakeLists.txt
  libos/dummyhost/_exit.c
@@ -1266,8 +1304,11 @@ Files: empty-libs/meson.build
  libos/dummyhost/unlink.c
  libos/dummyhost/write.c
  libos/fallback/CMakeLists.txt
+ libos/fallback/local-signal.h
  libos/fallback/meson.build
+ libos/fallback/raise.c
  libos/fallback/signal.c
+ libos/fallback/sigprocmask.c
  libos/fallback/sysconf.c
  libos/linux/_sigmask_from_linux.c
  libos/linux/_sigmask_to_linux.c
@@ -1300,10 +1341,12 @@ Files: empty-libs/meson.build
  libos/linux/geteuid.c
  libos/linux/getgid.c
  libos/linux/getgroups.c
+ libos/linux/gethostname.c
  libos/linux/getitimer.c
  libos/linux/getpgrp.c
  libos/linux/getpid.c
  libos/linux/getppid.c
+ libos/linux/getrlimit.c
  libos/linux/gettimeofday.c
  libos/linux/getuid.c
  libos/linux/getwd.c
@@ -1330,6 +1373,8 @@ Files: empty-libs/meson.build
  libos/linux/machine/aarch64/linux/linux-itimerspec-struct.h
  libos/linux/machine/aarch64/linux/linux-itimerval-struct.h
  libos/linux/machine/aarch64/linux/linux-poll.h
+ libos/linux/machine/aarch64/linux/linux-resource.h
+ libos/linux/machine/aarch64/linux/linux-rlimit-struct.h
  libos/linux/machine/aarch64/linux/linux-siginfo-struct.h
  libos/linux/machine/aarch64/linux/linux-signal.h
  libos/linux/machine/aarch64/linux/linux-sigval-struct.h
@@ -1359,6 +1404,8 @@ Files: empty-libs/meson.build
  libos/linux/machine/arm/linux/linux-itimerspec-struct.h
  libos/linux/machine/arm/linux/linux-itimerval-struct.h
  libos/linux/machine/arm/linux/linux-poll.h
+ libos/linux/machine/arm/linux/linux-resource.h
+ libos/linux/machine/arm/linux/linux-rlimit-struct.h
  libos/linux/machine/arm/linux/linux-siginfo-struct.h
  libos/linux/machine/arm/linux/linux-signal.h
  libos/linux/machine/arm/linux/linux-sigval-struct.h
@@ -1388,6 +1435,8 @@ Files: empty-libs/meson.build
  libos/linux/machine/i686/linux/linux-itimerspec-struct.h
  libos/linux/machine/i686/linux/linux-itimerval-struct.h
  libos/linux/machine/i686/linux/linux-poll.h
+ libos/linux/machine/i686/linux/linux-resource.h
+ libos/linux/machine/i686/linux/linux-rlimit-struct.h
  libos/linux/machine/i686/linux/linux-siginfo-struct.h
  libos/linux/machine/i686/linux/linux-signal.h
  libos/linux/machine/i686/linux/linux-sigval-struct.h
@@ -1414,6 +1463,8 @@ Files: empty-libs/meson.build
  libos/linux/machine/x86/linux/linux-itimerspec-struct.h
  libos/linux/machine/x86/linux/linux-itimerval-struct.h
  libos/linux/machine/x86/linux/linux-poll.h
+ libos/linux/machine/x86/linux/linux-resource.h
+ libos/linux/machine/x86/linux/linux-rlimit-struct.h
  libos/linux/machine/x86/linux/linux-siginfo-struct.h
  libos/linux/machine/x86/linux/linux-signal.h
  libos/linux/machine/x86/linux/linux-sigval-struct.h
@@ -1444,6 +1495,8 @@ Files: empty-libs/meson.build
  libos/linux/machine/x86_64/linux/linux-itimerspec-struct.h
  libos/linux/machine/x86_64/linux/linux-itimerval-struct.h
  libos/linux/machine/x86_64/linux/linux-poll.h
+ libos/linux/machine/x86_64/linux/linux-resource.h
+ libos/linux/machine/x86_64/linux/linux-rlimit-struct.h
  libos/linux/machine/x86_64/linux/linux-siginfo-struct.h
  libos/linux/machine/x86_64/linux/linux-signal.h
  libos/linux/machine/x86_64/linux/linux-sigval-struct.h
@@ -1470,6 +1523,7 @@ Files: empty-libs/meson.build
  libos/linux/readdir.c
  libos/linux/readlink.c
  libos/linux/rename.c
+ libos/linux/rewinddir.c
  libos/linux/sbrk.c
  libos/linux/setegid.c
  libos/linux/seteuid.c
@@ -1477,13 +1531,16 @@ Files: empty-libs/meson.build
  libos/linux/setgroups.c
  libos/linux/setitimer.c
  libos/linux/setpgid.c
+ libos/linux/setrlimit.c
  libos/linux/setuid.c
  libos/linux/sigaction.c
  libos/linux/signal.c
+ libos/linux/sigpending.c
  libos/linux/sigprocmask.c
  libos/linux/sigsuspend.c
  libos/linux/sleep.c
  libos/linux/stat.c
+ libos/linux/symlink.c
  libos/linux/tcflow.c
  libos/linux/tcflush.c
  libos/linux/tcgetattr.c
@@ -1501,6 +1558,8 @@ Files: empty-libs/meson.build
  libos/linux/utils/make-fcntl.c
  libos/linux/utils/make-ioctl.c
  libos/linux/utils/make-poll.c
+ libos/linux/utils/make-resource.c
+ libos/linux/utils/make-resource.h
  libos/linux/utils/make-signal.c
  libos/linux/utils/make-syscall.c
  libos/linux/utils/make-sysconf.c
@@ -1511,19 +1570,26 @@ Files: empty-libs/meson.build
  libos/linux/wait3.c
  libos/linux/waitpid.c
  libos/meson.build
+ libos/semihost/fake/fake_gettimeofday.c
  test/test-ctype/CMakeLists.txt
  test/test-ctype/meson.build
  test/test-ctype/test-iswctype.c
  test/test-environ.c
  test/test-hosted-exit-fail.c
  test/test-posix/test-alarm.c
+ test/test-posix/test-fnmatch.c
+ test/test-posix/test-getdelim.c
+ test/test-posix/test-grp.c
  test/test-posix/test-popen.c
  test/test-posix/test-pwd.c
  test/test-posix/test-signal.c
+ test/test-posix/test-stat.c
  test/test-posix/test-system.c
  test/test-stdio/test-fdevopen.c
  test/test-stdio/test-freopen.c
+ test/test-stdlib/test-double-free.c
  test/test-string/CMakeLists.txt
+ test/test-string/test-strerror.c
 Copyright: 2026 Keith Packard
 License: BSD3-1
 
@@ -1601,6 +1667,8 @@ Files: hello-world/Makefile
  libm/test/modff_vec.c
  libm/test/pow_vec.c
  libm/test/powf_vec.c
+ libos/fallback/getpid.c
+ libos/fallback/kill.c
  libos/fallback/sbrk.c
  libos/linux/iob_stderr.c
  libos/linux/iob_stdin.c
@@ -1608,7 +1676,6 @@ Files: hello-world/Makefile
  libos/semihost/common/close.c
  libos/semihost/common/exit.c
  libos/semihost/common/iob.c
- libos/semihost/common/kill.c
  libos/semihost/common/lseek.c
  libos/semihost/common/meson.build
  libos/semihost/common/open.c
@@ -1641,6 +1708,8 @@ Files: hello-world/Makefile
  libos/semihost/common/times.c
  libos/semihost/common/unlink.c
  libos/semihost/common/write.c
+ libos/semihost/fake/fake_getpid.c
+ libos/semihost/fake/fake_kill.c
  libos/semihost/machine/aarch64/semihost-aarch64.S
  libos/semihost/machine/arm/semihost-arm.S
  libos/semihost/machine/riscv/semihost-riscv.S
@@ -1655,7 +1724,6 @@ Files: hello-world/Makefile
  picocrt/shared/crt0.c
  scripts/do-aarch64-configure
  scripts/do-aarch64-linux-gnu-configure
- scripts/do-aarch64-none-elf-configure
  scripts/do-aarch64-zephyr-configure
  scripts/do-aarch64-zephyr-elf-configure
  scripts/do-arc-configure
@@ -1774,7 +1842,6 @@ Files: libc/ctype/ctype_extended.h
  libos/semihost/machine/lm32/lm32_read.c
  libos/semihost/machine/lm32/lm32_scall.c
  libos/semihost/machine/lm32/lm32_semihost.h
- libos/semihost/machine/lm32/lm32_stub.c
  libos/semihost/machine/lm32/lm32_unlink.c
  libos/semihost/machine/lm32/lm32_write.c
  libos/semihost/machine/lm32/meson.build
@@ -1978,7 +2045,6 @@ Files: libos/semihost/machine/mips/mips_close.c
  libos/semihost/machine/mips/mips_open.c
  libos/semihost/machine/mips/mips_read.c
  libos/semihost/machine/mips/mips_semihost.h
- libos/semihost/machine/mips/mips_stub.c
  libos/semihost/machine/mips/mips_unlink.c
  libos/semihost/machine/mips/mips_write.c
 Copyright: 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
@@ -2251,8 +2317,7 @@ Files: libc/include/grp.h
 Copyright: 1989, 1993 The Regents of the University of California.
 License: BSD3-4
 
-Files: libc/include/envlock.h
- libc/include/fnmatch.h
+Files: libc/include/fnmatch.h
 Copyright: 1992, 1993 The Regents of the University of California.
 License: BSD3-5
 
@@ -3382,27 +3447,33 @@ Files: .clang-format
  .editorconfig
  .gitattributes
  .github/Dockerfile
+ .github/Dockerfile-arm
  .github/Dockerfile-check-format
  .github/Dockerfile-coreboot
  .github/Dockerfile-zephyr
  .github/do-build
  .github/do-cmake-test
+ .github/do-linux-arm-linux
  .github/do-linux-misc
  .github/do-many
  .github/do-run
  .github/do-test
  .github/do-test-noopt
  .github/do-zephyr
+ .github/linux-arm-packages.txt
  .github/linux-files.txt
  .github/linux-packages.txt
  .github/workflows/Makefile
  .github/workflows/check-format.yml
  .github/workflows/head
+ .github/workflows/head-arm
  .github/workflows/head-coreboot
  .github/workflows/head-native
  .github/workflows/head-zephyr
+ .github/workflows/linux-arm.yml
  .github/workflows/linux.yml
  .github/workflows/make-workflow
+ .github/workflows/make-workflow-arm
  .github/workflows/make-workflow-coreboot
  .github/workflows/make-workflow-native
  .github/workflows/make-workflow-zephyr
@@ -3437,7 +3508,6 @@ Files: .clang-format
  doc/using.md
  hello-world/README.md
  libc/ctype/ctype.tex
- libc/include/sys/_tz_structs.h
  libc/libc.in.xml
  libc/machine/aarch64/sys/fcntl.h
  libc/machine/hexagon/longjmp.S
@@ -3473,6 +3543,7 @@ Files: .clang-format
  libos/semihost/machine/hexagon/hexagon_errno.c
  libos/semihost/machine/hexagon/hexagon_exit.c
  libos/semihost/machine/hexagon/hexagon_flen.c
+ libos/semihost/machine/hexagon/hexagon_fstat.c
  libos/semihost/machine/hexagon/hexagon_ftell.c
  libos/semihost/machine/hexagon/hexagon_get_cmdline.c
  libos/semihost/machine/hexagon/hexagon_isatty.c
@@ -3481,7 +3552,7 @@ Files: .clang-format
  libos/semihost/machine/hexagon/hexagon_read.c
  libos/semihost/machine/hexagon/hexagon_semihost.c
  libos/semihost/machine/hexagon/hexagon_semihost.h
- libos/semihost/machine/hexagon/hexagon_stub.c
+ libos/semihost/machine/hexagon/hexagon_stat.c
  libos/semihost/machine/hexagon/hexagon_unlink.c
  libos/semihost/machine/hexagon/hexagon_write.c
  libos/semihost/machine/hexagon/meson.build
@@ -3499,7 +3570,6 @@ Files: .clang-format
  scripts/cross-aarch64-linux-gnu.txt
  scripts/cross-aarch64-none-elf.txt
  scripts/cross-aarch64-zephyr-elf.txt
- scripts/cross-aarch64.txt
  scripts/cross-arc-zephyr-elf.txt
  scripts/cross-arc64-zephyr-elf.txt
  scripts/cross-arm-linux-gnueabihf.txt
@@ -3582,6 +3652,7 @@ Files: .clang-format
  test/CP720
  test/test-argv.c
  test/test-atomic.c
+ test/test-lseek-overflow.c
  test/test-math/.clang-format-ignore
  test/test-math/Makefile
  test/test-math/math-test-copyright
@@ -3693,7 +3764,6 @@ License: Default-1
 
 Files: libc/include/libgen.h
  libc/include/sys/string.h
- libc/time/gettzinfo.c
 Copyright: 2005 Jeff Johnston  <jjohnstn@redhat.com>
 License: Default-1
 
@@ -3903,6 +3973,10 @@ Files: libc/ssp/chk_fail.c
 Copyright: 2017 Yaakov Selkowitz <yselkowi@redhat.com>
 License: Default-1
 
+Files: libc/stdlib/_findenv.c
+Copyright: 1991 DJ Delorie.
+License: Default-1
+
 Files: libc/stdlib/abort.c
  libc/stdlib/abs.c
  libc/stdlib/assert.c
@@ -3930,10 +4004,6 @@ Files: libc/stdlib/abort.c
  libc/stdlib/wctomb.c
  libc/stdlib/wctomb_r.c
 Copyright: 1990 Regents of the University of California.
-License: Default-1
-
-Files: libc/stdlib/getenv_r.c
-Copyright: 1991 DJ Delorie.
 License: Default-1
 
 Files: libc/stdlib/itoa.c
@@ -4585,7 +4655,6 @@ Files: libc/signal/signal.tex
  libc/string/strcoll.c
  libc/string/strcpy.c
  libc/string/strcspn.c
- libc/string/strerror.c
  libc/string/strings.tex
  libc/string/strlen.c
  libc/string/strlwr.c
@@ -5047,6 +5116,7 @@ License: UCB-1
 
 Files: libc/stdio/mktemp.c
  libc/stdlib/setenv.c
+ libc/stdlib/unsetenv.c
 Copyright: 1987 Regents of the University of California.
 License: UCB-2
 
