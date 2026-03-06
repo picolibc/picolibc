@@ -48,7 +48,7 @@ jobs:
 
       - name: Build picolibc container
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           platforms: linux/arm64
           file: .github/Dockerfile-arm
