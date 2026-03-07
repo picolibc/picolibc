@@ -31,13 +31,18 @@ REAL_EXP = \
 
 REAL_OTHER = \
 	test-cbrt.h \
+	test-ceil.h \
 	test-erf.h \
 	test-erfc.h \
+	test-floor.h \
 	test-hypot.h \
 	test-j0.h \
 	test-j1.h \
 	test-jn.h \
 	test-lgamma.h \
+	test-remainder.h \
+	test-remquo.h \
+	test-round.h \
 	test-sqrt.h \
 	test-tgamma.h
 

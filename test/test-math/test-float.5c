@@ -38,7 +38,8 @@ int prec = 2048;
 int arg_prec;
 
 exception nan();
-exception infinity();
+exception infinity(bool neg);
+exception bad_precision(int prec);
 
 complex
 imprecise_arg(complex x, int prec)
@@ -47,6 +48,7 @@ imprecise_arg(complex x, int prec)
 	return imprecise(x, prec);
 }
 
+const real max_binary32 = imprecise(0x1.fffffep+127);
 const real min_binary32 = imprecise(0x1p-126);
 const real min_denorm_binary32 = imprecise(0x1p-149);
 
@@ -64,6 +66,7 @@ real32(real x)
 	return imprecise_arg(x, precision);
 }
 
+const real max_binary64 = imprecise(0x1.fffffffffffffp+1023);
 const real min_binary64 = imprecise(0x1p-1022);
 const real min_denorm_binary64 = imprecise(0x1p-1074);
 
@@ -81,6 +84,7 @@ real64(real x)
 	return imprecise_arg(x, precision);
 }
 
+const real max_binary80 = imprecise(0x1.fffffffffffffffep16383);
 const real min_binary80 = imprecise(0x1p-16382);
 const real min_denorm_binary80 = imprecise(0x1p-16445);
 
@@ -98,6 +102,7 @@ real80(real x)
 	return imprecise_arg(x, precision);
 }
 
+const real max_binary128 = imprecise(0x1.ffffffffffffffffffffffffffffp16383);
 const real min_binary128 = imprecise(0x1p-16382);
 const real min_denorm_binary128 = imprecise(0x1p-16494);
 
@@ -115,20 +120,65 @@ real128(real x)
 	return imprecise_arg(x, precision);
 }
 
-real [](real) real_convs = { real32, real64, real80, real128 };
+typedef struct {
+	real(real) conv;
+	int        precision;
+	string     macro;
+	real       min_denorm;
+	real       min;
+	real       max;
+} conv_t;
 
-string[] real_macros = { "FN32", "FN64", "FN80", "FN128" };
+conv_t[] real_convs = {
+	{
+		.conv = real32,
+		.precision = 24,
+		.macro = "FN32",
+		.min_denorm = min_denorm_binary32,
+		.min = min_binary32,
+		.max = max_binary32
+	},
+	{
+		.conv = real64,
+		.precision = 53,
+		.macro = "FN64",
+		.min_denorm = min_denorm_binary64,
+		.min = min_binary64,
+		.max = max_binary64
+	},
+	{
+		.conv = real80,
+		.precision = 64,
+		.macro = "FN80",
+		.min_denorm = min_denorm_binary80,
+		.min = min_binary80,
+		.max = max_binary80
+	},
+	{
+		.conv = real128,
+		.precision = 113,
+		.macro = "FN128",
+		.min_denorm = min_denorm_binary128,
+		.min = min_binary128,
+		.max = max_binary128
+	},
+};
 
 typedef union {
 	real	r;
-	void	i;
+	bool	i;
 	void	n;
 } result_t;
 
 void
 print_one_real(real x, int i)
 {
-	printf("%s(%a)", real_macros[i], x);
+	if (abs(x) > real_convs[i].max)
+		printf("%sINFINITY", x>0 ? "" : "-");
+	else if (abs(x) < real_convs[i].min_denorm)
+		printf("%s0", x>0 ? "" : "-");
+	else
+		printf("%s(%a)", real_convs[i].macro, x);
 }
 
 void
@@ -138,8 +188,8 @@ print_one_result(result_t y, int i)
 	case r r:
 		print_one_real(r, i);
 		break;
-	case i:
-		printf("INFINITY");
+	case i i:
+		printf("%sINFINITY", i?"-":"");
 		break;
 	case n:
 		printf("NAN");
@@ -208,24 +258,44 @@ compute_real_one(real x, real(real) f)
 	real[4]	xp;
 	result_t[4] yp;
 	for (int i = 0; i < 4; i++) {
-		xp[i] = real_convs[i](x);
+		xp[i] = real_convs[i].conv(x);
 		try {
 			try {
-				yp[i].r = real_convs[i](f(imprecise(xp[i], prec)));
+				yp[i].r = real_convs[i].conv(f(imprecise(xp[i], prec)));
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity();
+				raise infinity(x < 0);
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity() {
-			yp[i].i = ◊;
+		} catch infinity(bool sign) {
+			yp[i].i = sign;
 		} catch nan() {
 			yp[i].n = ◊;
 		}
 	}
 	print_real(xp, yp);
+}
+
+int current_conversion;
+
+bool
+is_inf(real x)
+{
+	return real_convs[current_conversion].max < abs(x);
+}
+
+bool
+is_denorm(real x)
+{
+	return real_convs[current_conversion].min_denorm <= abs(x) && abs(x) < real_convs[current_conversion].min;
+}
+
+bool
+is_zero(real x)
+{
+	return abs(x) < real_convs[current_conversion].min_denorm;
 }
 
 void
@@ -234,19 +304,20 @@ compute_int_real(int x1, real x2, real(int, real) f)
 	real[4]	x1p, x2p;
 	result_t[4] yp;
 	for (int i = 0; i < 4; i++) {
-		x2p[i] = real_convs[i](x2);
+		current_conversion = i;
+		x2p[i] = real_convs[i].conv(x2);
 		try {
 			try {
-				yp[i].r = real_convs[i](f(x1, imprecise(x2p[i], prec)));
+				yp[i].r = real_convs[i].conv(f(x1, imprecise(x2p[i], prec)));
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity();
+				raise infinity(x < 0);
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity() {
-			yp[i].i = ◊;
+		} catch infinity(bool sign) {
+			yp[i].i = sign;
 		} catch nan() {
 			yp[i].n = ◊;
 		}
@@ -284,20 +355,21 @@ compute_real_real(real x1, real x2, real(real, real) f)
 	real[4]	x1p, x2p;
 	result_t[4] yp;
 	for (int i = 0; i < 4; i++) {
-		x1p[i] = real_convs[i](x1);
-		x2p[i] = real_convs[i](x2);
+		current_conversion = i;
+		x1p[i] = real_convs[i].conv(x1);
+		x2p[i] = real_convs[i].conv(x2);
 		try {
 			try {
-				yp[i].r = real_convs[i](f(imprecise(x1p[i], prec), imprecise(x2p[i], prec)));
+				yp[i].r = real_convs[i].conv(f(imprecise(x1p[i], prec), imprecise(x2p[i], prec)));
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity();
+				raise infinity(x < 0);
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity() {
-			yp[i].i = ◊;
+		} catch infinity(bool sign) {
+			yp[i].i = sign;
 		} catch nan() {
 			yp[i].n = ◊;
 		}
