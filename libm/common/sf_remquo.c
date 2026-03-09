@@ -12,8 +12,17 @@
  * ====================================================
  */
 
-#include <math.h>
 #include "fdlibm.h"
+
+#include <limits.h>
+
+/* For quotient, return either all 31 bits that can from calculation (using
+ * int32_t), or as many as can fit into an int that is smaller than 32 bits.  */
+#if INT_MAX > 0x7FFFFFFFL
+#define QUO_MASK 0x7FFFFFFF
+#else
+#define QUO_MASK INT_MAX
+#endif
 
 /* For quotient, return either all 31 bits that can from calculation (using
  * int32_t), or as many as can fit into an int that is smaller than 32 bits.  */
@@ -111,6 +120,7 @@ remquof(float x, float y, int *quo)
 
     /* convert back to floating value and restore the sign */
     if (hx == 0) { /* return sign(x)*0 */
+        q &= QUO_MASK;
         *quo = (sxy ? -q : q);
         return Zero[(__uint32_t)sx >> 31];
     }
@@ -138,7 +148,7 @@ fixup:
     }
     GET_FLOAT_WORD(hx, x);
     SET_FLOAT_WORD(x, hx ^ sx);
-    q &= 0x7fffffff;
+    q &= QUO_MASK;
     *quo = (sxy ? -q : q);
     return x;
 }
