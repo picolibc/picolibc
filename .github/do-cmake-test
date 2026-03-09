@@ -8,7 +8,7 @@ shift
 # Fallback to previous behavior for other targets.
 case "$TARGET" in
     *clang-thumb*)
-        for p in /opt/LLVM-ET-Arm*/bin /opt/*/models/*; do
+        for p in /opt/ATfE-*/bin /opt/*/models/*; do
             [ -d "$p" ] && PATH="$p":$PATH
         done
         ;;

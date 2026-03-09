@@ -1,7 +1,7 @@
 #!/bin/bash
 here=`dirname "$0"`
-for sdk in /opt/zephyr-sdk-0.17.4 /opt /fail; do
-    if [ -d $sdk/aarch64-zephyr-elf ]; then
+for sdk in /opt/zephyr-sdk-1.0.0* /fail; do
+    if [ -e $sdk/aarch64-zephyr-elf ]; then
 	break
     fi
 done
