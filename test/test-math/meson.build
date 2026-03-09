@@ -64,6 +64,7 @@ tests_real_exp = [
 ]
 
 tests_real_other = [
+  'test-add',
   'test-cbrt',
   'test-ceil',
   'test-erf',
