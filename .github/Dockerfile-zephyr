@@ -31,4 +31,8 @@ RUN (apt-get update || apt-get update || apt-get update) && \
     else \
 	echo "No host tools found"; \
     fi && \
+    if [ -f /opt/zephyr-sdk-*/setup.sh ]; then \
+        echo "Setting up SDK"; \
+	/opt/zephyr-sdk-*/setup.sh -t all -h -o -c; \
+    fi && \
     rm -rf /var/lib/apt/lists/*

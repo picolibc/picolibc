@@ -18,7 +18,7 @@ case "$TARGET" in
         done
         ;;
     *clang-arm*|*clang-aarch64*|*clang-thumb*)
-        for p in "$TOP"/LLVM-ET-Arm*/bin "$TOP"/*/models/*; do
+        for p in "$TOP"/ATfE-*/bin "$TOP"/*/models/*; do
             [ -d "$p" ] && PATH="$p":$PATH
         done
         ;;
