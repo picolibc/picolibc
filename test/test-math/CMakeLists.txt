@@ -107,6 +107,7 @@ set(tests_complex_other
 )
 
 set(tests_other
+  test-add
   test-fenv
   test-fma
   test-long-double
