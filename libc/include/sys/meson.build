@@ -95,7 +95,7 @@ if really_install
 endif
 
 if enable_cdefs_tests
-  ignore_headers = ['config.h', 'features.h', 'string.h', 'custom_file.h', 'dirent.h']
+  ignore_headers = ['config.h', 'errno.h', 'features.h', 'string.h', 'custom_file.h', 'dirent.h']
   foreach header : inc_sys_headers
     if not (header in ignore_headers) and not (header.startswith('_'))
       test_name = 'check-cdef-sys-' + header

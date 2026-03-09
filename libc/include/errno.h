@@ -48,6 +48,28 @@ typedef __errno_t errno_t;
 #endif
 #endif
 
+_BEGIN_STD_C
+
+#if __GNU_VISIBLE
+char *_user_strerror(int errnum, int internal, int *errptr);
+#endif
+
+#ifdef __GLOBAL_ERRNO
+#define __THREAD_LOCAL_ERRNO
+#else
+#define __THREAD_LOCAL_ERRNO __THREAD_LOCAL
+#endif
+
+#ifdef __PICOLIBC_ERRNO_FUNCTION
+int *__PICOLIBC_ERRNO_FUNCTION(void);
+#define errno (*__PICOLIBC_ERRNO_FUNCTION())
+#else
+extern __THREAD_LOCAL_ERRNO int errno;
+#define errno errno
+#endif
+
 #include <sys/errno.h>
+
+_END_STD_C
 
 #endif /* !__ERRNO_H__ */
