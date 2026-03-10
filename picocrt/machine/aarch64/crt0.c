@@ -135,27 +135,27 @@ _cstart(void)
     uint64_t sctlr;
 
     /* Invalidate the cache */
-    __asm__("ic iallu");
-    __asm__("isb\n");
+    __asm__ volatile("ic iallu");
+    __asm__ volatile("isb\n");
 
 #if __ARM_ARCH_PROFILE != 'R'
     /*
      * Set up the TCR register to provide a 33bit VA space using
      * 4kB pages over 4GB of PA
      */
-    __asm__("msr    tcr_" BOOT_EL
-            ", %x0" ::"r"((0x1f << TCR_T0SZ_BIT) | TCR_IRGN0_WB_WA | TCR_ORGN0_WB_WA | TCR_SH0_IS
-                          | TCR_TG0_4KB | TCR_EPD1 | TCR_IPS_4GB));
+    __asm__ volatile("msr    tcr_" BOOT_EL
+                     ", %x0" ::"r"((0x1f << TCR_T0SZ_BIT) | TCR_IRGN0_WB_WA | TCR_ORGN0_WB_WA
+                                   | TCR_SH0_IS | TCR_TG0_4KB | TCR_EPD1 | TCR_IPS_4GB));
 
     /* Load the page table base */
-    __asm__("msr    ttbr0_" BOOT_EL ", %x0" ::"r"(__identity_page_table));
+    __asm__ volatile("msr    ttbr0_" BOOT_EL ", %x0" ::"r"(__identity_page_table));
 #else
     /* Enable the 8-R.64 MPU, and configure a single 'normal memory' region
      * covering the whole address map
      */
 
     /* Select the MPU region */
-    __asm__("msr    PRSELR_" BOOT_EL ", %x0" ::"r"(0));
+    __asm__ volatile("msr    PRSELR_" BOOT_EL ", %x0" ::"r"(0));
 
     /* Set the base address of memory region
      *
@@ -163,7 +163,7 @@ _cstart(void)
      * bits 3,2 are AP = 0b01: read and write permissions at all ELs
      * bits 1,0 are XN = 0b00: don't prohibit execution at any EL
      */
-    __asm__("msr    PRBAR_" BOOT_EL ", %x0\n" ::"r"(4));
+    __asm__ volatile("msr    PRBAR_" BOOT_EL ", %x0\n" ::"r"(4));
 
     /* Set the limit address of memory region
      * bit 5 is reserved
@@ -172,7 +172,7 @@ _cstart(void)
      * controlled by the low byte of MAIR_EL2.
      * bit 0 is EN = 1: this memory region is enabled at all
      */
-    __asm__("msr    PRLAR_" BOOT_EL ", %x0\n" ::"r"(0x000fffffffffffd1));
+    __asm__ volatile("msr    PRLAR_" BOOT_EL ", %x0\n" ::"r"(0x000fffffffffffd1));
 #endif
 
     /*
@@ -181,13 +181,13 @@ _cstart(void)
      * Region 0 is Normal memory
      * Region 1 is Device memory
      */
-    __asm__("msr    mair_" BOOT_EL ", %x0" ::"r"((0xffLL << 0) | (0x00LL << 8)));
+    __asm__ volatile("msr    mair_" BOOT_EL ", %x0" ::"r"((0xffLL << 0) | (0x00LL << 8)));
 
     /*
      * Enable caches, and the MMU, disable alignment requirements
      * and write-implies-XN
      */
-    __asm__("mrs    %x0, sctlr_" BOOT_EL "" : "=r"(sctlr));
+    __asm__ volatile("mrs    %x0, sctlr_" BOOT_EL "" : "=r"(sctlr));
     sctlr |= SCTLR_ICACHE | SCTLR_C | SCTLR_MMU;
 #ifdef __ARM_FEATURE_UNALIGNED
     sctlr &= ~SCTLR_A;
@@ -195,11 +195,11 @@ _cstart(void)
     sctlr |= SCTLR_A;
 #endif
     sctlr &= ~SCTLR_WXN;
-    __asm__("msr    sctlr_" BOOT_EL ", %x0" ::"r"(sctlr));
-    __asm__("isb\n");
+    __asm__ volatile("msr    sctlr_" BOOT_EL ", %x0" ::"r"(sctlr));
+    __asm__ volatile("isb\n");
 
     /* Set the vector base address register */
-    __asm__("msr    vbar_" BOOT_EL ", %x0" ::"r"(__vector_table));
+    __asm__ volatile("msr    vbar_" BOOT_EL ", %x0" ::"r"(__vector_table));
     __start();
 #endif
 }
