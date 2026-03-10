@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 PICOLIBC_DIR=/build/picolibc
 GLIBC_DIR=/build/glibc
@@ -10,7 +10,11 @@ set -e
 options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Dsanitize=undefined"
 stdoptions="$options --buildtype=release -Ddebug=true"
 
-for arch in aarch64 arm riscv; do
+declare -a ARCHS
+
+ARCHS=(x86_64-linux-gnu i686-linux-gnu aarch64 arm riscv)
+
+for arch in "${ARCHS[@]}"; do
 
     DIR=$PICOLIBC_DIR/builds/build-$arch
 
@@ -33,7 +37,7 @@ done
 options="-Dwerror=true"
 stdoptions="$options --buildtype=release -Ddebug=true"
 
-for arch in aarch64 arm riscv; do
+for arch in "${ARCHS[@]}"; do
 
     DIR=$GLIBC_DIR/builds/build-$arch
 
