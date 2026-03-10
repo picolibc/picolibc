@@ -108,10 +108,11 @@ struct caseconv_entry {
     uint_least32_t first : 21;
     uint_least32_t diff  : 8;
     uint_least32_t mode  : 2;
-#ifdef __MSP430__
+#if defined(__MSP430__) || defined(__arc__)
     /*
      * MSP430 has 20-bit integers which the compiler attempts to use and
-     * fails. Waste some memory to fix that.
+     * fails. Waste some memory to fix that. Arc compiler has bugs in
+     * extracting this field, so don't use it there either.
      */
     int_least32_t delta;
 #else
