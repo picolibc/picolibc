@@ -77,6 +77,7 @@ set(tests_real_other
   test-remainder
   test-remquo-quo
   test-round
+  test-scalbn
   test-sqrt
   test-tgamma
   )

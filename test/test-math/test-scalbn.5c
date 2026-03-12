@@ -1,0 +1,95 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+
+typedef struct {
+	real x1;
+	int x2;
+} pair_t;
+
+pair_t[] test_values = {
+	{ .x1 = 0x1.000002p0, .x2 = 150 },
+	{ .x1 = 0x1.0000000000001p0, .x2 = -1075 },
+	{ .x1 = 0x1.0000000000000002p0, .x2 = -16446 },
+	{ .x1 = 0x1.0000000000000002p0, .x2 = -16447 },
+	{ .x1 = 0x1.0000000000000000000000000001p0, .x2 = -16495 },
+};
+
+real
+scalbn(real x1, int x2)
+{
+	return x1 * (2 ** x2);
+}
+
+void
+compute_sign(real x1, int x2)
+{
+	compute_real_int( x1,  x2, scalbn);
+	compute_real_int( x1, -x2, scalbn);
+	compute_real_int(-x1,  x2, scalbn);
+	compute_real_int(-x1, -x2, scalbn);
+}
+
+int
+offset(int x)
+{
+	if (abs(x) > 1000)
+		return 3001;
+	if (abs(x) > 100)
+		return 101;
+	if (abs(x) > 10)
+		return 11;
+	return 1;
+}
+
+void
+main()
+{
+	for (int i = 0; i < dim(test_values); i++) {
+		real x1i = imprecise(test_values[i].x1, prec);
+		int x2 = test_values[i].x2;
+		compute_sign(x1i, x2);
+	}
+
+	for (real x1 = 1e-38; x1 < 1e38; x1 *= 1111) {
+		for (int x2 = -16495; x2 <= 16383; x2 += offset(x2)) {
+			real x1i = imprecise(x1, prec);
+			compute_sign(x1i, x2);
+		}
+	}
+}
+
+main();

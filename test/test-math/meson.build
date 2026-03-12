@@ -115,6 +115,7 @@ tests_other = [
   'test-math-errhandling',
   'test-math-funcs',
   'test-rounding-mode',
+  'test-scalbn',
   ]
 
 tests = tests_real_trig + tests_real_exp + tests_real_other
