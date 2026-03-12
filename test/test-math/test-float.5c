@@ -53,13 +53,25 @@ const real min_binary32 = imprecise(0x1p-126);
 const real min_denorm_binary32 = imprecise(0x1p-149);
 
 real
+copysign(real x, real y)
+{
+	x = abs(x);
+	if (y >= 0)
+		return x;
+	return -x;
+}
+
+real
 real32(real x)
 {
 	int	precision = 24;
 	int	exp_x = exponent(imprecise(x));
 	if (exp_x < exponent(min_denorm_binary32)) {
 		precision = 1;
-		x = 0;
+		if (abs(x) > min_denorm_binary32 / 2)
+			x = copysign(min_denorm_binary32, x);
+		else
+			x = 0;
 	} else if (exp_x < exponent(min_binary32)) {
 		precision = exp_x - exponent(min_denorm_binary32) + 1;
 	}
@@ -77,7 +89,10 @@ real64(real x)
 	int	exp_x = exponent(imprecise(x));
 	if (exp_x < exponent(min_denorm_binary64)) {
 		precision = 1;
-		x = 0;
+		if (abs(x) > min_denorm_binary64 / 2)
+			x = copysign(min_denorm_binary64, x);
+		else
+			x = 0;
 	} else if (exp_x < exponent(min_binary64)) {
 		precision = exp_x - exponent(min_denorm_binary64) + 1;
 	}
@@ -95,9 +110,33 @@ real80(real x)
 	int	exp_x = exponent(imprecise(x));
 	if (exp_x < exponent(min_denorm_binary80)) {
 		precision = 1;
-		x = 0;
+		if (abs(x) > min_denorm_binary80 / 2)
+			x = copysign(min_denorm_binary80, x);
+		else
+			x = 0;
 	} else if (exp_x < exponent(min_binary80)) {
 		precision = exp_x - exponent(min_denorm_binary80) + 1;
+	}
+	return imprecise_arg(x, precision);
+}
+
+const real max_binary80m = imprecise(0x1.fffffffffffffffep16383);
+const real min_binary80m = imprecise(0x1p-16383);
+const real min_denorm_binary80m = imprecise(0x1p-16446);
+
+real
+real80m(real x)
+{
+	int	precision = 64;
+	int	exp_x = exponent(imprecise(x));
+	if (exp_x < exponent(min_denorm_binary80m)) {
+		precision = 1;
+		if (abs(x) > min_denorm_binary80m / 2)
+			x = copysign(min_denorm_binary80m, x);
+		else
+			x = 0;
+	} else if (exp_x < exponent(min_binary80m)) {
+		precision = exp_x - exponent(min_denorm_binary80m) + 1;
 	}
 	return imprecise_arg(x, precision);
 }
@@ -113,7 +152,10 @@ real128(real x)
 	int	exp_x = exponent(imprecise(x));
 	if (exp_x < exponent(min_denorm_binary128)) {
 		precision = 1;
-		x = 0;
+		if (abs(x) > min_denorm_binary128 / 2)
+			x = copysign(min_denorm_binary128, x);
+		else
+			x = 0;
 	} else if (exp_x < exponent(min_binary128)) {
 		precision = exp_x - exponent(min_denorm_binary128) + 1;
 	}
@@ -155,6 +197,14 @@ conv_t[] real_convs = {
 		.max = max_binary80
 	},
 	{
+		.conv = real80m,
+		.precision = 64,
+		.macro = "FN80M",
+		.min_denorm = min_denorm_binary80m,
+		.min = min_binary80m,
+		.max = max_binary80m
+	},
+	{
 		.conv = real128,
 		.precision = 113,
 		.macro = "FN128",
@@ -163,6 +213,8 @@ conv_t[] real_convs = {
 		.max = max_binary128
 	},
 };
+
+const int nformat = dim(real_convs);
 
 typedef union {
 	real	r;
@@ -198,16 +250,16 @@ print_one_result(result_t y, int i)
 }
 
 void
-print_real(real[4] x, result_t[4] y)
+print_real(real[nformat] x, result_t[nformat] y)
 {
 	printf("{ .x = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_real(x[i], i);
 	}
 	printf("), .y = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_result(y[i], i);
@@ -216,16 +268,16 @@ print_real(real[4] x, result_t[4] y)
 }
 
 void
-print_real(real[4] x, result_t[4] y)
+print_real(real[nformat] x, result_t[nformat] y)
 {
 	printf("{ .x = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_real(x[i], i);
 	}
 	printf("), .y = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_result(y[i], i);
@@ -234,17 +286,17 @@ print_real(real[4] x, result_t[4] y)
 }
 
 void
-print_int_real(int x1, real[4] x2, result_t[4] y)
+print_int_real(int x1, real[nformat] x2, result_t[nformat] y)
 {
 	printf("{ .x1 = %d,", x1);
 	printf(" .x2 = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_real(x2[i], i);
 	}
 	printf("), .y = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_result(y[i], i);
@@ -255,9 +307,9 @@ print_int_real(int x1, real[4] x2, result_t[4] y)
 void
 compute_real_one(real x, real(real) f)
 {
-	real[4]	xp;
-	result_t[4] yp;
-	for (int i = 0; i < 4; i++) {
+	real[nformat]	xp;
+	result_t[nformat] yp;
+	for (int i = 0; i < nformat; i++) {
 		xp[i] = real_convs[i].conv(x);
 		try {
 			try {
@@ -301,9 +353,9 @@ is_zero(real x)
 void
 compute_int_real(int x1, real x2, real(int, real) f)
 {
-	real[4]	x1p, x2p;
-	result_t[4] yp;
-	for (int i = 0; i < 4; i++) {
+	real[nformat]	x1p, x2p;
+	result_t[nformat] yp;
+	for (int i = 0; i < nformat; i++) {
 		current_conversion = i;
 		x2p[i] = real_convs[i].conv(x2);
 		try {
@@ -326,22 +378,67 @@ compute_int_real(int x1, real x2, real(int, real) f)
 }
 
 void
-print_real_real(real[4] x1, real[4] x2, result_t[4] y)
+print_real_int(real[nformat] x1, int x2, result_t[nformat] y)
 {
 	printf("{ .x1 = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x1[i], i);
+	}
+	printf("), .x2 = %d, .y = REAL(", x2);
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+compute_real_int(real x1, int x2, real(real, int) f)
+{
+	real[nformat]	x1p, x2p;
+	result_t[nformat] yp;
+	for (int i = 0; i < nformat; i++) {
+		current_conversion = i;
+		x1p[i] = real_convs[i].conv(x1);
+		try {
+			try {
+				yp[i].r = real_convs[i].conv(f(imprecise(x1p[i], prec), x2));
+			} catch divide_by_zero(real x, real y) {
+				if (x == 0)
+					raise nan();
+				raise infinity(x < 0);
+			} catch invalid_argument(string error, int i, poly v) {
+				raise nan();
+			}
+		} catch infinity(bool sign) {
+			yp[i].i = sign;
+		} catch nan() {
+			yp[i].n = ◊;
+		}
+	}
+	print_real_int(x1p, x2, yp);
+}
+
+void
+print_real_real(real[nformat] x1, real[nformat] x2, result_t[nformat] y)
+{
+	printf("{ .x1 = REAL(");
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_real(x1[i], i);
 	}
 	printf("), .x2 = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_real(x2[i], i);
 	}
 	printf("), .y = REAL(");
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < nformat; i++) {
 		if (i > 0)
 			printf(", ");
 		print_one_result(y[i], i);
@@ -352,9 +449,9 @@ print_real_real(real[4] x1, real[4] x2, result_t[4] y)
 void
 compute_real_real(real x1, real x2, real(real, real) f)
 {
-	real[4]	x1p, x2p;
-	result_t[4] yp;
-	for (int i = 0; i < 4; i++) {
+	real[nformat]	x1p, x2p;
+	result_t[nformat] yp;
+	for (int i = 0; i < nformat; i++) {
 		current_conversion = i;
 		x1p[i] = real_convs[i].conv(x1);
 		x2p[i] = real_convs[i].conv(x2);

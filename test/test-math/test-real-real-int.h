@@ -66,8 +66,8 @@ static TEST_CONST struct {
     int      y;
     ulp_t    ulp;
 } test_32_vec[] = {
-#define REAL(r32, r64, r80, r128)     r32
-#define REAL_ULP(r32, r64, r80, r128) r32
+#define REAL(r32, r64, r80, r80m, r128)     r32
+#define REAL_ULP(r32, r64, r80, r80m, r128) r32
 #include TEST_VECTORS
 #undef REAL
 #undef REAL_ULP
@@ -112,8 +112,8 @@ static TEST_CONST struct {
     int      y;
     ulp_t    ulp;
 } test_64_vec[] = {
-#define REAL(r32, r64, r80, r128)     r64
-#define REAL_ULP(r32, r64, r80, r128) r64
+#define REAL(r32, r64, r80, r80m, r128)     r64
+#define REAL_ULP(r32, r64, r80, r80m, r128) r64
 #include TEST_VECTORS
 #undef REAL
 #undef REAL_ULP
@@ -159,8 +159,8 @@ static TEST_CONST struct {
     int      y;
     ulp_t    ulp;
 } test_80_vec[] = {
-#define REAL(r32, r64, r80, r128)     r80
-#define REAL_ULP(r32, r64, r80, r128) r80
+#define REAL(r32, r64, r80, r80m, r128)     REAL80(r80, r80m)
+#define REAL_ULP(r32, r64, r80, r80m, r128) REAL80(r80, r80m)
 #include TEST_VECTORS
 #undef REAL
 #undef REAL_ULP
@@ -208,8 +208,8 @@ static TEST_CONST struct {
     int       y;
     ulp_t     ulp;
 } test_128_vec[] = {
-#define REAL(r32, r64, r80, r128)     r128
-#define REAL_ULP(r32, r64, r80, r128) r128
+#define REAL(r32, r64, r80, r80m, r128)     r128
+#define REAL_ULP(r32, r64, r80, r80m, r128) r128
 #include TEST_VECTORS
 #undef REAL
 #undef REAL_ULP

@@ -310,6 +310,17 @@ culp64(cbinary64 a, cbinary64 b)
 #endif
 
 #if __LDBL_MANT_DIG__ == 64 && defined(_TEST_LONG_DOUBLE) && !defined(SKIP_BINARY80)
+#if __LDBL_MIN_EXP__ == (-16382)
+#define HAS_BINARY80_MOTOROLA
+#define REAL80(r80, r80m)               r80m
+#define COMPLEX80(r80, i80, r80m, i80m) CMPLX80(r80m, i80m)
+#elif __LDBL_MIN_EXP__ == (-16381)
+#define HAS_BINARY80_INTEL
+#define REAL80(r80, r80m)               r80
+#define COMPLEX80(r80, i80, r80m, i80m) CMPLX80(r80, i80)
+#elif
+#error unknown 80-bit floating point format
+#endif
 #define HAS_BINARY80
 typedef long double         binary80;
 typedef complex long double cbinary80;
@@ -324,6 +335,7 @@ typedef complex long double cbinary80;
 #define TEST_FUNC_80      MATH_CONCAT(TEST_FUNC, l)
 #define MIN_BINARY80      LDBL_MIN
 #define FN80(a)           a##l
+#define FN80M(a)          a##l
 #define FMT80             "%La"
 #define P80(a)            (a)
 #ifdef __LONG_DOUBLE_NOEXCEPT
