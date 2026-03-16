@@ -34,7 +34,7 @@
 #
 
 add_library(picocrt OBJECT crt0.S)
-add_library(picocrt-semihost OBJECT crt0.S)
+add_library(picocrt-semihost OBJECT crt0.S traps.S traps.c)
 
 target_compile_options(picocrt PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
 target_compile_options(picocrt-semihost PRIVATE -DCRT0_EXIT -DCRT0_SEMIHOST ${PICOLIBC_COMPILE_OPTIONS})
