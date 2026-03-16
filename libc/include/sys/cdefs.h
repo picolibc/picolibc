@@ -304,6 +304,9 @@
 #if __has_builtin(__builtin_alloca)
 #define __HAVE_BUILTIN_ALLOCA 1
 #endif
+#if __has_builtin(__builtin_complex) || defined(__GNUC__)
+#define __HAVE_BUILTIN_COMPLEX 1
+#endif
 #if __has_builtin(__builtin_copysign)
 #define __HAVE_BUILTIN_COPYSIGN 1
 #endif
