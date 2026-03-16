@@ -44,6 +44,7 @@ gettimeofday(struct timeval * __restrict tv, void * __restrict __tz)
     (void)__tz;
     tv->tv_sec = seconds++;
     tv->tv_usec = 0;
+    return 0;
 }
 
 #ifdef __strong_reference
