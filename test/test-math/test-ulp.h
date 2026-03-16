@@ -111,14 +111,14 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "casinh",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "catan",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "catanh",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
-    { .name = "ccos",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
+    { .name = "ccos",       .b32 = 2,       .b64 = 1,       .b80 = 1,       .b128 = INV_ULP },
 #if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "ccosh",      .b32 = INV_ULP, .b64 = MAX_ULP, .b80 = 1,       .b128 = 2       },
 #else
-    { .name = "ccosh", .b32 = INV_ULP, .b64 = 1, .b80 = 1, .b128 = 2 },
+    { .name = "ccosh", .b32 = 2, .b64 = 1, .b80 = 1, .b128 = 2 },
 #endif
-    { .name = "csin",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
-    { .name = "csinh",      .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
+    { .name = "csin",       .b32 = 2,       .b64 = 1,       .b80 = 2,       .b128 = INV_ULP },
+    { .name = "csinh",      .b32 = 2,       .b64 = 2,       .b80 = 2,       .b128 = INV_ULP },
 
 #if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "ctan",       .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 3,       .b128 = 1       },
@@ -136,7 +136,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
 #endif
 
     /* Complex exp/log functions */
-    { .name = "cexp",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
+    { .name = "cexp",       .b32 = 1,       .b64 = 2,       .b80 = 2,       .b128 = INV_ULP },
 #if defined(__m68k__) && FLT_EVAL_METHOD != 0
     { .name = "clog",       .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 5,       .b128 = 6       },
 #elif defined(__riscv_float_abi_soft) || defined(__clang__)
