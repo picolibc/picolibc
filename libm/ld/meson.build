@@ -81,7 +81,7 @@ srcs_ld_common = [
   'e_lgammal.c',
   'e_remainderl.c',
   'e_sqrtl.c',
-  'k_rem_pio2.c',
+  'k_rem_pio2l.c',
   'math_errl_check_oflowl.c',
   'math_errl_check_uflowl.c',
   'math_errl_divzerol.c',
