@@ -1,6 +1,6 @@
 #!/bin/sh
 set -e
 HERE=`dirname "$0"`
-for target in cmake-thumbv6m cmake-clang-thumbv6m cmake-thumbv7m cmake-clang-thumbv7m cmake-rx; do
+for target in cmake-x86_64 cmake-thumbv6m cmake-clang-thumbv6m cmake-thumbv7m cmake-clang-thumbv7m cmake-rx; do
     "$HERE"/do-cmake-test "$target" "$@" "$@"
 done
