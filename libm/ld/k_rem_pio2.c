@@ -37,6 +37,6 @@
 
 #if LDBL_MANT_DIG == 64 || LDBL_MANT_DIG == 113
 
-#include "common/k_rem_pio2.c"
+#include "common/k_rem_pio2l.c"
 
 #endif
