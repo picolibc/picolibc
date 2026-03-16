@@ -68,8 +68,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 #include "../common/fdlibm.h"
 
@@ -88,16 +87,8 @@ QUICKREF
 double complex
 cproj(double complex z)
 {
-    double_complex w = { .z = z };
+    if (isinf(creal(z)) || isinf(cimag(z)))
+        z = CMPLX(INFINITY, copysign(0, cimag(z)));
 
-    if (isinf(creal(z)) || isinf(cimag(z))) {
-#ifdef __INFINITY
-        REAL_PART(w) = __INFINITY;
-#else
-        REAL_PART(w) = (double)INFINITY;
-#endif
-        IMAG_PART(w) = copysign(0.0, cimag(z));
-    }
-
-    return (w.z);
+    return z;
 }

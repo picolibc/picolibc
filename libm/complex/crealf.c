@@ -33,7 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
+#include "local-complex.h"
 #include "../common/fdlibm.h"
 
 float

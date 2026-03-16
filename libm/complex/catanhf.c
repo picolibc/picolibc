@@ -32,7 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
+#include "local-complex.h"
 
 float complex
 catanhf(float complex z)

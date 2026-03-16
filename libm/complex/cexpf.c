@@ -32,8 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 float complex
 cexpf(float complex z)
@@ -43,5 +42,5 @@ cexpf(float complex z)
     x = crealf(z);
     y = cimagf(z);
     r = expf(x);
-    return (float complex)(r * cosf(y)) + r * sinf(y) * I;
+    return CMPLXF(r * cosf(y), r * sinf(y));
 }

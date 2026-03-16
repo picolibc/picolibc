@@ -1,7 +1,6 @@
 /* Copyright (c) 2016 Yaakov Selkowitz <yselkowi@redhat.com> */
 #define _GNU_SOURCE
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 float complex
 clog10f(float complex z)
@@ -11,5 +10,5 @@ clog10f(float complex z)
     rr = cabsf(z);
     p = log10f(rr);
     rr = atan2f(cimagf(z), crealf(z)) * (float)M_IVLN10;
-    return (float complex)p + rr * I;
+    return CMPLXF(p, rr);
 }

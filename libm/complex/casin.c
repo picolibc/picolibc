@@ -74,14 +74,10 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
-#ifdef __weak_alias
-__weak_alias(casin, _casin)
-#endif
-
-    double complex casin(double complex z)
+double complex
+casin(double complex z)
 {
     double complex w;
     double complex ca, ct, zz, z2;
@@ -91,17 +87,17 @@ __weak_alias(casin, _casin)
     y = cimag(z);
 
 #if 0 /* MD: test is incorrect, casin(>1) is defined */
-	if (y == 0.0) {
-		if (fabs(x) > 1.0) {
-			w = M_PI_2 + 0.0 * (double complex) I;
+    if (y == 0.0) {
+        if (fabs(x) > 1.0) {
+            w = CMPLX(M_PI_2, 0);
 #if 0
-			mtherr ("casin", DOMAIN);
+            mtherr ("casin", DOMAIN);
 #endif
-		} else {
-			w = asin(x) + 0.0 * (double complex) I;
-		}
-		return w;
-	}
+        } else {
+            w = CMPLX(asin(x), 0);
+        }
+        return w;
+    }
 #endif
 
     /* Power series expansion */
@@ -144,18 +140,19 @@ __weak_alias(casin, _casin)
     }
     */
 
-    ca = x + y * (double complex)I;
+    ca = CMPLX(x, y);
     ct = ca * (double complex)I;
     /* sqrt( 1 - z*z) */
     /* cmul( &ca, &ca, &zz ) */
     /*x * x  -  y * y */
-    zz = (x - y) * (x + y) + (2.0 * x * y) * (double complex)I;
+    zz = CMPLX((x - y) * (x + y), (2.0 * x * y));
 
-    zz = 1.0 - creal(zz) - cimag(zz) * (double complex)I;
+    zz = CMPLX(1.0 - creal(zz), -cimag(zz));
     z2 = csqrt(zz);
 
     zz = ct + z2;
     zz = clog(zz);
+
     /* multiply by 1/i = -i */
     w = zz * (-1.0 * (double complex)I);
     return w;

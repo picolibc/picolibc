@@ -66,8 +66,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 double complex
 csqrt(double complex z)
@@ -80,14 +79,14 @@ csqrt(double complex z)
 
     if (y == 0.0) {
         if (x == 0.0) {
-            w = 0.0 + y * (double complex)I;
+            w = CMPLX(0, y);
         } else {
             r = fabs(x);
             r = sqrt(r);
             if (x < 0.0) {
-                w = 0.0 + r * (double complex)I;
+                w = CMPLX(0, r);
             } else {
-                w = r + y * (double complex)I;
+                w = CMPLX(r, y);
             }
         }
         return w;
@@ -96,9 +95,9 @@ csqrt(double complex z)
         r = fabs(y);
         r = sqrt(0.5 * r);
         if (y > 0)
-            w = r + r * (double complex)I;
+            w = CMPLX(r, r);
         else
-            w = r - r * (double complex)I;
+            w = CMPLX(r, -r);
         return w;
     }
     /* Rescale to avoid internal overflow or underflow.  */
@@ -117,7 +116,7 @@ csqrt(double complex z)
         scale = 0.5;
 #endif
     }
-    w = x + y * (double complex)I;
+    w = CMPLX(x, y);
     r = cabs(w);
     if (x > 0) {
         t = sqrt(0.5 * r + 0.5 * x);
@@ -129,8 +128,8 @@ csqrt(double complex z)
         r *= scale;
     }
     if (y < 0)
-        w = t - r * (double complex)I;
+        w = CMPLX(t, -r);
     else
-        w = t + r * (double complex)I;
+        w = CMPLX(t, r);
     return w;
 }

@@ -29,9 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subrl.h"
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
@@ -47,11 +45,10 @@ ctanl(long double complex z)
 
     if (d == 0.0L) {
         /* mtherr ("ctan", OVERFLOW); */
-        return HUGE_VALL + HUGE_VALL * (long double complex)I;
+        return CMPLXL(HUGE_VALL, HUGE_VALL);
     }
 
-    return (long double complex)(sinl(2.0L * creall(z)) / d)
-        + (sinhl(2.0L * cimagl(z)) / d) * (long double complex)I;
+    return CMPLXL(sinl(2.0L * creall(z)) / d, sinhl(2.0L * cimagl(z)) / d);
 }
 
 #endif

@@ -64,9 +64,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subr.h"
+#include "local-complex.h"
 
 double complex
 csin(double complex z)
@@ -74,5 +72,5 @@ csin(double complex z)
     double ch, sh;
 
     _cchsh(cimag(z), &ch, &sh);
-    return (double complex)(sin(creal(z)) * ch) + (cos(creal(z)) * sh) * (double complex)I;
+    return CMPLX(sin(creal(z)) * ch, cos(creal(z)) * sh);
 }

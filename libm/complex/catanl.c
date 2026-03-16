@@ -29,17 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subrl.h"
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
-#ifdef __weak_alias
-__weak_alias(catanl, _catanl)
-#endif
-
-    long double complex catanl(long double complex z)
+long double complex
+catanl(long double complex z)
 {
     long double complex w;
     long double         a, t, x, x2, y;
@@ -70,9 +65,9 @@ __weak_alias(catanl, _catanl)
 
 ovrf:
 #if 0
-	mtherr ("catanl", OVERFLOW);
+    mtherr ("catanl", OVERFLOW);
 #endif
-    w = HUGE_VALL + HUGE_VALL * (long double complex)I;
+    w = CMPLXL(HUGE_VALL, HUGE_VALL);
     return w;
 }
 

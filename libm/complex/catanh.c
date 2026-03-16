@@ -77,7 +77,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
+#include "local-complex.h"
 
 double complex
 catanh(double complex z)

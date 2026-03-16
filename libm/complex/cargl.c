@@ -29,8 +29,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Public domain.
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 

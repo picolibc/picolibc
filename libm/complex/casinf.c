@@ -32,14 +32,10 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
-#ifdef __weak_alias
-__weak_alias(casinf, _casinf)
-#endif
-
-    float complex casinf(float complex z)
+float complex
+casinf(float complex z)
 {
     float complex w;
     float complex ca, ct, zz, z2;
@@ -49,17 +45,17 @@ __weak_alias(casinf, _casinf)
     y = cimagf(z);
 
 #if 0 /* MD: test is incorrect, casin(>1) is defined */
-	if (y == 0.0f) {
-		if (fabsf(x) > 1.0) {
-			w = M_PI_2 + 0.0f * I;
+    if (y == 0.0f) {
+        if (fabsf(x) > 1.0) {
+            w = CMPLXF((float) M_PI_2, 0);
 #if 0
-			mtherr ("casin", DOMAIN);
+            mtherr ("casin", DOMAIN);
 #endif
-		} else {
-			w = asinf(x) + 0.0f * I;
-		}
-		return w;
-	}
+        } else {
+            w = CMPLXF(asinf(x), 0);
+        }
+        return w;
+    }
 #endif
 
     /* Power series expansion */
@@ -102,14 +98,14 @@ __weak_alias(casinf, _casinf)
     }
     */
 
-    ca = x + y * I;
+    ca = CMPLXF(x, y);
     ct = ca * I;
     /* sqrt( 1 - z*z) */
     /* cmul( &ca, &ca, &zz ) */
     /*x * x  -  y * y */
-    zz = (x - y) * (x + y) + (2.0f * x * y) * I;
+    zz = CMPLXF((x - y) * (x + y), (2 * x * y));
 
-    zz = 1.0f - crealf(zz) - cimagf(zz) * I;
+    zz = CMPLXF(1 - crealf(zz), -cimagf(zz));
     z2 = csqrtf(zz);
 
     zz = ct + z2;

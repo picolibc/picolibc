@@ -32,8 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 float complex
 ctanhf(float complex z)
@@ -43,5 +42,5 @@ ctanhf(float complex z)
     x = crealf(z);
     y = cimagf(z);
     d = coshf(2.0f * x) + cosf(2.0f * y);
-    return (float complex)(sinhf(2.0f * x) / d) + (sinf(2.0f * y) / d) * I;
+    return CMPLXF(sinhf(2.0f * x) / d, sinf(2.0f * y) / d);
 }
