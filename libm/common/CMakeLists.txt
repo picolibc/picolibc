@@ -73,6 +73,9 @@ picolibc_sources(
   s_signbit.c
   s_trunc.c
   exp_data.c
+  math_denorm.c
+  math_denormf.c
+  math_denorml.c
   math_err_with_errno.c
   math_err_uflow.c
   math_err_oflow.c
