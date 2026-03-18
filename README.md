@@ -187,6 +187,7 @@ use Picolibc:
  * [Picolibc as embedded source](doc/embedsource.md)
  * [Releasing Picolibc](doc/releasing.md)
  * [Copyright and license information](COPYING.picolibc)
+ * [Thread Safety in Picolibc](doc/thread-safety.md)
 
 ## Releases
 
