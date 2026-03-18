@@ -89,68 +89,46 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "round",      .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
 #if defined(__riscv_float_abi_soft) || defined(__clang__)
     { .name = "sqrt",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 1       },
-#elif defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "sqrt", .b32 = 1, .b64 = 1, .b80 = 0, .b128 = 0 },
 #else
     { .name = "sqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
 #endif
     { .name = "tgamma",     .b32 = 238,     .b64 = 56,      .b80 = 4,       .b128 = 132     },
 
-/* Complex trig functions */
-#if defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "cacos",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 2,       .b128 = MAX_ULP },
-#else
-    { .name = "cacos", .b32 = 2, .b64 = 3, .b80 = 2, .b128 = MAX_ULP },
-#endif
-#if defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "cacosh",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 2,       .b128 = MAX_ULP },
-#else
-    { .name = "cacosh", .b32 = 1, .b64 = 2, .b80 = 2, .b128 = MAX_ULP },
-#endif
+    /* Complex trig functions */
+    { .name = "cacos",      .b32 = 2,       .b64 = 3,       .b80 = 2,       .b128 = MAX_ULP },
+    { .name = "cacosh",     .b32 = 1,       .b64 = 2,       .b80 = 2,       .b128 = MAX_ULP },
     { .name = "casin",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "casinh",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "catan",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "catanh",     .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = MAX_ULP, .b128 = MAX_ULP },
     { .name = "ccos",       .b32 = 2,       .b64 = 1,       .b80 = 1,       .b128 = INV_ULP },
-#if defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "ccosh",      .b32 = INV_ULP, .b64 = MAX_ULP, .b80 = 1,       .b128 = 2       },
-#else
-    { .name = "ccosh", .b32 = 2, .b64 = 1, .b80 = 1, .b128 = 2 },
-#endif
+    { .name = "ccosh",      .b32 = 2,       .b64 = 1,       .b80 = 1,       .b128 = 2       },
     { .name = "csin",       .b32 = 2,       .b64 = 1,       .b80 = 2,       .b128 = INV_ULP },
     { .name = "csinh",      .b32 = 2,       .b64 = 2,       .b80 = 2,       .b128 = INV_ULP },
 
-#if defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "ctan",       .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 3,       .b128 = 1       },
-#elif defined(__clang__) && defined(__SOFTFP__)
-    { .name = "ctan", .b32 = MAX_ULP, .b64 = 2, .b80 = 3, .b128 = 1 },
+#if defined(__clang__) && defined(__SOFTFP__)
+    { .name = "ctan",       .b32 = MAX_ULP, .b64 = 2,       .b80 = 3,       .b128 = 1       },
 #else
     { .name = "ctan", .b32 = 1, .b64 = 2, .b80 = 3, .b128 = 1 },
 #endif
-#if defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "ctanh",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 3,       .b128 = 1       },
-#elif defined(__clang__) && defined(__SOFTFP__)
-    { .name = "ctanh", .b32 = MAX_ULP, .b64 = 2, .b80 = 3, .b128 = 1 },
+#if defined(__clang__) && defined(__SOFTFP__)
+    { .name = "ctanh",      .b32 = MAX_ULP, .b64 = 2,       .b80 = 3,       .b128 = 1       },
 #else
     { .name = "ctanh", .b32 = 1, .b64 = 2, .b80 = 3, .b128 = 1 },
 #endif
 
     /* Complex exp/log functions */
     { .name = "cexp",       .b32 = 1,       .b64 = 2,       .b80 = 2,       .b128 = INV_ULP },
-#if defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "clog",       .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 5,       .b128 = 6       },
-#elif defined(__riscv_float_abi_soft) || defined(__clang__)
-    { .name = "clog", .b32 = 4, .b64 = 6, .b80 = 5, .b128 = 8 },
+#if defined(__riscv_float_abi_soft) || defined(__clang__)
+    { .name = "clog",       .b32 = 4,       .b64 = 6,       .b80 = 5,       .b128 = 8       },
 #else
     { .name = "clog", .b32 = 4, .b64 = 6, .b80 = 5, .b128 = 6 },
 #endif
     { .name = "cpow",       .b32 = INV_ULP, .b64 = INV_ULP, .b80 = INV_ULP, .b128 = INV_ULP },
 
 /* Complex misc functions */
-#if defined(__m68k__) && FLT_EVAL_METHOD != 0
-    { .name = "csqrt",      .b32 = MAX_ULP, .b64 = MAX_ULP, .b80 = 1,       .b128 = 1       },
-#elif defined(__riscv_float_abi_soft) || defined(__clang__)
-    { .name = "csqrt", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 2 },
+#if defined(__riscv_float_abi_soft) || defined(__clang__)
+    { .name = "csqrt",      .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 2       },
 #else
     { .name = "csqrt", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
 #endif

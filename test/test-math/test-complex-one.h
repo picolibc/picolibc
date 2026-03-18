@@ -48,9 +48,9 @@ static TEST_CONST struct {
 static int
 test_binary32(void)
 {
-    size_t i;
-    int    ret = 1;
-    ulp_t  math_ulp_binary32 = math_find_ulp_binary32();
+    volatile size_t i;
+    int             ret = 1;
+    ulp_t           math_ulp_binary32 = math_find_ulp_binary32();
 
     max_ulp = 0;
     printf("test %s\n", MATH_STRING(TEST_FUNC_32));

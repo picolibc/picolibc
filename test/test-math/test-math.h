@@ -183,8 +183,10 @@ typedef struct {
 } cunary32;
 
 static inline ulp_t
-ulp32(binary32 a, binary32 b)
+ulp32(binary32 ab, binary32 bb)
 {
+    volatile binary32 a = ab;
+    volatile binary32 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
@@ -270,8 +272,10 @@ typedef struct {
 } cunary64;
 
 static inline ulp_t
-ulp64(binary64 a, binary64 b)
+ulp64(binary64 ab, binary64 bb)
 {
+    volatile binary64 a = ab;
+    volatile binary64 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
@@ -369,8 +373,10 @@ typedef struct {
 } cunary80;
 
 static inline ulp_t
-ulp80(binary80 a, binary80 b)
+ulp80(binary80 ab, binary80 bb)
 {
+    volatile binary80 a = ab;
+    volatile binary80 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
@@ -432,8 +438,10 @@ typedef struct {
 } cunary128;
 
 static inline ulp_t
-ulp128(binary128 a, binary128 b)
+ulp128(binary128 ab, binary128 bb)
 {
+    volatile binary128 a = ab;
+    volatile binary128 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
