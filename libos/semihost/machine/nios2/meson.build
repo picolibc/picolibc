@@ -45,6 +45,7 @@ src_semihost += files([
                        'nios2_unlink.c',
                        'nios2_write.c',
                      ]) + [
+  src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
   src_semihost_fake_gettimeofday,
   src_semihost_fake_isatty,

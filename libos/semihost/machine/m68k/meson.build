@@ -47,6 +47,7 @@ src_semihost += files([
                        'm68k_unlink.c',
                        'm68k_write.c',
                      ]) + [
+  src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
   src_semihost_fake_isatty,
   src_semihost_fake_kill,

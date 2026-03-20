@@ -37,6 +37,7 @@ srcs_semihost_fake = [
   'fake_close.c',
   'fake_exit.c',
   'fake_fstat.c',
+  'fake_getentropy.c',
   'fake_getpid.c',
   'fake_gettimeofday.c',
   'fake_io.c',

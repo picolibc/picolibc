@@ -38,6 +38,7 @@ target_sources(semihost PRIVATE
   rx_iob.c
   ../../fake/fake_close.c
   ../../fake/fake_fstat.c
+  ../../fake/fake_getentropy.c
   ../../fake/fake_getpid.c
   ../../fake/fake_isatty.c
   ../../fake/fake_kill.c

@@ -48,6 +48,7 @@ src_semihost += files([
                        'hexagon_unlink.c', 
                        'hexagon_write.c',
                      ]) + [
+  src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
   src_semihost_fake_gettimeofday,
   src_semihost_fake_kill,

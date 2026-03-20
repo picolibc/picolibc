@@ -37,6 +37,7 @@ target_sources(semihost PRIVATE
   close.c
   exit.c
   fstat.c
+  getentropy.c
   gettimeofday.c
   isatty.c
   lseek.c

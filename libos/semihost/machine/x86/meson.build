@@ -39,6 +39,7 @@ src_semihost += files([
                      ]) + [
   src_semihost_fake_close,
   src_semihost_fake_fstat,
+  src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
   src_semihost_fake_gettimeofday,
   src_semihost_fake_isatty,

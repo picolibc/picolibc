@@ -45,6 +45,7 @@ src_semihost += files([
                        '../arc/arc_unlink.c',
                        '../arc/arc_write.c',
                      ]) + [
+  src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
   src_semihost_fake_gettimeofday,
   src_semihost_fake_isatty,
