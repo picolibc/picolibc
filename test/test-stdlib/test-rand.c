@@ -61,6 +61,15 @@ rand_double(void)
     return (double)rand() / RAND_MAX;
 }
 
+static double
+arc4random_double(void)
+{
+    uint64_t bits;
+
+    arc4random_buf(&bits, sizeof(bits));
+    return (double)bits / (double)UINT64_MAX;
+}
+
 static const struct {
     char  *name;
     double (*func)(void);
@@ -85,6 +94,12 @@ static const struct {
      .mean_err = 0.01,
      .stddev_err = 0.02,
      },
+    {
+     .name = "arc4random",
+     .func = arc4random_double,
+     .mean_err = 0.015,
+     .stddev_err = 0.03,
+     },
 };
 
 int
@@ -98,7 +113,7 @@ main(void)
         double s1 = 0;
         double s2 = 0;
         int    pass = 1;
-#define N 1000
+#define N 10000
         printf("Testing %s...", funcs[f].name);
         fflush(stdout);
         for (i = 0; i < N; i++) {
