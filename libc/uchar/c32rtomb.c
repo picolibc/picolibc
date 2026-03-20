@@ -35,13 +35,13 @@
 
 #include "uchar-local.h"
 
+static mbstate_t c32rtomb_state;
+
 size_t
 c32rtomb(char *s, char32_t c32, mbstate_t *ps)
 {
-    static mbstate_t local_state;
-
     if (ps == NULL)
-        ps = &local_state;
+        ps = &c32rtomb_state;
 
     if (!char32_is_valid(c32)) {
         errno = EILSEQ;

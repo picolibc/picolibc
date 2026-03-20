@@ -35,15 +35,16 @@
 
 #include "uchar-local.h"
 
+static mbstate_t c8rtomb_state;
+
 size_t
 c8rtomb(char *s, char8_t c8, mbstate_t *ps)
 {
-    static mbstate_t _state;
-    char32_t         c32;
-    int              count;
+    char32_t c32;
+    int      count;
 
     if (ps == NULL)
-        ps = &_state;
+        ps = &c8rtomb_state;
 
     if (s == NULL)
         c8 = 0;

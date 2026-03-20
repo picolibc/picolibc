@@ -35,13 +35,13 @@
 
 #include "uchar-local.h"
 
+static mbstate_t mbrtoc32_state;
+
 size_t
 mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n, mbstate_t * __restrict ps)
 {
-    static mbstate_t local_state;
-
     if (ps == NULL)
-        ps = &local_state;
+        ps = &mbrtoc32_state;
 
     char32_t c32;
     wchar_t  wc;

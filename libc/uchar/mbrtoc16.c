@@ -35,13 +35,13 @@
 
 #include "uchar-local.h"
 
+static mbstate_t mbrtoc16_state;
+
 size_t
 mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n, mbstate_t * __restrict ps)
 {
-    static mbstate_t local_state;
-
     if (ps == NULL)
-        ps = &local_state;
+        ps = &mbrtoc16_state;
 
 #if __SIZEOF_WCHAR_T__ == 2
     return mbrtowc((wchar_t *)pc16, s, n, ps);

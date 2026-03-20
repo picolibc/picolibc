@@ -35,13 +35,13 @@
 
 #include "uchar-local.h"
 
+static mbstate_t mbrtoc8_state;
+
 size_t
 mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n, mbstate_t * __restrict ps)
 {
-    static mbstate_t local_state;
-
     if (ps == NULL)
-        ps = &local_state;
+        ps = &mbrtoc8_state;
 
     if (ps->__count < 0) {
         int count = -ps->__count;
