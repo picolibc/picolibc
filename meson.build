@@ -1957,7 +1957,6 @@ endforeach
 
 if enable_tests
   subdir('test')
-  subdir('libm/test')
 endif
 
 subdir('empty-libs')

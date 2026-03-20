@@ -209,7 +209,7 @@ foreach params : targets
 		    link_depends: _link_depends,
 		    include_directories: inc),
          depends: bios_bin,
-         suite: 'math',
+         suite: 'newlib.math',
          env: test_env)
   endforeach
 endforeach
@@ -225,7 +225,7 @@ if enable_native_math_tests
 		    c_args: native_c_args + defines,
 		    link_args: native_c_args,
 		    dependencies: native_lib_m),
-         suite: 'math',
+         suite: 'newlib.math',
          env: test_env)
   endif
 endif
