@@ -42,10 +42,11 @@
 #include <limits.h>
 #include <errno.h>
 
+static char getpass_line[PASS_MAX + 1];
+
 char *
 getpass(const char *prompt)
 {
-    static char    line[PASS_MAX + 1];
     FILE          *tty;
     int            fd;
     struct termios termios;
@@ -67,7 +68,7 @@ getpass(const char *prompt)
         }
     }
     fputs(prompt, tty);
-    ret = fgets(line, sizeof(line), tty);
+    ret = fgets(getpass_line, sizeof(getpass_line), tty);
     if (ret) {
         nl = strchr(ret, '\n');
         if (nl)
