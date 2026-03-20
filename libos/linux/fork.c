@@ -35,13 +35,26 @@
 
 #include "local-sigaction.h"
 #include <unistd.h>
+#include <stdlib.h>
+#include <stdbool.h>
+
+static bool forked;
 
 pid_t
 fork(void)
 {
+    forked = true;
 #ifdef LINUX_SYS_fork
     return syscall(LINUX_SYS_fork);
 #else
     return syscall(LINUX_SYS_clone, __LINUX_SIGCHLD, 0, 0, 0, 0);
 #endif
+}
+
+int
+arc4random_fork_detect(void)
+{
+    bool was_forked = forked;
+    forked = false;
+    return (int)was_forked;
 }

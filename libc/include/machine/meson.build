@@ -34,7 +34,6 @@
 #
 inc_machine_headers_all = [
   'ansi.h',
-  '_arc4random.h',
   '_default_types.h',
   '_endian.h',
   'endian.h',

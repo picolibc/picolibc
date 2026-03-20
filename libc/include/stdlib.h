@@ -110,6 +110,8 @@ __malloc_like __alloc_align(1) __alloc_size(2) __warn_unused_result __nothrow;
 __uint32_t arc4random(void);
 __uint32_t arc4random_uniform(__uint32_t);
 void       arc4random_buf(void *, size_t);
+int        arc4random_fork_detect(void);
+void       arc4random_abort(void);
 #endif
 #if __ISO_C_VISIBLE >= 2011
 int at_quick_exit(void (*)(void));

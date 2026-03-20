@@ -31,8 +31,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <stdbool.h>
 #include <sys/types.h>
 #include <sys/time.h>
+#include <sys/lock.h>
 
 #define KEYSTREAM_ONLY
 #include "chacha_private.h"
@@ -59,22 +61,25 @@
 #endif
 
 /* Marked MAP_INHERIT_ZERO, so zero'd out in fork children. */
-static struct _rs {
+struct _rs {
     size_t rs_have;  /* valid bytes at end of rs_buf */
     size_t rs_count; /* bytes till reseed */
-} *rs;
+};
 
 /* Maybe be preserved in fork children, if _rs_allocate() decides. */
-static struct _rsx {
+struct _rsx {
     chacha_ctx    rs_chacha;       /* chacha context for random keystream */
     unsigned char rs_buf[RSBUFSZ]; /* keystream blocks */
-}                 *rsx;
+};
 
-static inline int  _rs_allocate(struct _rs **, struct _rsx **);
-static inline void _rs_forkdetect(void);
-#include "arc4random.h"
+static bool        arc4random_init;
+static struct _rs  arc4random_rs;
+static struct _rsx arc4random_rsx;
 
 static inline void _rs_rekey(unsigned char *dat, size_t datlen);
+
+int                arc4random_fork_detect(void) __weak;
+void               arc4random_abort(void) __weak;
 
 static inline void
 _rs_init(unsigned char *buf, size_t n)
@@ -82,13 +87,8 @@ _rs_init(unsigned char *buf, size_t n)
     if (n < KEYSZ + IVSZ)
         return;
 
-    if (rs == NULL) {
-        if (_rs_allocate(&rs, &rsx) == -1)
-            abort();
-    }
-
-    chacha_keysetup(&rsx->rs_chacha, buf, KEYSZ * 8);
-    chacha_ivsetup(&rsx->rs_chacha, buf + KEYSZ);
+    chacha_keysetup(&arc4random_rsx.rs_chacha, buf, KEYSZ * 8);
+    chacha_ivsetup(&arc4random_rsx.rs_chacha, buf + KEYSZ);
 }
 
 static void
@@ -99,57 +99,61 @@ _rs_stir(void)
 
     memset(rnd, 0, (KEYSZ + IVSZ) * sizeof(u_char));
 
-    if (getentropy(rnd, sizeof rnd) == -1)
-        _getentropy_fail();
+    if (getentropy(rnd, sizeof rnd) == -1) {
+        if (arc4random_abort)
+            arc4random_abort();
+    }
 
-    if (!rs)
+    if (!arc4random_init) {
+        arc4random_init = true;
         _rs_init(rnd, sizeof(rnd));
-    else
+    } else {
         _rs_rekey(rnd, sizeof(rnd));
+    }
     explicit_bzero(rnd, sizeof(rnd)); /* discard source seed */
 
     /* invalidate rs_buf */
-    rs->rs_have = 0;
-    memset(rsx->rs_buf, 0, sizeof(rsx->rs_buf));
+    arc4random_rs.rs_have = 0;
+    memset(arc4random_rsx.rs_buf, 0, sizeof(arc4random_rsx.rs_buf));
 
     /* rekey interval should not be predictable */
-    chacha_encrypt_bytes(&rsx->rs_chacha, (uint8_t *)&rekey_fuzz, (uint8_t *)&rekey_fuzz,
+    chacha_encrypt_bytes(&arc4random_rsx.rs_chacha, (uint8_t *)&rekey_fuzz, (uint8_t *)&rekey_fuzz,
                          sizeof(rekey_fuzz));
-    rs->rs_count = REKEY_BASE + (rekey_fuzz % REKEY_BASE);
+    arc4random_rs.rs_count = REKEY_BASE + (rekey_fuzz % REKEY_BASE);
 }
 
 static inline void
 _rs_stir_if_needed(size_t len)
 {
-    _rs_forkdetect();
-    if (!rs || rs->rs_count <= len)
+    if (arc4random_rs.rs_count <= len || (arc4random_fork_detect && arc4random_fork_detect()))
         _rs_stir();
-    if (rs->rs_count <= len)
-        rs->rs_count = 0;
+    if (arc4random_rs.rs_count <= len)
+        arc4random_rs.rs_count = 0;
     else
-        rs->rs_count -= len;
+        arc4random_rs.rs_count -= len;
 }
 
 static inline void
 _rs_rekey(unsigned char *dat, size_t datlen)
 {
 #ifndef KEYSTREAM_ONLY
-    memset(rsx->rs_buf, 0, sizeof(rsx->rs_buf));
+    memset(arc4random_rsx.rs_buf, 0, sizeof(arc4random_rsx.rs_buf));
 #endif
     /* fill rs_buf with the keystream */
-    chacha_encrypt_bytes(&rsx->rs_chacha, rsx->rs_buf, rsx->rs_buf, sizeof(rsx->rs_buf));
+    chacha_encrypt_bytes(&arc4random_rsx.rs_chacha, arc4random_rsx.rs_buf, arc4random_rsx.rs_buf,
+                         sizeof(arc4random_rsx.rs_buf));
     /* mix in optional user provided data */
     if (dat) {
         size_t i, m;
 
         m = minimum(datlen, KEYSZ + IVSZ);
         for (i = 0; i < m; i++)
-            rsx->rs_buf[i] ^= dat[i];
+            arc4random_rsx.rs_buf[i] ^= dat[i];
     }
     /* immediately reinit for backtracking resistance */
-    _rs_init(rsx->rs_buf, KEYSZ + IVSZ);
-    memset(rsx->rs_buf, 0, KEYSZ + IVSZ);
-    rs->rs_have = sizeof(rsx->rs_buf) - KEYSZ - IVSZ;
+    _rs_init(arc4random_rsx.rs_buf, KEYSZ + IVSZ);
+    memset(arc4random_rsx.rs_buf, 0, KEYSZ + IVSZ);
+    arc4random_rs.rs_have = sizeof(arc4random_rsx.rs_buf) - KEYSZ - IVSZ;
 }
 
 static inline void
@@ -161,16 +165,17 @@ _rs_random_buf(void *_buf, size_t n)
 
     _rs_stir_if_needed(n);
     while (n > 0) {
-        if (rs->rs_have > 0) {
-            m = minimum(n, rs->rs_have);
-            keystream = rsx->rs_buf + sizeof(rsx->rs_buf) - rs->rs_have;
+        if (arc4random_rs.rs_have > 0) {
+            m = minimum(n, arc4random_rs.rs_have);
+            keystream
+                = arc4random_rsx.rs_buf + sizeof(arc4random_rsx.rs_buf) - arc4random_rs.rs_have;
             memcpy(buf, keystream, m);
             memset(keystream, 0, m);
             buf += m;
             n -= m;
-            rs->rs_have -= m;
+            arc4random_rs.rs_have -= m;
         }
-        if (rs->rs_have == 0)
+        if (arc4random_rs.rs_have == 0)
             _rs_rekey(NULL, 0);
     }
 }
@@ -181,12 +186,12 @@ _rs_random_u32(uint32_t *val)
     unsigned char *keystream;
 
     _rs_stir_if_needed(sizeof(*val));
-    if (rs->rs_have < sizeof(*val))
+    if (arc4random_rs.rs_have < sizeof(*val))
         _rs_rekey(NULL, 0);
-    keystream = rsx->rs_buf + sizeof(rsx->rs_buf) - rs->rs_have;
+    keystream = arc4random_rsx.rs_buf + sizeof(arc4random_rsx.rs_buf) - arc4random_rs.rs_have;
     memcpy(val, keystream, sizeof(*val));
     memset(keystream, 0, sizeof(*val));
-    rs->rs_have -= sizeof(*val);
+    arc4random_rs.rs_have -= sizeof(*val);
 }
 
 uint32_t
