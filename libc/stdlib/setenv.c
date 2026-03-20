@@ -33,7 +33,7 @@
  */
 
 extern char **environ;
-static bool   alloced; /* if allocated space before */
+static bool   setenv_alloced; /* if allocated space before */
 
 int
 setenv(const char *name, const char *value, int rewrite)
@@ -129,10 +129,10 @@ setenv(const char *name, const char *value, int rewrite)
     __environ_sequence++;
 
     if (new_environ) {
-        if (alloced)
+        if (setenv_alloced)
             free(environ);
         environ = new_environ;
-        alloced = true;
+        setenv_alloced = true;
     }
 
     environ[offset] = new_entry;
