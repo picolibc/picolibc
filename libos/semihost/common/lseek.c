@@ -43,8 +43,9 @@
 off_t
 lseek(int fd, off_t offset, int whence)
 {
+    /* SEEK_CUR and zero offset means return current position */
     if (whence == SEEK_CUR && offset == 0)
-        return 0;
+        return sys_semihost2(SYS_SEEK, fd, 0);
 
     if (whence == SEEK_END) {
         int flen = sys_semihost_flen(fd);
