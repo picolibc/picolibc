@@ -45,6 +45,7 @@ src_semihost += files([
                        'mapstdio.c',
                        'open.c',
                        'read.c',
+                       'rename.c',
                        'sysconf.c',
                        'times.c',
                        'unlink.c',
