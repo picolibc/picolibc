@@ -52,6 +52,7 @@ enum hexagon_system_call_code {
     SYS_SEEK = 0x0a,
     SYS_FLEN = 12,
     SYS_REMOVE = 14,
+    SYS_RENAME = 15,
     SYS_GET_CMDLINE = 21,
     SYS_EXIT = 24,
     SYS_FTELL = 0x100,

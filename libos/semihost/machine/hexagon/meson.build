@@ -43,6 +43,7 @@ src_semihost += files([
                        'hexagon_lseek.c',
                        'hexagon_open.c',
                        'hexagon_read.c',
+                       'hexagon_rename.c',
                        'hexagon_semihost.c',
                        'hexagon_stat.c',
                        'hexagon_unlink.c', 

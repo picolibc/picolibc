@@ -38,6 +38,7 @@ tests = [
   'test-getdelim',
   'test-grp',
   'test-pwd',
+  'test-rename',
   'test-signal',
   'test-stat',
   ]
