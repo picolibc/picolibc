@@ -48,4 +48,5 @@ target_sources(semihost PRIVATE
   ../../fake/fake_gettimeofday.c
   ../../fake/fake_isatty.c
   ../../fake/fake_kill.c
+  ../../fake/fake_rename.c
   )

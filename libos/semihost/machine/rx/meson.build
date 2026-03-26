@@ -44,6 +44,7 @@ src_semihost += files([
   src_semihost_fake_gettimeofday,
   src_semihost_fake_isatty,
   src_semihost_fake_kill,
+  src_semihost_fake_rename,
   src_semihost_fake_lseek,
   src_semihost_fake_open,
   src_semihost_fake_read,
