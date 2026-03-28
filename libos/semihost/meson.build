@@ -38,6 +38,7 @@ has_semihost_test_flag = false
 has_semihost = true
 
 src_semihost = []
+semihost_c_args = []
 
 subdir('fake')
 
@@ -72,7 +73,7 @@ foreach params : targets
 			  install : really_install,
 			  install_dir : instdir,
 			  include_directories : inc,
-			  c_args : target_c_args + c_args)
+			  c_args : target_c_args + c_args + semihost_c_args)
   else
     target_lib_prefix = params['lib_prefix']
     _lib = static_library(join_paths(target_dir, target_lib_prefix + libsemihost_name),
@@ -80,7 +81,7 @@ foreach params : targets
 			  install : really_install,
 			  install_dir : instdir,
 			  include_directories : inc,
-			  c_args : target_c_args + c_args)
+			  c_args : target_c_args + c_args + semihost_c_args)
   endif
 
   set_variable('lib_semihost' + target, _lib)
