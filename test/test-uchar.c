@@ -243,6 +243,27 @@ main(void)
         }
     }
 
+    {
+        size_t ret = 0;
+        size_t exp = 0;
+
+        memset(&mbstate, 0, sizeof(mbstate));
+        exp = 1;
+        ret = mbrtoc8(NULL, "a", 1, &mbstate);
+        if (ret != exp) {
+            printf("mbrtoc8(NULL, \"a\", 1, &mbstate) returned %zu got %zu\n", ret, exp);
+            status = 1;
+        }
+
+        memset(&mbstate, 0, sizeof(mbstate));
+        exp = 0;
+        ret = mbrtoc8(NULL, "", 1, &mbstate);
+        if (ret != exp) {
+            printf("mbrtoc8(NULL, \"\", 1, &mbstate) returned %zu got %zu\n", ret, exp);
+            status = 1;
+        }
+    }
+
     /* utf-16 tests */
     for (i = 0; i < NTEST_C16; i++) {
         char   mb[MAX_MB];
@@ -312,6 +333,28 @@ main(void)
             }
         }
     }
+
+    {
+        size_t ret = 0;
+        size_t exp = 0;
+
+        memset(&mbstate, 0, sizeof(mbstate));
+        exp = 1;
+        ret = mbrtoc16(NULL, "a", 1, &mbstate);
+        if (ret != exp) {
+            printf("mbrtoc16(NULL, \"a\", 1, &mbstate) returned %zu got %zu\n", ret, exp);
+            status = 1;
+        }
+
+        memset(&mbstate, 0, sizeof(mbstate));
+        exp = 0;
+        ret = mbrtoc16(NULL, "", 1, &mbstate);
+        if (ret != exp) {
+            printf("mbrtoc16(NULL, \"\", 1, &mbstate) returned %zu got %zu\n", ret, exp);
+            status = 1;
+        }
+    }
+
     for (i = 0; i < NTEST_C32; i++) {
         char   mb[MAX_MB];
         size_t ret;
@@ -378,5 +421,27 @@ main(void)
             }
         }
     }
+
+    {
+        size_t ret = 0;
+        size_t exp = 0;
+
+        memset(&mbstate, 0, sizeof(mbstate));
+        exp = 1;
+        ret = mbrtoc32(NULL, "a", 1, &mbstate);
+        if (ret != exp) {
+            printf("mbrtoc32(NULL, \"a\", 1, &mbstate) returned %zu got %zu\n", ret, exp);
+            status = 1;
+        }
+
+        memset(&mbstate, 0, sizeof(mbstate));
+        exp = 0;
+        ret = mbrtoc32(NULL, "", 1, &mbstate);
+        if (ret != exp) {
+            printf("mbrtoc32(NULL, \"\", 1, &mbstate) returned %zu got %zu\n", ret, exp);
+            status = 1;
+        }
+    }
+
     return status;
 }

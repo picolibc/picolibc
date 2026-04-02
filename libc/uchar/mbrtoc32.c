@@ -121,7 +121,7 @@ mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n, mbstat
     }
 
     /* Ignore parameter pc32 if s is a null pointer */
-    if (s != NULL)
+    if (s != NULL && pc32 != NULL)
         *pc32 = c32;
 
     return ret;

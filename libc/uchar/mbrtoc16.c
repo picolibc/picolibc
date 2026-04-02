@@ -50,7 +50,8 @@ mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n, mbstat
     size_t  ret;
 
     if (ps->__count == -1) {
-        *pc16 = (ps->__value.__ucs & 0x3ff) + LOW_SURROGATE_FIRST;
+        if (pc16 != NULL)
+            *pc16 = (ps->__value.__ucs & 0x3ff) + LOW_SURROGATE_FIRST;
         ps->__count = 0;
         ps->__value.__ucs = 0;
         return (size_t)-3;
@@ -68,9 +69,11 @@ mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n, mbstat
     if (wc >= 0x10000) {
         ps->__value.__ucs = wc;
         ps->__count = -1;
-        *pc16 = ((ps->__value.__ucs - 0x10000) >> 10) + HIGH_SURROGATE_FIRST;
+        if (pc16 != NULL)
+            *pc16 = ((ps->__value.__ucs - 0x10000) >> 10) + HIGH_SURROGATE_FIRST;
     } else {
-        *pc16 = wc;
+        if (pc16 != NULL)
+            *pc16 = wc;
     }
     return ret;
 #else

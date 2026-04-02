@@ -47,7 +47,8 @@ mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n, mbstate_t
         int count = -ps->__count;
 
         count--;
-        *pc8 = 0x80 | ((ps->__value.__ucs >> (6 * count)) & 0x3f);
+        if (pc8 != NULL)
+            *pc8 = 0x80 | ((ps->__value.__ucs >> (6 * count)) & 0x3f);
         ps->__count = -count;
         return (size_t)-3;
     }
@@ -76,9 +77,11 @@ mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n, mbstate_t
         c8 |= (c32 >> (6 * count));
         ps->__count = -count;
         ps->__value.__ucs = c32;
-        *pc8 = c8;
+        if (pc8 != NULL)
+            *pc8 = c8;
     } else {
-        *pc8 = (char8_t)c32;
+        if (pc8 != NULL)
+            *pc8 = (char8_t)c32;
     }
     return ret;
 }
