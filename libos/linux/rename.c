@@ -42,6 +42,6 @@ rename(const char *oldpath, const char *newpath)
 #ifdef LINUX_SYS_rename
     return syscall(LINUX_SYS_rename, oldpath, newpath);
 #else
-    return syscall(LINUX_SYS_renameat, LINUX_AT_FDCWD, oldpath, newpath);
+    return syscall(LINUX_SYS_renameat, LINUX_AT_FDCWD, oldpath, LINUX_AT_FDCWD, newpath);
 #endif
 }
