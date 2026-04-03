@@ -41,6 +41,6 @@ unlink(const char *path)
 #ifdef LINUX_SYS_unlink
     return syscall(LINUX_SYS_unlink, path);
 #else
-    return syscall(LINUX_SYS_unlinkat, AT_FDCWD, path, 0);
+    return syscall(LINUX_SYS_unlinkat, LINUX_AT_FDCWD, path, 0);
 #endif
 }
