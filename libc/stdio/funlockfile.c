@@ -36,7 +36,7 @@
 #include "local-stdio.h"
 
 void
-funlockfile(FILE *f)
+funlockfile(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 {
 #ifdef __STDIO_LOCKING
     __funlockfile(f);

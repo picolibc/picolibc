@@ -256,10 +256,14 @@ int __stdio_flags(const char *mode, int *optr);
 
 #ifdef __STDIO_LOCKING
 void __flockfile_init(FILE *f);
-#define __LOCK_NONE      ((_LOCK_RECURSIVE_T)(uintptr_t)1)
-#define __LOCK_INIT_NONE .lock = __LOCK_NONE
+#define __LOCK_NONE             ((_LOCK_RECURSIVE_T)(uintptr_t)1)
+#define __LOCK_INIT_NONE        .lock = __LOCK_NONE
+#define __stdio_acquire_file(f) __acquire_capability((f)->lock)
+#define __stdio_release_file(f) __release_capability((f)->lock)
 #else
 #define __LOCK_INIT_NONE
+#define __stdio_acquire_file(f)
+#define __stdio_release_file(f)
 #endif
 
 #define __funlock_return(f, v) \
@@ -269,7 +273,7 @@ void __flockfile_init(FILE *f);
     } while (0)
 
 static inline void
-__flockfile(FILE *f)
+__flockfile(FILE *f) __stdio_acquire_file(f) __no_thread_safety_analysis
 {
     (void)f;
 #ifdef __STDIO_LOCKING
@@ -281,7 +285,7 @@ __flockfile(FILE *f)
 }
 
 static inline void
-__funlockfile(FILE *f)
+__funlockfile(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 {
     (void)f;
 #ifdef __STDIO_LOCKING
@@ -291,7 +295,7 @@ __funlockfile(FILE *f)
 }
 
 static inline void
-__flockfile_close(FILE *f)
+__flockfile_close(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 {
     (void)f;
 #ifdef __STDIO_LOCKING

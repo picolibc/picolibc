@@ -493,13 +493,19 @@ FILE *funopen(const void *cookie, ssize_t (*readfn)(void *cookie, void *buf, siz
 #endif /*__BSD_VISIBLE */
 
 #if __POSIX_VISIBLE >= 199309L
-int  getc_unlocked(FILE *) __nonnull((1));
-int  getchar_unlocked(void);
+int getc_unlocked(FILE *) __nonnull((1));
+int getchar_unlocked(void);
+#ifdef __STDIO_LOCKING
+void flockfile(FILE *__f) __nonnull((1)) __acquire_capability(__f->lock);
+int  ftrylockfile(FILE *) __nonnull((1));
+void funlockfile(FILE *__f) __nonnull((1)) __release_capability(__f->lock);
+#else
 void flockfile(FILE *) __nonnull((1));
 int  ftrylockfile(FILE *) __nonnull((1));
 void funlockfile(FILE *) __nonnull((1));
-int  putc_unlocked(int, FILE *) __nonnull((2));
-int  putchar_unlocked(int);
+#endif
+int putc_unlocked(int, FILE *) __nonnull((2));
+int putchar_unlocked(int);
 #ifndef __STDIO_LOCKING
 #define getc_unlocked(f)       getc(f)
 #define getchar_unlocked(f)    getc(stdin)

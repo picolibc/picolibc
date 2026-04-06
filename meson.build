@@ -373,6 +373,7 @@ common_options = [
   '-fstrict-flex-arrays=3',
   '-fno-builtin-copysignl',
   '-fno-stack-protector',
+  '-Wthread-safety',
 ]
 
 if compiler_id == 'clang'

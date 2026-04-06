@@ -101,7 +101,7 @@ __retarget_lock_close_recursive(_LOCK_T lock)
 }
 
 /* Acquiure non-recursive lock */
-void
+void __no_thread_safety_analysis
 __retarget_lock_acquire(_LOCK_T lock)
 {
     assert(lock->val == 0);
@@ -109,7 +109,7 @@ __retarget_lock_acquire(_LOCK_T lock)
 }
 
 /* Acquiure recursive lock */
-void
+void __no_thread_safety_analysis
 __retarget_lock_acquire_recursive(_LOCK_T lock)
 {
     assert(lock->val == 0);
@@ -117,7 +117,7 @@ __retarget_lock_acquire_recursive(_LOCK_T lock)
 }
 
 /* Release non-recursive lock */
-void
+void __no_thread_safety_analysis
 __retarget_lock_release(_LOCK_T lock)
 {
     assert(lock->val == 1);
@@ -125,7 +125,7 @@ __retarget_lock_release(_LOCK_T lock)
 }
 
 /* Release recursive lock */
-void
+void __no_thread_safety_analysis
 __retarget_lock_release_recursive(_LOCK_T lock)
 {
     assert(lock->val == 1);

@@ -50,6 +50,7 @@ tests = [
   'test-scmpu',
   'test-setjmp',
   'test-strftime',
+  'test-thread-safety',
   'test-time',
   'test-time2',
   'test-timegm',
@@ -71,6 +72,8 @@ endif
 if tests_enable_stack_protector
   tests += ['test-stack-smash']
 endif
+
+test_thread_safety_cflags = cc.get_supported_arguments('-Wthread-safety')
 
 test_ubsan_cflags = []
 if c_sanitize_flags != []
@@ -105,6 +108,7 @@ test_extra_src = {
 test_extra_c_args = {
   'test-argv': ['-DEXPECT_PROG="test-argv"'],
   'test-argv-no-flash': ['-DEXPECT_PROG="test-argv-no-flash"'],
+  'test-thread-safety': test_thread_safety_cflags,
   'test-ubsan': test_ubsan_cflags,
   'test-ubsan-no-flash': test_ubsan_cflags,
 }
@@ -116,12 +120,14 @@ test_args = {
 
 test_skip_native = [
   'test-stack-smash',
+  'test-thread-safety',
   'test-tls',
   'test-ubsan',
 ]
 
 test_skip_lockvalid = [
-  'test-hello'
+  'test-hello',
+  'test-thread-safety',
   ]
 
 test_lock_valid = files(['lock-valid.c'])

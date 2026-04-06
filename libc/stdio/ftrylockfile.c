@@ -42,7 +42,7 @@
  * don't have any try-lock ability in the picolibc lock API, so
  * we're stuck just blocking.
  */
-int
+int __no_thread_safety_analysis
 ftrylockfile(FILE *f)
 {
     (void)f;

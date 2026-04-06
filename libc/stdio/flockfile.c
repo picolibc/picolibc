@@ -36,7 +36,7 @@
 #include "local-stdio.h"
 
 void
-flockfile(FILE *f)
+flockfile(FILE *f) __stdio_acquire_file(f) __no_thread_safety_analysis
 {
 #ifdef __STDIO_LOCKING
     __flockfile(f);

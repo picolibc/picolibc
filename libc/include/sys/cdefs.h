@@ -292,6 +292,27 @@
 #endif
 
 /*
+ * Thread safety analysis annotations (Clang).
+ */
+#if __has_attribute(__capability__)
+#define __capability(x)                __attribute__((__capability__(x)))
+#define __acquire_capability(x)        __attribute__((__acquire_capability__(x)))
+#define __release_capability(x)        __attribute__((__release_capability__(x)))
+#define __try_acquire_capability(r, x) __attribute__((__try_acquire_capability__(r, x)))
+#define __requires_capability(x)       __attribute__((__requires_capability__(x)))
+#define __guarded_by(x)                __attribute__((__guarded_by__(x)))
+#define __no_thread_safety_analysis    __attribute__((__no_thread_safety_analysis__))
+#else
+#define __capability(x)
+#define __acquire_capability(x)
+#define __release_capability(x)
+#define __try_acquire_capability(r, x)
+#define __requires_capability(x)
+#define __guarded_by(x)
+#define __no_thread_safety_analysis
+#endif
+
+/*
  * Builtins.
  *
  * When __has_builtin isn't available, these need to be detected
