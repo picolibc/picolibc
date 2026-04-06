@@ -31,7 +31,7 @@
 
 #include "local-stdio.h"
 
-int
+int __no_thread_safety_analysis
 fclose(FILE *f)
 {
     struct __file_close *cf = (struct __file_close *)f;

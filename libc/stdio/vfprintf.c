@@ -583,12 +583,13 @@ vfprintf(FILE *stream, const CHAR *fmt, va_list ap_orig)
 #ifdef VFPRINTF_S
     const char *msg;
 
-    if (stream == NULL) {
-        msg = "output stream is null";
-        goto handle_error;
-    } else if (fmt == NULL) {
-        msg = "null format string";
-        goto handle_error;
+    if (stream == NULL || fmt == NULL) {
+        msg = stream == NULL ? "output stream is null" : "null format string";
+        if (__cur_handler != NULL)
+            __cur_handler(msg, NULL, -1);
+        if (stream)
+            stream->flags |= __SERR;
+        return -1;
     }
 #endif
 
@@ -841,12 +842,10 @@ fail:
     goto ret;
 #ifdef VFPRINTF_S
 handle_error:
-    if (__cur_handler != NULL) {
+    if (__cur_handler != NULL)
         __cur_handler(msg, NULL, -1);
-    }
-    if (stream)
-        stream->flags |= __SERR;
-    return -1;
+    stream->flags |= __SERR;
+    __funlock_return(stream, -1);
 #endif
 }
 
