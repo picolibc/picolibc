@@ -43,6 +43,8 @@ option('multilib-list', type: 'array', value: [],
        description: 'List of multilib configurations to build for')
 option('multilib-exclude', type: 'array', value: [],
        description: 'Multilib configurations containing any of these strings will not be built')
+option('shared-library', type: 'boolean', value: false,
+       description: 'Build shared libraries in addition to static libraries')
 option('sanitize-bounds', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize=bounds')
 option('sanitize-undefined', type: 'boolean', value: false,
