@@ -35,6 +35,7 @@
 
 tests = [
   'test-fnmatch',
+  'test-ftrunc',
   'test-getdelim',
   'test-grp',
   'test-pwd',
@@ -178,4 +179,3 @@ if enable_native_tests
   endforeach
 
 endif
-
