@@ -132,6 +132,8 @@ enable_picocrt_lib = get_option('picocrt-lib')
 picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
 enable_tests = get_option('tests')
+build_shared = get_option('shared-library')
+use_pic = build_shared
 if get_option('tests-cdefs') == 'auto'
   enable_cdefs_tests = enable_tests
 else
@@ -331,6 +333,7 @@ tls_model_spec = ''
 thread_local_storage = false
 thread_local_storage_option = get_option('thread-local-storage')
 have_picolibc_tls_api = get_option('thread-local-storage-api') and fs.is_file('libc/machine' / host_cpu_family / 'tls.c')
+
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if thread_local_storage_option == 'auto' or have_picolibc_tls_api
@@ -341,9 +344,18 @@ else
 endif
 
 if thread_local_storage
-  tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
+  # For shared libraries, we need to use a TLS model that supports dynamic loading
+  # local-exec is only valid for executables and static libraries
+  # global-dynamic is the most flexible model for shared libraries
+  if build_shared
+    tls_model = 'global-dynamic'
+  else
+    tls_model = get_option('tls-model')
+  endif
+  
+  tls_model_spec = '%{!ftls-model:-ftls-model=' + tls_model + '}'
 
-  tls_arg = '-ftls-model=' + get_option('tls-model')
+  tls_arg = '-ftls-model=' + tls_model
   assert(cc.has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
   c_args += [tls_arg]
 endif
@@ -1919,31 +1931,70 @@ foreach params : targets
 
   libc_name = 'c'
 
+  build_shared = get_option('shared-library')
+
   if meson.version().version_compare('>=1.10')
-    local_lib_c_target = static_library(libc_name,
-				        libsrcs_target,
-                                        build_subdir : target_dir,
-				        install : really_install,
-				        install_dir : instdir,
-				        pic: false,
-				        objects : libobjs,
-				        include_directories: inc,
-				        c_args: target_c_args + c_args)
+    if build_shared
+      local_lib_c_target = both_libraries(libc_name,
+				          libsrcs_target,
+                                          build_subdir : target_dir,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: true,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args,
+				          override_options: ['b_lundef=false'],
+				          link_args: runtime_lib)
+    else
+      local_lib_c_target = static_library(libc_name,
+				          libsrcs_target,
+                                          build_subdir : target_dir,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: false,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args)
+    endif
 
   else
     target_lib_prefix = params['lib_prefix']
 
-    local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
-				        libsrcs_target,
-				        install : really_install,
-				        install_dir : instdir,
-				        pic: false,
-				        objects : libobjs,
-				        include_directories: inc,
-				        c_args: target_c_args + c_args)
+    if build_shared
+      local_lib_c_target = both_libraries(join_paths(target_dir, target_lib_prefix + libc_name),
+				          libsrcs_target,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: true,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args,
+				          override_options: ['b_lundef=false'],
+				          link_args: runtime_lib)
+    else
+      local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
+				          libsrcs_target,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: false,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args)
+    endif
   endif
 
   set_variable('lib_c' + target, local_lib_c_target)
+
+  # For test linking, always use the static archive.  When build_shared=true,
+  # lib_c is a BothLibraries object whose full_path() returns libc.so, which
+  # cannot be linked with -static.  Store the static variant explicitly so
+  # all test sub-builds can use lib_c_link<target> without special-casing.
+  if build_shared
+    set_variable('lib_c_link' + target, local_lib_c_target.get_static_lib())
+  else
+    set_variable('lib_c_link' + target, local_lib_c_target)
+  endif
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,
