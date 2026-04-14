@@ -34,6 +34,7 @@
 src_semihost += files([
                        'hexagon_access.c',
                        'hexagon_close.c',
+                       'hexagon_closedir.c',
                        'hexagon_exit.c',
                        'hexagon_errno.c',
                        'hexagon_flen.c',
@@ -45,7 +46,9 @@ src_semihost += files([
                        'hexagon_isatty.c',
                        'hexagon_lseek.c',
                        'hexagon_open.c',
+                       'hexagon_opendir.c',
                        'hexagon_read.c',
+                       'hexagon_readdir.c',
                        'hexagon_rename.c',
                        'hexagon_semihost.c',
                        'hexagon_stat.c',

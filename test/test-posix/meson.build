@@ -40,6 +40,7 @@ tests = [
   'test-getcwd',
   'test-getdelim',
   'test-grp',
+  'test-dirent',
   'test-pwd',
   'test-rename',
   'test-signal',
