@@ -37,10 +37,7 @@
 int
 __STDIO_UNLOCKED(putc)(int c, FILE *stream)
 {
-    if ((stream->flags & __SWR) == 0)
-        return EOF;
-
-    if (stream->put(c, stream) < 0) {
+    if ((stream->flags & __SWR) == 0 || stream->put(c, stream) < 0) {
         stream->flags |= __SERR;
         return EOF;
     }

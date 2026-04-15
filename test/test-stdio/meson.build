@@ -100,6 +100,7 @@ if tests_enable_posix_io
     'test-fflush-input-error',
     'test-ungetc-fflush',
     'test-fopen',
+    'test-fputc',
     'test-fread-fwrite',
     'test-mktemp',
     'test-setvbuf',
