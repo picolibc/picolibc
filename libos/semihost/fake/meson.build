@@ -34,9 +34,12 @@
 #
 
 srcs_semihost_fake = [
+  'fake_access.c',
   'fake_close.c',
   'fake_exit.c',
   'fake_fstat.c',
+  'fake_ftruncate.c',
+  'fake_getcwd.c',
   'fake_getentropy.c',
   'fake_getpid.c',
   'fake_gettimeofday.c',
@@ -44,7 +47,6 @@ srcs_semihost_fake = [
   'fake_isatty.c',
   'fake_kill.c',
   'fake_lseek.c',
-  'fake_ftruncate.c',
   'fake_open.c',
   'fake_read.c',
   'fake_rename.c',

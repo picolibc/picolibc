@@ -39,6 +39,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <stdint.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <unistd.h>
 
 /* System call codes */
 enum hexagon_system_call_code {
@@ -74,6 +75,8 @@ enum hexagon_system_call_code {
 int  flen(int fd);
 int  hexagon_ftell(int fd);
 int  get_cmdline(char *buffer, int count);
+int  access(const char *pathname, int mode);
+char*  getcwd(char *buf, size_t size);
 
 int  hexagon_semihost(enum hexagon_system_call_code code, int *args);
 

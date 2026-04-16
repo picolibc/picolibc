@@ -34,7 +34,9 @@
 #
 
 set(tests
+  test-access
   test-fnmatch
+  test-getcwd
   test-getdelim
   test-grp
   test-pwd

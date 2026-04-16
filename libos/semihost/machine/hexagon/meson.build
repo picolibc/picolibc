@@ -32,15 +32,17 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 src_semihost += files([
+                       'hexagon_access.c',
                        'hexagon_close.c',
                        'hexagon_exit.c',
                        'hexagon_errno.c',
                        'hexagon_flen.c',
                        'hexagon_ftell.c',
                        'hexagon_fstat.c',
-                       'hexagon_get_cmdline.c',
-                       'hexagon_isatty.c',
                        'hexagon_ftruncate.c',
+                       'hexagon_get_cmdline.c',
+                       'hexagon_getcwd.c',
+                       'hexagon_isatty.c',
                        'hexagon_lseek.c',
                        'hexagon_open.c',
                        'hexagon_read.c',

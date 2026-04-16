@@ -42,8 +42,11 @@ if cc.get_define('_CALL_ELF') == '1'
                             'powerpc_exit.c',
                             'powerpc_io.c',
                           ]) + [
+    src_semihost_fake_access,
     src_semihost_fake_close,
     src_semihost_fake_fstat,
+    src_semihost_fake_ftruncate,
+    src_semihost_fake_getcwd,
     src_semihost_fake_getentropy,
     src_semihost_fake_getpid,
     src_semihost_fake_gettimeofday,

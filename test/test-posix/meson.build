@@ -34,8 +34,10 @@
 #
 
 tests = [
+  'test-access',
   'test-fnmatch',
   'test-ftrunc',
+  'test-getcwd',
   'test-getdelim',
   'test-grp',
   'test-pwd',
