@@ -44,13 +44,13 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define TEST_FILE_NAME "FTRUNC.TXT"
 #endif
 
-#define check(condition, message)                   \
-    do {                                            \
-        if (!(condition)) {                         \
-            printf("%s: %s\n", message, #condition);\
-            (void)remove(TEST_FILE_NAME);           \
-            exit(1);                                \
-        }                                           \
+#define check(condition, message)                    \
+    do {                                             \
+        if (!(condition)) {                          \
+            printf("%s: %s\n", message, #condition); \
+            (void)remove(TEST_FILE_NAME);            \
+            exit(1);                                 \
+        }                                            \
     } while (0)
 
 #define MESSAGE "hello, world\n"

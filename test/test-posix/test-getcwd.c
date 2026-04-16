@@ -56,7 +56,7 @@ __typeof(getcwd) __fake_getcwd __weak;
 int
 main(void)
 {
-    char buf[256];
+    char  buf[256];
     char *ret;
 
 #ifndef TESTS_ENABLE_POSIX_IO

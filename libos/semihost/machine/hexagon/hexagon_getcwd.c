@@ -39,7 +39,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 char *
 getcwd(char *buf, size_t size)
 {
-    int args[] = { (int)buf, (int)size };
+    int                args[] = { (int)buf, (int)size };
     /* SYS_GETCWD returns the buffer address on success, or (char *)0 on
      * error — not the usual -1 convention — so we can't use hexagon_semihost()
      * which only translates errno when r0 == -1. */
