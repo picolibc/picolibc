@@ -77,6 +77,7 @@ int   hexagon_ftell(int fd);
 int   get_cmdline(char *buffer, int count);
 int   access(const char *pathname, int mode);
 char *getcwd(char *buf, size_t size);
+int   ftruncate(int fd, off_t length);
 
 int   hexagon_semihost(enum hexagon_system_call_code code, int *args);
 
