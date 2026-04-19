@@ -338,10 +338,13 @@ char *_user_strerror(int, int, int *) __weak;
 char *
 _strerror_r(int errnum, int internal, int *errptr)
 {
-    if ((unsigned)errnum < NERRNAMES)
-        return (char *)errnames[(unsigned)errnum];
-
     char *error;
+
+    if ((unsigned)errnum < NERRNAMES) {
+        error = (char *)errnames[(unsigned)errnum];
+        if (error)
+            return error;
+    }
 
     if (!errptr)
         errptr = &errno;
