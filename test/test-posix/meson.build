@@ -50,6 +50,12 @@ tests = [
 tests_failure = []
 test_skip = []
 
+if enable_native_tests
+  test_skip += [
+    'test-dirent',
+  ]
+endif
+
 if has_os_posix
   tests += [
     'test-alarm',

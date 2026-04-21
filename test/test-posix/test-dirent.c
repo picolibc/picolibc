@@ -39,27 +39,8 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string.h>
 #include <limits.h>
 #include <dirent.h>
-#include <errno.h>
 
-/*
- * On Linux, readdir(3) may be provided by glibc whose struct dirent includes
- * d_off (off_t) and d_reclen (unsigned short) between d_ino and d_type,
- * shifting d_name 10 bytes later than picolibc's struct dirent.  Use a
- * compatible view to read d_name at the correct offset regardless of which
- * readdir implementation is linked.
- */
-#if defined(__linux__) && defined(__PICOLIBC__)
-struct __linux_dirent {
-    ino_t          d_ino;
-    off_t          d_off;
-    unsigned short d_reclen;
-    unsigned char  d_type;
-    char           d_name[NAME_MAX + 1];
-};
-#define dirent_name(ent) (((struct __linux_dirent *)(void *)(ent))->d_name)
-#else
 #define dirent_name(ent) ((ent)->d_name)
-#endif
 
 #ifndef TEST_FILE_NAME
 #define TEST_FILE_NAME "DIRENT.TXT"
