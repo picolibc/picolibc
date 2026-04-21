@@ -50,11 +50,6 @@ ftruncate(int fd, off_t length)
      * The semihosting r01 array uses 32-bit elements. off_t is 64-bit, so
      * length is passed as two consecutive 32-bit elements (lo, hi word),
      * which the simulator reads as a single 8-byte value at args[1].
-     *
-     * TODO: if the spec is clarified to use a single 32-bit length element,
-     * replace with:
-     *   int args[] = {fd, (int)length};
-     *   int retval = hexagon_semihost(SYS_FTRUNC, args);
      */
     int args[] = { fd, (int)(length & 0xffffffff), (int)(length >> 32) };
     int retval = hexagon_semihost(SYS_FTRUNC, args);
