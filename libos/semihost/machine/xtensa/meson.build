@@ -44,7 +44,10 @@ src_semihost += files([
                        'xtensa-write.c',
                        'simcall.S',
                      ]) + [
+  src_semihost_fake_access,
   src_semihost_fake_fstat,
+  src_semihost_fake_ftruncate,
+  src_semihost_fake_getcwd,
   src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
   src_semihost_fake_gettimeofday,

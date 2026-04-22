@@ -37,8 +37,11 @@ src_semihost += files([
                        'rx_exit.c',
                        'rx_iob.c',
                      ]) + [
+  src_semihost_fake_access,
   src_semihost_fake_close,
   src_semihost_fake_fstat,
+  src_semihost_fake_ftruncate,
+  src_semihost_fake_getcwd,
   src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
   src_semihost_fake_gettimeofday,
