@@ -39,6 +39,7 @@ set(tests
   test-getcwd
   test-getdelim
   test-grp
+  test-dirent
   test-pwd
   test-signal
   test-stat

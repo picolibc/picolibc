@@ -40,6 +40,7 @@ tests = [
   'test-getcwd',
   'test-getdelim',
   'test-grp',
+  'test-dirent',
   'test-pwd',
   'test-rename',
   'test-signal',
@@ -48,6 +49,12 @@ tests = [
 
 tests_failure = []
 test_skip = []
+
+if enable_native_tests
+  test_skip += [
+    'test-dirent',
+  ]
+endif
 
 if has_os_posix
   tests += [
