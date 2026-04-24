@@ -209,7 +209,7 @@ hence the size) of the library:
  * `-Dposix-console=true` This option provides stdin/stdout/stderr
    support using the picolibc POSIX I/O support.
 
- * `-Dformat=default={d,f,l,i,m}` Selects which printf and scanf
+ * `-Dformat-default={d,f,l,i,m}` Selects which printf and scanf
    variant is used by default.
 
  * `-Dprintf-aliases=true` This option, which is enabled by default,
