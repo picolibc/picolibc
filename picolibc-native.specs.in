@@ -7,13 +7,13 @@
 @SPECS_ISYSTEM@ %(picolibc_cpp)
 
 *cc1:
-@TLSMODEL@ @STACKGUARD@ %(picolibc_cc1) @CC1_SPEC@
+@TLSMODEL@ @STACKGUARD@ @CC1_SPEC@ %(picolibc_cc1)
 
 *cc1plus:
-@SPECS_ISYSTEM@ @TLSMODEL@ @STACKGUARD@ %(picolibc_cc1plus) @CC1_SPEC@ @CC1PLUS_SPEC@
+@SPECS_ISYSTEM@ @TLSMODEL@ @STACKGUARD@ @CC1_SPEC@ @CC1PLUS_SPEC@ %(picolibc_cc1plus)
 
 *link:
-@SPECS_PRINTF@ @SPECS_LIBPATH@ %(picolibc_link) --gc-sections @LINK_SPEC@
+@SPECS_PRINTF@ @SPECS_LIBPATH@ @LINK_SPEC@ %(picolibc_link)
 
 *lib:
 --start-group %(libgcc) @ADDITIONAL_LIBS@ -lc %{-oslib=*:-l%*} --end-group
