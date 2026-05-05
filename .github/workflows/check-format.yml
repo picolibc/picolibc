@@ -80,3 +80,10 @@ jobs:
       - name: Check Formatting
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE bash --login -c "./.github/do-check-format"
+
+      - name: Upload Formatting Patch
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clang-format-fix
+          path: picolibc/clang-format.patch
