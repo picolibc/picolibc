@@ -50,6 +50,8 @@ target_sources(dummyhost PRIVATE
   read.c
   sigprocmask.c
   stat.c
+  statvfs.c
+  fstatvfs.c
   times.c
   unlink.c
   write.c

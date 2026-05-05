@@ -85,6 +85,8 @@ src_semihost += files([
   src_semihost_fake_opendir,
   src_semihost_fake_readdir,
   src_semihost_fake_stat,
+  src_semihost_fake_statvfs,
+  src_semihost_fake_fstatvfs,
   ]
 
 inc_headers = ['semihost.h']

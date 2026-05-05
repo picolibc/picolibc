@@ -58,4 +58,6 @@ src_semihost += files([
   src_semihost_fake_readdir,
   src_semihost_fake_rename,
   src_semihost_fake_stat,
+  src_semihost_fake_statvfs,
+  src_semihost_fake_fstatvfs,
   ]
