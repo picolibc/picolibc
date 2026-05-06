@@ -213,8 +213,15 @@ main(int argc, char **argv)
     printf("(_t, _f) do {\\\n");
     for (i = 0; i < NELT; i++) {
         e = &elts[i];
-        if (!e->typename)
-            printf("        (_t)->%s = (_f)->%s;\\\n", e->name, e->name);
+        if (!e->typename) {
+            if (e->nelt > 0) {
+                printf("        { unsigned __i; for(__i = 0; i < %d; i++) (_t)->%s[__i] = "
+                       "(_f)->%s[__i]; } \\\n",
+                       e->nelt, e->name, e->name);
+            } else {
+                printf("        (_t)->%s = (_f)->%s;\\\n", e->name, e->name);
+            }
+        }
     }
     printf("    } while(0)\n");
 
