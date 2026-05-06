@@ -88,6 +88,7 @@ def analyze_struct(s, file=sys.stdout):
     print(f'static const char *name = "{name}";', file=file)
     if 'typedef' in s:
         type = s['typedef']
+        print(f'#define MAKE_TYPEDEF "{type}"', file=file)
         print(f'static {type} val;', file=file)
     elif 'type' in s:
         type = type_name(s['type'])

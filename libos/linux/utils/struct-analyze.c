@@ -204,6 +204,9 @@ main(int argc, char **argv)
     if (offset < sizeof(val))
         printf("    __uint8_t  __adjust_%zd[%zd];\n", offset, sizeof(val) - offset);
     printf("};\n");
+#ifdef MAKE_TYPEDEF
+    printf("typedef %s __kernel_%s __kernel_%s;\n", STRUCT_OR_UNION, name, MAKE_TYPEDEF);
+#endif
 
     printf("\n");
 
