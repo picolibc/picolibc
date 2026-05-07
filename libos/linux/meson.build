@@ -128,6 +128,7 @@ if fs.is_dir(machine_dir)
     'sigsuspend.c',
     'stat.c',
     '_statbuf.c',
+    'statvfs.c',
     'symlink.c',
     '_syscall_error.c',
     'tcflow.c',

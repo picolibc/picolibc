@@ -58,6 +58,7 @@ inc_sys_headers_all = [
   '_select.h',
   '_sigset.h',
   'stat.h',
+  'statvfs.h',
   '_stdint.h',
   'string.h',
   'syslimits.h',
