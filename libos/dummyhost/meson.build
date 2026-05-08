@@ -45,6 +45,8 @@ srcs_os_dummyhost = [
   'read.c',
   'sigprocmask.c',
   'stat.c',
+  'fstatvfs.c',
+  'statvfs.c',
   'times.c',
   'unlink.c',
   'write.c',

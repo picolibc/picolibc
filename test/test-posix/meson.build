@@ -45,6 +45,7 @@ tests = [
   'test-rename',
   'test-signal',
   'test-stat',
+  'test-statvfs',
   ]
 
 tests_failure = []
