@@ -54,6 +54,8 @@ srcs_semihost_fake = [
   'fake_readdir.c',
   'fake_rename.c',
   'fake_stat.c',
+  'fake_fstatvfs.c',
+  'fake_statvfs.c',
   'fake_unlink.c',
   'fake_write.c',
 ]

@@ -57,6 +57,7 @@ picolibc_headers(sys
   _select.h
   _sigset.h
   stat.h
+  statvfs.h
   _stdint.h
   string.h
   syslimits.h
