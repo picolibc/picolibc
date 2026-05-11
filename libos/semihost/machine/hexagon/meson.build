@@ -43,6 +43,7 @@ src_semihost += files([
                        'hexagon_ftruncate.c',
                        'hexagon_get_cmdline.c',
                        'hexagon_getcwd.c',
+                       'hexagon_gettimeofday.c',
                        'hexagon_isatty.c',
                        'hexagon_lseek.c',
                        'hexagon_open.c',
@@ -57,6 +58,5 @@ src_semihost += files([
                      ]) + [
   src_semihost_fake_getentropy,
   src_semihost_fake_getpid,
-  src_semihost_fake_gettimeofday,
   src_semihost_fake_kill,
   ]

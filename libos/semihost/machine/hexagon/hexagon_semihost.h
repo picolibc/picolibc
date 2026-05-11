@@ -54,6 +54,7 @@ enum hexagon_system_call_code {
     SYS_FLEN = 12,
     SYS_REMOVE = 14,
     SYS_RENAME = 15,
+    SYS_TIME = 0x11,
     SYS_GET_CMDLINE = 21,
     SYS_EXIT = 24,
     SYS_FTELL = 0x100,
