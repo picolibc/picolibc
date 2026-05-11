@@ -111,8 +111,8 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
     const uintxlen_t *lb = (const uintxlen_t *)b;
     uintxlen_t       *lend = (uintxlen_t *)((uintptr_t)end & ~msk);
 
-    if (unlikely(lend - la > 8)) {
-        while (lend - la > 8) {
+    if (unlikely(lend - la >= 8)) {
+        while (lend - la >= 8) {
             uintxlen_t b0 = *lb++;
             uintxlen_t b1 = *lb++;
             uintxlen_t b2 = *lb++;
@@ -121,7 +121,6 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
             uintxlen_t b5 = *lb++;
             uintxlen_t b6 = *lb++;
             uintxlen_t b7 = *lb++;
-            uintxlen_t b8 = *lb++;
             *la++ = b0;
             *la++ = b1;
             *la++ = b2;
@@ -130,7 +129,6 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
             *la++ = b5;
             *la++ = b6;
             *la++ = b7;
-            *la++ = b8;
         }
     }
 
