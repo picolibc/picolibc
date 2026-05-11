@@ -258,7 +258,7 @@ int sigaction(int, const struct sigaction * __restrict, struct sigaction * __res
 
 int sigaddset(sigset_t *, const int);
 
-static inline int
+static __inline int
 __sigaddset(sigset_t *what, int sig)
 {
     *what |= (sigset_t)1 << sig;
