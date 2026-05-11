@@ -52,7 +52,7 @@ gettimeofday(struct timeval * restrict tv, void * restrict tz)
         hexagon_semihost_errno((int)r1);
         return -1;
     }
-    tv->tv_sec  = (time_t)r0;
+    tv->tv_sec = (time_t)r0;
     tv->tv_usec = 0;
     return 0;
 }
