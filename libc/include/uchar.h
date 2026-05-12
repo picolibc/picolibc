@@ -60,19 +60,19 @@ typedef __uint_least32_t char32_t;
 #endif
 
 size_t mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n,
-               mbstate_t * __restrict ps);
+               mbstate_t * __restrict ps) __picolibc_export;
 
-size_t c8rtomb(char * __restrict s, char8_t c8, mbstate_t * __restrict ps);
+size_t c8rtomb(char * __restrict s, char8_t c8, mbstate_t * __restrict ps) __picolibc_export;
 
 size_t mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n,
-                mbstate_t * __restrict ps);
+                mbstate_t * __restrict ps) __picolibc_export;
 
-size_t c16rtomb(char * __restrict s, char16_t c16, mbstate_t * __restrict ps);
+size_t c16rtomb(char * __restrict s, char16_t c16, mbstate_t * __restrict ps) __picolibc_export;
 
 size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
-                mbstate_t * __restrict ps);
+                mbstate_t * __restrict ps) __picolibc_export;
 
-size_t c32rtomb(char * __restrict s, char32_t c32, mbstate_t * __restrict ps);
+size_t c32rtomb(char * __restrict s, char32_t c32, mbstate_t * __restrict ps) __picolibc_export;
 
 _END_STD_C
 

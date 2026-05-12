@@ -141,30 +141,31 @@ typedef struct getopt_data {
 #endif /* __need_getopt_newlib */
 
 /* externally-defined variables */
-extern char *optarg;
-extern int   optind;
-extern int   opterr;
-extern int   optopt;
+extern __picolibc_export char *optarg;
+extern __picolibc_export int   optind;
+extern __picolibc_export int   opterr;
+extern __picolibc_export int   optopt;
 
 /* function prototypes */
-int          getopt(int __argc, char          *const __argv[], const char *__optstring);
+int getopt(int __argc, char * const __argv[], const char *__optstring) __picolibc_export;
 
-int          getopt_long(int __argc, char          *const __argv[], const char *__shortopts,
-                         const struct option *__longopts, int *__longind);
+int getopt_long(int __argc, char * const __argv[], const char *__shortopts,
+                const struct option *__longopts, int *__longind) __picolibc_export;
 
-int          getopt_long_only(int __argc, char          *const __argv[], const char *__shortopts,
-                              const struct option *__longopts, int *__longind);
+int getopt_long_only(int __argc, char * const __argv[], const char *__shortopts,
+                     const struct option *__longopts, int *__longind) __picolibc_export;
 
 #ifdef __need_getopt_newlib
 int __getopt_r(int __argc, char * const __argv[], const char *__optstring,
-               struct getopt_data *__data);
+               struct getopt_data *__data) __picolibc_export;
 
 int __getopt_long_r(int __argc, char * const __argv[], const char *__shortopts,
-                    const struct option *__longopts, int *__longind, struct getopt_data *__data);
+                    const struct option *__longopts, int *__longind,
+                    struct getopt_data *__data) __picolibc_export;
 
 int __getopt_long_only_r(int __argc, char * const __argv[], const char *__shortopts,
                          const struct option *__longopts, int *__longind,
-                         struct getopt_data *__data);
+                         struct getopt_data *__data) __picolibc_export;
 #endif /* __need_getopt_newlib */
 
 _END_STD_C

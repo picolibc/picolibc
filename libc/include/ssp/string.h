@@ -35,15 +35,15 @@
 #include <ssp/ssp.h>
 
 _BEGIN_STD_C
-void *__memcpy_chk(void *, const void *, size_t, size_t);
-void *__memmove_chk(void *, const void *, size_t, size_t);
-void *__mempcpy_chk(void *, const void *, size_t, size_t);
-void *__memset_chk(void *, int, size_t, size_t);
-char *__stpcpy_chk(char *, const char *, size_t);
-char *__strcat_chk(char *, const char *, size_t);
-char *__strcpy_chk(char *, const char *, size_t);
-char *__strncat_chk(char *, const char *, size_t, size_t);
-char *__strncpy_chk(char *, const char *, size_t, size_t);
+void *__memcpy_chk(void *, const void *, size_t, size_t) __picolibc_export;
+void *__memmove_chk(void *, const void *, size_t, size_t) __picolibc_export;
+void *__mempcpy_chk(void *, const void *, size_t, size_t) __picolibc_export;
+void *__memset_chk(void *, int, size_t, size_t) __picolibc_export;
+char *__stpcpy_chk(char *, const char *, size_t) __picolibc_export;
+char *__strcat_chk(char *, const char *, size_t) __picolibc_export;
+char *__strcpy_chk(char *, const char *, size_t) __picolibc_export;
+char *__strncat_chk(char *, const char *, size_t, size_t) __picolibc_export;
+char *__strncpy_chk(char *, const char *, size_t, size_t) __picolibc_export;
 _END_STD_C
 
 #if __SSP_FORTIFY_LEVEL > 0

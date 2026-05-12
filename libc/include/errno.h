@@ -51,7 +51,7 @@ typedef __errno_t errno_t;
 _BEGIN_STD_C
 
 #if __GNU_VISIBLE
-char *_user_strerror(int errnum, int internal, int *errptr);
+char *_user_strerror(int errnum, int internal, int *errptr) __picolibc_export;
 #endif
 
 #ifdef __GLOBAL_ERRNO
@@ -61,10 +61,10 @@ char *_user_strerror(int errnum, int internal, int *errptr);
 #endif
 
 #ifdef __PICOLIBC_ERRNO_FUNCTION
-int *__PICOLIBC_ERRNO_FUNCTION(void);
+int *__PICOLIBC_ERRNO_FUNCTION(void) __picolibc_export;
 #define errno (*__PICOLIBC_ERRNO_FUNCTION())
 #else
-extern __THREAD_LOCAL_ERRNO int errno;
+extern __picolibc_export __THREAD_LOCAL_ERRNO int errno;
 #define errno errno
 #endif
 
