@@ -49,7 +49,7 @@
 #endif
 
 _BEGIN_STD_C
-int fnmatch(const char *, const char *, int);
+int fnmatch(const char *, const char *, int) __picolibc_export;
 _END_STD_C
 
 #endif /* !_FNMATCH_H_ */

@@ -82,8 +82,8 @@ struct lconv {
     char  int_p_sign_posn;
 };
 
-char         *setlocale(int, const char *);
-struct lconv *localeconv(void);
+char         *setlocale(int, const char *) __picolibc_export;
+struct lconv *localeconv(void) __picolibc_export;
 
 #if __POSIX_VISIBLE >= 200809 || defined(_LIBC)
 
@@ -104,15 +104,15 @@ struct lconv *localeconv(void);
 
 #define LC_GLOBAL_LOCALE ((locale_t) - 1)
 
-locale_t newlocale(int, const char *, locale_t);
-void     freelocale(locale_t);
-locale_t duplocale(locale_t);
-locale_t uselocale(locale_t);
+locale_t newlocale(int, const char *, locale_t) __picolibc_export;
+void     freelocale(locale_t) __picolibc_export;
+locale_t duplocale(locale_t) __picolibc_export;
+locale_t uselocale(locale_t) __picolibc_export;
 
 #endif
 
 #if __POSIX_VISIBLE >= 202405 || __MISC_VISIBLE
-const char *getlocalename_l(int, locale_t);
+const char *getlocalename_l(int, locale_t) __picolibc_export;
 #endif
 
 _END_STD_C

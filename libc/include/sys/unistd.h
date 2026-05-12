@@ -75,270 +75,277 @@ typedef __pid_t pid_t; /* process id */
 
 #define _POSIX_VERSION 202405L
 
-__noreturn void _exit(int __status);
+__noreturn void _exit(int __status) __picolibc_export;
 
-int             access(const char *__path, int __amode);
-unsigned        alarm(unsigned __secs);
-int             brk(void *);
-int             chdir(const char *__path);
-int             chown(const char *__path, uid_t __owner, gid_t __group);
+int             access(const char *__path, int __amode) __picolibc_export;
+unsigned        alarm(unsigned __secs) __picolibc_export;
+int             brk(void *) __picolibc_export;
+int             chdir(const char *__path) __picolibc_export;
+int             chown(const char *__path, uid_t __owner, gid_t __group) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-int chroot(const char *__path);
+int chroot(const char *__path) __picolibc_export;
 #endif
-int close(int __fildes);
+int close(int __fildes) __picolibc_export;
 #if __POSIX_VISIBLE >= 202405
-int posix_close(int __fildes, int __flag);
+int posix_close(int __fildes, int __flag) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 199209
-size_t confstr(int __name, char *__buf, size_t __len);
+size_t confstr(int __name, char *__buf, size_t __len) __picolibc_export;
 #endif
 #if __XSI_VISIBLE
-char *crypt(const char *__key, const char *__salt);
+char *crypt(const char *__key, const char *__salt) __picolibc_export;
 #endif
 #if __XSI_VISIBLE && __XSI_VISIBLE < 700
-char *ctermid(char *__s);
+char *ctermid(char *__s) __picolibc_export;
 #endif
 #if __XSI_VISIBLE && __XSI_VISIBLE < 600
-char *cuserid(char *__s);
+char *cuserid(char *__s) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-int daemon(int nochdir, int noclose);
+int daemon(int nochdir, int noclose) __picolibc_export;
 #endif
-int dup(int __fildes);
-int dup2(int __fildes, int __fildes2);
+int dup(int __fildes) __picolibc_export;
+int dup2(int __fildes, int __fildes2) __picolibc_export;
 #if __GNU_VISIBLE
-int dup3(int __fildes, int __fildes2, int flags);
-int eaccess(const char *__path, int __mode);
+int dup3(int __fildes, int __fildes2, int flags) __picolibc_export;
+int eaccess(const char *__path, int __mode) __picolibc_export;
 #endif
 #if __XSI_VISIBLE
-void encrypt(char *, int);
+void encrypt(char *, int) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-void endusershell(void);
+void endusershell(void) __picolibc_export;
 #endif
 #if __GNU_VISIBLE
-int euidaccess(const char *__path, int __mode);
+int euidaccess(const char *__path, int __mode) __picolibc_export;
 #endif
-int execl(const char *__path, const char *, ...);
-int execle(const char *__path, const char *, ...);
-int execlp(const char *__file, const char *, ...);
+int execl(const char *__path, const char *, ...) __picolibc_export;
+int execle(const char *__path, const char *, ...) __picolibc_export;
+int execlp(const char *__file, const char *, ...) __picolibc_export;
 #if __MISC_VISIBLE
-int execlpe(const char *__file, const char *, ...);
+int execlpe(const char *__file, const char *, ...) __picolibc_export;
 #endif
-int execv(const char *__path, char * const __argv[]);
-int execve(const char *__path, char * const __argv[], char * const __envp[]);
-int execvp(const char *__file, char * const __argv[]);
+int execv(const char *__path, char * const __argv[]) __picolibc_export;
+int execve(const char *__path, char * const __argv[], char * const __envp[]) __picolibc_export;
+int execvp(const char *__file, char * const __argv[]) __picolibc_export;
 #if __GNU_VISIBLE
-int execvpe(const char *__file, char * const __argv[], char * const __envp[]);
+int execvpe(const char *__file, char * const __argv[], char * const __envp[]) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
-int faccessat(int __dirfd, const char *__path, int __mode, int __flags);
+int faccessat(int __dirfd, const char *__path, int __mode, int __flags) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-int fchdir(int __fildes);
+int fchdir(int __fildes) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-int fchown(int __fildes, uid_t __owner, gid_t __group);
+int fchown(int __fildes, uid_t __owner, gid_t __group) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
-int fchownat(int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags);
+int fchownat(int __dirfd, const char *__path, uid_t __owner, gid_t __group,
+             int __flags) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809
-int fexecve(int __fd, char * const __argv[], char * const __envp[]);
+int fexecve(int __fd, char * const __argv[], char * const __envp[]) __picolibc_export;
 #endif
-pid_t fork(void);
-long  fpathconf(int __fd, int __name);
-long  __fallback_fpathconf(int __td, int __name);
-int   fsync(int __fd);
+pid_t fork(void) __picolibc_export;
+long  fpathconf(int __fd, int __name) __picolibc_export;
+long  __fallback_fpathconf(int __td, int __name) __picolibc_export;
+int   fsync(int __fd) __picolibc_export;
 #if __POSIX_VISIBLE >= 199309
-int fdatasync(int __fd);
+int fdatasync(int __fd) __picolibc_export;
 #endif
 #if __GNU_VISIBLE
-char *get_current_dir_name(void);
+char *get_current_dir_name(void) __picolibc_export;
 #endif
-char *getcwd(char *__buf, size_t __size);
+char *getcwd(char *__buf, size_t __size) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-int getdomainname(char *__name, size_t __len);
+int getdomainname(char *__name, size_t __len) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int getentropy(void *, size_t);
+int getentropy(void *, size_t) __picolibc_export;
 #endif
-gid_t getegid(void);
-uid_t geteuid(void);
-gid_t getgid(void);
-int   getgroups(int __gidsetsize, gid_t __grouplist[]);
+gid_t getegid(void) __picolibc_export;
+uid_t geteuid(void) __picolibc_export;
+gid_t getgid(void) __picolibc_export;
+int   getgroups(int __gidsetsize, gid_t __grouplist[]) __picolibc_export;
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
-long gethostid(void);
+long gethostid(void) __picolibc_export;
 #endif
-char *getlogin(void);
+char *getlogin(void) __picolibc_export;
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
-int getlogin_r(char *name, size_t namesize);
+int getlogin_r(char *name, size_t namesize) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __POSIX_VISIBLE < 200112)
-char *getpass(const char *__prompt);
-int   getpagesize(void);
+char *getpass(const char *__prompt) __picolibc_export;
+int   getpagesize(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int getpeereid(int, uid_t *, gid_t *);
+int getpeereid(int, uid_t *, gid_t *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
-pid_t getpgid(pid_t);
+pid_t getpgid(pid_t) __picolibc_export;
 #endif
-pid_t getpgrp(void);
-pid_t getpid(void);
-pid_t getppid(void);
+pid_t getpgrp(void) __picolibc_export;
+pid_t getpid(void) __picolibc_export;
+pid_t getppid(void) __picolibc_export;
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
-pid_t getsid(pid_t);
+pid_t getsid(pid_t) __picolibc_export;
 #endif
-uid_t getuid(void);
+uid_t getuid(void) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-char *getusershell(void);
+char *getusershell(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200809)
-char *getwd(char *__buf);
+char *getwd(char *__buf) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int iruserok(unsigned long raddr, int superuser, const char *ruser, const char *luser);
+int iruserok(unsigned long raddr, int superuser, const char *ruser,
+             const char *luser) __picolibc_export;
 #endif
-int isatty(int __fildes);
+int isatty(int __fildes) __picolibc_export;
 #if __BSD_VISIBLE
-int issetugid(void);
+int issetugid(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-int lchown(const char *__path, uid_t __owner, gid_t __group);
+int lchown(const char *__path, uid_t __owner, gid_t __group) __picolibc_export;
 #endif
-int link(const char *__path1, const char *__path2);
+int link(const char *__path1, const char *__path2) __picolibc_export;
 #if __ATFILE_VISIBLE
-int linkat(int __dirfd1, const char *__path1, int __dirfd2, const char *__path2, int __flags);
+int linkat(int __dirfd1, const char *__path1, int __dirfd2, const char *__path2,
+           int __flags) __picolibc_export;
 #endif
 #if __MISC_VISIBLE || __XSI_VISIBLE
-int nice(int __nice_value);
+int nice(int __nice_value) __picolibc_export;
 #endif
-off_t lseek(int __fildes, off_t __offset, int __whence);
+off_t lseek(int __fildes, off_t __offset, int __whence) __picolibc_export;
 #if __MISC_VISIBLE || __XSI_VISIBLE >= 4
 #define F_ULOCK 0
 #define F_LOCK  1
 #define F_TLOCK 2
 #define F_TEST  3
-int lockf(int __fd, int __cmd, off_t __len);
+int lockf(int __fd, int __cmd, off_t __len) __picolibc_export;
 #endif
-long pathconf(const char *__path, int __name);
-long __fallback_pathconf(const char *__path, int __name);
-int  pause(void);
+long pathconf(const char *__path, int __name) __picolibc_export;
+long __fallback_pathconf(const char *__path, int __name) __picolibc_export;
+int  pause(void) __picolibc_export;
 #if __POSIX_VISIBLE >= 199506
-int pthread_atfork(void (*)(void), void (*)(void), void (*)(void));
+int pthread_atfork(void (*)(void), void (*)(void), void (*)(void)) __picolibc_export;
 #endif
-int pipe(int __fildes[2]);
+int pipe(int __fildes[2]) __picolibc_export;
 #if __GNU_VISIBLE
-int pipe2(int __fildes[2], int flags);
+int pipe2(int __fildes[2], int flags) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
-ssize_t pread(int __fd, void *__buf, size_t __nbytes, off_t __offset);
-ssize_t pwrite(int __fd, const void *__buf, size_t __nbytes, off_t __offset);
+ssize_t pread(int __fd, void *__buf, size_t __nbytes, off_t __offset) __picolibc_export;
+ssize_t pwrite(int __fd, const void *__buf, size_t __nbytes, off_t __offset) __picolibc_export;
 #endif
-ssize_t read(int __fd, void *__buf, size_t __nbyte);
+ssize_t read(int __fd, void *__buf, size_t __nbyte) __picolibc_export;
 #if __BSD_VISIBLE
-int rresvport(int *__alport);
-int revoke(char *__path);
+int rresvport(int *__alport) __picolibc_export;
+int revoke(char *__path) __picolibc_export;
 #endif
-int rmdir(const char *__path);
+int rmdir(const char *__path) __picolibc_export;
 #if __BSD_VISIBLE
-int ruserok(const char *rhost, int superuser, const char *ruser, const char *luser);
+int ruserok(const char *rhost, int superuser, const char *ruser,
+            const char *luser) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-void *sbrk(ptrdiff_t __incr);
-void *__fallback_sbrk(ptrdiff_t __incr);
+void *sbrk(ptrdiff_t __incr) __picolibc_export;
+void *__fallback_sbrk(ptrdiff_t __incr) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
-int setegid(gid_t __gid);
-int seteuid(uid_t __uid);
+int setegid(gid_t __gid) __picolibc_export;
+int seteuid(uid_t __uid) __picolibc_export;
 #endif
-int setgid(gid_t __gid);
+int setgid(gid_t __gid) __picolibc_export;
 #if __BSD_VISIBLE
-int setgroups(int ngroups, const gid_t *grouplist);
+int setgroups(int ngroups, const gid_t *grouplist) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-int sethostname(const char *, size_t);
+int sethostname(const char *, size_t) __picolibc_export;
 #endif
-int setpgid(pid_t __pid, pid_t __pgid);
+int setpgid(pid_t __pid, pid_t __pgid) __picolibc_export;
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 500
-int setpgrp(void);
+int setpgrp(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
-int setregid(gid_t __rgid, gid_t __egid);
-int setreuid(uid_t __ruid, uid_t __euid);
+int setregid(gid_t __rgid, gid_t __egid) __picolibc_export;
+int setreuid(uid_t __ruid, uid_t __euid) __picolibc_export;
 #endif
-pid_t setsid(void);
-int   setuid(uid_t __uid);
+pid_t setsid(void) __picolibc_export;
+int   setuid(uid_t __uid) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-void setusershell(void);
+void setusershell(void) __picolibc_export;
 #endif
-unsigned sleep(unsigned int __seconds);
+unsigned sleep(unsigned int __seconds) __picolibc_export;
 #if __XSI_VISIBLE
-void swab(const void * __restrict, void * __restrict, ssize_t);
+void swab(const void * __restrict, void * __restrict, ssize_t) __picolibc_export;
 #endif
-long  sysconf(int __name);
-long  __fallback_sysconf(int __name);
-pid_t tcgetpgrp(int __fildes);
-int   tcsetpgrp(int __fildes, pid_t __pgrp_id);
-char *ttyname(int __fildes);
-int   ttyname_r(int, char *, size_t);
-int   unlink(const char *__path);
+long  sysconf(int __name) __picolibc_export;
+long  __fallback_sysconf(int __name) __picolibc_export;
+pid_t tcgetpgrp(int __fildes) __picolibc_export;
+int   tcsetpgrp(int __fildes, pid_t __pgrp_id) __picolibc_export;
+char *ttyname(int __fildes) __picolibc_export;
+int   ttyname_r(int, char *, size_t) __picolibc_export;
+int   unlink(const char *__path) __picolibc_export;
 #if __XSI_VISIBLE >= 500 && __POSIX_VISIBLE < 200809 || __BSD_VISIBLE
-int usleep(useconds_t __useconds);
+int usleep(useconds_t __useconds) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int vhangup(void);
+int vhangup(void) __picolibc_export;
 #endif
-ssize_t      write(int __fd, const void *__buf, size_t __nbyte);
+ssize_t                        write(int __fd, const void *__buf, size_t __nbyte) __picolibc_export;
 
-extern char *optarg; /* getopt(3) external variables */
-extern int   optind, opterr, optopt;
-int          getopt(int, char          *const[], const char *);
-extern int   optreset; /* getopt(3) external variable */
+extern __picolibc_export char *optarg; /* getopt(3) external variables */
+extern __picolibc_export int   optind;
+extern __picolibc_export int   opterr;
+extern __picolibc_export int   optopt;
+int                            getopt(int, char                            *const[], const char *) __picolibc_export;
+extern __picolibc_export int   optreset; /* getopt(3) external variable */
 
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200809)
-pid_t vfork(void);
+pid_t vfork(void) __picolibc_export;
 #endif
 
 #if __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
-int ftruncate(int __fd, off_t __length);
+int ftruncate(int __fd, off_t __length) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
-int truncate(const char *, off_t __length);
+int truncate(const char *, off_t __length) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE < 200112
-int getdtablesize(void);
+int getdtablesize(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
-useconds_t ualarm(useconds_t __useconds, useconds_t __interval);
+useconds_t ualarm(useconds_t __useconds, useconds_t __interval) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
 #if !(defined(_WINSOCK_H) || defined(_WINSOCKAPI_) || defined(__USE_W32_SOCKETS))
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
-int gethostname(char *__name, size_t __len);
+int gethostname(char *__name, size_t __len) __picolibc_export;
 #endif
 #endif
 
 #if __MISC_VISIBLE
-int setdtablesize(int);
+int setdtablesize(int) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 500
-void sync(void);
+void sync(void) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 4
-ssize_t readlink(const char * __restrict __path, char * __restrict __buf, size_t __buflen);
-int     symlink(const char *__name1, const char *__name2);
+ssize_t readlink(const char * __restrict __path, char * __restrict __buf,
+                 size_t __buflen) __picolibc_export;
+int     symlink(const char *__name1, const char *__name2) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
 ssize_t readlinkat(int    __dirfd1, const char    *__restrict __path, char    *__restrict __buf,
-                   size_t __buflen);
-int     symlinkat(const char *, int, const char *);
-int     unlinkat(int, const char *, int);
+                   size_t __buflen) __picolibc_export;
+int     symlinkat(const char *, int, const char *) __picolibc_export;
+int     unlinkat(int, const char *, int) __picolibc_export;
 #endif
 
 #define F_OK     0

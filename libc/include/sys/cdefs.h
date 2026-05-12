@@ -89,6 +89,12 @@
  * can be safely replaced with nothing when not supported
  */
 
+#if __has_attribute(__visibility__)
+#define __picolibc_export __attribute__((__visibility__("default")))
+#else
+#define __picolibc_export
+#endif
+
 #if __has_attribute(__pure__)
 #define __pure __attribute__((__pure__))
 #else

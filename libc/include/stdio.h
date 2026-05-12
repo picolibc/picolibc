@@ -161,9 +161,9 @@ typedef __FILE FILE;
 */
 #define __PICOLIBC_STDIO_GLOBALS
 
-extern FILE * const stdin;
-extern FILE * const stdout;
-extern FILE * const stderr;
+extern __picolibc_export FILE * const stdin;
+extern __picolibc_export FILE * const stdout;
+extern __picolibc_export FILE * const stderr;
 
 /* The stdin, stdout, and stderr symbols are described as macros in the C
  * standard. */
@@ -203,13 +203,14 @@ extern FILE * const stderr;
         .flush = (__flush),                               \
     }
 
-FILE *fdevopen(int (*__put)(char, FILE *), int (*__get)(FILE *), int (*__flush)(FILE *));
-int   fclose(FILE *__stream) __nonnull((1));
+FILE *fdevopen(int (*__put)(char, FILE *), int (*__get)(FILE *),
+               int (*__flush)(FILE *)) __picolibc_export;
+int   fclose(FILE *__stream) __nonnull((1)) __picolibc_export;
 int   fflush(FILE *stream)
 #ifndef __STDIO_EXIT_FLUSH
     __nonnull((1))
 #endif
-    ;
+    __picolibc_export;
 
 #define fdev_close(f) (fflush(f))
 
@@ -267,58 +268,68 @@ int   fflush(FILE *stream)
 #define __PRINTF_ATTRIBUTE__(__s, __f) __FORMAT_ATTRIBUTE__(printf, __s, __f)
 #define __SCANF_ATTRIBUTE__(__s, _f)   __FORMAT_ATTRIBUTE__(scanf, __s, __f)
 
-int fputc(int __c, FILE *__stream) __nonnull((2));
-int putc(int __c, FILE *__stream) __nonnull((2));
-int putchar(int __c);
+int fputc(int __c, FILE *__stream) __nonnull((2)) __picolibc_export;
+int putc(int __c, FILE *__stream) __nonnull((2)) __picolibc_export;
+int putchar(int __c) __picolibc_export;
 #define putc(__c, __stream) fputc(__c, __stream)
 #define putchar(__c)        fputc(__c, stdout)
 
-int printf(const char *__fmt, ...) __PRINTF_ATTRIBUTE__(1, 2);
-int fprintf(FILE *__stream, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3) __nonnull((1));
-int vprintf(const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(1, 0);
+int printf(const char *__fmt, ...) __PRINTF_ATTRIBUTE__(1, 2) __picolibc_export;
+int fprintf(FILE *__stream, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3)
+    __nonnull((1)) __picolibc_export;
+int vprintf(const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(1, 0) __picolibc_export;
 int vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(2, 0)
-    __nonnull((1));
-int sprintf(char *__s, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
-int snprintf(char *__s, size_t __n, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(3, 4);
-int vsprintf(char *__s, const char *__fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
+    __nonnull((1)) __picolibc_export;
+int sprintf(char *__s, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3) __picolibc_export;
+int snprintf(char *__s, size_t __n, const char *__fmt, ...)
+    __PRINTF_ATTRIBUTE__(3, 4) __picolibc_export;
+int vsprintf(char *__s, const char *__fmt, __gnuc_va_list ap)
+    __PRINTF_ATTRIBUTE__(2, 0) __picolibc_export;
 int vsnprintf(char *__s, size_t __n, const char *__fmt, __gnuc_va_list ap)
-    __PRINTF_ATTRIBUTE__(3, 0);
-int   asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2, 3);
-char *asnprintf(char *str, size_t *lenp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(3, 4);
-int   vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0);
+    __PRINTF_ATTRIBUTE__(3, 0) __picolibc_export;
+int   asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2, 3) __picolibc_export;
+char *asnprintf(char *str, size_t *lenp, const char *fmt, ...)
+    __PRINTF_ATTRIBUTE__(3, 4) __picolibc_export;
+int vasprintf(char **strp, const char *fmt, __gnuc_va_list ap)
+    __PRINTF_ATTRIBUTE__(2, 0) __picolibc_export;
 char *vasnprintf(char *str, size_t *lenp, const char *fmt, __gnuc_va_list ap)
-    __PRINTF_ATTRIBUTE__(3, 0);
+    __PRINTF_ATTRIBUTE__(3, 0) __picolibc_export;
 
-int    fputs(const char *__str, FILE *__stream) __nonnull((2));
-int    puts(const char *__str);
-size_t fwrite(const void *__ptr, size_t __size, size_t __nmemb, FILE *__stream) __nonnull((4));
+int    fputs(const char *__str, FILE *__stream) __nonnull((2)) __picolibc_export;
+int    puts(const char *__str) __picolibc_export;
+size_t fwrite(const void *__ptr, size_t __size, size_t __nmemb, FILE *__stream)
+    __nonnull((4)) __picolibc_export;
 
-int    fgetc(FILE *__stream) __nonnull((1));
-int    getc(FILE *__stream) __nonnull((1));
-int    getchar(void);
+int fgetc(FILE *__stream) __nonnull((1)) __picolibc_export;
+int getc(FILE *__stream) __nonnull((1)) __picolibc_export;
+int getchar(void) __picolibc_export;
 #define getchar() getc(stdin)
-int ungetc(int __c, FILE *__stream) __nonnull((2));
+int ungetc(int __c, FILE *__stream) __nonnull((2)) __picolibc_export;
 
-int scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2);
-int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3) __nonnull((1));
-int vscanf(const char *__fmt, __gnuc_va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0);
+int scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2) __picolibc_export;
+int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3)
+    __nonnull((1)) __picolibc_export;
+int vscanf(const char *__fmt, __gnuc_va_list __ap)
+    __FORMAT_ATTRIBUTE__(scanf, 1, 0) __picolibc_export;
 int vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __nonnull((1));
-int sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __nonnull((1)) __picolibc_export;
+int sscanf(const char *__buf, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(scanf, 2, 3) __picolibc_export;
 int vsscanf(const char *__buf, const char *__fmt, __gnuc_va_list ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
 
-char *fgets(char *__str, int __size, FILE *__stream) __nonnull((3));
+char *fgets(char *__str, int __size, FILE *__stream) __nonnull((3)) __picolibc_export;
 #ifdef _PICOLIBC_USE_DEPRECATED_GETS
-char *gets(char *str);
+char *gets(char *str) __picolibc_export;
 #endif
-size_t fread(void *__ptr, size_t __size, size_t __nmemb, FILE *__stream) __nonnull((4));
+size_t fread(void *__ptr, size_t __size, size_t __nmemb, FILE *__stream)
+    __nonnull((4)) __picolibc_export;
 
-void   clearerr(FILE *__stream) __nonnull((1));
-int    ferror(FILE *__stream) __nonnull((1));
-int    feof(FILE *__stream) __nonnull((1));
+void clearerr(FILE *__stream) __nonnull((1)) __picolibc_export;
+int  ferror(FILE *__stream) __nonnull((1)) __picolibc_export;
+int  feof(FILE *__stream) __nonnull((1)) __picolibc_export;
 #ifdef __MISC_VISIBLE
-void __fseterr(FILE *__stream) __nonnull((1));
+void __fseterr(FILE *__stream) __nonnull((1)) __picolibc_export;
 #endif
 
 /* fast inlined versions */
@@ -339,10 +350,10 @@ void __fseterr(FILE *__stream) __nonnull((1));
 
 /* Expose the unlocked symbols when requested */
 #ifdef __MISC_VISIBLE
-void clearerr_unlocked(FILE *__stream) __nonnull((1));
-int  ferror_unlocked(FILE *__stream) __nonnull((1));
-int  feof_unlocked(FILE *__stream) __nonnull((1));
-void __fseterr_unlocked(FILE *__stream) __nonnull((1));
+void clearerr_unlocked(FILE *__stream) __nonnull((1)) __picolibc_export;
+int  ferror_unlocked(FILE *__stream) __nonnull((1)) __picolibc_export;
+int  feof_unlocked(FILE *__stream) __nonnull((1)) __picolibc_export;
+void __fseterr_unlocked(FILE *__stream) __nonnull((1)) __picolibc_export;
 #define clearerr_unlocked(s)  __clearerr_unlocked(s)
 #define ferror_unlocked(s)    __ferror_unlocked(s)
 #define feof_unlocked(s)      __feof_unlocked(s)
@@ -352,38 +363,48 @@ void __fseterr_unlocked(FILE *__stream) __nonnull((1));
 /* Expose printf variants */
 #ifdef __GNU_VISIBLE
 int __d_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
 int __f_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
 int __i_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
 int __l_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
 int __m_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0);
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
 
-int __d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __i_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __l_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
-int __m_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0);
+int __d_sprintf(char *__s, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
+int __f_sprintf(char *__s, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
+int __i_sprintf(char *__s, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
+int __l_sprintf(char *__s, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
+int __m_sprintf(char *__s, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
 
-int __d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __i_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __l_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
-int __m_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0);
+int __d_snprintf(char *__s, size_t __n, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
+int __f_snprintf(char *__s, size_t __n, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
+int __i_snprintf(char *__s, size_t __n, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
+int __l_snprintf(char *__s, size_t __n, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
+int __m_snprintf(char *__s, size_t __n, const char *__fmt, ...)
+    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
 
 int __d_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
 int __f_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
 int __i_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
 int __l_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
 int __m_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 0);
+    __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
 
 #endif
 
@@ -448,64 +469,67 @@ typedef __gnuc_va_list va_list;
 #include <stdarg.h>
 #endif
 
-int dprintf(int fd, const char * __restrict fmt, ...);
-int vdprintf(int fd, const char * __restrict fmt, __gnuc_va_list ap);
+int dprintf(int fd, const char * __restrict fmt, ...) __picolibc_export;
+int vdprintf(int fd, const char * __restrict fmt, __gnuc_va_list ap) __picolibc_export;
 
 #endif
 
-int   fgetpos(FILE   *__restrict stream, fpos_t   *__restrict pos) __nonnull((1));
-FILE *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1);
-FILE *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3));
-FILE *fdopen(int, const char *) __malloc_like_with_free(fclose, 1);
-FILE *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1);
-int   fseek(FILE *stream, long offset, int whence) __nonnull((1));
-int   fsetpos(FILE *stream, const fpos_t *pos) __nonnull((1));
-long  ftell(FILE *stream) __nonnull((1));
-int   fileno(FILE *stream) __nonnull((1));
-void  perror(const char *s);
-int   remove(const char *pathname);
-int   rename(const char *oldpath, const char *newpath);
-void  rewind(FILE *stream) __nonnull((1));
-void  setbuf(FILE *stream, char *buf) __nonnull((1));
-void  setbuffer(FILE *stream, char *buf, size_t size) __nonnull((1));
-void  setlinebuf(FILE *stream) __nonnull((1));
-int   setvbuf(FILE *stream, char *buf, int mode, size_t size) __nonnull((1));
-FILE *tmpfile(void);
-char *tmpnam(char *s);
+int   fgetpos(FILE   *__restrict stream, fpos_t   *__restrict pos) __nonnull((1)) __picolibc_export;
+FILE *fopen(const char *path, const char *mode)
+    __malloc_like_with_free(fclose, 1) __picolibc_export;
+FILE *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3)) __picolibc_export;
+FILE *fdopen(int, const char *) __malloc_like_with_free(fclose, 1) __picolibc_export;
+FILE *fmemopen(void *buf, size_t size, const char *mode)
+    __malloc_like_with_free(fclose, 1) __picolibc_export;
+int   fseek(FILE *stream, long offset, int whence) __nonnull((1)) __picolibc_export;
+int   fsetpos(FILE *stream, const fpos_t *pos) __nonnull((1)) __picolibc_export;
+long  ftell(FILE *stream) __nonnull((1)) __picolibc_export;
+int   fileno(FILE *stream) __nonnull((1)) __picolibc_export;
+void  perror(const char *s) __picolibc_export;
+int   remove(const char *pathname) __picolibc_export;
+int   rename(const char *oldpath, const char *newpath) __picolibc_export;
+void  rewind(FILE *stream) __nonnull((1)) __picolibc_export;
+void  setbuf(FILE *stream, char *buf) __nonnull((1)) __picolibc_export;
+void  setbuffer(FILE *stream, char *buf, size_t size) __nonnull((1)) __picolibc_export;
+void  setlinebuf(FILE *stream) __nonnull((1)) __picolibc_export;
+int   setvbuf(FILE *stream, char *buf, int mode, size_t size) __nonnull((1)) __picolibc_export;
+FILE *tmpfile(void) __picolibc_export;
+char *tmpnam(char *s) __picolibc_export;
 
 #if __POSIX_VISIBLE
-int     fseeko(FILE *stream, off_t offset, int whence) __nonnull((1));
-off_t   ftello(FILE *stream) __nonnull((1));
+int     fseeko(FILE *stream, off_t offset, int whence) __nonnull((1)) __picolibc_export;
+off_t   ftello(FILE *stream) __nonnull((1)) __picolibc_export;
 ssize_t getline(char ** __restrict lineptr, size_t * __restrict n, FILE * __restrict stream)
-    __nonnull((3));
+    __nonnull((3)) __picolibc_export;
 ssize_t getdelim(char ** __restrict lineptr, size_t * __restrict n, int delim,
-                 FILE * __restrict stream) __nonnull((4));
-FILE   *popen(const char *command, const char *type);
-int     pclose(FILE *stream);
+                 FILE * __restrict stream) __nonnull((4)) __picolibc_export;
+FILE   *popen(const char *command, const char *type) __picolibc_export;
+int     pclose(FILE *stream) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE
 FILE *funopen(const void *cookie, ssize_t (*readfn)(void *cookie, void *buf, size_t n),
               ssize_t (*writefn)(void *cookie, const void *buf, size_t n),
-              off_t (*seekfn)(void *cookie, off_t off, int whence), int (*closefn)(void *cookie));
+              off_t   (*seekfn)(void *cookie, off_t off, int whence),
+              int     (*closefn)(void *cookie)) __picolibc_export;
 #define fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
 #define fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /*__BSD_VISIBLE */
 
 #if __POSIX_VISIBLE >= 199309L
-int getc_unlocked(FILE *) __nonnull((1));
-int getchar_unlocked(void);
+int getc_unlocked(FILE *) __nonnull((1)) __picolibc_export;
+int getchar_unlocked(void) __picolibc_export;
 #ifdef __STDIO_LOCKING
-void flockfile(FILE *__f) __nonnull((1)) __acquire_capability(__f->lock);
-int  ftrylockfile(FILE *) __nonnull((1));
-void funlockfile(FILE *__f) __nonnull((1)) __release_capability(__f->lock);
+void flockfile(FILE *__f) __nonnull((1)) __acquire_capability(__f->lock) __picolibc_export;
+int  ftrylockfile(FILE *) __nonnull((1)) __picolibc_export;
+void funlockfile(FILE *__f) __nonnull((1)) __release_capability(__f->lock) __picolibc_export;
 #else
-void flockfile(FILE *) __nonnull((1));
-int  ftrylockfile(FILE *) __nonnull((1));
-void funlockfile(FILE *) __nonnull((1));
+void flockfile(FILE *) __nonnull((1)) __picolibc_export;
+int  ftrylockfile(FILE *) __nonnull((1)) __picolibc_export;
+void funlockfile(FILE *) __nonnull((1)) __picolibc_export;
 #endif
-int putc_unlocked(int, FILE *) __nonnull((2));
-int putchar_unlocked(int);
+int putc_unlocked(int, FILE *) __nonnull((2)) __picolibc_export;
+int putchar_unlocked(int) __picolibc_export;
 #ifndef __STDIO_LOCKING
 #define getc_unlocked(f)       getc(f)
 #define getchar_unlocked(f)    getc(stdin)
@@ -515,7 +539,7 @@ int putchar_unlocked(int);
 #endif
 
 #if __GNU_VISIBLE
-int ungetc_unlocked(int c, FILE *) __nonnull((2));
+int ungetc_unlocked(int c, FILE *) __nonnull((2)) __picolibc_export;
 #ifndef __STDIO_LOCKING
 #define ungetc_unlocked(c, f) ungetc(c, f)
 #endif
@@ -539,9 +563,12 @@ typedef __rsize_t rsize_t;
 #define _RSIZE_T_DEFINED
 #endif
 
-int sprintf_s(char * __restrict __s, rsize_t __bufsize, const char * __restrict __format, ...);
-int vsnprintf_s(char * __restrict s, rsize_t n, const char * __restrict fmt, va_list arg);
-int vfprintf_s(FILE * __restrict stream, const char * __restrict fmt, va_list ap_orig);
+int sprintf_s(char * __restrict __s, rsize_t __bufsize, const char * __restrict __format,
+              ...) __picolibc_export;
+int vsnprintf_s(char * __restrict s, rsize_t n, const char * __restrict fmt,
+                va_list arg) __picolibc_export;
+int vfprintf_s(FILE * __restrict stream, const char * __restrict fmt,
+               va_list ap_orig) __picolibc_export;
 #endif
 
 /*

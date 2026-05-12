@@ -172,119 +172,121 @@ typedef __pid_t pid_t; /* process id */
 
 /* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
 #if __SVID_VISIBLE || __XSI_VISIBLE
-extern long timezone;
-extern int  daylight;
+extern __picolibc_export long timezone;
+extern __picolibc_export int  daylight;
 #endif
 
 #if __POSIX_VISIBLE
-extern char * const tzname[2];
+extern __picolibc_export char * const tzname[2];
 #endif /* __POSIX_VISIBLE */
 
-char *asctime(const struct tm *_tblock);
+char *asctime(const struct tm *_tblock) __picolibc_export;
 
 #if __POSIX_VISIBLE
 #define __ASCTIME_SIZE 26
 
-char *asctime_r(const struct tm * __restrict, char[__restrict_arr __min_size(__ASCTIME_SIZE)]);
+char *asctime_r(const struct tm * __restrict,
+                char[__restrict_arr __min_size(__ASCTIME_SIZE)]) __picolibc_export;
 #endif
 
-clock_t clock(void);
+clock_t clock(void) __picolibc_export;
 
 #if defined(_POSIX_CPUTIME)
-int clock_getcpuclockid(pid_t pid, clockid_t *clock_id);
+int clock_getcpuclockid(pid_t pid, clockid_t *clock_id) __picolibc_export;
 #endif /* _POSIX_CPUTIME */
 
 #if __POSIX_VISIBLE
-int clock_getres(clockid_t clock_id, struct timespec *res);
+int clock_getres(clockid_t clock_id, struct timespec *res) __picolibc_export;
 
-int clock_gettime(clockid_t clock_id, struct timespec *tp);
+int clock_gettime(clockid_t clock_id, struct timespec *tp) __picolibc_export;
 
 int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp,
-                    struct timespec *rmtp);
+                    struct timespec *rmtp) __picolibc_export;
 
-int clock_settime(clockid_t clock_id, const struct timespec *tp);
+int clock_settime(clockid_t clock_id, const struct timespec *tp) __picolibc_export;
 #endif
 
-char *ctime(const time_t *_time);
+char *ctime(const time_t *_time) __picolibc_export;
 
 #if __POSIX_VISIBLE
-char *ctime_r(const time_t *, char[__restrict_arr __min_size(__ASCTIME_SIZE)]);
+char *ctime_r(const time_t *, char[__restrict_arr __min_size(__ASCTIME_SIZE)]) __picolibc_export;
 #endif
 
-double difftime(time_t _time2, time_t _time1);
+double difftime(time_t _time2, time_t _time1) __picolibc_export;
 
 #if __XSI_VISIBLE >= 4
 
-extern int getdate_err;
+extern __picolibc_export int getdate_err;
 
-struct tm *getdate(const char *);
+struct tm                   *getdate(const char *) __picolibc_export;
 #endif /* __XSI_VISIBLE >= 4 */
 
 #if __GNU_VISIBLE
 
-int getdate_r(const char *, struct tm *);
+int getdate_r(const char *, struct tm *) __picolibc_export;
 #endif /* __GNU_VISIBLE */
 
-struct tm *gmtime(const time_t *_timer);
+struct tm *gmtime(const time_t *_timer) __picolibc_export;
 
 #if __POSIX_VISIBLE || __ZEPHYR_VISIBLE
-struct tm *gmtime_r(const time_t * __restrict, struct tm * __restrict);
+struct tm *gmtime_r(const time_t * __restrict, struct tm * __restrict) __picolibc_export;
 #endif
 
-struct tm *localtime(const time_t *_timer);
+struct tm *localtime(const time_t *_timer) __picolibc_export;
 
 #if __POSIX_VISIBLE
-struct tm *localtime_r(const time_t * __restrict, struct tm * __restrict);
+struct tm *localtime_r(const time_t * __restrict, struct tm * __restrict) __picolibc_export;
 #endif
 
-time_t mktime(struct tm *_timeptr);
+time_t mktime(struct tm *_timeptr) __picolibc_export;
 
-int    nanosleep(const struct timespec *rqtp, struct timespec *rmtp);
+int    nanosleep(const struct timespec *rqtp, struct timespec *rmtp) __picolibc_export;
 
 size_t strftime(char * __restrict _s, size_t _maxsize, const char * __restrict _fmt,
-                const struct tm * __restrict _t);
+                const struct tm * __restrict _t) __picolibc_export;
 
-int    timespec_get(struct timespec *_ts, int _base);
+int    timespec_get(struct timespec *_ts, int _base) __picolibc_export;
 
 #if __ISO_C_VISIBLE >= 2023
-int timespec_getres(struct timespec *_ts, int base);
+int timespec_getres(struct timespec *_ts, int base) __picolibc_export;
 #endif
 
 #if __POSIX_VISIBLE
 size_t strftime_l(char * __restrict _s, size_t              _maxsize, const char              *__restrict _fmt,
-                  const struct tm * __restrict _t, locale_t _l);
+                  const struct tm * __restrict _t, locale_t _l) __picolibc_export;
 #endif
 
 #if __XSI_VISIBLE
-char *strptime(const char * __restrict, const char * __restrict, struct tm * __restrict);
+char *strptime(const char * __restrict, const char * __restrict,
+               struct tm * __restrict) __picolibc_export;
 #endif
 #if __GNU_VISIBLE
 char *strptime_l(const char * __restrict, const char * __restrict, struct tm * __restrict,
-                 locale_t);
+                 locale_t) __picolibc_export;
 #endif
 
-time_t time(time_t *_timer);
+time_t time(time_t *_timer) __picolibc_export;
 
 #if __BSD_VISIBLE || __SVID_VISIBLE || __GNU_VISIBLE
-time_t timegm(struct tm *_timeptr);
+time_t timegm(struct tm *_timeptr) __picolibc_export;
 #endif
 
 #if __POSIX_VISIBLE
 struct sigevent;
 int timer_create(clockid_t clock_id, struct sigevent * __restrict evp,
-                 timer_t * __restrict timerid);
+                 timer_t * __restrict timerid) __picolibc_export;
 
-int timer_delete(timer_t timerid);
+int timer_delete(timer_t timerid) __picolibc_export;
 
-int timer_getoverrun(timer_t timerid);
+int timer_getoverrun(timer_t timerid) __picolibc_export;
 
-int timer_gettime(timer_t timerid, struct itimerspec *value);
+int timer_gettime(timer_t timerid, struct itimerspec *value) __picolibc_export;
 
 int timer_settime(timer_t timerid, int flags, const struct itimerspec * __restrict value,
-                  struct itimerspec * __restrict ovalue);
+                  struct itimerspec * __restrict ovalue) __picolibc_export;
 #endif
 
-void tzset(void);
+void tzset(void) __picolibc_export;
 
 #if __STDC_WANT_LIB_EXT1__ == 1
 #ifndef __STDC_LIB_EXT1__

@@ -50,10 +50,10 @@ typedef struct {
     jmp_buf    jmpb;
 } sigjmp_buf[1];
 
-__noreturn void     longjmp(jmp_buf __jmpb, int __retval);
-__returns_twice int setjmp(jmp_buf __jmpb);
-void                __sigjmp_getsigs(sigjmp_buf jmpb, int savesigs);
-void                __sigjmp_setsigs(sigjmp_buf jmpb);
+__noreturn void     longjmp(jmp_buf __jmpb, int __retval) __picolibc_export;
+__returns_twice int setjmp(jmp_buf __jmpb) __picolibc_export;
+void                __sigjmp_getsigs(sigjmp_buf jmpb, int savesigs) __picolibc_export;
+void                __sigjmp_setsigs(sigjmp_buf jmpb) __picolibc_export;
 
 #define sigsetjmp(__e, __s)  (__sigjmp_getsigs((__e), (__s)), setjmp((__e)[0].jmpb))
 #define siglongjmp(__e, __v) (__sigjmp_setsigs((__e)), longjmp((__e)[0].jmpb, (__v)))

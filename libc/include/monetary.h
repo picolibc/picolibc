@@ -49,8 +49,9 @@ typedef __ssize_t ssize_t;
 
 _BEGIN_STD_C
 
-ssize_t strfmon(char * __restrict, size_t, const char * __restrict, ...);
-ssize_t strfmon_l(char * __restrict, size_t, locale_t, const char * __restrict, ...);
+ssize_t strfmon(char * __restrict, size_t, const char * __restrict, ...) __picolibc_export;
+ssize_t strfmon_l(char * __restrict, size_t, locale_t, const char * __restrict,
+                  ...) __picolibc_export;
 
 _END_STD_C
 
