@@ -146,7 +146,6 @@ else
   enable_exhaustive_math_tests = exhaustive_math_tests_value == 'true'
 endif
 tests_enable_stack_protector = get_option('tests-enable-stack-protector')
-tests_enable_full_malloc_stress = get_option('tests-enable-full-malloc-stress')
 tests_enable_posix_io = get_option('tests-enable-posix-io')
 
 use_hlt_semihosting = false
