@@ -39,16 +39,16 @@
 struct __kernel_statfs {
     __int32_t         f_type;
     __int32_t         f_bsize;
-    __uint32_t        f_blocks;
-    __uint32_t        f_bfree;
-    __uint32_t        f_bavail;
-    __uint32_t        f_files;
-    __uint32_t        f_ffree;
+    __uint64_t        f_blocks;
+    __uint64_t        f_bfree;
+    __uint64_t        f_bavail;
+    __uint64_t        f_files;
+    __uint64_t        f_ffree;
     __kernel___fsid_t f_fsid;
     __int32_t         f_namelen;
     __int32_t         f_frsize;
     __int32_t         f_flags;
-    __uint8_t         __adjust_48[16];
+    __uint8_t         __adjust_68[16];
 };
 
 #define SIMPLE_MAP_STATFS(_t, _f)          \

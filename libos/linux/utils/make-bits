@@ -125,7 +125,7 @@ wrap_struct() {
     "$HERE"/make-struct "${HERE}"/"$JSON" --type="${TYPE_HEADER}" --struct="${STRUCT_HEADER}" || exit 1
 
 #    echo "${CC}" -g -I"${PWD}" "${HERE}"/type-analyze.c -o ${TYPE_EXEC}
-    "${CC}" -g -I"${PWD}" "${HERE}"/type-analyze.c -o ${TYPE_EXEC} || exit 1
+    "${CC}" -g -D_FILE_OFFSET_BITS=64 -I"${PWD}" "${HERE}"/type-analyze.c -o ${TYPE_EXEC} || exit 1
 
 #    echo "${RUN}" ./"${TYPE_EXEC}"
     "${RUN}" ./"${TYPE_EXEC}" > ${TYPE_OUT}
@@ -133,7 +133,7 @@ wrap_struct() {
     rm "${TYPE_EXEC}"
 
 #    echo "${CC}" -g -I"${PWD}" "${HERE}"/struct-analyze.c -o ${STRUCT_EXEC}
-    "${CC}" -g -I"${PWD}" "${HERE}"/struct-analyze.c -o ${STRUCT_EXEC} || exit 1
+    "${CC}" -g -D_FILE_OFFSET_BITS=64 -I"${PWD}" "${HERE}"/struct-analyze.c -o ${STRUCT_EXEC} || exit 1
     (
     copyright
     

@@ -1,5 +1,6 @@
 #include <stddef.h>
 #include "struct-data.h"
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdint.h>
 #include <ctype.h>
