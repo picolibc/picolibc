@@ -53,7 +53,8 @@ select which version with the
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| build-type-subdir
+| build-type-subdir           |         |                                                                                      |
+| force-install               | false   | Install files even when picolibc is built as a subproject                            |
 | specsdir                    | auto    | Where to install the .specs file (default is in the GCC directory). <br> If set to `none`, then picolibc.specs will not be installed at all.|
 | sysroot-install             | false   | Install in GCC sysroot location                                                      |
 | sysroot-install-skip-checks | false   | Skip sysroot path check when using sysroot-install.                                  |
@@ -66,24 +67,24 @@ testing the library using the host compiler and host C library.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
+| exhaustive-math-tests       | false   | Test every possible 32-bit float value, comparing 32-bit and 64-bit functions        |
+| fake-semihost               | false   | Create a fake semihost library to allow tests to link                                |
+| fortify-source              | 3       | Use this for _FORTIFY_SOURCE value when building tests                               |
+| freestanding                | false   | Build entire library with -ffreestanding. Used to be useful for Zephyr testing       |
+| native-math-tests           | true    | Also build math tests against host libc when native-tests is enabled                 |
+| native-tests                | false   | Build tests against host libc (used to validate tests)                               |
+| semihost                    | true    | Build semihost libary. Disable when doing native testing.                            |
+| split-large-tests           | false   | For tests which generate large executables, split them apart for smaller targets     |
+| picolib                     | true    | Include 'picolib' bits. Disable when doing native testing.                           |
 | tests                       | false   | Enable tests                                                                         |
 | tests-cdefs                 | auto    | Ensure every public header ends up including sys/cdefs.h. When set to auto, follows tests value |
 | tests-enable-stack-protector| true    | Build tests with stack protector enabled using -fstack-protector-all -fstack-protector-strong |
-| tests-enable-full-malloc-stress | false | Also enable malloc stress testing when building full malloc. This is always enabled for nano-malloc |
 | tests-enable-posix-io       | true    | Include tests which require full POSIX API                                           |
 | test-long-double            | true    | Enable long double tests.                                                            |
-| split-large-tests           | false   | For tests which generate large executables, split them apart for smaller targets     |
 | test-stdin                  | false   | Include tests which require working stdin                                            |
-| fortify-source              | 3       | Use this for _FORTIFY_SOURCE value when building tests                               |
 | test-machine                | qemu    | Target machine type for tests. AArch64 also supports 'fvp'                           |
-| freestanding                | false   | Build entire library with -ffreestanding. Used to be useful for Zephyr testing       |
-| native-tests                | false   | Build tests against host libc (used to validate tests)                               |
-| native-math-tests           | true    | Also build math tests against host libc when native-tests is enabled                 |
-| use-stdlib                  | false   | Do not link tests with -nostdlib. Useful for native testing.                         |
-| picolib                     | true    | Include 'picolib' bits. Disable when doing native testing.                           |
-| semihost                    | true    | Build semihost libary. Disable when doing native testing.                            |
-| fake-semihost               | false   | Create a fake semihost library to allow tests to link                                |
 | use-hlt-semihosting         | false   | Selects the HLT trap instruction for semihosting on AArch32 targets with Armv8 or later |
+| use-stdlib                  | false   | Do not link tests with -nostdlib. Useful for native testing.                         |
 
 ### Stdio options
 
@@ -150,16 +151,20 @@ at startup and shutdown times.
 
 ### Malloc options
 
-Picolibc offers two malloc implementations, the larger version offers
-better performance on large memory systems and for applications doing
-a lot of variable-sized allocations and deallocations. The smaller,
-default, implementation works best when applications perform few,
-persistent allocations.
+Picolibc offers a straightforward first-fit malloc implementation. The
+time taken by malloc and free operations scales with the total number
+of in-use and free blocks. For applications doing a lot of small
+malloc/free operations, you can have smaller allocations placed in a
+set of fixed-size buckets instead. Operations on those sizes will be
+constant time instead.
 
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
-| newlib-nano-malloc          | true    | Use small-footprint nano-malloc implementation                                       |
-| nano-malloc-clear-freed     | false   | Set contents of freed memory to zero when using nano-malloc                          |
+| enable-malloc               | true    | Include the malloc family of functions in the library                                |
+| internal-heap               | 0       | When non-zero, sets the size of a fixed block of memory for sbrk to use              |
+| malloc-clear-freed          | false   | Set contents of freed memory to zero                                                 |
+| malloc-error-abort          | false   | Calls abort when the allocation subsystem detects errors                             |
+| malloc-small-bucket         | 0       | Allocations no larger than this are placed in power-of-two buckets for constant-time malloc/free |
 
 ### Locking options
 

@@ -211,14 +211,14 @@ option('crt-runtime-size', type: 'boolean', value: false,
 
 option('enable-malloc', type: 'boolean', value: true,
        description: 'provide malloc family of functions based on sbrk')
-option('malloc-clear-freed', type: 'boolean', value: false,
-       description: 'Erase memory on free/realloc')
 option('internal-heap', type: 'integer', value: 0,
        description: 'provide internal static heap')
-option('malloc-small-bucket', type: 'integer', value: 0,
-       description: 'use fixed bucket sizes for allocations no larger than this')
+option('malloc-clear-freed', type: 'boolean', value: false,
+       description: 'Erase memory on free/realloc')
 option('malloc-error-abort', type: 'boolean', value: false,
        description: 'Abort when malloc usage errors are detected')
+option('malloc-small-bucket', type: 'integer', value: 0,
+       description: 'use fixed bucket sizes for allocations no larger than this')
 
 #
 # Locking options
