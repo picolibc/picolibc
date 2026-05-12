@@ -36,6 +36,7 @@
 target_sources(semihost PRIVATE
   rx_exit.c
   rx_iob.c
+  ../../fake/fake_gettimeofday.c
   ../../fake/fake_close.c
   ../../fake/fake_fstat.c
   ../../fake/fake_getentropy.c
