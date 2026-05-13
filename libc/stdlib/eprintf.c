@@ -14,7 +14,9 @@ All rights reserved.
    assert.h.  In such a case, this __eprintf will be used if there
    does not happen to be one in libgcc2.c.  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <stdio.h>
 

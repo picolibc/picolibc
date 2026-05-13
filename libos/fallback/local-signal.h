@@ -36,7 +36,9 @@
 #ifndef _LOCAL_SIGNAL_H_
 #define _LOCAL_SIGNAL_H_
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <errno.h>
 #include <signal.h>
 #include <unistd.h>

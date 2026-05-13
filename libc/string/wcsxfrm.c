@@ -33,7 +33,9 @@ PORTABILITY
 <<wcsxfrm>> is ISO/IEC 9899/AMD1:1995 (ISO C).
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <wchar.h>
 
 size_t

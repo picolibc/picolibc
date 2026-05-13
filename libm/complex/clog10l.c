@@ -29,7 +29,9 @@ PORTABILITY
 
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH

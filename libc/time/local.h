@@ -1,6 +1,8 @@
 /* Copyright (c) 2002 Jeff Johnston <jjohnstn@redhat.com> */
 /* local header used by libc/time routines */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <time.h>
 #include <sys/lock.h>
 #include <stdint.h>

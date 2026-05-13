@@ -33,7 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "math_ld.h"
 
 #if defined(_IEEE128_FLOAT) || defined(_INTEL80_FLOAT)

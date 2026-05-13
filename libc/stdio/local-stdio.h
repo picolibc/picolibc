@@ -32,7 +32,9 @@
 #ifndef _STDIO_PRIVATE_H_
 #define _STDIO_PRIVATE_H_
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdlib.h>
 #include <stdarg.h>
 #include <stddef.h>

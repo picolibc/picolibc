@@ -45,7 +45,9 @@ No supporting OS subroutines are required.
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <wchar.h>
 
 /*

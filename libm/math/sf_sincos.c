@@ -33,7 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "fdlibm.h"
 #if __OBSOLETE_MATH_FLOAT
 

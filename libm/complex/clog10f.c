@@ -1,5 +1,7 @@
 /* Copyright (c) 2016 Yaakov Selkowitz <yselkowi@redhat.com> */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "local-complex.h"
 
 float complex

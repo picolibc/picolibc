@@ -33,7 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "m68k_semihost.h"
 #include <sys/types.h>
 #include <sys/stat.h>

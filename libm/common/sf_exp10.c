@@ -17,7 +17,9 @@
  * wrapper exp10f(x)
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #undef exp10f
 #include "fdlibm.h"
 #include <errno.h>

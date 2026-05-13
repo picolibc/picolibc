@@ -34,7 +34,9 @@
  */
 
 #define __STDC_WANT_IEC_60559_BFP_EXT__
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <fenv.h>
 
 /* By default, the only state we carry is the rounding mode */

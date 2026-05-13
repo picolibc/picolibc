@@ -33,7 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #define TEST_VECTORS "test-sin.h"
 #define TEST_FUNC    sincos_sin
 

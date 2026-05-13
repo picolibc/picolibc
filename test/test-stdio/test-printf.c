@@ -3,7 +3,9 @@
    Please see the file COPYING.GPL2 in this distribution for
    license terms. */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>

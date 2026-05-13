@@ -17,7 +17,9 @@
  * wrapper pow10f(x)
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #undef pow10f
 #include "fdlibm.h"
 #include <errno.h>

@@ -12,7 +12,9 @@
  * is preserved.
  * ====================================================
  */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "fdlibm.h"
 
 static float       ponef(float), qonef(float);

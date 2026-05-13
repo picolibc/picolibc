@@ -4,7 +4,9 @@ Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling
  */
 /* Modified (m) 2017 Thomas Wolff: revise Unicode and locale/wchar handling */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <wctype.h>
 #include <stdint.h>
 #include <langinfo.h>

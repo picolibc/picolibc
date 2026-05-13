@@ -24,7 +24,9 @@
  * SUCH DAMAGE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "local-complex.h"
 #include <float.h>
 #include <stdbool.h>

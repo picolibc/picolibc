@@ -8,7 +8,9 @@
 #include "../../fenv/fenv.c"
 #else
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE // for FE_NOMASK_ENV
+#endif 
 #define __STDC_WANT_IEC_60559_BFP_EXT__
 
 #include <fenv.h>

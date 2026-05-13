@@ -55,7 +55,9 @@
  * 	   where x1 = x-3*pi/4. It is better to compute sin(x1),cos(x1)
  *	   by method mentioned above.
  */
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64

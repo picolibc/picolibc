@@ -11,7 +11,9 @@
  *   with a trailing slash.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <string.h>
 
 __typeof(basename) __gnu_basename;

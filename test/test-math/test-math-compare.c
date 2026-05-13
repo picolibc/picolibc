@@ -37,7 +37,9 @@
 #error Pass -DTEST_FUNC=function when building
 #endif
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "test-math.h"
 
 #define FNAME MATH_STRING(TEST_FUNC)

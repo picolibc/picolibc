@@ -29,7 +29,9 @@ PORTABILITY
 No supporting OS subroutines are required.
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <string.h>
 #include <wchar.h>
 

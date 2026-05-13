@@ -33,7 +33,9 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "math_config.h"
 
 #if defined(__HAVE_LONG_DOUBLE_MATH) && defined(_NEED_FLOAT_HUGE)

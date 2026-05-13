@@ -35,7 +35,9 @@
  * Compares a filename or pathname to a pattern.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <ctype.h>
 #include <fnmatch.h>
 #include <string.h>

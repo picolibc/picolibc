@@ -58,7 +58,9 @@ a non-empty alternate string without assigning into its third argument.
 */
 
 #undef __STRICT_ANSI__
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <errno.h>
 #include <string.h>
 #include "local.h"

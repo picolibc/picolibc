@@ -36,7 +36,9 @@
 #ifndef _LOCAL_LINUX_H_
 #define _LOCAL_LINUX_H_
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 
 #include <errno.h>
 #include <sys/stat.h>

@@ -56,7 +56,9 @@
  *	3. Special cases: y0(0)=-inf, y0(x<0)=NaN, y0(inf)=0.
  */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64

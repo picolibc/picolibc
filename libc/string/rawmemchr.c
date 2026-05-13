@@ -29,7 +29,9 @@ QUICKREF
         rawmemchr
 */
 
+#ifndef _GNU_SOURCE
 #define _GNU_SOURCE
+#endif
 #include <string.h>
 #include <limits.h>
 #include "local.h"
