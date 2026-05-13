@@ -33,18 +33,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_RLIMIT_STRUCT_H_
-#define _LINUX_RLIMIT_STRUCT_H_
+#ifndef _LINUX_RLIMIT64_STRUCT_H_
+#define _LINUX_RLIMIT64_STRUCT_H_
 
-struct __kernel_rlimit {
+struct __kernel_rlimit64 {
     __uint64_t rlim_cur;
     __uint64_t rlim_max;
 };
 
-#define SIMPLE_MAP_RLIMIT(_t, _f)        \
+#define SIMPLE_MAP_RLIMIT64(_t, _f)      \
     do {                                 \
         (_t)->rlim_cur = (_f)->rlim_cur; \
         (_t)->rlim_max = (_f)->rlim_max; \
     } while (0)
 
-#endif /* _LINUX_RLIMIT_STRUCT_H_ */
+#endif /* _LINUX_RLIMIT64_STRUCT_H_ */

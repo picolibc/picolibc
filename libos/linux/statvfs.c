@@ -38,8 +38,8 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int
 statvfs(const char *path, struct statvfs *buf)
 {
-    struct __kernel_statfs kbuf;
-    int                    ret;
+    struct __kernel_statfs_size kbuf;
+    int                         ret;
 
     /*
      * On 32-bit arches (arm, i686), the plain statfs syscall only returns

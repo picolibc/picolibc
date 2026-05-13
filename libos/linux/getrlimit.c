@@ -33,31 +33,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-linux.h"
-#include <sys/resource.h>
-#include <errno.h>
-#include <linux/linux-rlimit-struct.h>
-#include <linux/linux-resource.h>
+#include "local-resource.h"
 
 int
 getrlimit(int resource, struct rlimit *rlim)
 {
-    struct __kernel_rlimit klim = {};
+    struct __kernel_rlimit_size klim = {};
     resource = _rlimit_to_linux(resource);
     if (resource < 0) {
         errno = EINVAL;
         return -1;
     }
-#ifdef LINUX_SYS_ugetrlimit
+#ifdef LINUX_SYS_prlimit_size
+    int ret = syscall(LINUX_SYS_prlimit_size, 0, resource, NULL, &klim);
+#elif defined(LINUX_SYS_ugetrlimit)
     int ret = syscall(LINUX_SYS_ugetrlimit, resource, &klim);
 #else
     int ret = syscall(LINUX_SYS_getrlimit, resource, &klim);
 #endif
     if (ret >= 0) {
-        SIMPLE_MAP_RLIMIT(rlim, &klim);
-        if (klim.rlim_cur == LINUX_RLIM_INFINITY)
+        SIMPLE_MAP_RLIMIT_SIZE(rlim, &klim);
+        if (klim.rlim_cur == LINUX_RLIM_INFINITY_SIZE)
             rlim->rlim_cur = RLIM_INFINITY;
-        if (klim.rlim_max == LINUX_RLIM_INFINITY)
+        if (klim.rlim_max == LINUX_RLIM_INFINITY_SIZE)
             rlim->rlim_max = RLIM_INFINITY;
     }
     return ret;
