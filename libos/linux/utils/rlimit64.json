@@ -1,0 +1,9 @@
+{
+    "name": "rlimit64",
+    "defines": [ { "name": "_LARGEFILE64_SOURCE", "value": "1" } ],
+    "headers": [ "sys/resource.h" ],
+    "members": [
+	{ "name": "rlim_cur" },
+	{ "name": "rlim_max" }
+    ]
+}

@@ -33,18 +33,36 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_RLIMIT_STRUCT_H_
-#define _LINUX_RLIMIT_STRUCT_H_
+#ifndef _LINUX_STATFS64_STRUCT_H_
+#define _LINUX_STATFS64_STRUCT_H_
 
-struct __kernel_rlimit {
-    __uint64_t rlim_cur;
-    __uint64_t rlim_max;
+struct __kernel_statfs64 {
+    __int32_t         f_type;
+    __int32_t         f_bsize;
+    __uint64_t        f_blocks;
+    __uint64_t        f_bfree;
+    __uint64_t        f_bavail;
+    __uint64_t        f_files;
+    __uint64_t        f_ffree;
+    __kernel___fsid_t f_fsid;
+    __int32_t         f_namelen;
+    __int32_t         f_frsize;
+    __int32_t         f_flags;
+    __uint8_t         __adjust_68[16];
 };
 
-#define SIMPLE_MAP_RLIMIT(_t, _f)        \
-    do {                                 \
-        (_t)->rlim_cur = (_f)->rlim_cur; \
-        (_t)->rlim_max = (_f)->rlim_max; \
+#define SIMPLE_MAP_STATFS64(_t, _f)        \
+    do {                                   \
+        (_t)->f_type = (_f)->f_type;       \
+        (_t)->f_bsize = (_f)->f_bsize;     \
+        (_t)->f_blocks = (_f)->f_blocks;   \
+        (_t)->f_bfree = (_f)->f_bfree;     \
+        (_t)->f_bavail = (_f)->f_bavail;   \
+        (_t)->f_files = (_f)->f_files;     \
+        (_t)->f_ffree = (_f)->f_ffree;     \
+        (_t)->f_namelen = (_f)->f_namelen; \
+        (_t)->f_frsize = (_f)->f_frsize;   \
+        (_t)->f_flags = (_f)->f_flags;     \
     } while (0)
 
-#endif /* _LINUX_RLIMIT_STRUCT_H_ */
+#endif /* _LINUX_STATFS64_STRUCT_H_ */

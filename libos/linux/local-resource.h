@@ -33,18 +33,32 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _LINUX_RLIMIT_STRUCT_H_
-#define _LINUX_RLIMIT_STRUCT_H_
+#ifndef _LOCAL_RESOURCE_H_
+#define _LOCAL_RESOURCE_H_
+#include "local-linux.h"
+#include <sys/resource.h>
+#include <errno.h>
+#ifdef LINUX_SYS_prlimit64
+#include <linux/linux-rlimit64-struct.h>
+#else
+#include <linux/linux-rlimit-struct.h>
+#endif
+#include <linux/linux-resource.h>
 
-struct __kernel_rlimit {
-    __uint64_t rlim_cur;
-    __uint64_t rlim_max;
-};
+#ifdef LINUX_SYS_prlimit64
+#define LINUX_SYS_prlimit_size   LINUX_SYS_prlimit64
+#define __kernel_rlimit_size     __kernel_rlimit64
+#define LINUX_RLIM_INFINITY_SIZE LINUX_RLIM64_INFINITY
+#define LINUX_SYS_prlimit_size   LINUX_SYS_prlimit64
+#define SIMPLE_MAP_RLIMIT_SIZE   SIMPLE_MAP_RLIMIT64
+#else
+#ifdef LINUX_SYS_prlimit
+#define LINUX_SYS_prlimit_Size LINUX_SYS_prlimit
+#endif
+#define __kernel_rlimit_size     __kernel_rlimit
+#define LINUX_RLIM_INFINITY_SIZE LINUX_RLIM_INFINITY
+#define LINUX_SYS_prlimit_size   LINUX_SYS_prlimit
+#define SIMPLE_MAP_RLIMIT_SIZE   SIMPLE_MAP_RLIMIT
+#endif
 
-#define SIMPLE_MAP_RLIMIT(_t, _f)        \
-    do {                                 \
-        (_t)->rlim_cur = (_f)->rlim_cur; \
-        (_t)->rlim_max = (_f)->rlim_max; \
-    } while (0)
-
-#endif /* _LINUX_RLIMIT_STRUCT_H_ */
+#endif /* _LOCAL_RESOURCE_H_ */

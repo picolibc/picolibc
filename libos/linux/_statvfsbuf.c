@@ -50,7 +50,7 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * "available to non-privileged" inode count.
  */
 int
-_statvfsbuf(struct statvfs *buf, const struct __kernel_statfs *kbuf)
+_statvfsbuf(struct statvfs *buf, const struct __kernel_statfs_size *kbuf)
 {
     buf->f_bsize = (unsigned long)kbuf->f_bsize;
     buf->f_frsize = (unsigned long)(kbuf->f_frsize ? kbuf->f_frsize : kbuf->f_bsize);

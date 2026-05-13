@@ -32,19 +32,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#ifndef _LINUX_RLIMIT_STRUCT_H_
-#define _LINUX_RLIMIT_STRUCT_H_
-
-struct __kernel_rlimit {
-    __uint64_t rlim_cur;
-    __uint64_t rlim_max;
-};
-
-#define SIMPLE_MAP_RLIMIT(_t, _f)        \
-    do {                                 \
-        (_t)->rlim_cur = (_f)->rlim_cur; \
-        (_t)->rlim_max = (_f)->rlim_max; \
-    } while (0)
-
-#endif /* _LINUX_RLIMIT_STRUCT_H_ */
+#ifdef __x86_64
+#include "../../x86_64/linux/linux-rlimit64-struct.h"
+#else
+#include "../../i686/linux/linux-rlimit64-struct.h"
+#endif

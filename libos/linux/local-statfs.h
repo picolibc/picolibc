@@ -38,9 +38,21 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "local-linux.h"
 #include <linux/linux-fsid-struct.h>
+#ifdef LINUX_SYS_statfs64
+#include <linux/linux-statfs64-struct.h>
+#else
 #include <linux/linux-statfs-struct.h>
+#endif
 #include <sys/statvfs.h>
 
-int _statvfsbuf(struct statvfs *buf, const struct __kernel_statfs *kbuf);
+#ifdef LINUX_SYS_statfs64
+#define LINUX_SYS_statfs_size LINUX_SYS_statfs64
+#define __kernel_statfs_size  __kernel_statfs64
+#else
+#define LINUX_SYS_statfs_size LINUX_SYS_statfs
+#define __kernel_statfs_size  __kernel_statfs
+#endif
+
+int _statvfsbuf(struct statvfs *buf, const struct __kernel_statfs_size *kbuf);
 
 #endif /* _LOCAL_STATFS_H_ */
