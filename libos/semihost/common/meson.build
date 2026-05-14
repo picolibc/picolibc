@@ -78,15 +78,17 @@ src_semihost += files([
                      ]) + [
   src_semihost_fake_access,
   src_semihost_fake_closedir,
+  src_semihost_fake_fstatvfs,
   src_semihost_fake_ftruncate,
   src_semihost_fake_getcwd,
   src_semihost_fake_getpid,
+  src_semihost_fake_getrlimit,
   src_semihost_fake_kill,
   src_semihost_fake_opendir,
   src_semihost_fake_readdir,
+  src_semihost_fake_setrlimit,
   src_semihost_fake_stat,
   src_semihost_fake_statvfs,
-  src_semihost_fake_fstatvfs,
   ]
 
 inc_headers = ['semihost.h']
