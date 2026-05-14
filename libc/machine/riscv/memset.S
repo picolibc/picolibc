@@ -61,21 +61,76 @@ memset:
   ret
 
 #elif defined(__riscv_vector)
+/*
+ * Vector memset.
+ *
+ *   - Broadcast the fill byte ONCE into v0..v7 using e8/m8.
+ *     Every byte of the group holds the fill value, so subsequent
+ *     vse32 stores naturally write the correct splatted word
+ *     (byte | byte<<8 | byte<<16 | byte<<24) without any extra
+ *     scalar splat arithmetic.
+ *
+ *   - n < 16        : skip the alignment dance, go straight to the
+ *                     e8 tail loop (handles any alignment / size).
+ *   - common case   : align dst to 4 bytes with one e8 store, then
+ *                     bulk fill with vse32 (4x larger vl per iter
+ *                     than vse8 at the same LMUL).
+ *   - byte tail     : single e8 loop covers 0..3 bytes after bulk
+ *                     and also the < 16 small-size bypass.
+ *
+ * Registers:
+ *   a0 = dst (return value, preserved)
+ *   a1 = fill byte
+ *   a2 = n   (consumed)
+ *   t0 = running dst
+ *   t2,t3,t4,t5 = scratch
+ *   v0..v7 = broadcast fill
+ */
 .option push
 .option arch, +zve32x
-  mv     t0, a0                    /* running dst; keep a0 as return */
-  beqz   a2, .Ldone_set            /* n == 0 then return */
+  mv     t0, a0                    /* t0 = running dst */
+  beqz   a2, .Ldone_set
 
-  /* Broadcast fill byte once. */
-  vsetvli t1, zero, e8, m8, ta, ma
+  /* Broadcast fill byte ONCE across v0..v7. */
+  vsetvli t3, zero, e8, m8, ta, ma
   vmv.v.x v0, a1
 
-.Lbulk_set:
-  vsetvli t1, a2, e8, m8, ta, ma   /* t1 = vl (bytes) */
-  vse8.v v0, (t0)
-  add    t0, t0, t1
-  sub    a2, a2, t1
-  bnez   a2, .Lbulk_set
+  /* Small: skip alignment, go directly to byte tail loop. */
+  li      t3, 16
+  bltu    a2, t3, .Lset_tail
+
+  /* --- Align dst to 4 bytes (required for fast vse32) --- */
+  andi    t2, t0, 3
+  beqz    t2, .Lset_bulk
+  li      t4, 4
+  sub     t3, t4, t2                /* pad = 4 - (dst & 3), in {1,2,3} */
+  vsetvli zero, t3, e8, m1, ta, ma
+  vse8.v  v0, (t0)
+  add     t0, t0, t3
+  sub     a2, a2, t3
+
+.Lset_bulk:
+  srli    t3, a2, 2                 /* t3 = remaining word count */
+  andi    a2, a2, 3                 /* a2 = byte tail (0..3) */
+  beqz    t3, .Lset_tail
+.Lset_bulk_loop:
+  vsetvli t2, t3, e32, m8, ta, ma   /* t2 = words this iter */
+  vse32.v v0, (t0)
+  sub     t3, t3, t2
+  slli    t5, t2, 2                 /* bytes = words * 4 */
+  add     t0, t0, t5
+  bnez    t3, .Lset_bulk_loop
+
+  /* --- Byte tail: also entry for n < 16 small bypass --- */
+.Lset_tail:
+  beqz    a2, .Ldone_set
+.Lset_tail_loop:
+  vsetvli t2, a2, e8, m8, ta, ma
+  vse8.v  v0, (t0)
+  add     t0, t0, t2
+  sub     a2, a2, t2
+  bnez    a2, .Lset_tail_loop
+
 .Ldone_set:
   ret
 .option pop
