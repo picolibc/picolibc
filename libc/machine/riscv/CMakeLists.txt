@@ -39,7 +39,7 @@ picolibc_sources_flags("-fno-builtin"
   ieeefp.c
   memcpy-asm.S
   memcpy.c
-  memmove.S
+  memmove-asm.S
   memmove.c
   memset.S
   setjmp.S

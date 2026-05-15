@@ -36,7 +36,7 @@ srcs_machine = [
   'ieeefp.c',
   'memcpy-asm.S',
   'memcpy.c',
-  'memmove.S',
+  'memmove-asm.S',
   'memmove.c',
   'memset.S',
   'setjmp.S',
