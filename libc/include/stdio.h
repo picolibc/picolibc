@@ -516,6 +516,23 @@ FILE *funopen(const void *cookie, ssize_t (*readfn)(void *cookie, void *buf, siz
 #define fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /*__BSD_VISIBLE */
 
+#if __GNU_VISIBLE
+typedef ssize_t cookie_read_function_t(void *cookie, char *buf, size_t n);
+typedef ssize_t cookie_write_function_t(void *cookie, const char *buf, size_t n);
+typedef int     cookie_seek_function_t(void *cookie, off_t *pos, int whence);
+typedef int     cookie_close_function_t(void *cookie);
+
+typedef struct cookie_io_functions_t {
+    cookie_read_function_t  *read;
+    cookie_write_function_t *write;
+    cookie_seek_function_t  *seek;
+    cookie_close_function_t *close;
+} cookie_io_functions_t;
+
+FILE *fopencookie(void *cookie, const char *modes,
+                  cookie_io_functions_t io_funcs) __picolibc_export;
+#endif /* __GNU_VISIBLE */
+
 #if __POSIX_VISIBLE >= 199309L
 int getc_unlocked(FILE *) __nonnull((1)) __picolibc_export;
 int getchar_unlocked(void) __picolibc_export;

@@ -35,6 +35,7 @@
 
 set(tests
   test-fmemopen
+  test-fopencookie
   test-funopen
   test-put
   test-printf
