@@ -187,6 +187,16 @@ bufio_lseek(struct __file_bufio *bf, __off_t offset, int whence)
     return _FDEV_ERR;
 }
 
+static inline bool
+bufio_seekable(struct __file_bufio *bf)
+{
+#ifndef BUFIO_ABI_MATCHES
+    if (!(bf->bflags & __BFPTR))
+        return bf->lseek_int != NULL;
+#endif
+    return bf->lseek_ptr != NULL;
+}
+
 static inline int
 bufio_close(struct __file_bufio *bf)
 {
