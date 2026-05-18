@@ -214,39 +214,44 @@ off_t
 __bufio_seek(FILE *f, off_t offset, int whence)
 {
     struct __file_bufio *bf = (struct __file_bufio *)f;
-    off_t                ret;
+    off_t                ret = _FDEV_ERR;
 
     __bufio_lock(f);
+    if (!bufio_seekable(bf)) {
+        goto exit;
+    }
     if (__bufio_setdir_locked(f, __SRD) < 0) {
-        ret = _FDEV_ERR;
-    } else {
-        /* compute offset of the first char in the buffer */
-        __off_t buf_pos = bf->pos - bf->len;
+        goto exit;
+    }
 
-        switch (whence) {
-        case SEEK_CUR:
-            /* Map CUR -> SET, accounting for position within buffer */
-            whence = SEEK_SET;
-            offset += buf_pos + bf->off;
-            __fallthrough;
-        case SEEK_SET:
-            /* Optimize for seeks within buffer or just past buffer */
-            if (buf_pos <= offset && offset <= buf_pos + bf->len) {
-                bf->off = offset - buf_pos;
-                ret = offset;
-                break;
-            }
-            __fallthrough;
-        default:
-            ret = bufio_lseek(bf, offset, whence);
-            if (ret >= 0)
-                bf->pos = ret;
-            /* Flush any buffered data after a real seek */
-            bf->len = 0;
-            bf->off = 0;
+    /* compute offset of the first char in the buffer */
+    __off_t buf_pos = bf->pos - bf->len;
+
+    switch (whence) {
+    case SEEK_CUR:
+        /* Map CUR -> SET, accounting for position within buffer */
+        whence = SEEK_SET;
+        offset += buf_pos + bf->off;
+        __fallthrough;
+    case SEEK_SET:
+        /* Optimize for seeks within buffer or just past buffer */
+        if (buf_pos <= offset && offset <= buf_pos + bf->len) {
+            bf->off = offset - buf_pos;
+            ret = offset;
             break;
         }
+        __fallthrough;
+    default:
+        ret = bufio_lseek(bf, offset, whence);
+        if (ret >= 0)
+            bf->pos = ret;
+        /* Flush any buffered data after a real seek */
+        bf->len = 0;
+        bf->off = 0;
+        break;
     }
+
+exit:
     __bufio_unlock(f);
     return ret;
 }
