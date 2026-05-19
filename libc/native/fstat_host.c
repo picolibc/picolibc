@@ -45,7 +45,7 @@ __fstat_host(int fd, struct if_stat *if_stat)
     struct statx statxb;
     int          ret;
 
-    ret = statx(fd, NULL, AT_STATX_SYNC_AS_STAT | AT_EMPTY_PATH, STATX_BASIC_STATS, &statxb);
+    ret = statx(fd, "", AT_STATX_SYNC_AS_STAT | AT_EMPTY_PATH, STATX_BASIC_STATS, &statxb);
     if (ret >= 0)
         STAT_FROM_HOST(if_stat, &statxb);
     return ret;
