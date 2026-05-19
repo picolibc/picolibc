@@ -35,6 +35,7 @@
 
 set(tests
   test-fmemopen
+  test-open_memstream
   test-funopen
   test-put
   test-printf

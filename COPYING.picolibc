@@ -595,6 +595,14 @@ Files: CMakeLists.txt
 Copyright: 2022 Keith Packard
 License: BSD3-1
 
+Files: libc/stdio/open_memstream.c
+Copyright: 2024-2026 Espressif Systems (Shanghai) CO LTD. SPDX-License-Identifier: Apache-2.0
+License: Default-1
+
+Files: test/test-stdio/test-open_memstream.c
+Copyright: 2026 Alexey Lapshin
+License: BSD3-1
+
 Files: cmake/TC-arm-none-eabi.ld
  cmake/TC-microbit.ld
  hello-world/hello-worldpp.cpp
