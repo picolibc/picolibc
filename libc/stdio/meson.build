@@ -97,6 +97,7 @@ srcs_stdio = [
   'ftox_engine.c',
   'ftrylockfile.c',
   'funlockfile.c',
+  'fopencookie.c',
   'funopen.c',
   'fwide.c',
   'fwprintf.c',

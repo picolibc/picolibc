@@ -37,6 +37,7 @@ tests = [
   'test-fdevopen',
   'test-fmemopen',
   'test-freopen',
+  'test-fopencookie',
   'test-funopen',
   'test-put',
   'test-sprintf-percent-n',
