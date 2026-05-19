@@ -48,36 +48,81 @@ strcmp:
 #endif
 #endif
 
-  .macro check_one_word i n
-    REG_L a2, \i*SZREG(a0)
-    REG_L a3, \i*SZREG(a1)
+  /*
+   * Process TWO words per expansion so:
+   *   - REG_L a2,(i+0)*SZREG(a0) + REG_L a4,(i+1)*SZREG(a0) → Fused_LDD
+   *   - REG_L a3,(i+0)*SZREG(a1) + REG_L a6,(i+1)*SZREG(a1) → Fused_LDD
+   *   - orc.b t3,a2 + orc.b t4,a4                          → parallel ALU dispatch
+   *   - branches grouped at the end                         → don't break fusion
+   *
+   * \i = first word index of the pair (must be even)
+   * \n = total words unrolled in the loop body
+   */
+  .macro check_word_pair i n
+    /* --- Fused_LDD: two loads from base a0, consecutive offsets --- */
+    REG_L a2, \i*SZREG(a0)              /* was: (\i+0)*SZREG(a0) */
+    REG_L a4, \i*SZREG+SZREG(a0)        /* was: (\i+1)*SZREG(a0) */
+    /* --- Fused_LDD: two loads from base a1, consecutive offsets --- */
+    REG_L a3, \i*SZREG(a1)              /* was: (\i+0)*SZREG(a1) */
+    REG_L a6, \i*SZREG+SZREG(a1)        /* was: (\i+1)*SZREG(a1) */
+
+    /* --- Independent ALU ops: dual-issue on ALU pipes --- */
 #ifdef __riscv_zbb
-    orc.b a4, a2
+    orc.b t3, a2
+    orc.b t4, a4
 #else
-    and   a4, a2, a5
+    and   t3, a2, a5
+    and   t4, a4, a5
     or    t1, a2, a5
-    add   a4, a4, a5
-    or    a4, a4, t1
+    or    t5, a4, a5
+    add   t3, t3, a5
+    add   t4, t4, a5
+    or    t3, t3, t1
+    or    t4, t4, t5
 #endif
-    bne   a4, t2, .Lnull\i
-    .if \i+1-\n
+
+    /* --- Branches grouped at end --- */
+    bne   t3, t2, .Lnull\i             /* null in word i   (a2/a3 already correct) */
       bne   a2, a3, .Lmismatch
+    bne   t4, t2, .Lnull_hi_\i         /* null in word i+1 */
+    .if \i+2-\n
+      bne a4, a6, .Lmismatch_hi_\i
     .else
-      add   a0, a0, \n*SZREG
-      add   a1, a1, \n*SZREG
-      beq   a2, a3, .Lloop
-      # fall through to .Lmismatch
+      add a0, a0, \n*SZREG
+      add a1, a1, \n*SZREG
+      beq a4, a6, .Lloop
     .endif
+
+    /* Word i+1 handlers: move pair-2 regs into a2/a3 and reuse shared paths */
+.Lnull_hi_\i:
+    mv    a2, a4
+    mv    a3, a6
+    j     .Lnull\i\()_p1               /* foundnull entry for offset (i+1) */
+.Lmismatch_hi_\i:
+    mv    a2, a4
+    mv    a3, a6
+    j     .Lmismatch
   .endm
 
+  /*
+   * foundnull macro now also emits the .Lnull<i>_p1 entry for the
+   * second word of each pair (adjusts a0/a1 by (i+1)*SZREG).
+   */
   .macro foundnull i n
     .ifne \i
       .Lnull\i:
       add   a0, a0, \i*SZREG
       add   a1, a1, \i*SZREG
-      .ifeq \i-1
-        .Lnull0:
-      .endif
+    .else
+      .Lnull0:
+    .endif
+    bne   a2, a3, .Lmisaligned
+    li    a0, 0
+    ret
+    .ifeq \i & 1
+      .Lnull\i\()_p1:
+      add   a0, a0, \i*SZREG+SZREG      /* was: (\i+1)*SZREG */
+      add   a1, a1, \i*SZREG+SZREG
       bne   a2, a3, .Lmisaligned
       li    a0, 0
       ret
@@ -85,18 +130,10 @@ strcmp:
   .endm
 
 .Lloop:
-  # examine full words at a time, favoring strings of a couple dozen chars
-#if __riscv_xlen == 32
-  check_one_word 0 5
-  check_one_word 1 5
-  check_one_word 2 5
-  check_one_word 3 5
-  check_one_word 4 5
-#else
-  check_one_word 0 3
-  check_one_word 1 3
-  check_one_word 2 3
-#endif
+  /* 1 pair = 2 words per iter. Keeps Fused_LDD + parallel orc.b,
+     but limits over-read to 1 word past null (same as original). */
+  check_word_pair 0 2
+
   # backwards branch to .Lloop contained above
 
 .Lmismatch:
@@ -197,17 +234,8 @@ strcmp:
   ret
 
   # cases in which a null byte was detected
-#if __riscv_xlen == 32
-  foundnull 0 5
-  foundnull 1 5
-  foundnull 2 5
-  foundnull 3 5
-  foundnull 4 5
-#else
-  foundnull 0 3
-  foundnull 1 3
-  foundnull 2 3
-#endif
+  foundnull 0 2
+  foundnull 1 2
 #if !defined(__riscv_zbb) && SZREG != 4
 .align 3
 mask:
