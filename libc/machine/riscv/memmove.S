@@ -10,6 +10,7 @@
 */
 
 #include "rv_string.h"
+#include "asm.h"
 
 #ifdef _MACHINE_RISCV_MEMMOVE_VECTOR_
 .section .text.memmove
@@ -46,6 +47,7 @@
  *   t2,t3,t4,t5 = scratch
  */
 memmove:
+  LPAD
   beqz   a2, .Ldone_move          /* n == 0 */
   beq    a0, a1, .Ldone_move      /* dst == src */
 
@@ -174,6 +176,7 @@ memmove:
 .global memmove
 .type	memmove, @function
 memmove:
+  LPAD
   beqz a2, .Ldone		/* in case there are 0 bytes to be copied, return immediately */
 
   mv a4, a0			/* copy the destination address over to a4, since memmove should return that address in a0 at the end */

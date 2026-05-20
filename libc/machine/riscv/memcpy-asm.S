@@ -10,6 +10,7 @@
 */
 
 #include "rv_string.h"
+#include "asm.h"
 
 #ifdef _MACHINE_RISCV_MEMCPY_VECTOR_
 /*
@@ -37,6 +38,7 @@
 .option push
 .option arch, +zve32x
 memcpy:
+  LPAD
   mv     t0, a0                   /* t0 = running dst */
   mv     t1, a1                   /* t1 = running src */
   beqz   a2, .Ldone               /* if n == 0, return */
@@ -108,6 +110,7 @@ memcpy:
 .global memcpy
 .type	memcpy, @function
 memcpy:
+  LPAD
   mv a3, a0
   beqz a2, 2f
 

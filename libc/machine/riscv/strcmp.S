@@ -17,6 +17,7 @@
 .globl strcmp
 .type  strcmp, @function
 strcmp:
+  LPAD
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 .Lcompare:
   lbu   a2, 0(a0)
