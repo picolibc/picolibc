@@ -254,10 +254,10 @@ if(NOT DEFINED __ELIX_LEVEL)
 endif()
 
 # Use old math code for double funcs (0 no, 1 yes)
-set(__OBSOLETE_MATH_FLOAT ON)
+set(__OBSOLETE_MATH_FLOAT 1)
 
 # Use old math code for double funcs (0 no, 1 yes)
-set(__OBSOLETE_MATH_DOUBLE ON)
+set(__OBSOLETE_MATH_DOUBLE 1)
 
 # Compute static memory area sizes at runtime instead of link time
 set(__PICOCRT_RUNTIME_SIZE OFF)
