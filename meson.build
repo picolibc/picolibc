@@ -1701,6 +1701,10 @@ bios_bin = []
 
 subdir('libos')
 
+if build_shared
+  subdir('libdl')
+endif
+
 if use_stdlib or has_os_linux or has_os_fallback
   has_os_library = true
 endif

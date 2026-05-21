@@ -392,3 +392,7 @@ subdir('testsuite')
 if has_arm_semihost and oslib_test_variant == 'semihost'
   subdir('semihost')
 endif
+
+if build_shared
+  subdir('test-libdl')
+endif
