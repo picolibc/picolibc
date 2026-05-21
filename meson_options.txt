@@ -231,6 +231,13 @@ option('single-thread', type: 'boolean', value: false,
        description: 'disable support for multiple threads')
 
 #
+# Dynamic loading (libdl) options
+#
+
+option('libdl', type: 'boolean', value: false,
+       description: 'build libdl providing dlopen/dlsym/dlclose/dlerror (requires a supported machine port, default: false)')
+
+#
 # Thread-local storage options
 #
 

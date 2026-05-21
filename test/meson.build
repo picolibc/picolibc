@@ -428,6 +428,11 @@ subdir('test-stdio')
 subdir('test-stdlib')
 subdir('testsuite')
 
+if enable_libdl
+  subdir('test-libdl')
+endif
+
 if has_arm_semihost and oslib_test_variant == 'semihost'
   subdir('semihost')
 endif
+
