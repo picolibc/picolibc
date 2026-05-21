@@ -108,6 +108,10 @@ endif
 
 inc_headers += ['picotls.h']
 
+if enable_libdl
+  inc_headers += ['dlfcn.h']
+endif
+
 if really_install
   install_headers(inc_headers,
                   install_dir: include_dir)
