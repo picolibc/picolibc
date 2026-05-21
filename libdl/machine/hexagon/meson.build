@@ -1,3 +1,4 @@
+#
 # Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 #
@@ -12,7 +13,7 @@
 #     copyright notice, this list of conditions and the following
 #     disclaimer in the documentation and/or other materials provided
 #     with the distribution.
-# 
+#
 #   * Neither the name of Qualcomm Technologies, Inc. nor the names of its
 #     contributors may be used to endorse or promote products derived
 #     from this software without specific prior written permission.
@@ -30,5 +31,13 @@
 # IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+# Hexagon libdl machine port.  Declares the arch-specific sources consumed
+# by the top-level libdl/meson.build.  A new architecture only needs to add
+# libdl/machine/<arch>/meson.build setting libdl_arch_srcs.
 
-exec "$(dirname "$0")"/do-configure clang-hexagon -Dtests=true -Dmultilib=false -Dposix-console=true -Dtests-enable-posix-io=true -Dtest-stdin=true -Dlibdl=true -Dc_link_args=-L$(clang -print-resource-dir)/lib/hexagon-unknown-none-elf "$@"
+libdl_arch_srcs = files(
+  'dl_relocate.c',
+  'dl_syms.c',
+  'dl_tls.c',
+)
