@@ -50,6 +50,7 @@ inc_sys_headers_all = [
   'ioctl.h',
   '_locale.h',
   'lock.h',
+  'mman.h',
   'param.h',
   'queue.h',
   'resource.h',
