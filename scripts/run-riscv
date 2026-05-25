@@ -102,6 +102,18 @@ if [ -z "$options" ]; then
     options="$(echo "$elf" | sed 's/.*rv[36][24]\([a-z]*\)_.*$/\1/' | sed 's/\(.\)/\1 /g')"
 fi
 
+# The CFI shadow-stack crt0 variant builds an Sv32 page table and drops
+# to U-mode; it needs the QEMU MMU model to be enabled.  Re-enable mmu
+# when the test environment asks for Zicfi support.
+if [ -n "$QEMU_ADD_ZICFI" ]; then
+    cpu="$(echo "$cpu" | sed 's/,mmu=false//')"
+    # Zicfiss is only legal on a CPU model that includes the Supervisor
+    # extension;
+    for need in s u i m a f d c zicsr zifencei; do
+        echo "$options" | grep -q -w "$need" || options="$options $need"
+    done
+fi
+
 for o in $options; do
     # Old versions of qemu don't have new extension subsets
     case "$qemu_version" in
@@ -119,6 +131,11 @@ for o in $options; do
     case "$o" in
         zvl*)
             # qemu doesn't list zvl extensions
+            ;;
+        zicfilp|zicfiss|zimop|zcmop)
+            # Added below via $QEMU_ADD_ZICFI, but only on qemu >= 9.1.
+            # Skip here to avoid passing them on older qemu that would
+            # reject the option.
             ;;
         *)
             cpu="$cpu,$o=true"
@@ -147,6 +164,16 @@ case "$qemu_version" in
         ;;
 esac
 
+# QEMU only models Zicfilp/Zicfiss starting from v9.1.  When asked for
+# them via the test environment, add the corresponding cpu options.
+if [ -n "$QEMU_ADD_ZICFI" ]; then
+    case "$qemu_version" in
+        9.[1-9]*|9.[1-9][0-9]*|[1-9][0-9]*)
+            cpu="$cpu,zicfilp=true,zicfiss=true,zimop=true,zcmop=true"
+            ;;
+    esac
+fi
+
 for enabled in $enabled_options; do
     if echo "$options" | grep -q -w $enabled; then
         :
@@ -173,6 +200,15 @@ chardev=stdio,mux=on,id=stdio0
 # Point the semihosting driver at our new chardev
 
 semi=enable=on,chardev=stdio0,arg="program-name $args"
+
+# The CFI shadow-stack crt0 variant drops to U-mode before running the
+# application so that the MMU-enforced Zicfiss shadow-stack page is actually
+# exercised.  QEMU only honors the semihosting ebreak sequence from U-mode
+# when userspace semihosting is explicitly enabled; otherwise the ebreak is
+# taken as a plain breakpoint (mcause=3) and semihosting never runs
+if [ -n "$QEMU_ADD_ZICFI" ]; then
+    semi="$semi,userspace=on"
+fi
 
 # Disable monitor
 
