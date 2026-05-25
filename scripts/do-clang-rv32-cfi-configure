@@ -1,0 +1,14 @@
+#!/bin/sh
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Configure picolibc for a RISC-V 32-bit Clang build with CFI support
+# (Zicfilp + Zicfiss + Zimop) and select the matching `semihost-cfi'
+# crt0 variant.
+#
+exec "$(dirname "$0")"/do-configure clang-rv32-cfi-unknown-elf \
+     -Dtests=true \
+     -Dtests-enable-stack-protector=false \
+     -Dmultilib=false \
+     -Dcrt0-test=semihost_cfi \
+     "$@"
