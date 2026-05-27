@@ -45,10 +45,8 @@ mlockall(int flags)
         linux_flags |= LINUX_MCL_CURRENT;
     if (flags & MCL_FUTURE)
         linux_flags |= LINUX_MCL_FUTURE;
-#if __GNU_VISIBLE
     if (flags & MCL_ONFAULT)
         linux_flags |= LINUX_MCL_ONFAULT;
-#endif
 
     return (int)syscall(LINUX_SYS_mlockall, linux_flags);
 }
