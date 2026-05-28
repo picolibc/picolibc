@@ -41,6 +41,9 @@
 
 #define MMU_INVALID_FLAGS       0
 
+#define FEAT_SME_1      (1LL << 24)
+#define FEAT_SME_2      (1LL << 25)
+
   .macro start_page_table
   .section .rodata
   .global __identity_page_table
@@ -146,6 +149,27 @@ _start:
 #endif // __ARM_FP
 #endif
 
+	/* Determine if SME or SME2 is available */
+	mrs     x0, id_aa64pfr1_el1
+	tst     x0, (FEAT_SME_1|FEAT_SME_2)
+	cset    x0, ne /* _Bool has_sme (argument to _cstart) */
+
+	b.eq    .Lnosme
+
+	/* Clear TPIDR2_EL0 */
+	msr     S3_3_C13_C0_5, xzr
+	isb
+
+	/* set up Streaming SVE Vector Length (SVL) in SMCR_EL3 (4 LSB). */
+	mov     x2, #0xF
+
+	/* Try to set the maximum value supported by the architecture (2048). */
+	mrs     x1, s3_6_c1_c2_6 /* mrs  x1, smcr_el3 */
+	bfi     x1, x2, 0, 4
+	msr     s3_6_c1_c2_6, x1 /* msr  smcr_el3, x1 */
+	isb
+
+.Lnosme:
 	/* Jump into C code */
 	bl _cstart
   .size _start, .-_start
