@@ -61,6 +61,16 @@ _set_tls(void *tls)
     __asm__ volatile("msr tpidr_el0, %x0" : : "r"(tls - TP_OFFSET));
 }
 
+#ifndef CRT0_LINUX
+_Bool __arm64_has_sme;
+static void __arm64_post_memory_setup(_Bool has_sme) {
+    /* Initialize __arm64_has_sme once .bss and .data have been setup. */
+    __arm64_has_sme = has_sme;
+}
+#define BAREMETAL_START_ARGS _Bool has_sme
+#define POST_MEMORY_SETUP() __arm64_post_memory_setup(has_sme)
+#endif
+
 #include "../../crt0.h"
 
 /* Defined in crt0.S */
@@ -119,7 +129,7 @@ void
 #ifdef CRT0_LINUX
 _cstart(void *orig_sp)
 #else
-_cstart(void)
+_cstart(_Bool has_sme)
 #endif
 {
 #ifdef CRT0_LINUX
@@ -200,7 +210,7 @@ _cstart(void)
 
     /* Set the vector base address register */
     __asm__ volatile("msr    vbar_" BOOT_EL ", %x0" ::"r"(__vector_table));
-    __start();
+    __start(has_sme);
 #endif
 }
 
