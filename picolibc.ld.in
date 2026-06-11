@@ -99,6 +99,9 @@ SECTIONS
 		KEEP (*(.fini_array*))
 		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
 
+@RISCV@		/* JVT table, which needs to go in executable memory */
+@RISCV@		KEEP(*(.riscv.jvt));
+
 	} >@TEXT_MEM@ AT>@TEXT_MEM@ :@TEXT_PHDR@
 
 @CPP@	/* additional sections when compiling with C++ exception support */
