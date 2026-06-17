@@ -138,7 +138,7 @@ __bufio_lock(FILE *f)
 #ifdef __STDIO_BUFIO_LOCKING
     struct __file_bufio *bf = (struct __file_bufio *)f;
     if (!bf->lock)
-        __lock_init(bf->lock);
+        __bufio_lock_init(f);
     __lock_acquire(bf->lock);
 #endif
     (void)f;
