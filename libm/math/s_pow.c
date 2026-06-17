@@ -111,7 +111,7 @@ pow64(__float64 x, __float64 y)
     /* y==zero: x**0 = 1 unless x is snan */
     if ((iy | ly) == 0) {
         if (issignaling64_inline(x))
-            return x + y;
+            return opt_barrier_double(x) + opt_barrier_double(y);
         return one;
     }
 
@@ -121,7 +121,7 @@ pow64(__float64 x, __float64 y)
         if ((((__uint32_t)hx - 0x3ff00000) | lx) == 0 && !issignaling64_inline(y))
             return one;
         else
-            return x + y;
+            return opt_barrier_double(x) + opt_barrier_double(y);
     }
 
     /* determine if y is an odd int when x < 0
