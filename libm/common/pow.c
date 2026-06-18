@@ -313,7 +313,8 @@ pow(double x, double y)
            (|y| < 0x1p-65 or |y| >= 0x1p63 or nan).  */
         if (unlikely(zeroinfnan(iy))) {
             if (2 * iy == 0)
-                /* y==0 here; literal 0.0 instead of y avoids speculative +inf+(-inf) raising FE_INVALID. */
+                /* y==0 here; literal 0.0 instead of y avoids speculative +inf+(-inf) raising
+                 * FE_INVALID. */
                 return issignaling64_inline(x) ? x + 0.0 : 1.0;
             if (ix == asuint64(1.0))
                 /* x==1.0 here; literal 1.0 instead of x, same reason as above. */
