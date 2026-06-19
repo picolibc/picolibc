@@ -296,6 +296,20 @@ foreach params : targets
            suite: 'test-no-flash',
            env: test_env)
     endif
+
+    t1 = 'test-cdefs-cxx03'
+    t1_src = t1 + '.cpp'
+    _cxx03_args = _cpp_args + ['-std=c++03']
+    test(t1 + target,
+         executable(t1 + target, t1_src,
+                    cpp_args: _cxx03_args,
+                    link_args: _cxx03_args + _link_args,
+                    objects: _objs,
+                    link_depends: _link_depends,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
   endif
 
   foreach t1 : tests
@@ -356,6 +370,13 @@ if enable_native_tests
          suite: 'test',
          env: test_env
         )
+
+    test('test-cdefs-cxx03-native',
+         executable('test-cdefs-cxx03-native', 'test-cdefs-cxx03.cpp',
+                    cpp_args: native_cpp_args + ['-std=c++03'],
+                    link_args: native_cpp_args + ['-std=c++03']),
+         suite: 'test',
+         env: test_env)
   endif
 
   foreach t1 : tests

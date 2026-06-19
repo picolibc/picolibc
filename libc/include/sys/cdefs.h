@@ -504,10 +504,12 @@
 #endif
 #endif
 
+#if !__has_feature(c_alignof) && !__has_extension(c_alignof)
 #if defined(__cplusplus) && __cplusplus >= 201103L
 #define _Alignof(x) alignof(x)
 #else
 #define _Alignof(x) __alignof(x)
+#endif
 #endif
 
 #if !defined(__cplusplus) && !__has_feature(c_atomic) && !__has_feature(cxx_atomic) \
@@ -522,7 +524,7 @@
     }
 #endif
 
-#if !__has_feature(c_static_assert)
+#if !__has_feature(c_static_assert) && !__has_extension(c_static_assert)
 #if (defined(__cplusplus) && __cplusplus >= 201103L) || __has_feature(cxx_static_assert)
 #define _Static_assert(x, y) static_assert(x, y)
 #elif __GNUC_PREREQ__(4, 6) && !defined(__cplusplus)
