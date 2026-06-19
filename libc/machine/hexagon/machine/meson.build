@@ -1,3 +1,4 @@
+#
 # Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 #
@@ -12,7 +13,7 @@
 #     copyright notice, this list of conditions and the following
 #     disclaimer in the documentation and/or other materials provided
 #     with the distribution.
-# 
+#
 #   * Neither the name of Qualcomm Technologies, Inc. nor the names of its
 #     contributors may be used to endorse or promote products derived
 #     from this software without specific prior written permission.
@@ -30,23 +31,12 @@
 # IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-srcs_machine = [
-  'setjmp.S',
-  'longjmp.S',
-  'tls.c',
+#
+inc_machine_headers_machine = [
+  '_types.h',
 ]
 
-subdir('machine')
-
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-	set_variable('lib_machine' + target,
-		static_library('machine' + target,
-			srcs_machine,
-			pic: false,
-			include_directories: inc,
-			c_args: target_c_args + c_args + arg_fnobuiltin))
-endforeach
+if really_install
+  install_headers(inc_machine_headers_machine,
+                  install_dir: include_dir / 'machine')
+endif
