@@ -184,8 +184,7 @@ _trap(void)
             // __jvt_base$ is weak, so skip initializing `CSR[jvt]` if it is zero (undefined)
             "beqz t0, .Lafter_jvt_init_trap\n"
             "csrw jvt, t0\n"
-            ".Lafter_jvt_init_trap:\n"
-    );
+            ".Lafter_jvt_init_trap:\n");
 #endif
 
     /* Enable FPU (just in case) */
@@ -210,7 +209,7 @@ _trap(void)
 #ifdef __riscv_zcmt
             ".trap_jvt_base: .dword __jvt_base$\n"
 #endif
-           );
+    );
 #endif
 }
 #endif
@@ -267,8 +266,7 @@ _start(void)
             // __jvt_base$ is weak, so skip initializing `CSR[jvt]` if it is zero (undefined)
             "beqz t0, .Lafter_jvt_init\n"
             "csrw jvt, t0\n"
-            ".Lafter_jvt_init:\n"
-    );
+            ".Lafter_jvt_init:\n");
 #endif
 
 #ifdef CRT0_SEMIHOST

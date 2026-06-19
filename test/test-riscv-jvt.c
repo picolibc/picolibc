@@ -38,27 +38,21 @@
 
 #if !defined(__riscv) || !defined(__riscv_jvt)
 
-const char *
-get_message(void);
+const char    *get_message(void);
 
-_Noreturn
-void print_message(const char*);
+_Noreturn void print_message(const char *);
 
 /*
  * The Jump Table has 256 entries, the first 32 are for `cm.jt` and the rest are
  * for `cm.jalt`. The former is for `tail` and the latter is for `call`.
  */
-__attribute__((aligned(64)))
-__attribute__((section(".riscv.jvt")))
-void *func_table[256] = {
-  [0]=&print_message,
-  [32]=&get_message,
+__attribute__((aligned(64))) __attribute__((section(".riscv.jvt"))) void *func_table[256] = {
+    [0] = &print_message,
+    [32] = &get_message,
 };
 
 __asm__(".weak __jvt_base$\n"
         ".set __jvt_base$, func_table\n");
-
-
 
 const char *
 get_message(void)
@@ -89,12 +83,10 @@ main(void)
 #else
 
     __asm__("cm.jalt 32\n" // This is equivalent to `call func_table[32]`
-            "cm.jt 0\n" // This is equivalent to `tail func_table[0]`
-           );
+            "cm.jt 0\n"    // This is equivalent to `tail func_table[0]`
+    );
 
     printf("ERROR: cm.jt returned\n");
     return 1;
 #endif
 }
-
-
