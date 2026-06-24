@@ -96,15 +96,11 @@ int sys_semihost_get_cmdline(char *buf, int size);
 int get_cmdline(char *buffer, int size);
 #endif
 
-#ifndef BAREMETAL_START_ARGS
-#define BAREMETAL_START_ARGS void
-#endif
-
 static __noreturn __always_inline void
 #ifdef CRT0_LINUX
 __start(int argc, char **argv)
 #else
-__start(BAREMETAL_START_ARGS)
+__start(void)
 #endif
 {
 #ifndef NO_FLASH

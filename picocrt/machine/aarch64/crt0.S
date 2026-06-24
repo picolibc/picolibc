@@ -41,9 +41,6 @@
 
 #define MMU_INVALID_FLAGS       0
 
-#define FEAT_SME_1      (1LL << 24)
-#define FEAT_SME_2      (1LL << 25)
-
   .macro start_page_table
   .section .rodata
   .global __identity_page_table
@@ -150,11 +147,8 @@ _start:
 #endif
 
 	/* Determine if SME or SME2 is available */
-	mrs     x0, id_aa64pfr1_el1
-	tst     x0, (FEAT_SME_1|FEAT_SME_2)
-	cset    x0, ne /* _Bool has_sme (argument to _cstart) */
-
-	b.eq    .Lnosme
+	bl      __arm_has_sme
+	cbz     x0, .Lnosme
 
 	/* Clear TPIDR2_EL0 */
 	msr     S3_3_C13_C0_5, xzr
