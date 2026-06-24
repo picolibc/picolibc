@@ -2,5 +2,6 @@
 set -e
 HERE=`dirname "$0"`
 "$HERE"/do-test clang-arm "$@"
+"$HERE"/do-test clang-arm-fvp "$@"
 "$HERE"/do-test clang-aarch64 "$@"
 "$HERE"/do-test clang-aarch64-fvp "$@"
