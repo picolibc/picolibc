@@ -35,6 +35,13 @@ srcs_machine = [
   'setjmp.S',
   'longjmp.S',
   'tls.c',
+  'memcpy.S',
+  'fmemcpy.S',
+  'rmemcpy.S',
+  'memmove.S',
+  'memset.S',
+  'strcmp.S',
+  'strlen.S',
 ]
 
 subdir('machine')
