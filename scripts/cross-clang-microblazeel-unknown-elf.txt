@@ -1,0 +1,22 @@
+[binaries]
+c = ['/Users/sprice5/src/claude-mb/llvm-build/bin/clang', '--target=microblazeel-unknown-elf', '-nostdlib']
+cpp = ['/Users/sprice5/src/claude-mb/llvm-build/bin/clang', '--target=microblazeel-unknown-elf', '-nostdlib']
+c_ld = '/Users/sprice5/src/claude-mb/llvm-build/bin/ld.lld'
+cpp_ld = '/Users/sprice5/src/claude-mb/llvm-build/bin/ld.lld'
+ar = '/Users/sprice5/src/claude-mb/llvm-build/bin/llvm-ar'
+nm = '/Users/sprice5/src/claude-mb/llvm-build/bin/llvm-nm'
+strip = '/Users/sprice5/src/claude-mb/llvm-build/bin/llvm-strip'
+
+[host_machine]
+system = 'none'
+cpu_family = 'microblaze'
+cpu = 'microblazeel'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
+has_link_defsym = true
+default_flash_addr = '0x00000000'
+default_flash_size = '0x08000000'
+default_ram_addr   = '0x08000000'
+default_ram_size   = '0x10000000'
