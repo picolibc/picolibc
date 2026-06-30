@@ -47,6 +47,7 @@ tests = [
   'test-ilp32',
   'test-raise',
   'test-regex',
+  'test-riscv-jvt',
   'test-scmpu',
   'test-setjmp',
   'test-strftime',

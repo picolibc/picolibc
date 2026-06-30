@@ -164,11 +164,15 @@ powf(float x, float y)
         /* Either (x < 0x1p-126 or inf or nan) or (y is 0 or inf or nan).  */
         if (__builtin_expect(zeroinfnan(iy), 0)) {
             if (2 * iy == 0)
-                return issignalingf_inline(x) ? x + y : 1.0f;
+                /* y==0 here; literal 0.0f instead of y avoids speculative +inf+(-inf) raising
+                 * FE_INVALID. */
+                return issignalingf_inline(x) ? x + 0.0f : 1.0f;
             if (ix == 0x3f800000)
-                return issignalingf_inline(y) ? x + y : 1.0f;
+                /* x==1.0f here; literal 1.0f instead of x, same reason as above. */
+                return issignalingf_inline(y) ? y + 1.0f : 1.0f;
             if (2 * ix > 2u * (uint32_t)0x7f800000 || 2 * iy > 2u * (uint32_t)0x7f800000)
-                return x + y;
+                /* x or y is NaN; +0.0f propagates it safely; sNaN still raises FE_INVALID. */
+                return (2 * ix > 2u * (uint32_t)0x7f800000) ? x + 0.0f : y + 0.0f;
             if (2 * ix == 2 * (uint32_t)0x3f800000)
                 return 1.0f;
             if ((2 * ix < 2 * (uint32_t)0x3f800000) == !(iy & (uint32_t)0x80000000))

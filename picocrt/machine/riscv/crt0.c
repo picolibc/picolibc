@@ -163,7 +163,7 @@ _trap(void)
     SAVE_CSR(mtval);
 
     /*
-     * Pass pointer to saved registers in first parameter register
+     * Ensure GP and JVT are initialized before calling C
      */
     __asm__(".option	push\n"
             ".option	norelax\n"
@@ -173,7 +173,19 @@ _trap(void)
             "la	gp, __global_pointer$\n"
 #endif
             ".option	pop");
-    __asm__("mv     a0, sp");
+
+#ifdef __riscv_zcmt
+    __asm__(".weak __jvt_base$\n"
+#ifdef __riscv_cmodel_large
+            "ld t0, .trap_jvt_base\n"
+#else
+            "la t0, __jvt_base$\n"
+#endif
+            // __jvt_base$ is weak, so skip initializing `CSR[jvt]` if it is zero (undefined)
+            "beqz t0, .Lafter_jvt_init_trap\n"
+            "csrw jvt, t0\n"
+            ".Lafter_jvt_init_trap:\n");
+#endif
 
     /* Enable FPU (just in case) */
 #ifdef __riscv_flen
@@ -183,10 +195,21 @@ _trap(void)
             "csrw	mstatus, t0\n"
             "csrwi	fcsr, 0");
 #endif
-    __asm__("jal    _ctrap");
+
+    /*
+     * Call to C passing the saved registers as the first parameter.
+     */
+    __asm__("mv     a0, sp\n"
+            "jal    _ctrap");
+
 #ifdef __riscv_cmodel_large
-    __asm__(".align 3\n.trap_sp:\n.dword __stack");
-    __asm__(".align 3\n.trap_gp:\n.dword __global_pointer$");
+    __asm__(".align 3\n"
+            ".trap_sp: .dword __stack\n" /* FIXME: this is __heap_end in non-large code models. */
+            ".trap_gp: .dword __global_pointer$\n"
+#ifdef __riscv_zcmt
+            ".trap_jvt_base: .dword __jvt_base$\n"
+#endif
+    );
 #endif
 }
 #endif
@@ -232,6 +255,20 @@ _start(void)
             "csrw	mstatus, t0\n"
             "csrwi	vxrm, 1");
 #endif
+
+#ifdef __riscv_zcmt
+    __asm__(".weak __jvt_base$\n"
+#ifdef __riscv_cmodel_large
+            "ld t0, .start_jvt_base\n"
+#else
+            "la t0, __jvt_base$\n"
+#endif
+            // __jvt_base$ is weak, so skip initializing `CSR[jvt]` if it is zero (undefined)
+            "beqz t0, .Lafter_jvt_init\n"
+            "csrw jvt, t0\n"
+            ".Lafter_jvt_init:\n");
+#endif
+
 #ifdef CRT0_SEMIHOST
 #ifdef __riscv_cmodel_large
     __asm__("ld     t0,.start_trap");
@@ -244,13 +281,21 @@ _start(void)
     __asm__("csrsi 0x744, 0x8"); // mnstatus = 0x744, 1 << 3 = 8
 #endif
 #endif
+
+    /*
+     * Call into C start function
+     */
     __asm__("j      _cstart");
+
 #ifdef __riscv_cmodel_large
     __asm__(".align 3\n"
             ".start_sp: .dword __stack\n"
             ".start_gp: .dword __global_pointer$\n"
 #ifdef CRT0_SEMIHOST
-            ".start_trap: .dword _trap"
+            ".start_trap: .dword _trap\n"
+#endif
+#ifdef __riscv_zcmt
+            ".start_jvt_base: .dword __jvt_base$\n"
 #endif
     );
 #endif
