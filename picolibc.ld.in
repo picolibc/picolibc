@@ -70,6 +70,9 @@ SECTIONS
 		*(.literal.startup .text.startup .literal.startup.* .text.startup.*)
 		*(SORT(.text.sorted.*))
 		*(.literal .text .literal.* .text.* .opd .opd.* .branch_lt .branch_lt.* @EXTRA_TEXT_SECTIONS@)
+		PROVIDE (__start___lcxx_override = .);
+		*(__lcxx_override)
+		PROVIDE (__stop___lcxx_override = .);
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
 		@PREFIX@__text_end = .;
