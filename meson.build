@@ -1017,6 +1017,12 @@ foreach params : [default_target] + targets
       picolibc_ld_data.set('TLS_INIT_PHDR', 'tls')
     endif
 
+    if host_cpu_family == 'riscv'
+      picolibc_ld_data.set('RISCV', '')
+    else
+      picolibc_ld_data.set('RISCV', ld_comment)
+    endif
+
     default_init_section_template = init_section_template.format('@0@', '''
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))

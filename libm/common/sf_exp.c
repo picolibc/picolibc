@@ -69,7 +69,7 @@ expf(float x)
         if (asuint(x) == asuint(-INFINITY))
             return 0.0f;
         if (abstop >= top12(INFINITY))
-            return x + x;
+            return opt_barrier_float(x) + opt_barrier_float(x);
         if (x > 0x1.62e42ep6f) /* x > log(0x1p128) ~= 88.72 */
             return __math_oflowf(0);
         if (x < -0x1.9fe368p6f) /* x < log(0x1p-150) ~= -103.97 */

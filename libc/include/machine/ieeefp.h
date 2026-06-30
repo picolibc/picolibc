@@ -501,6 +501,7 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __HEXAGON_ARCH__
 #define __IEEE_LITTLE_ENDIAN
+#define _SUPPORTS_ERREXCEPT
 #endif
 
 #ifdef __x86_64__

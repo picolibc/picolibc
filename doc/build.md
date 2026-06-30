@@ -168,7 +168,7 @@ constant time instead.
 
 ### Locking options
 
-This option selects whether to disable locking support within the
+These options select whether to disable locking support within the
 library. By default, locking support is enabled, but the default
 locking functions are just stubs which don't do anything. Applications
 can replace these stubs with their own implementation and enable full
@@ -177,6 +177,7 @@ locking as described in [locking.md](locking.md).
 | Option                      | Default | Description                                                                          |
 | ------                      | ------- | -----------                                                                          |
 | single-thread               | false   | Disable support for locks                                                            |
+| stdio-locking               | false   | Perform POSIX-conforming per-file locking for all stdio operations (ignored when single-thread is true) |
 
 ### Thread local storage options
 
