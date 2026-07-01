@@ -98,10 +98,6 @@ Files: libc/machine/x86_64/machine/_fpmath.h
 Copyright: 2002, 2003 David Schultz <das@FreeBSD.ORG>
 License: BSD2-1
 
-Files: libc/stdlib/arc4random.h
-Copyright: 2016 embedded brains GmbH
-License: BSD2-1
-
 Files: libc/stdlib/imaxabs.c
  libc/stdlib/imaxdiv.c
  libc/stdlib/llabs.c
@@ -259,11 +255,8 @@ Files: libc/include/ssp/strings.h
  libm/complex/ccoshl.c
  libm/complex/ccosl.c
  libm/complex/cephes_subr.c
- libm/complex/cephes_subr.h
  libm/complex/cephes_subrf.c
- libm/complex/cephes_subrf.h
  libm/complex/cephes_subrl.c
- libm/complex/cephes_subrl.h
  libm/complex/cexp.c
  libm/complex/cexpf.c
  libm/complex/cexpl.c
@@ -481,7 +474,7 @@ Files: CMakeLists.txt
  libm/ld/e_tgammal.c
  libm/ld/invtrig.c
  libm/ld/k_cosl.c
- libm/ld/k_rem_pio2.c
+ libm/ld/k_rem_pio2l.c
  libm/ld/k_sinl.c
  libm/ld/k_tanl.c
  libm/ld/ldd/s_ceill.c
@@ -585,6 +578,7 @@ Files: CMakeLists.txt
  test/native-locks.c
  test/test-except.c
  test/test-math/test-long-double.c
+ test/test-riscv-jvt.c
  test/test-stdio/CMakeLists.txt
  test/test-stdio/test-fopen.c
  test/test-stdio/test-mktemp.c
@@ -593,14 +587,6 @@ Files: CMakeLists.txt
  test/testsuite/newlib.time/meson.build
  zephyr/zephyr.cmake
 Copyright: 2022 Keith Packard
-License: BSD3-1
-
-Files: libc/stdio/open_memstream.c
-Copyright: 2024-2026 Espressif Systems (Shanghai) CO LTD
-License: Other-29
-
-Files: test/test-stdio/test-open_memstream.c
-Copyright: 2026 Alexey Lapshin
 License: BSD3-1
 
 Files: cmake/TC-arm-none-eabi.ld
@@ -1015,6 +1001,7 @@ Files: cmake/TC-rx.ld
  test/test-math/test-round.5c
  test/test-math/test-round.c
  test/test-math/test-round.h
+ test/test-math/test-scalbn.h
  test/test-math/test-sin.5c
  test/test-math/test-sin.c
  test/test-math/test-sin.h
@@ -1054,554 +1041,8 @@ Files: cmake/TC-rx.ld
 Copyright: 2025 Keith Packard
 License: BSD3-1
 
-Files: doc/printf-sample/Makefile
- doc/printf-sample/printf.c
- libc/machine/arm/machine/fenv-fp.h
- libc/machine/m68k/CMakeLists.txt
- libc/machine/m68k/machine/fenv-fp.h
- libc/machine/m68k/machine/fenv.h
- libc/stdio/dtox_engine.c
- libc/stdio/ftox_engine.c
- libc/stdio/getdelim.c
- libc/stdio/ldtox_engine.c
- libc/stdio/swprintf.c
- libc/stdio/vswprintf.c
- libos/semihost/machine/aarch64/aarch64-semihost.h
- libos/semihost/machine/aarch64/aarch64_iob.c
- libos/semihost/machine/arc/arc_close.c
- libos/semihost/machine/arc/arc_errno.c
- libos/semihost/machine/arc/arc_exit.c
- libos/semihost/machine/arc/arc_fstat.c
- libos/semihost/machine/arc/arc_lseek.c
- libos/semihost/machine/arc/arc_open.c
- libos/semihost/machine/arc/arc_read.c
- libos/semihost/machine/arc/arc_semihost.h
- libos/semihost/machine/arc/arc_stat.c
- libos/semihost/machine/arc/arc_unlink.c
- libos/semihost/machine/arc/arc_write.c
- libos/semihost/machine/m68k/m68k_close.c
- libos/semihost/machine/m68k/m68k_exit.c
- libos/semihost/machine/m68k/m68k_fstat.c
- libos/semihost/machine/m68k/m68k_gettimeofday.c
- libos/semihost/machine/m68k/m68k_lseek.c
- libos/semihost/machine/m68k/m68k_open.c
- libos/semihost/machine/m68k/m68k_read.c
- libos/semihost/machine/m68k/m68k_rename.c
- libos/semihost/machine/m68k/m68k_semihost.S
- libos/semihost/machine/m68k/m68k_semihost.h
- libos/semihost/machine/m68k/m68k_stat.c
- libos/semihost/machine/m68k/m68k_unlink.c
- libos/semihost/machine/m68k/m68k_write.c
- libos/semihost/machine/msp430/msp430-iob.c
- libos/semihost/machine/msp430/msp430-semihost.h
- libos/semihost/machine/nios2/nios2_close.c
- libos/semihost/machine/nios2/nios2_exit.c
- libos/semihost/machine/nios2/nios2_fstat.c
- libos/semihost/machine/nios2/nios2_lseek.c
- libos/semihost/machine/nios2/nios2_open.c
- libos/semihost/machine/nios2/nios2_read.c
- libos/semihost/machine/nios2/nios2_semihost.c
- libos/semihost/machine/nios2/nios2_semihost.h
- libos/semihost/machine/nios2/nios2_stat.c
- libos/semihost/machine/nios2/nios2_unlink.c
- libos/semihost/machine/nios2/nios2_write.c
- libos/semihost/machine/or1k/or1k_iob.c
- libos/semihost/machine/or1k/or1k_semihost.h
- libos/semihost/machine/sh/sh_semihost.h
- libos/semihost/machine/sparc/sparc-semihost.h
- libos/semihost/machine/sparc/sparc_iob.c
- libos/semihost/machine/xtensa/xtensa-iob.c
- libos/semihost/machine/xtensa/xtensa-semihost.h
- picocrt/machine/m68k/crt0.c
- picocrt/machine/mips/crt0.c
- picocrt/machine/msp430/crt0.c
- picocrt/machine/nios2/crt0.c
- picocrt/machine/sparc/crt0.c
- test/test-math/test-fma.c
- test/test-raise.c
- test/test-stdio/test-fread-fwrite.c
- test/test-stdio/test-gets.c
- test/test-stdio/test-long-long.c
- test/test-ubsan.c
- test/testsuite/newlib.time/asctime.c
-Copyright: 2023 Keith Packard
-License: BSD3-1
-
-Files: empty-libs/empty.c
- libc/machine/arm/memmove.c
- libc/machine/xtensa/machine/meson.build
- libc/stdio/atold_engine.c
- libc/stdio/ldtoa_engine.c
- libc/stdio/matchcaseprefix.c
- libc/stdio/rewind.c
- libc/stdio/strfromd.c
- libc/stdio/strfromf.c
- libc/stdio/strfroml.c
- libc/stdlib/atexit.c
- libc/stdlib/cxa-atexit.c
- libc/stdlib/exit.c
- libc/stdlib/exitprocs.c
- libc/stdlib/local-onexit.h
- libc/stdlib/onexit.c
- libm/common/exp10l.c
- libm/common/math_inexact.c
- libm/common/math_inexactf.c
- libm/common/math_inexactl.c
- libm/common/s_getpayload.c
- libm/common/sf_getpayload.c
- libm/ld/ld128/s_getpayloadl.c
- libm/ld/ld80/s_getpayloadl.c
- libm/machine/powerpc/meson.build
- libm/test/scalb_vec.c
- libm/test/scalbn_vec.c
- libos/semihost/common/gettimeofday.c
- libos/semihost/machine/aarch64/aarch64_exit.c
- libos/semihost/machine/aarch64/meson.build
- libos/semihost/machine/arc/meson.build
- libos/semihost/machine/arc64/meson.build
- libos/semihost/machine/arm/meson.build
- libos/semihost/machine/m68k/meson.build
- libos/semihost/machine/msp430/meson.build
- libos/semihost/machine/msp430/msp430-exit.c
- libos/semihost/machine/nios2/meson.build
- libos/semihost/machine/or1k/meson.build
- libos/semihost/machine/or1k/or1k_exit.c
- libos/semihost/machine/powerpc/meson.build
- libos/semihost/machine/powerpc/powerpc_exit.c
- libos/semihost/machine/powerpc/powerpc_io.c
- libos/semihost/machine/riscv/meson.build
- libos/semihost/machine/rx/CMakeLists.txt
- libos/semihost/machine/rx/meson.build
- libos/semihost/machine/rx/rx_exit.c
- libos/semihost/machine/sh/meson.build
- libos/semihost/machine/sh/sh_exit.c
- libos/semihost/machine/sparc/meson.build
- libos/semihost/machine/sparc/sparc_exit.c
- libos/semihost/machine/x86/bios.S
- libos/semihost/machine/x86/e9_exit.c
- libos/semihost/machine/x86/e9_io.c
- libos/semihost/machine/x86/meson.build
- libos/semihost/machine/xtensa/meson.build
- libos/semihost/machine/xtensa/xtensa-exit.c
- libos/semihost/machine/xtensa/xtensa-stub.c
- picocrt/machine/aarch64/meson.build
- picocrt/machine/arc/meson.build
- picocrt/machine/arc64/meson.build
- picocrt/machine/arm/meson.build
- picocrt/machine/lm32/meson.build
- picocrt/machine/m68k/meson.build
- picocrt/machine/mips/meson.build
- picocrt/machine/msp430/meson.build
- picocrt/machine/nios2/meson.build
- picocrt/machine/or1k/meson.build
- picocrt/machine/powerpc/meson.build
- picocrt/machine/riscv/meson.build
- picocrt/machine/sh/meson.build
- picocrt/machine/sparc/meson.build
- picocrt/machine/x86/CMakeLists.txt
- picocrt/machine/x86/meson.build
- scripts/do-power9-configure
- scripts/do-power9-fp128-configure
- scripts/do-powerpc64-configure
- scripts/do-powerpc64le-configure
- test/constructor-skip.c
- test/constructor.c
- test/libc-testsuite/testcase.h
- test/test-hosted-exit.c
- test/test-math/test-math-funcs.c
- test/test-math/test-rounding-mode-sub.c
- test/test-math/test-rounding-mode.c
- test/test-math/test-rounding-mode.h
- test/test-stdio/test-put.c
- test/test-stdlib/test-atexit.c
- test/test-stdlib/test-on_exit.c
- test/test-string/test-memchr-simple.c
- test/test-string/test-memset.c
- test/test-string/test-strchr.c
- test/test-timegm.c
- test/test-timegm.h
-Copyright: 2021 Keith Packard
-License: BSD3-1
-
-Files: empty-libs/meson.build
- libc/ctype/ctype_class.h
- libc/include/poll.h
- libc/include/stdio-posix.h
- libc/include/sys/dirent.h
- libc/include/sys/ioctl.h
- libc/include/sys/termios.h
- libc/machine/arc64/sys/meson.build
- libc/machine/arc64/tls.c
- libc/machine/arc64/vector_table.c
- libc/machine/loongarch/CMakeLists.txt
- libc/machine/loongarch/machine/CMakeLists.txt
- libc/machine/msp430/CMakeLists.txt
- libc/native/fstat.c
- libc/native/fstat_host.c
- libc/native/if_native.h
- libc/native/lstat.c
- libc/native/lstat_host.c
- libc/native/meson.build
- libc/native/native_if.h
- libc/native/stat.c
- libc/native/stat_host.c
- libc/posix/endgrent.c
- libc/posix/endpwent.c
- libc/posix/execl.c
- libc/posix/execlp.c
- libc/posix/execv.c
- libc/posix/execvp.c
- libc/posix/execvpe.c
- libc/posix/fgetgrent.c
- libc/posix/fgetgrent_r.c
- libc/posix/fgetpwent.c
- libc/posix/fgetpwent_r.c
- libc/posix/getgrent.c
- libc/posix/getgrent_r.c
- libc/posix/getgrgid.c
- libc/posix/getgrgid_r.c
- libc/posix/getgrnam.c
- libc/posix/getgrnam_r.c
- libc/posix/getlogin.c
- libc/posix/getpass.c
- libc/posix/getpwent.c
- libc/posix/getpwent_r.c
- libc/posix/getpwnam.c
- libc/posix/getpwnam_r.c
- libc/posix/getpwuid.c
- libc/posix/getpwuid_r.c
- libc/posix/grdata.c
- libc/posix/grfile.c
- libc/posix/local-grp.h
- libc/posix/local-pwd.h
- libc/posix/pwdata.c
- libc/posix/pwfile.c
- libc/posix/setgrent.c
- libc/posix/setpwent.c
- libc/posix/sleep.c
- libc/posix/wait.c
- libc/signal/sigjmp_getsigs.c
- libc/signal/sigjmp_setsigs.c
- libc/stdio/atomic_store.c
- libc/stdio/bufio_close.c
- libc/stdio/bufio_close_nf.c
- libc/stdio/bufio_exit_flush.c
- libc/stdio/bufio_setvbuf.c
- libc/stdio/fseterr.c
- libc/stdio/pclose.c
- libc/stdio/popen.c
- libc/stdlib/malloc-error.c
- libc/string/strerror.c
- libc/time/timespec_get.c
- libc/time/timespec_getres.c
- libm/math/sf_rem_pio2.c
- libos/dummyhost/CMakeLists.txt
- libos/dummyhost/_exit.c
- libos/dummyhost/close.c
- libos/dummyhost/fstat.c
- libos/dummyhost/getentropy.c
- libos/dummyhost/gettimeofday.c
- libos/dummyhost/iob.c
- libos/dummyhost/lseek.c
- libos/dummyhost/meson.build
- libos/dummyhost/open.c
- libos/dummyhost/read.c
- libos/dummyhost/sigprocmask.c
- libos/dummyhost/stat.c
- libos/dummyhost/times.c
- libos/dummyhost/unlink.c
- libos/dummyhost/write.c
- libos/fallback/CMakeLists.txt
- libos/fallback/local-signal.h
- libos/fallback/meson.build
- libos/fallback/raise.c
- libos/fallback/signal.c
- libos/fallback/sigprocmask.c
- libos/fallback/sysconf.c
- libos/linux/_sigmask_from_linux.c
- libos/linux/_sigmask_to_linux.c
- libos/linux/_signal_from_linux.c
- libos/linux/_signal_to_linux.c
- libos/linux/_statbuf.c
- libos/linux/_syscall_error.c
- libos/linux/access.c
- libos/linux/alarm.c
- libos/linux/cfgetispeed.c
- libos/linux/cfgetospeed.c
- libos/linux/cfsetispeed.c
- libos/linux/cfsetospeed.c
- libos/linux/cfsetspeed.c
- libos/linux/chdir.c
- libos/linux/chmod.c
- libos/linux/clock_gettime.c
- libos/linux/close.c
- libos/linux/closedir.c
- libos/linux/dup.c
- libos/linux/dup2.c
- libos/linux/execve.c
- libos/linux/fcntl.c
- libos/linux/fork.c
- libos/linux/fpathconf.c
- libos/linux/fstat.c
- libos/linux/getcwd.c
- libos/linux/getegid.c
- libos/linux/getentropy.c
- libos/linux/geteuid.c
- libos/linux/getgid.c
- libos/linux/getgroups.c
- libos/linux/gethostname.c
- libos/linux/getitimer.c
- libos/linux/getpgrp.c
- libos/linux/getpid.c
- libos/linux/getppid.c
- libos/linux/getrlimit.c
- libos/linux/gettimeofday.c
- libos/linux/getuid.c
- libos/linux/getwd.c
- libos/linux/include/linux/linux-sigaction-nsig.h
- libos/linux/include/linux/linux-sigaction-struct.h
- libos/linux/ioctl.c
- libos/linux/isatty.c
- libos/linux/kill.c
- libos/linux/killpg.c
- libos/linux/local-dirent.h
- libos/linux/local-linux.h
- libos/linux/local-sigaction.h
- libos/linux/local-statx.h
- libos/linux/local-termios.h
- libos/linux/local-time.h
- libos/linux/local-times.h
- libos/linux/lseek.c
- libos/linux/lstat.c
- libos/linux/machine/aarch64/linux/linux-dirent.h
- libos/linux/machine/aarch64/linux/linux-dirent64-struct.h
- libos/linux/machine/aarch64/linux/linux-errno.h
- libos/linux/machine/aarch64/linux/linux-fcntl.h
- libos/linux/machine/aarch64/linux/linux-ioctl.h
- libos/linux/machine/aarch64/linux/linux-itimerspec-struct.h
- libos/linux/machine/aarch64/linux/linux-itimerval-struct.h
- libos/linux/machine/aarch64/linux/linux-poll.h
- libos/linux/machine/aarch64/linux/linux-resource.h
- libos/linux/machine/aarch64/linux/linux-rlimit-struct.h
- libos/linux/machine/aarch64/linux/linux-siginfo-struct.h
- libos/linux/machine/aarch64/linux/linux-signal.h
- libos/linux/machine/aarch64/linux/linux-sigval-struct.h
- libos/linux/machine/aarch64/linux/linux-statx-struct.h
- libos/linux/machine/aarch64/linux/linux-statx_timestamp-struct.h
- libos/linux/machine/aarch64/linux/linux-syscall.h
- libos/linux/machine/aarch64/linux/linux-sysconf.h
- libos/linux/machine/aarch64/linux/linux-termios-struct.h
- libos/linux/machine/aarch64/linux/linux-termios.h
- libos/linux/machine/aarch64/linux/linux-time.h
- libos/linux/machine/aarch64/linux/linux-timespec-struct.h
- libos/linux/machine/aarch64/linux/linux-timeval-struct.h
- libos/linux/machine/aarch64/linux/linux-timezone-struct.h
- libos/linux/machine/aarch64/linux/linux-tms-struct.h
- libos/linux/machine/aarch64/linux/linux-wait.h
- libos/linux/machine/aarch64/linux/linux-winsize-struct.h
- libos/linux/machine/aarch64/linux/meson.build
- libos/linux/machine/aarch64/meson.build
- libos/linux/machine/aarch64/sa-restore.S
- libos/linux/machine/aarch64/sys/meson.build
- libos/linux/machine/aarch64/syscall.S
- libos/linux/machine/arm/linux/linux-dirent.h
- libos/linux/machine/arm/linux/linux-dirent64-struct.h
- libos/linux/machine/arm/linux/linux-errno.h
- libos/linux/machine/arm/linux/linux-fcntl.h
- libos/linux/machine/arm/linux/linux-ioctl.h
- libos/linux/machine/arm/linux/linux-itimerspec-struct.h
- libos/linux/machine/arm/linux/linux-itimerval-struct.h
- libos/linux/machine/arm/linux/linux-poll.h
- libos/linux/machine/arm/linux/linux-resource.h
- libos/linux/machine/arm/linux/linux-rlimit-struct.h
- libos/linux/machine/arm/linux/linux-siginfo-struct.h
- libos/linux/machine/arm/linux/linux-signal.h
- libos/linux/machine/arm/linux/linux-sigval-struct.h
- libos/linux/machine/arm/linux/linux-statx-struct.h
- libos/linux/machine/arm/linux/linux-statx_timestamp-struct.h
- libos/linux/machine/arm/linux/linux-syscall.h
- libos/linux/machine/arm/linux/linux-sysconf.h
- libos/linux/machine/arm/linux/linux-termios-struct.h
- libos/linux/machine/arm/linux/linux-termios.h
- libos/linux/machine/arm/linux/linux-time.h
- libos/linux/machine/arm/linux/linux-timespec-struct.h
- libos/linux/machine/arm/linux/linux-timeval-struct.h
- libos/linux/machine/arm/linux/linux-timezone-struct.h
- libos/linux/machine/arm/linux/linux-tms-struct.h
- libos/linux/machine/arm/linux/linux-wait.h
- libos/linux/machine/arm/linux/linux-winsize-struct.h
- libos/linux/machine/arm/linux/meson.build
- libos/linux/machine/arm/meson.build
- libos/linux/machine/arm/sa-restore.S
- libos/linux/machine/arm/sys/meson.build
- libos/linux/machine/arm/syscall.S
- libos/linux/machine/i686/linux/linux-dirent.h
- libos/linux/machine/i686/linux/linux-dirent64-struct.h
- libos/linux/machine/i686/linux/linux-errno.h
- libos/linux/machine/i686/linux/linux-fcntl.h
- libos/linux/machine/i686/linux/linux-ioctl.h
- libos/linux/machine/i686/linux/linux-itimerspec-struct.h
- libos/linux/machine/i686/linux/linux-itimerval-struct.h
- libos/linux/machine/i686/linux/linux-poll.h
- libos/linux/machine/i686/linux/linux-resource.h
- libos/linux/machine/i686/linux/linux-rlimit-struct.h
- libos/linux/machine/i686/linux/linux-siginfo-struct.h
- libos/linux/machine/i686/linux/linux-signal.h
- libos/linux/machine/i686/linux/linux-sigval-struct.h
- libos/linux/machine/i686/linux/linux-statx-struct.h
- libos/linux/machine/i686/linux/linux-statx_timestamp-struct.h
- libos/linux/machine/i686/linux/linux-syscall.h
- libos/linux/machine/i686/linux/linux-sysconf.h
- libos/linux/machine/i686/linux/linux-termios-struct.h
- libos/linux/machine/i686/linux/linux-termios.h
- libos/linux/machine/i686/linux/linux-time.h
- libos/linux/machine/i686/linux/linux-timespec-struct.h
- libos/linux/machine/i686/linux/linux-timeval-struct.h
- libos/linux/machine/i686/linux/linux-timezone-struct.h
- libos/linux/machine/i686/linux/linux-tms-struct.h
- libos/linux/machine/i686/linux/linux-wait.h
- libos/linux/machine/i686/linux/linux-winsize-struct.h
- libos/linux/machine/x86/asm/ldt.h
- libos/linux/machine/x86/asm/meson.build
- libos/linux/machine/x86/linux/linux-dirent.h
- libos/linux/machine/x86/linux/linux-dirent64-struct.h
- libos/linux/machine/x86/linux/linux-errno.h
- libos/linux/machine/x86/linux/linux-fcntl.h
- libos/linux/machine/x86/linux/linux-ioctl.h
- libos/linux/machine/x86/linux/linux-itimerspec-struct.h
- libos/linux/machine/x86/linux/linux-itimerval-struct.h
- libos/linux/machine/x86/linux/linux-poll.h
- libos/linux/machine/x86/linux/linux-resource.h
- libos/linux/machine/x86/linux/linux-rlimit-struct.h
- libos/linux/machine/x86/linux/linux-siginfo-struct.h
- libos/linux/machine/x86/linux/linux-signal.h
- libos/linux/machine/x86/linux/linux-sigval-struct.h
- libos/linux/machine/x86/linux/linux-statx-struct.h
- libos/linux/machine/x86/linux/linux-statx_timestamp-struct.h
- libos/linux/machine/x86/linux/linux-syscall.h
- libos/linux/machine/x86/linux/linux-sysconf.h
- libos/linux/machine/x86/linux/linux-termios-struct.h
- libos/linux/machine/x86/linux/linux-termios.h
- libos/linux/machine/x86/linux/linux-time.h
- libos/linux/machine/x86/linux/linux-timespec-struct.h
- libos/linux/machine/x86/linux/linux-timeval-struct.h
- libos/linux/machine/x86/linux/linux-timezone-struct.h
- libos/linux/machine/x86/linux/linux-tms-struct.h
- libos/linux/machine/x86/linux/linux-wait.h
- libos/linux/machine/x86/linux/linux-winsize-struct.h
- libos/linux/machine/x86/linux/meson.build
- libos/linux/machine/x86/meson.build
- libos/linux/machine/x86/sa-restore.S
- libos/linux/machine/x86/sa_restore.S
- libos/linux/machine/x86/sys/meson.build
- libos/linux/machine/x86/syscall.S
- libos/linux/machine/x86_64/linux/linux-dirent.h
- libos/linux/machine/x86_64/linux/linux-dirent64-struct.h
- libos/linux/machine/x86_64/linux/linux-errno.h
- libos/linux/machine/x86_64/linux/linux-fcntl.h
- libos/linux/machine/x86_64/linux/linux-ioctl.h
- libos/linux/machine/x86_64/linux/linux-itimerspec-struct.h
- libos/linux/machine/x86_64/linux/linux-itimerval-struct.h
- libos/linux/machine/x86_64/linux/linux-poll.h
- libos/linux/machine/x86_64/linux/linux-resource.h
- libos/linux/machine/x86_64/linux/linux-rlimit-struct.h
- libos/linux/machine/x86_64/linux/linux-siginfo-struct.h
- libos/linux/machine/x86_64/linux/linux-signal.h
- libos/linux/machine/x86_64/linux/linux-sigval-struct.h
- libos/linux/machine/x86_64/linux/linux-statx-struct.h
- libos/linux/machine/x86_64/linux/linux-statx_timestamp-struct.h
- libos/linux/machine/x86_64/linux/linux-syscall.h
- libos/linux/machine/x86_64/linux/linux-sysconf.h
- libos/linux/machine/x86_64/linux/linux-termios-struct.h
- libos/linux/machine/x86_64/linux/linux-termios.h
- libos/linux/machine/x86_64/linux/linux-time.h
- libos/linux/machine/x86_64/linux/linux-timespec-struct.h
- libos/linux/machine/x86_64/linux/linux-timeval-struct.h
- libos/linux/machine/x86_64/linux/linux-timezone-struct.h
- libos/linux/machine/x86_64/linux/linux-tms-struct.h
- libos/linux/machine/x86_64/linux/linux-wait.h
- libos/linux/machine/x86_64/linux/linux-winsize-struct.h
- libos/linux/mkdir.c
- libos/linux/nanosleep.c
- libos/linux/opendir.c
- libos/linux/pathconf.c
- libos/linux/pipe.c
- libos/linux/poll.c
- libos/linux/raise.c
- libos/linux/readdir.c
- libos/linux/readlink.c
- libos/linux/rename.c
- libos/linux/rewinddir.c
- libos/linux/sbrk.c
- libos/linux/setegid.c
- libos/linux/seteuid.c
- libos/linux/setgid.c
- libos/linux/setgroups.c
- libos/linux/setitimer.c
- libos/linux/setpgid.c
- libos/linux/setrlimit.c
- libos/linux/setuid.c
- libos/linux/sigaction.c
- libos/linux/signal.c
- libos/linux/sigpending.c
- libos/linux/sigprocmask.c
- libos/linux/sigsuspend.c
- libos/linux/sleep.c
- libos/linux/stat.c
- libos/linux/symlink.c
- libos/linux/tcflow.c
- libos/linux/tcflush.c
- libos/linux/tcgetattr.c
- libos/linux/tcgetpgrp.c
- libos/linux/tcgetwinsize.c
- libos/linux/tcsetattr.c
- libos/linux/tcsetpgrp.c
- libos/linux/tcsetwinsize.c
- libos/linux/times.c
- libos/linux/ttyname.c
- libos/linux/ttyname_r.c
- libos/linux/umask.c
- libos/linux/utils/make-dirent.c
- libos/linux/utils/make-errno.c
- libos/linux/utils/make-fcntl.c
- libos/linux/utils/make-ioctl.c
- libos/linux/utils/make-poll.c
- libos/linux/utils/make-resource.c
- libos/linux/utils/make-resource.h
- libos/linux/utils/make-signal.c
- libos/linux/utils/make-syscall.c
- libos/linux/utils/make-sysconf.c
- libos/linux/utils/make-termios.c
- libos/linux/utils/make-time.c
- libos/linux/utils/make-wait.c
- libos/linux/vfork.c
- libos/linux/wait3.c
- libos/linux/waitpid.c
- libos/meson.build
- libos/semihost/fake/fake_gettimeofday.c
- test/test-ctype/CMakeLists.txt
- test/test-ctype/meson.build
- test/test-ctype/test-iswctype.c
- test/test-environ.c
- test/test-hosted-exit-fail.c
- test/test-posix/test-alarm.c
- test/test-posix/test-fnmatch.c
- test/test-posix/test-getdelim.c
- test/test-posix/test-grp.c
- test/test-posix/test-popen.c
- test/test-posix/test-pwd.c
- test/test-posix/test-signal.c
- test/test-posix/test-stat.c
- test/test-posix/test-system.c
- test/test-stdio/test-fdevopen.c
- test/test-stdio/test-freopen.c
- test/test-stdlib/test-double-free.c
- test/test-string/CMakeLists.txt
- test/test-string/test-strerror.c
-Copyright: 2026 Keith Packard
-License: BSD3-1
-
-Files: hello-world/Makefile
+Files: cmake/TC-x86_64.ld
+ hello-world/Makefile
  hello-world/hello-world.c
  hello-world/printf.c
  hello-world/run-aarch64
@@ -1667,14 +1108,6 @@ Files: hello-world/Makefile
  libm/machine/x86/meson.build
  libm/math/meson.build
  libm/meson.build
- libm/test/copysign_vec.c
- libm/test/copysignf_vec.c
- libm/test/issignaling_vec.c
- libm/test/meson.build
- libm/test/modf_vec.c
- libm/test/modff_vec.c
- libm/test/pow_vec.c
- libm/test/powf_vec.c
  libos/fallback/getpid.c
  libos/fallback/kill.c
  libos/fallback/sbrk.c
@@ -1802,12 +1235,605 @@ Files: hello-world/Makefile
  test/testsuite/meson.build
  test/testsuite/newlib.iconv/meson.build
  test/testsuite/newlib.locale/meson.build
+ test/testsuite/newlib.math/copysign_vec.c
+ test/testsuite/newlib.math/copysignf_vec.c
+ test/testsuite/newlib.math/issignaling_vec.c
+ test/testsuite/newlib.math/meson.build
+ test/testsuite/newlib.math/modf_vec.c
+ test/testsuite/newlib.math/modff_vec.c
+ test/testsuite/newlib.math/pow_vec.c
+ test/testsuite/newlib.math/powf_vec.c
  test/testsuite/newlib.search/meson.build
  test/testsuite/newlib.stdio/meson.build
  test/testsuite/newlib.stdlib/meson.build
  test/testsuite/newlib.string/meson.build
  test/testsuite/newlib.wctype/meson.build
 Copyright: 2019 Keith Packard
+License: BSD3-1
+
+Files: doc/printf-sample/Makefile
+ doc/printf-sample/printf.c
+ libc/machine/arm/machine/fenv-fp.h
+ libc/machine/m68k/CMakeLists.txt
+ libc/machine/m68k/machine/fenv-fp.h
+ libc/machine/m68k/machine/fenv.h
+ libc/stdio/dtox_engine.c
+ libc/stdio/ftox_engine.c
+ libc/stdio/getdelim.c
+ libc/stdio/ldtox_engine.c
+ libc/stdio/swprintf.c
+ libc/stdio/vswprintf.c
+ libos/semihost/machine/aarch64/aarch64-semihost.h
+ libos/semihost/machine/aarch64/aarch64_iob.c
+ libos/semihost/machine/arc/arc_close.c
+ libos/semihost/machine/arc/arc_errno.c
+ libos/semihost/machine/arc/arc_exit.c
+ libos/semihost/machine/arc/arc_fstat.c
+ libos/semihost/machine/arc/arc_lseek.c
+ libos/semihost/machine/arc/arc_open.c
+ libos/semihost/machine/arc/arc_read.c
+ libos/semihost/machine/arc/arc_semihost.h
+ libos/semihost/machine/arc/arc_stat.c
+ libos/semihost/machine/arc/arc_unlink.c
+ libos/semihost/machine/arc/arc_write.c
+ libos/semihost/machine/m68k/m68k_close.c
+ libos/semihost/machine/m68k/m68k_exit.c
+ libos/semihost/machine/m68k/m68k_fstat.c
+ libos/semihost/machine/m68k/m68k_gettimeofday.c
+ libos/semihost/machine/m68k/m68k_lseek.c
+ libos/semihost/machine/m68k/m68k_open.c
+ libos/semihost/machine/m68k/m68k_read.c
+ libos/semihost/machine/m68k/m68k_rename.c
+ libos/semihost/machine/m68k/m68k_semihost.S
+ libos/semihost/machine/m68k/m68k_semihost.h
+ libos/semihost/machine/m68k/m68k_stat.c
+ libos/semihost/machine/m68k/m68k_unlink.c
+ libos/semihost/machine/m68k/m68k_write.c
+ libos/semihost/machine/msp430/msp430-iob.c
+ libos/semihost/machine/msp430/msp430-semihost.h
+ libos/semihost/machine/nios2/nios2_close.c
+ libos/semihost/machine/nios2/nios2_exit.c
+ libos/semihost/machine/nios2/nios2_fstat.c
+ libos/semihost/machine/nios2/nios2_lseek.c
+ libos/semihost/machine/nios2/nios2_open.c
+ libos/semihost/machine/nios2/nios2_read.c
+ libos/semihost/machine/nios2/nios2_semihost.c
+ libos/semihost/machine/nios2/nios2_semihost.h
+ libos/semihost/machine/nios2/nios2_stat.c
+ libos/semihost/machine/nios2/nios2_unlink.c
+ libos/semihost/machine/nios2/nios2_write.c
+ libos/semihost/machine/or1k/or1k_iob.c
+ libos/semihost/machine/or1k/or1k_semihost.h
+ libos/semihost/machine/sh/sh_semihost.h
+ libos/semihost/machine/sparc/sparc-semihost.h
+ libos/semihost/machine/sparc/sparc_iob.c
+ libos/semihost/machine/xtensa/xtensa-iob.c
+ libos/semihost/machine/xtensa/xtensa-semihost.h
+ picocrt/machine/m68k/crt0.c
+ picocrt/machine/mips/crt0.c
+ picocrt/machine/msp430/crt0.c
+ picocrt/machine/nios2/crt0.c
+ picocrt/machine/sparc/crt0.c
+ test/test-math/test-fma.c
+ test/test-raise.c
+ test/test-stdio/test-fread-fwrite.c
+ test/test-stdio/test-gets.c
+ test/test-stdio/test-long-long.c
+ test/test-ubsan.c
+ test/testsuite/newlib.time/asctime.c
+Copyright: 2023 Keith Packard
+License: BSD3-1
+
+Files: empty-libs/empty.c
+ libc/machine/arm/memmove.c
+ libc/machine/xtensa/machine/meson.build
+ libc/stdio/atold_engine.c
+ libc/stdio/ldtoa_engine.c
+ libc/stdio/matchcaseprefix.c
+ libc/stdio/rewind.c
+ libc/stdio/strfromd.c
+ libc/stdio/strfromf.c
+ libc/stdio/strfroml.c
+ libc/stdlib/atexit.c
+ libc/stdlib/cxa-atexit.c
+ libc/stdlib/exit.c
+ libc/stdlib/exitprocs.c
+ libc/stdlib/local-onexit.h
+ libc/stdlib/onexit.c
+ libm/common/exp10l.c
+ libm/common/math_inexact.c
+ libm/common/math_inexactf.c
+ libm/common/math_inexactl.c
+ libm/common/s_getpayload.c
+ libm/common/sf_getpayload.c
+ libm/ld/ld128/s_getpayloadl.c
+ libm/ld/ld80/s_getpayloadl.c
+ libm/machine/powerpc/meson.build
+ libos/semihost/common/gettimeofday.c
+ libos/semihost/machine/aarch64/aarch64_exit.c
+ libos/semihost/machine/aarch64/meson.build
+ libos/semihost/machine/arc/meson.build
+ libos/semihost/machine/arc64/meson.build
+ libos/semihost/machine/arm/meson.build
+ libos/semihost/machine/m68k/meson.build
+ libos/semihost/machine/msp430/meson.build
+ libos/semihost/machine/msp430/msp430-exit.c
+ libos/semihost/machine/nios2/meson.build
+ libos/semihost/machine/or1k/meson.build
+ libos/semihost/machine/or1k/or1k_exit.c
+ libos/semihost/machine/powerpc/meson.build
+ libos/semihost/machine/powerpc/powerpc_exit.c
+ libos/semihost/machine/powerpc/powerpc_io.c
+ libos/semihost/machine/riscv/meson.build
+ libos/semihost/machine/rx/CMakeLists.txt
+ libos/semihost/machine/rx/meson.build
+ libos/semihost/machine/rx/rx_exit.c
+ libos/semihost/machine/sh/meson.build
+ libos/semihost/machine/sh/sh_exit.c
+ libos/semihost/machine/sparc/meson.build
+ libos/semihost/machine/sparc/sparc_exit.c
+ libos/semihost/machine/x86/CMakeLists.txt
+ libos/semihost/machine/x86/bios.S
+ libos/semihost/machine/x86/e9_exit.c
+ libos/semihost/machine/x86/e9_io.c
+ libos/semihost/machine/x86/meson.build
+ libos/semihost/machine/xtensa/meson.build
+ libos/semihost/machine/xtensa/xtensa-exit.c
+ libos/semihost/machine/xtensa/xtensa-stub.c
+ picocrt/machine/aarch64/meson.build
+ picocrt/machine/arc/meson.build
+ picocrt/machine/arc64/meson.build
+ picocrt/machine/arm/meson.build
+ picocrt/machine/lm32/meson.build
+ picocrt/machine/m68k/meson.build
+ picocrt/machine/mips/meson.build
+ picocrt/machine/msp430/meson.build
+ picocrt/machine/nios2/meson.build
+ picocrt/machine/or1k/meson.build
+ picocrt/machine/powerpc/meson.build
+ picocrt/machine/riscv/meson.build
+ picocrt/machine/sh/meson.build
+ picocrt/machine/sparc/meson.build
+ picocrt/machine/x86/CMakeLists.txt
+ picocrt/machine/x86/meson.build
+ scripts/do-power9-configure
+ scripts/do-power9-fp128-configure
+ scripts/do-powerpc64-configure
+ scripts/do-powerpc64le-configure
+ test/constructor-skip.c
+ test/constructor.c
+ test/libc-testsuite/testcase.h
+ test/test-hosted-exit.c
+ test/test-math/test-math-funcs.c
+ test/test-math/test-rounding-mode-sub.c
+ test/test-math/test-rounding-mode.c
+ test/test-math/test-rounding-mode.h
+ test/test-stdio/test-put.c
+ test/test-stdlib/test-atexit.c
+ test/test-stdlib/test-on_exit.c
+ test/test-string/test-memchr-simple.c
+ test/test-string/test-memset.c
+ test/test-string/test-strchr.c
+ test/test-timegm.c
+ test/test-timegm.h
+ test/testsuite/newlib.math/scalb_vec.c
+ test/testsuite/newlib.math/scalbn_vec.c
+Copyright: 2021 Keith Packard
+License: BSD3-1
+
+Files: empty-libs/meson.build
+ libc/ctype/ctype_class.h
+ libc/include/poll.h
+ libc/include/stdio-posix.h
+ libc/include/sys/dirent.h
+ libc/include/sys/ioctl.h
+ libc/include/sys/termios.h
+ libc/machine/arc64/sys/meson.build
+ libc/machine/arc64/tls.c
+ libc/machine/arc64/vector_table.c
+ libc/machine/loongarch/CMakeLists.txt
+ libc/machine/loongarch/machine/CMakeLists.txt
+ libc/machine/msp430/CMakeLists.txt
+ libc/native/fstat.c
+ libc/native/fstat_host.c
+ libc/native/if_native.h
+ libc/native/lstat.c
+ libc/native/lstat_host.c
+ libc/native/meson.build
+ libc/native/native_if.h
+ libc/native/stat.c
+ libc/native/stat_host.c
+ libc/posix/endgrent.c
+ libc/posix/endpwent.c
+ libc/posix/execl.c
+ libc/posix/execlp.c
+ libc/posix/execv.c
+ libc/posix/execvp.c
+ libc/posix/execvpe.c
+ libc/posix/fgetgrent.c
+ libc/posix/fgetgrent_r.c
+ libc/posix/fgetpwent.c
+ libc/posix/fgetpwent_r.c
+ libc/posix/getgrent.c
+ libc/posix/getgrent_r.c
+ libc/posix/getgrgid.c
+ libc/posix/getgrgid_r.c
+ libc/posix/getgrnam.c
+ libc/posix/getgrnam_r.c
+ libc/posix/getlogin.c
+ libc/posix/getpass.c
+ libc/posix/getpwent.c
+ libc/posix/getpwent_r.c
+ libc/posix/getpwnam.c
+ libc/posix/getpwnam_r.c
+ libc/posix/getpwuid.c
+ libc/posix/getpwuid_r.c
+ libc/posix/grdata.c
+ libc/posix/grfile.c
+ libc/posix/local-grp.h
+ libc/posix/local-pwd.h
+ libc/posix/pwdata.c
+ libc/posix/pwfile.c
+ libc/posix/setgrent.c
+ libc/posix/setpwent.c
+ libc/posix/sleep.c
+ libc/posix/wait.c
+ libc/signal/sigjmp_getsigs.c
+ libc/signal/sigjmp_setsigs.c
+ libc/stdio/atomic_store.c
+ libc/stdio/bufio_close.c
+ libc/stdio/bufio_close_nf.c
+ libc/stdio/bufio_exit_flush.c
+ libc/stdio/bufio_setvbuf.c
+ libc/stdio/fseterr.c
+ libc/stdio/pclose.c
+ libc/stdio/popen.c
+ libc/stdlib/malloc-error.c
+ libc/string/strerror.c
+ libc/time/timespec_get.c
+ libc/time/timespec_getres.c
+ libm/complex/local-complex.h
+ libm/math/sf_rem_pio2.c
+ libos/dummyhost/CMakeLists.txt
+ libos/dummyhost/_exit.c
+ libos/dummyhost/close.c
+ libos/dummyhost/fstat.c
+ libos/dummyhost/getentropy.c
+ libos/dummyhost/gettimeofday.c
+ libos/dummyhost/iob.c
+ libos/dummyhost/lseek.c
+ libos/dummyhost/meson.build
+ libos/dummyhost/open.c
+ libos/dummyhost/read.c
+ libos/dummyhost/sigprocmask.c
+ libos/dummyhost/stat.c
+ libos/dummyhost/times.c
+ libos/dummyhost/unlink.c
+ libos/dummyhost/write.c
+ libos/fallback/CMakeLists.txt
+ libos/fallback/local-signal.h
+ libos/fallback/meson.build
+ libos/fallback/raise.c
+ libos/fallback/signal.c
+ libos/fallback/sigprocmask.c
+ libos/fallback/sysconf.c
+ libos/linux/_sigmask_from_linux.c
+ libos/linux/_sigmask_to_linux.c
+ libos/linux/_signal_from_linux.c
+ libos/linux/_signal_to_linux.c
+ libos/linux/_statbuf.c
+ libos/linux/_syscall_error.c
+ libos/linux/access.c
+ libos/linux/alarm.c
+ libos/linux/cfgetispeed.c
+ libos/linux/cfgetospeed.c
+ libos/linux/cfsetispeed.c
+ libos/linux/cfsetospeed.c
+ libos/linux/cfsetspeed.c
+ libos/linux/chdir.c
+ libos/linux/chmod.c
+ libos/linux/clock_gettime.c
+ libos/linux/close.c
+ libos/linux/closedir.c
+ libos/linux/dup.c
+ libos/linux/dup2.c
+ libos/linux/execve.c
+ libos/linux/fcntl.c
+ libos/linux/fork.c
+ libos/linux/fpathconf.c
+ libos/linux/fstat.c
+ libos/linux/getcwd.c
+ libos/linux/getegid.c
+ libos/linux/getentropy.c
+ libos/linux/geteuid.c
+ libos/linux/getgid.c
+ libos/linux/getgroups.c
+ libos/linux/gethostname.c
+ libos/linux/getitimer.c
+ libos/linux/getpgrp.c
+ libos/linux/getpid.c
+ libos/linux/getppid.c
+ libos/linux/getrlimit.c
+ libos/linux/gettimeofday.c
+ libos/linux/getuid.c
+ libos/linux/getwd.c
+ libos/linux/include/linux/linux-sigaction-nsig.h
+ libos/linux/include/linux/linux-sigaction-struct.h
+ libos/linux/ioctl.c
+ libos/linux/isatty.c
+ libos/linux/kill.c
+ libos/linux/killpg.c
+ libos/linux/local-dirent.h
+ libos/linux/local-linux.h
+ libos/linux/local-resource.h
+ libos/linux/local-sigaction.h
+ libos/linux/local-statx.h
+ libos/linux/local-termios.h
+ libos/linux/local-time.h
+ libos/linux/local-times.h
+ libos/linux/lseek.c
+ libos/linux/lstat.c
+ libos/linux/machine/aarch64/linux/linux-dirent.h
+ libos/linux/machine/aarch64/linux/linux-dirent64-struct.h
+ libos/linux/machine/aarch64/linux/linux-errno.h
+ libos/linux/machine/aarch64/linux/linux-fcntl.h
+ libos/linux/machine/aarch64/linux/linux-fsid-struct.h
+ libos/linux/machine/aarch64/linux/linux-ioctl.h
+ libos/linux/machine/aarch64/linux/linux-itimerspec-struct.h
+ libos/linux/machine/aarch64/linux/linux-itimerval-struct.h
+ libos/linux/machine/aarch64/linux/linux-mman.h
+ libos/linux/machine/aarch64/linux/linux-poll.h
+ libos/linux/machine/aarch64/linux/linux-resource.h
+ libos/linux/machine/aarch64/linux/linux-rlimit-struct.h
+ libos/linux/machine/aarch64/linux/linux-rlimit64-struct.h
+ libos/linux/machine/aarch64/linux/linux-siginfo-struct.h
+ libos/linux/machine/aarch64/linux/linux-signal.h
+ libos/linux/machine/aarch64/linux/linux-sigval-struct.h
+ libos/linux/machine/aarch64/linux/linux-statfs-struct.h
+ libos/linux/machine/aarch64/linux/linux-statfs64-struct.h
+ libos/linux/machine/aarch64/linux/linux-statx-struct.h
+ libos/linux/machine/aarch64/linux/linux-statx_timestamp-struct.h
+ libos/linux/machine/aarch64/linux/linux-syscall.h
+ libos/linux/machine/aarch64/linux/linux-sysconf.h
+ libos/linux/machine/aarch64/linux/linux-termios-struct.h
+ libos/linux/machine/aarch64/linux/linux-termios.h
+ libos/linux/machine/aarch64/linux/linux-time.h
+ libos/linux/machine/aarch64/linux/linux-timespec-struct.h
+ libos/linux/machine/aarch64/linux/linux-timeval-struct.h
+ libos/linux/machine/aarch64/linux/linux-timezone-struct.h
+ libos/linux/machine/aarch64/linux/linux-tms-struct.h
+ libos/linux/machine/aarch64/linux/linux-wait.h
+ libos/linux/machine/aarch64/linux/linux-winsize-struct.h
+ libos/linux/machine/aarch64/linux/meson.build
+ libos/linux/machine/aarch64/meson.build
+ libos/linux/machine/aarch64/sa-restore.S
+ libos/linux/machine/aarch64/sys/meson.build
+ libos/linux/machine/aarch64/syscall.S
+ libos/linux/machine/arm/linux/linux-dirent.h
+ libos/linux/machine/arm/linux/linux-dirent64-struct.h
+ libos/linux/machine/arm/linux/linux-errno.h
+ libos/linux/machine/arm/linux/linux-fcntl.h
+ libos/linux/machine/arm/linux/linux-fsid-struct.h
+ libos/linux/machine/arm/linux/linux-ioctl.h
+ libos/linux/machine/arm/linux/linux-itimerspec-struct.h
+ libos/linux/machine/arm/linux/linux-itimerval-struct.h
+ libos/linux/machine/arm/linux/linux-mman.h
+ libos/linux/machine/arm/linux/linux-poll.h
+ libos/linux/machine/arm/linux/linux-resource.h
+ libos/linux/machine/arm/linux/linux-rlimit-struct.h
+ libos/linux/machine/arm/linux/linux-rlimit64-struct.h
+ libos/linux/machine/arm/linux/linux-siginfo-struct.h
+ libos/linux/machine/arm/linux/linux-signal.h
+ libos/linux/machine/arm/linux/linux-sigval-struct.h
+ libos/linux/machine/arm/linux/linux-statfs-struct.h
+ libos/linux/machine/arm/linux/linux-statfs64-struct.h
+ libos/linux/machine/arm/linux/linux-statx-struct.h
+ libos/linux/machine/arm/linux/linux-statx_timestamp-struct.h
+ libos/linux/machine/arm/linux/linux-syscall.h
+ libos/linux/machine/arm/linux/linux-sysconf.h
+ libos/linux/machine/arm/linux/linux-termios-struct.h
+ libos/linux/machine/arm/linux/linux-termios.h
+ libos/linux/machine/arm/linux/linux-time.h
+ libos/linux/machine/arm/linux/linux-timespec-struct.h
+ libos/linux/machine/arm/linux/linux-timeval-struct.h
+ libos/linux/machine/arm/linux/linux-timezone-struct.h
+ libos/linux/machine/arm/linux/linux-tms-struct.h
+ libos/linux/machine/arm/linux/linux-wait.h
+ libos/linux/machine/arm/linux/linux-winsize-struct.h
+ libos/linux/machine/arm/linux/meson.build
+ libos/linux/machine/arm/meson.build
+ libos/linux/machine/arm/sa-restore.S
+ libos/linux/machine/arm/sys/meson.build
+ libos/linux/machine/arm/syscall.S
+ libos/linux/machine/i686/linux/linux-dirent.h
+ libos/linux/machine/i686/linux/linux-dirent64-struct.h
+ libos/linux/machine/i686/linux/linux-errno.h
+ libos/linux/machine/i686/linux/linux-fcntl.h
+ libos/linux/machine/i686/linux/linux-fsid-struct.h
+ libos/linux/machine/i686/linux/linux-ioctl.h
+ libos/linux/machine/i686/linux/linux-itimerspec-struct.h
+ libos/linux/machine/i686/linux/linux-itimerval-struct.h
+ libos/linux/machine/i686/linux/linux-mman.h
+ libos/linux/machine/i686/linux/linux-poll.h
+ libos/linux/machine/i686/linux/linux-resource.h
+ libos/linux/machine/i686/linux/linux-rlimit-struct.h
+ libos/linux/machine/i686/linux/linux-rlimit64-struct.h
+ libos/linux/machine/i686/linux/linux-siginfo-struct.h
+ libos/linux/machine/i686/linux/linux-signal.h
+ libos/linux/machine/i686/linux/linux-sigval-struct.h
+ libos/linux/machine/i686/linux/linux-statfs-struct.h
+ libos/linux/machine/i686/linux/linux-statfs64-struct.h
+ libos/linux/machine/i686/linux/linux-statx-struct.h
+ libos/linux/machine/i686/linux/linux-statx_timestamp-struct.h
+ libos/linux/machine/i686/linux/linux-syscall.h
+ libos/linux/machine/i686/linux/linux-sysconf.h
+ libos/linux/machine/i686/linux/linux-termios-struct.h
+ libos/linux/machine/i686/linux/linux-termios.h
+ libos/linux/machine/i686/linux/linux-time.h
+ libos/linux/machine/i686/linux/linux-timespec-struct.h
+ libos/linux/machine/i686/linux/linux-timeval-struct.h
+ libos/linux/machine/i686/linux/linux-timezone-struct.h
+ libos/linux/machine/i686/linux/linux-tms-struct.h
+ libos/linux/machine/i686/linux/linux-wait.h
+ libos/linux/machine/i686/linux/linux-winsize-struct.h
+ libos/linux/machine/x86/asm/ldt.h
+ libos/linux/machine/x86/asm/meson.build
+ libos/linux/machine/x86/linux/linux-dirent.h
+ libos/linux/machine/x86/linux/linux-dirent64-struct.h
+ libos/linux/machine/x86/linux/linux-errno.h
+ libos/linux/machine/x86/linux/linux-fcntl.h
+ libos/linux/machine/x86/linux/linux-fsid-struct.h
+ libos/linux/machine/x86/linux/linux-ioctl.h
+ libos/linux/machine/x86/linux/linux-itimerspec-struct.h
+ libos/linux/machine/x86/linux/linux-itimerval-struct.h
+ libos/linux/machine/x86/linux/linux-mman.h
+ libos/linux/machine/x86/linux/linux-poll.h
+ libos/linux/machine/x86/linux/linux-resource.h
+ libos/linux/machine/x86/linux/linux-rlimit-struct.h
+ libos/linux/machine/x86/linux/linux-rlimit64-struct.h
+ libos/linux/machine/x86/linux/linux-siginfo-struct.h
+ libos/linux/machine/x86/linux/linux-signal.h
+ libos/linux/machine/x86/linux/linux-sigval-struct.h
+ libos/linux/machine/x86/linux/linux-statfs-struct.h
+ libos/linux/machine/x86/linux/linux-statfs64-struct.h
+ libos/linux/machine/x86/linux/linux-statx-struct.h
+ libos/linux/machine/x86/linux/linux-statx_timestamp-struct.h
+ libos/linux/machine/x86/linux/linux-syscall.h
+ libos/linux/machine/x86/linux/linux-sysconf.h
+ libos/linux/machine/x86/linux/linux-termios-struct.h
+ libos/linux/machine/x86/linux/linux-termios.h
+ libos/linux/machine/x86/linux/linux-time.h
+ libos/linux/machine/x86/linux/linux-timespec-struct.h
+ libos/linux/machine/x86/linux/linux-timeval-struct.h
+ libos/linux/machine/x86/linux/linux-timezone-struct.h
+ libos/linux/machine/x86/linux/linux-tms-struct.h
+ libos/linux/machine/x86/linux/linux-wait.h
+ libos/linux/machine/x86/linux/linux-winsize-struct.h
+ libos/linux/machine/x86/linux/meson.build
+ libos/linux/machine/x86/meson.build
+ libos/linux/machine/x86/sa-restore.S
+ libos/linux/machine/x86/sa_restore.S
+ libos/linux/machine/x86/sys/meson.build
+ libos/linux/machine/x86/syscall.S
+ libos/linux/machine/x86_64/linux/linux-dirent.h
+ libos/linux/machine/x86_64/linux/linux-dirent64-struct.h
+ libos/linux/machine/x86_64/linux/linux-errno.h
+ libos/linux/machine/x86_64/linux/linux-fcntl.h
+ libos/linux/machine/x86_64/linux/linux-fsid-struct.h
+ libos/linux/machine/x86_64/linux/linux-ioctl.h
+ libos/linux/machine/x86_64/linux/linux-itimerspec-struct.h
+ libos/linux/machine/x86_64/linux/linux-itimerval-struct.h
+ libos/linux/machine/x86_64/linux/linux-mman.h
+ libos/linux/machine/x86_64/linux/linux-poll.h
+ libos/linux/machine/x86_64/linux/linux-resource.h
+ libos/linux/machine/x86_64/linux/linux-rlimit-struct.h
+ libos/linux/machine/x86_64/linux/linux-rlimit64-struct.h
+ libos/linux/machine/x86_64/linux/linux-siginfo-struct.h
+ libos/linux/machine/x86_64/linux/linux-signal.h
+ libos/linux/machine/x86_64/linux/linux-sigval-struct.h
+ libos/linux/machine/x86_64/linux/linux-statfs-struct.h
+ libos/linux/machine/x86_64/linux/linux-statfs64-struct.h
+ libos/linux/machine/x86_64/linux/linux-statx-struct.h
+ libos/linux/machine/x86_64/linux/linux-statx_timestamp-struct.h
+ libos/linux/machine/x86_64/linux/linux-syscall.h
+ libos/linux/machine/x86_64/linux/linux-sysconf.h
+ libos/linux/machine/x86_64/linux/linux-termios-struct.h
+ libos/linux/machine/x86_64/linux/linux-termios.h
+ libos/linux/machine/x86_64/linux/linux-time.h
+ libos/linux/machine/x86_64/linux/linux-timespec-struct.h
+ libos/linux/machine/x86_64/linux/linux-timeval-struct.h
+ libos/linux/machine/x86_64/linux/linux-timezone-struct.h
+ libos/linux/machine/x86_64/linux/linux-tms-struct.h
+ libos/linux/machine/x86_64/linux/linux-wait.h
+ libos/linux/machine/x86_64/linux/linux-winsize-struct.h
+ libos/linux/mkdir.c
+ libos/linux/nanosleep.c
+ libos/linux/opendir.c
+ libos/linux/pathconf.c
+ libos/linux/pipe.c
+ libos/linux/poll.c
+ libos/linux/raise.c
+ libos/linux/readdir.c
+ libos/linux/readlink.c
+ libos/linux/rename.c
+ libos/linux/rewinddir.c
+ libos/linux/sbrk.c
+ libos/linux/setegid.c
+ libos/linux/seteuid.c
+ libos/linux/setgid.c
+ libos/linux/setgroups.c
+ libos/linux/setitimer.c
+ libos/linux/setpgid.c
+ libos/linux/setrlimit.c
+ libos/linux/setuid.c
+ libos/linux/sigaction.c
+ libos/linux/signal.c
+ libos/linux/sigpending.c
+ libos/linux/sigprocmask.c
+ libos/linux/sigsuspend.c
+ libos/linux/sleep.c
+ libos/linux/stat.c
+ libos/linux/symlink.c
+ libos/linux/tcflow.c
+ libos/linux/tcflush.c
+ libos/linux/tcgetattr.c
+ libos/linux/tcgetpgrp.c
+ libos/linux/tcgetwinsize.c
+ libos/linux/tcsetattr.c
+ libos/linux/tcsetpgrp.c
+ libos/linux/tcsetwinsize.c
+ libos/linux/times.c
+ libos/linux/ttyname.c
+ libos/linux/ttyname_r.c
+ libos/linux/umask.c
+ libos/linux/utils/make-dirent.c
+ libos/linux/utils/make-errno.c
+ libos/linux/utils/make-fcntl.c
+ libos/linux/utils/make-ioctl.c
+ libos/linux/utils/make-mman.c
+ libos/linux/utils/make-poll.c
+ libos/linux/utils/make-resource.c
+ libos/linux/utils/make-resource.h
+ libos/linux/utils/make-signal.c
+ libos/linux/utils/make-syscall.c
+ libos/linux/utils/make-sysconf.c
+ libos/linux/utils/make-termios.c
+ libos/linux/utils/make-time.c
+ libos/linux/utils/make-wait.c
+ libos/linux/vfork.c
+ libos/linux/wait3.c
+ libos/linux/waitpid.c
+ libos/meson.build
+ libos/semihost/fake/fake_getentropy.c
+ libos/semihost/fake/fake_getrlimit.c
+ libos/semihost/fake/fake_gettimeofday.c
+ libos/semihost/fake/fake_setrlimit.c
+ test/test-ctype/CMakeLists.txt
+ test/test-ctype/meson.build
+ test/test-ctype/test-iswctype.c
+ test/test-environ.c
+ test/test-hosted-exit-fail.c
+ test/test-math/test-add.c
+ test/test-math/test-scalbn.5c
+ test/test-math/test-scalbn.c
+ test/test-posix/test-alarm.c
+ test/test-posix/test-fnmatch.c
+ test/test-posix/test-getdelim.c
+ test/test-posix/test-getrlimit.c
+ test/test-posix/test-grp.c
+ test/test-posix/test-popen.c
+ test/test-posix/test-pwd.c
+ test/test-posix/test-setrlimit.c
+ test/test-posix/test-signal.c
+ test/test-posix/test-stat.c
+ test/test-posix/test-system.c
+ test/test-stdio/test-fdevopen.c
+ test/test-stdio/test-fflush.c
+ test/test-stdio/test-freopen.c
+ test/test-stdlib/test-double-free.c
+ test/test-string/CMakeLists.txt
+ test/test-string/test-strerror.c
+Copyright: 2026 Keith Packard
 License: BSD3-1
 
 Files: libc/ctype/ctype_extended.h
@@ -1971,6 +1997,12 @@ License: BSD3-1
 
 Files: libc/machine/xtensa/meson.build
 Copyright: 2019 Jonathan McDowell
+License: BSD3-1
+
+Files: libc/stdio/fopencookie.c
+ test/test-stdio/test-fopencookie.c
+ test/test-stdio/test-open_memstream.c
+Copyright: 2026 Alexey Lapshin
 License: BSD3-1
 
 Files: libc/stdio/sprintf_s.c
@@ -3490,7 +3522,6 @@ Files: .clang-format
  .github/workflows/variants
  .github/workflows/zephyr.yml
  .github/zephyr
- .github/zephyr-files.txt
  .github/zephyr-packages.txt
  .gitignore
  README.md
@@ -3499,6 +3530,7 @@ Files: .clang-format
  cmake/TC-rx.cmake
  cmake/TC-thumbv6m.cmake
  cmake/TC-thumbv7m.cmake
+ cmake/TC-x86_64.cmake
  cmake/have-bitfields-in-packed-structs.c
  cmake/have-cc-inhibit-loop-to-libcall.c
  doc/build.md
@@ -3512,13 +3544,19 @@ Files: .clang-format
  doc/printf.md
  doc/releasing.md
  doc/testing.md
+ doc/thread-safety.md
  doc/tls.md
  doc/using.md
  hello-world/README.md
  libc/ctype/ctype.tex
+ libc/include/sys/mman.h
+ libc/include/sys/statvfs.h
  libc/libc.in.xml
  libc/machine/aarch64/sys/fcntl.h
  libc/machine/hexagon/longjmp.S
+ libc/machine/hexagon/machine/fenv-fp.h
+ libc/machine/hexagon/machine/fenv.h
+ libc/machine/hexagon/machine/meson.build
  libc/machine/hexagon/meson.build
  libc/machine/hexagon/setjmp.S
  libc/machine/hexagon/tls.c
@@ -3537,27 +3575,62 @@ Files: .clang-format
  libm/fenv/fenv.tex
  libm/ld/files
  libm/libm.in.xml
+ libos/dummyhost/fstatvfs.c
+ libos/dummyhost/statvfs.c
+ libos/linux/_statvfsbuf.c
+ libos/linux/fstatvfs.c
+ libos/linux/local-statfs.h
+ libos/linux/madvise-gnu.c
+ libos/linux/madvise.c
+ libos/linux/mlock.c
+ libos/linux/mlockall_munlockall.c
+ libos/linux/mmap.c
+ libos/linux/mprotect.c
+ libos/linux/msync.c
+ libos/linux/munlock.c
+ libos/linux/munmap.c
+ libos/linux/statvfs.c
  libos/linux/utils/dirent64.json
  libos/linux/utils/make-bits
  libos/linux/utils/make-struct
  libos/linux/utils/sigaction.json
  libos/linux/utils/siginfo.json
+ libos/linux/utils/statfs.json
+ libos/linux/utils/statfs64.json
  libos/linux/utils/statx.json
  libos/linux/utils/struct-analyze.c
  libos/linux/utils/termios.json
  libos/linux/utils/tms.json
  libos/linux/utils/type-analyze.c
+ libos/semihost/common/rename.c
+ libos/semihost/fake/fake_access.c
+ libos/semihost/fake/fake_closedir.c
+ libos/semihost/fake/fake_fstatvfs.c
+ libos/semihost/fake/fake_ftruncate.c
+ libos/semihost/fake/fake_getcwd.c
+ libos/semihost/fake/fake_opendir.c
+ libos/semihost/fake/fake_readdir.c
+ libos/semihost/fake/fake_rename.c
+ libos/semihost/fake/fake_statvfs.c
+ libos/semihost/machine/hexagon/hexagon_access.c
  libos/semihost/machine/hexagon/hexagon_close.c
+ libos/semihost/machine/hexagon/hexagon_closedir.c
  libos/semihost/machine/hexagon/hexagon_errno.c
  libos/semihost/machine/hexagon/hexagon_exit.c
  libos/semihost/machine/hexagon/hexagon_flen.c
  libos/semihost/machine/hexagon/hexagon_fstat.c
  libos/semihost/machine/hexagon/hexagon_ftell.c
+ libos/semihost/machine/hexagon/hexagon_ftruncate.c
  libos/semihost/machine/hexagon/hexagon_get_cmdline.c
+ libos/semihost/machine/hexagon/hexagon_getcwd.c
+ libos/semihost/machine/hexagon/hexagon_gettimeofday.c
  libos/semihost/machine/hexagon/hexagon_isatty.c
  libos/semihost/machine/hexagon/hexagon_lseek.c
  libos/semihost/machine/hexagon/hexagon_open.c
+ libos/semihost/machine/hexagon/hexagon_opendir.c
  libos/semihost/machine/hexagon/hexagon_read.c
+ libos/semihost/machine/hexagon/hexagon_readdir.c
+ libos/semihost/machine/hexagon/hexagon_rename.c
  libos/semihost/machine/hexagon/hexagon_semihost.c
  libos/semihost/machine/hexagon/hexagon_semihost.h
  libos/semihost/machine/hexagon/hexagon_stat.c
@@ -3660,6 +3733,7 @@ Files: .clang-format
  test/CP720
  test/test-argv.c
  test/test-atomic.c
+ test/test-cdefs-cxx03.cpp
  test/test-lseek-overflow.c
  test/test-math/.clang-format-ignore
  test/test-math/Makefile
@@ -3669,8 +3743,18 @@ Files: .clang-format
  test/test-math/test-float.5c
  test/test-math/test-long-double-gen.5c
  test/test-math/test-long-double-vec.h
+ test/test-posix/test-access.c
+ test/test-posix/test-dirent.c
+ test/test-posix/test-ftrunc.c
+ test/test-posix/test-getcwd.c
+ test/test-posix/test-mmap.c
+ test/test-posix/test-posix-time.c
+ test/test-posix/test-rename.c
+ test/test-posix/test-statvfs.c
+ test/test-stdio/test-bufio-lock-init.c
  test/test-stdio/test-sprintf-time.c
  test/test-strftime.c
+ test/test-thread-safety.c
  test/test-wcsftime.c
  test/testsuite/newlib.time/tzset.c
 Copyright:
@@ -4330,61 +4414,6 @@ Files: libc/include/getopt.h
 Copyright: 1997 Gregory Pietsch
 License: Other-3
 
-Files: libc/include/machine/_arc4random.h
- libc/stdlib/arc4random.c
- libc/stdlib/chacha_private.h
-Copyright: 1996, David Mazieres <dm@uun.org>
- 2008, Damien Miller <djm@openbsd.org>
- 2013, Markus Friedl <markus@openbsd.org>
- 2014, Theo de Raadt <deraadt@openbsd.org>
-License: Other-4
-
-Files: libc/stdlib/arc4random_uniform.c
-Copyright: 2008, Damien Miller <djm@openbsd.org>
-License: Other-4
-
-Files: libc/stdlib/reallocarray.c
-Copyright: 2008 Otto Moerbeek <otto@drijf.net>
-License: Other-4
-
-Files: libc/string/strlcat.c
- libc/string/strlcpy.c
- libc/string/wcslcat.c
- libc/string/wcslcpy.c
-Copyright: 1998, 2015 Todd C. Miller <millert@openbsd.org>
-License: Other-4
-
-Files: libc/string/timingsafe_bcmp.c
-Copyright: 2010 Damien Miller.
-License: Other-4
-
-Files: libc/string/timingsafe_memcmp.c
-Copyright: 2014 Google Inc.
-License: Other-4
-
-Files: libm/ld/common/polevll.c
- libm/ld/ld128/e_expl.c
- libm/ld/ld128/e_lgammal_r.c
- libm/ld/ld128/e_log10l.c
- libm/ld/ld128/e_log2l.c
- libm/ld/ld128/e_logl.c
- libm/ld/ld128/s_expm1l.c
- libm/ld/ld128/s_log1pl.c
- libm/ld/ld80/e_expl.c
- libm/ld/ld80/e_log10l.c
- libm/ld/ld80/e_log2l.c
- libm/ld/ld80/e_logl.c
- libm/ld/ld80/e_powl.c
- libm/ld/ld80/e_tgammal.c
- libm/ld/ld80/s_expm1l.c
- libm/ld/ld80/s_log1pl.c
-Copyright: 2008 Stephen L. Moshier <steve@moshier.net>
-License: Other-4
-
-Files: libm/ld/ld128/e_tgammal.c
-Copyright: 2011 Martynas Venckus <martynas@openbsd.org>
-License: Other-4
-
 Files: libc/include/machine/fastmath.h
  libc/include/machine/ieeefp.h
  libc/include/machine/setjmp.h
@@ -4392,37 +4421,37 @@ Files: libc/include/machine/fastmath.h
  libc/include/machine/types.h
  libc/machine/x86/setjmp-32.S
 Copyright: 1991 DJ Delorie
-License: Other-5
+License: Other-4
 
 Files: libc/include/sched.h
  libc/include/sys/sched.h
 Copyright: 1989-2010. On-Line Applications Research Corporation (OAR).
-License: Other-6
+License: Other-5
 
 Files: libc/include/sys/features.h
 Copyright: 1989-2014.  On-Line Applications Research Corporation (OAR).
-License: Other-6
+License: Other-5
 
 Files: libc/string/strsignal.c
 Copyright: 2010, 2017. On-Line Applications Research Corporation (OAR).
-License: Other-6
+License: Other-5
 
 Files: libc/machine/amdgcn/abort.c
  libc/machine/amdgcn/atexit.c
  libc/machine/amdgcn/getreent.c
  libc/machine/amdgcn/signal.c
 Copyright: 2014-2017 Mentor Graphics.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/amdgcn/exit-value.h
  libc/machine/amdgcn/mlock.c
 Copyright: 2017 Mentor Graphics.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/bfin/longjmp.S
  libc/machine/bfin/setjmp.S
 Copyright: 2006 Analog Devices, Inc.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/cr16/getenv.c
  libc/machine/cr16/sys/libh.h
@@ -4432,11 +4461,11 @@ Files: libc/machine/cr16/getenv.c
  libc/machine/crx/sys/libh.h
  libc/machine/crx/sys/syscall.h
 Copyright: 2004 National Semiconductor Corporation
-License: Other-7
+License: Other-6
 
 Files: libc/machine/cr16/sys/asm.h
 Copyright: 2012 National Semiconductor Corporation
-License: Other-7
+License: Other-6
 
 Files: libc/machine/ft32/memcpy.S
  libc/machine/ft32/memset.S
@@ -4446,28 +4475,28 @@ Files: libc/machine/ft32/memcpy.S
  libc/machine/ft32/strcpy.S
  libc/machine/ft32/strlen.S
 Copyright: 2014 FTDI (support@ftdichip.com)
-License: Other-7
+License: Other-6
 
 Files: libc/machine/m68hc11/setjmp.S
 Copyright: 1999, 2000, 2001, 2002 Stephane Carrez (stcarrez@nerim.fr)
-License: Other-7
+License: Other-6
 
 Files: libc/machine/m68k/memcpy.S
  libc/machine/m68k/memset.S
 Copyright: 2007 mocom software GmbH & Co KG)
-License: Other-7
+License: Other-6
 
 Files: libc/machine/mips/strlen.c
 Copyright: 2001, 2002 Red Hat, Inc.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/mips/strncpy.c
 Copyright: 2001 Red Hat, Inc.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/moxie/setjmp.S
 Copyright: 2009, 2019  Anthony Green
-License: Other-7
+License: Other-6
 
 Files: libc/machine/nvptx/_exit.c
  libc/machine/nvptx/abort.c
@@ -4478,51 +4507,51 @@ Files: libc/machine/nvptx/_exit.c
  libc/machine/nvptx/reallocr.c
  libc/machine/nvptx/write.c
 Copyright: 2014-2018 Mentor Graphics.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/nvptx/assert.c
  libc/machine/nvptx/free.c
  libc/machine/nvptx/malloc.c
  libc/machine/nvptx/realloc.c
 Copyright: 2016-2018 Mentor Graphics.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/nvptx/printf.c
  libc/machine/nvptx/putchar.c
  libc/machine/nvptx/puts.c
 Copyright: 2015-2018 Mentor Graphics.
-License: Other-7
+License: Other-6
 
 Files: libc/machine/cris/include/pthread.h
  libc/machine/cris/sys/errno.h
  libc/machine/cris/sys/fcntl.h
  libc/machine/cris/sys/signal.h
 Copyright: 2001, 2004, 2005 Axis Communications AB.
-License: Other-8
+License: Other-7
 
 Files: libc/machine/cris/libcdtor.c
 Copyright: 1999, 2000, 2003, 2004, 2005 Axis Communications.
-License: Other-8
+License: Other-7
 
 Files: libc/machine/cris/memcpy.c
 Copyright: 1994-2005 Axis Communications.
-License: Other-8
+License: Other-7
 
 Files: libc/machine/cris/memmove.c
 Copyright: 2000-2005 Axis Communications.
-License: Other-8
+License: Other-7
 
 Files: libc/machine/cris/memset.c
 Copyright: 1999-2005 Axis Communications.
-License: Other-8
+License: Other-7
 
 Files: libc/machine/cris/setjmp.c
 Copyright: 1993-2005 Axis Communications.
-License: Other-8
+License: Other-7
 
 Files: test/testsuite/newlib.string/memmove1.c
 Copyright: 2005 Axis Communications.
-License: Other-8
+License: Other-7
 
 Files: libc/machine/hppa/memchr.S
  libc/machine/hppa/memcmp.S
@@ -4537,7 +4566,7 @@ Files: libc/machine/hppa/memchr.S
  libc/machine/hppa/strncmp.S
  libc/machine/hppa/strncpy.S
 Copyright: 1986 HEWLETT-PACKARD COMPANY
-License: Other-9
+License: Other-8
 
 Files: libc/machine/i960/memccpy.S
  libc/machine/i960/memccpy_ca.S
@@ -4568,54 +4597,54 @@ Files: libc/machine/i960/memccpy.S
  libc/machine/i960/strpbrk.S
  libc/machine/i960/strrchr.S
 Copyright: 1993 Intel Corporation
-License: Other-10
+License: Other-9
 
 Files: libc/machine/msp430/setjmp.S
 Copyright: 2013  Red Hat, Inc.
-License: Other-11
+License: Other-10
 
 Files: libc/machine/tic4x/setjmp.S
 Copyright: 2004 Michael Hayes <m.hayes@elec.canterbury.ac.nz>.
-License: Other-12
+License: Other-11
 
 Files: libc/machine/xc16x/putchar.c
  libc/machine/xc16x/puts.c
  libc/machine/xc16x/setjmp.S
 Copyright: 2006 KPIT Cummins
  2009 Conny Marco Menebröcker
-License: Other-13
+License: Other-12
 
 Files: libc/machine/xtensa/machine/core-isa.h
 Copyright: 1999-2010 Tensilica Inc.
-License: Other-14
+License: Other-13
 
 Files: libc/machine/xtensa/memcpy.S
 Copyright: 2002-2008 Tensilica Inc.
-License: Other-14
+License: Other-13
 
 Files: libc/machine/xtensa/memset.S
  libc/machine/xtensa/strcpy.S
  libc/machine/xtensa/strlen.S
  libc/machine/xtensa/strncpy.S
 Copyright: 2001-2008 Tensilica Inc.
-License: Other-14
+License: Other-13
 
 Files: libc/machine/xtensa/setjmp.S
 Copyright: 2001-2006 Tensilica Inc.
-License: Other-14
+License: Other-13
 
 Files: libc/machine/xtensa/strcmp.S
 Copyright: 2001-20012 Tensilica Inc.
-License: Other-14
+License: Other-13
 
 Files: libc/machine/xtensa/xtensa-asm.h
 Copyright: 2006 Tensilica Inc.
-License: Other-14
+License: Other-13
 
 Files: libc/string/strverscmp.c
  libm/common/nexttowardf.c
 Copyright: 2005-2014 Rich Felker, et al.
-License: Other-14
+License: Other-13
 
 Files: test/libc-testsuite/basename.c
  test/libc-testsuite/dirname.c
@@ -4628,22 +4657,22 @@ Files: test/libc-testsuite/basename.c
  test/libc-testsuite/strtol.c
  test/libc-testsuite/wcstol.c
 Copyright: 2005-2020 Rich Felker
-License: Other-14
+License: Other-13
 
 Files: libc/machine/z8k/memcmp.S
  libc/machine/z8k/memcpy.S
  libc/machine/z8k/memmove.S
  libc/machine/z8k/memset.S
 Copyright: 2004 Christian Groessler <chris@groessler.org>
-License: Other-15
+License: Other-14
 
 Files: libc/misc/fini.c
 Copyright: 2010 CodeSourcery, Inc.
-License: Other-15
+License: Other-14
 
 Files: libc/misc/init.c
 Copyright: 2004 CodeSourcery, LLC
-License: Other-15
+License: Other-14
 
 Files: libc/signal/signal.tex
  libc/string/bcmp.c
@@ -4690,96 +4719,96 @@ Files: libc/signal/signal.tex
  libc/time/mktime.c
  libc/time/time.c
  libc/time/time.tex
- libm/test/acos_vec.c
- libm/test/acosf_vec.c
- libm/test/acosh_vec.c
- libm/test/acoshf_vec.c
- libm/test/asin_vec.c
- libm/test/asinf_vec.c
- libm/test/asinh_vec.c
- libm/test/asinhf_vec.c
- libm/test/atan2_vec.c
- libm/test/atan2f_vec.c
- libm/test/atan_vec.c
- libm/test/atanf_vec.c
- libm/test/atanh_vec.c
- libm/test/atanhf_vec.c
- libm/test/ceil_vec.c
- libm/test/ceilf_vec.c
- libm/test/conv_vec.c
- libm/test/convert.c
- libm/test/cos_vec.c
- libm/test/cosf_vec.c
- libm/test/cosh_vec.c
- libm/test/coshf_vec.c
- libm/test/dcvt.c
- libm/test/dvec.c
- libm/test/erf_vec.c
- libm/test/erfc_vec.c
- libm/test/erfcf_vec.c
- libm/test/erff_vec.c
- libm/test/exp_vec.c
- libm/test/expf_vec.c
- libm/test/fabs_vec.c
- libm/test/fabsf_vec.c
- libm/test/floor_vec.c
- libm/test/floorf_vec.c
- libm/test/fmod_vec.c
- libm/test/fmodf_vec.c
- libm/test/gamma_vec.c
- libm/test/gammaf_vec.c
- libm/test/hypot_vec.c
- libm/test/hypotf_vec.c
- libm/test/iconv_vec.c
- libm/test/j0_vec.c
- libm/test/j0f_vec.c
- libm/test/j1_vec.c
- libm/test/j1f_vec.c
- libm/test/jn_vec.c
- libm/test/jnf_vec.c
- libm/test/log10_vec.c
- libm/test/log10f_vec.c
- libm/test/log1p_vec.c
- libm/test/log1pf_vec.c
- libm/test/log2_vec.c
- libm/test/log2f_vec.c
- libm/test/log_vec.c
- libm/test/logf_vec.c
- libm/test/math.c
- libm/test/math2.c
- libm/test/sin_vec.c
- libm/test/sinf_vec.c
- libm/test/sinh_vec.c
- libm/test/sinhf_vec.c
- libm/test/sprint_ivec.c
- libm/test/sprint_vec.c
- libm/test/sqrt_vec.c
- libm/test/sqrtf_vec.c
- libm/test/string.c
- libm/test/tan_vec.c
- libm/test/tanf_vec.c
- libm/test/tanh_vec.c
- libm/test/tanhf_vec.c
- libm/test/test.c
- libm/test/test.h
- libm/test/test_ieee.c
- libm/test/test_is.c
- libm/test/trunc_vec.c
- libm/test/truncf_vec.c
- libm/test/y0_vec.c
- libm/test/y0f_vec.c
- libm/test/y1_vec.c
- libm/test/y1f_vec.c
- libm/test/yn_vec.c
- libm/test/ynf_vec.c
+ test/testsuite/newlib.math/acos_vec.c
+ test/testsuite/newlib.math/acosf_vec.c
+ test/testsuite/newlib.math/acosh_vec.c
+ test/testsuite/newlib.math/acoshf_vec.c
+ test/testsuite/newlib.math/asin_vec.c
+ test/testsuite/newlib.math/asinf_vec.c
+ test/testsuite/newlib.math/asinh_vec.c
+ test/testsuite/newlib.math/asinhf_vec.c
+ test/testsuite/newlib.math/atan2_vec.c
+ test/testsuite/newlib.math/atan2f_vec.c
+ test/testsuite/newlib.math/atan_vec.c
+ test/testsuite/newlib.math/atanf_vec.c
+ test/testsuite/newlib.math/atanh_vec.c
+ test/testsuite/newlib.math/atanhf_vec.c
+ test/testsuite/newlib.math/ceil_vec.c
+ test/testsuite/newlib.math/ceilf_vec.c
+ test/testsuite/newlib.math/conv_vec.c
+ test/testsuite/newlib.math/convert.c
+ test/testsuite/newlib.math/cos_vec.c
+ test/testsuite/newlib.math/cosf_vec.c
+ test/testsuite/newlib.math/cosh_vec.c
+ test/testsuite/newlib.math/coshf_vec.c
+ test/testsuite/newlib.math/dcvt.c
+ test/testsuite/newlib.math/dvec.c
+ test/testsuite/newlib.math/erf_vec.c
+ test/testsuite/newlib.math/erfc_vec.c
+ test/testsuite/newlib.math/erfcf_vec.c
+ test/testsuite/newlib.math/erff_vec.c
+ test/testsuite/newlib.math/exp_vec.c
+ test/testsuite/newlib.math/expf_vec.c
+ test/testsuite/newlib.math/fabs_vec.c
+ test/testsuite/newlib.math/fabsf_vec.c
+ test/testsuite/newlib.math/floor_vec.c
+ test/testsuite/newlib.math/floorf_vec.c
+ test/testsuite/newlib.math/fmod_vec.c
+ test/testsuite/newlib.math/fmodf_vec.c
+ test/testsuite/newlib.math/gamma_vec.c
+ test/testsuite/newlib.math/gammaf_vec.c
+ test/testsuite/newlib.math/hypot_vec.c
+ test/testsuite/newlib.math/hypotf_vec.c
+ test/testsuite/newlib.math/iconv_vec.c
+ test/testsuite/newlib.math/j0_vec.c
+ test/testsuite/newlib.math/j0f_vec.c
+ test/testsuite/newlib.math/j1_vec.c
+ test/testsuite/newlib.math/j1f_vec.c
+ test/testsuite/newlib.math/jn_vec.c
+ test/testsuite/newlib.math/jnf_vec.c
+ test/testsuite/newlib.math/log10_vec.c
+ test/testsuite/newlib.math/log10f_vec.c
+ test/testsuite/newlib.math/log1p_vec.c
+ test/testsuite/newlib.math/log1pf_vec.c
+ test/testsuite/newlib.math/log2_vec.c
+ test/testsuite/newlib.math/log2f_vec.c
+ test/testsuite/newlib.math/log_vec.c
+ test/testsuite/newlib.math/logf_vec.c
+ test/testsuite/newlib.math/math.c
+ test/testsuite/newlib.math/math2.c
+ test/testsuite/newlib.math/sin_vec.c
+ test/testsuite/newlib.math/sinf_vec.c
+ test/testsuite/newlib.math/sinh_vec.c
+ test/testsuite/newlib.math/sinhf_vec.c
+ test/testsuite/newlib.math/sprint_ivec.c
+ test/testsuite/newlib.math/sprint_vec.c
+ test/testsuite/newlib.math/sqrt_vec.c
+ test/testsuite/newlib.math/sqrtf_vec.c
+ test/testsuite/newlib.math/string.c
+ test/testsuite/newlib.math/tan_vec.c
+ test/testsuite/newlib.math/tanf_vec.c
+ test/testsuite/newlib.math/tanh_vec.c
+ test/testsuite/newlib.math/tanhf_vec.c
+ test/testsuite/newlib.math/test.c
+ test/testsuite/newlib.math/test.h
+ test/testsuite/newlib.math/test_ieee.c
+ test/testsuite/newlib.math/test_is.c
+ test/testsuite/newlib.math/trunc_vec.c
+ test/testsuite/newlib.math/truncf_vec.c
+ test/testsuite/newlib.math/y0_vec.c
+ test/testsuite/newlib.math/y0f_vec.c
+ test/testsuite/newlib.math/y1_vec.c
+ test/testsuite/newlib.math/y1f_vec.c
+ test/testsuite/newlib.math/yn_vec.c
+ test/testsuite/newlib.math/ynf_vec.c
 Copyright: 1994 Cygnus Support.
-License: Other-16
+License: Other-15
 
 Files: libc/stdio/atod_ryu.c
  libc/stdio/atof_ryu.c
  libc/stdio/ryu/ryu_parse.h
 Copyright: 2019 Ulf Adams
-License: Other-17
+License: Other-16
 
 Files: libc/stdio/dtoa_ryu.c
  libc/stdio/ftoa_ryu.c
@@ -4795,7 +4824,65 @@ Files: libc/stdio/dtoa_ryu.c
  libc/stdio/ryu_table.c
  libc/stdio/ryu_umul128.c
 Copyright: 2018 Ulf Adams
+License: Other-16
+
+Files: libc/stdio/open_memstream.c
+Copyright: Text: 2024-2026 Espressif Systems (Shanghai) CO LTD
 License: Other-17
+
+Files: libc/stdlib/arc4random.c
+ libc/stdlib/chacha_private.h
+Copyright: 1996, David Mazieres <dm@uun.org>
+ 2008, Damien Miller <djm@openbsd.org>
+ 2013, Markus Friedl <markus@openbsd.org>
+ 2014, Theo de Raadt <deraadt@openbsd.org>
+License: Other-18
+
+Files: libc/stdlib/arc4random_uniform.c
+Copyright: 2008, Damien Miller <djm@openbsd.org>
+License: Other-18
+
+Files: libc/stdlib/reallocarray.c
+Copyright: 2008 Otto Moerbeek <otto@drijf.net>
+License: Other-18
+
+Files: libc/string/strlcat.c
+ libc/string/strlcpy.c
+ libc/string/wcslcat.c
+ libc/string/wcslcpy.c
+Copyright: 1998, 2015 Todd C. Miller <millert@openbsd.org>
+License: Other-18
+
+Files: libc/string/timingsafe_bcmp.c
+Copyright: 2010 Damien Miller.
+License: Other-18
+
+Files: libc/string/timingsafe_memcmp.c
+Copyright: 2014 Google Inc.
+License: Other-18
+
+Files: libm/ld/common/polevll.c
+ libm/ld/ld128/e_expl.c
+ libm/ld/ld128/e_lgammal_r.c
+ libm/ld/ld128/e_log10l.c
+ libm/ld/ld128/e_log2l.c
+ libm/ld/ld128/e_logl.c
+ libm/ld/ld128/s_expm1l.c
+ libm/ld/ld128/s_log1pl.c
+ libm/ld/ld80/e_expl.c
+ libm/ld/ld80/e_log10l.c
+ libm/ld/ld80/e_log2l.c
+ libm/ld/ld80/e_logl.c
+ libm/ld/ld80/e_powl.c
+ libm/ld/ld80/e_tgammal.c
+ libm/ld/ld80/s_expm1l.c
+ libm/ld/ld80/s_log1pl.c
+Copyright: 2008 Stephen L. Moshier <steve@moshier.net>
+License: Other-18
+
+Files: libm/ld/ld128/e_tgammal.c
+Copyright: 2011 Martynas Venckus <martynas@openbsd.org>
+License: Other-18
 
 Files: libc/stdlib/drand48.c
  libc/stdlib/erand48.c
@@ -4809,28 +4896,28 @@ Files: libc/stdlib/drand48.c
  libc/stdlib/seed48.c
  libc/stdlib/srand48.c
 Copyright: 1993 Martin Birgmeier
-License: Other-18
+License: Other-19
 
 Files: libc/stdlib/gdtoa.h
 Copyright: 1998 Lucent Technologies
-License: Other-19
+License: Other-20
 
 Files: libc/stdlib/getopt.c
 Copyright: 1997 Gregory Pietsch
-License: Other-20
+License: Other-21
 
 Files: libc/stdlib/mprec.h
 Copyright: 1991 AT&T.
-License: Other-21
+License: Other-22
 
 Files: libc/string/wcsnlen.c
 Copyright: 2003, Artem B. Bityuckiy (dedekind@mail.ru).
-License: Other-22
+License: Other-23
 
 Files: libc/xdr/xdr_private.c
  libc/xdr/xdr_private.h
 Copyright: 2009 Charles S. Wilson
-License: Other-23
+License: Other-24
 
 Files: libm/common/fdlibm.h
  libm/common/isgreater.c
@@ -5009,7 +5096,7 @@ Files: libm/common/fdlibm.h
  libm/math/sr_lgamma.c
  libm/math/srf_lgamma.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-24
+License: Other-25
 
 Files: libm/common/s_remquo.c
  libm/common/sf_remquo.c
@@ -5017,12 +5104,12 @@ Files: libm/common/s_remquo.c
  libm/ld/common/e_asinl.c
  libm/ld/common/e_atan2l.c
  libm/ld/common/e_lgammal.c
- libm/ld/common/k_rem_pio2.c
+ libm/ld/common/k_rem_pio2l.c
  libm/ld/ld128/s_remquol.c
  libm/ld/ld80/e_fmodl.c
  libm/ld/ld80/s_remquol.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-25
+License: Other-26
 
 Files: libm/ld/ld128/k_cosl.c
  libm/ld/ld128/k_sinl.c
@@ -5030,18 +5117,18 @@ Files: libm/ld/ld128/k_cosl.c
  libm/ld/ld80/k_sinl.c
 Copyright: 1993 Sun Microsystems, Inc.
  2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
-License: Other-25
+License: Other-26
 
 Files: libm/ld/common/s_cbrtl.c
 Copyright: 1993 Sun Microsystems, Inc.
  2009-2011, Bruce D. Evans, Steven G. Kargl, David Schultz.
-License: Other-26
+License: Other-27
 
 Files: libm/ld/ld128/e_rem_pio2l.h
  libm/ld/ld80/e_rem_pio2l.h
 Copyright: 1993 Sun Microsystems, Inc.
  2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
-License: Other-27
+License: Other-28
 
 Files: libm/machine/x86/f_llrint.c
  libm/machine/x86/f_llrintf.c
@@ -5053,7 +5140,7 @@ Files: libm/machine/x86/f_llrint.c
  libm/machine/x86/f_rintf.c
  libm/machine/x86/f_rintl.c
 Copyright: 2007 Dave Korn
-License: Other-28
+License: Other-29
 
 Files: libc/machine/d10v/setjmp.S
  libc/machine/d30v/setjmp.S
@@ -6366,6 +6453,7 @@ License: Default-1
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  OF THE POSSIBILITY OF SUCH DAMAGE.
 
+
 License: FreeBSD-1
  This copyrighted material is made available to anyone wishing to use,
  modify, copy, or redistribute it subject to the terms and conditions
@@ -6410,19 +6498,6 @@ License: Other-3
  gpietsch@comcast.net
 
 License: Other-4
- Permission to use, copy, modify, and distribute this software for any
- purpose with or without fee is hereby granted, provided that the above
- copyright notice and this permission notice appear in all copies.
- .
- THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
- WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
- ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
- WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
- ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
- OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
-
-License: Other-5
  Redistribution, modification, and use in source and binary forms is permitted
  provided that the above copyright notice and following paragraph are
  duplicated in all such forms.
@@ -6430,7 +6505,7 @@ License: Other-5
  This file is distributed WITHOUT ANY WARRANTY; without even the implied
  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-6
+License: Other-5
  Permission to use, copy, modify, and distribute this software for any
  purpose without fee is hereby granted, provided that this entire notice
  is included in all copies of any software which is or includes a copy
@@ -6441,7 +6516,7 @@ License: Other-6
  OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY OF THIS
  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
 
-License: Other-7
+License: Other-6
  The authors hereby grant permission to use, copy, modify, distribute,
  and license this software and its documentation for any purpose, provided
  that existing copyright notices are retained in all copies and that this
@@ -6452,7 +6527,7 @@ License: Other-7
  the new terms are clearly indicated on the first page of each file where
  they apply.
 
-License: Other-8
+License: Other-7
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6477,7 +6552,7 @@ License: Other-8
  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: Other-9
+License: Other-8
  To anyone who acknowledges that this file is provided "AS IS"
  without any express or implied warranty:
  permission to use, copy, modify, and distribute this file
@@ -6489,7 +6564,7 @@ License: Other-9
  Hewlett-Packard Company makes no representations about the
  suitability of this software for any purpose.
 
-License: Other-10
+License: Other-9
  Intel hereby grants you permission to copy, modify, and distribute this
  software and its documentation.  Intel grants this permission provided
  that the above copyright notice appears in all copies and that both the
@@ -6504,7 +6579,7 @@ License: Other-10
  Intel Corporation provides this AS IS, WITHOUT ANY WARRANTY, EXPRESS OR
  IMPLIED, INCLUDING, WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY
 
-License: Other-11
+License: Other-10
  This copyrighted material is made available to anyone wishing to use,
  modify, copy, or redistribute it subject to the terms and conditions
  of the BSD License.   This program is distributed in the hope that
@@ -6516,7 +6591,7 @@ License: Other-11
  the BSD License and may only be used or replicated with the express
  permission of Red Hat, Inc.
 
-License: Other-12
+License: Other-11
  The author hereby grant permission to use, copy, modify, distribute,
  and license this software and its documentation for any purpose, provided
  that existing copyright notices are retained in all copies and that this
@@ -6527,7 +6602,7 @@ License: Other-12
  the new terms are clearly indicated on the first page of each file where
  they apply.
 
-License: Other-13
+License: Other-12
  Redistribution and use in source and binary forms is permitted
  provided that the above copyright notice and following paragraph are
  duplicated in all such forms.
@@ -6535,7 +6610,7 @@ License: Other-13
  This file is distributed WITHOUT ANY WARRANTY; without even the implied
  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-14
+License: Other-13
  Permission is hereby granted, free of charge, to any person obtaining
  a copy of this software and associated documentation files (the
  Software"), to deal in the Software without restriction, including
@@ -6555,7 +6630,7 @@ License: Other-14
  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-License: Other-15
+License: Other-14
  Permission to use, copy, modify, and distribute this file
  for any purpose is hereby granted without fee, provided that
  the above copyright notice and this notice appears in all
@@ -6564,7 +6639,7 @@ License: Other-15
  This file is distributed WITHOUT ANY WARRANTY; without even the implied
  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-16
+License: Other-15
  Redistribution and use in source and binary forms are permitted
  provided that the above copyright notice and this paragraph are
  duplicated in all such forms and that any documentation,
@@ -6577,7 +6652,7 @@ License: Other-16
  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-17
+License: Other-16
  The contents of this file may be used under the terms of the Apache License,
  Version 2.0.
  .
@@ -6593,7 +6668,35 @@ License: Other-17
  is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  KIND, either express or implied.
 
+License: Other-17
+ SPDX-License-Identifier: Apache-2.0
+ .
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+ .
+ http://www.apache.org/licenses/LICENSE-2.0
+ .
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+
 License: Other-18
+ Permission to use, copy, modify, and distribute this software for any
+ purpose with or without fee is hereby granted, provided that the above
+ copyright notice and this permission notice appear in all copies.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR
+ ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES
+ WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN
+ ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
+ OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+License: Other-19
  You may redistribute unmodified or modified versions of this source
  code provided that the above copyright notice and this and the
  following conditions are retained.
@@ -6602,7 +6705,7 @@ License: Other-18
  of any kind. I shall in no event be liable for anything that happens
  to anyone/anything when using this software.
 
-License: Other-19
+License: Other-20
  Permission to use, copy, modify, and distribute this software and
  its documentation for any purpose and without fee is hereby
  granted, provided that the above copyright notice appear in all
@@ -6622,7 +6725,7 @@ License: Other-19
  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
  THIS SOFTWARE.
 
-License: Other-20
+License: Other-21
  This file and the accompanying getopt.h header file are hereby placed in the
  public domain without restrictions.  Just give the author credit, don't
  claim you wrote it or prevent anyone else from using it.
@@ -6630,7 +6733,7 @@ License: Other-20
  Gregory Pietsch's current e-mail address:
  gpietsch@comcast.net
 
-License: Other-21
+License: Other-22
  Permission to use, copy, modify, and distribute this software for any
  purpose without fee is hereby granted, provided that this entire notice
  is included in all copies of any software which is or includes a copy
@@ -6642,7 +6745,7 @@ License: Other-21
  REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
  OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
 
-License: Other-22
+License: Other-23
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the above copyright notice,
  this condition statement, and the following disclaimer are retained
@@ -6660,7 +6763,7 @@ License: Other-22
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
 
-License: Other-23
+License: Other-24
  Permission is hereby granted, free of charge, to any person obtaining a
  copy of this software and associated documentation files (the "Software"),
  to deal in the Software without restriction, including without limitation
@@ -6679,19 +6782,19 @@ License: Other-23
  ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
  OTHER DEALINGS IN THE SOFTWARE.
 
-License: Other-24
+License: Other-25
  Developed at SunPro, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-25
+License: Other-26
  Developed at SunSoft, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-26
+License: Other-27
  Developed at SunPro, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
@@ -6702,7 +6805,7 @@ License: Other-26
  written by Steven G. Kargl with input from Bruce D. Evans
  and David A. Schultz.
 
-License: Other-27
+License: Other-28
  Developed at SunSoft, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
@@ -6711,24 +6814,11 @@ License: Other-27
  .
  Optimized by Bruce D. Evans.
 
-License: Other-28
+License: Other-29
  x87 FP implementation contributed to Newlib by
  Dave Korn, November 2007.  This file is placed in the
  public domain.  Permission to use, copy, modify, and
  distribute this software is freely granted.
-
-License: Other-29
- Licensed under the Apache License, Version 2.0 (the "License");
- you may not use this file except in compliance with the License.
- You may obtain a copy of the License at
- .
- http://www.apache.org/licenses/LICENSE-2.0
- .
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
 
 License: UCB-1
  Redistribution and use in source and binary forms are permitted
