@@ -81,6 +81,7 @@ if tests_enable_posix_io
     'test-dprintf',
     'test-fgetc',
     'test-fgets-eof',
+    'test-fflush',
     'test-fopen',
     'test-fread-fwrite',
     'test-mktemp',
