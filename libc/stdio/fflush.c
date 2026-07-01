@@ -35,25 +35,30 @@
 
 #include "local-stdio.h"
 
+static int
+fflush_unlocked(FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = __fflush_locked(stream);
+    __funlock_return(stream, ret);
+}
+
 int
 fflush(FILE *stream)
 {
-    int ret = 0;
 #ifdef __STDIO_EXIT_FLUSH
     if (stream == NULL) {
-        void                _bufio_exit_flush(void) __weak;
         extern FILE * const stdout __weak;
         extern FILE * const stderr __weak;
         if (_bufio_exit_flush)
             _bufio_exit_flush();
         if (&stdout)
-            fflush(stdout);
+            fflush_unlocked(stdout);
         if (&stderr)
-            fflush(stderr);
+            fflush_unlocked(stderr);
         return 0;
     }
 #endif
-    __flockfile(stream);
-    ret = __fflush_locked(stream);
-    __funlock_return(stream, ret);
+    return fflush_unlocked(stream);
 }

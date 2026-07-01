@@ -262,7 +262,9 @@ bufio_remove_file(FILE *f)
 #define bufio_remove_file(f)
 #endif
 
-int __stdio_flags(const char *mode, int *optr);
+int  __stdio_flags(const char *mode, int *optr);
+
+void _bufio_exit_flush(void) __weak;
 
 #ifdef __STDIO_LOCKING
 void __flockfile_init(FILE *f);
