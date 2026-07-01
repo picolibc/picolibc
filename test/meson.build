@@ -138,7 +138,7 @@ foreach params : targets
   target_dir = params['dir']
   target_c_args = params['c_args']
 
-  _libs = [get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c_link' + target)]
   if is_variable(oslib_test + target)
     _libs += [get_variable(oslib_test + target)]
   endif
@@ -215,9 +215,9 @@ foreach params : targets
 
   if is_variable('lib_semihost_raw' + target) and test_machine == 'qemu'
 
-    _libs_raw = [get_variable('lib_c' + target)]
+    _libs_raw = [get_variable('lib_c_link' + target)]
     _libs_raw += [get_variable('lib_semihost_raw' + target)]
-    
+
     _lib_raw_files=[]
     foreach _lib_raw : _libs_raw
       _lib_raw_files += _lib_raw.full_path()
@@ -413,4 +413,8 @@ subdir('testsuite')
 
 if has_arm_semihost and oslib_test_variant == 'semihost'
   subdir('semihost')
+endif
+
+if build_shared
+  subdir('test-libdl')
 endif
