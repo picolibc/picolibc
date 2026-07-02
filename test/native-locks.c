@@ -56,7 +56,7 @@ libc_lock_init(void)
 {
     pthread_mutexattr_t mutexattr;
     pthread_mutexattr_init(&mutexattr);
-    pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+    pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_ERRORCHECK);
 
     pthread_mutex_init(&__lock___libc_recursive_mutex.mut, &mutexattr);
 }
@@ -77,11 +77,8 @@ static _Atomic int      in_use[MAX_LOCKS];
  */
 static __thread _LOCK_T tls_inited_lock;
 
-/* Create a new dynamic non-recursive lock */
-void                    __retarget_lock_init(_LOCK_T *lock);
-
-void
-__retarget_lock_init(_LOCK_T *lock)
+static void
+lock_init(_LOCK_T *lock, int kind)
 {
     int lock_id = 0;
 
@@ -91,7 +88,7 @@ __retarget_lock_init(_LOCK_T *lock)
         if (atomic_compare_exchange_strong(&in_use[lock_id], &expected, desired)) {
             pthread_mutexattr_t mutexattr;
             pthread_mutexattr_init(&mutexattr);
-            pthread_mutexattr_settype(&mutexattr, PTHREAD_MUTEX_RECURSIVE);
+            pthread_mutexattr_settype(&mutexattr, kind);
 
             pthread_mutex_init(&locks[lock_id].mut, &mutexattr);
             *lock = &locks[lock_id];
@@ -102,13 +99,22 @@ __retarget_lock_init(_LOCK_T *lock)
     }
 }
 
+/* Create a new dynamic non-recursive lock */
+void __retarget_lock_init(_LOCK_T *lock);
+
+void
+__retarget_lock_init(_LOCK_T *lock)
+{
+    lock_init(lock, PTHREAD_MUTEX_ERRORCHECK);
+}
+
 /* Create a new dynamic recursive lock */
 void __retarget_lock_init_recursive(_LOCK_T *lock);
 
 void
 __retarget_lock_init_recursive(_LOCK_T *lock)
 {
-    __retarget_lock_init(lock);
+    lock_init(lock, PTHREAD_MUTEX_RECURSIVE);
     /*
      * Recursive locks are always acquired via __retarget_lock_acquire_recursive,
      * never via __retarget_lock_acquire, so the tls_inited_lock check in
@@ -162,7 +168,9 @@ __retarget_lock_acquire(_LOCK_T lock)
      */
     assert(tls_inited_lock == NULL || tls_inited_lock == lock);
     tls_inited_lock = NULL;
-    pthread_mutex_lock(&lock->mut);
+    int ret = pthread_mutex_lock(&lock->mut);
+    assert(ret == 0);
+    (void)ret;
     tls_acquired_lock = lock;
 }
 
@@ -172,7 +180,9 @@ void __retarget_lock_acquire_recursive(_LOCK_T lock);
 void
 __retarget_lock_acquire_recursive(_LOCK_T lock)
 {
-    pthread_mutex_lock(&lock->mut);
+    int ret = pthread_mutex_lock(&lock->mut);
+    (void)ret;
+    assert(ret == 0);
 }
 
 /* Release non-recursive lock */
