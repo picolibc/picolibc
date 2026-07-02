@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019-2021 Keith Packard
+# Copyright © 2019-2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -42,7 +42,7 @@ project('picolibc', 'c',
 	],
 	license : 'BSD',
 	meson_version : '>= 0.61',
-	version: '1.8.11'
+	version: '1.8.12'
        )
 
 # When picolibc is embedded as a subproject you probably don't expect
