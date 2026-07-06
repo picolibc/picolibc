@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if !defined(__riscv) || !defined(__riscv_jvt)
+#if !defined(__riscv) || (!defined(__riscv_zcmt) && !defined(__riscv_xqccmt))
 
 const char    *get_message(void);
 
@@ -77,7 +77,7 @@ main(void)
     /*
      * This is a RISC-V specific feature.
      */
-#if !defined(__riscv) || !defined(__riscv_zcmt)
+#if !defined(__riscv) || (!defined(__riscv_zcmt) && !defined(__riscv_xqccmt))
     printf("jvt not supported for this target\n");
     return 77;
 #else
