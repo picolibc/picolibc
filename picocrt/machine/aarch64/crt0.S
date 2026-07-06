@@ -111,6 +111,26 @@ __identity_page_table:
   .global _start
   .type _start, %function
 _start:
+
+	/* Determine if SME or SME2 is available */
+	bl      __arm_has_sme
+	cbz     x0, .Lnosme
+
+	/* Clear TPIDR2_EL0 */
+	msr     S3_3_C13_C0_5, xzr
+	isb
+
+	/* set up Streaming SVE Vector Length (SVL) in SMCR_EL3 (4 LSB). */
+	mov     x2, #0xF
+
+	/* Try to set the maximum value supported by the architecture (2048). */
+	mrs     x1, s3_6_c1_c2_6 /* mrs  x1, smcr_el3 */
+	bfi     x1, x2, 0, 4
+	msr     s3_6_c1_c2_6, x1 /* msr  smcr_el3, x1 */
+	isb
+
+.Lnosme:
+
 #ifdef CRT0_LINUX
         mov x0, sp
 #else
@@ -146,24 +166,6 @@ _start:
 #endif // __ARM_FP
 #endif
 
-	/* Determine if SME or SME2 is available */
-	bl      __arm_has_sme
-	cbz     x0, .Lnosme
-
-	/* Clear TPIDR2_EL0 */
-	msr     S3_3_C13_C0_5, xzr
-	isb
-
-	/* set up Streaming SVE Vector Length (SVL) in SMCR_EL3 (4 LSB). */
-	mov     x2, #0xF
-
-	/* Try to set the maximum value supported by the architecture (2048). */
-	mrs     x1, s3_6_c1_c2_6 /* mrs  x1, smcr_el3 */
-	bfi     x1, x2, 0, 4
-	msr     s3_6_c1_c2_6, x1 /* msr  smcr_el3, x1 */
-	isb
-
-.Lnosme:
 	/* Jump into C code */
 	bl _cstart
   .size _start, .-_start
