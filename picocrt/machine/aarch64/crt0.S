@@ -142,6 +142,16 @@ __identity_page_table:
 #endif
 #endif /* CRT0_LINUX */
 
+        /*
+         *  op0   op1    CRn    CRm   op2
+         * 0b11 0b110 0b0001 0b0010 0b110
+         */
+#define SMCR_EL3 s3_6_c1_c2_6
+        /*
+         *  op0   op1    CRn    CRm   op2
+         * 0b11 0b000 0b0001 0b0010 0b110
+         */
+#define SMCR_EL1 S3_0_c1_c2_6
 
 /************ Entry point ************/
 
@@ -187,12 +197,17 @@ _start:
 #else
 #error "Unknown machine type"
 #endif
-#endif // __ARM_FP
-#endif
 
 	/* Determine if SME or SME2 is available */
 	bl      __arm_has_sme
 	cbz     x0, .Lnosme
+
+        /* Enable SME if running at EL1 */
+#if defined(MACHINE_qemu)
+        mrs     x0, BOOT_EL(CPACR)
+        ORR     x0, x0, #(0x3 << 24)
+        msr     BOOT_EL(CPACR), x0
+#endif
 
 	/* Clear TPIDR2_EL0 */
 	msr     S3_3_C13_C0_5, xzr
@@ -202,12 +217,17 @@ _start:
 	mov     x2, #0xF
 
 	/* Try to set the maximum value supported by the architecture (2048). */
-	mrs     x1, s3_6_c1_c2_6 /* mrs  x1, smcr_el3 */
+	mrs     x1, BOOT_EL(SMCR) /* mrs  x1, smcr */
 	bfi     x1, x2, 0, 4
-	msr     s3_6_c1_c2_6, x1 /* msr  smcr_el3, x1 */
+	msr     BOOT_EL(SMCR), x1 /* msr  smcr, x1 */
 	isb
 
 .Lnosme:
+
+
+#endif // __ARM_FP
+#endif
+
 	/* Jump into C code */
 	bl _cstart
   .size _start, .-_start
