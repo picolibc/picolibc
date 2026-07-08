@@ -1,3 +1,12 @@
+picolibc (1.8.11-3) unstable; urgency=medium
+
+  * Build with newer version of gcc-xtensa.
+
+  * Set Vcs-Browser to salsa mirror as cgit on keithp.com is no longer
+    available. Closes: #1132697.
+
+ -- Keith Packard <keithp@keithp.com>  Wed, 08 Jul 2026 08:18:32 -0700
+
 picolibc (1.8.11-2) unstable; urgency=medium
 
   * Cherry-pick patch to make flash section read-only
