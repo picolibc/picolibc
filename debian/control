@@ -8,7 +8,7 @@ Rules-Requires-Root: no
 Section: devel
 Homepage: https://keithp.com/picolibc
 Vcs-Git: git://keithp.com/git/picolibc.git -b debian
-Vcs-Browser: https://keithp.com/cgit/picolibc.git/
+Vcs-Browser: https://salsa.debian.org/electronics-team/toolchains/picolibc/-/tree/debian?ref_type=heads
 
 Package: picolibc-riscv64-unknown-elf
 Architecture: all
