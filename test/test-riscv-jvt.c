@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#if !defined(__riscv) || (!defined(__riscv_zcmt) && !defined(__riscv_xqccmt))
+#if defined(__riscv) && (defined(__riscv_zcmt) || defined(__riscv_xqccmt))
 
 const char    *get_message(void);
 
@@ -77,16 +77,22 @@ main(void)
     /*
      * This is a RISC-V specific feature.
      */
-#if !defined(__riscv) || (!defined(__riscv_zcmt) && !defined(__riscv_xqccmt))
-    printf("jvt not supported for this target\n");
-    return 77;
-#else
-
+#if defined(__riscv) && defined(__riscv_zcmt)
     __asm__("cm.jalt 32\n" // This is equivalent to `call func_table[32]`
             "cm.jt 0\n"    // This is equivalent to `tail func_table[0]`
     );
 
     printf("ERROR: cm.jt returned\n");
     return 1;
+#elif defined(__riscv) && defined(__riscv_xqccmt)
+    __asm__("qc.cm.jalt 32\n" // This is equivalent to `call func_table[32]`
+            "qc.cm.jt 0\n"    // This is equivalent to `tail func_table[0]`
+    );
+
+    printf("ERROR: qc.cm.jt returned\n");
+    return 1;
+#else
+    printf("jvt not supported for this target\n");
+    return 77;
 #endif
 }
