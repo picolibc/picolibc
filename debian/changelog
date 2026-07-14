@@ -1,3 +1,11 @@
+picolibc (1.8.11-4) unstable; urgency=medium
+
+  * Ignore lintian warnings about files in /usr
+
+  * Fix up debian/copyright
+
+ -- Keith Packard <keithp@keithp.com>  Tue, 14 Jul 2026 09:58:47 -0700
+
 picolibc (1.8.11-3) unstable; urgency=medium
 
   * Build with newer version of gcc-xtensa.
@@ -111,7 +119,7 @@ picolibc (1.8.6-1) unstable; urgency=medium
 
 picolibc (1.8.5-2) unstable; urgency=medium
 
-  * Silence aarch64 linker warning during autopkgtst 
+  * Silence aarch64 linker warning during autopkgtst
 
  -- Keith Packard <keithp@keithp.com>  Wed, 27 Sep 2023 09:36:11 -0700
 
