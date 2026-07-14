@@ -3129,8 +3129,8 @@ Files: .clang-format
  libm/ld/files
  libm/libm.in.xml
  picocrt/machine/aarch64/crt0.S
- picocrt/machine/hexagon/crt0_standalone.S
- picocrt/machine/hexagon/crt0_standalone.c
+ picocrt/machine/hexagon/crt0.S
+ picocrt/machine/hexagon/crt0.c
  picocrt/machine/hexagon/meson.build
  picolibc.h.in
  picolibc.ld.in
@@ -3247,7 +3247,7 @@ Files: .clang-format
  test/test-strftime.c
  test/test-wcsftime.c
  test/testsuite/newlib.time/tzset.c
-Copyright:
+Copyright: 2020 The Newlib Project
 License: Default-1
 
 Files: libc/ctype/caseconv.c
