@@ -1,10 +1,8 @@
 Source: picolibc
-Priority: optional
 Maintainer: Keith Packard <keithp@keithp.com>
-Build-Depends: debhelper-compat (= 13), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, gcc-xtensa-lx106,
+Build-Depends: debhelper-compat (= 14), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, gcc-xtensa-lx106,
  gcc-aarch64-none-elf, meson, ninja-build, qemu-system-arm, qemu-system-riscv
-Standards-Version: 4.7.0
-Rules-Requires-Root: no
+Standards-Version: 4.7.4
 Section: devel
 Homepage: https://keithp.com/picolibc
 Vcs-Git: git://keithp.com/git/picolibc.git -b debian
