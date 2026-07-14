@@ -1,5 +1,6 @@
 picolibc-aarch64-none-elf: arch-independent-package-contains-binary-or-object
 picolibc-aarch64-none-elf: unstripped-static-library
 picolibc-aarch64-none-elf: static-library-has-unneeded-sections
-picolibc-aarch64-none-elf: repeated-path-segment
 picolibc-aarch64-none-elf: no-code-sections
+picolibc-aarch64-none-elf: file-in-unusual-dir
+picolibc-aarch64-none-elf: non-standard-dir-in-usr
