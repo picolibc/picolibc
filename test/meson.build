@@ -119,6 +119,8 @@ test_args = {
   'test-argv-no-flash': ['--args', 'hello world'],
 }
 
+check_aarch64_fvp_page_table = find_program('check-aarch64-fvp-page-table.py')
+
 test_skip_native = [
   'test-stack-smash',
   'test-thread-safety',
@@ -162,6 +164,21 @@ foreach params : targets
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
   if have_cplusplus
     _cpp_args = target_c_args + get_variable('test_cpp_args' + target, test_cpp_args)
+  endif
+
+  if host_cpu_family == 'aarch64' and test_machine == 'fvp' and crt0_test_variant == 'semihost' and not target_dir.startswith('aarch64r')
+    t1 = 'test-crt0-page-table'
+    t1_exe = executable(t1 + target, t1 + '.c',
+                        c_args: _c_args,
+                        link_args: _link_args,
+                        objects: _objs,
+                        link_depends: _link_depends,
+                        include_directories: inc)
+    test(t1 + target,
+         check_aarch64_fvp_page_table,
+         args: ['--cc', cc.cmd_array()[0], t1_exe],
+         depends: t1_exe,
+         suite: 'test')
   endif
 
   if test_noflash
