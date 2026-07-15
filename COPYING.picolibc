@@ -577,11 +577,13 @@ Files: CMakeLists.txt
  test/lock-valid.c
  test/native-locks.c
  test/test-except.c
+ test/test-math/test-long-double-vec.h
  test/test-math/test-long-double.c
  test/test-riscv-jvt.c
  test/test-stdio/CMakeLists.txt
  test/test-stdio/test-fopen.c
  test/test-stdio/test-mktemp.c
+ test/test-stdio/test-sprintf-time.c
  test/test-stdlib/test-efcvt.c
  test/test-stdlib/test-strtod.c
  test/testsuite/newlib.time/meson.build
@@ -909,6 +911,7 @@ Files: cmake/TC-rx.ld
  test/test-math/test-clog.h
  test/test-math/test-complex-complex.h
  test/test-math/test-complex-one.h
+ test/test-math/test-complex.5c
  test/test-math/test-cos.5c
  test/test-math/test-cos.c
  test/test-math/test-cos.h
@@ -951,6 +954,7 @@ Files: cmake/TC-rx.ld
  test/test-math/test-expm1.5c
  test/test-math/test-expm1.c
  test/test-math/test-expm1.h
+ test/test-math/test-float.5c
  test/test-math/test-floor.5c
  test/test-math/test-floor.c
  test/test-math/test-floor.h
@@ -982,6 +986,7 @@ Files: cmake/TC-rx.ld
  test/test-math/test-log2.5c
  test/test-math/test-log2.c
  test/test-math/test-log2.h
+ test/test-math/test-long-double-gen.5c
  test/test-math/test-math-compare.c
  test/test-math/test-math.h
  test/test-math/test-pow.5c
@@ -1314,6 +1319,8 @@ Files: doc/printf-sample/Makefile
  picocrt/machine/msp430/crt0.c
  picocrt/machine/nios2/crt0.c
  picocrt/machine/sparc/crt0.c
+ test/fma_gen.5c
+ test/test-atomic.c
  test/test-math/test-fma.c
  test/test-raise.c
  test/test-stdio/test-fread-fwrite.c
@@ -1913,6 +1920,10 @@ Copyright: 2019 Keith Packard,
  2020 Anthony Anderson
 License: BSD3-1
 
+Files: libc/machine/aarch64/sys/fcntl.h
+Copyright: 2007 Jeff Johnston <jjohnstn@redhat.com>
+License: BSD3-1
+
 Files: libc/machine/arm/machine/math.h
 Copyright: 2020 Keith Packard
  2017 embedded brains GmbH.
@@ -2166,6 +2177,10 @@ License: BSD3-1
 
 Files: test/test-time2.c
 Copyright: 2021 R. Diez
+License: BSD3-1
+
+Files: test/testsuite/newlib.time/tzset.c
+Copyright: 2022 jdbouleu <hi@jdoubleu.de>
 License: BSD3-1
 
 Files: libc/ctype/ctype_.c
@@ -3631,14 +3646,12 @@ Files: .clang-format
  hello-world/README.md
  libc/ctype/ctype.tex
  libc/libc.in.xml
- libc/machine/aarch64/sys/fcntl.h
  libc/machine/nvptx/clock.c
  libc/machine/riscv/xlenint.h
  libc/machine/xtensa/xtensa.tex
  libc/ssp/ssp.tex
  libc/stdlib/mul_overflow.h
  libc/string/wcstrings.tex
- libc/time/strftime.c
  libc/time/tzset.c
  libc/xdr/README
  libm/complex/CMakeLists.txt
@@ -3746,19 +3759,10 @@ Files: .clang-format
  scripts/run-lm32
  scripts/test-picolibc
  test/CP720
- test/test-atomic.c
  test/test-cdefs-cxx03.cpp
  test/test-math/.clang-format-ignore
  test/test-math/Makefile
  test/test-math/math-test-copyright
- test/test-math/test-complex.5c
- test/test-math/test-float.5c
- test/test-math/test-long-double-gen.5c
- test/test-math/test-long-double-vec.h
- test/test-stdio/test-sprintf-time.c
- test/test-strftime.c
- test/test-wcsftime.c
- test/testsuite/newlib.time/tzset.c
 Copyright:
 License: Default-1
 
@@ -4719,8 +4723,11 @@ Files: libc/signal/signal.tex
  libc/time/lcltime_buf.c
  libc/time/lcltime_r.c
  libc/time/mktime.c
+ libc/time/strftime.c
  libc/time/time.c
  libc/time/time.tex
+ test/test-strftime.c
+ test/test-wcsftime.c
  test/testsuite/newlib.math/acos_vec.c
  test/testsuite/newlib.math/acosf_vec.c
  test/testsuite/newlib.math/acosh_vec.c

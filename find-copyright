@@ -393,6 +393,10 @@ def main():
                         copyright = find_copyright_pound(name)
                 elif re.match(r'.*\.[123]$', name):
                         copyright = find_copyright_troff(name)
+
+                if not copyright and re.match(r'.*\.5c$', name):
+                        copyright = find_copyright_source(name, 'text/x-c')
+
                 if not copyright:
                         m = magic.from_file(name)
                         if m is None:
