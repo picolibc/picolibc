@@ -99,8 +99,8 @@ def clean_copyright(string):
                 if derived.search(line):
                         skipping = True
                         continue
-#                if spdx.search(line):
-#                        continue
+                if spdx.search(line):
+                        continue
                 if only_upper:
                         if lower.search(line):
                                 break
