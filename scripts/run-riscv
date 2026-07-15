@@ -126,15 +126,7 @@ for o in $options; do
     esac
 done
 
-if [ -n "$QEMU_ADD_SMRNMI" ]; then
-    case "$qemu_version" in
-        10*)
-            cpu="$cpu,smrnmi=true"
-            ;;
-    esac
-fi
-
-# qemu enables some options by defualt; we need to explicitly
+# qemu enables some options by default; we need to explicitly
 # disable them when not selected
 enabled_options="i h e g m a f d c s u v zifencei zihintpause"
 
@@ -161,6 +153,18 @@ case "$qemu_version" in
         cpu="$(echo "$cpu" | sed 's/\<z/Z/g')"
         ;;
 esac
+
+# Enable smrnmi when needed
+
+if nm "$elf" | grep -q __riscv_enable_smrnmi; then
+    case "$qemu_version" in
+        11.0.[01]|10.*|9.*|8.*|7.*)
+        ;;
+        *)
+            cpu="$cpu,smrnmi=true"
+            ;;
+    esac
+fi
 
 # Set the target machine
 machine=virt,accel=tcg
@@ -193,4 +197,4 @@ echo $stdin | \
     -kernel "$elf" \
     -nographic \
     -bios none \
-    -m 2G
+    -m 2G "$@"
