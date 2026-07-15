@@ -404,7 +404,7 @@ def main():
                         else:
                                 if re.search(r'troff', m):
                                         copyright = find_copyright_troff(name)
-                                elif re.search(r'C source', m):
+                                elif re.search(r'C source', m) or re.search(r'C\+\+ source', m):
                                         copyright = find_copyright_source(name, 'text/x-c')
                                 elif (re.search(r'POSIX shell script', m) or
                                       re.search(r'Bourne-Again shell script', m) or
@@ -425,15 +425,15 @@ def main():
                             file_contains(r'automatically generated', name)):
                                 continue
 
-#                if not copyright:
-#
-#                        # Dig through git history to find the first commit
-#                        # adding the file and use the author of that
-#
-#                        log = subprocess.run(('git', 'log', '--format=format:%aN <%aE>', '--', name),
-#                                             capture_output=True, text=True)
-#                        if log.returncode == 0:
-#                                copyright = log.stdout.split('\n')[-1]
+                if not copyright:
+
+                        # Dig through git history to find the first commit
+                        # adding the file and use the author of that
+
+                        log = subprocess.run(('git', 'log', '--follow', '--format=format:%aN <%aE>', '--', name),
+                                             capture_output=True, text=True)
+                        if log.returncode == 0:
+                                copyright = log.stdout.split('\n')[-1]
 
                 if not copyright:
                         copyright = ''
