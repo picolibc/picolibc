@@ -4,6 +4,7 @@ import sys
 import fileinput
 import magic
 import re
+import subprocess
 from comment_parser import comment_parser
 
 end_pats = (r'This implementation just',
@@ -41,7 +42,8 @@ end_pats = (r'This implementation just',
             r'Static instance',
             r'Conversion is performed',
             r'Common routine',
-            r'l64a')
+            r'l64a'
+            )
 
 end_pats_s = (r'FUNCTION',)
 
@@ -56,19 +58,23 @@ for pat in end_pats_s:
 
 left_res = re.compile(r'^[^A-Za-z0-9]*(.*)')
 right_res = re.compile(r'(.*)[ /*\t]$')
+cpr_line_missing_year = re.compile(r'copyright.*(\(c\)|©)', re.I)
+cpr_line = re.compile(r'copyright.*(2[0-1][0-9][0-9]|19[7-9][0-9])', re.I)
+upper = re.compile(r'[A-Z]')
+lower = re.compile(r'[a-z]')
+modified = re.compile(r'Modified')
+derived = re.compile(r'code is derived from software', re.I)
+spdx = re.compile(r'SPDX')
 
 def clean_copyright(string):
         copyright = []
         have_cpr = False
-        cpr_line = re.compile(r'copyright.*(20[0-5][0-9]|19[7-9][0-9])', re.I)
-        upper = re.compile(r'[A-Z]')
-        lower = re.compile(r'[a-z]')
-        modified = re.compile(r'Modified')
-        derived = re.compile(r'code is derived from software', re.I)
         skipping = False
         only_upper = False
         for line in string.splitlines():
                 m = cpr_line.search(line)
+                if not m:
+                        m = cpr_line_missing_year.search(line)
                 if m:
                         line = line[m.start():]
                         m = re.match(r'(.*<[^>]+>).*', line)
@@ -93,6 +99,8 @@ def clean_copyright(string):
                 if derived.search(line):
                         skipping = True
                         continue
+#                if spdx.search(line):
+#                        continue
                 if only_upper:
                         if lower.search(line):
                                 break
@@ -209,6 +217,7 @@ def get_split(copyright):
         mod = re.search(r'modification', copyright, re.I | re.S)
         perm = re.search(r'permission to', copyright, re.I | re.S)
         public = re.search(r'public domain', copyright, re.I | re.S)
+        spdx = re.search(r'SPDX', copyright, re.I | re.S)
 
         split = None
         split = pick_split(split, all, True)
@@ -220,12 +229,15 @@ def get_split(copyright):
         split = pick_split(split, mod, False)
         split = pick_split(split, perm, False)
         split = pick_split(split, public, False)
+#        split = pick_split(split, spdx, False)
         return split
 
 def get_holder(copyright):
         split = get_split(copyright)
         if split:
-                return copyright[:split[0]]
+                copyright = copyright[:split[0]]
+        if copyright and not re.search(r'[^0-9][12][0-9][0-9][0-9][^0-9]', copyright):
+                copyright = '2026 ' + copyright
         return copyright
 
 def get_license(copyright):
@@ -377,7 +389,7 @@ def main():
                         copyright = find_copyright_semi(name)
                         if not copyright:
                                 copyright = find_copyright_source(name, 'text/x-c')
-                elif re.match(r'.*meson.*', name) or re.match(r'.*Makefile.*', name):
+                elif re.match(r'.*meson.*', name) or re.match(r'.*Makefile.*', name) or re.match(r'.*\.tex', name) or re.match(r'.*cross.*\.txt', name):
                         copyright = find_copyright_pound(name)
                 elif re.match(r'.*\.[123]$', name):
                         copyright = find_copyright_troff(name)
@@ -409,6 +421,17 @@ def main():
                             file_contains(r'automatically generated', name)):
                                 continue
 
+#                if not copyright:
+#
+#                        # Dig through git history to find the first commit
+#                        # adding the file and use the author of that
+#
+#                        log = subprocess.run(('git', 'log', '--format=format:%aN <%aE>', '--', name),
+#                                             capture_output=True, text=True)
+#                        if log.returncode == 0:
+#                                copyright = log.stdout.split('\n')[-1]
+
+                if not copyright:
                         copyright = ''
 
                 i = pack_copyright(copyright)

@@ -1404,6 +1404,7 @@ Files: empty-libs/empty.c
  test/constructor.c
  test/libc-testsuite/testcase.h
  test/test-hosted-exit.c
+ test/test-math/test-complex-funcs.c
  test/test-math/test-math-funcs.c
  test/test-math/test-rounding-mode-sub.c
  test/test-math/test-rounding-mode.c
@@ -2560,9 +2561,89 @@ Files: libc/include/sys/_sigset.h
 Copyright: 1982, 1986, 1989, 1991, 1993 The Regents of the University of California.
 License: BSD3-8
 
+Files: libc/include/sys/mman.h
+ libc/include/sys/statvfs.h
+ libc/machine/hexagon/longjmp.S
+ libc/machine/hexagon/machine/fenv-fp.h
+ libc/machine/hexagon/machine/fenv.h
+ libc/machine/hexagon/machine/meson.build
+ libc/machine/hexagon/meson.build
+ libc/machine/hexagon/setjmp.S
+ libc/machine/hexagon/tls.c
+ libos/dummyhost/fstatvfs.c
+ libos/dummyhost/statvfs.c
+ libos/linux/_statvfsbuf.c
+ libos/linux/fstatvfs.c
+ libos/linux/local-statfs.h
+ libos/linux/madvise-gnu.c
+ libos/linux/madvise.c
+ libos/linux/mlock.c
+ libos/linux/mlockall_munlockall.c
+ libos/linux/mmap.c
+ libos/linux/mprotect.c
+ libos/linux/msync.c
+ libos/linux/munlock.c
+ libos/linux/munmap.c
+ libos/linux/statvfs.c
+ libos/semihost/common/rename.c
+ libos/semihost/fake/fake_access.c
+ libos/semihost/fake/fake_closedir.c
+ libos/semihost/fake/fake_fstatvfs.c
+ libos/semihost/fake/fake_ftruncate.c
+ libos/semihost/fake/fake_getcwd.c
+ libos/semihost/fake/fake_opendir.c
+ libos/semihost/fake/fake_readdir.c
+ libos/semihost/fake/fake_rename.c
+ libos/semihost/fake/fake_statvfs.c
+ libos/semihost/machine/hexagon/hexagon_access.c
+ libos/semihost/machine/hexagon/hexagon_close.c
+ libos/semihost/machine/hexagon/hexagon_closedir.c
+ libos/semihost/machine/hexagon/hexagon_errno.c
+ libos/semihost/machine/hexagon/hexagon_exit.c
+ libos/semihost/machine/hexagon/hexagon_flen.c
+ libos/semihost/machine/hexagon/hexagon_fstat.c
+ libos/semihost/machine/hexagon/hexagon_ftell.c
+ libos/semihost/machine/hexagon/hexagon_ftruncate.c
+ libos/semihost/machine/hexagon/hexagon_get_cmdline.c
+ libos/semihost/machine/hexagon/hexagon_getcwd.c
+ libos/semihost/machine/hexagon/hexagon_gettimeofday.c
+ libos/semihost/machine/hexagon/hexagon_isatty.c
+ libos/semihost/machine/hexagon/hexagon_lseek.c
+ libos/semihost/machine/hexagon/hexagon_open.c
+ libos/semihost/machine/hexagon/hexagon_opendir.c
+ libos/semihost/machine/hexagon/hexagon_read.c
+ libos/semihost/machine/hexagon/hexagon_readdir.c
+ libos/semihost/machine/hexagon/hexagon_rename.c
+ libos/semihost/machine/hexagon/hexagon_semihost.c
+ libos/semihost/machine/hexagon/hexagon_semihost.h
+ libos/semihost/machine/hexagon/hexagon_stat.c
+ libos/semihost/machine/hexagon/hexagon_unlink.c
+ libos/semihost/machine/hexagon/hexagon_write.c
+ libos/semihost/machine/hexagon/meson.build
+ picocrt/machine/hexagon/crt0.S
+ picocrt/machine/hexagon/crt0.c
+ picocrt/machine/hexagon/meson.build
+ scripts/cross-clang-hexagon.txt
+ scripts/do-clang-hexagon-configure
+ scripts/run-hexagon
+ test/test-argv.c
+ test/test-lseek-overflow.c
+ test/test-posix/test-access.c
+ test/test-posix/test-dirent.c
+ test/test-posix/test-ftrunc.c
+ test/test-posix/test-getcwd.c
+ test/test-posix/test-mmap.c
+ test/test-posix/test-posix-time.c
+ test/test-posix/test-rename.c
+ test/test-posix/test-statvfs.c
+ test/test-stdio/test-bufio-lock-init.c
+ test/test-thread-safety.c
+Copyright: 2026 Qualcomm Technologies, Inc. and/or its subsidiaries. SPDX-License-Identifier: BSD-3-Clause-Clear
+License: BSD3-9
+
 Files: libc/machine/aarch64/machine/_types.h
 Copyright: 2012 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/aarch64/setjmp.S
  libm/machine/aarch64/s_ceil.c
@@ -2604,7 +2685,7 @@ Files: libc/machine/aarch64/setjmp.S
  libm/machine/arm/sf_round.c
  libm/machine/arm/sf_trunc.c
 Copyright: 2011, 2012 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/aeabi_memset.c
  libc/machine/arm/bzero.c
@@ -2619,24 +2700,24 @@ Files: libc/machine/arm/aeabi_memset.c
  libm/machine/aarch64/sf_fabs.c
  libm/machine/aarch64/sf_sqrt.c
 Copyright: 2015 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/arm_asm.h
 Copyright: 2009 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/machine/acle-compat.h
  libc/machine/arm/strcmp-armv6m.S
 Copyright: 2014 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/memcpy-armv7m.S
 Copyright: 2013 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/memcpy.S
 Copyright: 2013-2015 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/strcmp-arm-tiny.S
  libc/machine/arm/strcmp-armv4.S
@@ -2646,15 +2727,15 @@ Files: libc/machine/arm/strcmp-arm-tiny.S
  libc/machine/arm/strcmp-armv7m.S
  libc/machine/arm/strcmp.S
 Copyright: 2012-2014 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/strcpy.S
 Copyright: 2008 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/arm/strlen.c
 Copyright: 2008-2015 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/stdlib/calloc.c
  libc/stdlib/free.c
@@ -2671,12 +2752,12 @@ Files: libc/stdlib/calloc.c
  libc/stdlib/realloc.c
  libc/stdlib/valloc.c
 Copyright: 2012, 2013 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: test/testsuite/newlib.string/memcpy-1.c
  test/testsuite/newlib.string/strcmp-1.c
 Copyright: 2011 ARM Ltd
-License: BSD3-9
+License: BSD3-10
 
 Files: libc/machine/aarch64/memchr-stub.c
  libc/machine/aarch64/memcmp-stub.c
@@ -2686,21 +2767,21 @@ Files: libc/machine/aarch64/memchr-stub.c
  libc/machine/aarch64/strnlen-stub.c
  libc/machine/aarch64/strnlen.S
 Copyright: 2013, Linaro Limited
-License: BSD3-10
+License: BSD3-11
 
 Files: libc/machine/aarch64/memcpy-stub.c
  libc/machine/aarch64/memset-stub.c
  libc/machine/aarch64/strcmp-stub.c
 Copyright: 2012-2013, Linaro Limited
-License: BSD3-10
+License: BSD3-11
 
 Files: libc/machine/aarch64/strlen.S
 Copyright: 2013-2015, Linaro Limited
-License: BSD3-10
+License: BSD3-11
 
 Files: libc/machine/aarch64/strncmp.S
 Copyright: 2013, 2018, Linaro Limited
-License: BSD3-10
+License: BSD3-11
 
 Files: libc/machine/arm/memchr.c
  libc/machine/arm/memcpy.c
@@ -2708,16 +2789,16 @@ Files: libc/machine/arm/memchr.c
  libc/machine/arm/strlen-thumb2-Os.S
  libc/machine/arm/strlen.S
 Copyright: 2015 ARM Ltd.
-License: BSD3-10
+License: BSD3-11
 
 Files: libc/machine/aarch64/rawmemchr-stub.c
  libc/machine/aarch64/rawmemchr.S
 Copyright: 2015-2016, ARM Limited
-License: BSD3-11
+License: BSD3-12
 
 Files: libc/machine/aarch64/stpcpy-stub.c
 Copyright: 2015, ARM Limited
-License: BSD3-11
+License: BSD3-12
 
 Files: libc/machine/aarch64/strchr-stub.c
  libc/machine/aarch64/strchrnul-stub.c
@@ -2725,21 +2806,21 @@ Files: libc/machine/aarch64/strchr-stub.c
  libc/machine/aarch64/strrchr-stub.c
  libc/machine/aarch64/strrchr.S
 Copyright: 2014, ARM Limited
-License: BSD3-11
+License: BSD3-12
 
 Files: libc/machine/aarch64/strchr.S
  libc/machine/aarch64/strchrnul.S
 Copyright: 2014-2022, ARM Limited
-License: BSD3-11
+License: BSD3-12
 
 Files: libc/machine/aarch64/strcpy.S
 Copyright: 2013, 2014, 2015, 2020-2023 ARM Ltd.
-License: BSD3-11
+License: BSD3-12
 
 Files: libc/machine/arc/asm.h
  libc/machine/arc/strchr.S
 Copyright: 2015, Synopsys, Inc.
-License: BSD3-12
+License: BSD3-13
 
 Files: libc/machine/arc/memcmp-bs-norm.S
  libc/machine/arc/memcmp-stub.c
@@ -2767,7 +2848,7 @@ Files: libc/machine/arc/memcmp-bs-norm.S
  libc/machine/arc/strncpy-stub.c
  libc/machine/arc/strncpy.S
 Copyright: 2015-2024, Synopsys, Inc.
-License: BSD3-12
+License: BSD3-13
 
 Files: libc/machine/arc64/memchr.S
  libc/machine/arc64/memcmp-stub.c
@@ -2783,62 +2864,62 @@ Files: libc/machine/arc64/memchr.S
  libc/machine/arc64/strlen.S
  libc/machine/arc64/sys/asm.h
 Copyright: 2024, Synopsys, Inc.
-License: BSD3-12
+License: BSD3-13
 
 Files: libc/machine/arm/memchr.S
 Copyright: 2010-2011, Linaro Limited
-License: BSD3-13
+License: BSD3-14
 
 Files: libc/machine/arm/memcpy-armv7a.S
 Copyright: 2013, Linaro Limited
-License: BSD3-13
+License: BSD3-14
 
 Files: libc/machine/arm/strlen-armv7.S
 Copyright: 2010-2011,2013 Linaro Limited
-License: BSD3-13
+License: BSD3-14
 
 Files: libc/machine/epiphany/setjmp.S
 Copyright: 2011, Adapteva, Inc.
-License: BSD3-14
+License: BSD3-15
 
 Files: libc/machine/loongarch/machine/fenv-fp.h
 Copyright: 2017 Michael R. Neilly
  2024 Jiaxun Yang <jiaxun.yang@flygoat.com>
-License: BSD3-15
+License: BSD3-16
 
 Files: libc/machine/riscv/machine/fenv-fp.h
 Copyright: 2017 Michael R. Neilly
-License: BSD3-15
+License: BSD3-16
 
 Files: libc/machine/microblaze/abort.c
  libc/machine/microblaze/longjmp.S
  libc/machine/microblaze/setjmp.S
 Copyright: 2001, 2009 Xilinx, Inc.
-License: BSD3-16
+License: BSD3-17
 
 Files: libc/machine/microblaze/strcmp.c
  libc/machine/microblaze/strcpy.c
  libc/machine/microblaze/strlen.c
 Copyright: 2009 Xilinx, Inc.
-License: BSD3-16
+License: BSD3-17
 
 Files: libc/machine/mips/machine/asm.h
  libc/machine/mips/machine/regdef.h
 Copyright: 1996-2007 MIPS Technologies, Inc.
  2009 CodeSourcery, LLC. 
-License: BSD3-17
+License: BSD3-18
 
 Files: libc/machine/mips/memcpy.S
 Copyright: 2012-2015 MIPS Technologies, Inc., California.
-License: BSD3-18
+License: BSD3-19
 
 Files: libc/machine/mips/memset.S
 Copyright: 2013 MIPS Technologies, Inc., California.
-License: BSD3-18
+License: BSD3-19
 
 Files: libc/machine/mips/strcmp.S
 Copyright: 2014 Imagination Technologies Limited.
-License: BSD3-19
+License: BSD3-20
 
 Files: libc/machine/nds32/abort.c
  libc/machine/nds32/memcpy.S
@@ -2847,20 +2928,20 @@ Files: libc/machine/nds32/abort.c
  libc/machine/nds32/strcmp.S
  libc/machine/nds32/strcpy.S
 Copyright: 2013 Andes Technology Corporation.
-License: BSD3-20
+License: BSD3-21
 
 Files: libm/machine/nds32/w_sqrt.S
  libm/machine/nds32/wf_sqrt.S
 Copyright: 2013-2014 Andes Technology Corporation.
-License: BSD3-20
+License: BSD3-21
 
 Files: libc/machine/nios2/setjmp.s
 Copyright: 2003 Altera Corporation
-License: BSD3-21
+License: BSD3-22
 
 Files: libc/machine/sparc/setjmp.S
 Copyright: 1992, 1993 The Regents of the University of California.
-License: BSD3-22
+License: BSD3-23
 
 Files: libc/machine/spu/c99ppe.h
  libc/machine/spu/clearerr.c
@@ -2905,7 +2986,7 @@ Files: libc/machine/spu/c99ppe.h
  libc/machine/spu/vsprintf.c
  libc/machine/spu/vsscanf.c
 Copyright: IBM Corp. 2006 
-License: BSD3-23
+License: BSD3-24
 
 Files: libc/machine/spu/calloc_ea.c
  libc/machine/spu/ea_internal.h
@@ -2937,7 +3018,7 @@ Files: libc/machine/spu/calloc_ea.c
  libc/machine/spu/strspn_ea.c
  libc/machine/spu/strstr_ea.c
 Copyright: IBM Corp. 2007, 2008 
-License: BSD3-23
+License: BSD3-24
 
 Files: libc/machine/spu/fdopen.c
  libm/common/copysignl.c
@@ -2948,7 +3029,7 @@ Files: libc/machine/spu/fdopen.c
  libm/ld/s_isinfl.c
  libm/ld/s_signbitl.c
 Copyright: IBM Corp. 2009 
-License: BSD3-23
+License: BSD3-24
 
 Files: libc/machine/spu/include/spu_timer.h
  libc/machine/spu/pread_ea.c
@@ -2971,15 +3052,15 @@ Files: libc/machine/spu/include/spu_timer.h
  libc/machine/spu/write_ea.c
  libc/machine/spu/writev_ea.c
 Copyright: IBM Corp. 2008 
-License: BSD3-23
+License: BSD3-24
 
 Files: libc/machine/spu/setjmp.S
 Copyright: IBM Corp. 2005, 2006 
-License: BSD3-23
+License: BSD3-24
 
 Files: libc/machine/spu/sys/mman.h
 Copyright: IBM Corp. 2007 
-License: BSD3-23
+License: BSD3-24
 
 Files: libc/machine/spu/fiprintf.S
  libc/machine/spu/fiscanf.S
@@ -2997,17 +3078,17 @@ Files: libc/machine/spu/fiprintf.S
  libc/machine/spu/sscanf.S
  libc/machine/spu/stack_reg_va.S
 Copyright: 2007, Toshiba Corporation 
-License: BSD3-24
+License: BSD3-25
 
 Files: libc/machine/spu/mk_syscalls
  libc/machine/spu/syscall.def
 Copyright: 2007 TOSHIBA CORPORATION
-License: BSD3-24
+License: BSD3-25
 
 Files: libc/machine/spu/include/fenv.h
  libc/machine/spu/machine/fenv.h
 Copyright: 2006, 2007 International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-25
+License: BSD3-26
 
 Files: libc/machine/spu/machine/_types.h
  libc/machine/spu/sys/dirent.h
@@ -3022,7 +3103,7 @@ Files: libc/machine/spu/machine/_types.h
  libm/machine/spu/sf_isnanf.c
  libm/machine/spu/sf_nan.c
 Copyright: 2007 International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-25
+License: BSD3-26
 
 Files: libc/machine/spu/memcmp.c
  libc/machine/spu/straddr.h
@@ -3032,7 +3113,7 @@ Files: libc/machine/spu/memcmp.c
  libc/machine/spu/strncat.c
  libc/machine/spu/strncpy.c
 Copyright: 2008 International Business Machines Corporation
-License: BSD3-25
+License: BSD3-26
 
 Files: libc/machine/spu/memcpy.c
  libc/machine/spu/memmove.c
@@ -3167,20 +3248,20 @@ Files: libc/machine/spu/memcpy.c
  libm/machine/spu/wf_log10.c
  libm/machine/spu/wf_remainder.c
 Copyright: 2001,2006, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-25
+License: BSD3-26
 
 Files: libc/machine/spu/stdio.c
 Copyright: 2007 Sony Computer Entertainment Inc.
  2007 Sony Corp. 
-License: BSD3-25
+License: BSD3-26
 
 Files: libc/machine/spu/strncmp.h
 Copyright: 2001,2006,2008 International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-25
+License: BSD3-26
 
 Files: libc/machine/tic6x/setjmp.S
 Copyright: 1996-2010 Texas Instruments Incorporated http://www.ti.com
-License: BSD3-26
+License: BSD3-27
 
 Files: libc/machine/visium/memcpy.c
  libc/machine/visium/memcpy.h
@@ -3189,25 +3270,25 @@ Files: libc/machine/visium/memcpy.c
  libc/machine/visium/memset.h
  libc/machine/visium/setjmp.S
 Copyright: 2015 Rolls-Royce Controls and Data Services Limited.
-License: BSD3-27
+License: BSD3-28
 
 Files: libc/search/hcreate.c
  libc/search/hcreate_r.c
  test/testsuite/newlib.search/hsearchtest.c
 Copyright: 2001 Christopher G. Demetriou
-License: BSD3-28
+License: BSD3-29
 
 Files: libc/search/tsearch.3
 Copyright: 1997 Todd C. Miller <Todd.Miller@courtesan.com>
-License: BSD3-29
+License: BSD3-30
 
 Files: libc/stdio/ftoa_engine.c
 Copyright: 2005, Dmitry Xmelkov
-License: BSD3-30
+License: BSD3-31
 
 Files: libc/stdlib/aligned_alloc.c
 Copyright: 2020 Arm Ltd.
-License: BSD3-31
+License: BSD3-32
 
 Files: libc/string/memmem.c
  libc/string/strstr.c
@@ -3246,7 +3327,7 @@ Files: libc/string/memmem.c
  libm/ld/math_errl_uflowl.c
  libm/ld/math_errl_with_errnol.c
 Copyright: 2018 Arm Ltd.
-License: BSD3-31
+License: BSD3-32
 
 Files: libm/common/math_config.h
  libm/common/math_errf_divzerof.c
@@ -3257,7 +3338,7 @@ Files: libm/common/math_config.h
  libm/common/math_errf_with_errnof.c
  libm/common/sf_pow.c
 Copyright: 2017-2018 Arm Ltd.
-License: BSD3-31
+License: BSD3-32
 
 Files: libm/common/sf_exp.c
  libm/common/sf_exp2.c
@@ -3268,21 +3349,21 @@ Files: libm/common/sf_exp.c
  libm/common/sf_log_data.c
  libm/common/sf_pow_log2_data.c
 Copyright: 2017 Arm Ltd.
-License: BSD3-31
+License: BSD3-32
 
 Files: libc/time/strptime.c
  libc/time/strptime_l.c
 Copyright: 1999 Kungliga Tekniska Högskolan Royal Institute of Technology, Stockholm, Sweden).
-License: BSD3-32
+License: BSD3-33
 
 Files: libm/common/nexttoward.c
  libm/common/nexttowardl.c
 Copyright: 2014 Mentor Graphics, Inc.
-License: BSD3-33
+License: BSD3-34
 
 Files: libm/ld/common/s_fabsl.c
 Copyright: 2003 Dag-Erling Coïdan Smørgrav
-License: BSD3-34
+License: BSD3-35
 
 Files: libm/machine/spu/headers/acos.h
  libm/machine/spu/headers/acosd2.h
@@ -3407,7 +3488,7 @@ Files: libm/machine/spu/headers/acos.h
  libm/machine/spu/wf_sqrt.c
  libm/machine/spu/wf_tgamma.c
 Copyright: 2006,2008, International Business Machines Corporation
-License: BSD3-35
+License: BSD3-36
 
 Files: libm/machine/spu/headers/acosf4.h
  libm/machine/spu/headers/asinf4.h
@@ -3443,7 +3524,7 @@ Files: libm/machine/spu/headers/acosf4.h
  libm/machine/spu/headers/truncd2.h
  libm/machine/spu/headers/truncf4.h
 Copyright: 2001,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-35
+License: BSD3-36
 
 Files: libm/machine/spu/headers/acoshd2.h
  libm/machine/spu/headers/acoshf4.h
@@ -3475,13 +3556,13 @@ Files: libm/machine/spu/headers/acoshd2.h
  libm/machine/spu/headers/tgammad2.h
  libm/machine/spu/headers/tgammaf4.h
 Copyright: 2007,2008, International Business Machines Corporation
-License: BSD3-35
+License: BSD3-36
 
 Files: libm/machine/spu/headers/nearbyintf4.h
  libm/machine/spu/headers/rintf4.h
  libm/machine/spu/headers/scalbnf4.h
 Copyright: 2006,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
-License: BSD3-35
+License: BSD3-36
 
 Files: .clang-format
  .editorconfig
@@ -3549,18 +3630,8 @@ Files: .clang-format
  doc/using.md
  hello-world/README.md
  libc/ctype/ctype.tex
- libc/include/sys/mman.h
- libc/include/sys/statvfs.h
  libc/libc.in.xml
  libc/machine/aarch64/sys/fcntl.h
- libc/machine/hexagon/longjmp.S
- libc/machine/hexagon/machine/fenv-fp.h
- libc/machine/hexagon/machine/fenv.h
- libc/machine/hexagon/machine/meson.build
- libc/machine/hexagon/meson.build
- libc/machine/hexagon/setjmp.S
- libc/machine/hexagon/tls.c
- libc/machine/necv70/necv70.tex
  libc/machine/nvptx/clock.c
  libc/machine/riscv/xlenint.h
  libc/machine/xtensa/xtensa.tex
@@ -3575,21 +3646,6 @@ Files: .clang-format
  libm/fenv/fenv.tex
  libm/ld/files
  libm/libm.in.xml
- libos/dummyhost/fstatvfs.c
- libos/dummyhost/statvfs.c
- libos/linux/_statvfsbuf.c
- libos/linux/fstatvfs.c
- libos/linux/local-statfs.h
- libos/linux/madvise-gnu.c
- libos/linux/madvise.c
- libos/linux/mlock.c
- libos/linux/mlockall_munlockall.c
- libos/linux/mmap.c
- libos/linux/mprotect.c
- libos/linux/msync.c
- libos/linux/munlock.c
- libos/linux/munmap.c
- libos/linux/statvfs.c
  libos/linux/utils/dirent64.json
  libos/linux/utils/make-bits
  libos/linux/utils/make-struct
@@ -3602,46 +3658,8 @@ Files: .clang-format
  libos/linux/utils/termios.json
  libos/linux/utils/tms.json
  libos/linux/utils/type-analyze.c
- libos/semihost/common/rename.c
- libos/semihost/fake/fake_access.c
- libos/semihost/fake/fake_closedir.c
- libos/semihost/fake/fake_fstatvfs.c
- libos/semihost/fake/fake_ftruncate.c
- libos/semihost/fake/fake_getcwd.c
- libos/semihost/fake/fake_opendir.c
- libos/semihost/fake/fake_readdir.c
- libos/semihost/fake/fake_rename.c
- libos/semihost/fake/fake_statvfs.c
- libos/semihost/machine/hexagon/hexagon_access.c
- libos/semihost/machine/hexagon/hexagon_close.c
- libos/semihost/machine/hexagon/hexagon_closedir.c
- libos/semihost/machine/hexagon/hexagon_errno.c
- libos/semihost/machine/hexagon/hexagon_exit.c
- libos/semihost/machine/hexagon/hexagon_flen.c
- libos/semihost/machine/hexagon/hexagon_fstat.c
- libos/semihost/machine/hexagon/hexagon_ftell.c
- libos/semihost/machine/hexagon/hexagon_ftruncate.c
- libos/semihost/machine/hexagon/hexagon_get_cmdline.c
- libos/semihost/machine/hexagon/hexagon_getcwd.c
- libos/semihost/machine/hexagon/hexagon_gettimeofday.c
- libos/semihost/machine/hexagon/hexagon_isatty.c
- libos/semihost/machine/hexagon/hexagon_lseek.c
- libos/semihost/machine/hexagon/hexagon_open.c
- libos/semihost/machine/hexagon/hexagon_opendir.c
- libos/semihost/machine/hexagon/hexagon_read.c
- libos/semihost/machine/hexagon/hexagon_readdir.c
- libos/semihost/machine/hexagon/hexagon_rename.c
- libos/semihost/machine/hexagon/hexagon_semihost.c
- libos/semihost/machine/hexagon/hexagon_semihost.h
- libos/semihost/machine/hexagon/hexagon_stat.c
- libos/semihost/machine/hexagon/hexagon_unlink.c
- libos/semihost/machine/hexagon/hexagon_write.c
- libos/semihost/machine/hexagon/meson.build
  libos/semihost/machine/x86/bios.ld
  picocrt/machine/aarch64/crt0.S
- picocrt/machine/hexagon/crt0.S
- picocrt/machine/hexagon/crt0.c
- picocrt/machine/hexagon/meson.build
  picocrt/machine/x86/crt0.S
  picolibc-native.specs.in
  picolibc.h.in
@@ -3660,7 +3678,6 @@ Files: .clang-format
  scripts/cross-clang-aarch64-none-elf.txt
  scripts/cross-clang-arm-none-eabi.txt
  scripts/cross-clang-cortex-r82.txt
- scripts/cross-clang-hexagon.txt
  scripts/cross-clang-msp430.txt
  scripts/cross-clang-riscv64-unknown-elf.txt
  scripts/cross-clang-riscv64-zephyr-elf.txt
@@ -3723,38 +3740,23 @@ Files: .clang-format
  scripts/cross-xtensa-nxp_imx_adsp_zephyr-elf.txt
  scripts/cross-xtensa-sample_controller_zephyr-elf.txt
  scripts/do-arm-tk
- scripts/do-clang-hexagon-configure
  scripts/do-x86_64-linux-full
  scripts/duplicate-names
  scripts/monitor-e9
- scripts/run-hexagon
  scripts/run-lm32
  scripts/test-picolibc
  test/CP720
- test/test-argv.c
  test/test-atomic.c
  test/test-cdefs-cxx03.cpp
- test/test-lseek-overflow.c
  test/test-math/.clang-format-ignore
  test/test-math/Makefile
  test/test-math/math-test-copyright
- test/test-math/test-complex-funcs.c
  test/test-math/test-complex.5c
  test/test-math/test-float.5c
  test/test-math/test-long-double-gen.5c
  test/test-math/test-long-double-vec.h
- test/test-posix/test-access.c
- test/test-posix/test-dirent.c
- test/test-posix/test-ftrunc.c
- test/test-posix/test-getcwd.c
- test/test-posix/test-mmap.c
- test/test-posix/test-posix-time.c
- test/test-posix/test-rename.c
- test/test-posix/test-statvfs.c
- test/test-stdio/test-bufio-lock-init.c
  test/test-stdio/test-sprintf-time.c
  test/test-strftime.c
- test/test-thread-safety.c
  test/test-wcsftime.c
  test/testsuite/newlib.time/tzset.c
 Copyright:
@@ -5180,6 +5182,7 @@ Files: libc/machine/d10v/setjmp.S
  libc/machine/mn10300/strlen.S
  libc/machine/necv70/fastmath.S
  libc/machine/necv70/machine/registers.h
+ libc/machine/necv70/necv70.tex
  libc/machine/necv70/setjmp.S
  libc/machine/powerpc/setjmp.S
  libc/machine/sh/asm.h
@@ -5724,6 +5727,37 @@ License: BSD3-8
 
 License: BSD3-9
  Redistribution and use in source and binary forms, with or without
+ modification, are permitted (subject to the limitations in the
+ disclaimer below) provided that the following conditions are met:
+ .
+ Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ .
+ Redistributions in binary form must reproduce the above
+ copyright notice, this list of conditions and the following
+ disclaimer in the documentation and/or other materials provided
+ with the distribution.
+ .
+ Neither the name of Qualcomm Technologies, Inc. nor the names of its
+ contributors may be used to endorse or promote products derived
+ from this software without specific prior written permission.
+ .
+ NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+ GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+ HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+ GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD3-10
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
  1. Redistributions of source code must retain the above copyright
@@ -5746,7 +5780,7 @@ License: BSD3-9
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-10
+License: BSD3-11
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  Redistributions of source code must retain the above copyright
@@ -5770,7 +5804,7 @@ License: BSD3-10
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-11
+License: BSD3-12
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  Redistributions of source code must retain the above copyright
@@ -5794,7 +5828,7 @@ License: BSD3-11
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-12
+License: BSD3-13
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
@@ -5821,7 +5855,7 @@ License: BSD3-12
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-13
+License: BSD3-14
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -5849,7 +5883,7 @@ License: BSD3-13
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-14
+License: BSD3-15
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  Redistributions of source code must retain the above copyright notice,
@@ -5873,7 +5907,7 @@ License: BSD3-14
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-15
+License: BSD3-16
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -5902,7 +5936,7 @@ License: BSD3-15
  ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-16
+License: BSD3-17
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are
  met:
@@ -5930,7 +5964,7 @@ License: BSD3-16
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-17
+License: BSD3-18
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -5958,7 +5992,7 @@ License: BSD3-17
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-18
+License: BSD3-19
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -5983,7 +6017,7 @@ License: BSD3-18
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
 
-License: BSD3-19
+License: BSD3-20
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6008,7 +6042,7 @@ License: BSD3-19
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
 
-License: BSD3-20
+License: BSD3-21
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
@@ -6034,7 +6068,7 @@ License: BSD3-20
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-21
+License: BSD3-22
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6060,7 +6094,7 @@ License: BSD3-21
  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-22
+License: BSD3-23
  This software was developed by the Computer Systems Engineering group
  at Lawrence Berkeley Laboratory under DARPA contract BG 91-66 and
  contributed to Berkeley.
@@ -6089,7 +6123,7 @@ License: BSD3-22
  OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  SUCH DAMAGE.
 
-License: BSD3-23
+License: BSD3-24
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
@@ -6114,7 +6148,7 @@ License: BSD3-23
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-24
+License: BSD3-25
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
@@ -6139,7 +6173,7 @@ License: BSD3-24
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-25
+License: BSD3-26
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
@@ -6164,7 +6198,7 @@ License: BSD3-25
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-26
+License: BSD3-27
  Redistribution and  use in source  and binary forms, with  or without
  modification,  are permitted provided  that the  following conditions
  are met:
@@ -6194,7 +6228,7 @@ License: BSD3-26
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-27
+License: BSD3-28
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  .
@@ -6219,7 +6253,7 @@ License: BSD3-27
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
  THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-28
+License: BSD3-29
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6242,7 +6276,7 @@ License: BSD3-28
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-29
+License: BSD3-30
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6265,7 +6299,7 @@ License: BSD3-29
  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-30
+License: BSD3-31
  Rewritten in C by Soren Kuula
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
@@ -6290,7 +6324,7 @@ License: BSD3-30
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-31
+License: BSD3-32
  SPDX-License-Identifier: BSD-3-Clause
  .
  Redistribution and use in source and binary forms, with or without
@@ -6316,7 +6350,7 @@ License: BSD3-31
  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-32
+License: BSD3-33
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6344,7 +6378,7 @@ License: BSD3-32
  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-33
+License: BSD3-34
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  Redistributions of source code must retain the above copyright
@@ -6367,7 +6401,7 @@ License: BSD3-33
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-34
+License: BSD3-35
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6391,7 +6425,7 @@ License: BSD3-34
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-35
+License: BSD3-36
  Redistribution and use in source and binary forms, with or
  without modification, are permitted provided that the
  following conditions are met:
