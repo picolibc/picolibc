@@ -1,1 +1,1 @@
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v13/zephyr-sdk-1.0.0-rc1-19-gc3786f0_linux-x86_64_gnu.tar.xz
+https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v1.0.1/zephyr-sdk-1.0.1_linux-x86_64_gnu.tar.xz
