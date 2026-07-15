@@ -1,1 +1,1 @@
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v13/ATfE-23.0.0-pre-Linux-AArch64.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/ATfE-23.0.0-pre-Linux-AArch64.tar.xz
