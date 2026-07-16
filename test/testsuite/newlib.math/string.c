@@ -32,7 +32,7 @@
 #endif
 
 static const char *it = "<UNSET>"; /* Routine name for message routines. */
-static int         errors = 0;
+extern int         inacc;
 
 /* Complain if condition is not true.  */
 #define check(thing) checkit(thing, __LINE__)
@@ -46,7 +46,7 @@ checkit(int ok, int l)
 
     if (!ok) {
         printf("string.c:%d %s\n", l, it);
-        ++errors;
+        ++inacc;
     }
 }
 
