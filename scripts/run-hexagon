@@ -64,4 +64,4 @@ while [ $# -gt 0 -a $done -eq 0 ]; do
   esac
 done
 
-echo $stdin | $simulator  -cpu v68 -M virt -kernel $elf -append "$args"
+echo $stdin | $simulator  -cpu v68 -M virt -kernel $elf -append "$args" "$@"
