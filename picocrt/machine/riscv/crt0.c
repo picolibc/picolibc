@@ -278,7 +278,8 @@ _start(void)
     __asm__("csrw   mtvec, t0");
     __asm__("csrr   t1, mtvec");
 #ifdef CRT0_SMRNMI
-    __asm__("csrsi 0x744, 0x8"); // mnstatus = 0x744, 1 << 3 = 8
+    __asm__(".globl __riscv_enable_smrnmi");
+    __asm__("__riscv_enable_smrnmi: csrsi 0x744, 0x8"); // mnstatus = 0x744, 1 << 3 = 8
 #endif
 #endif
 
