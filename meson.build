@@ -692,8 +692,8 @@ have_alloc_size = cc.compiles(alloc_size_code, name : 'attribute __alloc_size__'
 
 # attributes constructor/destructor are a GNU extension - if the compiler doesn't have them, don't test them.
 attr_ctor_dtor_code = '''
-void __attribute__((constructor(101))) ctor (void) {}
-void __attribute__((destructor(101))) dtor (void) {}
+static void __attribute__((constructor(101))) ctor (void) {}
+static void __attribute__((destructor(101))) dtor (void) {}
 '''
 have_attr_ctor_dtor = cc.compiles(attr_ctor_dtor_code, name : 'attributes constructor/destructor', args : werror_c_args)
 
