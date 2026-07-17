@@ -34,6 +34,7 @@
  */
 
 #include "local-stdio.h"
+#include <stdint.h>
 
 #define INCR 16
 
@@ -50,7 +51,18 @@ getdelim(char ** restrict lineptr, size_t * restrict nptr, int delim, FILE * res
         if (c == EOF)
             break;
 
-        if (count >= (ssize_t)n) {
+        if ((size_t)count == (SIZE_MAX >> 1)) {
+            errno = EOVERFLOW;
+            count = -1;
+            break;
+        }
+
+        if ((size_t)count + 1 >= n) {
+            if (n > SIZE_MAX - INCR) {
+                errno = ENOMEM;
+                count = -1;
+                break;
+            }
             size_t newsize = n + INCR;
             char  *newline = realloc(line, newsize);
             if (newline == NULL) {
@@ -62,11 +74,14 @@ getdelim(char ** restrict lineptr, size_t * restrict nptr, int delim, FILE * res
         }
 
         line[count++] = c;
-        if (c == delim) {
-            line[count] = '\0';
+        if (c == delim)
             break;
-        }
     }
+
+    if (count > 0)
+        line[count] = '\0';
+    else if (count == 0)
+        count = -1;
 
     *lineptr = line;
     *nptr = n;

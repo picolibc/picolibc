@@ -66,6 +66,68 @@ main(void)
             result |= 4;
         free(line);
     }
+    {
+        char  *line = NULL;
+        size_t siz = 0;
+        if (getdelim(&line, &siz, '\n', in) != -1 ||
+            getdelim(&line, &siz, '\n', in) != -1)
+            result |= 8;
+        free(line);
+    }
     fclose(in);
+
+    {
+        static const char input[] = "\n";
+        FILE             *one = fmemopen((void *)input, sizeof(input) - 1, "r");
+        char             *line = malloc(2);
+        size_t            siz = 1;
+        int               len;
+
+        if (!one || !line)
+            return 1;
+        line[0] = 'x';
+        line[1] = 'x';
+        len = getdelim(&line, &siz, '\n', one);
+        if (!(len == 1 && siz >= 2 && line[0] == '\n' && line[1] == '\0'))
+            result |= 16;
+        free(line);
+        fclose(one);
+    }
+
+    {
+        static const char input[] = "123456789012345\n";
+        FILE             *exact = fmemopen((void *)input, sizeof(input) - 1, "r");
+        char             *line = malloc(sizeof(input));
+        size_t            siz = sizeof(input) - 1;
+        int               len;
+
+        if (!exact || !line)
+            return 1;
+        memset(line, 'x', sizeof(input));
+        len = getdelim(&line, &siz, '\n', exact);
+        if (!(len == (int)sizeof(input) - 1 && siz >= sizeof(input) &&
+              memcmp(line, input, sizeof(input)) == 0))
+            result |= 32;
+        free(line);
+        fclose(exact);
+    }
+
+    {
+        static const char input[] = "tail";
+        FILE             *partial = fmemopen((void *)input, sizeof(input) - 1, "r");
+        char             *line = malloc(8);
+        size_t            siz = 8;
+        int               len;
+
+        if (!partial || !line)
+            return 1;
+        memset(line, 'x', siz);
+        len = getdelim(&line, &siz, '\n', partial);
+        if (!(len == (int)sizeof(input) - 1 && strcmp(line, input) == 0))
+            result |= 64;
+        free(line);
+        fclose(partial);
+    }
+
     return result;
 }
