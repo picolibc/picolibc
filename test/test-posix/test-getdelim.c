@@ -53,8 +53,10 @@ main(void)
         char  *line = NULL;
         size_t siz = 0;
         int    len = getdelim(&line, &siz, '\n', in);
-        if (!(len == 4 && line && strcmp(line, "foo\n") == 0))
-            result |= 2;
+        if (!(len == 4 && line && strcmp(line, "foo\n") == 0)) {
+            printf("failed NULL buffer and zero size test\n");
+            result = 1;
+        }
         free(line);
     }
     {
@@ -62,10 +64,81 @@ main(void)
            This crashes on FreeBSD 8.0.  */
         char  *line = NULL;
         size_t siz = (size_t)(~0) / 4;
-        if (getdelim(&line, &siz, '\n', in) == -1)
-            result |= 4;
+        if (getdelim(&line, &siz, '\n', in) == -1) {
+            printf("failed NULL buffer and non-zero size test\n");
+            result = 1;
+        }
         free(line);
     }
+    {
+        char  *line = NULL;
+        size_t siz = 0;
+        /* Test result for a NULL buffer and zero size at EOF */
+        if (getdelim(&line, &siz, '\n', in) != -1 || getdelim(&line, &siz, '\n', in) != -1) {
+            printf("failed NULL buffer and zero size at EOF test\n");
+            result = 1;
+        }
+        free(line);
+    }
+
     fclose(in);
+
+    {
+        static const char input[] = "\n";
+        FILE             *one = fmemopen((void *)input, sizeof(input) - 1, "r");
+        char             *line = malloc(2);
+        size_t            siz = 1;
+        ssize_t           len;
+
+        if (!one || !line)
+            return 1;
+        line[0] = 'x';
+        line[1] = 'x';
+        len = getdelim(&line, &siz, '\n', one);
+        if (!(len == 1 && siz >= 2 && line[0] == '\n' && line[1] == '\0')) {
+            printf("failed non-NULL buffer and zero size test. len %zd siz %zd line '%s'\n", len,
+                   siz, line);
+            result = 1;
+        }
+        free(line);
+        fclose(one);
+    }
+    {
+        static const char input[] = "123456789012345\n";
+        FILE             *exact = fmemopen((void *)input, sizeof(input) - 1, "r");
+        char             *line = malloc(sizeof(input));
+        size_t            siz = sizeof(input) - 1;
+        int               len;
+        if (!exact || !line) {
+            printf("test setup failure\n");
+            return 1;
+        }
+        memset(line, 'x', sizeof(input));
+        len = getdelim(&line, &siz, '\n', exact);
+        if (!(len == (int)sizeof(input) - 1 && siz >= sizeof(input)
+              && memcmp(line, input, sizeof(input)) == 0)) {
+            printf("failed exact non-null buffer and non-zero size test\n");
+            result = 1;
+        }
+        free(line);
+        fclose(exact);
+    }
+    {
+        static const char input[] = "tail";
+        FILE             *partial = fmemopen((void *)input, sizeof(input) - 1, "r");
+        char             *line = malloc(8);
+        size_t            siz = 8;
+        int               len;
+        if (!partial || !line)
+            return 1;
+        memset(line, 'x', siz);
+        len = getdelim(&line, &siz, '\n', partial);
+        if (!(len == (int)sizeof(input) - 1 && strcmp(line, input) == 0)) {
+            printf("failed over size non-null buffer and non-zero size test\n");
+            result = 1;
+        }
+        free(line);
+        fclose(partial);
+    }
     return result;
 }
