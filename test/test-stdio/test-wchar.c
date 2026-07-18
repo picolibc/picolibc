@@ -99,8 +99,7 @@ main(void)
         return 1;
     }
 
-    if (fgetws(buf, sizeof(buf) / sizeof(buf[0]), file) == NULL ||
-        wcscmp(buf, L"Hello") != 0) {
+    if (fgetws(buf, sizeof(buf) / sizeof(buf[0]), file) == NULL || wcscmp(buf, L"Hello") != 0) {
         printf("Test Failed: fgetws discarded a partial line at EOF\n");
         fclose(file);
         unlink(TEST_FILE_NAME);
