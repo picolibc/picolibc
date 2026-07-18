@@ -40,6 +40,7 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <picotls.h>
+#include "crt0.h"
 char      **environ;
 char      **__argv;
 extern char __tls_base[];
