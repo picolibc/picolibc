@@ -206,6 +206,19 @@ const struct test fcvtf_tests[] = {
         }                                                                                        \
     } while (0)
 
+#define zero_len_test(func, value)                                                               \
+    do {                                                                                         \
+        char buf[1] = { 'x' };                                                                   \
+        int  decpt = -1;                                                                         \
+        int  sign = -1;                                                                          \
+        int  ret = func(value, 0, &decpt, &sign, buf, 0);                                        \
+                                                                                                 \
+        if (ret != -1 || buf[0] != 'x') {                                                       \
+            printf(#func " zero-len failed: ret %d buf %c\n", ret, buf[0]);                    \
+            error = 1;                                                                           \
+        }                                                                                        \
+    } while (0)
+
 int
 main(void)
 {
@@ -216,10 +229,13 @@ main(void)
     many_tests(fcvt_tests, fcvt_r, N_FCVT_TESTS, SKIP_LONGISH_FLOAT);
     many_tests(fcvt_extra_tests, fcvt_r, N_FCVT_EXTRA_TESTS, SKIP_LONG_FLOAT);
     many_tests(ecvt_tests, ecvt_r, N_ECVT_TESTS, SKIP_LONGISH_FLOAT);
+    zero_len_test(ecvt_r, 1.0);
 #ifdef __PICOLIBC__
     many_tests(fcvt_tests, fcvtf_r, N_FCVT_TESTS, SKIP_LONG_FLOAT);
     many_tests(fcvtf_tests, fcvtf_r, N_FCVTF_TESTS, SKIP_LONG_FLOAT);
     many_tests(ecvt_tests, ecvtf_r, N_ECVT_TESTS, SKIP_LONGISH_FLOAT);
+    zero_len_test(ecvtf_r, 1.0f);
+    zero_len_test(ecvtl_r, 1.0L);
 #endif
     return error;
 }

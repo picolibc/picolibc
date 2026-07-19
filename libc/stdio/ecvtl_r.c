@@ -49,7 +49,7 @@ ecvtl_r(long double invalue, int ndigit, int *decpt, int *sign, char *buf, size_
     if (ndigit < 0)
         ndigit = 0;
 
-    if ((size_t)ndigit > len - 1)
+    if (len == 0 || (size_t)ndigit >= len)
         return -1;
 
     if (!isfinite(invalue)) {
