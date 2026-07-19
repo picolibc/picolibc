@@ -149,6 +149,16 @@ if host_cpu_family == 'riscv'
     'c_args': ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SMRNMI'],
     'src': src_picocrt,
   }
+  # A CRT0 Semihosting variant that performs Zicfiss shadow-stack
+  # initialization via an Sv32 MMU page-table setup and drops to U-mode
+  # before running the application.  Only useful for builds that target
+  # Zicfilp+Zicfiss and are linked with -fcf-protection.
+  picocrt_variants += {
+    'name': 'semihost-cfi',
+    'suffix': '-semihost-cfi',
+    'c_args': ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt_riscv_cfi,
+  }
 endif
 
 foreach params : targets
