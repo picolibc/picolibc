@@ -17,13 +17,13 @@ MMU_BLOCK_NSE = 1 << 11
 
 EXPECTED = [
     0x0000000000000000,
-    0x0000000000000000,
+    0x0000000040000000,
     0x0000000080000F01,
     0x00000000C0000F01,
-    0x0000000000000000,
-    0x0000000000000000,
-    0x0000000000000000,
-    0x0000000000000000,
+    0x0000000100000000,
+    0x0000000140000000,
+    0x0000000180000000,
+    0x00000001C0000000,
 ]
 
 
@@ -71,34 +71,49 @@ def find_symbol(nm, elf, symbol):
 
 
 def read_bytes(objdump, elf, address, size):
+    stop_address = address + size
     output = run(
         [
             objdump,
             "-s",
             f"--start-address=0x{address:x}",
-            f"--stop-address=0x{address + size:x}",
+            f"--stop-address=0x{stop_address:x}",
             elf,
         ]
     )
 
     data = bytearray()
+    next_address = address
     for line in output.splitlines():
         fields = line.split()
         if len(fields) < 2:
             continue
         try:
-            int(fields[0], 16)
+            row_address = int(fields[0], 16)
         except ValueError:
             continue
+
+        row_data = bytearray()
         for field in fields[1:]:
             if len(field) % 2 != 0:
                 break
             try:
-                data.extend(bytes.fromhex(field))
+                row_data.extend(bytes.fromhex(field))
             except ValueError:
                 break
-            if len(data) >= size:
-                return bytes(data[:size])
+
+        row_end = row_address + len(row_data)
+        if row_end <= next_address:
+            continue
+        if row_address > next_address:
+            break
+
+        copy_start = next_address - row_address
+        copy_end = min(row_end, stop_address) - row_address
+        data.extend(row_data[copy_start:copy_end])
+        next_address += copy_end - copy_start
+        if next_address >= stop_address:
+            return bytes(data)
 
     raise ValueError(f"could not read {size} bytes at 0x{address:x}")
 
