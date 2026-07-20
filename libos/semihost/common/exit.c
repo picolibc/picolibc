@@ -40,14 +40,17 @@
 __noreturn void
 _exit(int code)
 {
-    if (sys_semihost_feature(SH_EXT_EXIT_EXTENDED)) {
+    if (sizeof(sh_param_t) != 8) {
+        /*
+         * On 32-bit arm, try the extended version first as
+         * SYS_EXIT doesn't pass the exit status along.
+         *
+         * We should use the semihosting extension mechanism to detect
+         * if this is supported, but FVP doesn't support detecting
+         * extensions, so we just give a try and if it fails, we fall
+         * back to the original path.
+         */
         sys_semihost_exit_extended(code);
-    } else {
-        uintptr_t value;
-        if (code == 0)
-            value = ADP_Stopped_ApplicationExit;
-        else
-            value = ADP_Stopped_RunTimeErrorUnknown;
-        sys_semihost_exit(value, code);
     }
+    sys_semihost_exit(ADP_Stopped_ApplicationExit, code);
 }
