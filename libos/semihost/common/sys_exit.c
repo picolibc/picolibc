@@ -41,7 +41,10 @@ sys_semihost_exit(uintptr_t exception, uintptr_t subcode)
 {
     if (sizeof(sh_param_t) == 8) {
         (void)sys_semihost2(SYS_EXIT, exception, subcode);
-    } else
+    } else {
+        if (exception == ADP_Stopped_ApplicationExit && subcode != 0)
+            exception = ADP_Stopped_RunTimeErrorUnknown;
         (void)sys_semihost(SYS_EXIT, exception);
+    }
     __builtin_unreachable();
 }

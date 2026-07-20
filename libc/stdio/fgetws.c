@@ -40,8 +40,11 @@ __STDIO_UNLOCKED(fgetws)(wchar_t *str, int size, FILE *stream)
 
     size--;
     for (c = 0, cp = str; c != L'\n' && size > 0; size--, cp++) {
-        if ((c = __STDIO_UNLOCKED(getwc)(stream)) == WEOF)
-            return NULL;
+        if ((c = __STDIO_UNLOCKED(getwc)(stream)) == WEOF) {
+            if (cp == str)
+                return NULL;
+            break;
+        }
         *cp = (wchar_t)c;
     }
     *cp = L'\0';

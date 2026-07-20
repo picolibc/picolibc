@@ -46,10 +46,7 @@ ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
     char       *digits = dtoa.digits;
     int         ngot;
 
-    if (ndigit < 0)
-        ndigit = 0;
-
-    if ((size_t)ndigit > len - 1)
+    if ((size_t)ndigit >= len)
         return -1;
 
     if (!isfinite(invalue)) {
