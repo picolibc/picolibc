@@ -84,7 +84,7 @@ foreach params : targets
   target_dir = params['dir']
   target_c_args = params['c_args']
 
-  _libs = [get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c_link' + target)]
   _libs += [get_variable(oslib_test + target)]
   if is_variable(crt0_test + target)
     _objs = [get_variable(crt0_test + target)]
