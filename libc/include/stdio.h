@@ -593,14 +593,20 @@ int vfprintf_s(FILE * __restrict stream, const char * __restrict fmt,
 #endif
 
 /*
- * The format of tmpnam names is TXXXXXX, which works with mktemp
+ * P_tmpdir must be empty or end with a path separator; L_tmpnam must fit
+ * P_tmpdir + the template + NUL. Both are set via meson tmpdir/tmpnam-len.
  */
+#ifdef __L_tmpnam
+#define L_tmpnam __L_tmpnam
+#else
 #define L_tmpnam 8
+#endif
 
-/*
- * tmpnam files are created in the current directory
- */
+#ifdef __P_tmpdir
+#define P_tmpdir __P_tmpdir
+#else
 #define P_tmpdir ""
+#endif
 
 /*
  * We don't have any way of knowing any underlying POSIX limits,
