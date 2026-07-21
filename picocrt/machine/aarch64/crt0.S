@@ -1,3 +1,38 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Oliver Stannard <oliver.stannard@arm.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
 #ifndef CRT0_LINUX
 /************ Page table ************/
 /*
@@ -19,6 +54,7 @@
 #define MMU_BLOCK_NT            (1 << 16)
 #define MMU_BLOCK_OA_BIT        12
 #define MMU_BLOCK_NG            (1 << 11)
+#define MMU_BLOCK_NSE           (1 << 11)
 #define MMU_BLOCK_AF            (1 << 10)
 #define MMU_BLOCK_SH_BIT        8
 #define MMU_BLOCK_SH_NS         (0 << MMU_BLOCK_SH_BIT)
@@ -73,13 +109,21 @@ __identity_page_table:
   page_table_entries 4, MMU_INVALID_FLAGS
   end_page_table
 #elif defined(MACHINE_fvp)
+#if __ARM_ARCH_PROFILE != 'R'
+  // The FVP A-profile crt0 runs at EL3. With FEAT_RME, descriptor bit 11 is
+  // NSE rather than nG; NS=0,NSE=1 selects Root PAS for EL3 execution.
+#define MMU_FVP_NORMAL_FLAGS    (MMU_NORMAL_FLAGS | MMU_BLOCK_NSE)
+#else
+#define MMU_FVP_NORMAL_FLAGS    MMU_NORMAL_FLAGS
+#endif
+
   start_page_table
   // [0x0000_0000,0x8000_0000): 2GiB unmapped. This actually contains a lot
   // of different memory regions and devices, but we don't need any of them
   // for testing.
   page_table_entries 2, MMU_INVALID_FLAGS
   // [0x8000_0000,0x1_0000_0000): 2GiB normal memory
-  page_table_entries 2, MMU_NORMAL_FLAGS
+  page_table_entries 2, MMU_FVP_NORMAL_FLAGS
   // [0x1_0000_0000,0x2_0000_0000): 4GiB un-mapped
   page_table_entries 4, MMU_INVALID_FLAGS
   end_page_table

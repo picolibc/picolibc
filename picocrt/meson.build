@@ -57,13 +57,25 @@ else
 endif
 
 machine_found = false
+test_picocrt_machine = ''
 foreach machine : picocrt_machines
   if machine['name'] == test_machine
     machine_found = true
+    test_picocrt_machine = machine.get('alias', machine['name'])
   endif
 endforeach
 if not machine_found
   error(test_machine + ': requested test machine not found')
+endif
+
+test_picocrt_machine_found = false
+foreach machine : picocrt_machines
+  if not machine.has_key('alias') and machine['name'] == test_picocrt_machine
+    test_picocrt_machine_found = true
+  endif
+endforeach
+if not test_picocrt_machine_found
+  error(test_machine + ': requested test machine maps to missing startup machine ' + test_picocrt_machine)
 endif
 
 stack_c_args = []
@@ -159,6 +171,10 @@ foreach params : targets
   instdir = join_paths(lib_dir, target_dir)
 
   foreach machine : picocrt_machines
+    if machine.has_key('alias')
+      continue
+    endif
+
     machine_suffix = machine['suffix']
 
     foreach variant : picocrt_variants
@@ -191,7 +207,7 @@ foreach params : targets
                           link_args : _link_args)
       endif
 
-      if machine['name'] == test_machine
+      if machine['name'] == test_picocrt_machine
         set_variable('crt0' + variant_suffix.underscorify() + target,
                      _crt.extract_objects(_src)
                     )

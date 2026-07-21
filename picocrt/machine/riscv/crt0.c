@@ -174,7 +174,7 @@ _trap(void)
 #endif
             ".option	pop");
 
-#ifdef __riscv_zcmt
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
     __asm__(".weak __jvt_base$\n"
 #ifdef __riscv_cmodel_large
             "ld t0, .trap_jvt_base\n"
@@ -206,7 +206,7 @@ _trap(void)
     __asm__(".align 3\n"
             ".trap_sp: .dword __stack\n" /* FIXME: this is __heap_end in non-large code models. */
             ".trap_gp: .dword __global_pointer$\n"
-#ifdef __riscv_zcmt
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
             ".trap_jvt_base: .dword __jvt_base$\n"
 #endif
     );
@@ -256,7 +256,7 @@ _start(void)
             "csrwi	vxrm, 1");
 #endif
 
-#ifdef __riscv_zcmt
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
     __asm__(".weak __jvt_base$\n"
 #ifdef __riscv_cmodel_large
             "ld t0, .start_jvt_base\n"
@@ -294,7 +294,7 @@ _start(void)
 #ifdef CRT0_SEMIHOST
             ".start_trap: .dword _trap\n"
 #endif
-#ifdef __riscv_zcmt
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
             ".start_jvt_base: .dword __jvt_base$\n"
 #endif
     );

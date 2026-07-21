@@ -33,7 +33,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 picolibc_headers(machine
-  _types.h
   fenv.h
   fenv-fp.h
   math.h

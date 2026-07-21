@@ -1177,6 +1177,27 @@ ATF_TC_BODY(test22, tc)
     }
 }
 
+ATF_TC(test23);
+ATF_TC_HEAD(test23, tc)
+{
+    atf_tc_set_md_var(tc, "descr", "test23");
+}
+ATF_TC_BODY(test23, tc)
+{
+    char  buf[BUFSIZ] = "contents";
+    FILE *fp = fmemopen(buf, sizeof(buf), "r+");
+
+    ATF_CHECK(fp != NULL);
+    ATF_CHECK(fseeko(fp, (off_t)2, SEEK_SET) == 0);
+
+    errno = 0;
+    ATF_CHECK(fseeko(fp, (off_t)0, INT_MAX) == -1);
+    ATF_CHECK(errno == EINVAL);
+    ATF_CHECK(ftello(fp) == (off_t)2);
+
+    ATF_CHECK(fclose(fp) == 0);
+}
+
 ATF_TP_ADD_TCS(tp)
 {
     ATF_TP_ADD_TC(tp, test00);
@@ -1202,6 +1223,7 @@ ATF_TP_ADD_TCS(tp)
     ATF_TP_ADD_TC(tp, test20);
     ATF_TP_ADD_TC(tp, test21);
     ATF_TP_ADD_TC(tp, test22);
+    ATF_TP_ADD_TC(tp, test23);
 
     return atf_no_error();
 }

@@ -50,6 +50,7 @@ main(void)
     FILE          *file;
     const wchar_t *ref;
     wint_t         res;
+    wchar_t        buf[8];
 
     /* Create testfile.dat in write mode */
     file = fopen(TEST_FILE_NAME, "w");
@@ -79,6 +80,39 @@ main(void)
         unlink(TEST_FILE_NAME);
         return 1;
     }
+
+    fclose(file);
+
+    file = fopen(TEST_FILE_NAME, "w");
+    if (file == NULL)
+        return 1;
+    if (fputws(L"Hello", file) < 0) {
+        fclose(file);
+        unlink(TEST_FILE_NAME);
+        return 1;
+    }
+    fclose(file);
+
+    file = fopen(TEST_FILE_NAME, "r");
+    if (file == NULL) {
+        unlink(TEST_FILE_NAME);
+        return 1;
+    }
+
+    if (fgetws(buf, sizeof(buf) / sizeof(buf[0]), file) == NULL || wcscmp(buf, L"Hello") != 0) {
+        printf("Test Failed: fgetws discarded a partial line at EOF\n");
+        fclose(file);
+        unlink(TEST_FILE_NAME);
+        return 1;
+    }
+    if (fgetws(buf, sizeof(buf) / sizeof(buf[0]), file) != NULL) {
+        printf("Test Failed: fgetws did not report an empty EOF\n");
+        fclose(file);
+        unlink(TEST_FILE_NAME);
+        return 1;
+    }
+
+    fclose(file);
 
     printf("Test Passed: Wide characters were written & read successfuly\n");
     unlink(TEST_FILE_NAME);
