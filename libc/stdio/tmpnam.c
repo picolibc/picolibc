@@ -47,9 +47,12 @@ static char _tmpnam[L_tmpnam];
 char *
 tmpnam(char *s)
 {
+    /* Fail the build if L_tmpnam can't hold the name. */
+    _Static_assert(L_tmpnam >= sizeof(P_tmpdir "TXXXXXX"), "L_tmpnam too small for P_tmpdir");
+
     if (!s)
         s = _tmpnam;
 
-    strcpy(s, "TXXXXXX");
+    strcpy(s, P_tmpdir "TXXXXXX");
     return mktemp(s);
 }

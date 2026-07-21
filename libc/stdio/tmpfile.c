@@ -42,7 +42,11 @@ tmpfile(void)
     int   fd;
     FILE *f;
 
-    strcpy(tmpnam, "TXXXXXX");
+    /* Fail the build if L_tmpnam can't hold the name. */
+    _Static_assert(L_tmpnam >= sizeof(P_tmpdir "TXXXXXX"), "L_tmpnam too small for P_tmpdir");
+
+    strcpy(tmpnam, P_tmpdir "TXXXXXX");
+
     fd = mkstemp(tmpnam);
     if (fd < 0)
         return NULL;

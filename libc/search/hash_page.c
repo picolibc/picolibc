@@ -799,13 +799,16 @@ __free_ovflpage(HTAB *hashp, BUFHEAD *obufp)
 static int
 open_temp(HTAB *hashp)
 {
+    /* P_tmpdir already includes its trailing separator (or is empty). */
+#define NAME_TEMPL (P_tmpdir "_hashXXXXXX")
     sigset_t set, oset;
-    char     namestr[sizeof("_hashXXXXXX")];
+    char     namestr[sizeof(NAME_TEMPL)];
+
+    strcpy(namestr, NAME_TEMPL);
 
     /* Block signals; make sure file goes away at process exit. */
     (void)sigfillset(&set);
     (void)sigprocmask(SIG_BLOCK, &set, &oset);
-    strcpy(namestr, "_hashXXXXXX");
     if ((hashp->fp = mkstemp(namestr)) != -1) {
         (void)unlink(namestr);
 #ifdef __HAVE_FCNTL
@@ -814,6 +817,7 @@ open_temp(HTAB *hashp)
     }
     (void)sigprocmask(SIG_SETMASK, &oset, (sigset_t *)NULL);
     return (hashp->fp != -1 ? 0 : -1);
+#undef NAME_TEMPL
 }
 
 /*

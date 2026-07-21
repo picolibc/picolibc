@@ -1499,6 +1499,14 @@ endif
 conf_data.set('__TINY_STDIO', true, description: 'Picolibc stdio comes from the avr C library')
 conf_data.set('__IO_DEFAULT', '\'@0@\''.format(format_default),
               description: 'The default printf and scanf variants')
+tmpdir = get_option('tmpdir')
+if tmpdir != '' and not tmpdir.endswith('/')
+  error('tmpdir must be empty or end with a path separator, got "@0@"'.format(tmpdir))
+endif
+conf_data.set('__L_tmpnam', get_option('tmpnam-len'),
+              description: 'Size of the tmpnam() buffer (L_tmpnam)')
+conf_data.set('__P_tmpdir', '"@0@"'.format(tmpdir),
+              description: 'Directory prefix for temporary file names (P_tmpdir)')
 conf_data.set('__IO_SMALL_ULTOA',
               printf_small_ultoa,
               description: 'avoid software division in decimal conversion')

@@ -248,6 +248,10 @@ option('tls-rp2040', type: 'boolean', value: false,
        description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
 option('stack-protector-guard', type: 'combo', choices: ['global', 'tls', 'auto'], value: 'auto',
        description: 'Set stack protection canary type')
+option('tmpdir', type: 'string', value: '',
+       description: 'Directory prefix for tmpnam()/tmpfile() names (P_tmpdir). Must be empty or end with a path separator. Empty means names are created in the current directory.')
+option('tmpnam-len', type: 'integer', value: 8,
+       description: 'Size of the tmpnam() buffer (L_tmpnam). Must be large enough to hold tmpdir + "TXXXXXX" + NUL.')
 
 #
 # Math options
