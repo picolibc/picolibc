@@ -244,12 +244,11 @@ endif()
 
 # Directory prefix and buffer size for tmpnam()/tmpfile() names. tmpdir must be
 # empty or already end with a path separator (it is concatenated with the
-# template, no slash added); tmpnam-len must hold tmpdir + "TXXXXXX" + NUL.
-if(NOT DEFINED __L_tmpnam)
-  set(__L_tmpnam 8)
-endif()
-if(NOT DEFINED __P_tmpdir)
-  set(__P_tmpdir "\"\"")
+# template, no slash added); __L_tmpnam must hold tmpdir + "TXXXXXX" + NUL.
+if(DEFINED tmpdir)
+  set(__P_tmpdir ${tmpdir})
+  string(LENGTH ${tmpdir} tmpdir_len)
+  math(EXPR __L_tmpnam "${tmpdir_len} + 8")
 endif()
 
 # math library sets errno
