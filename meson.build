@@ -1503,10 +1503,15 @@ tmpdir = get_option('tmpdir')
 if tmpdir != '' and not tmpdir.endswith('/')
   error('tmpdir must be empty or end with a path separator, got "@0@"'.format(tmpdir))
 endif
-conf_data.set('__L_tmpnam', get_option('tmpnam-len'),
-              description: 'Size of the tmpnam() buffer (L_tmpnam)')
-conf_data.set('__P_tmpdir', '"@0@"'.format(tmpdir),
-              description: 'Directory prefix for temporary file names (P_tmpdir)')
+if tmpdir != ''
+  strlen = find_program('scripts/strlen', required : true)
+  tmpdir_len_result = run_command(strlen, tmpdir, capture: true, check: true)
+  tmplen = tmpdir_len_result.stdout().to_int() + 8
+  conf_data.set('__P_tmpdir', '"@0@"'.format(tmpdir),
+                description: 'Directory prefix for temporary file names (P_tmpdir)')
+  conf_data.set('__L_tmpnam', tmplen,
+                description: 'Size of the tmpnam() buffer (L_tmpnam)')
+endif
 conf_data.set('__IO_SMALL_ULTOA',
               printf_small_ultoa,
               description: 'avoid software division in decimal conversion')
