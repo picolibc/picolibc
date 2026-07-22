@@ -594,7 +594,7 @@ int vfprintf_s(FILE * __restrict stream, const char * __restrict fmt,
 
 /*
  * P_tmpdir must be empty or end with a path separator; L_tmpnam must fit
- * P_tmpdir + the template + NUL. Both are set via meson tmpdir/tmpnam-len.
+ * P_tmpdir + the template + NUL. Both are set via meson or cmake tmpdir
  */
 #ifdef __L_tmpnam
 #define L_tmpnam __L_tmpnam
@@ -602,10 +602,12 @@ int vfprintf_s(FILE * __restrict stream, const char * __restrict fmt,
 #define L_tmpnam 8
 #endif
 
+#if __MISC_VISIBLE || XSI_VISIBLE
 #ifdef __P_tmpdir
 #define P_tmpdir __P_tmpdir
 #else
 #define P_tmpdir ""
+#endif
 #endif
 
 /*
