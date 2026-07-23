@@ -39,6 +39,7 @@
 exec "$(dirname "$0")"/do-configure x86_64-linux-gnu \
 	-Dsemihost=false \
 	-Dos-linux=true \
+	-Dtmpdir=/tmp/ \
 	-Dnative-tests=true \
 	-Dmultilib-exclude=x32 \
 	-Dtests=true \
