@@ -132,6 +132,7 @@ enable_picocrt_lib = get_option('picocrt-lib')
 picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
 enable_tests = get_option('tests')
+enable_libdl = get_option('libdl')
 if get_option('tests-cdefs') == 'auto'
   enable_cdefs_tests = enable_tests
 else
@@ -1707,6 +1708,10 @@ bios_bin = []
 # make sure to include os BEFORE picocrt!
 
 subdir('libos')
+
+if enable_libdl
+  subdir('libdl')
+endif
 
 if use_stdlib or has_os_linux or has_os_fallback
   has_os_library = true
