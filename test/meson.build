@@ -166,7 +166,11 @@ foreach params : targets
     _cpp_args = target_c_args + get_variable('test_cpp_args' + target, test_cpp_args)
   endif
 
-  if host_cpu_family == 'aarch64' and test_machine == 'fvp' and crt0_test_variant == 'semihost' and not target_dir.startswith('aarch64r')
+  target_arch_profile = ''
+  if host_cpu_family == 'aarch64' and test_machine == 'fvp' and crt0_test_variant == 'semihost'
+    target_arch_profile = cc.get_define('__ARM_ARCH_PROFILE', args: _c_args)
+  endif
+  if host_cpu_family == 'aarch64' and test_machine == 'fvp' and crt0_test_variant == 'semihost' and target_arch_profile == '\'A\''
     t1 = 'test-crt0-page-table'
     t1_exe = executable(t1 + target, t1 + '.c',
                         c_args: _c_args,
