@@ -29,22 +29,22 @@ case "$TARGET" in
         ;;
 esac
 
-# We can't use both the analyzer and sanitizer because
-# the analyzer is run after the sanitizer and generates a lot
-# of false positives, so just use the sanitizer as it
-# appears to find more relevant bugs at this point.
-
-SANITIZER="-Dsanitize=undefined"
-
-# Use traps with the sanitizer on msp430 as the handlers make many
-# tests too large
+OPTIONS=""
 
 case "$TARGET" in
+    *m68k*)
+	# Disable analyzer on m68k because the compiler gets very confused
+	# about complex values
+
+	OPTIONS="$OPTIONS -Danalyzer=false"
+	;;
     *msp430*)
-	SANITIZER="$SANITIZER -Dsanitize-trap-on-error=true"
+
+	# Use traps with the sanitizer on msp430 as the handlers make many
+	# tests too large
+
+	OPTIONS="$OPTIONS -Dsanitize-trap-on-error=true"
 	;;
 esac
 
-OPTIONS="$SANITIZER -Dexhaustive-math-tests=native"
-
-"$HERE"/do-run "$TARGET" $OPTIONS "$@"
+"$HERE"/do-run "$TARGET" "$@" $OPTIONS
