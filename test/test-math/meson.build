@@ -191,7 +191,7 @@ foreach params : targets
 
   if enable_exhaustive_math_tests
     foreach f : functions
-      test_name = 'test-math-compare-' + f
+      test_name = 'test-math-compare-' + f + target
       test_function_name_arg=['-DTEST_FUNC=' + f]
       test(test_name,
            executable(test_name, 'test-math-compare.c',
