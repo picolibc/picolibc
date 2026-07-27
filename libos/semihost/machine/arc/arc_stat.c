@@ -68,7 +68,7 @@ struct arc_stat {
 int
 stat(const char *pathname, struct stat * restrict statbuf)
 {
-    struct arc_stat arc_stat;
+    struct arc_stat arc_stat = {};
 
     int ret = arc_semihost2(SYS_SEMIHOST_stat, (uintptr_t)pathname, (uintptr_t)&arc_stat);
     if (ret < 0) {

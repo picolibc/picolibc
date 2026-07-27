@@ -68,7 +68,7 @@ struct arc_stat {
 int
 fstat(int fd, struct stat * restrict statbuf)
 {
-    struct arc_stat arc_stat;
+    struct arc_stat arc_stat = {};
 
     int             ret = arc_semihost2(SYS_SEMIHOST_fstat, fd, (uintptr_t)&arc_stat);
     if (ret < 0) {
