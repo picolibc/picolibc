@@ -177,12 +177,12 @@ report(char *expr, test_t v, int e, int exception, int oexception)
         result += report(s(expr), v, e, exception, oexception); \
     } while (0)
 
-#define TEST_CASE(expr, exception)                                         \
-    do {                                                                   \
-        if ((exception & (my_overflow | my_underflow)) && my_inexact != 0) \
-            TEST_CASE2(expr, exception, exception | my_inexact);           \
-        else                                                               \
-            TEST_CASE2(expr, exception, 0);                                \
+#define TEST_CASE(expr, exception)                                                  \
+    do {                                                                            \
+        if (((exception & (my_overflow | my_underflow)) != 0) && (my_inexact != 0)) \
+            TEST_CASE2(expr, exception, exception | my_inexact);                    \
+        else                                                                        \
+            TEST_CASE2(expr, exception, 0);                                         \
     } while (0)
 
 static const struct {
