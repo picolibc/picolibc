@@ -119,7 +119,9 @@ test_args = {
   'test-argv-no-flash': ['--args', 'hello world'],
 }
 
-check_aarch64_fvp_page_table = find_program('check-aarch64-fvp-page-table.py')
+if host_cpu_family == 'aarch64' and test_machine == 'fvp'
+  check_aarch64_fvp_page_table = find_program('check-aarch64-fvp-page-table.py')
+endif
 
 test_skip_native = [
   'test-stack-smash',
