@@ -153,6 +153,12 @@ __identity_page_table:
          */
 #define SMCR_EL1 S3_0_c1_c2_6
 
+#if defined(MACHINE_qemu)
+#define SMCR_BOOT_EL SMCR_EL1
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE != 'R'
+#define SMCR_BOOT_EL SMCR_EL3
+#endif
+
 /************ Entry point ************/
 
   // Defined in crt0.c
@@ -198,6 +204,7 @@ _start:
 #error "Unknown machine type"
 #endif
 
+#ifdef SMCR_BOOT_EL
 	/* Determine if SME or SME2 is available */
 	bl      __arm_has_sme
 	cbz     x0, .Lnosme
@@ -217,13 +224,14 @@ _start:
 	mov     x2, #0xF
 
 	/* Try to set the maximum value supported by the architecture (2048). */
-	mrs     x1, BOOT_EL(SMCR) /* mrs  x1, smcr */
+	mrs     x1, SMCR_BOOT_EL /* mrs  x1, smcr */
 	bfi     x1, x2, 0, 4
-	msr     BOOT_EL(SMCR), x1 /* msr  smcr, x1 */
+	msr     SMCR_BOOT_EL, x1 /* msr  smcr, x1 */
 	isb
 
 .Lnosme:
 
+#endif
 
 #endif // __ARM_FP
 #endif
