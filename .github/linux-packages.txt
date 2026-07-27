@@ -29,6 +29,8 @@ libc6-dev-sparc64-cross
 libc6:i386
 libc6-dev-i386
 lib32stdc++-15-dev
+libubsan1
+libubsan1:i386
 lld
 clang
 llvm-libunwind1

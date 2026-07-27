@@ -7,6 +7,8 @@ gcc
 gcc-arm-linux-gnueabihf
 libc6-dev-armhf-cross
 libc6:armhf
+libubsan1
+libubsan1:armhf
 ca-certificates
 wget
 gnupg
