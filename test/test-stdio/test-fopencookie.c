@@ -39,19 +39,15 @@
 #include <string.h>
 #include <stdlib.h>
 
-#define IO_T   ssize_t
-#define BUF_T  char
-#define SEEK_T off_t
+static char  test_buf[1024];
+static off_t test_pos;
+static off_t test_end;
 
-static char   test_buf[1024];
-static SEEK_T test_pos;
-static SEEK_T test_end;
+#define min(a, b) ((off_t)(a) < (off_t)(b) ? (off_t)(a) : (off_t)(b))
+#define max(a, b) ((off_t)(a) > (off_t)(b) ? (off_t)(a) : (off_t)(b))
 
-#define min(a, b) ((SEEK_T)(a) < (SEEK_T)(b) ? (SEEK_T)(a) : (SEEK_T)(b))
-#define max(a, b) ((SEEK_T)(a) > (SEEK_T)(b) ? (SEEK_T)(a) : (SEEK_T)(b))
-
-static IO_T
-test_read(void *cookie, BUF_T *buf, size_t n)
+static ssize_t
+test_read(void *cookie, char *buf, size_t n)
 {
     (void)cookie;
     assert(test_pos <= test_end);
@@ -61,8 +57,8 @@ test_read(void *cookie, BUF_T *buf, size_t n)
     return n;
 }
 
-static IO_T
-test_write(void *cookie, const BUF_T *buf, size_t n)
+static ssize_t
+test_write(void *cookie, const char *buf, size_t n)
 {
     (void)cookie;
     assert((size_t)test_pos <= sizeof(test_buf));
@@ -74,9 +70,9 @@ test_write(void *cookie, const BUF_T *buf, size_t n)
 }
 
 static int
-test_seek(void *cookie, SEEK_T *pos, int whence)
+test_seek(void *cookie, off_t *pos, int whence)
 {
-    SEEK_T new_pos = test_pos;
+    off_t new_pos = test_pos;
 
     (void)cookie;
     switch (whence) {
