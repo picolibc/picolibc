@@ -1,5 +1,6 @@
 #!/bin/bash
 
+PICOLIBC_PREFIX=/opt/picolibc-test
 PICOLIBC_DIR=/build/picolibc
 GLIBC_DIR=/build/glibc
 
@@ -8,7 +9,7 @@ set -e
 #test=echo
 
 options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Dsanitize=undefined"
-stdoptions="$options --buildtype=release -Ddebug=true"
+stdoptions="$options --buildtype=release -Ddebug=true --prefix=$PICOLIBC_PREFIX"
 
 declare -a ARCHS
 
@@ -18,13 +19,20 @@ for arch in "${ARCHS[@]}"; do
 
     DIR=$PICOLIBC_DIR/builds/build-$arch
 
+    echo '###################################'
+
+    echo '####' rm -rf $DIR
     $test rm -rf $DIR
+
+    echo '####' mkdir -p $DIR
     $test mkdir -p $DIR
+
+    echo '####' cd $DIR
     $test cd $DIR
 
-    echo '###################################'
     echo '####' ../../scripts/do-$arch-configure $stdoptions
     echo '###################################'
+
 
     $test ../../scripts/do-$arch-configure $stdoptions
 
