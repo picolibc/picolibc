@@ -44,6 +44,9 @@ ecvtf_r(float invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
     struct dtoa dtoa;
     int         ngot;
 
+    if (ndigit < 0)
+        ndigit = 0;
+
     if ((size_t)ndigit >= len)
         return -1;
 
