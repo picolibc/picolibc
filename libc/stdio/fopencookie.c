@@ -69,16 +69,16 @@ fopencookie_write(void *ptr, const void *buf, size_t count)
     return ret;
 }
 
-static __off_t
-fopencookie_seek(void *ptr, __off_t offset, int whence)
+static off_t
+fopencookie_seek(void *ptr, off_t offset, int whence)
 {
     struct __file_cookie *pf = ptr;
 
     if (!pf->io.seek)
-        return (__off_t)-1;
+        return (off_t)-1;
 
     if (pf->io.seek(pf->cookie, &offset, whence) == -1)
-        return (__off_t)-1;
+        return (off_t)-1;
 
     return offset;
 }
