@@ -102,13 +102,19 @@ static const char *locales[] = {
 #define LAST_CHAR 0xdffff
 #endif
 
+#if MB_LEN_MAX < 4
+#define MY_BUF_SIZE 4
+#else
+#define MY_BUF_SIZE MB_LEN_MAX
+#endif
+
 int
 main(int argc, char **argv)
 {
     int         error = 0;
     int         c, lastc;
     size_t      mb_cur_max;
-    char        mb[MB_LEN_MAX + 1];
+    char        mb[MY_BUF_SIZE + 1];
     char        byte2[2];
     int         nbyte2;
     int         i2;
