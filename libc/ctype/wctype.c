@@ -74,51 +74,53 @@ No supporting OS subroutines are required.
 wctype_t
 wctype(const char *c)
 {
-    switch (*c) {
-    case 'a':
-        if (!strcmp(c, "alnum"))
-            return CLASS_alnum;
-        else if (!strcmp(c, "alpha"))
-            return CLASS_alpha;
-        break;
-    case 'b':
-        if (!strcmp(c, "blank"))
-            return CLASS_blank;
-        break;
-    case 'c':
-        if (!strcmp(c, "cntrl"))
-            return CLASS_cntrl;
-        break;
-    case 'd':
-        if (!strcmp(c, "digit"))
-            return CLASS_digit;
-        break;
-    case 'g':
-        if (!strcmp(c, "graph"))
-            return CLASS_graph;
-        break;
-    case 'l':
-        if (!strcmp(c, "lower"))
-            return CLASS_lower;
-        break;
-    case 'p':
-        if (!strcmp(c, "print"))
-            return CLASS_print;
-        else if (!strcmp(c, "punct"))
-            return CLASS_punct;
-        break;
-    case 's':
-        if (!strcmp(c, "space"))
-            return CLASS_space;
-        break;
-    case 'u':
-        if (!strcmp(c, "upper"))
-            return CLASS_upper;
-        break;
-    case 'x':
-        if (!strcmp(c, "xdigit"))
-            return CLASS_xdigit;
-        break;
+    if (c != NULL) {
+        switch (*c) {
+        case 'a':
+            if (!strcmp(c, "alnum"))
+                return CLASS_alnum;
+            else if (!strcmp(c, "alpha"))
+                return CLASS_alpha;
+            break;
+        case 'b':
+            if (!strcmp(c, "blank"))
+                return CLASS_blank;
+            break;
+        case 'c':
+            if (!strcmp(c, "cntrl"))
+                return CLASS_cntrl;
+            break;
+        case 'd':
+            if (!strcmp(c, "digit"))
+                return CLASS_digit;
+            break;
+        case 'g':
+            if (!strcmp(c, "graph"))
+                return CLASS_graph;
+            break;
+        case 'l':
+            if (!strcmp(c, "lower"))
+                return CLASS_lower;
+            break;
+        case 'p':
+            if (!strcmp(c, "print"))
+                return CLASS_print;
+            else if (!strcmp(c, "punct"))
+                return CLASS_punct;
+            break;
+        case 's':
+            if (!strcmp(c, "space"))
+                return CLASS_space;
+            break;
+        case 'u':
+            if (!strcmp(c, "upper"))
+                return CLASS_upper;
+            break;
+        case 'x':
+            if (!strcmp(c, "xdigit"))
+                return CLASS_xdigit;
+            break;
+        }
     }
 
     /* otherwise invalid */
