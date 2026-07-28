@@ -199,7 +199,7 @@ matcher(struct re_guts *g, char *string, size_t nmatch, regmatch_t pmatch[], int
                 return (REG_NOMATCH);
         } else {
             for (dp = start; dp < stop; dp++)
-                if (*dp == g->must[0] && stop - dp >= g->mlen
+                if (g->must && *dp == g->must[0] && stop - dp >= g->mlen
                     && memcmp(dp, g->must, (size_t)g->mlen) == 0)
                     break;
             if (dp == stop) /* we didn't find g->must */
