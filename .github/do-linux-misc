@@ -18,7 +18,6 @@ HERE=`dirname "$0"`
 "$HERE"/do-build mipsel "$@"
 "$HERE"/do-test clang-hexagon "$@"
 "$HERE"/do-test m68k-unknown-elf "$@"
-"$HERE"/do-test rx-zephyr-elf "$@"
 "$HERE"/do-test sh-unknown-elf "$@"
 "$HERE"/do-avr-build avr "$@"
 "$HERE"/do-test msp430-unknown-elf "$@"

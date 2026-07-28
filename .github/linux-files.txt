@@ -5,7 +5,6 @@ https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/loongarch64-
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/m68k-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/msp430-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/or1k-unknown-elf.linux-amd64.tar.xz
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/rx-zephyr-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/sh-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/qemu-stable.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/qemu-hexagon.linux-amd64.tar.xz
