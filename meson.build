@@ -2014,6 +2014,7 @@ crt0_default = meson.get_external_property('crt0_default', 'crt0')
 if system_libc
   specs_isystem = ''
   specs_libpath = ''
+  specs_libgccpath = ''
   # The '%s' here asks gcc to search for this file in the 'usual' library path
   specs_startfile = '%{-crt0=*:crt0-%*%O%s; :@0@%O%s}'.format(crt0_default)
 else
