@@ -718,7 +718,7 @@ hash_seq(const DB *dbp, DBT *key, DBT *data, u_int flag)
                     return (ERROR);
                 hashp->cpage = bufp;
                 bp = (__uint16_t *)bufp->page;
-                if (bp[0])
+                if (bp && bp[0])
                     break;
             }
             hashp->cbucket = bucket;
@@ -739,7 +739,7 @@ hash_seq(const DB *dbp, DBT *key, DBT *data, u_int flag)
             bp = (__uint16_t *)(bufp->page);
             hashp->cndx = 1;
         }
-        if (!bp[0]) {
+        if (!bp || !bp[0]) {
             hashp->cpage = NULL;
             ++hashp->cbucket;
         }
@@ -851,6 +851,12 @@ __call_hash(HTAB *hashp, char *k, int len)
         bucket = bucket & hashp->LOW_MASK;
     return (bucket);
 }
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-malloc-leak"
+#endif
 
 /*
  * Allocate segment table.  On error, destroy the table and set errno.
