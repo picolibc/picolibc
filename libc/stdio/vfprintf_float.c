@@ -33,7 +33,6 @@
     uint8_t       sign;         /* sign character (or 0)	*/
     uint8_t       ndigs;        /* number of digits to convert */
     unsigned char case_convert; /* subtract to correct case */
-    int           exp;          /* exponent of most significant decimal digit */
     int           n;            /* total width */
     uint8_t       ndigs_exp;    /* number of digis in exponent */
 
@@ -58,7 +57,6 @@
                 prec = -1;
             prec = __lfloat_x_engine(fval, &u.dtoa, prec, case_convert);
             ndigs = prec + 1;
-            exp = u.dtoa.exp;
             ndigs_exp = 1;
         } else
 #endif /* _NEED_IO_C99_FORMATS */
@@ -88,7 +86,6 @@
 
             ndigs = __lfloat_d_engine(fval, &u.dtoa, ndigs, fmode, ndecimal);
 
-            exp = u.dtoa.exp;
             ndigs_exp = 2;
         }
     } else
@@ -111,7 +108,6 @@
             ndigs = 1 + __float_x_engine(fval, &u.dtoa, prec, case_convert);
             if (prec <= ndigs)
                 prec = ndigs - 1;
-            exp = u.dtoa.exp;
             ndigs_exp = 1;
         } else
 #endif /* _NEED_IO_C99_FORMATS */
@@ -140,22 +136,9 @@
                 ndigs = FLOAT_MAX_DIG;
 
             ndigs = __float_d_engine(fval, &u.dtoa, ndigs, fmode, ndecimal);
-            exp = u.dtoa.exp;
             ndigs_exp = 2;
         }
     }
-    if (exp < -9 || 9 < exp)
-        ndigs_exp = 2;
-    if (exp < -99 || 99 < exp)
-        ndigs_exp = 3;
-#ifdef _NEED_IO_FLOAT64
-    if (exp < -999 || 999 < exp)
-        ndigs_exp = 4;
-#ifdef _NEED_IO_FLOAT_LARGE
-    if (exp < -9999 || 9999 < exp)
-        ndigs_exp = 5;
-#endif
-#endif
 
     sign = 0;
     if (u.dtoa.flags & DTOA_MINUS)
@@ -185,7 +168,20 @@
         while ((c = *pnt++))
             my_putc(TOCASE(c), stream);
     } else {
+        int exp = u.dtoa.exp; /* exponent of most significant decimal digit */
 
+        if (exp < -9 || 9 < exp)
+            ndigs_exp = 2;
+        if (exp < -99 || 99 < exp)
+            ndigs_exp = 3;
+#ifdef _NEED_IO_FLOAT64
+        if (exp < -999 || 999 < exp)
+            ndigs_exp = 4;
+#ifdef _NEED_IO_FLOAT_LARGE
+        if (exp < -9999 || 9999 < exp)
+            ndigs_exp = 5;
+#endif
+#endif
         if (!(flags & (FL_FLTEXP | FL_FLTFIX))) {
 
             /* 'g(G)' format */
