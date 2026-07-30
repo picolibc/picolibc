@@ -115,6 +115,9 @@ picolibc_sources(
   exitprocs.c
   onexit.c
   cxa-atexit.c
+  at-quick-exit.c
+  quick-exit.c
+  cxa-at-quick-exit.c
   set_constraint_handler_s.c
   ignore_handler_s.c
   )
