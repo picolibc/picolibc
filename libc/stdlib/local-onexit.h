@@ -55,9 +55,24 @@ union on_exit_func {
     void (*cxa_atexit)(void *);
 };
 
-int  _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg);
+int _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg);
 
-int  __cxa_atexit(void (*func)(void *), void *arg, void *d);
+int __cxa_atexit(void (*func)(void *), void *arg, void *d);
+
+/*
+ * Handlers registered with at_quick_exit()/__cxa_at_quick_exit() are
+ * kept in a table separate from the atexit()/on_exit() handlers so that
+ * quick_exit() only invokes the quick-exit handlers (per C11 7.22.4.3).
+ */
+enum pico_quick_exit_kind {
+    PICO_QUICK_EXIT_EMPTY,
+    PICO_QUICK_EXIT_ATEXIT,
+    PICO_QUICK_EXIT_CXA_ATEXIT
+};
+
+int  _at_quick_exit(enum pico_quick_exit_kind kind, union on_exit_func func, void *arg);
+
+int  __cxa_at_quick_exit(void (*func)(void *), void *arg, void *d);
 
 void __libc_fini_array(void);
 
