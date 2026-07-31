@@ -6,6 +6,7 @@
 #
 
 import argparse
+import re
 import shutil
 import struct
 import subprocess
@@ -118,6 +119,20 @@ def read_bytes(objdump, elf, address, size):
     raise ValueError(f"could not read {size} bytes at 0x{address:x}")
 
 
+def is_little_endian(objdump, elf):
+    output = run([objdump, "-a", elf])
+    result = re.search(r"file format elf64-(\w+)aarch64", output)
+    if result is None:
+        raise ValueError("could not read endianness info from ELF file")
+    match result[1]:
+        case "little":
+            return True
+        case "big":
+            return False
+        case _:
+            raise ValueError("unexpected endianness value in ELF file")
+
+
 def parse_args(argv):
     parser = argparse.ArgumentParser()
     parser.add_argument("--cc", help="compiler used to build the ELF")
@@ -134,7 +149,13 @@ def main(argv):
         page_table_addr, page_table_size = find_symbol(nm, args.elf, "__identity_page_table")
         if page_table_size < 8 * 8:
             return error(f"__identity_page_table is too small: {page_table_size} bytes")
-        entries = list(struct.unpack("<8Q", read_bytes(objdump, args.elf, page_table_addr, 8 * 8)))
+        byte_order_spec = "<" if is_little_endian(objdump, args.elf) else ">"
+        entries = list(
+            struct.unpack(
+                f"{byte_order_spec}8Q",
+                read_bytes(objdump, args.elf, page_table_addr, 8 * 8),
+            )
+        )
     except (FileNotFoundError, subprocess.CalledProcessError, ValueError) as err:
         return error(str(err))
 
