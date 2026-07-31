@@ -1816,6 +1816,7 @@ Files: empty-libs/meson.build
  libos/semihost/fake/fake_getrlimit.c
  libos/semihost/fake/fake_gettimeofday.c
  libos/semihost/fake/fake_setrlimit.c
+ scripts/strlen
  test/test-ctype/CMakeLists.txt
  test/test-ctype/meson.build
  test/test-ctype/test-iswctype.c
@@ -1912,6 +1913,10 @@ Files: libc/ctype/ctype_extended.h
  test/test-stdio/test-funopen.c
  test/test-uchar.c
 Copyright: 2024 Keith Packard
+License: BSD3-1
+
+Files: libc/include/dlfcn.h
+Copyright: 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
 License: BSD3-1
 
 Files: libc/machine/aarch64/meson.build
@@ -2103,7 +2108,7 @@ Copyright: 2025 Jiaxun Yang <jiaxun.yang@flygoat.com>
 License: BSD3-1
 
 Files: meson.build
-Copyright: 2019-2021 Keith Packard
+Copyright: 2019-2026 Keith Packard
 License: BSD3-1
 
 Files: picocrt/machine/aarch64/crt0.S
@@ -2124,6 +2129,11 @@ Files: picocrt/machine/x86/crt0-32-linux.S
  picocrt/machine/x86/crt0-64-linux.S
  picocrt/machine/x86/crt0-64.S
 Copyright: 2021 Mike Haertel and Keith Packard
+License: BSD3-1
+
+Files: scripts/do-clang-arm-fvp-configure
+ scripts/run-arm-fvp
+Copyright: 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
 License: BSD3-1
 
 Files: scripts/do-coreboot-arm-eabi-configure
@@ -2582,13 +2592,44 @@ License: BSD3-8
 
 Files: libc/include/sys/mman.h
  libc/include/sys/statvfs.h
+ libc/machine/hexagon/fmemcpy.S
  libc/machine/hexagon/longjmp.S
  libc/machine/hexagon/machine/fenv-fp.h
  libc/machine/hexagon/machine/fenv.h
  libc/machine/hexagon/machine/meson.build
+ libc/machine/hexagon/memcpy.S
+ libc/machine/hexagon/memmove.S
+ libc/machine/hexagon/memset.S
  libc/machine/hexagon/meson.build
+ libc/machine/hexagon/rmemcpy.S
  libc/machine/hexagon/setjmp.S
+ libc/machine/hexagon/strcmp.S
+ libc/machine/hexagon/strlen.S
  libc/machine/hexagon/tls.c
+ libc/stdlib/at-quick-exit.c
+ libc/stdlib/cxa-at-quick-exit.c
+ libc/stdlib/quick-exit.c
+ libdl/dl.c
+ libdl/dl_impl.h
+ libdl/elf32.h
+ libdl/machine/hexagon/dl_arch.h
+ libdl/machine/hexagon/dl_relocate.c
+ libdl/machine/hexagon/dl_syms.c
+ libdl/machine/hexagon/dl_tls.c
+ libdl/machine/hexagon/meson.build
+ libdl/meson.build
+ libm/machine/hexagon/CMakeLists.txt
+ libm/machine/hexagon/meson.build
+ libm/machine/hexagon/s_fabs.c
+ libm/machine/hexagon/s_fma.c
+ libm/machine/hexagon/s_fmax.c
+ libm/machine/hexagon/s_fmin.c
+ libm/machine/hexagon/s_sqrt.c
+ libm/machine/hexagon/sf_fabs.c
+ libm/machine/hexagon/sf_fma.c
+ libm/machine/hexagon/sf_fmax.c
+ libm/machine/hexagon/sf_fmin.c
+ libm/machine/hexagon/sf_sqrt.c
  libos/dummyhost/fstatvfs.c
  libos/dummyhost/statvfs.c
  libos/linux/_statvfsbuf.c
@@ -2643,9 +2684,16 @@ Files: libc/include/sys/mman.h
  picocrt/machine/hexagon/crt0.c
  picocrt/machine/hexagon/meson.build
  scripts/cross-clang-hexagon.txt
+ scripts/cross-eld-x86_64.txt
  scripts/do-clang-hexagon-configure
+ scripts/do-eld-x86_64-configure
  scripts/run-hexagon
  test/test-argv.c
+ test/test-libdl/meson.build
+ test/test-libdl/test-libdl-error.c
+ test/test-libdl/test-libdl-load.c
+ test/test-libdl/test-libdl-tls.c
+ test/test-libdl/testmod.c
  test/test-lseek-overflow.c
  test/test-posix/test-access.c
  test/test-posix/test-dirent.c
@@ -2656,13 +2704,68 @@ Files: libc/include/sys/mman.h
  test/test-posix/test-rename.c
  test/test-posix/test-statvfs.c
  test/test-stdio/test-bufio-lock-init.c
+ test/test-stdlib/test-quick-exit.c
  test/test-thread-safety.c
 Copyright: 2026 Qualcomm Technologies, Inc. and/or its subsidiaries.
 License: BSD3-9
 
-Files: libc/machine/aarch64/machine/_types.h
-Copyright: 2012 ARM Ltd
+Files: libc/machine/aarch64/memchr-stub.c
+ libc/machine/aarch64/memcmp-stub.c
+ libc/machine/aarch64/memmove-stub.c
+ libc/machine/aarch64/strlen-stub.c
+ libc/machine/aarch64/strncmp-stub.c
+ libc/machine/aarch64/strnlen-stub.c
+ libc/machine/aarch64/strnlen.S
+Copyright: 2013, Linaro Limited
 License: BSD3-10
+
+Files: libc/machine/aarch64/memcpy-stub.c
+ libc/machine/aarch64/memset-stub.c
+ libc/machine/aarch64/strcmp-stub.c
+Copyright: 2012-2013, Linaro Limited
+License: BSD3-10
+
+Files: libc/machine/aarch64/strlen.S
+Copyright: 2013-2015, Linaro Limited
+License: BSD3-10
+
+Files: libc/machine/aarch64/strncmp.S
+Copyright: 2013, 2018, Linaro Limited
+License: BSD3-10
+
+Files: libc/machine/arm/memchr.c
+ libc/machine/arm/memcpy.c
+ libc/machine/arm/strlen-thumb1-Os.S
+ libc/machine/arm/strlen-thumb2-Os.S
+ libc/machine/arm/strlen.S
+Copyright: 2015 ARM Ltd.
+License: BSD3-10
+
+Files: libc/machine/aarch64/rawmemchr-stub.c
+ libc/machine/aarch64/rawmemchr.S
+Copyright: 2015-2016, ARM Limited
+License: BSD3-11
+
+Files: libc/machine/aarch64/stpcpy-stub.c
+Copyright: 2015, ARM Limited
+License: BSD3-11
+
+Files: libc/machine/aarch64/strchr-stub.c
+ libc/machine/aarch64/strchrnul-stub.c
+ libc/machine/aarch64/strcpy-stub.c
+ libc/machine/aarch64/strrchr-stub.c
+ libc/machine/aarch64/strrchr.S
+Copyright: 2014, ARM Limited
+License: BSD3-11
+
+Files: libc/machine/aarch64/strchr.S
+ libc/machine/aarch64/strchrnul.S
+Copyright: 2014-2022, ARM Limited
+License: BSD3-11
+
+Files: libc/machine/aarch64/strcpy.S
+Copyright: 2013, 2014, 2015, 2020-2023 ARM Ltd.
+License: BSD3-11
 
 Files: libc/machine/aarch64/setjmp.S
  libm/machine/aarch64/s_ceil.c
@@ -2704,7 +2807,7 @@ Files: libc/machine/aarch64/setjmp.S
  libm/machine/arm/sf_round.c
  libm/machine/arm/sf_trunc.c
 Copyright: 2011, 2012 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/aeabi_memset.c
  libc/machine/arm/bzero.c
@@ -2719,24 +2822,24 @@ Files: libc/machine/arm/aeabi_memset.c
  libm/machine/aarch64/sf_fabs.c
  libm/machine/aarch64/sf_sqrt.c
 Copyright: 2015 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/arm_asm.h
 Copyright: 2009 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/machine/acle-compat.h
  libc/machine/arm/strcmp-armv6m.S
 Copyright: 2014 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/memcpy-armv7m.S
 Copyright: 2013 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/memcpy.S
 Copyright: 2013-2015 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/strcmp-arm-tiny.S
  libc/machine/arm/strcmp-armv4.S
@@ -2746,19 +2849,19 @@ Files: libc/machine/arm/strcmp-arm-tiny.S
  libc/machine/arm/strcmp-armv7m.S
  libc/machine/arm/strcmp.S
 Copyright: 2012-2014 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/strcpy.S
 Copyright: 2008 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/machine/arm/strlen.c
 Copyright: 2008-2015 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/stdlib/aligned_alloc.c
 Copyright: 2020 Arm Ltd.
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/stdlib/calloc.c
  libc/stdlib/free.c
@@ -2775,7 +2878,7 @@ Files: libc/stdlib/calloc.c
  libc/stdlib/realloc.c
  libc/stdlib/valloc.c
 Copyright: 2012, 2013 ARM Ltd
-License: BSD3-10
+License: BSD3-12
 
 Files: libc/string/memmem.c
  libc/string/strstr.c
@@ -2814,7 +2917,7 @@ Files: libc/string/memmem.c
  libm/ld/math_errl_uflowl.c
  libm/ld/math_errl_with_errnol.c
 Copyright: 2018 Arm Ltd.
-License: BSD3-10
+License: BSD3-12
 
 Files: libm/common/math_config.h
  libm/common/math_errf_divzerof.c
@@ -2825,7 +2928,7 @@ Files: libm/common/math_config.h
  libm/common/math_errf_with_errnof.c
  libm/common/sf_pow.c
 Copyright: 2017-2018 Arm Ltd.
-License: BSD3-10
+License: BSD3-12
 
 Files: libm/common/sf_exp.c
  libm/common/sf_exp2.c
@@ -2836,69 +2939,11 @@ Files: libm/common/sf_exp.c
  libm/common/sf_log_data.c
  libm/common/sf_pow_log2_data.c
 Copyright: 2017 Arm Ltd.
-License: BSD3-10
+License: BSD3-12
 
 Files: test/testsuite/newlib.string/memcpy-1.c
  test/testsuite/newlib.string/strcmp-1.c
 Copyright: 2011 ARM Ltd
-License: BSD3-10
-
-Files: libc/machine/aarch64/memchr-stub.c
- libc/machine/aarch64/memcmp-stub.c
- libc/machine/aarch64/memmove-stub.c
- libc/machine/aarch64/strlen-stub.c
- libc/machine/aarch64/strncmp-stub.c
- libc/machine/aarch64/strnlen-stub.c
- libc/machine/aarch64/strnlen.S
-Copyright: 2013, Linaro Limited
-License: BSD3-11
-
-Files: libc/machine/aarch64/memcpy-stub.c
- libc/machine/aarch64/memset-stub.c
- libc/machine/aarch64/strcmp-stub.c
-Copyright: 2012-2013, Linaro Limited
-License: BSD3-11
-
-Files: libc/machine/aarch64/strlen.S
-Copyright: 2013-2015, Linaro Limited
-License: BSD3-11
-
-Files: libc/machine/aarch64/strncmp.S
-Copyright: 2013, 2018, Linaro Limited
-License: BSD3-11
-
-Files: libc/machine/arm/memchr.c
- libc/machine/arm/memcpy.c
- libc/machine/arm/strlen-thumb1-Os.S
- libc/machine/arm/strlen-thumb2-Os.S
- libc/machine/arm/strlen.S
-Copyright: 2015 ARM Ltd.
-License: BSD3-11
-
-Files: libc/machine/aarch64/rawmemchr-stub.c
- libc/machine/aarch64/rawmemchr.S
-Copyright: 2015-2016, ARM Limited
-License: BSD3-12
-
-Files: libc/machine/aarch64/stpcpy-stub.c
-Copyright: 2015, ARM Limited
-License: BSD3-12
-
-Files: libc/machine/aarch64/strchr-stub.c
- libc/machine/aarch64/strchrnul-stub.c
- libc/machine/aarch64/strcpy-stub.c
- libc/machine/aarch64/strrchr-stub.c
- libc/machine/aarch64/strrchr.S
-Copyright: 2014, ARM Limited
-License: BSD3-12
-
-Files: libc/machine/aarch64/strchr.S
- libc/machine/aarch64/strchrnul.S
-Copyright: 2014-2022, ARM Limited
-License: BSD3-12
-
-Files: libc/machine/aarch64/strcpy.S
-Copyright: 2013, 2014, 2015, 2020-2023 ARM Ltd.
 License: BSD3-12
 
 Files: libc/machine/arc/asm.h
@@ -3583,9 +3628,13 @@ Files: libm/machine/spu/headers/nearbyintf4.h
 Copyright: 2006,2008, International Business Machines Corporation, Sony Computer Entertainment, Incorporated, Toshiba Corporation, 
 License: BSD3-35
 
+Files: picocrt/machine/riscv/cfiss-mmu.S
+Copyright: 2026 picolibc contributors
+License: BSD3-36
+
 Files: test/test-cdefs-cxx03.cpp
 Copyright: 2024 Qualcomm Innovation Center, Inc.
-License: BSD3-36
+License: BSD3-37
 
 Files: .clang-format
  .editorconfig
@@ -3597,6 +3646,7 @@ Files: .clang-format
  .github/do-cmake-test
  .github/do-linux-arm-linux
  .github/do-linux-misc
+ .github/do-linux-riscv
  .github/do-many
  .github/do-run
  .github/do-test
@@ -4237,6 +4287,17 @@ Files: scripts/cross-clang-aarch64-none-elf-fvp.txt
 Copyright: 2024 Arm Limited and/or its affiliates <open-source-office@arm.com>
 License: Default-1
 
+Files: scripts/cross-clang-arm-none-eabi-fvp.txt
+Copyright: 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
+License: Default-1
+
+Files: scripts/cross-clang-rv32-cfi-unknown-elf.txt
+ scripts/cross-clang-rv64-cfi-unknown-elf.txt
+ scripts/do-clang-rv32-cfi-configure
+ scripts/do-clang-rv64-cfi-configure
+Copyright: 2026 Ahmed Shehab (Si-Vision) <shehab@eudcodcvder3104.internal.synopsys.com>
+License: Default-1
+
 Files: scripts/cross-loongarch64-unknown-elf.txt
 Copyright: 2026 Jiaxun Yang <jiaxun.yang@flygoat.com>
 License: Default-1
@@ -4252,6 +4313,11 @@ License: Default-1
 
 Files: scripts/cross-xtensa-lx106-elf.txt
 Copyright: 2026 Jonathan McDowell <noodles@earth.li>
+License: Default-1
+
+Files: test/check-aarch64-fvp-page-table.py
+ test/test-crt0-page-table.c
+Copyright: 2026, Arm Limited.
 License: Default-1
 
 Files: zephyr/Kconfig
@@ -4505,22 +4571,31 @@ Files: libc/string/strsignal.c
 Copyright: 2010, 2017. On-Line Applications Research Corporation (OAR).
 License: Other-5
 
+Files: libc/machine/aarch64/sme-abi.S
+Copyright: 2026, Arm Limited.
+License: Other-6
+
+Files: libc/xdr/xdr_private.c
+ libc/xdr/xdr_private.h
+Copyright: 2009 Charles S. Wilson
+License: Other-6
+
 Files: libc/machine/amdgcn/abort.c
  libc/machine/amdgcn/atexit.c
  libc/machine/amdgcn/getreent.c
  libc/machine/amdgcn/signal.c
 Copyright: 2014-2017 Mentor Graphics.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/amdgcn/exit-value.h
  libc/machine/amdgcn/mlock.c
 Copyright: 2017 Mentor Graphics.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/bfin/longjmp.S
  libc/machine/bfin/setjmp.S
 Copyright: 2006 Analog Devices, Inc.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/cr16/getenv.c
  libc/machine/cr16/sys/libh.h
@@ -4530,11 +4605,11 @@ Files: libc/machine/cr16/getenv.c
  libc/machine/crx/sys/libh.h
  libc/machine/crx/sys/syscall.h
 Copyright: 2004 National Semiconductor Corporation
-License: Other-6
+License: Other-7
 
 Files: libc/machine/cr16/sys/asm.h
 Copyright: 2012 National Semiconductor Corporation
-License: Other-6
+License: Other-7
 
 Files: libc/machine/ft32/memcpy.S
  libc/machine/ft32/memset.S
@@ -4544,28 +4619,28 @@ Files: libc/machine/ft32/memcpy.S
  libc/machine/ft32/strcpy.S
  libc/machine/ft32/strlen.S
 Copyright: 2014 FTDI (support@ftdichip.com)
-License: Other-6
+License: Other-7
 
 Files: libc/machine/m68hc11/setjmp.S
 Copyright: 1999, 2000, 2001, 2002 Stephane Carrez (stcarrez@nerim.fr)
-License: Other-6
+License: Other-7
 
 Files: libc/machine/m68k/memcpy.S
  libc/machine/m68k/memset.S
 Copyright: 2007 mocom software GmbH & Co KG)
-License: Other-6
+License: Other-7
 
 Files: libc/machine/mips/strlen.c
 Copyright: 2001, 2002 Red Hat, Inc.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/mips/strncpy.c
 Copyright: 2001 Red Hat, Inc.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/moxie/setjmp.S
 Copyright: 2009, 2019  Anthony Green
-License: Other-6
+License: Other-7
 
 Files: libc/machine/nvptx/_exit.c
  libc/machine/nvptx/abort.c
@@ -4576,51 +4651,51 @@ Files: libc/machine/nvptx/_exit.c
  libc/machine/nvptx/reallocr.c
  libc/machine/nvptx/write.c
 Copyright: 2014-2018 Mentor Graphics.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/nvptx/assert.c
  libc/machine/nvptx/free.c
  libc/machine/nvptx/malloc.c
  libc/machine/nvptx/realloc.c
 Copyright: 2016-2018 Mentor Graphics.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/nvptx/printf.c
  libc/machine/nvptx/putchar.c
  libc/machine/nvptx/puts.c
 Copyright: 2015-2018 Mentor Graphics.
-License: Other-6
+License: Other-7
 
 Files: libc/machine/cris/include/pthread.h
  libc/machine/cris/sys/errno.h
  libc/machine/cris/sys/fcntl.h
  libc/machine/cris/sys/signal.h
 Copyright: 2001, 2004, 2005 Axis Communications AB.
-License: Other-7
+License: Other-8
 
 Files: libc/machine/cris/libcdtor.c
 Copyright: 1999, 2000, 2003, 2004, 2005 Axis Communications.
-License: Other-7
+License: Other-8
 
 Files: libc/machine/cris/memcpy.c
 Copyright: 1994-2005 Axis Communications.
-License: Other-7
+License: Other-8
 
 Files: libc/machine/cris/memmove.c
 Copyright: 2000-2005 Axis Communications.
-License: Other-7
+License: Other-8
 
 Files: libc/machine/cris/memset.c
 Copyright: 1999-2005 Axis Communications.
-License: Other-7
+License: Other-8
 
 Files: libc/machine/cris/setjmp.c
 Copyright: 1993-2005 Axis Communications.
-License: Other-7
+License: Other-8
 
 Files: test/testsuite/newlib.string/memmove1.c
 Copyright: 2005 Axis Communications.
-License: Other-7
+License: Other-8
 
 Files: libc/machine/hppa/memchr.S
  libc/machine/hppa/memcmp.S
@@ -4635,7 +4710,7 @@ Files: libc/machine/hppa/memchr.S
  libc/machine/hppa/strncmp.S
  libc/machine/hppa/strncpy.S
 Copyright: 1986 HEWLETT-PACKARD COMPANY
-License: Other-8
+License: Other-9
 
 Files: libc/machine/i960/memccpy.S
  libc/machine/i960/memccpy_ca.S
@@ -4666,54 +4741,54 @@ Files: libc/machine/i960/memccpy.S
  libc/machine/i960/strpbrk.S
  libc/machine/i960/strrchr.S
 Copyright: 1993 Intel Corporation
-License: Other-9
+License: Other-10
 
 Files: libc/machine/msp430/setjmp.S
 Copyright: 2013  Red Hat, Inc.
-License: Other-10
+License: Other-11
 
 Files: libc/machine/tic4x/setjmp.S
 Copyright: 2004 Michael Hayes <m.hayes@elec.canterbury.ac.nz>.
-License: Other-11
+License: Other-12
 
 Files: libc/machine/xc16x/putchar.c
  libc/machine/xc16x/puts.c
  libc/machine/xc16x/setjmp.S
 Copyright: 2006 KPIT Cummins
  2009 Conny Marco Menebröcker
-License: Other-12
+License: Other-13
 
 Files: libc/machine/xtensa/machine/core-isa.h
 Copyright: 1999-2010 Tensilica Inc.
-License: Other-13
+License: Other-14
 
 Files: libc/machine/xtensa/memcpy.S
 Copyright: 2002-2008 Tensilica Inc.
-License: Other-13
+License: Other-14
 
 Files: libc/machine/xtensa/memset.S
  libc/machine/xtensa/strcpy.S
  libc/machine/xtensa/strlen.S
  libc/machine/xtensa/strncpy.S
 Copyright: 2001-2008 Tensilica Inc.
-License: Other-13
+License: Other-14
 
 Files: libc/machine/xtensa/setjmp.S
 Copyright: 2001-2006 Tensilica Inc.
-License: Other-13
+License: Other-14
 
 Files: libc/machine/xtensa/strcmp.S
 Copyright: 2001-20012 Tensilica Inc.
-License: Other-13
+License: Other-14
 
 Files: libc/machine/xtensa/xtensa-asm.h
 Copyright: 2006 Tensilica Inc.
-License: Other-13
+License: Other-14
 
 Files: libc/string/strverscmp.c
  libm/common/nexttowardf.c
 Copyright: 2005-2014 Rich Felker, et al.
-License: Other-13
+License: Other-14
 
 Files: test/libc-testsuite/basename.c
  test/libc-testsuite/dirname.c
@@ -4726,22 +4801,22 @@ Files: test/libc-testsuite/basename.c
  test/libc-testsuite/strtol.c
  test/libc-testsuite/wcstol.c
 Copyright: 2005-2020 Rich Felker
-License: Other-13
+License: Other-14
 
 Files: libc/machine/z8k/memcmp.S
  libc/machine/z8k/memcpy.S
  libc/machine/z8k/memmove.S
  libc/machine/z8k/memset.S
 Copyright: 2004 Christian Groessler <chris@groessler.org>
-License: Other-14
+License: Other-15
 
 Files: libc/misc/fini.c
 Copyright: 2010 CodeSourcery, Inc.
-License: Other-14
+License: Other-15
 
 Files: libc/misc/init.c
 Copyright: 2004 CodeSourcery, LLC
-License: Other-14
+License: Other-15
 
 Files: libc/signal/signal.tex
  libc/string/bcmp.c
@@ -4874,13 +4949,13 @@ Files: libc/signal/signal.tex
  test/testsuite/newlib.math/yn_vec.c
  test/testsuite/newlib.math/ynf_vec.c
 Copyright: 1994 Cygnus Support.
-License: Other-15
+License: Other-16
 
 Files: libc/stdio/atod_ryu.c
  libc/stdio/atof_ryu.c
  libc/stdio/ryu/ryu_parse.h
 Copyright: 2019 Ulf Adams
-License: Other-16
+License: Other-17
 
 Files: libc/stdio/dtoa_ryu.c
  libc/stdio/ftoa_ryu.c
@@ -4896,11 +4971,11 @@ Files: libc/stdio/dtoa_ryu.c
  libc/stdio/ryu_table.c
  libc/stdio/ryu_umul128.c
 Copyright: 2018 Ulf Adams
-License: Other-16
+License: Other-17
 
 Files: libc/stdio/open_memstream.c
 Copyright: Text: 2024-2026 Espressif Systems (Shanghai) CO LTD
-License: Other-17
+License: Other-18
 
 Files: libc/stdlib/arc4random.c
  libc/stdlib/chacha_private.h
@@ -4908,30 +4983,30 @@ Copyright: 1996, David Mazieres <dm@uun.org>
  2008, Damien Miller <djm@openbsd.org>
  2013, Markus Friedl <markus@openbsd.org>
  2014, Theo de Raadt <deraadt@openbsd.org>
-License: Other-18
+License: Other-19
 
 Files: libc/stdlib/arc4random_uniform.c
 Copyright: 2008, Damien Miller <djm@openbsd.org>
-License: Other-18
+License: Other-19
 
 Files: libc/stdlib/reallocarray.c
 Copyright: 2008 Otto Moerbeek <otto@drijf.net>
-License: Other-18
+License: Other-19
 
 Files: libc/string/strlcat.c
  libc/string/strlcpy.c
  libc/string/wcslcat.c
  libc/string/wcslcpy.c
 Copyright: 1998, 2015 Todd C. Miller <millert@openbsd.org>
-License: Other-18
+License: Other-19
 
 Files: libc/string/timingsafe_bcmp.c
 Copyright: 2010 Damien Miller.
-License: Other-18
+License: Other-19
 
 Files: libc/string/timingsafe_memcmp.c
 Copyright: 2014 Google Inc.
-License: Other-18
+License: Other-19
 
 Files: libm/ld/common/polevll.c
  libm/ld/ld128/e_expl.c
@@ -4950,11 +5025,11 @@ Files: libm/ld/common/polevll.c
  libm/ld/ld80/s_expm1l.c
  libm/ld/ld80/s_log1pl.c
 Copyright: 2008 Stephen L. Moshier <steve@moshier.net>
-License: Other-18
+License: Other-19
 
 Files: libm/ld/ld128/e_tgammal.c
 Copyright: 2011 Martynas Venckus <martynas@openbsd.org>
-License: Other-18
+License: Other-19
 
 Files: libc/stdlib/drand48.c
  libc/stdlib/erand48.c
@@ -4968,28 +5043,19 @@ Files: libc/stdlib/drand48.c
  libc/stdlib/seed48.c
  libc/stdlib/srand48.c
 Copyright: 1993 Martin Birgmeier
-License: Other-19
+License: Other-20
 
 Files: libc/stdlib/gdtoa.h
 Copyright: 1998 Lucent Technologies
-License: Other-20
+License: Other-21
 
 Files: libc/stdlib/getopt.c
 Copyright: 1997 Gregory Pietsch
-License: Other-21
-
-Files: libc/stdlib/mprec.h
-Copyright: 1991 AT&T.
 License: Other-22
 
 Files: libc/string/wcsnlen.c
 Copyright: 2003, Artem B. Bityuckiy (dedekind@mail.ru).
 License: Other-23
-
-Files: libc/xdr/xdr_private.c
- libc/xdr/xdr_private.h
-Copyright: 2009 Charles S. Wilson
-License: Other-24
 
 Files: libm/common/fdlibm.h
  libm/common/isgreater.c
@@ -5168,7 +5234,7 @@ Files: libm/common/fdlibm.h
  libm/math/sr_lgamma.c
  libm/math/srf_lgamma.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-25
+License: Other-24
 
 Files: libm/common/s_remquo.c
  libm/common/sf_remquo.c
@@ -5181,7 +5247,7 @@ Files: libm/common/s_remquo.c
  libm/ld/ld80/e_fmodl.c
  libm/ld/ld80/s_remquol.c
 Copyright: 1993 Sun Microsystems, Inc.
-License: Other-26
+License: Other-25
 
 Files: libm/ld/ld128/k_cosl.c
  libm/ld/ld128/k_sinl.c
@@ -5189,18 +5255,18 @@ Files: libm/ld/ld128/k_cosl.c
  libm/ld/ld80/k_sinl.c
 Copyright: 1993 Sun Microsystems, Inc.
  2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
-License: Other-26
+License: Other-25
 
 Files: libm/ld/common/s_cbrtl.c
 Copyright: 1993 Sun Microsystems, Inc.
  2009-2011, Bruce D. Evans, Steven G. Kargl, David Schultz.
-License: Other-27
+License: Other-26
 
 Files: libm/ld/ld128/e_rem_pio2l.h
  libm/ld/ld80/e_rem_pio2l.h
 Copyright: 1993 Sun Microsystems, Inc.
  2008 Steven G. Kargl, David Schultz, Bruce D. Evans.
-License: Other-28
+License: Other-27
 
 Files: libm/machine/x86/f_llrint.c
  libm/machine/x86/f_llrintf.c
@@ -5212,7 +5278,7 @@ Files: libm/machine/x86/f_llrint.c
  libm/machine/x86/f_rintf.c
  libm/machine/x86/f_rintl.c
 Copyright: 2007 Dave Korn
-License: Other-29
+License: Other-28
 
 Files: libc/machine/d10v/setjmp.S
  libc/machine/d30v/setjmp.S
@@ -5828,30 +5894,6 @@ License: BSD3-9
 
 License: BSD3-10
  Redistribution and use in source and binary forms, with or without
- modification, are permitted provided that the following conditions
- are met:
- 1. Redistributions of source code must retain the above copyright
- notice, this list of conditions and the following disclaimer.
- 2. Redistributions in binary form must reproduce the above copyright
- notice, this list of conditions and the following disclaimer in the
- documentation and/or other materials provided with the distribution.
- 3. The name of the company may not be used to endorse or promote
- products derived from this software without specific prior written
- permission.
- .
- THIS SOFTWARE IS PROVIDED BY ARM LTD ``AS IS'' AND ANY EXPRESS OR IMPLIED
- WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
- MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
- IN NO EVENT SHALL ARM LTD BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
- TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-License: BSD3-11
- Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  Redistributions of source code must retain the above copyright
  notice, this list of conditions and the following disclaimer.
@@ -5874,7 +5916,7 @@ License: BSD3-11
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-License: BSD3-12
+License: BSD3-11
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are met:
  Redistributions of source code must retain the above copyright
@@ -5897,6 +5939,30 @@ License: BSD3-12
  THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+License: BSD3-12
+ Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ 2. Redistributions in binary form must reproduce the above copyright
+ notice, this list of conditions and the following disclaimer in the
+ documentation and/or other materials provided with the distribution.
+ 3. The name of the company may not be used to endorse or promote
+ products derived from this software without specific prior written
+ permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY ARM LTD ``AS IS'' AND ANY EXPRESS OR IMPLIED
+ WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+ MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+ IN NO EVENT SHALL ARM LTD BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+ NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 License: BSD3-13
  Redistribution and use in source and binary forms, with or without
@@ -6503,6 +6569,26 @@ License: BSD3-35
 
 License: BSD3-36
  Redistribution and use in source and binary forms, with or without
+ modification, are permitted provided that the following conditions
+ are met:
+ .
+ 1. Redistributions of source code must retain the above copyright
+ notice, this list of conditions and the following disclaimer.
+ .
+ 2. Redistributions in binary form must reproduce the above
+ copyright notice, this list of conditions and the following
+ disclaimer in the documentation and/or other materials provided
+ with the distribution.
+ .
+ 3. Neither the name of the copyright holder nor the names of its
+ contributors may be used to endorse or promote products derived
+ from this software without specific prior written permission.
+ .
+ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES.
+
+License: BSD3-37
+ Redistribution and use in source and binary forms, with or without
  modification, are permitted (subject to the limitations in the
  disclaimer below) provided that the following conditions are met:
  .
@@ -6562,7 +6648,6 @@ License: Default-1
  STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  OF THE POSSIBILITY OF SUCH DAMAGE.
-
 
 License: FreeBSD-1
  This copyrighted material is made available to anyone wishing to use,
@@ -6626,6 +6711,25 @@ License: Other-5
  SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
 
 License: Other-6
+ Permission is hereby granted, free of charge, to any person obtaining a
+ copy of this software and associated documentation files (the "Software"),
+ to deal in the Software without restriction, including without limitation
+ the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ and/or sell copies of the Software, and to permit persons to whom the
+ Software is furnished to do so, subject to the following conditions:
+ .
+ The above copyright notice and this permission notice shall be included
+ in all copies or substantial portions of the Software.
+ .
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+ OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
+ OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
+ ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+ OTHER DEALINGS IN THE SOFTWARE.
+
+License: Other-7
  The authors hereby grant permission to use, copy, modify, distribute,
  and license this software and its documentation for any purpose, provided
  that existing copyright notices are retained in all copies and that this
@@ -6636,7 +6740,7 @@ License: Other-6
  the new terms are clearly indicated on the first page of each file where
  they apply.
 
-License: Other-7
+License: Other-8
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
  are met:
@@ -6661,7 +6765,7 @@ License: Other-7
  IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  POSSIBILITY OF SUCH DAMAGE.
 
-License: Other-8
+License: Other-9
  To anyone who acknowledges that this file is provided "AS IS"
  without any express or implied warranty:
  permission to use, copy, modify, and distribute this file
@@ -6673,7 +6777,7 @@ License: Other-8
  Hewlett-Packard Company makes no representations about the
  suitability of this software for any purpose.
 
-License: Other-9
+License: Other-10
  Intel hereby grants you permission to copy, modify, and distribute this
  software and its documentation.  Intel grants this permission provided
  that the above copyright notice appears in all copies and that both the
@@ -6688,7 +6792,7 @@ License: Other-9
  Intel Corporation provides this AS IS, WITHOUT ANY WARRANTY, EXPRESS OR
  IMPLIED, INCLUDING, WITHOUT LIMITATION, ANY WARRANTY OF MERCHANTABILITY
 
-License: Other-10
+License: Other-11
  This copyrighted material is made available to anyone wishing to use,
  modify, copy, or redistribute it subject to the terms and conditions
  of the BSD License.   This program is distributed in the hope that
@@ -6700,7 +6804,7 @@ License: Other-10
  the BSD License and may only be used or replicated with the express
  permission of Red Hat, Inc.
 
-License: Other-11
+License: Other-12
  The author hereby grant permission to use, copy, modify, distribute,
  and license this software and its documentation for any purpose, provided
  that existing copyright notices are retained in all copies and that this
@@ -6711,7 +6815,7 @@ License: Other-11
  the new terms are clearly indicated on the first page of each file where
  they apply.
 
-License: Other-12
+License: Other-13
  Redistribution and use in source and binary forms is permitted
  provided that the above copyright notice and following paragraph are
  duplicated in all such forms.
@@ -6719,7 +6823,7 @@ License: Other-12
  This file is distributed WITHOUT ANY WARRANTY; without even the implied
  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-13
+License: Other-14
  Permission is hereby granted, free of charge, to any person obtaining
  a copy of this software and associated documentation files (the
  Software"), to deal in the Software without restriction, including
@@ -6739,7 +6843,7 @@ License: Other-13
  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-License: Other-14
+License: Other-15
  Permission to use, copy, modify, and distribute this file
  for any purpose is hereby granted without fee, provided that
  the above copyright notice and this notice appears in all
@@ -6748,7 +6852,7 @@ License: Other-14
  This file is distributed WITHOUT ANY WARRANTY; without even the implied
  warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-15
+License: Other-16
  Redistribution and use in source and binary forms are permitted
  provided that the above copyright notice and this paragraph are
  duplicated in all such forms and that any documentation,
@@ -6761,7 +6865,7 @@ License: Other-15
  IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
 
-License: Other-16
+License: Other-17
  The contents of this file may be used under the terms of the Apache License,
  Version 2.0.
  .
@@ -6777,7 +6881,7 @@ License: Other-16
  is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
  KIND, either express or implied.
 
-License: Other-17
+License: Other-18
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
  You may obtain a copy of the License at
@@ -6790,7 +6894,7 @@ License: Other-17
  See the License for the specific language governing permissions and
  limitations under the License.
 
-License: Other-18
+License: Other-19
  Permission to use, copy, modify, and distribute this software for any
  purpose with or without fee is hereby granted, provided that the above
  copyright notice and this permission notice appear in all copies.
@@ -6803,7 +6907,7 @@ License: Other-18
  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-License: Other-19
+License: Other-20
  You may redistribute unmodified or modified versions of this source
  code provided that the above copyright notice and this and the
  following conditions are retained.
@@ -6812,7 +6916,7 @@ License: Other-19
  of any kind. I shall in no event be liable for anything that happens
  to anyone/anything when using this software.
 
-License: Other-20
+License: Other-21
  Permission to use, copy, modify, and distribute this software and
  its documentation for any purpose and without fee is hereby
  granted, provided that the above copyright notice appear in all
@@ -6832,25 +6936,13 @@ License: Other-20
  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF
  THIS SOFTWARE.
 
-License: Other-21
+License: Other-22
  This file and the accompanying getopt.h header file are hereby placed in the
  public domain without restrictions.  Just give the author credit, don't
  claim you wrote it or prevent anyone else from using it.
  .
  Gregory Pietsch's current e-mail address:
  gpietsch@comcast.net
-
-License: Other-22
- Permission to use, copy, modify, and distribute this software for any
- purpose without fee is hereby granted, provided that this entire notice
- is included in all copies of any software which is or includes a copy
- or modification of this software and in all copies of the supporting
- documentation for such software.
- .
- THIS SOFTWARE IS BEING PROVIDED "AS IS", WITHOUT ANY EXPRESS OR IMPLIED
- WARRANTY.  IN PARTICULAR, NEITHER THE AUTHOR NOR AT&T MAKES ANY
- REPRESENTATION OR WARRANTY OF ANY KIND CONCERNING THE MERCHANTABILITY
- OF THIS SOFTWARE OR ITS FITNESS FOR ANY PARTICULAR PURPOSE.
 
 License: Other-23
  Redistribution and use in source and binary forms, with or without
@@ -6871,37 +6963,18 @@ License: Other-23
  SUCH DAMAGE.
 
 License: Other-24
- Permission is hereby granted, free of charge, to any person obtaining a
- copy of this software and associated documentation files (the "Software"),
- to deal in the Software without restriction, including without limitation
- the rights to use, copy, modify, merge, publish, distribute, sublicense,
- and/or sell copies of the Software, and to permit persons to whom the
- Software is furnished to do so, subject to the following conditions:
- .
- The above copyright notice and this permission notice shall be included
- in all copies or substantial portions of the Software.
- .
- THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
- OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
- THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR
- OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE,
- ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
- OTHER DEALINGS IN THE SOFTWARE.
-
-License: Other-25
  Developed at SunPro, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-26
+License: Other-25
  Developed at SunSoft, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
  is preserved.
 
-License: Other-27
+License: Other-26
  Developed at SunPro, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
@@ -6912,7 +6985,7 @@ License: Other-27
  written by Steven G. Kargl with input from Bruce D. Evans
  and David A. Schultz.
 
-License: Other-28
+License: Other-27
  Developed at SunSoft, a Sun Microsystems, Inc. business.
  Permission to use, copy, modify, and distribute this
  software is freely granted, provided that this notice
@@ -6921,7 +6994,7 @@ License: Other-28
  .
  Optimized by Bruce D. Evans.
 
-License: Other-29
+License: Other-28
  x87 FP implementation contributed to Newlib by
  Dave Korn, November 2007.  This file is placed in the
  public domain.  Permission to use, copy, modify, and
