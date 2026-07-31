@@ -31,8 +31,4 @@ OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
 SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
-_BEGIN_STD_C
 #include <sys/termios.h>
-_END_STD_C

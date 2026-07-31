@@ -64,4 +64,4 @@ SEEALSO
 */
 
 #define MAKE_WCSFTIME
-#include "../time/strftime.c"
+#include "strftime.c"

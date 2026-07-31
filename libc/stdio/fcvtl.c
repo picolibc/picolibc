@@ -53,7 +53,7 @@ fcvtl(long double invalue, int ndigit, int *decpt, int *sign)
 
 #elif __SIZEOF_LONG_DOUBLE__ == 4
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 char *
 fcvtl(long double invalue, int ndecimal, int *decpt, int *sign)
@@ -63,7 +63,7 @@ fcvtl(long double invalue, int ndecimal, int *decpt, int *sign)
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 char *
 fcvtl(long double invalue, int ndecimal, int *decpt, int *sign)

@@ -74,6 +74,17 @@ case "$data" in
         ;;
 esac
 
+flags=$(readelf -h "$elf" | awk '/Flags/ { print $2 }')
+
+case "$flags" in
+    0xd*)
+        ;;
+    *)
+        echo "Skipping unsupported hardware $elf"
+        exit 77
+        ;;
+esac
+
 qemu="qemu-system-rx"
 cpu=rx62n
 

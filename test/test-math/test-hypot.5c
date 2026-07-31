@@ -35,6 +35,29 @@
 
 load "test-float.5c"
 
+typedef struct {
+	real x, y;
+} pair_t;
+
+pair_t[] test_values = {
+	{ .x = 0, .y = -0x2p-128 },
+	{ .y = -0x2p-128, .x = 0 },
+
+	{ .x = 0, .y = -0x0.8p128 },
+	{ .y = -0x0.8p128, .x = 0 },
+
+	{ .x = 0, .y = -0x2p-1024 },
+	{ .y = -0x2p-1024, .x = 0 },
+
+	{ .x = 0, .y = -0x0.8p1024 },
+	{ .y = -0x0.8p1024, .x = 0 },
+
+	{ .x = 0, .y = -0x2p-16384 },
+	{ .x = -0x2p-16384, .y = 0 },
+
+	{ .x = 0, .y = -0x0.8p16384 },
+	{ .x = -0x0.8p16384, .y = 0 },
+};
 
 real hypot(real x, real y)
 {
@@ -44,6 +67,12 @@ real hypot(real x, real y)
 void
 main()
 {
+	for (int i = 0; i < dim(test_values); i++) {
+		real xi = imprecise(test_values[i].x, prec);
+		real yi = imprecise(test_values[i].y, prec);
+		compute_real_real(xi, yi, hypot);
+	}
+
 	for (real x = 1e-38; x <= 1e38; x *= 1111) {
 		for (real y = 1e-38; y <= 1e38; y *= 1111) {
 			real xi = imprecise(x, prec);

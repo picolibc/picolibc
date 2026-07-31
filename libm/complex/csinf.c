@@ -32,9 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subrf.h"
+#include "local-complex.h"
 
 float complex
 csinf(float complex z)
@@ -42,5 +40,5 @@ csinf(float complex z)
     float ch, sh;
 
     _cchshf(cimagf(z), &ch, &sh);
-    return (float complex)(sinf(crealf(z)) * ch) + (cosf(crealf(z)) * sh) * I;
+    return CMPLXF(sinf(crealf(z)) * ch, cosf(crealf(z)) * sh);
 }

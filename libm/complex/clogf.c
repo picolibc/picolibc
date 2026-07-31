@@ -32,8 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 float complex
 clogf(float complex z)
@@ -43,5 +42,5 @@ clogf(float complex z)
     rr = cabsf(z);
     p = logf(rr);
     rr = atan2f(cimagf(z), crealf(z));
-    return (float complex)p + rr * I;
+    return CMPLXF(p, rr);
 }

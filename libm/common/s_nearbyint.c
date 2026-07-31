@@ -46,6 +46,7 @@ SEEALSO
 <<rint>>, <<round>>
 */
 
+#define _GNU_SOURCE
 #include <math.h>
 #include "fdlibm.h"
 
@@ -59,6 +60,7 @@ nearbyint64(__float64 x)
 #if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
     fenv_t env;
     fegetenv(&env);
+    fedisableexcept(FE_INEXACT);
 #endif
     x = rint64(x);
 #if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)

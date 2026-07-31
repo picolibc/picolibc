@@ -36,6 +36,7 @@
 dirs = [
         'newlib.iconv',
 	'newlib.locale',
+        'newlib.math',
 	'newlib.search',
 	'newlib.stdio',
 	'newlib.stdlib',

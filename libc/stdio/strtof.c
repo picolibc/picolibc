@@ -58,7 +58,7 @@
 
 #define STRTOF
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #include "conv_flt.c"
 

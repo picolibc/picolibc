@@ -35,14 +35,13 @@
 
 #include "uchar-local.h"
 
-size_t
-mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n,
-         _mbstate_t * __restrict ps)
-{
-    static mbstate_t local_state;
+static mbstate_t mbrtoc16_state;
 
+size_t
+mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n, mbstate_t * __restrict ps)
+{
     if (ps == NULL)
-        ps = &local_state;
+        ps = &mbrtoc16_state;
 
 #if __SIZEOF_WCHAR_T__ == 2
     return mbrtowc((wchar_t *)pc16, s, n, ps);
@@ -51,7 +50,8 @@ mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n,
     size_t  ret;
 
     if (ps->__count == -1) {
-        *pc16 = (ps->__value.__ucs & 0x3ff) + LOW_SURROGATE_FIRST;
+        if (pc16 != NULL)
+            *pc16 = (ps->__value.__ucs & 0x3ff) + LOW_SURROGATE_FIRST;
         ps->__count = 0;
         ps->__value.__ucs = 0;
         return (size_t)-3;
@@ -69,9 +69,11 @@ mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n,
     if (wc >= 0x10000) {
         ps->__value.__ucs = wc;
         ps->__count = -1;
-        *pc16 = ((ps->__value.__ucs - 0x10000) >> 10) + HIGH_SURROGATE_FIRST;
+        if (pc16 != NULL)
+            *pc16 = ((ps->__value.__ucs - 0x10000) >> 10) + HIGH_SURROGATE_FIRST;
     } else {
-        *pc16 = wc;
+        if (pc16 != NULL)
+            *pc16 = wc;
     }
     return ret;
 #else

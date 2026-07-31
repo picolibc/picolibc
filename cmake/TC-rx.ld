@@ -217,6 +217,7 @@ SECTIONS
 	PROVIDE( ___tdata_source_end = LOADADDR(.tdata) + SIZEOF(.tdata) );
 	PROVIDE( ___data_source_end = ___tdata_source_end );
 	PROVIDE( ___tdata_size = SIZEOF(.tdata) );
+	PROVIDE( ___tls_inittls = 0 );
 
 	PROVIDE( ___edata = ___data_end );
 	PROVIDE( __edata = ___data_end );

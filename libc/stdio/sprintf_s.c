@@ -33,10 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #define __STDC_WANT_LIB_EXT1__ 1
-#include "stdio_private.h"
-#include <stdio.h>
-#include <stddef.h>
-#include <stdbool.h>
+#include "local-stdio.h"
 #include "../stdlib/local_s.h"
 
 int

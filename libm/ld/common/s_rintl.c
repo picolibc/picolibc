@@ -94,12 +94,13 @@ nearbyintl(long double x)
 
     if (isnan(x))
         return x + x;
-#if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
+#if defined(FE_INEXACT) && !defined(__LONG_DOUBLE_NOEXCEPT)
     fenv_t env;
     fegetenv(&env);
+    fedisableexcept(FE_INEXACT);
 #endif
     ret = rintl(x);
-#if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
+#if defined(FE_INEXACT) && !defined(__LONG_DOUBLE_NOEXCEPT)
     fesetenv(&env);
 #endif
     return (ret);

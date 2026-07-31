@@ -68,17 +68,17 @@ typedef int (*__compar_fn_t)(const void *, const void *);
 #endif
 
 _BEGIN_STD_C
-int    hcreate(size_t);
-void   hdestroy(void);
-ENTRY *hsearch(ENTRY, ACTION);
-int    hcreate_r(size_t, struct hsearch_data *);
-void   hdestroy_r(struct hsearch_data *);
-int    hsearch_r(ENTRY, ACTION, ENTRY **, struct hsearch_data *);
-void  *tdelete(const void  *__restrict, void  **__restrict, __compar_fn_t);
-void   tdestroy(void *, void (*)(void *));
-void  *tfind(const void *, void **, __compar_fn_t);
-void  *tsearch(const void *, void **, __compar_fn_t);
-void   twalk(const void *, void (*)(const void *, VISIT, int));
+int    hcreate(size_t) __picolibc_export;
+void   hdestroy(void) __picolibc_export;
+ENTRY *hsearch(ENTRY, ACTION) __picolibc_export;
+int    hcreate_r(size_t, struct hsearch_data *) __picolibc_export;
+void   hdestroy_r(struct hsearch_data *) __picolibc_export;
+int    hsearch_r(ENTRY, ACTION, ENTRY **, struct hsearch_data *) __picolibc_export;
+void  *tdelete(const void  *__restrict, void  **__restrict, __compar_fn_t) __picolibc_export;
+void   tdestroy(void *, void (*)(void *)) __picolibc_export;
+void  *tfind(const void *, void **, __compar_fn_t) __picolibc_export;
+void  *tsearch(const void *, void **, __compar_fn_t) __picolibc_export;
+void   twalk(const void *, void (*)(const void *, VISIT, int)) __picolibc_export;
 _END_STD_C
 
 #endif /* !_SEARCH_H_ */

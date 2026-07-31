@@ -32,9 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subrf.h"
+#include "local-complex.h"
 
 float complex
 ctanf(float complex z)
@@ -48,8 +46,8 @@ ctanf(float complex z)
 
     if (d == 0.0f) {
         /* mtherr ("ctan", OVERFLOW); */
-        return HUGE_VALF + HUGE_VALF * I;
+        return CMPLXF(HUGE_VALF, HUGE_VALF);
     }
 
-    return (float complex)(sinf(2.0f * crealf(z)) / d) + (sinhf(2.0f * cimagf(z)) / d) * I;
+    return CMPLXF(sinf(2.0f * crealf(z)) / d, sinhf(2.0f * cimagf(z)) / d);
 }

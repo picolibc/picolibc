@@ -35,5 +35,4 @@
 picolibc_sources(
   psignal.c
   sig2str.c
-  signal.c
   )  

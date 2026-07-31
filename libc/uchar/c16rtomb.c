@@ -35,13 +35,13 @@
 
 #include "uchar-local.h"
 
+static mbstate_t c16rtomb_state;
+
 size_t
 c16rtomb(char *s, char16_t c16, mbstate_t *ps)
 {
-    static mbstate_t local_state;
-
     if (ps == NULL)
-        ps = &local_state;
+        ps = &c16rtomb_state;
 
 #if __SIZEOF_WCHAR_T__ == 2
     return wcrtomb(s, (wchar_t)c16, ps);

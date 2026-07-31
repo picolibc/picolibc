@@ -31,45 +31,71 @@
 */
 
 {
+
 #ifdef _NEED_IO_WCHAR
     if (flags & FL_LONG) {
         wstr = va_arg(ap, wchar_t *);
         if (!wstr)
             goto str_null;
-    wstr_lpad:
+
         size = (flags & FL_PREC) ? (size_t)prec : SIZE_MAX;
+
 #ifdef _NEED_IO_WIDETOMB
+        /* count bytes */
         size = _mbslen(wstr, size);
         if (size == (size_t)-1)
-            goto ret;
+            goto fail;
 #else
+        /* count wchar_t */
         size = wcsnlen(wstr, size);
+#if __SIZEOF_WCHAR_T__ == 2
+        /*
+         * Check for a trailing high surrogate and
+         * skip it
+         */
+        if (size > 0) {
+            uint16_t wc = (uint16_t)wstr[size - 1];
+            if (0xd800 <= wc && wc <= 0xdbff)
+                size--;
+        }
 #endif
-        goto str_lpad;
+
+#endif
+
     } else
-#endif
+#endif /* _NEED_IO_WCHAR */
+
+    {
         pnt = va_arg(ap, char *);
-    if (!pnt) {
+
+        if (!pnt) {
+
 #ifdef _NEED_IO_WCHAR
-    str_null:
+        str_null:
 #endif
+
 #ifdef VFPRINTF_S
-        msg = "arg corresponding to '%s' is null";
-        goto handle_error;
+            msg = "arg corresponding to '%s' is null";
+            goto handle_error;
 #endif
-        pnt = "(null)";
-    }
+            pnt = "(null)";
+        }
+
 #ifdef _NEED_IO_SHRINK
-    char c;
-    while ((c = *pnt++))
-        my_putc(c, stream);
+        char c;
+        while ((c = *pnt++))
+            my_putc(c, stream);
 #else
-    size = (flags & FL_PREC) ? (size_t)prec : SIZE_MAX;
+
+        size = (flags & FL_PREC) ? (size_t)prec : SIZE_MAX;
 #ifdef _NEED_IO_MBTOWIDE
-    size = _wcslen(pnt, size);
+        size = _wcslen(pnt, size);
 #else
-    size = strnlen(pnt, size);
+        size = strnlen(pnt, size);
 #endif
+    }
+
+    /* here's where %c and %lc land */
 str_lpad:
     if (!(flags & FL_LPAD)) {
         while ((size_t)width > size) {
@@ -78,32 +104,38 @@ str_lpad:
         }
     }
     width -= size;
+
 #ifdef _NEED_IO_WCHAR
     if (wstr) {
+
 #ifdef _NEED_IO_WIDETOMB
         mbstate_t ps = { 0 };
         while (size) {
             wchar_t c = *wstr++;
             char   *m = u.mb;
             int     mb_len = __WCTOMB(m, c, &ps);
-            while (size && mb_len) {
+
+            size -= mb_len;
+            while (mb_len--)
                 my_putc(*m++, stream);
-                size--;
-                mb_len--;
-            }
         }
 #else
         while (size--)
             my_putc(*wstr++, stream);
 #endif
+
     } else
 #endif
     {
+
 #ifdef _NEED_IO_MBTOWIDE
         mbstate_t ps = { 0 };
         while (size--) {
             wchar_t c;
             size_t  mb_len = mbrtowc(&c, pnt, MB_LEN_MAX, &ps);
+
+            /* _wcslen already checked for errors */
+
             my_putc(c, stream);
             pnt += mb_len;
         }
@@ -111,6 +143,7 @@ str_lpad:
         while (size--)
             my_putc(*pnt++, stream);
 #endif
+
+#endif /* !_NEED_IO_SHRINK */
     }
-#endif
 }

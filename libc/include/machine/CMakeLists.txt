@@ -34,7 +34,6 @@
 #
 picolibc_headers(machine
   ansi.h
-  _arc4random.h
   _default_types.h
   _endian.h
   endian.h

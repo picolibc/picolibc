@@ -39,6 +39,16 @@ void
 __ubsan_handle_type_mismatch(void *_data, void *ptr)
 {
     struct type_mismatch_data *data = _data;
-    __ubsan_error(&data->location, "type_mismatch", "(%s) %p %s\n", data->type->type_name, ptr,
-                  __ubsan_type_check_to_string(data->type_check_kind));
+#ifdef __riscv_abi_rve
+    /*
+     * The ILP32E ABI seems ambiguous about alignment as it relaxes
+     * stack alignment to 4 bytes but doesn't otherwise mention
+     * alignment restrictions. Re-do the alignment check here and
+     * allow access on any 4 byte boundary.
+     */
+    if (data->alignment > 4 && ((uintptr_t)ptr & 3) == 0)
+        return;
+#endif
+    __ubsan_error(&data->location, "type_mismatch", "(%s) %p %lx %s\n", data->type->type_name, ptr,
+                  data->alignment, __ubsan_type_check_to_string(data->type_check_kind));
 }

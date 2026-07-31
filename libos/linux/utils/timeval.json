@@ -1,0 +1,8 @@
+{
+    "name": "timeval",
+    "headers": [ "linux/time.h" ],
+    "members": [
+	{ "name": "tv_sec" },
+	{ "name": "tv_usec" }
+    ]
+}

@@ -47,8 +47,10 @@ inc_sys_headers_all = [
   'iconvnls.h',
   '_initfini.h',
   '_intsup.h',
+  'ioctl.h',
   '_locale.h',
   'lock.h',
+  'mman.h',
   'param.h',
   'queue.h',
   'resource.h',
@@ -57,9 +59,11 @@ inc_sys_headers_all = [
   '_select.h',
   '_sigset.h',
   'stat.h',
+  'statvfs.h',
   '_stdint.h',
   'string.h',
   'syslimits.h',
+  'termios.h',
   'timeb.h',
   'time.h',
   'times.h',
@@ -69,7 +73,6 @@ inc_sys_headers_all = [
   'tree.h',
   '_types.h',
   'types.h',
-  '_tz_structs.h',
   'unistd.h',
   'utime.h',
   'wait.h',
@@ -78,10 +81,12 @@ inc_sys_headers_all = [
 
 inc_sys_headers = []
 foreach file : inc_sys_headers_all
-  if not (file in inc_sys_headers_machine)
-    inc_sys_headers += file
-  else
+  if file in inc_sys_headers_machine
     message('libc/include/sys/' + file + ': machine overrides generic')
+  elif file in inc_sys_headers_os
+    message('libc/include/sys/' + file + ': os overrides generic')
+  else
+    inc_sys_headers += file
   endif
 endforeach
 
@@ -91,7 +96,7 @@ if really_install
 endif
 
 if enable_cdefs_tests
-  ignore_headers = ['config.h', 'features.h', 'string.h', 'custom_file.h', 'dirent.h']
+  ignore_headers = ['config.h', 'errno.h', 'features.h', 'string.h', 'custom_file.h', 'dirent.h']
   foreach header : inc_sys_headers
     if not (header in ignore_headers) and not (header.startswith('_'))
       test_name = 'check-cdef-sys-' + header

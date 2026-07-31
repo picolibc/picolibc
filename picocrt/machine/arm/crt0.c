@@ -34,6 +34,60 @@
  */
 
 #include <picolibc.h>
+
+#ifdef CRT0_LINUX
+#include <sys/cdefs.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <picotls.h>
+#include "crt0.h"
+char      **environ;
+char      **__argv;
+extern char __tls_base[];
+void        _set_tls(void *tls);
+
+int         main(int argc, char **argv);
+
+__noreturn __disable_sanitizer void __used
+_start(void)
+{
+    void *sp;
+    __asm__("mov %0, sp" : "=r"(sp));
+    int    argc = (*(int *)sp);
+    char **argv = ((char **)sp) + 1;
+    __argv = argv;
+    environ = argv + argc + 1;
+
+#ifdef __THREAD_LOCAL_STORAGE
+#ifdef INIT_TLS
+    _init_tls(__tls_base);
+#endif
+    _set_tls(__tls_base);
+#endif
+#if defined(__INIT_FINI_ARRAY) && CONSTRUCTORS
+    __libc_init_array();
+#endif
+
+    int ret;
+
+    ret = main(argc, argv);
+    exit(ret);
+}
+
+extern char __arm32_tls_tcb_offset;
+#define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
+
+long syscall(long sys_call, ...);
+
+void
+_set_tls(void *tls)
+{
+    tls = (uint8_t *)tls - TP_OFFSET;
+    syscall(0xf0005, tls);
+}
+
+#else
+
 #include "../../crt0.h"
 
 #if __ARM_ARCH_PROFILE == 'M'
@@ -90,10 +144,20 @@ _start(void)
 #endif
     __asm__("msr CONTROL, %0" : : "r"(control));
 #endif
+#ifdef CRT0_LINUX
+    __start(0, NULL);
+#else
     __start();
+#endif
 }
 
 #else /*  __ARM_ARCH_PROFILE == 'M' */
+
+#ifdef CRT0_LINUX
+
+char **environ;
+
+#else
 
 #ifdef __PICOCRT_ENABLE_MMU
 
@@ -148,41 +212,26 @@ extern uint32_t __identity_page_table[MMU_NORMAL_COUNT + MMU_DEVICE_COUNT];
 #define MMU_NORMAL_FLAGS        (MMU_TYPE_1MB | MMU_RW | MMU_NORMAL_MEMORY)
 #define MMU_DEVICE_FLAGS        (MMU_TYPE_1MB | MMU_RW | MMU_DEVICE_MEMORY)
 
+/* clang-format off */
 __asm__(
     ".section .rodata\n"
     ".global __identity_page_table\n"
     ".balign 16384\n"
     "__identity_page_table:\n"
     ".set _i, 0\n"
-    ".rept " __XSTRING(
-        MMU_NORMAL_COUNT) "\n"
-                          "  .4byte (_i << 20) |" __XSTRING(
-                              MMU_NORMAL_FLAGS) "\n"
-                                                "  .set _i, _i + 1\n"
-                                                ".endr\n"
-                                                ".set _i, 0\n"
-                                                ".rept " __XSTRING(
-                                                    MMU_DEVICE_COUNT) "\n"
-                                                                      "  .4byte (1 << 31) | (_i << "
-                                                                      "20) |" __XSTRING(
-                                                                          MMU_DEVICE_FLAGS) "\n"
-                                                                                            "  "
-                                                                                            ".set "
-                                                                                            "_i, "
-                                                                                            "_i + "
-                                                                                            "1\n"
-                                                                                            ".endr"
-                                                                                            "\n"
-                                                                                            ".size "
-                                                                                            "__"
-                                                                                            "identi"
-                                                                                            "ty_"
-                                                                                            "page_"
-                                                                                            "table,"
-                                                                                            " " __XSTRING(
-                                                                                                (MMU_NORMAL_COUNT
-                                                                                                 + MMU_DEVICE_COUNT)
-                                                                                                * 4) "\n");
+    ".rept " __XSTRING(MMU_NORMAL_COUNT) "\n"
+    "  .4byte (_i << 20) |" __XSTRING(MMU_NORMAL_FLAGS) "\n"
+    "  .set _i, _i + 1\n"
+    ".endr\n"
+    ".set _i, 0\n"
+    ".rept " __XSTRING(MMU_DEVICE_COUNT) "\n"
+    "  .4byte (1 << 31) | (_i << 20) |" __XSTRING(MMU_DEVICE_FLAGS) "\n"
+    ".set _i, _i + 1\n"
+    ".endr\n"
+    ".size __identity_page_table," __XSTRING((MMU_NORMAL_COUNT + MMU_DEVICE_COUNT) * 4) "\n"
+    ".text\n"
+    );
+/* clang-format on */
 #endif
 
 #endif /* __PICOCRT_ENABLE_MMU */
@@ -363,8 +412,9 @@ _start(void)
 }
 
 #endif
+#endif
 
-#ifdef CRT0_SEMIHOST
+#if defined(CRT0_SEMIHOST) && defined(__SEMIHOST)
 
 /*
  * Trap faults, print message and exit when running under semihost
@@ -432,6 +482,8 @@ arm_fault(struct fault *f, int reason)
     _exit(1);
 }
 
+void __naked __disable_sanitizer arm_hardfault_isr(void);
+
 void __naked __disable_sanitizer
 arm_hardfault_isr(void)
 {
@@ -439,6 +491,8 @@ arm_hardfault_isr(void)
     __asm__("movs r1, #" REASON(REASON_HARDFAULT));
     __asm__("bl  arm_fault");
 }
+
+void __naked __disable_sanitizer arm_memmange_isr(void);
 
 void __naked __disable_sanitizer
 arm_memmange_isr(void)
@@ -448,6 +502,8 @@ arm_memmange_isr(void)
     __asm__("bl  arm_fault");
 }
 
+void __naked __disable_sanitizer arm_busfault_isr(void);
+
 void __naked __disable_sanitizer
 arm_busfault_isr(void)
 {
@@ -455,6 +511,8 @@ arm_busfault_isr(void)
     __asm__("movs r1, #" REASON(REASON_BUSFAULT));
     __asm__("bl  arm_fault");
 }
+
+void __naked __disable_sanitizer arm_usagefault_isr(void);
 
 void __naked __disable_sanitizer
 arm_usagefault_isr(void)
@@ -525,3 +583,5 @@ arm_data_abort_vector(void)
 #endif /* else __ARM_ARCH_PROFILE == 'M' */
 
 #endif /* CRT0_SEMIHOST */
+
+#endif /* CRT0_LINUX */

@@ -49,7 +49,7 @@ ecvtl_r(long double invalue, int ndigit, int *decpt, int *sign, char *buf, size_
     if (ndigit < 0)
         ndigit = 0;
 
-    if ((size_t)ndigit > len - 1)
+    if ((size_t)ndigit >= len)
         return -1;
 
     if (!isfinite(invalue)) {
@@ -82,7 +82,7 @@ ecvtl_r(long double invalue, int ndigit, int *decpt, int *sign, char *buf, size_
 
 #elif __SIZEOF_LONG_DOUBLE__ == 4
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 ecvtl_r(long double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
@@ -92,7 +92,7 @@ ecvtl_r(long double invalue, int ndigit, int *decpt, int *sign, char *buf, size_
 
 #elif __SIZEOF_LONG_DOUBLE__ == __SIZEOF_DOUBLE__
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 ecvtl_r(long double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)

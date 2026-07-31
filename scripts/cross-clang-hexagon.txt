@@ -32,7 +32,7 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [binaries]
-c = ['clang', '--target=hexagon-unknown-none-elf', '-mv68', '-fno-pic', '-fno-PIE', '-static', '-nostdlib', '-fuse-init-array', '-G0']
+c = ['clang', '--target=hexagon-unknown-none-elf', '-mv68', '-fno-pic', '-fno-PIE', '-static', '-nostdlib', '-fuse-init-array']
 cpp = ''
 c_ld = 'eld'
 ar = 'ar'
@@ -57,6 +57,8 @@ librt = '-lclang_rt.builtins'
 skip_sanity_check = true
 needs_exe_wrapper = true
 link_spec = '--build-id=none'
+# sdata needs to be 64byte aligned for Hexagon
+sdata_alignment = '64'
 default_ram_addr   = '0x00500000'
 default_ram_size   = '0x00800000'
 default_flash_addr   = '0x00100000'

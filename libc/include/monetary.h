@@ -43,14 +43,15 @@
 #include <sys/_types.h>
 
 #ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
+typedef __ssize_t ssize_t;
 #define _SSIZE_T_DECLARED
 #endif
 
 _BEGIN_STD_C
 
-ssize_t strfmon(char * __restrict, size_t, const char * __restrict, ...);
-ssize_t strfmon_l(char * __restrict, size_t, locale_t, const char * __restrict, ...);
+ssize_t strfmon(char * __restrict, size_t, const char * __restrict, ...) __picolibc_export;
+ssize_t strfmon_l(char * __restrict, size_t, locale_t, const char * __restrict,
+                  ...) __picolibc_export;
 
 _END_STD_C
 

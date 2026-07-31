@@ -33,8 +33,7 @@ POSSIBILITY OF SUCH DAMAGE.
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 float
 cabsf(float complex z)

@@ -29,15 +29,12 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
-#ifdef __weak_alias
-__weak_alias(casinl, _casinl)
-#endif
-
-    long double complex casinl(long double complex z)
+long double complex
+casinl(long double complex z)
 {
     long double complex w;
     long double complex ca, ct, zz, z2;
@@ -47,17 +44,17 @@ __weak_alias(casinl, _casinl)
     y = cimagl(z);
 
 #if 0 /* MD: test is incorrect, casin(>1) is defined */
-	if (y == 0.0L) {
-		if (fabsl(x) > 1.0L) {
-			w = M_PI_2L + 0.0L * (double complex) I;
+    if (y == 0.0L) {
+        if (fabsl(x) > 1.0L) {
+            w = CMPLXL(M_PI_2L, 0);
 #if 0
-			mtherr ("casinl", DOMAIN);
+            mtherr ("casinl", DOMAIN);
 #endif
-		} else {
-			w = asinl(x) + 0.0L * (double complex) I;
-		}
-		return w;
-	}
+        } else {
+            w = CMPLXL(asinl(x), 0);
+        }
+        return w;
+    }
 #endif
 
     /* Power series expansion */
@@ -100,14 +97,14 @@ __weak_alias(casinl, _casinl)
     }
     */
 
-    ca = x + y * (long double complex)I;
+    ca = CMPLXL(x, y);
     ct = ca * (long double complex)I;
     /* sqrtl( 1 - z*z) */
     /* cmull( &ca, &ca, &zz ) */
     /*x * x  -  y * y */
-    zz = (x - y) * (x + y) + (2.0L * x * y) * (long double complex)I;
+    zz = CMPLXL((x - y) * (x + y), 2 * x * y);
 
-    zz = 1.0L - creall(zz) - cimagl(zz) * (long double complex)I;
+    zz = CMPLXL(1.0L - creall(zz), -cimagl(zz));
     z2 = csqrtl(zz);
 
     zz = ct + z2;

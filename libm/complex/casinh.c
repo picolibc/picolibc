@@ -84,7 +84,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
+#include "local-complex.h"
 
 double complex
 casinh(double complex z)

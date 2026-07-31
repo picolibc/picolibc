@@ -33,17 +33,39 @@
 #ifdef _NEED_IO_SHRINK
     my_putc(va_arg(ap, int), stream);
 #else
+
 #ifdef _NEED_IO_WCHAR
     if (flags & FL_LONG) {
-        u.wbuf[0] = va_arg(ap, wint_t);
-        u.wbuf[1] = L'\0';
+        wint_t wc = (wchar_t)va_arg(ap, wint_t);
+        u.wbuf[0] = wc;
         wstr = u.wbuf;
-        goto wstr_lpad;
-    }
+
+#ifdef _NEED_IO_WIDETOMB
+        /* count bytes */
+        size = _mbclen(wc);
+        if (size == (size_t)-1)
+            goto fail;
+#else
+        /* count wchar_t */
+        size = 1;
 #endif
-    u.buf[0] = va_arg(ap, int);
-    pnt = u.buf;
-    size = 1;
+
+    } else
+#endif
+
+    {
+        u.buf[0] = va_arg(ap, int);
+        pnt = u.buf;
+        size = 1;
+    }
+
+    /* Ignore any precision value */
+    flags &= ~FL_PREC;
+
+    /*
+     * Jump into the %s/%ls handling code now that we have a counted
+     * string
+     */
     goto str_lpad;
 #endif
 }

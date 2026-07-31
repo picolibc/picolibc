@@ -64,8 +64,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 double complex
 cexp(double complex z)
@@ -75,5 +74,5 @@ cexp(double complex z)
     x = creal(z);
     y = cimag(z);
     r = exp(x);
-    return (double complex)(r * cos(y)) + r * sin(y) * (double complex)I;
+    return CMPLX(r * cos(y), r * sin(y));
 }

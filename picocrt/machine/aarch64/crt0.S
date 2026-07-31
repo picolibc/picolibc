@@ -1,3 +1,39 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Oliver Stannard <oliver.stannard@arm.com>
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+#ifndef CRT0_LINUX
 /************ Page table ************/
 /*
  * The smallest VA we can construct is 8GB, which needs 8 block page table
@@ -18,6 +54,7 @@
 #define MMU_BLOCK_NT            (1 << 16)
 #define MMU_BLOCK_OA_BIT        12
 #define MMU_BLOCK_NG            (1 << 11)
+#define MMU_BLOCK_NSE           (1 << 11)
 #define MMU_BLOCK_AF            (1 << 10)
 #define MMU_BLOCK_SH_BIT        8
 #define MMU_BLOCK_SH_NS         (0 << MMU_BLOCK_SH_BIT)
@@ -72,13 +109,21 @@ __identity_page_table:
   page_table_entries 4, MMU_INVALID_FLAGS
   end_page_table
 #elif defined(MACHINE_fvp)
+#if __ARM_ARCH_PROFILE != 'R'
+  // The FVP A-profile crt0 runs at EL3. With FEAT_RME, descriptor bit 11 is
+  // NSE rather than nG; NS=0,NSE=1 selects Root PAS for EL3 execution.
+#define MMU_FVP_NORMAL_FLAGS    (MMU_NORMAL_FLAGS | MMU_BLOCK_NSE)
+#else
+#define MMU_FVP_NORMAL_FLAGS    MMU_NORMAL_FLAGS
+#endif
+
   start_page_table
   // [0x0000_0000,0x8000_0000): 2GiB unmapped. This actually contains a lot
   // of different memory regions and devices, but we don't need any of them
   // for testing.
   page_table_entries 2, MMU_INVALID_FLAGS
   // [0x8000_0000,0x1_0000_0000): 2GiB normal memory
-  page_table_entries 2, MMU_NORMAL_FLAGS
+  page_table_entries 2, MMU_FVP_NORMAL_FLAGS
   // [0x1_0000_0000,0x2_0000_0000): 4GiB un-mapped
   page_table_entries 4, MMU_INVALID_FLAGS
   end_page_table
@@ -95,7 +140,24 @@ __identity_page_table:
 #else
 #error "Unknown machine type"
 #endif
+#endif /* CRT0_LINUX */
 
+        /*
+         *  op0   op1    CRn    CRm   op2
+         * 0b11 0b110 0b0001 0b0010 0b110
+         */
+#define SMCR_EL3 s3_6_c1_c2_6
+        /*
+         *  op0   op1    CRn    CRm   op2
+         * 0b11 0b000 0b0001 0b0010 0b110
+         */
+#define SMCR_EL1 S3_0_c1_c2_6
+
+#if defined(MACHINE_qemu)
+#define SMCR_BOOT_EL SMCR_EL1
+#elif defined(MACHINE_fvp) && __ARM_ARCH_PROFILE != 'R'
+#define SMCR_BOOT_EL SMCR_EL3
+#endif
 
 /************ Entry point ************/
 
@@ -109,14 +171,21 @@ __identity_page_table:
   .global _start
   .type _start, %function
 _start:
+#ifdef CRT0_LINUX
+        mov x0, sp
+#else
   /* Use EL-banked stack pointer */
 	msr     SPSel, #1
 
+#ifdef __pic__
+        adrp x1, :got:__stack
+        ldr  x1, [x1, :got_lo12:__stack]
+#else
 	/* Initialize stack */
 	adrp x1, __stack
 	add  x1, x1, :lo12:__stack
+#endif
 	mov sp, x1
-
 	/* Enable FPU */
 #if __ARM_FP
 #if defined(MACHINE_qemu)
@@ -134,13 +203,44 @@ _start:
 #else
 #error "Unknown machine type"
 #endif
+
+#ifdef SMCR_BOOT_EL
+	/* Determine if SME or SME2 is available */
+	bl      __arm_has_sme
+	cbz     x0, .Lnosme
+
+        /* Enable SME if running at EL1 */
+#if defined(MACHINE_qemu)
+        mrs     x0, BOOT_EL(CPACR)
+        ORR     x0, x0, #(0x3 << 24)
+        msr     BOOT_EL(CPACR), x0
+#endif
+
+	/* Clear TPIDR2_EL0 */
+	msr     S3_3_C13_C0_5, xzr
+	isb
+
+	/* set up Streaming SVE Vector Length (SVL) in SMCR_EL3 (4 LSB). */
+	mov     x2, #0xF
+
+	/* Try to set the maximum value supported by the architecture (2048). */
+	mrs     x1, SMCR_BOOT_EL /* mrs  x1, smcr */
+	bfi     x1, x2, 0, 4
+	msr     SMCR_BOOT_EL, x1 /* msr  smcr, x1 */
+	isb
+
+.Lnosme:
+
+#endif
+
 #endif // __ARM_FP
+#endif
 
 	/* Jump into C code */
 	bl _cstart
   .size _start, .-_start
 
-
+#ifndef CRT0_LINUX
 
 /************ Exception handlers ************/
 #ifdef CRT0_SEMIHOST
@@ -217,3 +317,4 @@ aarch64_\name\()_vector:
   exception_handler serror, 3
 
 #endif // CRT0_SEMIHOST
+#endif // CRT0_LINUX

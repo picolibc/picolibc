@@ -34,7 +34,35 @@
  */
 
 #include <stddef.h>
+
+#if defined(__riscv_shadow_stack)
+#define _PICOLIBC_CFISS_ENABLED 1
+#endif
+
+#ifdef _PICOLIBC_CFISS_ENABLED
+/*
+ * Optional shadow-stack initialization hook. The default implementation
+ * (defined below) is a no-op; targets that need to set up page-table
+ * or PMP protection for the shadow stack and program the SSP CSR can
+ * provide a strong override of this symbol.
+ *
+ * Called from __start() via POST_MEMORY_SETUP, i.e. after .bss has been
+ * cleared, so that any storage used as the shadow stack (which typically
+ * lives in .bss) has been zeroed before it is marked as a shadow-stack
+ * region.
+ */
+extern void _init_cfiss(void);
+#define POST_MEMORY_SETUP() _init_cfiss()
+#endif
+
 #include "../../crt0.h"
+
+#ifdef _PICOLIBC_CFISS_ENABLED
+__attribute__((weak)) void
+_init_cfiss(void)
+{
+}
+#endif
 
 static void __used __section(".init")
 _cstart(void)
@@ -163,7 +191,7 @@ _trap(void)
     SAVE_CSR(mtval);
 
     /*
-     * Pass pointer to saved registers in first parameter register
+     * Ensure GP and JVT are initialized before calling C
      */
     __asm__(".option	push\n"
             ".option	norelax\n"
@@ -173,7 +201,19 @@ _trap(void)
             "la	gp, __global_pointer$\n"
 #endif
             ".option	pop");
-    __asm__("mv     a0, sp");
+
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
+    __asm__(".weak __jvt_base$\n"
+#ifdef __riscv_cmodel_large
+            "ld t0, .trap_jvt_base\n"
+#else
+            "la t0, __jvt_base$\n"
+#endif
+            // __jvt_base$ is weak, so skip initializing `CSR[jvt]` if it is zero (undefined)
+            "beqz t0, .Lafter_jvt_init_trap\n"
+            "csrw jvt, t0\n"
+            ".Lafter_jvt_init_trap:\n");
+#endif
 
     /* Enable FPU (just in case) */
 #ifdef __riscv_flen
@@ -183,10 +223,21 @@ _trap(void)
             "csrw	mstatus, t0\n"
             "csrwi	fcsr, 0");
 #endif
-    __asm__("jal    _ctrap");
+
+    /*
+     * Call to C passing the saved registers as the first parameter.
+     */
+    __asm__("mv     a0, sp\n"
+            "jal    _ctrap");
+
 #ifdef __riscv_cmodel_large
-    __asm__(".align 3\n.trap_sp:\n.dword __stack");
-    __asm__(".align 3\n.trap_gp:\n.dword __global_pointer$");
+    __asm__(".align 3\n"
+            ".trap_sp: .dword __stack\n" /* FIXME: this is __heap_end in non-large code models. */
+            ".trap_gp: .dword __global_pointer$\n"
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
+            ".trap_jvt_base: .dword __jvt_base$\n"
+#endif
+    );
 #endif
 }
 #endif
@@ -232,6 +283,68 @@ _start(void)
             "csrw	mstatus, t0\n"
             "csrwi	vxrm, 1");
 #endif
+
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
+    __asm__(".weak __jvt_base$\n"
+#ifdef __riscv_cmodel_large
+            "ld t0, .start_jvt_base\n"
+#else
+            "la t0, __jvt_base$\n"
+#endif
+            // __jvt_base$ is weak, so skip initializing `CSR[jvt]` if it is zero (undefined)
+            "beqz t0, .Lafter_jvt_init\n"
+            "csrw jvt, t0\n"
+            ".Lafter_jvt_init:\n");
+#endif
+
+#ifdef __riscv_landing_pad
+    /*
+     * Zicfilp: enable M-mode landing-pad enforcement by setting
+     * mseccfg.MLPE (bit 10). This macro is defined by the compiler
+     * only when both the Zicfilp extension is enabled and code is
+     * generated with -fcf-protection=branch (so that `lpad`
+     * instructions are emitted at indirect-call targets). After this
+     * is set, every indirect call or jump executed in M-mode must
+     * target an `lpad` instruction or a software-check exception
+     * (mcause=18, mtval=2) is raised.
+     */
+    __asm__("csrr	t0, mseccfg\n"
+            "li	t1, 1024\n"
+            "or	t0, t0, t1\n"
+            "csrw	0x747, t0");
+    /*
+     * Also enable landing-pad enforcement in S- and U-mode via
+     * menvcfg.LPE (bit 2) and senvcfg.LPE (bit 2). This is harmless on
+     * pure M-mode runs and is required when a crt0 variant drops to
+     * S/U-mode (e.g. for the Zicfiss shadow-stack MMU configuration).
+     */
+    __asm__("csrr	t0, menvcfg\n"
+            "li	t1, 4\n"
+            "or	t0, t0, t1\n"
+            "csrw	menvcfg, t0\n"
+            "csrr	t0, senvcfg\n"
+            "or	t0, t0, t1\n"
+            "csrw	senvcfg, t0");
+#endif
+#ifdef __riscv_shadow_stack
+    /*
+     * Zicfiss: enable shadow-stack support in mseccfg (SSE = bit 3) so
+     * that ssp may be written from M-mode, and in menvcfg/senvcfg so
+     * that the shadow-stack instructions are enabled for S/U.  The
+     * actual shadow-stack page mapping and ssp initialization is
+     * deferred to _init_cfiss() (invoked from POST_MEMORY_SETUP).
+     */
+    __asm__("csrr	t0, mseccfg\n"
+            "li	t1, 8\n"
+            "or	t0, t0, t1\n"
+            "csrw	0x747, t0\n"
+            "csrr	t0, menvcfg\n"
+            "or	t0, t0, t1\n"
+            "csrw	menvcfg, t0\n"
+            "csrr	t0, senvcfg\n"
+            "or	t0, t0, t1\n"
+            "csrw	senvcfg, t0");
+#endif
 #ifdef CRT0_SEMIHOST
 #ifdef __riscv_cmodel_large
     __asm__("ld     t0,.start_trap");
@@ -240,14 +353,26 @@ _start(void)
 #endif
     __asm__("csrw   mtvec, t0");
     __asm__("csrr   t1, mtvec");
+#ifdef CRT0_SMRNMI
+    __asm__(".globl __riscv_enable_smrnmi");
+    __asm__("__riscv_enable_smrnmi: csrsi 0x744, 0x8"); // mnstatus = 0x744, 1 << 3 = 8
 #endif
+#endif
+
+    /*
+     * Call into C start function
+     */
     __asm__("j      _cstart");
+
 #ifdef __riscv_cmodel_large
     __asm__(".align 3\n"
             ".start_sp: .dword __stack\n"
             ".start_gp: .dword __global_pointer$\n"
 #ifdef CRT0_SEMIHOST
-            ".start_trap: .dword _trap"
+            ".start_trap: .dword _trap\n"
+#endif
+#if defined(__riscv_zcmt) || defined(__riscv_xqccmt)
+            ".start_jvt_base: .dword __jvt_base$\n"
 #endif
     );
 #endif

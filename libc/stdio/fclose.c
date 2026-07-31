@@ -29,15 +29,14 @@
 
 /* $Id: fclose.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
-int
+int __no_thread_safety_analysis
 fclose(FILE *f)
 {
     struct __file_close *cf = (struct __file_close *)f;
 
 #ifdef __STDIO_LOCKING
-    fflush(f);
     __flockfile_close(f);
 #endif
     if ((f->flags & __SCLOSE) && cf->close) {

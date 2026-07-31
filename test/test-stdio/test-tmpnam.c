@@ -32,6 +32,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+/* P_tmpdir and tmpnam() are gated behind feature macros on hosted (glibc) builds */
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <string.h>
 
@@ -41,8 +43,20 @@ main(void)
     char generate[2][L_tmpnam];
 
     // Generate two temporary files
-    tmpnam(generate[0]);
-    tmpnam(generate[1]);
+    if (tmpnam(generate[0]) == NULL) {
+        printf("tmpnam(generate[0]) failed\n");
+        return -1;
+    }
+    if (tmpnam(generate[1]) == NULL) {
+        printf("tmpnam(generate[1]) failed\n");
+        return -1;
+    }
+
+    // Generated names must live under P_tmpdir
+    if (sizeof(P_tmpdir) > 1 && strncmp(generate[0], P_tmpdir, sizeof(P_tmpdir) - 1) != 0) {
+        printf("tmpnam \"%s\" not under P_tmpdir \"%s\"\n", generate[0], P_tmpdir);
+        return -1;
+    }
 
     // Check if the two file names are the same
     if (strcmp(tmpnam(generate[0]), generate[1]) == 0) {

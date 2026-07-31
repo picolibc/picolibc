@@ -41,6 +41,7 @@ picolibc_sources(
   bufio.c
   bufio_close.c
   bufio_close_nf.c
+  bufio_exit_flush.c
   bufio_setvbuf.c
   clearerr.c
   compare_exchange.c
@@ -76,6 +77,7 @@ picolibc_sources(
   filewstrget.c
   flockfile.c
   fmemopen.c
+  open_memstream.c
   fopen.c
   fprintf.c
   fputc.c
@@ -92,6 +94,7 @@ picolibc_sources(
   ftox_engine.c
   ftrylockfile.c
   funlockfile.c
+  fopencookie.c
   funopen.c
   fwide.c
   fwprintf.c
@@ -109,7 +112,9 @@ picolibc_sources(
   ldtox_engine.c
   matchcaseprefix.c
   mktemp.c
+  pclose.c
   perror.c
+  popen.c
   printf.c
   putchar.c
   puts.c

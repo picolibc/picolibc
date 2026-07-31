@@ -17,6 +17,9 @@ __fpclassifyl(long double x)
     else if (esx == 0)
         /* zero is already handled above */
         return FP_SUBNORMAL;
+    /* check for invalid values */
+    else if ((hx & 0x80000000) == 0)
+        return FP_NAN;
     else if (esx < 0x7fff)
         return FP_NORMAL;
     else if (hx == LDBL_NBIT_INF && lx == 0)

@@ -42,8 +42,8 @@
 #include <math.h>
 #include <errno.h>
 #include <ctype.h>
+#include <stdio.h>
 #include "posix-local.h"
-#include "stdio_private.h"
 
 /*
  * Shared function for strfmon and strfmon_l
@@ -199,12 +199,14 @@ __vstrfmon(char * __restrict buf, size_t size, const char * __restrict format, v
                 return -1;
             }
 
-            /* Trim trailing zeros */
-            while (val_pos[val_width - 1] == '0')
-                val_width--;
+            /* Trim trailing zeros from the default precision only */
+            if (right_precision < 0) {
+                while (val_pos[val_width - 1] == '0')
+                    val_width--;
 
-            if (val_pos[val_width - 1] == '.')
-                val_width--;
+                if (val_pos[val_width - 1] == '.')
+                    val_width--;
+            }
 
             /* Compute width of integer portion (left) */
             left_width = strchrnul(val_pos, '.') - val_pos;

@@ -106,7 +106,6 @@ typedef union {
 #define LDBL_NBIT     0
 #define LDBL_NBIT_INF 0
 #define LDBL_IMPLICIT_NBIT
-#define mask_nbit_l(u)   ((void)0)
 #define LDBL_INF_NAN_EXP 32767
 #define LDBL_EXP_MASK    0x7fff
 #define LDBL_EXP_SIGN    0x8000
@@ -298,7 +297,6 @@ typedef union {
 #else
 #define LDBL_NBIT_INF LDBL_NBIT
 #endif
-#define mask_nbit_l(u)   ((u).bits.manh &= ~LDBL_NBIT)
 #define LDBL_INF_NAN_EXP 32767
 #define LDBL_EXP_MASK    0x7fff
 #define LDBL_EXP_SIGN    0x8000
@@ -596,7 +594,6 @@ union IEEEl2bits {
 #define LDBL_NBIT     0
 #define LDBL_NBIT_INF 0
 #define LDBL_IMPLICIT_NBIT
-#define mask_nbit_l(u)   ((void)0)
 #define LDBL_INF_NAN_EXP 2047
 #define LDBL_EXP_MASK    0x7ff
 #define LDBL_EXP_SIGN    0x800

@@ -49,13 +49,13 @@ expm1f(float x)
     /* filter out huge and non-finite argument */
     if (hx >= 0x4195b844) { /* if |x|>=27*ln2 */
         if (FLT_UWORD_IS_NAN(hx))
-            return x + x;
+            return opt_barrier_float(x) + opt_barrier_float(x);
         if (FLT_UWORD_IS_INFINITE(hx))
             return (xsb == 0) ? x : -1.0f;      /* exp(+-inf)={inf,-1} */
         if (xsb == 0 && hx > FLT_UWORD_LOG_MAX) /* if x>=o_threshold */
             return __math_oflowf(0);            /* overflow */
         if (xsb != 0)                           /* x < -27*ln2, return -1.0 with inexact */
-            return __math_inexactf(tiny - one); /* return -1 */
+            return __math_inexactf(opt_barrier_float(tiny) - one); /* return -1 */
     }
 
     /* argument reduction */

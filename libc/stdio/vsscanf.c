@@ -27,7 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 vsscanf(const char *s, const char *fmt, va_list ap)

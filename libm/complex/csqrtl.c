@@ -25,9 +25,8 @@
  */
 
 #define _GNU_SOURCE
-#include <complex.h>
+#include "local-complex.h"
 #include <float.h>
-#include <math.h>
 #include <stdbool.h>
 
 #ifdef __HAVE_LONG_DOUBLE
@@ -42,9 +41,7 @@
 // #pragma	STDC CX_LIMITED_RANGE	ON
 
 /* We risk spurious overflow for components >= LDBL_MAX / (1 + sqrt(2)). */
-#define THRESH       (LDBL_MAX / 2.414213562373095048801688724209698L)
-
-#define cpackl(r, i) ((r) + (i) * (long double complex)I)
+#define THRESH (LDBL_MAX / 2.414213562373095048801688724209698L)
 
 long double complex
 csqrtl(long double complex z)
@@ -59,12 +56,12 @@ csqrtl(long double complex z)
 
     /* Handle special cases. */
     if (z == 0.0L)
-        return (cpackl((long double)0.0L, b));
+        return (CMPLXL((long double)0.0L, b));
     if (isinf(b))
-        return (cpackl((long double)INFINITY, b));
+        return (CMPLXL((long double)INFINITY, b));
     if (isnan(a)) {
         t = (b - b) / (b - b); /* raise invalid if b is not a NaN */
-        return (cpackl(a, t)); /* return NaN + NaN i */
+        return (CMPLXL(a, t)); /* return NaN + NaN i */
     }
     if (isinf(a)) {
         /*
@@ -74,9 +71,9 @@ csqrtl(long double complex z)
          * csqrt(-inf + y i)   = 0   +  inf i
          */
         if (signbit(a))
-            return (cpackl(fabsl(b - b), copysignl(a, b)));
+            return (CMPLXL(fabsl(b - b), copysignl(a, b)));
         else
-            return (cpackl(a, copysignl(b - b, b)));
+            return (CMPLXL(a, copysignl(b - b, b)));
     }
     /*
      * The remaining special case (b is NaN) is handled just fine by
@@ -95,10 +92,10 @@ csqrtl(long double complex z)
     /* Algorithm 312, CACM vol 10, Oct 1967. */
     if (a >= 0L) {
         t = sqrtl((a + hypotl(a, b)) * 0.5L);
-        result = cpackl(t, b / (2.0L * t));
+        result = CMPLXL(t, b / (2.0L * t));
     } else {
         t = sqrtl((-a + hypotl(a, b)) * 0.5L);
-        result = cpackl(fabsl(b) / (2.0L * t), copysignl(t, b));
+        result = CMPLXL(fabsl(b) / (2.0L * t), copysignl(t, b));
     }
 
     /* Rescale. */

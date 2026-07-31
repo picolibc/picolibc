@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 const char __match_inf[] = "INF";
 const char __match_inity[] = "INITY";

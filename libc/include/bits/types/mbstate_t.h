@@ -3,6 +3,6 @@
 
 #include <sys/_types.h>
 
-typedef _mbstate_t mbstate_t;
+typedef __mbstate_t mbstate_t;
 
 #endif /* _PICOLIBC_BITS_TYPES_MBSTATE_T_H */

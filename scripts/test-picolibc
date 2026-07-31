@@ -1,5 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 
+PICOLIBC_PREFIX=/opt/picolibc-test
 PICOLIBC_DIR=/build/picolibc
 GLIBC_DIR=/build/glibc
 
@@ -8,27 +9,32 @@ set -e
 #test=echo
 
 options="-Dwant-math-errno=true -Dio-long-double=true -Dwerror=true -Dmb-capable=true -Dmb-extended-charsets=true -Dsanitize=undefined"
-stdoptions="$options --buildtype=release -Ddebug=true"
+stdoptions="$options --buildtype=release -Ddebug=true --prefix=$PICOLIBC_PREFIX"
 
-for arch in aarch64 arm riscv; do
+declare -a ARCHS
+
+ARCHS=(x86_64-linux-gnu i686-linux-gnu aarch64 arm riscv)
+
+for arch in "${ARCHS[@]}"; do
 
     DIR=$PICOLIBC_DIR/builds/build-$arch
 
+    echo '###################################'
+
+    echo '####' rm -rf $DIR
     $test rm -rf $DIR
+
+    echo '####' mkdir -p $DIR
     $test mkdir -p $DIR
+
+    echo '####' cd $DIR
     $test cd $DIR
 
-    if [ $arch = aarch64 ]; then
-	conf=$arch-none-elf
-    else
-	conf=$arch
-    fi
-
-    echo '###################################'
-    echo '####' ../../scripts/do-$conf-configure $stdoptions
+    echo '####' ../../scripts/do-$arch-configure $stdoptions
     echo '###################################'
 
-    $test ../../scripts/do-$conf-configure $stdoptions
+
+    $test ../../scripts/do-$arch-configure $stdoptions
 
     $test ninja
     $test meson test -t 10
@@ -39,7 +45,7 @@ done
 options="-Dwerror=true"
 stdoptions="$options --buildtype=release -Ddebug=true"
 
-for arch in aarch64 arm riscv; do
+for arch in "${ARCHS[@]}"; do
 
     DIR=$GLIBC_DIR/builds/build-$arch
 

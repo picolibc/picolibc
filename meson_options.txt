@@ -61,6 +61,8 @@ option('fast-strcmp', type: 'boolean', value: true,
        description: 'Always optimize strcmp for performance')
 option('sanitize', type: 'string', value: 'none',
        description: 'Code sanitizer to use')
+option('use-hlt-semihosting', type: 'boolean', value: 'false',
+        description: 'Enable HLT Semihosting (only valid for Armv8)')
 
 #
 # Installation options
@@ -79,6 +81,9 @@ option('system-libc', type: 'boolean', value: false,
 option('force-install', type: 'boolean', value: false,
        description: 'If picolibc is a subproject its targets will not be installed by default, setting this to true forces installation')
 
+option('libgccdir', type: 'string',
+       description: 'path to picolibc libgcc dirictory')
+
 #
 # Testing options
 #
@@ -89,8 +94,6 @@ option('tests-cdefs', type: 'combo', choices: ['true', 'false', 'auto'], value: 
        description: 'Enable test of sys/cdefs.h. If set to auto, enable when tests are enabled')
 option('tests-enable-stack-protector', type: 'boolean', value: true,
        description: 'tests enable stack protector')
-option('tests-enable-full-malloc-stress', type: 'boolean', value: false,
-       description: 'tests enable stress test for full malloc')
 option('tests-enable-posix-io', type: 'boolean', value: true,
        description: 'tests enable posix-io when available')
 option('test-long-double', type: 'boolean', value: true,
@@ -113,12 +116,20 @@ option('exhaustive-math-tests', type: 'combo', choices: ['true', 'false', 'nativ
        description: 'Run exhaustive binary32 math tests. If set to native, enable when native tests are enabled')
 option('use-stdlib', type: 'boolean', value: false,
        description: 'Do not bypass the standard system library with -nostdlib (useful for native testing)')
-option('picolib', type: 'boolean', value: true,
-       description: 'Include pico lib bits. Disable when doing native testing.')
 option('semihost', type: 'boolean', value: true,
        description: 'Include semihost bits. Disable when doing native testing.')
+option('os-linux', type: 'boolean', value: false,
+       description: 'Include libos/linux bits. Enable for native Linux OS support.')
 option('fake-semihost', type: 'boolean', value: true,
        description: 'create fake semihost library to link tests [ignored]')
+option('crt0-test', type: 'string', value: '',
+       description: 'crt0 variant for testing')
+option('oslib-test', type: 'string', value: '',
+       description: 'oslib variant for testing')
+option('linkerscript-test', type: 'string', value: '',
+       description: 'linker script variant for testing')
+option('os-fallback', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Split some APIs off to a separate os-fallback library')
 
 #
 # Stdio options
@@ -160,6 +171,8 @@ option('have-fcntl', type: 'boolean', value: false,
        description: 'system provides fcntl function')
 option('fstat-bufsiz', type: 'boolean', value: false,
        description: 'use fstat to detect optimum buffer sizes for stdio')
+option('stdio-exit-flush', type: 'boolean', value: false,
+       description: 'flush all runtime allocated bufio files at exit and fflush(NULL)')
 
 #
 # Internationalization options
@@ -201,10 +214,14 @@ option('crt-runtime-size', type: 'boolean', value: false,
 
 option('enable-malloc', type: 'boolean', value: true,
        description: 'provide malloc family of functions based on sbrk')
-option('malloc-clear-freed', type: 'boolean', value: false,
-       description: 'Erase memory on free/realloc')
 option('internal-heap', type: 'integer', value: 0,
        description: 'provide internal static heap')
+option('malloc-clear-freed', type: 'boolean', value: false,
+       description: 'Erase memory on free/realloc')
+option('malloc-error-abort', type: 'boolean', value: false,
+       description: 'Abort when malloc usage errors are detected')
+option('malloc-small-bucket', type: 'integer', value: 0,
+       description: 'use fixed bucket sizes for allocations no larger than this')
 
 #
 # Locking options
@@ -212,6 +229,13 @@ option('internal-heap', type: 'integer', value: 0,
 
 option('single-thread', type: 'boolean', value: false,
        description: 'disable support for multiple threads')
+
+#
+# Dynamic loading (libdl) options
+#
+
+option('libdl', type: 'boolean', value: false,
+       description: 'build libdl providing dlopen/dlsym/dlclose/dlerror (requires a supported machine port, default: false)')
 
 #
 # Thread-local storage options
@@ -231,6 +255,8 @@ option('tls-rp2040', type: 'boolean', value: false,
        description: 'Use Raspberry Pi RP2040 CPUID register to index thread local storage value')
 option('stack-protector-guard', type: 'combo', choices: ['global', 'tls', 'auto'], value: 'auto',
        description: 'Set stack protection canary type')
+option('tmpdir', type: 'string', value: '',
+       description: 'Directory prefix for tmpnam()/tmpfile() names (P_tmpdir). Must be empty or end with a path separator. Empty means names are created in the current directory.')
 
 #
 # Math options

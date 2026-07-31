@@ -1,0 +1,17 @@
+{
+    "name": "siginfo",
+    "headers": ["asm/siginfo.h"],
+    "types": [ "union sigval" ],
+    "members": [
+	{ "name": "si_signo" },
+	{ "name": "si_code" },
+	{ "name": "si_errno" },
+	{ "name": "si_pid" },
+	{ "name": "si_uid" },
+	{ "name": "si_addr", "pointer": "true" },
+	{ "name": "si_status" },
+	{ "name": "si_band" },
+	{ "name": "si_value", "type": "union sigval" }
+    ]
+}
+	

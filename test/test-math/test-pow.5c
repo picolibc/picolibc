@@ -35,13 +35,103 @@
 
 load "test-float.5c"
 
+typedef struct {
+	real x, y;
+} pair_t;
+
+pair_t[] test_values = {
+	{ .x = 0x1.fffffep127, .y = 0.5 },
+	{ .x = 0x1.fffffffffffffp1023, .y = 0.5 },
+	{ .x = 0x1.fffffffffffffffep16383, .y = 0.5 },
+	{ .x = 0x1.ffffffffffffffffffffffffffffp16383, .y = 0.5 },
+	{ .x = 0x1.000002p0, .y = 0x1.62e432p29 },
+	{ .x = 0x1.0000000000001p0, .y = 0x1.62e42fefa39fp61 },
+	{ .x = 0x1.0000000000000002p0, .y = 0x1.62e42fefa39ef358p76 },
+	{ .x = 0x1.0000000000000002p0, .y = 0x2.468accp124 },
+	{ .x = 0x1.0000000000000000000000000001p0, .y = 0x1.62e42fefa39ef35793c7673007e7p125 },
+	{ .x = 1, .y = 0x1.fffffep127 },
+	{ .x = 1, .y = 0x1.fffffffffffffp1023 },
+	{ .x = 1, .y = 0x1.fffffffffffffffep16383 },
+	{ .x = 1, .y = 0x1.ffffffffffffffffffffffffffffp16383 },
+	{ .x = 1, .y = 0x1p-127 },
+	{ .x = 1, .y = 0x1p-1023 },
+	{ .x = 1, .y = 0x1p-16383 },
+};
+
+bool
+is_odd(real y)
+{
+	return y % 2 == 1;
+}
+
+bool
+is_even(real y)
+{
+	return y % 2 == 0;
+}
+
+bool
+is_int(real y)
+{
+	return floor(y) == y;
+}
 
 real
 wrap_pow(real x, real y)
 {
-	if (floor(y) == y && x < 0) {
+	if (x == 0 && y < 0 && is_odd(y))
+		raise infinity(false);
+
+	if (x == 0 && y < 0 && !is_odd(y))
+		raise infinity(false);
+
+	if (x == 0 && is_odd(y) && y > 0)
+		return 0;
+
+	if (x == 0 && y > 0 && !is_odd(y))
+		return 0;
+
+	/* inf y */
+	if (is_inf(y)) {
+		if (x == -1)
+			return 1;
+
+		if (abs(x) < 1 && y < 0)
+			raise infinity(false);
+		if (abs(x) > 1 && y < 0)
+			return 0;
+		if (abs(x) < 1 && y > 0)
+			return 0;
+		if (abs(x) > 1 && y > 0)
+			raise infinity(false);
+	}
+	/* inf x */
+	if (is_inf(x)) {
+		if (x < 0 && is_odd(y) && y < 0)
+			return 0;
+		if (x < 0 && y < 0 && !is_odd(y))
+			return 0;
+		if (x < 0 && is_odd(y) && y > 0)
+			raise infinity(true);
+		if (x < 0 && y > 0 && !is_odd(y))
+			raise infinity(false);
+		if (x > 0 && y < 0)
+			return 0;
+		if (x > 0 && y > 0)
+			raise infinity(false);
+	}
+
+	if (x == 1)
+		return 1;
+	if (y == 0)
+		return 1;
+
+	if (!is_inf(x) && x < 0 && !is_inf(y) && !is_int(y))
+		raise nan();
+
+	if (is_int(y) && x < 0) {
 		real r = pow(-x, y);
-		if ((floor(y) & 1) != 0)
+		if (is_odd(y))
 			r = -r;
 		return r;
 	}
@@ -49,16 +139,28 @@ wrap_pow(real x, real y)
 }
 
 void
+compute_sign(real xi, real yi)
+{
+	compute_real_real( xi,  yi, wrap_pow);
+	compute_real_real( xi, -yi, wrap_pow);
+	compute_real_real(-xi,  yi, wrap_pow);
+	compute_real_real(-xi, -yi, wrap_pow);
+}
+
+void
 main()
 {
+	for (int i = 0; i < dim(test_values); i++) {
+		real xi = imprecise(test_values[i].x, prec);
+		real yi = imprecise(test_values[i].y, prec);
+		compute_sign(xi, yi);
+	}
+
 	for (real x = 1e-38; x <= 1e38; x *= 1111) {
 		for (real y = 1e-38; y <= 1e38; y *= 1111) {
 			real xi = imprecise(x, prec);
 			real yi = imprecise(y, prec);
-			compute_real_real( xi,  yi, wrap_pow);
-			compute_real_real( xi, -yi, wrap_pow);
-			compute_real_real(-xi,  yi, wrap_pow);
-			compute_real_real(-xi, -yi, wrap_pow);
+			compute_sign(xi, yi);
 		}
 	}
 }

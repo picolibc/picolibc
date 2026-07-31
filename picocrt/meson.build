@@ -47,6 +47,7 @@ picocrt_machines = [
   },
 ]
 
+has_crt0_linux = false
 machine_dir = 'machine' / host_cpu_family
 picocrt_march_add=''
 if fs.is_dir(machine_dir)
@@ -56,13 +57,25 @@ else
 endif
 
 machine_found = false
+test_picocrt_machine = ''
 foreach machine : picocrt_machines
   if machine['name'] == test_machine
     machine_found = true
+    test_picocrt_machine = machine.get('alias', machine['name'])
   endif
 endforeach
 if not machine_found
   error(test_machine + ': requested test machine not found')
+endif
+
+test_picocrt_machine_found = false
+foreach machine : picocrt_machines
+  if not machine.has_key('alias') and machine['name'] == test_picocrt_machine
+    test_picocrt_machine_found = true
+  endif
+endforeach
+if not test_picocrt_machine_found
+  error(test_machine + ': requested test machine maps to missing startup machine ' + test_picocrt_machine)
 endif
 
 stack_c_args = []
@@ -116,10 +129,6 @@ picocrt_variants = [
   },
 ]
 
-# Use the semihost version of crt0 for testing as that
-# will have exception handling
-crt0_test = 'crt0_semihost'
-
 if thread_local_storage
   picocrt_variants += {
                        'name': 'inittls',
@@ -135,6 +144,35 @@ if thread_local_storage
   }
 endif
 
+if has_crt0_linux and get_option('os-linux')
+  picocrt_variants += {
+    'name': 'linux',
+    'suffix': '-linux',
+    'c_args': ['-DINIT_TLS', '-DNO_FLASH', '-DCRT0_EXIT', '-DCRT0_LINUX'],
+    'src': src_picocrt,
+  }
+endif
+
+if host_cpu_family == 'riscv'
+  # A CRT0 Semihosting variant with Smrnmi support
+  picocrt_variants += {
+    'name': 'semihost-smrnmi',
+    'suffix': '-semihost-smrnmi',
+    'c_args': ['-DCRT0_EXIT', '-DCRT0_SEMIHOST', '-DCRT0_SMRNMI'],
+    'src': src_picocrt,
+  }
+  # A CRT0 Semihosting variant that performs Zicfiss shadow-stack
+  # initialization via an Sv32 MMU page-table setup and drops to U-mode
+  # before running the application.  Only useful for builds that target
+  # Zicfilp+Zicfiss and are linked with -fcf-protection.
+  picocrt_variants += {
+    'name': 'semihost-cfi',
+    'suffix': '-semihost-cfi',
+    'c_args': ['-DCRT0_EXIT', '-DCRT0_SEMIHOST'],
+    'src': src_picocrt_riscv_cfi,
+  }
+endif
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
@@ -143,6 +181,10 @@ foreach params : targets
   instdir = join_paths(lib_dir, target_dir)
 
   foreach machine : picocrt_machines
+    if machine.has_key('alias')
+      continue
+    endif
+
     machine_suffix = machine['suffix']
 
     foreach variant : picocrt_variants
@@ -175,7 +217,7 @@ foreach params : targets
                           link_args : _link_args)
       endif
 
-      if machine['name'] == test_machine
+      if machine['name'] == test_picocrt_machine
         set_variable('crt0' + variant_suffix.underscorify() + target,
                      _crt.extract_objects(_src)
                     )

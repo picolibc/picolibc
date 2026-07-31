@@ -32,7 +32,7 @@
  * Implement either by merging adjacent free memory
  * or by calling malloc/memcpy
  */
-void *
+void * __disable_sanitizer
 realloc(void *ptr, size_t size)
 {
     void *mem;
@@ -45,24 +45,36 @@ realloc(void *ptr, size_t size)
         return NULL;
     }
 
-    if (size > MALLOC_MAXSIZE) {
+    if (size > MALLOC_ALLOC_MAX) {
         errno = ENOMEM;
         return NULL;
     }
 
+    if (!_check_busy(ptr, "realloc: already freed\n"))
+        return NULL;
+
     size_t   new_size = chunk_size(size);
+
     chunk_t *p_to_realloc = ptr_to_chunk(ptr);
 
 #if MALLOC_DEBUG
-    __malloc_validate_block(p_to_realloc);
+    assert(!_is_free(p_to_realloc));
+    __malloc_validate_chunk(p_to_realloc);
 #endif
 
     size_t old_size = _size(p_to_realloc);
 
+#if __MALLOC_SMALL_BUCKET
+    bool is_bucket;
+    is_bucket = (old_size <= MALLOC_MAX_BUCKET && old_size == BUCKET_SIZE(BUCKET_NUM(old_size)));
+#else
+#define is_bucket 0
+#endif
+
     /* See if we can avoid allocating new memory
      * when increasing the size
      */
-    if (new_size > old_size) {
+    if (!is_bucket && new_size > old_size) {
         void *chunk_e = chunk_end(p_to_realloc);
 
         MALLOC_LOCK;
@@ -76,7 +88,7 @@ realloc(void *ptr, size_t size)
             chunk_t **p, *r;
 
             /* Check to see if there's a chunk_t of free space just past
-             * the current block, merge it in in case that's useful
+             * the current chunk, merge it in in case that's useful
              */
             for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
                 if (r == chunk_e) {
@@ -88,7 +100,7 @@ realloc(void *ptr, size_t size)
                     /* clear the memory from r */
                     memset(r, '\0', r_size);
 
-                    /* add it's size to our block */
+                    /* add it's size to our chunk */
                     old_size += r_size;
                     _set_size(p_to_realloc, old_size);
                     break;
@@ -105,26 +117,24 @@ realloc(void *ptr, size_t size)
         size_t extra = old_size - new_size;
 
 #ifdef __MALLOC_CLEAR_FREED
-        if (extra > MALLOC_HEAD)
-            memset((char *)ptr + new_size, 0, extra - MALLOC_HEAD);
+        memset((char *)ptr + size, 0, old_size - size);
 #endif
         /* If there's enough space left over, split it out
          * and free it
          */
-        if (extra >= MALLOC_MINSIZE) {
+        if (!is_bucket && extra >= MALLOC_CHUNK_MIN) {
             _set_size(p_to_realloc, new_size);
             make_free_chunk(chunk_after(p_to_realloc), extra);
         }
         return ptr;
     }
-
     /* No short cuts, allocate new memory and copy */
 
     mem = malloc(size);
     if (!mem)
         return NULL;
 
-    memcpy(mem, ptr, old_size - MALLOC_HEAD);
+    memcpy(mem, ptr, malloc_size(old_size));
     free(ptr);
 
     return mem;

@@ -19,10 +19,6 @@ typedef __off_t off_t; /* file offset */
 typedef __pid_t pid_t; /* process id */
 #define _PID_T_DECLARED
 #endif
-#ifndef _OFF64_T_DECLARED
-typedef __off64_t off64_t; /* 64-bit file offset */
-#define _OFF64_T_DECLARED
-#endif
 
 #define _FOPEN      (-1)       /* from sys/file.h, kernel use only */
 #define _FREAD      0x0001     /* read enabled */
@@ -62,6 +58,7 @@ typedef __off64_t off64_t; /* 64-bit file offset */
 #define O_TRUNC  _FTRUNC
 #define O_EXCL   _FEXCL
 #define O_SYNC   _FSYNC
+#define O_ASYNC  _FASYNC
 /*	O_NDELAY	_FNDELAY 	set in include/fcntl.h */
 /*	O_NDELAY	_FNBIO 		set in include/fcntl.h */
 #define O_NONBLOCK _FNONBLOCK

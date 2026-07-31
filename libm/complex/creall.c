@@ -4,7 +4,7 @@
  * is freely granted, provided that this notice is preserved.
  */
 
-#include <complex.h>
+#include "local-complex.h"
 #include "../common/fdlibm.h"
 
 #ifdef __HAVE_LONG_DOUBLE

@@ -46,6 +46,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <assert.h>
+#include <fenv.h>
 
 #if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
 #pragma GCC diagnostic ignored "-Wpragmas"
@@ -167,6 +168,9 @@ typedef complex float cbinary32;
 // #define FMT32        "% -14.8e"
 #define FMT32  "% -15.6a"
 #define P32(a) ((double)(a))
+#ifdef __FLOAT_NOEXCEPT
+#define BINARY32_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY32
@@ -179,8 +183,10 @@ typedef struct {
 } cunary32;
 
 static inline ulp_t
-ulp32(binary32 a, binary32 b)
+ulp32(binary32 ab, binary32 bb)
 {
+    volatile binary32 a = ab;
+    volatile binary32 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
@@ -231,6 +237,9 @@ typedef complex double cbinary64;
 #define FN64(a)           a
 #define FMT64             "% -23.13a"
 #define P64(a)            (a)
+#ifdef __DOUBLE_NOEXCEPT
+#define BINARY64_NOEXCEPT
+#endif
 #elif __LDBL_MANT_DIG__ == 53 && defined(_TEST_LONG_DOUBLE) && !defined(SKIP_BINARY64)
 #define HAS_BINARY64
 typedef long double         binary64;
@@ -247,6 +256,9 @@ typedef complex long double cbinary64;
 #define FN64(a)           a##l
 #define FMT64             "%La"
 #define P64(a)            (a)
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define BINARY64_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY64
@@ -260,8 +272,10 @@ typedef struct {
 } cunary64;
 
 static inline ulp_t
-ulp64(binary64 a, binary64 b)
+ulp64(binary64 ab, binary64 bb)
 {
+    volatile binary64 a = ab;
+    volatile binary64 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
@@ -300,6 +314,17 @@ culp64(cbinary64 a, cbinary64 b)
 #endif
 
 #if __LDBL_MANT_DIG__ == 64 && defined(_TEST_LONG_DOUBLE) && !defined(SKIP_BINARY80)
+#if __LDBL_MIN_EXP__ == (-16382)
+#define HAS_BINARY80_MOTOROLA
+#define REAL80(r80, r80m)               r80m
+#define COMPLEX80(r80, i80, r80m, i80m) CMPLX80(r80m, i80m)
+#elif __LDBL_MIN_EXP__ == (-16381)
+#define HAS_BINARY80_INTEL
+#define REAL80(r80, r80m)               r80
+#define COMPLEX80(r80, i80, r80m, i80m) CMPLX80(r80, i80)
+#elif
+#error unknown 80-bit floating point format
+#endif
 #define HAS_BINARY80
 typedef long double         binary80;
 typedef complex long double cbinary80;
@@ -314,8 +339,12 @@ typedef complex long double cbinary80;
 #define TEST_FUNC_80      MATH_CONCAT(TEST_FUNC, l)
 #define MIN_BINARY80      LDBL_MIN
 #define FN80(a)           a##l
+#define FN80M(a)          a##l
 #define FMT80             "%La"
 #define P80(a)            (a)
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define BINARY80_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY80
@@ -344,8 +373,10 @@ typedef struct {
 } cunary80;
 
 static inline ulp_t
-ulp80(binary80 a, binary80 b)
+ulp80(binary80 ab, binary80 bb)
 {
+    volatile binary80 a = ab;
+    volatile binary80 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
@@ -391,6 +422,9 @@ typedef complex long double cbinary128;
 #define FN128(a)           a##l
 #define FMT128             "%La"
 #define P128(a)            (a)
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define BINARY128_NOEXCEPT
+#endif
 #endif
 
 #ifdef HAS_BINARY128
@@ -404,8 +438,10 @@ typedef struct {
 } cunary128;
 
 static inline ulp_t
-ulp128(binary128 a, binary128 b)
+ulp128(binary128 ab, binary128 bb)
 {
+    volatile binary128 a = ab;
+    volatile binary128 b = bb;
     if (a == b)
         return 0;
     if (isnan(a) && isnan(b))
@@ -437,15 +473,19 @@ culp128(cbinary128 a, cbinary128 b)
 
 #define sincos_sin 1
 #define sincos_cos 2
+#define remquo_quo 3
 
 #if TEST_FUNC == sincos_sin
 #define TEST_FUNC_SINCOS_SIN
 #elif TEST_FUNC == sincos_cos
 #define TEST_FUNC_SINCOS_COS
+#elif TEST_FUNC == remquo_quo
+#define TEST_FUNC_REMQUO_QUO
 #endif
 
 #undef sincos_sin
 #undef sincos_cos
+#undef remquo_quo
 
 #ifdef TEST_FUNC_SINCOS_SIN
 #ifdef TEST_FUNC_32
@@ -549,5 +589,94 @@ TEST_FUNC_128(binary128 x)
 #endif
 
 #endif /* TEST_FUNC_SINCOS_COS */
+
+#ifdef TEST_FUNC_REMQUO_QUO
+
+#define Q_UNSET  ((int)0x3cc3)
+
+#define QUO_MASK 0x7
+
+static inline int
+fix_quo(int q)
+{
+    if (q < 0)
+        return -((-q) & QUO_MASK);
+    else
+        return q & QUO_MASK;
+}
+
+#ifdef __RX__
+#define SKIP_NAN(x, y)        \
+    if (isinf(x) || isinf(y)) \
+        return QUO_MASK + 1;
+#else
+#define SKIP_NAN(x, y)
+#endif
+
+#ifdef TEST_FUNC_32
+int TEST_FUNC_32(binary32 x, binary32 y);
+
+int
+TEST_FUNC_32(binary32 x, binary32 y)
+{
+    int      q = Q_UNSET;
+    binary32 rem;
+    SKIP_NAN(x, y);
+    rem = FN32(remquo)(x, y, &q);
+    if (isnan(rem))
+        return QUO_MASK + 1;
+    return fix_quo(q);
+}
+#endif
+
+#ifdef HAS_BINARY64
+int TEST_FUNC_64(binary64 x, binary64 y);
+
+int
+TEST_FUNC_64(binary64 x, binary64 y)
+{
+    int      q = Q_UNSET;
+    binary64 rem;
+    SKIP_NAN(x, y);
+    rem = FN64(remquo)(x, y, &q);
+    if (isnan(rem))
+        return QUO_MASK + 1;
+    return fix_quo(q);
+}
+#endif
+
+#ifdef HAS_BINARY80
+int TEST_FUNC_80(binary80 x, binary80 y);
+
+int
+TEST_FUNC_80(binary80 x, binary80 y)
+{
+    int      q = Q_UNSET;
+    binary80 rem;
+    SKIP_NAN(x, y);
+    rem = FN80(remquo)(x, y, &q);
+    if (isnan(rem))
+        return QUO_MASK + 1;
+    return fix_quo(q);
+}
+#endif
+
+#ifdef HAS_BINARY128
+int TEST_FUNC_128(binary128 x, binary128 y);
+
+int
+TEST_FUNC_128(binary128 x, binary128 y)
+{
+    int       q = Q_UNSET;
+    binary128 rem;
+    SKIP_NAN(x, y);
+    rem = FN128(remquo)(x, y, &q);
+    if (isnan(rem))
+        return QUO_MASK + 1;
+    return fix_quo(q);
+}
+#endif
+
+#endif /* TEST_FUNC_REMQUO_QUO */
 
 #endif /* _TEST_MATH_H_ */

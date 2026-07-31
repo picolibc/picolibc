@@ -85,7 +85,7 @@ foreach params : targets
   target_c_args = params['c_args']
 
   _libs = [get_variable('lib_c' + target)]
-  _libs += [get_variable('lib_semihost' + target)]
+  _libs += [get_variable(oslib_test + target)]
   if is_variable(crt0_test + target)
     _objs = [get_variable(crt0_test + target)]
   else
@@ -106,7 +106,7 @@ foreach params : targets
     _cmd_arg += test_file_name_arg
 
     test(semihost_test + target,
-	 executable(semihost_test + target, [semihost_test_src],
+	 executable(semihost_test + target, [semihost_test_src] + test_lock_valid,
 		    c_args: printf_compile_args_d + _c_args + _cmd_arg,
 		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,

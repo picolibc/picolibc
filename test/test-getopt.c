@@ -229,6 +229,21 @@ test_getopt_long(void)
      */
     assert_not_equal('e', c, "unexpected option match");
     c = getopt_long(argc4, argv, accepted_opt, long_options, &option_index);
+
+    struct option long_options_ambiguous[] = {
+        { "xtremely-", no_argument, NULL, 1003 },
+        { "xtra",      no_argument, NULL, 1001 },
+        { "xtreme",    no_argument, NULL, 1002 },
+        { "xtremely",  no_argument, NULL, 1003 },
+        { NULL,        0,           NULL, 0    }
+    };
+    static const char * const argv_ambiguous[] = { "program", "--xtremel", NULL };
+    int                       argc_ambiguous = ARRAY_SIZE(argv_ambiguous) - 1;
+    argv = (char **)argv_ambiguous;
+    optind = 0;
+    c = getopt_long(argc_ambiguous, argv, "", long_options_ambiguous, &option_index);
+    assert_equal(c, 1003, "ambiguous option match failed");
+
     return err;
 }
 

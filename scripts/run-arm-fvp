@@ -1,0 +1,98 @@
+#!/bin/sh
+#
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Copyright 2026 Arm Limited and/or its affiliates <open-source-office@arm.com>
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions
+# are met:
+#
+# 1. Redistributions of source code must retain the above copyright
+#    notice, this list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above
+#    copyright notice, this list of conditions and the following
+#    disclaimer in the documentation and/or other materials provided
+#    with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+#    contributors may be used to endorse or promote products derived
+#    from this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+# COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+# INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+# (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+# HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+# STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+# OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+fvp_exe="FVP_Base_RevC-2xAEMvA"
+
+# select the program
+elf="$1"
+shift
+
+cmdline_param="cluster0.cpu0.semihosting-cmd_line"
+
+done=0
+while [ $# -gt 0 -a $done -eq 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      done=1
+      ;;
+  esac
+done
+
+echo "$stdin" | \
+$fvp_exe --quiet --application "$elf" --parameter "$cmdline_param=program-name $args" \
+    --parameter "bp.vis.disable_visualisation=1" \
+    --parameter "bp.terminal_0.quiet=1" \
+    --parameter "bp.terminal_1.quiet=1" \
+    --parameter "bp.terminal_2.quiet=1" \
+    --parameter "bp.terminal_3.quiet=1" \
+    --parameter "cluster0.NUM_CORES=1" \
+    --parameter "cluster1.NUM_CORES=0" \
+    --parameter "bp.secure_memory=0" \
+    --parameter "cluster0.cpu0.CONFIG64=0"
+
+result=$?
+if [ $result != 0 ]; then
+    case "$elf" in
+        *test-argv*|*test-getrlimit*|*test-ftrunc*|*test-access*|*test-dirent*|*test-scmpu*|*test-setrlimit*|*test-lseek-overflow*|*test-getcwd*|*test-statvfs*|*test-sprintf-percent-n*|*test-long-long-int*|*iconvjp*|*semihost-exit-extended*)
+            result=77
+            ;;
+        *test-fread-fwrite*|*posix-io*|*semihost-seek*)
+            echo "SYS_SEEK broken in FVP"
+            result=77
+            ;;
+        *semihost-gettimeofday*)
+            echo "SYS_ELAPSED broken in FVP"
+            result=77
+            ;;
+    esac
+fi
+exit $result

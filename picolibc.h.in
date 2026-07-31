@@ -83,6 +83,8 @@
 
 #cmakedefine _LITE_EXIT
 
+#cmakedefine __MALLOC_SMALL_BUCKET
+
 #cmakedefine __MB_CAPABLE
 
 #cmakedefine __MB_EXTENDED_CHARSETS_ALL
@@ -128,6 +130,12 @@
 #cmakedefine __IO_POS_ARGS
 
 #define __IO_DEFAULT '@__IO_DEFAULT@'
+
+/* Size of the tmpnam() buffer (L_tmpnam) */
+#cmakedefine __L_tmpnam @__L_tmpnam@
+
+/* Directory prefix for tmpnam()/tmpfile() names (P_tmpdir) */
+#cmakedefine __P_tmpdir "@__P_tmpdir@"
 
 /* math library sets errno */
 #cmakedefine __MATH_ERRNO

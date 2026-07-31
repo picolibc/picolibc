@@ -51,8 +51,11 @@ foreach params : targets
   target_c_args = params['c_args']
 
   _libs = [get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+  if is_variable(oslib_test + target)
+    _libs += [get_variable(oslib_test + target)]
+  endif
+  if is_variable(libfallback_var + target)
+    _libs += [get_variable(libfallback_var + target)]
   endif
 
   _lib_files=[]
@@ -74,7 +77,7 @@ foreach params : targets
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
     test(t1 + target,
-	 executable(t1 + target, [t1_src],
+	 executable(t1 + target, [t1_src] + test_lock_valid,
 		    c_args: printf_compile_args_d + test_file_name_arg + _c_args,
 		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,
@@ -91,6 +94,9 @@ endforeach
 if enable_native_tests
 
   localedef = find_program('localedef', required: true)
+
+  locale_env = test_env
+  locale_env.prepend('LOCPATH', meson.current_build_dir())
 
   ctype_c_args = []
 
@@ -164,7 +170,7 @@ if enable_native_tests
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args),
          suite: 'test-ctype',
-         env: ['LOCPATH=' + meson.current_build_dir()])
+         env: locale_env)
   endforeach
 
   diff = find_program('diff', required: false)
@@ -187,7 +193,8 @@ if enable_native_tests
                  include_directories: inc)
 
       out = custom_target (o, output: o,
-                           command: [e, '@OUTPUT@'])
+                           command: [e, '@OUTPUT@'],
+                           env: locale_env)
 
       ne = executable(n, src, 
                       c_args: native_c_args + ctype_c_args,
@@ -195,7 +202,7 @@ if enable_native_tests
 
       native_out = custom_target (no, output: no,
                                   depends: locales,
-                                  env: ['LOCPATH=' + meson.current_build_dir()],
+                                  env: locale_env,
                                   command: [ne, '@OUTPUT@'])
 
       test(test, diff, args: ['-u', out, native_out])

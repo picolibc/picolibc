@@ -76,7 +76,7 @@ extern uint8_t __stack[];
 
 #define i(addr, name) [(addr) / 4] = (void (*)(void))arm_##name##_isr
 
-__section(".data.init.enter") void (* const __weak_interrupt_vector[])(void)
+__section(".text.init.enter") void (* const __weak_interrupt_vector[])(void)
     __attribute((aligned(128)))
     = {
           [0] = (void (*)(void))__stack,

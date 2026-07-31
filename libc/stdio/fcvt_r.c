@@ -129,7 +129,7 @@ fcvt_r(double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t le
 
 #elif __SIZEOF_DOUBLE__ == 4
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 fcvt_r(double invalue, int ndecimal, int *decpt, int *sign, char *buf, size_t len)

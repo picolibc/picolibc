@@ -29,8 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
@@ -44,7 +43,7 @@ cpowl(long double complex a, long double complex z)
     y = cimagl(z);
     absa = cabsl(a);
     if (absa == 0.0L) {
-        return (0.0L + 0.0L * (long double complex)I);
+        return CMPLXL(0, 0);
     }
     arga = cargl(a);
     r = powl(absa, x);
@@ -53,7 +52,7 @@ cpowl(long double complex a, long double complex z)
         r = r * expl(-y * arga);
         theta = theta + y * logl(absa);
     }
-    w = r * cosl(theta) + (r * sinl(theta)) * (long double complex)I;
+    w = CMPLXL(r * cosl(theta), r * sinl(theta));
     return w;
 }
 

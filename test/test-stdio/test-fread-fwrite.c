@@ -109,31 +109,22 @@ random_offsets(int generation, int num_ops, size_t per_op)
     }
 }
 
-int
-main(int argc, char **argv)
+static int
+test_basic(const char *file_name, int repeat)
 {
     FILE  *f;
-    int    generation = 0;
     size_t ret;
     size_t size;
     size_t nmemb, per_op;
     off_t  offset;
-    char  *file_name = TEST_FILE_NAME;
     int    order;
     int    num_ops;
     int    op;
     int    status = 0;
-    int    repeat = 10000;
     long   failed;
+    int    generation = 0;
 
-    if (argc > 1) {
-        repeat = atoi(argv[1]);
-        if (!repeat)
-            repeat = 10000;
-    }
-
-    printf("test file %s repeat %d\n", file_name, repeat);
-
+    (void)repeat;
     /* Make sure we can create a file, write contents and read them back */
 
     for (size = 1; size < 16; size <<= 1) {
@@ -197,6 +188,16 @@ main(int argc, char **argv)
         }
     }
 
+    return status;
+}
+
+static int
+test_mixed(const char *file_name, int repeat)
+{
+    FILE  *f;
+    size_t ret;
+    int    status = 0;
+
     /* Now do a mix of read/write operations */
 
     f = fopen(file_name, "w+");
@@ -249,6 +250,32 @@ main(int argc, char **argv)
             }
         }
     }
+
+    fclose(f);
+
+    return status;
+}
+
+int
+main(int argc, char **argv)
+{
+    int   status = 0;
+    int   repeat = 10000;
+    char *file_name = TEST_FILE_NAME;
+
+    if (argc > 1) {
+        repeat = atoi(argv[1]);
+        if (!repeat)
+            repeat = 10000;
+    }
+
+    printf("test file %s repeat %d\n", file_name, repeat);
+
+    if (test_basic(file_name, repeat) != 0)
+        status = 1;
+
+    if (test_mixed(file_name, repeat) != 0)
+        status = 1;
 
     (void)remove(file_name);
 

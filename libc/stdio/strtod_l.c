@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #ifdef WIDE_CHARS
 #include <wctype.h>
@@ -49,6 +49,14 @@ strtod_l(const char * __restrict s00, char ** __restrict se, locale_t loc)
     (void)loc;
     return strtod(s00, se);
 }
+
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
+#pragma GCC diagnostic ignored "-Wattribute-alias"
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
 
 #if defined(__HAVE_LONG_DOUBLE) && defined(_LDBL_EQ_DBL)
 #ifdef __strong_reference

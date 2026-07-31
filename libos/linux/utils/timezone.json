@@ -1,0 +1,8 @@
+{
+    "name": "timezone",
+    "headers": [ "linux/time.h" ],
+    "members": [
+	{ "name": "tz_minuteswest" },
+	{ "name": "tz_dsttime" }
+    ]
+}

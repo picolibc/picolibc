@@ -33,42 +33,57 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #define INCR 16
 
-_ssize_t
+ssize_t
 getdelim(char ** restrict lineptr, size_t * restrict nptr, int delim, FILE * restrict stream)
 {
-    char    *line = *lineptr;
-    size_t   n = *nptr;
-    _ssize_t count = 0;
+    char   *line = *lineptr;
+    size_t  n = line ? *nptr : 0;
+    ssize_t count = 0;
 
     __flockfile(stream);
     for (;;) {
         int c = getc_unlocked(stream);
-        if (c == EOF)
-            break;
+        int is_eof = (c == EOF);
 
-        if (count >= (_ssize_t)n) {
-            size_t newsize = n + INCR;
-            char  *newline = realloc(line, newsize);
-            if (newline == NULL) {
-                count = -1;
-                break;
-            }
-            line = newline;
-            n = newsize;
+        /* EOF at the start: return -1 */
+        if (is_eof && count == 0) {
+            count = -1;
+            goto bail;
         }
+
+        /* Make space for char (if not eof) and '\0' terminator */
+        if ((size_t)count + !is_eof >= n) {
+
+            /* Check for overflow of ssize_t */
+            if (n > SSIZE_MAX - INCR) {
+                errno = EOVERFLOW;
+                count = -1;
+                goto bail;
+            }
+            n += INCR;
+
+            line = realloc(line, n);
+            if (line == NULL) {
+                count = -1;
+                goto bail;
+            }
+        }
+
+        if (is_eof)
+            break;
 
         line[count++] = c;
-        if (c == delim) {
-            line[count] = '\0';
+        if (c == delim)
             break;
-        }
     }
+    line[count] = '\0';
 
     *lineptr = line;
     *nptr = n;
+bail:
     __funlock_return(stream, count);
 }

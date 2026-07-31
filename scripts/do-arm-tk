@@ -68,19 +68,19 @@ set -e
 build_options=-Ddebug=true
 
 echo '###################################'
-echo '####' ../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true --buildtype=minsize $build_options
+echo '####' ../../scripts/do-aarch64-configure -Dsysroot-install=true --buildtype=minsize $build_options
 echo '###################################'
 
 cd "$MINSIZE_DIR_AARCH64"
-../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true --buildtype=minsize $build_options
+../../scripts/do-aarch64-configure -Dsysroot-install=true --buildtype=minsize $build_options
 ninja test install
 
 echo '###################################'
-echo '####' ../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
+echo '####' ../../scripts/do-aarch64-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
 echo '###################################'
 
 cd "$RELEASE_DIR_AARCH64"
-../../scripts/do-aarch64-none-elf-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
+../../scripts/do-aarch64-configure -Dsysroot-install=true -Dbuild-type-subdir=release --buildtype=release $build_options
 ninja test install
 
 echo '###################################'

@@ -57,9 +57,11 @@ picolibc_headers(sys
   _select.h
   _sigset.h
   stat.h
+  statvfs.h
   _stdint.h
   string.h
   syslimits.h
+  termios.h
   timeb.h
   time.h
   times.h
@@ -69,7 +71,6 @@ picolibc_headers(sys
   tree.h
   _types.h
   types.h
-  _tz_structs.h
   unistd.h
   utime.h
   wait.h

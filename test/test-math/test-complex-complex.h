@@ -40,7 +40,7 @@
 static TEST_CONST struct {
     cbinary32 x1, x2, y;
 } test_32_vec[] = {
-#define COMPLEX(r32, i32, r64, i64, r80, i80, r128, i128) CMPLX32(r32, i32)
+#define COMPLEX(r32, i32, r64, i64, r80, i80, r80m, i80m, r128, i128) CMPLX32(r32, i32)
 #include TEST_VECTORS
 #undef COMPLEX
 };
@@ -59,8 +59,8 @@ test_binary32(void)
             printf("Skipping denorm value\n");
             continue;
         }
-        cbinary32 y = TEST_FUNC_32(test_32_vec[i].x1, test_32_vec[i].x2);
-        ulp_t     ulp = culp32(y, test_32_vec[i].y);
+        volatile cbinary32 y = TEST_FUNC_32(test_32_vec[i].x1, test_32_vec[i].x2);
+        ulp_t              ulp = culp32(y, test_32_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary32) {
@@ -84,7 +84,7 @@ test_binary32(void)
 static TEST_CONST struct {
     cbinary64 x1, x2, y;
 } test_64_vec[] = {
-#define COMPLEX(r32, i32, r64, i64, r80, i80, r128, i128) CMPLX64(r64, i64)
+#define COMPLEX(r32, i32, r64, i64, r80, i80, r80m, i80m, r128, i128) CMPLX64(r64, i64)
 #include TEST_VECTORS
 #undef COMPLEX
 };
@@ -103,8 +103,8 @@ test_binary64(void)
             printf("Skipping denorm value\n");
             continue;
         }
-        cbinary64 y = TEST_FUNC_64(test_64_vec[i].x1, test_64_vec[i].x2);
-        ulp_t     ulp = culp64(y, test_64_vec[i].y);
+        volatile cbinary64 y = TEST_FUNC_64(test_64_vec[i].x1, test_64_vec[i].x2);
+        ulp_t              ulp = culp64(y, test_64_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary64) {
@@ -129,7 +129,8 @@ test_binary64(void)
 static TEST_CONST struct {
     cbinary80 x1, x2, y;
 } test_80_vec[] = {
-#define COMPLEX(r32, i32, r64, i64, r80, i80, r128, i128) CMPLX80(r80, i80)
+#define COMPLEX(r32, i32, r64, i64, r80, i80, r80m, i80m, r128, i128) \
+    COMPLEX80(r80, i80, r80m, i80m)
 #include TEST_VECTORS
 #undef COMPLEX
 };
@@ -150,8 +151,8 @@ test_binary80(void)
             printf("Skipping denorm value\n");
             continue;
         }
-        cbinary80 y = TEST_FUNC_80(test_80_vec[i].x1, test_80_vec[i].x2);
-        ulp_t     ulp = culp80(y, test_80_vec[i].y);
+        volatile cbinary80 y = TEST_FUNC_80(test_80_vec[i].x1, test_80_vec[i].x2);
+        ulp_t              ulp = culp80(y, test_80_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary80) {
@@ -176,7 +177,7 @@ test_binary80(void)
 static TEST_CONST struct {
     cbinary128 x1, x2, y;
 } test_128_vec[] = {
-#define COMPLEX(r32, i32, r64, i64, r80, i80, r128, i128) CMPLX128(r128, i128)
+#define COMPLEX(r32, i32, r64, i64, r80, i80, r80m, i80m, r128, i128) CMPLX128(r128, i128)
 #include TEST_VECTORS
 #undef COMPLEX
 };
@@ -195,8 +196,8 @@ test_binary128(void)
             printf("Skipping denorm value\n");
             continue;
         }
-        cbinary128 y = TEST_FUNC_128(test_128_vec[i].x1, test_128_vec[i].x2);
-        ulp_t      ulp = culp128(y, test_128_vec[i].y);
+        volatile cbinary128 y = TEST_FUNC_128(test_128_vec[i].x1, test_128_vec[i].x2);
+        ulp_t               ulp = culp128(y, test_128_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary128) {

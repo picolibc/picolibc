@@ -29,7 +29,7 @@
 
 /* $Id: fread.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #ifdef __FAST_BUFIO
 #include "../stdlib/mul_overflow.h"

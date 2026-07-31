@@ -1,0 +1,8 @@
+{
+    "name": "timespec",
+    "headers": [ "linux/time.h" ],
+    "members": [
+	{ "name": "tv_sec" },
+	{ "name": "tv_nsec" }
+    ]
+}

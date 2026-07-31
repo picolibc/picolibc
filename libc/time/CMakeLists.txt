@@ -41,7 +41,6 @@ picolibc_sources(
   difftime.c
   getdate.c
   getdate_r.c
-  gettzinfo.c
   gmtime.c
   gmtime_r.c
   lcltime.c

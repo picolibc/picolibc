@@ -99,6 +99,9 @@ SECTIONS
 		KEEP (*(.fini_array*))
 		PROVIDE_HIDDEN ( @PREFIX@__fini_array_end = . );
 
+@RISCV@		/* JVT table, which needs to go in executable memory */
+@RISCV@		KEEP(*(.riscv.jvt));
+
 	} >@TEXT_MEM@ AT>@TEXT_MEM@ :@TEXT_PHDR@
 
 @CPP@	/* additional sections when compiling with C++ exception support */
@@ -169,6 +172,7 @@ SECTIONS
 @INITTLS@
 @INITTLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
 @INITTLS@	PROVIDE( @PREFIX@__tls_space_size = @PREFIX@__tls_end - @PREFIX@__tls_start );
+@INITTLS@	PROVIDE( @PREFIX@__tls_inittls = 1 );
 
 @BFD@	/*
 @BFD@	 * Procedure linkage table. This ends up
@@ -241,12 +245,17 @@ SECTIONS
 		*(.gnu.linkonce.d.*)
 
 		/* Need to pre-align so that the symbols come after padding */
-		. = ALIGN(@DEFAULT_ALIGNMENT@);
+		. = ALIGN(@SDATA_ALIGNMENT@);
 
 		PROVIDE( @PREFIX@__global_pointer$ = . + 0x800 );
 		PROVIDE( @PREFIX@_gp = . + 0x8000);
-		*(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
-		*(.gnu.linkonce.s.*)
+                /* _SDA_BASE_ points the base of small data */
+                PROVIDE (_SDA_BASE_ = .);
+                *(.sdata .sdata.* .sdata2.* @EXTRA_SDATA_SECTIONS@)
+                *(.gnu.linkonce.s.*)
+                *(.gnu.linkonce.l*)
+                *(.scommon*)
+                *(.lit*)
 
 		/*
 		 * Make sure there is space for PowerPC thread-local
@@ -259,6 +268,7 @@ SECTIONS
 @DATATLS@		PROVIDE( @PREFIX@__tls_head_start = .);
 @DATATLS@		KEEP (*(.stack_chk .stack_chk.*))
 @DATATLS@		PROVIDE( @PREFIX@__tls_head_end = .);
+@DATATLS@	PROVIDE( @PREFIX@__tls_inittls = 0 );
 
 @INITTLS@		PROVIDE( @PREFIX@__data_end = . );
 
@@ -403,10 +413,12 @@ SECTIONS
 		. += (DEFINED(@PREFIX@__heap_size_min) ? @PREFIX@__heap_size_min : 0);
 	} >ram :ram
 
-	/* Define a stack region to make sure it fits in memory */
-	.stack (NOLOAD) : {
-		. += (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@);
-	} >ram :ram
+@LINUX@	PROVIDE ( @PREFIX@__stack_bottom = ORIGIN(ram) + LENGTH(ram) - (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@) );
+@LINUX@
+@LINUX@	/* Define a stack region to make sure it fits in memory */
+@LINUX@	.stack @PREFIX@__stack_bottom (NOLOAD) : {
+@LINUX@		. += (DEFINED(@PREFIX@@STACK@_size) ? @PREFIX@@STACK@_size : @DEFAULT_STACK_SIZE@);
+@LINUX@	} >ram :ram
 
 @C@	/* Throw away C++ exception handling information */
 @C@

@@ -29,7 +29,7 @@
 
 /* $Id: vprintf.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 vwprintf(const wchar_t *fmt, va_list ap)

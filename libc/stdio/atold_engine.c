@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 #include <float.h>
 
 #if __LDBL_MAX_10_EXP__ >= 4096

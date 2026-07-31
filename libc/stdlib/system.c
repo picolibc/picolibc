@@ -54,51 +54,10 @@ Supporting OS subroutines required: <<_exit>>, <<_execve>>, <<_fork_r>>,
 #include <unistd.h>
 #include <sys/wait.h>
 
-#if defined(unix) || defined(__CYGWIN__)
-static int do_system(const char *s);
-#endif
+extern char **environ;
 
 int
 system(const char *s)
-{
-#if defined(HAVE_SYSTEM)
-    return _system(s);
-#elif defined(NO_EXEC)
-    if (s == NULL)
-        return 0;
-    errno = ENOSYS;
-    return -1;
-#else
-
-    /* ??? How to handle (s == NULL) here is not exactly clear.
-       If _fork_r fails, that's not really a justification for returning 0.
-       For now we always return 0 and leave it to each target to explicitly
-       handle otherwise (this can always be relaxed in the future).  */
-
-#if defined(unix) || defined(__CYGWIN__)
-    if (s == NULL)
-        return 1;
-    return do_system(s);
-#else
-    if (s == NULL)
-        return 0;
-    errno = ENOSYS;
-    return -1;
-#endif
-
-#endif
-}
-
-#if defined(unix) && !defined(__CYGWIN__) && !defined(__rtems__)
-extern char  **environ;
-
-/* Only deal with a pointer to environ, to work around subtle bugs with shared
-   libraries and/or small data systems where the user declares his own
-   'environ'.  */
-static char ***p_environ = &environ;
-
-static int
-do_system(const char *s)
 {
     char *argv[4];
     int   pid, status;
@@ -109,16 +68,12 @@ do_system(const char *s)
     argv[3] = NULL;
 
     if ((pid = fork()) == 0) {
-        execve("/bin/sh", argv, *p_environ);
-        exit(100);
+        execve("/bin/sh", argv, environ);
+        _exit(127);
     } else if (pid == -1)
         return -1;
     else {
-        int rc = wait(&status);
-        if (rc == -1)
-            return -1;
-        status = (status >> 8) & 0xff;
+        (void)waitpid(pid, &status, 0);
         return status;
     }
 }
-#endif

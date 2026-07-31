@@ -52,18 +52,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-static struct hsearch_data htab;
+static struct hsearch_data hsearch_data;
 
 int
 hcreate(size_t nel)
 {
-    return hcreate_r(nel, &htab);
+    return hcreate_r(nel, &hsearch_data);
 }
 
 void
 hdestroy(void)
 {
-    hdestroy_r(&htab);
+    hdestroy_r(&hsearch_data);
 }
 
 ENTRY *
@@ -71,7 +71,7 @@ hsearch(ENTRY item, ACTION action)
 {
     ENTRY *retval;
 
-    hsearch_r(item, action, &retval, &htab);
+    hsearch_r(item, action, &retval, &hsearch_data);
 
     return retval;
 }

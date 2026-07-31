@@ -62,30 +62,30 @@ struct mallinfo {
 
 /* The routines.  */
 
-void free(void *) __nothrow;
-void *
+void free(void *) __nothrow __picolibc_export;
+void                                                              *
 malloc(size_t)
-__malloc_like __warn_unused_result __alloc_size(1) __nothrow;
-void *
+__malloc_like __warn_unused_result __alloc_size(1) __nothrow __picolibc_export;
+void                                                                  *
 calloc(size_t, size_t)
-__malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow;
-void *
+__malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow __picolibc_export;
+void                                                *
 realloc(void *, size_t)
-__warn_unused_result __alloc_size(2) __nothrow;
+__warn_unused_result __alloc_size(2) __nothrow __picolibc_export;
 void *memalign(size_t __alignment, size_t __size) __malloc_like __warn_unused_result __alloc_size(2)
-__nothrow;
+__nothrow __picolibc_export;
 
-struct mallinfo mallinfo(void);
-void            malloc_stats(void);
-int             mallopt(int, int);
-size_t          malloc_usable_size(void *);
+struct mallinfo mallinfo(void) __picolibc_export;
+void            malloc_stats(void) __picolibc_export;
+int             mallopt(int, int) __picolibc_export;
+size_t          malloc_usable_size(void *) __picolibc_export;
 /* These aren't too useful on an embedded system, but we define them
    anyhow.  */
 
-void           *pvalloc(size_t);
-int             malloc_trim(size_t);
-void            __malloc_lock(void);
-void            __malloc_unlock(void);
+void           *pvalloc(size_t) __picolibc_export;
+int             malloc_trim(size_t) __picolibc_export;
+void            __malloc_lock(void) __picolibc_export;
+void            __malloc_unlock(void) __picolibc_export;
 
 /* SVID2/XPG mallopt options */
 
@@ -102,7 +102,7 @@ void            __malloc_unlock(void);
 #define M_MMAP_MAX       -4
 
 /* Some systems provide this, so do too for compatibility.  */
-void cfree(void *);
+void cfree(void *) __picolibc_export;
 
 _END_STD_C
 

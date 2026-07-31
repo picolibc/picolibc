@@ -29,9 +29,35 @@ SUCH DAMAGE.
 #ifndef _SYS_RESOURCE_H_
 #define _SYS_RESOURCE_H_
 
-#include <sys/time.h>
+#include <sys/cdefs.h>
+#include <sys/_types.h>
+#include <sys/_timeval.h>
 
 _BEGIN_STD_C
+
+#ifndef _RLIM_T_DECLARED
+typedef __rlim_t rlim_t;
+#define _RLIM_T_DECLARED
+#endif
+
+#ifndef _ID_T_DECLARED
+typedef __id_t id_t;
+#define _ID_T_DECLARED
+#endif
+
+struct rlimit {
+    rlim_t rlim_cur;
+    rlim_t rlim_max;
+};
+
+struct rusage {
+    struct timeval ru_utime; /* user time used */
+    struct timeval ru_stime; /* system time used */
+};
+
+#define RLIM_INFINITY   __INT64_MAX__
+#define RLIM_SAVED_MAX  RLIM_INFINITY
+#define RLIM_SAVED_CUR  RLIM_INFINITY
 
 #define RUSAGE_SELF     0  /* calling process */
 #define RUSAGE_CHILDREN -1 /* terminated child processes */
@@ -39,12 +65,27 @@ _BEGIN_STD_C
 #define RUSAGE_THREAD 1
 #endif
 
-struct rusage {
-    struct timeval ru_utime; /* user time used */
-    struct timeval ru_stime; /* system time used */
-};
+#define PRIO_PROCESS  0
+#define PRIO_PGRP     1
+#define PRIO_USER     2
 
+#define RLIMIT_CPU    0 /* Limit on CPU time per process. */
+#define RLIMIT_FSIZE  1 /* Limit on file size. */
+#define RLIMIT_DATA   2 /* Limit on data segment size. */
+#define RLIMIT_STACK  3 /* Limit on stack size. */
+#define RLIMIT_CORE   4 /* Limit on size of core image. */
+#define RLIMIT_NOFILE 5 /* Limit on number of open files. */
+#define RLIMIT_AS     6 /* Limit on address space size. */
+
+#if __XSI_VISIBLE
+int getpriority(int, id_t);
+#endif
+int getrlimit(int, struct rlimit *);
+#if __XSI_VISIBLE
 int getrusage(int, struct rusage *);
+int setpriority(int, id_t, int);
+#endif
+int setrlimit(int, const struct rlimit *);
 
 _END_STD_C
 

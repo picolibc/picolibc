@@ -32,8 +32,7 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 float complex
 cacoshf(float complex z)
@@ -48,7 +47,7 @@ cacoshf(float complex z)
     }
 
 #if 0 /* does not give the principal value */
-	w = I * cacosf(z);
+    w = CMPLXF(0, cacosf(z));
 #else
     w = clogf(z + csqrtf(z + 1) * csqrtf(z - 1));
 #endif

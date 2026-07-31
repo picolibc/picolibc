@@ -49,7 +49,6 @@ inc_headers = [
   'devctl.h',
   'dirent.h',
   'endian.h',
-  'envlock.h',
   'envz.h',
   'errno.h',
   'fastmath.h',
@@ -73,6 +72,7 @@ inc_headers = [
   'ndbm.h',
   'newlib.h',
   'paths.h',
+  'poll.h',
   'pwd.h',
   'regdef.h',
   'regex.h',
@@ -84,6 +84,7 @@ inc_headers = [
   'stdint.h',
   'stdio.h',
   'stdio-bufio.h',
+  'stdio-posix.h',
   'stdnoreturn.h',
   'stdlib.h',
   'string.h',
@@ -106,6 +107,10 @@ if have_complex
 endif
 
 inc_headers += ['picotls.h']
+
+if enable_libdl
+  inc_headers += ['dlfcn.h']
+endif
 
 if really_install
   install_headers(inc_headers,

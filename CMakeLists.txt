@@ -35,7 +35,7 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
-project(Picolibc VERSION 1.8.11 LANGUAGES C ASM)
+project(Picolibc VERSION 1.8.12 LANGUAGES C ASM)
 
 # Set a default build type if none was specified
 set(default_build_type "MinSizeRel")
@@ -98,6 +98,10 @@ endif()
 # enable malloc code
 if(NOT DEFINED ENABLE_MALLOC)
   option(ENABLE_MALLOC "provide malloc family of functions based on sbrk" ON)
+endif()
+
+if(NOT DEFINED MALLOC_SMALL_BUCKET)
+  option(MALLOC_SMALL_BUCKET "use fixed bucket sizes for allocations no larger than this" 0)
 endif()
 
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
@@ -192,8 +196,6 @@ endif()
 
 set(__NANO_FORMATTED_IO OFF)
 
-option(__NANO_MALLOC "Use smaller malloc implementation" ON)
-
 set(_GLOBAL_ATEXIT OFF)
 
 set(__UNBUF_STREAM_OPT OFF)
@@ -238,6 +240,15 @@ endif()
 
 if(NOT DEFINED __IO_DEFAULT)
   set(__IO_DEFAULT d)
+endif()
+
+# Directory prefix and buffer size for tmpnam()/tmpfile() names. tmpdir must be
+# empty or already end with a path separator (it is concatenated with the
+# template, no slash added); __L_tmpnam must hold tmpdir + "TXXXXXX" + NUL.
+if(DEFINED tmpdir)
+  set(__P_tmpdir ${tmpdir})
+  string(LENGTH ${tmpdir} tmpdir_len)
+  math(EXPR __L_tmpnam "${tmpdir_len} + 8")
 endif()
 
 # math library sets errno
@@ -365,7 +376,7 @@ if(TESTS)
   # This could use some generalization, but it's good enough to do
   # semihosting-based tests
 
-  add_subdirectory(semihost)
+  add_subdirectory(libos)
   add_subdirectory(picocrt)
 
   set(PICOCRT_OBJ $<TARGET_OBJECTS:picocrt>)

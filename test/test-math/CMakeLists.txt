@@ -65,13 +65,19 @@ set(tests_real_exp
 
 set(tests_real_other
   test-cbrt
+  test-ceil
   test-erf
   test-erfc
+  test-floor
   test-hypot
   test-j0
   test-j1
   test-jn
   test-lgamma
+  test-remainder
+  test-remquo-quo
+  test-round
+  test-scalbn
   test-sqrt
   test-tgamma
   )
@@ -101,6 +107,16 @@ set(tests_complex_other
   test-csqrt
 )
 
+set(tests_other
+  test-add
+  test-fenv
+  test-fma
+  test-long-double
+  test-math-errhandling
+  test-math-funcs
+  test-rounding-mode
+  )
+
 set(tests
   ${tests_real_trig}
   ${tests_real_exp}
@@ -108,6 +124,7 @@ set(tests
   ${tests_complex_trig}
   ${tests_complex_exp}
   ${tests_complex_other}
+  ${tests_math_other}
   )
 
 foreach(test IN LISTS tests)

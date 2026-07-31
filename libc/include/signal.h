@@ -52,6 +52,11 @@ typedef void (*_sig_func_ptr)(int);
 
 #if __POSIX_VISIBLE
 
+#ifndef _PID_T_DECLARED
+typedef __pid_t pid_t; /* process id */
+#define _PID_T_DECLARED
+#endif
+
 #ifndef _UID_T_DECLARED
 typedef __uid_t uid_t; /* user id */
 #define _UID_T_DECLARED
@@ -84,8 +89,11 @@ typedef struct {
     uid_t        si_uid;    /* Real UID of sending process */
     void        *si_addr;   /* Address of faulting instruction */
     int          si_status; /* Exit value or signal */
+    long         si_band;   /* Band event for SIGPOLL */
     union sigval si_value;  /* Signal value */
 } siginfo_t;
+
+typedef void (*_sig_action_ptr)(int, siginfo_t *, void *);
 
 /*
  * Possible values for sa_flags in sigaction below.
@@ -207,6 +215,10 @@ struct sigevent {
 #define SIGUSR2   31    /* user defined signal 2 */
 #define _NSIG     32
 
+#ifdef __GNU_VISIBLE
+#define NSIG _NSIG
+#endif
+
 /* Using __MISC_VISIBLE until POSIX Issue 8 is officially released */
 #if __MISC_VISIBLE
 #if __SIZEOF_INT__ >= 4
@@ -225,61 +237,160 @@ typedef _sig_func_ptr sighandler_t; /* glibc naming */
 #endif
 
 #if __POSIX_VISIBLE
-int kill(__pid_t pid, int sig);
+int kill(__pid_t pid, int sig) __picolibc_export;
 #endif
-#if __XSI_VISIBLE >= 500
-int killpg(__pid_t pid, int sig);
+#if __XSI_VISIBLE >= 500 || __GNU_VISIBLE || __BSD_VISIBLE
+int killpg(__pid_t pid, int sig) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809L
-void psiginfo(const siginfo_t *, const char *);
+void psiginfo(const siginfo_t *, const char *) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __SVID_VISIBLE
-void psignal(int, const char *);
+void psignal(int, const char *) __picolibc_export;
 #endif
-int raise(int);
+int raise(int) __picolibc_export;
+int __fallback_raise(int) __picolibc_export;
 #if __MISC_VISIBLE
-int sig2str(int, char *);
+int sig2str(int, char *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE
-int sigaction(int, const struct sigaction * __restrict, struct sigaction * __restrict);
-int sigaddset(sigset_t *, const int);
-#define sigaddset(what, sig) (*(what) |= (1 << (sig)), 0)
+int sigaction(int, const struct sigaction * __restrict,
+              struct sigaction * __restrict) __picolibc_export;
+
+int sigaddset(sigset_t *, const int) __picolibc_export;
+
+static __inline int
+__sigaddset(sigset_t *what, int sig)
+{
+    *what |= (sigset_t)1 << sig;
+    return 0;
+}
+
+#define sigaddset(what, sig) __sigaddset(what, sig)
+
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-int sigaltstack(const stack_t * __restrict, stack_t * __restrict);
+int sigaltstack(const stack_t * __restrict, stack_t * __restrict) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE
-int sigdelset(sigset_t *, const int);
-#define sigdelset(what, sig) (*(what) &= ~((sigset_t)1 << (sig)), 0)
-int sigemptyset(sigset_t *);
-#define sigemptyset(what) (*(what) = (sigset_t)0, 0)
-int sigfillset(sigset_t *);
-#define sigfillset(what) (*(what) = ~((sigset_t)0), 0)
-int sigismember(const sigset_t *, int);
-#define sigismember(what, sig) (((*(what)) & ((sigset_t)1 << (sig))) != 0)
+
+int sigdelset(sigset_t *, const int) __nonnull((1)) __picolibc_export;
+
+static __inline int
+__sigdelset(sigset_t *what, int sig)
+{
+    *what &= ~(sigset_t)1 << sig;
+    return 0;
+}
+
+#define sigdelset(what, sig) __sigdelset(what, sig)
+
+int sigemptyset(sigset_t *) __nonnull((1)) __picolibc_export;
+
+static __inline int
+__sigemptyset(sigset_t *what)
+{
+    *what = 0;
+    return 0;
+}
+
+#define sigemptyset(what) __sigemptyset(what)
+
+int sigfillset(sigset_t *) __nonnull((1)) __picolibc_export;
+
+static __inline int
+__sigfillset(sigset_t *what)
+{
+    *what = ~(sigset_t)0;
+    return 0;
+}
+
+#define sigfillset(what) __sigfillset(what)
+
+int sigismember(const sigset_t *, int) __nonnull((1)) __picolibc_export;
+
+static __inline int
+__sigismember(const sigset_t *what, int sig)
+{
+    return (*(what) >> sig) & 1;
+}
+
+#define sigismember(what, sig) __sigismember(what, sig)
+
 #endif
-_sig_func_ptr signal(int, _sig_func_ptr);
+_sig_func_ptr signal(int, _sig_func_ptr) __picolibc_export;
+_sig_func_ptr __fallback_signal(int, _sig_func_ptr) __picolibc_export;
 #if __POSIX_VISIBLE
-int sigpending(sigset_t *);
-int sigprocmask(int, const sigset_t *, sigset_t *);
+int sigpending(sigset_t *) __picolibc_export;
+int sigprocmask(int, const sigset_t *, sigset_t *) __picolibc_export;
+int __fallback_sigprocmask(int, const sigset_t *, sigset_t *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 199309L
-int sigqueue(__pid_t, int, const union sigval);
+int sigqueue(__pid_t, int, const union sigval) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE
-int sigsuspend(const sigset_t *);
+int sigsuspend(const sigset_t *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 199309L
-int sigtimedwait(const sigset_t *, siginfo_t *, const struct timespec *);
+int sigtimedwait(const sigset_t *, siginfo_t *, const struct timespec *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 199506L
-int sigwait(const sigset_t *, int *);
+int sigwait(const sigset_t *, int *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 199309L
-int sigwaitinfo(const sigset_t *, siginfo_t *);
+int sigwaitinfo(const sigset_t *, siginfo_t *) __picolibc_export;
 #endif
 #if __MISC_VISIBLE
-int str2sig(const char * __restrict, int * __restrict);
+int str2sig(const char * __restrict, int * __restrict) __picolibc_export;
+#endif
+
+#if __GNU_VISIBLE
+
+int sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
+    __nonnull((1, 2, 3)) __picolibc_export;
+
+static __inline int
+__sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
+{
+    *dest = *left & *right;
+    return 0;
+}
+
+#define sigandset(d, l, r) __sigandset(d, l, r)
+
+int sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
+    __nonnull((1, 2, 3)) __picolibc_export;
+
+static __inline int
+__sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
+{
+    *dest = *left | *right;
+    return 0;
+}
+
+#define sigorset(d, l, r) __sigorset(d, l, r)
+
+int signotset(sigset_t *dest, const sigset_t *left) __nonnull((1, 2)) __picolibc_export;
+
+static __inline int
+__signotset(sigset_t *dest, const sigset_t *left)
+{
+    *dest = ~(*left);
+    return 0;
+}
+
+#define signotset(d, l) __signotset(d, l)
+
+int sigisemptyset(const sigset_t *set) __nonnull((1)) __picolibc_export;
+
+static __inline int
+__sigisemptyset(const sigset_t *set)
+{
+    return *set == 0;
+}
+
+#define sigisemptyset(s) __sigisemptyset(s)
+
 #endif
 
 _END_STD_C

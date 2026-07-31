@@ -1,0 +1,9 @@
+{
+    "name": "winsize",
+    "defines": [{ "name": "_SYS_IOCTL_H", "value": "1"}],
+    "headers": ["bits/ioctl-types.h"],
+    "members": [
+	{"name": "ws_row"},
+	{"name": "ws_col"}
+    ]
+}

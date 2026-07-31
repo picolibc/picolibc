@@ -1,0 +1,8 @@
+{
+    "name": "rlimit",
+    "headers": [ "sys/resource.h" ],
+    "members": [
+	{ "name": "rlim_cur" },
+	{ "name": "rlim_max" }
+    ]
+}

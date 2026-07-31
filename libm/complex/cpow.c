@@ -73,8 +73,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 double complex
 cpow(double complex a, double complex z)
@@ -86,7 +85,7 @@ cpow(double complex a, double complex z)
     y = cimag(z);
     absa = cabs(a);
     if (absa == 0.0) {
-        return (0.0 + 0.0 * (double complex)I);
+        return CMPLX(0, 0);
     }
     arga = carg(a);
     r = pow(absa, x);
@@ -95,6 +94,6 @@ cpow(double complex a, double complex z)
         r = r * exp(-y * arga);
         theta = theta + y * log(absa);
     }
-    w = r * cos(theta) + (r * sin(theta)) * (double complex)I;
+    w = CMPLX(r * cos(theta), r * sin(theta));
     return w;
 }

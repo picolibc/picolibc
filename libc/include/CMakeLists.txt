@@ -49,7 +49,6 @@ picolibc_headers(""
   devctl.h
   dirent.h
   endian.h
-  envlock.h
   envz.h
   errno.h
   fastmath.h
@@ -74,6 +73,7 @@ picolibc_headers(""
   newlib.h
   paths.h
   picotls.h
+  poll.h
   pwd.h
   regdef.h
   regex.h
@@ -84,6 +84,7 @@ picolibc_headers(""
   spawn.h
   stdio.h
   stdio-bufio.h
+  stdio-posix.h
   stdint.h
   stdnoreturn.h
   stdlib.h

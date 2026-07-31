@@ -44,6 +44,7 @@
 #define __BLBF  0x0002 /* bufio is line buffered */
 #define __BFALL 0x0004 /* FILE is allocated by stdio */
 #define __BFPTR 0x0008 /* funcs need pointers instead of ints */
+#define __BPIPE 0x0010 /* FILE is opened with popen */
 
 union __file_bufio_cookie {
     int   fd;
@@ -83,6 +84,9 @@ struct __file_bufio {
 #ifdef __STDIO_BUFIO_LOCKING
     _LOCK_T lock;
 #endif
+#ifdef __STDIO_EXIT_FLUSH
+    FILE *next;
+#endif
 };
 
 #define FDEV_SETUP_BUFIO(_fd, _buf, _size, _read, _write, _lseek, _close, _rwflag, _bflags)        \
@@ -115,7 +119,7 @@ struct __file_bufio {
 void __bufio_lock_init(FILE *f);
 #endif
 
-static inline void
+static inline void __no_thread_safety_analysis
 __bufio_lock_close(FILE *f)
 {
 #ifdef __STDIO_BUFIO_LOCKING
@@ -128,19 +132,19 @@ __bufio_lock_close(FILE *f)
     (void)f;
 }
 
-static inline void
+static inline void __no_thread_safety_analysis
 __bufio_lock(FILE *f)
 {
 #ifdef __STDIO_BUFIO_LOCKING
     struct __file_bufio *bf = (struct __file_bufio *)f;
     if (!bf->lock)
-        __lock_init(bf->lock);
+        __bufio_lock_init(f);
     __lock_acquire(bf->lock);
 #endif
     (void)f;
 }
 
-static inline void
+static inline void __no_thread_safety_analysis
 __bufio_unlock(FILE *f)
 {
     (void)f;

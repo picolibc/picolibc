@@ -89,6 +89,12 @@
  * can be safely replaced with nothing when not supported
  */
 
+#if __has_attribute(__visibility__)
+#define __picolibc_export __attribute__((__visibility__("default")))
+#else
+#define __picolibc_export
+#endif
+
 #if __has_attribute(__pure__)
 #define __pure __attribute__((__pure__))
 #else
@@ -292,6 +298,27 @@
 #endif
 
 /*
+ * Thread safety analysis annotations (Clang).
+ */
+#if __has_attribute(__capability__)
+#define __capability(x)                __attribute__((__capability__(x)))
+#define __acquire_capability(x)        __attribute__((__acquire_capability__(x)))
+#define __release_capability(x)        __attribute__((__release_capability__(x)))
+#define __try_acquire_capability(r, x) __attribute__((__try_acquire_capability__(r, x)))
+#define __requires_capability(x)       __attribute__((__requires_capability__(x)))
+#define __guarded_by(x)                __attribute__((__guarded_by__(x)))
+#define __no_thread_safety_analysis    __attribute__((__no_thread_safety_analysis__))
+#else
+#define __capability(x)
+#define __acquire_capability(x)
+#define __release_capability(x)
+#define __try_acquire_capability(r, x)
+#define __requires_capability(x)
+#define __guarded_by(x)
+#define __no_thread_safety_analysis
+#endif
+
+/*
  * Builtins.
  *
  * When __has_builtin isn't available, these need to be detected
@@ -303,6 +330,9 @@
 #endif
 #if __has_builtin(__builtin_alloca)
 #define __HAVE_BUILTIN_ALLOCA 1
+#endif
+#if __has_builtin(__builtin_complex) || defined(__GNUC__)
+#define __HAVE_BUILTIN_COMPLEX 1
 #endif
 #if __has_builtin(__builtin_copysign)
 #define __HAVE_BUILTIN_COPYSIGN 1
@@ -376,6 +406,20 @@
 #define __align_up(x, y)   __builtin_align_up(x, y)
 #define __align_down(x, y) __builtin_align_down(x, y)
 #define __is_aligned(x, y) __builtin_is_aligned(x, y)
+
+#ifdef __HAVE_BUILTIN_ADD_OVERFLOW
+#define __picolibc_add_overflow(a, b, c) __builtin_add_overflow(a, b, c)
+#else
+#define __picolibc_add_overflow(a, b, c)                                                \
+    ({                                                                                  \
+        __typeof(a)  __a = (a);                                                         \
+        __typeof(b)  __b = (b);                                                         \
+        __typeof(*c) __c = __a + __b;                                                   \
+        int          __ret = ((__c < 0 && __a > 0 && __b > 0) || (__a < 0 && __b < 0)); \
+        (*c) = __c;                                                                     \
+        __ret;                                                                          \
+    })
+#endif
 
 /*
  * When the address sanitizer is enabled, we must prevent the library
@@ -460,10 +504,12 @@
 #endif
 #endif
 
+#if !__has_feature(c_alignof) && !__has_extension(c_alignof)
 #if defined(__cplusplus) && __cplusplus >= 201103L
 #define _Alignof(x) alignof(x)
 #else
 #define _Alignof(x) __alignof(x)
+#endif
 #endif
 
 #if !defined(__cplusplus) && !__has_feature(c_atomic) && !__has_feature(cxx_atomic) \
@@ -478,7 +524,7 @@
     }
 #endif
 
-#if !__has_feature(c_static_assert)
+#if !__has_feature(c_static_assert) && !__has_extension(c_static_assert)
 #if (defined(__cplusplus) && __cplusplus >= 201103L) || __has_feature(cxx_static_assert)
 #define _Static_assert(x, y) static_assert(x, y)
 #elif __GNUC_PREREQ__(4, 6) && !defined(__cplusplus)

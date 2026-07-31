@@ -1,3 +1,9 @@
 #!/bin/sh
 git config --global --add safe.directory /picolibc
-git ls-files | xargs clang-format -n --Werror
+git ls-files | xargs clang-format -i
+git diff > clang-format.patch
+if [ -s clang-format.patch ]; then
+    echo "Formatting errors found. Patch to fix them:"
+    cat clang-format.patch
+    exit 1
+fi

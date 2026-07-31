@@ -1,3 +1,19 @@
+/*
+Copyright (c) 1994 Cygnus Support.
+All rights reserved.
+
+Redistribution and use in source and binary forms are permitted
+provided that the above copyright notice and this paragraph are
+duplicated in all such forms and that any documentation,
+and/or other materials related to such
+distribution and use acknowledge that the software was developed
+at Cygnus Support, Inc.  Cygnus Support, Inc. may not be used to
+endorse or promote products derived from this software without
+specific prior written permission.
+THIS SOFTWARE IS PROVIDED ``AS IS'' AND WITHOUT ANY EXPRESS OR
+IMPLIED WARRANTIES, INCLUDING, WITHOUT LIMITATION, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
+ */
 /* NOTE:  This file defines both strftime() and wcsftime().  Take care when
  * making changes.  See also wcsftime.c, and note the (small) overlap in the
  * manual description, taking care to edit both as needed.  */
@@ -278,7 +294,7 @@ BUGS
 locale, hard-coding the "C" locale settings.
 */
 
-#define _GNU_SOURCE
+#include "local.h"
 #include <stddef.h>
 #include <stdio.h>
 #include <time.h>
@@ -288,9 +304,8 @@ locale, hard-coding the "C" locale settings.
 #include <ctype.h>
 #include <wctype.h>
 #include <wchar.h>
-#include "local.h"
+#include <stdio.h>
 #include "locale_private.h"
-#include "stdio_private.h"
 #undef TOLOWER
 
 /* Defines to make the file dual use for either strftime() or wcsftime().
@@ -358,7 +373,7 @@ static int
 iso_year_adjust(const struct tm *tim_p)
 {
     /* Account for fact that tm_year==0 is year 1900.  */
-    int leap = isleap(tim_p->tm_year + (YEAR_BASE - (tim_p->tm_year < 0 ? 0 : 2000)));
+    int leap = isleap2(tim_p->tm_year, (YEAR_BASE - (tim_p->tm_year < 0 ? 0 : 2000)));
 
     /* Pack the yday, wday, and leap year into a single int since there are so
        many disparate cases.  */
@@ -1049,22 +1064,17 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                                     subtract to get UTC */
 
                 if (tim_p->tm_isdst >= 0) {
-                    TZ_LOCK;
                     if (!tzset_called) {
-                        _tzset_unlocked();
                         tzset_called = 1;
+                        tzset();
                     }
 
-#if defined(__TM_GMTOFF)
-                    offset = tim_p->__TM_GMTOFF;
-#else
-                    __tzinfo_type *tz = __gettzinfo();
+                    __LIBC_LOCK();
                     /* The sign of this is exactly opposite the envvar TZ.  We
                        could directly use the global _timezone for tm_isdst==0,
                        but have to use __tzrule for daylight savings.  */
-                    offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
-#endif
-                    TZ_UNLOCK;
+                    offset = -__tzinfo.rule[tim_p->tm_isdst > 0].offset;
+                    __LIBC_UNLOCK();
                 }
                 len = t_snprintf(&s[count], maxsize - count, CQ("%lld"),
                                  (((((long long)tim_p->tm_year - 69) / 4
@@ -1140,8 +1150,8 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                    previous year was leap year.  */
                 week = 52
                     + (4 >= (wday - tim_p->tm_yday
-                             - isleap(tim_p->tm_year
-                                      + (YEAR_BASE - 1 - (tim_p->tm_year < 0 ? 0 : 2000)))));
+                             - isleap2(tim_p->tm_year,
+                                       (YEAR_BASE - 1 - (tim_p->tm_year < 0 ? 0 : 2000)))));
 #ifdef _WANT_C99_TIME_FORMATS
             if (alt != CQ('O') || !*alt_digits
                 || !(len = conv_to_alt_digits(&s[count], maxsize - count, week, *alt_digits)))
@@ -1255,22 +1265,18 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
             if (tim_p->tm_isdst >= 0) {
                 long offset;
 
-                TZ_LOCK;
                 if (!tzset_called) {
-                    _tzset_unlocked();
+                    tzset();
                     tzset_called = 1;
                 }
 
-#if defined(__TM_GMTOFF)
-                offset = tim_p->__TM_GMTOFF;
-#else
-                __tzinfo_type *tz = __gettzinfo();
+                __LIBC_LOCK();
                 /* The sign of this is exactly opposite the envvar TZ.  We
                    could directly use the global _timezone for tm_isdst==0,
                    but have to use __tzrule for daylight savings.  */
-                offset = -tz->__tzrule[tim_p->tm_isdst > 0].offset;
-#endif
-                TZ_UNLOCK;
+                offset = -__tzinfo.rule[tim_p->tm_isdst > 0].offset;
+                __LIBC_UNLOCK();
+
                 len = t_snprintf(&s[count], maxsize - count, CQ("%+03ld%.2ld"),
                                  offset / SECSPERHOUR, labs(offset / SECSPERMIN) % 60L);
                 CHECK_LENGTH();
@@ -1281,16 +1287,13 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                 size_t      size;
                 const char *tznam = NULL;
 
-                TZ_LOCK;
                 if (!tzset_called) {
-                    _tzset_unlocked();
+                    tzset();
                     tzset_called = 1;
                 }
-#if defined(__TM_ZONE)
-                tznam = tim_p->__TM_ZONE;
-#endif
-                if (!tznam)
-                    tznam = tzname[tim_p->tm_isdst > 0];
+
+                __LIBC_LOCK();
+                tznam = tzname[tim_p->tm_isdst > 0];
                 /* Note that in case of wcsftime this loop only works for
                    timezone abbreviations using the portable codeset (aka ASCII).
                    This seems to be the case, but if that ever changes, this
@@ -1300,11 +1303,11 @@ __strftime(CHAR *s, size_t maxsize, const CHAR *format, const struct tm *tim_p, 
                     if (count < maxsize - 1)
                         s[count++] = tznam[i];
                     else {
-                        TZ_UNLOCK;
+                        __LIBC_UNLOCK();
                         return 0;
                     }
                 }
-                TZ_UNLOCK;
+                __LIBC_UNLOCK();
             }
             break;
         case CQ('%'):

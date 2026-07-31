@@ -64,8 +64,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 double complex
 csinh(double complex z)
@@ -74,5 +73,5 @@ csinh(double complex z)
 
     x = creal(z);
     y = cimag(z);
-    return (double complex)(sinh(x) * cos(y)) + (cosh(x) * sin(y)) * (double complex)I;
+    return CMPLX(sinh(x) * cos(y), cosh(x) * sin(y));
 }

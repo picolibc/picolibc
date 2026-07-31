@@ -29,7 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 

@@ -34,6 +34,7 @@
 #
 
 tests_mem = [
+  'test-ffs',
   'test-memchr',
   'test-memchr-simple',
   'test-memcpy_s',
@@ -44,6 +45,7 @@ tests_mem = [
   'test-strcat_s',
   'test-strchr',
   'test-strcpy_s',
+  'test-strerror',
   'test-strerrorlen_s',
   'test-strerror_s',
   'test-strncat_s',
@@ -60,8 +62,11 @@ foreach params : targets
   target_c_args = params['c_args']
 
   _libs = [get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+  if is_variable(oslib_test + target)
+    _libs += [get_variable(oslib_test + target)]
+  endif
+  if is_variable(libfallback_var + target)
+    _libs += [get_variable(libfallback_var + target)]
   endif
 
   _lib_files=[]
@@ -83,7 +88,7 @@ foreach params : targets
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
     test(t1 + target,
-	 executable(t1 + target, [t1_src],
+	 executable(t1 + target, [t1_src] + test_lock_valid,
 		    c_args: printf_compile_args_d + test_file_name_arg + _c_args,
 		    link_args: printf_link_args_d + _link_args,
 		    objects: _objs,
@@ -108,7 +113,8 @@ if enable_native_tests
 	 executable(t1_name, t1_src,
 		    c_args: native_c_args + ctype_c_args,
 		    link_args: native_c_args),
-         suite: 'test-string'
+         suite: 'test-string',
+         env: test_env
         )
   endforeach
 

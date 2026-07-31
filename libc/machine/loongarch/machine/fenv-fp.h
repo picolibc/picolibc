@@ -47,7 +47,7 @@
 
 __declare_fenv_inline(int) feclearexcept(int excepts)
 {
-    int fcsr;
+    __uint32_t fcsr;
 
     excepts &= FE_ALL_EXCEPT;
     _movfcsr2gr(fcsr);
@@ -78,7 +78,7 @@ __declare_fenv_inline(int) fegetenv(fenv_t *envp)
 {
 
     /* Get the current environment (FCSR) */
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
     *envp = fcsr;
@@ -107,7 +107,7 @@ __declare_fenv_inline(int) fegetenv(fenv_t *envp)
 __declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
 {
 
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
 
@@ -136,7 +136,7 @@ __declare_fenv_inline(int) fegetround(void)
 {
 
     /* Get current rounding mode */
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
 
@@ -170,7 +170,7 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 {
 
     /* Store the current FP environment in envp*/
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
     *envp = fcsr;
@@ -243,7 +243,7 @@ __declare_fenv_inline(int) feraiseexcept(int excepts)
 
 __declare_fenv_inline(int) fesetexcept(int excepts)
 {
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
     fcsr |= excepts & FE_ALL_EXCEPT;
@@ -310,7 +310,7 @@ __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 
 __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 {
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
 
@@ -344,7 +344,7 @@ __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
 __declare_fenv_inline(int) fesetround(int round)
 {
 
-    int fcsr;
+    __uint32_t fcsr;
 
     if ((round & ~FE_RMODE_MASK) != 0)
         return -1;
@@ -376,7 +376,7 @@ __declare_fenv_inline(int) fesetround(int round)
 
 __declare_fenv_inline(int) fetestexcept(int excepts)
 {
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
 
@@ -405,7 +405,7 @@ __declare_fenv_inline(int) fetestexcept(int excepts)
 
 __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 {
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
 
@@ -422,7 +422,7 @@ __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
 
 __declare_fenv_inline(int) feenableexcept(int excepts)
 {
-    int fcsr, old_excepts;
+    __uint32_t fcsr, old_excepts;
 
     _movfcsr2gr(fcsr);
 
@@ -438,7 +438,7 @@ __declare_fenv_inline(int) feenableexcept(int excepts)
 
 __declare_fenv_inline(int) fedisableexcept(int excepts)
 {
-    int fcsr, old_excepts;
+    __uint32_t fcsr, old_excepts;
 
     _movfcsr2gr(fcsr);
 
@@ -454,7 +454,7 @@ __declare_fenv_inline(int) fedisableexcept(int excepts)
 
 __declare_fenv_inline(int) fegetexcept(void)
 {
-    int fcsr;
+    __uint32_t fcsr;
 
     _movfcsr2gr(fcsr);
     return (fcsr << _FCSR_ENABLE_RSHIFT) & FE_ALL_EXCEPT;

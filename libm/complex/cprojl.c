@@ -26,8 +26,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 #include "../common/fdlibm.h"
 
@@ -48,19 +47,10 @@
 long double complex
 cprojl(long double complex z)
 {
-    long_double_complex w = { .z = z };
+    if (isinf(creall(z)) || isinf(cimagl(z)))
+        z = CMPLXL(INFINITY, copysignl(0, cimagl(z)));
 
-    /*CONSTCOND*/
-    if (isinf(creall(z)) || isinf(cimagl(z))) {
-#ifdef __INFINITY
-        REAL_PART(w) = HUGE_VAL;
-#else
-        REAL_PART(w) = (long double)INFINITY;
-#endif
-        IMAG_PART(w) = copysignl(0.0L, cimagl(z));
-    }
-
-    return (w.z);
+    return z;
 }
 
 #endif /* __HAVE_LONG_DOUBLE */

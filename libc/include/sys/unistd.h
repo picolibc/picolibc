@@ -49,18 +49,13 @@ typedef __intptr_t intptr_t;
 #endif
 
 #ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
+typedef __ssize_t ssize_t;
 #define _SSIZE_T_DECLARED
 #endif
 
 #ifndef _OFF_T_DECLARED
 typedef __off_t off_t;
 #define _OFF_T_DECLARED
-#endif
-
-#ifndef _OFF64_T_DECLARED
-typedef __off64_t off64_t; /* 64-bit file offset */
-#define _OFF64_T_DECLARED
 #endif
 
 #ifndef _UID_T_DECLARED
@@ -77,289 +72,280 @@ typedef __gid_t gid_t; /* group id */
 typedef __pid_t pid_t; /* process id */
 #define _PID_T_DECLARED
 #endif
-extern char   **environ;
 
-__noreturn void _exit(int __status);
+#define _POSIX_VERSION 202405L
 
-int             access(const char *__path, int __amode);
-unsigned        alarm(unsigned __secs);
-int             brk(void *);
-int             chdir(const char *__path);
-int             chown(const char *__path, uid_t __owner, gid_t __group);
+__noreturn void _exit(int __status) __picolibc_export;
+
+int             access(const char *__path, int __amode) __picolibc_export;
+unsigned        alarm(unsigned __secs) __picolibc_export;
+int             brk(void *) __picolibc_export;
+int             chdir(const char *__path) __picolibc_export;
+int             chown(const char *__path, uid_t __owner, gid_t __group) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-int chroot(const char *__path);
+int chroot(const char *__path) __picolibc_export;
 #endif
-int close(int __fildes);
+int close(int __fildes) __picolibc_export;
 #if __POSIX_VISIBLE >= 202405
-int posix_close(int __fildes, int __flag);
+int posix_close(int __fildes, int __flag) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 199209
-size_t confstr(int __name, char *__buf, size_t __len);
+size_t confstr(int __name, char *__buf, size_t __len) __picolibc_export;
 #endif
 #if __XSI_VISIBLE
-char *crypt(const char *__key, const char *__salt);
+char *crypt(const char *__key, const char *__salt) __picolibc_export;
 #endif
 #if __XSI_VISIBLE && __XSI_VISIBLE < 700
-char *ctermid(char *__s);
+char *ctermid(char *__s) __picolibc_export;
 #endif
 #if __XSI_VISIBLE && __XSI_VISIBLE < 600
-char *cuserid(char *__s);
+char *cuserid(char *__s) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-int daemon(int nochdir, int noclose);
+int daemon(int nochdir, int noclose) __picolibc_export;
 #endif
-int dup(int __fildes);
-int dup2(int __fildes, int __fildes2);
+int dup(int __fildes) __picolibc_export;
+int dup2(int __fildes, int __fildes2) __picolibc_export;
 #if __GNU_VISIBLE
-int dup3(int __fildes, int __fildes2, int flags);
-int eaccess(const char *__path, int __mode);
+int dup3(int __fildes, int __fildes2, int flags) __picolibc_export;
+int eaccess(const char *__path, int __mode) __picolibc_export;
 #endif
 #if __XSI_VISIBLE
-void encrypt(char *, int);
+void encrypt(char *, int) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-void endusershell(void);
+void endusershell(void) __picolibc_export;
 #endif
 #if __GNU_VISIBLE
-int euidaccess(const char *__path, int __mode);
+int euidaccess(const char *__path, int __mode) __picolibc_export;
 #endif
-int execl(const char *__path, const char *, ...);
-int execle(const char *__path, const char *, ...);
-int execlp(const char *__file, const char *, ...);
+int execl(const char *__path, const char *, ...) __picolibc_export;
+int execle(const char *__path, const char *, ...) __picolibc_export;
+int execlp(const char *__file, const char *, ...) __picolibc_export;
 #if __MISC_VISIBLE
-int execlpe(const char *__file, const char *, ...);
+int execlpe(const char *__file, const char *, ...) __picolibc_export;
 #endif
-int execv(const char *__path, char * const __argv[]);
-int execve(const char *__path, char * const __argv[], char * const __envp[]);
-int execvp(const char *__file, char * const __argv[]);
+int execv(const char *__path, char * const __argv[]) __picolibc_export;
+int execve(const char *__path, char * const __argv[], char * const __envp[]) __picolibc_export;
+int execvp(const char *__file, char * const __argv[]) __picolibc_export;
 #if __GNU_VISIBLE
-int execvpe(const char *__file, char * const __argv[], char * const __envp[]);
+int execvpe(const char *__file, char * const __argv[], char * const __envp[]) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
-int faccessat(int __dirfd, const char *__path, int __mode, int __flags);
+int faccessat(int __dirfd, const char *__path, int __mode, int __flags) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-int fchdir(int __fildes);
+int fchdir(int __fildes) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-int fchown(int __fildes, uid_t __owner, gid_t __group);
+int fchown(int __fildes, uid_t __owner, gid_t __group) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
-int fchownat(int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags);
+int fchownat(int __dirfd, const char *__path, uid_t __owner, gid_t __group,
+             int __flags) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809
-int fexecve(int __fd, char * const __argv[], char * const __envp[]);
+int fexecve(int __fd, char * const __argv[], char * const __envp[]) __picolibc_export;
 #endif
-pid_t fork(void);
-long  fpathconf(int __fd, int __name);
-int   fsync(int __fd);
+pid_t fork(void) __picolibc_export;
+long  fpathconf(int __fd, int __name) __picolibc_export;
+long  __fallback_fpathconf(int __td, int __name) __picolibc_export;
+int   fsync(int __fd) __picolibc_export;
 #if __POSIX_VISIBLE >= 199309
-int fdatasync(int __fd);
+int fdatasync(int __fd) __picolibc_export;
 #endif
 #if __GNU_VISIBLE
-char *get_current_dir_name(void);
+char *get_current_dir_name(void) __picolibc_export;
 #endif
-char *getcwd(char *__buf, size_t __size);
+char *getcwd(char *__buf, size_t __size) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-int getdomainname(char *__name, size_t __len);
+int getdomainname(char *__name, size_t __len) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int getentropy(void *, size_t);
+int getentropy(void *, size_t) __picolibc_export;
 #endif
-gid_t getegid(void);
-uid_t geteuid(void);
-gid_t getgid(void);
-int   getgroups(int __gidsetsize, gid_t __grouplist[]);
+gid_t getegid(void) __picolibc_export;
+uid_t geteuid(void) __picolibc_export;
+gid_t getgid(void) __picolibc_export;
+int   getgroups(int __gidsetsize, gid_t __grouplist[]) __picolibc_export;
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
-long gethostid(void);
+long gethostid(void) __picolibc_export;
 #endif
-char *getlogin(void);
+char *getlogin(void) __picolibc_export;
 #if defined(_POSIX_THREAD_SAFE_FUNCTIONS)
-int getlogin_r(char *name, size_t namesize);
+int getlogin_r(char *name, size_t namesize) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __POSIX_VISIBLE < 200112)
-char *getpass(const char *__prompt);
-int   getpagesize(void);
+char *getpass(const char *__prompt) __picolibc_export;
+int   getpagesize(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int getpeereid(int, uid_t *, gid_t *);
+int getpeereid(int, uid_t *, gid_t *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
-pid_t getpgid(pid_t);
+pid_t getpgid(pid_t) __picolibc_export;
 #endif
-pid_t getpgrp(void);
-pid_t getpid(void);
-pid_t getppid(void);
+pid_t getpgrp(void) __picolibc_export;
+pid_t getpid(void) __picolibc_export;
+pid_t getppid(void) __picolibc_export;
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 4
-pid_t getsid(pid_t);
+pid_t getsid(pid_t) __picolibc_export;
 #endif
-uid_t getuid(void);
+uid_t getuid(void) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-char *getusershell(void);
+char *getusershell(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200809)
-char *getwd(char *__buf);
+char *getwd(char *__buf) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int iruserok(unsigned long raddr, int superuser, const char *ruser, const char *luser);
+int iruserok(unsigned long raddr, int superuser, const char *ruser,
+             const char *luser) __picolibc_export;
 #endif
-int isatty(int __fildes);
+int isatty(int __fildes) __picolibc_export;
 #if __BSD_VISIBLE
-int issetugid(void);
+int issetugid(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4 || __POSIX_VISIBLE >= 200809
-int lchown(const char *__path, uid_t __owner, gid_t __group);
+int lchown(const char *__path, uid_t __owner, gid_t __group) __picolibc_export;
 #endif
-int link(const char *__path1, const char *__path2);
+int link(const char *__path1, const char *__path2) __picolibc_export;
 #if __ATFILE_VISIBLE
-int linkat(int __dirfd1, const char *__path1, int __dirfd2, const char *__path2, int __flags);
+int linkat(int __dirfd1, const char *__path1, int __dirfd2, const char *__path2,
+           int __flags) __picolibc_export;
 #endif
 #if __MISC_VISIBLE || __XSI_VISIBLE
-int nice(int __nice_value);
+int nice(int __nice_value) __picolibc_export;
 #endif
-#if !defined(__INSIDE_CYGWIN__)
-off_t lseek(int __fildes, off_t __offset, int __whence);
-#endif
+off_t lseek(int __fildes, off_t __offset, int __whence) __picolibc_export;
 #if __MISC_VISIBLE || __XSI_VISIBLE >= 4
 #define F_ULOCK 0
 #define F_LOCK  1
 #define F_TLOCK 2
 #define F_TEST  3
-int lockf(int __fd, int __cmd, off_t __len);
+int lockf(int __fd, int __cmd, off_t __len) __picolibc_export;
 #endif
-long pathconf(const char *__path, int __name);
-int  pause(void);
+long pathconf(const char *__path, int __name) __picolibc_export;
+long __fallback_pathconf(const char *__path, int __name) __picolibc_export;
+int  pause(void) __picolibc_export;
 #if __POSIX_VISIBLE >= 199506
-int pthread_atfork(void (*)(void), void (*)(void), void (*)(void));
+int pthread_atfork(void (*)(void), void (*)(void), void (*)(void)) __picolibc_export;
 #endif
-int pipe(int __fildes[2]);
+int pipe(int __fildes[2]) __picolibc_export;
 #if __GNU_VISIBLE
-int pipe2(int __fildes[2], int flags);
+int pipe2(int __fildes[2], int flags) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
-ssize_t pread(int __fd, void *__buf, size_t __nbytes, off_t __offset);
-ssize_t pwrite(int __fd, const void *__buf, size_t __nbytes, off_t __offset);
+ssize_t pread(int __fd, void *__buf, size_t __nbytes, off_t __offset) __picolibc_export;
+ssize_t pwrite(int __fd, const void *__buf, size_t __nbytes, off_t __offset) __picolibc_export;
 #endif
-ssize_t read(int __fd, void *__buf, size_t __nbyte);
+ssize_t read(int __fd, void *__buf, size_t __nbyte) __picolibc_export;
 #if __BSD_VISIBLE
-int rresvport(int *__alport);
-int revoke(char *__path);
+int rresvport(int *__alport) __picolibc_export;
+int revoke(char *__path) __picolibc_export;
 #endif
-int rmdir(const char *__path);
+int rmdir(const char *__path) __picolibc_export;
 #if __BSD_VISIBLE
-int ruserok(const char *rhost, int superuser, const char *ruser, const char *luser);
+int ruserok(const char *rhost, int superuser, const char *ruser,
+            const char *luser) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-void *sbrk(ptrdiff_t __incr);
+void *sbrk(ptrdiff_t __incr) __picolibc_export;
+void *__fallback_sbrk(ptrdiff_t __incr) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
-int setegid(gid_t __gid);
-int seteuid(uid_t __uid);
+int setegid(gid_t __gid) __picolibc_export;
+int seteuid(uid_t __uid) __picolibc_export;
 #endif
-int setgid(gid_t __gid);
+int setgid(gid_t __gid) __picolibc_export;
 #if __BSD_VISIBLE
-int setgroups(int ngroups, const gid_t *grouplist);
+int setgroups(int ngroups, const gid_t *grouplist) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-int sethostname(const char *, size_t);
+int sethostname(const char *, size_t) __picolibc_export;
 #endif
-int setpgid(pid_t __pid, pid_t __pgid);
+int setpgid(pid_t __pid, pid_t __pgid) __picolibc_export;
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 500
-int setpgrp(void);
+int setpgrp(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 4
-int setregid(gid_t __rgid, gid_t __egid);
-int setreuid(uid_t __ruid, uid_t __euid);
+int setregid(gid_t __rgid, gid_t __egid) __picolibc_export;
+int setreuid(uid_t __ruid, uid_t __euid) __picolibc_export;
 #endif
-pid_t setsid(void);
-int   setuid(uid_t __uid);
+pid_t setsid(void) __picolibc_export;
+int   setuid(uid_t __uid) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
-void setusershell(void);
+void setusershell(void) __picolibc_export;
 #endif
-unsigned sleep(unsigned int __seconds);
+unsigned sleep(unsigned int __seconds) __picolibc_export;
 #if __XSI_VISIBLE
-void swab(const void * __restrict, void * __restrict, ssize_t);
+void swab(const void * __restrict, void * __restrict, ssize_t) __picolibc_export;
 #endif
-long  sysconf(int __name);
-pid_t tcgetpgrp(int __fildes);
-int   tcsetpgrp(int __fildes, pid_t __pgrp_id);
-char *ttyname(int __fildes);
-int   ttyname_r(int, char *, size_t);
-int   unlink(const char *__path);
+long  sysconf(int __name) __picolibc_export;
+long  __fallback_sysconf(int __name) __picolibc_export;
+pid_t tcgetpgrp(int __fildes) __picolibc_export;
+int   tcsetpgrp(int __fildes, pid_t __pgrp_id) __picolibc_export;
+char *ttyname(int __fildes) __picolibc_export;
+int   ttyname_r(int, char *, size_t) __picolibc_export;
+int   unlink(const char *__path) __picolibc_export;
 #if __XSI_VISIBLE >= 500 && __POSIX_VISIBLE < 200809 || __BSD_VISIBLE
-int usleep(useconds_t __useconds);
+int usleep(useconds_t __useconds) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int vhangup(void);
+int vhangup(void) __picolibc_export;
 #endif
-ssize_t      write(int __fd, const void *__buf, size_t __nbyte);
+ssize_t                        write(int __fd, const void *__buf, size_t __nbyte) __picolibc_export;
 
-extern char *optarg; /* getopt(3) external variables */
-extern int   optind, opterr, optopt;
-int          getopt(int, char          *const[], const char *);
-extern int   optreset; /* getopt(3) external variable */
+extern __picolibc_export char *optarg; /* getopt(3) external variables */
+extern __picolibc_export int   optind;
+extern __picolibc_export int   opterr;
+extern __picolibc_export int   optopt;
+int                            getopt(int, char                            *const[], const char *) __picolibc_export;
+extern __picolibc_export int   optreset; /* getopt(3) external variable */
 
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200809)
-pid_t vfork(void);
+pid_t vfork(void) __picolibc_export;
 #endif
 
-#ifdef _LIBC
-/* Provide prototypes for most of the _<systemcall> names that are
-   provided in newlib for some compilers.  */
-int    close(int __fildes);
-pid_t  fork(void);
-pid_t  getpid(void);
-int    isatty(int __fildes);
-int    link(const char *__path1, const char *__path2);
-_off_t lseek(int __fildes, _off_t __offset, int __whence);
-void  *sbrk(ptrdiff_t __incr);
-int    unlink(const char *__path);
-#endif
-
-#if __LARGEFILE64_VISIBLE
-_off64_t lseek64(int __filedes, _off64_t __offset, int __whence);
-#endif
-
-#if !defined(__INSIDE_CYGWIN__)
 #if __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
-int ftruncate(int __fd, off_t __length);
+int ftruncate(int __fd, off_t __length) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
-int truncate(const char *, off_t __length);
-#endif
+int truncate(const char *, off_t __length) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE < 200112
-int getdtablesize(void);
+int getdtablesize(void) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500
-useconds_t ualarm(useconds_t __useconds, useconds_t __interval);
+useconds_t ualarm(useconds_t __useconds, useconds_t __interval) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 500
 #if !(defined(_WINSOCK_H) || defined(_WINSOCKAPI_) || defined(__USE_W32_SOCKETS))
 /* winsock[2].h defines as __stdcall, and with int as 2nd arg */
-int gethostname(char *__name, size_t __len);
+int gethostname(char *__name, size_t __len) __picolibc_export;
 #endif
 #endif
 
 #if __MISC_VISIBLE
-int setdtablesize(int);
+int setdtablesize(int) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __XSI_VISIBLE >= 500
-void sync(void);
+void sync(void) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 4
-ssize_t readlink(const char * __restrict __path, char * __restrict __buf, size_t __buflen);
-int     symlink(const char *__name1, const char *__name2);
+ssize_t readlink(const char * __restrict __path, char * __restrict __buf,
+                 size_t __buflen) __picolibc_export;
+int     symlink(const char *__name1, const char *__name2) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
 ssize_t readlinkat(int    __dirfd1, const char    *__restrict __path, char    *__restrict __buf,
-                   size_t __buflen);
-int     symlinkat(const char *, int, const char *);
-int     unlinkat(int, const char *, int);
+                   size_t __buflen) __picolibc_export;
+int     symlinkat(const char *, int, const char *) __picolibc_export;
+int     unlinkat(int, const char *, int) __picolibc_export;
 #endif
 
 #define F_OK     0
@@ -398,194 +384,188 @@ int     unlinkat(int, const char *, int);
  *  sysconf values per IEEE Std 1003.1, 2008 Edition
  */
 
-#define _SC_ARG_MAX     0
-#define _SC_CHILD_MAX   1
-#define _SC_CLK_TCK     2
-#define _SC_NGROUPS_MAX 3
-#define _SC_OPEN_MAX    4
-#define _SC_JOB_CONTROL 5
-#define _SC_SAVED_IDS   6
-#define _SC_VERSION     7
-#define _SC_PAGESIZE    8
-#define _SC_PAGE_SIZE   _SC_PAGESIZE
-/* These are non-POSIX values we accidentally introduced in 2000 without
-   guarding them.  Keeping them unguarded for backward compatibility. */
-#define _SC_NPROCESSORS_CONF 9
-#define _SC_NPROCESSORS_ONLN 10
-#define _SC_PHYS_PAGES       11
-#define _SC_AVPHYS_PAGES     12
-/* End of non-POSIX values. */
-#define _SC_MQ_OPEN_MAX                13
-#define _SC_MQ_PRIO_MAX                14
-#define _SC_RTSIG_MAX                  15
-#define _SC_SEM_NSEMS_MAX              16
-#define _SC_SEM_VALUE_MAX              17
-#define _SC_SIGQUEUE_MAX               18
-#define _SC_TIMER_MAX                  19
-#define _SC_TZNAME_MAX                 20
-#define _SC_ASYNCHRONOUS_IO            21
-#define _SC_FSYNC                      22
-#define _SC_MAPPED_FILES               23
-#define _SC_MEMLOCK                    24
-#define _SC_MEMLOCK_RANGE              25
-#define _SC_MEMORY_PROTECTION          26
-#define _SC_MESSAGE_PASSING            27
-#define _SC_PRIORITIZED_IO             28
-#define _SC_REALTIME_SIGNALS           29
-#define _SC_SEMAPHORES                 30
-#define _SC_SHARED_MEMORY_OBJECTS      31
-#define _SC_SYNCHRONIZED_IO            32
-#define _SC_TIMERS                     33
-#define _SC_AIO_LISTIO_MAX             34
-#define _SC_AIO_MAX                    35
-#define _SC_AIO_PRIO_DELTA_MAX         36
-#define _SC_DELAYTIMER_MAX             37
-#define _SC_THREAD_KEYS_MAX            38
-#define _SC_THREAD_STACK_MIN           39
-#define _SC_THREAD_THREADS_MAX         40
-#define _SC_TTY_NAME_MAX               41
-#define _SC_THREADS                    42
-#define _SC_THREAD_ATTR_STACKADDR      43
-#define _SC_THREAD_ATTR_STACKSIZE      44
-#define _SC_THREAD_PRIORITY_SCHEDULING 45
-#define _SC_THREAD_PRIO_INHERIT        46
+#define _SC_ARG_MAX                    0
+#define _SC_CHILD_MAX                  1
+#define _SC_CLK_TCK                    2
+#define _SC_NGROUPS_MAX                3
+#define _SC_OPEN_MAX                   4
+#define _SC_JOB_CONTROL                5
+#define _SC_SAVED_IDS                  6
+#define _SC_VERSION                    7
+#define _SC_PAGESIZE                   8
+#define _SC_PAGE_SIZE                  _SC_PAGESIZE
+#define _SC_MQ_OPEN_MAX                9
+#define _SC_MQ_PRIO_MAX                10
+#define _SC_RTSIG_MAX                  11
+#define _SC_SEM_NSEMS_MAX              12
+#define _SC_SEM_VALUE_MAX              13
+#define _SC_SIGQUEUE_MAX               14
+#define _SC_TIMER_MAX                  15
+#define _SC_TZNAME_MAX                 16
+#define _SC_ASYNCHRONOUS_IO            17
+#define _SC_FSYNC                      18
+#define _SC_MAPPED_FILES               19
+#define _SC_MEMLOCK                    20
+#define _SC_MEMLOCK_RANGE              21
+#define _SC_MEMORY_PROTECTION          22
+#define _SC_MESSAGE_PASSING            23
+#define _SC_PRIORITIZED_IO             24
+#define _SC_REALTIME_SIGNALS           25
+#define _SC_SEMAPHORES                 26
+#define _SC_SHARED_MEMORY_OBJECTS      27
+#define _SC_SYNCHRONIZED_IO            28
+#define _SC_TIMERS                     29
+#define _SC_AIO_LISTIO_MAX             30
+#define _SC_AIO_MAX                    31
+#define _SC_AIO_PRIO_DELTA_MAX         32
+#define _SC_DELAYTIMER_MAX             33
+#define _SC_THREAD_KEYS_MAX            34
+#define _SC_THREAD_STACK_MIN           35
+#define _SC_THREAD_THREADS_MAX         36
+#define _SC_TTY_NAME_MAX               37
+#define _SC_THREADS                    38
+#define _SC_THREAD_ATTR_STACKADDR      39
+#define _SC_THREAD_ATTR_STACKSIZE      40
+#define _SC_THREAD_PRIORITY_SCHEDULING 41
+#define _SC_THREAD_PRIO_INHERIT        42
 /* _SC_THREAD_PRIO_PROTECT was _SC_THREAD_PRIO_CEILING in early drafts */
-#define _SC_THREAD_PRIO_PROTECT          47
+#define _SC_THREAD_PRIO_PROTECT          43
 #define _SC_THREAD_PRIO_CEILING          _SC_THREAD_PRIO_PROTECT
-#define _SC_THREAD_PROCESS_SHARED        48
-#define _SC_THREAD_SAFE_FUNCTIONS        49
-#define _SC_GETGR_R_SIZE_MAX             50
-#define _SC_GETPW_R_SIZE_MAX             51
-#define _SC_LOGIN_NAME_MAX               52
-#define _SC_THREAD_DESTRUCTOR_ITERATIONS 53
-#define _SC_ADVISORY_INFO                54
-#define _SC_ATEXIT_MAX                   55
-#define _SC_BARRIERS                     56
-#define _SC_BC_BASE_MAX                  57
-#define _SC_BC_DIM_MAX                   58
-#define _SC_BC_SCALE_MAX                 59
-#define _SC_BC_STRING_MAX                60
-#define _SC_CLOCK_SELECTION              61
-#define _SC_COLL_WEIGHTS_MAX             62
-#define _SC_CPUTIME                      63
-#define _SC_EXPR_NEST_MAX                64
-#define _SC_HOST_NAME_MAX                65
-#define _SC_IOV_MAX                      66
-#define _SC_IPV6                         67
-#define _SC_LINE_MAX                     68
-#define _SC_MONOTONIC_CLOCK              69
-#define _SC_RAW_SOCKETS                  70
-#define _SC_READER_WRITER_LOCKS          71
-#define _SC_REGEXP                       72
-#define _SC_RE_DUP_MAX                   73
-#define _SC_SHELL                        74
-#define _SC_SPAWN                        75
-#define _SC_SPIN_LOCKS                   76
-#define _SC_SPORADIC_SERVER              77
-#define _SC_SS_REPL_MAX                  78
-#define _SC_SYMLOOP_MAX                  79
-#define _SC_THREAD_CPUTIME               80
-#define _SC_THREAD_SPORADIC_SERVER       81
-#define _SC_TIMEOUTS                     82
-#define _SC_TRACE                        83
-#define _SC_TRACE_EVENT_FILTER           84
-#define _SC_TRACE_EVENT_NAME_MAX         85
-#define _SC_TRACE_INHERIT                86
-#define _SC_TRACE_LOG                    87
-#define _SC_TRACE_NAME_MAX               88
-#define _SC_TRACE_SYS_MAX                89
-#define _SC_TRACE_USER_EVENT_MAX         90
-#define _SC_TYPED_MEMORY_OBJECTS         91
-#define _SC_V7_ILP32_OFF32               92
+#define _SC_THREAD_PROCESS_SHARED        44
+#define _SC_THREAD_SAFE_FUNCTIONS        45
+#define _SC_GETGR_R_SIZE_MAX             46
+#define _SC_GETPW_R_SIZE_MAX             47
+#define _SC_LOGIN_NAME_MAX               48
+#define _SC_THREAD_DESTRUCTOR_ITERATIONS 49
+#define _SC_ADVISORY_INFO                50
+#define _SC_ATEXIT_MAX                   51
+#define _SC_BARRIERS                     52
+#define _SC_BC_BASE_MAX                  53
+#define _SC_BC_DIM_MAX                   54
+#define _SC_BC_SCALE_MAX                 55
+#define _SC_BC_STRING_MAX                56
+#define _SC_CHARCLASS_NAME_MAX           57
+#define _SC_CLOCK_SELECTION              58
+#define _SC_COLL_WEIGHTS_MAX             59
+#define _SC_CPUTIME                      60
+#define _SC_EXPR_NEST_MAX                61
+#define _SC_HOST_NAME_MAX                62
+#define _SC_IOV_MAX                      63
+#define _SC_IPV6                         64
+#define _SC_LINE_MAX                     65
+#define _SC_MONOTONIC_CLOCK              66
+#define _SC_RAW_SOCKETS                  67
+#define _SC_READER_WRITER_LOCKS          68
+#define _SC_REGEXP                       69
+#define _SC_RE_DUP_MAX                   70
+#define _SC_SHELL                        71
+#define _SC_SPAWN                        72
+#define _SC_SPIN_LOCKS                   73
+#define _SC_SPORADIC_SERVER              74
+#define _SC_SS_REPL_MAX                  75
+#define _SC_SYMLOOP_MAX                  76
+#define _SC_THREAD_CPUTIME               77
+#define _SC_THREAD_SPORADIC_SERVER       78
+#define _SC_TIMEOUTS                     79
+#define _SC_TRACE                        80
+#define _SC_TRACE_EVENT_FILTER           81
+#define _SC_TRACE_EVENT_NAME_MAX         82
+#define _SC_TRACE_INHERIT                83
+#define _SC_TRACE_LOG                    84
+#define _SC_TRACE_NAME_MAX               85
+#define _SC_TRACE_SYS_MAX                86
+#define _SC_TRACE_USER_EVENT_MAX         87
+#define _SC_TYPED_MEMORY_OBJECTS         88
+#define _SC_V7_ILP32_OFF32               89
 #define _SC_V6_ILP32_OFF32               _SC_V7_ILP32_OFF32
 #define _SC_XBS5_ILP32_OFF32             _SC_V7_ILP32_OFF32
-#define _SC_V7_ILP32_OFFBIG              93
+#define _SC_V7_ILP32_OFFBIG              90
 #define _SC_V6_ILP32_OFFBIG              _SC_V7_ILP32_OFFBIG
 #define _SC_XBS5_ILP32_OFFBIG            _SC_V7_ILP32_OFFBIG
-#define _SC_V7_LP64_OFF64                94
+#define _SC_V7_LP64_OFF64                91
 #define _SC_V6_LP64_OFF64                _SC_V7_LP64_OFF64
 #define _SC_XBS5_LP64_OFF64              _SC_V7_LP64_OFF64
-#define _SC_V7_LPBIG_OFFBIG              95
+#define _SC_V7_LPBIG_OFFBIG              92
 #define _SC_V6_LPBIG_OFFBIG              _SC_V7_LPBIG_OFFBIG
 #define _SC_XBS5_LPBIG_OFFBIG            _SC_V7_LPBIG_OFFBIG
-#define _SC_XOPEN_CRYPT                  96
-#define _SC_XOPEN_ENH_I18N               97
-#define _SC_XOPEN_LEGACY                 98
-#define _SC_XOPEN_REALTIME               99
-#define _SC_STREAM_MAX                   100
-#define _SC_PRIORITY_SCHEDULING          101
-#define _SC_XOPEN_REALTIME_THREADS       102
-#define _SC_XOPEN_SHM                    103
-#define _SC_XOPEN_STREAMS                104
-#define _SC_XOPEN_UNIX                   105
-#define _SC_XOPEN_VERSION                106
-#define _SC_2_CHAR_TERM                  107
-#define _SC_2_C_BIND                     108
-#define _SC_2_C_DEV                      109
-#define _SC_2_FORT_DEV                   110
-#define _SC_2_FORT_RUN                   111
-#define _SC_2_LOCALEDEF                  112
-#define _SC_2_PBS                        113
-#define _SC_2_PBS_ACCOUNTING             114
-#define _SC_2_PBS_CHECKPOINT             115
-#define _SC_2_PBS_LOCATE                 116
-#define _SC_2_PBS_MESSAGE                117
-#define _SC_2_PBS_TRACK                  118
-#define _SC_2_SW_DEV                     119
-#define _SC_2_UPE                        120
-#define _SC_2_VERSION                    121
-#define _SC_THREAD_ROBUST_PRIO_INHERIT   122
-#define _SC_THREAD_ROBUST_PRIO_PROTECT   123
-#define _SC_XOPEN_UUCP                   124
-#define _SC_LEVEL1_ICACHE_SIZE           125
-#define _SC_LEVEL1_ICACHE_ASSOC          126
-#define _SC_LEVEL1_ICACHE_LINESIZE       127
-#define _SC_LEVEL1_DCACHE_SIZE           128
-#define _SC_LEVEL1_DCACHE_ASSOC          129
-#define _SC_LEVEL1_DCACHE_LINESIZE       130
-#define _SC_LEVEL2_CACHE_SIZE            131
-#define _SC_LEVEL2_CACHE_ASSOC           132
-#define _SC_LEVEL2_CACHE_LINESIZE        133
-#define _SC_LEVEL3_CACHE_SIZE            134
-#define _SC_LEVEL3_CACHE_ASSOC           135
-#define _SC_LEVEL3_CACHE_LINESIZE        136
-#define _SC_LEVEL4_CACHE_SIZE            137
-#define _SC_LEVEL4_CACHE_ASSOC           138
-#define _SC_LEVEL4_CACHE_LINESIZE        139
-#define _SC_POSIX_26_VERSION             140
+#define _SC_XOPEN_CRYPT                  93
+#define _SC_XOPEN_ENH_I18N               94
+#define _SC_XOPEN_LEGACY                 95
+#define _SC_XOPEN_REALTIME               96
+#define _SC_STREAM_MAX                   97
+#define _SC_PRIORITY_SCHEDULING          98
+#define _SC_XOPEN_REALTIME_THREADS       99
+#define _SC_XOPEN_SHM                    100
+#define _SC_XOPEN_STREAMS                101
+#define _SC_XOPEN_UNIX                   102
+#define _SC_XOPEN_VERSION                103
+#define _SC_2_CHAR_TERM                  104
+#define _SC_2_C_BIND                     105
+#define _SC_2_C_DEV                      106
+#define _SC_2_FORT_DEV                   107
+#define _SC_2_FORT_RUN                   108
+#define _SC_2_LOCALEDEF                  109
+#define _SC_2_PBS                        110
+#define _SC_2_PBS_ACCOUNTING             111
+#define _SC_2_PBS_CHECKPOINT             112
+#define _SC_2_PBS_LOCATE                 113
+#define _SC_2_PBS_MESSAGE                114
+#define _SC_2_PBS_TRACK                  115
+#define _SC_2_SW_DEV                     116
+#define _SC_2_UPE                        117
+#define _SC_2_VERSION                    118
+#define _SC_THREAD_ROBUST_PRIO_INHERIT   119
+#define _SC_THREAD_ROBUST_PRIO_PROTECT   120
+#define _SC_XOPEN_UUCP                   121
+#define _SC_LEVEL1_ICACHE_SIZE           122
+#define _SC_LEVEL1_ICACHE_ASSOC          123
+#define _SC_LEVEL1_ICACHE_LINESIZE       124
+#define _SC_LEVEL1_DCACHE_SIZE           125
+#define _SC_LEVEL1_DCACHE_ASSOC          126
+#define _SC_LEVEL1_DCACHE_LINESIZE       127
+#define _SC_LEVEL2_CACHE_SIZE            128
+#define _SC_LEVEL2_CACHE_ASSOC           129
+#define _SC_LEVEL2_CACHE_LINESIZE        130
+#define _SC_LEVEL3_CACHE_SIZE            131
+#define _SC_LEVEL3_CACHE_ASSOC           132
+#define _SC_LEVEL3_CACHE_LINESIZE        133
+#define _SC_LEVEL4_CACHE_SIZE            134
+#define _SC_LEVEL4_CACHE_ASSOC           135
+#define _SC_LEVEL4_CACHE_LINESIZE        136
+#define _SC_POSIX_26_VERSION             137
 
 /*
  *  pathconf values per IEEE Std 1003.1, 2008 Edition
  */
 
-#define _PC_LINK_MAX             0
-#define _PC_MAX_CANON            1
-#define _PC_MAX_INPUT            2
-#define _PC_NAME_MAX             3
-#define _PC_PATH_MAX             4
-#define _PC_PIPE_BUF             5
-#define _PC_CHOWN_RESTRICTED     6
-#define _PC_NO_TRUNC             7
-#define _PC_VDISABLE             8
-#define _PC_ASYNC_IO             9
-#define _PC_PRIO_IO              10
-#define _PC_SYNC_IO              11
-#define _PC_FILESIZEBITS         12
-#define _PC_2_SYMLINKS           13
-#define _PC_SYMLINK_MAX          14
-#define _PC_ALLOC_SIZE_MIN       15
-#define _PC_REC_INCR_XFER_SIZE   16
-#define _PC_REC_MAX_XFER_SIZE    17
-#define _PC_REC_MIN_XFER_SIZE    18
-#define _PC_REC_XFER_ALIGN       19
-#define _PC_TIMESTAMP_RESOLUTION 20
+#define _PC_FILESIZEBITS         0
+#define _PC_LINK_MAX             1
+#define _PC_MAX_CANON            2
+#define _PC_MAX_INPUT            3
+#define _PC_NAME_MAX             4
+#define _PC_PATH_MAX             5
+#define _PC_PIPE_BUF             6
+#define _PC_2_SYMLINKS           7
+#define _PC_ALLOC_SIZE_MIN       8
+#define _PC_REC_INCR_XFER_SIZE   9
+#define _PC_REC_MAX_XFER_SIZE    10
+#define _PC_REC_MIN_XFER_SIZE    11
+#define _PC_REC_XFER_ALIGN       12
+#define _PC_SYMLINK_MAX          13
+#define _PC_TEXTDOMAIN_MAX       14
+#define _PC_CHOWN_RESTRICTED     15
+#define _PC_NO_TRUNC             16
+#define _PC_VDISABLE             17
+#define _PC_ASYNC_IO             18
+#define _PC_FALLOC               19
+#define _PC_PRIO_IO              20
+#define _PC_SYNC_IO              21
+#define _PC_TIMESTAMP_RESOLUTION 22
 
 /*
  *  confstr values per IEEE Std 1003.1, 2004 Edition
  */
 
-/* Only defined on Cygwin and RTEMS for now. */
-#if defined(__CYGWIN__) || defined(__rtems__)
 #define _CS_PATH                           0
 #define _CS_POSIX_V7_ILP32_OFF32_CFLAGS    1
 #define _CS_POSIX_V6_ILP32_OFF32_CFLAGS    _CS_POSIX_V7_ILP32_OFF32_CFLAGS
@@ -638,7 +618,6 @@ int     unlinkat(int, const char *, int);
 #define _CS_LFS_LDFLAGS                    22
 #define _CS_LFS_LIBS                       23
 #define _CS_LFS_LINTFLAGS                  24
-#endif
 
 _END_STD_C
 

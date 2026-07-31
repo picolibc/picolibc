@@ -231,24 +231,20 @@ test_iconv_valid(void)
                 retry_to_utf:
                     if (inbytes_thistime > (incount - tocount))
                         inbytes_thistime = incount - tocount;
-#ifdef __GLIBC__
-                    /* glibc returns E2BIG if output overflows, so avoid that */
-                    outbytes_thistime = inbytes_thistime * MB_LEN_MAX;
-#else
-                    /* picolibc handles this correctly */
-                    outbytes_thistime = (tocount % 8) + 1;
-#endif
+
+                    outbytes_thistime = (tocount % 8) + MB_LEN_MAX;
 
                     /* Convert some bytes */
                     inbytes_left = inbytes_thistime;
                     outbytes_left = outbytes_thistime;
                     to_utf_ret = iconv(to_utf, &inptr, &inbytes_left, &utf8ptr, &outbytes_left);
+
                     /*
                      * When we get an error without converting any input, check to see if we need to
                      * extend the input to build a complete character
                      */
-                    if (to_utf_ret == (size_t)-1 && inbytes_left == inbytes_thistime
-                        && outbytes_left == outbytes_thistime) {
+                    if (to_utf_ret == (size_t)-1 && errno != E2BIG
+                        && inbytes_left == inbytes_thistime && outbytes_left == outbytes_thistime) {
                         if (errno == EINVAL || errno == EILSEQ) {
                             if (inbytes_thistime < (incount - tocount)
                                 && inbytes_extra < MB_LEN_MAX) {
@@ -305,12 +301,7 @@ test_iconv_valid(void)
                 retry_from_utf:
                     if (inbytes_thistime > utftotal - utf8count)
                         inbytes_thistime = utftotal - utf8count;
-#ifdef __GLIBC__
-                    /* glibc returns E2BIG if output overflows, so avoid that */
-                    outbytes_thistime = inbytes_thistime * MB_LEN_MAX;
-#else
-                    outbytes_thistime = (utf8count % 6) + 1;
-#endif
+                    outbytes_thistime = (utf8count % 6) + MB_LEN_MAX;
 
                     /* Perform the conversion */
                     inbytes_left = inbytes_thistime;
@@ -322,9 +313,9 @@ test_iconv_valid(void)
                      * When we get an error without converting any input, check to see if we need to
                      * extend the input to build a complete character
                      */
-                    if (from_utf_ret == (size_t)-1 && inbytes_left == inbytes_thistime
-                        && outbytes_left == outbytes_thistime) {
-                        if (errno == EINVAL || errno == EILSEQ) {
+                    if (from_utf_ret == (size_t)-1 && errno != E2BIG
+                        && inbytes_left == inbytes_thistime && outbytes_left == outbytes_thistime) {
+                        if (errno == EINVAL) {
                             if (inbytes_thistime < utftotal - utf8count
                                 && inbytes_extra < MB_LEN_MAX) {
                                 inbytes_thistime++;

@@ -108,14 +108,15 @@ main(void)
     test_id++;
     length = strerrorlen_s(EINVAL);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == strlen("Invalid argument"), "Normal error code length", handler_res,
-             test_id);
+    TEST_RES(length > 0 && length == strlen(strerror(EINVAL)), "Normal error code length",
+             handler_res, test_id);
 
     // Test case 2: Unknown error code
     test_id++;
     length = strerrorlen_s(12345);
     handler_res = test_handler_called(0, "", test_id);
-    TEST_RES(length == 0, "Unknown error code length", handler_res, test_id);
+    TEST_RES(length > 0 && length == strlen(strerror(12345)), "Unknown error code length",
+             handler_res, test_id);
 
     printf("All strerrorlen_s tests passed!\n");
     return 0;

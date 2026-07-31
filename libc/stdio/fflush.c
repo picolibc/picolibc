@@ -33,15 +33,32 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
+
+static int
+fflush_unlocked(FILE *stream)
+{
+    int ret;
+    __flockfile(stream);
+    ret = __fflush_locked(stream);
+    __funlock_return(stream, ret);
+}
 
 int
 fflush(FILE *stream)
 {
-    int ret = 0;
-    __flockfile(stream);
-    if (stream->flush)
-        ret = (stream->flush)(stream);
-    __atomic_store_ungetc(&stream->unget, 0);
-    __funlock_return(stream, ret);
+#ifdef __STDIO_EXIT_FLUSH
+    if (stream == NULL) {
+        extern FILE * const stdout __weak;
+        extern FILE * const stderr __weak;
+        if (_bufio_exit_flush)
+            _bufio_exit_flush();
+        if (&stdout)
+            fflush_unlocked(stdout);
+        if (&stderr)
+            fflush_unlocked(stderr);
+        return 0;
+    }
+#endif
+    return fflush_unlocked(stream);
 }

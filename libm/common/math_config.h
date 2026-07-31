@@ -443,6 +443,7 @@ force_eval_long_double(long double x)
 #pragma GCC diagnostic ignored "-Wpragmas"
 #pragma GCC diagnostic ignored "-Wunknown-warning-option"
 #pragma GCC diagnostic ignored "-Wattribute-alias="
+#pragma GCC diagnostic ignored "-Wattribute-alias"
 #pragma GCC diagnostic ignored "-Wmissing-attributes"
 #endif
 

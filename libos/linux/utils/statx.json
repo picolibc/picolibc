@@ -1,0 +1,23 @@
+{
+    "name": "statx",
+    "defines": [ { "name": "__GLIBC__", "value": "2" } ],
+    "headers": [ "linux/stat.h" ],
+    "types": [ "struct statx_timestamp" ],
+    "members": [
+	{ "name": "stx_dev_major" },
+	{ "name": "stx_dev_minor" },
+	{ "name": "stx_ino" },
+	{ "name": "stx_mode" },
+	{ "name": "stx_nlink" },
+	{ "name": "stx_uid" },
+	{ "name": "stx_gid" },
+	{ "name": "stx_rdev_major" },
+	{ "name": "stx_rdev_minor" },
+	{ "name": "stx_size" },
+	{ "name": "stx_blksize" },
+	{ "name": "stx_blocks" },
+	{ "name": "stx_atime", "type": "struct statx_timestamp"  },
+	{ "name": "stx_mtime", "type": "struct statx_timestamp"  },
+	{ "name": "stx_ctime", "type": "struct statx_timestamp"  }
+    ]
+}

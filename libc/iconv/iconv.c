@@ -61,8 +61,11 @@ iconv(iconv_t ic, char ** __restrict inbuf, size_t * __restrict inbytesleft,
     while (outbytes) {
         if (ic->buf_len) {
             tocopy = ic->buf_len - ic->buf_off;
-            if (tocopy > outbytes)
-                tocopy = outbytes;
+            if (tocopy > outbytes) {
+                errno = E2BIG;
+                inexact_count = (size_t)-1;
+                break;
+            }
             memcpy(out, ic->buf + ic->buf_off, tocopy);
             out += tocopy;
             outbytes -= tocopy;
@@ -135,10 +138,9 @@ done:
     *outbytesleft = outbytes;
     return inexact_count;
 fail:
-    *inbuf = in;
-    *inbytesleft = inbytes;
     errno = EILSEQ;
-    return (size_t)-1;
+    inexact_count = (size_t)-1;
+    goto done;
 #else
     (void)ic;
 

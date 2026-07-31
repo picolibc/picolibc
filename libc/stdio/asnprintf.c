@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 char *
 asnprintf(char *str, size_t *lenp, const char *fmt, ...)

@@ -29,9 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subrl.h"
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 /* calculate cosh and sinh */

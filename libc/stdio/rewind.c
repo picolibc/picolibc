@@ -33,13 +33,11 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 void
 rewind(FILE *stream)
 {
-    __flockfile(stream);
-    (void)fseek(stream, 0L, SEEK_SET);
     clearerr(stream);
-    __funlockfile(stream);
+    (void)fseek(stream, 0L, SEEK_SET);
 }

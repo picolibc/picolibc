@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #define __MALL 0x01
 #define __MAPP 0x02
@@ -113,6 +113,9 @@ __fmem_seek(FILE *f, off_t pos, int whence)
     case SEEK_END:
         pos += mf->size;
         break;
+    default:
+        errno = EINVAL;
+        return EOF;
     }
     _Static_assert(sizeof(off_t) >= sizeof(size_t), "must avoid truncation");
     if (pos < 0 || (off_t)mf->bufsize < pos)

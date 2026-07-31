@@ -55,8 +55,8 @@ picolibc_sources(
   eprintf.c
   erand48.c
   _Exit.c
+  _findenv.c
   getenv.c
-  getenv_r.c
   getopt.c
   getsubopt.c
   imaxabs.c
@@ -101,6 +101,7 @@ picolibc_sources(
   uctoji.c
   uctoej.c
   uctosj.c
+  unsetenv.c
   utoa.c
   wcrtomb.c
   wcsnrtombs.c
@@ -114,6 +115,9 @@ picolibc_sources(
   exitprocs.c
   onexit.c
   cxa-atexit.c
+  at-quick-exit.c
+  quick-exit.c
+  cxa-at-quick-exit.c
   set_constraint_handler_s.c
   ignore_handler_s.c
   )

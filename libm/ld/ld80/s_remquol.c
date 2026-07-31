@@ -73,7 +73,7 @@ remquol(long double x, long double y, int *quo)
             goto fixup; /* |x|<|y| return x or x-y */
         }
         if (hx == hy && lx == ly) {
-            *quo = 1;
+            *quo = (sxy ? -1 : 1);
             return Zero[sx != 0]; /* |x|=|y| return x*0*/
         }
     }
@@ -117,7 +117,7 @@ remquol(long double x, long double y, int *quo)
             lx = lz + lz;
             q++;
         }
-        q <<= 1;
+        q = lsl(q, 1);
     }
     hz = hx - hy;
     lz = lx - ly;

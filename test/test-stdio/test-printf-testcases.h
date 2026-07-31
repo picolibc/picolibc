@@ -798,24 +798,66 @@ result |= test(__LINE__, "0.123000", "%.*f", -1, printf_float(0.123));
     /* test %s for mbchar string */
     result |= testw(__LINE__, L"foo", L"%.3s", "foobar");
 
-    wchar_t wc = 0x1234;
+    wint_t  wc = 0x1234;
+    wchar_t wb[4] = {};
 
     /* test %lc for wchar_t */
-    wchar_t wb[2] = { 0x1234, 0 };
+    wb[0] = 0x1234;
     result |= testw(__LINE__, wb, L"%lc", wc);
 
     /* make sure %c truncates to char */
     wb[0] = 0x34;
     result |= testw(__LINE__, wb, L"%c", wc);
 
+    result |= testwl(__LINE__, L"ab", 2, L"%.47lc%.0lc", (wint_t)L'a', (wint_t)L'b');
+    result |= testwl(__LINE__, L"a\0b", 3, L"%.47lc%lc%.0lc", (wint_t)L'a', (wint_t)L'\0',
+                     (wint_t)L'b');
+
 #ifndef NO_MBCHAR
-    wb[0] = 0x3330;
-    result |= testw(__LINE__, wb, L"%s", "㌰");
-    result |= test(__LINE__, "$㌰$", "$%lc$", 0x3330);
+    result |= testw(__LINE__, L"$㌰$", L"$%s$", "㌰");
+
+    /* test to make sure we don't output partial chars */
+    result |= test(__LINE__, "$$", "$%.1ls$", L"㌰");
+    result |= test(__LINE__, "$✊$", "$%.3ls$", L"✊㌰");
+
+    /* Make sure precision is ignored for %lc */
+    result |= test(__LINE__, "$㌰$", "$%lc$", (wint_t)L'㌰');
+    result |= test(__LINE__, "$㌰$", "$%.1lc$", (wint_t)L'㌰');
+
+    /* Make sure an error is returned for invalid wide chars (surrogates) */
+    wb[0] = 0xd804; /* high surrogate */
+    wb[1] = 0;
+    result |= testl(__LINE__, "$", FAIL_LEN, "$%ls$", wb);
+    result |= testl(__LINE__, "$", FAIL_LEN, "$%lc$", (wint_t)wb[0]);
+
+    wb[0] = 0xdc05; /* low surrogate */
+    wb[1] = 0;
+    result |= testl(__LINE__, "$", FAIL_LEN, "$%ls$", wb);
+    result |= testl(__LINE__, "$", FAIL_LEN, "$%lc$", (wint_t)wb[0]);
+
+    /* Check a character beyond the BMP */
+    result |= test(__LINE__, "$🚀$", "$%ls$", L"🚀");
+    result |= test(__LINE__, "$$", "$%.3ls$", L"🚀");
+
+    result |= testw(__LINE__, L"$🚀$", L"$%ls$", L"🚀");
+#if __SIZEOF_WCHAR_T__ == 2
+    /* Make sure we don't write a lone surrogate */
+    result |= testw(__LINE__, L"$$", L"$%.1s$", "🚀");
+    result |= testw(__LINE__, L"$$", L"$%.1ls$", L"🚀");
+#else
+    /* this only takes one codepoint with UTF-32 */
+    result |= testw(__LINE__, L"$🚀$", L"$%.1s$", "🚀");
+#endif
+
 #endif
 #ifndef NO_WCHAR
     result |= test(__LINE__, "foobar", "%ls", L"foobar");
-    result |= test(__LINE__, "$c$", "$%lc$", L'c');
+    result |= test(__LINE__, "$c$", "$%lc$", (wint_t)L'c');
+    result |= testl(__LINE__, "ab", 2, "%.47lc%.0lc", (wint_t)L'a', (wint_t)L'b');
+    result
+        |= testl(__LINE__, "a\0b", 3, "%.47lc%lc%.0lc", (wint_t)L'a', (wint_t)L'\0', (wint_t)L'b');
 #endif
+    (void)testl;
+    (void)testwl;
 }
 #endif

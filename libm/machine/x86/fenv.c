@@ -292,19 +292,33 @@ feraiseexcept(int excepts)
 int
 fesetexcept(int excepts)
 {
-    fenv_t fenv;
-
     if (excepts & ~FE_ALL_EXCEPT)
         return EINVAL;
 
-    /* Need to save/restore whole environment to modify status word.  */
-    __asm__ volatile("fnstenv %0" : "=m"(fenv) :);
+    /* Use only SSE when available as that won't trap */
+    if (use_sse()) {
+        unsigned int mxcsr;
+        __asm__("stmxcsr %0" : "=m"(*&mxcsr));
+        mxcsr |= excepts;
+        __asm__("ldmxcsr %0" ::"m"(*&mxcsr));
+    } else {
+        fenv_t fenv;
 
-    /* Set desired exception bits.  */
-    fenv._fpu._fpu_sw |= excepts;
+        /* Need to save/restore whole environment to modify status word.  */
+        __asm__ volatile("fnstenv %0" : "=m"(fenv) :);
 
-    /* Set back into FPU state.  */
-    __asm__ volatile("fldenv %0" ::"m"(fenv));
+        /* Set desired exception bits.  */
+        fenv._fpu._fpu_sw |= excepts;
+
+        /* Don't trap, fail instead */
+        if (~fenv._fpu._fpu_cw & excepts) {
+            __asm__ volatile("fldcw %0" ::"m"(*&fenv._fpu._fpu_cw));
+            return -1;
+        }
+
+        /* Set back into FPU state.  */
+        __asm__ volatile("fldenv %0" ::"m"(fenv));
+    }
 
     return 0;
 }
@@ -363,17 +377,33 @@ fesetexceptflag(const fexcept_t *flagp, int excepts)
     if (excepts & ~FE_ALL_EXCEPT)
         return EINVAL;
 
-    /* Need to save/restore whole environment to modify status word.  */
-    fegetenv(&fenv);
+    __asm__("fnstenv %0" : "=m"(*&fenv));
 
-    /* Set/Clear desired exception bits.  */
-    fenv._fpu._fpu_sw &= ~excepts;
-    fenv._fpu._fpu_sw |= excepts & *flagp;
-    fenv._sse_mxcsr &= ~excepts;
-    fenv._sse_mxcsr |= excepts & *flagp;
+    if (use_sse()) {
+        unsigned int mxcsr;
 
-    /* Set back into FPU state.  */
-    return fesetenv(&fenv);
+        /* Only clear regular FPU flags as setting them would trap */
+        fenv._fpu._fpu_sw &= ~(excepts & ~*flagp);
+        __asm__("fldenv %0" : : "m"(*&fenv));
+
+        /* Set and clear SSE bits */
+        __asm__("stmxcsr %0" : "=m"(*&mxcsr));
+        mxcsr ^= (mxcsr ^ *flagp) & excepts;
+        __asm__("ldmxcsr %0" : : "m"(*&mxcsr));
+    } else {
+        /* Need to save/restore whole environment to modify status word.  */
+        fenv._fpu._fpu_sw ^= (fenv._fpu._fpu_sw ^ *flagp) & excepts;
+
+        /* We're not allowed to trap */
+        if ((~fenv._fpu._fpu_cw) & fenv._fpu._fpu_sw & excepts) {
+            __asm__ volatile("fldcw %0" : : "m"(*&fenv._fpu._fpu_cw));
+            return -1;
+        }
+
+        /* store environment */
+        __asm__("fldenv %0" : : "m"(*&fenv));
+    }
+    return 0;
 }
 
 /*  Returns the currently selected rounding mode, represented by one of the

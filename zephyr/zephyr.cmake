@@ -114,8 +114,15 @@ if(CONFIG_PICOLIBC_USE_MODULE)
   # We need to construct the absolute path to picolibc in same fashion as CMake
   # defines the library file name and location, because a generator expression
   # cannot be used as the CMake linker rule definition doesn't supports them.
+  # Duplicate the absolute path for ld.lld LTO compatibility.
+  #
+  # ld.lld processes archives in a single pass and cannot re-scan after
+  # LTO codegen. Listing the archive twice lets ld.lld resolve libc
+  # symbols that only appear after LTO code generation.
+  #
+  # Harmless for non-LTO builds — the second entry is a no-op.
   set_property(TARGET linker PROPERTY c_library
-      ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}c${CMAKE_STATIC_LIBRARY_SUFFIX}
+      "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}c${CMAKE_STATIC_LIBRARY_SUFFIX} ${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_STATIC_LIBRARY_PREFIX}c${CMAKE_STATIC_LIBRARY_SUFFIX}"
   )
   zephyr_system_include_directories($<TARGET_PROPERTY:c,INTERFACE_SYSTEM_INCLUDE_DIRECTORIES>)
 

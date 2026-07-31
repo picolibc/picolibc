@@ -32,6 +32,7 @@
  */
 
 #define _DEFAULT_SOURCE
+#include <assert.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <string.h>
@@ -44,25 +45,30 @@
 #include <sys/param.h>
 #include <stdint.h>
 
-#if MALLOC_DEBUG
-void __malloc_validate(void);
-void __malloc_validate_block(chunk_t *r);
-#define MALLOC_LOCK          \
-    do {                     \
-        __LIBC_LOCK();       \
-        __malloc_validate(); \
-    } while (0)
-#define MALLOC_UNLOCK        \
-    do {                     \
-        __malloc_validate(); \
-        __LIBC_UNLOCK();     \
-    } while (0)
-#else
-#define __malloc_validate()
-#define __malloc_validate_block(r)
-#define MALLOC_LOCK   __LIBC_LOCK()
-#define MALLOC_UNLOCK __LIBC_UNLOCK()
+#define _UP_POT(x, val, next) (((x) <= 1UL << (val)) ? (val) : (next))
+#define _UP_POT1024(x)        _UP_POT(x, 10, 0)
+#define _UP_POT512(x)         _UP_POT(x, 9, _UP_POT1024(x))
+#define _UP_POT256(x)         _UP_POT(x, 8, _UP_POT512(x))
+#define _UP_POT128(x)         _UP_POT(x, 7, _UP_POT256(x))
+#define _UP_POT64(x)          _UP_POT(x, 6, _UP_POT128(x))
+#define _UP_POT32(x)          _UP_POT(x, 5, _UP_POT64(x))
+#define _UP_POT16(x)          _UP_POT(x, 4, _UP_POT32(x))
+#define UP_POT(x)             _UP_POT16(x)
+
+/*
+ * Allocations smaller than this will get rounded up to the next power
+ * of two.  When allocations of these sizes are freed, they are placed
+ * in unsorted per-size free lists.
+ */
+
+#if __MALLOC_SMALL_BUCKET
+#define MALLOC_MAX_BUCKET_POT UP_POT(__MALLOC_SMALL_BUCKET)
+#if MALLOC_MAX_BUCKET_POT == 0
+#error __MALLOC_SMALL_BUCKET too large
 #endif
+#endif
+
+// #define MALLOC_DEBUG 1
 
 #if __STDC_VERSION__ >= 201112L
 typedef max_align_t align_chunk_t;
@@ -77,7 +83,7 @@ typedef union {
 #endif
 
 /*          --------------------------------------
- *          | size                               |
+ *    (head)| chunk size                         |
  *   chunk->| When allocated: data               |
  *          | When freed: pointer to next free   |
  *          | chunk                              |
@@ -111,29 +117,54 @@ typedef struct malloc_chunk {
  * may be smaller on some targets when size_t is smaller than
  * align_chunk_t.
  */
-#define MALLOC_HEAD_ALIGN _Alignof(head_t)
+#define MALLOC_HEAD_ALIGN  _Alignof(head_t)
 
-#define MALLOC_HEAD       sizeof(head_t)
+#define MALLOC_ALIGN_EXTRA (MALLOC_CHUNK_ALIGN - MALLOC_HEAD_ALIGN)
+
+#define MALLOC_HEAD_SIZE   sizeof(head_t)
+
+#define MALLOC_CHUNK_SIZE  sizeof(chunk_t)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN (0x1000)
 
-/* Minimum allocation size */
-#define MALLOC_MINSIZE __align_up(MALLOC_HEAD + sizeof(chunk_t), MALLOC_HEAD_ALIGN)
+/* Minimum chunk size */
+#define MALLOC_CHUNK_MIN __align_up(MALLOC_CHUNK_SIZE + MALLOC_HEAD_SIZE, MALLOC_CHUNK_ALIGN)
+
+/* Maximum chunk size */
+#define MALLOC_CHUNK_MAX (SIZE_MAX - 2 * MAX(MALLOC_CHUNK_SIZE, MALLOC_CHUNK_ALIGN))
 
 /* Maximum allocation size */
-#define MALLOC_MAXSIZE (SIZE_MAX - (MALLOC_HEAD + 2 * MALLOC_CHUNK_ALIGN))
+#define MALLOC_ALLOC_MAX (MALLOC_CHUNK_MAX - MALLOC_HEAD_SIZE)
 
 static inline size_t *
 _size_ref(chunk_t *chunk)
 {
-    return (size_t *)((char *)chunk - MALLOC_HEAD);
+    return (size_t *)((char *)chunk - MALLOC_HEAD_SIZE);
+}
+
+static inline void
+_mark_free(chunk_t *c)
+{
+    *_size_ref(c) |= 1;
+}
+
+static inline void
+_mark_busy(chunk_t *c)
+{
+    *_size_ref(c) &= ~(size_t)1;
+}
+
+static inline bool
+_is_free(chunk_t *c)
+{
+    return *_size_ref(c) & 1;
 }
 
 static inline size_t
 _size(chunk_t *chunk)
 {
-    return *_size_ref(chunk);
+    return *_size_ref(chunk) & ~(size_t)1;
 }
 
 static inline void
@@ -142,13 +173,56 @@ _set_size(chunk_t *chunk, size_t size)
     *_size_ref(chunk) = size;
 }
 
+#ifdef __MALLOC_ERROR_ABORT
+__noreturn bool __malloc_error(const char *msg);
+#define _check_busy(c, msg) (_is_free(c) ? __malloc_error(msg) : true)
+#define _check_free(c, msg) (!_is_free(c) ? __malloc_error(msg) : true)
+#else
+#define _check_busy(c, msg) (!_is_free(c) ? true : (errno = ENOMEM, false))
+#define _check_free(c, msg) (_is_free(c) ? true : (errno = ENOMEM, false))
+#endif
+
+#if MALLOC_DEBUG
+void __malloc_validate(void);
+void __malloc_validate_chunk(chunk_t *c);
+#define MALLOC_LOCK          \
+    do {                     \
+        __LIBC_LOCK();       \
+        __malloc_validate(); \
+    } while (0)
+#define MALLOC_UNLOCK        \
+    do {                     \
+        __malloc_validate(); \
+        __LIBC_UNLOCK();     \
+    } while (0)
+#else
+#define __malloc_validate()
+#define __malloc_validate_chunk(c)
+#define MALLOC_LOCK   __LIBC_LOCK()
+#define MALLOC_UNLOCK __LIBC_UNLOCK()
+#endif
+
 /* Forward data declarations */
 extern chunk_t *__malloc_free_list;
 extern char    *__malloc_sbrk_start;
 extern char    *__malloc_sbrk_top;
 
-#if MALLOC_DEBUG
-#else
+#ifdef MALLOC_MAX_BUCKET_POT
+
+/* Every power-of-two bucket gets padded by this amount */
+#define BUCKET_EXTRA        __align_up(MALLOC_HEAD_SIZE, MALLOC_CHUNK_ALIGN)
+
+#define BUCKET_SIZE(bucket) (((size_t)1 << ((bucket) + MIN_BUCKET_POT)) + BUCKET_EXTRA)
+
+#define MALLOC_MAX_BUCKET   (BUCKET_SIZE(MALLOC_MAX_BUCKET_POT - MIN_BUCKET_POT))
+
+#define MIN_BUCKET_POT      (UP_POT(MALLOC_CHUNK_MIN))
+#define MAX_BUCKET_POT      MALLOC_MAX_BUCKET_POT
+#define NUM_BUCKET_POT      (MAX_BUCKET_POT - MIN_BUCKET_POT + 1)
+
+#define BUCKET_NUM(s)       (UP_POT(s - BUCKET_EXTRA) - MIN_BUCKET_POT)
+
+extern chunk_t *__malloc_bucket_list[NUM_BUCKET_POT];
 #endif
 
 bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
@@ -179,21 +253,21 @@ chunk_to_ptr(chunk_t *c)
 }
 
 /* Convert address of chunk region to chunk pointer */
-static inline chunk_t *
+static inline chunk_t * __disable_sanitizer
 blob_to_chunk(void *blob)
 {
-    return (chunk_t *)((char *)blob + MALLOC_HEAD);
+    return (chunk_t *)((char *)blob + MALLOC_HEAD_SIZE);
 }
 
 /* Convert chunk pointer to address of chunk region */
-static inline void *
+static inline void * __disable_sanitizer
 chunk_to_blob(chunk_t *c)
 {
-    return (void *)((char *)c - MALLOC_HEAD);
+    return (void *)((char *)c - MALLOC_HEAD_SIZE);
 }
 
 /* end of chunk -- address of first byte past chunk storage */
-static inline void *
+static inline void * __disable_sanitizer
 chunk_end(chunk_t *c)
 {
     size_t *s = _size_ref(c);
@@ -201,7 +275,7 @@ chunk_end(chunk_t *c)
 }
 
 /* next chunk in memory -- address of chunk header past this chunk */
-static inline chunk_t *
+static inline __disable_sanitizer chunk_t *
 chunk_after(chunk_t *c)
 {
     return (chunk_t *)((char *)c + _size(c));
@@ -211,25 +285,30 @@ chunk_after(chunk_t *c)
 static inline size_t
 chunk_size(size_t malloc_size)
 {
-    /* Keep all blocks aligned */
+    /* Make space for the header */
+    malloc_size += MALLOC_HEAD_SIZE;
+
+    /* Align */
     malloc_size = __align_up(malloc_size, MALLOC_CHUNK_ALIGN);
 
-    /* Add space for header */
-    malloc_size += MALLOC_HEAD;
+    /* At least MALLOC_CHUNK_MIN bytes */
+    malloc_size = MAX(MALLOC_CHUNK_MIN, malloc_size);
 
-    /* fill the gap between chunks */
-    malloc_size += (MALLOC_CHUNK_ALIGN - MALLOC_HEAD_ALIGN);
-
-    /* Make sure the requested size is big enough to hold a free chunk */
-    malloc_size = MAX(MALLOC_MINSIZE, malloc_size);
     return malloc_size;
+}
+
+/* Usable bytes out of a chunk */
+static inline size_t
+malloc_size(size_t chunk_size)
+{
+    return chunk_size - MALLOC_HEAD_SIZE;
 }
 
 /* available storage in chunk */
 static inline size_t
 chunk_usable(chunk_t *c)
 {
-    return _size(c) - MALLOC_HEAD;
+    return malloc_size(_size(c));
 }
 
 /* assign 'size' to the specified chunk and return it to the free

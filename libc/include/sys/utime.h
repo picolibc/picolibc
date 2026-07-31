@@ -34,6 +34,12 @@ SUCH DAMAGE.
    it will override this one.  */
 
 #include <sys/cdefs.h>
+#include <sys/_types.h>
+
+#ifndef _TIME_T_DECLARED
+typedef __time_t time_t;
+#define _TIME_T_DECLARED
+#endif
 
 _BEGIN_STD_C
 

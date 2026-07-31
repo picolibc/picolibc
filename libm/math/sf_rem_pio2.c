@@ -152,26 +152,21 @@ __rem_pio2f(float x, float *y)
     /* Convert to floating point */
     float   y0 = irem;
 
-    int64_t iy0;
-
-#if defined(__RX__)
-    /* float to 128-bit int conversions are broken on this target */
+    /*
+     * Convert y0 back to a 64-bit int. Avoid using a simple cast as
+     * libgcc performs that with a 64-bit float intermediate value.
+     */
     int32_t y0i;
     GET_FLOAT_WORD(y0i, y0);
     uint32_t sig = (y0i & 0xffffff) | 0x800000;
     int      exp = ((y0i >> 23) & 0xff) - (127 + 23);
 
-    iy0 = (int64_t)sig;
-    if (exp >= 0)
-        iy0 <<= exp;
-    else
-        iy0 >>= -exp;
+    /* exp is always > 0 because |y0| > 0x1p31 */
+    int64_t  iy0 = (int64_t)sig << exp;
     if (y0i < 0)
         iy0 = -iy0;
-#else
-    iy0 = (int64_t)y0;
-#endif
 
+    /* Subtract off the portion in 'y0'. */
     float y1 = irem - iy0;
 
     /* Scale back to the final range */

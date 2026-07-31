@@ -138,13 +138,14 @@ typedef unsigned int width_t;
 #else
 #define FL_LONGLONG 0x00 /* 'long long' type modifier    */
 #endif
-#define FL_CHAR  0x10  /* 'char' type modifier		*/
-#define FL_SHORT 0x20  /* 'short' type modifier	*/
-#define FL_MINUS 0x40  /* minus flag (field or value)	*/
-#define FL_ANY   0x80  /* any digit was read	        */
-#define FL_OVFL  0x100 /* significand overflowed       */
-#define FL_DOT   0x200 /* decimal '.' was	        */
-#define FL_MEXP  0x400 /* exponent 'e' is neg.	        */
-#define FL_FHEX  0x800 /* hex significand              */
+#define FL_CHAR  0x10   /* 'char' type modifier		*/
+#define FL_SHORT 0x20   /* 'short' type modifier	*/
+#define FL_MINUS 0x40   /* minus flag (field or value)	*/
+#define FL_ANY   0x80   /* any digit was read	        */
+#define FL_OVFL  0x100  /* significand overflowed       */
+#define FL_DOT   0x200  /* decimal '.' was	        */
+#define FL_MEXP  0x400  /* exponent 'e' is neg.	        */
+#define FL_FHEX  0x800  /* hex significand              */
+#define FL_TWO   0x1000 /* more than one digit was read */
 
 #endif /* _SCANF_PRIVATE_H_ */

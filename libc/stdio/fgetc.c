@@ -29,7 +29,7 @@
 
 /* $Id: fgetc.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #undef getc
 #undef getc_unlocked

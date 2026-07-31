@@ -44,6 +44,9 @@ _start:
     // Setup stack pointer
     r0 = ##__stack
     sp = and (r0, #-16)
+    // Setup GP register for small data area
+    r0 = ##_SDA_BASE_
+    gp = r0
     jump _cstart
     .size _start, . - _start
 

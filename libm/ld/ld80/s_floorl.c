@@ -73,6 +73,12 @@ floorl(long double x)
                         i0 += 1; /* got a carry */
                     i1 = j;
                 }
+                /* overflow */
+                if (i0 == 0) {
+                    i0 = (u_int32_t)1 << 31;
+                    se++;
+                    i1 >>= 1;
+                }
             }
             i1 &= (~i);
         }

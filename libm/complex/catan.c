@@ -82,15 +82,10 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subr.h"
+#include "local-complex.h"
 
-#ifdef __weak_alias
-__weak_alias(catan, _catan)
-#endif
-
-    double complex catan(double complex z)
+double complex
+catan(double complex z)
 {
     double complex w;
     double         a, t, x, x2, y;
@@ -114,13 +109,13 @@ __weak_alias(catan, _catan)
 
     t = y + 1.0;
     a = (x2 + (t * t)) / a;
-    w = w + (0.25 * log(a)) * (double complex)I;
+    w = CMPLX(w, 0.25 * log(a));
     return w;
 
 ovrf:
 #if 0
-	mtherr ("catan", OVERFLOW);
+    mtherr ("catan", OVERFLOW);
 #endif
-    w = HUGE_VAL + HUGE_VAL * (double complex)I;
+    w = CMPLX(HUGE_VAL, HUGE_VAL);
     return w;
 }

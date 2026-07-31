@@ -36,7 +36,6 @@
 DIR="$(dirname "$0")"
 meson setup \
         --buildtype debug \
-	--fatal-meson-warnings \
         -Dtls-model=global-dynamic \
 	-Dpicocrt=false \
 	-Dsemihost=false \

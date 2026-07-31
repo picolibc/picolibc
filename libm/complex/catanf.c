@@ -32,15 +32,10 @@
  * Marco Atzeri <marco_atzeri@yahoo.it>
  */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subrf.h"
+#include "local-complex.h"
 
-#ifdef __weak_alias
-__weak_alias(catanf, _catanf)
-#endif
-
-    float complex catanf(float complex z)
+float complex
+catanf(float complex z)
 {
     float complex w;
     float         a, t, x, x2, y;
@@ -69,8 +64,8 @@ __weak_alias(catanf, _catanf)
 
 ovrf:
 #if 0
-	mtherr ("catan", OVERFLOW);
+    mtherr ("catan", OVERFLOW);
 #endif
-    w = HUGE_VALF + HUGE_VALF * I;
+    w = CMPLXF(HUGE_VALF, HUGE_VALF);
     return w;
 }

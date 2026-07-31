@@ -9,7 +9,6 @@ INDEX
         clog10f
 
 SYNOPSIS
-       #define _DEFAULT_SOURCE
        #include <complex.h>
        double complex clog10(double complex <[z]>);
        float complex clog10f(float complex <[z]>);
@@ -31,8 +30,7 @@ PORTABILITY
 */
 
 #define _GNU_SOURCE
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
@@ -44,7 +42,7 @@ clog10l(long double complex z)
     rr = cabsl(z);
     p = log10l(rr);
     rr = atan2l(cimagl(z), creall(z)) * _M_IVLN10L;
-    return (long double complex)p + rr * (long double complex)I;
+    return CMPLXL(p, rr);
 }
 
 #endif

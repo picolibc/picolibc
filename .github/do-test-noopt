@@ -3,17 +3,22 @@ HERE=`dirname "$0"`
 TARGET=$1
 shift
 
-ANALYZER="-Danalyzer=true"
-
-# Disable analyzer on m68k because the compiler gets very confused
-# about complex values
+OPTIONS=""
 
 case "$TARGET" in
     *m68k*)
-	ANALYZER=""
+	# Disable analyzer on m68k because the compiler gets very confused
+	# about complex values
+
+	OPTIONS="$OPTIONS -Danalyzer=false"
+	;;
+    *msp430*)
+
+	# Use traps with the sanitizer on msp430 as the handlers make many
+	# tests too large
+
+	OPTIONS="$OPTIONS -Dsanitize-trap-on-error=true"
 	;;
 esac
 
-OPTIONS="$ANALYZER"
-
-"$HERE"/do-run "$TARGET" $OPTIONS "$@"
+"$HERE"/do-run "$TARGET" "$@" $OPTIONS

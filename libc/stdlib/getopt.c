@@ -112,7 +112,7 @@ int        opterr = 1;
 int        optopt = '?';
 
 /* static variables */
-static int optwhere = 0;
+static int optwhere = 1;
 static int permute_from = 0;
 static int num_nonopts = 0;
 
@@ -295,7 +295,15 @@ getopt_internal(int argc, char * const argv[], const char *shortopts, const stru
                 else {
                     if (longopt_match < 0)
                         longopt_match = optindex;
-                    else {
+                    else if (!only && longopts[longopt_match].has_arg == longopts[optindex].has_arg
+                             && longopts[longopt_match].flag == longopts[optindex].flag
+                             && longopts[longopt_match].val == longopts[optindex].val) {
+                        /*
+                         * The two options are "the same"
+                         * so the ambiguity doesn't matter
+                         */
+                        ;
+                    } else {
                         /* we have ambiguous options */
                         if (data->opterr) {
                             fputs(argv[0], stderr);

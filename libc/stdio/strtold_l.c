@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #if defined(__HAVE_LONG_DOUBLE) && !defined(_LDBL_EQ_DBL)
 

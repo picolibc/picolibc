@@ -187,9 +187,111 @@ use Picolibc:
  * [Picolibc as embedded source](doc/embedsource.md)
  * [Releasing Picolibc](doc/releasing.md)
  * [Copyright and license information](COPYING.picolibc)
+ * [Thread Safety in Picolibc](doc/thread-safety.md)
 
 ## Releases
 
+### Picolibc release 1.8.12
+
+ * Native Linux support on a couple of architectures. This allows
+   building of numerous Linux applications and test cases.
+
+ * Clean up some picolibc structs that attempted to match native Linux
+   layout. Instead, map the contents at runtime, just like the new
+   native linux syscall support does.
+
+ * Eliminate off64_t type; off_t is always 64 bits.
+
+ * Fix iconv to not write partial codepoints to conform
+   to the spec.
+
+ * vfprintf("%lc") takes a wint_t parameter, not int. This only
+   matters when int is smaller than 32 bits (as on msp430).  Make %lc
+   work with a L'\0' value and ignore any specified precision.
+
+ * Fix some corner cases in vfprintf when wchar_t is 16 bits.
+
+ * Use an array for strerror instead of a switch statement.
+
+ * In ARM semihosting, preserve LR register and add an option
+   to use hlt instead of svc for arm arch >= 8 as that's the
+   new recommendation. Thanks to Simi Pallipurath.
+
+ * Add POSIX group file functions (getgrname et al).
+
+ * Add vectorized memset, memcpy and memmove for RISC-V. Thanks to
+   Pincheng Wang.
+
+ * Eliminate recursive locking of libc lock.
+
+ * Simplify arc4random state and fork detection logic.
+
+ * Fix possible NULL pointer dereference in the mbrtoc
+   functions. Thanks to Gergely Futo.
+
+ * Provide semihosting calls for Hexagon. Thanks to Kushal Pal and
+   Zain Siddavatam.
+
+ * Fix vfprintf_s thread safety analysis warning. Thanks to Brian
+   Cain.
+
+ * Add clang thread safety analysis annotations for functions which
+   change lock state.  Thanks to Brian Cain.
+
+ * Fix strerror_r to handle missing entries in errnames array. Thanks
+   to mrashad.
+
+ * Remove --gc-sections from picolibc.specs. This was more important
+   when the vfprintf and vfscanf variants were tied together to avoid
+   pulling in a vfscanf implementation.
+
+ * Make CI report the detected code formatting errors. Thanks to
+   Kushal Pal.
+
+ * Add 32-bit vector implementations for memmove, memcpy and
+   memset. Thanks to Abdallah Abdelhafeez.
+
+ * Fix generic C version of riscv memcpy so the loop only copies 8
+   elements rather than 9. Thanks to Abdallah Abdelhafeez.
+   
+ * Add fopencookie and open_memstream. Thanks to Alexey Lapshin.
+
+ * Improve performance of riscv strcmp function by re-ordering
+   instructions. Thanks to Abdallah Abdelhafeez.
+
+ * Add Hexagon floating point environment support. Thanks to Zain
+   Siddavatam.
+
+ * Fix bufio lazy lock initialization race. Thanks to Kushal Pal.
+
+ * Add support for riscv Zcmt extension. Thanks to Sam Elliott.
+
+ * Fix fflush(NULL) when -Dstdio-exit-flush=true. Thanks to Kushal Pal
+   for finding this bug.
+
+ * Test arm code using FVP. Thanks to Mark Murray.
+
+ * Add Hexagon assembly for various memory/string operations. Thanks
+   to Kushal Pal.
+
+ * Make directory used by various temporary file functions
+   configurable. Use /tmp for the native Linux ports. Thanks to Zain
+   Siddavatam.
+
+ * Add Hexagon optimized math functions. Thanks to Zain Siddavatam.
+
+ * Initialize AArch64 SME in picocrt. Thanks to Mark Murray.
+
+ * Add crt variant that enables riscv zicfilp/zicfiss features. Thanks
+   to Ahmed Shehab.
+
+ * Add dynamic linking support for Hexagon. Thanks to Kushal Pal.
+
+ * Add quick_exit and at_quick_exit. Thanks to Kushal Pal.
+
+ * Fix undefined behavior in floating point printf. Thanks to Alberto
+   Escolar Piedras.
+ 
 ### Picolibc release 1.8.11
 
  * Use __math_inexact to generate FE_INEXACT in several math

@@ -74,8 +74,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 double complex
 clog(double complex z)
@@ -85,5 +84,5 @@ clog(double complex z)
     rr = cabs(z);
     p = log(rr);
     rr = atan2(cimag(z), creal(z));
-    return (double complex)p + rr * (double complex)I;
+    return CMPLX(p, rr);
 }

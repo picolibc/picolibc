@@ -34,16 +34,45 @@
 #
 picolibc_sources(
   basename.c
+  creat.c
   collcmp.c
   dirname.c
+  endgrent.c
+  endpwent.c
+  execl.c
+  execv.c
+  execvp.c
+  execvpe.c
+  fgetgrent.c
+  fgetgrent_r.c
+  fgetpwent.c
+  fgetpwent_r.c
   fnmatch.c
-  fpathconf.c
-  pathconf.c
+  getgrent.c
+  getgrent_r.c
+  getgrgid.c
+  getgrgid_r.c
+  getgrnam.c
+  getgrnam_r.c
+  getlogin.c
+  getpass.c
+  getpwent.c
+  getpwnam.c
+  getpwnam_r.c
+  getpwuid.c
+  getpwuid_r.c
+  grdata.c
+  grfile.c
+  pwdata.c
   regcomp.c
   regerror.c
   regexec.c
   regfree.c
+  setgrent.c
+  setpwent.c
+  sleep.c
   strfmon.c
   strfmon_l.c
   vstrfmon.c
+  wait.c
   )

@@ -1,24 +1,23 @@
 [binaries]
-c = ['i686-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
-cpp = ['i686-linux-gnu-g++', '-march=core2', '-mfpmath=sse', '-msse2', '-fno-pic', '-fno-PIE', '-static', '-nostdlib']
+c = ['i686-linux-gnu-gcc', '-march=core2', '-mfpmath=sse', '-msse2']
+cpp = ['i686-linux-gnu-g++', '-march=core2', '-mfpmath=sse', '-msse2']
 ar = 'i686-linux-gnu-ar'
 as = 'i686-linux-gnu-as'
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
 objcopy = 'i686-linux-gnu-objcopy'
-# only needed to run tests
-exe_wrapper = ['env', 'run-i386']
+exe_wrapper = 'env'
 
 [host_machine]
 system='linux'
 cpu_family='x86'
-cpu='i386'
+cpu='x86'
 endian='little'
 
 [properties]
 skip_sanity_check = true
-needs_exe_wrapper = true
 link_spec = '--build-id=none'
+target_c_args = ['-static', '-fno-pic', '-fno-PIE', '-nostdlib', '-nostartfiles', '-Wl,--build-id=none']
 default_flash_addr = '0x00100000'
 default_flash_size = '0x00400000'
 default_ram_addr   = '0x00500000'

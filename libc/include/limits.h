@@ -4,6 +4,7 @@
 
 #include <sys/cdefs.h>
 #include <sys/syslimits.h>
+#include <sys/_types.h>
 
 #ifndef __MB_LEN_MAX
 #ifdef __MB_CAPABLE
@@ -17,6 +18,12 @@
 /* Maximum number of positional arguments, if __IO_POS_ARGS.  */
 #ifndef NL_ARGMAX
 #define NL_ARGMAX 32
+#endif
+
+#if __POSIX_VISIBLE
+#ifndef SSIZE_MAX
+#define SSIZE_MAX __SSIZE_MAX__
+#endif
 #endif
 
 /* if do not have #include_next support, then we

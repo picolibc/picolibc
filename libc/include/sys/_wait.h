@@ -33,6 +33,9 @@ SUCH DAMAGE.
 
 #define WNOHANG   1
 #define WUNTRACED 2
+#if (_XOPEN_SOURCE - 0) >= 500
+#define WCONTINUED 4
+#endif
 
 /* A status looks like:
       <1 byte info> <1 byte code>
@@ -43,11 +46,12 @@ SUCH DAMAGE.
       <code> == 80, there was a core dump.
 */
 
-#define WIFEXITED(w)   (((w) & 0xff) == 0)
-#define WIFSIGNALED(w) (((w) & 0x7f) > 0 && (((w) & 0x7f) < 0x7f))
-#define WIFSTOPPED(w)  (((w) & 0xff) == 0x7f)
-#define WEXITSTATUS(w) (((w) >> 8) & 0xff)
-#define WTERMSIG(w)    ((w) & 0x7f)
-#define WSTOPSIG       WEXITSTATUS
+#define WEXITSTATUS(w)     (((w) >> 8) & 0xff)
+#define WTERMSIG(w)        ((w) & 0x7f)
+#define WSTOPSIG(w)        WEXITSTATUS(w)
+#define WIFEXITED(w)       (WTERMSIG(w) == 0)
+#define WIFSIGNALED(w)     (((signed char)(((w) & 0x7f) + 1) >> 1) > 0)
+#define WIFSTOPPED(w)      (((w) & 0xff) == 0x7f)
+#define __W_EXITCODE(e, s) (((e) << 8) | (s))
 
 #endif

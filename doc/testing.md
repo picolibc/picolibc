@@ -26,7 +26,7 @@ Again, create a directory and build there:
 
     $ mkdir build-native
     $ cd build-native
-    $ ../do-native-configure
+    $ ../scripts/do-native-configure
     $ ninja
 
 This will also build a test case for printf and scanf in the

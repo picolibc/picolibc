@@ -47,9 +47,13 @@ foreach params : targets
   target_c_args = params['c_args']
 
   _libs = [get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+  if is_variable(oslib_test + target)
+    _libs += [get_variable(oslib_test + target)]
   endif
+  if is_variable(libfallback_var + target)
+    _libs += [get_variable(libfallback_var + target)]
+  endif
+
   if is_variable(crt0_test + target)
     _objs = [get_variable(crt0_test + target)]
   else
@@ -67,7 +71,7 @@ foreach params : targets
 
     src = test + '.c'
     test(test_name,
-	 executable(test_name, src,
+	 executable(test_name, [src] + test_lock_valid,
 		    c_args:  _c_args,
 		    link_args: _link_args,
 		    objects: _objs,

@@ -24,9 +24,8 @@ set(TEST_RUNNER run-arm)
 
 set(PICOLIBC_LINK_FLAGS
   --ld-path=/usr/bin/arm-none-eabi-ld
+  -L/usr/lib/gcc/arm-none-eabi/15/thumb/v6-m/nofp/
   -L/usr/lib/gcc/arm-none-eabi/14.2.1/thumb/v6-m/nofp/
-  -L/usr/lib/gcc/arm-none-eabi/13.3.1/thumb/v6-m/nofp/
-  -L/usr/lib/gcc/arm-none-eabi/13.2.1/thumb/v6-m/nofp/
   -Wl,-z,noexecstack
   -Wl,-no-enum-size-warning
   -T ${CMAKE_CURRENT_SOURCE_DIR}/cmake/TC-arm-none-eabi.ld

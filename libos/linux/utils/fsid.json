@@ -1,0 +1,8 @@
+{
+    "name": "__fsid",
+    "typedef": "__fsid_t",
+    "headers": [ "sys/statfs.h" ],
+    "members": [
+	{ "name": "__val", "array": "true" }
+    ]
+}

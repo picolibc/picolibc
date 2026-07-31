@@ -110,25 +110,25 @@ __retarget_lock_close_recursive(_LOCK_T lock)
     (void)lock;
 }
 
-void
+void __no_thread_safety_analysis
 __retarget_lock_acquire(_LOCK_T lock)
 {
     (void)lock;
 }
 
-void
+void __no_thread_safety_analysis
 __retarget_lock_acquire_recursive(_LOCK_T lock)
 {
     (void)lock;
 }
 
-void
+void __no_thread_safety_analysis
 __retarget_lock_release(_LOCK_T lock)
 {
     (void)lock;
 }
 
-void
+void __no_thread_safety_analysis
 __retarget_lock_release_recursive(_LOCK_T lock)
 {
     (void)lock;

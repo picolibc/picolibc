@@ -38,7 +38,7 @@ typedef __WCHAR_TYPE__ _wchar_t;
 #else
 #define __need_wchar_t
 #include <stddef.h>
-typdef wchar_t _wchar_t;
+typedef wchar_t _wchar_t;
 #endif
 
 #define __STRINGIFY(a) #a

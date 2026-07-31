@@ -29,7 +29,7 @@
 
 /* $Id: fputs.c 1944 2009-04-01 23:12:20Z arcanum $ */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 fputws(const wchar_t *str, FILE *stream)

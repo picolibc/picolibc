@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 __bufio_close(FILE *f)
@@ -56,6 +56,7 @@ __bufio_close(FILE *f)
      */
     if (bf->bflags & __BFALL) {
         ret = bufio_close(bf);
+        bufio_remove_file(f);
         free(f);
     }
     return ret;

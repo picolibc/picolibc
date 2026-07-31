@@ -7,7 +7,7 @@ nm = 'x86_64-elf-nm'
 strip = 'x86_64-elf-strip'
 objcopy = 'x86_64-elf-objcopy'
 # only needed to run tests
-exe_wrapper = ['env', 'run-x86_64']
+exe_wrapper = ['env', 'run-x86']
 
 [host_machine]
 system='linux'

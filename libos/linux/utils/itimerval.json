@@ -1,0 +1,9 @@
+{
+    "name": "itimerval",
+    "headers": [ "linux/time.h" ],
+    "types": [ "struct timeval" ],
+    "members": [
+	{ "name": "it_interval", "type": "struct timeval" },
+	{ "name": "it_value", "type": "struct timeval" }
+    ]
+}

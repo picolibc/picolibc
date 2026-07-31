@@ -49,7 +49,7 @@ ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
     if (ndigit < 0)
         ndigit = 0;
 
-    if ((size_t)ndigit > len - 1)
+    if ((size_t)ndigit >= len)
         return -1;
 
     if (!isfinite(invalue)) {
@@ -76,7 +76,7 @@ ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
 
 #elif __SIZEOF_DOUBLE__ == 4
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 ecvt_r(double invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)

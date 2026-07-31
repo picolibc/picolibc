@@ -71,7 +71,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
+#include "local-complex.h"
 #include "../common/fdlibm.h"
 
 double

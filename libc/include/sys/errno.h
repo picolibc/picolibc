@@ -33,28 +33,6 @@ SUCH DAMAGE.
 #ifndef _SYS_ERRNO_H_
 #define _SYS_ERRNO_H_
 
-#include <sys/cdefs.h>
-
-_BEGIN_STD_C
-
-#if __GNU_VISIBLE
-char *_user_strerror(int errnum, int internal, int *errptr);
-#endif
-
-#ifdef __GLOBAL_ERRNO
-#define __THREAD_LOCAL_ERRNO
-#else
-#define __THREAD_LOCAL_ERRNO __THREAD_LOCAL
-#endif
-
-#ifdef __PICOLIBC_ERRNO_FUNCTION
-int *__PICOLIBC_ERRNO_FUNCTION(void);
-#define errno (*__PICOLIBC_ERRNO_FUNCTION())
-#else
-extern __THREAD_LOCAL_ERRNO int errno;
-#define errno errno
-#endif
-
 #define EPERM           1      /* Not owner */
 #define ENOENT          2      /* No such file or directory */
 #define ESRCH           3      /* No such process */
@@ -186,7 +164,5 @@ extern __THREAD_LOCAL_ERRNO int errno;
 #define EWOULDBLOCK     EAGAIN /* Operation would block */
 
 #define __ELASTERROR    2000 /* Users can add values starting here */
-
-_END_STD_C
 
 #endif /* _SYS_ERRNO_H */

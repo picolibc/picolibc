@@ -89,4 +89,4 @@ $qemu \
         -rtc clock=vm \
         -icount shift=6,align=off,sleep=off \
 	-nographic \
-	-kernel "$elf"
+	-kernel "$elf" "$@"

@@ -75,30 +75,32 @@ ANSI C requires <<mktime>>.
 <<mktime>> and <<timegm>> require no supporting OS subroutines.
 */
 
-#define _DEFAULT_SOURCE
+#include "local.h"
 #include <stdlib.h>
 #include <time.h>
-#include "local.h"
+#include <errno.h>
+#include <stdbool.h>
 
 #define _DAYS_IN_MONTH(x) ((x == 1) ? days_in_feb : __month_lengths[0][x])
 
 static const int16_t _DAYS_BEFORE_MONTH[12]
     = { 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334 };
 
-#define _DAYS_IN_YEAR(year) (isleap(year + YEAR_BASE) ? 366 : 365)
+#define _DAYS_IN_YEAR(year) (365 + isleap2(year, YEAR_BASE))
 
 static void
-set_tm_wday(long days, struct tm *tim_p)
+set_tm_wday(time_t days, struct tm *tim_p)
 {
     if ((tim_p->tm_wday = (days + 4) % 7) < 0)
         tim_p->tm_wday += 7;
 }
 
-static void
+static bool
 validate_structure(struct tm *tim_p)
 {
     div_t res;
     int   days_in_feb = 28;
+    int   year_off = 0;
 
     /* calculate time & date to account for out of range values */
     if (tim_p->tm_sec < 0 || tim_p->tm_sec > 59) {
@@ -130,22 +132,22 @@ validate_structure(struct tm *tim_p)
 
     if (tim_p->tm_mon < 0 || tim_p->tm_mon > 11) {
         res = div(tim_p->tm_mon, 12);
-        tim_p->tm_year += res.quot;
+        year_off += res.quot;
         if ((tim_p->tm_mon = res.rem) < 0) {
             tim_p->tm_mon += 12;
-            --tim_p->tm_year;
+            year_off--;
         }
     }
 
-    if (isleap(tim_p->tm_year + YEAR_BASE))
+    if (isleap2(tim_p->tm_year, year_off + YEAR_BASE))
         days_in_feb = 29;
 
     if (tim_p->tm_mday <= 0) {
         while (tim_p->tm_mday <= 0) {
             if (--tim_p->tm_mon == -1) {
-                tim_p->tm_year--;
+                year_off--;
                 tim_p->tm_mon = 11;
-                days_in_feb = (isleap(tim_p->tm_year + YEAR_BASE) ? 29 : 28);
+                days_in_feb = (isleap2(tim_p->tm_year, year_off + YEAR_BASE) ? 29 : 28);
             }
             tim_p->tm_mday += _DAYS_IN_MONTH(tim_p->tm_mon);
         }
@@ -153,23 +155,30 @@ validate_structure(struct tm *tim_p)
         while (tim_p->tm_mday > _DAYS_IN_MONTH(tim_p->tm_mon)) {
             tim_p->tm_mday -= _DAYS_IN_MONTH(tim_p->tm_mon);
             if (++tim_p->tm_mon == 12) {
-                tim_p->tm_year++;
+                year_off++;
                 tim_p->tm_mon = 0;
-                days_in_feb = (isleap(tim_p->tm_year + YEAR_BASE) ? 29 : 28);
+                days_in_feb = (isleap2(tim_p->tm_year, year_off + YEAR_BASE) ? 29 : 28);
             }
         }
     }
+
+    if (__picolibc_add_overflow(tim_p->tm_year, year_off, &tim_p->tm_year))
+        return false;
+
+    return true;
 }
 
 static time_t
-mktime_utc(struct tm *tim_p, long *days_p)
+mktime_utc(struct tm *tim_p, time_t *days_p)
 {
     time_t tim = 0;
-    long   days = 0;
+    time_t days = 0;
     int    year;
+    time_t daysecs;
 
     /* validate structure */
-    validate_structure(tim_p);
+    if (!validate_structure(tim_p))
+        goto overflow;
 
     /* compute hours, minutes, seconds */
     tim += tim_p->tm_sec + (tim_p->tm_min * SECSPERMIN) + (tim_p->tm_hour * SECSPERHOUR);
@@ -177,40 +186,84 @@ mktime_utc(struct tm *tim_p, long *days_p)
     /* compute days in year */
     days += tim_p->tm_mday - 1;
     days += _DAYS_BEFORE_MONTH[tim_p->tm_mon];
-    if (tim_p->tm_mon > 1 && isleap(tim_p->tm_year + YEAR_BASE))
+    if (tim_p->tm_mon > 1 && isleap2(tim_p->tm_year, YEAR_BASE))
         days++;
 
     /* compute day of the year */
     tim_p->tm_yday = days;
 
-    if (tim_p->tm_year > 10000 || tim_p->tm_year < -10000)
-        return (time_t)-1;
+    year = tim_p->tm_year;
 
-    /* compute days in other years */
-    if ((year = tim_p->tm_year) > 70) {
-        for (year = 70; year < tim_p->tm_year; year++)
-            days += _DAYS_IN_YEAR(year);
-    } else if (year < 70) {
-        for (year = 69; year > tim_p->tm_year; year--)
-            days -= _DAYS_IN_YEAR(year);
-        days -= _DAYS_IN_YEAR(year);
+#define DAYSPERHCEN 3652425
+
+#define TIME_T_MAX  ((sizeof(time_t) < 8) ? INT32_MAX : INT64_MAX)
+#define TIME_T_MIN  ((sizeof(time_t) < 8) ? INT32_MIN : INT64_MIN)
+
+#define DAY_MAX     (TIME_T_MAX / SECSPERDAY)
+#define DAY_MIN     (TIME_T_MIN / SECSPERDAY)
+#define HCEN_MAX    (TIME_T_MAX / DAYSPERHCEN)
+#define HCEN_MIN    (TIME_T_MIN / DAYSPERHCEN)
+
+    if (sizeof(time_t) > 4) {
+        long hundredcentury;
+
+        /*
+         * Split out the multiple of 10000 as those are an exact integer
+         * number of days
+         */
+        if (year > 0)
+            hundredcentury = year / 10000;
+        else
+            hundredcentury = (int)-(-(unsigned)year / 10000);
+
+        year = year - hundredcentury * 10000;
+
+#if __SIZEOF_INT__ > 4
+        if (hundredcentury < HCEN_MIN || HCEN_MAX < hundredcentury)
+            goto overflow;
+#endif
+
+        days += (time_t)hundredcentury * DAYSPERHCEN;
     }
 
-    /* compute total seconds */
-    tim += (time_t)days * SECSPERDAY;
+    /* compute days in other years */
+    if (year > 70) {
+        long y;
+        for (y = 70; y < year; y++)
+            days += _DAYS_IN_YEAR(y);
+    } else if (year < 70) {
+        long y;
+        for (y = 69; y > year; y--)
+            days -= _DAYS_IN_YEAR(y);
+        days -= _DAYS_IN_YEAR(y);
+    }
+
+    if (days < DAY_MIN || DAY_MAX < days)
+        goto overflow;
+
+    daysecs = days * SECSPERDAY;
+
+    tim += daysecs;
+
+    /* tim is >= 0 after validate_structure */
+    if (daysecs > 0 && tim < 0)
+        goto overflow;
 
     *days_p = days;
     return tim;
+
+overflow:
+    errno = EOVERFLOW;
+    return (time_t)-1;
 }
 
 time_t
 mktime(struct tm *tim_p)
 {
-    long           days;
-    time_t         tim;
-    int            year;
-    int            isdst = 0;
-    __tzinfo_type *tz;
+    time_t days;
+    time_t tim;
+    int    year;
+    int    isdst = 0;
 
     tim = mktime_utc(tim_p, &days);
 
@@ -219,31 +272,29 @@ mktime(struct tm *tim_p)
 
     year = tim_p->tm_year;
 
-    tz = __gettzinfo();
+    tzset();
 
-    TZ_LOCK;
+    __LIBC_LOCK();
 
-    _tzset_unlocked();
-
-    if (_daylight) {
+    if (daylight) {
         int tm_isdst;
         int y = tim_p->tm_year + YEAR_BASE;
         /* Convert user positive into 1 */
         tm_isdst = tim_p->tm_isdst > 0 ? 1 : tim_p->tm_isdst;
         isdst = tm_isdst;
 
-        if (y == tz->__tzyear || __tzcalc_limits(y)) {
+        if (y == __tzinfo.year || __tzcalc_limits(y)) {
             /* calculate start of dst in dst local time and
                start of std in both std local time and dst local time */
-            time_t startdst_dst = tz->__tzrule[0].change - (time_t)tz->__tzrule[1].offset;
-            time_t startstd_dst = tz->__tzrule[1].change - (time_t)tz->__tzrule[1].offset;
-            time_t startstd_std = tz->__tzrule[1].change - (time_t)tz->__tzrule[0].offset;
+            time_t startdst_dst = __tzinfo.rule[0].change - (time_t)__tzinfo.rule[1].offset;
+            time_t startstd_dst = __tzinfo.rule[1].change - (time_t)__tzinfo.rule[1].offset;
+            time_t startstd_std = __tzinfo.rule[1].change - (time_t)__tzinfo.rule[0].offset;
             /* if the time is in the overlap between dst and std local times */
             if (tim >= startstd_std && tim < startstd_dst)
                 ; /* we let user decide or leave as -1 */
             else {
-                isdst = (tz->__tznorth ? (tim >= startdst_dst && tim < startstd_std)
-                                       : (tim >= startdst_dst || tim < startstd_std));
+                isdst = (__tzinfo.north ? (tim >= startdst_dst && tim < startstd_std)
+                                        : (tim >= startdst_dst || tim < startstd_std));
                 /* if user committed and was wrong, perform correction, but not
                  * if the user has given a negative value (which
                  * asks mktime() to determine if DST is in effect or not) */
@@ -253,7 +304,7 @@ mktime(struct tm *tim_p)
                        wrong. The diff is typically one hour, or 3600 seconds,
                        and should fit in a 16-bit int, even though offset
                        is a long to accomodate 12 hours. */
-                    int diff = (int)(tz->__tzrule[0].offset - tz->__tzrule[1].offset);
+                    int diff = (int)(__tzinfo.rule[0].offset - __tzinfo.rule[1].offset);
                     if (!isdst)
                         diff = -diff;
                     tim_p->tm_sec += diff;
@@ -285,13 +336,22 @@ mktime(struct tm *tim_p)
         }
     }
 
+    time_t offset = 0;
+
     /* add appropriate offset to put time in gmt format */
     if (isdst == 1)
-        tim += (time_t)tz->__tzrule[1].offset;
+        offset = (time_t)__tzinfo.rule[1].offset;
     else /* otherwise assume std time */
-        tim += (time_t)tz->__tzrule[0].offset;
+        offset = (time_t)__tzinfo.rule[0].offset;
 
-    TZ_UNLOCK;
+    __LIBC_UNLOCK();
+
+    if ((offset > 0 && (tim + offset) < tim) || (offset < 0 && (tim + offset) > tim)) {
+        errno = EOVERFLOW;
+        return (time_t)-1;
+    }
+
+    tim += offset;
 
     /* reset isdst flag to what we have calculated */
     tim_p->tm_isdst = isdst;
@@ -304,7 +364,7 @@ mktime(struct tm *tim_p)
 time_t
 timegm(struct tm *tim_p)
 {
-    long   days;
+    time_t days;
     time_t tim = mktime_utc(tim_p, &days);
 
     if (tim == (time_t)-1)

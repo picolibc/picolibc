@@ -29,8 +29,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <complex.h>
-#include <math.h>
+#include "local-complex.h"
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 
@@ -42,7 +41,7 @@ clogl(long double complex z)
     rr = cabsl(z);
     p = logl(rr);
     rr = atan2l(cimagl(z), creall(z));
-    return (long double complex)p + rr * (long double complex)I;
+    return CMPLXL(p, rr);
 }
 
 #endif

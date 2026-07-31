@@ -33,7 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 /*
  * This only serializes with other threads also using flockfile,
@@ -42,7 +42,7 @@
  * don't have any try-lock ability in the picolibc lock API, so
  * we're stuck just blocking.
  */
-int
+int __no_thread_safety_analysis
 ftrylockfile(FILE *f)
 {
     (void)f;

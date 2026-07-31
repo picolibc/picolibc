@@ -130,16 +130,14 @@ typedef __blksize_t blksize_t;
 #endif
 
 #ifndef _CLOCK_T_DECLARED
-typedef _CLOCK_T_ clock_t;
+typedef __clock_t clock_t;
 #define _CLOCK_T_DECLARED
 #endif
 
 #ifndef _TIME_T_DECLARED
-typedef _TIME_T_ time_t;
+typedef __time_t time_t;
 #define _TIME_T_DECLARED
 #endif
-
-typedef __daddr_t daddr_t;
 
 #ifndef __caddr_t_defined
 typedef char *caddr_t;
@@ -169,18 +167,13 @@ typedef unsigned long vm_size_t;
 #endif /* __i386__ && (GO32 || __MSDOS__) */
 
 #ifndef _SSIZE_T_DECLARED
-typedef _ssize_t ssize_t;
+typedef __ssize_t ssize_t;
 #define _SSIZE_T_DECLARED
 #endif
 
 #ifndef _OFF_T_DECLARED
 typedef __off_t off_t; /* file offset */
 #define _OFF_T_DECLARED
-#endif
-
-#ifndef _OFF64_T_DECLARED
-typedef __off64_t off64_t; /* 64-bit file offset */
-#define _OFF64_T_DECLARED
 #endif
 
 #ifndef _DEV_T_DECLARED

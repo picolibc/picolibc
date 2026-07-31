@@ -52,33 +52,37 @@ typedef __size_t size_t;
 
 _BEGIN_STD_C
 #if __BSD_VISIBLE || __POSIX_VISIBLE <= 200112
-int  bcmp(const void *, const void *, size_t) __pure; /* LEGACY */
-void bcopy(const void *, void *, size_t);             /* LEGACY */
-void bzero(void *, size_t);                           /* LEGACY */
+int
+       bcmp(const void *, const void *, size_t)
+__pure __picolibc_export;                                     /* LEGACY */
+void   bcopy(const void *, void *, size_t) __picolibc_export; /* LEGACY */
+void   bzero(void *, size_t) __picolibc_export;               /* LEGACY */
 #endif
 #if __BSD_VISIBLE
-void explicit_bzero(void *, size_t);
+void explicit_bzero(void *, size_t) __picolibc_export;
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE < 200809 || __XSI_VISIBLE >= 700
-int ffs(int) __const;
+int ffs(int) __const __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int ffsl(long) __const;
-int ffsll(long long) __const;
-int fls(int) __const;
-int flsl(long) __const;
-int flsll(long long) __const;
+int ffsl(long) __const __picolibc_export;
+int ffsll(long long) __const __picolibc_export;
+int fls(int) __const __picolibc_export;
+int flsl(long) __const __picolibc_export;
+int flsll(long long) __const __picolibc_export;
 #endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE <= 200112
-char *index(const char *, int) __pure;  /* LEGACY */
-char *rindex(const char *, int) __pure; /* LEGACY */
+char *index(const char *, int) __pure __picolibc_export;  /* LEGACY */
+char *rindex(const char *, int) __pure __picolibc_export; /* LEGACY */
 #endif
-int strcasecmp(const char *, const char *) __pure;
-int strncasecmp(const char *, const char *, size_t) __pure;
+int strcasecmp(const char *, const char *) __pure __picolibc_export;
+int
+       strncasecmp(const char *, const char *, size_t)
+__pure __picolibc_export;
 
 #if __POSIX_VISIBLE >= 200809
-int strcasecmp_l(const char *, const char *, locale_t);
-int strncasecmp_l(const char *, const char *, size_t, locale_t);
+int strcasecmp_l(const char *, const char *, locale_t) __picolibc_export;
+int strncasecmp_l(const char *, const char *, size_t, locale_t) __picolibc_export;
 #endif
 _END_STD_C
 

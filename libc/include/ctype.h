@@ -62,27 +62,27 @@ _BEGIN_STD_C
 #endif
 #endif
 
-int isalnum(int c);
-int isalpha(int c);
-int iscntrl(int c);
-int isdigit(int c);
-int isgraph(int c);
-int islower(int c);
-int isprint(int c);
-int ispunct(int c);
-int isspace(int c);
-int isupper(int c);
-int isxdigit(int c);
-int tolower(int c);
-int toupper(int c);
+int isalnum(int c) __picolibc_export;
+int isalpha(int c) __picolibc_export;
+int iscntrl(int c) __picolibc_export;
+int isdigit(int c) __picolibc_export;
+int isgraph(int c) __picolibc_export;
+int islower(int c) __picolibc_export;
+int isprint(int c) __picolibc_export;
+int ispunct(int c) __picolibc_export;
+int isspace(int c) __picolibc_export;
+int isupper(int c) __picolibc_export;
+int isxdigit(int c) __picolibc_export;
+int tolower(int c) __picolibc_export;
+int toupper(int c) __picolibc_export;
 
 #if __ISO_C_VISIBLE >= 1999
-int isblank(int c);
+int isblank(int c) __picolibc_export;
 #endif
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
-int isascii(int c);
-int toascii(int c);
+int isascii(int c) __picolibc_export;
+int toascii(int c) __picolibc_export;
 #define _tolower(__c) ((__c) + ('a' - 'A'))
 #define _toupper(__c) ((__c) - ('a' - 'A'))
 #define isascii(__c)  ((unsigned)(__c) <= 0177)
@@ -90,25 +90,25 @@ int toascii(int c);
 #endif
 
 #if __POSIX_VISIBLE >= 200809
-int isalnum_l(int c, locale_t l);
-int isalpha_l(int c, locale_t l);
-int isblank_l(int c, locale_t l);
-int iscntrl_l(int c, locale_t l);
-int isdigit_l(int c, locale_t l);
-int isgraph_l(int c, locale_t l);
-int islower_l(int c, locale_t l);
-int isprint_l(int c, locale_t l);
-int ispunct_l(int c, locale_t l);
-int isspace_l(int c, locale_t l);
-int isupper_l(int c, locale_t l);
-int isxdigit_l(int c, locale_t l);
-int tolower_l(int c, locale_t l);
-int toupper_l(int c, locale_t l);
+int isalnum_l(int c, locale_t l) __picolibc_export;
+int isalpha_l(int c, locale_t l) __picolibc_export;
+int isblank_l(int c, locale_t l) __picolibc_export;
+int iscntrl_l(int c, locale_t l) __picolibc_export;
+int isdigit_l(int c, locale_t l) __picolibc_export;
+int isgraph_l(int c, locale_t l) __picolibc_export;
+int islower_l(int c, locale_t l) __picolibc_export;
+int isprint_l(int c, locale_t l) __picolibc_export;
+int ispunct_l(int c, locale_t l) __picolibc_export;
+int isspace_l(int c, locale_t l) __picolibc_export;
+int isupper_l(int c, locale_t l) __picolibc_export;
+int isxdigit_l(int c, locale_t l) __picolibc_export;
+int tolower_l(int c, locale_t l) __picolibc_export;
+int toupper_l(int c, locale_t l) __picolibc_export;
 #endif
 
 #if __MISC_VISIBLE
-int isascii_l(int c, locale_t l);
-int toascii_l(int c, locale_t l);
+int isascii_l(int c, locale_t l) __picolibc_export;
+int toascii_l(int c, locale_t l) __picolibc_export;
 #define isascii_l(__c, __l) ((void)(__l), (unsigned)(__c) <= 0177)
 #define toascii_l(__c, __l) ((void)(__l), (__c) & 0177)
 #endif
@@ -299,8 +299,10 @@ toupper_l(int c, locale_t l)
 
 #define _CTYPE_OFFSET 127
 
-extern const char  _ctype_b[];
-extern const short _ctype_wide[];
+/* These must be exported: the isalpha()/isctype() macros dereference
+ * them directly from user code, so they must be visible in the DSO. */
+extern __picolibc_export const char  _ctype_b[];
+extern __picolibc_export const short _ctype_wide[];
 
 #define _ctype_       (_ctype_b + _CTYPE_OFFSET)
 
@@ -327,7 +329,7 @@ extern const short _ctype_wide[];
 #endif
 
 #ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
-const char *__locale_ctype_ptr(void);
+const char *__locale_ctype_ptr(void) __picolibc_export;
 #define __CTYPE_PTR __locale_ctype_ptr()
 #else
 #define __CTYPE_PTR _ctype_
@@ -363,7 +365,7 @@ isblank(int c)
 #if __POSIX_VISIBLE >= 200809
 
 #ifdef __MB_EXTENDED_CHARSETS_NON_UNICODE
-const char *__locale_ctype_ptr_l(locale_t);
+const char *__locale_ctype_ptr_l(locale_t) __picolibc_export;
 #define __CTYPE_PTR_L(__l) __locale_ctype_ptr_l(__l)
 #else
 #define __CTYPE_PTR_L(__l) ((void)(__l), _ctype_)

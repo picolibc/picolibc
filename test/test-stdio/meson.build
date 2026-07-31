@@ -36,7 +36,9 @@
 tests = [
   'test-fdevopen',
   'test-fmemopen',
+  'test-open_memstream',
   'test-freopen',
+  'test-fopencookie',
   'test-funopen',
   'test-put',
   'test-sprintf-percent-n',
@@ -62,11 +64,13 @@ test_extra_c_args = {
 
 test_extra_libs = {}
 
-if enable_native_tests
+if enable_native_tests and oslib_test_variant == ''
   tests += [
+    'test-bufio-lock-init',
     'test-flockfile',
   ]
   test_extra_libs = {
+    'test-bufio-lock-init' : native_lib,
     'test-flockfile' : native_lib
   }
 endif
@@ -77,6 +81,7 @@ if tests_enable_posix_io
     'test-dprintf',
     'test-fgetc',
     'test-fgets-eof',
+    'test-fflush',
     'test-fopen',
     'test-fread-fwrite',
     'test-mktemp',
@@ -126,8 +131,11 @@ foreach params : targets
   target_c_args = params['c_args']
 
   _libs = [get_variable('lib_c' + target)]
-  if is_variable('lib_semihost' + target)
-    _libs += [get_variable('lib_semihost' + target)]
+  if is_variable(oslib_test + target)
+    _libs += [get_variable(oslib_test + target)]
+  endif
+  if is_variable(libfallback_var + target)
+    _libs += [get_variable(libfallback_var + target)]
   endif
 
   _lib_files=[]
@@ -151,7 +159,7 @@ foreach params : targets
     if test_extra_libs.has_key(t1)
       lock_source = []
     else
-      lock_source = ['../lock-valid.c']
+      lock_source = test_lock_valid
     endif
 
     test(t1 + target,
@@ -177,7 +185,7 @@ foreach params : targets
     if test_extra_libs.has_key(t1)
       lock_source = []
     else
-      lock_source = ['../lock-valid.c']
+      lock_source = test_lock_valid
     endif
 
     test(t1 + target,
@@ -205,7 +213,7 @@ foreach params : targets
       test_file_name_arg=['-DTEST_FILE_NAME="' + test + _ext + target + '.txt"']
 
       test(test + target + _ext,
-	   executable(test + _ext + target, [test_src, '../lock-valid.c'],
+	   executable(test + _ext + target, [test_src, test_lock_valid],
 		      c_args: test_file_name_arg + _printf_c_args,
 		      link_args: _printf_link_args,
 		      objects: _objs,
@@ -232,7 +240,8 @@ if enable_native_tests
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args,
                     dependencies: native_lib_m),
-         suite: 'test-stdio'
+         suite: 'test-stdio',
+         env: test_env
         )
   endforeach
 

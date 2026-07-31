@@ -27,7 +27,7 @@
   POSSIBILITY OF SUCH DAMAGE.
 */
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 int
 swscanf(const wchar_t *s, const wchar_t *fmt, ...)

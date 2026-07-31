@@ -65,21 +65,34 @@ while [ $# -gt 0 -a $done -eq 0 ]; do
   esac
 done
 
-case "$elf" in
-    *_32)
-	qemu="qemu-system-i386"
-	;;
-    *)
+machine="$(readelf -h "$elf" | sed -n '/Machine:/s/^ *Machine: *//p')"
+
+case "$machine" in
+    *X86-64*|*80?86*)
 	qemu="qemu-system-x86_64"
 	;;
+    *)
+        echo 'Unknown machine:' "$machine" 1>&2
+        exit 1
+        ;;
 esac
+
+BIOS_DIR=""
+BIOS="libos/semihost/machine/x86/bios.bin"
+
+while [ "$BIOS_DIR" != "../../../../../../" ]; do
+    if [ -f $BIOS_DIR$BIOS ]; then
+        break
+    fi
+    BIOS_DIR=../"$BIOS_DIR"
+done
 
 "$dir"/monitor-e9 $qemu \
 	-cpu core2duo \
-	-bios semihost/machine/x86/bios.bin \
+	-bios "$BIOS_DIR$BIOS" \
 	-monitor none \
 	-serial none \
 	-debugcon stdio \
 	-nic none \
 	-device loader,file="$elf" \
-	-nographic
+	-nographic "$@"

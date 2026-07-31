@@ -1,10 +1,14 @@
 /* Copyright 2005 Tom Walsh <tom@openhardware.net> */
-#define _GNU_SOURCE
-#include <time.h>
+#include "local.h"
 
 /* Global timezone variables.  */
 
 /* Default timezone to GMT */
-char *tzname[2] = { "GMT", "GMT" };
-int   _daylight = 0;
-long  _timezone = 0;
+char         __tzname_std[TZNAME_MAX + 2] = "GMT";
+char         __tzname_dst[TZNAME_MAX + 2] = "GMT";
+char * const tzname[2] = { __tzname_std, __tzname_dst };
+int          daylight;
+long         timezone;
+
+/* Shared timezone information for libc/time functions.  */
+tzinfo_t     __tzinfo;

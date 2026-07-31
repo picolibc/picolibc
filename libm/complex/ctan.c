@@ -64,9 +64,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
-#include <math.h>
-#include "cephes_subr.h"
+#include "local-complex.h"
 
 double complex
 ctan(double complex z)
@@ -80,9 +78,8 @@ ctan(double complex z)
 
     if (d == 0.0) {
         /* mtherr ("ctan", OVERFLOW); */
-        return HUGE_VAL + HUGE_VAL * (double complex)I;
+        return CMPLX(HUGE_VAL, HUGE_VAL);
     }
 
-    return (double complex)(sin(2.0 * creal(z)) / d)
-        + (sinh(2.0 * cimag(z)) / d) * (double complex)I;
+    return CMPLX(sin(2.0 * creal(z)) / d, sinh(2.0 * cimag(z)) / d);
 }

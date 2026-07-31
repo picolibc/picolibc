@@ -23,7 +23,7 @@
 
 _BEGIN_STD_C
 
-struct __lock;
+struct __capability("mutex") __lock;
 typedef struct __lock *_LOCK_T;
 
 #define _LOCK_RECURSIVE_T              _LOCK_T
@@ -35,10 +35,10 @@ void                   __retarget_lock_init(_LOCK_T *lock);
 void                   __retarget_lock_init_recursive(_LOCK_T *lock);
 void                   __retarget_lock_close(_LOCK_T lock);
 void                   __retarget_lock_close_recursive(_LOCK_T lock);
-void                   __retarget_lock_acquire(_LOCK_T lock);
-void                   __retarget_lock_acquire_recursive(_LOCK_T lock);
-void                   __retarget_lock_release(_LOCK_T lock);
-void                   __retarget_lock_release_recursive(_LOCK_T lock);
+void                   __retarget_lock_acquire(_LOCK_T lock) __acquire_capability(lock);
+void                   __retarget_lock_acquire_recursive(_LOCK_T lock) __acquire_capability(lock);
+void                   __retarget_lock_release(_LOCK_T lock) __release_capability(lock);
+void                   __retarget_lock_release_recursive(_LOCK_T lock) __release_capability(lock);
 
 #define __lock_init(lock)              __retarget_lock_init(&lock)
 #define __lock_init_recursive(lock)    __retarget_lock_init_recursive(&lock)

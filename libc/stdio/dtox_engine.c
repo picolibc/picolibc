@@ -37,7 +37,7 @@
 #define DTOX_SIZE 8
 #endif
 
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #if DTOX_SIZE == 4 || defined(FLOAT64)
 

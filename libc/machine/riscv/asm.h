@@ -47,4 +47,13 @@
 # endif
 #endif
 
+/*
+ * LPAD - emit landing pad when Forward-Edge CFI is enabled.
+ */
+#ifdef __riscv_landing_pad
+# define LPAD  lpad 0
+#else
+# define LPAD  /* empty */
+#endif
+
 #endif /* sys/asm.h */

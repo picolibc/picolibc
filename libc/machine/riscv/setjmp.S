@@ -18,6 +18,7 @@
   .globl  setjmp
   .type   setjmp, @function
 setjmp:
+	LPAD
 	REG_S ra,  0*SZREG(a0)
   #if __riscv_xlen == 32 && (__riscv_zilsd) && (__riscv_misaligned_fast)
 	  sd    s0,  1*SZREG(a0)
@@ -65,6 +66,19 @@ setjmp:
 	FREG_S fs11,14*SZREG+11*SZFREG(a0)
 #endif
 
+#ifdef __riscv_shadow_stack
+	/* Save the current shadow stack pointer into jmp_buf.
+	 * ssrdp returns 0 if shadow stack is not active (SSE=0),
+	 * so this is safe even when the shadow stack is not enabled. */
+  #ifndef __riscv_float_abi_soft
+	ssrdp t0
+	REG_S t0, 14*SZREG+12*SZFREG(a0)
+  #else
+	ssrdp t0
+	REG_S t0, 14*SZREG(a0)
+  #endif
+#endif
+
 	li    a0, 0
 	ret
 	.size	setjmp, .-setjmp
@@ -74,6 +88,7 @@ setjmp:
   .globl  longjmp
   .type   longjmp, @function
 longjmp:
+	LPAD
 	REG_L ra,  0*SZREG(a0)
   #if __riscv_xlen == 32 && (__riscv_zilsd) && (__riscv_misaligned_fast)
     ld s0, 1*SZREG(a0)
@@ -118,6 +133,37 @@ longjmp:
 	FREG_L fs9, 14*SZREG+ 9*SZFREG(a0)
 	FREG_L fs10,14*SZREG+10*SZFREG(a0)
 	FREG_L fs11,14*SZREG+11*SZFREG(a0)
+#endif
+
+#ifdef __riscv_shadow_stack
+	/* Restore the shadow stack pointer saved by setjmp.
+	 * Skip unwinding if shadow stack is not enabled (ssrdp returns 0).
+	 * Advance SSP in page-sized chunks toward the saved value, validating
+	 * each step with sspush/sspopchk to detect guard pages. */
+  #ifndef __riscv_float_abi_soft
+	REG_L t1, 14*SZREG+12*SZFREG(a0)
+  #else
+	REG_L t1, 14*SZREG(a0)
+  #endif
+	ssrdp t0
+	beqz  t0, .Lss_done
+.Lss_unwind:
+	/* If current SSP (t0) has reached saved SSP (t1), we are done */
+	bleu  t1, t0, .Lss_done
+	/* Advance by at most one page (4096 bytes) to ensure we hit a
+	 * guard page before accidentally landing on another shadow stack.
+	 * t0 = (t1 - t0 >= 4096) ? t0 + 4096 : t1 */
+	lui   a0, 1                 /* a0 = 4096 */
+	add   t0, t0, a0
+	bleu  t0, t1, 1f
+	mv    t0, t1
+1:
+	csrw  ssp, t0
+	/* Validate that the new SSP points to a legal shadow stack page */
+	sspush x5
+	sspopchk x5
+	j     .Lss_unwind
+.Lss_done:
 #endif
 
 	seqz a0, a1

@@ -1,0 +1,9 @@
+{
+    "name": "itimerspec",
+    "headers": [ "linux/time.h" ],
+    "types": [ "struct timespec" ],
+    "members": [
+	{ "name": "it_interval", "type": "struct timespec" },
+	{ "name": "it_value", "type": "struct timespec" }
+    ]
+}

@@ -34,6 +34,8 @@ WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.
  */
 
 #include "local.h"
+#include <limits.h>
+#include <errno.h>
 
 /* Move epoch from 01.01.1970 to 01.03.0000 (yes, Year 0) - this is the first
  * day of a 400-year long "era", right after additional day of leap year.
@@ -67,7 +69,9 @@ gmtime_r(const time_t * __restrict tim_p, struct tm * __restrict res)
     long          rem;
     time_t        days;
     const time_t  lcltime = *tim_p;
-    int           era, weekday, year;
+    time_t        era;
+    int           weekday;
+    time_t        year;
     unsigned      erayear, yearday, month, day;
     unsigned long eraday;
 
@@ -106,7 +110,11 @@ gmtime_r(const time_t * __restrict tim_p, struct tm * __restrict res)
     res->tm_yday = yearday >= DAYS_PER_YEAR - DAYS_IN_JANUARY - DAYS_IN_FEBRUARY
         ? yearday - (DAYS_PER_YEAR - DAYS_IN_JANUARY - DAYS_IN_FEBRUARY)
         : yearday + DAYS_IN_JANUARY + DAYS_IN_FEBRUARY + isleap(erayear);
-    res->tm_year = year - YEAR_BASE;
+    year = year - YEAR_BASE;
+    if (sizeof(year) != sizeof(int) && (year > INT_MAX || year < INT_MIN))
+        return NULL;
+
+    res->tm_year = year;
     res->tm_mon = month;
     res->tm_mday = day;
 

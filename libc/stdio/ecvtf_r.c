@@ -34,7 +34,7 @@
  */
 
 #define _NEED_IO_FLOAT
-#include "stdio_private.h"
+#include "local-stdio.h"
 
 #include "dtoa.h"
 
@@ -47,7 +47,7 @@ ecvtf_r(float invalue, int ndigit, int *decpt, int *sign, char *buf, size_t len)
     if (ndigit < 0)
         ndigit = 0;
 
-    if ((size_t)ndigit > len - 1)
+    if ((size_t)ndigit >= len)
         return -1;
 
     ngot = __ftoa_engine(asuint(invalue), &dtoa, ndigit, false, 0);

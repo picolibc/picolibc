@@ -20,7 +20,7 @@ data. That includes:
 Picolibc uses per-file locks for the buffered POSIX file backend, but
 it doesn't require any locks for the bulk of the implementation. You
 can enable POSIX-compliant locking in stdio with
--Dstdio-locking-true. That will prevent I/O from stdio operations from
+-Dstdio-locking=true. That will prevent I/O from stdio operations from
 interleaving between threads.
 
 ## Where Picolibc uses atomics

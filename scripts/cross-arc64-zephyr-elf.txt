@@ -1,5 +1,5 @@
 [binaries]
-c = ['arc64-zephyr-elf-gcc', '-nostdlib']
+c = ['arc64-zephyr-elf-gcc', '-nostdlib', '-fno-builtin-roundf', '-fno-builtin-round', '-fno-builtin-roundl']
 cpp = ['arc64-zephyr-elf-g++', '-nostdlib']
 ar = 'arc64-zephyr-elf-ar'
 as = 'arc64-zephyr-elf-as'

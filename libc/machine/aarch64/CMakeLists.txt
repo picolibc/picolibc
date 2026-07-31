@@ -68,6 +68,7 @@ picolibc_sources_flags("-fno-builtin"
   strnlen.S
   strrchr-stub.c
   strrchr.S
+  sme-abi.S
   tls.c
   )
 

@@ -76,7 +76,7 @@ QUICKREF
 
 */
 
-#include <complex.h>
+#include "local-complex.h"
 
 double complex
 cacosh(double complex z)
@@ -84,7 +84,7 @@ cacosh(double complex z)
     double complex w;
 
 #if 0 /* does not give the principal value */
-	w = (double complex) I * cacos(z);
+    w = CMPLX(0, cacos(z));
 #else
     w = clog(z + csqrt(z + 1) * csqrt(z - 1));
 #endif

@@ -30,13 +30,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: picolibc
 
       - name: Cache the Docker Image
         id: cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -44,11 +44,11 @@ jobs:
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/setup-buildx-action@v3
+        uses: docker/setup-buildx-action@v4
 
       - name: Build picolibc container
         if: steps.cache.outputs.cache-hit != 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           platforms: linux/amd64
           file: .github/Dockerfile-check-format
@@ -60,12 +60,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Clone picolibc
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           path: picolibc
 
       - name: Restore the Docker Image
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
           key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
@@ -80,3 +80,10 @@ jobs:
       - name: Check Formatting
         run: |
           docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE bash --login -c "./.github/do-check-format"
+
+      - name: Upload Formatting Patch
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: clang-format-fix
+          path: picolibc/clang-format.patch

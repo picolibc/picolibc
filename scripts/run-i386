@@ -69,7 +69,7 @@ done
 
 "$dir"/monitor-e9 $qemu \
 	-cpu core2duo \
-	-bios semihost/machine/x86/bios.bin \
+	-bios libos/semihost/machine/x86/bios.bin \
 	-monitor none \
 	-serial none \
 	-debugcon stdio \
