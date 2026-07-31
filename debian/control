@@ -1,7 +1,11 @@
 Source: picolibc
 Maintainer: Keith Packard <keithp@keithp.com>
-Build-Depends: debhelper-compat (= 14), gcc-arm-none-eabi, gcc-riscv64-unknown-elf, gcc-xtensa-lx106,
- gcc-aarch64-none-elf, meson, ninja-build, qemu-system-arm, qemu-system-riscv
+Build-Depends: debhelper-compat (= 14),
+ gcc-aarch64-none-elf (>= 15:15.3.rel1),
+ gcc-arm-none-eabi (>= 15:15.3.rel1),
+ gcc-riscv64-unknown-elf (>= 15.3.0),
+ gcc-xtensa-lx106 (>= 15.3.0),
+ meson, ninja-build, qemu-system-arm, qemu-system-riscv
 Standards-Version: 4.7.4
 Section: devel
 Homepage: https://keithp.com/picolibc

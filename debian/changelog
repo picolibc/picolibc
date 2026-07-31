@@ -1,3 +1,9 @@
+picolibc (1.8.12-1) unstable; urgency=medium
+
+  * New upstream version
+
+ -- Keith Packard <keithp@keithp.com>  Thu, 30 Jul 2026 20:46:16 -0700
+
 picolibc (1.8.11-4) unstable; urgency=medium
 
   * Ignore lintian warnings about files in /usr
