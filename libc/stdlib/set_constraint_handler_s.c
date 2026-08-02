@@ -51,7 +51,7 @@ set_constraint_handler_s(constraint_handler_t handler)
 {
     constraint_handler_t h = __cur_handler;
 
-    if (handler == (constraint_handler_t)NULL) {
+    if (handler == 0) {
         __cur_handler = abort_handler_s; // null restores to default handler
     } else {
         __cur_handler = handler;

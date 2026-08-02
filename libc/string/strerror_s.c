@@ -77,7 +77,7 @@ strerror_s(char *buf, rsize_t buflen, __errno_t errnum)
     return result;
 
 handle_error:
-    if (__cur_handler != NULL) {
+    if (__cur_handler != 0) {
         __cur_handler(msg, NULL, -1);
     }
 

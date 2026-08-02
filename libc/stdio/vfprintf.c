@@ -585,7 +585,7 @@ vfprintf(FILE *stream, const CHAR *fmt, va_list ap_orig)
 
     if (stream == NULL || fmt == NULL) {
         msg = stream == NULL ? "output stream is null" : "null format string";
-        if (__cur_handler != NULL)
+        if (__cur_handler != 0)
             __cur_handler(msg, NULL, -1);
         if (stream)
             stream->flags |= __SERR;
@@ -842,7 +842,7 @@ fail:
     goto ret;
 #ifdef VFPRINTF_S
 handle_error:
-    if (__cur_handler != NULL)
+    if (__cur_handler != 0)
         __cur_handler(msg, NULL, -1);
     stream->flags |= __SERR;
     __funlock_return(stream, -1);

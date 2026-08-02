@@ -192,9 +192,9 @@ bufio_seekable(struct __file_bufio *bf)
 {
 #ifndef BUFIO_ABI_MATCHES
     if (!(bf->bflags & __BFPTR))
-        return bf->lseek_int != NULL;
+        return bf->lseek_int != 0;
 #endif
-    return bf->lseek_ptr != NULL;
+    return bf->lseek_ptr != 0;
 }
 
 static inline int
