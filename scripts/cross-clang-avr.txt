@@ -1,0 +1,20 @@
+[binaries]
+c = ['clang', '--target=avr', '-mmcu=atmega1284p', '-nostdlib', '-D__AVR_HAVE_SPH__']
+cpp = ['clang', '--target=avr', '-mmcu=atmega1284p', '-nostdlib', '-D__AVR_HAVE_SPH__']
+c_ld = 'lld'
+cpp_ld = 'lld'
+ar = 'avr-ar'
+nm = 'avr-nm'
+strip = 'avr-strip'
+
+[host_machine]
+system = 'none'
+cpu_family = 'avr'
+cpu = 'avr'
+endian = 'little'
+
+[properties]
+skip_sanity_check = true
+
+[built-in options]
+c_args = ['-Wno-tautological-compare']
