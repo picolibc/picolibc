@@ -36,7 +36,7 @@
 
 #ifdef _NEED_IO_WCHAR
     if (flags & FL_LONG) {
-        wint_t wc = (wchar_t)va_arg(ap, wint_t);
+        wint_t wc = (wchar_t)va_arg(ap, __typeof__(+(wint_t)0));
         u.wbuf[0] = wc;
         wstr = u.wbuf;
 
