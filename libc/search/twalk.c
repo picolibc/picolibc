@@ -75,6 +75,6 @@ void
 twalk(const void *vroot, /* Root of the tree to be walked */
       void        (*action)(const void *, VISIT, int))
 {
-    if (vroot != NULL && action != NULL)
+    if (vroot != NULL && action != 0)
         trecurse(vroot, action, 0);
 }

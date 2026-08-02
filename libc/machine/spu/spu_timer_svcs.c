@@ -61,7 +61,7 @@ spu_timer_alloc(int interval, void (*func)(int))
 {
     unsigned was_enabled;
     int      id;
-    if (interval < MIN_INTVL || interval > MAX_INTVL || func == NULL)
+    if (interval < MIN_INTVL || interval > MAX_INTVL || func == 0)
         return SPU_TIMER_ERR_INVALID_PARM;
 
     was_enabled = spu_readch(SPU_RdMachStat) & 0x1;

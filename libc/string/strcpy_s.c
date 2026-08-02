@@ -117,7 +117,7 @@ handle_error:
         *s1 = '\0';
     }
 
-    if (__cur_handler != NULL) {
+    if (__cur_handler != 0) {
         __cur_handler(msg, NULL, -1);
     }
 

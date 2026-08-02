@@ -66,7 +66,7 @@ sprintf_s(char * __restrict s, rsize_t bufsize, const char * __restrict fmt, ...
     return rc;
 
 handle_error:
-    if (__cur_handler != NULL) {
+    if (__cur_handler != 0) {
         __cur_handler(msg, NULL, -1);
     }
 

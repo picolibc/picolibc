@@ -348,7 +348,7 @@ _strerror_r(int errnum, int internal, int *errptr)
 
     if (!errptr)
         errptr = &errno;
-    if (&_user_strerror == NULL || (error = _user_strerror(errnum, internal, errptr)) == 0)
+    if (&_user_strerror == 0 || (error = _user_strerror(errnum, internal, errptr)) == 0)
         error = "Unknown error";
     return error;
 }

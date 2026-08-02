@@ -78,7 +78,7 @@ handle_error:
         (void)memset(s1, (int32_t)'\0', s1max);
     }
 
-    if (__cur_handler != NULL) {
+    if (__cur_handler != 0) {
         __cur_handler(msg, NULL, -1);
     }
 
