@@ -440,7 +440,7 @@ skip_to_arg(const CHAR *fmt_orig, my_va_list *ap, int target_argno)
                 SKIP_FLOAT_ARG(flags, ap->ap);
             } else if (c == 'c') {
                 if (flags & FL_LONG)
-                    (void)va_arg(ap->ap, wint_t);
+                    (void)va_arg(ap->ap, __typeof__(+(wint_t)0));
                 else
                     (void)va_arg(ap->ap, int);
             } else if (c == 's') {

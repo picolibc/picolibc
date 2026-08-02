@@ -309,6 +309,14 @@ main(void)
         errors++;
         fflush(stdout);
     }
+#ifndef NO_MULTI_BYTE
+    r = snprintf(buf, sizeof(buf), "%2$lc %1$d", 3, (wint_t)L'㌰');
+    if (r != 5 || strcmp(buf, "㌰ 3") != 0) {
+        printf("pos: wanted \"㌰ 3\" (ret %d) got \"%s\" (ret %d)\n", 5, buf, r);
+        errors++;
+        fflush(stdout);
+    }
+#endif
 #endif
 
     /*
