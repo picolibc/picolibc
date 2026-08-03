@@ -48,7 +48,18 @@ struct on_exit {
     enum pico_onexit_kind kind;
 };
 
-static struct on_exit on_exits[ATEXIT_MAX];
+/*
+ * stdio-exit-flush registers one internal atexit handler before main. Keep
+ * that implementation detail from reducing the ISO C guarantee of at least
+ * ATEXIT_MAX registrations available to the application.
+ */
+#ifdef __STDIO_EXIT_FLUSH
+#define __ATEXIT_COUNT (ATEXIT_MAX + 1)
+#else
+#define __ATEXIT_COUNT ATEXIT_MAX
+#endif
+
+static struct on_exit on_exits[__ATEXIT_COUNT];
 
 int
 _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg)
@@ -56,7 +67,7 @@ _on_exit(enum pico_onexit_kind kind, union on_exit_func func, void *arg)
     int ret = -1;
     int o;
     __LIBC_LOCK();
-    for (o = 0; o < ATEXIT_MAX; o++) {
+    for (o = 0; o < __ATEXIT_COUNT; o++) {
         if (on_exits[o].kind == PICO_ONEXIT_EMPTY) {
             on_exits[o].func = func;
             on_exits[o].arg = arg;
@@ -91,7 +102,7 @@ __call_exitprocs(int code, void *param)
         void                 *arg = 0;
 
         __LIBC_LOCK();
-        for (i = ATEXIT_MAX - 1; i >= 0; i--) {
+        for (i = __ATEXIT_COUNT - 1; i >= 0; i--) {
             kind = on_exits[i].kind;
             if (kind != PICO_ONEXIT_EMPTY) {
                 func = on_exits[i].func;
