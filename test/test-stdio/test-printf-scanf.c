@@ -319,6 +319,30 @@ main(void)
 #endif
 #endif
 
+    {
+        struct {
+            const char *input;
+            const char *format;
+            const char *expected;
+        } scansets[] = {
+            { "aconve-rsion", "%[acveron-]", "aconve-r" },
+            { "-abc",         "%[-a]",       "-a"       },
+            { "abcXYZ",       "%[a-c]",      "abc"      },
+        };
+        unsigned i;
+
+        for (i = 0; i < sizeof(scansets) / sizeof(scansets[0]); i++) {
+            char result[16] = "";
+            int  ret = sscanf(scansets[i].input, scansets[i].format, result);
+
+            if (ret != 1 || strcmp(result, scansets[i].expected) != 0) {
+                printf("scanset %s on %s: wanted %s, got %s (ret %d)\n", scansets[i].format,
+                       scansets[i].input, scansets[i].expected, result, ret);
+                errors++;
+            }
+        }
+    }
+
     /*
      * test snprintf and vsnprintf to make sure they don't
      * overwrite the specified buffer length (even if that is
