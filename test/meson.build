@@ -295,6 +295,19 @@ foreach params : targets
   endif
 
   if have_cplusplus
+    t1 = 'test-inttypes-cplusplus'
+    t1_src = t1 + '.cpp'
+    test(t1 + target,
+         executable(t1 + target, t1_src,
+                    cpp_args: _cpp_args,
+		    link_args: _cpp_args + _link_args,
+		    objects: _objs,
+		    link_depends: _link_depends,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
+
     t1 = 'test-cplusplus'
     t1_src = t1 + '.cpp'
     test(t1 + target,
@@ -441,4 +454,3 @@ endif
 if has_arm_semihost and oslib_test_variant == 'semihost'
   subdir('semihost')
 endif
-
