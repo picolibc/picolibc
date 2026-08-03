@@ -388,7 +388,8 @@ conv_brk(FILE *stream, scanf_context_t *context, width_t width, void *addr, cons
             if (fmt != _fmt + 1) {
                 if (f == ']')
                     break;
-                if (f == '-' && !frange) {
+                /* A trailing '-' is a literal scanset member. */
+                if (f == '-' && !frange && *fmt != ']') {
                     frange = true;
                     continue;
                 }
