@@ -16,6 +16,27 @@
 
 #if defined(__riscv_flen) || defined(__riscv_zfinx)
 
+/*
+ * We can't tell if we're using compiler-rt or libgcc; instead
+ * we assume a connection between the compiler in use and
+ * the runtime library.
+ */
+#if defined(__clang__)
+
+/* compiler-rt has no exceptions in soft-float */
+
+#if __riscv_flen < 128
+#define __LONG_DOUBLE_NOROUND
+#define __LONG_DOUBLE_NOEXCEPT
+#endif
+
+#if __riscv_flen < 64
+#define __DOUBLE_NOROUND
+#define __DOUBLE_NOEXCEPT
+#endif
+
+#endif
+
 /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
  * Version 2.1", Section 8.2, "Floating-Point Control and Status
  * Register":
