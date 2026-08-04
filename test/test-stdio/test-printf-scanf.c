@@ -115,6 +115,18 @@ check_vsnprintf(char *str, size_t size, const char *format, ...)
 #endif
 
 #ifndef NO_WIDE_IO
+static int
+check_vswprintf(wchar_t *str, size_t size, const wchar_t *format, ...)
+{
+    int     i;
+    va_list ap;
+
+    va_start(ap, format);
+    i = vswprintf(str, size, format, ap);
+    va_end(ap);
+    return i;
+}
+
 static const struct {
     const wchar_t * const str;
     const wchar_t * const fmt;
@@ -288,6 +300,53 @@ main(void)
         }
     }
 #endif
+
+    /*
+     * snprintf returns the number of characters that would have been
+     * written, while swprintf returns a negative value on truncation.
+     * "123456" needs 7 characters including the terminating null.
+     */
+    {
+        wchar_t wbuf[8];
+        int     nret;
+        int     wret;
+
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
+        nret = snprintf(buf, 6, "123456");
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic pop
+#endif
+        wret = swprintf(wbuf, 6, L"123456");
+        if (nret != 6 || wret >= 0) {
+            printf("truncation: snprintf returned %d, swprintf returned %d\n", nret, wret);
+            ++errors;
+        }
+        if (swprintf(wbuf, 7, L"123456") != 6 || wcscmp(wbuf, L"123456") != 0) {
+            printf("swprintf: exact fit failed\n");
+            ++errors;
+        }
+        if (swprintf(wbuf, 0, L"123456") >= 0) {
+            printf("swprintf: zero size reported as success\n");
+            ++errors;
+        }
+        if (swprintf(NULL, 0, L"") >= 0) {
+            printf("swprintf: empty zero-size output reported as success\n");
+            ++errors;
+        }
+        nret = check_vsnprintf(buf, 6, "123456");
+        wret = check_vswprintf(wbuf, 6, L"123456");
+        if (nret != 6 || wret >= 0) {
+            printf("truncation: vsnprintf returned %d, vswprintf returned %d\n", nret, wret);
+            ++errors;
+        }
+        if (check_vswprintf(NULL, 0, L"") >= 0) {
+            printf("vswprintf: empty zero-size output reported as success\n");
+            ++errors;
+        }
+    }
 #endif
 
 #if !defined(__IO_NO_FLOATING_POINT)
