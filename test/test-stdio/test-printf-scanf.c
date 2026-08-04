@@ -270,6 +270,14 @@ main(void)
             ++errors;
         }
     }
+    {
+        char result[4];
+
+        if (swscanf(L"", L"%[Gdo]", result) != EOF) {
+            printf("swscanf did not report an input failure for an empty string\n");
+            ++errors;
+        }
+    }
 #ifndef NO_MULTI_BYTE
     {
         wchar_t c;

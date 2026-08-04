@@ -53,8 +53,10 @@ __STDIO_UNLOCKED(getwc)(FILE *stream)
 
     for (i = 0; i < sizeof(wchar_t); i++) {
         sc = stream->get(stream);
-        if (sc < 0)
+        if (sc < 0) {
+            stream->flags |= (sc == _FDEV_ERR) ? __SERR : __SEOF;
             return WEOF;
+        }
         u.c[i] = (char)sc;
     }
 
