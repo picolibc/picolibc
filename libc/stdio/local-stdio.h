@@ -63,6 +63,8 @@ int               __file_wstr_get(FILE *stream);
 
 int               __file_str_put(char c, FILE *stream);
 
+int               __file_wstr_put(char c, FILE *stream);
+
 int               __file_str_put_alloc(char c, FILE *stream);
 
 extern const char __match_inf[];
@@ -102,6 +104,14 @@ bool              __matchcaseprefix(const char *input, const char *pattern);
         .file = { .flags = __SWR, .put = __file_str_put, __LOCK_INIT_NONE }, \
         .pos = (_s),                                                         \
         .end = (_end),                                                       \
+    }
+
+/* A zero-sized wide string is an error even when no output is generated. */
+#define FDEV_SETUP_WSTRING_WRITE(_s, _n)                                                 \
+    {                                                                                    \
+        .file = { .flags = (_n) ? __SWR : 0, .put = __file_wstr_put, __LOCK_INIT_NONE }, \
+        .pos = (char *)(_s),                                                             \
+        .end = (char *)FDEV_STRING_WRITE_END((_s), (_n)),                                \
     }
 
 #define FDEV_SETUP_STRING_ALLOC()                                                  \
