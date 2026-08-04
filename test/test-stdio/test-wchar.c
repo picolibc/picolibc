@@ -80,6 +80,11 @@ main(void)
         unlink(TEST_FILE_NAME);
         return 1;
     }
+    if (!feof(file)) {
+        printf("Test Failed: fgetwc did not set the end-of-file indicator\n");
+        unlink(TEST_FILE_NAME);
+        return 1;
+    }
 
     fclose(file);
 
