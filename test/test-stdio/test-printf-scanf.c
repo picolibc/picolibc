@@ -517,6 +517,33 @@ main(void)
     }
 #endif
 
+#if !defined(__IO_NO_FLOATING_POINT)
+    /*
+     * On a matching failure the differing input character must remain
+     * unread. "left777" is used because 'l' cannot start a float and,
+     * unlike 'i' or 'n', does not enter the inf/nan matching path.
+     */
+    {
+        FILE      *f = fmemopen((void *)"left777", 7, "r");
+        float_type fv;
+
+        if (f == NULL) {
+            printf("fmemopen failed\n");
+            errors++;
+        } else {
+            if (fscanf(f, scanf_format, &fv) != 0) {
+                printf("scanf rollback: wanted a matching failure\n");
+                errors++;
+            }
+            if (fgetc(f) != 'l') {
+                printf("scanf rollback: nonmatching input was consumed\n");
+                errors++;
+            }
+            fclose(f);
+        }
+    }
+#endif
+
     for (x = -37; x <= 37; x++) {
         float_type r;
         unsigned   t;
