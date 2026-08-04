@@ -391,8 +391,10 @@ conv_flt(FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, ui
         } while (CHECK_WIDTH() && !IS_EOF(i = scanf_getc(stream, context)));
 
         if (!(flags & FL_ANY)) {
-            if (!(flags & FL_FHEX))
+            if (!(flags & FL_FHEX)) {
+                scanf_ungetc(i, stream, context);
                 return 0;
+            }
 #if defined(STRTOD) || defined(STRTOF) || defined(STRTOLD)
             scanf_ungetc(i, stream, context);
             scanf_ungetc(i, stream, context);
