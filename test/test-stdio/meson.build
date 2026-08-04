@@ -78,6 +78,7 @@ endif
 if tests_enable_posix_io
   tests += [
     'test-posix-io',
+    'test-atexit-max',
     'test-dprintf',
     'test-fgetc',
     'test-fgets-eof',
