@@ -881,73 +881,22 @@ foreach params : [default_target] + targets
 
   if target == 'default-target' or custom_mem_config != ''
 
-    # Figure out all of the file and variable names
+    # Figure out all of the variable names
 
     if target == 'default-target'
-      picolibc_ld_file = 'picolibc.ld'
-      picolibc_ld_variable = 'picolibc_ld'
-      picolibc_ld_config_variable = 'picolibc_ld_config'
-
-      picolibc_noflash_ld_file = 'picolibc_noflash.ld'
-      picolibc_noflash_ld_variable = 'picolibc_noflash_ld'
-      picolibc_noflash_ld_config_variable = 'picolibc_noflash_ld_config'
-
-      picolibc_linux_ld_file = 'picolibc_linux.ld'
-      picolibc_linux_ld_variable = 'picolibc_linux_ld'
-      picolibc_linux_ld_config_variable = 'picolibc_linux_ld_config'
-
-      picolibcpp_ld_file = 'picolibcpp.ld'
-      picolibcpp_ld_variable = 'picolibcpp_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_ld_config'
-
-      picolibcpp_noflash_ld_file = 'picolibcpp_noflash.ld'
-      picolibcpp_noflash_ld_variable = 'picolibcpp_noflash_ld'
-      picolibcpp_noflash_ld_config_variable = 'picolibcpp_noflash_ld_config'
-
-      picolibcpp_linux_ld_file = 'picolibcpp_linux.ld'
-      picolibcpp_linux_ld_variable = 'picolibcpp_linux_ld'
-      picolibcpp_linux_ld_config_variable = 'picolibcpp_linux_ld_config'
-
+      target = ''
       picolibc_ld_install = true
-
-      if thread_local_storage
-        picolibc_inittls_ld_file = 'picolibc_inittls.ld'
-        picolibc_inittls_ld_variable = 'picolibc_inittls_ld'
-        picolibc_inittls_ld_config_variable = 'picolibc_inittls_ld_config'
-      endif
     else
-      picolibc_ld_file = 'picolibc_' + custom_mem_config + '.ld'
-      picolibc_ld_variable = 'picolibc' + target + '_ld'
-      picolibc_ld_config_variable = 'picolibc_' + custom_mem_config + '_ld_config'
-
-      picolibc_noflash_ld_file = 'picolibc_' + custom_mem_config + '_noflash.ld'
-      picolibc_noflash_ld_variable = 'picolibc' + target + '_noflash_ld'
-      picolibc_noflash_ld_config_variable = 'picolibc_' + custom_mem_config + '_noflash_ld_config'
-
-      picolibc_linux_ld_file = 'picolibc_linux_' + custom_mem_config + '.ld'
-      picolibc_linux_ld_variable = 'picolibc_linux' + target + '_ld'
-      picolibc_linux_ld_config_variable = 'picolibc_linux_' + custom_mem_config + '_ld_config'
-
-      picolibcpp_ld_file = 'picolibcpp_' + custom_mem_config + '.ld'
-      picolibcpp_ld_variable = 'picolibcpp' + target + '_ld'
-      picolibcpp_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_ld_config'
-
-      picolibcpp_noflash_ld_file = 'picolibcpp_noflash_' + custom_mem_config + '.ld'
-      picolibcpp_noflash_ld_variable = 'picolibcpp_noflash' + target.underscorify() + '_ld'
-      picolibcpp_noflash_ld_config_variable = 'picolibcpp_noflash_' + custom_mem_config + '_ld_config'
-
-      picolibcpp_linux_ld_file = 'picolibcpp_' + custom_mem_config + '_linux.ld'
-      picolibcpp_linux_ld_variable = 'picolibcpp_' + target.underscorify() + '_linux_ld'
-      picolibcpp_linux_ld_config_variable = 'picolibcpp_' + custom_mem_config + '_linux_ld_config'
-
-      if thread_local_storage
-        picolibc_inittls_ld_file = 'picolibc_inittls_' + custom_mem_config + '.ld'
-        picolibc_inittls_ld_variable = 'picolibc_inittls_' + target + '_ld'
-        picolibc_inittls_ld_config_variable = 'picolibc_inittls_' + custom_mem_config + '_ld_config'
-      endif
-
-      picolibc_ld_install = false
+      picolibc_ld_install = get_option('install-multilib-linker-scripts')
     endif
+
+    picolibc_ld_variable = 'picolibc' + target + '_ld'
+    picolibc_noflash_ld_variable = 'picolibc_noflash' + target + '_ld'
+    picolibc_linux_ld_variable = 'picolibc_linux' + target + '_ld'
+    picolibc_inittls_ld_variable = 'picolibc_inittls' + target + '_ld'
+    picolibcpp_ld_variable = 'picolibcpp' + target + '_ld'
+    picolibcpp_noflash_ld_variable = 'picolibcpp_noflash' + target + '_ld'
+    picolibcpp_linux_ld_variable = 'picolibcpp_linux' + target + '_ld'
 
     # Compute settings for the default linker script
 
@@ -1215,16 +1164,24 @@ foreach params : [default_target] + targets
 
     # Generate the default linker script
 
-    if not is_variable(picolibc_ld_config_variable)
-      set_variable(picolibc_ld_config_variable,
-                   configure_file(input: 'picolibc.ld.in',
-                                  output: picolibc_ld_file,
-                                  configuration: picolibc_ld_data,
-                                  install: picolibc_ld_install and really_install,
-                                  install_dir: lib_dir))
+    instdir = join_paths(lib_dir, target_dir)
+
+    if meson.version().version_compare('>=1.10')
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: 'picolibc.ld',
+                                         build_subdir : target_dir,
+                                         configuration: picolibc_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
+    else
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: target_dir.underscorify() + '_' + 'picolibc.ld',
+                                         configuration: picolibc_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
     endif
 
-    set_variable(picolibc_ld_variable, get_variable(picolibc_ld_config_variable))
+    set_variable(picolibc_ld_variable, local_picolibc_ld)
 
     # Generate C++ linker script
     picolibcpp_ld_data = configuration_data()
@@ -1234,16 +1191,22 @@ foreach params : [default_target] + targets
     picolibcpp_ld_data.set('CPP', '')
     picolibcpp_ld_data.set('C', ld_comment)
 
-    if not is_variable(picolibcpp_ld_config_variable)
-      set_variable(picolibcpp_ld_config_variable,
-                 configure_file(input: 'picolibc.ld.in',
-                                output: picolibcpp_ld_file,
-                                configuration: picolibcpp_ld_data,
-                                install: picolibc_ld_install and really_install,
-                                install_dir: lib_dir))
+    if meson.version().version_compare('>=1.10')
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: 'picolibcpp.ld',
+                                         build_subdir: target_dir,
+                                         configuration: picolibcpp_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
+    else
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: target_dir.underscorify() + '_' + 'picolibcpp.ld',
+                                         configuration: picolibcpp_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
     endif
 
-    set_variable(picolibcpp_ld_variable, get_variable(picolibcpp_ld_config_variable))
+    set_variable(picolibcpp_ld_variable, local_picolibc_ld)
 
     # Generate a linker script with separate TLS data
 
@@ -1255,16 +1218,22 @@ foreach params : [default_target] + targets
       picolibc_inittls_ld_data.set('INITTLS', '')
       picolibc_inittls_ld_data.set('DATATLS', ld_comment)
 
-      if not is_variable(picolibc_inittls_ld_config_variable)
-        set_variable(picolibc_inittls_ld_config_variable,
-                     configure_file(input: 'picolibc.ld.in',
-                                    output: picolibc_inittls_ld_file,
-                                    configuration: picolibc_inittls_ld_data,
-                                    install: picolibc_ld_install and really_install,
-                                    install_dir: lib_dir))
+      if meson.version().version_compare('>=1.10')
+        local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                           output: 'picolibc_inittls.ld',
+                                           build_subdir: target_dir,
+                                           configuration: picolibc_inittls_ld_data,
+                                           install: picolibc_ld_install and really_install,
+                                           install_dir: instdir)
+      else
+        local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                           output: target_dir.underscorify() + '_' + 'picolibc_inittls.ld',
+                                           configuration: picolibc_inittls_ld_data,
+                                           install: picolibc_ld_install and really_install,
+                                           install_dir: instdir)
       endif
 
-      set_variable(picolibc_inittls_ld_variable, get_variable(picolibc_inittls_ld_config_variable))
+      set_variable(picolibc_inittls_ld_variable, local_picolibc_ld)
     endif
 
     # Generate and install noflash C and C++ linker scripts
@@ -1302,16 +1271,22 @@ foreach params : [default_target] + targets
     picolibc_noflash_ld_data.set('DEFAULT_STACK_SIZE', _default_noflash_stack_size)
     picolibc_noflash_ld_data.set('DEFAULT_ALIGNMENT', _default_noflash_alignment)
 
-    if not is_variable(picolibc_noflash_ld_config_variable)
-      set_variable(picolibc_noflash_ld_config_variable,
-                   configure_file(input: 'picolibc.ld.in',
-                                  output: picolibc_noflash_ld_file,
-                                  configuration: picolibc_noflash_ld_data,
-                                  install: picolibc_ld_install and really_install,
-                                  install_dir: lib_dir))
+    if meson.version().version_compare('>=1.10')
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: 'picolibc_noflash.ld',
+                                         build_subdir: target_dir,
+                                         configuration: picolibc_noflash_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
+    else
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: target_dir.underscorify() + 'picolibc_noflash.ld',
+                                         configuration: picolibc_noflash_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
     endif
 
-    set_variable(picolibc_noflash_ld_variable, get_variable(picolibc_noflash_ld_config_variable))
+    set_variable(picolibc_noflash_ld_variable, local_picolibc_ld)
 
     # no flash C++ version is just the noflash version with CPP and C swapped
     picolibcpp_noflash_ld_data = configuration_data()
@@ -1319,16 +1294,22 @@ foreach params : [default_target] + targets
     picolibcpp_noflash_ld_data.set('CPP', '')
     picolibcpp_noflash_ld_data.set('C', ld_comment)
 
-    if not is_variable(picolibcpp_noflash_ld_config_variable)
-      set_variable(picolibcpp_noflash_ld_config_variable,
-                   configure_file(input: 'picolibc.ld.in',
-                                  output: picolibcpp_noflash_ld_file,
-                                  configuration: picolibcpp_noflash_ld_data,
-                                  install: picolibc_ld_install and really_install,
-                                  install_dir: lib_dir))
+    if meson.version().version_compare('>=1.10')
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: 'picolibcpp_noflash.ld',
+                                         build_subdir: target_dir,
+                                         configuration: picolibcpp_noflash_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
+    else
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: target_dir.underscorify() + '_' + 'picolibcpp_noflash.ld',
+                                         configuration: picolibcpp_noflash_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
     endif
 
-    set_variable(picolibcpp_noflash_ld_variable, get_variable(picolibcpp_noflash_ld_config_variable))
+    set_variable(picolibcpp_noflash_ld_variable, local_picolibc_ld)
 
     # Generate and install linux C and C++ linker scripts
 
@@ -1360,16 +1341,24 @@ foreach params : [default_target] + targets
     picolibc_linux_ld_data.set('DEFAULT_STACK_SIZE', _default_linux_stack_size)
     picolibc_linux_ld_data.set('DEFAULT_ALIGNMENT', _default_linux_alignment)
 
-    if not is_variable(picolibc_linux_ld_config_variable)
-      set_variable(picolibc_linux_ld_config_variable,
-                   configure_file(input: 'picolibc.ld.in',
-                                  output: picolibc_linux_ld_file,
-                                  configuration: picolibc_linux_ld_data,
-                                  install: picolibc_ld_install and really_install,
-                                  install_dir: lib_dir))
+
+    if meson.version().version_compare('>=1.10')
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: 'picolibc_linux.ld',
+                                         build_subdir : target_dir,
+                                         configuration: picolibc_linux_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
+    else
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: target_dir.underscorify() + '_' + 'picolibc_linux.ld',
+                                         configuration: picolibc_linux_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
     endif
 
-    set_variable(picolibc_linux_ld_variable, get_variable(picolibc_linux_ld_config_variable))
+
+    set_variable(picolibc_linux_ld_variable, local_picolibc_ld)
 
     # linux C++ version is just the linux version with CPP and C swapped
     picolibcpp_linux_ld_data = configuration_data()
@@ -1377,16 +1366,22 @@ foreach params : [default_target] + targets
     picolibcpp_linux_ld_data.set('CPP', '')
     picolibcpp_linux_ld_data.set('C', ld_comment)
 
-    if not is_variable(picolibcpp_linux_ld_config_variable)
-      set_variable(picolibcpp_linux_ld_config_variable,
-                   configure_file(input: 'picolibc.ld.in',
-                                  output: picolibcpp_linux_ld_file,
-                                  configuration: picolibcpp_linux_ld_data,
-                                  install: picolibc_ld_install and really_install,
-                                  install_dir: lib_dir))
+    if meson.version().version_compare('>=1.10')
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: 'picolibcpp_linux.ld',
+                                         build_subdir: target_dir,
+                                         configuration: picolibcpp_linux_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
+    else
+      local_picolibc_ld = configure_file(input: 'picolibc.ld.in',
+                                         output: target_dir.underscorify() + '_' + 'picolibcpp_linux.ld',
+                                         configuration: picolibcpp_linux_ld_data,
+                                         install: picolibc_ld_install and really_install,
+                                         install_dir: instdir)
     endif
 
-    set_variable(picolibcpp_linux_ld_variable, get_variable(picolibcpp_linux_ld_config_variable))
+    set_variable(picolibcpp_linux_ld_variable, local_picolibc_ld)
 
   endif
 endforeach
@@ -1883,7 +1878,7 @@ if oslib_test != ''
         test_inittls_link_args_variable = 'test_inittls_link_args' + target
         test_inittls_linker_files_variable = 'test_inittls_linker_files_' + target
         test_inittls_link_depends_variable = 'test_inittls_link_depends' + target
-        picolibc_inittls_ld_value = get_variable('picolibc_inittls_' + target + '_ld', picolibc_inittls_ld)
+        picolibc_inittls_ld_value = get_variable('picolibc_inittls' + target + '_ld', picolibc_inittls_ld)
       endif
 
     endif
