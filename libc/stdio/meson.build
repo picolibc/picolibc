@@ -76,6 +76,7 @@ srcs_stdio = [
   'filestrputalloc.c',
   'filestrput.c',
   'filewstrget.c',
+  'filewstrput.c',
   'flockfile.c',
   'flockfile_init.c',
   'fmemopen.c',

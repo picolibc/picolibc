@@ -38,7 +38,7 @@
 int
 vswprintf(wchar_t *s, size_t n, const wchar_t *fmt, va_list ap)
 {
-    struct __file_str f = FDEV_SETUP_STRING_WRITE((char *)s, (char *)FDEV_STRING_WRITE_END(s, n));
+    struct __file_str f = FDEV_SETUP_WSTRING_WRITE(s, n);
     int               i;
 
     f.file.flags |= __SWIDE;
