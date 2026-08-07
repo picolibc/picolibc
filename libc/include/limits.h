@@ -147,5 +147,12 @@
 #define __GLIBC_USE(x) 1
 #endif
 #endif
+/* Workaround buggy toolchains that define __STDC_WANT_LIB_EXT1__ in limits.h */
+#ifndef __STDC_WANT_LIB_EXT1__
+#define __UNDEF__STDC_WANT_LIB_EXT1__
+#endif
 #include_next <limits.h>
+#ifdef __UNDEF__STDC_WANT_LIB_EXT1__
+#undef __STDC_WANT_LIB_EXT1__
+#endif
 #endif /* __GNUC__ && !_GCC_LIMITS_H_ */
