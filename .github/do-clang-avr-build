@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+HERE=$(dirname "$0")
+AVR_SDK_INSTALL_DIR=${AVR_SDK_INSTALL_DIR:-/opt/avr}
+C_INCLUDE_PATH="$AVR_SDK_INSTALL_DIR/avr/include${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}"
+export C_INCLUDE_PATH
+
+exec "$HERE"/do-build clang-avr "$@" -Danalyzer=false

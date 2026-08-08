@@ -60,10 +60,18 @@
 #include <avr/io.h>
 #include "macros.inc"
 
-/* ???: What was a reason to use aliases for common registers?
-   Check the address: is it a port number (value for IN/OUT)?	*/
-#if	AVR_STACK_POINTER_LO_ADDR != 0x3D	\
-     || AVR_STATUS_ADDR != 0x3F
+#ifndef SPL_IO_ADDR
+#define SPL_IO_ADDR AVR_STACK_POINTER_LO_ADDR
+#endif
+#ifndef SPH_IO_ADDR
+#define SPH_IO_ADDR AVR_STACK_POINTER_HI_ADDR
+#endif
+#ifndef SREG_IO_ADDR
+#define SREG_IO_ADDR AVR_STATUS_ADDR
+#endif
+
+/* These registers are accessed with IN/OUT below. */
+#if	SPL_IO_ADDR != 0x3D || SREG_IO_ADDR != 0x3F
 # error  "Strange address of common registers SPL, SREG"
 #endif
 
@@ -97,16 +105,16 @@ _U(setjmp):
 	pop	ZH
 	pop	ZL
   ; save stack pointer (after poping)
-	in	ret_lo, AVR_STACK_POINTER_LO_ADDR
+	in	ret_lo, SPL_IO_ADDR
 	st	X+, ret_lo
-#ifdef __HAVE_AVR_STACK_POINTER_HI    
-	in	ret_lo, AVR_STACK_POINTER_HI_ADDR
+#ifdef SPH
+	in	ret_lo, SPH_IO_ADDR
 	st	X+, ret_lo
 #else
 	st	X+, __zero_reg__
 #endif
   ; save status register (I flag)
-	in	ret_lo, AVR_STATUS_ADDR
+	in	ret_lo, SREG_IO_ADDR
 	st	X+, ret_lo
   ; save return address
 	st	X+, ZL
@@ -148,19 +156,19 @@ _U(longjmp):
 #if  defined (__AVR_XMEGA__) && __AVR_XMEGA__
 	/* A write to SPL will automatically disable interrupts for up to 4
 	   instructions or until the next I/O memory write.	*/
-	out	AVR_STATUS_ADDR, __tmp_reg__
-	out	AVR_STACK_POINTER_LO_ADDR, ZL
-	out	AVR_STACK_POINTER_HI_ADDR, ZH
+	out	SREG_IO_ADDR, __tmp_reg__
+	out	SPL_IO_ADDR, ZL
+	out	SPH_IO_ADDR, ZH
 #else
-# ifdef __HAVE_AVR_STACK_POINTER_HI
+# ifdef SPH
 	/* interrupts disabled for shortest possible time (3 cycles) */
 	cli
-	out	AVR_STACK_POINTER_HI_ADDR, ZH
+	out	SPH_IO_ADDR, ZH
 # endif
 	/* Restore status register (including the interrupt enable flag).
 	   Interrupts are re-enabled only after the next instruction.  */
-	out	AVR_STATUS_ADDR, __tmp_reg__
-	out	AVR_STACK_POINTER_LO_ADDR, ZL
+	out	SREG_IO_ADDR, __tmp_reg__
+	out	SPL_IO_ADDR, ZL
 #endif
   ; get return address and jump
 	ld	ZL, X+

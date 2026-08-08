@@ -22,6 +22,11 @@ case "$TARGET" in
             [ -d "$p" ] && PATH="$p":$PATH
         done
         ;;
+    *clang-avr*)
+        for p in "$TOP"/*avr*/bin; do
+            [ -d "$p" ] && PATH="$p":$PATH
+        done
+        ;;
     *)
         for p in "$TOP"/*/bin "$TOP"/*/models/*; do
             PATH="$p":$PATH
