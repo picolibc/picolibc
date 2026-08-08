@@ -112,6 +112,11 @@ main(void)
     int       status = 0;
     mbstate_t mbstate;
 
+    if (wctob(WEOF) != EOF || wctob((wint_t)-2) != EOF || wctob((wint_t)-3) != EOF) {
+        printf("wctob accepted an invalid negative value\n");
+        status = 1;
+    }
+
 #if !defined(__PICOLIBC__) || defined(__MB_CAPABLE)
     if (!setlocale(LC_CTYPE, "C.UTF-8")) {
         printf("setlocale(LC_CTYPE, \"C.UTF-8\") failed\n");
