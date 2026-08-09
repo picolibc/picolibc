@@ -835,7 +835,6 @@ ret:
 #endif
     __funlock_return(stream, stream_len);
 #undef my_putc
-#undef ap
 fail:
     stream->flags |= __SERR;
     stream_len = -1;
@@ -845,8 +844,12 @@ handle_error:
     if (__cur_handler != 0)
         __cur_handler(msg, NULL, -1);
     stream->flags |= __SERR;
+#ifdef _NEED_IO_POS_ARGS
+    va_end(ap);
+#endif
     __funlock_return(stream, -1);
 #endif
+#undef ap
 }
 
 #if !defined(VFPRINTF_S) && !defined(WIDE_CHARS)
