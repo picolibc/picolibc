@@ -35,6 +35,12 @@
 
 #include <unistd.h>
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-infinite-loop"
+#endif
+
 void
 _exit(int status)
 {
