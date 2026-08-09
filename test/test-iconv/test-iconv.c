@@ -352,6 +352,8 @@ test_iconv_valid(void)
                     err = 1;
                 }
 #endif
+                (void)inexact_from_utf;
+                (void)inexact_to_utf;
 
                 /* Make sure the round trip is successful */
                 if (tocount != fromcount) {
