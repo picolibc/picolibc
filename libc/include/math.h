@@ -693,15 +693,21 @@ extern void sincosf(float, float *, float *);
 #ifdef __HAVE_LONG_DOUBLE_MATH
 extern void sincosl(long double, long double *, long double *);
 #endif
-extern double exp10(double);
 extern double pow10(double);
-extern float  exp10f(float);
 extern float  pow10f(float);
 #ifdef __HAVE_LONG_DOUBLE_MATH
-extern long double exp10l(long double);
 extern long double pow10l(long double);
 #endif
 #endif /* __GNU_VISIBLE */
+
+/* C23 / GNU */
+#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+extern double exp10(double);
+extern float  exp10f(float);
+#ifdef __HAVE_LONG_DOUBLE_MATH
+extern long double exp10l(long double);
+#endif
+#endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
 extern int signgam;
