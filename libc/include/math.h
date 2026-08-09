@@ -693,15 +693,21 @@ extern void sincosf(float, float *, float *) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE_MATH
 extern void sincosl(long double, long double *, long double *) __picolibc_export;
 #endif
-extern double exp10(double) __picolibc_export;
 extern double pow10(double) __picolibc_export;
-extern float  exp10f(float) __picolibc_export;
 extern float  pow10f(float) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE_MATH
-extern long double exp10l(long double) __picolibc_export;
 extern long double pow10l(long double) __picolibc_export;
 #endif
 #endif /* __GNU_VISIBLE */
+
+/* C23 / GNU */
+#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+extern double exp10(double) __picolibc_export;
+extern float  exp10f(float) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE_MATH
+extern long double exp10l(long double) __picolibc_export;
+#endif
+#endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
 extern __picolibc_export int signgam;

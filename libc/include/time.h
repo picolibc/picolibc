@@ -228,13 +228,13 @@ int getdate_r(const char *, struct tm *) __picolibc_export;
 
 struct tm *gmtime(const time_t *_timer) __picolibc_export;
 
-#if __POSIX_VISIBLE || __ZEPHYR_VISIBLE
+#if __POSIX_VISIBLE || __ZEPHYR_VISIBLE || __ISO_C_VISIBLE >= 2023
 struct tm *gmtime_r(const time_t * __restrict, struct tm * __restrict) __picolibc_export;
 #endif
 
 struct tm *localtime(const time_t *_timer) __picolibc_export;
 
-#if __POSIX_VISIBLE
+#if __POSIX_VISIBLE || __ISO_C_VISIBLE >= 2023
 struct tm *localtime_r(const time_t * __restrict, struct tm * __restrict) __picolibc_export;
 #endif
 
@@ -267,7 +267,7 @@ char *strptime_l(const char * __restrict, const char * __restrict, struct tm * _
 
 time_t time(time_t *_timer) __picolibc_export;
 
-#if __BSD_VISIBLE || __SVID_VISIBLE || __GNU_VISIBLE
+#if __BSD_VISIBLE || __SVID_VISIBLE || __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
 time_t timegm(struct tm *_timeptr) __picolibc_export;
 #endif
 

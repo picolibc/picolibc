@@ -257,7 +257,7 @@ extern "C" {
  *	g++ -std=c++11 or newer (on by default since GCC 6), or with
  *	_ISOC11_SOURCE.
  *
- * __ISO_C_VISIBLE >= 2020
+ * __ISO_C_VISIBLE >= 2023
  *	ISO C23; enabled with gcc -std=c23 or newer,
  *	g++ -std=c++20 or newer, or with
  *	_ISOC23_SOURCE or _ISOC2x_SOURCE.
