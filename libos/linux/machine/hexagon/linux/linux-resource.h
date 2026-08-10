@@ -32,25 +32,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#ifndef _LINUX_RESOURCE_H_
+#define _LINUX_RESOURCE_H_
+#define LINUX_RLIMIT_CPU      0
+#define LINUX_RLIMIT_FSIZE    1
+#define LINUX_RLIMIT_DATA     2
+#define LINUX_RLIMIT_STACK    3
+#define LINUX_RLIMIT_CORE     4
+#define LINUX_RLIMIT_NOFILE   7
+#define LINUX_RLIMIT_AS       9
+#define LINUX_RLIM_INFINITY   18446744073709551615U
+#define LINUX_RLIM64_INFINITY 18446744073709551615U
+#define LINUX_RLIM_SAVED_MAX  18446744073709551615U
+#define LINUX_RLIM_SAVED_CUR  18446744073709551615U
 
-#include "local-statx.h"
-
-int
-fstat(int fd, struct stat *statbuf)
+static inline int
+_rlimit_to_linux(int resource)
 {
-    struct __kernel_statx statxbuf;
-    int                   ret;
-
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
+    switch (resource) {
+    case RLIMIT_CPU:
+        return LINUX_RLIMIT_CPU;
+    case RLIMIT_FSIZE:
+        return LINUX_RLIMIT_FSIZE;
+    case RLIMIT_DATA:
+        return LINUX_RLIMIT_DATA;
+    case RLIMIT_STACK:
+        return LINUX_RLIMIT_STACK;
+    case RLIMIT_CORE:
+        return LINUX_RLIMIT_CORE;
+    case RLIMIT_NOFILE:
+        return LINUX_RLIMIT_NOFILE;
+    case RLIMIT_AS:
+        return LINUX_RLIMIT_AS;
+    default:
+        return -1;
+    }
 }
+#endif /* _LINUX_RESOURCE_H_ */

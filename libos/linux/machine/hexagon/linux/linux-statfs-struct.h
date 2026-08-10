@@ -33,24 +33,36 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-statx.h"
+#ifndef _LINUX_STATFS_STRUCT_H_
+#define _LINUX_STATFS_STRUCT_H_
 
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
+struct __kernel_statfs {
+    __uint32_t        f_type;
+    __uint32_t        f_bsize;
+    __uint64_t        f_blocks;
+    __uint64_t        f_bfree;
+    __uint64_t        f_bavail;
+    __uint64_t        f_files;
+    __uint64_t        f_ffree;
+    __kernel___fsid_t f_fsid;
+    __uint32_t        f_namelen;
+    __uint32_t        f_frsize;
+    __uint32_t        f_flags;
+    __uint8_t         __adjust_68[20];
+};
 
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#define SIMPLE_MAP_STATFS(_t, _f)          \
+    do {                                   \
+        (_t)->f_type = (_f)->f_type;       \
+        (_t)->f_bsize = (_f)->f_bsize;     \
+        (_t)->f_blocks = (_f)->f_blocks;   \
+        (_t)->f_bfree = (_f)->f_bfree;     \
+        (_t)->f_bavail = (_f)->f_bavail;   \
+        (_t)->f_files = (_f)->f_files;     \
+        (_t)->f_ffree = (_f)->f_ffree;     \
+        (_t)->f_namelen = (_f)->f_namelen; \
+        (_t)->f_frsize = (_f)->f_frsize;   \
+        (_t)->f_flags = (_f)->f_flags;     \
+    } while (0)
+
+#endif /* _LINUX_STATFS_STRUCT_H_ */

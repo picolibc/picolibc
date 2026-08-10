@@ -33,24 +33,26 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-statx.h"
+#ifndef _LINUX_TERMIOS_STRUCT_H_
+#define _LINUX_TERMIOS_STRUCT_H_
 
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
+typedef __uint32_t __kernel_tcflag_t;
+typedef __uint8_t  __kernel_cc_t;
+typedef __uint32_t __kernel_speed_t;
 
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+struct __kernel_termios2 {
+    __kernel_tcflag_t c_iflag;
+    __kernel_tcflag_t c_oflag;
+    __kernel_tcflag_t c_cflag;
+    __kernel_tcflag_t c_lflag;
+    __kernel_cc_t     c_line;
+    __kernel_cc_t     c_cc[19];
+    __kernel_speed_t  c_ispeed;
+    __kernel_speed_t  c_ospeed;
+};
+
+#define SIMPLE_MAP_TERMIOS2(_t, _f) \
+    do {                            \
+    } while (0)
+
+#endif /* _LINUX_TERMIOS_STRUCT_H_ */

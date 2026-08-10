@@ -32,25 +32,41 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "local-statx.h"
-
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
-
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#ifndef _LINUX_DIRENT_H_
+#define _LINUX_DIRENT_H_
+#define LINUX_DT_BLK     6
+#define LINUX_DT_CHR     2
+#define LINUX_DT_DIR     4
+#define LINUX_DT_FIFO    1
+#define LINUX_DT_LNK     10
+#define LINUX_DT_REG     8
+#define LINUX_DT_SOCK    12
+#define LINUX_DT_UNKNOWN 0
+#define MAP_DT(p_dt, l_dt) \
+    switch (l_dt) {        \
+    case LINUX_DT_BLK:     \
+        p_dt = DT_BLK;     \
+        break;             \
+    case LINUX_DT_CHR:     \
+        p_dt = DT_CHR;     \
+        break;             \
+    case LINUX_DT_DIR:     \
+        p_dt = DT_DIR;     \
+        break;             \
+    case LINUX_DT_FIFO:    \
+        p_dt = DT_FIFO;    \
+        break;             \
+    case LINUX_DT_LNK:     \
+        p_dt = DT_LNK;     \
+        break;             \
+    case LINUX_DT_REG:     \
+        p_dt = DT_REG;     \
+        break;             \
+    case LINUX_DT_SOCK:    \
+        p_dt = DT_SOCK;    \
+        break;             \
+    case LINUX_DT_UNKNOWN: \
+        p_dt = DT_UNKNOWN; \
+        break;             \
+    }
+#endif /* _LINUX_DIRENT_H_ */

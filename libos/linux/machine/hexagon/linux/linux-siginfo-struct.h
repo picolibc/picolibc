@@ -33,24 +33,36 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-statx.h"
+#ifndef _LINUX_SIGINFO_STRUCT_H_
+#define _LINUX_SIGINFO_STRUCT_H_
 
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
+struct __kernel_siginfo {
+    __int32_t si_signo;
+    __int32_t si_errno;
+    __int32_t si_code;
+    union {
+        __int32_t si_pid;
+        void     *si_addr;
+        __int32_t si_band;
+    };
+    __uint32_t si_uid;
+    union {
+        __int32_t             si_status;
+        union __kernel_sigval si_value;
+    };
+    __uint8_t __adjust_24[104];
+};
 
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#define SIMPLE_MAP_SIGINFO(_t, _f)         \
+    do {                                   \
+        (_t)->si_signo = (_f)->si_signo;   \
+        (_t)->si_code = (_f)->si_code;     \
+        (_t)->si_errno = (_f)->si_errno;   \
+        (_t)->si_pid = (_f)->si_pid;       \
+        (_t)->si_uid = (_f)->si_uid;       \
+        (_t)->si_addr = (_f)->si_addr;     \
+        (_t)->si_status = (_f)->si_status; \
+        (_t)->si_band = (_f)->si_band;     \
+    } while (0)
+
+#endif /* _LINUX_SIGINFO_STRUCT_H_ */
