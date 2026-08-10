@@ -33,24 +33,21 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-statx.h"
+#ifndef _LINUX_FSID_STRUCT_H_
+#define _LINUX_FSID_STRUCT_H_
 
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
+struct __kernel___fsid {
+    __int32_t __val[2];
+};
+typedef struct __kernel___fsid __kernel___fsid_t;
 
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#define SIMPLE_MAP___FSID(_t, _f)                    \
+    do {                                             \
+        {                                            \
+            unsigned __i;                            \
+            for (__i = 0; __i < 2; __i++)            \
+                (_t)->__val[__i] = (_f)->__val[__i]; \
+        }                                            \
+    } while (0)
+
+#endif /* _LINUX_FSID_STRUCT_H_ */

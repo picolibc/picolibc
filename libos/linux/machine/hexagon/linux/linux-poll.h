@@ -32,25 +32,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "local-statx.h"
-
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
-
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#ifndef _LINUX_POLL_H_
+#define _LINUX_POLL_H_
+#define LINUX_POLLIN     1
+#define LINUX_POLLPRI    2
+#define LINUX_POLLOUT    4
+#define LINUX_POLLERR    8
+#define LINUX_POLLHUP    16
+#define LINUX_POLLNVAL   32
+#define LINUX_POLLRDNORM 64
+#define LINUX_POLLRDBAND 128
+#define LINUX_POLLWRNORM 256
+#define LINUX_POLLWRBAND 512
+#define LINUX_POLLMSG    1024
+#define LINUX_POLLREMOVE 4096
+#define LINUX_POLLRDHUP  8192
+#endif /* _LINUX_POLL_H_ */
