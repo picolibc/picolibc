@@ -670,12 +670,14 @@ endif
 # CompCert does not support bitfields in packed structs, so avoid using this optimization
 bitfields_in_packed_structs_code = '''
 struct test { int part: 24; } __attribute__((packed));
+unsigned int foobar (const struct test *p);
 unsigned int foobar (const struct test *p) { return p->part; }
 '''
 have_bitfields_in_packed_structs = cc.compiles(bitfields_in_packed_structs_code, name : 'packed structs may contain bitfields', args: c_args)
 
 # CompCert does not support _Complex
 complex_code = '''
+float _Complex test(float _Complex z);
 float _Complex test(float _Complex z) { return z; }
 '''
 have_complex = cc.compiles(complex_code, name : 'supports _Complex', args: c_args)
