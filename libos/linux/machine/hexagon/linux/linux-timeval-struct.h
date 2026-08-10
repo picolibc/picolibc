@@ -33,24 +33,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-statx.h"
+#ifndef _LINUX_TIMEVAL_STRUCT_H_
+#define _LINUX_TIMEVAL_STRUCT_H_
 
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
+struct __kernel_timeval {
+    __int32_t tv_sec;
+    __int32_t tv_usec;
+};
 
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#define SIMPLE_MAP_TIMEVAL(_t, _f)     \
+    do {                               \
+        (_t)->tv_sec = (_f)->tv_sec;   \
+        (_t)->tv_usec = (_f)->tv_usec; \
+    } while (0)
+
+#endif /* _LINUX_TIMEVAL_STRUCT_H_ */

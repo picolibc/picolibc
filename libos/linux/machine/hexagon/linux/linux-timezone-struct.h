@@ -33,24 +33,18 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "local-statx.h"
+#ifndef _LINUX_TIMEZONE_STRUCT_H_
+#define _LINUX_TIMEZONE_STRUCT_H_
 
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
+struct __kernel_timezone {
+    __int32_t tz_minuteswest;
+    __int32_t tz_dsttime;
+};
 
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#define SIMPLE_MAP_TIMEZONE(_t, _f)                  \
+    do {                                             \
+        (_t)->tz_minuteswest = (_f)->tz_minuteswest; \
+        (_t)->tz_dsttime = (_f)->tz_dsttime;         \
+    } while (0)
+
+#endif /* _LINUX_TIMEZONE_STRUCT_H_ */

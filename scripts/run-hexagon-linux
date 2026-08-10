@@ -1,3 +1,4 @@
+#!/bin/sh
 # Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
 # SPDX-License-Identifier: BSD-3-Clause-Clear
 #
@@ -31,5 +32,38 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-src_picocrt = files('crt0.S', 'crt0.c')
-has_crt0_linux = true
+elf="$1"
+shift
+elf_dir=$(dirname "$elf")
+elf_base=$(basename "$elf")
+
+done=0
+while [ $# -gt 0 ] && [ $done -eq 0 ]; do
+  case "$1" in
+    --stdin)
+      if [ $# -lt 2 ]; then
+        echo "Error: --stdin requires a quoted string"
+        exit 1
+      fi
+      stdin="$2"
+      shift 2
+      ;;
+    --args)
+      if [ $# -lt 2 ]; then
+        echo "Error: --args requires a quoted string"
+        exit 1
+      fi
+      args="$2"
+      shift 2
+      ;;
+    *)
+      done=1
+      ;;
+  esac
+done
+
+if [ -n "$stdin" ]; then
+  (cd "$elf_dir" && printf '%s\n' "$stdin" | qemu-hexagon "./$elf_base" $args "$@")
+else
+  cd "$elf_dir" && exec qemu-hexagon "./$elf_base" $args "$@"
+fi

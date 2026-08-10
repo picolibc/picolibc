@@ -32,25 +32,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-
-#include "local-statx.h"
-
-int
-fstat(int fd, struct stat *statbuf)
-{
-    struct __kernel_statx statxbuf;
-    int                   ret;
-
-    /*
-     * AT_EMPTY_PATH operates on the descriptor itself and is defined in
-     * terms of an empty pathname, which has worked since it was added in
-     * Linux 2.6.39. A NULL pathname is only accepted from Linux 6.11
-     * onwards, and qemu-linux-user only started forwarding NULL instead
-     * of failing with EFAULT in late 2025, so pass "" to stay portable.
-     */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
-    if (ret < 0)
-        return ret;
-    return _statbuf(statbuf, &statxbuf);
-}
+#ifndef _LINUX_TIME_H_
+#define _LINUX_TIME_H_
+#define LINUX_CLOCK_MONOTONIC          0x00000001
+#define LINUX_CLOCK_PROCESS_CPUTIME_ID 0x00000002
+#define LINUX_CLOCK_REALTIME           0x00000000
+#define LINUX_CLOCK_THREAD_CPUTIME_ID  0x00000003
+#define LINUX_ITIMER_PROF              0x00000002
+#define LINUX_ITIMER_REAL              0x00000000
+#define LINUX_ITIMER_VIRTUAL           0x00000001
+#define LINUX_TIMER_ABSTIME            0x00000001
+#endif /* _LINUX_TIME_H_ */
