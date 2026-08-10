@@ -32,10 +32,23 @@ IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
 OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-    .section .text.init.enter, "awx", @progbits
+    .section .text.init.enter, "ax", @progbits
     .global _start
     .type _start, @function
 _start:
+#ifdef CRT0_LINUX
+    /*
+     * Linux enters _start with r29/sp pointing at the initial process
+     * stack: argc, argv[], NULL, envp[], NULL, auxv[].  Preserve that
+     * original stack pointer in r0 for _cstart(), then align sp before
+     * calling C code.  Do not replace sp with __stack as the bare-metal
+     * path does or argc/argv would be lost.
+     */
+    r30 = #0
+    r0 = r29
+    r29 = and(r29, #-16)
+    call _cstart
+#else
 #ifdef CRT0_SEMIHOST
     // Setup event vector base
     r0 = ##.EventVectors
@@ -48,9 +61,10 @@ _start:
     r0 = ##_SDA_BASE_
     gp = r0
     jump _cstart
+#endif
     .size _start, . - _start
 
-#ifdef CRT0_SEMIHOST
+#if defined(CRT0_SEMIHOST) && !defined(CRT0_LINUX)
     .text
     .p2align 4
     .type event_handle_reset, @function

@@ -34,6 +34,7 @@
  */
 
 #include <asm/termbits.h>
+#include <asm/ioctls.h>
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <stdio.h>

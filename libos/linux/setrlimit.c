@@ -44,6 +44,18 @@ setrlimit(int resource, const struct rlimit *rlim)
         errno = EINVAL;
         return -1;
     }
+    /*
+     * POSIX requires EINVAL when the soft limit exceeds the hard limit.
+     * The kernel enforces this, but qemu-linux-user deliberately does not
+     * forward RLIMIT_AS, RLIMIT_DATA and RLIMIT_STACK (applying them would
+     * also constrain QEMU itself), reporting success without validating
+     * anything. Check here so the error is reported consistently on both
+     * real hardware and under emulation.
+     */
+    if (rlim->rlim_cur > rlim->rlim_max) {
+        errno = EINVAL;
+        return -1;
+    }
     SIMPLE_MAP_RLIMIT_SIZE(&klim, rlim);
     if (rlim->rlim_cur == RLIM_INFINITY)
         klim.rlim_cur = LINUX_RLIM_INFINITY_SIZE;

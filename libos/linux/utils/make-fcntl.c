@@ -35,6 +35,7 @@
 
 #define _GNU_SOURCE
 #include <fcntl.h>
+#include <linux/stat.h>
 #include <sys/stat.h>
 #include <stdio.h>
 
