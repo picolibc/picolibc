@@ -180,6 +180,9 @@ __malloc_like __warn_unused_result __alloc_size(1) __nothrow __picolibc_export;
 int    mblen(const char *, size_t) __picolibc_export;
 size_t mbstowcs(wchar_t * __restrict, const char * __restrict, size_t) __picolibc_export;
 int    mbtowc(wchar_t    *__restrict, const char    *__restrict, size_t) __picolibc_export;
+#if __ISO_C_VISIBLE >= 2023
+size_t memalignment(const void *) __picolibc_export;
+#endif
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 char *mkdtemp(char *) __picolibc_export;
 #endif

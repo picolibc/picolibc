@@ -42,6 +42,7 @@ set(tests
   test-quick-exit
   test-rand
   test-strtod
+  test-memalignment
   )
 
 set(tests_fail

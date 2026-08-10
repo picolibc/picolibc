@@ -80,6 +80,7 @@ picolibc_sources(
   mbstowcs.c
   mbtowc.c
   mbtowc_r.c
+  memalignment.c
   mrand48.c
   nrand48.c
   putenv.c

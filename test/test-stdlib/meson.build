@@ -39,6 +39,7 @@ tests = [
   'test-efcvt',
   'test-malloc',
   'test-malloc-stress',
+  'test-memalignment',
   'test-on_exit',
   'test-quick-exit',
   'test-rand',
@@ -136,9 +137,17 @@ foreach params : targets
 
 endforeach
 
+# Host libc may not provide C23 memalignment yet.
+test_skip_native = [
+  'test-memalignment',
+]
+
 if enable_native_tests
 
   foreach t1 : tests
+    if t1 in test_skip_native
+      continue
+    endif
     t1_src = t1 + '.c'
     t1_name = t1 + '-native'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']

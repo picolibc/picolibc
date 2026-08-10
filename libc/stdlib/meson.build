@@ -103,6 +103,7 @@ srcs_stdlib = [
     'mbstowcs.c',
     'mbtowc.c',
     'mbtowc_r.c',
+    'memalignment.c',
     'mrand48.c',
     'nrand48.c',
     'onexit.c',
