@@ -127,6 +127,7 @@ endif
 enable_multilib = get_option('multilib')
 multilib_list = get_option('multilib-list')
 multilib_exclude = get_option('multilib-exclude')
+multilib_include = get_option('multilib-include')
 enable_picocrt = get_option('picocrt')
 enable_picocrt_lib = get_option('picocrt-lib')
 picocrt_enable_mmu = get_option('picocrt-enable-mmu')
@@ -718,14 +719,23 @@ if enable_multilib
   foreach target : target_list
     tmp = target.split(';')
     matches_exclude = false
+    if multilib_include != []
+      matches_exclude = true
+      foreach include : multilib_include
+        if tmp[0].contains(include)
+          matches_exclude = false
+          break
+        endif
+      endforeach
+    endif
     foreach exclude : multilib_exclude
       if tmp[0].contains(exclude)
         matches_exclude = true
-        message('skipping target ' + tmp[0])
         break
       endif
     endforeach
     if matches_exclude
+      message('skipping target ' + tmp[0])
       continue
     endif
 

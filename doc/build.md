@@ -35,6 +35,7 @@ These options control some general build configuration values.
 | multilib                    | true    | Build every multilib configuration supported by the compiler                         |
 | multilib-list               | <empty> | If non-empty, the set of multilib configurations to compile for                      |
 | multilib-exclude            | <empty> | Multilib configurations containing any of these strings will not be built            |
+| multilib-include            | <empty> | If non-empty, only build multilib configurations containing any of these strings     |
 | b_sanitize=_option list_    | false   | Build the library -fsanitize set to the provided list, e.g. -Db_sanitize=undefined   |
 | sanitize-trap-on-error      | false   | Build the library with -fsanitize-undefined-trap-on-error                            |
 | sanitize-allow-missing      | false   | Don't bail if the selected sanitize option is not supported by the compiler          |
