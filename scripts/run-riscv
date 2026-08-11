@@ -193,17 +193,7 @@ if nm "$elf" | grep -q __riscv_enable_smrnmi; then
     esac
 fi
 
-# Set the target machine
-machine=virt,accel=tcg
-
-# Map stdio to a multiplexed character device so we can use it
-# for the monitor and semihosting output
-
-chardev=stdio,mux=on,id=stdio0
-
-# Point the semihosting driver at our new chardev
-
-semi=enable=on,chardev=stdio0,arg="program-name $args"
+semi=enable=on,arg="program-name $args"
 
 # The CFI shadow-stack crt0 variant drops to U-mode before running the
 # application so that the MMU-enforced Zicfiss shadow-stack page is actually
@@ -214,23 +204,13 @@ if [ -n "$QEMU_ADD_ZICFI" ]; then
     semi="$semi,userspace=on"
 fi
 
-# Disable monitor
-
-mon=none
-
-# Disable serial
-
-serial=none
-
 echo $stdin | \
   "$qemu" \
-    -chardev $chardev \
     -semihosting-config "$semi" \
-    -monitor "$mon" \
-    -serial "$serial" \
-    -machine "$machine" \
+    -monitor none \
+    -serial none \
+    -machine none \
     -cpu "$cpu" \
-    -kernel "$elf" \
+    -device loader,file="$elf",cpu-num=0 \
     -nographic \
-    -bios none \
-    -m 2G "$@"
+    -m 4G "$@"
