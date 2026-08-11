@@ -34,8 +34,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu="qemu-system-aarch64"
-
 # select the program
 elf=hello-world-aarch64.elf
 
@@ -46,8 +44,13 @@ case $1 in
 	;;
 esac
 
-# Set the target machine
-machine=virt
+# Set the target cpu
 cpu=cortex-a57
 
-$qemu -semihosting-config enable=on -monitor none -serial none -nographic -machine $machine -cpu $cpu -kernel $elf "$@"
+qemu-system-aarch64 \
+    -semihosting-config enable=on \
+    -monitor none \
+    -serial none \
+    -nographic -machine virt \
+    -cpu $cpu \
+    -kernel $elf "$@"

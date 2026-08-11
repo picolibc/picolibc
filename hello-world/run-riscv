@@ -34,8 +34,6 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-qemu="qemu-system-riscv32"
-
 # select the program
 elf=hello-world-riscv.elf
 
@@ -46,8 +44,12 @@ case $1 in
 	;;
 esac
 
-# Set the target machine
-machine=virt,accel=tcg
-cpu=rv32
-
-$qemu -semihosting-config enable=on -monitor none -serial none -nographic -machine $machine -cpu $cpu -bios none -kernel $elf "$@"
+qemu-system-riscv32 \
+    -semihosting-config enable=on \
+    -monitor none \
+    -serial none \
+    -nographic \
+    -machine none \
+    -cpu rv32 \
+    -device "loader,file=$elf,cpu-num=0" \
+    -m 4G "$@"
