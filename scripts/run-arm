@@ -1,5 +1,5 @@
-#!/bin/bash
-#
+#!/bin/sh
+#  
 # SPDX-License-Identifier: BSD-3-Clause
 #
 # Copyright © 2019 Keith Packard
@@ -73,10 +73,17 @@ memory=
 # Map ELF information to required core type
 #
 
-cpu_arch=`readelf -A "$elf" | awk '/Tag_CPU_arch:/ { print $2 }'`
-cpu_profile=`readelf -A "$elf" | awk '/Tag_CPU_arch_profile:/ { print $2 }'`
-fp_arch=`readelf -A "$elf" | awk '/Tag_FP_arch/ { print $2 }'`
-fp_use=`readelf -A "$elf" | awk '/Tag_ABI_HardFP_use/ { print $2 }'`
+cpu_arch=$(readelf -A "$elf" | awk '/Tag_CPU_arch:/ { print $2 }')
+cpu_profile=$(readelf -A "$elf" | awk '/Tag_CPU_arch_profile:/ { print $2 }')
+fp_arch=$(readelf -A "$elf" | awk '/Tag_FP_arch/ { print $2 }')
+fp_use=$(readelf -A "$elf" | awk '/Tag_ABI_HardFP_use/ { print $2 }')
+data=$(readelf -h "$elf" | awk '/Data:/ { print $0 }')
+
+case "$data" in
+    *"big endian"*)
+        echo "Skipping $elf: big endian"
+        exit 77
+esac
 
 case "$cpu_arch"/"$cpu_profile" in
     v4T/)
