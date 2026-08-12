@@ -1,12 +1,12 @@
 [binaries]
-c = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib']
-cpp = ['clang', '-target', 'riscv64-unknown-elf', '-mcmodel=medany', '-nostdlib', '-stdlib=libstdc++']
-c_ld = '/usr/bin/riscv64-unknown-elf-ld'
-cpp_ld = '/usr/bin/riscv64-unknown-elf-ld'
-ar = 'riscv64-unknown-elf-ar'
-as = 'riscv64-unknown-elf-as'
-nm = 'riscv64-unknown-elf-nm'
-strip = 'riscv64-unknown-elf-strip'
+c = ['clang', '--target=riscv64-unknown-elf', '-nostdlib']
+cpp = ['clang', '--target=riscv64-unknown-elf', '-nostdlib']
+c_ld = 'lld'
+cpp_ld = 'lld'
+ar = 'llvm-ar'
+as = 'clang'
+nm = 'llvm-nm'
+strip = 'llvm-strip'
 # only needed to run tests
 exe_wrapper = ['env', 'run-riscv']
 
@@ -17,12 +17,9 @@ cpu = 'riscv'
 endian = 'little'
 
 [properties]
-c_args = ['-Werror=double-promotion', '-fshort-enums']
-c_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/15/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/15.2.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
-cpp_link_args = ['-L/usr/lib/gcc/riscv64-unknown-elf/15/rv64imac/lp64/', '-L/usr/lib/gcc/riscv64-unknown-elf/15.2.0/rv64imac/lp64/', '-Wno-unused-command-line-argument']
 skip_sanity_check = true
-has_link_defsym = true
-default_flash_addr = '0x80000000'
+librt='-lclang_rt.builtins'
+default_flash_addr = '0x00000000'
 default_flash_size = '0x00400000'
-default_ram_addr   = '0x80400000'
+default_ram_addr   = '0x00400000'
 default_ram_size   = '0x00200000'
