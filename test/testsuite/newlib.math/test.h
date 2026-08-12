@@ -454,3 +454,9 @@ void test_y1f(int vector);
 void test_yn(int vector);
 
 void test_ynf(int vector);
+
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wmissing-braces"
+#endif
