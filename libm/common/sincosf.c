@@ -47,16 +47,15 @@ sincosf(float y, float *sinp, float *cosp)
     const sincos_t *p = &__sincosf_table[0];
 
     if (abstop12(y) < abstop12(pio4)) {
-        double x2 = x * x;
-
         if (unlikely(abstop12(y) < abstop12(0x1p-12f))) {
             if (unlikely(abstop12(y) < abstop12(0x1p-126f)))
                 /* Force underflow for tiny y.  */
-                force_eval_float(x2);
+                force_eval_float(y * y);
             *sinp = y;
             *cosp = 1.0f;
             return;
         }
+        double x2 = x * x;
 
         sincosf_poly(x, x2, p, 0, sinp, cosp);
     } else if (abstop12(y) < abstop12(120.0f)) {

@@ -46,14 +46,13 @@ sinf(float y)
     const sincos_t *p = &__sincosf_table[0];
 
     if (abstop12(y) < abstop12(pio4)) {
-        s = x * x;
-
         if (unlikely(abstop12(y) < abstop12(0x1p-12f))) {
             if (unlikely(abstop12(y) < abstop12(0x1p-126f)))
                 /* Force underflow for tiny y.  */
-                force_eval_float(s);
+                force_eval_float(y * y);
             return y;
         }
+        s = x * x;
 
         return sinf_poly(x, s, p, 0);
     } else if (likely(abstop12(y) < abstop12(120.0f))) {
