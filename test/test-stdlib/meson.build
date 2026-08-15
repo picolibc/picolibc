@@ -39,6 +39,7 @@ tests = [
   'test-efcvt',
   'test-malloc',
   'test-malloc-stress',
+  'test-many-malloc',
   'test-memalignment',
   'test-on_exit',
   'test-quick-exit',
