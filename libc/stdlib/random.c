@@ -55,6 +55,7 @@ algorithm as <<rand>>.
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
 #include <stdint.h>
+#include "local.h"
 
 __THREAD_LOCAL uint64_t _rand_next = 1;
 

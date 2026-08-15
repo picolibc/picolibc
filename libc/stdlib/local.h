@@ -24,6 +24,8 @@ extern uint32_t __environ_sequence;
 #include <wchar.h>
 #endif
 
+extern __THREAD_LOCAL uint64_t _rand_next;
+
 #ifdef __AVR__
 typedef unsigned int uwchar_t;
 #else

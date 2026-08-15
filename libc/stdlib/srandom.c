@@ -54,8 +54,7 @@ algorithm as <<rand>>.
 
 #define _DEFAULT_SOURCE
 #include <stdlib.h>
-
-extern __THREAD_LOCAL long long _rand_next;
+#include "local.h"
 
 void
 srandom(unsigned int seed)
