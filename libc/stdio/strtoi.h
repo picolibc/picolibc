@@ -102,6 +102,12 @@ strtoi(const strtoi_char * __restrict nptr, strtoi_char ** __restrict endptr, in
             nptr = (const strtoi_char *)s;
             i = s[1];
             s += 2;
+        } else if (TOLOWER(*s) == 'b' && ((base | 2) == 2)) {
+            base = 2;
+            /* Parsed the '0' */
+            nptr = (const strtoi_char *)s;
+            i = s[1];
+            s += 2;
         } else if (base == 0) {
             base = 8;
         }

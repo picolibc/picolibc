@@ -141,6 +141,21 @@ test_strtol(void)
     TEST(l, strtol(s = "0x1234", &c, 16), 0x1234, "%ld != %ld");
     TEST2(i, c - s, 6, "wrong final position %ld != %ld");
 
+#ifndef NO_NEWLIB
+    /* C23 0b/0B prefixes: picolibc only. Host libc may still be pre-C23. */
+    TEST(l, strtol(s = "0b101", &c, 0), 5, "%ld != %ld");
+    TEST2(i, c - s, 5, "wrong final position %d != %d");
+
+    TEST(l, strtol(s = "0B101", &c, 0), 5, "%ld != %ld");
+    TEST2(i, c - s, 5, "wrong final position %d != %d");
+
+    TEST(l, strtol(s = "0b101", &c, 2), 5, "%ld != %ld");
+    TEST2(i, c - s, 5, "wrong final position %d != %d");
+
+    TEST(l, strtol(s = "0bz", &c, 0), 0, "%ld != %ld");
+    TEST2(i, c - s, 1, "wrong final position %d != %d");
+#endif
+
     char delim_buf[6] = "09af:";
 
     for (int j = 0; j < 256; j++) {
