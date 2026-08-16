@@ -257,7 +257,7 @@ main(void)
             char *med = realloc(small, 1024);
             if (med) {
 //                                printf("med %p\n", med);
-#ifdef __NANO_MALLOC
+#ifdef __PICOLIBC__
                 int i;
                 for (i = 128; i < 1024; i++)
                     if (med[i] != 0) {
@@ -271,6 +271,30 @@ main(void)
             free(small);
         }
     }
+
+#ifdef __PICOLIBC__
+    /* try to get realloc to merge an adjacent free block */
+
+    void *first = malloc(2048);
+    if (first)
+        memset(first, '1', 2048);
+    void *second = malloc(2048);
+    if (second) {
+        memset(second, '2', 2048);
+        free(second);
+    }
+    if (first) {
+        void *again = realloc(first, 4096);
+        if (again) {
+            printf("first %p second %p again %p\n", first, second, again);
+            if (again != first) {
+                printf("realloc into adjacent free block failed\n");
+                ++result;
+            }
+            free(again);
+        }
+    }
+#endif
 
     malloc_stats();
 
