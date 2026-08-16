@@ -82,31 +82,41 @@ realloc(void *ptr, size_t size)
         if (__malloc_grow_chunk(p_to_realloc, new_size)) {
             /* clear new memory */
             memset(chunk_e, '\0', new_size - old_size);
-            /* adjust chunk_t size */
-            old_size = new_size;
+            /* update size */
+            old_size = _size(p_to_realloc);
         } else {
-            chunk_t **p, *r;
-
-            /* Check to see if there's a chunk_t of free space just past
-             * the current chunk, merge it in in case that's useful
+            /*
+             * Check to see if there's a chunk_t of free space just
+             * past the current chunk, merge it in in case that's
+             * useful
              */
-            for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
-                if (r == chunk_e) {
-                    size_t r_size = _size(r);
+            chunk_t      *c;
+            malloc_prev_t prev;
+#ifdef __MALLOC_SKIP_LIST
+            _ms_find(p_to_realloc, &prev);
+            c = _ms_this(&prev);
+#else
+            for (_ms_step_init(&prev); (c = _ms_this(&prev)) != NULL; _ms_step(c, &prev)) {
+                if (p_to_realloc < c)
+                    break;
+            }
+#endif
+            if (c && chunk_to_blob(c) == chunk_e) {
+                size_t c_size = _size(c);
+                if (old_size + c_size >= new_size) {
 
-                    /* remove R from the free list */
-                    *p = r->next;
+                    /* Remove c from the free list */
+                    _ms_clip_out(c, &prev);
 
-                    /* clear the memory from r */
-                    memset(r, '\0', r_size);
+                    /* clear the memory from c */
+                    memset(chunk_to_blob(c), 0, new_size - old_size);
 
                     /* add it's size to our chunk */
-                    old_size += r_size;
+                    old_size += c_size;
                     _set_size(p_to_realloc, old_size);
-                    break;
+                    MALLOC_UNLOCK;
+                    goto add_leftover;
                 }
-                if (p_to_realloc < r)
-                    break;
             }
         }
 
@@ -114,15 +124,18 @@ realloc(void *ptr, size_t size)
     }
 
     if (new_size <= old_size) {
-        size_t extra = old_size - new_size;
 
 #ifdef __MALLOC_CLEAR_FREED
         memset((char *)ptr + size, 0, old_size - size);
 #endif
+
+    add_leftover:;
         /* If there's enough space left over, split it out
          * and free it
          */
-        if (!is_bucket && extra >= MALLOC_CHUNK_MIN) {
+        size_t extra = old_size - new_size;
+
+        if (!is_bucket && extra >= MALLOC_SPLIT_MIN) {
             _set_size(p_to_realloc, new_size);
             make_free_chunk(chunk_after(p_to_realloc), extra);
         }

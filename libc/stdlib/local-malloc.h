@@ -106,8 +106,64 @@ typedef struct malloc_head {
 } head_t;
 
 typedef struct malloc_chunk {
+#ifdef __MALLOC_SKIP_LIST
+    struct {
+    } empty; /* C doesn't allow a struct with only a flex-array member */
+    struct malloc_chunk *next[];
+#else
     struct malloc_chunk *next;
+#endif
 } chunk_t;
+
+#ifdef __MALLOC_SKIP_LIST
+#include "malloc-skip.h"
+
+extern malloc_head_t __malloc_skip_list;
+
+#define __malloc_free_list (__malloc_skip_list.next[0])
+#define __next_chunk(c)    _ms_next(c)
+#define __next_bucket(c)   ((c)->next[0])
+
+#else
+
+extern chunk_t   *__malloc_free_list;
+
+#define __next_chunk(c)  ((c)->next)
+#define __next_bucket(c) ((c)->next)
+
+typedef chunk_t **malloc_prev_t;
+
+static inline void
+_ms_step_init(malloc_prev_t *prev)
+{
+    *prev = &__malloc_free_list;
+}
+
+static inline chunk_t *
+_ms_this(malloc_prev_t *prev)
+{
+    return **prev;
+}
+
+static inline void
+_ms_step(chunk_t *c, malloc_prev_t *prev)
+{
+    *prev = &c->next;
+}
+
+static inline void
+_ms_clip_out(chunk_t *c, malloc_prev_t *prev)
+{
+    **prev = c->next;
+}
+
+static inline void
+_ms_clip_in(chunk_t *c, malloc_prev_t *prev)
+{
+    c->next = **prev;
+    **prev = c;
+}
+#endif
 
 /* Alignment of allocated chunk. Compute the alignment required from a
  * range of types */
@@ -123,13 +179,23 @@ typedef struct malloc_chunk {
 
 #define MALLOC_HEAD_SIZE   sizeof(head_t)
 
-#define MALLOC_CHUNK_SIZE  sizeof(chunk_t)
+#define MALLOC_CHUNK_SIZE  sizeof(chunk_t *)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN (0x1000)
 
 /* Minimum chunk size */
 #define MALLOC_CHUNK_MIN __align_up(MALLOC_CHUNK_SIZE + MALLOC_HEAD_SIZE, MALLOC_CHUNK_ALIGN)
+
+/* Minimum chunk split size */
+#ifdef __MALLOC_SKIP_LIST
+#define MALLOC_SPLIT_PTRS (MS_MAX_LEVEL + 1)
+#else
+#define MALLOC_SPLIT_PTRS 1
+#endif
+
+#define MALLOC_SPLIT_MIN                                                                    \
+    __align_up(MALLOC_CHUNK_SIZE *MALLOC_SPLIT_PTRS + MALLOC_HEAD_SIZE, MALLOC_CHUNK_ALIGN)
 
 /* Maximum chunk size */
 #define MALLOC_CHUNK_MAX (SIZE_MAX - 2 * MAX(MALLOC_CHUNK_SIZE, MALLOC_CHUNK_ALIGN))
@@ -202,10 +268,8 @@ void __malloc_validate_chunk(chunk_t *c);
 #define MALLOC_UNLOCK __LIBC_UNLOCK()
 #endif
 
-/* Forward data declarations */
-extern chunk_t *__malloc_free_list;
-extern char    *__malloc_sbrk_start;
-extern char    *__malloc_sbrk_top;
+extern char *__malloc_sbrk_start;
+extern char *__malloc_sbrk_top;
 
 #ifdef MALLOC_MAX_BUCKET_POT
 
@@ -271,7 +335,7 @@ static inline void * __disable_sanitizer
 chunk_end(chunk_t *c)
 {
     size_t *s = _size_ref(c);
-    return (char *)s + *s;
+    return (char *)s + (*s & ~(size_t)1);
 }
 
 /* next chunk in memory -- address of chunk header past this chunk */

@@ -67,7 +67,7 @@ memalign(size_t align, size_t s)
     /* Make sure there's space to align the allocation and split
      * off chunk_t from the front
      */
-    size_with_padding = s + align + MALLOC_CHUNK_MIN;
+    size_with_padding = s + align + MALLOC_SPLIT_MIN;
 
     allocated = __malloc_malloc(size_with_padding);
     if (allocated == NULL)
@@ -81,7 +81,7 @@ memalign(size_t align, size_t s)
 
     /* Split off the front piece if necessary */
     if (offset) {
-        if (offset < MALLOC_CHUNK_MIN) {
+        if (offset < MALLOC_SPLIT_MIN) {
             aligned_p += align;
             offset += align;
         }
@@ -97,7 +97,7 @@ memalign(size_t align, size_t s)
     offset = _size(chunk_p) - s;
 
     /* Split off the back piece if large enough */
-    if (offset >= MALLOC_CHUNK_MIN) {
+    if (offset >= MALLOC_SPLIT_MIN) {
         *_size_ref(chunk_p) -= offset;
 
         make_free_chunk(chunk_after(chunk_p), offset);

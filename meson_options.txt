@@ -224,6 +224,8 @@ option('malloc-error-abort', type: 'boolean', value: false,
        description: 'Abort when malloc usage errors are detected')
 option('malloc-small-bucket', type: 'integer', value: 0,
        description: 'use fixed bucket sizes for allocations no larger than this')
+option('malloc-skip-list', type: 'boolean', value: false,
+       description: 'Use skip-list for free list')
 
 #
 # Locking options

@@ -40,8 +40,8 @@
 void __disable_sanitizer
 __malloc_free(void *free_p)
 {
-    chunk_t  *p_to_free;
-    chunk_t **p, *c;
+    chunk_t *p_to_free;
+    chunk_t *c;
 
     if (free_p == NULL)
         return;
@@ -54,7 +54,9 @@ __malloc_free(void *free_p)
 #ifdef __MALLOC_CLEAR_FREED
     memset(p_to_free, 0, chunk_usable(p_to_free));
 #else
+#ifndef __MALLOC_SKIP_LIST
     p_to_free->next = NULL;
+#endif
 #endif
 
 #if MALLOC_DEBUG
@@ -71,15 +73,51 @@ __malloc_free(void *free_p)
         int    bucket = BUCKET_NUM(s);
         size_t expect = BUCKET_SIZE(bucket);
         if (s == expect) {
+            chunk_t **p;
             p = &__malloc_bucket_list[bucket];
-            p_to_free->next = *p;
+            __next_bucket(p_to_free) = *p;
             *p = p_to_free;
             goto unlock;
         }
     }
 #endif
 
-    for (p = &__malloc_free_list; (c = *p) != NULL; p = &c->next) {
+    malloc_prev_t prev;
+#ifdef __MALLOC_SKIP_LIST
+    _ms_find(p_to_free, &prev);
+
+    c = _ms_this(&prev);
+
+    /* Check for double free */
+    if (c == p_to_free) {
+        errno = ENOMEM;
+        goto unlock;
+    }
+
+    /* Add the next block to this block if they're adjacent */
+    if (chunk_after(p_to_free) == c) {
+        *_size_ref(p_to_free) += _size(c);
+        _ms_clip_out(c, &prev);
+    }
+
+    /* prev[0] points at the *reference* to the next chunk,
+     * which is the same as the address of the previous chunk
+     */
+    chunk_t *prior = (chunk_t *)prev.prev[0];
+
+    /* Add this block to the prior block if they're adjacent */
+    if (prior != (chunk_t *)&__malloc_skip_list && chunk_after(prior) == p_to_free) {
+        *_size_ref(prior) += _size(p_to_free);
+#if __MALLOC_SMALL_BUCKET
+        p_to_free = prior;
+        _ms_find(p_to_free, &prev);
+#endif
+    } else {
+        _ms_clip_in(p_to_free, &prev);
+    }
+
+#else
+    for (_ms_step_init(&prev); (c = _ms_this(&prev)) != NULL; _ms_step(c, &prev)) {
         /* Insert in address order */
         if (p_to_free <= c) {
 
@@ -101,8 +139,7 @@ __malloc_free(void *free_p)
         }
     }
 
-    p_to_free->next = c;
-    *p = p_to_free;
+    _ms_clip_in(p_to_free, &prev);
 
 no_insert:
 
@@ -120,6 +157,7 @@ no_insert:
 #endif
         p_to_free->next = c->next;
     }
+#endif
 
 #if __MALLOC_SMALL_BUCKET
     s = _size(p_to_free);
@@ -130,14 +168,13 @@ no_insert:
         /* Move from general free list to bucket */
         if (s == bucket_size) {
 #ifdef MALLOC_DEBUG
-            assert(*p == p_to_free);
+            assert(_ms_this(&prev) == p_to_free);
 #endif
-
             /* unlink from general list */
-            *p = p_to_free->next;
+            _ms_clip_out(p_to_free, &prev);
 
             /* link to bucket list */
-            p_to_free->next = __malloc_bucket_list[bucket];
+            __next_bucket(p_to_free) = __malloc_bucket_list[bucket];
             __malloc_bucket_list[bucket] = p_to_free;
         }
     }
