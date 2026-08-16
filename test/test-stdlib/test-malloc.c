@@ -79,6 +79,34 @@ main(void)
     }
     free(r);
 
+#ifdef __PICOLIBC__
+    /* try to get realloc to merge an adjacent free block */
+
+#if defined(__MALLOC_SMALL_BUCKET) && __MALLOC_SMALL_BUCKET != 0
+#define MERGE_SIZE (__MALLOC_SMALL_BUCKET * 2)
+#else
+#define MERGE_SIZE 2048
+#endif
+    void *first = malloc(MERGE_SIZE);
+    if (first)
+        memset(first, '1', MERGE_SIZE);
+    void *second = malloc(MERGE_SIZE);
+    if (second) {
+        memset(second, '2', MERGE_SIZE);
+        free(second);
+    }
+    if (first) {
+        void *again = realloc(first, MERGE_SIZE * 2);
+        if (again) {
+            if (again != first) {
+                printf("realloc into adjacent free block failed\n");
+                ++result;
+            }
+            free(again);
+        }
+    }
+#endif
+
     r = memalign(128, 237);
     //        printf("memalign(128, 237): %p\n", r);
     if ((uintptr_t)r & 127) {
@@ -257,7 +285,7 @@ main(void)
             char *med = realloc(small, 1024);
             if (med) {
 //                                printf("med %p\n", med);
-#ifdef __NANO_MALLOC
+#ifdef __PICOLIBC__
                 int i;
                 for (i = 128; i < 1024; i++)
                     if (med[i] != 0) {
