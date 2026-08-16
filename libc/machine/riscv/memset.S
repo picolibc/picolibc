@@ -75,7 +75,9 @@ memset:
  *                     e8 tail loop (handles any alignment / size).
  *   - common case   : align dst to 4 bytes with one e8 store, then
  *                     bulk fill with vse32 (4x larger vl per iter
- *                     than vse8 at the same LMUL).
+ *                     than vse8 at the same LMUL). vl is set once for
+ *                     the full chunks and re-set only for the last
+ *                     partial one.
  *   - byte tail     : single e8 loop covers 0..3 bytes after bulk
  *                     and also the < 16 small-size bypass.
  *
@@ -114,13 +116,23 @@ memset:
   srli    t3, a2, 2                 /* t3 = remaining word count */
   andi    a2, a2, 3                 /* a2 = byte tail (0..3) */
   beqz    t3, .Lset_tail
+
+  /* vl stays at vlmax while a whole chunk remains, so set it just once */
+  vsetvli t2, zero, e32, m8, ta, ma /* t2 = words per full chunk */
+  slli    t5, t2, 2                 /* bytes = words * 4 */
 .Lset_bulk_loop:
-  vsetvli t2, t3, e32, m8, ta, ma   /* t2 = words this iter */
+  bltu    t3, t2, .Lset_bulk_last
   vse32.v v0, (t0)
   sub     t3, t3, t2
-  slli    t5, t2, 2                 /* bytes = words * 4 */
   add     t0, t0, t5
   bnez    t3, .Lset_bulk_loop
+  j       .Lset_tail
+
+.Lset_bulk_last:
+  vsetvli t2, t3, e32, m8, ta, ma   /* t2 = words in the partial chunk */
+  vse32.v v0, (t0)
+  slli    t5, t2, 2
+  add     t0, t0, t5
 
   /* --- Byte tail: also entry for n < 16 small bypass --- */
 .Lset_tail:
