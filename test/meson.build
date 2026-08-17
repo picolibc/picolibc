@@ -43,6 +43,7 @@ tests = [
   'test-hello',
   'test-hosted-exit',
   'test-lseek-overflow',
+  'test-ssize-max',
   'test-hosted-exit-fail',
   'test-ilp32',
   'test-raise',
