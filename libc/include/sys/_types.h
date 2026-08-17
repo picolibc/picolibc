@@ -144,7 +144,16 @@ typedef unsigned long __size_t;
 #define unsigned signed
 typedef __SIZE_TYPE__ __ssize_t;
 #undef unsigned
-#define __SSIZE_MAX__ ((__ssize_t)(__SIZE_MAX__ >> 1))
+/* Use __PTRDIFF_MAX__ rather than a cast of (__SIZE_MAX__ >> 1): it is the
+   signed, pointer-width maximum and, unlike a cast expression, is usable in
+   preprocessor #if directives as <limits.h> macros are required to be. */
+#define __SSIZE_MAX__ __PTRDIFF_MAX__
+/* Guarded because this header is also parsed as C++ and as pre-C11 C, where
+   _Static_assert is not accepted. */
+#if defined(__SIZE_MAX__) && defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
+_Static_assert((__size_t)__SSIZE_MAX__ == (__SIZE_MAX__ >> 1),
+               "__SSIZE_MAX__ must be the top half of the __size_t range");
+#endif
 #else
 #if defined(__INT_MAX__) && __INT_MAX__ == 2147483647
 typedef int __ssize_t;
