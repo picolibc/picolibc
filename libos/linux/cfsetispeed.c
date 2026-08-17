@@ -41,4 +41,5 @@ cfsetispeed(struct termios *termios, speed_t speed)
     if (speed == 0)
         speed = termios->c_ospeed;
     termios->c_ispeed = speed;
+    return 0;
 }
