@@ -71,6 +71,8 @@ getdelim(char ** restrict lineptr, size_t * restrict nptr, int delim, FILE * res
                 count = -1;
                 goto bail;
             }
+            *lineptr = line;
+            *nptr = n;
         }
 
         if (is_eof)
@@ -82,8 +84,6 @@ getdelim(char ** restrict lineptr, size_t * restrict nptr, int delim, FILE * res
     }
     line[count] = '\0';
 
-    *lineptr = line;
-    *nptr = n;
 bail:
     __funlock_return(stream, count);
 }
