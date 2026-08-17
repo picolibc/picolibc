@@ -37,6 +37,7 @@
 #include <sys/types.h>
 #include <regex.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #define MAX_MATCH 10
 
@@ -102,8 +103,9 @@ main(void)
                     if (matches[m].rm_so != tests[t].matches[m].rm_so
                         || matches[m].rm_eo != tests[t].matches[m].rm_eo) {
                         printf("match %d wrong range got (%td,%td) expect (%td,%td)\n", m,
-                               matches[m].rm_so, matches[m].rm_eo, tests[t].matches[m].rm_so,
-                               tests[t].matches[m].rm_eo);
+                               (ptrdiff_t)matches[m].rm_so, (ptrdiff_t)matches[m].rm_eo,
+                               (ptrdiff_t)tests[t].matches[m].rm_so,
+                               (ptrdiff_t)tests[t].matches[m].rm_eo);
                         errors++;
                     }
                 } else {
