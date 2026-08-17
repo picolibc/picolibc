@@ -43,6 +43,7 @@ tests = [
   'test-on_exit',
   'test-quick-exit',
   'test-rand',
+  'test-stdckdint',
   'test-strtod',
   ]
 
@@ -137,7 +138,7 @@ foreach params : targets
 
 endforeach
 
-# Host libc may not provide C23 memalignment yet.
+# Host libc may not provide memalignment yet.
 test_skip_native = [
   'test-memalignment',
 ]

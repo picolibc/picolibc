@@ -81,6 +81,7 @@ inc_headers = [
   'setjmp.h',
   'signal.h',
   'spawn.h',
+  'stdckdint.h',
   'stdint.h',
   'stdio.h',
   'stdio-bufio.h',

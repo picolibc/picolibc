@@ -82,10 +82,11 @@ picolibc_headers(""
   setjmp.h
   signal.h
   spawn.h
+  stdckdint.h
+  stdint.h
   stdio.h
   stdio-bufio.h
   stdio-posix.h
-  stdint.h
   stdnoreturn.h
   stdlib.h
   string.h
