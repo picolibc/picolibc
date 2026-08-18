@@ -59,7 +59,9 @@ strcmp:
  *
  * RV32E + non-Zbb: not enough scratch for the pair path → forced off.
  * ------------------------------------------------------------------- */
-#ifndef STRCMP_PAIR
+#if defined(__STRCMP_PAIR)
+#  define STRCMP_PAIR 1
+#else
 #  define STRCMP_PAIR 0
 #endif
 #if STRCMP_PAIR && (defined(__riscv_e) || defined(__riscv_32e)) \

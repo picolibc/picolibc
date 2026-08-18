@@ -80,6 +80,11 @@ if(NOT DEFINED __FAST_STRCMP)
   option(__FAST_STRCMP "Always optimize strcmp for performance" ON)
 endif()
 
+# Use RISC-V paired-word strcmp (dual-issue / fused-load cores)
+if(NOT DEFINED __STRCMP_PAIR)
+  option(__STRCMP_PAIR "Use RISC-V paired-word strcmp" OFF)
+endif()
+
 # use global errno variable
 if(NOT DEFINED __GLOBAL_ERRNO)
   option(__GLOBAL_ERRNO "use global errno variable" OFF)

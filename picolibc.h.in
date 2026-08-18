@@ -11,6 +11,9 @@
 /* Always optimize strcmp for performance */
 #cmakedefine __FAST_STRCMP
 
+/* Use RISC-V paired-word strcmp (dual-issue / fused-load cores) */
+#cmakedefine __STRCMP_PAIR
+
 /* use global errno variable */
 #cmakedefine __GLOBAL_ERRNO
 

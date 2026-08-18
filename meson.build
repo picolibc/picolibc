@@ -475,6 +475,7 @@ foreach ld : test_link_args_extra
 endforeach
 
 fast_strcmp = get_option('fast-strcmp')
+strcmp_pair = get_option('strcmp-pair')
 
 mb_capable = get_option('mb-capable')
 mb_extended_charsets = mb_capable and get_option('mb-extended-charsets')
@@ -1490,6 +1491,7 @@ conf_data.set('__IEEE_LIBM', not get_option('want-math-errno'), description: 'ma
 conf_data.set('__MATH_ERRNO', get_option('want-math-errno'), description: 'math library sets errno')
 conf_data.set('__PREFER_SIZE_OVER_SPEED', get_option('optimization') == 's', description: 'Optimize for space over speed')
 conf_data.set('__FAST_STRCMP', fast_strcmp, description: 'Always optimize strcmp for performance')
+conf_data.set('__STRCMP_PAIR', strcmp_pair, description: 'Use RISC-V paired-word strcmp')
 conf_data.set('__GLOBAL_ERRNO', get_option('newlib-global-errno'), description: 'use global errno variable')
 conf_data.set('__INIT_FINI_ARRAY', get_option('initfini-array'), description: 'Support INIT_ARRAY linker sections')
 conf_data.set('__INIT_FINI_FUNCS', get_option('initfini'), description: 'Support _init() and _fini() functions')

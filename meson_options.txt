@@ -61,6 +61,8 @@ option('assert-verbose', type: 'boolean', value: true,
        description: 'Assert provides verbose information')
 option('fast-strcmp', type: 'boolean', value: true,
        description: 'Always optimize strcmp for performance')
+option('strcmp-pair', type: 'boolean', value: false,
+       description: 'Use RISC-V paired-word strcmp (dual-issue / fused-load cores)')
 option('sanitize', type: 'string', value: 'none',
        description: 'Code sanitizer to use')
 option('use-hlt-semihosting', type: 'boolean', value: 'false',
