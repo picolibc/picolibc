@@ -68,9 +68,15 @@ __malloc_free(void *free_p)
 #if __MALLOC_SMALL_BUCKET
     size_t s = _size(p_to_free);
     if (s <= MALLOC_MAX_BUCKET) {
-        int    bucket = BUCKET_NUM(s);
-        size_t expect = BUCKET_SIZE(bucket);
-        if (s == expect) {
+        int bucket = BUCKET_FLOOR(s);
+
+        /*
+         * The size might not exactly match the bucket if p_to_free is
+         * spacing out a memalign chunk. In that case, dump it into
+         * the general allocation chain where it can get merged with
+         * the adjacent blocks when those are freed.
+         */
+        if (s == BUCKET_SIZE(bucket)) {
             p = &__malloc_bucket_list[bucket];
             p_to_free->next = *p;
             *p = p_to_free;

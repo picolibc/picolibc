@@ -89,6 +89,13 @@ memalign(size_t align, size_t s)
         chunk_t *new_chunk_p = ptr_to_chunk(aligned_p);
         _set_size(new_chunk_p, _size(chunk_p) - offset);
 
+        /*
+         * This may create a free chunk smaller than MALLOC_MAX_BUCKET
+         * but which is not exactly the size of a bucket. Free places this
+         * in the general list instead of the per-bucket list where it
+         * will never be allocated, but where it will merge with adjacent
+         * blocks when freed.
+         */
         make_free_chunk(chunk_p, offset);
 
         chunk_p = new_chunk_p;
@@ -98,6 +105,10 @@ memalign(size_t align, size_t s)
 
     /* Split off the back piece if large enough */
     if (offset >= MALLOC_CHUNK_MIN) {
+#if __MALLOC_SMALL_BUCKET
+        if (offset <= MALLOC_MAX_BUCKET)
+            offset = BUCKET_SIZE(BUCKET_FLOOR(offset));
+#endif
         *_size_ref(chunk_p) -= offset;
 
         make_free_chunk(chunk_after(chunk_p), offset);
