@@ -152,7 +152,7 @@ typedef struct malloc_chunk {
 #define MALLOC_CHUNK_MIN __align_up(MALLOC_CHUNK_SIZE + MALLOC_HEAD_SIZE, MALLOC_CHUNK_ALIGN)
 
 /* Maximum chunk size */
-#define MALLOC_CHUNK_MAX (SIZE_MAX - 2 * MAX(MALLOC_CHUNK_SIZE, MALLOC_CHUNK_ALIGN))
+#define MALLOC_CHUNK_MAX __align_down(SIZE_MAX - MALLOC_HEAD_SIZE, MALLOC_CHUNK_ALIGN)
 
 /* Maximum allocation size */
 #define MALLOC_ALLOC_MAX (MALLOC_CHUNK_MAX - MALLOC_HEAD_SIZE)
