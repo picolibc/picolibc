@@ -460,7 +460,7 @@ endif
 
 test_link_args_base = runtime_lib
 
-test_link_args_extra = ['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments']
+test_link_args_extra = ['-Wl,--gc-sections', '-Wl,--no-warn-rwx-segments', '-Wl,--no-fatal-warnings']
 
 if profile
   test_link_args_extra += ['-pg']
@@ -1482,6 +1482,7 @@ conf_data.set('__SINGLE_THREAD', get_option('single-thread'), description: 'Disa
 conf_data.set('__HAVE_FCNTL', get_option('have-fcntl'), description: 'System provides fcntl function')
 conf_data.set('__MALLOC_CLEAR_FREED', get_option('malloc-clear-freed'))
 conf_data.set('__MALLOC_SMALL_BUCKET', get_option('malloc-small-bucket'))
+conf_data.set('__MALLOC_SKIP_LIST', get_option('malloc-skip-list'))
 conf_data.set('__MALLOC_ERROR_ABORT', get_option('malloc-error-abort'))
 if internal_heap != 0
   conf_data.set('__INTERNAL_HEAP', internal_heap)
@@ -1753,6 +1754,8 @@ if get_option('test-long-double')
   test_c_args += ['-D_TEST_LONG_DOUBLE']
   native_c_args += ['-D_TEST_LONG_DOUBLE']
 endif
+
+native_c_args += ['-Wl,--no-fatal-warnings']
 
 test_env = environment()
 test_env.prepend('PATH', meson.current_source_dir() / 'scripts')

@@ -33,11 +33,77 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include <termios.h>
+#define _DEFAULT_SOURCE
+#include <stdlib.h>
+#include <stdio.h>
+
+static size_t
+random_int(size_t count)
+{
+    return ((size_t)random()) % count;
+}
+
+static void
+shuffle(void **values, size_t n)
+{
+    size_t i;
+
+    for (i = 0; i < n - 1; i++) {
+        size_t p = random_int(n - i);
+        void  *t = values[i];
+        values[i] = values[i + p];
+        values[i + p] = t;
+    }
+}
+
+#if __SIZE_MAX__ < 0xffffffffUL
+/*
+ * Compute space for the pointer array and the objects on small
+ * targets
+ */
+#define N ((__SIZE_MAX__) >> 16)
+#else
+
+#if (defined(__MALLOC_SMALL_BUCKET) && __MALLOC_SMALL_BUCKET == 0) && !defined(__MALLOC_SKIP_LIST)
+#define N ((size_t) 1024 * (size_t) 128)
+#else
+#define N ((size_t) 1024 * (size_t) 1024)
+#endif
+
+#endif
+
+#define OBJ_SIZE 8
 
 int
-cfsetospeed(struct termios *termios, speed_t speed)
+main(void)
 {
-    termios->c_ospeed = speed;
+    void **objs;
+    size_t o;
+
+    objs = calloc(N, sizeof(void *));
+    if (!objs) {
+        printf("cannot allocate objs array\n");
+        return 77;
+    }
+
+    for (o = 0; o < N; o++) {
+        objs[o] = malloc(OBJ_SIZE);
+        if (!objs[o]) {
+            printf("cannot allocate obj %zd\n", o);
+            return 77;
+        }
+        if (o % 100000 == 0)
+            printf("malloc %zd\n", o);
+    }
+
+    shuffle(objs, N);
+
+    for (o = 0; o < N; o++) {
+        free(objs[o]);
+        if (o % 100000 == 0)
+            printf("free %zd\n", o);
+    }
+
+    printf("All done\n");
     return 0;
 }

@@ -39,6 +39,7 @@ malloc_srcs_stdlib = [
   'mallinfo.c',
   'malloc.c',
   'malloc-error.c',
+  'malloc-skip.c',
   'malloc-stats.c',
   'malloc-usable-size.c',
   'mallopt.c',

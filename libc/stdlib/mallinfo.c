@@ -52,7 +52,7 @@ mallinfo(void)
             total_size = (size_t)(sbrk_now - __malloc_sbrk_start);
     }
 
-    for (pf = __malloc_free_list; pf; pf = pf->next) {
+    for (pf = __malloc_free_list; pf; pf = __next_chunk(pf)) {
         ordblks++;
         free_size += _size(pf);
     }
@@ -61,7 +61,7 @@ mallinfo(void)
     size_t smblks = 0;
     size_t fsmblks = 0;
     for (b = 0; b < NUM_BUCKET_POT; b++)
-        for (pf = __malloc_bucket_list[b]; pf; pf = pf->next) {
+        for (pf = __malloc_bucket_list[b]; pf; pf = __next_bucket(pf)) {
             smblks++;
             fsmblks += _size(pf);
         }

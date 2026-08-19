@@ -28,8 +28,12 @@
 
 #include "local-malloc.h"
 
-/* List list header of free blocks */
+/* List header of free chunks */
+#ifdef __MALLOC_SKIP_LIST
+malloc_head_t __malloc_skip_list;
+#else
 chunk_t *__malloc_free_list;
+#endif
 
 #if __MALLOC_SMALL_BUCKET
 chunk_t *__malloc_bucket_list[NUM_BUCKET_POT];
@@ -107,7 +111,7 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
 
     if (chunk_e != __malloc_sbrk_top)
         return false;
-    size_t add_size = MAX(MALLOC_CHUNK_MIN, new_size - _size(c));
+    size_t add_size = MAX(MALLOC_SPLIT_MIN, new_size - _size(c));
 
     /* Ask for the extra memory needed */
     char  *heap = __malloc_sbrk_aligned(add_size);
@@ -134,9 +138,9 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
 void * __disable_sanitizer
 malloc(size_t s)
 {
-    chunk_t **p, *c;
-    char     *ptr;
-    size_t    alloc_size;
+    chunk_t *c;
+    char    *ptr;
+    size_t   alloc_size;
 
     if (s > MALLOC_ALLOC_MAX) {
         errno = ENOMEM;
@@ -150,23 +154,27 @@ malloc(size_t s)
 #if __MALLOC_SMALL_BUCKET
     /* Small allocations use the bucket allocator */
     if (alloc_size <= MALLOC_MAX_BUCKET) {
-        int bucket = BUCKET_NUM(alloc_size);
+        int       bucket = BUCKET_NUM(alloc_size);
+        chunk_t **p;
 
         alloc_size = BUCKET_SIZE(bucket);
         p = &__malloc_bucket_list[bucket];
         if ((c = *p) != NULL)
-            *p = c->next;
+            *p = __next_bucket(c);
     } else
 #endif
     {
-        for (p = &__malloc_free_list; (c = *p) != NULL; p = &c->next) {
+        malloc_prev_t prev;
+        for (_ms_step_init(&prev); (c = _ms_this(&prev)) != NULL; _ms_step(c, &prev)) {
             if (_size(c) >= alloc_size) {
                 size_t rem = _size(c) - alloc_size;
 
-                if (rem >= MALLOC_CHUNK_MIN) {
+                if (rem >= MALLOC_SPLIT_MIN) {
                     /* Find a chunk_t that much larger than required size, break
                      * it into two chunks and return the first one
                      */
+
+                    _ms_clip_out(c, &prev);
 
                     chunk_t *s = (chunk_t *)((char *)c + alloc_size);
                     _set_size(c, alloc_size);
@@ -182,30 +190,29 @@ malloc(size_t s)
                         int    bucket = BUCKET_NUM(rem);
                         size_t bucket_size = BUCKET_SIZE(bucket);
                         if (rem == bucket_size) {
-                            s->next = __malloc_bucket_list[bucket];
+                            /* insert into bucket list */
+                            __next_bucket(s) = __malloc_bucket_list[bucket];
                             __malloc_bucket_list[bucket] = s;
-
-                            /* unlink from the general list */
-                            *p = c->next;
                             break;
                         }
                     }
 #endif
-                    s->next = c->next;
-                    *p = s;
+
+                    _ms_clip_in(s, &prev);
                 } else {
                     /* Find a chunk_t that is exactly the size or slightly bigger
                      * than requested size, just return this chunk_t
                      */
-                    *p = c->next;
+                    _ms_clip_out(c, &prev);
                 }
                 break;
             }
-            if (!c->next && __malloc_grow_chunk(c, alloc_size)) {
-                /* Grow the last chunk in memory to the requested size,
+            if (!__next_chunk(c) && __malloc_grow_chunk(c, alloc_size)) {
+                /*
+                 * Grew the last chunk in memory to the requested size,
                  * just return it
                  */
-                *p = c->next;
+                _ms_clip_out(c, &prev);
                 break;
             }
         }
@@ -213,6 +220,26 @@ malloc(size_t s)
 
     /* Failed to find a appropriate chunk_t. Ask for more memory */
     if (c == NULL) {
+
+#ifdef __MALLOC_SKIP_LIST__
+        /*
+         * Avoid a large number of tiny allocations making our skip list
+         * too flat by randomly increasing chunk sizes using our skip
+         * list allocation scheme
+         */
+        size_t need_size = chunk_size(_ms_size(MS_MAX_LEVEL));
+        if (alloc_size < need_size) {
+            long   bits = random();
+            size_t level = 0;
+            while (!(bits & MS_LEVEL_MASK) && level < MS_MAX_LEVEL) {
+                level++;
+                bits >>= MS_LEVEL_BITS;
+            }
+            size_t need_size = chunk_size(_ms_size(level));
+            if (alloc_size < need_size)
+                alloc_size = need_size;
+        }
+#endif
         void *blob = __malloc_sbrk_aligned(alloc_size);
 
         /* sbrk returns -1 if fail to allocate */
@@ -253,7 +280,7 @@ __malloc_validate_chunk(chunk_t *c)
     assert(__align_up(chunk_to_ptr(c), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(c));
     assert(__align_up(c, MALLOC_HEAD_ALIGN) == c);
     assert(_size(c) >= MALLOC_CHUNK_MIN);
-    assert(_size(c) < 0x80000000UL);
+    assert(_size(c) < MALLOC_CHUNK_MAX);
     assert(__align_up(_size(c), MALLOC_HEAD_ALIGN) == _size(c));
 }
 
@@ -262,7 +289,7 @@ __malloc_validate(void)
 {
     chunk_t *c;
 
-    for (c = __malloc_free_list; c; c = c->next) {
+    for (c = __malloc_free_list; c; c = __next_chunk(c)) {
         assert(_is_free(c));
         __malloc_validate_chunk(c);
 #if __MALLOC_SMALL_BUCKET
@@ -272,18 +299,21 @@ __malloc_validate(void)
         size_t bucket_size = BUCKET_SIZE(bucket);
         assert(s > max_bucket || s != bucket_size);
 #endif
-        assert(c->next == NULL || chunk_after(c) <= c->next);
+        assert(__next_chunk(c) == NULL || chunk_after(c) <= __next_chunk(c));
     }
 #if __MALLOC_SMALL_BUCKET
     size_t b;
 
     for (b = 0; b < NUM_BUCKET_POT; b++) {
-        for (c = __malloc_bucket_list[b]; c; c = c->next) {
+        for (c = __malloc_bucket_list[b]; c; c = __next_bucket(c)) {
             assert(_is_free(c));
             __malloc_validate_chunk(c);
             assert(_size(c) == BUCKET_SIZE(b));
         }
     }
+#endif
+#ifdef __MALLOC_SKIP_LIST
+    _ms_validate();
 #endif
 }
 
