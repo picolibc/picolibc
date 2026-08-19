@@ -213,13 +213,13 @@ void __malloc_validate(void);
 void __malloc_validate_chunk(chunk_t *c);
 #define MALLOC_LOCK          \
     do {                     \
-        __LIBC_LOCK();       \
         __malloc_validate(); \
+        __LIBC_LOCK();       \
     } while (0)
 #define MALLOC_UNLOCK        \
     do {                     \
-        __malloc_validate(); \
         __LIBC_UNLOCK();     \
+        __malloc_validate(); \
     } while (0)
 #else
 #define __malloc_validate()
