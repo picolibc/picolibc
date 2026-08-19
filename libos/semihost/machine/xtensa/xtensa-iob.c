@@ -40,6 +40,7 @@ xtensa_putc(char c, FILE *file)
 {
     (void)file;
     _simcall(SYS_write, 1, (intptr_t)&c, 1);
+    return 0;
 }
 
 static int
