@@ -1438,7 +1438,7 @@ if not have_has_builtin
     ['builtin_issignaling', '__builtin_issignaling((long double)42)', 'int'],
     ['builtin_mul_overflow', '__builtin_mul_overflow(1, 2, &u)', 'int'],
     ['builtin_add_overflow', '__builtin_add_overflow(1, 2, &u)', 'int'],
-    ['builtin_expect', '__builtin_expect(1 > 0)', 'int'],
+    ['builtin_expect', '__builtin_expect(1 > 0, 1)', 'int'],
   ]
 endif
 
