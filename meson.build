@@ -1428,7 +1428,13 @@ if not have_has_builtin
     ['builtin_ctzl', '__builtin_ctzl((unsigned long)42)', 'int'],
     ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42)', 'int'],
     ['builtin_stdc_bit_width', '__builtin_stdc_bit_width(42U)', 'unsigned int'],
+    ['builtin_clzg', '__builtin_clzg(42U, 8*sizeof(42U))', 'unsigned int'],
+    ['builtin_clz', '__builtin_clz(42U)', 'int'],
+    ['builtin_clzl', '__builtin_clzl(42UL)', 'int'],
     ['builtin_constant_p', '__builtin_constant_p(1)', 'int'],
+    ['builtin_align_up', '__builtin_align_up((unsigned) 1, (unsigned) 8)', 'unsigned'],
+    ['builtin_align_down', '__builtin_align_down((unsigned) 15, (unsigned) 8)', 'unsigned'],
+    ['builtin_is_aligned', '__builtin_is_aligned((unsigned) 4, (unsigned) 2)', 'int'],
     ['builtin_copysignl', '__builtin_copysignl((long double)42, (long double) 42)', 'long double'],
     ['builtin_copysign', '__builtin_copysign(42, 42)', 'double'],
     ['builtin_isinfl', '__builtin_isinfl((long double)42)', 'int'],
@@ -1441,15 +1447,23 @@ if not have_has_builtin
     ['builtin_mul_overflow', '__builtin_mul_overflow(1, 2, &u)', 'int'],
     ['builtin_add_overflow', '__builtin_add_overflow(1, 2, &u)', 'int'],
     ['builtin_expect', '__builtin_expect(1 > 0, 1)', 'int'],
+    ['builtin_unreachable', 'if (0) __builtin_unreachable();', 'void'],
   ]
 endif
 
 foreach builtin : builtins
-  builtin_template='''
-static int foo(@1@ i __attribute__((unused))) { return 0; }
-unsigned u;
-int main(void) { return foo(@0@); }
-'''
+  if builtin[2] == 'void'
+    builtin_template='''
+        int main(void) { @0@; return 0; }
+        '''
+  else
+    builtin_template='''
+        static int foo(@1@ i __attribute__((unused))) { return 0; }
+        unsigned u;
+        int main(void) { return foo(@0@); }
+        '''
+  endif
+
   builtin_code = builtin_template.format(builtin[1], builtin[2])
   have_current_builtin = cc.links(builtin_code, name : 'test for __' + builtin[0], args: c_args)
   if have_current_builtin
