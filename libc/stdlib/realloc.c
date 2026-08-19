@@ -117,17 +117,34 @@ realloc(void *ptr, size_t size)
     }
 
     if (new_size <= old_size) {
-        size_t extra = old_size - new_size;
+        size_t rem = old_size - new_size;
 
 #ifdef __MALLOC_CLEAR_FREED
-        memset((char *)ptr + size, 0, old_size - size);
+        memset((char *)ptr + size, 0, rem);
 #endif
         /* If there's enough space left over, split it out
          * and free it
          */
-        if (!is_bucket && extra >= MALLOC_CHUNK_MIN) {
+        if (!is_bucket && rem >= MALLOC_CHUNK_MIN) {
+
+#if __MALLOC_SMALL_BUCKET
+            /*
+             * If the remainder fits a bucket, adjust to the largest
+             * possible bucket and free that
+             */
+            if (rem <= MALLOC_MAX_BUCKET) {
+                /*
+                 * Adjust remainder to bucket size
+                 */
+
+                int bucket = BUCKET_FLOOR(rem);
+                rem = BUCKET_SIZE(bucket);
+
+                new_size = old_size - rem;
+            }
+#endif
             _set_size(p_to_realloc, new_size);
-            make_free_chunk(chunk_after(p_to_realloc), extra);
+            make_free_chunk(chunk_after(p_to_realloc), rem);
         }
         return ptr;
     }

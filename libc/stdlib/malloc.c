@@ -160,18 +160,17 @@ malloc(size_t s)
 #endif
     {
         for (p = &__malloc_free_list; (c = *p) != NULL; p = &c->next) {
-            if (_size(c) >= alloc_size) {
-                size_t rem = _size(c) - alloc_size;
+
+            chunk_t *next = c->next;
+            size_t   c_size = _size(c);
+
+            if (c_size >= alloc_size) {
+                size_t rem = c_size - alloc_size;
 
                 if (rem >= MALLOC_CHUNK_MIN) {
                     /* Find a chunk_t that much larger than required size, break
                      * it into two chunks and return the first one
                      */
-
-                    chunk_t *s = (chunk_t *)((char *)c + alloc_size);
-                    _set_size(c, alloc_size);
-                    _set_size(s, rem);
-                    _mark_free(s);
 
 #if __MALLOC_SMALL_BUCKET
                     /*
@@ -179,33 +178,44 @@ malloc(size_t s)
                      * rather than into the general list
                      */
                     if (rem <= MALLOC_MAX_BUCKET) {
-                        int    bucket = BUCKET_NUM(rem);
-                        size_t bucket_size = BUCKET_SIZE(bucket);
-                        if (rem == bucket_size) {
-                            s->next = __malloc_bucket_list[bucket];
-                            __malloc_bucket_list[bucket] = s;
+                        /*
+                         * Adjust remainder to bucket size
+                         */
 
-                            /* unlink from the general list */
-                            *p = c->next;
-                            break;
-                        }
+                        int bucket = BUCKET_FLOOR(rem);
+                        rem = BUCKET_SIZE(bucket);
+
+                        alloc_size = c_size - rem;
+
+                        /* unlink from the general list */
+                        *p = next;
+
+                        /*
+                         * Prepare pointers to link the tail chunk to
+                         * its free list
+                         */
+                        next = __malloc_bucket_list[bucket];
+                        p = &__malloc_bucket_list[bucket];
                     }
 #endif
-                    s->next = c->next;
-                    *p = s;
-                } else {
-                    /* Find a chunk_t that is exactly the size or slightly bigger
-                     * than requested size, just return this chunk_t
-                     */
-                    *p = c->next;
+                    chunk_t *s = (chunk_t *)((char *)c + alloc_size);
+
+                    _set_size(c, alloc_size);
+                    _set_size(s, rem);
+                    _mark_free(s);
+
+                    /* Link into the free chain */
+                    s->next = next;
+                    next = s;
                 }
+                *p = next;
                 break;
             }
-            if (!c->next && __malloc_grow_chunk(c, alloc_size)) {
+            if (!next && __malloc_grow_chunk(c, alloc_size)) {
                 /* Grow the last chunk in memory to the requested size,
                  * just return it
                  */
-                *p = c->next;
+                *p = next;
                 break;
             }
         }
@@ -253,7 +263,7 @@ __malloc_validate_chunk(chunk_t *c)
     assert(__align_up(chunk_to_ptr(c), MALLOC_CHUNK_ALIGN) == chunk_to_ptr(c));
     assert(__align_up(c, MALLOC_HEAD_ALIGN) == c);
     assert(_size(c) >= MALLOC_CHUNK_MIN);
-    assert(_size(c) < 0x80000000UL);
+    assert(_size(c) < MALLOC_CHUNK_MAX);
     assert(__align_up(_size(c), MALLOC_HEAD_ALIGN) == _size(c));
 }
 
