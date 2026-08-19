@@ -28,6 +28,33 @@
 
 #include "local-malloc.h"
 
+static bool
+__realloc_grow_adjacent(chunk_t *p_to_realloc, size_t old_size, size_t new_size)
+{
+    chunk_t **p, *r, *after = chunk_after(p_to_realloc);
+
+    /*
+     * Check to see if there's a large enough chunk_t of free space
+     * just past the current chunk. If we find one, merge it in
+     */
+    for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
+        if (r == after) {
+            size_t r_size = _size(r);
+
+            if (r_size >= new_size || old_size + r_size >= new_size) {
+                /* remove R from the free list */
+                *p = r->next;
+
+                _set_size(p_to_realloc, old_size + r_size);
+                return true;
+            }
+        }
+        if (p_to_realloc < r)
+            break;
+    }
+    return false;
+}
+
 /*
  * Implement either by merging adjacent free memory
  * or by calling malloc/memcpy
@@ -75,39 +102,15 @@ realloc(void *ptr, size_t size)
      * when increasing the size
      */
     if (!is_bucket && new_size > old_size) {
-        void *chunk_e = chunk_end(p_to_realloc);
-
         MALLOC_LOCK;
 
-        if (__malloc_grow_chunk(p_to_realloc, new_size)) {
+        if (__malloc_grow_chunk(p_to_realloc, new_size)
+            || __realloc_grow_adjacent(p_to_realloc, old_size, new_size)) {
             /* clear new memory */
-            memset(chunk_e, '\0', new_size - old_size);
-            /* adjust chunk_t size */
-            old_size = new_size;
-        } else {
-            chunk_t **p, *r;
+            memset((char *)chunk_to_blob(p_to_realloc) + old_size, '\0', new_size - old_size);
 
-            /* Check to see if there's a chunk_t of free space just past
-             * the current chunk, merge it in in case that's useful
-             */
-            for (p = &__malloc_free_list; (r = *p) != NULL; p = &r->next) {
-                if (r == chunk_e) {
-                    size_t r_size = _size(r);
-
-                    /* remove R from the free list */
-                    *p = r->next;
-
-                    /* clear the memory from r */
-                    memset(r, '\0', r_size);
-
-                    /* add it's size to our chunk */
-                    old_size += r_size;
-                    _set_size(p_to_realloc, old_size);
-                    break;
-                }
-                if (p_to_realloc < r)
-                    break;
-            }
+            /* Reset chunk_t size */
+            old_size = _size(p_to_realloc);
         }
 
         MALLOC_UNLOCK;
