@@ -382,6 +382,12 @@
 #if __has_builtin(__builtin_mul_overflow)
 #define __HAVE_BUILTIN_MUL_OVERFLOW 1
 #endif
+#if __has_builtin(__builtin_stdc_bit_width)
+#define __HAVE_BUILTIN_STDC_BIT_WIDTH 1
+#endif
+#if __has_builtin(__builtin_constant_p)
+#define __HAVE_BUILTIN_CONSTANT_P 1
+#endif
 
 #if !__has_builtin(__builtin_expect)
 #define __builtin_expect(cond, exp) (cond)

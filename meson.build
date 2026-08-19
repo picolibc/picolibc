@@ -1427,6 +1427,8 @@ if not have_has_builtin
     ['builtin_ctz', '__builtin_ctz((unsigned int)42)', 'int'],
     ['builtin_ctzl', '__builtin_ctzl((unsigned long)42)', 'int'],
     ['builtin_ctzll', '__builtin_ctzll((unsigned long long)42)', 'int'],
+    ['builtin_stdc_bit_width', '__builtin_stdc_bit_width(42U)', 'unsigned int'],
+    ['builtin_constant_p', '__builtin_constant_p(1)', 'int'],
     ['builtin_copysignl', '__builtin_copysignl((long double)42, (long double) 42)', 'long double'],
     ['builtin_copysign', '__builtin_copysign(42, 42)', 'double'],
     ['builtin_isinfl', '__builtin_isinfl((long double)42)', 'int'],
