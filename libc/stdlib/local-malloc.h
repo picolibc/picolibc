@@ -182,9 +182,15 @@ _is_free(chunk_t *c)
 }
 
 static inline size_t
+_size_val(size_t size)
+{
+    return size & ~(size_t)1;
+}
+
+static inline size_t
 _size(chunk_t *chunk)
 {
-    return *_size_ref(chunk) & ~(size_t)1;
+    return _size_val(*_size_ref(chunk));
 }
 
 static inline void
@@ -292,7 +298,7 @@ static inline void * __disable_sanitizer
 chunk_end(chunk_t *c)
 {
     size_t *s = _size_ref(c);
-    return (char *)s + *s;
+    return (char *)s + _size_val(*s);
 }
 
 /* next chunk in memory -- address of chunk header past this chunk */
