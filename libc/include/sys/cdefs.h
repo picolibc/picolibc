@@ -376,8 +376,8 @@
 #if __has_builtin(__builtin_isnanl)
 #define __HAVE_BUILTIN_ISNANL 1
 #endif
-#if __has_builtin(__builtin_issignalingl)
-#define __HAVE_BUILTIN_ISSIGNALINGL 1
+#if __has_builtin(__builtin_issignaling)
+#define __HAVE_BUILTIN_ISSIGNALING 1
 #endif
 #if __has_builtin(__builtin_mul_overflow)
 #define __HAVE_BUILTIN_MUL_OVERFLOW 1

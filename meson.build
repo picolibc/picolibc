@@ -1435,7 +1435,7 @@ if not have_has_builtin
     ['builtin_isnan', '__builtin_isnan((long double)42)', 'int'],
     ['builtin_finitel', '__builtin_finitel((long double)42)', 'int'],
     ['builtin_isfinite', '__builtin_isfinite((long double)42)', 'int'],
-    ['builtin_issignalingl', '__builtin_issignalingl((long double)42)', 'int'],
+    ['builtin_issignaling', '__builtin_issignaling((long double)42)', 'int'],
     ['builtin_mul_overflow', '__builtin_mul_overflow(1, 2, &u)', 'int'],
     ['builtin_add_overflow', '__builtin_add_overflow(1, 2, &u)', 'int'],
     ['builtin_expect', '__builtin_expect(1 > 0)', 'int'],

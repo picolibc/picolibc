@@ -35,10 +35,10 @@
 
 #include "math_config.h"
 
-#if defined(_NEED_FLOAT_HUGE) && __HAVE_BUILTIN_ISSIGNALINGL
+#if defined(_NEED_FLOAT_HUGE) && __HAVE_BUILTIN_ISSIGNALING
 int
 __issignalingl(long double x)
 {
-    return __builtin_issignalingl(x);
+    return __builtin_issignaling(x);
 }
 #endif
