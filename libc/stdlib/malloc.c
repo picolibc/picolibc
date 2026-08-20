@@ -150,7 +150,11 @@ malloc(size_t s)
 #if __MALLOC_SMALL_BUCKET
     /* Small allocations use the bucket allocator */
     if (alloc_size <= MALLOC_MAX_BUCKET) {
-        int bucket = BUCKET_NUM(alloc_size);
+        unsigned bucket = BUCKET_NUM(alloc_size);
+
+#ifdef MALLOC_DEBUG
+        assert(bucket < NUM_BUCKET_POT);
+#endif
 
         alloc_size = BUCKET_SIZE(bucket);
         p = &__malloc_bucket_list[bucket];
@@ -182,7 +186,10 @@ malloc(size_t s)
                          * Adjust remainder to bucket size
                          */
 
-                        int bucket = BUCKET_FLOOR(rem);
+                        unsigned bucket = BUCKET_FLOOR(rem);
+#ifdef MALLOC_DEBUG
+                        assert(bucket < NUM_BUCKET_POT);
+#endif
                         rem = BUCKET_SIZE(bucket);
 
                         alloc_size = c_size - rem;
@@ -276,10 +283,10 @@ __malloc_validate(void)
         assert(_is_free(c));
         __malloc_validate_chunk(c);
 #if __MALLOC_SMALL_BUCKET
-        size_t s = _size(c);
-        size_t max_bucket = MALLOC_MAX_BUCKET;
-        int    bucket = BUCKET_NUM(s);
-        size_t bucket_size = BUCKET_SIZE(bucket);
+        size_t   s = _size(c);
+        size_t   max_bucket = MALLOC_MAX_BUCKET;
+        unsigned bucket = BUCKET_NUM(s);
+        size_t   bucket_size = BUCKET_SIZE(bucket);
         assert(s > max_bucket || s != bucket_size);
 #endif
         assert(c->next == NULL || chunk_after(c) <= c->next);

@@ -136,9 +136,7 @@ realloc(void *ptr, size_t size)
                 /*
                  * Adjust remainder to bucket size
                  */
-
-                int bucket = BUCKET_FLOOR(rem);
-                rem = BUCKET_SIZE(bucket);
+                rem = BUCKET_SIZE(BUCKET_FLOOR(rem));
 
                 new_size = old_size - rem;
             }

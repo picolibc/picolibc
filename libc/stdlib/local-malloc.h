@@ -45,19 +45,33 @@
 #include <sys/param.h>
 #include <stdint.h>
 
-#define _UP_POT(x, val, next) (((x) <= 1UL << (val)) ? (val) : (next))
-#define _UP_POT4096(x)        _UP_POT(x, 12, 0UL)
-#define _UP_POT2048(x)        _UP_POT(x, 11, _UP_POT4096(x))
-#define _UP_POT1024(x)        _UP_POT(x, 10, _UP_POT2048(x))
-#define _UP_POT512(x)         _UP_POT(x, 9, _UP_POT1024(x))
-#define _UP_POT256(x)         _UP_POT(x, 8, _UP_POT512(x))
-#define _UP_POT128(x)         _UP_POT(x, 7, _UP_POT256(x))
-#define _UP_POT64(x)          _UP_POT(x, 6, _UP_POT128(x))
-#define _UP_POT32(x)          _UP_POT(x, 5, _UP_POT64(x))
-#define _UP_POT16(x)          _UP_POT(x, 4, _UP_POT32(x))
-#define _UP_POT8(x)           _UP_POT(x, 3, _UP_POT16(x))
-#define _UP_POT4(x)           _UP_POT(x, 2, _UP_POT8(x))
-#define UP_POT(x)             _UP_POT4(x)
+#define _UP_POT(x, val, next)   (((x) <= 1UL << (val)) ? (val) : (next))
+#define _UP_POT4096(x)          _UP_POT(x, 12, 0UL)
+#define _UP_POT2048(x)          _UP_POT(x, 11, _UP_POT4096(x))
+#define _UP_POT1024(x)          _UP_POT(x, 10, _UP_POT2048(x))
+#define _UP_POT512(x)           _UP_POT(x, 9, _UP_POT1024(x))
+#define _UP_POT256(x)           _UP_POT(x, 8, _UP_POT512(x))
+#define _UP_POT128(x)           _UP_POT(x, 7, _UP_POT256(x))
+#define _UP_POT64(x)            _UP_POT(x, 6, _UP_POT128(x))
+#define _UP_POT32(x)            _UP_POT(x, 5, _UP_POT64(x))
+#define _UP_POT16(x)            _UP_POT(x, 4, _UP_POT32(x))
+#define _UP_POT8(x)             _UP_POT(x, 3, _UP_POT16(x))
+#define _UP_POT4(x)             _UP_POT(x, 2, _UP_POT8(x))
+#define UP_POT(x)               _UP_POT4(x)
+
+#define _DOWN_POT(x, val, next) (((x) < 1UL << (val)) ? ((val) - 1) : (next))
+#define _DOWN_POT4096(x)        _DOWN_POT(x, 12, 0UL)
+#define _DOWN_POT2048(x)        _DOWN_POT(x, 11, _DOWN_POT4096(x))
+#define _DOWN_POT1024(x)        _DOWN_POT(x, 10, _DOWN_POT2048(x))
+#define _DOWN_POT512(x)         _DOWN_POT(x, 9, _DOWN_POT1024(x))
+#define _DOWN_POT256(x)         _DOWN_POT(x, 8, _DOWN_POT512(x))
+#define _DOWN_POT128(x)         _DOWN_POT(x, 7, _DOWN_POT256(x))
+#define _DOWN_POT64(x)          _DOWN_POT(x, 6, _DOWN_POT128(x))
+#define _DOWN_POT32(x)          _DOWN_POT(x, 5, _DOWN_POT64(x))
+#define _DOWN_POT16(x)          _DOWN_POT(x, 4, _DOWN_POT32(x))
+#define _DOWN_POT8(x)           _DOWN_POT(x, 3, _DOWN_POT16(x))
+#define _DOWN_POT4(x)           _DOWN_POT(x, 2, _DOWN_POT8(x))
+#define DOWN_POT(x)             _DOWN_POT4(x)
 
 static inline unsigned int
 up_pot(size_t x)
@@ -235,7 +249,7 @@ extern char    *__malloc_sbrk_top;
 
 #ifdef MALLOC_MAX_BUCKET_POT
 
-#define MIN_BUCKET_POT (UP_POT(MALLOC_CHUNK_SIZE))
+#define MIN_BUCKET_POT (DOWN_POT(MAX(MALLOC_CHUNK_ALIGN - MALLOC_HEAD_SIZE, MALLOC_CHUNK_SIZE)))
 #define MAX_BUCKET_POT MALLOC_MAX_BUCKET_POT
 #define NUM_BUCKET_POT (MAX_BUCKET_POT - MIN_BUCKET_POT + 1)
 
@@ -244,10 +258,12 @@ extern char    *__malloc_sbrk_top;
 #define MALLOC_MAX_BUCKET (BUCKET_SIZE(MALLOC_MAX_BUCKET_POT - MIN_BUCKET_POT))
 #define MALLOC_MIN_BUCKET (BUCKET_SIZE(0))
 
-_Static_assert(MALLOC_MIN_BUCKET == MALLOC_CHUNK_MIN);
+_Static_assert(MALLOC_MIN_BUCKET == MALLOC_CHUNK_MIN, "Malloc bucket sizes mis-computed");
 
-#define BUCKET_NUM(s)   (up_pot(s - MALLOC_HEAD_SIZE) - MIN_BUCKET_POT)
-#define BUCKET_FLOOR(s) (down_pot(s - MALLOC_HEAD_SIZE) - MIN_BUCKET_POT)
+#define BUCKET_NUM(s)                                                                     \
+    ((s) <= MALLOC_CHUNK_ALIGN ? 0 : (up_pot((s) - MALLOC_CHUNK_ALIGN) - MIN_BUCKET_POT))
+#define BUCKET_FLOOR(s)                                                                     \
+    ((s) <= MALLOC_CHUNK_ALIGN ? 0 : (down_pot((s) - MALLOC_CHUNK_ALIGN) - MIN_BUCKET_POT))
 
 extern chunk_t *__malloc_bucket_list[NUM_BUCKET_POT];
 #endif
