@@ -126,6 +126,16 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
     return false;
 }
 
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && __MALLOC_SMALL_BUCKET
+/*
+ * The analyzer is confused by the bucket number computation and thinks it
+ * might be -1, leading to reading __malloc_bucket_list[-1], which would be bad.
+ */
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wanalyzer-out-of-bounds"
+#endif
+
 /** Function malloc
  * Algorithm:
  *   Walk through the free list to find the first match. If fails to find
