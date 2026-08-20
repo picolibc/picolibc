@@ -143,21 +143,21 @@ typedef struct malloc_chunk {
     struct malloc_chunk *next;
 } chunk_t;
 
+#define MALLOC_HEAD_SIZE  sizeof(head_t)
+
+#define MALLOC_CHUNK_SIZE sizeof(chunk_t)
+
 /* Alignment of allocated chunk. Compute the alignment required from a
  * range of types */
-#define MALLOC_CHUNK_ALIGN _Alignof(align_chunk_t)
+#define MALLOC_CHUNK_ALIGN MAX(_Alignof(align_chunk_t), MALLOC_CHUNK_SIZE)
 
 /* Alignment of the header. Never larger than MALLOC_CHUNK_ALIGN, but
  * may be smaller on some targets when size_t is smaller than
  * align_chunk_t.
  */
-#define MALLOC_HEAD_ALIGN  _Alignof(head_t)
+#define MALLOC_HEAD_ALIGN  MAX(_Alignof(head_t), MALLOC_HEAD_SIZE)
 
 #define MALLOC_ALIGN_EXTRA (MALLOC_CHUNK_ALIGN - MALLOC_HEAD_ALIGN)
-
-#define MALLOC_HEAD_SIZE   sizeof(head_t)
-
-#define MALLOC_CHUNK_SIZE  sizeof(chunk_t)
 
 /* nominal "page size" */
 #define MALLOC_PAGE_ALIGN (0x1000)
