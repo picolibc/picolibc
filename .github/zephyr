@@ -30,7 +30,7 @@ esac
 
 . $ZEPHYR_SDK_INSTALL_DIR/$hosttools/environment-setup-*
 
-for dir in "$ZEPHYR_SDK_INSTALL_DIR"/* "$ZEPHYR_SDK_INSTALL_DIR"/qemu*; do
+for dir in "$ZEPHYR_SDK_INSTALL_DIR"/* "$ZEPHYR_SDK_INSTALL_DIR"/qemu* "$ZEPHYR_SDK_INSTALL_DIR"/gnu/*; do
     if [ -d "$dir" -a -d "$dir"/bin ]; then
 	PATH="$dir"/bin:$PATH
     fi
