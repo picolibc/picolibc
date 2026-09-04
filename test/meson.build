@@ -42,6 +42,7 @@ tests = [
   'test-getopt',
   'test-hello',
   'test-hosted-exit',
+  'test-lseek64-linux',
   'test-lseek-overflow',
   'test-ssize-max',
   'test-hosted-exit-fail',
@@ -114,6 +115,16 @@ test_extra_c_args = {
   'test-ubsan': test_ubsan_cflags,
   'test-ubsan-no-flash': test_ubsan_cflags,
 }
+
+if oslib_test_variant == 'linux'
+  test_extra_c_args += {
+    'test-lseek-overflow': ['-DTESTS_LSEEK64'],
+  }
+else
+  test_extra_c_args += {
+    'test-lseek64-linux': ['-DTESTS_LSEEK64_SKIP'],
+  }
+endif
 
 test_args = {
   'test-argv': ['--args', 'hello world'],

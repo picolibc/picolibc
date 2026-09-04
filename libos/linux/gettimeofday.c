@@ -40,9 +40,9 @@
 int
 gettimeofday(struct timeval *tv, void *tz)
 {
-    struct __kernel_timespec ts;
+    struct __kernel_timespec_time_t ts;
 
-    if (syscall(LINUX_SYS_clock_gettime, LINUX_CLOCK_REALTIME, &ts) < 0)
+    if (syscall(LINUX_SYS_clock_gettime_time_t, LINUX_CLOCK_REALTIME, &ts) < 0)
         return -1;
     tv->tv_sec = (time_t)ts.tv_sec;
     tv->tv_usec = ts.tv_nsec / 1000;

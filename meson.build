@@ -974,6 +974,8 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('TEXT_MEM', 'flash')
     picolibc_ld_data.set('TEXT_AT', 'flash')
     picolibc_ld_data.set('TEXT_PHDR', 'text')
+    picolibc_ld_data.set('RODATA_PHDR_DECL', '')
+    picolibc_ld_data.set('DATA_INIT_PHDR_DECL', '')
 
     # attributes for read-only data sections
     picolibc_ld_data.set('RODATA_MEM', 'flash')
@@ -1348,9 +1350,11 @@ foreach params : [default_target] + targets
     picolibc_linux_ld_data.set('RODATA_MEM', 'ram')
     picolibc_linux_ld_data.set('RODATA_AT', 'ram')
     picolibc_linux_ld_data.set('RODATA_PHDR', 'ram')
+    picolibc_linux_ld_data.set('RODATA_PHDR_DECL', ld_comment)
 
     picolibc_linux_ld_data.set('DATA_AT', 'ram')
     picolibc_linux_ld_data.set('DATA_INIT_PHDR', 'ram')
+    picolibc_linux_ld_data.set('DATA_INIT_PHDR_DECL', ld_comment)
 
     # set up default memory layout
     picolibc_linux_ld_data.set('DEFAULT_FLASH_ADDR', _default_linux_flash_addr)

@@ -7,6 +7,6 @@ https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/msp430-unkno
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/or1k-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/sh-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/qemu-stable.linux-amd64.tar.xz
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/qemu-hexagon.linux-amd64.tar.xz
+https://github.com/quic-k/picolibc-ci-tools/releases/download/v16/qemu-hexagon.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v15/ATfE-23.0.0-pre-Linux-x86_64.tar.xz
 https://github.com/picolibc/toolchains/raw/refs/heads/main/FVP_Base_RevC-2xAEMvA_11.28_23_Linux64-nonexecstack.tar.xz

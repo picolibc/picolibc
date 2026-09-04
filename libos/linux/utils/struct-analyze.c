@@ -219,7 +219,7 @@ main(int argc, char **argv)
         e = &elts[i];
         if (!e->typename) {
             if (e->nelt > 0) {
-                printf("        { unsigned __i; for(__i = 0; i < %d; i++) (_t)->%s[__i] = "
+                printf("        { unsigned __i; for(__i = 0; __i < %d; __i++) (_t)->%s[__i] = "
                        "(_f)->%s[__i]; } \\\n",
                        e->nelt, e->name, e->name);
             } else {

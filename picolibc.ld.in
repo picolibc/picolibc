@@ -53,8 +53,8 @@ MEMORY
 PHDRS
 {@INIT_PHDRS@
 	text PT_LOAD;
-	rodata PT_LOAD;
-	ram_init PT_LOAD;
+@RODATA_PHDR_DECL@	rodata PT_LOAD;
+@DATA_INIT_PHDR_DECL@	ram_init PT_LOAD;
 	ram PT_LOAD;
 	@TLS_PHDRS@
 }

@@ -37,6 +37,7 @@
 #define _LINUX_SIGACTION_STRUCT_H_
 
 #include <linux/linux-sigaction-nsig.h>
+#include <linux/linux-signal.h>
 
 typedef struct __kernel_sigset {
     unsigned sa_mask[__KERNEL_NSIG / (sizeof(unsigned) * 8)];
@@ -45,7 +46,9 @@ typedef struct __kernel_sigset {
 struct __kernel_sigaction {
     _sig_func_ptr     sa_handler;
     unsigned long     sa_flags;
+#ifdef LINUX_SA_RESTORER
     void              (*sa_restorer)(void);
+#endif
     __kernel_sigset_t sa_mask;
 };
 

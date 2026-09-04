@@ -91,7 +91,9 @@ _signal_sigaction(int sig, struct __kernel_siginfo *kinfo, void *ucontext)
 }
 
 extern void __restore_rt(void);
+#ifdef LINUX_SA_RESTORER
 extern void __sa_restore(void);
+#endif
 
 static const struct {
     int pflag;
@@ -128,7 +130,9 @@ sigaction(int sig, const struct sigaction *act, struct sigaction *oldact)
     ksig = _signal_to_linux(sig);
 
     if (act) {
+#ifdef LINUX_SA_RESTORER
         kact.sa_flags = LINUX_SA_RESTORER;
+#endif
 
         if (act->sa_flags & SA_SIGINFO) {
             func.sa_sigaction = act->sa_sigaction;
@@ -150,7 +154,9 @@ sigaction(int sig, const struct sigaction *act, struct sigaction *oldact)
 
         _sigmask_to_linux(&kact.sa_mask, &act->sa_mask);
 
+#ifdef LINUX_SA_RESTORER
         kact.sa_restorer = __sa_restore;
+#endif
 
         pact = &kact;
     }

@@ -43,6 +43,8 @@ main(void)
 {
 #ifdef SYS__llseek
     printf("#define %-32.32s %d\n", "LINUX_SYS__llseek", SYS__llseek);
+#elif defined(SYS_llseek)
+    printf("#define %-32.32s %d\n", "LINUX_SYS__llseek", SYS_llseek);
 #endif
 #ifdef SYS__newselect
     printf("#define %-32.32s %d\n", "LINUX_SYS__newselect", SYS__newselect);
@@ -137,14 +139,26 @@ main(void)
 #ifdef SYS_clock_getres
     printf("#define %-32.32s %d\n", "LINUX_SYS_clock_getres", SYS_clock_getres);
 #endif
+#ifdef SYS_clock_getres_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_clock_getres_time64", SYS_clock_getres_time64);
+#endif
 #ifdef SYS_clock_gettime
     printf("#define %-32.32s %d\n", "LINUX_SYS_clock_gettime", SYS_clock_gettime);
+#endif
+#ifdef SYS_clock_gettime64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_clock_gettime64", SYS_clock_gettime64);
 #endif
 #ifdef SYS_clock_nanosleep
     printf("#define %-32.32s %d\n", "LINUX_SYS_clock_nanosleep", SYS_clock_nanosleep);
 #endif
+#ifdef SYS_clock_nanosleep_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_clock_nanosleep_time64", SYS_clock_nanosleep_time64);
+#endif
 #ifdef SYS_clock_settime
     printf("#define %-32.32s %d\n", "LINUX_SYS_clock_settime", SYS_clock_settime);
+#endif
+#ifdef SYS_clock_settime64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_clock_settime64", SYS_clock_settime64);
 #endif
 #ifdef SYS_clone2
     printf("#define %-32.32s %d\n", "LINUX_SYS_clone2", SYS_clone2);
@@ -334,6 +348,9 @@ main(void)
 #endif
 #ifdef SYS_futex
     printf("#define %-32.32s %d\n", "LINUX_SYS_futex", SYS_futex);
+#endif
+#ifdef SYS_futex_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_futex_time64", SYS_futex_time64);
 #endif
 #ifdef SYS_futimesat
     printf("#define %-32.32s %d\n", "LINUX_SYS_futimesat", SYS_futimesat);
@@ -687,8 +704,14 @@ main(void)
 #ifdef SYS_mq_timedreceive
     printf("#define %-32.32s %d\n", "LINUX_SYS_mq_timedreceive", SYS_mq_timedreceive);
 #endif
+#ifdef SYS_mq_timedreceive_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_mq_timedreceive_time64", SYS_mq_timedreceive_time64);
+#endif
 #ifdef SYS_mq_timedsend
     printf("#define %-32.32s %d\n", "LINUX_SYS_mq_timedsend", SYS_mq_timedsend);
+#endif
+#ifdef SYS_mq_timedsend_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_mq_timedsend_time64", SYS_mq_timedsend_time64);
 #endif
 #ifdef SYS_mq_unlink
     printf("#define %-32.32s %d\n", "LINUX_SYS_mq_unlink", SYS_mq_unlink);
@@ -834,6 +857,9 @@ main(void)
 #ifdef SYS_ppoll
     printf("#define %-32.32s %d\n", "LINUX_SYS_ppoll", SYS_ppoll);
 #endif
+#ifdef SYS_ppoll_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_ppoll_time64", SYS_ppoll_time64);
+#endif
 #ifdef SYS_prctl
     printf("#define %-32.32s %d\n", "LINUX_SYS_prctl", SYS_prctl);
 #endif
@@ -860,6 +886,9 @@ main(void)
 #endif
 #ifdef SYS_pselect6
     printf("#define %-32.32s %d\n", "LINUX_SYS_pselect6", SYS_pselect6);
+#endif
+#ifdef SYS_pselect6_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_pselect6_time64", SYS_pselect6_time64);
 #endif
 #ifdef SYS_ptrace
     printf("#define %-32.32s %d\n", "LINUX_SYS_ptrace", SYS_ptrace);
@@ -966,6 +995,9 @@ main(void)
 #ifdef SYS_rt_sigtimedwait
     printf("#define %-32.32s %d\n", "LINUX_SYS_rt_sigtimedwait", SYS_rt_sigtimedwait);
 #endif
+#ifdef SYS_rt_sigtimedwait_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_rt_sigtimedwait_time64", SYS_rt_sigtimedwait_time64);
+#endif
 #ifdef SYS_rt_tgsigqueueinfo
     printf("#define %-32.32s %d\n", "LINUX_SYS_rt_tgsigqueueinfo", SYS_rt_tgsigqueueinfo);
 #endif
@@ -1046,6 +1078,9 @@ main(void)
 #endif
 #ifdef SYS_semtimedop
     printf("#define %-32.32s %d\n", "LINUX_SYS_semtimedop", SYS_semtimedop);
+#endif
+#ifdef SYS_semtimedop_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_semtimedop_time64", SYS_semtimedop_time64);
 #endif
 #ifdef SYS_send
     printf("#define %-32.32s %d\n", "LINUX_SYS_send", SYS_send);
@@ -1335,8 +1370,14 @@ main(void)
 #ifdef SYS_timer_gettime
     printf("#define %-32.32s %d\n", "LINUX_SYS_timer_gettime", SYS_timer_gettime);
 #endif
+#ifdef SYS_timer_gettime64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_timer_gettime64", SYS_timer_gettime64);
+#endif
 #ifdef SYS_timer_settime
     printf("#define %-32.32s %d\n", "LINUX_SYS_timer_settime", SYS_timer_settime);
+#endif
+#ifdef SYS_timer_settime64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_timer_settime64", SYS_timer_settime64);
 #endif
 #ifdef SYS_timerfd_create
     printf("#define %-32.32s %d\n", "LINUX_SYS_timerfd_create", SYS_timerfd_create);
@@ -1344,8 +1385,14 @@ main(void)
 #ifdef SYS_timerfd_gettime
     printf("#define %-32.32s %d\n", "LINUX_SYS_timerfd_gettime", SYS_timerfd_gettime);
 #endif
+#ifdef SYS_timerfd_gettime64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_timerfd_gettime64", SYS_timerfd_gettime64);
+#endif
 #ifdef SYS_timerfd_settime
     printf("#define %-32.32s %d\n", "LINUX_SYS_timerfd_settime", SYS_timerfd_settime);
+#endif
+#ifdef SYS_timerfd_settime64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_timerfd_settime64", SYS_timerfd_settime64);
 #endif
 #ifdef SYS_times
     printf("#define %-32.32s %d\n", "LINUX_SYS_times", SYS_times);
@@ -1403,6 +1450,9 @@ main(void)
 #endif
 #ifdef SYS_utimensat
     printf("#define %-32.32s %d\n", "LINUX_SYS_utimensat", SYS_utimensat);
+#endif
+#ifdef SYS_utimensat_time64
+    printf("#define %-32.32s %d\n", "LINUX_SYS_utimensat_time64", SYS_utimensat_time64);
 #endif
 #ifdef SYS_utimes
     printf("#define %-32.32s %d\n", "LINUX_SYS_utimes", SYS_utimes);
