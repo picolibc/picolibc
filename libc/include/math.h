@@ -704,8 +704,17 @@ extern long double pow10l(long double) __picolibc_export;
 #if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
 extern double exp10(double) __picolibc_export;
 extern float  exp10f(float) __picolibc_export;
+extern double cospi(double) __picolibc_export;
+extern float  cospif(float) __picolibc_export;
+extern double sinpi(double) __picolibc_export;
+extern float  sinpif(float) __picolibc_export;
+extern double tanpi(double) __picolibc_export;
+extern float  tanpif(float) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE_MATH
 extern long double exp10l(long double) __picolibc_export;
+extern long double cospil(long double) __picolibc_export;
+extern long double sinpil(long double) __picolibc_export;
+extern long double tanpil(long double) __picolibc_export;
 #endif
 #endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
 

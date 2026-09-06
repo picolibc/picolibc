@@ -103,6 +103,13 @@ typedef union {
         (v) = sh_u.parts64.lsw;    \
     } while (0)
 
+#define GET_LDOUBLE_EXP(v, d)           \
+    do {                                \
+        ieee_quad_shape_type sh_u;      \
+        sh_u.value = (d);               \
+        (v) = sh_u.parts32.mswhi >> 16; \
+    } while (0)
+
 #define LDBL_NBIT     0
 #define LDBL_NBIT_INF 0
 #define LDBL_IMPLICIT_NBIT

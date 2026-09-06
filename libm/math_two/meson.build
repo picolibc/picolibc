@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2019 Keith Packard
+# Copyright © 2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -33,57 +33,27 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['math', 'common', 'math_two', 'fenv', 'ld']
+srcs_math_two = [
+  'pi_32.c',
+  'pi_64.c',
+  'pi_80.c',
+  'pi_128.c',
+  'rem_half_32.c',
+  'rem_half_64.c',
+  'rem_half_80.c',
+  'rem_half_128.c',
+  'cospi_32.c',
+  'cospi_64.c',
+  'cospi_80.c',
+  'cospi_128.c',
+  'sinpi_32.c',
+  'sinpi_64.c',
+  'sinpi_80.c',
+  'sinpi_128.c',
+  'tanpi_32.c',
+  'tanpi_64.c',
+  'tanpi_80.c',
+  'tanpi_128.c',
+  ]
 
-if have_complex
-  libdirs = libdirs + ['complex']
-endif
-
-libnames = libdirs
-
-libm_machine_dir = 'machine' / host_cpu_family
-if fs.is_dir(libm_machine_dir)
-  libdirs = [libm_machine_dir] + libdirs
-  libnames = ['machine'] + libnames
-else
-  srcs_libm_machine = []
-endif
-
-inc = [include_directories('common'), include_directories('math_two'), inc]
-
-foreach libdir : libdirs
-  subdir(libdir)
-endforeach
-
-src_mpart = []
-
-foreach libname : libnames
-  src_mpart += get_variable('src_libm_' + libname, [])
-endforeach
-
-foreach params : targets
-  target = params['name']
-  target_dir = params['dir']
-  target_c_args = params['c_args']
-  libobjs = []
-  libsrcs_target = []
-
-  foreach libname : libnames
-    if is_variable('lib_' + libname + target)
-      libobjs += get_variable('lib_' + libname + target).extract_all_objects(recursive:true)
-    endif
-    libsrcs_target += get_variable('src_libm_' + libname + target, [])
-  endforeach
-
-  set_variable('src_mpart_' + target, libsrcs_target)
-
-  if libobjs != []
-    local_lib_mpart_target = static_library('mpart' + target,
-					    pic: false,
-					    objects : libobjs,
-					    include_directories: inc,
-					    c_args: target_c_args + c_args)
-    set_variable('lib_mpart' + target, local_lib_mpart_target)
-  endif
-endforeach
-
+src_libm_math_two = files(srcs_math_two)
