@@ -126,8 +126,13 @@ __start(void)
 #endif
 
 #if defined(CRT0_GET_CMDLINE) || (defined(CRT0_SEMIHOST) && defined(__ARM_SEMIHOST))
+#if __SIZEOF_POINTER__ == 2
+#define CMDLINE_LEN 256 /* keep static buffers small on 16-bit targets */
+#define ARGV_LEN    16
+#else
 #define CMDLINE_LEN 1024
 #define ARGV_LEN    64
+#endif
     static char  cmdline[CMDLINE_LEN];
     static char *argv[ARGV_LEN];
     int          argc = 0;
