@@ -1276,6 +1276,21 @@ foreach params : [default_target] + targets
     picolibc_noflash_ld_data.set('INITTLS', '')
     picolibc_noflash_ld_data.set('DATATLS', ld_comment)
 
+    # The default .init section inherited from picolibc_ld_data targets
+    # `flash`. In a noflash build there is no distinct flash region — it
+    # either does not exist or is aliased to `ram` — so `.init > flash`
+    # is either nonsensical or overlaps `.text`. Redirect .init to ram
+    # in the noflash variant.
+    #
+    # Only applies when the default (single-.init) init-sections layout
+    # is in use; when the target enables `additional_sections` /
+    # `separate_boot_flash`, the inherited multi-section init layout
+    # (with its own explicit regions) is preserved.
+    if additional_sections == []
+      picolibc_noflash_ld_data.set('INIT_SECTIONS',
+        default_init_section_template.format(init_section_name, 'ram', 'text'))
+    endif
+
     # place all remaining sections in ram
 
     # attributes for regular executable sections
