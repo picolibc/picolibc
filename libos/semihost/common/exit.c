@@ -37,6 +37,15 @@
 #include <sys/cdefs.h>
 #include <unistd.h>
 
+/*
+ * ADP_Stopped_ApplicationExit is 0x20026, which does not fit in a
+ * 16-bit uintptr_t and would be silently truncated by the compiler on
+ * targets where sizeof(uintptr_t) < sizeof(int). Targets that need a
+ * word-size-appropriate exit path must supply their own _exit in
+ * their machine directory.
+ */
+#if __SIZEOF_POINTER__ >= 4
+
 __noreturn void
 _exit(int code)
 {
@@ -54,3 +63,5 @@ _exit(int code)
     }
     sys_semihost_exit(ADP_Stopped_ApplicationExit, code);
 }
+
+#endif /* __SIZEOF_POINTER__ >= 4 */
