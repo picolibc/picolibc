@@ -36,9 +36,19 @@
 #include "semihost-private.h"
 #include <sys/cdefs.h>
 
+/*
+ * ADP_Stopped_ApplicationExit is 0x20026 and does not fit in a 16-bit
+ * uintptr_t. See libos/semihost/common/exit.c for the analogous guard;
+ * targets that need this call on a smaller word size must supply their
+ * own sys_semihost_exit_extended in their machine directory.
+ */
+#if __SIZEOF_POINTER__ >= 4
+
 __noreturn void
 sys_semihost_exit_extended(uintptr_t code)
 {
     (void)sys_semihost2(SYS_EXIT_EXTENDED, ADP_Stopped_ApplicationExit, code);
     __builtin_unreachable();
 }
+
+#endif /* __SIZEOF_POINTER__ >= 4 */
