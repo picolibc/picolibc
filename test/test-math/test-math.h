@@ -191,6 +191,10 @@ ulp32(binary32 ab, binary32 bb)
         return 0;
     if (isnan(a) && isnan(b))
         return 0;
+#ifdef TEST_IGNORE_INF_SIGN
+    if (isinf(a) && isinf(b))
+        return 0;
+#endif
     if (isnan(a) || isnan(b)) {
 #ifdef __RX__
         printf("RX fails to generate NaN, ignoring\n");
@@ -280,6 +284,10 @@ ulp64(binary64 ab, binary64 bb)
         return 0;
     if (isnan(a) && isnan(b))
         return 0;
+#ifdef TEST_IGNORE_INF_SIGN
+    if (isinf(a) && isinf(b))
+        return 0;
+#endif
     /* sometimes inf != inf on m68k? */
     if (isinf(a) && isinf(b) && (a > 0) == (b > 0))
         return 0;
@@ -379,6 +387,10 @@ ulp80(binary80 ab, binary80 bb)
     volatile binary80 b = bb;
     if (a == b)
         return 0;
+#ifdef TEST_IGNORE_INF_SIGN
+    if (isinf(a) && isinf(b))
+        return 0;
+#endif
     if (isnan(a) && isnan(b))
         return 0;
     if (isnan(a) || isnan(b))
@@ -444,6 +456,10 @@ ulp128(binary128 ab, binary128 bb)
     volatile binary128 b = bb;
     if (a == b)
         return 0;
+#ifdef TEST_IGNORE_INF_SIGN
+    if (isinf(a) && isinf(b))
+        return 0;
+#endif
     if (isnan(a) && isnan(b))
         return 0;
     if (isnan(a) || isnan(b))

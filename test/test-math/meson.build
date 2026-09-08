@@ -43,12 +43,15 @@ tests_real_trig = [
   'test-atanh',
   'test-cos',
   'test-cosh',
+  'test-cospi',
   'test-sin',
   'test-sincos-cos',
   'test-sincos-sin',
   'test-sinh',
+  'test-sinpi',
   'test-tan',
-  'test-tanh'
+  'test-tanh',
+  'test-tanpi',
 ]
 
 tests_real_exp = [
@@ -123,10 +126,11 @@ tests += tests_complex_trig + tests_complex_exp + tests_complex_other
 tests += tests_other
 
 functions = [ 'acos', 'acosh', 'asin', 'asinh', 'atan', 'atanh',
-              'cbrt', 'cos', 'cosh', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
-              'expm1', 'j0', 'j1', 'lgamma', 'log', 'log10', 'log1p', 'log2',
-              'sin', 'sincos_cos', 'sincos_sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tgamma', 'y0', 'y1',
-            ]
+              'cbrt', 'cos', 'cosh', 'cospi', 'erf', 'erfc', 'exp',
+              'exp10', 'exp2', 'expm1', 'j0', 'j1', 'lgamma', 'log',
+              'log10', 'log1p', 'log2', 'sin', 'sinpi', 'sincos_cos',
+              'sincos_sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tanpi',
+              'tgamma', 'y0', 'y1', ]
 
 test_extra_libs = {}
 

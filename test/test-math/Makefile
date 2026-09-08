@@ -13,10 +13,13 @@ REAL_TRIG = \
 	test-atanh.h \
 	test-cos.h \
 	test-cosh.h \
+	test-cospi.h \
 	test-sin.h \
 	test-sinh.h \
+	test-sinpi.h \
 	test-tan.h \
-	test-tanh.h
+	test-tanh.h \
+	test-tanpi.h
 
 REAL_EXP = \
 	test-exp.h \

@@ -49,11 +49,14 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "cos",        .b32 = 3,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "sincos_cos", .b32 = 3,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "cosh",       .b32 = 3,       .b64 = 0,       .b80 = 1,       .b128 = 1       },
+    { .name = "cospi",      .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "sin",        .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "sincos_sin", .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "sinh",       .b32 = 3,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
+    { .name = "sinpi",      .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "tan",        .b32 = 3,       .b64 = 1,       .b80 = 0,       .b128 = 1       },
     { .name = "tanh",       .b32 = 2,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
+    { .name = "tanpi",      .b32 = 3,       .b64 = 1,       .b80 = 0,       .b128 = 1       },
 
     /* Exp/log functions */
     { .name = "exp",        .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
@@ -146,11 +149,14 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "cos", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "sincos_cos", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "cosh", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 1 },
+    { .name = "cospi", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "sin", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
+    { .name = "sinpi", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "sincos_sin", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "sinh", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "tan", .b32 = 0, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "tanh", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
+    { .name = "tanpi", .b32 = 1, .b64 = 2, .b80 = 1, .b128 = 2 },
 
     /* Exp/log functions */
     { .name = "exp", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },

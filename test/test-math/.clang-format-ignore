@@ -8,10 +8,13 @@ test-atan2.h
 test-atanh.h
 test-cos.h
 test-cosh.h
+test-cospi.h
 test-sin.h
 test-sinh.h
+test-sinpi.h
 test-tan.h
 test-tanh.h
+test-tanpi.h
 test-exp.h
 test-exp10.h
 test-exp2.h
