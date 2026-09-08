@@ -6,11 +6,15 @@ NICKLE=nickle
 REAL_TRIG = \
 	test-acos.h \
 	test-acosh.h \
+	test-acospi.h \
 	test-asin.h \
 	test-asinh.h \
+	test-asinpi.h \
 	test-atan.h \
 	test-atan2.h \
 	test-atanh.h \
+	test-atanpi.h \
+	test-atan2pi.h \
 	test-cos.h \
 	test-cosh.h \
 	test-cospi.h \
