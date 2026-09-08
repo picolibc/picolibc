@@ -222,3 +222,4 @@ float_t           name(_ff_scalbn)(ff_t x, int expo);
 int               name(_rem_half)(float_t x, float_t *y);
 
 extern const ff_t name(_pi_ff_);
+extern const ff_t name(_inv_pi_ff_);

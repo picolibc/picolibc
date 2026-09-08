@@ -704,6 +704,14 @@ extern long double pow10l(long double) __picolibc_export;
 #if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
 extern double exp10(double) __picolibc_export;
 extern float  exp10f(float) __picolibc_export;
+extern double acospi(double) __picolibc_export;
+extern float  acospif(float) __picolibc_export;
+extern double asinpi(double) __picolibc_export;
+extern float  asinpif(float) __picolibc_export;
+extern double atanpi(double) __picolibc_export;
+extern float  atanpif(float) __picolibc_export;
+extern double atan2pi(double, double) __picolibc_export;
+extern float  atan2pif(float, float) __picolibc_export;
 extern double cospi(double) __picolibc_export;
 extern float  cospif(float) __picolibc_export;
 extern double sinpi(double) __picolibc_export;
@@ -712,6 +720,10 @@ extern double tanpi(double) __picolibc_export;
 extern float  tanpif(float) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE_MATH
 extern long double exp10l(long double) __picolibc_export;
+extern long double acospil(long double) __picolibc_export;
+extern long double asinpil(long double) __picolibc_export;
+extern long double atanpil(long double) __picolibc_export;
+extern long double atan2pil(long double, long double) __picolibc_export;
 extern long double cospil(long double) __picolibc_export;
 extern long double sinpil(long double) __picolibc_export;
 extern long double tanpil(long double) __picolibc_export;
