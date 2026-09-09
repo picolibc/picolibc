@@ -46,6 +46,7 @@
 double        d1, d2, d3;
 float         f1, f2, f3;
 int           i1;
+unsigned int  u1;
 long int      li1;
 long long int lli1;
 
@@ -309,7 +310,6 @@ main(void)
     l1 = erfcl(l1);
     f1 = dreml(l1, l2);
     sincosl(l1, &l2, &l3);
-    l1 = exp10l(l1);
 #ifdef __PICOLIBC__
     l1 = pow10l(l1);
 #endif
@@ -317,6 +317,7 @@ main(void)
     d1 = nexttoward(d1, l1);
     l1 = nextafterl(l1, l2);
     l1 = nexttowardl(l1, l2);
+
 #endif /* __HAVE_LONG_DOUBLE_MATH */
 #endif /* _TEST_LONG_DOUBLE */
 
@@ -341,11 +342,9 @@ main(void)
 
     sincos(d1, &d2, &d3);
     sincosf(f1, &f2, &f3);
-    d1 = exp10(d1);
 #ifdef __PICOLIBC__
     d1 = pow10(d1);
 #endif
-    f1 = exp10f(f1);
 #ifdef __PICOLIBC__
     f1 = pow10f(f1);
 #endif
@@ -480,6 +479,161 @@ main(void)
 #endif /* _TEST_LONG_DOUBLE */
 
 #endif /* __HAVE_COMPLEX */
+
+    /* C23 additions */
+
+    i1 = iscanonical(d1);
+    i1 = iscanonical(f1);
+
+    d1 = exp10(d1);
+    f1 = exp10f(f1);
+
+#ifndef __PICOLIBC__
+    /* Missing functions */
+
+    i1 = canonicalize(&d1, &d2);
+    i1 = canonicalizef(&f1, &f2);
+
+    d1 = compoundn(d1, lli1);
+    f1 = compoundnf(f1, lli1);
+
+    d1 = exp10m1(d1);
+    f1 = exp10m1f(f1);
+
+    d1 = exp2m1(d1);
+    f1 = exp2m1f(f1);
+
+    f1 = fadd(d1, d2);
+
+    f1 = fdiv(d1, d2);
+
+    f1 = ffma(d1, d2, d3);
+
+    d1 = fmaximum(d1, d2);
+    d1 = fmaximum_mag(d1, d2);
+    d1 = fmaximum_mag_num(d1, d2);
+    d1 = fmaximum_num(d1, d2);
+
+    d1 = fminimum(d1, d2);
+    d1 = fminimum_mag(d1, d2);
+    d1 = fminimum_mag_num(d1, d2);
+    d1 = fminimum_num(d1, d2);
+
+    f1 = fmaximumf(f1, f2);
+    f1 = fmaximum_magf(f1, f2);
+    f1 = fmaximum_mag_numf(f1, f2);
+    f1 = fmaximum_numf(f1, f2);
+
+    d1 = fminimum(d1, d2);
+    d1 = fminimum_mag(d1, d2);
+    d1 = fminimum_mag_num(d1, d2);
+    d1 = fminimum_num(d1, d2);
+
+    f1 = fminimumf(f1, f2);
+    f1 = fminimum_magf(f1, f2);
+    f1 = fminimum_mag_numf(f1, f2);
+    f1 = fminimum_numf(f1, f2);
+
+    f1 = fmul(d1, d2);
+
+    d1 = fromfp(d1, i1, u1);
+    f1 = fromfpf(f1, i1, u1);
+
+    d1 = fromfpx(d1, i1, u1);
+    f1 = fromfpxf(f1, i1, u1);
+
+    f1 = fsqrt(d1);
+
+    f1 = fsub(d1, d2);
+
+    li1 = llogb(d1);
+    li1 = llogbf(d1);
+
+    d1 = log10p1(d1);
+    f1 = log10p1f(f1);
+
+    d1 = log2p1(d1);
+    f1 = log2p1f(f1);
+
+    d1 = logp1(d1);
+    f1 = logp1f(f1);
+
+    d1 = nextdown(d1);
+    f1 = nextdownf(f1);
+
+    d1 = nextup(d1);
+    f1 = nextupf(f1);
+
+    d1 = pown(d1, li1);
+    f1 = pownf(f1, li1);
+
+    d1 = powr(d1, d2);
+    f1 = powrf(f1, f2);
+
+    d1 = rootn(d1, li1);
+    f1 = rootnf(f1, li1);
+
+    d1 = rsqrt(d1);
+    f1 = rsqrtf(f1);
+
+    d1 = roundeven(d1);
+    f1 = roundevenf(f1);
+
+    d1 = ufromfp(d1, i1, u1);
+    f1 = ufromfpf(f1, i1, u1);
+
+    d1 = ufromfpx(d1, i1, u1);
+    f1 = ufromfpxf(f1, i1, u1);
+#endif
+
+#ifdef __HAVE_LONG_DOUBLE_MATH
+    i1 = iscanonical(l1);
+
+    l1 = exp10l(l1);
+
+#ifndef __PICOLIBC__
+    /* Missing functions */
+    i1 = canonicalizel(&l1, &l2);
+    l1 = compoundnl(l1, lli1);
+    l1 = exp10m1l(l1);
+    l1 = exp2m1l(l1);
+
+    l1 = fmaximuml(l1, l2);
+    l1 = fmaximum_magl(l1, l2);
+    l1 = fmaximum_mag_numl(l1, l2);
+    l1 = fmaximum_numl(l1, l2);
+
+    l1 = fminimuml(l1, l2);
+    l1 = fminimum_magl(l1, l2);
+    l1 = fminimum_mag_numl(l1, l2);
+    l1 = fminimum_numl(l1, l2);
+
+    l1 = fromfp(l1, i1, u1);
+    l1 = fromfpx(l1, i1, u1);
+
+    f1 = fsqrtl(l1);
+    d1 = dsqrtl(l1);
+
+    f1 = fsubl(l1, l2);
+    d1 = dsubl(l1, l2);
+
+    li1 = llogbl(l1);
+
+    l1 = log10p1l(l1);
+    l1 = log2p1l(l1);
+    l1 = logp1l(l1);
+
+    l1 = nextdown(l1);
+    l1 = nextup(l1);
+    l1 = pown(l1, li1);
+    l1 = powr(l1, l2);
+    l1 = rootnl(l1, li1);
+    l1 = rsqrtl(l1);
+    l1 = roundeven(l1);
+    l1 = ufromfpl(l1, i1, u1);
+    l1 = ufromfpxl(l1, i1, u1);
+#endif
+#endif
 
     i1 = feclearexcept(FE_ALL_EXCEPT);
     i1 = fegetexceptflag(&fex, FE_ALL_EXCEPT);
