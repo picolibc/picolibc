@@ -610,19 +610,27 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define _LDBL_EQ_DBL
 #endif
 
-#if __SIZEOF_DOUBLE__ == 4
-#define _DOUBLE_IS_32BITS
+/* Figure out if the compiler supports the long double type. */
+#ifdef __SIZEOF_LONG_DOUBLE__
+#define __HAVE_LONG_DOUBLE
 #endif
 
 /*
- * long double is supported for binary128 and 80-bit extended
- * precision for x86 and m68k. Targets with binary64 long double
- * are supported by al
+ * Picolibc has full support for long double in four cases:
+ *
+ * 1. long double is an alias for double
+ * 2. Standard binary64 representation
+ * 3. Intel and Motorola 80 bit extended representation
+ * 4. Standard binary128 representation
  */
-#if defined(_LDBL_EQ_DBL) || defined(__CYGWIN__)                    \
-    || (defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) \
-    || (__LDBL_MANT_DIG__ == 64 || __LDBL_MANT_DIG__ == 113)
+#if defined(_LDBL_EQ_DBL) || __LDBL_MANT_DIG__ == 53 || __LDBL_MANT_DIG__ == 64 \
+    || __LDBL_MANT_DIG__ == 113
 #define __HAVE_LONG_DOUBLE_MATH
+#endif
+
+/* Check for 32-bit double type */
+#if __SIZEOF_DOUBLE__ == 4
+#define _DOUBLE_IS_32BITS
 #endif
 
 /* New math code requires 64-bit doubles */

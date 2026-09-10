@@ -264,20 +264,4 @@
 #define __MB_EXTENDED_CHARSETS_ANY
 #endif
 
-/* Figure out if the compiler supports the long double type. */
-#ifdef __SIZEOF_LONG_DOUBLE__
-#define __HAVE_LONG_DOUBLE
-#endif
-
-/* Newlib doesn't fully support long double math functions so far.
-   On platforms where long double equals double the long double functions
-   simply call the double functions.  On Cygwin the long double functions
-   are implemented independently from newlib to be able to use optimized
-   assembler functions despite using the Microsoft x86_64 ABI. */
-#if defined(_LDBL_EQ_DBL) || defined(__CYGWIN__)                    \
-    || (defined(__HAVE_LONG_DOUBLE) && __SIZEOF_LONG_DOUBLE__ <= 8) \
-    || (__LDBL_MANT_DIG__ == 64 || __LDBL_MANT_DIG__ == 113)
-#define __HAVE_LONG_DOUBLE_MATH
-#endif
-
 #endif /* __SYS_CONFIG_H__ */
