@@ -205,22 +205,17 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #if defined(__mc68hc11__) || defined(__mc68hc12__) || defined(__mc68hc1x__)
 #define __IEEE_BIG_ENDIAN
-#ifdef __HAVE_SHORT_DOUBLE__
-#define _DOUBLE_IS_32BITS
-#endif
 #endif
 
 #if defined(__H8300__) || defined(__H8300H__) || defined(__H8300S__) || defined(__H8500__) \
     || defined(__H8300SX__)
 #define __IEEE_BIG_ENDIAN
 #define _FLOAT_ARG float
-#define _DOUBLE_IS_32BITS
 #endif
 
 #if defined(__xc16x__) || defined(__xc16xL__) || defined(__xc16xS__)
 #define __IEEE_LITTLE_ENDIAN
 #define _FLOAT_ARG float
-#define _DOUBLE_IS_32BITS
 #endif
 
 #ifdef __sh__
@@ -304,7 +299,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #if defined(_C4x) || defined(_C3x)
 #define __IEEE_BIG_ENDIAN
-#define _DOUBLE_IS_32BITS
 #endif
 
 #ifdef __TMS320C6X__
@@ -347,7 +341,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __W65__
 #define __IEEE_LITTLE_ENDIAN
-#define _DOUBLE_IS_32BITS
 #endif
 
 #if defined(__Z8001__) || defined(__Z8002__)
@@ -364,7 +357,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __mn10200__
 #define __IEEE_LITTLE_ENDIAN
-#define _DOUBLE_IS_32BITS
 #endif
 
 #ifdef __v800
@@ -377,9 +369,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __D10V__
 #define __IEEE_BIG_ENDIAN
-#if __DOUBLE__ == 32
-#define _DOUBLE_IS_32BITS
-#endif
 #endif
 
 #ifdef __PPC__
@@ -459,9 +448,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __AVR__
 #define __IEEE_LITTLE_ENDIAN
-#if !defined(__SIZEOF_DOUBLE__) || __SIZEOF_DOUBLE__ == 4
-#define _DOUBLE_IS_32BITS
-#endif
 #endif
 
 #if defined(__or1k__) || defined(__OR1K__) || defined(__OR1KND__)
@@ -471,7 +457,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #ifdef __IP2K__
 #define __IEEE_BIG_ENDIAN
 #define __SMALL_BITFIELDS
-#define _DOUBLE_IS_32BITS
 #endif
 
 #ifdef __iq2000__
@@ -540,7 +525,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #define __IEEE_LITTLE_ENDIAN
 #define __SMALL_BITFIELDS /* 16 Bit INT */
 #ifndef __RL78_64BIT_DOUBLES__
-#define _DOUBLE_IS_32BITS
 #endif
 #endif
 
@@ -553,7 +537,6 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #endif
 
 #ifndef __RX_64BIT_DOUBLES__
-#define _DOUBLE_IS_32BITS
 #endif
 
 #ifdef __RX_16BIT_INTS__
