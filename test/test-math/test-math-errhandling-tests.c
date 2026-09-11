@@ -271,7 +271,42 @@ makemathname(test_atanh_neg2)(void)
 {
     return makemathname(atanh)(-makemathname(two));
 }
-
+static FLOAT_T
+makemathname(test_canonicalize_1)(void)
+{
+    FLOAT_T input = makemathname(one);
+    FLOAT_T output;
+    if (makemathname(canonicalize)(&output, &input) != 0)
+        return makemathname(infval);
+    return output;
+}
+static FLOAT_T
+makemathname(test_canonicalize_inf)(void)
+{
+    FLOAT_T input = makemathname(infval);
+    FLOAT_T output;
+    if (makemathname(canonicalize)(&output, &input) != 0)
+        return makemathname(one);
+    return output;
+}
+static FLOAT_T
+makemathname(test_canonicalize_qnan)(void)
+{
+    FLOAT_T input = makemathname(qnanval);
+    FLOAT_T output;
+    if (makemathname(canonicalize)(&output, &input) != 0)
+        return makemathname(infval);
+    return output;
+}
+static FLOAT_T
+makemathname(test_canonicalize_snan)(void)
+{
+    FLOAT_T input = makemathname(snanval);
+    FLOAT_T output;
+    if (makemathname(canonicalize)(&output, &input) != 0)
+        return makemathname(infval);
+    return output;
+}
 static FLOAT_T
 makemathname(test_cbrt_0)(void)
 {
@@ -3179,6 +3214,11 @@ TEST_CONST struct {
     TEST(atanh_neg1, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
     TEST(atanh_2, (FLOAT_T)NAN, FE_INVALID, EDOM),
     TEST(atanh_neg2, (FLOAT_T)NAN, FE_INVALID, EDOM),
+
+    TEST(canonicalize_1, (FLOAT_T)1.0, 0, 0),
+    TEST(canonicalize_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(canonicalize_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(canonicalize_snan, (FLOAT_T)NAN, FE_INVALID, 0),
 
     TEST(cbrt_0, (FLOAT_T)0.0, 0, 0),
     TEST(cbrt_neg0, -(FLOAT_T)0.0, 0, 0),

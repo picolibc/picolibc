@@ -488,11 +488,11 @@ main(void)
     d1 = exp10(d1);
     f1 = exp10f(f1);
 
-#ifndef __PICOLIBC__
-    /* Missing functions */
-
     i1 = canonicalize(&d1, &d2);
     i1 = canonicalizef(&f1, &f2);
+
+#ifndef __PICOLIBC__
+    /* Missing functions */
 
     d1 = compoundn(d1, lli1);
     f1 = compoundnf(f1, lli1);
@@ -586,14 +586,16 @@ main(void)
     f1 = ufromfpxf(f1, i1, u1);
 #endif
 
+#ifdef _TEST_LONG_DOUBLE
 #ifdef __HAVE_LONG_DOUBLE_MATH
     i1 = iscanonical(l1);
 
     l1 = exp10l(l1);
 
+    i1 = canonicalizel(&l1, &l2);
+
 #ifndef __PICOLIBC__
     /* Missing functions */
-    i1 = canonicalizel(&l1, &l2);
     l1 = compoundnl(l1, lli1);
     l1 = exp10m1l(l1);
     l1 = exp2m1l(l1);
@@ -632,6 +634,7 @@ main(void)
     l1 = roundeven(l1);
     l1 = ufromfpl(l1, i1, u1);
     l1 = ufromfpxl(l1, i1, u1);
+#endif
 #endif
 #endif
 

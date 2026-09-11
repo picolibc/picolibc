@@ -713,6 +713,8 @@ extern double atanpi(double) __picolibc_export;
 extern float  atanpif(float) __picolibc_export;
 extern double atan2pi(double, double) __picolibc_export;
 extern float  atan2pif(float, float) __picolibc_export;
+int           canonicalize(double *, const double *) __picolibc_export;
+int           canonicalizef(float *, const float *) __picolibc_export;
 extern double cospi(double) __picolibc_export;
 extern float  cospif(float) __picolibc_export;
 extern double exp10(double) __picolibc_export;
@@ -723,9 +725,6 @@ extern double tanpi(double) __picolibc_export;
 extern float  tanpif(float) __picolibc_export;
 
 /* Missing functions */
-
-int           canonicalize(double *, double *) __picolibc_export; /* XXX */
-int           canonicalizef(float *, float *) __picolibc_export;  /* XXX */
 
 double        compoundn(double, long long int) __picolibc_export; /* XXX */
 float         compoundnf(float, long long int) __picolibc_export; /* XXX */
@@ -822,13 +821,13 @@ extern long double acospil(long double) __picolibc_export;
 extern long double asinpil(long double) __picolibc_export;
 extern long double atanpil(long double) __picolibc_export;
 extern long double atan2pil(long double, long double) __picolibc_export;
+int                canonicalizel(long double *, const long double *) __picolibc_export;
 extern long double cospil(long double) __picolibc_export;
 extern long double exp10l(long double) __picolibc_export;
 extern long double sinpil(long double) __picolibc_export;
 extern long double tanpil(long double) __picolibc_export;
 
 /* Missing functions */
-int                canonicalizel(long double *, long double *) __picolibc_export;  /* XXX */
 long double        compoundnl(long double, long long int) __picolibc_export;       /* XXX */
 double             daddl(long double, long double) __picolibc_export;              /* XXX */
 double             ddivl(long double, long double) __picolibc_export;              /* XXX */
