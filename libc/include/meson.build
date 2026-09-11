@@ -113,6 +113,18 @@ if enable_libdl
   inc_headers += ['dlfcn.h']
 endif
 
+if exclude_headers.length() > 0
+  inc_headers_kept = []
+  foreach header : inc_headers
+    if fs.name('@0@'.format(header)) in exclude_headers
+      message('libc: excluding ' + fs.name('@0@'.format(header)) + ' (-Dexclude-headers)')
+    else
+      inc_headers_kept += header
+    endif
+  endforeach
+  inc_headers = inc_headers_kept
+endif
+
 if really_install
   install_headers(inc_headers,
                   install_dir: include_dir)

@@ -67,6 +67,10 @@ option('sanitize', type: 'string', value: 'none',
        description: 'Code sanitizer to use')
 option('use-hlt-semihosting', type: 'boolean', value: 'false',
         description: 'Enable HLT Semihosting (only valid for Armv8)')
+option('exclude-sources', type: 'array', value: [],
+       description: 'Source basenames to omit from libc')
+option('exclude-headers', type: 'array', value: [],
+       description: 'Header basenames to omit from libc')
 
 #
 # Installation options

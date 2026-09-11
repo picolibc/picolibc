@@ -38,6 +38,9 @@ libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
            'stdio', 'stdlib', 'string', 'time', 'xdr',
            'uchar', 'ubsan']
 
+exclude_srcs = get_option('exclude-sources')
+exclude_headers = get_option('exclude-headers')
+
 if use_stdlib
   libdirs += ['native']
 endif
@@ -72,6 +75,18 @@ endforeach
 
 if not has_os_library
   src_cpart += src_os_fallback
+endif
+
+if exclude_srcs.length() > 0
+  src_cpart_kept = []
+  foreach src : src_cpart
+    if fs.name('@0@'.format(src)) in exclude_srcs
+      message('libc: excluding ' + fs.name('@0@'.format(src)) + ' (-Dexclude-sources)')
+    else
+      src_cpart_kept += src
+    endif
+  endforeach
+  src_cpart = src_cpart_kept
 endif
 
 subdir('include')
