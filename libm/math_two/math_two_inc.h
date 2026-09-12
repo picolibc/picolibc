@@ -75,6 +75,12 @@ typedef struct {
     float_t hi, lo;
 } ff_t;
 
+static inline ff_t
+f_to_ff(float_t x)
+{
+    return (ff_t) { .hi = x, .lo = 0 };
+}
+
 /* From https://hal.archives-ouvertes.fr/hal-01351529v3/document */
 
 #ifndef __HAVE_FAST_FMA_F
@@ -273,8 +279,8 @@ ff_div_ff(ff_t x, ff_t y)
 }
 
 float_t           name(_ff_scalbn)(ff_t x, int expo);
-
 int               name(_rem_half)(float_t x, float_t *y);
+float_t           name(_ff_pown)(float_t hi, float_t lo, long long int k);
 
 extern const ff_t name(_pi_ff_);
 extern const ff_t name(_inv_pi_ff_);
