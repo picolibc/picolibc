@@ -63,6 +63,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "tanpi",      .b32 = 3,       .b64 = 1,       .b80 = 0,       .b128 = 1       },
 
     /* Exp/log functions */
+    { .name = "compoundn",  .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "exp",        .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
 #if defined(__arm__) && (__ARM_FP & 0x8) == 0
     { .name = "exp10",      .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
@@ -76,6 +77,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "log2",       .b32 = 2,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "log",        .b32 = 1,       .b64 = 0,       .b80 = 0,       .b128 = 1       },
     { .name = "pow",        .b32 = 1,       .b64 = 1,       .b80 = 6107,    .b128 = 1       },
+    { .name = "pown",       .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
 
     /* Misc functions */
     { .name = "cbrt",       .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
@@ -87,6 +89,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "j0",         .b32 = MAX_ULP, .b64 = 42,      .b80 = 0,       .b128 = 0       },
     { .name = "j1",         .b32 = MAX_ULP, .b64 = 1,       .b80 = 0,       .b128 = 0       },
     { .name = "jn",         .b32 = 3,       .b64 = 3,       .b80 = 0,       .b128 = 0       },
+    { .name = "scalbn",     .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "y0",         .b32 = MAX_ULP, .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "y1",         .b32 = MAX_ULP, .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "yn",         .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
@@ -167,6 +170,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "tanpi", .b32 = 1, .b64 = 2, .b80 = 1, .b128 = 2 },
 
     /* Exp/log functions */
+    { .name = "compoundn", .b32 = 1, .b64 = 1, .b80 = 2, .b128 = 1 },
     { .name = "exp", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "exp10", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "exp2", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
@@ -176,6 +180,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "log1p", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "log2", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "pow", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
+    { .name = "pown", .b32 = 1, .b64 = 1, .b80 = 3, .b128 = 2 },
 
     /* Misc functions */
     { .name = "cbrt", .b32 = 0, .b64 = 2, .b80 = 1, .b128 = 1 },
@@ -187,6 +192,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "j0", .b32 = 9, .b64 = 32, .b80 = 13, .b128 = 25 },
     { .name = "j1", .b32 = 9, .b64 = 1, .b80 = 3, .b128 = 2 },
     { .name = "jn", .b32 = 2, .b64 = 2, .b80 = 3, .b128 = 3 },
+    { .name = "scalbn", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "y0", .b32 = 9, .b64 = 0, .b80 = 0, .b128 = 1 },
     { .name = "y1", .b32 = 9, .b64 = 0, .b80 = 0, .b128 = 1 },
     { .name = "yn", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 1 },

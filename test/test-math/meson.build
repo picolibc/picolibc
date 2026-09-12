@@ -59,6 +59,7 @@ tests_real_trig = [
 ]
 
 tests_real_exp = [
+  'test-compoundn',
   'test-exp',
   'test-exp10',
   'test-exp2',
@@ -67,7 +68,8 @@ tests_real_exp = [
   'test-log10',
   'test-log1p',
   'test-log2',
-  'test-pow'
+  'test-pow',
+  'test-pown',
 ]
 
 tests_real_other = [

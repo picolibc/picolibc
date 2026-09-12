@@ -7,9 +7,9 @@ test-asinh.h
 test-asinpi.h
 test-atan.h
 test-atan2.h
-test-atan2pi.h
 test-atanh.h
 test-atanpi.h
+test-atan2pi.h
 test-cos.h
 test-cosh.h
 test-cospi.h
@@ -19,6 +19,7 @@ test-sinpi.h
 test-tan.h
 test-tanh.h
 test-tanpi.h
+test-compoundn.h
 test-exp.h
 test-exp10.h
 test-exp2.h
@@ -28,6 +29,7 @@ test-log10.h
 test-log1p.h
 test-log2.h
 test-pow.h
+test-pown.h
 test-cbrt.h
 test-ceil.h
 test-erf.h

@@ -491,11 +491,14 @@ main(void)
     i1 = canonicalize(&d1, &d2);
     i1 = canonicalizef(&f1, &f2);
 
-#ifndef __PICOLIBC__
-    /* Missing functions */
-
     d1 = compoundn(d1, lli1);
     f1 = compoundnf(f1, lli1);
+
+    d1 = pown(d1, li1);
+    f1 = pownf(f1, li1);
+
+#ifndef __PICOLIBC__
+    /* Missing functions */
 
     d1 = exp10m1(d1);
     f1 = exp10m1f(f1);
@@ -564,9 +567,6 @@ main(void)
     d1 = nextup(d1);
     f1 = nextupf(f1);
 
-    d1 = pown(d1, li1);
-    f1 = pownf(f1, li1);
-
     d1 = powr(d1, d2);
     f1 = powrf(f1, f2);
 
@@ -589,14 +589,13 @@ main(void)
 #ifdef _TEST_LONG_DOUBLE
 #ifdef __HAVE_LONG_DOUBLE_MATH
     i1 = iscanonical(l1);
-
     l1 = exp10l(l1);
-
     i1 = canonicalizel(&l1, &l2);
+    l1 = compoundnl(l1, lli1);
+    l1 = pownl(l1, li1);
 
 #ifndef __PICOLIBC__
     /* Missing functions */
-    l1 = compoundnl(l1, lli1);
     l1 = exp10m1l(l1);
     l1 = exp2m1l(l1);
 
@@ -627,7 +626,6 @@ main(void)
 
     l1 = nextdown(l1);
     l1 = nextup(l1);
-    l1 = pown(l1, li1);
     l1 = powr(l1, l2);
     l1 = rootnl(l1, li1);
     l1 = rsqrtl(l1);

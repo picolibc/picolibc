@@ -26,6 +26,7 @@ REAL_TRIG = \
 	test-tanpi.h
 
 REAL_EXP = \
+	test-compoundn.h \
 	test-exp.h \
 	test-exp10.h \
 	test-exp2.h \
@@ -34,7 +35,8 @@ REAL_EXP = \
 	test-log10.h \
 	test-log1p.h \
 	test-log2.h \
-	test-pow.h
+	test-pow.h \
+	test-pown.h
 
 REAL_OTHER = \
 	test-cbrt.h \
