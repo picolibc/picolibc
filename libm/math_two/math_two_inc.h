@@ -75,8 +75,9 @@ typedef struct {
     float_t hi, lo;
 } ff_t;
 
-#ifndef HAVE_FAST_FMA_F
+/* From https://hal.archives-ouvertes.fr/hal-01351529v3/document */
 
+#ifndef __HAVE_FAST_FMA_F
 #define SPLIT   (float_f(SPLIT_VAL) + float_f(1.0))
 #define split_f name(split)
 
@@ -147,7 +148,7 @@ ff_add_ff(ff_t x, ff_t y)
 static inline ff_t
 f_mul_f(float_t x, float_t y)
 {
-#ifdef HAVE_FAST_FMA_F
+#ifdef __HAVE_FAST_FMA_F
     /* 2mul with FMA */
     float_t hi = x * y;
     float_t lo = fma_f(x, y, -hi);

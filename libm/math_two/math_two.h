@@ -47,8 +47,8 @@
 typedef float float32_t;
 #define float32_suffix f
 #define float_32(x)    (x##f)
-#ifdef FP_FAST_FMAF
-#define HAVE_FAST_FMA_32
+#ifdef __HAVE_FAST_FMAF
+#define __HAVE_FAST_FMA_32
 #endif
 #define fma_32(a, b, c) fmaf(a, b, c)
 #define floor_32(x)     floorf(x)
@@ -61,8 +61,8 @@ typedef float float32_t;
 typedef double float64_t;
 #define float64_suffix
 #define float_64(x) (x)
-#ifdef HAVE_FAST_FMA
-#define HAVE_FAST_FMA_64
+#ifdef __HAVE_FAST_FMA
+#define __HAVE_FAST_FMA_64
 #endif
 #define fma_64(a, b, c) fma(a, b, c)
 #define floor_64(x)     floor(x)
@@ -73,8 +73,8 @@ typedef double float64_t;
 typedef long double float64_t;
 #define float64_suffix l
 #define float_64(x)    (x##l)
-#ifdef HAVE_FAST_FMAL
-#define HAVE_FAST_FMA_64
+#ifdef __HAVE_FAST_FMAL
+#define __HAVE_FAST_FMA_64
 #endif
 #define fma_64(a, b, c) fmal(a, b, c)
 #define floor_64(x)     floorl(x)
@@ -87,8 +87,8 @@ typedef long double float64_t;
 typedef long double float80_t;
 #define float80_suffix l
 #define float_80(x)    (x##l)
-#ifdef HAVE_FAST_FMAL
-#define HAVE_FAST_FMA_80
+#ifdef __HAVE_FAST_FMAL
+#define __HAVE_FAST_FMA_80
 #endif
 #define fma_80(a, b, c) fmal(a, b, c)
 #define floor_80(x)     floorl(x)
@@ -101,8 +101,8 @@ typedef long double float80_t;
 typedef long double float128_t;
 #define float128_suffix l
 #define float_128(x)    (x##l)
-#ifdef HAVE_FAST_FMAL
-#define HAVE_FAST_FMA_128
+#ifdef __HAVE_FAST_FMAL
+#define __HAVE_FAST_FMA_128
 #endif
 #define fma_128(a, b, c) fmal(a, b, c)
 #define floor_128(x)     floorl(x)
@@ -120,8 +120,8 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p12
 #define float_f(x)        float_32(x)
 #define _isint_float_f(x) _isint_float_32(x)
-#ifdef HAVE_FAST_FMA_32
-#define HAVE_FAST_FMA_F
+#ifdef __HAVE_FAST_FMA_32
+#define __HAVE_FAST_FMA_F
 #endif
 
 #include "math_two_inc.h"
@@ -138,8 +138,8 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p26
 #define float_f(x)        float_64(x)
 #define _isint_float_f(x) _isint_float_64(x)
-#ifdef HAVE_FAST_FMA_64
-#define HAVE_FAST_FMA_F
+#ifdef __HAVE_FAST_FMA_64
+#define __HAVE_FAST_FMA_F
 #endif
 
 #include "math_two_inc.h"
@@ -154,8 +154,8 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p32
 #define float_f(x)        float_80(x)
 #define _isint_float_f(x) _isint_float_80(x)
-#ifdef HAVE_FAST_FMA_80
-#define HAVE_FAST_FMA_F
+#ifdef __HAVE_FAST_FMA_80
+#define __HAVE_FAST_FMA_F
 #endif
 
 #include "math_two_inc.h"
@@ -170,8 +170,8 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p57
 #define float_f(x)        float_128(x)
 #define _isint_float_f(x) _isint_float_128(x)
-#ifdef HAVE_FAST_FMA_128
-#define HAVE_FAST_FMA_F
+#ifdef __HAVE_FAST_FMA_128
+#define __HAVE_FAST_FMA_F
 #endif
 
 #include "math_two_inc.h"
