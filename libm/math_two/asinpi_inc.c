@@ -33,7 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "trigpi.h"
+#define _ISOC23_SOURCE
+#include "math_two.h"
 
 #ifdef float_t
 

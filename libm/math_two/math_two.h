@@ -54,6 +54,7 @@ typedef float float32_t;
 #define floor_32(x)     floorf(x)
 #define frexp_32(x, a)  frexpf(x, a)
 #define ldexp_32(x, a)  ldexpf(x, a)
+
 #endif
 
 #if __DBL_MANT_DIG__ == 53
@@ -124,6 +125,26 @@ typedef long double float128_t;
 #define __HAVE_FAST_FMA_F
 #endif
 
+#define GET_EXP(_ix, _x)         \
+    do {                         \
+        GET_FLOAT_WORD(_ix, _x); \
+        (_ix) &= 0x7fffffff;     \
+    } while (0)
+
+#define EXP_IS_NONFINITE(_ix) (!FLT_UWORD_IS_FINITE(_ix))
+
+#define EXP_ONE_QUARTER       0x3e800000
+
+#define MAKE_SIG_ODD(_x)       \
+    do {                       \
+        int32_t w;             \
+        GET_FLOAT_WORD(w, _x); \
+        w |= 1;                \
+        SET_FLOAT_WORD(_x, w); \
+    } while (0)
+
+#define GET_LOW_UINT32(v, x) GET_FLOAT_WORD(v, x)
+
 #include "math_two_inc.h"
 
 #endif
@@ -142,6 +163,26 @@ typedef long double float128_t;
 #define __HAVE_FAST_FMA_F
 #endif
 
+#define GET_EXP(_ix, _x)        \
+    do {                        \
+        GET_HIGH_WORD(_ix, _x); \
+        (_ix) &= 0x7fffffff;    \
+    } while (0)
+
+#define EXP_IS_NONFINITE(_ix) ((_ix) >= 0x7ff00000)
+
+#define EXP_ONE_QUARTER       0x3fd00000
+
+#define MAKE_SIG_ODD(_x)       \
+    do {                       \
+        uint32_t low;          \
+        GET_LOW_WORD(low, _x); \
+        low |= 1;              \
+        SET_LOW_WORD(_x, low); \
+    } while (0)
+
+#define GET_LOW_UINT32(v, x) GET_LOW_WORD(v, x)
+
 #include "math_two_inc.h"
 
 #endif
@@ -158,6 +199,30 @@ typedef long double float128_t;
 #define __HAVE_FAST_FMA_F
 #endif
 
+#define GET_EXP(_ix, _x)                    \
+    do {                                    \
+        u_int32_t se, i0, i1;               \
+                                            \
+        GET_LDOUBLE_WORDS(se, i0, i1, x);   \
+        (void)i1;                           \
+        (_ix) = se & 0x7fff;                \
+        (_ix) = ((_ix) << 16) | (i0 >> 16); \
+    } while (0)
+
+#define EXP_IS_NONFINITE(_ix) ((_ix) >= 0x7fff0000)
+
+#define EXP_ONE_QUARTER       0x3fe80000
+
+#define MAKE_SIG_ODD(_x)            \
+    do {                            \
+        uint32_t low;               \
+        GET_LDOUBLE_LSW(low, (_x)); \
+        low |= 1;                   \
+        SET_LDOUBLE_LSW((_x), low); \
+    } while (0)
+
+#define GET_LOW_UINT32(v, x) GET_LDOUBLE_LSW(v, x)
+
 #include "math_two_inc.h"
 
 #endif
@@ -173,6 +238,31 @@ typedef long double float128_t;
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F
 #endif
+
+#define GET_EXP(_ix, _x)          \
+    do {                          \
+        GET_LDOUBLE_EXP(_ix, _x); \
+        (_ix) &= 0x7fff;          \
+    } while (0)
+
+#define EXP_IS_NONFINITE(_ix) ((_ix) >= 0x7fff)
+
+#define EXP_ONE_QUARTER       0x3ff8
+
+#define MAKE_SIG_ODD(_x)              \
+    do {                              \
+        uint64_t low;                 \
+        GET_LDOUBLE_LSW64(low, (_x)); \
+        low |= 1;                     \
+        SET_LDOUBLE_LSW64((_x), low); \
+    } while (0)
+
+#define GET_LOW_UINT32(_v, _x)         \
+    do {                               \
+        uint64_t _low;                 \
+        GET_LDOUBLE_LSW64(_low, (_x)); \
+        (_v) = (uint32_t)_low;         \
+    } while (0)
 
 #include "math_two_inc.h"
 
