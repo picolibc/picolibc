@@ -135,7 +135,7 @@ typedef long double float128_t;
 #define fuint_t     uint64_t
 #define NAME_SUFFIX float64_suffix
 #define KERNEL_SUFFIX
-#define SPLIT_VAL         0x1p26
+#define SPLIT_VAL         0x1p27
 #define float_f(x)        float_64(x)
 #define _isint_float_f(x) _isint_float_64(x)
 #ifdef __HAVE_FAST_FMA_64
