@@ -68,7 +68,7 @@ typedef __float64 FLOAT_T;
 #define ILOGB          ilogb64
 #define COPYSIGN       copysign64
 
-#define SPLIT          ((FLOAT_T)0x1p26 + (FLOAT_T)1.0)
+#define SPLIT          ((FLOAT_T)0x1p27 + (FLOAT_T)1.0)
 #define FLOAT_MANT_DIG _FLOAT64_MANT_DIG
 #define FLOAT_MAX_EXP  _FLOAT64_MAX_EXP
 #define FLOAT_MIN      _FLOAT64_MIN
