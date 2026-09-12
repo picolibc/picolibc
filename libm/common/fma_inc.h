@@ -128,7 +128,7 @@ dd_mul(FLOAT_T a, FLOAT_T b)
 {
     static const FLOAT_T split = SPLIT;
     struct dd            ret;
-    FLOAT_T              ha, hb, la, lb, p, q;
+    FLOAT_T              ha, hb, la, lb, p;
 
     p = a * split;
     ha = a - p;
@@ -140,11 +140,13 @@ dd_mul(FLOAT_T a, FLOAT_T b)
     hb += p;
     lb = b - hb;
 
-    p = ha * hb;
-    q = ha * lb + la * hb;
-
-    ret.hi = p + q;
-    ret.lo = p - ret.hi + q + la * lb;
+    FLOAT_T r1 = a * b;
+    FLOAT_T t1 = ha * hb - r1;
+    FLOAT_T t2 = ha * lb + t1;
+    FLOAT_T t3 = la * hb + t2;
+    FLOAT_T r2 = la * lb + t3;
+    ret.hi = r1;
+    ret.lo = r2;
     return (ret);
 }
 
