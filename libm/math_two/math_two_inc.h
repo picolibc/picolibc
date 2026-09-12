@@ -181,11 +181,17 @@ f_mul_f(float_t x, float_t y)
 static inline ff_t
 ff_mul_f(ff_t x, float_t y)
 {
+#ifdef __HAVE_FAST_FMA_F
+    ff_t    c = f_mul_f(x.hi, y);
+    float_t cl3 = fma_f(x.lo, y, c.lo);
+    return f_add_f_fast(c.hi, cl3);
+#else
     ff_t    c = f_mul_f(x.hi, y);
     float_t cl2 = x.lo * y;
     ff_t    t = f_add_f_fast(c.hi, cl2);
     float_t tl2 = t.lo + c.lo;
     return f_add_f_fast(t.hi, tl2);
+#endif
 }
 
 #define ff_mul_ff name(ff_mul_ff_)
@@ -193,11 +199,39 @@ ff_mul_f(ff_t x, float_t y)
 static inline ff_t
 ff_mul_ff(ff_t x, ff_t y)
 {
-    ff_t    c = f_mul_f(x.hi, y.hi);
+#ifdef __HAVE_FAST_FMA_F
+    ff_t c = f_mul_f(x.hi, y.hi);
+    if (isinf(c.hi))
+        return c;
     float_t tl = x.hi * y.lo;
     float_t cl2 = fma_f(x.lo, y.hi, tl);
     float_t cl3 = c.lo + cl2;
     return f_add_f_fast(c.hi, cl3);
+#else
+    ff_t c = f_mul_f(x.hi, y.hi);
+    if (isinf(c.hi))
+        return c;
+    float_t tl1 = x.hi * y.lo;
+    float_t tl2 = x.lo * y.hi;
+    float_t cl2 = tl1 + tl2;
+    float_t cl3 = c.lo + cl2;
+    return f_add_f_fast(c.hi, cl3);
+#endif
+}
+
+#define ff_div_f name(ff_div_f_)
+
+static inline ff_t
+ff_div_f(ff_t x, float_t y)
+{
+    float_t th = x.hi / y;
+    ff_t    pi = f_mul_f(th, y);
+    ff_t    de1 = f_add_f(x.hi, -pi.hi);
+    float_t del2 = x.lo - pi.lo;
+    float_t del = de1.lo + del2;
+    float_t de = de1.hi + del;
+    float_t tl = de / y;
+    return f_add_f_fast(th, tl);
 }
 
 #define ff_div_ff name(ff_div_ff_)
@@ -205,17 +239,37 @@ ff_mul_ff(ff_t x, ff_t y)
 static inline ff_t
 ff_div_ff(ff_t x, ff_t y)
 {
+#ifdef __HAVE_FAST_FMA_F
+    /* Algorithm 18 */
     if (isinf(y.hi))
         return (ff_t) { .hi = 0, .lo = 0 };
     if (y.hi == 0)
         return (ff_t) { .hi = x.hi / y.hi, .lo = 0 };
     float_t th = 1 / y.hi;
+    if (isinf(th))
+        return (ff_t) { .hi = th, .lo = 0 };
     float_t rh = -fma_f(y.hi, th, -1);
-    float_t rl = -(y.lo * th);
+    float_t rl = -y.lo * th;
     ff_t    e = f_add_f_fast(rh, rl);
     ff_t    de = ff_mul_f(e, th);
     ff_t    m = ff_add_f(de, th);
     return ff_mul_ff(x, m);
+#else
+    /* Algorithm 17 */
+    if (isinf(y.hi))
+        return (ff_t) { .hi = 0, .lo = 0 };
+    if (y.hi == 0)
+        return (ff_t) { .hi = 1 / y.hi, .lo = 0 };
+    float_t th = x.hi / y.hi;
+    if (isinf(th))
+        return (ff_t) { .hi = th, .lo = 0 };
+    ff_t    r = ff_mul_f(y, th);
+    float_t pih = x.hi - r.hi;
+    float_t del = x.lo - r.lo;
+    float_t de = pih + del;
+    float_t tl = de / y.hi;
+    return f_add_f_fast(th, tl);
+#endif
 }
 
 float_t           name(_ff_scalbn)(ff_t x, int expo);
