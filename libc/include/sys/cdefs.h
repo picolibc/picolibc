@@ -81,6 +81,9 @@
 #ifndef __has_builtin
 #define __has_builtin(x) 0
 #endif
+#ifndef __has_extension
+#define __has_extension(x) 0
+#endif
 
 /*
  * Attributes.
