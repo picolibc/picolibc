@@ -79,6 +79,20 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "pow",        .b32 = 1,       .b64 = 1,       .b80 = 6107,    .b128 = 1       },
     { .name = "pown",       .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
 
+    /* Narrowing functions */
+    { .name = "dadd",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "dsub",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "dmul",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "ddiv",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "dfma",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "dsqrt",      .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fadd",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fsub",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fmul",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fdiv",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "ffma",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fsqrt",      .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+
     /* Misc functions */
     { .name = "cbrt",       .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "ceil",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
@@ -182,6 +196,20 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "pow", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "pown", .b32 = 1, .b64 = 1, .b80 = 3, .b128 = 2 },
 
+    /* Narrowing functions */
+    { .name = "dadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dsub", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dmul", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "ddiv", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dfma", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dsqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fsub", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fmul", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fdiv", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "ffma", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fsqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+
     /* Misc functions */
     { .name = "cbrt", .b32 = 0, .b64 = 2, .b80 = 1, .b128 = 1 },
     { .name = "ceil", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
@@ -202,6 +230,16 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "lgamma", .b32 = 1, .b64 = 2, .b80 = 2, .b128 = 3 },
     { .name = "sqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 1 },
     { .name = "tgamma", .b32 = 1, .b64 = 4, .b80 = 2, .b128 = 2 },
+
+    /* Narrowing functions */
+    { .name = "dadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "ddiv", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dmul", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dsub", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fdiv", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fmul", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fsub", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
 
     /* Complex trig functions */
     { .name = "cacos", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },

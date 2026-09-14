@@ -1,0 +1,35 @@
+#!/bin/bash
+
+set -e
+
+VECTORS=512
+
+for outsize in f d; do
+    insizes="64 80 128"
+    case $outsize in
+	f)
+	    insizes="64 80 128"
+	    ;;
+	d)
+	    insizes="80 128"
+	    ;;
+    esac
+    for insize in $insizes; do
+	sizes="$outsize-$insize"
+
+	./gen-narrowing-${sizes} $VECTORS 1 >& narrow-${sizes}.txt
+    done
+
+    sizes_under=$(echo ${sizes} | sed 's/-/_/g')
+
+    for func in add sub mul div fma sqrt; do
+	(echo -n "test_values = (test_vector_t[]) { "
+	 for insize in $insizes; do
+	     sizes="$outsize-$insize"
+	     sed -n '/ f'$func' /s/ f'$func' \(.*\)$/ '"${outsize}${func} ${insize}"' \1,/p' narrow-${sizes}.txt
+	 done
+	 echo '};'
+	 cat math-test-copyright
+	) > test-${outsize}${func}-inc.5c
+    done
+done

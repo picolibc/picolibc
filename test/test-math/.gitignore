@@ -1,0 +1,8 @@
+gen-narrowing-d-80
+gen-narrowing-d-128
+gen-narrowing-f-64
+gen-narrowing-f-80
+gen-narrowing-f-128
+test-*-inc.5c
+narrow-[df]-*.txt
+narrow-stamp
