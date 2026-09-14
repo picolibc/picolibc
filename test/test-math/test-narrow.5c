@@ -1,0 +1,117 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+
+typedef struct {
+	real a, b, c;
+} test_vector_t;
+
+test_vector_t[] test_values;
+
+real
+single_round_one(real a);
+
+real
+single_round_two(real a, real b);
+
+real
+single_round_three(real a, real b, real c);
+
+int[] bits = { 64, 80, 128 };
+
+void
+check_ifdef(int i, int d)
+{
+	if (d % 3 == 0) {
+		int thirds = d / 3;
+
+		if (i % thirds == 0)
+			printf("#ifdef HAS_BINARY%d\n", bits[i / thirds]);
+	} else {
+		int halves = d / 2;
+
+		if (i % halves == 0)
+			printf("#ifdef HAS_BINARY%d\n", bits[i / halves + 1]);
+	}
+}
+
+void
+check_endif(int i, int d)
+{
+	if (d % 3 == 0) {
+		int thirds = d / 3;
+
+		if ((i + 1) % thirds == 0)
+			printf("#endif /* HAS_BINARY%d */\n", bits[(i + 1) / thirds - 1]);
+	} else {
+		int halves = d / 2;
+
+		if ((i + 1) % halves == 0)
+			printf("#endif /* HAS_BINARY%d */\n", bits[(i + 1) / halves]);
+	}
+}
+
+void
+test_one()
+{
+	for (int i = 0; i < dim(test_values); i++) {
+		check_ifdef(i, dim(test_values));
+		compute_real_one(test_values[i].a, single_round_one);
+		check_endif(i, dim(test_values));
+	}
+}
+
+void
+test_two()
+{
+	for (int i = 0; i < dim(test_values); i++) {
+		check_ifdef(i, dim(test_values));
+		compute_real_real(test_values[i].a, test_values[i].b,
+				  single_round_two);
+		check_endif(i, dim(test_values));
+	}
+}
+
+void
+test_three()
+{
+	for (int i = 0; i < dim(test_values); i++) {
+		check_ifdef(i, dim(test_values));
+		compute_real_real_real(test_values[i].a, test_values[i].b,
+				       test_values[i].c, single_round_three);
+		check_endif(i, dim(test_values));
+	}
+}

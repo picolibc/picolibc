@@ -38,6 +38,20 @@ REAL_EXP = \
 	test-pow.h \
 	test-pown.h
 
+REAL_NARROW = \
+	test-fadd.h \
+	test-fsub.h \
+	test-fmul.h \
+	test-fdiv.h \
+	test-fsqrt.h \
+	test-ffma.h \
+	test-dadd.h \
+	test-dsub.h \
+	test-dmul.h \
+	test-ddiv.h \
+	test-dsqrt.h \
+	test-dfma.h
+
 REAL_OTHER = \
 	test-cbrt.h \
 	test-ceil.h \
@@ -79,7 +93,7 @@ COMPLEX_OTHER = \
 	test-csqrt.h
 
 TEST_FILES = \
-	$(REAL_TRIG) $(REAL_EXP) $(REAL_OTHER) \
+	$(REAL_TRIG) $(REAL_EXP) $(REAL_NARROW) $(REAL_OTHER) \
 	$(COMPLEX_TRIG) $(COMPLEX_EXP) $(COMPLEX_OTHER)
 
 all: $(TEST_FILES) .clang-format-ignore
@@ -94,5 +108,36 @@ $(TEST_FILES): test-complex.5c test-float.5c math-test-copyright
 .clang-format-ignore: Makefile
 	for i in '!**/*.[ch]' $(TEST_FILES); do echo "$$i"; done > $@
 
+CC_80=x86_64-linux-gnu-gcc
+
+CC_128=aarch64-linux-gnu-gcc
+
+gen-narrowing-f-64: gen-narrowing.c
+	$(CC) -g -O0 -o $@ $< -lm
+
+gen-narrowing-f-80: gen-narrowing.c
+	$(CC_80) -g -O0 -o $@ -DWIDE_LD $< -lm
+
+gen-narrowing-f-128: gen-narrowing.c
+	$(CC_128) -g -O0 -o $@ -DWIDE_LD $< -lm
+
+gen-narrowing-d-80: gen-narrowing.c
+	$(CC_80) -g -O0 -o $@ -DNARROW_D -DWIDE_LD $< -lm
+
+gen-narrowing-d-128: gen-narrowing.c
+	$(CC_128) -g -O0 -o $@ -DNARROW_D -DWIDE_LD $< -lm
+
+$(REAL_NARROW): narrow-stamp test-narrow.5c
+
+GEN_NARROWING_F=gen-narrowing-f-64 gen-narrowing-f-80 gen-narrowing-f-128
+GEN_NARROWING_D=gen-narrowing-d-80 gen-narrowing-d-128
+GEN_NARROWING=$(GEN_NARROWING_F) $(GEN_NARROWING_D)
+
+narrow-stamp: $(GEN_NARROWING) make-narrowing
+	./make-narrowing
+	touch $@
+
 clean:
+	rm -f $(GEN_NARROWING) narrow-stamp
 	rm -f $(TEST_FILES)
+	rm -f test-[df]*-inc.5c

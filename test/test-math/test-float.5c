@@ -473,3 +473,62 @@ compute_real_real(real x1, real x2, real(real, real) f)
 	}
 	print_real_real(x1p, x2p, yp);
 }
+
+void
+print_real_real_real(real[nformat] x1, real[nformat] x2, real[nformat] x3, result_t[nformat] y)
+{
+	printf("{ .x1 = REAL(");
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x1[i], i);
+	}
+	printf("), .x2 = REAL(");
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x2[i], i);
+	}
+	printf("), .x3 = REAL(");
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x3[i], i);
+	}
+	printf("), .y = REAL(");
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(y[i], i);
+	}
+	printf(") },\n");
+}
+
+void
+compute_real_real_real(real x1, real x2, real x3, real(real, real, real) f)
+{
+	real[nformat]	x1p, x2p, x3p;
+	result_t[nformat] yp;
+	for (int i = 0; i < nformat; i++) {
+		current_conversion = i;
+		x1p[i] = real_convs[i].conv(x1);
+		x2p[i] = real_convs[i].conv(x2);
+		x3p[i] = real_convs[i].conv(x3);
+		try {
+			try {
+				yp[i].r = real_convs[i].conv(f(imprecise(x1p[i], prec), imprecise(x2p[i], prec), imprecise(x3p[i], prec)));
+			} catch divide_by_zero(real x, real y) {
+				if (x == 0)
+					raise nan();
+				raise infinity(x < 0);
+			} catch invalid_argument(string error, int i, poly v) {
+				raise nan();
+			}
+		} catch infinity(bool sign) {
+			yp[i].i = sign;
+		} catch nan() {
+			yp[i].n = ◊;
+		}
+	}
+	print_real_real_real(x1p, x2p, x3p, yp);
+}

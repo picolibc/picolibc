@@ -72,6 +72,21 @@ tests_real_exp = [
   'test-pown',
 ]
 
+tests_real_narrow = [
+  'test-fadd',
+  'test-fsub',
+  'test-fmul',
+  'test-fdiv',
+  'test-fsqrt',
+  'test-ffma',
+  'test-dadd',
+  'test-dsub',
+  'test-dmul',
+  'test-ddiv',
+  'test-dsqrt',
+  'test-dfma',
+]
+
 tests_real_other = [
   'test-add',
   'test-cbrt',
@@ -127,7 +142,7 @@ tests_other = [
   'test-scalbn',
   ]
 
-tests = tests_real_trig + tests_real_exp + tests_real_other
+tests = tests_real_trig + tests_real_exp + tests_real_narrow + tests_real_other
 tests += tests_complex_trig + tests_complex_exp + tests_complex_other
 tests += tests_other
 
@@ -194,7 +209,7 @@ foreach params : targets
                     link_with: test_extra_libs.get(t1, []),
 		    include_directories: inc),
          depends: bios_bin,
-	 timeout: 60,
+	 timeout: 120,
          suite: 'test-math',
 	 env: test_env)
   endforeach

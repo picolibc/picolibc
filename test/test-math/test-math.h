@@ -72,12 +72,12 @@
 #define _MATH_STRING(a)    #a
 #define MATH_STRING(a)     _MATH_STRING(a)
 
-#ifdef SKIP_DENORM
 #define MY_ABS(x)                         \
     ({                                    \
         __typeof(x) __tmp__ = (x);        \
         __tmp__ < 0 ? -__tmp__ : __tmp__; \
     })
+#ifdef SKIP_DENORM
 #define SKIP_DENORM32(x)  (MY_ABS(x) < MIN_BINARY32)
 #define SKIP_DENORM64(x)  (MY_ABS(x) < MIN_BINARY64)
 #define SKIP_DENORM80(x)  (MY_ABS(x) < MIN_BINARY80)
@@ -189,6 +189,10 @@ ulp32(binary32 ab, binary32 bb)
     volatile binary32 b = bb;
     if (a == b)
         return 0;
+#ifdef SKIP_RESULT
+    if (SKIP_RESULT(ab))
+        return 0;
+#endif
     if (isnan(a) && isnan(b))
         return 0;
 #ifdef TEST_IGNORE_INF_SIGN
@@ -284,6 +288,10 @@ ulp64(binary64 ab, binary64 bb)
         return 0;
     if (isnan(a) && isnan(b))
         return 0;
+#ifdef SKIP_RESULT
+    if (SKIP_RESULT(ab))
+        return 0;
+#endif
 #ifdef TEST_IGNORE_INF_SIGN
     if (isinf(a) && isinf(b))
         return 0;
@@ -387,6 +395,10 @@ ulp80(binary80 ab, binary80 bb)
     volatile binary80 b = bb;
     if (a == b)
         return 0;
+#ifdef SKIP_RESULT
+    if (SKIP_RESULT(ab))
+        return 0;
+#endif
 #ifdef TEST_IGNORE_INF_SIGN
     if (isinf(a) && isinf(b))
         return 0;
@@ -458,6 +470,10 @@ ulp128(binary128 ab, binary128 bb)
         return 0;
 #ifdef TEST_IGNORE_INF_SIGN
     if (isinf(a) && isinf(b))
+        return 0;
+#endif
+#ifdef SKIP_RESULT
+    if (SKIP_RESULT(ab))
         return 0;
 #endif
     if (isnan(a) && isnan(b))
