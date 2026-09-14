@@ -91,6 +91,12 @@ tests_real_other = [
   'test-tgamma'
 ]
 
+tests_real_narrow = [
+  'test-dadd',
+  'test-fadd',
+  'test-fmul',
+]
+
 tests_complex_trig = [
   'test-cacos',
   'test-cacosh',
@@ -127,7 +133,7 @@ tests_other = [
   'test-scalbn',
   ]
 
-tests = tests_real_trig + tests_real_exp + tests_real_other
+tests = tests_real_trig + tests_real_exp + tests_real_other + tests_real_narrow
 tests += tests_complex_trig + tests_complex_exp + tests_complex_other
 tests += tests_other
 

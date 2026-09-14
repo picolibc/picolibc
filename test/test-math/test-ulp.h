@@ -104,6 +104,16 @@ static TEST_CONST math_ulps_t math_ulps[] = {
 #endif
     { .name = "tgamma",     .b32 = 238,     .b64 = 56,      .b80 = 4,       .b128 = 132     },
 
+    /* Narrowing functions */
+    { .name = "dadd",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "ddiv",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "dmul",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "dsub",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fadd",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fdiv",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fmul",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "fsub",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+
     /* Complex trig functions */
     { .name = "cacos",      .b32 = 2,       .b64 = 3,       .b80 = 2,       .b128 = MAX_ULP },
     { .name = "cacosh",     .b32 = 1,       .b64 = 2,       .b80 = 2,       .b128 = MAX_ULP },
@@ -202,6 +212,16 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "lgamma", .b32 = 1, .b64 = 2, .b80 = 2, .b128 = 3 },
     { .name = "sqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 1 },
     { .name = "tgamma", .b32 = 1, .b64 = 4, .b80 = 2, .b128 = 2 },
+
+    /* Narrowing functions */
+    { .name = "dadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "ddiv", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dmul", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "dsub", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fdiv", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fmul", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "fsub", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
 
     /* Complex trig functions */
     { .name = "cacos", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },

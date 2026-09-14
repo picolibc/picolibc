@@ -56,6 +56,11 @@ REAL_OTHER = \
 	test-sqrt.h \
 	test-tgamma.h
 
+REAL_NARROW = \
+	test-fadd.h \
+	test-fmul.h \
+	test-dadd.h
+
 COMPLEX_TRIG = \
 	test-cacos.h \
 	test-cacosh.h \
@@ -79,7 +84,7 @@ COMPLEX_OTHER = \
 	test-csqrt.h
 
 TEST_FILES = \
-	$(REAL_TRIG) $(REAL_EXP) $(REAL_OTHER) \
+	$(REAL_TRIG) $(REAL_EXP) $(REAL_OTHER) $(REAL_NARROW) \
 	$(COMPLEX_TRIG) $(COMPLEX_EXP) $(COMPLEX_OTHER)
 
 all: $(TEST_FILES) .clang-format-ignore

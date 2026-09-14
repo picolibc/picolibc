@@ -46,6 +46,9 @@ test-round.h
 test-scalbn.h
 test-sqrt.h
 test-tgamma.h
+test-fadd.h
+test-fmul.h
+test-dadd.h
 test-cacos.h
 test-cacosh.h
 test-casin.h
