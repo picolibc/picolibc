@@ -278,6 +278,34 @@ ff_div_ff(ff_t x, ff_t y)
 #endif
 }
 
+/*
+ * Use a wrapping inline to pass the hi/lo values to work around a
+ * compiler bug with gcc 14.2.0 for lm32-unknown-elf
+ */
+static inline float_t
+ff_round_odd_f(float_t hi, float_t lo)
+{
+    if (lo) {
+        uint32_t lsw;
+
+        GET_LOW_UINT32(lsw, hi);
+        if ((lsw & 1) == 0) {
+            if (signbit(lo) != signbit(hi)) {
+                hi = name(nextafter)(hi, 0);
+            } else {
+                MAKE_SIG_ODD(hi);
+            }
+        }
+    }
+    return hi;
+}
+
+static inline float_t
+round_odd_ff(ff_t x)
+{
+    return ff_round_odd_f(x.hi, x.lo);
+}
+
 float_t           name(_ff_scalbn)(ff_t x, int expo);
 int               name(_rem_half)(float_t x, float_t *y);
 float_t           name(_ff_pown)(float_t hi, float_t lo, long long int k);
