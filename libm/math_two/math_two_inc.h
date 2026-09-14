@@ -278,6 +278,24 @@ ff_div_ff(ff_t x, ff_t y)
 #endif
 }
 
+static inline float_t
+round_odd_ff(ff_t x)
+{
+    if (x.lo) {
+        uint32_t        lsw;
+
+        GET_LOW_WORD(lsw, x.hi);
+        if ((lsw & 1) == 0) {
+            if (signbit(x.lo) != signbit(x.hi)) {
+                x.hi = nextafter(x.hi, 0);
+            } else {
+                MAKE_SIG_ODD(x.hi);
+            }
+        }
+    }
+    return x.hi;
+}
+
 float_t           name(_ff_scalbn)(ff_t x, int expo);
 int               name(_rem_half)(float_t x, float_t *y);
 float_t           name(_ff_pown)(float_t hi, float_t lo, long long int k);

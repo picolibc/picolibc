@@ -269,6 +269,15 @@ typedef union {
         (v) = sh_u.parts.msw;          \
     } while (0)
 
+/* Get the more significant 32 bits of a long double mantissa.  */
+
+#define GET_LDOUBLE_LSW(v, d)          \
+    do {                               \
+        ieee_extended_shape_type sh_u; \
+        sh_u.value = (d);              \
+        (v) = sh_u.parts.lsw;          \
+    } while (0)
+
 /* Set the more significant 32 bits of a long double mantissa from an int.  */
 
 #define SET_LDOUBLE_MSW(d, v)          \
@@ -276,6 +285,25 @@ typedef union {
         ieee_extended_shape_type sh_u; \
         sh_u.value = (d);              \
         sh_u.parts.msw = (v);          \
+        (d) = sh_u.value;              \
+    } while (0)
+
+/* Get the less significant 32 bits of a long double mantissa.  */
+
+#define GET_LDOUBLE_LSW(v, d)          \
+    do {                               \
+        ieee_extended_shape_type sh_u; \
+        sh_u.value = (d);              \
+        (v) = sh_u.parts.lsw;          \
+    } while (0)
+
+/* Set the less significant 32 bits of a long double mantissa from an int.  */
+
+#define SET_LDOUBLE_LSW(d, v)          \
+    do {                               \
+        ieee_extended_shape_type sh_u; \
+        sh_u.value = (d);              \
+        sh_u.parts.lsw = (v);          \
         (d) = sh_u.value;              \
     } while (0)
 
@@ -490,6 +518,16 @@ typedef union {
         double_double_shape_type sh_u; \
         sh_u.value = (d);              \
         (v) = sh_u.parts64.lsw;        \
+    } while (0)
+
+/* Set the least significant 64 bits of a long double mantissa.  */
+
+#define SET_LDOUBLE_LSW64(d, v)        \
+    do {                               \
+        double_double_shape_type sh_u; \
+        sh_u.value = (d);              \
+        sh_u.parts64.lsw = (v);        \
+        (d) = sh_u.value;              \
     } while (0)
 
 /* Get int from the exponent of a long double.  */
