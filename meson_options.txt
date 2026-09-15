@@ -67,6 +67,8 @@ option('sanitize', type: 'string', value: 'none',
        description: 'Code sanitizer to use')
 option('use-hlt-semihosting', type: 'boolean', value: 'false',
         description: 'Enable HLT Semihosting (only valid for Armv8)')
+option('picolibc-export', type: 'boolean', value: true,
+       description: 'Annotate public picolibc APIs with default (exported) visibility')
 
 #
 # Installation options

@@ -165,6 +165,9 @@
 /* Compute static memory area sizes at runtime instead of link time */
 #cmakedefine __PICOCRT_RUNTIME_SIZE
 
+/* Annotate public picolibc APIs with default (exported) visibility */
+#cmakedefine __PICOLIBC_EXPORT
+
 /* The Picolibc minor version number. */
 #define __PICOLIBC_MINOR__ @PROJECT_VERSION_MINOR@
 

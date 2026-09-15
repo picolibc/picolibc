@@ -109,6 +109,10 @@ if(NOT DEFINED MALLOC_SMALL_BUCKET)
   option(MALLOC_SMALL_BUCKET "use fixed bucket sizes for allocations no larger than this" 0)
 endif()
 
+if(NOT DEFINED __PICOLIBC_EXPORT)
+  option(__PICOLIBC_EXPORT "Annotate public picolibc APIs with default (exported) visibility" OFF)
+endif()
+
 option(POSIX_CONSOLE "Use POSIX I/O for stdin/stdout/stderr" OFF)
 
 # Optimize for space over speed

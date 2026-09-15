@@ -92,7 +92,12 @@
  * can be safely replaced with nothing when not supported
  */
 
-#if __has_attribute(__visibility__)
+#if __has_attribute(__visibility__) && defined(__PICOLIBC_EXPORT)
+/* Define __PICOLIBC_EXPORT to force public picolibc symbols to have default (exported) visibility
+ * even when picolibc is built with a more limited default visibility.
+ * This is useful when building picolibc as part of a library while remaining callable
+ * from outside that library.
+ */
 #define __picolibc_export __attribute__((__visibility__("default")))
 #else
 #define __picolibc_export
