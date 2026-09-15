@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2024, Synopsys Inc.
+ * Copyright © 2024-2026, MIPS Holding Inc.
  * Copyright © 2024, Solid Sands B.V.
  *
  * Redistribution and use in source and binary forms, with or without

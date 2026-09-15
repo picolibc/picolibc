@@ -2054,7 +2054,7 @@ Files: libc/stdio/sprintf_s.c
  test/test-string/test-strncat_s.c
  test/test-string/test-strncpy_s.c
  test/test-string/test-strnlen_s.c
-Copyright: 2024, Synopsys Inc.
+Copyright: 2024-2026 MIPS Holding, Inc.
 License: BSD3-1
 
 Files: libm/machine/riscv/s_copysign.c
@@ -2173,7 +2173,7 @@ License: BSD3-1
 Files: test/test-stdio/test-sprintf-percent-n.c
  test/test-stdio/test-vfscanf-percent-a.c
  test/test-stdio/test-wchar.c
-Copyright: 2024, Synopsys Inc.
+Copyright: 2024-2026 MIPS Holding, Inc.
  2024, Solid Sands B.V.
 License: BSD3-1
 
@@ -2948,7 +2948,7 @@ License: BSD3-12
 
 Files: libc/machine/arc/asm.h
  libc/machine/arc/strchr.S
-Copyright: 2015, Synopsys, Inc.
+Copyright: 2015-2026 MIPS Holding, Inc.
 License: BSD3-13
 
 Files: libc/machine/arc/memcmp-bs-norm.S
@@ -2976,7 +2976,7 @@ Files: libc/machine/arc/memcmp-bs-norm.S
  libc/machine/arc/strncpy-bs.S
  libc/machine/arc/strncpy-stub.c
  libc/machine/arc/strncpy.S
-Copyright: 2015-2024, Synopsys, Inc.
+Copyright: 2015-2026 MIPS Holding, Inc.
 License: BSD3-13
 
 Files: libc/machine/arc64/memchr.S
@@ -2992,7 +2992,7 @@ Files: libc/machine/arc64/memchr.S
  libc/machine/arc64/strcmp.S
  libc/machine/arc64/strlen.S
  libc/machine/arc64/sys/asm.h
-Copyright: 2024, Synopsys, Inc.
+Copyright: 2024-2026 MIPS Holding, Inc.
 License: BSD3-13
 
 Files: libc/machine/arm/memchr.S
@@ -4295,7 +4295,7 @@ Files: scripts/cross-clang-rv32-cfi-unknown-elf.txt
  scripts/cross-clang-rv64-cfi-unknown-elf.txt
  scripts/do-clang-rv32-cfi-configure
  scripts/do-clang-rv64-cfi-configure
-Copyright: 2026 Ahmed Shehab (Si-Vision) <shehab@eudcodcvder3104.internal.synopsys.com>
+Copyright: 2026 Ahmed Shehab (Si-Vision) <ahmed.shehab@globalfoundries.com>
 License: Default-1
 
 Files: scripts/cross-loongarch64-unknown-elf.txt
@@ -5975,7 +5975,7 @@ License: BSD3-13
  this list of conditions and the following disclaimer in the documentation
  and/or other materials provided with the distribution.
  .
- 3) Neither the name of the Synopsys, Inc., nor the names of its contributors
+ 3) Neither the name of the MIPS Holding, Inc., nor the names of its contributors
  may be used to endorse or promote products derived from this software
  without specific prior written permission.
  .
