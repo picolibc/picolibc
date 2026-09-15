@@ -1525,6 +1525,8 @@ conf_data.set('__THREAD_LOCAL_STORAGE_RP2040', get_option('tls-rp2040'),
 conf_data.set('__THREAD_LOCAL_STORAGE_STACK_GUARD', tls_stack_guard, description: 'use thread local storage for stack protection canary')
 conf_data.set('__HAVE_BITFIELDS_IN_PACKED_STRUCTS', have_bitfields_in_packed_structs, description: 'Use bitfields in packed structs')
 conf_data.set('__HAVE_COMPLEX', have_complex, description: 'Compiler supports _Complex')
+conf_data.set('__PICOLIBC_EXPORT', get_option('picolibc-export'),
+              description: 'Annotate public picolibc APIs with default (exported) visibility')
 
 conf_data.set('__MB_CAPABLE', mb_capable)
 if mb_capable
