@@ -120,6 +120,10 @@ typedef __pid_t pid_t; /* process id */
 
 #endif
 
+#include <machine/_clockid.h>
+
+#ifndef __machine_clockid_values_defined
+
 #if __GNU_VISIBLE
 #define CLOCK_REALTIME_COARSE (0)
 #endif
@@ -169,6 +173,8 @@ typedef __pid_t pid_t; /* process id */
 #define CLOCK_THREAD_CPUTIME_ID  (11)
 
 #endif
+
+#endif /* !__machine_clockid_values_defined */
 
 /* defines for the opengroup specifications Derived from Issue 1 of the SVID.  */
 #if __SVID_VISIBLE || __XSI_VISIBLE
