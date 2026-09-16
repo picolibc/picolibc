@@ -52,6 +52,6 @@ def_fn	strlen p2align=1
 	.size	strlen, . - strlen
 
 
-#if defined(__linux__) && defined(__ELF__)
+#if defined(__ELF__)
 .section .note.GNU-stack,"",%progbits
 #endif

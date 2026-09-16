@@ -59,7 +59,7 @@ m68k_semihost:
 	.cfi_endproc
 	.size m68k_semihost, .- m68k_semihost
 	
-#if defined(__linux__) && defined(__ELF__)
+#if defined(__ELF__)
 	.section .note.GNU-stack,"",%progbits
 #endif
 

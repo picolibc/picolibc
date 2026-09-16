@@ -74,7 +74,7 @@ SYM (longjmp_68881):
 	.size	SYM(longjmp_68881), . - SYM(longjmp_68881)
 #endif
 
-#if defined(__linux__) && defined(__ELF__)
+#if defined(__ELF__)
 	.section .note.GNU-stack,"",%progbits
 #endif
 
