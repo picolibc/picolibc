@@ -47,6 +47,7 @@ inc_machine_headers_all = [
   'setjmp.h',
   'stdlib.h',
   'termios.h',
+  '_sched.h',
   '_time.h',
   'time.h',
   '_types.h',
