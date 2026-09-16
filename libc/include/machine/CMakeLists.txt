@@ -47,6 +47,7 @@ picolibc_headers(machine
   setjmp.h
   stdlib.h
   termios.h
+  _sched.h
   _time.h
   time.h
   _types.h

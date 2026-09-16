@@ -26,6 +26,9 @@
 
 _BEGIN_STD_C
 
+#include <machine/_sched.h>
+
+#ifndef __machine_sched_values_defined
 /* Scheduling Policies */
 /* Open Group Specifications Issue 6 */
 #define SCHED_OTHER 0
@@ -44,10 +47,12 @@ _BEGIN_STD_C
 /* Flag to drop realtime policies and negative nice values on fork(). */
 #define SCHED_RESET_ON_FORK 0x40000000
 #endif
+#endif /* !__machine_sched_values_defined */
 
 /* Scheduling Parameters */
 /* Open Group Specifications Issue 6 */
 
+#ifndef __machine_sched_param_defined
 struct sched_param {
     int sched_priority; /* Process execution scheduling priority */
 
@@ -62,6 +67,7 @@ struct sched_param {
                                        /* sporadic server */
 #endif
 };
+#endif /* !__machine_sched_param_defined */
 
 _END_STD_C
 

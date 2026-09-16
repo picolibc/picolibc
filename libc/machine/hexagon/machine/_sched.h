@@ -1,0 +1,61 @@
+/*
+Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+SPDX-License-Identifier: BSD-3-Clause-Clear
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted (subject to the limitations in the
+disclaimer below) provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright
+    notice, this list of conditions and the following disclaimer.
+
+  * Redistributions in binary form must reproduce the above
+    copyright notice, this list of conditions and the following
+    disclaimer in the documentation and/or other materials provided
+    with the distribution.
+
+  * Neither the name of Qualcomm Technologies, Inc. nor the names of its
+    contributors may be used to endorse or promote products derived
+    from this software without specific prior written permission.
+
+NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
+#ifndef _MACHINE__SCHED_H
+#define _MACHINE__SCHED_H
+
+/* Tells <sys/sched.h> to skip its own SCHED_* policy block. */
+#define __machine_sched_values_defined
+
+#define SCHED_FIFO     0
+#define SCHED_RR       1
+#define SCHED_SPORADIC 2
+#define SCHED_OTHER    3
+
+#if __GNU_VISIBLE
+#define SCHED_IDLE          32
+#define SCHED_BATCH         33
+#define SCHED_RESET_ON_FORK 0x40000000
+#endif
+
+/* Tells <sys/sched.h> to skip its own struct sched_param definition. */
+#define __machine_sched_param_defined
+
+struct sched_param {
+    void *unimplemented;
+    int   sched_priority;
+};
+
+#endif /* _MACHINE__SCHED_H */
