@@ -34,6 +34,7 @@
 #
 picolibc_headers(machine
   ansi.h
+  _clockid.h
   _default_types.h
   _endian.h
   endian.h
