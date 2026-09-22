@@ -67,7 +67,7 @@ static inline wctype_t
 __ctype_table_lookup(wint_t ic, locale_t locale, wctype_t mask)
 {
     (void)locale;
-    if (ic >= (wint_t)0x100)
+    if (ic >= (wint_t)0x80)
         return 0;
     return (_ctype_class + 1)[(int)(ic)] & mask;
 }

@@ -74,8 +74,8 @@ main(void)
 
     for (t = 0; t < NUM_WCTYPES; t++)
         wctypes[t].desc = wctype(wctypes[t].name);
-    for (c = 0; c <= 0x80; c++) {
-        if (c == 0x80) {
+    for (c = 0; c <= 0x100; c++) {
+        if (c == 0x100) {
             c = EOF;
             wc = WEOF;
         } else
