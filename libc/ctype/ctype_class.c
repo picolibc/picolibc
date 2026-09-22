@@ -31,7 +31,7 @@
 #include <wctype.h>
 #include "local.h"
 
-const wctype_t _ctype_class[+1256] = {
+const wctype_t _ctype_class[1 + 128] = {
     0,
 #include "ctype_class.h"
 };
