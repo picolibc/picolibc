@@ -135,6 +135,7 @@ test_machine = get_option('test-machine')
 enable_tests = get_option('tests')
 enable_libdl = get_option('libdl')
 build_shared = get_option('shared-library')
+shared_lib_version = get_option('shared-library-version')
 use_pic = build_shared
 if get_option('tests-cdefs') == 'auto'
   enable_cdefs_tests = enable_tests
@@ -1997,6 +1998,11 @@ foreach params : targets
   libc_name = 'c'
 
   build_shared = get_option('shared-library')
+  if build_shared and shared_lib_version != ''
+    shared_ver_kwargs = {'version': shared_lib_version}
+  else
+    shared_ver_kwargs = {}
+  endif
 
   if meson.version().version_compare('>=1.10')
     if build_shared
@@ -2010,7 +2016,9 @@ foreach params : targets
 				          include_directories: inc,
 				          c_args: target_c_args + c_args,
 				          override_options: ['b_lundef=false'],
-				          link_args: runtime_lib)
+				          link_args: runtime_lib,
+                                          kwargs: shared_ver_kwargs
+                                          )
     else
       local_lib_c_target = static_library(libc_name,
 				          libsrcs_target,
@@ -2036,7 +2044,8 @@ foreach params : targets
 				          include_directories: inc,
 				          c_args: target_c_args + c_args,
 				          override_options: ['b_lundef=false'],
-				          link_args: runtime_lib)
+				          link_args: runtime_lib,
+                                          kwargs: shared_ver_kwargs)
     else
       local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
 				          libsrcs_target,
