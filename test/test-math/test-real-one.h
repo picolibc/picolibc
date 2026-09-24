@@ -40,7 +40,6 @@
 
 static TEST_CONST struct {
     binary32 x, y;
-    ulp_t    ulp;
 } test_32_vec[] = {
 #define REAL(r32, r64, r80, r80m, r128)     r32
 #define REAL_ULP(r32, r64, r80, r80m, r128) r32
@@ -83,7 +82,6 @@ test_binary32(void)
 #if defined(HAS_BINARY64) && !defined(SKIP_BINARY64)
 static TEST_CONST struct {
     binary64 x, y;
-    ulp_t    ulp;
 } test_64_vec[] = {
 #define REAL(r32, r64, r80, r80m, r128)     r64
 #define REAL_ULP(r32, r64, r80, r80m, r128) r64
@@ -127,7 +125,6 @@ test_binary64(void)
 #if defined(HAS_BINARY80) && !defined(SKIP_BINARY80)
 static TEST_CONST struct {
     binary80 x, y;
-    ulp_t    ulp;
 } test_80_vec[] = {
 #define REAL(r32, r64, r80, r80m, r128)     REAL80(r80, r80m)
 #define REAL_ULP(r32, r64, r80, r80m, r128) REAL80(r80, r80m)
@@ -173,7 +170,6 @@ test_binary80(void)
 #if defined(HAS_BINARY128) && !defined(SKIP_BINARY128)
 static TEST_CONST struct {
     binary128 x, y;
-    ulp_t     ulp;
 } test_128_vec[] = {
 #define REAL(r32, r64, r80, r80m, r128)     r128
 #define REAL_ULP(r32, r64, r80, r80m, r128) r128
