@@ -72,6 +72,9 @@ SECTIONS
 		*(.literal .text .literal.* .text.* .opd .opd.* .branch_lt .branch_lt.* @EXTRA_TEXT_SECTIONS@)
 		*(.gnu.linkonce.t.*)
 		KEEP (*(.fini .fini.*))
+@CPP@	PROVIDE (__start___lcxx_override = .);
+@CPP@	*(__lcxx_override)
+@CPP@	PROVIDE (__stop___lcxx_override = .);
 		@PREFIX@__text_end = .;
 
 		PROVIDE (@PREFIX@__etext = @PREFIX@__text_end);
