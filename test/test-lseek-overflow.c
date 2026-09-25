@@ -70,6 +70,11 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int
 main(void)
 {
+#ifdef TESTS_LSEEK64
+    printf("Linux supports 64-bit lseek, skipping semihost overflow test\n");
+    return 77;
+#endif
+
     /* Right now test is aimed for Hexagon only */
 #ifndef __HEXAGON_ARCH__
     return 77;
