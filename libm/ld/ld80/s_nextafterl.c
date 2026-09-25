@@ -20,16 +20,38 @@
 #include <stdio.h>
 
 long double
+#if defined(NEXTUP)
+nextupl(long double x)
+#elif defined(NEXTDOWN)
+nextdownl(long double x)
+#else
 nextafterl(long double x, long double y)
+#endif
 {
-    u_int32_t hx, hy, ix, iy;
-    u_int32_t lx, ly;
-    int32_t   esx, esy;
+    u_int32_t hx, ix, lx;
+    int32_t   esx;
 
     GET_LDOUBLE_WORDS(esx, hx, lx, x);
-    GET_LDOUBLE_WORDS(esy, hy, ly, y);
     ix = esx & 0x7fff; /* |x| */
+
+#if defined(NEXTUP)
+#define esy LDBL_EXP_MASK
+#define iy  LDBL_EXP_MASK
+#define hy  ((u_int32_t)LDBL_NBIT_INF)
+#define ly  ((u_int32_t)0)
+#define y   ((long double)INFINITY)
+#elif defined(NEXTDOWN)
+#define esy ((int32_t)((int16_t)(LDBL_EXP_MASK | LDBL_EXP_SIGN)))
+#define iy  LDBL_EXP_MASK
+#define hy  ((u_int32_t)LDBL_NBIT_INF)
+#define ly  ((u_int32_t)0)
+#define y   ((long double)-INFINITY)
+#else
+    u_int32_t hy, iy, ly;
+    int32_t   esy;
+    GET_LDOUBLE_WORDS(esy, hy, ly, y);
     iy = esy & 0x7fff; /* |y| */
+#endif
 
     if (((ix == 0x7fff) && (((hx & 0x7fffffff) | lx) != 0)) || /* x is nan */
         ((iy == 0x7fff) && (((hy & 0x7fffffff) | ly) != 0)))   /* y is nan */
@@ -100,6 +122,7 @@ nextafterl(long double x, long double y)
     return x;
 }
 
+#if !defined(NEXTUP) && !defined(NEXTDOWN)
 #ifdef __strong_reference
 __strong_reference(nextafterl, nexttowardl);
 #else
@@ -108,4 +131,5 @@ nexttowardl(long double x, long double y)
 {
     return nextafterl(x, y);
 }
+#endif
 #endif

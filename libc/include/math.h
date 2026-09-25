@@ -727,6 +727,10 @@ float    ffma(double, double, double) __picolibc_export;
 float    fmul(double, double) __picolibc_export;
 float    fsqrt(double) __picolibc_export;
 float    fsub(double, double) __picolibc_export;
+double   nextdown(double) __picolibc_export;
+float    nextdownf(float) __picolibc_export;
+double   nextup(double) __picolibc_export;
+float    nextupf(float) __picolibc_export;
 double   pown(double, long long int) __picolibc_export;
 float    pownf(float, long long int) __picolibc_export;
 double   sinpi(double) __picolibc_export;
@@ -784,12 +788,6 @@ float    log2p1f(float) __picolibc_export; /* XXX */
 double   logp1(double) __picolibc_export; /* XXX */
 float    logp1f(float) __picolibc_export; /* XXX */
 
-double   nextdown(double) __picolibc_export; /* XXX */
-float    nextdownf(float) __picolibc_export; /* XXX */
-
-double   nextup(double) __picolibc_export; /* XXX */
-float    nextupf(float) __picolibc_export; /* XXX */
-
 double   powr(double, double) __picolibc_export; /* XXX */
 float    powrf(float, float) __picolibc_export;  /* XXX */
 
@@ -829,6 +827,8 @@ float       ffmal(long double, long double, long double) __picolibc_export;
 float       fmull(long double, long double) __picolibc_export;
 float       fsqrtl(long double) __picolibc_export;
 float       fsubl(long double, long double) __picolibc_export;
+long double nextdownl(long double) __picolibc_export;
+long double nextupl(long double) __picolibc_export;
 long double pownl(long double, long long int) __picolibc_export;
 long double sinpil(long double) __picolibc_export;
 long double tanpil(long double) __picolibc_export;
@@ -850,8 +850,6 @@ long int    llogbl(long double) __picolibc_export;                         /* XX
 long double log10p1l(long double) __picolibc_export;                       /* XXX */
 long double log2p1l(long double) __picolibc_export;                        /* XXX */
 long double logp1l(long double) __picolibc_export;                         /* XXX */
-long double nextdownl(long double) __picolibc_export;                      /* XXX */
-long double nextupl(long double) __picolibc_export;                        /* XXX */
 long double powrl(long double, long double) __picolibc_export;             /* XXX */
 long double rootnl(long double, long long int) __picolibc_export;          /* XXX */
 long double rsqrtl(long double) __picolibc_export;                         /* XXX */

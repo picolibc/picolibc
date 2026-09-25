@@ -66,6 +66,8 @@ srcs_ld_arch = [
     's_modfl.c',
     's_nanl.c',
     's_nextafterl.c',
+    's_nextdownl.c',
+    's_nextupl.c',
     's_nexttoward.c',
     's_nexttowardf.c',
     's_remquol.c',
