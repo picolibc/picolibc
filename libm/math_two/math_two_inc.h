@@ -287,15 +287,9 @@ ff_round_odd_f(float_t hi, float_t lo)
 {
     if (lo) {
         uint32_t lsw;
-
         GET_LOW_UINT32(lsw, hi);
-        if ((lsw & 1) == 0) {
-            if (signbit(lo) != signbit(hi)) {
-                hi = name(nextafter)(hi, 0);
-            } else {
-                MAKE_SIG_ODD(hi);
-            }
-        }
+        if ((lsw & 1) == 0)
+            hi = name(nextafter)(hi, name(copysign)((float_t) INFINITY, lo));
     }
     return hi;
 }
