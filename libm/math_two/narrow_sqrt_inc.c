@@ -58,7 +58,7 @@ func(float_t x)
 {
     if (x < 0)
         return INVALID(x);
-    if (!finite(x))
+    if (!isfinite(x))
         return x + x;
     if (x == 0)
         return x;
