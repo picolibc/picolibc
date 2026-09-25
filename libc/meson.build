@@ -94,7 +94,7 @@ foreach params : targets
 
   if libobjs != []
     local_lib_cpart_target = static_library('cpart' + target,
-				            pic: false,
+				            pic: use_pic,
 				            objects : libobjs,
 					    include_directories: inc,
 					    c_args: target_c_args + c_args)
