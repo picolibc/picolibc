@@ -48,26 +48,56 @@ PORTABILITY
  *   Special cases:
  */
 
+#define _ISOC23_SOURCE
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64
 
 __float64
+#if defined(NEXTUP)
+nextup64(__float64 x)
+#elif defined(NEXTDOWN)
+nextdown64(__float64 x)
+#else
 nextafter64(__float64 x, __float64 y)
+#endif
+
 {
-    __int32_t  hx, hy, ix, iy;
-    __uint32_t lx, ly;
+    __int32_t  hx, ix;
+    __uint32_t lx;
 
     EXTRACT_WORDS(hx, lx, x);
-    EXTRACT_WORDS(hy, ly, y);
     ix = hx & 0x7fffffff; /* |x| */
+
+#if defined(NEXTUP)
+#define hy ((__int32_t)0x7ff00000)
+#define ly ((__uint32_t)0)
+#define iy ((__int32_t)0x7ff00000)
+#define y x
+#elif defined(NEXTDOWN)
+#define hy ((__int32_t)0xfff00000)
+#define ly ((__uint32_t)0)
+#define iy ((__int32_t)0x7ff00000)
+#define y x
+#else
+    __int32_t  hy, iy;
+    __uint32_t ly;
+
+    EXTRACT_WORDS(hy, ly, y);
     iy = hy & 0x7fffffff; /* |y| */
+
+#define CHECK_EQUAL
+#endif
 
     if (((ix >= 0x7ff00000) && ((ix - 0x7ff00000) | lx) != 0) || /* x is nan */
         ((iy >= 0x7ff00000) && ((iy - 0x7ff00000) | ly) != 0))   /* y is nan */
         return x + y;
+
+#ifdef CHECK_EQUAL
     if (x == y)
-        return y;                            /* x=y, return y */
+        return y; /* x=y, return y */
+#endif
+
     if ((ix | lx) == 0) {                    /* x == 0 */
         INSERT_WORDS(x, hy & 0x80000000, 1); /* return +-minsubnormal */
         force_eval_float64(opt_barrier_float64(x) * x);
@@ -94,15 +124,21 @@ nextafter64(__float64 x, __float64 y)
                 hx += 1;
         }
     }
-    hy = hx & 0x7ff00000;
-    if (hy >= 0x7ff00000)
+    ix = hx & 0x7ff00000;
+    if (ix >= 0x7ff00000)
         return __math_oflow(hx < 0); /* overflow  */
     INSERT_WORDS(x, hx, lx);
-    if (hy < 0x00100000) /* underflow */
+    if (ix < 0x00100000) /* underflow */
         return __math_denorm(x);
     return (x);
 }
 
+#if defined(NEXTUP)
+_MATH_ALIAS_d_dd(nextup)
+#elif defined(NEXTDOWN)
+_MATH_ALIAS_d_dd(nextdown)
+#else
 _MATH_ALIAS_d_dd(nextafter)
+#endif
 
 #endif /* _NEED_FLOAT64 */

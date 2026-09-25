@@ -52,6 +52,8 @@ picolibc_sources(
   s_log1p.c
   s_nan.c
   s_nextafter.c
+  s_nextup.c
+  s_nextdown.c
   s_pow10.c
   s_rint.c
   s_logb.c
