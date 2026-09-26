@@ -44,6 +44,7 @@ set(tests
   test-printf-scanf
   test-sprintf-percent-n
   test-sprintf-s
+  test-strto-int
   test-ungetc
   test-vfprintf-s
   test-vsnprintf-s
