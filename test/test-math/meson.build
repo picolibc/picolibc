@@ -99,6 +99,7 @@ tests_real_other = [
   'test-j1',
   'test-jn',
   'test-lgamma',
+  'test-nextafter',
   'test-remainder',
   'test-remquo-quo',
   'test-round',

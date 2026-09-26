@@ -62,6 +62,7 @@ REAL_OTHER = \
 	test-j0.h \
 	test-j1.h \
 	test-jn.h \
+	test-nextafter.h \
 	test-lgamma.h \
 	test-remainder.h \
 	test-remquo.h \
