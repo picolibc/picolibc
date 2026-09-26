@@ -34,4 +34,4 @@
  */
 #define _ISOC23_SOURCE
 #define NEXTUP
-#include "s_nextafter.c"
+#include "sf_nextafter.c"

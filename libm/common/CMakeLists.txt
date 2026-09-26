@@ -109,6 +109,8 @@ picolibc_sources(
   sf_log1p.c
   sf_nan.c
   sf_nextafter.c
+  sf_nextdown.c
+  sf_nextup.c
   sf_pow10.c
   sf_rint.c
   sf_logb.c

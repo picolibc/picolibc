@@ -48,7 +48,6 @@ PORTABILITY
  *   Special cases:
  */
 
-#define _ISOC23_SOURCE
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64

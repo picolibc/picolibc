@@ -33,5 +33,5 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #define _ISOC23_SOURCE
-#define NEXTUP
-#include "s_nextafter.c"
+#define NEXTDOWN
+#include "sf_nextafter.c"
