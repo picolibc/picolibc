@@ -39,6 +39,7 @@ tests_mem = [
   'test-memchr-simple',
   'test-memcpy_s',
   'test-memmem',
+  'test-memmove',
   'test-memmove_s',
   'test-memset',
   'test-memset_s',
