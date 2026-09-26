@@ -56,6 +56,7 @@ tests_failure = []
 tests_printf = [
   'test-long-long',
   'test-printf',
+  'test-printf-int-edge',
   'test-printf-scanf',
   ]
 
