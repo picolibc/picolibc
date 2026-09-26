@@ -41,6 +41,12 @@ exception nan();
 exception infinity(bool neg);
 exception bad_precision(int prec);
 
+typedef union {
+	real	r;
+	bool	i;
+	void	n;
+} result_t;
+
 complex
 imprecise_arg(complex x, int prec)
 {
@@ -78,6 +84,97 @@ real32(real x)
 	return imprecise_arg(x, precision);
 }
 
+result_t
+real32_result(result_t r)
+{
+	union switch (r) {
+	case r x:
+		if (abs(x) > max_binary32)
+			r = (result_t) { .i = (x < 0) };
+		else
+			r = (result_t) { .r = real32(x) };
+		break;
+	default:
+		break;
+	}
+	return r;
+}
+
+int
+toint_gen(result_t r, int prec, int exp_bits)
+{
+	int sign, exp, sig;
+
+	int exp_bias = (1 << (exp_bits - 1)) - 1;
+
+	union switch (r) {
+	case i i:
+		sign = i ? 1 : 0;
+		exp = (1 << exp_bits) - 1;
+		sig = 0;
+		break;
+	case n:
+		sign = 0;
+		exp = (1 << exp_bits) - 1;
+		sig = (1 << (prec - 2));
+		break;
+	case r x:
+		real xc = abs(x);
+		real mant = mantissa(xc) * 2;
+		exp = exponent(xc) - 1;
+
+		sign = x < 0 ? 1 : 0;
+		if (xc == 0) {
+			exp = 0;
+			sig = 0;
+		} else {
+			exp += exp_bias;
+			if (exp <= 0) {
+				sig = mant * 2**(exp + prec - 2);
+				exp = 0;
+			} else {
+				sig = mant * 2**(prec - 1) - (1 << (prec-1));
+			}
+		}
+		break;
+	}
+	return (sign << (prec + exp_bits - 1)) | (exp << (prec-1)) | sig;
+}
+
+result_t
+toreal_gen(int x, int prec, int exp_bits)
+{
+	int sign, exp, sig;
+	int exp_bias = (1 << (exp_bits - 1)) - 1;
+
+	sign = (x >> (prec + exp_bits - 1));
+	exp = (x >> (prec - 1)) & ((1 << exp_bits) - 1);
+	sig = x & ((1 << (prec - 1)) - 1);
+
+	if (exp == ((1 << exp_bits) - 1)) {
+		if (sig != 0) {
+			return (result_t) { .n = ◊ };
+		}
+		return (result_t) { .i = (sign != 0) };
+	}
+
+	if (exp == 0) {
+		exp = 2 - prec - exp_bias;
+		if (sig == 0)
+			prec = 1;
+		else
+			prec = 1 + floor(log2(sig));
+	} else {
+		sig |= (1 << (prec-1));
+		exp = exp - exp_bias - (prec - 1);
+	}
+	real y = sig * 2 ** exp;
+	if (sign != 0)
+		y = -y;
+
+	return (result_t) { .r = imprecise(y, prec) };
+}
+
 const real max_binary64 = imprecise(0x1.fffffffffffffp+1023);
 const real min_binary64 = imprecise(0x1p-1022);
 const real min_denorm_binary64 = imprecise(0x1p-1074);
@@ -97,6 +194,22 @@ real64(real x)
 		precision = exp_x - exponent(min_denorm_binary64) + 1;
 	}
 	return imprecise_arg(x, precision);
+}
+
+result_t
+real64_result(result_t r)
+{
+	union switch (r) {
+	case r x:
+		if (abs(x) > max_binary64)
+			r = (result_t) { .i = x < 0 };
+		else
+			r = (result_t) { .r = real64(x) };
+		break;
+	default:
+		break;
+	}
+	return r;
 }
 
 const real max_binary80 = imprecise(0x1.fffffffffffffffep16383);
@@ -120,6 +233,22 @@ real80(real x)
 	return imprecise_arg(x, precision);
 }
 
+result_t
+real80_result(result_t r)
+{
+	union switch (r) {
+	case r x:
+		if (abs(x) > max_binary80)
+			r = (result_t) { .i = x < 0 };
+		else
+			r = (result_t) { .r = real80(x) };
+		break;
+	default:
+		break;
+	}
+	return r;
+}
+
 const real max_binary80m = imprecise(0x1.fffffffffffffffep16383);
 const real min_binary80m = imprecise(0x1p-16383);
 const real min_denorm_binary80m = imprecise(0x1p-16446);
@@ -139,6 +268,22 @@ real80m(real x)
 		precision = exp_x - exponent(min_denorm_binary80m) + 1;
 	}
 	return imprecise_arg(x, precision);
+}
+
+result_t
+real80m_result(result_t r)
+{
+	union switch (r) {
+	case r x:
+		if (abs(x) > max_binary80m)
+			r = (result_t) { .i = x < 0 };
+		else
+			r = (result_t) { .r = real80m(x) };
+		break;
+	default:
+		break;
+	}
+	return r;
 }
 
 const real max_binary128 = imprecise(0x1.ffffffffffffffffffffffffffffp16383);
@@ -162,9 +307,180 @@ real128(real x)
 	return imprecise_arg(x, precision);
 }
 
+result_t
+real128_result(result_t r)
+{
+	union switch (r) {
+	case r x:
+		if (abs(x) > max_binary128)
+			r = (result_t) { .i = x < 0 };
+		else
+			r = (result_t) { .r = real128(x) };
+		break;
+	default:
+		break;
+	}
+	return r;
+}
+
+int
+toint32(result_t r)
+{
+	return toint_gen(real32_result(r), 24, 8);
+}
+
+result_t
+toreal32(int x)
+{
+	return toreal_gen(x, 24, 8);
+}
+
+int
+toint64(result_t r)
+{
+	return toint_gen(real64_result(r), 53, 11);
+}
+
+result_t
+toreal64(int x)
+{
+	return toreal_gen(x, 53, 11);
+}
+
+int
+toint80_gen(result_t r, bool moto)
+{
+	int sign, exp, sig;
+	int prec = 64;
+	int exp_bits = 15;
+	int exp_bias = (1 << (exp_bits - 1)) - 1;
+
+	union switch (r) {
+	case i i:
+		sign = i ? 1 : 0;
+		exp = (1 << exp_bits) - 1;
+		if (moto)
+			sig = 0;
+		else
+			sig = (1 << (prec -1));
+		break;
+	case n:
+		sign = 0;
+		exp = (1 << exp_bits) - 1;
+		sig = (1 << (prec - 2));
+		break;
+	case r x:
+		real xc = abs(x);
+		real mant = mantissa(xc) * 2;
+		exp = exponent(xc) - 1;
+		sign = x < 0 ? 1 : 0;
+		if (xc == 0) {
+			exp = 0;
+			sig = 0;
+		} else {
+			exp += exp_bias;
+			if (moto) {
+				if (exp < 0) {
+					sig = mant * 2**(exp + prec - 1);
+					exp = 0;
+				} else {
+					sig = mant * 2**(prec-1);
+				}
+			} else {
+				if (exp <= 0) {
+					sig = mant * 2**(exp + prec - 2);
+					exp = 0;
+				} else {
+					sig = mant * 2**(prec-1);
+				}
+			}
+		}
+		break;
+	}
+
+	return (sign << (prec + exp_bits)) | (exp << (prec)) | sig;
+}
+
+result_t
+toreal80_gen(int x, bool moto)
+{
+	int prec = 64;
+	int exp_bits = 15;
+	int exp_bias = (1 << (exp_bits - 1)) - 1;
+
+	int sign = x >> (prec + exp_bits);
+	int exp = (x >> (prec)) & ((1 << exp_bits) - 1);
+	int sig = x & ((1 << prec) - 1);
+
+	if (exp == ((1 << exp_bits) - 1)) {
+		if (!moto)
+			sig &= ((1 << (prec -1)) - 1);
+		if (sig != 0)
+			return (result_t) { .n = ◊ };
+		return (result_t) { .i = (sign != 0) };
+	}
+
+	if (exp == 0) {
+		if (moto)
+			exp = 1 - prec - exp_bias;
+		else
+			exp = 2 - prec - exp_bias;
+		if (sig == 0)
+			prec = 1;
+		else
+			prec = 1 + floor(log2(sig));
+	} else {
+		exp = exp - exp_bias - (prec - 1);
+	}
+	real y = sig * 2 ** exp;
+	if (sign != 0)
+		y = -y;
+
+	return (result_t) { .r = imprecise(y, prec) };
+}
+
+int
+toint80(result_t r)
+{
+	return toint80_gen(real80_result(r), false);
+}
+
+result_t
+toreal80(int x)
+{
+	return toreal80_gen(x, false);
+}
+
+int
+toint80m(result_t r)
+{
+	return toint80_gen(real80m_result(r), true);
+}
+
+result_t
+toreal80m(int x)
+{
+	return toreal80_gen(x, true);
+}
+
+int
+toint128(result_t r)
+{
+	return toint_gen(real128_result(r), 113, 15);
+}
+
+result_t
+toreal128(int x)
+{
+	return toreal_gen(x, 113, 15);
+}
+
 typedef struct {
 	real(real) conv;
+	int(result_t)  toint;
+	result_t(int)  toreal;
 	int        precision;
+	int	   exp;
 	string     macro;
 	real       min_denorm;
 	real       min;
@@ -174,7 +490,10 @@ typedef struct {
 conv_t[] real_convs = {
 	{
 		.conv = real32,
+		.toint = toint32,
+		.toreal = toreal32,
 		.precision = 24,
+		.exp = 8,
 		.macro = "FN32",
 		.min_denorm = min_denorm_binary32,
 		.min = min_binary32,
@@ -182,7 +501,10 @@ conv_t[] real_convs = {
 	},
 	{
 		.conv = real64,
+		.toint = toint64,
+		.toreal = toreal64,
 		.precision = 53,
+		.exp = 11,
 		.macro = "FN64",
 		.min_denorm = min_denorm_binary64,
 		.min = min_binary64,
@@ -190,7 +512,10 @@ conv_t[] real_convs = {
 	},
 	{
 		.conv = real80,
+		.toint = toint80,
+		.toreal = toreal80,
 		.precision = 64,
+		.exp = 15,
 		.macro = "FN80",
 		.min_denorm = min_denorm_binary80,
 		.min = min_binary80,
@@ -198,7 +523,10 @@ conv_t[] real_convs = {
 	},
 	{
 		.conv = real80m,
+		.toint = toint80m,
+		.toreal = toreal80m,
 		.precision = 64,
+		.exp = 15,
 		.macro = "FN80M",
 		.min_denorm = min_denorm_binary80m,
 		.min = min_binary80m,
@@ -206,7 +534,10 @@ conv_t[] real_convs = {
 	},
 	{
 		.conv = real128,
+		.toint = toint128,
+		.toreal = toreal128,
 		.precision = 113,
+		.exp = 15,
 		.macro = "FN128",
 		.min_denorm = min_denorm_binary128,
 		.min = min_binary128,
@@ -215,12 +546,6 @@ conv_t[] real_convs = {
 };
 
 const int nformat = dim(real_convs);
-
-typedef union {
-	real	r;
-	bool	i;
-	void	n;
-} result_t;
 
 void
 print_one_real(real x, int i)
@@ -304,12 +629,15 @@ print_int_real(int x1, real[nformat] x2, result_t[nformat] y)
 	printf(") },\n");
 }
 
+int current_conversion;
+
 void
 compute_real_one(real x, real(real) f)
 {
 	real[nformat]	xp;
 	result_t[nformat] yp;
 	for (int i = 0; i < nformat; i++) {
+		current_conversion = i;
 		xp[i] = real_convs[i].conv(x);
 		try {
 			try {
@@ -329,8 +657,6 @@ compute_real_one(real x, real(real) f)
 	}
 	print_real(xp, yp);
 }
-
-int current_conversion;
 
 bool
 is_inf(real x)

@@ -142,6 +142,8 @@ main(void)
     d1 = asinh(d1);
     d1 = cbrt(d1);
     d1 = nextafter(d1, d2);
+    d1 = nextup(d1);
+    d1 = nextdown(d1);
     d1 = rint(d1);
     d1 = scalbn(d1, i1);
 
@@ -230,6 +232,8 @@ main(void)
     f1 = asinhf(f1);
     f1 = cbrtf(f1);
     f1 = nextafterf(f1, f2);
+    f1 = nextdownf(f1);
+    f1 = nextupf(f1);
     f1 = rintf(f1);
     f1 = scalbnf(f1, i1);
     f1 = log1pf(f1);

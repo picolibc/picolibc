@@ -1,0 +1,197 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+
+real
+copysign(real x, real y)
+{
+	x = abs(x);
+	if (y < 0)
+		x = -x;
+	return x;
+}
+
+real
+nextafter(real x, real y)
+{
+	real inf = real_convs[current_conversion].max * 2;
+	real xc = real_convs[current_conversion].conv(x);
+	real yc = real_convs[current_conversion].conv(y);
+
+	if (abs(xc) > real_convs[current_conversion].max)
+		xc = copysign(inf, x);
+	if (abs(yc) > real_convs[current_conversion].max)
+		yc = copysign(inf, y);
+
+	int xi = real_convs[current_conversion].toint((result_t) { .r = xc });
+	int step = 1;
+	if (xc < 0)
+		step = -1;
+	if (xc > yc)
+		step = -step;
+	else if (xc == yc)
+		step = 0;
+
+	if (real_convs[current_conversion].precision == 64) {
+		bool moto = real_convs[current_conversion].min == min_binary80m;
+
+#		if (abs(x) == 0x1p1000000)
+#			printf("moto %v x %a xc %a y %a yc %a\n", moto, x, xc, y, yc);
+		if (xc == 0) {
+			if (step > 0) {
+				xi = 1;
+			} else if (step < 0) {
+				xi = (1 << 79) + 1;
+			}
+		} else {
+			int sign = (xi >> 79) & 1;
+			int exp = (xi >> 64) & 0x7fff;
+			int sig = xi & ((1 << 64) - 1);
+
+			if (exp == 0x7fff && moto && sig == 0)
+				sig = (1 << 63);
+
+			int new_sig = sig + step;
+			if (new_sig == 0 && step != 0)
+				exp = 0;
+			else if (new_sig >= (1 << 64)) {
+				exp++;
+				new_sig >>= 1;
+			} else {
+				if (moto) {
+					if (new_sig < (1 << 63) && step < 0) {
+						if (exp > 1) {
+							exp--;
+							new_sig = (new_sig << 1) | 1;
+						} else if (exp == 1) {
+							exp--;
+							new_sig = (new_sig << 1) | 1;
+						}
+					}
+				} else {
+					if (new_sig < (1 << 63) && exp > 0) {
+						exp--;
+						if (exp > 0)
+							new_sig = (new_sig << 1) | 1;
+					}
+				}
+			}
+			if (exp == 0x7fff) {
+				if (moto)
+					new_sig = 0;
+				else
+					new_sig = (1 << 63);
+			}
+			int new_xi = (sign << 79) | (exp << 64) | new_sig;
+#			if (abs(x) == 0x1p1000000)
+#				printf("moto %v step %d sig 0x%x -> 0x%x xi 0x%x -> 0x%x\n", moto, step, sig, new_sig, xi, new_xi);
+			xi = new_xi;
+		}
+	} else {
+		if (xc == 0) {
+			if (step > 0) {
+				xi = 1;
+			} else if (step < 0) {
+				int sign = (real_convs[current_conversion].precision +
+					    real_convs[current_conversion].exp - 1);
+				xi = (1 << sign) + 1;
+			}
+		} else {
+			  xi += step;
+		}
+	}
+	result_t ret = real_convs[current_conversion].toreal(xi);
+
+	union switch(ret) {
+	case n:
+		raise infinity(xc < 0);
+	case i i:
+		raise infinity(i);
+	case r r:
+		return r;
+	}
+}
+
+real[] test_values = {
+	0,
+	0x1p1000000,
+	min_denorm_binary32,
+	min_binary32,
+	max_binary32,
+	0x1.fffffep0,
+	min_denorm_binary64,
+	min_binary64,
+	max_binary64,
+	0x1.fffffffffffffp+0,
+	min_denorm_binary80,
+	min_binary80,
+	max_binary80,
+	0x1.fffffffffffffffep0,
+	min_denorm_binary80m,
+	min_binary80m,
+	max_binary80m,
+	min_denorm_binary128,
+	min_binary128,
+	max_binary128,
+	0x1.ffffffffffffffffffffffffffffp0,
+};
+
+void
+do_sign(real x)
+{
+	real infinity = 0x1p100001;
+	compute_real_real(x, infinity, nextafter);
+	compute_real_real(x, 0, nextafter);
+	compute_real_real(x, -infinity, nextafter);
+	compute_real_real(-x, infinity, nextafter);
+	compute_real_real(-x, 0, nextafter);
+	compute_real_real(-x, -infinity, nextafter);
+}
+
+void
+main()
+{
+#	compute_real_real(0x8p-16386, 0, nextafter);
+#	return;
+
+	for (int i = 0; i < dim(test_values); i++)
+		do_sign(test_values[i]);
+
+	for (real x = min_denorm_binary32; x < max_binary32; x *= 111)
+		do_sign(x);
+}
+
+main();
