@@ -220,10 +220,10 @@ typedef union {
     long double value;
     struct {
 #ifdef __LP64__
-        int padh : 32;
+        int32_t padh;
 #endif
-        int       exp  : 16;
-        int       padl : 16;
+        int16_t   exp;
+        int16_t   padl;
         u_int32_t msw;
         u_int32_t lsw;
     } parts;
@@ -238,10 +238,10 @@ typedef union {
     struct {
         u_int32_t lsw;
         u_int32_t msw;
-        int       exp  : 16;
-        int       padl : 16;
+        int16_t   exp;
+        int16_t   padl;
 #ifdef __LP64__
-        int padh : 32;
+        int32_t padh;
 #endif
     } parts;
 } ieee_extended_shape_type;
