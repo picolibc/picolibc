@@ -26,15 +26,13 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#if !IO_VARIANT_IS_FLOAT(PRINTF_VARIANT) && defined(__IO_SMALL_ULTOA)
+#if defined(__IO_SMALL_ULTOA)
 
 /*
- * Enable fancy divmod for targets where we don't expect either
- * hardware division support or that software will commonly be using
- * the soft division code. That means platforms where 'long' is not at
- * least 64-bits get the fancy code for 64-bit values and platforms
- * where 'int' is not at least 32-bits also get the fancy code for
- * 32-bit values
+ * Enable fancy divmod when the conversion type is wider than 'long',
+ * where binary-to-decimal conversion would otherwise use slow soft
+ * division code (e.g. 64-bit division on 32-bit targets) which is
+ * often quite large as well
  */
 
 #if SIZEOF_ULTOA > __SIZEOF_LONG__
@@ -108,6 +106,11 @@ udivmod10(ultoa_unsigned_t n, char *rp)
     return q;
 }
 
+/*
+ * Digit extraction for the bases used by the printf converters: 2
+ * (when %b is enabled), 8, 10 and 16. Any other value falls back to
+ * division by ten, so callers must only pass those bases.
+ */
 static inline ultoa_unsigned_t
 udivmod(ultoa_unsigned_t val, int base, char *dig)
 {
