@@ -39,46 +39,52 @@ nextafterl(long double x, long double y)
         force_eval_long_double(opt_barrier_long_double(x) * x);
         return x;
     }
-    if (esx >= 0) { /* x > 0 */
-        if (esy < 0 || (ix > iy || ((ix == iy) && (hx > hy || ((hx == hy) && (lx > ly)))))) {
-            /* x > y, x -= ulp */
-            if (lx == 0) {
-                if ((hx & 0x7fffffff) == 0)
-                    esx -= 1;
-                hx = (hx - 1) | (hx & 0x80000000);
-            }
-            lx -= 1;
-        } else { /* x < y, x += ulp */
-            lx += 1;
-            if (lx == 0) {
-                hx = (hx + 1) | (hx & 0x80000000);
-                if ((hx & 0x7fffffff) == 0)
-                    esx += 1;
+#if LDBL_NBIT_INF == 0
+    if (ix == 0x7fff)
+        hx |= LDBL_NBIT;
+#endif
+
+    if ((esx >= 0) == (x > y)) {
+        /* x >= 0 and x > y or x < 0 and x < y, x -= ulp */
+        if (lx == 0) {
+            hx--;
+            if (hx == 0x7fffffff) {
+                /*
+                 * Handle denorms. On x86, normal values always have a
+                 * non-zero exponent and the MSB of the significand
+                 * set, while on m68k, normal values can have a zero
+                 * exponent as long as the MSB of the significant is
+                 * set.
+                 */
+#ifdef __m68k__
+                if (ix > 0) {
+                    esx--;
+                    hx |= 0x80000000;
+                }
+#else
+                if (ix > 1) {
+                    esx--;
+                    hx |= 0x80000000;
+                } else {
+                    esx = esx & ~0x7fff;
+                }
+#endif
             }
         }
-    } else { /* x < 0 */
-        if (esy >= 0 || (ix > iy || ((ix == iy) && (hx > hy || ((hx == hy) && (lx > ly)))))) {
-            /* x < y, x -= ulp */
-            if (lx == 0) {
-                if ((hx & 0x7fffffff) == 0)
-                    esx -= 1;
-                hx = (hx - 1) | (hx & 0x80000000);
-            }
-            lx -= 1;
-        } else { /* x > y, x += ulp */
-            lx += 1;
-            if (lx == 0) {
-                hx = (hx + 1) | (hx & 0x80000000);
-                if ((hx & 0x7fffffff) == 0)
-                    esx += 1;
-            }
+        lx -= 1;
+    } else { /* x < 0 and x < y or x >= 0 and x > y, x += ulp */
+        lx += 1;
+        if (lx == 0) {
+            hx = (hx + 1) | (hx & 0x80000000);
+            if ((hx & 0x7fffffff) == 0)
+                esx += 1;
         }
     }
-    esy = esx & 0x7fff;
-    if (esy == 0x7fff)
-        return __math_oflowl(esx & 0x8000); /* overflow  */
+    ix = esx & 0x7fff;
+    if (ix == 0x7fff)
+        return __math_oflowl(esx < 0); /* overflow  */
     SET_LDOUBLE_WORDS(x, esx, hx, lx);
-    if (esy == 0)
+    if (ix == 0)
         return __math_denorml(x);
     return x;
 }
