@@ -1184,11 +1184,11 @@ check_uflow(__float64 x)
 
 /* Set inexact exception */
 #if defined(FE_INEXACT) && !defined(__FLOAT64_NOEXCEPT)
-__float64 __math_inexact64(__float64 x);
-void      __math_set_inexact64(void);
+__float64 __math_inexact(__float64 x);
+void      __math_set_inexact(void);
 #else
-#define __math_inexact64(val)  (val)
-#define __math_set_inexact64() ((void)0)
+#define __math_inexact(val)  (val)
+#define __math_set_inexact() ((void)0)
 #endif
 
 #if WANT_ERRNO

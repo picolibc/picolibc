@@ -148,9 +148,9 @@ log1p64(__float64 x)
         }
         if (ax < 0x3e200000) {   /* |x| < 2**-29 */
             if (ax < 0x3c900000) /* |x| < 2**-54 */
-                return __math_inexact64(x);
+                return __math_inexact(x);
             else
-                return __math_inexact64(x - x * x * _F_64(0.5));
+                return __math_inexact(x - x * x * _F_64(0.5));
         }
         if (hx > 0 || hx <= ((__int32_t)0xbfd2bec3)) {
             k = 0;

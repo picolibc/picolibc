@@ -94,7 +94,7 @@ llrint64(__float64 x)
         if (sizeof(long long) == 4 && (__float64)LLONG_MIN - _F_64(1.0) < x
             && x < (__float64)LLONG_MIN) {
             if (nearbyint(x) == LLONG_MIN)
-                __math_set_inexact64();
+                __math_set_inexact();
             else
                 __math_set_invalid();
             return LLONG_MIN;

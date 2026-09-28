@@ -49,7 +49,7 @@ atanh64(__float64 x)
     if (ix == 0x3ff00000)
         return __math_divzero(x < 0);
     if (ix < 0x3e300000) /* x<2**-28 */
-        return __math_inexact64(x);
+        return __math_inexact(x);
     SET_HIGH_WORD(x, ix);
     if (ix < 0x3fe00000) { /* x < 0.5 */
         t = x + x;

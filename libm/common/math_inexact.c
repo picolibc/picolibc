@@ -40,13 +40,13 @@
 static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MIN, _F_64(0.0));
 
 HIDDEN void
-__math_set_inexact64(void)
+__math_set_inexact(void)
 {
     force_eval_float64(_F_64(1.0) + VAL);
 }
 
 HIDDEN __float64
-__math_inexact64(__float64 val)
+__math_inexact(__float64 val)
 {
     force_eval_float64(_F_64(1.0) + VAL);
     return val;

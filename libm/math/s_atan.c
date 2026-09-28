@@ -119,7 +119,7 @@ atan64(__float64 x)
     }
     if (ix < 0x3fdc0000) {   /* |x| < 0.4375 */
         if (ix < 0x3e200000) /* |x| < 2^-29 */
-            return __math_inexact64(x);
+            return __math_inexact(x);
         id = -1;
     } else {
         x = fabs64(x);
