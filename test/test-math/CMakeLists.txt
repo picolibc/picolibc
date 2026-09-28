@@ -74,6 +74,9 @@ set(tests_real_other
   test-j1
   test-jn
   test-lgamma
+  test-nextafter
+  test-nextdown
+  test-nextup
   test-remainder
   test-remquo-quo
   test-round

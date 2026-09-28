@@ -38,12 +38,8 @@ load "test-next-common.5c"
 void
 do_sign(real x)
 {
-	compute_real_real(x, r_inf, nextafter);
-	compute_real_real(x, 0, nextafter);
-	compute_real_real(x, -r_inf, nextafter);
-	compute_real_real(-x, r_inf, nextafter);
-	compute_real_real(-x, 0, nextafter);
-	compute_real_real(-x, -r_inf, nextafter);
+	compute_real_one(x, nextup);
+	compute_real_one(-x, nextup);
 }
 
 void
@@ -55,13 +51,13 @@ do_sign_range(real r)
 			real	x = r;
 			for (int j = 0; j < 1; j++) {
 				current_conversion = i;
-				x = nextafter(x, -r_inf);
+				x = nextdown(x);
 			}
 
 			for (int j = 0; j <= 2; j++) {
 				do_sign(x);
 				current_conversion = i;
-				x = nextafter(x, r_inf);
+				x = nextup(x);
 			}
 		} catch infinity(bool sign) {
 		}

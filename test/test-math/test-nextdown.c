@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2026 Keith Packard
+ * Copyright © 2025 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,49 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-load "test-next-common.5c"
+#define _ISOC23_SOURCE
+#define TEST_VECTORS "test-nextdown.h"
+#define TEST_FUNC    nextdown
 
-void
-do_sign(real x)
-{
-	compute_real_real(x, r_inf, nextafter);
-	compute_real_real(x, 0, nextafter);
-	compute_real_real(x, -r_inf, nextafter);
-	compute_real_real(-x, r_inf, nextafter);
-	compute_real_real(-x, 0, nextafter);
-	compute_real_real(-x, -r_inf, nextafter);
-}
-
-void
-do_sign_range(real r)
-{
-	for (int i = 0; i < nformat; i++) {
-
-		try {
-			real	x = r;
-			for (int j = 0; j < 1; j++) {
-				current_conversion = i;
-				x = nextafter(x, -r_inf);
-			}
-
-			for (int j = 0; j <= 2; j++) {
-				do_sign(x);
-				current_conversion = i;
-				x = nextafter(x, r_inf);
-			}
-		} catch infinity(bool sign) {
-		}
-	}
-}
-
-void
-main()
-{
-	for (int i = 0; i < dim(test_values); i++)
-		do_sign_range(test_values[i]);
-
-	for (real x = min_denorm_binary32; x < max_binary32; x *= 111)
-		do_sign(x);
-}
-
-main();
+#include "test-real-one.h"
