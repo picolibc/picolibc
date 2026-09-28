@@ -45,8 +45,11 @@
 #if __FLT_MANT_DIG__ == 24
 #define HAVE_FLOAT32
 typedef float float32_t;
-#define float32_suffix f
-#define float_32(x)    (x##f)
+#define float32_suffix      f
+#define float_32(x)         (x##f)
+#define FLOAT_32_MAX        FLT_MAX
+#define FLOAT_32_MIN        FLT_MIN
+#define FLOAT_32_DENORM_MIN __FLT_DENORM_MIN__
 #ifdef __HAVE_FAST_FMAF
 #define __HAVE_FAST_FMA_32
 #endif
@@ -61,7 +64,10 @@ typedef float float32_t;
 #define HAVE_FLOAT64
 typedef double float64_t;
 #define float64_suffix
-#define float_64(x) (x)
+#define float_64(x)         (x)
+#define FLOAT_64_MAX        DBL_MAX
+#define FLOAT_64_MIN        DBL_MIN
+#define FLOAT_64_DENORM_MIN __DBL_DENORM_MIN__
 #ifdef __HAVE_FAST_FMA
 #define __HAVE_FAST_FMA_64
 #endif
@@ -72,8 +78,11 @@ typedef double float64_t;
 #elif __LDBL_MANT_DIG__ == 53
 #define HAVE_FLOAT64
 typedef long double float64_t;
-#define float64_suffix l
-#define float_64(x)    (x##l)
+#define float64_suffix      l
+#define float_64(x)         (x##l)
+#define FLOAT_64_MAX        LDBL_MAX
+#define FLOAT_64_MIN        LDBL_MIN
+#define FLOAT_64_DENORM_MIN __LDBL_DENORM_MIN__
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_64
 #endif
@@ -86,8 +95,11 @@ typedef long double float64_t;
 #if __LDBL_MANT_DIG__ == 64
 #define HAVE_FLOAT80
 typedef long double float80_t;
-#define float80_suffix l
-#define float_80(x)    (x##l)
+#define float80_suffix      l
+#define float_80(x)         (x##l)
+#define FLOAT_80_MAX        LDBL_MAX
+#define FLOAT_80_MIN        LDBL_MIN
+#define FLOAT_80_DENORM_MIN __LDBL_DENORM_MIN__
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_80
 #endif
@@ -100,8 +112,11 @@ typedef long double float80_t;
 #if __LDBL_MANT_DIG__ == 113
 #define HAVE_FLOAT128
 typedef long double float128_t;
-#define float128_suffix l
-#define float_128(x)    (x##l)
+#define float128_suffix      l
+#define float_128(x)         (x##l)
+#define FLOAT_128_MAX        LDBL_MAX
+#define FLOAT_128_MIN        LDBL_MIN
+#define FLOAT_128_DENORM_MIN __LDBL_DENORM_MIN__
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_128
 #endif
@@ -121,6 +136,9 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p12
 #define float_f(x)        float_32(x)
 #define _isint_float_f(x) _isint_float_32(x)
+#define FLOAT_MAX         FLOAT_32_MAX
+#define FLOAT_MIN         FLOAT_32_MIN
+#define FLOAT_DENORM_MIN  FLOAT_32_DENORM_MIN
 #ifdef __HAVE_FAST_FMA_32
 #define __HAVE_FAST_FMA_F
 #endif
@@ -159,6 +177,9 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p27
 #define float_f(x)        float_64(x)
 #define _isint_float_f(x) _isint_float_64(x)
+#define FLOAT_MAX         FLOAT_64_MAX
+#define FLOAT_MIN         FLOAT_64_MIN
+#define FLOAT_DENORM_MIN  FLOAT_64_DENORM_MIN
 #ifdef __HAVE_FAST_FMA_64
 #define __HAVE_FAST_FMA_F
 #endif
@@ -195,6 +216,9 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p32
 #define float_f(x)        float_80(x)
 #define _isint_float_f(x) _isint_float_80(x)
+#define FLOAT_MAX         FLOAT_80_MAX
+#define FLOAT_MIN         FLOAT_80_MIN
+#define FLOAT_DENORM_MIN  FLOAT_80_DENORM_MIN
 #ifdef __HAVE_FAST_FMA_80
 #define __HAVE_FAST_FMA_F
 #endif
@@ -235,6 +259,9 @@ typedef long double float128_t;
 #define SPLIT_VAL         0x1p57
 #define float_f(x)        float_128(x)
 #define _isint_float_f(x) _isint_float_128(x)
+#define FLOAT_MAX         FLOAT_128_MAX
+#define FLOAT_MIN         FLOAT_128_MIN
+#define FLOAT_DENORM_MIN  FLOAT_128_DENORM_MIN
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F
 #endif

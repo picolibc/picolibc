@@ -721,6 +721,10 @@ double   cospi(double) __picolibc_export;
 float    cospif(float) __picolibc_export;
 double   exp10(double) __picolibc_export;
 float    exp10f(float) __picolibc_export;
+double   exp10m1(double) __picolibc_export;
+float    exp10m1f(float) __picolibc_export;
+double   exp2m1(double) __picolibc_export;
+float    exp2m1f(float) __picolibc_export;
 float    fadd(double, double) __picolibc_export;
 float    fdiv(double, double) __picolibc_export;
 float    ffma(double, double, double) __picolibc_export;
@@ -739,12 +743,6 @@ double   tanpi(double) __picolibc_export;
 float    tanpif(float) __picolibc_export;
 
 /* Missing functions */
-
-double   exp10m1(double) __picolibc_export; /* XXX */
-float    exp10m1f(float) __picolibc_export; /* XXX */
-
-double   exp2m1(double) __picolibc_export; /* XXX */
-float    exp2m1f(float) __picolibc_export; /* XXX */
 
 double   fmaximum(double, double) __picolibc_export; /* XXX */
 float    fmaximumf(float, float) __picolibc_export;  /* XXX */
@@ -821,6 +819,8 @@ double      dmull(long double, long double) __picolibc_export;
 double      dsqrtl(long double) __picolibc_export;
 double      dsubl(long double, long double) __picolibc_export;
 long double exp10l(long double) __picolibc_export;
+long double exp10m1l(long double) __picolibc_export;
+long double exp2m1l(long double) __picolibc_export;
 float       faddl(long double, long double) __picolibc_export;
 float       fdivl(long double, long double) __picolibc_export;
 float       ffmal(long double, long double, long double) __picolibc_export;
@@ -834,8 +834,6 @@ long double sinpil(long double) __picolibc_export;
 long double tanpil(long double) __picolibc_export;
 
 /* Missing functions */
-long double exp10m1l(long double) __picolibc_export;                       /* XXX */
-long double exp2m1l(long double) __picolibc_export;                        /* XXX */
 long double fmaximuml(long double, long double) __picolibc_export;         /* XXX */
 long double fmaximum_magl(long double, long double) __picolibc_export;     /* XXX */
 long double fmaximum_mag_numl(long double, long double) __picolibc_export; /* XXX */

@@ -161,7 +161,11 @@ f_mul_f(float_t x, float_t y)
 #ifdef __HAVE_FAST_FMA_F
     /* 2mul with FMA */
     float_t hi = x * y;
-    float_t lo = fma_f(x, y, -hi);
+    float_t lo;
+    if (!isfinite(hi))
+        lo = 0;
+    else
+        lo = fma_f(x, y, -hi);
     return (ff_t) {
         .hi = hi,
         .lo = lo,
@@ -174,14 +178,21 @@ f_mul_f(float_t x, float_t y)
     ff_t    xs = split_f(xi);
     ff_t    ys = split_f(yi);
     float_t r1 = xi * yi;
-    float_t t1 = xs.hi * ys.hi - r1;
-    float_t t2 = xs.hi * ys.lo + t1;
-    float_t t3 = xs.lo * ys.hi + t2;
-    float_t r2 = xs.lo * ys.lo + t3;
-    float_t hi = ldexp_f(r1, xexp + yexp);
-    float_t lo = ldexp_f(r2, xexp + yexp);
-    if (!isfinite(hi))
+    float_t hi, lo;
+    if (!isfinite(r1)) {
+        hi = r1;
         lo = 0;
+    } else {
+        float_t t1 = xs.hi * ys.hi - r1;
+        float_t t2 = xs.hi * ys.lo + t1;
+        float_t t3 = xs.lo * ys.hi + t2;
+        float_t r2 = xs.lo * ys.lo + t3;
+        hi = ldexp_f(r1, xexp + yexp);
+        if (!isfinite(hi))
+            lo = 0;
+        else
+            lo = ldexp_f(r2, xexp + yexp);
+    }
     return (ff_t) { .hi = hi, .lo = lo };
 #endif
 }
@@ -192,11 +203,17 @@ static inline ff_t
 ff_mul_f(ff_t x, float_t y)
 {
 #ifdef __HAVE_FAST_FMA_F
-    ff_t    c = f_mul_f(x.hi, y);
+    ff_t c = f_mul_f(x.hi, y);
+    if (isinf(c.hi))
+        return c;
     float_t cl3 = fma_f(x.lo, y, c.lo);
     return f_add_f_fast(c.hi, cl3);
 #else
-    ff_t    c = f_mul_f(x.hi, y);
+    if (x.hi == 0 || y == 0)
+        return (ff_t) { .hi = 0, .lo = 0 };
+    ff_t c = f_mul_f(x.hi, y);
+    if (isinf(c.hi))
+        return c;
     float_t cl2 = x.lo * y;
     ff_t    t = f_add_f_fast(c.hi, cl2);
     float_t tl2 = t.lo + c.lo;

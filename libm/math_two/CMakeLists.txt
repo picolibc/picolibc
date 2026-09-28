@@ -1,7 +1,7 @@
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2022 Keith Packard
+# Copyright © 2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -32,13 +32,99 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-
-add_subdirectory(machine)
-add_subdirectory(common)
-add_subdirectory(math)
-add_subdirectory(ld)
-add_subdirectory(fenv)
-add_subdirectory(math_two)
-if(${__HAVE_COMPLEX})
-  add_subdirectory(complex)
-endif()
+picolibc_sources(
+  pi_32.c
+  pi_64.c
+  pi_80.c
+  pi_128.c
+  inv_pi_32.c
+  inv_pi_64.c
+  inv_pi_80.c
+  inv_pi_128.c
+  rem_half_32.c
+  rem_half_64.c
+  rem_half_80.c
+  rem_half_128.c
+  acospi_32.c
+  acospi_64.c
+  acospi_80.c
+  acospi_128.c
+  asinpi_32.c
+  asinpi_64.c
+  asinpi_80.c
+  asinpi_128.c
+  atanpi_32.c
+  atanpi_64.c
+  atanpi_80.c
+  atanpi_128.c
+  atan2pi_32.c
+  atan2pi_64.c
+  atan2pi_80.c
+  atan2pi_128.c
+  canonicalize_32.c
+  canonicalize_64.c
+  canonicalize_80.c
+  canonicalize_128.c
+  compoundn_32.c
+  compoundn_64.c
+  compoundn_80.c
+  compoundn_128.c
+  cospi_32.c
+  cospi_64.c
+  cospi_80.c
+  cospi_128.c
+  dadd_80.c
+  dadd_128.c
+  ddiv_80.c
+  ddiv_128.c
+  dmul_80.c
+  dmul_128.c
+  dsub_80.c
+  dsub_128.c
+  dsqrt_80.c
+  dsqrt_128.c
+  dfma_80.c
+  dfma_128.c
+  exp10m1_32.c
+  exp10m1_64.c
+  exp10m1_80.c
+  exp10m1_128.c
+  exp2m1_32.c
+  exp2m1_64.c
+  exp2m1_80.c
+  exp2m1_128.c
+  fadd_64.c
+  fadd_80.c
+  fadd_128.c
+  fdiv_64.c
+  fdiv_80.c
+  fdiv_128.c
+  fmul_64.c
+  fmul_80.c
+  fmul_128.c
+  fsub_64.c
+  fsub_80.c
+  fsub_128.c
+  fsqrt_64.c
+  fsqrt_80.c
+  fsqrt_128.c
+  ffma_64.c
+  ffma_80.c
+  ffma_128.c
+  ff_pown_32.c
+  ff_pown_64.c
+  ff_pown_80.c
+  ff_pown_128.c
+  pown_32.c
+  pown_64.c
+  pown_80.c
+  pown_128.c
+  sinpi_32.c
+  sinpi_64.c
+  sinpi_80.c
+  sinpi_128.c
+  tanpi_32.c
+  tanpi_64.c
+  tanpi_80.c
+  tanpi_128.c
+  )
