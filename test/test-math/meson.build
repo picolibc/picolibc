@@ -64,6 +64,8 @@ tests_real_exp = [
   'test-exp10',
   'test-exp2',
   'test-expm1',
+  'test-exp10m1',
+  'test-exp2m1',
   'test-log',
   'test-log10',
   'test-log1p',
@@ -152,9 +154,10 @@ tests += tests_other
 functions = [ 'acos', 'acosh', 'acospi', 'asin', 'asinh', 'asinpi',
               'atan', 'atanh', 'atanpi', 'cbrt', 'cos', 'cosh',
               'cospi', 'erf', 'erfc', 'exp', 'exp10', 'exp2', 'expm1',
-              'j0', 'j1', 'lgamma', 'log', 'log10', 'log1p', 'log2',
-              'sin', 'sinpi', 'sincos_cos', 'sincos_sin', 'sinh',
-              'sqrt', 'tan', 'tanh', 'tanpi', 'tgamma', 'y0', 'y1', ]
+              'exp10m1', 'exp2m1', 'j0', 'j1', 'lgamma', 'log',
+              'log10', 'log1p', 'log2', 'sin', 'sinpi', 'sincos_cos',
+              'sincos_sin', 'sinh', 'sqrt', 'tan', 'tanh', 'tanpi',
+              'tgamma', 'y0', 'y1', ]
 
 test_extra_libs = {}
 

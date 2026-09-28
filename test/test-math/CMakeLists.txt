@@ -56,6 +56,8 @@ set(tests_real_exp
   test-exp10
   test-exp2
   test-expm1
+  test-exp2m1
+  test-exp10m1
   test-log
   test-log10
   test-log1p

@@ -33,30 +33,8 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-load "test-float.5c"
+#define _ISOC23_SOURCE
+#define TEST_VECTORS "test-exp10m1.h"
+#define TEST_FUNC    exp10m1
 
-real[] test_values = {
-        0x1p-23,
-	-0x1p100001,
-};
-
-real
-expm1(real x)
-{
-	real xi = imprecise(x, 2048);
-	return exp(xi) - 1;
-}
-
-void
-main()
-{
-        for (int i = 0; i < dim(test_values); i++)
-                compute_real_one(test_values[i], expm1);
-	for (real r = 1e-38; r < 87; r *= 1.5) {
-		real ri = imprecise(r, prec);
-		compute_real_one(ri, expm1);
-		compute_real_one(-ri, expm1);
-	}
-}
-
-main();
+#include "test-real-one.h"

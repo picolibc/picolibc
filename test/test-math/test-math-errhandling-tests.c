@@ -627,6 +627,88 @@ makemathname(test_expm1_negbig)(void)
     return makemathname(expm1)(-makemathname(big));
 }
 
+static FLOAT_T
+makemathname(test_exp10m1_qnan)(void)
+{
+    return makemathname(exp10m1)(makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_exp10m1_snan)(void)
+{
+    return makemathname(exp10m1)(makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_exp10m1_0)(void)
+{
+    return makemathname(exp10m1)(makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_exp10m1_neg0)(void)
+{
+    return makemathname(exp10m1)(-makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_exp10m1_inf)(void)
+{
+    return makemathname(exp10m1)(makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_exp10m1_neginf)(void)
+{
+    return makemathname(exp10m1)(-makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_exp10m1_big)(void)
+{
+    return makemathname(exp10m1)(makemathname(big));
+}
+static FLOAT_T
+makemathname(test_exp10m1_negbig)(void)
+{
+    return makemathname(exp10m1)(-makemathname(big));
+}
+
+static FLOAT_T
+makemathname(test_exp2m1_qnan)(void)
+{
+    return makemathname(exp2m1)(makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_exp2m1_snan)(void)
+{
+    return makemathname(exp2m1)(makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_exp2m1_0)(void)
+{
+    return makemathname(exp2m1)(makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_exp2m1_neg0)(void)
+{
+    return makemathname(exp2m1)(-makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_exp2m1_inf)(void)
+{
+    return makemathname(exp2m1)(makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_exp2m1_neginf)(void)
+{
+    return makemathname(exp2m1)(-makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_exp2m1_big)(void)
+{
+    return makemathname(exp2m1)(makemathname(big));
+}
+static FLOAT_T
+makemathname(test_exp2m1_negbig)(void)
+{
+    return makemathname(exp2m1)(-makemathname(big));
+}
+
 #endif /* SIMPLE_MATH_ONLY */
 
 static FLOAT_T
@@ -3296,6 +3378,34 @@ TEST_CONST struct {
     TEST(expm1_negbig, -(FLOAT_T)1.0, 0, 0),
 #else
     TEST(expm1_negbig, -(FLOAT_T)1.0, FE_INEXACT, 0),
+#endif
+
+    TEST(exp10m1_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(exp10m1_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(exp10m1_0, (FLOAT_T)0.0, 0, 0),
+    TEST(exp10m1_neg0, -(FLOAT_T)0.0, 0, 0),
+    TEST(exp10m1_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(exp10m1_neginf, -(FLOAT_T)1.0, 0, 0),
+    TEST(exp10m1_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+#if !defined(__PICOLIBC__) && !defined(TEST_FLOAT)
+    /* glibc returns incorrect value on x86 */
+    TEST(exp10m1_negbig, -(FLOAT_T)1.0, 0, 0),
+#else
+    TEST(exp10m1_negbig, -(FLOAT_T)1.0, FE_INEXACT, 0),
+#endif
+
+    TEST(exp2m1_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(exp2m1_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(exp2m1_0, (FLOAT_T)0.0, 0, 0),
+    TEST(exp2m1_neg0, -(FLOAT_T)0.0, 0, 0),
+    TEST(exp2m1_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(exp2m1_neginf, -(FLOAT_T)1.0, 0, 0),
+    TEST(exp2m1_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+#if !defined(__PICOLIBC__) && !defined(TEST_FLOAT)
+    /* glibc returns incorrect value on x86 */
+    TEST(exp2m1_negbig, -(FLOAT_T)1.0, 0, 0),
+#else
+    TEST(exp2m1_negbig, -(FLOAT_T)1.0, FE_INEXACT, 0),
 #endif
 
 #endif

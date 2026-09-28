@@ -31,6 +31,8 @@ REAL_EXP = \
 	test-exp10.h \
 	test-exp2.h \
 	test-expm1.h \
+	test-exp10m1.h \
+	test-exp2m1.h \
 	test-log.h \
 	test-log10.h \
 	test-log1p.h \

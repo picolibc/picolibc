@@ -41,21 +41,21 @@ real[] test_values = {
 };
 
 real
-expm1(real x)
+exp10m1(real x)
 {
 	real xi = imprecise(x, 2048);
-	return exp(xi) - 1;
+	return pow(10, xi) - 1;
 }
 
 void
 main()
 {
         for (int i = 0; i < dim(test_values); i++)
-                compute_real_one(test_values[i], expm1);
+                compute_real_one(test_values[i], exp10m1);
 	for (real r = 1e-38; r < 87; r *= 1.5) {
 		real ri = imprecise(r, prec);
-		compute_real_one(ri, expm1);
-		compute_real_one(-ri, expm1);
+		compute_real_one(ri, exp10m1);
+		compute_real_one(-ri, exp10m1);
 	}
 }
 

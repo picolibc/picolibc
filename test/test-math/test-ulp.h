@@ -72,6 +72,8 @@ static TEST_CONST math_ulps_t math_ulps[] = {
 #endif
     { .name = "exp2",       .b32 = 1,       .b64 = 1,       .b80 = 2,       .b128 = 0       },
     { .name = "expm1",      .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
+    { .name = "exp10m1",    .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
+    { .name = "exp2m1",     .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "log10",      .b32 = 2,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "log1p",      .b32 = 1,       .b64 = 1,       .b80 = 2,       .b128 = 1       },
     { .name = "log2",       .b32 = 2,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
@@ -192,6 +194,8 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "exp10", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "exp2", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "expm1", .b32 = 0, .b64 = 1, .b80 = 2, .b128 = 1 },
+    { .name = "exp10m1", .b32 = 2, .b64 = 2, .b80 = 2, .b128 = 2 },
+    { .name = "exp2m1", .b32 = 1, .b64 = 2, .b80 = 2, .b128 = 2 },
     { .name = "log", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "log10", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "log1p", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
