@@ -118,11 +118,15 @@ f_add_f(float_t a, float_t b)
     float_t s, ap, bp, da, db, t;
 
     s = a + b;
-    ap = s - b;
-    bp = s - ap;
-    da = a - ap;
-    db = b - bp;
-    t = da + db;
+    if (isinf(s))
+        t = 0;
+    else {
+        ap = s - b;
+        bp = s - ap;
+        da = a - ap;
+        db = b - bp;
+        t = da + db;
+    }
     return (ff_t) { .hi = s, .lo = t };
 }
 
