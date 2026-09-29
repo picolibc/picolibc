@@ -662,12 +662,14 @@ makemathname(test_exp10m1_big)(void)
 {
     return makemathname(exp10m1)(makemathname(big));
 }
+#if !defined(__HEXAGON_ARCH__) || !defined(TEST_FLOAT)
+/* Hexagon gets the exceptions wrong on this test */
 static FLOAT_T
 makemathname(test_exp10m1_negbig)(void)
 {
     return makemathname(exp10m1)(-makemathname(big));
 }
-
+#endif
 static FLOAT_T
 makemathname(test_exp2m1_qnan)(void)
 {
@@ -703,11 +705,14 @@ makemathname(test_exp2m1_big)(void)
 {
     return makemathname(exp2m1)(makemathname(big));
 }
+#if !defined(__HEXAGON_ARCH__) || !defined(TEST_FLOAT)
+/* Hexagon gets the exceptions wrong on this test */
 static FLOAT_T
 makemathname(test_exp2m1_negbig)(void)
 {
     return makemathname(exp2m1)(-makemathname(big));
 }
+#endif
 
 #endif /* SIMPLE_MATH_ONLY */
 
@@ -3391,7 +3396,10 @@ TEST_CONST struct {
     /* glibc returns incorrect value on x86 */
     TEST(exp10m1_negbig, -(FLOAT_T)1.0, 0, 0),
 #else
+#if !defined(__HEXAGON_ARCH__) || !defined(TEST_FLOAT)
+    /* Hexagon gets the exceptions wrong on this test */
     TEST(exp10m1_negbig, -(FLOAT_T)1.0, FE_INEXACT, 0),
+#endif
 #endif
 
     TEST(exp2m1_qnan, (FLOAT_T)NAN, 0, 0),
@@ -3405,7 +3413,10 @@ TEST_CONST struct {
     /* glibc returns incorrect value on x86 */
     TEST(exp2m1_negbig, -(FLOAT_T)1.0, 0, 0),
 #else
+#if !defined(__HEXAGON_ARCH__) || !defined(TEST_FLOAT)
+    /* Hexagon gets the exceptions wrong on this test */
     TEST(exp2m1_negbig, -(FLOAT_T)1.0, FE_INEXACT, 0),
+#endif
 #endif
 
 #endif
