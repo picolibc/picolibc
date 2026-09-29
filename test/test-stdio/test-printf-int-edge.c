@@ -80,6 +80,7 @@ compare(const char *what, const char *got, int n, const char *want)
     }
 }
 
+#ifdef _HAS_IO_LONG_LONG
 static void
 check_ull(const char *what, const char *fmt, unsigned long long v, int neg, int base,
           unsigned long long mag)
@@ -90,6 +91,7 @@ check_ull(const char *what, const char *fmt, unsigned long long v, int neg, int 
     ref_ull(mag, base, neg, want);
     compare(what, got, snprintf(got, sizeof(got), fmt, v), want);
 }
+#endif
 
 static void
 check_ul(const char *what, const char *fmt, unsigned long v, int neg, int base, unsigned long mag)
@@ -101,6 +103,7 @@ check_ul(const char *what, const char *fmt, unsigned long v, int neg, int base, 
     compare(what, got, snprintf(got, sizeof(got), fmt, v), want);
 }
 
+#ifdef _HAS_IO_LONG_LONG
 static void
 check_ll(const char *what, const char *fmt, long long v, int neg, int base, unsigned long long mag)
 {
@@ -110,6 +113,7 @@ check_ll(const char *what, const char *fmt, long long v, int neg, int base, unsi
     ref_ull(mag, base, neg, want);
     compare(what, got, snprintf(got, sizeof(got), fmt, v), want);
 }
+#endif
 
 static void
 check_l(const char *what, const char *fmt, long v, int neg, int base, unsigned long mag)
@@ -164,19 +168,40 @@ test_truncation(void)
     int  len;
 
     /* return value is the length which would have been written */
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
     n = snprintf(buf, 4, "%d", 123456789);
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic pop
+#endif
     if (n != 9 || strcmp(buf, "123") != 0) {
         printf("truncate 4: got \"%s\" (%d)\n", buf, n);
         errors++;
     }
 
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
     n = snprintf(buf, 1, "%d", 42);
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic pop
+#endif
     if (n != 2 || buf[0] != '\0') {
         printf("truncate 1: got \"%s\" (%d)\n", buf, n);
         errors++;
     }
 
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
     n = snprintf(buf, 0, "%d", 42);
+#if ((__GNUC__ == 4 && __GNUC_MINOR__ >= 2) || __GNUC__ > 4)
+#pragma GCC diagnostic pop
+#endif
     if (n != 2) {
         printf("truncate 0: got (%d)\n", n);
         errors++;
