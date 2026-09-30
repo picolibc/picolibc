@@ -501,9 +501,6 @@ main(void)
     d1 = pown(d1, li1);
     f1 = pownf(f1, li1);
 
-#ifndef __PICOLIBC__
-    /* Missing functions */
-
     d1 = exp10m1(d1);
     f1 = exp10m1f(f1);
 
@@ -543,18 +540,9 @@ main(void)
 
     f1 = fmul(d1, d2);
 
-    d1 = fromfp(d1, i1, u1);
-    f1 = fromfpf(f1, i1, u1);
-
-    d1 = fromfpx(d1, i1, u1);
-    f1 = fromfpxf(f1, i1, u1);
-
     f1 = fsqrt(d1);
 
     f1 = fsub(d1, d2);
-
-    li1 = llogb(d1);
-    li1 = llogbf(d1);
 
     d1 = log10p1(d1);
     f1 = log10p1f(f1);
@@ -570,6 +558,18 @@ main(void)
 
     d1 = nextup(d1);
     f1 = nextupf(f1);
+
+#ifndef __PICOLIBC__
+    /* Missing functions */
+
+    d1 = fromfp(d1, i1, u1);
+    f1 = fromfpf(f1, i1, u1);
+
+    d1 = fromfpx(d1, i1, u1);
+    f1 = fromfpxf(f1, i1, u1);
+
+    li1 = llogb(d1);
+    li1 = llogbf(d1);
 
     d1 = powr(d1, d2);
     f1 = powrf(f1, f2);
@@ -598,8 +598,6 @@ main(void)
     l1 = compoundnl(l1, lli1);
     l1 = pownl(l1, li1);
 
-#ifndef __PICOLIBC__
-    /* Missing functions */
     l1 = exp10m1l(l1);
     l1 = exp2m1l(l1);
 
@@ -613,23 +611,26 @@ main(void)
     l1 = fminimum_mag_numl(l1, l2);
     l1 = fminimum_numl(l1, l2);
 
+    f1 = fsubl(l1, l2);
+    d1 = dsubl(l1, l2);
+
+    l1 = log10p1l(l1);
+    l1 = log2p1l(l1);
+    l1 = logp1l(l1);
+
+    l1 = nextdownl(l1);
+    l1 = nextupl(l1);
+
+#ifndef __PICOLIBC__
+    /* Missing functions */
     l1 = fromfp(l1, i1, u1);
     l1 = fromfpx(l1, i1, u1);
 
     f1 = fsqrtl(l1);
     d1 = dsqrtl(l1);
 
-    f1 = fsubl(l1, l2);
-    d1 = dsubl(l1, l2);
-
     li1 = llogbl(l1);
 
-    l1 = log10p1l(l1);
-    l1 = log2p1l(l1);
-    l1 = logp1l(l1);
-
-    l1 = nextdown(l1);
-    l1 = nextup(l1);
     l1 = powr(l1, l2);
     l1 = rootnl(l1, li1);
     l1 = rsqrtl(l1);
