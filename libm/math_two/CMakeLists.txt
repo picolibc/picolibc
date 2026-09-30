@@ -167,6 +167,14 @@ picolibc_sources(
   ff_pown_64.c
   ff_pown_80.c
   ff_pown_128.c
+  log10p1_32.c
+  log10p1_64.c
+  log10p1_80.c
+  log10p1_128.c
+  log2p1_32.c
+  log2p1_64.c
+  log2p1_80.c
+  log2p1_128.c
   pown_32.c
   pown_64.c
   pown_80.c

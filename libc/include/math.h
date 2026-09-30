@@ -747,6 +747,12 @@ float    fminimum_numf(float, float) __picolibc_export;
 float    fmul(double, double) __picolibc_export;
 float    fsqrt(double) __picolibc_export;
 float    fsub(double, double) __picolibc_export;
+double   log10p1(double) __picolibc_export;
+float    log10p1f(float) __picolibc_export;
+double   log2p1(double) __picolibc_export;
+float    log2p1f(float) __picolibc_export;
+double   logp1(double) __picolibc_export;
+float    logp1f(float) __picolibc_export;
 double   nextdown(double) __picolibc_export;
 float    nextdownf(float) __picolibc_export;
 double   nextup(double) __picolibc_export;
@@ -768,15 +774,6 @@ float    fromfpxf(float, int, unsigned int) __picolibc_export; /* XXX */
 
 long int llogb(double) __picolibc_export; /* XXX */
 long int llogbf(float) __picolibc_export; /* XXX */
-
-double   log10p1(double) __picolibc_export; /* XXX */
-float    log10p1f(float) __picolibc_export; /* XXX */
-
-double   log2p1(double) __picolibc_export; /* XXX */
-float    log2p1f(float) __picolibc_export; /* XXX */
-
-double   logp1(double) __picolibc_export; /* XXX */
-float    logp1f(float) __picolibc_export; /* XXX */
 
 double   powr(double, double) __picolibc_export; /* XXX */
 float    powrf(float, float) __picolibc_export;  /* XXX */
@@ -827,6 +824,9 @@ long double fminimum_numl(long double, long double) __picolibc_export;
 float       fmull(long double, long double) __picolibc_export;
 float       fsqrtl(long double) __picolibc_export;
 float       fsubl(long double, long double) __picolibc_export;
+long double log10p1l(long double) __picolibc_export;
+long double log2p1l(long double) __picolibc_export;
+long double logp1l(long double) __picolibc_export;
 long double nextdownl(long double) __picolibc_export;
 long double nextupl(long double) __picolibc_export;
 long double pownl(long double, long long int) __picolibc_export;
@@ -837,9 +837,6 @@ long double tanpil(long double) __picolibc_export;
 long double fromfpl(long double, int, unsigned int) __picolibc_export;   /* XXX */
 long double fromfpxl(long double, int, unsigned int) __picolibc_export;  /* XXX */
 long int    llogbl(long double) __picolibc_export;                       /* XXX */
-long double log10p1l(long double) __picolibc_export;                     /* XXX */
-long double log2p1l(long double) __picolibc_export;                      /* XXX */
-long double logp1l(long double) __picolibc_export;                       /* XXX */
 long double powrl(long double, long double) __picolibc_export;           /* XXX */
 long double rootnl(long double, long long int) __picolibc_export;        /* XXX */
 long double rsqrtl(long double) __picolibc_export;                       /* XXX */
