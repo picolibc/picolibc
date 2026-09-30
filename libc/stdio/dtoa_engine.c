@@ -33,6 +33,7 @@
 #define _NEED_IO_FLOAT64
 
 #include "dtoa.h"
+#include "udivmod10.h"
 
 #define max(a, b)           \
     ({                      \
@@ -133,7 +134,11 @@ __dtoa_engine(uint64_t v, struct dtoa *dtoa, int max_digits, bool fmode, int max
              * by 5 not to lose too much precision in extreme cases.
              */
             fract += 2;
+#if defined(_UDIVMOD10_DIVIDE_FREE)
+            fract = div5m_64(fract);
+#else
             fract /= 5U;
+#endif
             expo--;
             decexp++;
 
@@ -199,12 +204,20 @@ __dtoa_engine(uint64_t v, struct dtoa *dtoa, int max_digits, bool fmode, int max
         /* Round the value to the last digit being printed. */
         uint64_t round = BIT64(59); /* 0.5 */
         while (decimals--) {
+#if defined(_UDIVMOD10_DIVIDE_FREE)
+            round = div10m_64(round);
+#else
             round /= 10U;
+#endif
         }
         fract += round;
         /* Make sure rounding didn't make fract >= 1.0 */
         if (fract >= BIT64(60)) {
+#if defined(_UDIVMOD10_DIVIDE_FREE)
+            fract = div10m_64(fract);
+#else
             fract /= 10U;
+#endif
             decexp++;
             max_digits = min(save_max_digits, max(1, max_decimals + decexp + 1));
         }
