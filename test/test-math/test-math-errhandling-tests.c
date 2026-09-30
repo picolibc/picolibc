@@ -89,14 +89,29 @@ volatile TEST_CONST FLOAT_T makemathname(long_long_max_one)
 
 FLOAT_T makemathname(scalb)(FLOAT_T, FLOAT_T);
 
-#define cat2(a, b) a##b
-#define str(a)     #a
-#define TEST(n, v, ex, er)                  \
-    { .func = makemathname(cat2(test_, n)), \
-      .name = str(n),                       \
-      .value = (v),                         \
-      .except = (ex),                       \
-      .errno_expect = (er) }
+#define FLAG_ZEROSIGN 1
+
+#define cat2(a, b)    a##b
+#define str(a)        #a
+#define TEST(n, v, ex, er)                    \
+    {                                         \
+        .func = makemathname(cat2(test_, n)), \
+        .name = str(n),                       \
+        .value = (v),                         \
+        .except = (ex),                       \
+        .errno_expect = (er),                 \
+        .flags = 0,                           \
+    }
+
+#define TESTF(n, v, ex, er, fl)               \
+    {                                         \
+        .func = makemathname(cat2(test_, n)), \
+        .name = str(n),                       \
+        .value = (v),                         \
+        .except = (ex),                       \
+        .errno_expect = (er),                 \
+        .flags = (fl),                        \
+    }
 
 static int _signgam;
 
@@ -944,6 +959,7 @@ makemathname(test_fma_0_inf_snan)(void)
 
 #endif
 
+/* fmax */
 static FLOAT_T
 makemathname(test_fmax_qnan_qnan)(void)
 {
@@ -977,6 +993,7 @@ makemathname(test_fmax_1_snan)(void)
 }
 #endif
 
+/* fmin */
 static FLOAT_T
 makemathname(test_fmin_qnan_qnan)(void)
 {
@@ -1012,6 +1029,409 @@ makemathname(test_fmin_1_snan)(void)
 
 #ifndef SIMPLE_MATH_ONLY
 
+/* fmaximum */
+static FLOAT_T
+makemathname(test_fmaximum_qnan_qnan)(void)
+{
+    return makemathname(fmaximum)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_qnan_1)(void)
+{
+    return makemathname(fmaximum)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_1_qnan)(void)
+{
+    return makemathname(fmaximum)(makemathname(one), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_zero_negzero)(void)
+{
+    return makemathname(fmaximum)(makemathname(zero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_negzero_zero)(void)
+{
+    return makemathname(fmaximum)(makemathname(negzero), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_negzero_negzero)(void)
+{
+    return makemathname(fmaximum)(makemathname(negzero), makemathname(negzero));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fmaximum_snan_snan)(void)
+{
+    return makemathname(fmaximum)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_snan_1)(void)
+{
+    return makemathname(fmaximum)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_1_snan)(void)
+{
+    return makemathname(fmaximum)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fmaximum_mag */
+static FLOAT_T
+makemathname(test_fmaximum_mag_qnan_qnan)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_qnan_1)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_1_qnan)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(one), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_zero_negzero)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(zero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_negzero_zero)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(negzero), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_negzero_negzero)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(negzero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_one_zero)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(one), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_one_negtwo)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(one), -makemathname(two));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fmaximum_mag_snan_snan)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_snan_1)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_1_snan)(void)
+{
+    return makemathname(fmaximum_mag)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fmaximum_mag_num */
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_qnan_qnan)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_qnan_1)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_1_qnan)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(one), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_zero_negzero)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(zero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_negzero_zero)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(negzero), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_negzero_negzero)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(negzero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_one_zero)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(one), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_one_negtwo)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(one), -makemathname(two));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_snan_snan)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_snan_1)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_mag_num_1_snan)(void)
+{
+    return makemathname(fmaximum_mag_num)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fmaximum_num */
+static FLOAT_T
+makemathname(test_fmaximum_num_qnan_qnan)(void)
+{
+    return makemathname(fmaximum_num)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_num_qnan_1)(void)
+{
+    return makemathname(fmaximum_num)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_num_1_qnan)(void)
+{
+    return makemathname(fmaximum_num)(makemathname(one), makemathname(qnanval));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fmaximum_num_snan_snan)(void)
+{
+    return makemathname(fmaximum_num)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fmaximum_num_snan_1)(void)
+{
+    return makemathname(fmaximum_num)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fmaximum_num_1_snan)(void)
+{
+    return makemathname(fmaximum_num)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fminimum */
+static FLOAT_T
+makemathname(test_fminimum_qnan_qnan)(void)
+{
+    return makemathname(fminimum)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_qnan_1)(void)
+{
+    return makemathname(fminimum)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_1_qnan)(void)
+{
+    return makemathname(fminimum)(makemathname(one), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_zero_negzero)(void)
+{
+    return makemathname(fminimum)(makemathname(zero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fminimum_negzero_zero)(void)
+{
+    return makemathname(fminimum)(makemathname(negzero), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fminimum_negzero_negzero)(void)
+{
+    return makemathname(fminimum)(makemathname(negzero), makemathname(negzero));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fminimum_snan_snan)(void)
+{
+    return makemathname(fminimum)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_snan_1)(void)
+{
+    return makemathname(fminimum)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_1_snan)(void)
+{
+    return makemathname(fminimum)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fminimum_mag */
+static FLOAT_T
+makemathname(test_fminimum_mag_qnan_qnan)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_qnan_1)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_1_qnan)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(one), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_zero_negzero)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(zero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_negzero_zero)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(negzero), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_negzero_negzero)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(negzero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_one_zero)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(one), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_one_negtwo)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(one), -makemathname(two));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fminimum_mag_snan_snan)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_snan_1)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_1_snan)(void)
+{
+    return makemathname(fminimum_mag)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fminimum_mag_num */
+static FLOAT_T
+makemathname(test_fminimum_mag_num_qnan_qnan)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_qnan_1)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_1_qnan)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(one), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_zero_negzero)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(zero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_negzero_zero)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(negzero), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_negzero_negzero)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(negzero), makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_one_zero)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(one), makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_one_negtwo)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(one), -makemathname(two));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fminimum_mag_num_snan_snan)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_snan_1)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_mag_num_1_snan)(void)
+{
+    return makemathname(fminimum_mag_num)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fminimum_num */
+static FLOAT_T
+makemathname(test_fminimum_num_qnan_qnan)(void)
+{
+    return makemathname(fminimum_num)(makemathname(qnanval), makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_num_qnan_1)(void)
+{
+    return makemathname(fminimum_num)(makemathname(qnanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_num_1_qnan)(void)
+{
+    return makemathname(fminimum_num)(makemathname(one), makemathname(qnanval));
+}
+#ifndef SKIP_SNAN_CHECKS
+static FLOAT_T
+makemathname(test_fminimum_num_snan_snan)(void)
+{
+    return makemathname(fminimum_num)(makemathname(snanval), makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_fminimum_num_snan_1)(void)
+{
+    return makemathname(fminimum_num)(makemathname(snanval), makemathname(one));
+}
+static FLOAT_T
+makemathname(test_fminimum_num_1_snan)(void)
+{
+    return makemathname(fminimum_num)(makemathname(one), makemathname(snanval));
+}
+#endif
+
+/* fmod */
 static FLOAT_T
 makemathname(test_fmod_qnan_1)(void)
 {
@@ -3261,6 +3681,7 @@ TEST_CONST struct {
     FLOAT_T value;
     int     except;
     int     errno_expect;
+    int     flags;
 } makemathname(tests)[] = {
 #ifndef SIMPLE_MATH_ONLY
     TEST(acos_2, (FLOAT_T)NAN, FE_INVALID, EDOM),
@@ -3497,6 +3918,104 @@ TEST_CONST struct {
 #endif
 
 #ifndef SIMPLE_MATH_ONLY
+
+    TESTF(fmaximum_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_qnan_1, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_1_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_zero_negzero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_negzero_zero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_negzero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fmaximum_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_snan_1, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_1_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
+
+    TESTF(fmaximum_mag_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_qnan_1, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_1_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_zero_negzero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_negzero_zero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_negzero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_one_negtwo, (FLOAT_T)-2.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_one_zero, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fmaximum_mag_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_snan_1, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_1_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
+
+    TESTF(fmaximum_mag_num_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_qnan_1, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_1_qnan, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_zero_negzero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_negzero_zero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_negzero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_one_negtwo, (FLOAT_T)-2.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_one_zero, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fmaximum_mag_num_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_snan_1, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_mag_num_1_snan, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
+
+    TESTF(fmaximum_num_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_num_qnan_1, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_num_1_qnan, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fmaximum_num_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_num_snan_1, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fmaximum_num_1_snan, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
+
+    TESTF(fminimum_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_qnan_1, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_1_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_zero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_negzero_zero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_negzero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fminimum_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_snan_1, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_1_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
+
+    TESTF(fminimum_mag_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_qnan_1, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_1_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_zero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_negzero_zero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_negzero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_one_negtwo, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_one_zero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fminimum_mag_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_snan_1, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_1_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
+
+    TESTF(fminimum_mag_num_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_qnan_1, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_1_qnan, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_zero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_negzero_zero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_negzero_negzero, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_one_negtwo, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_one_zero, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fminimum_mag_num_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_snan_1, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_mag_num_1_snan, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
+
+    TESTF(fminimum_num_qnan_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_num_qnan_1, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_num_1_qnan, (FLOAT_T)1.0, 0, 0, FLAG_ZEROSIGN),
+#ifndef SKIP_SNAN_CHECKS
+    TESTF(fminimum_num_snan_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_num_snan_1, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(fminimum_num_1_snan, (FLOAT_T)1.0, FE_INVALID, 0, FLAG_ZEROSIGN),
+#endif
 
     TEST(fmod_qnan_1, (FLOAT_T)NAN, 0, 0),
     TEST(fmod_1_qnan, (FLOAT_T)NAN, 0, 0),
@@ -3912,6 +4431,7 @@ static TEST_CONST struct {
     long long value;
     int       except;
     int       errno_expect;
+    int       flags;
 } makemathname(itests)[] = {
     TEST(fpclassify_snan, FP_NAN, 0, 0),
     TEST(fpclassify_nan, FP_NAN, 0, 0),
@@ -4033,7 +4553,7 @@ static TEST_CONST struct {
            strerror(err), e_to_str(except))
 
 static int
-makemathname(is_equal)(FLOAT_T a, FLOAT_T b)
+makemathname(is_equal)(FLOAT_T a, FLOAT_T b, int flags)
 {
     if (isinf(a) && isinf(b))
         return (a > 0) == (b > 0);
@@ -4044,6 +4564,8 @@ makemathname(is_equal)(FLOAT_T a, FLOAT_T b)
         return issignaling(a) == issignaling(b);
 #endif
     }
+    if ((flags & FLAG_ZEROSIGN) && a == 0 && b == 0)
+        return signbit(a) == signbit(b);
     return a == b;
 }
 
@@ -4203,7 +4725,8 @@ makemathname(run_tests)(void)
         v = makemathname(tests)[t].func();
         err = errno;
         except = fetestexcept(MY_EXCEPT);
-        if (!makemathname(is_equal)(v, makemathname(tests)[t].value)) {
+        if (!makemathname(is_equal)(v, makemathname(tests)[t].value,
+                                    makemathname(tests)[t].flags)) {
             PRINT;
             printf("\tbad value got ");
             makemathname(print_float)(v);
