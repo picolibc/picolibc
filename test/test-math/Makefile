@@ -37,6 +37,8 @@ REAL_EXP = \
 	test-log10.h \
 	test-log1p.h \
 	test-log2.h \
+	test-log10p1.h \
+	test-log2p1.h \
 	test-pow.h \
 	test-pown.h
 
