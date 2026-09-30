@@ -36,5 +36,5 @@
 #include "narrow_fma_inc.c"
 
 #ifdef float_t
-_MATH_ALIAS_d_ddd(ffma)
+_MATH_ALIAS_f_ddd(ffma)
 #endif

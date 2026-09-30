@@ -36,5 +36,5 @@
 #include "fmul_inc.c"
 
 #ifdef float_t
-_MATH_ALIAS_d_dd(fmul)
+_MATH_ALIAS_f_dd(fmul)
 #endif

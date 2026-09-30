@@ -73,16 +73,30 @@ picolibc_sources(
   cospi_64.c
   cospi_80.c
   cospi_128.c
+  dadd_32.c
+  dadd_64.c
+  ddiv_32.c
+  ddiv_64.c
   dadd_80.c
   dadd_128.c
+  ddiv_32.c
+  ddiv_64.c
   ddiv_80.c
   ddiv_128.c
+  dmul_32.c
+  dmul_64.c
   dmul_80.c
   dmul_128.c
+  dsub_32.c
+  dsub_64.c
   dsub_80.c
   dsub_128.c
+  dsqrt_32.c
+  dsqrt_64.c
   dsqrt_80.c
   dsqrt_128.c
+  dfma_32.c
+  dfma_64.c
   dfma_80.c
   dfma_128.c
   exp10m1_32.c
@@ -93,9 +107,11 @@ picolibc_sources(
   exp2m1_64.c
   exp2m1_80.c
   exp2m1_128.c
+  fadd_32.c
   fadd_64.c
   fadd_80.c
   fadd_128.c
+  fdiv_32.c
   fdiv_64.c
   fdiv_80.c
   fdiv_128.c
@@ -131,15 +147,19 @@ picolibc_sources(
   fminimum_num_64.c
   fminimum_num_80.c
   fminimum_num_128.c
+  fmul_32.c
   fmul_64.c
   fmul_80.c
   fmul_128.c
+  fsub_32.c
   fsub_64.c
   fsub_80.c
   fsub_128.c
+  fsqrt_32.c
   fsqrt_64.c
   fsqrt_80.c
   fsqrt_128.c
+  ffma_32.c
   ffma_64.c
   ffma_80.c
   ffma_128.c

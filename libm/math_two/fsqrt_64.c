@@ -36,5 +36,5 @@
 #include "narrow_sqrt_inc.c"
 
 #ifdef float_t
-_MATH_ALIAS_d_d(fsqrt)
+_MATH_ALIAS_f_d(fsqrt)
 #endif

@@ -36,5 +36,5 @@
 #include "fsub_inc.c"
 
 #ifdef float_t
-_MATH_ALIAS_d_dd(fsub)
+_MATH_ALIAS_f_dd(fsub)
 #endif

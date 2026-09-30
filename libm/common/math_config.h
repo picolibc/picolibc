@@ -490,6 +490,9 @@ force_evall(long double x)
 #define _MATH_ALIAS_v_dDD_to_f(name) _MATH_ALIAS_d_to_f(name)
 #define _MATH_ALIAS_i_DcD_to_f(name) _MATH_ALIAS_d_to_f(name)
 #define _MATH_ALIAS_d_dk_to_f(name)  _MATH_ALIAS_d_to_f(name)
+#define _MATH_ALIAS_f_d_to_f(name)   _MATH_ALIAS_d_to_f(name)
+#define _MATH_ALIAS_f_dd_to_f(name)  _MATH_ALIAS_d_to_f(name)
+#define _MATH_ALIAS_f_ddd_to_f(name) _MATH_ALIAS_d_to_f(name)
 #else
 #define _MATH_ALIAS_d_to_f(name)             \
     double _D_NAME(name)(void)               \
@@ -591,6 +594,21 @@ force_evall(long double x)
     {                                               \
         return __FLOAT_NAME(name)((float)x, k);     \
     }
+#define _MATH_ALIAS_f_d_to_f(name)                  \
+    float _D_NAME(name)(double x)                   \
+    {                                               \
+        return (float)__FLOAT_NAME(name)((float)x); \
+    }
+#define _MATH_ALIAS_f_dd_to_f(name)                                  \
+    _MATH_ALIAS_d_to_f(name) float _D_NAME(name)(double x, double y) \
+    {                                                                \
+        return (float)__FLOAT_NAME(name)((float)x, (float)y);        \
+    }
+#define _MATH_ALIAS_f_ddd_to_f(name)                                           \
+    _MATH_ALIAS_d_to_f(name) float _D_NAME(name)(double x, double y, double z) \
+    {                                                                          \
+        return (float)__FLOAT_NAME(name)((float)x, (float)y, (float)z);        \
+    }
 #endif
 #else
 #define _MATH_ALIAS_d_to_f(name)
@@ -613,6 +631,9 @@ force_evall(long double x)
 #define _MATH_ALIAS_v_dDD_to_f(name)
 #define _MATH_ALIAS_i_DcD_to_f(name)
 #define _MATH_ALIAS_d_dk_to_f(name)
+#define _MATH_ALIAS_f_d_to_f(name)
+#define _MATH_ALIAS_f_dd_to_f(name)
+#define _MATH_ALIAS_f_ddd_to_f(name)
 #ifdef __DOUBLE_NOEXCEPT
 #define __FLOAT64_NOEXCEPT
 #endif
@@ -643,6 +664,15 @@ force_evall(long double x)
 #define _MATH_ALIAS_v_lLL_to_f(name) _MATH_ALIAS_l_to_f(name)
 #define _MATH_ALIAS_i_LcL_to_f(name) _MATH_ALIAS_l_to_f(name)
 #define _MATH_ALIAS_l_lk_to_f(name)  _MATH_ALIAS_l_to_f(name)
+#define _MATH_ALIAS_d_l_to_f(name)   _MATH_ALIAS_l_to_f(name)
+#define _MATH_ALIAS_d_ll_to_f(name)  _MATH_ALIAS_l_to_f(name)
+#define _MATH_ALIAS_d_lll_to_f(name) _MATH_ALIAS_l_to_f(name)
+#define _MATH_ALIAS_f_l_to_f(name)   _MATH_ALIAS_l_to_f(name)
+#define _MATH_ALIAS_f_ll_to_f(name)  _MATH_ALIAS_l_to_f(name)
+#define _MATH_ALIAS_f_lll_to_f(name) _MATH_ALIAS_l_to_f(name)
+#define _MATH_ALIAS_f_l_to_d(name)   __strong_reference_dup(_D_NAME(name), _LD_NAME(name));
+#define _MATH_ALIAS_f_ll_to_d(name)  _MATH_ALIAS_f_l_to_d(name)
+#define _MATH_ALIAS_f_lll_to_d(name) _MATH_ALIAS_f_l_to_d(name)
 #else
 #define _MATH_ALIAS_l_to_f(name)                 \
     long double _LD_NAME(name)(void)             \
@@ -729,15 +759,45 @@ force_evall(long double x)
     {                                                                  \
         return _FLOAT_NAME(name)((float)x, (float *)y, (float *)z);    \
     }
-#define _MATH_ALIAS_i_LcL_to_f(name)                      \
-    int _LD_NAME(name)(long double *x, long double *y)    \
-    {                                                     \
-        return _FLOAT_NAME(name)((float *)x, (float *)y); \
+#define _MATH_ALIAS_i_LcL_to_f(name)                         \
+    int _LD_NAME(name)(long double *x, const long double *y) \
+    {                                                        \
+        return _FLOAT_NAME(name)((float *)x, (float *)y);    \
     }
 #define _MATH_ALIAS_l_lk_to_f(name)                            \
     long double _LD_NAME(name)(long double x, long long int k) \
     {                                                          \
         return _FLOAT_NAME(name)((float)x, k);                 \
+    }
+#define _MATH_ALIAS_d_l_to_f(name)                  \
+    double _LD_NAME(name)(long double x)            \
+    {                                               \
+        return (double)_FLOAT_NAME(name)((float)x); \
+    }
+#define _MATH_ALIAS_d_ll_to_f(name)                           \
+    double _LD_NAME(name)(long double x, long double y)       \
+    {                                                         \
+        return (double)_FLOAT_NAME(name)((float)x, (float)y); \
+    }
+#define _MATH_ALIAS_d_lll_to_f(name)                                    \
+    double _LD_NAME(name)(long double x, long double y, long double z)  \
+    {                                                                   \
+        return (double)_FLOAT_NAME(name)((float)x, (float)y, (float)z); \
+    }
+#define _MATH_ALIAS_f_l_to_d(name)              \
+    float _LD_NAME(name)(long double x)         \
+    {                                           \
+        return (float)_D_NAME(name)((double)x); \
+    }
+#define _MATH_ALIAS_f_ll_to_d(name)                        \
+    float _LD_NAME(name)(long double x, long double y)     \
+    {                                                      \
+        return (float)_D_NAME(name)((double)x, (double)y); \
+    }
+#define _MATH_ALIAS_f_lll_to_d(name)                                  \
+    float _LD_NAME(name)(long double x, long double y, long double z) \
+    {                                                                 \
+        return (float)_D_NAME(name)((double)x, (double)y, (double)z); \
     }
 #endif
 #define _MATH_ALIAS_l_to_d(name)
@@ -759,6 +819,9 @@ force_evall(long double x)
 #define _MATH_ALIAS_v_lLL_to_d(name)
 #define _MATH_ALIAS_i_LcL_to_d(name)
 #define _MATH_ALIAS_l_lk_to_d(name)
+#define _MATH_ALIAS_d_l_to_d(name)
+#define _MATH_ALIAS_d_ll_to_d(name)
+#define _MATH_ALIAS_d_lll_to_d(name)
 #else
 #define _MATH_ALIAS_l_to_f(name)
 #define _MATH_ALIAS_l_l_to_f(name)
@@ -779,6 +842,12 @@ force_evall(long double x)
 #define _MATH_ALIAS_v_lLL_to_f(name)
 #define _MATH_ALIAS_i_LcL_to_f(name)
 #define _MATH_ALIAS_l_lk_to_f(name)
+#define _MATH_ALIAS_d_l_to_f(name)
+#define _MATH_ALIAS_d_ll_to_f(name)
+#define _MATH_ALIAS_d_lll_to_f(name)
+#define _MATH_ALIAS_f_l_to_f(name)
+#define _MATH_ALIAS_f_ll_to_f(name)
+#define _MATH_ALIAS_f_lll_to_f(name)
 #ifdef __strong_reference
 #define _MATH_ALIAS_l_to_d(name)     __strong_reference_dup(_D_NAME(name), _LD_NAME(name));
 #define _MATH_ALIAS_l_l_to_d(name)   _MATH_ALIAS_l_to_d(name)
@@ -799,6 +868,12 @@ force_evall(long double x)
 #define _MATH_ALIAS_v_lLL_to_d(name) _MATH_ALIAS_l_to_d(name)
 #define _MATH_ALIAS_i_LcL_to_d(name) _MATH_ALIAS_l_to_d(name)
 #define _MATH_ALIAS_l_lk_to_d(name)  _MATH_ALIAS_l_to_d(name)
+#define _MATH_ALIAS_d_l_to_d(name)   _MATH_ALIAS_l_to_d(name)
+#define _MATH_ALIAS_d_ll_to_d(name)  _MATH_ALIAS_l_to_d(name)
+#define _MATH_ALIAS_d_lll_to_d(name) _MATH_ALIAS_l_to_d(name)
+#define _MATH_ALIAS_f_l_to_d(name)   _MATH_ALIAS_l_to_d(name)
+#define _MATH_ALIAS_f_ll_to_d(name)  _MATH_ALIAS_l_to_d(name)
+#define _MATH_ALIAS_f_lll_to_d(name) _MATH_ALIAS_l_to_d(name)
 #else
 #define _MATH_ALIAS_l_to_d(name)             \
     long double _LD_NAME(name)(void)         \
@@ -895,6 +970,36 @@ force_evall(long double x)
     {                                                          \
         return _D_NAME(name)((double)x, k);                    \
     }
+#define _MATH_ALIAS_d_l_to_d(name)              \
+    double _LD_NAME(name)(long double x)        \
+    {                                           \
+        return (double)_D_NAME(name)((float)x); \
+    }
+#define _MATH_ALIAS_d_ll_to_d(name)                       \
+    double _LD_NAME(name)(long double x, long double y)   \
+    {                                                     \
+        return (double)_D_NAME(name)((float)x, (float)y); \
+    }
+#define _MATH_ALIAS_d_lll_to_d(name)                                   \
+    double _LD_NAME(name)(long double x, long double y, long double z) \
+    {                                                                  \
+        return (double)_D_NAME(name)((float)x, (float)y, (float)z);    \
+    }
+#define _MATH_ALIAS_f_l_to_d(name)              \
+    float _LD_NAME(name)(long double x)         \
+    {                                           \
+        return (float)_D_NAME(name)((double)x); \
+    }
+#define _MATH_ALIAS_f_ll_to_d(name)                        \
+    float _LD_NAME(name)(long double x, long double y)     \
+    {                                                      \
+        return (float)_D_NAME(name)((double)x, (double)y); \
+    }
+#define _MATH_ALIAS_f_lll_to_d(name)                                  \
+    float _LD_NAME(name)(long double x, long double y, long double z) \
+    {                                                                 \
+        return (float)_D_NAME(name)((double)x, (double)y, (double)z); \
+    }
 #endif
 #endif
 #else
@@ -959,6 +1064,12 @@ force_evall(long double x)
 #define _MATH_ALIAS_v_lLL_to_d(name)
 #define _MATH_ALIAS_i_LcL_to_d(name)
 #define _MATH_ALIAS_l_lk_to_d(name)
+#define _MATH_ALIAS_f_l_to_d(name)
+#define _MATH_ALIAS_f_ll_to_d(name)
+#define _MATH_ALIAS_f_lll_to_d(name)
+#define _MATH_ALIAS_d_l_to_d(name)
+#define _MATH_ALIAS_d_ll_to_d(name)
+#define _MATH_ALIAS_d_lll_to_d(name)
 #endif
 
 #ifndef _NAME_64
@@ -1081,6 +1192,12 @@ force_evall(long double x)
 #define _MATH_ALIAS_i_DcD(name) _MATH_ALIAS_i_LcL_to_d(name)
 
 #define _MATH_ALIAS_d_dk(name)  _MATH_ALIAS_l_lk_to_d(name)
+
+#define _MATH_ALIAS_f_d(name)   _MATH_ALIAS_f_l_to_d(name)
+
+#define _MATH_ALIAS_f_dd(name)  _MATH_ALIAS_f_ll_to_d(name)
+
+#define _MATH_ALIAS_f_ddd(name) _MATH_ALIAS_f_lll_to_d(name)
 
 /* Evaluate an expression as the specified type, normally a type
    cast should be enough, but compilers implement non-standard

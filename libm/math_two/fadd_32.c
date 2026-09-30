@@ -32,9 +32,18 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
+#define WANT_FLOAT32
+#define _ISOC23_SOURCE
+#include "math_two.h"
 
-long double
-infinityl(void)
+#if defined(float_t) && defined(_DOUBLE_IS_32BITS)
+
+float
+fadd(double x, double y)
 {
-    return (long double)INFINITY;
+    return (float)(x + y);
 }
+
+_MATH_ALIAS_f_dd(fadd)
+
+#endif

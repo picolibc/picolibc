@@ -36,5 +36,5 @@
 #include "fdiv_inc.c"
 
 #ifdef float_t
-_MATH_ALIAS_d_dd(fdiv)
+_MATH_ALIAS_f_dd(fdiv)
 #endif

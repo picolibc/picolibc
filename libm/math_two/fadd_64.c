@@ -36,5 +36,5 @@
 #include "fadd_inc.c"
 
 #ifdef float_t
-_MATH_ALIAS_d_dd(fadd)
+_MATH_ALIAS_f_dd(fadd)
 #endif
