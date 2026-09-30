@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _ISOC23_SOURCE
 #include "math_ld.h"
 
 #if LDBL_MANT_DIG == 64
@@ -43,4 +44,23 @@
 
 #include "ld128/s_log1pl.c"
 
+#endif
+
+#ifdef __HAVE_LD_SUPPORT
+
+#ifdef __strong_reference
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC)
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(log1pl, logp1l);
+#else
+long double
+logp1l(long double x)
+{
+    return log1pl(x);
+}
+#endif
 #endif

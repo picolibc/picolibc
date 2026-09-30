@@ -1469,6 +1469,7 @@ extern int __signgam;
 #define log64           _NAME_64(log)
 #define log1064         _NAME_64(log10)
 #define log1p64         _NAME_64(log1p)
+#define logp164         _NAME_64(logp1)
 #define log264          _NAME_64(log2)
 #define logb64          _NAME_64(logb)
 #define lrint64         _NAME_64(lrint)

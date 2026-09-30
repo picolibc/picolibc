@@ -112,6 +112,7 @@ Interface Definition (Issue 2).
  *	 See HP-15C Advanced Functions Handbook, p.193.
  */
 
+#define _ISOC23_SOURCE
 #include "fdlibm.h"
 #include "math_config.h"
 
@@ -208,6 +209,22 @@ log1p64(__float64 x)
         return k * ln2_hi - ((hfsq - (s * (hfsq + R) + (k * ln2_lo + c))) - f);
 }
 
-_MATH_ALIAS_d_d(log1p)
+#ifdef __strong_reference
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC)
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wattribute-alias="
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(log1p64, logp164);
+#else
+__float64
+logp164(__float64 x)
+{
+    return log1p64(x);
+}
+#endif
+
+_MATH_ALIAS_d_d(log1p) _MATH_ALIAS_d_d(logp1)
 
 #endif /* _NEED_FLOAT64 */

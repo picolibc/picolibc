@@ -108,4 +108,17 @@ log1pf(float x)
         return k * ln2_hi - ((hfsq - (s * (hfsq + R) + (k * ln2_lo + c))) - f);
 }
 
-_MATH_ALIAS_f_f(log1p)
+#ifdef __strong_reference
+#if defined(__GNUCLIKE_PRAGMA_DIAGNOSTIC) && !defined(__clang__)
+#pragma GCC diagnostic ignored "-Wmissing-attributes"
+#endif
+__strong_reference(log1pf, logp1f);
+#else
+float
+logp1f(float x)
+{
+    return log1pf(x);
+}
+#endif
+
+_MATH_ALIAS_f_f(log1p) _MATH_ALIAS_f_f(logp1)
