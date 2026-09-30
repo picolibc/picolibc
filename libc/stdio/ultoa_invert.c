@@ -26,84 +26,28 @@
   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
   POSSIBILITY OF SUCH DAMAGE. */
 
-#if defined(__IO_SMALL_ULTOA)
+#include "udivmod10.h"
 
 /*
  * Enable fancy divmod when the conversion type is wider than 'long',
  * where binary-to-decimal conversion would otherwise use slow soft
  * division code (e.g. 64-bit division on 32-bit targets) which is
- * often quite large as well
+ * often quite large as well.  The _UDIVMOD10_DIVIDE_FREE predicate of
+ * udivmod10.h decides between this and sharing the soft division
+ * helper, and excludes targets with native 64-bit division.
  */
-
-#if SIZEOF_ULTOA > __SIZEOF_LONG__
+#if defined(_UDIVMOD10_DIVIDE_FREE) && SIZEOF_ULTOA > __SIZEOF_LONG__
 
 #define FANCY_DIVMOD
 
 static inline ultoa_unsigned_t
 udivmod10(ultoa_unsigned_t n, char *rp)
 {
-    ultoa_unsigned_t q;
-    char             r;
-
-    /* Compute n * 0x1999999999999999 / (2^64) ≃ n / 10 */
-
-    /* q = n * 0xc >> 4 */
-    q = (n >> 1) + (n >> 2);
-
-    /*
-      q = q * 0x11 >> 4
-        = (n * 0xc >> 4) * 0x11 >> 4
-        ≂ n * 0xcc >> 8
-    */
-    q = q + (q >> 4);
-
-    /*
-      q = q * 0x101 >> 8
-        = ((n * 0xc >> 4) * 0x11 >> 4) * 0x101 >> 8
-        ≂ (n * 0xcc >> 8) * 0x101 >> 8
-        ≂ n * 0xcccc >> 16
-    */
-    q = q + (q >> 8);
-
-    /*
-      q = q * 0x10001 >> 16
-        = (((n * 0xc >> 4) * 0x11 >> 4) * 0x101 >> 8) * 0x10001 >> 16
-        ≂ (n * 0xcccc >> 16) * 0x10001 >> 16
-        ≂ n * 0xcccccccc >> 32
-     */
-    q = q + (q >> 16);
-
 #if SIZEOF_ULTOA > 4
-    /*
-      q = q * 0x100000001 >> 32
-        = ((((n * 0xc >> 4) * 0x11 >> 4) * 0x101 >> 8) * 0x10001 >> 16) * 0x100000001 >> 32
-        ≂ (n * 0xcccccccc >> 32) * 0x100000001 >> 32
-        ≂ n * cccccccccccccccc >> 64
-    */
-    q = q + (q >> 32);
+    return udivmod10_64(n, rp);
+#else
+    return udivmod10_32(n, rp);
 #endif
-
-    /*
-      q = q >> 3
-        = (((((n * 0xc >> 4) * 0x11 >> 4) * 0x101 >> 8) * 0x10001 >> 16) * 0x100000001 >> 32) >> 3
-        ≂ (n * cccccccccccccccc >> 64) >> 3
-        ≂ n * 0x1999999999999999 >> 64
-    */
-    q = q >> 3;
-
-    /* r = n - q * 10 */
-    r = (char)(n - (((q << 2) + q) << 1));
-
-    /*
-     * Because of the approximations above, q will
-     * be +0/-1 of the real result. Check and adjust
-     */
-    if (r > 9) {
-        q++;
-        r -= 10;
-    }
-    *rp = r;
-    return q;
 }
 
 /*
@@ -130,7 +74,6 @@ udivmod(ultoa_unsigned_t val, int base, char *dig)
     return udivmod10(val, dig);
 }
 
-#endif
 #endif
 
 static __noinline char *
