@@ -32,7 +32,7 @@
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [binaries]
-c = ['clang', '--target=hexagon-unknown-none-elf', '-mv68', '-fno-pic', '-fno-PIE', '-static', '-nostdlib', '-fuse-init-array']
+c = ['clang', '--target=hexagon-unknown-none-elf', '--cstdlib=picolibc', '-mv68', '-nostdlib']
 cpp = ''
 c_ld = 'eld'
 ar = 'ar'
@@ -51,8 +51,6 @@ endian='little'
 
 [properties]
 # hardcode runtime library, otherwise meson build configuration will add '-lgcc'
-# use -Dc_link_args=-L$(clang -print-resource-dir)/lib/hexagon-unknown-none-elf flag while calling hexagon configure script
-# so that clang can find builtins library
 librt = '-lclang_rt.builtins'
 skip_sanity_check = true
 needs_exe_wrapper = true
