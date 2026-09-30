@@ -39,9 +39,9 @@
  * The udivmod*m_64/div*m_64 forms serve the digit loops which divide
  * 64-bit quantities by ten (or five).  Where 64-bit division compiles
  * to a call to wide software division (__aeabi_uldivmod and friends)
- * -- even for a constant divisor when optimizing for size -- the magic
- * multiply (64x64->128 high half) or the shift/add form above
- * replaces it.  Elsewhere plain division is kept.
+ * -- even for a constant divisor -- the magic multiply (64x64->128
+ * high half) or the shift/add form above replaces it.  Elsewhere
+ * plain division is kept.
  */
 #ifndef _UDIVMOD10_H_
 #define _UDIVMOD10_H_
@@ -58,17 +58,21 @@
  *
  * The predicates below classify the ISA from the compiler's macros:
  * a 64-bit ISA shows up as a 64-bit long or pointer, __int128
- * support, or a known 64-bit ISA macro.  _UDIVMOD10_WIDE_SOFTDIV is
- * the negation; targets lacking a usable wide multiply (ARMv6-M,
- * ARMv8-M Baseline, and other small cores) additionally cannot have
- * constant division strength-reduced, so the multiply-free shift/add
- * form is used there at every optimization level.
+ * support, or a known 64-bit ISA macro.  RV64 without the M extension
+ * is the exception: it has 64-bit registers but no divide instruction.
+ * _UDIVMOD10_WIDE_SOFTDIV is the negation; targets lacking a usable
+ * wide multiply (ARMv6-M, ARMv8-M Baseline, AVR, MSP430, RISC-V
+ * without the M extension) use the multiply-free shift/add form
+ * instead.
  */
 #if !defined(_UDIVMOD10_NATIVE64) && !defined(_UDIVMOD10_WIDE_SOFTDIV)
-#if __SIZEOF_LONG__ == 8 || __SIZEOF_POINTER__ == 8 || defined(__SIZEOF_INT128__)                 \
+#if defined(__riscv) && __riscv_xlen == 64 && !defined(__riscv_div)
+/* RV64 without the M extension has no divide instruction */
+#define _UDIVMOD10_WIDE_SOFTDIV
+#elif __SIZEOF_LONG__ == 8 || __SIZEOF_POINTER__ == 8 || defined(__SIZEOF_INT128__)               \
     || defined(__x86_64__) || defined(__aarch64__) || defined(__mips64) || defined(__loongarch64) \
     || defined(__powerpc64__) || defined(__s390x__) || defined(__sparcv9)                         \
-    || (defined(__riscv) && __riscv_xlen == 64)
+    || (defined(__riscv) && __riscv_xlen == 64 && defined(__riscv_div))
 #define _UDIVMOD10_NATIVE64
 #else
 #define _UDIVMOD10_WIDE_SOFTDIV
@@ -76,18 +80,24 @@
 #endif
 
 #if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_8M_BASE__) || defined(__AVR__) \
-    || defined(__MSP430__)
+    || defined(__MSP430__) || (defined(__riscv) && !defined(__riscv_mul))
 #define _UDIVMOD10_NO_WIDE_MUL
 #endif
 
 /*
  * Use the divide-free conversions when the target has wide software
- * division and printf-small-ultoa asks to avoid it (the default).
- * Otherwise the soft division helper is shared with the rest of the
- * application.  ultoa_invert.c uses this predicate as well; keep the
- * printf-small-ultoa description in meson_options.txt in sync.
+ * division and either printf-small-ultoa asks to avoid it (the
+ * default) or this build optimizes while not optimizing for size
+ * (__OPTIMIZE__ and not __OPTIMIZE_SIZE__: -Og, -O1, -O2, -O3; the
+ * compiler macros do not distinguish the levels).  -O0 and
+ * size-optimized builds honour a request to share the soft division
+ * helper when the option is disabled; with it enabled the divide-free
+ * code paths are selected at every optimization level.  ultoa_invert.c
+ * uses this predicate as well; keep the printf-small-ultoa description
+ * in meson_options.txt in sync.
  */
-#if defined(_UDIVMOD10_WIDE_SOFTDIV) && defined(__IO_SMALL_ULTOA)
+#if defined(_UDIVMOD10_WIDE_SOFTDIV)                                                         \
+    && (defined(__IO_SMALL_ULTOA) || (defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)))
 #define _UDIVMOD10_DIVIDE_FREE
 #endif
 
@@ -188,13 +198,15 @@ div5m_64(uint64_t n)
     return (q << 1) + (uint64_t)(r >= 5);
 }
 
-#elif defined(_UDIVMOD10_DIVIDE_FREE) && defined(__OPTIMIZE_SIZE__)
+#elif defined(_UDIVMOD10_DIVIDE_FREE) && (defined(__OPTIMIZE_SIZE__) || !defined(__OPTIMIZE__))
 
 /*
  * High half of a 64x64->128 product, built from 32-bit multiplies so
  * it needs no compiler-specific 128-bit type.  Chosen when optimizing
- * for size, where it replaces the wide soft-division call that even
- * constant divisors can otherwise lower to.
+ * for size or when optimization is off, where wide constant division
+ * can otherwise lower to a soft-division call.  At -Og/-O1/-O2/-O3
+ * the compiler's constant-division expansion is left in place because
+ * it is smaller than the magic-multiply form on the supported targets.
  */
 static inline uint64_t
 umulh64(uint64_t a, uint64_t b)
