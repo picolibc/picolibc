@@ -82,12 +82,16 @@
 
 /*
  * Use the divide-free conversions when the target has wide software
- * division and printf-small-ultoa asks to avoid it (the default).
- * Otherwise the soft division helper is shared with the rest of the
- * application.  ultoa_invert.c uses this predicate as well; keep the
+ * division and either printf-small-ultoa asks to avoid it (the
+ * default) or this build optimizes while not optimizing for size
+ * (__OPTIMIZE__ and not __OPTIMIZE_SIZE__: -Og, -O1, -O2, -O3; the
+ * compiler macros do not distinguish the levels).  -O0 and
+ * size-optimized builds honour a request to share the soft division
+ * helper.  ultoa_invert.c uses this predicate as well; keep the
  * printf-small-ultoa description in meson_options.txt in sync.
  */
-#if defined(_UDIVMOD10_WIDE_SOFTDIV) && defined(__IO_SMALL_ULTOA)
+#if defined(_UDIVMOD10_WIDE_SOFTDIV)                                                         \
+    && (defined(__IO_SMALL_ULTOA) || (defined(__OPTIMIZE__) && !defined(__OPTIMIZE_SIZE__)))
 #define _UDIVMOD10_DIVIDE_FREE
 #endif
 

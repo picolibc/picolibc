@@ -113,7 +113,7 @@ definitions which use the same POSIX I/O functions.
 | format-default              | double  | Sets the default printf/scanf style ('d, 'f', 'l', 'i' or 'm')                       |
 | printf-aliases              | true    | Support link-time printf aliases to set the default printf/scanf variant             |
 | io-percent-b                | false   | Support the C23 %b printf specifier for binary formatted integers                    |
-| printf-small-ultoa          | false   | Avoid soft division routine during integer binary to decimal conversion in printf    |
+| printf-small-ultoa          | true    | Avoid soft division in printf decimal conversions (see printf.md)                     |
 | printf-percent-n            | false   | Support the dangerous %n format specifier in printf                                  |
 | minimal-io-long-long        | false   | Support long long values in the minimal ('m') printf and scanf variants              |
 | fast-bufio                  | false   | Improve performance of some I/O operations when using bufio                          |
