@@ -354,6 +354,19 @@ if get_option('analyzer')
   c_args += cc.get_supported_arguments(['-fanalyzer'])
 endif
 
+# These are compiler flags needed to perform compiler argument
+# validation. Clang needs a couple of critical flags to keep
+# it from complaining about valid-but-unused flags
+
+common_prep_options = []
+
+if compiler_id == 'clang'
+  common_prep_options += [
+    '-Wno-unused-command-line-argument',
+    '-Wno-unsupported-floating-point-opt',
+  ]
+endif
+
 common_options = [
   '-Werror=vla',
   '-Warray-bounds',
@@ -370,19 +383,13 @@ common_options = [
   '-Wflex-array-member-not-at-end',
   '-fno-common',
   '-frounding-math',
+  '-ftrapping-math',
   '-fsignaling-nans',
   '-fstrict-flex-arrays=3',
   '-fno-builtin-copysignl',
   '-fno-stack-protector',
   '-Wthread-safety',
 ]
-
-if compiler_id == 'clang'
-  common_options += [
-  '-Wno-unused-command-line-argument',
-  '-Wno-unsupported-floating-point-opt',
-  ]
-endif
 
 cpp_options = [
   '-fno-exceptions',
@@ -396,31 +403,51 @@ if have_cplusplus
   cpp_args = c_args
   native_cpp_args = native_c_args
 
+  cpp_prep_flags = []
+  foreach _flag : common_prep_options
+    if cpp.compiles('extern int i;',
+                    args: werror_c_flag + cpp_prep_flags + [_flag],
+                    name: _flag)
+      cpp_prep_flags += [_flag]
+    endif
+  endforeach
+
   # We can't use get_supported_arguments because known flags
   # not supported for the target language generate warnings
   # not errors, so we need -Werror
   cpp_flags = []
   foreach _flag : common_options + cpp_options
     if cpp.compiles('extern int i;',
-                    args: ['-Werror', _flag],
+                    args: werror_c_flag + cpp_prep_flags + [_flag],
                     name: _flag)
       cpp_flags += [_flag]
     endif
   endforeach
-  cpp_args += cpp_flags
-  native_cpp_args += cpp_flags
+  cpp_prep_args = cpp_prep_flags
+  cpp_args += cpp_prep_flags + cpp_flags
+  native_cpp_args += cpp_prep_flags + cpp_flags
 endif
+
+c_prep_flags = []
+foreach _flag : common_prep_options
+  if cc.compiles('extern int i;',
+                  args: werror_c_flag + c_prep_flags + [_flag],
+                  name: _flag)
+    c_prep_flags += [_flag]
+  endif
+endforeach
 
 c_flags = []
 foreach _flag : common_options
   if cc.compiles('extern int i;',
-                 args: ['-Werror', _flag],
+                 args: werror_c_flag + c_prep_flags + [_flag],
                  name: _flag)
     c_flags += [_flag]
   endif
 endforeach
-c_args += c_flags
-native_c_args += c_flags
+c_prep_args = c_prep_flags
+c_args += c_prep_flags + c_flags
+native_c_args += c_prep_flags + c_flags
 
 # Make sure _LIBC is not defined when building tests
 test_c_args = c_args
@@ -455,10 +482,12 @@ endif
 # native_cpp_args   native C++ code
 # test_c_args       target test C code
 # test_cpp_args     target test C++ code
+# c_prep_args       C code for silencing arg warnings
+# cpp_prep_args     C++ code for silencing arg warnings
 
 global_link_args = []
 foreach ld : ['-Wl,--no-warn-rwx-segments', '-Wl,--no-fatal-warnings', '-Wl,-znoexecstack']
-  if cc.has_multi_link_arguments(link_test_args + [ld])
+  if cc.has_multi_link_arguments(c_prep_args + link_test_args + [ld])
     global_link_args += [ld]
   endif
 endforeach
@@ -476,7 +505,7 @@ endif
 test_link_args_extra += test_c_args
 
 foreach ld : test_link_args_extra
-  if cc.has_multi_link_arguments(link_test_args + [ld])
+  if cc.has_multi_link_arguments(c_prep_args + link_test_args + [ld])
     test_link_args_base += [ld]
   endif
 endforeach
