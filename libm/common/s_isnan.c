@@ -212,7 +212,7 @@ isnan64(__float64 x)
 __strong_reference(isnan64, __isnan64);
 #else
 int
-__isnan64(float x)
+__isnan64(__float64 x)
 {
     return isnan64(x);
 }

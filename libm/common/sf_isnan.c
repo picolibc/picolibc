@@ -44,4 +44,7 @@ __isnanf(float x)
 }
 #endif
 
+#undef isnan
+#undef isnanl
+
 _MATH_ALIAS_i_f(isnan) _MATH_ALIAS_i_f(__isnan)

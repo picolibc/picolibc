@@ -41,7 +41,7 @@ isinf64(__float64 x)
 __strong_reference(isinf64, __isinf64);
 #else
 int
-__isinf64(float x)
+__isinf64(__float64 x)
 {
     return isinf64(x);
 }

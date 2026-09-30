@@ -38,5 +38,5 @@
 #include "atan2pi_inc.c"
 
 #ifdef float_t
-_MATH_ALIAS_d_d(atan2pi)
+_MATH_ALIAS_d_dd(atan2pi)
 #endif

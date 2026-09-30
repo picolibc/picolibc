@@ -133,9 +133,9 @@ nextafter64(__float64 x, __float64 y)
 }
 
 #if defined(NEXTUP)
-_MATH_ALIAS_d_dd(nextup)
+_MATH_ALIAS_d_d(nextup)
 #elif defined(NEXTDOWN)
-_MATH_ALIAS_d_dd(nextdown)
+_MATH_ALIAS_d_d(nextdown)
 #else
 _MATH_ALIAS_d_dd(nextafter)
 #endif

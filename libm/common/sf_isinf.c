@@ -47,4 +47,7 @@ __isinff(float x)
 }
 #endif
 
+#undef isinf
+#undef isinfl
+
 _MATH_ALIAS_i_f(isinf) _MATH_ALIAS_i_f(__isinf)

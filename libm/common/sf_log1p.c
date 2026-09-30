@@ -13,6 +13,7 @@
  * ====================================================
  */
 
+#define _ISOC23_SOURCE
 #include "fdlibm.h"
 #include "math_config.h"
 

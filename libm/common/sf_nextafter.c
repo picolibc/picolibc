@@ -76,10 +76,12 @@ nextafterf(float x, float y)
     return x;
 }
 
+#undef y
+
 #if defined(NEXTUP)
-_MATH_ALIAS_f_ff(nextup)
+_MATH_ALIAS_f_f(nextup)
 #elif defined(NEXTDOWN)
-_MATH_ALIAS_f_ff(nextdown)
+_MATH_ALIAS_f_f(nextdown)
 #else
 _MATH_ALIAS_f_ff(nextafter)
 #endif
