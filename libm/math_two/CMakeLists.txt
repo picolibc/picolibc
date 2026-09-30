@@ -99,6 +99,38 @@ picolibc_sources(
   fdiv_64.c
   fdiv_80.c
   fdiv_128.c
+  fmaximum_32.c
+  fmaximum_64.c
+  fmaximum_80.c
+  fmaximum_128.c
+  fmaximum_mag_32.c
+  fmaximum_mag_64.c
+  fmaximum_mag_80.c
+  fmaximum_mag_128.c
+  fmaximum_mag_num_32.c
+  fmaximum_mag_num_64.c
+  fmaximum_mag_num_80.c
+  fmaximum_mag_num_128.c
+  fmaximum_num_32.c
+  fmaximum_num_64.c
+  fmaximum_num_80.c
+  fmaximum_num_128.c
+  fminimum_32.c
+  fminimum_64.c
+  fminimum_80.c
+  fminimum_128.c
+  fminimum_mag_32.c
+  fminimum_mag_64.c
+  fminimum_mag_80.c
+  fminimum_mag_128.c
+  fminimum_mag_num_32.c
+  fminimum_mag_num_64.c
+  fminimum_mag_num_80.c
+  fminimum_mag_num_128.c
+  fminimum_num_32.c
+  fminimum_num_64.c
+  fminimum_num_80.c
+  fminimum_num_128.c
   fmul_64.c
   fmul_80.c
   fmul_128.c

@@ -327,7 +327,21 @@ force_eval_float(float x)
 }
 
 static __always_inline void
+force_evalf(float x)
+{
+    FORCE_FLOAT y = x;
+    (void)y;
+}
+
+static __always_inline void
 force_eval_double(double x)
+{
+    FORCE_DOUBLE y = x;
+    (void)y;
+}
+
+static __always_inline void
+force_eval(double x)
 {
     FORCE_DOUBLE y = x;
     (void)y;
@@ -343,6 +357,13 @@ opt_barrier_long_double(long double x)
 
 static __always_inline void
 force_eval_long_double(long double x)
+{
+    FORCE_LONG_DOUBLE y = x;
+    (void)y;
+}
+
+static __always_inline void
+force_evall(long double x)
 {
     FORCE_LONG_DOUBLE y = x;
     (void)y;

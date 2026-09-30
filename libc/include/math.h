@@ -728,6 +728,22 @@ float    exp2m1f(float) __picolibc_export;
 float    fadd(double, double) __picolibc_export;
 float    fdiv(double, double) __picolibc_export;
 float    ffma(double, double, double) __picolibc_export;
+double   fmaximum(double, double) __picolibc_export;
+float    fmaximumf(float, float) __picolibc_export;
+double   fmaximum_mag(double, double) __picolibc_export;
+float    fmaximum_magf(float, float) __picolibc_export;
+double   fmaximum_mag_num(double, double) __picolibc_export;
+float    fmaximum_mag_numf(float, float) __picolibc_export;
+double   fmaximum_num(double, double) __picolibc_export;
+float    fmaximum_numf(float, float) __picolibc_export;
+double   fminimum(double, double) __picolibc_export;
+float    fminimumf(float, float) __picolibc_export;
+double   fminimum_mag(double, double) __picolibc_export;
+float    fminimum_magf(float, float) __picolibc_export;
+double   fminimum_mag_num(double, double) __picolibc_export;
+float    fminimum_mag_numf(float, float) __picolibc_export;
+double   fminimum_num(double, double) __picolibc_export;
+float    fminimum_numf(float, float) __picolibc_export;
 float    fmul(double, double) __picolibc_export;
 float    fsqrt(double) __picolibc_export;
 float    fsub(double, double) __picolibc_export;
@@ -743,30 +759,6 @@ double   tanpi(double) __picolibc_export;
 float    tanpif(float) __picolibc_export;
 
 /* Missing functions */
-
-double   fmaximum(double, double) __picolibc_export; /* XXX */
-float    fmaximumf(float, float) __picolibc_export;  /* XXX */
-
-double   fmaximum_mag(double, double) __picolibc_export; /* XXX */
-float    fmaximum_magf(float, float) __picolibc_export;  /* XXX */
-
-double   fmaximum_mag_num(double, double) __picolibc_export; /* XXX */
-float    fmaximum_mag_numf(float, float) __picolibc_export;  /* XXX */
-
-double   fmaximum_num(double, double) __picolibc_export; /* XXX */
-float    fmaximum_numf(float, float) __picolibc_export;  /* XXX */
-
-double   fminimum(double, double) __picolibc_export; /* XXX */
-float    fminimumf(float, float) __picolibc_export;  /* XXX */
-
-double   fminimum_mag(double, double) __picolibc_export; /* XXX */
-float    fminimum_magf(float, float) __picolibc_export;  /* XXX */
-
-double   fminimum_mag_num(double, double) __picolibc_export; /* XXX */
-float    fminimum_mag_numf(float, float) __picolibc_export;  /* XXX */
-
-double   fminimum_num(double, double) __picolibc_export; /* XXX */
-float    fminimum_numf(float, float) __picolibc_export;  /* XXX */
 
 double   fromfp(double, int, unsigned int) __picolibc_export; /* XXX */
 float    fromfpf(float, int, unsigned int) __picolibc_export; /* XXX */
@@ -824,6 +816,14 @@ long double exp2m1l(long double) __picolibc_export;
 float       faddl(long double, long double) __picolibc_export;
 float       fdivl(long double, long double) __picolibc_export;
 float       ffmal(long double, long double, long double) __picolibc_export;
+long double fmaximuml(long double, long double) __picolibc_export;
+long double fmaximum_magl(long double, long double) __picolibc_export;
+long double fmaximum_mag_numl(long double, long double) __picolibc_export;
+long double fmaximum_numl(long double, long double) __picolibc_export;
+long double fminimuml(long double, long double) __picolibc_export;
+long double fminimum_magl(long double, long double) __picolibc_export;
+long double fminimum_mag_numl(long double, long double) __picolibc_export;
+long double fminimum_numl(long double, long double) __picolibc_export;
 float       fmull(long double, long double) __picolibc_export;
 float       fsqrtl(long double) __picolibc_export;
 float       fsubl(long double, long double) __picolibc_export;
@@ -834,26 +834,18 @@ long double sinpil(long double) __picolibc_export;
 long double tanpil(long double) __picolibc_export;
 
 /* Missing functions */
-long double fmaximuml(long double, long double) __picolibc_export;         /* XXX */
-long double fmaximum_magl(long double, long double) __picolibc_export;     /* XXX */
-long double fmaximum_mag_numl(long double, long double) __picolibc_export; /* XXX */
-long double fmaximum_numl(long double, long double) __picolibc_export;     /* XXX */
-long double fminimuml(long double, long double) __picolibc_export;         /* XXX */
-long double fminimum_magl(long double, long double) __picolibc_export;     /* XXX */
-long double fminimum_mag_numl(long double, long double) __picolibc_export; /* XXX */
-long double fminimum_numl(long double, long double) __picolibc_export;     /* XXX */
-long double fromfpl(long double, int, unsigned int) __picolibc_export;     /* XXX */
-long double fromfpxl(long double, int, unsigned int) __picolibc_export;    /* XXX */
-long int    llogbl(long double) __picolibc_export;                         /* XXX */
-long double log10p1l(long double) __picolibc_export;                       /* XXX */
-long double log2p1l(long double) __picolibc_export;                        /* XXX */
-long double logp1l(long double) __picolibc_export;                         /* XXX */
-long double powrl(long double, long double) __picolibc_export;             /* XXX */
-long double rootnl(long double, long long int) __picolibc_export;          /* XXX */
-long double rsqrtl(long double) __picolibc_export;                         /* XXX */
-long double roundevenl(long double) __picolibc_export;                     /* XXX */
-long double ufromfpl(long double, int, unsigned int) __picolibc_export;    /* XXX */
-long double ufromfpxl(long double, int, unsigned int) __picolibc_export;   /* XXX */
+long double fromfpl(long double, int, unsigned int) __picolibc_export;   /* XXX */
+long double fromfpxl(long double, int, unsigned int) __picolibc_export;  /* XXX */
+long int    llogbl(long double) __picolibc_export;                       /* XXX */
+long double log10p1l(long double) __picolibc_export;                     /* XXX */
+long double log2p1l(long double) __picolibc_export;                      /* XXX */
+long double logp1l(long double) __picolibc_export;                       /* XXX */
+long double powrl(long double, long double) __picolibc_export;           /* XXX */
+long double rootnl(long double, long long int) __picolibc_export;        /* XXX */
+long double rsqrtl(long double) __picolibc_export;                       /* XXX */
+long double roundevenl(long double) __picolibc_export;                   /* XXX */
+long double ufromfpl(long double, int, unsigned int) __picolibc_export;  /* XXX */
+long double ufromfpxl(long double, int, unsigned int) __picolibc_export; /* XXX */
 
 #endif
 #endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
