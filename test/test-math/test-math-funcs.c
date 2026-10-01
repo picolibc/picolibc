@@ -179,6 +179,7 @@ test_exp(void)
     d1 = pown(d1, li1);
     d1 = exp10m1(d1);
     d1 = exp2m1(d1);
+    li1 = llogb(d1);
     d1 = log10p1(d1);
     d1 = log2p1(d1);
     d1 = logp1(d1);
@@ -190,7 +191,6 @@ test_exp(void)
 #ifndef __PICOLIBC__
     d1 = powr(d1, d2);
     d1 = rootn(d1, li1);
-    li1 = llogb(d1);
 #endif
 
     f1 = expf(f1);
@@ -207,6 +207,7 @@ test_exp(void)
     f1 = pownf(f1, li1);
     f1 = exp10m1f(f1);
     f1 = exp2m1f(f1);
+    li1 = llogbf(d1);
     f1 = log10p1f(f1);
     f1 = log2p1f(f1);
     f1 = logp1f(f1);
@@ -218,7 +219,6 @@ test_exp(void)
 #ifndef __PICOLIBC__
     f1 = powrf(f1, f2);
     f1 = rootnf(f1, li1);
-    li1 = llogbf(d1);
 #endif
 
 #if defined(_TEST_LONG_DOUBLE) && defined(__HAVE_LONG_DOUBLE_MATH)
@@ -238,6 +238,7 @@ test_exp(void)
     l1 = exp10m1l(l1);
     l1 = exp2m1l(l1);
 
+    li1 = llogbl(l1);
     l1 = log10p1l(l1);
     l1 = log2p1l(l1);
     l1 = logp1l(l1);
@@ -249,7 +250,6 @@ test_exp(void)
 #ifndef __PICOLIBC__
     l1 = powrl(l1, l2);
     l1 = rootnl(l1, li1);
-    li1 = llogbl(l1);
 #endif
 
 #endif /* _TEST_LONG_DOUBLE */
@@ -390,8 +390,8 @@ test_bits(void)
     l1 = nanl("");
 
 #ifndef __PICOLIBC__
-    l1 = fromfp(l1, i1, u1);
-    l1 = fromfpx(l1, i1, u1);
+    l1 = fromfpl(l1, i1, u1);
+    l1 = fromfpxl(l1, i1, u1);
 
     l1 = ufromfpl(l1, i1, u1);
     l1 = ufromfpxl(l1, i1, u1);

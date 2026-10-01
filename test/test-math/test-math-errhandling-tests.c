@@ -1575,6 +1575,32 @@ makemathname(test_ilogb_neginf)(void)
 }
 
 static long long
+makemathname(test_llogb_0)(void)
+{
+    return makemathname(llogb)(makemathname(zero));
+}
+static long long
+makemathname(test_llogb_qnan)(void)
+{
+    return makemathname(llogb)(makemathname(qnanval));
+}
+static long long
+makemathname(test_llogb_snan)(void)
+{
+    return makemathname(llogb)(makemathname(snanval));
+}
+static long long
+makemathname(test_llogb_inf)(void)
+{
+    return makemathname(llogb)(makemathname(infval));
+}
+static long long
+makemathname(test_llogb_neginf)(void)
+{
+    return makemathname(llogb)(-makemathname(infval));
+}
+
+static long long
 makemathname(test_fpclassify_snan)(void)
 {
     return fpclassify(makemathname(snanval));
@@ -4493,6 +4519,12 @@ static TEST_CONST struct {
     TEST(ilogb_snan, FP_ILOGBNAN, FE_INVALID, EDOM),
     TEST(ilogb_inf, INT_MAX, FE_INVALID, EDOM),
     TEST(ilogb_neginf, INT_MAX, FE_INVALID, EDOM),
+
+    TEST(llogb_0, FP_LLOGB0, FE_INVALID, EDOM),
+    TEST(llogb_qnan, FP_LLOGBNAN, FE_INVALID, EDOM),
+    TEST(llogb_snan, FP_LLOGBNAN, FE_INVALID, EDOM),
+    TEST(llogb_inf, LONG_MAX, FE_INVALID, EDOM),
+    TEST(llogb_neginf, LONG_MAX, FE_INVALID, EDOM),
 
     TEST(lrint_zero, 0, 0, 0),
     TEST(lrint_negzero, 0, 0, 0),
