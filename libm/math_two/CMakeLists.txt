@@ -179,6 +179,10 @@ picolibc_sources(
   pown_64.c
   pown_80.c
   pown_128.c
+  roundeven_32.c
+  roundeven_64.c
+  roundeven_80.c
+  roundeven_128.c
   sinpi_32.c
   sinpi_64.c
   sinpi_80.c
