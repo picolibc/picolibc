@@ -73,6 +73,7 @@ REAL_OTHER = \
 	test-remainder.h \
 	test-remquo.h \
 	test-round.h \
+	test-roundeven.h \
 	test-scalbn.h \
 	test-sqrt.h \
 	test-tgamma.h

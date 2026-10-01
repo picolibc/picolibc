@@ -289,11 +289,11 @@ test_bits(void)
     d1 = remainder(d1, d2);
     d1 = drem(d1, d2);
     d1 = getpayload((double *)&d1);
+    d1 = roundeven(d1);
 
 #ifndef __PICOLIBC__
     d1 = fromfp(d1, i1, u1);
     d1 = fromfpx(d1, i1, u1);
-    d1 = roundeven(d1);
     d1 = ufromfp(d1, i1, u1);
     d1 = ufromfpx(d1, i1, u1);
 #endif
@@ -332,11 +332,11 @@ test_bits(void)
     f1 = scalbf(f1, f2);
     f1 = compoundnf(f1, lli1);
     i1 = canonicalizef((float *)&f1, (float *)&f2);
+    f1 = roundevenf(f1);
 
 #ifndef __PICOLIBC__
     f1 = fromfpf(f1, i1, u1);
     f1 = fromfpxf(f1, i1, u1);
-    f1 = roundevenf(f1);
     f1 = ufromfpf(f1, i1, u1);
     f1 = ufromfpxf(f1, i1, u1);
 #endif
@@ -381,7 +381,9 @@ test_bits(void)
 
     i1 = canonicalizel((long double *)&l1, (long double *)&l2);
     l1 = compoundnl(l1, lli1);
+    l1 = roundevenl(l1);
 #endif
+
 #ifdef __PICOLIBC__
     l1 = infinityl();
 #endif
@@ -391,7 +393,6 @@ test_bits(void)
     l1 = fromfp(l1, i1, u1);
     l1 = fromfpx(l1, i1, u1);
 
-    l1 = roundeven(l1);
     l1 = ufromfpl(l1, i1, u1);
     l1 = ufromfpxl(l1, i1, u1);
 #endif

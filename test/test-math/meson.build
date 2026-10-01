@@ -109,6 +109,7 @@ tests_real_other = [
   'test-remainder',
   'test-remquo-quo',
   'test-round',
+  'test-roundeven',
   'test-sqrt',
   'test-tgamma'
 ]
@@ -154,12 +155,13 @@ tests += tests_complex_trig + tests_complex_exp + tests_complex_other
 tests += tests_other
 
 functions = [ 'acos', 'acosh', 'acospi', 'asin', 'asinh', 'asinpi',
-              'atan', 'atanh', 'atanpi', 'cbrt', 'cos', 'cosh',
-              'cospi', 'erf', 'erfc', 'exp', 'exp10', 'exp2', 'expm1',
-              'exp10m1', 'exp2m1', 'j0', 'j1', 'lgamma', 'log',
-              'log10', 'log1p', 'log2', 'log10p1', 'log2p1', 'sin',
-              'sinpi', 'sincos_cos', 'sincos_sin', 'sinh', 'sqrt',
-              'tan', 'tanh', 'tanpi', 'tgamma', 'y0', 'y1', ]
+              'atan', 'atanh', 'atanpi', 'cbrt', 'ceil', 'cos',
+              'cosh', 'cospi', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
+              'expm1', 'exp10m1', 'exp2m1', 'floor', 'j0', 'j1',
+              'lgamma', 'log', 'log10', 'log1p', 'log2', 'log10p1',
+              'log2p1', 'round', 'roundeven', 'sin', 'sinpi',
+              'sincos_cos', 'sincos_sin', 'sinh', 'sqrt', 'tan',
+              'tanh', 'tanpi', 'tgamma', 'y0', 'y1', ]
 
 test_extra_libs = {}
 
