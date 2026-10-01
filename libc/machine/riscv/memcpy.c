@@ -132,6 +132,31 @@ memcpy(void * __restrict aa, const void * __restrict bb, size_t n)
         }
     }
 
+    /* At most 7 words remain; copy them in 4/2/1-word steps. */
+    size_t words = lend - la;
+    if (words & 4) {
+        uintxlen_t b0 = lb[0];
+        uintxlen_t b1 = lb[1];
+        uintxlen_t b2 = lb[2];
+        uintxlen_t b3 = lb[3];
+        la[0] = b0;
+        la[1] = b1;
+        la[2] = b2;
+        la[3] = b3;
+        la += 4;
+        lb += 4;
+    }
+    if (words & 2) {
+        uintxlen_t b0 = lb[0];
+        uintxlen_t b1 = lb[1];
+        la[0] = b0;
+        la[1] = b1;
+        la += 2;
+        lb += 2;
+    }
+    if (words & 1)
+        *la++ = *lb++;
+
     a = (unsigned char *)la;
     b = (const unsigned char *)lb;
     if (unlikely(a < end))
