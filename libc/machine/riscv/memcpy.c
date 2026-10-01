@@ -30,7 +30,7 @@ __libc_memcpy_bytewise(unsigned char *dst, const unsigned char *src, const size_
 }
 
 #ifndef __riscv_misaligned_fast
-static uintxlen_t
+static __always_inline uintxlen_t
 __libc_load_xlen(const void *src)
 {
     const unsigned char *p = (const unsigned char *)src;
