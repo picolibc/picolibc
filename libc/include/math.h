@@ -498,9 +498,6 @@ extern double        lgamma(double) __picolibc_export;
 extern double        erf(double) __picolibc_export;
 extern double        erfc(double) __picolibc_export;
 extern double        log2(double) __picolibc_export;
-#if !defined(__cplusplus)
-#define log2(x) (log(x) / _M_LN2)
-#endif
 
 extern double        hypot(double, double) __picolibc_export;
 
