@@ -10,10 +10,25 @@
  * ====================================================
  */
 
+#include <math.h>
 #include <limits.h>
 
-int
-ilogbl(long double x)
+#ifdef LLOGB
+#define NAME    llogbl
+#define TYPE    long int
+#define LOGB0   FP_LLOGB0
+#define LOGBNAN FP_LLOGBNAN
+#define LOGBINF LONG_MAX
+#else
+#define NAME    ilogbl
+#define TYPE    int
+#define LOGB0   FP_ILOGB0
+#define LOGBNAN FP_ILOGBNAN
+#define LOGBINF INT_MAX
+#endif
+
+TYPE
+NAME(long double x)
 {
     union IEEEl2bits u;
     uint64_t         m;
@@ -23,7 +38,7 @@ ilogbl(long double x)
     if (u.bits.exp == 0) {
         if ((u.bits.manl | u.bits.manh) == 0) {
             (void)__math_invalidl(x);
-            return (FP_ILOGB0);
+            return LOGB0;
         }
         /* denormalized */
 #ifdef LDBL_MANL_SIZE
@@ -41,14 +56,14 @@ ilogbl(long double x)
 #ifdef LDBL_IMPLICIT_NBIT
         b++;
 #endif
-        return (LDBL_MIN_EXP - b - 1);
+        return (TYPE)(LDBL_MIN_EXP - b - 1);
     } else if (u.bits.exp < (LDBL_MAX_EXP << 1) - 1)
-        return (u.bits.exp - LDBL_MAX_EXP + 1);
-    else if (u.bits.manl != 0 || u.bits.manh != 0) {
+        return (TYPE)(u.bits.exp - LDBL_MAX_EXP + 1);
+    else if (u.bits.manl != 0 || u.bits.manh != LDBL_NBIT_INF) {
         (void)__math_invalidl(0.0L);
-        return (FP_ILOGBNAN);
+        return LOGBNAN;
     } else {
         (void)__math_invalidl(0.0L);
-        return (INT_MAX);
+        return LOGBINF;
     }
 }

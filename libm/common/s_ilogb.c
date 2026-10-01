@@ -65,8 +65,22 @@ C99, POSIX
 
 #ifdef _NEED_FLOAT64
 
-int
-ilogb64(__float64 x)
+#ifdef LLOGB
+#define NAME    llogb64
+#define TYPE    long int
+#define LOGB0   FP_LLOGB0
+#define LOGBNAN FP_LLOGBNAN
+#define LOGBINF LONG_MAX
+#else
+#define NAME    ilogb64
+#define TYPE    int
+#define LOGB0   FP_ILOGB0
+#define LOGBNAN FP_ILOGBNAN
+#define LOGBINF INT_MAX
+#endif
+
+TYPE
+NAME(__float64 x)
 {
     __int32_t hx, lx, ix;
 
@@ -75,8 +89,8 @@ ilogb64(__float64 x)
     if (hx < 0x00100000) {
         if ((hx | lx) == 0) {
             (void)__math_invalid(_F_64(0.0));
-            return FP_ILOGB0; /* ilogb(0) = special case error */
-        } else                /* subnormal x */
+            return LOGB0; /* ilogb(0) = special case error */
+        } else            /* subnormal x */
             if (hx == 0) {
                 for (ix = -1043; lx > 0; lx = lsl(lx, 1))
                     ix -= 1;
@@ -84,21 +98,25 @@ ilogb64(__float64 x)
                 for (ix = -1022, hx = lsl(hx, 11); hx > 0; hx = lsl(hx, 1))
                     ix -= 1;
             }
-        return ix;
+        return (TYPE)ix;
     } else if (hx < 0x7ff00000)
-        return (hx >> 20) - 1023;
-#if FP_ILOGBNAN != INT_MAX
+        return (TYPE)((hx >> 20) - 1023);
+#if ILOGBNAN != LOGBINF
     else if (hx > 0x7ff00000) {
         (void)__math_invalid(_F_64(0.0));
-        return FP_ILOGBNAN; /* NAN */
+        return LOGBNAN; /* NAN */
     }
 #endif
     else {
         (void)__math_invalid(_F_64(0.0));
-        return INT_MAX; /* infinite (or, possibly, NAN) */
+        return LOGBINF; /* infinite (or, possibly, NAN) */
     }
 }
 
+#ifdef LLOGB
+_MATH_ALIAS_j_d(llogb)
+#else
 _MATH_ALIAS_i_d(ilogb)
+#endif
 
 #endif /* _NEED_FLOAT64 */

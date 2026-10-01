@@ -16,8 +16,22 @@
 #include <limits.h>
 #include "fdlibm.h"
 
-int
-ilogbf(float x)
+#ifdef LLOGB
+#define NAME    llogbf
+#define TYPE    long int
+#define LOGB0   FP_LLOGB0
+#define LOGBNAN FP_LLOGBNAN
+#define LOGBINF LONG_MAX
+#else
+#define NAME    ilogbf
+#define TYPE    int
+#define LOGB0   FP_ILOGB0
+#define LOGBNAN FP_ILOGBNAN
+#define LOGBINF INT_MAX
+#endif
+
+TYPE
+NAME(float x)
 {
     __int32_t hx, ix;
 
@@ -25,24 +39,28 @@ ilogbf(float x)
     hx &= 0x7fffffff;
     if (FLT_UWORD_IS_ZERO(hx)) {
         (void)__math_invalidf(0.0);
-        return FP_ILOGB0; /* ilogb(0) = special case error */
+        return LOGB0; /* ilogb(0) = special case error */
     }
     if (FLT_UWORD_IS_SUBNORMAL(hx)) {
         for (ix = -126, hx = lsl(hx, 8); hx > 0; hx = lsl(hx, 1))
             ix -= 1;
-        return ix;
+        return (TYPE)ix;
     }
-#if FP_ILOGBNAN != INT_MAX
+#if LOGBNAN != LOGBINF
     else if (FLT_UWORD_IS_NAN(hx)) {
         (void)__math_invalidf(0.0);
-        return FP_ILOGBNAN; /* NAN */
+        return LOGBNAN; /* NAN */
     }
 #endif
     else if (!FLT_UWORD_IS_FINITE(hx)) {
         (void)__math_invalidf(0.0);
-        return INT_MAX;
+        return LOGBINF;
     } else
-        return (hx >> 23) - 127;
+        return (TYPE)(hx >> 23) - 127;
 }
 
+#ifdef LLOGB
+_MATH_ALIAS_j_f(llogb)
+#else
 _MATH_ALIAS_i_f(ilogb)
+#endif

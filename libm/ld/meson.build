@@ -110,6 +110,7 @@ srcs_ld_common = [
   's_issignalingl.c',
   's_llrintl.c',
   's_llroundl.c',
+  's_llogbl.c',
   's_logbl.c',
   's_lrintl.c',
   's_lroundl.c',

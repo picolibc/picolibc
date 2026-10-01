@@ -586,6 +586,7 @@ extern long double   rintl(long double) __picolibc_export;
 extern long int      lrintl(long double) __picolibc_export;
 extern long long int llrintl(long double) __picolibc_export;
 extern int           ilogbl(long double) __picolibc_export;
+extern long int      llogbl(long double) __picolibc_export;
 extern long double   logbl(long double) __picolibc_export;
 extern long double   ldexpl(long double, int) __picolibc_export;
 extern long double   nearbyintl(long double) __picolibc_export;
@@ -702,6 +703,11 @@ extern long double pow10l(long double) __picolibc_export;
 
 /* C23 / GNU */
 #if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+
+/* Return values from llogb */
+#define FP_LLOGB0   (-__LONG_MAX__)
+#define FP_LLOGBNAN (__LONG_MAX__ - 1)
+
 double   acospi(double) __picolibc_export;
 float    acospif(float) __picolibc_export;
 double   asinpi(double) __picolibc_export;
@@ -744,6 +750,8 @@ float    fminimum_numf(float, float) __picolibc_export;
 float    fmul(double, double) __picolibc_export;
 float    fsqrt(double) __picolibc_export;
 float    fsub(double, double) __picolibc_export;
+long int llogb(double) __picolibc_export;
+long int llogbf(float) __picolibc_export;
 double   log10p1(double) __picolibc_export;
 float    log10p1f(float) __picolibc_export;
 double   log2p1(double) __picolibc_export;
@@ -770,9 +778,6 @@ float    fromfpf(float, int, unsigned int) __picolibc_export; /* XXX */
 
 double   fromfpx(double, int, unsigned int) __picolibc_export; /* XXX */
 float    fromfpxf(float, int, unsigned int) __picolibc_export; /* XXX */
-
-long int llogb(double) __picolibc_export; /* XXX */
-long int llogbf(float) __picolibc_export; /* XXX */
 
 double   powr(double, double) __picolibc_export; /* XXX */
 float    powrf(float, float) __picolibc_export;  /* XXX */
@@ -833,7 +838,6 @@ long double tanpil(long double) __picolibc_export;
 /* Missing functions */
 long double fromfpl(long double, int, unsigned int) __picolibc_export;   /* XXX */
 long double fromfpxl(long double, int, unsigned int) __picolibc_export;  /* XXX */
-long int    llogbl(long double) __picolibc_export;                       /* XXX */
 long double powrl(long double, long double) __picolibc_export;           /* XXX */
 long double rootnl(long double, long long int) __picolibc_export;        /* XXX */
 long double rsqrtl(long double) __picolibc_export;                       /* XXX */

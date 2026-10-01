@@ -1573,6 +1573,7 @@ extern int __signgam;
 #define __isnan64       _NAME_64_SPECIAL(__isnand, __isnanl)
 #define __issignaling64 _NAME_64(__issignaling)
 #define ldexp64         _NAME_64(ldexp)
+#define llogb64         _NAME_64(llogb)
 #define j064            _NAME_64(j0)
 #define y064            _NAME_64(y0)
 #define j164            _NAME_64(j1)
