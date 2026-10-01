@@ -41,22 +41,24 @@
 float_t
 name(_ff_pown)(float_t hi, float_t lo, long long int k)
 {
-    ff_t xx = { .hi = hi, .lo = lo };
-    ff_t result = { .hi = 1, .lo = 0 };
+    ff_t                   xx = { .hi = hi, .lo = lo };
+    ff_t                   result = { .hi = 1, .lo = 0 };
+    unsigned long long int ku;
 
     if (k < 0) {
-        k = -k;
+        ku = -(unsigned long long int)k;
         xx = ff_div_ff(result, xx);
-    }
+    } else
+        ku = k;
 
     for (;;) {
-        if (k & 1) {
+        if (ku & 1) {
             result = ff_mul_ff(result, xx);
             if (isinf(result.hi) || result.hi == 0)
                 break;
         }
-        k >>= 1;
-        if (!k)
+        ku >>= 1;
+        if (!ku)
             break;
         xx = ff_mul_ff(xx, xx);
     }
