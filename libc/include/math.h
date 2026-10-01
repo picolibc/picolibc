@@ -708,6 +708,13 @@ extern long double pow10l(long double) __picolibc_export;
 #define FP_LLOGB0   (-__LONG_MAX__)
 #define FP_LLOGBNAN (__LONG_MAX__ - 1)
 
+/* Rounding modes for fromfp functions */
+#define FP_INT_UPWARD            0
+#define FP_INT_DOWNWARD          1
+#define FP_INT_TOWARDZERO        2
+#define FP_INT_TONEARESTFROMZERO 3
+#define FP_INT_TONEAREST         4
+
 double   acospi(double) __picolibc_export;
 float    acospif(float) __picolibc_export;
 double   asinpi(double) __picolibc_export;
@@ -748,6 +755,10 @@ float    fminimum_mag_numf(float, float) __picolibc_export;
 double   fminimum_num(double, double) __picolibc_export;
 float    fminimum_numf(float, float) __picolibc_export;
 float    fmul(double, double) __picolibc_export;
+double   fromfp(double, int, unsigned int) __picolibc_export;
+float    fromfpf(float, int, unsigned int) __picolibc_export;
+double   fromfpx(double, int, unsigned int) __picolibc_export;
+float    fromfpxf(float, int, unsigned int) __picolibc_export;
 float    fsqrt(double) __picolibc_export;
 float    fsub(double, double) __picolibc_export;
 long int llogb(double) __picolibc_export;
@@ -772,26 +783,18 @@ double   sinpi(double) __picolibc_export;
 float    sinpif(float) __picolibc_export;
 double   tanpi(double) __picolibc_export;
 float    tanpif(float) __picolibc_export;
+double   ufromfp(double, int, unsigned int) __picolibc_export;
+float    ufromfpf(float, int, unsigned int) __picolibc_export;
+double   ufromfpx(double, int, unsigned int) __picolibc_export;
+float    ufromfpxf(float, int, unsigned int) __picolibc_export;
 
 /* Missing functions */
-
-double   fromfp(double, int, unsigned int) __picolibc_export; /* XXX */
-float    fromfpf(float, int, unsigned int) __picolibc_export; /* XXX */
-
-double   fromfpx(double, int, unsigned int) __picolibc_export; /* XXX */
-float    fromfpxf(float, int, unsigned int) __picolibc_export; /* XXX */
 
 double   rootn(double, long long int) __picolibc_export; /* XXX */
 float    rootnf(float, long long int) __picolibc_export; /* XXX */
 
 double   rsqrt(double) __picolibc_export; /* XXX */
 float    rsqrtf(float) __picolibc_export; /* XXX */
-
-double   ufromfp(double, int, unsigned int) __picolibc_export; /* XXX */
-float    ufromfpf(float, int, unsigned int) __picolibc_export; /* XXX */
-
-double   ufromfpx(double, int, unsigned int) __picolibc_export; /* XXX */
-float    ufromfpxf(float, int, unsigned int) __picolibc_export; /* XXX */
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 long double acospil(long double) __picolibc_export;
@@ -822,6 +825,8 @@ long double fminimum_magl(long double, long double) __picolibc_export;
 long double fminimum_mag_numl(long double, long double) __picolibc_export;
 long double fminimum_numl(long double, long double) __picolibc_export;
 float       fmull(long double, long double) __picolibc_export;
+long double fromfpl(long double, int, unsigned int) __picolibc_export;
+long double fromfpxl(long double, int, unsigned int) __picolibc_export;
 float       fsqrtl(long double) __picolibc_export;
 float       fsubl(long double, long double) __picolibc_export;
 long double log10p1l(long double) __picolibc_export;
@@ -834,14 +839,12 @@ long double powrl(long double, long double) __picolibc_export;
 long double roundevenl(long double) __picolibc_export;
 long double sinpil(long double) __picolibc_export;
 long double tanpil(long double) __picolibc_export;
+long double ufromfpl(long double, int, unsigned int) __picolibc_export;
+long double ufromfpxl(long double, int, unsigned int) __picolibc_export;
 
 /* Missing functions */
-long double fromfpl(long double, int, unsigned int) __picolibc_export;   /* XXX */
-long double fromfpxl(long double, int, unsigned int) __picolibc_export;  /* XXX */
 long double rootnl(long double, long long int) __picolibc_export;        /* XXX */
 long double rsqrtl(long double) __picolibc_export;                       /* XXX */
-long double ufromfpl(long double, int, unsigned int) __picolibc_export;  /* XXX */
-long double ufromfpxl(long double, int, unsigned int) __picolibc_export; /* XXX */
 
 #endif
 #endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */

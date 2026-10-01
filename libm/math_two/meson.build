@@ -150,6 +150,7 @@ srcs_math_two = [
   'fmul_64.c',
   'fmul_80.c',
   'fmul_128.c',
+  'fromfp_32.c',
   'fsub_32.c',
   'fsub_64.c',
   'fsub_80.c',
