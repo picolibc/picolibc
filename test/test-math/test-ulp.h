@@ -82,6 +82,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "log",        .b32 = 1,       .b64 = 0,       .b80 = 0,       .b128 = 1       },
     { .name = "pow",        .b32 = 1,       .b64 = 1,       .b80 = 6107,    .b128 = 1       },
     { .name = "pown",       .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
+    { .name = "powr",       .b32 = 1,       .b64 = 1,       .b80 = 6107,    .b128 = 1       },
 
     /* Narrowing functions */
     { .name = "dadd",       .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
@@ -207,6 +208,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "log2", .b32 = 1, .b64 = 0, .b80 = 1, .b128 = 1 },
     { .name = "pow", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "pown", .b32 = 1, .b64 = 1, .b80 = 3, .b128 = 2 },
+    { .name = "powr", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
 
     /* Narrowing functions */
     { .name = "dadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },

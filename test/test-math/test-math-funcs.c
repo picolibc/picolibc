@@ -183,13 +183,13 @@ test_exp(void)
     d1 = log10p1(d1);
     d1 = log2p1(d1);
     d1 = logp1(d1);
+    d1 = powr(d1, d2);
 
 #ifdef __PICOLIBC__
     d1 = pow10(d1);
 #endif
 
 #ifndef __PICOLIBC__
-    d1 = powr(d1, d2);
     d1 = rootn(d1, li1);
 #endif
 
@@ -211,13 +211,13 @@ test_exp(void)
     f1 = log10p1f(f1);
     f1 = log2p1f(f1);
     f1 = logp1f(f1);
+    f1 = powrf(f1, f2);
 
 #ifdef __PICOLIBC__
     f1 = pow10f(f1);
 #endif
 
 #ifndef __PICOLIBC__
-    f1 = powrf(f1, f2);
     f1 = rootnf(f1, li1);
 #endif
 
@@ -242,13 +242,13 @@ test_exp(void)
     l1 = log10p1l(l1);
     l1 = log2p1l(l1);
     l1 = logp1l(l1);
+    l1 = powrl(l1, l2);
 
 #ifdef __PICOLIBC__
     l1 = pow10l(l1);
 #endif
 
 #ifndef __PICOLIBC__
-    l1 = powrl(l1, l2);
     l1 = rootnl(l1, li1);
 #endif
 

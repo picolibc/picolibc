@@ -65,6 +65,8 @@ set(tests_real_exp
   test-log10p1
   test-log2p1
   test-pow
+  test-pown
+  test-powr
 )
 
 set(tests_real_other

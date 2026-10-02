@@ -40,7 +40,8 @@ REAL_EXP = \
 	test-log10p1.h \
 	test-log2p1.h \
 	test-pow.h \
-	test-pown.h
+	test-pown.h \
+	test-powr.h
 
 REAL_NARROW = \
 	test-fadd.h \

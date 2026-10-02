@@ -74,6 +74,7 @@ tests_real_exp = [
   'test-log2',
   'test-pow',
   'test-pown',
+  'test-powr',
 ]
 
 tests_real_narrow = [

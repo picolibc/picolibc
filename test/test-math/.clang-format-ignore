@@ -34,6 +34,7 @@ test-log10p1.h
 test-log2p1.h
 test-pow.h
 test-pown.h
+test-powr.h
 test-fadd.h
 test-fsub.h
 test-fmul.h
@@ -62,6 +63,7 @@ test-lgamma.h
 test-remainder.h
 test-remquo.h
 test-round.h
+test-roundeven.h
 test-scalbn.h
 test-sqrt.h
 test-tgamma.h
