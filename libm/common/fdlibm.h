@@ -292,7 +292,16 @@ typedef union {
 
 /* Get a 32 bit int from a float.  */
 
+/*
+ * Debian gcc-powerpc64-linux-gnu 4:16.1.0-1 miscompiles sf_pow.c with
+ *
+ *  -mfloat128-hardware -mvsx -mcpu=power9 -Wno-psabi
+ */
+#ifdef __POWER9_VECTOR__
+#define GET_FLOAT_WORD(i, d) force_evalf((i) = asuint(d))
+#else
 #define GET_FLOAT_WORD(i, d) ((i) = asuint(d))
+#endif
 
 /* Set a float from a 32 bit int.  */
 
