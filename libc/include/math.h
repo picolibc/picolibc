@@ -764,6 +764,8 @@ double   nextup(double) __picolibc_export;
 float    nextupf(float) __picolibc_export;
 double   pown(double, long long int) __picolibc_export;
 float    pownf(float, long long int) __picolibc_export;
+double   powr(double, double) __picolibc_export;
+float    powrf(float, float) __picolibc_export;
 double   roundeven(double) __picolibc_export;
 float    roundevenf(float) __picolibc_export;
 double   sinpi(double) __picolibc_export;
@@ -778,9 +780,6 @@ float    fromfpf(float, int, unsigned int) __picolibc_export; /* XXX */
 
 double   fromfpx(double, int, unsigned int) __picolibc_export; /* XXX */
 float    fromfpxf(float, int, unsigned int) __picolibc_export; /* XXX */
-
-double   powr(double, double) __picolibc_export; /* XXX */
-float    powrf(float, float) __picolibc_export;  /* XXX */
 
 double   rootn(double, long long int) __picolibc_export; /* XXX */
 float    rootnf(float, long long int) __picolibc_export; /* XXX */
@@ -831,6 +830,7 @@ long double logp1l(long double) __picolibc_export;
 long double nextdownl(long double) __picolibc_export;
 long double nextupl(long double) __picolibc_export;
 long double pownl(long double, long long int) __picolibc_export;
+long double powrl(long double, long double) __picolibc_export;
 long double roundevenl(long double) __picolibc_export;
 long double sinpil(long double) __picolibc_export;
 long double tanpil(long double) __picolibc_export;
@@ -838,7 +838,6 @@ long double tanpil(long double) __picolibc_export;
 /* Missing functions */
 long double fromfpl(long double, int, unsigned int) __picolibc_export;   /* XXX */
 long double fromfpxl(long double, int, unsigned int) __picolibc_export;  /* XXX */
-long double powrl(long double, long double) __picolibc_export;           /* XXX */
 long double rootnl(long double, long long int) __picolibc_export;        /* XXX */
 long double rsqrtl(long double) __picolibc_export;                       /* XXX */
 long double ufromfpl(long double, int, unsigned int) __picolibc_export;  /* XXX */
