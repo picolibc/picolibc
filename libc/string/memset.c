@@ -97,8 +97,11 @@ memset(void *m, int c, size_t n)
 
 #endif /* not __PREFER_SIZE_OVER_SPEED */
 
-    while (n--)
-        *s++ = (char)c;
+    if (n) {
+        do {
+            *s++ = (char)c;
+        } while (--n);
+    }
 
     return m;
 }
