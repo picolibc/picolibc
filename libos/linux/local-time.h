@@ -44,6 +44,42 @@
 
 #include <time.h>
 
+/*
+ * Reading the clock.
+ *
+ * Architectures with a 64-bit time_t ABI provide clock_gettime, which
+ * takes a struct __kernel_timespec with a 64-bit tv_sec.
+ *
+ * 32-bit architectures added after the y2038 work (riscv32, hexagon,
+ * ...) do not provide clock_gettime at all; the only entry point is
+ * clock_gettime64. Older 32-bit architectures provide both: their
+ * clock_gettime is the y2038-limited *_time32 kernel handler, while
+ * clock_gettime64 is y2038-safe. Prefer clock_gettime64 whenever the
+ * kernel offers it.
+ *
+ * The two syscalls do not share a layout: clock_gettime64 always
+ * expects a 64-bit tv_sec/tv_nsec pair, whereas the generated struct
+ * __kernel_timespec follows the arch's native time_t and is 32-bit on
+ * those targets. Pair each syscall with a matching struct so the kernel
+ * never writes past the end of the object.
+ */
+#ifdef LINUX_SYS_clock_gettime64
+
+#define LINUX_SYS_clock_gettime_time_t LINUX_SYS_clock_gettime64
+
+struct __kernel_timespec_time_t {
+    __int64_t tv_sec;
+    __int64_t tv_nsec;
+};
+
+#else
+
+#define LINUX_SYS_clock_gettime_time_t LINUX_SYS_clock_gettime
+
+#define __kernel_timespec_time_t       __kernel_timespec
+
+#endif
+
 /* Copy between kernel and library representations of itimerval */
 #define MAP_ITV(a, b)                                             \
     do {                                                          \

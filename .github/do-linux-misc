@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 HERE=`dirname "$0"`
+"$HERE"/do-test clang-hexagon-linux "$@"
+"$HERE"/do-test clang-hexagon "$@"
 "$HERE"/do-build lx106 "$@"
 "$HERE"/do-build powerpc64le "$@"
 "$HERE"/do-build powerpc64 "$@"
@@ -16,7 +18,6 @@ HERE=`dirname "$0"`
 "$HERE"/do-build mips64 "$@"
 "$HERE"/do-build mips "$@"
 "$HERE"/do-build mipsel "$@"
-"$HERE"/do-test clang-hexagon "$@"
 "$HERE"/do-test m68k-unknown-elf "$@"
 "$HERE"/do-test sh-unknown-elf "$@"
 "$HERE"/do-avr-build avr "$@"

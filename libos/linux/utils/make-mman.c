@@ -35,6 +35,7 @@
 
 #define _GNU_SOURCE
 #include <sys/mman.h>
+#include <asm/mman.h>
 #include <stdio.h>
 
 int

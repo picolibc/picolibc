@@ -33,7 +33,9 @@ OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#ifndef CRT0_LINUX
 #define CRT0_GET_CMDLINE
+#endif
 
 #include "../../crt0.h"
 
@@ -73,10 +75,20 @@ coredump()
 #endif
 
 void __attribute__((noreturn))
-_cstart()
+#ifdef CRT0_LINUX
+_cstart(void *orig_sp)
+#else
+_cstart(void)
+#endif
 {
+#ifdef CRT0_LINUX
+    int    argc = *(int *)orig_sp;
+    char **argv = ((char **)orig_sp) + 1;
+    __start(argc, argv);
+#else
 #ifdef CRT0_SEMIHOST
     hexagon_write_SSR(0);
 #endif
     __start();
+#endif
 }
