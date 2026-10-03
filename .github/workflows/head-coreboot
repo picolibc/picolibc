@@ -22,6 +22,8 @@ env:
   IMAGE: picolibc
   PACKAGES_FILE: picolibc/.github/coreboot-packages.txt
   EXTRA_FILE: picolibc/.github/coreboot-files.txt
+  BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+  AFTER_SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
 
 jobs:
   cache-maker:

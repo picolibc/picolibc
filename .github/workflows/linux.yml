@@ -21,6 +21,8 @@ env:
   IMAGE: picolibc-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
   EXTRA_FILE: picolibc/.github/linux-files.txt
+  BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+  AFTER_SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
 
 jobs:
   cache-maker:
@@ -85,7 +87,7 @@ jobs:
           docker images -a $IMAGE
       - name: CMake test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
   minsize-linux-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -120,7 +122,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   minsize-linux-riscv:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -155,7 +157,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   minsize-linux-misc:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -190,7 +192,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   release-linux-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -225,7 +227,7 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
   release-linux-riscv:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -260,7 +262,7 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
   release-linux-misc:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -295,4 +297,4 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release

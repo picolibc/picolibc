@@ -24,6 +24,8 @@ env:
   IMAGE: picolibc-check-format
   PACKAGES_FILE: picolibc/.github/check-format-packages.txt
   EXTRA_FILE: picolibc/.github/check-format-files.txt
+  BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+  AFTER_SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
 
 jobs:
   cache-maker:
@@ -79,7 +81,7 @@ jobs:
           
       - name: Check Formatting
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE bash --login -c "./.github/do-check-format"
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE bash --login -c "./.github/do-check-format"
 
       - name: Upload Formatting Patch
         if: failure()

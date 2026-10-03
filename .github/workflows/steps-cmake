@@ -1,3 +1,3 @@
       - name: CMake test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}

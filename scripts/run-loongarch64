@@ -35,6 +35,12 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+dir="$(dirname "$0")"
+
+if $dir/check-ci "$1"; then
+    exit 77
+fi
+
 qemu="qemu-system-loongarch64"
 
 # select the program

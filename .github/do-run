@@ -3,13 +3,37 @@ TARGET=$1
 DIR=build-"$TARGET"
 CONFIGURE=do-"$TARGET"-configure
 shift
+printenv
 
 (mkdir "$DIR" || exit 1
  cd "$DIR" || exit 2
+ date
+ if [ -n "$BEFORE_SHA" -a -n "$AFTER_SHA" ]; then
+     echo '##################################################'
+     echo '##########' git checkout $BEFORE_SHA
+     echo '##################################################'
+     git checkout $BEFORE_SHA
+     case $? in
+	 0)
+	     echo 'Checkout before succeeded'
+	     if [ -f ../scripts/check-ci ]; then
+		 echo 'check-ci script present, doing incremental tests'
+		 INC_TESTS=yes
+	     else
+		 echo 'check-ci script missing'
+		 echo '########' git checkout $AFTER_SHA
+		 git checkout $AFTER_SHA
+	     fi
+	     ;;
+	 *)
+	     echo 'Checkout before failed'
+	     git checkout $AFTER_SHA
+	     ;;
+     esac
+ fi
  echo '##################################################'
  echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@"
  echo '##################################################'
- date
  ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@" > config.log 2>&1
  case $? in
      0)
@@ -23,13 +47,20 @@ shift
 	 exit 3
 	 ;;
  esac
- echo '##########' "$TARGET" 'ninja'
  date
+ echo '##########' "$TARGET" 'ninja'
  ninja > ninja.log 2>&1 || exit 4
  echo 'Build succeeded'
- echo '##########' "$TARGET" 'meson test -t 20'
  date
- meson test -t 20 > test.log 2>&1 || exit 5
+ if [ -n "$INC_TESTS" ]; then
+     echo '##########' "$TARGET" 'CI_CAPTURE=yes meson test'
+     CI_CAPTURE=yes meson test > capture.log 2>&1 || exit 5
+     echo '##########' "$TARGET" "git checkout $AFTER_SHA"
+     git checkout "$AFTER_SHA"
+ fi
+     
+ echo '##########' "$TARGET" 'meson test -t 20'
+ meson test -t 20 > test.log 2>&1 || exit 6
  echo 'Test succeeded'
  date)
 case $? in
@@ -71,6 +102,19 @@ case $? in
 	exit 1
 	;;
     5)
+	echo '##################################'
+	echo '############# Capture failed'
+	echo '##################################'
+	echo 'test.log'
+	echo '##################################'
+	cat "$DIR"/test.log
+	echo '##################################'
+	echo 'meson-logs/testlog.txt'
+	echo '##################################'
+	cat "$DIR"/meson-logs/testlog.txt
+	exit 1
+	;;
+    6)
 	echo '##################################'
 	echo '############# Test failed'
 	echo '##################################'
