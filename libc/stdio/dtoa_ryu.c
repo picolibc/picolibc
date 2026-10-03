@@ -44,6 +44,7 @@
 
 #include "ryu/common.h"
 #include "ryu/d2s_intrinsics.h"
+#include "udivmod10.h"
 
 #define DOUBLE_MANTISSA_BITS 52
 #define DOUBLE_EXPONENT_BITS 11
@@ -310,7 +311,11 @@ d2d(const uint64_t ieeeMantissa, const uint32_t ieeeExponent, int max_digits, bo
 
             if (len > max_digits) {
                 output += 5;
+#if defined(_UDIVMOD10_DIVIDE_FREE)
+                output = div10m_64(output);
+#else
                 output /= 10;
+#endif
                 e10++;
                 len--;
             }
@@ -433,8 +438,14 @@ __dtoa_engine(uint64_t bits, struct dtoa *dtoa, int max_digits, bool fmode, int 
     int      i;
 
     for (i = 0; i < olength; i++) {
+#if defined(_UDIVMOD10_DIVIDE_FREE)
+        char d;
+        mant = udivmod10m_64(mant, &d);
+        dtoa->digits[olength - i - 1] = d + '0';
+#else
         dtoa->digits[olength - i - 1] = (mant % 10) + '0';
         mant /= 10;
+#endif
     }
 
     dtoa->exp = exp;
