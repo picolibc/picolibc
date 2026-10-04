@@ -21,6 +21,8 @@ env:
   IMAGE: picolibc-linux
   PACKAGES_FILE: picolibc/.github/linux-packages.txt
   EXTRA_FILE: picolibc/.github/linux-files.txt
+  BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+  AFTER_SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
 
 jobs:
   cache-maker:
@@ -30,6 +32,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: picolibc
+          fetch-depth: 128
 
       - name: Cache the Docker Image
         id: cache
@@ -61,7 +64,7 @@ jobs:
           "-Dsanitize=undefined",
 
           # math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dsanitize=undefined -Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dsanitize=undefined -Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dprintf-small-ultoa=true -Dprintf-percent-n=true -Dstrcmp-pair=true",
           "-Danalyzer=true -Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=true -Dfast-bufio=true -Dstdio-locking=true -Dstdio-exit-flush=true -Dfstat-bufsiz=true -Dmalloc-small-bucket=1024",
         ]
         test: [
@@ -72,6 +75,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: picolibc
+          fetch-depth: 128
 
       - name: Restore the Docker Image
         uses: actions/cache@v6
@@ -86,7 +90,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   release-native:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -96,7 +100,7 @@ jobs:
           "-Dsanitize=undefined",
 
           # math configurations, one with multithread disabled and with locale, original malloc and atexit/onexit code
-          "-Dsanitize=undefined -Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dprintf-small-ultoa=true -Dprintf-percent-n=true",
+          "-Dsanitize=undefined -Dio-float-exact=false -Dio-long-long=true -Dio-percent-b=true -Dio-long-double=true -Dnewlib-obsolete-math=false -Dwant-math-errno=true -Dsingle-thread=true -Dmb-capable=true -Dmb-extended-charsets=true -Dprintf-small-ultoa=true -Dprintf-percent-n=true -Dstrcmp-pair=true",
           "-Danalyzer=true -Dformat-default=integer -Dfreestanding=true -Dnewlib-obsolete-math=true -Dwant-math-errno=true -Dassert-verbose=true -Dfast-bufio=true -Dstdio-locking=true -Dstdio-exit-flush=true -Dfstat-bufsiz=true -Dmalloc-small-bucket=1024",
         ]
         test: [
@@ -107,6 +111,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: picolibc
+          fetch-depth: 128
 
       - name: Restore the Docker Image
         uses: actions/cache@v6
@@ -121,4 +126,4 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release

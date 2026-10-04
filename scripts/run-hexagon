@@ -34,6 +34,10 @@
 #!/bin/sh
 dir="$(dirname "$0")"
 
+if $dir/check-ci "$1"; then
+    exit 77
+fi
+
 simulator="qemu-system-hexagon"
 # select the program
 elf="$1"

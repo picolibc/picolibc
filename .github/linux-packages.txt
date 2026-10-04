@@ -3,6 +3,7 @@ meson
 cmake
 file
 ninja-build
+git
 gcc
 libx32gcc-16-dev
 lib32gcc-16-dev

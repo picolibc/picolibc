@@ -36,6 +36,10 @@
 
 dir="$(dirname "$0")"
 
+if $dir/check-ci "$1"; then
+    exit 77
+fi
+
 qemu="qemu-system-i386"
 
 # select the program
