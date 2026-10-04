@@ -1,8 +1,8 @@
 #!/bin/sh
-#
+#  
 # SPDX-License-Identifier: BSD-3-Clause
 #
-# Copyright © 2020 Keith Packard
+# Copyright © 2026 Keith Packard
 #
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions
@@ -40,61 +40,4 @@ if $dir/check-ci "$1"; then
     exit 77
 fi
 
-# select the program
-elf="$1"
-shift
-
-done=0
-while [ $# -gt 0 -a $done -eq 0 ]; do
-  case "$1" in
-    --stdin)
-      if [ $# -lt 2 ]; then
-        echo "Error: --stdin requires a quoted string"
-        exit 1
-      fi
-      stdin="$2"
-      shift 2
-      ;;
-    --args)
-      if [ $# -lt 2 ]; then
-        echo "Error: --args requires a quoted string"
-        exit 1
-      fi
-      args="$2"
-      shift 2
-      ;;
-    *)
-      done=1
-      ;;
-  esac
-done
-
-target=$(readelf -h "$elf" | grep Flags)
-case "$target" in
-    *sh4*)
-        endian=$(readelf -h "$elf" | grep Data)
-        case "$endian" in
-            *little*)
-                qemu="qemu-system-sh4"
-                ;;
-            *big*)
-                qemu="qemu-system-sh4eb"
-                ;;
-        esac
-        cpu=sh7750r
-
-        "$dir"/monitor-e9 $qemu \
-              -chardev stdio,id=con,mux=on \
-              -machine r2d \
-              -cpu $cpu \
-              -serial chardev:con \
-              -mon chardev=con,mode=readline \
-              -net none \
-              -nographic \
-              -device loader,file="$elf",cpu-num=0
-
-        ;;
-    *)
-        sh-unknown-elf-run "$elf"
-        ;;
-esac
+exec "$@"

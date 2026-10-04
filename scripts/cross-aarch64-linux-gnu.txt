@@ -6,7 +6,7 @@ as = 'aarch64-linux-gnu-as'
 ld = 'aarch64-linux-gnu-ld'
 nm = 'aarch64-linux-gnu-nm'
 strip = 'aarch64-linux-gnu-strip'
-exe_wrapper = 'env'
+exe_wrapper = ['env', 'run-native']
 
 [host_machine]
 system = 'linux'
@@ -17,6 +17,7 @@ endian = 'little'
 [properties]
 target_c_args = ['-static', '-fno-pic', '-fno-PIE', '-nostdlib', '-nostartfiles', '-Wl,--build-id=none', '-Wl,--no-warn-rwx-segments']
 skip_sanity_check = true
+needs_exe_wrapper = true
 crt0_default = 'crt0-linux'
 oslib_default = 'linux'
 linkerscript_default_c = 'picolibc_linux.ld'

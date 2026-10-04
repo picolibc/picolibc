@@ -6,7 +6,7 @@ as = 'arm-linux-gnueabihf-as'
 ld = 'arm-linux-gnueabihf-ld'
 nm = 'arm-linux-gnueabihf-nm'
 strip = 'arm-linux-gnueabihf-strip'
-exe_wrapper = 'env'
+exe_wrapper = ['env', 'run-native']
 
 [host_machine]
 system = 'linux'
@@ -18,6 +18,7 @@ endian = 'little'
 link_spec = '--build-id=none'
 target_c_args = ['-static', '-fno-pic', '-fno-PIE', '-nostdlib', '-nostartfiles', '-Wl,--build-id=none']
 skip_sanity_check = true
+needs_exe_wrapper = true
 crt0_default = 'crt0-linux'
 oslib_default = 'linux'
 linkerscript_default_c = 'picolibc_linux.ld'

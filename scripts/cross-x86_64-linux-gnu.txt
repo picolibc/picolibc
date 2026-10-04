@@ -6,7 +6,7 @@ as = 'x86_64-linux-gnu-as'
 nm = 'x86_64-linux-gnu-nm'
 strip = 'x86_64-linux-gnu-strip'
 objcopy = 'x86_64-linux-gnu-objcopy'
-exe_wrapper = 'env'
+exe_wrapper = ['env', 'run-native']
 
 [host_machine]
 system='linux'
@@ -16,6 +16,7 @@ endian='little'
 
 [properties]
 skip_sanity_check = true
+needs_exe_wrapper = true
 link_spec = '--build-id=none'
 crt0_default = 'crt0-linux'
 oslib_default = 'linux'

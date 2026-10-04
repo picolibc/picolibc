@@ -6,7 +6,7 @@ as = 'i686-linux-gnu-as'
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
 objcopy = 'i686-linux-gnu-objcopy'
-exe_wrapper = 'env'
+exe_wrapper = ['env', 'run-native']
 
 [host_machine]
 system='linux'
@@ -16,6 +16,7 @@ endian='little'
 
 [properties]
 skip_sanity_check = true
+needs_exe_wrapper = true
 link_spec = '--build-id=none'
 target_c_args = ['-static', '-fno-pic', '-fno-PIE', '-nostdlib', '-nostartfiles', '-Wl,--build-id=none']
 default_flash_addr = '0x00100000'
