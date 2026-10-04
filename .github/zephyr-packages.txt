@@ -1,6 +1,7 @@
 build-essential
 cmake
 file
+git
 libgtk-3-0
 libjack0
 libpulse0
