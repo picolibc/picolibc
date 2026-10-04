@@ -205,7 +205,11 @@ if enable_native_tests
                                   env: locale_env,
                                   command: [ne, '@OUTPUT@'])
 
-      test(test, diff, args: ['-u', out, native_out])
+      test(test,
+           diff,
+           args: ['-u', out, native_out],
+           suite: 'ctype-diff'
+          )
     endforeach
   endif
 
