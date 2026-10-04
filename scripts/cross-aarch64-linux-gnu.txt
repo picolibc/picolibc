@@ -6,7 +6,7 @@ as = 'aarch64-linux-gnu-as'
 ld = 'aarch64-linux-gnu-ld'
 nm = 'aarch64-linux-gnu-nm'
 strip = 'aarch64-linux-gnu-strip'
-exe_wrapper = 'env'
+exe_wrapper = ['env', 'run-native']
 
 [host_machine]
 system = 'linux'

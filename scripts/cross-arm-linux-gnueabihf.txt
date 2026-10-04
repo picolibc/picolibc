@@ -6,7 +6,7 @@ as = 'arm-linux-gnueabihf-as'
 ld = 'arm-linux-gnueabihf-ld'
 nm = 'arm-linux-gnueabihf-nm'
 strip = 'arm-linux-gnueabihf-strip'
-exe_wrapper = 'env'
+exe_wrapper = ['env', 'run-native']
 
 [host_machine]
 system = 'linux'

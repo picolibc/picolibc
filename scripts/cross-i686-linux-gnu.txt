@@ -6,7 +6,7 @@ as = 'i686-linux-gnu-as'
 nm = 'i686-linux-gnu-nm'
 strip = 'i686-linux-gnu-strip'
 objcopy = 'i686-linux-gnu-objcopy'
-exe_wrapper = 'env'
+exe_wrapper = ['env', 'run-native']
 
 [host_machine]
 system='linux'
