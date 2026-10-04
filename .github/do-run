@@ -4,6 +4,7 @@ DIR=build-"$TARGET"
 CONFIGURE=do-"$TARGET"-configure
 shift
 printenv
+git config --global --add safe.directory /picolibc
 
 (mkdir "$DIR" || exit 1
  cd "$DIR" || exit 2
