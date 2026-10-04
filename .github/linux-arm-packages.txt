@@ -3,6 +3,7 @@ meson
 cmake
 file
 ninja-build
+git
 gcc
 gcc-arm-linux-gnueabihf
 libc6-dev-armhf-cross
