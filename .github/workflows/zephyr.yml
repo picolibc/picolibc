@@ -32,6 +32,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: picolibc
+          fetch-depth: 128
 
       - name: Cache the Docker Image
         id: cache
@@ -74,6 +75,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: picolibc
+          fetch-depth: 128
 
       - name: Restore the Docker Image
         uses: actions/cache@v6
@@ -109,6 +111,7 @@ jobs:
         uses: actions/checkout@v7
         with:
           path: picolibc
+          fetch-depth: 128
 
       - name: Restore the Docker Image
         uses: actions/cache@v6
