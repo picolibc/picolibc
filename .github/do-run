@@ -3,13 +3,59 @@ TARGET=$1
 DIR=build-"$TARGET"
 CONFIGURE=do-"$TARGET"-configure
 shift
+git config --global --add safe.directory /picolibc
+DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 
 (mkdir "$DIR" || exit 1
  cd "$DIR" || exit 2
- echo '##################################################'
- echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@"
- echo '##################################################'
+ if [ -n "$BEFORE_SHA" -a -n "$AFTER_SHA" ]; then
+     for f in $DOCKER_FILES; do
+	 md5sum ../../$f > ../../$f.md5
+     done
+     date
+     echo '##########' git checkout $BEFORE_SHA
+     git checkout $BEFORE_SHA > checkout-before.log 2>&1
+     case $? in
+	 0)
+	     echo 'Checkout before succeeded'
+	     DOCKER_OK=y
+	     for f in $DOCKER_FILES; do
+		 if md5sum --check --quiet ../../$f.md5; then
+		     :
+		 else
+		     echo "Docker file $f changed"
+		     DOCKER_OK=
+		 fi
+	     done
+	     if [ -f ../scripts/check-ci -a -n "$DOCKER_OK" ]; then
+		 echo 'docker files and check-ci script ok, doing incremental tests'
+		 INC_TESTS=yes
+	     else
+		 echo 'Docker files or check-ci script not ok'
+		 date
+		 echo '########' git checkout $AFTER_SHA
+		 if git checkout $AFTER_SHA > checkout-restore.log 2>&1; then
+		     :
+		 else
+		     cat checkout-restore.log
+		     exit 2
+		 fi
+	     fi
+	     ;;
+	 *)
+	     cat checkout-before.log
+	     echo 'Checkout before failed'
+	     if git checkout $AFTER_SHA > checkout-restore.log 2>&1; then
+		 :
+	     else
+		 cat checkout-restore.log
+		 exit 2
+	     fi
+	     ;;
+     esac
+ fi
  date
+ echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@"
  ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@" > config.log 2>&1
  case $? in
      0)
@@ -23,15 +69,42 @@ shift
 	 exit 3
 	 ;;
  esac
- echo '##########' "$TARGET" 'ninja'
+ TEST_WRAPPER=
+ if grep -q 'Cross files' meson-logs/meson-setup.txt; then
+     echo 'Cross build, no wrapper'
+ else
+     TEST_WRAPPER="--wrapper $PWD/../scripts/run-native"
+ fi
+ if [ -n "$INC_TESTS" ]; then
+     date
+     echo '########## incremental' "$TARGET" 'ninja'
+     ninja > incremental.log 2>&1 || exit 4
+     INC_TEST_ARGS="$TEST_WRAPPER --no-suite headers --no-suite ctype-diff"
+     date
+     echo '########## incremental' "$TARGET" "CI_CAPTURE=yes meson $INC_TEST_ARGS test"
+     CI_CAPTURE=yes meson test $INC_TEST_ARGS > capture.log 2>&1 || exit 5
+     date
+     echo '########## incremental' "$TARGET" "git checkout $AFTER_SHA"
+     if git checkout "$AFTER_SHA" > checkout-after.log 2>&1; then
+	 :
+     else
+	 cat checkout-after.log
+	 echo git checkout $AFTER_SHA failed
+	 exit 5
+     fi
+ fi
  date
- ninja > ninja.log 2>&1 || exit 4
- echo 'Build succeeded'
- echo '##########' "$TARGET" 'meson test -t 20'
+ echo '##########' "$TARGET" ninja
+ ninja > ninja.log 2>&1 || exit 6
  date
- meson test -t 20 > test.log 2>&1 || exit 5
+ echo '##########' "$TARGET" "meson test $TEST_WRAPPER -t 20"
+ meson test $TEST_WRAPPER -t 20 > test.log 2>&1 || exit 7
+ date
+ if [ -n "$INC_TESTS" ]; then
+     grep -v '\( Generating \| headers -\| ctype-diff -\| SKIP \)' test.log
+ fi
  echo 'Test succeeded'
- date)
+)
 case $? in
     0)
 	rm -rf "$DIR"
@@ -44,7 +117,7 @@ case $? in
 	;;
     2)
 	echo '##################################'
-	echo '############# cd' "$DIR" 'failed'
+	echo '############# setup' "$DIR" 'failed'
 	echo '##################################'
 	exit 1
 	;;
@@ -63,6 +136,28 @@ case $? in
 	;;
     4)
 	echo '##################################'
+	echo '############# Incremental Build failed'
+	echo '##################################'
+	echo 'incremental.log'
+	echo '##################################'
+	cat "$DIR"/incremental.log
+	exit 1
+	;;
+    5)
+	echo '##################################'
+	echo '############# Incremental Capture failed'
+	echo '##################################'
+	echo 'capture.log'
+	echo '##################################'
+	cat "$DIR"/capture.log
+	echo '##################################'
+	echo 'meson-logs/testlog.txt'
+	echo '##################################'
+	cat "$DIR"/meson-logs/testlog.txt
+	exit 1
+	;;
+    6)
+	echo '##################################'
 	echo '############# Build failed'
 	echo '##################################'
 	echo 'ninja.log'
@@ -70,7 +165,7 @@ case $? in
 	cat "$DIR"/ninja.log
 	exit 1
 	;;
-    5)
+    7)
 	echo '##################################'
 	echo '############# Test failed'
 	echo '##################################'
