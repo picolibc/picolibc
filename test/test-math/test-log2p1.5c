@@ -38,6 +38,7 @@ load "test-float.5c"
 real[] test_values = {
         0x1.bb67bp-23,
         0x1.800006p-21,
+	0x1p0,
 };
 
 real
