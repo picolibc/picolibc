@@ -34,6 +34,8 @@
 #
 
 if(DEFINED OS_FALLBACK)
+  picolibc_libos_sources(sleep.c)
+
   add_library(os-fallback STATIC)
 
   target_compile_options(os-fallback PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
@@ -48,8 +50,10 @@ if(DEFINED OS_FALLBACK)
     raise.c
     sbrk.c
     signal.c
+    sleep.c
     sigprocmask.c
     sysconf.c
+    lock.c
     )
 else()
   picolibc_sources(
@@ -60,7 +64,9 @@ else()
     raise.c
     sbrk.c
     signal.c
+    sleep.c
     sigprocmask.c
     sysconf.c
+    lock.c
     )
 endif()

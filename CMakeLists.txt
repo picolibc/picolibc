@@ -376,20 +376,23 @@ define_property(GLOBAL PROPERTY PICOLIBC_HEADERS
   BRIEF_DOCS "Installed header files"
   FULL_DOCS "These are names of header files which are to be installed.")
 
+set_property(GLOBAL PROPERTY PICOLIBC_LIBOS_SOURCES "")
+
+option(TESTS "Enable tests" OFF)
+
 add_subdirectory(libc)
 add_subdirectory(libm)
+add_subdirectory(libos)
 
 install(TARGETS c
   LIBRARY DESTINATION lib
   PUBLIC_HEADER DESTINATION include)
 
-option(TESTS "Enable tests" OFF)
 if(TESTS)
 
   # This could use some generalization, but it's good enough to do
   # semihosting-based tests
 
-  add_subdirectory(libos)
   add_subdirectory(picocrt)
 
   set(PICOCRT_OBJ $<TARGET_OBJECTS:picocrt>)

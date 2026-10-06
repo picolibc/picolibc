@@ -151,6 +151,8 @@ foreach file : srcs_stdlib
     message('libc/stdlib/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/stdlib/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/stdlib/' + file + ': libos overrides generic')
   else
     srcs_stdlib_use += file
   endif

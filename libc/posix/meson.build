@@ -73,7 +73,6 @@ srcs_posix = [
   'regfree.c',
   'setgrent.c',
   'setpwent.c',
-  'sleep.c',
   'strfmon.c',
   'strfmon_l.c',
   'vstrfmon.c',

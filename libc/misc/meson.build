@@ -39,7 +39,6 @@ srcs_misc = [
   'fini.c',
   'init.c',
   'inittls.c',
-  'lock.c',
   'unctrl.c',
 ]
 
