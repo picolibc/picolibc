@@ -170,6 +170,7 @@ if enable_native_tests
 		    c_args: native_c_args + test_file_name_arg + ctype_c_args,
 		    link_args: native_c_args),
          suite: 'test-ctype',
+         depends: locales,
          env: locale_env)
   endforeach
 
