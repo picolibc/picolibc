@@ -162,7 +162,7 @@ option('printf-aliases', type: 'boolean', value: true,
 option('io-percent-b', type: 'boolean', value: false,
        description: 'enable proposed %b/%B format in printf and scanf (default: false)')
 option('printf-small-ultoa', type: 'boolean', value: true,
-       description: 'Avoid softare division in decimal conversions')
+       description: 'Avoid software division in decimal conversions. When false, -O0 and size-optimised builds share the soft division helper; -Og/-O1/-O2/-O3 always use the divide-free path.')
 option('printf-percent-n', type: 'boolean', value: false,
        description: 'Support %n in printf format strings (default: false)')
 option('minimal-io-long-long', type: 'boolean', value: false,

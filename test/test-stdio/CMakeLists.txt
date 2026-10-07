@@ -41,6 +41,8 @@ set(tests
   test-fwrite-fast-path
   test-put
   test-printf
+  test-printf-fp-edge
+  test-printf-int-edge
   test-printf-scanf
   test-sprintf-percent-n
   test-sprintf-s
