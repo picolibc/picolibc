@@ -59,6 +59,7 @@ if fs.is_dir(machine_dir)
     'cfsetspeed.c',
     'chdir.c',
     'chmod.c',
+    'clock_getres.c',
     'clock_gettime.c',
     'close.c',
     'closedir.c',
