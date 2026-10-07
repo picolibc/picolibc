@@ -36,6 +36,7 @@ set(tests
   test-memchr
   test-memchr-simple
   test-memmem
+  test-memmove
   test-memset
   test-strchr
   test-strncpy

@@ -64,12 +64,16 @@ memmove(void *dst_void, const void *src_void, size_t length)
         /* Have to copy backwards */
         src += length;
         dst += length;
-        while (length--) {
-            *--dst = *--src;
+        if (length) {
+            do {
+                *--dst = *--src;
+            } while (--length);
         }
     } else {
-        while (length--) {
-            *dst++ = *src++;
+        if (length) {
+            do {
+                *dst++ = *src++;
+            } while (--length);
         }
     }
 
@@ -100,8 +104,10 @@ memmove(void *dst_void, const void *src_void, size_t length)
             src = (char *)aligned_src;
         }
 
-        while (length--) {
-            *--dst = *--src;
+        if (length) {
+            do {
+                *--dst = *--src;
+            } while (--length);
         }
     } else {
         /* Use optimizing algorithm for a non-destructive copy to closely
@@ -131,8 +137,10 @@ memmove(void *dst_void, const void *src_void, size_t length)
             src = (char *)aligned_src;
         }
 
-        while (length--) {
-            *dst++ = *src++;
+        if (length) {
+            do {
+                *dst++ = *src++;
+            } while (--length);
         }
     }
 
