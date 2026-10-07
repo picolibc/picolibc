@@ -1,2 +1,4 @@
-!**/*.[ch]
+# Ignore all but *.c and *.h without '!', which clang-format 23 changed
+**/*[!ch]
+**/*[!.][ch]
 *_vec.c
