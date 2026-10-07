@@ -45,6 +45,7 @@ tests = [
   'test-sprintf-percent-n',
   'test-sprintf-s',
   'test-sprintf-time',
+  'test-strto-int',
   'test-vfprintf-s',
   'test-vfscanf-percent-a',
   'test-vsnprintf-s',
