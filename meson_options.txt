@@ -45,6 +45,10 @@ option('multilib-exclude', type: 'array', value: [],
        description: 'Multilib configurations containing any of these strings will not be built')
 option('multilib-include', type: 'array', value: [],
        description: 'Only build multilib configurations containing any of these strings')
+option('shared-library', type: 'boolean', value: false,
+       description: 'Build shared libraries in addition to static libraries')
+option('shared-library-version', type: 'string', value: '',
+        description: 'Version for the shared libc (e.g. "2.0.0" -> libc.so.2.0.0 with SONAME libc.so.2). Empty means unversioned libc.so.')
 option('sanitize-bounds', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize=bounds')
 option('sanitize-undefined', type: 'boolean', value: false,
