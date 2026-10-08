@@ -1,5 +1,6 @@
 {
     "name": "__fsid",
+    "defines": [ { "name": "__fsid_t", "value": "fsid_t" } ],
     "typedef": "__fsid_t",
     "headers": [ "sys/statfs.h" ],
     "members": [
