@@ -51,6 +51,8 @@ SUCH DAMAGE.
 #include <alloca.h>
 #endif
 
+#define __STDC_VERSION_STDLIB_H__ 202311L
+
 #if __GNU_VISIBLE
 #include <sys/_locale.h>
 #endif
@@ -92,6 +94,27 @@ size_t __locale_mb_cur_max(void) __picolibc_export;
 
 /* Declare free up here so it can be used with __malloc_like */
 void free(void *) __nothrow __picolibc_export;
+
+#if __ISO_C_VISIBLE >= 2023
+
+void free_aligned_sized(void *ptr, size_t alignment, size_t size) __picolibc_export;
+void free_sized(void *ptr, size_t size) __picolibc_export;
+
+__declare_extern_inline(void)
+free_aligned_sized(void *ptr, size_t alignment, size_t size)
+{
+    (void)alignment;
+    (void)size;
+    free(ptr);
+}
+
+__declare_extern_inline(void)
+free_sized(void *ptr, size_t size)
+{
+    (void)size;
+    free(ptr);
+}
+#endif
 
 #if __ISO_C_VISIBLE >= 1999
 __noreturn void _Exit(int __status) __picolibc_export;

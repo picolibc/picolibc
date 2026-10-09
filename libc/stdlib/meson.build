@@ -35,6 +35,8 @@
 malloc_srcs_stdlib = [
   'calloc.c',
   'free.c',
+  'free_aligned_sized.c',
+  'free_sized.c',
   'getpagesize.c',
   'mallinfo.c',
   'malloc.c',
