@@ -41,8 +41,10 @@ srcs_os_fallback = [
   'raise.c',
   'sbrk.c',
   'signal.c',
+  'sleep.c',
   'sigprocmask.c',
   'sysconf.c',
+  'lock.c',
   ]
 
 src_os_fallback = files(srcs_os_fallback)

@@ -33,6 +33,17 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+# Register sources supplied by libos so matching generic libc sources can be
+# omitted.
+function(picolibc_libos_sources)
+  get_property(current_sources GLOBAL PROPERTY PICOLIBC_LIBOS_SOURCES)
+  foreach(source IN LISTS ARGN)
+    get_filename_component(source_base "${source}" NAME_WLE)
+    list(APPEND current_sources "${source_base}")
+  endforeach()
+  set_property(GLOBAL PROPERTY PICOLIBC_LIBOS_SOURCES ${current_sources})
+endfunction()
+
 # Add sources to libc, eliding any duplicate basenames
 function(picolibc_sources_flags flags)
 
@@ -40,6 +51,7 @@ function(picolibc_sources_flags flags)
   get_property(current_sources_real TARGET c PROPERTY SOURCES)
   get_property(current_sources_fake TARGET c PROPERTY SOURCES_FAKE)
   set(current_sources ${current_sources_real} ${current_sources_fake})
+  get_property(libos_sources GLOBAL PROPERTY PICOLIBC_LIBOS_SOURCES)
   set(sources ${ARGN})
 
   foreach(source IN LISTS ARGN)
@@ -51,6 +63,10 @@ function(picolibc_sources_flags flags)
 	list(REMOVE_ITEM sources "${source}")
       endif()
     endforeach()
+    if(source_base IN_LIST libos_sources)
+      message(STATUS "Using libos implementation for ${source}; excluding generic source")
+      list(REMOVE_ITEM sources "${source}")
+    endif()
   endforeach()
 
   # Add all files that aren't duplicated
@@ -158,4 +174,3 @@ function(picolibc_flag flag)
     set(${flag} ${flag} PARENT_SCOPE)
   endif()
 endfunction()
-

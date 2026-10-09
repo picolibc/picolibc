@@ -31,7 +31,7 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
 # IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-src_semihost += files([
+srcs_semihost_hexagon = [
                        'hexagon_access.c',
                        'hexagon_close.c',
                        'hexagon_closedir.c',
@@ -53,9 +53,15 @@ src_semihost += files([
                        'hexagon_rename.c',
                        'hexagon_semihost.c',
                        'hexagon_stat.c',
+                       'system.c',
+                       'tmpnam.c',
                        'hexagon_unlink.c',
                        'hexagon_write.c',
-                     ]) + [
+                       ]
+
+srcs_libos += srcs_semihost_hexagon
+
+src_semihost += files(srcs_semihost_hexagon) + [
   src_semihost_fake_fstatvfs,
   src_semihost_fake_getentropy,
   src_semihost_fake_getpid,

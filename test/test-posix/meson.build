@@ -67,6 +67,8 @@ if has_os_posix
     'test-popen',
     'test-system',
   ]
+elif host_cpu_family == 'hexagon'
+  tests += ['test-system']
 endif
 
 if oslib_test_variant == 'linux'
