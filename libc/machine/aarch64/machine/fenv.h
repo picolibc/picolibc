@@ -100,6 +100,13 @@ typedef __uint64_t fexcept_t;
 #define _FPUSW_SHIFT    8
 #define _ENABLE_MASK    (FE_ALL_EXCEPT << _FPUSW_SHIFT)
 
+/*
+ * fenv_t holds the exception enables and rounding mode in their FPCR
+ * bit positions and the exception flags in their FPSR bit positions;
+ * these fields do not overlap.
+ */
+#define _FPCR_ENV_MASK  (_ENABLE_MASK | (_ROUND_MASK << _ROUND_SHIFT))
+
 #define __mrs_fpcr(__r) __asm__ __volatile__("mrs %0, fpcr" : "=r"(__r))
 #define __msr_fpcr(__r) __asm__ __volatile__("msr fpcr, %0" : : "r"(__r))
 

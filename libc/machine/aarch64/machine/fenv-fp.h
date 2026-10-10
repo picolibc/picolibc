@@ -105,10 +105,10 @@ __declare_fenv_inline(int) fegetenv(fenv_t *__envp)
     fenv_t __r;
 
     __mrs_fpcr(__r);
-    *__envp = __r & _ENABLE_MASK;
+    *__envp = __r & _FPCR_ENV_MASK;
 
     __mrs_fpsr(__r);
-    *__envp |= __r & (FE_ALL_EXCEPT | (_ROUND_MASK << _ROUND_SHIFT));
+    *__envp |= __r & FE_ALL_EXCEPT;
 
     return (0);
 }
@@ -118,13 +118,13 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *__envp)
     fenv_t __r;
 
     __mrs_fpcr(__r);
-    *__envp = __r & _ENABLE_MASK;
+    *__envp = __r & _FPCR_ENV_MASK;
     __r &= ~(_ENABLE_MASK);
     __msr_fpcr(__r);
 
     __mrs_fpsr(__r);
-    *__envp |= __r & (FE_ALL_EXCEPT | (_ROUND_MASK << _ROUND_SHIFT));
-    __r &= ~(_ENABLE_MASK);
+    *__envp |= __r & FE_ALL_EXCEPT;
+    __r &= ~(FE_ALL_EXCEPT);
     __msr_fpsr(__r);
     return (0);
 }
@@ -132,8 +132,8 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *__envp)
 __declare_fenv_inline(int) fesetenv(const fenv_t *__envp)
 {
 
-    __msr_fpcr((*__envp) & _ENABLE_MASK);
-    __msr_fpsr((*__envp) & (FE_ALL_EXCEPT | (_ROUND_MASK << _ROUND_SHIFT)));
+    __msr_fpcr((*__envp) & _FPCR_ENV_MASK);
+    __msr_fpsr((*__envp) & FE_ALL_EXCEPT);
     return (0);
 }
 
