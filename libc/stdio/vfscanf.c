@@ -695,26 +695,103 @@ vfscanf(FILE *stream, const CHAR *fmt, va_list ap_orig)
                 break;
 #ifdef _NEED_IO_C99_FORMATS
 #ifdef _NEED_IO_LONG_LONG
-#define CHECK_LONGLONG(type) else if (sizeof(type) == sizeof(long long)) flags |= FL_LONGLONG
+#define CHECK_LONGLONG(size) else if (size == sizeof(long long)) flags |= FL_LONGLONG
 #else
-#define CHECK_LONGLONG(type)
+#define CHECK_LONGLONG(size)
 #endif
 
-#define CHECK_INT_SIZE(letter, type)                \
-    case letter:                                    \
-        if (sizeof(type) != sizeof(int)) {          \
-            if (sizeof(type) == sizeof(long))       \
-                flags |= FL_LONG;                   \
-            else if (sizeof(type) == sizeof(short)) \
-                flags |= FL_SHORT;                  \
-            CHECK_LONGLONG(type);                   \
-        }                                           \
-        c = *fmt++;                                 \
+#define SET_INT_SIZE(size)              \
+    if (size != sizeof(int)) {          \
+        if (size == sizeof(long))       \
+            flags |= FL_LONG;           \
+        else if (size == sizeof(short)) \
+            flags |= FL_SHORT;          \
+        else if (size == sizeof(char))  \
+            flags |= FL_CHAR;           \
+        CHECK_LONGLONG(size);           \
+    }
+
+#define CHECK_INT_SIZE(letter, type) \
+    case letter:                     \
+        SET_INT_SIZE(sizeof(type));  \
+        c = *fmt++;                  \
         break;
 
                 CHECK_INT_SIZE('j', intmax_t);
                 CHECK_INT_SIZE('z', size_t);
                 CHECK_INT_SIZE('t', ptrdiff_t);
+#endif
+#ifdef __IO_LENGTH_W
+
+#ifdef __INT_FAST8_TYPE__
+#define CHECK_INT_FAST8_SIZE(wlen)         \
+    if (wlen == 1) {                       \
+        SET_INT_SIZE(sizeof(int_fast8_t)); \
+    }
+#else
+#define CHECK_INT_FAST8_SIZE(wlen)
+#endif
+
+#ifdef __INT_FAST16_TYPE__
+#define CHECK_INT_FAST16_SIZE(wlen)         \
+    if (wlen == 2) {                        \
+        SET_INT_SIZE(sizeof(int_fast16_t)); \
+    }
+#else
+#define CHECK_INT_FAST16_SIZE(wlen)
+#endif
+
+#ifdef __INT_FAST32_TYPE__
+#define CHECK_INT_FAST32_SIZE(wlen)         \
+    if (wlen == 4) {                        \
+        SET_INT_SIZE(sizeof(int_fast32_t)); \
+    }
+#else
+#define CHECK_INT_FAST32_SIZE(wlen)
+#endif
+
+#ifdef __INT_FAST64_TYPE__
+#define CHECK_INT_FAST64_SIZE(wlen)         \
+    if (wlen == 8) {                        \
+        SET_INT_SIZE(sizeof(int_fast64_t)); \
+    }
+#else
+#define CHECK_INT_FAST64_SIZE(wlen)
+#endif
+
+#ifdef __INT_FAST128_TYPE__
+#define CHECK_INT_FAST128_SIZE(wlen)         \
+    if (wlen == 16) {                        \
+        SET_INT_SIZE(sizeof(int_fast128_t)); \
+    }
+#else
+#define CHECK_INT_FAST128_SIZE(wlen)
+#endif
+
+            case 'w':
+                c = *fmt++;
+                if (c == 'f') {
+                    flags |= FL_WF;
+                    c = *fmt++;
+                }
+                int wlen = 0;
+                while ('0' <= c && c <= '9') {
+                    wlen = 10 * wlen + c - '0';
+                    c = *fmt++;
+                }
+                if (wlen) {
+                    wlen >>= 3;
+                    if (flags & FL_WF) {
+                        CHECK_INT_FAST8_SIZE(wlen);
+                        CHECK_INT_FAST16_SIZE(wlen);
+                        CHECK_INT_FAST32_SIZE(wlen);
+                        CHECK_INT_FAST64_SIZE(wlen);
+                        CHECK_INT_FAST128_SIZE(wlen);
+                    } else {
+                        SET_INT_SIZE(wlen);
+                    }
+                }
+                break;
 #endif
             }
 

@@ -743,6 +743,7 @@ test_except(void)
     i1 = feraiseexcept(0);
     i1 = fesetexceptflag(&fex, FE_ALL_EXCEPT);
     i1 = fetestexcept(FE_ALL_EXCEPT);
+    i1 = fetestexceptflag(&fex, FE_ALL_EXCEPT);
 
     i1 = fegetround();
     i1 = fesetround(FE_TONEAREST);

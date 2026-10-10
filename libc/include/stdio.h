@@ -37,7 +37,9 @@
 */
 
 #ifndef _STDIO_H_
-#define _STDIO_H_ 1
+#define _STDIO_H_                1
+
+#define __STDC_VERSION_STDIO_H__ 202311L
 
 #include <sys/cdefs.h>
 #define __need_NULL
@@ -203,10 +205,10 @@ extern __picolibc_export FILE * const stderr;
         .flush = (__flush),                               \
     }
 
-FILE *fdevopen(int (*__put)(char, FILE *), int (*__get)(FILE *),
-               int (*__flush)(FILE *)) __picolibc_export;
-int   fclose(FILE *__stream) __nonnull((1)) __picolibc_export;
-int   fflush(FILE *stream)
+FILE *fdevopen(int (*__put)(char, FILE *), int (*__get)(FILE *), int (*__flush)(FILE *))
+    __picolibc_export;
+int fclose(FILE *__stream) __nonnull((1)) __picolibc_export;
+int fflush(FILE *stream)
 #ifndef __STDIO_EXIT_FLUSH
     __nonnull((1))
 #endif
@@ -275,30 +277,30 @@ int putchar(int __c) __picolibc_export;
 #define putchar(__c)        fputc(__c, stdout)
 
 int printf(const char *__fmt, ...) __PRINTF_ATTRIBUTE__(1, 2) __picolibc_export;
-int fprintf(FILE *__stream, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3)
-    __nonnull((1)) __picolibc_export;
+int fprintf(FILE *__stream, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3) __nonnull((1))
+__picolibc_export;
 int vprintf(const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(1, 0) __picolibc_export;
 int vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap) __PRINTF_ATTRIBUTE__(2, 0)
     __nonnull((1)) __picolibc_export;
 int sprintf(char *__s, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(2, 3) __picolibc_export;
-int snprintf(char *__s, size_t __n, const char *__fmt, ...)
-    __PRINTF_ATTRIBUTE__(3, 4) __picolibc_export;
-int vsprintf(char *__s, const char *__fmt, __gnuc_va_list ap)
-    __PRINTF_ATTRIBUTE__(2, 0) __picolibc_export;
+int snprintf(char *__s, size_t __n, const char *__fmt, ...) __PRINTF_ATTRIBUTE__(3, 4)
+    __picolibc_export;
+int vsprintf(char *__s, const char *__fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0)
+    __picolibc_export;
 int vsnprintf(char *__s, size_t __n, const char *__fmt, __gnuc_va_list ap)
     __PRINTF_ATTRIBUTE__(3, 0) __picolibc_export;
 int   asprintf(char **strp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(2, 3) __picolibc_export;
-char *asnprintf(char *str, size_t *lenp, const char *fmt, ...)
-    __PRINTF_ATTRIBUTE__(3, 4) __picolibc_export;
-int vasprintf(char **strp, const char *fmt, __gnuc_va_list ap)
-    __PRINTF_ATTRIBUTE__(2, 0) __picolibc_export;
+char *asnprintf(char *str, size_t *lenp, const char *fmt, ...) __PRINTF_ATTRIBUTE__(3, 4)
+    __picolibc_export;
+int vasprintf(char **strp, const char *fmt, __gnuc_va_list ap) __PRINTF_ATTRIBUTE__(2, 0)
+    __picolibc_export;
 char *vasnprintf(char *str, size_t *lenp, const char *fmt, __gnuc_va_list ap)
     __PRINTF_ATTRIBUTE__(3, 0) __picolibc_export;
 
 int    fputs(const char *__str, FILE *__stream) __nonnull((2)) __picolibc_export;
 int    puts(const char *__str) __picolibc_export;
-size_t fwrite(const void *__ptr, size_t __size, size_t __nmemb, FILE *__stream)
-    __nonnull((4)) __picolibc_export;
+size_t fwrite(const void *__ptr, size_t __size, size_t __nmemb, FILE *__stream) __nonnull((4))
+__picolibc_export;
 
 int fgetc(FILE *__stream) __nonnull((1)) __picolibc_export;
 int getc(FILE *__stream) __nonnull((1)) __picolibc_export;
@@ -307,14 +309,14 @@ int getchar(void) __picolibc_export;
 int ungetc(int __c, FILE *__stream) __nonnull((2)) __picolibc_export;
 
 int scanf(const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 1, 2) __picolibc_export;
-int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3)
-    __nonnull((1)) __picolibc_export;
-int vscanf(const char *__fmt, __gnuc_va_list __ap)
-    __FORMAT_ATTRIBUTE__(scanf, 1, 0) __picolibc_export;
+int fscanf(FILE *__stream, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3) __nonnull((1))
+__picolibc_export;
+int vscanf(const char *__fmt, __gnuc_va_list __ap) __FORMAT_ATTRIBUTE__(scanf, 1, 0)
+    __picolibc_export;
 int vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
     __FORMAT_ATTRIBUTE__(scanf, 2, 0) __nonnull((1)) __picolibc_export;
-int sscanf(const char *__buf, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(scanf, 2, 3) __picolibc_export;
+int sscanf(const char *__buf, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(scanf, 2, 3)
+    __picolibc_export;
 int vsscanf(const char *__buf, const char *__fmt, __gnuc_va_list ap)
     __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
 
@@ -322,8 +324,8 @@ char *fgets(char *__str, int __size, FILE *__stream) __nonnull((3)) __picolibc_e
 #ifdef _PICOLIBC_USE_DEPRECATED_GETS
 char *gets(char *str) __picolibc_export;
 #endif
-size_t fread(void *__ptr, size_t __size, size_t __nmemb, FILE *__stream)
-    __nonnull((4)) __picolibc_export;
+size_t fread(void *__ptr, size_t __size, size_t __nmemb, FILE *__stream) __nonnull((4))
+__picolibc_export;
 
 void clearerr(FILE *__stream) __nonnull((1)) __picolibc_export;
 int  ferror(FILE *__stream) __nonnull((1)) __picolibc_export;
@@ -373,27 +375,27 @@ int __l_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
 int __m_vfprintf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
     __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
 
-int __d_sprintf(char *__s, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
-int __f_sprintf(char *__s, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
-int __i_sprintf(char *__s, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
-int __l_sprintf(char *__s, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
-int __m_sprintf(char *__s, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 2, 0) __picolibc_export;
+int __d_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0)
+    __picolibc_export;
+int __f_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0)
+    __picolibc_export;
+int __i_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0)
+    __picolibc_export;
+int __l_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0)
+    __picolibc_export;
+int __m_sprintf(char *__s, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 2, 0)
+    __picolibc_export;
 
-int __d_snprintf(char *__s, size_t __n, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
-int __f_snprintf(char *__s, size_t __n, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
-int __i_snprintf(char *__s, size_t __n, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
-int __l_snprintf(char *__s, size_t __n, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
-int __m_snprintf(char *__s, size_t __n, const char *__fmt, ...)
-    __FORMAT_ATTRIBUTE__(printf, 3, 0) __picolibc_export;
+int __d_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0)
+    __picolibc_export;
+int __f_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0)
+    __picolibc_export;
+int __i_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0)
+    __picolibc_export;
+int __l_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0)
+    __picolibc_export;
+int __m_snprintf(char *__s, size_t __n, const char *__fmt, ...) __FORMAT_ATTRIBUTE__(printf, 3, 0)
+    __picolibc_export;
 
 int __d_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
     __FORMAT_ATTRIBUTE__(scanf, 2, 0) __picolibc_export;
@@ -421,6 +423,10 @@ int __m_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
 /* only mentioned for libstdc++ support, not implemented in library */
 #ifndef BUFSIZ
 #define BUFSIZ 512
+#endif
+
+#ifndef _PRINTF_NAN_LEN_MAX
+#define _PRINTF_NAN_LEN_MAX 3
 #endif
 
 /*
@@ -475,15 +481,15 @@ int vdprintf(int fd, const char * __restrict fmt, __gnuc_va_list ap) __picolibc_
 #endif
 
 int   fgetpos(FILE   *__restrict stream, fpos_t   *__restrict pos) __nonnull((1)) __picolibc_export;
-FILE *fopen(const char *path, const char *mode)
-    __malloc_like_with_free(fclose, 1) __picolibc_export;
+FILE *fopen(const char *path, const char *mode) __malloc_like_with_free(fclose, 1)
+__picolibc_export;
 FILE *freopen(const char *path, const char *mode, FILE *stream) __nonnull((3)) __picolibc_export;
 FILE *fdopen(int, const char *) __malloc_like_with_free(fclose, 1) __picolibc_export;
-FILE *fmemopen(void *buf, size_t size, const char *mode)
-    __malloc_like_with_free(fclose, 1) __picolibc_export;
+FILE *fmemopen(void *buf, size_t size, const char *mode) __malloc_like_with_free(fclose, 1)
+__picolibc_export;
 #if __POSIX_VISIBLE >= 200809
-FILE *open_memstream(char **bufp, size_t *sizep)
-    __malloc_like_with_free(fclose, 1) __picolibc_export;
+FILE *open_memstream(char **bufp, size_t *sizep) __malloc_like_with_free(fclose, 1)
+__picolibc_export;
 #endif
 int   fseek(FILE *stream, long offset, int whence) __nonnull((1)) __picolibc_export;
 int   fsetpos(FILE *stream, const fpos_t *pos) __nonnull((1)) __picolibc_export;
@@ -514,8 +520,8 @@ int     pclose(FILE *stream) __picolibc_export;
 #if __BSD_VISIBLE
 FILE *funopen(const void *cookie, ssize_t (*readfn)(void *cookie, void *buf, size_t n),
               ssize_t (*writefn)(void *cookie, const void *buf, size_t n),
-              off_t   (*seekfn)(void *cookie, off_t off, int whence),
-              int     (*closefn)(void *cookie)) __picolibc_export;
+              off_t (*seekfn)(void *cookie, off_t off, int whence), int (*closefn)(void *cookie))
+    __picolibc_export;
 #define fropen(__cookie, __fn) funopen(__cookie, __fn, NULL, NULL, NULL)
 #define fwopen(__cookie, __fn) funopen(__cookie, NULL, __fn, NULL, NULL)
 #endif /*__BSD_VISIBLE */
@@ -533,8 +539,8 @@ typedef struct cookie_io_functions_t {
     cookie_close_function_t *close;
 } cookie_io_functions_t;
 
-FILE *fopencookie(void *cookie, const char *modes,
-                  cookie_io_functions_t io_funcs) __picolibc_export;
+FILE *fopencookie(void *cookie, const char *modes, cookie_io_functions_t io_funcs)
+    __picolibc_export;
 #endif /* __GNU_VISIBLE */
 
 #if __POSIX_VISIBLE >= 199309L
@@ -584,12 +590,12 @@ typedef __rsize_t rsize_t;
 #define _RSIZE_T_DEFINED
 #endif
 
-int sprintf_s(char * __restrict __s, rsize_t __bufsize, const char * __restrict __format,
-              ...) __picolibc_export;
-int vsnprintf_s(char * __restrict s, rsize_t n, const char * __restrict fmt,
-                va_list arg) __picolibc_export;
-int vfprintf_s(FILE * __restrict stream, const char * __restrict fmt,
-               va_list ap_orig) __picolibc_export;
+int sprintf_s(char * __restrict __s, rsize_t __bufsize, const char * __restrict __format, ...)
+    __picolibc_export;
+int vsnprintf_s(char * __restrict s, rsize_t n, const char * __restrict fmt, va_list arg)
+    __picolibc_export;
+int vfprintf_s(FILE * __restrict stream, const char * __restrict fmt, va_list ap_orig)
+    __picolibc_export;
 #endif
 
 /*
@@ -654,6 +660,9 @@ __printf_float(float f)
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
 #endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
+#endif
 #elif _PICOLIBC_PRINTF == __IO_VARIANT_LLONG
 #define printf_float(x) ((double)(x))
 #define _HAS_IO_LONG_LONG
@@ -666,6 +675,9 @@ __printf_float(float f)
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
 #endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
+#endif
 #elif _PICOLIBC_PRINTF == __IO_VARIANT_FLOAT
 #define printf_float(x) __printf_float(x)
 #define _HAS_IO_LONG_LONG
@@ -673,6 +685,9 @@ __printf_float(float f)
 #define _HAS_IO_C99_FORMATS
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
+#endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
 #endif
 #define _HAS_IO_FLOAT
 #else /* _PICOLIBC_PRINTF == __IO_VARIANT_DOUBLE */
@@ -689,6 +704,9 @@ __printf_float(float f)
 #endif
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
+#endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
 #endif
 #ifdef __IO_LONG_DOUBLE
 #define _HAS_IO_LONG_DOUBLE

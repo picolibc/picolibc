@@ -50,6 +50,8 @@
 
 #ifndef __PICOLIBC__
 #define printf_float(x) ((double)(x))
+#define BINARY_FORMAT
+#define LENGTH_W
 #else
 #if !defined(_HAS_IO_FLOAT) && !defined(_HAS_IO_DOUBLE)
 #define __IO_NO_FLOATING_POINT
@@ -68,6 +70,9 @@
 #endif
 #ifdef _HAS_IO_PERCENT_B
 #define BINARY_FORMAT
+#endif
+#ifdef _HAS_IO_LENGTH_W
+#define LENGTH_W
 #endif
 #endif
 
@@ -451,6 +456,8 @@ main(void)
 
 #define FMT(prefix, conv) "%" prefix conv
 
+#pragma GCC diagnostic ignored "-Wpointer-to-int-cast"
+
 #define VERIFY_BOTH(prefix, oconv, iconv)                                         \
     do {                                                                          \
         int __n;                                                                  \
@@ -532,6 +539,17 @@ main(void)
     }
     CHECK_RT(size_t, "z");
     CHECK_RTI(ptrdiff_t, "t");
+#endif
+#ifdef LENGTH_W
+    printf("Checking w length\n");
+    CHECK_RT(int8_t, "w8");
+    CHECK_RT(int16_t, "w16");
+    CHECK_RT(int32_t, "w32");
+    CHECK_RT(int64_t, "w64");
+    CHECK_RT(int_fast8_t, "wf8");
+    CHECK_RT(int_fast16_t, "wf16");
+    CHECK_RT(int_fast32_t, "wf32");
+    CHECK_RT(int_fast64_t, "wf64");
 #endif
 
     {

@@ -32,6 +32,9 @@ QUICKREF
 #define _GNU_SOURCE
 #include <string.h>
 
+#undef strchrnul
+#undef strchr
+
 char *
 strchrnul(const char *s1, int i)
 {

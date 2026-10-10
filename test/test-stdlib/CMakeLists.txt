@@ -35,6 +35,7 @@
 
 set(tests
   test-atexit
+  test-bsearch
   test-efcvt
   test-malloc
   test-malloc-stress

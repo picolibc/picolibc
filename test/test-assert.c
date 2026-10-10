@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2024 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,47 +33,13 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef _UCHAR_H_
-#define _UCHAR_H_
+#define _ISOC23_SOURCE
+#include <assert.h>
 
-#include <sys/cdefs.h>
-#include <machine/_default_types.h>
-#include <sys/_types.h>
-#define __need_size_t
-#include <stddef.h>
-
-#define __STDC_VERSION_UCHAR_H__ 202311L
-
-_BEGIN_STD_C
-
-#ifndef _MBSTATE_DECLARED
-typedef __mbstate_t mbstate_t;
-#define _MBSTATE_DECLARED
-#endif
-
-#ifndef __cpp_char8_t
-typedef unsigned char char8_t;
-#endif
-#if !defined __cplusplus || __cplusplus < 201103L
-typedef __uint_least16_t char16_t;
-typedef __uint_least32_t char32_t;
-#endif
-
-size_t mbrtoc8(char8_t * __restrict pc8, const char * __restrict s, size_t n,
-               mbstate_t * __restrict ps) __picolibc_export;
-
-size_t c8rtomb(char * __restrict s, char8_t c8, mbstate_t * __restrict ps) __picolibc_export;
-
-size_t mbrtoc16(char16_t * __restrict pc16, const char * __restrict s, size_t n,
-                mbstate_t * __restrict ps) __picolibc_export;
-
-size_t c16rtomb(char * __restrict s, char16_t c16, mbstate_t * __restrict ps) __picolibc_export;
-
-size_t mbrtoc32(char32_t * __restrict pc32, const char * __restrict s, size_t n,
-                mbstate_t * __restrict ps) __picolibc_export;
-
-size_t c32rtomb(char * __restrict s, char32_t c32, mbstate_t * __restrict ps) __picolibc_export;
-
-_END_STD_C
-
-#endif /* _UCHAR_H_ */
+int
+main(void)
+{
+    assert(1);
+    assert((int[2]) { 1, 0 }[0]);
+    return 0;
+}

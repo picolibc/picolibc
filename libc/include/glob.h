@@ -83,8 +83,8 @@ typedef struct {
 #define GLOB_NOMATCH (-3) /* No match and GLOB_NOCHECK not set. */
 
 _BEGIN_STD_C
-int  glob(const char  *__restrict, int, int (*)(const char *, int),
-          glob_t  *__restrict) __picolibc_export;
+int glob(const char * __restrict, int, int (*)(const char *, int), glob_t * __restrict)
+    __picolibc_export;
 void globfree(glob_t *) __picolibc_export;
 _END_STD_C
 

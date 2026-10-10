@@ -141,8 +141,8 @@ int fchdir(int __fildes) __picolibc_export;
 int fchown(int __fildes, uid_t __owner, gid_t __group) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
-int fchownat(int __dirfd, const char *__path, uid_t __owner, gid_t __group,
-             int __flags) __picolibc_export;
+int fchownat(int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags)
+    __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809
 int fexecve(int __fd, char * const __argv[], char * const __envp[]) __picolibc_export;
@@ -199,8 +199,8 @@ char *getusershell(void) __picolibc_export;
 char *getwd(char *__buf) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-int iruserok(unsigned long raddr, int superuser, const char *ruser,
-             const char *luser) __picolibc_export;
+int iruserok(unsigned long raddr, int superuser, const char *ruser, const char *luser)
+    __picolibc_export;
 #endif
 int isatty(int __fildes) __picolibc_export;
 #if __BSD_VISIBLE
@@ -211,8 +211,8 @@ int lchown(const char *__path, uid_t __owner, gid_t __group) __picolibc_export;
 #endif
 int link(const char *__path1, const char *__path2) __picolibc_export;
 #if __ATFILE_VISIBLE
-int linkat(int __dirfd1, const char *__path1, int __dirfd2, const char *__path2,
-           int __flags) __picolibc_export;
+int linkat(int __dirfd1, const char *__path1, int __dirfd2, const char *__path2, int __flags)
+    __picolibc_export;
 #endif
 #if __MISC_VISIBLE || __XSI_VISIBLE
 int nice(int __nice_value) __picolibc_export;
@@ -246,8 +246,8 @@ int revoke(char *__path) __picolibc_export;
 #endif
 int rmdir(const char *__path) __picolibc_export;
 #if __BSD_VISIBLE
-int ruserok(const char *rhost, int superuser, const char *ruser,
-            const char *luser) __picolibc_export;
+int ruserok(const char *rhost, int superuser, const char *ruser, const char *luser)
+    __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 void *sbrk(ptrdiff_t __incr) __picolibc_export;
@@ -337,9 +337,9 @@ void sync(void) __picolibc_export;
 #endif
 
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 4
-ssize_t readlink(const char * __restrict __path, char * __restrict __buf,
-                 size_t __buflen) __picolibc_export;
-int     symlink(const char *__name1, const char *__name2) __picolibc_export;
+ssize_t readlink(const char * __restrict __path, char * __restrict __buf, size_t __buflen)
+    __picolibc_export;
+int symlink(const char *__name1, const char *__name2) __picolibc_export;
 #endif
 #if __ATFILE_VISIBLE
 ssize_t readlinkat(int    __dirfd1, const char    *__restrict __path, char    *__restrict __buf,

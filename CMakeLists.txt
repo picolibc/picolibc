@@ -244,7 +244,11 @@ if(NOT DEFINED __IO_PERCENT_N)
 endif()
 
 if(NOT DEFINED __IO_PERCENT_B)
-  option(__IO_PERCENT_B "Support %b/%B formats in printf/scanf" OFF)
+  option(__IO_PERCENT_B "Support %b/%B formats in printf/scanf" ON)
+endif()
+
+if(NOT DEFINED __IO_LENGTH_W)
+  option(__IO_LENGTH_W "Support wN and wfN lengths in printf" ON)
 endif()
 
 if(NOT DEFINED __IO_WCHAR)

@@ -450,11 +450,11 @@ c_args += c_prep_flags + c_flags
 native_c_args += c_prep_flags + c_flags
 
 # Make sure _LIBC is not defined when building tests
-test_c_args = c_args
+test_c_args = c_args + ['-D_TEST_LIBC']
 c_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
 
 if have_cplusplus
-  test_cpp_args = cpp_args
+  test_cpp_args = cpp_args + ['-D_TEST_LIBC']
   cpp_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
 endif
 
@@ -574,6 +574,7 @@ format_default = _line.substring(0, 1)
 
 printf_aliases = get_option('printf-aliases')
 io_percent_b = get_option('io-percent-b')
+io_length_w = get_option('io-length-w')
 printf_small_ultoa = get_option('printf-small-ultoa')
 printf_percent_n = get_option('printf-percent-n')
 minimal_io_long_long = get_option('minimal-io-long-long')
@@ -1527,6 +1528,7 @@ conf_data.set('__IO_POS_ARGS', io_pos_args)
 conf_data.set('__IO_C99_FORMATS', io_c99_formats)
 conf_data.set('__IO_FLOAT_EXACT', io_float_exact)
 conf_data.set('__IO_PERCENT_B', io_percent_b)
+conf_data.set('__IO_LENGTH_W', io_length_w)
 conf_data.set('__IO_LONG_DOUBLE', io_long_double)
 conf_data.set('__IO_WCHAR', io_wchar)
 conf_data.set('__STDIO_EXIT_FLUSH', get_option('stdio-exit-flush'))
