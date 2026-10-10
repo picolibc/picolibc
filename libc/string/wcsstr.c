@@ -59,6 +59,8 @@ PORTABILITY
 #include <stddef.h>
 #include <wchar.h>
 
+#undef wcsstr
+
 wchar_t *
 wcsstr(const wchar_t * __restrict big, const wchar_t * __restrict little)
 {

@@ -40,6 +40,8 @@ PORTABILITY
 
 #include <string.h>
 
+#undef strpbrk
+
 char *
 strpbrk(const char *s1, const char *s2)
 {

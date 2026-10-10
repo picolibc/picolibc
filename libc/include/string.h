@@ -41,6 +41,8 @@ SUCH DAMAGE.
 
 #include <sys/cdefs.h>
 
+#define __STDC_VERSION_STRING_H__ 202311L
+
 #define __need_size_t
 #define __need_NULL
 #include <stddef.h>
@@ -78,11 +80,11 @@ char * __nonnull((1)) basename(const char *) _ASMNAME("__gnu_basename");
 #if __MISC_VISIBLE || __POSIX_VISIBLE || __ISO_C_VISIBLE >= 2023
 void *memccpy(void * __restrict, const void * __restrict, int, size_t) __picolibc_export;
 #endif
-void *memchr(const void *, int, size_t) __picolibc_export;
+void *memchr(const void *s, int c, size_t n) __picolibc_export;
 int   memcmp(const void *, const void *, size_t) __picolibc_export;
 void *memcpy(void * __restrict, const void * __restrict, size_t) __picolibc_export;
 #if __GNU_VISIBLE
-void *memmem(const void *, size_t, const void *, size_t) __picolibc_export;
+void *memmem(const void *h, size_t h_n, const void *n, size_t n_n) __picolibc_export;
 #endif
 void *memmove(void *, const void *, size_t) __picolibc_export;
 #if __GNU_VISIBLE
@@ -104,7 +106,7 @@ char *stpncpy(char * __restrict, const char * __restrict, size_t) __picolibc_exp
 char *strcasestr(const char *, const char *) __picolibc_export;
 #endif
 char *strcat(char * __restrict, const char * __restrict) __picolibc_export;
-char *strchr(const char *, int) __picolibc_export;
+char *strchr(const char *s, int c) __picolibc_export;
 #if __GNU_VISIBLE
 char *strchrnul(const char *, int) __picolibc_export;
 #endif
@@ -184,8 +186,8 @@ char        *
 strnstr(const char *, const char *, size_t)
 __pure __picolibc_export;
 #endif
-char *strpbrk(const char *, const char *) __picolibc_export;
-char *strrchr(const char *, int) __picolibc_export;
+char *strpbrk(const char *s, const char *a) __picolibc_export;
+char *strrchr(const char *s, int c) __picolibc_export;
 #if __BSD_VISIBLE
 char *strsep(char **, const char *) __picolibc_export;
 #endif
@@ -193,7 +195,7 @@ char *strsep(char **, const char *) __picolibc_export;
 char *strsignal(int __signo) __picolibc_export;
 #endif
 size_t strspn(const char *, const char *) __picolibc_export;
-char  *strstr(const char *, const char *) __picolibc_export;
+char  *strstr(const char *h, const char *n) __picolibc_export;
 char  *strtok(char  *__restrict, const char  *__restrict) __picolibc_export;
 #if __MISC_VISIBLE || __POSIX_VISIBLE || __ZEPHYR_VISIBLE
 char *strtok_r(char * __restrict, const char * __restrict, char ** __restrict) __picolibc_export;
@@ -211,6 +213,22 @@ size_t strxfrm_l(char * __restrict, const char * __restrict, size_t, locale_t) _
 #if __BSD_VISIBLE
 int timingsafe_bcmp(const void *, const void *, size_t) __picolibc_export;
 int timingsafe_memcmp(const void *, const void *, size_t) __picolibc_export;
+#endif
+
+#ifdef __preserve_const
+#define memchr(_s, _c, _n) __preserve_const(memchr, _s, (_s, _c, _n))
+#define strchr(_s, _c)     __preserve_const(strchr, _s, (_s, _c))
+#define strpbrk(_s, _a)    __preserve_const(strpbrk, _s, (_s, _a))
+#define strrchr(_s, _c)    __preserve_const(strrchr, _s, (_s, _c))
+#define strstr(_h, _n)     __preserve_const(strstr, _h, (_h, _n))
+
+#if __GNU_VISIBLE
+#define memmem(_h, _h_n, _n, _n_n) __preserve_const(memmem, _h, (_h, _h_n, _n, _n_n))
+#define memrchr(_s, _c, _n)        __preserve_const(memrchr, _s, (_s, _c, _n))
+#define rawmemchr(_s, _c)          __preserve_const(rawmemchr, _s, (_s, _c))
+#define strcasestr(_h, _n)         __preserve_const(strcasestr, _h, (_h, _n))
+#define strchrnul(_s, _c)          __preserve_const(strchrnul, _s, (_s, _c))
+#endif
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1

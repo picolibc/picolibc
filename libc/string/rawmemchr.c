@@ -34,6 +34,8 @@ QUICKREF
 #include <limits.h>
 #include "local.h"
 
+#undef rawmemchr
+
 void *
 rawmemchr(const void *src_void, int c)
 {
