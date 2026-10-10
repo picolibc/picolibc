@@ -35,6 +35,7 @@
 
 tests = [
   'test-argv',
+  'test-assert',
   'test-atomic',
   'test-environ',
   'test-except',
