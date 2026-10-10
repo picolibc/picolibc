@@ -35,6 +35,8 @@ QUICKREF
 #include <limits.h>
 #include "local.h"
 
+#undef memrchr
+
 void *
 memrchr(const void *src_void, int c, size_t length)
 {

@@ -63,6 +63,8 @@ QUICKREF
 #include <string.h>
 #include <stdint.h>
 
+#undef memmem
+
 #if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
 
 /* Small and efficient memmem implementation (quadratic worst-case).  */

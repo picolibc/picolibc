@@ -72,6 +72,8 @@ QUICKREF
 #include <string.h>
 #include <strings.h>
 
+#undef strcasestr
+
 #if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
 #define RETURN_TYPE char *
 #define AVAILABLE(h, h_l, j, n_l)                                              \

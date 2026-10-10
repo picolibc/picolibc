@@ -26,6 +26,8 @@ SUCH DAMAGE.
 #ifndef _WCHAR_H_
 #define _WCHAR_H_
 
+#define __STDC_VERSION_WCHAR_H__ 202311L
+
 #include <sys/cdefs.h>
 #define __need_size_t
 #define __need_wchar_t
@@ -179,7 +181,7 @@ int wcscasecmp(const wchar_t *, const wchar_t *) __picolibc_export;
 int wcscasecmp_l(const wchar_t *, const wchar_t *, locale_t) __picolibc_export;
 #endif
 wchar_t *wcscat(wchar_t * __restrict, const wchar_t * __restrict) __picolibc_export;
-wchar_t *wcschr(const wchar_t *, wchar_t) __picolibc_export;
+wchar_t *wcschr(const wchar_t *s, wchar_t c) __picolibc_export;
 int      wcscmp(const wchar_t *, const wchar_t *) __picolibc_export;
 int      wcscoll(const wchar_t *, const wchar_t *) __picolibc_export;
 #if __POSIX_VISIBLE >= 200809
@@ -215,12 +217,12 @@ size_t wcsnlen(const wchar_t *, size_t) __picolibc_export;
 size_t wcsnrtombs(char * __restrict, const wchar_t ** __restrict, size_t, size_t,
                   mbstate_t * __restrict) __picolibc_export;
 #endif
-wchar_t *wcspbrk(const wchar_t *, const wchar_t *) __picolibc_export;
-wchar_t *wcsrchr(const wchar_t *, wchar_t) __picolibc_export;
+wchar_t *wcspbrk(const wchar_t *s, const wchar_t *a) __picolibc_export;
+wchar_t *wcsrchr(const wchar_t *s, wchar_t c) __picolibc_export;
 size_t   wcsrtombs(char   *__restrict, const wchar_t   **__restrict, size_t,
                    mbstate_t   *__restrict) __picolibc_export;
 size_t   wcsspn(const wchar_t *, const wchar_t *) __picolibc_export;
-wchar_t *wcsstr(const wchar_t * __restrict, const wchar_t * __restrict) __picolibc_export;
+wchar_t *wcsstr(const wchar_t * __restrict h, const wchar_t * __restrict n) __picolibc_export;
 double   wcstod(const wchar_t   *__restrict, wchar_t   **__restrict) __picolibc_export;
 #if __GNU_VISIBLE
 double wcstod_l(const wchar_t *, wchar_t **, locale_t) __picolibc_export;
@@ -275,7 +277,7 @@ int wctob(wint_t) __picolibc_export;
 #if __XSI_VISIBLE
 int wcwidth(const wchar_t) __picolibc_export;
 #endif
-wchar_t *wmemchr(const wchar_t *, wchar_t, size_t) __picolibc_export;
+wchar_t *wmemchr(const wchar_t *s, wchar_t c, size_t n) __picolibc_export;
 int      wmemcmp(const wchar_t *, const wchar_t *, size_t) __picolibc_export;
 wchar_t *wmemcpy(wchar_t * __restrict, const wchar_t * __restrict, size_t) __picolibc_export;
 wchar_t *wmemmove(wchar_t *, const wchar_t *, size_t) __picolibc_export;
@@ -286,6 +288,14 @@ wchar_t *wmemset(wchar_t *, wchar_t, size_t) __picolibc_export;
 #if __ISO_C_VISIBLE >= 1999 || __XSI_VISIBLE >= 500
 int wprintf(const wchar_t * __restrict, ...) __picolibc_export;
 int wscanf(const wchar_t * __restrict, ...) __picolibc_export;
+#endif
+
+#ifdef __preserve_const
+#define wmemchr(_s, _c, _n) __preserve_const(wmemchr, _s, (_s, _c, _n))
+#define wcschr(_s, _c)      __preserve_const(wcschr, _s, (_s, _c))
+#define wcspbrk(_s, _a)     __preserve_const(wcspbrk, _s, (_s, _a))
+#define wcsrchr(_s, _c)     __preserve_const(wcsrchr, _s, (_s, _c))
+#define wcsstr(_h, _n)      __preserve_const(wcsstr, _h, (_h, _n))
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1

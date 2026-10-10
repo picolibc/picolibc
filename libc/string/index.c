@@ -46,6 +46,9 @@ QUICKREF
 #include <string.h>
 #include <strings.h>
 
+#undef index
+#undef strchr
+
 char *
 index(const char *s, int c)
 {

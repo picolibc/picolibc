@@ -58,6 +58,8 @@ No supporting OS subroutines are required.
 #include <stddef.h>
 #include <wchar.h>
 
+#undef wcsrchr
+
 wchar_t *
 wcsrchr(const wchar_t *s, wchar_t c)
 {
