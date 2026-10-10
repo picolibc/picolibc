@@ -159,8 +159,8 @@ option('format-default', type: 'combo', choices: ['double', 'float', 'long-long'
        description: 'which printf/scanf versions should be the default')
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
-option('io-percent-b', type: 'boolean', value: false,
-       description: 'enable proposed %b/%B format in printf and scanf (default: false)')
+option('io-percent-b', type: 'boolean', value: true,
+       description: 'enable %b/%B format in printf and scanf (default: true)')
 option('printf-small-ultoa', type: 'boolean', value: true,
        description: 'Avoid softare division in decimal conversions')
 option('printf-percent-n', type: 'boolean', value: false,
