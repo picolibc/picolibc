@@ -700,6 +700,15 @@ __picolibc_bit_width(__SIZE_TYPE__ a)
 #define __rangeof(type, start, end) (__offsetof(type, end) - __offsetof(type, start))
 
 /*
+ * Construct const-qualifier preserving macros for various functions
+ */
+#if __STDC_VERSION__ >= 201112L                                           \
+    && (__ISO_C_VISIBLE >= 2023 || defined(_LIBC) || defined(_TEST_LIBC))
+#define __preserve_const(_f, _s, _a)                                                    \
+    _Generic(1 ? (_s) : (void *)1, const void *: (const void *)(_f)_a, default: (_f)_a)
+#endif
+
+/*
  * Given the pointer x to the member m of the struct s, return
  * a pointer to the containing structure.  When using GCC, we first
  * assign pointer x to a local variable, to check that its type is
