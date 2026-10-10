@@ -13,6 +13,8 @@
 #ifndef _INTTYPES_H
 #define _INTTYPES_H
 
+#define __STDC_VERSION_INTTYPES_H__ 202311L
+
 #include <sys/cdefs.h>
 #include <stdint.h>
 #include <sys/_intsup.h>
@@ -66,6 +68,8 @@ typedef wchar_t _wchar_t;
 #define __SCN8FAST(x)  __FAST8 __STRINGIFY(x)
 #endif /* __IO_C99_FORMATS */
 
+#define PRIb8 __PRI8(b)
+#define PRIB8 __PRI8(B)
 #define PRId8 __PRI8(d)
 #define PRIi8 __PRI8(i)
 #define PRIo8 __PRI8(o)
@@ -76,6 +80,7 @@ typedef wchar_t _wchar_t;
 /* Macros below are only enabled for a newlib built with C99 I/O format support. */
 #if defined(__IO_C99_FORMATS)
 
+#define SCNb8 __SCN8(b)
 #define SCNd8 __SCN8(d)
 #define SCNi8 __SCN8(i)
 #define SCNo8 __SCN8(o)
@@ -84,6 +89,8 @@ typedef wchar_t _wchar_t;
 
 #endif /* __IO_C99_FORMATS */
 
+#define PRIbLEAST8 __PRI8LEAST(b)
+#define PRIBLEAST8 __PRI8LEAST(B)
 #define PRIdLEAST8 __PRI8LEAST(d)
 #define PRIiLEAST8 __PRI8LEAST(i)
 #define PRIoLEAST8 __PRI8LEAST(o)
@@ -94,6 +101,7 @@ typedef wchar_t _wchar_t;
 /* Macros below are only enabled for a newlib built with C99 I/O format support. */
 #if defined(__IO_C99_FORMATS)
 
+#define SCNbLEAST8 __SCN8LEAST(b)
 #define SCNdLEAST8 __SCN8LEAST(d)
 #define SCNiLEAST8 __SCN8LEAST(i)
 #define SCNoLEAST8 __SCN8LEAST(o)
@@ -102,6 +110,8 @@ typedef wchar_t _wchar_t;
 
 #endif /* __IO_C99_FORMATS */
 
+#define PRIbFAST8 __PRI8FAST(b)
+#define PRIBFAST8 __PRI8FAST(B)
 #define PRIdFAST8 __PRI8FAST(d)
 #define PRIiFAST8 __PRI8FAST(i)
 #define PRIoFAST8 __PRI8FAST(o)
@@ -112,6 +122,7 @@ typedef wchar_t _wchar_t;
 /* Macros below are only enabled for a newlib built with C99 I/O format support. */
 #if defined(__IO_C99_FORMATS)
 
+#define SCNbFAST8 __SCN8FAST(b)
 #define SCNdFAST8 __SCN8FAST(d)
 #define SCNiFAST8 __SCN8FAST(i)
 #define SCNoFAST8 __SCN8FAST(o)
@@ -128,6 +139,8 @@ typedef wchar_t _wchar_t;
 #define __SCN16LEAST(x) __LEAST16 __STRINGIFY(x)
 #define __SCN16FAST(x)  __FAST16 __STRINGIFY(x)
 
+#define PRIb16          __PRI16(b)
+#define PRIB16          __PRI16(B)
 #define PRId16          __PRI16(d)
 #define PRIi16          __PRI16(i)
 #define PRIo16          __PRI16(o)
@@ -135,12 +148,15 @@ typedef wchar_t _wchar_t;
 #define PRIx16          __PRI16(x)
 #define PRIX16          __PRI16(X)
 
+#define SCNb16          __SCN16(b)
 #define SCNd16          __SCN16(d)
 #define SCNi16          __SCN16(i)
 #define SCNo16          __SCN16(o)
 #define SCNu16          __SCN16(u)
 #define SCNx16          __SCN16(x)
 
+#define PRIbLEAST16     __PRI16LEAST(b)
+#define PRIBLEAST16     __PRI16LEAST(B)
 #define PRIdLEAST16     __PRI16LEAST(d)
 #define PRIiLEAST16     __PRI16LEAST(i)
 #define PRIoLEAST16     __PRI16LEAST(o)
@@ -148,12 +164,15 @@ typedef wchar_t _wchar_t;
 #define PRIxLEAST16     __PRI16LEAST(x)
 #define PRIXLEAST16     __PRI16LEAST(X)
 
+#define SCNbLEAST16     __SCN16LEAST(b)
 #define SCNdLEAST16     __SCN16LEAST(d)
 #define SCNiLEAST16     __SCN16LEAST(i)
 #define SCNoLEAST16     __SCN16LEAST(o)
 #define SCNuLEAST16     __SCN16LEAST(u)
 #define SCNxLEAST16     __SCN16LEAST(x)
 
+#define PRIbFAST16      __PRI16FAST(b)
+#define PRIBFAST16      __PRI16FAST(B)
 #define PRIdFAST16      __PRI16FAST(d)
 #define PRIiFAST16      __PRI16FAST(i)
 #define PRIoFAST16      __PRI16FAST(o)
@@ -161,6 +180,7 @@ typedef wchar_t _wchar_t;
 #define PRIxFAST16      __PRI16FAST(x)
 #define PRIXFAST16      __PRI16FAST(X)
 
+#define SCNbFAST16      __SCN16FAST(b)
 #define SCNdFAST16      __SCN16FAST(d)
 #define SCNiFAST16      __SCN16FAST(i)
 #define SCNoFAST16      __SCN16FAST(o)
@@ -175,6 +195,8 @@ typedef wchar_t _wchar_t;
 #define __PRI32FAST(x)  __FAST32 __STRINGIFY(x)
 #define __SCN32FAST(x)  __FAST32 __STRINGIFY(x)
 
+#define PRIb32          __PRI32(b)
+#define PRIB32          __PRI32(B)
 #define PRId32          __PRI32(d)
 #define PRIi32          __PRI32(i)
 #define PRIo32          __PRI32(o)
@@ -182,12 +204,15 @@ typedef wchar_t _wchar_t;
 #define PRIx32          __PRI32(x)
 #define PRIX32          __PRI32(X)
 
+#define SCNb32          __SCN32(b)
 #define SCNd32          __SCN32(d)
 #define SCNi32          __SCN32(i)
 #define SCNo32          __SCN32(o)
 #define SCNu32          __SCN32(u)
 #define SCNx32          __SCN32(x)
 
+#define PRIbLEAST32     __PRI32LEAST(b)
+#define PRIBLEAST32     __PRI32LEAST(B)
 #define PRIdLEAST32     __PRI32LEAST(d)
 #define PRIiLEAST32     __PRI32LEAST(i)
 #define PRIoLEAST32     __PRI32LEAST(o)
@@ -195,12 +220,15 @@ typedef wchar_t _wchar_t;
 #define PRIxLEAST32     __PRI32LEAST(x)
 #define PRIXLEAST32     __PRI32LEAST(X)
 
+#define SCNbLEAST32     __SCN32LEAST(b)
 #define SCNdLEAST32     __SCN32LEAST(d)
 #define SCNiLEAST32     __SCN32LEAST(i)
 #define SCNoLEAST32     __SCN32LEAST(o)
 #define SCNuLEAST32     __SCN32LEAST(u)
 #define SCNxLEAST32     __SCN32LEAST(x)
 
+#define PRIbFAST32      __PRI32FAST(b)
+#define PRIBFAST32      __PRI32FAST(B)
 #define PRIdFAST32      __PRI32FAST(d)
 #define PRIiFAST32      __PRI32FAST(i)
 #define PRIoFAST32      __PRI32FAST(o)
@@ -208,6 +236,7 @@ typedef wchar_t _wchar_t;
 #define PRIxFAST32      __PRI32FAST(x)
 #define PRIXFAST32      __PRI32FAST(X)
 
+#define SCNbFAST32      __SCN32FAST(b)
 #define SCNdFAST32      __SCN32FAST(d)
 #define SCNiFAST32      __SCN32FAST(i)
 #define SCNoFAST32      __SCN32FAST(o)
@@ -224,6 +253,8 @@ typedef wchar_t _wchar_t;
 #define __SCN64FAST(x)  __FAST64 __STRINGIFY(x)
 
 #if __int64_t_defined
+#define PRIb64 __PRI64(b)
+#define PRIB64 __PRI64(B)
 #define PRId64 __PRI64(d)
 #define PRIi64 __PRI64(i)
 #define PRIo64 __PRI64(o)
@@ -231,6 +262,7 @@ typedef wchar_t _wchar_t;
 #define PRIx64 __PRI64(x)
 #define PRIX64 __PRI64(X)
 
+#define SCNb64 __SCN64(b)
 #define SCNd64 __SCN64(d)
 #define SCNi64 __SCN64(i)
 #define SCNo64 __SCN64(o)
@@ -239,6 +271,8 @@ typedef wchar_t _wchar_t;
 #endif
 
 #if __int_least64_t_defined
+#define PRIbLEAST64 __PRI64LEAST(b)
+#define PRIBLEAST64 __PRI64LEAST(B)
 #define PRIdLEAST64 __PRI64LEAST(d)
 #define PRIiLEAST64 __PRI64LEAST(i)
 #define PRIoLEAST64 __PRI64LEAST(o)
@@ -246,6 +280,7 @@ typedef wchar_t _wchar_t;
 #define PRIxLEAST64 __PRI64LEAST(x)
 #define PRIXLEAST64 __PRI64LEAST(X)
 
+#define SCNbLEAST64 __SCN64LEAST(b)
 #define SCNdLEAST64 __SCN64LEAST(d)
 #define SCNiLEAST64 __SCN64LEAST(i)
 #define SCNoLEAST64 __SCN64LEAST(o)
@@ -254,6 +289,8 @@ typedef wchar_t _wchar_t;
 #endif
 
 #if __int_fast64_t_defined
+#define PRIbFAST64 __PRI64FAST(b)
+#define PRIBFAST64 __PRI64FAST(B)
 #define PRIdFAST64 __PRI64FAST(d)
 #define PRIiFAST64 __PRI64FAST(i)
 #define PRIoFAST64 __PRI64FAST(o)
@@ -261,6 +298,7 @@ typedef wchar_t _wchar_t;
 #define PRIxFAST64 __PRI64FAST(x)
 #define PRIXFAST64 __PRI64FAST(X)
 
+#define SCNbFAST64 __SCN64FAST(b)
 #define SCNdFAST64 __SCN64FAST(d)
 #define SCNiFAST64 __SCN64FAST(i)
 #define SCNoFAST64 __SCN64FAST(o)
@@ -280,6 +318,8 @@ typedef wchar_t _wchar_t;
 #define __SCNMAX(x) __STRINGIFY(x)
 #endif
 
+#define PRIbMAX __PRIMAX(b)
+#define PRIBMAX __PRIMAX(B)
 #define PRIdMAX __PRIMAX(d)
 #define PRIiMAX __PRIMAX(i)
 #define PRIoMAX __PRIMAX(o)
@@ -287,6 +327,7 @@ typedef wchar_t _wchar_t;
 #define PRIxMAX __PRIMAX(x)
 #define PRIXMAX __PRIMAX(X)
 
+#define SCNbMAX __SCNMAX(B)
 #define SCNdMAX __SCNMAX(d)
 #define SCNiMAX __SCNMAX(i)
 #define SCNoMAX __SCNMAX(o)
@@ -305,6 +346,8 @@ typedef wchar_t _wchar_t;
 #define __SCNPTR(x) __STRINGIFY(x)
 #endif
 
+#define PRIbPTR __PRIPTR(b)
+#define PRIBPTR __PRIPTR(B)
 #define PRIdPTR __PRIPTR(d)
 #define PRIiPTR __PRIPTR(i)
 #define PRIoPTR __PRIPTR(o)
@@ -312,6 +355,7 @@ typedef wchar_t _wchar_t;
 #define PRIxPTR __PRIPTR(x)
 #define PRIXPTR __PRIPTR(X)
 
+#define SCNbPTR __SCNPTR(b)
 #define SCNdPTR __SCNPTR(d)
 #define SCNiPTR __SCNPTR(i)
 #define SCNoPTR __SCNPTR(o)
