@@ -147,6 +147,10 @@ long long atoll(const char *__nptr) __picolibc_export;
 #endif
 void *bsearch(const void *__key, const void *__base, size_t __nmemb, size_t __size,
               __compar_fn_t _compar) __picolibc_export;
+#if __ISO_C_VISIBLE >= 2023
+#define bsearch(__key, __base, __nmemb, __size, __compar)                         \
+    __preserve_const(bsearch, __base, (__key, __base, __nmemb, __size, __compar))
+#endif
 void                                                                  *
 calloc(size_t, size_t)
 __malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow __picolibc_export;
