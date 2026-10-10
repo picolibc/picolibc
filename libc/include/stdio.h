@@ -37,7 +37,9 @@
 */
 
 #ifndef _STDIO_H_
-#define _STDIO_H_ 1
+#define _STDIO_H_                1
+
+#define __STDC_VERSION_STDIO_H__ 202311L
 
 #include <sys/cdefs.h>
 #define __need_NULL
@@ -421,6 +423,10 @@ int __m_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
 /* only mentioned for libstdc++ support, not implemented in library */
 #ifndef BUFSIZ
 #define BUFSIZ 512
+#endif
+
+#ifndef _PRINTF_NAN_LEN_MAX
+#define _PRINTF_NAN_LEN_MAX 3
 #endif
 
 /*
