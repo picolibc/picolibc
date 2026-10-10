@@ -161,6 +161,8 @@ option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
 option('io-percent-b', type: 'boolean', value: true,
        description: 'enable %b/%B format in printf and scanf (default: true)')
+option('io-length-w', type: 'boolean', value: true,
+       description: 'enable wN and wfN printf length modifiers (default: true)')
 option('printf-small-ultoa', type: 'boolean', value: true,
        description: 'Avoid softare division in decimal conversions')
 option('printf-percent-n', type: 'boolean', value: false,

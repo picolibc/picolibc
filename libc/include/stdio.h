@@ -660,6 +660,9 @@ __printf_float(float f)
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
 #endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
+#endif
 #elif _PICOLIBC_PRINTF == __IO_VARIANT_LLONG
 #define printf_float(x) ((double)(x))
 #define _HAS_IO_LONG_LONG
@@ -672,6 +675,9 @@ __printf_float(float f)
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
 #endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
+#endif
 #elif _PICOLIBC_PRINTF == __IO_VARIANT_FLOAT
 #define printf_float(x) __printf_float(x)
 #define _HAS_IO_LONG_LONG
@@ -679,6 +685,9 @@ __printf_float(float f)
 #define _HAS_IO_C99_FORMATS
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
+#endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
 #endif
 #define _HAS_IO_FLOAT
 #else /* _PICOLIBC_PRINTF == __IO_VARIANT_DOUBLE */
@@ -695,6 +704,9 @@ __printf_float(float f)
 #endif
 #ifdef __IO_PERCENT_B
 #define _HAS_IO_PERCENT_B
+#endif
+#ifdef __IO_LENGTH_W
+#define _HAS_IO_LENGTH_W
 #endif
 #ifdef __IO_LONG_DOUBLE
 #define _HAS_IO_LONG_DOUBLE

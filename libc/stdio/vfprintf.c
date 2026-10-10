@@ -273,28 +273,34 @@ typedef long          ultoa_signed_t;
 #define FL_LONG      0x0080
 #define FL_SHORT     0x0100
 #define FL_REPD_TYPE 0x0200
+#define FL_WF        0x0400
 
-#define FL_NEGATIVE  0x0400
+#define FL_NEGATIVE  0x0800
 
 #ifdef _NEED_IO_C99_FORMATS
-#define FL_FLTHEX 0x0800
+#define FL_FLTHEX 0x1000
 #endif
-#define FL_FLTEXP 0x1000
-#define FL_FLTFIX 0x2000
+#define FL_FLTEXP 0x2000
+#define FL_FLTFIX 0x4000
+
+#define SET_INT_SIZE(size, flags)         \
+    if (size == sizeof(int))              \
+        ;                                 \
+    else if (size == sizeof(long))        \
+        flags |= FL_LONG;                 \
+    else if (size == sizeof(long long))   \
+        flags |= FL_LONG | FL_REPD_TYPE;  \
+    else if (size == sizeof(short))       \
+        flags |= FL_SHORT;                \
+    else if (size == sizeof(char))        \
+        flags |= FL_SHORT | FL_REPD_TYPE;
 
 #ifdef _NEED_IO_C99_FORMATS
 
-#define CHECK_INT_SIZE(c, flags, letter, type)      \
-    if (c == letter) {                              \
-        if (sizeof(type) == sizeof(int))            \
-            ;                                       \
-        else if (sizeof(type) == sizeof(long))      \
-            flags |= FL_LONG;                       \
-        else if (sizeof(type) == sizeof(long long)) \
-            flags |= FL_LONG | FL_REPD_TYPE;        \
-        else if (sizeof(type) == sizeof(short))     \
-            flags |= FL_SHORT;                      \
-        continue;                                   \
+#define CHECK_INT_SIZE(c, flags, letter, type) \
+    if (c == letter) {                         \
+        SET_INT_SIZE(sizeof(type), flags);     \
+        continue;                              \
     }
 
 #define CHECK_C99_INT_SIZES(c, flags)         \
@@ -304,6 +310,86 @@ typedef long          ultoa_signed_t;
 
 #else
 #define CHECK_C99_INT_SIZES(c, flags)
+#endif
+
+#ifdef __IO_LENGTH_W
+
+#ifdef __INT_FAST8_TYPE__
+#define CHECK_INT_FAST8_SIZE(wlen, flags)         \
+    if (wlen == 1) {                              \
+        SET_INT_SIZE(sizeof(int_fast8_t), flags); \
+    }
+#else
+#define CHECK_INT_FAST8_SIZE(wlen, flags)
+#endif
+
+#ifdef __INT_FAST16_TYPE__
+#define CHECK_INT_FAST16_SIZE(wlen, flags)         \
+    if (wlen == 2) {                               \
+        SET_INT_SIZE(sizeof(int_fast16_t), flags); \
+    }
+#else
+#define CHECK_INT_FAST16_SIZE(wlen, flags)
+#endif
+
+#ifdef __INT_FAST32_TYPE__
+#define CHECK_INT_FAST32_SIZE(wlen, flags)         \
+    if (wlen == 4) {                               \
+        SET_INT_SIZE(sizeof(int_fast32_t), flags); \
+    }
+#else
+#define CHECK_INT_FAST32_SIZE(wlen, flags)
+#endif
+
+#ifdef __INT_FAST64_TYPE__
+#define CHECK_INT_FAST64_SIZE(wlen, flags)         \
+    if (wlen == 8) {                               \
+        SET_INT_SIZE(sizeof(int_fast64_t), flags); \
+    }
+#else
+#define CHECK_INT_FAST64_SIZE(wlen, flags)
+#endif
+
+#ifdef __INT_FAST128_TYPE__
+#define CHECK_INT_FAST128_SIZE(wlen, flags)         \
+    if (wlen == 16) {                               \
+        SET_INT_SIZE(sizeof(int_fast128_t), flags); \
+    }
+#else
+#define CHECK_INT_FAST128_SIZE(wlen, flags)
+#endif
+
+#define SET_FAST_INT_SIZE(wlen, flags)   \
+    CHECK_INT_FAST8_SIZE(wlen, flags);   \
+    CHECK_INT_FAST16_SIZE(wlen, flags);  \
+    CHECK_INT_FAST32_SIZE(wlen, flags);  \
+    CHECK_INT_FAST64_SIZE(wlen, flags);  \
+    CHECK_INT_FAST128_SIZE(wlen, flags);
+
+#define CHECK_WLEN_SIZES(c, flags)              \
+    if (c == 'w') {                             \
+        int wlen = 0;                           \
+        c = *fmt++;                             \
+        if (c == 'f') {                         \
+            c = *fmt++;                         \
+            flags |= FL_WF;                     \
+        }                                       \
+        while ('0' <= c && c <= '9') {          \
+            wlen = wlen * 10 + (c - '0');       \
+            c = *fmt++;                         \
+        }                                       \
+        if (wlen) {                             \
+            wlen >>= 3;                         \
+            if (flags & FL_WF) {                \
+                SET_FAST_INT_SIZE(wlen, flags); \
+            } else {                            \
+                SET_INT_SIZE(wlen, flags);      \
+            }                                   \
+        }                                       \
+        break;                                  \
+    }
+#else
+#define CHECK_WLEN_SIZES(c, flags)
 #endif
 
 #define CHECK_INT_SIZES(c, flags)      \
@@ -329,6 +415,7 @@ typedef long          ultoa_signed_t;
             continue;                  \
         }                              \
         CHECK_C99_INT_SIZES(c, flags); \
+        CHECK_WLEN_SIZES(c, flags);    \
     }
 
 #ifdef _NEED_IO_POS_ARGS
