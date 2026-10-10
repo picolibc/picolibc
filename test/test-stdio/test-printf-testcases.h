@@ -21,9 +21,13 @@
 #define __IO_C99_FORMATS
 #define __IO_LONG_LONG
 #define __IO_POS_ARGS
+#define LENGTH_W
 #else
 #ifdef _HAS_IO_PERCENT_B
 #define BINARY_FORMAT
+#endif
+#ifdef _HAS_IO_LENGTH_W
+#define LENGTH_W
 #endif
 #ifdef _HAS_IO_DOUBLE
 #if __SIZEOF_DOUBLE__ == 4
@@ -313,9 +317,6 @@ result |= test(__LINE__, "12", "%o", 10);
 result |= test(__LINE__, "(null)", "%s", NULL);
 result |= test(__LINE__, "%%%%", "%s", "%%%%");
 result |= test(__LINE__, I("4294967295", "65535"), "%u", -1);
-#ifdef __PICOLIBC__
-result |= test(__LINE__, "%w", "%w", -1);
-#endif
 /* 172: excluded for C */
 /* 173: excluded for C */
 /* 174: excluded for C */
@@ -606,6 +607,11 @@ result |= test(__LINE__, I("1234ABCD            ", "0ABCD               "), "% -
 result |= test(__LINE__, I("00EDCB5433          ", "0000005433          "), "% -+0*.*X", 20, 10,
                3989525555U);
 result |= test(__LINE__, "hi x", "%*sx", -3, "hi");
+#endif
+#ifdef LENGTH_W
+result |= test(__LINE__, "cc", "%w8x", (int8_t)0xaacc);
+result |= test(__LINE__, "bbcc", "%w16x", (int16_t)0xaabbcc);
+result |= test(__LINE__, "aacc", "%w32x", (int32_t)0xaacc);
 #endif
 #ifndef NO_FLOAT
 #ifndef NO_DENORM
