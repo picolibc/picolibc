@@ -174,7 +174,7 @@ char *strncat(char * __restrict, const char * __restrict, size_t) __picolibc_exp
 int   strncmp(const char *, const char *, size_t) __picolibc_export;
 char *strncpy(char * __restrict, const char * __restrict, size_t) __picolibc_export;
 #if __POSIX_VISIBLE >= 200809 || __ISO_C_VISIBLE >= 2023
-char                                    *
+char *
 strndup(const char *, size_t)
 __malloc_like __warn_unused_result __picolibc_export;
 #endif
@@ -182,7 +182,7 @@ __malloc_like __warn_unused_result __picolibc_export;
 size_t strnlen(const char *, size_t) __picolibc_export;
 #endif
 #if __BSD_VISIBLE
-char        *
+char *
 strnstr(const char *, const char *, size_t)
 __pure __picolibc_export;
 #endif
