@@ -254,8 +254,8 @@ int __fallback_raise(int) __picolibc_export;
 int sig2str(int, char *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE
-int sigaction(int, const struct sigaction * __restrict,
-              struct sigaction * __restrict) __picolibc_export;
+int sigaction(int, const struct sigaction * __restrict, struct sigaction * __restrict)
+    __picolibc_export;
 
 int sigaddset(sigset_t *, const int) __picolibc_export;
 
@@ -346,8 +346,8 @@ int str2sig(const char * __restrict, int * __restrict) __picolibc_export;
 
 #if __GNU_VISIBLE
 
-int sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
-    __nonnull((1, 2, 3)) __picolibc_export;
+int sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right) __nonnull((1, 2, 3))
+__picolibc_export;
 
 static __inline int
 __sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
@@ -358,8 +358,8 @@ __sigandset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
 
 #define sigandset(d, l, r) __sigandset(d, l, r)
 
-int sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right)
-    __nonnull((1, 2, 3)) __picolibc_export;
+int sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right) __nonnull((1, 2, 3))
+__picolibc_export;
 
 static __inline int
 __sigorset(sigset_t *dest, const sigset_t *left, const sigset_t *right)

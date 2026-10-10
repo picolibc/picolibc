@@ -22,6 +22,7 @@ AllowShortFunctionsOnASingleLine: Inline
 AttributeMacros:
   - '__pure'
   - '__picolibc_format'
+  - '__picolibc_export'
   - '__nonnull'
   - '__returns_nonnull'
   - '__alloc_size'
