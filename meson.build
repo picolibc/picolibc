@@ -450,11 +450,11 @@ c_args += c_prep_flags + c_flags
 native_c_args += c_prep_flags + c_flags
 
 # Make sure _LIBC is not defined when building tests
-test_c_args = c_args
+test_c_args = c_args + ['-D_TEST_LIBC']
 c_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
 
 if have_cplusplus
-  test_cpp_args = cpp_args
+  test_cpp_args = cpp_args + ['-D_TEST_LIBC']
   cpp_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
 endif
 
