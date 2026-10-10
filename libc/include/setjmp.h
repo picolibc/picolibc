@@ -38,6 +38,8 @@ SUCH DAMAGE.
 #ifndef _SETJMP_H_
 #define _SETJMP_H_
 
+#define __STDC_VERSION_SETJMP_H__ 202311L
+
 #include <sys/cdefs.h>
 #include <sys/_sigset.h>
 #include <machine/setjmp.h>
