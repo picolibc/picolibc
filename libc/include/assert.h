@@ -38,13 +38,17 @@ SUCH DAMAGE.
 
 _BEGIN_STD_C
 
+#ifndef __STDC_VERSION_ASSERT_H__
+#define __STDC_VERSION_ASSERT_H__ 202311L
+#endif
+
 #undef assert
 
 #ifdef NDEBUG /* required by ANSI standard */
-#define assert(__e) ((void)0)
+#define assert(...) ((void)0)
 #else
 #if !defined(__ASSERT_VERBOSE) || defined(__ASSERT_QUIET)
-#define assert(__e) ((__e) ? (void)0 : __assert_no_args())
+#define assert(...) ((__VA_ARGS__) ? (void)0 : __assert_no_args())
 #else
 #ifndef __ASSERT_FUNC
 /* Use g++'s demangled names in C++.  */
@@ -65,7 +69,8 @@ _BEGIN_STD_C
 #endif
 #endif /* !__ASSERT_FUNC */
 
-#define assert(__e) ((__e) ? (void)0 : __assert_func(__FILE__, __LINE__, __ASSERT_FUNC, #__e))
+#define assert(...)                                                                            \
+    ((__VA_ARGS__) ? (void)0 : __assert_func(__FILE__, __LINE__, __ASSERT_FUNC, #__VA_ARGS__))
 #endif
 
 #endif /* !NDEBUG */
