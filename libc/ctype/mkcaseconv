@@ -15,6 +15,9 @@ else	echo UnicodeData.txt not found >&2
 	exit 1
 fi
 
+ReadMe=$(dirname "$UnicodeData")/ReadMe.txt
+UnicodeVersion=$(sed -n '/Version/s/^.*Version \([^ ]*\) .*Unicode Standard.*$/\1/p' "${ReadMe}")
+
 LC_ALL=C
 export LC_ALL
 
@@ -37,6 +40,7 @@ sed \
 -e t \
 -e d |
 (#src 01C5 upper "01C4" lower "01C6" title "01C5"
+echo "/* Unicode Version ${UnicodeVersion} */"
 if $compact
 then
   (

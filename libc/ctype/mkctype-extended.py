@@ -127,6 +127,15 @@ def load_unicode_data(name):
                 ret[ud.code] = ud
     return ret
 
+def load_version(name):
+    version = ""
+    with open(name) as file:
+        for line in file:
+            m = re.match('.*Version ([1-9][0-9.]*) ', line)
+            if m:
+                version = m.group(1)
+    return version
+
 def to_upper(code):
     global CodePoints
     if code in CodePoints:
@@ -579,7 +588,7 @@ def dump_range(title, encoding, start, end):
 def dump_table():
     global prev_above
 
-    print('''/*
+    print(f'''/*
  * SPDX-License-Identifier: BSD-3-Clause
  *
  * Copyright © 2024 Keith Packard
@@ -616,6 +625,7 @@ def dump_table():
 
 /* This file is auto-generated from mkctype-extended.py */
 /* clang-format off */
+/* Unicode Version {UnicodeVersion} */
 ''')   
 #    for val in (10,):
 #        encoding = 'iso8859-%d' % val
@@ -668,6 +678,7 @@ def dump_table():
         dump_range(define + '255 ', encoding, 255, 255)
         
 
+UnicodeVersion = load_version('/usr/share/unicode/ReadMe.txt')
 DerivedProperties = load_derived_properties('/usr/share/unicode/DerivedCoreProperties.txt')
 CodePoints = load_unicode_data('/usr/share/unicode/UnicodeData.txt')
 
