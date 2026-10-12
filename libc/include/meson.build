@@ -81,6 +81,7 @@ inc_headers = [
   'setjmp.h',
   'signal.h',
   'spawn.h',
+  'stdc-predef.h',
   'stdckdint.h',
   'stdint.h',
   'stdio.h',
@@ -126,7 +127,7 @@ endif
 
 if enable_cdefs_tests
 
-  ignore_headers = ['cpio.h', 'paths.h', 'termios.h', 'newlib.h', 'regdef.h', 'tar.h', 'utmp.h']
+  ignore_headers = ['cpio.h', 'paths.h', 'termios.h', 'newlib.h', 'regdef.h', 'tar.h', 'utmp.h', 'stdc-predef.h']
   foreach header : inc_headers
 
     if not (header in ignore_headers) and not (header.startswith('_'))

@@ -25,6 +25,7 @@
 extern "C" {
 #endif
 
+#include <stdc-predef.h>
 #include <picolibc.h>
 
 /* Macro to test version of GCC.  Returns 0 for non-GCC or too old GCC. */
@@ -467,18 +468,6 @@ extern "C" {
 #define _POSIX_JOB_CONTROL 1
 #define _POSIX_SAVED_IDS   1
 #define _POSIX_VERSION     199009L
-#endif
-
-#if __WCHAR_WIDTH__ >= 21
-/*
- * The current ctype tables are based on Unicode 17.0.0.
- *
- * This value matches the release date of ISO/IEC 10646:2020/Amd
- * 2:2025, which is the version of that standard based on Unicode
- * 16.0.0. If a ISO/IEC 10646 version is released that is based on
- * Unicode 17.0.0, this value should be updated.
- */
-#define __STDC_ISO_10646__ 202506L
 #endif
 
 #ifdef __cplusplus

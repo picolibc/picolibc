@@ -82,6 +82,7 @@ picolibc_headers(""
   setjmp.h
   signal.h
   spawn.h
+  stdc-predef.h
   stdckdint.h
   stdint.h
   stdio.h

@@ -789,6 +789,12 @@ float    rootnf(float, long long int) __picolibc_export; /* XXX */
 double   rsqrt(double) __picolibc_export; /* XXX */
 float    rsqrtf(float) __picolibc_export; /* XXX */
 
+int      setpayload(double *res, double pl) __picolibc_export; /* XXX */
+int      setpayloadf(float *res, float pl) __picolibc_export;  /* XXX */
+
+int      setpayloadsig(double *res, double pl) __picolibc_export; /* XXX */
+int      setpayloadsigf(float *res, float pl) __picolibc_export;  /* XXX */
+
 int      totalorder(const double *x, const double *y) __picolibc_export; /* XXX */
 int      totalorderf(const float *x, const float *y) __picolibc_export;  /* XXX */
 
@@ -848,6 +854,8 @@ long double fromfpl(long double, int, unsigned int) __picolibc_export;          
 long double fromfpxl(long double, int, unsigned int) __picolibc_export;                   /* XXX */
 long double rootnl(long double, long long int) __picolibc_export;                         /* XXX */
 long double rsqrtl(long double) __picolibc_export;                                        /* XXX */
+int         setpayloadl(long double *res, long double pl) __picolibc_export;              /* XXX */
+int         setpayloadsigl(long double *res, long double pl) __picolibc_export;           /* XXX */
 int         totalorderl(const long double *x, const long double *y) __picolibc_export;    /* XXX */
 int         totalordermagl(const long double *x, const long double *y) __picolibc_export; /* XXX */
 long double ufromfpl(long double, int, unsigned int) __picolibc_export;                   /* XXX */
