@@ -36,6 +36,8 @@ SUCH DAMAGE.
 
 #include <sys/cdefs.h>
 
+#define __STDC_VERSION_MATH_H__ 202311L
+
 _BEGIN_STD_C
 
 /* Natural log of 2 */
@@ -787,6 +789,12 @@ float    rootnf(float, long long int) __picolibc_export; /* XXX */
 double   rsqrt(double) __picolibc_export; /* XXX */
 float    rsqrtf(float) __picolibc_export; /* XXX */
 
+int      totalorder(const double *x, const double *y) __picolibc_export; /* XXX */
+int      totalorderf(const float *x, const float *y) __picolibc_export;  /* XXX */
+
+int      totalordermag(const double *x, const double *y) __picolibc_export; /* XXX */
+int      totalordermagf(const float *x, const float *y) __picolibc_export;  /* XXX */
+
 double   ufromfp(double, int, unsigned int) __picolibc_export; /* XXX */
 float    ufromfpf(float, int, unsigned int) __picolibc_export; /* XXX */
 
@@ -836,12 +844,14 @@ long double sinpil(long double) __picolibc_export;
 long double tanpil(long double) __picolibc_export;
 
 /* Missing functions */
-long double fromfpl(long double, int, unsigned int) __picolibc_export;   /* XXX */
-long double fromfpxl(long double, int, unsigned int) __picolibc_export;  /* XXX */
-long double rootnl(long double, long long int) __picolibc_export;        /* XXX */
-long double rsqrtl(long double) __picolibc_export;                       /* XXX */
-long double ufromfpl(long double, int, unsigned int) __picolibc_export;  /* XXX */
-long double ufromfpxl(long double, int, unsigned int) __picolibc_export; /* XXX */
+long double fromfpl(long double, int, unsigned int) __picolibc_export;                    /* XXX */
+long double fromfpxl(long double, int, unsigned int) __picolibc_export;                   /* XXX */
+long double rootnl(long double, long long int) __picolibc_export;                         /* XXX */
+long double rsqrtl(long double) __picolibc_export;                                        /* XXX */
+int         totalorderl(const long double *x, const long double *y) __picolibc_export;    /* XXX */
+int         totalordermagl(const long double *x, const long double *y) __picolibc_export; /* XXX */
+long double ufromfpl(long double, int, unsigned int) __picolibc_export;                   /* XXX */
+long double ufromfpxl(long double, int, unsigned int) __picolibc_export;                  /* XXX */
 
 #endif
 #endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
