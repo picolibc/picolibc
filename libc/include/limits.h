@@ -1,6 +1,8 @@
 /* Copyright (c) 2002 Jeff Johnston  <jjohnstn@redhat.com> */
 #ifndef _LIBC_LIMITS_H_
-#define _LIBC_LIMITS_H_ 1
+#define _LIBC_LIMITS_H_           1
+
+#define __STDC_VERSION_LIMITS_H__ 202311L
 
 #include <sys/cdefs.h>
 #include <sys/syslimits.h>
