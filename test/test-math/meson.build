@@ -112,7 +112,9 @@ tests_real_other = [
   'test-round',
   'test-roundeven',
   'test-sqrt',
-  'test-tgamma'
+  'test-tgamma',
+  'test-totalorder',
+  'test-totalordermag',
 ]
 
 tests_complex_trig = [

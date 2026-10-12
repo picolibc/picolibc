@@ -90,6 +90,8 @@ set(tests_real_other
   test-scalbn
   test-sqrt
   test-tgamma
+  test-totalorder
+  test-totalordermag
   )
 
 set(tests_complex_trig

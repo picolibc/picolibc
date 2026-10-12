@@ -69,6 +69,8 @@ test-roundeven.h
 test-scalbn.h
 test-sqrt.h
 test-tgamma.h
+test-totalorder.h
+test-totalordermag.h
 test-cacos.h
 test-cacosh.h
 test-casin.h

@@ -77,7 +77,9 @@ REAL_OTHER = \
 	test-roundeven.h \
 	test-scalbn.h \
 	test-sqrt.h \
-	test-tgamma.h
+	test-tgamma.h \
+	test-totalorder.h \
+	test-totalordermag.h
 
 COMPLEX_TRIG = \
 	test-cacos.h \
