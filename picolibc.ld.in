@@ -318,8 +318,7 @@ SECTIONS
 @DATATLS@ @BFD@	 */
 @DATATLS@ @BFD@
 @DATATLS@ @BFD@	.tbss_space (NOLOAD) : {
-@DATATLS@ @BFD@		. = ADDR(.tbss);
-@DATATLS@ @BFD@		. = . + SIZEOF(.tbss);
+@DATATLS@ @BFD@		. = ADDR(.tbss) + SIZEOF(.tbss);
 @DATATLS@ @BFD@	} >@BSS_MEM@ AT>@BSS_AT@ :@BSS_PHDR@
 @DATATLS@
 @DATATLS@	PROVIDE( @PREFIX@__tls_start = SIZEOF(.tdata) ? ADDR(.tdata) : ADDR(.tbss) );
