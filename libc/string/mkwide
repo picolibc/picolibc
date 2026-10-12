@@ -15,8 +15,8 @@ if [ ! -r Blocks.txt ]
 then	ln -s /usr/share/unicode/ucd/Blocks.txt . || exit 1
 fi
 
-sed -e "s,^\([^;]*\);[NAH],\1," -e t -e d EastAsianWidth.txt > wide.na
-sed -e "s,^\([^;]*\);[WF],\1," -e t -e d EastAsianWidth.txt > wide.fw
+sed -e "s,^\([^;]*\); *[NAH],\1," -e t -e d EastAsianWidth.txt > wide.na
+sed -e "s,^\([^;]*\); *[WF],\1," -e t -e d EastAsianWidth.txt > wide.fw
 
 PATH="$PATH:." # for uniset
 
@@ -29,8 +29,8 @@ extrablocks="2E80-303E"
 
 # check all blocks
 includes () {
-	nr=`uniset +wide.$2 -$1 nr | sed -e 's,.*:,,'`
-	test $nr != $3
+    nr=$(uniset +wide.$2 -$1 nr | sed -e 's,.*:,,')
+    test $nr != $3
 }
 echo "adding compact closure of wide ranges, this may take ~10min"
 for b in $extrablocks `sed -e 's,^\([0-9A-F]*\)\.\.\([0-9A-F]*\).*,\1-\2,' -e t -e d Blocks.txt`
@@ -41,7 +41,10 @@ do	range=$b
 	fi
 done > wide.blocks
 
+UNICODE_VERSION=$(sed -n '1s,[^.0-9],,gp' Blocks.txt)
+
 (
+echo "/* Unicode Version ${UNICODE_VERSION} */"
 sed -e "s,^,//," -e 1q EastAsianWidth.txt
 sed -e "s,^,//," -e 1q Blocks.txt
 uniset `sed -e 's,^,+,' wide.blocks` +wide.fw c
