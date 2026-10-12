@@ -59,6 +59,12 @@ name(touint)(float_t x)
     return u.u;
 }
 
+static inline fint_t
+name(toint)(float_t x)
+{
+    return (fint_t)name(touint)(x);
+}
+
 static inline float_t
 name(tofloat)(fuint_t x)
 {

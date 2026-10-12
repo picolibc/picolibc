@@ -68,6 +68,7 @@ typedef double float64_t;
 #define FLOAT_64_MAX        DBL_MAX
 #define FLOAT_64_MIN        DBL_MIN
 #define FLOAT_64_DENORM_MIN __DBL_DENORM_MIN__
+#define FLOAT_64_SNAN_BIT   0x0008000000000000ULL
 #ifdef __HAVE_FAST_FMA
 #define __HAVE_FAST_FMA_64
 #endif
@@ -100,6 +101,7 @@ typedef long double float80_t;
 #define FLOAT_80_MAX        LDBL_MAX
 #define FLOAT_80_MIN        LDBL_MIN
 #define FLOAT_80_DENORM_MIN __LDBL_DENORM_MIN__
+#define FLOAT_80_SNAN_BIT   0x40000000U
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_80
 #endif
@@ -117,6 +119,7 @@ typedef long double float128_t;
 #define FLOAT_128_MAX        LDBL_MAX
 #define FLOAT_128_MIN        LDBL_MIN
 #define FLOAT_128_DENORM_MIN __LDBL_DENORM_MIN__
+#define FLOAT_128_SNAN_BIT   0x0000800000000000ULL
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_128
 #endif
@@ -139,9 +142,14 @@ typedef long double float128_t;
 #define FLOAT_MAX         FLOAT_32_MAX
 #define FLOAT_MIN         FLOAT_32_MIN
 #define FLOAT_DENORM_MIN  FLOAT_32_DENORM_MIN
+#define FLOAT_SNAN_BIT    0x00400000u
 #ifdef __HAVE_FAST_FMA_32
 #define __HAVE_FAST_FMA_F
 #endif
+
+#define GET_ABS(_ix)   ((_ix) & 0x7fffffff)
+#define IS_FINITE(_ix) FLT_UWORD_IS_FINITE(_ix)
+#define IS_NAN(_ix)    FLT_UWORD_IS_NAN(_ix)
 
 #define GET_EXP(_ix, _x)         \
     do {                         \
@@ -180,8 +188,20 @@ typedef long double float128_t;
 #define FLOAT_MAX         FLOAT_64_MAX
 #define FLOAT_MIN         FLOAT_64_MIN
 #define FLOAT_DENORM_MIN  FLOAT_64_DENORM_MIN
+#define FLOAT_SNAN_BIT    0x0008000000000000LL
 #ifdef __HAVE_FAST_FMA_64
 #define __HAVE_FAST_FMA_F
+#endif
+
+#define GET_ABS(_ix) ((_ix) & 0x7fffffffffffffffLL)
+#ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
+#define IS_FINITE(_ix) 1
+#define IS_INF(_ix)    0
+#define IS_NAN(_ix)    0
+#else
+#define IS_FINITE(_ix) ((_ix) < 0x7ff0000000000000LL)
+#define IS_INF(_ix)    ((_ix) == 0x7ff0000000000000LL)
+#define IS_NAN(_ix)    ((_ix) > 0x7ff0000000000000LL)
 #endif
 
 #define GET_EXP(_ix, _x)        \
@@ -262,8 +282,20 @@ typedef long double float128_t;
 #define FLOAT_MAX         FLOAT_128_MAX
 #define FLOAT_MIN         FLOAT_128_MIN
 #define FLOAT_DENORM_MIN  FLOAT_128_DENORM_MIN
+#define FLOAT_SNAN_BIT    0x0000800000000000LL
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F
+#endif
+#define GET_ABS(_hx) ((_hx) & 0x7fffffffffffffffLL)
+#ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
+#define IS_FINITE(_hx, _lx) 1
+#define IS_INF(_hx, _lx)    0
+#define IS_NAN(_hx, _lx)    0
+#else
+#define IS_FINITE(_hx, _lx) ((_hx) < 0x7fff000000000000LL)
+#define IS_INF(_hx, _lx)    ((_hx) == 0x7fff000000000000LL && (_lx) == 0)
+#define IS_NAN(_hx, _lx)                                                            \
+    ((_hx) > 0x7fff000000000000LL || ((_hx) == 0x7fff000000000000LL && (_lx) != 0))
 #endif
 
 #define GET_EXP(_ix, _x)          \

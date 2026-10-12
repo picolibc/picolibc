@@ -194,6 +194,14 @@ srcs_math_two = [
   'tanpi_64.c',
   'tanpi_80.c',
   'tanpi_128.c',
+  'totalorder_32.c',
+  'totalorder_64.c',
+  'totalorder_80.c',
+  'totalorder_128.c',
+  'totalordermag_32.c',
+  'totalordermag_64.c',
+  'totalordermag_80.c',
+  'totalordermag_128.c',
   ]
 
 src_libm_math_two = files(srcs_math_two)
