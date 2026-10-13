@@ -482,6 +482,7 @@ typedef struct {
 	int        precision;
 	int	   exp;
 	string     macro;
+	string	   print;
 	real       min_denorm;
 	real       min;
 	real       max;
@@ -495,6 +496,7 @@ conv_t[] real_convs = {
 		.precision = 24,
 		.exp = 8,
 		.macro = "FN32",
+		.print = "P32",
 		.min_denorm = min_denorm_binary32,
 		.min = min_binary32,
 		.max = max_binary32
@@ -506,6 +508,7 @@ conv_t[] real_convs = {
 		.precision = 53,
 		.exp = 11,
 		.macro = "FN64",
+		.print = "P64",
 		.min_denorm = min_denorm_binary64,
 		.min = min_binary64,
 		.max = max_binary64
@@ -517,6 +520,7 @@ conv_t[] real_convs = {
 		.precision = 64,
 		.exp = 15,
 		.macro = "FN80",
+		.print = "P80",
 		.min_denorm = min_denorm_binary80,
 		.min = min_binary80,
 		.max = max_binary80
@@ -528,6 +532,7 @@ conv_t[] real_convs = {
 		.precision = 64,
 		.exp = 15,
 		.macro = "FN80M",
+		.print = "P80",
 		.min_denorm = min_denorm_binary80m,
 		.min = min_binary80m,
 		.max = max_binary80m
@@ -539,6 +544,7 @@ conv_t[] real_convs = {
 		.precision = 113,
 		.exp = 15,
 		.macro = "FN128",
+		.print = "P128",
 		.min_denorm = min_denorm_binary128,
 		.min = min_binary128,
 		.max = max_binary128

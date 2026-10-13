@@ -56,6 +56,20 @@
 #pragma GCC diagnostic ignored "-Wdouble-promotion"
 #endif
 
+#ifndef __PICOLIBC__
+#ifdef __mips__
+#ifndef __mips_nan2008
+#define _IEEE_754_2008_SNAN 0
+#endif
+#endif
+#ifdef __sh__
+#define _IEEE_754_2008_SNAN 0
+#endif
+#ifndef _IEEE_754_2008_SNAN
+#define _IEEE_754_2008_SNAN 1
+#endif
+#endif
+
 #ifdef __RX__
 #define SKIP_DENORM
 #endif
@@ -185,6 +199,9 @@ typedef struct {
 static inline ulp_t
 ulp32(binary32 ab, binary32 bb)
 {
+#ifdef ULP_BITWISE
+    return memcmp(&ab, &bb, sizeof(ab));
+#else
     volatile binary32 a = ab;
     volatile binary32 b = bb;
     if (a == b)
@@ -215,6 +232,7 @@ ulp32(binary32 ab, binary32 bb)
             break;
     }
     return ulp;
+#endif
 }
 
 static inline ulp_t
@@ -282,6 +300,9 @@ typedef struct {
 static inline ulp_t
 ulp64(binary64 ab, binary64 bb)
 {
+#ifdef ULP_BITWISE
+    return memcmp(&ab, &bb, sizeof(ab));
+#else
     volatile binary64 a = ab;
     volatile binary64 b = bb;
     if (a == b)
@@ -315,6 +336,7 @@ ulp64(binary64 ab, binary64 bb)
             break;
     }
     return ulp;
+#endif
 }
 
 static inline ulp_t
@@ -388,9 +410,65 @@ typedef struct {
     cbinary80 x, y;
 } cunary80;
 
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+
+typedef union {
+    long double value;
+    struct {
+#ifdef __LP64__
+        int32_t padh;
+#endif
+        int16_t exp;
+        int16_t padl;
+        union {
+            struct {
+                u_int32_t msw;
+                u_int32_t lsw;
+            };
+            uint64_t sw;
+        };
+    } parts;
+} ieee_extended_shape_type;
+
+#endif
+
+#if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
+
+typedef union {
+    long double value;
+    struct {
+        union {
+            struct {
+                u_int32_t lsw;
+                u_int32_t msw;
+            };
+            uint64_t sw;
+        };
+        int16_t exp;
+        int16_t padl;
+#ifdef __LP64__
+        int32_t padh;
+#endif
+    } parts;
+} ieee_extended_shape_type;
+
+#endif
+
 static inline ulp_t
 ulp80(binary80 ab, binary80 bb)
 {
+#ifdef ULP_BITWISE
+    ieee_extended_shape_type au, bu;
+    au.value = ab;
+    bu.value = bb;
+    if (au.parts.exp == bu.parts.exp && au.parts.sw == bu.parts.sw)
+        return 0;
+    printf("a exp 0x%04x msw 0x%08lx lsw 0x%08lx\n", (int)au.parts.exp & 0xffff, (long)au.parts.msw,
+           (long)au.parts.lsw);
+    printf("b exp 0x%04x msw 0x%08lx lsw 0x%08lx\n", (int)bu.parts.exp & 0xffff, (long)bu.parts.msw,
+           (long)bu.parts.lsw);
+    return 1;
+#else
     volatile binary80 a = ab;
     volatile binary80 b = bb;
     if (a == b)
@@ -416,6 +494,7 @@ ulp80(binary80 ab, binary80 bb)
             break;
     }
     return ulp;
+#endif
 }
 
 static inline ulp_t
@@ -464,6 +543,9 @@ typedef struct {
 static inline ulp_t
 ulp128(binary128 ab, binary128 bb)
 {
+#ifdef ULP_BITWISE
+    return memcmp(&ab, &bb, sizeof(ab));
+#else
     volatile binary128 a = ab;
     volatile binary128 b = bb;
     if (a == b)
@@ -489,6 +571,7 @@ ulp128(binary128 ab, binary128 bb)
             break;
     }
     return ulp;
+#endif
 }
 
 static inline ulp_t

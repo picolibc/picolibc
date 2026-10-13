@@ -76,6 +76,8 @@ REAL_OTHER = \
 	test-round.h \
 	test-roundeven.h \
 	test-scalbn.h \
+	test-setpayload.h \
+	test-setpayloadsig.h \
 	test-sqrt.h \
 	test-tgamma.h \
 	test-totalorder.h \
@@ -148,6 +150,8 @@ GEN_NARROWING=$(GEN_NARROWING_F) $(GEN_NARROWING_D)
 narrow-stamp: $(GEN_NARROWING) make-narrowing
 	./make-narrowing
 	touch $@
+
+test-setpayloadsig.h: test-setpayload.5c
 
 clean:
 	rm -f $(GEN_NARROWING) narrow-stamp

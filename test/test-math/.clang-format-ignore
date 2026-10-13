@@ -67,6 +67,8 @@ test-remquo.h
 test-round.h
 test-roundeven.h
 test-scalbn.h
+test-setpayload.h
+test-setpayloadsig.h
 test-sqrt.h
 test-tgamma.h
 test-totalorder.h

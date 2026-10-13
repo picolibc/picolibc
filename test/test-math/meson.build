@@ -111,6 +111,8 @@ tests_real_other = [
   'test-remquo-quo',
   'test-round',
   'test-roundeven',
+  'test-setpayload',
+  'test-setpayloadsig',
   'test-sqrt',
   'test-tgamma',
   'test-totalorder',

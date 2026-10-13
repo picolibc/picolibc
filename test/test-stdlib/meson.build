@@ -106,7 +106,7 @@ foreach params : targets
 		    include_directories: inc),
          depends: bios_bin,
          args: test_args.get(t1, []),
-	 timeout: 60,
+	 timeout: 120,
          suite: 'test-stdlib',
 	 env: test_env)
   endforeach

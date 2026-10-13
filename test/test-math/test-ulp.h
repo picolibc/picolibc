@@ -120,6 +120,8 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "remquo_quo",    .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "round",         .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "roundeven",     .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "setpayload",    .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+    { .name = "setpayloadsig", .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
 #if defined(__riscv_float_abi_soft) || defined(__clang__)
     { .name = "sqrt",          .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 1       },
 #else
@@ -248,6 +250,8 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "round", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "roundeven", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "lgamma", .b32 = 1, .b64 = 2, .b80 = 2, .b128 = 3 },
+    { .name = "setpayload", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "setpayloadsig", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "sqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 1 },
     { .name = "tgamma", .b32 = 1, .b64 = 4, .b80 = 2, .b128 = 2 },
     { .name = "totalorder", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },

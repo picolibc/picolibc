@@ -88,6 +88,8 @@ set(tests_real_other
   test-round
   test-roundeven
   test-scalbn
+  test-setpayload
+  test-setpayloadsig
   test-sqrt
   test-tgamma
   test-totalorder
