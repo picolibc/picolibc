@@ -57,6 +57,8 @@ foreach file : srcs_locale
     message('libc/locale/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/locale/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/locale/' + file + ': libos overrides generic')
   else
     srcs_locale_use += file
   endif

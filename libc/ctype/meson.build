@@ -115,6 +115,8 @@ foreach file : srcs_ctype
     message('libc/ctype/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/ctype/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/ctype/' + file + ': libos overrides generic')
   else
     srcs_ctype_use += file
   endif

@@ -49,6 +49,7 @@ static struct {
 } tests[] = {
     { .command = "exit 0", .exited = true, .exit = 0, .signaled = false, .sig = 0 },
     { .command = "exit 1", .exited = true, .exit = 1, .signaled = false, .sig = 0 },
+#if !defined(__hexagon__)
     {
      .command = "kill -INT $$",
      .exited = false,
@@ -63,6 +64,7 @@ static struct {
      .signaled = true,
      .sig = SIGUSR1,
      },
+#endif
 };
 
 #define NTESTS (sizeof(tests) / sizeof(tests[0]))
