@@ -71,6 +71,8 @@ foreach file : srcs_time
     message('libc/time/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/time/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/time/' + file + ': libos overrides generic')
   else
     srcs_time_use += file
   endif

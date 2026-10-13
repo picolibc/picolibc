@@ -164,6 +164,8 @@ foreach file : srcs_string
     message('libc/string/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/string/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/string/' + file + ': libos overrides generic')
   else
     srcs_string_use += file
   endif
@@ -176,6 +178,8 @@ foreach file : srcs_strcmp
     message('libc/string/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/string/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/string/' + file + ': libos overrides generic')
   else
     srcs_strcmp_use += file
   endif

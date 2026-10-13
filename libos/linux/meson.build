@@ -165,6 +165,8 @@ if fs.is_dir(machine_dir)
 
   src_os_linux = files(srcs_os_linux) + src_os_linux_machine
 
+  srcs_libos += srcs_os_linux
+
   linux_inc = include_directories(machine_dir, 'include')
 
   foreach params : targets
