@@ -42,44 +42,39 @@
 
 #ifdef MAG
 #define NAME totalordermag
-#define NORMALIZE(h, l)            \
-    do {                           \
-        h &= 0x7fffffffffffffffLL; \
+#define NORMALIZE(i)                           \
+    do {                                       \
+        i.parts64.msw &= 0x7fffffffffffffffLL; \
     } while (0)
 #else
 #define NAME totalorder
-#define NORMALIZE(h, l)          \
-    do {                         \
-        uint64_t sign = h >> 63; \
-        h ^= sign >> 1;          \
-        l ^= sign;               \
+#define NORMALIZE(i)                                  \
+    do {                                              \
+        uint64_t sign = (int64_t)i.parts64.msw >> 63; \
+        i.parts64.msw ^= sign >> 1;                   \
+        i.parts64.lsw ^= sign;                        \
     } while (0)
 #endif
 
 int
 name(NAME)(const float_t *x, const float_t *y)
 {
-    int64_t  hx;
-    uint64_t lx;
-    GET_LDOUBLE_WORDS64(hx, lx, *x);
-
-    int64_t  hy;
-    uint64_t ly;
-    GET_LDOUBLE_WORDS64(hy, ly, *y);
+    fuint_t xi = f_touint(*x);
+    fuint_t yi = f_touint(*y);
 
     if (!_IEEE_754_2008_SNAN) {
-        if (IS_NAN(GET_ABS(hx), lx))
-            hx ^= FLOAT_SNAN_BIT;
-        if (IS_NAN(GET_ABS(hy), ly))
-            hy ^= FLOAT_SNAN_BIT;
+        if (f_is_nan(xi))
+            xi.parts64.msw ^= FLOAT_SNAN_BIT;
+        if (f_is_nan(yi))
+            xi.parts64.msw ^= FLOAT_SNAN_BIT;
     }
 
-    NORMALIZE(hx, lx);
-    NORMALIZE(hy, ly);
+    NORMALIZE(xi);
+    NORMALIZE(yi);
 
-    if (hy == hx)
-        return lx <= ly;
-    return hx <= hy;
+    if (xi.parts64.msw == yi.parts64.msw)
+        return xi.parts64.lsw <= yi.parts64.lsw;
+    return (int64_t)xi.parts64.msw <= (int64_t)yi.parts64.msw;
 }
 
 #endif

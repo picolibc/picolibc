@@ -56,13 +56,13 @@
 int
 name(NAME)(const float_t *x, const float_t *y)
 {
-    fint_t xi = name(toint)(*x);
-    fint_t yi = name(toint)(*y);
+    fint_t xi = f_toint(*x);
+    fint_t yi = f_toint(*y);
 
     if (!_IEEE_754_2008_SNAN) {
-        if (IS_NAN(GET_ABS(xi)))
+        if (f_is_nan(xi))
             xi ^= FLOAT_SNAN_BIT;
-        if (IS_NAN(GET_ABS(yi)))
+        if (f_is_nan(yi))
             yi ^= FLOAT_SNAN_BIT;
     }
     NORMALIZE(xi);

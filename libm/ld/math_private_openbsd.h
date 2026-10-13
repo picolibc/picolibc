@@ -222,10 +222,15 @@ typedef union {
 #ifdef __LP64__
         int32_t padh;
 #endif
-        int16_t   exp;
-        int16_t   padl;
-        u_int32_t msw;
-        u_int32_t lsw;
+        int16_t exp;
+        int16_t padl;
+        union {
+            struct {
+                u_int32_t msw;
+                u_int32_t lsw;
+            };
+            uint64_t sw;
+        };
     } parts;
 } ieee_extended_shape_type;
 
@@ -236,10 +241,15 @@ typedef union {
 typedef union {
     long double value;
     struct {
-        u_int32_t lsw;
-        u_int32_t msw;
-        int16_t   exp;
-        int16_t   padl;
+        union {
+            struct {
+                u_int32_t lsw;
+                u_int32_t msw;
+            };
+            uint64_t sw;
+        };
+        int16_t exp;
+        int16_t padl;
 #ifdef __LP64__
         int32_t padh;
 #endif

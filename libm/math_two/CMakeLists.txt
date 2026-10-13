@@ -187,6 +187,14 @@ picolibc_sources(
   roundeven_64.c
   roundeven_80.c
   roundeven_128.c
+  setpayload_32.c
+  setpayload_64.c
+  setpayload_80.c
+  setpayload_128.c
+  setpayloadsig_32.c
+  setpayloadsig_64.c
+  setpayloadsig_80.c
+  setpayloadsig_128.c
   sinpi_32.c
   sinpi_64.c
   sinpi_80.c

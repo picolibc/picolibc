@@ -40,6 +40,7 @@
 #include "../ld/math_ld.h"
 #include <math.h>
 #include <inttypes.h>
+#include <stdbool.h>
 
 /* Figure out mapping between C types and floating point formats */
 #if __FLT_MANT_DIG__ == 24
@@ -101,7 +102,6 @@ typedef long double float80_t;
 #define FLOAT_80_MAX        LDBL_MAX
 #define FLOAT_80_MIN        LDBL_MIN
 #define FLOAT_80_DENORM_MIN __LDBL_DENORM_MIN__
-#define FLOAT_80_SNAN_BIT   0x40000000U
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_80
 #endif
@@ -143,6 +143,10 @@ typedef long double float128_t;
 #define FLOAT_MIN         FLOAT_32_MIN
 #define FLOAT_DENORM_MIN  FLOAT_32_DENORM_MIN
 #define FLOAT_SNAN_BIT    0x00400000u
+#define FLOAT_EXP_MASK    0x7f800000U
+#define FLOAT_EXP_BIAS    0x7f
+#define FLOAT_EXP_INF     0xff
+#define FLOAT_PAYLOAD_DIG 23
 #ifdef __HAVE_FAST_FMA_32
 #define __HAVE_FAST_FMA_F
 #endif
@@ -189,6 +193,10 @@ typedef long double float128_t;
 #define FLOAT_MIN         FLOAT_64_MIN
 #define FLOAT_DENORM_MIN  FLOAT_64_DENORM_MIN
 #define FLOAT_SNAN_BIT    0x0008000000000000LL
+#define FLOAT_EXP_MASK    0x7ff0000000000000LL
+#define FLOAT_EXP_BIAS    0x3ff
+#define FLOAT_EXP_INF     0x7ff
+#define FLOAT_PAYLOAD_DIG 52
 #ifdef __HAVE_FAST_FMA_64
 #define __HAVE_FAST_FMA_F
 #endif
@@ -238,10 +246,16 @@ typedef long double float128_t;
 #define _isint_float_f(x) _isint_float_80(x)
 #define FLOAT_MAX         FLOAT_80_MAX
 #define FLOAT_MIN         FLOAT_80_MIN
+#define FLOAT_EXP_BIAS    0x3fff
+#define FLOAT_EXP_INF     0x7fff
+#define FLOAT_SNAN_BIT    0x4000000000000000ULL
 #define FLOAT_DENORM_MIN  FLOAT_80_DENORM_MIN
+#define FLOAT_PAYLOAD_DIG 64
 #ifdef __HAVE_FAST_FMA_80
 #define __HAVE_FAST_FMA_F
 #endif
+
+typedef ieee_extended_shape_type fuint_t;
 
 #define GET_EXP(_ix, _x)                    \
     do {                                    \
@@ -269,6 +283,46 @@ typedef long double float128_t;
 
 #include "math_two_inc.h"
 
+static inline fuint_t
+f_touint(float_t x)
+{
+    fuint_t i;
+    i.value = x;
+    return i;
+}
+
+static inline float_t
+f_tofloat(fuint_t i)
+{
+    return i.value;
+}
+
+static inline int
+f_exp(fuint_t i)
+{
+    return (int)(i.parts.exp & 0x7fff) - FLOAT_EXP_BIAS;
+}
+
+static inline bool
+f_is_minus(fuint_t i)
+{
+    return i.parts.exp < 0;
+}
+
+static inline bool
+f_is_zero(fuint_t i)
+{
+    return (i.parts.exp & 0x7fff) == 0 && i.parts.sw == 0;
+}
+
+static inline bool
+f_is_integer(fuint_t i, int shift)
+{
+    if (f_is_zero(i))
+        return true;
+    return (i.parts.sw & (((uint64_t)1 << (shift - 1)) - 1)) == 0;
+}
+
 #endif
 
 #if defined(HAVE_FLOAT128) && defined(WANT_FLOAT128)
@@ -281,12 +335,15 @@ typedef long double float128_t;
 #define _isint_float_f(x) _isint_float_128(x)
 #define FLOAT_MAX         FLOAT_128_MAX
 #define FLOAT_MIN         FLOAT_128_MIN
+#define FLOAT_EXP_BIAS    0x3fff
 #define FLOAT_DENORM_MIN  FLOAT_128_DENORM_MIN
-#define FLOAT_SNAN_BIT    0x0000800000000000LL
+#define FLOAT_SNAN_BIT    0x0000800000000000ULL
+#define FLOAT_EXP_INF     0x7fff
+#define FLOAT_PAYLOAD_DIG 112
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F
 #endif
-#define GET_ABS(_hx) ((_hx) & 0x7fffffffffffffffLL)
+#define FLOAT_ABS(_hx) ((_hx) & 0x7fffffffffffffffLL)
 #ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
 #define IS_FINITE(_hx, _lx) 1
 #define IS_INF(_hx, _lx)    0
@@ -324,6 +381,111 @@ typedef long double float128_t;
     } while (0)
 
 #include "math_two_inc.h"
+
+typedef ieee_quad_shape_type fuint_t;
+
+static inline fuint_t
+f_touint(float_t x)
+{
+    fuint_t i;
+    i.value = x;
+    return i;
+}
+
+static inline float_t
+f_tofloat(fuint_t i)
+{
+    return i.value;
+}
+
+static inline fuint_t
+f_abs(fuint_t i)
+{
+    i.parts32.mswhi &= 0x7fffffffUL;
+    return i;
+}
+
+static inline bool
+f_is_minus(fuint_t i)
+{
+    return (int64_t)i.parts64.msw < 0;
+}
+
+static inline bool
+f_is_zero(fuint_t i)
+{
+    return i.parts64.msw == 0 && i.parts64.lsw == 0;
+}
+
+static inline int
+f_exp(fuint_t i)
+{
+    return (int)(i.parts64.msw >> (FLOAT_PAYLOAD_DIG - 64)) - FLOAT_EXP_BIAS;
+}
+
+static inline bool
+f_is_nan(fuint_t i)
+{
+    i = f_abs(i);
+    if (i.parts64.msw < 0x7fff000000000000ULL)
+        return false;
+    if (i.parts64.msw == 0x7fff000000000000ULL && i.parts64.lsw == 0)
+        return false;
+    return true;
+}
+
+static inline bool
+f_is_integer(fuint_t pi, int shift)
+{
+    if (f_is_zero(pi))
+        return true;
+    if (shift >= 64) {
+        if ((pi.parts64.msw & (((uint64_t)1 << (shift - 64)) - 1)) != 0)
+            return false;
+        if (pi.parts64.lsw != 0)
+            return false;
+        return true;
+    }
+    return (pi.parts64.lsw & (((uint64_t)1 << shift) - 1)) == 0;
+}
+
+static inline fuint_t
+f_and(fuint_t i, fuint_t j)
+{
+    i.parts64.msw &= j.parts64.msw;
+    i.parts64.lsw &= j.parts64.lsw;
+    return i;
+}
+
+static inline fuint_t
+f_or(fuint_t i, fuint_t j)
+{
+    i.parts64.msw |= j.parts64.msw;
+    i.parts64.lsw |= j.parts64.lsw;
+    return i;
+}
+
+static inline fuint_t
+f_xor(fuint_t i, fuint_t j)
+{
+    i.parts64.msw ^= j.parts64.msw;
+    i.parts64.lsw ^= j.parts64.lsw;
+    return i;
+}
+
+static inline fuint_t
+f_exp_or(fuint_t i, uint32_t exp)
+{
+    i.parts32.mswhi |= exp << 16;
+    return i;
+}
+
+static inline fuint_t
+f_exp_and(fuint_t i, uint32_t exp)
+{
+    i.parts32.mswhi &= exp << 16;
+    return i;
+}
 
 #endif
 

@@ -49,7 +49,7 @@
 
 #ifdef fuint_t
 static inline fuint_t
-name(touint)(float_t x)
+f_touint(float_t x)
 {
     union {
         float_t f;
@@ -60,13 +60,18 @@ name(touint)(float_t x)
 }
 
 static inline fint_t
-name(toint)(float_t x)
+f_toint(float_t x)
 {
-    return (fint_t)name(touint)(x);
+    union {
+        float_t f;
+        fint_t  i;
+    } u;
+    u.f = x;
+    return u.i;
 }
 
 static inline float_t
-name(tofloat)(fuint_t x)
+f_tofloat(fuint_t x)
 {
     union {
         float_t f;
@@ -74,6 +79,49 @@ name(tofloat)(fuint_t x)
     } u;
     u.u = x;
     return u.f;
+}
+
+static inline bool
+f_is_minus(fuint_t i)
+{
+    return (fint_t)i < 0;
+}
+
+static inline bool
+f_is_zero(fuint_t i)
+{
+    return i == 0;
+}
+
+static inline bool
+f_is_integer(fuint_t pi, int shift)
+{
+    if (f_is_zero(pi))
+        return true;
+    return (pi & (((fuint_t)1 << shift) - 1)) == 0;
+}
+
+static inline int
+f_exp(fuint_t x)
+{
+    return (int)(x >> FLOAT_PAYLOAD_DIG) - FLOAT_EXP_BIAS;
+}
+
+static inline fuint_t
+f_abs(fuint_t x)
+{
+    return x & (((fuint_t)1 << ((sizeof(fuint_t) * 8) - 1)) - 1);
+}
+
+static inline bool
+f_is_nan(fuint_t x)
+{
+#ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
+    return false;
+#else
+    x = f_abs(x);
+    return x > FLOAT_EXP_MASK;
+#endif
 }
 #endif
 

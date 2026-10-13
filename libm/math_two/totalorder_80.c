@@ -48,12 +48,12 @@
     } while (0)
 #else
 #define NAME totalorder
-#define NORMALIZE(es, h, l)                          \
-    do {                                             \
-        uint32_t sign = es >> 31;                    \
-        es ^= (sign >> 17);                          \
-        h ^= sign;                                   \
-        l ^= sign;                                   \
+#define NORMALIZE(es, h, l)       \
+    do {                          \
+        uint32_t sign = es >> 31; \
+        es ^= (sign >> 17);       \
+        h ^= sign;                \
+        l ^= sign;                \
     } while (0)
 #endif
 
