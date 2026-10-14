@@ -33,7 +33,7 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 	     else
 		 echo 'Docker files or check-ci script not ok'
 		 date
-		 echo '########' git checkout $AFTER_SHA
+		 echo '##########' git checkout $AFTER_SHA
 		 if git checkout $AFTER_SHA > checkout-restore.log 2>&1; then
 		     :
 		 else
@@ -66,7 +66,31 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 	 exit 0
 	 ;;
      *)
-	 exit 3
+	 if [ -n "$INC_TESTS" ]; then
+	     echo '##########' Incremental configure failed
+	     if git checkout $AFTER_SHA > checkout-restore.log 2>&1; then
+		 :
+	     else
+		 cat checkout-restore.log
+		 exit 3
+	     fi
+	     echo '##########' ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@"
+	     ../scripts/"$CONFIGURE" -Dwerror=true -Ddebug=false "$@" > config.log 2>&1
+	     case $? in
+		 0)
+		     echo 'Configuration succeeded'
+		     ;;
+		 77)
+		     echo 'Configuration skipped'
+		     exit 0
+		     ;;
+		 *)
+		     exit 3
+		     ;;
+	     esac
+	 else
+	     exit 3
+	 fi
 	 ;;
  esac
  TEST_WRAPPER=
@@ -78,12 +102,21 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
  if [ -n "$INC_TESTS" ]; then
      date
      echo '########## incremental' "$TARGET" 'ninja'
-     ninja > incremental.log 2>&1 || exit 4
-     INC_TEST_ARGS="$TEST_WRAPPER --no-suite headers --no-suite ctype-diff"
-     date
-     echo '########## incremental' "$TARGET" "CI_CAPTURE=yes meson $INC_TEST_ARGS test"
-     CI_CAPTURE=yes meson test $INC_TEST_ARGS > capture.log 2>&1 || exit 5
-     date
+     ninja > incremental.log 2>&1
+     case $? in
+	 0)
+	     INC_TEST_ARGS="$TEST_WRAPPER --no-suite headers --no-suite ctype-diff"
+	     date
+	     echo '########## incremental' "$TARGET" "CI_CAPTURE=yes meson $INC_TEST_ARGS test"
+	     CI_CAPTURE=yes meson test $INC_TEST_ARGS > capture.log 2>&1 || exit 5
+	     date
+	     ;;
+	 *)
+	     echo '##########' incremental build failed
+	     cat incremental.log
+	     INC_TESTS=""
+	     ;;
+     esac
      echo '########## incremental' "$TARGET" "git checkout $AFTER_SHA"
      if git checkout "$AFTER_SHA" > checkout-after.log 2>&1; then
 	 :
