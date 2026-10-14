@@ -36,6 +36,7 @@
 #define _ISOC23_SOURCE
 #define SKIP_BINARY32
 #define SKIP_BINARY64
+#define ULP_BITWISE
 
 #define TEST_VECTORS "test-dfma.h"
 #define TEST_FUNC    dfma

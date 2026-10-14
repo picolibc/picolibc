@@ -200,7 +200,7 @@ static inline ulp_t
 ulp32(binary32 ab, binary32 bb)
 {
 #ifdef ULP_BITWISE
-    return memcmp(&ab, &bb, sizeof(ab));
+    return (memcmp(&ab, &bb, sizeof(ab)) != 0) * MAX_ULP;
 #else
     volatile binary32 a = ab;
     volatile binary32 b = bb;
@@ -301,7 +301,7 @@ static inline ulp_t
 ulp64(binary64 ab, binary64 bb)
 {
 #ifdef ULP_BITWISE
-    return memcmp(&ab, &bb, sizeof(ab));
+    return (memcmp(&ab, &bb, sizeof(ab)) != 0) * MAX_ULP;
 #else
     volatile binary64 a = ab;
     volatile binary64 b = bb;
@@ -467,7 +467,7 @@ ulp80(binary80 ab, binary80 bb)
            (long)au.parts.lsw);
     printf("b exp 0x%04x msw 0x%08lx lsw 0x%08lx\n", (int)bu.parts.exp & 0xffff, (long)bu.parts.msw,
            (long)bu.parts.lsw);
-    return 1;
+    return MAX_ULP;
 #else
     volatile binary80 a = ab;
     volatile binary80 b = bb;
@@ -544,7 +544,7 @@ static inline ulp_t
 ulp128(binary128 ab, binary128 bb)
 {
 #ifdef ULP_BITWISE
-    return memcmp(&ab, &bb, sizeof(ab));
+    return (memcmp(&ab, &bb, sizeof(ab)) != 0) * MAX_ULP;
 #else
     volatile binary128 a = ab;
     volatile binary128 b = bb;

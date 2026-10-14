@@ -39,7 +39,7 @@ load "test-ffma-inc.5c"
 real
 single_round_three(real a, real b, real c)
 {
-	return real32(a * b + c);
+	return range32(a * b + c);
 }
 
 test_three();
