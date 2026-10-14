@@ -54,6 +54,8 @@ test-ceil.h
 test-erf.h
 test-erfc.h
 test-floor.h
+test-fromfp.h
+test-fromfpx.h
 test-hypot.h
 test-j0.h
 test-j1.h
@@ -73,6 +75,8 @@ test-sqrt.h
 test-tgamma.h
 test-totalorder.h
 test-totalordermag.h
+test-ufromfp.h
+test-ufromfpx.h
 test-cacos.h
 test-cacosh.h
 test-casin.h

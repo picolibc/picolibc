@@ -63,6 +63,8 @@ REAL_OTHER = \
 	test-erf.h \
 	test-erfc.h \
 	test-floor.h \
+	test-fromfp.h \
+	test-fromfpx.h \
 	test-hypot.h \
 	test-j0.h \
 	test-j1.h \
@@ -81,7 +83,9 @@ REAL_OTHER = \
 	test-sqrt.h \
 	test-tgamma.h \
 	test-totalorder.h \
-	test-totalordermag.h
+	test-totalordermag.h \
+	test-ufromfp.h \
+	test-ufromfpx.h
 
 COMPLEX_TRIG = \
 	test-cacos.h \
@@ -152,6 +156,8 @@ narrow-stamp: $(GEN_NARROWING) make-narrowing
 	touch $@
 
 test-setpayloadsig.h: test-setpayload.5c
+
+test-fromfp.h test-fromfpx.h test-ufromfp.h test-ufromfpx.h: test-fromfp-common.5c
 
 clean:
 	rm -f $(GEN_NARROWING) narrow-stamp
