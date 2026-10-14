@@ -75,6 +75,8 @@ set(tests_real_other
   test-erf
   test-erfc
   test-floor
+  test-fromfp
+  test-fromfpx
   test-hypot
   test-j0
   test-j1
@@ -94,6 +96,8 @@ set(tests_real_other
   test-tgamma
   test-totalorder
   test-totalordermag
+  test-ufromfp
+  test-ufromfpx
   )
 
 set(tests_complex_trig

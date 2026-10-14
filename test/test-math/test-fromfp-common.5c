@@ -1,0 +1,238 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+
+string[] rounding_modes = {
+	"FP_INT_UPWARD",
+	"FP_INT_DOWNWARD",
+	"FP_INT_TOWARDZERO",
+	"FP_INT_TONEARESTFROMZERO",
+	"FP_INT_TONEAREST"
+};
+
+typedef struct {
+	result_t	v;
+	bool		overflow;
+	bool		inexact;
+} fromfp_ret_t;
+
+real
+round(real x)
+{
+	if (x > 0)
+		return floor(x + 0.5);
+	else
+		return ceil(x-0.5);
+}
+
+real
+roundeven(real x)
+{
+	real xi = round(x);
+	if (abs(x - xi) == 0.5) {
+		if (xi != x && (xi & 1) != 0) {
+			if (xi > x)
+				xi--;
+			else
+				xi++;
+		}
+	}
+	return xi;
+}
+
+real
+trunc(real x)
+{
+	if (x < 0)
+		return ceil(x);
+	else
+		return floor(x);
+}
+
+fromfp_ret_t
+fromfp(real x, bool unsign, string rm, int width)
+{
+	real xi;
+	switch (rm) {
+	case "FP_INT_UPWARD":
+		xi = ceil(x);
+		break;
+	case "FP_INT_DOWNWARD":
+		xi = floor(x);
+		break;
+	case "FP_INT_TOWARDZERO":
+		xi = trunc(x);
+		break;
+	case "FP_INT_TONEARESTFROMZERO":
+		xi = round(x);
+		break;
+	case "FP_INT_TONEAREST":
+		xi = roundeven(x);
+		break;
+	}
+
+	if (width > 100000)
+		width = 100000;
+
+	real low, high;
+	if (unsign) {
+		low = 0;
+		high = 2**width - 1;
+	} else {
+		low = -(2**(width-1));
+		high = 2**(width - 1) - 1;
+	}
+
+	if (xi < low || xi > high) {
+		return (fromfp_ret_t) {
+			.v = { .n = ◊ },
+			.overflow = true,
+			.inexact = false,
+		};
+	}
+	fromfp_ret_t ret = {
+		.v = { .r = xi },
+		.overflow = false,
+		.inexact = xi != x
+	};
+	return ret;
+}
+
+string[] rounding_modes = {
+	"FP_INT_UPWARD",
+	"FP_INT_DOWNWARD",
+	"FP_INT_TOWARDZERO",
+	"FP_INT_TONEARESTFROMZERO",
+	"FP_INT_TONEAREST",
+};
+
+string
+result_string(result_t r)
+{
+	union switch (r) {
+	case r v:
+		return sprintf("%a", v);
+	case i i:
+		return sprintf("%sINFINITY", i?"-":"");
+	case n:
+		return  sprintf("NAN");
+	}
+}
+
+string
+exception_string(fromfp_ret_t r, bool imprecise)
+{
+	string ret = "0";
+	if (r.overflow)
+		ret = "FE_INVALID";
+	if (r.inexact && imprecise) {
+		if (ret == "0")
+			ret = "FE_INEXACT";
+		else
+			ret += "|FE_INEXACT";
+	}
+	return ret;
+}
+
+string
+errno_string(fromfp_ret_t r, bool imprecise)
+{
+	if (r.overflow)
+		return "EDOM";
+	else
+		return "0";
+}
+
+void
+print_x(real x)
+{
+	printf(".x = REAL(");
+	for (int i = 0; i < dim(real_convs); i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(x, i);
+	}
+	printf(")");
+}
+
+void
+print_y(result_t y)
+{
+	printf(".y = REAL(");
+	for (int i = 0; i < dim(real_convs); i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(y, i);
+	}
+	printf(")");
+}
+
+void do_one(real x, bool unsign, bool imprecise, string mode, int width)
+{
+	fromfp_ret_t r = fromfp(x, unsign, mode, width);
+	string y = result_string(r.v);
+	string e = exception_string(r, imprecise);
+	string er = errno_string(r, imprecise);
+	printf("{ ");
+	print_x(x);
+	printf(", ");
+	print_y(r.v);
+	printf(", .mode = %s, .width = %d, .exception=%s, .errno=%s },\n", mode, width, e, er);
+}
+
+int[] extra_widths = {
+	2**15-1,
+	2**31-1,
+	2**31,
+	2**32-1,
+};
+
+void doit(bool unsign, bool imprecise)
+{
+	for (real value = -4; value <= 4; value ++) {
+		for (real off = 0; off <= 0.75; off += 0.25) {
+			for (int pow = 0; pow < 4; pow++) {
+				real x = value * 2**pow + off;
+				for (int mode = 0; mode < dim(rounding_modes); mode++) {
+					for (int width = 1; width < 8; width++)
+						do_one(x, unsign, imprecise, rounding_modes[mode], width);
+					for (int w = 0; w < dim(extra_widths); w++)
+						do_one(x, unsign, imprecise, rounding_modes[mode], extra_widths[w]);
+				}
+			}
+		}
+	}
+}
