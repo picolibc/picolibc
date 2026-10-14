@@ -47,4 +47,4 @@ case "$TARGET" in
 	;;
 esac
 
-"$HERE"/do-run "$TARGET" "$@" $OPTIONS
+exec "$HERE"/do-run "$TARGET" "$@" $OPTIONS
