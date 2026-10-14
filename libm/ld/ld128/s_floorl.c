@@ -15,11 +15,7 @@
  * Return x rounded toward -inf to integral value
  * Method:
  *	Bit twiddling.
- * Exception:
- *	Inexact flag raised if x not equal to floor(x).
  */
-
-static const long double huge = 1.0e4930L;
 
 long double
 floorl(long double x)
@@ -29,23 +25,19 @@ floorl(long double x)
     GET_LDOUBLE_WORDS64(i0, i1, x);
     jj0 = ((i0 >> 48) & 0x7fff) - 0x3fff;
     if (jj0 < 48) {
-        if (jj0 < 0) { /* raise inexact if x != 0 */
-            if (huge + x > 0.0L) {
-                if (i0 >= 0)
-                    return 0.0L;
-                else if (((i0 & 0x7fffffffffffffffLL) | i1) != 0)
-                    return -1.0L;
-            }
+        if (jj0 < 0) {
+            if (i0 >= 0)
+                return 0.0L;
+            else if (((i0 & 0x7fffffffffffffffLL) | i1) != 0)
+                return -1.0L;
         } else {
             i = (0x0000ffffffffffffULL) >> jj0;
             if (((i0 & i) | i1) == 0)
-                return x;          /* x is integral */
-            if (huge + x > 0.0L) { /* raise inexact flag */
-                if (i0 < 0)
-                    i0 += (0x0001000000000000LL) >> jj0;
-                i0 &= (~i);
-                i1 = 0;
-            }
+                return x; /* x is integral */
+            if (i0 < 0)
+                i0 += (0x0001000000000000LL) >> jj0;
+            i0 &= (~i);
+            i1 = 0;
         }
     } else if (jj0 > 111) {
         if (jj0 == 0x4000)
@@ -55,20 +47,18 @@ floorl(long double x)
     } else {
         i = -1ULL >> (jj0 - 48);
         if ((i1 & i) == 0)
-            return x;          /* x is integral */
-        if (huge + x > 0.0L) { /* raise inexact flag */
-            if (i0 < 0) {
-                if (jj0 == 48)
-                    i0 += 1;
-                else {
-                    j = i1 + (1ULL << (112 - jj0));
-                    if (j < (u_int64_t)i1)
-                        i0 += 1; /* got a carry */
-                    i1 = j;
-                }
+            return x; /* x is integral */
+        if (i0 < 0) {
+            if (jj0 == 48)
+                i0 += 1;
+            else {
+                j = i1 + (1ULL << (112 - jj0));
+                if (j < (u_int64_t)i1)
+                    i0 += 1; /* got a carry */
+                i1 = j;
             }
-            i1 &= (~i);
         }
+        i1 &= (~i);
     }
     SET_LDOUBLE_WORDS64(x, i0, i1);
     return x;
