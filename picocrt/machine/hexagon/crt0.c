@@ -74,6 +74,13 @@ coredump()
 }
 #endif
 
+#ifdef CRT0_LINUX
+char **environ;
+#else
+static const char * const initial_env[] = { 0 };
+char                    **environ = (char **)initial_env;
+#endif
+
 void __attribute__((noreturn))
 #ifdef CRT0_LINUX
 _cstart(void *orig_sp)
@@ -84,6 +91,7 @@ _cstart(void)
 #ifdef CRT0_LINUX
     int    argc = *(int *)orig_sp;
     char **argv = ((char **)orig_sp) + 1;
+    environ = argv + argc + 1;
     __start(argc, argv);
 #else
 #ifdef CRT0_SEMIHOST

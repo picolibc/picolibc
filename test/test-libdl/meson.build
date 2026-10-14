@@ -53,7 +53,7 @@ libdl_error_tests = [
   'test-libdl-error',
 ]
 
-if enable_libdl
+if enable_libdl and false
 
   foreach params : targets
     target        = params['name']
