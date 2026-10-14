@@ -51,6 +51,7 @@ typedef float float32_t;
 #define FLOAT_32_MAX        FLT_MAX
 #define FLOAT_32_MIN        FLT_MIN
 #define FLOAT_32_DENORM_MIN __FLT_DENORM_MIN__
+#define FLOAT_32_MAX_EXP    FLT_MAX_EXP
 #ifdef __HAVE_FAST_FMAF
 #define __HAVE_FAST_FMA_32
 #endif
@@ -70,6 +71,7 @@ typedef double float64_t;
 #define FLOAT_64_MIN        DBL_MIN
 #define FLOAT_64_DENORM_MIN __DBL_DENORM_MIN__
 #define FLOAT_64_SNAN_BIT   0x0008000000000000ULL
+#define FLOAT_64_MAX_EXP    DBL_MAX_EXP
 #ifdef __HAVE_FAST_FMA
 #define __HAVE_FAST_FMA_64
 #endif
@@ -85,6 +87,7 @@ typedef long double float64_t;
 #define FLOAT_64_MAX        LDBL_MAX
 #define FLOAT_64_MIN        LDBL_MIN
 #define FLOAT_64_DENORM_MIN __LDBL_DENORM_MIN__
+#define FLOAT_64_MAX_EXP    LDBL_MAX_EXP
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_64
 #endif
@@ -102,6 +105,7 @@ typedef long double float80_t;
 #define FLOAT_80_MAX        LDBL_MAX
 #define FLOAT_80_MIN        LDBL_MIN
 #define FLOAT_80_DENORM_MIN __LDBL_DENORM_MIN__
+#define FLOAT_80_MAX_EXP    LDBL_MAX_EXP
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_80
 #endif
@@ -120,6 +124,7 @@ typedef long double float128_t;
 #define FLOAT_128_MIN        LDBL_MIN
 #define FLOAT_128_DENORM_MIN __LDBL_DENORM_MIN__
 #define FLOAT_128_SNAN_BIT   0x0000800000000000ULL
+#define FLOAT_128_MAX_EXP    LDBL_MAX_EXP
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_128
 #endif
@@ -131,6 +136,7 @@ typedef long double float128_t;
 
 #if defined(HAVE_FLOAT32) && defined(WANT_FLOAT32)
 
+#define FLOAT_LEN         32
 #define float_t           float32_t
 #define fint_t            int32_t
 #define fuint_t           uint32_t
@@ -142,6 +148,7 @@ typedef long double float128_t;
 #define FLOAT_MAX         FLOAT_32_MAX
 #define FLOAT_MIN         FLOAT_32_MIN
 #define FLOAT_DENORM_MIN  FLOAT_32_DENORM_MIN
+#define FLOAT_MAX_EXP     FLOAT_32_MAX_EXP
 #define FLOAT_SNAN_BIT    0x00400000u
 #define FLOAT_EXP_MASK    0x7f800000U
 #define FLOAT_EXP_BIAS    0x7f
@@ -181,6 +188,7 @@ typedef long double float128_t;
 
 #if defined(HAVE_FLOAT64) && defined(WANT_FLOAT64)
 
+#define FLOAT_LEN   64
 #define float_t     float64_t
 #define fint_t      int64_t
 #define fuint_t     uint64_t
@@ -192,6 +200,7 @@ typedef long double float128_t;
 #define FLOAT_MAX         FLOAT_64_MAX
 #define FLOAT_MIN         FLOAT_64_MIN
 #define FLOAT_DENORM_MIN  FLOAT_64_DENORM_MIN
+#define FLOAT_MAX_EXP     FLOAT_64_MAX_EXP
 #define FLOAT_SNAN_BIT    0x0008000000000000LL
 #define FLOAT_EXP_MASK    0x7ff0000000000000LL
 #define FLOAT_EXP_BIAS    0x3ff
@@ -238,6 +247,7 @@ typedef long double float128_t;
 
 #if defined(HAVE_FLOAT80) && defined(WANT_FLOAT80)
 
+#define FLOAT_LEN         80
 #define float_t           float80_t
 #define NAME_SUFFIX       float80_suffix
 #define KERNEL_SUFFIX     l
@@ -250,6 +260,7 @@ typedef long double float128_t;
 #define FLOAT_EXP_INF     0x7fff
 #define FLOAT_SNAN_BIT    0x4000000000000000ULL
 #define FLOAT_DENORM_MIN  FLOAT_80_DENORM_MIN
+#define FLOAT_MAX_EXP     FLOAT_80_MAX_EXP
 #define FLOAT_PAYLOAD_DIG 64
 #ifdef __HAVE_FAST_FMA_80
 #define __HAVE_FAST_FMA_F
@@ -327,6 +338,7 @@ f_is_integer(fuint_t i, int shift)
 
 #if defined(HAVE_FLOAT128) && defined(WANT_FLOAT128)
 
+#define FLOAT_LEN         128
 #define float_t           float128_t
 #define NAME_SUFFIX       float128_suffix
 #define KERNEL_SUFFIX     l
@@ -339,6 +351,7 @@ f_is_integer(fuint_t i, int shift)
 #define FLOAT_DENORM_MIN  FLOAT_128_DENORM_MIN
 #define FLOAT_SNAN_BIT    0x0000800000000000ULL
 #define FLOAT_EXP_INF     0x7fff
+#define FLOAT_MAX_EXP     FLOAT_128_MAX_EXP
 #define FLOAT_PAYLOAD_DIG 112
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F

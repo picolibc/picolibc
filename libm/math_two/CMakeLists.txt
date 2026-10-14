@@ -167,6 +167,14 @@ picolibc_sources(
   ff_pown_64.c
   ff_pown_80.c
   ff_pown_128.c
+  fromfp_32.c
+  fromfp_64.c
+  fromfp_80.c
+  fromfp_128.c
+  fromfpx_32.c
+  fromfpx_64.c
+  fromfpx_80.c
+  fromfpx_128.c
   log10p1_32.c
   log10p1_64.c
   log10p1_80.c
@@ -211,4 +219,12 @@ picolibc_sources(
   totalordermag_64.c
   totalordermag_80.c
   totalordermag_128.c
+  ufromfp_32.c
+  ufromfp_64.c
+  ufromfp_80.c
+  ufromfp_128.c
+  ufromfpx_32.c
+  ufromfpx_64.c
+  ufromfpx_80.c
+  ufromfpx_128.c
   )
