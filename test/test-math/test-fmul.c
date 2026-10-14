@@ -38,6 +38,7 @@
 
 #define TEST_VECTORS "test-fmul.h"
 #define TEST_FUNC    fmul
+#define ULP_BITWISE
 
 #ifdef __HAVE_68881__
 /* Rounding doesn't follow the rules */

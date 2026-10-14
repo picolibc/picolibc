@@ -40,6 +40,18 @@ typedef struct {
 } test_vector_t;
 
 test_vector_t[] test_values;
+test_vector_t[] test_extra;
+
+test_values = (test_vector_t[0]) {};
+test_extra = (test_vector_t[0]) {};
+
+typedef struct {
+	string	x1, x2, x3, y;
+} special_t;
+
+special_t[] specials;
+
+specials = (special_t[0]) {};
 
 real
 single_round_one(real a);
@@ -49,6 +61,51 @@ single_round_two(real a, real b);
 
 real
 single_round_three(real a, real b, real c);
+
+real
+range32(real a)
+{
+	a = real32(a);
+	if (abs(a) > max_binary32)
+		raise infinity(a < 0);
+	return a;
+}
+
+real
+range64(real a)
+{
+	a = real64(a);
+	if (abs(a) > max_binary64)
+		raise infinity(a < 0);
+	return a;
+}
+
+real
+range80(real a)
+{
+	a = real80(a);
+	if (abs(a) > max_binary80)
+		raise infinity(a < 0);
+	return a;
+}
+
+real
+range80m(real a)
+{
+	a = real80m(a);
+	if (abs(a) > max_binary80m)
+		raise infinity(a < 0);
+	return a;
+}
+
+real
+range128(real a)
+{
+	a = real128(a);
+	if (abs(a) > max_binary128)
+		raise infinity(a < 0);
+	return a;
+}
 
 int[] bits = { 64, 80, 128 };
 
@@ -85,8 +142,32 @@ check_endif(int i, int d)
 }
 
 void
+do_value(string v)
+{
+	printf("REAL(");
+	for (int c = 0; c < dim(real_convs); c++) {
+		if (c > 0)
+			printf(", ");
+		if (String::index(v, "INF") >= 0)
+			printf("%s", v);
+		else
+			printf("%s(%s)", real_convs[c].macro, v);
+	}
+	printf(")");
+}
+
+void
 test_one()
 {
+	for (int i = 0; i < dim(specials); i++) {
+		printf("{ .x = ");
+		do_value(specials[i].x1);
+		printf(", .y = ");
+		do_value(specials[i].y);
+		printf("},\n");
+	}
+	for (int i = 0; i < dim(test_extra); i++)
+		compute_real_one(test_extra[i].a, single_round_one);
 	for (int i = 0; i < dim(test_values); i++) {
 		check_ifdef(i, dim(test_values));
 		compute_real_one(test_values[i].a, single_round_one);
@@ -97,6 +178,18 @@ test_one()
 void
 test_two()
 {
+	for (int i = 0; i < dim(specials); i++) {
+		printf("{ .x1 = ");
+		do_value(specials[i].x1);
+		printf(", .x2 = ");
+		do_value(specials[i].x2);
+		printf(", .y = ");
+		do_value(specials[i].y);
+		printf("},\n");
+	}
+	for (int i = 0; i < dim(test_extra); i++)
+		compute_real_real(test_extra[i].a, test_extra[i].b,
+				  single_round_two);
 	for (int i = 0; i < dim(test_values); i++) {
 		check_ifdef(i, dim(test_values));
 		compute_real_real(test_values[i].a, test_values[i].b,
@@ -108,6 +201,20 @@ test_two()
 void
 test_three()
 {
+	for (int i = 0; i < dim(specials); i++) {
+		printf("{ .x1 = ");
+		do_value(specials[i].x1);
+		printf(", .x2 = ");
+		do_value(specials[i].x2);
+		printf(", .x3 = ");
+		do_value(specials[i].x3);
+		printf(", .y = ");
+		do_value(specials[i].y);
+		printf("},\n");
+	}
+	for (int i = 0; i < dim(test_extra); i++)
+		compute_real_real_real(test_extra[i].a, test_extra[i].b,
+				       test_extra[i].c, single_round_three);
 	for (int i = 0; i < dim(test_values); i++) {
 		check_ifdef(i, dim(test_values));
 		compute_real_real_real(test_values[i].a, test_values[i].b,
