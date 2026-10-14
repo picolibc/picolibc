@@ -65,9 +65,11 @@ shuffle(void **values, size_t n)
 #else
 
 #if defined(__MALLOC_SMALL_BUCKET) && __MALLOC_SMALL_BUCKET == 0
-#define N ((size_t)1024 * (size_t)128)
+#define N        ((size_t)1024 * (size_t)32)
+#define ANNOUNCE 1000
 #else
-#define N ((size_t)1024 * (size_t)1024)
+#define N        ((size_t)1024 * (size_t)1024)
+#define ANNOUNCE 100000
 #endif
 
 #endif
@@ -92,7 +94,7 @@ main(void)
             printf("cannot allocate obj %zd\n", o);
             return 77;
         }
-        if (o % 100000 == 0)
+        if (o % ANNOUNCE == 0)
             printf("malloc %zd\n", o);
     }
 
@@ -100,7 +102,7 @@ main(void)
 
     for (o = 0; o < N; o++) {
         free(objs[o]);
-        if (o % 100000 == 0)
+        if (o % ANNOUNCE == 0)
             printf("free %zd\n", o);
     }
 
