@@ -212,6 +212,9 @@ ff_add_ff(ff_t x, ff_t y)
 static inline ff_t
 f_mul_f(float_t x, float_t y)
 {
+    /* Preserve zero signs */
+    if (x == 0 || y == 0)
+        return (ff_t) { .hi = x * y, .lo = 0 };
 #ifdef __HAVE_FAST_FMA_F
     /* 2mul with FMA */
     float_t hi = x * y;
@@ -256,18 +259,13 @@ f_mul_f(float_t x, float_t y)
 static inline ff_t
 ff_mul_f(ff_t x, float_t y)
 {
-#ifdef __HAVE_FAST_FMA_F
     ff_t c = f_mul_f(x.hi, y);
-    if (isinf(c.hi))
+    if (!isfinite(c.hi) || c.hi == 0)
         return c;
+#ifdef __HAVE_FAST_FMA_F
     float_t cl3 = fma_f(x.lo, y, c.lo);
     return f_add_f_fast(c.hi, cl3);
 #else
-    if (x.hi == 0 || y == 0)
-        return (ff_t) { .hi = 0, .lo = 0 };
-    ff_t c = f_mul_f(x.hi, y);
-    if (isinf(c.hi))
-        return c;
     float_t cl2 = x.lo * y;
     ff_t    t = f_add_f_fast(c.hi, cl2);
     float_t tl2 = t.lo + c.lo;
@@ -280,24 +278,18 @@ ff_mul_f(ff_t x, float_t y)
 static inline ff_t
 ff_mul_ff(ff_t x, ff_t y)
 {
-#ifdef __HAVE_FAST_FMA_F
     ff_t c = f_mul_f(x.hi, y.hi);
-    if (isinf(c.hi))
-        return c;
-    float_t tl = x.hi * y.lo;
-    float_t cl2 = fma_f(x.lo, y.hi, tl);
-    float_t cl3 = c.lo + cl2;
-    return f_add_f_fast(c.hi, cl3);
-#else
-    ff_t c = f_mul_f(x.hi, y.hi);
-    if (isinf(c.hi))
+    if (!isfinite(c.hi) || c.hi == 0)
         return c;
     float_t tl1 = x.hi * y.lo;
+#ifdef __HAVE_FAST_FMA_F
+    float_t cl2 = fma_f(x.lo, y.hi, tl1);
+#else
     float_t tl2 = x.lo * y.hi;
     float_t cl2 = tl1 + tl2;
+#endif
     float_t cl3 = c.lo + cl2;
     return f_add_f_fast(c.hi, cl3);
-#endif
 }
 
 #define ff_div_f name(ff_div_f_)
@@ -306,12 +298,15 @@ static inline ff_t
 ff_div_f(ff_t x, float_t y)
 {
     float_t th = x.hi / y;
+    float_t tl;
+    if (!isfinite(th) || th == 0)
+        return (ff_t) { .hi = th, .lo = 0 };
     ff_t    pi = f_mul_f(th, y);
     ff_t    de1 = f_add_f(x.hi, -pi.hi);
     float_t del2 = x.lo - pi.lo;
     float_t del = de1.lo + del2;
     float_t de = de1.hi + del;
-    float_t tl = de / y;
+    tl = de / y;
     return f_add_f_fast(th, tl);
 }
 
@@ -320,14 +315,12 @@ ff_div_f(ff_t x, float_t y)
 static inline ff_t
 ff_div_ff(ff_t x, ff_t y)
 {
+    if (y.hi == 0 || !isfinite(y.hi) || x.hi == 0 || !isfinite(x.hi))
+        return (ff_t) { .hi = x.hi / y.hi, .lo = 0 };
 #ifdef __HAVE_FAST_FMA_F
     /* Algorithm 18 */
-    if (isinf(y.hi))
-        return (ff_t) { .hi = 0, .lo = 0 };
-    if (y.hi == 0)
-        return (ff_t) { .hi = x.hi / y.hi, .lo = 0 };
     float_t th = 1 / y.hi;
-    if (isinf(th))
+    if (!isfinite(th) || th == 0)
         return (ff_t) { .hi = th, .lo = 0 };
     float_t rh = -fma_f(y.hi, th, -1);
     float_t rl = -y.lo * th;
@@ -337,12 +330,8 @@ ff_div_ff(ff_t x, ff_t y)
     return ff_mul_ff(x, m);
 #else
     /* Algorithm 17 */
-    if (isinf(y.hi))
-        return (ff_t) { .hi = 0, .lo = 0 };
-    if (y.hi == 0)
-        return (ff_t) { .hi = 1 / y.hi, .lo = 0 };
     float_t th = x.hi / y.hi;
-    if (isinf(th))
+    if (!isfinite(th) || th == 0)
         return (ff_t) { .hi = th, .lo = 0 };
     ff_t    r = ff_mul_f(y, th);
     float_t pih = x.hi - r.hi;
