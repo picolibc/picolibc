@@ -36,10 +36,14 @@
 load "test-narrow.5c"
 load "test-fsqrt-inc.5c"
 
+specials = (special_t[]) {
+	{ .x1 = "-0.0", .y = "-0.0" },
+};
+
 real
 single_round_one(real a)
 {
-	return real64(sqrt(imprecise(a, 4096)));
+	return range64(sqrt(imprecise(a, 4096)));
 }
 
 test_one();

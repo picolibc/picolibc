@@ -36,10 +36,24 @@
 load "test-narrow.5c"
 load "test-ddiv-inc.5c"
 
+test_extra = (test_vector_t[]) {
+    { .a = 1, .b = 0, .c = 0 },
+    { .a = 1, .b = 0x1p100000, .c = 0 },
+    { .a = 0x1p1000000, .b = 1, .c = 0 },
+    { .a = 0x1p1023, .b = 0.5, .c = 0 },
+};
+
+specials = (special_t[]) {
+	{ .x1 = "-0.0", .x2 = "1.0", .y = "-0.0" },
+	{ .x1 = "1.0", .x2 = "-0.0", .y = "-INFINITY" },
+	{ .x1 = "1.0", .x2 = "INFINITY", .y = "0.0" },
+	{ .x1 = "1.0", .x2 = "-INFINITY", .y = "-0.0" },
+};
+
 real
 single_round_two(real a, real b)
 {
-	return real64(a / b);
+	return range64(a / b);
 }
 
 test_two();

@@ -35,6 +35,9 @@
 
 #define _ISOC23_SOURCE
 #define SKIP_BINARY32
+#ifndef __m68k__
+#define ULP_BITWISE
+#endif
 
 #define TEST_VECTORS "test-ffma.h"
 #define TEST_FUNC    ffma
