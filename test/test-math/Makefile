@@ -41,7 +41,8 @@ REAL_EXP = \
 	test-log2p1.h \
 	test-pow.h \
 	test-pown.h \
-	test-powr.h
+	test-powr.h \
+	test-rootn.h
 
 REAL_NARROW = \
 	test-fadd.h \
@@ -77,6 +78,7 @@ REAL_OTHER = \
 	test-remquo.h \
 	test-round.h \
 	test-roundeven.h \
+	test-rsqrt.h \
 	test-scalbn.h \
 	test-setpayload.h \
 	test-setpayloadsig.h \

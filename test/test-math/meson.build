@@ -75,6 +75,7 @@ tests_real_exp = [
   'test-pow',
   'test-pown',
   'test-powr',
+  'test-rootn',
 ]
 
 tests_real_narrow = [
@@ -113,6 +114,7 @@ tests_real_other = [
   'test-remquo-quo',
   'test-round',
   'test-roundeven',
+  'test-rsqrt',
   'test-setpayload',
   'test-setpayloadsig',
   'test-sqrt',

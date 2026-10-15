@@ -87,8 +87,10 @@ set(tests_real_other
   test-nextup
   test-remainder
   test-remquo-quo
+  test-rootn
   test-round
   test-roundeven
+  test-rsqrt
   test-scalbn
   test-setpayload
   test-setpayloadsig

@@ -83,6 +83,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "pow",           .b32 = 1,       .b64 = 1,       .b80 = 6107,    .b128 = 1       },
     { .name = "pown",          .b32 = 1,       .b64 = 1,       .b80 = 1,       .b128 = 1       },
     { .name = "powr",          .b32 = 1,       .b64 = 1,       .b80 = 6107,    .b128 = 1       },
+    { .name = "rootn",         .b32 = 1,       .b64 = 2,       .b80 = 3,       .b128 = 2       },
 
     /* Narrowing functions */
     { .name = "dadd",          .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
@@ -120,6 +121,13 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "remquo_quo",    .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "round",         .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "roundeven",     .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
+#if defined(__riscv_float_abi_soft) || defined(__clang__)
+    { .name = "rsqrt",         .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 1       },
+#elif defined(__RX__)
+    { .name = "rsqrt", .b32 = 1, .b64 = 1, .b80 = 0, .b128 = 0 },
+#else
+    { .name = "rsqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+#endif
     { .name = "setpayload",    .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "setpayloadsig", .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
 #if defined(__riscv_float_abi_soft) || defined(__clang__)
@@ -213,6 +221,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "pow", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "pown", .b32 = 1, .b64 = 1, .b80 = 3, .b128 = 2 },
     { .name = "powr", .b32 = 0, .b64 = 1, .b80 = 1, .b128 = 1 },
+    { .name = "rootn", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 2 },
 
     /* Narrowing functions */
     { .name = "dadd", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
@@ -249,6 +258,7 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "remquo_quo", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "round", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "roundeven", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
+    { .name = "rsqrt", .b32 = 1, .b64 = 1, .b80 = 1, .b128 = 1 },
     { .name = "lgamma", .b32 = 1, .b64 = 2, .b80 = 2, .b128 = 3 },
     { .name = "setpayload", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
     { .name = "setpayloadsig", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
