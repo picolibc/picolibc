@@ -221,7 +221,7 @@ typedef double double_t;
 #define FP_ILOGB0 (-__INT_MAX__)
 #endif
 #ifndef FP_ILOGBNAN
-#define FP_ILOGBNAN __INT_MAX__
+#define FP_ILOGBNAN (-__INT_MAX__ - 1)
 #endif
 
 #if !defined(FP_FAST_FMA) && (__HAVE_FAST_FMA || defined(__FP_FAST_FMA))
@@ -717,7 +717,7 @@ extern long double pow10l(long double) __picolibc_export;
 
 /* Return values from llogb */
 #define FP_LLOGB0   (-__LONG_MAX__)
-#define FP_LLOGBNAN (__LONG_MAX__ - 1)
+#define FP_LLOGBNAN (-__LONG_MAX__ - 1)
 
 double   acospi(double) __picolibc_export;
 float    acospif(float) __picolibc_export;
