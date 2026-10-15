@@ -423,6 +423,7 @@ conv_flt(FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, ui
             switch (esign) {
             case CQ('-'):
                 flags |= FL_MEXP;
+                exp = -exp;
                 __fallthrough;
             case CQ('+'):
                 if (!CHECK_WIDTH()) {
@@ -446,17 +447,17 @@ conv_flt(FLT_STREAM *stream, FLT_CONTEXT *context, width_t width, void *addr, ui
 
             i = edig;
             expacc = 0;
-#define MAX_POSSIBLE_EXP (FLOAT_MAX_EXP + FLOAT_MANT_DIG * 4)
+#define MAX_POSSIBLE_EXP (-FLOAT_MIN_EXP + FLOAT_MANT_DIG * 4)
             do {
-                if (expacc < MAX_POSSIBLE_EXP)
+                if (expacc + exp < MAX_POSSIBLE_EXP)
                     expacc = expacc * 10 + (i - CQ('0'));
             } while (CHECK_WIDTH() && isdigit(i = scanf_getc(stream, context)));
-            if (flags & FL_MEXP)
-                expacc = -expacc;
             exp += expacc;
+        no_exp:
+            if (flags & FL_MEXP)
+                exp = -exp;
         }
 
-    no_exp:
         if (width)
             scanf_ungetc(i, stream, context);
 
