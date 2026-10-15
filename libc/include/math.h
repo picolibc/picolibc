@@ -781,8 +781,12 @@ double   pown(double, long long int) __picolibc_export;
 float    pownf(float, long long int) __picolibc_export;
 double   powr(double, double) __picolibc_export;
 float    powrf(float, float) __picolibc_export;
+double   rootn(double, long long int) __picolibc_export;
+float    rootnf(float, long long int) __picolibc_export;
 double   roundeven(double) __picolibc_export;
 float    roundevenf(float) __picolibc_export;
+double   rsqrt(double) __picolibc_export;
+float    rsqrtf(float) __picolibc_export;
 int      setpayload(double *res, double pl) __picolibc_export;
 int      setpayloadf(float *res, float pl) __picolibc_export;
 int      setpayloadsig(double *res, double pl) __picolibc_export;
@@ -799,14 +803,6 @@ double   ufromfp(double, int, unsigned int) __picolibc_export;
 float    ufromfpf(float, int, unsigned int) __picolibc_export;
 double   ufromfpx(double, int, unsigned int) __picolibc_export;
 float    ufromfpxf(float, int, unsigned int) __picolibc_export;
-
-/* Missing functions */
-
-double   rootn(double, long long int) __picolibc_export; /* XXX */
-float    rootnf(float, long long int) __picolibc_export; /* XXX */
-
-double   rsqrt(double) __picolibc_export; /* XXX */
-float    rsqrtf(float) __picolibc_export; /* XXX */
 
 #ifdef __HAVE_LONG_DOUBLE_MATH
 long double acospil(long double) __picolibc_export;
@@ -848,7 +844,9 @@ long double nextdownl(long double) __picolibc_export;
 long double nextupl(long double) __picolibc_export;
 long double pownl(long double, long long int) __picolibc_export;
 long double powrl(long double, long double) __picolibc_export;
+long double rootnl(long double, long long int) __picolibc_export;
 long double roundevenl(long double) __picolibc_export;
+long double rsqrtl(long double) __picolibc_export;
 int         setpayloadl(long double *res, long double pl) __picolibc_export;
 int         setpayloadsigl(long double *res, long double pl) __picolibc_export;
 long double sinpil(long double) __picolibc_export;
@@ -857,10 +855,6 @@ int         totalorderl(const long double *x, const long double *y) __picolibc_e
 int         totalordermagl(const long double *x, const long double *y) __picolibc_export;
 long double ufromfpl(long double, int, unsigned int) __picolibc_export;
 long double ufromfpxl(long double, int, unsigned int) __picolibc_export;
-
-/* Missing functions */
-long double rootnl(long double, long long int) __picolibc_export; /* XXX */
-long double rsqrtl(long double) __picolibc_export;                /* XXX */
 
 #endif
 #endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
