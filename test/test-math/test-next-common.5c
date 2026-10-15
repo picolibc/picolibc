@@ -51,10 +51,14 @@ nextafter(real x, real y)
 	real xc = real_convs[current_conversion].conv(x);
 	real yc = real_convs[current_conversion].conv(y);
 
-	if (abs(xc) > real_convs[current_conversion].max)
+	if (is_inf(xc))
 		xc = copysign(inf, x);
-	if (abs(yc) > real_convs[current_conversion].max)
+	if (is_zero(xc))
+		xc = 0;
+	if (is_inf(yc))
 		yc = copysign(inf, y);
+	if (is_zero(yc))
+		yc = 0;
 
 	int xi = real_convs[current_conversion].toint((result_t) { .r = xc });
 	int step = 1;

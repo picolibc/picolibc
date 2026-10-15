@@ -52,7 +52,7 @@ real
 quo(real x, real y)
 {
 	real n = 0;
-	if (is_inf(x) || y == 0)
+	if (is_inf(x) || is_zero(y))
 		return quo_mask+1;
 	try {
 		real quo = floor(x / y + 0.5);

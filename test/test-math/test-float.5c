@@ -54,6 +54,11 @@ imprecise_arg(complex x, int prec)
 	return imprecise(x, prec);
 }
 
+const real plus_zero = 0x1p-100000;
+const real minus_zero = -0x1p-100000;
+const real plus_inf = 0x1p100000;
+const real minus_inf = -0x1p100000;
+
 const real max_binary32 = imprecise(0x1.fffffep+127);
 const real min_binary32 = imprecise(0x1p-126);
 const real min_denorm_binary32 = imprecise(0x1p-149);
@@ -76,8 +81,6 @@ real32(real x)
 		precision = 1;
 		if (abs(x) > min_denorm_binary32 / 2)
 			x = copysign(min_denorm_binary32, x);
-		else
-			x = 0;
 	} else if (exp_x < exponent(min_binary32)) {
 		precision = exp_x - exponent(min_denorm_binary32) + 1;
 	}
@@ -91,6 +94,8 @@ real32_result(result_t r)
 	case r x:
 		if (abs(x) > max_binary32)
 			r = (result_t) { .i = (x < 0) };
+		else if (abs(x) < min_denorm_binary32)
+			r = (result_t) { .r = imprecise(0) };
 		else
 			r = (result_t) { .r = real32(x) };
 		break;
@@ -188,8 +193,6 @@ real64(real x)
 		precision = 1;
 		if (abs(x) > min_denorm_binary64 / 2)
 			x = copysign(min_denorm_binary64, x);
-		else
-			x = 0;
 	} else if (exp_x < exponent(min_binary64)) {
 		precision = exp_x - exponent(min_denorm_binary64) + 1;
 	}
@@ -203,6 +206,8 @@ real64_result(result_t r)
 	case r x:
 		if (abs(x) > max_binary64)
 			r = (result_t) { .i = x < 0 };
+		else if (abs(x) < min_denorm_binary64)
+			r = (result_t) { .r = imprecise(0) };
 		else
 			r = (result_t) { .r = real64(x) };
 		break;
@@ -225,8 +230,6 @@ real80(real x)
 		precision = 1;
 		if (abs(x) > min_denorm_binary80 / 2)
 			x = copysign(min_denorm_binary80, x);
-		else
-			x = 0;
 	} else if (exp_x < exponent(min_binary80)) {
 		precision = exp_x - exponent(min_denorm_binary80) + 1;
 	}
@@ -240,6 +243,8 @@ real80_result(result_t r)
 	case r x:
 		if (abs(x) > max_binary80)
 			r = (result_t) { .i = x < 0 };
+		else if (abs(x) < min_denorm_binary80)
+			r = (result_t) { .r = imprecise(0) };
 		else
 			r = (result_t) { .r = real80(x) };
 		break;
@@ -262,8 +267,6 @@ real80m(real x)
 		precision = 1;
 		if (abs(x) > min_denorm_binary80m / 2)
 			x = copysign(min_denorm_binary80m, x);
-		else
-			x = 0;
 	} else if (exp_x < exponent(min_binary80m)) {
 		precision = exp_x - exponent(min_denorm_binary80m) + 1;
 	}
@@ -277,6 +280,8 @@ real80m_result(result_t r)
 	case r x:
 		if (abs(x) > max_binary80m)
 			r = (result_t) { .i = x < 0 };
+		else if (abs(x) < min_denorm_binary80m)
+			r = (result_t) { .r = imprecise(0) };
 		else
 			r = (result_t) { .r = real80m(x) };
 		break;
@@ -299,8 +304,6 @@ real128(real x)
 		precision = 1;
 		if (abs(x) > min_denorm_binary128 / 2)
 			x = copysign(min_denorm_binary128, x);
-		else
-			x = 0;
 	} else if (exp_x < exponent(min_binary128)) {
 		precision = exp_x - exponent(min_denorm_binary128) + 1;
 	}
@@ -314,6 +317,8 @@ real128_result(result_t r)
 	case r x:
 		if (abs(x) > max_binary128)
 			r = (result_t) { .i = x < 0 };
+		else if (abs(x) < min_denorm_binary128)
+			r = (result_t) { .r = imprecise(0) };
 		else
 			r = (result_t) { .r = real128(x) };
 		break;
@@ -559,7 +564,7 @@ print_one_real(real x, int i)
 	if (abs(x) > real_convs[i].max)
 		printf("%sINFINITY", x>0 ? "" : "-");
 	else if (abs(x) < real_convs[i].min_denorm)
-		printf("%s0", x>0 ? "" : "-");
+		printf("%s0.0", x>0 ? "" : "-");
 	else
 		printf("%s(%a)", real_convs[i].macro, x);
 }
@@ -680,6 +685,13 @@ bool
 is_zero(real x)
 {
 	return abs(x) < real_convs[current_conversion].min_denorm;
+}
+
+real
+zero(real x)
+{
+	if (is_zero(x)) return 0;
+	return x;
 }
 
 void

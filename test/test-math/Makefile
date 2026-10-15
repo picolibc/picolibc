@@ -159,6 +159,8 @@ test-setpayloadsig.h: test-setpayload.5c
 
 test-fromfp.h test-fromfpx.h test-ufromfp.h test-ufromfpx.h: test-fromfp-common.5c
 
+test-nextafter.h test-nextdown.h test-nextup.h: test-next-common.5c
+
 clean:
 	rm -f $(GEN_NARROWING) narrow-stamp
 	rm -f $(TEST_FILES)
