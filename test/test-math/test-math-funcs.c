@@ -35,6 +35,7 @@
 
 #define __STDC_WANT_IEC_60559_BFP_EXT__
 #define _GNU_SOURCE
+#define _ISOC23_SOURCE
 #include <stdio.h>
 #include <math.h>
 #include <fenv.h>
@@ -189,10 +190,7 @@ test_exp(void)
     d1 = pow10(d1);
 #endif
 
-#ifndef __PICOLIBC__
     d1 = rootn(d1, li1);
-#endif
-
     f1 = expf(f1);
     f1 = logf(f1);
     f1 = log10f(f1);
@@ -217,9 +215,7 @@ test_exp(void)
     f1 = pow10f(f1);
 #endif
 
-#ifndef __PICOLIBC__
     f1 = rootnf(f1, li1);
-#endif
 
 #if defined(_TEST_LONG_DOUBLE) && defined(__HAVE_LONG_DOUBLE_MATH)
     i1 = ilogbl(l1);
@@ -247,10 +243,7 @@ test_exp(void)
 #ifdef __PICOLIBC__
     l1 = pow10l(l1);
 #endif
-
-#ifndef __PICOLIBC__
     l1 = rootnl(l1, li1);
-#endif
 
 #endif /* _TEST_LONG_DOUBLE */
 }
@@ -291,12 +284,10 @@ test_bits(void)
     d1 = getpayload((double *)&d1);
     d1 = roundeven(d1);
 
-#ifndef __PICOLIBC__
     d1 = fromfp(d1, i1, u1);
     d1 = fromfpx(d1, i1, u1);
     d1 = ufromfp(d1, i1, u1);
     d1 = ufromfpx(d1, i1, u1);
-#endif
 
 #ifdef __PICOLIBC__
     d1 = infinity();
@@ -334,12 +325,10 @@ test_bits(void)
     i1 = canonicalizef((float *)&f1, (float *)&f2);
     f1 = roundevenf(f1);
 
-#ifndef __PICOLIBC__
     f1 = fromfpf(f1, i1, u1);
     f1 = fromfpxf(f1, i1, u1);
     f1 = ufromfpf(f1, i1, u1);
     f1 = ufromfpxf(f1, i1, u1);
-#endif
 
 #ifdef __PICOLIBC__
     f1 = infinityf();
@@ -382,20 +371,18 @@ test_bits(void)
     i1 = canonicalizel((long double *)&l1, (long double *)&l2);
     l1 = compoundnl(l1, lli1);
     l1 = roundevenl(l1);
-#endif
 
-#ifdef __PICOLIBC__
-    l1 = infinityl();
-#endif
-    l1 = nanl("");
-
-#ifndef __PICOLIBC__
     l1 = fromfpl(l1, i1, u1);
     l1 = fromfpxl(l1, i1, u1);
 
     l1 = ufromfpl(l1, i1, u1);
     l1 = ufromfpxl(l1, i1, u1);
 #endif
+
+#ifdef __PICOLIBC__
+    l1 = infinityl();
+#endif
+    l1 = nanl("");
 #endif /* _TEST_LONG_DOUBLE */
 }
 
@@ -456,11 +443,7 @@ test_other(void)
     d1 = j0(d1);
     d1 = j1(d1);
     d1 = jn(i1, d1);
-
-#ifndef __PICOLIBC__
     d1 = rsqrt(d1);
-#endif
-
     f1 = cbrtf(f1);
     f1 = sqrtf(f1);
     f1 = fmaf(f1, f2, f3);
@@ -478,10 +461,7 @@ test_other(void)
     f1 = j0f(f1);
     f1 = j1f(f1);
     f1 = jnf(i1, f2);
-
-#ifndef __PICOLIBC__
     f1 = rsqrtf(f1);
-#endif
 
 #ifdef _TEST_LONG_DOUBLE
     l1 = frexpl(l1, (int *)&i1);
@@ -497,9 +477,7 @@ test_other(void)
     l1 = lgammal_r(l1, (int *)&i1);
     l1 = erfl(l1);
     l1 = erfcl(l1);
-#ifndef __PICOLIBC__
     l1 = rsqrtl(l1);
-#endif
 #endif
 #endif
 }
