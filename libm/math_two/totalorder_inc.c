@@ -35,6 +35,7 @@
 
 #define _ISOC23_SOURCE
 #include "math_two.h"
+#include <string.h>
 
 #ifdef float_t
 
@@ -56,8 +57,15 @@
 int
 name(NAME)(const float_t *x, const float_t *y)
 {
-    fint_t xi = f_toint(*x);
-    fint_t yi = f_toint(*y);
+    fint_t xi, yi;
+
+#if defined(__i386__) || defined(__m68k__)
+    memcpy(&xi, x, sizeof(float_t));
+    memcpy(&yi, y, sizeof(float_t));
+#else
+    xi = f_toint(*x);
+    yi = f_toint(*y);
+#endif
 
     if (!_IEEE_754_2008_SNAN) {
         if (f_is_nan(xi))

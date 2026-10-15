@@ -112,7 +112,7 @@ name(NAME)(float_t *result, float_t payload)
     /* Set the SNAN/QNAN bit if necessary */
     if (SET_SNAN)
         pi |= FLOAT_SNAN_BIT;
-#ifdef __i386__
+#if defined(__i386__) || defined(__m68k__)
     memcpy(result, &pi, sizeof(*result));
 #else
     *result = f_tofloat(pi);
