@@ -65,10 +65,11 @@ test_binary32(void)
 #ifdef TEST_FUNC_REF
         volatile binary32 y;
         (void)TEST_FUNC_32((binary32 *)&y, test_32_vec[i].x);
+        ulp_t ulp = ulp32_r((const binary32 *)&y, &test_32_vec[i].y);
 #else
         volatile binary32 y = TEST_FUNC_32(test_32_vec[i].x);
+        ulp_t             ulp = ulp32(y, test_32_vec[i].y);
 #endif
-        ulp_t ulp = ulp32(y, test_32_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary32) {
@@ -112,10 +113,11 @@ test_binary64(void)
 #ifdef TEST_FUNC_REF
         volatile binary64 y;
         (void)TEST_FUNC_64((binary64 *)&y, test_64_vec[i].x);
+        ulp_t ulp = ulp64_r((const binary64 *)&y, &test_64_vec[i].y);
 #else
         volatile binary64 y = TEST_FUNC_64(test_64_vec[i].x);
+        ulp_t             ulp = ulp64(y, test_64_vec[i].y);
 #endif
-        ulp_t ulp = ulp64(y, test_64_vec[i].y);
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary64) {

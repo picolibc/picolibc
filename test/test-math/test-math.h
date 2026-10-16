@@ -197,6 +197,23 @@ typedef struct {
 } cunary32;
 
 static inline ulp_t
+ulp32_r(const binary32 *ab, const binary32 *bb)
+{
+    if (memcmp(ab, bb, sizeof(binary32)) == 0)
+        return 0;
+    if (isnan(*ab) || isnan(*bb)) {
+        union {
+            binary32 b;
+            uint32_t u;
+        } au, bu;
+        memcpy(&au.b, ab, sizeof(binary32));
+        memcpy(&bu.b, bb, sizeof(binary32));
+        printf("a 0x%08lx b 0x%08lx\n", (unsigned long)au.u, (unsigned long)bu.u);
+    }
+    return MAX_ULP;
+}
+
+static inline ulp_t
 ulp32(binary32 ab, binary32 bb)
 {
 #ifdef ULP_BITWISE
@@ -307,6 +324,23 @@ typedef struct {
 typedef struct {
     cbinary64 x, y;
 } cunary64;
+
+static inline ulp_t
+ulp64_r(const binary64 *ab, const binary64 *bb)
+{
+    if (memcmp(ab, bb, sizeof(binary64)) == 0)
+        return 0;
+    if (isnan(*ab) || isnan(*bb)) {
+        union {
+            binary64 b;
+            uint64_t u;
+        } au, bu;
+        memcpy(&au.b, ab, sizeof(binary64));
+        memcpy(&bu.b, bb, sizeof(binary64));
+        printf("a 0x%016llx b 0x%016llx\n", (unsigned long long)au.u, (unsigned long long)bu.u);
+    }
+    return MAX_ULP;
+}
 
 static inline ulp_t
 ulp64(binary64 ab, binary64 bb)
