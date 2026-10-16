@@ -102,7 +102,7 @@ NAME(__float64 x)
     } else if (hx < 0x7ff00000)
         return (TYPE)((hx >> 20) - 1023);
 #if LOGBNAN != LOGBINF
-    else if (hx > 0x7ff00000) {
+    else if (hx > 0x7ff00000 || lx != 0) {
         (void)__math_invalid(_F_64(0.0));
         return LOGBNAN; /* NAN */
     }
