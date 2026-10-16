@@ -41,13 +41,13 @@
 float_t
 name(compoundn)(float_t x, long long int k)
 {
-    if (isnan(x))
-        return x + x;
-    if (x < -1)
+    if (isless(x, -1))
         return kernel(__math_invalid)(x);
     if (k == 0)
         return 1;
-    if (x == 1) {
+    if (isnan(x))
+        return kernel(__math_invalid)(x);
+    if (x == -1) {
         if (k > 0)
             return 0;
         return kernel(__math_divzero)(0);
