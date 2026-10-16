@@ -206,11 +206,15 @@ void do_one(real x, bool unsign, bool imprecise, string mode, int width)
 	string y = result_string(r.v);
 	string e = exception_string(r, imprecise);
 	string er = errno_string(r, imprecise);
+	if (width != 0 && (width & 32767) == 0)
+		printf("#if UINT_MAX >= %d\n", width);
 	printf("{ ");
 	print_x(x);
 	printf(", ");
 	print_y(r.v);
 	printf(", .mode = %s, .width = %d, .except=%s, .err=%s },\n", mode, width, e, er);
+	if (width != 0 && (width & 32767) == 0)
+		printf("#endif\n");
 }
 
 int[] extra_widths = {

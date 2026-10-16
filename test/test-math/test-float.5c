@@ -564,7 +564,7 @@ print_one_real(real x, int i)
 	if (abs(x) > real_convs[i].max)
 		printf("%sINFINITY", x>0 ? "" : "-");
 	else if (abs(x) < real_convs[i].min_denorm)
-		printf("%s0.0", x>0 ? "" : "-");
+		printf("%s%s(0.0)", x>=0 ? "" : "-", real_convs[i].macro);
 	else
 		printf("%s(%a)", real_convs[i].macro, x);
 }

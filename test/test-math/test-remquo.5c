@@ -51,11 +51,11 @@ pair_t[] test_values = {
 real
 quo(real x, real y)
 {
-	real n = 0;
+	int n = 0;
 	if (is_inf(x) || is_zero(y))
 		return quo_mask+1;
 	try {
-		real quo = floor(x / y + 0.5);
+		int quo = floor(x / y + 0.5);
 		if (quo < 0) {
 			n = -((-quo) & quo_mask);
 		} else {
