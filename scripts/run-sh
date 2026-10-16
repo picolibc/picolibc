@@ -91,7 +91,7 @@ case "$target" in
               -mon chardev=con,mode=readline \
               -net none \
               -nographic \
-              -device loader,file="$elf",cpu-num=0
+              -device loader,file="$elf",cpu-num=0 "$@"
 
         ;;
     *)

@@ -236,18 +236,21 @@ f_mul_f(float_t x, float_t y)
     ff_t    ys = split_f(yi);
     float_t r1 = xi * yi;
     float_t hi, lo;
+#ifdef __sh__
+    static const volatile float_t zero = float_f(0.0);
+    lo = zero;
+#else
+    lo = 0;
+#endif
     if (!isfinite(r1)) {
         hi = r1;
-        lo = 0;
     } else {
         float_t t1 = xs.hi * ys.hi - r1;
         float_t t2 = xs.hi * ys.lo + t1;
         float_t t3 = xs.lo * ys.hi + t2;
         float_t r2 = xs.lo * ys.lo + t3;
         hi = ldexp_f(r1, xexp + yexp);
-        if (!isfinite(hi))
-            lo = 0;
-        else
+        if (isfinite(hi))
             lo = ldexp_f(r2, xexp + yexp);
     }
     return (ff_t) { .hi = hi, .lo = lo };
