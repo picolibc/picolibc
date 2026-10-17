@@ -47,8 +47,14 @@
 
 #define ff_t           name(ff)
 
+#ifdef __lm32__
+#define math_two_inline __always_inline
+#else
+#define math_two_inline inline
+#endif
+
 #ifdef fuint_t
-static inline fuint_t
+static math_two_inline fuint_t
 f_touint(float_t x)
 {
     union {
@@ -59,7 +65,7 @@ f_touint(float_t x)
     return u.u;
 }
 
-static inline fint_t
+static math_two_inline fint_t
 f_toint(float_t x)
 {
     union {
@@ -70,7 +76,7 @@ f_toint(float_t x)
     return u.i;
 }
 
-static inline float_t
+static math_two_inline float_t
 f_tofloat(fuint_t x)
 {
     union {
@@ -81,19 +87,19 @@ f_tofloat(fuint_t x)
     return u.f;
 }
 
-static inline bool
+static math_two_inline bool
 f_is_minus(fuint_t i)
 {
     return (fint_t)i < 0;
 }
 
-static inline bool
+static math_two_inline bool
 f_is_zero(fuint_t i)
 {
     return i == 0;
 }
 
-static inline bool
+static math_two_inline bool
 f_is_integer(fuint_t pi, int shift)
 {
     if (f_is_zero(pi))
@@ -101,19 +107,19 @@ f_is_integer(fuint_t pi, int shift)
     return (pi & (((fuint_t)1 << shift) - 1)) == 0;
 }
 
-static inline int
+static math_two_inline int
 f_exp(fuint_t x)
 {
     return (int)(x >> FLOAT_PAYLOAD_DIG) - FLOAT_EXP_BIAS;
 }
 
-static inline fuint_t
+static math_two_inline fuint_t
 f_abs(fuint_t x)
 {
     return x & (((fuint_t)1 << ((sizeof(fuint_t) * 8) - 1)) - 1);
 }
 
-static inline bool
+static math_two_inline bool
 f_is_nan(fuint_t x)
 {
 #ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
@@ -129,7 +135,7 @@ typedef struct {
     float_t hi, lo;
 } ff_t;
 
-static inline ff_t
+static math_two_inline ff_t
 f_to_ff(float_t x)
 {
     return (ff_t) { .hi = x, .lo = 0 };
@@ -141,7 +147,7 @@ f_to_ff(float_t x)
 #define SPLIT   (float_f(SPLIT_VAL) + float_f(1.0))
 #define split_f name(split)
 
-static inline ff_t
+static math_two_inline ff_t
 split_f(float_t x)
 {
     float_t a = SPLIT * x;
@@ -154,7 +160,7 @@ split_f(float_t x)
 
 #define f_add_f_fast name(f_add_f_fast_)
 
-static inline ff_t
+static math_two_inline ff_t
 f_add_f_fast(float_t x, float_t y)
 {
     float_t s, z, t;
@@ -166,7 +172,7 @@ f_add_f_fast(float_t x, float_t y)
 
 #define f_add_f name(f_add_f_)
 
-static inline ff_t
+static math_two_inline ff_t
 f_add_f(float_t a, float_t b)
 {
     float_t s, ap, bp, da, db, t;
@@ -186,7 +192,7 @@ f_add_f(float_t a, float_t b)
 
 #define ff_add_f name(ff_add_f_)
 
-static inline ff_t
+static math_two_inline ff_t
 ff_add_f(ff_t x, float_t y)
 {
     ff_t    s = f_add_f(x.hi, y);
@@ -196,7 +202,7 @@ ff_add_f(ff_t x, float_t y)
 
 #define ff_add_ff name(ff_add_ff_)
 
-static inline ff_t
+static math_two_inline ff_t
 ff_add_ff(ff_t x, ff_t y)
 {
     ff_t    s = f_add_f(x.hi, y.hi);
@@ -209,7 +215,7 @@ ff_add_ff(ff_t x, ff_t y)
 
 #define f_mul_f name(f_mul_f_)
 
-static inline ff_t
+static math_two_inline ff_t
 f_mul_f(float_t x, float_t y)
 {
     /* Preserve zero signs */
@@ -259,7 +265,7 @@ f_mul_f(float_t x, float_t y)
 
 #define ff_mul_f name(ff_mul_f_)
 
-static inline ff_t
+static math_two_inline ff_t
 ff_mul_f(ff_t x, float_t y)
 {
     ff_t c = f_mul_f(x.hi, y);
@@ -278,7 +284,7 @@ ff_mul_f(ff_t x, float_t y)
 
 #define ff_mul_ff name(ff_mul_ff_)
 
-static inline ff_t
+static math_two_inline ff_t
 ff_mul_ff(ff_t x, ff_t y)
 {
     ff_t c = f_mul_f(x.hi, y.hi);
@@ -297,7 +303,7 @@ ff_mul_ff(ff_t x, ff_t y)
 
 #define ff_div_f name(ff_div_f_)
 
-static inline ff_t
+static math_two_inline ff_t
 ff_div_f(ff_t x, float_t y)
 {
     float_t th = x.hi / y;
@@ -315,7 +321,7 @@ ff_div_f(ff_t x, float_t y)
 
 #define ff_div_ff name(ff_div_ff_)
 
-static inline ff_t
+static math_two_inline ff_t
 ff_div_ff(ff_t x, ff_t y)
 {
     if (y.hi == 0 || !isfinite(y.hi) || x.hi == 0 || !isfinite(x.hi))
@@ -346,10 +352,10 @@ ff_div_ff(ff_t x, ff_t y)
 }
 
 /*
- * Use a wrapping inline to pass the hi/lo values to work around a
+ * Use a wrapping math_two_inline to pass the hi/lo values to work around a
  * compiler bug with gcc 14.2.0 for lm32-unknown-elf
  */
-static inline float_t
+static math_two_inline float_t
 ff_round_odd_f(float_t hi, float_t lo)
 {
     if (lo) {
@@ -361,7 +367,7 @@ ff_round_odd_f(float_t hi, float_t lo)
     return hi;
 }
 
-static inline float_t
+static math_two_inline float_t
 round_odd_ff(ff_t x)
 {
     return ff_round_odd_f(x.hi, x.lo);
