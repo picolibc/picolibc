@@ -33,7 +33,7 @@
 
 EXTRA=
 case "$*" in
-    *"buildtype release"*)
+    *"buildtype release"*|*"buildtype=release"*)
 	EXTRA="-Doptimization=2"
 	;;
 esac

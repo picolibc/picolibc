@@ -268,8 +268,8 @@ culp32(cbinary32 a, cbinary32 b)
 {
     if (a == b)
         return 0;
-    binary32 a_r = cabs32(a);
-    binary32 d_r = cabs32(a - b);
+    volatile binary32 a_r = cabs32(a);
+    volatile binary32 d_r = cabs32(a - b);
     return ulp32(a_r + d_r, a_r);
 }
 
@@ -400,8 +400,8 @@ culp64(cbinary64 a, cbinary64 b)
 {
     if (a == b)
         return 0;
-    binary64 a_r = cabs64(a);
-    binary64 d_r = cabs64(a - b);
+    volatile binary64 a_r = cabs64(a);
+    volatile binary64 d_r = cabs64(a - b);
     return ulp64(a_r + d_r, a_r);
 }
 
@@ -560,8 +560,8 @@ culp80(cbinary80 a, cbinary80 b)
 {
     if (a == b)
         return 0;
-    binary80 a_r = cabs80(a);
-    binary80 d_r = cabs80(a - b);
+    volatile binary80 a_r = cabs80(a);
+    volatile binary80 d_r = cabs80(a - b);
     return ulp80(a_r + d_r, a_r);
 }
 
@@ -639,8 +639,8 @@ culp128(cbinary128 a, cbinary128 b)
 {
     if (a == b)
         return 0;
-    binary128 a_r = cabs128(a);
-    binary128 d_r = cabs128(a - b);
+    volatile binary128 a_r = cabs128(a);
+    volatile binary128 d_r = cabs128(a - b);
     return ulp128(a_r + d_r, a_r);
 }
 
