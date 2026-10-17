@@ -42,11 +42,9 @@ if [ -n "$CI_CAPTURE" ]; then
     exit 0
 fi
 
-if [ -f "$elf".md5 ] && md5sum --check "$elf".md5; then
+if [ -f "$elf".md5 ] && md5sum --check --status "$elf".md5; then
     echo "$elf" "skipping unchanged test"
     exit 0
 fi
-
-echo "$elf" "running test"
 
 exit 1
