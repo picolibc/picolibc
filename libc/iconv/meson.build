@@ -46,6 +46,8 @@ foreach file : srcs_iconv
     message('libc/iconv/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/iconv/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/iconv/' + file + ': libos overrides generic')
   else
     srcs_iconv_use += file
   endif

@@ -79,6 +79,8 @@ foreach file : srcs_ubsan
     message('libc/ubsan/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/ubsan/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/ubsan/' + file + ': libos overrides generic')
   else
     srcs_ubsan_use += file
   endif
