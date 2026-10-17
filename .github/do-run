@@ -52,7 +52,7 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 	     echo 'Checkout before succeeded'
 	     DOCKER_OK=y
 	     for f in $DOCKER_FILES; do
-		 if md5sum --check --quiet ../../$f.md5; then
+		 if md5sum --check --status ../../$f.md5; then
 		     :
 		 else
 		     echo "Docker file $f changed"
@@ -136,9 +136,6 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
  echo '##########' "$TARGET" "meson test $TEST_WRAPPER -t 20"
  meson test $TEST_WRAPPER -t 20 > test.log 2>&1 || exit 7
  date
- if [ -n "$INC_TESTS" ]; then
-     grep -v '\( Generating \| headers -\| ctype-diff -\| SKIP \)' test.log
- fi
  echo 'Test succeeded'
 )
 case $? in
