@@ -170,7 +170,7 @@ randval(void)
 #define SMALL_MIN  -1024ll
 #define SMALL_MAX  1024ll
 #define SMALL_STEP 1
-#elif defined(__arc__)
+#elif defined(__arc__) || defined(__lm32__) || defined(__sh__)
 #define RAND_LOOPS 1000ll
 #define SMALL_MIN  -65536
 #define SMALL_MAX  65536
