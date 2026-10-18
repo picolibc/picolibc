@@ -49,4 +49,9 @@ esac
 
 OPTIONS="$ANALYZER $CDEFS"
 
-"$HERE"/do-run "$TARGET" $OPTIONS "$@"
+# Disable incremental tests; the cdefs tests are probably
+# faster than the incremental build
+BEFORE_SHA=
+AFTER_SHA=
+
+exec "$HERE"/do-run "$TARGET" $OPTIONS "$@"
