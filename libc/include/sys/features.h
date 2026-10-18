@@ -25,7 +25,10 @@
 extern "C" {
 #endif
 
+#if __STDC_HOSTED__
 #include <stdc-predef.h>
+#endif
+
 #include <picolibc.h>
 
 /* Macro to test version of GCC.  Returns 0 for non-GCC or too old GCC. */
