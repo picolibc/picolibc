@@ -41,12 +41,15 @@ picolibc_headers(sys
   dirent.h
   dir.h
   errno.h
+  _exactint.h
+  _fastint.h
   fcntl.h
   features.h
   file.h
   iconvnls.h
   _initfini.h
   _intsup.h
+  _leastint.h
   _locale.h
   lock.h
   param.h
