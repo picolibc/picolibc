@@ -109,7 +109,14 @@ unsigned int stdc_leading_ones_ull(unsigned long long value) __pure __picolibc_e
 unsigned int stdc_leading_ones_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_leading_ones)
+#define stdc_leading_ones(value) __builtin_stdc_leading_ones(value)
+#elif __has_builtin(__builtin_clzg)
+#define stdc_leading_ones(value)                                                                \
+    ((unsigned int)__builtin_clzg((__typeof(value))~(value), (int)sizeof(__typeof(value)) * 8))
+#else
 #define stdc_leading_ones(value) __stdbit_generic_ui(stdc_leading_ones, value)
+#endif
 
 /* Count leading zeros */
 
@@ -122,7 +129,14 @@ unsigned int stdc_leading_zeros_ull(unsigned long long value) __pure __picolibc_
 unsigned int stdc_leading_zeros_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_leading_zeros)
+#define stdc_leading_zeros(value) __builtin_stdc_leading_zeros(value)
+#elif __has_builtin(__builtin_clzg)
+#define stdc_leading_zeros(value)                                           \
+    ((unsigned int)__builtin_clzg(value, (int)sizeof(__typeof(value)) * 8))
+#else
 #define stdc_leading_zeros(value) __stdbit_generic_ui(stdc_leading_zeros, value)
+#endif
 
 /* Count trailing ones */
 
@@ -135,7 +149,14 @@ unsigned int stdc_trailing_ones_ull(unsigned long long value) __pure __picolibc_
 unsigned int stdc_trailing_ones_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_trailing_ones)
+#define stdc_trailing_ones(value) __builtin_stdc_trailing_ones(value)
+#elif __has_builtin(__builtin_ctzg)
+#define stdc_trailing_ones(value)                                                               \
+    ((unsigned int)__builtin_ctzg((__typeof(value))~(value), (int)sizeof(__typeof(value)) * 8))
+#else
 #define stdc_trailing_ones(value) __stdbit_generic_ui(stdc_trailing_ones, value)
+#endif
 
 /* Count trailing zeros */
 
@@ -148,9 +169,14 @@ unsigned int stdc_trailing_zeros_ull(unsigned long long value) __pure __picolibc
 unsigned int stdc_trailing_zeros_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_trailing_zeros)
+#define stdc_trailing_zeros(value) __builtin_stdc_trailing_zeros(value)
+#elif __has_builtin(__builtin_ctzg)
+#define stdc_trailing_zeros(value)                                          \
+    ((unsigned int)__builtin_ctzg(value, (int)sizeof(__typeof(value)) * 8))
+#else
 #define stdc_trailing_zeros(value) __stdbit_generic_ui(stdc_trailing_zeros, value)
-
-/* XXX unimplemented below here */
+#endif
 
 /* First leading ones */
 
@@ -163,7 +189,13 @@ unsigned int stdc_first_leading_one_ull(unsigned long long value) __pure __picol
 unsigned int stdc_first_leading_one_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_first_leading_one)
+#define stdc_first_leading_one(value) __builtin_stdc_first_leading_one(value)
+#elif __has_builtin(__builtin_clzg)
+#define stdc_first_leading_one(value) ((unsigned int)__builtin_clzg(value, -1) + 1U)
+#else
 #define stdc_first_leading_one(value) __stdbit_generic_ui(stdc_first_leading_one, value)
+#endif
 
 /* First leading zeros */
 
@@ -176,7 +208,14 @@ unsigned int stdc_first_leading_zero_ull(unsigned long long value) __pure __pico
 unsigned int stdc_first_leading_zero_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_first_leading_zero)
+#define stdc_first_leading_zero(value) __builtin_stdc_first_leading_zero(value)
+#elif __has_builtin(__builtin_clzg)
+#define stdc_first_leading_zero(value)                                 \
+    ((unsigned int)__builtin_clzg((__typeof(value))~(value), -1) + 1U)
+#else
 #define stdc_first_leading_zero(value) __stdbit_generic_ui(stdc_first_leading_zero, value)
+#endif
 
 /* First trailing ones */
 
@@ -189,7 +228,13 @@ unsigned int stdc_first_trailing_one_ull(unsigned long long value) __pure __pico
 unsigned int stdc_first_trailing_one_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_first_trailing_one)
+#define stdc_first_trailing_one(value) __builtin_stdc_first_trailing_one(value)
+#elif __has_builtin(__builtin_ctzg)
+#define stdc_first_trailing_one(value) ((unsigned int)__builtin_ctzg(value, -1) + 1U)
+#else
 #define stdc_first_trailing_one(value) __stdbit_generic_ui(stdc_first_trailing_one, value)
+#endif
 
 /* First trailing zeros */
 
@@ -202,7 +247,14 @@ unsigned int stdc_first_trailing_zero_ull(unsigned long long value) __pure __pic
 unsigned int stdc_first_trailing_zero_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_first_trailing_zero)
+#define stdc_first_trailing_zero(value) __builtin_stdc_first_trailing_zero(value)
+#elif __has_builtin(__builtin_ctzg)
+#define stdc_first_trailing_zero(value)                                \
+    ((unsigned int)__builtin_ctzg((__typeof(value))~(value), -1) + 1U)
+#else
 #define stdc_first_trailing_zero(value) __stdbit_generic_ui(stdc_first_trailing_zero, value)
+#endif
 
 /* Count ones */
 
@@ -215,7 +267,13 @@ unsigned int stdc_count_ones_ull(unsigned long long value) __pure __picolibc_exp
 unsigned int stdc_count_ones_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_count_ones)
+#define stdc_count_ones(value) __builtin_stdc_count_ones(value)
+#elif __has_builtin(__builtin_popcountg)
+#define stdc_count_ones(value) __builtin_popcountg(value)
+#else
 #define stdc_count_ones(value) __stdbit_generic_ui(stdc_count_ones, value)
+#endif
 
 /* Count zeros */
 
@@ -228,7 +286,13 @@ unsigned int stdc_count_zeros_ull(unsigned long long value) __pure __picolibc_ex
 unsigned int stdc_count_zeros_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_count_zeros)
+#define stdc_count_zeros(value) __builtin_stdc_count_zeros(value)
+#elif __has_builtin(__builtin_popcountg)
+#define stdc_count_zeros(value) __builtin_popcountg((__typeof(value))~(value))
+#else
 #define stdc_count_zeros(value) __stdbit_generic_ui(stdc_count_zeros, value)
+#endif
 
 /* Check for values with only one bit set */
 
@@ -241,7 +305,13 @@ _Bool stdc_has_single_bit_ull(unsigned long long value) __pure __picolibc_export
 _Bool stdc_has_single_bit_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_has_single_bit)
+#define stdc_has_single_bit(value) __builtin_stdc_has_single_bit(value)
+#elif __has_builtin(__builtin_popcountg)
+#define stdc_has_single_bit(value) ((_Bool)(__builtin_popcountg(value) == 1))
+#else
 #define stdc_has_single_bit(value) __stdbit_generic_ui(stdc_has_single_bit, value)
+#endif
 
 /* Compute number bits needed to hold a value */
 
@@ -254,7 +324,16 @@ unsigned int stdc_bit_width_ull(unsigned long long value) __pure __picolibc_expo
 unsigned int stdc_bit_width_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if __has_builtin(__builtin_stdc_bit_width)
+#define stdc_bit_width(value) __builtin_stdc_bit_width(value)
+#elif __has_builtin(__builtin_clzg)
+#define stdc_bit_width(value)                                   \
+    ((unsigned int)(sizeof(__typeof(value)) * 8)                \
+     - __builtin_clzg(value, (int)sizeof(__typeof(value)) * 8))
+#else
+#warning using generic bit width
 #define stdc_bit_width(value) __stdbit_generic_ui(stdc_bit_width, value)
+#endif
 
 /* Largest power of two <= value */
 
@@ -267,7 +346,29 @@ unsigned long long stdc_bit_floor_ull(unsigned long long value) __pure __picolib
 unsigned __int128 stdc_bit_floor_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if defined(__declare_extern_inline) && __has_builtin(__builtin_clzg)
+#define __stdc_bit_floor(type, ext)                                              \
+    __declare_extern_inline(type) __stdbit_func(stdc_bit_floor, ext)(type value) \
+    {                                                                            \
+        if (value == 0)                                                          \
+            return 0;                                                            \
+        return (type)1 << (sizeof(type) * 8 - 1 - __builtin_clzg(value));        \
+    }
+__stdc_bit_floor(unsigned char, _uc);
+__stdc_bit_floor(unsigned short, _us);
+__stdc_bit_floor(unsigned int, _ui);
+__stdc_bit_floor(unsigned long, _ul);
+__stdc_bit_floor(unsigned long long, _ull);
+#ifdef __SIZEOF_INT128__
+__stdc_bit_floor(unsigned __int128, _u128);
+#endif
+#endif
+
+#if __has_builtin(__builtin_stdc_bit_floor)
+#define stdc_bit_floor(value) __builtin_stdc_bit_floor(value)
+#else
 #define stdc_bit_floor(value) __stdbit_generic_ub(stdc_bit_floor, value)
+#endif
 
 /* Smallest power of two >= value */
 
@@ -280,7 +381,29 @@ unsigned long long stdc_bit_ceil_ull(unsigned long long value) __pure __picolibc
 unsigned __int128 stdc_bit_ceil_u128(unsigned __int128 value) __pure __picolibc_export;
 #endif
 
+#if defined(__declare_extern_inline) && __has_builtin(__builtin_clzg)
+#define __stdc_bit_ceil(type, ext)                                                    \
+    __declare_extern_inline(type) __stdbit_func(stdc_bit_ceil, ext)(type value)       \
+    {                                                                                 \
+        if (value <= 1)                                                               \
+            return 1;                                                                 \
+        return (type)2 << (sizeof(type) * 8 - 1 - __builtin_clzg((type)(value - 1))); \
+    }
+__stdc_bit_ceil(unsigned char, _uc);
+__stdc_bit_ceil(unsigned short, _us);
+__stdc_bit_ceil(unsigned int, _ui);
+__stdc_bit_ceil(unsigned long, _ul);
+__stdc_bit_ceil(unsigned long long, _ull);
+#ifdef __SIZEOF_INT128__
+__stdc_bit_ceil(unsigned __int128, _u128);
+#endif
+#endif
+
+#if __has_builtin(__builtin_stdc_bit_ceil)
+#define stdc_bit_ceil(value) __builtin_stdc_bit_ceil(value)
+#else
 #define stdc_bit_ceil(value) __stdbit_generic_ub(stdc_bit_ceil, value)
+#endif
 
 _END_STD_C
 

@@ -41,12 +41,18 @@
 unsigned int
 NAME_SB(stdbit_t value)
 {
+#if __has_builtin(__builtin_stdc_bit_width)
+    return __builtin_stdc_bit_width(value);
+#elif __has_builtin(__builtin_clzg)
+    return (unsigned int)(sizeof(stdbit_t) * 8) - __builtin_clzg(value, (int)sizeof(stdbit_t) * 8);
+#else
     unsigned int width = 0;
     while (value) {
         width++;
         value >>= 1;
     }
     return width;
+#endif
 }
 
 ALIASES

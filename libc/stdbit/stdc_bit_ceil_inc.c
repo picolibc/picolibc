@@ -41,10 +41,18 @@
 stdbit_t
 NAME_SB(stdbit_t value)
 {
+#if __has_builtin(__builtin_stdc_bit_ceil)
+    return __builtin_stdc_bit_ceil(value);
+#elif __has_builtin(__builtin_clzg)
+    if (value <= 1)
+        return 1;
+    return (stdbit_t)2 << (sizeof(stdbit_t) * 8 - 1 - __builtin_clzg((stdbit_t)(value - 1)));
+#else
     stdbit_t bit = 1;
     while (bit != 0 && bit < value)
         bit <<= 1;
     return bit;
+#endif
 }
 
 ALIASES

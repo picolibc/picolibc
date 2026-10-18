@@ -41,6 +41,11 @@
 unsigned int
 NAME_SB(stdbit_t value)
 {
+#if __has_builtin(__builtin_stdc_count_zeros)
+    return __builtin_stdc_count_zeros(value);
+#elif __has_builtin(__builtin_popcountg)
+    return __builtin_popcountg((stdbit_t)~value);
+#else
     unsigned int count = 0;
     stdbit_t     bit = 1;
     while (bit != 0) {
@@ -49,6 +54,7 @@ NAME_SB(stdbit_t value)
         bit <<= 1;
     }
     return count;
+#endif
 }
 
 ALIASES

@@ -41,7 +41,11 @@
 _Bool
 NAME_SB(stdbit_t value)
 {
+#if __has_builtin(__builtin_stdc_has_single_bit)
+    return __builtin_stdc_has_single_bit(value);
+#else
     return value != 0 && (value & (value - 1)) == 0;
+#endif
 }
 
 ALIASES

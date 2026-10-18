@@ -41,6 +41,11 @@
 unsigned int
 NAME_SB(stdbit_t value)
 {
+#if __has_builtin(__builtin_stdc_first_leading_one)
+    return __builtin_stdc_first_leading_one(value);
+#elif __has_builtin(__builtin_clzg)
+    return (unsigned int)__builtin_clzg(value, -1) + 1U;
+#else
     if (value == 0)
         return 0;
 
@@ -52,6 +57,7 @@ NAME_SB(stdbit_t value)
         bit >>= 1;
     }
     return ret;
+#endif
 }
 
 ALIASES
