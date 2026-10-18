@@ -83,6 +83,7 @@ picolibc_headers(""
   signal.h
   spawn.h
   stdc-predef.h
+  stdbit.h
   stdckdint.h
   stdint.h
   stdio.h

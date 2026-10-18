@@ -33,10 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
-           'misc', 'posix', 'search', 'signal', 'ssp',
-           'stdio', 'stdlib', 'string', 'time', 'xdr',
-           'uchar', 'ubsan']
+libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale', 'misc',
+           'posix', 'search', 'signal', 'ssp', 'stdbit', 'stdio',
+           'stdlib', 'string', 'time', 'xdr', 'uchar', 'ubsan']
 
 if use_stdlib
   libdirs += ['native']
