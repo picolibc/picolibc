@@ -446,62 +446,6 @@
 #define __is_aligned(x, align) (((__uintptr_t)x & ((align) - 1)) == 0)
 #endif
 
-/*
- * __picolibc_bit_width returns the 'width' of its operand, which is
- * one plus the bit position of the highest bit set in the value.
- *
- * This matches __builtin_stdc_bit_width, but with the type limited to
- * size_t. There are four implementations based upon what builtins the
- * compiler provides.
- */
-#ifdef __HAVE_BUILTIN_STDC_BIT_WIDTH
-
-#define __picolibc_bit_width(a) __builtin_stdc_bit_width(a)
-
-#elif defined(__HAVE_BUILTIN_CLZG)
-
-static inline unsigned int
-__picolibc_bit_width(size_t a)
-{
-    unsigned int prec = sizeof(a) * 8;
-    return (unsigned int)(prec - __builtin_clzg(a, prec));
-}
-
-#elif defined(__HAVE_BUILTIN_CLZ) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-
-static inline unsigned int
-__picolibc_bit_width(__SIZE_TYPE__ a)
-{
-    if (a == 0)
-        return 0;
-    return (unsigned int)(sizeof(a) * 8 - __builtin_clz(a));
-}
-
-#elif defined(__HAVE_BUILTIN_CLZL) && __SIZEOF_SIZE_T__ == __SIZEOF_LONG__
-
-static inline unsigned int
-__picolibc_bit_width(__SIZE_TYPE__ a)
-{
-    if (a == 0)
-        return 0;
-    return (unsigned int)(sizeof(a) * 8 - __builtin_clzl(a));
-}
-
-#else
-
-static inline unsigned int
-__picolibc_bit_width(__SIZE_TYPE__ a)
-{
-    unsigned int width = 0;
-    while (a) {
-        width++;
-        a >>= 1;
-    }
-    return width;
-}
-
-#endif
-
 #ifdef __HAVE_BUILTIN_ADD_OVERFLOW
 #define __picolibc_add_overflow(a, b, c) __builtin_add_overflow(a, b, c)
 #else

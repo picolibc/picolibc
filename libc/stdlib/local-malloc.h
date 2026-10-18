@@ -44,6 +44,7 @@
 #include <sys/lock.h>
 #include <sys/param.h>
 #include <stdint.h>
+#include <stdbit.h>
 
 #define _UP_POT(x, val, next)   (((x) <= 1UL << (val)) ? (val) : (next))
 #define _UP_POT4096(x)          _UP_POT(x, 12, 0UL)
@@ -80,13 +81,13 @@ up_pot(size_t x)
     if (__builtin_constant_p(x))
         return UP_POT(x);
 #endif
-    return __picolibc_bit_width(x - 1);
+    return stdc_bit_width(x - 1);
 }
 
 static inline unsigned int
 down_pot(size_t x)
 {
-    return __picolibc_bit_width(x) - 1;
+    return stdc_bit_width(x) - 1;
 }
 
 /*
