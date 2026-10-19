@@ -90,6 +90,7 @@ volatile TEST_CONST FLOAT_T makemathname(long_long_max_one)
 FLOAT_T makemathname(scalb)(FLOAT_T, FLOAT_T);
 
 #define FLAG_ZEROSIGN 1
+#define FLAG_CHECK_INEXACT 2
 
 #define cat2(a, b)    a##b
 #define str(a)        #a
@@ -1476,6 +1477,27 @@ static FLOAT_T
 makemathname(test_fmod_neg0_1)(void)
 {
     return makemathname(fmod)(-makemathname(zero), makemathname(one));
+}
+
+static FLOAT_T
+makemathname(test_fromfp_1_0)(void)
+{
+    return makemathname(fromfp)(makemathname(one), FP_INT_TOWARDZERO, 0);
+}
+static FLOAT_T
+makemathname(test_fromfp_inf_1)(void)
+{
+    return makemathname(fromfp)(makemathname(infval), FP_INT_TOWARDZERO, 1);
+}
+static FLOAT_T
+makemathname(test_fromfp_3_1)(void)
+{
+    return makemathname(fromfp)(makemathname(three), FP_INT_TOWARDZERO, 1);
+}
+static FLOAT_T
+makemathname(test_fromfp_3_25_4)(void)
+{
+    return makemathname(fromfp)((FLOAT_T)3.25, FP_INT_TOWARDZERO, 4);
 }
 
 #endif
@@ -4128,6 +4150,11 @@ TEST_CONST struct {
     TEST(gamma_inf, (FLOAT_T)INFINITY, 0, 0),
     TEST(gamma_neginf, (FLOAT_T)INFINITY, 0, 0),
 
+    TESTF(fromfp_1_0, (FLOAT_T)NAN, FE_INVALID, EDOM, FLAG_CHECK_INEXACT),
+    TESTF(fromfp_inf_1, (FLOAT_T)NAN, FE_INVALID, EDOM, FLAG_CHECK_INEXACT),
+    TESTF(fromfp_3_1, (FLOAT_T)NAN, FE_INVALID, EDOM, FLAG_CHECK_INEXACT),
+    TESTF(fromfp_3_25_4, (FLOAT_T)3.0, 0, 0, FLAG_CHECK_INEXACT),
+
 #endif
 
     TEST(hypot_big, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
@@ -4850,7 +4877,7 @@ makemathname(run_tests)(void)
             /* underflow can be set for inexact operations */
             if (expect_except & FE_INEXACT)
                 mask &= ~FE_UNDERFLOW;
-            else
+            else if (!(makemathname(tests)[t].flags & FLAG_CHECK_INEXACT))
                 mask &= ~FE_INEXACT;
 
             if ((except & (expect_except | mask)) != expect_except) {
@@ -4912,7 +4939,7 @@ makemathname(run_tests)(void)
             /* underflow can be set for inexact operations */
             if (expect_except & FE_INEXACT)
                 mask &= ~FE_UNDERFLOW;
-            else
+            else if (!(makemathname(tests)[t].flags & FLAG_CHECK_INEXACT))
                 mask &= ~FE_INEXACT;
 
             if ((except & (expect_except | mask)) != expect_except) {

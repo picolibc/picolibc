@@ -76,7 +76,7 @@ name(NAME)(float_t x, int rnd, unsigned int width)
     int     e;
 
     if (!isfinite(x) || width == 0)
-        return kernel(__math_invalid)(x);
+        return kernel(__math_invalid)(float_f(0.0));
 
     SAVE;
     switch (rnd) {
