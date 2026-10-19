@@ -41,17 +41,10 @@
 float_t
 name(NAME)(float_t x)
 {
-    if (!isfinite(x))
-        return x + x;
-
-    if (x <= -1) {
-        if (x == -1)
-            return kernel(__math_divzero)(1);
-        else
-            return kernel(__math_invalid)(x);
-    }
-
-    return INVLOGN * name(logp1)(x);
+    float_t y = name(logp1)(x);
+    if (isfinite(y))
+        y *= INVLOGN;
+    return y;
 }
 
 #endif
