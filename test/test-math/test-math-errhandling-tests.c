@@ -2355,6 +2355,68 @@ makemathname(test_nextafter_neg1_neg2)(void)
     return makemathname(nextafter)(-makemathname(one), -makemathname(two));
 }
 
+static FLOAT_T
+makemathname(test_nextup_0)(void)
+{
+    return makemathname(nextup)(makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_nextup_neg0)(void)
+{
+    return makemathname(nextup)(-makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_nextup_negmin)(void)
+{
+    return makemathname(nextup)(-makemathname(min_val));
+}
+static FLOAT_T
+makemathname(test_nextup_max)(void)
+{
+    return makemathname(nextup)(makemathname(max_val));
+}
+static FLOAT_T
+makemathname(test_nextup_qnan)(void)
+{
+    return makemathname(nextup)(makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_nextup_snan)(void)
+{
+    return makemathname(nextup)(makemathname(snanval));
+}
+
+static FLOAT_T
+makemathname(test_nextdown_0)(void)
+{
+    return makemathname(nextdown)(makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_nextdown_neg0)(void)
+{
+    return makemathname(nextdown)(-makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_nextdown_min)(void)
+{
+    return makemathname(nextdown)(makemathname(min_val));
+}
+static FLOAT_T
+makemathname(test_nextdown_negmax)(void)
+{
+    return makemathname(nextdown)(-makemathname(max_val));
+}
+static FLOAT_T
+makemathname(test_nextdown_qnan)(void)
+{
+    return makemathname(nextdown)(makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_nextdown_snan)(void)
+{
+    return makemathname(nextdown)(makemathname(snanval));
+}
+
 #if defined(_TEST_LONG_DOUBLE) && !defined(NO_NEXTTOWARD)
 
 static FLOAT_T
@@ -4323,6 +4385,20 @@ TEST_CONST struct {
     TEST(nextafter_negmin_0, (FLOAT_T)0, FE_UNDERFLOW, ERANGE),
     TEST(nextafter_1_2, (FLOAT_T)1.0 + EPSILON_VAL, 0, 0),
     TEST(nextafter_neg1_neg2, -(FLOAT_T)1.0 - EPSILON_VAL, 0, 0),
+
+    TEST(nextup_0, (FLOAT_T)MIN_VAL, 0, 0),
+    TEST(nextup_neg0, (FLOAT_T)MIN_VAL, 0, 0),
+    TEST(nextup_negmin, (FLOAT_T)-0.0, 0, 0),
+    TEST(nextup_max, (FLOAT_T)INFINITY, 0, 0),
+    TEST(nextup_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(nextup_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+
+    TEST(nextdown_0, (FLOAT_T)-MIN_VAL, 0, 0),
+    TEST(nextdown_neg0, (FLOAT_T)-MIN_VAL, 0, 0),
+    TEST(nextdown_min, (FLOAT_T)0.0, 0, 0),
+    TEST(nextdown_negmax, (FLOAT_T)-INFINITY, 0, 0),
+    TEST(nextdown_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(nextdown_snan, (FLOAT_T)NAN, FE_INVALID, 0),
 
 #if defined(_TEST_LONG_DOUBLE) && !defined(NO_NEXTTOWARD)
     TEST(nexttoward_0_neg0, -(FLOAT_T)0, 0, 0),

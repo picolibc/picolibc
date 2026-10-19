@@ -84,8 +84,8 @@ nextafter64(__float64 x, __float64 y)
 
     EXTRACT_WORDS(hy, ly, y);
     iy = hy & 0x7fffffff; /* |y| */
-
 #define CHECK_EQUAL
+#define EXCEPT
 #endif
 
     if (((ix >= 0x7ff00000) && ((ix - 0x7ff00000) | lx) != 0) || /* x is nan */
@@ -95,11 +95,17 @@ nextafter64(__float64 x, __float64 y)
 #ifdef CHECK_EQUAL
     if (x == y)
         return y; /* x=y, return y */
+#else
+    /* Check for X infinity with the correct sign and avoid raising overflow */
+    if (hx == hy && lx == 0)
+        return x;
 #endif
 
     if ((ix | lx) == 0) {                    /* x == 0 */
         INSERT_WORDS(x, hy & 0x80000000, 1); /* return +-minsubnormal */
+#ifdef EXCEPT
         force_eval_float64(opt_barrier_float64(x) * x);
+#endif
         return x;
     }
     if (hx >= 0) {                                  /* x > 0 */
@@ -123,12 +129,16 @@ nextafter64(__float64 x, __float64 y)
                 hx += 1;
         }
     }
+#ifdef EXCEPT
     ix = hx & 0x7ff00000;
     if (ix >= 0x7ff00000)
         return __math_oflow(hx < 0); /* overflow  */
+#endif
     INSERT_WORDS(x, hx, lx);
+#ifdef EXCEPT
     if (ix < 0x00100000) /* underflow */
         return __math_denorm(x);
+#endif
     return (x);
 }
 
