@@ -3754,6 +3754,46 @@ makemathname(test_tanpi_neginf)(void)
 {
     return makemathname(tanpi)(-makemathname(infval));
 }
+static FLOAT_T
+makemathname(test_tanpi_2)(void)
+{
+    return makemathname(tanpi)(makemathname(two));
+}
+static FLOAT_T
+makemathname(test_tanpi_3)(void)
+{
+    return makemathname(tanpi)(makemathname(three));
+}
+static FLOAT_T
+makemathname(test_tanpi_m2)(void)
+{
+    return makemathname(tanpi)(-makemathname(two));
+}
+static FLOAT_T
+makemathname(test_tanpi_m3)(void)
+{
+    return makemathname(tanpi)(-makemathname(three));
+}
+static FLOAT_T
+makemathname(test_tanpi_2_5)(void)
+{
+    return makemathname(tanpi)((FLOAT_T)2.5);
+}
+static FLOAT_T
+makemathname(test_tanpi_3_5)(void)
+{
+    return makemathname(tanpi)((FLOAT_T)3.5);
+}
+static FLOAT_T
+makemathname(test_tanpi_m2_5)(void)
+{
+    return makemathname(tanpi)((FLOAT_T)-2.5);
+}
+static FLOAT_T
+makemathname(test_tanpi_m3_5)(void)
+{
+    return makemathname(tanpi)((FLOAT_T)-3.5);
+}
 
 #ifndef NO_BESSEL_TESTS
 static FLOAT_T
@@ -4727,10 +4767,18 @@ TEST_CONST struct {
     TEST(tanh_inf, (FLOAT_T)1.0, 0, 0),
     TEST(tanh_neginf, (FLOAT_T)-1.0, 0, 0),
 
-    TEST(tanpi_qnan, (FLOAT_T)NAN, 0, 0),
-    TEST(tanpi_snan, (FLOAT_T)NAN, FE_INVALID, 0),
-    TEST(tanpi_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
-    TEST(tanpi_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
+    TESTF(tanpi_qnan, (FLOAT_T)NAN, 0, 0, FLAG_ZEROSIGN),
+    TESTF(tanpi_snan, (FLOAT_T)NAN, FE_INVALID, 0, FLAG_ZEROSIGN),
+    TESTF(tanpi_inf, (FLOAT_T)NAN, FE_INVALID, EDOM, FLAG_ZEROSIGN),
+    TESTF(tanpi_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM, FLAG_ZEROSIGN),
+    TESTF(tanpi_2, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(tanpi_3, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(tanpi_m2, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(tanpi_m3, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(tanpi_2_5, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE, FLAG_ZEROSIGN),
+    TESTF(tanpi_3_5, (FLOAT_T)-INFINITY, FE_DIVBYZERO, ERANGE, FLAG_ZEROSIGN),
+    TESTF(tanpi_m2_5, (FLOAT_T)-INFINITY, FE_DIVBYZERO, ERANGE, FLAG_ZEROSIGN),
+    TESTF(tanpi_m3_5, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE, FLAG_ZEROSIGN),
 
     TEST(tgamma_0, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
     TEST(tgamma_neg0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
