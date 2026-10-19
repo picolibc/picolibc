@@ -96,4 +96,4 @@ mon=none
 	-chardev stdio,id=s1 \
 	-machine powernv9,accel=tcg \
 	-kernel "$one_elf" \
-	-nographic
+	-nographic "$@"
