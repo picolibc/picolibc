@@ -51,9 +51,15 @@ tanpi(real x)
 {
 	if (x == floor(x))
 		return 0;
-	real x2 = 2 * x;
+
+	if (is_inf(x))
+		raise nan();
+
+	real xi = real_convs[current_conversion].conv(x);
+
+	real x2 = 2 * xi;
 	if (x2 == floor(x2) && x2 % 2 == 1)
-		raise infinity(false);
+		raise infinity((floor(xi) & 1) != 0);
 	return tan(imprecise(x, 4096) * pi_4096);
 }
 

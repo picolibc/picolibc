@@ -51,12 +51,14 @@ name(tanpi)(float_t x)
         return kernel(__math_invalid)(x);
 
     /* check for integers and return zero immediately */
-    if (_isint_float_f(x))
-        return float_f(0.0);
+    int isint = _isint_float_f(x);
+    if (isint)
+        /* -0 for odd XOR negative */
+        return (isint == 1) != (signbit(x) != 0) ? float_f(-0.0) : float_f(0.0);
 
-    /* pin .5 values to +infinity */
+    /* overflow for 0.5 values */
     if (_isint_float_f(x * 2) == 1)
-        return (float_t)INFINITY;
+        return kernel(__math_divzero)(_isint_float_f(x - float_f(0.5)) & 1);
 
     /* |x| < 0.25 */
     if (ix < EXP_ONE_QUARTER) {
