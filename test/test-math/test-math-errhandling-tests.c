@@ -2967,34 +2967,96 @@ makemathname(test_log10_neginf)(void)
 }
 
 static FLOAT_T
-makemathname(test_log1p_qnan)(void)
+makemathname(test_logp1_qnan)(void)
 {
-    return makemathname(log1p)(makemathname(qnanval));
+    return makemathname(logp1)(makemathname(qnanval));
 }
 static FLOAT_T
-makemathname(test_log1p_snan)(void)
+makemathname(test_logp1_snan)(void)
 {
-    return makemathname(log1p)(makemathname(snanval));
+    return makemathname(logp1)(makemathname(snanval));
 }
 static FLOAT_T
-makemathname(test_log1p_inf)(void)
+makemathname(test_logp1_inf)(void)
 {
-    return makemathname(log1p)(makemathname(infval));
+    return makemathname(logp1)(makemathname(infval));
 }
 static FLOAT_T
-makemathname(test_log1p_neginf)(void)
+makemathname(test_logp1_neginf)(void)
 {
-    return makemathname(log1p)(-makemathname(infval));
+    return makemathname(logp1)(-makemathname(infval));
 }
 static FLOAT_T
-makemathname(test_log1p_neg1)(void)
+makemathname(test_logp1_neg1)(void)
 {
-    return makemathname(log1p)(-makemathname(one));
+    return makemathname(logp1)(-makemathname(one));
 }
 static FLOAT_T
-makemathname(test_log1p_neg2)(void)
+makemathname(test_logp1_neg2)(void)
 {
-    return makemathname(log1p)(-makemathname(two));
+    return makemathname(logp1)(-makemathname(two));
+}
+
+static FLOAT_T
+makemathname(test_log2p1_qnan)(void)
+{
+    return makemathname(log2p1)(makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_log2p1_snan)(void)
+{
+    return makemathname(log2p1)(makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_log2p1_inf)(void)
+{
+    return makemathname(log2p1)(makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_log2p1_neginf)(void)
+{
+    return makemathname(log2p1)(-makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_log2p1_neg1)(void)
+{
+    return makemathname(log2p1)(-makemathname(one));
+}
+static FLOAT_T
+makemathname(test_log2p1_neg2)(void)
+{
+    return makemathname(log2p1)(-makemathname(two));
+}
+
+static FLOAT_T
+makemathname(test_log10p1_qnan)(void)
+{
+    return makemathname(log10p1)(makemathname(qnanval));
+}
+static FLOAT_T
+makemathname(test_log10p1_snan)(void)
+{
+    return makemathname(log10p1)(makemathname(snanval));
+}
+static FLOAT_T
+makemathname(test_log10p1_inf)(void)
+{
+    return makemathname(log10p1)(makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_log10p1_neginf)(void)
+{
+    return makemathname(log10p1)(-makemathname(infval));
+}
+static FLOAT_T
+makemathname(test_log10p1_neg1)(void)
+{
+    return makemathname(log10p1)(-makemathname(one));
+}
+static FLOAT_T
+makemathname(test_log10p1_neg2)(void)
+{
+    return makemathname(log10p1)(-makemathname(two));
 }
 
 static FLOAT_T
@@ -4249,12 +4311,26 @@ TEST_CONST struct {
     TEST(log10_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
     TEST(log10_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
 
-    TEST(log1p_qnan, (FLOAT_T)NAN, 0, 0),
-    TEST(log1p_snan, (FLOAT_T)NAN, FE_INVALID, 0),
-    TEST(log1p_inf, (FLOAT_T)INFINITY, 0, 0),
-    TEST(log1p_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
-    TEST(log1p_neg1, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
-    TEST(log1p_neg2, (FLOAT_T)NAN, FE_INVALID, EDOM),
+    TEST(logp1_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(logp1_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(logp1_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(logp1_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
+    TEST(logp1_neg1, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
+    TEST(logp1_neg2, (FLOAT_T)NAN, FE_INVALID, EDOM),
+
+    TEST(log2p1_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(log2p1_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(log2p1_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(log2p1_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
+    TEST(log2p1_neg1, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
+    TEST(log2p1_neg2, (FLOAT_T)NAN, FE_INVALID, EDOM),
+
+    TEST(log10p1_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(log10p1_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(log10p1_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(log10p1_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
+    TEST(log10p1_neg1, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
+    TEST(log10p1_neg2, (FLOAT_T)NAN, FE_INVALID, EDOM),
 
     TEST(log2_qnan, (FLOAT_T)NAN, 0, 0),
     TEST(log2_snan, (FLOAT_T)NAN, FE_INVALID, 0),
