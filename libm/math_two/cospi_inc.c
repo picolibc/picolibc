@@ -49,6 +49,10 @@ name(cospi)(float_t x)
     if (EXP_IS_NONFINITE(ix))
         return kernel(__math_invalid)(x);
 
+    /* Make sure cospi(x) is the same as cospi(-x) for all rounding modes */
+    if (x < 0)
+        x = -x;
+
     switch (_isint_float_f(x)) {
     case 1:
         return float_f(-1.0);
@@ -65,7 +69,7 @@ name(cospi)(float_t x)
     if (ix < EXP_ONE_QUARTER) {
         n = 0;
     } else {
-        n = name(_rem_half)(name(fabs)(x), &x);
+        n = name(_rem_half)(x, &x);
     }
 
     prod = ff_mul_f(name(_pi_ff_), x);
