@@ -41,6 +41,9 @@
 float
 cosf(float y)
 {
+    /* Make sure cos(-x) is identical to cos(x) under up/down rounding */
+    if (isless(y, 0))
+        y = -y;
     double          x = (double)y;
     double          s;
     int             n;
