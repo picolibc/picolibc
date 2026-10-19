@@ -56,6 +56,23 @@ fail(const char *what, const char *s)
 }
 
 static void
+check_invalid_base(const char *what, const char *s, int base)
+{
+    char *end = (char *)s;
+    long  v;
+
+    errno = 0;
+    v = strtol(s, &end, base);
+#ifdef NO_NEWLIB
+    /* Native libcs may leave endptr untouched for an unsupported base. */
+    if (v != 0 || errno != EINVAL)
+#else
+    if (v != 0 || errno != EINVAL || end != s)
+#endif
+        fail(what, s);
+}
+
+static void
 check_ul(const char *s, int base, unsigned long want, size_t consumed)
 {
     char         *end;
@@ -227,7 +244,12 @@ test_malformed(void)
     s = "";
     end = (char *)1;
     v = strtoul(s, &end, 10);
+#ifdef __PICOLIBC__
     if (v != 0 || errno != 0)
+#else
+    /* Some native libcs set EINVAL when no conversion is performed. */
+    if (v != 0 || (errno != 0 && errno != EINVAL))
+#endif
         fail("strtoul empty", s);
     if (end != s)
         fail("strtoul empty endptr", s);
@@ -275,9 +297,6 @@ test_malformed(void)
 static void
 test_bases(void)
 {
-    char *end;
-    long  v;
-
     check_l("101", 2, 5, 3);
     check_l("777", 8, 511, 3);
     check_l("ff", 16, 255, 2);
@@ -285,19 +304,9 @@ test_bases(void)
     check_l("0xff", 16, 255, 4);
     check_l("0777", 8, 511, 4);
 
-    v = strtol("12", &end, 1);
-    if (v != 0 || errno != EINVAL || end != (char *)"12")
-        fail("strtol base 1", "12");
-
-    errno = 0;
-    v = strtol("12", &end, 37);
-    if (v != 0 || errno != EINVAL || end != (char *)"12")
-        fail("strtol base 37", "12");
-
-    errno = 0;
-    v = strtol("12", &end, -5);
-    if (v != 0 || errno != EINVAL || end != (char *)"12")
-        fail("strtol base -5", "12");
+    check_invalid_base("strtol base 1", "12", 1);
+    check_invalid_base("strtol base 37", "12", 37);
+    check_invalid_base("strtol base -5", "12", -5);
 
     /* base 0 auto-detection */
     check_l("0x10", 0, 16, 4);
