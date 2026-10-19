@@ -378,22 +378,22 @@ makemathname(test_cos_0)(void)
 static FLOAT_T
 makemathname(test_cospi_inf)(void)
 {
-    return makemathname(cos)(makemathname(infval));
+    return makemathname(cospi)(makemathname(infval));
 }
 static FLOAT_T
 makemathname(test_cospi_qnan)(void)
 {
-    return makemathname(cos)(makemathname(qnanval));
+    return makemathname(cospi)(makemathname(qnanval));
 }
 static FLOAT_T
 makemathname(test_cospi_snan)(void)
 {
-    return makemathname(cos)(makemathname(snanval));
+    return makemathname(cospi)(makemathname(snanval));
 }
 static FLOAT_T
 makemathname(test_cospi_0)(void)
 {
-    return makemathname(cos)(makemathname(zero));
+    return makemathname(cospi)(makemathname(zero));
 }
 
 static FLOAT_T
@@ -2678,36 +2678,46 @@ makemathname(test_sin_0)(void)
 {
     return makemathname(sin)(makemathname(zero));
 }
+static FLOAT_T
+makemathname(test_sin_neg0)(void)
+{
+    return makemathname(sin)(makemathname(negzero));
+}
 
 static FLOAT_T
 makemathname(test_sinpi_inf)(void)
 {
-    return makemathname(sin)(makemathname(infval));
+    return makemathname(sinpi)(makemathname(infval));
 }
 static FLOAT_T
 makemathname(test_sinpi_qnan)(void)
 {
-    return makemathname(sin)(makemathname(qnanval));
+    return makemathname(sinpi)(makemathname(qnanval));
 }
 static FLOAT_T
 makemathname(test_sinpi_snan)(void)
 {
-    return makemathname(sin)(makemathname(snanval));
-}
-static FLOAT_T
-makemathname(test_sinpi_pio2)(void)
-{
-    return makemathname(sin)(makemathname(pio2));
-}
-static FLOAT_T
-makemathname(test_sinpi_small)(void)
-{
-    return makemathname(sin)(makemathname(small));
+    return makemathname(sinpi)(makemathname(snanval));
 }
 static FLOAT_T
 makemathname(test_sinpi_0)(void)
 {
-    return makemathname(sin)(makemathname(zero));
+    return makemathname(sinpi)(makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_sinpi_neg0)(void)
+{
+    return makemathname(sinpi)(makemathname(negzero));
+}
+static FLOAT_T
+makemathname(test_sinpi_1)(void)
+{
+    return makemathname(sinpi)(makemathname(one));
+}
+static FLOAT_T
+makemathname(test_sinpi_neg1)(void)
+{
+    return makemathname(sinpi)(-makemathname(one));
 }
 
 /* This is mostly here to make sure sincos doesn't infinite loop due to compiler optimization */
@@ -4711,14 +4721,16 @@ TEST_CONST struct {
     TEST(sin_snan, (FLOAT_T)NAN, FE_INVALID, 0),
     TEST(sin_pio2, (FLOAT_T)1.0, FE_INEXACT, 0),
     TEST(sin_small, (FLOAT_T)SMALL, FE_INEXACT, 0),
-    TEST(sin_0, (FLOAT_T)0.0, 0, 0),
+    TESTF(sin_0, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(sin_neg0, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
 
     TEST(sinpi_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
     TEST(sinpi_qnan, (FLOAT_T)NAN, 0, 0),
     TEST(sinpi_snan, (FLOAT_T)NAN, FE_INVALID, 0),
-    TEST(sinpi_pio2, (FLOAT_T)1.0, FE_INEXACT, 0),
-    TEST(sinpi_small, (FLOAT_T)SMALL, FE_INEXACT, 0),
-    TEST(sinpi_0, (FLOAT_T)0.0, 0, 0),
+    TESTF(sinpi_0, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(sinpi_neg0, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(sinpi_1, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
+    TESTF(sinpi_neg1, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
 
     TEST(sincos, (FLOAT_T)1.0, 0, 0),
     TEST(sincos_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),

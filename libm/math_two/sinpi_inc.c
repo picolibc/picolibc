@@ -52,7 +52,7 @@ name(sinpi)(float_t x)
 
     /* check for integers and return zero immediately */
     if (_isint_float_f(x))
-        return float_f(0.0);
+        return name(copysign)(float_f(0.0), x);
 
     /* |x| < 0.25 */
     if (ix < EXP_ONE_QUARTER) {
