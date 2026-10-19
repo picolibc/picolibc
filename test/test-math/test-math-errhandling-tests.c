@@ -2529,6 +2529,126 @@ makemathname(test_nexttoward_neg1_neg2)(void)
 #endif
 
 static FLOAT_T
+makemathname(test_round_0)(void)
+{
+    return makemathname(round)(makemathname(zero));
+}
+
+static FLOAT_T
+makemathname(test_round_neg0)(void)
+{
+    return makemathname(round)(makemathname(negzero));
+}
+
+static FLOAT_T
+makemathname(test_round_inf)(void)
+{
+    return makemathname(round)(makemathname(infval));
+}
+
+static FLOAT_T
+makemathname(test_round_minf)(void)
+{
+    return makemathname(round)(makemathname(minfval));
+}
+
+static FLOAT_T
+makemathname(test_round_qnan)(void)
+{
+    return makemathname(round)(makemathname(qnanval));
+}
+
+static FLOAT_T
+makemathname(test_round_snan)(void)
+{
+    return makemathname(round)(makemathname(snanval));
+}
+
+static FLOAT_T
+makemathname(test_round_2_5)(void)
+{
+    return makemathname(round)(makemathname(two) + makemathname(half));
+}
+
+static FLOAT_T
+makemathname(test_round_3_5)(void)
+{
+    return makemathname(round)(makemathname(three) + makemathname(half));
+}
+
+static FLOAT_T
+makemathname(test_round_m2_5)(void)
+{
+    return makemathname(round)(-(makemathname(two) + makemathname(half)));
+}
+
+static FLOAT_T
+makemathname(test_round_m3_5)(void)
+{
+    return makemathname(round)(-(makemathname(three) + makemathname(half)));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_0)(void)
+{
+    return makemathname(roundeven)(makemathname(zero));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_neg0)(void)
+{
+    return makemathname(roundeven)(makemathname(negzero));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_inf)(void)
+{
+    return makemathname(roundeven)(makemathname(infval));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_minf)(void)
+{
+    return makemathname(roundeven)(makemathname(minfval));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_qnan)(void)
+{
+    return makemathname(roundeven)(makemathname(qnanval));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_snan)(void)
+{
+    return makemathname(roundeven)(makemathname(snanval));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_2_5)(void)
+{
+    return makemathname(roundeven)(makemathname(two) + makemathname(half));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_3_5)(void)
+{
+    return makemathname(roundeven)(makemathname(three) + makemathname(half));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_m2_5)(void)
+{
+    return makemathname(roundeven)(-(makemathname(two) + makemathname(half)));
+}
+
+static FLOAT_T
+makemathname(test_roundeven_m3_5)(void)
+{
+    return makemathname(roundeven)(-(makemathname(three) + makemathname(half)));
+}
+
+static FLOAT_T
 makemathname(test_sin_inf)(void)
 {
     return makemathname(sin)(makemathname(infval));
@@ -4523,6 +4643,28 @@ TEST_CONST struct {
     TEST(nexttoward_1_2, (FLOAT_T)1.0 + EPSILON_VAL, 0, 0),
     TEST(nexttoward_neg1_neg2, -(FLOAT_T)1.0 - EPSILON_VAL, 0, 0),
 #endif
+
+    TEST(round_0, (FLOAT_T)0.0, 0, 0),
+    TEST(round_neg0, (FLOAT_T)-0.0, 0, 0),
+    TEST(round_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(round_minf, (FLOAT_T)-INFINITY, 0, 0),
+    TEST(round_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(round_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(round_2_5, (FLOAT_T)3.0, 0, 0),
+    TEST(round_3_5, (FLOAT_T)4.0, 0, 0),
+    TEST(round_m2_5, (FLOAT_T)-3.0, 0, 0),
+    TEST(round_m3_5, (FLOAT_T)-4.0, 0, 0),
+
+    TEST(roundeven_0, (FLOAT_T)0.0, 0, 0),
+    TEST(roundeven_neg0, (FLOAT_T)-0.0, 0, 0),
+    TEST(roundeven_inf, (FLOAT_T)INFINITY, 0, 0),
+    TEST(roundeven_minf, (FLOAT_T)-INFINITY, 0, 0),
+    TEST(roundeven_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(roundeven_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    TEST(roundeven_2_5, (FLOAT_T)2.0, 0, 0),
+    TEST(roundeven_3_5, (FLOAT_T)4.0, 0, 0),
+    TEST(roundeven_m2_5, (FLOAT_T)-2.0, 0, 0),
+    TEST(roundeven_m3_5, (FLOAT_T)-4.0, 0, 0),
 
     TEST(sin_inf, (FLOAT_T)NAN, FE_INVALID, EDOM),
     TEST(sin_qnan, (FLOAT_T)NAN, 0, 0),

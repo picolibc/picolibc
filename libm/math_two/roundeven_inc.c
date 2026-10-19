@@ -44,7 +44,7 @@ name(roundeven)(float_t x)
     float_t y;
 
     y = name(round)(x);
-    if (name(fabs)(y - x) == float_f(0.5) && _isint_float_f(y) == 1)
+    if (isfinite(y) && name(fabs)(y - x) == float_f(0.5) && _isint_float_f(y) == 1)
         y -= name(copysign)(1, y);
     return y;
 }
