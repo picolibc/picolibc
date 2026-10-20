@@ -63,7 +63,7 @@ report(const char *what, size_t n, size_t a1, size_t a2)
 }
 
 static void
-fill_seq(unsigned char *p, size_t n, unsigned seed)
+fill_seq(unsigned char *p, size_t n, uint32_t seed)
 {
     size_t i;
     for (i = 0; i < n; i++) {
@@ -111,7 +111,7 @@ test_move_disjoint(void)
         size_t n = lens[li];
         for (a1 = 0; a1 < ALIGN; a1++) {
             for (a2 = 0; a2 < ALIGN; a2++) {
-                fill_seq(work, sizeof(work), (unsigned)(n * 64 + a1 * 8 + a2));
+                fill_seq(work, sizeof(work), (uint32_t)(n * 64 + a1 * 8 + a2));
                 ref_move(model, work, sizeof(work));
                 if (memmove(work + a1, work + SRC_BASE + a2, n) != work + a1) {
                     report("memmove return", n, a1, a2);
@@ -144,7 +144,7 @@ test_move_overlap(void)
 
             /* dst = src + k: overlapping forward copy */
             for (a = 0; a < ALIGN; a++) {
-                fill_seq(work, sizeof(work), (unsigned)(n * 32 + k));
+                fill_seq(work, sizeof(work), (uint32_t)(n * 32 + k));
                 ref_move(model, work, sizeof(work));
                 if (memmove(work + a + k, work + a, n) != work + a + k) {
                     report("memmove ovw return", n, k, a);
@@ -155,7 +155,7 @@ test_move_overlap(void)
 
             /* src = dst + k: overlapping backward copy */
             for (a = 0; a < ALIGN; a++) {
-                fill_seq(work, sizeof(work), (unsigned)(n * 32 + k + 1));
+                fill_seq(work, sizeof(work), (uint32_t)(n * 32 + k + 1));
                 ref_move(model, work, sizeof(work));
                 if (memmove(work + a, work + a + k, n) != work + a) {
                     report("memmove ovb return", n, k, a);
@@ -166,7 +166,7 @@ test_move_overlap(void)
 
             /* identical pointers: must leave memory unchanged */
             for (a = 0; a < ALIGN; a++) {
-                fill_seq(work, sizeof(work), (unsigned)(n + k + a));
+                fill_seq(work, sizeof(work), (uint32_t)(n + k + a));
                 ref_move(model, work, sizeof(work));
                 memmove(work + a, work + a, n);
                 check_region("memmove self overlap", n, k, a);
