@@ -35,6 +35,7 @@
 
 set(tests
   test-fmemopen
+  test-fmemopen-rplus
   test-fopencookie
   test-open_memstream
   test-funopen
@@ -45,6 +46,11 @@ set(tests
   test-sprintf-percent-n
   test-sprintf-s
   test-ungetc
+  test-ungetc-reposition
+  test-fseek-failure
+  test-fflush-input-error
+  test-pipe-read-flush
+  test-ungetc-fflush
   test-vfprintf-s
   test-vsnprintf-s
   )

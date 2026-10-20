@@ -47,6 +47,8 @@ FSEEK(FILE *stream, FSEEK_TYPE offset, int whence)
 
     __flockfile(stream);
     if ((stream->flags & __SEXT) && xf->seek) {
+        if (whence == SEEK_CUR && __atomic_load_ungetc(&stream->unget) != 0)
+            offset--;
         if ((xf->seek)(stream, (__off_t)offset, whence) >= 0) {
             stream->flags &= ~__SEOF;
             __atomic_store_ungetc(&stream->unget, 0);
