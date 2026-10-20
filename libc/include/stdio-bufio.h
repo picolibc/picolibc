@@ -170,6 +170,8 @@ off_t __bufio_seek(FILE *f, off_t offset, int whence);
 
 int   __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size);
 
+int   __bufio_setvbuf_locked(FILE *f, char *buf, int mode, size_t size);
+
 int   __bufio_close(FILE *f);
 
 int   __bufio_close_nf(FILE *f);
