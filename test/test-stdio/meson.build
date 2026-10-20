@@ -49,6 +49,11 @@ tests = [
   'test-vfscanf-percent-a',
   'test-vsnprintf-s',
   'test-ungetc',
+  'test-fclose-flush-error',
+  'test-fflush-error',
+  'test-fdevclose-flush-error',
+  'test-fclose-locking-error',
+  'test-fdevclose-locking',
 ]
 
 tests_failure = []

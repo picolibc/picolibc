@@ -35,15 +35,21 @@ int __no_thread_safety_analysis
 fclose(FILE *f)
 {
     struct __file_close *cf = (struct __file_close *)f;
+    int                  ret = 0;
 
 #ifdef __STDIO_LOCKING
-    __flockfile_close(f);
+    if (__flockfile_close(f) < 0)
+        ret = EOF;
 #endif
     if ((f->flags & __SCLOSE) && cf->close) {
         /*
          * File has 'close' function, call it
          */
-        return (*cf->close)(f);
+        int close_ret = (*cf->close)(f);
+
+        if (ret == EOF || close_ret < 0)
+            return EOF;
+        return close_ret;
     }
-    return 0;
+    return ret;
 }
