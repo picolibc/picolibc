@@ -88,6 +88,7 @@ if tests_enable_posix_io
     'test-fgets-eof',
     'test-fflush',
     'test-fflush-input-error',
+    'test-pipe-read-flush',
     'test-ungetc-fflush',
     'test-fopen',
     'test-fread-fwrite',

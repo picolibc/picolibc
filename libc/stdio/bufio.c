@@ -47,6 +47,32 @@ __bufio_lock_init(FILE *f)
 }
 #endif
 
+/*
+ * POSIX.1-2024 only synchronizes the file offset of a reading stream
+ * "if the file is one capable of seeking".  When it cannot be done,
+ * keep the read-ahead and move any pushed back character into the read
+ * buffer instead of dropping it, so that flushing a non-seekable input
+ * stream is a true no-op.
+ */
+static void
+bufio_keep_unget(FILE *f, __ungetc_t unget)
+{
+    struct __file_bufio *bf = (struct __file_bufio *)f;
+
+    if (unget == 0)
+        return;
+    __atomic_store_ungetc(&f->unget, 0);
+    /* Wide pushback cannot be represented as a raw byte */
+    if (bf->buf == NULL || (f->flags & __SWIDE))
+        return;
+    if (bf->off > 0)
+        bf->buf[--bf->off] = (char)(unget - 1);
+    else if (bf->len == 0 && bf->size > 0) {
+        bf->buf[0] = (char)(unget - 1);
+        bf->len = 1;
+    }
+}
+
 int
 __bufio_flush_locked(FILE *f)
 {
@@ -54,7 +80,9 @@ __bufio_flush_locked(FILE *f)
     char                *buf;
     off_t                backup;
     off_t                newpos;
+    __ungetc_t           unget;
 
+    unget = __atomic_load_ungetc(&f->unget);
     switch (bf->dir) {
     case __SWR:
         /* Flush everything, drop contents if that doesn't work */
@@ -74,18 +102,30 @@ __bufio_flush_locked(FILE *f)
     case __SRD:
         /* Move the FD back to the current read position */
         backup = bf->len - bf->off;
-        if (__atomic_load_ungetc(&f->unget) != 0)
+        if (unget != 0)
             backup++;
         if (backup) {
+            if (!bufio_seekable(bf)) {
+                bufio_keep_unget(f, unget);
+                return 0;
+            }
             newpos = bf->pos - backup;
-            if (bufio_lseek(bf, newpos, SEEK_SET) < 0)
-                return _FDEV_ERR;
+            if (bufio_lseek(bf, newpos, SEEK_SET) < 0) {
+                if (errno != ESPIPE)
+                    return _FDEV_ERR;
+                bufio_keep_unget(f, unget);
+                return 0;
+            }
             bf->pos = newpos;
+            /* A successful reposition discards the pushback */
+            __atomic_store_ungetc(&f->unget, 0);
         }
         bf->len = 0;
         bf->off = 0;
         break;
     default:
+        /* Nothing read yet: only a pushback can be pending */
+        bufio_keep_unget(f, unget);
         break;
     }
     return 0;
@@ -135,8 +175,13 @@ __bufio_setdir_locked(FILE *f, uint8_t dir)
 
     if (bf->dir != dir) {
         ret = __bufio_flush_locked(f);
-        if (ret == 0)
+        if (ret == 0) {
+            if (bf->dir == __SRD)
+                /* Buffered input must not be reused as pending output */
+                bf->len = 0;
+            bf->off = 0;
             bf->dir = dir;
+        }
     }
     return ret;
 }

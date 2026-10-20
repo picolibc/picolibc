@@ -49,6 +49,7 @@ set(tests
   test-ungetc-reposition
   test-fseek-failure
   test-fflush-input-error
+  test-pipe-read-flush
   test-ungetc-fflush
   test-vfprintf-s
   test-vsnprintf-s
