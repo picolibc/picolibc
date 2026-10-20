@@ -90,6 +90,11 @@ static int
 __fmem_flush(FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
+
+    if ((f->flags & __SRD) && __atomic_load_ungetc(&f->unget) != 0) {
+        if (mf->pos > 0)
+            mf->pos--;
+    }
     if ((f->flags & __SWR) && mf->pos < mf->bufsize) {
         mf->buf[mf->pos] = '\0';
         if (mf->pos > mf->size) {

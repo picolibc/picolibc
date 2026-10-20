@@ -855,7 +855,8 @@ __fflush_locked(FILE *stream)
     int ret = 0;
     if (stream->flush)
         ret = (stream->flush)(stream);
-    __atomic_store_ungetc(&stream->unget, 0);
+    if (ret >= 0)
+        __atomic_store_ungetc(&stream->unget, 0);
     return ret;
 }
 

@@ -49,6 +49,8 @@ tests = [
   'test-vfscanf-percent-a',
   'test-vsnprintf-s',
   'test-ungetc',
+  'test-ungetc-reposition',
+  'test-fseek-failure',
 ]
 
 tests_failure = []
@@ -84,6 +86,8 @@ if tests_enable_posix_io
     'test-fgetc',
     'test-fgets-eof',
     'test-fflush',
+    'test-fflush-input-error',
+    'test-ungetc-fflush',
     'test-fopen',
     'test-fread-fwrite',
     'test-mktemp',

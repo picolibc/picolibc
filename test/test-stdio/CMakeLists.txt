@@ -45,6 +45,10 @@ set(tests
   test-sprintf-percent-n
   test-sprintf-s
   test-ungetc
+  test-ungetc-reposition
+  test-fseek-failure
+  test-fflush-input-error
+  test-ungetc-fflush
   test-vfprintf-s
   test-vsnprintf-s
   )

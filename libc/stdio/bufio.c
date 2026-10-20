@@ -53,6 +53,7 @@ __bufio_flush_locked(FILE *f)
     struct __file_bufio *bf = (struct __file_bufio *)f;
     char                *buf;
     off_t                backup;
+    off_t                newpos;
 
     switch (bf->dir) {
     case __SWR:
@@ -73,9 +74,13 @@ __bufio_flush_locked(FILE *f)
     case __SRD:
         /* Move the FD back to the current read position */
         backup = bf->len - bf->off;
+        if (__atomic_load_ungetc(&f->unget) != 0)
+            backup++;
         if (backup) {
-            bf->pos -= backup;
-            (void)bufio_lseek(bf, bf->pos, SEEK_SET);
+            newpos = bf->pos - backup;
+            if (bufio_lseek(bf, newpos, SEEK_SET) < 0)
+                return _FDEV_ERR;
+            bf->pos = newpos;
         }
         bf->len = 0;
         bf->off = 0;
@@ -130,7 +135,8 @@ __bufio_setdir_locked(FILE *f, uint8_t dir)
 
     if (bf->dir != dir) {
         ret = __bufio_flush_locked(f);
-        bf->dir = dir;
+        if (ret == 0)
+            bf->dir = dir;
     }
     return ret;
 }
@@ -243,11 +249,12 @@ __bufio_seek(FILE *f, off_t offset, int whence)
         __fallthrough;
     default:
         ret = bufio_lseek(bf, offset, whence);
-        if (ret >= 0)
+        if (ret >= 0) {
             bf->pos = ret;
-        /* Flush any buffered data after a real seek */
-        bf->len = 0;
-        bf->off = 0;
+            /* Flush any buffered data after a real seek */
+            bf->len = 0;
+            bf->off = 0;
+        }
         break;
     }
 
