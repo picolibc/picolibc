@@ -45,7 +45,6 @@ struct __file_mem {
     size_t            bufsize; /* Upper limit on size. */
     size_t            pos;
     uint8_t           mflags;
-    uint8_t           dir;
 };
 
 static int
@@ -53,7 +52,6 @@ __fmem_put(char c, FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
     size_t             pos = mf->mflags & __MAPP ? mf->size : mf->pos;
-    mf->dir = __SWR;
     if ((f->flags & __SWR) == 0) {
         return _FDEV_ERR;
     } else if (pos < mf->bufsize) {
@@ -79,7 +77,6 @@ static int
 __fmem_get(FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
-    mf->dir = __SRD;
     if ((f->flags & __SRD) == 0) {
         return _FDEV_ERR;
     } else if (mf->pos < mf->size) {
@@ -94,19 +91,8 @@ __fmem_flush(FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
 
-    if (mf->dir == __SRD) {
-        if (__atomic_load_ungetc(&f->unget) != 0) {
-            if (mf->pos > 0)
-                mf->pos--;
-        }
-        return 0;
-    }
-    if (mf->dir == __SWR && (f->flags & __SWR) && mf->pos < mf->bufsize) {
-        mf->buf[mf->pos] = '\0';
-        if (mf->pos > mf->size) {
-            mf->size = mf->pos;
-        }
-    }
+    if (__atomic_load_ungetc(&f->unget) != 0 && mf->pos > 0)
+        mf->pos--;
     return 0;
 }
 
@@ -132,7 +118,6 @@ __fmem_seek(FILE *f, off_t pos, int whence)
     if (pos < 0 || (off_t)mf->bufsize < pos)
         return EOF;
     mf->pos = pos;
-    mf->dir = 0;
     return pos;
 }
 
@@ -198,9 +183,8 @@ fmemopen(void *buf, size_t size, const char *mode)
             mflags |= __MAPP;
         } else {
             initial_size = 0;
-            /* w+ mode truncates the buffer, writing NUL */
-            if ((open_flags & O_ACCMODE) == O_RDWR)
-                *((char *)buf) = '\0';
+            /* Modes beginning with 'w' truncate the buffer, writing NUL. */
+            *((char *)buf) = '\0';
         }
     } else {
         initial_size = size;

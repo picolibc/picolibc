@@ -224,8 +224,8 @@ fmemopen_truncates_buffer(const char *mode)
     /* glibc only truncates the file if "+" is the second char. */
     return (mode[1] == '+');
 #else
-    /* POSIX mandates truncation for w+ and wb+ */
-    return strchr(mode, '+') != 0;
+    /* POSIX mandates truncation whenever mode begins with 'w'. */
+    return true;
 #endif
 }
 

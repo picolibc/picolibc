@@ -80,7 +80,7 @@ flush_after_ungetc(void)
 {
     char  data[4] = { 'A', 'B', 'C', 'D' };
     FILE *f = fmemopen(data, sizeof(data), "r+");
-    int   first, next, flush_ret;
+    int   first, next, flush_ret, second_flush_ret;
     int   errors = 0;
 
     if (!f) {
@@ -98,19 +98,82 @@ flush_after_ungetc(void)
         printf("second ungetc unexpectedly succeeded\n");
         errors++;
     }
+    if (ftell(f) != 0) {
+        printf("ungetc: ftell is not 0\n");
+        errors++;
+    }
     flush_ret = fflush(f);
+    second_flush_ret = fflush(f);
     if (ftell(f) != 0) {
         printf("ungetc+fflush: ftell is not 0\n");
         errors++;
     }
     next = fgetc(f);
 
-    if (first != 'A' || flush_ret != 0 || next != 'A') {
-        printf("ungetc+fflush: first=%c fflush=%d next=%c\n", first, flush_ret, next);
+    if (first != 'A' || flush_ret != 0 || second_flush_ret != 0 || next != 'A') {
+        printf("ungetc+fflush: first=%c fflush=%d/%d next=%c\n", first, flush_ret, second_flush_ret,
+               next);
         errors++;
     }
     if (memcmp(data, "ABCD", sizeof(data)) != 0) {
         printf("ungetc+fflush corrupted buffer: %.4s\n", data);
+        errors++;
+    }
+    fclose(f);
+    return errors;
+}
+
+static int
+overwrite_and_flush(void)
+{
+    char  data[4] = { 'A', 'B', 'C', 'D' };
+    FILE *f = fmemopen(data, sizeof(data), "r+");
+    int   errors = 0;
+
+    if (!f) {
+        perror("fmemopen");
+        return 1;
+    }
+
+    if (fseek(f, 1, SEEK_SET) != 0 || fputc('X', f) != 'X' || fflush(f) != 0 || fflush(f) != 0) {
+        printf("overwrite+fflush failed\n");
+        errors++;
+    }
+    if (memcmp(data, "AXCD", sizeof(data)) != 0) {
+        printf("overwrite+fflush corrupted buffer\n");
+        errors++;
+    }
+    if (fclose(f) != 0) {
+        printf("overwrite+fclose failed\n");
+        errors++;
+    }
+    if (memcmp(data, "AXCD", sizeof(data)) != 0) {
+        printf("overwrite+fclose corrupted buffer\n");
+        errors++;
+    }
+    return errors;
+}
+
+static int
+ungetc_after_write_seek(void)
+{
+    char  data[4] = { 'A', 'B', 'C', 'D' };
+    FILE *f = fmemopen(data, sizeof(data), "r+");
+    int   errors = 0;
+
+    if (!f) {
+        perror("fmemopen");
+        return 1;
+    }
+
+    if (fseek(f, 1, SEEK_SET) != 0 || fputc('X', f) != 'X' || fseek(f, 2, SEEK_SET) != 0
+        || ungetc('Y', f) != 'Y' || ftell(f) != 1 || fflush(f) != 0 || fflush(f) != 0
+        || ftell(f) != 1 || fgetc(f) != 'X') {
+        printf("write+seek+ungetc+fflush failed\n");
+        errors++;
+    }
+    if (memcmp(data, "AXCD", sizeof(data)) != 0) {
+        printf("write+seek+ungetc+fflush corrupted buffer\n");
         errors++;
     }
     fclose(f);
@@ -149,6 +212,8 @@ main(void)
     errors += flush_after_read();
     errors += flush_after_ungetc();
     errors += write_after_flush();
+    errors += overwrite_and_flush();
+    errors += ungetc_after_write_seek();
 
     if (errors) {
         printf("%d fmemopen r+ failures\n", errors);
