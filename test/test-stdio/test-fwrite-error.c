@@ -45,6 +45,15 @@
 #include <string.h>
 #include <wchar.h>
 
+#ifndef __PICOLIBC__
+int
+main(void)
+{
+    printf("Picolibc fwrite buffering test skipped\n");
+    return 77;
+}
+#else
+
 static int    write_calls;
 static int    fail_on_call;
 static int    partial_on_call;
@@ -404,3 +413,4 @@ main(void)
     }
     return 0;
 }
+#endif
