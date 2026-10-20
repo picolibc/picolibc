@@ -69,10 +69,14 @@ if enable_native_tests and oslib_test_variant == ''
   tests += [
     'test-bufio-lock-init',
     'test-flockfile',
+    'test-freopen-linebuf-lock',
+    'test-ftrylockfile',
   ]
   test_extra_libs = {
     'test-bufio-lock-init' : native_lib,
-    'test-flockfile' : native_lib
+    'test-flockfile' : native_lib,
+    'test-freopen-linebuf-lock' : native_lib,
+    'test-ftrylockfile' : native_lib
   }
 endif
 

@@ -80,8 +80,12 @@ freopen(const char *pathname, const char *mode, FILE *stream)
 
     /* Reset buffer mode and size */
     buf_size = bufio_get_buf_size(fd);
-    if (buf_size != pf->size || (pf->bflags & __BLBF))
-        (pf->xfile.setvbuf ? pf->xfile.setvbuf : __bufio_setvbuf)(stream, NULL, _IOFBF, buf_size);
+    if (buf_size != pf->size || (pf->bflags & __BLBF)) {
+        if (pf->xfile.setvbuf)
+            (void)pf->xfile.setvbuf(stream, NULL, _IOFBF, buf_size);
+        else
+            (void)__bufio_setvbuf_locked(stream, NULL, _IOFBF, buf_size);
+    }
 
     ret = stream;
     __bufio_unlock(stream);

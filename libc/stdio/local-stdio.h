@@ -311,7 +311,7 @@ __funlockfile(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 {
     (void)f;
 #ifdef __STDIO_LOCKING
-    if (f->lock != __LOCK_NONE)
+    if (f->lock && f->lock != __LOCK_NONE)
         __lock_release_recursive(f->lock);
 #endif
 }

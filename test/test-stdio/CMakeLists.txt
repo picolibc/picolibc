@@ -39,12 +39,22 @@ set(tests
   test-open_memstream
   test-funopen
   test-fwrite-fast-path
+  test-fwrite-error
   test-put
   test-printf
   test-printf-scanf
   test-sprintf-percent-n
   test-sprintf-s
   test-ungetc
+  test-ungetc-reposition
+  test-fseek-failure
+  test-fflush-input-error
+  test-ungetc-fflush
+  test-fclose-flush-error
+  test-fflush-error
+  test-fdevclose-flush-error
+  test-fclose-locking-error
+  test-fdevclose-locking
   test-vfprintf-s
   test-vsnprintf-s
   )

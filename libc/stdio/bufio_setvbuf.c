@@ -36,12 +36,11 @@
 #include "local-stdio.h"
 
 int
-__bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
+__bufio_setvbuf_locked(FILE *f, char *buf, int mode, size_t size)
 {
     struct __file_bufio *bf = (struct __file_bufio *)f;
     int                  ret = -1;
 
-    __bufio_lock(f);
     if (__bufio_flush_locked(f) < 0) {
         ret = _FDEV_ERR;
         goto bail;
@@ -98,6 +97,16 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
     }
     ret = 0;
 bail:
+    return ret;
+}
+
+int
+__bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
+{
+    int ret;
+
+    __bufio_lock(f);
+    ret = __bufio_setvbuf_locked(f, buf, mode, size);
     __bufio_unlock(f);
     return ret;
 }

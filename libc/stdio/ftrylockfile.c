@@ -36,16 +36,19 @@
 #include "local-stdio.h"
 
 /*
- * This only serializes with other threads also using flockfile,
- * but it's about as good as we can reasonably manage without
- * actually adding per-file locking to every API. We also
- * don't have any try-lock ability in the picolibc lock API, so
- * we're stuck just blocking.
+ * The retarget lock API has no try-lock operation, so ftrylockfile
+ * blocks. It must nevertheless use the same lock that funlockfile
+ * releases: the per-FILE recursive lock under __STDIO_LOCKING, and the
+ * global libc lock otherwise.
  */
 int __no_thread_safety_analysis
 ftrylockfile(FILE *f)
 {
+#ifdef __STDIO_LOCKING
+    __flockfile(f);
+#else
     (void)f;
     __LIBC_LOCK();
+#endif
     return 0;
 }
