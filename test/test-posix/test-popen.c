@@ -70,6 +70,26 @@ check_popen(int mode, size_t size, int code)
     assert(errno == ECHILD);
 }
 
+static void
+check_waitpid_failure(void)
+{
+    FILE *p;
+    int   status;
+    pid_t child;
+
+    p = popen("exit 7", "w");
+    assert(p != NULL);
+
+    child = waitpid(-1, &status, 0);
+    assert(child > 0);
+    assert(WIFEXITED(status));
+    assert(WEXITSTATUS(status) == 7);
+
+    errno = 0;
+    assert(pclose(p) == -1);
+    assert(errno == ECHILD);
+}
+
 int
 main(void)
 {
@@ -93,5 +113,6 @@ main(void)
     check_popen(_IOFBF, 1, 3);
     check_popen(_IONBF, 0, 4);
     check_popen(_IOFBF, 4096, 5);
+    check_waitpid_failure();
     return 0;
 }
