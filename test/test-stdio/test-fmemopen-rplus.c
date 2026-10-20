@@ -57,6 +57,10 @@ flush_after_read(void)
 
     first = fgetc(f);
     flush_ret = fflush(f);
+    if (ftell(f) != 1) {
+        printf("read+fflush: ftell is not 1\n");
+        errors++;
+    }
     next = fgetc(f);
 
     if (first != 'A' || flush_ret != 0 || next != 'B') {
@@ -90,7 +94,15 @@ flush_after_ungetc(void)
         fclose(f);
         return 1;
     }
+    if (ungetc('B', f) != EOF) {
+        printf("second ungetc unexpectedly succeeded\n");
+        errors++;
+    }
     flush_ret = fflush(f);
+    if (ftell(f) != 0) {
+        printf("ungetc+fflush: ftell is not 0\n");
+        errors++;
+    }
     next = fgetc(f);
 
     if (first != 'A' || flush_ret != 0 || next != 'A') {
