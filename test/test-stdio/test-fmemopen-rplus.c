@@ -42,6 +42,15 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifndef __PICOLIBC__
+int
+main(void)
+{
+    printf("Picolibc fmemopen test skipped\n");
+    return 77;
+}
+#else
+
 static int
 flush_after_read(void)
 {
@@ -221,3 +230,4 @@ main(void)
     }
     return 0;
 }
+#endif
