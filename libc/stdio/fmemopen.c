@@ -101,7 +101,7 @@ __fmem_flush(FILE *f)
         }
         return 0;
     }
-    if (mf->dir == __SWR && mf->pos < mf->bufsize) {
+    if (mf->dir == __SWR && (f->flags & __SWR) && mf->pos < mf->bufsize) {
         mf->buf[mf->pos] = '\0';
         if (mf->pos > mf->size) {
             mf->size = mf->pos;
