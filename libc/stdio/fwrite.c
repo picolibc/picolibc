@@ -98,6 +98,11 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
         for (j = 0; j < size; j++)
             if (stream->put(*cp++, stream) < 0) {
                 stream->flags |= __SERR;
+
+                /* A failed bufio flush drops the buffer, so prior elements
+                 * from this call were not committed either. */
+                if (stream->flags & __SBUF)
+                    i = 0;
                 __funlock_return(stream, i);
             }
 

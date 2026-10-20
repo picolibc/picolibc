@@ -167,6 +167,38 @@ test_direct_preflush_error(void)
 }
 
 static int
+test_partial_element_error(void)
+{
+    char          file_buf[8];
+    unsigned char first[2] = { 'a', 'b' };
+    unsigned char second[6] = { 'c', 'd', 'e', 'f', 'g', 'h' };
+    FILE         *f = fopencookie(NULL, "w", funcs);
+    size_t        r1, r2;
+    int           errors;
+
+    if (!f)
+        return 1;
+    if (setvbuf(f, file_buf, _IOFBF, sizeof(file_buf)) != 0) {
+        fclose(f);
+        return 1;
+    }
+
+    fail_writes = 0;
+    r1 = fwrite(first, 2, 1, f);
+    fail_writes = 1;
+    r2 = fwrite(second, 2, 3, f);
+
+    errors = 0;
+    if (r1 != 1) {
+        printf("partial: first fwrite=%zu\n", r1);
+        errors++;
+    }
+    errors += check_error(f, "partial", r2, 0);
+    fclose(f);
+    return errors;
+}
+
+static int
 test_char_path_error(void)
 {
     char   storage[4] = { 0 };
@@ -196,6 +228,7 @@ main(void)
     int errors = 0;
 
     errors += test_buffered_error();
+    errors += test_partial_element_error();
     errors += test_direct_preflush_error();
     errors += test_char_path_error();
 
