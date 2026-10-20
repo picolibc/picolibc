@@ -184,9 +184,11 @@ __ftoa_engine(uint32_t val, struct dtoa *ftoa, int maxDigits, bool fmode, int ma
         decimal *= 10;
         if (prod >= (decimal >> 1)) {
             uint8_t rounded;
+            int     saveOutputIdx;
         round_up:
 
             rounded = 0;
+            saveOutputIdx = outputIdx;
             while (outputIdx != 0) {
 
                 /* Increment digit, check if we're done */
@@ -207,10 +209,12 @@ __ftoa_engine(uint32_t val, struct dtoa *ftoa, int maxDigits, bool fmode, int ma
                  * The remaining digits will already be '0',
                  * so we don't need to mess with them
                  */
-                ftoa->digits[0] = '1';
                 exp10++;
-                if (fmode)
+                if (fmode) {
+                    ftoa->digits[saveOutputIdx] = '0';
                     maxDigits = min(saveMaxDigits, max(1, maxDecimals + exp10 + 1));
+                }
+                ftoa->digits[0] = '1';
             }
         }
         ftoa->exp = exp10;
