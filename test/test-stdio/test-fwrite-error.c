@@ -45,7 +45,21 @@
 #include <string.h>
 #include <wchar.h>
 
-static int fail_writes;
+static int    write_calls;
+static int    fail_on_call;
+static int    partial_on_call;
+static size_t partial_count;
+static size_t backend_bytes;
+
+static void
+reset_backend(int fail_call, int partial_call, size_t partial)
+{
+    write_calls = 0;
+    fail_on_call = fail_call;
+    partial_on_call = partial_call;
+    partial_count = partial;
+    backend_bytes = 0;
+}
 
 static ssize_t
 cookie_write(void *cookie, const char *buf, size_t n)
@@ -53,10 +67,14 @@ cookie_write(void *cookie, const char *buf, size_t n)
     (void)cookie;
     (void)buf;
     (void)n;
-    if (fail_writes) {
+    write_calls++;
+    if (write_calls == fail_on_call) {
         errno = EIO;
         return -1;
     }
+    if (write_calls == partial_on_call && n > partial_count)
+        n = partial_count;
+    backend_bytes += n;
     return (ssize_t)n;
 }
 
@@ -75,12 +93,13 @@ static cookie_io_functions_t funcs = {
 };
 
 static int
-check_error(FILE *f, const char *what, size_t count, size_t want_max)
+check_error(FILE *f, const char *what, size_t count, size_t want)
 {
     int errors = 0;
+    int saved_errno = errno;
 
-    if (count > want_max) {
-        printf("%s: count %zu > %zu\n", what, count, want_max);
+    if (count != want) {
+        printf("%s: count %zu != %zu\n", what, count, want);
         errors++;
     }
     if (ferror(f) == 0) {
@@ -91,8 +110,12 @@ check_error(FILE *f, const char *what, size_t count, size_t want_max)
         printf("%s: false EOF\n", what);
         errors++;
     }
-    if (fwide(f, 0) > 0) {
-        printf("%s: false wide orientation\n", what);
+    if (fwide(f, 0) >= 0) {
+        printf("%s: stream is not byte-oriented\n", what);
+        errors++;
+    }
+    if (saved_errno != EIO) {
+        printf("%s: errno=%d instead of EIO\n", what, saved_errno);
         errors++;
     }
     return errors;
@@ -115,9 +138,10 @@ test_buffered_error(void)
         return 1;
     }
 
-    fail_writes = 0;
+    reset_backend(0, 0, 0);
     r1 = fwrite(first, 1, sizeof(first), f);
-    fail_writes = 1;
+    reset_backend(1, 0, 0);
+    errno = 0;
     r2 = fwrite(second, 1, sizeof(second), f);
 
     errors = 0;
@@ -126,6 +150,7 @@ test_buffered_error(void)
         errors++;
     }
     errors += check_error(f, "buffered", r2, sizeof(second) - 1);
+    reset_backend(0, 0, 0);
     fclose(f);
     return errors;
 }
@@ -148,9 +173,10 @@ test_direct_preflush_error(void)
         return 1;
     }
 
-    fail_writes = 0;
+    reset_backend(0, 0, 0);
     r1 = fwrite(first, 1, sizeof(first), f);
-    fail_writes = 1;
+    reset_backend(1, 0, 0);
+    errno = 0;
     r2 = fwrite(large, 1, sizeof(large), f);
 
     errors = 0;
@@ -158,7 +184,8 @@ test_direct_preflush_error(void)
         printf("direct: first fwrite=%zu\n", r1);
         errors++;
     }
-    errors += check_error(f, "direct", r2, sizeof(large) - 1);
+    errors += check_error(f, "direct", r2, 0);
+    reset_backend(0, 0, 0);
     fclose(f);
     return errors;
 #else
@@ -183,9 +210,10 @@ test_partial_element_error(void)
         return 1;
     }
 
-    fail_writes = 0;
+    reset_backend(0, 0, 0);
     r1 = fwrite(first, 2, 1, f);
-    fail_writes = 1;
+    reset_backend(1, 0, 0);
+    errno = 0;
     r2 = fwrite(second, 2, 3, f);
 
     errors = 0;
@@ -193,9 +221,120 @@ test_partial_element_error(void)
         printf("partial: first fwrite=%zu\n", r1);
         errors++;
     }
-    errors += check_error(f, "partial", r2, 0);
+    errors += check_error(f, "partial", r2, 2);
+    reset_backend(0, 0, 0);
     fclose(f);
     return errors;
+}
+
+static int
+test_later_flush_error(size_t size)
+{
+#ifndef __FAST_BUFIO
+    char          file_buf[4];
+    unsigned char data[8] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+    FILE         *f = fopencookie(NULL, "w", funcs);
+    size_t        count;
+    int           errors = 0;
+
+    if (!f)
+        return 1;
+    if (setvbuf(f, file_buf, _IOFBF, sizeof(file_buf)) != 0) {
+        fclose(f);
+        return 1;
+    }
+
+    reset_backend(2, 0, 0);
+    errno = 0;
+    count = fwrite(data, size, sizeof(data) / size, f);
+    errors += check_error(f, size == 1 ? "later-flush-byte" : "later-flush-element", count,
+                          size == 1 ? 7 : 3);
+    if (backend_bytes != 4) {
+        printf("later flush: backend bytes %zu != 4\n", backend_bytes);
+        errors++;
+    }
+    reset_backend(0, 0, 0);
+    fclose(f);
+    return errors;
+#else
+    (void)size;
+    return 0;
+#endif
+}
+
+static int
+test_partial_backend_error(void)
+{
+#ifndef __FAST_BUFIO
+    char          file_buf[4];
+    unsigned char data[4] = { 'a', 'b', 'c', 'd' };
+    FILE         *f = fopencookie(NULL, "w", funcs);
+    size_t        count;
+    int           errors = 0;
+
+    if (!f)
+        return 1;
+    if (setvbuf(f, file_buf, _IOFBF, sizeof(file_buf)) != 0) {
+        fclose(f);
+        return 1;
+    }
+
+    reset_backend(2, 1, 2);
+    errno = 0;
+    count = fwrite(data, 1, sizeof(data), f);
+    errors += check_error(f, "partial-backend", count, 3);
+    if (backend_bytes != 2) {
+        printf("partial backend: bytes %zu != 2\n", backend_bytes);
+        errors++;
+    }
+    reset_backend(0, 0, 0);
+    fclose(f);
+    return errors;
+#else
+    return 0;
+#endif
+}
+
+static int
+test_direct_partial_error(size_t size)
+{
+#ifdef __FAST_BUFIO
+    char          file_buf[8];
+    unsigned char prefix[2] = { 'x', 'y' };
+    unsigned char data[8] = { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h' };
+    FILE         *f = fopencookie(NULL, "w", funcs);
+    size_t        first, count;
+    int           errors = 0;
+
+    if (!f)
+        return 1;
+    if (setvbuf(f, file_buf, _IOFBF, sizeof(file_buf)) != 0) {
+        fclose(f);
+        return 1;
+    }
+
+    reset_backend(0, 0, 0);
+    first = fwrite(prefix, 1, sizeof(prefix), f);
+    reset_backend(3, 2, 3);
+    errno = 0;
+    count = fwrite(data, size, sizeof(data) / size, f);
+    if (first != sizeof(prefix)) {
+        printf("direct partial: prefix=%zu\n", first);
+        errors++;
+    }
+    errors += check_error(f, size == 1 ? "direct-partial-byte" : "direct-partial-element", count,
+                          3 / size);
+    if (backend_bytes != sizeof(prefix) + 3) {
+        printf("direct partial: backend bytes %zu != %zu\n", backend_bytes, sizeof(prefix) + 3);
+        errors++;
+    }
+    reset_backend(0, 0, 0);
+    fclose(f);
+    return errors;
+#else
+    (void)size;
+    return 0;
+#endif
 }
 
 static int
@@ -210,14 +349,35 @@ test_char_path_error(void)
     if (!f)
         return 1;
     written = fwrite(data, 1, sizeof(data), f);
-    if (written >= sizeof(data)) {
-        printf("char: fwrite claimed %zu\n", written);
+    if (written != sizeof(storage)) {
+        printf("char: fwrite returned %zu instead of %zu\n", written, sizeof(storage));
         errors++;
     }
     if (!ferror(f)) {
         printf("char: ferror is clear\n");
         errors++;
     }
+    fclose(f);
+    return errors;
+}
+
+static int
+test_zero_length(void)
+{
+    unsigned char data[1] = { 'a' };
+    FILE         *f = fopencookie(NULL, "w", funcs);
+    int           errors = 0;
+
+    if (!f)
+        return 1;
+    reset_backend(1, 0, 0);
+    errno = EDOM;
+    if (fwrite(data, 0, 1, f) != 0 || fwrite(data, 1, 0, f) != 0 || errno != EDOM || ferror(f) != 0
+        || feof(f) != 0 || fwide(f, 0) >= 0) {
+        printf("zero-length fwrite changed stream state\n");
+        errors++;
+    }
+    reset_backend(0, 0, 0);
     fclose(f);
     return errors;
 }
@@ -229,8 +389,14 @@ main(void)
 
     errors += test_buffered_error();
     errors += test_partial_element_error();
+    errors += test_later_flush_error(1);
+    errors += test_later_flush_error(2);
+    errors += test_partial_backend_error();
     errors += test_direct_preflush_error();
+    errors += test_direct_partial_error(1);
+    errors += test_direct_partial_error(2);
     errors += test_char_path_error();
+    errors += test_zero_length();
 
     if (errors) {
         printf("%d fwrite error-check failures\n", errors);
