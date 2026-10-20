@@ -41,6 +41,7 @@ tests = [
   'test-fopencookie',
   'test-funopen',
   'test-fwrite-fast-path',
+  'test-fwrite-error',
   'test-put',
   'test-sprintf-percent-n',
   'test-sprintf-s',

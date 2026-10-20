@@ -39,6 +39,7 @@ set(tests
   test-open_memstream
   test-funopen
   test-fwrite-fast-path
+  test-fwrite-error
   test-put
   test-printf
   test-printf-scanf
