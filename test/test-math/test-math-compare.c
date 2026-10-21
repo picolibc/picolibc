@@ -38,6 +38,7 @@
 #endif
 
 #define _GNU_SOURCE
+#define _ISOC23_SOURCE
 #include "test-math.h"
 
 #define FNAME MATH_STRING(TEST_FUNC)

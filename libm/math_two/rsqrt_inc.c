@@ -42,6 +42,12 @@
  * Compute 1/sqrt(x) using Newton's method
  */
 
+#define MAX_LOOPS 128
+
+#define __str(n)  #n
+#define _str(n)   __str(n)
+#define STR_NAME  _str(name(rsqrt))
+
 float_t
 name(rsqrt)(float_t x)
 {
@@ -59,11 +65,24 @@ name(rsqrt)(float_t x)
 
     frac = name(frexp)(x, &exp);
 
-    ff_t yy = f_to_ff(name(ldexp)(frac / 2, exp / 2));
-    ff_t xx = f_to_ff(x);
+    /*
+     * sqrt(x*2^2n) = 2^n * sqrt(x)
+     *
+     * sqrt(x*2^(2n+1)) = 2^n * sqrt(2x)
+     */
+
+    if (exp & 1)
+        frac *= 2;
+
+    /* floor(exp/2) */
+    exp = asr(exp, 1);
+
+    ff_t xx = f_to_ff(frac);
+    ff_t yy = f_to_ff(frac * float_f(0.75));
 
     int  loop;
-    int  bounds = 128;
+
+    int  bounds = MAX_LOOPS;
 
     for (loop = 0; loop < bounds; loop++) {
         ff_t qq = ff_div_ff(xx, yy);
@@ -71,18 +90,20 @@ name(rsqrt)(float_t x)
         ff_t nn = { .hi = ss.hi / 2, .lo = ss.lo / 2 };
 
         /*
-         * Once the upper term is stable, run the loop twice more to
+         * Once the upper term is stable, run the loop once more to
          * compute the lower term
          */
-        if (bounds > loop + 2 && nn.hi == yy.hi)
-            bounds = loop + 2;
+        if (bounds == MAX_LOOPS && nn.hi == yy.hi)
+            bounds = loop + 1;
 
         yy = nn;
     }
 
     yy = ff_div_ff(f_to_ff(1), yy);
 
-    return yy.hi;
+    float_t y = name(ldexp)(yy.hi, -exp);
+
+    return y;
 }
 
 #if defined(WANT_FLOAT32)

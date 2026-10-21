@@ -170,7 +170,7 @@ functions = [ 'acos', 'acosh', 'acospi', 'asin', 'asinh', 'asinpi',
               'cosh', 'cospi', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
               'expm1', 'exp10m1', 'exp2m1', 'floor', 'j0', 'j1',
               'lgamma', 'log', 'log10', 'log1p', 'log2', 'log10p1',
-              'log2p1', 'round', 'roundeven', 'sin', 'sinpi',
+              'log2p1', 'round', 'roundeven', 'rsqrt', 'sin', 'sinpi',
               'sincos_cos', 'sincos_sin', 'sinh', 'sqrt', 'tan',
               'tanh', 'tanpi', 'tgamma', 'y0', 'y1', ]
 

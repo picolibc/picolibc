@@ -121,10 +121,9 @@ static TEST_CONST math_ulps_t math_ulps[] = {
     { .name = "remquo_quo",    .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "round",         .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
     { .name = "roundeven",     .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 0       },
-#if defined(__riscv_float_abi_soft) || defined(__clang__)
     { .name = "rsqrt",         .b32 = 0,       .b64 = 0,       .b80 = 0,       .b128 = 1       },
-#elif defined(__RX__)
-    { .name = "rsqrt", .b32 = 1, .b64 = 1, .b80 = 0, .b128 = 0 },
+#if defined(__RX__)
+    { .name = "rsqrt",         .b32 = 1,       .b64 = 1,       .b80 = 0,       .b128 = 0       },
 #else
     { .name = "rsqrt", .b32 = 0, .b64 = 0, .b80 = 0, .b128 = 0 },
 #endif
