@@ -225,7 +225,13 @@ hence the size) of the library:
    machine registers as those functions are often quite large and
    slow. Applications using soft division on large values elsewhere
    will save space by disabling this option as that avoids including
-   custom divide-and-modulus-by-ten implementations.
+   custom divide-and-modulus-by-ten implementations.  With the option
+   enabled, the divide-free conversions are selected at every
+   optimization level; at `-O1` and above the compiler's constant
+   division may remain for the constant divisors.  Disabling the
+   option is honoured at `-O0` and when optimising for size (`-Os`,
+   `-Oz`); at `-Og`, `-O1`, `-O2` and `-O3` the divide-free
+   conversions are selected regardless of this setting.
 
  * `-Dprintf-percent-n=true` This option, which is disabled by default,
    provides support for the dangerous %n printf format specifier.
