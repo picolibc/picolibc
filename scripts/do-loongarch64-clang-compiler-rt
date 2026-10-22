@@ -1,0 +1,27 @@
+#!/bin/sh
+# Build the loongarch64-unknown-elf baremetal compiler-rt builtins.
+# The resulting libclang_rt.builtins-loongarch64.a must be linked
+# manually into test/program builds; clang does not ship it and
+# --rtlib=compiler-rt does not work for this target.
+
+set -e
+
+cmake -G Ninja -S compiler-rt -B build-rt-loongarch \
+  -DCMAKE_C_COMPILER=clang \
+  -DCMAKE_C_COMPILER_TARGET=loongarch64-unknown-elf \
+  "-DCMAKE_C_FLAGS= -ffreestanding -fno-stack-protector -Xclang -nostdsysteminc" \
+  -DCMAKE_TRY_COMPILE_TARGET_TYPE=STATIC_LIBRARY \
+  -DCOMPILER_RT_BAREMETAL_BUILD=ON \
+  -DCOMPILER_RT_OS_DIR="baremetal" \
+  -DCOMPILER_RT_BUILD_BUILTINS=ON \
+  -DCOMPILER_RT_BUILD_LIBFUZZER=OFF \
+  -DCOMPILER_RT_BUILD_PROFILE=OFF \
+  -DCOMPILER_RT_BUILD_SANITIZERS=OFF \
+  -DCOMPILER_RT_BUILD_XRAY=OFF \
+  -DCOMPILER_RT_BUILD_GWP_ASAN=OFF \
+  -DCOMPILER_RT_BUILD_MEMPROF=OFF \
+  -DCOMPILER_RT_BUILD_ORC=OFF \
+  -DCOMPILER_RT_DEFAULT_TARGET_ONLY=ON \
+  -DCMAKE_BUILD_TYPE=Release
+
+cd build-rt-loongarch && ninja
