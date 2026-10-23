@@ -316,15 +316,21 @@ __funlockfile(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 #endif
 }
 
-static inline void
+static inline int
 __flockfile_close(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 {
     (void)f;
 #ifdef __STDIO_LOCKING
+    int ret = 0;
+
     if (f->lock && f->lock != __LOCK_NONE) {
-        fflush(f);
+        ret = fflush(f);
         __lock_close(f->lock);
+        f->lock = __LOCK_NONE;
     }
+    return ret;
+#else
+    return 0;
 #endif
 }
 
@@ -855,7 +861,10 @@ __fflush_locked(FILE *stream)
     int ret = 0;
     if (stream->flush)
         ret = (stream->flush)(stream);
-    __atomic_store_ungetc(&stream->unget, 0);
+    if (ret < 0)
+        stream->flags |= __SERR;
+    if (ret >= 0)
+        __atomic_store_ungetc(&stream->unget, 0);
     return ret;
 }
 
