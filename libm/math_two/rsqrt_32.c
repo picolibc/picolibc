@@ -166,7 +166,6 @@ float rsqrtf(float x)
                 mantissa<<=shift; // normalize subnormal
                 shift= -126 - shift;
                 mantissa <<= shift & 1 ;
-                //int32_t newExp = (-(shift>>1)) +127-2;
                 int32_t newExp = -asr(shift,1) +127-2;
                 uint32_t new_mantissa=mantissa_rsqrt(mantissa);
                 return asfloat(new_mantissa + ((uint32_t)newExp << 23));
