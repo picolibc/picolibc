@@ -194,7 +194,7 @@ float rsqrtf(float x)
             errno = EDOM;
             #endif
             //rsqrt(negative)=qNaN
-            return nanf();
+            return nanf("");
         }
     }
 }
@@ -283,7 +283,7 @@ float sqrtf(float x)
             errno = EDOM;
             #endif
             //sqrt(negative)=qNaN
-            return nanf();
+            return nanf("");
         }
 
     }
