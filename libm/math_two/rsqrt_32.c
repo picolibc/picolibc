@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 #define _ISOC23_SOURCE
+#define WANT_FLOAT32
 #include "math_two.h"
 
 #define QUIET_NAN ((255u << 23) | (1u << 22) | 1u)
@@ -142,7 +143,8 @@ float rsqrtf(float x)
             else
             {
                 __math_set_invalid();
-                return asfloat(QUIET_NAN);
+                //pass through NaN unmodified
+                return asfloat(xu);
             }
         }
         else //normal case
@@ -192,12 +194,13 @@ float rsqrtf(float x)
             errno = EDOM;
             #endif
             //rsqrt(negative)=qNaN
-            return asfloat(QUIET_NAN);
+            return nanf();
         }
     }
 }
 #endif
 
+_MATH_ALIAS_f_f(rsqrt)
 
 //sqrtf implementation, can be enabled on soft-float targets
 #if 0
@@ -233,7 +236,7 @@ float sqrtf(float x)
             else
             {
                 __math_set_invalid();
-                return asfloat(QUIET_NAN);
+                return asfloat(xu);
             }
         }
         else
@@ -280,7 +283,7 @@ float sqrtf(float x)
             errno = EDOM;
             #endif
             //sqrt(negative)=qNaN
-            return asfloat(QUIET_NAN);
+            return nanf();
         }
 
     }
