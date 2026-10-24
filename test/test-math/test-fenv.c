@@ -206,6 +206,87 @@ static const struct {
 
 #define NUM_EXCEPTS (sizeof(excepts) / sizeof(excepts[0]))
 
+/*
+ * Make sure fegetenv/fesetenv and feholdexcept/feupdateenv save and
+ * restore both the rounding mode and the exception flags
+ */
+static int
+test_env(void)
+{
+    int    result = 0;
+    int    round_ok = 0;
+    fenv_t env;
+    int    e;
+
+    (void)env;
+    (void)round_ok;
+    (void)e;
+#if defined(FE_DOWNWARD) && defined(FE_TONEAREST)
+    if (fesetround(FE_DOWNWARD) == 0 && fegetround() == FE_DOWNWARD)
+        round_ok = 1;
+    if (round_ok) {
+        fegetenv(&env);
+        fesetround(FE_TONEAREST);
+        fesetenv(&env);
+        e = fegetround();
+        if (e != FE_DOWNWARD) {
+            printf("fesetenv: expect rounding mode %d got %d\n", FE_DOWNWARD, e);
+            result = 1;
+        }
+    }
+    fesetround(FE_TONEAREST);
+#endif
+#if FE_DIVBYZERO && FE_INVALID
+    if (math_errhandling & MATH_ERREXCEPT) {
+        feclearexcept(FE_ALL_EXCEPT);
+        feraiseexcept(FE_DIVBYZERO);
+        if (fetestexcept(FE_DIVBYZERO)) {
+#ifdef FE_DOWNWARD
+            if (round_ok)
+                fesetround(FE_DOWNWARD);
+#endif
+            feholdexcept(&env);
+            e = fetestexcept(FE_ALL_EXCEPT);
+            if (e != 0) {
+                printf("feholdexcept: expect %s got %s\n", e_to_str(0), e_to_str(e));
+                result = 1;
+            }
+#ifdef FE_DOWNWARD
+            if (round_ok) {
+                e = fegetround();
+                if (e != FE_DOWNWARD) {
+                    printf("feholdexcept: expect rounding mode %d got %d\n", FE_DOWNWARD, e);
+                    result = 1;
+                }
+                fesetround(FE_TONEAREST);
+            }
+#endif
+            feraiseexcept(FE_INVALID);
+            feupdateenv(&env);
+            e = fetestexcept(FE_DIVBYZERO | FE_INVALID);
+            if (e != (FE_DIVBYZERO | FE_INVALID)) {
+                printf("feupdateenv: expect FE_DIVBYZERO|FE_INVALID got 0x%x\n", e);
+                result = 1;
+            }
+#ifdef FE_DOWNWARD
+            if (round_ok) {
+                e = fegetround();
+                if (e != FE_DOWNWARD) {
+                    printf("feupdateenv: expect rounding mode %d got %d\n", FE_DOWNWARD, e);
+                    result = 1;
+                }
+            }
+#endif
+        }
+        feclearexcept(FE_ALL_EXCEPT);
+    }
+#endif
+#ifdef FE_TONEAREST
+    fesetround(FE_TONEAREST);
+#endif
+    return result;
+}
+
 int
 main(void)
 {
@@ -261,5 +342,7 @@ main(void)
             }
         }
     }
+    if (test_env())
+        result = 1;
     return result;
 }
