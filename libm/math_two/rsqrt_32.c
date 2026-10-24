@@ -136,7 +136,7 @@ float rsqrtf(float x)
         {
             // 1 / sqrt(+Inf) = +0
             // 1 / sqrt(NaN) = qNaN
-            if ((xu == INF))
+            if (xu == INF)
             {
                 return asfloat(0);
             }
