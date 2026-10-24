@@ -44,7 +44,7 @@
 #if !(__OBSOLETE_MATH_FLOAT)
 float rsqrtf(float x)
 {
-    return (1.0/(double)x)*sqrt((double)x);
+    return 1.0/sqrt((double)x);
 }
 
 #else
