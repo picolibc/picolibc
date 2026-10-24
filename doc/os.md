@@ -72,7 +72,7 @@ static FILE __stdio = FDEV_SETUP_STREAM(sample_putc,
 
 This defines a FILE which can read and write characters using the putc
 and getc functions described above, but not using any flush
-function. The final paramter, which specifies the operations
+function. The final parameter, which specifies the operations
 supported, can be one of the following:
 
 | Mode              | Operations | Required Functions |
@@ -120,7 +120,7 @@ Picolibc and which source files reference them.
    + libc/ssp/stack/protector.c
    + libc/stdlib/arc4random.c
 
- * int gettimeofday(struct timeval *tv, sruct timezone *tz)
+ * int gettimeofday(struct timeval *tv, struct timezone *tz)
 
    + libc/time/time.c
 
