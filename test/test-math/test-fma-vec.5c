@@ -89,11 +89,13 @@ format_or_none_t none_format = { .none = <> };
  */
 
 float_t
-round(float_t f, format_t format, format_or_none_t i_format, rounding_mode_t rm)
+round(float_t f, format_t format, format_or_none_t i_format, rounding_mode_t rm, &bool exact)
 {
+	exact = true;
+
 	union switch (i_format) {
 	case format format:
-		f = round(f, format, none_format, rm);
+		f = round(f, format, none_format, rm, &exact);
 		break;
 	case none:
 		break;
@@ -216,14 +218,20 @@ round(float_t f, format_t format, format_or_none_t i_format, rounding_mode_t rm)
 			mant /= 2;
 		}
 
+		float_t new_f = f;
+
 		/* Overflow to infinity */
 		if (exp > format.max_exp) {
-			f.u.inf = <>;
+			new_f.u.inf = <>;
 		} else {
-			f.u.num = mant * 2 ** exp;
-			if (f.sign)
-				f.u.num = -f.u.num;
+			new_f.u.num = mant * 2 ** exp;
+			if (new_f.sign)
+				new_f.u.num = -new_f.u.num;
 		}
+
+		if (new_f != f)
+			exact = false;
+		f = new_f;
 		break;
 	case nan:
 	case inf:
@@ -326,7 +334,7 @@ plus(float_t a, float_t b)
 	if (isinf(a)) {
 		/* inf + -inf is NaN */
 		if (isinf(b) && a.sign != b.sign)
-			return (float_t) { .sign = true, .u = { .nan = <> } };
+			return (float_t) { .sign = false, .u = { .nan = <> } };
 		return a;
 	}
 	if (isinf(b)) {
@@ -381,6 +389,34 @@ max_exp(int exp_bits)
 	return (2**(exp_bits-1));
 }
 
+void generate_one(string suf, format_t format, format_or_none_t i_format, real x_r, real y_r, real z_r)
+{
+	void print_result(float_t r, rounding_mode_t rounding_mode) {
+		bool exact;
+		float_t rounded = round(r, format, i_format, rounding_mode, &exact);
+		printf(" { .r = %-17s, .exact = %-5s }, ",
+		       strfromfloat(rounded, suf),
+		       exact ? "true" : "false");
+	}
+
+	float_t real_to_float(real r) {
+		bool exact;
+		return round(make_float(r), format, none_format, rounding_mode_t.TONEAREST, &exact);
+	}
+
+	float_t x = real_to_float(x_r);
+	float_t y = real_to_float(y_r);
+	float_t z = real_to_float(z_r);
+
+	printf("{ .line = __LINE__, .x = %-17s, .y = %-17s, .z = %-17s, .r = {", strfromfloat(x, suf), strfromfloat(y, suf), strfromfloat(z, suf));
+	float_t r = plus(times(x, y), z);
+	print_result(r, rounding_mode_t.TONEAREST);
+	print_result(r, rounding_mode_t.UPWARD);
+	print_result(r, rounding_mode_t.DOWNWARD);
+	print_result(r, rounding_mode_t.TOWARDZERO);
+	printf(" } },\n");
+}
+
 /*
  * Generate a set of test vectors for the specified floating point
  * format
@@ -396,27 +432,35 @@ void generate(string suf, format_t format, format_or_none_t i_format)
 
 	int i = 0;
 
+	bool exact;
+
 	/* Check +/- z */
 	for (int zs = -1; zs <= 1; zs += 2) {
 		for (int ze = format.first_exp; ze <= format.last_exp; ze = next_exp(ze, format)) {
-			float_t z = round(make_float(zs * val * (2 ** ze)), format, none_format, rounding_mode_t.TONEAREST);
+			real z = zs * val * (2 ** ze);
 			for (int ye = format.first_exp; ye <= format.last_exp; ye = next_exp(ye, format)) {
-				float_t y = round(make_float(val * (2 ** ye)), format, none_format, rounding_mode_t.TONEAREST);
+				real y = val * (2 ** ye);
 				for (int xs = -1; xs <= 1; xs += 2) {
 					for (int xe = format.first_exp; xe <= format.last_exp; xe = next_exp(xe, format)) {
-						float_t x = round(make_float(xs * val * (2 ** xe)), format, none_format, rounding_mode_t.TONEAREST);
-						printf(" /* %4d */ { %-17s, %-17s, %-17s, {", i, strfromfloat(x, suf), strfromfloat(y, suf), strfromfloat(z, suf));
-						float_t r = plus(times(x, y), z);
-						printf(" %s,", strfromfloat(round(r, format, i_format, rounding_mode_t.TONEAREST), suf));
-						printf(" %s,", strfromfloat(round(r, format, i_format, rounding_mode_t.UPWARD), suf));
-						printf(" %s,", strfromfloat(round(r, format, i_format, rounding_mode_t.DOWNWARD), suf));
-						printf(" %s" , strfromfloat(round(r, format, i_format, rounding_mode_t.TOWARDZERO), suf));
-						printf(" } },\n");
+						real x = xs * val * (2 ** xe);
+						generate_one(suf, format, i_format, x, y, z);
 						i++;
 					}
 				}
 			}
 		}
+	}
+}
+
+typedef struct {
+	real x, y, z, r;
+} exact_t;
+
+void generate_exact(string suf, format_t format, format_or_none_t i_format, exact_t[] e)
+{
+	for (int i = 0; i < dim(e); i++) {
+		generate_one(suf, format, i_format,
+			     e[i].x, e[i].y, e[i].z);
 	}
 }
 
@@ -427,6 +471,19 @@ format_t ieee_32 = {
 	.max_exp = max_exp(8),
 };
 
+exact_t[] exact_32 = {
+    { .x = -0xd2e6b4p-27, .y = 0x8c5c7fp-28,  .z = 0xe744bcp-32,  .r = 0xdb9680p-60  },
+    { .x = 0x9818e8p-24,  .y = -0xe8e25dp-21, .z = 0x8a5d10p-21,  .r = 0x8223b8p-45  },
+    { .x = -0xeb0d54p-28, .y = -0x8d116ep-23, .z = -0x818658p-27, .r = 0x993860p-53  },
+    { .x = 0x90c192p-28,  .y = 0xa170b3p-19,  .z = -0xb692ecp-24, .r = 0xb93916p-47  },
+    { .x = -0x95e60ap-23, .y = 0xb898d1p-29,  .z = 0xd82da4p-29,  .r = -0x9af8a8p-54 },
+    { .x = -0xa217bep-25, .y = 0x8a6a63p-28,  .z = 0xaf4851p-30,  .r = -0xdfb4f4p-54 },
+    { .x = -0xae97bap-27, .y = -0x923a73p-19, .z = -0xc774cap-23, .r = -0xed9b90p-49 },
+    { .x = 0x98f135p-21,  .y = 0x907a70p-29,  .z = -0xaca1a6p-27, .r = 0xacc930p-50  },
+    { .x = 0x881ed1p-23,  .y = 0xf731afp-20,  .z = -0x837027p-19, .r = -0xcbdc42p-44 },
+    { .x = -0xccdd20p-21, .y = -0xd7ee05p-18, .z = -0xaccc30p-15, .r = -0x8bee60p-39 },
+};
+
 format_t ieee_64 = {
 	.bits = 53,
 	.exp_bits = 11,
@@ -434,11 +491,97 @@ format_t ieee_64 = {
 	.max_exp = max_exp(11),
 };
 
+exact_t[] exact_64 = {
+    { .x = -0x13c73112bd4acep-50,
+     .y = 0x1af21fc1d3fcffp-56,
+     .z = 0x10a77de31b7437p-53,
+     .r = -0x13555febf49664p-107 },
+    { .x = -0x11412f6bf46c69p-48,
+     .y = 0x12563a8ede0d7ap-46,
+     .z = 0x13c652deb51eecp-42,
+     .r = 0x10fe11c5ea01ecp-95   },
+    { .x = -0x1b34a9b1fee08fp-49,
+     .y = 0x1e993bcc011cddp-57,
+     .z = 0x1a03a5b8c38954p-53,
+     .r = 0x15ea4743b3011ap-107  },
+    { .x = 0x18a357f1d69ed6p-51,
+     .y = 0x11f10110a3d6b2p-47,
+     .z = -0x1ba0ab7173db37p-46,
+     .r = -0x126e45edbcab34p-98  },
+    { .x = -0x15ccb1fe3b890bp-51,
+     .y = -0x1c62a262c33a4fp-48,
+     .z = -0x13564d3f1ba57bp-46,
+     .r = -0x1c82cdd4ccde6cp-101 },
+    { .x = -0x1ec635f0ce5835p-53,
+     .y = -0x1fcc551df9fd78p-58,
+     .z = -0x1e9485b47a5b81p-58,
+     .r = 0x13ab47cd395cecp-110  },
+    { .x = -0x17ec75bd0561e6p-52,
+     .y = -0x1fe362df1582b0p-57,
+     .z = -0x17d7115d429144p-56,
+     .r = 0x1df16622903440p-110  },
+    { .x = 0x11950366d22876p-54,
+     .y = -0x1dc6d5d1bc52d9p-50,
+     .z = 0x105c4a9556049ep-51,
+     .r = 0x13cad13d1ef3fdp-103  },
+    { .x = 0x15d8de5bd86d40p-52,
+     .y = -0x12a7cf26a2c0bdp-56,
+     .z = 0x19791c92b02d2ep-56,
+     .r = -0x14dbe30ce2a100p-110 },
+    { .x = 0x1bd0ec88daf401p-49,
+     .y = 0x140406f3fe39c0p-47,
+     .z = -0x116613fe5dce41p-43,
+     .r = -0x10a49fc7bb6320p-95  },
+};
+
 format_t ieee_128 = {
 	.bits = 113,
 	.exp_bits = 15,
 	.min_exp = min_exp(15),
 	.max_exp = max_exp(15),
+};
+
+exact_t[] exact_128 = {
+	{  .x = -0x1.cfb33c94f8e0d974b822f0a612e1p+2,
+	   .y =  0x1.4ef4fc377c61075dce9e7bb2dae3p-1,
+	   .z =  0x1.2f5bcc5c8590e64f23f025beeb64p+2,
+	},
+        {  .x =  0x1.26daab0e6d1ca10d04b240699a83p+5,
+	   .y = -0x1.3978c694494e110443704ced3062p-6,
+	   .z =  0x1.690c765cbd5178104beaee9fff8ep-1,
+	},
+        {  .x =  0x1.49f5b7895f8ed584a285e92195e8p+1,
+	   .y =  0x1.d612852495966643d5c8f8a7e4e1p-1,
+	   .z = -0x1.2ef07eec76677fcf7fe8cad6ea1cp+1,
+	},
+        {  .x = -0x1.0dc9520f6f477e52292d5312eeb9p-1,
+	   .y =  0x1.650c411720d0d7bbc7774ed31d1ap+3,
+	   .z =  0x1.7846a977dc6976553867d4dcb476p+2,
+	},
+        {  .x = -0x1.266c1355e4e910f62c7a263ade4fp+1,
+	   .y =  0x1.a3b060af7e14804f0c92c3882df5p+5,
+	   .z =  0x1.e2adbd253cd90a143294c7738068p+6,
+	},
+        {  .x =  0x1.9a300a18d7bf574fc6d06c5ddcebp+0,
+	   .y = -0x1.e58e6ed5ad1301e7871573f78b92p+2,
+	   .z =  0x1.85009daed71295ae7f8d26a17098p+3,
+	},
+        {  .x = -0x1.916cc4506aeb6540e9c8cea787f9p+2,
+	   .y = -0x1.55016c2c600939bc4628d2296d0bp+4,
+	   .z = -0x1.0b5c0e45ad6b7259062e0515c50ap+7,
+	},
+        {  .x = -0x1.d39f1ced8f42c62a2f50fc2b5656p+3,
+	   .y =  0x1.252deb3fce8a4ab83f00a7b81777p+2,
+	   .z =  0x1.0bc47e65cbdb39067c07a2e1bda4p+6,
+	},
+        {  .x = -0x1.4dbcdfbf669c9b6b26c4deb992bdp+2,
+	   .y = -0x1.0b6e11cefb018639b9851cc916bp+2,
+	   .z = -0x1.5ca37bbc24555b522933255a6094p+4,
+	},
+        { .x = -0x1.937ea412560cc115c5123ae1e589p+0,
+	  .y =  0x1.845a07da9149d8085eca10f10ab8p+6,
+	  .z =  0x1.320cebc9371875d1dc1f23d12183p+7,
+	},
 };
 
 format_t intel_80 = {
@@ -455,6 +598,49 @@ format_t moto_80 = {
 	.max_exp = max_exp(15),
 };
 
+exact_t[] exact_80 = {
+    { .x = -0xad1b72dba7abe1c2p-58,
+     .y = 0xdef88334e647cb8fp-57,
+     .z = 0x96c5d8ea91426d28p-51,
+     .r = 0xc54d34e044541d44p-116  },
+    { .x = -0xcc4169a3ae3a2b7fp-61,
+     .y = -0xe4e50cad66237a04p-68,
+     .z = -0xb6a102b6b13d16f0p-65,
+     .r = 0x821dffb1fe0033fcp-129  },
+    { .x = -0x913db17d30cbc97dp-66,
+     .y = -0xd70dc1951c2442f9p-60,
+     .z = -0xf4053c0c860b449cp-63,
+     .r = 0x9c8c96600de9a4a8p-129  },
+    { .x = 0x9118bb16000f49c8p-67,
+     .y = -0xdd158a2ff2ee4e45p-60,
+     .z = 0xfa9d1db7b1dfb674p-64,
+     .r = -0xaa53fd40a913a5d0p-128 },
+    { .x = 0xe050914a9d33a01cp-67,
+     .y = -0xd8ee8571f4998d7cp-60,
+     .z = 0xbe14fa6bbd60f14dp-63,
+     .r = 0xab0c4cea16260ce0p-128  },
+    { .x = -0x873be078f3b7a50dp-64,
+     .y = 0xea0575438b0d590bp-69,
+     .z = 0xf73f3a97f9b46ceap-70,
+     .r = 0xf45427747c22c6e2p-134  },
+    { .x = 0xdd02de92a49636a2p-68,
+     .y = 0x84b5a81842d87208p-64,
+     .z = -0xe5249dd39d2d0cc4p-69,
+     .r = -0xc28b61c1a4a26f00p-136 },
+    { .x = 0xc59db9165b0ee76fp-66,
+     .y = 0x80b0c08bc7702420p-64,
+     .z = -0xc6ae9b393c9cfa54p-67,
+     .r = -0x88b662b4fc077620p-130 },
+    { .x = 0xfc241d0bc9d488b1p-57,
+     .y = 0xbd4882a5ce5b2a92p-63,
+     .z = -0xba6e144784983becp-56,
+     .r = -0xa9b77f1402e4021cp-121 },
+    { .x = -0xb32dd3313a0b9965p-61,
+     .y = 0x876b3e36bb2313f5p-69,
+     .z = 0xbd90742345f5bf5fp-67,
+     .r = 0xb70e0147ad6966aep-131 },
+};
+
 format_or_none_t intel_80_optional = { .format = intel_80 };
 format_or_none_t moto_80_optional = { .format = moto_80 };
 
@@ -466,6 +652,7 @@ void main()
 	printf("#if __FLT_EVAL_METHOD__ == 0 && FLT_MANT_DIG == 24\n");
 	printf("#define HAVE_FLOAT_FMA_VEC\n");
 	printf("TEST_CONST struct fmaf_vec fmaf_vec[] = {\n");
+	generate_exact("f", ieee_32, none_format, exact_32);
 	generate("f", ieee_32, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -474,6 +661,7 @@ void main()
 	printf("#if __FLT_EVAL_METHOD__ == 2 && FLT_MANT_DIG == 24 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
 	printf("#define HAVE_FLOAT_FMA_VEC\n");
 	printf("TEST_CONST struct fmaf_vec fmaf_vec[] = {\n");
+	generate_exact("f", ieee_32, intel_80_optional, exact_32);
 	generate("f", ieee_32, intel_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -482,6 +670,7 @@ void main()
 	printf("#if __FLT_EVAL_METHOD__ == 2 && FLT_MANT_DIG == 24 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
 	printf("#define HAVE_FLOAT_FMA_VEC\n");
 	printf("TEST_CONST struct fmaf_vec fmaf_vec[] = {\n");
+	generate_exact("f", ieee_32, moto_80_optional, exact_32);
 	generate("f", ieee_32, moto_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -490,6 +679,7 @@ void main()
 	printf("#if __FLT_EVAL_METHOD__ <= 1 && DBL_MANT_DIG == 53\n");
 	printf("#define HAVE_DOUBLE_FMA_VEC\n");
 	printf("TEST_CONST struct fma_vec fma_vec[] = {\n");
+	generate_exact("", ieee_64, none_format, exact_64);
 	generate("", ieee_64, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -498,6 +688,7 @@ void main()
 	printf("#if __FLT_EVAL_METHOD__ == 2 && DBL_MANT_DIG == 53 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
 	printf("#define HAVE_DOUBLE_FMA_VEC\n");
 	printf("TEST_CONST struct fma_vec fma_vec[] = {\n");
+	generate_exact("", ieee_64, intel_80_optional, exact_64);
 	generate("", ieee_64, intel_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -506,6 +697,7 @@ void main()
 	printf("#if __FLT_EVAL_METHOD__ == 2 && DBL_MANT_DIG == 53 && LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
 	printf("#define HAVE_DOUBLE_FMA_VEC\n");
 	printf("TEST_CONST struct fma_vec fma_vec[] = {\n");
+	generate_exact("", ieee_64, moto_80_optional, exact_64);
 	generate("", ieee_64, moto_80_optional);
 	printf("};\n");
 	printf("#endif\n");
@@ -514,6 +706,7 @@ void main()
 	printf("#if LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16381\n");
 	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
 	printf("TEST_CONST struct fmal_vec fmal_vec[] = {\n");
+	generate_exact("l", intel_80, none_format, exact_80);
 	generate("l", intel_80, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -522,6 +715,7 @@ void main()
 	printf("#if LDBL_MANT_DIG == 64 && LDBL_MIN_EXP == -16382\n");
 	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
 	printf("TEST_CONST struct fmal_vec fmal_vec[] = {\n");
+	generate_exact("l", moto_80, none_format, exact_80);
 	generate("l", moto_80, none_format);
 	printf("};\n");
 	printf("#endif\n");
@@ -530,6 +724,7 @@ void main()
 	printf("#if LDBL_MANT_DIG == 113\n");
 	printf("#define HAVE_LONG_DOUBLE_FMA_VEC\n");
 	printf("TEST_CONST struct fmal_vec fmal_vec[] = {\n");
+	generate_exact("l", ieee_128, none_format, exact_128);
 	generate("l", ieee_128, none_format);
 	printf("};\n");
 	printf("#endif\n");
