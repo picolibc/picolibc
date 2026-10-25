@@ -142,7 +142,7 @@ float rsqrtf(float x)
             }
             else
             {
-                __math_set_invalid();
+                __math_set_invalidf();
                 //pass through NaN unmodified
                 return asfloat(xu);
             }
@@ -189,7 +189,7 @@ float rsqrtf(float x)
         }
         else
         {
-            __math_set_invalid();
+            __math_set_invalidf();
             #ifdef __MATH_ERRNO
             errno = EDOM;
             #endif
@@ -235,7 +235,7 @@ float sqrtf(float x)
             }
             else
             {
-                __math_set_invalid();
+                __math_set_invalidf();
                 return asfloat(xu);
             }
         }
@@ -278,7 +278,7 @@ float sqrtf(float x)
             //sqrt(-0)=-0
             return asfloat(1u<<31);
         } else {
-            __math_set_invalid();
+            __math_set_invalidf();
             #ifdef __MATH_ERRNO
             errno = EDOM;
             #endif
