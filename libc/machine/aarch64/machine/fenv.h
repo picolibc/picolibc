@@ -60,10 +60,11 @@ typedef __uint64_t fexcept_t;
 
 #else
 
-/* libgcc has exceptions when there is an FPU */
+#define __LONG_DOUBLE_NOROUND
+
+/* libgcc has exceptions (but still no rounding) when there is an FPU */
 
 #if __ARM_FP == 0
-#define __LONG_DOUBLE_NOROUND
 #define __LONG_DOUBLE_NOEXCEPT
 #define __DOUBLE_NOROUND
 #define __DOUBLE_NOEXCEPT
