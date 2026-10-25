@@ -326,11 +326,11 @@ force_eval_float(float x)
     (void)y;
 }
 
-static __always_inline void
+static __always_inline float
 force_evalf(float x)
 {
     FORCE_FLOAT y = x;
-    (void)y;
+    return y;
 }
 
 static __always_inline void
@@ -340,11 +340,11 @@ force_eval_double(double x)
     (void)y;
 }
 
-static __always_inline void
+static __always_inline double
 force_eval(double x)
 {
     FORCE_DOUBLE y = x;
-    (void)y;
+    return y;
 }
 
 #ifdef __HAVE_LONG_DOUBLE
@@ -362,11 +362,11 @@ force_eval_long_double(long double x)
     (void)y;
 }
 
-static __always_inline void
+static __always_inline long double
 force_evall(long double x)
 {
     FORCE_LONG_DOUBLE y = x;
-    (void)y;
+    return y;
 }
 #endif
 

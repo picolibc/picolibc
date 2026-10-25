@@ -55,12 +55,14 @@
 #if __FLT_MANT_DIG__ == 24
 #define HAVE_FLOAT32
 typedef float float32_t;
-#define float32_suffix      f
-#define float_32(x)         (x##f)
-#define FLOAT_32_MAX        FLT_MAX
-#define FLOAT_32_MIN        FLT_MIN
-#define FLOAT_32_DENORM_MIN __FLT_DENORM_MIN__
-#define FLOAT_32_MAX_EXP    FLT_MAX_EXP
+#define float32_suffix       f
+#define float_32(x)          (x##f)
+#define FLOAT_32_MAX         FLT_MAX
+#define FLOAT_32_MIN         FLT_MIN
+#define FLOAT_32_DENORM_MIN  __FLT_DENORM_MIN__
+#define FLOAT_32_MAX_EXP     FLT_MAX_EXP
+#define FLOAT_32_MANT_DIG    FLT_MANT_DIG
+#define FLOAT_32_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMAF
 #define __HAVE_FAST_FMA_32
 #endif
@@ -82,12 +84,14 @@ typedef float float32_t;
 #define HAVE_FLOAT64
 typedef double float64_t;
 #define float64_suffix
-#define float_64(x)         (x)
-#define FLOAT_64_MAX        DBL_MAX
-#define FLOAT_64_MIN        DBL_MIN
-#define FLOAT_64_DENORM_MIN __DBL_DENORM_MIN__
-#define FLOAT_64_SNAN_BIT   0x0008000000000000ULL
-#define FLOAT_64_MAX_EXP    DBL_MAX_EXP
+#define float_64(x)          (x)
+#define FLOAT_64_MAX         DBL_MAX
+#define FLOAT_64_MIN         DBL_MIN
+#define FLOAT_64_DENORM_MIN  __DBL_DENORM_MIN__
+#define FLOAT_64_SNAN_BIT    0x0008000000000000ULL
+#define FLOAT_64_MAX_EXP     DBL_MAX_EXP
+#define FLOAT_64_MANT_DIG    DBL_MANT_DIG
+#define FLOAT_64_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMA
 #define __HAVE_FAST_FMA_64
 #endif
@@ -105,12 +109,14 @@ typedef double float64_t;
 #elif __LDBL_MANT_DIG__ == 53
 #define HAVE_FLOAT64
 typedef long double float64_t;
-#define float64_suffix      l
-#define float_64(x)         (x##l)
-#define FLOAT_64_MAX        LDBL_MAX
-#define FLOAT_64_MIN        LDBL_MIN
-#define FLOAT_64_DENORM_MIN __LDBL_DENORM_MIN__
-#define FLOAT_64_MAX_EXP    LDBL_MAX_EXP
+#define float64_suffix       l
+#define float_64(x)          (x##l)
+#define FLOAT_64_MAX         LDBL_MAX
+#define FLOAT_64_MIN         LDBL_MIN
+#define FLOAT_64_DENORM_MIN  __LDBL_DENORM_MIN__
+#define FLOAT_64_MAX_EXP     LDBL_MAX_EXP
+#define FLOAT_64_MANT_DIG    LDBL_MANT_DIG
+#define FLOAT_64_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_64
 #endif
@@ -136,6 +142,13 @@ typedef long double float80_t;
 #define FLOAT_80_MIN        LDBL_MIN
 #define FLOAT_80_DENORM_MIN __LDBL_DENORM_MIN__
 #define FLOAT_80_MAX_EXP    LDBL_MAX_EXP
+#define FLOAT_80_MANT_DIG   LDBL_MANT_DIG
+#if __LDBL_MIN_EXP__ == -16382
+/* 68881 allows normal values with zero exponent */
+#define FLOAT_80_DENORM_BIAS 0
+#else
+#define FLOAT_80_DENORM_BIAS 1
+#endif
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_80
 #endif
@@ -155,13 +168,15 @@ typedef long double float80_t;
 #if __LDBL_MANT_DIG__ == 113
 #define HAVE_FLOAT128
 typedef long double float128_t;
-#define float128_suffix      l
-#define float_128(x)         (x##l)
-#define FLOAT_128_MAX        LDBL_MAX
-#define FLOAT_128_MIN        LDBL_MIN
-#define FLOAT_128_DENORM_MIN __LDBL_DENORM_MIN__
-#define FLOAT_128_SNAN_BIT   0x0000800000000000ULL
-#define FLOAT_128_MAX_EXP    LDBL_MAX_EXP
+#define float128_suffix       l
+#define float_128(x)          (x##l)
+#define FLOAT_128_MAX         LDBL_MAX
+#define FLOAT_128_MIN         LDBL_MIN
+#define FLOAT_128_DENORM_MIN  __LDBL_DENORM_MIN__
+#define FLOAT_128_SNAN_BIT    0x0000800000000000ULL
+#define FLOAT_128_MAX_EXP     LDBL_MAX_EXP
+#define FLOAT_128_MANT_DIG    LDBL_MANT_DIG
+#define FLOAT_128_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_128
 #endif
@@ -193,6 +208,8 @@ typedef long double float128_t;
 #define FLOAT_MIN         FLOAT_32_MIN
 #define FLOAT_DENORM_MIN  FLOAT_32_DENORM_MIN
 #define FLOAT_MAX_EXP     FLOAT_32_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_32_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_32_DENORM_BIAS
 #define FLOAT_SNAN_BIT    0x00400000u
 #define FLOAT_EXP_MASK    0x7f800000U
 #define FLOAT_EXP_BIAS    0x7f
@@ -251,6 +268,8 @@ typedef long double float128_t;
 #define FLOAT_MIN         FLOAT_64_MIN
 #define FLOAT_DENORM_MIN  FLOAT_64_DENORM_MIN
 #define FLOAT_MAX_EXP     FLOAT_64_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_64_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_64_DENORM_BIAS
 #define FLOAT_SNAN_BIT    0x0008000000000000LL
 #define FLOAT_EXP_MASK    0x7ff0000000000000LL
 #define FLOAT_EXP_BIAS    0x3ff
@@ -317,6 +336,8 @@ typedef long double float128_t;
 #define FLOAT_SNAN_BIT    0x4000000000000000ULL
 #define FLOAT_DENORM_MIN  FLOAT_80_DENORM_MIN
 #define FLOAT_MAX_EXP     FLOAT_80_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_80_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_80_DENORM_BIAS
 #define FLOAT_PAYLOAD_DIG 64
 #ifdef __HAVE_FAST_FMA_80
 #define __HAVE_FAST_FMA_F
@@ -414,6 +435,8 @@ f_is_integer(fuint_t i, int shift)
 #define FLOAT_SNAN_BIT    0x0000800000000000ULL
 #define FLOAT_EXP_INF     0x7fff
 #define FLOAT_MAX_EXP     FLOAT_128_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_128_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_128_DENORM_BIAS
 #define FLOAT_PAYLOAD_DIG 112
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F

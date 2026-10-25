@@ -351,6 +351,22 @@ ff_div_ff(ff_t x, ff_t y)
 #endif
 }
 
+static math_two_inline bool
+is_odd_sig(float_t x)
+{
+    uint32_t lsw;
+    GET_LOW_UINT32(lsw, x);
+    return (lsw & 1) != 0;
+}
+
+static math_two_inline bool
+is_even_sig(float_t x)
+{
+    uint32_t lsw;
+    GET_LOW_UINT32(lsw, x);
+    return (lsw & 1) == 0;
+}
+
 /*
  * Use a wrapping math_two_inline to pass the hi/lo values to work around a
  * compiler bug with gcc 14.2.0 for lm32-unknown-elf
@@ -359,10 +375,8 @@ static math_two_inline float_t
 ff_round_odd_f(float_t hi, float_t lo)
 {
     if (lo) {
-        uint32_t lsw;
-        GET_LOW_UINT32(lsw, hi);
-        if ((lsw & 1) == 0)
-            hi = name(nextafter)(hi, name(copysign)((float_t)INFINITY, lo));
+        if (is_even_sig(hi))
+            hi = name(nextafter)(hi, (float_t)INFINITY * lo);
     }
     return hi;
 }
