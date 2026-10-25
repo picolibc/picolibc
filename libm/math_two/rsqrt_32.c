@@ -36,9 +36,9 @@
 #define WANT_FLOAT32
 #include "math_two.h"
 
-#define QUIET_NAN ((255u << 23) | (1u << 22) | 1u)
-#define INF (255u << 23)
-#define NEGATIVE_INF ((1u<<31)|(255u << 23))
+#define QUIET_NAN (((uint32_t)255u << 23) | ((uint32_t)1u << 22) | 1u)
+#define INF ((uint32_t)255u << 23)
+#define NEGATIVE_INF (((uint32_t)1u<<31)|((uint32_t)255u << 23))
 
 //hard float rsqrtf
 #if !(__OBSOLETE_MATH_FLOAT)
@@ -53,10 +53,10 @@ static uint32_t sqrt_core(uint32_t xyy, uint32_t y)
 {
     xyy<<=6;
     uint32_t t=xyy+(xyy>>1);
-    if (t < (1u<<31))
+    if (t < ((uint32_t)1u<<31))
     { //first iteration is special cased
         t+=t>>1;
-        if (t < (1u<<31))
+        if (t < ((uint32_t)1u<<31))
         {
             xyy=t;
             y+=y>>1;
@@ -70,7 +70,7 @@ static uint32_t sqrt_core(uint32_t xyy, uint32_t y)
 #if 1
         uint32_t t=xyy+(xyy>>i);
         t+=t>>i;
-        if (t < (1u<<31))
+        if (t < ((uint32_t)1u<<31))
         {
             xyy=t;
             y+=y>>i;
@@ -106,7 +106,7 @@ asm(    ".syntax unified\n\t"
 static uint32_t mantissa_rsqrt(uint32_t x)
 {
     uint32_t Y=x;
-    uint32_t U=sqrt_core(x,1u<<30 )>>6;
+    uint32_t U=sqrt_core(x,(uint32_t)1u<<30 )>>6;
     //we could return (U+1)>>1 and be 90 % accurate
     //but we want infinitely precise rounding
     U |=1;
@@ -117,7 +117,7 @@ static uint32_t mantissa_rsqrt(uint32_t x)
     uint64_t C= (uint64_t) Y*A_hi;
     uint64_t S=B_hi+C;
     uint32_t P=S>>32;
-    uint32_t Q=1u<<(9);
+    uint32_t Q=1u<<9;
     if (P < Q)
        U+=1;
 
@@ -150,7 +150,7 @@ float rsqrtf(float x)
         else //normal case
         {
             uint32_t mantissa = xu &~ ((uint32_t)exp << 23);
-            mantissa += 1u << 23;
+            mantissa += (uint32_t)1u << 23;
             mantissa<<= !(exp & 1);
             uint32_t newMantissa=mantissa_rsqrt(mantissa);
             int32_t newExp = -asr(exp - 127, 1) + 127 -2;
@@ -180,7 +180,7 @@ float rsqrtf(float x)
                 return asfloat(INF);
             }
         }
-        else if (xu == (1u<<31))
+        else if (xu == ((uint32_t)1u<<31))
         {
             #ifdef __MATH_ERRNO
             errno = ERANGE;
@@ -250,7 +250,7 @@ float sqrtf(float x)
             // meaning -1/2= -0.5 should map to -1
             exponent = exponent + 126;
             uint32_t new_mantissa=mantissa_sqrt(mantissa);
-            return asfloat((exponent<<23) + new_mantissa);
+            return asfloat(((uint32_t)exponent<<23) + new_mantissa);
         }
     }
     else
@@ -262,21 +262,21 @@ float sqrtf(float x)
                 uint32_t mantissa = xu &~ ((uint32_t)exponent << 23);
                 int32_t shift=__builtin_clz(mantissa)- (31-23);
                 mantissa <<= shift; // normalize subnormal
-                int32_t exponent =  - (126)-shift;
+                int32_t exponent =  -126-shift;
                 mantissa <<= (exponent & 1);
                 uint32_t new_mantissa=mantissa_sqrt(mantissa);
                 exponent =asr(exponent,1);
                 exponent = (exponent + (126));
-                return asfloat((exponent<<23) + new_mantissa);
+                return asfloat(((uint32_t)exponent<<23) + new_mantissa);
             } else //sqrt(+0)=+0
             {
                 return asfloat(0);
             }
 
-        } else if (xu == (1u<<31))
+        } else if (xu == ((uint32_t)1u<<31))
         {
             //sqrt(-0)=-0
-            return asfloat(1u<<31);
+            return asfloat((uint32_t)1u<<31);
         } else {
             __math_set_invalidf();
             #ifdef __MATH_ERRNO
