@@ -100,15 +100,7 @@ static const char * const rounding_names[] = {
 
 #define NROUND (sizeof(roundings) / sizeof(roundings[0]))
 
-#ifdef __DOUBLE_NOEXCEPT
-/*
- * Assume that a lack of exceptions for doubles also means a lack of
- * support for non-default rounding modes for doubles.
- */
-#define SKIP_ROUNDINGS_FLOAT
-#endif
-
-#ifdef SKIP_ROUNDINGS_FLOAT
+#ifdef __FLOAT_NOROUND
 #define NROUND_FLOAT 1
 #else
 #define NROUND_FLOAT NROUND
@@ -121,20 +113,38 @@ static const char * const rounding_names[] = {
 #define nanl __builtin_nanl("")
 #define infl ((long double)INFINITY)
 
+typedef struct {
+    float r;
+    bool  exact;
+} float_ret;
+
 struct fmaf_vec {
-    float x, y, z;
-    float r[4];
+    unsigned  line;
+    float     x, y, z;
+    float_ret r[4];
 };
 
+typedef struct {
+    double r;
+    bool   exact;
+} double_ret;
+
 struct fma_vec {
-    double x, y, z;
-    double r[4];
+    unsigned   line;
+    double     x, y, z;
+    double_ret r[4];
 };
 
 #if LDBL_MANT_DIG != 0
+typedef struct {
+    long double r;
+    bool        exact;
+} long_double_ret;
+
 struct fmal_vec {
-    long double x, y, z;
-    long double r[4];
+    unsigned        line;
+    long double     x, y, z;
+    long_double_ret r[4];
 };
 #endif
 
@@ -153,6 +163,14 @@ struct fmal_vec {
 #endif
 
 #ifdef HAVE_FLOAT_FMA_VEC
+
+#if defined(FE_INEXACT) && !defined(__FLOAT_NOEXCEPT)
+#define FLOAT_CLEAR_INEXACT feclearexcept(FE_ALL_EXCEPT)
+#define FLOAT_TEST_INEXACT  (fetestexcept(FE_INEXACT) == 0)
+#else
+#define FLOAT_CLEAR_INEXACT
+#define FLOAT_TEST_INEXACT s_exact
+#endif
 
 static bool
 equalf(float x, float y)
@@ -178,19 +196,24 @@ test_fmaf(void)
         else
             fesetround(roundings[ro]);
         for (t = 0; t < NUM_FMAF_VEC; t++) {
-            float          x = fmaf_vec[t].x;
-            float          y = fmaf_vec[t].y;
-            float          z = fmaf_vec[t].z;
+            float x = fmaf_vec[t].x;
+            float y = fmaf_vec[t].y;
+            float z = fmaf_vec[t].z;
+            float s = fmaf_vec[t].r[rounding_map[ro]].r;
+            bool  s_exact = fmaf_vec[t].r[rounding_map[ro]].exact;
+            bool  r_exact;
+            FLOAT_CLEAR_INEXACT;
             volatile float r = fmaf(x, y, z);
-            float          s = fmaf_vec[t].r[rounding_map[ro]];
-            if (!equalf(r, s)) {
+            r_exact = FLOAT_TEST_INEXACT;
+            if (!equalf(r, s) || r_exact != s_exact) {
                 strfromf(xs, sizeof(xs), "%a", x);
                 strfromf(ys, sizeof(xs), "%a", y);
                 strfromf(zs, sizeof(xs), "%a", z);
                 strfromf(rs, sizeof(xs), "%a", r);
                 strfromf(ss, sizeof(xs), "%a", s);
-                printf("%u: round %s %s %s %s -> got %s want %s\n", t, rounding_names[ro], xs, ys,
-                       zs, rs, ss);
+                printf("%u: round %s %s * %s + %s -> got %s %s want %s %s\n", fmaf_vec[t].line,
+                       rounding_names[ro], xs, ys, zs, rs, r_exact ? "exact" : "inexact", ss,
+                       s_exact ? "exact" : "inexact");
                 ret = 1;
             }
         }
@@ -204,15 +227,15 @@ test_fmaf(void)
 
 #ifdef HAVE_DOUBLE_FMA_VEC
 
-#ifdef __DOUBLE_NOEXCEPT
-/*
- * Assume that a lack of exceptions for doubles also means a lack of
- * support for non-default rounding modes for doubles.
- */
-#define SKIP_ROUNDINGS_DOUBLE
+#if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
+#define DOUBLE_CLEAR_INEXACT feclearexcept(FE_ALL_EXCEPT)
+#define DOUBLE_TEST_INEXACT  (fetestexcept(FE_INEXACT) == 0)
+#else
+#define DOUBLE_CLEAR_INEXACT
+#define DOUBLE_TEST_INEXACT s_exact
 #endif
 
-#ifdef SKIP_ROUNDINGS_DOUBLE
+#ifdef __DOUBLE_NOROUND
 #define NROUND_DOUBLE 1
 #else
 #define NROUND_DOUBLE NROUND
@@ -241,14 +264,19 @@ test_fma(void)
         else
             fesetround(roundings[ro]);
         for (t = 0; t < NUM_FMA_VEC; t++) {
-            double          x = fma_vec[t].x;
-            double          y = fma_vec[t].y;
-            double          z = fma_vec[t].z;
+            double x = fma_vec[t].x;
+            double y = fma_vec[t].y;
+            double z = fma_vec[t].z;
+            double s = fma_vec[t].r[rounding_map[ro]].r;
+            bool   s_exact = fma_vec[t].r[rounding_map[ro]].exact;
+            bool   r_exact;
+            DOUBLE_CLEAR_INEXACT;
             volatile double r = fma(x, y, z);
-            double          s = fma_vec[t].r[rounding_map[ro]];
-            if (!equal(r, s)) {
-                printf("%u: round %s %a * %a + %a -> got %a want %a\n", t, rounding_names[ro], x, y,
-                       z, r, s);
+            r_exact = DOUBLE_TEST_INEXACT;
+            if (!equal(r, s) || r_exact != s_exact) {
+                printf("%u: round %s %a * %a + %a -> got %a %s want %a %s\n", fma_vec[t].line,
+                       rounding_names[ro], x, y, z, r, r_exact ? "exact" : "inexact", s,
+                       s_exact ? "exact" : "inexact");
                 ret = 1;
             }
         }
@@ -262,15 +290,15 @@ test_fma(void)
 
 #if defined(_TEST_LONG_DOUBLE) && defined(HAVE_LONG_DOUBLE_FMA_VEC)
 
-#ifdef __LONG_DOUBLE_NOEXCEPT
-/*
- * Assume that a lack of exceptions for doubles also means a lack of
- * support for non-default rounding modes for doubles.
- */
-#define SKIP_ROUNDINGS_LONG_DOUBLE
+#if defined(FE_INEXACT) && !defined(__LONG_DOUBLE_NOEXCEPT)
+#define LONG_DOUBLE_CLEAR_INEXACT feclearexcept(FE_ALL_EXCEPT)
+#define LONG_DOUBLE_TEST_INEXACT  (fetestexcept(FE_INEXACT) == 0)
+#else
+#define LONG_DOUBLE_CLEAR_INEXACT
+#define LONG_DOUBLE_TEST_INEXACT s_exact
 #endif
 
-#ifdef SKIP_ROUNDINGS_LONG_DOUBLE
+#ifdef __LONG_DOUBLE_NOROUND
 #define NROUND_LONG_DOUBLE 1
 #else
 #define NROUND_LONG_DOUBLE NROUND
@@ -299,16 +327,19 @@ test_fmal(void)
         else
             fesetround(roundings[ro]);
         for (t = 0; t < NUM_FMAL_VEC; t++) {
-            if (t < 30)
-                continue;
             long double x = fmal_vec[t].x;
             long double y = fmal_vec[t].y;
             long double z = fmal_vec[t].z;
-            long double r = fmal(x, y, z);
-            long double s = fmal_vec[t].r[rounding_map[ro]];
-            if (!equall(r, s)) {
-                printf("%u: round %s %La * %La + %La -> got %La want %La\n", t, rounding_names[ro],
-                       x, y, z, r, s);
+            long double s = fmal_vec[t].r[rounding_map[ro]].r;
+            bool        s_exact = fmal_vec[t].r[rounding_map[ro]].exact;
+            bool        r_exact;
+            LONG_DOUBLE_CLEAR_INEXACT;
+            volatile long double r = fmal(x, y, z);
+            r_exact = LONG_DOUBLE_TEST_INEXACT;
+            if (!equall(r, s) || r_exact != s_exact) {
+                printf("%u: round %s %La * %La + %La -> got %La %s want %La %s\n", fmal_vec[t].line,
+                       rounding_names[ro], x, y, z, r, r_exact ? "exact" : "inexact", s,
+                       s_exact ? "exact" : "inexact");
                 ret = 1;
             }
         }
