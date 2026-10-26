@@ -95,3 +95,4 @@ test-cexp.h
 test-clog.h
 test-cpow.h
 test-csqrt.h
+test-fma-vec.h

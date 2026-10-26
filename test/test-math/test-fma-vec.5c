@@ -489,6 +489,12 @@ typedef struct {
 	real x, y, z, r;
 } exact_t;
 
+/*
+ * exact_t holds reals, which have no signed zero. This value is too
+ * small for any format, so rounding it on input produces -0.0.
+ */
+const real neg_zero = -0x1p-100000;
+
 void generate_exact(string suf, format_t format, format_or_none_t i_format, exact_t[] e)
 {
 	for (int i = 0; i < dim(e); i++) {
@@ -515,6 +521,34 @@ exact_t[] exact_32 = {
     { .x = 0x98f135p-21,  .y = 0x907a70p-29,  .z = -0xaca1a6p-27, .r = 0xacc930p-50  },
     { .x = 0x881ed1p-23,  .y = 0xf731afp-20,  .z = -0x837027p-19, .r = -0xcbdc42p-44 },
     { .x = -0xccdd20p-21, .y = -0xd7ee05p-18, .z = -0xaccc30p-15, .r = -0x8bee60p-39 },
+    /*
+     * Results of zero with a mixture of signs, covering exact and
+     * inexact (underflowed) zeros.
+     */
+    /* (+0)(+5) + (+0): like-signed zeros keep sign, even in RD */
+    { .x = 0.0,           .y = 0x5p+0,       .z = 0.0,            .r = 0.0      },
+    /* (-0)(+5) + (-0): like-signed zeros keep sign */
+    { .x = neg_zero,      .y = 0x5p+0,       .z = neg_zero,       .r = neg_zero },
+    /* (+0)(-5) + (-0): product sign is XOR (-0), like-signed */
+    { .x = 0.0,           .y = -0x5p+0,      .z = neg_zero,       .r = neg_zero },
+    /* (-0)(-5) + (-0): product +0, opposite to c */
+    { .x = neg_zero,      .y = -0x5p+0,      .z = neg_zero,       .r = 0.0      },
+    /* (+0)(-5) + (+0): product -0, opposite to c */
+    { .x = 0.0,           .y = -0x5p+0,      .z = 0.0,            .r = 0.0      },
+    /* 2 * 3 + (-6): exact cancellation, normal */
+    { .x = 0x1p+1,        .y = 0x3p+0,       .z = -0x3p+1,        .r = 0.0      },
+    /* (max/2)(-2) + max: exact cancellation at the top of the range */
+    { .x = 0xffffffp+103, .y = -0x1p+1,      .z = 0xffffffp+104,  .r = 0.0      },
+    /* minsub * 3 + (-3 minsub): exact cancellation, subnormal */
+    { .x = 0x1p-149,      .y = 0x3p+0,       .z = -0x3p-149,      .r = 0.0      },
+    /* minsub * (-0.5) + (+0): tie below minsub, negative, c = +0 */
+    { .x = 0x1p-149,      .y = -0x1p-1,      .z = 0.0,            .r = neg_zero },
+    /* (-minsub)(-minsub) + (-0): far below minsub, positive, c = -0 */
+    { .x = -0x1p-149,     .y = -0x1p-149,    .z = neg_zero,       .r = 0.0      },
+    /* x*y - z, residue +2^emin*ulp^2 (< minsub/2): inexact cancellation */
+    { .x = 0x800001p-86,  .y = 0x800001p-86, .z = -0x400001p-148, .r = 0.0      },
+    /* -x*y + z, residue -2^emin*ulp^2: inexact cancellation, negative */
+    { .x = -0x800001p-86, .y = 0x800001p-86, .z = 0x400001p-148,  .r = neg_zero },
 };
 
 format_t ieee_64 = {
@@ -565,6 +599,70 @@ exact_t[] exact_64 = {
      .y = 0x140406f3fe39c0p-47,
      .z = -0x116613fe5dce41p-43,
      .r = -0x10a49fc7bb6320p-95  },
+    /*
+     * Results of zero with a mixture of signs, covering exact and
+     * inexact (underflowed) zeros.
+     */
+    /* (+0)(+5) + (+0): like-signed zeros keep sign, even in RD */
+    { .x = 0.0,
+     .y = 0x5p+0,
+     .z = 0.0,
+     .r = 0.0      },
+    /* (-0)(+5) + (-0): like-signed zeros keep sign */
+    { .x = neg_zero,
+     .y = 0x5p+0,
+     .z = neg_zero,
+     .r = neg_zero },
+    /* (+0)(-5) + (-0): product sign is XOR (-0), like-signed */
+    { .x = 0.0,
+     .y = -0x5p+0,
+     .z = neg_zero,
+     .r = neg_zero },
+    /* (-0)(-5) + (-0): product +0, opposite to c */
+    { .x = neg_zero,
+     .y = -0x5p+0,
+     .z = neg_zero,
+     .r = 0.0      },
+    /* (+0)(-5) + (+0): product -0, opposite to c */
+    { .x = 0.0,
+     .y = -0x5p+0,
+     .z = 0.0,
+     .r = 0.0      },
+    /* 2 * 3 + (-6): exact cancellation, normal */
+    { .x = 0x1p+1,
+     .y = 0x3p+0,
+     .z = -0x3p+1,
+     .r = 0.0      },
+    /* (max/2)(-2) + max: exact cancellation at the top of the range */
+    { .x = 0x1fffffffffffffp+970,
+     .y = -0x1p+1,
+     .z = 0x1fffffffffffffp+971,
+     .r = 0.0      },
+    /* minsub * 3 + (-3 minsub): exact cancellation, subnormal */
+    { .x = 0x1p-1074,
+     .y = 0x3p+0,
+     .z = -0x3p-1074,
+     .r = 0.0      },
+    /* minsub * (-0.5) + (+0): tie below minsub, negative, c = +0 */
+    { .x = 0x1p-1074,
+     .y = -0x1p-1,
+     .z = 0.0,
+     .r = neg_zero },
+    /* (-minsub)(-minsub) + (-0): far below minsub, positive, c = -0 */
+    { .x = -0x1p-1074,
+     .y = -0x1p-1074,
+     .z = neg_zero,
+     .r = 0.0      },
+    /* x*y - z, residue +2^emin*ulp^2 (< minsub/2): inexact cancellation */
+    { .x = 0x10000000000001p-563,
+     .y = 0x10000000000001p-563,
+     .z = -0x8000000000001p-1073,
+     .r = 0.0      },
+    /* -x*y + z, residue -2^emin*ulp^2: inexact cancellation, negative */
+    { .x = -0x10000000000001p-563,
+     .y = 0x10000000000001p-563,
+     .z = 0x8000000000001p-1073,
+     .r = neg_zero },
 };
 
 format_t ieee_128 = {
@@ -614,6 +712,82 @@ exact_t[] exact_128 = {
         { .x = -0x1.937ea412560cc115c5123ae1e589p+0,
 	  .y =  0x1.845a07da9149d8085eca10f10ab8p+6,
 	  .z =  0x1.320cebc9371875d1dc1f23d12183p+7,
+	},
+	/*
+	 * Results of zero with a mixture of signs, covering exact and
+	 * inexact (underflowed) zeros.
+	 */
+	/* (+0)(+5) + (+0): like-signed zeros keep sign, even in RD */
+	{  .x =  0.0,
+	   .y =  0x1.4p+2,
+	   .z =  0.0,
+	   .r =  0.0,
+	},
+	/* (-0)(+5) + (-0): like-signed zeros keep sign */
+	{  .x =  neg_zero,
+	   .y =  0x1.4p+2,
+	   .z =  neg_zero,
+	   .r =  neg_zero,
+	},
+	/* (+0)(-5) + (-0): product sign is XOR (-0), like-signed */
+	{  .x =  0.0,
+	   .y = -0x1.4p+2,
+	   .z =  neg_zero,
+	   .r =  neg_zero,
+	},
+	/* (-0)(-5) + (-0): product +0, opposite to c */
+	{  .x =  neg_zero,
+	   .y = -0x1.4p+2,
+	   .z =  neg_zero,
+	   .r =  0.0,
+	},
+	/* (+0)(-5) + (+0): product -0, opposite to c */
+	{  .x =  0.0,
+	   .y = -0x1.4p+2,
+	   .z =  0.0,
+	   .r =  0.0,
+	},
+	/* 2 * 3 + (-6): exact cancellation, normal */
+	{  .x =  0x1p+1,
+	   .y =  0x1.8p+1,
+	   .z = -0x1.8p+2,
+	   .r =  0.0,
+	},
+	/* (max/2)(-2) + max: exact cancellation at the top of the range */
+	{  .x =  0x1.ffffffffffffffffffffffffffffp+16382,
+	   .y = -0x1p+1,
+	   .z =  0x1.ffffffffffffffffffffffffffffp+16383,
+	   .r =  0.0,
+	},
+	/* minsub * 3 + (-3 minsub): exact cancellation, subnormal */
+	{  .x =  0x1p-16494,
+	   .y =  0x1.8p+1,
+	   .z = -0x1.8p-16493,
+	   .r =  0.0,
+	},
+	/* minsub * (-0.5) + (+0): tie below minsub, negative, c = +0 */
+	{  .x =  0x1p-16494,
+	   .y = -0x1p-1,
+	   .z =  0.0,
+	   .r =  neg_zero,
+	},
+	/* (-minsub)(-minsub) + (-0): far below minsub, positive, c = -0 */
+	{  .x = -0x1p-16494,
+	   .y = -0x1p-16494,
+	   .z =  neg_zero,
+	   .r =  0.0,
+	},
+	/* x*y - z, residue +2^emin*ulp^2 (< minsub/2): inexact cancellation */
+	{  .x =  0x1.0000000000000000000000000001p-8191,
+	   .y =  0x1.0000000000000000000000000001p-8191,
+	   .z = -0x1.0000000000000000000000000002p-16382,
+	   .r =  0.0,
+	},
+	/* -x*y + z, residue -2^emin*ulp^2: inexact cancellation, negative */
+	{  .x = -0x1.0000000000000000000000000001p-8191,
+	   .y =  0x1.0000000000000000000000000001p-8191,
+	   .z =  0x1.0000000000000000000000000002p-16382,
+	   .r =  neg_zero,
 	},
 };
 
@@ -672,6 +846,95 @@ exact_t[] exact_80 = {
      .y = 0x876b3e36bb2313f5p-69,
      .z = 0xbd90742345f5bf5fp-67,
      .r = 0xb70e0147ad6966aep-131 },
+    /*
+     * Results of zero with a mixture of signs, covering exact and
+     * inexact (underflowed) zeros.
+     */
+    /* (+0)(+5) + (+0): like-signed zeros keep sign, even in RD (Intel) */
+    { .x = 0.0,
+     .y = 0x5p+0,
+     .z = 0.0,
+     .r = 0.0      },
+    /* (-0)(+5) + (-0): like-signed zeros keep sign (Intel) */
+    { .x = neg_zero,
+     .y = 0x5p+0,
+     .z = neg_zero,
+     .r = neg_zero },
+    /* (+0)(-5) + (-0): product sign is XOR (-0), like-signed (Intel) */
+    { .x = 0.0,
+     .y = -0x5p+0,
+     .z = neg_zero,
+     .r = neg_zero },
+    /* (-0)(-5) + (-0): product +0, opposite to c (Intel) */
+    { .x = neg_zero,
+     .y = -0x5p+0,
+     .z = neg_zero,
+     .r = 0.0      },
+    /* (+0)(-5) + (+0): product -0, opposite to c (Intel) */
+    { .x = 0.0,
+     .y = -0x5p+0,
+     .z = 0.0,
+     .r = 0.0      },
+    /* 2 * 3 + (-6): exact cancellation, normal (Intel) */
+    { .x = 0x1p+1,
+     .y = 0x3p+0,
+     .z = -0x3p+1,
+     .r = 0.0      },
+    /* (max/2)(-2) + max: exact cancellation at the top of the range (Intel) */
+    { .x = 0xffffffffffffffffp+16319,
+     .y = -0x1p+1,
+     .z = 0xffffffffffffffffp+16320,
+     .r = 0.0      },
+    /* minsub * 3 + (-3 minsub): exact cancellation, subnormal (Intel) */
+    { .x = 0x1p-16445,
+     .y = 0x3p+0,
+     .z = -0x3p-16445,
+     .r = 0.0      },
+    /* minsub * (-0.5) + (+0): tie below minsub, negative, c = +0 (Intel) */
+    { .x = 0x1p-16445,
+     .y = -0x1p-1,
+     .z = 0.0,
+     .r = neg_zero },
+    /* (-minsub)(-minsub) + (-0): far below minsub, positive, c = -0 (Intel) */
+    { .x = -0x1p-16445,
+     .y = -0x1p-16445,
+     .z = neg_zero,
+     .r = 0.0      },
+    /* x*y - z, residue +2^emin*ulp^2 (< minsub/2): inexact cancellation (Intel) */
+    { .x = 0x8000000000000001p-8254,
+     .y = 0x8000000000000001p-8254,
+     .z = -0x4000000000000001p-16444,
+     .r = 0.0      },
+    /* -x*y + z, residue -2^emin*ulp^2: inexact cancellation, negative (Intel) */
+    { .x = -0x8000000000000001p-8254,
+     .y = 0x8000000000000001p-8254,
+     .z = 0x4000000000000001p-16444,
+     .r = neg_zero },
+    /* minsub * 3 + (-3 minsub): exact cancellation, subnormal (Motorola) */
+    { .x = 0x1p-16446,
+     .y = 0x3p+0,
+     .z = -0x3p-16446,
+     .r = 0.0      },
+    /* (2 minsub) * (-0.25) + (+0): tie below minsub, negative, c = +0 (Motorola) */
+    { .x = 0x1p-16445,
+     .y = -0x1p-2,
+     .z = 0.0,
+     .r = neg_zero },
+    /* (-minsub)(-minsub) + (-0): far below minsub, positive, c = -0 (Motorola) */
+    { .x = -0x1p-16446,
+     .y = -0x1p-16446,
+     .z = neg_zero,
+     .r = 0.0      },
+    /* x*y - z, residue +2^emin*ulp^2 (< minsub/2): inexact cancellation (Motorola) */
+    { .x = 0x8000000000000001p-8255,
+     .y = 0x8000000000000001p-8254,
+     .z = -0x4000000000000001p-16445,
+     .r = 0.0      },
+    /* -x*y + z, residue -2^emin*ulp^2: inexact cancellation, negative (Motorola) */
+    { .x = -0x8000000000000001p-8255,
+     .y = 0x8000000000000001p-8254,
+     .z = 0x4000000000000001p-16445,
+     .r = neg_zero },
 };
 
 format_or_none_t intel_80_optional = { .format = intel_80 };
