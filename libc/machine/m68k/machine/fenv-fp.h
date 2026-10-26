@@ -161,7 +161,7 @@ __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 
     /* Set the rounding mode */
 
-    fpcr = (fpcr & ~(0x3 << 4)) | (env & 3);
+    fpcr = (fpcr & ~(0x3 << 4)) | ((env & 3) << 4);
 
     /* Set the exception enables */
 
