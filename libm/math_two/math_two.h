@@ -42,6 +42,15 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wignored-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#endif
+
+#pragma STDC FENV_ROUND FE_DYNAMIC
+#pragma STDC FENV_ACCESS ON
+
 /* Figure out mapping between C types and floating point formats */
 #if __FLT_MANT_DIG__ == 24
 #define HAVE_FLOAT32
