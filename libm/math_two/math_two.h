@@ -64,6 +64,13 @@ typedef float float32_t;
 #ifdef __HAVE_FAST_FMAF
 #define __HAVE_FAST_FMA_32
 #endif
+#ifdef __FLOAT_NOROUND
+#define __FLOAT_32_NOROUND
+#endif
+#ifdef __FLOAT_NOEXCEPT
+#define __FLOAT_32_NOEXCEPT
+#endif
+
 #define fma_32(a, b, c) fmaf(a, b, c)
 #define floor_32(x)     floorf(x)
 #define frexp_32(x, a)  frexpf(x, a)
@@ -84,6 +91,13 @@ typedef double float64_t;
 #ifdef __HAVE_FAST_FMA
 #define __HAVE_FAST_FMA_64
 #endif
+#ifdef __DOUBLE_NOROUND
+#define __FLOAT_64_NOROUND
+#endif
+#ifdef __DOUBLE_NOEXCEPT
+#define __FLOAT_64_NOEXCEPT
+#endif
+
 #define fma_64(a, b, c) fma(a, b, c)
 #define floor_64(x)     floor(x)
 #define frexp_64(x, a)  frexp(x, a)
@@ -100,6 +114,13 @@ typedef long double float64_t;
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_64
 #endif
+#ifdef __LONG_DOUBLE_NOROUND
+#define __FLOAT_64_NOROUND
+#endif
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define __FLOAT_64_NOEXCEPT
+#endif
+
 #define fma_64(a, b, c) fmal(a, b, c)
 #define floor_64(x)     floorl(x)
 #define frexp_64(x, a)  frexpl(x, a)
@@ -118,6 +139,13 @@ typedef long double float80_t;
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_80
 #endif
+#ifdef __LONG_DOUBLE_NOROUND
+#define __FLOAT_80_NOROUND
+#endif
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define __FLOAT_80_NOEXCEPT
+#endif
+
 #define fma_80(a, b, c) fmal(a, b, c)
 #define floor_80(x)     floorl(x)
 #define frexp_80(x, a)  frexpl(x, a)
@@ -137,6 +165,13 @@ typedef long double float128_t;
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_128
 #endif
+#ifdef __LONG_DOUBLE_NOROUND
+#define __FLOAT_128_NOROUND
+#endif
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define __FLOAT_128_NOEXCEPT
+#endif
+
 #define fma_128(a, b, c) fmal(a, b, c)
 #define floor_128(x)     floorl(x)
 #define frexp_128(x, a)  frexpl(x, a)
@@ -165,6 +200,12 @@ typedef long double float128_t;
 #define FLOAT_PAYLOAD_DIG 23
 #ifdef __HAVE_FAST_FMA_32
 #define __HAVE_FAST_FMA_F
+#endif
+#ifdef __FLOAT_32_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_32_NOROUND
+#define __FLOAT_NOROUND_F
 #endif
 
 #define GET_ABS(_ix)   ((_ix) & 0x7fffffff)
@@ -217,6 +258,12 @@ typedef long double float128_t;
 #define FLOAT_PAYLOAD_DIG 52
 #ifdef __HAVE_FAST_FMA_64
 #define __HAVE_FAST_FMA_F
+#endif
+#ifdef __FLOAT_64_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_64_NOROUND
+#define __FLOAT_NOROUND_F
 #endif
 
 #define GET_ABS(_ix) ((_ix) & 0x7fffffffffffffffLL)
@@ -273,6 +320,12 @@ typedef long double float128_t;
 #define FLOAT_PAYLOAD_DIG 64
 #ifdef __HAVE_FAST_FMA_80
 #define __HAVE_FAST_FMA_F
+#endif
+#ifdef __FLOAT_80_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_80_NOROUND
+#define __FLOAT_NOROUND_F
 #endif
 
 typedef ieee_extended_shape_type fuint_t;
@@ -365,6 +418,13 @@ f_is_integer(fuint_t i, int shift)
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F
 #endif
+#ifdef __FLOAT_128_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_128_NOROUND
+#define __FLOAT_NOROUND_F
+#endif
+
 #define FLOAT_ABS(_hx) ((_hx) & 0x7fffffffffffffffLL)
 #ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
 #define IS_FINITE(_hx, _lx) 1
