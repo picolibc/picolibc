@@ -87,8 +87,8 @@ int strncasecmp_l(const char *, const char *, size_t, locale_t) __picolibc_expor
 
 #ifdef __preserve_const
 #if __BSD_VISIBLE || __POSIX_VISIBLE <= 200112
-#define index(_s, _c)  __preserve_const(index, _s, (_s, _c))
-#define rindex(_s, _c) __preserve_const(rindex, _s, (_s, _c))
+#define index(_s, _c)  __preserve_const(char *, index, _s, (_s, _c))
+#define rindex(_s, _c) __preserve_const(char *, rindex, _s, (_s, _c))
 #endif
 #endif
 
