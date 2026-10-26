@@ -177,7 +177,7 @@ equalf(float x, float y)
 {
     if (isnan(x) && isnan(y))
         return true;
-    return x == y;
+    return x == y && signbit(x) == signbit(y);
 }
 
 static int
@@ -246,7 +246,7 @@ equal(double x, double y)
 {
     if (isnan(x) && isnan(y))
         return true;
-    return x == y;
+    return x == y && signbit(x) == signbit(y);
 }
 
 static int
@@ -309,7 +309,7 @@ equall(long double x, long double y)
 {
     if (isnan(x) && isnan(y))
         return true;
-    return x == y;
+    return x == y && signbit(x) == signbit(y);
 }
 
 static int

@@ -250,7 +250,7 @@ strfromfloat(float_t f, string suffix)
 			 * Make sure zero is printed as 0.0 so that
 			 * the suffix works
 			 */
-			return sprintf("%.1f%s", x, suffix);
+			return sprintf("%s%.1f%s", f.sign? "-" : "", x, suffix);
 		else
 			/*
 			 * %a format involves conversion to float; the
@@ -307,6 +307,7 @@ times(float_t a, float_t b)
 	if (isnan(b))
 		return b;
 
+	/* XOR rule */
 	bool sign = !(a.sign == b.sign);
 
 	/* Special case inf values -- inf * 0 is nan, but inf * other is inf */
@@ -324,7 +325,7 @@ times(float_t a, float_t b)
 }
 
 float_t
-plus(float_t a, float_t b)
+plus(float_t a, float_t b, rounding_mode_t rounding_mode)
 {
 	if (isnan(a))
 		return a;
@@ -341,9 +342,35 @@ plus(float_t a, float_t b)
 		return b;
 	}
 	real v = a.u.num + b.u.num;
+
 	bool sign = v < 0;
-	if (v == 0)
-		sign = a.sign;
+
+	/*
+	 * IEEE 754 factoid:
+	 *
+	 * For all rounding modes except DOWNWARD:
+	 *
+	 * -0.0 + +0.0 = +0.0
+	 * -0.0 + -0.0 = -0.0
+	 * +0.0 + +0.0 = +0.0
+	 * +0.0 + -0.0 = +0.0
+	 *
+	 * So, if the RHS is -0.0, then adopt the LHS sign
+	 * otherwise, the answer is +0.0
+	 */
+	if (v == 0) {
+		if (rounding_mode == rounding_mode_t.DOWNWARD) {
+			if (!a.sign && !b.sign)
+				sign = false;
+			else
+				sign = true;
+		} else {
+			if (b.u.num == 0) {
+				if (b.sign)
+					sign = a.sign;
+			}
+		}
+	}
 	return (float_t) { .sign = sign, .u = { .num = v } };
 }
 
@@ -352,9 +379,9 @@ plus(float_t a, float_t b)
  * implementation is pretty simple
  */
 float_t
-fma(float_t x, float_t y, float_t z)
+fma(float_t x, float_t y, float_t z, rounding_mode_t rounding_mode)
 {
-	return plus(times(x, y), z);
+	return plus(times(x, y), z, rounding_mode);
 }
 
 int next_exp(int e, format_t format)
@@ -389,6 +416,13 @@ max_exp(int exp_bits)
 	return (2**(exp_bits-1));
 }
 
+rounding_mode_t[] rounding_modes = {
+	rounding_mode_t.TONEAREST,
+	rounding_mode_t.UPWARD,
+	rounding_mode_t.DOWNWARD,
+	rounding_mode_t.TOWARDZERO
+};
+
 void generate_one(string suf, format_t format, format_or_none_t i_format, real x_r, real y_r, real z_r)
 {
 	void print_result(float_t r, rounding_mode_t rounding_mode) {
@@ -409,11 +443,10 @@ void generate_one(string suf, format_t format, format_or_none_t i_format, real x
 	float_t z = real_to_float(z_r);
 
 	printf("{ .line = __LINE__, .x = %-17s, .y = %-17s, .z = %-17s, .r = {", strfromfloat(x, suf), strfromfloat(y, suf), strfromfloat(z, suf));
-	float_t r = plus(times(x, y), z);
-	print_result(r, rounding_mode_t.TONEAREST);
-	print_result(r, rounding_mode_t.UPWARD);
-	print_result(r, rounding_mode_t.DOWNWARD);
-	print_result(r, rounding_mode_t.TOWARDZERO);
+	for (int m = 0; m < dim(rounding_modes); m++) {
+		float_t r = fma(x, y, z, rounding_modes[m]);
+		print_result(r, rounding_modes[m]);
+	}
 	printf(" } },\n");
 }
 
