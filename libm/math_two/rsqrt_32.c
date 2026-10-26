@@ -35,6 +35,7 @@
 #define _ISOC23_SOURCE
 #define WANT_FLOAT32
 #include "math_two.h"
+#include <stdbit.h>
 
 #define QUIET_NAN (((uint32_t)255u << 23) | ((uint32_t)1u << 22) | 1u)
 #define INF ((uint32_t)255u << 23)
@@ -164,7 +165,7 @@ float rsqrtf(float x)
             if (likely (xu!=0 )) //subnormal
             {
                 uint32_t mantissa = xu;
-                int32_t shift=__builtin_clz(mantissa)- (31-23);
+                int32_t shift=stdc_leading_zeros(mantissa)- (31-23);
                 mantissa<<=shift; // normalize subnormal
                 shift= -126 - shift;
                 mantissa <<= shift & 1 ;
@@ -260,7 +261,7 @@ float sqrtf(float x)
             if (likely (xu !=0) )
             {
                 uint32_t mantissa = xu &~ ((uint32_t)exponent << 23);
-                int32_t shift=__builtin_clz(mantissa)- (31-23);
+                int32_t shift=stdc_leading_zeros(mantissa)- (31-23);
                 mantissa <<= shift; // normalize subnormal
                 int32_t exponent =  -126-shift;
                 mantissa <<= (exponent & 1);
