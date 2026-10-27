@@ -184,7 +184,7 @@ name(fma)(float_t x, float_t y, float_t z)
 
     if (rr.hi == 0) {
         RESTORE;
-        hi = xy.hi + zs + xy.lo;
+        hi = name(force_eval)(xy.hi) + zs + xy.lo;
     } else {
         hi = rr.hi;
 
