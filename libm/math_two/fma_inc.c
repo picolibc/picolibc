@@ -201,7 +201,7 @@ name(fma)(float_t x, float_t y, float_t z)
                 rr = f_add_f(hi, lo);
                 hi = rr.hi;
                 lo = rr.lo;
-                CONST_FORCE_FLOAT_MODIFIER bool inexact = (name(force_eval)(lo) != 0);
+                CONST_FORCE_FLOAT_MODIFIER bool inexact = (lo != 0);
                 if (inexact) {
                     /*
                      * Compute the number of significand bits which
