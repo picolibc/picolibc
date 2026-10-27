@@ -75,15 +75,14 @@ the form may be one of:
     week in the month; day 0 is Sunday
 
 <[time1]> is the optional local time that alternate time starts, in
-the same format as <[offset1]> without any sign, and defaults
-to 02:00:00
+the same format as <[offset1]> except that <[hh]> may be up to 167,
+and defaults to 02:00:00
 
 <[end]> is the date in the year that alternate time ends, in the same
 forms as <[start]>
 
 <[time2]> is the optional local time that alternate time ends, in
-the same format as <[offset1]> without any sign, and
-defaults to 02:00:00
+the same format as <[time1]>
 
 Note that there is no white-space padding between fields. Also note that
 if <[TZ]> is null, the default is Universal Time which has no daylight saving
@@ -269,14 +268,24 @@ tzset(void)
         mm = 0;
         ss = 0;
         n = 0;
+        sign = 1;
 
-        if (*tzenv == '/')
-            if (sscanf(tzenv, "/%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0) {
+        if (*tzenv == '/') {
+            /* POSIX.1-2024 allows a signed time, e.g. "M3.5.0/-1" */
+            ++tzenv;
+            if (*tzenv == '-') {
+                sign = -1;
+                ++tzenv;
+            } else if (*tzenv == '+')
+                ++tzenv;
+
+            if (sscanf(tzenv, "%hu%n:%hu%n:%hu%n", &hh, &n, &mm, &n, &ss, &n) <= 0) {
                 /* error in time format */
                 goto bail;
             }
+        }
 
-        new_tzrule[i].s = ss + SECSPERMIN * mm + SECSPERHOUR * hh;
+        new_tzrule[i].s = sign * (ss + SECSPERMIN * mm + SECSPERHOUR * hh);
 
         tzenv += n;
     }
