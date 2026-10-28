@@ -194,6 +194,7 @@ bufio_lseek(struct __file_bufio *bf, __off_t offset, int whence)
         if (bf->lseek_ptr)
             return (bf->lseek_ptr)((void *)bf->ptr, offset, whence);
     }
+    errno = ESPIPE;
     return _FDEV_ERR;
 }
 
@@ -856,9 +857,12 @@ void       __picolibc_non_atomic_store_ungetc(__ungetc_t *p, __ungetc_t v);
 static inline int
 __fflush_locked(FILE *stream)
 {
-    if (stream->flush && (stream->flush)(stream) != 0) {
-        stream->flags |= __SERR;
-        return EOF;
+    if (stream->flush) {
+        if ((stream->flush)(stream) < 0) {
+            stream->flags |= __SERR;
+            return EOF;
+        }
+        return 0;
     }
     __atomic_store_ungetc(&stream->unget, 0);
     return 0;
