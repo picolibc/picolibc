@@ -44,6 +44,7 @@ set(tests
   test-rand
   test-strtod
   test-memalignment
+  test-call-once
   test-stdckdint
   )
 

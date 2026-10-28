@@ -36,6 +36,7 @@
 tests = [
   'test-atexit',
   'test-bsearch',
+  'test-call-once',
   'test-double-free',
   'test-efcvt',
   'test-malloc',
@@ -55,9 +56,24 @@ tests_failure = [
 
 test_extra_libs = {}
 
+if enable_native_tests and oslib_test_variant == ''
+  tests += [
+    'test-call-once-threads',
+  ]
+  test_extra_libs = {
+    'test-call-once-threads' : native_lib,
+  }
+endif
+
 test_extra_c_args = {}
 
 test_args = {}
+
+# call_once holds the libc lock while running the user function, which
+# may itself use the libc lock; lock-valid.c rejects recursive locking.
+tests_no_lock_valid = [
+  'test-call-once',
+  ]
 
 foreach params : targets
   target = params['name']
@@ -90,7 +106,7 @@ foreach params : targets
     t1_src = t1 + '.c'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
 
-    if test_extra_libs.has_key(t1)
+    if test_extra_libs.has_key(t1) or t1 in tests_no_lock_valid
       lock_source = []
     else
       lock_source = test_lock_valid
@@ -140,8 +156,10 @@ foreach params : targets
 
 endforeach
 
-# Host libc may not provide memalignment yet.
+# Host libc may not provide memalignment or call_once in stdlib.h yet.
 test_skip_native = [
+  'test-call-once',
+  'test-call-once-threads',
   'test-memalignment',
 ]
 
