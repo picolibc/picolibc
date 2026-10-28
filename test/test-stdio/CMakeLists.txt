@@ -46,6 +46,11 @@ set(tests
   test-sprintf-s
   test-strfromf
   test-ungetc
+  test-fclose-flush-error
+  test-fflush-error
+  test-fdevclose-flush-error
+  test-fclose-locking-error
+  test-fdevclose-locking
   test-vfprintf-s
   test-vsnprintf-s
   )
