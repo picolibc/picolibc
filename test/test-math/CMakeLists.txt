@@ -154,6 +154,7 @@ set(tests_complex_exp
 set(tests_complex_other
   test-csqrt
   test-complex-funcs
+  test-tgmath
 )
 
 set(tests_other
