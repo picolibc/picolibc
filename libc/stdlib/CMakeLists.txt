@@ -48,6 +48,7 @@ picolibc_sources(
   atol.c
   atoll.c
   btowc.c
+  call_once.c
   div.c
   drand48.c
   ejtouc.c

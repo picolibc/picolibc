@@ -78,6 +78,12 @@ typedef struct {
 } lldiv_t;
 #endif
 
+#if __ISO_C_VISIBLE >= 2023 && !defined(__cplusplus) && !defined(__once_flag_defined)
+#define __once_flag_defined
+typedef int once_flag;
+#define ONCE_FLAG_INIT 0
+#endif
+
 #ifndef __compar_fn_t_defined
 #define __compar_fn_t_defined
 typedef int (*__compar_fn_t)(const void *, const void *);
@@ -158,6 +164,9 @@ void *bsearch(const void *__key, const void *__base, size_t __nmemb, size_t __si
 void *
 calloc(size_t, size_t)
 __malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow __picolibc_export;
+#if __ISO_C_VISIBLE >= 2023 && !defined(__cplusplus)
+void call_once(once_flag *__flag, void (*__func)(void)) __picolibc_export;
+#endif
 div_t div(int __numer, int __denom) __picolibc_export;
 #if __SVID_VISIBLE || __XSI_VISIBLE
 struct _rand48;
