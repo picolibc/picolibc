@@ -89,6 +89,7 @@ main(void)
     /* Make sure we can create a file, write contents and read them back */
     f = fopen(TEST_FILE_NAME, "w");
     check(f != NULL, "fopen w");
+    setlinebuf(f);
     fputs(MESSAGE, f);
 
     f = freopen(ANOTHER_FILE_NAME, "w", f);
