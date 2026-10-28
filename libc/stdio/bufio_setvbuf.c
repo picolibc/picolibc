@@ -91,7 +91,7 @@ __bufio_setvbuf(FILE *f, char *buf, int mode, size_t size)
                 goto bail;
             bf->bflags |= __BALL;
         }
-        if (bf->bflags & __BALL)
+        if ((bf->bflags & (__BALL | __BPIPE)) == __BALL)
             bf->xfile.cfile.close = __bufio_close;
         bf->buf = buf;
         bf->size = size;
