@@ -67,6 +67,8 @@ fwrite(const void *ptr, size_t size, size_t nmemb, FILE *stream)
                 if (bf->len >= bf->size) {
                     int ret = __bufio_flush_locked(stream);
                     if (ret) {
+                        /* Undo the write */
+                        cp -= this_time;
                         stream->flags |= __SERR;
                         break;
                     }
