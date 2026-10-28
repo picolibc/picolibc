@@ -106,7 +106,7 @@ inc_headers = [
 ]
 
 if have_complex
-  inc_headers += ['complex.h']
+  inc_headers += ['complex.h', 'tgmath.h']
 endif
 
 inc_headers += ['picotls.h']

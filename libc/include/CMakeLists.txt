@@ -109,5 +109,6 @@ picolibc_headers(""
 if(${__HAVE_COMPLEX})
   picolibc_headers(""
     complex.h
+    tgmath.h
     )
 endif()
