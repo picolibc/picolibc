@@ -36,6 +36,7 @@
 tests = [
   'test-fdevopen',
   'test-fmemopen',
+  'test-fmemopen-rplus',
   'test-open_memstream',
   'test-freopen',
   'test-fopencookie',
@@ -51,6 +52,8 @@ tests = [
   'test-vfscanf-percent-a',
   'test-vsnprintf-s',
   'test-ungetc',
+  'test-ungetc-reposition',
+  'test-fseek-failure',
   'test-fclose-flush-error',
   'test-fflush-error',
   'test-fdevclose-flush-error',
@@ -91,6 +94,8 @@ if tests_enable_posix_io
     'test-fgetc',
     'test-fgets-eof',
     'test-fflush',
+    'test-fflush-input-error',
+    'test-ungetc-fflush',
     'test-fopen',
     'test-fread-fwrite',
     'test-mktemp',
@@ -99,6 +104,12 @@ if tests_enable_posix_io
     'test-ungetc-ftell',
     'test-wchar',
   ]
+endif
+
+if has_os_posix or use_stdlib
+  tests += [
+    'test-pipe-read-flush',
+    ]
 endif
 
 if get_option('test-stdin')
