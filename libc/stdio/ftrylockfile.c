@@ -36,16 +36,17 @@
 #include "local-stdio.h"
 
 /*
- * This only serializes with other threads also using flockfile,
- * but it's about as good as we can reasonably manage without
- * actually adding per-file locking to every API. We also
- * don't have any try-lock ability in the picolibc lock API, so
+ * We don't have any try-lock ability in the picolibc lock API, so
  * we're stuck just blocking.
  */
-int __no_thread_safety_analysis
-ftrylockfile(FILE *f)
+int
+ftrylockfile(FILE *f) __stdio_try_acquire_file(0, f) __no_thread_safety_analysis
 {
+#ifdef __STDIO_LOCKING
+    __flockfile(f);
+#else
     (void)f;
     __LIBC_LOCK();
+#endif
     return 0;
 }

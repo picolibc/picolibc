@@ -548,7 +548,7 @@ int getc_unlocked(FILE *) __nonnull((1)) __picolibc_export;
 int getchar_unlocked(void) __picolibc_export;
 #ifdef __STDIO_LOCKING
 void flockfile(FILE *__f) __nonnull((1)) __acquire_capability(__f->lock) __picolibc_export;
-int  ftrylockfile(FILE *) __nonnull((1)) __picolibc_export;
+int ftrylockfile(FILE *__f) __nonnull((1)) __try_acquire_capability(0, __f->lock) __picolibc_export;
 void funlockfile(FILE *__f) __nonnull((1)) __release_capability(__f->lock) __picolibc_export;
 #else
 void flockfile(FILE *) __nonnull((1)) __picolibc_export;

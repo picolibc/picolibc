@@ -55,10 +55,12 @@
 
 /* When __STDIO_LOCKING isn't defined, use flockfile/funlockfile */
 #if defined(__PICOLIBC__) && !defined(__STDIO_LOCKING)
-#define LOCK(out)   flockfile(out)
-#define UNLOCK(out) funlockfile(out)
+#define LOCK(out)    flockfile(out)
+#define TRYLOCK(out) ftrylockfile(out)
+#define UNLOCK(out)  funlockfile(out)
 #else
 #define LOCK(out)
+#define TRYLOCK(out) 0
 #define UNLOCK(out)
 #endif
 
@@ -84,10 +86,41 @@ write_func(void *arg)
         flockfile(out);
         v = val;
         while (*v) {
-            putc(*v++, out);
+            putc_unlocked(*v++, out);
             usleep(rand() & 15);
         }
         funlockfile(out);
+    }
+    return NULL;
+}
+
+static void *
+try_write_func(void *arg)
+{
+    char *val = arg;
+    char *v;
+    int   i;
+    for (i = 0; i < 10; i++) {
+        if (TRYLOCK(out) == 0) {
+            fprintf(out, "%s", val);
+            UNLOCK(out);
+        }
+    }
+    for (i = 0; i < 10; i++) {
+        if (TRYLOCK(out) == 0) {
+            fputs(val, out);
+            UNLOCK(out);
+        }
+    }
+    for (i = 0; i < 10; i++) {
+        if (ftrylockfile(out) == 0) {
+            v = val;
+            while (*v) {
+                putc_unlocked(*v++, out);
+                usleep(rand() & 15);
+            }
+            funlockfile(out);
+        }
     }
     return NULL;
 }
@@ -179,16 +212,29 @@ main(void)
     }
     setvbuf(out, NULL, _IONBF, 0);
 #endif
-    srand(1);
-    ret = start_thread(write_func, STRING);
-    srand(2);
-    if (ret) {
-        perror("pthread_create");
-        exit(1);
+
+    int mode;
+
+    for (mode = 0; mode < 2; mode++) {
+        void *(*mode_write_func)(void *);
+
+        if (mode == 0)
+            mode_write_func = write_func;
+        else
+            mode_write_func = try_write_func;
+
+        srand(1);
+        ret = start_thread(write_func, STRING);
+        srand(2);
+        if (ret) {
+            perror("pthread_create");
+            exit(1);
+        }
+        mode_write_func(STRING);
+        stop_thread();
     }
-    write_func(STRING);
-    stop_thread();
     fclose(out);
+
     in = fopen(TEST_FILE_NAME, "r");
     if (!in) {
         perror(TEST_FILE_NAME);

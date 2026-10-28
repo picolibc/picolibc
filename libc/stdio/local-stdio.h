@@ -278,13 +278,15 @@ void _bufio_exit_flush(void) __weak;
 
 #ifdef __STDIO_LOCKING
 void __flockfile_init(FILE *f);
-#define __LOCK_NONE             ((_LOCK_RECURSIVE_T)(uintptr_t)1)
-#define __LOCK_INIT_NONE        .lock = __LOCK_NONE
-#define __stdio_acquire_file(f) __acquire_capability((f)->lock)
-#define __stdio_release_file(f) __release_capability((f)->lock)
+#define __LOCK_NONE                    ((_LOCK_RECURSIVE_T)(uintptr_t)1)
+#define __LOCK_INIT_NONE               .lock = __LOCK_NONE
+#define __stdio_acquire_file(f)        __acquire_capability((f)->lock)
+#define __stdio_try_acquire_file(r, f) __try_acquire_capability(r, (f)->lock)
+#define __stdio_release_file(f)        __release_capability((f)->lock)
 #else
 #define __LOCK_INIT_NONE
 #define __stdio_acquire_file(f)
+#define __stdio_try_acquire_file(r, f)
 #define __stdio_release_file(f)
 #endif
 
