@@ -186,13 +186,13 @@ fmemopen(void *buf, size_t size, const char *mode)
             mflags |= __MAPP;
         } else {
             initial_size = 0;
-            /* w+ mode truncates the buffer, writing NUL */
-            if ((open_flags & O_ACCMODE) == O_RDWR)
-                *((char *)buf) = '\0';
         }
     } else {
         initial_size = size;
     }
+
+    if (open_flags & O_TRUNC)
+        ((char *)buf)[initial_size] = '\0';
 
     *mf = (struct __file_mem) {
         .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush, __fmem_close, __fmem_seek,
