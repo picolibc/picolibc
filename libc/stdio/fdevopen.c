@@ -82,9 +82,9 @@
 static int
 fdevclose(FILE *f)
 {
-    int ret = 0;
+    int ret;
 
-    fflush(f);
+    ret = fflush(f);
     free(f);
     return ret;
 }

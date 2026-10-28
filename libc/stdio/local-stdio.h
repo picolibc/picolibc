@@ -318,16 +318,18 @@ __funlockfile(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 #endif
 }
 
-static inline void
+static inline int
 __flockfile_close(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 {
+    int ret = 0;
     (void)f;
 #ifdef __STDIO_LOCKING
     if (f->lock && f->lock != __LOCK_NONE) {
-        fflush(f);
+        ret = fflush(f);
         __lock_close(f->lock);
     }
 #endif
+    return ret;
 }
 
 /* Silence santizer errors when adding/subtracting 0 to a NULL pointer */
@@ -854,11 +856,12 @@ void       __picolibc_non_atomic_store_ungetc(__ungetc_t *p, __ungetc_t v);
 static inline int
 __fflush_locked(FILE *stream)
 {
-    int ret = 0;
-    if (stream->flush)
-        ret = (stream->flush)(stream);
+    if (stream->flush && (stream->flush)(stream) != 0) {
+        stream->flags |= __SERR;
+        return EOF;
+    }
     __atomic_store_ungetc(&stream->unget, 0);
-    return ret;
+    return 0;
 }
 
 /*
