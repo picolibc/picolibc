@@ -59,6 +59,9 @@ tests = [
   'test-fdevclose-flush-error',
   'test-fclose-locking-error',
   'test-fdevclose-locking',
+  'test-fwrite-flush-recover',
+  'test-ftell-write',
+  'test-ungetc-start-fflush',
 ]
 
 tests_failure = []

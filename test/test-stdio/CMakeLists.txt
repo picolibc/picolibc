@@ -56,6 +56,9 @@ set(tests
   test-fseek-failure
   test-fflush-input-error
   test-ungetc-fflush
+  test-fwrite-flush-recover
+  test-ftell-write
+  test-ungetc-start-fflush
   test-vfprintf-s
   test-vsnprintf-s
   )
