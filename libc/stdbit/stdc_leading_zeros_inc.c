@@ -45,25 +45,42 @@ NAME_SB(stdbit_t value)
     return __builtin_stdc_leading_zeros(value);
 #elif __has_builtin(__builtin_clzg)
     return (unsigned int)__builtin_clzg(value, (int)sizeof(stdbit_t) * 8);
-#else
+#elif __has_builtin(__builtin_clz)    && WANT_SIZE == __SIZEOF_INT__ * 8
     if (value == 0)
         return 8 * sizeof(value);
-    if ( __has_builtin(__builtin_clz) && __builtin_types_compatible_p(unsigned int, stdbit_t))
-        return __builtin_clz(value);
-    else if (__has_builtin(__builtin_clzl) && __builtin_types_compatible_p(unsigned long int, stdbit_t))
-        return __builtin_clzl(value);
-    else if (__has_builtin(__builtin_clzll) && __builtin_types_compatible_p(unsigned long long int, stdbit_t))
-        return __builtin_clzll(value);
-    else {
-        unsigned int ret=0;
-        for (int i = 4 * sizeof(value);  i > 0; i >>= 1 ) {
-            if (value >> (8 * sizeof(value) - i) == 0) {
-                value <<= i;
-                ret += i;
-            }
-        }
-        return ret;
+
+    return __builtin_clz(value);
+#elif __has_builtin(__builtin_clzl)  && WANT_SIZE == __SIZEOF_LONG__ * 8
+    if (value == 0)
+        return WANT_SIZE;
+
+    return __builtin_clzl(value);
+#elif __has_builtin(__builtin_clzll) && WANT_SIZE == __SIZEOF_LONG_LONG__ * 8
+    if (value == 0)
+        return WANT_SIZE;
+
+    return __builtin_clzll(value);
+#else 
+    if (value == 0)
+        return WANT_SIZE;
+
+#if (WANT_SIZE & (WANT_SIZE-1)) == 0
+    unsigned int ceil_p2 = WANT_SIZE;  
+#else
+    unsigned int ceil_p2 = 1;
+    while (ceil_p2 < WANT_SIZE) {
+            ceil_p2 <<= 1;
     }
+#endif  
+    unsigned int ret = 0;
+    for (int i = ceil_p2 >> 1 ;  i > 0; i >>= 1 ) {
+        if (value >> (WANT_SIZE - i) == 0) {
+            value <<= i;
+            ret += i;
+        }
+    }
+    return ret;
+
 #endif
 }
 
