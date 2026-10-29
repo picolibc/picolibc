@@ -60,18 +60,18 @@ NAME_SB(stdbit_t value)
         return WANT_SIZE;
 
     return __builtin_clzll(value);
-#else 
+#else
     if (value == 0)
         return WANT_SIZE;
 
 #if (WANT_SIZE & (WANT_SIZE - 1)) == 0
-    unsigned int ceil_p2 = WANT_SIZE;  
+    unsigned int ceil_p2 = WANT_SIZE;
 #else
     unsigned int ceil_p2 = 1;
     while (ceil_p2 < WANT_SIZE) {
             ceil_p2 <<= 1;
     }
-#endif  
+#endif
     unsigned int ret = 0;
     for (int i = ceil_p2 >> 1;  i > 0; i >>= 1 ) {
         if (value >> (WANT_SIZE - i) == 0) {
@@ -80,7 +80,6 @@ NAME_SB(stdbit_t value)
         }
     }
     return ret;
-
 #endif
 }
 
