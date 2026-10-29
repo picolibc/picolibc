@@ -44,7 +44,7 @@ NAME_SB(stdbit_t value)
 #if __has_builtin(__builtin_stdc_leading_zeros)
     return __builtin_stdc_leading_zeros(value);
 #elif __has_builtin(__builtin_clzg)
-    return (unsigned int)__builtin_clzg(value, (int)sizeof(stdbit_t) * 8);
+    return (unsigned int)__builtin_clzg(value, WANT_SIZE);
 #elif __has_builtin(__builtin_clz)    && WANT_SIZE == __SIZEOF_INT__ * 8
     if (value == 0)
         return WANT_SIZE;
