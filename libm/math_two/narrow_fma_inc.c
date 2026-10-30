@@ -38,6 +38,8 @@
 
 #ifdef float_t
 
+#include "fma_common_inc.c"
+
 #ifdef NARROW_D
 typedef double narrow_t;
 #define func       name(dfma)
@@ -63,11 +65,31 @@ func(float_t x, float_t y, float_t z)
     if (x == (float_t)0.0 || y == (float_t)0.0)
         return (narrow_t)(x * y + z);
 
-    ff_t rr = f_mul_f(x, y);
-    if (z != (float_t)0.0)
-        rr = ff_add_f(rr, z);
+    /*
+     * Compute x * y + z rounded to odd at the wider precision in
+     * round to nearest mode, then scale and narrow the result in the
+     * caller's rounding mode. Rounding to odd first ensures the final
+     * rounding is correct in every mode
+     */
+    int  e;
+    ff_t rr;
 
-    return (narrow_t)round_odd_ff(rr);
+    SAVE_ENV;
+
+    rr = name(_fma_scaled)(x, y, z, &e);
+    if (rr.hi == 0) {
+        /* An exact zero takes its sign from the rounding mode */
+        if (rr.lo == 0) {
+            RESTORE;
+            return (narrow_t)(x * y + z);
+        }
+        rr = (ff_t) { .hi = rr.lo, .lo = 0 };
+    }
+
+    float_t r = round_odd_ff(rr);
+
+    RESTORE;
+    return (narrow_t)_ldexp_no_errno(r, e);
 }
 
 #endif
