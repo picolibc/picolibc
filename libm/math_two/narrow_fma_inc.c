@@ -42,10 +42,12 @@
 
 #ifdef NARROW_D
 typedef double narrow_t;
+#define narrow(x)  narrow_to_double(x)
 #define func       name(dfma)
 #define INVALID(x) __math_invalid(x)
 #else
 typedef float narrow_t;
+#define narrow(x)  narrow_to_float(x)
 #define func       name(ffma)
 #define INVALID(x) __math_invalidf(x)
 #endif
@@ -59,11 +61,11 @@ func(float_t x, float_t y, float_t z)
      * infinities, NaNs, overflows, and signed zeroes correctly.
      */
     if (!isfinite(z) && isfinite(x) && isfinite(y))
-        return (narrow_t)(z + z);
+        return narrow(z + z);
     if (!isfinite(x) || !isfinite(y) || !isfinite(z))
-        return (narrow_t)(x * y + z);
+        return narrow(x * y + z);
     if (x == (float_t)0.0 || y == (float_t)0.0)
-        return (narrow_t)(x * y + z);
+        return narrow(x * y + z);
 
     /*
      * Compute x * y + z rounded to odd at the wider precision in
@@ -86,7 +88,7 @@ func(float_t x, float_t y, float_t z)
         /* An exact zero takes its sign from the rounding mode */
         if (rr.lo == 0) {
             RESTORE;
-            return (narrow_t)(name(force_eval)(x) * y + z);
+            return narrow(name(force_eval)(x) * y + z);
         }
         rr = (ff_t) { .hi = rr.lo, .lo = 0 };
     }
@@ -94,7 +96,7 @@ func(float_t x, float_t y, float_t z)
     float_t r = name(force_eval)(round_odd_ff(rr));
 
     RESTORE;
-    return (narrow_t)_ldexp_no_errno(name(force_eval)(r), e);
+    return narrow(_ldexp_no_errno(name(force_eval)(r), e));
 }
 
 #endif

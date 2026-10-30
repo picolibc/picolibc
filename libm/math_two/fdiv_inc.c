@@ -42,7 +42,7 @@ float
 name(fdiv)(float_t x, float_t y)
 {
     ff_t xx = { .hi = x, .lo = 0 };
-    return (float)round_odd_ff(ff_div_f(xx, y));
+    return narrow_to_float(round_odd_ff(ff_div_f(xx, y)));
 }
 
 #endif

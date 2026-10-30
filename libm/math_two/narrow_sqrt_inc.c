@@ -40,10 +40,12 @@
 
 #ifdef NARROW_D
 typedef double narrow_t;
+#define narrow(x)  narrow_to_double(x)
 #define func       name(dsqrt)
 #define INVALID(x) __math_invalid(x)
 #else
 typedef float narrow_t;
+#define narrow(x)  narrow_to_float(x)
 #define func       name(fsqrt)
 #define INVALID(x) __math_invalidf(x)
 #endif
@@ -93,7 +95,7 @@ func(float_t x)
     if (test.hi == x && test.lo == 0)
         yy.lo = 0;
 
-    return (narrow_t)round_odd_ff(yy);
+    return narrow(round_odd_ff(yy));
 }
 
 #endif

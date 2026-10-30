@@ -41,7 +41,7 @@
 double
 name(dsub)(float_t x, float_t y)
 {
-    return (double)round_odd_ff(f_add_f(x, -y));
+    return narrow_to_double(round_odd_ff(f_add_f(x, -y)));
 }
 
 #endif

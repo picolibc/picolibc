@@ -41,7 +41,7 @@
 float
 name(fsub)(float_t x, float_t y)
 {
-    return (float)round_odd_ff(f_add_f(x, -y));
+    return narrow_to_float(round_odd_ff(f_add_f(x, -y)));
 }
 
 #endif
