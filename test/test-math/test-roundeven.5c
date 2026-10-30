@@ -63,6 +63,9 @@ roundeven(real x)
 		else
 			y += 1;
 	}
+	/* Zero results keep the sign of x */
+	if (y == 0)
+		return copysign(plus_zero, x);
 	return y;
 }
 
