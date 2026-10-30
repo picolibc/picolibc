@@ -194,7 +194,6 @@ real lgamma(real x) {
 		raise infinity(1);
 	return log(gamma(x));
 }
-real log1p(real x) { return log(1+x); }
 real logb(real x) {
 	if (x == 0)
 		raise infinity(-1);
@@ -347,7 +346,7 @@ real round_even(real x, int bits)
 	real ret = ipart * (2 ** (exp - bits));
 	if (x < 0)
 		ret = -ret;
-	return ret;
+	return imprecise(ret, bits);
 }
 
 real j0(real x) = jn(x,0);
@@ -378,7 +377,7 @@ func_f_f_t[] funcs_f_f = {
 #	{ .f = jn, .name = "jnl" },
 	{ .f = lgamma, .name = "lgammal" },
 	{ .f = log10, .name = "log10l" },
-	{ .f = log1p, .name = "log1pl" },
+	{ .f = logp1, .name = "logp1l" },
 	{ .f = log2, .name = "log2l" },
 	{ .f = logb, .name = "logbl" },
 	{ .f = log, .name = "logl" },
