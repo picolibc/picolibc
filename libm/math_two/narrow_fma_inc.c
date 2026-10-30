@@ -76,7 +76,7 @@ func(float_t x, float_t y, float_t z)
     int  e;
     ff_t rr;
 
-    SAVE_ENV;
+    FENV_SAVE;
 
     /*
      * The barriers keep the compiler from moving the computation
@@ -87,7 +87,7 @@ func(float_t x, float_t y, float_t z)
     if (rr.hi == 0) {
         /* An exact zero takes its sign from the rounding mode */
         if (rr.lo == 0) {
-            RESTORE;
+            FENV_RESTORE;
             return narrow(name(force_eval)(x) * y + z);
         }
         rr = (ff_t) { .hi = rr.lo, .lo = 0 };
@@ -95,8 +95,8 @@ func(float_t x, float_t y, float_t z)
 
     float_t r = name(force_eval)(round_odd_ff(rr));
 
-    RESTORE;
-    return narrow(_ldexp_no_errno(name(force_eval)(r), e));
+    FENV_RESTORE;
+    return narrow(ldexp_no_errno_f(name(force_eval)(r), e));
 }
 
 #endif
