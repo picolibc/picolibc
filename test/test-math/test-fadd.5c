@@ -36,6 +36,11 @@
 load "test-narrow.5c"
 load "test-fadd-inc.5c"
 
+/* A float denorm result which double rounding would get wrong */
+test_extra = (test_vector_t[]) {
+    { .a = 0x1.8p-149, .b = -0x1p-179, .c = 0 },
+};
+
 specials = (special_t[]) {
 	{ .x1 = "-0.0", .x2 = "-0.0", .y = "-0.0" },
 	{ .x1 = "-0.0", .x2 = "0.0", .y = "0.0" },
