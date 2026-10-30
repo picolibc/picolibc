@@ -8,6 +8,8 @@
 #ifndef _COMPLEX_H
 #define _COMPLEX_H
 
+#define __STDC_VERSION_COMPLEX_H__ 202311L
+
 #include <sys/cdefs.h>
 
 #define complex    _Complex
