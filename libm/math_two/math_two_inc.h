@@ -306,17 +306,34 @@ ff_mul_ff(ff_t x, ff_t y)
 static math_two_inline ff_t
 ff_div_f(ff_t x, float_t y)
 {
+    if (y == 0 || !isfinite(y) || x.hi == 0 || !isfinite(x.hi))
+        return (ff_t) { .hi = x.hi / y, .lo = 0 };
+
+    /* Scale everyone to [0.5,1) */
+    int xe, ye;
+    x.hi = name(frexp)(x.hi, &xe);
+    x.lo = name(ldexp)(x.lo, -xe);
+    y = name(frexp)(y, &ye);
+
+    /* Perform the division */
     float_t th = x.hi / y;
     float_t tl;
-    if (!isfinite(th) || th == 0)
-        return (ff_t) { .hi = th, .lo = 0 };
     ff_t    pi = f_mul_f(th, y);
     ff_t    de1 = f_add_f(x.hi, -pi.hi);
     float_t del2 = x.lo - pi.lo;
     float_t del = de1.lo + del2;
     float_t de = de1.hi + del;
     tl = de / y;
-    return f_add_f_fast(th, tl);
+    ff_t rr = f_add_f_fast(th, tl);
+
+    /* Scale back */
+    int  re = xe - ye;
+    rr.hi = name(ldexp)(rr.hi, re);
+    if (!isfinite(rr.hi))
+        rr.lo = 0;
+    else
+        rr.lo = name(ldexp)(rr.lo, re);
+    return rr;
 }
 
 #define ff_div_ff name(ff_div_ff_)
@@ -326,6 +343,14 @@ ff_div_ff(ff_t x, ff_t y)
 {
     if (y.hi == 0 || !isfinite(y.hi) || x.hi == 0 || !isfinite(x.hi))
         return (ff_t) { .hi = x.hi / y.hi, .lo = 0 };
+
+    /* Scale everything to [0.5,1) */
+    int xe, ye;
+    x.hi = name(frexp)(x.hi, &xe);
+    x.lo = name(ldexp)(x.lo, -xe);
+    y.hi = name(frexp)(y.hi, &ye);
+    y.lo = name(ldexp)(y.lo, -ye);
+
 #ifdef __HAVE_FAST_FMA_F
     /* Algorithm 18 */
     float_t th = 1 / y.hi;
@@ -336,7 +361,7 @@ ff_div_ff(ff_t x, ff_t y)
     ff_t    e = f_add_f_fast(rh, rl);
     ff_t    de = ff_mul_f(e, th);
     ff_t    m = ff_add_f(de, th);
-    return ff_mul_ff(x, m);
+    ff_t    rr = ff_mul_ff(x, m);
 #else
     /* Algorithm 17 */
     float_t th = x.hi / y.hi;
@@ -347,8 +372,17 @@ ff_div_ff(ff_t x, ff_t y)
     float_t del = x.lo - r.lo;
     float_t de = pih + del;
     float_t tl = de / y.hi;
-    return f_add_f_fast(th, tl);
+    ff_t    rr = f_add_f_fast(th, tl);
 #endif
+
+    /* Scale back */
+    int re = xe - ye;
+    rr.hi = name(ldexp)(rr.hi, re);
+    if (!isfinite(rr.hi))
+        rr.lo = 0;
+    else
+        rr.lo = name(ldexp)(rr.lo, re);
+    return rr;
 }
 
 static math_two_inline bool
