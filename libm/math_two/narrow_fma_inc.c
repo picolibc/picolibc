@@ -89,7 +89,7 @@ func(float_t x, float_t y, float_t z)
     float_t r = round_odd_ff(rr);
 
     FENV_RESTORE;
-    return (narrow_t)_ldexp_no_errno(r, e);
+    return (narrow_t)ldexp_no_errno_f(r, e);
 }
 
 #endif

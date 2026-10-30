@@ -76,7 +76,7 @@ name(_fma_scaled)(float_t x, float_t y, float_t z, int *e)
 
     /* Likewise when z is far below x * y */
     if (spread <= FLOAT_MANT_DIG * 2)
-        zs = _ldexp_no_errno(zs, -spread);
+        zs = ldexp_no_errno_f(zs, -spread);
     else
         zs = name(copysign)(FLOAT_MIN, zs);
 

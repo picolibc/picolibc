@@ -42,7 +42,21 @@ float
 name(fdiv)(float_t x, float_t y)
 {
     ff_t xx = { .hi = x, .lo = 0 };
-    return (float)round_odd_ff(ff_div_f(xx, y));
+
+    /* Compute the quotient in round to nearest mode */
+    FENV_SAVE;
+    ff_t rr = ff_div_f(xx, y);
+    FENV_RESTORE;
+
+    /*
+     * When the result overflowed or underflowed the wider type, the
+     * narrow result depends only on the sign and rounding mode
+     */
+    if (!isnormal(rr.hi))
+        return (float)(x / y);
+
+    /* Round to odd, then round once more in the caller's mode */
+    return (float)round_odd_ff(rr);
 }
 
 #endif

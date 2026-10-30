@@ -154,7 +154,7 @@ name(fma)(float_t x, float_t y, float_t z)
         }
     }
 
-    hi = _ldexp_no_errno(hi, e);
+    hi = ldexp_no_errno_f(hi, e);
 #ifdef FENV_HAS_EXCEPTIONS
     /* An inexact result smaller than the smallest normal has underflowed */
     if (inexact && name(fabs)(hi) < FLOAT_MIN)
