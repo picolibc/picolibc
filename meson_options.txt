@@ -73,6 +73,8 @@ option('use-hlt-semihosting', type: 'boolean', value: 'false',
         description: 'Enable HLT Semihosting (only valid for Armv8)')
 option('picolibc-export', type: 'boolean', value: true,
        description: 'Annotate public picolibc APIs with default (exported) visibility')
+option('ndebug', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Build the library with -DNDEBUG (auto: unless buildtype is debug)')
 
 #
 # Installation options

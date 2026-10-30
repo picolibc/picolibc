@@ -45,6 +45,7 @@ These options control some general build configuration values.
 | fast-strcmp                 | true    | Always optimize strcmp for performance (to make Dhrystone happy)                     |
 | strcmp-pair                 | false   | Use RISC-V paired-word strcmp (dual-issue / fused-load cores)                        |
 | picolibc-export             | true    | Annotate public picolibc APIs with default (exported) visibility                     |
+| ndebug                      | auto    | Build the library with -DNDEBUG (auto: unless buildtype is debug)                    |
 
 ### Installation options
 
