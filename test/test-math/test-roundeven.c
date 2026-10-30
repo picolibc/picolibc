@@ -34,6 +34,7 @@
  */
 
 #define _ISOC23_SOURCE
+#define ULP_BITWISE
 #define TEST_VECTORS "test-roundeven.h"
 #define TEST_FUNC    roundeven
 
