@@ -37,4 +37,7 @@
 #define TEST_VECTORS "test-atan2pi.h"
 #define TEST_FUNC    atan2pi
 
+/* atan2pi(±y, ±y) is exactly ±1/4 or ±3/4 */
+#define TEST_EXACT_RESULT(x1, x2) ((x1) == (x2) || (x1) == -(x2))
+
 #include "test-real-real.h"
