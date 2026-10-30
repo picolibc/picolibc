@@ -40,25 +40,19 @@ real[] test_values = {
         0x1.800006p-21,
 };
 
-real
-log1p(real x)
-{
-	return log(1 + x);
-}
-
 void
 main()
 {
         for (int i = 0; i < dim(test_values); i++)
-                compute_real_one(test_values[i], log1p);
+                compute_real_one(test_values[i], logp1);
 	for (real r = 0x1p-149; r < 0x1.fffffep-1; r *= 1.4) {
 		real ri = imprecise(r, prec);
-		compute_real_one(ri, log1p);
-		compute_real_one(-ri, log1p);
+		compute_real_one(ri, logp1);
+		compute_real_one(-ri, logp1);
 	}
 	for (real r = 1e-38; r < 1e38; r *= 3) {
 		real ri = imprecise(r, prec);
-		compute_real_one(ri, log1p);
+		compute_real_one(ri, logp1);
 	}
 }
 
