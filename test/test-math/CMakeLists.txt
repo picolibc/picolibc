@@ -36,22 +36,30 @@
 set(tests_real_trig
   test-acos
   test-acosh
+  test-acospi
   test-asin
   test-asinh
+  test-asinpi
   test-atan
   test-atan2
   test-atanh
+  test-atanpi
+  test-atan2pi
   test-cos
   test-cosh
+  test-cospi
   test-sin
   test-sincos-cos
   test-sincos-sin
   test-sinh
+  test-sinpi
   test-tan
   test-tanh
+  test-tanpi
 )
 
 set(tests_real_exp
+  test-compoundn
   test-exp
   test-exp10
   test-exp2
@@ -60,13 +68,28 @@ set(tests_real_exp
   test-exp10m1
   test-log
   test-log10
-  test-log1p
+  test-logp1
   test-log2
   test-log10p1
   test-log2p1
   test-pow
   test-pown
   test-powr
+)
+
+set(tests_real_narrow
+  test-fadd
+  test-fsub
+  test-fmul
+  test-fdiv
+  test-fsqrt
+  test-ffma
+  test-dadd
+  test-dsub
+  test-dmul
+  test-ddiv
+  test-dsqrt
+  test-dfma
 )
 
 set(tests_real_other
@@ -81,6 +104,9 @@ set(tests_real_other
   test-j0
   test-j1
   test-jn
+  test-y0
+  test-y1
+  test-yn
   test-lgamma
   test-nextafter
   test-nextdown
@@ -125,6 +151,7 @@ set(tests_complex_exp
 
 set(tests_complex_other
   test-csqrt
+  test-complex-funcs
 )
 
 set(tests_other
@@ -134,20 +161,23 @@ set(tests_other
   test-long-double
   test-math-errhandling
   test-math-funcs
-  test-rounding-mode
   )
 
 set(tests
   ${tests_real_trig}
   ${tests_real_exp}
+  ${tests_real_narrow}
   ${tests_real_other}
   ${tests_complex_trig}
   ${tests_complex_exp}
   ${tests_complex_other}
-  ${tests_math_other}
+  ${tests_other}
   )
 
 foreach(test IN LISTS tests)
   picolibc_test(${test})
 endforeach()
+
+# test-rounding-mode needs a second source file
+picolibc_test(test-rounding-mode test-rounding-mode-sub.c)
 
