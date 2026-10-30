@@ -43,18 +43,7 @@ clock_gettime(clockid_t id, struct timespec *ts)
     int                             kid;
     int                             ret;
 
-    if (id == CLOCK_MONOTONIC)
-        kid = LINUX_CLOCK_MONOTONIC;
-    else if (id == CLOCK_PROCESS_CPUTIME_ID)
-        kid = LINUX_CLOCK_PROCESS_CPUTIME_ID;
-    else if (id == CLOCK_REALTIME)
-        kid = LINUX_CLOCK_REALTIME;
-    else if (id == CLOCK_THREAD_CPUTIME_ID)
-        kid = LINUX_CLOCK_THREAD_CPUTIME_ID;
-    else {
-        errno = EINVAL;
-        return -1;
-    }
+    MAP_CLOCK_ID(kid, id);
     ret = syscall(LINUX_SYS_clock_gettime_time_t, kid, &kts);
     if (ret < 0)
         return ret;
