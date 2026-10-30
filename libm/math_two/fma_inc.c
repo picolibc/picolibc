@@ -61,28 +61,7 @@ name(fma)(float_t x, float_t y, float_t z)
 
 #else
 
-#if (defined(FE_INEXACT) || defined(FE_UNDERFLOW)) && !defined(__FLOAT_NOEXCEPT_F)
-#define HAS_EXCEPTIONS
-#endif
-
-#if (defined(FE_UPWARD) || defined(FE_DOWNWARD) || defined(FE_TOWARDZERO)) \
-    && !defined(__FLOAT_NOROUND_F)
-#define HAS_ROUNDING
-#endif
-
-/* Wrap ldexp to avoid trashing errno */
-#ifdef __MATH_ERRNO
-static float_t
-_ldexp_no_errno(float_t x, int n)
-{
-    int save_errno = errno;
-    x = name(ldexp)(x, n);
-    errno = save_errno;
-    return x;
-}
-#else
-#define _ldexp_no_errno(a, b) name(ldexp)(a, b)
-#endif
+#include "fma_common_inc.c"
 
 float_t
 name(fma)(float_t x, float_t y, float_t z)
@@ -102,15 +81,6 @@ name(fma)(float_t x, float_t y, float_t z)
     if (z == 0)
         return (x * y);
 
-    float_t xs, ys, zs;
-    int     xe, ye, ze;
-
-    xs = name(frexp)(x, &xe);
-    ys = name(frexp)(y, &ye);
-    zs = name(frexp)(z, &ze);
-
-    int spread = xe + ye - ze;
-
 #ifdef HAS_ROUNDING
     int oround = fegetround();
 #define ROUND_NEAREST (oround == FE_TONEAREST)
@@ -118,78 +88,38 @@ name(fma)(float_t x, float_t y, float_t z)
 #define ROUND_NEAREST 1
 #endif
 
-    /*
-     * If x * y and z are many orders of magnitude apart, the scaling
-     * will overflow, so we handle these cases specially.  Rounding
-     * modes other than FE_TONEAREST are painful.
-     */
-    if (spread < -FLOAT_MANT_DIG) {
-#ifdef HAS_EXCEPTIONS
-        feraiseexcept(FE_INEXACT);
-        if (!isnormal(z))
-            feraiseexcept(FE_UNDERFLOW);
-#endif
-#ifdef HAS_ROUNDING
-        switch (oround) {
-        default:
-            break;
-#ifdef FE_TOWARDZERO
-        case FE_TOWARDZERO:
-            if ((x > 0) ^ (y < 0) ^ (z < 0))
-                break;
-            else
-                return name(nextafter)(z, 0);
-#endif
-#ifdef FE_DOWNWARD
-        case FE_DOWNWARD:
-            if ((x > 0) ^ (y < 0))
-                break;
-            else
-                return (name(nextafter)(z, -(float_t)INFINITY));
-#endif
-#ifdef FE_UPWARD
-        case FE_UPWARD:
-            if ((x > 0) ^ (y < 0))
-                return (name(nextafter)(z, (float_t)INFINITY));
-            break;
-#endif
-        }
-#endif
-        return (z);
-    }
-
-#if defined(HAS_EXCEPTIONS) || defined(HAS_ROUNDING)
     /* Save and restore exceptions and rounding modes */
-    fenv_t save_env;
-    fegetenv(&save_env);
-#ifdef HAS_ROUNDING
-    fesetround(FE_TONEAREST);
-#endif
-#define RESTORE fesetenv(&save_env)
-#else
-#define RESTORE
-#endif
+    SAVE_ENV;
 
-    if (spread <= FLOAT_MANT_DIG * 2)
-        zs = _ldexp_no_errno(zs, -spread);
-    else
-        zs = name(copysign)(FLOAT_MIN, zs);
-
-    ff_t    xy = f_mul_f(xs, ys);
-    ff_t    rr = f_add_f(xy.hi, zs);
-
-    int     e = xe + ye;
-
-    float_t hi;
+    int                             e;
+    ff_t                            rr = name(_fma_scaled)(x, y, z, &e);
+    float_t                         hi;
+    CONST_FORCE_FLOAT_MODIFIER bool inexact = false;
 
     if (rr.hi == 0) {
         RESTORE;
-        hi = name(force_eval)(xy.hi) + zs + xy.lo;
+        /*
+         * An exact zero takes its sign from the rounding mode. The
+         * barrier keeps the compiler from computing it before the
+         * rounding mode is restored.
+         */
+        if (rr.lo == 0) {
+#if defined(__m68k__) && !defined(__HAVE_68881__) && !defined(__mcffpu__)
+            /*
+             * Work around bug in libgcc 14.2.0: the m68k soft-float
+             * __addsf3 returns -0 for -a + a in round to nearest mode.
+             * |z| - |z| has the same sign as x * y + z in every mode.
+             */
+            return name(fabs)(name(force_eval)(z)) - name(fabs)(z);
+#else
+            return name(force_eval)(x) * y + z;
+#endif
+        }
+        hi = rr.lo;
     } else {
         hi = rr.hi;
-
-        /* Prepare the low float for use in rounding */
-        float_t lo = round_odd_ff(f_add_f(xy.lo, rr.lo));
+        float_t lo = rr.lo;
+        inexact = (lo != 0);
 
         if (ROUND_NEAREST) {
 
@@ -201,7 +131,7 @@ name(fma)(float_t x, float_t y, float_t z)
                 rr = f_add_f(hi, lo);
                 hi = rr.hi;
                 lo = rr.lo;
-                CONST_FORCE_FLOAT_MODIFIER bool inexact = (lo != 0);
+                inexact = (lo != 0);
                 if (inexact) {
                     /*
                      * Compute the number of significand bits which
@@ -239,6 +169,11 @@ name(fma)(float_t x, float_t y, float_t z)
     }
 
     hi = _ldexp_no_errno(hi, e);
+#ifdef HAS_EXCEPTIONS
+    /* An inexact result smaller than the smallest normal has underflowed */
+    if (inexact && name(fabs)(hi) < FLOAT_MIN)
+        feraiseexcept(FE_UNDERFLOW);
+#endif
     return hi;
 }
 
