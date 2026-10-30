@@ -17,7 +17,7 @@
 _BEGIN_STD_C
 
 #if __ISO_C_VISIBLE >= 2023
-#define __STDC_VERSION_STDINT_H__ 0x202311L
+#define __STDC_VERSION_STDINT_H__ 202311L
 #endif
 
 #include <sys/_leastint.h>
