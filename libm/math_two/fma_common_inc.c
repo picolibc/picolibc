@@ -38,46 +38,6 @@
  * Include after math_two.h with float_t defined.
  */
 
-#if (defined(FE_INEXACT) || defined(FE_UNDERFLOW)) && !defined(__FLOAT_NOEXCEPT_F)
-#define HAS_EXCEPTIONS
-#endif
-
-#if (defined(FE_UPWARD) || defined(FE_DOWNWARD) || defined(FE_TOWARDZERO)) \
-    && !defined(__FLOAT_NOROUND_F)
-#define HAS_ROUNDING
-#endif
-
-/* Save the environment and select round to nearest, RESTORE puts it back */
-#if defined(HAS_EXCEPTIONS) || defined(HAS_ROUNDING)
-#ifdef HAS_ROUNDING
-#define SET_NEAREST fesetround(FE_TONEAREST)
-#else
-#define SET_NEAREST
-#endif
-#define SAVE_ENV         \
-    fenv_t save_env;     \
-    fegetenv(&save_env); \
-    SET_NEAREST
-#define RESTORE fesetenv(&save_env)
-#else
-#define SAVE_ENV
-#define RESTORE
-#endif
-
-/* Wrap ldexp to avoid trashing errno */
-#ifdef __MATH_ERRNO
-static math_two_inline float_t
-_ldexp_no_errno(float_t x, int n)
-{
-    int save_errno = errno;
-    x = name(ldexp)(x, n);
-    errno = save_errno;
-    return x;
-}
-#else
-#define _ldexp_no_errno(a, b) name(ldexp)(a, b)
-#endif
-
 /*
  * Compute x * y + z for finite x, y and z where x and y are non-zero.
  * The operands are scaled with frexp so nothing overflows or

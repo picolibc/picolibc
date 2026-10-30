@@ -74,13 +74,13 @@ func(float_t x, float_t y, float_t z)
     int  e;
     ff_t rr;
 
-    SAVE_ENV;
+    FENV_SAVE;
 
     rr = name(_fma_scaled)(x, y, z, &e);
     if (rr.hi == 0) {
         /* An exact zero takes its sign from the rounding mode */
         if (rr.lo == 0) {
-            RESTORE;
+            FENV_RESTORE;
             return (narrow_t)(x * y + z);
         }
         rr = (ff_t) { .hi = rr.lo, .lo = 0 };
@@ -88,7 +88,7 @@ func(float_t x, float_t y, float_t z)
 
     float_t r = round_odd_ff(rr);
 
-    RESTORE;
+    FENV_RESTORE;
     return (narrow_t)_ldexp_no_errno(r, e);
 }
 

@@ -35,23 +35,38 @@
 
 #include <stdio.h>
 
-#define __name(a, b)   a##b
-#define _name(a, b)    __name(a, b)
-#define name(a)        _name(a, NAME_SUFFIX)
-#define kernel(a)      _name(a, KERNEL_SUFFIX)
+#define __name(a, b)           a##b
+#define _name(a, b)            __name(a, b)
+#define name(a)                _name(a, NAME_SUFFIX)
+#define kernel(a)              _name(a, KERNEL_SUFFIX)
 
-#define fma_f(a, b, c) name(fma)(a, b, c)
-#define floor_f(x)     name(floor)(x)
-#define frexp_f(x, a)  name(frexp)(x, a)
-#define ldexp_f(x, a)  name(ldexp)(x, a)
+#define fma_f(a, b, c)         name(fma)(a, b, c)
+#define floor_f(x)             name(floor)(x)
+#define frexp_f(x, a)          name(frexp)(x, a)
+#define ldexp_f(x, a)          name(ldexp)(x, a)
+#define ldexp_no_errno_f(x, a) name(ldexp_no_errno)(x, a)
 
-#define ff_t           name(ff)
+#define ff_t                   name(ff)
 
 #ifdef __lm32__
 #define math_two_inline __always_inline
 #else
 #define math_two_inline inline
 #endif
+
+/* Wrap ldexp to avoid trashing errno */
+static math_two_inline float_t
+name(ldexp_no_errno)(float_t x, int n)
+{
+#ifdef __MATH_ERRNO
+    int save_errno = errno;
+    x = ldexp_f(x, n);
+    errno = save_errno;
+    return x;
+#else
+    return ldexp_f(x, n);
+#endif
+}
 
 #ifdef fuint_t
 static math_two_inline fuint_t
@@ -300,6 +315,36 @@ ff_mul_ff(ff_t x, ff_t y)
     float_t cl3 = c.lo + cl2;
     return f_add_f_fast(c.hi, cl3);
 }
+
+/*
+ * Floating point environment handling for float_t. FENV_SAVE saves the
+ * environment and selects round to nearest; FENV_RESTORE puts it back,
+ * discarding any exceptions raised in between.
+ */
+#if (defined(FE_INEXACT) || defined(FE_UNDERFLOW)) && !defined(__FLOAT_NOEXCEPT_F)
+#define FENV_HAS_EXCEPTIONS
+#endif
+
+#if (defined(FE_UPWARD) || defined(FE_DOWNWARD) || defined(FE_TOWARDZERO)) \
+    && !defined(__FLOAT_NOROUND_F)
+#define FENV_HAS_ROUNDING
+#endif
+
+#if defined(FENV_HAS_EXCEPTIONS) || defined(FENV_HAS_ROUNDING)
+#ifdef FENV_HAS_ROUNDING
+#define FENV_SET_NEAREST fesetround(FE_TONEAREST)
+#else
+#define FENV_SET_NEAREST
+#endif
+#define FENV_SAVE        \
+    fenv_t save_env;     \
+    fegetenv(&save_env); \
+    FENV_SET_NEAREST
+#define FENV_RESTORE fesetenv(&save_env)
+#else
+#define FENV_SAVE
+#define FENV_RESTORE
+#endif
 
 #define ff_div_f name(ff_div_f_)
 

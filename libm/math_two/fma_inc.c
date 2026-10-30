@@ -81,7 +81,7 @@ name(fma)(float_t x, float_t y, float_t z)
     if (z == 0)
         return (x * y);
 
-#ifdef HAS_ROUNDING
+#ifdef FENV_HAS_ROUNDING
     int oround = fegetround();
 #define ROUND_NEAREST (oround == FE_TONEAREST)
 #else
@@ -89,7 +89,7 @@ name(fma)(float_t x, float_t y, float_t z)
 #endif
 
     /* Save and restore exceptions and rounding modes */
-    SAVE_ENV;
+    FENV_SAVE;
 
     int                             e;
     ff_t                            rr = name(_fma_scaled)(x, y, z, &e);
@@ -97,7 +97,7 @@ name(fma)(float_t x, float_t y, float_t z)
     CONST_FORCE_FLOAT_MODIFIER bool inexact = false;
 
     if (rr.hi == 0) {
-        RESTORE;
+        FENV_RESTORE;
         /* An exact zero takes its sign from the rounding mode */
         if (rr.lo == 0)
             return x * y + z;
@@ -139,23 +139,23 @@ name(fma)(float_t x, float_t y, float_t z)
                     if ((lost_bits == 1) == is_odd_sig(hi))
                         hi = name(nextafter)(hi, (float_t)INFINITY * lo);
                 }
-                RESTORE;
-#ifdef HAS_EXCEPTIONS
+                FENV_RESTORE;
+#ifdef FENV_HAS_EXCEPTIONS
                 if (inexact)
                     feraiseexcept(FE_INEXACT);
 #endif
             } else {
-                RESTORE;
+                FENV_RESTORE;
                 hi = name(force_eval)(hi) + lo;
             }
         } else {
-            RESTORE;
+            FENV_RESTORE;
             hi = name(force_eval)(hi) + lo;
         }
     }
 
     hi = _ldexp_no_errno(hi, e);
-#ifdef HAS_EXCEPTIONS
+#ifdef FENV_HAS_EXCEPTIONS
     /* An inexact result smaller than the smallest normal has underflowed */
     if (inexact && name(fabs)(hi) < FLOAT_MIN)
         feraiseexcept(FE_UNDERFLOW);
