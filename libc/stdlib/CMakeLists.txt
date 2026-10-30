@@ -132,6 +132,7 @@ if(ENABLE_MALLOC)
     getpagesize.c
     mallinfo.c
     malloc.c
+    malloc-error.c
     malloc-stats.c
     malloc-usable-size.c
     mallopt.c

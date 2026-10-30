@@ -116,7 +116,7 @@ srcs_ld_common = [
   's_rintl.c',
   's_roundl.c',
   's_scalbl.c',
-  's_scalbln.c',
+  's_scalblnl.c',
   's_scalbnl.c',
   's_signbitl.c',
   's_sincosl.c',

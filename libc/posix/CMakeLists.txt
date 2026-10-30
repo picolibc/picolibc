@@ -40,6 +40,7 @@ picolibc_sources(
   endgrent.c
   endpwent.c
   execl.c
+  execlp.c
   execv.c
   execvp.c
   execvpe.c
@@ -57,6 +58,7 @@ picolibc_sources(
   getlogin.c
   getpass.c
   getpwent.c
+  getpwent_r.c
   getpwnam.c
   getpwnam_r.c
   getpwuid.c
@@ -64,6 +66,7 @@ picolibc_sources(
   grdata.c
   grfile.c
   pwdata.c
+  pwfile.c
   regcomp.c
   regerror.c
   regexec.c

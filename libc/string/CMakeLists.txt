@@ -66,7 +66,6 @@ picolibc_sources(
   strchrnul.c
   strcoll.c
   strcoll_l.c
-  strcmp.c
   strcpy.c
   strcspn.c
   strdup.c
@@ -147,3 +146,14 @@ picolibc_sources(
   strncpy_s.c
   strnlen_s.c
   )
+
+# Always optimize strcmp for performance when requested
+if(__FAST_STRCMP)
+  picolibc_sources_flags("-O3"
+    strcmp.c
+    )
+else()
+  picolibc_sources(
+    strcmp.c
+    )
+endif()

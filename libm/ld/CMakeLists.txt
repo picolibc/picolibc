@@ -59,6 +59,7 @@ picolibc_sources(
   s_expm1l.c
   s_floorl.c
   s_fpclassifyl.c
+  s_getpayloadl.c
   s_log1pl.c
   s_modfl.c
   s_nanl.c
@@ -68,6 +69,7 @@ picolibc_sources(
   s_nexttoward.c
   s_nexttowardf.c
   s_remquol.c
+  s_significandl.c
   s_tanhl.c
   s_truncl.c
   e_acosl.c
@@ -76,7 +78,6 @@ picolibc_sources(
   e_lgammal.c
   e_remainderl.c
   e_sqrtl.c
-  k_rem_pio2.c
   polevll.c
   s_atanl.c
   s_ilogbl.c
@@ -85,7 +86,6 @@ picolibc_sources(
   s_fabsl.c
   s_fdiml.c
   s_finitel.c
-  s_fmal.c
   s_fmaxl.c
   s_fminl.c
   s_frexpl.c
@@ -93,6 +93,7 @@ picolibc_sources(
   s_iseqsigl.c
   s_isinfl.c
   s_isnanl.c
+  s_issignalingl.c
   s_llrintl.c
   s_llroundl.c
   s_llogbl.c
@@ -101,7 +102,8 @@ picolibc_sources(
   s_lroundl.c
   s_rintl.c
   s_roundl.c
-  s_scalbln.c
+  s_scalbl.c
+  s_scalblnl.c
   s_scalbnl.c
   s_signbitl.c
   s_sincosl.c
