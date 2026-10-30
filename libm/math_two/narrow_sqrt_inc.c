@@ -58,8 +58,8 @@ typedef float narrow_t;
 narrow_t
 func(float_t x)
 {
-    if (x < 0)
-        return INVALID(x);
+    if (isless(x, float_f(0.0)))
+        return INVALID((narrow_t)0.0);
     if (!isfinite(x))
         return x + x;
     if (x == 0)
@@ -68,6 +68,14 @@ func(float_t x)
     float_t frac;
     int     exp;
 
+    /*
+     * Compute the root in round to nearest mode. The barriers keep
+     * the compiler from moving the computation across the rounding
+     * mode changes.
+     */
+    FENV_SAVE;
+
+    x = name(force_eval)(x);
     frac = name(frexp)(x, &exp);
 
     ff_t yy = f_to_ff(name(ldexp)(frac / 2, exp / 2));
@@ -95,7 +103,15 @@ func(float_t x)
     if (test.hi == x && test.lo == 0)
         yy.lo = 0;
 
-    return narrow(round_odd_ff(yy));
+    /* Round to odd, which doesn't depend on the rounding mode */
+    float_t r = name(force_eval)(round_odd_ff(yy));
+    FENV_RESTORE;
+
+    /*
+     * Round once more in the caller's mode. The barrier keeps the
+     * compiler from moving this before the rounding mode is restored.
+     */
+    return narrow(name(force_eval)(r));
 }
 
 #endif
