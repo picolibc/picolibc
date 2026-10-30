@@ -70,6 +70,9 @@ REAL_OTHER = \
 	test-j0.h \
 	test-j1.h \
 	test-jn.h \
+	test-y0.h \
+	test-y1.h \
+	test-yn.h \
 	test-nextafter.h \
 	test-nextdown.h \
 	test-nextup.h \
