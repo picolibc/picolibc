@@ -63,6 +63,7 @@ if cc.get_define('_CALL_ELF') == '1'
     src_semihost_fake_readdir,
     src_semihost_fake_setrlimit,
     src_semihost_fake_statvfs,
+    src_semihost_fake_times,
     src_semihost_fake_unlink,
     src_semihost_fake_write,
   ]

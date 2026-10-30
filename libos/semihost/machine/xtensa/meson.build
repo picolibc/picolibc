@@ -62,4 +62,5 @@ src_semihost += files([
   src_semihost_fake_setrlimit,
   src_semihost_fake_stat,
   src_semihost_fake_statvfs,
+  src_semihost_fake_times,
   ]
