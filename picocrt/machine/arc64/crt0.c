@@ -55,17 +55,17 @@ extern void(* const __vector_table[]);
  *        will fit in mov_s/movl_s.
  */
 #ifdef __ARC64_ARCH64__
-#define SRR  "srl"
-#define LRR  "lrl"
-#define PUSH "pushl"
-#define MOV "movl"
+#define SRR   "srl"
+#define LRR   "lrl"
+#define PUSH  "pushl"
+#define MOV   "movl"
 #define MOV_S "movl_s"
 typedef uint64_t reg_t;
 #else
-#define SRR  "sr"
-#define LRR  "lr"
-#define PUSH "push"
-#define MOV "mov_s"
+#define SRR   "sr"
+#define LRR   "lr"
+#define PUSH  "push"
+#define MOV   "mov_s"
 #define MOV_S "mov_s"
 typedef uint32_t reg_t;
 #endif
@@ -78,8 +78,8 @@ _start(void)
      * memory addresses
      */
     __asm__(LRR " r2, [0xA]\n"
-            "bset r2, r2, 19\n"
-            "flag r2");
+                "bset r2, r2, 19\n"
+                "flag r2");
 
     /* Set up the stack pointer and the vector table */
 #ifdef __ARC64_ARCH64__
@@ -100,35 +100,12 @@ _start(void)
 #endif
 
     /* Clear the registers except r26 (GP) and r28 (SP) */
-    __asm__(MOV " r0, 0\n"
-            MOV " r1, 0\n"
-            MOV " r2, 0\n"
-            MOV " r3, 0\n"
-            MOV " r4, 0\n"
-            MOV " r5, 0\n"
-            MOV " r6, 0\n"
-            MOV " r7, 0\n"
-            MOV " r8, 0\n"
-            MOV " r9, 0\n"
-            MOV " r10, 0\n"
-            MOV " r11, 0\n"
-            MOV " r12, 0\n"
-            MOV " r13, 0\n"
-            MOV " r14, 0\n"
-            MOV " r15, 0\n"
-            MOV " r16, 0\n"
-            MOV " r17, 0\n"
-            MOV " r18, 0\n"
-            MOV " r19, 0\n"
-            MOV " r20, 0\n"
-            MOV " r21, 0\n"
-            MOV " r22, 0\n"
-            MOV " r23, 0\n"
-            MOV " r24, 0\n"
-            MOV " r25, 0\n"
-            MOV " r27, 0\n"
-            MOV " ilink, 0\n"
-            MOV " r30, 0\n");
+    __asm__(MOV " r0, 0\n" MOV " r1, 0\n" MOV " r2, 0\n" MOV " r3, 0\n" MOV " r4, 0\n" MOV
+                " r5, 0\n" MOV " r6, 0\n" MOV " r7, 0\n" MOV " r8, 0\n" MOV " r9, 0\n" MOV
+                " r10, 0\n" MOV " r11, 0\n" MOV " r12, 0\n" MOV " r13, 0\n" MOV " r14, 0\n" MOV
+                " r15, 0\n" MOV " r16, 0\n" MOV " r17, 0\n" MOV " r18, 0\n" MOV " r19, 0\n" MOV
+                " r20, 0\n" MOV " r21, 0\n" MOV " r22, 0\n" MOV " r23, 0\n" MOV " r24, 0\n" MOV
+                " r25, 0\n" MOV " r27, 0\n" MOV " ilink, 0\n" MOV " r30, 0\n");
 
     /* Branch to C code */
     __asm__("j _cstart");

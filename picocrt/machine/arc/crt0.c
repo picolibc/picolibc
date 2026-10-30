@@ -37,11 +37,11 @@
 #include "../../crt0.h"
 
 /* Define __ARCEM__ and __ARCHS__ for older GCC for ARC */
-#if defined (__EM__) && !defined (__ARCEM__)
+#if defined(__EM__) && !defined(__ARCEM__)
 #define __ARCEM__ 1
 #endif
 
-#if defined (__HS__) && !defined (__ARCHS__)
+#if defined(__HS__) && !defined(__ARCHS__)
 #define __ARCHS__ 1
 #endif
 
@@ -70,8 +70,8 @@ _start(void)
      */
 #ifdef __ARCHS__
     __asm__(LRR " r2, [0xA]\n"
-            "bset r2, r2, 19\n"
-            "flag r2");
+                "bset r2, r2, 19\n"
+                "flag r2");
 #endif
 
     /* Initialize JLI (Jump and Link Indexed) table */
@@ -122,7 +122,7 @@ _start(void)
             "mov r25, 0\n"
 #endif
             "mov r27, 0\n"
-#if defined (__ARCEM__) || defined (__ARCHS__)
+#if defined(__ARCEM__) || defined(__ARCHS__)
             "mov ilink, 0\n"
             "mov r30, 0\n");
 #else
