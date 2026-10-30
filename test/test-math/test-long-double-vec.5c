@@ -317,12 +317,12 @@ real jn(real x, int n)
 
 real scalbnl(real x, int exp)
 {
-	return x * (2 ** exp);
+	return ldexp(x, exp);
 }
 
 real ldexpl(real x, int exp)
 {
-	return x * (2 ** exp);
+	return ldexp(x, exp);
 }
 
 real rintl(real x) {
@@ -331,8 +331,27 @@ real rintl(real x) {
 
 real round_even(real x, int bits)
 {
-	int exp = exponent(x);
-	real mant = abs(mantissa(x)) * 2**bits;
+	/* Zero has no exponent and rounds to itself */
+	if (x == 0)
+		return x;
+
+	/*
+	 * Find the exponent with 2**(exp-1) <= |x| < 2**exp; exact
+	 * values have none of their own
+	 */
+	int exp;
+	if (is_rational(x)) {
+		int n = abs(numerator(x));
+		int d = denominator(x);
+
+		/* From the bit widths, 2**(exp-1) < n/d < 2**(exp+1) */
+		exp = bit_width(n) - bit_width(d);
+		if ((exp >= 0) ? (n >= (d << exp)) : ((n << -exp) >= d))
+			exp++;
+	} else
+		exp = exponent(x);
+
+	real mant = ldexp(abs(x), bits - exp);
 
 	int ipart = floor(mant);
 	real fpart = mant - ipart;
@@ -343,7 +362,7 @@ real round_even(real x, int bits)
 	} else if (fpart > 0.5)
 		ipart++;
 
-	real ret = ipart * (2 ** (exp - bits));
+	real ret = ldexp(ipart, exp - bits);
 	if (x < 0)
 		ret = -ret;
 	return imprecise(ret, bits);
