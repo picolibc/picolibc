@@ -304,7 +304,7 @@ conv_int(FILE *stream, scanf_context_t *context, width_t width, void *addr, uint
             if (!--width || IS_EOF(i = scanf_getc(stream, context)))
                 goto putval;
 #ifdef _NEED_IO_PERCENT_B
-        } else if (i == 'b' && base <= 2) {
+        } else if (TOLOWER(i) == 'b' && base <= 2) {
             base = 2;
             if (!--width || IS_EOF(i = scanf_getc(stream, context)))
                 goto putval;
