@@ -65,7 +65,10 @@
  */
 #ifdef LINUX_SYS_clock_gettime64
 
-#define LINUX_SYS_clock_gettime_time_t LINUX_SYS_clock_gettime64
+#define LINUX_SYS_clock_gettime_time_t   LINUX_SYS_clock_gettime64
+#define LINUX_SYS_clock_getres_time_t    LINUX_SYS_clock_getres_time64
+#define LINUX_SYS_clock_nanosleep_time_t LINUX_SYS_clock_nanosleep_time64
+#define LINUX_SYS_clock_settime_time_t   LINUX_SYS_clock_settime64
 
 struct __kernel_timespec_time_t {
     __int64_t tv_sec;
@@ -74,9 +77,12 @@ struct __kernel_timespec_time_t {
 
 #else
 
-#define LINUX_SYS_clock_gettime_time_t LINUX_SYS_clock_gettime
+#define LINUX_SYS_clock_gettime_time_t   LINUX_SYS_clock_gettime
+#define LINUX_SYS_clock_getres_time_t    LINUX_SYS_clock_getres
+#define LINUX_SYS_clock_nanosleep_time_t LINUX_SYS_clock_nanosleep
+#define LINUX_SYS_clock_settime_time_t   LINUX_SYS_clock_settime
 
-#define __kernel_timespec_time_t       __kernel_timespec
+#define __kernel_timespec_time_t         __kernel_timespec
 
 #endif
 
@@ -85,6 +91,22 @@ struct __kernel_timespec_time_t {
     do {                                                          \
         SIMPLE_MAP_TIMEVAL(&(a)->it_interval, &(b)->it_interval); \
         SIMPLE_MAP_TIMEVAL(&(a)->it_value, &(b)->it_value);       \
+    } while (0)
+
+#define MAP_CLOCK_ID(kid, id)                     \
+    do {                                          \
+        if (id == CLOCK_MONOTONIC)                \
+            kid = LINUX_CLOCK_MONOTONIC;          \
+        else if (id == CLOCK_PROCESS_CPUTIME_ID)  \
+            kid = LINUX_CLOCK_PROCESS_CPUTIME_ID; \
+        else if (id == CLOCK_REALTIME)            \
+            kid = LINUX_CLOCK_REALTIME;           \
+        else if (id == CLOCK_THREAD_CPUTIME_ID)   \
+            kid = LINUX_CLOCK_THREAD_CPUTIME_ID;  \
+        else {                                    \
+            errno = EINVAL;                       \
+            return -1;                            \
+        }                                         \
     } while (0)
 
 #endif /* _LOCAL_TIME_H_ */
