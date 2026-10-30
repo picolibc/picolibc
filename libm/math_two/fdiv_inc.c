@@ -41,8 +41,28 @@
 float
 name(fdiv)(float_t x, float_t y)
 {
-    ff_t xx = { .hi = x, .lo = 0 };
-    return narrow_to_float(round_odd_ff(ff_div_f(xx, y)));
+    /*
+     * Compute the quotient in round to nearest mode and round it to
+     * odd, which doesn't depend on the rounding mode. The barriers keep
+     * the compiler from moving the computation across the rounding
+     * mode changes.
+     */
+    FENV_SAVE;
+    ff_t    xx = { .hi = name(force_eval)(x), .lo = 0 };
+    float_t r = name(force_eval)(round_odd_ff(ff_div_f(xx, y)));
+    FENV_RESTORE;
+
+    /*
+     * When the result overflowed or underflowed the wider type, the
+     * narrow result depends only on the sign and rounding mode. The
+     * barriers keep the compiler from moving the remaining computation
+     * before the rounding mode is restored.
+     */
+    if (!isnormal(r))
+        return narrow_to_float(name(force_eval)(x) / y);
+
+    /* Round once more in the caller's mode */
+    return narrow_to_float(name(force_eval)(r));
 }
 
 #endif
