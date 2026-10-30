@@ -57,6 +57,15 @@
 #define SYS_SEMIHOST_memset       1004
 #define SYS_SEMIHOST_errno        2000
 
+/* These open flags are used by nSIM semihosting */
+#define ARC_LINUX_RDONLY 0
+#define ARC_LINUX_WRONLY 1
+#define ARC_LINUX_RDWR   2
+#define ARC_LINUX_CREAT  0x0040
+#define ARC_LINUX_APPEND 0x0400
+#define ARC_LINUX_TRUNC  0x0200
+#define ARC_LINUX_EXCL   0x0080
+
 enum {
     TARGET_ERRNO_EPERM = 1,             /* Not owner */
     TARGET_ERRNO_ENOENT = 2,            /* No such file or directory */

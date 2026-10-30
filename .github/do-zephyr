@@ -2,8 +2,8 @@
 set -e
 HERE=`dirname "$0"`
 "$HERE"/do-zephyr-test aarch64-zephyr -Dmultilib=false "$@"
-"$HERE"/do-zephyr-test arc -Dmultilib=false "$@"
-"$HERE"/do-zephyr-test arc64 -Dmultilib=false "$@"
+"$HERE"/do-zephyr-test arc-zephyr -Dmultilib=false "$@"
+"$HERE"/do-zephyr-test arc64-zephyr -Dmultilib=false "$@"
 "$HERE"/do-zephyr-test arm-zephyr -Dmultilib=false "$@"
 "$HERE"/do-zephyr-test clang-aarch64 -Dmultilib=false "$@"
 #"$HERE"/do-zephyr-test clang-arm "$@" # blocked by bug in compiler-rt
