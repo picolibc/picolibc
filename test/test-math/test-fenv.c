@@ -39,6 +39,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdint.h>
 
 #ifdef __STDC_IEC_559__
 #define HAVE_HW_DOUBLE
@@ -244,6 +245,71 @@ main(void)
         TEST_CASE(test_sqrt(-two), FE_INVALID);
 #endif
     }
+
+#if defined(FE_UPWARD) && defined(FE_TONEAREST)
+    /* Saving and restoring the environment must preserve the rounding mode */
+    if (fesetround(FE_UPWARD) == 0) {
+        fenv_t env;
+
+        fegetenv(&env);
+        fesetround(FE_TONEAREST);
+        fesetenv(&env);
+        if (fegetround() != FE_UPWARD) {
+            printf("fesetenv didn't restore the rounding mode\n");
+            result = 1;
+        }
+
+        fesetround(FE_UPWARD);
+        feholdexcept(&env);
+        fesetround(FE_TONEAREST);
+        fesetenv(&env);
+        if (fegetround() != FE_UPWARD) {
+            printf("feholdexcept didn't save the rounding mode\n");
+            result = 1;
+        }
+        fesetround(FE_TONEAREST);
+    }
+#endif
+
+#ifdef __aarch64__
+    /* fesetenv restores all of fpcr, including flush-to-zero */
+    {
+        fenv_t   env;
+        uint64_t fpcr, got;
+
+        __asm__ __volatile__("mrs %0, fpcr" : "=r"(fpcr));
+        __asm__ __volatile__("msr fpcr, %0" : : "r"(fpcr | (UINT64_C(1) << 24)));
+        fegetenv(&env);
+        __asm__ __volatile__("msr fpcr, %0" : : "r"(fpcr & ~(UINT64_C(1) << 24)));
+        fesetenv(&env);
+        __asm__ __volatile__("mrs %0, fpcr" : "=r"(got));
+        if (!(got & (UINT64_C(1) << 24))) {
+            printf("fesetenv didn't restore fpcr.FZ\n");
+            result = 1;
+        }
+        __asm__ __volatile__("msr fpcr, %0" : : "r"(fpcr));
+    }
+#endif
+
+#if FE_INVALID
+    /* feholdexcept clears the exception flags and fesetenv puts them back */
+    if (math_errhandling & MATH_ERREXCEPT) {
+        fenv_t env;
+
+        feclearexcept(FE_ALL_EXCEPT);
+        feraiseexcept(FE_INVALID);
+        feholdexcept(&env);
+        if (fetestexcept(FE_ALL_EXCEPT) != 0) {
+            printf("feholdexcept didn't clear the exception flags\n");
+            result = 1;
+        }
+        fesetenv(&env);
+        if (fetestexcept(FE_INVALID) == 0) {
+            printf("fesetenv didn't restore the exception flags\n");
+            result = 1;
+        }
+    }
+#endif
 
     feclearexcept(FE_ALL_EXCEPT);
     for (i = 0; i < NUM_EXCEPTS; i++) {
