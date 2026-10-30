@@ -114,7 +114,7 @@ COMPLEX_OTHER = \
 TEST_FILES = \
 	$(REAL_TRIG) $(REAL_EXP) $(REAL_NARROW) $(REAL_OTHER) \
 	$(COMPLEX_TRIG) $(COMPLEX_EXP) $(COMPLEX_OTHER) \
-	test-fma-vec.h
+	test-fma-vec.h test-long-double-vec.h
 
 all: $(TEST_FILES) .clang-format-ignore
 
