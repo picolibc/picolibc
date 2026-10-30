@@ -44,6 +44,9 @@ target_sources(semihost PRIVATE
   mapstdio.c
   open.c
   read.c
+  rename.c
+  sysconf.c
+  times.c
   unlink.c
   write.c
   sys_clock.c

@@ -46,6 +46,7 @@ target_sources(semihost PRIVATE
   ../../fake/fake_lseek.c
   ../../fake/fake_open.c
   ../../fake/fake_read.c
+  ../../fake/fake_times.c
   ../../fake/fake_unlink.c
   ../../fake/fake_write.c
   )
