@@ -56,8 +56,8 @@ typedef float narrow_t;
 narrow_t
 func(float_t x)
 {
-    if (x < 0)
-        return INVALID(x);
+    if (isless(x, float_f(0.0)))
+        return INVALID((narrow_t)0.0);
     if (!isfinite(x))
         return x + x;
     if (x == 0)
@@ -65,6 +65,9 @@ func(float_t x)
 
     float_t frac;
     int     exp;
+
+    /* Compute the root in round to nearest mode */
+    FENV_SAVE;
 
     frac = name(frexp)(x, &exp);
 
@@ -93,6 +96,9 @@ func(float_t x)
     if (test.hi == x && test.lo == 0)
         yy.lo = 0;
 
+    FENV_RESTORE;
+
+    /* Round to odd, then round once more in the caller's mode */
     return (narrow_t)round_odd_ff(yy);
 }
 
