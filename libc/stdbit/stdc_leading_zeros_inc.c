@@ -45,12 +45,12 @@ NAME_SB(stdbit_t value)
     return __builtin_stdc_leading_zeros(value);
 #elif __has_builtin(__builtin_clzg)
     return (unsigned int)__builtin_clzg(value, WANT_SIZE);
-#elif __has_builtin(__builtin_clz)    && WANT_SIZE == INT_WIDTH
+#elif __has_builtin(__builtin_clz) && WANT_SIZE == INT_WIDTH
     if (value == 0)
         return WANT_SIZE;
 
     return __builtin_clz(value);
-#elif __has_builtin(__builtin_clzl)  && WANT_SIZE == LONG_WIDTH
+#elif __has_builtin(__builtin_clzl) && WANT_SIZE == LONG_WIDTH
     if (value == 0)
         return WANT_SIZE;
 
@@ -69,11 +69,11 @@ NAME_SB(stdbit_t value)
 #else
     unsigned int ceil_p2 = 1;
     while (ceil_p2 < WANT_SIZE) {
-            ceil_p2 <<= 1;
+        ceil_p2 <<= 1;
     }
 #endif
     unsigned int ret = 0;
-    for (int i = ceil_p2 >> 1;  i > 0; i >>= 1 ) {
+    for (int i = ceil_p2 >> 1; i > 0; i >>= 1) {
         if (value >> (WANT_SIZE - i) == 0) {
             value <<= i;
             ret += i;
