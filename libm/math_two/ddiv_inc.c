@@ -42,7 +42,23 @@ double
 name(ddiv)(float_t x, float_t y)
 {
     ff_t xx = { .hi = x, .lo = 0 };
-    return (double)round_odd_ff(ff_div_f(xx, y));
+
+    /* Compute the quotient in round to nearest mode */
+    FENV_SAVE;
+    ff_t rr = ff_div_f(xx, y);
+    FENV_RESTORE;
+
+    /*
+     * When the result overflowed or underflowed the wider type, the
+     * narrow result depends only on the sign and rounding mode. The
+     * barrier keeps the compiler from reusing the value computed in
+     * round to nearest mode.
+     */
+    if (!isnormal(rr.hi))
+        return (double)(name(force_eval)(x) / y);
+
+    /* Round to odd, then round once more in the caller's mode */
+    return (double)round_odd_ff(rr);
 }
 
 #endif

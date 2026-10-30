@@ -41,7 +41,22 @@
 double
 name(dmul)(float_t x, float_t y)
 {
-    return (double)round_odd_ff(f_mul_f(x, y));
+    /* Compute the exact result in round to nearest mode */
+    FENV_SAVE;
+    ff_t rr = f_mul_f(x, y);
+    FENV_RESTORE;
+
+    /*
+     * When the result overflowed or underflowed the wider type, the
+     * narrow result depends only on the sign and rounding mode. The
+     * barrier keeps the compiler from reusing the value computed in
+     * round to nearest mode.
+     */
+    if (!isnormal(rr.hi))
+        return (double)(name(force_eval)(x) * y);
+
+    /* Round to odd, then round once more in the caller's mode */
+    return (double)round_odd_ff(rr);
 }
 
 #endif
