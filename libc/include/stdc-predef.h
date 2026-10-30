@@ -71,4 +71,8 @@
 #define __STDC_ISO_10646__ 202506L
 #endif
 
+#if defined(__has_include) && !__has_include(<threads.h>)
+#define __STDC_NO_THREADS__ 1
+#endif
+
 #endif /* _STDC_PREDEF_H_ */
