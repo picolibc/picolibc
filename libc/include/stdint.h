@@ -389,7 +389,7 @@ _BEGIN_STD_C
 #endif
 
 /* define INT16_WIDTH and UINT16_WIDTH if possible */
-#ifdef _int16_t_defined
+#ifdef __int16_t_defined
 #ifdef __INT16_WIDTH__
 #define INT16_WIDTH __INT16_WIDTH__
 #elif defined __UINT16_WIDTH__
