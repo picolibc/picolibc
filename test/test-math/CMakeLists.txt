@@ -134,6 +134,7 @@ set(tests_other
   test-long-double
   test-math-errhandling
   test-math-funcs
+  test-narrow-fenv
   test-rounding-mode
   )
 

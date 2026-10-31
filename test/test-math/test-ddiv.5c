@@ -42,6 +42,9 @@ test_extra = (test_vector_t[]) {
     { .a = 1, .b = plus_inf, .c = 0 },
     { .a = plus_inf, .b = 1, .c = 0 },
     { .a = 0x1p1023, .b = 0.5, .c = 0 },
+    { .a = max_binary80, .b = 1.5, .c = 0 },
+    { .a = max_binary80, .b = max_binary32, .c = 0 },
+    { .a = min_denorm_binary80, .b = -1.5, .c = 0 },
 };
 
 specials = (special_t[]) {

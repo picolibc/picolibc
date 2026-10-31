@@ -157,6 +157,7 @@ tests_other = [
   'test-long-double',
   'test-math-errhandling',
   'test-math-funcs',
+  'test-narrow-fenv',
   'test-rounding-mode',
   'test-scalbn',
   ]
@@ -182,6 +183,7 @@ test_extra_src = {
 
 test_extra_c_args = {
   'test-math-errhandling': arg_fnobuiltin,
+  'test-narrow-fenv': arg_fnobuiltin,
   'test-rounding-mode': arg_fnobuiltin
 }
 

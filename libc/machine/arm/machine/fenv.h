@@ -39,6 +39,7 @@ typedef int fexcept_t;
 #if (__ARM_FP & 0x8) == 0
 #define __DOUBLE_NOROUND
 #define __DOUBLE_NOEXCEPT
+#define __LONG_DOUBLE_NOROUND
 #define __LONG_DOUBLE_NOEXCEPT
 #endif
 

@@ -595,6 +595,36 @@ f_exp_and(fuint_t i, uint32_t exp)
 #endif
 
 /*
+ * Work around bug in GCC 14.2.0: on the 68040 and 68060, conversions to
+ * float and double use fsmove and fdmove, which round the significand
+ * but keep the extended exponent range, so results outside the range of
+ * the narrower type don't become infinities, zeros or denorms, and
+ * denorms get rounded twice. Use fmove to convert directly from the
+ * register to the narrower format, which rounds once.
+ */
+#if defined(__GNUC__) && !defined(__clang__) && defined(__HAVE_68881__) \
+    && (defined(__mc68040__) || defined(__mc68060__))
+static __always_inline float
+narrow_to_float(long double x)
+{
+    float y;
+    __asm__ __volatile__("fmove.s %1,%0" : "=d"(y) : "f"(x));
+    return y;
+}
+
+static __always_inline double
+narrow_to_double(long double x)
+{
+    double y;
+    __asm__ __volatile__("fmove.d %1,%0" : "=m"(y) : "f"(x));
+    return y;
+}
+#else
+#define narrow_to_float(x)  ((float)(x))
+#define narrow_to_double(x) ((double)(x))
+#endif
+
+/*
  * inline functions to characterize floats which have no fractional
  * component.
  * isint = 0	... x is not an integer

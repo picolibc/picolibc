@@ -62,6 +62,9 @@
 
 #define MY_EXCEPT (FE_DIVBYZERO | FE_INEXACT | FE_INVALID | FE_OVERFLOW | FE_UNDERFLOW)
 
+/* Results are exact, so zeros must have the right sign too */
+#define zero_sign_differs(a, b) ((a) == 0 && (b) == 0 && !signbit(a) != !signbit(b))
+
 static const char *
 mode_name(unsigned int mode)
 {
@@ -222,6 +225,8 @@ test_binary32(void)
         }
 #endif
         ulp_t ulp = ulp32(y, test_32_vec[i].y);
+        if (zero_sign_differs(y, test_32_vec[i].y))
+            ulp = 1;
         if (ulp != 0 || except != expect_except || err != expect_err) {
             ret = 0;
             printf("%5zu " FMT32 " %s got " FMT32 " %s %s want " FMT32 " %s %s\n", i + 1,
@@ -285,6 +290,8 @@ test_binary64(void)
         }
 #endif
         ulp_t ulp = ulp64(y, test_64_vec[i].y);
+        if (zero_sign_differs(y, test_64_vec[i].y))
+            ulp = 1;
         if (ulp != 0 || except != expect_except || err != expect_err) {
             ret = 0;
             printf("%5zu " FMT64 " %s got " FMT64 " %s %s want " FMT64 " %s %s\n", i + 1,
@@ -351,6 +358,8 @@ test_binary80(void)
         }
 #endif
         ulp_t ulp = ulp80(y, test_80_vec[i].y);
+        if (zero_sign_differs(y, test_80_vec[i].y))
+            ulp = 1;
         if (ulp != 0 || except != expect_except || err != expect_err) {
             ret = 0;
             printf("%5zu " FMT80 " %s got " FMT80 " %s %s want " FMT80 " %s %s\n", i + 1,
@@ -416,6 +425,8 @@ test_binary128(void)
         }
 #endif
         ulp_t ulp = ulp128(y, test_128_vec[i].y);
+        if (zero_sign_differs(y, test_128_vec[i].y))
+            ulp = 1;
         if (ulp != 0 || except != expect_except || err != expect_err) {
             ret = 0;
             printf("%5zu " FMT128 " %s got " FMT128 " %s %s want " FMT128 " %s %s\n", i + 1,
