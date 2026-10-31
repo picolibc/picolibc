@@ -71,4 +71,5 @@ src_semihost += files(srcs_semihost_hexagon) + [
   src_semihost_fake_kill,
   src_semihost_fake_statvfs,
   src_semihost_fake_setrlimit,
+  src_semihost_fake_times,
   ]

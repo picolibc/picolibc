@@ -589,10 +589,10 @@ main(void)
     char *asctime_r_ret = asctime_r(&tm_value, buf);
     (void)asctime_r_ret;
 
-#ifndef __PICOLIBC__
     clock_t clock_ret = clock();
     (void)clock_ret;
 
+#ifndef __SEMIHOST
 #ifdef _POSIX_CPUTIME
     int clock_getcpuclockid_ret = clock_getcpuclockid(pid_value, &clockid_value);
     (void)clock_getcpuclockid_ret;
@@ -612,7 +612,7 @@ main(void)
 
     int clock_settime_ret = clock_settime(realtime_value, &timespec_value);
     (void)clock_settime_ret;
-#endif /* !__PICOLIBC__ */
+#endif
 
     char *ctime_ret = ctime(&time_value);
     (void)ctime_ret;

@@ -49,8 +49,8 @@ memalign(size_t align, size_t s)
     size_t   offset, size_with_padding;
     char    *allocated, *aligned_p;
 
-    /* Return NULL if align isn't power of 2 */
-    if ((align & (align - 1)) != 0) {
+    /* Return NULL if align is zero or isn't power of 2 */
+    if (align == 0 || (align & (align - 1)) != 0) {
         errno = EINVAL;
         return NULL;
     }

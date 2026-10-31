@@ -58,6 +58,7 @@ srcs_semihost_fake = [
   'fake_fstatvfs.c',
   'fake_setrlimit.c',
   'fake_statvfs.c',
+  'fake_times.c',
   'fake_unlink.c',
   'fake_write.c',
 ]
