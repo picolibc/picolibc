@@ -75,6 +75,9 @@
 #ifndef __has_attribute
 #define __has_attribute(x) 0
 #endif
+#ifndef __has_c_attribute
+#define __has_c_attribute(x) 0
+#endif
 #ifndef __has_feature
 #define __has_feature(x) 0
 #endif
@@ -730,6 +733,19 @@
 #define __fallthrough \
     do {              \
     } while (0)
+#endif
+
+/*
+ * Functions with no side effects whose results depend only on their
+ * arguments
+ */
+#if __STDC_VERSION__ > 201710L && __has_c_attribute(__unsequenced__)
+/* Standard C23 attribute */
+#define __unsequenced [[__unsequenced__]]
+#elif __has_attribute(__unsequenced__)
+#define __unsequenced __attribute__((__unsequenced__))
+#else
+#define __unsequenced
 #endif
 
 /*  The traditional meaning of 'extern inline' for GCC is not

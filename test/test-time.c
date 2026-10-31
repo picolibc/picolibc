@@ -44,6 +44,13 @@
 #include <stdlib.h>
 #include <limits.h>
 
+/* asctime and ctime are deprecated in C23; this test still checks they exist */
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 #if defined(__TIMESIZE) && __TIMESIZE != 64
 
 int

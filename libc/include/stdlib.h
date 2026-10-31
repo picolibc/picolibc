@@ -131,7 +131,7 @@ long a64l(const char *__input) __picolibc_export;
 __noreturn void abort(void) __picolibc_export;
 int             abs(int) __picolibc_export;
 #if __ISO_C_VISIBLE >= 2011 || __GNU_VISIBLE
-void               *
+void *
 aligned_alloc(size_t, size_t)
 __malloc_like __alloc_align(1) __alloc_size(2) __warn_unused_result __nothrow __picolibc_export;
 #endif
