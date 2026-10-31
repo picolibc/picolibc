@@ -66,9 +66,9 @@
 
 #define _fclass_d(_x)                                          \
     (__extension__({                                           \
-        long __fclass;                                         \
+        double __fclass;                                       \
         __asm__("fclass.d %0, %1" : "=f"(__fclass) : "f"(_x)); \
-        __fclass;                                              \
+        (long)__fclass;                                        \
     }))
 
 #endif
@@ -78,11 +78,11 @@
 /* anything with a 32-bit FPU has FMAF */
 #define __HAVE_FAST_FMAF 1
 
-#define _fclass_f(_x)                                          \
+#define _fclass_d(_x)                                          \
     (__extension__({                                           \
-        long __fclass;                                         \
-        __asm__("fclass.s %0, %1" : "=f"(__fclass) : "f"(_x)); \
-        __fclass;                                              \
+        float __fclass;                                        \
+        __asm__("fclass.d %0, %1" : "=f"(__fclass) : "f"(_x)); \
+        (long)__fclass;                                        \
     }))
 
 #endif
