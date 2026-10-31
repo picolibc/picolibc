@@ -50,6 +50,14 @@ ANSI C requires <<ctime>>.
 
 #include <time.h>
 
+/* asctime is deprecated in C23, but ctime is defined in terms of it */
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 char *
 ctime(const time_t *tim_p)
 {
