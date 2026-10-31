@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2022 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,18 +33,5 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define _ADD_D_TO_DOUBLE_FUNCS
-
-#include "fdlibm.h"
-
-int
-__iseqsigf(float x, float y)
-{
-    if (isnan(x))
-        return __math_invalidf(x);
-    if (isnan(y))
-        return __math_invalidf(y);
-    return x == y;
-}
-
-_MATH_ALIAS_i_ff(__iseqsig)
+#define WANT_FLOAT32
+#include "iseqsig_inc.c"

@@ -33,13 +33,5 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-int
-__iseqsigl(long double x, long double y)
-{
-    if (isnan(x))
-        return __math_invalidl(x);
-    if (isnan(y))
-        return __math_invalidl(y);
-
-    return x == y;
-}
+#define WANT_FLOAT128
+#include "iseqsig_inc.c"

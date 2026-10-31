@@ -90,7 +90,6 @@ picolibc_sources(
   s_fminl.c
   s_frexpl.c
   s_infinityl.c
-  s_iseqsigl.c
   s_isinfl.c
   s_isnanl.c
   s_issignalingl.c
