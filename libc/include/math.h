@@ -353,25 +353,24 @@ extern int __signbitl(long double) __picolibc_export;
 #define iszerol(x)   iszero((long double)(x))
 #endif
 
-#ifndef iseqsig
-int __iseqsigd(double x, double y) __picolibc_export;
+int __iseqsig(double x, double y) __picolibc_export;
 int __iseqsigf(float x, float y) __picolibc_export;
 
 #ifdef __HAVE_LONG_DOUBLE
 int __iseqsigl(long double x, long double y) __picolibc_export;
-#define iseqsig(__x, __y)                                                                  \
-    ((sizeof(__x) == sizeof(float) && sizeof(__y) == sizeof(float)) ? __iseqsigf(__x, __y) \
-         : (sizeof(__x) == sizeof(double) && sizeof(__y) == sizeof(double))                \
-         ? __iseqsigd(__x, __y)                                                            \
-         : __iseqsigl(__x, __y))
-#else
-#ifdef _DOUBLE_IS_32BITS
-#define iseqsig(__x, __y) __iseqsigf((float)(__x), (float)(__y))
-#else
-#define iseqsig(__x, __y)                                                                   \
-    ((sizeof(__x) == sizeof(float) && sizeof(__y) == sizeof(float)) ? __iseqsigf(__x, __y)  \
-                                                                    : __iseqsigd(__x, __y))
 #endif
+
+#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+#ifdef __HAVE_LONG_DOUBLE
+#define iseqsig(__x, __y)                                                \
+    ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y)) \
+         : (sizeof((__x) + (__y)) == sizeof(double))                     \
+         ? __iseqsig((double)(__x), (double)(__y))                       \
+         : __iseqsigl((long double)(__x), (long double)(__y)))
+#else
+#define iseqsig(__x, __y)                                                                \
+    ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y))                 \
+                                              : __iseqsig((double)(__x), (double)(__y)))
 #endif
 #endif
 
