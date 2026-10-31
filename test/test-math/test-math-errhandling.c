@@ -200,7 +200,7 @@ e_to_str(int e)
 #undef _TEST_LONG_DOUBLE
 #endif
 
-#if defined(__m68k__) && !defined(__mcoldfire__) && !defined(__HAVE_M68881__)
+#if defined(__m68k__) && !defined(__mcoldfire__) && !defined(__HAVE_68881__)
 #undef _TEST_LONG_DOUBLE
 #define NO_NEXTTOWARD
 #endif

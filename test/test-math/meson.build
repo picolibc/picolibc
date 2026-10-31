@@ -149,6 +149,7 @@ tests_complex_exp = [
 tests_complex_other = [
   'test-csqrt',
   'test-complex-funcs',
+  'test-tgmath',
 ]
 
 tests_other = [
