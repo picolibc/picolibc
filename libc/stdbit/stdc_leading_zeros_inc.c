@@ -36,7 +36,7 @@
 #define NAME stdc_leading_zeros
 
 #include "local-stdbit.h"
-#include <stdint.h>
+
 #ifdef stdbit_t
 unsigned int
 NAME_SB(stdbit_t value)
