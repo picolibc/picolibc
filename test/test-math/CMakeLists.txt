@@ -70,6 +70,7 @@ set(tests_real_exp
 )
 
 set(tests_real_other
+  test-canonicalize
   test-cbrt
   test-ceil
   test-erf
