@@ -236,6 +236,11 @@ typedef double double_t;
 #define FP_FAST_FMAL
 #endif
 
+/* We've got a real __iscanonicall for 80-bit and double-double values */
+#if __LDBL_MANT_DIG__ == 64 || (__LDBL_MANT_DIG__ == 106 && __LDBL_MAX_EXP__ == 1024)
+#define __LONG_DOUBLE_NON_CANONICAL
+#endif
+
 #ifndef MATH_ERRNO
 #define MATH_ERRNO 1
 #endif
@@ -335,8 +340,17 @@ extern int __signbitl(long double) __picolibc_export;
 #define issubnormal(__x)          (fpclassify(__x) == FP_SUBNORMAL)
 #define iszero(__x)               (fpclassify(__x) == FP_ZERO)
 #endif
+
 #if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+
+#ifdef __LONG_DOUBLE_NON_CANONICAL
+extern int __iscanonicall(long double) __picolibc_export;
+#define iscanonical(__x)                                                                        \
+    _Generic((__x), long double: __iscanonicall(__x), default: ((void)(__typeof(__x))(__x), 1))
+#else
 #define iscanonical(x) ((void)(__typeof(x))(x), 1)
+#endif
+
 #endif
 
 #define isfinitef(x) isfinite((float)(x))
@@ -616,6 +630,10 @@ extern long double   significandl(long double) __picolibc_export;
 extern long double   fabsl(long double) __picolibc_export;
 extern long double   copysignl(long double, long double) __picolibc_export;
 
+#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+int canonicalizel(long double *, const long double *) __picolibc_export;
+#endif
+
 #ifdef __HAVE_LONG_DOUBLE_MATH
 extern long double atanl(long double) __picolibc_export;
 extern long double cosl(long double) __picolibc_export;
@@ -809,7 +827,6 @@ long double acospil(long double) __picolibc_export;
 long double asinpil(long double) __picolibc_export;
 long double atanpil(long double) __picolibc_export;
 long double atan2pil(long double, long double) __picolibc_export;
-int         canonicalizel(long double *, const long double *) __picolibc_export;
 long double compoundnl(long double, long long int) __picolibc_export;
 long double cospil(long double) __picolibc_export;
 double      daddl(long double, long double) __picolibc_export;

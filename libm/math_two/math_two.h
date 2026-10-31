@@ -193,6 +193,34 @@ typedef long double float128_t;
 #define ldexp_128(x, a)  ldexpl(x, a)
 #endif
 
+#if defined(WANT_DOUBLE_DOUBLE) && __LDBL_MANT_DIG__ == 106 && __LDBL_MAX_EXP__ == 1024
+#define HAVE_FLOAT128
+#define HAVE_DOUBLE_DOUBLE_128
+typedef long double float128_t;
+
+#define float128_suffix       l
+#define float_128(x)          (x##l)
+#define FLOAT_128_MAX         LDBL_MAX
+#define FLOAT_128_MIN         LDBL_MIN
+#define FLOAT_128_DENORM_MIN  __LDBL_DENORM_MIN__
+#define FLOAT_128_MAX_EXP     LDBL_MAX_EXP
+#define FLOAT_128_MANT_DIG    LDBL_MANT_DIG
+#define FLOAT_128_DENORM_BIAS 1
+#ifdef __HAVE_FAST_FMAL
+#define __HAVE_FAST_FMA_128
+#endif
+#ifdef __LONG_DOUBLE_NOROUND
+#define __FLOAT_128_NOROUND
+#endif
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define __FLOAT_128_NOEXCEPT
+#endif
+
+#define floor_128(x)    floorl(x)
+#define frexp_128(x, a) frexpl(x, a)
+#define ldexp_128(x, a) ldexpl(x, a)
+#endif
+
 #if defined(HAVE_FLOAT32) && defined(WANT_FLOAT32)
 
 #define FLOAT_LEN         32
@@ -421,12 +449,29 @@ f_is_integer(fuint_t i, int shift)
 
 #if defined(HAVE_FLOAT128) && defined(WANT_FLOAT128)
 
-#define FLOAT_LEN         128
-#define float_t           float128_t
-#define NAME_SUFFIX       float128_suffix
-#define KERNEL_SUFFIX     l
-#define SPLIT_VAL         0x1p57
-#define float_f(x)        float_128(x)
+#define FLOAT_LEN     128
+#define float_t       float128_t
+#define NAME_SUFFIX   float128_suffix
+#define KERNEL_SUFFIX l
+#define SPLIT_VAL     0x1p57
+#define float_f(x)    float_128(x)
+
+#ifdef HAVE_DOUBLE_DOUBLE_128
+
+#define __name(a, b) a##b
+#define _name(a, b)  __name(a, b)
+#define name(a)      _name(a, NAME_SUFFIX)
+#define kernel(a)    _name(a, KERNEL_SUFFIX)
+
+#define FENV_SAVE             \
+    fenv_t save_env;          \
+    fegetenv(&save_env);      \
+    fesetround(FE_TONEAREST);
+
+#define FENV_RESTORE fesetenv(&save_env)
+
+#else
+
 #define _isint_float_f(x) _isint_float_128(x)
 #define FLOAT_MAX         FLOAT_128_MAX
 #define FLOAT_MIN         FLOAT_128_MIN
@@ -592,7 +637,8 @@ f_exp_and(fuint_t i, uint32_t exp)
     return i;
 }
 
-#endif
+#endif /* HAVE_DOUBLE_DOUBLE_128 */
+#endif /* defined(HAVE_FLOAT128) && defined(WANT_FLOAT128) */
 
 /*
  * Work around bug in GCC 14.2.0: on the 68040 and 68060, conversions to
