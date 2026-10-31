@@ -33,10 +33,29 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "math_ld.h"
+#define _ISOC23_SOURCE
+#define WANT_DOUBLE_DOUBLE
+#include "math_two.h"
 
-#ifdef _NEED_FLOAT_HUGE
+#ifdef float_t
 
-#include "common/s_iseqsigl.c"
+int
+name(__iseqsig)(float_t x, float_t y)
+{
+    bool x_le_y = x <= y;
+    bool y_le_x = y <= x;
+
+    if (x_le_y && y_le_x)
+        return 1;
+    if (!x_le_y && !y_le_x)
+        kernel(__math_set_invalid)();
+    return 0;
+}
+
+#if defined(WANT_FLOAT32)
+_MATH_ALIAS_i_ff(__iseqsig)
+#elif defined(WANT_FLOAT64)
+_MATH_ALIAS_i_dd(__iseqsig)
+#endif
 
 #endif

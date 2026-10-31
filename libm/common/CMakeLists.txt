@@ -45,7 +45,6 @@ picolibc_sources(
   s_expm1.c
   s_ilogb.c
   s_infinity.c
-  s_iseqsig.c
   s_isinf.c
   s_isnan.c
   s_issignaling.c
@@ -101,7 +100,6 @@ picolibc_sources(
   sf_getpayload.c
   sf_ilogb.c
   sf_infinity.c
-  sf_iseqsig.c
   sf_isinf.c
   sf_isnan.c
   sf_issignaling.c

@@ -1646,7 +1646,7 @@ extern int __signgam;
 #define hypot64         _NAME_64(hypot)
 #define ilogb64         _NAME_64(ilogb)
 #define infinity64      _NAME_64(infinity)
-#define __iseqsig64     _NAME_64_SPECIAL(__iseqsigd, __iseqsigl)
+#define __iseqsig64     _NAME_64_SPECIAL(__iseqsig, __iseqsigl)
 #define isfinite64      _NAME_64(isfinite)
 #define isinf64         _NAME_64(isinf)
 #define __isinf64       _NAME_64_SPECIAL(__isinfd, __isinfl)
