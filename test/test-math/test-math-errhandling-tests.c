@@ -3528,6 +3528,16 @@ makemathname(test_pow_negbig_bigeven)(void)
     return makemathname(pow)(-makemathname(big), makemathname(bigeven));
 }
 static FLOAT_T
+makemathname(test_pow_min_neg1)(void)
+{
+    return makemathname(pow)(makemathname(min_val), -makemathname(one));
+}
+static FLOAT_T
+makemathname(test_pow_negmin_neg1)(void)
+{
+    return makemathname(pow)(-makemathname(min_val), -makemathname(one));
+}
+static FLOAT_T
 makemathname(test_pow_inf_inf)(void)
 {
     return makemathname(pow)(makemathname(infval), makemathname(infval));
@@ -4585,6 +4595,8 @@ TEST_CONST struct {
     TEST(pow_negbig_bigodd, (FLOAT_T)-INFINITY, FE_OVERFLOW, ERANGE),
     TEST(pow_negsmall_negbigeven, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
     TEST(pow_negbig_bigeven, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+    TEST(pow_min_neg1, (FLOAT_T)INFINITY, FE_OVERFLOW, ERANGE),
+    TEST(pow_negmin_neg1, (FLOAT_T)-INFINITY, FE_OVERFLOW, ERANGE),
     TEST(pow_inf_inf, (FLOAT_T)INFINITY, 0, 0),
     TEST(pow_inf_neginf, (FLOAT_T)0, 0, 0),
     TEST(pow_neginf_inf, (FLOAT_T)INFINITY, 0, 0),
