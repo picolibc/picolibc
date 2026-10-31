@@ -93,6 +93,7 @@ set(tests_real_narrow
 )
 
 set(tests_real_other
+  test-canonicalize
   test-cbrt
   test-ceil
   test-erf

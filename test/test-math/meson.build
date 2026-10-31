@@ -95,6 +95,7 @@ tests_real_narrow = [
 
 tests_real_other = [
   'test-add',
+  'test-canonicalize',
   'test-cbrt',
   'test-ceil',
   'test-erf',
