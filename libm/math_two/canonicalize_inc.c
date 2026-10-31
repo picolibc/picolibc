@@ -34,6 +34,7 @@
  */
 
 #define _ISOC23_SOURCE
+#define WANT_DOUBLE_DOUBLE
 #include "math_two.h"
 
 #ifdef float_t
@@ -41,19 +42,33 @@
 int
 name(canonicalize)(float_t *result_p, const float_t *input_p)
 {
+#if defined(WANT_FLOAT80) || (defined(WANT_FLOAT128) && defined(_DOUBLE_DOUBLE_FLOAT))
+    FENV_SAVE;
     float_t input = *input_p;
 
-    /*
-     * iscanonical never returns false for currently supported binary
-     * formats, so this is a no-op.
-     */
-    if (!iscanonical(input))
-        return 1;
+    if (isnan(input)) {
+#ifdef _DOUBLE_DOUBLE_FLOAT
+        union IEEEl2bits u;
+
+        u.e = input;
+        u.dbits.dl = 0.0;
+        input = u.e;
+#endif
+        FENV_RESTORE;
+        *result_p = kernel(__math_invalid)(input);
+    } else {
+        *result_p = input + float_f(-0.0);
+        FENV_RESTORE;
+    }
+    return 0;
+#else
+    float_t input = *input_p;
 
     if (issignaling(input))
         input = input + input;
     *result_p = input;
     return 0;
+#endif
 }
 
 #endif

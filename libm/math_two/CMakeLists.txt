@@ -179,6 +179,8 @@ picolibc_sources(
   fromfpx_64.c
   fromfpx_80.c
   fromfpx_128.c
+  iscanonical_80.c
+  iscanonical_128.c
   log10p1_32.c
   log10p1_64.c
   log10p1_80.c
