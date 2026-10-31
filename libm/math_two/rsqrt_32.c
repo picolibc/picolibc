@@ -137,9 +137,11 @@ rsqrtf(float x)
             if (xu == INF) {
                 return asfloat(0);
             } else {
-                __math_set_invalidf();
-                // pass through NaN unmodified
-                return asfloat(xu);
+#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
+                if (issignaling(x))
+                    __math_set_invalidf();
+#endif
+                return nanf("");
             }
         } else // normal case
         {
@@ -165,22 +167,21 @@ rsqrtf(float x)
                 return asfloat(new_mantissa + ((uint32_t)newExp << 23));
             } else // rsqrt(+0)=+INF
             {
-#ifdef __MATH_ERRNO
-                errno = ERANGE;
-#endif
-                return asfloat(INF);
+                return __math_divzerof(x);
             }
         } else if (xu == ((uint32_t)1u << 31)) {
-#ifdef __MATH_ERRNO
-            errno = ERANGE;
-#endif
-            return asfloat(NEGATIVE_INF);
+                return __math_divzerof(x);
         } else {
-            __math_set_invalidf();
+            if (x < 0) {
+                __math_set_invalidf();
 #ifdef __MATH_ERRNO
-            errno = EDOM;
+                errno = EDOM;
 #endif
-            // rsqrt(negative)=qNaN
+            }
+#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
+            else if (issignaling(x))
+                __math_set_invalidf();
+#endif
             return nanf("");
         }
     }
@@ -222,8 +223,11 @@ float sqrtf(float x)
             }
             else
             {
-                __math_set_invalidf();
-                return asfloat(xu);
+#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
+                if (issignaling(x))
+                    __math_set_invalidf();
+#endif
+                return nanf("");
             }
         }
         else
@@ -265,9 +269,15 @@ float sqrtf(float x)
             //sqrt(-0)=-0
             return asfloat((uint32_t)1u<<31);
         } else {
-            __math_set_invalidf();
+            if (x < 0) {
+                __math_set_invalidf();
 #ifdef __MATH_ERRNO
-            errno = EDOM;
+                errno = EDOM;
+#endif
+            }
+#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
+            else if (issignaling(x))
+                __math_set_invalidf();
 #endif
             //sqrt(negative)=qNaN
             return nanf("");
