@@ -72,7 +72,7 @@ if(CONFIG_PICOLIBC_USE_MODULE)
 
   # Map Zephyr options to Picolibc options
 
-  picolibc_option_true(__FAST_STRCMP CONFIG_PICOLIBC___FAST_STRCMP)
+  picolibc_option_true(__FAST_STRCMP CONFIG_PICOLIBC_FAST_STRCMP)
   picolibc_option_true(__IO_C99_FORMATS CONFIG_PICOLIBC_IO_C99_FORMATS)
   picolibc_option_true(__IO_MINIMAL_LONG_LONG CONFIG_PICOLIBC_IO_MINIMAL_LONG_LONG)
   picolibc_option_false(__IO_PERCENT_B CONFIG_PICOLIBC_IO_PERCENT_B)
