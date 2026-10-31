@@ -33,10 +33,28 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+/*
+ * Use the compiler builtins when available so that the compiler knows
+ * these access FPSCR. Inline asm can't say that it writes FPSCR, so
+ * clang will split a floating point comparison around it, testing the
+ * condition flags loaded by the write instead of the comparison result.
+ */
+#ifdef __has_builtin
+#if __has_builtin(__builtin_arm_get_fpscr) && __has_builtin(__builtin_arm_set_fpscr)
+#define _HAVE_FPSCR_BUILTINS
+#endif
+#endif
+
+#ifdef _HAVE_FPSCR_BUILTINS
+#define _vmrs_fpscr(__r) ((__r) = __builtin_arm_get_fpscr())
+#define _vmsr_fpscr(__r) __builtin_arm_set_fpscr(__r)
+#else
 #define _vmrs_fpscr(__r) __asm__ __volatile__("vmrs %0, fpscr" : "=&r"(__r))
 #define _vmsr_fpscr(__r) __asm__ __volatile__("vmsr fpscr, %0" : : "r"(__r))
-#define _FPU_MASK_SHIFT  8
-#define _ROUND_MASK      (FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
+#endif
+
+#define _FPU_MASK_SHIFT 8
+#define _ROUND_MASK     (FE_TONEAREST | FE_DOWNWARD | FE_UPWARD | FE_TOWARDZERO)
 
 __declare_fenv_inline(int) feclearexcept(int excepts)
 {
