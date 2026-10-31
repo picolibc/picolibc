@@ -104,6 +104,7 @@ tests_real_other = [
   'test-fromfp',
   'test-fromfpx',
   'test-hypot',
+  'test-iseqsig',
   'test-j0',
   'test-j1',
   'test-jn',
