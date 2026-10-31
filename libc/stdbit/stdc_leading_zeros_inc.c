@@ -44,15 +44,40 @@ NAME_SB(stdbit_t value)
 #if __has_builtin(__builtin_stdc_leading_zeros)
     return __builtin_stdc_leading_zeros(value);
 #elif __has_builtin(__builtin_clzg)
-    return (unsigned int)__builtin_clzg(value, (int)sizeof(stdbit_t) * 8);
+    return (unsigned int)__builtin_clzg(value, WANT_SIZE);
+#elif __has_builtin(__builtin_clz) && WANT_SIZE == INT_WIDTH
+    if (value == 0)
+        return WANT_SIZE;
+
+    return __builtin_clz(value);
+#elif __has_builtin(__builtin_clzl) && WANT_SIZE == LONG_WIDTH
+    if (value == 0)
+        return WANT_SIZE;
+
+    return __builtin_clzl(value);
+#elif __has_builtin(__builtin_clzll) && WANT_SIZE == LLONG_WIDTH
+    if (value == 0)
+        return WANT_SIZE;
+
+    return __builtin_clzll(value);
 #else
-    unsigned int ret = 0;
-    stdbit_t     bit = (stdbit_t)1 << ((sizeof(stdbit_t)) * 8 - 1);
-    while (bit && (value & bit) == 0) {
-        ret++;
-        bit >>= 1;
+
+#if (WANT_SIZE & (WANT_SIZE - 1)) == 0
+    unsigned int ceil_p2 = WANT_SIZE;
+#else
+    unsigned int ceil_p2 = 1;
+    while (ceil_p2 < WANT_SIZE) {
+        ceil_p2 <<= 1;
     }
-    return ret;
+#endif
+    int ret = WANT_SIZE;
+    for (int i = ceil_p2 >> 1; i > 0; i >>= 1) { 
+        if (value >> i != 0) {
+            value >>= i;
+            ret -= i;
+        }
+    }
+    return ret - value;
 #endif
 }
 
