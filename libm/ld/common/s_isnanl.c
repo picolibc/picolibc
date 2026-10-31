@@ -36,12 +36,17 @@ isnanl(long double e)
     u.e = e;
 #if LDBL_NBIT != 0
 #if LDBL_NBIT_INF == 0
-    /* m68k inf can have either a 1 or 0 explicit one bit */
+    /*
+     * m68k inf can have either a 1 or 0 explicit one bit, and values
+     * without the explicit one bit are valid unnormals
+     */
     if (u.bits.exp == LDBL_INF_NAN_EXP)
         u.bits.manh |= LDBL_NBIT;
-#endif
+#else
+    /* x86 treats values without the explicit one bit as invalid */
     if ((u.bits.manh & LDBL_NBIT) == 0 && u.bits.exp != 0)
         return 1;
+#endif
 #endif
     return (u.bits.exp == LDBL_INF_NAN_EXP && (u.bits.manl != 0 || u.bits.manh != LDBL_NBIT));
 }
