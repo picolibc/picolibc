@@ -111,7 +111,7 @@ powf(float x, float y)
         if (hy < 0) {
             if (x == 0)
                 return __math_divzerof(hx < 0);
-            return one / x;
+            return __math_check_oflowf(one / x);
         } else
             return x;
     }
