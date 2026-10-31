@@ -43,6 +43,13 @@ real[] test_values = {
 real
 exp10m1(real x)
 {
+	/*
+	 * Below -650, 10**x is under 2**-2048, so 10**x - 1 rounds to -1
+	 * at 2048 bits. Skip computing 10**x, which takes as many
+	 * squarings as the argument's exponent
+	 */
+	if (x < -650)
+		return imprecise(-1, 2048);
 	real xi = imprecise(x, 2048);
 	return pow(10, xi) - 1;
 }
