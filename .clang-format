@@ -30,6 +30,7 @@ AttributeMacros:
   - '__alooc_align'
   - '__noreturn'
   - '__const'
+  - '__unsequenced'
   - '__unused'
   - '__used'
   - '__packed'
