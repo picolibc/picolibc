@@ -27,7 +27,7 @@ AttributeMacros:
   - '__returns_nonnull'
   - '__alloc_size'
   - '__alloc_size2'
-  - '__alooc_align'
+  - '__alloc_align'
   - '__noreturn'
   - '__const'
   - '__unsequenced'
