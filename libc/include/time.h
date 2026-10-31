@@ -186,7 +186,7 @@ extern __picolibc_export int  daylight;
 extern __picolibc_export char * const tzname[2];
 #endif /* __POSIX_VISIBLE */
 
-char *asctime(const struct tm *_tblock) __picolibc_export;
+char *asctime(const struct tm *_tblock) __deprecated __picolibc_export;
 
 #if __POSIX_VISIBLE
 #define __ASCTIME_SIZE 26
@@ -212,7 +212,7 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp,
 int clock_settime(clockid_t clock_id, const struct timespec *tp) __picolibc_export;
 #endif
 
-char *ctime(const time_t *_time) __picolibc_export;
+char *ctime(const time_t *_time) __deprecated __picolibc_export;
 
 #if __POSIX_VISIBLE
 char *ctime_r(const time_t *, char[__restrict_arr __min_size(__ASCTIME_SIZE)]) __picolibc_export;
