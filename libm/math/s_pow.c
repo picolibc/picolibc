@@ -161,7 +161,7 @@ pow64(__float64 x, __float64 y)
             if (hy < 0) {
                 if (x == 0)
                     return __math_divzero(hx < 0);
-                return one / x;
+                return __math_check_oflow(one / x);
             } else
                 return x;
         }
