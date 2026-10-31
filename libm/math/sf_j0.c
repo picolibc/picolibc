@@ -253,7 +253,7 @@ pzerof(float x)
     if (ix >= 0x41000000) {
         p = pR8;
         q = pS8;
-    } else if (ix >= 0x40f71c58) {
+    } else if (ix >= 0x4091745d) {
         p = pR5;
         q = pS5;
     } else if (ix >= 0x4036db68) {
@@ -361,7 +361,7 @@ qzerof(float x)
     if (ix >= 0x41000000) {
         p = qR8;
         q = qS8;
-    } else if (ix >= 0x40f71c58) {
+    } else if (ix >= 0x4091745d) {
         p = qR5;
         q = qS5;
     } else if (ix >= 0x4036db68) {
