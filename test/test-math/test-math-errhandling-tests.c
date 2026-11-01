@@ -3682,9 +3682,16 @@ makemathname(test_sqrt_neg)(void)
 {
     return makemathname(sqrt)(-makemathname(two));
 }
-#if 0
-static FLOAT_T makemathname(test_sqrt_2)(void) { return makemathname(sqrt)(makemathname(two)); }
-#endif
+static FLOAT_T
+makemathname(test_sqrt_2)(void)
+{
+    return makemathname(sqrt)(makemathname(two));
+}
+static FLOAT_T
+makemathname(test_sqrt_4)(void)
+{
+    return makemathname(sqrt)(makemathname(two) * makemathname(two));
+}
 
 #ifndef SIMPLE_MATH_ONLY
 
@@ -4757,13 +4764,9 @@ TEST_CONST struct {
     TEST(sqrt_inf, (FLOAT_T)INFINITY, 0, 0),
     TEST(sqrt_neginf, (FLOAT_T)NAN, FE_INVALID, EDOM),
     TEST(sqrt_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
-/*
- * Picolibc doesn't ever set inexact for sqrt as that's
- * an expensive operation
- */
-#if 0
-	TEST(sqrt_2, (FLOAT_T)1.4142135623730951, FE_INEXACT, 0),
-#endif
+    TEST(sqrt_2, (FLOAT_T)1.41421356237309504880168872420969807856967187537694807317667973799L,
+         FE_INEXACT, 0),
+    TESTF(sqrt_4, (FLOAT_T)2.0, 0, 0, FLAG_CHECK_INEXACT),
 
 #ifndef SIMPLE_MATH_ONLY
 
