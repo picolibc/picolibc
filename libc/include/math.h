@@ -821,6 +821,18 @@ float    ufromfpf(float, int, unsigned int) __picolibc_export;
 double   ufromfpx(double, int, unsigned int) __picolibc_export;
 float    ufromfpxf(float, int, unsigned int) __picolibc_export;
 
+/*
+ * clang 21 crashes expanding its fmaximum_num and fminimum_num
+ * builtins for x87 long double (clang 23 does not). Giving the
+ * declarations an asm label stops clang treating them as builtins.
+ */
+#if defined(__clang__) && __clang_major__ < 23 && (defined(__i386__) || defined(__x86_64__)) \
+    && __LDBL_MANT_DIG__ == 64
+#define __fmaxmin_numl_export(n) _ASMNAME(#n) __picolibc_export
+#else
+#define __fmaxmin_numl_export(n) __picolibc_export
+#endif
+
 #ifdef __HAVE_LONG_DOUBLE_MATH
 long double acospil(long double) __picolibc_export;
 long double asinpil(long double) __picolibc_export;
@@ -843,11 +855,11 @@ float       ffmal(long double, long double, long double) __picolibc_export;
 long double fmaximuml(long double, long double) __picolibc_export;
 long double fmaximum_magl(long double, long double) __picolibc_export;
 long double fmaximum_mag_numl(long double, long double) __picolibc_export;
-long double fmaximum_numl(long double, long double) __picolibc_export;
+long double fmaximum_numl(long double, long double) __fmaxmin_numl_export(fmaximum_numl);
 long double fminimuml(long double, long double) __picolibc_export;
 long double fminimum_magl(long double, long double) __picolibc_export;
 long double fminimum_mag_numl(long double, long double) __picolibc_export;
-long double fminimum_numl(long double, long double) __picolibc_export;
+long double fminimum_numl(long double, long double) __fmaxmin_numl_export(fminimum_numl);
 float       fmull(long double, long double) __picolibc_export;
 long double fromfpl(long double, int, unsigned int) __picolibc_export;
 long double fromfpxl(long double, int, unsigned int) __picolibc_export;
