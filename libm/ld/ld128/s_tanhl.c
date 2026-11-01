@@ -75,11 +75,12 @@ tanhl(long double x)
     /* |x| < 40 */
     if (ix < 0x40044000) {
         if (u.value == 0)
-            return x;                /* x == +- 0 */
-        if (ix < 0x3fc60000)         /* |x| < 2^-57 */
-            return x * (one + tiny); /* tanh(small) = small */
-        u.parts32.mswhi = ix;        /* Absolute value of x.  */
-        if (ix >= 0x3fff0000) {      /* |x| >= 1  */
+            return x;        /* x == +- 0 */
+        if (ix < 0x3fc60000) /* |x| < 2^-57 */
+            /* tanh(small) = small */
+            return __math_inexactl(x);
+        u.parts32.mswhi = ix;   /* Absolute value of x.  */
+        if (ix >= 0x3fff0000) { /* |x| >= 1  */
             t = expm1l(two * u.value);
             z = one - two / (t + two);
         } else {

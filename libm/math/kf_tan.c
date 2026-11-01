@@ -46,7 +46,7 @@ __kernel_tanf(float x, float y, int iy)
             if ((ix | (iy + 1)) == 0)
                 return one / fabsf(x);
             else
-                return (iy == 1) ? x : -one / x;
+                return (iy == 1) ? __math_inexactf(x) : -one / x;
         }
     }
     if (ix >= 0x3f2ca140) { /* |x|>=0.6744 */
