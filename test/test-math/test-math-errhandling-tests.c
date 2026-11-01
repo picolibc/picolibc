@@ -91,6 +91,8 @@ FLOAT_T makemathname(scalb)(FLOAT_T, FLOAT_T);
 
 #define FLAG_ZEROSIGN      1
 #define FLAG_CHECK_INEXACT 2
+#define FLAG_ANY_VALUE     4
+#define FLAG_UFLOW_ERRNO   8 /* errno may be ERANGE on underflow (C23 7.12.1p6) */
 
 #define cat2(a, b)         a##b
 #define str(a)             #a
@@ -3984,6 +3986,68 @@ makemathname(test_scalbn_tiny)(void)
     return makemathname(scalbn)(makemathname(one), -INT_MAX);
 }
 
+#ifndef SIMPLE_MATH_ONLY
+/*
+ * Tiny inexact results must raise underflow (C23 F.10p9), including
+ * when the function simply returns a tiny argument.
+ */
+static FLOAT_T
+makemathname(test_tan_small)(void)
+{
+    return makemathname(tan)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_asin_small)(void)
+{
+    return makemathname(asin)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_atan_small)(void)
+{
+    return makemathname(atan)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_sinh_small)(void)
+{
+    return makemathname(sinh)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_tanh_small)(void)
+{
+    return makemathname(tanh)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_asinh_small)(void)
+{
+    return makemathname(asinh)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_atanh_small)(void)
+{
+    return makemathname(atanh)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_expm1_small)(void)
+{
+    return makemathname(expm1)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_log1p_small)(void)
+{
+    return makemathname(log1p)(makemathname(small));
+}
+static FLOAT_T
+makemathname(test_atan2_small)(void)
+{
+    return makemathname(atan2)((FLOAT_T)4.0 * makemathname(small), makemathname(two));
+}
+static FLOAT_T
+makemathname(test_exp_subnormal)(void)
+{
+    return makemathname(exp)(makemathname(log)(makemathname(min_val)) + makemathname(one));
+}
+#endif
+
 #ifndef FE_DIVBYZERO
 #define FE_DIVBYZERO 0
 #endif
@@ -4724,7 +4788,7 @@ TEST_CONST struct {
     TEST(sin_qnan, (FLOAT_T)NAN, 0, 0),
     TEST(sin_snan, (FLOAT_T)NAN, FE_INVALID, 0),
     TEST(sin_pio2, (FLOAT_T)1.0, FE_INEXACT, 0),
-    TEST(sin_small, (FLOAT_T)SMALL, FE_INEXACT, 0),
+    TESTF(sin_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
     TESTF(sin_0, (FLOAT_T)0.0, 0, 0, FLAG_ZEROSIGN),
     TESTF(sin_neg0, (FLOAT_T)-0.0, 0, 0, FLAG_ZEROSIGN),
 
@@ -4833,6 +4897,21 @@ TEST_CONST struct {
 #endif
 #endif
 
+#ifndef SIMPLE_MATH_ONLY
+    TESTF(tan_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(asin_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(atan_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(sinh_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(tanh_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(asinh_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(atanh_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(expm1_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(log1p_small, (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0, FLAG_UFLOW_ERRNO),
+    TESTF(atan2_small, (FLOAT_T)2.0 * (FLOAT_T)SMALL, FE_UNDERFLOW | FE_INEXACT, 0,
+          FLAG_UFLOW_ERRNO),
+    TESTF(exp_subnormal, (FLOAT_T)0.0, FE_UNDERFLOW | FE_INEXACT, 0,
+          FLAG_ANY_VALUE | FLAG_UFLOW_ERRNO),
+#endif
     { 0 },
 };
 
@@ -4956,6 +5035,7 @@ static TEST_CONST struct {
     TEST(llround_long_long_min_mask, FLOAT_LONG_LONG_MIN, 0, 0),
     TEST(llround_long_long_max_one, LROUND_LLONG_MAX, FE_INVALID, 0),
     TEST(llround_long_long_min_one, LLONG_MIN, FE_INVALID, 0),
+
     { 0 },
 };
 
@@ -4972,6 +5052,8 @@ static TEST_CONST struct {
 static int
 makemathname(is_equal)(FLOAT_T a, FLOAT_T b, int flags)
 {
+    if (flags & FLAG_ANY_VALUE)
+        return 1;
     if (isinf(a) && isinf(b))
         return (a > 0) == (b > 0);
     if (makemathname(isnan)(a) && makemathname(isnan)(b)) {
@@ -5184,7 +5266,8 @@ makemathname(run_tests)(void)
             }
         }
         if (math_errhandling & MATH_ERRNO) {
-            if (err != makemathname(tests)[t].errno_expect) {
+            if (err != makemathname(tests)[t].errno_expect
+                && !((makemathname(tests)[t].flags & FLAG_UFLOW_ERRNO) && err == ERANGE)) {
                 PRINT;
                 printf("\terrno supported but %s returns %d (%s) instead of %d (%s)\n",
                        makemathname(tests)[t].name, err, strerror(err),
