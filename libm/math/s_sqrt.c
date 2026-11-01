@@ -170,6 +170,7 @@ sqrt64(__float64 x)
 
     if ((ix0 | ix1) != 0) {
         FE_DECL_ROUND(rnd);
+        __math_set_inexact();
         if (__is_nearest(rnd) || __is_upward(rnd)) {
             if (q1 == (__uint32_t)0xffffffff) {
                 q1 = 0;
