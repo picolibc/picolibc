@@ -1,2 +1,3 @@
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v1.0.1/zephyr-sdk-1.0.1_linux-x86_64_gnu.tar.xz
 https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v1.0.1/zephyr-sdk-1.0.1_linux-x86_64_llvm.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/meson-stable.tar.xz

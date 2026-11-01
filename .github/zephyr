@@ -36,4 +36,12 @@ for dir in "$ZEPHYR_SDK_INSTALL_DIR"/* "$ZEPHYR_SDK_INSTALL_DIR"/qemu* "$ZEPHYR_
     fi
 done
 
+# Use the picolibc-ci-tools meson
+for dir in /opt/picolibc-ci/meson-stable /opt/meson-stable; do
+    if [ -d "$dir"/bin ]; then
+	PATH="$dir"/bin:$PATH
+	break
+    fi
+done
+
 exec "$@"

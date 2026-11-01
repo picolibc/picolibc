@@ -10,3 +10,4 @@ https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/qemu-stable.
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/qemu-hexagon.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/ATfE-23.0.0-pre-Linux-x86_64.tar.xz
 https://github.com/picolibc/toolchains/raw/refs/heads/main/FVP_Base_RevC-2xAEMvA_11.28_23_Linux64-nonexecstack.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/meson-stable.tar.xz
