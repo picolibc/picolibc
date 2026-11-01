@@ -83,7 +83,7 @@ __kernel_tan(__float64 x, __float64 y, int iy)
                 return one / fabs64(x);
             else {
                 if (iy == 1)
-                    return x;
+                    return __math_inexact(x);
                 else {
                     __float64 a, t;
                     z = w = x + y;

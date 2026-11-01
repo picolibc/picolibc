@@ -55,7 +55,16 @@ __math_set_inexactl(void)
 HIDDEN long double
 __math_inexactl(long double val)
 {
-    force_eval_long_double(eqn);
+    /*
+     * A tiny inexact result also underflows (C23 F.10p9). Squaring a
+     * tiny non-zero value raises underflow and inexact in any rounding
+     * mode; otherwise just raise inexact. Zero is excluded, as callers
+     * like rintl return an exact zero for an inexact result.
+     */
+    if (val != 0 && val > -LDBL_MIN && val < LDBL_MIN)
+        force_eval_long_double(val * val);
+    else
+        force_eval_long_double(eqn);
     return val;
 }
 

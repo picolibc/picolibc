@@ -37,8 +37,8 @@ asinhl(long double x)
     if (ix >= 0x7fff0000)
         return x + x;      /* x is inf or NaN */
     if (ix < 0x3fc70000) { /* |x| < 2^ -56 */
-        if (huge + x > one)
-            return x; /* return x inexact except 0 */
+        /* return x inexact */
+        return __math_inexactl(x);
     }
     u.parts32.mswhi = ix;
     if (ix > 0x40350000) { /* |x| > 2 ^ 54 */

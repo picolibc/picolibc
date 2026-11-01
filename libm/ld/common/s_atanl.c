@@ -45,8 +45,8 @@ atanl(long double x)
     expman = (expt << 8) | ((u.bits.manh >> (MANH_SIZE - 9)) & 0xff);
     if (expman < ((BIAS - 2) << 8) + 0xc0) { /* |x| < 0.4375 */
         if (expt < ATAN_LINEAR) {            /* if |x| is small, atanl(x)~=x */
-            if (huge + x > one)
-                return x; /* raise inexact */
+            /* raise inexact */
+            return __math_inexactl(x);
         }
         id = -1;
     } else {

@@ -48,7 +48,16 @@ __math_set_inexactf(void)
 HIDDEN float
 __math_inexactf(float val)
 {
-    force_eval_float(1.0f + VAL);
+    /*
+     * A tiny inexact result also underflows (C23 F.10p9). Squaring a
+     * tiny non-zero value raises underflow and inexact in any rounding
+     * mode; otherwise just raise inexact. Zero is excluded, as callers
+     * like rintl return an exact zero for an inexact result.
+     */
+    if (val != 0 && val > -FLT_MIN && val < FLT_MIN)
+        force_eval_float(val * val);
+    else
+        force_eval_float(1.0f + VAL);
     return val;
 }
 

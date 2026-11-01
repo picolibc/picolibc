@@ -46,10 +46,9 @@
 #ifdef _NEED_FLOAT64
 
 static const __float64 one = _F_64(1.00000000000000000000e+00), /* 0x3FF00000, 0x00000000 */
-    huge = _F_64(1.000e+300),
-                       pio2_hi = _F_64(1.57079632679489655800e+00), /* 0x3FF921FB, 0x54442D18 */
-    pio2_lo = _F_64(6.12323399573676603587e-17),                    /* 0x3C91A626, 0x33145C07 */
-    pio4_hi = _F_64(7.85398163397448278999e-01),                    /* 0x3FE921FB, 0x54442D18 */
+    pio2_hi = _F_64(1.57079632679489655800e+00),                /* 0x3FF921FB, 0x54442D18 */
+    pio2_lo = _F_64(6.12323399573676603587e-17),                /* 0x3C91A626, 0x33145C07 */
+    pio4_hi = _F_64(7.85398163397448278999e-01),                /* 0x3FE921FB, 0x54442D18 */
     /* coefficient for R(x^2) */
     pS0 = _F_64(1.66666666666666657415e-01),  /* 0x3FC55555, 0x55555555 */
     pS1 = _F_64(-3.25565818622400915405e-01), /* 0xBFD4D612, 0x03EB6F7D */
@@ -78,8 +77,8 @@ asin64(__float64 x)
         return __math_invalid(x); /* asin(|x|>1) is NaN */
     } else if (ix < 0x3fe00000) { /* |x|<0.5 */
         if (ix < 0x3e400000) {    /* if |x| < 2**-27 */
-            if (huge + x > one)
-                return x; /* return x with inexact if x!=0*/
+            /* return x with inexact */
+            return __math_inexact(x);
         } else {
             t = x * x;
             p = t * (pS0 + t * (pS1 + t * (pS2 + t * (pS3 + t * (pS4 + t * pS5)))));

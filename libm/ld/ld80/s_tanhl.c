@@ -59,10 +59,11 @@ tanhl(long double x)
     /* |x| < 23 */
     if (ix < 0x4003 || (ix == 0x4003 && jj0 < 0xb8000000u)) { /* |x|<23 */
         if ((ix | jj0 | jj1) == 0)
-            return x;                /* x == +- 0 */
-        if (ix < 0x3fc8)             /* |x|<2**-55 */
-            return x * (one + tiny); /* tanh(small) = small */
-        if (ix >= 0x3fff) {          /* |x|>=1  */
+            return x;    /* x == +- 0 */
+        if (ix < 0x3fc8) /* |x|<2**-55 */
+            /* tanh(small) = small */
+            return __math_inexactl(x);
+        if (ix >= 0x3fff) { /* |x|>=1  */
             t = expm1l(two * fabsl(x));
             z = one - two / (t + two);
         } else {

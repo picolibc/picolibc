@@ -35,10 +35,11 @@ tanhf(float x)
     }
 
     /* |x| < 22 */
-    if (ix < 0x41b00000) {        /* |x|<22 */
-        if (ix < 0x24000000)      /* |x|<2**-55 */
-            return x * (one + x); /* tanh(small) = small */
-        if (ix >= 0x3f800000) {   /* |x|>=1  */
+    if (ix < 0x41b00000) {   /* |x|<22 */
+        if (ix < 0x24000000) /* |x|<2**-55 */
+            /* tanh(small) = small */
+            return x == 0 ? x : __math_inexactf(x);
+        if (ix >= 0x3f800000) { /* |x|>=1  */
             t = expm1f(two * fabsf(x));
             z = one - two / (t + two);
         } else {

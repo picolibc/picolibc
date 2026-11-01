@@ -159,7 +159,8 @@ exp64(__float64 x) /* default IEEE double exp */
         __uint32_t hy;
         GET_HIGH_WORD(hy, y);
         SET_HIGH_WORD(y, hy + lsl((k + 1000), 20)); /* add k to y's exponent */
-        return y * twom1000;
+        /* tiny and inexact */
+        return __math_inexact(y * twom1000);
     }
 }
 

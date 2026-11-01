@@ -20,16 +20,15 @@
 #define const
 #endif
 
-static const float one = 1.0, huge = 1.0e+30, tiny = 1.0e-30,
-                   ln2_hi = 6.9313812256e-01, /* 0x3f317180 */
-    ln2_lo = 9.0580006145e-06,                /* 0x3717f7d1 */
-    invln2 = 1.4426950216e+00,                /* 0x3fb8aa3b */
-                                              /* scaled coefficients related to expm1 */
-    Q1 = -3.3333335072e-02,                   /* 0xbd088889 */
-    Q2 = 1.5873016091e-03,                    /* 0x3ad00d01 */
-    Q3 = -7.9365076090e-05,                   /* 0xb8a670cd */
-    Q4 = 4.0082177293e-06,                    /* 0x36867e54 */
-    Q5 = -2.0109921195e-07;                   /* 0xb457edbb */
+static const float one = 1.0, tiny = 1.0e-30, ln2_hi = 6.9313812256e-01, /* 0x3f317180 */
+    ln2_lo = 9.0580006145e-06,                                           /* 0x3717f7d1 */
+    invln2 = 1.4426950216e+00,                                           /* 0x3fb8aa3b */
+    /* scaled coefficients related to expm1 */
+    Q1 = -3.3333335072e-02, /* 0xbd088889 */
+    Q2 = 1.5873016091e-03,  /* 0x3ad00d01 */
+    Q3 = -7.9365076090e-05, /* 0xb8a670cd */
+    Q4 = 4.0082177293e-06,  /* 0x36867e54 */
+    Q5 = -2.0109921195e-07; /* 0xb457edbb */
 
 float
 expm1f(float x)
@@ -79,8 +78,8 @@ expm1f(float x)
         x = hi - lo;
         c = (hi - x) - lo;
     } else if (hx < 0x33000000) { /* when |x|<2**-25, return x */
-        t = huge + x;             /* return x with inexact flags when x!=0 */
-        return x - (t - (huge + x));
+        /* return x with inexact */
+        return __math_inexactf(x);
     } else
         k = 0;
 

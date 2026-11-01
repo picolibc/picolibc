@@ -50,8 +50,9 @@ atanhl(long double x)
         else
             return __math_invalidl(x);
     }
-    if (ix < 0x3fc60000 && (huge + x) > zero)
-        return x; /* x < 2^-57 */
+    if (ix < 0x3fc60000)
+        /* x < 2^-57 */
+        return __math_inexactl(x);
 
     if (ix < 0x3ffe0000) { /* x < 0.5 */
         t = u.value + u.value;

@@ -50,8 +50,8 @@ sinhl(long double x)
     /* |x| in [0,25], return sign(x)*0.5*(E+E/(E+1))) */
     if (ix < 0x4003 || (ix == 0x4003 && i0 <= 0xc8000000)) { /* |x|<25 */
         if (ix < 0x3fdf)                                     /* |x|<2**-32 */
-            if (shuge + x > one)
-                return x; /* sinh(tiny) = tiny with inexact */
+            /* sinh(tiny) = tiny with inexact */
+            return __math_inexactl(x);
         t = expm1l(fabsl(x));
         if (ix < 0x3fff)
             return h * (2.0l * t - t * t / (t + one));
