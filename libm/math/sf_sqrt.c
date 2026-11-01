@@ -69,6 +69,7 @@ sqrtf(float x)
 
     if (ix != 0) {
         FE_DECL_ROUND(rnd);
+        __math_set_inexactf();
         if (__is_nearest(rnd))
             q += (q & 1);
         else if (__is_upward(rnd))
