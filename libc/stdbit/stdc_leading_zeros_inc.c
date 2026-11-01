@@ -71,7 +71,7 @@ NAME_SB(stdbit_t value)
     }
 #endif
     int ret = WANT_SIZE;
-    for (int i = ceil_p2 >> 1; i > 0; i >>= 1) { 
+    for (int i = ceil_p2 >> 1; i > 0; i >>= 1) {
         if (value >> i != 0) {
             value >>= i;
             ret -= i;
