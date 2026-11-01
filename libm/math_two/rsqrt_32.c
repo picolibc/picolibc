@@ -46,6 +46,10 @@
 float
 rsqrtf(float x)
 {
+#ifdef __MATH_ERRNO
+    if (x == 0)
+        errno = ERANGE;
+#endif
     return 1.0 / sqrt((double)x);
 }
 
@@ -137,11 +141,13 @@ rsqrtf(float x)
             if (xu == INF) {
                 return asfloat(0);
             } else {
-#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
-                if (issignaling(x))
+                if (issignaling(x)) {
                     __math_set_invalidf();
-#endif
-                return nanf("");
+                    //this quiets the sNaN into a qNaN
+                    return nanf("");
+                }
+                //pass through nan unmodified
+                return asfloat(xu);
             }
         } else // normal case
         {
@@ -167,22 +173,24 @@ rsqrtf(float x)
                 return asfloat(new_mantissa + ((uint32_t)newExp << 23));
             } else // rsqrt(+0)=+INF
             {
-                return __math_divzerof(x);
+                return __math_divzerof(xu);
             }
         } else if (xu == ((uint32_t)1u << 31)) {
-                return __math_divzerof(x);
+            return __math_divzerof(xu);
         } else {
             if (x < 0) {
                 __math_set_invalidf();
 #ifdef __MATH_ERRNO
                 errno = EDOM;
 #endif
-            }
-#if defined(_WANT_SNAN) && defined(__SUPPORT_SNAN__)
-            else if (issignaling(x))
+                return nanf("");
+            } else if (issignaling(x)) {
                 __math_set_invalidf();
-#endif
-            return nanf("");
+                //this quiets the sNaN into a qNaN
+                return nanf("");
+            }
+            //pass through qNaN unmodified
+            return asfloat(xu);
         }
     }
 }
