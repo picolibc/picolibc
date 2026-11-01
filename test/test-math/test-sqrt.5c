@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2025 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,20 +33,213 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-load "test-float.5c"
+/*
+ * Generate test-sqrt.h: the square root of each value in every
+ * rounding mode, and whether it is inexact.
+ *
+ * Starting from the round-to-nearest result r, comparing r*r with x
+ * (exactly, as r has at most 113 bits) says which side of the root r
+ * is on, which gives the directed results. Square roots are never
+ * halfway cases, so there are no ties to worry about.
+ */
 
-real[...] test_values = {
+load "test-float.5c"
+autoload PRNG;
+
+/*
+ * Precision and exponent range of each format: binary32, binary64,
+ * Intel and Motorola binary80, binary128. Motorola binary80 differs
+ * from Intel only in having normal values with a zero exponent field,
+ * so its smallest values are half the size.
+ */
+typedef struct {
+	int	prec;
+	int	min_exp;	/* exponent of the smallest normal value */
+	int	max_exp;	/* exponent of the largest finite value */
+	int	denorm_exp;	/* exponent of the smallest subnormal value */
+} format_t;
+
+format_t[...] formats = {
+	{ .prec = 24, .min_exp = -126, .max_exp = 127, .denorm_exp = -149 },
+	{ .prec = 53, .min_exp = -1022, .max_exp = 1023, .denorm_exp = -1074 },
+	{ .prec = 64, .min_exp = -16382, .max_exp = 16383, .denorm_exp = -16445 },
+	{ .prec = 64, .min_exp = -16383, .max_exp = 16383, .denorm_exp = -16446 },
+	{ .prec = 113, .min_exp = -16382, .max_exp = 16383, .denorm_exp = -16494 },
 };
+
+/* Values whose square roots stress the rounding of each format */
+void
+edge_values(format_t f, void(real) check)
+{
+	int	p = f.prec;
+	real	ulp = 2**(1 - p);		/* ulp of values in [1, 2) */
+	int	h = p // 2;
+	real	s = 1 + 2**-h;			/* s*s needs 2h + 1 <= p bits */
+
+	for (int e = 0; e < 2; e++) {		/* even and odd exponents */
+		real	scale = 2**e;
+		check(scale * (1 - ulp/2));	/* just below 1 */
+		check(scale * (1 + ulp));	/* just above 1 */
+		check(scale * (2 - ulp));	/* just below 2 */
+		check(scale * (2 + 2*ulp));	/* just above 2 */
+		check(scale * 2 * (2 - ulp));	/* just below 4: rounding up carries */
+		check(scale * s * s);		/* an exact square */
+		check(scale * (s * s - ulp));	/* its neighbours */
+		check(scale * (s * s + ulp));
+	}
+
+	/* The ends of the range, including subnormals */
+	check(2**f.denorm_exp);
+	check(3 * 2**f.denorm_exp);
+	check(2**(f.denorm_exp + 1));
+	check((2**(f.min_exp - f.denorm_exp) - 1) * 2**f.denorm_exp);	/* largest subnormal */
+	check(2**f.min_exp);
+	check(2**(f.min_exp + 1));
+	check((2 - ulp) * 2**f.max_exp);
+	check((2 - ulp) * 2**(f.max_exp - 1));
+
+	/* Negative values: NaN, or -0 where they underflow */
+	check(-2**f.denorm_exp);
+	check(-2**f.min_exp);
+
+	/* Random significands across the whole exponent range */
+	for (int i = 0; i < 16; i++) {
+		int	sig = 2**(p - 1) + PRNG::randbits(p - 1);
+		int	exp = f.min_exp + PRNG::randbits(32) % (f.max_exp - f.min_exp + 1);
+		check(sig * 2**(exp - (p - 1)));
+	}
+
+	/* Random subnormals */
+	for (int i = 0; i < 8; i++) {
+		int	bits = 1 + PRNG::randbits(32) % (f.min_exp - f.denorm_exp);
+		check((PRNG::randbits(bits) | 1) * 2**f.denorm_exp);
+	}
+}
+
+/* Every value above, starting from a fixed seed so the vectors don't change */
+void
+sqrt_values(void(real) check)
+{
+	PRNG::srandom(0x9e3779b9);
+	check(minus_zero);
+	check(-1);
+	for (int i = 0; i < dim(formats); i++)
+		edge_values(formats[i], check);
+}
+
+typedef struct {
+	result_t	rn, ru, rd, rz;
+	bool		inexact;
+} modes_t;
+
+modes_t
+all_modes(result_t r)
+{
+	return (modes_t) { .rn = r, .ru = r, .rd = r, .rz = r, .inexact = false };
+}
+
+/* The gap above and below a positive normal value r of format i */
+real
+gap_above(real r, int i)
+{
+	return 2**(exponent(r) - real_convs[i].precision);
+}
+
+real
+gap_below(real r, int i)
+{
+	int	e = exponent(r);
+	if (r == 2**(e - 1))
+		return 2**(e - 1 - real_convs[i].precision);
+	return 2**(e - real_convs[i].precision);
+}
+
+/* sqrt of x, already converted to format i */
+modes_t
+sqrt_modes(real x, int i)
+{
+	current_conversion = i;
+
+	/* Values printed as infinity or zero for this format */
+	if (is_inf(x)) {
+		if (x < 0)
+			return all_modes((result_t) { .n = ◊ });
+		return all_modes((result_t) { .i = false });
+	}
+	if (is_zero(x))
+		return all_modes((result_t) { .r = x < 0 ? minus_zero : 0 });
+	if (x < 0)
+		return all_modes((result_t) { .n = ◊ });
+
+	real	r = real_convs[i].conv(sqrt(imprecise(x, prec)));
+	real	rr = imprecise(r, prec) * imprecise(r, prec);
+	real	xx = imprecise(x, prec);
+
+	if (rr == xx)
+		return all_modes((result_t) { .r = r });
+
+	real	below, above;
+	if (rr < xx) {
+		below = r;
+		above = real_convs[i].conv(imprecise(r, prec) + gap_above(r, i));
+	} else {
+		below = real_convs[i].conv(imprecise(r, prec) - gap_below(r, i));
+		above = r;
+	}
+	return (modes_t) {
+		.rn = (result_t) { .r = r },
+		.ru = (result_t) { .r = above },
+		.rd = (result_t) { .r = below },
+		.rz = (result_t) { .r = below },
+		.inexact = true
+	};
+}
+
+void
+print_results(modes_t[nformat] m, string name, result_t(modes_t) pick)
+{
+	printf(", .%s = REAL(", name);
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_result(pick(m[i]), i);
+	}
+	printf(")");
+}
+
+void
+check(real x)
+{
+	real[nformat]		xp;
+	modes_t[nformat]	m;
+
+	for (int i = 0; i < nformat; i++) {
+		xp[i] = real_convs[i].conv(x);
+		m[i] = sqrt_modes(xp[i], i);
+	}
+	printf("{ .x = REAL(");
+	for (int i = 0; i < nformat; i++) {
+		if (i > 0)
+			printf(", ");
+		print_one_real(xp[i], i);
+	}
+	printf(")");
+	print_results(m, "rn", result_t func(modes_t v) { return v.rn; });
+	print_results(m, "ru", result_t func(modes_t v) { return v.ru; });
+	print_results(m, "rd", result_t func(modes_t v) { return v.rd; });
+	print_results(m, "rz", result_t func(modes_t v) { return v.rz; });
+	printf(", .inexact = REAL(");
+	for (int i = 0; i < nformat; i++)
+		printf("%s%d", i > 0 ? ", " : "", m[i].inexact ? 1 : 0);
+	printf(") },\n");
+}
 
 void
 main()
 {
-        for (int i = 0; i < dim(test_values); i++)
-                compute_real_one(test_values[i], sqrt);
-	for (real r = 1e-38; r < 1e38; r *= 11) {
-		real ri = imprecise(r, prec);
-		compute_real_one(ri, sqrt);
-	}
+	for (real r = 1e-38; r < 1e38; r *= 11)
+		check(imprecise(r, prec));
+	sqrt_values(check);
 }
 
 main();
