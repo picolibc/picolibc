@@ -86,12 +86,6 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 	     ;;
      esac
  fi
- TEST_WRAPPER=
- if grep -q 'Cross files' meson-logs/meson-setup.txt; then
-     echo 'Cross build, no wrapper'
- else
-     TEST_WRAPPER="--wrapper $PWD/../scripts/run-native"
- fi
  if [ -n "$INC_TESTS" ]; then
      date
      echo '########## incremental' "$TARGET" 'ninja'
@@ -99,8 +93,8 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
      case $? in
 	 0)
 	     date
-	     echo '########## incremental' "$TARGET" "meson test --hash-record $TEST_WRAPPER"
-	     meson test --hash-record $TEST_WRAPPER > capture.log 2>&1 || exit 5
+	     echo '########## incremental' "$TARGET" "meson test --hash-record"
+	     meson test --hash-record > capture.log 2>&1 || exit 5
 	     ;;
 	 *)
 	     echo '##########' incremental build failed
@@ -121,7 +115,7 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
  date
  echo '##########' "$TARGET" ninja
  ninja > ninja.log 2>&1 || exit 6
- TEST_ARGS="$TEST_WRAPPER -t 20"
+ TEST_ARGS="-t 20"
  if [ -n "$INC_TESTS" ]; then
      TEST_ARGS="--hash-changed $TEST_ARGS"
  fi
