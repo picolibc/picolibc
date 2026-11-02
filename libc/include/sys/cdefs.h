@@ -264,6 +264,13 @@
 #define __deprecated
 #endif
 
+/* For interfaces that C23 deprecates but earlier versions of C don't */
+#if (__STDC_VERSION__ - 0) > 201710L
+#define __deprecated_c23 __deprecated
+#else
+#define __deprecated_c23
+#endif
+
 #if __has_attribute(__no_builtin__)
 #define __no_builtin __attribute__((__no_builtin__))
 #elif defined(__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
