@@ -40,146 +40,77 @@ SUCH DAMAGE.
 
 _BEGIN_STD_C
 
+/*
+ * Layout: macros and types, then the functions in the order of C23
+ * section 7.12, split into blocks by the standard which added them,
+ * then extensions. Within each section, double, float and long double
+ * versions are listed in that order.
+ *
+ * Every long double function is declared whenever long double exists.
+ * Without __HAVE_LONG_DOUBLE_MATH, picolibc only implements some of
+ * them; using one of the others fails at link time.
+ */
+
+/*
+ * clang 21 crashes expanding its fmaximum_num and fminimum_num
+ * builtins for x87 long double (clang 23 does not). Giving the
+ * declarations an asm label stops clang treating them as builtins.
+ */
+#if defined(__clang__) && __clang_major__ < 23 && (defined(__i386__) || defined(__x86_64__)) \
+    && __LDBL_MANT_DIG__ == 64
+#define __fmaxmin_numl_export(n) _ASMNAME(#n) __picolibc_export
+#else
+#define __fmaxmin_numl_export(n) __picolibc_export
+#endif
+
 /* Natural log of 2 */
 #define _M_LN2    0.693147180559945309417
 #define _M_LN2_LD 0.693147180559945309417232121458176568l
 
-#if __GNUC_PREREQ(3, 3) || defined(__clang__) || defined(__COMPCERT__)
-/* gcc >= 3.3 implicitly defines builtins for HUGE_VALx values.  */
+/*
+ * Macros and types
+ */
 
 #ifndef HUGE_VAL
 #define HUGE_VAL (__builtin_huge_val())
 #endif
-
+#if __ISO_C_VISIBLE >= 1999
 #ifndef HUGE_VALF
 #define HUGE_VALF (__builtin_huge_valf())
 #endif
-
 #ifndef HUGE_VALL
 #define HUGE_VALL (__builtin_huge_vall())
 #endif
-
 #ifndef INFINITY
 #define INFINITY (__builtin_inff())
 #endif
-
 #ifndef NAN
 #define NAN (__builtin_nanf(""))
 #endif
-
-#else /* !gcc >= 3.3  */
-
-/*      No builtins.  Use fixed defines instead.  (All 3 HUGE plus the INFINITY
- * and NAN macros are required to be constant expressions.  Using a variable--
- * even a static const--does not meet this requirement, as it cannot be
- * evaluated at translation time.)
- *      The infinities are done using numbers that are far in excess of
- * something that would be expected to be encountered in a floating-point
- * implementation.  (A more certain way uses values from float.h, but that is
- * avoided because system includes are not supposed to include each other.)
- *      This method might produce warnings from some compilers.  (It does in
- * newer GCCs, but not for ones that would hit this #else.)  If this happens,
- * please report details to the Newlib mailing list.  */
-
-#ifndef HUGE_VAL
-#define HUGE_VAL (1.0e999999999)
 #endif
 
-#ifndef HUGE_VALF
-#define HUGE_VALF (1.0e999999999F)
-#endif
-
-#if !defined(HUGE_VALL) && defined(__HAVE_LONG_DOUBLE)
-#define HUGE_VALL (1.0e999999999L)
-#endif
-
-#if !defined(INFINITY)
-#define INFINITY (HUGE_VALF)
-#endif
-
-#if !defined(NAN)
-#if defined(__GNUC__) && defined(__cplusplus)
-/* Exception:  older g++ versions warn about the divide by 0 used in the
- * normal case (even though older gccs do not).  This trick suppresses the
- * warning, but causes errors for plain gcc, so is only used in the one
- * special case.  */
-static const union {
-    __ULong __i[1];
-    float   __d;
-} __Nanf = { 0x7FC00000 };
-#define NAN (__Nanf.__d)
-#else
-#define NAN (0.0F / 0.0F)
-#endif
-#endif
-
-#endif /* !gcc >= 3.3  */
-
-extern double atan(double) __picolibc_export;
-extern double cos(double) __picolibc_export;
-extern double sin(double) __picolibc_export;
-extern double tan(double) __picolibc_export;
-extern double tanh(double) __picolibc_export;
-extern double frexp(double, int *) __picolibc_export;
-extern double modf(double, double *) __picolibc_export;
-extern double ceil(double) __picolibc_export;
-extern double fabs(double) __picolibc_export;
-extern double floor(double) __picolibc_export;
-
-extern double acos(double) __picolibc_export;
-extern double asin(double) __picolibc_export;
-extern double atan2(double, double) __picolibc_export;
-extern double cosh(double) __picolibc_export;
-extern double sinh(double) __picolibc_export;
-extern double exp(double) __picolibc_export;
-extern double ldexp(double, int) __picolibc_export;
-extern double log(double) __picolibc_export;
-extern double log10(double) __picolibc_export;
-extern double pow(double, double) __picolibc_export;
-extern double sqrt(double) __picolibc_export;
-extern double fmod(double, double) __picolibc_export;
-
-#if __MISC_VISIBLE
-extern int finite(double) __picolibc_export;
-extern int finitef(float) __picolibc_export;
-extern int isinff(float) __picolibc_export;
-extern int isnanf(float) __picolibc_export;
-#if defined(__HAVE_LONG_DOUBLE)
-extern int finitel(long double) __picolibc_export;
-extern int isinfl(long double) __picolibc_export;
-extern int isnanl(long double) __picolibc_export;
-#endif
-#if !defined(__cplusplus) || __cplusplus < 201103L
-extern int isinf(double) __picolibc_export;
-#endif
-#endif /* __MISC_VISIBLE */
-#if (__MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 600)) \
-    && (!defined(__cplusplus) || __cplusplus < 201103L)
-extern int isnan(double) __picolibc_export;
+/*
+ * Specifies whether the target uses the snan/nan discriminator
+ * definition from IEEE 754 2008 (top bit of significand is 1 for qNaN
+ * and 0 for sNaN). This is set to zero in machine/math.h for targets
+ * that don't do this (such as MIPS).
+ */
+#ifndef _IEEE_754_2008_SNAN
+#define _IEEE_754_2008_SNAN 1
 #endif
 
 #if __ISO_C_VISIBLE >= 1999
-/* ISO C99 types and macros. */
 
-/* FIXME:  FLT_EVAL_METHOD should somehow be gotten from float.h (which is hard,
- * considering that the standard says the includes it defines should not
- * include other includes that it defines) and that value used.  (This can be
- * solved, but autoconf has a bug which makes the solution more difficult, so
- * it has been skipped for now.)  */
+/*
+ * float_t and double_t. FLT_EVAL_METHOD 16 (from TS 18661-3) means the
+ * same as 0, but also says that _Float16 exists. For other values,
+ * the target is expected to provide __FLOAT_TYPE and __DOUBLE_TYPE.
+ */
 #if !defined(FLT_EVAL_METHOD) && defined(__FLT_EVAL_METHOD__)
 #define FLT_EVAL_METHOD __FLT_EVAL_METHOD__
 #define __TMP_FLT_EVAL_METHOD
-#endif /* FLT_EVAL_METHOD */
+#endif
 #if defined FLT_EVAL_METHOD
-/* FLT_EVAL_METHOD == 16 has meaning as defined in ISO/IEC TS 18661-3,
- * which provides non-compliant extensions to C and POSIX (by adding
- * additional positive values for FLT_EVAL_METHOD).  It effectively has
- * same meaning as the C99 and C11 definitions for value 0, while also
- * serving as a flag that the _Float16 (float16_t) type exists.
- *
- * FLT_EVAL_METHOD could be any number of bits of supported floating point
- * format (e.g. 32, 64, 128), but currently only AArch64 and few other targets
- * might define that as 16.  */
 #if (FLT_EVAL_METHOD == 0) || (FLT_EVAL_METHOD == 16)
 typedef float  float_t;
 typedef double double_t;
@@ -189,21 +120,11 @@ typedef double double_t;
 #elif FLT_EVAL_METHOD == 2
 typedef long double float_t;
 typedef long double double_t;
-#else
-/* Implementation-defined.  Assume float_t and double_t have been
- * defined previously for this configuration (e.g. config.h). */
-
-/* If __DOUBLE_TYPE is defined (__FLOAT_TYPE is then supposed to be
-   defined as well) float_t and double_t definition is suggested by
-   an arch specific header.  */
-#ifdef __DOUBLE_TYPE
+#elif defined(__DOUBLE_TYPE)
 typedef __DOUBLE_TYPE double_t;
 typedef __FLOAT_TYPE  float_t;
 #endif
-/* Assume config.h has provided these types.  */
-#endif
 #else
-/* Assume basic definitions.  */
 typedef float  float_t;
 typedef double double_t;
 #endif
@@ -227,11 +148,9 @@ typedef double double_t;
 #if !defined(FP_FAST_FMA) && (__HAVE_FAST_FMA || defined(__FP_FAST_FMA))
 #define FP_FAST_FMA
 #endif
-
 #if !defined(FP_FAST_FMAF) && (__HAVE_FAST_FMAF || defined(__FP_FAST_FMAF))
 #define FP_FAST_FMAF
 #endif
-
 #if !defined(FP_FAST_FMAL) && (__HAVE_FAST_FMAL || defined(__FP_FAST_FMAL))
 #define FP_FAST_FMAL
 #endif
@@ -261,104 +180,104 @@ typedef double double_t;
 #define math_errhandling (_MATH_ERRHANDLING_ERRNO | _MATH_ERRHANDLING_ERREXCEPT)
 #endif
 
-#if __ISO_C_VISIBLE >= 2023
-/* Rounding modes for fromfp functions */
-#define FP_INT_UPWARD            0
-#define FP_INT_DOWNWARD          1
-#define FP_INT_TOWARDZERO        2
-#define FP_INT_TONEARESTFROMZERO 3
-#define FP_INT_TONEAREST         4
+/* 7.12.3 Classification macros */
+
+int __isinff(float __x) __picolibc_export;
+int __isinfd(double __x) __picolibc_export;
+int __isnanf(float __x) __picolibc_export;
+int __isnand(double __x) __picolibc_export;
+int __fpclassifyf(float __x) __picolibc_export;
+int __fpclassifyd(double __x) __picolibc_export;
+int __signbitf(float __x) __picolibc_export;
+int __signbitd(double __x) __picolibc_export;
+int __finite(double __x) __picolibc_export;
+int __finitef(float __x) __picolibc_export;
+int __issignalingf(float __x) __picolibc_export;
+int __issignaling(double __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+int __fpclassifyl(long double __x) __picolibc_export;
+int __isinfl(long double __x) __picolibc_export;
+int __isnanl(long double __x) __picolibc_export;
+int __finitel(long double __x) __picolibc_export;
+int __signbitl(long double __x) __picolibc_export;
+int __issignalingl(long double __x) __picolibc_export;
 #endif
 
 /*
- * Specifies whether the target uses the snan/nan discriminator
- * definition from IEEE 754 2008 (top bit of significand is 1 for qNaN
- * and 0 for sNaN). This is set to zero in machine/math.h for targets
- * that don't do this (such as MIPS).
+ * Pick the float, double or long double version of a function by the
+ * size of the argument.
  */
-#ifndef _IEEE_754_2008_SNAN
-#define _IEEE_754_2008_SNAN 1
-#endif
-
-extern int __isinff(float) __picolibc_export;
-extern int __isinfd(double) __picolibc_export;
-extern int __isnanf(float) __picolibc_export;
-extern int __isnand(double) __picolibc_export;
-extern int __fpclassifyf(float) __picolibc_export;
-extern int __fpclassifyd(double) __picolibc_export;
-extern int __signbitf(float) __picolibc_export;
-extern int __signbitd(double) __picolibc_export;
-extern int __finite(double) __picolibc_export;
-extern int __finitef(float) __picolibc_export;
-#if defined(__HAVE_LONG_DOUBLE)
-extern int __fpclassifyl(long double) __picolibc_export;
-extern int __isinfl(long double) __picolibc_export;
-extern int __isnanl(long double) __picolibc_export;
-extern int __finitel(long double) __picolibc_export;
-extern int __signbitl(long double) __picolibc_export;
-#endif
-
-/* Note: isinf and isnan were once functions in newlib that took double
- *       arguments.  C99 specifies that these names are reserved for macros
- *       supporting multiple floating point types.  Thus, they are
- *       now defined as macros.  Implementations of the old functions
- *       taking double arguments still exist for compatibility purposes
- *       (prototypes for them are earlier in this header).  */
-
-/*
- * GCC bug 66462 raises INVALID exception when __builtin_fpclassify is
- * passed snan, so we cannot use it when building with snan support.
- * clang doesn't appear to have an option to control snan behavior, and
- * it's builtin fpclassify also raises INVALID for snan, so always use
- * our version for that.
- */
-#if __GNUC_PREREQ(4, 4) && (FE_INVALID != 0) && !defined(__SUPPORT_SNAN__) && !defined(__clang__)
-#define fpclassify(__x)                                                                \
-    (__builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x))
-#define isfinite(__x)    (__builtin_isfinite(__x))
-#define isinf(__x)       (__builtin_isinf_sign(__x))
-#define isnan(__x)       (__builtin_isnan(__x))
-#define isnormal(__x)    (__builtin_isnormal(__x))
-#define issubnormal(__x) (__builtin_issubnormal(__x))
-#define iszero(__x)      (__builtin_iszero(__x))
-#else
-#if defined(__HAVE_LONG_DOUBLE)
+#ifdef __HAVE_LONG_DOUBLE
 #define __float_generic3(__f, __d, __l, __x)                          \
     ((sizeof(__x) == sizeof(float))        ? __f(__x)                 \
          : (sizeof(__x) == sizeof(double)) ? __d((double)(__x))       \
                                            : __l((long double)(__x)))
+#elif defined(_DOUBLE_IS_32BITS)
+#define __float_generic3(__f, __d, __l, __x) __f((float)(__x))
 #else
 #define __float_generic3(__f, __d, __l, __x)                         \
     ((sizeof(__x) == sizeof(float)) ? __f(__x) : __d((double)(__x)))
 #endif
 #define __float_generic(__p, __x) __float_generic3(__p##f, __p##d, __p##l, __x)
-#define fpclassify(__x)           __float_generic(__fpclassify, __x)
-#define isfinite(__x)             __float_generic3(__finitef, __finite, __finitel, __x)
-#define isinf(__x)                __float_generic(__isinf, __x)
-#define isnan(__x)                __float_generic(__isnan, __x)
-#define isnormal(__x)             (fpclassify(__x) == FP_NORMAL)
-#define issubnormal(__x)          (fpclassify(__x) == FP_SUBNORMAL)
-#define iszero(__x)               (fpclassify(__x) == FP_ZERO)
+
+/*
+ * GCC bug 66462 raises INVALID exception when __builtin_fpclassify is
+ * passed snan, so we cannot use it when building with snan support.
+ * clang doesn't appear to have an option to control snan behavior, and
+ * its builtin fpclassify also raises INVALID for snan, so always use
+ * our version for that.
+ */
+#if __GNUC_PREREQ(4, 4) && (FE_INVALID != 0) && !defined(__SUPPORT_SNAN__) && !defined(__clang__)
+#define fpclassify(__x)                                                                \
+    (__builtin_fpclassify(FP_NAN, FP_INFINITE, FP_NORMAL, FP_SUBNORMAL, FP_ZERO, __x))
+#define isfinite(__x)      (__builtin_isfinite(__x))
+#define isinf(__x)         (__builtin_isinf_sign(__x))
+#define isnan(__x)         (__builtin_isnan(__x))
+#define isnormal(__x)      (__builtin_isnormal(__x))
+#define __issubnormal(__x) (__builtin_issubnormal(__x))
+#define __iszero(__x)      (__builtin_iszero(__x))
+#else
+#define fpclassify(__x)    __float_generic(__fpclassify, __x)
+#define isfinite(__x)      __float_generic3(__finitef, __finite, __finitel, __x)
+#define isinf(__x)         __float_generic(__isinf, __x)
+#define isnan(__x)         __float_generic(__isnan, __x)
+#define isnormal(__x)      (fpclassify(__x) == FP_NORMAL)
+#define __issubnormal(__x) (fpclassify(__x) == FP_SUBNORMAL)
+#define __iszero(__x)      (fpclassify(__x) == FP_ZERO)
+#endif
+
+#if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+#define issubnormal(__x) __issubnormal(__x)
+#define iszero(__x)      __iszero(__x)
+#ifndef issignaling
+#define issignaling(__x) __float_generic3(__issignalingf, __issignaling, __issignalingl, __x)
+#endif
+#endif
+
+#if __GNUC_PREREQ(4, 0)
+#define signbit(__x)                                                                 \
+    __float_generic3(__builtin_signbitf, __builtin_signbit, __builtin_signbitl, __x)
+#else
+#define signbit(__x) __float_generic(__signbit, __x)
 #endif
 
 #if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
-
 #ifdef __LONG_DOUBLE_NON_CANONICAL
-extern int __iscanonicall(long double) __picolibc_export;
+int __iscanonicall(long double __x) __picolibc_export;
 #define iscanonical(__x)                                                                        \
     _Generic((__x), long double: __iscanonicall(__x), default: ((void)(__typeof(__x))(__x), 1))
 #else
 #define iscanonical(x) ((void)(__typeof(x))(x), 1)
 #endif
-
 #endif
 
+/* picolibc extensions */
+#if __MISC_VISIBLE
 #define isfinitef(x) isfinite((float)(x))
 #define isinff(x)    isinf((float)(x))
 #define isnanf(x)    isnan((float)(x))
 #define isnormalf(x) isnormal((float)(x))
 #define iszerof(x)   iszero((float)(x))
-
 #ifdef __HAVE_LONG_DOUBLE
 #define isfinitel(x) isfinite((long double)(x))
 #define isinfl(x)    isinf((long double)(x))
@@ -366,70 +285,9 @@ extern int __iscanonicall(long double) __picolibc_export;
 #define isnormall(x) isnormal((long double)(x))
 #define iszerol(x)   iszero((long double)(x))
 #endif
+#endif /* __MISC_VISIBLE */
 
-int __iseqsig(double x, double y) __picolibc_export;
-int __iseqsigf(float x, float y) __picolibc_export;
-
-#ifdef __HAVE_LONG_DOUBLE
-int __iseqsigl(long double x, long double y) __picolibc_export;
-#endif
-
-#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
-#ifdef __HAVE_LONG_DOUBLE
-#define iseqsig(__x, __y)                                                \
-    ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y)) \
-         : (sizeof((__x) + (__y)) == sizeof(double))                     \
-         ? __iseqsig((double)(__x), (double)(__y))                       \
-         : __iseqsigl((long double)(__x), (long double)(__y)))
-#else
-#define iseqsig(__x, __y)                                                                \
-    ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y))                 \
-                                              : __iseqsig((double)(__x), (double)(__y)))
-#endif
-#endif
-
-#ifndef issignaling
-int __issignalingf(float f) __picolibc_export;
-int __issignaling(double d) __picolibc_export;
-
-#if defined(__HAVE_LONG_DOUBLE)
-int __issignalingl(long double d) __picolibc_export;
-#define issignaling(__x)                                                         \
-    ((sizeof(__x) == sizeof(float))        ? __issignalingf(__x)                 \
-         : (sizeof(__x) == sizeof(double)) ? __issignaling((double)(__x))        \
-                                           : __issignalingl((long double)(__x)))
-#else
-#ifdef _DOUBLE_IS_32BITS
-#define issignaling(__x) __issignalingf((float)(__x))
-#else
-#define issignaling(__x)                                                                  \
-    ((sizeof(__x) == sizeof(float)) ? __issignalingf(__x) : __issignaling((double)(__x)))
-#endif /* _DOUBLE_IS_32BITS */
-#endif /* __HAVE_LONG_DOUBLE */
-#endif
-
-#if __GNUC_PREREQ(4, 0)
-#if defined(__HAVE_LONG_DOUBLE)
-#define signbit(__x)                                                                   \
-    ((sizeof(__x) == sizeof(float))                                                    \
-         ? __builtin_signbitf(__x)                                                     \
-         : ((sizeof(__x) == sizeof(double)) ? __builtin_signbit((double)(__x))         \
-                                            : __builtin_signbitl((long double)(__x))))
-#else
-#define signbit(__x)                                                                              \
-    ((sizeof(__x) == sizeof(float)) ? __builtin_signbitf(__x) : __builtin_signbit((double)(__x)))
-#endif
-#else
-#if defined(__HAVE_LONG_DOUBLE)
-#define signbit(__x)                                                           \
-    ((sizeof(__x) == sizeof(float))                                            \
-         ? __signbitf(__x)                                                     \
-         : ((sizeof(__x) == sizeof(double)) ? __signbit((double)(__x))         \
-                                            : __signbitl((long double)(__x))))
-#else
-#define signbit(__x) ((sizeof(__x) == sizeof(float)) ? __signbitf(__x) : __signbitd((double)(__x)))
-#endif
-#endif
+/* 7.12.15 Comparison macros */
 
 #if __GNUC_PREREQ(2, 97) && !(defined(__riscv) && defined(__clang__))
 #define isgreater(__x, __y)      (__builtin_isgreater(__x, __y))
@@ -469,7 +327,6 @@ int __issignalingl(long double d) __picolibc_export;
         __typeof__(y) __y = (y);                            \
         !isunordered(__x, __y) && (__x < __y || __x > __y); \
     }))
-
 #define isunordered(a, b)                                       \
     (__extension__({                                            \
         __typeof__(a) __a = (a);                                \
@@ -478,420 +335,561 @@ int __issignalingl(long double d) __picolibc_export;
     }))
 #endif
 
-/* Non ANSI double precision functions.  */
-
-extern double        infinity(void) __picolibc_export;
-extern double        nan(const char *) __picolibc_export;
-extern double        copysign(double, double) __picolibc_export;
-extern double        logb(double) __picolibc_export;
-extern int           ilogb(double) __picolibc_export;
-
-extern double        asinh(double) __picolibc_export;
-extern double        cbrt(double) __picolibc_export;
-extern double        nextafter(double, double) __picolibc_export;
-extern double        rint(double) __picolibc_export;
-extern double        scalbn(double, int) __picolibc_export;
-extern double        scalb(double, double) __picolibc_export;
-extern double        getpayload(const double *x) __picolibc_export;
-extern double        significand(double) __picolibc_export;
-
-extern double        exp2(double) __picolibc_export;
-extern double        scalbln(double, long int) __picolibc_export;
-extern double        tgamma(double) __picolibc_export;
-extern double        nearbyint(double) __picolibc_export;
-extern long int      lrint(double) __picolibc_export;
-extern long long int llrint(double) __picolibc_export;
-extern double        round(double) __picolibc_export;
-extern long int      lround(double) __picolibc_export;
-extern long long int llround(double) __picolibc_export;
-extern double        trunc(double) __picolibc_export;
-extern double        remquo(double, double, int *) __picolibc_export;
-extern double        fdim(double, double) __picolibc_export;
-extern double        fmax(double, double) __picolibc_export;
-extern double        fmin(double, double) __picolibc_export;
-extern double        fma(double, double, double) __picolibc_export;
-
-extern double        log1p(double) __picolibc_export;
-extern double        expm1(double) __picolibc_export;
-
-extern double        acosh(double) __picolibc_export;
-extern double        atanh(double) __picolibc_export;
-extern double        remainder(double, double) __picolibc_export;
-extern double        gamma(double) __picolibc_export;
-extern double        lgamma(double) __picolibc_export;
-extern double        erf(double) __picolibc_export;
-extern double        erfc(double) __picolibc_export;
-extern double        log2(double) __picolibc_export;
-
-extern double        hypot(double, double) __picolibc_export;
-
-/* Single precision versions of ANSI functions.  */
-
-extern float         atanf(float) __picolibc_export;
-extern float         cosf(float) __picolibc_export;
-extern float         sinf(float) __picolibc_export;
-extern float         tanf(float) __picolibc_export;
-extern float         tanhf(float) __picolibc_export;
-extern float         frexpf(float, int *) __picolibc_export;
-extern float         modff(float, float *) __picolibc_export;
-extern float         ceilf(float) __picolibc_export;
-extern float         fabsf(float) __picolibc_export;
-extern float         floorf(float) __picolibc_export;
-
-extern float         acosf(float) __picolibc_export;
-extern float         asinf(float) __picolibc_export;
-extern float         atan2f(float, float) __picolibc_export;
-extern float         coshf(float) __picolibc_export;
-extern float         sinhf(float) __picolibc_export;
-extern float         expf(float) __picolibc_export;
-extern float         ldexpf(float, int) __picolibc_export;
-extern float         logf(float) __picolibc_export;
-extern float         log10f(float) __picolibc_export;
-extern float         powf(float, float) __picolibc_export;
-extern float         sqrtf(float) __picolibc_export;
-extern float         fmodf(float, float) __picolibc_export;
-
-/* Other single precision functions.  */
-
-extern float         exp2f(float) __picolibc_export;
-extern float         scalblnf(float, long int) __picolibc_export;
-extern float         tgammaf(float) __picolibc_export;
-extern float         nearbyintf(float) __picolibc_export;
-extern long int      lrintf(float) __picolibc_export;
-extern long long int llrintf(float) __picolibc_export;
-extern float         roundf(float) __picolibc_export;
-extern long int      lroundf(float) __picolibc_export;
-extern long long int llroundf(float) __picolibc_export;
-extern float         truncf(float) __picolibc_export;
-extern float         remquof(float, float, int *) __picolibc_export;
-extern float         fdimf(float, float) __picolibc_export;
-extern float         fmaxf(float, float) __picolibc_export;
-extern float         fminf(float, float) __picolibc_export;
-extern float         fmaf(float, float, float) __picolibc_export;
-
-extern float         infinityf(void) __picolibc_export;
-extern float         nanf(const char *) __picolibc_export;
-extern float         copysignf(float, float) __picolibc_export;
-extern float         logbf(float) __picolibc_export;
-extern int           ilogbf(float) __picolibc_export;
-
-extern float         asinhf(float) __picolibc_export;
-extern float         cbrtf(float) __picolibc_export;
-extern float         nextafterf(float, float) __picolibc_export;
-extern float         rintf(float) __picolibc_export;
-extern float         scalbnf(float, int) __picolibc_export;
-extern float         scalbf(float, float) __picolibc_export;
-extern float         log1pf(float) __picolibc_export;
-extern float         expm1f(float) __picolibc_export;
-extern float         getpayloadf(const float *x) __picolibc_export;
-extern float         significandf(float) __picolibc_export;
-
-extern float         acoshf(float) __picolibc_export;
-extern float         atanhf(float) __picolibc_export;
-extern float         remainderf(float, float) __picolibc_export;
-extern float         gammaf(float) __picolibc_export;
-extern float         lgammaf(float) __picolibc_export;
-extern float         erff(float) __picolibc_export;
-extern float         erfcf(float) __picolibc_export;
-extern float         log2f(float) __picolibc_export;
-extern float         hypotf(float, float) __picolibc_export;
-
+int __iseqsig(double __x, double __y) __picolibc_export;
+int __iseqsigf(float __x, float __y) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE
-
-/*
- * Declare every long double function whenever the type exists.
- * Picolibc only implements some of them when __HAVE_LONG_DOUBLE_MATH
- * is not defined; using one of the others then fails at link time
- * instead of silently compiling a call to something else.
- */
-
-extern long double   hypotl(long double, long double) __picolibc_export;
-extern long double   infinityl(void) __picolibc_export;
-extern long double   sqrtl(long double) __picolibc_export;
-extern long double   frexpl(long double, int *) __picolibc_export;
-extern long double   scalbnl(long double, int) __picolibc_export;
-extern long double   scalblnl(long double, long) __picolibc_export;
-extern long double   rintl(long double) __picolibc_export;
-extern long int      lrintl(long double) __picolibc_export;
-extern long long int llrintl(long double) __picolibc_export;
-extern int           ilogbl(long double) __picolibc_export;
-extern long int      llogbl(long double) __picolibc_export;
-extern long double   logbl(long double) __picolibc_export;
-extern long double   ldexpl(long double, int) __picolibc_export;
-extern long double   nearbyintl(long double) __picolibc_export;
-extern long double   ceill(long double) __picolibc_export;
-extern long double   fmaxl(long double, long double) __picolibc_export;
-extern long double   fminl(long double, long double) __picolibc_export;
-extern long double   roundl(long double) __picolibc_export;
-extern long          lroundl(long double) __picolibc_export;
-extern long long int llroundl(long double) __picolibc_export;
-extern long double   truncl(long double) __picolibc_export;
-extern long double   nanl(const char *) __picolibc_export;
-extern long double   floorl(long double) __picolibc_export;
-extern long double   scalbl(long double, long double) __picolibc_export;
-extern long double   significandl(long double) __picolibc_export;
-/* Compiler provides these */
-extern long double   fabsl(long double) __picolibc_export;
-extern long double   copysignl(long double, long double) __picolibc_export;
-
-#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
-int canonicalizel(long double *, const long double *) __picolibc_export;
+int __iseqsigl(long double __x, long double __y) __picolibc_export;
 #endif
 
-extern long double   atanl(long double) __picolibc_export;
-extern long double   cosl(long double) __picolibc_export;
-extern long double   sinl(long double) __picolibc_export;
-extern long double   tanl(long double) __picolibc_export;
-extern long double   tanhl(long double) __picolibc_export;
-extern long double   modfl(long double, long double *) __picolibc_export;
-extern long double   log1pl(long double) __picolibc_export;
-extern long double   expm1l(long double) __picolibc_export;
-extern long double   acosl(long double) __picolibc_export;
-extern long double   asinl(long double) __picolibc_export;
-extern long double   atan2l(long double, long double) __picolibc_export;
-extern long double   coshl(long double) __picolibc_export;
-extern long double   sinhl(long double) __picolibc_export;
-extern long double   expl(long double) __picolibc_export;
-extern long double   logl(long double) __picolibc_export;
-extern long double   log10l(long double) __picolibc_export;
-extern long double   powl(long double, long double) __picolibc_export;
-extern long double   fmodl(long double, long double) __picolibc_export;
-extern long double   asinhl(long double) __picolibc_export;
-extern long double   cbrtl(long double) __picolibc_export;
-extern long double   nextafterl(long double, long double) __picolibc_export;
-extern float         nexttowardf(float, long double) __picolibc_export;
-extern double        nexttoward(double, long double) __picolibc_export;
-extern long double   nexttowardl(long double, long double) __picolibc_export;
-extern long double   log2l(long double) __picolibc_export;
-extern long double   exp2l(long double) __picolibc_export;
-extern long double   tgammal(long double) __picolibc_export;
-extern long double   remquol(long double, long double, int *) __picolibc_export;
-extern long double   fdiml(long double, long double) __picolibc_export;
-extern long double   fmal(long double, long double, long double) __picolibc_export;
-extern long double   acoshl(long double) __picolibc_export;
-extern long double   atanhl(long double) __picolibc_export;
-extern long double   remainderl(long double, long double) __picolibc_export;
-extern long double   lgammal(long double) __picolibc_export;
-extern long double   gammal(long double) __picolibc_export;
-extern long double   erfl(long double) __picolibc_export;
-extern long double   erfcl(long double) __picolibc_export;
-extern long double   j0l(long double) __picolibc_export;
-extern long double   y0l(long double) __picolibc_export;
-extern long double   j1l(long double) __picolibc_export;
-extern long double   y1l(long double) __picolibc_export;
-extern long double   jnl(int, long double) __picolibc_export;
-extern long double   ynl(int, long double) __picolibc_export;
-
-extern long double   getpayloadl(const long double *x) __picolibc_export;
-
-#endif /* __HAVE_LONG_DOUBLE */
+#if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+#ifdef __HAVE_LONG_DOUBLE
+#define iseqsig(__x, __y)                                                \
+    ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y)) \
+         : (sizeof((__x) + (__y)) == sizeof(double))                     \
+         ? __iseqsig((double)(__x), (double)(__y))                       \
+         : __iseqsigl((long double)(__x), (long double)(__y)))
+#else
+#define iseqsig(__x, __y)                                                                \
+    ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y))                 \
+                                              : __iseqsig((double)(__x), (double)(__y)))
+#endif
+#endif
 
 #endif /* __ISO_C_VISIBLE >= 1999 */
 
-#if __MISC_VISIBLE
-extern double drem(double, double) __picolibc_export;
-extern float  dremf(float, float) __picolibc_export;
-#ifdef __HAVE_LONG_DOUBLE
-extern long double dreml(long double, long double) __picolibc_export;
-extern long double lgammal_r(long double, int *) __picolibc_export;
-#endif
-extern double lgamma_r(double, int *) __picolibc_export;
-extern float  lgammaf_r(float, int *) __picolibc_export;
-#endif
-
-#if __MISC_VISIBLE || __XSI_VISIBLE
-extern double y0(double) __picolibc_export;
-extern double y1(double) __picolibc_export;
-extern double yn(int, double) __picolibc_export;
-extern double j0(double) __picolibc_export;
-extern double j1(double) __picolibc_export;
-extern double jn(int, double) __picolibc_export;
-#endif
-
-#if __MISC_VISIBLE || __XSI_VISIBLE >= 600
-extern float y0f(float) __picolibc_export;
-extern float y1f(float) __picolibc_export;
-extern float ynf(int, float) __picolibc_export;
-extern float j0f(float) __picolibc_export;
-extern float j1f(float) __picolibc_export;
-extern float jnf(int, float) __picolibc_export;
-#endif
-
-/* GNU extensions */
-#if __GNU_VISIBLE
-extern void sincos(double, double *, double *) __picolibc_export;
-extern void sincosf(float, float *, float *) __picolibc_export;
-#ifdef __HAVE_LONG_DOUBLE
-extern void sincosl(long double, long double *, long double *) __picolibc_export;
-#endif
-extern double pow10(double) __picolibc_export;
-extern float  pow10f(float) __picolibc_export;
-#ifdef __HAVE_LONG_DOUBLE
-extern long double pow10l(long double) __picolibc_export;
-#endif
-#endif /* __GNU_VISIBLE */
-
-/* C23 / GNU */
 #if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+
+/* Rounding modes for fromfp functions */
+#define FP_INT_UPWARD            0
+#define FP_INT_DOWNWARD          1
+#define FP_INT_TOWARDZERO        2
+#define FP_INT_TONEARESTFROMZERO 3
+#define FP_INT_TONEAREST         4
 
 /* Return values from llogb */
 #define FP_LLOGB0   (-__LONG_MAX__)
 #define FP_LLOGBNAN (-__LONG_MAX__ - 1)
 
-double   acospi(double) __picolibc_export;
-float    acospif(float) __picolibc_export;
-double   asinpi(double) __picolibc_export;
-float    asinpif(float) __picolibc_export;
-double   atanpi(double) __picolibc_export;
-float    atanpif(float) __picolibc_export;
-double   atan2pi(double, double) __picolibc_export;
-float    atan2pif(float, float) __picolibc_export;
-int      canonicalize(double *, const double *) __picolibc_export;
-int      canonicalizef(float *, const float *) __picolibc_export;
-double   compoundn(double, long long int) __picolibc_export;
-float    compoundnf(float, long long int) __picolibc_export;
-double   cospi(double) __picolibc_export;
-float    cospif(float) __picolibc_export;
-double   exp10(double) __picolibc_export;
-float    exp10f(float) __picolibc_export;
-double   exp10m1(double) __picolibc_export;
-float    exp10m1f(float) __picolibc_export;
-double   exp2m1(double) __picolibc_export;
-float    exp2m1f(float) __picolibc_export;
-float    fadd(double, double) __picolibc_export;
-float    fdiv(double, double) __picolibc_export;
-float    ffma(double, double, double) __picolibc_export;
-double   fmaximum(double, double) __picolibc_export;
-float    fmaximumf(float, float) __picolibc_export;
-double   fmaximum_mag(double, double) __picolibc_export;
-float    fmaximum_magf(float, float) __picolibc_export;
-double   fmaximum_mag_num(double, double) __picolibc_export;
-float    fmaximum_mag_numf(float, float) __picolibc_export;
-double   fmaximum_num(double, double) __picolibc_export;
-float    fmaximum_numf(float, float) __picolibc_export;
-double   fminimum(double, double) __picolibc_export;
-float    fminimumf(float, float) __picolibc_export;
-double   fminimum_mag(double, double) __picolibc_export;
-float    fminimum_magf(float, float) __picolibc_export;
-double   fminimum_mag_num(double, double) __picolibc_export;
-float    fminimum_mag_numf(float, float) __picolibc_export;
-double   fminimum_num(double, double) __picolibc_export;
-float    fminimum_numf(float, float) __picolibc_export;
-float    fmul(double, double) __picolibc_export;
-double   fromfp(double, int, unsigned int) __picolibc_export;
-float    fromfpf(float, int, unsigned int) __picolibc_export;
-double   fromfpx(double, int, unsigned int) __picolibc_export;
-float    fromfpxf(float, int, unsigned int) __picolibc_export;
-float    fsqrt(double) __picolibc_export;
-float    fsub(double, double) __picolibc_export;
-long int llogb(double) __picolibc_export;
-long int llogbf(float) __picolibc_export;
-double   log10p1(double) __picolibc_export;
-float    log10p1f(float) __picolibc_export;
-double   log2p1(double) __picolibc_export;
-float    log2p1f(float) __picolibc_export;
-double   logp1(double) __picolibc_export;
-float    logp1f(float) __picolibc_export;
-double   nextdown(double) __picolibc_export;
-float    nextdownf(float) __picolibc_export;
-double   nextup(double) __picolibc_export;
-float    nextupf(float) __picolibc_export;
-double   pown(double, long long int) __picolibc_export;
-float    pownf(float, long long int) __picolibc_export;
-double   powr(double, double) __picolibc_export;
-float    powrf(float, float) __picolibc_export;
-double   rootn(double, long long int) __picolibc_export;
-float    rootnf(float, long long int) __picolibc_export;
-double   roundeven(double) __picolibc_export;
-float    roundevenf(float) __picolibc_export;
-double   rsqrt(double) __picolibc_export;
-float    rsqrtf(float) __picolibc_export;
-int      setpayload(double *res, double pl) __picolibc_export;
-int      setpayloadf(float *res, float pl) __picolibc_export;
-int      setpayloadsig(double *res, double pl) __picolibc_export;
-int      setpayloadsigf(float *res, float pl) __picolibc_export;
-double   sinpi(double) __picolibc_export;
-float    sinpif(float) __picolibc_export;
-double   tanpi(double) __picolibc_export;
-float    tanpif(float) __picolibc_export;
-int      totalorder(const double *x, const double *y) __picolibc_export;
-int      totalorderf(const float *x, const float *y) __picolibc_export;
-int      totalordermag(const double *x, const double *y) __picolibc_export;
-int      totalordermagf(const float *x, const float *y) __picolibc_export;
-double   ufromfp(double, int, unsigned int) __picolibc_export;
-float    ufromfpf(float, int, unsigned int) __picolibc_export;
-double   ufromfpx(double, int, unsigned int) __picolibc_export;
-float    ufromfpxf(float, int, unsigned int) __picolibc_export;
+#endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
 
 /*
- * clang 21 crashes expanding its fmaximum_num and fminimum_num
- * builtins for x87 long double (clang 23 does not). Giving the
- * declarations an asm label stops clang treating them as builtins.
+ * C89 functions. The C89 standard reserves the float and long double
+ * names, so they are declared here as well.
  */
-#if defined(__clang__) && __clang_major__ < 23 && (defined(__i386__) || defined(__x86_64__)) \
-    && __LDBL_MANT_DIG__ == 64
-#define __fmaxmin_numl_export(n) _ASMNAME(#n) __picolibc_export
-#else
-#define __fmaxmin_numl_export(n) __picolibc_export
-#endif
 
+/* 7.12.4 Trigonometric functions */
+double acos(double __x) __picolibc_export;
+double asin(double __x) __picolibc_export;
+double atan(double __x) __picolibc_export;
+double atan2(double __y, double __x) __picolibc_export;
+double cos(double __x) __picolibc_export;
+double sin(double __x) __picolibc_export;
+double tan(double __x) __picolibc_export;
+float  acosf(float __x) __picolibc_export;
+float  asinf(float __x) __picolibc_export;
+float  atanf(float __x) __picolibc_export;
+float  atan2f(float __y, float __x) __picolibc_export;
+float  cosf(float __x) __picolibc_export;
+float  sinf(float __x) __picolibc_export;
+float  tanf(float __x) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE
-long double acospil(long double) __picolibc_export;
-long double asinpil(long double) __picolibc_export;
-long double atanpil(long double) __picolibc_export;
-long double atan2pil(long double, long double) __picolibc_export;
-long double compoundnl(long double, long long int) __picolibc_export;
-long double cospil(long double) __picolibc_export;
-double      daddl(long double, long double) __picolibc_export;
-double      ddivl(long double, long double) __picolibc_export;
-double      dfmal(long double, long double, long double) __picolibc_export;
-double      dmull(long double, long double) __picolibc_export;
-double      dsqrtl(long double) __picolibc_export;
-double      dsubl(long double, long double) __picolibc_export;
-long double exp10l(long double) __picolibc_export;
-long double exp10m1l(long double) __picolibc_export;
-long double exp2m1l(long double) __picolibc_export;
-float       faddl(long double, long double) __picolibc_export;
-float       fdivl(long double, long double) __picolibc_export;
-float       ffmal(long double, long double, long double) __picolibc_export;
-long double fmaximuml(long double, long double) __picolibc_export;
-long double fmaximum_magl(long double, long double) __picolibc_export;
-long double fmaximum_mag_numl(long double, long double) __picolibc_export;
-long double fmaximum_numl(long double, long double) __fmaxmin_numl_export(fmaximum_numl);
-long double fminimuml(long double, long double) __picolibc_export;
-long double fminimum_magl(long double, long double) __picolibc_export;
-long double fminimum_mag_numl(long double, long double) __picolibc_export;
-long double fminimum_numl(long double, long double) __fmaxmin_numl_export(fminimum_numl);
-float       fmull(long double, long double) __picolibc_export;
-long double fromfpl(long double, int, unsigned int) __picolibc_export;
-long double fromfpxl(long double, int, unsigned int) __picolibc_export;
-float       fsqrtl(long double) __picolibc_export;
-float       fsubl(long double, long double) __picolibc_export;
-long double log10p1l(long double) __picolibc_export;
-long double log2p1l(long double) __picolibc_export;
-long double logp1l(long double) __picolibc_export;
-long double nextdownl(long double) __picolibc_export;
-long double nextupl(long double) __picolibc_export;
-long double pownl(long double, long long int) __picolibc_export;
-long double powrl(long double, long double) __picolibc_export;
-long double rootnl(long double, long long int) __picolibc_export;
-long double roundevenl(long double) __picolibc_export;
-long double rsqrtl(long double) __picolibc_export;
-int         setpayloadl(long double *res, long double pl) __picolibc_export;
-int         setpayloadsigl(long double *res, long double pl) __picolibc_export;
-long double sinpil(long double) __picolibc_export;
-long double tanpil(long double) __picolibc_export;
-int         totalorderl(const long double *x, const long double *y) __picolibc_export;
-int         totalordermagl(const long double *x, const long double *y) __picolibc_export;
-long double ufromfpl(long double, int, unsigned int) __picolibc_export;
-long double ufromfpxl(long double, int, unsigned int) __picolibc_export;
-
+long double acosl(long double __x) __picolibc_export;
+long double asinl(long double __x) __picolibc_export;
+long double atanl(long double __x) __picolibc_export;
+long double atan2l(long double __y, long double __x) __picolibc_export;
+long double cosl(long double __x) __picolibc_export;
+long double sinl(long double __x) __picolibc_export;
+long double tanl(long double __x) __picolibc_export;
 #endif
+
+/* 7.12.5 Hyperbolic functions */
+double cosh(double __x) __picolibc_export;
+double sinh(double __x) __picolibc_export;
+double tanh(double __x) __picolibc_export;
+float  coshf(float __x) __picolibc_export;
+float  sinhf(float __x) __picolibc_export;
+float  tanhf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double coshl(long double __x) __picolibc_export;
+long double sinhl(long double __x) __picolibc_export;
+long double tanhl(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.6 Exponential and logarithmic functions */
+double exp(double __x) __picolibc_export;
+double frexp(double __value, int *__exp) __picolibc_export;
+double ldexp(double __x, int __exp) __picolibc_export;
+double log(double __x) __picolibc_export;
+double log10(double __x) __picolibc_export;
+double modf(double __value, double *__iptr) __picolibc_export;
+float  expf(float __x) __picolibc_export;
+float  frexpf(float __value, int *__exp) __picolibc_export;
+float  ldexpf(float __x, int __exp) __picolibc_export;
+float  logf(float __x) __picolibc_export;
+float  log10f(float __x) __picolibc_export;
+float  modff(float __value, float *__iptr) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double expl(long double __x) __picolibc_export;
+long double frexpl(long double __value, int *__exp) __picolibc_export;
+long double ldexpl(long double __x, int __exp) __picolibc_export;
+long double logl(long double __x) __picolibc_export;
+long double log10l(long double __x) __picolibc_export;
+long double modfl(long double __value, long double *__iptr) __picolibc_export;
+#endif
+
+/* 7.12.7 Power and absolute-value functions */
+double fabs(double __x) __picolibc_export;
+double pow(double __x, double __y) __picolibc_export;
+double sqrt(double __x) __picolibc_export;
+float  fabsf(float __x) __picolibc_export;
+float  powf(float __x, float __y) __picolibc_export;
+float  sqrtf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double fabsl(long double __x) __picolibc_export;
+long double powl(long double __x, long double __y) __picolibc_export;
+long double sqrtl(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.9 Nearest integer functions */
+double ceil(double __x) __picolibc_export;
+double floor(double __x) __picolibc_export;
+float  ceilf(float __x) __picolibc_export;
+float  floorf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double ceill(long double __x) __picolibc_export;
+long double floorl(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.10 Remainder functions */
+double fmod(double __x, double __y) __picolibc_export;
+float  fmodf(float __x, float __y) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double fmodl(long double __x, long double __y) __picolibc_export;
+#endif
+
+/*
+ * C99 functions
+ */
+#if __ISO_C_VISIBLE >= 1999
+
+/* 7.12.5 Hyperbolic functions */
+double acosh(double __x) __picolibc_export;
+double asinh(double __x) __picolibc_export;
+double atanh(double __x) __picolibc_export;
+float  acoshf(float __x) __picolibc_export;
+float  asinhf(float __x) __picolibc_export;
+float  atanhf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double acoshl(long double __x) __picolibc_export;
+long double asinhl(long double __x) __picolibc_export;
+long double atanhl(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.6 Exponential and logarithmic functions */
+double exp2(double __x) __picolibc_export;
+double expm1(double __x) __picolibc_export;
+int    ilogb(double __x) __picolibc_export;
+double log1p(double __x) __picolibc_export;
+double log2(double __x) __picolibc_export;
+double logb(double __x) __picolibc_export;
+double scalbn(double __x, int __n) __picolibc_export;
+double scalbln(double __x, long int __n) __picolibc_export;
+float  exp2f(float __x) __picolibc_export;
+float  expm1f(float __x) __picolibc_export;
+int    ilogbf(float __x) __picolibc_export;
+float  log1pf(float __x) __picolibc_export;
+float  log2f(float __x) __picolibc_export;
+float  logbf(float __x) __picolibc_export;
+float  scalbnf(float __x, int __n) __picolibc_export;
+float  scalblnf(float __x, long int __n) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double exp2l(long double __x) __picolibc_export;
+long double expm1l(long double __x) __picolibc_export;
+int         ilogbl(long double __x) __picolibc_export;
+long double log1pl(long double __x) __picolibc_export;
+long double log2l(long double __x) __picolibc_export;
+long double logbl(long double __x) __picolibc_export;
+long double scalbnl(long double __x, int __n) __picolibc_export;
+long double scalblnl(long double __x, long int __n) __picolibc_export;
+#endif
+
+/* 7.12.7 Power and absolute-value functions */
+double cbrt(double __x) __picolibc_export;
+double hypot(double __x, double __y) __picolibc_export;
+float  cbrtf(float __x) __picolibc_export;
+float  hypotf(float __x, float __y) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double cbrtl(long double __x) __picolibc_export;
+long double hypotl(long double __x, long double __y) __picolibc_export;
+#endif
+
+/* 7.12.8 Error and gamma functions */
+double erf(double __x) __picolibc_export;
+double erfc(double __x) __picolibc_export;
+double lgamma(double __x) __picolibc_export;
+double tgamma(double __x) __picolibc_export;
+float  erff(float __x) __picolibc_export;
+float  erfcf(float __x) __picolibc_export;
+float  lgammaf(float __x) __picolibc_export;
+float  tgammaf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double erfl(long double __x) __picolibc_export;
+long double erfcl(long double __x) __picolibc_export;
+long double lgammal(long double __x) __picolibc_export;
+long double tgammal(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.9 Nearest integer functions */
+double        nearbyint(double __x) __picolibc_export;
+double        rint(double __x) __picolibc_export;
+long int      lrint(double __x) __picolibc_export;
+long long int llrint(double __x) __picolibc_export;
+double        round(double __x) __picolibc_export;
+long int      lround(double __x) __picolibc_export;
+long long int llround(double __x) __picolibc_export;
+double        trunc(double __x) __picolibc_export;
+float         nearbyintf(float __x) __picolibc_export;
+float         rintf(float __x) __picolibc_export;
+long int      lrintf(float __x) __picolibc_export;
+long long int llrintf(float __x) __picolibc_export;
+float         roundf(float __x) __picolibc_export;
+long int      lroundf(float __x) __picolibc_export;
+long long int llroundf(float __x) __picolibc_export;
+float         truncf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double   nearbyintl(long double __x) __picolibc_export;
+long double   rintl(long double __x) __picolibc_export;
+long int      lrintl(long double __x) __picolibc_export;
+long long int llrintl(long double __x) __picolibc_export;
+long double   roundl(long double __x) __picolibc_export;
+long int      lroundl(long double __x) __picolibc_export;
+long long int llroundl(long double __x) __picolibc_export;
+long double   truncl(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.10 Remainder functions */
+double remainder(double __x, double __y) __picolibc_export;
+double remquo(double __x, double __y, int *__quo) __picolibc_export;
+float  remainderf(float __x, float __y) __picolibc_export;
+float  remquof(float __x, float __y, int *__quo) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double remainderl(long double __x, long double __y) __picolibc_export;
+long double remquol(long double __x, long double __y, int *__quo) __picolibc_export;
+#endif
+
+/* 7.12.11 Manipulation functions */
+double copysign(double __x, double __y) __picolibc_export;
+double nan(const char *__tagp) __picolibc_export;
+double nextafter(double __x, double __y) __picolibc_export;
+float  copysignf(float __x, float __y) __picolibc_export;
+float  nanf(const char *__tagp) __picolibc_export;
+float  nextafterf(float __x, float __y) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+double      nexttoward(double __x, long double __y) __picolibc_export;
+float       nexttowardf(float __x, long double __y) __picolibc_export;
+long double copysignl(long double __x, long double __y) __picolibc_export;
+long double nanl(const char *__tagp) __picolibc_export;
+long double nextafterl(long double __x, long double __y) __picolibc_export;
+long double nexttowardl(long double __x, long double __y) __picolibc_export;
+#endif
+
+/* 7.12.12 Maximum, minimum, and positive difference functions */
+double fdim(double __x, double __y) __picolibc_export;
+double fmax(double __x, double __y) __picolibc_export;
+double fmin(double __x, double __y) __picolibc_export;
+float  fdimf(float __x, float __y) __picolibc_export;
+float  fmaxf(float __x, float __y) __picolibc_export;
+float  fminf(float __x, float __y) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double fdiml(long double __x, long double __y) __picolibc_export;
+long double fmaxl(long double __x, long double __y) __picolibc_export;
+long double fminl(long double __x, long double __y) __picolibc_export;
+#endif
+
+/* 7.12.13 Floating multiply-add */
+double fma(double __x, double __y, double __z) __picolibc_export;
+float  fmaf(float __x, float __y, float __z) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double fmal(long double __x, long double __y, long double __z) __picolibc_export;
+#endif
+
+#endif /* __ISO_C_VISIBLE >= 1999 */
+
+/*
+ * C23 functions
+ */
+#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+
+/* 7.12.4 Trigonometric functions */
+double acospi(double __x) __picolibc_export;
+double asinpi(double __x) __picolibc_export;
+double atanpi(double __x) __picolibc_export;
+double atan2pi(double __y, double __x) __picolibc_export;
+double cospi(double __x) __picolibc_export;
+double sinpi(double __x) __picolibc_export;
+double tanpi(double __x) __picolibc_export;
+float  acospif(float __x) __picolibc_export;
+float  asinpif(float __x) __picolibc_export;
+float  atanpif(float __x) __picolibc_export;
+float  atan2pif(float __y, float __x) __picolibc_export;
+float  cospif(float __x) __picolibc_export;
+float  sinpif(float __x) __picolibc_export;
+float  tanpif(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double acospil(long double __x) __picolibc_export;
+long double asinpil(long double __x) __picolibc_export;
+long double atanpil(long double __x) __picolibc_export;
+long double atan2pil(long double __y, long double __x) __picolibc_export;
+long double cospil(long double __x) __picolibc_export;
+long double sinpil(long double __x) __picolibc_export;
+long double tanpil(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.6 Exponential and logarithmic functions */
+double   exp10(double __x) __picolibc_export;
+double   exp10m1(double __x) __picolibc_export;
+double   exp2m1(double __x) __picolibc_export;
+long int llogb(double __x) __picolibc_export;
+double   log10p1(double __x) __picolibc_export;
+double   log2p1(double __x) __picolibc_export;
+double   logp1(double __x) __picolibc_export;
+float    exp10f(float __x) __picolibc_export;
+float    exp10m1f(float __x) __picolibc_export;
+float    exp2m1f(float __x) __picolibc_export;
+long int llogbf(float __x) __picolibc_export;
+float    log10p1f(float __x) __picolibc_export;
+float    log2p1f(float __x) __picolibc_export;
+float    logp1f(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double exp10l(long double __x) __picolibc_export;
+long double exp10m1l(long double __x) __picolibc_export;
+long double exp2m1l(long double __x) __picolibc_export;
+long int    llogbl(long double __x) __picolibc_export;
+long double log10p1l(long double __x) __picolibc_export;
+long double log2p1l(long double __x) __picolibc_export;
+long double logp1l(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.7 Power and absolute-value functions */
+double compoundn(double __x, long long int __n) __picolibc_export;
+double pown(double __x, long long int __n) __picolibc_export;
+double powr(double __x, double __y) __picolibc_export;
+double rootn(double __x, long long int __n) __picolibc_export;
+double rsqrt(double __x) __picolibc_export;
+float  compoundnf(float __x, long long int __n) __picolibc_export;
+float  pownf(float __x, long long int __n) __picolibc_export;
+float  powrf(float __x, float __y) __picolibc_export;
+float  rootnf(float __x, long long int __n) __picolibc_export;
+float  rsqrtf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double compoundnl(long double __x, long long int __n) __picolibc_export;
+long double pownl(long double __x, long long int __n) __picolibc_export;
+long double powrl(long double __x, long double __y) __picolibc_export;
+long double rootnl(long double __x, long long int __n) __picolibc_export;
+long double rsqrtl(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.9 Nearest integer functions */
+double roundeven(double __x) __picolibc_export;
+double fromfp(double __x, int __rnd, unsigned int __width) __picolibc_export;
+double ufromfp(double __x, int __rnd, unsigned int __width) __picolibc_export;
+double fromfpx(double __x, int __rnd, unsigned int __width) __picolibc_export;
+double ufromfpx(double __x, int __rnd, unsigned int __width) __picolibc_export;
+float  roundevenf(float __x) __picolibc_export;
+float  fromfpf(float __x, int __rnd, unsigned int __width) __picolibc_export;
+float  ufromfpf(float __x, int __rnd, unsigned int __width) __picolibc_export;
+float  fromfpxf(float __x, int __rnd, unsigned int __width) __picolibc_export;
+float  ufromfpxf(float __x, int __rnd, unsigned int __width) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double roundevenl(long double __x) __picolibc_export;
+long double fromfpl(long double __x, int __rnd, unsigned int __width) __picolibc_export;
+long double ufromfpl(long double __x, int __rnd, unsigned int __width) __picolibc_export;
+long double fromfpxl(long double __x, int __rnd, unsigned int __width) __picolibc_export;
+long double ufromfpxl(long double __x, int __rnd, unsigned int __width) __picolibc_export;
+#endif
+
+/* 7.12.11 Manipulation functions */
+int    canonicalize(double *__cx, const double *__x) __picolibc_export;
+double nextdown(double __x) __picolibc_export;
+double nextup(double __x) __picolibc_export;
+int    canonicalizef(float *__cx, const float *__x) __picolibc_export;
+float  nextdownf(float __x) __picolibc_export;
+float  nextupf(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+int         canonicalizel(long double *__cx, const long double *__x) __picolibc_export;
+long double nextdownl(long double __x) __picolibc_export;
+long double nextupl(long double __x) __picolibc_export;
+#endif
+
+/* 7.12.12 Maximum, minimum, and positive difference functions */
+double fmaximum(double __x, double __y) __picolibc_export;
+double fminimum(double __x, double __y) __picolibc_export;
+double fmaximum_mag(double __x, double __y) __picolibc_export;
+double fminimum_mag(double __x, double __y) __picolibc_export;
+double fmaximum_num(double __x, double __y) __picolibc_export;
+double fminimum_num(double __x, double __y) __picolibc_export;
+double fmaximum_mag_num(double __x, double __y) __picolibc_export;
+double fminimum_mag_num(double __x, double __y) __picolibc_export;
+float  fmaximumf(float __x, float __y) __picolibc_export;
+float  fminimumf(float __x, float __y) __picolibc_export;
+float  fmaximum_magf(float __x, float __y) __picolibc_export;
+float  fminimum_magf(float __x, float __y) __picolibc_export;
+float  fmaximum_numf(float __x, float __y) __picolibc_export;
+float  fminimum_numf(float __x, float __y) __picolibc_export;
+float  fmaximum_mag_numf(float __x, float __y) __picolibc_export;
+float  fminimum_mag_numf(float __x, float __y) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double fmaximuml(long double __x, long double __y) __picolibc_export;
+long double fminimuml(long double __x, long double __y) __picolibc_export;
+long double fmaximum_magl(long double __x, long double __y) __picolibc_export;
+long double fminimum_magl(long double __x, long double __y) __picolibc_export;
+long double fmaximum_numl(long double __x, long double __y) __fmaxmin_numl_export(fmaximum_numl);
+long double fminimum_numl(long double __x, long double __y) __fmaxmin_numl_export(fminimum_numl);
+long double fmaximum_mag_numl(long double __x, long double __y) __picolibc_export;
+long double fminimum_mag_numl(long double __x, long double __y) __picolibc_export;
+#endif
+
+/* 7.12.14 Functions that round result to narrower type */
+float fadd(double __x, double __y) __picolibc_export;
+float fsub(double __x, double __y) __picolibc_export;
+float fmul(double __x, double __y) __picolibc_export;
+float fdiv(double __x, double __y) __picolibc_export;
+float ffma(double __x, double __y, double __z) __picolibc_export;
+float fsqrt(double __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+float  faddl(long double __x, long double __y) __picolibc_export;
+float  fsubl(long double __x, long double __y) __picolibc_export;
+float  fmull(long double __x, long double __y) __picolibc_export;
+float  fdivl(long double __x, long double __y) __picolibc_export;
+float  ffmal(long double __x, long double __y, long double __z) __picolibc_export;
+float  fsqrtl(long double __x) __picolibc_export;
+double daddl(long double __x, long double __y) __picolibc_export;
+double dsubl(long double __x, long double __y) __picolibc_export;
+double dmull(long double __x, long double __y) __picolibc_export;
+double ddivl(long double __x, long double __y) __picolibc_export;
+double dfmal(long double __x, long double __y, long double __z) __picolibc_export;
+double dsqrtl(long double __x) __picolibc_export;
+#endif
+
+/* F.10.12 Total order functions */
+int totalorder(const double *__x, const double *__y) __picolibc_export;
+int totalordermag(const double *__x, const double *__y) __picolibc_export;
+int totalorderf(const float *__x, const float *__y) __picolibc_export;
+int totalordermagf(const float *__x, const float *__y) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+int totalorderl(const long double *__x, const long double *__y) __picolibc_export;
+int totalordermagl(const long double *__x, const long double *__y) __picolibc_export;
+#endif
+
+/* F.10.13 Payload functions */
+double getpayload(const double *__x) __picolibc_export;
+int    setpayload(double *__res, double __pl) __picolibc_export;
+int    setpayloadsig(double *__res, double __pl) __picolibc_export;
+float  getpayloadf(const float *__x) __picolibc_export;
+int    setpayloadf(float *__res, float __pl) __picolibc_export;
+int    setpayloadsigf(float *__res, float __pl) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double getpayloadl(const long double *__x) __picolibc_export;
+int         setpayloadl(long double *__res, long double __pl) __picolibc_export;
+int         setpayloadsigl(long double *__res, long double __pl) __picolibc_export;
+#endif
+
 #endif /* __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023 */
+
+/*
+ * Extensions
+ */
+
+/* GNU */
+#if __GNU_VISIBLE
+void   sincos(double __x, double *__sinx, double *__cosx) __picolibc_export;
+double pow10(double __x) __picolibc_export;
+void   sincosf(float __x, float *__sinx, float *__cosx) __picolibc_export;
+float  pow10f(float __x) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+void        sincosl(long double __x, long double *__sinx, long double *__cosx) __picolibc_export;
+long double pow10l(long double __x) __picolibc_export;
+#endif
+#endif /* __GNU_VISIBLE */
 
 #if __MISC_VISIBLE || __XSI_VISIBLE
 extern __picolibc_export int signgam;
-#endif /* __MISC_VISIBLE || __XSI_VISIBLE */
+#endif
+
+/* Bessel functions. XSI only specifies the double versions. */
+#if __MISC_VISIBLE || __XSI_VISIBLE
+double j0(double __x) __picolibc_export;
+double j1(double __x) __picolibc_export;
+double jn(int __n, double __x) __picolibc_export;
+double y0(double __x) __picolibc_export;
+double y1(double __x) __picolibc_export;
+double yn(int __n, double __x) __picolibc_export;
+#endif
+#if __MISC_VISIBLE || __XSI_VISIBLE >= 600
+float j0f(float __x) __picolibc_export;
+float j1f(float __x) __picolibc_export;
+float jnf(int __n, float __x) __picolibc_export;
+float y0f(float __x) __picolibc_export;
+float y1f(float __x) __picolibc_export;
+float ynf(int __n, float __x) __picolibc_export;
+#endif
+#if __MISC_VISIBLE && defined(__HAVE_LONG_DOUBLE)
+long double j0l(long double __x) __picolibc_export;
+long double j1l(long double __x) __picolibc_export;
+long double jnl(int __n, long double __x) __picolibc_export;
+long double y0l(long double __x) __picolibc_export;
+long double y1l(long double __x) __picolibc_export;
+long double ynl(int __n, long double __x) __picolibc_export;
+#endif
+
+/*
+ * Legacy BSD and SVID functions. The classification functions share
+ * their names with macros, so the names are in parentheses.
+ */
+#if __MISC_VISIBLE
+int finite(double __x) __picolibc_export;
+int finitef(float __x) __picolibc_export;
+int(isinff)(float __x) __picolibc_export;
+int(isnanf)(float __x) __picolibc_export;
+#if !defined(__cplusplus) || __cplusplus < 201103L
+int(isinf)(double __x) __picolibc_export;
+#endif
+
+double drem(double __x, double __y) __picolibc_export;
+double gamma(double __x) __picolibc_export;
+double infinity(void) __picolibc_export;
+double lgamma_r(double __x, int *__signgamp) __picolibc_export;
+double significand(double __x) __picolibc_export;
+float  dremf(float __x, float __y) __picolibc_export;
+float  gammaf(float __x) __picolibc_export;
+float  infinityf(void) __picolibc_export;
+float  lgammaf_r(float __x, int *__signgamp) __picolibc_export;
+float  significandf(float __x) __picolibc_export;
+
+#ifdef __HAVE_LONG_DOUBLE
+int finitel(long double __x) __picolibc_export;
+int(isinfl)(long double __x) __picolibc_export;
+int(isnanl)(long double __x) __picolibc_export;
+long double dreml(long double __x, long double __y) __picolibc_export;
+long double gammal(long double __x) __picolibc_export;
+long double infinityl(void) __picolibc_export;
+long double lgammal_r(long double __x, int *__signgamp) __picolibc_export;
+long double significandl(long double __x) __picolibc_export;
+#endif
+#endif /* __MISC_VISIBLE */
+
+#if __MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 700)
+double scalb(double __x, double __n) __picolibc_export;
+float  scalbf(float __x, float __n) __picolibc_export;
+#ifdef __HAVE_LONG_DOUBLE
+long double scalbl(long double __x, long double __n) __picolibc_export;
+#endif
+#endif
+
+#if (__MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 600)) \
+    && (!defined(__cplusplus) || __cplusplus < 201103L)
+int(isnan)(double __x) __picolibc_export;
+#endif
 
 /* Useful constants.  */
 
@@ -918,7 +916,7 @@ extern __picolibc_export int signgam;
 #define M_SQRT2    1.41421356237309504880
 #define M_SQRT1_2  0.70710678118654752440
 
-#ifdef __GNU_VISIBLE
+#if __GNU_VISIBLE
 #define M_PIl   _M_PI_L
 #define M_PI_2l _M_PI_2L
 #define M_PI_4l _M_PI_4L

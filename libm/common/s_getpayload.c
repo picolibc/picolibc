@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _ISOC23_SOURCE
 #include "fdlibm.h"
 
 #ifdef _NEED_FLOAT64
