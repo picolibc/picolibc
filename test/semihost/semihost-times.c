@@ -61,6 +61,6 @@ main(void)
     printf("%.17g\n", y);
     ticks_per_second = sysconf(_SC_CLK_TCK);
     seconds = ((double)(end - begin)) / (double)ticks_per_second;
-    printf("delta %ld seconds %.17g\n", (long)end - (long)begin, seconds);
+    printf("delta %ld seconds %.17g\n", (long)(end - begin), seconds);
     exit(end == begin);
 }
