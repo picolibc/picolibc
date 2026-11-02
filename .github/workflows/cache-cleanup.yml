@@ -1,0 +1,28 @@
+name: Cache Cleanup
+
+# Delete the Actions caches created for a pull request once it is closed
+# or merged. Each PR's caches are scoped to refs/pull/N/merge and can't be
+# used by anything else, so they only take space from the 10 GB limit.
+#
+# This uses pull_request_target so the token can delete caches for PRs
+# from forks too. It never checks out or runs code from the PR.
+
+on:
+  pull_request_target:
+    types:
+      - closed
+
+permissions:
+  actions: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Delete the pull request's caches
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          REF: refs/pull/${{ github.event.pull_request.number }}/merge
+        run: |
+          gh cache list --ref "$REF" --limit 100 --json id --jq '.[].id' | xargs -r -n1 gh cache delete
