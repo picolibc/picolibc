@@ -21,12 +21,15 @@ env:
   IMAGE: picolibc
   PACKAGES_FILE: picolibc/.github/zephyr-packages.txt
   EXTRA_FILE: picolibc/.github/zephyr-files.txt
+  TOOLCHAINS_FILE: picolibc/.github/zephyr-toolchains.txt
   BEFORE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
   AFTER_SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
 
 jobs:
   cache-maker:
     runs-on: ubuntu-latest
+    outputs:
+      image-key: ${{ steps.key.outputs.key }}
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v7
@@ -34,12 +37,16 @@ jobs:
           path: picolibc
           fetch-depth: 128
 
+      - name: Compute the Docker Image cache key
+        id: key
+        run: echo "key=${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE, env.TOOLCHAINS_FILE ) }}" >> "$GITHUB_OUTPUT"
+
       - name: Cache the Docker Image
         id: cache
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ steps.key.outputs.key }}
           lookup-only: true
 
       - name: Set up Docker Buildx

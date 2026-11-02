@@ -27,6 +27,8 @@ env:
 jobs:
   cache-maker:
     runs-on: ubuntu-latest
+    outputs:
+      image-key: ${{ steps.key.outputs.key }}
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v7
@@ -34,12 +36,16 @@ jobs:
           path: picolibc
           fetch-depth: 128
 
+      - name: Compute the Docker Image cache key
+        id: key
+        run: echo "key=${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}" >> "$GITHUB_OUTPUT"
+
       - name: Cache the Docker Image
         id: cache
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ steps.key.outputs.key }}
           lookup-only: true
 
       - name: Set up Docker Buildx
@@ -80,7 +86,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -89,7 +95,7 @@ jobs:
           docker images -a $IMAGE
       - name: CMake test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
+          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.cmake_flags }}
   minsize-linux-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -116,7 +122,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -125,7 +131,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   minsize-linux-riscv:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -152,7 +158,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -161,7 +167,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   minsize-linux-misc:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -188,7 +194,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -197,7 +203,7 @@ jobs:
           docker images -a $IMAGE
       - name: Minsize test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
+          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   release-linux-arm:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -224,7 +230,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -233,7 +239,7 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
   release-linux-riscv:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -260,7 +266,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -269,7 +275,7 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
   release-linux-misc:
     needs: cache-maker
     runs-on: ubuntu-latest
@@ -296,7 +302,7 @@ jobs:
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image
@@ -305,4 +311,4 @@ jobs:
           docker images -a $IMAGE
       - name: Release test
         run: |
-          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release
+          docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype release

@@ -7,6 +7,10 @@ COPY .github/zephyr-files.txt /
 
 COPY .github/zephyr-setup /
 
+# Zephyr SDK GNU toolchains to install (those used by .github/do-zephyr);
+# LLVM is installed too, for the clang targets
+COPY .github/zephyr-toolchains.txt /
+
 RUN (apt-get update || apt-get update || apt-get update) && \
     (apt-get upgrade -y || apt-get upgrade -y || apt-get upgrade -y) && \
     (xargs -a zephyr-packages.txt apt-get install -y --no-install-recommends || \
@@ -33,6 +37,8 @@ RUN (apt-get update || apt-get update || apt-get update) && \
     fi && \
     if [ -f /opt/zephyr-sdk-*/setup.sh ]; then \
         echo "Setting up SDK"; \
-	/opt/zephyr-sdk-*/setup.sh -t all -h -o -c; \
+	cd /opt/zephyr-sdk-* && \
+	./setup.sh $(sed -e 's/^/-t /' /zephyr-toolchains.txt) -l -h -o -c && \
+	rm -f gnu/*.tar.xz *.tar.xz; \
     fi && \
     rm -rf /var/lib/apt/lists/*

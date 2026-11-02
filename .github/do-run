@@ -22,7 +22,7 @@ esac
 CONFIGURE=do-"$TARGET"-configure
 shift
 git config --global --add safe.directory /picolibc
-DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
+DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE $TOOLCHAINS_FILE"
 
 (cd "$DIR" || exit 2
  date
