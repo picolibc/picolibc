@@ -37,6 +37,9 @@
 #define _POLL_H_
 
 #include <sys/cdefs.h>
+#include <sys/_types.h>
+
+_BEGIN_STD_C
 
 struct pollfd {
     int   fd;
@@ -54,7 +57,7 @@ typedef __size_t nfds_t;
 #define POLLHUP  0x0010
 #define POLLNVAL 0x0020
 
-#if _XOPEN_SOURCE
+#if __XSI_VISIBLE || __POSIX_VISIBLE >= 200809
 #define POLLRDNORM 0x0040
 #define POLLRDBAND 0x0080
 #define POLLWRNORM 0x0100
@@ -68,5 +71,7 @@ typedef __size_t nfds_t;
 #endif
 
 int poll(struct pollfd[], nfds_t, int);
+
+_END_STD_C
 
 #endif /* _POLL_H_ */
