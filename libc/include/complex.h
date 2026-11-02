@@ -136,8 +136,6 @@ long double complex cprojl(long double complex) __picolibc_export;
 long double         creall(long double complex) __picolibc_export;
 long double complex conjl(long double complex) __picolibc_export;
 long double         cimagl(long double complex) __picolibc_export;
-
-#ifdef __HAVE_LONG_DOUBLE_MATH
 long double         cargl(long double complex) __picolibc_export;
 long double complex casinl(long double complex) __picolibc_export;
 long double complex cacosl(long double complex) __picolibc_export;
@@ -157,7 +155,6 @@ long double complex cpowl(long double complex, long double complex) __picolibc_e
 #if __GNU_VISIBLE
 long double complex clog10l(long double complex) __picolibc_export;
 #endif
-#endif /* __HAVE_LONG_DOUBLE_MATH */
 
 #endif /* __HAVE_LONG_DOUBLE */
 

@@ -598,7 +598,12 @@ extern float         hypotf(float, float) __picolibc_export;
 
 #ifdef __HAVE_LONG_DOUBLE
 
-/* These functions are always available for long double */
+/*
+ * Declare every long double function whenever the type exists.
+ * Picolibc only implements some of them when __HAVE_LONG_DOUBLE_MATH
+ * is not defined; using one of the others then fails at link time
+ * instead of silently compiling a call to something else.
+ */
 
 extern long double   hypotl(long double, long double) __picolibc_export;
 extern long double   infinityl(void) __picolibc_export;
@@ -633,54 +638,51 @@ extern long double   copysignl(long double, long double) __picolibc_export;
 int canonicalizel(long double *, const long double *) __picolibc_export;
 #endif
 
-#ifdef __HAVE_LONG_DOUBLE_MATH
-extern long double atanl(long double) __picolibc_export;
-extern long double cosl(long double) __picolibc_export;
-extern long double sinl(long double) __picolibc_export;
-extern long double tanl(long double) __picolibc_export;
-extern long double tanhl(long double) __picolibc_export;
-extern long double modfl(long double, long double *) __picolibc_export;
-extern long double log1pl(long double) __picolibc_export;
-extern long double expm1l(long double) __picolibc_export;
-extern long double acosl(long double) __picolibc_export;
-extern long double asinl(long double) __picolibc_export;
-extern long double atan2l(long double, long double) __picolibc_export;
-extern long double coshl(long double) __picolibc_export;
-extern long double sinhl(long double) __picolibc_export;
-extern long double expl(long double) __picolibc_export;
-extern long double logl(long double) __picolibc_export;
-extern long double log10l(long double) __picolibc_export;
-extern long double powl(long double, long double) __picolibc_export;
-extern long double fmodl(long double, long double) __picolibc_export;
-extern long double asinhl(long double) __picolibc_export;
-extern long double cbrtl(long double) __picolibc_export;
-extern long double nextafterl(long double, long double) __picolibc_export;
-extern float       nexttowardf(float, long double) __picolibc_export;
-extern double      nexttoward(double, long double) __picolibc_export;
-extern long double nexttowardl(long double, long double) __picolibc_export;
-extern long double log2l(long double) __picolibc_export;
-extern long double exp2l(long double) __picolibc_export;
-extern long double tgammal(long double) __picolibc_export;
-extern long double remquol(long double, long double, int *) __picolibc_export;
-extern long double fdiml(long double, long double) __picolibc_export;
-extern long double fmal(long double, long double, long double) __picolibc_export;
-extern long double acoshl(long double) __picolibc_export;
-extern long double atanhl(long double) __picolibc_export;
-extern long double remainderl(long double, long double) __picolibc_export;
-extern long double lgammal(long double) __picolibc_export;
-extern long double gammal(long double) __picolibc_export;
-extern long double erfl(long double) __picolibc_export;
-extern long double erfcl(long double) __picolibc_export;
-extern long double j0l(long double) __picolibc_export;
-extern long double y0l(long double) __picolibc_export;
-extern long double j1l(long double) __picolibc_export;
-extern long double y1l(long double) __picolibc_export;
-extern long double jnl(int, long double) __picolibc_export;
-extern long double ynl(int, long double) __picolibc_export;
+extern long double   atanl(long double) __picolibc_export;
+extern long double   cosl(long double) __picolibc_export;
+extern long double   sinl(long double) __picolibc_export;
+extern long double   tanl(long double) __picolibc_export;
+extern long double   tanhl(long double) __picolibc_export;
+extern long double   modfl(long double, long double *) __picolibc_export;
+extern long double   log1pl(long double) __picolibc_export;
+extern long double   expm1l(long double) __picolibc_export;
+extern long double   acosl(long double) __picolibc_export;
+extern long double   asinl(long double) __picolibc_export;
+extern long double   atan2l(long double, long double) __picolibc_export;
+extern long double   coshl(long double) __picolibc_export;
+extern long double   sinhl(long double) __picolibc_export;
+extern long double   expl(long double) __picolibc_export;
+extern long double   logl(long double) __picolibc_export;
+extern long double   log10l(long double) __picolibc_export;
+extern long double   powl(long double, long double) __picolibc_export;
+extern long double   fmodl(long double, long double) __picolibc_export;
+extern long double   asinhl(long double) __picolibc_export;
+extern long double   cbrtl(long double) __picolibc_export;
+extern long double   nextafterl(long double, long double) __picolibc_export;
+extern float         nexttowardf(float, long double) __picolibc_export;
+extern double        nexttoward(double, long double) __picolibc_export;
+extern long double   nexttowardl(long double, long double) __picolibc_export;
+extern long double   log2l(long double) __picolibc_export;
+extern long double   exp2l(long double) __picolibc_export;
+extern long double   tgammal(long double) __picolibc_export;
+extern long double   remquol(long double, long double, int *) __picolibc_export;
+extern long double   fdiml(long double, long double) __picolibc_export;
+extern long double   fmal(long double, long double, long double) __picolibc_export;
+extern long double   acoshl(long double) __picolibc_export;
+extern long double   atanhl(long double) __picolibc_export;
+extern long double   remainderl(long double, long double) __picolibc_export;
+extern long double   lgammal(long double) __picolibc_export;
+extern long double   gammal(long double) __picolibc_export;
+extern long double   erfl(long double) __picolibc_export;
+extern long double   erfcl(long double) __picolibc_export;
+extern long double   j0l(long double) __picolibc_export;
+extern long double   y0l(long double) __picolibc_export;
+extern long double   j1l(long double) __picolibc_export;
+extern long double   y1l(long double) __picolibc_export;
+extern long double   jnl(int, long double) __picolibc_export;
+extern long double   ynl(int, long double) __picolibc_export;
 
-extern long double getpayloadl(const long double *x) __picolibc_export;
-
-#endif /* __HAVE_LONG_DOUBLE_MATH */
+extern long double   getpayloadl(const long double *x) __picolibc_export;
 
 #endif /* __HAVE_LONG_DOUBLE */
 
@@ -689,7 +691,7 @@ extern long double getpayloadl(const long double *x) __picolibc_export;
 #if __MISC_VISIBLE
 extern double drem(double, double) __picolibc_export;
 extern float  dremf(float, float) __picolibc_export;
-#ifdef __HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE
 extern long double dreml(long double, long double) __picolibc_export;
 extern long double lgammal_r(long double, int *) __picolibc_export;
 #endif
@@ -719,12 +721,12 @@ extern float jnf(int, float) __picolibc_export;
 #if __GNU_VISIBLE
 extern void sincos(double, double *, double *) __picolibc_export;
 extern void sincosf(float, float *, float *) __picolibc_export;
-#ifdef __HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE
 extern void sincosl(long double, long double *, long double *) __picolibc_export;
 #endif
 extern double pow10(double) __picolibc_export;
 extern float  pow10f(float) __picolibc_export;
-#ifdef __HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE
 extern long double pow10l(long double) __picolibc_export;
 #endif
 #endif /* __GNU_VISIBLE */
@@ -833,7 +835,7 @@ float    ufromfpxf(float, int, unsigned int) __picolibc_export;
 #define __fmaxmin_numl_export(n) __picolibc_export
 #endif
 
-#ifdef __HAVE_LONG_DOUBLE_MATH
+#ifdef __HAVE_LONG_DOUBLE
 long double acospil(long double) __picolibc_export;
 long double asinpil(long double) __picolibc_export;
 long double atanpil(long double) __picolibc_export;
