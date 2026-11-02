@@ -28,6 +28,7 @@ RUN (apt-get update || apt-get update || apt-get update) && \
 	echo "Removing $file"; \
 	rm `basename "$file"`; \
      done) && \
+    if [ -f /opt/meson-stable/bin/meson ]; then chmod 755 /opt/meson-stable/bin/meson; fi && \
     if [ -f /opt/zephyr-sdk-*-hosttools*.sh ]; then \
 	echo "Unpacking host tools"; \
 	/opt/zephyr-sdk-*-hosttools*.sh -y -d /opt/zephyr-sdk-hosttools; \

@@ -22,5 +22,6 @@ RUN dpkg --add-architecture i386 && \
 	echo "Removing $file"; \
 	rm `basename "$file"`; \
      done) && \
+    if [ -f /opt/meson-stable/bin/meson ]; then chmod 755 /opt/meson-stable/bin/meson; fi && \
     rm -rf /var/lib/apt/lists/*
 
