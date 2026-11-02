@@ -8,6 +8,8 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    - cron: '37 5 * * *'
 
 # When a PR is updated, cancel the jobs from the previous version. Merges
 # do not define head_ref, so use run_id to never cancel those jobs.
@@ -28,6 +30,9 @@ env:
 jobs:
   cache-maker:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
+      contents: read
     outputs:
       image-key: ${{ steps.key.outputs.key }}
     steps:
@@ -49,6 +54,16 @@ jobs:
           key: ${{ steps.key.outputs.key }}
           lookup-only: true
 
+      # A scheduled run only refreshes main's cache entry, so it isn't
+      # evicted while PRs still need it; restoring it updates its
+      # last-access time, which a lookup doesn't.
+      - name: Refresh the Docker Image cache entry
+        if: github.event_name == 'schedule' && steps.cache.outputs.cache-hit == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ steps.key.outputs.key }}
+
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
         uses: docker/setup-buildx-action@v4
@@ -62,8 +77,19 @@ jobs:
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
 
+      - name: Delete stale Docker Image caches from main
+        if: github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          KEY: ${{ steps.key.outputs.key }}
+        run: |
+          gh cache list --ref refs/heads/main --key "$IMAGE_FILE-" --limit 100 --json id,key \
+            --jq ".[] | select(.key != \"$KEY\") | .id" | xargs -r -n1 gh cache delete
+
   minsize-zephyr:
     needs: cache-maker
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -100,6 +126,7 @@ jobs:
           docker run -v $(readlink -f picolibc):/picolibc -e DOCKERFILE -e PACKAGES_FILE -e EXTRA_FILE -e TOOLCHAINS_FILE -e BEFORE_SHA -e AFTER_SHA -w /picolibc $IMAGE ${{ matrix.test }} ${{ matrix.meson_flags }} --buildtype minsize
   release-zephyr:
     needs: cache-maker
+    if: github.event_name != 'schedule'
     runs-on: ubuntu-latest
     strategy:
       matrix:
