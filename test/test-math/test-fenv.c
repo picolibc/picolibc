@@ -271,7 +271,7 @@ main(void)
     }
 #endif
 
-#ifdef __aarch64__
+#if defined(__aarch64__) && defined(__ARM_FP)
     /* fesetenv restores all of fpcr, including flush-to-zero */
     {
         fenv_t   env;
