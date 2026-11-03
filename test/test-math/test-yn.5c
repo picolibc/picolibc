@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2025 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,7 +33,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#define TEST_VECTORS "test-log1p.h"
-#define TEST_FUNC    log1p
+load "test-float.5c"
 
-#include "test-real-one.h"
+
+void
+main()
+{
+	for (int j = 2; j < 5; j++) {
+		for (real r = 1e-10; r < 1000; r *= 11) {
+			real ri = imprecise(r, prec);
+			compute_int_real(j, ri, yn);
+			compute_int_real(j, -ri, yn);
+		}
+	}
+}
+
+main();

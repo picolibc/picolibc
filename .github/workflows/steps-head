@@ -9,7 +9,7 @@
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ needs.cache-maker.outputs.image-key }}
           fail-on-cache-miss: true
 
       - name: Load and Check the Docker Image

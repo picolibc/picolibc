@@ -35,7 +35,7 @@ REAL_EXP = \
 	test-exp2m1.h \
 	test-log.h \
 	test-log10.h \
-	test-log1p.h \
+	test-logp1.h \
 	test-log2.h \
 	test-log10p1.h \
 	test-log2p1.h \
@@ -70,6 +70,9 @@ REAL_OTHER = \
 	test-j0.h \
 	test-j1.h \
 	test-jn.h \
+	test-y0.h \
+	test-y1.h \
+	test-yn.h \
 	test-nextafter.h \
 	test-nextdown.h \
 	test-nextup.h \
@@ -114,7 +117,7 @@ COMPLEX_OTHER = \
 TEST_FILES = \
 	$(REAL_TRIG) $(REAL_EXP) $(REAL_NARROW) $(REAL_OTHER) \
 	$(COMPLEX_TRIG) $(COMPLEX_EXP) $(COMPLEX_OTHER) \
-	test-fma-vec.h
+	test-fma-vec.h test-long-double-vec.h
 
 all: $(TEST_FILES) .clang-format-ignore
 

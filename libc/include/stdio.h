@@ -426,7 +426,7 @@ int __m_vfscanf(FILE *__stream, const char *__fmt, __gnuc_va_list __ap)
 #endif
 
 #ifndef _PRINTF_NAN_LEN_MAX
-#define _PRINTF_NAN_LEN_MAX 3
+#define _PRINTF_NAN_LEN_MAX 4
 #endif
 
 /*

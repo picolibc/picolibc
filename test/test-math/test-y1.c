@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: BSD-3-Clause
  *
- * Copyright © 2025 Keith Packard
+ * Copyright © 2026 Keith Packard
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -33,33 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-load "test-float.5c"
+#define _DEFAULT_SOURCE
+#include <sys/types.h>
 
-real[] test_values = {
-        0x1.bb67bp-23,
-        0x1.800006p-21,
-};
+#ifdef __PICOLIBC__
+#define SKIP_BINARY80
+#define SKIP_BINARY128
+#endif
 
-real
-log1p(real x)
-{
-	return log(1 + x);
-}
+#define TEST_VECTORS "test-y1.h"
+#define TEST_FUNC    y1
 
-void
-main()
-{
-        for (int i = 0; i < dim(test_values); i++)
-                compute_real_one(test_values[i], log1p);
-	for (real r = 0x1p-149; r < 0x1.fffffep-1; r *= 1.4) {
-		real ri = imprecise(r, prec);
-		compute_real_one(ri, log1p);
-		compute_real_one(-ri, log1p);
-	}
-	for (real r = 1e-38; r < 1e38; r *= 3) {
-		real ri = imprecise(r, prec);
-		compute_real_one(ri, log1p);
-	}
-}
-
-main();
+#include "test-real-one.h"

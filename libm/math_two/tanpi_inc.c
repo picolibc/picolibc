@@ -64,7 +64,21 @@ name(tanpi)(float_t x)
     if (ix < EXP_ONE_QUARTER) {
         n = 0;
     } else {
+#ifdef __lm32__
+        /*
+         * Work around lm32 gcc 14.2 placing address-taken
+         * parameters in misaligned stack slots by passing an aligned
+         * local instead. Remove once picolibc CI uses the fixed
+         * compiler from picolibc-ci-tools v19.
+         */
+        {
+            float_t lm32_x = x;
+            n = name(_rem_half)(lm32_x, &lm32_x);
+            x = lm32_x;
+        }
+#else
         n = name(_rem_half)(x, &x);
+#endif
     }
 
     prod = ff_mul_f(name(_pi_ff_), x);
