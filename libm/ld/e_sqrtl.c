@@ -35,7 +35,8 @@
 
 #include "math_ld.h"
 
-#ifdef _NEED_FLOAT_HUGE
+/* Only double-double lacks an exact integer-only implementation */
+#if defined(_NEED_FLOAT_HUGE) && defined(_DOUBLE_DOUBLE_FLOAT)
 
 #include "common/e_sqrtl.c"
 
