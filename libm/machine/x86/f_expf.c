@@ -23,6 +23,7 @@ Function computes e ** x.  The following special cases exist:
 There is no error checking or setting of errno.
 */
 
+#define _DEFAULT_SOURCE
 #include <math.h>
 #include "f_math.h"
 
