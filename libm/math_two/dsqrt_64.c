@@ -36,12 +36,22 @@
 #define _ISOC23_SOURCE
 #include "math_two.h"
 
-#if defined(float_t) && !defined(_DOUBLE_IS_32BITS) && defined(_LDBL_EQ_DBL)
+#ifdef float_t
+
+#if defined(_DOUBLE_IS_32BITS)
+
+/* With 32-bit double, float_t is long double and this defines dsqrtl */
+#define NARROW_D
+#include "narrow_sqrt_inc.c"
+
+#elif defined(_LDBL_EQ_DBL)
 
 double
 dsqrtl(long double x)
 {
     return (double)sqrtl(x);
 }
+
+#endif
 
 #endif

@@ -69,6 +69,7 @@ srcs_stdlib = [
     'atol.c',
     'atoll.c',
     'btowc.c',
+    'call_once.c',
     'cxa-atexit.c',
     'cxa-at-quick-exit.c',
     'div.c',

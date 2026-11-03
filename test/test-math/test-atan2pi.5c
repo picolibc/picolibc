@@ -42,9 +42,54 @@ atan2pi(real x1, real x2)
 	return y / pi_value(precision(y));
 }
 
+/*
+ * Signed zeros can't be represented in nickle, so these values are
+ * written directly as C constants
+ */
+typedef struct {
+	string	x1, x2, y;
+} special_t;
+
+special_t[] specials = {
+	{ .x1 = "0.0", .x2 = "0.0", .y = "0.0" },
+	{ .x1 = "0.0", .x2 = "-0.0", .y = "1.0" },
+	{ .x1 = "-0.0", .x2 = "0.0", .y = "-0.0" },
+	{ .x1 = "-0.0", .x2 = "-0.0", .y = "-1.0" },
+};
+
+void
+print_special(string v)
+{
+	printf("REAL(");
+	for (int c = 0; c < dim(real_convs); c++) {
+		if (c > 0)
+			printf(", ");
+		printf("%s(%s)", real_convs[c].macro, v);
+	}
+	printf(")");
+}
+
 void
 main()
 {
+	for (int i = 0; i < dim(specials); i++) {
+		printf("{ .x1 = ");
+		print_special(specials[i].x1);
+		printf(", .x2 = ");
+		print_special(specials[i].x2);
+		printf(", .y = ");
+		print_special(specials[i].y);
+		printf(" },\n");
+	}
+	/* atan2pi(±y, ±y) is exactly ±1/4 or ±3/4 */
+	real[] exact_values = { 1, 3, plus_inf };
+	for (int i = 0; i < dim(exact_values); i++) {
+		real v = exact_values[i];
+		compute_real_real( v,  v, atan2pi);
+		compute_real_real( v, -v, atan2pi);
+		compute_real_real(-v,  v, atan2pi);
+		compute_real_real(-v, -v, atan2pi);
+	}
 	for (real x = 1e-38; x <= 1e38; x *= 1111) {
 		for (real y = 1e-38; y <= 1e38; y *= 1111) {
 			real xi = imprecise(x, prec);

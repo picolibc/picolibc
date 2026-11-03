@@ -471,6 +471,19 @@ if have_cplusplus
   cpp_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
 endif
 
+# Disable assert() within the library (by default, unless this is a debug build)
+if get_option('ndebug') == 'auto'
+  ndebug = get_option('buildtype') != 'debug'
+else
+  ndebug = get_option('ndebug') == 'true'
+endif
+if ndebug
+  c_args += ['-DNDEBUG']
+  if have_cplusplus
+    cpp_args += ['-DNDEBUG']
+  endif
+endif
+
 test_flags = []
 # Select a fortify source option
 fortify_source = get_option('fortify-source')

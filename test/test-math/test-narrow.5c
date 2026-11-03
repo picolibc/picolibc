@@ -68,6 +68,9 @@ range32(real a)
 	a = real32(a);
 	if (abs(a) > max_binary32)
 		raise infinity(a < 0);
+	/* Results which round to zero keep their sign */
+	if (abs(a) < min_denorm_binary32)
+		return copysign(plus_zero, a);
 	return a;
 }
 
@@ -77,6 +80,9 @@ range64(real a)
 	a = real64(a);
 	if (abs(a) > max_binary64)
 		raise infinity(a < 0);
+	/* Results which round to zero keep their sign */
+	if (abs(a) < min_denorm_binary64)
+		return copysign(plus_zero, a);
 	return a;
 }
 
@@ -86,6 +92,9 @@ range80(real a)
 	a = real80(a);
 	if (abs(a) > max_binary80)
 		raise infinity(a < 0);
+	/* Results which round to zero keep their sign */
+	if (abs(a) < min_denorm_binary80)
+		return copysign(plus_zero, a);
 	return a;
 }
 
@@ -95,6 +104,9 @@ range80m(real a)
 	a = real80m(a);
 	if (abs(a) > max_binary80m)
 		raise infinity(a < 0);
+	/* Results which round to zero keep their sign */
+	if (abs(a) < min_denorm_binary80m)
+		return copysign(plus_zero, a);
 	return a;
 }
 
@@ -104,6 +116,9 @@ range128(real a)
 	a = real128(a);
 	if (abs(a) > max_binary128)
 		raise infinity(a < 0);
+	/* Results which round to zero keep their sign */
+	if (abs(a) < min_denorm_binary128)
+		return copysign(plus_zero, a);
 	return a;
 }
 

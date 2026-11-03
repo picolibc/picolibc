@@ -65,6 +65,10 @@ test_binary32(void)
         }
         volatile binary32 y = TEST_FUNC_32(test_32_vec[i].x1, test_32_vec[i].x2);
         ulp_t             ulp = ulp32(y, test_32_vec[i].y);
+#ifdef TEST_EXACT_RESULT
+        if (ulp != 0 && TEST_EXACT_RESULT(test_32_vec[i].x1, test_32_vec[i].x2))
+            ulp = MAX_ULP;
+#endif
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary32) {
@@ -114,6 +118,10 @@ test_binary64(void)
 #endif
         volatile binary64 y = TEST_FUNC_64(test_64_vec[i].x1, test_64_vec[i].x2);
         ulp_t             ulp = ulp64(y, test_64_vec[i].y);
+#ifdef TEST_EXACT_RESULT
+        if (ulp != 0 && TEST_EXACT_RESULT(test_64_vec[i].x1, test_64_vec[i].x2))
+            ulp = MAX_ULP;
+#endif
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary64) {
@@ -162,6 +170,10 @@ test_binary80(void)
         }
         volatile binary80 y = TEST_FUNC_80(test_80_vec[i].x1, test_80_vec[i].x2);
         ulp_t             ulp = ulp80(y, test_80_vec[i].y);
+#ifdef TEST_EXACT_RESULT
+        if (ulp != 0 && TEST_EXACT_RESULT(test_80_vec[i].x1, test_80_vec[i].x2))
+            ulp = MAX_ULP;
+#endif
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary80) {
@@ -208,6 +220,10 @@ test_binary128(void)
         }
         volatile binary128 y = TEST_FUNC_128(test_128_vec[i].x1, test_128_vec[i].x2);
         ulp_t              ulp = ulp128(y, test_128_vec[i].y);
+#ifdef TEST_EXACT_RESULT
+        if (ulp != 0 && TEST_EXACT_RESULT(test_128_vec[i].x1, test_128_vec[i].x2))
+            ulp = MAX_ULP;
+#endif
         if (ulp > max_ulp)
             max_ulp = ulp;
         if (ulp > math_ulp_binary128) {

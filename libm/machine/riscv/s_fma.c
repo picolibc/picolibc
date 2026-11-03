@@ -47,6 +47,4 @@ fma64(__float64 x, __float64 y, __float64 z)
 
 _MATH_ALIAS_d_ddd(fma)
 
-#else
-#include "../../common/s_fma.c"
 #endif

@@ -48,6 +48,7 @@ picolibc_sources(
   atol.c
   atoll.c
   btowc.c
+  call_once.c
   div.c
   drand48.c
   ejtouc.c
@@ -132,6 +133,7 @@ if(ENABLE_MALLOC)
     getpagesize.c
     mallinfo.c
     malloc.c
+    malloc-error.c
     malloc-stats.c
     malloc-usable-size.c
     mallopt.c

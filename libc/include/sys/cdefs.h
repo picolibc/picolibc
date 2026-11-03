@@ -75,6 +75,9 @@
 #ifndef __has_attribute
 #define __has_attribute(x) 0
 #endif
+#ifndef __has_c_attribute
+#define __has_c_attribute(x) 0
+#endif
 #ifndef __has_feature
 #define __has_feature(x) 0
 #endif
@@ -259,6 +262,13 @@
 #else
 #define __deprecated_m(m)
 #define __deprecated
+#endif
+
+/* For interfaces that C23 deprecates but earlier versions of C don't */
+#if (__STDC_VERSION__ - 0) > 201710L
+#define __deprecated_c23 __deprecated
+#else
+#define __deprecated_c23
 #endif
 
 #if __has_attribute(__no_builtin__)
@@ -648,8 +658,8 @@
  */
 #if __STDC_VERSION__ >= 201112L                                           \
     && (__ISO_C_VISIBLE >= 2023 || defined(_LIBC) || defined(_TEST_LIBC))
-#define __preserve_const(_f, _s, _a)                                                    \
-    _Generic(1 ? (_s) : (void *)1, const void *: (const void *)(_f)_a, default: (_f)_a)
+#define __preserve_const(_t, _f, _s, _a)                                            \
+    _Generic(1 ? (_s) : (void *)1, const void *: (const _t)(_f)_a, default: (_f)_a)
 #endif
 
 /*
@@ -730,6 +740,19 @@
 #define __fallthrough \
     do {              \
     } while (0)
+#endif
+
+/*
+ * Functions with no side effects whose results depend only on their
+ * arguments
+ */
+#if __STDC_VERSION__ > 201710L && __has_c_attribute(__unsequenced__)
+/* Standard C23 attribute */
+#define __unsequenced [[__unsequenced__]]
+#elif __has_attribute(__unsequenced__)
+#define __unsequenced __attribute__((__unsequenced__))
+#else
+#define __unsequenced
 #endif
 
 /*  The traditional meaning of 'extern inline' for GCC is not

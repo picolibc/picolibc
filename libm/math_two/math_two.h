@@ -42,19 +42,37 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wignored-pragmas"
+#pragma GCC diagnostic ignored "-Wunknown-pragmas"
+#endif
+
+#pragma STDC FENV_ROUND FE_DYNAMIC
+#pragma STDC FENV_ACCESS ON
+
 /* Figure out mapping between C types and floating point formats */
 #if __FLT_MANT_DIG__ == 24
 #define HAVE_FLOAT32
 typedef float float32_t;
-#define float32_suffix      f
-#define float_32(x)         (x##f)
-#define FLOAT_32_MAX        FLT_MAX
-#define FLOAT_32_MIN        FLT_MIN
-#define FLOAT_32_DENORM_MIN __FLT_DENORM_MIN__
-#define FLOAT_32_MAX_EXP    FLT_MAX_EXP
+#define float32_suffix       f
+#define float_32(x)          (x##f)
+#define FLOAT_32_MAX         FLT_MAX
+#define FLOAT_32_MIN         FLT_MIN
+#define FLOAT_32_DENORM_MIN  __FLT_DENORM_MIN__
+#define FLOAT_32_MAX_EXP     FLT_MAX_EXP
+#define FLOAT_32_MANT_DIG    FLT_MANT_DIG
+#define FLOAT_32_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMAF
 #define __HAVE_FAST_FMA_32
 #endif
+#ifdef __FLOAT_NOROUND
+#define __FLOAT_32_NOROUND
+#endif
+#ifdef __FLOAT_NOEXCEPT
+#define __FLOAT_32_NOEXCEPT
+#endif
+
 #define fma_32(a, b, c) fmaf(a, b, c)
 #define floor_32(x)     floorf(x)
 #define frexp_32(x, a)  frexpf(x, a)
@@ -66,15 +84,24 @@ typedef float float32_t;
 #define HAVE_FLOAT64
 typedef double float64_t;
 #define float64_suffix
-#define float_64(x)         (x)
-#define FLOAT_64_MAX        DBL_MAX
-#define FLOAT_64_MIN        DBL_MIN
-#define FLOAT_64_DENORM_MIN __DBL_DENORM_MIN__
-#define FLOAT_64_SNAN_BIT   0x0008000000000000ULL
-#define FLOAT_64_MAX_EXP    DBL_MAX_EXP
+#define float_64(x)          (x)
+#define FLOAT_64_MAX         DBL_MAX
+#define FLOAT_64_MIN         DBL_MIN
+#define FLOAT_64_DENORM_MIN  __DBL_DENORM_MIN__
+#define FLOAT_64_SNAN_BIT    0x0008000000000000ULL
+#define FLOAT_64_MAX_EXP     DBL_MAX_EXP
+#define FLOAT_64_MANT_DIG    DBL_MANT_DIG
+#define FLOAT_64_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMA
 #define __HAVE_FAST_FMA_64
 #endif
+#ifdef __DOUBLE_NOROUND
+#define __FLOAT_64_NOROUND
+#endif
+#ifdef __DOUBLE_NOEXCEPT
+#define __FLOAT_64_NOEXCEPT
+#endif
+
 #define fma_64(a, b, c) fma(a, b, c)
 #define floor_64(x)     floor(x)
 #define frexp_64(x, a)  frexp(x, a)
@@ -82,15 +109,24 @@ typedef double float64_t;
 #elif __LDBL_MANT_DIG__ == 53
 #define HAVE_FLOAT64
 typedef long double float64_t;
-#define float64_suffix      l
-#define float_64(x)         (x##l)
-#define FLOAT_64_MAX        LDBL_MAX
-#define FLOAT_64_MIN        LDBL_MIN
-#define FLOAT_64_DENORM_MIN __LDBL_DENORM_MIN__
-#define FLOAT_64_MAX_EXP    LDBL_MAX_EXP
+#define float64_suffix       l
+#define float_64(x)          (x##l)
+#define FLOAT_64_MAX         LDBL_MAX
+#define FLOAT_64_MIN         LDBL_MIN
+#define FLOAT_64_DENORM_MIN  __LDBL_DENORM_MIN__
+#define FLOAT_64_MAX_EXP     LDBL_MAX_EXP
+#define FLOAT_64_MANT_DIG    LDBL_MANT_DIG
+#define FLOAT_64_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_64
 #endif
+#ifdef __LONG_DOUBLE_NOROUND
+#define __FLOAT_64_NOROUND
+#endif
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define __FLOAT_64_NOEXCEPT
+#endif
+
 #define fma_64(a, b, c) fmal(a, b, c)
 #define floor_64(x)     floorl(x)
 #define frexp_64(x, a)  frexpl(x, a)
@@ -106,9 +142,23 @@ typedef long double float80_t;
 #define FLOAT_80_MIN        LDBL_MIN
 #define FLOAT_80_DENORM_MIN __LDBL_DENORM_MIN__
 #define FLOAT_80_MAX_EXP    LDBL_MAX_EXP
+#define FLOAT_80_MANT_DIG   LDBL_MANT_DIG
+#if __LDBL_MIN_EXP__ == -16382
+/* 68881 allows normal values with zero exponent */
+#define FLOAT_80_DENORM_BIAS 0
+#else
+#define FLOAT_80_DENORM_BIAS 1
+#endif
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_80
 #endif
+#ifdef __LONG_DOUBLE_NOROUND
+#define __FLOAT_80_NOROUND
+#endif
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define __FLOAT_80_NOEXCEPT
+#endif
+
 #define fma_80(a, b, c) fmal(a, b, c)
 #define floor_80(x)     floorl(x)
 #define frexp_80(x, a)  frexpl(x, a)
@@ -118,16 +168,25 @@ typedef long double float80_t;
 #if __LDBL_MANT_DIG__ == 113
 #define HAVE_FLOAT128
 typedef long double float128_t;
-#define float128_suffix      l
-#define float_128(x)         (x##l)
-#define FLOAT_128_MAX        LDBL_MAX
-#define FLOAT_128_MIN        LDBL_MIN
-#define FLOAT_128_DENORM_MIN __LDBL_DENORM_MIN__
-#define FLOAT_128_SNAN_BIT   0x0000800000000000ULL
-#define FLOAT_128_MAX_EXP    LDBL_MAX_EXP
+#define float128_suffix       l
+#define float_128(x)          (x##l)
+#define FLOAT_128_MAX         LDBL_MAX
+#define FLOAT_128_MIN         LDBL_MIN
+#define FLOAT_128_DENORM_MIN  __LDBL_DENORM_MIN__
+#define FLOAT_128_SNAN_BIT    0x0000800000000000ULL
+#define FLOAT_128_MAX_EXP     LDBL_MAX_EXP
+#define FLOAT_128_MANT_DIG    LDBL_MANT_DIG
+#define FLOAT_128_DENORM_BIAS 1
 #ifdef __HAVE_FAST_FMAL
 #define __HAVE_FAST_FMA_128
 #endif
+#ifdef __LONG_DOUBLE_NOROUND
+#define __FLOAT_128_NOROUND
+#endif
+#ifdef __LONG_DOUBLE_NOEXCEPT
+#define __FLOAT_128_NOEXCEPT
+#endif
+
 #define fma_128(a, b, c) fmal(a, b, c)
 #define floor_128(x)     floorl(x)
 #define frexp_128(x, a)  frexpl(x, a)
@@ -149,6 +208,8 @@ typedef long double float128_t;
 #define FLOAT_MIN         FLOAT_32_MIN
 #define FLOAT_DENORM_MIN  FLOAT_32_DENORM_MIN
 #define FLOAT_MAX_EXP     FLOAT_32_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_32_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_32_DENORM_BIAS
 #define FLOAT_SNAN_BIT    0x00400000u
 #define FLOAT_EXP_MASK    0x7f800000U
 #define FLOAT_EXP_BIAS    0x7f
@@ -156,6 +217,12 @@ typedef long double float128_t;
 #define FLOAT_PAYLOAD_DIG 23
 #ifdef __HAVE_FAST_FMA_32
 #define __HAVE_FAST_FMA_F
+#endif
+#ifdef __FLOAT_32_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_32_NOROUND
+#define __FLOAT_NOROUND_F
 #endif
 
 #define GET_ABS(_ix)   ((_ix) & 0x7fffffff)
@@ -201,6 +268,8 @@ typedef long double float128_t;
 #define FLOAT_MIN         FLOAT_64_MIN
 #define FLOAT_DENORM_MIN  FLOAT_64_DENORM_MIN
 #define FLOAT_MAX_EXP     FLOAT_64_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_64_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_64_DENORM_BIAS
 #define FLOAT_SNAN_BIT    0x0008000000000000LL
 #define FLOAT_EXP_MASK    0x7ff0000000000000LL
 #define FLOAT_EXP_BIAS    0x3ff
@@ -208,6 +277,12 @@ typedef long double float128_t;
 #define FLOAT_PAYLOAD_DIG 52
 #ifdef __HAVE_FAST_FMA_64
 #define __HAVE_FAST_FMA_F
+#endif
+#ifdef __FLOAT_64_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_64_NOROUND
+#define __FLOAT_NOROUND_F
 #endif
 
 #define GET_ABS(_ix) ((_ix) & 0x7fffffffffffffffLL)
@@ -261,9 +336,17 @@ typedef long double float128_t;
 #define FLOAT_SNAN_BIT    0x4000000000000000ULL
 #define FLOAT_DENORM_MIN  FLOAT_80_DENORM_MIN
 #define FLOAT_MAX_EXP     FLOAT_80_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_80_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_80_DENORM_BIAS
 #define FLOAT_PAYLOAD_DIG 64
 #ifdef __HAVE_FAST_FMA_80
 #define __HAVE_FAST_FMA_F
+#endif
+#ifdef __FLOAT_80_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_80_NOROUND
+#define __FLOAT_NOROUND_F
 #endif
 
 typedef ieee_extended_shape_type fuint_t;
@@ -352,10 +435,19 @@ f_is_integer(fuint_t i, int shift)
 #define FLOAT_SNAN_BIT    0x0000800000000000ULL
 #define FLOAT_EXP_INF     0x7fff
 #define FLOAT_MAX_EXP     FLOAT_128_MAX_EXP
+#define FLOAT_MANT_DIG    FLOAT_128_MANT_DIG
+#define FLOAT_DENORM_BIAS FLOAT_128_DENORM_BIAS
 #define FLOAT_PAYLOAD_DIG 112
 #ifdef __HAVE_FAST_FMA_128
 #define __HAVE_FAST_FMA_F
 #endif
+#ifdef __FLOAT_128_NOEXCEPT
+#define __FLOAT_NOEXCEPT_F
+#endif
+#ifdef __FLOAT_128_NOROUND
+#define __FLOAT_NOROUND_F
+#endif
+
 #define FLOAT_ABS(_hx) ((_hx) & 0x7fffffffffffffffLL)
 #ifdef _FLT_LARGEST_EXPONENT_IS_NORMAL
 #define IS_FINITE(_hx, _lx) 1
@@ -500,6 +592,36 @@ f_exp_and(fuint_t i, uint32_t exp)
     return i;
 }
 
+#endif
+
+/*
+ * Work around bug in GCC 14.2.0: on the 68040 and 68060, conversions to
+ * float and double use fsmove and fdmove, which round the significand
+ * but keep the extended exponent range, so results outside the range of
+ * the narrower type don't become infinities, zeros or denorms, and
+ * denorms get rounded twice. Use fmove to convert directly from the
+ * register to the narrower format, which rounds once.
+ */
+#if defined(__GNUC__) && !defined(__clang__) && defined(__HAVE_68881__) \
+    && (defined(__mc68040__) || defined(__mc68060__))
+static __always_inline float
+narrow_to_float(long double x)
+{
+    float y;
+    __asm__ __volatile__("fmove.s %1,%0" : "=d"(y) : "f"(x));
+    return y;
+}
+
+static __always_inline double
+narrow_to_double(long double x)
+{
+    double y;
+    __asm__ __volatile__("fmove.d %1,%0" : "=m"(y) : "f"(x));
+    return y;
+}
+#else
+#define narrow_to_float(x)  ((float)(x))
+#define narrow_to_double(x) ((double)(x))
 #endif
 
 /*

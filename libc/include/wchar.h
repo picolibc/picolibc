@@ -291,11 +291,11 @@ int wscanf(const wchar_t * __restrict, ...) __picolibc_export;
 #endif
 
 #ifdef __preserve_const
-#define wmemchr(_s, _c, _n) __preserve_const(wmemchr, _s, (_s, _c, _n))
-#define wcschr(_s, _c)      __preserve_const(wcschr, _s, (_s, _c))
-#define wcspbrk(_s, _a)     __preserve_const(wcspbrk, _s, (_s, _a))
-#define wcsrchr(_s, _c)     __preserve_const(wcsrchr, _s, (_s, _c))
-#define wcsstr(_h, _n)      __preserve_const(wcsstr, _h, (_h, _n))
+#define wmemchr(_s, _c, _n) __preserve_const(wchar_t *, wmemchr, _s, (_s, _c, _n))
+#define wcschr(_s, _c)      __preserve_const(wchar_t *, wcschr, _s, (_s, _c))
+#define wcspbrk(_s, _a)     __preserve_const(wchar_t *, wcspbrk, _s, (_s, _a))
+#define wcsrchr(_s, _c)     __preserve_const(wchar_t *, wcsrchr, _s, (_s, _c))
+#define wcsstr(_h, _n)      __preserve_const(wchar_t *, wcsstr, _h, (_h, _n))
 #endif
 
 #if __STDC_WANT_LIB_EXT1__ == 1

@@ -114,6 +114,10 @@ srcs_math_two = [
   'fdiv_64.c',
   'fdiv_80.c',
   'fdiv_128.c',
+  'fma_32.c',
+  'fma_64.c',
+  'fma_80.c',
+  'fma_128.c',
   'fmaximum_32.c',
   'fmaximum_64.c',
   'fmaximum_80.c',
@@ -236,4 +240,16 @@ srcs_math_two = [
   'ufromfpx_128.c',
   ]
 
-src_libm_math_two = files(srcs_math_two)
+srcs_math_two_use = []
+foreach file : srcs_math_two
+  s_file = fs.replace_suffix(file, '.S')
+  if file in srcs_libm_machine
+    message('libm/math_two/' + file + ': machine overrides generic')
+  elif s_file in srcs_libm_machine
+    message('libm/math_two/' + s_file + ': machine overrides generic')
+  else
+    srcs_math_two_use += file
+  endif
+endforeach
+
+src_libm_math_two = files(srcs_math_two_use)

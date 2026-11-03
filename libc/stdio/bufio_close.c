@@ -55,7 +55,9 @@ __bufio_close(FILE *f)
      * FILE structs defined for stdin/stdout/stderr.
      */
     if (bf->bflags & __BFALL) {
-        ret = bufio_close(bf);
+        int close_ret = bufio_close(bf);
+        if (close_ret)
+            ret = close_ret;
         bufio_remove_file(f);
         free(f);
     }

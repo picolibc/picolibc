@@ -123,10 +123,15 @@ fromfp(real x, bool unsign, string rm, int width)
 			.inexact = false,
 		};
 	}
+	bool inexact = xi != x;
+
+	/* Zero results keep the sign of x */
+	if (xi == 0)
+		xi = copysign(plus_zero, x);
 	fromfp_ret_t ret = {
 		.v = { .r = xi },
 		.overflow = false,
-		.inexact = xi != x
+		.inexact = inexact
 	};
 	return ret;
 }

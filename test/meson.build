@@ -136,6 +136,27 @@ if host_cpu_family == 'aarch64' and test_machine == 'fvp'
   check_aarch64_fvp_page_table = find_program('check-aarch64-fvp-page-table.py')
 endif
 
+# C23 deprecates asctime and ctime but earlier versions of C don't:
+# check that time.h only marks them deprecated when compiling as C23.
+# Each check needs a compiler that supports the language version.
+check_deprecated = find_program(meson.project_source_root() / 'scripts' / 'check-deprecated')
+time_deprecated_src = meson.current_source_dir() / 'test-time-deprecated.c'
+time_deprecated_cmd = cc.cmd_array() + c_args + inc_args
+
+if cc.has_argument('-std=c17')
+  test('test-time-deprecated-c17',
+       check_deprecated,
+       args: ['not-deprecated', time_deprecated_src] + time_deprecated_cmd + ['-std=c17'],
+       suite: 'headers')
+endif
+
+if cc.has_argument('-std=c23') and cc.has_function_attribute('deprecated')
+  test('test-time-deprecated-c23',
+       check_deprecated,
+       args: ['deprecated', time_deprecated_src] + time_deprecated_cmd + ['-std=c23'],
+       suite: 'headers')
+endif
+
 test_skip_native = [
   'test-stack-smash',
   'test-thread-safety',

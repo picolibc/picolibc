@@ -49,6 +49,9 @@
 /* Compiler supports _Complex */
 #cmakedefine __HAVE_COMPLEX
 
+/* The compiler supports __builtin_complex */
+#cmakedefine __HAVE_BUILTIN_COMPLEX 1
+
 #cmakedefine __HAVE_FCNTL
 
 /* IEEE fp funcs available */
@@ -83,7 +86,7 @@
 
 #cmakedefine _LITE_EXIT
 
-#cmakedefine __MALLOC_SMALL_BUCKET
+#define __MALLOC_SMALL_BUCKET @__MALLOC_SMALL_BUCKET@
 
 #cmakedefine __MB_CAPABLE
 
@@ -103,15 +106,6 @@
 
 /* The newlib version in string format. */
 #define _NEWLIB_VERSION "@NEWLIB_VERSION@"
-
-/* The Picolibc minor version number. */
-#define _PICOLIBC_MINOR__ @PROJECT_VERSION_MINOR@
-
-/* The Picolibc version in string format. */
-#define _PICOLIBC_VERSION "@PROJECT_VERSION@"
-
-/* The Picolibc major version number. */
-#define _PICOLIBC__ @PROJECT_VERSION_MAJOR@
 
 #cmakedefine _GLOBAL_ATEXIT
 
@@ -147,9 +141,6 @@
 /* chatty assert */
 #cmakedefine __ASSERT_VERBOSE
 
-/* elix level */
-#cmakedefine __ELIX_LEVEL @__ELIX_LEVEL@
-
 /* The newlib minor version number. */
 #define __NEWLIB_MINOR__ @NEWLIB_MINOR@
 
@@ -159,10 +150,17 @@
 /* The newlib major version number. */
 #define __NEWLIB__ @NEWLIB_MAJOR@
 
-/* Use old math code */
-#define __OBSOLETE_MATH_FLOAT @__OBSOLETE_MATH_FLOAT@
+/* The newlib version in string format. */
+#define __NEWLIB_VERSION__ "@NEWLIB_VERSION@"
 
-#define __OBSOLETE_MATH_DOUBLE @__OBSOLETE_MATH_DOUBLE@
+/* Use old math code (undef auto, 0 no, 1 yes) */
+@__OBSOLETE_MATH_DEFINE@
+
+/* Use old math code for float funcs (undef auto, 0 no, 1 yes) */
+@__OBSOLETE_MATH_FLOAT_DEFINE@
+
+/* Use old math code for double funcs (undef auto, 0 no, 1 yes) */
+@__OBSOLETE_MATH_DOUBLE_DEFINE@
 
 /* Compute static memory area sizes at runtime instead of link time */
 #cmakedefine __PICOCRT_RUNTIME_SIZE

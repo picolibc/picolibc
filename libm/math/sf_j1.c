@@ -251,7 +251,7 @@ ponef(float x)
     if (ix >= 0x41000000) {
         p = pr8;
         q = ps8;
-    } else if (ix >= 0x40f71c58) {
+    } else if (ix >= 0x4091745d) {
         p = pr5;
         q = ps5;
     } else if (ix >= 0x4036db68) {
@@ -356,10 +356,10 @@ qonef(float x)
     __int32_t    ix;
     GET_FLOAT_WORD(ix, x);
     ix &= 0x7fffffff;
-    if (ix >= 0x40200000) {
+    if (ix >= 0x41000000) {
         p = qr8;
         q = qs8;
-    } else if (ix >= 0x40f71c58) {
+    } else if (ix >= 0x4091745d) {
         p = qr5;
         q = qs5;
     } else if (ix >= 0x4036db68) {

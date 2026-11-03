@@ -752,7 +752,7 @@ use Picolibc:
    mspsim.
 
  * Run tests on MSP430 using the simulator that comes with gdb. Thanks to
-   Peter Jonsson for spliting tests apart to make them small enough to
+   Peter Jonsson for splitting tests apart to make them small enough to
    link in under 1MB. This requires a patch adding primitive
    semihosting to the simulator.
 
@@ -763,7 +763,7 @@ use Picolibc:
    meson option and is 'false' by default.
 
  * Add 'minimal' printf and scanf variants. These reduce functionality
-   by removing code that acts on most data modifers including width
+   by removing code that acts on most data modifiers including width
    and precision fields and alternate presentation modes. A new config
    variable, minimal-io-long-long, controls whether that code supports
    long long types.
@@ -1242,7 +1242,7 @@ than usual.
     sets the base of all picolibc file names.
 
  7. Add bare-metal i386 and x86_64 initializatiton code (thanks to
-    Mike Haertel). These initalize the processor from power up to
+    Mike Haertel). These initialize the processor from power up to
     running code without requiring any BIOS.
 
  8. Merge newlib as of late April, 2021

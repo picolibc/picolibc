@@ -62,5 +62,16 @@ main(void)
     ret = fgets(buf, sizeof(buf), in);
     assert(ret == buf);
     assert(strcmp(buf, TEST_STRING) == 0);
+
+    /* Make sure setvbuf doesn't break things */
+
+    out = popen("exit 3", "w");
+    setvbuf(out, NULL, _IOFBF, 1);
+
+    int status;
+
+    status = pclose(out);
+    assert(status == (3 << 8));
+
     return 0;
 }

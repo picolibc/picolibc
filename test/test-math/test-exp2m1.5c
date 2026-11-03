@@ -44,6 +44,13 @@ real[] test_values = {
 real
 exp2m1(real x)
 {
+	/*
+	 * Below -2100, 2**x is under 2**-2048, so 2**x - 1 rounds to -1
+	 * at 2048 bits. Skip computing 2**x, which takes as many
+	 * squarings as the argument's exponent
+	 */
+	if (x < -2100)
+		return imprecise(-1, 2048);
 	real xi = imprecise(x, 2048);
 	return pow(2, xi) - 1;
 }
