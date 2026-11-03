@@ -41,17 +41,24 @@ nextafterf(float x, float y)
     GET_FLOAT_WORD(hy, y);
     iy = hy & 0x7fffffff; /* |y| */
 #define CHECK_EQUAL
+#define EXCEPT
 #endif
 
     if (FLT_UWORD_IS_NAN(ix) || FLT_UWORD_IS_NAN(iy))
-        return x + y;
+        return clang_barrier_float(x) + y;
 #ifdef CHECK_EQUAL
     if (x == y)
         return y; /* x=y, return y */
+#else
+    /* Avoid FE_OVERFLOW when x is infinity */
+    if (hx == hy)
+        return x;
 #endif
     if (FLT_UWORD_IS_ZERO(ix)) { /* x == 0 */
         SET_FLOAT_WORD(x, (hy & 0x80000000) | FLT_UWORD_MIN);
+#ifdef EXCEPT
         force_eval_float(opt_barrier_float(x) * x);
+#endif
         return x;
     }
     if (hx >= 0) {     /* x > 0 */
@@ -67,12 +74,16 @@ nextafterf(float x, float y)
             hx += 1;
         }
     }
+#ifdef EXCEPT
     ix = hx & 0x7f800000;
     if (ix > FLT_UWORD_MAX)
         return check_oflowf(x + x); /* overflow  */
+#endif
     SET_FLOAT_WORD(x, hx);
+#ifdef EXCEPT
     if (ix < 0x00800000) /* underflow */
         return __math_denormf(x);
+#endif
     return x;
 }
 

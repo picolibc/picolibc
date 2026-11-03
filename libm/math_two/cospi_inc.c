@@ -49,6 +49,10 @@ name(cospi)(float_t x)
     if (EXP_IS_NONFINITE(ix))
         return kernel(__math_invalid)(x);
 
+    /* Make sure cospi(x) is the same as cospi(-x) for all rounding modes */
+    if (x < 0)
+        x = -x;
+
     switch (_isint_float_f(x)) {
     case 1:
         return float_f(-1.0);
@@ -65,7 +69,21 @@ name(cospi)(float_t x)
     if (ix < EXP_ONE_QUARTER) {
         n = 0;
     } else {
-        n = name(_rem_half)(name(fabs)(x), &x);
+#ifdef __lm32__
+        /*
+         * Work around lm32 gcc 14.2 placing address-taken
+         * parameters in misaligned stack slots by passing an aligned
+         * local instead. Remove once picolibc CI uses the fixed
+         * compiler from picolibc-ci-tools v19.
+         */
+        {
+            float_t lm32_x = x;
+            n = name(_rem_half)(lm32_x, &lm32_x);
+            x = lm32_x;
+        }
+#else
+        n = name(_rem_half)(x, &x);
+#endif
     }
 
     prod = ff_mul_f(name(_pi_ff_), x);

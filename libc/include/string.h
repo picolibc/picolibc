@@ -216,18 +216,18 @@ int timingsafe_memcmp(const void *, const void *, size_t) __picolibc_export;
 #endif
 
 #ifdef __preserve_const
-#define memchr(_s, _c, _n) __preserve_const(memchr, _s, (_s, _c, _n))
-#define strchr(_s, _c)     __preserve_const(strchr, _s, (_s, _c))
-#define strpbrk(_s, _a)    __preserve_const(strpbrk, _s, (_s, _a))
-#define strrchr(_s, _c)    __preserve_const(strrchr, _s, (_s, _c))
-#define strstr(_h, _n)     __preserve_const(strstr, _h, (_h, _n))
+#define memchr(_s, _c, _n) __preserve_const(void *, memchr, _s, (_s, _c, _n))
+#define strchr(_s, _c)     __preserve_const(char *, strchr, _s, (_s, _c))
+#define strpbrk(_s, _a)    __preserve_const(char *, strpbrk, _s, (_s, _a))
+#define strrchr(_s, _c)    __preserve_const(char *, strrchr, _s, (_s, _c))
+#define strstr(_h, _n)     __preserve_const(char *, strstr, _h, (_h, _n))
 
 #if __GNU_VISIBLE
-#define memmem(_h, _h_n, _n, _n_n) __preserve_const(memmem, _h, (_h, _h_n, _n, _n_n))
-#define memrchr(_s, _c, _n)        __preserve_const(memrchr, _s, (_s, _c, _n))
-#define rawmemchr(_s, _c)          __preserve_const(rawmemchr, _s, (_s, _c))
-#define strcasestr(_h, _n)         __preserve_const(strcasestr, _h, (_h, _n))
-#define strchrnul(_s, _c)          __preserve_const(strchrnul, _s, (_s, _c))
+#define memmem(_h, _h_n, _n, _n_n) __preserve_const(void *, memmem, _h, (_h, _h_n, _n, _n_n))
+#define memrchr(_s, _c, _n)        __preserve_const(void *, memrchr, _s, (_s, _c, _n))
+#define rawmemchr(_s, _c)          __preserve_const(void *, rawmemchr, _s, (_s, _c))
+#define strcasestr(_h, _n)         __preserve_const(char *, strcasestr, _h, (_h, _n))
+#define strchrnul(_s, _c)          __preserve_const(char *, strchrnul, _s, (_s, _c))
 #endif
 #endif
 

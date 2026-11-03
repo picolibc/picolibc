@@ -47,6 +47,7 @@ nextafterl(long double x, long double y)
     u_int64_t ly;
     GET_LDOUBLE_WORDS64(hy, ly, y);
     iy = hy & 0x7fffffffffffffffLL; /* |y| */
+#define EXCEPT
 #endif
 
     if (((ix >= 0x7fff000000000000LL) && ((ix - 0x7fff000000000000LL) | lx) != 0) || /* x is nan */
@@ -56,7 +57,9 @@ nextafterl(long double x, long double y)
         return y;                                              /* x=y, return y */
     if ((ix | lx) == 0) {                                      /* x == 0 */
         SET_LDOUBLE_WORDS64(x, hy & 0x8000000000000000ULL, 1); /* return +-minsubnormal */
+#ifdef EXCEPT
         force_eval_long_double(opt_barrier_long_double(x) * x);
+#endif
         return x;
     }
     if (hx >= 0) {                                  /* x > 0 */
@@ -80,12 +83,16 @@ nextafterl(long double x, long double y)
                 hx++;
         }
     }
+#ifdef EXCEPT
     ix = hx & 0x7fff000000000000LL;
     if (ix == 0x7fff000000000000LL)
         return __math_oflowl(hy < 0);
+#endif
     SET_LDOUBLE_WORDS64(x, hx, lx);
+#ifdef EXCEPT
     if (ix == 0)
         return __math_denorml(x);
+#endif
     return x;
 }
 

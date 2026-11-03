@@ -90,8 +90,12 @@ static int
 __fmem_flush(FILE *f)
 {
     struct __file_mem *mf = (struct __file_mem *)f;
-    if ((f->flags & __SWR) && mf->pos < mf->bufsize) {
-        mf->buf[mf->pos] = '\0';
+
+    if ((__atomic_exchange_ungetc(&f->unget, 0)) != 0) {
+        if (mf->pos > 0)
+            mf->pos--;
+    }
+    if ((f->flags & __SWR)) {
         if (mf->pos > mf->size) {
             mf->size = mf->pos;
         }
@@ -186,13 +190,13 @@ fmemopen(void *buf, size_t size, const char *mode)
             mflags |= __MAPP;
         } else {
             initial_size = 0;
-            /* w+ mode truncates the buffer, writing NUL */
-            if ((open_flags & O_ACCMODE) == O_RDWR)
-                *((char *)buf) = '\0';
         }
     } else {
         initial_size = size;
     }
+
+    if (open_flags & O_TRUNC)
+        ((char *)buf)[initial_size] = '\0';
 
     *mf = (struct __file_mem) {
         .xfile = FDEV_SETUP_EXT(__fmem_put, __fmem_get, __fmem_flush, __fmem_close, __fmem_seek,

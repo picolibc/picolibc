@@ -87,6 +87,8 @@ foreach file : srcs_posix
     message('libc/posix/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/posix/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/posix/' + file + ': libos overrides generic')
   else
     srcs_posix_use += file
   endif

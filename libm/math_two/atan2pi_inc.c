@@ -38,15 +38,29 @@
 
 #ifdef float_t
 
+static const float_t exacts[] = {
+    float_f(0.25),
+    float_f(0.75),
+    float_f(-0.25),
+    float_f(-0.75),
+};
+
 float_t
 name(atan2pi)(float_t x1, float_t x2)
 {
     float_t y;
 
-    y = name(atan2)(x1, x2);
-    if (isfinite(y)) {
-        ff_t prod = ff_mul_f(name(_inv_pi_ff_), y);
-        y = prod.hi;
+    if (isnan(x1) || isnan(x2))
+        return x1 + x2;
+
+    if (x1 != 0 && name(fabs)(x1) == name(fabs)(x2)) {
+        return exacts[((!!signbit(x1)) << 1) | (!!signbit(x2))];
+    } else {
+        y = name(atan2)(x1, x2);
+        if (isfinite(y) && y != 0) {
+            ff_t prod = ff_mul_f(name(_inv_pi_ff_), y);
+            y = prod.hi;
+        }
     }
     return y;
 }

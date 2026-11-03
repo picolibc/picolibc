@@ -36,10 +36,25 @@
 load "test-narrow.5c"
 load "test-dfma-inc.5c"
 
+test_extra = (test_vector_t[]) {
+    { .a = max_binary32, .b = max_binary80, .c = 0x1p-1000 },
+    { .a = 0x1p-1074, .b = -min_denorm_binary80, .c = -0x1p-1075 },
+    { .a = -0x1p-1074, .b = min_denorm_binary80, .c = 0x1.fffffffffffff8p1023 },
+};
+
 real
 single_round_three(real a, real b, real c)
 {
-	return range64(a * b + c);
+	real p = zero(a) * zero(b);
+
+	/*
+	 * When the product is too small to change c at the working
+	 * precision, replace it with a value of the same sign which is
+	 * still small enough to only act as a sticky bit
+	 */
+	if (p != 0 && c != 0 && exponent(c) - exponent(p) > prec - 256)
+		p = copysign(abs(c) * 2**(256 - prec), p);
+	return range64(p + c);
 }
 
 test_three();

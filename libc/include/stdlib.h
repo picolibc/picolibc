@@ -78,6 +78,12 @@ typedef struct {
 } lldiv_t;
 #endif
 
+#if __ISO_C_VISIBLE >= 2023 && !defined(__cplusplus) && !defined(__once_flag_defined)
+#define __once_flag_defined
+typedef int once_flag;
+#define ONCE_FLAG_INIT 0
+#endif
+
 #ifndef __compar_fn_t_defined
 #define __compar_fn_t_defined
 typedef int (*__compar_fn_t)(const void *, const void *);
@@ -125,7 +131,7 @@ long a64l(const char *__input) __picolibc_export;
 __noreturn void abort(void) __picolibc_export;
 int             abs(int) __picolibc_export;
 #if __ISO_C_VISIBLE >= 2011 || __GNU_VISIBLE
-void               *
+void *
 aligned_alloc(size_t, size_t)
 __malloc_like __alloc_align(1) __alloc_size(2) __warn_unused_result __nothrow __picolibc_export;
 #endif
@@ -152,12 +158,15 @@ long long atoll(const char *__nptr) __picolibc_export;
 void *bsearch(const void *__key, const void *__base, size_t __nmemb, size_t __size,
               __compar_fn_t _compar) __picolibc_export;
 #ifdef __preserve_const
-#define bsearch(__key, __base, __nmemb, __size, __compar)                         \
-    __preserve_const(bsearch, __base, (__key, __base, __nmemb, __size, __compar))
+#define bsearch(__key, __base, __nmemb, __size, __compar)                                 \
+    __preserve_const(void *, bsearch, __base, (__key, __base, __nmemb, __size, __compar))
 #endif
 void *
 calloc(size_t, size_t)
 __malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow __picolibc_export;
+#if __ISO_C_VISIBLE >= 2023 && !defined(__cplusplus)
+void call_once(once_flag *__flag, void (*__func)(void)) __picolibc_export;
+#endif
 div_t div(int __numer, int __denom) __picolibc_export;
 #if __SVID_VISIBLE || __XSI_VISIBLE
 struct _rand48;

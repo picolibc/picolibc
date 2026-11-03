@@ -471,6 +471,19 @@ if have_cplusplus
   cpp_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
 endif
 
+# Disable assert() within the library (by default, unless this is a debug build)
+if get_option('ndebug') == 'auto'
+  ndebug = get_option('buildtype') != 'debug'
+else
+  ndebug = get_option('ndebug') == 'true'
+endif
+if ndebug
+  c_args += ['-DNDEBUG']
+  if have_cplusplus
+    cpp_args += ['-DNDEBUG']
+  endif
+endif
+
 test_flags = []
 # Select a fortify source option
 fortify_source = get_option('fortify-source')
@@ -1599,6 +1612,10 @@ if tmpdir != ''
                 description: 'Directory prefix for temporary file names (P_tmpdir)')
   conf_data.set('__L_tmpnam', tmplen,
                 description: 'Size of the tmpnam() buffer (L_tmpnam)')
+elif host_cpu_family == 'hexagon'
+  # Hexagon semihosting composes the temporary-directory prefix itself.
+  conf_data.set('__L_tmpnam', 256,
+                description: 'Size of the tmpnam() buffer (L_tmpnam)')
 endif
 conf_data.set('__IO_SMALL_ULTOA',
               printf_small_ultoa,
@@ -1791,6 +1808,9 @@ libfallback_var=libfallback_name.underscorify()
 
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
+
+# libc sources supplied by the OS library override generic implementations.
+srcs_libos = []
 
 # make sure to include os BEFORE picocrt!
 

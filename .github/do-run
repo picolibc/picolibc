@@ -22,7 +22,7 @@ esac
 CONFIGURE=do-"$TARGET"-configure
 shift
 git config --global --add safe.directory /picolibc
-DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
+DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE $TOOLCHAINS_FILE"
 
 (cd "$DIR" || exit 2
  date
@@ -59,21 +59,11 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 		     DOCKER_OK=
 		 fi
 	     done
-	     case "$TARGET" in
-		 *hexagon-linux*)
-		     if grep -q check-ci ../scripts/run-hexagon-linux; then
-			 echo "Hexagon linux script has check-ci"
-		     else
-			 echo "Hexagon linux script missing check-ci"
-			 DOCKER_OK=
-		     fi
-		     ;;
-	     esac
-	     if [ -f ../scripts/check-ci -a -n "$DOCKER_OK" ]; then
-		 echo 'docker files and check-ci script ok, doing incremental tests'
+	     if [ -n "$DOCKER_OK" ]; then
+		 echo 'docker files ok, doing incremental tests'
 		 INC_TESTS=yes
 	     else
-		 echo 'Docker files or check-ci script not ok'
+		 echo 'Docker files not ok'
 		 date
 		 echo '##########' git checkout $AFTER_SHA
 		 if git checkout $AFTER_SHA > checkout-restore.log 2>&1; then
@@ -96,23 +86,15 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 	     ;;
      esac
  fi
- TEST_WRAPPER=
- if grep -q 'Cross files' meson-logs/meson-setup.txt; then
-     echo 'Cross build, no wrapper'
- else
-     TEST_WRAPPER="--wrapper $PWD/../scripts/run-native"
- fi
  if [ -n "$INC_TESTS" ]; then
      date
      echo '########## incremental' "$TARGET" 'ninja'
      ninja > incremental.log 2>&1
      case $? in
 	 0)
-	     INC_TEST_ARGS="$TEST_WRAPPER --no-suite headers --no-suite ctype-diff -t 20"
 	     date
-	     echo '########## incremental' "$TARGET" "CI_CAPTURE=yes meson $INC_TEST_ARGS test"
-	     CI_CAPTURE=yes meson test $INC_TEST_ARGS > capture.log 2>&1 || exit 5
-	     date
+	     echo '########## incremental' "$TARGET" "meson test --hash-record"
+	     meson test --hash-record > capture.log 2>&1 || exit 5
 	     ;;
 	 *)
 	     echo '##########' incremental build failed
@@ -120,6 +102,7 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
 	     INC_TESTS=""
 	     ;;
      esac
+     date
      echo '########## incremental' "$TARGET" "git checkout $AFTER_SHA"
      if git checkout "$AFTER_SHA" > checkout-after.log 2>&1; then
 	 :
@@ -132,9 +115,13 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE"
  date
  echo '##########' "$TARGET" ninja
  ninja > ninja.log 2>&1 || exit 6
+ TEST_ARGS="-t 20"
+ if [ -n "$INC_TESTS" ]; then
+     TEST_ARGS="--hash-changed $TEST_ARGS"
+ fi
  date
- echo '##########' "$TARGET" "meson test $TEST_WRAPPER -t 20"
- meson test $TEST_WRAPPER -t 20 > test.log 2>&1 || exit 7
+ echo '##########' "$TARGET" "meson test $TEST_ARGS"
+ meson test $TEST_ARGS > test.log 2>&1 || exit 7
  date
  echo 'Test succeeded'
 )
@@ -178,15 +165,11 @@ case $? in
 	;;
     5)
 	echo '##################################'
-	echo '############# Incremental Capture failed'
+	echo '############# Incremental hash record failed'
 	echo '##################################'
 	echo 'capture.log'
 	echo '##################################'
 	cat "$DIR"/capture.log
-	echo '##################################'
-	echo 'meson-logs/testlog.txt'
-	echo '##################################'
-	cat "$DIR"/meson-logs/testlog.txt
 	exit 1
 	;;
     6)

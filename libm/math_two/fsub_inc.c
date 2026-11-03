@@ -41,7 +41,27 @@
 float
 name(fsub)(float_t x, float_t y)
 {
-    return (float)round_odd_ff(f_add_f(x, -y));
+    /*
+     * Compute the exact result in round to nearest mode and round it
+     * to odd, which doesn't depend on the rounding mode. The barriers
+     * keep the compiler from moving the computation across the
+     * rounding mode changes.
+     */
+    FENV_SAVE;
+    float_t r = name(force_eval)(round_odd_ff(f_add_f(name(force_eval)(x), -y)));
+    FENV_RESTORE;
+
+    /*
+     * When the result overflowed or underflowed the wider type, the
+     * narrow result depends only on the sign and rounding mode. The
+     * barriers keep the compiler from moving the remaining computation
+     * before the rounding mode is restored.
+     */
+    if (!isnormal(r))
+        return narrow_to_float(name(force_eval)(x) - y);
+
+    /* Round once more in the caller's mode */
+    return narrow_to_float(name(force_eval)(r));
 }
 
 #endif

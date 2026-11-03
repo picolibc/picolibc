@@ -68,7 +68,7 @@ tests_real_exp = [
   'test-exp2m1',
   'test-log',
   'test-log10',
-  'test-log1p',
+  'test-logp1',
   'test-log10p1',
   'test-log2p1',
   'test-log2',
@@ -106,6 +106,9 @@ tests_real_other = [
   'test-j0',
   'test-j1',
   'test-jn',
+  'test-y0',
+  'test-y1',
+  'test-yn',
   'test-lgamma',
   'test-nextafter',
   'test-nextdown',
@@ -157,6 +160,7 @@ tests_other = [
   'test-long-double',
   'test-math-errhandling',
   'test-math-funcs',
+  'test-narrow-fenv',
   'test-rounding-mode',
   'test-scalbn',
   ]
@@ -169,8 +173,8 @@ functions = [ 'acos', 'acosh', 'acospi', 'asin', 'asinh', 'asinpi',
               'atan', 'atanh', 'atanpi', 'cbrt', 'ceil', 'cos',
               'cosh', 'cospi', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
               'expm1', 'exp10m1', 'exp2m1', 'floor', 'j0', 'j1',
-              'lgamma', 'log', 'log10', 'log1p', 'log2', 'log10p1',
-              'log2p1', 'round', 'roundeven', 'sin', 'sinpi',
+              'lgamma', 'log', 'log10', 'logp1', 'log2', 'log10p1',
+              'log2p1', 'round', 'roundeven', 'rsqrt', 'sin', 'sinpi',
               'sincos_cos', 'sincos_sin', 'sinh', 'sqrt', 'tan',
               'tanh', 'tanpi', 'tgamma', 'y0', 'y1', ]
 
@@ -182,6 +186,7 @@ test_extra_src = {
 
 test_extra_c_args = {
   'test-math-errhandling': arg_fnobuiltin,
+  'test-narrow-fenv': arg_fnobuiltin,
   'test-rounding-mode': arg_fnobuiltin
 }
 

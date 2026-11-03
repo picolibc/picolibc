@@ -109,8 +109,8 @@ if(NOT DEFINED ENABLE_MALLOC)
   option(ENABLE_MALLOC "provide malloc family of functions based on sbrk" ON)
 endif()
 
-if(NOT DEFINED MALLOC_SMALL_BUCKET)
-  option(MALLOC_SMALL_BUCKET "use fixed bucket sizes for allocations no larger than this" 0)
+if(NOT DEFINED __MALLOC_SMALL_BUCKET)
+  set(__MALLOC_SMALL_BUCKET 0 CACHE STRING "use fixed bucket sizes for allocations no larger than this")
 endif()
 
 if(NOT DEFINED __PICOLIBC_EXPORT)
@@ -150,6 +150,9 @@ picolibc_flag(__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
 
 # Compiler supports _Complex
 picolibc_flag(__HAVE_COMPLEX)
+
+# Compiler supports __builtin_complex
+picolibc_flag(__HAVE_BUILTIN_COMPLEX)
 
 set(__HAVE_FCNTL 0)
 
@@ -275,15 +278,21 @@ set(_WANT_REGISTER_FINI OFF)
 
 set(__WIDE_ORIENT OFF)
 
-if(NOT DEFINED __ELIX_LEVEL)
-  set(__ELIX_LEVEL 4)
-endif()
+# Use old math code (auto chooses based on platform, as with meson)
+set(__OBSOLETE_MATH auto CACHE STRING "Use old math code (auto, true, false)")
+set(__OBSOLETE_MATH_FLOAT auto CACHE STRING "Use old math code for float funcs (auto, true, false)")
+set(__OBSOLETE_MATH_DOUBLE auto CACHE STRING "Use old math code for double funcs (auto, true, false)")
 
-# Use old math code for double funcs (0 no, 1 yes)
-set(__OBSOLETE_MATH_FLOAT ON)
-
-# Use old math code for double funcs (0 no, 1 yes)
-set(__OBSOLETE_MATH_DOUBLE ON)
+# Leave auto undefined so math_config.h chooses, otherwise define 0 or 1
+foreach(var __OBSOLETE_MATH __OBSOLETE_MATH_FLOAT __OBSOLETE_MATH_DOUBLE)
+  if("${${var}}" STREQUAL "auto")
+    set(${var}_DEFINE "/* #undef ${var} */")
+  elseif(${var})
+    set(${var}_DEFINE "#define ${var} 1")
+  else()
+    set(${var}_DEFINE "#define ${var} 0")
+  endif()
+endforeach()
 
 # Compute static memory area sizes at runtime instead of link time
 set(__PICOCRT_RUNTIME_SIZE OFF)
@@ -337,6 +346,8 @@ configure_file(picolibc.specs.in "${PROJECT_BINARY_DIR}/picolibc.specs" @ONLY)
 set(PICOLIBC_COMPILE_OPTIONS
   "-nostdlib"
   "-D_LIBC"
+  "-U_FORTIFY_SOURCE"
+  "-g"
   ${TLSMODEL}
   ${TARGET_COMPILE_OPTIONS}
   ${PICOLIBC_EXTRA_COMPILE_OPTIONS}
@@ -353,10 +364,11 @@ foreach(c_option "${PICOLIBC_COMPILE_OPTIONS}")
 endforeach()
 
 picolibc_supported_compile_options(
+  "-std=c18"
   "-fno-common"
   "-fno-stack-protector"
+  "-mstack-protector-guard=global"
   "-ffunction-sections"
-  "-fdata-sections"
   "-Wall"
   "-Wextra"
   "-Werror=implicit-function-declaration"
@@ -364,7 +376,10 @@ picolibc_supported_compile_options(
   "-Warray-bounds"
   "-Wold-style-definition"
   "-frounding-math"
+  "-ftrapping-math"
   "-fsignaling-nans"
+  "-fstrict-flex-arrays=3"
+  "-fno-builtin-copysignl"
   )
 
 add_library(c STATIC)

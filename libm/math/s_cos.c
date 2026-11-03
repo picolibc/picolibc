@@ -55,8 +55,12 @@ cos64(__float64 x)
     /* High word of x. */
     GET_HIGH_WORD(ix, x);
 
-    /* |x| ~< pi/4 */
     ix &= 0x7fffffff;
+
+    /* Make sure cos(-x) is the same as cos(x) under up/down rounding */
+    SET_HIGH_WORD(x, ix);
+
+    /* |x| ~< pi/4 */
     if (ix <= 0x3fe921fb)
         return __kernel_cos(x, z);
 

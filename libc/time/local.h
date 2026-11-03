@@ -22,13 +22,13 @@
 #define EPOCH_YEARS_SINCE_LEAP_CENTURY 370
 
 typedef struct {
-    char   ch;
-    int    m; /* Month of year if ch=M */
-    int    n; /* Week of month if ch=M */
-    int    d; /* Day of week if ch=M, day of year if ch=J or ch=D */
-    int    s; /* Time of day in seconds */
-    time_t change;
-    long   offset; /* Match type of _timezone. */
+    char    ch;
+    int8_t  m; /* Month of year if ch=M */
+    int8_t  n; /* Week of month if ch=M */
+    int16_t d; /* Day of week if ch=M, day of year if ch=J or ch=D */
+    int32_t s; /* Time of day in seconds */
+    time_t  change;
+    int32_t offset; /* Seconds west of UTC, as in timezone */
 } tzrule_t;
 
 typedef struct {

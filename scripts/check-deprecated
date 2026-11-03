@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -34,17 +34,38 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-elf="$1"
+# Check whether compiling a source file draws a deprecation warning
+#
+# usage: check-deprecated deprecated|not-deprecated <source> <compiler> [args...]
+#
+# Compiles <source> with -fsyntax-only -Werror=deprecated-declarations.
+# With 'deprecated', succeed only if the compiler reports a deprecated
+# declaration; with 'not-deprecated', succeed only if it compiles
+# cleanly.
 
-if [ -n "$CI_CAPTURE" ]; then
-    echo "$eif" "capture test checksum"
-    md5sum "$elf" > "$elf".md5
-    exit 0
-fi
+expect="$1"
+source="$2"
+shift 2
 
-if [ -f "$elf".md5 ] && md5sum --check --status "$elf".md5; then
-    echo "$elf" "skipping unchanged test"
-    exit 0
-fi
+output=$("$@" -fsyntax-only -Werror=deprecated-declarations "$source" 2>&1)
+status=$?
 
+case "$expect" in
+    deprecated)
+        if [ $status -ne 0 ] && echo "$output" | grep -q deprecated; then
+            exit 0
+        fi
+        echo "expected deprecation warnings from $source"
+        ;;
+    not-deprecated)
+        if [ $status -eq 0 ]; then
+            exit 0
+        fi
+        echo "unexpected errors from $source"
+        ;;
+    *)
+        echo "usage: $0 deprecated|not-deprecated <source> <compiler> [args...]"
+        ;;
+esac
+echo "$output"
 exit 1

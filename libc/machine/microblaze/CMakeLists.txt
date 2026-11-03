@@ -38,7 +38,7 @@ picolibc_sources_flags("-fno-builtin"
   abort.c
   longjmp.S
   setjmp.S
-  strcmp.S
+  strcmp.c
   strcpy.c
   strlen.c
   )

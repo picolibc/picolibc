@@ -49,6 +49,8 @@ foreach file : srcs_uchar
     message('libc/uchar/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/uchar/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/uchar/' + file + ': libos overrides generic')
   else
     srcs_uchar_use += file
   endif

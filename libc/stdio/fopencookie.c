@@ -77,10 +77,25 @@ fopencookie_seek(void *ptr, off_t offset, int whence)
     if (!pf->io.seek)
         return (off_t)-1;
 
+#ifdef __lm32__
+    /*
+     * Work around lm32 gcc 14.2 placing address-taken parameters in
+     * misaligned stack slots by passing an aligned local instead.
+     * Remove once picolibc CI uses the fixed compiler from
+     * picolibc-ci-tools v19.
+     */
+    {
+        off_t lm32_offset = offset;
+        if (pf->io.seek(pf->cookie, &lm32_offset, whence) == -1)
+            return (off_t)-1;
+        return lm32_offset;
+    }
+#else
     if (pf->io.seek(pf->cookie, &offset, whence) == -1)
         return (off_t)-1;
 
     return offset;
+#endif
 }
 
 static int

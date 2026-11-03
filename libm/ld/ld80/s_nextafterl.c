@@ -51,6 +51,7 @@ nextafterl(long double x, long double y)
     int32_t   esy;
     GET_LDOUBLE_WORDS(esy, hy, ly, y);
     iy = esy & 0x7fff; /* |y| */
+#define EXCEPT
 #endif
 
     if (((ix == 0x7fff) && (((hx & 0x7fffffff) | lx) != 0)) || /* x is nan */
@@ -60,7 +61,9 @@ nextafterl(long double x, long double y)
         return y;              /* x=y, return y */
     if ((ix | hx | lx) == 0) { /* x == 0 */
         SET_LDOUBLE_WORDS(x, (int16_t)(esy & 0x8000), hx, 1);
+#ifdef EXCEPT
         force_eval_long_double(opt_barrier_long_double(x) * x);
+#endif
         return x;
     }
 #if LDBL_NBIT_INF == 0
@@ -113,12 +116,16 @@ nextafterl(long double x, long double y)
             }
         }
     }
+#ifdef EXCEPT
     ix = esx & 0x7fff;
     if (ix == 0x7fff)
         return __math_oflowl(esx < 0); /* overflow  */
+#endif
     SET_LDOUBLE_WORDS(x, esx, hx, lx);
+#ifdef EXCEPT
     if (ix == 0)
         return __math_denorml(x);
+#endif
     return x;
 }
 

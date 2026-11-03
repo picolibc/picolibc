@@ -36,6 +36,10 @@
 load "test-narrow.5c"
 load "test-fsqrt-inc.5c"
 
+test_extra = (test_vector_t[]) {
+    { .a = max_binary80, .b = 0, .c = 0 },
+};
+
 specials = (special_t[]) {
 	{ .x1 = "-0.0", .y = "-0.0" },
 };

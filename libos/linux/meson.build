@@ -60,6 +60,9 @@ if fs.is_dir(machine_dir)
     'chdir.c',
     'chmod.c',
     'clock_gettime.c',
+    'clock_getres.c',
+    'clock_nanosleep.c',
+    'clock_settime.c',
     'close.c',
     'closedir.c',
     'dup.c',
@@ -164,6 +167,8 @@ if fs.is_dir(machine_dir)
   subdir(machine_dir)
 
   src_os_linux = files(srcs_os_linux) + src_os_linux_machine
+
+  srcs_libos += srcs_os_linux
 
   linux_inc = include_directories(machine_dir, 'include')
 

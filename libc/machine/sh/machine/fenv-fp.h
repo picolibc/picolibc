@@ -113,8 +113,14 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
 
 __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
 {
+    fenv_t __env;
 
-    _sh_set_fpscr(*envp);
+#define _SH_FP_STATE ((FE_ALL_EXCEPT << _SH_FPU_MASK_SHIFT) | FE_ALL_EXCEPT | _SH_FPU_ROUND_MASK)
+
+    _sh_get_fpscr(__env);
+    __env = __env & ~(_SH_FP_STATE);
+    __env |= *envp & (_SH_FP_STATE);
+    _sh_set_fpscr(__env);
     return (0);
 }
 

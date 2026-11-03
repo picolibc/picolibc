@@ -115,6 +115,10 @@ picolibc_sources(
   fdiv_64.c
   fdiv_80.c
   fdiv_128.c
+  fma_32.c
+  fma_64.c
+  fma_80.c
+  fma_128.c
   fmaximum_32.c
   fmaximum_64.c
   fmaximum_80.c

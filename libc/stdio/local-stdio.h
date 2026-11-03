@@ -194,6 +194,7 @@ bufio_lseek(struct __file_bufio *bf, __off_t offset, int whence)
         if (bf->lseek_ptr)
             return (bf->lseek_ptr)((void *)bf->ptr, offset, whence);
     }
+    errno = ESPIPE;
     return _FDEV_ERR;
 }
 
@@ -278,13 +279,15 @@ void _bufio_exit_flush(void) __weak;
 
 #ifdef __STDIO_LOCKING
 void __flockfile_init(FILE *f);
-#define __LOCK_NONE             ((_LOCK_RECURSIVE_T)(uintptr_t)1)
-#define __LOCK_INIT_NONE        .lock = __LOCK_NONE
-#define __stdio_acquire_file(f) __acquire_capability((f)->lock)
-#define __stdio_release_file(f) __release_capability((f)->lock)
+#define __LOCK_NONE                    ((_LOCK_RECURSIVE_T)(uintptr_t)1)
+#define __LOCK_INIT_NONE               .lock = __LOCK_NONE
+#define __stdio_acquire_file(f)        __acquire_capability((f)->lock)
+#define __stdio_try_acquire_file(r, f) __try_acquire_capability(r, (f)->lock)
+#define __stdio_release_file(f)        __release_capability((f)->lock)
 #else
 #define __LOCK_INIT_NONE
 #define __stdio_acquire_file(f)
+#define __stdio_try_acquire_file(r, f)
 #define __stdio_release_file(f)
 #endif
 
@@ -316,16 +319,18 @@ __funlockfile(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 #endif
 }
 
-static inline void
+static inline int
 __flockfile_close(FILE *f) __stdio_release_file(f) __no_thread_safety_analysis
 {
+    int ret = 0;
     (void)f;
 #ifdef __STDIO_LOCKING
     if (f->lock && f->lock != __LOCK_NONE) {
-        fflush(f);
+        ret = fflush(f);
         __lock_close(f->lock);
     }
 #endif
+    return ret;
 }
 
 /* Silence santizer errors when adding/subtracting 0 to a NULL pointer */
@@ -852,11 +857,15 @@ void       __picolibc_non_atomic_store_ungetc(__ungetc_t *p, __ungetc_t v);
 static inline int
 __fflush_locked(FILE *stream)
 {
-    int ret = 0;
-    if (stream->flush)
-        ret = (stream->flush)(stream);
+    if (stream->flush) {
+        if ((stream->flush)(stream) < 0) {
+            stream->flags |= __SERR;
+            return EOF;
+        }
+        return 0;
+    }
     __atomic_store_ungetc(&stream->unget, 0);
-    return ret;
+    return 0;
 }
 
 /*
