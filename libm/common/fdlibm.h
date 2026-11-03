@@ -298,7 +298,7 @@ typedef union {
  *  -mfloat128-hardware -mvsx -mcpu=power9 -Wno-psabi
  */
 #ifdef __POWER9_VECTOR__
-#define GET_FLOAT_WORD(i, d) force_evalf((i) = asuint(d))
+#define GET_FLOAT_WORD(i, d) ((i) = asuint(force_evalf(d)))
 #else
 #define GET_FLOAT_WORD(i, d) ((i) = asuint(d))
 #endif
