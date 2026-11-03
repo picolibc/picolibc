@@ -21,6 +21,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define _ISOC23_SOURCE
 #include "math_config.h"
 
 // This is only necessary because the implementation of isnan only works
