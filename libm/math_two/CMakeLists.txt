@@ -163,6 +163,8 @@ picolibc_sources(
   fsqrt_64.c
   fsqrt_80.c
   fsqrt_128.c
+  sqrt_80.c
+  sqrt_128.c
   ffma_32.c
   ffma_64.c
   ffma_80.c
