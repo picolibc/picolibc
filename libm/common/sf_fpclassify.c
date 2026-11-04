@@ -11,14 +11,13 @@
 int
 __fpclassifyf(float x)
 {
-    /* volatile prevents Clang from replacing the integer comparisons with
-       sfcmp on Hexagon, which would raise FE_INVALID for signaling NaN.  */
-#ifdef __hexagon__
-    volatile __uint32_t w;
-#else
     __uint32_t w;
-#endif
+
     GET_FLOAT_WORD(w, x);
+    /* Keep Clang from replacing the integer comparisons with
+       floating point ones (sfcmp on Hexagon), which would raise
+       FE_INVALID for signaling NaN.  */
+    w = opt_barrier_int(w);
 
     if (w == 0x00000000 || w == 0x80000000)
         return FP_ZERO;
