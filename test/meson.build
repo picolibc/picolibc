@@ -157,6 +157,27 @@ if cc.has_argument('-std=c23') and cc.has_function_attribute('deprecated')
        suite: 'headers')
 endif
 
+# C++ code may use names which the C headers define as macros: check
+# that the macros in cplusplus-hidden-macros.txt aren't defined in any
+# C++ version the compiler supports
+if have_cplusplus
+  check_cplusplus_macros = find_program(meson.project_source_root() / 'scripts' / 'check-cplusplus-macros')
+  cplusplus_hidden_macros = meson.current_source_dir() / 'cplusplus-hidden-macros.txt'
+  cplusplus_macros_src = meson.current_source_dir() / 'test-math-cplusplus.cpp'
+  cplusplus_macros_cmd = cpp.cmd_array() + test_cpp_args + inc_args
+
+  foreach std : ['c++98', 'gnu++98', 'c++11', 'gnu++11', 'c++17', 'gnu++17',
+                 'c++20', 'gnu++20', 'c++23', 'gnu++23', 'c++26', 'gnu++26']
+    if cpp.has_argument('-std=' + std)
+      test('test-cplusplus-macros-' + std,
+           check_cplusplus_macros,
+           args: [cplusplus_hidden_macros, cplusplus_macros_src] + cplusplus_macros_cmd
+                 + ['-std=' + std],
+           suite: 'headers')
+    endif
+  endforeach
+endif
+
 test_skip_native = [
   'test-stack-smash',
   'test-thread-safety',

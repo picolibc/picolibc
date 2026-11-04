@@ -236,7 +236,8 @@ int __issignalingl(long double __x) __picolibc_export;
 #define __iszero(__x)      (fpclassify(__x) == FP_ZERO)
 #endif
 
-#if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+/* C23 classification macros are C-only: C++ code may use these names as identifiers */
+#if (__MISC_VISIBLE || __ISO_C_VISIBLE >= 2023) && !defined(__cplusplus)
 #define issubnormal(__x) __issubnormal(__x)
 #define iszero(__x)      __iszero(__x)
 #ifndef issignaling
@@ -251,7 +252,7 @@ int __issignalingl(long double __x) __picolibc_export;
 #define signbit(__x) __float_generic(__signbit, __x)
 #endif
 
-#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+#if (__GNU_VISIBLE || __ISO_C_VISIBLE >= 2023) && !defined(__cplusplus)
 #ifdef __LONG_DOUBLE_NON_CANONICAL
 int __iscanonicall(long double __x) __picolibc_export;
 #define iscanonical(__x)                                                                        \
@@ -262,7 +263,7 @@ int __iscanonicall(long double __x) __picolibc_export;
 #endif
 
 /* picolibc extensions */
-#if __MISC_VISIBLE
+#if __MISC_VISIBLE && !defined(__cplusplus)
 #define isfinitef(x) isfinite((float)(x))
 #define isinff(x)    isinf((float)(x))
 #define isnanf(x)    isnan((float)(x))
@@ -331,7 +332,7 @@ int __iseqsigf(float __x, float __y) __picolibc_export;
 int __iseqsigl(long double __x, long double __y) __picolibc_export;
 #endif
 
-#if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+#if (__MISC_VISIBLE || __ISO_C_VISIBLE >= 2023) && !defined(__cplusplus)
 #ifdef __HAVE_LONG_DOUBLE
 #define iseqsig(__x, __y)                                                \
     ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y)) \
