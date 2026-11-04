@@ -58,7 +58,7 @@ nextafterl(long double x, long double y)
     if ((ix | lx) == 0) {                                      /* x == 0 */
         SET_LDOUBLE_WORDS64(x, hy & 0x8000000000000000ULL, 1); /* return +-minsubnormal */
 #ifdef EXCEPT
-        force_eval_long_double(opt_barrier_long_double(x) * x);
+        force_eval_long_double(opt_barrier_float(x) * x);
 #endif
         return x;
     }

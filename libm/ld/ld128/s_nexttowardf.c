@@ -25,7 +25,7 @@ nexttowardf(float x, long double y)
     iy = hy & 0x7fffffffffffffffLL; /* |y| */
 
     if (ix > 0x7f800000) { /* x is nan */
-        force_eval_long_double(opt_barrier_long_double(y) + y);
+        force_eval_long_double(opt_barrier_float(y) + y);
         return x + x;
     }
     if ((iy >= 0x7fff000000000000LL) && ((iy - 0x7fff000000000000LL) | ly) != 0) { /* y is nan */

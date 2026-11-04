@@ -184,7 +184,7 @@ specialcase(double_t tmp, uint64_t sbits, uint64_t ki)
         if (y == 0.0)
             y = asfloat64(sbits & 0x8000000000000000);
         /* The underflow exception needs to be signaled explicitly.  */
-        force_eval_double(opt_barrier_double(0x1p-1022) * 0x1p-1022);
+        force_eval_double(opt_barrier_float(0x1p-1022) * 0x1p-1022);
     }
     y = 0x1p-1022 * y;
     return check_uflow(y);
@@ -338,7 +338,7 @@ pow(double x, double y)
                 return __math_divzero(sign_bias);
             /* Without the barrier some versions of clang hoist the 1/x2 and
                thus division by zero exception can be signaled spuriously.  */
-            return iy >> 63 ? opt_barrier_double(1 / x2) : x2;
+            return iy >> 63 ? opt_barrier_float(1 / x2) : x2;
         }
         /* Here x and y are non-zero finite.  */
         if (ix >> 63) {

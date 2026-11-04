@@ -118,7 +118,7 @@ rint64(__float64 x)
          * conditional move instead of a branch for the if
          */
         if (j0 == 0x400)
-            return opt_barrier_double(x + x);
+            return opt_barrier_float(x + x);
         return x;
     } else {
         i = ((__uint32_t)(0xffffffff)) >> (j0 - 20);

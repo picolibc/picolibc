@@ -298,7 +298,17 @@ typedef union {
  *  -mfloat128-hardware -mvsx -mcpu=power9 -Wno-psabi
  */
 #ifdef __POWER9_VECTOR__
-#define GET_FLOAT_WORD(i, d) ((i) = asuint(force_evalf(d)))
+/*
+ * The workaround needs the value to pass through memory; a register
+ * barrier isn't enough to avoid the miscompile.
+ */
+static __always_inline uint32_t
+__get_float_word_mem(float d)
+{
+    volatile float __v = d;
+    return asuint(__v);
+}
+#define GET_FLOAT_WORD(i, d) ((i) = __get_float_word_mem(d))
 #else
 #define GET_FLOAT_WORD(i, d) ((i) = asuint(d))
 #endif
