@@ -760,7 +760,7 @@ use Picolibc:
    printf at friends. This is useful on targets without hardware
    divide as it avoids pulling in a (usually large) software
    implementation. This is controlled with the 'printf-small-ultoa'
-   meson option and is 'false' by default.
+   meson option and is 'true' by default.
 
  * Add 'minimal' printf and scanf variants. These reduce functionality
    by removing code that acts on most data modifiers including width
