@@ -77,10 +77,10 @@ static const __float64 TWO52[2] = {
 __float64
 rint64(__float64 x)
 {
-    __int32_t          i0, j0, sx;
-    __uint32_t         i, i1;
-    __float64          t;
-    volatile __float64 w;
+    __int32_t  i0, j0, sx;
+    __uint32_t i, i1;
+    __float64  t;
+    __float64  w;
     EXTRACT_WORDS(i0, i1, x);
     sx = (i0 >> 31) & 1;               /* sign */
     j0 = ((i0 >> 20) & 0x7ff) - 0x3ff; /* exponent */
@@ -92,7 +92,7 @@ rint64(__float64 x)
             i0 &= 0xfffe0000;
             i0 |= ((i1 | -i1) >> 12) & 0x80000;
             SET_HIGH_WORD(x, i0);
-            w = TWO52[sx] + x;
+            w = barrier_float(TWO52[sx] + x);
             t = w - TWO52[sx];
             GET_HIGH_WORD(i0, t);
             SET_HIGH_WORD(t, (i0 & 0x7fffffff) | lsl(sx, 31));
@@ -129,7 +129,7 @@ rint64(__float64 x)
             i1 = (i1 & (~i)) | ((0x40000000) >> (j0 - 20));
     }
     INSERT_WORDS(x, i0, i1);
-    w = TWO52[sx] + x;
+    w = barrier_float(TWO52[sx] + x);
     return w - TWO52[sx];
 }
 
