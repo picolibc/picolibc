@@ -45,17 +45,17 @@ NAME_SB(stdbit_t value)
     return __builtin_stdc_leading_zeros(value);
 #elif __has_builtin(__builtin_clzg)
     return (unsigned int)__builtin_clzg(value, WANT_SIZE);
-#elif __has_builtin(__builtin_clz) && WANT_SIZE == INT_WIDTH
+#elif __has_builtin(__builtin_clz) && WANT_SIZE == __INT_WIDTH__
     if (value == 0)
         return WANT_SIZE;
 
     return __builtin_clz(value);
-#elif __has_builtin(__builtin_clzl) && WANT_SIZE == LONG_WIDTH
+#elif __has_builtin(__builtin_clzl) && WANT_SIZE == __LONG_WIDTH__
     if (value == 0)
         return WANT_SIZE;
 
     return __builtin_clzl(value);
-#elif __has_builtin(__builtin_clzll) && WANT_SIZE == LLONG_WIDTH
+#elif __has_builtin(__builtin_clzll) && WANT_SIZE == __LONG_LONG_WIDTH__
     if (value == 0)
         return WANT_SIZE;
 
@@ -77,7 +77,7 @@ NAME_SB(stdbit_t value)
             ret -= i;
         }
     }
-    return ret - value;
+    return ret - (int)value;
 #endif
 }
 
