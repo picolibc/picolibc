@@ -246,7 +246,8 @@ int __issignalingl(long double __x) __picolibc_export;
 #define __iszero(__x)      (fpclassify(__x) == FP_ZERO)
 #endif
 
-#if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+/* C23 classification macros are C-only: C++ code may use these names as identifiers */
+#if (__MISC_VISIBLE || __ISO_C_VISIBLE >= 2023) && !defined(__cplusplus)
 #define issubnormal(__x) __issubnormal(__x)
 #define iszero(__x)      __iszero(__x)
 #ifndef issignaling
@@ -261,7 +262,7 @@ int __issignalingl(long double __x) __picolibc_export;
 #define signbit(__x) __float_generic(__signbit, __x)
 #endif
 
-#if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
+#if (__GNU_VISIBLE || __ISO_C_VISIBLE >= 2023) && !defined(__cplusplus)
 #ifdef __LONG_DOUBLE_NON_CANONICAL
 int __iscanonicall(long double __x) __picolibc_export;
 #define iscanonical(__x)                                                                        \
@@ -272,7 +273,7 @@ int __iscanonicall(long double __x) __picolibc_export;
 #endif
 
 /* picolibc extensions */
-#if __MISC_VISIBLE
+#if __MISC_VISIBLE && !defined(__cplusplus)
 #define isfinitef(x) isfinite((float)(x))
 #define isinff(x)    isinf((float)(x))
 #define isnanf(x)    isnan((float)(x))
@@ -341,7 +342,7 @@ int __iseqsigf(float __x, float __y) __picolibc_export;
 int __iseqsigl(long double __x, long double __y) __picolibc_export;
 #endif
 
-#if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+#if (__MISC_VISIBLE || __ISO_C_VISIBLE >= 2023) && !defined(__cplusplus)
 #ifdef __HAVE_LONG_DOUBLE
 #define iseqsig(__x, __y)                                                \
     ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y)) \
@@ -801,7 +802,7 @@ int         setpayloadsigl(long double *__res, long double __pl) __picolibc_expo
  */
 
 /* GNU */
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE && !defined(__cplusplus)
 void   sincos(double __x, double *__sinx, double *__cosx) __picolibc_export;
 double pow10(double __x) __picolibc_export;
 void   sincosf(float __x, float *__sinx, float *__cosx) __picolibc_export;
@@ -825,7 +826,7 @@ double y0(double __x) __picolibc_export;
 double y1(double __x) __picolibc_export;
 double yn(int __n, double __x) __picolibc_export;
 #endif
-#if __MISC_VISIBLE || __XSI_VISIBLE >= 600
+#if (__MISC_VISIBLE || __XSI_VISIBLE >= 600) && !defined(__cplusplus)
 float j0f(float __x) __picolibc_export;
 float j1f(float __x) __picolibc_export;
 float jnf(int __n, float __x) __picolibc_export;
@@ -833,7 +834,7 @@ float y0f(float __x) __picolibc_export;
 float y1f(float __x) __picolibc_export;
 float ynf(int __n, float __x) __picolibc_export;
 #endif
-#if __MISC_VISIBLE && defined(__HAVE_LONG_DOUBLE)
+#if __MISC_VISIBLE && defined(__HAVE_LONG_DOUBLE) && !defined(__cplusplus)
 long double j0l(long double __x) __picolibc_export;
 long double j1l(long double __x) __picolibc_export;
 long double jnl(int __n, long double __x) __picolibc_export;
@@ -846,7 +847,7 @@ long double ynl(int __n, long double __x) __picolibc_export;
  * Legacy BSD and SVID functions. The classification functions share
  * their names with macros, so the names are in parentheses.
  */
-#if __MISC_VISIBLE
+#if __MISC_VISIBLE && !defined(__cplusplus)
 int finite(double __x) __picolibc_export;
 int finitef(float __x) __picolibc_export;
 int(isinff)(float __x) __picolibc_export;
@@ -878,7 +879,7 @@ long double significandl(long double __x) __picolibc_export;
 #endif
 #endif /* __MISC_VISIBLE */
 
-#if __MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 700)
+#if (__MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 700)) && !defined(__cplusplus)
 double scalb(double __x, double __n) __picolibc_export;
 float  scalbf(float __x, float __n) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE
@@ -886,8 +887,7 @@ long double scalbl(long double __x, long double __n) __picolibc_export;
 #endif
 #endif
 
-#if (__MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 600)) \
-    && (!defined(__cplusplus) || __cplusplus < 201103L)
+#if (__MISC_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 600)) && !defined(__cplusplus)
 int(isnan)(double __x) __picolibc_export;
 #endif
 
@@ -895,7 +895,9 @@ int(isnan)(double __x) __picolibc_export;
 
 #if __BSD_VISIBLE || __XSI_VISIBLE
 
-#define MAXFLOAT   3.40282347e+38F
+#if !defined(__cplusplus)
+#define MAXFLOAT 3.40282347e+38F
+#endif
 
 #define M_E        2.7182818284590452354
 #define _M_E_L     2.718281828459045235360287471352662498L
@@ -927,16 +929,20 @@ int(isnan)(double __x) __picolibc_export;
 
 #if __BSD_VISIBLE
 
-#define M_TWOPI    (M_PI * 2.0)
-#define M_3PI_4    2.3561944901923448370E0
-#define M_SQRTPI   1.77245385090551602792981
-#define M_LN2LO    1.9082149292705877000E-10
-#define M_LN2HI    6.9314718036912381649E-1
-#define M_SQRT3    1.73205080756887719000
+#if !defined(__cplusplus)
+#define M_TWOPI  (M_PI * 2.0)
+#define M_3PI_4  2.3561944901923448370E0
+#define M_SQRTPI 1.77245385090551602792981
+#define M_LN2LO  1.9082149292705877000E-10
+#define M_LN2HI  6.9314718036912381649E-1
+#endif
+#define M_SQRT3 1.73205080756887719000
+#if !defined(__cplusplus)
 #define M_IVLN10   0.43429448190325182765 /* 1 / log(10) */
 #define _M_IVLN10L 0.43429448190325182765112891891660508229439700580366656611445378316586464920887L
 #define M_LOG2_E   _M_LN2
 #define M_INVLN2   1.4426950408889633870E0 /* 1 / log(2) */
+#endif
 
 #endif /* __BSD_VISIBLE */
 

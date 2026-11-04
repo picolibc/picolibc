@@ -67,6 +67,31 @@
 #include <locale.h>
 #include <math.h>
 
+/* picolibc headers only: the native build uses the host libc */
+#ifndef NO_NEWLIB
+#if defined(issubnormal) || defined(iszero) || defined(issignaling) || \
+    defined(iscanonical) || defined(iseqsig)
+#error "C23 classification macros must not be defined in C++"
+#endif
+
+#if defined(isfinitef) || defined(isinff) || defined(isnanf) || \
+    defined(isnormalf) || defined(iszerof) || defined(isfinitel) || \
+    defined(isinfl) || defined(isnanl) || defined(isnormall) || \
+    defined(iszerol) || defined(MAXFLOAT) || defined(M_TWOPI) || \
+    defined(M_3PI_4) || defined(M_SQRTPI) || defined(M_LN2LO) || \
+    defined(M_LN2HI) || defined(M_IVLN10) || defined(M_LOG2_E) || \
+    defined(M_INVLN2)
+#error "non-standard math.h macros must not be defined in C++"
+#endif
+
+/* Non-standard functions: a global of the same name conflicts with the declaration */
+extern int finite, finitef, finitel, drem, dremf, dreml, gamma, gammaf, gammal,
+    infinity, infinityf, infinityl, lgamma_r, lgammaf_r, lgammal_r, significand,
+    significandf, significandl, isinff, isnanf, isinfl, isnanl, j0f, j1f, jnf, y0f,
+    y1f, ynf, j0l, j1l, jnl, y0l, y1l, ynl, sincos, sincosf, sincosl, pow10, pow10f,
+    pow10l, scalb, scalbf, scalbl;
+#endif
+
 //#include <monetary.h>
 //#include <mqueue.h>
 //#include <ndbm.h>
