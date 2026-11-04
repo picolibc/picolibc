@@ -45,7 +45,7 @@ __math_invalid(__float64 x)
 HIDDEN void
 __math_set_invalid(void)
 {
-    force_eval_float64(pick_float64_except(VAL / VAL, VAL));
+    (void)opt_barrier_float(pick_float64_except(VAL / VAL, VAL));
 }
 #endif
 

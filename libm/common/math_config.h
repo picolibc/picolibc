@@ -300,86 +300,6 @@ issignaling64_inline(__float64 x)
 #define pick_long_double_except(expr, val) (expr)
 #endif
 
-static __always_inline void
-force_eval_float(float x)
-{
-#ifdef __FLOAT_NOEXCEPT
-    (void)x;
-#else
-    (void)barrier_float(x);
-#endif
-}
-
-static __always_inline float
-force_evalf(float x)
-{
-#ifdef __FLOAT_NOEXCEPT
-    return x;
-#else
-    return barrier_float(x);
-#endif
-}
-
-static __always_inline void
-force_eval_double(double x)
-{
-#ifdef __DOUBLE_NOEXCEPT
-    (void)x;
-#else
-    (void)barrier_float(x);
-#endif
-}
-
-static __always_inline double
-force_eval(double x)
-{
-#ifdef __DOUBLE_NOEXCEPT
-    return x;
-#else
-    return barrier_float(x);
-#endif
-}
-
-#ifdef __HAVE_LONG_DOUBLE
-static __always_inline void
-force_eval_long_double(long double x)
-{
-#ifdef __LONG_DOUBLE_NOEXCEPT
-    (void)x;
-#else
-    (void)barrier_float(x);
-#endif
-}
-
-static __always_inline long double
-force_evall(long double x)
-{
-#ifdef __LONG_DOUBLE_NOEXCEPT
-    return x;
-#else
-    return barrier_float(x);
-#endif
-}
-#endif
-
-/* Clang doesn't appear to suppor precise exceptions on
- * many targets. We introduce barriers for that compiler
- * to force evaluation order where needed
- */
-#ifdef __clang__
-#define clang_barrier_long_double(x) opt_barrier_float(x)
-#define clang_barrier_double(x)      opt_barrier_float(x)
-#define clang_barrier_float(x)       opt_barrier_float(x)
-#define clang_force_double(x)        force_eval_double(x)
-#define clang_force_float(x)         force_eval_float(x)
-#else
-#define clang_barrier_long_double(x) (x)
-#define clang_barrier_double(x)      (x)
-#define clang_barrier_float(x)       (x)
-#define clang_force_double(x)        (x)
-#define clang_force_float(x)         (x)
-#endif
-
 #ifdef _ADD_UNDER_R_TO_FUNCS
 
 #define __FLOAT_NAME(x) x##f_r
@@ -1077,7 +997,6 @@ force_evall(long double x)
 #define _FLOAT64_MAX_EXP    LDBL_MAX_EXP
 #define _FLOAT64_DENORM_MIN __LDBL_DENORM_MIN__
 #define _FLOAT64_MANT_DIG   __LDBL_MANT_DIG__
-#define force_eval_float64  force_eval_long_double
 #endif
 #define _MATH_ALIAS_l_to_f(name)
 #define _MATH_ALIAS_l_l_to_f(name)
@@ -1142,7 +1061,6 @@ force_evall(long double x)
 #define _FLOAT64_MANT_DIG         __DBL_MANT_DIG__
 #define CONST_FORCE_FLOAT64       CONST_FORCE_DOUBLE
 #define pick_float64_except(a, b) pick_double_except(a, b)
-#define force_eval_float64        force_eval_double
 #endif
 
 #if __SIZEOF_LONG_DOUBLE__ > 8

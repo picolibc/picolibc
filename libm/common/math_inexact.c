@@ -42,7 +42,7 @@ static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MIN, _F_64(0.0));
 HIDDEN void
 __math_set_inexact(void)
 {
-    force_eval_float64(_F_64(1.0) + VAL);
+    (void)opt_barrier_float(_F_64(1.0) + VAL);
 }
 
 HIDDEN __float64
@@ -55,9 +55,9 @@ __math_inexact(__float64 val)
      * like rintl return an exact zero for an inexact result.
      */
     if (val != 0 && val > -_FLOAT64_MIN && val < _FLOAT64_MIN)
-        force_eval_float64(val * val);
+        (void)opt_barrier_float(val * val);
     else
-        force_eval_float64(_F_64(1.0) + VAL);
+        (void)opt_barrier_float(_F_64(1.0) + VAL);
     return val;
 }
 

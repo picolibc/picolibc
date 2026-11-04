@@ -44,6 +44,6 @@ __math_invalidf(float x)
 HIDDEN void
 __math_set_invalidf(void)
 {
-    force_eval_float(pick_float_except(VAL / VAL, VAL));
+    (void)opt_barrier_float(pick_float_except(VAL / VAL, VAL));
 }
 #endif

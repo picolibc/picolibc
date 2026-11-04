@@ -62,7 +62,7 @@ nextafterl(long double x, long double y)
     if ((ix | hx | lx) == 0) { /* x == 0 */
         SET_LDOUBLE_WORDS(x, (int16_t)(esy & 0x8000), hx, 1);
 #ifdef EXCEPT
-        force_eval_long_double(opt_barrier_float(x) * x);
+        (void)opt_barrier_float(opt_barrier_float(x) * x);
 #endif
         return x;
     }

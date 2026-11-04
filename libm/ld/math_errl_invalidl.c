@@ -45,7 +45,7 @@ __math_invalidl(long double x)
 HIDDEN void
 __math_set_invalidl(void)
 {
-    force_eval_long_double(pick_long_double_except(VAL / VAL, VAL));
+    (void)opt_barrier_float(pick_long_double_except(VAL / VAL, VAL));
 }
 #endif
 

@@ -184,7 +184,7 @@ specialcase(double_t tmp, uint64_t sbits, uint64_t ki)
         if (y == 0.0)
             y = asfloat64(sbits & 0x8000000000000000);
         /* The underflow exception needs to be signaled explicitly.  */
-        force_eval_double(opt_barrier_float(0x1p-1022) * 0x1p-1022);
+        (void)opt_barrier_float(opt_barrier_float(0x1p-1022) * 0x1p-1022);
     }
     y = 0x1p-1022 * y;
     return check_uflow(y);
