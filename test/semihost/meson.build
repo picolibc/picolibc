@@ -41,6 +41,7 @@ semihost_tests = [
   'semihost-close',
   'semihost-errno',
   'semihost-flen',
+  'semihost-fopen',
   'semihost-get-cmdline',
   'semihost-gettimeofday',
   'semihost-iserror',
