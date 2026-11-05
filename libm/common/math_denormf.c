@@ -37,7 +37,7 @@ static CONST_FORCE_FLOAT VAL = __FLT_MIN__;
 HIDDEN float
 __math_denormf(float x)
 {
-    (void)pick_float_except(force_eval_float(VAL * VAL), 0.0f);
+    (void)pick_float_except(opt_barrier_float(VAL * VAL), 0.0f);
     return __math_with_errnof(x, ERANGE);
 }
 

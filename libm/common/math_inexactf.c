@@ -42,7 +42,7 @@ static CONST_FORCE_FLOAT VAL = pick_float_except(FLT_MIN, 0.0f);
 HIDDEN void
 __math_set_inexactf(void)
 {
-    force_eval_float(1.0f + VAL);
+    (void)opt_barrier_float(1.0f + VAL);
 }
 
 HIDDEN float
@@ -55,9 +55,9 @@ __math_inexactf(float val)
      * like rintl return an exact zero for an inexact result.
      */
     if (val != 0 && val > -FLT_MIN && val < FLT_MIN)
-        force_eval_float(val * val);
+        (void)opt_barrier_float(val * val);
     else
-        force_eval_float(1.0f + VAL);
+        (void)opt_barrier_float(1.0f + VAL);
     return val;
 }
 

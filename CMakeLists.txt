@@ -386,8 +386,21 @@ add_library(c STATIC)
 
 target_compile_options(c PRIVATE ${PICOLIBC_COMPILE_OPTIONS})
 
-set(PICOLIBC_INCLUDE_DIRECTORIES
-  "${PICOLIBC_INCLUDE}")
+# Build using the source header directories, machine first so that
+# machine headers override generic ones, as with the installed headers.
+# The build directory holds the generated picolibc.h.
+set(PICOLIBC_INCLUDE_DIRECTORIES)
+set(PICOLIBC_MACHINE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libc/machine/${CMAKE_SYSTEM_PROCESSOR}")
+if(EXISTS "${PICOLIBC_MACHINE_DIR}/CMakeLists.txt")
+  list(APPEND PICOLIBC_INCLUDE_DIRECTORIES "${PICOLIBC_MACHINE_DIR}")
+  if(EXISTS "${PICOLIBC_MACHINE_DIR}/include")
+    list(APPEND PICOLIBC_INCLUDE_DIRECTORIES "${PICOLIBC_MACHINE_DIR}/include")
+  endif()
+endif()
+list(APPEND PICOLIBC_INCLUDE_DIRECTORIES
+  "${PICOLIBC_INCLUDE}"
+  "${CMAKE_CURRENT_SOURCE_DIR}/libc/include"
+  "${CMAKE_CURRENT_SOURCE_DIR}/libos/semihost/common")
 
 target_include_directories(c SYSTEM PUBLIC ${PICOLIBC_INCLUDE_DIRECTORIES})
 

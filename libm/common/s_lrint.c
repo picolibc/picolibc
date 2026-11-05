@@ -80,11 +80,11 @@ static const __float64
 long int
 lrint64(__float64 x)
 {
-    __int32_t          i0, j0, sx;
-    __uint32_t         i1;
-    __float64          t;
-    volatile __float64 w;
-    long int           result;
+    __int32_t  i0, j0, sx;
+    __uint32_t i1;
+    __float64  t;
+    __float64  w;
+    long int   result;
 
     EXTRACT_WORDS(i0, i1, x);
 
@@ -98,7 +98,7 @@ lrint64(__float64 x)
     if (j0 < 20) {
         /* j0 in [-1023,19] */
         /* shift amt in [0,19] */
-        w = TWO52[sx] + x;
+        w = barrier_float(TWO52[sx] + x);
         t = w - TWO52[sx];
         GET_HIGH_WORD(i0, t);
         /* After round:  j0 in [0,20] */
@@ -129,7 +129,7 @@ lrint64(__float64 x)
             } else {
                 /* 32bit return: j0 in [20,30] */
                 /* 64bit return: j0 in [20,51] */
-                w = TWO52[sx] + x;
+                w = barrier_float(TWO52[sx] + x);
                 t = w - TWO52[sx];
             }
             EXTRACT_WORDS(i0, i1, t);

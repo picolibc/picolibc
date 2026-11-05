@@ -49,7 +49,7 @@ static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MIN, 0.0L);
 HIDDEN void
 __math_set_inexactl(void)
 {
-    force_eval_long_double(eqn);
+    (void)opt_barrier_float(eqn);
 }
 
 HIDDEN long double
@@ -62,9 +62,9 @@ __math_inexactl(long double val)
      * like rintl return an exact zero for an inexact result.
      */
     if (val != 0 && val > -LDBL_MIN && val < LDBL_MIN)
-        force_eval_long_double(val * val);
+        (void)opt_barrier_float(val * val);
     else
-        force_eval_long_double(eqn);
+        (void)opt_barrier_float(eqn);
     return val;
 }
 

@@ -39,7 +39,7 @@ static CONST_FORCE_LONG_DOUBLE VAL = __LDBL_MIN__;
 HIDDEN long double
 __math_denorml(long double x)
 {
-    (void)pick_long_double_except(force_eval_long_double(VAL * VAL), 0.0L);
+    (void)pick_long_double_except(opt_barrier_float(VAL * VAL), 0.0L);
     return __math_with_errnol(x, ERANGE);
 }
 

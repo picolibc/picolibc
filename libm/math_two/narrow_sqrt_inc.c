@@ -75,7 +75,7 @@ func(float_t x)
      */
     FENV_SAVE;
 
-    x = name(force_eval)(x);
+    x = opt_barrier_float(x);
     frac = name(frexp)(x, &exp);
 
     ff_t yy = f_to_ff(name(ldexp)(frac / 2, exp / 2));
@@ -104,14 +104,14 @@ func(float_t x)
         yy.lo = 0;
 
     /* Round to odd, which doesn't depend on the rounding mode */
-    float_t r = name(force_eval)(round_odd_ff(yy));
+    float_t r = opt_barrier_float(round_odd_ff(yy));
     FENV_RESTORE;
 
     /*
      * Round once more in the caller's mode. The barrier keeps the
      * compiler from moving this before the rounding mode is restored.
      */
-    return narrow(name(force_eval)(r));
+    return narrow(opt_barrier_float(r));
 }
 
 #endif

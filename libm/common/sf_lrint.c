@@ -38,11 +38,11 @@ static const float
 long int
 lrintf(float x)
 {
-    __int32_t      j0, sx;
-    __uint32_t     i0;
-    float          t;
-    volatile float w;
-    long int       result;
+    __int32_t  j0, sx;
+    __uint32_t i0;
+    float      t;
+    float      w;
+    long int   result;
 
     GET_FLOAT_WORD(i0, x);
 
@@ -56,7 +56,7 @@ lrintf(float x)
         if (j0 >= 23)
             result = (long int)((i0 & 0x7fffff) | 0x800000) << (j0 - 23);
         else {
-            w = TWO23[sx] + x;
+            w = barrier_float(TWO23[sx] + x);
             t = w - TWO23[sx];
             GET_FLOAT_WORD(i0, t);
             j0 = ((i0 >> 23) & 0xff) - 0x7f;

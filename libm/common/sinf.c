@@ -49,7 +49,7 @@ sinf(float y)
         if (unlikely(abstop12(y) < abstop12(0x1p-12f))) {
             if (unlikely(abstop12(y) < abstop12(0x1p-126f)))
                 /* Force underflow for tiny y.  */
-                force_eval_float(y * y);
+                (void)opt_barrier_float(y * y);
             return y;
         }
         s = x * x;

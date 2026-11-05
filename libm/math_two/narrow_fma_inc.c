@@ -83,20 +83,20 @@ func(float_t x, float_t y, float_t z)
      * across the rounding mode changes, including the computations
      * after the rounding mode is restored.
      */
-    rr = name(_fma_scaled)(name(force_eval)(x), y, z, &e);
+    rr = name(_fma_scaled)(opt_barrier_float(x), y, z, &e);
     if (rr.hi == 0) {
         /* An exact zero takes its sign from the rounding mode */
         if (rr.lo == 0) {
             FENV_RESTORE;
-            return narrow(name(force_eval)(x) * y + z);
+            return narrow(opt_barrier_float(x) * y + z);
         }
         rr = (ff_t) { .hi = rr.lo, .lo = 0 };
     }
 
-    float_t r = name(force_eval)(round_odd_ff(rr));
+    float_t r = opt_barrier_float(round_odd_ff(rr));
 
     FENV_RESTORE;
-    return narrow(ldexp_no_errno_f(name(force_eval)(r), e));
+    return narrow(ldexp_no_errno_f(opt_barrier_float(r), e));
 }
 
 #endif

@@ -48,8 +48,8 @@ name(ddiv)(float_t x, float_t y)
      * mode changes.
      */
     FENV_SAVE;
-    ff_t    xx = { .hi = name(force_eval)(x), .lo = 0 };
-    float_t r = name(force_eval)(round_odd_ff(ff_div_f(xx, y)));
+    ff_t    xx = { .hi = opt_barrier_float(x), .lo = 0 };
+    float_t r = opt_barrier_float(round_odd_ff(ff_div_f(xx, y)));
     FENV_RESTORE;
 
     /*
@@ -59,10 +59,10 @@ name(ddiv)(float_t x, float_t y)
      * before the rounding mode is restored.
      */
     if (!isnormal(r))
-        return narrow_to_double(name(force_eval)(x) / y);
+        return narrow_to_double(opt_barrier_float(x) / y);
 
     /* Round once more in the caller's mode */
-    return narrow_to_double(name(force_eval)(r));
+    return narrow_to_double(opt_barrier_float(r));
 }
 
 #endif

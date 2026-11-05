@@ -110,9 +110,9 @@ name(fma)(float_t x, float_t y, float_t z)
              * __addsf3 returns -0 for -a + a in round to nearest mode.
              * |z| - |z| has the same sign as x * y + z in every mode.
              */
-            return name(fabs)(name(force_eval)(z)) - name(fabs)(z);
+            return name(fabs)(opt_barrier_float(z)) - name(fabs)(z);
 #else
-            return name(force_eval)(x) * y + z;
+            return opt_barrier_float(x) * y + z;
 #endif
         }
         hi = rr.lo;
@@ -160,11 +160,11 @@ name(fma)(float_t x, float_t y, float_t z)
 #endif
             } else {
                 FENV_RESTORE;
-                hi = name(force_eval)(hi) + lo;
+                hi = opt_barrier_float(hi) + lo;
             }
         } else {
             FENV_RESTORE;
-            hi = name(force_eval)(hi) + lo;
+            hi = opt_barrier_float(hi) + lo;
         }
     }
 

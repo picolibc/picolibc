@@ -23,14 +23,13 @@
 int
 finitef(float x)
 {
-    /* volatile prevents Clang from replacing the integer comparison with
-       sfcmp on Hexagon, which would raise FE_INVALID for signaling NaN.  */
-#ifdef __hexagon__
-    volatile __int32_t ix;
-#else
     __int32_t ix;
-#endif
+
     GET_FLOAT_WORD(ix, x);
+    /* Keep Clang from replacing the integer comparison with
+       floating point ones (sfcmp on Hexagon), which would raise
+       FE_INVALID for signaling NaN.  */
+    ix = opt_barrier_int(ix);
     ix &= 0x7fffffff;
     return (FLT_UWORD_IS_FINITE(ix));
 }

@@ -48,7 +48,7 @@ name(dmul)(float_t x, float_t y)
      * rounding mode changes.
      */
     FENV_SAVE;
-    float_t r = name(force_eval)(round_odd_ff(f_mul_f(name(force_eval)(x), y)));
+    float_t r = opt_barrier_float(round_odd_ff(f_mul_f(opt_barrier_float(x), y)));
     FENV_RESTORE;
 
     /*
@@ -58,10 +58,10 @@ name(dmul)(float_t x, float_t y)
      * before the rounding mode is restored.
      */
     if (!isnormal(r))
-        return narrow_to_double(name(force_eval)(x) * y);
+        return narrow_to_double(opt_barrier_float(x) * y);
 
     /* Round once more in the caller's mode */
-    return narrow_to_double(name(force_eval)(r));
+    return narrow_to_double(opt_barrier_float(r));
 }
 
 #endif
