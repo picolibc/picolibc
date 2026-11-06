@@ -6,6 +6,7 @@ https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/m68k-unknown
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/msp430-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/or1k-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/sh-unknown-elf.linux-amd64.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v<N>/v850-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/qemu-stable.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/qemu-hexagon.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/ATfE-23.0.0-pre-Linux-x86_64.tar.xz
