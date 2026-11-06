@@ -24,3 +24,4 @@ HERE=`dirname "$0"`
 "$HERE"/do-clang-avr-build "$@"
 "$HERE"/do-test msp430-unknown-elf "$@"
 "$HERE"/do-test lm32-unknown-elf "$@"
+"$HERE"/do-test v850-elf "$@"
