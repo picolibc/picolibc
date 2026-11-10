@@ -65,6 +65,8 @@ option('assert-verbose', type: 'boolean', value: true,
        description: 'Assert provides verbose information')
 option('fast-strcmp', type: 'boolean', value: true,
        description: 'Always optimize strcmp for performance')
+option('fast-memfuncs', type: 'boolean', value: false,
+       description: 'Always optimize memcpy, memmove and memset for performance')
 option('strcmp-pair', type: 'boolean', value: false,
        description: 'Use RISC-V paired-word strcmp (dual-issue / fused-load cores)')
 option('sanitize', type: 'string', value: 'none',

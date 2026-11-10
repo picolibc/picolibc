@@ -30,7 +30,9 @@
 
 #include <picolibc.h>
 
-#if defined(__OPTIMIZE_SIZE__) || defined(__PREFER_SIZE_OVER_SPEED) || defined(__ARC_RF16__)
+#if ((defined(__OPTIMIZE_SIZE__) || defined(__PREFER_SIZE_OVER_SPEED)) \
+     && !defined(__FAST_MEMFUNCS))                                     \
+    || defined(__ARC_RF16__)
 #include "../../string/memcpy.c"
 #else
 /* See memcpy-*.S.  */

@@ -6,6 +6,9 @@
 /* Always optimize strcmp for performance */
 #cmakedefine __FAST_STRCMP
 
+/* Always optimize memcpy, memmove and memset for performance */
+#cmakedefine __FAST_MEMFUNCS
+
 /* Use RISC-V paired-word strcmp (dual-issue / fused-load cores) */
 #cmakedefine __STRCMP_PAIR
 

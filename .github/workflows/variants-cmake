@@ -6,5 +6,5 @@
         cmake_flags: [
           "",
           # optional configurations
-          "-D__IO_FLOAT=y -D__IO_FLOAT_EXACT=n -D__IO_LONG_LONG=y -D_MB_CAPABLE=y -D_MB_EXTENDED_CHARSETS_ALL=y -D__IO_POS_ARGS=y -D_WANT_MINIMAL_IO_LONG_LONG=y -D_PRINTF_PERCENT_N=y",
+          "-D__IO_FLOAT=y -D__IO_FLOAT_EXACT=n -D__IO_LONG_LONG=y -D_MB_CAPABLE=y -D_MB_EXTENDED_CHARSETS_ALL=y -D__IO_POS_ARGS=y -D_WANT_MINIMAL_IO_LONG_LONG=y -D_PRINTF_PERCENT_N=y -D__FAST_MEMFUNCS=y",
         ]
