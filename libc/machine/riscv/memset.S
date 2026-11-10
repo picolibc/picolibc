@@ -48,7 +48,7 @@
 .type	memset, @function
 memset:
   LPAD
-#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if (defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)) && !defined(__FAST_MEMFUNCS)
   mv     a3, a0
   beqz   a2, .Ldone
 

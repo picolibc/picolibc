@@ -84,6 +84,11 @@ if(NOT DEFINED __FAST_STRCMP)
   option(__FAST_STRCMP "Always optimize strcmp for performance" ON)
 endif()
 
+# Always optimize memcpy, memmove and memset for performance
+if(NOT DEFINED __FAST_MEMFUNCS)
+  option(__FAST_MEMFUNCS "Always optimize memcpy, memmove and memset for performance" OFF)
+endif()
+
 # Use RISC-V paired-word strcmp (dual-issue / fused-load cores)
 if(NOT DEFINED __STRCMP_PAIR)
   option(__STRCMP_PAIR "Use RISC-V paired-word strcmp" OFF)

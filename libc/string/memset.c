@@ -53,7 +53,7 @@ memset(void *m, int c, size_t n)
 {
     char *s = (char *)m;
 
-#if !defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)
+#if (!defined(__PREFER_SIZE_OVER_SPEED) && !defined(__OPTIMIZE_SIZE__)) || defined(__FAST_MEMFUNCS)
     unsigned int   i;
     unsigned long  buffer;
     unsigned long *aligned_addr;

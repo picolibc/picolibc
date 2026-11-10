@@ -28,7 +28,7 @@ _memcpy:
 	mov d1,a0
 	mov d2,a1
 	mov (28,sp),d1
-#ifndef __OPTIMIZE_SIZE__
+#if !defined(__OPTIMIZE_SIZE__) || defined(__FAST_MEMFUNCS)
 	mov a0,d0
 	or d2,d0
 	btst 3,d0
