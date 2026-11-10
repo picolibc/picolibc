@@ -145,11 +145,11 @@ compute_complex_one(complex x, complex(complex) f)
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity(x);
+				raise infinity(x < 0);
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity(real v) {
+		} catch infinity(bool sign) {
 			yp[i] = complex_inf;
 		} catch nan() {
 			yp[i] = complex_nan;
@@ -198,11 +198,11 @@ compute_complex_complex(complex x1, complex x2, complex(complex, complex) f)
 			} catch divide_by_zero(real x, real y) {
 				if (x == 0)
 					raise nan();
-				raise infinity(x);
+				raise infinity(x < 0);
 			} catch invalid_argument(string error, int i, poly v) {
 				raise nan();
 			}
-		} catch infinity(real v) {
+		} catch infinity(bool sign) {
 			yp[i] = complex_inf;
 		} catch nan() {
 			yp[i] = complex_nan;
