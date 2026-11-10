@@ -1,7 +1,7 @@
 #if _IEEE_754_2008_SNAN
-{ .x = REAL(FN32(0x0p-2), FN64(0x0p-2), FN80(0x0p-2), FN80M(0x0p-2), FN128(0x0p-2)),  .y = REAL(FN32(__builtin_nan)("0"), FN64(__builtin_nan)("0"), FN80(__builtin_nan)("0"), FN80M(__builtin_nan)("0"), FN128(__builtin_nan)("0")),  },
+{ .x = REAL(FN32(0x0p0), FN64(0x0p0), FN80(0x0p0), FN80M(0x0p0), FN128(0x0p0)),  .y = REAL(FN32(__builtin_nan)("0"), FN64(__builtin_nan)("0"), FN80(__builtin_nan)("0"), FN80M(__builtin_nan)("0"), FN128(__builtin_nan)("0")),  },
 #else
-{ .x = REAL(FN32(0x0p-2), FN64(0x0p-2), FN80(0x0p-2), FN80M(0x0p-2), FN128(0x0p-2)),  .y = REAL(FN32(0.0), FN64(0.0), FN80(0.0), FN80M(0.0), FN128(0.0)),  },
+{ .x = REAL(FN32(0x0p0), FN64(0x0p0), FN80(0x0p0), FN80M(0x0p0), FN128(0x0p0)),  .y = REAL(FN32(0.0), FN64(0.0), FN80(0.0), FN80M(0.0), FN128(0.0)),  },
 #endif
 { .x = REAL(FN32(0x1p0), FN64(0x1p0), FN80(0x1p0), FN80M(0x1p0), FN128(0x1p0)),  .y = REAL(FN32(__builtin_nan)("1"), FN64(__builtin_nan)("1"), FN80(__builtin_nan)("1"), FN80M(__builtin_nan)("1"), FN128(__builtin_nan)("1")),  },
 { .x = REAL(FN32(0x1.9p6), FN64(0x1.9p6), FN80(0x1.9p6), FN80M(0x1.9p6), FN128(0x1.9p6)),  .y = REAL(FN32(__builtin_nan)("100"), FN64(__builtin_nan)("100"), FN80(__builtin_nan)("100"), FN80M(__builtin_nan)("100"), FN128(__builtin_nan)("100")),  },
