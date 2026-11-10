@@ -34,6 +34,7 @@
  */
 
 #include <stdlib.h>
+#include <unistd.h>
 #include <semihost.h>
 
 #ifndef TEST_FILE_NAME
@@ -58,5 +59,11 @@ main(void)
         code = 2;
     }
     (void)sys_semihost_remove(TEST_FILE_NAME);
+
+    ret = close(-1);
+    if (ret == 0) {
+        printf("close should have failed %d %d\n", ret, sys_semihost_errno());
+        code = 2;
+    }
     exit(code);
 }
