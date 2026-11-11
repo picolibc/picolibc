@@ -75,6 +75,9 @@
 #ifndef __has_attribute
 #define __has_attribute(x) 0
 #endif
+#ifndef __has_c_attribute
+#define __has_c_attribute(x) 0
+#endif
 #ifndef __has_feature
 #define __has_feature(x) 0
 #endif
@@ -261,6 +264,13 @@
 #define __deprecated
 #endif
 
+/* For interfaces that C23 deprecates but earlier versions of C don't */
+#if (__STDC_VERSION__ - 0) > 201710L
+#define __deprecated_c23 __deprecated
+#else
+#define __deprecated_c23
+#endif
+
 #if __has_attribute(__no_builtin__)
 #define __no_builtin __attribute__((__no_builtin__))
 #elif defined(__HAVE_CC_INHIBIT_LOOP_TO_LIBCALL)
@@ -444,62 +454,6 @@
 #define __is_aligned(x, y) __builtin_is_aligned(x, y)
 #else
 #define __is_aligned(x, align) (((__uintptr_t)x & ((align) - 1)) == 0)
-#endif
-
-/*
- * __picolibc_bit_width returns the 'width' of its operand, which is
- * one plus the bit position of the highest bit set in the value.
- *
- * This matches __builtin_stdc_bit_width, but with the type limited to
- * size_t. There are four implementations based upon what builtins the
- * compiler provides.
- */
-#ifdef __HAVE_BUILTIN_STDC_BIT_WIDTH
-
-#define __picolibc_bit_width(a) __builtin_stdc_bit_width(a)
-
-#elif defined(__HAVE_BUILTIN_CLZG)
-
-static inline unsigned int
-__picolibc_bit_width(size_t a)
-{
-    unsigned int prec = sizeof(a) * 8;
-    return (unsigned int)(prec - __builtin_clzg(a, prec));
-}
-
-#elif defined(__HAVE_BUILTIN_CLZ) && __SIZEOF_SIZE_T__ == __SIZEOF_INT__
-
-static inline unsigned int
-__picolibc_bit_width(__SIZE_TYPE__ a)
-{
-    if (a == 0)
-        return 0;
-    return (unsigned int)(sizeof(a) * 8 - __builtin_clz(a));
-}
-
-#elif defined(__HAVE_BUILTIN_CLZL) && __SIZEOF_SIZE_T__ == __SIZEOF_LONG__
-
-static inline unsigned int
-__picolibc_bit_width(__SIZE_TYPE__ a)
-{
-    if (a == 0)
-        return 0;
-    return (unsigned int)(sizeof(a) * 8 - __builtin_clzl(a));
-}
-
-#else
-
-static inline unsigned int
-__picolibc_bit_width(__SIZE_TYPE__ a)
-{
-    unsigned int width = 0;
-    while (a) {
-        width++;
-        a >>= 1;
-    }
-    return width;
-}
-
 #endif
 
 #ifdef __HAVE_BUILTIN_ADD_OVERFLOW
@@ -700,6 +654,15 @@ __picolibc_bit_width(__SIZE_TYPE__ a)
 #define __rangeof(type, start, end) (__offsetof(type, end) - __offsetof(type, start))
 
 /*
+ * Construct const-qualifier preserving macros for various functions
+ */
+#if __STDC_VERSION__ >= 201112L                                           \
+    && (__ISO_C_VISIBLE >= 2023 || defined(_LIBC) || defined(_TEST_LIBC))
+#define __preserve_const(_t, _f, _s, _a)                                            \
+    _Generic(1 ? (_s) : (void *)1, const void *: (const _t)(_f)_a, default: (_f)_a)
+#endif
+
+/*
  * Given the pointer x to the member m of the struct s, return
  * a pointer to the containing structure.  When using GCC, we first
  * assign pointer x to a local variable, to check that its type is
@@ -777,6 +740,19 @@ __picolibc_bit_width(__SIZE_TYPE__ a)
 #define __fallthrough \
     do {              \
     } while (0)
+#endif
+
+/*
+ * Functions with no side effects whose results depend only on their
+ * arguments
+ */
+#if __STDC_VERSION__ > 201710L && __has_c_attribute(__unsequenced__)
+/* Standard C23 attribute */
+#define __unsequenced [[__unsequenced__]]
+#elif __has_attribute(__unsequenced__)
+#define __unsequenced __attribute__((__unsequenced__))
+#else
+#define __unsequenced
 #endif
 
 /*  The traditional meaning of 'extern inline' for GCC is not

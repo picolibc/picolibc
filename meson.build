@@ -73,6 +73,8 @@ endforeach
 cpu_family_aliases = {
 		       # aarch64
 		       'arm64' : 'aarch64',
+		       # ARCv3
+		       'arc32' : 'arc64',
 		       # cris
 		       'crisv32' : 'cris',
            # loongarch
@@ -134,6 +136,9 @@ picocrt_enable_mmu = get_option('picocrt-enable-mmu')
 test_machine = get_option('test-machine')
 enable_tests = get_option('tests')
 enable_libdl = get_option('libdl')
+build_shared = get_option('shared-library')
+shared_lib_version = get_option('shared-library-version')
+use_pic = build_shared
 if get_option('tests-cdefs') == 'auto'
   enable_cdefs_tests = enable_tests
 else
@@ -333,6 +338,7 @@ tls_model_spec = ''
 thread_local_storage = false
 thread_local_storage_option = get_option('thread-local-storage')
 have_picolibc_tls_api = get_option('thread-local-storage-api') and fs.is_file('libc/machine' / host_cpu_family / 'tls.c')
+
 if thread_local_storage_option == 'auto' or thread_local_storage_option == 'picolibc'
   # We assume that _set_tls() is defined in the arch specific tls.c
   if thread_local_storage_option == 'auto' or have_picolibc_tls_api
@@ -343,9 +349,18 @@ else
 endif
 
 if thread_local_storage
-  tls_model_spec = '%{!ftls-model:-ftls-model=' + get_option('tls-model') + '}'
+  # For shared libraries, we need to use a TLS model that supports dynamic loading
+  # local-exec is only valid for executables and static libraries
+  # global-dynamic is the most flexible model for shared libraries
+  if build_shared
+    tls_model = 'global-dynamic'
+  else
+    tls_model = get_option('tls-model')
+  endif
+  
+  tls_model_spec = '%{!ftls-model:-ftls-model=' + tls_model + '}'
 
-  tls_arg = '-ftls-model=' + get_option('tls-model')
+  tls_arg = '-ftls-model=' + tls_model
   assert(cc.has_argument(tls_arg), 'Compiler does not support \'-ftls-model\'!')
   c_args += [tls_arg]
 endif
@@ -450,12 +465,25 @@ c_args += c_prep_flags + c_flags
 native_c_args += c_prep_flags + c_flags
 
 # Make sure _LIBC is not defined when building tests
-test_c_args = c_args
+test_c_args = c_args + ['-D_TEST_LIBC']
 c_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
 
 if have_cplusplus
-  test_cpp_args = cpp_args
+  test_cpp_args = cpp_args + ['-D_TEST_LIBC']
   cpp_args += ['-D_LIBC', '-U_FORTIFY_SOURCE']
+endif
+
+# Disable assert() within the library (by default, unless this is a debug build)
+if get_option('ndebug') == 'auto'
+  ndebug = get_option('buildtype') != 'debug'
+else
+  ndebug = get_option('ndebug') == 'true'
+endif
+if ndebug
+  c_args += ['-DNDEBUG']
+  if have_cplusplus
+    cpp_args += ['-DNDEBUG']
+  endif
 endif
 
 test_flags = []
@@ -574,6 +602,7 @@ format_default = _line.substring(0, 1)
 
 printf_aliases = get_option('printf-aliases')
 io_percent_b = get_option('io-percent-b')
+io_length_w = get_option('io-length-w')
 printf_small_ultoa = get_option('printf-small-ultoa')
 printf_percent_n = get_option('printf-percent-n')
 minimal_io_long_long = get_option('minimal-io-long-long')
@@ -1003,6 +1032,8 @@ foreach params : [default_target] + targets
     picolibc_ld_data.set('TEXT_MEM', 'flash')
     picolibc_ld_data.set('TEXT_AT', 'flash')
     picolibc_ld_data.set('TEXT_PHDR', 'text')
+    picolibc_ld_data.set('RODATA_PHDR_DECL', '')
+    picolibc_ld_data.set('DATA_INIT_PHDR_DECL', '')
 
     # attributes for read-only data sections
     picolibc_ld_data.set('RODATA_MEM', 'flash')
@@ -1377,9 +1408,11 @@ foreach params : [default_target] + targets
     picolibc_linux_ld_data.set('RODATA_MEM', 'ram')
     picolibc_linux_ld_data.set('RODATA_AT', 'ram')
     picolibc_linux_ld_data.set('RODATA_PHDR', 'ram')
+    picolibc_linux_ld_data.set('RODATA_PHDR_DECL', ld_comment)
 
     picolibc_linux_ld_data.set('DATA_AT', 'ram')
     picolibc_linux_ld_data.set('DATA_INIT_PHDR', 'ram')
+    picolibc_linux_ld_data.set('DATA_INIT_PHDR_DECL', ld_comment)
 
     # set up default memory layout
     picolibc_linux_ld_data.set('DEFAULT_FLASH_ADDR', _default_linux_flash_addr)
@@ -1527,6 +1560,7 @@ conf_data.set('__IO_POS_ARGS', io_pos_args)
 conf_data.set('__IO_C99_FORMATS', io_c99_formats)
 conf_data.set('__IO_FLOAT_EXACT', io_float_exact)
 conf_data.set('__IO_PERCENT_B', io_percent_b)
+conf_data.set('__IO_LENGTH_W', io_length_w)
 conf_data.set('__IO_LONG_DOUBLE', io_long_double)
 conf_data.set('__IO_WCHAR', io_wchar)
 conf_data.set('__STDIO_EXIT_FLUSH', get_option('stdio-exit-flush'))
@@ -1579,6 +1613,10 @@ if tmpdir != ''
   conf_data.set('__P_tmpdir', '"@0@"'.format(tmpdir),
                 description: 'Directory prefix for temporary file names (P_tmpdir)')
   conf_data.set('__L_tmpnam', tmplen,
+                description: 'Size of the tmpnam() buffer (L_tmpnam)')
+elif host_cpu_family == 'hexagon'
+  # Hexagon semihosting composes the temporary-directory prefix itself.
+  conf_data.set('__L_tmpnam', 256,
                 description: 'Size of the tmpnam() buffer (L_tmpnam)')
 endif
 conf_data.set('__IO_SMALL_ULTOA',
@@ -1772,6 +1810,9 @@ libfallback_var=libfallback_name.underscorify()
 
 # some semihost needs bios to run the tests with qemu
 bios_bin = []
+
+# libc sources supplied by the OS library override generic implementations.
+srcs_libos = []
 
 # make sure to include os BEFORE picocrt!
 
@@ -2013,31 +2054,78 @@ foreach params : targets
 
   libc_name = 'c'
 
+  build_shared = get_option('shared-library')
+  if build_shared and shared_lib_version != ''
+    shared_ver_kwargs = {'version': shared_lib_version}
+  else
+    shared_ver_kwargs = {}
+  endif
+
   if meson.version().version_compare('>=1.10')
-    local_lib_c_target = static_library(libc_name,
-				        libsrcs_target,
-                                        build_subdir : target_dir,
-				        install : really_install,
-				        install_dir : instdir,
-				        pic: false,
-				        objects : libobjs,
-				        include_directories: inc,
-				        c_args: target_c_args + c_args)
+    if build_shared
+      local_lib_c_target = both_libraries(libc_name,
+				          libsrcs_target,
+                                          build_subdir : target_dir,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: true,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args,
+				          override_options: ['b_lundef=false'],
+				          link_args: runtime_lib,
+                                          kwargs: shared_ver_kwargs
+                                          )
+    else
+      local_lib_c_target = static_library(libc_name,
+				          libsrcs_target,
+                                          build_subdir : target_dir,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: false,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args)
+    endif
 
   else
     target_lib_prefix = params['lib_prefix']
 
-    local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
-				        libsrcs_target,
-				        install : really_install,
-				        install_dir : instdir,
-				        pic: false,
-				        objects : libobjs,
-				        include_directories: inc,
-				        c_args: target_c_args + c_args)
+    if build_shared
+      local_lib_c_target = both_libraries(join_paths(target_dir, target_lib_prefix + libc_name),
+				          libsrcs_target,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: true,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args,
+				          override_options: ['b_lundef=false'],
+				          link_args: runtime_lib,
+                                          kwargs: shared_ver_kwargs)
+    else
+      local_lib_c_target = static_library(join_paths(target_dir, target_lib_prefix + libc_name),
+				          libsrcs_target,
+				          install : really_install,
+				          install_dir : instdir,
+				          pic: false,
+				          objects : libobjs,
+				          include_directories: inc,
+				          c_args: target_c_args + c_args)
+    endif
   endif
 
   set_variable('lib_c' + target, local_lib_c_target)
+
+  # For test linking, always use the static archive.  When build_shared=true,
+  # lib_c is a BothLibraries object whose full_path() returns libc.so, which
+  # cannot be linked with -static.  Store the static variant explicitly so
+  # all test sub-builds can use lib_c_link<target> without special-casing.
+  if build_shared
+    set_variable('lib_c_link' + target, local_lib_c_target.get_static_lib())
+  else
+    set_variable('lib_c_link' + target, local_lib_c_target)
+  endif
 
   if check_duplicate_names
     custom_target('libc_duplicates' + target,

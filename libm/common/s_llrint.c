@@ -40,11 +40,11 @@ static const double
 long long int
 llrint64(__float64 x)
 {
-    __int32_t          i0, j0, sx;
-    __uint32_t         i1;
-    __float64          t;
-    volatile __float64 w;
-    long long int      result;
+    __int32_t     i0, j0, sx;
+    __uint32_t    i1;
+    __float64     t;
+    __float64     w;
+    long long int result;
 
     EXTRACT_WORDS(i0, i1, x);
 
@@ -57,7 +57,7 @@ llrint64(__float64 x)
 
     if (j0 < 20) {
         /* j0 in [-1023,19] */
-        w = TWO52[sx] + x;
+        w = barrier_float(TWO52[sx] + x);
         t = w - TWO52[sx];
         GET_HIGH_WORD(i0, t);
         /* Detect the all-zeros representation of plus and
@@ -78,7 +78,7 @@ llrint64(__float64 x)
                 lsl((long long int)i1, (j0 - 52));
         else {
             /* 64bit return: j0 in [20,51] */
-            w = TWO52[sx] + x;
+            w = barrier_float(TWO52[sx] + x);
             t = w - TWO52[sx];
             EXTRACT_WORDS(i0, i1, t);
             j0 = ((i0 & 0x7ff00000) >> 20) - 1023;

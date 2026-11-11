@@ -36,10 +36,18 @@
 load "test-narrow.5c"
 load "test-fsqrt-inc.5c"
 
+test_extra = (test_vector_t[]) {
+    { .a = max_binary80, .b = 0, .c = 0 },
+};
+
+specials = (special_t[]) {
+	{ .x1 = "-0.0", .y = "-0.0" },
+};
+
 real
 single_round_one(real a)
 {
-	return real32(sqrt(imprecise(a, 4096)));
+	return range32(sqrt(imprecise(a, 4096)));
 }
 
 test_one();

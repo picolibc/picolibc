@@ -189,6 +189,32 @@ const struct tz_test        test_timezones[] = {
     { "M\0STR7:30:36", 0, NO_TIME }
 };
 
+// Rule times, checked with localtime_r(): the tests above use mktime() with a
+// fixed tm_isdst, so they don't depend on when DST starts or ends.
+struct rule_test {
+    const char *tzstr;
+    time_t      utc;
+    int         isdst;
+    int         hour;
+};
+
+extern const struct rule_test test_rules[];
+
+const struct rule_test        test_rules[] = {
+    // America/Nuuk since tzdb 2023a: a negative rule time (POSIX.1-2024)
+    { "<-02>2<-01>,M3.5.0/-1,M10.5.0/0", 1642248000, 0, 10 }, // 2022-01-15 12:00 UTC
+    { "<-02>2<-01>,M3.5.0/-1,M10.5.0/0", 1648341000, 0, 22 }, // 2022-03-27 00:30 UTC
+    { "<-02>2<-01>,M3.5.0/-1,M10.5.0/0", 1648344600, 1, 0  }, // 2022-03-27 01:30 UTC
+    { "<-02>2<-01>,M3.5.0/-1,M10.5.0/0", 1667089800, 1, 23 }, // 2022-10-30 00:30 UTC
+    { "<-02>2<-01>,M3.5.0/-1,M10.5.0/0", 1667093400, 0, 23 }, // 2022-10-30 01:30 UTC
+    // explicit plus sign
+    { "EST5EDT,M3.2.0/+2,M11.1.0/+2",    1642248000, 0, 7  }, // 2022-01-15 12:00 UTC
+    { "EST5EDT,M3.2.0/+2,M11.1.0/+2",    1657886400, 1, 8  }, // 2022-07-15 12:00 UTC
+    // Asia/Jerusalem: a rule time past 24 hours
+    { "IST-2IDT,M3.4.4/26,M10.5.0",      1648164600, 0, 1  }, // 2022-03-24 23:30 UTC
+    { "IST-2IDT,M3.4.4/26,M10.5.0",      1648168200, 1, 3  }, // 2022-03-25 00:30 UTC
+};
+
 // END test vectors
 
 static int failed = 0;
@@ -230,9 +256,30 @@ test_TimezoneStrings(void)
     }
 }
 
+static void
+test_RuleTimes(void)
+{
+    char buffer[128];
+
+    for (size_t i = 0; i < (sizeof(test_rules) / sizeof(struct rule_test)); ++i) {
+        struct rule_test ptr = test_rules[i];
+        struct tm        tm;
+
+        setenv("TZ", ptr.tzstr, 1);
+        tzset();
+        localtime_r(&ptr.utc, &tm);
+
+        snprintf(buffer, 128, "tm_isdst at %lld, timezone = \"%s\"", (long long)ptr.utc, ptr.tzstr);
+        TEST_ASSERT_EQUAL_INT_MESSAGE(ptr.isdst, tm.tm_isdst, buffer);
+        snprintf(buffer, 128, "tm_hour at %lld, timezone = \"%s\"", (long long)ptr.utc, ptr.tzstr);
+        TEST_ASSERT_EQUAL_INT_MESSAGE(ptr.hour, tm.tm_hour, buffer);
+    }
+}
+
 int
 main(void)
 {
     test_TimezoneStrings();
+    test_RuleTimes();
     exit(failed);
 }

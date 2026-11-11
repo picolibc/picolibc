@@ -61,6 +61,11 @@ name(FUNC)(float_t x)
             return -1;
         return x;
     }
+    /* Preserve zero sign */
+    if (x == 0)
+        return x;
+
+    /* Return zero for small values of x */
     if (x < _limit)
         return kernel(__math_inexact)(FLOAT_DENORM_MIN - 1);
 

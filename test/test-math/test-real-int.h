@@ -64,6 +64,10 @@ test_binary32(void)
 
     printf("test %s\n", MATH_STRING(TEST_FUNC_32));
     for (i = 0; i < count(test_32_vec); i++) {
+        if (SKIP_DENORM32(test_32_vec[i].x1)) {
+            printf("Skipping denorm value\n");
+            continue;
+        }
         volatile binary32 y = TEST_FUNC_32(test_32_vec[i].x1, test_32_vec[i].x2);
         ulp_t             ulp = ulp32(y, test_32_vec[i].y);
         if (ulp > max_ulp)
@@ -105,6 +109,10 @@ test_binary64(void)
 
     printf("test %s\n", MATH_STRING(TEST_FUNC_64));
     for (i = 0; i < count(test_64_vec); i++) {
+        if (SKIP_DENORM64(test_64_vec[i].x1)) {
+            printf("Skipping denorm value\n");
+            continue;
+        }
         volatile binary64 y = TEST_FUNC_64(test_64_vec[i].x1, test_64_vec[i].x2);
         ulp_t             ulp = ulp64(y, test_64_vec[i].y);
         if (ulp > max_ulp)
@@ -149,6 +157,10 @@ test_binary80(void)
         return ret;
     printf("test %s\n", MATH_STRING(TEST_FUNC_80));
     for (i = 0; i < count(test_80_vec); i++) {
+        if (SKIP_DENORM80(test_80_vec[i].x1)) {
+            printf("Skipping denorm value\n");
+            continue;
+        }
         volatile binary80 y = TEST_FUNC_80(test_80_vec[i].x1, test_80_vec[i].x2);
         ulp_t             ulp = ulp80(y, test_80_vec[i].y);
         if (ulp > max_ulp)
@@ -191,6 +203,10 @@ test_binary128(void)
 
     printf("test %s\n", MATH_STRING(TEST_FUNC_128));
     for (i = 0; i < count(test_128_vec); i++) {
+        if (SKIP_DENORM128(test_128_vec[i].x1)) {
+            printf("Skipping denorm value\n");
+            continue;
+        }
         volatile binary128 y = TEST_FUNC_128(test_128_vec[i].x1, test_128_vec[i].x2);
         ulp_t              ulp = ulp128(y, test_128_vec[i].y);
         if (ulp > max_ulp)

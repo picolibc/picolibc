@@ -35,8 +35,8 @@ asinhl(long double x)
     if (ix == 0x7fff)
         return x + x;  /* x is inf or NaN */
     if (ix < 0x3fde) { /* |x|<2**-34 */
-        if (huge + x > one)
-            return x; /* return x inexact except 0 */
+        /* return x inexact */
+        return __math_inexactl(x);
     }
     if (ix > 0x4020) { /* |x| > 2**34 */
         w = logl(fabsl(x)) + ln2;

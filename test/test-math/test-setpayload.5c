@@ -1,0 +1,150 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+load "test-float.5c"
+
+real[] values = {
+	0,
+	1,
+	100,
+	-1,
+	/* 32-bit tests */
+	0x1.fffffcp21,	/* fractional */
+	0x1.fffff8p21,	/* largest valid */
+	0x1.fffffcp22,	/* smallest invalid */
+	/* 64-bit tests */
+	0x1.ffffffffffffep50, /* fractional */
+	0x1.ffffffffffffcp50, /* largest valid */
+	0x1.ffffffffffffep51, /* smallest invalid */
+	/* 80-bit tests */
+	0xf.fff_ffff_ffff_fffep58, /* fractional */
+	0xf.fff_ffff_ffff_fffcp58, /* largest valid */
+	0xf.fff_ffff_ffff_fffep59, /* smallest invalid */
+	/* 128-bit tests */
+	0x1.ffff_ffff_ffff_ffff_ffff_ffff_fffep110,
+	0x1.ffff_ffff_ffff_ffff_ffff_ffff_fffcp110,
+	0x1.ffff_ffff_ffff_ffff_ffff_ffff_fffep111,
+};
+
+void
+print_value(string v)
+{
+	printf("REAL(");
+	for (int i = 0; i < dim(real_convs); i++) {
+		if (i > 0)
+			printf(", ");
+		switch (v) {
+		case "sNAN":
+			printf("%s(__builtin_nans)(\"\")", real_convs[i].macro);
+			break;
+		case "-sNAN":
+			printf("-%s(__builtin_nans)(\"\")", real_convs[i].macro);
+			break;
+		case "NAN":
+		case "INFINITY":
+			printf("%s(%s)", real_convs[i].print, v);
+			break;
+		case "-NAN":
+		case "-INFINITY":
+			printf("%s(%s)", real_convs[i].print, v);
+			break;
+		default:
+			printf("%s(%s)", real_convs[i].macro, v);
+			break;
+		}
+	}
+	printf("), ");
+}
+
+string
+setpayload(bool sig, bool zero_valid, real value, int i)
+{
+	if (value < 0 ||
+	    (value == 0 && !zero_valid) ||
+	    value != floor(value) ||
+	    value >= 2**(real_convs[i].precision-2))
+	{
+		return sprintf("%s(0.0)", real_convs[i].macro);
+	}
+	if (sig)
+		return sprintf("%s(__builtin_nans)(\"%d\")",
+			       real_convs[i].macro, floor(value));
+	else
+		return sprintf("%s(__builtin_nan)(\"%d\")",
+			       real_convs[i].macro, floor(value));
+}
+
+void
+print_nan(bool sig, bool zero_valid, real payload)
+{
+	printf("REAL(");
+	for (int i = 0; i < dim(real_convs); i++) {
+		if (i > 0)
+			printf(", ");
+		printf("%s", setpayload(sig, zero_valid, payload, i));
+	}
+	printf("), ");
+}
+
+void
+one_value(bool sig, bool zero_valid, real payload)
+{
+	printf("{ .x = ");
+	print_value(sprintf("%a", payload));
+	printf(" .y = ");
+	print_nan(sig, zero_valid, payload);
+	printf(" },\n");
+}
+
+int main()
+{
+	bool sig = Command::valid_name((string[]){"setpayloadsig"});
+
+	for (int i = 0; i < dim(values); i++) {
+		real value = values[i];
+		if (value == 0) {
+			printf("#if _IEEE_754_2008_SNAN\n");
+			one_value(sig, !sig, value);
+			printf("#else\n");
+			one_value(sig, sig, value);
+			printf("#endif\n");
+		} else {
+			one_value(sig, !sig, value);
+		}
+	}
+	return 0;
+}
+
+main();

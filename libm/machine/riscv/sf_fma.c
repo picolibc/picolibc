@@ -47,6 +47,4 @@ fmaf(float x, float y, float z)
 
 _MATH_ALIAS_f_fff(fma)
 
-#else
-#include "../../common/sf_fma.c"
 #endif

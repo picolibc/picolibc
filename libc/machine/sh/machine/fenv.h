@@ -50,8 +50,10 @@ typedef int fexcept_t;
 #endif
 
 #ifdef __SH4_SINGLE_ONLY__
+#if !__GNUC_PREREQ(16, 1)
 #define __LONG_DOUBLE_NOROUND
 #define __LONG_DOUBLE_NOEXCEPT
+#endif
 #endif
 
 /* Exception flags */

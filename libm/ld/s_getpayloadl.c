@@ -33,6 +33,7 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#define _ISOC23_SOURCE
 #include "math_ld.h"
 
 #if LDBL_MANT_DIG == 64

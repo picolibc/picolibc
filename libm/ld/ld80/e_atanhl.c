@@ -45,8 +45,9 @@ atanhl(long double x)
         return __math_invalidl(x);
     if (ix == 0x3fff)
         return __math_divzerol(se & 0x8000);
-    if (ix < 0x3fe3 && (huge + x) > zero)
-        return x; /* x<2**-28 */
+    if (ix < 0x3fe3)
+        /* x<2**-28 */
+        return __math_inexactl(x);
     SET_LDOUBLE_EXP(x, ix);
     if (ix < 0x3ffe) { /* x < 0.5 */
         t = x + x;

@@ -2,6 +2,8 @@
 #
 # Update data based on unicode tables
 #
+# When this is done, also update the value of __STDC_ISO_10646__ in
+# libc/include/sys/features.h to match
 
 set -e
 python3 mkctype_class.py > ctype_class.h

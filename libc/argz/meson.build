@@ -64,6 +64,8 @@ foreach file : srcs_argz
     message('libc/argz/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/argz/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/argz/' + file + ': libos overrides generic')
   else
     srcs_argz_use += file
   endif

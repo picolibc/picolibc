@@ -50,7 +50,7 @@ real
 remainder(real x, real y)
 {
 	real ret = 0;
-	if (is_inf(x))
+	if (is_inf(x) || is_zero(y))
 		raise nan();
 	try {
 		real n = floor(x / y + 0.5);

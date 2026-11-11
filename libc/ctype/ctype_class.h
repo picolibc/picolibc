@@ -35,6 +35,7 @@
 
 /* This file is auto-generated from mkctype_class.py */
 /* clang-format off */
+/* Unicode Version 17.0.0 */
 
     /* 0x00 */ CLASS_cntrl,
     /* 0x01 */ CLASS_cntrl,

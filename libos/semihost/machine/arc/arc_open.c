@@ -42,16 +42,33 @@
 #include <errno.h>
 #include <stdarg.h>
 
+static int
+convert_open_flags(int flags)
+{
+    int nsim_flags = 0;
+
+    nsim_flags |= (flags & O_RDONLY) ? ARC_LINUX_RDONLY : 0;
+    nsim_flags |= (flags & O_WRONLY) ? ARC_LINUX_WRONLY : 0;
+    nsim_flags |= (flags & O_RDWR) ? ARC_LINUX_RDWR : 0;
+    nsim_flags |= (flags & O_CREAT) ? ARC_LINUX_CREAT : 0;
+    nsim_flags |= (flags & O_APPEND) ? ARC_LINUX_APPEND : 0;
+    nsim_flags |= (flags & O_TRUNC) ? ARC_LINUX_TRUNC : 0;
+    nsim_flags |= (flags & O_EXCL) ? ARC_LINUX_EXCL : 0;
+
+    return nsim_flags;
+}
+
 int
 open(const char *pathname, int flags, ...)
 {
     va_list ap;
     int     ret;
+    int     nsim_flags = convert_open_flags(flags);
 
     va_start(ap, flags);
     uintptr_t mode = va_arg(ap, uintptr_t);
     va_end(ap);
-    ret = arc_semihost3(SYS_SEMIHOST_open, (uintptr_t)pathname, flags, mode);
+    ret = arc_semihost3(SYS_SEMIHOST_open, (uintptr_t)pathname, nsim_flags, mode);
 
     if (ret < 0)
         arc_semihost_errno(EINVAL);

@@ -54,6 +54,8 @@ foreach file : srcs_xdr
     message('libc/xdr/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/xdr/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/xdr/' + file + ': libos overrides generic')
   else
     srcs_xdr_use += file
   endif

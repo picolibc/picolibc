@@ -64,9 +64,12 @@ if has_os_posix
   tests += [
     'test-alarm',
     'test-mmap',
+    'test-pclose',
     'test-popen',
     'test-system',
   ]
+elif host_cpu_family == 'hexagon'
+  tests += ['test-system']
 endif
 
 if oslib_test_variant == 'linux'
@@ -88,7 +91,7 @@ foreach params : targets
   target_dir = params['dir']
   target_c_args = params['c_args']
 
-  _libs = [get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c_link' + target)]
   if is_variable(oslib_test + target)
     _libs += [get_variable(oslib_test + target)]
   endif

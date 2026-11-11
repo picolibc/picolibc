@@ -50,7 +50,7 @@ name(powr)(float_t x, float_t y)
     x = name(fabs)(x);
     float_t r = name(pow)(x, y);
     if (!isfinite(r)) {
-        if (isfinite(x) && isfinite(y))
+        if (isfinite(x) && x != 0 && isfinite(y))
             return kernel(__math_oflow)(signbit(r));
     } else if (r == 0 && isfinite(x) && x != 0 && isfinite(y)) {
         return kernel(__math_uflow)(signbit(r));

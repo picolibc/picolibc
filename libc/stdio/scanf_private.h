@@ -147,5 +147,6 @@ typedef unsigned int width_t;
 #define FL_MEXP  0x400  /* exponent 'e' is neg.	        */
 #define FL_FHEX  0x800  /* hex significand              */
 #define FL_TWO   0x1000 /* more than one digit was read */
+#define FL_WF    0x2000 /* wf length specifier          */
 
 #endif /* _SCANF_PRIVATE_H_ */

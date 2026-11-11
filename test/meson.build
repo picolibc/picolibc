@@ -35,6 +35,7 @@
 
 tests = [
   'test-argv',
+  'test-assert',
   'test-atomic',
   'test-environ',
   'test-except',
@@ -42,6 +43,7 @@ tests = [
   'test-getopt',
   'test-hello',
   'test-hosted-exit',
+  'test-lseek64-linux',
   'test-lseek-overflow',
   'test-ssize-max',
   'test-hosted-exit-fail',
@@ -115,6 +117,16 @@ test_extra_c_args = {
   'test-ubsan-no-flash': test_ubsan_cflags,
 }
 
+if oslib_test_variant == 'linux'
+  test_extra_c_args += {
+    'test-lseek-overflow': ['-DTESTS_LSEEK64'],
+  }
+else
+  test_extra_c_args += {
+    'test-lseek64-linux': ['-DTESTS_LSEEK64_SKIP'],
+  }
+endif
+
 test_args = {
   'test-argv': ['--args', 'hello world'],
   'test-argv-no-flash': ['--args', 'hello world'],
@@ -122,6 +134,27 @@ test_args = {
 
 if host_cpu_family == 'aarch64' and test_machine == 'fvp'
   check_aarch64_fvp_page_table = find_program('check-aarch64-fvp-page-table.py')
+endif
+
+# C23 deprecates asctime and ctime but earlier versions of C don't:
+# check that time.h only marks them deprecated when compiling as C23.
+# Each check needs a compiler that supports the language version.
+check_deprecated = find_program(meson.project_source_root() / 'scripts' / 'check-deprecated')
+time_deprecated_src = meson.current_source_dir() / 'test-time-deprecated.c'
+time_deprecated_cmd = cc.cmd_array() + c_args + inc_args
+
+if cc.has_argument('-std=c17')
+  test('test-time-deprecated-c17',
+       check_deprecated,
+       args: ['not-deprecated', time_deprecated_src] + time_deprecated_cmd + ['-std=c17'],
+       suite: 'headers')
+endif
+
+if cc.has_argument('-std=c23') and cc.has_function_attribute('deprecated')
+  test('test-time-deprecated-c23',
+       check_deprecated,
+       args: ['deprecated', time_deprecated_src] + time_deprecated_cmd + ['-std=c23'],
+       suite: 'headers')
 endif
 
 test_skip_native = [
@@ -143,7 +176,7 @@ foreach params : targets
   target_dir = params['dir']
   target_c_args = params['c_args']
 
-  _libs = [get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c_link' + target)]
   if is_variable(oslib_test + target)
     _libs += [get_variable(oslib_test + target)]
   endif
@@ -239,9 +272,9 @@ foreach params : targets
 
   if is_variable('lib_semihost_raw' + target) and test_machine == 'qemu'
 
-    _libs_raw = [get_variable('lib_c' + target)]
+    _libs_raw = [get_variable('lib_c_link' + target)]
     _libs_raw += [get_variable('lib_semihost_raw' + target)]
-    
+
     _lib_raw_files=[]
     foreach _lib_raw : _libs_raw
       _lib_raw_files += _lib_raw.full_path()
@@ -444,6 +477,7 @@ subdir('test-posix')
 subdir('test-math')
 subdir('test-string')
 subdir('test-monetary')
+subdir('test-stdbit')
 subdir('test-stdio')
 subdir('test-stdlib')
 subdir('testsuite')

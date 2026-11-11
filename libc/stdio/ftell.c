@@ -47,7 +47,7 @@ FTELL(FILE *stream)
     __flockfile(stream);
     if ((stream->flags & __SEXT) && xf->seek) {
         FTELL_TYPE ret = (FTELL_TYPE)(xf->seek)(stream, 0, SEEK_CUR);
-        if (__atomic_load_ungetc(&stream->unget) != 0)
+        if (ret > 0 && __atomic_load_ungetc(&stream->unget) != 0)
             ret--;
         __funlock_return(stream, ret);
     }

@@ -37,8 +37,8 @@ asinl(long double x)
         return __math_invalidl(x); /* asin(|x|>1) is NaN */
     } else if (expt < BIAS - 1) {  /* |x|<0.5 */
         if (expt < ASIN_LINEAR) {  /* if |x| is small, asinl(x)=x */
-            if (huge + x > one)
-                return x; /* return x with inexact if x!=0*/
+            /* return x with inexact */
+            return __math_inexactl(x);
         }
         t = x * x;
         p = P(t);

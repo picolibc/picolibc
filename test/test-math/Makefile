@@ -35,13 +35,14 @@ REAL_EXP = \
 	test-exp2m1.h \
 	test-log.h \
 	test-log10.h \
-	test-log1p.h \
+	test-logp1.h \
 	test-log2.h \
 	test-log10p1.h \
 	test-log2p1.h \
 	test-pow.h \
 	test-pown.h \
-	test-powr.h
+	test-powr.h \
+	test-rootn.h
 
 REAL_NARROW = \
 	test-fadd.h \
@@ -63,10 +64,15 @@ REAL_OTHER = \
 	test-erf.h \
 	test-erfc.h \
 	test-floor.h \
+	test-fromfp.h \
+	test-fromfpx.h \
 	test-hypot.h \
 	test-j0.h \
 	test-j1.h \
 	test-jn.h \
+	test-y0.h \
+	test-y1.h \
+	test-yn.h \
 	test-nextafter.h \
 	test-nextdown.h \
 	test-nextup.h \
@@ -75,9 +81,16 @@ REAL_OTHER = \
 	test-remquo.h \
 	test-round.h \
 	test-roundeven.h \
+	test-rsqrt.h \
 	test-scalbn.h \
+	test-setpayload.h \
+	test-setpayloadsig.h \
 	test-sqrt.h \
-	test-tgamma.h
+	test-tgamma.h \
+	test-totalorder.h \
+	test-totalordermag.h \
+	test-ufromfp.h \
+	test-ufromfpx.h
 
 COMPLEX_TRIG = \
 	test-cacos.h \
@@ -103,7 +116,8 @@ COMPLEX_OTHER = \
 
 TEST_FILES = \
 	$(REAL_TRIG) $(REAL_EXP) $(REAL_NARROW) $(REAL_OTHER) \
-	$(COMPLEX_TRIG) $(COMPLEX_EXP) $(COMPLEX_OTHER)
+	$(COMPLEX_TRIG) $(COMPLEX_EXP) $(COMPLEX_OTHER) \
+	test-fma-vec.h test-long-double-vec.h
 
 all: $(TEST_FILES) .clang-format-ignore
 
@@ -146,6 +160,12 @@ GEN_NARROWING=$(GEN_NARROWING_F) $(GEN_NARROWING_D)
 narrow-stamp: $(GEN_NARROWING) make-narrowing
 	./make-narrowing
 	touch $@
+
+test-setpayloadsig.h: test-setpayload.5c
+
+test-fromfp.h test-fromfpx.h test-ufromfp.h test-ufromfpx.h: test-fromfp-common.5c
+
+test-nextafter.h test-nextdown.h test-nextup.h: test-next-common.5c
 
 clean:
 	rm -f $(GEN_NARROWING) narrow-stamp

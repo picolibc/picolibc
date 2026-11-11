@@ -74,8 +74,8 @@ sinhl(long double x)
     /* |x| in [0,40], return sign(x)*0.5*(E+E/(E+1))) */
     if (ix <= 0x40044000) {
         if (ix < 0x3fc60000) /* |x| < 2^-57 */
-            if (shuge + x > one)
-                return x; /* sinh(tiny) = tiny with inexact */
+            /* sinh(tiny) = tiny with inexact */
+            return __math_inexactl(x);
         t = expm1l(u.value);
         if (ix < 0x3fff0000)
             return h * (2.0L * t - t * t / (t + one));

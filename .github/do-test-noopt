@@ -3,6 +3,17 @@ HERE=`dirname "$0"`
 TARGET=$1
 shift
 
+if [ -d /opt/picolibc-ci ]; then
+    TOP=/opt/picolibc-ci
+else
+    TOP=/opt
+fi
+
+# Use the picolibc-ci-tools meson
+if [ -d "$TOP"/meson-stable/bin ]; then
+    PATH="$TOP"/meson-stable/bin:$PATH
+fi
+
 OPTIONS=""
 
 case "$TARGET" in

@@ -51,6 +51,8 @@ SUCH DAMAGE.
 #include <alloca.h>
 #endif
 
+#define __STDC_VERSION_STDLIB_H__ 202311L
+
 #if __GNU_VISIBLE
 #include <sys/_locale.h>
 #endif
@@ -76,6 +78,12 @@ typedef struct {
 } lldiv_t;
 #endif
 
+#if __ISO_C_VISIBLE >= 2023 && !defined(__cplusplus) && !defined(__once_flag_defined)
+#define __once_flag_defined
+typedef int once_flag;
+#define ONCE_FLAG_INIT 0
+#endif
+
 #ifndef __compar_fn_t_defined
 #define __compar_fn_t_defined
 typedef int (*__compar_fn_t)(const void *, const void *);
@@ -93,6 +101,27 @@ size_t __locale_mb_cur_max(void) __picolibc_export;
 /* Declare free up here so it can be used with __malloc_like */
 void free(void *) __nothrow __picolibc_export;
 
+#if __ISO_C_VISIBLE >= 2023
+
+void free_aligned_sized(void *ptr, size_t alignment, size_t size) __picolibc_export;
+void free_sized(void *ptr, size_t size) __picolibc_export;
+
+__declare_extern_inline(void)
+free_aligned_sized(void *ptr, size_t alignment, size_t size)
+{
+    (void)alignment;
+    (void)size;
+    free(ptr);
+}
+
+__declare_extern_inline(void)
+free_sized(void *ptr, size_t size)
+{
+    (void)size;
+    free(ptr);
+}
+#endif
+
 #if __ISO_C_VISIBLE >= 1999
 __noreturn void _Exit(int __status) __picolibc_export;
 #endif
@@ -102,7 +131,7 @@ long a64l(const char *__input) __picolibc_export;
 __noreturn void abort(void) __picolibc_export;
 int             abs(int) __picolibc_export;
 #if __ISO_C_VISIBLE >= 2011 || __GNU_VISIBLE
-void               *
+void *
 aligned_alloc(size_t, size_t)
 __malloc_like __alloc_align(1) __alloc_size(2) __warn_unused_result __nothrow __picolibc_export;
 #endif
@@ -128,9 +157,16 @@ long long atoll(const char *__nptr) __picolibc_export;
 #endif
 void *bsearch(const void *__key, const void *__base, size_t __nmemb, size_t __size,
               __compar_fn_t _compar) __picolibc_export;
-void                                                                  *
+#ifdef __preserve_const
+#define bsearch(__key, __base, __nmemb, __size, __compar)                                 \
+    __preserve_const(void *, bsearch, __base, (__key, __base, __nmemb, __size, __compar))
+#endif
+void *
 calloc(size_t, size_t)
 __malloc_like __warn_unused_result __alloc_size2(1, 2) __nothrow __picolibc_export;
+#if __ISO_C_VISIBLE >= 2023 && !defined(__cplusplus)
+void call_once(once_flag *__flag, void (*__func)(void)) __picolibc_export;
+#endif
 div_t div(int __numer, int __denom) __picolibc_export;
 #if __SVID_VISIBLE || __XSI_VISIBLE
 struct _rand48;
@@ -174,7 +210,7 @@ lldiv_t   lldiv(long long __numer, long long __denom) __picolibc_export;
 long lrand48(void) __picolibc_export;
 long _lrand48_r(struct _rand48 *) __picolibc_export;
 #endif
-void                                                              *
+void *
 malloc(size_t)
 __malloc_like __warn_unused_result __alloc_size(1) __nothrow __picolibc_export;
 int    mblen(const char *, size_t) __picolibc_export;
@@ -197,8 +233,8 @@ int mkstemp(char *) __picolibc_export;
 int mkstemps(char *, int) __picolibc_export;
 #endif
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
-char *mktemp(char *)
-    __deprecated_m("the use of `mktemp' is dangerous; use `mkstemp' instead") __picolibc_export;
+char *mktemp(char *) __deprecated_m("the use of `mktemp' is dangerous; use `mkstemp' instead")
+__picolibc_export;
 #endif
 #if __SVID_VISIBLE || __XSI_VISIBLE
 long mrand48(void) __picolibc_export;
@@ -226,8 +262,8 @@ void qsort_r(void *__base, size_t __nmemb, size_t __size,
 #elif __BSD_VISIBLE
 #ifdef __GNUC__
 void qsort_r(void *__base, size_t __nmemb, size_t __size, void *__thunk,
-             int (*_compar)(void *, const void *,
-                            const void *)) __asm__(__ASMNAME("__bsd_qsort_r")) __picolibc_export;
+             int (*_compar)(void *, const void *, const void *)) __asm__(__ASMNAME("__bsd_qsort_r"))
+    __picolibc_export;
 #else
 void __bsd_qsort_r(void *__base, size_t __nmemb, size_t __size, void *__thunk,
                    int (*_compar)(void *, const void *, const void *)) __picolibc_export;
@@ -241,14 +277,14 @@ int rand_r(unsigned *__seed) __picolibc_export;
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4 || __BSD_VISIBLE
 long random(void) __picolibc_export;
 #endif
-void                                                *
+void *
 realloc(void *, size_t)
 __warn_unused_result __alloc_size(2) __nothrow __picolibc_export;
 #if __BSD_VISIBLE
-void                                          *
+void *
 reallocarray(void *, size_t, size_t)
 __warn_unused_result __alloc_size2(2, 3) __picolibc_export;
-void                                      *
+void *
 reallocf(void *, size_t)
 __warn_unused_result __alloc_size(2) __picolibc_export;
 #endif
@@ -280,18 +316,18 @@ void _srand48_r(struct _rand48 *, long) __picolibc_export;
 void srandom(unsigned) __picolibc_export;
 #endif
 double strtod(const char * __restrict __n, char ** __restrict __end_PTR) __picolibc_export;
-int    strfromd(char    *__restrict str, size_t n, const char    *__restrict format,
-                double fp) __picolibc_export;
+int    strfromd(char    *__restrict str, size_t n, const char    *__restrict format, double fp)
+    __picolibc_export;
 #if __ISO_C_VISIBLE >= 1999
 float strtof(const char * __restrict __n, char ** __restrict __end_PTR) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE
 long double strtold(const char * __restrict __n, char ** __restrict __end_PTR) __picolibc_export;
 #endif
-int strfromf(char * __restrict str, size_t n, const char * __restrict format,
-             float fp) __picolibc_export;
+int strfromf(char * __restrict str, size_t n, const char * __restrict format, float fp)
+    __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE
-int strfroml(char * __restrict str, size_t n, const char * __restrict format,
-             long double fp) __picolibc_export;
+int strfroml(char * __restrict str, size_t n, const char * __restrict format, long double fp)
+    __picolibc_export;
 #endif
 #endif
 #if __MISC_VISIBLE
@@ -300,37 +336,37 @@ int strfroml(char * __restrict str, size_t n, const char * __restrict format,
 #define strtodf strtof
 #endif
 #endif
-long strtol(const char * __restrict __n, char ** __restrict __end_PTR,
-            int __base) __picolibc_export;
+long strtol(const char * __restrict __n, char ** __restrict __end_PTR, int __base)
+    __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE
 #if __ISO_C_VISIBLE >= 1999
 extern long double strtold(const char * __restrict, char ** __restrict) __picolibc_export;
 #endif
 #endif /* __HAVE_LONG_DOUBLE */
 #if __ISO_C_VISIBLE >= 1999
-long long strtoll(const char * __restrict __n, char ** __restrict __end_PTR,
-                  int __base) __picolibc_export;
+long long strtoll(const char * __restrict __n, char ** __restrict __end_PTR, int __base)
+    __picolibc_export;
 #endif
-unsigned long strtoul(const char * __restrict __n, char ** __restrict __end_PTR,
-                      int __base) __picolibc_export;
+unsigned long strtoul(const char * __restrict __n, char ** __restrict __end_PTR, int __base)
+    __picolibc_export;
 #if __ISO_C_VISIBLE >= 1999
-unsigned long long strtoull(const char * __restrict __n, char ** __restrict __end_PTR,
-                            int __base) __picolibc_export;
+unsigned long long strtoull(const char * __restrict __n, char ** __restrict __end_PTR, int __base)
+    __picolibc_export;
 #endif
 
 #if __GNU_VISIBLE
 double strtod_l(const char * __restrict, char ** __restrict, locale_t) __picolibc_export;
 float  strtof_l(const char  *__restrict, char  **__restrict, locale_t) __picolibc_export;
 #ifdef __HAVE_LONG_DOUBLE
-extern long double strtold_l(const char * __restrict, char ** __restrict,
-                             locale_t) __picolibc_export;
+extern long double strtold_l(const char * __restrict, char ** __restrict, locale_t)
+    __picolibc_export;
 #endif /* __HAVE_LONG_DOUBLE */
 long strtol_l(const char * __restrict, char ** __restrict, int, locale_t) __picolibc_export;
-unsigned long strtoul_l(const char * __restrict, char ** __restrict, int,
-                        locale_t __loc) __picolibc_export;
+unsigned long strtoul_l(const char * __restrict, char ** __restrict, int, locale_t __loc)
+    __picolibc_export;
 long long strtoll_l(const char * __restrict, char ** __restrict, int, locale_t) __picolibc_export;
-unsigned long long strtoull_l(const char * __restrict, char ** __restrict, int,
-                              locale_t __loc) __picolibc_export;
+unsigned long long strtoull_l(const char * __restrict, char ** __restrict, int, locale_t __loc)
+    __picolibc_export;
 #endif
 int system(const char *__string) __picolibc_export;
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200112
@@ -338,7 +374,7 @@ int unsetenv(const char *__string) __picolibc_export;
 #endif
 size_t wcstombs(char * __restrict, const wchar_t * __restrict, size_t) __picolibc_export;
 int    wctomb(char *, wchar_t) __picolibc_export;
-void                                                              *
+void *
 valloc(size_t)
 __malloc_like __warn_unused_result __alloc_size(1) __nothrow __picolibc_export;
 #if __SVID_VISIBLE || __XSI_VISIBLE >= 4
@@ -411,10 +447,10 @@ typedef void         (*constraint_handler_t)(const char         *__restrict msg,
                                      __errno_t error);
 
 constraint_handler_t set_constraint_handler_s(constraint_handler_t handler) __picolibc_export;
-void                 abort_handler_s(const char                 *__restrict msg, void                 *__restrict ptr,
-                                     __errno_t error) __picolibc_export;
-void                 ignore_handler_s(const char                 *__restrict msg, void                 *__restrict ptr,
-                                      __errno_t error) __picolibc_export;
+void abort_handler_s(const char * __restrict msg, void * __restrict ptr, __errno_t error)
+    __picolibc_export;
+void ignore_handler_s(const char * __restrict msg, void * __restrict ptr, __errno_t error)
+    __picolibc_export;
 #endif
 
 _END_STD_C

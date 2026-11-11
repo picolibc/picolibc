@@ -83,7 +83,7 @@ name(NAME)(float_t x, float_t y)
     if (isnan(x) || isnan(y))
         return x + y;
 #endif
-    if (x == y)
+    if (VAL(x) == VAL(y))
         return CMP(!signbit(x), !signbit(y)) ? x : y;
     return CMP(VAL(x), VAL(y)) ? (x) : (y);
 }

@@ -67,6 +67,7 @@ picolibc_sources(
   ferror.c
   fflush.c
   fgetc.c
+  fgetpos.c
   fgets.c
   fgetwc.c
   fgetws.c
@@ -77,6 +78,7 @@ picolibc_sources(
   filewstrget.c
   filewstrput.c
   flockfile.c
+  flockfile_init.c
   fmemopen.c
   open_memstream.c
   fopen.c
@@ -90,6 +92,8 @@ picolibc_sources(
   fscanf.c
   fseek.c
   fseeko.c
+  fseterr.c
+  fsetpos.c
   ftell.c
   ftello.c
   ftox_engine.c

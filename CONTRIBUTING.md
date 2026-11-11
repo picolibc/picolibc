@@ -10,7 +10,7 @@ Picolibc sources are maintained in git and hosted in two places.
  1. [keithp.com](https://keithp.com/cgit/picolibc.git/). This is the
     'canonical' source location.
 
- 2. [github](https://github.com/keith-packard/picolibc). This should
+ 2. [github](https://github.com/picolibc/picolibc). This should
     exactly mirror the code at keithp.com. I've placed it here to
     make contributing to Picolibc easier for people familiar with github.
 
@@ -20,7 +20,7 @@ You can create a local copy of the repository with git clone:
 
 or
 
-	$ git clone https://github.com/keith-packard/picolibc.git
+	$ git clone https://github.com/picolibc/picolibc.git
 
 ## Meson
 
@@ -34,27 +34,45 @@ As Picolibc is designed to be used for embedded systems, getting that
 configured correctly can be a challenge. Learn more about that in the
 [build](doc/build.md) page.
 
+## Policy on the use of Large Language Models (LLMs) and AI tooling
+
+We expect everyone contributing to picolibc to fully own their
+contribution, be able to reason about it, be able to explain why
+things were done a particular way and act as the full owner of that
+code. AI tools are treated the same as traditional tooling like sed,
+awk or coccinelle.
+
+For the purpose of this project, AI tools CANNOT be treated as author,
+co-author or be credited in any way that would suggest any ownership
+over the contribution.
+
+Contributions are expected to be idiomatic to the project and should
+be written to ease human review. Anything coming from an automated
+tool must be carefully edited by the submitter to make it clear,
+correct and concise. This includes commit messages, which should be as
+brief as practical. People review every submission to the project,
+please be respectful of their time by taking at least as much time
+when preparing them.
+
+Unguided use of those tools or the inability to prove understanding of
+the code contributed will result in a loss of trust in that
+contributor by project maintainers which can then lead to exclusion
+from any further contribution to the project.
+
+As with any other submissions, authors are responsible for doing due
+diligence and ensuring their submissions are compatible with the
+project’s licenses as documented in COPYING.picolibc
+
 ## Formatting Source Code
 
-Picolibc code comes from a multitude of sources using an enormous
-range of styles. As picolibc tries to retain compatibility with newlib
-so that bug fixes can be shared between projects, we can't easily
-reformat all of the existing code. Here are suggestions on how to
-preserve compatibility while still being able to write readable code:
+Picolibc uses clang-format with a custom template. Format checking is
+included the CI process, and as any submission with CI errors will not
+be considered, you'll need to make sure your contributions are
+correctly formatted.
 
- 1. Whitespace-only changes are not helpful, please don't submit
-    changes that are only fixing formatting.
-
- 2. Try to adopt local coding styles as much as you can manage by
-    matching code within the same files.
-
- 3. For brand-new files, please use the global .editorconfig settings
-    if possible:
-
-     * no literal tab characters, only spaces
-     * 4-space indentation for nested elements
-     * no trailing whitespace
-     * utf-8 encoding
+The CI process produces a patch indicating how the code would need to
+be changed to pass. This can be useful if you do not have access to a
+compatible version of clang-format.
 
 ## Patch Submission
 
@@ -79,12 +97,12 @@ You can submit patches in a couple of ways:
 
 We're using the issue tracker on Github for now; if you have issues,
 please submit them to the
-[Picolibc Issue Tracker](https://github.com/keith-packard/picolibc/issues)
+[Picolibc Issue Tracker](https://github.com/picolibc/picolibc/issues)
 
 ## Mailing List
 
-Picolibc has a mailing list, hosted at keithp.com. You can
-[subscribe here](https://keithp.com/mailman/listinfo/picolibc).
+Picolibc has a mailing list, hosted at keithp.com. It's largely unused
+because we're unable to keep the subscription process automated.
 This is a public list, with public archives. Participants are expected
 to abide by the [Picolibc Code of Conduct](CODE_OF_CONDUCT.md).
 

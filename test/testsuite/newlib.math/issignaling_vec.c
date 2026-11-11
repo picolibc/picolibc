@@ -35,7 +35,9 @@
 //#define _GNU_SOURCE
 #include "test.h"
 one_line_type issignaling_vec[] = {
+#ifndef __mcffpu__
 	{64, 0, 123, __LINE__, 0x3ff00000, 0x00000000, 0x7ff40000, 0x00000000}, /* 1 = f(snan) */
+#endif
 	{64, 0, 123, __LINE__, 0x00000000, 0x00000000, 0x7ff80000, 0x00000000}, /* 0 = f(qnan) */
 	{64, 0, 123, __LINE__, 0x00000000, 0x00000000, 0x7ff00000, 0x00000000}, /* 0 = f(+inf) */
 	{64, 0, 123, __LINE__, 0x00000000, 0x00000000, 0xfff00000, 0x00000000}, /* 0 = f(-inf) */

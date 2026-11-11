@@ -35,6 +35,7 @@
 
 set(tests
   test-atexit
+  test-bsearch
   test-efcvt
   test-malloc
   test-malloc-stress
@@ -43,6 +44,7 @@ set(tests
   test-rand
   test-strtod
   test-memalignment
+  test-call-once
   test-stdckdint
   )
 

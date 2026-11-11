@@ -42,7 +42,7 @@
 #define __need_size_t
 #include <stddef.h>
 
-#define __STDC_VERSION_UCHAR_H_ 202311L
+#define __STDC_VERSION_UCHAR_H__ 202311L
 
 _BEGIN_STD_C
 

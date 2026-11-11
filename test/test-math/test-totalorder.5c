@@ -1,0 +1,108 @@
+/*
+ * SPDX-License-Identifier: BSD-3-Clause
+ *
+ * Copyright © 2026 Keith Packard
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ *
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ *
+ * 2. Redistributions in binary form must reproduce the above
+ *    copyright notice, this list of conditions and the following
+ *    disclaimer in the documentation and/or other materials provided
+ *    with the distribution.
+ *
+ * 3. Neither the name of the copyright holder nor the names of its
+ *    contributors may be used to endorse or promote products derived
+ *    from this software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+ * FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
+ * COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+ * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+ * STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
+ * OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+string[] values = {
+	"-NAN",
+	"-sNAN",
+	"-INFINITY",
+	"-0x1p10",
+	"-1.0",
+	"-0x1p-10",
+	"-0.0",
+	"0.0",
+	"0x1p-10",
+	"1.0",
+	"0x1p10",
+	"INFINITY",
+	"sNAN",
+	"NAN",
+};
+
+struct {
+	string	fn;
+	string	p;
+}[] convs = {
+	{ .fn = "FN32", .p = "P32" },
+	{ .fn = "FN64", .p = "P64" },
+	{ .fn = "FN80", .p = "P80" },
+	{ .fn = "FN80M", .p = "P80" },
+	{ .fn = "FN128", .p = "P128" },
+};
+
+void
+print_value(string v)
+{
+	printf("REAL(");
+	for (int i = 0; i < dim(convs); i++) {
+		if (i > 0)
+			printf(", ");
+		switch (v) {
+		case "sNAN":
+			printf("%s(__builtin_nans)(\"\")", convs[i].fn);
+			break;
+		case "-sNAN":
+			printf("-%s(__builtin_nans)(\"\")", convs[i].fn);
+			break;
+		case "NAN":
+		case "INFINITY":
+			printf("%s(%s)", convs[i].p, v);
+			break;
+		case "-NAN":
+		case "-INFINITY":
+			printf("%s(%s)", convs[i].p, v);
+			break;
+		default:
+			printf("%s(%s)", convs[i].fn, v);
+			break;
+		}
+	}
+	printf("), ");
+}
+
+void
+main()
+{
+	for (int i = 0; i < dim(values); i++) {
+		for (int j = 0; j < dim(values); j++) {
+			printf("{ .x1 = ");
+			print_value(values[i]);
+			printf(" .x2 = ");
+			print_value(values[j]);
+			printf(" .y = %d },\n", i <= j ? 1 : 0);
+		}
+	}
+}
+
+main();

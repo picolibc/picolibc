@@ -23,10 +23,10 @@ static const float TWO23[2] = {
 float
 rintf(float x)
 {
-    __int32_t      i0, j0, sx;
-    __uint32_t     i, i1, ix;
-    float          t;
-    volatile float w;
+    __int32_t  i0, j0, sx;
+    __uint32_t i, i1, ix;
+    float      t;
+    float      w;
     GET_FLOAT_WORD(i0, x);
     sx = (i0 >> 31) & 1;
     ix = (i0 & 0x7fffffff);
@@ -39,7 +39,7 @@ rintf(float x)
             i0 &= 0xfff00000;
             i0 |= ((i1 | -i1) >> 9) & 0x400000;
             SET_FLOAT_WORD(x, i0);
-            w = TWO23[sx] + x;
+            w = barrier_float(TWO23[sx] + x);
             t = w - TWO23[sx];
             GET_FLOAT_WORD(i0, t);
             SET_FLOAT_WORD(t, (i0 & 0x7fffffff) | lsl(sx, 31));
@@ -59,7 +59,7 @@ rintf(float x)
             return x; /* x is integral */
     }
     SET_FLOAT_WORD(x, i0);
-    w = TWO23[sx] + x;
+    w = barrier_float(TWO23[sx] + x);
     return w - TWO23[sx];
 }
 

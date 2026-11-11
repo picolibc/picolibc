@@ -59,6 +59,8 @@ foreach file : srcs_ssp
     message('libc/ssp/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/ssp/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/ssp/' + file + ': libos overrides generic')
   else
     srcs_ssp_use += file
   endif

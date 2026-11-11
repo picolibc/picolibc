@@ -41,13 +41,19 @@
 float_t
 name(pown)(float_t x, long long int k)
 {
+    if (k == 0) {
+        if (issignaling(x))
+            return x + x;
+        return 1;
+    }
     if (isnan(x))
         return x + x;
-    if (k == 0)
-        return 1;
     if (x == 0) {
-        if (k > 0)
+        if (k > 0) {
+            if (k & 1)
+                return x;
             return 0;
+        }
         return kernel(__math_divzero)((k & 1) && signbit(x));
     }
     if (isinf(x)) {
@@ -56,7 +62,7 @@ name(pown)(float_t x, long long int k)
                 x = (float_t)INFINITY;
             return x;
         }
-        return ((k & 1) && signbit(x)) ? -0 : 0;
+        return ((k & 1) && signbit(x)) ? float_f(-0.0) : float_f(0.0);
     }
     if (k == 1)
         return x;

@@ -43,6 +43,8 @@ foreach file : srcs_errno
     message('libc/errno/' + file + ': machine overrides generic')
   elif s_file in srcs_machine
     message('libc/errno/' + s_file + ': machine overrides generic')
+  elif file in srcs_libos
+    message('libc/errno/' + file + ': libos overrides generic')
   else
     srcs_errno_use += file
   endif

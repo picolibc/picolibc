@@ -114,6 +114,10 @@ srcs_math_two = [
   'fdiv_64.c',
   'fdiv_80.c',
   'fdiv_128.c',
+  'fma_32.c',
+  'fma_64.c',
+  'fma_80.c',
+  'fma_128.c',
   'fmaximum_32.c',
   'fmaximum_64.c',
   'fmaximum_80.c',
@@ -158,6 +162,8 @@ srcs_math_two = [
   'fsqrt_64.c',
   'fsqrt_80.c',
   'fsqrt_128.c',
+  'sqrt_80.c',
+  'sqrt_128.c',
   'ffma_32.c',
   'ffma_64.c',
   'ffma_80.c',
@@ -166,6 +172,20 @@ srcs_math_two = [
   'ff_pown_64.c',
   'ff_pown_80.c',
   'ff_pown_128.c',
+  'fromfp_32.c',
+  'fromfp_64.c',
+  'fromfp_80.c',
+  'fromfp_128.c',
+  'fromfpx_32.c',
+  'fromfpx_64.c',
+  'fromfpx_80.c',
+  'fromfpx_128.c',
+  'iscanonical_80.c',
+  'iscanonical_128.c',
+  'iseqsig_32.c',
+  'iseqsig_64.c',
+  'iseqsig_80.c',
+  'iseqsig_128.c',
   'log10p1_32.c',
   'log10p1_64.c',
   'log10p1_80.c',
@@ -182,10 +202,26 @@ srcs_math_two = [
   'powr_64.c',
   'powr_80.c',
   'powr_128.c',
+  'rootn_32.c',
+  'rootn_64.c',
+  'rootn_80.c',
+  'rootn_128.c',
   'roundeven_32.c',
   'roundeven_64.c',
   'roundeven_80.c',
   'roundeven_128.c',
+  'rsqrt_32.c',
+  'rsqrt_64.c',
+  'rsqrt_80.c',
+  'rsqrt_128.c',
+  'setpayload_32.c',
+  'setpayload_64.c',
+  'setpayload_80.c',
+  'setpayload_128.c',
+  'setpayloadsig_32.c',
+  'setpayloadsig_64.c',
+  'setpayloadsig_80.c',
+  'setpayloadsig_128.c',
   'sinpi_32.c',
   'sinpi_64.c',
   'sinpi_80.c',
@@ -194,6 +230,34 @@ srcs_math_two = [
   'tanpi_64.c',
   'tanpi_80.c',
   'tanpi_128.c',
+  'totalorder_32.c',
+  'totalorder_64.c',
+  'totalorder_80.c',
+  'totalorder_128.c',
+  'totalordermag_32.c',
+  'totalordermag_64.c',
+  'totalordermag_80.c',
+  'totalordermag_128.c',
+  'ufromfp_32.c',
+  'ufromfp_64.c',
+  'ufromfp_80.c',
+  'ufromfp_128.c',
+  'ufromfpx_32.c',
+  'ufromfpx_64.c',
+  'ufromfpx_80.c',
+  'ufromfpx_128.c',
   ]
 
-src_libm_math_two = files(srcs_math_two)
+srcs_math_two_use = []
+foreach file : srcs_math_two
+  s_file = fs.replace_suffix(file, '.S')
+  if file in srcs_libm_machine
+    message('libm/math_two/' + file + ': machine overrides generic')
+  elif s_file in srcs_libm_machine
+    message('libm/math_two/' + s_file + ': machine overrides generic')
+  else
+    srcs_math_two_use += file
+  endif
+endforeach
+
+src_libm_math_two = files(srcs_math_two_use)

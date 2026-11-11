@@ -19,9 +19,9 @@ __typeof(basename) __gnu_basename;
 char *
 __gnu_basename(const char *path)
 {
-    char *p;
+    const char *p;
     if ((p = strrchr(path, '/')))
-        return p + 1;
+        return (char *)(p + 1);
     return (char *)path;
 }
 

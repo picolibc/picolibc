@@ -37,6 +37,7 @@ src_semihost += files([
                        'arc_errno.c',
                        'arc_exit.c',
                        'arc_fstat.c',
+                       'arc_getentropy.c',
                        'arc_lseek.c',
                        'arc_open.c',
                        'arc_read.c',
@@ -60,4 +61,5 @@ src_semihost += files([
   src_semihost_fake_rename,
   src_semihost_fake_setrlimit,
   src_semihost_fake_statvfs,
+  src_semihost_fake_times,
   ]

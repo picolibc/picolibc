@@ -41,8 +41,8 @@ const char haystack[] = "hello world";
 
 #define check(func, needle, expect)                                                              \
     do {                                                                                         \
-        char *ptr = func(haystack, needle);                                                      \
-        int   result = -1;                                                                       \
+        const char *ptr = func(haystack, needle);                                                \
+        int         result = -1;                                                                 \
         if (ptr)                                                                                 \
             result = ptr - haystack;                                                             \
         if (result != expect) {                                                                  \

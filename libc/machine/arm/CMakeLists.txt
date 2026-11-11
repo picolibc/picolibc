@@ -41,6 +41,7 @@ picolibc_sources_flags("-fno-builtin"
   interrupt.c
   memchr.c
   memchr.S
+  memcmp.c
   memcpy.c
   memcpy.S
   memmove.c

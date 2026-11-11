@@ -47,4 +47,5 @@ picolibc_sources_flags("-fno-builtin"
   strcmp.S
   strlen.S
   tls.c
+  vector_table.c
   )

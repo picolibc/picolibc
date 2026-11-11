@@ -36,10 +36,6 @@
 
 dir="$(dirname "$0")"
 
-if $dir/check-ci "$1"; then
-    exit 77
-fi
-
 # select the program
 elf="$1"
 shift
@@ -91,7 +87,7 @@ case "$target" in
               -mon chardev=con,mode=readline \
               -net none \
               -nographic \
-              -device loader,file="$elf",cpu-num=0
+              -device loader,file="$elf",cpu-num=0 "$@"
 
         ;;
     *)

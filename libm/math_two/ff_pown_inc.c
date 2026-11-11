@@ -54,8 +54,10 @@ name(_ff_pown)(float_t hi, float_t lo, long long int k)
     for (;;) {
         if (ku & 1) {
             result = ff_mul_ff(result, xx);
-            if (isinf(result.hi) || result.hi == 0)
-                break;
+            if (isinf(result.hi))
+                return kernel(__math_oflow)(result.hi < 0);
+            if (result.hi == 0)
+                return kernel(__math_uflow)(signbit(result.hi));
         }
         ku >>= 1;
         if (!ku)

@@ -21,6 +21,7 @@
  * SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
+#define _ISOC23_SOURCE
 #include "math_config.h"
 
 // This is only necessary because the implementation of isnan only works
@@ -54,7 +55,7 @@ nexttowardf(float x, long double y)
         if (signbit(y))
             ux |= 0x80000000;
         x = asfloat(ux);
-        force_eval_float(opt_barrier_float(x) * x);
+        (void)opt_barrier_float(opt_barrier_float(x) * x);
         return x;
     } else if ((long double)x < y) {
         if (signbit(x))

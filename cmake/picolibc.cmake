@@ -78,6 +78,10 @@ function(picolibc_sources_fake)
   set_property(TARGET c PROPERTY SOURCES_FAKE ${current_sources_fake})
 endfunction()
 
+# Install headers. Only the first version of each header is installed,
+# so machine headers, which are added first, override generic ones.
+# The library itself is built using the source directories; see
+# PICOLIBC_INCLUDE_DIRECTORIES.
 function(picolibc_headers subdir)
 
   # Get current headers
@@ -96,7 +100,6 @@ function(picolibc_headers subdir)
     endforeach()
     if(include)
       list(APPEND current_headers "${rel_header}")
-      configure_file("${header}" "${PROJECT_BINARY_DIR}/picolibc/include/${rel_header}")
     endif()
   endforeach()
   set_property(GLOBAL PROPERTY PICOLIBC_HEADERS ${current_headers})

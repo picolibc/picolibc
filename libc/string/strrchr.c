@@ -45,6 +45,8 @@ QUICKREF
 
 #include <string.h>
 
+#undef strrchr
+
 char *
 strrchr(const char *s, int i)
 {

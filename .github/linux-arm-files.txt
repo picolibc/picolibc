@@ -1,1 +1,2 @@
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v16/ATfE-23.0.0-pre-Linux-AArch64.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/ATfE-23.0.0-pre-Linux-AArch64.tar.xz
+https://github.com/picolibc/picolibc-ci-tools/releases/download/v18/meson-stable.tar.xz

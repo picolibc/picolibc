@@ -100,40 +100,31 @@ __declare_fenv_inline(int) fesetround(int __round)
     return (0);
 }
 
+/* fenv_t holds fpcr in the upper 32 bits and fpsr in the lower 32 bits */
 __declare_fenv_inline(int) fegetenv(fenv_t *__envp)
 {
-    fenv_t __r;
+    fenv_t __fpcr, __fpsr;
 
-    __mrs_fpcr(__r);
-    *__envp = __r & _ENABLE_MASK;
-
-    __mrs_fpsr(__r);
-    *__envp |= __r & (FE_ALL_EXCEPT | (_ROUND_MASK << _ROUND_SHIFT));
-
+    __mrs_fpcr(__fpcr);
+    __mrs_fpsr(__fpsr);
+    *__envp = (__fpcr << 32) | (__uint32_t)__fpsr;
     return (0);
 }
 
 __declare_fenv_inline(int) feholdexcept(fenv_t *__envp)
 {
-    fenv_t __r;
+    fegetenv(__envp);
 
-    __mrs_fpcr(__r);
-    *__envp = __r & _ENABLE_MASK;
-    __r &= ~(_ENABLE_MASK);
-    __msr_fpcr(__r);
-
-    __mrs_fpsr(__r);
-    *__envp |= __r & (FE_ALL_EXCEPT | (_ROUND_MASK << _ROUND_SHIFT));
-    __r &= ~(_ENABLE_MASK);
-    __msr_fpsr(__r);
+    /* Disable traps and clear the exception flags */
+    __msr_fpcr((*__envp >> 32) & ~(fenv_t)_ENABLE_MASK);
+    __msr_fpsr((fenv_t)(__uint32_t)*__envp & ~(fenv_t)FE_ALL_EXCEPT);
     return (0);
 }
 
 __declare_fenv_inline(int) fesetenv(const fenv_t *__envp)
 {
-
-    __msr_fpcr((*__envp) & _ENABLE_MASK);
-    __msr_fpsr((*__envp) & (FE_ALL_EXCEPT | (_ROUND_MASK << _ROUND_SHIFT)));
+    __msr_fpcr(*__envp >> 32);
+    __msr_fpsr((fenv_t)(__uint32_t)*__envp);
     return (0);
 }
 

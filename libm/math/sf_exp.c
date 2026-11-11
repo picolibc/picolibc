@@ -92,7 +92,8 @@ expf(float x) /* default IEEE double exp */
         __uint32_t hy;
         GET_FLOAT_WORD(hy, y);
         SET_FLOAT_WORD(y, hy + lsl((k + 100), 23)); /* add k to y's exponent */
-        return y * twom100;
+        /* tiny and inexact */
+        return __math_inexactf(y * twom100);
     }
 }
 

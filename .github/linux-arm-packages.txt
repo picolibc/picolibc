@@ -1,5 +1,5 @@
 build-essential
-meson
+python3
 cmake
 file
 ninja-build

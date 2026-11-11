@@ -296,9 +296,19 @@ typedef union {
  * Debian gcc-powerpc64-linux-gnu 4:16.1.0-1 miscompiles sf_pow.c with
  *
  *  -mfloat128-hardware -mvsx -mcpu=power9 -Wno-psabi
+ *
+ * We can't just use opt_barrier_float as that's optimized on
+ * powerpc as an asm with register constraints and we need the value
+ * to go through memory.
  */
 #ifdef __POWER9_VECTOR__
-#define GET_FLOAT_WORD(i, d) force_evalf((i) = asuint(d))
+static __always_inline uint32_t
+__get_float_word_mem(float d)
+{
+    volatile float __v = d;
+    return asuint(__v);
+}
+#define GET_FLOAT_WORD(i, d) ((i) = __get_float_word_mem(d))
 #else
 #define GET_FLOAT_WORD(i, d) ((i) = asuint(d))
 #endif

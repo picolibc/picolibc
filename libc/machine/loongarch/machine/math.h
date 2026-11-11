@@ -112,7 +112,7 @@ __declare_extern_inline(double)
 fmax(double x, double y)
 {
     double result;
-    if (issignaling(x) || issignaling(y))
+    if (__issignaling(x) || __issignaling(y))
         return x + y;
 
     __asm__ volatile("fmax.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
@@ -123,7 +123,7 @@ __declare_extern_inline(double)
 fmin(double x, double y)
 {
     double result;
-    if (issignaling(x) || issignaling(y))
+    if (__issignaling(x) || __issignaling(y))
         return x + y;
 
     __asm__ volatile("fmin.d\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
@@ -219,7 +219,7 @@ __declare_extern_inline(float)
 fmaxf(float x, float y)
 {
     float result;
-    if (issignaling(x) || issignaling(y))
+    if (__issignalingf(x) || __issignalingf(y))
         return x + y;
 
     __asm__ volatile("fmax.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));
@@ -230,7 +230,7 @@ __declare_extern_inline(float)
 fminf(float x, float y)
 {
     float result;
-    if (issignaling(x) || issignaling(y))
+    if (__issignalingf(x) || __issignalingf(y))
         return x + y;
 
     __asm__ volatile("fmin.s\t%0, %1, %2" : "=f"(result) : "f"(x), "f"(y));

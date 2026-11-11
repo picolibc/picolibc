@@ -33,10 +33,9 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale',
-           'misc', 'posix', 'search', 'signal', 'ssp',
-           'stdio', 'stdlib', 'string', 'time', 'xdr',
-           'uchar', 'ubsan']
+libdirs = ['argz', 'ctype', 'errno', 'iconv', 'locale', 'misc',
+           'posix', 'search', 'signal', 'ssp', 'stdbit', 'stdio',
+           'stdlib', 'string', 'time', 'xdr', 'uchar', 'ubsan']
 
 if use_stdlib
   libdirs += ['native']
@@ -94,7 +93,7 @@ foreach params : targets
 
   if libobjs != []
     local_lib_cpart_target = static_library('cpart' + target,
-				            pic: false,
+				            pic: use_pic,
 				            objects : libobjs,
 					    include_directories: inc,
 					    c_args: target_c_args + c_args)

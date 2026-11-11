@@ -47,6 +47,8 @@ QUICKREF
 #include <limits.h>
 #include "local.h"
 
+#undef strchr
+
 char *
 strchr(const char *s1, int i)
 {

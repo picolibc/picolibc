@@ -47,7 +47,7 @@ sinl(long double x)
     /* If x = +-0 or x is a subnormal number, then sin(x) = x */
     if (z.bits.exp == 0) {
         if (x != 0.0L)
-            __math_set_inexactl();
+            return __math_inexactl(x);
         return (x);
     }
 

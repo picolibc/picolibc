@@ -16,7 +16,6 @@ case "$1" in
 	echo ""
 	echo "Options:"
 	echo "  -u    download files from unicode.org first, download uniset tool"
-	echo "  -i    copy files from /usr/share/unicode/ucd first"
 	echo "  -h    show this"
 	exit
 	;;
@@ -36,36 +35,49 @@ case "$1" in
 	do	wget http://unicode.org/Public/UNIDATA/$data
 	done
 	;;
--i)
-	echo copying data from /usr/share/unicode/ucd
-	for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt
-	do	cp /usr/share/unicode/ucd/$data .
-	done
-	;;
 esac
+
+UNICODE_DIR=""
+
+for dir in /usr/share/unicode /usr/share/unicode/ucd; do
+    if [ -r $dir/UnicodeData.txt ]; then
+	echo Using data from $dir
+	UNICODE_DIR=$dir
+    fi
+done
 
 echo checking uniset tool
 type uniset || exit 9
 
 echo checking Unicode data files
-for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt
-do	if [ -r $data ]
-	then	true
-	else	echo $data not available, skipping table generation
-		exit
+for data in UnicodeData.txt Blocks.txt EastAsianWidth.txt; do
+    if [ -r $data ]; then
+	true
+    else
+	if [ -r $UNICODE_DIR/$data ]; then
+	    ln -s $UNICODE_DIR/$data $data
+	else
+	    echo $data not available, skipping table generation
+	    exit 1
 	fi
+    fi
 done
 
-echo generating from Unicode version `sed -e 's,[^.0-9],,g' -e 1q Blocks.txt`
+
+UNICODE_VERSION=$(sed -n '1s,[^.0-9],,gp' Blocks.txt)
+echo "generating from Unicode version ${UNICODE_VERSION}"
 
 #############################################################################
 # table generation
 
 echo generating combining characters table
-uniset +cat=Me +cat=Mn +cat=Cf -00AD +1160-11FF +200B +D7B0-D7C6 +D7CB-D7FB c > combining.t
+(echo "/* Unicode version ${UNICODE_VERSION} */" &&
+     uniset +cat=Me +cat=Mn +cat=Cf -00AD +1160-11FF +200B +D7B0-D7C6 +D7CB-D7FB c) > combining.t
 
 echo generating ambiguous width characters table
-sh ./mkwidthA && uniset +WIDTH-A -cat=Me -cat=Mn -cat=Cf c > ambiguous.t
+sh ./mkwidthA
+(echo "/* Unicode version ${UNICODE_VERSION} */" &&
+     uniset +WIDTH-A -cat=Me -cat=Mn -cat=Cf c) > ambiguous.t
 
 echo generating wide characters table
 sh ./mkwide

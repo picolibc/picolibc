@@ -82,6 +82,8 @@ picolibc_headers(""
   setjmp.h
   signal.h
   spawn.h
+  stdc-predef.h
+  stdbit.h
   stdckdint.h
   stdint.h
   stdio.h
@@ -107,5 +109,6 @@ picolibc_headers(""
 if(${__HAVE_COMPLEX})
   picolibc_headers(""
     complex.h
+    tgmath.h
     )
 endif()

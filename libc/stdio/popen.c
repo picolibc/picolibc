@@ -47,7 +47,8 @@ __pipe_close(FILE *file)
     int                 ret;
 
     ret = __bufio_close(file);
-    (void)waitpid(child, wstatus, 0);
+    if (waitpid(child, wstatus, 0) < 0)
+        return _FDEV_ERR;
     return ret;
 }
 

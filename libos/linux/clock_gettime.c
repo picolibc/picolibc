@@ -39,23 +39,12 @@
 int
 clock_gettime(clockid_t id, struct timespec *ts)
 {
-    struct __kernel_timespec kts;
-    int                      kid;
-    int                      ret;
+    struct __kernel_timespec_time_t kts;
+    int                             kid;
+    int                             ret;
 
-    if (id == CLOCK_MONOTONIC)
-        kid = LINUX_CLOCK_MONOTONIC;
-    else if (id == CLOCK_PROCESS_CPUTIME_ID)
-        kid = LINUX_CLOCK_PROCESS_CPUTIME_ID;
-    else if (id == CLOCK_REALTIME)
-        kid = LINUX_CLOCK_REALTIME;
-    else if (id == CLOCK_THREAD_CPUTIME_ID)
-        kid = LINUX_CLOCK_THREAD_CPUTIME_ID;
-    else {
-        errno = EINVAL;
-        return -1;
-    }
-    ret = syscall(LINUX_SYS_clock_gettime, kid, &kts);
+    MAP_CLOCK_ID(kid, id);
+    ret = syscall(LINUX_SYS_clock_gettime_time_t, kid, &kts);
     if (ret < 0)
         return ret;
     ts->tv_sec = kts.tv_sec;

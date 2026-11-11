@@ -69,6 +69,9 @@ compoundn(real x, int y)
 	if (x < -1)
 		raise nan();
 
+	if (y == 0)
+		return 1;
+
 	if (x == -1 && y < 0 && is_odd(y))
 		raise infinity(false);
 
@@ -98,8 +101,6 @@ compoundn(real x, int y)
 	}
 
 	if (x == 0)
-		return 1;
-	if (y == 0)
 		return 1;
 
 	x = imprecise(x, 8192) + 1;

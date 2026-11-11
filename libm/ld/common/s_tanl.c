@@ -52,7 +52,7 @@ tanl(long double x)
 
     /* If x = +-0 or x is subnormal, then tan(x) = x. */
     if (z.bits.exp == 0)
-        return (x);
+        return x != 0.0L ? __math_inexactl(x) : x;
 
     /* If x = NaN or Inf, then tan(x) = NaN. */
     if (z.bits.exp == 32767)

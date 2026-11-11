@@ -186,13 +186,13 @@ extern __picolibc_export int  daylight;
 extern __picolibc_export char * const tzname[2];
 #endif /* __POSIX_VISIBLE */
 
-char *asctime(const struct tm *_tblock) __picolibc_export;
+char *asctime(const struct tm *_tblock) __deprecated_c23 __picolibc_export;
 
 #if __POSIX_VISIBLE
 #define __ASCTIME_SIZE 26
 
-char *asctime_r(const struct tm * __restrict,
-                char[__restrict_arr __min_size(__ASCTIME_SIZE)]) __picolibc_export;
+char *asctime_r(const struct tm * __restrict, char[__restrict_arr __min_size(__ASCTIME_SIZE)])
+    __picolibc_export;
 #endif
 
 clock_t clock(void) __picolibc_export;
@@ -212,7 +212,7 @@ int clock_nanosleep(clockid_t clock_id, int flags, const struct timespec *rqtp,
 int clock_settime(clockid_t clock_id, const struct timespec *tp) __picolibc_export;
 #endif
 
-char *ctime(const time_t *_time) __picolibc_export;
+char *ctime(const time_t *_time) __deprecated_c23 __picolibc_export;
 
 #if __POSIX_VISIBLE
 char *ctime_r(const time_t *, char[__restrict_arr __min_size(__ASCTIME_SIZE)]) __picolibc_export;
@@ -263,12 +263,12 @@ size_t strftime_l(char * __restrict _s, size_t              _maxsize, const char
 #endif
 
 #if __XSI_VISIBLE
-char *strptime(const char * __restrict, const char * __restrict,
-               struct tm * __restrict) __picolibc_export;
+char *strptime(const char * __restrict, const char * __restrict, struct tm * __restrict)
+    __picolibc_export;
 #endif
 #if __GNU_VISIBLE
-char *strptime_l(const char * __restrict, const char * __restrict, struct tm * __restrict,
-                 locale_t) __picolibc_export;
+char *strptime_l(const char * __restrict, const char * __restrict, struct tm * __restrict, locale_t)
+    __picolibc_export;
 #endif
 
 time_t time(time_t *_timer) __picolibc_export;
@@ -279,8 +279,8 @@ time_t timegm(struct tm *_timeptr) __picolibc_export;
 
 #if __POSIX_VISIBLE
 struct sigevent;
-int timer_create(clockid_t clock_id, struct sigevent * __restrict evp,
-                 timer_t * __restrict timerid) __picolibc_export;
+int timer_create(clockid_t clock_id, struct sigevent * __restrict evp, timer_t * __restrict timerid)
+    __picolibc_export;
 
 int timer_delete(timer_t timerid) __picolibc_export;
 

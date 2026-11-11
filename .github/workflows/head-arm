@@ -8,6 +8,8 @@ on:
     branches:
       - main
   workflow_dispatch:
+  schedule:
+    - cron: '27 5 * * *'
 
 permissions:
   contents: read
@@ -30,6 +32,11 @@ env:
 jobs:
   cache-maker:
     runs-on: ubuntu-24.04-arm
+    permissions:
+      actions: write
+      contents: read
+    outputs:
+      image-key: ${{ steps.key.outputs.key }}
     steps:
       - name: Clone picolibc
         uses: actions/checkout@v7
@@ -37,13 +44,27 @@ jobs:
           path: picolibc
           fetch-depth: 128
 
+      - name: Compute the Docker Image cache key
+        id: key
+        run: echo "key=${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}" >> "$GITHUB_OUTPUT"
+
       - name: Cache the Docker Image
         id: cache
         uses: actions/cache@v6
         with:
           path: ${{ env.IMAGE_FILE }}
-          key: ${{ env.IMAGE_FILE }}-${{ hashFiles( env.DOCKERFILE, env.PACKAGES_FILE, env.EXTRA_FILE ) }}
+          key: ${{ steps.key.outputs.key }}
           lookup-only: true
+
+      # A scheduled run only refreshes main's cache entry, so it isn't
+      # evicted while PRs still need it; restoring it updates its
+      # last-access time, which a lookup doesn't.
+      - name: Refresh the Docker Image cache entry
+        if: github.event_name == 'schedule' && steps.cache.outputs.cache-hit == 'true'
+        uses: actions/cache/restore@v6
+        with:
+          path: ${{ env.IMAGE_FILE }}
+          key: ${{ steps.key.outputs.key }}
 
       - name: Set up Docker Buildx
         if: steps.cache.outputs.cache-hit != 'true'
@@ -57,4 +78,14 @@ jobs:
           file: .github/Dockerfile-arm
           tags: ${{ env.IMAGE }}:latest
           outputs: type=docker,force-compression=true,compression=zstd,compression-level=22,dest=${{ env.IMAGE_FILE }}
+
+      - name: Delete stale Docker Image caches from main
+        if: github.event_name == 'schedule' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          KEY: ${{ steps.key.outputs.key }}
+        run: |
+          gh cache list --ref refs/heads/main --key "$IMAGE_FILE-" --limit 100 --json id,key \
+            --jq ".[] | select(.key != \"$KEY\") | .id" | xargs -r -n1 gh cache delete
 

@@ -68,13 +68,14 @@ tests_real_exp = [
   'test-exp2m1',
   'test-log',
   'test-log10',
-  'test-log1p',
+  'test-logp1',
   'test-log10p1',
   'test-log2p1',
   'test-log2',
   'test-pow',
   'test-pown',
   'test-powr',
+  'test-rootn',
 ]
 
 tests_real_narrow = [
@@ -94,15 +95,22 @@ tests_real_narrow = [
 
 tests_real_other = [
   'test-add',
+  'test-canonicalize',
   'test-cbrt',
   'test-ceil',
   'test-erf',
   'test-erfc',
   'test-floor',
+  'test-fromfp',
+  'test-fromfpx',
   'test-hypot',
+  'test-iseqsig',
   'test-j0',
   'test-j1',
   'test-jn',
+  'test-y0',
+  'test-y1',
+  'test-yn',
   'test-lgamma',
   'test-nextafter',
   'test-nextdown',
@@ -111,8 +119,15 @@ tests_real_other = [
   'test-remquo-quo',
   'test-round',
   'test-roundeven',
+  'test-rsqrt',
+  'test-setpayload',
+  'test-setpayloadsig',
   'test-sqrt',
-  'test-tgamma'
+  'test-tgamma',
+  'test-totalorder',
+  'test-totalordermag',
+  'test-ufromfp',
+  'test-ufromfpx',
 ]
 
 tests_complex_trig = [
@@ -139,6 +154,7 @@ tests_complex_exp = [
 tests_complex_other = [
   'test-csqrt',
   'test-complex-funcs',
+  'test-tgmath',
 ]
 
 tests_other = [
@@ -147,6 +163,7 @@ tests_other = [
   'test-long-double',
   'test-math-errhandling',
   'test-math-funcs',
+  'test-narrow-fenv',
   'test-rounding-mode',
   'test-scalbn',
   ]
@@ -159,8 +176,8 @@ functions = [ 'acos', 'acosh', 'acospi', 'asin', 'asinh', 'asinpi',
               'atan', 'atanh', 'atanpi', 'cbrt', 'ceil', 'cos',
               'cosh', 'cospi', 'erf', 'erfc', 'exp', 'exp10', 'exp2',
               'expm1', 'exp10m1', 'exp2m1', 'floor', 'j0', 'j1',
-              'lgamma', 'log', 'log10', 'log1p', 'log2', 'log10p1',
-              'log2p1', 'round', 'roundeven', 'sin', 'sinpi',
+              'lgamma', 'log', 'log10', 'logp1', 'log2', 'log10p1',
+              'log2p1', 'round', 'roundeven', 'rsqrt', 'sin', 'sinpi',
               'sincos_cos', 'sincos_sin', 'sinh', 'sqrt', 'tan',
               'tanh', 'tanpi', 'tgamma', 'y0', 'y1', ]
 
@@ -172,6 +189,7 @@ test_extra_src = {
 
 test_extra_c_args = {
   'test-math-errhandling': arg_fnobuiltin,
+  'test-narrow-fenv': arg_fnobuiltin,
   'test-rounding-mode': arg_fnobuiltin
 }
 
@@ -185,7 +203,7 @@ foreach params : targets
   target_dir = params['dir']
   target_c_args = params['c_args']
 
-  _libs = [get_variable('lib_c' + target)]
+  _libs = [get_variable('lib_c_link' + target)]
   if is_variable(oslib_test + target)
     _libs += [get_variable(oslib_test + target)]
   endif

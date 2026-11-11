@@ -45,6 +45,10 @@ option('multilib-exclude', type: 'array', value: [],
        description: 'Multilib configurations containing any of these strings will not be built')
 option('multilib-include', type: 'array', value: [],
        description: 'Only build multilib configurations containing any of these strings')
+option('shared-library', type: 'boolean', value: false,
+       description: 'Build shared libraries in addition to static libraries')
+option('shared-library-version', type: 'string', value: '',
+        description: 'Version for the shared libc (e.g. "2.0.0" -> libc.so.2.0.0 with SONAME libc.so.2). Empty means unversioned libc.so.')
 option('sanitize-bounds', type: 'boolean', value: false,
        description: 'Build the library with -fsanitize=bounds')
 option('sanitize-undefined', type: 'boolean', value: false,
@@ -69,6 +73,8 @@ option('use-hlt-semihosting', type: 'boolean', value: 'false',
         description: 'Enable HLT Semihosting (only valid for Armv8)')
 option('picolibc-export', type: 'boolean', value: true,
        description: 'Annotate public picolibc APIs with default (exported) visibility')
+option('ndebug', type: 'combo', choices: ['true', 'false', 'auto'], value: 'auto',
+       description: 'Build the library with -DNDEBUG (auto: unless buildtype is debug)')
 
 #
 # Installation options
@@ -159,8 +165,10 @@ option('format-default', type: 'combo', choices: ['double', 'float', 'long-long'
        description: 'which printf/scanf versions should be the default')
 option('printf-aliases', type: 'boolean', value: true,
        description: 'Allow link-time printf aliases')
-option('io-percent-b', type: 'boolean', value: false,
-       description: 'enable proposed %b/%B format in printf and scanf (default: false)')
+option('io-percent-b', type: 'boolean', value: true,
+       description: 'enable %b/%B format in printf and scanf (default: true)')
+option('io-length-w', type: 'boolean', value: true,
+       description: 'enable wN and wfN printf length modifiers (default: true)')
 option('printf-small-ultoa', type: 'boolean', value: true,
        description: 'Avoid softare division in decimal conversions')
 option('printf-percent-n', type: 'boolean', value: false,

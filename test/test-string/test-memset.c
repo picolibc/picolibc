@@ -188,6 +188,36 @@ test(size_t start, size_t end, int c)
     return error;
 }
 
+/*
+ * Deterministic boundary cases: zero/one/max lengths at every
+ * alignment and the char values which exercise sign handling.
+ */
+static size_t
+test_edges(void)
+{
+    static const int    chars[] = { 0x00, 0x01, 0x7f, 0x80, 0xff, 0xaa };
+    static const size_t lens[] = { 0,  1,  2,  3,   4,   7,   8,   15,  16,  17,  31,
+                                   32, 33, 64, 127, 128, 255, 256, 257, 511, 512, 1024 };
+    size_t              error = 0;
+    size_t              a, n, ci;
+
+    for (ci = 0; ci < sizeof(chars) / sizeof(chars[0]); ci++) {
+        for (n = 0; n < sizeof(lens) / sizeof(lens[0]); n++) {
+            for (a = 0; a < 8; a++) {
+                if (a + lens[n] > MAX_BUF)
+                    continue;
+                fill();
+                if (memset(buf + a, chars[ci], lens[n]) != buf + a) {
+                    printf("memset return (%zu, %zu)\n", a, lens[n]);
+                    error++;
+                }
+                error += check("memset edge", buf, MAX_BUF, a, a + lens[n], chars[ci]);
+            }
+        }
+    }
+    return error;
+}
+
 int
 main(void)
 {
@@ -198,6 +228,8 @@ main(void)
     int    nend;
     int    nstart;
     int    ret = 0;
+
+    ret |= test_edges() != 0;
 
     init_crc();
     for (nend = 0; nend < NEND; nend++) {

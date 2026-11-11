@@ -37,6 +37,10 @@
 #include <poll.h>
 #include <stdio.h>
 
+#ifndef POLLREMOVE
+#define POLLREMOVE 0x1000
+#endif
+
 int
 main(void)
 {

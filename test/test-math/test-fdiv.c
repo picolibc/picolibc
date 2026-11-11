@@ -38,5 +38,6 @@
 
 #define TEST_VECTORS "test-fdiv.h"
 #define TEST_FUNC    fdiv
+#define ULP_BITWISE
 
 #include "test-real-real.h"
