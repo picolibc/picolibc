@@ -39,9 +39,10 @@
 # Compiles <source> as C++ with -fsyntax-only, then includes each
 # header named in <list> and checks that none of the macros listed
 # there is defined in C++. C++ code may use any name which C++ doesn't
-# define as a macro, so these C-only macros would break it. Defining
-# _GNU_SOURCE makes the headers define everything they can, so a
-# missing C++ check shows up with any C++ version.
+# define as a macro, so these C-only macros would break it. The
+# compiler arguments should define _GNU_SOURCE so that the headers
+# define everything they can, otherwise a missing C++ check may not
+# show up.
 
 set -o pipefail
 export LC_ALL=C
@@ -63,7 +64,7 @@ hidden=$(echo "$entries" | awk '{ print $2 }' | sort -u)
 
 macros=$(for header in $headers; do
              echo "#include <$header>"
-         done | "$@" -x c++ -D_GNU_SOURCE -E -dM - |
+         done | "$@" -x c++ -E -dM - |
              awk '$1 == "#define" { sub(/\(.*/, "", $2); print $2 }' | sort -u) || exit 1
 
 if ! grep -q -x __PICOLIBC__ <<< "$macros"; then
