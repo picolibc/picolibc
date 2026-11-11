@@ -388,6 +388,19 @@ foreach params : targets
            env: test_env)
     endif
 
+    t1 = 'test-math-cplusplus'
+    t1_src = t1 + '.cpp'
+    test(t1 + target,
+         executable(t1 + target, t1_src,
+                    cpp_args: _cpp_args,
+                    link_args: _cpp_args + _link_args,
+                    objects: _objs,
+                    link_depends: _link_depends,
+                    include_directories: inc),
+         depends: bios_bin,
+         suite: 'test',
+         env: test_env)
+
     t1 = 'test-cdefs-cxx03'
     t1_src = t1 + '.cpp'
     _cxx03_args = _cpp_args + ['-std=c++03']

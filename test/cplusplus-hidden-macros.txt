@@ -34,8 +34,10 @@
 # Macros which picolibc headers define in C but not in C++.
 #
 # C++ code may use any name which C++ doesn't define as a macro, for
-# example as the name of a member function, so these C-only macros are
-# hidden from C++. Functions with the same names are still declared.
+# example as the name of a member function, so these C macros aren't
+# defined in C++. math.h provides overloaded inline functions with the
+# same names instead, except for isinff, isnanf, isinfl and isnanl,
+# which are library functions in both C and C++.
 #
 # math.h also doesn't declare the legacy int isinf(double) and int
 # isnan(double) functions from C++11 on, as they conflict with the

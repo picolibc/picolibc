@@ -1849,6 +1849,9 @@ endif
 if get_option('test-long-double')
   test_c_args += ['-D_TEST_LONG_DOUBLE']
   native_c_args += ['-D_TEST_LONG_DOUBLE']
+  if have_cplusplus
+    test_cpp_args += ['-D_TEST_LONG_DOUBLE']
+  endif
 endif
 
 native_c_args += ['-Wl,--no-fatal-warnings']
