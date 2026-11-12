@@ -37,7 +37,20 @@
 #include "../../crt0.h"
 
 #define PSW_CU0 0x00010000
+#define PSW_CU1 0x00020000
 #define FPSR_FS 0x00020000
+
+#ifdef __FPU_OK__
+#define PSW_CU_FPU PSW_CU0
+#else
+#define PSW_CU_FPU 0
+#endif
+
+#ifdef __V850_FXU__
+#define PSW_CU_FXU PSW_CU1
+#else
+#define PSW_CU_FXU 0
+#endif
 
 #if defined(__V850_CALLT__)                                                                       \
     && (defined(__v850e__) || defined(__v850e1__) || defined(__v850e2__) || defined(__v850e2v3__) \
@@ -48,11 +61,13 @@
 static void __used __section(".text.startup")
 _cstart(void)
 {
-#ifdef __FPU_OK__
+#if PSW_CU_FPU | PSW_CU_FXU
     uint32_t psw;
 
     __asm__ volatile("stsr psw, %0" : "=r"(psw));
-    __asm__ volatile("ldsr %0, psw" : : "r"(psw | PSW_CU0));
+    __asm__ volatile("ldsr %0, psw" : : "r"(psw | PSW_CU_FPU | PSW_CU_FXU));
+#endif
+#ifdef __FPU_OK__
     __asm__ volatile("ldsr %0, fpsr" : : "r"(FPSR_FS));
 #endif
     __start();
