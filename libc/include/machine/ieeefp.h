@@ -365,6 +365,9 @@ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 #ifdef __v850
 #define __IEEE_LITTLE_ENDIAN
+#ifdef __FPU_OK__
+#define _SUPPORTS_ERREXCEPT
+#endif
 #endif
 
 #ifdef __D10V__
