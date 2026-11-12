@@ -33,6 +33,8 @@
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
+add_subdirectory(machine)
+
 picolibc_sources(
   setjmp.S
   )
