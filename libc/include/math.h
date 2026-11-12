@@ -246,11 +246,81 @@ int __issignalingl(long double __x) __picolibc_export;
 #define __iszero(__x)      (fpclassify(__x) == FP_ZERO)
 #endif
 
+/*
+ * C++ code may use these names as identifiers, so C++ gets overloaded
+ * functions instead of the C23 classification macros. They use
+ * fpclassify as older GCC versions lack the builtins used by
+ * __issubnormal and __iszero.
+ */
 #if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+#ifdef __cplusplus
+extern "C++" {
+inline int
+issubnormal(float __x)
+{
+    return fpclassify(__x) == FP_SUBNORMAL;
+}
+
+inline int
+issubnormal(double __x)
+{
+    return fpclassify(__x) == FP_SUBNORMAL;
+}
+
+#ifdef __HAVE_LONG_DOUBLE
+inline int
+issubnormal(long double __x)
+{
+    return fpclassify(__x) == FP_SUBNORMAL;
+}
+#endif
+
+inline int
+iszero(float __x)
+{
+    return fpclassify(__x) == FP_ZERO;
+}
+
+inline int
+iszero(double __x)
+{
+    return fpclassify(__x) == FP_ZERO;
+}
+
+#ifdef __HAVE_LONG_DOUBLE
+inline int
+iszero(long double __x)
+{
+    return fpclassify(__x) == FP_ZERO;
+}
+#endif
+
+inline int
+issignaling(float __x)
+{
+    return __float_generic3(__issignalingf, __issignaling, __issignalingl, __x);
+}
+
+inline int
+issignaling(double __x)
+{
+    return __float_generic3(__issignalingf, __issignaling, __issignalingl, __x);
+}
+
+#ifdef __HAVE_LONG_DOUBLE
+inline int
+issignaling(long double __x)
+{
+    return __float_generic3(__issignalingf, __issignaling, __issignalingl, __x);
+}
+#endif
+}
+#else
 #define issubnormal(__x) __issubnormal(__x)
 #define iszero(__x)      __iszero(__x)
 #ifndef issignaling
 #define issignaling(__x) __float_generic3(__issignalingf, __issignaling, __issignalingl, __x)
+#endif
 #endif
 #endif
 
@@ -264,6 +334,36 @@ int __issignalingl(long double __x) __picolibc_export;
 #if __GNU_VISIBLE || __ISO_C_VISIBLE >= 2023
 #ifdef __LONG_DOUBLE_NON_CANONICAL
 int __iscanonicall(long double __x) __picolibc_export;
+#endif
+#ifdef __cplusplus
+extern "C++" {
+inline int
+iscanonical(float)
+{
+    return 1;
+}
+
+inline int
+iscanonical(double)
+{
+    return 1;
+}
+
+#ifdef __LONG_DOUBLE_NON_CANONICAL
+inline int
+iscanonical(long double __x)
+{
+    return __iscanonicall(__x);
+}
+#elif defined(__HAVE_LONG_DOUBLE)
+inline int
+iscanonical(long double)
+{
+    return 1;
+}
+#endif
+}
+#elif defined(__LONG_DOUBLE_NON_CANONICAL)
 #define iscanonical(__x)                                                                        \
     _Generic((__x), long double: __iscanonicall(__x), default: ((void)(__typeof(__x))(__x), 1))
 #else
@@ -273,6 +373,48 @@ int __iscanonicall(long double __x) __picolibc_export;
 
 /* picolibc extensions */
 #if __MISC_VISIBLE
+#ifdef __cplusplus
+/* isinff, isnanf, isinfl and isnanl are real functions, declared below */
+extern "C++" {
+inline int
+isfinitef(float __x)
+{
+    return isfinite(__x);
+}
+
+inline int
+isnormalf(float __x)
+{
+    return isnormal(__x);
+}
+
+inline int
+iszerof(float __x)
+{
+    return iszero(__x);
+}
+
+#ifdef __HAVE_LONG_DOUBLE
+inline int
+isfinitel(long double __x)
+{
+    return isfinite(__x);
+}
+
+inline int
+isnormall(long double __x)
+{
+    return isnormal(__x);
+}
+
+inline int
+iszerol(long double __x)
+{
+    return iszero(__x);
+}
+#endif
+}
+#else
 #define isfinitef(x) isfinite((float)(x))
 #define isinff(x)    isinf((float)(x))
 #define isnanf(x)    isnan((float)(x))
@@ -284,6 +426,7 @@ int __iscanonicall(long double __x) __picolibc_export;
 #define isnanl(x)    isnan((long double)(x))
 #define isnormall(x) isnormal((long double)(x))
 #define iszerol(x)   iszero((long double)(x))
+#endif
 #endif
 #endif /* __MISC_VISIBLE */
 
@@ -342,7 +485,23 @@ int __iseqsigl(long double __x, long double __y) __picolibc_export;
 #endif
 
 #if __MISC_VISIBLE || __ISO_C_VISIBLE >= 2023
+#ifdef __cplusplus
+extern "C++" {
+/* Compare in the wider of the two types, like the C macro */
+template <class __T1, class __T2>
+inline int
+iseqsig(__T1 __x, __T2 __y)
+{
+    if (sizeof(__x + __y) == sizeof(float))
+        return __iseqsigf((float)__x, (float)__y);
 #ifdef __HAVE_LONG_DOUBLE
+    if (sizeof(__x + __y) != sizeof(double))
+        return __iseqsigl((long double)__x, (long double)__y);
+#endif
+    return __iseqsig((double)__x, (double)__y);
+}
+}
+#elif defined(__HAVE_LONG_DOUBLE)
 #define iseqsig(__x, __y)                                                \
     ((sizeof((__x) + (__y)) == sizeof(float)) ? __iseqsigf((__x), (__y)) \
          : (sizeof((__x) + (__y)) == sizeof(double))                     \
