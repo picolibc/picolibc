@@ -107,6 +107,15 @@ SECTIONS
 
 	} >@TEXT_MEM@ AT>@TEXT_MEM@ :@TEXT_PHDR@
 
+@V850@	/* CALLT table, then the code it points to */
+@V850@	.call_table_data : ALIGN(2) {
+@V850@		PROVIDE(__ctbp = .);
+@V850@		*(.call_table_data)
+@V850@	} >@TEXT_MEM@ AT>@TEXT_MEM@ :@TEXT_PHDR@
+@V850@	.call_table_text : {
+@V850@		*(.call_table_text)
+@V850@	} >@TEXT_MEM@ AT>@TEXT_MEM@ :@TEXT_PHDR@
+
 @CPP@	/* additional sections when compiling with C++ exception support */
 @CPP@	.except_ordered : {
 @CPP@		*(.gcc_except_table *.gcc_except_table.*)

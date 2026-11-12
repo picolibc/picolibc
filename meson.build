@@ -1104,6 +1104,12 @@ foreach params : [default_target] + targets
       picolibc_ld_data.set('RISCV', ld_comment)
     endif
 
+    if host_cpu_family == 'v850'
+      picolibc_ld_data.set('V850', '')
+    else
+      picolibc_ld_data.set('V850', ld_comment)
+    endif
+
     default_init_section_template = init_section_template.format('@0@', '''
 		KEEP (*(.text.init.enter))
 		KEEP (*(.data.init.enter))
