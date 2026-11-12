@@ -47,11 +47,35 @@
         __fpsr;                                           \
     })
 
-#define __v850_set_fpsr(__fpsr)       __asm__ volatile("ldsr %0, fpsr" : : "r"(__fpsr))
+#define __v850_set_fpsr(__fpsr) __asm__ volatile("ldsr %0, fpsr" : : "r"(__fpsr))
+
+#ifdef __V850_FXU__
+
+/* FXSR has the FPSR layout for these fields; flags are raised in FPSR */
+#define __v850_get_fxsr()                                 \
+    ({                                                    \
+        unsigned int __fxsr;                              \
+        __asm__ volatile("stsr fxsr, %0" : "=r"(__fxsr)); \
+        __fxsr;                                           \
+    })
+
+#define __v850_set_fxsr(__fxsr) __asm__ volatile("ldsr %0, fxsr" : : "r"(__fxsr))
+
+#define __v850_get_flags()      ((__v850_get_fpsr() | __v850_get_fxsr()) & FE_ALL_EXCEPT)
+
+#define __v850_update(__clear, __set)                                                   \
+    do {                                                                                \
+        __v850_set_fpsr((__v850_get_fpsr() & ~(__clear)) | (__set));                    \
+        __v850_set_fxsr((__v850_get_fxsr() & ~(__clear)) | ((__set) & ~FE_ALL_EXCEPT)); \
+    } while (0)
+
+#else
 
 #define __v850_get_flags()            (__v850_get_fpsr() & FE_ALL_EXCEPT)
 
 #define __v850_update(__clear, __set) __v850_set_fpsr((__v850_get_fpsr() & ~(__clear)) | (__set))
+
+#endif
 
 __declare_fenv_inline(int) feclearexcept(int excepts)
 {
