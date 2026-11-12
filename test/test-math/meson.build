@@ -225,6 +225,7 @@ foreach params : targets
   _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
+  _fs_flush = tests_fs_flush_fail != [] and cc.get_define('__FPU_OK__', args: _c_args) != ''
   foreach t1 : tests
     t1_src = t1 + '.c'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
@@ -240,7 +241,8 @@ foreach params : targets
          depends: bios_bin,
 	 timeout: 120,
          suite: 'test-math',
-	 env: test_env)
+	 env: test_env,
+         should_fail: _fs_flush and t1 in tests_fs_flush_fail)
   endforeach
 
   if enable_exhaustive_math_tests
