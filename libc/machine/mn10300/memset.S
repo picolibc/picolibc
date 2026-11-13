@@ -28,7 +28,7 @@ _memset:
 	mov   d1, d2
 	mov   (28, sp),a1
 	mov   d3, a0
-#ifndef __OPTIMIZE_SIZE__
+#if !defined(__OPTIMIZE_SIZE__) || defined(__FAST_MEMFUNCS)
 	cmp   3, a1
 	bls   .L41
 	btst  3, d3

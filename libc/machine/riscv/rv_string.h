@@ -23,7 +23,7 @@
 
 #include <picolibc.h>
 
-#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if (defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)) && !defined(__FAST_MEMFUNCS)
 #define _MACHINE_RISCV_MEMCPY_ASM_
 #elif defined(__riscv_vector)
 #define _MACHINE_RISCV_MEMCPY_VECTOR_
@@ -31,7 +31,7 @@
 #define _MACHINE_RISCV_MEMCPY_C_
 #endif
 
-#if defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)
+#if (defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)) && !defined(__FAST_MEMFUNCS)
 #define _MACHINE_RISCV_MEMMOVE_ASM_
 #elif defined(__riscv_vector)
 #define _MACHINE_RISCV_MEMMOVE_VECTOR_
