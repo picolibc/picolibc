@@ -38,11 +38,12 @@
 #define _REGEX_H_
 
 #include <sys/cdefs.h>
-#define __need_ptrdiff_t
+#include <sys/_types.h>
+#define __need_size_t
 #include <stddef.h>
 
 /* types */
-typedef ptrdiff_t regoff_t;
+typedef __ssize_t regoff_t;
 
 typedef struct {
     unsigned int    re_magic;
