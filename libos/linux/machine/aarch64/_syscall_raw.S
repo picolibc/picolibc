@@ -33,28 +33,19 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-        .syntax unified
-        .section .text._syscall
-        .align 4
-        .p2align 4,,15
-        .globl _syscall
-        .type _syscall,%function
-#ifdef __thumb__
-	.thumb
-#endif
-_syscall:
-	mov	ip, sp
-	push	{r4, r5, r6, r7}
-	mov	r7, r0
-	mov	r0, r1
-	mov	r1, r2
-	mov	r2, r3
-	ldmfd	ip, {r3, r4, r5, r6}
-	swi	0x0
-	pop	{r4, r5, r6, r7}
-	cmn	r0, #4096
-	it	cc
-        bxcc    lr
-	b	_syscall_error
+        .section .text._syscall_raw
+        .globl _syscall_raw
+        .type  _syscall_raw, @function
+_syscall_raw:
+       	uxtw	x8, w0
+	mov	x0, x1
+	mov	x1, x2
+	mov	x2, x3
+	mov	x3, x4
+	mov	x4, x5
+	mov	x5, x6
+	mov	x6, x7
+	svc	0x0
+	ret
 
-        .size _syscall, . - _syscall
+        .size _syscall_raw, . - _syscall_raw

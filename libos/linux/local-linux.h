@@ -55,6 +55,13 @@
 #include <linux/linux-wait.h>
 
 long _syscall(long sys_call, ...);
-long _syscall_error(long ret);
+
+/*
+ * As _syscall, but returning the kernel's result, a negative Linux
+ * errno value on failure, without touching errno. _syscall_errno
+ * converts such a value to picolibc's errno.
+ */
+long _syscall_raw(long sys_call, ...);
+int  _syscall_errno(long ret);
 
 #endif /* _LOCAL_LINUX_H_ */

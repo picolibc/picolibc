@@ -33,10 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-        .section .text._syscall
-        .globl _syscall
-        .type  _syscall, @function
-_syscall:
+        .section .text._syscall_raw
+        .globl _syscall_raw
+        .type  _syscall_raw, @function
+_syscall_raw:
 #ifdef __x86_64
 
         # x86_64 calling convention
@@ -73,12 +73,7 @@ _syscall:
 	movq %r9, %r8           # arg4
 	movq 8(%rsp),%r9        # arg5
         syscall
-        cmpq $-4095, %rax
-        jae 0f
         ret
-0:      
-        movq %rax, %rdi
-        jmp  _syscall_error
 #else
         pushl %ebp
         pushl %edi
@@ -104,11 +99,6 @@ _syscall:
         popl %edi
         popl %ebp
 
-        cmpl $-4095, %eax
-        jae 0f
         ret
-0:
-        movl %eax,4(%esp)
-        jmp _syscall_error
 #endif
-        .size _syscall, . - _syscall
+        .size _syscall_raw, . - _syscall_raw

@@ -34,15 +34,32 @@
  */
 
 #include "local-linux.h"
-#include <linux/linux-errno.h>
+#include <stdarg.h>
 
+/*
+ * Make a system call, setting errno on failure. Callers pass up to six
+ * arguments; reading them all is safe on the architectures Linux
+ * supports, as other C libraries' syscall wrappers rely on too.
+ */
 long
-_syscall_error(long ret)
+_syscall(long sys_call, ...)
 {
-    unsigned long linux_errno = (unsigned long)-ret;
-    if (linux_errno < sizeof(__errno_map) / sizeof(__errno_map[0]))
-        errno = (int)__errno_map[linux_errno];
-    else
-        errno = EINVAL;
-    return -1;
+    va_list ap;
+    long    a, b, c, d, e, f;
+    long    ret;
+
+    va_start(ap, sys_call);
+    a = va_arg(ap, long);
+    b = va_arg(ap, long);
+    c = va_arg(ap, long);
+    d = va_arg(ap, long);
+    e = va_arg(ap, long);
+    f = va_arg(ap, long);
+    va_end(ap);
+    ret = _syscall_raw(sys_call, a, b, c, d, e, f);
+    if ((unsigned long)ret >= (unsigned long)-4095) {
+        errno = _syscall_errno(ret);
+        return -1;
+    }
+    return ret;
 }
