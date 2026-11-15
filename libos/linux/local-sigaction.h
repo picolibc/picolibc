@@ -49,6 +49,15 @@ int  _signal_from_linux(int sig);
 void _sigmask_to_linux(__kernel_sigset_t *kset, const sigset_t *set);
 void _sigmask_from_linux(sigset_t *set, const __kernel_sigset_t *kset);
 
+/* Linux si_code values for signals sent from user space */
+#define LINUX_SI_USER    0
+#define LINUX_SI_QUEUE   (-1)
+#define LINUX_SI_TIMER   (-2)
+#define LINUX_SI_MESGQ   (-3)
+#define LINUX_SI_ASYNCIO (-4)
+#define LINUX_SI_TKILL   (-6)
+
+void _siginfo_from_linux(siginfo_t *info, const struct __kernel_siginfo *kinfo);
 #define __KERNEL_NSIG_BYTES (sizeof(__kernel_sigset_t))
 
 static inline void

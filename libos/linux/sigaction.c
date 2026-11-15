@@ -85,8 +85,7 @@ _signal_sigaction(int sig, struct __kernel_siginfo *kinfo, void *ucontext)
 #else
     func = _sig_func[sig];
 #endif
-    SIMPLE_MAP_SIGINFO(&info, kinfo);
-    SIMPLE_MAP_SIGVAL(&info.si_value, &(kinfo->si_value));
+    _siginfo_from_linux(&info, kinfo);
     (*func.sa_sigaction)(sig, &info, ucontext);
 }
 
