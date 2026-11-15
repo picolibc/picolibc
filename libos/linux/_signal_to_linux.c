@@ -38,10 +38,22 @@
 
 #define NUM_SIG (sizeof(__signal_picolibc_to_linux) / sizeof(__signal_picolibc_to_linux[0]))
 
+/*
+ * Returns the Linux signal number, 0 for 0, or -1 for signals Linux
+ * doesn't have, which the kernel then rejects.
+ */
 int
 _signal_to_linux(int sig)
 {
-    if ((unsigned)sig < NUM_SIG)
-        return (int)__signal_picolibc_to_linux[sig];
-    return (int)__LINUX_SIGINT;
+    int ksig;
+
+    if (sig == 0)
+        return 0;
+    if (sig < 0 || (unsigned)sig >= NUM_SIG)
+        return -1;
+    ksig = (int)__signal_picolibc_to_linux[sig];
+    /* The table maps signals Linux lacks to SIGINT */
+    if (ksig == (int)__LINUX_SIGINT && sig != SIGINT)
+        return -1;
+    return ksig;
 }

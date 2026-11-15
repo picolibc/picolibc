@@ -42,6 +42,6 @@ _sigmask_from_linux(sigset_t *set, const __kernel_sigset_t *kset)
 
     sigemptyset(set);
     for (sig = 0; sig < _NSIG; sig++)
-        if (__kernel_sigset_get_mask(kset, _signal_to_linux(sig)))
+        if (_signal_to_linux(sig) > 0 && __kernel_sigset_get_mask(kset, _signal_to_linux(sig)))
             sigaddset(set, sig);
 }
