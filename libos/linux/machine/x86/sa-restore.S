@@ -49,3 +49,18 @@ __sa_restore:
         int     $0x80
 #endif
         .size __sa_restore, . - __sa_restore
+
+        /* Return from a SA_SIGINFO handler, which has a real-time signal frame */
+        .section .text.__sa_restore_rt
+        .global __sa_restore_rt
+        .type __sa_restore_rt, function
+        .align 8
+__sa_restore_rt:
+#ifdef __x86_64
+        movq    $LINUX_SYS_rt_sigreturn, %rax
+        syscall
+#else
+        movl    $LINUX_SYS_rt_sigreturn, %eax
+        int     $0x80
+#endif
+        .size __sa_restore_rt, . - __sa_restore_rt
