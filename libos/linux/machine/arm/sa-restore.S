@@ -48,3 +48,19 @@ __sa_restore:
         nop
 
         .size __sa_restore, . - __sa_restore
+
+        /* Return from a SA_SIGINFO handler, which has a real-time signal frame */
+        .section .text.__sa_restore_rt
+        .align 4
+        .p2align 4,,15
+        .globl __sa_restore_rt
+        .type __sa_restore_rt,%function
+#ifdef __thumb__
+	.thumb
+#endif
+__sa_restore_rt:
+        mov     r7, #173
+	swi	0x0
+        nop
+
+        .size __sa_restore_rt, . - __sa_restore_rt

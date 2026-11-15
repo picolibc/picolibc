@@ -39,7 +39,11 @@
         .align 4
         .globl __sa_restore
         .type __sa_restore,%function
+        .globl __sa_restore_rt
+        .type __sa_restore_rt,%function
+        /* There is only a real-time signal frame */
 __sa_restore:
+__sa_restore_rt:
         mov     x8, #LINUX_SYS_rt_sigreturn
 	svc     0x0
         nop
