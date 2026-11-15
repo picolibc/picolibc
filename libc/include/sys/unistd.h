@@ -296,7 +296,11 @@ int usleep(useconds_t __useconds) __picolibc_export;
 #if __BSD_VISIBLE
 int vhangup(void) __picolibc_export;
 #endif
-ssize_t                        write(int __fd, const void *__buf, size_t __nbyte) __picolibc_export;
+ssize_t write(int __fd, const void *__buf, size_t __nbyte) __picolibc_export;
+
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
+extern __picolibc_export char **environ;
+#endif
 
 extern __picolibc_export char *optarg; /* getopt(3) external variables */
 extern __picolibc_export int   optind;
