@@ -33,23 +33,15 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-        .section .text._syscall
-        .globl _syscall
-        .type  _syscall, @function
-_syscall:
-       	uxtw	x8, w0
-	mov	x0, x1
-	mov	x1, x2
-	mov	x2, x3
-	mov	x3, x4
-	mov	x4, x5
-	mov	x5, x6
-	mov	x6, x7
-	svc	0x0
-	cmn	x0, #4095
-	b.cs	0f
-	ret
-0:
-	b	_syscall_error
+#include "local-linux.h"
+#include <linux/linux-errno.h>
 
-        .size _syscall, . - _syscall
+int
+_syscall_errno(long ret)
+{
+    unsigned long linux_errno = (unsigned long)-ret;
+
+    if (linux_errno < sizeof(__errno_map) / sizeof(__errno_map[0]))
+        return (int)__errno_map[linux_errno];
+    return EINVAL;
+}

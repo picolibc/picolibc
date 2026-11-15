@@ -1530,7 +1530,8 @@ Files: empty-libs/meson.build
  libos/linux/_signal_from_linux.c
  libos/linux/_signal_to_linux.c
  libos/linux/_statbuf.c
- libos/linux/_syscall_error.c
+ libos/linux/_syscall.c
+ libos/linux/_syscall_errno.c
  libos/linux/access.c
  libos/linux/alarm.c
  libos/linux/cfgetispeed.c
@@ -1581,6 +1582,7 @@ Files: empty-libs/meson.build
  libos/linux/local-times.h
  libos/linux/lseek.c
  libos/linux/lstat.c
+ libos/linux/machine/aarch64/_syscall_raw.S
  libos/linux/machine/aarch64/linux/linux-dirent.h
  libos/linux/machine/aarch64/linux/linux-dirent64-struct.h
  libos/linux/machine/aarch64/linux/linux-errno.h
@@ -1616,7 +1618,7 @@ Files: empty-libs/meson.build
  libos/linux/machine/aarch64/meson.build
  libos/linux/machine/aarch64/sa-restore.S
  libos/linux/machine/aarch64/sys/meson.build
- libos/linux/machine/aarch64/syscall.S
+ libos/linux/machine/arm/_syscall_raw.S
  libos/linux/machine/arm/linux/linux-dirent.h
  libos/linux/machine/arm/linux/linux-dirent64-struct.h
  libos/linux/machine/arm/linux/linux-errno.h
@@ -1652,7 +1654,6 @@ Files: empty-libs/meson.build
  libos/linux/machine/arm/meson.build
  libos/linux/machine/arm/sa-restore.S
  libos/linux/machine/arm/sys/meson.build
- libos/linux/machine/arm/syscall.S
  libos/linux/machine/i686/linux/linux-dirent.h
  libos/linux/machine/i686/linux/linux-dirent64-struct.h
  libos/linux/machine/i686/linux/linux-errno.h
@@ -1684,6 +1685,7 @@ Files: empty-libs/meson.build
  libos/linux/machine/i686/linux/linux-tms-struct.h
  libos/linux/machine/i686/linux/linux-wait.h
  libos/linux/machine/i686/linux/linux-winsize-struct.h
+ libos/linux/machine/x86/_syscall_raw.S
  libos/linux/machine/x86/asm/ldt.h
  libos/linux/machine/x86/asm/meson.build
  libos/linux/machine/x86/linux/linux-dirent.h
@@ -1722,7 +1724,6 @@ Files: empty-libs/meson.build
  libos/linux/machine/x86/sa-restore.S
  libos/linux/machine/x86/sa_restore.S
  libos/linux/machine/x86/sys/meson.build
- libos/linux/machine/x86/syscall.S
  libos/linux/machine/x86_64/linux/linux-dirent.h
  libos/linux/machine/x86_64/linux/linux-dirent64-struct.h
  libos/linux/machine/x86_64/linux/linux-errno.h

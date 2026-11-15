@@ -37,7 +37,7 @@ subdir('linux')
 
 srcs_os_linux_machine = [
   'sa-restore.S',
-  'syscall.S',
+  '_syscall_raw.S',
 ]
 
 src_os_linux_machine = files(srcs_os_linux_machine)
