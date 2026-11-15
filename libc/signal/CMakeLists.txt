@@ -35,6 +35,11 @@
 picolibc_sources(
   psignal.c
   sig2str.c
+  sigaddset.c
+  sigdelset.c
+  sigemptyset.c
+  sigfillset.c
+  sigismember.c
   sigjmp_getsigs.c
   sigjmp_setsigs.c
   )  
