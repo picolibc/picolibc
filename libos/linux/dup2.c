@@ -40,8 +40,8 @@ int
 dup2(int oldfd, int newfd)
 {
 #ifdef LINUX_SYS_dup2
-    return syscall(LINUX_SYS_dup2, oldfd, newfd);
+    return _syscall(LINUX_SYS_dup2, oldfd, newfd);
 #else
-    return syscall(LINUX_SYS_dup3, oldfd, newfd, 0);
+    return _syscall(LINUX_SYS_dup3, oldfd, newfd, 0);
 #endif
 }

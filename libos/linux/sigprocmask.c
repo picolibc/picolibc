@@ -61,7 +61,7 @@ sigprocmask(int how, const sigset_t *set, sigset_t *oldset)
     }
     if (oldset)
         poldset = &koldset;
-    ret = syscall(LINUX_SYS_rt_sigprocmask, how, pset, poldset, __KERNEL_NSIG_BYTES);
+    ret = _syscall(LINUX_SYS_rt_sigprocmask, how, pset, poldset, __KERNEL_NSIG_BYTES);
     if (ret < 0)
         return ret;
     if (oldset)

@@ -39,5 +39,5 @@
 int
 getgroups(int size, gid_t *list)
 {
-    return syscall(LINUX_SYS_getgroups, size, list);
+    return _syscall(LINUX_SYS_getgroups, size, list);
 }

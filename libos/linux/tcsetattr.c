@@ -72,7 +72,7 @@ tcsetattr(int fd, int actions, const struct termios *termios)
     struct __kernel_termios2 ktermios = {};
     long                     cmd;
 
-    if (syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios) == -1)
+    if (_syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios) == -1)
         return -1;
 
     switch (actions) {
@@ -92,5 +92,5 @@ tcsetattr(int fd, int actions, const struct termios *termios)
 
     MAP_STRUCT;
 
-    return syscall(LINUX_SYS_ioctl, fd, cmd, &ktermios);
+    return _syscall(LINUX_SYS_ioctl, fd, cmd, &ktermios);
 }

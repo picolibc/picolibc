@@ -39,5 +39,5 @@
 int
 seteuid(uid_t uid)
 {
-    return syscall(LINUX_SYS_setreuid, -1, uid);
+    return _syscall(LINUX_SYS_setreuid, -1, uid);
 }

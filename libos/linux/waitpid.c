@@ -49,7 +49,7 @@ waitpid(pid_t pid, int *wstatus, int options)
         koptions |= LINUX_WUNTRACED;
     if (options & WCONTINUED)
         koptions |= LINUX_WCONTINUED;
-    ret = syscall(LINUX_SYS_wait4, pid, &kstatus, koptions, NULL);
+    ret = _syscall(LINUX_SYS_wait4, pid, &kstatus, koptions, NULL);
     if (ret != (pid_t)-1) {
         if (WIFSIGNALED(kstatus))
             kstatus = __W_EXITCODE(0, _signal_from_linux(WTERMSIG(kstatus)));

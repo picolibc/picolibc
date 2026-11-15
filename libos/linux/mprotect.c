@@ -48,5 +48,5 @@ mprotect(void *addr, size_t len, int prot)
     if (prot & PROT_EXEC)
         linux_prot |= LINUX_PROT_EXEC;
 
-    return (int)syscall(LINUX_SYS_mprotect, addr, len, linux_prot);
+    return (int)_syscall(LINUX_SYS_mprotect, addr, len, linux_prot);
 }

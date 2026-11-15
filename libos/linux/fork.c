@@ -45,9 +45,9 @@ fork(void)
 {
     forked = true;
 #ifdef LINUX_SYS_fork
-    return syscall(LINUX_SYS_fork);
+    return _syscall(LINUX_SYS_fork);
 #else
-    return syscall(LINUX_SYS_clone, __LINUX_SIGCHLD, 0, 0, 0, 0);
+    return _syscall(LINUX_SYS_clone, __LINUX_SIGCHLD, 0, 0, 0, 0);
 #endif
 }
 

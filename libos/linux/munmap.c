@@ -39,5 +39,5 @@ IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int
 munmap(void *addr, size_t len)
 {
-    return (int)syscall(LINUX_SYS_munmap, addr, len);
+    return (int)_syscall(LINUX_SYS_munmap, addr, len);
 }

@@ -39,5 +39,5 @@
 uid_t
 getuid(void)
 {
-    return syscall(LINUX_SYS_getuid);
+    return _syscall(LINUX_SYS_getuid);
 }

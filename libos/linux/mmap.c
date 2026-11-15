@@ -68,9 +68,9 @@ mmap(void *addr, size_t len, int prot, int flags, int fd, off_t offset)
         errno = EINVAL;
         return MAP_FAILED;
     }
-    return (void *)syscall(LINUX_SYS_mmap2, addr, len, linux_prot, linux_flags, fd,
-                           (long)(offset >> 12));
+    return (void *)_syscall(LINUX_SYS_mmap2, addr, len, linux_prot, linux_flags, fd,
+                            (long)(offset >> 12));
 #else
-    return (void *)syscall(LINUX_SYS_mmap, addr, len, linux_prot, linux_flags, fd, (long)offset);
+    return (void *)_syscall(LINUX_SYS_mmap, addr, len, linux_prot, linux_flags, fd, (long)offset);
 #endif
 }

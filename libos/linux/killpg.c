@@ -39,5 +39,5 @@ int
 killpg(int pgrp, int sig)
 {
     sig = _signal_to_linux(sig);
-    return syscall(LINUX_SYS_kill, -pgrp, sig);
+    return _syscall(LINUX_SYS_kill, -pgrp, sig);
 }

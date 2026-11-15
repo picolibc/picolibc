@@ -40,7 +40,7 @@ char *
 getcwd(char *buf, size_t size)
 {
     int ret;
-    ret = syscall(LINUX_SYS_getcwd, buf, size);
+    ret = _syscall(LINUX_SYS_getcwd, buf, size);
     if (ret < 0)
         return NULL;
     return buf;

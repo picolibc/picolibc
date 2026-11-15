@@ -40,8 +40,8 @@ int
 mkdir(const char *path, mode_t mode)
 {
 #ifdef LINUX_SYS_mkdir
-    return syscall(LINUX_SYS_mkdir, path, mode);
+    return _syscall(LINUX_SYS_mkdir, path, mode);
 #else
-    return syscall(LINUX_SYS_mkdirat, LINUX_AT_FDCWD, path, mode);
+    return _syscall(LINUX_SYS_mkdirat, LINUX_AT_FDCWD, path, mode);
 #endif
 }

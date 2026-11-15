@@ -39,5 +39,5 @@
 int
 setegid(gid_t gid)
 {
-    return syscall(LINUX_SYS_setregid, -1, gid);
+    return _syscall(LINUX_SYS_setregid, -1, gid);
 }

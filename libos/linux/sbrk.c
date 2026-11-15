@@ -50,7 +50,7 @@ void * __disable_sanitizer
 sbrk(intptr_t increment)
 {
     if (real_brk == NULL) {
-        real_brk = (void *)syscall(LINUX_SYS_brk, 0);
+        real_brk = (void *)_syscall(LINUX_SYS_brk, 0);
         reported_brk = real_brk;
     }
 
@@ -66,7 +66,7 @@ sbrk(intptr_t increment)
         void *ret = old_real_brk;
 
         if (!use_mmap)
-            ret = (void *)syscall(LINUX_SYS_brk, new_real_brk);
+            ret = (void *)_syscall(LINUX_SYS_brk, new_real_brk);
         if (ret == old_real_brk) {
             /*
              * Something mapped after the break stops it from growing;

@@ -55,5 +55,5 @@ tcflow(int fd, int action)
         errno = EINVAL;
         return -1;
     }
-    return syscall(LINUX_SYS_ioctl, fd, LINUX_TCXONC, action);
+    return _syscall(LINUX_SYS_ioctl, fd, LINUX_TCXONC, action);
 }

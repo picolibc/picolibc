@@ -39,5 +39,5 @@
 mode_t
 umask(mode_t mask)
 {
-    return syscall(LINUX_SYS_umask, mask);
+    return _syscall(LINUX_SYS_umask, mask);
 }

@@ -39,5 +39,5 @@
 int
 setgid(gid_t gid)
 {
-    return syscall(LINUX_SYS_setgid, gid);
+    return _syscall(LINUX_SYS_setgid, gid);
 }

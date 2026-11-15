@@ -55,7 +55,7 @@ wait3(int *wstatus, int options, struct rusage *rusage)
         koptions |= LINUX_WCONTINUED;
     if (rusage)
         pusage = &kusage;
-    ret = syscall(LINUX_SYS_wait4, -1, &kstatus, koptions, pusage);
+    ret = _syscall(LINUX_SYS_wait4, -1, &kstatus, koptions, pusage);
     if (ret != (pid_t)-1) {
         if (WIFSIGNALED(kstatus))
             kstatus = __W_EXITCODE(0, _signal_from_linux(WTERMSIG(kstatus)));

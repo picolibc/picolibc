@@ -39,5 +39,5 @@
 pid_t
 getpid(void)
 {
-    return syscall(LINUX_SYS_getpid);
+    return _syscall(LINUX_SYS_getpid);
 }

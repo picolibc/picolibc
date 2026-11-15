@@ -61,7 +61,7 @@ setitimer(int which, const struct itimerval *new_value, struct itimerval *old_va
     if (old_value)
         pokit = &okit;
 
-    ret = syscall(LINUX_SYS_setitimer, which, &kit, pokit);
+    ret = _syscall(LINUX_SYS_setitimer, which, &kit, pokit);
 
     if (old_value)
         MAP_ITV(old_value, &okit);

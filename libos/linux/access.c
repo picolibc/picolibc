@@ -40,8 +40,8 @@ int
 access(const char *path, int mode)
 {
 #ifdef LINUX_SYS_access
-    return syscall(LINUX_SYS_access, path, mode);
+    return _syscall(LINUX_SYS_access, path, mode);
 #else
-    return syscall(LINUX_SYS_faccessat, LINUX_AT_FDCWD, path, mode, 0);
+    return _syscall(LINUX_SYS_faccessat, LINUX_AT_FDCWD, path, mode, 0);
 #endif
 }

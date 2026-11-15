@@ -56,7 +56,7 @@ getitimer(int which, struct itimerval *cur_value)
         return -1;
     }
 
-    ret = syscall(LINUX_SYS_getitimer, which, &kcur);
+    ret = _syscall(LINUX_SYS_getitimer, which, &kcur);
 
     MAP_ITV(cur_value, &kcur);
 

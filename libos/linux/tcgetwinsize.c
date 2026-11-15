@@ -40,7 +40,7 @@ tcgetwinsize(int fd, struct winsize *winsize)
 {
     int                     ret;
     struct __kernel_winsize kws;
-    ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGWINSZ, &kws);
+    ret = _syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGWINSZ, &kws);
     if (ret == 0)
         MAP_WINSIZE(winsize, &kws);
     return ret;

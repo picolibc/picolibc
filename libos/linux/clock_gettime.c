@@ -44,7 +44,7 @@ clock_gettime(clockid_t id, struct timespec *ts)
     int                             ret;
 
     MAP_CLOCK_ID(kid, id);
-    ret = syscall(LINUX_SYS_clock_gettime_time_t, kid, &kts);
+    ret = _syscall(LINUX_SYS_clock_gettime_time_t, kid, &kts);
     if (ret < 0)
         return ret;
     ts->tv_sec = kts.tv_sec;

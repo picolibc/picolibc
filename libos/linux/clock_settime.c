@@ -46,7 +46,7 @@ clock_settime(clockid_t id, const struct timespec *ts)
     MAP_CLOCK_ID(kid, id);
     kts.tv_sec = ts->tv_sec;
     kts.tv_nsec = ts->tv_nsec;
-    ret = syscall(LINUX_SYS_clock_settime_time_t, kid, &kts);
+    ret = _syscall(LINUX_SYS_clock_settime_time_t, kid, &kts);
     if (ret < 0)
         return ret;
     return 0;

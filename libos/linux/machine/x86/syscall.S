@@ -33,10 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-        .section .text.syscall
-        .globl syscall
-        .type  syscall, @function
-syscall:
+        .section .text._syscall
+        .globl _syscall
+        .type  _syscall, @function
+_syscall:
 #ifdef __x86_64
 
         # x86_64 calling convention
@@ -111,4 +111,4 @@ syscall:
         movl %eax,4(%esp)
         jmp _syscall_error
 #endif
-        .size syscall, . - syscall
+        .size _syscall, . - _syscall

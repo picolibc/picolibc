@@ -39,5 +39,5 @@
 int
 setuid(uid_t uid)
 {
-    return syscall(LINUX_SYS_setuid, uid);
+    return _syscall(LINUX_SYS_setuid, uid);
 }

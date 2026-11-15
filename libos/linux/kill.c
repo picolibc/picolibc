@@ -39,5 +39,5 @@ int
 kill(pid_t pid, int sig)
 {
     sig = _signal_to_linux(sig);
-    return syscall(LINUX_SYS_kill, pid, sig);
+    return _syscall(LINUX_SYS_kill, pid, sig);
 }

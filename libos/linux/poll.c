@@ -122,12 +122,12 @@ poll(struct pollfd *fds, nfds_t nfds, int timeout)
         fds[n].events = picolibc_to_linux(fds[n].events);
 
 #ifdef LINUX_SYS_poll
-    ret = syscall(LINUX_SYS_poll, fds, nfds, timeout);
+    ret = _syscall(LINUX_SYS_poll, fds, nfds, timeout);
 #else
     /* A negative timeout waits forever */
     struct __kernel_timespec tmo
         = { .tv_sec = timeout / 1000, .tv_nsec = ((uint64_t)timeout % 1000) * 1000000UL };
-    ret = syscall(LINUX_SYS_ppoll, fds, nfds, timeout < 0 ? NULL : &tmo, NULL, 0);
+    ret = _syscall(LINUX_SYS_ppoll, fds, nfds, timeout < 0 ? NULL : &tmo, NULL, 0);
 #endif
 
     /* revert the events changes, and map the results of every entry */

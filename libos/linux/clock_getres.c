@@ -46,7 +46,7 @@ clock_getres(clockid_t id, struct timespec *res)
     MAP_CLOCK_ID(kid, id);
     if (res)
         pkres = &kres;
-    ret = syscall(LINUX_SYS_clock_getres_time_t, kid, pkres);
+    ret = _syscall(LINUX_SYS_clock_getres_time_t, kid, pkres);
     if (ret < 0)
         return ret;
     if (res) {

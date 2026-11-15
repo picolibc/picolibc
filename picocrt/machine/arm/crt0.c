@@ -77,13 +77,13 @@ _start(void)
 extern char __arm32_tls_tcb_offset;
 #define TP_OFFSET ((size_t)&__arm32_tls_tcb_offset)
 
-long syscall(long sys_call, ...);
+long _syscall(long sys_call, ...);
 
 void
 _set_tls(void *tls)
 {
     tls = (uint8_t *)tls - TP_OFFSET;
-    syscall(0xf0005, tls);
+    _syscall(0xf0005, tls);
 }
 
 #else

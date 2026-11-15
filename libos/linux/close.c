@@ -38,5 +38,5 @@
 int
 close(int fd)
 {
-    return syscall(LINUX_SYS_close, fd);
+    return _syscall(LINUX_SYS_close, fd);
 }

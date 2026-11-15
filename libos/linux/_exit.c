@@ -38,6 +38,6 @@
 void
 _exit(int status)
 {
-    syscall(LINUX_SYS_exit, status);
+    _syscall(LINUX_SYS_exit, status);
     __builtin_unreachable();
 }
