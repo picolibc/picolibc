@@ -38,11 +38,8 @@
 int
 sigsuspend(const sigset_t *mask)
 {
-    __kernel_sigset_t kmask = {};
-    int               sig;
+    __kernel_sigset_t kmask;
 
-    for (sig = 0; sig < _NSIG; sig++)
-        if (sigismember(mask, sig))
-            __kernel_sigset_set_mask(&kmask, _signal_to_linux(sig));
-    return syscall(LINUX_SYS_rt_sigsuspend, &kmask);
+    _sigmask_to_linux(&kmask, mask);
+    return syscall(LINUX_SYS_rt_sigsuspend, &kmask, __KERNEL_NSIG_BYTES);
 }
