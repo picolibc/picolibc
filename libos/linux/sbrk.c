@@ -36,11 +36,14 @@
 #include "local-linux.h"
 #include <unistd.h>
 #include <stdint.h>
+#include <stdbool.h>
+#include <sys/mman.h>
 
 static void *real_brk;
 static void *reported_brk;
+static bool  use_mmap;
 
-#define BRK_CHUNK 4096
+#define BRK_CHUNK (1024 * 1024)
 #define BRK_MASK  (BRK_CHUNK - 1)
 
 void * __disable_sanitizer
@@ -60,9 +63,26 @@ sbrk(intptr_t increment)
     if ((uintptr_t)new_brk > (uintptr_t)real_brk) {
         void *old_real_brk = real_brk;
         void *new_real_brk = (void *)(((uintptr_t)new_brk + BRK_MASK) & ~(uintptr_t)BRK_MASK);
-        void *ret = (void *)syscall(LINUX_SYS_brk, new_real_brk);
-        if (ret == old_real_brk)
-            return (void *)(uintptr_t)-1;
+        void *ret = old_real_brk;
+
+        if (!use_mmap)
+            ret = (void *)syscall(LINUX_SYS_brk, new_real_brk);
+        if (ret == old_real_brk) {
+            /*
+             * Something mapped after the break stops it from growing;
+             * take memory from an anonymous mapping instead. malloc
+             * copes with the gap.
+             */
+            size_t size = ((size_t)increment + BRK_MASK) & ~(size_t)BRK_MASK;
+            void  *map
+                = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+            if (map == MAP_FAILED)
+                return (void *)(uintptr_t)-1;
+            use_mmap = true;
+            old_brk = map;
+            new_brk = map + increment;
+            ret = map + size;
+        }
         real_brk = (void *)ret;
     }
     reported_brk = new_brk;
