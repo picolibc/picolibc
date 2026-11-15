@@ -68,6 +68,8 @@ if has_os_posix
     'test-popen',
     'test-poll',
     'test-sbrk-blocked',
+    'test-siginfo',
+    'test-sigsuspend',
     'test-system',
   ]
 elif host_cpu_family == 'hexagon'
