@@ -70,6 +70,7 @@ if has_os_posix
     'test-sbrk-blocked',
     'test-siginfo',
     'test-sigsuspend',
+    'test-clock-nanosleep',
     'test-system',
   ]
 elif host_cpu_family == 'hexagon'
