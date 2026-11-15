@@ -245,12 +245,12 @@ int killpg(__pid_t pid, int sig) __picolibc_export;
 #if __POSIX_VISIBLE >= 200809L
 void psiginfo(const siginfo_t *, const char *) __picolibc_export;
 #endif
-#if __BSD_VISIBLE || __SVID_VISIBLE
+#if __BSD_VISIBLE || __SVID_VISIBLE || __POSIX_VISIBLE >= 200809
 void psignal(int, const char *) __picolibc_export;
 #endif
 int raise(int) __picolibc_export;
 int __fallback_raise(int) __picolibc_export;
-#if __MISC_VISIBLE
+#if __MISC_VISIBLE || __POSIX_VISIBLE >= 202405
 int sig2str(int, char *) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE
@@ -340,7 +340,7 @@ int sigwait(const sigset_t *, int *) __picolibc_export;
 #if __POSIX_VISIBLE >= 199309L
 int sigwaitinfo(const sigset_t *, siginfo_t *) __picolibc_export;
 #endif
-#if __MISC_VISIBLE
+#if __MISC_VISIBLE || __POSIX_VISIBLE >= 202405
 int str2sig(const char * __restrict, int * __restrict) __picolibc_export;
 #endif
 

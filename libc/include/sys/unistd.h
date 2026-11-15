@@ -106,8 +106,10 @@ int daemon(int nochdir, int noclose) __picolibc_export;
 #endif
 int dup(int __fildes) __picolibc_export;
 int dup2(int __fildes, int __fildes2) __picolibc_export;
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
 int dup3(int __fildes, int __fildes2, int flags) __picolibc_export;
+#endif
+#if __GNU_VISIBLE
 int eaccess(const char *__path, int __mode) __picolibc_export;
 #endif
 #if __XSI_VISIBLE
@@ -161,7 +163,7 @@ char *getcwd(char *__buf, size_t __size) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE && __XSI_VISIBLE < 500)
 int getdomainname(char *__name, size_t __len) __picolibc_export;
 #endif
-#if __BSD_VISIBLE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 202405
 int getentropy(void *, size_t) __picolibc_export;
 #endif
 gid_t getegid(void) __picolibc_export;
@@ -232,7 +234,7 @@ int  pause(void) __picolibc_export;
 int pthread_atfork(void (*)(void), void (*)(void), void (*)(void)) __picolibc_export;
 #endif
 int pipe(int __fildes[2]) __picolibc_export;
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
 int pipe2(int __fildes[2], int flags) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809 || __XSI_VISIBLE >= 500

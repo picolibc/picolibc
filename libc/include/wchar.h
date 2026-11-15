@@ -200,7 +200,7 @@ size_t wcsftime(wchar_t * __restrict, size_t, const wchar_t * __restrict,
 size_t wcsftime_l(wchar_t * __restrict, size_t, const wchar_t * __restrict,
                   const struct tm * __restrict, locale_t) __picolibc_export;
 #endif
-#if __BSD_VISIBLE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 202405
 size_t wcslcat(wchar_t *, const wchar_t *, size_t) __picolibc_export;
 size_t wcslcpy(wchar_t *, const wchar_t *, size_t) __picolibc_export;
 #endif

@@ -180,7 +180,9 @@ void            free(void *) __nothrow __picolibc_export;
 char           *getenv(const char *__string) __picolibc_export;
 #if __GNU_VISIBLE
 extern __picolibc_export char **__argv;
-char                           *secure_getenv(const char *__string) __picolibc_export;
+#endif
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
+char *secure_getenv(const char *__string) __picolibc_export;
 #endif
 #if __POSIX_VISIBLE >= 200809
 extern __picolibc_export char *suboptarg; /* getsubopt(3) external variable */
@@ -222,8 +224,10 @@ size_t memalignment(const void *) __picolibc_export;
 #if __BSD_VISIBLE || __POSIX_VISIBLE >= 200809
 char *mkdtemp(char *) __picolibc_export;
 #endif
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
 int mkostemp(char *, int) __picolibc_export;
+#endif
+#if __GNU_VISIBLE
 int mkostemps(char *, int, int) __picolibc_export;
 #endif
 #if __MISC_VISIBLE || __POSIX_VISIBLE >= 200112 || __XSI_VISIBLE >= 4
@@ -280,10 +284,12 @@ long random(void) __picolibc_export;
 void *
 realloc(void *, size_t)
 __warn_unused_result __alloc_size(2) __nothrow __picolibc_export;
-#if __BSD_VISIBLE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 202405
 void *
 reallocarray(void *, size_t, size_t)
 __warn_unused_result __alloc_size2(2, 3) __picolibc_export;
+#endif
+#if __BSD_VISIBLE
 void *
 reallocf(void *, size_t)
 __warn_unused_result __alloc_size(2) __picolibc_export;

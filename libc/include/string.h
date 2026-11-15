@@ -83,7 +83,7 @@ void *memccpy(void * __restrict, const void * __restrict, int, size_t) __picolib
 void *memchr(const void *s, int c, size_t n) __picolibc_export;
 int   memcmp(const void *, const void *, size_t) __picolibc_export;
 void *memcpy(void * __restrict, const void * __restrict, size_t) __picolibc_export;
-#if __GNU_VISIBLE
+#if __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
 void *memmem(const void *h, size_t h_n, const void *n, size_t n_n) __picolibc_export;
 #endif
 void *memmove(void *, const void *, size_t) __picolibc_export;
@@ -160,11 +160,11 @@ int __xpg_strerror_r(int, char *, size_t) __picolibc_export;
 const char *strerrorname_np(int errnum) __picolibc_export;
 const char *strerrordesc_np(int errnum) __picolibc_export;
 #endif
-#if __BSD_VISIBLE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 202405
 size_t strlcat(char *, const char *, size_t) __picolibc_export;
 #endif
 size_t strlen(const char *) __picolibc_export;
-#if __BSD_VISIBLE
+#if __BSD_VISIBLE || __POSIX_VISIBLE >= 202405
 size_t strlcpy(char *, const char *, size_t) __picolibc_export;
 #endif
 #if __MISC_VISIBLE
