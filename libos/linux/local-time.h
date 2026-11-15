@@ -93,6 +93,12 @@ struct __kernel_timespec_time_t {
         SIMPLE_MAP_TIMEVAL(&(a)->it_value, &(b)->it_value);       \
     } while (0)
 
+/*
+ * Map a clock id to Linux. Clocks Linux doesn't have get an id the
+ * kernel rejects, so each caller reports EINVAL in its usual way.
+ */
+#define LINUX_CLOCK_INVALID 0x7fffffff
+
 #define MAP_CLOCK_ID(kid, id)                     \
     do {                                          \
         if (id == CLOCK_MONOTONIC)                \
@@ -103,10 +109,8 @@ struct __kernel_timespec_time_t {
             kid = LINUX_CLOCK_REALTIME;           \
         else if (id == CLOCK_THREAD_CPUTIME_ID)   \
             kid = LINUX_CLOCK_THREAD_CPUTIME_ID;  \
-        else {                                    \
-            errno = EINVAL;                       \
-            return -1;                            \
-        }                                         \
+        else                                      \
+            kid = LINUX_CLOCK_INVALID;            \
     } while (0)
 
 #endif /* _LOCAL_TIME_H_ */

@@ -43,8 +43,13 @@ clock_nanosleep(clockid_t id, int flags, const struct timespec *dur, struct time
     struct __kernel_timespec_time_t krem, *pkrem = NULL;
     int                             kid;
     int                             kflags = 0;
-    int                             ret;
+    long                            ret;
 
+    /*
+     * clock_nanosleep reports errors in its return value, leaving
+     * errno alone, so use _syscall_raw. The kernel checks the clock
+     * and the time.
+     */
     MAP_CLOCK_ID(kid, id);
     if (flags == TIMER_ABSTIME)
         kflags = LINUX_TIMER_ABSTIME;
@@ -52,12 +57,13 @@ clock_nanosleep(clockid_t id, int flags, const struct timespec *dur, struct time
     kdur.tv_nsec = dur->tv_nsec;
     if (rem)
         pkrem = &krem;
-    ret = _syscall(LINUX_SYS_clock_nanosleep_time_t, kid, kflags, &kdur, pkrem);
+    ret = _syscall_raw(LINUX_SYS_clock_nanosleep_time_t, kid, kflags, &kdur, pkrem);
     if (ret < 0)
-        return ret;
-    if (rem) {
+        ret = _syscall_errno(ret);
+    /* An interrupted relative sleep reports the time remaining */
+    if (ret == EINTR && rem && !(kflags & LINUX_TIMER_ABSTIME)) {
         rem->tv_sec = krem.tv_sec;
         rem->tv_nsec = krem.tv_nsec;
     }
-    return 0;
+    return (int)ret;
 }
