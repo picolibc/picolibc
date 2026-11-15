@@ -37,33 +37,14 @@
  *  high.  Then merge with neighbor chunks if adjacent.
  */
 
+/*
+ * Insert a chunk already marked free into the free lists, merging it
+ * with its neighbors. The caller holds the malloc lock.
+ */
 void __disable_sanitizer
-__malloc_free(void *free_p)
+__malloc_insert_free(chunk_t *p_to_free)
 {
-    chunk_t  *p_to_free;
     chunk_t **p, *c;
-
-    if (free_p == NULL)
-        return;
-
-    p_to_free = ptr_to_chunk(free_p);
-
-    if (!_check_busy(p_to_free, "free: double free\n"))
-        return;
-
-#ifdef __MALLOC_CLEAR_FREED
-    memset(p_to_free, 0, chunk_usable(p_to_free));
-#else
-    p_to_free->next = NULL;
-#endif
-
-#if MALLOC_DEBUG
-    __malloc_validate_chunk(p_to_free);
-#endif
-
-    _mark_free(p_to_free);
-
-    MALLOC_LOCK;
 
 #if __MALLOC_SMALL_BUCKET
     size_t s = _size(p_to_free);
@@ -80,7 +61,7 @@ __malloc_free(void *free_p)
             p = &__malloc_bucket_list[bucket];
             p_to_free->next = *p;
             *p = p_to_free;
-            goto unlock;
+            return;
         }
     }
 #endif
@@ -92,7 +73,7 @@ __malloc_free(void *free_p)
             /* Check for double free */
             if (p_to_free == c) {
                 errno = ENOMEM;
-                goto unlock;
+                return;
             }
 
             break;
@@ -150,8 +131,35 @@ no_insert:
         }
     }
 #endif
+}
 
-unlock:
+void __disable_sanitizer
+__malloc_free(void *free_p)
+{
+    chunk_t *p_to_free;
+
+    if (free_p == NULL)
+        return;
+
+    p_to_free = ptr_to_chunk(free_p);
+
+    if (!_check_busy(p_to_free, "free: double free\n"))
+        return;
+
+#ifdef __MALLOC_CLEAR_FREED
+    memset(p_to_free, 0, chunk_usable(p_to_free));
+#else
+    p_to_free->next = NULL;
+#endif
+
+#if MALLOC_DEBUG
+    __malloc_validate_chunk(p_to_free);
+#endif
+
+    _mark_free(p_to_free);
+
+    MALLOC_LOCK;
+    __malloc_insert_free(p_to_free);
     MALLOC_UNLOCK;
 }
 

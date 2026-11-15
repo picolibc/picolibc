@@ -271,6 +271,9 @@ extern chunk_t *__malloc_bucket_list[NUM_BUCKET_POT];
 
 bool __malloc_grow_chunk(chunk_t *c, size_t new_size);
 
+/* Add a free chunk to the free lists; the caller holds the malloc lock */
+void __malloc_insert_free(chunk_t *c);
+
 /* Work around compiler optimizing away stores to 'size' field before
  * call to free.
  */

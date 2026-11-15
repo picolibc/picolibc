@@ -120,8 +120,16 @@ __malloc_grow_chunk(chunk_t *c, size_t new_size)
     }
 
     if (heap != (char *)-1) {
-        /* sbrk returned unexpected memory, free it */
-        make_free_chunk(blob_to_chunk(heap), add_size);
+        /*
+         * sbrk returned memory elsewhere; add it to the free lists
+         * directly, as the caller holds the malloc lock
+         */
+        chunk_t *n = blob_to_chunk(heap);
+
+        _set_size(n, add_size);
+        n->next = NULL;
+        _mark_free(n);
+        __malloc_insert_free(n);
     }
     return false;
 }
@@ -228,11 +236,16 @@ malloc(size_t s)
                 *p = next;
                 break;
             }
-            if (!next && __malloc_grow_chunk(c, alloc_size)) {
+            if (!next) {
                 /* Grow the last chunk in memory to the requested size,
-                 * just return it
+                 * just return it. Otherwise, any memory sbrk returned
+                 * elsewhere is now on the free list after this chunk;
+                 * stop here and ask for a whole new chunk below.
                  */
-                *p = next;
+                if (__malloc_grow_chunk(c, alloc_size))
+                    *p = next;
+                else
+                    c = NULL;
                 break;
             }
         }
