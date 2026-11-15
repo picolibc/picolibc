@@ -39,5 +39,5 @@
 int
 gethostname(char *name, size_t size)
 {
-    return syscall(LINUX_SYS_uname, name, size);
+    return _syscall(LINUX_SYS_uname, name, size);
 }

@@ -74,5 +74,5 @@ fcntl(int fd, int op, ...)
     if (arg)
         arg = va_arg(ap, int);
     va_end(ap);
-    return syscall(LINUX_SYS_fcntl, fd, op, arg);
+    return _syscall(LINUX_SYS_fcntl, fd, op, arg);
 }

@@ -57,24 +57,24 @@ raise(int sig)
      * unavailable.
      */
 #if defined(LINUX_SYS_tgkill) && defined(LINUX_SYS_getpid) && defined(LINUX_SYS_gettid)
-    int pid = syscall(LINUX_SYS_getpid);
+    int pid = _syscall(LINUX_SYS_getpid);
     int tid;
 
     if (pid < 0)
         return pid;
 
-    tid = syscall(LINUX_SYS_gettid);
+    tid = _syscall(LINUX_SYS_gettid);
     if (tid < 0)
         return tid;
 
-    return syscall(LINUX_SYS_tgkill, pid, tid, _signal_to_linux(sig));
+    return _syscall(LINUX_SYS_tgkill, pid, tid, _signal_to_linux(sig));
 #elif defined(LINUX_SYS_tkill) && defined(LINUX_SYS_gettid)
-    int tid = syscall(LINUX_SYS_gettid);
+    int tid = _syscall(LINUX_SYS_gettid);
 
     if (tid < 0)
         return tid;
 
-    return syscall(LINUX_SYS_tkill, tid, _signal_to_linux(sig));
+    return _syscall(LINUX_SYS_tkill, tid, _signal_to_linux(sig));
 #else
     return kill(getpid(), sig);
 #endif

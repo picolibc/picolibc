@@ -44,5 +44,5 @@ sigsuspend(const sigset_t *mask)
     for (sig = 0; sig < _NSIG; sig++)
         if (sigismember(mask, sig))
             __kernel_sigset_set_mask(&kmask, _signal_to_linux(sig));
-    return syscall(LINUX_SYS_rt_sigsuspend, &kmask);
+    return _syscall(LINUX_SYS_rt_sigsuspend, &kmask);
 }

@@ -39,5 +39,5 @@
 gid_t
 getegid(void)
 {
-    return syscall(LINUX_SYS_getegid);
+    return _syscall(LINUX_SYS_getegid);
 }

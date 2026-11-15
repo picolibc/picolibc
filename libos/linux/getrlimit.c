@@ -45,11 +45,11 @@ getrlimit(int resource, struct rlimit *rlim)
         return -1;
     }
 #ifdef LINUX_SYS_prlimit_size
-    int ret = syscall(LINUX_SYS_prlimit_size, 0, resource, NULL, &klim);
+    int ret = _syscall(LINUX_SYS_prlimit_size, 0, resource, NULL, &klim);
 #elif defined(LINUX_SYS_ugetrlimit)
-    int ret = syscall(LINUX_SYS_ugetrlimit, resource, &klim);
+    int ret = _syscall(LINUX_SYS_ugetrlimit, resource, &klim);
 #else
-    int ret = syscall(LINUX_SYS_getrlimit, resource, &klim);
+    int ret = _syscall(LINUX_SYS_getrlimit, resource, &klim);
 #endif
     if (ret >= 0) {
         SIMPLE_MAP_RLIMIT_SIZE(rlim, &klim);

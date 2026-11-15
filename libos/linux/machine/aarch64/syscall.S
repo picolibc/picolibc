@@ -33,10 +33,10 @@
  * OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-        .section .text.syscall
-        .globl syscall
-        .type  syscall, @function
-syscall:
+        .section .text._syscall
+        .globl _syscall
+        .type  _syscall, @function
+_syscall:
        	uxtw	x8, w0
 	mov	x0, x1
 	mov	x1, x2
@@ -52,4 +52,4 @@ syscall:
 0:
 	b	_syscall_error
 
-        .size syscall, . - syscall
+        .size _syscall, . - _syscall

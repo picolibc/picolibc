@@ -147,5 +147,5 @@ madvise(void *addr, size_t len, int advice)
         errno = EINVAL;
         return -1;
     }
-    return (int)syscall(LINUX_SYS_madvise, addr, len, linux_advice);
+    return (int)_syscall(LINUX_SYS_madvise, addr, len, linux_advice);
 }

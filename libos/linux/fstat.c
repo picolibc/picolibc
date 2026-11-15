@@ -48,8 +48,8 @@ fstat(int fd, struct stat *statbuf)
      * onwards, and qemu-linux-user only started forwarding NULL instead
      * of failing with EFAULT in late 2025, so pass "" to stay portable.
      */
-    ret = syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
-                  LINUX_STATX_BASIC_STATS, &statxbuf);
+    ret = _syscall(LINUX_SYS_statx, fd, "", LINUX_AT_EMPTY_PATH | LINUX_AT_STATX_SYNC_AS_STAT,
+                   LINUX_STATX_BASIC_STATS, &statxbuf);
     if (ret < 0)
         return ret;
     return _statbuf(statbuf, &statxbuf);

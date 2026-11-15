@@ -40,10 +40,10 @@ tcsetwinsize(int fd, const struct winsize *winsize)
 {
     int                     ret;
     struct __kernel_winsize kws;
-    ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGWINSZ, &kws);
+    ret = _syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGWINSZ, &kws);
     if (ret == 0) {
         MAP_WINSIZE(&kws, winsize);
-        ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCSWINSZ, &kws);
+        ret = _syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCSWINSZ, &kws);
     }
     return ret;
 }

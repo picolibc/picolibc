@@ -6,8 +6,8 @@
  * Hexagon Linux syscall gateway.
  *
  * Implements the generic C-callable:
- *   long syscall(long number, long a1, long a2, long a3,
- *                long a4, long a5, long a6);
+ *   long _syscall(long number, long a1, long a2, long a3,
+ *                 long a4, long a5, long a6);
  *
  * Hexagon Linux syscall ABI:
  *   r6  = syscall number
@@ -30,10 +30,10 @@
  * returns -1.
  */
 
-    .section .text.syscall, "ax", @progbits
-    .globl syscall
-    .type  syscall, @function
-syscall:
+    .section .text._syscall, "ax", @progbits
+    .globl _syscall
+    .type  _syscall, @function
+_syscall:
     r6 = r0
     r0 = memw(r29+#0)
     r1 = memw(r29+#4)
@@ -65,4 +65,4 @@ syscall:
     p0 = cmp.gtu(r1, r0)
     if (p0) jumpr r31
     jump _syscall_error
-    .size syscall, . - syscall
+    .size _syscall, . - _syscall

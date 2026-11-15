@@ -116,5 +116,5 @@ open(const char *path, int flags, ...)
     if (flags & O_TRUNC)
         linux_flags |= LINUX_O_TRUNC;
 #endif
-    return syscall(LINUX_SYS_openat, LINUX_AT_FDCWD, path, linux_flags | LINUX_O_LARGEFILE, mode);
+    return _syscall(LINUX_SYS_openat, LINUX_AT_FDCWD, path, linux_flags | LINUX_O_LARGEFILE, mode);
 }

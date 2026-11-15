@@ -39,5 +39,5 @@
 int
 chdir(const char *path)
 {
-    return syscall(LINUX_SYS_chdir, path);
+    return _syscall(LINUX_SYS_chdir, path);
 }

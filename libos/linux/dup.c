@@ -39,5 +39,5 @@
 int
 dup(int oldfd)
 {
-    return syscall(LINUX_SYS_dup, oldfd);
+    return _syscall(LINUX_SYS_dup, oldfd);
 }

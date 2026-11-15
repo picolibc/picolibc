@@ -41,7 +41,7 @@ tcgetpgrp(int fd)
 {
     int pgrp;
 
-    if (syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGPGRP, &pgrp) < 0)
+    if (_syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCGPGRP, &pgrp) < 0)
         return (pid_t)-1;
     return (pid_t)pgrp;
 }

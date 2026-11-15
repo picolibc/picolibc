@@ -39,7 +39,7 @@ int
 getentropy(void *buffer, size_t length)
 {
     while (length) {
-        ssize_t bytes = syscall(LINUX_SYS_getrandom, buffer, length, 0);
+        ssize_t bytes = _syscall(LINUX_SYS_getrandom, buffer, length, 0);
         if (bytes < 0) {
             if (errno == EINTR)
                 continue;

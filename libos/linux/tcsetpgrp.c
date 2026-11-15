@@ -39,5 +39,5 @@
 int
 tcsetpgrp(int fd, pid_t pgrp)
 {
-    return syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCSPGRP, &pgrp);
+    return _syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCSPGRP, &pgrp);
 }

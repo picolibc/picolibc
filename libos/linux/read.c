@@ -38,5 +38,5 @@
 ssize_t
 read(int fd, void *buf, size_t count)
 {
-    return syscall(LINUX_SYS_read, fd, buf, count);
+    return _syscall(LINUX_SYS_read, fd, buf, count);
 }

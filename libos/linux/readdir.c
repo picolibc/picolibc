@@ -46,7 +46,7 @@ readdir(DIR *dir)
     struct dirent            *dirent;
 
     if (dir->offset == dir->count) {
-        ssize_t ret = syscall(LINUX_SYS_getdents64, dir->fd, dir->buf, sizeof(dir->buf));
+        ssize_t ret = _syscall(LINUX_SYS_getdents64, dir->fd, dir->buf, sizeof(dir->buf));
         if (ret <= 0)
             return NULL;
         dir->offset = 0;

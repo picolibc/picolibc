@@ -47,7 +47,7 @@ void * __disable_sanitizer
 sbrk(intptr_t increment)
 {
     if (real_brk == NULL) {
-        real_brk = (void *)syscall(LINUX_SYS_brk, 0);
+        real_brk = (void *)_syscall(LINUX_SYS_brk, 0);
         reported_brk = real_brk;
     }
 
@@ -60,7 +60,7 @@ sbrk(intptr_t increment)
     if ((uintptr_t)new_brk > (uintptr_t)real_brk) {
         void *old_real_brk = real_brk;
         void *new_real_brk = (void *)(((uintptr_t)new_brk + BRK_MASK) & ~(uintptr_t)BRK_MASK);
-        void *ret = (void *)syscall(LINUX_SYS_brk, new_real_brk);
+        void *ret = (void *)_syscall(LINUX_SYS_brk, new_real_brk);
         if (ret == old_real_brk)
             return (void *)(uintptr_t)-1;
         real_brk = (void *)ret;

@@ -62,9 +62,9 @@ setrlimit(int resource, const struct rlimit *rlim)
     if (rlim->rlim_max == RLIM_INFINITY)
         klim.rlim_max = LINUX_RLIM_INFINITY_SIZE;
 #ifdef LINUX_SYS_prlimit_size
-    int ret = syscall(LINUX_SYS_prlimit_size, 0, resource, &klim, NULL);
+    int ret = _syscall(LINUX_SYS_prlimit_size, 0, resource, &klim, NULL);
 #else
-    int ret = syscall(LINUX_SYS_setrlimit, resource, &klim);
+    int ret = _syscall(LINUX_SYS_setrlimit, resource, &klim);
 #endif
     return ret;
 }

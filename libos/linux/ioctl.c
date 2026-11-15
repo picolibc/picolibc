@@ -47,7 +47,7 @@ ioctl(int fd, unsigned long op, void *arg)
     case TIOCSWINSZ:
         return tcsetwinsize(fd, arg);
     case TIOCLINUX:
-        return syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCLINUX, arg);
+        return _syscall(LINUX_SYS_ioctl, fd, LINUX_TIOCLINUX, arg);
     default:
         errno = EINVAL;
         return -1;

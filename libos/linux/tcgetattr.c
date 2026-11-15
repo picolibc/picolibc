@@ -74,7 +74,7 @@ tcgetattr(int fd, struct termios *termios)
     int                      ret;
 
     memset(&ktermios, 0, sizeof(ktermios));
-    ret = syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios);
+    ret = _syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios);
     if (ret < 0)
         return ret;
 

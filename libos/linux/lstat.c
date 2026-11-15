@@ -41,9 +41,9 @@ lstat(const char * __restrict path, struct stat * __restrict statbuf)
     struct __kernel_statx statxbuf;
     int                   ret;
 
-    ret = syscall(LINUX_SYS_statx, LINUX_AT_FDCWD, path,
-                  LINUX_AT_STATX_SYNC_AS_STAT | LINUX_AT_SYMLINK_NOFOLLOW, LINUX_STATX_BASIC_STATS,
-                  &statxbuf);
+    ret = _syscall(LINUX_SYS_statx, LINUX_AT_FDCWD, path,
+                   LINUX_AT_STATX_SYNC_AS_STAT | LINUX_AT_SYMLINK_NOFOLLOW, LINUX_STATX_BASIC_STATS,
+                   &statxbuf);
     if (ret < 0)
         return ret;
     return _statbuf(statbuf, &statxbuf);

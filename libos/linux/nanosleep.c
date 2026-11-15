@@ -48,7 +48,7 @@ nanosleep(const struct timespec *request, struct timespec *remain)
         k_remainp = &k_remain;
     else
         k_remainp = NULL;
-    ret = syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
+    ret = _syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
     if (ret < 0) {
         if (remain && errno != EINVAL) {
             remain->tv_sec = k_remain.tv_sec;

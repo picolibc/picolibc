@@ -38,5 +38,5 @@
 int
 tcflush(int fd, int queue_selector)
 {
-    return syscall(LINUX_SYS_ioctl, fd, LINUX_TCFLSH, queue_selector);
+    return _syscall(LINUX_SYS_ioctl, fd, LINUX_TCFLSH, queue_selector);
 }

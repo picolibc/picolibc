@@ -40,8 +40,8 @@ pid_t
 getpgrp(void)
 {
 #ifdef LINUX_SYS_getpgrp
-    return syscall(LINUX_SYS_getpgrp);
+    return _syscall(LINUX_SYS_getpgrp);
 #else
-    return syscall(LINUX_SYS_getpgid, 0);
+    return _syscall(LINUX_SYS_getpgid, 0);
 #endif
 }

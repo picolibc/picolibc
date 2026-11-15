@@ -40,12 +40,12 @@ unsigned int
 alarm(unsigned int seconds)
 {
 #ifdef LINUX_SYS_alarm_
-    return syscall(LINUX_SYS_alarm, seconds);
+    return _syscall(LINUX_SYS_alarm, seconds);
 #else
     struct __kernel_itimerval old, new = { .it_value.tv_sec = (long)seconds };
     unsigned int              retval;
 
-    if (syscall(LINUX_SYS_setitimer, LINUX_ITIMER_REAL, &new, &old) < 0)
+    if (_syscall(LINUX_SYS_setitimer, LINUX_ITIMER_REAL, &new, &old) < 0)
         return 0;
 
     retval = old.it_value.tv_sec;

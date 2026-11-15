@@ -39,5 +39,5 @@
 int
 setpgid(pid_t pid, pid_t pgid)
 {
-    return syscall(LINUX_SYS_setpgid, pid, pgid);
+    return _syscall(LINUX_SYS_setpgid, pid, pgid);
 }

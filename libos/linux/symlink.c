@@ -40,5 +40,5 @@
 int
 symlink(const char *target, const char *linkpath)
 {
-    return syscall(LINUX_SYS_symlinkat, target, LINUX_AT_FDCWD, linkpath);
+    return _syscall(LINUX_SYS_symlinkat, target, LINUX_AT_FDCWD, linkpath);
 }

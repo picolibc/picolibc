@@ -45,11 +45,11 @@ lseek(int fd, off_t offset, int whence)
     unsigned long offset_low = (unsigned long)offset;
     int           ret;
 
-    ret = syscall(LINUX_SYS__llseek, fd, offset_high, offset_low, &result, whence);
+    ret = _syscall(LINUX_SYS__llseek, fd, offset_high, offset_low, &result, whence);
     if (ret < 0)
         result = ret;
     return (off_t)result;
 #else
-    return syscall(LINUX_SYS_lseek, fd, offset, whence);
+    return _syscall(LINUX_SYS_lseek, fd, offset, whence);
 #endif
 }

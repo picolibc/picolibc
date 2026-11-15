@@ -49,9 +49,9 @@ statvfs(const char *path, struct statvfs *buf)
      * use plain statfs.
      */
 #ifdef LINUX_SYS_statfs64
-    ret = syscall(LINUX_SYS_statfs64, path, sizeof(kbuf), &kbuf);
+    ret = _syscall(LINUX_SYS_statfs64, path, sizeof(kbuf), &kbuf);
 #else
-    ret = syscall(LINUX_SYS_statfs, path, &kbuf);
+    ret = _syscall(LINUX_SYS_statfs, path, &kbuf);
 #endif
     if (ret < 0)
         return ret;

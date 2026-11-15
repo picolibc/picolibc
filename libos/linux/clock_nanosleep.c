@@ -52,7 +52,7 @@ clock_nanosleep(clockid_t id, int flags, const struct timespec *dur, struct time
     kdur.tv_nsec = dur->tv_nsec;
     if (rem)
         pkrem = &krem;
-    ret = syscall(LINUX_SYS_clock_nanosleep_time_t, kid, kflags, &kdur, pkrem);
+    ret = _syscall(LINUX_SYS_clock_nanosleep_time_t, kid, kflags, &kdur, pkrem);
     if (ret < 0)
         return ret;
     if (rem) {

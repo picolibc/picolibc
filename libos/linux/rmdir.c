@@ -40,8 +40,8 @@ int
 rmdir(const char *path)
 {
 #ifdef LINUX_SYS_rmdir
-    return syscall(LINUX_SYS_rmdir, path);
+    return _syscall(LINUX_SYS_rmdir, path);
 #else
-    return syscall(LINUX_SYS_unlinkat, LINUX_AT_FDCWD, path, LINUX_AT_REMOVEDIR);
+    return _syscall(LINUX_SYS_unlinkat, LINUX_AT_FDCWD, path, LINUX_AT_REMOVEDIR);
 #endif
 }

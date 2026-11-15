@@ -69,7 +69,7 @@ posix_madvise(void *addr, size_t len, int advice)
     int linux_advice = _posix_advice_to_linux(advice);
     if (linux_advice < 0)
         return EINVAL;
-    int ret = (int)syscall(LINUX_SYS_madvise, addr, len, linux_advice);
+    int ret = (int)_syscall(LINUX_SYS_madvise, addr, len, linux_advice);
     if (ret < 0)
         return errno;
     return 0;

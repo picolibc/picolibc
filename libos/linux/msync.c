@@ -48,5 +48,5 @@ msync(void *addr, size_t len, int flags)
     if (flags & MS_INVALIDATE)
         linux_flags |= LINUX_MS_INVALIDATE;
 
-    return (int)syscall(LINUX_SYS_msync, addr, len, linux_flags);
+    return (int)_syscall(LINUX_SYS_msync, addr, len, linux_flags);
 }

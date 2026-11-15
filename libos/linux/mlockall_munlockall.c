@@ -48,11 +48,11 @@ mlockall(int flags)
     if (flags & MCL_ONFAULT)
         linux_flags |= LINUX_MCL_ONFAULT;
 
-    return (int)syscall(LINUX_SYS_mlockall, linux_flags);
+    return (int)_syscall(LINUX_SYS_mlockall, linux_flags);
 }
 
 int
 munlockall(void)
 {
-    return (int)syscall(LINUX_SYS_munlockall);
+    return (int)_syscall(LINUX_SYS_munlockall);
 }

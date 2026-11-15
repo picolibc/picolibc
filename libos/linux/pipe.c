@@ -39,5 +39,5 @@
 int
 pipe(int pipefd[2])
 {
-    return syscall(LINUX_SYS_pipe2, pipefd, 0);
+    return _syscall(LINUX_SYS_pipe2, pipefd, 0);
 }

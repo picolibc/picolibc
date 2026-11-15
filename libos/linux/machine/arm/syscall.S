@@ -34,15 +34,15 @@
  */
 
         .syntax unified
-        .section .text.syscall
+        .section .text._syscall
         .align 4
         .p2align 4,,15
-        .globl syscall
-        .type syscall,%function
+        .globl _syscall
+        .type _syscall,%function
 #ifdef __thumb__
 	.thumb
 #endif
-syscall:
+_syscall:
 	mov	ip, sp
 	push	{r4, r5, r6, r7}
 	mov	r7, r0
@@ -57,4 +57,4 @@ syscall:
         bxcc    lr
 	b	_syscall_error
 
-        .size syscall, . - syscall
+        .size _syscall, . - _syscall

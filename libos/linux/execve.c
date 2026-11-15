@@ -39,5 +39,5 @@
 int
 execve(const char *path, char * const argv[], char * const envp[])
 {
-    return syscall(LINUX_SYS_execve, path, argv, envp);
+    return _syscall(LINUX_SYS_execve, path, argv, envp);
 }

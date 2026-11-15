@@ -54,7 +54,7 @@
 #include <linux/linux-time.h>
 #include <linux/linux-wait.h>
 
-long syscall(long sys_call, ...);
+long _syscall(long sys_call, ...);
 long _syscall_error(long ret);
 
 #endif /* _LOCAL_LINUX_H_ */

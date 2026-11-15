@@ -164,7 +164,7 @@ sigaction(int sig, const struct sigaction *act, struct sigaction *oldact)
     if (oldact)
         poldact = &koldact;
 
-    ret = syscall(LINUX_SYS_rt_sigaction, ksig, pact, poldact, __KERNEL_NSIG_BYTES);
+    ret = _syscall(LINUX_SYS_rt_sigaction, ksig, pact, poldact, __KERNEL_NSIG_BYTES);
 
     if (ret == 0) {
 #ifdef _USE_ATOMIC_SIGNAL

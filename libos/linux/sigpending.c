@@ -39,7 +39,7 @@ int
 sigpending(sigset_t *set)
 {
     __kernel_sigset_t kset;
-    int               ret = syscall(LINUX_SYS_rt_sigpending, &kset, __KERNEL_NSIG_BYTES);
+    int               ret = _syscall(LINUX_SYS_rt_sigpending, &kset, __KERNEL_NSIG_BYTES);
     if (ret == 0)
         _sigmask_from_linux(set, &kset);
     return ret;

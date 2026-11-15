@@ -40,5 +40,5 @@ isatty(int fd)
 {
     struct __kernel_termios2 ktermios;
 
-    return syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios) == 0;
+    return _syscall(LINUX_SYS_ioctl, fd, LINUX_TCGETS2, &ktermios) == 0;
 }
