@@ -67,6 +67,7 @@ if has_os_posix
     'test-pclose',
     'test-popen',
     'test-poll',
+    'test-sbrk-blocked',
     'test-system',
   ]
 elif host_cpu_family == 'hexagon'
@@ -84,7 +85,10 @@ if tests_enable_posix_io
   args_test_posix += ['-DTESTS_ENABLE_POSIX_IO']
 endif
 
-test_extra_c_args = {}
+# Keep the compiler from removing the allocations the test makes
+test_extra_c_args = {
+  'test-sbrk-blocked': ['-fno-builtin'],
+}
 test_args = {}
 
 foreach params : targets
@@ -172,9 +176,15 @@ foreach params : targets
 
 endforeach
 
+# picolibc's sbrk falls back to mmap; other C libraries' doesn't
+test_skip_native = ['test-sbrk-blocked']
+
 if enable_native_tests
 
   foreach t1 : tests
+    if t1 in test_skip_native
+      continue
+    endif
     t1_src = t1 + '.c'
     t1_name = t1 + '-native'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1_name + '.txt"']
