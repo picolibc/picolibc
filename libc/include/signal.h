@@ -279,7 +279,7 @@ int sigdelset(sigset_t *, const int) __nonnull((1)) __picolibc_export;
 static __inline int
 __sigdelset(sigset_t *what, int sig)
 {
-    *what &= ~(sigset_t)1 << sig;
+    *what &= ~((sigset_t)1 << sig);
     return 0;
 }
 
