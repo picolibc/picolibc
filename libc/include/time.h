@@ -183,7 +183,15 @@ extern __picolibc_export int  daylight;
 #endif
 
 #if __POSIX_VISIBLE
+/*
+ * The library defines tzname as const so that it stays in read-only
+ * storage; applications see the POSIX type.
+ */
+#ifdef _LIBC
 extern __picolibc_export char * const tzname[2];
+#else
+extern __picolibc_export char *tzname[2];
+#endif
 #endif /* __POSIX_VISIBLE */
 
 char *asctime(const struct tm *_tblock) __deprecated_c23 __picolibc_export;
