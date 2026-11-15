@@ -43,6 +43,6 @@ _sigmask_to_linux(__kernel_sigset_t *kset, const sigset_t *set)
 
     memset(kset, 0, sizeof(*kset));
     for (sig = 0; sig < _NSIG; sig++)
-        if (sigismember(set, sig))
+        if (sigismember(set, sig) && _signal_to_linux(sig) > 0)
             __kernel_sigset_set_mask(kset, _signal_to_linux(sig));
 }
