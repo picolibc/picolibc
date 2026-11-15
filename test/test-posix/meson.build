@@ -67,6 +67,7 @@ if has_os_posix
     'test-pclose',
     'test-popen',
     'test-clock-nanosleep',
+    'test-syscall-name',
     'test-system',
   ]
 elif host_cpu_family == 'hexagon'
