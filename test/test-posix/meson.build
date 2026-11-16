@@ -66,6 +66,7 @@ if has_os_posix
     'test-mmap',
     'test-pclose',
     'test-popen',
+    'test-poll',
     'test-system',
   ]
 elif host_cpu_family == 'hexagon'
