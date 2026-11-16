@@ -130,13 +130,10 @@ poll(struct pollfd *fds, nfds_t nfds, int timeout)
     ret = syscall(LINUX_SYS_ppoll, fds, nfds, timeout < 0 ? NULL : &tmo, NULL, 0);
 #endif
 
-    /* revert the events changes */
-    for (n = 0; n < nfds; n++)
+    /* revert the events changes, and map the results of every entry */
+    for (n = 0; n < nfds; n++) {
         fds[n].events = linux_to_picolibc(fds[n].events);
-
-    if (ret > 0) {
-        for (n = 0; n < (nfds_t)ret; n++)
-            fds[n].revents = linux_to_picolibc(fds[n].revents);
+        fds[n].revents = linux_to_picolibc(fds[n].revents);
     }
     return ret;
 }
