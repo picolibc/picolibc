@@ -22,7 +22,17 @@ esac
 CONFIGURE=do-"$TARGET"-configure
 shift
 git config --global --add safe.directory /picolibc
-DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE $TOOLCHAINS_FILE"
+
+INC_OK=""
+if [ -n "$BEFORE_SHA" -a -n "$AFTER_SHA" ]; then
+    echo '##########' git diff --quiet "$BEFORE_SHA".."$AFTER_SHA" -- .github scripts
+    if git diff --quiet "$BEFORE_SHA".."$AFTER_SHA" -- .github scripts; then
+	INC_OK="y"
+	echo 'No changes in .github or scripts. Enable incremental tests.'
+    else
+	echo 'Changes in .github or scripts. Running all tests.'
+    fi
+fi
 
 (cd "$DIR" || exit 2
  date
@@ -40,44 +50,20 @@ DOCKER_FILES="$DOCKERFILE $PACKAGES_FILE $EXTRA_FILE $TOOLCHAINS_FILE"
 	 exit 3
 	 ;;
  esac
- if [ -n "$BEFORE_SHA" -a -n "$AFTER_SHA" ]; then
-     for f in $DOCKER_FILES; do
-	 md5sum ../../$f > ../../$f.md5
-     done
+ INC_TESTS=""
+ if [ -n "$INC_OK" ]; then
      date
      echo '##########' git checkout $BEFORE_SHA
      git checkout $BEFORE_SHA > checkout-before.log 2>&1
      case $? in
 	 0)
 	     echo 'Checkout before succeeded'
-	     DOCKER_OK=y
-	     for f in $DOCKER_FILES; do
-		 if md5sum --check --status ../../$f.md5; then
-		     :
-		 else
-		     echo "Docker file $f changed"
-		     DOCKER_OK=
-		 fi
-	     done
-	     if [ -n "$DOCKER_OK" ]; then
-		 echo 'docker files ok, doing incremental tests'
-		 INC_TESTS=yes
-	     else
-		 echo 'Docker files not ok'
-		 date
-		 echo '##########' git checkout $AFTER_SHA
-		 if git checkout $AFTER_SHA > checkout-restore.log 2>&1; then
-		     :
-		 else
-		     cat checkout-restore.log
-		     exit 2
-		 fi
-	     fi
+	     INC_TESTS=yes
 	     ;;
 	 *)
 	     cat checkout-before.log
 	     echo 'Checkout before failed'
-	     if git checkout $AFTER_SHA > checkout-restore.log 2>&1; then
+	     if git checkout "$AFTER_SHA" > checkout-restore.log 2>&1; then
 		 :
 	     else
 		 cat checkout-restore.log
