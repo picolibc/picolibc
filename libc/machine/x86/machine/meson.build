@@ -34,7 +34,8 @@
 #
 inc_machine_headers_machine = [
   'fenv.h',
-  'fastmath.h'
+  'fastmath.h',
+  'math.h',
 ]
 
 if really_install

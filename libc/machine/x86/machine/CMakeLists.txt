@@ -35,4 +35,5 @@
 picolibc_headers(machine
   fenv.h
   fastmath.h
+  math.h
   )
