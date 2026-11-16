@@ -161,6 +161,7 @@ set(tests_other
   test-add
   test-fenv
   test-fma
+  test-fp-fast-fma
   test-long-double
   test-math-errhandling
   test-math-funcs
