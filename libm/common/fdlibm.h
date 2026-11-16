@@ -178,7 +178,70 @@ extern __float64 __kernel_tan(__float64, __float64, int);
 extern int       __kernel_rem_pio2(__float64 *, __float64 *, int, int, int, const __int32_t *);
 #endif
 
-extern int   __rem_pio2f(float, float *);
+extern int __rem_pio2f_general(float, float *);
+
+/*
+ * With float arithmetic in hardware, evaluated in float precision,
+ * reduce moderate arguments with float operations instead of the
+ * 64-bit integer code in __rem_pio2f_general.
+ */
+#if defined(__HAVE_HW_FLOAT) && (__FLT_EVAL_METHOD__ == 0 || __FLT_EVAL_METHOD__ == 16)
+#define __HAVE_REM_PIO2F_MEDIUM
+
+/*
+ * pi/2 split into four floats. The first three have at most 17
+ * significant bits, so multiplying them by an integer quotient less
+ * than 128 (at most 7 bits) is exact.
+ */
+#define __PIO2F_1   0x1.922p+0f
+#define __PIO2F_2   -0x1.2aefp-18f
+#define __PIO2F_3   0x1.68c2p-39f
+#define __PIO2F_4   0x1.a62634p-58f
+#define __INV_PIO2F 0x1.45f306p-1f
+
+/*
+ * Cody-Waite reduction for pi/4 <= |x| <= 120
+ */
+static __always_inline int
+__rem_pio2f_medium(float x, float *y)
+{
+    /* Round x * 2/pi to the nearest integer */
+    float fn = (x * __INV_PIO2F + 0x1.8p23f) - 0x1.8p23f;
+    int   n = (int)fn;
+
+    /*
+     * Exact: fn * __PIO2F_1 fits in a float, and x is within a
+     * factor of two of it
+     */
+    float r = x - fn * __PIO2F_1;
+
+    /* Subtract fn * __PIO2F_2, also exact, keeping the error in y1 */
+    float w = fn * __PIO2F_2;
+    float y0 = r - w;
+    float y1 = (r - y0) - w;
+
+    /* Subtract the rest of fn * pi/2 */
+    y1 -= fn * __PIO2F_3;
+    y1 -= fn * __PIO2F_4;
+    y[0] = y0;
+    y[1] = y1;
+    return n & 3;
+}
+#endif
+
+/*
+ * Reduce x, with pi/4 < |x| and x finite, handling moderate
+ * arguments inline when possible
+ */
+static __always_inline int
+__rem_pio2f(float x, float *y)
+{
+#ifdef __HAVE_REM_PIO2F_MEDIUM
+    if (fabsf(x) <= 120.0f)
+        return __rem_pio2f_medium(x, y);
+#endif
+    return __rem_pio2f_general(x, y);
+}
 
 /* float versions of fdlibm kernel functions */
 extern float __kernel_sinf(float, float, int);
