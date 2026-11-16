@@ -51,6 +51,7 @@ srcs_machine = [
 ]
 
 subdir('sys')
+subdir('machine')
 
 foreach params : targets
   target = params['name']

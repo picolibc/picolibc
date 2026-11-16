@@ -943,6 +943,21 @@ int(isnan)(double __x) __picolibc_export;
 #define FP_FAST_FMAL
 #endif
 
+/*
+ * __HAVE_HW_FLOAT, __HAVE_HW_DOUBLE and __HAVE_HW_LONG_DOUBLE, set in
+ * machine/math.h, mean that IEEE arithmetic on that type uses hardware
+ * instructions. Formats built from software sequences, like IBM
+ * double-double, don't count. A type with the same format as a smaller
+ * one inherits its setting.
+ */
+#if defined(__HAVE_HW_FLOAT) && !defined(__HAVE_HW_DOUBLE) && __DBL_MANT_DIG__ == __FLT_MANT_DIG__
+#define __HAVE_HW_DOUBLE 1
+#endif
+#if defined(__HAVE_HW_DOUBLE) && !defined(__HAVE_HW_LONG_DOUBLE) \
+    && __LDBL_MANT_DIG__ == __DBL_MANT_DIG__
+#define __HAVE_HW_LONG_DOUBLE 1
+#endif
+
 #ifdef __FAST_MATH__
 #include <machine/fastmath.h>
 #endif

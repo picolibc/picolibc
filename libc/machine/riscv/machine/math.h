@@ -37,6 +37,18 @@
 #define _MACHINE_MATH_H_
 
 #if defined(__riscv_flen) || defined(__riscv_zfinx)
+#define __HAVE_HW_FLOAT 1
+#endif
+
+#if __riscv_flen >= 64 || defined(__riscv_zdinx)
+#define __HAVE_HW_DOUBLE 1
+#endif
+
+#if __riscv_flen >= 128
+#define __HAVE_HW_LONG_DOUBLE 1
+#endif
+
+#if defined(__riscv_flen) || defined(__riscv_zfinx)
 
 #if (__riscv_flen >= 64) || defined(__riscv_zdinx)
 #define __RISCV_HARD_FLOAT 64

@@ -36,6 +36,9 @@
 #ifndef _MACHINE_MATH_H_
 #define _MACHINE_MATH_H_
 
+#define __HAVE_HW_FLOAT  1
+#define __HAVE_HW_DOUBLE 1
+
 #define __HAVE_FAST_FMA  1
 #define __HAVE_FAST_FMAF 1
 

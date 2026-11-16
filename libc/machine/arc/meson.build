@@ -64,6 +64,8 @@ srcs_machine = [
   'vector_table.c',
 ]
 
+subdir('machine')
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']
