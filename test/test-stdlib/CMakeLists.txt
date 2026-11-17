@@ -41,6 +41,8 @@ set(tests
   test-malloc-stress
   test-on_exit
   test-quick-exit
+  test-qsort-r
+  test-qsort-r-posix
   test-rand
   test-strtod
   test-memalignment

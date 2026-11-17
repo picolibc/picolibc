@@ -45,9 +45,15 @@ tests = [
   'test-memalignment',
   'test-on_exit',
   'test-quick-exit',
+  'test-qsort-r',
+  'test-qsort-r-posix',
   'test-rand',
   'test-stdckdint',
   'test-strtod',
+  ]
+
+tests_cpp = [
+  'test-qsort-r-cplusplus'
   ]
 
 tests_failure = [
@@ -102,6 +108,10 @@ foreach params : targets
   _c_args = target_c_args + get_variable('test_c_args' + target, test_c_args)
   _link_args = target_c_args + _lib_files + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends) + _libs
+  if have_cplusplus
+    _cpp_args = target_c_args + get_variable('test_cpp_args' + target, test_cpp_args)
+  endif
+
   foreach t1 : tests
     t1_src = t1 + '.c'
     test_file_name_arg=['-DTEST_FILE_NAME="' + t1 + target + '.txt"']
@@ -154,6 +164,22 @@ foreach params : targets
          should_fail: true)
   endforeach
 
+  if have_cplusplus
+    foreach t1 : tests_cpp
+      t1_src = t1 + '.cpp'
+      test(t1 + target,
+           executable(t1 + target, t1_src,
+                      cpp_args: _cpp_args,
+                      link_args: _cpp_args + _link_args,
+                      objects: _objs,
+                      link_depends: _link_depends,
+                      include_directories: inc),
+           depends: bios_bin,
+           suite: 'test-stdlib',
+           env: test_env)
+    endforeach
+  endif
+
 endforeach
 
 # Host libc may not provide memalignment or call_once in stdlib.h yet.
@@ -161,6 +187,8 @@ test_skip_native = [
   'test-call-once',
   'test-call-once-threads',
   'test-memalignment',
+  'test-qsort-r',
+  'test-qsort-r-posix',
 ]
 
 if enable_native_tests
