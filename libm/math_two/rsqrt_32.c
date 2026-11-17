@@ -143,10 +143,10 @@ rsqrtf(float x)
             } else {
                 if (issignaling(x)) {
                     __math_set_invalidf();
-                    //this quiets the sNaN into a qNaN
+                    // this quiets the sNaN into a qNaN
                     return nanf("");
                 }
-                //pass through nan unmodified
+                // pass through nan unmodified
                 return asfloat(xu);
             }
         } else // normal case
@@ -154,9 +154,12 @@ rsqrtf(float x)
             uint32_t mantissa = xu & ~((uint32_t)exp << 23);
             mantissa += (uint32_t)1u << 23;
             mantissa <<= !(exp & 1);
-            uint32_t newMantissa = mantissa_rsqrt(mantissa);
+            uint32_t new_mantissa = mantissa_rsqrt(mantissa);
+            if (!(stdc_has_single_bit(mantissa) && stdc_has_single_bit(new_mantissa)))
+                    __math_set_inexactf();
+
             int32_t  newExp = -asr(exp - 127, 1) + 127 - 2;
-            return asfloat(newMantissa + ((uint32_t)newExp << 23));
+            return asfloat(new_mantissa + ((uint32_t)newExp << 23));
         }
     } else // exp<=0
     {
@@ -170,6 +173,9 @@ rsqrtf(float x)
                 mantissa <<= shift & 1;
                 int32_t  newExp = -asr(shift, 1) + 127 - 2;
                 uint32_t new_mantissa = mantissa_rsqrt(mantissa);
+                if (!(stdc_has_single_bit(mantissa) && stdc_has_single_bit(new_mantissa)))
+                    __math_set_inexactf();
+
                 return asfloat(new_mantissa + ((uint32_t)newExp << 23));
             } else // rsqrt(+0)=+INF
             {
@@ -186,10 +192,10 @@ rsqrtf(float x)
                 return nanf("");
             } else if (issignaling(x)) {
                 __math_set_invalidf();
-                //this quiets the sNaN into a qNaN
+                // this quiets the sNaN into a qNaN
                 return nanf("");
             }
-            //pass through qNaN unmodified
+            // pass through qNaN unmodified
             return asfloat(xu);
         }
     }
