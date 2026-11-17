@@ -145,16 +145,6 @@ typedef double double_t;
 #define FP_ILOGBNAN (-__INT_MAX__ - 1)
 #endif
 
-#if !defined(FP_FAST_FMA) && (__HAVE_FAST_FMA || defined(__FP_FAST_FMA))
-#define FP_FAST_FMA
-#endif
-#if !defined(FP_FAST_FMAF) && (__HAVE_FAST_FMAF || defined(__FP_FAST_FMAF))
-#define FP_FAST_FMAF
-#endif
-#if !defined(FP_FAST_FMAL) && (__HAVE_FAST_FMAL || defined(__FP_FAST_FMAL))
-#define FP_FAST_FMAL
-#endif
-
 /* We've got a real __iscanonicall for 80-bit and double-double values */
 #if __LDBL_MANT_DIG__ == 64 || (__LDBL_MANT_DIG__ == 106 && __LDBL_MAX_EXP__ == 1024)
 #define __LONG_DOUBLE_NON_CANONICAL
@@ -941,6 +931,32 @@ int(isnan)(double __x) __picolibc_export;
 #endif /* __BSD_VISIBLE */
 
 #include <machine/math.h>
+
+/* machine/math.h sets __HAVE_FAST_FMA* for targets with fast fma */
+#if !defined(FP_FAST_FMA) && (__HAVE_FAST_FMA || defined(__FP_FAST_FMA))
+#define FP_FAST_FMA
+#endif
+#if !defined(FP_FAST_FMAF) && (__HAVE_FAST_FMAF || defined(__FP_FAST_FMAF))
+#define FP_FAST_FMAF
+#endif
+#if !defined(FP_FAST_FMAL) && (__HAVE_FAST_FMAL || defined(__FP_FAST_FMAL))
+#define FP_FAST_FMAL
+#endif
+
+/*
+ * __HAVE_HW_FLOAT, __HAVE_HW_DOUBLE and __HAVE_HW_LONG_DOUBLE, set in
+ * machine/math.h, mean that IEEE arithmetic on that type uses hardware
+ * instructions. Formats built from software sequences, like IBM
+ * double-double, don't count. A type with the same format as a smaller
+ * one inherits its setting.
+ */
+#if defined(__HAVE_HW_FLOAT) && !defined(__HAVE_HW_DOUBLE) && __DBL_MANT_DIG__ == __FLT_MANT_DIG__
+#define __HAVE_HW_DOUBLE 1
+#endif
+#if defined(__HAVE_HW_DOUBLE) && !defined(__HAVE_HW_LONG_DOUBLE) \
+    && __LDBL_MANT_DIG__ == __DBL_MANT_DIG__
+#define __HAVE_HW_LONG_DOUBLE 1
+#endif
 
 #ifdef __FAST_MATH__
 #include <machine/fastmath.h>

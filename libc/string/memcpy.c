@@ -54,7 +54,7 @@ memcpy(void * __restrict dst0, const void * __restrict src0, size_t len0)
 {
     char       *dst = dst0;
     const char *src = src0;
-#if !(defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__))
+#if !(defined(__PREFER_SIZE_OVER_SPEED) || defined(__OPTIMIZE_SIZE__)) || defined(__FAST_MEMFUNCS)
     unsigned long       *aligned_dst;
     const unsigned long *aligned_src;
 

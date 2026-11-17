@@ -37,6 +37,14 @@
 #define _MACHINE_MATH_H_
 
 #ifndef __loongarch_soft_float
+#define __HAVE_HW_FLOAT 1
+#endif
+
+#ifdef __loongarch_double_float
+#define __HAVE_HW_DOUBLE 1
+#endif
+
+#ifndef __loongarch_soft_float
 
 #ifdef __MATH_ERRNO
 #include <errno.h>

@@ -61,6 +61,8 @@ srcs_machine = [
   'strncpy.c',
 ]
 
+subdir('machine')
+
 foreach params : targets
   target = params['name']
   target_dir = params['dir']

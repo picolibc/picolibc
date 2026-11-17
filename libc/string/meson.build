@@ -47,12 +47,9 @@ srcs_string = [
     'memccpy.c',
     'memchr.c',
     'memcmp.c',
-    'memcpy.c',
     'memmem.c',
-    'memmove.c',
     'mempcpy.c',
     'memrchr.c',
-    'memset.c',
     'memset_explicit.c',
     'rawmemchr.c',
     'rindex.c',
@@ -153,9 +150,20 @@ hdrs_string = [
     'string_private.h',
 ]
 
-srcs_strcmp = [
-  'strcmp.c'
-]
+# Sources always optimized for performance when requested
+srcs_fast = []
+
+if fast_strcmp
+  srcs_fast += ['strcmp.c']
+else
+  srcs_string += ['strcmp.c']
+endif
+
+if fast_memfuncs
+  srcs_fast += ['memcpy.c', 'memmove.c', 'memset.c']
+else
+  srcs_string += ['memcpy.c', 'memmove.c', 'memset.c']
+endif
 
 srcs_string_use = []
 foreach file : srcs_string
@@ -171,8 +179,8 @@ foreach file : srcs_string
   endif
 endforeach
 
-srcs_strcmp_use = []
-foreach file : srcs_strcmp
+srcs_fast_use = []
+foreach file : srcs_fast
   s_file = fs.replace_suffix(file, '.S')
   if file in srcs_machine
     message('libc/string/' + file + ': machine overrides generic')
@@ -181,31 +189,25 @@ foreach file : srcs_strcmp
   elif file in srcs_libos
     message('libc/string/' + file + ': libos overrides generic')
   else
-    srcs_strcmp_use += file
+    srcs_fast_use += file
   endif
 endforeach
 
-if fast_strcmp
-  cargs_strcmp = ['-O3']
-else
-  cargs_strcmp = []
-endif
-
 src_string = files(srcs_string_use)
 
-# Need a sub-library to pass custom cflags to strcmp
+# Need a sub-library to pass custom cflags to the fast sources
 
-if srcs_strcmp_use != []
+if srcs_fast_use != []
   foreach params : targets
     target = params['name']
     target_dir = params['dir']
     target_c_args = params['c_args']
 
     set_variable('lib_string' + target,
-		 static_library('strcmp' + target,
-				srcs_strcmp_use,
+		 static_library('string_fast' + target,
+				srcs_fast_use,
 				pic: use_pic,
-				c_args: target_c_args + c_args + cargs_strcmp,
+				c_args: target_c_args + c_args + ['-O3'],
 				include_directories: inc))
   endforeach
 endif

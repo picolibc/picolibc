@@ -33,7 +33,7 @@
 
 #include "machine/acle-compat.h"
 
-#if defined (__OPTIMIZE_SIZE__) || defined (__PREFER_SIZE_OVER_SPEED)
+#if (defined (__OPTIMIZE_SIZE__) || defined (__PREFER_SIZE_OVER_SPEED)) && !defined (__FAST_MEMFUNCS)
   /* Defined in memcpy-stub.c.  */
 
 #elif (__ARM_ARCH >= 7 && __ARM_ARCH_PROFILE == 'A' \

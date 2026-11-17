@@ -71,7 +71,7 @@ static const uint32_t __inv_pio4[24]
         0xc0db6295, 0xdb629599, 0x6295993c, 0x95993c43, 0x993c4390, 0x3c439041 };
 
 int
-__rem_pio2f(float x, float *y)
+__rem_pio2f_general(float x, float *y)
 {
     int32_t  xs;
     uint32_t xi, xa;
@@ -92,6 +92,8 @@ __rem_pio2f(float x, float *y)
     int      xexp = xa >> 23;
     uint32_t xsig = (xa & 0x7fffff) | 0x800000;
 
+#ifndef __HAVE_REM_PIO2F_MEDIUM
+    /* __rem_pio2f handles these itself with hardware float */
     if (xa <= 0x42f00000) {
         /* <= 120 */
 
@@ -109,7 +111,9 @@ __rem_pio2f(float x, float *y)
         uint64_t hl = (uint64_t)xsig * HPI_INV_63_LO;
 
         rem = (hh + ((hl + 0x8000000) >> 32)) << 7;
-    } else {
+    } else
+#endif
+    {
         /* > 120 */
 
         /* Convert to integer value */

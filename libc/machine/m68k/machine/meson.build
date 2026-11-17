@@ -32,12 +32,13 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED
 # OF THE POSSIBILITY OF SUCH DAMAGE.
 #
-inc_sys_headers_machine = [
+inc_machine_headers_machine = [
   'fenv.h',
-  'fenv-fp.h'
+  'fenv-fp.h',
+  'math.h',
 ]
 
 if really_install
-  install_headers(inc_sys_headers_machine,
+  install_headers(inc_machine_headers_machine,
                   install_dir: include_dir / 'machine')
 endif
