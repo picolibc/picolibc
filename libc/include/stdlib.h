@@ -256,22 +256,33 @@ int putenv(char *__string) __picolibc_export;
 __noreturn void quick_exit(int) __picolibc_export;
 #endif /* __ISO_C_VISIBLE >= 2011 */
 void qsort(void *__base, size_t __nmemb, size_t __size, __compar_fn_t _compar) __picolibc_export;
-/* There are two common qsort_r variants.  If you request
-   _BSD_SOURCE, you get the BSD version; otherwise you get the GNU
-   version.  We want that #undef qsort_r will still let you
-   invoke the underlying function, but that requires gcc support. */
-#if __GNU_VISIBLE
+#if __BSD_VISIBLE || __GNU_VISIBLE || __POSIX_VISIBLE >= 202405
+/*
+ * POSIX.1-2024 adopted the GNU qsort_r, which takes the comparison
+ * function before the thunk and passes the thunk to it last. BSD
+ * systems used the opposite order. Like FreeBSD, choose the
+ * implementation from the type of the last argument so that code
+ * written for either works; '#undef qsort_r' gets the POSIX version.
+ */
 void qsort_r(void *__base, size_t __nmemb, size_t __size,
              int (*_compar)(const void *, const void *, void *), void *__thunk) __picolibc_export;
-#elif __BSD_VISIBLE
-#ifdef __GNUC__
-void qsort_r(void *__base, size_t __nmemb, size_t __size, void *__thunk,
-             int (*_compar)(void *, const void *, const void *)) __asm__(__ASMNAME("__bsd_qsort_r"))
-    __picolibc_export;
-#else
+#if __BSD_VISIBLE
 void __bsd_qsort_r(void *__base, size_t __nmemb, size_t __size, void *__thunk,
                    int (*_compar)(void *, const void *, const void *)) __picolibc_export;
-#define qsort_r __bsd_qsort_r
+#ifdef __cplusplus
+extern "C++" {
+inline void
+qsort_r(void *__base, size_t __nmemb, size_t __size, void *__thunk,
+        int (*_compar)(void *, const void *, const void *))
+{
+    __bsd_qsort_r(__base, __nmemb, __size, __thunk, _compar);
+}
+}
+#elif defined(__generic)
+#define qsort_r(__base, __nmemb, __size, __a4, __a5)                            \
+    __generic(__a5, int (*)(void *, const void *, const void *), __bsd_qsort_r, \
+              qsort_r)(__base, __nmemb, __size, __a4, __a5)
+#endif
 #endif
 #endif
 int rand(void) __picolibc_export;

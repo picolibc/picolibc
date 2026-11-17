@@ -70,6 +70,9 @@ PORTABILITY
 #include <stdlib.h>
 #include <stdint.h>
 
+/* Define the functions themselves, not the stdlib.h selector */
+#undef qsort_r
+
 #if defined(I_AM_QSORT_R)
 typedef int cmp_t(void *, const void *, const void *);
 #elif defined(I_AM_GNU_QSORT_R)
