@@ -156,9 +156,9 @@ rsqrtf(float x)
             mantissa <<= !(exp & 1);
             uint32_t new_mantissa = mantissa_rsqrt(mantissa);
             if (!(stdc_has_single_bit(mantissa) && stdc_has_single_bit(new_mantissa)))
-                    __math_set_inexactf();
+                __math_set_inexactf();
 
-            int32_t  newExp = -asr(exp - 127, 1) + 127 - 2;
+            int32_t newExp = -asr(exp - 127, 1) + 127 - 2;
             return asfloat(new_mantissa + ((uint32_t)newExp << 23));
         }
     } else // exp<=0
@@ -171,7 +171,7 @@ rsqrtf(float x)
                 mantissa <<= shift; // normalize subnormal
                 shift = -126 - shift;
                 mantissa <<= shift & 1;
-                int32_t  newExp = -asr(shift, 1) + 127 - 2;
+                int32_t newExp = -asr(shift, 1) + 127 - 2;
                 uint32_t new_mantissa = mantissa_rsqrt(mantissa);
                 if (!(stdc_has_single_bit(mantissa) && stdc_has_single_bit(new_mantissa)))
                     __math_set_inexactf();
