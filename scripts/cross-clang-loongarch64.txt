@@ -17,8 +17,10 @@ cpu = 'loongarch'
 endian = 'little'
 
 [built-in options]
-c_link_args = ['-Wl,-m,elf64loongarch']
-cpp_link_args = ['-Wl,-m,elf64loongarch']
+# uncomment for test
+# librt= libclang_rt.builtins-loongarch64.a
+c_link_args = ['-Wl,-m,elf64loongarch,--no-pie']
+cpp_link_args = ['-Wl,-m,elf64loongarch,--no-pie']
 c_args = ['-mabi=lp64d', '-march=loongarch64']
 cpp_args = ['-mabi=lp64d','-march=loongarch64']
 
