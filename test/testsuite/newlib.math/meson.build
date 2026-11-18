@@ -189,6 +189,7 @@ foreach params : targets
   _link_args = target_c_args + get_variable('test_link_args' + target, test_link_args)
   _link_depends = get_variable('test_link_depends' + target, test_link_depends)
 
+  _fs_flush = tests_fs_flush_fail != [] and cc.get_define('__FPU_OK__', args: _c_args) != ''
   _c_args = printf_compile_args_d + _c_args
   _link_args = printf_link_args_d + _link_args
 
@@ -210,7 +211,8 @@ foreach params : targets
 		    include_directories: inc),
          depends: bios_bin,
          suite: 'newlib.math',
-         env: test_env)
+         env: test_env,
+         should_fail: _fs_flush and 'math_test' in tests_fs_flush_fail)
   endforeach
 endforeach
 

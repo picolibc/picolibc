@@ -50,6 +50,7 @@ is used to validate the code for all patch integration:
  * OpenRisc
  * Power9
  * Renesas RX
+ * Renesas V850
  * RISC-V (both 32- and 64- bit)
  * SparcV8 (32 bit)
  * SuperH

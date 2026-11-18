@@ -229,7 +229,11 @@ _BEGIN_STD_C
 #ifdef __v850
 /* I think our setjmp is saving 15 regs at the moment.  Gives us one word
    slop if we need to expand.  */
+#ifdef __V850_FXU__
+#define _JBLEN 144
+#else
 #define _JBLEN 16
+#endif
 #endif
 
 #if defined(_C4x)

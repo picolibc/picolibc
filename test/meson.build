@@ -69,6 +69,53 @@ tests_should_fail = [
   'test-hosted-exit-fail',
   ]
 
+# v850 hard float flushes subnormal numbers to zero (FPSR.FS = 1)
+tests_fs_flush_fail = []
+if host_cpu_family == 'v850'
+  tests_fs_flush_fail = [
+    'test-add',
+    'test-asinpi',
+    'test-atan2',
+    'test-atan2pi',
+    'test-atanpi',
+    'test-cbrt',
+    'test-compoundn',
+    'test-erf',
+    'test-erfc',
+    'test-exp10',
+    'test-exp10m1',
+    'test-exp2m1',
+    'test-fadd',
+    'test-ffma',
+    'test-fma',
+    'test-fmul',
+    'test-hypot',
+    'test-iseqsig',
+    'test-jn',
+    'test-log',
+    'test-log10',
+    'test-log10p1',
+    'test-log2',
+    'test-log2p1',
+    'test-long-double',
+    'test-math-errhandling',
+    'test-narrow-fenv',
+    'test-pow',
+    'test-pown',
+    'test-powr',
+    'test-remainder',
+    'test-remquo-quo',
+    'test-rootn',
+    'test-rsqrt',
+    'test-scalbn',
+    'test-sinpi',
+    'test-tanpi',
+    'test-tgamma',
+    'math_test',
+    'test-printf-float',
+  ]
+endif
+
 if have_attr_ctor_dtor
   tests += ['constructor']
 endif

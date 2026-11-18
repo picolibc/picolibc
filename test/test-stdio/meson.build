@@ -227,6 +227,7 @@ foreach params : targets
          should_fail: true)
   endforeach
 
+  _fs_flush = tests_fs_flush_fail != [] and cc.get_define('__FPU_OK__', args: _c_args) != ''
   foreach printf_type : printf_types
     _printf_c_args = printf_type['c_args'] + _c_args
     _printf_link_args = printf_type['link_args'] + _link_args
@@ -245,7 +246,8 @@ foreach params : targets
            depends: bios_bin,
 	   timeout: 60,
            suite: 'test-stdio',
-	   env: test_env)
+	   env: test_env,
+           should_fail: _fs_flush and (test + _ext) in tests_fs_flush_fail)
     endforeach
   endforeach
 
