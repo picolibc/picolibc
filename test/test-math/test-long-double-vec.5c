@@ -98,7 +98,7 @@ is_full_func(string name)
 	return true;
 }
 
-exception infinity(real v);
+exception infinity(bool sign);
 exception nan();
 
 int prec = 512;
@@ -143,20 +143,20 @@ gen_real_f_f(func_f_f_t f)
 			try {
 				try {
 					y = imprecise(f.f(imprecise(x, prec)), out_prec);
-					sy = sprintf("%.-eL", y);
+					sy = sprintf("%.-gL", y);
 				} catch divide_by_zero(real x, real y) {
 					if (x == 0)
 						raise invalid_argument(f.name, 0, x);
-					raise infinity(x);
+					raise infinity(x < 0);
 				}
-			} catch infinity(real v) {
+			} catch infinity(bool sign) {
 				sy = "(long double) INFINITY";
-				if (v < 0)
+				if (sign)
 					sy = "-" + sy;
 			} catch nan() {
 				sy = "(long double) NAN";
 			}
-			printf("    { .line = __LINE__, .x = %.-eL, .y = %s },\n", x, sy);
+			printf("    { .line = __LINE__, .x = %.-gL, .y = %s },\n", x, sy);
 		} catch invalid_argument(string s, int i, poly x) {
 		}
 	}
@@ -174,7 +174,6 @@ gen_real_f_f(func_f_f_t f)
 		printf("#endif /* FULL_LONG_DOUBLE */\n");
 }
 
-real cbrt(real x) { return x**(1/3); }
 real exp10(real x) { return 10**x; }
 real exp2(real x) { return 2**x; }
 real expm1(real x) {
@@ -191,12 +190,12 @@ real expm1(real x) {
 }
 real lgamma(real x) {
 	if (x < 0 && x == floor(x))
-		raise infinity(1);
-	return log(gamma(x));
+		raise infinity(false);
+	return log(abs(gamma(x)));
 }
 real logb(real x) {
 	if (x == 0)
-		raise infinity(-1);
+		raise infinity(true);
 	return exponent(imprecise(x)) - 1;
 }
 real pow10(real x) { return 10**x; }
@@ -207,42 +206,20 @@ real trunc(x) { if (x < 0) return -trunc(-x); return floor(x); }
 real acosh(x) {
 	if (x < 1)
 		raise nan();
-	return log(x + sqrt(x*x-1));
-}
-
-real asinh(x) {
-	if (x == 0) return 0;
-	real sign = 1;
-	if (x < 0) {
-		sign = -1;
-		x = -x;
-	}
-	return sign * log(x + sqrt(x*x+1));
+	return Math::acosh(x);
 }
 
 real atanh(x) {
 	if (abs(x) > 1)
 		raise nan();
 	if (abs(x) == 1)
-		raise infinity(x);
-	return 0.5 * log((1 + x) / (1 - x));
-}
-
-real cosh(x) {
-	return (exp(x) + exp(-x)) / 2;
-}
-
-real sinh(x) {
-	return (exp(x) - exp(-x)) / 2;
-}
-
-real tanh(x) {
-	return sinh(x) / cosh(x);
+		raise infinity(x < 0);
+	return Math::atanh(x);
 }
 
 real tgamma(real x) {
 	if (x == 0)
-		raise infinity(1);
+		raise infinity(false);
 	if (x < 0 && x == floor(x))
 		raise nan();
 	return gamma(x);
@@ -264,55 +241,6 @@ real nearbyint(real x) {
 		}
 	}
 	return y;
-}
-
-real _erf(real x, real off)
-{
-	x = imprecise(x);
-	int bits = precision(x);
-	int obits = bits + 512;
-	real factor = 2 / sqrt(pi_value(obits));
-
-	x = imprecise(x, obits);
-	off = imprecise(off, obits) / factor;
-	real val = x - off;
-
-	for (int n = 1; ; n++) {
-		int f = 2 * n + 1;
-		real a = ((-1)**n * x**f) / (n! * f);
-		val += a;
-		if (exponent(val) - exponent(a) > obits)
-			break;
-	}
-	return imprecise(val * factor, bits);
-}
-
-real erf(real x)
-{
-	return _erf(x, 0);
-}
-
-real erfc(real x)
-{
-	return -_erf(x, 1);
-}
-
-real jn(real x, int n)
-{
-	x = imprecise(x);
-	int bits = precision(x);
-	int obits = bits + 512;
-
-	x = imprecise(x, obits);
-	real val = imprecise(0, obits);
-
-	for (int m = 0; ; m++) {
-		real a = ((-1)**m / (m! * gamma(m + n + 1))) * (x/2)**(2 * m + n);
-		val += a;
-		if (exponent(val) - exponent(a) > obits)
-			break;
-	}
-	return imprecise(val, bits);
 }
 
 real scalbnl(real x, int exp)
@@ -367,9 +295,6 @@ real round_even(real x, int bits)
 		ret = -ret;
 	return imprecise(ret, bits);
 }
-
-real j0(real x) = jn(x,0);
-real j1(real x) = jn(x,1);
 
 real default_prec = 1e-20;
 
@@ -434,20 +359,20 @@ gen_real_f_ff(func_f_ff_t f)
 				try {
 					try {
 						y = round_even(f.f(imprecise(x0, prec), imprecise(x1, prec)), out_prec);
-						sy = sprintf("%.-eL", y);
+						sy = sprintf("%.-gL", y);
 					} catch divide_by_zero(real x, real y) {
 						if (x == 0)
 							raise invalid_argument(f.name, 0, x);
-						raise infinity(x);
+						raise infinity(x < 0);
 					}
-				} catch infinity(real v) {
+				} catch infinity(bool sign) {
 					sy = "(long double) INFINITY";
-					if (v < 0)
+					if (sign)
 						sy = "-" + sy;
 				} catch nan() {
 					sy = "(long double) NAN";
 				}
-				printf("    { .line = __LINE__, .x0 = %.-eL, .x1 = %.-eL, .y = %s },\n", x0, x1, sy);
+				printf("    { .line = __LINE__, .x0 = %.-gL, .x1 = %.-gL, .y = %s },\n", x0, x1, sy);
 			} catch invalid_argument(string s, int i, poly x) {
 			}
 		}
@@ -485,20 +410,20 @@ gen_real_f_fff(func_f_fff_t f)
 					try {
 						try {
 							y = imprecise(f.f(imprecise(x0, prec), imprecise(x1, prec), imprecise(x2, prec)), out_prec);
-							sy = sprintf("%.-eL", y);
+							sy = sprintf("%.-gL", y);
 						} catch divide_by_zero(real x, real y) {
 							if (x == 0)
 								raise invalid_argument(f.name, 0, x);
-							raise infinity(x);
+							raise infinity(x < 0);
 						}
-					} catch infinity(real v) {
+					} catch infinity(bool sign) {
 						sy = "(long double) INFINITY";
-						if (v < 0)
+						if (sign)
 							sy = "-" + sy;
 					} catch nan() {
 						sy = "(long double) NAN";
 					}
-					printf("    { .line = __LINE__, .x0 = %.-eL, .x1 = %.-eL, .x2 = %.-eL, .y = %s },\n", x0, x1, x2, sy);
+					printf("    { .line = __LINE__, .x0 = %.-gL, .x1 = %.-gL, .x2 = %.-gL, .y = %s },\n", x0, x1, x2, sy);
 				} catch invalid_argument(string s, int i, poly x) {
 				}
 			}
@@ -584,9 +509,9 @@ isint(real x) {
 /* Deal with the oddities of IEEE pow */
 real powl(real x, real y) {
 	if (x == 0 && isoddint(y) && y < 0)
-		raise infinity(1);
+		raise infinity(false);
 	if (x == 0 && y < 0)
-		raise infinity(1);
+		raise infinity(false);
 	if (x == 0 && y > 0)
 		return 0;
 	if (x == 1)
@@ -652,20 +577,20 @@ gen_real_f_fi(func_f_fi_t f)
 				try {
 					try {
 						y = imprecise(f.f(imprecise(x0, prec), x1), out_prec);
-						sy = sprintf("%.-eL", y);
+						sy = sprintf("%.-gL", y);
 					} catch divide_by_zero(real x, real y) {
 						if (x == 0)
 							raise invalid_argument(f.name, 0, x);
-						raise infinity(x);
+						raise infinity(x < 0);
 					}
-				} catch infinity(real v) {
+				} catch infinity(bool sign) {
 					sy = "(long double) INFINITY";
-					if (v < 0)
+					if (sign)
 						sy = "-" + sy;
 				} catch nan() {
 					sy = "(long double) NAN";
 				}
-				printf("    { .line = __LINE__, .x0 = %.-eL, .x1 = %d, .y = %s },\n", x0, x1, sy);
+				printf("    { .line = __LINE__, .x0 = %.-gL, .x1 = %d, .y = %s },\n", x0, x1, sy);
 			} catch invalid_argument(string s, int i, poly x) {
 			}
 		}
@@ -712,7 +637,7 @@ gen_real_i_f(func_i_f_t f)
 			} catch invalid_int(string s) {
 				sy = s;
 			}
-			printf("    { .line = __LINE__, .x = %.-eL, .y = %s },\n", x, sy);
+			printf("    { .line = __LINE__, .x = %.-gL, .y = %s },\n", x, sy);
 		} catch invalid_argument(string s, int i, poly x) {
 		}
 	}
