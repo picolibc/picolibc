@@ -1,5 +1,8 @@
 #!/bin/sh
-git config --global --add safe.directory /picolibc
+# The CI container mounts the source at /picolibc owned by another user
+if [ -d /picolibc ] && ! git config --global --get-all safe.directory | grep -qxF /picolibc; then
+    git config --global --add safe.directory /picolibc
+fi
 git ls-files | xargs clang-format -i
 git diff > clang-format.patch
 if [ -s clang-format.patch ]; then

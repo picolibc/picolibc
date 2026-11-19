@@ -21,7 +21,10 @@ case "$ME" in
 esac
 CONFIGURE=do-"$TARGET"-configure
 shift
-git config --global --add safe.directory /picolibc
+# The CI container mounts the source at /picolibc owned by another user
+if [ -d /picolibc ] && ! git config --global --get-all safe.directory | grep -qxF /picolibc; then
+    git config --global --add safe.directory /picolibc
+fi
 
 INC_OK=""
 if [ -n "$BEFORE_SHA" -a -n "$AFTER_SHA" ]; then
