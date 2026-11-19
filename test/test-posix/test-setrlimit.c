@@ -99,8 +99,8 @@ main(void)
         ret = getrlimit(resources[r], &rlimit);
         assert(ret == 0);
 
-        /* Set the soft limit to a small value */
-        rlimit.rlim_cur = 1;
+        /* Set the soft limit to a small value, within the hard limit */
+        rlimit.rlim_cur = rlimit.rlim_max < 1 ? rlimit.rlim_max : 1;
         ret = setrlimit(resources[r], &rlimit);
         assert(ret == 0);
 
@@ -109,11 +109,16 @@ main(void)
         ret = setrlimit(resources[r], &rlimit);
         assert(ret == 0);
 
-        /* Set soft and hard limits, with soft limit < hard limit */
-        rlimit.rlim_max = 2;
-        rlimit.rlim_cur = 1;
-        ret = setrlimit(resources[r], &rlimit);
-        assert(ret == 0);
+        /*
+         * Set soft and hard limits, with soft limit < hard limit. Raising
+         * the hard limit needs privilege, so only when it's at least 2.
+         */
+        if (rlimit.rlim_max >= 2) {
+            rlimit.rlim_max = 2;
+            rlimit.rlim_cur = 1;
+            ret = setrlimit(resources[r], &rlimit);
+            assert(ret == 0);
+        }
 
         /* Set soft and hard limits, with soft limit > hard limit (should fail) */
         rlimit.rlim_max = 1;
