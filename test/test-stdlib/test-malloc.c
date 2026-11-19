@@ -73,7 +73,13 @@ main(void)
     errno = 0;
     r = malloc(0);
     //        printf("malloc(0): %p\n", r);
+#ifdef __PICOLIBC__
+    /* picolibc leaves errno alone when malloc succeeds */
     if (errno != 0) {
+#else
+    /* other C libraries may set errno even when malloc succeeds */
+    if (r == NULL && errno != 0) {
+#endif
         printf("malloc(0) failed: %s. got %p\n", strerror(errno), r);
         result = 1;
     }
