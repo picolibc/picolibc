@@ -2,7 +2,14 @@
 set -eu
 
 HERE=$(dirname "$0")
-AVR_SDK_INSTALL_DIR=${AVR_SDK_INSTALL_DIR:-/opt/avr}
+
+if [ -d /opt/picolibc-ci ]; then
+    TOP=/opt/picolibc-ci
+else
+    TOP=/opt
+fi
+
+AVR_SDK_INSTALL_DIR=${AVR_SDK_INSTALL_DIR:-$TOP/avr}
 C_INCLUDE_PATH="$AVR_SDK_INSTALL_DIR/avr/include${C_INCLUDE_PATH:+:$C_INCLUDE_PATH}"
 export C_INCLUDE_PATH
 
