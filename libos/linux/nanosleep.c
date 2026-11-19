@@ -34,26 +34,21 @@
  */
 
 #include "local-linux.h"
-#include "local-time.h"
+#include <errno.h>
+#include <time.h>
 
+/*
+ * clock_nanosleep has a 64-bit time system call on every architecture;
+ * Linux's nanosleep system call is y2038-limited on 32-bit ones.
+ */
 int
 nanosleep(const struct timespec *request, struct timespec *remain)
 {
-    struct __kernel_timespec k_request, k_remain, *k_remainp;
-    int                      ret;
+    int ret = clock_nanosleep(CLOCK_REALTIME, 0, request, remain);
 
-    k_request.tv_sec = request->tv_sec;
-    k_request.tv_nsec = request->tv_nsec;
-    if (remain)
-        k_remainp = &k_remain;
-    else
-        k_remainp = NULL;
-    ret = _syscall(LINUX_SYS_nanosleep, &k_request, k_remainp);
-    if (ret < 0) {
-        if (remain && errno != EINVAL) {
-            remain->tv_sec = k_remain.tv_sec;
-            remain->tv_nsec = k_remain.tv_nsec;
-        }
+    if (ret) {
+        errno = ret;
+        return -1;
     }
-    return ret;
+    return 0;
 }
