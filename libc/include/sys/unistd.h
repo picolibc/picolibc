@@ -79,9 +79,11 @@ __noreturn void _exit(int __status) __picolibc_export;
 
 int             access(const char *__path, int __amode) __picolibc_export;
 unsigned        alarm(unsigned __secs) __picolibc_export;
-int             brk(void *) __picolibc_export;
-int             chdir(const char *__path) __picolibc_export;
-int             chown(const char *__path, uid_t __owner, gid_t __group) __picolibc_export;
+#if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
+int brk(void *__addr) __picolibc_export;
+#endif
+int chdir(const char *__path) __picolibc_export;
+int chown(const char *__path, uid_t __owner, gid_t __group) __picolibc_export;
 #if __BSD_VISIBLE || (__XSI_VISIBLE >= 4 && __POSIX_VISIBLE < 200112)
 int chroot(const char *__path) __picolibc_export;
 #endif
