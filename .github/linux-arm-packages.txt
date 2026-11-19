@@ -19,3 +19,4 @@ libc++abi-dev
 gcc-arm-none-eabi
 gcc-aarch64-none-elf
 qemu-system-arm
+qemu-user
