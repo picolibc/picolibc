@@ -136,6 +136,9 @@ main(void)
 #ifdef SYS_clock_adjtime
     printf("#define %-32s %d\n", "LINUX_SYS_clock_adjtime", SYS_clock_adjtime);
 #endif
+#ifdef SYS_clock_adjtime64
+    printf("#define %-32s %d\n", "LINUX_SYS_clock_adjtime64", SYS_clock_adjtime64);
+#endif
 #ifdef SYS_clock_getres
     printf("#define %-32s %d\n", "LINUX_SYS_clock_getres", SYS_clock_getres);
 #endif
@@ -522,6 +525,9 @@ main(void)
 #endif
 #ifdef SYS_io_pgetevents
     printf("#define %-32s %d\n", "LINUX_SYS_io_pgetevents", SYS_io_pgetevents);
+#endif
+#ifdef SYS_io_pgetevents_time64
+    printf("#define %-32s %d\n", "LINUX_SYS_io_pgetevents_time64", SYS_io_pgetevents_time64);
 #endif
 #ifdef SYS_io_setup
     printf("#define %-32s %d\n", "LINUX_SYS_io_setup", SYS_io_setup);
@@ -943,6 +949,9 @@ main(void)
 #ifdef SYS_recvmmsg
     printf("#define %-32s %d\n", "LINUX_SYS_recvmmsg", SYS_recvmmsg);
 #endif
+#ifdef SYS_recvmmsg_time64
+    printf("#define %-32s %d\n", "LINUX_SYS_recvmmsg_time64", SYS_recvmmsg_time64);
+#endif
 #ifdef SYS_remap_file_pages
     printf("#define %-32s %d\n", "LINUX_SYS_remap_file_pages", SYS_remap_file_pages);
 #endif
@@ -1041,6 +1050,10 @@ main(void)
 #endif
 #ifdef SYS_sched_rr_get_interval
     printf("#define %-32s %d\n", "LINUX_SYS_sched_rr_get_interval", SYS_sched_rr_get_interval);
+#endif
+#ifdef SYS_sched_rr_get_interval_time64
+    printf("#define %-32s %d\n", "LINUX_SYS_sched_rr_get_interval_time64",
+           SYS_sched_rr_get_interval_time64);
 #endif
 #ifdef SYS_sched_set_affinity
     printf("#define %-32s %d\n", "LINUX_SYS_sched_set_affinity", SYS_sched_set_affinity);
