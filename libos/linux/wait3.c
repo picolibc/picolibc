@@ -34,18 +34,17 @@
  */
 
 #include "local-sigaction.h"
+#include "local-time.h"
+#include <linux/linux-rusage-struct.h>
 #include <sys/wait.h>
 
 pid_t
 wait3(int *wstatus, int options, struct rusage *rusage)
 {
-    int   koptions = 0;
-    pid_t ret;
-    int   kstatus;
-    struct {
-        struct rusage usage;
-        long          space[16];
-    } kusage, *pusage = NULL;
+    int                    koptions = 0;
+    pid_t                  ret;
+    int                    kstatus;
+    struct __kernel_rusage kusage, *pusage = NULL;
 
     if (options & WNOHANG)
         koptions |= LINUX_WNOHANG;
@@ -62,8 +61,10 @@ wait3(int *wstatus, int options, struct rusage *rusage)
         else if (WIFSTOPPED(kstatus))
             kstatus = __W_EXITCODE(_signal_from_linux(WSTOPSIG(kstatus)), 0x7f);
         *wstatus = kstatus;
-        if (rusage)
-            *rusage = kusage.usage;
+        if (rusage) {
+            SIMPLE_MAP_TIMEVAL(&rusage->ru_utime, &kusage.ru_utime);
+            SIMPLE_MAP_TIMEVAL(&rusage->ru_stime, &kusage.ru_stime);
+        }
     }
     return ret;
 }
