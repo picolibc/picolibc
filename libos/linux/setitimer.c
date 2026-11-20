@@ -58,6 +58,22 @@ setitimer(int which, const struct itimerval *new_value, struct itimerval *old_va
 
     MAP_ITV(&kit, new_value);
 
+#if __SIZEOF_LONG__ <= __SIZEOF_INT__
+    /*
+     * The kernel's itimerval holds seconds in a long, and Linux has no
+     * 64-bit version of setitimer. As alarm does, clamp to the range it
+     * holds, about 68 years each way, rather than wrapping
+     */
+    if (new_value->it_value.tv_sec > __LONG_MAX__)
+        kit.it_value.tv_sec = __LONG_MAX__;
+    else if (new_value->it_value.tv_sec < -__LONG_MAX__ - 1)
+        kit.it_value.tv_sec = -__LONG_MAX__ - 1;
+    if (new_value->it_interval.tv_sec > __LONG_MAX__)
+        kit.it_interval.tv_sec = __LONG_MAX__;
+    else if (new_value->it_interval.tv_sec < -__LONG_MAX__ - 1)
+        kit.it_interval.tv_sec = -__LONG_MAX__ - 1;
+#endif
+
     if (old_value)
         pokit = &okit;
 

@@ -45,6 +45,12 @@ alarm(unsigned int seconds)
     struct __kernel_itimerval old, new = { .it_value.tv_sec = (long)seconds };
     unsigned int              retval;
 
+#if __SIZEOF_LONG__ <= __SIZEOF_INT__
+    /* alarm can't fail, so clamp to the longest interval the kernel holds */
+    if (seconds > (unsigned int)__LONG_MAX__)
+        new.it_value.tv_sec = __LONG_MAX__;
+#endif
+
     if (_syscall(LINUX_SYS_setitimer, LINUX_ITIMER_REAL, &new, &old) < 0)
         return 0;
 

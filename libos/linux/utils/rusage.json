@@ -1,0 +1,9 @@
+{
+    "name": "rusage",
+    "headers": [ "linux/resource.h" ],
+    "types": [ "struct timeval" ],
+    "members": [
+	{ "name": "ru_utime", "type": "struct timeval" },
+	{ "name": "ru_stime", "type": "struct timeval" }
+    ]
+}
