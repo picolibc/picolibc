@@ -1,0 +1,80 @@
+#!/bin/bash
+# Copyright (c) Qualcomm Technologies, Inc. and/or its subsidiaries.
+# SPDX-License-Identifier: BSD-3-Clause-Clear
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted (subject to the limitations in the
+# disclaimer below) provided that the following conditions are met:
+#
+#   * Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#
+#   * Redistributions in binary form must reproduce the above
+#     copyright notice, this list of conditions and the following
+#     disclaimer in the documentation and/or other materials provided
+#     with the distribution.
+#
+#   * Neither the name of Qualcomm Technologies, Inc. nor the names of its
+#     contributors may be used to endorse or promote products derived
+#     from this software without specific prior written permission.
+#
+# NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE
+# GRANTED BY THIS LICENSE. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT
+# HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+# WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
+# MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+# IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+# ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE
+# GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER
+# IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
+# OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN
+# IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+# Check that picolibc headers work in C++
+#
+# usage: check-cplusplus-macros <list> <source> <compiler> [args...]
+#
+# Compiles <source> as C++ with -fsyntax-only, then includes each
+# header named in <list> and checks that none of the macros listed
+# there is defined in C++. C++ code may use any name which C++ doesn't
+# define as a macro, so these C-only macros would break it. The
+# compiler arguments should define _GNU_SOURCE so that the headers
+# define everything they can, otherwise a missing C++ check may not
+# show up.
+
+set -o pipefail
+export LC_ALL=C
+
+list="$1"
+source="$2"
+shift 2
+
+"$@" -x c++ -fsyntax-only "$source" || exit 1
+
+entries=$(grep -v -E '^[[:space:]]*(#|$)' "$list")
+if [ -z "$entries" ]; then
+    echo "no macros listed in $list"
+    exit 1
+fi
+
+headers=$(echo "$entries" | awk '{ print $1 }' | sort -u)
+hidden=$(echo "$entries" | awk '{ print $2 }' | sort -u)
+
+macros=$(for header in $headers; do
+             echo "#include <$header>"
+         done | "$@" -x c++ -E -dM - |
+             awk '$1 == "#define" { sub(/\(.*/, "", $2); print $2 }' | sort -u) || exit 1
+
+if ! grep -q -x __PICOLIBC__ <<< "$macros"; then
+    echo "the headers listed in $list are not from picolibc"
+    exit 1
+fi
+
+defined=$(comm -12 <(echo "$hidden") <(echo "$macros"))
+
+if [ -n "$defined" ]; then
+    echo "defined as macros in C++ (see $list):" $defined
+    exit 1
+fi
