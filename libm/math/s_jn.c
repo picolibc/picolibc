@@ -229,23 +229,30 @@ jn64(int n, __float64 x)
         return b;
 }
 
-_MATH_ALIAS_d_id(jn)
-
-    __float64 yn64(int n, __float64 x)
+__float64
+yn64(int n, __float64 x)
 {
     __int32_t i, hx, ix, lx;
     __int32_t sign;
     __float64 a, b, temp;
 
-    EXTRACT_WORDS(hx, lx, x);
-    ix = 0x7fffffff & hx;
-    /* if Y(n,NaN) is NaN */
-
-    if ((ix | lx) == 0)
-        return __math_divzero(1);
-
+    /* Y(n,NaN) is NaN */
     if (isnan(x))
         return x + x;
+
+    EXTRACT_WORDS(hx, lx, x);
+    ix = 0x7fffffff & hx;
+
+    /*
+     * Y(n,0) = -inf, n > 0
+     * Y(-n,x) = (-1)ⁿY(n,x)
+     * ⇒
+     * Y(-n,0) = +inf
+     */
+    if ((ix | lx) == 0) {
+        uint32_t sign = !(n < 0 && (n & 1));
+        return __math_divzero(sign);
+    }
 
     if (hx < 0)
         return __math_invalid(x);
@@ -312,6 +319,8 @@ _MATH_ALIAS_d_id(jn)
         return -b;
 }
 
-_MATH_ALIAS_d_id(yn)
+_MATH_ALIAS_d_id(jn)
+
+    _MATH_ALIAS_d_id(yn)
 
 #endif /* _NEED_FLOAT64 */

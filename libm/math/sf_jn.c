@@ -177,8 +177,16 @@ ynf(int n, float x)
     GET_FLOAT_WORD(hx, x);
     ix = 0x7fffffff & hx;
 
-    if (ix == 0)
-        return __math_divzerof(1);
+    /*
+     * Y(n,0) = -inf, n > 0
+     * Y(-n,x) = (-1)ⁿY(n,x)
+     * ⇒
+     * Y(-n,0) = +inf
+     */
+    if (ix == 0) {
+        uint32_t sign = !(n < 0 && (n & 1));
+        return __math_divzerof(sign);
+    }
 
     if (ix > 0x7f800000)
         return x + x;
