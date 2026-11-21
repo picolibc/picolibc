@@ -41,12 +41,12 @@
  * floating-point exceptions represented by excepts."
  */
 
-__declare_fenv_inline(int) feclearexcept(int excepts)
+__declare_fenv_inline(int) feclearexcept(int __excepts)
 {
 
     /* Mask excepts to be sure only supported flag bits are set */
 
-    excepts &= FE_ALL_EXCEPT;
+    __excepts &= FE_ALL_EXCEPT;
 
     /* Per "The RISC-V Instruction Set Manual: Volume I: User-Level ISA:
      * Version 2.1":
@@ -62,7 +62,7 @@ __declare_fenv_inline(int) feclearexcept(int excepts)
 
     /* Clear the requested flags */
 
-    __asm__ volatile("csrrc zero, fflags, %0" : : "r"(excepts));
+    __asm__ volatile("csrrc zero, fflags, %0" : : "r"(__excepts));
 
     /* Per 'feclearexcept.html
      * "If the argument is zero or if all the specified exceptions were
@@ -84,17 +84,17 @@ __declare_fenv_inline(int) feclearexcept(int excepts)
  *
  */
 
-__declare_fenv_inline(int) fegetenv(fenv_t *envp)
+__declare_fenv_inline(int) fegetenv(fenv_t *__envp)
 {
 
     /* Get the current environment (FCSR) */
 
-    fenv_t fcsr;
-    __asm__ volatile("frcsr %0" : "=r"(fcsr));
+    fenv_t __fcsr;
+    __asm__ volatile("frcsr %0" : "=r"(__fcsr));
 
     /* Store FCSR in envp */
 
-    *envp = fcsr;
+    *__envp = __fcsr;
 
     /* Per 'fegetenv.html:
      *
@@ -117,21 +117,21 @@ __declare_fenv_inline(int) fegetenv(fenv_t *envp)
  * the object pointed to by the argument flagp."
  */
 
-__declare_fenv_inline(int) fegetexceptflag(fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fegetexceptflag(fexcept_t *__flagp, int __excepts)
 {
 
     /* Mask excepts to be sure only supported flag bits are set */
 
-    excepts &= FE_ALL_EXCEPT;
+    __excepts &= FE_ALL_EXCEPT;
 
     /* Get current exception flags */
 
-    fexcept_t flags;
-    __asm__ volatile("frflags %0" : "=r"(flags));
+    fexcept_t __flags;
+    __asm__ volatile("frflags %0" : "=r"(__flags));
 
     /* Return the requested flags in flagp */
 
-    *flagp = flags & excepts;
+    *__flagp = __flags & __excepts;
 
     /* Per 'fegetexceptflag.html:
      *
@@ -157,8 +157,8 @@ __declare_fenv_inline(int) fegetround(void)
 
     /* Get current rounding mode */
 
-    fenv_t frm;
-    __asm__ volatile("frrm %0" : "=r"(frm));
+    fenv_t __frm;
+    __asm__ volatile("frrm %0" : "=r"(__frm));
 
     /* Per 'fegetround.html:
      *
@@ -170,7 +170,7 @@ __declare_fenv_inline(int) fegetround(void)
 
     /* Return the rounding mode */
 
-    return frm;
+    return __frm;
 }
 
 /* This implementation is intended to comply with the following
@@ -186,14 +186,14 @@ __declare_fenv_inline(int) fegetround(void)
  * floating-point exceptions."
  */
 
-__declare_fenv_inline(int) feholdexcept(fenv_t *envp)
+__declare_fenv_inline(int) feholdexcept(fenv_t *__envp)
 {
 
     /* Store the current FP environment in envp*/
 
-    fenv_t fcsr;
-    __asm__ volatile("frcsr %0" : "=r"(fcsr));
-    *envp = fcsr;
+    fenv_t __fcsr;
+    __asm__ volatile("frcsr %0" : "=r"(__fcsr));
+    *__envp = __fcsr;
 
     /* Clear all flags */
 
@@ -229,16 +229,16 @@ __declare_fenv_inline(int) feholdexcept(fenv_t *envp)
  * underflow floating-point exception is implementation-defined."
  */
 
-__declare_fenv_inline(int) feraiseexcept(int excepts)
+__declare_fenv_inline(int) feraiseexcept(int __excepts)
 {
 
     /* Mask excepts to be sure only supported flag bits are set */
 
-    excepts &= FE_ALL_EXCEPT;
+    __excepts &= FE_ALL_EXCEPT;
 
     /* Set the requested exception flags */
 
-    __asm__ volatile("csrs fflags, %0" : : "r"(excepts));
+    __asm__ volatile("csrs fflags, %0" : : "r"(__excepts));
 
     /* Per 'feraiseexcept.html:
      * "If the argument is zero or if all the specified exceptions were
@@ -258,9 +258,9 @@ __declare_fenv_inline(int) feraiseexcept(int excepts)
     return 0;
 }
 
-__declare_fenv_inline(int) fesetexcept(int excepts)
+__declare_fenv_inline(int) fesetexcept(int __excepts)
 {
-    return feraiseexcept(excepts);
+    return feraiseexcept(__excepts);
 }
 
 /* This implementation is intended to comply with the following
@@ -281,13 +281,13 @@ __declare_fenv_inline(int) fesetexcept(int excepts)
  * status flags represented through its argument."
  */
 
-__declare_fenv_inline(int) fesetenv(const fenv_t *envp)
+__declare_fenv_inline(int) fesetenv(const fenv_t *__envp)
 {
 
     /* Set environment (FCSR) */
 
-    fenv_t fcsr = *envp;
-    __asm__ volatile("fscsr %0" : : "r"(fcsr));
+    fenv_t __fcsr = *__envp;
+    __asm__ volatile("fscsr %0" : : "r"(__fcsr));
 
     /* Per 'fegetenv.html:
      *
@@ -315,21 +315,21 @@ __declare_fenv_inline(int) fesetenv(const fenv_t *envp)
  *
  */
 
-__declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
+__declare_fenv_inline(int) fesetexceptflag(const fexcept_t *__flagp, int __excepts)
 {
 
     /* Mask excepts to be sure only supported flag bits are set */
 
-    excepts &= FE_ALL_EXCEPT;
+    __excepts &= FE_ALL_EXCEPT;
 
     /* Set the requested flags */
 
-    fexcept_t flags = *flagp & FE_ALL_EXCEPT;
+    fexcept_t __flags = *__flagp & FE_ALL_EXCEPT;
 
     /* Set new the flags */
 
-    __asm__ volatile("csrc fflags, %0" : : "r"(excepts));
-    __asm__ volatile("csrs fflags, %0" : : "r"(flags & excepts));
+    __asm__ volatile("csrc fflags, %0" : : "r"(__excepts));
+    __asm__ volatile("csrs fflags, %0" : : "r"(__flags & __excepts));
 
     /* Per 'fesetexceptflag.html:
      *
@@ -353,11 +353,11 @@ __declare_fenv_inline(int) fesetexceptflag(const fexcept_t *flagp, int excepts)
  * not changed."
  */
 
-__declare_fenv_inline(int) fesetround(int round)
+__declare_fenv_inline(int) fesetround(int __round)
 {
-    int status = 1;
+    int __status = 1;
 
-    switch (round) {
+    switch (__round) {
     case FE_TONEAREST_MM:
         /* Intentional fall-through */
 
@@ -372,10 +372,10 @@ __declare_fenv_inline(int) fesetround(int round)
 
     case FE_TONEAREST:
         /* Set the rounding mode */
-        __asm__ volatile("fsrm %0" : : "r"(round));
+        __asm__ volatile("fsrm %0" : : "r"(__round));
 
         /* status 0 to indicate successful processing of rounding mode */
-        status = 0;
+        __status = 0;
         break;
 
     default:
@@ -388,7 +388,7 @@ __declare_fenv_inline(int) fesetround(int round)
      * if the requested rounding direction was established."
      */
 
-    return status;
+    return __status;
 }
 
 /* This implementation is intended to comply with the following
@@ -402,17 +402,17 @@ __declare_fenv_inline(int) fesetround(int round)
  * queried."
  */
 
-__declare_fenv_inline(int) fetestexcept(int excepts)
+__declare_fenv_inline(int) fetestexcept(int __excepts)
 {
 
     /* Mask excepts to be sure only supported flag bits are set */
 
-    excepts &= FE_ALL_EXCEPT;
+    __excepts &= FE_ALL_EXCEPT;
 
     /* Read the current flags */
 
-    fexcept_t flags;
-    __asm__ volatile("frflags %0" : "=r"(flags));
+    fexcept_t __flags;
+    __asm__ volatile("frflags %0" : "=r"(__flags));
 
     /* "The fetestexcept() function shall return the value of the
      * bitwise-inclusive OR of the floating-point exception macros
@@ -420,7 +420,7 @@ __declare_fenv_inline(int) fetestexcept(int excepts)
      * included in excepts."
      */
 
-    return (flags & excepts);
+    return (__flags & __excepts);
 }
 
 /* This implementation is intended to comply with the following
@@ -437,22 +437,22 @@ __declare_fenv_inline(int) fetestexcept(int excepts)
  * floating-point environment macro."
  */
 
-__declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
+__declare_fenv_inline(int) feupdateenv(const fenv_t *__envp)
 {
 
     /* Get current exception flags */
 
-    fexcept_t flags;
-    __asm__ volatile("frflags %0" : "=r"(flags));
+    fexcept_t __flags;
+    __asm__ volatile("frflags %0" : "=r"(__flags));
 
     /* Set the environment as requested */
 
-    fenv_t fcsr = *envp;                        /* Environment to install */
-    __asm__ volatile("fscsr %0" : : "r"(fcsr)); /* Install environment */
+    fenv_t __fcsr = *__envp;                      /* Environment to install */
+    __asm__ volatile("fscsr %0" : : "r"(__fcsr)); /* Install environment */
 
     /* OR in the saved exception flags */
 
-    __asm__ volatile("csrs fflags, %0" : : "r"(flags));
+    __asm__ volatile("csrs fflags, %0" : : "r"(__flags));
 
     /* "The feupdateenv() function shall return a zero value if and only
      * if all the required actions were successfully carried out."
@@ -461,15 +461,15 @@ __declare_fenv_inline(int) feupdateenv(const fenv_t *envp)
     return 0;
 }
 
-__declare_fenv_inline(int) feenableexcept(int excepts)
+__declare_fenv_inline(int) feenableexcept(int __excepts)
 {
-    return excepts == 0 ? 0 : -1;
+    return __excepts == 0 ? 0 : -1;
 }
 
-__declare_fenv_inline(int) fedisableexcept(int excepts)
+__declare_fenv_inline(int) fedisableexcept(int __excepts)
 {
-    (void)excepts;
-    return excepts == 0 ? 0 : -1;
+    (void)__excepts;
+    return __excepts == 0 ? 0 : -1;
 }
 
 __declare_fenv_inline(int) fegetexcept(void)
