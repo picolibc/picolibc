@@ -815,7 +815,7 @@ double y0(double __x) __picolibc_export;
 double y1(double __x) __picolibc_export;
 double yn(int __n, double __x) __picolibc_export;
 #endif
-#if __MISC_VISIBLE || __XSI_VISIBLE >= 600
+#if __MISC_VISIBLE
 float j0f(float __x) __picolibc_export;
 float j1f(float __x) __picolibc_export;
 float jnf(int __n, float __x) __picolibc_export;
