@@ -43,6 +43,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <fcntl.h>
 
 #include <ndbm.h>
 #include "hash.h"
@@ -72,6 +73,9 @@ dbm_open(const char *file, int flags, mode_t mode)
         errno = ENAMETOOLONG;
         return (NULL);
     }
+    /* The files of a write-only database are opened for reading and writing */
+    if ((flags & (O_WRONLY | O_RDWR)) == O_WRONLY)
+        flags = (flags & ~O_WRONLY) | O_RDWR;
     (void)strcpy(path, file);
     (void)strcat(path, DBM_SUFFIX);
     return ((DBM *)__hash_open(path, flags, mode, 0, &info));
