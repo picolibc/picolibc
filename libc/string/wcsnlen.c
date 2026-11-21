@@ -57,8 +57,10 @@ wcsnlen(const wchar_t *s, size_t maxlen)
     const wchar_t *p;
 
     p = s;
-    while (*p && maxlen-- > 0)
+    while (maxlen > 0 && *p) {
         p++;
+        maxlen--;
+    }
 
     return (size_t)(p - s);
 }
