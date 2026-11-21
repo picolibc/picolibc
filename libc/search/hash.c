@@ -703,10 +703,13 @@ hash_seq(const DB *dbp, DBT *key, DBT *data, u_int flag)
 #ifdef HASH_STATISTICS
     hash_accesses++;
 #endif
-    if ((hashp->cbucket < 0) || (flag == R_FIRST)) {
+    if (flag == R_FIRST) {
         hashp->cbucket = 0;
         hashp->cndx = 1;
         hashp->cpage = NULL;
+    } else if (hashp->cbucket < 0) {
+        /* Past the end, the scan stays there until it is restarted */
+        return (ABNORMAL);
     }
 
     for (bp = NULL; !bp || !bp[0];) {
