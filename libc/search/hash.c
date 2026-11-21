@@ -180,7 +180,6 @@ __hash_open(const char *file, int flags, int mode, int dflags,
          * max_bucket + 1.
          */
         nsegs = (hashp->MAX_BUCKET + 1 + hashp->SGSIZE - 1) / hashp->SGSIZE;
-        hashp->nsegs = 0;
         if (alloc_segs(hashp, nsegs))
             /*
              * If alloc_segs fails, table will have been destroyed
@@ -885,7 +884,8 @@ alloc_segs(HTAB *hashp, int nsegs)
         return (-1);
     }
     hashp->dir[0] = store;
-    for (i = 1; i < nsegs; i++, hashp->nsegs++)
+    hashp->nsegs = nsegs;
+    for (i = 1; i < nsegs; i++)
         hashp->dir[i] = &store[i << hashp->SSHIFT];
     return (0);
 }
