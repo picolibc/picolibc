@@ -54,7 +54,7 @@ jn64(int n, __float64 x)
     __float64 z, w;
 
     if (isnan(x))
-        return x + x;
+        return opt_barrier_float(x + x);
 
     if (isinf(x))
         return _F_64(0.0);
@@ -238,7 +238,7 @@ yn64(int n, __float64 x)
 
     /* Y(n,NaN) is NaN */
     if (isnan(x))
-        return x + x;
+        return opt_barrier_float(x + x);
 
     EXTRACT_WORDS(hx, lx, x);
     ix = 0x7fffffff & hx;

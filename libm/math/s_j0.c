@@ -86,7 +86,7 @@ j064(__float64 x)
     __int32_t hx, ix;
 
     if (isnan(x))
-        return x + x;
+        return opt_barrier_float(x + x);
 
     if (isinf(x))
         return _F_64(0.0);
@@ -165,7 +165,7 @@ y064(__float64 x)
         return __math_divzero(1);
 
     if (isnan(x))
-        return x + x;
+        return opt_barrier_float(x + x);
 
     if (hx < 0)
         return __math_invalid(x);
