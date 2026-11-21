@@ -953,13 +953,13 @@ int(isnan)(double __x) __picolibc_export;
 
 /* machine/math.h sets __HAVE_FAST_FMA* for targets with fast fma */
 #if !defined(FP_FAST_FMA) && (__HAVE_FAST_FMA || defined(__FP_FAST_FMA))
-#define FP_FAST_FMA
+#define FP_FAST_FMA 1
 #endif
 #if !defined(FP_FAST_FMAF) && (__HAVE_FAST_FMAF || defined(__FP_FAST_FMAF))
-#define FP_FAST_FMAF
+#define FP_FAST_FMAF 1
 #endif
 #if !defined(FP_FAST_FMAL) && (__HAVE_FAST_FMAL || defined(__FP_FAST_FMAL))
-#define FP_FAST_FMAL
+#define FP_FAST_FMAL 1
 #endif
 
 /*
