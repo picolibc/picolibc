@@ -128,23 +128,20 @@ hcreate_r(size_t nel, struct hsearch_data *htab)
 void
 hdestroy_r(struct hsearch_data *htab)
 {
-#if 0
-	struct internal_entry *ie;
-	size_t idx;
-#endif
+    struct internal_entry *ie;
+    size_t                 idx;
+
     if (htab->htable == NULL)
         return;
 
-#if 0
-	for (idx = 0; idx < htab->htablesize; idx++) {
-		while (!SLIST_EMPTY(&(htab->htable[idx]))) {
-			ie = SLIST_FIRST(&(htab->htable[idx]));
-			SLIST_REMOVE_HEAD(&(htab->htable[idx]), link);
-                        free(ie->ent.key);
-			free(ie);
-		}
-	}
-#endif
+    /* The keys and data belong to the application */
+    for (idx = 0; idx < htab->htablesize; idx++) {
+        while (!SLIST_EMPTY(&(htab->htable[idx]))) {
+            ie = SLIST_FIRST(&(htab->htable[idx]));
+            SLIST_REMOVE_HEAD(&(htab->htable[idx]), link);
+            free(ie);
+        }
+    }
     free(htab->htable);
     htab->htable = NULL;
 }
