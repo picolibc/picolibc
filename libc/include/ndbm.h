@@ -40,15 +40,15 @@
 #ifndef _NDBM_H_
 #define _NDBM_H_
 
-#include <sys/types.h> /* For mode_t. */
-/* #include <db.h> */
+#include <sys/cdefs.h>
+#include <sys/_types.h>
+#define __need_size_t
+#include <stddef.h>
 
-/*
- * The above header-file is directly included in `libc/search/ndbm.c`
- * as `db.h` is present in form of `db_local.h`, inside `libc/search`
- * directory and not in `libc/include`.
- * Necessary data-types are mentioned in form of forward-declarations
- */
+#ifndef _MODE_T_DECLARED
+typedef __mode_t mode_t;
+#define _MODE_T_DECLARED
+#endif
 
 /* Map dbm interface onto db(3). */
 #define DBM_RDONLY O_RDONLY
@@ -68,9 +68,7 @@ typedef struct {
     int   dsize; /* XXX Should be size_t according to 1003.1-2008. */
 } datum;
 
-struct __db;            /* Forward-declaration */
-typedef struct __db DB; /* Forward-declaration */
-typedef DB          DBM;
+typedef struct __db DBM;
 #define dbm_pagfno(a) DBM_PAGFNO_NOT_AVAILABLE
 
 _BEGIN_STD_C
