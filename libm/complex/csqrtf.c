@@ -43,9 +43,22 @@ csqrtf(float complex z)
     x = crealf(z);
     y = cimagf(z);
 
+    /* Infinite and NaN parts, as csqrtl handles them */
+    if (isinf(y))
+        return CMPLXF(INFINITY, y);
+    if (isnan(x))
+        return CMPLXF(x, (y - y) / (y - y)); /* NaN + NaN i, invalid unless y is NaN */
+    if (isinf(x)) {
+        if (signbit(x))
+            return CMPLXF(fabsf(y - y), copysignf(x, y));
+        else
+            return CMPLXF(x, copysignf(y - y, y));
+    }
+
     if (y == 0.0f) {
         if (x < 0.0f) {
-            w = CMPLXF(0, sqrtf(-x));
+            /* The sign of zero picks the side of the branch cut */
+            w = CMPLXF(0, copysignf(sqrtf(-x), y));
         } else if (x == 0.0f) {
             w = CMPLXF(0, y);
         } else {

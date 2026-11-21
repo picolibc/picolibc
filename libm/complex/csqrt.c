@@ -77,6 +77,18 @@ csqrt(double complex z)
     x = creal(z);
     y = cimag(z);
 
+    /* Infinite and NaN parts, as csqrtl handles them */
+    if (isinf(y))
+        return CMPLX(INFINITY, y);
+    if (isnan(x))
+        return CMPLX(x, (y - y) / (y - y)); /* NaN + NaN i, invalid unless y is NaN */
+    if (isinf(x)) {
+        if (signbit(x))
+            return CMPLX(fabs(y - y), copysign(x, y));
+        else
+            return CMPLX(x, copysign(y - y, y));
+    }
+
     if (y == 0.0) {
         if (x == 0.0) {
             w = CMPLX(0, y);
@@ -84,7 +96,8 @@ csqrt(double complex z)
             r = fabs(x);
             r = sqrt(r);
             if (x < 0.0) {
-                w = CMPLX(0, r);
+                /* The sign of zero picks the side of the branch cut */
+                w = CMPLX(0, copysign(r, y));
             } else {
                 w = CMPLX(r, y);
             }
