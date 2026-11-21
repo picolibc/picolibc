@@ -60,7 +60,8 @@ cont:
 
     if (c == 0) { /* no non-delimiter characters */
         *lasts = NULL;
-        return (NULL);
+        /* strsep returns the empty last field */
+        return skip_leading_delim ? NULL : s - 1;
     }
     tok = s - 1;
 
