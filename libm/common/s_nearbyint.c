@@ -61,9 +61,11 @@ nearbyint64(__float64 x)
     fenv_t env;
     fegetenv(&env);
     fedisableexcept(FE_INEXACT);
+    x = opt_barrier_float(x);
 #endif
     x = rint64(x);
 #if defined(FE_INEXACT) && !defined(__DOUBLE_NOEXCEPT)
+    x = opt_barrier_float(x);
     fesetenv(&env);
 #endif
     return x;

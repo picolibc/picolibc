@@ -90,18 +90,18 @@ rintl(long double x)
 long double
 nearbyintl(long double x)
 {
-    long double ret;
-
     if (isnan(x))
         return x + x;
 #if defined(FE_INEXACT) && !defined(__LONG_DOUBLE_NOEXCEPT)
     fenv_t env;
     fegetenv(&env);
     fedisableexcept(FE_INEXACT);
+    x = opt_barrier_float(x);
 #endif
-    ret = rintl(x);
+    x = rintl(x);
 #if defined(FE_INEXACT) && !defined(__LONG_DOUBLE_NOEXCEPT)
+    x = opt_barrier_float(x);
     fesetenv(&env);
 #endif
-    return (ret);
+    return (x);
 }

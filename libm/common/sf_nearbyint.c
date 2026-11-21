@@ -22,9 +22,11 @@ nearbyintf(float x)
     fenv_t env;
     fegetenv(&env);
     fedisableexcept(FE_INEXACT);
+    x = opt_barrier_float(x);
 #endif
     x = rintf(x);
 #if defined(FE_INEXACT)
+    x = opt_barrier_float(x);
     fesetenv(&env);
 #endif
     return x;
