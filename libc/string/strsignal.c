@@ -122,8 +122,8 @@ static const char * const signames[] = {
 #ifdef SIGTTIN
     [SIGTTIN] = "Stopped (tty input)",
 #endif
-#ifdef SIGTTOUT
-    [SIGTTOUT] = "Stopped (tty output)",
+#ifdef SIGTTOU
+    [SIGTTOU] = "Stopped (tty output)",
 #endif
 #ifdef SIGIO
 #if defined(SIGPOLL) && (SIGIO != SIGPOLL)
@@ -167,9 +167,9 @@ static __THREAD_LOCAL char _signal_buf[24];
 static inline char *
 _intsig(const char *head, int i)
 {
-    char *buf = _signal_buf;
-    buf = stpcpy(buf, head);
-    if (i >= 100) {
+    char *buf = stpcpy(_signal_buf, head);
+    *buf++ = ' ';
+    if (i < 0 || i >= 100) {
         *buf++ = '?';
     } else {
         if (i >= 10) {
@@ -178,7 +178,7 @@ _intsig(const char *head, int i)
         }
         *buf++ = '0' + i;
     }
-    *buf++ = '\0';
+    *buf = '\0';
     return _signal_buf;
 }
 
@@ -191,7 +191,7 @@ strsignal(int signal)
     }
 #endif
 
-    if ((unsigned)signal < NSIGNAMES)
+    if ((unsigned)signal < NSIGNAMES && signames[(unsigned)signal])
         return (char *)signames[(unsigned)signal];
 
     return _intsig("Unknown signal", signal);
