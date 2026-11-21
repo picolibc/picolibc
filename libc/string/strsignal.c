@@ -51,6 +51,7 @@ QUICKREF
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include "string_private.h"
 
 static const char * const signames[] = {
 #ifdef SIGHUP
@@ -162,12 +163,12 @@ static const char * const signames[] = {
 
 #define NSIGNAMES (sizeof(signames) / sizeof(signames[0]))
 
-static __THREAD_LOCAL char _signal_buf[24];
+static __THREAD_LOCAL char _signal_buf[__STRSIGNAL_BUF];
 
 static inline char *
-_intsig(const char *head, int i)
+_intsig(char *sigbuf, const char *head, int i)
 {
-    char *buf = stpcpy(_signal_buf, head);
+    char *buf = stpcpy(sigbuf, head);
     *buf++ = ' ';
     if (i < 0 || i >= 100) {
         *buf++ = '?';
@@ -179,20 +180,27 @@ _intsig(const char *head, int i)
         *buf++ = '0' + i;
     }
     *buf = '\0';
-    return _signal_buf;
+    return sigbuf;
 }
 
+/* psignal uses this with its own buffer so it doesn't overwrite strsignal's */
 char *
-strsignal(int signal)
+__strsignal_r(int signal, char buf[__STRSIGNAL_BUF])
 {
 #if defined(SIGRTMIN) && defined(SIGRTMAX)
     if ((signal >= SIGRTMIN) && (signal <= SIGRTMAX)) {
-        return _intsig("Real-time signal", signal - SIGRTMIN);
+        return _intsig(buf, "Real-time signal", signal - SIGRTMIN);
     }
 #endif
 
     if ((unsigned)signal < NSIGNAMES && signames[(unsigned)signal])
         return (char *)signames[(unsigned)signal];
 
-    return _intsig("Unknown signal", signal);
+    return _intsig(buf, "Unknown signal", signal);
+}
+
+char *
+strsignal(int signal)
+{
+    return __strsignal_r(signal, _signal_buf);
 }

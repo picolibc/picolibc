@@ -34,12 +34,16 @@ Supporting OS subroutines required: <<close>>, <<fstat>>, <<isatty>>,
 #include <string.h>
 #include <unistd.h>
 #include <signal.h>
+#include "../string/string_private.h"
 
 void
 psignal(int sig, const char *s)
 {
+    char buf[__STRSIGNAL_BUF];
+
     fflush(stderr);
     if (s != NULL && *s != '\0')
         fprintf(stderr, "%s: ", s);
-    fprintf(stderr, "%s\n", strsignal(sig));
+    /* Not strsignal, whose string psignal mustn't overwrite */
+    fprintf(stderr, "%s\n", __strsignal_r(sig, buf));
 }

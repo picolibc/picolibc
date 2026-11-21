@@ -41,4 +41,9 @@
 
 char *_strerror_r(int errnum, int internal, int *errptr);
 
+/* Room for "Real-time signal", a space, two digits and a null */
+#define __STRSIGNAL_BUF 24
+
+char *__strsignal_r(int signal, char buf[__STRSIGNAL_BUF]);
+
 #endif // STRING_PRIVATE_H_
