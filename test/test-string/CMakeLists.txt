@@ -50,6 +50,7 @@ set(tests
   test-strncat_s
   test-strncpy_s
   test-strnlen_s
+  test-strsep
   )
 
 foreach(test IN LISTS tests)
