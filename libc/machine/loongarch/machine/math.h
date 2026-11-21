@@ -74,9 +74,9 @@
 
 #define _fclass_d(_x)                                          \
     (__extension__({                                           \
-        long __fclass;                                         \
-        __asm__("fclass.d %0, %1" : "=f"(__fclass) : "f"(_x)); \
-        __fclass;                                              \
+        union { double f; long i; } __u;                       \
+        __asm__("fclass.d %0, %1" : "=f"(__u.f) : "f"(_x));    \
+        __u.i;                                                 \
     }))
 
 #endif
@@ -89,7 +89,13 @@
 #define _fclass_f(_x)                                          \
     (__extension__({                                           \
         long __fclass;                                         \
-        __asm__("fclass.s %0, %1" : "=f"(__fclass) : "f"(_x)); \
+        __asm__(                                               \
+        "fclass.s $f0, %1\n\t"                                 \
+        "movfr2gr.s %0, $f0"                                   \
+        : "=r"(__fclass)                                       \
+        : "f"(_x)                                              \
+        : "$f0"                                                \
+        );                                                     \
         __fclass;                                              \
     }))
 
