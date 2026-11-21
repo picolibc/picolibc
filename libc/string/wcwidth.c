@@ -93,7 +93,7 @@ PORTABILITY
 #include <wchar.h>
 #include <stdint.h>
 #ifndef __MB_CAPABLE
-#include <wctype.h> /* iswprint, iswcntrl */
+#include <wctype.h> /* iswprint */
 #endif
 #include "local.h"
 
@@ -189,6 +189,10 @@ __wcwidth(const wint_t _ucs)
     if (ucs >= 0x20 && ucs < 0x7f)
         return 1;
 
+    /* The C locale has no printable characters outside ASCII */
+    if (__locale_is_C(0))
+        return -1;
+
     /* Test for control characters */
     if (ucs < 0xa0)
         return -1;
@@ -216,10 +220,10 @@ __wcwidth(const wint_t _ucs)
     else
         return 1;
 #else  /* !__MB_CAPABLE */
+    if (ucs == L'\0')
+        return 0;
     if (iswprint(ucs))
         return 1;
-    if (iswcntrl(ucs) || ucs == L'\0')
-        return 0;
     return -1;
 #endif /* __MB_CAPABLE */
 }
