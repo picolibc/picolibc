@@ -155,11 +155,13 @@ __finite(double x)
     return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
+#if __MISC_VISIBLE
 __declare_extern_inline(int)
 finite(double x)
 {
     return __finite(x);
 }
+#endif
 
 __declare_extern_inline(int)
 __isinfd(double x)
@@ -262,11 +264,13 @@ __finitef(float x)
     return (fclass & (FCLASS_INF | FCLASS_NAN)) == 0;
 }
 
+#if __MISC_VISIBLE
 __declare_extern_inline(int)
 finitef(float x)
 {
     return __finitef(x);
 }
+#endif
 
 __declare_extern_inline(int)
 __isinff(float x)
