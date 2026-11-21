@@ -61,7 +61,9 @@ remquof(float x, float y, int *quo)
     /* purge off exception values */
     if (hy == 0 || hx >= 0x7f800000 || hy > 0x7f800000) { /* y=0,NaN;or x not finite */
         *quo = 0; /* Not necessary, but return consistent value */
-        return (x * y) / (x * y);
+        if (isnan(x) || isnan(y))
+            return x + y;
+        return __math_invalidf(x); /* x infinite or y zero: a domain error */
     }
     if (hx < hy) {
         q = 0;

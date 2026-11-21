@@ -65,8 +65,12 @@ remquol(long double x, long double y, int *quo)
     if ((hy | ly) == 0 ||                      /* y=0 */
         ((hx >> 48) == BIAS + LDBL_MAX_EXP) || /* or x not finite */
         ((hy >> 48) == BIAS + LDBL_MAX_EXP
-         && (((hy & 0x0000ffffffffffffLL) & ~LDBL_NBIT) | ly) != 0)) /* or y is NaN */
-        return (x * y) / (x * y);
+         && (((hy & 0x0000ffffffffffffLL) & ~LDBL_NBIT) | ly) != 0)) { /* or y is NaN */
+        *quo = 0;
+        if (isnan(x) || isnan(y))
+            return x + y;
+        return __math_invalidl(x); /* x infinite or y zero: a domain error */
+    }
     if ((hx >> 48) <= (hy >> 48)) {
         if (((hx >> 48) < (hy >> 48))
             || ((hx & 0x0000ffffffffffffLL) <= (hy & 0x0000ffffffffffffLL)
