@@ -258,10 +258,12 @@ __declare_fenv_inline(int) feraiseexcept(int __excepts)
     return 0;
 }
 
+#if __ISO_C_VISIBLE >= 2023 || __GNU_VISIBLE
 __declare_fenv_inline(int) fesetexcept(int __excepts)
 {
     return feraiseexcept(__excepts);
 }
+#endif
 
 /* This implementation is intended to comply with the following
  * specification:
@@ -461,6 +463,7 @@ __declare_fenv_inline(int) feupdateenv(const fenv_t *__envp)
     return 0;
 }
 
+#if __GNU_VISIBLE
 __declare_fenv_inline(int) feenableexcept(int __excepts)
 {
     return __excepts == 0 ? 0 : -1;
@@ -476,3 +479,4 @@ __declare_fenv_inline(int) fegetexcept(void)
 {
     return 0;
 }
+#endif /* __GNU_VISIBLE */
