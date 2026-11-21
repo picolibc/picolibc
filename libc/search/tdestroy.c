@@ -44,6 +44,7 @@ SUCH DAMAGE.
 #endif /* LIBC_SCCS and not lint */
 #endif
 
+#define _DEFAULT_SOURCE
 #include <assert.h>
 #define _SEARCH_PRIVATE
 #include <search.h>

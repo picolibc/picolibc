@@ -51,11 +51,11 @@ SUCH DAMAGE.
 
 /* find a node, or return 0 */
 void *
-tfind(const void *vkey,   /* key to be found */
-      void      **vrootp, /* address of the tree root */
-      int         (*compar)(const void *, const void *))
+tfind(const void   *vkey,   /* key to be found */
+      void * const *vrootp, /* address of the tree root */
+      int           (*compar)(const void *, const void *))
 {
-    node_t **rootp = (node_t **)vrootp;
+    node_t * const *rootp = (node_t * const *)vrootp;
 
     if (rootp == NULL)
         return NULL;

@@ -46,6 +46,7 @@
 #endif /* LIBC_SCCS and not lint */
 #endif
 
+#define _DEFAULT_SOURCE
 #include <sys/types.h>
 #include <errno.h>
 #include <search.h>
