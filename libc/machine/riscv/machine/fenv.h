@@ -25,12 +25,12 @@
 
 /* compiler-rt has no exceptions in soft-float */
 
-#if __riscv_flen < 128
+#if !defined(__riscv_flen) || __riscv_flen < 128
 #define __LONG_DOUBLE_NOROUND
 #define __LONG_DOUBLE_NOEXCEPT
 #endif
 
-#if __riscv_flen < 64
+#if !defined(__riscv_flen) || __riscv_flen < 64
 #define __DOUBLE_NOROUND
 #define __DOUBLE_NOEXCEPT
 #endif
