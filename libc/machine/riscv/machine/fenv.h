@@ -12,7 +12,7 @@
 #ifndef _MACHINE_FENV_H
 #define _MACHINE_FENV_H
 
-#include <stddef.h>
+#include <sys/_types.h>
 
 #if defined(__riscv_flen) || defined(__riscv_zfinx)
 
@@ -95,8 +95,8 @@
  * floating-point unit."
  */
 
-typedef size_t fenv_t;
-typedef size_t fexcept_t;
+typedef __size_t fenv_t;
+typedef __size_t fexcept_t;
 
 #if !defined(__declare_fenv_inline) && defined(__declare_extern_inline)
 #define __declare_fenv_inline(type) __declare_extern_inline(type)
