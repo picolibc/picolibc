@@ -3657,6 +3657,43 @@ makemathname(test_remainder_neg1_2)(void)
     return makemathname(remainder)(-makemathname(one), makemathname(two));
 }
 
+static FLOAT_T
+makemathname(test_remquo_inf_2)(void)
+{
+    int quo;
+    return makemathname(remquo)(makemathname(infval), makemathname(two), &quo);
+}
+static FLOAT_T
+makemathname(test_remquo_2_0)(void)
+{
+    int quo;
+    return makemathname(remquo)(makemathname(two), makemathname(zero), &quo);
+}
+static FLOAT_T
+makemathname(test_remquo_inf_0)(void)
+{
+    int quo;
+    return makemathname(remquo)(makemathname(infval), makemathname(zero), &quo);
+}
+static FLOAT_T
+makemathname(test_remquo_qnan_0)(void)
+{
+    int quo;
+    return makemathname(remquo)(makemathname(qnanval), makemathname(zero), &quo);
+}
+static FLOAT_T
+makemathname(test_remquo_inf_qnan)(void)
+{
+    int quo;
+    return makemathname(remquo)(makemathname(infval), makemathname(qnanval), &quo);
+}
+static FLOAT_T
+makemathname(test_remquo_1_2)(void)
+{
+    int quo;
+    return makemathname(remquo)(makemathname(one), makemathname(two), &quo);
+}
+
 #endif
 
 static FLOAT_T
@@ -4708,6 +4745,12 @@ TEST_CONST struct {
     TEST(remainder_2_0, (FLOAT_T)NAN, FE_INVALID, EDOM),
     TEST(remainder_1_2, (FLOAT_T)1.0, 0, 0),
     TEST(remainder_neg1_2, -(FLOAT_T)1.0, 0, 0),
+    TEST(remquo_inf_2, (FLOAT_T)NAN, FE_INVALID, REMQUO_DOMAIN_ERRNO),
+    TEST(remquo_2_0, (FLOAT_T)NAN, FE_INVALID, REMQUO_DOMAIN_ERRNO),
+    TEST(remquo_inf_0, (FLOAT_T)NAN, FE_INVALID, REMQUO_DOMAIN_ERRNO),
+    TEST(remquo_qnan_0, (FLOAT_T)NAN, 0, 0),
+    TEST(remquo_inf_qnan, (FLOAT_T)NAN, 0, 0),
+    TEST(remquo_1_2, (FLOAT_T)1.0, 0, 0),
 #endif
 
     TEST(rint_qnan, (FLOAT_T)NAN, 0, 0),

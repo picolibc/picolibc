@@ -194,6 +194,13 @@ e_to_str(int e)
 #define LOGB_POLE_ERRNO ERANGE
 #endif
 
+/* POSIX makes remquo's domain errors set errno; glibc doesn't */
+#ifdef __GLIBC__
+#define REMQUO_DOMAIN_ERRNO 0
+#else
+#define REMQUO_DOMAIN_ERRNO EDOM
+#endif
+
 #ifdef __mcffpu__
 #define SKIP_SNAN_CHECKS
 #endif
