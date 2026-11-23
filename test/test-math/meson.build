@@ -153,6 +153,7 @@ tests_complex_exp = [
 
 tests_complex_other = [
   'test-csqrt',
+  'test-csqrt-special',
   'test-complex-funcs',
   'test-tgmath',
 ]
