@@ -41,6 +41,102 @@
 
 static const char * const errnames[] = {
     [0] = "Success",
+#ifdef ECHRNG
+    [ECHRNG] = "Channel number out of range",
+#endif
+#ifdef EL2NSYNC
+    [EL2NSYNC] = "Level 2 not synchronized",
+#endif
+#ifdef EL3HLT
+    [EL3HLT] = "Level 3 halted",
+#endif
+#ifdef EL3RST
+    [EL3RST] = "Level 3 reset",
+#endif
+#ifdef ELNRNG
+    [ELNRNG] = "Link number out of range",
+#endif
+#ifdef EUNATCH
+    [EUNATCH] = "Protocol driver not attached",
+#endif
+#ifdef ENOCSI
+    [ENOCSI] = "No CSI structure available",
+#endif
+#ifdef EL2HLT
+    [EL2HLT] = "Level 2 halted",
+#endif
+#ifdef EBADE
+    [EBADE] = "Invalid exchange",
+#endif
+#ifdef EBADR
+    [EBADR] = "Invalid request descriptor",
+#endif
+#ifdef EXFULL
+    [EXFULL] = "Exchange full",
+#endif
+#ifdef ENOANO
+    [ENOANO] = "No anode",
+#endif
+#ifdef EBADRQC
+    [EBADRQC] = "Invalid request code",
+#endif
+#ifdef EBADSLT
+    [EBADSLT] = "Invalid slot",
+#endif
+#ifdef EBFONT
+    [EBFONT] = "Bad font file format",
+#endif
+#ifdef ELBIN
+    [ELBIN] = "Inode is remote",
+#endif
+#ifdef EDOTDOT
+    [EDOTDOT] = "RFS specific error",
+#endif
+#if defined(EFTYPE) && (!defined(EBFONT) || (EFTYPE != EBFONT))
+    [EFTYPE] = "Inappropriate file type or format",
+#endif
+#ifdef ENOTUNIQ
+    [ENOTUNIQ] = "Name not unique on network",
+#endif
+#ifdef EBADFD
+    [EBADFD] = "File descriptor in bad state",
+#endif
+#ifdef EREMCHG
+    [EREMCHG] = "Remote address changed",
+#endif
+#ifdef EPFNOSUPPORT
+    [EPFNOSUPPORT] = "Protocol family not supported",
+#endif
+#ifdef ETOOMANYREFS
+    [ETOOMANYREFS] = "Too many references: cannot splice",
+#endif
+#ifdef EPROCLIM
+    [EPROCLIM] = "Too many processes",
+#endif
+#ifdef EUSERS
+    [EUSERS] = "Too many users",
+#endif
+#ifdef ENOMEDIUM
+    [ENOMEDIUM] = "No medium found",
+#endif
+#ifdef EHWPOISON
+    [EHWPOISON] = "Memory page has hardware error",
+#endif
+#ifdef EISNAM
+    [EISNAM] = "Is a named type file",
+#endif
+#ifdef EKEYEXPIRED
+    [EKEYEXPIRED] = "Key has expired",
+#endif
+#ifdef EKEYREJECTED
+    [EKEYREJECTED] = "Key was rejected by service",
+#endif
+#ifdef EKEYREVOKED
+    [EKEYREVOKED] = "Key has been revoked",
+#endif
+#if defined(EDEADLOCK) && (!defined(EDEADLK) || (EDEADLOCK != EDEADLK))
+    [EDEADLOCK] = "File locking deadlock error",
+#endif
 #if defined(EPERM) && (!defined(EACCES) || (EPERM != EACCES))
     [EPERM] = "Not owner",
 #endif
@@ -66,7 +162,7 @@ static const char * const errnames[] = {
     [ENOEXEC] = "Exec format error",
 #endif
 #ifdef EALREADY
-    [EALREADY] = "Socket already connected",
+    [EALREADY] = "Operation already in progress",
 #endif
 #ifdef EBADF
     [EBADF] = "Bad file number",
@@ -111,7 +207,7 @@ static const char * const errnames[] = {
     [EHOSTDOWN] = "Host is down",
 #endif
 #ifdef EINPROGRESS
-    [EINPROGRESS] = "Connection already in progress",
+    [EINPROGRESS] = "Operation now in progress",
 #endif
 #ifdef EISDIR
     [EISDIR] = "Is a directory",
@@ -328,6 +424,12 @@ static const char * const errnames[] = {
 #endif
 #ifdef ETIMEDOUT
     [ETIMEDOUT] = "Connection timed out",
+#endif
+#ifdef EDQUOT
+    [EDQUOT] = "Disk quota exceeded",
+#endif
+#ifdef ESTALE
+    [ESTALE] = "Stale file handle",
 #endif
 };
 
