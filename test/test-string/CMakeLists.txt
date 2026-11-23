@@ -53,6 +53,7 @@ set(tests
   test-strsep
   test-strsignal
   test-strverscmp
+  test-wcwidth
   )
 
 foreach(test IN LISTS tests)

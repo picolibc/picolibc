@@ -56,6 +56,7 @@ tests_mem = [
   'test-strsep',
   'test-strsignal',
   'test-strverscmp',
+  'test-wcwidth',
   ]
 
 tests_string = tests_mem
