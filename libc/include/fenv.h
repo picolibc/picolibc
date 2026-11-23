@@ -26,7 +26,7 @@ _BEGIN_STD_C
 
 #ifdef __declare_fenv_inline
 
-#if __ISO_C_VISIBLE >= 2023
+#if __ISO_C_VISIBLE >= 2023 || __GNU_VISIBLE
 __declare_fenv_inline(int) fetestexceptflag(const fexcept_t *flagp, int excepts)
 {
     return *flagp & excepts & FE_ALL_EXCEPT;

@@ -9,8 +9,17 @@
 #else
 
 #define _GNU_SOURCE // for FE_NOMASK_ENV
+#include <sys/cdefs.h>
 #define __STDC_WANT_IEC_60559_BFP_EXT__
 
+#define __declare_fenv_inline(type) type
+#ifdef __GNUCLIKE_PRAGMA_DIAGNOSTIC
+#pragma GCC diagnostic ignored "-Wpragmas"
+#pragma GCC diagnostic ignored "-Wunknown-warning-option"
+/* We're not declaring the functions before defining them */
+#pragma GCC diagnostic ignored "-Wmissing-declarations"
+#pragma GCC diagnostic ignored "-Wmissing-prototypes"
+#endif
 #include <fenv.h>
 #include <errno.h>
 #include <string.h> // for memcpy

@@ -36,7 +36,6 @@ srcs_fenv = [
   'fenv.c',
   'fegetmode.c',
   'fesetmode.c',
-  'fetestexceptflag.c',
   'fe_dfl_env.c',
 ]
 

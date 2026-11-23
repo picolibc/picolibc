@@ -38,5 +38,4 @@ picolibc_sources(
   fenv.c
   fegetmode.c
   fesetmode.c
-  fetestexceptflag.c
   )
