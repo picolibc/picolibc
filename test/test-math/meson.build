@@ -164,6 +164,7 @@ tests_other = [
   'test-fp-fast-fma',
   'test-long-double',
   'test-math-errhandling',
+  'test-math_h',
   'test-math-funcs',
   'test-narrow-fenv',
   'test-rounding-mode',
@@ -197,7 +198,9 @@ test_extra_c_args = {
 
 test_args = {}
 
+# glibc lacks the POSIX.1-2024 M_ constants
 test_skip_native = [
+  'test-math_h',
 ]
 
 foreach params : targets
