@@ -1930,6 +1930,38 @@ makemathname(test_jn_snan)(void)
 {
     return makemathname(jn)(3, makemathname(snanval));
 }
+
+/* Huge arguments are finite: no overflow from the NaN case's x + x */
+static FLOAT_T
+makemathname(test_j0_big)(void)
+{
+    return makemathname(j0)(makemathname(big));
+}
+static FLOAT_T
+makemathname(test_j1_big)(void)
+{
+    return makemathname(j1)(makemathname(big));
+}
+static FLOAT_T
+makemathname(test_jn_big)(void)
+{
+    return makemathname(jn)(3, makemathname(big));
+}
+static FLOAT_T
+makemathname(test_y0_big)(void)
+{
+    return makemathname(y0)(makemathname(big));
+}
+static FLOAT_T
+makemathname(test_y1_big)(void)
+{
+    return makemathname(y1)(makemathname(big));
+}
+static FLOAT_T
+makemathname(test_yn_big)(void)
+{
+    return makemathname(yn)(3, makemathname(big));
+}
 #endif
 
 #endif
@@ -4553,6 +4585,14 @@ TEST_CONST struct {
     TEST(jn_inf, 0, 0, 0),
     TEST(jn_qnan, (FLOAT_T)NAN, 0, 0),
     TEST(jn_snan, (FLOAT_T)NAN, FE_INVALID, 0),
+    /* Huge arguments don't overflow. jnf and ynf raise underflow too, so jn and yn expect inexact,
+       which masks it */
+    TESTF(j0_big, 0, 0, 0, FLAG_ANY_VALUE),
+    TESTF(j1_big, 0, 0, 0, FLAG_ANY_VALUE),
+    TESTF(jn_big, 0, FE_INEXACT, 0, FLAG_ANY_VALUE),
+    TESTF(y0_big, 0, 0, 0, FLAG_ANY_VALUE),
+    TESTF(y1_big, 0, 0, 0, FLAG_ANY_VALUE),
+    TESTF(yn_big, 0, FE_INEXACT, 0, FLAG_ANY_VALUE),
 #endif
 
 #endif
