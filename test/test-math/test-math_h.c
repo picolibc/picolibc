@@ -41,13 +41,24 @@
 
 /*
  * <math.h> for _XOPEN_SOURCE 800 (POSIX.1-2024): every M_ constant,
- * with a long double form ending in 'l', and no MAXFLOAT, which
- * Issue 8 removed
+ * with a long double form ending in 'l', no MAXFLOAT, which Issue 8
+ * removed, and no float Bessel functions
  */
 
 #ifdef MAXFLOAT
 #error "MAXFLOAT is defined for _XOPEN_SOURCE 800"
 #endif
+
+/*
+ * XSI specifies the Bessel functions for double alone, so the float
+ * ones are the application's names
+ */
+static int j0f __attribute__((unused));
+static int j1f __attribute__((unused));
+static int jnf __attribute__((unused));
+static int y0f __attribute__((unused));
+static int y1f __attribute__((unused));
+static int ynf __attribute__((unused));
 
 static int errors;
 
