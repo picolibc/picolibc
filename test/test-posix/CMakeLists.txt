@@ -40,6 +40,7 @@ set(tests
   test-getdelim
   test-grp
   test-hsearch
+  test-ndbm
   test-ndbm_h
   test-dirent
   test-posix-time
