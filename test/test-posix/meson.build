@@ -41,6 +41,7 @@ tests = [
   'test-getdelim',
   'test-getrlimit',
   'test-grp',
+  'test-hsearch',
   'test-ndbm_h',
   'test-dirent',
   'test-posix-time',

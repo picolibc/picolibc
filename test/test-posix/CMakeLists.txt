@@ -39,6 +39,7 @@ set(tests
   test-getcwd
   test-getdelim
   test-grp
+  test-hsearch
   test-ndbm_h
   test-dirent
   test-posix-time
