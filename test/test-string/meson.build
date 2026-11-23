@@ -54,6 +54,7 @@ tests_mem = [
   'test-strncpy_s',
   'test-strnlen_s',
   'test-strsep',
+  'test-strverscmp',
   ]
 
 tests_string = tests_mem
