@@ -102,6 +102,9 @@ fgetgrent_r(FILE *stream, struct group *grbuf, char *buf, size_t size, struct gr
                 break;
             case gr_mem:
                 grbuf->gr_mem = gr_memp;
+                /* An empty member field is a group with no members */
+                if (*token == '\0')
+                    token = NULL;
                 while ((mem = strsep(&token, ",")) != NULL && n_gr_mem > 1) {
                     *gr_memp++ = mem;
                     n_gr_mem--;
