@@ -3902,6 +3902,22 @@ makemathname(test_yn_0)(void)
 {
     return makemathname(yn)(2, makemathname(zero));
 }
+/* yn(-n, x) is (-1)^n yn(n, x) */
+static FLOAT_T
+makemathname(test_yn_neg1_0)(void)
+{
+    return makemathname(yn)(-1, makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_yn_neg2_0)(void)
+{
+    return makemathname(yn)(-2, makemathname(zero));
+}
+static FLOAT_T
+makemathname(test_yn_neg3_0)(void)
+{
+    return makemathname(yn)(-3, makemathname(zero));
+}
 #endif
 
 #endif
@@ -4908,6 +4924,9 @@ TEST_CONST struct {
     TEST(yn_qnan, (FLOAT_T)NAN, 0, 0),
     TEST(yn_snan, (FLOAT_T)NAN, FE_INVALID, 0),
     TEST(yn_0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
+    TEST(yn_neg1_0, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
+    TEST(yn_neg2_0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
+    TEST(yn_neg3_0, (FLOAT_T)INFINITY, FE_DIVBYZERO, ERANGE),
     TEST(yn_neg, (FLOAT_T)NAN, FE_INVALID, EDOM),
 #endif
 #endif
