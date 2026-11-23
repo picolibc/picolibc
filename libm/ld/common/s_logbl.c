@@ -19,10 +19,8 @@ logbl(long double x)
 
     u.e = x;
     if (u.bits.exp == 0) {
-        if ((u.bits.manl | u.bits.manh) == 0) { /* x == 0 */
-            u.bits.sign = 1;
-            return (1.0L / u.e);
-        }
+        if ((u.bits.manl | u.bits.manh) == 0) /* x == 0, a pole error */
+            return __math_divzerol(1);
         /* denormalized */
 #ifdef LDBL_MANL_SIZE
         if (u.bits.manh == 0) {

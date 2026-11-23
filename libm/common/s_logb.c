@@ -84,9 +84,9 @@ logb64(__float64 x)
     hx &= 0x7fffffff;      /* high |x| */
     if (hx < 0x00100000) { /* 0 or subnormal */
         if ((hx | lx) == 0) {
-            /* arg==0:  return -inf and raise divide-by-zero exception */
-            return -1. / fabs64(x); /* logb(0) = -inf */
-        } else                      /* subnormal x */
+            /* arg==0:  return -inf, a pole error */
+            return __math_divzero(1); /* logb(0) = -inf */
+        } else                        /* subnormal x */
             if (hx == 0) {
                 for (ix = -1043; lx > 0; lx = lsl(lx, 1))
                     ix -= 1;
