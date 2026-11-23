@@ -187,6 +187,13 @@ e_to_str(int e)
 
 #define scat(a, b) a##b
 
+/* POSIX makes logb(0) a pole error; glibc doesn't set errno for it */
+#ifdef __GLIBC__
+#define LOGB_POLE_ERRNO 0
+#else
+#define LOGB_POLE_ERRNO ERANGE
+#endif
+
 #ifdef __mcffpu__
 #define SKIP_SNAN_CHECKS
 #endif

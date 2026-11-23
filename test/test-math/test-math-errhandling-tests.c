@@ -4595,8 +4595,8 @@ TEST_CONST struct {
 
     TEST(logb_qnan, (FLOAT_T)NAN, 0, 0),
     TEST(logb_snan, (FLOAT_T)NAN, FE_INVALID, 0),
-    TEST(logb_0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, 0),
-    TEST(logb_neg0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, 0),
+    TEST(logb_0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, LOGB_POLE_ERRNO),
+    TEST(logb_neg0, -(FLOAT_T)INFINITY, FE_DIVBYZERO, LOGB_POLE_ERRNO),
     TEST(logb_inf, (FLOAT_T)INFINITY, 0, 0),
     TEST(logb_neginf, (FLOAT_T)INFINITY, 0, 0),
 
