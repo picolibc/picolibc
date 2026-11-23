@@ -70,6 +70,25 @@ main(void)
     printf("FP_FAST_FMAL defined but __HAVE_HW_LONG_DOUBLE not defined\n");
     ret = 1;
 #endif
+    /* When defined, each expands to the integer constant 1 */
+#ifdef FP_FAST_FMA
+#if FP_FAST_FMA + 0 != 1
+    printf("FP_FAST_FMA isn't 1\n");
+    ret = 1;
+#endif
+#endif
+#ifdef FP_FAST_FMAF
+#if FP_FAST_FMAF + 0 != 1
+    printf("FP_FAST_FMAF isn't 1\n");
+    ret = 1;
+#endif
+#endif
+#ifdef FP_FAST_FMAL
+#if FP_FAST_FMAL + 0 != 1
+    printf("FP_FAST_FMAL isn't 1\n");
+    ret = 1;
+#endif
+#endif
     if (ret == 0)
         printf("success\n");
     return ret;
