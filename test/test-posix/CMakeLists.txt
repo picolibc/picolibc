@@ -42,6 +42,7 @@ set(tests
   test-dirent
   test-posix-time
   test-pwd
+  test-search_h
   test-signal
   test-stat
   )

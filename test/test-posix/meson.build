@@ -45,6 +45,7 @@ tests = [
   'test-posix-time',
   'test-pwd',
   'test-rename',
+  'test-search_h',
   'test-setrlimit',
   'test-signal',
   'test-stat',
