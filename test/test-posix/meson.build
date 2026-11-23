@@ -74,6 +74,7 @@ if has_os_posix
     'test-syscall-name',
     'test-system',
     'test-time64',
+    'test-wcsnlen',
   ]
 elif host_cpu_family == 'hexagon'
   tests += ['test-system']
