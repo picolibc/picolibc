@@ -41,6 +41,7 @@ tests = [
   'test-getdelim',
   'test-getrlimit',
   'test-grp',
+  'test-ndbm_h',
   'test-dirent',
   'test-posix-time',
   'test-pwd',
@@ -184,7 +185,8 @@ foreach params : targets
 endforeach
 
 # picolibc's sbrk falls back to mmap; other C libraries' doesn't
-test_skip_native = ['test-sbrk-blocked']
+# glibc has no <ndbm.h>
+test_skip_native = ['test-sbrk-blocked', 'test-ndbm_h']
 
 if enable_native_tests
 
