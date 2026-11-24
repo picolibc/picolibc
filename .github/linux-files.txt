@@ -1,5 +1,5 @@
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v20/avr.linux-amd64.tar.xz
-https://github.com/picolibc/picolibc-ci-tools/releases/download/v20/clang-hexagon-toolchain.Linux-x86_64.tar.xz
+https://github.com/quic-k/picolibc-ci-tools/releases/download/v21/clang-hexagon-toolchain.Linux-x86_64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v20/lm32-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v20/loongarch64-unknown-elf.linux-amd64.tar.xz
 https://github.com/picolibc/picolibc-ci-tools/releases/download/v20/m68k-unknown-elf.linux-amd64.tar.xz
