@@ -26,6 +26,7 @@
 
 #define _NEED_IO_FLOAT32
 #include "dtoa.h"
+#include "udivmod10.h"
 
 /*
  * 2^b ~= f * r * 10^e
@@ -132,6 +133,44 @@ __ftoa_engine(uint32_t val, struct dtoa *ftoa, int maxDigits, bool fmode, int ma
         uint8_t  saveMaxDigits = maxDigits;
 
         do {
+#if defined(_UDIVMOD10_DIVIDE_FREE)
+            /*
+             * Skip leading zero digits before computing the first
+             * significant digit so that exp10 tracks the decimal
+             * exponent of the most significant digit.
+             */
+            if (!hadNonzeroDigit) {
+                if (prod < decimal) {
+                    exp10--;
+                    decimal = div10m_64(decimal);
+                    continue;
+                }
+                hadNonzeroDigit = 1;
+                if (fmode) {
+                    maxDigits = min(maxDigits, max(maxDecimals < 0, maxDecimals + exp10 + 1));
+                    if (maxDigits == 0)
+                        break;
+                }
+            }
+
+            /*
+             * Compute one digit and the remainder by repeated
+             * subtraction: digit = prod / decimal, prod = prod %
+             * decimal.  At most 9 iterations since prod < 10*decimal
+             * at every step (prod starts below 10^15 and each step
+             * reduces it below decimal before decimal is divided by
+             * 10).  This replaces the prod / decimal and prod %
+             * decimal pair with 64-bit subtracts and avoids the
+             * soft-division call without needing any digit buffer.
+             */
+            char digit = '0';
+            /* Subnormals may need zero padding after decimal reaches zero. */
+            while (prod != 0 && prod >= decimal) {
+                prod -= decimal;
+                digit++;
+            }
+            decimal = div10m_64(decimal);
+#else  /* _UDIVMOD10_DIVIDE_FREE */
             /* Compute next digit */
             char digit = '0';
             if (prod != 0)
@@ -162,6 +201,7 @@ __ftoa_engine(uint32_t val, struct dtoa *ftoa, int maxDigits, bool fmode, int ma
             if (prod != 0)
                 prod = prod % decimal;
             decimal /= 10;
+#endif /* _UDIVMOD10_DIVIDE_FREE */
 
             /* Now we have a digit. */
             if (digit < '0' + 10) {
