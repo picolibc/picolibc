@@ -35,7 +35,8 @@ static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MAX, (__float64)IN
 HIDDEN __float64
 __math_oflow(uint32_t sign)
 {
-    __float64 y = pick_float64_except((sign ? -VAL : VAL) * VAL, sign ? -VAL : VAL);
+    __float64 v = VAL;
+    __float64 y = pick_float64_except((sign ? -v : v) * v, sign ? -v : v);
     return __math_with_errno(y, ERANGE);
 }
 

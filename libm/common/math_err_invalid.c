@@ -37,7 +37,8 @@ __math_invalid(__float64 x)
 {
     if (isnan(x))
         return pick_float64_except(x + x, VAL);
-    x = pick_float64_except(VAL / VAL, VAL);
+    __float64 v = VAL;
+    x = pick_float64_except(v / v, v);
     return __math_with_errno(x, EDOM);
 }
 
@@ -45,7 +46,8 @@ __math_invalid(__float64 x)
 HIDDEN void
 __math_set_invalid(void)
 {
-    (void)opt_barrier_float(pick_float64_except(VAL / VAL, VAL));
+    __float64 v = VAL;
+    (void)opt_barrier_float(pick_float64_except(v / v, v));
 }
 #endif
 

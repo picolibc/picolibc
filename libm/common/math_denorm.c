@@ -32,14 +32,13 @@
 
 #ifndef __math_denorm
 
-#ifndef __FLOAT64_NOEXCEPT
-static CONST_FORCE_FLOAT64 VAL = _FLOAT64_MIN;
-#endif
+static CONST_FORCE_FLOAT64 VAL = pick_float64_except(_FLOAT64_MIN, _F_64(0.0));
 
 HIDDEN __float64
 __math_denorm(__float64 x)
 {
-    (void)pick_float64_except(opt_barrier_float(VAL * VAL), 0.0);
+    __float64 v = VAL;
+    (void)pick_float64_except(opt_barrier_float(v * v), v);
     return __math_with_errno(x, ERANGE);
 }
 
