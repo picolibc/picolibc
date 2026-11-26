@@ -35,7 +35,8 @@ static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(LDBL_MAX, (long dou
 HIDDEN long double
 __math_oflowl(uint32_t sign)
 {
-    long double y = pick_long_double_except((sign ? -VAL : VAL) * VAL, sign ? -VAL : VAL);
+    long double v = VAL;
+    long double y = pick_long_double_except((sign ? -v : v) * v, sign ? -v : v);
     return __math_with_errnol(y, ERANGE);
 }
 

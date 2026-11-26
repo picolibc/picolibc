@@ -32,14 +32,13 @@
 
 #ifndef __math_denorml
 
-#ifndef __LONG_DOUBLE_NOEXCEPT
-static CONST_FORCE_LONG_DOUBLE VAL = __LDBL_MIN__;
-#endif
+static CONST_FORCE_LONG_DOUBLE VAL = pick_long_double_except(__LDBL_MIN__, 0.0L);
 
 HIDDEN long double
 __math_denorml(long double x)
 {
-    (void)pick_long_double_except(opt_barrier_float(VAL * VAL), 0.0L);
+    long double v = VAL;
+    (void)pick_long_double_except(opt_barrier_float(v * v), v);
     return __math_with_errnol(x, ERANGE);
 }
 

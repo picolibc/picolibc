@@ -37,7 +37,8 @@ __math_invalidl(long double x)
 {
     if (isnanl_inline(x))
         return pick_long_double_except(x + x, VAL);
-    x = pick_long_double_except(VAL / VAL, VAL);
+    long double v = VAL;
+    x = pick_long_double_except(v / v, v);
     return __math_with_errnol(x, EDOM);
 }
 
@@ -45,7 +46,8 @@ __math_invalidl(long double x)
 HIDDEN void
 __math_set_invalidl(void)
 {
-    (void)opt_barrier_float(pick_long_double_except(VAL / VAL, VAL));
+    long double v = VAL;
+    (void)opt_barrier_float(pick_long_double_except(v / v, v));
 }
 #endif
 

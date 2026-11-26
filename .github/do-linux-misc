@@ -16,10 +16,8 @@ HERE=`dirname "$0"`
 "$HERE"/do-build mips64 "$@"
 "$HERE"/do-build mips "$@"
 "$HERE"/do-build mipsel "$@"
-# This is broken in the v20 toolchain
-# "$HERE"/do-test clang-hexagon "$@"
-# TLS is broken in the v20 toolchain
-#"$HERE"/do-test clang-hexagon-linux "$@"
+"$HERE"/do-test clang-hexagon "$@"
+"$HERE"/do-test clang-hexagon-linux "$@"
 "$HERE"/do-test m68k-unknown-elf "$@"
 "$HERE"/do-test sh-unknown-elf "$@"
 "$HERE"/do-avr-build avr "$@"

@@ -36,7 +36,8 @@ __math_invalidf(float x)
 {
     if (isnan(x))
         return pick_float_except(x + x, (float)NAN);
-    x = pick_float_except(VAL / VAL, VAL);
+    float v = VAL;
+    x = pick_float_except(v / v, v);
     return __math_with_errnof(x, EDOM);
 }
 
@@ -44,6 +45,7 @@ __math_invalidf(float x)
 HIDDEN void
 __math_set_invalidf(void)
 {
-    (void)opt_barrier_float(pick_float_except(VAL / VAL, VAL));
+    float v = VAL;
+    (void)opt_barrier_float(pick_float_except(v / v, v));
 }
 #endif

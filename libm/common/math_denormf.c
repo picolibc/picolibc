@@ -30,14 +30,13 @@
 
 #ifndef __math_denormf
 
-#ifndef __FLOAT_NOEXCEPT
-static CONST_FORCE_FLOAT VAL = __FLT_MIN__;
-#endif
+static CONST_FORCE_FLOAT VAL = pick_float_except(__FLT_MIN__, 0.0f);
 
 HIDDEN float
 __math_denormf(float x)
 {
-    (void)pick_float_except(opt_barrier_float(VAL * VAL), 0.0f);
+    float v = VAL;
+    (void)pick_float_except(opt_barrier_float(v * v), v);
     return __math_with_errnof(x, ERANGE);
 }
 
